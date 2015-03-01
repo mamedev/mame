@@ -811,7 +811,9 @@ static void load_gl_lib(running_machine &machine)
 		/* FIXME: must be freed as well */
 #endif
 #endif
+#ifdef USE_DISPATCH_GL
 		gl_dispatch = (osd_gl_dispatch *) osd_malloc(sizeof(osd_gl_dispatch));
+#endif
 		dll_loaded=1;
 	}
 }

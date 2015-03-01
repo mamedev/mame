@@ -19,6 +19,14 @@ namespace bgfx
 #	define BGFX_CHECK_RENDER_THREAD()
 #endif // BGFX_CONFIG_MULTITHREADED && !BX_PLATFORM_OSX && !BX_PLATFORM_IOS
 
+#define BGFX_CHECK_HANDLE(_handle, _max) \
+			BX_CHECK(isValid(_handle) \
+				&& _handle.idx < _max \
+				, "Invalid handle. %d (< %d " #_max ")" \
+				, _handle.idx \
+				, _max \
+				);
+
 #if BX_PLATFORM_ANDROID
 	::ANativeWindow* g_bgfxAndroidWindow = NULL;
 
@@ -797,6 +805,10 @@ namespace bgfx
 
 	void Frame::sort()
 	{
+		for (uint32_t ii = 0, num = m_num; ii < num; ++ii)
+		{
+			m_sortKeys[ii] = SortKey::remapView(m_sortKeys[ii], m_viewRemap);
+		}
 		bx::radixSort64(m_sortKeys, s_ctx->m_tempKeys, m_sortValues, s_ctx->m_tempValues, m_num);
 	}
 
@@ -950,6 +962,11 @@ namespace bgfx
 #else
 		BX_TRACE("Multithreaded renderer is disabled.");
 #endif // BGFX_CONFIG_MULTITHREADED
+
+		for (uint32_t ii = 0; ii < BX_COUNTOF(m_viewRemap); ++ii)
+		{
+			m_viewRemap[ii] = ii;
+		}
 
 		memset(m_fb, 0xff, sizeof(m_fb) );
 		memset(m_clear, 0, sizeof(m_clear) );
@@ -1156,6 +1173,8 @@ namespace bgfx
 		freeDynamicBuffers();
 		m_submit->m_resolution = m_resolution;
 		m_submit->m_debug = m_debug;
+
+		memcpy(m_submit->m_viewRemap, m_viewRemap, sizeof(m_viewRemap) );
 		memcpy(m_submit->m_fb, m_fb, sizeof(m_fb) );
 		memcpy(m_submit->m_clear, m_clear, sizeof(m_clear) );
 		memcpy(m_submit->m_rect, m_rect, sizeof(m_rect) );
@@ -1961,6 +1980,7 @@ again:
 		g_caps.supported = 0
 			| (BGFX_CONFIG_MULTITHREADED ? BGFX_CAPS_RENDERER_MULTITHREADED : 0)
 			;
+		g_caps.maxViews     = BGFX_CONFIG_MAX_VIEWS;
 		g_caps.maxDrawCalls = BGFX_CONFIG_MAX_DRAW_CALLS;
 		g_caps.maxFBAttachments = 1;
 
@@ -2617,60 +2637,74 @@ again:
 		s_ctx->setClearColor(_index, _rgba);
 	}
 
+	bool checkView(uint8_t _id)
+	{
+		// workaround GCC 4.9 type-limit check.
+		const uint32_t id = _id;
+		return id < BGFX_CONFIG_MAX_VIEWS;
+	}
+
 	void setViewName(uint8_t _id, const char* _name)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewName(_id, _name);
 	}
 
 	void setViewRect(uint8_t _id, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewRect(_id, _x, _y, _width, _height);
 	}
 
 	void setViewScissor(uint8_t _id, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewScissor(_id, _x, _y, _width, _height);
 	}
 
 	void setViewClear(uint8_t _id, uint16_t _flags, uint32_t _rgba, float _depth, uint8_t _stencil)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewClear(_id, _flags, _rgba, _depth, _stencil);
 	}
 
 	void setViewClear(uint8_t _id, uint16_t _flags, float _depth, uint8_t _stencil, uint8_t _0, uint8_t _1, uint8_t _2, uint8_t _3, uint8_t _4, uint8_t _5, uint8_t _6, uint8_t _7)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewClear(_id, _flags, _depth, _stencil, _0, _1, _2, _3, _4, _5, _6, _7);
 	}
 
 	void setViewSeq(uint8_t _id, bool _enabled)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewSeq(_id, _enabled);
 	}
 
 	void setViewFrameBuffer(uint8_t _id, FrameBufferHandle _handle)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewFrameBuffer(_id, _handle);
 	}
 
 	void setViewTransform(uint8_t _id, const void* _view, const void* _projL, uint8_t _flags, const void* _projR)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BX_CHECK(_id < BGFX_CONFIG_MAX_VIEWS, "Invalid view id: %d", _id);
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
 		s_ctx->setViewTransform(_id, _view, _projL, _flags, _projR);
+	}
+
+	void setViewRemap(uint8_t _id, uint8_t _num, const void* _remap)
+	{
+		BGFX_CHECK_MAIN_THREAD();
+		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
+		s_ctx->setViewRemap(_id, _num, _remap);
 	}
 
 	void setMarker(const char* _marker)
@@ -2724,18 +2758,21 @@ again:
 	void setUniform(UniformHandle _handle, const void* _value, uint16_t _num)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_UNIFORMS);
 		s_ctx->setUniform(_handle, _value, _num);
 	}
 
 	void setIndexBuffer(IndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_INDEX_BUFFERS);
 		s_ctx->setIndexBuffer(_handle, _firstIndex, _numIndices);
 	}
 
 	void setIndexBuffer(DynamicIndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_INDEX_BUFFERS);
 		s_ctx->setIndexBuffer(_handle, _firstIndex, _numIndices);
 	}
 
@@ -2760,12 +2797,14 @@ again:
 	void setVertexBuffer(VertexBufferHandle _handle, uint32_t _startVertex, uint32_t _numVertices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_VERTEX_BUFFERS);
 		s_ctx->setVertexBuffer(_handle, _startVertex, _numVertices);
 	}
 
 	void setVertexBuffer(DynamicVertexBufferHandle _handle, uint32_t _numVertices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_VERTEX_BUFFERS);
 		s_ctx->setVertexBuffer(_handle, _numVertices);
 	}
 
@@ -2784,24 +2823,28 @@ again:
 	void setInstanceDataBuffer(const InstanceDataBuffer* _idb, uint32_t _num)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BX_CHECK(NULL != _idb, "_idb can't be NULL");
 		s_ctx->setInstanceDataBuffer(_idb, _num);
 	}
 
 	void setInstanceDataBuffer(VertexBufferHandle _handle, uint32_t _startVertex, uint32_t _num)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_VERTEX_BUFFERS);
 		s_ctx->setInstanceDataBuffer(_handle, _startVertex, _num);
 	}
 
 	void setInstanceDataBuffer(DynamicVertexBufferHandle _handle, uint32_t _startVertex, uint32_t _num)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_VERTEX_BUFFERS);
 		s_ctx->setInstanceDataBuffer(_handle, _startVertex, _num);
 	}
 
 	void setProgram(ProgramHandle _handle)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_PROGRAMS);
 		s_ctx->setProgram(_handle);
 	}
 
@@ -2826,37 +2869,41 @@ again:
 	void setBuffer(uint8_t _stage, IndexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_INDEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 
 	void setBuffer(uint8_t _stage, VertexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_VERTEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 
 	void setBuffer(uint8_t _stage, DynamicIndexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_INDEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 
 	void setBuffer(uint8_t _stage, DynamicVertexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
+		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_VERTEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 
-	void setImage(uint8_t _stage, UniformHandle _sampler, TextureHandle _handle, uint8_t _mip, TextureFormat::Enum _format, Access::Enum _access)
+	void setImage(uint8_t _stage, UniformHandle _sampler, TextureHandle _handle, uint8_t _mip, Access::Enum _access, TextureFormat::Enum _format)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		s_ctx->setImage(_stage, _sampler, _handle, _mip, _format, _access);
+		s_ctx->setImage(_stage, _sampler, _handle, _mip, _access, _format);
 	}
 
-	void setImage(uint8_t _stage, UniformHandle _sampler, FrameBufferHandle _handle, uint8_t _attachment, TextureFormat::Enum _format, Access::Enum _access)
+	void setImage(uint8_t _stage, UniformHandle _sampler, FrameBufferHandle _handle, uint8_t _attachment, Access::Enum _access, TextureFormat::Enum _format)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		s_ctx->setImage(_stage, _sampler, _handle, _attachment, _format, _access);
+		s_ctx->setImage(_stage, _sampler, _handle, _attachment, _access, _format);
 	}
 
 	void dispatch(uint8_t _id, ProgramHandle _handle, uint16_t _numX, uint16_t _numY, uint16_t _numZ, uint8_t _flags)
@@ -3466,18 +3513,18 @@ BGFX_C_API uint32_t bgfx_submit(uint8_t _id, int32_t _depth)
 	return bgfx::submit(_id, _depth);
 }
 
-BGFX_C_API void bgfx_set_image(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint8_t _mip, bgfx_texture_format_t _format, bgfx_access_t _access)
+BGFX_C_API void bgfx_set_image(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_texture_handle_t _handle, uint8_t _mip, bgfx_access_t _access, bgfx_texture_format_t _format)
 {
 	union { bgfx_uniform_handle_t c; bgfx::UniformHandle cpp; } sampler = { _sampler };
 	union { bgfx_texture_handle_t c; bgfx::TextureHandle cpp; } handle  = { _handle  };
-	bgfx::setImage(_stage, sampler.cpp, handle.cpp, _mip, bgfx::TextureFormat::Enum(_format), bgfx::Access::Enum(_access) );
+	bgfx::setImage(_stage, sampler.cpp, handle.cpp, _mip, bgfx::Access::Enum(_access), bgfx::TextureFormat::Enum(_format) );
 }
 
-BGFX_C_API void bgfx_set_image_from_frame_buffer(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, bgfx_texture_format_t _format, bgfx_access_t _access)
+BGFX_C_API void bgfx_set_image_from_frame_buffer(uint8_t _stage, bgfx_uniform_handle_t _sampler, bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, bgfx_access_t _access, bgfx_texture_format_t _format)
 {
 	union { bgfx_uniform_handle_t c;      bgfx::UniformHandle cpp;     } sampler = { _sampler };
 	union { bgfx_frame_buffer_handle_t c; bgfx::FrameBufferHandle cpp; } handle  = { _handle };
-	bgfx::setImage(_stage, sampler.cpp, handle.cpp, _attachment, bgfx::TextureFormat::Enum(_format), bgfx::Access::Enum(_access) );
+	bgfx::setImage(_stage, sampler.cpp, handle.cpp, _attachment, bgfx::Access::Enum(_access), bgfx::TextureFormat::Enum(_format) );
 }
 
 BGFX_C_API void bgfx_dispatch(uint8_t _id, bgfx_program_handle_t _handle, uint16_t _numX, uint16_t _numY, uint16_t _numZ, uint8_t _flags)

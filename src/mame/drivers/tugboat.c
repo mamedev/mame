@@ -11,6 +11,7 @@ TODO:
   but the current implementation is a big kludge, and it still looks wrong.
 - colors might not be entirely accurate
   Suspect berenstn is using the wrong color PROM.
+- convert to use the H46505 device.
 
 the problem which caused the controls not to work
 ---
@@ -39,32 +40,37 @@ public:
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_ram(*this, "ram") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	
+	required_shared_ptr<UINT8> m_ram;
 
 	UINT8 m_hd46505_0_reg[18];
 	UINT8 m_hd46505_1_reg[18];
 	int m_reg0;
 	int m_reg1;
 	int m_ctrl;
-	DECLARE_WRITE8_MEMBER(tugboat_hd46505_0_w);
-	DECLARE_WRITE8_MEMBER(tugboat_hd46505_1_w);
-	DECLARE_WRITE8_MEMBER(tugboat_score_w);
-	DECLARE_READ8_MEMBER(tugboat_input_r);
-	DECLARE_WRITE8_MEMBER(tugboat_ctrl_w);
+	emu_timer *m_interrupt_timer;
+	
+	DECLARE_WRITE8_MEMBER(hd46505_0_w);
+	DECLARE_WRITE8_MEMBER(hd46505_1_w);
+	DECLARE_WRITE8_MEMBER(score_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(tugboat);
-	UINT32 screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency);
 
@@ -75,11 +81,13 @@ protected:
 
 void tugboat_state::machine_start()
 {
-	/*save_item(NAME(m_hd46505_0_reg));
+	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	
 	save_item(NAME(m_hd46505_0_reg));
+	save_item(NAME(m_hd46505_1_reg));
 	save_item(NAME(m_reg0));
 	save_item(NAME(m_reg1));
-	save_item(NAME(m_ctrl));*/
+	save_item(NAME(m_ctrl));
 }
 
 void tugboat_state::video_start()
@@ -113,19 +121,19 @@ PALETTE_INIT_MEMBER(tugboat_state, tugboat)
 
 /* see mc6845.c. That file is only a placeholder, I process the writes here
    because I need the start_addr register to handle scrolling */
-WRITE8_MEMBER(tugboat_state::tugboat_hd46505_0_w)
+WRITE8_MEMBER(tugboat_state::hd46505_0_w)
 {
 	if (offset == 0) m_reg0 = data & 0x0f;
 	else if (m_reg0 < 18) m_hd46505_0_reg[m_reg0] = data;
 }
-WRITE8_MEMBER(tugboat_state::tugboat_hd46505_1_w)
+WRITE8_MEMBER(tugboat_state::hd46505_1_w)
 {
 	if (offset == 0) m_reg1 = data & 0x0f;
 	else if (m_reg1 < 18) m_hd46505_1_reg[m_reg1] = data;
 }
 
 
-WRITE8_MEMBER(tugboat_state::tugboat_score_w)
+WRITE8_MEMBER(tugboat_state::score_w)
 {
 		if (offset>=0x8) m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
 		if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
@@ -168,7 +176,7 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 	}
 }
 
-UINT32 tugboat_state::screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int startaddr0 = m_hd46505_0_reg[0x0c]*256 + m_hd46505_0_reg[0x0d];
 	int startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
@@ -181,7 +189,7 @@ UINT32 tugboat_state::screen_update_tugboat(screen_device &screen, bitmap_ind16 
 
 
 
-READ8_MEMBER(tugboat_state::tugboat_input_r)
+READ8_MEMBER(tugboat_state::input_r)
 {
 	if (~m_ctrl & 0x80)
 		return ioport("IN0")->read();
@@ -195,7 +203,7 @@ READ8_MEMBER(tugboat_state::tugboat_input_r)
 		return ioport("IN4")->read();
 }
 
-WRITE8_MEMBER(tugboat_state::tugboat_ctrl_w)
+WRITE8_MEMBER(tugboat_state::ctrl_w)
 {
 	m_ctrl = data;
 }
@@ -206,7 +214,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_INTERRUPT:
 		m_maincpu->set_input_line(0, HOLD_LINE);
-		timer_set(m_screen->frame_period(), TIMER_INTERRUPT);
+		m_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in tugboat_state::device_timer");
@@ -215,7 +223,7 @@ void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void tugboat_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(0), TIMER_INTERRUPT);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -223,12 +231,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tugboat_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)  /* scrolling is performed changing the start_addr register (0C/0D) */
-	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(tugboat_hd46505_1_w)
+	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(hd46505_0_w)  /* scrolling is performed changing the start_addr register (0C/0D) */
+	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(hd46505_1_w)
 	AM_RANGE(0x11e4, 0x11e7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x11e8, 0x11eb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	//AM_RANGE(0x1700, 0x1fff) AM_RAM
-	AM_RANGE(0x18e0, 0x18ef) AM_WRITE(tugboat_score_w)
+	AM_RANGE(0x18e0, 0x18ef) AM_WRITE(score_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM /* tilemap RAM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -352,17 +360,17 @@ static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,tugboat_input_r))
+	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,input_r))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tugboat_state, tugboat_ctrl_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tugboat_state, ctrl_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8,32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update_tugboat)
+	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tugboat)
@@ -460,6 +468,6 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat, driver_device,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",    GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, noahsark, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, berenstn, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1982, tugboat,  0, tugboat, tugboat, driver_device,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",    GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1983, noahsark, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, berenstn, 0, tugboat, noahsark, driver_device, 0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

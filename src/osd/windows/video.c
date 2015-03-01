@@ -32,7 +32,7 @@
 //  GLOBAL VARIABLES
 //============================================================
 
-win_video_config video_config;
+osd_video_config video_config;
 
 
 
@@ -170,7 +170,7 @@ float win_monitor_info::aspect()
 //  winvideo_monitor_from_handle
 //============================================================
 
-win_monitor_info *winvideo_monitor_from_handle(HMONITOR hmonitor)
+win_monitor_info *win_monitor_info::monitor_from_handle(HMONITOR hmonitor)
 {
 	win_monitor_info *monitor;
 
@@ -297,18 +297,15 @@ static win_monitor_info *pick_monitor(windows_options &options, int index)
 	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
 
 	// look for a match in the name first
-	if (scrname[0] != 0)
+	if (scrname != NULL && (scrname[0] != 0))
+	{
 		for (monitor = win_monitor_list; monitor != NULL; monitor = monitor->m_next)
 		{
-			int rc = 1;
-
 			moncount++;
-
-			rc = strcmp(scrname, monitor->devicename());
-
-			if (rc == 0)
+			if (strcmp(scrname, monitor->devicename()) == 0)
 				goto finishit;
 		}
+	}
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
@@ -365,6 +362,7 @@ void windows_osd_interface::extract_video_config()
 	// global options: extract the data
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
+	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 
@@ -414,10 +412,70 @@ void windows_osd_interface::extract_video_config()
 	// ddraw options: extract the data
 	video_config.hwstretch     = options().hwstretch();
 
-	// d3d options: extract the data
-	video_config.filter        = options().filter();
-	if (video_config.prescale == 0)
+	if (video_config.prescale < 1 || video_config.prescale > 3)
+	{
+		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;
+	}
+	#if (USE_OPENGL)
+		// default to working video please
+		video_config.forcepow2texture = options().gl_force_pow2_texture();
+		video_config.allowtexturerect = !(options().gl_no_texture_rect());
+		video_config.vbo         = options().gl_vbo();
+		video_config.pbo         = options().gl_pbo();
+		video_config.glsl        = options().gl_glsl();
+		if ( video_config.glsl )
+		{
+			int i;
+
+			video_config.glsl_filter = options().glsl_filter();
+
+			video_config.glsl_shader_mamebm_num=0;
+
+			for(i=0; i<GLSL_SHADER_MAX; i++)
+			{
+				stemp = options().shader_mame(i);
+				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				{
+					video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
+					strcpy(video_config.glsl_shader_mamebm[i], stemp);
+					video_config.glsl_shader_mamebm_num++;
+				} else {
+					video_config.glsl_shader_mamebm[i] = NULL;
+				}
+			}
+
+			video_config.glsl_shader_scrn_num=0;
+
+			for(i=0; i<GLSL_SHADER_MAX; i++)
+			{
+				stemp = options().shader_screen(i);
+				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
+				{
+					video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
+					strcpy(video_config.glsl_shader_scrn[i], stemp);
+					video_config.glsl_shader_scrn_num++;
+				} else {
+					video_config.glsl_shader_scrn[i] = NULL;
+				}
+			}
+		} else {
+			int i;
+			video_config.glsl_filter = 0;
+			video_config.glsl_shader_mamebm_num=0;
+			for(i=0; i<GLSL_SHADER_MAX; i++)
+			{
+				video_config.glsl_shader_mamebm[i] = NULL;
+			}
+			video_config.glsl_shader_scrn_num=0;
+			for(i=0; i<GLSL_SHADER_MAX; i++)
+			{
+				video_config.glsl_shader_scrn[i] = NULL;
+			}
+		}
+
+	#endif /* USE_OPENGL */
+
 }
 
 

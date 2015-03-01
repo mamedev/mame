@@ -72,6 +72,7 @@ public:
 	DECLARE_WRITE8_MEMBER(suprgolf_writeB);
 	DECLARE_DRIVER_INIT(suprgolf);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+    virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_suprgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -249,6 +250,12 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_bg_vram_w)
 	}
 }
 
+void suprgolf_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 16, memregion("user2")->base(), 0x4000);
+    membank("bank2")->configure_entries(0, 64, memregion("user1")->base(), 0x4000);
+}
+
 WRITE8_MEMBER(suprgolf_state::suprgolf_pen_w)
 {
 	m_vreg_pen = data;
@@ -266,14 +273,11 @@ READ8_MEMBER(suprgolf_state::rom_bank_select_r)
 
 WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 {
-	UINT8 *region_base = memregion("user1")->base();
+    m_rom_bank = data;
 
-	m_rom_bank = data;
-
-	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
-
-//  osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space.device().safe_pcbase());
-	membank("bank2")->set_base(region_base + (data&0x3f ) * 0x4000);
+    //popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
+    //osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,space.device().safe_pcbase());
+    membank("bank2")->set_entry(data & 0x3f);
 
 	m_msm_nmi_mask = data & 0x40;
 	flip_screen_set(data & 0x80);
@@ -281,11 +285,9 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 
 WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 {
-	UINT8 *region_base = memregion("user2")->base();
-//  osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,space.device().safe_pcbase());
-
-	membank("bank1")->set_base(region_base + (data&0x0f) * 0x4000);
-
+    //osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,space.device().safe_pcbase());
+    membank("bank1")->set_entry(data & 0x0f);
+    
 	if(data & 0xf0)
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }

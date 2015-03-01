@@ -11,25 +11,6 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-struct GAMATE_CHANNEL
-{
-	GAMATE_CHANNEL() :
-//      on(0),
-//      waveform(0),
-		volume(0),
-		pos(0),
-		size(0)
-//      count(0)
-	{
-	}
-
-	int on;
-	int /*waveform,*/ volume;
-	int pos;
-	int size;
-//  int count;
-};
-
 
 // ======================> gamate_sound_device
 
@@ -49,11 +30,46 @@ protected:
 
 public:
 	DECLARE_WRITE8_MEMBER( device_w );
+	DECLARE_READ8_MEMBER( device_r );
 
 private:
 
+	static const int DAConverter[];
+	static int Value2Volume(int volume) { return DAConverter[volume]*1; }
+
 	sound_stream *m_mixer_channel;
-	GAMATE_CHANNEL m_channels[3];
+	struct Tone
+	{
+	  Tone() :
+		envelope_on(false),
+		level(false),
+		tone(false), full_cycle(false),
+		volume(0),
+		pos(0),
+		size(0)
+	  {
+	  }
+
+	  bool envelope_on, level;
+	  bool tone/*else noise*/, full_cycle/* else square signal/pulse */;
+	  int volume;
+	  int pos, size;
+	};
+	enum { Right, Left, Both };
+	Tone m_channels[3];
+	struct Noise {
+	  Noise(): state(1), level(false), step(0.0), pos(0.0) {}
+	  int state;
+	  bool level;
+	  double step, pos;
+	} noise;
+	struct Envelope {
+	  Envelope():control(0), index(0), first(false) {}
+	  int control;
+	  int index;
+	  bool first;
+	  double step, pos;
+	} envelope;
 	UINT8 reg[14];
 };
 

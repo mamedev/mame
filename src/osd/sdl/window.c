@@ -1472,17 +1472,17 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 			break;
 
 		case WMSZ_BOTTOMLEFT:
-			ret = rect.move_by(-adjwidth, 0).resize(rect.width(), rect.height() + adjheight);
+			ret = rect.move_by(-adjwidth, 0).resize(rect.width() + adjwidth, rect.height() + adjheight);
 			break;
 
 		case WMSZ_LEFT:
 		case WMSZ_TOPLEFT:
 		case WMSZ_TOP:
-			ret = rect.move_by(-adjwidth, -adjheight);
+			ret = rect.move_by(-adjwidth, -adjheight).resize(rect.width() + adjwidth, rect.height() + adjheight);
 			break;
 
 		case WMSZ_TOPRIGHT:
-			ret = rect.move_by(0, -adjheight).resize(rect.width() + adjwidth, rect.height());
+			ret = rect.move_by(0, -adjheight).resize(rect.width() + adjwidth, rect.height() + adjheight);
 			break;
 }
 	return ret;
@@ -1498,6 +1498,8 @@ osd_rect sdl_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 osd_dim sdl_window_info::get_min_bounds(int constrain)
 {
 	INT32 minwidth, minheight;
+
+	//assert(GetCurrentThreadId() == window_threadid);
 
 	// get the minimum target size
 	m_target->compute_minimum_size(minwidth, minheight);
@@ -1548,9 +1550,11 @@ osd_dim sdl_window_info::get_min_bounds(int constrain)
 
 osd_dim sdl_window_info::get_max_bounds(int constrain)
 {
-	// compute the maximum client area
+	//assert(GetCurrentThreadId() == window_threadid);
 
-	osd_rect maximum = m_monitor->position_size();
+	// compute the maximum client area
+	// m_monitor->refresh();
+	osd_rect maximum = m_monitor->usuable_position_size();
 
 	// clamp to the window's max
 	int tempw = maximum.width();

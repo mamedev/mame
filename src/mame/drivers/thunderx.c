@@ -312,14 +312,8 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 
 WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	int offs;
-
-//logerror("%04x: bank switch %02x\n",space.device().safe_pc(),data);
-
-	/* bits 0-3 ROM bank */
-	offs = 0x10000 + (data & 0x0f)*0x2000;
-	membank("bank1")->set_base(&RAM[offs] );
+    // logerror("%04x: bank switch %02x\n", space.device().safe_pc(), data & 0x0f);
+    membank("bank1")->set_entry(data & 0x0f);
 
 	/* bit 4 select work RAM or palette RAM at 5800-5fff */
 	m_palette_selected = ~data & 0x10;
@@ -585,6 +579,8 @@ MACHINE_START_MEMBER(thunderx_state,scontra)
 	save_item(NAME(m_palette_selected));
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_pmcbank));
+    
+    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 MACHINE_START_MEMBER(thunderx_state,thunderx)

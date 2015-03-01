@@ -179,7 +179,7 @@ void ssv_state::update_irq_state()
 	m_maincpu->set_input_line(0, (m_requested_int & m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(ssv_state::ssv_irq_callback)
+IRQ_CALLBACK_MEMBER(ssv_state::irq_callback)
 {
 	int i;
 	for ( i = 0; i <= 7; i++ )
@@ -193,7 +193,7 @@ IRQ_CALLBACK_MEMBER(ssv_state::ssv_irq_callback)
 	return 0;
 }
 
-WRITE16_MEMBER(ssv_state::ssv_irq_ack_w)
+WRITE16_MEMBER(ssv_state::irq_ack_w)
 {
 	int level = ((offset * 2) & 0x70) >> 4;
 
@@ -220,12 +220,12 @@ WRITE16_MEMBER(ssv_state::ssv_irq_ack_w)
     ultrax:     40,00 at the start then 42,4a
     twineag2:   40,00 at the start then 42,4a
 */
-WRITE16_MEMBER(ssv_state::ssv_irq_enable_w)
+WRITE16_MEMBER(ssv_state::irq_enable_w)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::ssv_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::interrupt)
 {
 	int scanline = param;
 
@@ -283,7 +283,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::gdfs_interrupt)
     survarts:   83
     sxyreact:   80
 */
-WRITE16_MEMBER(ssv_state::ssv_lockout_w)
+WRITE16_MEMBER(ssv_state::lockout_w)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -293,12 +293,12 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_w)
 		coin_counter_w(machine(), 1, data & 0x04);
 		coin_counter_w(machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video(data & 0x80);
+		enable_video(data & 0x80);
 	}
 }
 
 /* Same as above but with inverted lockout lines */
-WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
+WRITE16_MEMBER(ssv_state::lockout_inv_w)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -308,7 +308,7 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
 		coin_counter_w(machine(), 1, data & 0x04);
 		coin_counter_w(machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video(data & 0x80);
+		enable_video(data & 0x80);
 	}
 }
 
@@ -396,19 +396,19 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("spriteram")                                       /*  Sprites */  \
 	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette */\
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM                                                             /*          */  \
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(ssv_vblank_r           )                                   /*  Vblank? */  \
+	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(vblank_r           )                                   /*  Vblank? */  \
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY                                    /*  Scroll  */  \
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_SHARE("scroll")                  /*  Scroll  */  \
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(scroll_w) AM_SHARE("scroll")                  /*  Scroll  */  \
 	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")                                                               \
 	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")                                                               \
 	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")                                                                 \
 	AM_RANGE(0x21000a, 0x21000b) AM_READ_PORT("P2")                                                                 \
 	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")                                                             \
-	AM_RANGE(0x21000e, 0x21000f) AM_READNOP AM_WRITE(ssv_lockout_w)                             /*  Lockout */  \
+	AM_RANGE(0x21000e, 0x21000f) AM_READNOP AM_WRITE(lockout_w)                             /*  Lockout */  \
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                                        \
 	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_SHARE("irq_vectors")                       /*  IRQ Vec */  \
-	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                           /*  IRQ Ack */  \
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                                         /*  IRQ En  */  \
+	AM_RANGE(0x240000, 0x240071) AM_WRITE(irq_ack_w )                                           /*  IRQ Ack */  \
+	AM_RANGE(0x260000, 0x260001) AM_WRITE(irq_enable_w)                                         /*  IRQ En  */  \
 	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0x00ff)    /*  Sound   */  \
 	AM_RANGE(_ROM, 0xffffff) AM_ROM AM_REGION("maincpu", 0)                                         /*  ROM     */
 /***************************************************************************
@@ -513,7 +513,7 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)            // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)            // Inverted lockout lines
+	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)            // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(hypreact_input_r)              // Inputs
 	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_SHARE("input_sel")           //
@@ -529,7 +529,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)                // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)                // Inverted lockout lines
+	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
 	AM_RANGE(0x500000, 0x500001) AM_READ(hypreact_input_r)                  // Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ(hypreact_input_r)                  // (again?)
@@ -587,18 +587,18 @@ ADDRESS_MAP_END
 
 /* Monster Slider needs the RAM mirrored for the gameplay logic to work correctly */
 
-READ16_MEMBER(ssv_state::ssv_mainram_r)
+READ16_MEMBER(ssv_state::mainram_r)
 {
 	return m_mainram[offset];
 }
 
-WRITE16_MEMBER(ssv_state::ssv_mainram_w)
+WRITE16_MEMBER(ssv_state::mainram_w)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
 static ADDRESS_MAP_START( mslider_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x010000, 0x01ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w) // RAM Mirror
+	AM_RANGE(0x010000, 0x01ffff) AM_READWRITE(mainram_r, mainram_w) // RAM Mirror
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY                           // ?
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP                          // ? ff at the start
@@ -684,7 +684,7 @@ static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x050faf) AM_RAM                                     // More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)                // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)                // Coin Counters / Lockouts
+	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                // Coin Counters / Lockouts
 	AM_RANGE(0x300076, 0x300077) AM_READ(srmp7_irqv_r)                      // Sound
 //  0x540000, 0x540003, related to lev 5 irq?
 	AM_RANGE(0x580000, 0x580001) AM_WRITE(srmp7_sound_bank_w)               // Sound Bank
@@ -751,10 +751,10 @@ WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
 }
 
 static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16, ssv_state )
-//  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)             // sxyreac2 reads / writes here, why?
+//  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(mainram_r, mainram_w)             // sxyreac2 reads / writes here, why?
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)                            // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)                            // Inverted lockout lines
+	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
 	AM_RANGE(0x500002, 0x500003) AM_READ(sxyreact_ballswitch_r)                         // ?
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(sxyreact_dial_r, sxyreact_motor_w)        // Dial Value (serial)
 	AM_RANGE(0x520000, 0x520001) AM_WRITE(sxyreact_dial_w)                              // Dial Value (advance 1 bit)
@@ -828,7 +828,7 @@ WRITE16_MEMBER(ssv_state::latch16_w)
 }
 
 static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x050000, 0x05ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w) // RAM Mirror?
+	AM_RANGE(0x050000, 0x05ffff) AM_READWRITE(mainram_r, mainram_w) // RAM Mirror?
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)               // Watchdog
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM                                     // RAM?
 	AM_RANGE(0x900000, 0x900007) AM_READWRITE(latch16_r, latch16_w)
@@ -898,7 +898,7 @@ static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(eaglshot_gfxram_r, eaglshot_gfxram_w)
 	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_READ(watchdog_reset16_r)*/                 // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)                            // Inverted lockout lines
+	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(eaglshot_gfxrom_bank_w)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(eaglshot_trackball_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROMBANK("gfxrom")
@@ -2481,7 +2481,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void ssv_state::init_ssv(int interrupt_ultrax)
+void ssv_state::init(int interrupt_ultrax)
 {
 	int i;
 	for (i = 0; i < 16; i++)
@@ -2489,8 +2489,11 @@ void ssv_state::init_ssv(int interrupt_ultrax)
 								( (i & 4) ? (2 << 16) : 0 ) +
 								( (i & 2) ? (4 << 16) : 0 ) +
 								( (i & 1) ? (8 << 16) : 0 ) ;
-	ssv_enable_video(1);
+	enable_video(1);
 	m_interrupt_ultrax = interrupt_ultrax;
+	
+	save_item(NAME(m_requested_int));
+	save_item(NAME(m_irq_enable));
 }
 
 void ssv_state::init_hypreac2_common()
@@ -2528,30 +2531,30 @@ void ssv_state::init_st010()
 	}
 }
 
-DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init_ssv(0); init_st010();  }
-DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init_ssv(0); init_eaglshot_banking();    }
-DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {    init_ssv(0); init_hypreac2_common();    }
-DRIVER_INIT_MEMBER(ssv_state,janjans1)     {    init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,keithlcy)     {    init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init_ssv(0);
+DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); save_item(NAME(m_trackball_select)); }
+DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); save_item(NAME(m_gdfs_lightgun_select)); save_item(NAME(m_gdfs_eeprom_old)); }
+DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init(0); }
+DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {    init(0); init_hypreac2_common();    }
+DRIVER_INIT_MEMBER(ssv_state,janjans1)     {    init(0); }
+DRIVER_INIT_MEMBER(ssv_state,keithlcy)     {    init(0); }
+DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init(0); }
+DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init(0); }
+DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init(0); }
+DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init(0);
 //  ((UINT16 *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
-DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init_ssv(0); init_st010(); }
-DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init_ssv(0); init_hypreac2_common();    }
-DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init_ssv(0); init_hypreac2_common();    }
-DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init_ssv(0); init_hypreac2_common();    }
-DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init_ssv(1); init_st010();  }
-DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init_ssv(1); }
-DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init_ssv(0); }
-DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init(0); }
+DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); init_st010(); }
+DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init(0); }
+DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init(0); }
+DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
+DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init(0); init_hypreac2_common();    }
+DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
+DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init(1); }
+DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init(0); }
+DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latches)); }
 
 #define SSV_MASTER_CLOCK XTAL_48MHz/3
 
@@ -2567,14 +2570,14 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,ssv_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ssv_state,irq_callback)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, ssv_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(SSV_PIXEL_CLOCK,SSV_HTOTAL,SSV_HBEND,SSV_HBSTART,SSV_VTOTAL,SSV_VBEND,SSV_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_ssv)
+	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssv)
@@ -4706,58 +4709,58 @@ ROM_END
 
 //     year   rom       clone     machine   inputs    init      monitor manufacturer          title                                               flags
 
-GAME( 1993,  dynagear,  0,        dynagear, dynagear, ssv_state, dynagear, ROT0,   "Sammy",              "Dyna Gear",                                                              GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993,  dynagear,  0,        dynagear, dynagear, ssv_state, dynagear, ROT0,   "Sammy",              "Dyna Gear",                                                              GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1993,  keithlcy,  0,        keithlcy, keithlcy, ssv_state, keithlcy, ROT0,   "Visco",              "Dramatic Adventure Quiz Keith & Lucy (Japan)",                           GAME_NO_COCKTAIL )
+GAME( 1993,  keithlcy,  0,        keithlcy, keithlcy, ssv_state, keithlcy, ROT0,   "Visco",              "Dramatic Adventure Quiz Keith & Lucy (Japan)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1993,  srmp4,     0,        srmp4,    srmp4,    ssv_state, srmp4,    ROT0,   "Seta",               "Super Real Mahjong PIV (Japan)",                                         GAME_NO_COCKTAIL )
-GAME( 1993,  srmp4o,    srmp4,    srmp4,    srmp4,    ssv_state, srmp4,    ROT0,   "Seta",               "Super Real Mahjong PIV (Japan, older set)",                              GAME_NO_COCKTAIL ) // by the numbering of the program roms this should be older
+GAME( 1993,  srmp4,     0,        srmp4,    srmp4,    ssv_state, srmp4,    ROT0,   "Seta",               "Super Real Mahjong PIV (Japan)",                                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993,  srmp4o,    srmp4,    srmp4,    srmp4,    ssv_state, srmp4,    ROT0,   "Seta",               "Super Real Mahjong PIV (Japan, older set)",                              GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // by the numbering of the program roms this should be older
 
-GAME( 1993,  survarts,  0,        survarts, survarts, ssv_state, survarts, ROT0,   "Sammy",              "Survival Arts (World)",                                                  GAME_NO_COCKTAIL )
-GAME( 1993,  survartsu, survarts, survarts, survarts, ssv_state, survarts, ROT0,   "American Sammy",     "Survival Arts (USA)",                                                    GAME_NO_COCKTAIL )
-GAME( 1993,  survartsj, survarts, survarts, survarts, ssv_state, survarts, ROT0,   "Sammy",              "Survival Arts (Japan)",                                                  GAME_NO_COCKTAIL )
+GAME( 1993,  survarts,  0,        survarts, survarts, ssv_state, survarts, ROT0,   "Sammy",              "Survival Arts (World)",                                                  GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993,  survartsu, survarts, survarts, survarts, ssv_state, survarts, ROT0,   "American Sammy",     "Survival Arts (USA)",                                                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993,  survartsj, survarts, survarts, survarts, ssv_state, survarts, ROT0,   "Sammy",              "Survival Arts (Japan)",                                                  GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1994,  drifto94,  0,        drifto94, drifto94, ssv_state, drifto94, ROT0,   "Visco",              "Drift Out '94 - The Hard Order (Japan)",                                 GAME_NO_COCKTAIL )
+GAME( 1994,  drifto94,  0,        drifto94, drifto94, ssv_state, drifto94, ROT0,   "Visco",              "Drift Out '94 - The Hard Order (Japan)",                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, ssv_state, eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf",                                                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994,  eaglshot,  0,        eaglshot, eaglshot, ssv_state, eaglshot, ROT0,   "Sammy",              "Eagle Shot Golf",                                                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1995,  hypreact,  0,        hypreact, hypreact, ssv_state, hypreact, ROT0,   "Sammy",              "Mahjong Hyper Reaction (Japan)",                                         GAME_NO_COCKTAIL )
+GAME( 1995,  hypreact,  0,        hypreact, hypreact, ssv_state, hypreact, ROT0,   "Sammy",              "Mahjong Hyper Reaction (Japan)",                                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, twineag2, ROT270, "Seta",               "Twin Eagle II - The Rescue Mission",                                     GAME_NO_COCKTAIL )
+GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, twineag2, ROT270, "Seta",               "Twin Eagle II - The Rescue Mission",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, gdfs,     ROT0,   "Banpresto",          "Mobil Suit Gundam Final Shooting (Japan)",                               GAME_NO_COCKTAIL )
+GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, gdfs,     ROT0,   "Banpresto",          "Mobil Suit Gundam Final Shooting (Japan)",                               GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS ) // 95-01-30 13:27:15 on startup
-GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
+GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
+GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
 
-GAME( 1996,  janjans1,  0,        janjans1, janjans1, ssv_state, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",                           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996,  janjans1,  0,        janjans1, janjans1, ssv_state, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",                           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1996?, meosism,   0,        meosism,  meosism,  ssv_state, meosism,  ROT0,   "Sammy",              "Meosis Magic (Japan)",                                                   GAME_NO_COCKTAIL )
+GAME( 1996?, meosism,   0,        meosism,  meosism,  ssv_state, meosism,  ROT0,   "Sammy",              "Meosis Magic (Japan)",                                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1996,  stmblade,  0,        stmblade, stmblade, ssv_state, stmblade, ROT270, "Visco",              "Storm Blade (US)",                                                       GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996,  stmbladej, stmblade, stmblade, stmblade, ssv_state, stmblade, ROT270, "Visco",              "Storm Blade (Japan)",                                                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996,  stmblade,  0,        stmblade, stmblade, ssv_state, stmblade, ROT270, "Visco",              "Storm Blade (US)",                                                       GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996,  stmbladej, stmblade, stmblade, stmblade, ssv_state, stmblade, ROT270, "Visco",              "Storm Blade (Japan)",                                                    GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1997,  hypreac2,  0,        hypreac2, hypreac2, ssv_state, hypreac2, ROT0,   "Sammy",              "Mahjong Hyper Reaction 2 (Japan)",                                       GAME_NO_COCKTAIL )
+GAME( 1997,  hypreac2,  0,        hypreac2, hypreac2, ssv_state, hypreac2, ROT0,   "Sammy",              "Mahjong Hyper Reaction 2 (Japan)",                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1997,  jsk,       0,        jsk,      jsk,      ssv_state, jsk,      ROT0,   "Visco",              "Joryuu Syougi Kyoushitsu (Japan)",                                       GAME_NO_COCKTAIL )
+GAME( 1997,  jsk,       0,        jsk,      jsk,      ssv_state, jsk,      ROT0,   "Visco",              "Joryuu Syougi Kyoushitsu (Japan)",                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1997,  koikois2,  0,        janjans1, koikois2, ssv_state, janjans1, ROT0,   "Visco",              "Koi Koi Shimasho 2 - Super Real Hanafuda (Japan)",                       GAME_NO_COCKTAIL )
+GAME( 1997,  koikois2,  0,        janjans1, koikois2, ssv_state, janjans1, ROT0,   "Visco",              "Koi Koi Shimasho 2 - Super Real Hanafuda (Japan)",                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1997,  mslider,   0,        mslider,  mslider,  ssv_state, mslider,  ROT0,   "Visco / Datt Japan", "Monster Slider (Japan)",                                                 GAME_NO_COCKTAIL )
+GAME( 1997,  mslider,   0,        mslider,  mslider,  ssv_state, mslider,  ROT0,   "Visco / Datt Japan", "Monster Slider (Japan)",                                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1997,  srmp7,     0,        srmp7,    srmp7,    ssv_state, srmp7,    ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                                          GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1997,  srmp7,     0,        srmp7,    srmp7,    ssv_state, srmp7,    ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                                          GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1998,  ryorioh,   0,        ryorioh,  ryorioh,  ssv_state, ryorioh,  ROT0,   "Visco",              "Gourmet Battle Quiz Ryohrioh CooKing (Japan)",                           GAME_NO_COCKTAIL )
+GAME( 1998,  ryorioh,   0,        ryorioh,  ryorioh,  ssv_state, ryorioh,  ROT0,   "Visco",              "Gourmet Battle Quiz Ryohrioh CooKing (Japan)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1998,  sxyreact,  0,        sxyreact, sxyreact, ssv_state, sxyreact, ROT0,   "Sammy",              "Pachinko Sexy Reaction (Japan)",                                         GAME_NO_COCKTAIL )
+GAME( 1998,  sxyreact,  0,        sxyreact, sxyreact, ssv_state, sxyreact, ROT0,   "Sammy",              "Pachinko Sexy Reaction (Japan)",                                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1999,  sxyreac2,  0,        sxyreac2, sxyreact, ssv_state, sxyreac2, ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                                       GAME_NO_COCKTAIL )
+GAME( 1999,  sxyreac2,  0,        sxyreac2, sxyreact, ssv_state, sxyreac2, ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1999,  cairblad,  0,        cairblad, cairblad, ssv_state, cairblad, ROT270, "Sammy",              "Change Air Blade (Japan)",                                               GAME_NO_COCKTAIL )
+GAME( 1999,  cairblad,  0,        cairblad, cairblad, ssv_state, cairblad, ROT270, "Sammy",              "Change Air Blade (Japan)",                                               GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 2000,  janjans2,  0,        janjans1, janjans2, ssv_state, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho 2 (Japan)",                         GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000,  janjans2,  0,        janjans1, janjans2, ssv_state, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho 2 (Japan)",                         GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 2000,  vasara,    0,        vasara,   vasara,   ssv_state, vasara,   ROT270, "Visco",              "Vasara",                                                                 GAME_NO_COCKTAIL )
+GAME( 2000,  vasara,    0,        vasara,   vasara,   ssv_state, vasara,   ROT270, "Visco",              "Vasara",                                                                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 2001,  vasara2,   0,        vasara,   vasara2,  ssv_state, vasara,   ROT270, "Visco",              "Vasara 2 (set 1)",                                                       GAME_NO_COCKTAIL )
-GAME( 2001,  vasara2a,  vasara2,  vasara,   vasara2,  ssv_state, vasara,   ROT270, "Visco",              "Vasara 2 (set 2)",                                                       GAME_NO_COCKTAIL )
+GAME( 2001,  vasara2,   0,        vasara,   vasara2,  ssv_state, vasara,   ROT270, "Visco",              "Vasara 2 (set 1)",                                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 2001,  vasara2a,  vasara2,  vasara,   vasara2,  ssv_state, vasara,   ROT270, "Visco",              "Vasara 2 (set 2)",                                                       GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

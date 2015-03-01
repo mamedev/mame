@@ -98,30 +98,30 @@ TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 	if (scanline > 256)
 		scanline = 0;
 
-	timer_set(m_screen->time_until_pos(scanline), TIMER_INTERRUPT);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline));
 }
 
 
-unsigned fgoal_state::video_ram_address(  )
+unsigned fgoal_state::video_ram_address( )
 {
 	return 0x4000 | (m_row << 5) | (m_col >> 3);
 }
 
 
-READ8_MEMBER(fgoal_state::fgoal_analog_r)
+READ8_MEMBER(fgoal_state::analog_r)
 {
-	return ioport(m_fgoal_player ? "PADDLE1" : "PADDLE0")->read(); /* PCB can be jumpered to use a single dial */
+	return ioport(m_player ? "PADDLE1" : "PADDLE0")->read(); /* PCB can be jumpered to use a single dial */
 }
 
 
-CUSTOM_INPUT_MEMBER(fgoal_state::fgoal_80_r)
+CUSTOM_INPUT_MEMBER(fgoal_state::_80_r)
 {
 	UINT8 ret = (m_screen->vpos() & 0x80) ? 1 : 0;
 
 	return ret;
 }
 
-READ8_MEMBER(fgoal_state::fgoal_nmi_reset_r)
+READ8_MEMBER(fgoal_state::nmi_reset_r)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
@@ -129,7 +129,7 @@ READ8_MEMBER(fgoal_state::fgoal_nmi_reset_r)
 }
 
 
-READ8_MEMBER(fgoal_state::fgoal_irq_reset_r)
+READ8_MEMBER(fgoal_state::irq_reset_r)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -137,42 +137,42 @@ READ8_MEMBER(fgoal_state::fgoal_irq_reset_r)
 }
 
 
-READ8_MEMBER(fgoal_state::fgoal_row_r)
+READ8_MEMBER(fgoal_state::row_r)
 {
 	return m_row;
 }
 
 
-WRITE8_MEMBER(fgoal_state::fgoal_row_w)
+WRITE8_MEMBER(fgoal_state::row_w)
 {
 	m_row = data;
 	m_mb14241->shift_data_w(space, 0, 0);
 }
 
-WRITE8_MEMBER(fgoal_state::fgoal_col_w)
+WRITE8_MEMBER(fgoal_state::col_w)
 {
 	m_col = data;
 	m_mb14241->shift_count_w(space, 0, data);
 }
 
-READ8_MEMBER(fgoal_state::fgoal_address_hi_r)
+READ8_MEMBER(fgoal_state::address_hi_r)
 {
 	return video_ram_address() >> 8;
 }
 
-READ8_MEMBER(fgoal_state::fgoal_address_lo_r)
+READ8_MEMBER(fgoal_state::address_lo_r)
 {
 	return video_ram_address() & 0xff;
 }
 
-READ8_MEMBER(fgoal_state::fgoal_shifter_r)
+READ8_MEMBER(fgoal_state::shifter_r)
 {
 	UINT8 v = m_mb14241->shift_result_r(space, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-READ8_MEMBER(fgoal_state::fgoal_shifter_reverse_r)
+READ8_MEMBER(fgoal_state::shifter_reverse_r)
 {
 	UINT8 v = m_mb14241->shift_result_r(space, 0);
 
@@ -180,7 +180,7 @@ READ8_MEMBER(fgoal_state::fgoal_shifter_reverse_r)
 }
 
 
-WRITE8_MEMBER(fgoal_state::fgoal_sound1_w)
+WRITE8_MEMBER(fgoal_state::sound1_w)
 {
 	/* BIT0 => SX2 */
 	/* BIT1 => SX1 */
@@ -193,7 +193,7 @@ WRITE8_MEMBER(fgoal_state::fgoal_sound1_w)
 }
 
 
-WRITE8_MEMBER(fgoal_state::fgoal_sound2_w)
+WRITE8_MEMBER(fgoal_state::sound2_w)
 {
 	/* BIT0 => CX0 */
 	/* BIT1 => SX6 */
@@ -201,7 +201,7 @@ WRITE8_MEMBER(fgoal_state::fgoal_sound2_w)
 	/* BIT3 => SX5 */
 	/* BIT4 => SX4 */
 	/* BIT5 => SX3 */
-	m_fgoal_player = data & 1;
+	m_player = data & 1;
 }
 
 
@@ -209,31 +209,31 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
 
 	AM_RANGE(0x0000, 0x00ef) AM_RAM
 
-	AM_RANGE(0x00f0, 0x00f0) AM_READ(fgoal_row_r)
-	AM_RANGE(0x00f1, 0x00f1) AM_READ(fgoal_analog_r)
+	AM_RANGE(0x00f0, 0x00f0) AM_READ(row_r)
+	AM_RANGE(0x00f1, 0x00f1) AM_READ(analog_r)
 	AM_RANGE(0x00f2, 0x00f2) AM_READ_PORT("IN0")
 	AM_RANGE(0x00f3, 0x00f3) AM_READ_PORT("IN1")
-	AM_RANGE(0x00f4, 0x00f4) AM_READ(fgoal_address_hi_r)
-	AM_RANGE(0x00f5, 0x00f5) AM_READ(fgoal_address_lo_r)
-	AM_RANGE(0x00f6, 0x00f6) AM_READ(fgoal_shifter_r)
-	AM_RANGE(0x00f7, 0x00f7) AM_READ(fgoal_shifter_reverse_r)
-	AM_RANGE(0x00f8, 0x00fb) AM_READ(fgoal_nmi_reset_r)
-	AM_RANGE(0x00fc, 0x00ff) AM_READ(fgoal_irq_reset_r)
+	AM_RANGE(0x00f4, 0x00f4) AM_READ(address_hi_r)
+	AM_RANGE(0x00f5, 0x00f5) AM_READ(address_lo_r)
+	AM_RANGE(0x00f6, 0x00f6) AM_READ(shifter_r)
+	AM_RANGE(0x00f7, 0x00f7) AM_READ(shifter_reverse_r)
+	AM_RANGE(0x00f8, 0x00fb) AM_READ(nmi_reset_r)
+	AM_RANGE(0x00fc, 0x00ff) AM_READ(irq_reset_r)
 
-	AM_RANGE(0x00f0, 0x00f0) AM_WRITE(fgoal_row_w)
-	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(fgoal_col_w)
-	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(fgoal_row_w)
-	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(fgoal_col_w)
+	AM_RANGE(0x00f0, 0x00f0) AM_WRITE(row_w)
+	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(col_w)
+	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(row_w)
+	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(col_w)
 	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(fgoal_sound1_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
+	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(sound1_w)
+	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(sound2_w)
 
 	AM_RANGE(0x0100, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(fgoal_ypos_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(fgoal_xpos_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(fgoal_color_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(ypos_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(xpos_w)
+	AM_RANGE(0x8002, 0x8002) AM_WRITE(color_w)
 
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xffff) AM_ROM
@@ -266,7 +266,7 @@ static INPUT_PORTS_START( fgoal )
 	/* extra credit score changes depending on player's performance */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state,fgoal_80_r, NULL) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state, _80_r, NULL) /* 128V */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
@@ -338,10 +338,12 @@ GFXDECODE_END
 
 void fgoal_state::machine_start()
 {
+	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
 	save_item(NAME(m_current_color));
-	save_item(NAME(m_fgoal_player));
+	save_item(NAME(m_player));
 	save_item(NAME(m_row));
 	save_item(NAME(m_col));
 	save_item(NAME(m_prev_coin));
@@ -349,12 +351,12 @@ void fgoal_state::machine_start()
 
 void fgoal_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(0), TIMER_INTERRUPT);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(0));
 
 	m_xpos = 0;
 	m_ypos = 0;
 	m_current_color = 0;
-	m_fgoal_player = 0;
+	m_player = 0;
 	m_row = 0;
 	m_col = 0;
 	m_prev_coin = 0;
@@ -375,7 +377,7 @@ static MACHINE_CONFIG_START( fgoal, fgoal_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 263)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update_fgoal)
+	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fgoal)
@@ -433,5 +435,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 1)", GAME_NO_SOUND )
-GAME( 1979, fgoala, fgoal, fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 2)", GAME_NO_SOUND )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, fgoala, fgoal, fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

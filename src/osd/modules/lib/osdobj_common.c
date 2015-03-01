@@ -82,6 +82,41 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO, OPTION_STRING,     "sound output method: " },
 	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",   OPTION_INTEGER,    "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
+	{ NULL,                                   NULL,   OPTION_HEADER,  "OSD VIDEO OPTIONS" },
+	{ OSDOPTION_FILTER ";glfilter;flt",       "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
+	{ OSDOPTION_PRESCALE,                     "1",    OPTION_INTEGER,                 "scale screen rendering by this amount in software" },
+
+#if USE_OPENGL
+	// OpenGL specific options
+	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
+	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",    OPTION_BOOLEAN, "force power of two textures  (default no)" },
+	{ OSDOPTION_GL_NOTEXTURERECT,             "0",    OPTION_BOOLEAN, "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
+	{ OSDOPTION_GL_VBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
+	{ OSDOPTION_GL_PBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
+	{ OSDOPTION_GL_GLSL,                      "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
+	{ OSDOPTION_GLSL_FILTER,                  "1",    OPTION_STRING,  "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+	{ OSDOPTION_SHADER_MAME "0",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 0" },
+	{ OSDOPTION_SHADER_MAME "1",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 1" },
+	{ OSDOPTION_SHADER_MAME "2",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 2" },
+	{ OSDOPTION_SHADER_MAME "3",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 3" },
+	{ OSDOPTION_SHADER_MAME "4",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 4" },
+	{ OSDOPTION_SHADER_MAME "5",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 5" },
+	{ OSDOPTION_SHADER_MAME "6",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 6" },
+	{ OSDOPTION_SHADER_MAME "7",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 7" },
+	{ OSDOPTION_SHADER_MAME "8",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 8" },
+	{ OSDOPTION_SHADER_MAME "9",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 9" },
+	{ OSDOPTION_SHADER_SCREEN "0",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 0" },
+	{ OSDOPTION_SHADER_SCREEN "1",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 1" },
+	{ OSDOPTION_SHADER_SCREEN "2",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 2" },
+	{ OSDOPTION_SHADER_SCREEN "3",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 3" },
+	{ OSDOPTION_SHADER_SCREEN "4",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 4" },
+	{ OSDOPTION_SHADER_SCREEN "5",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 5" },
+	{ OSDOPTION_SHADER_SCREEN "6",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 6" },
+	{ OSDOPTION_SHADER_SCREEN "7",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 7" },
+	{ OSDOPTION_SHADER_SCREEN "8",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 8" },
+	{ OSDOPTION_SHADER_SCREEN "9",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 9" },
+#endif
+
 	// End of list
 	{ NULL }
 };

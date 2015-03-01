@@ -143,6 +143,7 @@ Address bus A0-A11 is Y0-Y11
 #include "bus/a2bus/a2dx1.h"
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/mouse.h"
+#include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/a2eauxslot.h"
 #include "bus/a2bus/a2estd80col.h"
 #include "bus/a2bus/a2eext80col.h"
@@ -3035,6 +3036,9 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("dx1", A2BUS_DX1)    /* Decillonix DX-1 sampler card */
 	SLOT_INTERFACE("tm2ho", A2BUS_TIMEMASTERHO) /* Applied Engineering TimeMaster II H.O. */
 	SLOT_INTERFACE("mouse", A2BUS_MOUSE)    /* Apple II Mouse Card */
+	SLOT_INTERFACE("ezcgi", A2BUS_EZCGI)	/* E-Z Color Graphics Interface */
+	SLOT_INTERFACE("ezcgi9938", A2BUS_EZCGI_9938)	/* E-Z Color Graphics Interface (TMS9938) */
+	SLOT_INTERFACE("ezcgi9958", A2BUS_EZCGI_9958)	/* E-Z Color Graphics Interface (TMS9958) */
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 

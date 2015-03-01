@@ -41,7 +41,7 @@
 #include "window.h"
 #include "config.h"
 #include "d3dcomm.h"
-#include "drawd3d.h"
+#include "modules/render/drawd3d.h"
 #include "strconv.h"
 
 

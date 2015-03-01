@@ -380,7 +380,11 @@
 						dir = cfg_dirs[cfg][v]
 						if hit_counts[dir] == 1 then break end
 					end
-					cfg.objectsdir = path.getrelative(cfg.location, dir)
+					if (cfg.flags.SingleOutputDir) then
+						cfg.objectsdir = cfg.objdir or cfg.project.objdir or "obj"
+					else
+						cfg.objectsdir = path.getrelative(cfg.location, dir)
+					end
 				end
 			end
 		end		

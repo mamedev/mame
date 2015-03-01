@@ -428,7 +428,8 @@ OBJDIRS += $(SDLOBJ) \
 	$(OSDOBJ)/modules/font \
 	$(OSDOBJ)/modules/netdev \
 	$(OSDOBJ)/modules/opengl \
-
+	$(OSDOBJ)/modules/render
+	
 #-------------------------------------------------
 # OSD core library
 #-------------------------------------------------
@@ -461,7 +462,6 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/sound/sdl_sound.o  \
 	$(OSDOBJ)/modules/sound/none.o  \
 	$(SDLOBJ)/video.o \
-	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
@@ -475,6 +475,7 @@ OSDOBJS = \
 	$(OSDOBJ)/modules/netdev/none.o \
 	$(OSDOBJ)/modules/midi/portmidi.o \
 	$(OSDOBJ)/modules/midi/none.o \
+	$(OSDOBJ)/modules/render/drawsdl.o \
 
 ifdef NO_USE_MIDI
 	DEFS += -DNO_USE_MIDI
@@ -484,7 +485,7 @@ endif
 # Add SDL2.0 support
 
 ifeq ($(SDL_LIBVER),sdl2)
-OSDOBJS += $(SDLOBJ)/draw13.o
+OSDOBJS += $(OSDOBJ)/modules/render/draw13.o
 endif
 
 # add an ARCH define
@@ -809,7 +810,7 @@ OSDOBJS += \
 
 ifdef USE_BGFX
 DEFS += -DUSE_BGFX
-OSDOBJS += $(SDLOBJ)/drawbgfx.o
+OSDOBJS += $(OSDOBJ)/modules/render/drawbgfx.o
 INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
 USE_DISPATCH_GL = 0
 BGFX_LIB = $(OBJ)/libbgfx.a
@@ -823,7 +824,7 @@ ifeq ($(NO_OPENGL),1)
 DEFS += -DUSE_OPENGL=0
 else
 OSDOBJS += \
-	$(SDLOBJ)/drawogl.o \
+	$(OSDOBJ)/modules/render/drawogl.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
 	
@@ -930,10 +931,10 @@ $(OBJ)/emu/video/tms9927.o : CCOMFLAGS += -Wno-error
 endif # solaris
 
 # drawSDL depends on the core software renderer, so make sure it exists
-$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.inc $(SDLSRC)/drawogl.c
+$(OSDOBJ)/modules/render/drawsdl.o : $(SRC)/emu/rendersw.inc $(OSDSRC)/modules/render/drawogl.c
 
 # draw13 depends on blit13.h
-$(SDLOBJ)/draw13.o : $(SDLSRC)/blit13.h
+$(OSDOBJ)/modules/render/draw13.o : $(OSDSRC)/modules/render/blit13.h
 
 #$(OSDCOREOBJS): $(SDLSRC)/sdl.mak
 

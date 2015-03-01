@@ -61,7 +61,7 @@
 //  GLOBAL VARIABLES
 //============================================================
 
-sdl_video_config video_config;
+osd_video_config video_config;
 
 sdl_monitor_info *sdl_monitor_info::primary_monitor = NULL;
 sdl_monitor_info *sdl_monitor_info::list = NULL;
@@ -477,7 +477,7 @@ sdl_monitor_info *sdl_monitor_info::pick_monitor(sdl_options &options, int index
 	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
 
 	// look for a match in the name first
-	if (scrname != NULL)
+	if (scrname != NULL && (scrname[0] != 0))
 	{
 		for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		{
@@ -587,6 +587,7 @@ void sdl_osd_interface::extract_video_config()
 	// global options: extract the data
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
+	video_config.filter        = options().filter();
 	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 	video_config.fullstretch   = options().uneven_stretch();
@@ -650,16 +651,12 @@ void sdl_osd_interface::extract_video_config()
 		video_config.syncrefresh = 0;
 	}
 
-	#if (USE_OPENGL || SDLMAME_SDL2)
-	video_config.filter        = options().filter();
-	#endif
-
+	if (video_config.prescale < 1 || video_config.prescale > 3)
+	{
+		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
+		video_config.prescale = 1;
+	}
 	#if (USE_OPENGL)
-		if (video_config.prescale < 1 || video_config.prescale > 3)
-		{
-			osd_printf_warning("Invalid prescale option, reverting to '1'\n");
-			video_config.prescale = 1;
-		}
 		// default to working video please
 		video_config.forcepow2texture = options().gl_force_pow2_texture();
 		video_config.allowtexturerect = !(options().gl_no_texture_rect());

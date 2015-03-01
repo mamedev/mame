@@ -107,38 +107,6 @@ const options_entry sdl_options::s_option_entries[] =
 #else
 	{ SDLOPTION_SCALEMODE ";sm",         OSDOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #endif
-#if USE_OPENGL
-	// OpenGL specific options
-	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
-	{ SDLOPTION_FILTER ";glfilter;flt",       "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
-	{ SDLOPTION_PRESCALE,                     "1",    OPTION_INTEGER,                 "scale screen rendering by this amount in software" },
-	{ SDLOPTION_GL_FORCEPOW2TEXTURE,          "0",    OPTION_BOOLEAN, "force power of two textures  (default no)" },
-	{ SDLOPTION_GL_NOTEXTURERECT,             "0",    OPTION_BOOLEAN, "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
-	{ SDLOPTION_GL_VBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
-	{ SDLOPTION_GL_PBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
-	{ SDLOPTION_GL_GLSL,                      "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
-	{ SDLOPTION_GLSL_FILTER,                  "1",    OPTION_STRING,  "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
-	{ SDLOPTION_SHADER_MAME "0",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 0" },
-	{ SDLOPTION_SHADER_MAME "1",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 1" },
-	{ SDLOPTION_SHADER_MAME "2",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 2" },
-	{ SDLOPTION_SHADER_MAME "3",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 3" },
-	{ SDLOPTION_SHADER_MAME "4",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 4" },
-	{ SDLOPTION_SHADER_MAME "5",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 5" },
-	{ SDLOPTION_SHADER_MAME "6",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 6" },
-	{ SDLOPTION_SHADER_MAME "7",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 7" },
-	{ SDLOPTION_SHADER_MAME "8",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 8" },
-	{ SDLOPTION_SHADER_MAME "9",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 9" },
-	{ SDLOPTION_SHADER_SCREEN "0",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 0" },
-	{ SDLOPTION_SHADER_SCREEN "1",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 1" },
-	{ SDLOPTION_SHADER_SCREEN "2",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 2" },
-	{ SDLOPTION_SHADER_SCREEN "3",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 3" },
-	{ SDLOPTION_SHADER_SCREEN "4",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 4" },
-	{ SDLOPTION_SHADER_SCREEN "5",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 5" },
-	{ SDLOPTION_SHADER_SCREEN "6",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 6" },
-	{ SDLOPTION_SHADER_SCREEN "7",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 7" },
-	{ SDLOPTION_SHADER_SCREEN "8",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 8" },
-	{ SDLOPTION_SHADER_SCREEN "9",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 9" },
-#endif
 
 	// full screen options
 	#ifdef SDLMAME_X11

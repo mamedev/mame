@@ -107,7 +107,7 @@ Known issues :
 ===============
  - Half transparent color (50% alpha blending) is not emulated.
  - Sprite priority switch of Butasan is shown in test mode. What will be
-   happened when set it ? JFF is not implemented this mistery switch too.
+   happened when set it ? JFF is not implemented this mystery switch too.
  - Data proms of Butasan does exist. But I don't know what is used for.
  - Though clock speed of Argus is actually 4 MHz, major sprite problems
    are broken out in the middle of slowdown. So, it is set 5 MHz now.
@@ -123,13 +123,18 @@ Known issues :
 #include "includes/argus.h"
 
 
+void argus_state::machine_start()
+{
+	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+}
+
 /***************************************************************************
 
   Interrupt(s)
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(argus_state::argus_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(argus_state::scanline)
 {
 	int scanline = param;
 
@@ -151,11 +156,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
-/* Handler called by the YM2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(argus_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /***************************************************************************
 
@@ -163,13 +163,9 @@ WRITE_LINE_MEMBER(argus_state::irqhandler)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(argus_state::argus_bankselect_w)
+WRITE8_MEMBER(argus_state::bankselect_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	int bankaddress;
-
-	bankaddress = 0x10000 + ((data & 7) * 0x4000);
-	membank("bank1")->set_base(&RAM[bankaddress]);   /* Select 8 banks of 16k */
+	membank("mainbank")->set_entry(data & 7);   /* Select 8 banks of 16k */
 }
 
 
@@ -181,23 +177,23 @@ WRITE8_MEMBER(argus_state::argus_bankselect_w)
 
 static ADDRESS_MAP_START( argus_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
+	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
 	AM_RANGE(0xc300, 0xc301) AM_RAM AM_SHARE("bg0_scrollx")
 	AM_RANGE(0xc302, 0xc303) AM_RAM AM_SHARE("bg0_scrolly")
 	AM_RANGE(0xc308, 0xc309) AM_RAM AM_SHARE("bg1_scrollx")
 	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_SHARE("bg1_scrolly")
 	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(argus_bg_status_w)
-	AM_RANGE(0xc400, 0xcfff) AM_READWRITE(argus_paletteram_r, argus_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(argus_txram_r, argus_txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(argus_bg1ram_r, argus_bg1ram_w) AM_SHARE("bg1ram")
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(argus_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txram_w) AM_SHARE("txram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(bg1ram_w) AM_SHARE("bg1ram")
 	AM_RANGE(0xe000, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -205,23 +201,23 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( valtric_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
+	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(valtric_unknown_w)
 	AM_RANGE(0xc308, 0xc309) AM_RAM AM_SHARE("bg1_scrollx")
 	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_SHARE("bg1_scrolly")
 	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(valtric_bg_status_w)
 	AM_RANGE(0xc30d, 0xc30d) AM_WRITE(valtric_mosaic_w)
-	AM_RANGE(0xc400, 0xcfff) AM_READWRITE(argus_paletteram_r, valtric_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(argus_txram_r, argus_txram_w) AM_SHARE("txram")
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(argus_bg1ram_r, argus_bg1ram_w) AM_SHARE("bg1ram")
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(valtric_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txram_w) AM_SHARE("txram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(bg1ram_w) AM_SHARE("bg1ram")
 	AM_RANGE(0xe000, 0xf1ff) AM_RAM
 	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -229,7 +225,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
@@ -237,8 +233,8 @@ static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc100, 0xc100) AM_WRITE(butasan_unknown_w)
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
+	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(butasan_pageselect_w)
 	AM_RANGE(0xc300, 0xc301) AM_RAM AM_SHARE("bg0_scrollx")
 	AM_RANGE(0xc302, 0xc303) AM_RAM AM_SHARE("bg0_scrolly")
@@ -246,8 +242,8 @@ static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc308, 0xc309) AM_RAM AM_SHARE("bg1_scrollx")
 	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_SHARE("bg1_scrolly")
 	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(butasan_bg1_status_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(butasan_bg1ram_r, butasan_bg1ram_w) AM_SHARE("butasan_bg1ram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(argus_paletteram_r, butasan_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(butasan_bg1ram_w) AM_SHARE("butasan_bg1ram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(butasan_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(butasan_pagedram_r, butasan_pagedram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf67f) AM_RAM AM_SHARE("spriteram")
@@ -534,7 +530,7 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(argus_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, argus_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_a)
@@ -560,7 +556,7 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(argus_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -578,7 +574,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(valtric_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, argus_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", argus_state, scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_a)
@@ -604,7 +600,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(argus_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -648,7 +644,7 @@ static MACHINE_CONFIG_START( butasan, argus_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(argus_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
@@ -796,7 +792,7 @@ ROM_END
 
 
 /*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                  FULLNAME ) */
-GAME( 1986, argus,    0,      argus,    argus, driver_device,    0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, valtric,  0,      valtric,  valtric, driver_device,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, butasan,  0,      butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, butasanj, butasan,butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, argus,    0,      argus,    argus, driver_device,    0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, valtric,  0,      valtric,  valtric, driver_device,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1987, butasan,  0,      butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1987, butasanj, butasan,butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

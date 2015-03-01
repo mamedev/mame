@@ -52,33 +52,25 @@ public:
 	optional_shared_ptr<UINT16> m_input_sel;
 
 	int m_tile_code[16];
-
 	int m_enable_video;
 	int m_shadow_pen_mask;
 	int m_shadow_pen_shift;
-
 	UINT8 m_requested_int;
 	UINT16 m_irq_enable;
-
 	UINT16 *m_eaglshot_gfxram;
-
 	tilemap_t *m_gdfs_tmap;
-
 	int m_interrupt_ultrax;
-
 	int m_gdfs_lightgun_select;
-
 	UINT16 m_sxyreact_serial;
 	int m_sxyreact_dial;
 	UINT16 m_gdfs_eeprom_old;
-
 	UINT32 m_latches[8];
-
 	UINT8 m_trackball_select;
-	DECLARE_WRITE16_MEMBER(ssv_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(ssv_irq_enable_w);
-	DECLARE_WRITE16_MEMBER(ssv_lockout_w);
-	DECLARE_WRITE16_MEMBER(ssv_lockout_inv_w);
+
+	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	DECLARE_WRITE16_MEMBER(irq_enable_w);
+	DECLARE_WRITE16_MEMBER(lockout_w);
+	DECLARE_WRITE16_MEMBER(lockout_inv_w);
 	DECLARE_READ16_MEMBER(dsp_dr_r);
 	DECLARE_WRITE16_MEMBER(dsp_dr_w);
 	DECLARE_READ16_MEMBER(dsp_r);
@@ -90,8 +82,8 @@ public:
 	DECLARE_READ16_MEMBER(gdfs_blitram_r);
 	DECLARE_WRITE16_MEMBER(gdfs_blitram_w);
 	DECLARE_READ16_MEMBER(hypreact_input_r);
-	DECLARE_READ16_MEMBER(ssv_mainram_r);
-	DECLARE_WRITE16_MEMBER(ssv_mainram_w);
+	DECLARE_READ16_MEMBER(mainram_r);
+	DECLARE_WRITE16_MEMBER(mainram_w);
 	DECLARE_READ16_MEMBER(srmp4_input_r);
 	DECLARE_READ16_MEMBER(srmp7_irqv_r);
 	DECLARE_WRITE16_MEMBER(srmp7_sound_bank_w);
@@ -110,10 +102,13 @@ public:
 	DECLARE_READ16_MEMBER(eaglshot_gfxram_r);
 	DECLARE_WRITE16_MEMBER(eaglshot_gfxram_w);
 	DECLARE_WRITE16_MEMBER(gdfs_tmapram_w);
-	DECLARE_READ16_MEMBER(ssv_vblank_r);
-	DECLARE_WRITE16_MEMBER(ssv_scroll_w);
+	DECLARE_READ16_MEMBER(vblank_r);
+	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_READ16_MEMBER(gdfs_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gdfs_eeprom_w);
+	
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	
 	DECLARE_DRIVER_INIT(gdfs);
 	DECLARE_DRIVER_INIT(sxyreac2);
 	DECLARE_DRIVER_INIT(hypreac2);
@@ -136,24 +131,26 @@ public:
 	DECLARE_DRIVER_INIT(jsk);
 	DECLARE_DRIVER_INIT(twineag2);
 	DECLARE_DRIVER_INIT(mslider);
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_VIDEO_START(gdfs);
 	DECLARE_VIDEO_START(eaglshot);
-	UINT32 screen_update_ssv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(ssv_interrupt);
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gdfs_interrupt);
 	void update_irq_state();
-	IRQ_CALLBACK_MEMBER(ssv_irq_callback);
-	void ssv_drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,int shadow);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	
+	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,int shadow);
 	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ssv_enable_video(int enable);
-	void init_ssv(int interrupt_ultrax);
+	void enable_video(int enable);
+	void init(int interrupt_ultrax);
 	void init_hypreac2_common();
 	void init_eaglshot_banking();
 	void init_st010();

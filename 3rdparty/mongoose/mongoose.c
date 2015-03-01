@@ -124,12 +124,7 @@ typedef struct _stati64 ns_stat_t;
 #include <sys/socket.h>
 #include <sys/select.h>
 #define closesocket(x) close(x)
-#ifndef __OS2__
 #define __cdecl
-#else
-#include <sys/time.h>
-typedef int socklen_t;
-#endif
 #define INVALID_SOCKET (-1)
 #define to64(x) strtoll(x, NULL, 10)
 typedef int sock_t;
@@ -606,6 +601,30 @@ int ns_socketpair(sock_t sp[2]) {
 
 // TODO(lsm): use non-blocking resolver
 static int ns_resolve2(const char *host, struct in_addr *ina) {
+#ifdef NS_ENABLE_GETADDRINFO
+  int rv = 0;
+  struct addrinfo hints, *servinfo, *p;
+  struct sockaddr_in *h = NULL;
+  char *ip = NS_MALLOC(17);
+  memset(ip, '\0', 17);
+
+  memset(&hints, 0, sizeof hints);
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+
+  if((rv = getaddrinfo(host, NULL , NULL, &servinfo)) != 0) {
+    DBG(("getaddrinfo(%s) failed: %s", host, strerror(errno)));
+    return 0;
+  }
+
+  for(p = servinfo; p != NULL; p = p->ai_next) {
+    memcpy(&h, &p->ai_addr, sizeof(struct sockaddr_in *));
+    memcpy(ina, &h->sin_addr, sizeof(ina));
+  }
+
+  freeaddrinfo(servinfo);
+  return 1;
+#else
   struct hostent *he;
   if ((he = gethostbyname(host)) == NULL) {
     DBG(("gethostbyname(%s) failed: %s", host, strerror(errno)));
@@ -614,6 +633,7 @@ static int ns_resolve2(const char *host, struct in_addr *ina) {
     return 1;
   }
   return 0;
+#endif
 }
 
 // Resolve FDQN "host", store IP address in the "ip".
@@ -1556,37 +1576,6 @@ static void *mmap(void *addr, int64_t len, int prot, int flags, int fd,
   return p;
 }
 #define munmap(x, y)  UnmapViewOfFile(x)
-#define MAP_FAILED NULL
-#define MAP_PRIVATE 0
-#define PROT_READ 0
-#elif defined(__OS2__)
-static void *mmap(void *addr, int64_t len, int prot, int flags, int fd,
-                  int offset) {
-  void *p;
-
-  int pos = lseek( fd, 0, SEEK_CUR ); /* Get a current position */
-
-  if (pos == -1)
-    return NULL;
-
-  /* Seek to offset offset */
-  if (lseek( fd, offset, SEEK_SET) == -1)
-    return NULL;
-
-  p = malloc(len);
-
-  /* Read in a file */
-  if (!p || read(fd, p, len) == -1) {
-    free(p);
-    p = NULL;
-  }
-
-  /* Restore the position */
-  lseek(fd, pos, SEEK_SET);
-
-  return p;
-}
-#define munmap(x, y)  free(x)
 #define MAP_FAILED NULL
 #define MAP_PRIVATE 0
 #define PROT_READ 0
@@ -3009,9 +2998,9 @@ size_t mg_websocket_write(struct mg_connection *conn, int opcode,
       copy_len = 4 + data_len;
     } else {
       // 64-bit length field
-      copy[1] = 127;
       const uint32_t hi = htonl((uint32_t) ((uint64_t) data_len >> 32));
       const uint32_t lo = htonl(data_len & 0xffffffff);
+      copy[1] = 127;
       memcpy(copy+2,&hi,sizeof(hi));
       memcpy(copy+6,&lo,sizeof(lo));
       memcpy(copy + 10, data, data_len);

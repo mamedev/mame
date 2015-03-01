@@ -99,6 +99,8 @@ OBJDIRS += $(WINOBJ) \
 	$(OSDOBJ)/modules/midi \
 	$(OSDOBJ)/modules/font \
 	$(OSDOBJ)/modules/netdev \
+	$(OSDOBJ)/modules/render \
+	$(OSDOBJ)/modules/render/d3d \
 	$(OSDOBJ)/modules/debugger/win
 
 ifdef USE_QTDEBUG
@@ -373,13 +375,13 @@ OSDCOREOBJS = \
 #-------------------------------------------------
 
 OSDOBJS = \
-	$(WINOBJ)/d3d9intf.o \
-	$(WINOBJ)/drawd3d.o \
-	$(WINOBJ)/d3dhlsl.o \
-	$(WINOBJ)/drawdd.o \
-	$(WINOBJ)/drawgdi.o \
-	$(WINOBJ)/drawbgfx.o \
-	$(WINOBJ)/drawnone.o \
+	$(OSDOBJ)/modules/render/drawd3d.o \
+	$(OSDOBJ)/modules/render/d3d/d3d9intf.o \
+	$(OSDOBJ)/modules/render/d3d/d3dhlsl.o \
+	$(OSDOBJ)/modules/render/drawdd.o \
+	$(OSDOBJ)/modules/render/drawgdi.o \
+	$(OSDOBJ)/modules/render/drawbgfx.o \
+	$(OSDOBJ)/modules/render/drawnone.o \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
 	$(OSDOBJ)/modules/sound/js_sound.o  \
@@ -403,13 +405,12 @@ OSDOBJS = \
 
 ifdef USE_OPENGL
 OSDOBJS += \
-	$(WINOBJ)/../sdl/drawogl.o \
+	$(OSDOBJ)/modules/render/drawogl.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
 	
 OBJDIRS += \
-	$(OSDOBJ)/modules/opengl \
-	$(WINOBJ)/../sdl
+	$(OSDOBJ)/modules/opengl 
 
 DEFS += -DUSE_OPENGL=1
 

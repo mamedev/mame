@@ -85,6 +85,7 @@ void st0020_device::device_start()
 	save_pointer(NAME(m_st0020_gfxram), 4 * 0x100000/2);
 	save_pointer(NAME(m_st0020_spriteram), 0x80000/2);
 	save_pointer(NAME(m_st0020_blitram), 0x100/2);
+	save_item(NAME(m_st0020_gfxram_bank));
 }
 
 void st0020_device::device_reset()

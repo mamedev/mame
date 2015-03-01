@@ -5,7 +5,46 @@
   This driver is a collection of simple dedicated handheld and tabletop
   toys based around the TMS1000 MCU series. Anything more complex or clearly
   part of a series is (or will be) in its own driver.
+  
+  Let's use this driver for a list of known devices and their serials,
+  excluding TI's own products (see for example ticalc1x.c, tispeak.c)
 
+  serial   device   etc.
+--------------------------------------------------------------------
+ @CP0904A  TMS0970  1977, Milton Bradley Comp IV
+ @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
+ @MP0914   TMS1000  1978, Entex Baseball 1
+ @MP1030   TMS1100  1980, APF Mathemagician
+ @MP3226   TMS1000  1978, Milton Bradley Simon
+ @MP3403   TMS1100  1978, unknown
+ @MP3404   TMS1100  1978, Parker Brothers Merlin
+ @MP3405   TMS1100  1979, Coleco Amaze-A-Tron
+ @MP3438A  TMS1100  1979, Kenner Star Wars Electronic Battle Command
+  MP3450A  TMS1100  1979, MicroVision cartridge: Blockbuster
+  MP3454   TMS1100  1979, MicroVision cartridge: Star Trek Phaser Strike
+  MP3455   TMS1100  1980, MicroVision cartridge: Pinball
+  MP3457   TMS1100  1979, MicroVision cartridge: Mindbuster
+  MP3474   TMS1100  1979, MicroVision cartridge: Vegas Slots
+  MP3475   TMS1100  1979, MicroVision cartridge: Bowling
+  MP3479   TMS1100  1980, MicroVision cartridge: Baseball
+  MP3481   TMS1100  1979, MicroVision cartridge: Connect Four
+  MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
+ @MP6100A  TMS0980  1979, Ideal Electronic Detective
+ @MP6101B  TMS0980  1979, Parker Brothers Stop Thief
+ @MP7313   TMS1400  1980, Parker Brothers Bank Shot
+ @MP7314   TMS1400  1980, Parker Brothers Split Second
+ *MP7332   TMS1400  1981, Milton Bradley Dark Tower
+ @MP7334   TMS1400  1981, Coleco Total Control 4
+
+  inconsistent:
+  
+  M34009   TMS1100  1981, MicroVision cartridge: Alien Raiders
+  M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
+  M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
+
+  CD7282SL TMS1100  1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
+
+  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
 ***************************************************************************/
 
@@ -13,6 +52,7 @@
 #include "cpu/tms0980/tms0980.h"
 #include "sound/speaker.h"
 
+// internal artwork
 #include "amaztron.lh"
 #include "bankshot.lh"
 #include "cnsector.lh"
@@ -20,12 +60,12 @@
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
-#include "merlin.lh"
-#include "simon.lh"
+#include "merlin.lh" // clickable
+#include "simon.lh" // clickable
 #include "splitsec.lh"
 #include "starwbc.lh"
 #include "stopthie.lh"
-#include "tandy12.lh"
+#include "tandy12.lh" // clickable
 #include "tc4.lh"
 
 
@@ -42,15 +82,25 @@ public:
 		m_display_maxx(0)
 	{ }
 
+	// devices
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<7> m_inp_matrix; // max 7
 	optional_device<speaker_sound_device> m_speaker;
 	
+	// misc common
 	UINT16 m_r;
 	UINT16 m_o;
 	UINT16 m_inp_mux;
 	bool m_power_on;
 
+	UINT8 read_inputs(int columns);
+	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
+	DECLARE_WRITE_LINE_MEMBER(tms0980_auto_power_off);
+
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	// display common
 	int m_display_wait;
 	int m_display_maxy;
 	int m_display_maxx;
@@ -61,13 +111,9 @@ public:
 	UINT16 m_7seg_mask[0x20];
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	bool index_is_7segled(int index);
 	void display_update();
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 	
-	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
-	DECLARE_WRITE_LINE_MEMBER(tms0980_auto_power_off);
-
 	// game-specific handlers
 	void mathmagi_display();
 	DECLARE_READ8_MEMBER(mathmagi_read_k);
@@ -83,6 +129,11 @@ public:
 	DECLARE_READ8_MEMBER(tc4_read_k);
 	DECLARE_WRITE16_MEMBER(tc4_write_r);
 	DECLARE_WRITE16_MEMBER(tc4_write_o);
+
+	void ebball_display();
+	DECLARE_READ8_MEMBER(ebball_read_k);
+	DECLARE_WRITE16_MEMBER(ebball_write_r);
+	DECLARE_WRITE16_MEMBER(ebball_write_o);
 
 	DECLARE_READ8_MEMBER(elecdet_read_k);
 	DECLARE_WRITE16_MEMBER(elecdet_write_r);
@@ -113,12 +164,10 @@ public:
 	DECLARE_WRITE16_MEMBER(stopthief_write_r);
 	DECLARE_WRITE16_MEMBER(stopthief_write_o);
 
-	void bankshot_display();
 	DECLARE_READ8_MEMBER(bankshot_read_k);
 	DECLARE_WRITE16_MEMBER(bankshot_write_r);
 	DECLARE_WRITE16_MEMBER(bankshot_write_o);
 
-	void splitsec_display();
 	DECLARE_READ8_MEMBER(splitsec_read_k);
 	DECLARE_WRITE16_MEMBER(splitsec_write_r);
 	DECLARE_WRITE16_MEMBER(splitsec_write_o);
@@ -131,11 +180,10 @@ public:
 	DECLARE_READ8_MEMBER(unk3403_read_k);
 	DECLARE_WRITE16_MEMBER(unk3403_write_r);
 	DECLARE_WRITE16_MEMBER(unk3403_write_o);
-
-	virtual void machine_start();
-	virtual void machine_reset();
 };
 
+
+// machine_start/reset
 
 void hh_tms1k_state::machine_start()
 {
@@ -144,7 +192,7 @@ void hh_tms1k_state::machine_start()
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
-
+	
 	m_o = 0;
 	m_r = 0;
 	m_inp_mux = 0;
@@ -166,11 +214,12 @@ void hh_tms1k_state::machine_start()
 	save_item(NAME(m_power_on));
 }
 
-
 void hh_tms1k_state::machine_reset()
 {
 	m_power_on = true;
 }
+
+
 
 /***************************************************************************
 
@@ -241,17 +290,42 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
 	display_update();
 }
 
+void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
+
+	// update current state
+	UINT32 mask = (1 << maxx) - 1;
+	for (int y = 0; y < maxy; y++)
+		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
+	
+	display_update();
+}
+
 
 UINT8 hh_tms1k_state::read_inputs(int columns)
 {
-	UINT8 k = 0;
+	UINT8 ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			k |= m_inp_matrix[i]->read();
+			ret |= m_inp_matrix[i]->read();
 
-	return k;
+	return ret;
+}
+
+
+// devices with a TMS0980 can auto power-off
+
+WRITE_LINE_MEMBER(hh_tms1k_state::tms0980_auto_power_off)
+{
+	if (state)
+	{
+		m_power_on = false;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
 }
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::tms0980_power_button)
@@ -260,15 +334,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::tms0980_power_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(hh_tms1k_state::tms0980_auto_power_off)
-{
-	// TMS0980 auto power-off opcode
-	if (state)
-	{
-		m_power_on = false;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-}
+
 
 /***************************************************************************
 
@@ -305,14 +371,14 @@ WRITE_LINE_MEMBER(hh_tms1k_state::tms0980_auto_power_off)
 
 void hh_tms1k_state::mathmagi_display()
 {
-	m_display_maxy = 11;
 	m_display_maxx = 8;
+	m_display_maxy = 11;
 
 	// R0-R7: 7seg leds
 	for (int y = 0; y < 8; y++)
 	{
 		m_7seg_mask[y] = 0x7f;
-		m_display_state[y] = (m_r >> y & 1) ? ((m_o >> 1 & 0x7f) | (m_o << 7 & 0x80)) : 0;
+		m_display_state[y] = (m_r >> y & 1) ? (m_o >> 1) : 0;
 	}
 
 	// R8: custom math symbols digit
@@ -328,7 +394,6 @@ READ8_MEMBER(hh_tms1k_state::mathmagi_read_k)
 {
 	return read_inputs(6);
 }
-
 
 WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_r)
 {
@@ -347,6 +412,7 @@ WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_o)
 	data = (data << 1 & 0xfe) | (data >> 7 & 1); // because opla is unknown
 	m_o = data;
 }
+
 
 /* physical button layout and labels is like this:
 
@@ -397,6 +463,7 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+// output PLA is not dumped
 static const UINT16 mathmagi_output_pla[0x20] =
 {
 	lA+lB+lC+lD+lE+lF,      // 0
@@ -433,7 +500,6 @@ static const UINT16 mathmagi_output_pla[0x20] =
 	lA+lF+lE+lD+lC          // G
 };
 
-
 static MACHINE_CONFIG_START( mathmagi, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -469,8 +535,8 @@ MACHINE_CONFIG_END
 
 void hh_tms1k_state::amaztron_display()
 {
-	m_display_maxy = 3;
 	m_display_maxx = 8;
+	m_display_maxy = 3;
 
 	// R8,R9: select digit
 	for (int y = 0; y < 2; y++)
@@ -624,19 +690,14 @@ MACHINE_CONFIG_END
 void hh_tms1k_state::tc4_display()
 {
 	m_display_wait = 50;
-	m_display_maxy = 10;
-	m_display_maxx = 9;
 	
 	// R5,7,8,9 are 7segs
-	for (int y = 0; y < m_display_maxy; y++)
+	for (int y = 0; y < 10; y++)
 		if (y >= 5 && y <= 9 && y != 6)
 			m_7seg_mask[y] = 0x7f;
 	
 	// update current state (note: R6 as extra column!)
-	for (int y = 0; y < m_display_maxy; y++)
-		m_display_state[y] = (m_r >> y & 1) ? (m_o | (m_r << 2 & 0x100)) : 0;
-	
-	display_update();
+	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
 }
 
 READ8_MEMBER(hh_tms1k_state::tc4_read_k)
@@ -660,14 +721,14 @@ WRITE16_MEMBER(hh_tms1k_state::tc4_write_r)
 	m_inp_mux = data & 0x23f;
 	
 	// R6: led column 8
-	// +other: select leds
+	// +other columns
 	m_r = data;
 	tc4_display();
 }
 
 WRITE16_MEMBER(hh_tms1k_state::tc4_write_o)
 {
-	// O0-O7: leds/7segment
+	// O0-O7: led row
 	m_o = data;
 	tc4_display();
 }
@@ -740,21 +801,109 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Entex Baseball
+  Entex Electronic Baseball (1)
   * TMS1000NLP MP0914 (die labeled MP0914A)
+  
+  This is a handheld LED baseball game. One player controls the batter, the CPU
+  or other player controls the pitcher. Pitcher throw buttons are on a 'joypad'
+  obtained from a compartment in the back. Player scores are supposed to be
+  written down manually, the game doesn't save scores or innings (this annoyance
+  was resolved in the sequel). For more information, refer to the official manual.
+  
+  The overlay graphic is known to have 2 versions: one where the field players
+  are denoted by words ("left", "center", "short", etc), and an alternate one
+  with little guys drawn next to the LEDs.
+
+
+  lamp translation table: led LDzz from game PCB = MESS lampyx:
+
+    LD0  = -        LD10 = lamp12   LD20 = lamp42   LD30 = lamp60
+    LD1  = lamp23   LD11 = lamp4    LD21 = lamp41   LD31 = lamp61
+    LD2  = lamp0    LD12 = lamp15   LD22 = lamp40   LD32 = lamp62
+    LD3  = lamp1    LD13 = lamp22   LD23 = lamp43   LD33 = lamp70
+    LD4  = lamp2    LD14 = lamp33   LD24 = lamp53   LD34 = lamp71
+    LD5  = lamp10   LD15 = lamp32   LD25 = lamp52
+    LD6  = lamp13   LD16 = lamp21   LD26 = lamp51
+    LD7  = lamp11   LD17 = lamp31   LD27 = lamp50
+    LD8  = lamp3    LD18 = lamp30   LD28 = lamp72
+    LD9  = lamp14   LD19 = lamp20   LD29 = lamp73
 
 ***************************************************************************/
 
-// inputs
+void hh_tms1k_state::ebball_display()
+{
+	// R8 is a 7seg
+	m_7seg_mask[8] = 0x7f;
+	
+	display_matrix(7, 9, ~m_o, m_r);
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball_read_k)
+{
+	// note: K8(Vss row) is always on
+	return m_inp_matrix[5]->read() | read_inputs(5);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
+{
+	// R1-R5: input mux
+	m_inp_mux = data >> 1 & 0x1f;
+	
+	// R9: speaker out
+	m_speaker->level_w(data >> 9 & 1);
+	
+	// R0-R8: led columns
+	m_r = data;
+	ebball_display();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
+{
+	// O0-O6: led row
+	// O7: N/C
+	m_o = data;
+	ebball_display();
+}
+
 static INPUT_PORTS_START( ebball )
+	PORT_START("IN.0") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Change Sides")
+	PORT_CONFNAME( 0x04, 0x04, "Pitcher" )
+	PORT_CONFSETTING(    0x04, "Auto" )
+	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Knuckler")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Curve")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Slider")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // Vss!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
-// machine config
 static MACHINE_CONFIG_START( ebball, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=43K, C=47pf -> ~350kHz
+	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // RC osc. R=43K, C=47pf -> ~375kHz
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball_write_o))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball)
 
 	/* no video! */
@@ -793,21 +942,14 @@ READ8_MEMBER(hh_tms1k_state::elecdet_read_k)
 
 WRITE16_MEMBER(hh_tms1k_state::elecdet_write_r)
 {
-	m_display_maxy = 7;
-	m_display_maxx = 7;
-
-	// R0-R6: select digit
-	UINT8 o = BITSWAP8(m_o,7,5,2,1,4,0,6,3);
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		m_7seg_mask[y] = 0x7f;
-		m_display_state[y] = (data >> y & 1) ? o : 0;
-	}
-
-	display_update();
-
 	// R7,R8: speaker on
 	m_speaker->level_w((data & 0x180 && m_o & 0x80) ? 1 : 0);
+
+	// R0-R6: select digit
+	for (int y = 0; y < 7; y++)
+		m_7seg_mask[y] = 0x7f;
+
+	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::elecdet_write_o)
@@ -831,28 +973,28 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_o)
 */
 
 static INPUT_PORTS_START( elecdet )
-	PORT_START("IN.0") // O0 pin18
+	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Private Question")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 
-	PORT_START("IN.1") // O1 pin17
+	PORT_START("IN.1") // O1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.2") // O4 pin14
+	PORT_START("IN.2") // O4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("I Accuse")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
 
-	PORT_START("IN.3") // O6 pin12
+	PORT_START("IN.3") // O6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
@@ -906,20 +1048,10 @@ MACHINE_CONFIG_END
 
 void hh_tms1k_state::starwbc_display()
 {
-	m_display_maxy = 10;
-	m_display_maxx = 8;
-
-	UINT8 o = (m_o << 4 & 0xf0) | (m_o >> 4 & 0x0f);
-	for (int y = 0; y < m_display_maxy; y+=2)
-	{
-		m_display_state[y] = (m_r >> y & 1) ? o : 0;
-		
-		// R6,R8 are 7segs
-		if (y == 6 || y == 8)
-			m_7seg_mask[y] = 0x7f;
-	}
-
-	display_update();
+	// R6,R8 are 7segs
+	m_7seg_mask[6] = m_7seg_mask[8] = 0x7f;
+	
+	display_matrix(8, 10, m_o, m_r);
 }
 
 READ8_MEMBER(hh_tms1k_state::starwbc_read_k)
@@ -932,21 +1064,20 @@ WRITE16_MEMBER(hh_tms1k_state::starwbc_write_r)
 	// R0,R1,R3,R5,R7: input mux
 	m_inp_mux = (data & 3) | (data >> 1 & 4) | (data >> 2 & 8) | (data >> 3 & 0x10);
 
-	// R9: piezo speaker
+	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
 
-	// R0,R2,R4,R6,R8: leds
-	m_r = data;
+	// R0,R2,R4,R6,R8: led columns
+	m_r = data & 0x155;
 	starwbc_display();
 }
 
 WRITE16_MEMBER(hh_tms1k_state::starwbc_write_o)
 {
-	// O0-O7: leds state
-	m_o = data;
+	// O0-O7: led row
+	m_o = (data << 4 & 0xf0) | (data >> 4 & 0x0f);
 	starwbc_display();
 }
-
 
 
 /* physical button layout and labels is like this:
@@ -994,7 +1125,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( starwbc, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 300000) // RC osc. R=51K, C=47pf -> ~300kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // RC osc. R=51K, C=47pf -> ~325kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, starwbc_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, starwbc_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, starwbc_write_o))
@@ -1027,9 +1158,6 @@ MACHINE_CONFIG_END
   Refer to the official manual for more information.
 
 
-  TODO:
-  - MCU clock is unknown
-
 ***************************************************************************/
 
 READ8_MEMBER(hh_tms1k_state::comp4_read_k)
@@ -1045,17 +1173,19 @@ WRITE16_MEMBER(hh_tms1k_state::comp4_write_r)
 	// R2    R7
 	// R1    R6
 	// R0    R5
-	m_display_maxx = 11;
-	m_display_state[0] = data;
-	display_update();
+	m_r = data;
+	display_matrix(11, 1, m_r, m_o);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::comp4_write_o)
 {
-	// O0: leds common (always writes 1)
 	// O1-O3: input mux
-	// other bits: N/C
 	m_inp_mux = data >> 1 & 7;
+
+	// O0: leds common
+	// other bits: N/C
+	m_o = data;
+	display_matrix(11, 1, m_r, m_o);
 }
 
 
@@ -1103,7 +1233,7 @@ MACHINE_CONFIG_END
   Milton Bradley Simon, created by Ralph Baer
 
   Revision A hardware:
-  * TMS1000 (has internal ROM), DS75494 lamp driver
+  * TMS1000 (die labeled MP3226), DS75494 lamp driver
 
   Newer revisions have a smaller 16-pin MB4850 chip instead of the TMS1000.
   This one has been decapped too, but we couldn't find an internal ROM.
@@ -1127,9 +1257,7 @@ WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
 	// R5 -> 75494 IN3 -> red lamp
 	// R6 -> 75494 IN5 -> yellow lamp
 	// R7 -> 75494 IN2 -> blue lamp
-	m_display_maxx = 4;
-	m_display_state[0] = data >> 4 & 0xf;
-	display_update();
+	display_matrix(4, 1, data >> 4, 1);
 
 	// R8 -> 75494 IN0 -> speaker
 	m_speaker->level_w(data >> 8 & 1);
@@ -1219,8 +1347,8 @@ READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
 
 WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 {
-	m_display_maxy = 7;
 	m_display_maxx = 8;
+	m_display_maxy = 7;
 
 	// R0-R5: select digit (right-to-left)
 	for (int y = 0; y < 6; y++)
@@ -1336,9 +1464,7 @@ WRITE16_MEMBER(hh_tms1k_state::merlin_write_r)
 	R7   R8   R9
 	     R10
 	*/
-	m_display_maxx = 11;
-	m_display_state[0] = data;
-	display_update();
+	display_matrix(11, 1, data, 1);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::merlin_write_o)
@@ -1429,11 +1555,11 @@ READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
 
 WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 {
-	m_display_maxy = 3;
 	m_display_maxx = 7;
+	m_display_maxy = 3;
 
 	// R0-R2: select digit
-	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7);
+	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
 	for (int y = 0; y < m_display_maxy; y++)
 	{
 		m_7seg_mask[y] = 0x7f;
@@ -1535,23 +1661,10 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::bankshot_display()
-{
-	m_display_maxy = 11;
-	m_display_maxx = 7;
-	
-	// update current state
-	for (int y = 0; y < m_display_maxy; y++)
-		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
-	
-	display_update();
-}
-
 READ8_MEMBER(hh_tms1k_state::bankshot_read_k)
 {
 	return read_inputs(2);
 }
-
 
 WRITE16_MEMBER(hh_tms1k_state::bankshot_write_r)
 {
@@ -1561,17 +1674,17 @@ WRITE16_MEMBER(hh_tms1k_state::bankshot_write_r)
 	// R2,R3: input mux
 	m_inp_mux = data >> 2 & 3;
 
-	// R2-R10: led rows
+	// R2-R10: led columns
 	m_r = data & ~3;
-	bankshot_display();
+	display_matrix(7, 11, m_o, m_r);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::bankshot_write_o)
 {
-	// O0-O6: led columns
+	// O0-O6: led row
 	// O7: N/C
 	m_o = data;
-	bankshot_display();
+	display_matrix(7, 11, m_o, m_r);
 }
 
 
@@ -1641,10 +1754,7 @@ MACHINE_CONFIG_END
 
   *: higher number indicates higher difficulty
 
-***************************************************************************/
-
-
-/* display layout, where number xy is lamp R(x),O(y)
+  display layout, where number xy is lamp R(x),O(y)
 
        00    02    04
     10 01 12 03 14 05 16
@@ -1657,19 +1767,8 @@ MACHINE_CONFIG_END
        71    73    75
     50 60 52 62 54 64 56
        70    72    74
-*/
 
-void hh_tms1k_state::splitsec_display()
-{
-	m_display_maxy = 8;
-	m_display_maxx = 7;
-	
-	// update current state
-	for (int y = 0; y < m_display_maxy; y++)
-		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
-	
-	display_update();
-}
+***************************************************************************/
 
 READ8_MEMBER(hh_tms1k_state::splitsec_read_k)
 {
@@ -1684,17 +1783,17 @@ WRITE16_MEMBER(hh_tms1k_state::splitsec_write_r)
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
 
-	// R0-R7: led rows
+	// R0-R7: led columns
 	m_r = data;
-	display_update();
+	display_matrix(7, 8, m_o, m_r);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::splitsec_write_o)
 {
-	// O0-O6: led columns
+	// O0-O6: led row
 	// O7: N/C
 	m_o = data;
-	splitsec_display();
+	display_matrix(7, 8, m_o, m_r);
 }
 
 static INPUT_PORTS_START( splitsec )
@@ -1706,8 +1805,8 @@ static INPUT_PORTS_START( splitsec )
 
 	PORT_START("IN.1") // R10
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Select")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1764,11 +1863,8 @@ MACHINE_CONFIG_END
 
 void hh_tms1k_state::tandy12_display()
 {
-	m_display_maxx = 13;
-	
 	// O0-O7: button lamps 1-8, R0-R3: button lamps 9-12
-	m_display_state[0] = (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00);
-	display_update();
+	display_matrix(13, 1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00), 1);
 }
 
 READ8_MEMBER(hh_tms1k_state::tandy12_read_k)
@@ -1995,7 +2091,7 @@ ROM_END
 
 ROM_START( amaztron )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "tms1100nll_mp3405", 0x0000, 0x0800, CRC(9cbc0009) SHA1(17772681271b59280687492f37fa0859998f041d) )
+	ROM_LOAD( "mp3405", 0x0000, 0x0800, CRC(9cbc0009) SHA1(17772681271b59280687492f37fa0859998f041d) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_amaztron_mpla.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
@@ -2008,7 +2104,7 @@ ROM_END
 
 ROM_START( tc4 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms1400nll_mp7334", 0x0000, 0x1000, CRC(923f3821) SHA1(a9ae342d7ff8dae1dedcd1e4984bcfae68586581) )
+	ROM_LOAD( "mp7334", 0x0000, 0x1000, CRC(923f3821) SHA1(a9ae342d7ff8dae1dedcd1e4984bcfae68586581) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
@@ -2030,7 +2126,7 @@ ROM_END
 
 ROM_START( elecdet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms0980nll_mp6100a", 0x0000, 0x1000, CRC(6f396bb8) SHA1(1f104d4ca9bee0d4572be4779b7551dfe20c4f04) )
+	ROM_LOAD( "mp6100a", 0x0000, 0x1000, CRC(6f396bb8) SHA1(1f104d4ca9bee0d4572be4779b7551dfe20c4f04) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -2118,7 +2214,7 @@ ROM_END
 
 ROM_START( stopthie )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms0980nll_mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
+	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -2146,7 +2242,7 @@ ROM_END
 
 ROM_START( bankshot )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms1400nll_mp7313", 0x0000, 0x1000, CRC(7a5016a9) SHA1(a8730dc8a282ffaa3d89e675f371d43eb39f39b4) )
+	ROM_LOAD( "mp7313", 0x0000, 0x1000, CRC(7a5016a9) SHA1(a8730dc8a282ffaa3d89e675f371d43eb39f39b4) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
@@ -2157,7 +2253,7 @@ ROM_END
 
 ROM_START( splitsec )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "tms1400nll_mp7314", 0x0000, 0x1000, CRC(e94b2098) SHA1(f0fc1f56a829252185592a2508740354c50bedf8) )
+	ROM_LOAD( "mp7314", 0x0000, 0x1000, CRC(e94b2098) SHA1(f0fc1f56a829252185592a2508740354c50bedf8) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
@@ -2178,7 +2274,7 @@ ROM_END
 
 ROM_START( unk3403 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "tms1100nll_mp3403", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
+	ROM_LOAD( "mp3403", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
@@ -2198,7 +2294,7 @@ CONS( 1980, mathmagi, 0, 0, mathmagi, mathmagi, driver_device, 0, "APF Electroni
 CONS( 1979, amaztron, 0, 0, amaztron, amaztron, driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4, 0, 0, tc4, tc4, driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
-CONS( 1979, ebball, 0, 0, ebball, ebball, driver_device, 0, "Entex", "Baseball (Entex)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1978, ebball, 0, 0, ebball, ebball, driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet, 0, 0, elecdet, elecdet, driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE )
 
