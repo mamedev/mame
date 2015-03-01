@@ -217,8 +217,6 @@ dina      // Telegames Dina
 prsarcde  // Telegames Personal Arcade
 adam      // Coleco Adam
 
-amaztron
-
 // NEC
 pce    // PC/Engine NEC 1987-1993
 tg16      // Turbo Grafix-16  NEC 1989-1993
@@ -301,9 +299,7 @@ intvsrs   // Intellivision (Sears License) - 19??
 intvoice      // Mattel Intellivision + IntelliVoice expansion - 1982
 
 // Milton Bradley
-comp4
 microvsn  // MicroVision - 1979
-simon
 
 // Entex
 advision  // Adventurevision
@@ -1173,7 +1169,6 @@ m5p
 // APF Electronics Inc.
 apfm1000
 apfimag
-mathmagi
 
 // Tatung
 einstein
@@ -1240,7 +1235,6 @@ ht108064 // Hradstechnika Szvetkezet HT-1080Z/64
 radionic  // Radionic
 tandy2k
 tandy2khd
-tandy12
 
 coco      // Color Computer
 cocoe    // Color Computer (Extended BASIC 1.0)
@@ -2121,7 +2115,6 @@ sfortec  // 1989 Novag Super Forte C Chess Computer
 sexpertc // 1989 Novag Super Expert C Chess Computer
 diablo68 // 1991 Novag Diablo 68000 Chess Computer
 
-
 // Hegener & Glaser Munich
 //mephisto  // Mephisto 1 - roms needed - not in driver
 mm2       // Mephisto 2
@@ -2179,10 +2172,40 @@ ngen        // 1983
 ngenb38     // 1991
 386i        // 199?
 
+// Dedicated handhelds/tabletops
+maniac      // Ideal
+
+mathmagi    // APF
+amaztron    // Coleco
+tc4         // Coleco
+ebball      // Entex
+elecdet     // Ideal
+starwbc     // Kenner
+starwbcp    // Kenner (prototype)
+comp4       // MB
+simon       // MB
+cnsector    // Parker Bros
+merlin      // Parker Bros
+stopthie    // Parker Bros
+stopthiep   // Parker Bros (prototype)
+bankshot    // Parker Bros
+splitsec    // Parker Bros
+tandy12     // TRS
+unk3403
+
+edracula    // Epoch
+tmpacman    // Tomy
+tmtennis    // Tomy
+alnchase    // Tomy
+
+wildfire    // Parker Bros
+
+
 //********** Misc **********************************************************
 
 ssem // Manchester Small-Scale Experimental Machine, "Baby"
 craft // Craft, by [lft]
+
 
 //********** To sort (mostly skeleton drivers) *****************************
 
@@ -2271,13 +2294,6 @@ swyft
 mmd1
 mmd2
 mpf1p
-cnsector
-starwbc
-starwbcp
-stopthie
-stopthiep
-splitsec
-bankshot
 amico2k
 jtc
 jtces88
@@ -2539,7 +2555,6 @@ dvk_ksm
 asmapro
 asma2k
 altos5
-merlin
 ts802
 ts802h
 ts803h
@@ -2609,13 +2624,3 @@ leapstertv
 excali64
 bitgrpha
 bitgrphb
-unk3403
-elecdet
-wildfire
-tmtennis
-alnchase
-edracula
-tc4
-ebball
-tmpacman
-maniac
