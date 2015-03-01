@@ -63,11 +63,14 @@
 
 osd_video_config video_config;
 
+// monitor info
 osd_monitor_info *osd_monitor_info::list = NULL;
+
 
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
+
 
 //============================================================
 //  PROTOTYPES
@@ -318,7 +321,7 @@ void sdl_osd_interface::update(bool skip_redraw)
 	// poll the joystick values here
 	sdlinput_poll(machine());
 	check_osd_inputs(machine());
-
+	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
 }
@@ -450,7 +453,6 @@ void sdl_monitor_info::exit()
 //  pick_monitor
 //============================================================
 
-#if (SDLMAME_SDL2) || defined(SDLMAME_WIN32)
 osd_monitor_info *osd_monitor_info::pick_monitor(sdl_options &options, int index)
 {
 	osd_monitor_info *monitor;
@@ -472,7 +474,7 @@ osd_monitor_info *osd_monitor_info::pick_monitor(sdl_options &options, int index
 	// look for a match in the name first
 	if (scrname != NULL && (scrname[0] != 0))
 	{
-		for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
+		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->devicename()) == 0)
@@ -482,12 +484,12 @@ osd_monitor_info *osd_monitor_info::pick_monitor(sdl_options &options, int index
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		if (index-- == 0)
 			goto finishit;
 
 	// return the primary just in case all else fails
-	for (monitor = sdl_monitor_info::list; monitor != NULL; monitor = monitor->next())
+	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		if (monitor->is_primary())
 			goto finishit;
 
@@ -499,25 +501,6 @@ finishit:
 	}
 	return monitor;
 }
-#else
-osd_monitor_info *osd_monitor_info::pick_monitor(sdl_options &options, int index)
-{
-	osd_monitor_info *monitor;
-	float aspect;
-
-	// get the aspect ratio
-	aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
-
-	// return the primary just in case all else fails
-	monitor = osd_monitor_info::list;
-
-	if (aspect != 0)
-	{
-		monitor->m_aspect = aspect;
-	}
-	return monitor;
-}
-#endif
 
 
 //============================================================

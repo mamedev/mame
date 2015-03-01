@@ -29,32 +29,35 @@
 #include "config.h"
 
 //============================================================
+//  CONSTANTS
+//============================================================
+
+
+//============================================================
 //  GLOBAL VARIABLES
 //============================================================
 
 osd_video_config video_config;
 
+// monitor info
+osd_monitor_info *osd_monitor_info::list = NULL;
 
 
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
 
-// monitor info
-osd_monitor_info *osd_monitor_info::list = NULL;
 
 //============================================================
 //  PROTOTYPES
 //============================================================
 
 static void init_monitors(void);
-static osd_monitor_info *pick_monitor(windows_options &options, int index);
 
 static void check_osd_inputs(running_machine &machine);
 
 static float get_aspect(const char *defdata, const char *data, int report_error);
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
-
 
 
 //============================================================
@@ -80,7 +83,7 @@ bool windows_osd_interface::video_init()
 	// create the windows
 	windows_options &options = downcast<windows_options &>(machine().options());
 	for (index = 0; index < video_config.numscreens; index++)
-		win_window_info::create(machine(), index, pick_monitor(options, index), &windows[index]);
+		win_window_info::create(machine(), index, osd_monitor_info::pick_monitor(options, index), &windows[index]);
 	if (video_config.mode != VIDEO_MODE_NONE)
 		SetForegroundWindow(win_window_list->m_hwnd);
 
@@ -184,8 +187,12 @@ void windows_osd_interface::update(bool skip_redraw)
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
+	{
+//      profiler_mark(PROFILER_BLIT);
 		for (win_window_info *window = win_window_list; window != NULL; window = window->m_next)
 			window->update();
+//      profiler_mark(PROFILER_END);
+	}
 
 	// poll the joystick values here
 	winwindow_process_events(machine(), TRUE, FALSE);
@@ -196,6 +203,43 @@ void windows_osd_interface::update(bool skip_redraw)
 		debugger_update();
 }
 
+
+
+
+
+//============================================================
+//  monitor_enum_callback
+//============================================================
+
+BOOL CALLBACK win_monitor_info::monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
+{
+	osd_monitor_info ***tailptr = (osd_monitor_info ***)data;
+	osd_monitor_info *monitor;
+	MONITORINFOEX info;
+	BOOL result;
+
+	// get the monitor info
+	info.cbSize = sizeof(info);
+	result = GetMonitorInfo(handle, (LPMONITORINFO)&info);
+	assert(result);
+	(void)result; // to silence gcc 4.6
+
+	// guess the aspect ratio assuming square pixels
+	float aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
+
+	// allocate a new monitor info
+	char *temp = utf8_from_wstring(info.szDevice);
+	// copy in the data
+	monitor = global_alloc(win_monitor_info(handle, temp, aspect));
+	osd_free(temp);
+
+	// hook us into the list
+	**tailptr = monitor;
+	*tailptr = &monitor->m_next;
+
+	// enumerate all the available monitors so to list their names in verbose mode
+	return TRUE;
+}
 
 
 //============================================================
@@ -222,50 +266,14 @@ static void init_monitors(void)
 }
 
 
-
-//============================================================
-//  monitor_enum_callback
-//============================================================
-
-BOOL CALLBACK win_monitor_info::monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
-{
-	osd_monitor_info ***tailptr = (osd_monitor_info ***)data;
-	osd_monitor_info *monitor;
-	MONITORINFOEX info;
-	BOOL result;
-
-	// get the monitor info
-	info.cbSize = sizeof(info);
-	result = GetMonitorInfo(handle, (LPMONITORINFO)&info);
-	assert(result);
-	(void)result; // to silence gcc 4.6
-
-	// allocate a new monitor info
-	monitor = global_alloc(win_monitor_info(handle, "", 1.0f));
-	// copy in the data
-	//monitor->refresh();
-
-	// guess the aspect ratio assuming square pixels
-	monitor->set_aspect((float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top));
-
-	// hook us into the list
-	**tailptr = monitor;
-	*tailptr = &monitor->m_next;
-
-	// enumerate all the available monitors so to list their names in verbose mode
-	return TRUE;
-}
-
-
-
 //============================================================
 //  pick_monitor
 //============================================================
 
-static osd_monitor_info *pick_monitor(windows_options &options, int index)
+osd_monitor_info *osd_monitor_info::pick_monitor(windows_options &options, int index)
 {
-	const char *scrname, *scrname2;
 	osd_monitor_info *monitor;
+	const char *scrname, *scrname2;
 	int moncount = 0;
 	float aspect;
 
@@ -283,7 +291,7 @@ static osd_monitor_info *pick_monitor(windows_options &options, int index)
 	// look for a match in the name first
 	if (scrname != NULL && (scrname[0] != 0))
 	{
-		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->m_next)
+		for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		{
 			moncount++;
 			if (strcmp(scrname, monitor->devicename()) == 0)
@@ -293,15 +301,16 @@ static osd_monitor_info *pick_monitor(windows_options &options, int index)
 
 	// didn't find it; alternate monitors until we hit the jackpot
 	index %= moncount;
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->m_next)
+	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		if (index-- == 0)
 			goto finishit;
 
 	// return the primary just in case all else fails
-	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->m_next)
+	for (monitor = osd_monitor_info::list; monitor != NULL; monitor = monitor->next())
 		if (monitor->is_primary())
 			goto finishit;
 
+	// FIXME: FatalError?
 finishit:
 	if (aspect != 0)
 	{
@@ -309,7 +318,6 @@ finishit:
 	}
 	return monitor;
 }
-
 
 
 //============================================================
@@ -492,7 +500,7 @@ static float get_aspect(const char *defdata, const char *data, int report_error)
 
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error)
 {
-	config->width = config->height = config->refresh = 0;
+	config->width = config->height = config->depth = config->refresh = 0;
 	if (strcmp(data, OSDOPTVAL_AUTO) == 0)
 	{
 		if (strcmp(defdata, OSDOPTVAL_AUTO) == 0)

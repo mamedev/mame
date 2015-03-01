@@ -650,6 +650,7 @@ int sdl_info13::create()
 void sdl_info13::destroy()
 {
 	destroy_all_textures();
+	SDL_DestroyRenderer(m_sdl_renderer);
 }
 
 

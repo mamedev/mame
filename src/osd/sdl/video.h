@@ -128,7 +128,7 @@ public:
 
 	virtual ~osd_monitor_info() { }
 
-	const void *handle() { return m_handle; }
+	const void *oshandle() { return m_handle; }
 
 	const osd_rect &position_size() { refresh(); return m_pos_size; }
 	const osd_rect &usuable_position_size() { refresh(); return m_usuable_pos_size; }

@@ -10,6 +10,7 @@
 #define __WIN_VIDEO__
 
 #include "render.h"
+#include "winmain.h"
 
 //============================================================
 //  CONSTANTS
@@ -123,9 +124,7 @@ public:
 
 	osd_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
 
-#ifdef OSD_SDL
-	static osd_monitor_info *pick_monitor(sdl_options &options, int index);
-#endif
+	static osd_monitor_info *pick_monitor(windows_options &options, int index);
 	static osd_monitor_info *list;
 
 	// FIXME: should be private!

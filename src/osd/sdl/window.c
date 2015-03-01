@@ -866,7 +866,7 @@ osd_dim sdl_window_info::pick_best_mode()
 	}
 
 	// FIXME: this should be provided by monitor !
-	num = SDL_GetNumDisplayModes(*((UINT64 *)m_monitor->handle()));
+	num = SDL_GetNumDisplayModes(*((UINT64 *)m_monitor->oshandle()));
 
 	if (num == 0)
 	{
@@ -878,7 +878,7 @@ osd_dim sdl_window_info::pick_best_mode()
 		for (i = 0; i < num; ++i)
 		{
 			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(*((UINT64 *)m_monitor->handle()), i, &mode);
+			SDL_GetDisplayMode(*((UINT64 *)m_monitor->oshandle()), i, &mode);
 
 			// compute initial score based on difference between target and current
 			size_score = 1.0f / (1.0f + fabsf((INT32)mode.w - target_width) + fabsf((INT32)mode.h - target_height));
