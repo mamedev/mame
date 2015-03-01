@@ -2,10 +2,11 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  NEC uCOM4 MCU handhelds
+  NEC uCOM4 MCU tabletops/handhelds or other simple devices.
 
 
-
+  known chips:
+  
   serial  device  etc.
 -----------------------------------------------
  @048     uPD552  1980, Tomy Tennis
@@ -133,11 +134,8 @@ void hh_ucom4_state::machine_start()
 
 ***************************************************************************/
 
-
-
 // The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
-
 
 void hh_ucom4_state::display_update()
 {
@@ -210,6 +208,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
 	return ret;
 }
+
 
 
 /***************************************************************************
@@ -305,6 +304,7 @@ MACHINE_CONFIG_END
 
 
 
+
 /***************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
@@ -322,7 +322,6 @@ MACHINE_CONFIG_END
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
-
 
 READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
 {
@@ -394,6 +393,7 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+
 void hh_ucom4_state::tmtennis_set_clock()
 {
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
@@ -411,7 +411,6 @@ MACHINE_RESET_MEMBER(hh_ucom4_state, tmtennis)
 {
 	tmtennis_set_clock();
 }
-
 
 static MACHINE_CONFIG_START( tmtennis, hh_ucom4_state )
 
@@ -439,6 +438,8 @@ static MACHINE_CONFIG_START( tmtennis, hh_ucom4_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
+
 
 
 
@@ -537,6 +538,8 @@ MACHINE_CONFIG_END
 
 
 
+
+
 /***************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
@@ -592,6 +595,7 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_port_e_w)
 	alnchase_display_w(space, offset, data);
 }
 
+
 /* physical button layout and labels is like this:
 
     POWER SOUND LEVEL PLAYER
@@ -628,6 +632,7 @@ static INPUT_PORTS_START( alnchase )
 	PORT_CONFSETTING(    0x02, "Professional" )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
 
 static MACHINE_CONFIG_START( alnchase, hh_ucom4_state )
 
@@ -674,7 +679,6 @@ ROM_START( tmtennis )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
 ROM_END
-
 
 
 ROM_START( tmpacman )

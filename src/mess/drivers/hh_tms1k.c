@@ -46,6 +46,16 @@
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
+
+  TODO:
+  - verify output PLA and microinstructions PLA for MCUs that have been dumped
+    electronically (mpla is usually the default, opla is often custom)
+  - unknown MCU clocks for some
+  - some of the games rely on the fact that faster(longer) strobed leds appear
+    brighter: tc4(offensive players), bankshot(cue ball)
+  - add softwarelist for tc4 cartridges?
+  - stopthiep: unable to start a game (may be intentional?)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -243,7 +253,6 @@ enum
 // The device strobes the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
-
 void hh_tms1k_state::display_update()
 {
 	UINT32 active_state[0x20];
@@ -361,11 +370,6 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::tms0980_power_button)
   4) Gooey Gumdrop
   5) Football
   6) Lunar Lander
-
-
-  TODO:
-  - some of the led symbols are probably wrong, output PLA is unknown
-  - microinstructions PLA is not verified
 
 ***************************************************************************/
 
@@ -532,7 +536,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-
 void hh_tms1k_state::amaztron_display()
 {
 	m_display_maxx = 8;
@@ -649,6 +652,7 @@ MACHINE_CONFIG_END
 
 
 
+
 /***************************************************************************
 
   Coleco Total Control 4
@@ -677,13 +681,6 @@ MACHINE_CONFIG_END
   - Hockey      (K4?)
   - Soccer      (K2?)
   - Basketball  (K1?)
-
-
-  TODO:
-  - pin configuration of other carts is guessed
-  - softlist for the cartridges?
-  - offsensive players leds are supposed to look brighter
-  - MCU clock is unknown
 
 ***************************************************************************/
 
@@ -779,6 +776,7 @@ static INPUT_PORTS_START( tc4 )
 	PORT_CONFSETTING(    0x08, "Football" )
 INPUT_PORTS_END
 
+
 static MACHINE_CONFIG_START( tc4, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -797,6 +795,9 @@ static MACHINE_CONFIG_START( tc4, hh_tms1k_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
+
+
 
 
 /***************************************************************************
@@ -865,6 +866,7 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
 	ebball_display();
 }
 
+
 static INPUT_PORTS_START( ebball )
 	PORT_START("IN.0") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
@@ -916,6 +918,8 @@ MACHINE_CONFIG_END
 
 
 
+
+
 /***************************************************************************
 
   Ideal Electronic Detective
@@ -927,12 +931,7 @@ MACHINE_CONFIG_END
   difficulty(1-3), then number of players(1-4), then [ENTER]. Refer to the
   manual for more information.
 
-
-  TODO:
-  - MCU clock is unknown
-
 ***************************************************************************/
-
 
 READ8_MEMBER(hh_tms1k_state::elecdet_read_k)
 {
@@ -1209,8 +1208,6 @@ static INPUT_PORTS_START( comp4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-
-
 static MACHINE_CONFIG_START( comp4, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -1228,6 +1225,9 @@ static MACHINE_CONFIG_START( comp4, hh_tms1k_state )
 MACHINE_CONFIG_END
 
 
+
+
+
 /***************************************************************************
 
   Milton Bradley Simon, created by Ralph Baer
@@ -1235,13 +1235,10 @@ MACHINE_CONFIG_END
   Revision A hardware:
   * TMS1000 (die labeled MP3226), DS75494 lamp driver
 
-  Newer revisions have a smaller 16-pin MB4850 chip instead of the TMS1000.
-  This one has been decapped too, but we couldn't find an internal ROM.
-  It is possibly a cost-reduced custom ASIC specifically for Simon.
-
-  Other games assumed to be on similar hardware:
-  - Pocket Simon, but there's a chance it only exists with MB4850 chip
-  - Super Simon (TMS1100)
+  Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
+  instead of the TMS1000. This one has been decapped too, but we couldn't
+  find an internal ROM. It is possibly a cost-reduced custom ASIC specifically
+  for Simon. The semi-sequel Super Simon uses a TMS1100.
 
 ***************************************************************************/
 
@@ -1325,6 +1322,7 @@ MACHINE_CONFIG_END
 
 
 
+
 /***************************************************************************
 
   Parker Brothers Code Name: Sector, by Bob Doyle
@@ -1333,10 +1331,6 @@ MACHINE_CONFIG_END
   This is a tabletop submarine pursuit game. A grid board and small toy
   boats are used to remember your locations (a Paint app should be ok too).
   Refer to the official manual for more information, it is not a simple game.
-
-
-  TODO:
-  - MCU clock is unknown
 
 ***************************************************************************/
 
@@ -1371,7 +1365,6 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_o)
 	// O0-O7: digit segments
 	m_o = data;
 }
-
 
 
 static INPUT_PORTS_START( cnsector )
@@ -1426,10 +1419,16 @@ MACHINE_CONFIG_END
 
 
 
+
 /***************************************************************************
 
-  Parker Bros Merlin handheld computer game, by Bob Doyle
+  Parker Bros Merlin handheld game, by Bob Doyle
   * TMS1100NLL MP3404A-N2
+  * red LEDs and 1-bit sound
+  
+  Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
+  The one with dark-blue case is the rare sequel Master Merlin. More sequels
+  followed too, but on other hardware.
 
   To start a game, press NEW GAME, followed by a number:
   1: Tic-Tac-Toe
@@ -1440,12 +1439,6 @@ MACHINE_CONFIG_END
   6: Mindbender
 
   Refer to the official manual for more information on the games.
-
-
-  Other handhelds assumed to be on similar hardware:
-  - Dr. Smith - by Tomy, released in Japan (basically a white version of Merlin,
-    let's assume for now that the ROM contents is identical)
-  - Master Merlin
 
 ***************************************************************************/
 
@@ -1479,7 +1472,6 @@ WRITE16_MEMBER(hh_tms1k_state::merlin_write_o)
 }
 
 
-
 static INPUT_PORTS_START( merlin )
 	PORT_START("IN.0") // O0
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("Button 0")
@@ -1509,7 +1501,6 @@ INPUT_PORTS_END
 
 static const INT16 merlin_speaker_levels[] = { 0, 10922, 21845, 32767 };
 
-
 static MACHINE_CONFIG_START( merlin, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -1531,6 +1522,9 @@ static MACHINE_CONFIG_START( merlin, hh_tms1k_state )
 MACHINE_CONFIG_END
 
 
+
+
+
 /***************************************************************************
 
   Parker Brothers Stop Thief, by Bob Doyle
@@ -1539,11 +1533,6 @@ MACHINE_CONFIG_END
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
   the ON button. Otherwise, it is in test-mode where you can hear all sounds.
-
-
-  TODO:
-  - MCU clock is unknown
-  - stopthiep: unable to start a game (may be intentional?)
 
 ***************************************************************************/
 
@@ -1639,6 +1628,7 @@ MACHINE_CONFIG_END
 
 
 
+
 /***************************************************************************
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
@@ -1651,13 +1641,6 @@ MACHINE_CONFIG_END
   2: Straight Pool (2 players)
   3: Poison Pool
   4: Trick Shots
-
-
-  TODO:
-  - bankshot: the cue ball led is strobed more often than other leds,
-    making it look brighter. We need more accurate led decay simulation
-    for this to work.
-  - MCU clock is unknown
 
 ***************************************************************************/
 
@@ -1688,8 +1671,6 @@ WRITE16_MEMBER(hh_tms1k_state::bankshot_write_o)
 }
 
 
-
-
 /* physical button layout and labels is like this:
   (note: remember that you can rotate the display in MESS)
 
@@ -1716,7 +1697,6 @@ static INPUT_PORTS_START( bankshot )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 static MACHINE_CONFIG_START( bankshot, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -1735,6 +1715,7 @@ static MACHINE_CONFIG_START( bankshot, hh_tms1k_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
 
 
 
@@ -1833,8 +1814,6 @@ MACHINE_CONFIG_END
 
 
 
-
-
 /***************************************************************************
 
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
@@ -1853,11 +1832,6 @@ MACHINE_CONFIG_END
   As always, refer to the official manual for more information.
 
   See below at the input defs for a list of the games.
-
-
-  TODO:
-  - output PLA is not verified
-  - microinstructions PLA is not verified
 
 ***************************************************************************/
 
@@ -1958,7 +1932,6 @@ static const UINT16 tandy12_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-
 static MACHINE_CONFIG_START( tandy12, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -1978,6 +1951,8 @@ static MACHINE_CONFIG_START( tandy12, hh_tms1k_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
+
 
 
 
@@ -2043,6 +2018,7 @@ static INPUT_PORTS_START( unk3403 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)
 INPUT_PORTS_END
 
+
 static const UINT16 unk3403_output_pla[0x20] =
 {
 	/* O output PLA configuration currently unknown */
@@ -2051,7 +2027,6 @@ static const UINT16 unk3403_output_pla[0x20] =
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
 	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
 };
-
 
 static MACHINE_CONFIG_START( unk3403, hh_tms1k_state )
 
@@ -2071,12 +2046,14 @@ static MACHINE_CONFIG_START( unk3403, hh_tms1k_state )
 MACHINE_CONFIG_END
 
 
+
+
+
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
-
 
 ROM_START( mathmagi )
 	ROM_REGION( 0x800, "maincpu", 0 )
@@ -2098,8 +2075,6 @@ ROM_START( amaztron )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_amaztron_opla.pla", 0, 365, CRC(f3875384) SHA1(3c256a3db4f0aa9d93cf78124db39f4cbdc57e4a) )
 ROM_END
-
-
 
 
 ROM_START( tc4 )
@@ -2160,7 +2135,6 @@ ROM_START( starwbcp )
 ROM_END
 
 
-
 ROM_START( comp4 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc0904nl_cp0904a", 0x0000, 0x0400, CRC(6233ee1b) SHA1(738e109b38c97804b4ec52bed80b00a8634ad453) )
@@ -2185,6 +2159,7 @@ ROM_START( simon )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_simon_opla.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
 ROM_END
+
 
 ROM_START( cnsector )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -2240,6 +2215,7 @@ ROM_START( stopthiep )
 	ROM_LOAD( "tms0980_stopthie_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
+
 ROM_START( bankshot )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7313", 0x0000, 0x1000, CRC(7a5016a9) SHA1(a8730dc8a282ffaa3d89e675f371d43eb39f39b4) )
@@ -2272,6 +2248,7 @@ ROM_START( tandy12 )
 	ROM_LOAD( "tms1100_tandy12_opla.pla", 0, 365, NO_DUMP )
 ROM_END
 
+
 ROM_START( unk3403 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp3403", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
@@ -2281,11 +2258,6 @@ ROM_START( unk3403 )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_xxx_opla.pla", 0, 365, NO_DUMP )
 ROM_END
-
-
-
-
-
 
 
 
@@ -2303,7 +2275,6 @@ CONS( 1979, starwbcp, starwbc, 0, starwbc, starwbc, driver_device, 0, "Kenner", 
 
 CONS( 1977, comp4, 0, 0, comp4, comp4, driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon, 0, 0, simon, simon, driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
-
 
 CONS( 1977, cnsector, 0, 0, cnsector, cnsector, driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, merlin, 0, 0, merlin, merlin, driver_device, 0, "Parker Brothers", "Merlin", GAME_SUPPORTS_SAVE )
