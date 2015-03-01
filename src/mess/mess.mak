@@ -1470,6 +1470,7 @@ $(MESSOBJ)/novag.a:             \
 
 $(MESSOBJ)/olivetti.a:          \
 	$(MESS_DRIVERS)/m20.o       \
+	$(MESS_DRIVERS)/m24.o       \
 
 $(MESSOBJ)/omnibyte.a:          \
 	$(MESS_DRIVERS)/msbc1.o     \
