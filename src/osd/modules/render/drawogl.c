@@ -29,8 +29,8 @@
 #include "sdlinc.h"
 #endif
 
-// OpenGL headers
-#include "modules/opengl/osd_opengl.h"
+#include "modules/lib/osdlib.h"
+#include "modules/lib/osdobj_common.h"
 
 #ifdef OSD_WINDOWS
 #define SDLMAME_SDL2 1
@@ -39,9 +39,8 @@
 #endif
 #endif
 
-#include "modules/lib/osdlib.h"
-#include "modules/lib/osdobj_common.h"
-
+// OpenGL headers
+#include "modules/opengl/osd_opengl.h"
 
 #include "modules/opengl/gl_shader_tool.h"
 #include "modules/opengl/gl_shader_mgr.h"
