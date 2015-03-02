@@ -34,9 +34,6 @@
 
 #ifdef OSD_WINDOWS
 #define SDLMAME_SDL2 1
-#ifndef USE_DISPATCH_GL
-#include "GL/wglext.h"
-#endif
 #endif
 
 // OpenGL headers
