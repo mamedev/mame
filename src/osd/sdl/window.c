@@ -285,7 +285,6 @@ bool sdl_osd_interface::window_init()
 			NULL
 	};
 
-
 	osd_printf_verbose("\nHints:\n");
 	for (int i = 0; hints[i] != NULL; i++)
 		osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
@@ -551,6 +550,8 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 	}
 
 	window->renderer().destroy();
+	global_free(window->m_renderer);
+	window->m_renderer = NULL;
 
 #if (SDLMAME_SDL2)
 	bool is_osx = false;
@@ -575,6 +576,8 @@ OSDWORK_CALLBACK( sdl_window_info::sdlwindow_toggle_full_screen_wt )
 
 
 	sdlinput_release_keys();
+
+	window->set_renderer(draw.create(window));
 
 	// toggle the window mode
 	window->set_fullscreen(!window->fullscreen());
@@ -851,6 +854,7 @@ osd_dim sdl_window_info::pick_best_mode()
 	int i;
 	int num;
 	float size_score, best_score = 0.0f;
+	osd_dim ret(0,0);
 
 	// determine the minimum width/height for the selected target
 	m_target->compute_minimum_size(minimum_width, minimum_height);
@@ -905,12 +909,12 @@ osd_dim sdl_window_info::pick_best_mode()
 			if (size_score > best_score)
 			{
 				best_score = size_score;
-				return osd_dim(mode.w, mode.h);
+				ret = osd_dim(mode.w, mode.h);
 			}
 
 		}
 	}
-	return osd_dim(0,0); // please compiler
+	return ret;
 }
 #else
 osd_dim sdl_window_info::pick_best_mode()
@@ -1083,6 +1087,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	ASSERT_WINDOW_THREAD();
 	osd_free(wp);
 
+	// clear out original mode. Needed on OSX
 	if (window->fullscreen())
 	{
 		// default to the current mode exactly
@@ -1146,10 +1151,17 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	else
 		window->m_extra_flags = 0;
 
+#ifdef SDLMAME_MACOSX
+	/* FIMXE: On OSX, SDL_WINDOW_FULLSCREEN_DESKTOP seems to be more reliable.
+	 * 		  It however creates issues with white borders, i.e. the screen clear
+	 * 		  does not work. This happens both with opengl and accel.
+	 */
+#endif
+
 	// create the SDL window
 	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
 	window->m_extra_flags |= (window->fullscreen() ?
-			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
+			/*SDL_WINDOW_BORDERLESS |*/ SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 #if defined(SDLMAME_WIN32)
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
@@ -1198,7 +1210,8 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	// show window
 
 	SDL_ShowWindow(window->sdl_window());
-	//SDL_SetWindowFullscreen(window().sdl_window(), window().fullscreen);
+	//SDL_SetWindowFullscreen(window->sdl_window(), 0);
+	//SDL_SetWindowFullscreen(window->sdl_window(), window->fullscreen());
 	SDL_RaiseWindow(window->sdl_window());
 
 #ifdef SDLMAME_WIN32
