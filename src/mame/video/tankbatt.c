@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  tankbatt.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -56,18 +56,16 @@ PALETTE_INIT_MEMBER(tankbatt_state, tankbatt)
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_videoram_w)
+WRITE8_MEMBER(tankbatt_state::videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 TILE_GET_INFO_MEMBER(tankbatt_state::get_bg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	int code = videoram[tile_index];
-	int color = videoram[tile_index] | 0x01;
+	int code = m_videoram[tile_index];
+	int color = m_videoram[tile_index] | 0x01;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -79,9 +77,7 @@ void tankbatt_state::video_start()
 
 void tankbatt_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 0;offs < m_bulletsram.bytes();offs += 2)
+	for (int offs = 0;offs < m_bulletsram.bytes();offs += 2)
 	{
 		int color = 0xff;   /* cyan, same color as the tanks */
 		int x = m_bulletsram[offs + 1];
@@ -95,7 +91,7 @@ void tankbatt_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 tankbatt_state::screen_update_tankbatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tankbatt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_bullets(bitmap, cliprect);
