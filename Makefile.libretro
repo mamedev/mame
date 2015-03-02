@@ -1,4 +1,3 @@
-			SKIP_UNCHANGED=1 
 ###########################################################################
 #
 #   makefile
@@ -117,7 +116,7 @@ ifeq ($(platform), unix)
 	NATIVELDFLAGS = -Wl,--warn-common -lstdc++ -Wl,--no-undefined
 	NATIVECC = g++
 	NATIVECFLAGS = -std=gnu99
-BASELIBS +=  -lpthread
+	BASELIBS +=  -lpthread
 	CC_AS = gcc 
 	CC = g++
 	AR = @ar
@@ -210,16 +209,22 @@ else ifeq ($(platform), ios)
 	SHARED := -dynamiclib
 	TARGETOS = macosx
 
+	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
+	DEVROOT := $(shell xcodebuild -version -sdk iphoneos PlatformPath)/Developer
 	CC_AS = clang -arch armv7 -isysroot $(IOSSDK)
 	CC = clang++ -arch armv7 -isysroot $(IOSSDK)
+	AR = $(DEVROOT)/usr/bin/ar
 	LD = $(CC) -stdlib=libc++
 	LDFLAGS +=  $(fpic) $(SHARED)
-	NATIVELD = c++ -stdlib=libc++
+	# FIXME: NATIVELD probably shouldn't be -arch armv7 (but NATIVELD is used
+	#        places it shouldn't be I think)
+	NATIVELD = c++ -arch armv7 -isysroot $(IOSSDK) -stdlib=libc++
+	#NATIVELD = c++ -stdlib=libc++
 	NATIVECC = c++
 	PYTHON ?= @python
 	CFLAGS += -DIOS
-	LDFLAGSEMULATOR +=  -stdlib=libc++
-	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DUSE_ARM_HACK -DHAVE_POSIX_MEMALIGN
+	LDFLAGSEMULATOR += -stdlib=libc++
+	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DUSE_ARM_HACK -DHAVE_POSIX_MEMALIGN -marm
 	CCOMFLAGS += $(PLATCFLAGS)
 
 # QNX
@@ -389,7 +394,7 @@ else
 	LIBS += -lws2_32
 	DEFS = -DCRLF=3
 	DEFS += -DX64_WINDOWS_ABI
-    ifneq ($(findstring MINGW,$(shell uname -a)),)
+	ifneq ($(findstring MINGW,$(shell uname -a)),)
 		PTR64=1
 	endif
 
@@ -794,15 +799,19 @@ CDEFS = $(DEFS)
 emulator: maketree $(BUILD) $(EMULATOR)
 
 buildtools: maketree $(BUILD)
+# FIXME: This stuff is only used on iOS (where it doesn't work), and removing
+#        it gets us much closer to compiling.  Just commenting it for now in
+#        case it needs to be put back.
+#
+#ifeq ($(NATIVE),1)
+#	mkdir prec-build
+#	cp -R $(OBJ)/build/* prec-build/
+#	$(RM) -r $(OBJ)/osd
+#	$(RM) -r $(OBJ)/lib/util
+#	$(RM) -r $(OBJ)/libutil.a
+#	$(RM) -r $(OBJ)/libocore.a
+#endif
 
-ifeq ($(NATIVE),1)
-	mkdir prec-build
-	cp -R $(OBJ)/build/* prec-build/
-	$(RM) -r $(OBJ)/osd
-	$(RM) -r $(OBJ)/lib/util
-	$(RM) -r $(OBJ)/libutil.a
-	$(RM) -r $(OBJ)/libocore.a
-endif
 tools: maketree $(TOOLS)
 
 maketree: $(sort $(OBJDIRS))
@@ -825,7 +834,7 @@ endif
 	$(RM) depend_ume.mak
 	@echo Deleting build targets...
 ifneq ($(PARTIAL),1)
-	# TODO: We should do this smarter at some point
+# 	TODO: We should do this smarter at some point
 	$(RM) *_libretro.so *_libretro.dylib *_libretro.dll
 endif
 
@@ -850,6 +859,7 @@ BUILDTOOLS_CUSTOM = 0
 ifeq ($(platform), android)
 BUILDTOOLS_CUSTOM = 1
 else ifeq ($(platform), ios)
+# FIXME: Does nothing on iOS where NATIVE is 1 (at least via libretro-super)
 BUILDTOOLS_CUSTOM = 1
 endif
 
