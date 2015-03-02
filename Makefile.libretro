@@ -210,21 +210,16 @@ else ifeq ($(platform), ios)
 	TARGETOS = macosx
 
 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
-	DEVROOT := $(shell xcodebuild -version -sdk iphoneos PlatformPath)/Developer
 	CC_AS = clang -arch armv7 -isysroot $(IOSSDK)
 	CC = clang++ -arch armv7 -isysroot $(IOSSDK)
-	AR = $(DEVROOT)/usr/bin/ar
 	LD = $(CC) -stdlib=libc++
 	LDFLAGS +=  $(fpic) $(SHARED)
-	# FIXME: NATIVELD probably shouldn't be -arch armv7 (but NATIVELD is used
-	#        places it shouldn't be I think)
-	NATIVELD = c++ -arch armv7 -isysroot $(IOSSDK) -stdlib=libc++
-	#NATIVELD = c++ -stdlib=libc++
+	NATIVELD = c++ -stdlib=libc++
 	NATIVECC = c++
 	PYTHON ?= @python
 	CFLAGS += -DIOS
 	LDFLAGSEMULATOR += -stdlib=libc++
-	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DUSE_ARM_HACK -DHAVE_POSIX_MEMALIGN -marm
+	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DUSE_ARM_HACK -DHAVE_POSIX_MEMALIGN
 	CCOMFLAGS += $(PLATCFLAGS)
 
 # QNX
@@ -799,19 +794,15 @@ CDEFS = $(DEFS)
 emulator: maketree $(BUILD) $(EMULATOR)
 
 buildtools: maketree $(BUILD)
-# FIXME: This stuff is only used on iOS (where it doesn't work), and removing
-#        it gets us much closer to compiling.  Just commenting it for now in
-#        case it needs to be put back.
-#
-#ifeq ($(NATIVE),1)
-#	mkdir prec-build
-#	cp -R $(OBJ)/build/* prec-build/
-#	$(RM) -r $(OBJ)/osd
-#	$(RM) -r $(OBJ)/lib/util
-#	$(RM) -r $(OBJ)/libutil.a
-#	$(RM) -r $(OBJ)/libocore.a
-#endif
 
+ifeq ($(NATIVE),1)
+	mkdir prec-build
+	cp -R $(OBJ)/build/* prec-build/
+	$(RM) -r $(OBJ)/osd
+	$(RM) -r $(OBJ)/lib/util
+	$(RM) -r $(OBJ)/libutil.a
+	$(RM) -r $(OBJ)/libocore.a
+endif
 tools: maketree $(TOOLS)
 
 maketree: $(sort $(OBJDIRS))
@@ -859,7 +850,6 @@ BUILDTOOLS_CUSTOM = 0
 ifeq ($(platform), android)
 BUILDTOOLS_CUSTOM = 1
 else ifeq ($(platform), ios)
-# FIXME: Does nothing on iOS where NATIVE is 1 (at least via libretro-super)
 BUILDTOOLS_CUSTOM = 1
 endif
 
