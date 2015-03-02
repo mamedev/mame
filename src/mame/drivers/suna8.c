@@ -1955,10 +1955,10 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_CPU_IO_MAP(brickzn_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  // nmi breaks ramtest but is needed!
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* Z0840006PSC - 3MHz better matches the tempo in the video */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)   /* Z0840006PSC - 6MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(brickzn_sound_map)
 
-	MCFG_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)    /* Z0840006PSC */
+	MCFG_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)    /* Z0840006PSC - 6MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(brickzn_pcm_map)
 	MCFG_CPU_IO_MAP(brickzn_pcm_io_map)
 
@@ -1983,12 +1983,12 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)		// 3MHz (measured)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)	// 1.5MHz (measured)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
