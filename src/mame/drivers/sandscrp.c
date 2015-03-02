@@ -102,39 +102,39 @@ public:
 	UINT8 m_vblank_irq;
 	UINT8 m_latch1_full;
 	UINT8 m_latch2_full;
-	DECLARE_READ16_MEMBER(sandscrp_irq_cause_r);
-	DECLARE_WRITE16_MEMBER(sandscrp_irq_cause_w);
-	DECLARE_WRITE16_MEMBER(sandscrp_coin_counter_w);
-	DECLARE_READ16_MEMBER(sandscrp_latchstatus_word_r);
-	DECLARE_WRITE16_MEMBER(sandscrp_latchstatus_word_w);
-	DECLARE_READ16_MEMBER(sandscrp_soundlatch_word_r);
-	DECLARE_WRITE16_MEMBER(sandscrp_soundlatch_word_w);
-	DECLARE_WRITE8_MEMBER(sandscrp_bankswitch_w);
-	DECLARE_READ8_MEMBER(sandscrp_latchstatus_r);
-	DECLARE_READ8_MEMBER(sandscrp_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(sandscrp_soundlatch_w);
-	virtual void machine_reset();
-	UINT32 screen_update_sandscrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_sandscrp(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(sandscrp_interrupt);
+	
+	DECLARE_READ16_MEMBER(irq_cause_r);
+	DECLARE_WRITE16_MEMBER(irq_cause_w);
+	DECLARE_WRITE16_MEMBER(coincounter_w);
+	DECLARE_READ16_MEMBER(latchstatus_word_r);
+	DECLARE_WRITE16_MEMBER(latchstatus_word_w);
+	DECLARE_READ16_MEMBER(soundlatch_word_r);
+	DECLARE_WRITE16_MEMBER(soundlatch_word_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(latchstatus_r);
+	DECLARE_READ8_MEMBER(soundlatch_r);
+	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	
+	virtual void machine_start();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_eof(screen_device &screen, bool state);
+	
+	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_DRIVER_INIT(sandscp);
 };
 
 
 
-UINT32 sandscrp_state::screen_update_sandscrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-
-	int i;
 
 	screen.priority().fill(0, cliprect);
 
 	m_view2_0->kaneko16_prepare(bitmap, cliprect);
 
-	for ( i = 0; i < 8; i++ )
+	for ( int i = 0; i < 8; i++ )
 	{
 		m_view2_0->render_tilemap_chip(screen,bitmap,cliprect,i);
 	}
@@ -147,12 +147,16 @@ UINT32 sandscrp_state::screen_update_sandscrp(screen_device &screen, bitmap_ind1
 
 
 
-void sandscrp_state::machine_reset()
+void sandscrp_state::machine_start()
 {
+	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	
+	save_item(NAME(m_sprite_irq));
+	save_item(NAME(m_unknown_irq));
+	save_item(NAME(m_vblank_irq));
+	save_item(NAME(m_latch1_full));
+	save_item(NAME(m_latch2_full));
 }
-
-/* Sand Scorpion */
-
 
 
 /* Update the IRQ state based on all possible causes */
@@ -167,14 +171,14 @@ void sandscrp_state::update_irq_state()
 
 
 /* Called once/frame to generate the VBLANK interrupt */
-INTERRUPT_GEN_MEMBER(sandscrp_state::sandscrp_interrupt)
+INTERRUPT_GEN_MEMBER(sandscrp_state::interrupt)
 {
 	m_vblank_irq = 1;
 	update_irq_state();
 }
 
 
-void sandscrp_state::screen_eof_sandscrp(screen_device &screen, bool state)
+void sandscrp_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)
@@ -186,7 +190,7 @@ void sandscrp_state::screen_eof_sandscrp(screen_device &screen, bool state)
 }
 
 /* Reads the cause of the interrupt */
-READ16_MEMBER(sandscrp_state::sandscrp_irq_cause_r)
+READ16_MEMBER(sandscrp_state::irq_cause_r)
 {
 	return  ( m_sprite_irq  ?  0x08  : 0 ) |
 			( m_unknown_irq ?  0x10  : 0 ) |
@@ -195,7 +199,7 @@ READ16_MEMBER(sandscrp_state::sandscrp_irq_cause_r)
 
 
 /* Clear the cause of the interrupt */
-WRITE16_MEMBER(sandscrp_state::sandscrp_irq_cause_w)
+WRITE16_MEMBER(sandscrp_state::irq_cause_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -216,7 +220,7 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_irq_cause_w)
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE16_MEMBER(sandscrp_state::sandscrp_coin_counter_w)
+WRITE16_MEMBER(sandscrp_state::coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -226,13 +230,13 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_coin_counter_w)
 }
 
 
-READ16_MEMBER(sandscrp_state::sandscrp_latchstatus_word_r)
+READ16_MEMBER(sandscrp_state::latchstatus_word_r)
 {
 	return  (m_latch1_full ? 0x80 : 0) |
 			(m_latch2_full ? 0x40 : 0) ;
 }
 
-WRITE16_MEMBER(sandscrp_state::sandscrp_latchstatus_word_w)
+WRITE16_MEMBER(sandscrp_state::latchstatus_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -241,13 +245,13 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_latchstatus_word_w)
 	}
 }
 
-READ16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_r)
+READ16_MEMBER(sandscrp_state::soundlatch_word_r)
 {
 	m_latch2_full = 0;
 	return soundlatch2_byte_r(space,0);
 }
 
-WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
+WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -260,7 +264,7 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
 
 static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(sandscrp_irq_cause_w) // IRQ Ack
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(irq_cause_w) // IRQ Ack
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM     // RAM
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
@@ -268,15 +272,15 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)  // Coin Counters (Lockout unused)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(coincounter_w)  // Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
 	AM_RANGE(0xec0000, 0xec0001) AM_READ(watchdog_reset16_r)    //
-	AM_RANGE(0x800000, 0x800001) AM_READ(sandscrp_irq_cause_r)  // IRQ Cause
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(sandscrp_soundlatch_word_r, sandscrp_soundlatch_word_w)   // From/To Sound CPU
-	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE(sandscrp_latchstatus_word_r, sandscrp_latchstatus_word_w) //
+	AM_RANGE(0x800000, 0x800001) AM_READ(irq_cause_r)  // IRQ Cause
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(soundlatch_word_r, soundlatch_word_w)   // From/To Sound CPU
+	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE(latchstatus_word_r, latchstatus_word_w) //
 ADDRESS_MAP_END
 
 
@@ -285,24 +289,24 @@ ADDRESS_MAP_END
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE8_MEMBER(sandscrp_state::sandscrp_bankswitch_w)
+WRITE8_MEMBER(sandscrp_state::bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 7);
 }
 
-READ8_MEMBER(sandscrp_state::sandscrp_latchstatus_r)
+READ8_MEMBER(sandscrp_state::latchstatus_r)
 {
 	return  (m_latch2_full ? 0x80 : 0) |    // swapped!?
 			(m_latch1_full ? 0x40 : 0) ;
 }
 
-READ8_MEMBER(sandscrp_state::sandscrp_soundlatch_r)
+READ8_MEMBER(sandscrp_state::soundlatch_r)
 {
 	m_latch1_full = 0;
 	return soundlatch_byte_r(space,0);
 }
 
-WRITE8_MEMBER(sandscrp_state::sandscrp_soundlatch_w)
+WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 {
 	m_latch2_full = 1;
 	soundlatch2_byte_w(space,0,data);
@@ -316,12 +320,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sandscrp_soundport, AS_IO, 8, sandscrp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sandscrp_bankswitch_w)    // ROM Bank
+	AM_RANGE(0x00, 0x00) AM_WRITE(bankswitch_w)    // ROM Bank
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)        // PORTA/B read
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", okim6295_device, write)     // OKIM6295
-	AM_RANGE(0x06, 0x06) AM_WRITE(sandscrp_soundlatch_w)    //
-	AM_RANGE(0x07, 0x07) AM_READ(sandscrp_soundlatch_r)     //
-	AM_RANGE(0x08, 0x08) AM_READ(sandscrp_latchstatus_r)    //
+	AM_RANGE(0x06, 0x06) AM_WRITE(soundlatch_w)    //
+	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r)     //
+	AM_RANGE(0x08, 0x08) AM_READ(latchstatus_r)    //
 ADDRESS_MAP_END
 
 
@@ -455,19 +459,13 @@ GFXDECODE_END
                                 Sand Scorpion
 ***************************************************************************/
 
-/* YM3014B + YM2203C */
-
-WRITE_LINE_MEMBER(sandscrp_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
 	MCFG_CPU_PROGRAM_MAP(sandscrp)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sandscrp_state,  sandscrp_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sandscrp_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* Z8400AB1, Reads the DSWs: it can't be disabled */
 	MCFG_CPU_PROGRAM_MAP(sandscrp_soundmem)
@@ -481,8 +479,8 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update_sandscrp)
-	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof_sandscrp)
+	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sandscrp)
@@ -508,20 +506,15 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
+	/* YM3014B + YM2203C */
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sandscrp_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
-
-DRIVER_INIT_MEMBER(sandscrp_state, sandscp)
-{
-	UINT8 *ROM = memregion("audiocpu")->base();
-	membank("bank1")->configure_entries(0, 8, ROM, 0x4000);
-}
 
 /***************************************************************************
 
@@ -590,6 +583,6 @@ ROM_START( sandscrpb ) /* Different rev PCB */
 ROM_END
 
 
-GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, sandscp,          ROT90, "Face",   "Sand Scorpion", 0 )
-GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, sandscp,          ROT90, "Face",   "Sand Scorpion (Earlier)", 0 )
-GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, sandscp,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", 0 )
+GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion", GAME_SUPPORTS_SAVE )
+GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", GAME_SUPPORTS_SAVE )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", GAME_SUPPORTS_SAVE )
