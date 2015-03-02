@@ -17,11 +17,17 @@ public:
 
 	mgolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram") { }
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -34,25 +40,25 @@ public:
 	UINT8 m_mask;
 	attotime m_time_pushed;
 	attotime m_time_released;
+	emu_timer *m_interrupt_timer;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	DECLARE_WRITE8_MEMBER(mgolf_vram_w);
-	DECLARE_READ8_MEMBER(mgolf_wram_r);
-	DECLARE_READ8_MEMBER(mgolf_dial_r);
-	DECLARE_READ8_MEMBER(mgolf_misc_r);
-	DECLARE_WRITE8_MEMBER(mgolf_wram_w);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(wram_r);
+	DECLARE_READ8_MEMBER(dial_r);
+	DECLARE_READ8_MEMBER(misc_r);
+	DECLARE_WRITE8_MEMBER(wram_w);
+	
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(mgolf);
-	UINT32 screen_update_mgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	
 	void update_plunger(  );
 	double calc_plunger_pos();
 
@@ -69,7 +75,7 @@ TILE_GET_INFO_MEMBER(mgolf_state::get_tile_info)
 }
 
 
-WRITE8_MEMBER(mgolf_state::mgolf_vram_w)
+WRITE8_MEMBER(mgolf_state::vram_w)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -82,7 +88,7 @@ void mgolf_state::video_start()
 }
 
 
-UINT32 mgolf_state::screen_update_mgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -157,7 +163,7 @@ TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 	if (scanline >= 262)
 		scanline = 16;
 
-	timer_set(m_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -167,13 +173,13 @@ double mgolf_state::calc_plunger_pos()
 }
 
 
-READ8_MEMBER(mgolf_state::mgolf_wram_r)
+READ8_MEMBER(mgolf_state::wram_r)
 {
 	return m_video_ram[0x380 + offset];
 }
 
 
-READ8_MEMBER(mgolf_state::mgolf_dial_r)
+READ8_MEMBER(mgolf_state::dial_r)
 {
 	UINT8 val = ioport("41")->read();
 
@@ -190,7 +196,7 @@ READ8_MEMBER(mgolf_state::mgolf_dial_r)
 }
 
 
-READ8_MEMBER(mgolf_state::mgolf_misc_r)
+READ8_MEMBER(mgolf_state::misc_r)
 {
 	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
@@ -209,7 +215,7 @@ READ8_MEMBER(mgolf_state::mgolf_misc_r)
 }
 
 
-WRITE8_MEMBER(mgolf_state::mgolf_wram_w)
+WRITE8_MEMBER(mgolf_state::wram_w)
 {
 	m_video_ram[0x380 + offset] = data;
 }
@@ -220,11 +226,11 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")
-	AM_RANGE(0x0041, 0x0041) AM_READ(mgolf_dial_r)
+	AM_RANGE(0x0041, 0x0041) AM_READ(dial_r)
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("60")
-	AM_RANGE(0x0061, 0x0061) AM_READ(mgolf_misc_r)
-	AM_RANGE(0x0080, 0x00ff) AM_READ(mgolf_wram_r)
-	AM_RANGE(0x0180, 0x01ff) AM_READ(mgolf_wram_r)
+	AM_RANGE(0x0061, 0x0061) AM_READ(misc_r)
+	AM_RANGE(0x0080, 0x00ff) AM_READ(wram_r)
+	AM_RANGE(0x0180, 0x01ff) AM_READ(wram_r)
 	AM_RANGE(0x0800, 0x0bff) AM_READONLY
 
 	AM_RANGE(0x0000, 0x0009) AM_WRITENOP
@@ -238,9 +244,9 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	AM_RANGE(0x006a, 0x006a) AM_WRITENOP
 	AM_RANGE(0x006c, 0x006c) AM_WRITENOP
 	AM_RANGE(0x006d, 0x006d) AM_WRITENOP
-	AM_RANGE(0x0080, 0x00ff) AM_WRITE(mgolf_wram_w)
-	AM_RANGE(0x0180, 0x01ff) AM_WRITE(mgolf_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(mgolf_vram_w) AM_SHARE("video_ram")
+	AM_RANGE(0x0080, 0x00ff) AM_WRITE(wram_w)
+	AM_RANGE(0x0180, 0x01ff) AM_WRITE(wram_w)
+	AM_RANGE(0x0800, 0x0bff) AM_WRITE(vram_w) AM_SHARE("video_ram")
 
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -336,13 +342,17 @@ GFXDECODE_END
 
 void mgolf_state::machine_start()
 {
+	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	
 	save_item(NAME(m_prev));
 	save_item(NAME(m_mask));
+	save_item(NAME(m_time_pushed));
+	save_item(NAME(m_time_released));
 }
 
 void mgolf_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(16), TIMER_INTERRUPT, 16);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(16), 16);
 
 	m_mask = 0;
 	m_prev = 0;
@@ -361,7 +371,7 @@ static MACHINE_CONFIG_START( mgolf, mgolf_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update_mgolf)
+	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgolf)
@@ -396,4 +406,4 @@ ROM_START( mgolf )
 ROM_END
 
 
-GAME( 1978, mgolf, 0, mgolf, mgolf, driver_device, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", GAME_NO_SOUND )
+GAME( 1978, mgolf, 0, mgolf, mgolf, driver_device, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
