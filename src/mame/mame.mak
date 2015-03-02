@@ -1346,7 +1346,6 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/firebeat.o $(MACHINE)/midikbd.o \
 	$(DRIVERS)/flkatck.o $(VIDEO)/flkatck.o \
 	$(DRIVERS)/gberet.o $(VIDEO)/gberet.o \
-	$(DRIVERS)/gbusters.o $(VIDEO)/gbusters.o \
 	$(DRIVERS)/gijoe.o $(VIDEO)/gijoe.o \
 	$(DRIVERS)/gradius3.o $(VIDEO)/gradius3.o \
 	$(DRIVERS)/gticlub.o \
