@@ -579,22 +579,14 @@ MACHINE_START_MEMBER(thunderx_state,scontra)
 	save_item(NAME(m_palette_selected));
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_pmcbank));
-    
-    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
+
+    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
 }
 
 MACHINE_START_MEMBER(thunderx_state,thunderx)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
-	membank("bank1")->configure_entries(12, 4, &ROM[0x08000], 0x2000);
-	membank("bank1")->set_entry(0);
-
-	memset(m_pmcram, 0, sizeof(m_pmcram));
-
 	MACHINE_START_CALL_MEMBER(scontra);
-
+	memset(m_pmcram, 0, sizeof(m_pmcram));
 	save_item(NAME(m_pmcram));
 }
 
@@ -658,7 +650,7 @@ MACHINE_CONFIG_END
 WRITE8_MEMBER( thunderx_state::thunderx_banking_callback )
 {
 	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
-	membank("bank1")->set_entry(((data & 0x0f) ^ 0x08));
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 static MACHINE_CONFIG_START( thunderx, thunderx_state )
@@ -712,10 +704,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( scontra )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "775-e02.k11",     0x10000, 0x08000, CRC(a61c0ead) SHA1(9a0aadc8d3538fc1d88b761753fffcac8923a218) )   /* banked ROM */
-	ROM_CONTINUE(            0x08000, 0x08000 )             /* fixed ROM */
-	ROM_LOAD( "775-e03.k13",     0x20000, 0x10000, CRC(00b02622) SHA1(caf1da53815e437e3fb952d29e71f2c314684cd9) )   /* banked ROM */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "775-e02.k11",     0x00000, 0x10000, CRC(a61c0ead) SHA1(9a0aadc8d3538fc1d88b761753fffcac8923a218) )   /* banked + fixed ROM */
+	ROM_LOAD( "775-e03.k13",     0x10000, 0x10000, CRC(00b02622) SHA1(caf1da53815e437e3fb952d29e71f2c314684cd9) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "775-c01.bin", 0x00000, 0x08000, CRC(0ced785a) SHA1(1eebe005a968fbaac595c168499107e34763976c) )
@@ -767,10 +758,9 @@ ROM_START( scontra )
 ROM_END
 
 ROM_START( scontraj )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "775-f02.bin", 0x10000, 0x08000, CRC(8d5933a7) SHA1(e13ec62a4209b790b609429d98620ec0d07bd0ee) )   /* banked ROM */
-	ROM_CONTINUE(            0x08000, 0x08000 )             /* fixed ROM */
-	ROM_LOAD( "775-f03.bin", 0x20000, 0x10000, CRC(1ef63d80) SHA1(8fa41038ec2928f9572d0d4511a4bb3a3d8de06d) )   /* banked ROM */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "775-f02.bin", 0x00000, 0x10000, CRC(8d5933a7) SHA1(e13ec62a4209b790b609429d98620ec0d07bd0ee) )   /* banked + fixed ROM */
+	ROM_LOAD( "775-f03.bin", 0x10000, 0x10000, CRC(1ef63d80) SHA1(8fa41038ec2928f9572d0d4511a4bb3a3d8de06d) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "775-c01.bin", 0x00000, 0x08000, CRC(0ced785a) SHA1(1eebe005a968fbaac595c168499107e34763976c) )
@@ -822,10 +812,9 @@ ROM_START( scontraj )
 ROM_END
 
 ROM_START( thunderx )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-s03.k15", 0x10000, 0x10000, CRC(2aec2699) SHA1(8f52703a6a1ba6417c484925192ce697af9c73f1) )
-	ROM_LOAD( "873-s02.k13", 0x20000, 0x08000, CRC(6619333a) SHA1(1961658d528b0870c57f1cb78e016fb881f50392) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-s02.k13", 0x00000, 0x10000, CRC(6619333a) SHA1(1961658d528b0870c57f1cb78e016fb881f50392) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-s03.k15", 0x10000, 0x10000, CRC(2aec2699) SHA1(8f52703a6a1ba6417c484925192ce697af9c73f1) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
@@ -855,10 +844,9 @@ ROM_START( thunderx )
 ROM_END
 
 ROM_START( thunderxa ) /* Alternate Starting stage then the other 2 sets, Perhaps a US set? */
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-k03.k15", 0x10000, 0x10000, CRC(276817ad) SHA1(34b1beecf2a4c54dd7cd150c5d83b44f67be288a) )
-	ROM_LOAD( "873-k02.k13", 0x20000, 0x08000, CRC(80cc1c45) SHA1(881bc6eea94671e8c3fdb7a10b0e742b18cb7212) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-k02.k13", 0x00000, 0x10000, CRC(80cc1c45) SHA1(881bc6eea94671e8c3fdb7a10b0e742b18cb7212) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-k03.k15", 0x10000, 0x10000, CRC(276817ad) SHA1(34b1beecf2a4c54dd7cd150c5d83b44f67be288a) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-h01.f8",    0x0000, 0x8000, CRC(990b7a7c) SHA1(0965e7350c6006a9652cea0f24d836b4979910fd) )
@@ -888,10 +876,9 @@ ROM_START( thunderxa ) /* Alternate Starting stage then the other 2 sets, Perhap
 ROM_END
 
 ROM_START( thunderxb ) /* Set had no labels, same starting stage as parent set */
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-03.k15", 0x10000, 0x10000, CRC(36680a4e) SHA1(9b3b6bf75a9c04e764448cd958277bd081cc4a53) )
-	ROM_LOAD( "873-02.k13", 0x20000, 0x08000, CRC(c58b2c34) SHA1(4050d2edc579ffedba3d40782a08e43ac89b1b86) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-02.k13", 0x00000, 0x10000, CRC(c58b2c34) SHA1(4050d2edc579ffedba3d40782a08e43ac89b1b86) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-03.k15", 0x10000, 0x10000, CRC(36680a4e) SHA1(9b3b6bf75a9c04e764448cd958277bd081cc4a53) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
@@ -921,10 +908,9 @@ ROM_START( thunderxb ) /* Set had no labels, same starting stage as parent set *
 ROM_END
 
 ROM_START( thunderxj )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-n03.k15", 0x10000, 0x10000, CRC(a01e2e3e) SHA1(eba0d95dc0c5eed18743a96e4bbda5e60d5d9c97) )
-	ROM_LOAD( "873-n02.k13", 0x20000, 0x08000, CRC(55afa2cc) SHA1(5fb9df0c7c7c0c2029dbe0f3c1e0340234a03e8a) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-n02.k13", 0x00000, 0x10000, CRC(55afa2cc) SHA1(5fb9df0c7c7c0c2029dbe0f3c1e0340234a03e8a) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-n03.k15", 0x10000, 0x10000, CRC(a01e2e3e) SHA1(eba0d95dc0c5eed18743a96e4bbda5e60d5d9c97) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
