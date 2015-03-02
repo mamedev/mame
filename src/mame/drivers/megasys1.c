@@ -105,8 +105,8 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 
 - Understand properly how irqs truly works, kazan / iganinju is (again) broken.
 
-- 64street: player characters in attract mode doesn't move at all, protection
-  or btanb?
+- 64street: player characters in attract mode doesn't move at all, protection?
+  they move on the real PCB
 
 - Understand a handful of unknown bits in video regs
 
@@ -1751,7 +1751,7 @@ ROM_START( 64street )
 	ROM_LOAD( "64th_10.rom", 0x000000, 0x040000, CRC(a3390561) SHA1(f86d5c61e3e80d30408535c2203940ca1e95ac18) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "prom",        0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "pr91009.12",  0x0000, 0x0200, CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // same as pr-91044 on hayaosi1
 ROM_END
 
 
@@ -1787,7 +1787,7 @@ ROM_START( 64streetj )
 	ROM_LOAD( "64th_10.rom", 0x000000, 0x040000, CRC(a3390561) SHA1(f86d5c61e3e80d30408535c2203940ca1e95ac18) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "prom",        0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "pr91009.12",  0x0000, 0x0200, CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // same as pr-91044 on hayaosi1
 ROM_END
 
 
