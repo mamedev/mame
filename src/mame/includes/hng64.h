@@ -30,6 +30,43 @@ struct blit_parameters
 };
 
 
+///////////////
+// 3d Engine //
+///////////////
+
+struct polyVert
+{
+	float worldCoords[4];   // World space coordinates (X Y Z 1.0)
+
+	float texCoords[4];     // Texture coordinates (U V 0 1.0) -> OpenGL style...
+
+	float normal[4];        // Normal (X Y Z 1.0)
+	float clipCoords[4];    // Homogeneous screen space coordinates (X Y Z W)
+
+	float light[3];         // The intensity of the illumination at this point
+};
+
+struct polygon
+{
+	int n;                      // Number of sides
+	struct polyVert vert[10];   // Vertices (maximum number per polygon is 10 -> 3+6)
+
+	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
+	int visible;                // Polygon visibility in scene
+
+	UINT8 texIndex;             // Which texture to draw from (0x00-0x0f)
+	UINT8 texType;              // How to index into the texture
+	UINT8 texPageSmall;         // Does this polygon use 'small' texture pages?
+	UINT8 texPageHorizOffset;   // If it does use small texture pages, how far is this page horizontally offset?
+	UINT8 texPageVertOffset;    // If it does use small texture pages, how far is this page vertically offset?
+
+	UINT32 palOffset;           // The base offset where this object's palette starts.
+	UINT32 palPageSize;         // The size of the palette page that is being pointed to.
+
+	UINT32 debugColor;          // Will go away someday.  Used to explicitly color polygons for debugging.
+};
+
+
 
 ///////////////////////
 // polygon rendering //
@@ -46,6 +83,16 @@ struct polygonRasterOptions
 	int palPageSize;
 	int debugColor;
 };
+
+// Refer to the clipping planes as numbers
+#define HNG64_LEFT   0
+#define HNG64_RIGHT  1
+#define HNG64_TOP    2
+#define HNG64_BOTTOM 3
+#define HNG64_NEAR   4
+#define HNG64_FAR    5
+
+
 
 class hng64_state : public driver_device
 {
@@ -66,7 +113,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_dl(*this, "dl"),
 		m_3dregs(*this, "3dregs"),
 		m_3d_1(*this, "3d_1"),
 		m_3d_2(*this, "3d_2"),
@@ -93,7 +139,8 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 	/* 3D stuff */
-	required_shared_ptr<UINT32> m_dl;
+	UINT16* m_dl;
+
 	required_shared_ptr<UINT32> m_3dregs;
 	required_shared_ptr<UINT32> m_3d_1;
 	required_shared_ptr<UINT32> m_3d_2;
@@ -153,8 +200,6 @@ public:
 	UINT32 m_old_animbits;
 	UINT16 m_old_tileflags[4];
 
-	UINT32 m_dls[2][0x81];
-
 	// 3d State
 	int m_paletteState3d;
 	float m_projectionMatrix[16];
@@ -184,8 +229,8 @@ public:
 	DECLARE_READ32_MEMBER(hng64_3d_2_r);
 	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
 	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
-	DECLARE_WRITE32_MEMBER(dl_w);
-	DECLARE_READ32_MEMBER(dl_r);
+	DECLARE_WRITE16_MEMBER(dl_w);
+	//DECLARE_READ32_MEMBER(dl_r);
 	DECLARE_WRITE32_MEMBER(dl_control_w);
 	DECLARE_WRITE32_MEMBER(dl_upload_w);
 	DECLARE_WRITE32_MEMBER(tcram_w);
@@ -293,6 +338,20 @@ public:
 	void drawShaded( struct polygon *p);
 
 	void hng64_patch_bios_region(int region);
+
+	void printPacket(const UINT16* packet, int hex);
+	void matmul4(float *product, const float *a, const float *b);
+	void vecmatmul4(float *product, const float *a, const float *b);
+	float vecDotProduct(const float *a, const float *b);
+	void setIdentity(float *matrix);
+	float uToF(UINT16 input);
+	void normalize(float* x);
+	int Inside(struct polyVert *v, int plane);
+	void Intersect(struct polyVert *input0, struct polyVert *input1, struct polyVert *output, int plane);
+	void performFrustumClip(struct polygon *p);
+	UINT8 *m_texturerom;
+	UINT16* m_vertsrom;
+	int m_vertsrom_size;
 
 };
 

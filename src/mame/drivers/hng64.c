@@ -812,133 +812,6 @@ WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 }
 
 
-// Hardware calls these '3d buffers'
-//   They're only read during the startup check of fatfurwa.  Z-buffer memory?  Front buffer, back buffer?
-//   They're definitely mirrored in the startup test.  Elsemi says:
-//   <ElSemi> 30100000-3011ffff is framebuffer A0
-//   <ElSemi> 30120000-3013ffff is framebuffer A1
-//   <ElSemi> 30140000-3015ffff is ZBuffer A
-READ32_MEMBER(hng64_state::hng64_3d_1_r)
-{
-	return m_3d_1[offset];
-}
-
-WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
-{
-	COMBINE_DATA (&m_3d_1[offset]);
-}
-
-READ32_MEMBER(hng64_state::hng64_3d_2_r)
-{
-	return m_3d_2[offset];
-}
-
-WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
-{
-	COMBINE_DATA (&m_3d_2[offset]);
-}
-
-// The 3d 'display list'
-WRITE32_MEMBER(hng64_state::dl_w)
-{
-	UINT32 *hng64_dl = m_dl;
-	//UINT16 packet3d[16];
-
-	COMBINE_DATA(&hng64_dl[offset]);
-
-#if 0
-	if (offset == 0x08 || offset == 0x7f || // Special buggers.
-		offset == 0x10 || offset == 0x18 ||
-		offset == 0x20 || offset == 0x28 ||
-		offset == 0x30 || offset == 0x38 ||
-		offset == 0x40 || offset == 0x48 ||
-		offset == 0x50 || offset == 0x58 ||
-		offset == 0x60 || offset == 0x68 ||
-		offset == 0x70 || offset == 0x78)
-	{
-		// Create a 3d packet
-		UINT16 packetStart = offset - 0x08;
-		if (offset == 0x7f) packetStart += 1;
-
-		for (i = 0; i < 0x08; i++)
-		{
-			packet3d[i*2+0] = (hng64_dl[packetStart+i] & 0xffff0000) >> 16;
-			packet3d[i*2+1] = (hng64_dl[packetStart+i] & 0x0000ffff);
-		}
-
-		// Send it off to the 3d subsystem.
-		hng64_command3d( packet3d);
-	}
-#endif
-}
-
-#if 0
-READ32_MEMBER(hng64_state::dl_r)
-{
-	//osd_printf_debug("dl R (%08x) : %x %x\n", space.device().safe_pc(), offset, hng64_dl[offset]);
-	//usrintf_showmessage("dl R (%08x) : %x %x", space.device().safe_pc(), offset, hng64_dl[offset]);
-	return hng64_dl[offset];
-}
-#endif
-
-TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
-{
-// ...
-	m_set_irq(0x0008);
-}
-
-/* TODO: different param for both Samurai games, less FIFO to process? */
-WRITE32_MEMBER(hng64_state::dl_upload_w)
-{
-	// this handles 3d to fb upload
-	UINT16 packet3d[16];
-//	printf("dl_upload_w %08x %08x\n", data, mem_mask);
-
-
-	for(int packetStart=0;packetStart<0x200/4;packetStart+=8)
-	{
-		// Create a 3d packet
-		//UINT16 packetStart = offset - 0x08;
-		//if (offset == 0x7f) packetStart += 1;
-
-		for (int i = 0; i < 0x08; i++)
-		{
-			packet3d[i*2+0] = (m_dl[packetStart+i] & 0xffff0000) >> 16;
-			packet3d[i*2+1] = (m_dl[packetStart+i] & 0x0000ffff);
-		}
-
-		// Send it off to the 3d subsystem.
-		hng64_command3d( packet3d);
-	}
-
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
-}
-
-/* Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown */
-WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
-{
-//	printf("dl_control_w %08x %08x\n", data, mem_mask);
-
-	//if(data & 2) // swap buffers
-	//{
-	//  clear3d();
-	//}
-
-//  printf("%02x\n",data);
-
-//  if(data & 1) // process DMA from 3d FIFO to framebuffer
-
-//  if(data & 4) // reset buffer count
-}
-
-#ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(hng64_state::activate_3d_buffer)
-{
-	COMBINE_DATA (&active_3d_buffer[offset]);
-	osd_printf_debug("COMBINED %d\n", active_3d_buffer[offset]);
-}
-#endif
-
 // Transition Control memory.
 WRITE32_MEMBER(hng64_state::tcram_w)
 {
@@ -1210,7 +1083,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_SHARE("dl")  // 3d Display List
+	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
 	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
