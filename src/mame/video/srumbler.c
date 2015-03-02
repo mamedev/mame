@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  srumbler.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -52,6 +52,8 @@ void srumbler_state::video_start()
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x07ff,0xf800); /* split type 1 has pens 0-10 transparent in front half */
+	
+	save_item(NAME(m_scroll));
 }
 
 
@@ -62,20 +64,20 @@ void srumbler_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(srumbler_state::srumbler_foreground_w)
+WRITE8_MEMBER(srumbler_state::foreground_w)
 {
 	m_foregroundram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(srumbler_state::srumbler_background_w)
+WRITE8_MEMBER(srumbler_state::background_w)
 {
 	m_backgroundram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
 
-WRITE8_MEMBER(srumbler_state::srumbler_4009_w)
+WRITE8_MEMBER(srumbler_state::_4009_w)
 {
 	/* bit 0 flips screen */
 	flip_screen_set(data & 1);
@@ -88,7 +90,7 @@ WRITE8_MEMBER(srumbler_state::srumbler_4009_w)
 }
 
 
-WRITE8_MEMBER(srumbler_state::srumbler_scroll_w)
+WRITE8_MEMBER(srumbler_state::scroll_w)
 {
 	m_scroll[offset] = data;
 
@@ -151,7 +153,7 @@ void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 srumbler_state::screen_update_srumbler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 srumbler_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(bitmap,cliprect);
