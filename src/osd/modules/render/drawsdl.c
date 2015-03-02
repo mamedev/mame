@@ -508,6 +508,7 @@ void sdl_info::destroy()
 		global_free_array(m_yuv_bitmap);
 		m_yuv_bitmap = NULL;
 	}
+	SDL_DestroyRenderer(m_sdl_renderer);
 }
 
 //============================================================

@@ -166,7 +166,6 @@ enum
 //  MACROS
 //============================================================
 
-#ifdef OSD_WINDOWS
 // texture formats
 // This used to be an enum, but these are now defines so we can use them as
 // preprocessor conditionals
@@ -179,6 +178,7 @@ enum
 #define SDL_TEXFORMAT_RGB15             (6)
 #define SDL_TEXFORMAT_RGB15_PALETTED    (7)
 #define SDL_TEXFORMAT_PALETTE16A        (8)
+#if 0
 // special texture formats for 16bpp texture destination support, do not use
 // to address the tex properties / tex functions arrays!
 #define SDL_TEXFORMAT_PALETTE16_ARGB1555    (16)

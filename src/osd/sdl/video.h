@@ -29,24 +29,6 @@ enum {
 
 #define VIDEO_SCALE_MODE_NONE       (0)
 
-// texture formats
-// This used to be an enum, but these are now defines so we can use them as
-// preprocessor conditionals
-#define SDL_TEXFORMAT_ARGB32            (0) // non-16-bit textures or specials
-#define SDL_TEXFORMAT_RGB32             (1)
-#define SDL_TEXFORMAT_RGB32_PALETTED    (2)
-#define SDL_TEXFORMAT_YUY16             (3)
-#define SDL_TEXFORMAT_YUY16_PALETTED    (4)
-#define SDL_TEXFORMAT_PALETTE16         (5)
-#define SDL_TEXFORMAT_RGB15             (6)
-#define SDL_TEXFORMAT_RGB15_PALETTED    (7)
-#define SDL_TEXFORMAT_PALETTE16A        (8)
-// special texture formats for 16bpp texture destination support, do not use
-// to address the tex properties / tex functions arrays!
-#define SDL_TEXFORMAT_PALETTE16_ARGB1555    (16)
-#define SDL_TEXFORMAT_RGB15_ARGB1555        (17)
-#define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555   (18)
-
 #define GLSL_SHADER_MAX 10
 
 //============================================================
