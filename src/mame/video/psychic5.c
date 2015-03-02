@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/jalblend.h"
 #include "includes/psychic5.h"
 
 
@@ -25,8 +24,10 @@ void psychic5_state::change_palette(int offset, UINT8* palram, int palbase)
 	UINT8 hi = palram[(offset) | 1];
 
 	int color = offset >> 1;
-
-	jal_blend_set(palbase + color, hi & 0x0f);
+	
+	if (m_blend)
+		m_blend->set(palbase + color, hi & 0x0f);
+	
 	m_palette->set_pen_color(palbase + color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
@@ -56,7 +57,7 @@ void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)
 	{
 		UINT8 val = (r + g + b) / 3;        /* Grey */
 		/* Just leave plain grey */
-		m_palette->set_pen_color(color,jal_blend_func(rgb_t(val,val,val),irgb,ix));
+		m_palette->set_pen_color(color,m_blend->func(rgb_t(val,val,val),irgb,ix));
 	}
 	else
 	{
@@ -64,7 +65,7 @@ void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)
 		if (!(m_title_screen & 1))
 		{
 			/* Leave the world as-is */
-			m_palette->set_pen_color(color,jal_blend_func(rgb_t(r,g,b),irgb,ix));
+			m_palette->set_pen_color(color,m_blend->func(rgb_t(r,g,b),irgb,ix));
 		}
 	}
 }
@@ -191,7 +192,6 @@ VIDEO_START_MEMBER(psychic5_state,psychic5)
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
-	jal_blend_init(machine(), 1);
 	
 	save_item(NAME(m_title_screen));
 
@@ -204,7 +204,6 @@ VIDEO_START_MEMBER(psychic5_state,bombsa)
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
-	jal_blend_init(machine(), 0);
 	
 	save_item(NAME(m_bombsa_unknown));
 }
@@ -223,7 +222,11 @@ VIDEO_RESET_MEMBER(psychic5_state,psychic5)
   Screen refresh
 ***************************************************************************/
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(m_palette, bitmap, cliprect, m_gfxdecode->gfx(0), code, color, flipx, flipy, sx, sy, 15);
+#define DRAW_SPRITE(code, sx, sy) \
+	if (m_blend) \
+		m_blend->drawgfx(m_palette, bitmap, cliprect, m_gfxdecode->gfx(0), code, color, flipx, flipy, sx, sy, 15); \
+	else \
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 15);
 
 void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
