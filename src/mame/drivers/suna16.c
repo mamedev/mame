@@ -288,22 +288,28 @@ ADDRESS_MAP_END
                             Back Street Soccer
 ***************************************************************************/
 
+MACHINE_START_MEMBER(suna16_state, bssoccer)
+{
+    membank("bank1")->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
+    membank("bank2")->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
+}
+
 /* Bank Switching */
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
-	UINT8 *RAM = memregion("pcm1")->base();
-	int bank = data & 7;
+	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-	membank("bank1")->set_base(&RAM[bank * 0x10000 + 0x1000]);
+    printf("%d %d\n", 1, bank);
+    membank("bank1")->set_entry(bank);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
-	UINT8 *RAM = memregion("pcm2")->base();
-	int bank = data & 7;
+	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-	membank("bank2")->set_base(&RAM[bank * 0x10000 + 0x1000]);
+    printf("%d %d\n", 2, bank);
+    membank("bank2")->set_entry(bank);
 }
 
 
@@ -366,10 +372,9 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
-	UINT8 *RAM = memregion("pcm1")->base();
-	int bank = data & 1;
+	const int bank = data & 1;
 	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-	membank("bank1")->set_base(&RAM[bank * 0x10000 + 0x400]);
+    membank("bank1")->set_entry(bank);
 }
 
 /* Memory maps: Yes, *no* RAM */
@@ -386,6 +391,11 @@ static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(bssoccer_DAC2_w)  // 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
+
+MACHINE_START_MEMBER(suna16_state,uballoon)
+{
+    membank("bank1")->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+}
 
 MACHINE_RESET_MEMBER(suna16_state,uballoon)
 {
@@ -812,6 +822,8 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+    MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -869,6 +881,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+    MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
 
 	/* video hardware */

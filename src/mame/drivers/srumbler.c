@@ -27,27 +27,31 @@ WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
 	  Note that 5000-8fff can be either ROM or RAM, so we should handle
 	  that as well to be 100% accurate.
 	 */
-	int i;
-	UINT8 *ROM = memregion("user1")->base();
 	UINT8 *prom1 = memregion("proms")->base() + (data & 0xf0);
 	UINT8 *prom2 = memregion("proms")->base() + 0x100 + ((data & 0x0f) << 4);
 
-	for (i = 0x05;i < 0x10;i++)
+	for (int i = 0x05;i < 0x10;i++)
 	{
+        /* bit 2 of prom1 selects ROM or RAM - not supported */
 		int bank = ((prom1[i] & 0x03) << 4) | (prom2[i] & 0x0f);
-		char bankname[10];
-		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
+        char bankname[10];
 		sprintf(bankname, "%04x", i*0x1000);
-		membank(bankname)->set_base(&ROM[bank*0x1000]);
+        membank(bankname)->set_entry(bank);
 	}
 }
 
 void srumbler_state::machine_start()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/* initialize banked ROM pointers */
-	srumbler_bankswitch_w(space,0,0);
+    for (int i = 0x05; i < 0x10; i++)
+	{
+        char bankname[10];
+		sprintf(bankname, "%04x", i*0x1000);
+        membank(bankname)->configure_entries(0, 64, memregion("user1")->base(), 0x1000);
+	}
+
+    /* initialize banked ROM pointers */
+	srumbler_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::srumbler_interrupt)
@@ -84,7 +88,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x400e, 0x400e) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000") AM_WRITE(srumbler_foreground_w) AM_SHARE("foregroundram") /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000") /* Banked ROM */
-	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP    /* Video RAM 2 ??? (not used) */
+	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP        /* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000") /* Banked ROM */
 	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000") /* Banked ROM */
