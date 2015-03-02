@@ -16,8 +16,12 @@
 	 * #include <GL/glext.h>
 	 */
 	#ifdef OSD_WINDOWS
-	#include "GL/gl.h"
-	#include "GL/glext.h"
+		#ifdef _MSC_VER
+			#include "SDL1211_opengl.h"
+		#else
+			#include "GL/gl.h"
+			#include "GL/glext.h"
+		#endif
 	#else
 	#if (SDLMAME_SDL2)
 	#include <SDL2/SDL_version.h>
