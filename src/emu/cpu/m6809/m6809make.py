@@ -15,8 +15,9 @@ def load_file(fname, lines):
 		path = path + '/'
 	try:
 		f = open(fname, "rU")
-	except Exception, err:
-		print "Cannot read opcodes file %s [%s]" % (fname, err)
+	except Exception:
+		err = sys.exc_info()[1]
+		sys.stderr.write("Cannot read opcodes file %s [%s]\n" % (fname, err))
 		sys.exit(1)
 	
 	rawlines = re.split('(\n|; *\n?)', f.read())

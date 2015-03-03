@@ -351,7 +351,8 @@ def EmitGroup17(f,funcname, opname, opexecute):
 
 try:
     f = open(sys.argv[1], "w")
-except Exception, err:
+except Exception:
+    err = sys.exc_info()[1]
     sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[1], err))
     sys.exit(1)
 

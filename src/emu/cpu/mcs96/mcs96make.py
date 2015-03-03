@@ -70,8 +70,9 @@ class OpcodeList:
         self.macros = {}
         try:
             f = open(fname, "rU")
-        except Exception, err:
-            print "Cannot read opcodes file %s [%s]" % (fname, err)
+        except Exception:
+            err = sys.exc_info()[1]
+            sys.stderr.write("Cannot read opcodes file %s [%s]\n" % (fname, err))
             sys.exit(1)
 
         opc = None
@@ -174,7 +175,8 @@ def main(argv):
     
     try:
         f = open(argv[3], "w")
-    except Exception, err:
+    except Exception:
+        err = sys.exc_info()[1]
         sys.stderr.write("cannot write file %s [%s]\n" % (argv[3], err))
         sys.exit(1)
     
