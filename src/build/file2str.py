@@ -29,7 +29,7 @@ except IOError:
     print("Unable to open source file '%s'" % srcfile)
     sys.exit(-1)
 
-bytes = os.path.getsize(srcfile)
+byteCount = os.path.getsize(srcfile)
 try:
     dst = open(dstfile,'w')
     dst.write('extern const %s %s[];\n' % ( type, varname ));
@@ -42,11 +42,11 @@ try:
                 for b in chunk:
                     dst.write('0x%02x' % b)
                     offs = offs + 1
-                    if offs != bytes:
+                    if offs != byteCount:
                         dst.write(',')
             else:
                 break
-            if offs != bytes:
+            if offs != byteCount:
                 dst.write('\n\t')
     if terminate == 1:
         dst.write(',0x00')
