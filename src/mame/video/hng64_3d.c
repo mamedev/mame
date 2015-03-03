@@ -500,9 +500,9 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 			if (chunkOffset[1] & 0x1000) polys[*numPolys].texType = 0x1;
 			else                         polys[*numPolys].texType = 0x0;
 
-			polys[*numPolys].texPageSmall       = (chunkOffset[2] & 0x8000) >> 15;  // Just a guess.
-			polys[*numPolys].texPageHorizOffset = (chunkOffset[2] & 0x3000) >> 12;
-			polys[*numPolys].texPageVertOffset  = (chunkOffset[2] & 0x0060) >> 5;
+			polys[*numPolys].texPageSmall       = (chunkOffset[2] & 0xc000)>>14;  // Just a guess.
+			polys[*numPolys].texPageHorizOffset = (chunkOffset[2] & 0x3800) >> 11;
+			polys[*numPolys].texPageVertOffset  = (chunkOffset[2] & 0x0070) >> 4;
 
 			polys[*numPolys].texIndex = chunkOffset[1] & 0x000f;
 
@@ -537,6 +537,16 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 			polys[*numPolys].palOffset += (explicitPaletteValue1 + explicitPaletteValue2);
 
 
+#if 0
+			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
+			{
+			//	if (chunkOffset[2] == 0xd870)
+				{
+					polys[*numPolys].debugColor = 0xffff0000;
+					printf("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
+				}
+			}
+#endif
 
 			UINT8 chunkLength = 0;
 			switch(chunkType)
@@ -1275,15 +1285,25 @@ inline void hng64_state::FillSmoothTexPCHorizontalLine(
 					textureT = t_coord * 512.0f;
 				}
 
+				// stuff in mode 1 here already looks good?
 				// Small-Page textures
-				if (prOptions.texPageSmall)
+				if (prOptions.texPageSmall == 2)
 				{
 					textureT = fmod(textureT, 256.0f);
 					textureS = fmod(textureS, 256.0f);
 
-					textureT += (256.0f * prOptions.texPageHorizOffset);
-					textureS += (256.0f * prOptions.texPageVertOffset);
+					textureT += (256.0f * (prOptions.texPageHorizOffset>>1));
+					textureS += (256.0f * (prOptions.texPageVertOffset>>1));
 				}
+				else if (prOptions.texPageSmall == 3)
+				{
+					textureT = fmod(textureT, 128.0f);
+					textureS = fmod(textureS, 128.0f);
+
+					textureT += (128.0f * (prOptions.texPageHorizOffset>>0));
+					textureS += (128.0f * (prOptions.texPageVertOffset>>0));
+				}
+
 				paletteEntry = textureOffset[((int)textureS)*1024 + (int)textureT];
 
 				// Naieve Alpha Implementation (?) - don't draw if you're at texture index 0...
