@@ -226,13 +226,13 @@ void i386_device::x87_write_stack(int i, floatx80 value, int update_tag)
 
 void i386_device::x87_set_stack_underflow()
 {
-	m_x87_sw |= X87_SW_C1 | X87_SW_IE | X87_SW_SF;
+	m_x87_sw &= ~X87_SW_C1;
+	m_x87_sw |= X87_SW_IE | X87_SW_SF;
 }
 
 void i386_device::x87_set_stack_overflow()
 {
-	m_x87_sw &= ~X87_SW_C1;
-	m_x87_sw |= X87_SW_IE | X87_SW_SF;
+	m_x87_sw |= X87_SW_C1 | X87_SW_IE | X87_SW_SF;
 }
 
 int i386_device::x87_inc_stack()
