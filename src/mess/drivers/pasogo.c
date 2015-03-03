@@ -465,80 +465,34 @@ PORT_START("JOY")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
 INPUT_PORTS_END
 
-static const unsigned char pasogo_palette[][3] =
-{
-	{ 0, 0, 0 },
-	{ 45,45,43 },
-	{ 130, 159, 166 },
-	{ 255,255,255 }
-};
-
 PALETTE_INIT_MEMBER(pasogo_state, pasogo)
 {
-	int i;
-
-	for ( i = 0; i < ARRAY_LENGTH(pasogo_palette); i++ )
-	{
-		palette.set_pen_color(i, pasogo_palette[i][0], pasogo_palette[i][1], pasogo_palette[i][2]);
-	}
+	palette.set_pen_color(0, rgb_t(160, 190, 170));
+	palette.set_pen_color(1, rgb_t(40, 50, 70));
 }
 
 
 UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//static int width = -1, height = -1;
-	UINT8 *rom = (UINT8 *)m_vram.target();
-	static const UINT16 c[] = { 3, 0 };
-	int x,y;
-//  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0);
-	int w = 640;
-	int h = 240;
-	if (0)
+	UINT8 *vram = (UINT8 *)m_vram.target();
+	int x, y;
+	for (y=0; y<240; y++)
 	{
-		w = 320;
-		h = 240;
-		for (y=0; y<h; y++)
+		for (x=0; x<(320/8); x++)
 		{
-			for (x=0; x<w; x+=4)
-			{
-				int a = (y & 1) * 0x2000;
-				UINT8 d = rom[a + (y & ~1) * 80/2 + x/4];
-				UINT16 *line = &bitmap.pix16(y, x);
-				*line++ = (d >> 6) & 3;
-				*line++ = (d >> 4) & 3;
-				*line++ = (d >> 2) & 3;
-				*line++ = (d >> 0) & 3;
-			}
+			int a = (y & 3) * 0x2000;
+			UINT8 d1 = vram[a + (y >> 2) * 80 + x];
+			UINT16 *line = &bitmap.pix16(y, x << 3);
+			*line++ = ((d1 >> 7) & 1);
+			*line++ = ((d1 >> 6) & 1);
+			*line++ = ((d1 >> 5) & 1);
+			*line++ = ((d1 >> 4) & 1);
+			*line++ = ((d1 >> 3) & 1);
+			*line++ = ((d1 >> 2) & 1);
+			*line++ = ((d1 >> 1) & 1);
+			*line++ = ((d1 >> 0) & 1);
 		}
 	}
-	else
-	{
-		for (y=0; y<h; y++)
-		{
-			for (x=0; x<w; x+=8)
-			{
-				int a = (y & 3) * 0x2000;
-				UINT8 d = rom[a + (y & ~3) * 80/4 + x/8];
-				UINT16 *line = &bitmap.pix16(y, x);
-				*line++ = c[(d >> 7) & 1];
-				*line++ = c[(d >> 6) & 1];
-				*line++ = c[(d >> 5) & 1];
-				*line++ = c[(d >> 4) & 1];
-				*line++ = c[(d >> 3) & 1];
-				*line++ = c[(d >> 2) & 1];
-				*line++ = c[(d >> 1) & 1];
-				*line++ = c[(d >> 0) & 1];
-			}
-		}
-	}
-#if 0
-	if (w!=width || h!=height)
-	{
-		width = w; height = h;
-//      machine().first_screen()->set_visible_area(0, width - 1, 0, height - 1);
-		screen.set_visible_area(0, width - 1, 0, height - 1);
-	}
-#endif
 	return 0;
 }
 
@@ -582,11 +536,11 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	// The carts use vg230 specific registers and mostly ignore the mc6845.
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(pasogo_palette))
+	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(pasogo_state, pasogo)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pasogo_cart")
