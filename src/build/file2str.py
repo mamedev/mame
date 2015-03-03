@@ -40,7 +40,7 @@ try:
             chunk = src.read(16)
             if chunk:
                 for b in chunk:
-                    dst.write('0x%02x' % b)
+                    dst.write('0x%02x' % ord(b))
                     offs = offs + 1
                     if offs != byteCount:
                         dst.write(',')
