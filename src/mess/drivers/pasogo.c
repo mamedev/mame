@@ -467,8 +467,8 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(pasogo_state, pasogo)
 {
-	palette.set_pen_color(0, rgb_t(160, 190, 170));
-	palette.set_pen_color(1, rgb_t(40, 50, 70));
+	palette.set_pen_color(0, rgb_t(80, 130, 130));
+	palette.set_pen_color(1, rgb_t(40, 60, 140));
 }
 
 
