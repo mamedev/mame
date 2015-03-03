@@ -17,6 +17,7 @@
 	 */
 	#ifdef OSD_WINDOWS
 		#ifdef _MSC_VER
+			#include <windows.h>
 			#include "SDL1211_opengl.h"
 		#else
 			#include "GL/gl.h"

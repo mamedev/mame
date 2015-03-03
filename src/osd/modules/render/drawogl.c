@@ -199,10 +199,10 @@ public:
 	{
 		m_error[0] = 0;
 
-		this->pfn_wglGetProcAddress = (PROC WINAPI (*)(LPCSTR lpszProc)) GetProcAddress(m_module, "wglGetProcAddress");
-		this->pfn_wglCreateContext = (HGLRC WINAPI (*)(HDC hdc)) GetProcAddress(m_module, "wglCreateContext");
-		this->pfn_wglDeleteContext = (BOOL WINAPI (*)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
-		this->pfn_wglMakeCurrent = (BOOL WINAPI (*)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
+		this->pfn_wglGetProcAddress = (PROC (WINAPI *)(LPCSTR lpszProc)) GetProcAddress(m_module, "wglGetProcAddress");
+		this->pfn_wglCreateContext = (HGLRC (WINAPI *)(HDC hdc)) GetProcAddress(m_module, "wglCreateContext");
+		this->pfn_wglDeleteContext = (BOOL (WINAPI *)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
+		this->pfn_wglMakeCurrent = (BOOL (WINAPI *)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
 
 		m_hdc = GetDC(window);
 		if (!setupPixelFormat(m_hdc))
@@ -306,10 +306,10 @@ private:
 	HDC m_hdc;
 	char m_error[256];
 
-	PROC WINAPI (*pfn_wglGetProcAddress)(LPCSTR lpszProc);
-	HGLRC WINAPI (*pfn_wglCreateContext)(HDC hdc);
-	BOOL WINAPI (*pfn_wglDeleteContext)(HGLRC hglrc);
-	BOOL WINAPI (*pfn_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
+	PROC (WINAPI *pfn_wglGetProcAddress)(LPCSTR lpszProc);
+	HGLRC (WINAPI *pfn_wglCreateContext)(HDC hdc);
+	BOOL (WINAPI *pfn_wglDeleteContext)(HGLRC hglrc);
+	BOOL (WINAPI *pfn_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
 
 	static HMODULE m_module;
 };
