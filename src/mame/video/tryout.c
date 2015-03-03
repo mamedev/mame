@@ -52,6 +52,11 @@ TILE_GET_INFO_MEMBER(tryout_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, m_vram[tile_index] & 0x7f, 2, 0);
 }
 
+READ8_MEMBER(tryout_state::vram_r)
+{
+	return m_vram[offset]; // debug only
+}
+
 WRITE8_MEMBER(tryout_state::videoram_w)
 {
 	m_videoram[offset] = data;
@@ -158,6 +163,7 @@ void tryout_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_fg_memory_offset),this),8,8,32,32);
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tryout_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(tryout_state::get_bg_memory_offset),this),16,16,64,16);
 
+	m_vram=auto_alloc_array(machine(), UINT8, 8 * 0x800);
 	m_vram_gfx=auto_alloc_array(machine(), UINT8, 0x6000);
 
 	m_gfxdecode->gfx(2)->set_source(m_vram_gfx);
@@ -165,6 +171,7 @@ void tryout_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_vram_bank));
+	save_pointer(NAME(m_vram), 8 * 0x800);
 	save_pointer(NAME(m_vram_gfx), 0x6000);
 }
 

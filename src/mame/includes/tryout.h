@@ -10,8 +10,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_gfx_control(*this, "gfx_control"),
-		m_vram(*this, "vram") { }
+		m_gfx_control(*this, "gfx_control") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -22,17 +21,18 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_gfx_control;
-	required_shared_ptr<UINT8> m_vram;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_vram_bank;
+	UINT8 *m_vram;
 	UINT8 *m_vram_gfx;
 	
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(vram_bankswitch_w);

@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("P1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P2")
