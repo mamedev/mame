@@ -8,40 +8,39 @@
 To enter service mode in some games press service1+F3.
 
 
-Year + Game                         System      Protection
-----------------------------------------------------------------------------
+Year + Game                       System    Protection
+---------------------------------------------------------------------
 88  Legend of Makai (World) /       Z
     Makai Densetsu  (Japan)         Z
     P-47  (World) /                 A
     P-47  (Japan) /                 A
     P-47  (Japan, Export)           A
     Kick Off (Japan)                A
-    Takeda Shingen (Japan)          A                 Encryption (key 1)
-    Ninja Kazan (World) /           A           Yes + Encryption (key 1)
-    Iga Ninjyutsuden (Japan)        A           Yes + Encryption (key 1)
-89  Astyanax          (World) /     A           Yes + Encryption (key 2)
-    The Lord of King  (Japan)       A           Yes + Encryption (key 2)
-    Hachoo!                         A           Yes + Encryption (key 2)
-    Jitsuryoku!! Pro Yakyuu (Japan) A           Yes + Encryption (key 2)
-    Plus Alpha                      A           Yes + Encryption (key 2)
-    Saint Dragon                    A           Yes + Encryption (key 1)
-90  RodLand  (World) /              A                 Encryption (key 3)
-    RodLand  (Japan)                A                 Encryption (key 2)
-    Phantasm        (Japan) /       A                 Encryption (key 1)
-91  Avenging Spirit (World)         B           Inputs
-    Earth Defense Force             B           Inputs
-    64th Street  (World) /          C       *   Inputs
-    64th Street  (Japan)            C       *   Inputs
-92  Soldam (Japan)                  A                 Encryption (key 2)
-    Big Striker                     C           Inputs
-93  Chimera Beast                   C       *   Inputs
-    Cybattler                       C           Inputs
-    Hayaoshi Quiz Ouza Ketteisen    B           Inputs
-    Peek-a-Boo!                     D           Inputs
---------------------------------------------^-------------------------------
-                                            |
-                            The Priority Prom is missing for these games !
+    Takeda Shingen (Japan)          A             Encryption (key 1)
+    Ninja Kazan (World) /           A       Yes + Encryption (key 1)
+    Iga Ninjyutsuden (Japan)        A       Yes + Encryption (key 1)
+89  Astyanax          (World) /     A       Yes + Encryption (key 2)
+    The Lord of King  (Japan)       A       Yes + Encryption (key 2)
+    Hachoo!                         A       Yes + Encryption (key 2)
+    Jitsuryoku!! Pro Yakyuu (Japan) A       Yes + Encryption (key 2)
+    Plus Alpha                      A       Yes + Encryption (key 2)
+    Saint Dragon                    A       Yes + Encryption (key 1)
+90  RodLand  (World) /              A             Encryption (key 3)
+    RodLand  (Japan)                A             Encryption (key 2)
+    Phantasm        (Japan) /       A             Encryption (key 1)
+91  Avenging Spirit (World)         B       Inputs
+    Earth Defense Force             B       Inputs
+    64th Street  (World) /          C       Inputs
+    64th Street  (Japan)            C       Inputs
+92  Soldam (Japan)                  A             Encryption (key 2)
+    Big Striker                     C       Inputs
+93  Chimera Beast                   C       Inputs
+    Cybattler                       C       Inputs
+    Hayaoshi Quiz Ouza Ketteisen    B       Inputs
+    Peek-a-Boo!                     D       Inputs
+---------------------------------------------------------------------
 
+NOTE: Chimera Beast is the game game missing a dump of it's priority PROM
 
 
 Hardware    Main CPU    Sound CPU   Sound Chips
