@@ -463,26 +463,21 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 			// GATHER A SINGLE TRIANGLE'S INFORMATION //
 			////////////////////////////////////////////
 			// SINGLE POLY CHUNK FORMAT
-			// [0] ??-- - ???
-			// [0] --xx - Chunk type
-			//
-			// [1] ?--- - Flags [?000 = ???
-			//                   0?00 = ???
-			//                   00?0 = ???
-			//                   000x = low-res texture flag]
-			// [1] -x-- - Explicit 0x80 palette index.
-			// [1] --x- - Explicit 0x08 palette index.
-			// [1] ---x - Texture page (1024x1024 bytes)
-			//
-			// [2] x--- - Texture Flags [x000 = Uses 4x4 sub-texture pages?
-			//                           0?00 = ??? - differen sub-page size?  SNK logo in RoadEdge.  Always on in bbust2.
-			//                           00xx = Horizontal sub-texture page index]
-			// [2] -?-- - ??? - barely visible (thus far) in roadedge
-			// [2] --x- - Texture Flags [?000 = ???
-			//                           0xx0 = Vertical sub-texture page index.
-			//                           000? = ???]
-			// [2] ---? - ???
-			//////////////////////////
+			////////////////////////////////////////////
+			// GATHER A SINGLE TRIANGLE'S INFORMATION //
+			////////////////////////////////////////////
+			// SINGLE POLY CHUNK FORMAT
+			// [0] 0000 0000 cccc cccc    0 = always 0 | c = chunk type / format of data that follows (see below)
+			// [1] u--l pppp pppp ssss    u = unknown, always on for most games, on for the backgrounds only on sams64, l = low-res texture?  p = palette?  s = texture sheet (1024 x 1024 pages)
+			// [2] S?XX *--- -YY# ----    S = use 4x4 sub-texture pages?  ? = SNK logo roadedge / bbust2 / broken banners in xrally,  XX = horizontal subtexture  * = broken banners in xrally  YY = vertical subtexture  @ = broken banners in xrally
+
+			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
+			// looks like vertical / horizontal sub-pages might be 3 bits, not 2,  ? could be enable bit for that..
+
+			// 'Welcome to South Africa' roadside banner on xrally | 000e 8c0d d870 or 0096 8c0d d870  (8c0d, d870 seems key 1000 1100 0000 1101
+			//                                                                                                               1101 1000 0111 0000 )
+
+
 			UINT8 chunkType = chunkOffset[0] & 0x00ff;
 
 			// Debug - ajg
@@ -849,6 +844,12 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 		}
 	}
 }
+
+// note 0x0102 packets are only 8 words, it appears they can be in either the upper or lower half of the 16 word packet.
+// We currently only draw 0x0102 packets where both halves contain 0x0102 (2 calls), but this causes graphics to vanish in xrally because in some cases the 0x0102 packet only exists in the upper or lower half
+// with another value (often 0x0000 - NOP) in the other.
+// If we also treat (0x0000 - NOP) as 8 word  instead of 16 so that we can access a 0x0102 in the 2nd half of the 16 word packet then we end up with other invalid packets in the 2nd half which should be ignored.
+// This would suggest our processing if flawed in other ways, or there is something else to indicate packet length.
 
 void hng64_state::hng64_command3d(const UINT16* packet)
 {
