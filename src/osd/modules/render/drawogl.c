@@ -199,33 +199,33 @@ public:
 	{
 		m_error[0] = 0;
 
-		this->wglGetProcAddress = (PROC WINAPI (*)(LPCSTR lpszProc)) GetProcAddress(m_module, "wglGetProcAddress");
-		this->wglCreateContext = (HGLRC WINAPI (*)(HDC hdc)) GetProcAddress(m_module, "wglCreateContext");
-		this->wglDeleteContext = (BOOL WINAPI (*)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
-		this->wglMakeCurrent = (BOOL WINAPI (*)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
+		this->pfn_wglGetProcAddress = (PROC WINAPI (*)(LPCSTR lpszProc)) GetProcAddress(m_module, "wglGetProcAddress");
+		this->pfn_wglCreateContext = (HGLRC WINAPI (*)(HDC hdc)) GetProcAddress(m_module, "wglCreateContext");
+		this->pfn_wglDeleteContext = (BOOL WINAPI (*)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
+		this->pfn_wglMakeCurrent = (BOOL WINAPI (*)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
 
 		m_hdc = GetDC(window);
 		if (!setupPixelFormat(m_hdc))
 		{
-			m_context = wglCreateContext(m_hdc);
+			m_context = this->pfn_wglCreateContext(m_hdc);
 			if  (!m_context)
 			{
 				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), 0, m_error, 255, NULL);
 				return;
 			}
-			wglMakeCurrent(m_hdc, m_context);
+			this->pfn_wglMakeCurrent(m_hdc, m_context);
 		}
 	}
 
 	virtual ~win_gl_context()
 	{
-		wglDeleteContext(m_context);
+		this->pfn_wglDeleteContext(m_context);
 		ReleaseDC(m_window, m_hdc);
 	}
 
 	virtual void MakeCurrent()
 	{
-		wglMakeCurrent(m_hdc, m_context);
+		this->pfn_wglMakeCurrent(m_hdc, m_context);
 	}
 
 	virtual const char *LastErrorMsg()
@@ -240,7 +240,7 @@ public:
 	{
 		void *ret = (void *) GetProcAddress(m_module, proc);
 		if (ret == NULL)
-			ret = (void *) wglGetProcAddress(proc);
+			ret = (void *) this->pfn_wglGetProcAddress(proc);
 		return ret;
 	}
 
@@ -306,10 +306,10 @@ private:
 	HDC m_hdc;
 	char m_error[256];
 
-	PROC WINAPI (*wglGetProcAddress)(LPCSTR lpszProc);
-	HGLRC WINAPI (*wglCreateContext)(HDC hdc);
-	BOOL WINAPI (*wglDeleteContext)(HGLRC hglrc);
-	BOOL WINAPI (*wglMakeCurrent)(HDC hdc, HGLRC hglrc);
+	PROC WINAPI (*pfn_wglGetProcAddress)(LPCSTR lpszProc);
+	HGLRC WINAPI (*pfn_wglCreateContext)(HDC hdc);
+	BOOL WINAPI (*pfn_wglDeleteContext)(HGLRC hglrc);
+	BOOL WINAPI (*pfn_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
 
 	static HMODULE m_module;
 };
