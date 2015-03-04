@@ -1961,13 +1961,14 @@ MACHINE_CONFIG_END
 
   TMS1100NLL MP3403 DBS 7836 SINGAPORE some game board with 7-segs.
 
-  What old electronic game is this?
+  What old electronic game is this? Board layout proves it's a bowling game,
+  10 lamps for bowling pins + 3 more bulbs, and 7segs for frame number and
+  scores. Board size is 10-12" by 6-8".
 
   some clues:
   - it's from 1978
   - Merlin is MP3404, Amaze-A-Tron is MP3405, this one is MP3403
-  - it plays some short jingles (you need to be lucky with button mashing),
-    jingles feel like maybe a horse racing game, or casino
+  - it plays some short jingles (you need to be lucky with button mashing)
 
 ***************************************************************************/
 
@@ -2287,4 +2288,4 @@ CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Par
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE ) // partially unplayable without cards/dice/..
 
-CONS( 1978, unk3403,   0,        0, unk3403,   unk3403,   driver_device, 0, "<unknown>", "unknown TMS1100 electronic game", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1978, unk3403,   0,        0, unk3403,   unk3403,   driver_device, 0, "<unknown>", "unknown TMS1100 electronic bowling game", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
