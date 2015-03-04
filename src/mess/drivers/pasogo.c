@@ -121,12 +121,14 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_ems(*this, "ems")
 		, m_vram(*this, "vram")
+		, m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<address_map_bank_device> m_ems;
 	required_shared_ptr<UINT16> m_vram;
+	required_device<palette_device> m_palette;
 
 	DECLARE_READ16_MEMBER(ems_r);
 	DECLARE_WRITE16_MEMBER(ems_w);
@@ -159,10 +161,10 @@ public:
 	void machine_reset();
 	void machine_start();
 
-	DECLARE_PALETTE_INIT(pasogo);
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
+	DECLARE_INPUT_CHANGED_MEMBER(contrast);
 
 	memory_region *m_cart_rom;
 	UINT8 m_ems_index;
@@ -452,7 +454,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pasogo )
-PORT_START("JOY")
+	PORT_START("JOY")
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT)  PORT_NAME("select")
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("start")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("O") /*?*/
@@ -463,14 +465,25 @@ PORT_START("JOY")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("a") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
+	PORT_START("COLOR")
+	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, pasogo_state, contrast, 0)
+	PORT_CONFSETTING(0x00, "Actual")
+	PORT_CONFSETTING(0x01, "Enhanced")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pasogo_state, pasogo)
+INPUT_CHANGED_MEMBER(pasogo_state::contrast)
 {
-	palette.set_pen_color(0, rgb_t(80, 130, 130));
-	palette.set_pen_color(1, rgb_t(40, 60, 140));
+	if(newval)
+	{
+		m_palette->set_pen_color(0, rgb_t(80, 130, 130));
+		m_palette->set_pen_color(1, rgb_t(40, 60, 140));
+	}
+	else
+	{
+		m_palette->set_pen_color(0, rgb_t(100, 110, 100));
+		m_palette->set_pen_color(1, rgb_t(90, 80, 110));
+	}
 }
-
 
 UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -504,6 +517,7 @@ INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 void pasogo_state::machine_reset()
 {
 	astring region_tag;
+	ioport_port *color = ioport("COLOR");
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 	if (!m_cart_rom)    // this should never happen, since we make carts mandatory!
 		m_cart_rom = memregion("maincpu");
@@ -511,6 +525,7 @@ void pasogo_state::machine_reset()
 	membank("bank27")->set_base(m_cart_rom->base());
 	m_ems_index = 0;
 	memset(m_ems_bank, 0, sizeof(m_ems_bank));
+	contrast(*color->first_field(), NULL, 0, color->read());
 }
 
 static MACHINE_CONFIG_START( pasogo, pasogo_state )
@@ -541,7 +556,6 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pasogo_state, pasogo)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pasogo_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
