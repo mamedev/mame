@@ -5,10 +5,10 @@
 <!--
   Koei PasoGo (パソ碁) possible undumped games
 
-  94年度三大タイトル挑戦手合集 [cart KS-1005?]
-  歴代棋聖戦名曲集        [cart KS-1006?]
-  棋界覇王伝・古典編       [cart KS-1007?]
-  棋界覇王伝・現代編       [cart KS-1008?]
+  94年度三大タイトル挑戦手合集 (94 Nendo San Dai Title Chousen Teaishuu) [cart KS-1005?]
+  歴代棋聖戦名曲集 (Rekidai Kisei Sen Meikyokushuu)                    [cart KS-1006?]
+  棋界覇王伝・古典編 (Kikai Haoh Den - Koten-hen)                       [cart KS-1007?]
+  棋界覇王伝・現代編 (Kikai Haoh Den - Gendai-hen)                      [cart KS-1008?]
   
 -->
 
@@ -60,7 +60,7 @@
 		<year>1996</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="KS-1004"/>
-		<info name="alt_title" value="囲碁名局集 第1巻"/>
+		<info name="alt_title" value="囲碁名局集・第1巻"/>
 		<part name="cart" interface="pasogo_cart">
 			<dataarea name="rom" width="16" endianness="little" size="524288">
 				<rom name="ks-1004.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
