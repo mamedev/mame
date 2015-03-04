@@ -2182,8 +2182,9 @@ ebball      // Entex
 elecdet     // Ideal
 starwbc     // Kenner
 starwbcp    // Kenner (prototype)
-comp4       // MB
-simon       // MB
+elecbowl    // Marx
+comp4       // Milton Bradley
+simon       // Milton Bradley
 cnsector    // Parker Bros
 merlin      // Parker Bros
 stopthie    // Parker Bros
@@ -2191,7 +2192,6 @@ stopthiep   // Parker Bros (prototype)
 bankshot    // Parker Bros
 splitsec    // Parker Bros
 tandy12     // TRS
-unk3403
 
 edracula    // Epoch
 tmpacman    // Tomy
