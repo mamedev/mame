@@ -94,6 +94,8 @@ MACHINE_START_MEMBER(srmp2_state,srmp3)
 	iox.protcheck[1] = 0x4c; iox.protlatch[1] = 0x00;
 	iox.protcheck[2] = 0x1c; iox.protlatch[2] = 0x04;
 	iox.protcheck[3] = 0x45; iox.protlatch[3] = 0x00;
+    
+    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x2000);
 }
 
 MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
@@ -107,6 +109,8 @@ MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 	iox.protcheck[1] = 0x45; iox.protlatch[1] = 0x00;
 	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
 	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
+
+    membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x8000, 0x2000);
 }
 
 /***************************************************************************
@@ -349,16 +353,14 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
     ---x xxxx : MAIN ROM bank
     xxx- ---- : ADPCM ROM bank
 */
-
-	UINT8 *ROM = memregion("maincpu")->base();
-	int addr;
-
 	m_adpcm_bank = ((data & 0xe0) >> 5);
 
-	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x0f))) - 0x8000);
-	else addr = 0x10000;
-
-	membank("bank1")->set_base(&ROM[addr]);
+    // TODO: Check this code (and the corresponding configure_entires), 
+    // as it seems to be inconsistent with the notes at the head of this function
+	if (data & 0x1f)
+        membank("bank1")->set_entry(data & 0x0f);
+	else
+        membank("bank1")->set_entry(8);
 }
 
 /**************************************************************************
@@ -499,16 +501,12 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
     ---x xxxx : MAIN ROM bank
     xxx- ---- : ADPCM ROM bank
 */
-
-	UINT8 *ROM = memregion("maincpu")->base();
-	int addr;
-
 	m_adpcm_bank = ((data & 0xe0) >> 5);
 
-	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x1f))) - 0x8000);
-	else addr = 0x10000;
-
-	membank("bank1")->set_base(&ROM[addr]);
+    if (data & 0x1f) 
+        membank("bank1")->set_entry(data & 0x1f);
+	else
+        membank("bank1")->set_entry(8);
 }
 
 static ADDRESS_MAP_START( rmgoldyh_io_map, AS_IO, 8, srmp2_state )
