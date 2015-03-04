@@ -731,11 +731,6 @@ static MACHINE_CONFIG_DERIVED( mbeepc, mbeeic )
 	MCFG_CPU_IO_MAP(mbeepc_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbeepc85b, mbeepc )
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(mbee_state, mbeepc85b)
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
@@ -1138,7 +1133,7 @@ COMP( 1982, mbee,     0,        0,      mbee,     mbee,     mbee_state,  mbee,  
 COMP( 1982, mbeeic,   mbee,     0,      mbeeic,   mbee,     mbee_state,  mbeeic,     "Applied Technology",  "Microbee 32 IC" , 0 )
 COMP( 1982, mbeepc,   mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc,     "Applied Technology",  "Microbee Personal Communicator" , 0 )
 COMP( 1985, mbeepc85, mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85" , 0 )
-COMP( 1985, mbeepc85b,mbee,     0,      mbeepc85b,mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (New version)" , 0 )
+COMP( 1985, mbeepc85b,mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (New version)" , 0 )
 COMP( 1985, mbeepc85s,mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc85,   "Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
 COMP( 1986, mbeeppc,  mbee,     0,      mbeeppc,  mbee,     mbee_state,  mbeeppc,    "Applied Technology",  "Microbee Premium PC85" , 0 )
 COMP( 1986, mbeett,   mbee,     0,      mbeett,   mbee256,  mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
