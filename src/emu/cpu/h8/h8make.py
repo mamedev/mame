@@ -266,7 +266,7 @@ class OpcodeList:
             sys.stderr.write("Cannot read opcodes file %s [%s]\n" % (fname, err))
             sys.exit(1)
         
-        opc = None
+        inf = None
         for line in f:
             if line.startswith("#"):
                 continue
