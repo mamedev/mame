@@ -468,7 +468,7 @@ void hh_ucom4_state::tmpacman_display()
 	UINT8 grid = BITSWAP8((UINT8)m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
 	
-	display_matrix(19, 8, plate | 0x100, grid);
+	display_matrix(19, 8, plate | 0x100, grid); // plate 8 (maze) is always on
 }
 
 WRITE8_MEMBER(hh_ucom4_state::tmpacman_grid_w)
