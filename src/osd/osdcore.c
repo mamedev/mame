@@ -1,4 +1,3 @@
-#include "emucore.h"
 #include "osdcore.h"
 
 bool g_print_verbose = false;
@@ -13,11 +12,12 @@ static int m_ptr = -1;
 
 void osd_output::push(osd_output *delegate)
 {
-	assert(m_ptr < MAXSTACK);
-	delegate->m_chain = (m_ptr >= 0 ? m_stack[m_ptr] : NULL);
-	m_ptr++;
-	m_stack[m_ptr] = delegate;
-	//printf("push m_ptr == %d\n", m_ptr);
+	if (m_ptr < MAXSTACK)
+	{
+		delegate->m_chain = (m_ptr >= 0 ? m_stack[m_ptr] : NULL);
+		m_ptr++;
+		m_stack[m_ptr] = delegate;
+	}
 }
 
 void osd_output::pop(osd_output *delegate)
@@ -37,7 +37,6 @@ void osd_output::pop(osd_output *delegate)
 		for (int i = f; i <= m_ptr; i++)
 			m_stack[i] = m_stack[i+1];
 	}
-	//printf("pop m_ptr == %d\n", m_ptr);
 }
 
 
