@@ -199,18 +199,18 @@ void validity_checker::check_all()
 	if (m_errors > 0 || m_warnings > 0)
 	{
 		astring tempstr;
-		output_via_delegate(m_saved_error_output, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Core: %d errors, %d warnings\n", m_errors, m_warnings);
 		if (m_errors > 0)
 		{
 			m_error_text.replace("\n", "\n   ");
-			output_via_delegate(m_saved_error_output, "Errors:\n   %s", m_error_text.cstr());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Errors:\n   %s", m_error_text.cstr());
 		}
 		if (m_warnings > 0)
 		{
 			m_warning_text.replace("\n", "\n   ");
-			output_via_delegate(m_saved_error_output, "Warnings:\n   %s", m_warning_text.cstr());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Warnings:\n   %s", m_warning_text.cstr());
 		}
-		output_via_delegate(m_saved_error_output, "\n");
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
 	}
 
 	// then iterate over all drivers and check them
@@ -232,8 +232,7 @@ void validity_checker::check_all()
 void validity_checker::validate_begin()
 {
 	// take over error and warning outputs
-	m_saved_error_output = osd_set_output_channel(OSD_OUTPUT_CHANNEL_ERROR, output_delegate(FUNC(validity_checker::error_output), this));
-	m_saved_warning_output = osd_set_output_channel(OSD_OUTPUT_CHANNEL_WARNING, output_delegate(FUNC(validity_checker::warning_output), this));
+	osd_output::push(this);
 
 	// reset all our maps
 	m_names_map.reset();
@@ -257,8 +256,7 @@ void validity_checker::validate_begin()
 void validity_checker::validate_end()
 {
 	// restore the original output callbacks
-	osd_set_output_channel(OSD_OUTPUT_CHANNEL_ERROR, m_saved_error_output);
-	osd_set_output_channel(OSD_OUTPUT_CHANNEL_WARNING, m_saved_warning_output);
+	osd_output::pop(this);
 }
 
 
@@ -301,18 +299,18 @@ void validity_checker::validate_one(const game_driver &driver)
 	if (m_errors > start_errors || m_warnings > start_warnings)
 	{
 		astring tempstr;
-		output_via_delegate(m_saved_error_output, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(tempstr, driver.source_file).cstr(), m_errors - start_errors, m_warnings - start_warnings);
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Driver %s (file %s): %d errors, %d warnings\n", driver.name, core_filename_extract_base(tempstr, driver.source_file).cstr(), m_errors - start_errors, m_warnings - start_warnings);
 		if (m_errors > start_errors)
 		{
 			m_error_text.replace("\n", "\n   ");
-			output_via_delegate(m_saved_error_output, "Errors:\n   %s", m_error_text.cstr());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Errors:\n   %s", m_error_text.cstr());
 		}
 		if (m_warnings > start_warnings)
 		{
 			m_warning_text.replace("\n", "\n   ");
-			output_via_delegate(m_saved_error_output, "Warnings:\n   %s", m_warning_text.cstr());
+			output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "Warnings:\n   %s", m_warning_text.cstr());
 		}
-		output_via_delegate(m_saved_error_output, "\n");
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "\n");
 	}
 
 	// reset the driver/device
@@ -834,10 +832,10 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 	// if we have a coin error, demonstrate the correct way
 	if (coin_error)
 	{
-		output_via_delegate(m_saved_error_output, "   Note proper coin sort order should be:\n");
+		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "   Note proper coin sort order should be:\n");
 		for (int entry = 0; entry < ARRAY_LENGTH(coin_list); entry++)
 			if (coin_list[entry])
-				output_via_delegate(m_saved_error_output, "      %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
+				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
 	}
 }
 
@@ -1057,40 +1055,38 @@ void validity_checker::build_output_prefix(astring &string)
 //  error_output - error message output override
 //-------------------------------------------------
 
-void validity_checker::error_output(const char *format, va_list argptr)
+void validity_checker::output_callback(osd_output_channel channel, const char *msg, va_list args)
 {
-	// count the error
-	m_errors++;
-
-	// output the source(driver) device 'tag'
 	astring output;
-	build_output_prefix(output);
+	switch (channel)
+	{
+		case OSD_OUTPUT_CHANNEL_ERROR:
+			// count the error
+			m_errors++;
 
-	// generate the string
-	output.catvprintf(format, argptr);
-	m_error_text.cat(output);
+			// output the source(driver) device 'tag'
+			build_output_prefix(output);
+
+			// generate the string
+			output.catvprintf(msg, args);
+			m_error_text.cat(output);
+			break;
+		case OSD_OUTPUT_CHANNEL_WARNING:
+			// count the error
+			m_warnings++;
+
+			// output the source(driver) device 'tag'
+			build_output_prefix(output);
+
+			// generate the string and output to the original target
+			output.catvprintf(msg, args);
+			m_warning_text.cat(output);
+			break;
+		default:
+			chain_output(channel, msg, args);
+			break;
+	}
 }
-
-
-//-------------------------------------------------
-//  warning_output - warning message output
-//  override
-//-------------------------------------------------
-
-void validity_checker::warning_output(const char *format, va_list argptr)
-{
-	// count the error
-	m_warnings++;
-
-	// output the source(driver) device 'tag'
-	astring output;
-	build_output_prefix(output);
-
-	// generate the string and output to the original target
-	output.catvprintf(format, argptr);
-	m_warning_text.cat(output);
-}
-
 
 //-------------------------------------------------
 //  output_via_delegate - helper to output a
@@ -1098,12 +1094,12 @@ void validity_checker::warning_output(const char *format, va_list argptr)
 //  can be forwarded onto the given delegate
 //-------------------------------------------------
 
-void validity_checker::output_via_delegate(output_delegate &delegate, const char *format, ...)
+void validity_checker::output_via_delegate(osd_output_channel channel, const char *format, ...)
 {
 	va_list argptr;
 
 	// call through to the delegate with the proper parameters
 	va_start(argptr, format);
-	delegate(format, argptr);
+	this->chain_output(channel, format, argptr);
 	va_end(argptr);
 }

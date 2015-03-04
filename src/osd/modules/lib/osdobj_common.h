@@ -140,7 +140,7 @@ private:
 // ======================> osd_interface
 
 // description of the currently-running machine
-class osd_common_t : public osd_interface
+class osd_common_t : public osd_interface, osd_output
 {
 public:
 	// construction/destruction
@@ -210,6 +210,9 @@ public:
 	virtual void video_options_add(const char *name, void *type);
 
 	osd_options &options() { return m_options; }
+
+	// osd_output interface ...
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args);
 
 protected:
 	virtual bool input_init();

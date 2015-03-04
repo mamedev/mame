@@ -133,12 +133,24 @@ osd_options::osd_options()
 //-------------------------------------------------
 
 osd_common_t::osd_common_t(osd_options &options)
-	: m_machine(NULL),
+	: osd_output(), m_machine(NULL),
 		m_options(options),
 		m_sound(NULL),
 		m_debugger(NULL)
-
 {
+	osd_output::push(this);
+}
+
+//-------------------------------------------------
+//  osd_interface - destructor
+//-------------------------------------------------
+
+osd_common_t::~osd_common_t()
+{
+	for(int i= 0; i < m_video_names.count(); ++i)
+		osd_free(const_cast<char*>(m_video_names[i]));
+	//m_video_options,reset();
+	osd_output::pop(this);
 }
 
 #define REGISTER_MODULE(_O, _X ) { extern const module_type _X; _O . register_module( _X ); }
@@ -228,17 +240,32 @@ void osd_common_t::update_option(const char * key, dynamic_array<const char *> &
 	m_options.set_description(key, core_strdup(current_value.cat(new_option_value).cstr()));
 }
 
-//-------------------------------------------------
-//  osd_interface - destructor
-//-------------------------------------------------
 
-osd_common_t::~osd_common_t()
+//-------------------------------------------------
+//  output_callback  - callback for osd_printf_...
+//-------------------------------------------------
+void osd_common_t::output_callback(osd_output_channel channel, const char *msg, va_list args)
 {
-	for(int i= 0; i < m_video_names.count(); ++i)
-		osd_free(const_cast<char*>(m_video_names[i]));
-	//m_video_options,reset();
+	switch (channel)
+	{
+		case OSD_OUTPUT_CHANNEL_ERROR:
+		case OSD_OUTPUT_CHANNEL_WARNING:
+			vfprintf(stderr, msg, args);
+			break;
+		case OSD_OUTPUT_CHANNEL_INFO:
+		case OSD_OUTPUT_CHANNEL_VERBOSE:
+		case OSD_OUTPUT_CHANNEL_LOG:
+			vfprintf(stdout, msg, args);
+			break;
+		case OSD_OUTPUT_CHANNEL_DEBUG:
+#ifdef MAME_DEBUG
+			vfprintf(stdout, msg, args);
+#endif
+			break;
+		default:
+			break;
+	}
 }
-
 
 //-------------------------------------------------
 //  init - initialize the OSD system.

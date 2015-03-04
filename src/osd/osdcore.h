@@ -20,7 +20,6 @@
 #define __OSDCORE_H__
 
 #include "osdcomm.h"
-#include "delegate.h"
 #include <stdarg.h>
 
 /***************************************************************************
@@ -926,7 +925,7 @@ const char *osd_get_volume_name(int idx);
 /* ----- output management ----- */
 
 // output channels
-enum output_channel
+enum osd_output_channel
 {
 	OSD_OUTPUT_CHANNEL_ERROR,
 	OSD_OUTPUT_CHANNEL_WARNING,
@@ -937,11 +936,26 @@ enum output_channel
 	OSD_OUTPUT_CHANNEL_COUNT
 };
 
-// output channel callback
-typedef delegate<void (const char *, va_list)> output_delegate;
+class osd_output
+{
+public:
+	osd_output() : m_chain(NULL) { }
+	virtual ~osd_output() { }
 
-/* set the output handler for a channel, returns the current one */
-output_delegate osd_set_output_channel(output_channel channel, output_delegate callback);
+	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) = 0;
+
+	static void push(osd_output *delegate);
+	static void pop(osd_output *delegate);
+protected:
+
+	void chain_output(osd_output_channel channel, const char *msg, va_list args)
+	{
+		if (m_chain != NULL)
+			m_chain->output_callback(channel, msg, args);
+	}
+private:
+	osd_output *m_chain;
+};
 
 /* calls to be used by the code */
 void CLIB_DECL osd_printf_error(const char *format, ...) ATTR_PRINTF(1,2);
