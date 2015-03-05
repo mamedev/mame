@@ -52,6 +52,7 @@ P0-080A  (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
 P0-081A  (BP933KA)      93 Mobile Suit Gundam                   Banpresto
 P0-083A  (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
 P0-092A                 93 Daioh                                Athena
+P0-072-2 (prototype)    93 Daioh(prototype)                     Athena
 P0-096A  (BP934KA)      93 Kamen Rider                          Banpresto
 P0-097A                 93 Oishii Puzzle ..                     Sunsoft + Atlus
 bootleg                 9? Triple Fun (4)                       bootleg (Comad?)
@@ -2259,7 +2260,7 @@ ADDRESS_MAP_END
                        Daioh (location test version)
 ***************************************************************************/
 
-static ADDRESS_MAP_START( daiohloc_map, AS_PROGRAM, 16, seta_state )
+static ADDRESS_MAP_START( daiohp_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_MIRROR(0x080000)         // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
@@ -3815,10 +3816,10 @@ static INPUT_PORTS_START( daioh )
 INPUT_PORTS_END
 
 /***************************************************************************
-                       Daioh (location test version)
+                       Daioh (prototype)
 ***************************************************************************/
 
-static INPUT_PORTS_START( daiohloc )
+static INPUT_PORTS_START( daiohp )
 	PORT_START("P1")
 	JOY_TYPE1_3BUTTONS(1)
 
@@ -7465,7 +7466,7 @@ GFXDECODE_END
                        Daioh (location test version)
 ***************************************************************************/
 
-static GFXDECODE_START( daiohloc )
+static GFXDECODE_START( daiohp )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             512*0, 32 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 512*2, 32 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "gfx3", 0, layout_planes_2roms_split, 512*1, 32 ) // [2] Layer 2
@@ -8209,14 +8210,14 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
-                       Daioh (location test version)
+                       Daioh (prototype)
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( daiohloc, seta_state )
+static MACHINE_CONFIG_START( daiohp, seta_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)   /* 16 MHz, MC68000-16, Verified from PCB */
-	MCFG_CPU_PROGRAM_MAP(daiohloc_map)
+	MCFG_CPU_PROGRAM_MAP(daiohp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
@@ -8232,7 +8233,7 @@ static MACHINE_CONFIG_START( daiohloc, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", daiohloc)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", daiohp)
 	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
@@ -10326,7 +10327,39 @@ ROM_START( atehate )
 	ROM_LOAD( "fs001004.pcm", 0x000000, 0x100000, CRC(f9344ce5) SHA1(cffbc235f3a8e9a5004e671d924affd321ec9eed) )
 ROM_END
 
+/*
+The changes between the set daioh and daioha are very minimal, the main game effects are:
+
+ - Fixes the crashing bug in the US version caused by pressing Shot1 and Shot2 in weird orders and timings.
+ - 1UP, and 2UPs no longer spawn "randomly". (Only the fixed extend items exist, and the 1UPs from score)
+ - After picking up a max powerup, a 1UP or a 2UP, daoiha sets the "item timer" to a random value.
+   daioh always sets it to 0x7F.
+ - The powerups spawned from picking up an additional max powerup are no longer random, but feeds from the
+   original "spawn item" function (thus, it advances the "item timer")
+
+So it's a bug fix version which also makes the game a little harder by limiting the spawning of 1ups
+*/
+
 ROM_START( daioh )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "fg001001.u3",  0x000000, 0x080000, CRC(e1ef3007) SHA1(864349efac3e3dc3ccdeb892fed285c73aea3997) )
+	ROM_LOAD16_BYTE( "fg001002.u4",  0x000001, 0x080000, CRC(5e3481f9) SHA1(7585a7e56392fc2b13d466cf262383dd68d6d995) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "fg-001-004", 0x000000, 0x100000, CRC(9ab0533e) SHA1(b260ceb2b3e140971419329bee07a020171794f7) )
+	ROM_LOAD( "fg-001-003", 0x100000, 0x100000, CRC(1c9d51e2) SHA1(1d6236ab28d11676386834fd6e405fd40198e924) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
+	ROM_LOAD( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
+	ROM_LOAD( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
+ROM_END
+
+ROM_START( daioha )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "fg-001-001.u3",  0x000000, 0x080000, CRC(104ae74a) SHA1(928c467e3ff98285a4828a927d851fcdf296849b) )
 	ROM_LOAD16_BYTE( "fg-001-002.u4",  0x000001, 0x080000, CRC(e39a4e67) SHA1(c3f47e9d407f32dbfaf209d29b4446e4de8829a2) )
@@ -10345,41 +10378,10 @@ ROM_START( daioh )
 	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
 ROM_END
 
-/*
-The changes between this set and the parent set are very minimal. It is potentially a hack/bootleg.
-
-Overview of the changes:
-- the vector table has been changed to make bus error and address error go somewhere other than a hard lock
-  - the new destination is a newly inserted RTE that's located at the first NOP in the code that would've affected nothing
-- there's a change in a jumptable at $23A28 that pushes the destination PC into the original function, but not into a different one
-  - which would make no sense from an official build unless they possibly lost the source
-- at $23DF2 a fairly large chunk of code has been rewritten, with a bunch of NOPs added for padding
-- there are various changes around that change things like "ADDI $20, D0" to "MOVE $7F, D0"
-  - these are after doing real computation with D0, so it seems strange
-*/
-ROM_START( daioh1 )
-	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "fg-001-001.bin",  0x000000, 0x080000, CRC(e1ef3007) SHA1(864349efac3e3dc3ccdeb892fed285c73aea3997) )
-	ROM_LOAD16_BYTE( "fg-001-002.bin",  0x000001, 0x080000, CRC(5e3481f9) SHA1(7585a7e56392fc2b13d466cf262383dd68d6d995) )
-
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "fg-001-004", 0x000000, 0x100000, CRC(9ab0533e) SHA1(b260ceb2b3e140971419329bee07a020171794f7) )
-	ROM_LOAD( "fg-001-003", 0x100000, 0x100000, CRC(1c9d51e2) SHA1(1d6236ab28d11676386834fd6e405fd40198e924) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
-	ROM_LOAD( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
-
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
-	ROM_LOAD( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
-
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
-ROM_END
-
-ROM_START( daiohloc )
+ROM_START( daiohp ) /* Found on the same P0-072-2 PCB as the Blandia prototype */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "prg_even.u3", 0x000000, 0x040000, CRC(3c97b976) SHA1(5850bf71b594a25f3e2de16f2933078c4a0dc518) )
-	ROM_LOAD16_BYTE( "prg_odd.u4",  0x000001, 0x040000, CRC(aed2b87e) SHA1(d5b81614fbbda8a75418e69eb481e5adf38b4ebf) )
+	ROM_LOAD16_BYTE( "prg_even.u3",    0x000000, 0x040000, CRC(3c97b976) SHA1(5850bf71b594a25f3e2de16f2933078c4a0dc518) )
+	ROM_LOAD16_BYTE( "prg_odd.u4",     0x000001, 0x040000, CRC(aed2b87e) SHA1(d5b81614fbbda8a75418e69eb481e5adf38b4ebf) )
 	ROM_LOAD16_BYTE( "data_even.u103", 0x100000, 0x040000, CRC(e07776ef) SHA1(5e75dd35fd8eae98182a9798a8b3eceb3e33b780) )
 	ROM_LOAD16_BYTE( "data_odd.u102",  0x100001, 0x040000, CRC(b75b9a5c) SHA1(4c187105fe5253cc86862df1f3970fa45d4f7317) )
 
@@ -11547,8 +11549,8 @@ GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip, driver_device,  0,        ROT
 GAME( 1993, atehate,  0,        atehate,  atehate, driver_device,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 
 GAME( 1993, daioh,    0,        daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh", 0 )
-GAME( 1993, daioh1,   daioh,    daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (hack?)", 0 ) // possible hack or bugfix made without source, see notes near romdef
-GAME( 1993, daiohloc, daioh,    daiohloc, daiohloc, driver_device, 0,        ROT270, "Athena",                 "Daioh (location test ver)", 0 )
+GAME( 1993, daioha,   daioh,    daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (earlier)", 0 )
+GAME( 1993, daiohp,   daioh,    daiohp,   daiohp,   driver_device, 0,        ROT270, "Athena",                 "Daioh (prototype)", 0 )
 
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
