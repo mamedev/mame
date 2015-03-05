@@ -54,7 +54,7 @@ void speedbal_state::video_start()
  *                                   *
  *************************************/
 
-WRITE8_MEMBER(speedbal_state::speedbal_foreground_videoram_w)
+WRITE8_MEMBER(speedbal_state::foreground_videoram_w)
 {
 	m_foreground_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset>>1);
@@ -66,7 +66,7 @@ WRITE8_MEMBER(speedbal_state::speedbal_foreground_videoram_w)
  *                                   *
  *************************************/
 
-WRITE8_MEMBER(speedbal_state::speedbal_background_videoram_w)
+WRITE8_MEMBER(speedbal_state::background_videoram_w)
 {
 	m_background_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset>>1);
@@ -81,22 +81,21 @@ WRITE8_MEMBER(speedbal_state::speedbal_background_videoram_w)
 
 void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
 	int x,y,code,color,offset,flipx,flipy;
 
 	/* Drawing sprites: 64 in total */
 
 	for (offset = 0;offset < m_spriteram.bytes();offset += 4)
 	{
-		if(!(spriteram[offset + 2] & 0x80))
+		if(!(m_spriteram[offset + 2] & 0x80))
 			continue;
 
-		x = 243 - spriteram[offset + 3];
-		y = 239 - spriteram[offset + 0];
+		x = 243 - m_spriteram[offset + 3];
+		y = 239 - m_spriteram[offset + 0];
 
-		code = (spriteram[offset + 1]) | ((spriteram[offset + 2] & 0x40) << 2);
+		code = (m_spriteram[offset + 1]) | ((m_spriteram[offset + 2] & 0x40) << 2);
 
-		color = spriteram[offset + 2] & 0x0f;
+		color = m_spriteram[offset + 2] & 0x0f;
 
 		flipx = flipy = 0;
 
@@ -121,7 +120,7 @@ void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  *                                   *
  *************************************/
 
-UINT32 speedbal_state::screen_update_speedbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 speedbal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);

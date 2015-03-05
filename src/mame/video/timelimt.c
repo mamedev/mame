@@ -61,8 +61,7 @@ TILE_GET_INFO_MEMBER(timelimt_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
 {
-	UINT8 *videoram = m_videoram;
-	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
+	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
 void timelimt_state::video_start()
@@ -74,36 +73,38 @@ void timelimt_state::video_start()
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
+	
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 }
 
 /***************************************************************************/
 
-WRITE8_MEMBER(timelimt_state::timelimt_videoram_w)
+WRITE8_MEMBER(timelimt_state::videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::timelimt_bg_videoram_w)
+WRITE8_MEMBER(timelimt_state::bg_videoram_w)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::timelimt_scroll_x_lsb_w)
+WRITE8_MEMBER(timelimt_state::scroll_x_lsb_w)
 {
 	m_scrollx &= 0x100;
 	m_scrollx |= data & 0xff;
 }
 
-WRITE8_MEMBER(timelimt_state::timelimt_scroll_x_msb_w)
+WRITE8_MEMBER(timelimt_state::scroll_x_msb_w)
 {
 	m_scrollx &= 0xff;
 	m_scrollx |= ( data & 1 ) << 8;
 }
 
-WRITE8_MEMBER(timelimt_state::timelimt_scroll_y_w)
+WRITE8_MEMBER(timelimt_state::scroll_y_w)
 {
 	m_scrolly = data;
 }
@@ -111,17 +112,14 @@ WRITE8_MEMBER(timelimt_state::timelimt_scroll_y_w)
 
 void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for( offs = m_spriteram.bytes(); offs >= 0; offs -= 4 )
+	for( int offs = m_spriteram.bytes(); offs >= 0; offs -= 4 )
 	{
-		int sy = 240 - spriteram[offs];
-		int sx = spriteram[offs+3];
-		int code = spriteram[offs+1] & 0x3f;
-		int attr = spriteram[offs+2];
-		int flipy = spriteram[offs+1] & 0x80;
-		int flipx = spriteram[offs+1] & 0x40;
+		int sy = 240 - m_spriteram[offs];
+		int sx = m_spriteram[offs+3];
+		int code = m_spriteram[offs+1] & 0x3f;
+		int attr = m_spriteram[offs+2];
+		int flipy = m_spriteram[offs+1] & 0x80;
+		int flipx = m_spriteram[offs+1] & 0x40;
 
 		code += ( attr & 0x80 ) ? 0x40 : 0x00;
 		code += ( attr & 0x40 ) ? 0x80 : 0x00;
@@ -135,7 +133,7 @@ void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 timelimt_state::screen_update_timelimt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 timelimt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx);
 	m_bg_tilemap->set_scrolly(0, m_scrolly);
