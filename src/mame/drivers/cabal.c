@@ -48,6 +48,17 @@ Dip locations verified with Fabtek manual for the trackball version
 #include "sound/msm5205.h"
 #include "includes/cabal.h"
 
+MACHINE_START_MEMBER(cabal_state,cabal)
+{
+	save_item(NAME(m_last));
+}
+
+MACHINE_START_MEMBER(cabal_state,cabalbl)
+{
+	save_item(NAME(m_sound_command1));
+	save_item(NAME(m_sound_command2));
+}
+
 MACHINE_RESET_MEMBER(cabal_state,cabalbl)
 {
 	m_sound_command1 = m_sound_command2 = 0xff;
@@ -94,7 +105,7 @@ READ16_MEMBER(cabal_state::track_r)
 }
 
 
-WRITE16_MEMBER(cabal_state::cabal_sound_irq_trigger_word_w)
+WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 {
 	m_seibu_sound->main_word_w(space,4,data,mem_mask);
 
@@ -114,17 +125,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
 	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_SHARE("colorram")
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_SHARE("videoram")
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("colorram")
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa000f) AM_READ(track_r)
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(track_reset_w)
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
-	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
+	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w) // fix coin insertion
+	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 ADDRESS_MAP_END
 
@@ -133,14 +144,14 @@ static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
 	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_SHARE("colorram")
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_SHARE("videoram")
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("colorram")
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("JOY")
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
-	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
+	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
 	AM_RANGE(0xe8004, 0xe8005) AM_READ(soundlatch2_word_r)
@@ -464,6 +475,8 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+	
+	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabal)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -471,7 +484,7 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
+	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
@@ -521,6 +534,7 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabalbl)
 	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)
 
 	/* video hardware */
@@ -529,7 +543,7 @@ static MACHINE_CONFIG_START( cabalbl, cabal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update_cabal)
+	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cabal)
@@ -847,10 +861,10 @@ DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 }
 
 
-GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", 0 )
-GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", 0 ) // korea?
-GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, driver_device,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND )
-GAME( 1988, cabalbl2,cabal, cabal,   cabalj, cabal_state,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", 0 )
+GAME( 1988, cabal,   0,     cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation", "Cabal (World, Joystick version)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cabala,  cabal, cabal,   cabalj, cabal_state,   cabal,   ROT0, "TAD Corporation (Alpha Trading license)", "Cabal (Alpha Trading)", GAME_SUPPORTS_SAVE ) // korea?
+GAME( 1988, cabalbl, cabal, cabalbl, cabalbl, driver_device,  0,       ROT0, "bootleg (Red Corporation)", "Cabal (bootleg of Joystick version, set 1, alternate sound hardware)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1988, cabalbl2,cabal, cabal,   cabalj, cabal_state,   cabalbl2,ROT0, "bootleg", "Cabal (bootleg of Joystick version, set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", 0 )
-GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 2, Trackball version)", 0 )
+GAME( 1988, cabalus, cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 1, Trackball version)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cabalus2,cabal, cabal,   cabalt, cabal_state,   cabal,  ROT0, "TAD Corporation (Fabtek license)", "Cabal (US set 2, Trackball version)", GAME_SUPPORTS_SAVE )
