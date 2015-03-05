@@ -11547,7 +11547,7 @@ GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip, driver_device,  0,        ROT
 GAME( 1993, atehate,  0,        atehate,  atehate, driver_device,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 
 GAME( 1993, daioh,    0,        daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh", 0 )
-GAME( 1993, daioh1,   daioh,    daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (set 1)", 0 )
+GAME( 1993, daioh1,   daioh,    daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (hack?)", 0 ) // possible hack or bugfix made without source, see notes near romdef
 GAME( 1993, daiohloc, daioh,    daiohloc, daiohloc, driver_device, 0,        ROT270, "Athena",                 "Daioh (location test ver)", 0 )
 
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
