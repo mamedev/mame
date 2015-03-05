@@ -30,8 +30,8 @@
 // MAME headers
 #include "osdcomm.h"
 #include "osdcore.h"
+#include "osdsync.h"
 
-#include "retrosync.h"
 #include <stdlib.h>
 
 #ifndef WIN32

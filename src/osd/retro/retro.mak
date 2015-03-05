@@ -67,7 +67,6 @@ endif
 OSDCOREOBJS := \
 	$(MINIOBJ)/retrodir.o \
 	$(MINIOBJ)/retrofile.o \
-	$(MINIOBJ)/retromisc.o \
 	$(MINIOBJ)/retroos.o \
 	$(MINIOBJ)/font_retro.o \
 	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
@@ -80,8 +79,6 @@ OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
 else
 OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_osd.o
 endif
-#	$(MINIOBJ)/retrowork.o \
-#	$(MINIOBJ)/retroos.o 
 
 #-------------------------------------------------
 # OSD mini library

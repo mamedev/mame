@@ -21,9 +21,7 @@
 
 char *osd_get_clipboard_text(void)
 {
-	char *result = NULL;
-
-	return result;
+	return NULL;
 }
 
 #if 1
@@ -47,7 +45,8 @@ osd_directory_entry *osd_stat(const char *path)
    err = stat64(path, &st);
 #endif
 
-	if( err == -1) return NULL;
+	if( err == -1)
+      return NULL;
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
@@ -66,7 +65,8 @@ osd_directory_entry *osd_stat(const char *path)
 
 const char *osd_get_volume_name(int idx)
 {
-	if (idx!=0) return NULL;
+	if (idx != 0)
+      return NULL;
 	return "/";
 }
 
