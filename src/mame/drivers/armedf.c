@@ -79,7 +79,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
     to find its purpose (any more infos are welcome)
 
 
-1b) 'legiono' (bootleg set?)
+1b) 'legionjb' (bootleg set?)
 
   - The ROM test (code at 0x000466) checks range 0x000102-0x03ffff
     but NEVER reports an error if the checksum isn't correct due
@@ -461,7 +461,7 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(armedf_state::legiono_fg_scroll_w)
+WRITE8_MEMBER(armedf_state::legionjb_fg_scroll_w)
 {
 	if(offset >= 0xb && offset < 0xf)
 		m_legion_cmd[offset-0xb] = data & 0xff;
@@ -470,8 +470,8 @@ WRITE8_MEMBER(armedf_state::legiono_fg_scroll_w)
 	m_fg_scrolly = (m_legion_cmd[0x00] & 0xff) | ((m_legion_cmd[0x01] & 0x3) << 8);
 }
 
-static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16, armedf_state )
-	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legiono_fg_scroll_w,0x00ff)
+static ADDRESS_MAP_START( legionjb_map, AS_PROGRAM, 16, armedf_state )
+	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legionjb_fg_scroll_w,0x00ff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
@@ -1453,11 +1453,11 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( legiono, armedf_state )
+static MACHINE_CONFIG_START( legionjb, armedf_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
-	MCFG_CPU_PROGRAM_MAP(legiono_map)
+	MCFG_CPU_PROGRAM_MAP(legionjb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
@@ -1592,7 +1592,36 @@ ROM_START( legion )
 	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
 ROM_END
 
-ROM_START( legiono )
+ROM_START( legionj )
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
+	ROM_LOAD16_BYTE( "legion.e1", 0x000001, 0x010000, CRC(977fa324) SHA1(04432ecb0cab61731e17bcf665ca66fe34b2d75c) )
+	ROM_LOAD16_BYTE( "legion.e5", 0x000000, 0x010000, CRC(49e8e1b7) SHA1(ed0b38aae3f46f689fe9d2c96c383d375716e77e) )
+	ROM_LOAD16_BYTE( "legion.1b", 0x020001, 0x010000, CRC(c306660a) SHA1(31c6b868ba07677b5110c577335873354bff596f) )
+	ROM_LOAD16_BYTE( "legion.1d", 0x020000, 0x010000, CRC(c2e45e1e) SHA1(95cc359145b1b03123262891feed358407ba105a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
+	ROM_LOAD( "legion.1h", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) )
+	ROM_LOAD( "legion.1i", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "legion.1g", 0x00000, 0x08000, CRC(c50b0125) SHA1(83b5e9707152d97777fb65fa8820ba34ec2fac8d) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "legion.1e", 0x00000, 0x10000, CRC(a9d70faf) SHA1(8b8b60ae49c55e931d6838e863463f6b2bf7adb0) )
+	ROM_LOAD( "legion.1f", 0x18000, 0x08000, CRC(f018313b) SHA1(860bc9937202dc3a40c9fa7caad11c2c2aa19f5c) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "legion.1l", 0x00000, 0x10000, CRC(29b8adaa) SHA1(10338ebe7324960683de1f796dd311ed662e42b4) )
+
+	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_LOAD( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
+	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
+
+	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter */
+	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
+ROM_END
+
+ROM_START( legionjb )
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "legion.1a", 0x000001, 0x010000, CRC(8c0cda1d) SHA1(14b93d4fb4381ebc6a4ccdb480089bf69c6f474b) )
 	ROM_LOAD16_BYTE( "legion.1c", 0x000000, 0x010000, CRC(21226660) SHA1(ee48812d6ec9d4dccc58684164916f91b71aabf2) )
@@ -2115,7 +2144,7 @@ DRIVER_INIT_MEMBER(armedf_state,legion)
 	m_scroll_type = 2;
 }
 
-DRIVER_INIT_MEMBER(armedf_state,legiono)
+DRIVER_INIT_MEMBER(armedf_state,legionjb)
 {
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
@@ -2152,16 +2181,22 @@ DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
 
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,                     MONITOR, COMPANY,                        FULLNAME, FLAGS */
 GAME( 1987, legion,   0,        legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
-GAME( 1987, legiono,  legion,   legiono,  legion,   armedf_state,   legiono,  ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
+GAME( 1987, legionj,  legion,   legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05)", GAME_SUPPORTS_SAVE )
+GAME( 1987, legionjb, legion,   legionjb, legion,   armedf_state,   legionjb, ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan ver 1.05, bootleg)", GAME_SUPPORTS_SAVE) /* blitter protection removed */
+
 GAME( 1987, terraf,   0,        terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", GAME_SUPPORTS_SAVE )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, terrafj,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafb,  terraf,   terraf,   terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan, bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafb,  terraf,   terraf,   terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan, bootleg set 2)", GAME_SUPPORTS_SAVE )
+
 GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
+
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
+
 GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
