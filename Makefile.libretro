@@ -199,7 +199,8 @@ else ifeq ($(platform), osx)
 	else
 		PLATCFLAGS += -DLSB_FIRST
 	endif
-
+	PLATCFLAGS += -DSDLMAME_NO64BITIO -DOSX
+	CCOMFLAGS += $(PLATCFLAGS)
 # iOS
 else ifeq ($(platform), ios)
 	armplatform := 1
