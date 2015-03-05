@@ -2,6 +2,32 @@
 
 // internal helpers
 
+inline UINT8 hmcs40_cpu_device::ram_r()
+{
+	UINT8 address = (m_x << 4 | m_y) & m_datamask;
+	return m_data->read_byte(address) & 0xf;
+}
+
+inline void hmcs40_cpu_device::ram_w(UINT8 data)
+{
+	UINT8 address = (m_x << 4 | m_y) & m_datamask;
+	m_data->write_byte(address, data & 0xf);
+}
+
+void hmcs40_cpu_device::pop_stack()
+{
+	m_pc = m_stack[0] & m_prgmask;
+	for (int i = 0; i < m_stack_levels-1; i++)
+		m_stack[i] = m_stack[i+1];
+}
+
+void hmcs40_cpu_device::push_stack()
+{
+	for (int i = m_stack_levels-1; i >= 1; i--)
+		m_stack[i] = m_stack[i-1];
+	m_stack[0] = m_pc;
+}
+
 void hmcs40_cpu_device::op_illegal()
 {
 	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_pc);
@@ -16,37 +42,45 @@ void hmcs40_cpu_device::op_illegal()
 void hmcs40_cpu_device::op_lab()
 {
 	// LAB: Load A from B
-	op_illegal();
+	m_a = m_b;
 }
 
 void hmcs40_cpu_device::op_lba()
 {
 	// LBA: Load B from A
-	op_illegal();
+	m_b = m_a;
 }
 
 void hmcs40_cpu_device::op_lay()
 {
 	// LAY: Load A from Y
-	op_illegal();
+	m_a = m_y;
 }
 
 void hmcs40_cpu_device::op_laspx()
 {
 	// LASPX: Load A from SPX
-	op_illegal();
+	m_a = m_spx;
 }
 
 void hmcs40_cpu_device::op_laspy()
 {
 	// LASPY: Load A from SPY
-	op_illegal();
+	m_a = m_spy;
 }
 
 void hmcs40_cpu_device::op_xamr()
 {
 	// XAMR m: Exchange A and MR(m)
-	op_illegal();
+	
+	// determine MR(Memory Register) location
+	UINT8 y = m_op & 0xf;
+	UINT8 x = (y > 3) ? 0xf : (y + 12);
+	UINT8 address = (x << 4 | y) & m_datamask;
+	
+	UINT8 old_a = m_a;
+	m_a = m_data->read_byte(address) & 0xf;
+	m_data->write_byte(address, old_a & 0xf);
 }
 
 
@@ -55,67 +89,78 @@ void hmcs40_cpu_device::op_xamr()
 void hmcs40_cpu_device::op_lxa()
 {
 	// LXA: Load X from A
-	op_illegal();
+	m_x = m_a;
 }
 
 void hmcs40_cpu_device::op_lya()
 {
 	// LYA: Load Y from A
-	op_illegal();
+	m_y = m_a;
 }
 
 void hmcs40_cpu_device::op_lxi()
 {
 	// LXI i: Load X from Immediate
-	op_illegal();
+	m_x = m_op & 0xf;
 }
 
 void hmcs40_cpu_device::op_lyi()
 {
 	// LYI i: Load Y from Immediate
-	op_illegal();
+	m_y = m_op & 0xf;
 }
 
 void hmcs40_cpu_device::op_iy()
 {
 	// IY: Increment Y
-	op_illegal();
+	m_y = (m_y + 1) & 0xf;
+	m_s = (m_y != 0);
 }
 
 void hmcs40_cpu_device::op_dy()
 {
 	// DY: Decrement Y
-	op_illegal();
+	m_y = (m_y - 1) & 0xf;
+	m_s = (m_y != 0xf);
 }
 
 void hmcs40_cpu_device::op_ayy()
 {
 	// AYY: Add A to Y
-	op_illegal();
+	m_y += m_a;
+	m_s = m_y >> 4 & 1;
+	m_y &= 0xf;
 }
 
 void hmcs40_cpu_device::op_syy()
 {
 	// SYY: Subtract A from Y
-	op_illegal();
+	m_y -= m_a;
+	m_s = ~m_y >> 4 & 1;
+	m_y &= 0xf;
 }
 
 void hmcs40_cpu_device::op_xspx()
 {
 	// XSPX: Exchange X and SPX
-	op_illegal();
+	UINT8 old_x = m_x;
+	m_x = m_spx;
+	m_spx = old_x;
 }
 
-void hmcs40_cpu_device::op_sxpy()
+void hmcs40_cpu_device::op_xspy()
 {
-	// SXPY: Exchange Y and SPY
-	op_illegal();
+	// XSPY: Exchange Y and SPY
+	UINT8 old_y = m_y;
+	m_y = m_spy;
+	m_spy = old_y;
 }
 
 void hmcs40_cpu_device::op_xspxy()
 {
 	// XSPXY: Exchange X and SPX, Y and SPY
-	op_illegal();
+	op_xspx();
+	op_xspy();
 }
 
 
@@ -124,37 +169,49 @@ void hmcs40_cpu_device::op_xspxy()
 void hmcs40_cpu_device::op_lam()
 {
 	// LAM (XY): Load A from Memory
-	op_illegal();
+	m_a = ram_r();
+	op_xspxy();
 }
 
 void hmcs40_cpu_device::op_lbm()
 {
 	// LBM (XY): Load B from Memory
-	op_illegal();
+	m_b = ram_r();
+	op_xspxy();
 }
 
 void hmcs40_cpu_device::op_xma()
 {
 	// XMA (XY): Exchange Memory and A
-	op_illegal();
+	UINT8 old_a = m_a;
+	m_a = ram_r();
+	ram_w(old_a);
+	op_xspxy();
 }
 
 void hmcs40_cpu_device::op_xmb()
 {
 	// XMB (XY): Exchange Memory and B
-	op_illegal();
+	UINT8 old_b = m_b;
+	m_b = ram_r();
+	ram_w(old_b);
+	op_xspxy();
 }
 
 void hmcs40_cpu_device::op_lmaiy()
 {
 	// LMAIY (X): Load Memory from A, Increment Y
-	op_illegal();
+	ram_w(m_a);
+	op_iy();
+	op_xspx();
 }
 
 void hmcs40_cpu_device::op_lmady()
 {
 	// LMADY (X): Load Memory from A, Decrement Y
-	op_illegal();
+	ram_w(m_a);
+	op_dy();
+	op_xspx();
 }
 
 
@@ -163,19 +220,20 @@ void hmcs40_cpu_device::op_lmady()
 void hmcs40_cpu_device::op_lmiiy()
 {
 	// LMIIY i: Load Memory from Immediate, Increment Y
-	op_illegal();
+	ram_w(m_op & 0xf);
+	op_iy();
 }
 
 void hmcs40_cpu_device::op_lai()
 {
 	// LAI i: Load A from Immediate
-	op_illegal();
+	m_a = m_op & 0xf;
 }
 
 void hmcs40_cpu_device::op_lbi()
 {
 	// LBI i: Load B from Immediate
-	op_illegal();
+	m_b = m_op & 0xf;
 }
 
 
