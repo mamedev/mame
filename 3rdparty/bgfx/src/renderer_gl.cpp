@@ -236,6 +236,59 @@ namespace bgfx
 	};
 	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_textureFormat) );
 
+	static GLenum s_rboFormat[] =
+	{
+		GL_ZERO,               // BC1
+		GL_ZERO,               // BC2
+		GL_ZERO,               // BC3
+		GL_ZERO,               // BC4
+		GL_ZERO,               // BC5
+		GL_ZERO,               // BC6H
+		GL_ZERO,               // BC7
+		GL_ZERO,               // ETC1
+		GL_ZERO,               // ETC2
+		GL_ZERO,               // ETC2A
+		GL_ZERO,               // ETC2A1
+		GL_ZERO,               // PTC12
+		GL_ZERO,               // PTC14
+		GL_ZERO,               // PTC12A
+		GL_ZERO,               // PTC14A
+		GL_ZERO,               // PTC22
+		GL_ZERO,               // PTC24
+		GL_ZERO,               // Unknown
+		GL_ZERO,               // R1
+		GL_R8,                 // R8
+		GL_R16,                // R16
+		GL_R16F,               // R16F
+		GL_R32UI,              // R32
+		GL_R32F,               // R32F
+		GL_RG8,                // RG8
+		GL_RG16,               // RG16
+		GL_RG16F,              // RG16F
+		GL_RG32UI,             // RG32
+		GL_RG32F,              // RG32F
+		GL_RGBA8,              // BGRA8
+		GL_RGBA16,             // RGBA16
+		GL_RGBA16F,            // RGBA16F
+		GL_RGBA32UI,           // RGBA32
+		GL_RGBA32F,            // RGBA32F
+		GL_RGB565,             // R5G6B5
+		GL_RGBA4,              // RGBA4
+		GL_RGB5_A1,            // RGB5A1
+		GL_RGB10_A2,           // RGB10A2
+		GL_R11F_G11F_B10F,     // R11G11B10F
+		GL_ZERO,               // UnknownDepth
+		GL_DEPTH_COMPONENT16,  // D16
+		GL_DEPTH_COMPONENT24,  // D24
+		GL_DEPTH24_STENCIL8,   // D24S8
+		GL_DEPTH_COMPONENT32,  // D32
+		GL_DEPTH_COMPONENT32F, // D16F
+		GL_DEPTH_COMPONENT32F, // D24F
+		GL_DEPTH_COMPONENT32F, // D32F
+		GL_STENCIL_INDEX8,     // D0S8
+	};
+	BX_STATIC_ASSERT(TextureFormat::Count == BX_COUNTOF(s_rboFormat) );
+
 	static GLenum s_imageFormat[] =
 	{
 		GL_ZERO,           // BC1
@@ -1115,12 +1168,7 @@ namespace bgfx
 			{
 				setTextureFormat(TextureFormat::D32, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 
-				if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
-				{
-					setTextureFormat(TextureFormat::R16,    GL_R16UI,    GL_RED_INTEGER,  GL_UNSIGNED_SHORT);
-					setTextureFormat(TextureFormat::RGBA16, GL_RGBA16UI, GL_RGBA_INTEGER, GL_UNSIGNED_SHORT);
-				}
-				else
+				if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES < 30) )
 				{
 					setTextureFormat(TextureFormat::RGBA16F, GL_RGBA, GL_RGBA, GL_HALF_FLOAT);
 
@@ -1130,6 +1178,17 @@ namespace bgfx
 						setTextureFormat(TextureFormat::D24S8, GL_DEPTH_STENCIL,   GL_DEPTH_STENCIL,   GL_UNSIGNED_INT_24_8);
 					}
 				}
+			}
+
+			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
+			||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30) )
+			{
+				setTextureFormat(TextureFormat::R16,    GL_R16UI,    GL_RED_INTEGER,  GL_UNSIGNED_SHORT);
+				setTextureFormat(TextureFormat::RG16,   GL_RG16UI,   GL_RG_INTEGER,   GL_UNSIGNED_SHORT);
+				setTextureFormat(TextureFormat::RGBA16, GL_RGBA16UI, GL_RGBA_INTEGER, GL_UNSIGNED_SHORT);
+				setTextureFormat(TextureFormat::R32,    GL_R32UI,    GL_RED_INTEGER,  GL_UNSIGNED_INT);
+				setTextureFormat(TextureFormat::RG32,   GL_RG32UI,   GL_RG_INTEGER,   GL_UNSIGNED_INT);
+				setTextureFormat(TextureFormat::RGBA32, GL_RGBA32UI, GL_RGBA_INTEGER, GL_UNSIGNED_INT);
 			}
 
 			if (s_extension[Extension::EXT_texture_format_BGRA8888  ].m_supported
@@ -3140,7 +3199,7 @@ namespace bgfx
 				if (0 == msaaQuality)
 				{
 					GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER
-						, s_textureFormat[m_textureFormat].m_internalFmt
+						, s_rboFormat[m_textureFormat]
 						, _width
 						, _height
 						) );
@@ -3149,7 +3208,7 @@ namespace bgfx
 				{
 					GL_CHECK(glRenderbufferStorageMultisample(GL_RENDERBUFFER
 						, msaaQuality
-						, s_textureFormat[m_textureFormat].m_internalFmt
+						, s_rboFormat[m_textureFormat]
 						, _width
 						, _height
 						) );

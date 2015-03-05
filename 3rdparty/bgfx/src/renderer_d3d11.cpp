@@ -1786,6 +1786,9 @@ namespace bgfx
 
 		void commitTextureStage()
 		{
+			m_deviceCtx->VSSetShaderResources(0, BGFX_CONFIG_MAX_TEXTURE_SAMPLERS, m_textureStage.m_srv);
+			m_deviceCtx->VSSetSamplers(0, BGFX_CONFIG_MAX_TEXTURE_SAMPLERS, m_textureStage.m_sampler);
+
 			m_deviceCtx->PSSetShaderResources(0, BGFX_CONFIG_MAX_TEXTURE_SAMPLERS, m_textureStage.m_srv);
 			m_deviceCtx->PSSetSamplers(0, BGFX_CONFIG_MAX_TEXTURE_SAMPLERS, m_textureStage.m_sampler);
 		}
@@ -2369,12 +2372,53 @@ namespace bgfx
 		ID3D11DeviceContext* deviceCtx = s_renderD3D11->m_deviceCtx;
 		BX_CHECK(m_dynamic, "Must be dynamic!");
 
+#if 1
+		BX_UNUSED(_discard);
+		ID3D11Device* device = s_renderD3D11->m_device;
+
+		D3D11_BUFFER_DESC desc;
+		desc.ByteWidth = _size;
+		desc.Usage     = D3D11_USAGE_STAGING;
+		desc.BindFlags = 0;
+		desc.MiscFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		desc.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA srd;
+		srd.pSysMem     = _data;
+		srd.SysMemPitch = 0;
+		srd.SysMemSlicePitch = 0;
+
+		ID3D11Buffer* ptr;
+		DX_CHECK(device->CreateBuffer(&desc, &srd, &ptr) );
+
+		D3D11_BOX box;
+		box.left   = 0;
+		box.top    = 0;
+		box.front  = 0;
+		box.right  = _size;
+		box.bottom = 1;
+		box.back   = 1;
+
+		deviceCtx->CopySubresourceRegion(m_ptr
+			, 0
+			, _offset
+			, 0
+			, 0
+			, ptr
+			, 0
+			, &box
+			);
+
+		DX_RELEASE(ptr, 0);
+#else
 		D3D11_MAPPED_SUBRESOURCE mapped;
 		BX_UNUSED(_discard);
 		D3D11_MAP type = D3D11_MAP_WRITE_DISCARD;
 		DX_CHECK(deviceCtx->Map(m_ptr, 0, type, 0, &mapped));
-		memcpy((uint8_t*)mapped.pData + _offset, _data, _size);
+		memcpy( (uint8_t*)mapped.pData + _offset, _data, _size);
 		deviceCtx->Unmap(m_ptr, 0);
+#endif // 0
 	}
 
 	void VertexBufferD3D11::create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint8_t _flags)

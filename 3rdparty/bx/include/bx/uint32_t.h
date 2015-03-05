@@ -669,7 +669,7 @@ namespace bx
 	inline uint64_t uint64_cnttz(uint64_t _val)
 	{
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
-		return __builtin_ctz(_val);
+		return __builtin_ctzl(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS && BX_ARCH_64BIT
 		unsigned long index;
 		_BitScanForward64(&index, _val);

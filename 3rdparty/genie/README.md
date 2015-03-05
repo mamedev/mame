@@ -14,7 +14,7 @@ Supported project generators:
 Download (stable)
 -----------------
 
-	version 181 (commit 6b59593a0a812fea6c5caaf6a50772076a6e5637)
+	version 197 (commit 2b34cf0f0831d265b274d8e11a24bf6320d73d6e)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -35,7 +35,7 @@ Building (dev)
 Documentation
 -------------
 
-[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/scripting-reference.md)
+[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)
 
 History
 -------

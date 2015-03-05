@@ -210,6 +210,12 @@
 		return table.contains(extensions, ext)
 	end
 	
+	function path.isobjcfile(fname)
+		local extensions = { ".m", ".mm" }
+		local ext = path.getextension(fname):lower()
+		return table.contains(extensions, ext)
+	end
+
 	function path.iscppheader(fname)
 		local extensions = { ".h", ".hh", ".hpp", ".hxx" }
 		local ext = path.getextension(fname):lower()

@@ -326,6 +326,7 @@
 
 		_p('  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_c)))
 		_p('  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_cpp)))
+		_p('  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_objc)))
 
 		_p('  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)%s',
 		        make.list(table.join(cc.getdefines(cfg.resdefines),
@@ -435,12 +436,18 @@
 					, _MAKE.esc(path.trimdots(path.removeext(file)))
 					, _MAKE.esc(file)
 					)
-				if prj.msgcompile then
+				if (path.isobjcfile(file) and prj.msgcompile_objc) then
+					_p('\t@echo ' .. prj.msgcompile_objc)
+				elseif prj.msgcompile then
 					_p('\t@echo ' .. prj.msgcompile)
 				else
 					_p('\t@echo $(notdir $<)')
 				end
-				cpp.buildcommand(path.iscfile(file) and not prj.options.ForceCPP, "o")
+				if (path.isobjcfile(file)) then
+					_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.o=%%.d) -c "$<"')
+				else
+					cpp.buildcommand(path.iscfile(file) and not prj.options.ForceCPP, "o")
+				end
 				_p('')
 			elseif (path.getextension(file) == ".rc") then
 				_p('$(OBJDIR)/%s.res: %s', _MAKE.esc(path.getbasename(file)), _MAKE.esc(file))
