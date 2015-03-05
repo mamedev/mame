@@ -204,6 +204,19 @@ public:
 		this->pfn_wglDeleteContext = (BOOL (WINAPI *)(HGLRC hglrc)) GetProcAddress(m_module, "wglDeleteContext");
 		this->pfn_wglMakeCurrent = (BOOL (WINAPI *)(HDC hdc, HGLRC hglrc)) GetProcAddress(m_module, "wglMakeCurrent");
 
+		this->pfn_wglGetExtensionsStringEXT = (const char *(WINAPI *) (void)) pfn_wglGetProcAddress("wglGetExtensionsStringEXT");
+
+		if (WGLExtensionSupported("WGL_EXT_swap_control"))
+		{
+			this->pfn_wglSwapIntervalEXT = (BOOL (WINAPI *) (int)) getProcAddress("wglSwapIntervalEXT");
+			this->pfn_wglGetSwapIntervalEXT = (int (WINAPI *) (void)) getProcAddress("wglGetSwapIntervalEXT");
+		}
+		else
+		{
+			pfn_wglSwapIntervalEXT = NULL;
+			pfn_wglGetSwapIntervalEXT = NULL;
+		}
+
 		m_hdc = GetDC(window);
 		if (!setupPixelFormat(m_hdc))
 		{
@@ -246,7 +259,10 @@ public:
 
 	virtual int SetSwapInterval(const int swap)
 	{
-		// FIXME: Missing!
+		if (this->pfn_wglSwapIntervalEXT != NULL)
+		{
+			this->pfn_wglSwapIntervalEXT(swap ? 1 : 0);
+		}
 		return 0;
 	}
 
@@ -300,6 +316,16 @@ private:
 	    return 0;
 	}
 
+	bool WGLExtensionSupported(const char *extension_name)
+	{
+	    //if (pfn_wglGetExtensionsStringEXT != NULL)
+	    //	printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
+
+	    if (pfn_wglGetExtensionsStringEXT != NULL && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != NULL)
+	        return true;
+	    else
+	    	return false;
+	}
 
 	HGLRC m_context;
 	HWND m_window;
@@ -310,6 +336,10 @@ private:
 	HGLRC (WINAPI *pfn_wglCreateContext)(HDC hdc);
 	BOOL (WINAPI *pfn_wglDeleteContext)(HGLRC hglrc);
 	BOOL (WINAPI *pfn_wglMakeCurrent)(HDC hdc, HGLRC hglrc);
+
+	const char *(WINAPI *pfn_wglGetExtensionsStringEXT) (void);
+	BOOL (WINAPI *pfn_wglSwapIntervalEXT) (int interval);
+	int (WINAPI * pfn_wglGetSwapIntervalEXT) (void);
 
 	static HMODULE m_module;
 };
