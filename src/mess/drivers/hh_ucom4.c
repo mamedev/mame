@@ -2,10 +2,11 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  NEC uCOM4 MCU handhelds
+  NEC uCOM4 MCU tabletops/handhelds or other simple devices.
 
 
-
+  known chips:
+  
   serial  device  etc.
 -----------------------------------------------
  @048     uPD552  1980, Tomy Tennis
@@ -87,6 +88,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(tmtennis_difficulty_switch);
 	DECLARE_MACHINE_RESET(tmtennis);
 
+	void tmpacman_display();
 	DECLARE_WRITE8_MEMBER(tmpacman_grid_w);
 	DECLARE_WRITE8_MEMBER(tmpacman_plate_w);
 	DECLARE_WRITE8_MEMBER(tmpacman_port_e_w);
@@ -132,11 +134,8 @@ void hh_ucom4_state::machine_start()
 
 ***************************************************************************/
 
-
-
-// The device strobes the outputs very fast, it is unnoticeable to the user.
+// The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
-
 
 void hh_ucom4_state::display_update()
 {
@@ -211,6 +210,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 }
 
 
+
 /***************************************************************************
 
   Minidrivers (I/O, Inputs, Machine Config)
@@ -231,12 +231,11 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
   NOTE!: MESS external artwork is recommended
 
-
 ***************************************************************************/
 
 WRITE8_MEMBER(hh_ucom4_state::edracula_grid_w)
 {
-	// ports C,D: vfd matrix grid
+	// C,D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
@@ -245,7 +244,7 @@ WRITE8_MEMBER(hh_ucom4_state::edracula_grid_w)
 
 WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
 {
-	// ports E-H,I01: vfd matrix plate
+	// E-H,I01: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -304,6 +303,7 @@ MACHINE_CONFIG_END
 
 
 
+
 /***************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
@@ -322,16 +322,15 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-
 READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
 {
-	// ports A,B: buttons
+	// A,B: buttons
 	return ~read_inputs(2) >> (offset*4);
 }
 
 WRITE8_MEMBER(hh_ucom4_state::tmtennis_grid_w)
 {
-	// ports G-I: vfd matrix grid
+	// G-I: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
@@ -340,7 +339,7 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_grid_w)
 
 WRITE8_MEMBER(hh_ucom4_state::tmtennis_plate_w)
 {
-	// ports C-F: vfd matrix plate
+	// C-F: vfd matrix plate
 	if (offset == NEC_UCOM4_PORTF) offset--;
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
@@ -393,6 +392,7 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+
 void hh_ucom4_state::tmtennis_set_clock()
 {
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
@@ -410,7 +410,6 @@ MACHINE_RESET_MEMBER(hh_ucom4_state, tmtennis)
 {
 	tmtennis_set_clock();
 }
-
 
 static MACHINE_CONFIG_START( tmtennis, hh_ucom4_state )
 
@@ -441,6 +440,8 @@ MACHINE_CONFIG_END
 
 
 
+
+
 /***************************************************************************
 
   Tomy(tronic) Pac-Man (manufactured in Japan)
@@ -452,29 +453,40 @@ MACHINE_CONFIG_END
   known releases:
   - Japan: Puck Man
   - USA: Pac Man
-  - UK: Puckman (Tomy), and also as Munchman, published by Grandstand
+  - UK: Puckman (Tomy), and also published by Grandstand as Munchman
   - Australia: Pac Man-1, published by Futuretronics
+  
+  The game will start automatically after turning it on. This Pac Man refuses
+  to eat dots with his butt, you can only eat them going right-to-left.
 
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
 
+void hh_ucom4_state::tmpacman_display()
+{
+	UINT8 grid = BITSWAP8((UINT8)m_grid,0,1,2,3,4,5,6,7);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
+	
+	display_matrix(19, 8, plate | 0x100, grid); // plate 8 (maze) is always on
+}
+
 WRITE8_MEMBER(hh_ucom4_state::tmpacman_grid_w)
 {
-	// ports C,D: vfd matrix grid
+	// C,D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
-	display_matrix(19, 8, m_plate, m_grid);
+	tmpacman_display();
 }
 
 WRITE8_MEMBER(hh_ucom4_state::tmpacman_plate_w)
 {
-	// ports E-I: vfd matrix plate
+	// E023,F-I: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
-	display_matrix(19, 8, m_plate, m_grid);
+	tmpacman_display();
 }
 
 WRITE8_MEMBER(hh_ucom4_state::tmpacman_port_e_w)
@@ -494,7 +506,7 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 
 	PORT_START("IN.1") // port B
-	PORT_CONFNAME( 0x00, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x01, "Professional" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -528,6 +540,8 @@ MACHINE_CONFIG_END
 
 
 
+
+
 /***************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
@@ -548,7 +562,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(hh_ucom4_state::alnchase_input_r)
 {
-	// port A: buttons
+	// A: buttons
 	return read_inputs(2);
 }
 
@@ -556,7 +570,7 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_display_w)
 {
 	if (offset <= NEC_UCOM4_PORTE)
 	{
-		// ports C,D,E0: vfd matrix grid
+		// C,D,E0: vfd matrix grid
 		int shift = (offset - NEC_UCOM4_PORTC) * 4;
 		m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
@@ -567,7 +581,7 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_display_w)
 
 	if (offset >= NEC_UCOM4_PORTE)
 	{
-		// ports F-I,E23: vfd matrix plate
+		// E23,F-I: vfd matrix plate
 		int shift = (offset - NEC_UCOM4_PORTE) * 4;
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
 	}
@@ -582,6 +596,7 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_port_e_w)
 
 	alnchase_display_w(space, offset, data);
 }
+
 
 /* physical button layout and labels is like this:
 
@@ -619,6 +634,7 @@ static INPUT_PORTS_START( alnchase )
 	PORT_CONFSETTING(    0x02, "Professional" )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
 
 static MACHINE_CONFIG_START( alnchase, hh_ucom4_state )
 
@@ -667,7 +683,6 @@ ROM_START( tmtennis )
 ROM_END
 
 
-
 ROM_START( tmpacman )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
@@ -681,8 +696,9 @@ ROM_END
 
 
 
-CONS( 1982, edracula, 0, 0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+/*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1982, edracula,  0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-CONS( 1980, tmtennis, 0, 0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, tmpacman, 0, 0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1984, alnchase, 0, 0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, tmtennis,  0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1982, tmpacman,  0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1984, alnchase,  0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )

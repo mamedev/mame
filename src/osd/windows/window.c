@@ -646,7 +646,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 //  (main thread)
 //============================================================
 
-void win_window_info::create(running_machine &machine, int index, win_monitor_info *monitor, const osd_window_config *config)
+void win_window_info::create(running_machine &machine, int index, osd_monitor_info *monitor, const osd_window_config *config)
 {
 	win_window_info *window, *win;
 
@@ -833,9 +833,9 @@ void win_window_info::update()
 //  (window thread)
 //============================================================
 
-win_monitor_info *win_window_info::winwindow_video_window_monitor(const osd_rect *proposed)
+osd_monitor_info *win_window_info::winwindow_video_window_monitor(const osd_rect *proposed)
 {
-	win_monitor_info *monitor;
+	osd_monitor_info *monitor;
 
 	// in window mode, find the nearest
 	if (!m_fullscreen)
@@ -858,7 +858,7 @@ win_monitor_info *win_window_info::winwindow_video_window_monitor(const osd_rect
 		monitor = m_monitor;
 
 	// make sure we're up-to-date
-	monitor->refresh();
+	//monitor->refresh();
 	return monitor;
 }
 
@@ -1523,7 +1523,7 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	INT32 viswidth, visheight;
 	INT32 adjwidth, adjheight;
 	float pixel_aspect;
-	win_monitor_info *monitor = winwindow_video_window_monitor(&rect);
+	osd_monitor_info *monitor = winwindow_video_window_monitor(&rect);
 
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -1686,7 +1686,7 @@ osd_dim win_window_info::get_max_bounds(int constrain)
 	//assert(GetCurrentThreadId() == window_threadid);
 
 	// compute the maximum client area
-	m_monitor->refresh();
+	//m_monitor->refresh();
 	osd_rect maximum = m_monitor->usuable_position_size();
 
 	// clamp to the window's max
@@ -1823,7 +1823,7 @@ void win_window_info::adjust_window_position_after_major_change()
 	// in full screen, make sure it covers the primary display
 	else
 	{
-		win_monitor_info *monitor = winwindow_video_window_monitor(NULL);
+		osd_monitor_info *monitor = winwindow_video_window_monitor(NULL);
 		newrect = monitor->position_size();
 	}
 

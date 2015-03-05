@@ -149,7 +149,7 @@ Speak & Math:
 Speak & Read:
 
     Speak & Read (US), 1980
-    - MCU: CD2705*
+    - MCU: CD2705**
     - TMS51xx(1/2): 16KB CD2394 (rev.A)
     - TMS51xx(2/2): 16KB CD2395 (rev.A)
 

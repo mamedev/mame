@@ -492,19 +492,6 @@ static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-/***************************** PIC16C57 Memory Map **************************/
-
-	/* $000 - 7FF  PIC16C57 Internal Program ROM. Note: code is 12bits wide */
-	/* $000 - 07F  PIC16C57 Internal Data RAM */
-
-static ADDRESS_MAP_START( kickgoal_sound_io_map, AS_IO, 8, kickgoal_state )
-	/* Unknown without the PIC dump */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( actionhw_io_map, AS_IO, 8, kickgoal_state )
-	/* Unknown without the PIC dump */
-ADDRESS_MAP_END
-
 
 /* INPUT ports ***************************************************************/
 
@@ -646,8 +633,6 @@ static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)  /* 3MHz ? */
 	MCFG_DEVICE_DISABLE()   /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
-	MCFG_CPU_IO_MAP(kickgoal_sound_io_map)
-
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(kickgoal_default_eeprom_type1, 128)
@@ -683,8 +668,6 @@ static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)    /* verified on pcb */
 	MCFG_DEVICE_DISABLE() /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
-	MCFG_CPU_IO_MAP(actionhw_io_map)
-
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(kickgoal_default_eeprom_type1, 128)

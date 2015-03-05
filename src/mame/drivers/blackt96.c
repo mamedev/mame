@@ -117,7 +117,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram7;
 	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
 	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
-	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
+	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
 	DECLARE_READ8_MEMBER(blackt96_soundio_port01_r);
 	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
@@ -560,7 +560,7 @@ static GFXDECODE_START( blackt96 )
 GFXDECODE_END
 
 
-READ8_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
+READ_LINE_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
 {
 	return 0;
 }
@@ -587,13 +587,6 @@ WRITE8_MEMBER(blackt96_state::blackt96_soundio_port02_w)
 {
 }
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, blackt96_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE(blackt96_soundio_port00_w )
-	AM_RANGE(0x01, 0x01) AM_READWRITE(blackt96_soundio_port01_r, blackt96_soundio_port01_w )
-	AM_RANGE(0x02, 0x02) AM_READWRITE(blackt96_soundio_port02_r, blackt96_soundio_port02_w )
-	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
-ADDRESS_MAP_END
-
 
 
 static MACHINE_CONFIG_START( blackt96, blackt96_state )
@@ -602,7 +595,12 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(blackt96_state, blackt96_soundio_port00_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(blackt96_state, blackt96_soundio_port01_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(blackt96_state, blackt96_soundio_port01_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(blackt96_state, blackt96_soundio_port02_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(blackt96_state, blackt96_soundio_port02_w))
+	MCFG_PIC16C5x_T0_CB(READLINE(blackt96_state, PIC16C5X_T0_clk_r))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
 

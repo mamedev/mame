@@ -74,7 +74,7 @@ READ8_MEMBER( mbee_state::video_low_r )
 	if (m_is_premium && ((m_1c & 0x9f) == 0x90))
 		return m_p_attribram[offset];
 	else
-	if BIT(m_0b, 0)
+	if (m_0b)
 		return m_p_gfxram[offset];
 	else
 		return m_p_videoram[offset];
@@ -120,7 +120,7 @@ READ8_MEMBER( mbee_state::port08_r )
 
 WRITE8_MEMBER( mbee_state::port08_w )
 {
-	m_08 = data;
+	m_08 = data & 0x4e;
 }
 
 READ8_MEMBER( mbee_state::port1c_r )
@@ -362,9 +362,9 @@ MC6845_UPDATE_ROW( mbee_state::mono_update_row )
 MC6845_UPDATE_ROW( mbee_state::colour_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 inv,attr,gfx,fg,bg;
-	UINT16 mem,x,col,chr;
-	UINT16 colourm = (m_08 & 0x0e) << 7;
+	UINT8 inv,attr,gfx,fg,bg,col;
+	UINT16 mem,x,chr;
+	UINT8 colourm = (m_08 & 0x0e) >> 1;
 	UINT32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)           // for each character
@@ -387,8 +387,6 @@ MC6845_UPDATE_ROW( mbee_state::colour_update_row )
 			if (BIT(attr, 7) & BIT(m_framecnt, 4))            // flashing attribute
 				chr = 0x20;
 		}
-		else
-			col |= colourm;
 
 		oldkb_scan(x+ma);
 
@@ -403,12 +401,12 @@ MC6845_UPDATE_ROW( mbee_state::colour_update_row )
 		if (m_is_premium)
 		{
 			fg = col & 15;
-			bg = (col & 0xf0) >> 4;
+			bg = col >> 4;
 		}
 		else
 		{
-			fg = (col & 0x001f) | 64;
-			bg = (col & 0x07e0) >> 5;
+			fg = (col & 0x1f) | 64;
+			bg = ((col & 0xe0) >> 2) | colourm;
 		}
 
 		/* Display a scanline of a character (8 pixels) */
@@ -424,65 +422,51 @@ MC6845_UPDATE_ROW( mbee_state::colour_update_row )
 }
 
 
-/***********************************************************
+/*****************************************************************************************************
 
     Palette
 
-************************************************************/
+    Standard Palette: The 8 bits from the colour RAM are divided into 5 bits for foreground, and 3
+    bits for background. The 5 foreground bits pass through a PAL, which has 6 outputs. A write to
+    port 8 produces 3 more background lines, giving 6 in total. These 12 lines travel to a pair of
+    74LS157 switching chips, where the foreground or background lines are selected by the absence or
+    or presence of a pixel. The 6 chosen lines pass through a 7407 then are merged to the final 3 RGB
+    lines. Each pair is merged like this:
+    VCC --- 330 ohm --- primary colour line + out to monitor ---- 120 ohm --- secondary colour line
+
+*****************************************************************************************************/
 
 PALETTE_INIT_MEMBER( mbee_state, standard )
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	UINT16 i;
-	UINT8 r, b, g, k;
-	UINT8 level[] = { 0, 0x80, 0xff, 0xff };    /* off, half, full intensity */
+	UINT8 i=0, r, b, g, k, r1, g1, b1;
+	UINT8 bglevel[] = { 0, 0x54, 0xa0, 0xff };
+	UINT8 fglevel[] = { 0, 0xa0, 0xff, 0xff };
 
-	/* set up background palette (00-63) */
-	for (i = 0; i < 64; i++)
+	// set up background colours (00-63)
+	for (b1 = 0; b1 < 4; b1++)
 	{
-		r = level[((i>>0)&1)|((i>>2)&2)];
-		g = level[((i>>1)&1)|((i>>3)&2)];
-		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		b = bglevel[b1];
+		for (g1 = 0; g1 < 4; g1++)
+		{
+			g = bglevel[g1];
+			for (r1 = 0; r1 < 4; r1++)
+			{
+				r = bglevel[r1];
+				k = BITSWAP8(i, 7, 6, 5, 3, 1, 4, 2, 0);
+				palette.set_pen_color(k, rgb_t(r, g, b));
+				i++;
+			}
+		}
 	}
 
-	/* set up foreground palette (64-95) by reading the prom */
+	// set up foreground palette (64-95) by reading the prom
 	for (i = 0; i < 32; i++)
 	{
 		k = color_prom[i];
-		r = level[((k>>2)&1)|((k>>4)&2)];
-		g = level[((k>>1)&1)|((k>>3)&2)];
-		b = level[((k>>0)&1)|((k>>2)&2)];
-		palette.set_pen_color(i|64, rgb_t(r, g, b));
-	}
-}
-
-
-PALETTE_INIT_MEMBER( mbee_state, mbeepc85b )
-{
-	const UINT8 *color_prom = memregion("proms")->base();
-	UINT16 i;
-	UINT8 r, b, g, k;
-	UINT8 level[] = { 0, 0x80, 0x80, 0xff };    /* off, half, full intensity */
-
-	/* set up background palette (00-63) */
-	for (i = 0; i < 64; i++)
-	{
-		r = level[((i>>0)&1)|((i>>2)&2)];
-		g = level[((i>>1)&1)|((i>>3)&2)];
-		b = level[((i>>2)&1)|((i>>4)&2)];
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-
-	level[2] = 0xff;
-
-	/* set up foreground palette (64-95) by reading the prom */
-	for (i = 0; i < 32; i++)
-	{
-		k = color_prom[i];
-		r = level[((k>>2)&1)|((k>>4)&2)];
-		g = level[((k>>1)&1)|((k>>3)&2)];
-		b = level[((k>>0)&1)|((k>>2)&2)];
+		r = fglevel[(BIT(k, 2))|(BIT(k, 5)<<1)];
+		g = fglevel[(BIT(k, 1))|(BIT(k, 4)<<1)];
+		b = fglevel[(BIT(k, 0))|(BIT(k, 3)<<1)];
 		palette.set_pen_color(i|64, rgb_t(r, g, b));
 	}
 }
@@ -490,24 +474,23 @@ PALETTE_INIT_MEMBER( mbee_state, mbeepc85b )
 
 PALETTE_INIT_MEMBER( mbee_state, premium )
 {
-	UINT16 i;
-	UINT8 r, b, g;
+	UINT8 i, r, b, g;
 
 	/* set up 8 low intensity colours */
 	for (i = 0; i < 8; i++)
 	{
-		r = (i & 1) ? 0xc0 : 0;
-		g = (i & 2) ? 0xc0 : 0;
-		b = (i & 4) ? 0xc0 : 0;
+		r = BIT(i, 0) ? 0xa0 : 0;
+		g = BIT(i, 1) ? 0xa0 : 0;
+		b = BIT(i, 2) ? 0xa0 : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	/* set up 8 high intensity colours */
 	for (i = 9; i < 16; i++)
 	{
-		r = (i & 1) ? 0xff : 0;
-		g = (i & 2) ? 0xff : 0;
-		b = (i & 4) ? 0xff : 0;
+		r = BIT(i, 0) ? 0xff : 0;
+		g = BIT(i, 1) ? 0xff : 0;
+		b = BIT(i, 2) ? 0xff : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }

@@ -46,7 +46,7 @@ public:
 
 	void update();
 
-	win_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed);
+	osd_monitor_info *winwindow_video_window_monitor(const osd_rect *proposed);
 
 	bool win_has_menu()
 	{
@@ -60,13 +60,13 @@ public:
 		return osd_dim(client.right - client.left, client.bottom - client.top);
 	}
 
-	win_monitor_info *monitor() const { return m_monitor; }
+	osd_monitor_info *monitor() const { return m_monitor; }
 
 	void destroy();
 
 	// static
 
-	static void create(running_machine &machine, int index, win_monitor_info *monitor, const osd_window_config *config);
+	static void create(running_machine &machine, int index, osd_monitor_info *monitor, const osd_window_config *config);
 
 	// static callbacks
 
@@ -86,7 +86,7 @@ public:
 	int                 m_ismaximized;
 
 	// monitor info
-	win_monitor_info *  m_monitor;
+	osd_monitor_info *  m_monitor;
 	int                 m_fullscreen;
 	int                 m_fullscreen_safe;
 	float               m_aspect;

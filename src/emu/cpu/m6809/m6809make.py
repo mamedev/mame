@@ -15,8 +15,9 @@ def load_file(fname, lines):
 		path = path + '/'
 	try:
 		f = open(fname, "rU")
-	except Exception, err:
-		print "Cannot read opcodes file %s [%s]" % (fname, err)
+	except Exception:
+		err = sys.exc_info()[1]
+		sys.stderr.write("Cannot read opcodes file %s [%s]\n" % (fname, err))
 		sys.exit(1)
 	
 	rawlines = re.split('(\n|; *\n?)', f.read())
@@ -76,7 +77,7 @@ while count < len(lines):
 			next_dispatch = lines[count+1][percent_pos+1:].strip("\t\n; ")
 
 			# If there is no state number associated with the next dispatch, make one
-			if not dispatch_to_states.has_key(next_dispatch):
+			if next_dispatch not in dispatch_to_states:
 				dispatch_to_states[next_dispatch] = state
 				states_to_dispatch[state] = next_dispatch
 				state = state + 1
@@ -112,7 +113,7 @@ while count < len(lines):
 
 # Output the case labels
 for i in range(0, state):
-	print "\tcase %d:	goto %s;" % (i, states_to_dispatch[i] if states_to_dispatch.has_key(i) else "state_%s" % str(i))
+	print("\tcase %d:	goto %s;" % (i, states_to_dispatch.get(i, "state_%d" % i)))
 
 # Output a default case
 print "\tdefault:"

@@ -722,6 +722,8 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
 	MCFG_PALETTE_ADD("palette", 768)
 
+	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
+
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 

@@ -558,6 +558,26 @@ $(LIBOBJ)/lua/lsqlite3/%.o: $(3RDPARTY)/lsqlite3/%.c | $(OSPREBUILD)
 	$(CC_AS) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -I$(3RDPARTY)/lua/src -I$(3RDPARTY) $(LUA_FLAGS) -c $< -o $@
 
 #-------------------------------------------------
+# web library objects
+#-------------------------------------------------
+
+WEBOBJS = \
+	$(LIBOBJ)/mongoose/mongoose.o \
+	$(LIBOBJ)/jsoncpp/json_reader.o \
+	$(LIBOBJ)/jsoncpp/json_value.o \
+	$(LIBOBJ)/jsoncpp/json_writer.o \
+
+$(OBJ)/libweb.a: $(WEBOBJS)
+
+$(LIBOBJ)/jsoncpp/%.o: $(3RDPARTY)/jsoncpp/src/lib_json/%.cpp | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC_AS) $(CDEFS) $(CFLAGS) -I$(3RDPARTY)/jsoncpp/include -c $< -o $@
+
+$(LIBOBJ)/mongoose/%.o: $(3RDPARTY)/mongoose/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC_AS) $(CDEFS) $(CFLAGS) -I$(3RDPARTY)/mongoose -DNS_STACK_SIZE=0 -DMONGOOSE_ENABLE_THREADS -c $< -o $@
+
+#-------------------------------------------------
 # SQLite3 library objects
 #-------------------------------------------------
 

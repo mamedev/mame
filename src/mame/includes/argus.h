@@ -1,3 +1,5 @@
+#include "video/jalblend.h"
+
 class argus_state : public driver_device
 {
 public:
@@ -8,6 +10,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_blend(*this, "blend"),
 		m_bg0_scrollx(*this, "bg0_scrollx"),
 		m_bg0_scrolly(*this, "bg0_scrolly"),
 		m_bg1_scrollx(*this, "bg1_scrollx"),
@@ -23,6 +26,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<jaleco_blend_device> m_blend;
 
 	optional_shared_ptr<UINT8> m_bg0_scrollx;
 	optional_shared_ptr<UINT8> m_bg0_scrolly;

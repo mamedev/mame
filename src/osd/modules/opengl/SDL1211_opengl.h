@@ -22,7 +22,7 @@
 
 /* This is a simple file to encapsulate the OpenGL API headers */
 
-#include <SDL/SDL_config.h>
+//#include <SDL/SDL_config.h>
 
 #ifdef __WIN32__
 #define WIN32_LEAN_AND_MEAN

@@ -10,6 +10,7 @@
 #define __WIN_VIDEO__
 
 #include "render.h"
+#include "winmain.h"
 
 //============================================================
 //  CONSTANTS
@@ -54,6 +55,10 @@ private:
 class osd_rect
 {
 public:
+	osd_rect()
+	: m_x(0), m_y(0), m_d(0,0)
+	{
+	}
 	osd_rect(const int x, const int y, const int &w, const int &h)
 	: m_x(x), m_y(y), m_d(w,h)
 	{
@@ -86,38 +91,74 @@ inline osd_rect RECT_to_osd_rect(const RECT &r)
 	return osd_rect(r.left, r.top, r.right - r.left, r.bottom - r.top);
 }
 
-class win_monitor_info
+class osd_monitor_info
 {
 public:
-	win_monitor_info();
-	virtual ~win_monitor_info();
 
-	void refresh();
+#if 0
+	osd_monitor_info()
+	: m_next(NULL), m_handle(NULL), m_aspect(0.0f)
+		{
+			strcpy(m_name, "");
+		}
+#endif
+	osd_monitor_info(void *handle, const char *monitor_device, float aspect)
+	: m_next(NULL), m_handle(handle), m_aspect(aspect)
+	{
+		strncpy(m_name, monitor_device, ARRAY_LENGTH(m_name) - 1);
+	}
 
-	const HMONITOR handle() { return m_handle; }
-	// position_size is used only by draw_dd renderer
-	const osd_rect position_size() { refresh(); return RECT_to_osd_rect(m_info.rcMonitor); }
-	const osd_rect usuable_position_size() { refresh(); return RECT_to_osd_rect(m_info.rcWork); }
-	bool is_primary() { return (m_info.dwFlags & MONITORINFOF_PRIMARY) != 0; }
-	const char *devicename() { refresh(); return (m_name != NULL) ? m_name : "UNKNOWN"; }
+	virtual ~osd_monitor_info() { }
+
+	const void *oshandle() { return m_handle; }
+
+	const osd_rect &position_size() { refresh(); return m_pos_size; }
+	const osd_rect &usuable_position_size() { refresh(); return m_usuable_pos_size; }
+
+	const char *devicename() { refresh(); return m_name[0] ? m_name : "UNKNOWN"; }
 
 	float aspect();
 
 	void set_aspect(const float a) { m_aspect = a; }
+	bool is_primary() { refresh(); return m_is_primary; }
 
-	win_monitor_info  * m_next;                   // pointer to next monitor in list
+	osd_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
+
+	static osd_monitor_info *pick_monitor(windows_options &options, int index);
+	static osd_monitor_info *list;
+
+	// FIXME: should be private!
+	osd_monitor_info    *m_next;                   // pointer to next monitor in list
+protected:
+	virtual void refresh() = 0;
+	osd_rect			m_pos_size;
+	osd_rect			m_usuable_pos_size;
+	bool				m_is_primary;
+	char                m_name[64];
+private:
+
+	void *              m_handle;                 // handle to the monitor
+	float               m_aspect;                 // computed/configured aspect ratio of the physical device
+};
+
+class win_monitor_info : public osd_monitor_info
+{
+public:
+	win_monitor_info(const HMONITOR handle, const char *monitor_device, float aspect);
+	virtual ~win_monitor_info();
+
+	virtual void refresh();
 
 	// static
 
 	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
-	static win_monitor_info *monitor_from_handle(HMONITOR monitor);
+	static osd_monitor_info *monitor_from_handle(HMONITOR monitor);
+
+	HMONITOR handle() { return m_handle; }
 
 private:
 	HMONITOR            m_handle;                 // handle to the monitor
 	MONITORINFOEX       m_info;                   // most recently retrieved info
-
-	float               m_aspect;               // computed/configured aspect ratio of the physical device
-	char *              m_name;
 };
 
 struct osd_video_config

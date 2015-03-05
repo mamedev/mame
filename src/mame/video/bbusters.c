@@ -27,7 +27,7 @@
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(bbusters_state::get_bbusters_tile_info)
+TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
 {
 	UINT16 tile = m_videoram[tile_index];
 
@@ -48,19 +48,19 @@ TILE_GET_INFO_MEMBER(bbusters_state::get_pf2_tile_info)
 	SET_TILE_INFO_MEMBER(4,tile&0xfff,tile>>12,0);
 }
 
-WRITE16_MEMBER(bbusters_state::bbusters_video_w)
+WRITE16_MEMBER(bbusters_state::video_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bbusters_state::bbusters_pf1_w)
+WRITE16_MEMBER(bbusters_state::pf1_w)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bbusters_state::bbusters_pf2_w)
+WRITE16_MEMBER(bbusters_state::pf2_w)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset);
@@ -70,22 +70,26 @@ WRITE16_MEMBER(bbusters_state::bbusters_pf2_w)
 
 VIDEO_START_MEMBER(bbusters_state,bbuster)
 {
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_bbusters_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 	m_pf2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 
 	m_pf1_tilemap->set_transparent_pen(15);
 	m_fix_tilemap->set_transparent_pen(15);
+	
+	save_item(NAME(m_scale_line_count));
 }
 
 VIDEO_START_MEMBER(bbusters_state,mechatt)
 {
-	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_bbusters_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 	m_pf2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_pf2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 
 	m_pf1_tilemap->set_transparent_pen(15);
 	m_fix_tilemap->set_transparent_pen(15);
+	
+	save_item(NAME(m_scale_line_count));
 }
 
 /******************************************************************************/
@@ -143,7 +147,7 @@ inline const UINT8 *bbusters_state::get_source_ptr(gfx_element *gfx, UINT32 spri
 	return gfx->get_data((sprite+code) % gfx->elements()) + ((dy%16) * gfx->rowbytes());
 }
 
-void bbusters_state::bbusters_draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
+void bbusters_state::draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(bank);
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
@@ -237,25 +241,25 @@ void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const UINT16 *source, in
 				scale=source[offs+0]&0x7;
 				m_scale_table_ptr = scale_table+0x387f+(0x80*scale);
 				m_scale_line_count = 0x10-scale;
-				bbusters_draw_block(bitmap,x,y,16,fx,fy,sprite,colour,bank,block);
+				draw_block(bitmap,x,y,16,fx,fy,sprite,colour,bank,block);
 				break;
 			case 1: /* 2 x 2 */
 				scale=source[offs+0]&0xf;
 				m_scale_table_ptr = scale_table+0x707f+(0x80*scale);
 				m_scale_line_count = 0x20-scale;
-				bbusters_draw_block(bitmap,x,y,32,fx,fy,sprite,colour,bank,block);
+				draw_block(bitmap,x,y,32,fx,fy,sprite,colour,bank,block);
 				break;
 			case 2: /* 64 by 64 block (2 x 2) x 2 */
 				scale=source[offs+0]&0x1f;
 				m_scale_table_ptr = scale_table+0xa07f+(0x80*scale);
 				m_scale_line_count = 0x40-scale;
-				bbusters_draw_block(bitmap,x,y,64,fx,fy,sprite,colour,bank,block);
+				draw_block(bitmap,x,y,64,fx,fy,sprite,colour,bank,block);
 				break;
 			case 3: /* 2 x 2 x 2 x 2 */
 				scale=source[offs+0]&0x3f;
 				m_scale_table_ptr = scale_table+0xc07f+(0x80*scale);
 				m_scale_line_count = 0x80-scale;
-				bbusters_draw_block(bitmap,x,y,128,fx,fy,sprite,colour,bank,block);
+				draw_block(bitmap,x,y,128,fx,fy,sprite,colour,bank,block);
 				break;
 		}
 	}

@@ -249,12 +249,6 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-static const unsigned short gamate_palette[4] =
-{
-	0,1,2,3
-};
-
-
 /* palette in red, green, blue tribles */
 static const unsigned char gamate_colors[4][3] =
 {

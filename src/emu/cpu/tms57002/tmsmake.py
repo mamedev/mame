@@ -416,7 +416,8 @@ def EmitCintrp(f, ins_list):
 ins_list = LoadLst(sys.argv[1])
 try:
     f = open(sys.argv[2], "w")
-except Exception, err:
+except Exception:
+    err = sys.exc_info()[1]
     sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[2], err))
     sys.exit(1)
 

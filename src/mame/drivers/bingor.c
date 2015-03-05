@@ -453,8 +453,6 @@ public:
 		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_READ8_MEMBER(test8_r);
 	virtual void video_start();
 	UINT32 screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -509,12 +507,6 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-#if 0
-READ16_MEMBER(bingor_state::test_r)
-{
-	return machine().rand();
-}
-#endif
 
 static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
@@ -525,22 +517,10 @@ static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bingor_io, AS_IO, 16, bingor_state )
-//  AM_RANGE(0x0000, 0x00ff) AM_READ(test_r )
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
 	AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
-//  AM_RANGE(0x0200, 0x0201) AM_READ(test_r )
 ADDRESS_MAP_END
 
-READ8_MEMBER(bingor_state::test8_r)
-{
-	return machine().rand();
-}
-
-static ADDRESS_MAP_START( pic_io_map, AS_IO, 8, bingor_state )
-	AM_RANGE(0x00, 0x00) AM_WRITENOP
-	AM_RANGE(0x02, 0x02) AM_READ(test8_r)
-	AM_RANGE(0x10, 0x10) AM_READNOP
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bingor )
 	PORT_START("IN0")
@@ -631,8 +611,6 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(bingor_state, unk_irq,  30)
 
 	MCFG_CPU_ADD("pic", PIC16C57, 12000000) //?? Mhz
-	MCFG_CPU_IO_MAP(pic_io_map)
-
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bingor)
 	//MCFG_NVRAM_ADD_0FILL("nvram")

@@ -1,4 +1,5 @@
 #include "machine/bankdev.h"
+#include "video/jalblend.h"
 
 class psychic5_state : public driver_device
 {
@@ -10,6 +11,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_vrambank(*this, "vrambank"),
+		m_blend(*this, "blend"),
 		m_spriteram(*this, "spriteram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -25,6 +27,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<address_map_bank_device> m_vrambank;
+	optional_device<jaleco_blend_device> m_blend;
+	
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_bg_videoram;
@@ -83,5 +87,5 @@ public:
 	void change_bg_palette(int color, int lo_offs, int hi_offs);
 	void set_background_palette_intensity();
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_background(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_background(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect); //only used by psychic5
 };

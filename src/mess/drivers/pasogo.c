@@ -101,51 +101,16 @@ TODO:
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/am9517a.h"
-#include "machine/i8255.h"
-#include "sound/speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/bankdev.h"
+#include "includes/genpc.h"
 
 
 /*
   rtc interrupt irq 2
  */
 
-struct vg230_t
-{
-	UINT8 index;
-	UINT8 data[0x100];
-	struct {
-		UINT16 data;
-	} bios_timer; // 1.19 MHz tclk signal
-	struct {
-		int seconds, minutes, hours, days;
-		int alarm_seconds, alarm_minutes, alarm_hours, alarm_days;
-
-		int onehertz_interrupt_on;
-		int onehertz_interrupt_request;
-		int alarm_interrupt_on;
-		int alarm_interrupt_request;
-	} rtc;
-	struct {
-		int write_protected;
-	} pmu;
-};
-
-struct ems_t
-{
-	UINT8 data;
-	int index;
-	struct {
-		UINT8 data[2];
-		int address;
-		int type;
-		int on;
-	} mapper[26];
-};
 
 class pasogo_state : public driver_device
 {
@@ -153,81 +118,57 @@ public:
 	pasogo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pic8259(*this, "pic8259")
-		, m_dma8237(*this, "dma8237")
-		, m_pit8253(*this, "pit8254")
-		, m_speaker(*this, "speaker")
 		, m_cart(*this, "cartslot")
+		, m_ems(*this, "ems")
+		, m_vram(*this, "vram")
+		, m_palette(*this, "palette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<pic8259_device> m_pic8259;
-	required_device<am9517a_device> m_dma8237;
-	required_device<pit8254_device> m_pit8253;
-	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
+	required_device<address_map_bank_device> m_ems;
+	required_shared_ptr<UINT16> m_vram;
+	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(ems_r);
-	DECLARE_WRITE8_MEMBER(ems_w);
+	DECLARE_READ16_MEMBER(ems_r);
+	DECLARE_WRITE16_MEMBER(ems_w);
+	DECLARE_READ16_MEMBER(emsram_r);
+	DECLARE_WRITE16_MEMBER(emsram_w);
 	DECLARE_READ8_MEMBER(vg230_io_r);
 	DECLARE_WRITE8_MEMBER(vg230_io_w);
-	vg230_t m_vg230;
-	ems_t m_ems;
-	DECLARE_DRIVER_INIT(pasogo);
-	virtual void machine_reset();
-	DECLARE_PALETTE_INIT(pasogo);
+
+	struct
+	{
+		UINT8 index;
+		UINT8 data[0x100];
+		struct {
+			UINT16 data;
+		} bios_timer; // 1.19 MHz tclk signal
+		struct {
+			int seconds, minutes, hours, days;
+			int alarm_seconds, alarm_minutes, alarm_hours, alarm_days;
+
+			int onehertz_interrupt_on;
+			int onehertz_interrupt_request;
+			int alarm_interrupt_on;
+			int alarm_interrupt_request;
+		} rtc;
+		struct {
+			int write_protected;
+		} pmu;
+	} m_vg230;
+
+	void machine_reset();
+	void machine_start();
+
 	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
-	void vg230_reset();
-	void vg230_init();
-	DECLARE_READ8_MEMBER( page_r );
-	DECLARE_WRITE8_MEMBER( page_w );
-	DECLARE_WRITE_LINE_MEMBER( speaker_set_spkrdata );
-	DECLARE_WRITE_LINE_MEMBER( pit8253_out1_changed );
-	DECLARE_WRITE_LINE_MEMBER( pit8253_out2_changed );
-	DECLARE_WRITE_LINE_MEMBER( dma_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( dma8237_out_eop );
-	DECLARE_READ8_MEMBER( dma_read_byte );
-	DECLARE_WRITE8_MEMBER( dma_write_byte );
-	DECLARE_READ8_MEMBER( dma8237_1_dack_r );
-	DECLARE_READ8_MEMBER( dma8237_2_dack_r );
-	DECLARE_READ8_MEMBER( dma8237_3_dack_r );
-	DECLARE_WRITE8_MEMBER( dma8237_0_dack_w );
-	DECLARE_WRITE8_MEMBER( dma8237_1_dack_w );
-	DECLARE_WRITE8_MEMBER( dma8237_2_dack_w );
-	DECLARE_WRITE8_MEMBER( dma8237_3_dack_w );
-	void select_dma_channel(int channel, bool state);
-	DECLARE_WRITE_LINE_MEMBER( dack0_w ) { select_dma_channel(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack1_w ) { select_dma_channel(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack2_w ) { select_dma_channel(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( dack3_w ) { select_dma_channel(3, state); }
-	DECLARE_READ8_MEMBER( ppi_porta_r );
-	DECLARE_READ8_MEMBER( ppi_portc_r );
-	DECLARE_WRITE8_MEMBER( ppi_portb_w );
+	DECLARE_INPUT_CHANGED_MEMBER(contrast);
 
-protected:
-	UINT8 m_u73_q2;
-	UINT8 m_out1;
-	int m_dma_channel;
-	bool m_cur_eop;
-	UINT8 m_dma_offset[4];
-	UINT8 m_pc_spkrdata;
-	UINT8 m_pit_out2;
-
-	memory_region *m_maincpu_rom;
 	memory_region *m_cart_rom;
-
-	int m_ppi_portc_switch_high;
-	int m_ppi_speaker;
-	int m_ppi_keyboard_clear;
-	UINT8 m_ppi_keyb_clock;
-	UINT8 m_ppi_portb;
-	UINT8 m_ppi_clock_signal;
-	UINT8 m_ppi_data_signal;
-	UINT8 m_ppi_shift_register;
-	UINT8 m_ppi_shift_enable;
-
+	UINT8 m_ems_index;
+	UINT16 m_ems_bank[28];
 };
 
 
@@ -259,7 +200,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pasogo_state::vg230_timer)
 	}
 }
 
-void pasogo_state::vg230_reset()
+void pasogo_state::machine_start()
 {
 	system_time systime;
 
@@ -274,12 +215,6 @@ void pasogo_state::vg230_reset()
 
 	m_vg230.bios_timer.data=0x7200; // HACK
 }
-
-void pasogo_state::vg230_init()
-{
-	vg230_reset();
-}
-
 
 READ8_MEMBER( pasogo_state::vg230_io_r )
 {
@@ -439,146 +374,87 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 }
 
 
-READ8_MEMBER( pasogo_state::ems_r )
+READ16_MEMBER( pasogo_state::ems_r )
 {
 	UINT8 data = 0;
+	UINT8 index;
 
 	switch (offset)
 	{
 		case 0:
-			data = m_ems.data;
+			data = m_ems_index;
 			break;
 
-		case 2:
-		case 3:
-			data = m_ems.mapper[m_ems.index].data[offset & 1];
+		case 1:
+			index = (m_ems_index >> 2) & 0x1f;
+			data = m_ems_bank[index];
 			break;
 	}
 	return data;
 }
 
 
-WRITE8_MEMBER( pasogo_state::ems_w )
+WRITE16_MEMBER( pasogo_state::ems_w )
 {
-	char bank[10];
+	UINT8 index;
 
 	switch (offset)
 	{
 	case 0:
-		m_ems.data = data;
-		switch (data & ~3)
-		{
-			case 0x80: m_ems.index = 0; break;
-			case 0x84: m_ems.index = 1; break;
-			case 0x88: m_ems.index = 2; break;
-			case 0x8c: m_ems.index = 3; break;
-			case 0x90: m_ems.index = 4; break;
-			case 0x94: m_ems.index = 5; break;
-			case 0x98: m_ems.index = 6; break;
-			case 0x9c: m_ems.index = 7; break;
-			case 0xa0: m_ems.index = 8; break;
-			case 0xa4: m_ems.index = 9; break;
-			case 0xa8: m_ems.index = 10; break;
-			case 0xac: m_ems.index = 11; break;
-			case 0xb0: m_ems.index = 12; break;
-			case 0xb4: m_ems.index = 13; break;
-			//case 0xb8: m_ems.index = 14; break;
-			//case 0xbc: m_ems.index = 15; break;
-			case 0xc0: m_ems.index = 14; break;
-			case 0xc4: m_ems.index = 15; break;
-			case 0xc8: m_ems.index = 16; break;
-			case 0xcc: m_ems.index = 17; break;
-			case 0xd0: m_ems.index = 18; break;
-			case 0xd4: m_ems.index = 19; break;
-			case 0xd8: m_ems.index = 20; break;
-			case 0xdc: m_ems.index = 21; break;
-			case 0xe0: m_ems.index = 22; break;
-			case 0xe4: m_ems.index = 23; break;
-			case 0xe8: m_ems.index = 24; break;
-			case 0xec: m_ems.index = 25; break;
-		}
+		m_ems_index = data;
 		break;
 
-	case 2:
-	case 3:
-		m_ems.mapper[m_ems.index].data[offset & 1] = data;
-		m_ems.mapper[m_ems.index].address = (m_ems.mapper[m_ems.index].data[0] << 14) | ((m_ems.mapper[m_ems.index].data[1] & 0xf) << 22);
-		m_ems.mapper[m_ems.index].on = m_ems.mapper[m_ems.index].data[1] & 0x80;
-		m_ems.mapper[m_ems.index].type = (m_ems.mapper[m_ems.index].data[1] & 0x70) >> 4;
-		logerror("%.5x ems mapper %d(%05x)on:%d type:%d address:%07x\n", (int)m_maincpu->pc(), m_ems.index, m_ems.data << 12,
-			m_ems.mapper[m_ems.index].on, m_ems.mapper[m_ems.index].type, m_ems.mapper[m_ems.index].address );
-
-		switch (m_ems.mapper[m_ems.index].type)
+	case 1:
+		index = (m_ems_index >> 2) & 0x1f;
+		if((index & ~1) == 10)
 		{
-		case 0: /*external*/
-		case 1: /*ram*/
-			sprintf(bank, "bank%d", m_ems.index + 1);
-			membank(bank)->set_base(m_maincpu_rom->base() + (m_ems.mapper[m_ems.index].address & 0xfffff));
-			break;
-		case 3: /* rom 1 */
-		case 4: /* pc card a */
-		case 5: /* pc card b */
-		default:
-			break;
-		case 2:
-			sprintf(bank, "bank%d", m_ems.index + 1);
-			membank(bank)->set_base(m_cart_rom->base() + (m_ems.mapper[m_ems.index].address & 0xfffff));
+			logerror("EMS mapping of CGA framebuffer\n");
 			break;
 		}
+		else if(index >= 28)
+		{
+			logerror("EMS index out of range\n");
+			break;
+		}
+		COMBINE_DATA(&m_ems_bank[index]);
 		break;
 	}
 }
 
+READ16_MEMBER( pasogo_state::emsram_r )
+{
+	m_ems->set_bank(m_ems_bank[(offset >> 13) & 0x1f] & 0x7fff);
+	return m_ems->read16(space, offset & 0x1fff, mem_mask);
+}
+
+WRITE16_MEMBER( pasogo_state::emsram_w )
+{
+	m_ems->set_bank(m_ems_bank[(offset >> 13) & 0x1f] & 0x7fff);
+	m_ems->write16(space, offset & 0x1fff, data, mem_mask);
+}
+
+static ADDRESS_MAP_START(emsbank_map, AS_PROGRAM, 16, pasogo_state)
+	AM_RANGE(0x04080000, 0x040fffff) AM_RAM
+	AM_RANGE(0x08000000, 0x080fffff) AM_ROMBANK("bank27")
+	AM_RANGE(0x10000000, 0x1000ffff) AM_RAM // cart ram?
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xffFFF)
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM
-	AM_RANGE(0x80000, 0x83fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x84000, 0x87fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x88000, 0x8bfff) AM_RAMBANK("bank3")
-	AM_RANGE(0x8c000, 0x8ffff) AM_RAMBANK("bank4")
-	AM_RANGE(0x90000, 0x93fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x94000, 0x97fff) AM_RAMBANK("bank6")
-	AM_RANGE(0x98000, 0x9bfff) AM_RAMBANK("bank7")
-	AM_RANGE(0x9c000, 0x9ffff) AM_RAMBANK("bank8")
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAMBANK("bank9")
-	AM_RANGE(0xa4000, 0xa7fff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa8000, 0xabfff) AM_RAMBANK("bank11")
-	AM_RANGE(0xac000, 0xaffff) AM_RAMBANK("bank12")
-	AM_RANGE(0xb0000, 0xb3fff) AM_RAMBANK("bank13")
-	AM_RANGE(0xb4000, 0xb7fff) AM_RAMBANK("bank14")
-//  AM_RANGE(0xb8000, 0xbffff) AM_RAM
-	AM_RANGE(0xb8000, 0xbffff) AM_RAMBANK("bank28")
-	AM_RANGE(0xc0000, 0xc3fff) AM_RAMBANK("bank15")
-	AM_RANGE(0xc4000, 0xc7fff) AM_RAMBANK("bank16")
-	AM_RANGE(0xc8000, 0xcbfff) AM_RAMBANK("bank17")
-	AM_RANGE(0xcc000, 0xcffff) AM_RAMBANK("bank18")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAMBANK("bank19")
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAMBANK("bank20")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAMBANK("bank21")
-	AM_RANGE(0xdc000, 0xdffff) AM_RAMBANK("bank22")
-	AM_RANGE(0xe0000, 0xe3fff) AM_RAMBANK("bank23")
-	AM_RANGE(0xe4000, 0xe7fff) AM_RAMBANK("bank24")
-	AM_RANGE(0xe8000, 0xebfff) AM_RAMBANK("bank25")
-	AM_RANGE(0xec000, 0xeffff) AM_RAMBANK("bank26")
-
+	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10")
+	AM_RANGE(0xb8000, 0xbffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x80000, 0xeffff) AM_READWRITE(emsram_r, emsram_w)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
-//  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
-	AM_RANGE(0x26, 0x27) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE8(ems_r, ems_w, 0xffff)
+	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff)
+	AM_RANGE(0x006c, 0x006f) AM_READWRITE(ems_r, ems_w)
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pasogo )
-PORT_START("JOY")
+	PORT_START("JOY")
 //  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT)  PORT_NAME("select")
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("start")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("O") /*?*/
@@ -589,85 +465,47 @@ PORT_START("JOY")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("a") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
+	PORT_START("COLOR")
+	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, pasogo_state, contrast, 0)
+	PORT_CONFSETTING(0x00, "Actual")
+	PORT_CONFSETTING(0x01, "Enhanced")
 INPUT_PORTS_END
 
-
-/* palette in red, green, blue tribles */
-static const unsigned char pasogo_palette[][3] =
+INPUT_CHANGED_MEMBER(pasogo_state::contrast)
 {
-	{ 0, 0, 0 },
-	{ 45,45,43 },
-	{ 130, 159, 166 },
-	{ 255,255,255 }
-};
-
-
-PALETTE_INIT_MEMBER(pasogo_state, pasogo)
-{
-	int i;
-
-	for ( i = 0; i < ARRAY_LENGTH(pasogo_palette); i++ )
+	if(newval)
 	{
-		palette.set_pen_color(i, pasogo_palette[i][0], pasogo_palette[i][1], pasogo_palette[i][2]);
-	}
-}
-
-
-UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	//static int width = -1, height = -1;
-	UINT8 *rom = m_maincpu_rom->base() + 0xb8000;
-	static const UINT16 c[] = { 3, 0 };
-	int x,y;
-//  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0);
-	int w = 640;
-	int h = 240;
-	if (0)
-	{
-		w = 320;
-		h = 240;
-		for (y=0; y<h; y++)
-		{
-			for (x=0; x<w; x+=4)
-			{
-				int a = (y & 1) * 0x2000;
-				UINT8 d = rom[a + (y & ~1) * 80/2 + x/4];
-				UINT16 *line = &bitmap.pix16(y, x);
-				*line++ = (d >> 6) & 3;
-				*line++ = (d >> 4) & 3;
-				*line++ = (d >> 2) & 3;
-				*line++ = (d >> 0) & 3;
-			}
-		}
+		m_palette->set_pen_color(0, rgb_t(80, 130, 130));
+		m_palette->set_pen_color(1, rgb_t(40, 60, 140));
 	}
 	else
 	{
-		for (y=0; y<h; y++)
+		m_palette->set_pen_color(0, rgb_t(100, 110, 100));
+		m_palette->set_pen_color(1, rgb_t(90, 80, 110));
+	}
+}
+
+UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT8 *vram = (UINT8 *)m_vram.target();
+	int x, y;
+	for (y=0; y<240; y++)
+	{
+		for (x=0; x<(320/8); x++)
 		{
-			for (x=0; x<w; x+=8)
-			{
-				int a = (y & 3) * 0x2000;
-				UINT8 d = rom[a + (y & ~3) * 80/4 + x/8];
-				UINT16 *line = &bitmap.pix16(y, x);
-				*line++ = c[(d >> 7) & 1];
-				*line++ = c[(d >> 6) & 1];
-				*line++ = c[(d >> 5) & 1];
-				*line++ = c[(d >> 4) & 1];
-				*line++ = c[(d >> 3) & 1];
-				*line++ = c[(d >> 2) & 1];
-				*line++ = c[(d >> 1) & 1];
-				*line++ = c[(d >> 0) & 1];
-			}
+			int a = (y & 3) * 0x2000;
+			UINT8 d1 = vram[a + (y >> 2) * 80 + x];
+			UINT16 *line = &bitmap.pix16(y, x << 3);
+			*line++ = ((d1 >> 7) & 1);
+			*line++ = ((d1 >> 6) & 1);
+			*line++ = ((d1 >> 5) & 1);
+			*line++ = ((d1 >> 4) & 1);
+			*line++ = ((d1 >> 3) & 1);
+			*line++ = ((d1 >> 2) & 1);
+			*line++ = ((d1 >> 1) & 1);
+			*line++ = ((d1 >> 0) & 1);
 		}
 	}
-#if 0
-	if (w!=width || h!=height)
-	{
-		width = w; height = h;
-//      machine().first_screen()->set_visible_area(0, width - 1, 0, height - 1);
-		screen.set_visible_area(0, width - 1, 0, height - 1);
-	}
-#endif
 	return 0;
 }
 
@@ -679,295 +517,45 @@ INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 void pasogo_state::machine_reset()
 {
 	astring region_tag;
-	m_maincpu_rom = memregion("maincpu");
+	ioport_port *color = ioport("COLOR");
 	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
 	if (!m_cart_rom)    // this should never happen, since we make carts mandatory!
 		m_cart_rom = memregion("maincpu");
 
 	membank("bank27")->set_base(m_cart_rom->base());
-	membank("bank28")->set_base(m_maincpu_rom->base() + 0xb8000/*?*/);
-
-	m_u73_q2 = 0;
-	m_out1 = 2; // initial state of pit output is undefined
-	m_pc_spkrdata = 0;
-	m_pit_out2 = 1;
-	m_dma_channel = -1;
-	m_cur_eop = false;
+	m_ems_index = 0;
+	memset(m_ems_bank, 0, sizeof(m_ems_bank));
+	contrast(*color->first_field(), NULL, 0, color->read());
 }
-
-
-WRITE_LINE_MEMBER(pasogo_state::speaker_set_spkrdata)
-{
-	m_pc_spkrdata = state ? 1 : 0;
-	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
-}
-
-
-WRITE_LINE_MEMBER( pasogo_state::pit8253_out1_changed )
-{
-	/* Trigger DMA channel #0 */
-	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
-	{
-		m_u73_q2 = 1;
-		m_dma8237->dreq0_w( m_u73_q2 );
-	}
-	m_out1 = state;
-}
-
-
-WRITE_LINE_MEMBER( pasogo_state::pit8253_out2_changed )
-{
-	m_pit_out2 = state ? 1 : 0;
-	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
-}
-
-
-READ8_MEMBER( pasogo_state::page_r )
-{
-	return 0xff;
-}
-
-
-WRITE8_MEMBER( pasogo_state::page_w )
-{
-	switch(offset % 4)
-	{
-		case 1:
-			m_dma_offset[2] = data;
-			break;
-		case 2:
-			m_dma_offset[3] = data;
-			break;
-		case 3:
-			m_dma_offset[0] = m_dma_offset[1] = data;
-			break;
-	}
-}
-
-
-WRITE_LINE_MEMBER( pasogo_state::dma_hrq_changed )
-{
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	m_dma8237->hack_w(state);
-}
-
-WRITE_LINE_MEMBER( pasogo_state::dma8237_out_eop )
-{
-	m_cur_eop = state == ASSERT_LINE;
-	if(m_dma_channel != -1 && m_cur_eop)
-	{
-		//m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
-	}
-}
-
-READ8_MEMBER( pasogo_state::dma_read_byte )
-{
-	if(m_dma_channel == -1)
-		return 0xff;
-	address_space &spaceio = m_maincpu->space(AS_PROGRAM);
-	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
-	return spaceio.read_byte( page_offset + offset);
-}
-
-WRITE8_MEMBER( pasogo_state::dma_write_byte )
-{
-	if(m_dma_channel == -1)
-		return;
-	address_space &spaceio = m_maincpu->space(AS_PROGRAM);
-	offs_t page_offset = (((offs_t) m_dma_offset[m_dma_channel]) << 16) & 0x0F0000;
-
-	spaceio.write_byte( page_offset + offset, data);
-}
-
-
-READ8_MEMBER( pasogo_state::dma8237_1_dack_r )
-{
-	return 0;
-	//return m_isabus->dack_r(1);
-}
-
-
-READ8_MEMBER( pasogo_state::dma8237_2_dack_r )
-{
-	return 0;
-	//return m_isabus->dack_r(2);
-}
-
-
-READ8_MEMBER( pasogo_state::dma8237_3_dack_r )
-{
-	return 0;
-	//return m_isabus->dack_r(3);
-}
-
-
-WRITE8_MEMBER( pasogo_state::dma8237_0_dack_w )
-{
-	m_u73_q2 = 0;
-	m_dma8237->dreq0_w( m_u73_q2 );
-}
-
-
-WRITE8_MEMBER( pasogo_state::dma8237_1_dack_w )
-{
-	//m_isabus->dack_w(1,data);
-}
-
-
-WRITE8_MEMBER( pasogo_state::dma8237_2_dack_w )
-{
-	//m_isabus->dack_w(2,data);
-}
-
-
-WRITE8_MEMBER( pasogo_state::dma8237_3_dack_w )
-{
-	//m_isabus->dack_w(3,data);
-}
-
-
-void pasogo_state::select_dma_channel(int channel, bool state)
-{
-	if (!state)
-	{
-		m_dma_channel = channel;
-		if(m_cur_eop)
-		{
-			//m_isabus->eop_w(channel, ASSERT_LINE );
-		}
-	}
-	else if(m_dma_channel == channel)
-	{
-		m_dma_channel = -1;
-		if(m_cur_eop)
-		{
-			//m_isabus->eop_w(channel, CLEAR_LINE );
-		}
-	}
-}
-
-READ8_MEMBER (pasogo_state::ppi_porta_r)
-{
-	int data = 0xFF;
-	/* KB port A */
-	if (m_ppi_keyboard_clear)
-	{
-		//data = ioport("DSW0")->read();
-	}
-	else
-	{
-		data = m_ppi_shift_register;
-	}
-	return data;
-}
-
-
-READ8_MEMBER ( pasogo_state::ppi_portc_r )
-{
-	int data=0xff;
-
-	data&=~0x80; // no parity error
-	data&=~0x40; // no error on expansion board
-	/* KB port C: equipment flags */
-	if (m_ppi_portc_switch_high)
-	{
-		/* read hi nibble of S2 */
-		//data = (data & 0xf0) | ((ioport("DSW0")->read() >> 4) & 0x0f);
-	}
-	else
-	{
-		/* read lo nibble of S2 */
-		//data = (data & 0xf0) | (ioport("DSW0")->read() & 0x0f);
-	}
-
-	if ( m_ppi_portb & 0x01 )
-	{
-		data = ( data & ~0x10 ) | ( m_pit_out2 ? 0x10 : 0x00 );
-	}
-	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
-
-	return data;
-}
-
-
-WRITE8_MEMBER( pasogo_state::ppi_portb_w )
-{
-	/* PPI controller port B*/
-	m_ppi_portb = data;
-	m_ppi_portc_switch_high = data & 0x08;
-	m_ppi_keyboard_clear = data & 0x80;
-	m_ppi_keyb_clock = data & 0x40;
-	m_pit8253->write_gate2(BIT(data, 0));
-	speaker_set_spkrdata( data & 0x02 );
-
-	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-	//m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
-
-	/* If PB7 is set clear the shift register and reset the IRQ line */
-	if ( m_ppi_keyboard_clear )
-	{
-		m_pic8259->ir1_w(0);
-		m_ppi_shift_register = 0;
-		m_ppi_shift_enable = 1;
-	}
-}
-
 
 static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
 	MCFG_CPU_ADD("maincpu", V30, XTAL_32_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
-	MCFG_CPU_IO_MAP( pasogo_io)
+	MCFG_CPU_IO_MAP(pasogo_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
-	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(pasogo_state, pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pasogo_state, pit8253_out2_changed))
+	MCFG_DEVICE_ADD("ems", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(emsbank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_DEVICE_ADD("dma8237", AM9517A, XTAL_14_31818MHz/3)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pasogo_state, dma_hrq_changed))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(pasogo_state, dma8237_out_eop))
-	MCFG_I8237_IN_MEMR_CB(READ8(pasogo_state, dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(pasogo_state, dma_write_byte))
-	MCFG_I8237_IN_IOR_1_CB(READ8(pasogo_state, dma8237_1_dack_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(pasogo_state, dma8237_2_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(pasogo_state, dma8237_3_dack_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pasogo_state, dma8237_0_dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(pasogo_state, dma8237_1_dack_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(pasogo_state, dma8237_2_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(pasogo_state, dma8237_3_dack_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(pasogo_state, dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pasogo_state, dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pasogo_state, dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pasogo_state, dack3_w))
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pasogo_state, ppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pasogo_state, ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pasogo_state, ppi_portc_r))
-
+	// It's a CGA device right so lets use isa_cga!  Well, not so much.
+	// The carts use vg230 specific registers and mostly ignore the mc6845.
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pasogo_state, screen_update_pasogo)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(pasogo_palette))
-	MCFG_PALETTE_INIT_OWNER(pasogo_state, pasogo)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_PALETTE_ADD("palette", 2)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pasogo_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
@@ -978,17 +566,9 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vg230_timer", pasogo_state, vg230_timer, attotime::from_hz(1))
 MACHINE_CONFIG_END
 
-
-ROM_START(pasogo)
-	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF) // 1 megabyte dram?
+ROM_START( pasogo )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
 
-
-DRIVER_INIT_MEMBER(pasogo_state,pasogo)
-{
-	vg230_init();
-	memset(&m_ems, 0, sizeof(m_ems));
-}
-
 //    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS
-CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, pasogo_state,    pasogo,   "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)
+CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, driver_device,    0,   "KOEI", "PasoGo", GAME_NO_SOUND|GAME_NOT_WORKING)

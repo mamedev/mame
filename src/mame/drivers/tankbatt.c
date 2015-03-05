@@ -62,12 +62,18 @@ Known issues:
 #include "includes/tankbatt.h"
 
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_led_w)
+void tankbatt_state::machine_start()
+{
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_sound_enable));
+}
+
+WRITE8_MEMBER(tankbatt_state::led_w)
 {
 	set_led_status(machine(), offset,data & 1);
 }
 
-READ8_MEMBER(tankbatt_state::tankbatt_in0_r)
+READ8_MEMBER(tankbatt_state::in0_r)
 {
 	int val;
 
@@ -75,7 +81,7 @@ READ8_MEMBER(tankbatt_state::tankbatt_in0_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-READ8_MEMBER(tankbatt_state::tankbatt_in1_r)
+READ8_MEMBER(tankbatt_state::in1_r)
 {
 	int val;
 
@@ -83,7 +89,7 @@ READ8_MEMBER(tankbatt_state::tankbatt_in1_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-READ8_MEMBER(tankbatt_state::tankbatt_dsw_r)
+READ8_MEMBER(tankbatt_state::dsw_r)
 {
 	int val;
 
@@ -91,7 +97,7 @@ READ8_MEMBER(tankbatt_state::tankbatt_dsw_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_interrupt_enable_w)
+WRITE8_MEMBER(tankbatt_state::interrupt_enable_w)
 {
 	m_nmi_enable = !data;
 	m_sound_enable = !data;
@@ -100,12 +106,12 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_interrupt_enable_w)
 	if (data) m_samples->stop(2);
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_demo_interrupt_enable_w)
+WRITE8_MEMBER(tankbatt_state::demo_interrupt_enable_w)
 {
 	m_nmi_enable = data;
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_sh_expl_w)
+WRITE8_MEMBER(tankbatt_state::sh_expl_w)
 {
 	if (m_sound_enable)
 	{
@@ -113,7 +119,7 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_sh_expl_w)
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_sh_engine_w)
+WRITE8_MEMBER(tankbatt_state::sh_engine_w)
 {
 	if (m_sound_enable)
 	{
@@ -125,7 +131,7 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_sh_engine_w)
 	else m_samples->stop(2);
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_sh_fire_w)
+WRITE8_MEMBER(tankbatt_state::sh_fire_w)
 {
 	if (m_sound_enable)
 	{
@@ -133,19 +139,19 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_sh_fire_w)
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_irq_ack_w)
+WRITE8_MEMBER(tankbatt_state::irq_ack_w)
 {
 	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_coin_counter_w)
+WRITE8_MEMBER(tankbatt_state::coincounter_w)
 {
 	coin_counter_w(machine(), 0,data & 1);
 	coin_counter_w(machine(), 1,data & 1);
 }
 
-WRITE8_MEMBER(tankbatt_state::tankbatt_coin_lockout_w)
+WRITE8_MEMBER(tankbatt_state::coinlockout_w)
 {
 	coin_lockout_w(machine(), 0,data & 1);
 	coin_lockout_w(machine(), 1,data & 1);
@@ -155,28 +161,28 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
 	AM_RANGE(0x0000, 0x000f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
-	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)
-	AM_RANGE(0x0c03, 0x0c03) AM_WRITE(tankbatt_coin_lockout_w)
-	AM_RANGE(0x0c08, 0x0c0f) AM_READ(tankbatt_in1_r)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0c00, 0x0c07) AM_READ(in0_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(led_w)
+	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(coincounter_w)
+	AM_RANGE(0x0c03, 0x0c03) AM_WRITE(coinlockout_w)
+	AM_RANGE(0x0c08, 0x0c0f) AM_READ(in1_r)
 	AM_RANGE(0x0c08, 0x0c08) AM_WRITENOP //coin counter mirror?
-	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE(tankbatt_interrupt_enable_w)
-	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE(tankbatt_sh_engine_w)
-	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE(tankbatt_sh_fire_w)
-	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE(tankbatt_sh_expl_w) // bit 7 == led for the start 2 button
+	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE(sh_engine_w)
+	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE(sh_fire_w)
+	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE(sh_expl_w) // bit 7 == led for the start 2 button
 	AM_RANGE(0x0c0e, 0x0c0e) AM_WRITENOP //bit 7 == led for the start 1 button
-	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE(tankbatt_demo_interrupt_enable_w)
-	AM_RANGE(0x0c10, 0x0c10) AM_WRITE(tankbatt_irq_ack_w)
-	AM_RANGE(0x0c18, 0x0c1f) AM_READ(tankbatt_dsw_r)
+	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE(demo_interrupt_enable_w)
+	AM_RANGE(0x0c10, 0x0c10) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x0c18, 0x0c1f) AM_READ(dsw_r)
 	AM_RANGE(0x0c18, 0x0c18) AM_WRITENOP    /* watchdog ?? */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("maincpu",0)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu",0) //mirror for the reset/irq vectors
 	AM_RANGE(0x2000, 0xffff) AM_READNOP //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
 ADDRESS_MAP_END
 
-INTERRUPT_GEN_MEMBER(tankbatt_state::tankbatt_interrupt)
+INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)
 {
 	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
@@ -276,7 +282,7 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbatt_state,  tankbatt_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbatt_state,  interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -284,7 +290,7 @@ static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tankbatt_state, screen_update_tankbatt)
+	MCFG_SCREEN_UPDATE_DRIVER(tankbatt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbatt)
@@ -337,5 +343,5 @@ ROM_START( tankbattb ) /* board with "NAMCO" removed from gfx1 rom, otherwise id
 	ROM_LOAD( "bct1-1.l3", 0x0000, 0x0100, CRC(d17518bc) SHA1(f3b0deffa586808bc59e9a24ec1699c54ebe84cc) ) // dm74s287n.3l
 ROM_END
 
-GAME( 1980, tankbatt,  0,        tankbatt, tankbatt, driver_device, 0, ROT90, "Namco",   "Tank Battalion", GAME_IMPERFECT_SOUND )
-GAME( 1980, tankbattb, tankbatt, tankbatt, tankbatt, driver_device, 0, ROT90, "bootleg", "Tank Battalion (bootleg)", GAME_IMPERFECT_SOUND )
+GAME( 1980, tankbatt,  0,        tankbatt, tankbatt, driver_device, 0, ROT90, "Namco",   "Tank Battalion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, tankbattb, tankbatt, tankbatt, tankbatt, driver_device, 0, ROT90, "bootleg", "Tank Battalion (bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

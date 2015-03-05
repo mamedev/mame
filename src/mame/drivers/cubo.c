@@ -11,6 +11,7 @@
    Title                | rev. | year
    ----------------------------------------------
    Candy Puzzle         |  1.0 | 1995
+   Double Strixx        |      | 1995
    Harem Challenge      |      | 1995
    Laser Quiz           |      | 1995
    Laser Quiz 2 "Italy" |  1.0 | 1995
@@ -18,6 +19,7 @@
    Laser Strixx 2       |      | 1995
    Magic Premium        |  1.1 | 1996
    Laser Quiz France    |  1.0 | 1995
+   Laser Quiz Greece?   |      | 1995 *may exist
    Odeon Twister        |      | 199x
    Odeon Twister 2      |202.19| 1999
 

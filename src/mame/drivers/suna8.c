@@ -678,7 +678,7 @@ READ8_MEMBER(suna8_state::brickzn_cheats_r)
          ---- ---0   Palette RAM Bank
 
 
-  C0A0:  Sound Latch
+  C0A0:  Sound Latch (optionally scrambled)
 
 
   C0A0:  7654 3---
@@ -699,9 +699,20 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 	}
 	else if ((m_protection_val & 0xfc) == 0x90)
 	{
-		soundlatch_byte_w(space, 0, data);
+		/*
+			0d	brick hit		NO!		25?
+			2c	side wall hit	OK
+			3b	paddle hit		OK
+			44	death			OK?
+			53	death			OK?
+			56	coin in			OK?
+			70	monster hit		NO?		58?
+		*/
+		UINT8 remap = (m_remap_sound ? BITSWAP8(data, 7,6,3,4,5,2,1,0) : data);
 
-		logerror("CPU #0 - PC %04X: soundlatch = %02X\n",space.device().safe_pc(),data);
+		soundlatch_byte_w(space, 0, remap);
+
+		logerror("CPU #0 - PC %04X: soundlatch = %02X (->%02X)\n",space.device().safe_pc(),data,remap);
 	}
 	else if (protselect == 0x04)
 	{
@@ -773,6 +784,8 @@ WRITE8_MEMBER(suna8_state::brickzn_prot2_w)
 		space.unmap_write(0xc800, 0xdfff);
 	else
 		space.install_ram(0xc800, 0xdfff, m_wram);
+
+	m_remap_sound = ((m_prot2 ^ data) == 0xf8) ? 1 : 0;
 
 	// Select alternate data decryption, see code at 787e:
 	membank("bank1")->set_entry((membank("bank1")->entry() & 0x0f) + ((m_prot2 == (data | 0xdc)) ? 0x10 : 0));
@@ -1527,6 +1540,19 @@ static INPUT_PORTS_START( brickzn )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( brickznv6 )
+	PORT_INCLUDE(brickzn)
+
+	PORT_MODIFY("DSW2") // DSW 2 - $c103
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "None" )
+	PORT_DIPSETTING(    0x10, "10K" )
+	PORT_DIPSETTING(    0x08, "30K" )
+	PORT_DIPSETTING(    0x00, "50K" )
+	PORT_DIPNAME( 0x20, 0x20, "Display" )   PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+INPUT_PORTS_END
 
 /***************************************************************************
                                 Hard Head 2
@@ -1917,6 +1943,7 @@ MACHINE_CONFIG_END
 MACHINE_RESET_MEMBER(suna8_state,brickzn)
 {
 	m_protection_val = m_prot2 = m_prot2_prev = 0xff;
+	m_remap_sound = 0;
 	membank("bank1")->set_entry(0);
 }
 
@@ -1928,10 +1955,10 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	MCFG_CPU_IO_MAP(brickzn_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  // nmi breaks ramtest but is needed!
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)   /* Z0840006PSC */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)   /* Z0840006PSC - 6MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(brickzn_sound_map)
 
-	MCFG_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)    /* Z0840006PSC */
+	MCFG_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)    /* Z0840006PSC - 6MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(brickzn_pcm_map)
 	MCFG_CPU_IO_MAP(brickzn_pcm_io_map)
 
@@ -1956,12 +1983,12 @@ static MACHINE_CONFIG_START( brickzn, suna8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)		// 3MHz (measured)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)	// 1.5MHz (measured)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
@@ -2882,7 +2909,7 @@ GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, starfigh,  ROT
 GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
 
 // is meant to sound like this https://www.youtube.com/watch?v=yfU1C7A3iZI (recorded from v6.0, Joystick version)
-GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", GAME_IMPERFECT_SOUND )
-GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", GAME_IMPERFECT_SOUND )
-GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  GAME_IMPERFECT_SOUND )
-GAME( 1992, brickzn11, brickzn,  brickzn,  brickzn,  suna8_state, brickzn11, ROT90, "SunA",                       "Brick Zone (v1.1)",  GAME_NOT_WORKING )
+GAME( 1992, brickzn,   0,        brickzn,  brickznv6,suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 )
+GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )
+GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  0 )
+GAME( 1992, brickzn11, brickzn,  brickzn,  brickzn,  suna8_state, brickzn11, ROT90, "SunA",                       "Brick Zone (v1.1)",           GAME_NOT_WORKING )

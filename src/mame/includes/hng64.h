@@ -10,6 +10,88 @@ enum
 	BURIKI_MCU
 };
 
+enum hng64trans_t
+{
+	HNG64_TILEMAP_NORMAL = 1,
+	HNG64_TILEMAP_ADDITIVE,
+	HNG64_TILEMAP_ALPHA
+};
+
+
+struct blit_parameters
+{
+	bitmap_rgb32 *          bitmap;
+	rectangle           cliprect;
+	UINT32              tilemap_priority_code;
+	UINT8               mask;
+	UINT8               value;
+	UINT8               alpha;
+	hng64trans_t        drawformat;
+};
+
+
+///////////////
+// 3d Engine //
+///////////////
+
+struct polyVert
+{
+	float worldCoords[4];   // World space coordinates (X Y Z 1.0)
+
+	float texCoords[4];     // Texture coordinates (U V 0 1.0) -> OpenGL style...
+
+	float normal[4];        // Normal (X Y Z 1.0)
+	float clipCoords[4];    // Homogeneous screen space coordinates (X Y Z W)
+
+	float light[3];         // The intensity of the illumination at this point
+};
+
+struct polygon
+{
+	int n;                      // Number of sides
+	struct polyVert vert[10];   // Vertices (maximum number per polygon is 10 -> 3+6)
+
+	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
+	int visible;                // Polygon visibility in scene
+
+	UINT8 texIndex;             // Which texture to draw from (0x00-0x0f)
+	UINT8 texType;              // How to index into the texture
+	UINT8 texPageSmall;         // Does this polygon use 'small' texture pages?
+	UINT8 texPageHorizOffset;   // If it does use small texture pages, how far is this page horizontally offset?
+	UINT8 texPageVertOffset;    // If it does use small texture pages, how far is this page vertically offset?
+
+	UINT32 palOffset;           // The base offset where this object's palette starts.
+	UINT32 palPageSize;         // The size of the palette page that is being pointed to.
+
+	UINT32 debugColor;          // Will go away someday.  Used to explicitly color polygons for debugging.
+};
+
+
+
+///////////////////////
+// polygon rendering //
+///////////////////////
+
+struct polygonRasterOptions
+{
+	UINT8 texType;
+	UINT8 texIndex;
+	UINT8 texPageSmall;
+	UINT8 texPageHorizOffset;
+	UINT8 texPageVertOffset;
+	int palOffset;
+	int palPageSize;
+	int debugColor;
+};
+
+// Refer to the clipping planes as numbers
+#define HNG64_LEFT   0
+#define HNG64_RIGHT  1
+#define HNG64_TOP    2
+#define HNG64_BOTTOM 3
+#define HNG64_NEAR   4
+#define HNG64_FAR    5
+
 
 
 class hng64_state : public driver_device
@@ -31,7 +113,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_dl(*this, "dl"),
 		m_3dregs(*this, "3dregs"),
 		m_3d_1(*this, "3d_1"),
 		m_3d_2(*this, "3d_2"),
@@ -40,8 +121,9 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram")
-		{ }
 
+	{ }
+	
 	required_device<mips3_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_comm;
@@ -57,7 +139,8 @@ public:
 	required_shared_ptr<UINT32> m_videoregs;
 	required_shared_ptr<UINT32> m_tcram;
 	/* 3D stuff */
-	required_shared_ptr<UINT32> m_dl;
+	UINT16* m_dl;
+
 	required_shared_ptr<UINT32> m_3dregs;
 	required_shared_ptr<UINT32> m_3d_1;
 	required_shared_ptr<UINT32> m_3d_2;
@@ -69,6 +152,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT32> m_generic_paletteram_32;
+
 
 	int m_mcu_type;
 
@@ -97,20 +181,13 @@ public:
 
 	UINT8 m_screen_dis;
 
-	tilemap_t *m_tilemap0_8x8;
-	tilemap_t *m_tilemap1_8x8;
-	tilemap_t *m_tilemap2_8x8;
-	tilemap_t *m_tilemap3_8x8;
+	struct hng64_tilemap {
+		tilemap_t *m_tilemap_8x8;
+		tilemap_t *m_tilemap_16x16;
+		tilemap_t *m_tilemap_16x16_alt;
+	};
 
-	tilemap_t *m_tilemap0_16x16;
-	tilemap_t *m_tilemap1_16x16;
-	tilemap_t *m_tilemap2_16x16;
-	tilemap_t *m_tilemap3_16x16;
-
-	tilemap_t *m_tilemap0_16x16_alt;
-	tilemap_t *m_tilemap1_16x16_alt;
-	tilemap_t *m_tilemap2_16x16_alt;
-	tilemap_t *m_tilemap3_16x16_alt;
+	hng64_tilemap m_tilemap[4];
 
 	UINT8 m_additive_tilemap_debug;
 
@@ -121,12 +198,7 @@ public:
 
 	UINT32 m_old_animmask;
 	UINT32 m_old_animbits;
-	UINT16 m_old_tileflags0;
-	UINT16 m_old_tileflags1;
-	UINT16 m_old_tileflags2;
-	UINT16 m_old_tileflags3;
-
-	UINT32 m_dls[2][0x81];
+	UINT16 m_old_tileflags[4];
 
 	// 3d State
 	int m_paletteState3d;
@@ -157,8 +229,8 @@ public:
 	DECLARE_READ32_MEMBER(hng64_3d_2_r);
 	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
 	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
-	DECLARE_WRITE32_MEMBER(dl_w);
-	DECLARE_READ32_MEMBER(dl_r);
+	DECLARE_WRITE16_MEMBER(dl_w);
+	//DECLARE_READ32_MEMBER(dl_r);
 	DECLARE_WRITE32_MEMBER(dl_control_w);
 	DECLARE_WRITE32_MEMBER(dl_upload_w);
 	DECLARE_WRITE32_MEMBER(tcram_w);
@@ -166,6 +238,7 @@ public:
 	DECLARE_READ32_MEMBER(unk_vreg_r);
 	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
 	DECLARE_READ32_MEMBER(hng64_soundram_r);
+	DECLARE_WRITE32_MEMBER(hng64_vregs_w);
 
 	// not actually used, but left in code so you can turn it and see the (possibly undesired?) behavior, see notes in memory map
 	DECLARE_WRITE32_MEMBER(hng64_soundram2_w);
@@ -226,7 +299,59 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
 	void clear3d();
 	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
+
+	void FillSmoothTexPCHorizontalLine(
+		const polygonRasterOptions& prOptions,
+		int x_start, int x_end, int y, float z_start, float z_delta,
+		float w_start, float w_delta, float r_start, float r_delta,
+		float g_start, float g_delta, float b_start, float b_delta,
+		float s_start, float s_delta, float t_start, float t_delta);
+
+	void hng64_command3d(const UINT16* packet);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void transition_control( bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
+	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
+	void setCameraTransformation(const UINT16* packet);
+	void setLighting(const UINT16* packet);
+	void set3dFlags(const UINT16* packet);
+	void setCameraProjectionMatrix(const UINT16* packet);
+	void recoverPolygonBlock(const UINT16* packet, struct polygon* polys, int* numPolys);
+	void hng64_mark_all_tiles_dirty(int tilemap);
+	void hng64_mark_tile_dirty(int tilemap, int tile_index);
+
+	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat);
+
+	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat);
+
+	void RasterizeTriangle_SMOOTH_TEX_PC(
+		float A[4], float B[4], float C[4],
+		float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
+		float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
+		const polygonRasterOptions& prOptions);
+
+	void drawShaded( struct polygon *p);
+
+	void hng64_patch_bios_region(int region);
+
+	void printPacket(const UINT16* packet, int hex);
+	void matmul4(float *product, const float *a, const float *b);
+	void vecmatmul4(float *product, const float *a, const float *b);
+	float vecDotProduct(const float *a, const float *b);
+	void setIdentity(float *matrix);
+	float uToF(UINT16 input);
+	void normalize(float* x);
+	int Inside(struct polyVert *v, int plane);
+	void Intersect(struct polyVert *input0, struct polyVert *input1, struct polyVert *output, int plane);
+	void performFrustumClip(struct polygon *p);
+	UINT8 *m_texturerom;
+	UINT16* m_vertsrom;
+	int m_vertsrom_size;
+
 };
 
-/*----------- defined in video/hng64.c -----------*/
-void hng64_command3d(running_machine& machine, const UINT16* packet);

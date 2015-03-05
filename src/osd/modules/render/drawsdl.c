@@ -271,7 +271,7 @@ void sdl_info::setup_texture(const osd_dim &size)
 	UINT32 fmt;
 
 	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(window().monitor()->handle(), &mode);
+	SDL_GetCurrentDisplayMode(*((UINT64 *)window().monitor()->oshandle()), &mode);
 
 	if (m_yuv_bitmap)
 	{
@@ -508,6 +508,7 @@ void sdl_info::destroy()
 		global_free_array(m_yuv_bitmap);
 		m_yuv_bitmap = NULL;
 	}
+	SDL_DestroyRenderer(m_sdl_renderer);
 }
 
 //============================================================

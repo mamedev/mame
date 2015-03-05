@@ -35,7 +35,7 @@ typedef UINT32 HashT;
 class sdl_window_info : public osd_window
 {
 public:
-	sdl_window_info(running_machine &a_machine, int index, sdl_monitor_info *a_monitor,
+	sdl_window_info(running_machine &a_machine, int index, osd_monitor_info *a_monitor,
 			const osd_window_config *config)
 	: osd_window(), m_next(NULL),
 		// Following three are used by input code to defer resizes
@@ -94,7 +94,7 @@ public:
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
 	running_machine &machine() const { return m_machine; }
-	sdl_monitor_info *monitor() const { return m_monitor; }
+	osd_monitor_info *monitor() const { return m_monitor; }
 	int fullscreen() const { return m_fullscreen; }
 
 	render_target *target() { return m_target; }
@@ -164,7 +164,7 @@ private:
 	// Pointer to machine
 	running_machine &   m_machine;
 	// monitor info
-	sdl_monitor_info *  m_monitor;
+	osd_monitor_info *  m_monitor;
 	int                 m_fullscreen;
 	int                 m_index;
 	osd_renderer *      m_renderer;

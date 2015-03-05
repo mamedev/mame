@@ -46,6 +46,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bestbest_flipscreen_w);
 	DECLARE_READ16_MEMBER(suna16_paletteram16_r);
 	DECLARE_WRITE16_MEMBER(suna16_paletteram16_w);
+    DECLARE_MACHINE_START(bssoccer);
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC1_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC2_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC3_w);
@@ -54,6 +55,7 @@ public:
 	DECLARE_DRIVER_INIT(uballoon);
 	virtual void video_start();
 	DECLARE_MACHINE_RESET(uballoon);
+    DECLARE_MACHINE_START(uballoon);
 	UINT32 screen_update_suna16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);

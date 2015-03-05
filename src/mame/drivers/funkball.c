@@ -87,7 +87,8 @@ public:
 		: pcat_base_state(mconfig, type, tag),
 			m_voodoo(*this, "voodoo_0"),
 			m_unk_ram(*this, "unk_ram"),
-			m_flashbank(*this, "flashbank")
+			m_flashbank(*this, "flashbank"),
+			m_inputs(*this, "IN")
 	{ }
 
 	UINT8 m_funkball_config_reg_sel;
@@ -104,6 +105,7 @@ public:
 
 	required_shared_ptr<UINT32> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
+	required_ioport_array<16> m_inputs;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_WRITE32_MEMBER( flash_w );
@@ -135,7 +137,6 @@ public:
 	DECLARE_WRITE8_MEMBER(io20_w);
 	virtual void machine_start();
 	virtual void machine_reset();
-	UINT32 screen_update_funkball(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void funkball_state::video_start()
@@ -324,10 +325,7 @@ WRITE8_MEMBER(funkball_state::bios_ram_w)
 
 READ8_MEMBER( funkball_state::test_r )
 {
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7",
-												"IN8", "IN9", "INA", "INB", "INC", "IND", "INE", "INF",};
-
-	return ioport(portnames[offset])->read();
+	return m_inputs[offset]->read();
 }
 
 static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32, funkball_state)
@@ -378,7 +376,7 @@ static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funkball )
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_DIPNAME( 0x01, 0x01, "0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -403,7 +401,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_DIPNAME( 0x01, 0x01, "1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -428,7 +426,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_DIPNAME( 0x01, 0x01, "2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -453,7 +451,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN3")
+	PORT_START("IN.3")
 	PORT_DIPNAME( 0x01, 0x01, "3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -478,7 +476,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN4")
+	PORT_START("IN.4")
 	PORT_DIPNAME( 0x01, 0x01, "4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -503,7 +501,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN5")
+	PORT_START("IN.5")
 	PORT_DIPNAME( 0x01, 0x01, "5" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -528,7 +526,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN6")
+	PORT_START("IN.6")
 	PORT_DIPNAME( 0x01, 0x01, "6" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -554,7 +552,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* 7-8 P1/P2 E-F "dgDelay" */
-	PORT_START("IN7")
+	PORT_START("IN.7")
 	PORT_DIPNAME( 0x01, 0x01, "7" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -579,7 +577,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN8")
+	PORT_START("IN.8")
 	PORT_DIPNAME( 0x01, 0x01, "8" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -604,7 +602,7 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN9")
+	PORT_START("IN.9")
 	PORT_DIPNAME( 0x01, 0x01, "9" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -629,8 +627,8 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("INA")
-	PORT_DIPNAME( 0x01, 0x01, "A" )
+	PORT_START("IN.10")
+	PORT_DIPNAME( 0x01, 0x01, "10" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -654,8 +652,8 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("INB")
-	PORT_DIPNAME( 0x01, 0x01, "B" )
+	PORT_START("IN.11")
+	PORT_DIPNAME( 0x01, 0x01, "11" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -679,8 +677,8 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("INC")
-	PORT_DIPNAME( 0x01, 0x01, "C" )
+	PORT_START("IN.12")
+	PORT_DIPNAME( 0x01, 0x01, "12" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -704,8 +702,8 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IND")
-	PORT_DIPNAME( 0x01, 0x01, "D" )
+	PORT_START("IN.13")
+	PORT_DIPNAME( 0x01, 0x01, "13" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -729,8 +727,8 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("INE")
-	PORT_DIPNAME( 0x01, 0x01, "E" )
+	PORT_START("IN.14")
+	PORT_DIPNAME( 0x01, 0x01, "14" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -754,8 +752,8 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("INF")
-	PORT_DIPNAME( 0x01, 0x01, "F" )
+	PORT_START("IN.15")
+	PORT_DIPNAME( 0x01, 0x01, "15" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -801,12 +799,6 @@ void funkball_state::machine_reset()
 	membank("bios_bank3")->set_base(memregion("bios")->base() + 0x18000);
 	membank("bios_bank4")->set_base(memregion("bios")->base() + 0x1c000);
 	m_voodoo_pci_regs.base_addr = 0xff000000;
-}
-
-UINT32 funkball_state::screen_update_funkball(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	voodoo_update(machine().device("voodoo_0"), bitmap, cliprect);
-	return 0;
 }
 
 static MACHINE_CONFIG_START( funkball, funkball_state )

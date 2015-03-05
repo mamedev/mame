@@ -29,24 +29,6 @@ enum {
 
 #define VIDEO_SCALE_MODE_NONE       (0)
 
-// texture formats
-// This used to be an enum, but these are now defines so we can use them as
-// preprocessor conditionals
-#define SDL_TEXFORMAT_ARGB32            (0) // non-16-bit textures or specials
-#define SDL_TEXFORMAT_RGB32             (1)
-#define SDL_TEXFORMAT_RGB32_PALETTED    (2)
-#define SDL_TEXFORMAT_YUY16             (3)
-#define SDL_TEXFORMAT_YUY16_PALETTED    (4)
-#define SDL_TEXFORMAT_PALETTE16         (5)
-#define SDL_TEXFORMAT_RGB15             (6)
-#define SDL_TEXFORMAT_RGB15_PALETTED    (7)
-#define SDL_TEXFORMAT_PALETTE16A        (8)
-// special texture formats for 16bpp texture destination support, do not use
-// to address the tex properties / tex functions arrays!
-#define SDL_TEXFORMAT_PALETTE16_ARGB1555    (16)
-#define SDL_TEXFORMAT_RGB15_ARGB1555        (17)
-#define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555   (18)
-
 #define GLSL_SHADER_MAX 10
 
 //============================================================
@@ -73,6 +55,10 @@ private:
 class osd_rect
 {
 public:
+	osd_rect()
+	: m_x(0), m_y(0), m_d(0,0)
+	{
+	}
 	osd_rect(const int x, const int y, const int &w, const int &h)
 	: m_x(x), m_y(y), m_d(w,h)
 	{
@@ -105,53 +91,84 @@ inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
 	return osd_rect(r.x, r.y, r.w, r.h);
 }
 
-// FIXME: This is sort of ugly ... and should be a real interface only
-class sdl_monitor_info
+class osd_monitor_info
 {
 public:
 
-	sdl_monitor_info()
-	: m_next(NULL), m_handle(0), m_aspect(0.0f)
-		{}
-	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
+#if 0
+	osd_monitor_info()
+	: m_next(NULL), m_handle(NULL), m_aspect(0.0f)
+		{
+			strcpy(m_name, "");
+		}
+#endif
+	osd_monitor_info(void *handle, const char *monitor_device, float aspect)
 	: m_next(NULL), m_handle(handle), m_aspect(aspect)
 	{
 		strncpy(m_name, monitor_device, ARRAY_LENGTH(m_name) - 1);
-		refresh();
 	}
 
-	const UINT64 handle() { return m_handle; }
-	const osd_rect position_size() { refresh(); return SDL_Rect_to_osd_rect(m_dimensions); }
-	const osd_rect usuable_position_size() { refresh(); return SDL_Rect_to_osd_rect(m_dimensions); }
+	virtual ~osd_monitor_info() { }
+
+	const void *oshandle() { return m_handle; }
+
+	const osd_rect &position_size() { refresh(); return m_pos_size; }
+	const osd_rect &usuable_position_size() { refresh(); return m_usuable_pos_size; }
 
 	const char *devicename() { refresh(); return m_name[0] ? m_name : "UNKNOWN"; }
 
 	float aspect();
 
 	void set_aspect(const float a) { m_aspect = a; }
+	bool is_primary() { refresh(); return m_is_primary; }
+
+	osd_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
+
+	static osd_monitor_info *pick_monitor(sdl_options &options, int index);
+	static osd_monitor_info *list;
+
+	// FIXME: should be private!
+	osd_monitor_info    *m_next;                   // pointer to next monitor in list
+protected:
+	virtual void refresh() = 0;
+	osd_rect			m_pos_size;
+	osd_rect			m_usuable_pos_size;
+	bool				m_is_primary;
+	char                m_name[64];
+private:
+
+	void *              m_handle;                 // handle to the monitor
+	float               m_aspect;                 // computed/configured aspect ratio of the physical device
+};
+
+
+class sdl_monitor_info : public osd_monitor_info
+{
+public:
+#if 0
+	sdl_monitor_info()
+	: m_next(NULL), m_handle(0), m_aspect(0.0f)
+		{}
+#endif
+	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
+	: osd_monitor_info(&m_handle, monitor_device, aspect), m_handle(handle)
+	{
+		refresh();
+	}
 
 	// STATIC
 	static void init();
 	static void exit();
-	static sdl_monitor_info *pick_monitor(sdl_options &options, int index);
 #if !defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
 	static void add_primary_monitor(void *data);
 #endif
-
-	sdl_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
-
-	// STATIC
-	static sdl_monitor_info *primary_monitor;
-	static sdl_monitor_info *list;
-
-	sdl_monitor_info    * m_next;                   // pointer to next monitor in list
+#if defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
+	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
+#endif
 private:
-	void refresh();
+	void virtual refresh();
 
 	UINT64              m_handle;                 // handle to the monitor
-	SDL_Rect            m_dimensions;
-	char                m_name[64];
-	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };
 
 struct osd_video_config

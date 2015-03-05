@@ -1,70 +1,48 @@
-#include "emucore.h"
 #include "osdcore.h"
 
 bool g_print_verbose = false;
 
+static const int MAXSTACK = 10;
+static osd_output *m_stack[MAXSTACK];
+static int m_ptr = -1;
 
 /*-------------------------------------------------
-    osd_file_output_callback - default callback
-    for file output
+    osd_output
 -------------------------------------------------*/
 
-void osd_file_output_callback(FILE *param, const char *format, va_list argptr)
+void osd_output::push(osd_output *delegate)
 {
-	vfprintf(param, format, argptr);
+	if (m_ptr < MAXSTACK)
+	{
+		delegate->m_chain = (m_ptr >= 0 ? m_stack[m_ptr] : NULL);
+		m_ptr++;
+		m_stack[m_ptr] = delegate;
+	}
 }
 
-
-/*-------------------------------------------------
-    osd_null_output_callback - default callback
-    for no output
--------------------------------------------------*/
-
-void osd_null_output_callback(FILE *param, const char *format, va_list argptr)
+void osd_output::pop(osd_output *delegate)
 {
+	int f = -1;
+	for (int i=0; i<=m_ptr; i++)
+		if (m_stack[i] == delegate)
+		{
+			f = i;
+			break;
+		}
+	if (f >= 0)
+	{
+		if (f < m_ptr)
+			m_stack[f+1]->m_chain = m_stack[f]->m_chain;
+		m_ptr--;
+		for (int i = f; i <= m_ptr; i++)
+			m_stack[i] = m_stack[i+1];
+	}
 }
-
-
-
-/* output channels */
-static output_delegate output_cb[OSD_OUTPUT_CHANNEL_COUNT] =
-{
-	output_delegate(FUNC(osd_file_output_callback), stderr),   // OSD_OUTPUT_CHANNEL_ERROR
-	output_delegate(FUNC(osd_file_output_callback), stderr),   // OSD_OUTPUT_CHANNEL_WARNING
-	output_delegate(FUNC(osd_file_output_callback), stdout),   // OSD_OUTPUT_CHANNEL_INFO
-#ifdef MAME_DEBUG
-	output_delegate(FUNC(osd_file_output_callback), stdout),   // OSD_OUTPUT_CHANNEL_DEBUG
-#else
-	output_delegate(FUNC(osd_null_output_callback), stdout),   // OSD_OUTPUT_CHANNEL_DEBUG
-#endif
-	output_delegate(FUNC(osd_file_output_callback), stdout),   // OSD_OUTPUT_CHANNEL_VERBOSE
-	output_delegate(FUNC(osd_file_output_callback), stdout)    // OSD_OUTPUT_CHANNEL_LOG
-};
 
 
 /***************************************************************************
     OUTPUT MANAGEMENT
 ***************************************************************************/
-
-/*-------------------------------------------------
-    osd_set_output_channel - configure an output
-    channel
--------------------------------------------------*/
-
-output_delegate osd_set_output_channel(output_channel channel, output_delegate callback)
-{
-	if (!(channel < OSD_OUTPUT_CHANNEL_COUNT) || callback.isnull())
-	{
-		throw std::exception();
-	}
-
-	/* return the originals if requested */
-	output_delegate prevcb = output_cb[channel];
-
-	/* set the new ones */
-	output_cb[channel] = callback;
-	return prevcb;
-}
 
 /*-------------------------------------------------
     osd_printf_error - output an error to the
@@ -77,7 +55,7 @@ void CLIB_DECL osd_printf_error(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
-	output_cb[OSD_OUTPUT_CHANNEL_ERROR](format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_ERROR, format, argptr);
 	va_end(argptr);
 }
 
@@ -93,7 +71,7 @@ void CLIB_DECL osd_printf_warning(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
-	output_cb[OSD_OUTPUT_CHANNEL_WARNING](format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_WARNING, format, argptr);
 	va_end(argptr);
 }
 
@@ -109,7 +87,7 @@ void CLIB_DECL osd_printf_info(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
-	output_cb[OSD_OUTPUT_CHANNEL_INFO](format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_INFO, format, argptr);
 	va_end(argptr);
 }
 
@@ -129,7 +107,7 @@ void CLIB_DECL osd_printf_verbose(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
-	output_cb[OSD_OUTPUT_CHANNEL_VERBOSE](format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_VERBOSE, format, argptr);
 	va_end(argptr);
 }
 
@@ -145,7 +123,7 @@ void CLIB_DECL osd_printf_debug(const char *format, ...)
 
 	/* do the output */
 	va_start(argptr, format);
-	output_cb[OSD_OUTPUT_CHANNEL_DEBUG](format, argptr);
+	if (m_ptr >= 0) m_stack[m_ptr]->output_callback(OSD_OUTPUT_CHANNEL_DEBUG, format, argptr);
 	va_end(argptr);
 }
 

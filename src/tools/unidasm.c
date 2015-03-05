@@ -94,6 +94,7 @@ CPU_DISASSEMBLE( hd61700 );
 CPU_DISASSEMBLE( hd6301 );
 CPU_DISASSEMBLE( hd6309 );
 CPU_DISASSEMBLE( hd63701 );
+CPU_DISASSEMBLE( hmcs40 );
 CPU_DISASSEMBLE( hyperstone_generic );
 CPU_DISASSEMBLE( i4004 );
 CPU_DISASSEMBLE( i8008 );
@@ -243,6 +244,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hd6301",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd6301) },
 	{ "hd6309",     _8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
 	{ "hd63701",    _8bit,  0, CPU_DISASSEMBLE_NAME(hd63701) },
+	{ "hmcs40",     _16be,  0, CPU_DISASSEMBLE_NAME(hmcs40) },
 	{ "hyperstone", _16be,  0, CPU_DISASSEMBLE_NAME(hyperstone_generic) },
 	{ "i4004",      _8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
 	{ "i8008",      _8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
