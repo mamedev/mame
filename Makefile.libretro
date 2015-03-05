@@ -171,12 +171,13 @@ else ifeq ($(platform), osx)
 	TARGETLIB := $(TARGET_NAME)_libretro.dylib
 	TARGETOS = macosx
 	fpic := -fPIC -mmacosx-version-min=10.7
-	LDFLAGSEMULATOR +=  -stdlib=libc++
+	LIBCXX := libstdc++
+	LDFLAGSEMULATOR +=  -stdlib=$(LIBCXX)
 	PLATCFLAGS += $(fpic)
 	SHARED := -dynamiclib
-	CC = c++ -stdlib=libc++
-	LD = c++ -stdlib=libc++
-	NATIVELD = c++ -stdlib=libc++
+	CC = c++ -stdlib=$(LIBCXX)
+	LD = c++ -stdlib=$(LIBCXX)
+	NATIVELD = c++ -stdlib=$(LIBCXX)
 	NATIVECC = c++
 	LDFLAGS +=  $(fpic) $(SHARED)
 	CC_AS = clang
@@ -209,17 +210,18 @@ else ifeq ($(platform), ios)
 	fpic := -fPIC
 	SHARED := -dynamiclib
 	TARGETOS = macosx
+	LIBCXX := libc++
 
 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 	CC_AS = clang -arch armv7 -isysroot $(IOSSDK)
 	CC = clang++ -arch armv7 -isysroot $(IOSSDK)
-	LD = $(CC) -stdlib=libc++
+	LD = $(CC) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
-	NATIVELD = c++ -stdlib=libc++
+	NATIVELD = c++ -stdlib=$(LIBCXX)
 	NATIVECC = c++
 	PYTHON ?= @python
 	CFLAGS += -DIOS
-	LDFLAGSEMULATOR += -stdlib=libc++
+	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
 	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
 	CCOMFLAGS += $(PLATCFLAGS)
 
