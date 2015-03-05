@@ -10328,21 +10328,52 @@ ROM_END
 
 ROM_START( daioh )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "fg1-001.u3",  0x000000, 0x080000, CRC(104ae74a) SHA1(928c467e3ff98285a4828a927d851fcdf296849b) )
-	ROM_LOAD16_BYTE( "fg1-002.u4",  0x000001, 0x080000, CRC(e39a4e67) SHA1(c3f47e9d407f32dbfaf209d29b4446e4de8829a2) )
+	ROM_LOAD16_BYTE( "fg-001-001.u3",  0x000000, 0x080000, CRC(104ae74a) SHA1(928c467e3ff98285a4828a927d851fcdf296849b) )
+	ROM_LOAD16_BYTE( "fg-001-002.u4",  0x000001, 0x080000, CRC(e39a4e67) SHA1(c3f47e9d407f32dbfaf209d29b4446e4de8829a2) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "fg1-004", 0x000000, 0x100000, CRC(9ab0533e) SHA1(b260ceb2b3e140971419329bee07a020171794f7) )
-	ROM_LOAD( "fg1-003", 0x100000, 0x100000, CRC(1c9d51e2) SHA1(1d6236ab28d11676386834fd6e405fd40198e924) )
+	ROM_LOAD( "fg-001-004", 0x000000, 0x100000, CRC(9ab0533e) SHA1(b260ceb2b3e140971419329bee07a020171794f7) )
+	ROM_LOAD( "fg-001-003", 0x100000, 0x100000, CRC(1c9d51e2) SHA1(1d6236ab28d11676386834fd6e405fd40198e924) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
-	ROM_LOAD( "fg1-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
+	ROM_LOAD( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
-	ROM_LOAD( "fg1-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
+	ROM_LOAD( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "fg1-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
+	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
+ROM_END
+
+/*
+The changes between this set and the parent set are very minimal. It is potentially a hack/bootleg.
+
+Overview of the changes:
+- the vector table has been changed to make bus error and address error go somewhere other than a hard lock
+  - the new destination is a newly inserted RTE that's located at the first NOP in the code that would've affected nothing
+- there's a change in a jumptable at $23A28 that pushes the destination PC into the original function, but not into a different one
+  - which would make no sense from an official build unless they possibly lost the source
+- at $23DF2 a fairly large chunk of code has been rewritten, with a bunch of NOPs added for padding
+- there are various changes around that change things like "ADDI $20, D0" to "MOVE $7F, D0"
+  - these are after doing real computation with D0, so it seems strange
+*/
+ROM_START( daioh1 )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "fg-001-001.bin",  0x000000, 0x080000, CRC(e1ef3007) SHA1(864349efac3e3dc3ccdeb892fed285c73aea3997) )
+	ROM_LOAD16_BYTE( "fg-001-002.bin",  0x000001, 0x080000, CRC(5e3481f9) SHA1(7585a7e56392fc2b13d466cf262383dd68d6d995) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "fg-001-004", 0x000000, 0x100000, CRC(9ab0533e) SHA1(b260ceb2b3e140971419329bee07a020171794f7) )
+	ROM_LOAD( "fg-001-003", 0x100000, 0x100000, CRC(1c9d51e2) SHA1(1d6236ab28d11676386834fd6e405fd40198e924) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
+	ROM_LOAD( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
+	ROM_LOAD( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
 ROM_END
 
 ROM_START( daiohloc )
@@ -11516,6 +11547,7 @@ GAME( 1992, zingzipbl,zingzip,  zingzipbl,zingzip, driver_device,  0,        ROT
 GAME( 1993, atehate,  0,        atehate,  atehate, driver_device,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 
 GAME( 1993, daioh,    0,        daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh", 0 )
+GAME( 1993, daioh1,   daioh,    daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (set 1)", 0 )
 GAME( 1993, daiohloc, daioh,    daiohloc, daiohloc, driver_device, 0,        ROT270, "Athena",                 "Daioh (location test ver)", 0 )
 
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
