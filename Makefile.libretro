@@ -215,11 +215,12 @@ else ifeq ($(platform), ios)
 
 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 	CC_AS = cc
-	CC = c++ -arch armv7 -isysroot $(IOSSDK)
+	CXX_AS := c++
+	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
 	LD = $(CC) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
-	NATIVELD = c++ -stdlib=$(LIBCXX)
-	NATIVECC = c++
+	NATIVELD = $(CXX_AS) -stdlib=$(LIBCXX)
+	NATIVECC = $(CXX_AS)
 	PYTHON ?= @python
 	CFLAGS += -DIOS
 	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
