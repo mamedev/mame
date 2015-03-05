@@ -72,10 +72,12 @@ protected:
 	int m_stack_levels; // number of callstack levels
 	UINT16 m_stack[4];  // max 4
 	UINT16 m_op;
+	UINT16 m_prev_op;
 	UINT16 m_arg;
 	int m_icount;
 	
 	UINT16 m_pc;        // Program Counter
+	UINT8 m_page;       // LPU prepared page
 	UINT8 m_a;          // 4-bit Accumulator
 	UINT8 m_b;          // 4-bit B register
 	UINT8 m_x;          // 1/3/4-bit X register

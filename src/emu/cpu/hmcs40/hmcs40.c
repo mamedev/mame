@@ -140,8 +140,10 @@ void hmcs40_cpu_device::device_start()
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
 	m_op = 0;
+	m_prev_op = 0;
 	m_arg = 0;
 	m_pc = 0;
+	m_page = 0;
 	m_a = 0;
 	m_b = 0;
 	m_x = 0;
@@ -154,8 +156,10 @@ void hmcs40_cpu_device::device_start()
 	// register for savestates
 	save_item(NAME(m_stack));
 	save_item(NAME(m_op));
+	save_item(NAME(m_prev_op));
 	save_item(NAME(m_arg));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_page));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_x));
@@ -216,7 +220,7 @@ inline void hmcs40_cpu_device::increment_pc()
 inline void hmcs40_cpu_device::fetch_arg()
 {
 	// P is the only 2-byte opcode
-	if (m_op == 0x3ff)
+	if ((m_op & 0x3f8) == 0x368)
 	{
 		m_icount--;
 		m_arg = m_program->read_word(m_pc << 1);
@@ -230,6 +234,14 @@ void hmcs40_cpu_device::execute_run()
 	{
 		m_icount--;
 		
+		// LPU is handled 1 cycle later
+		if ((m_prev_op & 0x3e0) == 0x340)
+			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_prgmask;
+
+		// remember previous opcode
+		m_prev_op = m_op;
+		
+		// fetch next opcode
 		debugger_instruction_hook(this, m_pc << 1);
 		m_op = m_program->read_word(m_pc << 1);
 		increment_pc();

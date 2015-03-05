@@ -431,31 +431,43 @@ void hmcs40_cpu_device::op_tm()
 void hmcs40_cpu_device::op_br()
 {
 	// BR a: Branch on Status 1
-	op_illegal();
+	if (m_s)
+		m_pc = (m_pc & ~0x3f) | (m_op & 0x3f);
+	else
+		m_s = 1;
 }
 
 void hmcs40_cpu_device::op_cal()
 {
 	// CAL a: Subroutine Jump on Status 1
-	op_illegal();
+	if (m_s)
+	{
+		push_stack();
+		m_pc = m_op & 0x3f; // short calls default to page 0
+	}
+	else
+		m_s = 1;
 }
 
 void hmcs40_cpu_device::op_lpu()
 {
 	// LPU u: Load Program Counter Upper on Status 1
-	op_illegal();
+	if (m_s)
+		m_page = m_op & 0x1f;
+	else
+		m_op = 0;
 }
 
 void hmcs40_cpu_device::op_tbr()
 {
 	// TBR p: Table Branch
-	op_illegal();
+	m_pc = (m_a | m_b << 4 | m_c << 8 | ((m_op & 7) << 9)) & m_prgmask;
 }
 
 void hmcs40_cpu_device::op_rtn()
 {
 	// RTN: Return from Subroutine
-	op_illegal();
+	pop_stack();
 }
 
 
