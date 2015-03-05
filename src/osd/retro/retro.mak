@@ -52,6 +52,7 @@ OSDOBJ = $(OBJ)/osd
 
 OBJDIRS += $(MINIOBJ) $(LIBCOOBJ) \
 	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/font \
 	$(OSDOBJ)/modules/lib \
 	$(OSDOBJ)/modules/midi
 
@@ -68,7 +69,7 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrodir.o \
 	$(MINIOBJ)/retrofile.o \
 	$(MINIOBJ)/retroos.o \
-	$(MINIOBJ)/font_retro.o \
+	$(MINIOBJ)/../modules/font/font_none.o \
 	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
 	$(OSDOBJ)/modules/sync/sync_retro.o \
 	$(MINIOBJ)/../modules/midi/none.o \
