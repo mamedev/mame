@@ -222,8 +222,8 @@ class Macro:
         values.append(lval)
         for i in range(0, len(self.source)):
             line = self.source[i]
-            for i in range(0, len(self.params)):
-                line = line.replace(self.params[i], values[i])
+            for j in range(0, len(self.params)):
+                line = line.replace(self.params[j], values[j])
             target.add_source_line(line)
 
 class DispatchStep:
@@ -275,7 +275,7 @@ class OpcodeList:
             if not line:
                 continue
             if line.startswith(" ") or line.startswith("\t"):
-                if inf != None:
+                if inf is not None:
                     # append instruction to last opcode, maybe expand a macro
                     tokens = line.split()
                     if tokens[0] in self.macros:
