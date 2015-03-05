@@ -242,97 +242,121 @@ void hmcs40_cpu_device::op_lbi()
 void hmcs40_cpu_device::op_ai()
 {
 	// AI i: Add Immediate to A
-	op_illegal();
+	m_a += (m_op & 0xf);
+	m_s = m_a >> 4 & 1;
+	m_a &= 0xf;
 }
 
 void hmcs40_cpu_device::op_ib()
 {
 	// IB: Increment B
-	op_illegal();
+	m_b = (m_b + 1) & 0xf;
+	m_s = (m_b != 0);
 }
 
 void hmcs40_cpu_device::op_db()
 {
 	// DB: Decrement B
-	op_illegal();
+	m_b = (m_b - 1) & 0xf;
+	m_s = (m_b != 0xf);
 }
 
 void hmcs40_cpu_device::op_amc()
 {
 	// AMC: Add A to Memory with Carry
-	op_illegal();
+	m_a += ram_r() + m_c;
+	m_c = m_a >> 4 & 1;
+	m_s = m_c;
+	m_a &= 0xf;
 }
 
 void hmcs40_cpu_device::op_smc()
 {
 	// SMC: Subtract A from Memory with Carry
-	op_illegal();
+	m_a = ram_r() - m_a - (m_c ^ 1);
+	m_c = ~m_a >> 4 & 1;
+	m_s = m_c;
+	m_a &= 0xf;
 }
 
 void hmcs40_cpu_device::op_am()
 {
 	// AM: Add A to Memory
-	op_illegal();
+	m_a += ram_r();
+	m_s = m_a >> 4 & 1;
+	m_a &= 0xf;
 }
 
 void hmcs40_cpu_device::op_daa()
 {
 	// DAA: Decimal Adjust for Addition
-	op_illegal();
+	if (m_c || m_a > 9)
+	{
+		m_a = (m_a + 6) & 0xf;
+		m_c = 1;
+	}
 }
 
 void hmcs40_cpu_device::op_das()
 {
 	// DAS: Decimal Adjust for Subtraction
-	op_illegal();
+	if (!m_c || m_a > 9)
+	{
+		m_a = (m_a + 10) & 0xf;
+		m_c = 0;
+	}
 }
 
 void hmcs40_cpu_device::op_nega()
 {
 	// NEGA: Negate A
-	op_illegal();
+	m_a = (0 - m_a) & 0xf;
 }
 
 void hmcs40_cpu_device::op_comb()
 {
 	// COMB: Complement B
-	op_illegal();
+	m_b ^= 0xf;
 }
 
 void hmcs40_cpu_device::op_sec()
 {
 	// SEC: Set Carry
-	op_illegal();
+	m_c = 1;
 }
 
 void hmcs40_cpu_device::op_rec()
 {
 	// REC: Reset Carry
-	op_illegal();
+	m_c = 0;
 }
 
 void hmcs40_cpu_device::op_tc()
 {
 	// TC: Test Carry
-	op_illegal();
+	m_s = m_c;
 }
 
 void hmcs40_cpu_device::op_rotl()
 {
 	// ROTL: Rotate Left A with Carry
-	op_illegal();
+	m_a = m_a << 1 | m_c;
+	m_c = m_a >> 4 & 1;
+	m_a &= 0xf;
 }
 
 void hmcs40_cpu_device::op_rotr()
 {
 	// ROTR: Rotate Right A with Carry
-	op_illegal();
+	UINT8 c = m_a & 1;
+	m_a = m_a >> 1 | m_c << 3;
+	m_c = c;
 }
 
 void hmcs40_cpu_device::op_or()
 {
 	// OR: OR A and B
-	op_illegal();
+	m_a |= m_b;
 }
 
 
@@ -341,43 +365,43 @@ void hmcs40_cpu_device::op_or()
 void hmcs40_cpu_device::op_mnei()
 {
 	// MNEI i: Memory Not Equal to Immediate
-	op_illegal();
+	m_s = (ram_r() != (m_op & 0xf));
 }
 
 void hmcs40_cpu_device::op_ynei()
 {
 	// YNEI i: Y Not Equal to Immediate
-	op_illegal();
+	m_s = (m_y != (m_op & 0xf));
 }
 
 void hmcs40_cpu_device::op_anem()
 {
 	// ANEM: A Not Equal to Memory
-	op_illegal();
+	m_s = (m_a != ram_r());
 }
 
 void hmcs40_cpu_device::op_bnem()
 {
 	// BNEM: B Not Equal to Memory
-	op_illegal();
+	m_s = (m_b != ram_r());
 }
 
 void hmcs40_cpu_device::op_alei()
 {
 	// ALEI i: A Less or Equal to Immediate
-	op_illegal();
+	m_s = (m_a <= (m_op & 0xf));
 }
 
 void hmcs40_cpu_device::op_alem()
 {
 	// ALEM: A Less or Equal to Memory
-	op_illegal();
+	m_s = (m_a <= ram_r());
 }
 
 void hmcs40_cpu_device::op_blem()
 {
 	// BLEM: B Less or Equal to Memory
-	op_illegal();
+	m_s = (m_b <= ram_r());
 }
 
 
@@ -386,19 +410,19 @@ void hmcs40_cpu_device::op_blem()
 void hmcs40_cpu_device::op_sem()
 {
 	// SEM n: Set Memory Bit
-	op_illegal();
+	ram_w(ram_r() | (1 << (m_op & 3)));
 }
 
 void hmcs40_cpu_device::op_rem()
 {
 	// REM n: Reset Memory Bit
-	op_illegal();
+	ram_w(ram_r() & ~(1 << (m_op & 3)));
 }
 
 void hmcs40_cpu_device::op_tm()
 {
 	// TM n: Test Memory Bit
-	op_illegal();
+	m_s = ((ram_r() & (1 << (m_op & 3))) != 0);
 }
 
 

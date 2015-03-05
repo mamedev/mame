@@ -4,6 +4,10 @@
 
   Hitachi HMCS40 MCU family cores
 
+  References:
+  - 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
+  - 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
+
 */
 
 #include "hmcs40.h"
