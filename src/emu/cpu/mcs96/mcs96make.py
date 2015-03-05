@@ -158,7 +158,7 @@ class OpcodeList:
             if opc != None:
                 nm = opc.name + "_" + opc.amode
                 if opc.is_196:
-                    nm = nm + "_196"
+	                nm += "_196"
                 print >>f, "\tcase 0x%03x: %s_full(); break;" % (i, nm)
         print >>f, "\tcase 0x200: fetch_full(); break;"
         print >>f, "\tcase 0x201: fetch_noirq_full(); break;"

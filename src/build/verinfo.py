@@ -120,7 +120,7 @@ if outfmt == 'rc':
     fp.write('\tFILEVERSION %s,%s,%s,%s\n' % (version_major, version_minor, version_build, version_subbuild))
     fp.write('\tPRODUCTVERSION %s,%s,%s,%s\n' % (version_major, version_minor, version_build, version_subbuild))
     fp.write('\tFILEFLAGSMASK 0x3fL\n')
-    if (version_build == 0):
+    if version_build == 0:
         fp.write('\tFILEFLAGS 0x0L\n')
     else:
         fp.write('\tFILEFLAGS VS_FF_PRERELEASE\n')

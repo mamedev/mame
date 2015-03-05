@@ -12,7 +12,7 @@ states_to_dispatch = { 0 : "MAIN" }
 def load_file(fname, lines):
 	path = fname.rpartition('/')[0]
 	if path != "":
-		path = path + '/'
+		path += '/'
 	try:
 		f = open(fname, "rU")
 	except Exception:
@@ -28,7 +28,7 @@ def load_file(fname, lines):
 			load_file(path + line.split('"')[1], lines)
 		else:
 			lines.append(line)
-		count = count + 2
+		count += 2
 	
 	f.close()
 
@@ -57,12 +57,12 @@ while count < len(lines):
 
 		# Do we have a label?
 		label = line[:percent_pos].strip()
-		if (label != ""):
+		if label != "":
 			text += whitespace + label + "\n"
-			whitespace = whitespace + "\t"
+			whitespace += "\t"
 		
 		# Create the goto command
-		if (dispatch[-1:] == "*"):
+		if dispatch[-1:] == "*":
 			goto_command = "if (is_register_register_op_16_bit()) goto %s16; else goto %s8;\n" %(dispatch[:-1], dispatch[:-1])
 		else:
 			goto_command = "goto %s;\n" % dispatch
@@ -70,7 +70,7 @@ while count < len(lines):
 		# Are we right before a 'return'?
 		if next_line_is_return:
 			text += whitespace + goto_command
-			count = count + 1	# Skip the return
+			count += 1  # Skip the return
 		elif next_line_is_dispatch_and_return:
 			# We are followed by a dispatch/return combo; identify the next dispatch
 			percent_pos = lines[count+1].find("%")
@@ -80,18 +80,18 @@ while count < len(lines):
 			if next_dispatch not in dispatch_to_states:
 				dispatch_to_states[next_dispatch] = state
 				states_to_dispatch[state] = next_dispatch
-				state = state + 1
+				state += 1
 
 			text += whitespace + "push_state(%s);\t// %s\n" % (dispatch_to_states[next_dispatch], next_dispatch)
 			text += whitespace + goto_command
-			count = count + 2	# Skip the dispatch/return
-							
+			count += 2  # Skip the dispatch/return
+
 		else:
 			# Normal dispatch
-			text += whitespace + "push_state(%s);\n" % (state)
+			text += whitespace + "push_state(%s);\n" % state
 			text += whitespace + goto_command
-			text += "state_%s:\n" % (state)
-			state = state + 1
+			text += "state_%s:\n" % state
+			state += 1
 	else:
 		# "Normal" code
 		# Is there an '@' here?
@@ -104,12 +104,12 @@ while count < len(lines):
 
 		# If we have to decrement the icount, output more info
 		if check_icount and not next_line_is_return:
-			text += whitespace + "if (UNEXPECTED(m_icount <= 0)) { push_state(%s); return; }\n" % (state)
-			text += "state_%s:\n" % (state)
-			state = state + 1
+			text += whitespace + "if (UNEXPECTED(m_icount <= 0)) { push_state(%s); return; }\n" % state
+			text += "state_%s:\n" % state
+			state += 1
 
 	# Advance to next line
-	count = count + 1
+	count += 1
 
 # Output the case labels
 for i in range(0, state):

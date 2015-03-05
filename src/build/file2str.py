@@ -5,7 +5,7 @@ from __future__ import with_statement
 import sys
 import os
 
-if (len(sys.argv) < 4) :
+if len(sys.argv) < 4:
     print('Usage:')
     print('  file2str <source.lay> <output.h> <varname> [<type>]')
     print('')
@@ -17,7 +17,7 @@ srcfile = sys.argv[1]
 dstfile = sys.argv[2]
 varname = sys.argv[3]
 
-if (len(sys.argv) >= 5) :
+if len(sys.argv) >= 5:
     type = sys.argv[4]
     terminate = 0
 else:
@@ -32,8 +32,8 @@ except IOError:
 byteCount = os.path.getsize(srcfile)
 try:
     dst = open(dstfile,'w')
-    dst.write('extern const %s %s[];\n' % ( type, varname ));
-    dst.write('const %s %s[] =\n{\n\t' % ( type, varname));
+    dst.write('extern const %s %s[];\n' % ( type, varname ))
+    dst.write('const %s %s[] =\n{\n\t' % ( type, varname))
     offs = 0
     with open(srcfile, "rb") as src:
         while True:
@@ -44,7 +44,7 @@ try:
                     if isinstance(b, str):
                         b = ord(b)
                     dst.write('0x%02x' % b)
-                    offs = offs + 1
+                    offs += 1
                     if offs != byteCount:
                         dst.write(',')
             else:
