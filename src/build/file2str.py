@@ -26,7 +26,7 @@ else:
 try:
     myfile = open(srcfile, 'rb')
 except IOError:
-    print("Unable to open source file '%s'" % srcfile)
+    sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
     sys.exit(-1)
 
 byteCount = os.path.getsize(srcfile)
@@ -56,5 +56,5 @@ try:
     dst.write('\n};\n')
     dst.close()
 except IOError:
-    print("Unable to open output file '%s'" % dstfile)
+    sys.stderr.write("Unable to open output file '%s'\n" % dstfile)
     sys.exit(-1)

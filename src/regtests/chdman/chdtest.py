@@ -121,15 +121,15 @@ else:
 	chdmanBin = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "chdman"))
 
 if not os.path.exists(chdmanBin):
-	print chdmanBin + " does not exist"
+	sys.stderr.write(chdmanBin + " does not exist\n")
 	sys.exit(1)
 
 if not os.path.exists(inputPath):
-	print inputPath + " does not exist"
+	sys.stderr.write(inputPath + " does not exist\n")
 	sys.exit(1)
 	
 if not os.path.exists(outputPath):
-	print outputPath + " does not exist"
+	sys.stderr.write(outputPath + " does not exist\n")
 	sys.exit(1)
 
 if os.path.exists(tempPath):	

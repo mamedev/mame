@@ -15,7 +15,7 @@ def name_to_type(name):
         return 2
     if name == "s26":
         return 3
-    print "Unknown chip type name %s" % name
+    sys.stderr.write("Unknown chip type name %s\n" % name)
     sys.exit(1)
 
 def type_to_device(dtype):
@@ -96,7 +96,7 @@ class Hash:
         if val in self.d:
             h = self.d[val]
             if h.premask != premask:
-                print "Premask conflict"
+                sys.stderr.write("Premask conflict\n")
                 sys.exit(1)
             return h
         h = Hash(premask)
@@ -105,7 +105,7 @@ class Hash:
     
     def set(self, val, opc):
         if val in self.d:
-            print "Collision on %s" % opc.description()
+            sys.stderr.write("Collision on %s\n" % opc.description())
             sys.exit(1)
         self.d[val] = opc
 
@@ -331,7 +331,7 @@ class OpcodeList:
                     if v in h.d:
                         d = h.d[v]
                         if not d.is_dispatch():
-                            print "Collision on %s" % opc.description()
+                            sys.stderr.write("Collision on %s\n" % opc.description())
                             sys.exit(1)
                         if opc.enabled:
                             d.enabled = True

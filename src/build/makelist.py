@@ -10,7 +10,7 @@ def parse_file(srcfile):
     try:
         fp = open(srcfile, 'rb')
     except IOError:
-        print("Unable to open source file '%s'" % srcfile)
+        sys.stderr.write("Unable to open source file '%s'\n" % srcfile)
         return 1
     in_comment = 0
     linenum = 0
