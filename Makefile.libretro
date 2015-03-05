@@ -175,12 +175,13 @@ else ifeq ($(platform), osx)
 	LDFLAGSEMULATOR +=  -stdlib=$(LIBCXX)
 	PLATCFLAGS += $(fpic)
 	SHARED := -dynamiclib
-	CC = c++ -stdlib=$(LIBCXX)
-	LD = c++ -stdlib=$(LIBCXX)
-	NATIVELD = c++ -stdlib=$(LIBCXX)
-	NATIVECC = c++
+	CC_AS = cc
+	CXX_AS = c++
+	CC = $(CXX_AS) -stdlib=$(LIBCXX)
+	LD = $(CXX_AS) -stdlib=$(LIBCXX)
+	NATIVELD = $(CXX_AS) -stdlib=$(LIBCXX)
+	NATIVECC = $(CXX_AS)
 	LDFLAGS +=  $(fpic) $(SHARED)
-	CC_AS = clang
 	AR = @ar
 	PYTHON ?= @python
 	ifeq ($(COMMAND_MODE),"legacy")
@@ -213,8 +214,8 @@ else ifeq ($(platform), ios)
 	LIBCXX := libc++
 
 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
-	CC_AS = clang -arch armv7 -isysroot $(IOSSDK)
-	CC = clang++ -arch armv7 -isysroot $(IOSSDK)
+	CC_AS = cc
+	CC = c++ -arch armv7 -isysroot $(IOSSDK)
 	LD = $(CC) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
 	NATIVELD = c++ -stdlib=$(LIBCXX)
