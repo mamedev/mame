@@ -16,7 +16,7 @@
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
-#ifdef USE_ARM_HACK
+#ifdef SDLMAME_ARM
 //FIXME ARM VS X86 structure Alignment -> sizeof(NO_PRIORITY) != 3
 UINT8 no_priority_size_is_wrong[1];
 #else

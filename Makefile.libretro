@@ -151,7 +151,7 @@ else ifeq ($(platform), android)
 	LD = @arm-linux-androideabi-g++ 
 	FORCE_DRC_C_BACKEND = 1
 	CCOMFLAGS += -fPIC -mstructure-size-boundary=32 -mthumb-interwork -falign-functions=16 -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
-	PLATCFLAGS += -march=armv7-a -mfloat-abi=softfp -DRETRO_AND -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DANDTIME -DRANDPATH -DANDROID_BUILD -DUSE_ARM_HACK -DRETRO_SETJMP_HACK -DUSE_ARM_COMPAT_DELEGATE
+	PLATCFLAGS += -march=armv7-a -mfloat-abi=softfp -DRETRO_AND -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DANDTIME -DRANDPATH -DANDROID_BUILD -DSDLMAME_ARM -DRETRO_SETJMP_HACK
 	ifeq ($(VRENDER),opengl)
 		PLATCFLAGS += -DHAVE_GL
 		LIBS += -lGLESv2
@@ -219,7 +219,7 @@ else ifeq ($(platform), ios)
 	PYTHON ?= @python
 	CFLAGS += -DIOS
 	LDFLAGSEMULATOR += -stdlib=libc++
-	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DUSE_ARM_HACK -DHAVE_POSIX_MEMALIGN
+	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
 	CCOMFLAGS += $(PLATCFLAGS)
 
 # QNX
@@ -312,7 +312,7 @@ else ifneq (,$(findstring armv,$(platform)))
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
 	CCOMFLAGS += $(fpic) -mstructure-size-boundary=32 -falign-functions=16 -fsigned-char -finline -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
-	PLATCFLAGS += -march=armv7-a -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DUSE_ARM_HACK -DRETRO_SETJMP_HACK
+	PLATCFLAGS += -march=armv7-a -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DSDLMAME_ARM -DRETRO_SETJMP_HACK
 	LDFLAGS += -Wl,--fix-cortex-a8 -Wl,--no-as-needed $(fpic) $(SHARED)
 	NATIVELD = g++
 	NATIVELDFLAGS = -Wl,--warn-common -lstdc++ -Wl,--no-undefined

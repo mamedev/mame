@@ -99,7 +99,7 @@
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#elif defined(SDLMAME_EMSCRIPTEN)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
-	#elif defined(SDLMAME_ARM) || defined(USE_ARM_COMPAT_DELEGATE)
+	#elif defined(SDLMAME_ARM)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#else
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
@@ -491,20 +491,12 @@ public:
 	// default constructor
 	delegate_mfp()
 		: m_function(0),
-#ifdef USE_ARM_HACK
-      			m_is_virtual(0) { }
-#else
 			m_this_delta(0) { }
-#endif
 
 	// copy constructor
 	delegate_mfp(const delegate_mfp &src)
 		: m_function(src.m_function),
-#ifdef USE_ARM_HACK
-      			m_is_virtual(src.m_is_virtual) {}
-#else
 			m_this_delta(src.m_this_delta) { }
-#endif
 
 	// construct from any member function pointer
 	template<typename _MemberFunctionType, class _MemberFunctionClass, typename _ReturnType, typename _StaticFunctionType>
@@ -515,11 +507,7 @@ public:
 	}
 
 	// comparison helpers
-#ifdef USE_ARM_HACK
-    	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function && m_is_virtual == rhs.m_is_virtual); }
-#else
 	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function && m_this_delta == rhs.m_this_delta); }
-#endif
 	bool isnull() const { return (m_function == 0); }
 
 	// getters
@@ -541,11 +529,7 @@ private:
 												//    if even, it's a pointer to the function
 												//    if odd, it's the byte offset into the vtable
 
-#ifdef USE_ARM_HACK
-    int 					m_is_virtual;
-#else
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
-#endif
 
 };
 
