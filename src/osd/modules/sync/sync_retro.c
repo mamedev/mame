@@ -444,7 +444,7 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
    thread->handle = (HANDLE)handle;
 #else
 	pthread_attr_init(&attr);
-#ifndef RETRO_AND
+#ifndef SDLMAME_ARM
 	pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
 #endif
 	if ( pthread_create(&thread->thread, &attr, callback, cbparam) != 0 )
@@ -493,7 +493,7 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 {
 #if defined(__GNUC__) && defined(WIN32)
    return TRUE; /* stub */
-#elif !defined(NO_AFFINITY_NP) && !defined(__MACH__) && !defined(RETRO_AND)
+#elif !defined(NO_AFFINITY_NP) && !defined(__MACH__) && !defined(SDLMAME_ARM)
 	cpu_set_t   cmask;
 	pthread_t   lthread;
 	int         bitnum;

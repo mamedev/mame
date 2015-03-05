@@ -1,5 +1,4 @@
-
-#ifdef RETRO_AND
+#ifdef ANDROID
 #include <android/log.h>
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "mame151-retro", __VA_ARGS__))
 #undef write_log

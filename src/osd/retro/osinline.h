@@ -33,7 +33,7 @@ empty
 #endif
 #endif
 
-#ifndef RETRO_AND
+#ifndef SDLMAME_ARM
 #define mul_32x32(a, b) ((INT64)a * (INT64)b)
 #define mulu_32x32(a, b) ((UINT64)a * (UINT64)b)
 #define mul_32x32_hi(a, b) ((UINT32)(((INT64)a * (INT64)b) >> 32))

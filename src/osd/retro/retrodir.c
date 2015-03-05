@@ -32,7 +32,7 @@
 #define INVPATHSEPCH '\\'
 #endif
 
-#if defined(__MACH__) || defined(_WIN32) || defined(RETRO_AND) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
+#if defined(__MACH__) || defined(_WIN32) || defined(SDLMAME_ARM) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_BSD) || defined(SDLMAME_OS2) || defined(SDLMAME_HAIKU)
 typedef struct dirent sdl_dirent;
 typedef struct stat sdl_stat;
 #define sdl_readdir readdir
