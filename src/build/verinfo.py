@@ -23,13 +23,13 @@ def parse_args():
         elif flags and (sys.argv[i] == '-p'):
             format = 'plist'
         elif flags and (sys.argv[i] == '-b'):
-            i += 1;
+            i += 1
             if (i >= len(sys.argv)) or (sys.argv[i] not in ('mame', 'mess', 'ume')):
                 usage()
             else:
                 target = sys.argv[i]
         elif flags and (sys.argv[i] == '-o'):
-            i += 1;
+            i += 1
             if (i >= len(sys.argv)) or (output is not None):
                 usage()
             else:
