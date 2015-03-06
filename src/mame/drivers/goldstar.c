@@ -14063,9 +14063,9 @@ GAME(  1991, cmasterf,  cmaster,  cm,       cmasterb, goldstar_state, cmv4,     
 
 
 GAME(  1991, tonypok,   0,        cm,       cmv801,   goldstar_state, tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 )
-GAME(  199?, jkrmast,   0,        pkrmast,  cmasterb, goldstar_state, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // encrypted?
-GAME(  199?, pkrmast,   jkrmast,  pkrmast,  cmasterb, goldstar_state, cmv4,      ROT0, "<unknown>",         "Poker Master (set 1)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
-GAME(  199?, pkrmasta,  jkrmast,  pkrmast,  cmasterb, goldstar_state, cmv4,      ROT0, "<unknown>",         "Poker Master (set 2)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
+GAME(  199?, jkrmast,   0,        pkrmast,  crazybon, goldstar_state, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // encrypted?
+GAME(  199?, pkrmast,   jkrmast,  pkrmast,  crazybon, goldstar_state, cmv4,      ROT0, "<unknown>",         "Poker Master (set 1)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
+GAME(  199?, pkrmasta,  jkrmast,  pkrmast,  crazybon, goldstar_state, cmv4,      ROT0, "<unknown>",         "Poker Master (set 2)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
 
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
