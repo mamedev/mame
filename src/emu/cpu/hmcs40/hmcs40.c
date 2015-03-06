@@ -10,6 +10,19 @@
 
 */
 
+enum
+{
+	FAMILY_HMCS42 = 0,
+	FAMILY_HMCS43,
+	FAMILY_HMCS44,
+	FAMILY_HMCS45,
+	FAMILY_HMCS46,
+	FAMILY_HMCS47,
+};
+
+#define IS_CMOS true
+#define IS_PMOS false
+
 #include "hmcs40.h"
 #include "debugger.h"
 
@@ -75,16 +88,30 @@ ADDRESS_MAP_END
 
 
 // device definitions
+hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, is_cmos, 3, 12, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
+{ }
+
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hmcs40_cpu_device(mconfig, HD38750, "HD38750", tag, owner, clock, 3, 12, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), "hd38750", __FILE__)
+	: hmcs43_cpu_device(mconfig, HD38750, "HD38750", tag, owner, clock, IS_PMOS, "hd38750")
+{ }
+
+
+hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS44, is_cmos, 4, 13, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hmcs40_cpu_device(mconfig, HD38800, "HD38800", tag, owner, clock, 4, 13, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), "hd38800", __FILE__)
+	: hmcs44_cpu_device(mconfig, HD38800, "HD38800", tag, owner, clock, IS_PMOS, "hd38800")
+{ }
+
+
+hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS45, is_cmos, 4, 13, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: hmcs40_cpu_device(mconfig, HD38820, "HD38820", tag, owner, clock, 4, 13, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), "hd38820", __FILE__)
+	: hmcs45_cpu_device(mconfig, HD38820, "HD38820", tag, owner, clock, IS_PMOS, "hd38820")
 { }
 
 
@@ -101,7 +128,7 @@ void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, ast
 			break;
 
 		case STATE_GENPC:
-			string.printf("%03X", m_pc << 1);
+			string.printf("%04X", m_pc << 1);
 			break;
 
 		default: break;
@@ -132,17 +159,35 @@ void hmcs40_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
-	m_xmask = (1 << (m_datawidth - 4)) - 1;
+	
+	UINT8 defval = (m_is_cmos) ? 0xf : 0;
+	m_read_r0.resolve_safe(defval);
+	m_read_r1.resolve_safe(defval);
+	m_read_r2.resolve_safe(defval);
+	m_read_r3.resolve_safe(defval);
+	m_read_r4.resolve_safe(defval);
+	m_read_r5.resolve_safe(defval);
+	m_read_r6.resolve_safe(defval);
+	m_read_r7.resolve_safe(defval);
+	
+	m_write_r0.resolve_safe();
+	m_write_r1.resolve_safe();
+	m_write_r2.resolve_safe();
+	m_write_r3.resolve_safe();
+	m_write_r4.resolve_safe();
+	m_write_r5.resolve_safe();
+	m_write_r6.resolve_safe();
+	m_write_r7.resolve_safe();
 
-	m_read_d.resolve_safe(0);
+	m_read_d.resolve_safe((m_is_cmos) ? 0xffff : 0);
 	m_write_d.resolve_safe();
 
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
 	m_op = 0;
 	m_prev_op = 0;
-	m_arg = 0;
 	m_pc = 0;
+	m_prev_pc = 0;
 	m_page = 0;
 	m_a = 0;
 	m_b = 0;
@@ -150,15 +195,17 @@ void hmcs40_cpu_device::device_start()
 	m_spx = 0;
 	m_y = 0;
 	m_spy = 0;
-	m_s = 0;
+	m_s = 1;
 	m_c = 0;
+	memset(m_r, 0, sizeof(m_r));
+	m_d = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
-	save_item(NAME(m_arg));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_page));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -168,6 +215,8 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_spy));
 	save_item(NAME(m_s));
 	save_item(NAME(m_c));
+	save_item(NAME(m_r));
+	save_item(NAME(m_d));
 
 	// register state for debugger
 	state_add(HMCS40_PC,  "PC",  m_pc).formatstr("%04X");
@@ -178,7 +227,7 @@ void hmcs40_cpu_device::device_start()
 	state_add(HMCS40_Y,   "Y",   m_y).formatstr("%01X");
 	state_add(HMCS40_SPY, "SPY", m_spy).formatstr("%01X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%03X").noshow();
+	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
 
 	m_icountptr = &m_icount;
@@ -192,8 +241,16 @@ void hmcs40_cpu_device::device_start()
 
 void hmcs40_cpu_device::device_reset()
 {
-	m_pc = 0xffff & m_prgmask;
-	m_op = 0;
+	m_pc = m_prgmask;
+	m_prev_op = m_op = 0;
+	
+	// clear i/o
+	m_d = (m_is_cmos) ? 0xffff : 0;
+	for (int i = 0; i < 16; i++)
+		hmcs40_cpu_device::write_d(i, (m_is_cmos) ? 1 : 0);
+	
+	for (int i = 0; i < 8; i++)
+		hmcs40_cpu_device::write_r(i, (m_is_cmos) ? 0xf : 0);
 }
 
 
@@ -217,17 +274,6 @@ inline void hmcs40_cpu_device::increment_pc()
 	m_pc = (m_pc & ~mask) | ((m_pc << 1 | fb) & mask);
 }
 
-inline void hmcs40_cpu_device::fetch_arg()
-{
-	// P is the only 2-byte opcode
-	if ((m_op & 0x3f8) == 0x368)
-	{
-		m_icount--;
-		m_arg = m_program->read_word(m_pc << 1);
-		increment_pc();
-	}
-}
-
 void hmcs40_cpu_device::execute_run()
 {
 	while (m_icount > 0)
@@ -238,13 +284,13 @@ void hmcs40_cpu_device::execute_run()
 		if ((m_prev_op & 0x3e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_prgmask;
 
-		// remember previous opcode
+		// remember previous state
 		m_prev_op = m_op;
+		m_prev_pc = m_pc;
 		
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc << 1);
 		m_op = m_program->read_word(m_pc << 1);
 		increment_pc();
-		fetch_arg();
 	}
 }

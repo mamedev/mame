@@ -28,10 +28,143 @@ void hmcs40_cpu_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
-void hmcs40_cpu_device::op_illegal()
+
+// i/o
+
+UINT8 hmcs40_cpu_device::read_r(int index)
 {
-	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_pc);
+	index &= 7;
+	UINT8 inp = 0xf;
+	
+	switch (index)
+	{
+		case 0: inp = m_read_r0(index, 0xff); break;
+		case 1: inp = m_read_r1(index, 0xff); break;
+		case 2: inp = m_read_r2(index, 0xff); break;
+		case 3: inp = m_read_r3(index, 0xff); break;
+		case 4: inp = m_read_r4(index, 0xff); break;
+		case 5: inp = m_read_r5(index, 0xff); break;
+		case 6: inp = m_read_r6(index, 0xff); break;
+		case 7: inp = m_read_r7(index, 0xff); break;
+	}
+	
+	if (m_is_cmos)
+		return inp & m_r[index];
+	else
+		return inp | m_r[index];
 }
+
+void hmcs40_cpu_device::write_r(int index, UINT8 data)
+{
+	index &= 7;
+	m_r[index] = data & 0xf;
+	
+	switch (index)
+	{
+		case 0: m_write_r0(index, m_r[index], 0xff); break;
+		case 1: m_write_r1(index, m_r[index], 0xff); break;
+		case 2: m_write_r2(index, m_r[index], 0xff); break;
+		case 3: m_write_r3(index, m_r[index], 0xff); break;
+		case 4: m_write_r4(index, m_r[index], 0xff); break;
+		case 5: m_write_r5(index, m_r[index], 0xff); break;
+		case 6: m_write_r6(index, m_r[index], 0xff); break;
+		case 7: m_write_r7(index, m_r[index], 0xff); break;
+	}
+}
+
+int hmcs40_cpu_device::read_d(int index)
+{
+	index &= 15;
+	
+	if (m_is_cmos)
+		return (m_read_d(index, 0xffff) & m_d) >> index & 1;
+	else
+		return (m_read_d(index, 0xffff) | m_d) >> index & 1;
+}
+
+void hmcs40_cpu_device::write_d(int index, int state)
+{
+	index &= 15;
+	
+	m_d = (m_d & ~(1 << index)) | (state << index);
+	m_write_d(index, m_d, 0xffff);
+}
+
+// HMCS43:
+// R0 is input-only, R1 is i/o, R2,R3 are output-only, no R4-R7
+// D0-D3 are i/o, D4-D15 are output-only
+
+UINT8 hmcs43_cpu_device::read_r(int index)
+{
+	if ((index & 7) >= 4)
+		logerror("%s read from unknown port R%d at $%04X\n", tag(), index & 7, m_prev_pc << 1);
+	
+	return hmcs40_cpu_device::read_r(index);
+}
+
+void hmcs43_cpu_device::write_r(int index, UINT8 data)
+{
+	index &= 7;
+
+	if (index != 0 && index < 4)
+		hmcs40_cpu_device::write_r(index, data);
+	else
+		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc << 1);
+}
+
+int hmcs43_cpu_device::read_d(int index)
+{
+	if ((index & 15) >= 4)
+		return m_d >> index & 1;
+	else
+		return hmcs40_cpu_device::read_d(index);
+}
+
+// HMCS44:
+// R0-R3 are i/o, R4,R5 are extra registers, no R6,R7
+// D0-D15 are i/o
+
+UINT8 hmcs44_cpu_device::read_r(int index)
+{
+	if ((index & 7) >= 6)
+		logerror("%s read from unknown port R%d at $%04X\n", tag(), index & 7, m_prev_pc << 1);
+	
+	return hmcs40_cpu_device::read_r(index);
+}
+
+void hmcs44_cpu_device::write_r(int index, UINT8 data)
+{
+	index &= 7;
+
+	if (index < 6)
+		hmcs40_cpu_device::write_r(index, data);
+	else
+		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc << 1);
+}
+
+// HMCS45:
+// R0-R5 are i/o, R6 is output-only, no R7
+// D0-D15 are i/o
+
+UINT8 hmcs45_cpu_device::read_r(int index)
+{
+	if ((index & 7) == 7)
+		logerror("%s read from unknown port R%d at $%04X\n", tag(), index & 7, m_prev_pc << 1);
+	
+	return hmcs40_cpu_device::read_r(index);
+}
+
+void hmcs45_cpu_device::write_r(int index, UINT8 data)
+{
+	index &= 7;
+
+	if (index != 7)
+		hmcs40_cpu_device::write_r(index, data);
+	else
+		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc << 1);
+}
+
+
 
 
 
@@ -461,7 +594,7 @@ void hmcs40_cpu_device::op_lpu()
 void hmcs40_cpu_device::op_tbr()
 {
 	// TBR p: Table Branch
-	m_pc = (m_a | m_b << 4 | m_c << 8 | ((m_op & 7) << 9)) & m_prgmask;
+	m_pc = (m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9) & m_prgmask;
 }
 
 void hmcs40_cpu_device::op_rtn()
@@ -593,61 +726,75 @@ void hmcs40_cpu_device::op_rtni()
 void hmcs40_cpu_device::op_sed()
 {
 	// SED: Set Discrete I/O Latch
-	op_illegal();
+	write_d(m_y, 1);
 }
 
 void hmcs40_cpu_device::op_red()
 {
 	// RED: Reset Discrete I/O Latch
-	op_illegal();
+	write_d(m_y, 0);
 }
 
 void hmcs40_cpu_device::op_td()
 {
 	// TD: Test Discrete I/O Latch
-	op_illegal();
+	m_s = read_d(m_y);
 }
 
 void hmcs40_cpu_device::op_sedd()
 {
 	// SEDD n: Set Discrete I/O Latch Direct
-	op_illegal();
+	write_d(m_op & 0xf, 1);
 }
 
 void hmcs40_cpu_device::op_redd()
 {
 	// REDD n: Reset Discrete I/O Latch Direct
-	op_illegal();
+	write_d(m_op & 0xf, 0);
 }
 
 void hmcs40_cpu_device::op_lar()
 {
 	// LAR p: Load A from R-Port Register
-	op_illegal();
+	m_a = read_r(m_op & 7);
 }
 
 void hmcs40_cpu_device::op_lbr()
 {
 	// LBR p: Load B from R-Port Register
-	op_illegal();
+	m_b = read_r(m_op & 7);
 }
 
 void hmcs40_cpu_device::op_lra()
 {
 	// LRA p: Load R-Port Register from A
-	op_illegal();
+	write_r(m_op & 7, m_a);
 }
 
 void hmcs40_cpu_device::op_lrb()
 {
 	// LRB p: Load R-Port Register from B
-	op_illegal();
+	write_r(m_op & 7, m_b);
 }
 
 void hmcs40_cpu_device::op_p()
 {
 	// P p: Pattern Generation
-	op_illegal();
+	m_icount--;
+	UINT16 address = (m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9) | (m_pc & ~0x3f);
+	UINT16 o = m_program->read_word(address << 1);
+	
+	// destination is determined by the 2 highest bits
+	if (o & 0x100)
+	{
+		m_a = o & 0xf;
+		m_b = o >> 4 & 0xf;
+	}
+	if (o & 0x200)
+	{
+		write_r(2, o >> 4 & 0xf);
+		write_r(3, o & 0xf);
+	}
 }
 
 
@@ -656,4 +803,10 @@ void hmcs40_cpu_device::op_p()
 void hmcs40_cpu_device::op_nop()
 {
 	// NOP: No Operation
+}
+
+
+void hmcs40_cpu_device::op_illegal()
+{
+	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc << 1);
 }
