@@ -479,9 +479,9 @@ PALETTE_INIT_MEMBER( mbee_state, premium )
 	/* set up 8 low intensity colours */
 	for (i = 0; i < 8; i++)
 	{
-		r = BIT(i, 0) ? 0xa0 : 0;
-		g = BIT(i, 1) ? 0xa0 : 0;
-		b = BIT(i, 2) ? 0xa0 : 0;
+		r = BIT(i, 0) ? 0xc0 : 0;
+		g = BIT(i, 1) ? 0xc0 : 0;
+		b = BIT(i, 2) ? 0xc0 : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 

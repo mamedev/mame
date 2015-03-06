@@ -118,7 +118,9 @@
     - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
       crashes due to a bug in z80pio emulation.
 
-    - 256tc: Keyboard ROM U60 needs to be dumped.
+    - 256tc: the Intro disk doesn't work
+
+    - 256tc, Teleterm: Keyboard CPU inbuilt ROM needs to be dumped.
     - 128k, 64k: PALs need to be dumped for the bankswitching.
 
     - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
@@ -127,6 +129,8 @@
     - Mouse: a few programs support the use of a serial mouse which interfaced
              directly to the Z80PIO. However there's little info to be found.
              PIO B3 to ground activates the mouse pointer in Shell v3.01.
+
+    - Hard drive (10MB) & controller
 
 *******************************************************************************/
 
@@ -143,7 +147,7 @@
 
 static ADDRESS_MAP_START(mbee_mem, AS_PROGRAM, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
@@ -653,8 +657,8 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
 
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
-	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
+	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 3)
+	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 3)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("z80pio", z80pio_device, strobe_a))
@@ -860,7 +864,7 @@ ROM_START( mbeeic )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc )
@@ -886,7 +890,7 @@ ROM_START( mbeepc )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85 )
@@ -916,7 +920,7 @@ ROM_START( mbeepc85 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85b )
@@ -947,7 +951,7 @@ ROM_START( mbeepc85b )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85s )
@@ -976,7 +980,7 @@ ROM_START( mbeepc85s )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeett )
@@ -1030,7 +1034,7 @@ ROM_START( mbeeppc )
 	ROM_RELOAD( 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
@@ -1047,7 +1051,7 @@ ROM_START( mbee56 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
@@ -1068,7 +1072,7 @@ ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbee128p ) // Premium 128K
@@ -1096,7 +1100,7 @@ ROM_START( mbee128p ) // Premium 128K
 	ROM_RELOAD( 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
@@ -1118,7 +1122,7 @@ ROM_START( mbee256 ) // 256tc
 	ROM_COPY( "gfx", 0x1000, 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 

@@ -482,9 +482,8 @@ MACHINE_RESET_MEMBER( mbee_state, mbeett )
 
 DRIVER_INIT_MEMBER( mbee_state, mbee )
 {
-	m_size = 0x4000;
+	m_size = 0x8000;
 	m_has_oldkb = 1;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeic )
@@ -495,7 +494,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeic )
 
 	m_size = 0x8000;
 	m_has_oldkb = 1;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc )
@@ -509,7 +507,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc )
 
 	m_size = 0x8000;
 	m_has_oldkb = 1;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
@@ -523,7 +520,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbeepc85 )
 
 	m_size = 0x8000;
 	m_has_oldkb = 1;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
@@ -540,14 +536,12 @@ DRIVER_INIT_MEMBER( mbee_state, mbeeppc )
 
 	m_size = 0x8000;
 	m_has_oldkb = 1;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee56 )
 {
 	m_size = 0xe000;
 	m_has_oldkb = 1;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee128 )
@@ -569,7 +563,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbee128 )
 
 	m_size = 0x8000;
 	m_has_oldkb = 1;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbee256 )
@@ -593,7 +586,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbee256 )
 
 	m_size = 0x8000;
 	m_has_oldkb = 0;
-	m_is_mbeett = 0;
 }
 
 DRIVER_INIT_MEMBER( mbee_state, mbeett )
@@ -609,7 +601,6 @@ DRIVER_INIT_MEMBER( mbee_state, mbeett )
 
 	m_size = 0x8000;
 	m_has_oldkb = 0;
-	m_is_mbeett = 1;
 }
 
 

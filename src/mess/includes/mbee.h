@@ -129,7 +129,6 @@ private:
 	bool m_b7_rtc;
 	bool m_b7_vs;
 	bool m_b2;
-	bool m_is_mbeett;
 	UINT8 m_framecnt;
 	UINT8 m_08;
 	UINT8 m_0a;
