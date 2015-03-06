@@ -32,11 +32,12 @@ class hmcs40_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int family, bool is_cmos, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int family, bool is_cmos, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, 0, program)
+		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth-1)
+		, m_pcwidth(pcwidth)
+		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
 		, m_family(family)
 		, m_is_cmos(is_cmos)
@@ -94,8 +95,10 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_pcwidth;      // Program Counter bit-width
 	int m_prgwidth;
 	int m_datawidth;
+	int m_pcmask;
 	int m_prgmask;
 	int m_datamask;
 	int m_family;       // MCU family (42-47)

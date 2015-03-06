@@ -16,7 +16,7 @@ inline void hmcs40_cpu_device::ram_w(UINT8 data)
 
 void hmcs40_cpu_device::pop_stack()
 {
-	m_pc = m_stack[0] & m_prgmask;
+	m_pc = m_stack[0] & m_pcmask;
 	for (int i = 0; i < m_stack_levels-1; i++)
 		m_stack[i] = m_stack[i+1];
 }
@@ -594,7 +594,7 @@ void hmcs40_cpu_device::op_lpu()
 void hmcs40_cpu_device::op_tbr()
 {
 	// TBR p: Table Branch
-	m_pc = (m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9) & m_prgmask;
+	m_pc = (m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9) & m_pcmask;
 }
 
 void hmcs40_cpu_device::op_rtn()
@@ -782,7 +782,7 @@ void hmcs40_cpu_device::op_p()
 	// P p: Pattern Generation
 	m_icount--;
 	UINT16 address = (m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9) | (m_pc & ~0x3f);
-	UINT16 o = m_program->read_word(address << 1);
+	UINT16 o = m_program->read_word((address & m_prgmask) << 1);
 	
 	// destination is determined by the 2 highest bits
 	if (o & 0x100)

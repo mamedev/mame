@@ -31,7 +31,7 @@ enum
 // MCU types
 
 // HMCS42/C/CL
-//const device_type HD38702 = &device_creator<hd38702_device>; // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM
+//const device_type HD38702 = &device_creator<hd38702_device>; // PMOS, 28 pins, 22 I/O lines, (512+32)x10 ROM, 32x4 RAM, no B or SPY register
 //const device_type HD44700 = &device_creator<hd44700_device>; // CMOS version
 //const device_type HD44708 = &device_creator<hd44708_device>; // CMOS version, low-power
 
@@ -65,13 +65,13 @@ const device_type HD38820 = &device_creator<hd38820_device>; // PMOS, 54 pins(QF
 
 // internal memory maps
 static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 16, hmcs40_cpu_device)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x007f) AM_ROM
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x043f) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_2k, AS_PROGRAM, 16, hmcs40_cpu_device)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x10ff) AM_ROM
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0800, 0x087f) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 
 // device definitions
 hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, is_cmos, 3, 12, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, is_cmos, 3, 10, 11, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -98,7 +98,7 @@ hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS44, is_cmos, 4, 13, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS44, is_cmos, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -107,7 +107,7 @@ hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, d
 
 
 hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS45, is_cmos, 4, 13, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS45, is_cmos, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -125,10 +125,6 @@ void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, ast
 				m_c ? 'C':'c',
 				m_s ? 'S':'s'
 			);
-			break;
-
-		case STATE_GENPC:
-			string.printf("%04X", m_pc << 1);
 			break;
 
 		default: break;
@@ -159,6 +155,7 @@ void hmcs40_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_pcmask = (1 << m_pcwidth) - 1;
 	
 	UINT8 defval = (m_is_cmos) ? 0xf : 0;
 	m_read_r0.resolve_safe(defval);
@@ -241,7 +238,7 @@ void hmcs40_cpu_device::device_start()
 
 void hmcs40_cpu_device::device_reset()
 {
-	m_pc = m_prgmask;
+	m_pc = m_pcmask;
 	m_prev_op = m_op = 0;
 	
 	// clear i/o
@@ -282,15 +279,15 @@ void hmcs40_cpu_device::execute_run()
 		
 		// LPU is handled 1 cycle later
 		if ((m_prev_op & 0x3e0) == 0x340)
-			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_prgmask;
+			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
 
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
 		
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc << 1);
-		m_op = m_program->read_word(m_pc << 1);
+		debugger_instruction_hook(this, m_pc);
+		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
 		increment_pc();
 	}
 }
