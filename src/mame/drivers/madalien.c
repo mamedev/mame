@@ -428,13 +428,25 @@ ROM_START( madalienb )
 	ROM_REGION( 0x0400, "gfx2", 0 )    /* headlight */
 	ROM_LOAD( "ma-.2bc", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
 
-	ROM_REGION( 0x0400, "user1", 0 )                    /* background tile map */
+
+
+	ROM_REGION( 0x0400, "user1", 0 )                    // background tile map
 	ROM_LOAD( "mf-1.4h", 0x0000, 0x0400, CRC(9b04c446) SHA1(918013f3c0244ab6a670b9d1b6b642298e2c5ab8) )
 
-	ROM_REGION( 0x0c00, "gfx1", 0 )    /* background tiles */
-	ROM_LOAD( "mc-1.3k", 0x0000, 0x0400, NO_DUMP )
+	ROM_REGION( 0x0c00, "gfx1", 0 )    // background tiles
+	ROM_LOAD( "mc-1.3k", 0x0000, 0x0400, BAD_DUMP CRC(2710c47e) SHA1(337e4f160c7db143ec3bfae3e08e8789b9e41cc5) ) // taken from chwy, see below, tile 2 is mismatched with the 2 roms from the actual PCB.
 	ROM_LOAD( "me-1.3l", 0x0400, 0x0400, CRC(7328a425) SHA1(327adc8b0e25d93f1ae98a44c26d0aaaac1b1a9c) )
 	ROM_LOAD( "md-1.3m", 0x0800, 0x0400, CRC(b5329929) SHA1(86890e1b7cc8cb31fc0dcbc2d3cff02e4cf95619) )
+	
+	/*  for reference, this is the data used by Highway Chase on the cassette system when extracted
+	ROM_REGION( 0x0400, "user1", 0 )                    // background tile map
+	ROM_LOAD( "rom1", 0x0000, 0x0400, CRC(9b04c446) SHA1(918013f3c0244ab6a670b9d1b6b642298e2c5ab8) )
+
+	ROM_REGION( 0x0c00, "gfx1", 0 )    // background tiles
+	ROM_LOAD( "rom2", 0x0000, 0x0400, CRC(2710c47e) SHA1(337e4f160c7db143ec3bfae3e08e8789b9e41cc5) )
+	ROM_LOAD( "rom3", 0x0400, 0x0400, CRC(4ec78c6a) SHA1(52c7fd0cbd2716edbfae0c73cc59fd3097941e2d) )
+	ROM_LOAD( "rom4", 0x0800, 0x0400, CRC(c1f7375e) SHA1(02358f498565bb88b6c323620a5b85a39e8c84db) )
+	*/
 
 	ROM_REGION( 0x0800, "user2", 0 )                   /* shifting table */
 	ROM_LOAD( "mb-.5cd", 0x0000, 0x0800, CRC(cb801e49) SHA1(7444c4af7cf07e5fdc54044d62ea4fcb201b2b8b) )
