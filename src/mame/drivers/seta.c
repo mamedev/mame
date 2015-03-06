@@ -7463,7 +7463,7 @@ static GFXDECODE_START( msgundam )
 GFXDECODE_END
 
 /***************************************************************************
-                       Daioh (location test version)
+                       Daioh (prototype)
 ***************************************************************************/
 
 static GFXDECODE_START( daiohp )
