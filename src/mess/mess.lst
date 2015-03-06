@@ -2185,7 +2185,6 @@ ebball      // Entex
 elecdet     // Ideal
 starwbc     // Kenner
 starwbcp    // Kenner (prototype)
-elecbowl    // Marx
 comp4       // Milton Bradley
 simon       // Milton Bradley
 cnsector    // Parker Bros
@@ -2201,6 +2200,7 @@ tmpacman    // Tomy
 tmtennis    // Tomy
 alnchase    // Tomy
 
+elecbowl    // Marx
 wildfire    // Parker Bros
 
 

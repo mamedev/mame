@@ -748,6 +748,7 @@ DRVLIBS += \
 	$(MESSOBJ)/luxor.a \
 	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/makerbot.a \
+	$(MESSOBJ)/marx.a \
 	$(MESSOBJ)/matsushi.a \
 	$(MESSOBJ)/mattel.a \
 	$(MESSOBJ)/mb.a \
@@ -1367,6 +1368,9 @@ $(MESSOBJ)/magnavox.a:          \
 
 $(MESSOBJ)/makerbot.a:          \
 	$(MESS_DRIVERS)/replicator.o\
+
+$(MESSOBJ)/marx.a:              \
+	$(MESS_DRIVERS)/elecbowl.o  \
 
 $(MESSOBJ)/mattel.a:            \
 	$(MESS_DRIVERS)/aquarius.o $(MESS_VIDEO)/aquarius.o \
@@ -2114,6 +2118,7 @@ $(MESS_DRIVERS)/digel804.o: $(MESS_LAYOUT)/digel804.lh
 $(MESS_DRIVERS)/dmv.o:      $(MESS_LAYOUT)/dmv.lh
 $(MESS_DRIVERS)/dolphunk.o: $(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/eacc.o:     $(MESS_LAYOUT)/eacc.lh
+$(MESS_DRIVERS)/elecbowl.o: $(MESS_LAYOUT)/elecbowl.lh
 $(MESS_DRIVERS)/elekscmp.o: $(MESS_LAYOUT)/elekscmp.lh
 $(MESS_DRIVERS)/elf.o:      $(MESS_LAYOUT)/elf2.lh
 $(MESS_MACHINE)/esqvfd.o:   $(MESS_LAYOUT)/esq2by40.lh \
@@ -2134,7 +2139,6 @@ $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/cnsector.lh \
                             $(MESS_LAYOUT)/comp4.lh \
                             $(MESS_LAYOUT)/ebball.lh \
-                            $(MESS_LAYOUT)/elecbowl.lh \
                             $(MESS_LAYOUT)/elecdet.lh \
                             $(MESS_LAYOUT)/mathmagi.lh \
                             $(MESS_LAYOUT)/merlin.lh \
