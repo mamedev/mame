@@ -121,6 +121,7 @@
 #include "goldstar.lh"
 #include "cherryb3.lh"
 #include "lucky8.lh"
+#include "crazybon.lh"
 #include "bingowng.lh"
 
 
@@ -642,6 +643,30 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
+WRITE8_MEMBER(goldstar_state::pkrmast_lamps_w)
+{
+/*  bits
+  7654 3210
+  ---- --x-  Start
+  ---- x---  Bet
+  ---x ----  Stop All / Take Score
+  --x- ----  Double Up
+  -x-- ----  Small / Info
+  x--- ----  Big
+  ---- -x-x  Unused in Crazy Bonus
+*/
+
+	output_set_lamp_value(0, (data >> 1) & 1);  /* Start */
+	output_set_lamp_value(1, (data >> 3) & 1);  /* Bet */
+	output_set_lamp_value(2, (data >> 4) & 1);  /* Stop All / Take Score */
+	output_set_lamp_value(3, (data >> 5) & 1);  /* Double Up */
+	output_set_lamp_value(4, (data >> 6) & 1);  /* Small / Info */
+	output_set_lamp_value(5, (data >> 7) & 1);  /* Big */
+
+	if (data & 0x05)
+		popmessage("lamps: %02X", data);
+}
+
 static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
@@ -655,6 +680,7 @@ static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW3-0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW3-1")
+	AM_RANGE(0x22, 0x22) AM_WRITE(pkrmast_lamps_w)
 
 	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW1")
 	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW2")
@@ -14030,7 +14056,7 @@ GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,        
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING )
 GAME(  199?, star100,   0,        star100,  star100,  driver_device,  0,         ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    GAME_IMPERFECT_COLORS )
-GAME(  1997, crazybon,  0,        pkrmast,  crazybon, goldstar_state, cmv4,      ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                          GAME_IMPERFECT_COLORS )
+GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, goldstar_state, cmv4,      ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                          GAME_IMPERFECT_COLORS, layout_crazybon )
 
 
 // are these really dyna, or bootlegs?

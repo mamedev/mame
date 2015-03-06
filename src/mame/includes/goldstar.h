@@ -65,6 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(goldstar_lamps_w);
 	DECLARE_WRITE8_MEMBER(cb3_lamps_w);
 	DECLARE_WRITE8_MEMBER(cm_outport1_w);
+	DECLARE_WRITE8_MEMBER(pkrmast_lamps_w);
 	DECLARE_WRITE8_MEMBER(lucky8_outport_w);
 	DECLARE_WRITE8_MEMBER(magodds_outb850_w);
 	DECLARE_WRITE8_MEMBER(magodds_outb860_w);
