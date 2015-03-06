@@ -262,6 +262,24 @@ public:
 	hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class hd38755_device : public hmcs43_cpu_device
+{
+public:
+	hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44750_device : public hmcs43_cpu_device
+{
+public:
+	hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44758_device : public hmcs43_cpu_device
+{
+public:
+	hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 class hmcs44_cpu_device : public hmcs40_cpu_device
 {
@@ -278,6 +296,24 @@ class hd38800_device : public hmcs44_cpu_device
 {
 public:
 	hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd38805_device : public hmcs44_cpu_device
+{
+public:
+	hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44801_device : public hmcs44_cpu_device
+{
+public:
+	hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44808_device : public hmcs44_cpu_device
+{
+public:
+	hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -298,11 +334,40 @@ public:
 	hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class hd38825_device : public hmcs45_cpu_device
+{
+public:
+	hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44820_device : public hmcs45_cpu_device
+{
+public:
+	hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44828_device : public hmcs45_cpu_device
+{
+public:
+	hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 
 extern const device_type HD38750;
+extern const device_type HD38755;
+extern const device_type HD44750;
+extern const device_type HD44758;
+
 extern const device_type HD38800;
+extern const device_type HD38805;
+extern const device_type HD44801;
+extern const device_type HD44808;
+
 extern const device_type HD38820;
+extern const device_type HD38825;
+extern const device_type HD44820;
+extern const device_type HD44828;
 
 
 #endif /* _HMCS40_H_ */
