@@ -269,7 +269,7 @@ def bitmapToChars(pngObject, font):
 
         # scan the column to find characters
         colStart = 0
-        while (colStart < width):
+        while colStart < width:
             ch = RenderFontChar()
 
             # Find the start of the character
@@ -321,7 +321,7 @@ def bitmapToChars(pngObject, font):
         rowStart = rowEnd + 1
     
     # Return non-zero if we errored
-    return (rowStart < height)
+    return rowStart < height
 
 
 

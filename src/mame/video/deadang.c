@@ -4,27 +4,26 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(deadang_state::deadang_foreground_w)
+WRITE16_MEMBER(deadang_state::foreground_w)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 	m_pf1_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(deadang_state::deadang_text_w)
+WRITE16_MEMBER(deadang_state::text_w)
 {
-	UINT16 *videoram = m_videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&m_videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(deadang_state::deadang_bank_w)
+WRITE16_MEMBER(deadang_state::bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_deadangle_tilebank = data&1;
-		if (m_deadangle_tilebank!=m_deadangle_oldtilebank)
+		m_tilebank = data&1;
+		if (m_tilebank!=m_oldtilebank)
 		{
-			m_deadangle_oldtilebank = m_deadangle_tilebank;
+			m_oldtilebank = m_tilebank;
 			m_pf1_layer->mark_all_dirty();
 		}
 	}
@@ -57,14 +56,13 @@ TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
 	int color=tile >> 12;
 	tile=tile&0xfff;
 
-	SET_TILE_INFO_MEMBER(2,tile+m_deadangle_tilebank*0x1000,color,0);
+	SET_TILE_INFO_MEMBER(2,tile+m_tilebank*0x1000,color,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
 {
-	UINT16 *videoram = m_videoram;
-	int tile=(videoram[tile_index] & 0xff) | ((videoram[tile_index] >> 6) & 0x300);
-	int color=(videoram[tile_index] >> 8)&0xf;
+	int tile=(m_videoram[tile_index] & 0xff) | ((m_videoram[tile_index] >> 6) & 0x300);
+	int color=(m_videoram[tile_index] >> 8)&0xf;
 
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
@@ -79,19 +77,21 @@ void deadang_state::video_start()
 	m_pf2_layer->set_transparent_pen(15);
 	m_pf1_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(15);
+	
+	save_item(NAME(m_tilebank));
+	save_item(NAME(m_oldtilebank));
 }
 
 void deadang_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite,pri;
 
 	for (offs = 0; offs<0x800/2; offs+=4)
 	{
 		/* Don't draw empty sprite table entries */
-		if ((spriteram16[offs+3] & 0xff00)!=0xf00) continue;
+		if ((m_spriteram[offs+3] & 0xff00)!=0xf00) continue;
 
-		switch (spriteram16[offs+2]&0xc000) {
+		switch (m_spriteram[offs+2]&0xc000) {
 		default:
 		case 0xc000: pri=0; break; /* Unknown */
 		case 0x8000: pri=0; break; /* Over all playfields */
@@ -99,15 +99,15 @@ void deadang_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		case 0x0000: pri=0xf0|0xcc; break; /* Under middle playfield */
 		}
 
-		fx= spriteram16[offs+0]&0x2000;
-		fy= spriteram16[offs+0]&0x4000;
-		y = spriteram16[offs+0] & 0xff;
-		x = spriteram16[offs+2] & 0xff;
+		fx= m_spriteram[offs+0]&0x2000;
+		fy= m_spriteram[offs+0]&0x4000;
+		y = m_spriteram[offs+0] & 0xff;
+		x = m_spriteram[offs+2] & 0xff;
 		if (fy) fy=0; else fy=1;
-		if (spriteram16[offs+2]&0x100) x=0-(0xff-x);
+		if (m_spriteram[offs+2]&0x100) x=0-(0xff-x);
 
-		color = (spriteram16[offs+1]>>12)&0xf;
-		sprite = spriteram16[offs+1]&0xfff;
+		color = (m_spriteram[offs+1]>>12)&0xf;
+		sprite = m_spriteram[offs+1]&0xfff;
 
 		if (flip_screen()) {
 			x=240-x;
@@ -123,7 +123,7 @@ void deadang_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 }
 
-UINT32 deadang_state::screen_update_deadang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 deadang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Setup the tilemaps */
 	m_pf3_layer->set_scrolly(0, ((m_scroll_ram[0x01]&0xf0)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7) );

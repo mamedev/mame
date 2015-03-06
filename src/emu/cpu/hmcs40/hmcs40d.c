@@ -14,7 +14,7 @@
 CPU_DISASSEMBLE(hmcs40)
 {
 	int pos = 2;//0;
-//	UINT16 op = ((oprom[pos] << 8) | oprom[pos + 1]) & 0x3ff;
+//	UINT16 op = (oprom[pos] | oprom[pos + 1] << 8) & 0x3ff;
 //	pos += 2;
 //	UINT8 instr = hmcs40_mnemonic[op];
 

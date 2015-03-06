@@ -4,6 +4,10 @@
 
   Hitachi HMCS40 MCU family cores
 
+  References:
+  - 1985 #AP1 Hitachi 4-bit Single-Chip Microcomputer Data Book
+  - 1988 HMCS400 Series Handbook (note: *400 is a newer MCU series, with similarities)
+
 */
 
 #include "hmcs40.h"
@@ -65,7 +69,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_160x4, AS_DATA, 8, hmcs40_cpu_device)
 	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x9f) AM_RAM AM_MIRROR(0x70)
+	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x30)
+	AM_RANGE(0xc0, 0xcf) AM_RAM AM_MIRROR(0x30)
 ADDRESS_MAP_END
 
 
@@ -93,6 +98,10 @@ void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, ast
 				m_c ? 'C':'c',
 				m_s ? 'S':'s'
 			);
+			break;
+
+		case STATE_GENPC:
+			string.printf("%03X", m_pc << 1);
 			break;
 
 		default: break;
@@ -123,6 +132,7 @@ void hmcs40_cpu_device::device_start()
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
+	m_xmask = (1 << (m_datawidth - 4)) - 1;
 
 	m_read_d.resolve_safe(0);
 	m_write_d.resolve_safe();
@@ -130,7 +140,10 @@ void hmcs40_cpu_device::device_start()
 	// zerofill
 	memset(m_stack, 0, sizeof(m_stack));
 	m_op = 0;
+	m_prev_op = 0;
+	m_arg = 0;
 	m_pc = 0;
+	m_page = 0;
 	m_a = 0;
 	m_b = 0;
 	m_x = 0;
@@ -143,7 +156,10 @@ void hmcs40_cpu_device::device_start()
 	// register for savestates
 	save_item(NAME(m_stack));
 	save_item(NAME(m_op));
+	save_item(NAME(m_prev_op));
+	save_item(NAME(m_arg));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_page));
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
 	save_item(NAME(m_x));
@@ -162,7 +178,7 @@ void hmcs40_cpu_device::device_start()
 	state_add(HMCS40_Y,   "Y",   m_y).formatstr("%01X");
 	state_add(HMCS40_SPY, "SPY", m_spy).formatstr("%01X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_s).formatstr("%2s").noshow();
 
 	m_icountptr = &m_icount;
@@ -176,7 +192,7 @@ void hmcs40_cpu_device::device_start()
 
 void hmcs40_cpu_device::device_reset()
 {
-	m_pc = 0;
+	m_pc = 0xffff & m_prgmask;
 	m_op = 0;
 }
 
@@ -186,14 +202,49 @@ void hmcs40_cpu_device::device_reset()
 //  execute
 //-------------------------------------------------
 
+inline void hmcs40_cpu_device::increment_pc()
+{
+	// PC lower bits is a LFSR identical to TI TMS1000
+	UINT8 mask = 0x3f;
+	UINT8 low = m_pc & mask;
+	int fb = (low << 1 & 0x20) == (low & 0x20);
+
+	if (low == (mask >> 1))
+		fb = 1;
+	else if (low == mask)
+		fb = 0;
+
+	m_pc = (m_pc & ~mask) | ((m_pc << 1 | fb) & mask);
+}
+
+inline void hmcs40_cpu_device::fetch_arg()
+{
+	// P is the only 2-byte opcode
+	if ((m_op & 0x3f8) == 0x368)
+	{
+		m_icount--;
+		m_arg = m_program->read_word(m_pc << 1);
+		increment_pc();
+	}
+}
+
 void hmcs40_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
 		m_icount--;
 		
-		debugger_instruction_hook(this, m_pc);
-		m_op = m_program->read_byte(m_pc);
-		m_pc = (m_pc + 1) & m_prgmask;
+		// LPU is handled 1 cycle later
+		if ((m_prev_op & 0x3e0) == 0x340)
+			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_prgmask;
+
+		// remember previous opcode
+		m_prev_op = m_op;
+		
+		// fetch next opcode
+		debugger_instruction_hook(this, m_pc << 1);
+		m_op = m_program->read_word(m_pc << 1);
+		increment_pc();
+		fetch_arg();
 	}
 }

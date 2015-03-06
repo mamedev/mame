@@ -1288,6 +1288,7 @@ $(MESSOBJ)/hitachi.a:           \
 	$(MESS_DRIVERS)/b16.o       \
 	$(MESS_DRIVERS)/bmjr.o      \
 	$(MESS_DRIVERS)/bml3.o      \
+	$(MESS_DRIVERS)/hh_hmcs40.o \
 
 $(MESSOBJ)/homebrew.a:          \
 	$(MESS_DRIVERS)/4004clk.o   \
@@ -2125,6 +2126,8 @@ $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 $(MESS_DRIVERS)/gamecom.o:  $(MESS_LAYOUT)/gamecom.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
+$(MESS_DRIVERS)/hh_hmcs40.o:$(MESS_LAYOUT)/alnattck.lh \
+                            $(MESS_LAYOUT)/tmtron.lh
 $(MESS_DRIVERS)/hh_pic16.o: $(MESS_LAYOUT)/maniac.lh
 $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/bankshot.lh \

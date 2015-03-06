@@ -510,7 +510,8 @@ youma2          // (c) 1986 (Japan)
 youmab          // bootleg
 youmab2         // bootleg
 legion          // (c) 1986
-legiono         // (c) 1986
+legionj         // (c) 1986
+legionjb        // (c) 1986
 terraf          // (c) 1987
 terrafu         // (c) 1987 Nichibutsu USA
 terrafj         // (c) 1987 Nichibutsu Japan
@@ -5837,6 +5838,7 @@ rblaster        // (c) 1985
 // other Data East games
 madalien        // (c) 1980
 madaliena       // (c) 1980
+madalienb       // (c) 1980
 astrof          // (c) [1980?]
 astrof2         // (c) [1980?]
 astrof3         // (c) [1980?]
@@ -6342,6 +6344,7 @@ combatsc        // GX611 (c) 1988
 combatsct       // GX611 (c) 1987
 combatscj       // GX611 (c) 1987 (Japan)
 bootcamp        // GX611 (c) 1987
+bootcampa		// GX611 (c) 1987
 combatscb       // bootleg
 rockrage        // GX620 (c) 1986 (World?)
 rockragea       // GX620 (c) 1986 (Prototype?)
@@ -9061,6 +9064,7 @@ msgundam        // (c) 1993 Banpresto
 msgundam1       // (c) 1993 Banpresto
 daioh           // (C) 1993 Athena
 daioha          // (C) 1993 Athena
+daiohp          // (C) 1993 Athena (prototype)
 oisipuzl        // (c) 1993 SunSoft / Atlus
 triplfun        // bootleg
 utoukond        // (c) 1993 Banpresto + Tsuburaya Prod.

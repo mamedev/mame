@@ -2674,6 +2674,7 @@ $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
 			$(LAYOUT)/cherryb3.lh \
 			$(LAYOUT)/lucky8.lh \
+			$(LAYOUT)/crazybon.lh \
 			$(LAYOUT)/bingowng.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh

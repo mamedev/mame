@@ -7,23 +7,23 @@ Usage:
 import sys
 
 def name_to_type(name):
-    if(name == "o"):
+    if name == "o":
         return 0
-    if(name == "h"):
+    if name == "h":
         return 1
-    if(name == "s20"):
+    if name == "s20":
         return 2
-    if(name == "s26"):
+    if name == "s26":
         return 3
-    print "Unknown chip type name %s" % name
+    sys.stderr.write("Unknown chip type name %s\n" % name)
     sys.exit(1)
 
 def type_to_device(dtype):
-    if(dtype == 0):
+    if dtype == 0:
         return "h8_device"
-    if(dtype == 1):
+    if dtype == 1:
         return "h8h_device"
-    if(dtype == 2):
+    if dtype == 2:
         return "h8s2000_device"
     return "h8s2600_device"
 
@@ -52,10 +52,10 @@ def save_full_one(f, t, name, source):
         if has_memory(line):
             print >>f, "\tif(icount <= bcount) { inst_substate = %d; return; }" % substate
             print >>f, line
-            substate = substate + 1
+            substate += 1
         elif has_eat(line):
             print >>f, "\tif(icount) icount = bcount; inst_substate = %d; return;" % substate
-            substate = substate + 1
+            substate += 1
         else:
             print >>f, line
     print >>f, "}"
@@ -72,11 +72,11 @@ def save_partial_one(f, t, name, source):
             print >>f, "\tif(icount <= bcount) { inst_substate = %d; return; }" % substate
             print >>f, "case %d:;" % substate
             print >>f, line
-            substate = substate + 1
+            substate += 1
         elif has_eat(line):
             print >>f, "\tif(icount) icount = bcount; inst_substate = %d; return;" % substate
             print >>f, "case %d:;" % substate
-            substate = substate + 1
+            substate += 1
         else:
             print >>f, line
     print >>f, "\tbreak;"
@@ -96,7 +96,7 @@ class Hash:
         if val in self.d:
             h = self.d[val]
             if h.premask != premask:
-                print "Premask conflict"
+                sys.stderr.write("Premask conflict\n")
                 sys.exit(1)
             return h
         h = Hash(premask)
@@ -105,7 +105,7 @@ class Hash:
     
     def set(self, val, opc):
         if val in self.d:
-            print "Collision on %s" % opc.description()
+            sys.stderr.write("Collision on %s\n" % opc.description())
             sys.exit(1)
         self.d[val] = opc
 
@@ -122,22 +122,22 @@ class Opcode:
         self.enabled = otype == -1 or (otype == 0 and dtype == 0) or (otype != 0 and dtype >= otype)
         self.needed = self.enabled and (otype == dtype or (otype == -1 and dtype == 0))
         if dtype == 0 and (am1 == "r16l" or am2 == "r16l"):
-            self.mask[len(self.mask)-1] = self.mask[len(self.mask)-1] | 0x08
+            self.mask[len(self.mask) - 1] |= 0x08
         if dtype == 0 and (am1 == "r16h" or am2 == "r16h"):
-            self.mask[len(self.mask)-1] = self.mask[len(self.mask)-1] | 0x80
+            self.mask[len(self.mask) - 1] |= 0x80
         extra_words = 0
         if (am1 == "abs16" or am2 == "abs16" or am1 == "abs16e" or am1 == "abs24e") and self.skip == 0:
-            extra_words = extra_words + 1
+            extra_words += 1
         if (am1 == "abs32" or am2 == "abs32") and self.skip == 0:
-            extra_words = extra_words + 2
+            extra_words += 2
         if am1 == "imm16" or am1 == "rel16" or am1 == "r16d16h" or am2 == "r16d16h" or am1 == "r32d16h" or am2 == "r32d16h":
-            extra_words = extra_words + 1
+            extra_words += 1
         if am1 == "imm32" or am1 == "r32d32hh" or am2 == "r32d32hh":
-            extra_words = extra_words + 2
+            extra_words += 2
         self.extra_words = extra_words
         base_offset = len(self.val)/2 + self.skip
         for i in range(0, extra_words):
-            self.source.append("\tfetch(%d);\n" % (i+base_offset));
+            self.source.append("\tfetch(%d);\n" % (i+base_offset))
 
     def description(self):
         return "%s %s %s" % (self.name, self.am1, self.am2)
@@ -217,13 +217,13 @@ class Macro:
         lval = ""
         for i in range(len(self.params)-1, len(tokens)-1):
             if lval != "":
-                lval = lval + " "
+                lval += " "
             lval = lval + tokens[i+1]
         values.append(lval)
         for i in range(0, len(self.source)):
             line = self.source[i]
-            for i in range(0, len(self.params)):
-                line = line.replace(self.params[i], values[i])
+            for j in range(0, len(self.params)):
+                line = line.replace(self.params[j], values[j])
             target.add_source_line(line)
 
 class DispatchStep:
@@ -234,7 +234,7 @@ class DispatchStep:
         self.enabled = False
         self.mask = opc.mask[pos-1]
         for i in range(0, pos):
-            self.name = self.name + ("%02x" % opc.val[i])
+            self.name += "%02x" % opc.val[i]
         if pos == 2:
             self.skip = opc.skip
         else:
@@ -250,7 +250,8 @@ class DispatchStep:
         for i in range(start, end+1):
             s.append("\tIR[%d] = fetch();" % i)
         s.append("\tinst_state = 0x%x0000 | IR[%d];" % (self.id, end))
-        return s;
+        return s
+
 
 class OpcodeList:
     def __init__(self, fname, dtype):
@@ -274,7 +275,7 @@ class OpcodeList:
             if not line:
                 continue
             if line.startswith(" ") or line.startswith("\t"):
-                if inf != None:
+                if inf is not None:
                     # append instruction to last opcode, maybe expand a macro
                     tokens = line.split()
                     if tokens[0] in self.macros:
@@ -330,7 +331,7 @@ class OpcodeList:
                     if v in h.d:
                         d = h.d[v]
                         if not d.is_dispatch():
-                            print "Collision on %s" % opc.description()
+                            sys.stderr.write("Collision on %s\n" % opc.description())
                             sys.exit(1)
                         if opc.enabled:
                             d.enabled = True
@@ -392,11 +393,11 @@ class OpcodeList:
                             fmask = h2.premask | (h.mask ^ 0xff)
                             c = ""
                             s = 0
-                            while(s < 0x100):
-                                c = c + "case 0x%02x: " % (val | s)
-                                s = s + 1
-                                while(s & fmask):
-                                    s = s + (s & fmask)                    
+                            while s < 0x100:
+                                c += "case 0x%02x: " % (val | s)
+                                s += 1
+                                while s & fmask:
+                                    s += s & fmask
                             print >>f, "\t\t%s{" % c
                             if h2.mask == 0x00:
                                 n = h2.d[0]
@@ -420,11 +421,11 @@ class OpcodeList:
                                             fmask = fmask | n.mask[mpos]
                                         c = ""
                                         s = 0
-                                        while(s < 0x100):
-                                            c = c + "case 0x%02x: " % (val2 | s)
-                                            s = s + 1
-                                            while(s & fmask):
-                                                s = s + (s & fmask)
+                                        while s < 0x100:
+                                            c += "case 0x%02x: " % (val2 | s)
+                                            s += 1
+                                            while s & fmask:
+                                                s += s & fmask
                                         if n.is_dispatch():
                                             print >>f, "\t\t\t%sdispatch_%s_%s(); break;" % (c, n.name, v)
                                         else:

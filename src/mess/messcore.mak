@@ -55,12 +55,14 @@ OBJDIRS += \
 	$(MESS_DRIVERS) \
 	$(MESS_LAYOUT) \
 	$(MESS_MACHINE) \
-	$(MESS_MACHINE)/c64 \
 	$(MESS_VIDEO) \
 
 # System-specific directories
 
-OBJDIRS += $(MESS_MACHINE)/ti99 \
+OBJDIRS += \
+	$(MESS_MACHINE)/c64 \
+	$(MESS_MACHINE)/ti99 \
+
 
 #-------------------------------------------------
 # MESS core objects

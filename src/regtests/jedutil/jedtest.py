@@ -58,8 +58,8 @@ def runViewJedTests(tests, jedUtilApp):
     for test in tests:
         command = [jedUtilApp, "-view", test.jedFile, test.name]
         if VERBOSE:
-            print "Viewing the JED file: %s" % (test.jedFile)
-            print "Command: %s" % ((" ").join(command))
+            print "Viewing the JED file: %s" % test.jedFile
+            print "Command: %s" % " ".join(command)
 
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout,stderr) = process.communicate()
@@ -84,7 +84,7 @@ def main():
     else:		
         jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "jedutil"))
 
-    if (VERBOSE):
+    if VERBOSE:
         print "JED Path:      %s" % jedsPath
         print "Baseline Path: %s" % baselinePath
         print "Output Path:   %s" % outputPath
@@ -109,7 +109,7 @@ def main():
 
 
     # Setup the output paths
-    if (VERBOSE):
+    if VERBOSE:
         print "Cleaning the output directory"
         print
     if os.path.exists(outputPath):

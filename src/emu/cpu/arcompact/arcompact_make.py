@@ -114,7 +114,7 @@ def EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, 
 
 def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler):
     # the mode 0x00 handler  
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p00(OPS_32)" % (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p00(OPS_32)" % funcname
     print >>f, "{"
     print >>f, "	int size = 4;"
     
@@ -170,8 +170,8 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
     print >>f, "	}"
     print >>f, "	/* todo: is the limm, limm syntax valid? (it's pointless.) */"
     print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
-    print >>f, "	%s" % (opexecute)
-    print >>f, "	%s" % (opwrite)	
+    print >>f, "	%s" % opexecute
+    print >>f, "	%s" % opwrite
     print >>f, "	"
     EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
     print >>f, "	return m_pc + (size >> 0);"
@@ -179,11 +179,11 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
     print >>f, ""
     print >>f, ""
     # the mode 0x01 handler    
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p01(OPS_32)" % (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p01(OPS_32)" % funcname
     print >>f, "{"
     EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler)
-    print >>f, "	%s" % (opexecute)
-    print >>f, "	%s" % (opwrite)	
+    print >>f, "	%s" % opexecute
+    print >>f, "	%s" % opwrite
     print >>f, "	"
     EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
     print >>f, "	return m_pc + (size >> 0);"
@@ -191,7 +191,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
     print >>f, ""
     print >>f, ""
     # the mode 0x10 handler 
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p10(OPS_32)" % (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p10(OPS_32)" % funcname
     if ignore_a == 2:
         print >>f, "{"
         print >>f, "	int size = 4;"
@@ -237,8 +237,8 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, " 	c = (UINT32)S;"
         print >>f, "	"
         print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
-        print >>f, "	%s" % (opexecute)
-        print >>f, "	%s" % (opwrite_alt)	
+        print >>f, "	%s" % opexecute
+        print >>f, "	%s" % opwrite_alt
         print >>f, "	"
         EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
         print >>f, "	return m_pc + (size >> 0);"
@@ -246,7 +246,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
     print >>f, ""
     print >>f, ""
     # the mode 0x11 m0 handler    
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m0(OPS_32)" % (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m0(OPS_32)" % funcname
     if ignore_a == 2:
         print >>f, "{"
         print >>f, "	int size = 4;"
@@ -262,7 +262,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, ""
         print >>f, ""	
     # the mode 0x11 m1 handler    
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m1(OPS_32)" % (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m1(OPS_32)" % funcname
     if ignore_a == 2:
         print >>f, "{"
         print >>f, "	int size = 4;"
@@ -276,8 +276,8 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, "	if (!check_condition(condition))"
         print >>f, "		return m_pc + (size>>0);"
         print >>f, ""		
-        print >>f, "	%s" % (opexecute)
-        print >>f, "	%s" % (opwrite_alt)	
+        print >>f, "	%s" % opexecute
+        print >>f, "	%s" % opwrite_alt
         print >>f, "	"
         EmitGroup04_Flaghandler(f,funcname,opname,flagcondition,flaghandler)
         print >>f, "	return m_pc + (size >> 0);"
@@ -288,7 +288,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
 
 # xxx_S  c, b, u3  format opcodes (note c is destination)
 def EmitGroup0d(f,funcname, opname, opexecute, opwrite):
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"  % (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"  % funcname
     print >>f, "{"
     print >>f, "	int u, breg, creg;"
     print >>f, ""
@@ -299,8 +299,8 @@ def EmitGroup0d(f,funcname, opname, opexecute, opwrite):
     print >>f, "	REG_16BIT_RANGE(breg);"
     print >>f, "	REG_16BIT_RANGE(creg);"
     print >>f, ""
-    print >>f, "	%s" % (opexecute)
-    print >>f, "	%s" % (opwrite)
+    print >>f, "	%s" % opexecute
+    print >>f, "	%s" % opwrite
     print >>f, ""
     print >>f, "	return m_pc + (2 >> 0);"
     print >>f, "}"
@@ -310,7 +310,7 @@ def EmitGroup0d(f,funcname, opname, opexecute, opwrite):
 
 # xxx_S b <- b,c format opcodes
 def EmitGroup0f(f,funcname, opname, opexecute, opwrite):
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"% (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)"% funcname
     print >>f, "{"
     print >>f, "	int breg, creg;"
     print >>f, ""
@@ -320,8 +320,8 @@ def EmitGroup0f(f,funcname, opname, opexecute, opwrite):
     print >>f, "	REG_16BIT_RANGE(breg);"
     print >>f, "	REG_16BIT_RANGE(creg);"
     print >>f, ""
-    print >>f, "	%s" % (opexecute)
-    print >>f, "	%s" % (opwrite) 	
+    print >>f, "	%s" % opexecute
+    print >>f, "	%s" % opwrite
     print >>f, ""
     print >>f, "	return m_pc + (2 >> 0);"
     print >>f, "}"
@@ -331,7 +331,7 @@ def EmitGroup0f(f,funcname, opname, opexecute, opwrite):
 
 #  xxx_S b, b, u5 format opcodes
 def EmitGroup17(f,funcname, opname, opexecute):
-    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)" % (funcname)
+    print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s(OPS_16)" % funcname
     print >>f, "{"
     print >>f, "	int breg, u;"
     print >>f, "	"
@@ -340,7 +340,7 @@ def EmitGroup17(f,funcname, opname, opexecute):
     print >>f, "	"
     print >>f, "	REG_16BIT_RANGE(breg);"
     print >>f, "	"
-    print >>f, "	%s" % (opexecute) 
+    print >>f, "	%s" % opexecute
     print >>f, "	"
     print >>f, "	return m_pc + (2 >> 0);"
     print >>f, "}"

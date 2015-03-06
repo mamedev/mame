@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
 	AM_RANGE(0x06000, 0x0600f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
-	AM_RANGE(0x08000, 0x087ff) AM_WRITE(deadang_text_w) AM_SHARE("videoram")
+	AM_RANGE(0x08000, 0x087ff) AM_WRITE(text_w) AM_SHARE("videoram")
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
 	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
@@ -76,9 +76,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
-	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(deadang_foreground_w) AM_SHARE("video_data")
+	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(foreground_w) AM_SHARE("video_data")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x08000, 0x08001) AM_WRITE(deadang_bank_w)
+	AM_RANGE(0x08000, 0x08001) AM_WRITE(bank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -206,7 +206,7 @@ GFXDECODE_END
 
 /* Interrupt Generators */
 
-TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_main_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 {
 	int scanline = param;
 
@@ -217,7 +217,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_main_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_sub_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 {
 	int scanline = param;
 
@@ -235,11 +235,11 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer1", deadang_state, deadang_main_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer1", deadang_state, main_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, deadang_sub_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", deadang_state, sub_scanline, "screen", 0, 1)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deadang_state, screen_update_deadang)
+	MCFG_SCREEN_UPDATE_DRIVER(deadang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deadang)
@@ -267,13 +267,13 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( deadang )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* v20 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("2.18h",   0x0c0000, 0x10000, CRC(1bc05b7e) SHA1(21833150a1f5ab543999a67f5b3bfbaf703e5508) )
 	ROM_LOAD16_BYTE("4.22h",   0x0c0001, 0x10000, CRC(5751d4e7) SHA1(2e1a30c20199461fd876849f7563fef1d9a80c2d) )
 	ROM_LOAD16_BYTE("1.18f",   0x0e0000, 0x10000, CRC(8e7b15cc) SHA1(7e4766953c1adf04be18207a2aa6f5e861ea5f6c) )
 	ROM_LOAD16_BYTE("3.21f",   0x0e0001, 0x10000, CRC(e784b1fa) SHA1(3f41d31e0b36b9a2fab5e9998bb4146dfa0a97eb) )
 
-	ROM_REGION( 0x100000, "sub", 0 ) /* v20 sub cpu */
+	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE("5.6bh",   0x0e0000, 0x10000, CRC(9c69eb35) SHA1(d5a9714f279b71c419b4bae0f142c4cb1cc8d30e) )
 	ROM_LOAD16_BYTE("6.9b",    0x0e0001, 0x10000, CRC(34a44ce5) SHA1(621c69d8778d4c96ac3be06b033a5931a6a23da2) )
 
@@ -314,13 +314,13 @@ ROM_START( deadang )
 ROM_END
 
 ROM_START( leadang )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* v20 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("2.18h",   0x0c0000, 0x10000, CRC(611247e0) SHA1(1b9ad50f67ba3a3a9e5a0d6e33f4d4be2fc20446) ) // sldh
 	ROM_LOAD16_BYTE("4.22h",   0x0c0001, 0x10000, CRC(348c1201) SHA1(277dd77dcbc950299de0fd56a4f66db8f90752ad) ) // sldh
 	ROM_LOAD16_BYTE("1.18f",   0x0e0000, 0x10000, CRC(fb952d71) SHA1(c6578cddf019872e6005c3a9e8e3e024d17d8c6e) ) // sldh
 	ROM_LOAD16_BYTE("3.22f",   0x0e0001, 0x10000, CRC(2271c6df) SHA1(774a92bb698606e58d0c74ea07d7eaecf766dddf) )
 
-	ROM_REGION( 0x100000, "sub", 0 ) /* v20 sub cpu */
+	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE("5.6b",    0x0e0000, 0x10000, CRC(9c69eb35) SHA1(d5a9714f279b71c419b4bae0f142c4cb1cc8d30e) )
 	ROM_LOAD16_BYTE("6.9b",    0x0e0001, 0x10000, CRC(34a44ce5) SHA1(621c69d8778d4c96ac3be06b033a5931a6a23da2) )
 
@@ -361,13 +361,13 @@ ROM_START( leadang )
 ROM_END
 
 ROM_START( ghunter )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* v20 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("ggh-2.h18",   0x0c0000, 0x10000, CRC(7ccc6fee) SHA1(bccc283d82f080157f0521457b04fdd1d63caafe) )
 	ROM_LOAD16_BYTE("ggh-4.h22",   0x0c0001, 0x10000, CRC(d1f23ad7) SHA1(2668729af797ccab52ac2bf519d43ab2fa9e54ce) )
 	ROM_LOAD16_BYTE("ggh-1.f18",   0x0e0000, 0x10000, CRC(0d6ff111) SHA1(209d26170446b43d1d463737b447e30aaca614a7) )
 	ROM_LOAD16_BYTE("ggh-3.f22",   0x0e0001, 0x10000, CRC(66dec38d) SHA1(78dd3143265c3da90d1a0ab2c4f42b4e32716af8) )
 
-	ROM_REGION( 0x100000, "sub", 0 ) /* v20 sub cpu */
+	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE("ggh-5.b6",   0x0e0000, 0x10000, CRC(1f612f3b) SHA1(71840fa0e988828a819d371f082ce31d5a5e3a30) )
 	ROM_LOAD16_BYTE("ggh-6.b10",  0x0e0001, 0x10000, CRC(63e18e56) SHA1(5183d0909a7c795e76540723fb710a5a75730298) )
 
@@ -428,6 +428,6 @@ DRIVER_INIT_MEMBER(deadang_state,ghunter)
 
 /* Game Drivers */
 
-GAME( 1988, deadang, 0,       deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu", "Dead Angle", 0 )
-GAME( 1988, leadang, deadang, deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu", "Lead Angle (Japan)", 0 )
-GAME( 1988, ghunter, deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter (Spain)", 0 )
+GAME( 1988, deadang, 0,       deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu", "Dead Angle", GAME_SUPPORTS_SAVE )
+GAME( 1988, leadang, deadang, deadang, deadang, deadang_state, deadang, ROT0, "Seibu Kaihatsu", "Lead Angle (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ghunter, deadang, deadang, ghunter, deadang_state, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter (Spain)", GAME_SUPPORTS_SAVE )

@@ -21,6 +21,7 @@ Notes:
 
 void timelimt_state::machine_start()
 {
+	save_item(NAME(m_nmi_enabled));
 }
 
 void timelimt_state::machine_reset()
@@ -44,8 +45,8 @@ WRITE8_MEMBER(timelimt_state::sound_reset_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     /* rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM     /* ram */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_SHARE("videoram") /* video ram */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(timelimt_bg_videoram_w) AM_SHARE("bg_videoram")/* background ram */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") /* video ram */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")/* background ram */
 	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
@@ -54,9 +55,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_reset_w)/* sound reset ? */
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_byte_w) /* sound write */
 	AM_RANGE(0xb800, 0xb800) AM_READNOP     /* NMI ack? */
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(timelimt_scroll_x_lsb_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(timelimt_scroll_x_msb_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(timelimt_scroll_y_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(scroll_x_lsb_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(scroll_x_msb_w)
+	AM_RANGE(0xc802, 0xc802) AM_WRITE(scroll_y_w)
 	AM_RANGE(0xc803, 0xc803) AM_WRITENOP        /* ???? bit 0 used only */
 	AM_RANGE(0xc804, 0xc804) AM_WRITENOP        /* ???? not used */
 ADDRESS_MAP_END
@@ -204,7 +205,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(timelimt_state::timelimt_irq)
+INTERRUPT_GEN_MEMBER(timelimt_state::irq)
 {
 	if ( m_nmi_enabled )
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -218,7 +219,7 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timelimt_state,  timelimt_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", timelimt_state,  irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -234,7 +235,7 @@ static MACHINE_CONFIG_START( timelimt, timelimt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update_timelimt)
+	MCFG_SCREEN_UPDATE_DRIVER(timelimt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timelimt)
@@ -317,5 +318,5 @@ ROM_START( progress )
 	ROM_LOAD( "57.bin", 0x0040, 0x0020, CRC(18455a79) SHA1(e4d64368560e3116a922588129f5f91a4c520f7d) )
 ROM_END
 
-GAME( 1983, timelimt, 0, timelimt, timelimt, driver_device, 0, ROT90, "Chuo Co. Ltd", "Time Limit", GAME_IMPERFECT_COLORS )
-GAME( 1984, progress, 0, timelimt, progress, driver_device, 0, ROT90, "Chuo Co. Ltd", "Progress", 0 )
+GAME( 1983, timelimt, 0, timelimt, timelimt, driver_device, 0, ROT90, "Chuo Co. Ltd", "Time Limit", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1984, progress, 0, timelimt, progress, driver_device, 0, ROT90, "Chuo Co. Ltd", "Progress", GAME_SUPPORTS_SAVE )

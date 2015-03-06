@@ -26,8 +26,8 @@ public:
 	// construction/destruction
 	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_BIG, 16, prgwidth, 0, program)
-		, m_data_config("data", ENDIANNESS_BIG, 8, datawidth, 0, data)
+		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, 0, program)
+		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
 		, m_prgwidth(prgwidth-1)
 		, m_datawidth(datawidth)
 		, m_stack_levels(stack_levels)
@@ -68,12 +68,16 @@ protected:
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
+	int m_xmask;
 	int m_stack_levels; // number of callstack levels
 	UINT16 m_stack[4];  // max 4
 	UINT16 m_op;
+	UINT16 m_prev_op;
+	UINT16 m_arg;
 	int m_icount;
 	
 	UINT16 m_pc;        // Program Counter
+	UINT8 m_page;       // LPU prepared page
 	UINT8 m_a;          // 4-bit Accumulator
 	UINT8 m_b;          // 4-bit B register
 	UINT8 m_x;          // 1/3/4-bit X register
@@ -86,6 +90,15 @@ protected:
 	// i/o handlers
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
+
+	// misc internal helpers
+	void increment_pc();
+	void fetch_arg();
+
+	UINT8 ram_r();
+	void ram_w(UINT8 data);
+	void pop_stack();
+	void push_stack();
 
 	// opcode handlers
 	void op_lab();
@@ -104,7 +117,7 @@ protected:
 	void op_ayy();
 	void op_syy();
 	void op_xspx();
-	void op_sxpy();
+	void op_xspy();
 	void op_xspxy();
 
 	void op_lam();

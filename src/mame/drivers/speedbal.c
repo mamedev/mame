@@ -33,7 +33,14 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 #include "includes/speedbal.h"
 #include "speedbal.lh"
 
-WRITE8_MEMBER(speedbal_state::speedbal_coincounter_w)
+
+void speedbal_state::machine_start()
+{
+	save_item(NAME(m_leds_start));
+	save_item(NAME(m_leds_shiftreg));
+}
+
+WRITE8_MEMBER(speedbal_state::coincounter_w)
 {
 	coin_counter_w(machine(), 0, data & 0x80);
 	coin_counter_w(machine(), 1, data & 0x40);
@@ -44,16 +51,16 @@ WRITE8_MEMBER(speedbal_state::speedbal_coincounter_w)
 static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0x0000, 0xdbff) AM_ROM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xf600, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(speedbal_state::speedbal_maincpu_50_w)
+WRITE8_MEMBER(speedbal_state::maincpu_50_w)
 {
-	//logerror("%s: speedbal_maincpu_50_w %02x\n", this->machine().describe_context(), data);
+	//logerror("%s: maincpu_50_w %02x\n", this->machine().describe_context(), data);
 }
 
 static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
@@ -62,8 +69,8 @@ static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("P2")
-	AM_RANGE(0x40, 0x40) AM_WRITE(speedbal_coincounter_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(speedbal_maincpu_50_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(coincounter_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(maincpu_50_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, speedbal_state )
@@ -264,7 +271,7 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update_speedbal)
+	MCFG_SCREEN_UPDATE_DRIVER(speedbal_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedbal)
@@ -375,5 +382,5 @@ DRIVER_INIT_MEMBER(speedbal_state,musicbal)
 
 
 
-GAMEL( 1987, speedbal, 0,        speedbal, speedbal, speedbal_state, speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball", 0, layout_speedbal )
-GAMEL( 1988, musicbal, 0,        speedbal, musicbal, speedbal_state, musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", 0, layout_speedbal )
+GAMEL( 1987, speedbal, 0,        speedbal, speedbal, speedbal_state, speedbal, ROT270, "Tecfri / Desystem S.A.", "Speed Ball", GAME_SUPPORTS_SAVE, layout_speedbal )
+GAMEL( 1988, musicbal, 0,        speedbal, musicbal, speedbal_state, musicbal, ROT270, "Tecfri / Desystem S.A.", "Music Ball", GAME_SUPPORTS_SAVE, layout_speedbal )

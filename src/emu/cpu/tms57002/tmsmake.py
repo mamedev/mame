@@ -269,8 +269,7 @@ class Instruction:
                 if v in flags_fixed:
                     #print "@@@@", f
                     vals.append("%s=%d" % (v, flags_fixed[v]))
-            out = []
-            out.append("case %d: // %s %s" % (no, self._name, " ".join(vals)))
+            out = ["case %d: // %s %s" % (no, self._name, " ".join(vals))]
             for line in self.PreprocessRunString():
                 out.append(self.ExpandCintrp(line, flags_fixed))
             out.append("  break;")
