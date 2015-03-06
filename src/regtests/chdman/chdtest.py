@@ -30,10 +30,17 @@ def compareInfo(info1, info2):
 def sha1sum(path):
 	if not os.path.exists(path):
 		return ""
-	sha1 = hashlib.sha1()
-	f = open(path, 'r')
-	sha1.update(f.read())
-	f.close()
+	f = open(path, 'rb')
+	try:
+		sha1 = hashlib.sha1()
+		while True:
+			data = f.read(8192)
+			if data:
+				sha1.update(data)
+			else:
+				break
+	finally:
+		f.close()
 	return sha1.hexdigest()
 
 def extractcdAndCompare(type):
