@@ -31,13 +31,13 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<3> m_inp_matrix; // max 3
+	optional_ioport_array<7> m_inp_matrix; // max 7
 	optional_device<speaker_sound_device> m_speaker;
 	
 	// misc common
 	UINT16 m_inp_mux;
 
-	UINT8 read_inputs(int columns);
+	UINT16 read_inputs(int columns);
 
 	virtual void machine_start();
 
@@ -59,6 +59,9 @@ public:
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// game-specific handlers
+	DECLARE_WRITE8_MEMBER(alnattck_plate_w);
+	DECLARE_READ16_MEMBER(alnattck_d_r);
+	DECLARE_WRITE16_MEMBER(alnattck_d_w);
 };
 
 
@@ -160,9 +163,9 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 set
 }
 
 
-UINT8 hh_hmcs40_state::read_inputs(int columns)
+UINT16 hh_hmcs40_state::read_inputs(int columns)
 {
-	UINT8 ret = 0;
+	UINT16 ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -190,7 +193,63 @@ UINT8 hh_hmcs40_state::read_inputs(int columns)
 
 ***************************************************************************/
 
+WRITE8_MEMBER(hh_hmcs40_state::alnattck_plate_w)
+{
+	// R0x-R3x, D0-D3: vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT32 plate = BITSWAP16((UINT16)m_plate,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15) | (m_plate & 0xf0000);
+	
+	display_matrix(20, 10, plate, m_grid);
+}
+
+READ16_MEMBER(hh_hmcs40_state::alnattck_d_r)
+{
+	// D5: inputs
+	return (offset == 5) ? (read_inputs(7) << 5 & 0x20) : 0;
+}
+
+WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
+{
+	// D4: speaker out
+	m_speaker->level_w(data >> 4 & 1);
+	
+	// D7-D13: input mux
+	m_inp_mux = data >> 7 & 0x7f;
+
+	// D6-D15: vfd matrix grid
+	m_grid = data >> 6 & 0x3ff;
+	
+	// D0-D3: plate 16-19 (update display there)
+	alnattck_plate_w(space, 4, data & 0xf);
+}
+
+
 static INPUT_PORTS_START( alnattck )
+	PORT_START("IN.0") // D5 D7
+	PORT_CONFNAME( 0x01, 0x00, "Skill" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+
+	PORT_START("IN.1") // D5 D8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+
+	PORT_START("IN.2") // D5 D9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.3") // D5 D10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.4") // D5 D11
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN.5") // D5 D12
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Move")
+
+	PORT_START("IN.6") // D5 D13
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
 
@@ -199,7 +258,7 @@ static MACHINE_CONFIG_START( alnattck, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_alnattck)
 
 	/* no video! */
