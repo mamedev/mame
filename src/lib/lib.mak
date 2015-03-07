@@ -616,6 +616,7 @@ BGFXOBJS = \
 	$(LIBOBJ)/bgfx/renderer_d3d9.o \
 	$(LIBOBJ)/bgfx/renderer_gl.o \
 	$(LIBOBJ)/bgfx/renderer_null.o \
+	$(LIBOBJ)/bgfx/renderer_vk.o \
 	$(LIBOBJ)/bgfx/renderdoc.o \
 	$(LIBOBJ)/bgfx/vertexdecl.o \
 	$(LIBOBJ)/bgfx/common/bgfx_utils.o \

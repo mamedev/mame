@@ -125,9 +125,10 @@
 #	ifndef NOMINMAX
 #		define NOMINMAX
 #	endif // NOMINMAX
-#	if defined(_MSC_VER) && (_MSC_VER >= 1700)
+//  If _USING_V110_SDK71_ is defined it means we are using the v110_xp or v120_xp toolset.
+#	if defined(_MSC_VER) && (_MSC_VER >= 1700) && (!_USING_V110_SDK71_)
 #		include <winapifamily.h>
-#	endif // defined(_MSC_VER) && (_MSC_VER >= 1700)
+#	endif // defined(_MSC_VER) && (_MSC_VER >= 1700) && (!_USING_V110_SDK71_)
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #		undef  BX_PLATFORM_WINDOWS
 #		if !defined(WINVER) && !defined(_WIN32_WINNT)

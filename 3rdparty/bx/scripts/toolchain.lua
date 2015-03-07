@@ -40,6 +40,8 @@ function toolchain(_buildDir, _libDir)
 		allowed = {
 			{ "vs2012-clang",  "Clang 3.6"         },
 			{ "vs2013-clang",  "Clang 3.6"         },
+			{ "vs2012-xp", 	   "Visual Studio 2012 targeting XP" },
+			{ "vs2013-xp", 	   "Visual Studio 2013 targeting XP" },
 			{ "winphone8",     "Windows Phone 8.0" },
 			{ "winphone81",    "Windows Phone 8.1" },
 		},
@@ -291,6 +293,17 @@ function toolchain(_buildDir, _libDir)
 			platforms { "ARM" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-winphone81"))
 		end
+
+		if ("vs2012-xp") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("v110_xp")
+			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
+		end
+		
+		if ("vs2013-xp") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("v120_xp")
+			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
+		end
+		
 	elseif _ACTION == "xcode4" then
 
 		if "osx" == _OPTIONS["xcode"] then
