@@ -658,12 +658,15 @@ void hmcs40_cpu_device::op_p()
 	// destination is determined by the 2 highest bits
 	if (o & 0x100)
 	{
-		m_a = o & 0xf;
+		// B3 B2 B1 B0 A0 A1 A2 A3
+		m_a = BITSWAP8((UINT8)o,7,6,5,4,0,1,2,3) & 0xf;
 		m_b = o >> 4 & 0xf;
 	}
 	if (o & 0x200)
 	{
-		write_r(2, o >> 4 & 0xf);
-		write_r(3, o & 0xf);
+		// R20 R21 R22 R23 R30 R31 R32 R33
+		o = BITSWAP8((UINT8)o,0,1,2,3,4,5,6,7);
+		write_r(2, o & 0xf);
+		write_r(3, o >> 4 & 0xf);
 	}
 }
