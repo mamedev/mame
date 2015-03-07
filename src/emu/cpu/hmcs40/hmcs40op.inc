@@ -4,13 +4,13 @@
 
 inline UINT8 hmcs40_cpu_device::ram_r()
 {
-	UINT8 address = (m_x << 4 | m_y) & m_datamask;
+	UINT16 address = (m_x << 4 | m_y) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
 inline void hmcs40_cpu_device::ram_w(UINT8 data)
 {
-	UINT8 address = (m_x << 4 | m_y) & m_datamask;
+	UINT16 address = (m_x << 4 | m_y) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -49,15 +49,16 @@ UINT8 hmcs40_cpu_device::read_r(int index)
 	}
 	
 	if (m_is_cmos)
-		return inp & m_r[index];
+		return (inp & m_r[index]) & 0xf;
 	else
-		return inp | m_r[index];
+		return (inp | m_r[index]) & 0xf;
 }
 
 void hmcs40_cpu_device::write_r(int index, UINT8 data)
 {
 	index &= 7;
-	m_r[index] = data & 0xf;
+	data &= 0xf;
+	m_r[index] = data;
 	
 	switch (index)
 	{
@@ -86,7 +87,7 @@ void hmcs40_cpu_device::write_d(int index, int state)
 {
 	index &= 15;
 	
-	m_d = (m_d & ~(1 << index)) | (state << index);
+	m_d = (m_d & ~(1 << index)) | (((state) ? 1 : 0) << index);
 	m_write_d(index, m_d, 0xffff);
 }
 
@@ -96,9 +97,11 @@ void hmcs40_cpu_device::write_d(int index, int state)
 
 UINT8 hmcs43_cpu_device::read_r(int index)
 {
-	if ((index & 7) >= 4)
-		logerror("%s read from unknown port R%d at $%04X\n", tag(), index & 7, m_prev_pc << 1);
+	index &= 7;
 	
+	if (index >= 2)
+		logerror("%s read from %s port R%d at $%04X\n", tag(), (index >= 4) ? "unknown" : "output", index, m_prev_pc << 1);
+
 	return hmcs40_cpu_device::read_r(index);
 }
 
@@ -114,8 +117,13 @@ void hmcs43_cpu_device::write_r(int index, UINT8 data)
 
 int hmcs43_cpu_device::read_d(int index)
 {
-	if ((index & 15) >= 4)
+	index &= 15;
+	
+	if (index >= 4)
+	{
+		logerror("%s read from output pin D%d at $%04X\n", tag(), index, m_prev_pc << 1);
 		return m_d >> index & 1;
+	}
 	else
 		return hmcs40_cpu_device::read_d(index);
 }
@@ -126,8 +134,10 @@ int hmcs43_cpu_device::read_d(int index)
 
 UINT8 hmcs44_cpu_device::read_r(int index)
 {
-	if ((index & 7) >= 6)
-		logerror("%s read from unknown port R%d at $%04X\n", tag(), index & 7, m_prev_pc << 1);
+	index &= 7;
+	
+	if (index >= 6)
+		logerror("%s read from unknown port R%d at $%04X\n", tag(), index, m_prev_pc << 1);
 	
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -148,8 +158,10 @@ void hmcs44_cpu_device::write_r(int index, UINT8 data)
 
 UINT8 hmcs45_cpu_device::read_r(int index)
 {
-	if ((index & 7) == 7)
-		logerror("%s read from unknown port R%d at $%04X\n", tag(), index & 7, m_prev_pc << 1);
+	index &= 7;
+	
+	if (index >= 6)
+		logerror("%s read from %s port R%d at $%04X\n", tag(), (index == 7) ? "unknown" : "output", index, m_prev_pc << 1);
 	
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -215,7 +227,7 @@ void hmcs40_cpu_device::op_xamr()
 	// determine MR(Memory Register) location
 	UINT8 y = m_op & 0xf;
 	UINT8 x = (y > 3) ? 0xf : (y + 12);
-	UINT8 address = (x << 4 | y) & m_datamask;
+	UINT16 address = (x << 4 | y) & m_datamask;
 	
 	UINT8 old_a = m_a;
 	m_a = m_data->read_byte(address) & 0xf;
@@ -555,7 +567,7 @@ void hmcs40_cpu_device::op_rem()
 void hmcs40_cpu_device::op_tm()
 {
 	// TM n: Test Memory Bit
-	m_s = ((ram_r() & (1 << (m_op & 3))) != 0);
+	m_s = ram_r() >> (m_op & 3) & 1;
 }
 
 
@@ -594,7 +606,8 @@ void hmcs40_cpu_device::op_lpu()
 void hmcs40_cpu_device::op_tbr()
 {
 	// TBR p: Table Branch
-	m_pc = (m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9) & m_pcmask;
+	UINT16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
+	m_pc = address & m_pcmask;
 }
 
 void hmcs40_cpu_device::op_rtn()
@@ -781,7 +794,7 @@ void hmcs40_cpu_device::op_p()
 {
 	// P p: Pattern Generation
 	m_icount--;
-	UINT16 address = (m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9) | (m_pc & ~0x3f);
+	UINT16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
 	UINT16 o = m_program->read_word((address & m_prgmask) << 1);
 	
 	// destination is determined by the 2 highest bits
