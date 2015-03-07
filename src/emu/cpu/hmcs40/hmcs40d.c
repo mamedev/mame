@@ -75,6 +75,15 @@ static const UINT32 s_flags[] =
 	0, 0
 };
 
+// next program counter in sequence (relative)
+static const INT8 s_next_pc[0x40] =
+{
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32+1,
+	-32, -31, -30, -29, -28, -27, -26, -25, -24, -23, -22, -21, -20, -19, -18, -17,
+	-15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, -1
+};
+
 
 static const UINT8 hmcs40_mnemonic[0x400] =
 {
@@ -171,9 +180,7 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 
 CPU_DISASSEMBLE(hmcs40)
 {
-	int pos = 0;
-	UINT16 op = (oprom[pos] | oprom[pos + 1] << 8) & 0x3ff;
-	pos++;
+	UINT16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
 	char *dst = buffer;
 	UINT8 instr = hmcs40_mnemonic[op];
 	INT8 bits = s_bits[instr];
@@ -201,6 +208,7 @@ CPU_DISASSEMBLE(hmcs40)
 		else
 			dst += sprintf(dst, "%d", param);
 	}
-
+	
+	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
 }
