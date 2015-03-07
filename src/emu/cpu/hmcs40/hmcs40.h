@@ -15,13 +15,13 @@
 // I/O ports setup
 
 // max 8 4-bit R ports
-#define MCFG_HMCS40_READ_R_CB(_r, _devcb) \
-	hmcs40_cpu_device::set_read_r##_r_callback(*device, DEVCB_##_devcb);
-#define MCFG_HMCS40_WRITE_R_CB(_r, _devcb) \
-	hmcs40_cpu_device::set_write_r##_r_callback(*device, DEVCB_##_devcb);
+#define MCFG_HMCS40_READ_R_CB(R, _devcb) \
+	hmcs40_cpu_device::set_read_r##R##_callback(*device, DEVCB_##_devcb);
+#define MCFG_HMCS40_WRITE_R_CB(R, _devcb) \
+	hmcs40_cpu_device::set_write_r##R##_callback(*device, DEVCB_##_devcb);
 
 // 16-bit discrete
-#define MCFG_HMCS40_READ_A_CB(_devcb) \
+#define MCFG_HMCS40_READ_D_CB(_devcb) \
 	hmcs40_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
 #define MCFG_HMCS40_WRITE_D_CB(_devcb) \
 	hmcs40_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
@@ -143,6 +143,8 @@ protected:
 	virtual void write_d(int index, int state);
 
 	// opcode handlers
+	void op_illegal();
+
 	void op_lab();
 	void op_lba();
 	void op_lay();
@@ -158,9 +160,7 @@ protected:
 	void op_dy();
 	void op_ayy();
 	void op_syy();
-	void op_xspx();
-	void op_xspy();
-	void op_xspxy();
+	void op_xsp();
 
 	void op_lam();
 	void op_lbm();
@@ -238,9 +238,6 @@ protected:
 	void op_lra();
 	void op_lrb();
 	void op_p();
-
-	void op_nop();
-	void op_illegal();
 };
 
 

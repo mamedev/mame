@@ -170,6 +170,12 @@ void hmcs45_cpu_device::write_r(int index, UINT8 data)
 
 // instruction set
 
+void hmcs40_cpu_device::op_illegal()
+{
+	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc << 1);
+}
+
+
 // Register-to-Register Instruction
 
 void hmcs40_cpu_device::op_lab()
@@ -273,27 +279,21 @@ void hmcs40_cpu_device::op_syy()
 	m_y &= 0xf;
 }
 
-void hmcs40_cpu_device::op_xspx()
+void hmcs40_cpu_device::op_xsp()
 {
-	// XSPX: Exchange X and SPX
-	UINT8 old_x = m_x;
-	m_x = m_spx;
-	m_spx = old_x;
-}
-
-void hmcs40_cpu_device::op_xspy()
-{
-	// XSPY: Exchange Y and SPY
-	UINT8 old_y = m_y;
-	m_y = m_spy;
-	m_spy = old_y;
-}
-
-void hmcs40_cpu_device::op_xspxy()
-{
-	// XSPXY: Exchange X and SPX, Y and SPY
-	op_xspx();
-	op_xspy();
+	// XSP (XY): Exchange X and SPX, Y and SPY, or NOP if 0
+	if (m_op & 1)
+	{
+		UINT8 old_x = m_x;
+		m_x = m_spx;
+		m_spx = old_x;
+	}
+	if (m_op & 2)
+	{
+		UINT8 old_y = m_y;
+		m_y = m_spy;
+		m_spy = old_y;
+	}
 }
 
 
@@ -303,14 +303,14 @@ void hmcs40_cpu_device::op_lam()
 {
 	// LAM (XY): Load A from Memory
 	m_a = ram_r();
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lbm()
 {
 	// LBM (XY): Load B from Memory
 	m_b = ram_r();
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_xma()
@@ -319,7 +319,7 @@ void hmcs40_cpu_device::op_xma()
 	UINT8 old_a = m_a;
 	m_a = ram_r();
 	ram_w(old_a);
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_xmb()
@@ -328,7 +328,7 @@ void hmcs40_cpu_device::op_xmb()
 	UINT8 old_b = m_b;
 	m_b = ram_r();
 	ram_w(old_b);
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lmaiy()
@@ -336,7 +336,7 @@ void hmcs40_cpu_device::op_lmaiy()
 	// LMAIY (X): Load Memory from A, Increment Y
 	ram_w(m_a);
 	op_iy();
-	op_xspx();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lmady()
@@ -344,7 +344,7 @@ void hmcs40_cpu_device::op_lmady()
 	// LMADY (X): Load Memory from A, Decrement Y
 	ram_w(m_a);
 	op_dy();
-	op_xspx();
+	op_xsp();
 }
 
 
@@ -795,18 +795,4 @@ void hmcs40_cpu_device::op_p()
 		write_r(2, o >> 4 & 0xf);
 		write_r(3, o & 0xf);
 	}
-}
-
-
-// Control Instruction
-
-void hmcs40_cpu_device::op_nop()
-{
-	// NOP: No Operation
-}
-
-
-void hmcs40_cpu_device::op_illegal()
-{
-	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc << 1);
 }

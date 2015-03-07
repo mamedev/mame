@@ -257,6 +257,12 @@ static MACHINE_CONFIG_START( alnattck, hh_hmcs40_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(hh_hmcs40_state, alnattck_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, alnattck_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, alnattck_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, alnattck_plate_w))
+	MCFG_HMCS40_READ_D_CB(READ16(hh_hmcs40_state, alnattck_d_r))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, alnattck_d_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_alnattck)
