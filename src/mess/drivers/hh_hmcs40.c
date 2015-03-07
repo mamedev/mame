@@ -208,7 +208,7 @@ WRITE8_MEMBER(hh_hmcs40_state::alnattck_plate_w)
 READ16_MEMBER(hh_hmcs40_state::alnattck_d_r)
 {
 	// D5: inputs
-	return (offset == 5) ? (read_inputs(7) << 5 & 0x20) : 0;
+	return (read_inputs(7) & 1) << 5;
 }
 
 WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
@@ -321,14 +321,16 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( alnattck )
-	ROM_REGION( 0x1100, "maincpu", 0 )
-	ROM_LOAD( "hd38800a25", 0x0000, 0x1100, CRC(18b50869) SHA1(11e9d5f7b4ae818b077b0ee14a3b43190e20bff3) )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800a25", 0x0000, 0x1000, CRC(18b50869) SHA1(11e9d5f7b4ae818b077b0ee14a3b43190e20bff3) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
 ROM_END
 
 
 ROM_START( tmtron )
-	ROM_REGION( 0x1100, "maincpu", 0 )
-	ROM_LOAD( "hd38800a88", 0x0000, 0x1100, CRC(33db9670) SHA1(d6f747a59356526698784047bcfdbb59e79b9a23) )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800a88", 0x0000, 0x1000, CRC(33db9670) SHA1(d6f747a59356526698784047bcfdbb59e79b9a23) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
 ROM_END
 
 

@@ -4,13 +4,13 @@
 
 inline UINT8 hmcs40_cpu_device::ram_r()
 {
-	UINT16 address = (m_x << 4 | m_y) & m_datamask;
+	UINT8 address = (m_x << 4 | m_y) & m_datamask;
 	return m_data->read_byte(address) & 0xf;
 }
 
 inline void hmcs40_cpu_device::ram_w(UINT8 data)
 {
-	UINT16 address = (m_x << 4 | m_y) & m_datamask;
+	UINT8 address = (m_x << 4 | m_y) & m_datamask;
 	m_data->write_byte(address, data & 0xf);
 }
 
@@ -75,10 +75,18 @@ void hmcs40_cpu_device::op_xamr()
 	// XAMR m: Exchange A and MR(m)
 	
 	// determine MR(Memory Register) location
-	UINT8 y = m_op & 0xf;
-	UINT8 x = (y > 3) ? 0xf : (y + 12);
-	UINT16 address = (x << 4 | y) & m_datamask;
+	UINT8 address = m_op & 0xf;
 	
+	// HMCS42: MR0 on file 0, MR4-MR15 on file 4 (there is no file 1-3)
+	// HMCS43: MR0-MR3 on file 0-3, MR4-MR15 on file 4
+	if (m_family == FAMILY_HMCS42 || m_family == FAMILY_HMCS43)
+		address |= (address < 4) ? (address << 4) : 0x40;
+	
+	// HMCS44/45/46/47: all on last file
+	else
+		address |= 0xf0;
+	
+	address &= m_datamask;
 	UINT8 old_a = m_a;
 	m_a = m_data->read_byte(address) & 0xf;
 	m_data->write_byte(address, old_a & 0xf);

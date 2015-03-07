@@ -67,12 +67,12 @@ const device_type HD44828 = &device_creator<hd44828_device>; // CMOS version, lo
 // internal memory maps
 static ADDRESS_MAP_START(program_1k, AS_PROGRAM, 16, hmcs40_cpu_device)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x043f) AM_ROM
+	AM_RANGE(0x0780, 0x07bf) AM_ROM // patterns on page 30
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_2k, AS_PROGRAM, 16, hmcs40_cpu_device)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x087f) AM_ROM
+	AM_RANGE(0x0f40, 0x0fbf) AM_ROM // patterns on page 61,62
 ADDRESS_MAP_END
 
 
