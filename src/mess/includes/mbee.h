@@ -49,10 +49,10 @@ public:
 		, m_pak(*this, "pak")
 		, m_telcom(*this, "telcom")
 		, m_basic(*this, "basic")
-		, m_io_extra(*this, "EXTRA")
-		, m_io_config(*this, "CONFIG")
+		, m_io_x7(*this, "X.7")
 		, m_io_oldkb(*this, "X")
 		, m_io_newkb(*this, "Y")
+		, m_io_config(*this, "CONFIG")
 		, m_screen(*this, "screen")
 	{ }
 
@@ -164,10 +164,10 @@ private:
 	optional_memory_bank m_pak;
 	optional_memory_bank m_telcom;
 	optional_memory_bank m_basic;
-	optional_ioport m_io_extra;
-	required_ioport m_io_config;
+	optional_ioport m_io_x7;
 	optional_ioport_array<8> m_io_oldkb;
 	optional_ioport_array<15> m_io_newkb;
+	required_ioport m_io_config;
 	required_device<screen_device> m_screen;
 };
 

@@ -156,28 +156,47 @@ void mbee_state::oldkb_matrix_r(UINT16 offs)
 {
 	if (m_has_oldkb)
 	{
+		offs &= 0x3f0; // safety check
 		UINT8 port = (offs >> 7) & 7;
 		UINT8 bit = (offs >> 4) & 7;
+		UINT8 extra = 0;
 		UINT8 data = m_io_oldkb[port]->read();
+		if ((port == 0) || (port == 2) || (port == 3))
+			extra = m_io_x7->read();
+		else
+		if (port == 7)
+			extra = data;
+		
 		bool keydown  = ( data >> bit ) & 1;
 
-		// This adds premium-style cursor keys to the old keyboard
-		// They are used by the pc85 & ppc menu, and the 128k shell.
-		if (!keydown)
+		// This adds premium-style cursor keys to the old keyboard.
+		// They are used by the pc85 menu. Premium keyboards already
+		// have these keys fitted.
+		if (!keydown && !m_is_premium && extra)
 		{
-			UINT8 extra = m_io_extra->read();
-
-			if (extra && port == 7 && bit == 1) keydown = 1;   /* Control */
-
-			if (BIT(extra, 0) && ( port == 0 && bit == 5 )) keydown = 1; // cursor up = ^E
+			if BIT(extra, 0) // cursor up
+			{
+				if( port == 7 && bit == 1 ) keydown = 1;
+				if( port == 0 && bit == 5 ) keydown = 1; // control E
+			}
 			else
-			if (BIT(extra, 1) && ( port == 3 && bit == 0 )) keydown = 1; // cursor down = ^X
+			if BIT(extra, 2) // cursor down
+			{
+				if( port == 7 && bit == 1 ) keydown = 1;
+				if( port == 3 && bit == 0 ) keydown = 1; // control X
+			}
 			else
-			if (BIT(extra, 2) && ( port == 2 && bit == 3 )) keydown = 1; // cursor left = ^S
+			if BIT(extra, 3) // cursor left
+			{
+				if( port == 7 && bit == 1 ) keydown = 1;
+				if( port == 2 && bit == 3 ) keydown = 1; // control S
+			}
 			else
-			if (BIT(extra, 3) && ( port == 0 && bit == 4 )) keydown = 1; // cursor right = ^D
-			else
-			if (BIT(extra, 4) && ( port == 2 && bit == 6 )) keydown = 1; // insert = ^V
+			if BIT(extra, 6) // cursor right
+			{
+				if( port == 7 && bit == 1 ) keydown = 1;
+				if( port == 0 && bit == 4 ) keydown = 1; // control D
+			}
 		}
 
 		if( keydown )
