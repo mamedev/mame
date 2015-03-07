@@ -84,14 +84,17 @@ public:
 
 	// brickzn
 	DECLARE_READ8_MEMBER(brickzn_cheats_r);
-	DECLARE_WRITE8_MEMBER(brickzn_multi_w);
-	DECLARE_WRITE8_MEMBER(brickzn_prot_w);
-	DECLARE_WRITE8_MEMBER(brickzn_prot2_w);
+	DECLARE_WRITE8_MEMBER(brickzn_leds_w);
+	DECLARE_WRITE8_MEMBER(brickzn_palbank_w);
+	DECLARE_WRITE8_MEMBER(brickzn_sprbank_w);
 	DECLARE_WRITE8_MEMBER(brickzn_rombank_w);
-	DECLARE_WRITE8_MEMBER(brickzn_enab_palram_w);
-	DECLARE_WRITE8_MEMBER(brickzn_disab_palram_w);
 	DECLARE_WRITE8_MEMBER(brickzn_pcm_w);
 	DECLARE_WRITE8_MEMBER(brickzn_banked_paletteram_w);
+	// brickzn (newer sets)
+	DECLARE_WRITE8_MEMBER(brickzn_prot2_w);
+	DECLARE_WRITE8_MEMBER(brickzn_multi_w);
+	DECLARE_WRITE8_MEMBER(brickzn_enab_palram_w);
+	DECLARE_WRITE8_MEMBER(brickzn_disab_palram_w);
 
 	// hardhea2
 	DECLARE_WRITE8_MEMBER(hardhea2_nmi_w);
