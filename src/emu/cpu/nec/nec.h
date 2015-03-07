@@ -414,10 +414,31 @@ public:
 	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class v33a_device : public nec_common_device
+{
+public:
+	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class v53_device : public nec_common_device
+{
+public:
+	v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class v53a_device : public nec_common_device
+{
+public:
+	v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 extern const device_type V20;
 extern const device_type V30;
 extern const device_type V33;
+extern const device_type V33A;
+extern const device_type V53;
+extern const device_type V53A;
 
 
 #endif

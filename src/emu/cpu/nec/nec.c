@@ -51,8 +51,7 @@
 
 
 
-    V33A = uPD70136A
-
+    V33A = uPD70136A (interrupt vector #s compatible with x86)
     V53A = uPD70236A
 
 
@@ -61,7 +60,7 @@
         V20, V30, V40, V50 have dedicated emulation instructions
             (BRKEM, RETEM, CALLN)
 
-        V33A, V53A has dedicated address mode instructions
+        V33 / V33A has dedicated address mode instructions (V53 / V53A are based on those cores with extra peripherals)
             (BRKXA, RETXA)
 
 
@@ -117,6 +116,9 @@ typedef UINT32 DWORD;
 const device_type V20 = &device_creator<v20_device>;
 const device_type V30 = &device_creator<v30_device>;
 const device_type V33 = &device_creator<v33_device>;
+const device_type V33A =&device_creator<v33a_device>;
+const device_type V53 = &device_creator<v53_device>;
+const device_type V53A =&device_creator<v53a_device>;
 
 
 nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, bool is_16bit, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
@@ -151,6 +153,21 @@ v33_device::v33_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+
+v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: nec_common_device(mconfig, V33A, "V33A", tag, owner, clock, "v33A", true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+{
+}
+
+v53_device::v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: nec_common_device(mconfig, V53, "V53", tag, owner, clock, "v53", true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+{
+}
+
+v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: nec_common_device(mconfig, V53A, "V53A", tag, owner, clock, "v53a", true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+{
+}
 
 offs_t nec_common_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {

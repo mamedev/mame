@@ -1,5 +1,6 @@
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"
+#include "cpu/nec/nec.h"
 
 enum
 {
@@ -29,6 +30,7 @@ struct blit_parameters
 	hng64trans_t        drawformat;
 };
 
+#define HNG64_MASTER_CLOCK 50000000
 
 ///////////////
 // 3d Engine //
@@ -101,7 +103,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_comm(*this, "comm"),
+		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
 		m_cart(*this, "cart"),
@@ -337,8 +339,6 @@ public:
 
 	void drawShaded( struct polygon *p);
 
-	void hng64_patch_bios_region(int region);
-
 	void printPacket(const UINT16* packet, int hex);
 	void matmul4(float *product, const float *a, const float *b);
 	void vecmatmul4(float *product, const float *a, const float *b);
@@ -352,6 +352,7 @@ public:
 	UINT8 *m_texturerom;
 	UINT16* m_vertsrom;
 	int m_vertsrom_size;
-
+	void reset_sound();
+	void reset_net();
 };
 
