@@ -59,11 +59,17 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 	m_dblwidth(0),
 	m_gfxdecode(*this),
 	m_palette(*this)
-	//m_bg_ram[0](NULL),
-	//m_bg_ram[1](NULL),
-	//m_bgscroll_ram[0](NULL),
-	//m_bgscroll_ram[1](NULL)
 {
+	for (int i = 0; i < 8; i++)
+		m_ctrl[i] = 0;
+	
+	for (int i = 0; i < 2; i++)
+	{
+		m_bg_ram[i] = NULL;
+		m_bgscroll_ram[i] = NULL;
+		m_bgscrollx[i] = 0;
+		m_bgscrolly[i] = 0;
+	}
 }
 
 //-------------------------------------------------
