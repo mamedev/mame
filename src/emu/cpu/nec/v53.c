@@ -5,11 +5,12 @@
 // Interrupt Controller is uPD71059 equivalent
 // DMA Controller can operate in modes providing a subset of the uPD71071 or uPD71037 functionality (some modes unavailable / settings ignored)
 // Serial Controller is based on the uPD71051 but with some changes
-// Timer Unit is functionally identical to uPD71054
+// Timer Unit is functionally identical to uPD71054 (which in turn is said to be the same as a pit8253)
 
 #include "emu.h"
 #include "v53.h"
 
+#include "machine/pit8253.h"
 const device_type V53 = &device_creator<v53_device>;
 const device_type V53A =&device_creator<v53a_device>;
 
@@ -339,43 +340,16 @@ WRITE8_MEMBER(v53_base_device::scu_simk_w)
 
 /*** TCU ***/
 
-READ8_MEMBER(v53_base_device::tmu_tst0_r)
-{
-	printf("v53: tmu_tst0_r\n");
-	return 0;
-}
+WRITE8_MEMBER(v53_base_device::tmu_tct0_w) { m_pit->write(space, 0, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct1_w) { m_pit->write(space, 1, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct2_w) { m_pit->write(space, 2, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_pit->write(space, 3, data); }
 
-WRITE8_MEMBER(v53_base_device::tmu_tct0_w)
-{
-	printf("v53: tmu_tct0_w %02x\n", data);
-}
 
-READ8_MEMBER(v53_base_device::tmu_tst1_r)
-{
-	printf("v53: tmu_tst1_r\n");
-	return 0;
-}
+READ8_MEMBER(v53_base_device::tmu_tst0_r) {	return m_pit->read(space, 0); }
+READ8_MEMBER(v53_base_device::tmu_tst1_r) {	return m_pit->read(space, 1); }
+READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_pit->read(space, 2); }
 
-WRITE8_MEMBER(v53_base_device::tmu_tct1_w)
-{
-	printf("v53: tmu_tct1_w %02x\n", data);
-}
-
-READ8_MEMBER(v53_base_device::tmu_tst2_r)
-{
-	printf("v53: tmu_tst2_r\n");
-	return 0;
-}
-
-WRITE8_MEMBER(v53_base_device::tmu_tct2_w)
-{
-	printf("v53: tmu_tct2_w %02x\n", data);
-}
-
-WRITE8_MEMBER(v53_base_device::tmu_tmd_w)
-{
-	printf("v53: tmu_tmd_w %02x\n", data);
-}
 
 /* General stuff */
 
@@ -414,9 +388,22 @@ static ADDRESS_MAP_START( v53_internal_port_map, AS_IO, 16, v53_base_device )
 //	AM_RANGE(0xfffe, 0xffff) // (reserved     ,  0xff00) // 0xffff
 ADDRESS_MAP_END
 
+static MACHINE_CONFIG_FRAGMENT( v53 )
+	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
+	MCFG_PIT8253_CLK0(16000000/2/8)
+	//MCFG_PIT8253_OUT0_HANDLER(WRITELINE(v53_base_device, pit_out0))
+MACHINE_CONFIG_END
+
+machine_config_constructor v53_base_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( v53 );
+}
+
+
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
 	: nec_common_device(mconfig, type, name, tag, owner, clock, shortname, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) )
+	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) ),
+	m_pit(*this, "pit")
 {
 }
 

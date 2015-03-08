@@ -3,6 +3,8 @@
 #include "nec.h"
 #include "necpriv.h"
 
+#include "machine/pit8253.h"
+
 class v53_base_device : public nec_common_device
 {
 public:
@@ -76,8 +78,11 @@ public:
 		}
 	}
 
+	required_device<pit8253_device> m_pit;
+
 protected:
 	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
 };
