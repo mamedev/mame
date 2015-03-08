@@ -215,7 +215,7 @@ void v53_base_device::install_peripheral_io()
 		}
 		else // uPD71071 mode
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x0f, read8_delegate(FUNC(upd71071_device::read), (upd71071_device*)m_dma_71071mode), write8_delegate(FUNC(upd71071_device::write),  (upd71071_device*)m_dma_71071mode), 0xffff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x0f, read8_delegate(FUNC(upd71071_v53_device::read), (upd71071_v53_device*)m_dma_71071mode), write8_delegate(FUNC(upd71071_v53_device::write),  (upd71071_v53_device*)m_dma_71071mode), 0xffff);
 		}
 	}
 
@@ -354,10 +354,55 @@ READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_pit->read(space, 2); }
 /*** DMA ***/
 
 // could be wrong / nonexistent 
-int v53_base_device::dmarq(int state, int channel)
+WRITE_LINE_MEMBER(v53_base_device::dreq0_trampoline_w)
 {
-	return m_dma_71071mode->dmarq(state, channel);
+	if (!(m_SCTL & 0x02))
+	{
+		m_dma_71071mode->dreq0_w(state);
+	}
+	else
+	{
+		printf("v53: dreq0 not in 71071mode\n");
+	}
 }
+
+WRITE_LINE_MEMBER(v53_base_device::dreq1_trampoline_w)
+{
+	if (!(m_SCTL & 0x02))
+	{
+		m_dma_71071mode->dreq1_w(state);
+	}
+	else
+	{
+		printf("v53: dreq1 not in 71071mode\n");
+	}
+}
+
+WRITE_LINE_MEMBER(v53_base_device::dreq2_trampoline_w)
+{
+	if (!(m_SCTL & 0x02))
+	{
+		m_dma_71071mode->dreq2_w(state);
+	}
+	else
+	{
+		printf("v53: dreq2 not in 71071mode\n");
+	}
+}
+
+WRITE_LINE_MEMBER(v53_base_device::dreq3_trampoline_w)
+{
+	if (!(m_SCTL & 0x02))
+	{
+		m_dma_71071mode->dreq3_w(state);
+	}
+	else
+	{
+		printf("v53: dreq3 not in 71071mode\n");
+	}
+}
+
+
 
 /* General stuff */
 
@@ -401,14 +446,8 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_PIT8253_CLK0(16000000/2/8)
 	//MCFG_PIT8253_OUT0_HANDLER(WRITELINE(v53_base_device, pit_out0))
 
-	MCFG_DEVICE_ADD("upd71071dma", UPD71071, 0)
-//	MCFG_UPD71071_CPU("audiocpu") // should use owner name
-	MCFG_UPD71071_CLOCK(4000000)
-//	MCFG_UPD71071_DMA_READ_0_CB(READ16(towns_state, towns_fdc_dma_r))
-//	MCFG_UPD71071_DMA_READ_1_CB(READ16(towns_state, towns_scsi_dma_r))
-//	MCFG_UPD71071_DMA_READ_3_CB(READ16(towns_state, towns_cdrom_dma_r))
-//	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(towns_state, towns_fdc_dma_w))
-//	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))
+	MCFG_DEVICE_ADD("upd71071dma", UPD71071_V53, 4000000)
+
 
 MACHINE_CONFIG_END
 

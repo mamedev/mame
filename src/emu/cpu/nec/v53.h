@@ -4,7 +4,7 @@
 #include "necpriv.h"
 
 #include "machine/pit8253.h"
-#include "machine/upd71071.h"
+#include "machine/am9517a.h"
 
 class v53_base_device : public nec_common_device
 {
@@ -80,9 +80,13 @@ public:
 	}
 
 	required_device<pit8253_device> m_pit;
-	required_device<upd71071_device> m_dma_71071mode;
+	required_device<upd71071_v53_device> m_dma_71071mode;
 	
-	int dmarq(int state, int channel); // trampoline to upd71071
+	DECLARE_WRITE_LINE_MEMBER(dreq0_trampoline_w);
+	DECLARE_WRITE_LINE_MEMBER(dreq1_trampoline_w);
+	DECLARE_WRITE_LINE_MEMBER(dreq2_trampoline_w);
+	DECLARE_WRITE_LINE_MEMBER(dreq3_trampoline_w);
+
 
 protected:
 	// device-level overrides

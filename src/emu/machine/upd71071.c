@@ -1,6 +1,8 @@
 
 /*
 
+	am9517a.c is a more complete implementation of this, the uPD71071 appears to be a clone of it
+
     NEC uPD71071 DMA Controller
     Used on the Fujitsu FM-Towns
 
@@ -79,14 +81,6 @@
 	Note, the uPD71071 compatible mode of the V53 CPU differs from a real uPD71071 in the following ways
 
 
-	                           V53     Real uPD71071
-	Software Reqs              No      Yes
-	Memory-to-Memory DMA       No      Yes
-	DMARQ active level         High    High or Low
-	DMAAK active level         Low     High or Low
-	Bus Cycle                  4       4 or 3
-
-	we don't currently handle the differences
 
 */
 

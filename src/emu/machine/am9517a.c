@@ -2,7 +2,11 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    AMD AM9517A/8237A Multimode DMA Controller emulation
+    AMD AM9517A
+	Intel 8237A
+	NEC UPD71071
+	
+	Multimode DMA Controller emulation
 
     Copyright the MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -18,6 +22,22 @@
 
 */
 
+/*
+
+	When the V53 operates in uPD71071 compatible mode there are the following
+	differences from a real uPD71071
+
+	                           V53     Real uPD71071
+	Software Reqs              No      Yes
+	Memory-to-Memory DMA       No      Yes
+	DMARQ active level         High    programmable
+	DMAAK active level         Low     programmable
+	Bus Cycle                  4       4 or 3
+
+	we don't currently handle the differences
+
+*/
+
 #include "am9517a.h"
 
 
@@ -27,7 +47,7 @@
 //**************************************************************************
 
 const device_type AM9517A = &device_creator<am9517a_device>;
-
+const device_type UPD71071_V53 = &device_creator<upd71071_v53_device>;
 
 
 //**************************************************************************
@@ -447,6 +467,34 @@ inline void am9517a_device::end_of_process()
 //  am9517a_device - constructor
 //-------------------------------------------------
 
+
+am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+	: device_t(mconfig, AM9517A, name, tag, owner, clock, shortname, __FILE__),
+		device_execute_interface(mconfig, *this),
+		m_icount(0),
+		m_out_hreq_cb(*this),
+		m_out_eop_cb(*this),
+		m_in_memr_cb(*this),
+		m_out_memw_cb(*this),
+		m_in_ior_0_cb(*this),
+		m_in_ior_1_cb(*this),
+		m_in_ior_2_cb(*this),
+		m_in_ior_3_cb(*this),
+		m_out_iow_0_cb(*this),
+		m_out_iow_1_cb(*this),
+		m_out_iow_2_cb(*this),
+		m_out_iow_3_cb(*this),
+		m_out_dack_0_cb(*this),
+		m_out_dack_1_cb(*this),
+		m_out_dack_2_cb(*this),
+		m_out_dack_3_cb(*this),
+		m_hack(0),
+		m_ready(1),
+		m_command(0)
+{
+}
+
+
 am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock, "am9517a", __FILE__),
 		device_execute_interface(mconfig, *this),
@@ -470,6 +518,11 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 		m_hack(0),
 		m_ready(1),
 		m_command(0)
+{
+}
+
+upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: am9517a_device(mconfig, UPD71071_V53, "UPD71071 (V53)", tag, owner, clock, "upd71071_v53")
 {
 }
 
