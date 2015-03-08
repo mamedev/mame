@@ -21,8 +21,8 @@ enum
 	FAMILY_HMCS47,
 };
 
-#define IS_CMOS true
-#define IS_PMOS false
+#define IS_PMOS 0
+#define IS_CMOS ~0
 
 #include "hmcs40.h"
 #include "debugger.h"
@@ -89,8 +89,8 @@ ADDRESS_MAP_END
 
 
 // device definitions
-hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, is_cmos, 3, 10, 11, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
+hmcs43_cpu_device::hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS43, polarity, 3, 10, 11, ADDRESS_MAP_NAME(program_1k), 7, ADDRESS_MAP_NAME(data_80x4), shortname, __FILE__)
 { }
 
 hd38750_device::hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -107,8 +107,8 @@ hd44758_device::hd44758_device(const machine_config &mconfig, const char *tag, d
 { }
 
 
-hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS44, is_cmos, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+hmcs44_cpu_device::hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS44, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38800_device::hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -125,8 +125,8 @@ hd44808_device::hd44808_device(const machine_config &mconfig, const char *tag, d
 { }
 
 
-hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_cmos, const char *shortname)
-	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS45, is_cmos, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
+hmcs45_cpu_device::hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname)
+	: hmcs40_cpu_device(mconfig, type, name, tag, owner, clock, FAMILY_HMCS45, polarity, 4, 11, 12, ADDRESS_MAP_NAME(program_2k), 8, ADDRESS_MAP_NAME(data_160x4), shortname, __FILE__)
 { }
 
 hd38820_device::hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -185,15 +185,14 @@ void hmcs40_cpu_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 	m_pcmask = (1 << m_pcwidth) - 1;
 	
-	UINT8 defval = (m_is_cmos) ? 0xf : 0;
-	m_read_r0.resolve_safe(defval);
-	m_read_r1.resolve_safe(defval);
-	m_read_r2.resolve_safe(defval);
-	m_read_r3.resolve_safe(defval);
-	m_read_r4.resolve_safe(defval);
-	m_read_r5.resolve_safe(defval);
-	m_read_r6.resolve_safe(defval);
-	m_read_r7.resolve_safe(defval);
+	m_read_r0.resolve_safe(0);
+	m_read_r1.resolve_safe(0);
+	m_read_r2.resolve_safe(0);
+	m_read_r3.resolve_safe(0);
+	m_read_r4.resolve_safe(0);
+	m_read_r5.resolve_safe(0);
+	m_read_r6.resolve_safe(0);
+	m_read_r7.resolve_safe(0);
 	
 	m_write_r0.resolve_safe();
 	m_write_r1.resolve_safe();
@@ -204,7 +203,7 @@ void hmcs40_cpu_device::device_start()
 	m_write_r6.resolve_safe();
 	m_write_r7.resolve_safe();
 
-	m_read_d.resolve_safe((m_is_cmos) ? 0xffff : 0);
+	m_read_d.resolve_safe(0);
 	m_write_d.resolve_safe();
 
 	// zerofill
@@ -270,12 +269,12 @@ void hmcs40_cpu_device::device_reset()
 	m_prev_op = m_op = 0;
 	
 	// clear i/o
-	m_d = (m_is_cmos) ? 0xffff : 0;
+	m_d = m_polarity;
 	for (int i = 0; i < 16; i++)
-		hmcs40_cpu_device::write_d(i, (m_is_cmos) ? 1 : 0);
+		hmcs40_cpu_device::write_d(i, 0);
 	
 	for (int i = 0; i < 8; i++)
-		hmcs40_cpu_device::write_r(i, (m_is_cmos) ? 0xf : 0);
+		hmcs40_cpu_device::write_r(i, 0);
 }
 
 
@@ -301,28 +300,25 @@ UINT8 hmcs40_cpu_device::read_r(int index)
 		case 7: inp = m_read_r7(index, 0xff); break;
 	}
 	
-	if (m_is_cmos)
-		return (inp & m_r[index]) & 0xf;
-	else
-		return (inp | m_r[index]) & 0xf;
+	return ((inp ^ m_polarity) | m_r[index]) & 0xf;
 }
 
 void hmcs40_cpu_device::write_r(int index, UINT8 data)
 {
 	index &= 7;
-	data &= 0xf;
+	data = (data ^ m_polarity) & 0xf;
 	m_r[index] = data;
 	
 	switch (index)
 	{
-		case 0: m_write_r0(index, m_r[index], 0xff); break;
-		case 1: m_write_r1(index, m_r[index], 0xff); break;
-		case 2: m_write_r2(index, m_r[index], 0xff); break;
-		case 3: m_write_r3(index, m_r[index], 0xff); break;
-		case 4: m_write_r4(index, m_r[index], 0xff); break;
-		case 5: m_write_r5(index, m_r[index], 0xff); break;
-		case 6: m_write_r6(index, m_r[index], 0xff); break;
-		case 7: m_write_r7(index, m_r[index], 0xff); break;
+		case 0: m_write_r0(index, data, 0xff); break;
+		case 1: m_write_r1(index, data, 0xff); break;
+		case 2: m_write_r2(index, data, 0xff); break;
+		case 3: m_write_r3(index, data, 0xff); break;
+		case 4: m_write_r4(index, data, 0xff); break;
+		case 5: m_write_r5(index, data, 0xff); break;
+		case 6: m_write_r6(index, data, 0xff); break;
+		case 7: m_write_r7(index, data, 0xff); break;
 	}
 }
 
@@ -330,17 +326,15 @@ int hmcs40_cpu_device::read_d(int index)
 {
 	index &= 15;
 	
-	if (m_is_cmos)
-		return (m_read_d(index, 0xffff) & m_d) >> index & 1;
-	else
-		return (m_read_d(index, 0xffff) | m_d) >> index & 1;
+	return ((m_read_d(index, 0xffff) ^ m_polarity) | m_d) >> index & 1;
 }
 
 void hmcs40_cpu_device::write_d(int index, int state)
 {
 	index &= 15;
+	state = (((state) ? 1 : 0) ^ m_polarity) & 1;
 	
-	m_d = (m_d & ~(1 << index)) | (((state) ? 1 : 0) << index);
+	m_d = (m_d & ~(1 << index)) | state << index;
 	m_write_d(index, m_d, 0xffff);
 }
 
@@ -373,12 +367,9 @@ int hmcs43_cpu_device::read_d(int index)
 	index &= 15;
 	
 	if (index >= 4)
-	{
 		logerror("%s read from output pin D%d at $%04X\n", tag(), index, m_prev_pc << 1);
-		return m_d >> index & 1;
-	}
-	else
-		return hmcs40_cpu_device::read_d(index);
+
+	return hmcs40_cpu_device::read_d(index);
 }
 
 // HMCS44:
@@ -479,10 +470,10 @@ void hmcs40_cpu_device::execute_run()
 			case 0x004: case 0x005: case 0x006: case 0x007:
 				op_sem(); break;
 			case 0x008: case 0x009: case 0x00a: case 0x00b:
-				op_lam(); break;
+/* ok */		op_lam(); break;
 			case 0x010: case 0x011: case 0x012: case 0x013: case 0x014: case 0x015: case 0x016: case 0x017:
 			case 0x018: case 0x019: case 0x01a: case 0x01b: case 0x01c: case 0x01d: case 0x01e: case 0x01f:
-				op_lmiiy(); break;
+/* ok */		op_lmiiy(); break;
 			case 0x020: case 0x021: case 0x022: case 0x023:
 				op_lbm(); break;
 			case 0x030:
@@ -491,7 +482,7 @@ void hmcs40_cpu_device::execute_run()
 				op_lta(); break;
 			
 			case 0x040:
-				op_lxa(); break;
+/* ok */		op_lxa(); break;
 			case 0x04b:
 				op_rec(); break;
 			case 0x04f:
@@ -506,15 +497,15 @@ void hmcs40_cpu_device::execute_run()
 				op_ib(); break;
 			case 0x070: case 0x071: case 0x072: case 0x073: case 0x074: case 0x075: case 0x076: case 0x077:
 			case 0x078: case 0x079: case 0x07a: case 0x07b: case 0x07c: case 0x07d: case 0x07e: case 0x07f:
-				op_lai(); break;
+/* ok */		op_lai(); break;
 			
 			case 0x080: case 0x081: case 0x082: case 0x083: case 0x084: case 0x085: case 0x086: case 0x087:
 			case 0x088: case 0x089: case 0x08a: case 0x08b: case 0x08c: case 0x08d: case 0x08e: case 0x08f:
-				op_ai(); break;
+/* ok */		op_ai(); break;
 			case 0x090:
-				op_sed(); break;
+/* ok */		op_sed(); break;
 			case 0x094:
-				op_td(); break;
+/* ok */		op_td(); break;
 			case 0x0a0:
 				op_seif1(); break;
 			case 0x0a1:
@@ -549,13 +540,13 @@ void hmcs40_cpu_device::execute_run()
 
 			case 0x140: case 0x141: case 0x142: case 0x143: case 0x144: case 0x145: case 0x146: case 0x147:
 			case 0x148: case 0x149: case 0x14a: case 0x14b: case 0x14c: case 0x14d: case 0x14e: case 0x14f:
-				op_lxi(); break;
+/* ok */		op_lxi(); break;
 			case 0x150: case 0x151: case 0x152: case 0x153: case 0x154: case 0x155: case 0x156: case 0x157:
 			case 0x158: case 0x159: case 0x15a: case 0x15b: case 0x15c: case 0x15d: case 0x15e: case 0x15f:
-				op_lyi(); break;
+/* ok */		op_lyi(); break;
 			case 0x160: case 0x161: case 0x162: case 0x163: case 0x164: case 0x165: case 0x166: case 0x167:
 			case 0x168: case 0x169: case 0x16a: case 0x16b: case 0x16c: case 0x16d: case 0x16e: case 0x16f:
-				op_lbi(); break;
+/* ok */		op_lbi(); break;
 			case 0x170: case 0x171: case 0x172: case 0x173: case 0x174: case 0x175: case 0x176: case 0x177:
 			case 0x178: case 0x179: case 0x17a: case 0x17b: case 0x17c: case 0x17d: case 0x17e: case 0x17f:
 				op_lti(); break;
@@ -579,7 +570,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x1e8: case 0x1e9: case 0x1ea: case 0x1eb: case 0x1ec: case 0x1ed: case 0x1ee: case 0x1ef:
 			case 0x1f0: case 0x1f1: case 0x1f2: case 0x1f3: case 0x1f4: case 0x1f5: case 0x1f6: case 0x1f7:
 			case 0x1f8: case 0x1f9: case 0x1fa: case 0x1fb: case 0x1fc: case 0x1fd: case 0x1fe: case 0x1ff:
-				op_br(); break;
+/* ok */		op_br(); break;
 
 
 			/* 0x200 */
@@ -594,7 +585,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x218: case 0x219: case 0x21a: case 0x21b: case 0x21c: case 0x21d: case 0x21e: case 0x21f:
 				op_mnei(); break;
 			case 0x220: case 0x221: case 0x222: case 0x223:
-				op_xmb(); break;
+/* ok */		op_xmb(); break;
 			case 0x224:
 				op_rotr(); break;
 			case 0x225:
@@ -624,7 +615,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x288: case 0x289: case 0x28a: case 0x28b: case 0x28c: case 0x28d: case 0x28e: case 0x28f:
 				op_ynei(); break;
 			case 0x290:
-				op_red(); break;
+/* ok */		op_red(); break;
 			case 0x2a0:
 				op_reif1(); break;
 			case 0x2a1:
@@ -637,7 +628,7 @@ void hmcs40_cpu_device::execute_run()
 				op_retf(); break;
 
 			case 0x2c0: case 0x2c1: case 0x2c2: case 0x2c3: case 0x2c4: case 0x2c5: case 0x2c6: case 0x2c7:
-				op_lra(); break;
+/* ok */		op_lra(); break;
 			case 0x2d0: case 0x2d1: case 0x2d2: case 0x2d3: case 0x2d4: case 0x2d5: case 0x2d6: case 0x2d7:
 			case 0x2d8: case 0x2d9: case 0x2da: case 0x2db: case 0x2dc: case 0x2dd: case 0x2de: case 0x2df:
 				op_redd(); break;
@@ -653,16 +644,16 @@ void hmcs40_cpu_device::execute_run()
 			case 0x348: case 0x349: case 0x34a: case 0x34b: case 0x34c: case 0x34d: case 0x34e: case 0x34f:
 			case 0x350: case 0x351: case 0x352: case 0x353: case 0x354: case 0x355: case 0x356: case 0x357:
 			case 0x358: case 0x359: case 0x35a: case 0x35b: case 0x35c: case 0x35d: case 0x35e: case 0x35f:
-				op_lpu(); break;
+/* ok */		op_lpu(); break;
 			case 0x360: case 0x361: case 0x362: case 0x363: case 0x364: case 0x365: case 0x366: case 0x367:
 				op_tbr(); break;
 			case 0x368: case 0x369: case 0x36a: case 0x36b: case 0x36c: case 0x36d: case 0x36e: case 0x36f:
-				op_p(); break;
+/* ok */		op_p(); break;
 
 			case 0x3a4:
 				op_rtni(); break;
 			case 0x3a7:
-				op_rtn(); break;
+/* ok */		op_rtn(); break;
 
 			case 0x3c0: case 0x3c1: case 0x3c2: case 0x3c3: case 0x3c4: case 0x3c5: case 0x3c6: case 0x3c7:
 			case 0x3c8: case 0x3c9: case 0x3ca: case 0x3cb: case 0x3cc: case 0x3cd: case 0x3ce: case 0x3cf:
@@ -672,7 +663,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x3e8: case 0x3e9: case 0x3ea: case 0x3eb: case 0x3ec: case 0x3ed: case 0x3ee: case 0x3ef:
 			case 0x3f0: case 0x3f1: case 0x3f2: case 0x3f3: case 0x3f4: case 0x3f5: case 0x3f6: case 0x3f7:
 			case 0x3f8: case 0x3f9: case 0x3fa: case 0x3fb: case 0x3fc: case 0x3fd: case 0x3fe: case 0x3ff:
-				op_cal(); break;
+/* ok */		op_cal(); break;
 			
 			
 			default:
