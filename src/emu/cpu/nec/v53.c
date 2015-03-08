@@ -1,5 +1,12 @@
 /* V53 */
 
+// V33 / V33A cores with onboard peripherals
+
+// Interrupt Controller is uPD71059 equivalent
+// DMA Controller can operate in modes providing a subset of the uPD71071 or uPD71037 functionality (some modes unavailable / settings ignored)
+// Serial Controller is based on the uPD71051 but with some changes
+// Timer Unit is functionally identical to uPD71054
+
 #include "emu.h"
 #include "v53.h"
 
@@ -193,24 +200,35 @@ void v53_base_device::install_peripheral_io()
 
 	if (m_OPSEL & 0x01) // DMA Unit available
 	{
-		if (IOAG) // 8-bit 
+		if (m_SCTL & 0x02) // uPD71037 mode
 		{
+			if (IOAG) // 8-bit 
+			{
 
+			}
+			else
+			{
+
+			}
 		}
 		else
 		{
-			
+
 		}
 	}
 
 	if (m_OPSEL & 0x02) // Interupt Control Unit available
 	{
+		UINT16 base = (m_OPHA << 8) | m_IULA;
+
 		if (IOAG) // 8-bit 
 		{
 
 		}
 		else
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::icu_0_r), this), write8_delegate(FUNC(v53_base_device::icu_0_w), this), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::icu_1_r), this), write8_delegate(FUNC(v53_base_device::icu_1_w), this), 0x00ff);
 
 		}
 	}
@@ -218,7 +236,7 @@ void v53_base_device::install_peripheral_io()
 	if (m_OPSEL & 0x04) // Timer Control Unit available
 	{
 		UINT16 base = (m_OPHA << 8) | m_TULA;
-		printf("installing TCU to %04x\n", base);
+		//printf("installing TCU to %04x\n", base);
 
 		if (IOAG) // 8-bit 
 		{
@@ -235,18 +253,89 @@ void v53_base_device::install_peripheral_io()
 
 	if (m_OPSEL & 0x08) // Serial Control Unit available
 	{
-
+		UINT16 base = (m_OPHA << 8) | m_SULA;
 		if (IOAG) // 8-bit 
 		{
 
 		}
 		else
 		{
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::scu_srb_r), this), write8_delegate(FUNC(v53_base_device::scu_stb_w), this), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::scu_sst_r), this), write8_delegate(FUNC(v53_base_device::scu_scm_w), this), 0x00ff);
+			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8_delegate(FUNC(v53_base_device::scu_smd_w), this), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x06, base+0x07, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0x00ff);
 
 		}
 	}
 
 }
+
+/*** ICU ***/
+
+
+
+READ8_MEMBER(v53_base_device::icu_0_r)
+{
+	printf("v53: icu_0_r\n");
+	return 0;
+}
+
+WRITE8_MEMBER(v53_base_device::icu_0_w)
+{
+	printf("v53: icu_0_w %02x\n", data);
+}
+
+READ8_MEMBER(v53_base_device::icu_1_r)
+{
+	printf("v53: icu_1_r\n");
+	return 0;
+}
+
+WRITE8_MEMBER(v53_base_device::icu_1_w)
+{
+	printf("v53: icu_1_w %02x\n", data);
+}
+
+/*** SCU ***/
+
+READ8_MEMBER(v53_base_device::scu_srb_r)
+{
+	printf("v53: scu_srb_r\n");
+	return 0;
+}
+
+WRITE8_MEMBER(v53_base_device::scu_stb_w)
+{
+	printf("v53: scu_stb_w %02x\n", data);
+}
+
+READ8_MEMBER(v53_base_device::scu_sst_r)
+{
+	printf("v53: scu_sst_r\n");
+	return 0;
+}
+
+WRITE8_MEMBER(v53_base_device::scu_scm_w)
+{
+	printf("v53: scu_scm_w %02x\n", data);
+}
+
+WRITE8_MEMBER(v53_base_device::scu_smd_w)
+{
+	printf("v53: scu_smd_w %02x\n", data);
+}
+
+READ8_MEMBER(v53_base_device::scu_simk_r)
+{
+	printf("v53: scu_simk_r\n");
+	return 0;
+}
+
+WRITE8_MEMBER(v53_base_device::scu_simk_w)
+{
+	printf("v53: scu_simk_w %02x\n", data);
+}
+
 
 /*** TCU ***/
 

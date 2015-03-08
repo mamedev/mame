@@ -48,6 +48,21 @@ public:
 	DECLARE_WRITE8_MEMBER(tmu_tct2_w);
 	DECLARE_WRITE8_MEMBER(tmu_tmd_w);
 
+	// SCU
+	DECLARE_READ8_MEMBER(scu_srb_r);
+	DECLARE_WRITE8_MEMBER(scu_stb_w);
+	DECLARE_READ8_MEMBER(scu_sst_r);
+	DECLARE_WRITE8_MEMBER(scu_scm_w);
+	DECLARE_WRITE8_MEMBER(scu_smd_w);
+	DECLARE_READ8_MEMBER(scu_simk_r);
+	DECLARE_WRITE8_MEMBER(scu_simk_w);
+
+	// ICU
+	DECLARE_READ8_MEMBER(icu_0_r);
+	DECLARE_WRITE8_MEMBER(icu_0_w);
+	DECLARE_READ8_MEMBER(icu_1_r);
+	DECLARE_WRITE8_MEMBER(icu_1_w);
+
 	void install_peripheral_io();
 
 	const address_space_config m_io_space_config;
