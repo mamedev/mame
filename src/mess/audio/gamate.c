@@ -118,7 +118,7 @@ void gamate_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 				      if (channel->level) volume=0xf-EnvelopeVolumes[envelope.index];
 				      break;
 				    case 0xa: // rising, falling
-				      if (channel->level) volume=EnvelopeVolumes[envelope.index];
+				      if (channel->level) volume=0xf-EnvelopeVolumes[envelope.index]; // cube up
 				      break;
 				    case 0xb: // one time falling, high
 				      if (channel->level) volume=envelope.first? 0xf-EnvelopeVolumes[envelope.index]: 0xf;

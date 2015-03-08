@@ -5,7 +5,6 @@
  Juan F??lix Mateos vectrex@hackermesh.org
 
  nmi unknown 
- cube up audio sometimes missing
  bomb blast top status line missing
  ******************************************************************************/
 
@@ -192,7 +191,7 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 
 WRITE8_MEMBER( gamate_state::gamate_audio_w )
 {
-//  printf("audio write %x:%x\n", offset, data);//logerror("%.6f %04x audio write %04x %02x\n",machine().time().as_double(),m_maincpu->pc(),offset,data);
+//  logerror("%.6f %04x audio write %04x %02x\n",machine().time().as_double(),m_maincpu->pc(),offset,data);
   m_sound->device_w(space, offset, data);
 }
 
