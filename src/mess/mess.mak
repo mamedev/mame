@@ -2131,8 +2131,7 @@ $(MESS_DRIVERS)/fidelz80.o: $(MESS_LAYOUT)/fidelz80.lh \
 $(MESS_DRIVERS)/gamecom.o:  $(MESS_LAYOUT)/gamecom.lh
 $(MESS_DRIVERS)/glasgow.o:  $(MESS_LAYOUT)/glasgow.lh
 $(MESS_DRIVERS)/h8.o:       $(MESS_LAYOUT)/h8.lh
-$(MESS_DRIVERS)/hh_hmcs40.o:$(MESS_LAYOUT)/alnattck.lh \
-                            $(MESS_LAYOUT)/tmtron.lh
+$(MESS_DRIVERS)/hh_hmcs40.o:$(MESS_LAYOUT)/hh_hmcs40_test.lh
 $(MESS_DRIVERS)/hh_pic16.o: $(MESS_LAYOUT)/maniac.lh
 $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/bankshot.lh \
@@ -2148,10 +2147,7 @@ $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/stopthie.lh \
                             $(MESS_LAYOUT)/tandy12.lh \
                             $(MESS_LAYOUT)/tc4.lh
-$(MESS_DRIVERS)/hh_ucom4.o: $(MESS_LAYOUT)/alnchase.lh \
-                            $(MESS_LAYOUT)/edracula.lh \
-                            $(MESS_LAYOUT)/tmpacman.lh \
-                            $(MESS_LAYOUT)/tmtennis.lh
+$(MESS_DRIVERS)/hh_ucom4.o: $(MESS_LAYOUT)/hh_ucom4_test.lh
 $(MESS_DRIVERS)/ie15.o:     $(MESS_LAYOUT)/ie15.lh
 $(MESS_DRIVERS)/instruct.o: $(MESS_LAYOUT)/instruct.lh
 $(MESS_DRIVERS)/k1003.o:    $(MESS_LAYOUT)/k1003.lh

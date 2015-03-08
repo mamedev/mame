@@ -11,9 +11,7 @@
 #include "cpu/hmcs40/hmcs40.h"
 #include "sound/speaker.h"
 
-// test-layouts - use external artwork
-#include "alnattck.lh"
-#include "tmtron.lh"
+#include "hh_hmcs40_test.lh" // test-layout - use external artwork
 
 
 class hh_hmcs40_state : public driver_device
@@ -265,7 +263,7 @@ static MACHINE_CONFIG_START( alnattck, hh_hmcs40_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, alnattck_d_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_alnattck)
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
 
@@ -300,7 +298,7 @@ static MACHINE_CONFIG_START( tmtron, hh_hmcs40_state )
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
 
 //	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tmtron)
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
 

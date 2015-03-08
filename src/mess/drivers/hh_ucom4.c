@@ -26,11 +26,7 @@
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"
 
-// test-layouts - use external artwork
-#include "alnchase.lh"
-#include "edracula.lh"
-#include "tmpacman.lh"
-#include "tmtennis.lh"
+#include "hh_ucom4_test.lh" // test-layout - use external artwork
 
 
 class hh_ucom4_state : public driver_device
@@ -290,7 +286,7 @@ static MACHINE_CONFIG_START( edracula, hh_ucom4_state )
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, edracula_port_i_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_edracula)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* no video! */
 
@@ -426,7 +422,7 @@ static MACHINE_CONFIG_START( tmtennis, hh_ucom4_state )
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, tmtennis_grid_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tmtennis)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	MCFG_MACHINE_RESET_OVERRIDE(hh_ucom4_state, tmtennis)
 
@@ -528,7 +524,7 @@ static MACHINE_CONFIG_START( tmpacman, hh_ucom4_state )
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tmpacman)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* no video! */
 
@@ -651,7 +647,7 @@ static MACHINE_CONFIG_START( alnchase, hh_ucom4_state )
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, alnchase_display_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_alnchase)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* no video! */
 
