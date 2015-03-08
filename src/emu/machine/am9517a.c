@@ -54,7 +54,7 @@ const device_type UPD71071_V53 = &device_creator<upd71071_v53_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
 
 enum
@@ -360,6 +360,7 @@ inline void am9517a_device::dma_advance()
 		if (MODE_ADDRESS_DECREMENT)
 		{
 			m_channel[m_current_channel].m_address--;
+			m_channel[m_current_channel].m_address &= m_address_mask;
 
 			if ((m_channel[m_current_channel].m_address & 0xff) == 0xff)
 			{
@@ -369,6 +370,7 @@ inline void am9517a_device::dma_advance()
 		else
 		{
 			m_channel[m_current_channel].m_address++;
+			m_channel[m_current_channel].m_address &= m_address_mask;
 
 			if ((m_channel[m_current_channel].m_address & 0xff) == 0x00)
 			{
@@ -585,8 +587,16 @@ void am9517a_device::device_start()
 		save_item(NAME(m_channel[i].m_base_count), i);
 		save_item(NAME(m_channel[i].m_mode), i);
 	}
+
+	m_address_mask = 0xffff;
+
 }
 
+void upd71071_v53_device::device_start()
+{
+	am9517a_device::device_start();
+	m_address_mask = 0x00ffffff;
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -776,10 +786,12 @@ void am9517a_device::execute_run()
 			if (MODE_ADDRESS_DECREMENT)
 			{
 				m_channel[m_current_channel].m_address--;
+				m_channel[m_current_channel].m_address &= m_address_mask;
 			}
 			else
 			{
 				m_channel[m_current_channel].m_address++;
+				m_channel[m_current_channel].m_address &= m_address_mask;
 			}
 
 			break;
@@ -1061,4 +1073,19 @@ WRITE_LINE_MEMBER( am9517a_device::dreq2_w )
 WRITE_LINE_MEMBER( am9517a_device::dreq3_w )
 {
 	dma_request(3, state);
+}
+
+//-------------------------------------------------
+//  upd71071 register layouts
+//-------------------------------------------------
+
+READ8_MEMBER(upd71071_v53_device::read)
+{
+//	printf("upd71071_v53_device read %02x\n", offset);
+	return 0x00;
+}
+
+WRITE8_MEMBER(upd71071_v53_device::write)
+{
+//	printf("upd71071_v53_device write %02x %02x\n", offset, data);
 }
