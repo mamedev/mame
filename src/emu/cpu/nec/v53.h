@@ -4,6 +4,7 @@
 #include "necpriv.h"
 
 #include "machine/pit8253.h"
+#include "machine/upd71071.h"
 
 class v53_base_device : public nec_common_device
 {
@@ -79,6 +80,9 @@ public:
 	}
 
 	required_device<pit8253_device> m_pit;
+	required_device<upd71071_device> m_dma_71071mode;
+	
+	int dmarq(int state, int channel); // trampoline to upd71071
 
 protected:
 	// device-level overrides

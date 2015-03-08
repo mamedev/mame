@@ -127,7 +127,7 @@ public:
 	{ }
 	
 	required_device<mips3_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<v53a_device> m_audiocpu;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
 	required_shared_ptr<UINT32> m_mainram;
@@ -354,5 +354,7 @@ public:
 	int m_vertsrom_size;
 	void reset_sound();
 	void reset_net();
+	WRITE16_MEMBER(hng64_sound_port_0008_w);
+
 };
 

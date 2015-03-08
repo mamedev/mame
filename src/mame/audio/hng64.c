@@ -147,9 +147,22 @@ static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
+WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
+{
+	printf("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
+	// just a guess, the v53 docs seem to indicate no software requests tho?? buriki sets up the DMA, then writes here, then waits for the counter to expire?
+	// Maybe it's automatic? I see no way to trigger an actual DMA in the uPD71071 code at present otherwise tho?
+	m_audiocpu->dmarq(1, 0);
+	m_audiocpu->dmarq(1, 1);
+	m_audiocpu->dmarq(1, 2);
+	m_audiocpu->dmarq(1, 3);
+
+}
+
 static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
-	AM_RANGE(0xc002, 0xc003) AM_NOP // buriki one fills the log, wants 0xffff
+	AM_RANGE(0x0008, 0x0009) AM_WRITE( hng64_sound_port_0008_w )
 ADDRESS_MAP_END
+
 
 MACHINE_CONFIG_FRAGMENT( hng64_audio )
 	MCFG_CPU_ADD("audiocpu", V53A, 16000000)              // V53A, 16? mhz!

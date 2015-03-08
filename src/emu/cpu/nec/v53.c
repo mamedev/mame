@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "v53.h"
 
-#include "machine/pit8253.h"
+
 const device_type V53 = &device_creator<v53_device>;
 const device_type V53A =&device_creator<v53a_device>;
 
@@ -191,7 +191,7 @@ void v53_base_device::device_start()
 void v53_base_device::install_peripheral_io()
 {
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
-	space(AS_IO).unmap_readwrite(0x0000, 0xfeff);
+	space(AS_IO).unmap_readwrite(0x1000, 0xfeff); // todo, we need to have a way to NOT unmap things defined in the drivers, but instead have this act as an overlay mapping / unampping only!!
 
 	// IOAG determines if the handlers used 8-bit or 16-bit access
 	// the hng64.c games first set everything up in 8-bit mode, then
@@ -201,6 +201,8 @@ void v53_base_device::install_peripheral_io()
 
 	if (m_OPSEL & 0x01) // DMA Unit available
 	{
+		UINT16 base = (m_OPHA << 8) | m_DULA;
+
 		if (m_SCTL & 0x02) // uPD71037 mode
 		{
 			if (IOAG) // 8-bit 
@@ -209,12 +211,11 @@ void v53_base_device::install_peripheral_io()
 			}
 			else
 			{
-
 			}
 		}
-		else
+		else // uPD71071 mode
 		{
-
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x0f, read8_delegate(FUNC(upd71071_device::read), (upd71071_device*)m_dma_71071mode), write8_delegate(FUNC(upd71071_device::write),  (upd71071_device*)m_dma_71071mode), 0xffff);
 		}
 	}
 
@@ -350,6 +351,13 @@ READ8_MEMBER(v53_base_device::tmu_tst0_r) {	return m_pit->read(space, 0); }
 READ8_MEMBER(v53_base_device::tmu_tst1_r) {	return m_pit->read(space, 1); }
 READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_pit->read(space, 2); }
 
+/*** DMA ***/
+
+// could be wrong / nonexistent 
+int v53_base_device::dmarq(int state, int channel)
+{
+	return m_dma_71071mode->dmarq(state, channel);
+}
 
 /* General stuff */
 
@@ -392,6 +400,16 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
 	MCFG_PIT8253_CLK0(16000000/2/8)
 	//MCFG_PIT8253_OUT0_HANDLER(WRITELINE(v53_base_device, pit_out0))
+
+	MCFG_DEVICE_ADD("upd71071dma", UPD71071, 0)
+//	MCFG_UPD71071_CPU("audiocpu") // should use owner name
+	MCFG_UPD71071_CLOCK(4000000)
+//	MCFG_UPD71071_DMA_READ_0_CB(READ16(towns_state, towns_fdc_dma_r))
+//	MCFG_UPD71071_DMA_READ_1_CB(READ16(towns_state, towns_scsi_dma_r))
+//	MCFG_UPD71071_DMA_READ_3_CB(READ16(towns_state, towns_cdrom_dma_r))
+//	MCFG_UPD71071_DMA_WRITE_0_CB(WRITE16(towns_state, towns_fdc_dma_w))
+//	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))
+
 MACHINE_CONFIG_END
 
 machine_config_constructor v53_base_device::device_mconfig_additions() const
@@ -403,7 +421,8 @@ machine_config_constructor v53_base_device::device_mconfig_additions() const
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
 	: nec_common_device(mconfig, type, name, tag, owner, clock, shortname, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) ),
-	m_pit(*this, "pit")
+	m_pit(*this, "pit"),
+	m_dma_71071mode(*this, "upd71071dma")
 {
 }
 
