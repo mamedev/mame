@@ -9,14 +9,16 @@
   
   serial  device  etc.
 -----------------------------------------------
- @048     uPD552  1980, Tomy Tennis
+ @031     uPD553  1979, Bambino Superstar Football (ET-03)
+ @048     uPD552  1980, Tomy Tennis (TN-04)
+ @055     uPD553  1980, Bambino Laser Fight (ET-12)
  *085     uPD650  1980, Roland TR-808
   102     uPD553  1981, Bandai Block Out
  *128     uPD650  1982, Roland TR-606
   133     uPD650  1982, Roland TB-303
- @160     uPD553  1982, Tomy Pac Man
+ @160     uPD553  1982, Tomy Pac Man (TN-08)
  @206     uPD553  1982, Epoch Dracula
- @258     uPD553  1984, Tomy Alien Chase
+ @258     uPD553  1984, Tomy Alien Chase (TN-16)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
@@ -212,6 +214,76 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   Minidrivers (I/O, Inputs, Machine Config)
 
 ***************************************************************************/
+
+/***************************************************************************
+
+  Bambino Superstar Football (manufactured in Japan)
+  * PCB label Emix Corp. ET-03
+  * NEC uCOM-43 MCU, labeled D553C 031
+  * green VFD display Emix-102
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+static INPUT_PORTS_START( ssfball )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( ssfball, hh_ucom4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+
+//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bambino Space Laser Fight (manufactured in Japan)
+  * PCB label Emix Corp. ET-12
+  * NEC uCOM-43 MCU, labeled D553C 055
+  * blue VFD display Emix-104
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+static INPUT_PORTS_START( splasfgt )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( splasfgt, hh_ucom4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+
+//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
 
 /***************************************************************************
 
@@ -667,6 +739,18 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+ROM_START( ssfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+ROM_END
+
+
+ROM_START( splasfgt )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
+ROM_END
+
+
 ROM_START( edracula )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d553c-206", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
@@ -693,6 +777,9 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1979, ssfball,   0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1980, splasfgt,  0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+
 CONS( 1982, edracula,  0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1980, tmtennis,  0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
