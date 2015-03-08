@@ -96,6 +96,29 @@ protected:
 	int m_icount;
 	UINT32 m_address_mask;
 
+	struct
+	{
+		UINT32 m_address;
+		UINT16 m_count;
+		UINT32 m_base_address;
+		UINT16 m_base_count;
+		UINT8 m_mode;
+	} m_channel[4];
+
+	int m_msb;
+	int m_hreq;
+	int m_hack;
+	int m_ready;
+	int m_eop;
+	int m_state;
+	int m_current_channel;
+	int m_last_channel;
+	UINT8 m_command;
+	UINT8 m_mask;
+	UINT8 m_status;
+	UINT16 m_temp;
+	UINT8 m_request;
+
 private:
 	inline void dma_request(int channel, int state);
 	inline bool is_request_active(int channel);
@@ -128,29 +151,10 @@ private:
 	devcb_write_line   m_out_dack_2_cb;
 	devcb_write_line   m_out_dack_3_cb;
 
-	struct
-	{
-		UINT32 m_address;
-		UINT16 m_count;
-		UINT32 m_base_address;
-		UINT16 m_base_count;
-		UINT8 m_mode;
-	} m_channel[4];
 
 
-	int m_msb;
-	int m_hreq;
-	int m_hack;
-	int m_ready;
-	int m_eop;
-	int m_state;
-	int m_current_channel;
-	int m_last_channel;
-	UINT8 m_command;
-	UINT8 m_mask;
-	UINT8 m_status;
-	UINT8 m_temp;
-	UINT8 m_request;
+
+
 };
 
 
@@ -166,6 +170,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
+
+	int	m_selected_channel;
+	int m_base;
+	UINT8 m_command_high;
+
 };
 
 

@@ -474,6 +474,9 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, AM9517A, name, tag, owner, clock, shortname, __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
+		m_hack(0),
+		m_ready(1),
+		m_command(0),
 		m_out_hreq_cb(*this),
 		m_out_eop_cb(*this),
 		m_in_memr_cb(*this),
@@ -489,10 +492,7 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 		m_out_dack_0_cb(*this),
 		m_out_dack_1_cb(*this),
 		m_out_dack_2_cb(*this),
-		m_out_dack_3_cb(*this),
-		m_hack(0),
-		m_ready(1),
-		m_command(0)
+		m_out_dack_3_cb(*this)
 {
 }
 
@@ -501,6 +501,9 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock, "am9517a", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
+		m_hack(0),
+		m_ready(1),
+		m_command(0),
 		m_out_hreq_cb(*this),
 		m_out_eop_cb(*this),
 		m_in_memr_cb(*this),
@@ -516,10 +519,8 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 		m_out_dack_0_cb(*this),
 		m_out_dack_1_cb(*this),
 		m_out_dack_2_cb(*this),
-		m_out_dack_3_cb(*this),
-		m_hack(0),
-		m_ready(1),
-		m_command(0)
+		m_out_dack_3_cb(*this)
+
 {
 }
 
@@ -592,11 +593,6 @@ void am9517a_device::device_start()
 
 }
 
-void upd71071_v53_device::device_start()
-{
-	am9517a_device::device_start();
-	m_address_mask = 0x00ffffff;
-}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -1079,13 +1075,202 @@ WRITE_LINE_MEMBER( am9517a_device::dreq3_w )
 //  upd71071 register layouts
 //-------------------------------------------------
 
+void upd71071_v53_device::device_start()
+{
+	am9517a_device::device_start();
+	m_address_mask = 0x00ffffff;
+
+	m_selected_channel = 0;
+	m_base = 0;
+
+	save_item(NAME(m_selected_channel));
+	save_item(NAME(m_base));
+}
+
+void upd71071_v53_device::device_reset()
+{
+	am9517a_device::device_reset();
+
+	m_selected_channel = 0;
+	m_base = 0;
+}
+
+
 READ8_MEMBER(upd71071_v53_device::read)
 {
-//	printf("upd71071_v53_device read %02x\n", offset);
-	return 0x00;
+	UINT8 ret = 0;
+	int channel = m_selected_channel;
+
+	logerror("DMA: read from register %02x\n",offset);
+	switch (offset)
+	{
+		case 0x01:  // Channel
+			ret = (1 << m_selected_channel);
+			if (m_base != 0)
+				ret |= 0x10;
+			break;
+		case 0x02:  // Count (low)
+			if (m_base != 0)
+				ret = m_channel[channel].m_base_count & 0xff;
+			else
+				ret = m_channel[channel].m_count & 0xff;
+			break;
+		case 0x03:  // Count (high)
+			if (m_base != 0)
+				ret = (m_channel[channel].m_base_count >> 8) & 0xff;
+			else
+				ret = (m_channel[channel].m_count >> 8) & 0xff;
+			break;
+		case 0x04:  // Address (low)
+			if (m_base != 0)
+				ret = m_channel[channel].m_base_address & 0xff;
+			else
+				ret = m_channel[channel].m_address & 0xff;
+			break;
+		case 0x05:  // Address (mid)
+			if (m_base != 0)
+				ret = (m_channel[channel].m_base_address >> 8) & 0xff;
+			else
+				ret = (m_channel[channel].m_address >> 8) & 0xff;
+			break;
+		case 0x06:  // Address (high)
+			if (m_base != 0)
+				ret = (m_channel[channel].m_base_address >> 16) & 0xff;
+			else
+				ret = (m_channel[channel].m_address >> 16) & 0xff;
+			break;
+		case 0x07:  // Address (highest)
+			if (m_base != 0)
+				ret = (m_channel[channel].m_base_address >> 24) & 0xff;
+			else
+				ret = (m_channel[channel].m_address >> 24) & 0xff;
+			break;
+		case 0x0a:  // Mode control
+				ret = (m_channel[channel].m_mode);
+			break;
+
+		case 0x08:  // Device control (low)
+			ret = m_command & 0xff;
+			break;
+		case 0x09:  // Device control (high) // UPD71071 only?
+			ret = m_command_high & 0xff; 
+			break;
+		case 0x0b:  // Status
+			ret = m_status;
+			// clear TC bits
+			m_status &= 0xf0;
+			break;
+		case 0x0c:  // Temporary (low)
+			ret = m_temp & 0xff;
+			break;
+		case 0x0d:  // Temporary (high) // UPD71071 only? (other doesn't do 16-bit?)
+			ret = (m_temp >> 8 ) & 0xff;
+			break;
+		case 0x0e:  // Request
+			//ret = m_reg.request;
+			ret = 0; // invalid?
+			break;
+		case 0x0f:  // Mask
+			ret = m_mask;
+			break;
+
+	}
+
+	return ret;
 }
 
 WRITE8_MEMBER(upd71071_v53_device::write)
 {
-//	printf("upd71071_v53_device write %02x %02x\n", offset, data);
+	int channel = m_selected_channel;
+	
+	switch (offset)
+	{
+		case 0x00:  // Initialise
+			// TODO: reset (bit 0)
+			//m_buswidth = data & 0x02;
+			//if (data & 0x01)
+			//	soft_reset();
+			logerror("DMA: Initialise [%02x]\n", data);
+			break;
+		case 0x01:  // Channel
+			m_selected_channel = data & 0x03;
+			m_base = data & 0x04;
+			logerror("DMA: Channel selected [%02x]\n", data);
+			break;
+		case 0x02:  // Count (low)
+			m_channel[channel].m_base_count =
+				(m_channel[channel].m_base_count & 0xff00) | data;
+			if (m_base == 0)
+				m_channel[channel].m_count =
+				(m_channel[channel].m_count & 0xff00) | data;
+			logerror("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
+			break;
+		case 0x03:  // Count (high)
+			m_channel[channel].m_base_count =
+				(m_channel[channel].m_base_count & 0x00ff) | (data << 8);
+			if (m_base == 0)
+				m_channel[channel].m_count =
+				(m_channel[channel].m_count & 0x00ff) | (data << 8);
+			logerror("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
+			break;
+		case 0x04:  // Address (low)
+			m_channel[channel].m_base_address =
+				(m_channel[channel].m_base_address & 0xffffff00) | data;
+			if (m_base == 0)
+				m_channel[channel].m_address =
+				(m_channel[channel].m_address & 0xffffff00) | data;
+			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			break;
+		case 0x05:  // Address (mid)
+			m_channel[channel].m_base_address =
+				(m_channel[channel].m_base_address & 0xffff00ff) | (data << 8);
+			if (m_base == 0)
+				m_channel[channel].m_address =
+				(m_channel[channel].m_address & 0xffff00ff) | (data << 8);
+			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			break;
+		case 0x06:  // Address (high)
+			m_channel[channel].m_base_address =
+				(m_channel[channel].m_base_address & 0xff00ffff) | (data << 16);
+			if (m_base == 0)
+				m_channel[channel].m_address =
+				(m_channel[channel].m_address & 0xff00ffff) | (data << 16);
+			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			break;
+		case 0x07:  // Address (highest)
+			m_channel[channel].m_base_address =
+				(m_channel[channel].m_base_address & 0x00ffffff) | (data << 24);
+			if (m_base == 0)
+				m_channel[channel].m_address =
+				(m_channel[channel].m_address & 0x00ffffff) | (data << 24);
+			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			break;
+		case 0x0a:  // Mode control
+			m_channel[channel].m_mode = data;
+			// clear terminal count
+			m_status &= ~(1 << channel);
+
+			logerror("DMA: Channel %i Mode control set [%02x]\n",m_selected_channel,m_channel[channel].m_mode);
+			break;
+
+		case 0x08:  // Device control (low)
+			m_command = data;
+			logerror("DMA: Device control low set [%02x]\n",data);
+			break;
+		case 0x09:  // Device control (high)
+			m_command_high = data;
+			logerror("DMA: Device control high set [%02x]\n",data);
+			break;
+		case 0x0e:  // Request
+			//m_reg.request = data;
+			logerror("(invalid) DMA: Request set [%02x]\n",data); // no software requests on the v53 integrated version
+			break;
+		case 0x0f:  // Mask
+			m_mask = data & 0x0f;
+			logerror("DMA: Mask set [%02x]\n",data);
+			break;
+
+
+	}
+
 }
