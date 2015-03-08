@@ -1776,6 +1776,7 @@ OBJDIRS += $(CPUOBJ)/nec
 CPUOBJS += $(CPUOBJ)/nec/nec.o
 CPUOBJS += $(CPUOBJ)/nec/v25.o
 CPUOBJS += $(CPUOBJ)/nec/v25sfr.o
+CPUOBJS += $(CPUOBJ)/nec/v53.o
 DASMOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
