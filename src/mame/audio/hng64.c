@@ -12,7 +12,11 @@ sams64_2  (#)SNK R&D Center (R) HYPER NEOGEO64 Sound Driver Ver 1.14. (#)Copyrig
 fatfurwa  (#)SNK R&D Center (R) HYPER NEOGEO64 Sound Driver Ver 1.14. (#)Copyright (C) SNK Corp. 1997,1998 All rights reserved
 buriki    (#)SNK R&D Center (R) HYPER NEOGEO64 Sound Driver Ver 1.15. (#)Copyright (C) SNK Corp. 1997,1998 All rights reserved
 
-the earlier revisions appear to have 2 banks of code (there are vectors at the end of the 0x1e0000 block and the 0x1f0000 block)
+The earlier revisions appear to have 2 banks of code (there are vectors at the end of the 0x1e0000 block and the 0x1f0000 block)
+
+Those first two revisions also spam the entire range of I/O ports with values several times on startup causing some unexpected
+writes to the V53 internal registers.  The important ones are reinitialized after this however, I'm guessing this is harmless
+on real hardware, as the code flow seems to be correct.
 
 data structures look very similar between all of them
 

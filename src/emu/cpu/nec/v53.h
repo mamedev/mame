@@ -30,8 +30,28 @@ public:
 	DECLARE_WRITE8_MEMBER(OPSEL_w);
 	DECLARE_WRITE8_MEMBER(SCTL_w);
 
-	const address_space_config m_io_space_config;
+	UINT8 m_SCTL;
+	UINT8 m_OPSEL;
+	
+	UINT8 m_SULA;
+	UINT8 m_TULA;
+	UINT8 m_IULA;
+	UINT8 m_DULA;
+	UINT8 m_OPHA;
 
+	// TMU
+	DECLARE_READ8_MEMBER(tmu_tst0_r);
+	DECLARE_WRITE8_MEMBER(tmu_tct0_w);
+	DECLARE_READ8_MEMBER(tmu_tst1_r);
+	DECLARE_WRITE8_MEMBER(tmu_tct1_w);
+	DECLARE_READ8_MEMBER(tmu_tst2_r);
+	DECLARE_WRITE8_MEMBER(tmu_tct2_w);
+	DECLARE_WRITE8_MEMBER(tmu_tmd_w);
+
+	void install_peripheral_io();
+
+	const address_space_config m_io_space_config;
+	
 	const address_space_config *memory_space_config(address_spacenum spacenum) const
 	{
 		switch (spacenum)
@@ -40,6 +60,11 @@ public:
 			default: return nec_common_device::memory_space_config(spacenum);
 		}
 	}
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
 };
 
 
