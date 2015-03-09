@@ -162,36 +162,6 @@ VIDEO_START_MEMBER(goldstar_state, goldstar)
 	m_cm_enable_reg = 0x0b;
 }
 
-VIDEO_START_MEMBER(goldstar_state, bingowng)
-{
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-
-	m_reel1_tilemap->set_scroll_cols(64);
-
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-
-	// is there an enable reg for this game?
-	m_cm_enable_reg = 0x0b;
-}
-
-VIDEO_START_MEMBER(goldstar_state, magical)
-{
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-
-	m_reel1_tilemap->set_scroll_cols(32);
-	m_reel2_tilemap->set_scroll_cols(32);
-	m_reel3_tilemap->set_scroll_cols(32);
-
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-
-	// is there an enable reg for this game?
-	m_cm_enable_reg = 0x0b;
-}
-
 VIDEO_START_MEMBER(goldstar_state, cherrym)
 {
 	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
@@ -311,105 +281,6 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 }
 
 
-UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int i;
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	if (!(m_cm_enable_reg &0x01))
-		return 0;
-
-	if (m_cm_enable_reg &0x08)
-	{
-		for (i= 0;i < 64;i++)
-		{
-			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-		}
-
-
-		const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (4+7)*8-1);
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-	}
-
-	if (m_cm_enable_reg &0x04)
-	{
-		if (memregion("user1")->base())
-		{
-			gfx_element *gfx = m_gfxdecode->gfx(2);
-			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
-			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
-
-			gfx->zoom_transpen(bitmap,cliprect,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
-		}
-	}
-
-	if (m_cm_enable_reg &0x02)
-	{
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	}
-
-	return 0;
-}
-
-
-UINT32 goldstar_state::screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int i;
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	if (!(m_cm_enable_reg &0x01))
-		return 0;
-
-	if (m_cm_enable_reg &0x08)
-	{
-		// guess, could be wrong, but different screens clearly need different reel layouts
-		if (m_unkch_vidreg & 2)
-		{
-			for (i= 0;i < 32;i++)
-			{
-				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
-				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
-			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
-			}
-
-
-			const rectangle visible1alt(0*8, (16+48)*8-1,  4*8,  16*8-1);
-			const rectangle visible2alt(0*8, (16+48)*8-1, 16*8,  28*8-1);
-
-			m_reel1_tilemap->draw(screen, bitmap, visible1alt, 0, 0);
-			m_reel2_tilemap->draw(screen, bitmap, visible2alt, 0, 0);
-			//m_reel3_tilemap->draw(screen, bitmap, &magical_visible3, 0, 0);
-		}
-		else
-		{
-			for (i= 0;i < 32;i++)
-			{
-				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
-				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
-				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
-			}
-
-
-			const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+8)*8-1);
-			const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+8)*8-1);
-			const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+8)*8-1);
-
-			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
-		}
-	}
-
-	if (m_cm_enable_reg &0x02)
-	{
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	}
-
-	return 0;
-}
-
 UINT32 goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
@@ -475,6 +346,137 @@ UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16
 	if (m_cm_enable_reg &0x04)
 	{
 		// no girls
+	}
+
+	if (m_cm_enable_reg &0x02)
+	{
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
+	return 0;
+}
+
+
+
+VIDEO_START_MEMBER(wingco_state, bingowng)
+{
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+
+	m_reel1_tilemap->set_scroll_cols(64);
+
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	// is there an enable reg for this game?
+	m_cm_enable_reg = 0x0b;
+}
+
+VIDEO_START_MEMBER(wingco_state, magical)
+{
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+
+	m_reel1_tilemap->set_scroll_cols(32);
+	m_reel2_tilemap->set_scroll_cols(32);
+	m_reel3_tilemap->set_scroll_cols(32);
+
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	// is there an enable reg for this game?
+	m_cm_enable_reg = 0x0b;
+}
+
+
+UINT32 wingco_state::screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int i;
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	if (!(m_cm_enable_reg &0x01))
+		return 0;
+
+	if (m_cm_enable_reg &0x08)
+	{
+		for (i= 0;i < 64;i++)
+		{
+			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+		}
+
+
+		const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (4+7)*8-1);
+		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+	}
+
+	if (m_cm_enable_reg &0x04)
+	{
+		if (memregion("user1")->base())
+		{
+			gfx_element *gfx = m_gfxdecode->gfx(2);
+			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
+			int girlxscroll = (INT8)((m_cm_girl_scroll & 0x0f)<<4);
+
+			gfx->zoom_transpen(bitmap,cliprect,m_cmaster_girl_num,m_cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll), 0x20000, 0x10000,0);
+		}
+	}
+
+	if (m_cm_enable_reg &0x02)
+	{
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
+	return 0;
+}
+
+UINT32 wingco_state::screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int i;
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	if (!(m_cm_enable_reg &0x01))
+		return 0;
+
+	if (m_cm_enable_reg &0x08)
+	{
+		// guess, could be wrong, but different screens clearly need different reel layouts
+		if (m_vidreg & 2)
+		{
+			for (i= 0;i < 32;i++)
+			{
+				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
+				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
+			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
+			}
+
+
+			const rectangle visible1alt(0*8, (16+48)*8-1,  4*8,  16*8-1);
+			const rectangle visible2alt(0*8, (16+48)*8-1, 16*8,  28*8-1);
+
+			m_reel1_tilemap->draw(screen, bitmap, visible1alt, 0, 0);
+			m_reel2_tilemap->draw(screen, bitmap, visible2alt, 0, 0);
+			//m_reel3_tilemap->draw(screen, bitmap, &magical_visible3, 0, 0);
+		}
+		else
+		{
+			for (i= 0;i < 32;i++)
+			{
+				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
+				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
+				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
+			}
+
+
+			const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+8)*8-1);
+			const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+8)*8-1);
+			const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+8)*8-1);
+
+			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		}
 	}
 
 	if (m_cm_enable_reg &0x02)
@@ -714,7 +716,7 @@ VIDEO_START_MEMBER(unkch_state, unkch)
 
 	m_cmaster_girl_num = 0;
 	m_cmaster_girl_pal = 0;
-	m_unkch_vidreg = 0x00;
+	m_vidreg = 0x00;
 
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -735,7 +737,7 @@ UINT32 unkch_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &bit
 	{
 		// guess, this could be something else completely!!
 		// only draw the first 'reels' tilemap, but fullscreen, using alt registers? (or no scrolling at all? - doubtful, see girl)
-		if (m_unkch_vidreg & 0x40)
+		if (m_vidreg & 0x40)
 		{
 			for (i= 0;i < 32;i++)
 			{

@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(goldstar_state::magodds_outb850_w)
+WRITE8_MEMBER(wingco_state::magodds_outb850_w)
 {
 	// guess, could be wrong, this might just be lights
 
@@ -801,12 +801,12 @@ WRITE8_MEMBER(goldstar_state::magodds_outb850_w)
 
 }
 
-WRITE8_MEMBER(goldstar_state::magodds_outb860_w)
+WRITE8_MEMBER(wingco_state::magodds_outb860_w)
 {
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8, goldstar_state )
+static ADDRESS_MAP_START( magodds_map, AS_PROGRAM, 8, wingco_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -958,7 +958,7 @@ WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
 {
 	//popmessage("unkcm_0x03_w %02x", data);
 
-	m_unkch_vidreg = data;
+	m_vidreg = data;
 
 	// -x-- ----   seems to toggle when a 'normal' tilemap should be displayed instead of the reels?
 }
@@ -7477,22 +7477,22 @@ static GFXDECODE_START( cm97 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(goldstar_state::system_outputa_w)
+WRITE8_MEMBER(wingco_state::system_outputa_w)
 {
 	//popmessage("system_outputa_w %02x",data);
 }
 
 
-WRITE8_MEMBER(goldstar_state::system_outputb_w)
+WRITE8_MEMBER(wingco_state::system_outputb_w)
 {
 	//popmessage("system_outputb_w %02x",data);
 }
 
 
-WRITE8_MEMBER(goldstar_state::system_outputc_w)
+WRITE8_MEMBER(wingco_state::system_outputc_w)
 {
-	m_lucky8_nmi_enable = data & 8;
-	m_unkch_vidreg = data & 2;
+	m_nmi_enable = data & 8;
+	m_vidreg = data & 2;
 	//popmessage("system_outputc_w %02x",data);
 }
 
@@ -7763,7 +7763,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cmast91)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state,lucky8)
+PALETTE_INIT_MEMBER(goldstar_state, lucky8)
 {
 	/* BBGGGRRR */
 
@@ -8171,19 +8171,19 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN_MEMBER(goldstar_state::lucky8_irq)
+INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
 {
-	if(m_lucky8_nmi_enable)
+	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( lucky8, goldstar_state )
+static MACHINE_CONFIG_START( lucky8, wingco_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lucky8_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state, masked_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8197,9 +8197,9 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8213,7 +8213,7 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -8232,13 +8232,13 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bingowng, goldstar_state )
+static MACHINE_CONFIG_START( bingowng, wingco_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lucky8_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state,  masked_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8252,9 +8252,9 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8262,7 +8262,7 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
+	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_bingowng)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
@@ -8270,7 +8270,7 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8286,61 +8286,11 @@ static MACHINE_CONFIG_START( bingowng, goldstar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bingownga, goldstar_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lucky8_map)
-	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN4"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_bingowng)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bingownga)       /* GFX Decode is the only difference with the parent machine */
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,bingowng)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(goldstar_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(goldstar_state, ay8910_outputb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+static MACHINE_CONFIG_DERIVED( bingownga, bingowng )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", bingownga)
 MACHINE_CONFIG_END
 
-PALETTE_INIT_MEMBER(goldstar_state,magodds)
+PALETTE_INIT_MEMBER(wingco_state, magodds)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -8357,13 +8307,13 @@ PALETTE_INIT_MEMBER(goldstar_state,magodds)
 	}
 }
 
-static MACHINE_CONFIG_START( magodds, goldstar_state )
+static MACHINE_CONFIG_START( magodds, wingco_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(magodds_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  lucky8_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state,  masked_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8377,9 +8327,9 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8387,15 +8337,15 @@ static MACHINE_CONFIG_START( magodds, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_magical)
+	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_magical)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magodds)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,magodds)
+	MCFG_PALETTE_INIT_OWNER(wingco_state, magodds)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,magical)
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8443,7 +8393,7 @@ static MACHINE_CONFIG_START( kkotnoli, goldstar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
@@ -8483,7 +8433,7 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -8499,7 +8449,7 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wcat3, goldstar_state )
+static MACHINE_CONFIG_START( wcat3, wingco_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8519,9 +8469,9 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(goldstar_state, system_outputa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(goldstar_state, system_outputb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(goldstar_state, system_outputc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(wingco_state, system_outputa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(wingco_state, system_outputb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(wingco_state, system_outputc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8534,7 +8484,7 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -8773,12 +8723,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
-
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cm97, ncb3 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
-
 MACHINE_CONFIG_END
 
 
@@ -8840,7 +8788,7 @@ static MACHINE_CONFIG_START( megaline, unkch_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
@@ -8885,7 +8833,7 @@ static MACHINE_CONFIG_START( bonusch, unkch_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
 	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,lucky8)
+	MCFG_PALETTE_INIT_OWNER(goldstar_state, lucky8)
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
@@ -10886,7 +10834,7 @@ YM2203
 
 is this the original Magical Odds?
 */
-DRIVER_INIT_MEMBER(goldstar_state,magoddsc)
+DRIVER_INIT_MEMBER(wingco_state, magoddsc)
 {
 	int A;
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -13594,7 +13542,7 @@ DRIVER_INIT_MEMBER(goldstar_state,cmast91)
 	ROM[0x0a92] = 0x9b;
 }
 
-DRIVER_INIT_MEMBER(goldstar_state,lucky8a)
+DRIVER_INIT_MEMBER(wingco_state, lucky8a)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
@@ -14188,9 +14136,9 @@ GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, cmast91,  
 
 
 GAMEL( 1989, lucky8,    0,        lucky8,   lucky8,   driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )
-GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  goldstar_state, lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )
+GAMEL( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  wingco_state,   lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )
 GAMEL( 1989, lucky8b,   lucky8,   lucky8,   lucky8b,  driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8 )
-GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   goldstar_state, lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                     layout_lucky8 )
+GAMEL( 1989, lucky8c,   lucky8,   lucky8,   lucky8,   wingco_state,   lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                     layout_lucky8 )
 GAMEL( 1989, lucky8d,   lucky8,   lucky8,   lucky8d,  driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )
 GAMEL( 1989, lucky8e,   lucky8,   lucky8,   lucky8d,  driver_device,  0,         ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )
 GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  driver_device,  0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8 )
@@ -14211,8 +14159,8 @@ GAMEL( 1993, bingownga, bingowng, bingownga,bingownga,driver_device,  0,        
 GAME(  1992, magodds,   0,        magodds,  magodds,  driver_device,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
 GAME(  1992, magoddsa,  magodds,  magodds,  magodds,  driver_device,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
 GAME(  1992, magoddsb,  magodds,  magodds,  magodds,  driver_device,  0,         ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME(  1991, magoddsc,  magodds,  magodds,  magoddsc, goldstar_state, magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
-GAME(  1991, magoddsd,  magodds,  magodds,  magoddsc, goldstar_state, magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
+GAME(  1991, magoddsc,  magodds,  magodds,  magoddsc, wingco_state,   magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
+GAME(  1991, magoddsd,  magodds,  magodds,  magoddsc, wingco_state,   magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", GAME_WRONG_COLORS | GAME_NOT_WORKING |GAME_NO_SOUND)
 
 
 /* --- Amcoe games --- */
