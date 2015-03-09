@@ -46,7 +46,7 @@ void sidearms_state::machine_start()
     membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
-WRITE8_MEMBER(sidearms_state::sidearms_bankswitch_w)
+WRITE8_MEMBER(sidearms_state::bankswitch_w)
 {
     membank("bank1")->set_entry(data & 0x07);
 }
@@ -71,17 +71,17 @@ static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE(sidearms_bankswitch_w)
+	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE(bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW0")
-	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("DSW1") AM_WRITE(sidearms_c804_w)
-	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("DSW2") AM_WRITE(sidearms_star_scrollx_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(sidearms_star_scrolly_w)
+	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("DSW1") AM_WRITE(c804_w)
+	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("DSW2") AM_WRITE(star_scrollx_w)
+	AM_RANGE(0xc806, 0xc806) AM_WRITE(star_scrolly_w)
 	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_SHARE("bg_scrollx")
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_SHARE("bg_scrolly")
-	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(sidearms_gfxctrl_w)   /* background and sprite enable */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(gfxctrl_w)   /* background and sprite enable */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -95,16 +95,16 @@ static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xe800, 0xe807) AM_READ(turtship_ports_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(sidearms_bankswitch_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xe802, 0xe802) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xe804, 0xe804) AM_WRITE(sidearms_c804_w)
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(sidearms_star_scrollx_w)
-	AM_RANGE(0xe806, 0xe806) AM_WRITE(sidearms_star_scrolly_w)
+	AM_RANGE(0xe804, 0xe804) AM_WRITE(c804_w)
+	AM_RANGE(0xe805, 0xe805) AM_WRITE(star_scrollx_w)
+	AM_RANGE(0xe806, 0xe806) AM_WRITE(star_scrolly_w)
 	AM_RANGE(0xe808, 0xe809) AM_WRITEONLY AM_SHARE("bg_scrollx")
 	AM_RANGE(0xe80a, 0xe80b) AM_WRITEONLY AM_SHARE("bg_scrolly")
-	AM_RANGE(0xe80c, 0xe80c) AM_WRITE(sidearms_gfxctrl_w)   /* background and sprite enable */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(sidearms_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe80c, 0xe80c) AM_WRITE(gfxctrl_w)   /* background and sprite enable */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sidearms_sound_map, AS_PROGRAM, 8, sidearms_state )
@@ -139,17 +139,17 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("DSW1") AM_WRITE(whizz_bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN0") AM_WRITENOP
-	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("IN1") AM_WRITE(sidearms_c804_w)
+	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("IN1") AM_WRITE(c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_READ_PORT("IN2") AM_WRITENOP
 	AM_RANGE(0xc806, 0xc806) AM_READ_PORT("IN3")
 	AM_RANGE(0xc807, 0xc807) AM_READ_PORT("IN4")
 	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_SHARE("bg_scrollx")
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_SHARE("bg_scrolly")
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(sidearms_star_scrollx_w)
-	AM_RANGE(0xe806, 0xe806) AM_WRITE(sidearms_star_scrolly_w)
-	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(sidearms_gfxctrl_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe805, 0xe805) AM_WRITE(star_scrollx_w)
+	AM_RANGE(0xe806, 0xe806) AM_WRITE(star_scrolly_w)
+	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(gfxctrl_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -580,11 +580,6 @@ static GFXDECODE_START( turtship )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        512, 16 )  /* colors 512-767 */
 GFXDECODE_END
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER( sidearms_state::irqhandler )
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 static MACHINE_CONFIG_START( sidearms, sidearms_state )
 
@@ -604,7 +599,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
+	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -617,7 +612,7 @@ static MACHINE_CONFIG_START( sidearms, sidearms_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sidearms_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -650,7 +645,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
-	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
+	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turtship)
@@ -662,7 +657,7 @@ static MACHINE_CONFIG_START( turtship, sidearms_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sidearms_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -697,7 +692,7 @@ static MACHINE_CONFIG_START( whizz, sidearms_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update_sidearms)
+	MCFG_SCREEN_UPDATE_DRIVER(sidearms_state, screen_update)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1148,17 +1143,17 @@ DRIVER_INIT_MEMBER(sidearms_state,whizz)
 
 // date string is at 0xaa2 in 'rom 03' it does not appear to be displayed
 
-GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, sidearms,   0,        sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (World, 861129)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, sidearmsu,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861202)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, sidearmsur1,sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom (Romstar license)", "Side Arms - Hyper Dyne (US, 861128)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, sidearmsj,  sidearms, sidearms, sidearms, sidearms_state, sidearms, ROT0,   "Capcom",                   "Side Arms - Hyper Dyne (Japan, 861128)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1988, turtship, 0,        turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", 0 )
-GAME( 1988, turtshipj,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", 0 )
-GAME( 1988, turtshipk,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", 0 )
+GAME( 1988, turtship, 0,        turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Sharp Image license)",   "Turtle Ship (North America)", GAME_SUPPORTS_SAVE )
+GAME( 1988, turtshipj,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko (Pacific Games license)", "Turtle Ship (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, turtshipk,turtship, turtship, turtship, sidearms_state, turtship, ROT0,   "Philko",                         "Turtle Ship (Korea)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, dyger,    0,        turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", 0 )
-GAME( 1989, dygera,   dyger,    turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", 0 )
+GAME( 1989, dyger,    0,        turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dygera,   dyger,    turtship, dyger, sidearms_state,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, twinfalc, 0,        whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", 0 )
-GAME( 1989, whizz,    twinfalc, whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko",                             "Whizz", 0 )
+GAME( 1989, twinfalc, 0,        whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", GAME_SUPPORTS_SAVE )
+GAME( 1989, whizz,    twinfalc, whizz,    whizz, sidearms_state,    whizz,    ROT0,   "Philko",                             "Whizz", GAME_SUPPORTS_SAVE )

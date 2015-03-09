@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  sidearms.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -9,19 +9,19 @@
 #include "emu.h"
 #include "includes/sidearms.h"
 
-WRITE8_MEMBER(sidearms_state::sidearms_videoram_w)
+WRITE8_MEMBER(sidearms_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::sidearms_colorram_w)
+WRITE8_MEMBER(sidearms_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidearms_state::sidearms_c804_w)
+WRITE8_MEMBER(sidearms_state::c804_w)
 {
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
@@ -65,13 +65,13 @@ WRITE8_MEMBER(sidearms_state::sidearms_c804_w)
 	}
 }
 
-WRITE8_MEMBER(sidearms_state::sidearms_gfxctrl_w)
+WRITE8_MEMBER(sidearms_state::gfxctrl_w)
 {
 	m_objon = data & 0x01;
 	m_bgon = data & 0x02;
 }
 
-WRITE8_MEMBER(sidearms_state::sidearms_star_scrollx_w)
+WRITE8_MEMBER(sidearms_state::star_scrollx_w)
 {
 	UINT32 last_state = m_hcount_191;
 
@@ -83,7 +83,7 @@ WRITE8_MEMBER(sidearms_state::sidearms_star_scrollx_w)
 		m_hflop_74a_n ^= 1;
 }
 
-WRITE8_MEMBER(sidearms_state::sidearms_star_scrolly_w)
+WRITE8_MEMBER(sidearms_state::star_scrolly_w)
 {
 	m_vcount_191++;
 	m_vcount_191 &= 0xff;
@@ -125,7 +125,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(sidearms_state::sidearms_tilemap_scan)
+TILEMAP_MAPPER_MEMBER(sidearms_state::tilemap_scan)
 {
 	/* logical (col,row) -> memory offset */
 	int offset = ((row << 7) + col) << 1;
@@ -140,14 +140,14 @@ void sidearms_state::video_start()
 
 	if (!m_gameid)
 	{
-		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_sidearms_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),this),
+		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_sidearms_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::tilemap_scan),this),
 				32, 32, 128, 128);
 
 		m_bg_tilemap->set_transparent_pen(15);
 	}
 	else
 	{
-		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_philko_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::sidearms_tilemap_scan),this), 32, 32, 128, 128);
+		m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_philko_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::tilemap_scan),this), 32, 32, 128, 128);
 	}
 
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
@@ -159,6 +159,16 @@ void sidearms_state::video_start()
 	m_latch_374 = m_vcount_191 = m_hcount_191 = 0;
 
 	m_flipon = m_charon = m_staron = m_objon = m_bgon = 0;
+	
+	save_item(NAME(m_bgon));
+	save_item(NAME(m_objon));
+	save_item(NAME(m_staron));
+	save_item(NAME(m_charon));
+	save_item(NAME(m_flipon));
+	save_item(NAME(m_hflop_74a_n));
+	save_item(NAME(m_hcount_191));
+	save_item(NAME(m_vcount_191));
+	save_item(NAME(m_latch_374));
 }
 
 void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
@@ -193,7 +203,7 @@ void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &
 	}
 }
 
-void sidearms_state::sidearms_draw_starfield( bitmap_ind16 &bitmap )
+void sidearms_state::draw_starfield( bitmap_ind16 &bitmap )
 {
 	int x, y, i;
 	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
@@ -329,9 +339,9 @@ void sidearms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 sidearms_state::screen_update_sidearms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sidearms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sidearms_draw_starfield(bitmap);
+	draw_starfield(bitmap);
 
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx[0] + (m_bg_scrollx[1] << 8 & 0xf00));
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly[0] + (m_bg_scrolly[1] << 8 & 0xf00));
