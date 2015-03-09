@@ -13,6 +13,7 @@
 --------------------------------------------------------------------
  @CP0904A  TMS0970  1977, Milton Bradley Comp IV
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
+ *MP0168   TMS1000? 1979, Conic Basketball
  @MP0914   TMS1000  1979, Entex Baseball 1
  @MP1030   TMS1100  1980, APF Mathemagician
  @MP1204   TMS1100  1980, Entex Baseball 3
@@ -34,6 +35,7 @@
   MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
  @MP6100A  TMS0980  1979, Ideal Electronic Detective
  @MP6101B  TMS0980  1979, Parker Brothers Stop Thief
+ *MP6361   ?        1983, Defender Strikes
  *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
@@ -150,6 +152,11 @@ public:
 	DECLARE_READ8_MEMBER(ebball_read_k);
 	DECLARE_WRITE16_MEMBER(ebball_write_r);
 	DECLARE_WRITE16_MEMBER(ebball_write_o);
+
+	void ebball3_display();
+	DECLARE_READ8_MEMBER(ebball3_read_k);
+	DECLARE_WRITE16_MEMBER(ebball3_write_r);
+	DECLARE_WRITE16_MEMBER(ebball3_write_o);
 
 	DECLARE_READ8_MEMBER(elecdet_read_k);
 	DECLARE_WRITE16_MEMBER(elecdet_write_r);
@@ -899,6 +906,7 @@ static INPUT_PORTS_START( ebball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
+
 static MACHINE_CONFIG_START( ebball, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -926,11 +934,103 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Electronic Baseball 3
+  * boards are labeled: Zeny
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
+  * 2*SN75492N LED display driver
+
+
+  lamp translation table: led zz from game PCB = MESS lampyx:
+  note: unlabeled panel leds are listed here as Sz, Bz, Oz, Iz, z left-to-right
+  
+    00 = -        10 = lamp75   20 = lamp72
+    01 = lamp60   11 = lamp65   21 = lamp84
+    02 = lamp61   12 = lamp55   22 = lamp85
+    03 = lamp62   13 = lamp52   23 = lamp90
+    04 = lamp63   14 = lamp80   24 = lamp92
+    05 = lamp73   15 = lamp81   25 = lamp91
+    06 = lamp53   16 = lamp51   26 = lamp93
+    07 = lamp74   17 = lamp82   27 = lamp95
+    08 = lamp64   18 = lamp83   28 = lamp94
+    09 = lamp54   19 = lamp50
+
+    S1,S2: lamp40,41
+    B1-B3: lamp30-32
+    O1,O2: lamp42,43
+    I1-I6: lamp20-25, I7-I9: lamp33-35
 
 ***************************************************************************/
 
+void hh_tms1k_state::ebball3_display()
+{
+	m_display_maxx = 7;
+	m_display_maxy = 10+2;
+
+	// update current state
+	for (int y = 0; y < 10; y++)
+		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+
+	// R0,R1 are normal 7segs
+	m_7seg_mask[0] = m_7seg_mask[1] = 0x7f;
+	
+	// R4,R7 contain segments(only F and B) for the two other digits
+	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
+	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
+	m_7seg_mask[10] = m_7seg_mask[11] = 0x22;
+	
+	display_update();
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
+{
+	//printf("%X ",m_r);
+
+	return read_inputs(3);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball3_write_r)
+{
+	// R0-R2: input mux
+	m_inp_mux = data & 7;
+	
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+	
+	// R0-R9: led columns
+	m_r = data;
+	ebball3_display();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball3_write_o)
+{
+	// O0-O6: led row
+	// O7: N/C
+	m_o = data & 0x7f;
+	ebball3_display();
+}
+
+
 static INPUT_PORTS_START( ebball3 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+//	PORT_CONFNAME( 0x01, 0x01, "Pitcher" )
+//	PORT_CONFSETTING(    0x01, "Auto" )
+//	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+//	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -938,11 +1038,11 @@ static MACHINE_CONFIG_START( ebball3, hh_tms1k_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, 425000) // RC osc. R=47K, C=33pf -> ~425kHz
-//	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball3_read_k))
-//	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball3_write_r))
-//	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball3_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball3_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball3_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball3_write_o))
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball3)
 
 	/* no video! */
