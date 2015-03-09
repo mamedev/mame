@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Kevin Horton
 /***************************************************************************
 
   Marx Series 300 Electronic Bowling Game
