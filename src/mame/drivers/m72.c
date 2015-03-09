@@ -556,16 +556,10 @@ static const UINT8 bchopper_code[CODE_LEN] =
 	0xc6,0x06,0x00,0x00,0xcb^0xff,  // mov [0000h], byte 0cbh ; retf : bypass protection check during the game
 	0x68,0x00,0xd0,             // push 0d000h
 	0x1f,                       // pop ds
-	// the following is for mrheli only, the game checks for
-	// "This game can only be played in Japan..." message in the video text buffer
-	// the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
-	0xc6,0x06,0x70,0x16,0x77,   // mov [1670h], byte 077h
 	0xea,0x68,0x01,0x40,0x00    // jmp  0040:$0168
 };
 static const UINT8 bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
 												0x54,0x91,0x94,0xeb, 0x00,0x00 };
-static const UINT8 mrheli_crc[CRC_LEN] =      { 0x24,0x21,0x1f,0x14, 0xf9,0x28,0xfb,0x47,
-												0x4c,0x77,0x9e,0xc2, 0x00,0x00 };
 
 /* Ninja Spirit */
 static const UINT8 nspirit_code[CODE_LEN] =
@@ -722,11 +716,6 @@ DRIVER_INIT_MEMBER(m72_state,bchopper)
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
 }
 
-DRIVER_INIT_MEMBER(m72_state,mrheli)
-{
-	install_protection_handler(bchopper_code,mrheli_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
-}
 
 DRIVER_INIT_MEMBER(m72_state,nspirit)
 {
@@ -2594,8 +2583,8 @@ ROM_START( mrheli )
 	ROM_LOAD16_BYTE( "mh-c-l3.bin",  0x60000, 0x10000, CRC(c0982536) SHA1(45399f8d0577c6e2a277a69303954ce5d2de7c07) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
-	ROM_LOAD( "mrheli_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "mh-c-pr.bin",  0x00000, 0x1000, CRC(897dc4ee) SHA1(05a24bf76e8fa9ca96ba9376cbf44d299df04138) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "mh-c-00.bin",  0x00000, 0x20000, CRC(dec4e121) SHA1(92169b523f1600e994e016dc1959a52958e1d89d) )  /* sprites */
@@ -3757,7 +3746,7 @@ GAME( 1987, rtypejp,     rtype,    rtype,       rtypep, driver_device,   0,     
 GAME( 1987, rtypeu,      rtype,    rtype,       rtype, driver_device,    0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL )
 GAME( 1987, rtypeb,      rtype,    rtype,       rtype, driver_device,    0,           ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL )
 GAME( 1987, bchopper,    0,        m72,         bchopper, m72_state, bchopper,    ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
-GAME( 1987, mrheli,      bchopper, m72,         bchopper, m72_state, mrheli,      ROT0,   "Irem", "Mr. HELI no Daibouken", GAME_NO_COCKTAIL )
+GAME( 1987, mrheli,      bchopper, m72_8751,    bchopper, m72_state, m72_8751,    ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, nspirit,     0,        m72,         nspirit, m72_state,  nspirit,     ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
 GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit, m72_state,  m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
 GAME( 1988, imgfight,    0,        m72,         imgfight, m72_state, imgfight,    ROT270, "Irem", "Image Fight (World, revision A)", 0 )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
