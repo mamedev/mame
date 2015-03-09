@@ -202,6 +202,7 @@ void v53_base_device::install_peripheral_io()
 	if (m_OPSEL & 0x01) // DMA Unit available
 	{
 		UINT16 base = (m_OPHA << 8) | m_DULA;
+		base &= 0xfffe;
 
 		if (m_SCTL & 0x02) // uPD71037 mode
 		{
@@ -222,6 +223,7 @@ void v53_base_device::install_peripheral_io()
 	if (m_OPSEL & 0x02) // Interupt Control Unit available
 	{
 		UINT16 base = (m_OPHA << 8) | m_IULA;
+		base &= 0xfffe;
 
 		if (IOAG) // 8-bit 
 		{
@@ -239,6 +241,7 @@ void v53_base_device::install_peripheral_io()
 	{
 		UINT16 base = (m_OPHA << 8) | m_TULA;
 		//printf("installing TCU to %04x\n", base);
+		base &= 0xfffe;
 
 		if (IOAG) // 8-bit 
 		{
@@ -256,6 +259,8 @@ void v53_base_device::install_peripheral_io()
 	if (m_OPSEL & 0x08) // Serial Control Unit available
 	{
 		UINT16 base = (m_OPHA << 8) | m_SULA;
+		base &= 0xfffe;
+
 		if (IOAG) // 8-bit 
 		{
 
