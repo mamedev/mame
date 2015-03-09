@@ -41,14 +41,14 @@ Notes:
 #include "sound/2151intf.h"
 #include "includes/sidearms.h"
 
+void sidearms_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
+}
+
 WRITE8_MEMBER(sidearms_state::sidearms_bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-
-	/* bits 0 and 1 select the ROM bank */
-	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
-	membank("bank1")->set_base(&RAM[bankaddress]);
+    membank("bank1")->set_entry(data & 0x07);
 }
 
 
@@ -119,10 +119,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 {
-	int bankaddress;
-	UINT8 *RAM = memregion("maincpu")->base();
-	int bank = 0;
-
+    int bank = 0;
 	switch (data & 0xC0)
 	{
 		case 0x00 : bank = 0;   break;
@@ -130,9 +127,7 @@ WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 		case 0x80 : bank = 1;   break;
 		case 0xC0 : bank = 3;   break;
 	}
-
-	bankaddress = 0x10000 + bank * 0x4000;
-	membank("bank1")->set_base(&RAM[bankaddress]);
+    membank("bank1")->set_entry(bank);
 }
 
 static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
@@ -726,8 +721,8 @@ MACHINE_CONFIG_END
 ROM_START( sidearms )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "sa03.bin",     0x00000, 0x08000, CRC(e10fe6a0) SHA1(ae59461768d044f14b9aac3e4e491c76cec7adac) )        /* CODE */
-	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
-	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
+	ROM_LOAD( "a_14e.rom",    0x08000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
+	ROM_LOAD( "a_12e.rom",    0x10000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
@@ -771,8 +766,8 @@ ROM_END
 ROM_START( sidearmsu )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "SAA_03.15E",   0x00000, 0x08000, CRC(32ef2739) SHA1(15e0535a6e3508c0d1ed73157a052c3716571000) )        /* CODE */
-	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
-	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
+	ROM_LOAD( "a_14e.rom",    0x08000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
+	ROM_LOAD( "a_12e.rom",    0x10000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
@@ -816,8 +811,8 @@ ROM_END
 ROM_START( sidearmsur1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "03",           0x00000, 0x08000, CRC(9a799c45) SHA1(cf6836108506929ee2449546a4867a7cbf00bcc8) )        /* CODE */
-	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
-	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
+	ROM_LOAD( "a_14e.rom",    0x08000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
+	ROM_LOAD( "a_12e.rom",    0x10000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
@@ -861,8 +856,8 @@ ROM_END
 ROM_START( sidearmsj )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "a_15e.rom",    0x00000, 0x08000, CRC(61ceb0cc) SHA1(bacf28e5e02b90a9d404c3ade0267e0a7cd73cd8) )        /* CODE */
-	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
-	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
+	ROM_LOAD( "a_14e.rom",    0x08000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
+	ROM_LOAD( "a_12e.rom",    0x10000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
@@ -906,8 +901,8 @@ ROM_END
 ROM_START( turtship )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "t-3.bin",   0x00000, 0x08000, CRC(b73ed7f2) SHA1(bb98fe41b989d6568fe8cf1900a0d15c176b61a0) )
-	ROM_LOAD( "t-2.3g",    0x10000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
-	ROM_LOAD( "t-1.bin",   0x18000, 0x08000, CRC(a258ffec) SHA1(caa689607ebe450a68736933dbfaf6bf9b6d3487) )
+	ROM_LOAD( "t-2.3g",    0x08000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
+	ROM_LOAD( "t-1.bin",   0x10000, 0x08000, CRC(a258ffec) SHA1(caa689607ebe450a68736933dbfaf6bf9b6d3487) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "t-4.8a",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
@@ -939,8 +934,8 @@ ROM_END
 ROM_START( turtshipj )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "t-3.5g",    0x00000, 0x08000, CRC(0863fc1c) SHA1(b583e06e05e466c2344a4a420a47227c9ab8705c) )
-	ROM_LOAD( "t-2.3g",    0x10000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
-	ROM_LOAD( "t-1.3e",    0x18000, 0x08000, CRC(845a9ab0) SHA1(f1455aeca92d129c7ed145d76e5093f41ce62ccb) )
+	ROM_LOAD( "t-2.3g",    0x08000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
+	ROM_LOAD( "t-1.3e",    0x10000, 0x08000, CRC(845a9ab0) SHA1(f1455aeca92d129c7ed145d76e5093f41ce62ccb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "t-4.8a",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
@@ -972,8 +967,8 @@ ROM_END
 ROM_START( turtshipk )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "turtship.003",  0x00000, 0x08000, CRC(e7a7fc2e) SHA1(1a9147e82a5e56e8e5b68bbce144f96261e88669) )
-	ROM_LOAD( "turtship.002",  0x10000, 0x08000, CRC(e576f482) SHA1(3be3792cb437bff0345681a3a2fdefefa3439357) )
-	ROM_LOAD( "turtship.001",  0x18000, 0x08000, CRC(a9b64240) SHA1(38c59877de6055230c3250ef74abc97e4ed88cb6) )
+	ROM_LOAD( "turtship.002",  0x08000, 0x08000, CRC(e576f482) SHA1(3be3792cb437bff0345681a3a2fdefefa3439357) )
+	ROM_LOAD( "turtship.001",  0x10000, 0x08000, CRC(a9b64240) SHA1(38c59877de6055230c3250ef74abc97e4ed88cb6) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "t-4.8a",        0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
@@ -1004,8 +999,8 @@ ROM_END
 ROM_START( dyger )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "d-3.5g",  0x00000, 0x08000, CRC(bae9882e) SHA1(88194e58673ebd0841e9e07482842f6dbb823afc) )
-	ROM_LOAD( "d-2.3g",  0x10000, 0x08000, CRC(059ac4dc) SHA1(fe46d819946e168b4a8188302737fdde957743ea) )
-	ROM_LOAD( "d-1.3e",  0x18000, 0x08000, CRC(d8440f66) SHA1(3b2ee8c09d40edbe76d5004ed9074add0d4e4fd0) )
+	ROM_LOAD( "d-2.3g",  0x08000, 0x08000, CRC(059ac4dc) SHA1(fe46d819946e168b4a8188302737fdde957743ea) )
+	ROM_LOAD( "d-1.3e",  0x10000, 0x08000, CRC(d8440f66) SHA1(3b2ee8c09d40edbe76d5004ed9074add0d4e4fd0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "d-4.8a",  0x0000, 0x8000, CRC(8a256c09) SHA1(2c692af62da7c12b7d4f3f79264ee045a2cfa39f) )
@@ -1037,8 +1032,8 @@ ROM_END
 ROM_START( dygera )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "d-3.bin", 0x00000, 0x08000, CRC(fc63da8b) SHA1(f324a314cda167ae05e2eb017da355709489a7a3) )
-	ROM_LOAD( "d-2.3g",  0x10000, 0x08000, CRC(059ac4dc) SHA1(fe46d819946e168b4a8188302737fdde957743ea) )
-	ROM_LOAD( "d-1.3e",  0x18000, 0x08000, CRC(d8440f66) SHA1(3b2ee8c09d40edbe76d5004ed9074add0d4e4fd0) )
+	ROM_LOAD( "d-2.3g",  0x08000, 0x08000, CRC(059ac4dc) SHA1(fe46d819946e168b4a8188302737fdde957743ea) )
+	ROM_LOAD( "d-1.3e",  0x10000, 0x08000, CRC(d8440f66) SHA1(3b2ee8c09d40edbe76d5004ed9074add0d4e4fd0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "d-4.8a",  0x0000, 0x8000, CRC(8a256c09) SHA1(2c692af62da7c12b7d4f3f79264ee045a2cfa39f) )
@@ -1070,7 +1065,7 @@ ROM_END
 ROM_START( twinfalc )   /* Shows "Notice  This game is for use in Korea only..." The real PCB displays the same :-) */
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "t-15.bin",    0x00000, 0x08000, CRC(e1f20144) SHA1(911781232fc1a7d6e36abb1c45e68a4398d8deac) )
-	ROM_LOAD( "t-14.bin",    0x10000, 0x10000, CRC(c499ff83) SHA1(d99bb8cb04485638c5f05584cffdd2fbbe061af7) )
+	ROM_LOAD( "t-14.bin",    0x08000, 0x10000, CRC(c499ff83) SHA1(d99bb8cb04485638c5f05584cffdd2fbbe061af7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "t-1.b4",     0x0000, 0x8000, CRC(b84bc980) SHA1(d2d302a96a9e3197f27144e525a901cfb9da09e4) )
@@ -1102,7 +1097,7 @@ ROM_END
 ROM_START( whizz )  /* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Serial: WZ-089-00845 */
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
 	ROM_LOAD( "t-15.l11",    0x00000, 0x08000, CRC(73161302) SHA1(de815bba66c376cea775139f4285de0b1a589d88) )
-	ROM_LOAD( "t-14.k11",    0x10000, 0x10000, CRC(bf248879) SHA1(f46f15e3949221e59d8c37de9c23473a74c2927e) )
+	ROM_LOAD( "t-14.k11",    0x08000, 0x10000, CRC(bf248879) SHA1(f46f15e3949221e59d8c37de9c23473a74c2927e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "t-1.b4",     0x0000, 0x8000, CRC(b84bc980) SHA1(d2d302a96a9e3197f27144e525a901cfb9da09e4) )
