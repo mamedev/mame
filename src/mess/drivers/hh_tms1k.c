@@ -15,6 +15,8 @@
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
  @MP0914   TMS1000  1978, Entex Baseball 1
  @MP1030   TMS1100  1980, APF Mathemagician
+ *MP1221   TMS1100  1980, Entex Raise The Devil
+ *MP2788   ?        1980, Bandai Flight Time
  @MP3226   TMS1000  1978, Milton Bradley Simon
   MP3403   TMS1100  1978, Marx Electronic Bowling
  @MP3404   TMS1100  1978, Parker Brothers Merlin
@@ -31,6 +33,7 @@
   MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
  @MP6100A  TMS0980  1979, Ideal Electronic Detective
  @MP6101B  TMS0980  1979, Parker Brothers Stop Thief
+ *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
  *MP7332   TMS1400  1981, Milton Bradley Dark Tower
@@ -42,7 +45,7 @@
   M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
   M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
 
-  CD7282SL TMS1100  1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100  1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 

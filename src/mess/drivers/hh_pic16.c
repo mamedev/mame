@@ -2,7 +2,18 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Collection of PIC16xx/16Cxx-driven dedicated handhelds or other simple devices
+  GI PIC16xx-driven dedicated handhelds or other simple devices.
+
+  known chips:
+
+  serial  device  etc.
+-----------------------------------------------------------
+ @036     1655A   1979, Ideal Maniac
+ *110     1650A   1979, Tiger Rocket Pinball
+ *192     1650    19??, (a phone dialer, have dump)
+ *255     1655    19??, (a talking clock, have dump)
+
+  (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
 
   TODO:

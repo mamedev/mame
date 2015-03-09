@@ -7,18 +7,21 @@
 
   known chips:
   
-  serial  device  etc.
------------------------------------------------
- @031     uPD553  1979, Bambino Superstar Football (ET-03)
- @048     uPD552  1980, Tomy Tennis (TN-04)
- @055     uPD553  1980, Bambino Laser Fight (ET-12)
- *085     uPD650  1980, Roland TR-808
-  102     uPD553  1981, Bandai Block Out
- *128     uPD650  1982, Roland TR-606
-  133     uPD650  1982, Roland TB-303
- @160     uPD553  1982, Tomy Pac Man (TN-08)
- @206     uPD553  1982, Epoch Dracula
- @258     uPD553  1984, Tomy Alien Chase (TN-16)
+  serial  device   etc.
+----------------------------------------------------------------
+ @031     uPD553C  1979, Bambino Superstar Football (ET-03)
+ *042     uPD552C  1979, Tomy Space Attack
+ @048     uPD552C  1980, Tomy Tennis (TN-04)
+ @055     uPD553C  1980, Bambino Laser Fight (ET-12)
+ *085     uPD650C  1980, Roland TR-808
+ *102     uPD553C  1981, Bandai Block Out
+ *127     uPD650C  198?  Sony OA-S1100 Typecorder (subcpu, have dump)
+ *128     uPD650C  1982, Roland TR-606
+  133     uPD650C  1982, Roland TB-303
+ @160     uPD553C  1982, Tomy Pac Man (TN-08)
+ *202     uPD553C  1982, Epoch Astro Command
+ @206     uPD553C  1982, Epoch Dracula
+ @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
@@ -615,7 +618,7 @@ MACHINE_CONFIG_END
   Tomy Alien Chase (manufactured in Japan)
   * boards are labeled TN-16 2E121B01
   * NEC uCOM-43 MCU, labeled D553C 258
-  * red/green VFD display NEC FIP9AM24T with color overlay, 2-sided*
+  * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
 
   *Player one views the VFD from the front (grid+filament side) while the
   opposite player views it from the back side (through the conductive traces),
