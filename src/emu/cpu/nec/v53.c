@@ -459,13 +459,13 @@ WRITE_LINE_MEMBER(v53_base_device::dma_hrq_changed)
 
 WRITE8_MEMBER(v53_base_device::dma_io_3_w)
 {
-	logerror("dma_io_3_w %02x\n", data);
+//	logerror("dma_io_3_w %02x\n", data);
 }
 
 READ8_MEMBER(v53_base_device::dma_memin_r)
 {
 	UINT8 ret = rand();
-	logerror("dma_memin_r offset %08x %02x\n", offset, ret);
+//	logerror("dma_memin_r offset %08x %02x\n", offset, ret);
 	return ret;
 }
 

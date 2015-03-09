@@ -54,7 +54,7 @@ const device_type UPD71071_V53 = &device_creator<upd71071_v53_device>;
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 
 enum
@@ -1101,7 +1101,8 @@ READ8_MEMBER(upd71071_v53_device::read)
 	UINT8 ret = 0;
 	int channel = m_selected_channel;
 
-	logerror("DMA: read from register %02x\n",offset);
+	if (LOG) logerror("DMA: read from register %02x\n",offset);
+
 	switch (offset)
 	{
 		case 0x01:  // Channel
