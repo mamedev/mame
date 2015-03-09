@@ -15,7 +15,9 @@ public:
 		m_reel3_scroll(*this, "reel3_scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{
+	}
 
 	int m_dataoffset;
 
@@ -99,19 +101,14 @@ public:
 	DECLARE_DRIVER_INIT(cmast91);
 	DECLARE_DRIVER_INIT(nfb96_dk);
 	DECLARE_DRIVER_INIT(cm);
-	DECLARE_DRIVER_INIT(chry10);
 	DECLARE_DRIVER_INIT(lucky8a);
 	DECLARE_DRIVER_INIT(nfb96sea);
 	DECLARE_DRIVER_INIT(schery97a);
-	DECLARE_DRIVER_INIT(chrygld);
 	DECLARE_DRIVER_INIT(rp35);
-	DECLARE_DRIVER_INIT(cb3);
-	DECLARE_DRIVER_INIT(cb3e);
 	DECLARE_DRIVER_INIT(wcherry);
 	DECLARE_DRIVER_INIT(cmv4);
 	DECLARE_DRIVER_INIT(nfb96_c2);
 	DECLARE_DRIVER_INIT(rp36);
-	DECLARE_DRIVER_INIT(cherrys);
 	DECLARE_DRIVER_INIT(schery97);
 	DECLARE_DRIVER_INIT(nfb96_d);
 	DECLARE_DRIVER_INIT(tonypok);
@@ -145,11 +142,42 @@ public:
 	INTERRUPT_GEN_MEMBER(lucky8_irq);
 	void do_blockswaps(UINT8* ROM);
 	void dump_to_file( UINT8* ROM);
-	UINT8 decrypt(UINT8 cipherText, UINT16 address);
-	UINT8 chry10_decrypt(UINT8 cipherText);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+};
+
+
+class cb3_state : public goldstar_state
+{
+public:
+	cb3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: goldstar_state(mconfig, type, tag)
+	{
+	}
+
+	DECLARE_DRIVER_INIT(cb3);
+	DECLARE_DRIVER_INIT(cb3e);
+	DECLARE_DRIVER_INIT(cherrys);
+
+protected:
+	UINT8 decrypt(UINT8 cipherText, UINT16 address);
+};
+
+
+class chrygld_state : public goldstar_state
+{
+public:
+	chrygld_state(const machine_config &mconfig, device_type type, const char *tag)
+		: goldstar_state(mconfig, type, tag)
+	{
+	}
+
+	DECLARE_DRIVER_INIT(chrygld);
+	DECLARE_DRIVER_INIT(chry10);
+
+protected:
+	UINT8 chry10_decrypt(UINT8 cipherText);
 };
 
 

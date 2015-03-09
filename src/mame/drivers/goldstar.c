@@ -483,7 +483,7 @@ WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
 }
 
 
-static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
+static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, cb3_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -7839,7 +7839,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( cb3e, goldstar_state )
+static MACHINE_CONFIG_START( cb3e, cb3_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -7889,7 +7889,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( cb3c, goldstar_state )
+static MACHINE_CONFIG_START( cb3c, cb3_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -7938,7 +7938,7 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ncb3, goldstar_state )
+static MACHINE_CONFIG_START( ncb3, cb3_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -13480,7 +13480,7 @@ void goldstar_state::dump_to_file( UINT8* ROM)
 	#endif
 }
 
-UINT8 goldstar_state::decrypt(UINT8 cipherText, UINT16 address)
+UINT8 cb3_state::decrypt(UINT8 cipherText, UINT16 address)
 {
 	int idx;
 	UINT8 output;
@@ -13497,12 +13497,12 @@ UINT8 goldstar_state::decrypt(UINT8 cipherText, UINT16 address)
 	return output ^ sbox[idx];
 }
 
-UINT8 goldstar_state::chry10_decrypt(UINT8 cipherText)
+UINT8 chrygld_state::chry10_decrypt(UINT8 cipherText)
 {
 	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
 }
 
-DRIVER_INIT_MEMBER(goldstar_state,chry10)
+DRIVER_INIT_MEMBER(chrygld_state, chry10)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -13526,7 +13526,7 @@ DRIVER_INIT_MEMBER(goldstar_state,chry10)
 	dump_to_file(ROM);
 }
 
-DRIVER_INIT_MEMBER(goldstar_state,cb3)
+DRIVER_INIT_MEMBER(cb3_state, cb3)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
@@ -13544,7 +13544,7 @@ DRIVER_INIT_MEMBER(goldstar_state,cb3)
 }
 
 
-DRIVER_INIT_MEMBER(goldstar_state,chrygld)
+DRIVER_INIT_MEMBER(chrygld_state, chrygld)
 {
 	int A;
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -13983,7 +13983,7 @@ DRIVER_INIT_MEMBER(goldstar_state,match133)
 	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(goldstar_state::fixedvale4_r),this));
 }
 
-DRIVER_INIT_MEMBER(goldstar_state,cherrys)
+DRIVER_INIT_MEMBER(cb3_state, cherrys)
 {
 	int i;
 	UINT8 *ROM = memregion("maincpu")->base();
@@ -14073,7 +14073,7 @@ DRIVER_INIT_MEMBER(goldstar_state, super9)
 
 }
 
-DRIVER_INIT_MEMBER(goldstar_state, cb3e)
+DRIVER_INIT_MEMBER(cb3_state, cb3e)
 {
 /*  program bitswap */
 	int i;
@@ -14130,8 +14130,8 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
 GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
-GAME(  199?, chrygld,   0,        chrygld,  chrygld,  goldstar_state, chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
-GAME(  199?, chry10,    0,        chrygld,  chry10,   goldstar_state, chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
+GAME(  199?, chrygld,   0,        chrygld,  chrygld,  chrygld_state,  chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
+GAME(  199?, chry10,    0,        chrygld,  chry10,   chrygld_state,  chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING )
@@ -14142,11 +14142,11 @@ GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, goldstar_state, cmv4,     
 // are these really dyna, or bootlegs?
 GAMEL( 199?, ncb3,      0,        ncb3,     ncb3,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
 GAMEL( 199?, cb3a,      ncb3,     ncb3,     cb3a,     driver_device,  0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     goldstar_state, cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
-GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     goldstar_state, cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
-GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  goldstar_state, cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
+GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3_state,      cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
+GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
+GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
-GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  goldstar_state, cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_cherryb3 )
+GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_cherryb3 )
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           GAME_NOT_WORKING) // fix prom decode
 
