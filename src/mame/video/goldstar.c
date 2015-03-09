@@ -19,33 +19,6 @@
 ***************************************************************************/
 
 
-WRITE8_MEMBER(goldstar_state::cm_girl_scroll_w)
-{
-	m_cm_girl_scroll = data;
-	/*
-	    xxxx ----  yscroll
-	    ---- xxxx  xscroll
-
-	    this isn't very fine scrolling, but i see no other registers.
-	    1000 1000 is the center of the screen.
-	*/
-}
-
-WRITE8_MEMBER(goldstar_state::cm_outport0_w)
-{
-	m_cm_enable_reg = data;
-	/*
-	    ---- ---x  (global enable or irq enable?)
-	    ---- --x-  (fg enable)
-	    ---- -x--  (girl enable?)
-	    ---- x---  (reels enable)
-
-	    xxxx ----  unused?
-
-	*/
-	//popmessage("%02x",data);
-}
-
 WRITE8_MEMBER(goldstar_state::goldstar_fg_vidram_w)
 {
 	m_fg_vidram[offset] = data;
@@ -66,17 +39,6 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 
 	SET_TILE_INFO_MEMBER(0,
 			code | (attr & 0xf0)<<4,
-			attr&0x0f,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_magical_fg_tile_info)
-{
-	int code = m_fg_vidram[tile_index];
-	int attr = m_fg_atrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(0,
-			(code | (attr & 0xf0)<<4)+m_tile_bank*0x1000,
 			attr&0x0f,
 			0);
 }
@@ -193,42 +155,6 @@ WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
 	m_reel3_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(goldstar_state::cm_background_col_w)
-{
-	//printf("cm_background_col_w %02x\n",data);
-
-	/* cherry master writes
-
-	so it's probably
-
-	0ggg cc00
-
-	where g is which girl to display and c is the colour palette
-
-	(note, this doesn't apply to the amcoe games which have no girls, I'm unsure how the priority/positioning works)
-
-
-	*/
-	m_cmaster_girl_num = (data >> 4)&0x7;
-	m_cmaster_girl_pal = (data >> 2)&0x3;
-
-	//bgcolor = (data & 0x03) >> 0;
-
-	// apparently some boards have this colour scheme?
-	// i'm not convinced it isn't just a different prom on them
-	#if 0
-	m_bgcolor = 0;
-	m_bgcolor |= (data & 0x01) << 1;
-	m_bgcolor |= (data & 0x02) >> 1;
-	#else
-	m_bgcolor = (data & 0x03) >> 0;
-	#endif
-
-	m_reel1_tilemap->mark_all_dirty();
-	m_reel2_tilemap->mark_all_dirty();
-	m_reel3_tilemap->mark_all_dirty();
-}
-
 
 
 UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -316,7 +242,73 @@ UINT32 goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+
+WRITE8_MEMBER(cmaster_state::outport0_w)
+{
+	m_cm_enable_reg = data;
+	/*
+	    ---- ---x  (global enable or irq enable?)
+	    ---- --x-  (fg enable)
+	    ---- -x--  (girl enable?)
+	    ---- x---  (reels enable)
+
+	    xxxx ----  unused?
+
+	*/
+	//popmessage("%02x",data);
+}
+
+WRITE8_MEMBER(cmaster_state::girl_scroll_w)
+{
+	m_cm_girl_scroll = data;
+	/*
+	    xxxx ----  yscroll
+	    ---- xxxx  xscroll
+
+	    this isn't very fine scrolling, but i see no other registers.
+	    1000 1000 is the center of the screen.
+	*/
+}
+
+WRITE8_MEMBER(cmaster_state::background_col_w)
+{
+	//printf("cm_background_col_w %02x\n",data);
+
+	/* cherry master writes
+
+	so it's probably
+
+	0ggg cc00
+
+	where g is which girl to display and c is the colour palette
+
+	(note, this doesn't apply to the amcoe games which have no girls, I'm unsure how the priority/positioning works)
+
+
+	*/
+	m_cmaster_girl_num = (data >> 4)&0x7;
+	m_cmaster_girl_pal = (data >> 2)&0x3;
+
+	//bgcolor = (data & 0x03) >> 0;
+
+	// apparently some boards have this colour scheme?
+	// i'm not convinced it isn't just a different prom on them
+	#if 0
+	m_bgcolor = 0;
+	m_bgcolor |= (data & 0x01) << 1;
+	m_bgcolor |= (data & 0x02) >> 1;
+	#else
+	m_bgcolor = (data & 0x03) >> 0;
+	#endif
+
+	m_reel1_tilemap->mark_all_dirty();
+	m_reel2_tilemap->mark_all_dirty();
+	m_reel3_tilemap->mark_all_dirty();
+}
+
+
+UINT32 cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -358,13 +350,25 @@ UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16
 
 
 
+TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
+{
+	int code = m_fg_vidram[tile_index];
+	int attr = m_fg_atrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(0,
+			(code | (attr & 0xf0)<<4)+m_tile_bank*0x1000,
+			attr&0x0f,
+			0);
+}
+
+
 VIDEO_START_MEMBER(wingco_state, bingowng)
 {
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -373,15 +377,15 @@ VIDEO_START_MEMBER(wingco_state, bingowng)
 
 VIDEO_START_MEMBER(wingco_state, magical)
 {
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(32);
 	m_reel2_tilemap->set_scroll_cols(32);
 	m_reel3_tilemap->set_scroll_cols(32);
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(wingco_state::get_magical_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
@@ -718,7 +722,7 @@ VIDEO_START_MEMBER(unkch_state, unkch)
 	m_cmaster_girl_pal = 0;
 	m_vidreg = 0x00;
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_cm_enable_reg = 0x0b;

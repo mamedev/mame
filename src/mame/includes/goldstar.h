@@ -19,9 +19,46 @@ public:
 	{
 	}
 
+	DECLARE_WRITE8_MEMBER(protection_w);
+	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE8_MEMBER(lucky8_outport_w);
+	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
+	DECLARE_WRITE8_MEMBER(goldstar_lamps_w);
+	DECLARE_WRITE8_MEMBER(cb3_lamps_w);
+	DECLARE_WRITE8_MEMBER(pkrmast_lamps_w);
+	DECLARE_WRITE8_MEMBER(ladylinr_outport_w);
+	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_fg_atrram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_reel1_ram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_reel2_ram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_reel3_ram_w);
+	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
+	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
+	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	DECLARE_DRIVER_INIT(goldstar);
+	DECLARE_DRIVER_INIT(cmast91);
+	DECLARE_DRIVER_INIT(wcherry);
+	DECLARE_DRIVER_INIT(super9);
+	DECLARE_VIDEO_START(goldstar);
+	DECLARE_PALETTE_INIT(cm);
+	DECLARE_VIDEO_START(cherrym);
+	DECLARE_PALETTE_INIT(cmast91);
+	DECLARE_PALETTE_INIT(lucky8);
+	UINT32 screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_goldstar_reel1_tile_info);
+	TILE_GET_INFO_MEMBER(get_goldstar_reel2_tile_info);
+	TILE_GET_INFO_MEMBER(get_goldstar_reel3_tile_info);
+
+	void do_blockswaps(UINT8* ROM);
+	void dump_to_file(UINT8* ROM);
+
 	int m_dataoffset;
 
-	UINT8 *m_atrram;
 	required_shared_ptr<UINT8> m_fg_vidram;
 	required_shared_ptr<UINT8> m_fg_atrram;
 
@@ -36,7 +73,6 @@ public:
 	optional_shared_ptr<UINT8> m_reel2_scroll;
 	optional_shared_ptr<UINT8> m_reel3_scroll;
 
-
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
@@ -48,87 +84,67 @@ public:
 	UINT8 m_cmaster_girl_pal;
 	UINT8 m_cm_enable_reg;
 	UINT8 m_cm_girl_scroll;
-	int m_tile_bank;
 
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(lucky8_outport_w);
-	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
-	DECLARE_WRITE8_MEMBER(goldstar_lamps_w);
-	DECLARE_WRITE8_MEMBER(cb3_lamps_w);
-	DECLARE_WRITE8_MEMBER(cm_outport1_w);
-	DECLARE_WRITE8_MEMBER(pkrmast_lamps_w);
-	DECLARE_WRITE8_MEMBER(ladylinr_outport_w);
-	DECLARE_READ8_MEMBER(fixedvalb4_r);
-	DECLARE_READ8_MEMBER(fixedvala8_r);
-	DECLARE_READ8_MEMBER(fixedval38_r);
-	DECLARE_READ8_MEMBER(fixedvalea_r);
-	DECLARE_READ8_MEMBER(fixedval68_r);
-	DECLARE_READ8_MEMBER(fixedval58_r);
-	DECLARE_READ8_MEMBER(fixedval80_r);
-	DECLARE_READ8_MEMBER(fixedval96_r);
-	DECLARE_READ8_MEMBER(fixedvalaa_r);
-	DECLARE_READ8_MEMBER(fixedvalbe_r);
-	DECLARE_READ8_MEMBER(fixedval90_r);
-	DECLARE_READ8_MEMBER(fixedval84_r);
-	DECLARE_READ8_MEMBER(fixedvalb2_r);
-	DECLARE_READ8_MEMBER(fixedval48_r);
-	DECLARE_READ8_MEMBER(fixedval09_r);
-	DECLARE_READ8_MEMBER(fixedval74_r);
-	DECLARE_READ8_MEMBER(fixedvale4_r);
-	DECLARE_READ8_MEMBER(fixedvalc7_r);
-	DECLARE_READ8_MEMBER(fixedval7d_r);
-	DECLARE_WRITE8_MEMBER(cm_girl_scroll_w);
-	DECLARE_WRITE8_MEMBER(cm_outport0_w);
-	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_fg_atrram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
-	DECLARE_WRITE8_MEMBER(cm_background_col_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
-	DECLARE_DRIVER_INIT(goldstar);
-	DECLARE_DRIVER_INIT(cmast91);
-	DECLARE_DRIVER_INIT(nfb96_dk);
-	DECLARE_DRIVER_INIT(cm);
-	DECLARE_DRIVER_INIT(nfb96sea);
-	DECLARE_DRIVER_INIT(schery97a);
-	DECLARE_DRIVER_INIT(rp35);
-	DECLARE_DRIVER_INIT(wcherry);
-	DECLARE_DRIVER_INIT(cmv4);
-	DECLARE_DRIVER_INIT(nfb96_c2);
-	DECLARE_DRIVER_INIT(rp36);
-	DECLARE_DRIVER_INIT(schery97);
-	DECLARE_DRIVER_INIT(nfb96_d);
-	DECLARE_DRIVER_INIT(tonypok);
-	DECLARE_DRIVER_INIT(skill98);
-	DECLARE_DRIVER_INIT(po33);
-	DECLARE_DRIVER_INIT(match133);
-	DECLARE_DRIVER_INIT(rp36c3);
-	DECLARE_DRIVER_INIT(nfb96_c1);
-	DECLARE_DRIVER_INIT(fb2010);
-	DECLARE_DRIVER_INIT(super9);
-	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel3_tile_info);
-	DECLARE_VIDEO_START(goldstar);
-	DECLARE_PALETTE_INIT(cm);
-	DECLARE_VIDEO_START(cherrym);
-	DECLARE_PALETTE_INIT(cmast91);
-	DECLARE_PALETTE_INIT(lucky8);
-	UINT32 screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void do_blockswaps(UINT8* ROM);
-	void dump_to_file( UINT8* ROM);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+};
+
+
+class cmaster_state : public goldstar_state
+{
+public:
+	cmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		goldstar_state(mconfig, type, tag)
+	{
+	}
+
+	DECLARE_WRITE8_MEMBER(outport0_w);
+	DECLARE_WRITE8_MEMBER(outport1_w);
+	DECLARE_WRITE8_MEMBER(girl_scroll_w);
+	DECLARE_WRITE8_MEMBER(background_col_w);
+
+	DECLARE_DRIVER_INIT(cm);
+	DECLARE_DRIVER_INIT(cmv4);
+	DECLARE_DRIVER_INIT(tonypok);
+	DECLARE_DRIVER_INIT(schery97);
+	DECLARE_DRIVER_INIT(schery97a);
+	DECLARE_DRIVER_INIT(skill98);
+	DECLARE_DRIVER_INIT(po33);
+	DECLARE_DRIVER_INIT(match133);
+	DECLARE_DRIVER_INIT(nfb96_dk);
+	DECLARE_DRIVER_INIT(nfb96_c2);
+	DECLARE_DRIVER_INIT(nfb96_d);
+	DECLARE_DRIVER_INIT(nfb96_c1);
+	DECLARE_DRIVER_INIT(nfb96sea);
+	DECLARE_DRIVER_INIT(fb2010);
+	DECLARE_DRIVER_INIT(rp35);
+	DECLARE_DRIVER_INIT(rp36);
+	DECLARE_DRIVER_INIT(rp36c3);
+
+	UINT32 screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	// installed by various driver init handlers to get stuff to work
+	READ8_MEMBER(fixedval09_r) { return 0x09; }
+	READ8_MEMBER(fixedval38_r) { return 0x38; }
+	READ8_MEMBER(fixedval48_r) { return 0x48; }
+	READ8_MEMBER(fixedval58_r) { return 0x58; }
+	READ8_MEMBER(fixedval68_r) { return 0x68; }
+	READ8_MEMBER(fixedval74_r) { return 0x74; }
+	READ8_MEMBER(fixedval7d_r) { return 0x7d; }
+	READ8_MEMBER(fixedval80_r) { return 0x80; }
+	READ8_MEMBER(fixedval84_r) { return 0x84; }
+	READ8_MEMBER(fixedval90_r) { return 0x90; }
+	READ8_MEMBER(fixedval96_r) { return 0x96; }
+	READ8_MEMBER(fixedvala8_r) { return 0xa8; }
+	READ8_MEMBER(fixedvalaa_r) { return 0xaa; }
+	READ8_MEMBER(fixedvalb2_r) { return 0xb2; }
+	READ8_MEMBER(fixedvalb4_r) { return 0xb4; }
+	READ8_MEMBER(fixedvalbe_r) { return 0xbe; }
+	READ8_MEMBER(fixedvalc7_r) { return 0xc7; }
+	READ8_MEMBER(fixedvalea_r) { return 0xea; }
+	READ8_MEMBER(fixedvale4_r) { return 0xe4; }
 };
 
 
@@ -157,9 +173,14 @@ public:
 
 	INTERRUPT_GEN_MEMBER(masked_irq);
 
+protected:
+	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
+
 private:
 	UINT8 m_nmi_enable;
 	UINT8 m_vidreg;
+
+	int m_tile_bank;
 };
 
 
