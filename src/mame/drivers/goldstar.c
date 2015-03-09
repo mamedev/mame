@@ -1134,6 +1134,93 @@ static INPUT_PORTS_START( cmv4_service )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cmv4_dsw3 )
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")
+	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
+	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cmv4_dsw4 )
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x07, 0x06, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")
+	PORT_DIPSETTING(    0x07, "5,000" )
+	PORT_DIPSETTING(    0x06, "10,000" )
+	PORT_DIPSETTING(    0x05, "20,000" )
+	PORT_DIPSETTING(    0x04, "30,000" )
+	PORT_DIPSETTING(    0x03, "40,000" )
+	PORT_DIPSETTING(    0x02, "50,000" )
+	PORT_DIPSETTING(    0x01, "100,000" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(    0x10, "C-Type" )
+	PORT_DIPSETTING(    0x00, "D-Type" )
+	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(    0x20, "16 Bet" )
+	PORT_DIPSETTING(    0x00, "8 Bet" )
+	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( cmv4_dsw5 )
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3")
+	PORT_DIPSETTING(    0x06, "1,000" )
+	PORT_DIPSETTING(    0x04, "5,000" )
+	PORT_DIPSETTING(    0x02, "10,000" )
+	PORT_DIPSETTING(    0x00, "20,000" )
+	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5")
+	PORT_DIPSETTING(    0x18, "12-7-1" )
+	PORT_DIPSETTING(    0x10, "9-5-1" )
+	PORT_DIPSETTING(    0x08, "6-3-1" )
+	PORT_DIPSETTING(    0x00, "3-2-1" )
+	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( cmv801 )
 	PORT_INCLUDE( cmv4_player )
 
@@ -1191,85 +1278,17 @@ static INPUT_PORTS_START( cmv801 )
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* not checked */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* not working */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* Display Of Payout Limit not working; all others OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* only affects payout table screen */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* OK */
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
-	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not working */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmv4 )
@@ -1329,85 +1348,17 @@ static INPUT_PORTS_START( cmv4 )
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x06, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* OK */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x00, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* OK */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* all OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* only affects payout table screen, also flashes info string */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* OK*/
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
-	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not working */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmaster )
@@ -1475,85 +1426,17 @@ static INPUT_PORTS_START( cmaster )
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x06, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* OK */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x00, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* OK */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* all OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* only affects payout table screen */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* OK */
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
-	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not working */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmasterb )
@@ -1621,85 +1504,17 @@ static INPUT_PORTS_START( cmasterb )
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x05, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* OK */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x00, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4")    /* OK */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* all OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* only affects payout table screen */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* OK */
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
-	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not checked */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmasterc )
@@ -1767,85 +1582,17 @@ static INPUT_PORTS_START( cmasterc )
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x05, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* OK */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x00, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4")    /* OK */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* all OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* only affects payout table screen */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* OK */
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
-	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not checked */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmast91 )
@@ -1913,83 +1660,22 @@ static INPUT_PORTS_START( cmast91 )
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x06, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* OK */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x00, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4")    /* OK */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x00, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* all OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:1")  /* no whores here */
+	PORT_INCLUDE( cmv4_dsw5 )
+	PORT_MODIFY("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW5:1")  /* normally Display of Doll On Demo, but no whores in this set */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                 PORT_DIPLOCATION("DSW5:2,3")   /* OK  */
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" ) PORT_DIPLOCATION("DSW5:4,5")   /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:6")  /* not checked */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW5:6")  /* normally Display Of Doll At All Fr. Bonus, but no whores in this set */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )               PORT_DIPLOCATION("DSW5:7")  /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )              PORT_DIPLOCATION("DSW5:8")  /* no whores in demo */
+	/* DSW5-7 listed as unused */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW5:8")  /* normally Test Mode For Disp. Of Doll, but no whores in this set */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -6768,55 +6454,15 @@ static INPUT_PORTS_START( cmpacman )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* not checked */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* not working */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* Display Of Payout Limit not working; all others OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* only affects payout table screen */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* OK */
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
-	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not working */
 INPUT_PORTS_END
 
 
@@ -6900,85 +6546,17 @@ static INPUT_PORTS_START( cmtetris )
 	PORT_DIPSETTING(    0x80, "Unlimited" )
 	PORT_DIPSETTING(    0x00, "Limited" )
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")  /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
-	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")  /* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_INCLUDE( cmv4_dsw3 )   /* all OK */
 
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Credit Limit" )            PORT_DIPLOCATION("DSW4:1,2,3")    /* not checked */
-	PORT_DIPSETTING(    0x07, "5,000" )
-	PORT_DIPSETTING(    0x06, "10,000" )
-	PORT_DIPSETTING(    0x05, "20,000" )
-	PORT_DIPSETTING(    0x04, "30,000" )
-	PORT_DIPSETTING(    0x03, "40,000" )
-	PORT_DIPSETTING(    0x02, "50,000" )
-	PORT_DIPSETTING(    0x01, "100,000" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )
-	PORT_DIPNAME( 0x08, 0x08, "Display Of Payout Limit" ) PORT_DIPLOCATION("DSW4:4") /* not working */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Type Of Coin D" )          PORT_DIPLOCATION("DSW4:5")    /* OK */
-	PORT_DIPSETTING(    0x10, "C-Type" )
-	PORT_DIPSETTING(    0x00, "D-Type" )
-	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" ) PORT_DIPLOCATION("DSW4:6")    /* OK */
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
-	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )              PORT_DIPLOCATION("DSW4:7")    /* OK */
-	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x80, 0x80, "Hopper Out By Coin A" )    PORT_DIPLOCATION("DSW4:8")    /* not checked */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw4 )   /* Display Of Payout Limit not working; all others OK */
 
-	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Display Of Doll On Demo" )          PORT_DIPLOCATION("DSW5:1")   /* not working */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )                    PORT_DIPLOCATION("DSW5:2,3") /* not checked */
-	PORT_DIPSETTING(    0x06, "1,000" )
-	PORT_DIPSETTING(    0x04, "5,000" )
-	PORT_DIPSETTING(    0x02, "10,000" )
-	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x18, "Condition For 3 Kind Of Bonus" )    PORT_DIPLOCATION("DSW5:4,5") /* not checked */
-	PORT_DIPSETTING(    0x18, "12-7-1" )
-	PORT_DIPSETTING(    0x10, "9-5-1" )
-	PORT_DIPSETTING(    0x08, "6-3-1" )
-	PORT_DIPSETTING(    0x00, "3-2-1" )
-	PORT_DIPNAME( 0x20, 0x00, "Display Of Doll At All Fr. Bonus" ) PORT_DIPLOCATION("DSW5:6")   /* not checked */
-	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )                  PORT_DIPLOCATION("DSW5:7")   /* listed as unused */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode For Disp. Of Doll" )      PORT_DIPLOCATION("DSW5:8")   /* not working */
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_INCLUDE( cmv4_dsw5 )
+	/* Display of Doll On Demo only affects payout table screen */
+	/* Coin In Limit OK */
+	/* Condition For 3 Kind Of Bonus not checked */
+	/* Display Of Doll At All Fr. Bonus not checked */
+	/* DSW5-7 listed as unused */
+	/* Test Mode For Disp. Of Doll not working */
 INPUT_PORTS_END
 
 
