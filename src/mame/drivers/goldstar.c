@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sangho_state )
+static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sanghopm_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(fg_vidram_w) AM_SHARE("fg_vidram")    // videoram 1
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sangho_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(sangho_state::coincount_w)
+WRITE8_MEMBER(sanghopm_state::coincount_w)
 {
 /*
   7654 3210
@@ -309,12 +309,12 @@ WRITE8_MEMBER(sangho_state::coincount_w)
 	coin_counter_w(machine(), 4, data & 0x01);  /* counter5 payout */
 }
 
-WRITE8_MEMBER(sangho_state::enable_w)
+WRITE8_MEMBER(sanghopm_state::enable_w)
 {
 	m_enable_reg = data;
 }
 
-static ADDRESS_MAP_START( star100_readport, AS_IO, 8, sangho_state )
+static ADDRESS_MAP_START( star100_readport, AS_IO, 8, sanghopm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
@@ -7589,13 +7589,13 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( star100, sangho_state )
+static MACHINE_CONFIG_START( star100, sanghopm_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(star100_map)
 	MCFG_CPU_IO_MAP(star100_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sangho_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sanghopm_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7603,7 +7603,7 @@ static MACHINE_CONFIG_START( star100, sangho_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sangho_state, screen_update_sangho)
+	MCFG_SCREEN_UPDATE_DRIVER(sanghopm_state, screen_update_sangho)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -7613,7 +7613,7 @@ static MACHINE_CONFIG_START( star100, sangho_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START_OVERRIDE(sangho_state, sangho)
+	MCFG_VIDEO_START_OVERRIDE(sanghopm_state, sangho)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

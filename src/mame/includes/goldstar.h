@@ -217,10 +217,10 @@ protected:
 };
 
 
-class sangho_state : public goldstar_state
+class sanghopm_state : public goldstar_state
 {
 public:
-	sangho_state(const machine_config &mconfig, device_type type, const char *tag) :
+	sanghopm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		goldstar_state(mconfig, type, tag),
 		m_reel1_attrram(*this, "reel1_attrram"),
 		m_reel2_attrram(*this, "reel2_attrram"),

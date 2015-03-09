@@ -493,50 +493,50 @@ UINT32 wingco_state::screen_update_magical(screen_device &screen, bitmap_ind16 &
 
 
 
-WRITE8_MEMBER(sangho_state::fg_vidram_w)
+WRITE8_MEMBER(sanghopm_state::fg_vidram_w)
 {
 	m_fg_vidram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sangho_state::fg_atrram_w)
+WRITE8_MEMBER(sanghopm_state::fg_atrram_w)
 {
 	m_fg_atrram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sangho_state::bg_vidram_w)
+WRITE8_MEMBER(sanghopm_state::bg_vidram_w)
 {
 	m_bg_vidram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sangho_state::bg_atrram_w)
+WRITE8_MEMBER(sanghopm_state::bg_atrram_w)
 {
 	m_bg_atrram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sangho_state::reel1_attrram_w)
+WRITE8_MEMBER(sanghopm_state::reel1_attrram_w)
 {
 	m_reel1_attrram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sangho_state::reel2_attrram_w)
+WRITE8_MEMBER(sanghopm_state::reel2_attrram_w)
 {
 	m_reel2_attrram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sangho_state::reel3_attrram_w)
+WRITE8_MEMBER(sanghopm_state::reel3_attrram_w)
 {
 	m_reel3_attrram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 
-TILE_GET_INFO_MEMBER(sangho_state::get_fg_tile_info)
+TILE_GET_INFO_MEMBER(sanghopm_state::get_fg_tile_info)
 {
 	int code = m_fg_vidram[tile_index];
 	int attr = m_fg_atrram[tile_index];
@@ -547,7 +547,7 @@ TILE_GET_INFO_MEMBER(sangho_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sangho_state::get_bg_tile_info)
+TILE_GET_INFO_MEMBER(sanghopm_state::get_bg_tile_info)
 {
 	int code = m_bg_vidram[tile_index];
 	int attr = m_bg_atrram[tile_index];
@@ -558,7 +558,7 @@ TILE_GET_INFO_MEMBER(sangho_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sangho_state::get_reel1_tile_info)
+TILE_GET_INFO_MEMBER(sanghopm_state::get_reel1_tile_info)
 {
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attrram[tile_index];
@@ -569,7 +569,7 @@ TILE_GET_INFO_MEMBER(sangho_state::get_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sangho_state::get_reel2_tile_info)
+TILE_GET_INFO_MEMBER(sanghopm_state::get_reel2_tile_info)
 {
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attrram[tile_index];
@@ -580,7 +580,7 @@ TILE_GET_INFO_MEMBER(sangho_state::get_reel2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sangho_state::get_reel3_tile_info)
+TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
 {
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attrram[tile_index];
@@ -592,24 +592,24 @@ TILE_GET_INFO_MEMBER(sangho_state::get_reel3_tile_info)
 }
 
 
-VIDEO_START_MEMBER(sangho_state, sangho)
+VIDEO_START_MEMBER(sanghopm_state, sangho)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
 	m_reel3_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sanghopm_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
-UINT32 sangho_state::screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
