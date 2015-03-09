@@ -58,30 +58,6 @@ WRITE8_MEMBER(goldstar_state::goldstar_fg_atrram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(goldstar_state::sangho_fg_vidram_w)
-{
-	m_fg_vidram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(goldstar_state::sangho_fg_atrram_w)
-{
-	m_fg_atrram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(goldstar_state::sangho_bg_vidram_w)
-{
-	m_bg_vidram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(goldstar_state::sangho_bg_atrram_w)
-{
-	m_bg_atrram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
 
 TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 {
@@ -91,28 +67,6 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0,
 			code | (attr & 0xf0)<<4,
 			attr&0x0f,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_fg_tile_info)
-{
-	int code = m_fg_vidram[tile_index];
-	int attr = m_fg_atrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(0,
-			code | (attr & 0x0f)<<8,
-			(attr&0x70)>>4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_bg_tile_info)
-{
-	int code = m_bg_vidram[tile_index];
-	int attr = m_bg_atrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr & 0x0f)<<8,
-			(attr&0x70)>>4,
 			0);
 }
 
@@ -191,113 +145,6 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(goldstar_state::unkch_reel1_attrram_w)
-{
-	m_reel1_attrram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(goldstar_state::unkch_reel2_attrram_w)
-{
-	m_reel2_attrram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-
-WRITE8_MEMBER(goldstar_state::unkch_reel3_attrram_w)
-{
-	m_reel3_attrram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel1_tile_info)
-{
-	int code = m_reel1_ram[tile_index];
-	int attr = m_reel1_attrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr & 0x0f)<<8,
-			(attr&0xf0)>>4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel2_tile_info)
-{
-	int code = m_reel2_ram[tile_index];
-	int attr = m_reel2_attrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr & 0x0f)<<8,
-			(attr&0xf0)>>4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel3_tile_info)
-{
-	int code = m_reel3_ram[tile_index];
-	int attr = m_reel3_attrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr & 0x0f)<<8,
-			(attr&0xf0)>>4,
-			0);
-}
-
-
-WRITE8_MEMBER(goldstar_state::sangho_reel1_attrram_w)
-{
-	m_reel1_attrram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(goldstar_state::sangho_reel2_attrram_w)
-{
-	m_reel2_attrram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(goldstar_state::sangho_reel3_attrram_w)
-{
-	m_reel3_attrram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_reel1_tile_info)
-{
-	int code = m_reel1_ram[tile_index];
-	int attr = m_reel1_attrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr & 0x0f)<<8,
-			(attr&0x70)>>4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_reel2_tile_info)
-{
-	int code = m_reel2_ram[tile_index];
-	int attr = m_reel2_attrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr & 0x0f)<<8,
-			(attr&0x70)>>4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_sangho_reel3_tile_info)
-{
-	int code = m_reel3_ram[tile_index];
-	int attr = m_reel3_attrram[tile_index];
-
-	SET_TILE_INFO_MEMBER(1,
-			code | (attr & 0x0f)<<8,
-			(attr&0x70)>>4,
-			0);
-}
-
-
 VIDEO_START_MEMBER(goldstar_state, goldstar)
 {
 	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
@@ -345,26 +192,6 @@ VIDEO_START_MEMBER(goldstar_state, magical)
 	m_cm_enable_reg = 0x0b;
 }
 
-VIDEO_START_MEMBER(goldstar_state, unkch)
-{
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-
-	m_reel1_tilemap->set_scroll_cols(32);
-	m_reel2_tilemap->set_scroll_cols(32);
-	m_reel3_tilemap->set_scroll_cols(32);
-
-	m_cmaster_girl_num = 0;
-	m_cmaster_girl_pal = 0;
-	m_unkch_vidreg = 0x00;
-
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-
-	m_cm_enable_reg = 0x0b;
-}
-
 VIDEO_START_MEMBER(goldstar_state, cherrym)
 {
 	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
@@ -383,23 +210,6 @@ VIDEO_START_MEMBER(goldstar_state, cherrym)
 
 	m_cm_enable_reg = 0x0b;
 }
-
-VIDEO_START_MEMBER(goldstar_state, sangho)
-{
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_sangho_bg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_sangho_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_sangho_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_sangho_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
-
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_sangho_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap->set_transparent_pen(0);
-}
-
 
 
 WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
@@ -600,60 +410,6 @@ UINT32 goldstar_state::screen_update_magical(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-
-UINT32 goldstar_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int i;
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	if (!(m_cm_enable_reg &0x01))
-		return 0;
-
-	if (m_cm_enable_reg &0x08)
-	{
-		// guess, this could be something else completely!!
-		// only draw the first 'reels' tilemap, but fullscreen, using alt registers? (or no scrolling at all? - doubtful, see girl)
-		if (m_unkch_vidreg & 0x40)
-		{
-			for (i= 0;i < 32;i++)
-			{
-				m_reel1_tilemap->set_scrolly(i, -0x08/*m_reel1_scroll[(i*2)+1]*/);
-			//  m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[(i*2)+1]);
-			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[(i*2)+1]);
-			}
-
-			m_reel1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-		}
-		// or draw the reels normally?
-		else
-		{
-			for (i= 0;i < 32;i++)
-			{
-				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
-				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
-				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
-			}
-
-			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
-			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
-			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
-
-			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
-		}
-	}
-
-	if (m_cm_enable_reg &0x02)
-	{
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	}
-
-	return 0;
-}
-
 UINT32 goldstar_state::screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
@@ -730,13 +486,130 @@ UINT32 goldstar_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind16
 }
 
 
-UINT32 goldstar_state::screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+WRITE8_MEMBER(sangho_state::fg_vidram_w)
+{
+	m_fg_vidram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(sangho_state::fg_atrram_w)
+{
+	m_fg_atrram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(sangho_state::bg_vidram_w)
+{
+	m_bg_vidram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(sangho_state::bg_atrram_w)
+{
+	m_bg_atrram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(sangho_state::reel1_attrram_w)
+{
+	m_reel1_attrram[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(sangho_state::reel2_attrram_w)
+{
+	m_reel2_attrram[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(sangho_state::reel3_attrram_w)
+{
+	m_reel3_attrram[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
+}
+
+
+TILE_GET_INFO_MEMBER(sangho_state::get_fg_tile_info)
+{
+	int code = m_fg_vidram[tile_index];
+	int attr = m_fg_atrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(0,
+			code | (attr & 0x0f)<<8,
+			(attr&0x70)>>4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(sangho_state::get_bg_tile_info)
+{
+	int code = m_bg_vidram[tile_index];
+	int attr = m_bg_atrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(1,
+			code | (attr & 0x0f)<<8,
+			(attr&0x70)>>4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(sangho_state::get_reel1_tile_info)
+{
+	int code = m_reel1_ram[tile_index];
+	int attr = m_reel1_attrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(1,
+			code | (attr & 0x0f)<<8,
+			(attr&0x70)>>4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(sangho_state::get_reel2_tile_info)
+{
+	int code = m_reel2_ram[tile_index];
+	int attr = m_reel2_attrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(1,
+			code | (attr & 0x0f)<<8,
+			(attr&0x70)>>4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(sangho_state::get_reel3_tile_info)
+{
+	int code = m_reel3_ram[tile_index];
+	int attr = m_reel3_attrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(1,
+			code | (attr & 0x0f)<<8,
+			(attr&0x70)>>4,
+			0);
+}
+
+
+VIDEO_START_MEMBER(sangho_state, sangho)
+{
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+
+	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel2_tilemap->set_scroll_cols(64);
+	m_reel3_tilemap->set_scroll_cols(64);
+
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sangho_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+
+UINT32 sangho_state::screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	if (m_sangho_enable_reg &0x01)
+	if (m_enable_reg & 0x01)
 	{
 		/* disable reels (only render bg and fg layers) */
 		m_bg_tilemap->set_scrolly(0, -16);
@@ -767,6 +640,135 @@ UINT32 goldstar_state::screen_update_sangho(screen_device &screen, bitmap_ind16 
 		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
 		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
 
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
+	return 0;
+}
+
+
+
+WRITE8_MEMBER(unkch_state::reel1_attrram_w)
+{
+	m_reel1_attrram[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
+}
+
+WRITE8_MEMBER(unkch_state::reel2_attrram_w)
+{
+	m_reel2_attrram[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
+}
+
+
+WRITE8_MEMBER(unkch_state::reel3_attrram_w)
+{
+	m_reel3_attrram[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
+}
+
+
+TILE_GET_INFO_MEMBER(unkch_state::get_reel1_tile_info)
+{
+	int code = m_reel1_ram[tile_index];
+	int attr = m_reel1_attrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(1,
+			code | (attr & 0x0f)<<8,
+			(attr&0xf0)>>4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(unkch_state::get_reel2_tile_info)
+{
+	int code = m_reel2_ram[tile_index];
+	int attr = m_reel2_attrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(1,
+			code | (attr & 0x0f)<<8,
+			(attr&0xf0)>>4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
+{
+	int code = m_reel3_ram[tile_index];
+	int attr = m_reel3_attrram[tile_index];
+
+	SET_TILE_INFO_MEMBER(1,
+			code | (attr & 0x0f)<<8,
+			(attr&0xf0)>>4,
+			0);
+}
+
+
+VIDEO_START_MEMBER(unkch_state, unkch)
+{
+	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(unkch_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+
+	m_reel1_tilemap->set_scroll_cols(32);
+	m_reel2_tilemap->set_scroll_cols(32);
+	m_reel3_tilemap->set_scroll_cols(32);
+
+	m_cmaster_girl_num = 0;
+	m_cmaster_girl_pal = 0;
+	m_unkch_vidreg = 0x00;
+
+	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goldstar_state::get_cherrym_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_cm_enable_reg = 0x0b;
+}
+
+UINT32 unkch_state::screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int i;
+
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	if (!(m_cm_enable_reg &0x01))
+		return 0;
+
+	if (m_cm_enable_reg &0x08)
+	{
+		// guess, this could be something else completely!!
+		// only draw the first 'reels' tilemap, but fullscreen, using alt registers? (or no scrolling at all? - doubtful, see girl)
+		if (m_unkch_vidreg & 0x40)
+		{
+			for (i= 0;i < 32;i++)
+			{
+				m_reel1_tilemap->set_scrolly(i, -0x08/*m_reel1_scroll[(i*2)+1]*/);
+			//  m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[(i*2)+1]);
+			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[(i*2)+1]);
+			}
+
+			m_reel1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+		}
+		// or draw the reels normally?
+		else
+		{
+			for (i= 0;i < 32;i++)
+			{
+				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
+				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
+				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
+			}
+
+			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
+			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
+			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
+
+			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
+			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		}
+	}
+
+	if (m_cm_enable_reg &0x02)
+	{
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 

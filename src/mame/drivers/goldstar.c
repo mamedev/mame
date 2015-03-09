@@ -248,11 +248,11 @@ static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, goldstar_state )
+static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sangho_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(sangho_fg_vidram_w ) AM_SHARE("fg_vidram")    // videoram 1
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sangho_fg_atrram_w ) AM_SHARE("fg_atrram")    // atrram 1
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(fg_vidram_w) AM_SHARE("fg_vidram")    // videoram 1
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_atrram_w) AM_SHARE("fg_atrram")    // atrram 1
 
 	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_SHARE("reel1_scroll")
 	AM_RANGE(0xd840, 0xd9ff) AM_RAM
@@ -261,17 +261,17 @@ static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xdc00, 0xdc3f) AM_RAM AM_SHARE("reel3_scroll")
 	AM_RANGE(0xdc40, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xe200, 0xe3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
+	AM_RANGE(0xe200, 0xe3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
 
-	AM_RANGE(0xe600, 0xe7ff) AM_RAM_WRITE(sangho_bg_vidram_w ) AM_SHARE("bg_vidram")    // videoram 2
+	AM_RANGE(0xe600, 0xe7ff) AM_RAM_WRITE(bg_vidram_w) AM_SHARE("bg_vidram")    // videoram 2
 
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(sangho_reel1_attrram_w ) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xea00, 0xebff) AM_RAM_WRITE(sangho_reel2_attrram_w ) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xec00, 0xedff) AM_RAM_WRITE(sangho_reel3_attrram_w ) AM_SHARE("reel3_attrram")
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
+	AM_RANGE(0xea00, 0xebff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
+	AM_RANGE(0xec00, 0xedff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
 
-	AM_RANGE(0xee00, 0xefff) AM_RAM_WRITE(sangho_bg_atrram_w ) AM_SHARE("bg_atrram")    // atrram 2
+	AM_RANGE(0xee00, 0xefff) AM_RAM_WRITE(bg_atrram_w) AM_SHARE("bg_atrram")    // atrram 2
 
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(goldstar_state::sangho_coincount_w)
+WRITE8_MEMBER(sangho_state::coincount_w)
 {
 /*
   7654 3210
@@ -300,12 +300,12 @@ WRITE8_MEMBER(goldstar_state::sangho_coincount_w)
 	coin_counter_w(machine(), 4, data & 0x01);  /* counter5 payout */
 }
 
-WRITE8_MEMBER(goldstar_state::sangho_enable_w)
+WRITE8_MEMBER(sangho_state::enable_w)
 {
-	m_sangho_enable_reg = data;
+	m_enable_reg = data;
 }
 
-static ADDRESS_MAP_START( star100_readport, AS_IO, 8, goldstar_state )
+static ADDRESS_MAP_START( star100_readport, AS_IO, 8, sangho_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
@@ -324,13 +324,13 @@ static ADDRESS_MAP_START( star100_readport, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW4-0")     // the first 4 bits map to DSW4 1 to 4.
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW4-1")     // the first 4 bits map to DSW4 5 to 8.
 
-	AM_RANGE(0x24, 0x24) AM_WRITE(sangho_coincount_w)   // coin counters.
+	AM_RANGE(0x24, 0x24) AM_WRITE(coincount_w)      // coin counters.
 
 	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW2")
 	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW3")
 
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP                // writting 0's and 1's constantly. seems watchdog feeder.
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(sangho_enable_w)  // enable/disable reels register.
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(enable_w)         // enable/disable reels register.
 
 ADDRESS_MAP_END
 
@@ -916,7 +916,7 @@ ADDRESS_MAP_END
 
 
 /*
-READ8_MEMBER(goldstar_state::unkch_unk_r)
+READ8_MEMBER(unkch_state::unk_r)
 {
     return 0xff;
 }
@@ -924,7 +924,7 @@ READ8_MEMBER(goldstar_state::unkch_unk_r)
 
 
 /* newer / more capable hw */
-static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, goldstar_state )
+static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, unkch_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
@@ -939,22 +939,22 @@ static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
 	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(unkch_reel1_attrram_w ) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(unkch_reel2_attrram_w ) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(unkch_reel3_attrram_w ) AM_SHARE("reel3_attrram")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
+	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
+	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(goldstar_state::unkcm_0x02_w)
+WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 {
 	//popmessage("unkcm_0x02_w %02x", data);
 }
 
-WRITE8_MEMBER(goldstar_state::unkcm_0x03_w)
+WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
 {
 	//popmessage("unkcm_0x03_w %02x", data);
 
@@ -964,18 +964,18 @@ WRITE8_MEMBER(goldstar_state::unkcm_0x03_w)
 }
 
 
-WRITE8_MEMBER(goldstar_state::unkcm_0x11_w)
+WRITE8_MEMBER(unkch_state::unkcm_0x11_w)
 {
 	//popmessage("unkcm_0x11_w %02x", data);
 }
 
-WRITE8_MEMBER(goldstar_state::unkcm_0x12_w)
+WRITE8_MEMBER(unkch_state::unkcm_0x12_w)
 {
 //  popmessage("unkcm_0x12_w %02x", data);
 }
 
 
-static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
+static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, unkch_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
@@ -992,7 +992,7 @@ static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( megaline_map, AS_PROGRAM, 8, goldstar_state )
+static ADDRESS_MAP_START( megaline_map, AS_PROGRAM, 8, unkch_state )
 /* Reels stuff are there just as placeholder, and obviously in wrong offset */
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 
@@ -1006,13 +1006,13 @@ static ADDRESS_MAP_START( megaline_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
 
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_SHARE("reel1_ram")
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w) AM_SHARE("reel2_ram")
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w) AM_SHARE("reel3_ram")
 	AM_RANGE(0xf600, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(unkch_reel1_attrram_w ) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(unkch_reel2_attrram_w ) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(unkch_reel3_attrram_w ) AM_SHARE("reel3_attrram")
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
+	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
+	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1034,7 +1034,7 @@ static ADDRESS_MAP_START( megaline_portmap, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bonusch_map, AS_PROGRAM, 8, goldstar_state )
+static ADDRESS_MAP_START( bonusch_map, AS_PROGRAM, 8, unkch_state )
 /* Reels stuff and RAM are there just as placeholder, and obviously in wrong offset */
 
 	AM_RANGE(0x0000, 0xbfff) AM_ROM     // ok
@@ -1054,10 +1054,9 @@ static ADDRESS_MAP_START( bonusch_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf680, 0xf6bf) AM_RAM AM_SHARE("reel2_scroll")
 	AM_RANGE(0xf700, 0xf73f) AM_RAM AM_SHARE("reel3_scroll")
 
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(unkch_reel1_attrram_w ) AM_SHARE("reel1_attrram")
-	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(unkch_reel2_attrram_w ) AM_SHARE("reel2_attrram")
-	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(unkch_reel3_attrram_w ) AM_SHARE("reel3_attrram")
-
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(reel1_attrram_w) AM_SHARE("reel1_attrram")
+	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(reel2_attrram_w) AM_SHARE("reel2_attrram")
+	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(reel3_attrram_w) AM_SHARE("reel3_attrram")
 ADDRESS_MAP_END
 
 /* Bonus Chance W-8
@@ -7580,13 +7579,13 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( star100, goldstar_state )
+static MACHINE_CONFIG_START( star100, sangho_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(star100_map)
 	MCFG_CPU_IO_MAP(star100_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", sangho_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7594,7 +7593,7 @@ static MACHINE_CONFIG_START( star100, goldstar_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_sangho)
+	MCFG_SCREEN_UPDATE_DRIVER(sangho_state, screen_update_sangho)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -7604,7 +7603,7 @@ static MACHINE_CONFIG_START( star100, goldstar_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, sangho)
+	MCFG_VIDEO_START_OVERRIDE(sangho_state, sangho)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8735,7 +8734,7 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) /* analyzed for clips */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( unkch, goldstar_state )
+static MACHINE_CONFIG_START( unkch, unkch_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8750,7 +8749,7 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_unkch)
+	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unkch)
@@ -8759,7 +8758,7 @@ static MACHINE_CONFIG_START( unkch, goldstar_state )
 
 	//MCFG_NVRAM_HANDLER(goldstar)
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,unkch)
+	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -8818,7 +8817,7 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( megaline, goldstar_state )
+static MACHINE_CONFIG_START( megaline, unkch_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8868,7 +8867,7 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bonusch, goldstar_state )
+static MACHINE_CONFIG_START( bonusch, unkch_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -14022,21 +14021,21 @@ DRIVER_INIT_MEMBER(goldstar_state,cherrys)
 }
 
 /* todo: remove these patches! */
-DRIVER_INIT_MEMBER(goldstar_state,unkch1)
+DRIVER_INIT_MEMBER(unkch_state, unkch1)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9d52] = 0x00;
 	ROM[0x9d53] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(goldstar_state,unkch3)
+DRIVER_INIT_MEMBER(unkch_state, unkch3)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9b86] = 0x00;
 	ROM[0x9b87] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(goldstar_state,unkch4)
+DRIVER_INIT_MEMBER(unkch_state, unkch4)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9a6e] = 0x00;
@@ -14261,10 +14260,10 @@ GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,        
 GAME( 2003, nfm,       0,        nfm,      nfb96bl,   driver_device,  0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)", GAME_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99" probably hacks of a 1994 version of Cherry Bonus / Cherry Master (Super Cherry Master?)
-GAME( 1999, unkch1,   0,         unkch,    unkch,     goldstar_state, unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, unkch2,   unkch1,    unkch,    unkch,     goldstar_state, unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, unkch3,   unkch1,    unkch,    unkch3,    goldstar_state, unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ) // cards have been hacked to look like barrels, girl removed?
-GAME( 1999, unkch4,   unkch1,    unkch,    unkch4,    goldstar_state, unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         GAME_NOT_WORKING|GAME_NO_SOUND ) // by 'Toy System' Hungary
+GAME( 1999, unkch1,   0,         unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, unkch2,   unkch1,    unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, unkch3,   unkch1,    unkch,    unkch3,    unkch_state,    unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ) // cards have been hacked to look like barrels, girl removed?
+GAME( 1999, unkch4,   unkch1,    unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         GAME_NOT_WORKING|GAME_NO_SOUND ) // by 'Toy System' Hungary
 
 
 /* Stealth sets.
