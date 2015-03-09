@@ -42,13 +42,29 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(tsamurai_state,tsamurai)
+void tsamurai_state::video_start()
+{
+	//save_item(NAME(m_flicker));
+	save_item(NAME(m_textbank1));
+}
+
+VIDEO_START_MEMBER(tsamurai_state, tsamurai)
 {
 	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_background->set_transparent_pen(0);
 	m_foreground->set_transparent_pen(0);
+	
+	save_item(NAME(m_bgcolor));
+	video_start();
+}
+
+VIDEO_START_MEMBER(tsamurai_state, m660)
+{
+	VIDEO_START_CALL_MEMBER(tsamurai);
+	
+	save_item(NAME(m_textbank2));
 }
 
 
@@ -58,22 +74,22 @@ VIDEO_START_MEMBER(tsamurai_state,tsamurai)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tsamurai_state::tsamurai_scrolly_w)
+WRITE8_MEMBER(tsamurai_state::scrolly_w)
 {
 	m_background->set_scrolly(0, data );
 }
 
-WRITE8_MEMBER(tsamurai_state::tsamurai_scrollx_w)
+WRITE8_MEMBER(tsamurai_state::scrollx_w)
 {
 	m_background->set_scrollx(0, data );
 }
 
-WRITE8_MEMBER(tsamurai_state::tsamurai_bgcolor_w)
+WRITE8_MEMBER(tsamurai_state::bgcolor_w)
 {
 	m_bgcolor = data;
 }
 
-WRITE8_MEMBER(tsamurai_state::tsamurai_textbank1_w)
+WRITE8_MEMBER(tsamurai_state::textbank1_w)
 {
 	if( m_textbank1!=data )
 	{
@@ -82,7 +98,7 @@ WRITE8_MEMBER(tsamurai_state::tsamurai_textbank1_w)
 	}
 }
 
-WRITE8_MEMBER(tsamurai_state::tsamurai_textbank2_w)
+WRITE8_MEMBER(tsamurai_state::m660_textbank2_w)
 {
 	if( m_textbank2!=data )
 	{
@@ -91,18 +107,18 @@ WRITE8_MEMBER(tsamurai_state::tsamurai_textbank2_w)
 	}
 }
 
-WRITE8_MEMBER(tsamurai_state::tsamurai_bg_videoram_w)
+WRITE8_MEMBER(tsamurai_state::bg_videoram_w)
 {
 	m_bg_videoram[offset]=data;
 	offset = offset/2;
 	m_background->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(tsamurai_state::tsamurai_fg_videoram_w)
+WRITE8_MEMBER(tsamurai_state::fg_videoram_w)
 {
 	m_videoram[offset]=data;
 	m_foreground->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(tsamurai_state::tsamurai_fg_colorram_w)
+WRITE8_MEMBER(tsamurai_state::fg_colorram_w)
 {
 	if( m_colorram[offset]!=data )
 	{
@@ -126,10 +142,9 @@ WRITE8_MEMBER(tsamurai_state::tsamurai_fg_colorram_w)
 
 void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	const UINT8 *source = spriteram+32*4-4;
-	const UINT8 *finish = spriteram; /* ? */
+	const UINT8 *source = m_spriteram+32*4-4;
+	const UINT8 *finish = m_spriteram; /* ? */
 	m_flicker = 1-m_flicker;
 
 	while( source>=finish )
@@ -183,7 +198,7 @@ void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 tsamurai_state::screen_update_tsamurai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tsamurai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -241,6 +256,9 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
 VIDEO_START_MEMBER(tsamurai_state,vsgongf)
 {
 	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tsamurai_state::get_vsgongf_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	
+	save_item(NAME(m_vsgongf_color));
+	video_start();
 }
 
 UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
