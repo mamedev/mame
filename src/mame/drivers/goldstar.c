@@ -124,7 +124,16 @@
   Dyna copyright depending on DIP settings and has both poker and slots games (the
   set in MAME displays "Crazy Co." copyright and only has a slots game).
 
+  This is a stealth set that hides behind a fake Windows ME desktop if DSW2-6 is
+  off.  Push Start followed by Bet five time to access the game.  It will return
+  to the desktop after the game is over.  Colours currently appear to be bad on
+  the desktop screen.
+
+  Judging from the contents of the graphics ROMs and the Stats screens, there's a
+  poker game buried in there, but there's apparently no way to access it.
+
   Hold Settings button (9) during boot to access switch test.
+  Hold Stats button (0) during boot to access palette test.
 
 
 ***************************************************************************/
@@ -6572,7 +6581,7 @@ static INPUT_PORTS_START( crazybon )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Mode" )                      PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x00, "Game" )
-	PORT_DIPSETTING(    0x20, "Desktop" )   /* displays a fake Windows ME desktop - wtf */
+	PORT_DIPSETTING(    0x20, "Stealth" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -8925,7 +8934,7 @@ ROM_END
 
   27C020 socket place for OKI samples is blind.
 
-  This dump is not from the original Sang Ho board, it's from a Poker Master conversion kit
+  This dump is not from the original Sang Ho board, it's from a Poker Master stealth conversion kit
   Plug-in daughterboard dated 1997
   This set displays Crazy Co. copyright
 
