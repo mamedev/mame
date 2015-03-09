@@ -5,6 +5,8 @@
 
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
+#include "machine/pic8259.h"
+#include "machine/i8251.h"
 
 class v53_base_device : public nec_common_device
 {
@@ -81,7 +83,9 @@ public:
 
 	required_device<pit8253_device> m_pit;
 	required_device<upd71071_v53_device> m_dma_71071mode;
-	
+	required_device<pic8259_device> m_upd71059;
+	required_device<i8251_device> m_upd71051;
+
 	DECLARE_WRITE_LINE_MEMBER(dreq0_trampoline_w);
 	DECLARE_WRITE_LINE_MEMBER(dreq1_trampoline_w);
 	DECLARE_WRITE_LINE_MEMBER(dreq2_trampoline_w);
@@ -91,6 +95,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE8_MEMBER(dma_io_3_w);
 	DECLARE_READ8_MEMBER(dma_memin_r);
+
+	DECLARE_READ8_MEMBER(get_pic_ack);
+	DECLARE_WRITE_LINE_MEMBER(upd71059_irq_w);
 
 protected:
 	// device-level overrides

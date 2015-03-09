@@ -2,9 +2,9 @@
 
 // V33 / V33A cores with onboard peripherals
 
-// Interrupt Controller is uPD71059 equivalent
-// DMA Controller can operate in modes providing a subset of the uPD71071 or uPD71037 functionality (some modes unavailable / settings ignored)
-// Serial Controller is based on the uPD71051 but with some changes
+// Interrupt Controller is uPD71059 equivalent (a PIC8259 clone?)
+// DMA Controller can operate in modes providing a subset of the uPD71071 or uPD71037 functionality (some modes unavailable / settings ignored) (uPD71071 mode is an extended am9517a, uPD71037 mode is ??)
+// Serial Controller is based on the uPD71051 but with some changes (i8251 clone?)
 // Timer Unit is functionally identical to uPD71054 (which in turn is said to be the same as a pit8253)
 
 #include "emu.h"
@@ -474,6 +474,15 @@ READ8_MEMBER(v53_base_device::dma_memin_r)
 	return ret;
 }
 
+READ8_MEMBER(v53_base_device::get_pic_ack)
+{
+	return 0;
+}
+
+WRITE_LINE_MEMBER( v53_base_device::upd71059_irq_w)
+{
+	printf("upd71059_irq_w %d", state);
+}
 
 static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
@@ -486,6 +495,9 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_I8237_IN_MEMR_CB(READ8(v53_base_device, dma_memin_r))
 	
 	
+	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, upd71059_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
+
+	MCFG_DEVICE_ADD("upd71051", I8251, 0) 
 
 MACHINE_CONFIG_END
 
@@ -499,7 +511,9 @@ v53_base_device::v53_base_device(const machine_config &mconfig, device_type type
 	: nec_common_device(mconfig, type, name, tag, owner, clock, shortname, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) ),
 	m_pit(*this, "pit"),
-	m_dma_71071mode(*this, "upd71071dma")
+	m_dma_71071mode(*this, "upd71071dma"),
+	m_upd71059(*this, "upd71059pic"),
+	m_upd71051(*this, "upd71051")
 {
 }
 
