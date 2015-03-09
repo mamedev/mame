@@ -1272,5 +1272,6 @@ WRITE8_MEMBER(upd71071_v53_device::write)
 
 
 	}
+	trigger(1);
 
 }

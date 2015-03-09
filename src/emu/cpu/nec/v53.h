@@ -86,7 +86,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dreq1_trampoline_w);
 	DECLARE_WRITE_LINE_MEMBER(dreq2_trampoline_w);
 	DECLARE_WRITE_LINE_MEMBER(dreq3_trampoline_w);
+	DECLARE_WRITE_LINE_MEMBER(hack_trampoline_w);
 
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	DECLARE_WRITE8_MEMBER(dma_io_3_w);
+	DECLARE_READ8_MEMBER(dma_memin_r);
 
 protected:
 	// device-level overrides

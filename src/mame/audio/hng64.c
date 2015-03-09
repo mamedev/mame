@@ -149,9 +149,13 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 {
-	printf("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
+//	printf("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
+
+
 	m_audiocpu->dreq3_trampoline_w(data&1);
+//	m_audiocpu->hack_trampoline_w(1);
+
 }
 
 static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )

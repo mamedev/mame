@@ -402,7 +402,17 @@ WRITE_LINE_MEMBER(v53_base_device::dreq3_trampoline_w)
 	}
 }
 
-
+WRITE_LINE_MEMBER(v53_base_device::hack_trampoline_w)
+{
+	if (!(m_SCTL & 0x02))
+	{
+		m_dma_71071mode->hack_w(state);
+	}
+	else
+	{
+		printf("v53: hack_trampoline_w not in 71071mode\n");
+	}
+}
 
 /* General stuff */
 
@@ -441,13 +451,36 @@ static ADDRESS_MAP_START( v53_internal_port_map, AS_IO, 16, v53_base_device )
 //	AM_RANGE(0xfffe, 0xffff) // (reserved     ,  0xff00) // 0xffff
 ADDRESS_MAP_END
 
+WRITE_LINE_MEMBER(v53_base_device::dma_hrq_changed)
+{
+	// pass this back to the driver? / expose externally? 
+	m_dma_71071mode->hack_w(state);
+}
+
+WRITE8_MEMBER(v53_base_device::dma_io_3_w)
+{
+	logerror("dma_io_3_w %02x\n", data);
+}
+
+READ8_MEMBER(v53_base_device::dma_memin_r)
+{
+	UINT8 ret = rand();
+	logerror("dma_memin_r offset %08x %02x\n", offset, ret);
+	return ret;
+}
+
+
 static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
 	MCFG_PIT8253_CLK0(16000000/2/8)
 	//MCFG_PIT8253_OUT0_HANDLER(WRITELINE(v53_base_device, pit_out0))
 
 	MCFG_DEVICE_ADD("upd71071dma", UPD71071_V53, 4000000)
-
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(v53_base_device, dma_hrq_changed))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(v53_base_device, dma_io_3_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(v53_base_device, dma_memin_r))
+	
+	
 
 MACHINE_CONFIG_END
 
