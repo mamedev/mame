@@ -3,17 +3,30 @@ class xain_state : public driver_device
 public:
 	xain_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_charram(*this, "charram"),
-		m_bgram0(*this, "bgram0"),
-		m_bgram1(*this, "bgram1"),
-		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_charram(*this, "charram"),
+		m_bgram0(*this, "bgram0"),
+		m_bgram1(*this, "bgram1"),
+		m_spriteram(*this, "spriteram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<UINT8> m_charram;
+	required_shared_ptr<UINT8> m_bgram0;
+	required_shared_ptr<UINT8> m_bgram1;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	int m_vblank;
 	int m_from_main;
@@ -29,9 +42,6 @@ public:
 	UINT8 m_port_c_in;
 	int m_mcu_ready;
 	int m_mcu_accept;
-	required_shared_ptr<UINT8> m_charram;
-	required_shared_ptr<UINT8> m_bgram0;
-	required_shared_ptr<UINT8> m_bgram1;
 	UINT8 m_pri;
 	tilemap_t *m_char_tilemap;
 	tilemap_t *m_bgram0_tilemap;
@@ -40,51 +50,48 @@ public:
 	UINT8 m_scrollyP0[2];
 	UINT8 m_scrollxP1[2];
 	UINT8 m_scrollyP1[2];
-	required_shared_ptr<UINT8> m_spriteram;
-	DECLARE_WRITE8_MEMBER(xainCPUA_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(xainCPUB_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(xain_sound_command_w);
-	DECLARE_WRITE8_MEMBER(xain_main_irq_w);
-	DECLARE_WRITE8_MEMBER(xain_irqA_assert_w);
-	DECLARE_WRITE8_MEMBER(xain_irqB_clear_w);
-	DECLARE_READ8_MEMBER(xain_68705_r);
-	DECLARE_WRITE8_MEMBER(xain_68705_w);
-	DECLARE_READ8_MEMBER(xain_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(xain_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(xain_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(xain_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(xain_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(xain_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(xain_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(xain_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(xain_68705_ddr_c_w);
+
+	DECLARE_WRITE8_MEMBER(cpuA_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(cpuB_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(main_irq_w);
+	DECLARE_WRITE8_MEMBER(irqA_assert_w);
+	DECLARE_WRITE8_MEMBER(irqB_clear_w);
+	DECLARE_READ8_MEMBER(m68705_r);
+	DECLARE_WRITE8_MEMBER(m68705_w);
+	DECLARE_READ8_MEMBER(m68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(m68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(m68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(m68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(m68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(m68705_ddr_b_w);
+	DECLARE_READ8_MEMBER(m68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(m68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(m68705_ddr_c_w);
 	DECLARE_READ8_MEMBER(mcu_comm_reset_r);
-	DECLARE_WRITE8_MEMBER(xain_bgram0_w);
-	DECLARE_WRITE8_MEMBER(xain_bgram1_w);
-	DECLARE_WRITE8_MEMBER(xain_charram_w);
-	DECLARE_WRITE8_MEMBER(xain_scrollxP0_w);
-	DECLARE_WRITE8_MEMBER(xain_scrollyP0_w);
-	DECLARE_WRITE8_MEMBER(xain_scrollxP1_w);
-	DECLARE_WRITE8_MEMBER(xain_scrollyP1_w);
-	DECLARE_WRITE8_MEMBER(xain_flipscreen_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(xain_vblank_r);
+	DECLARE_WRITE8_MEMBER(bgram0_w);
+	DECLARE_WRITE8_MEMBER(bgram1_w);
+	DECLARE_WRITE8_MEMBER(charram_w);
+	DECLARE_WRITE8_MEMBER(scrollxP0_w);
+	DECLARE_WRITE8_MEMBER(scrollyP0_w);
+	DECLARE_WRITE8_MEMBER(scrollxP1_w);
+	DECLARE_WRITE8_MEMBER(scrollyP1_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+
 	TILEMAP_MAPPER_MEMBER(back_scan);
 	TILE_GET_INFO_MEMBER(get_bgram0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgram1_tile_info);
 	TILE_GET_INFO_MEMBER(get_char_tile_info);
+
 	virtual void machine_start();
 	virtual void video_start();
-	UINT32 screen_update_xain(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(xain_scanline);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	inline int scanline_to_vcount(int scanline);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
-	optional_device<cpu_device> m_mcu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 };

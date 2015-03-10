@@ -68,11 +68,6 @@ const atari_motion_objects_config shuuz_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(shuuz_state,shuuz)
-{
-}
-
-
 
 /*************************************
  *
@@ -80,7 +75,7 @@ VIDEO_START_MEMBER(shuuz_state,shuuz)
  *
  *************************************/
 
-UINT32 shuuz_state::screen_update_shuuz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_vad->mob()->draw_async(cliprect);
