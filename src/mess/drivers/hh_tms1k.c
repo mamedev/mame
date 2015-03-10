@@ -20,6 +20,7 @@
  *MP1221   TMS1100  1980, Entex Raise The Devil
  *MP2788   ?        1980, Bandai Flight Time
  @MP3226   TMS1000  1978, Milton Bradley Simon
+ *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
   MP3403   TMS1100  1978, Marx Electronic Bowling
  @MP3404   TMS1100  1978, Parker Brothers Merlin
  @MP3405   TMS1100  1979, Coleco Amaze-A-Tron
@@ -157,6 +158,9 @@ public:
 	DECLARE_READ8_MEMBER(ebball3_read_k);
 	DECLARE_WRITE16_MEMBER(ebball3_write_r);
 	DECLARE_WRITE16_MEMBER(ebball3_write_o);
+	void ebball3_set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(ebball3_difficulty_switch);
+	DECLARE_MACHINE_RESET(ebball3);
 
 	DECLARE_READ8_MEMBER(elecdet_read_k);
 	DECLARE_WRITE16_MEMBER(elecdet_write_r);
@@ -937,6 +941,10 @@ MACHINE_CONFIG_END
   * boards are labeled: Zeny
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
   * 2*SN75492N LED display driver
+  
+  This is another improvement over Entex Baseball, where gameplay is a bit more
+  varied, and it keeps up with score and innings. Like the others, the pitcher
+  controls are on a separate joypad.
 
 
   lamp translation table: led zz from game PCB = MESS lampyx:
@@ -982,8 +990,6 @@ void hh_tms1k_state::ebball3_display()
 
 READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
 {
-	//printf("%X ",m_r);
-
 	return read_inputs(3);
 }
 
@@ -1009,41 +1015,77 @@ WRITE16_MEMBER(hh_tms1k_state::ebball3_write_o)
 }
 
 
+/* physical button layout and labels is like this:
+   
+    main device (batter side):            remote pitcher:                                  
+                                                                                                 
+                          MAN
+    PRO                    |              [FAST BALL]  [CHANGE UP]    [CURVE]  [SLIDER]    
+     |                  OFF|
+     o                     o                   [STEAL DEFENSE]           [KNUCKLER]
+    AM                    AUTO
+    
+    [BUNT]  [BATTER]  [STEAL]
+*/
+
 static INPUT_PORTS_START( ebball3 )
 	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Slider")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Curve")
 
 	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Knuckler")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Steal")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Steal Defense")
 
 	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 )
-//	PORT_CONFNAME( 0x01, 0x01, "Pitcher" )
-//	PORT_CONFSETTING(    0x01, "Auto" )
-//	PORT_CONFSETTING(    0x00, "Manual" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 )
-//	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_CONFNAME( 0x01, 0x01, "Pitcher" )
+	PORT_CONFSETTING(    0x01, "Auto" )
+	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Bunt")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // fake
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, ebball3_difficulty_switch, NULL)
+	PORT_CONFSETTING(    0x00, "Amateur" )
+	PORT_CONFSETTING(    0x01, "Professional" )
 INPUT_PORTS_END
 
+
+void hh_tms1k_state::ebball3_set_clock()
+{
+	// MCU clock is from an RC circuit oscillating by default at ~375kHz,
+	// but on PRO, the difficulty switch adds an extra capacitor to Vdd to speed
+	// it up to unknown, let's assume ~425kHz.
+	m_maincpu->set_unscaled_clock(m_inp_matrix[3]->read() & 1 ? 425000 : 375000);
+}
+
+INPUT_CHANGED_MEMBER(hh_tms1k_state::ebball3_difficulty_switch)
+{
+	ebball3_set_clock();
+}
+
+MACHINE_RESET_MEMBER(hh_tms1k_state, ebball3)
+{
+	machine_reset();
+	ebball3_set_clock();
+}
 
 static MACHINE_CONFIG_START( ebball3, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 425000) // RC osc. R=47K, C=33pf -> ~425kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // RC osc. R=47K, C=33pf -> ~375kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball3_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball3_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball3_write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball3)
+
+	MCFG_MACHINE_RESET_OVERRIDE(hh_tms1k_state, ebball3)
 
 	/* no video! */
 
@@ -2311,8 +2353,8 @@ CONS( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF
 CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
-CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball", GAME_SUPPORTS_SAVE )
-CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
+CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // unplayable without game cards
 

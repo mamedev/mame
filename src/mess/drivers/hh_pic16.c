@@ -192,8 +192,8 @@ WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
 	else
 		m_b = data;
 	
-	// d7: speaker out/enable
-	m_speaker->level_w((m_b & m_c) >> 7 & 1);
+	// d7: speaker out
+	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
 
 	// d0-d6: 7seg
 	m_display_maxx = 7;
@@ -214,6 +214,8 @@ static INPUT_PORTS_START( maniac )
 INPUT_PORTS_END
 
 
+static const INT16 maniac_speaker_levels[] = { 0, 32767, -32768, 0 };
+
 static MACHINE_CONFIG_START( maniac, hh_pic16_state )
 
 	/* basic machine hardware */
@@ -231,6 +233,7 @@ static MACHINE_CONFIG_START( maniac, hh_pic16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, maniac_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
