@@ -359,9 +359,15 @@ int load_builtin_scripts(lua_State* L)
 		}
 	}
 
+	/* set error handler to get tracebacks in built-in scripts  */
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "traceback");
+	lua_remove(L, -2);
+	int ehpos = lua_gettop(L);
+	
 	/* hand off control to the scripts */
 	lua_getglobal(L, "_premake_main");
-	if (lua_pcall(L, 0, 1, 0) != OKAY)
+	if (lua_pcall(L, 0, 1, ehpos) != OKAY)
 	{
 		printf(ERROR_MESSAGE, lua_tostring(L, -1));
 		return !OKAY;

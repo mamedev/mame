@@ -66,6 +66,14 @@ namespace bx
 			return invalid;
 		}
 
+		bool isValid(uint16_t _handle)
+		{
+			uint16_t* sparse = &m_handles[MaxHandlesT];
+			uint16_t index = sparse[_handle];
+
+			return (index < m_numHandles && m_handles[index] == _handle);
+		}
+
 		void free(uint16_t _handle)
 		{
 			BX_CHECK(0 < m_numHandles, "Freeing invalid handle %d.", _handle);
@@ -137,6 +145,14 @@ namespace bx
 			}
 
 			return invalid;
+		}
+
+		bool isValid(uint16_t _handle)
+		{
+			uint16_t* sparse = &m_handles[m_maxHandles];
+			uint16_t index = sparse[_handle];
+
+			return (index < m_numHandles && m_handles[index] == _handle);
 		}
 
 		void free(uint16_t _handle)

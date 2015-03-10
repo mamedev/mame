@@ -14,7 +14,7 @@ Supported project generators:
 Download (stable)
 -----------------
 
-	version 197 (commit 2b34cf0f0831d265b274d8e11a24bf6320d73d6e)
+	version 206 (commit e65d8143b1186496b9da03c6461a25402a2ee873)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -96,7 +96,7 @@ This long period between releases where multiple versions are in flight cause
 confusion for users who are not familiar with Premake, and they just need to
 use Premake to generate project files for project they are interested in.
 
-I've been using Premake for [a while](https://carbongames.com/2011/08/Premake/),
+I've been using Premake for [a while](https://web.archive.org/web/20120119020903/http://carbongames.com/2011/08/Premake),
 I really like it's simplicity, and that it does one thing really well.
 
 I was considering replacing Premake with other build systems that also could
