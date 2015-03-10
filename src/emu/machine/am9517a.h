@@ -183,7 +183,7 @@ protected:
 
 // device type definition
 extern const device_type AM9517A;
-extern const device_type UPD71071_V53;
+extern const device_type V53_DMAU;
 
 
 /***************************************************************************

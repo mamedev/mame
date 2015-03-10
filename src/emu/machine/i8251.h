@@ -40,6 +40,7 @@ class i8251_device :  public device_t,
 {
 public:
 	// construction/destruction
+	i8251_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
 	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
@@ -55,6 +56,8 @@ public:
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(command_w);
+	DECLARE_WRITE8_MEMBER(mode_w);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
@@ -132,7 +135,18 @@ private:
 	bool m_disable_tx_pending;
 };
 
+class v53_scu_device :  public i8251_device
+{
+public:
+	// construction/destruction
+	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+
 // device type definition
 extern const device_type I8251;
+extern const device_type V53_SCU;
+
 
 #endif /* __I8251_H__ */

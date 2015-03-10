@@ -4,7 +4,12 @@
 
     AMD AM9517A
 	Intel 8237A
-	NEC UPD71071
+	NEC uPD71037
+
+	NEC uPD71071 (extended version of above)
+
+	a variant is used in the V53 CPU which offers subsets of both the
+	uPD71071 and uPD71037 functionality depending on a mode bit.
 	
 	Multimode DMA Controller emulation
 
@@ -17,7 +22,6 @@
 
     TODO:
 
-    - memory-to-memory transfer
     - external EOP
 
 */
@@ -47,7 +51,7 @@
 //**************************************************************************
 
 const device_type AM9517A = &device_creator<am9517a_device>;
-const device_type UPD71071_V53 = &device_creator<upd71071_v53_device>;
+const device_type V53_DMAU = &device_creator<upd71071_v53_device>;
 
 
 //**************************************************************************
@@ -471,7 +475,7 @@ inline void am9517a_device::end_of_process()
 
 
 am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
-	: device_t(mconfig, AM9517A, name, tag, owner, clock, shortname, __FILE__),
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_hack(0),
@@ -525,7 +529,7 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 }
 
 upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: am9517a_device(mconfig, UPD71071_V53, "UPD71071 (V53)", tag, owner, clock, "upd71071_v53")
+	: am9517a_device(mconfig, V53_DMAU, "V53 DMAU", tag, owner, clock, "v53_dmau")
 {
 }
 

@@ -62,11 +62,6 @@ public:
 	DECLARE_READ8_MEMBER(scu_simk_r);
 	DECLARE_WRITE8_MEMBER(scu_simk_w);
 
-	// ICU
-	DECLARE_READ8_MEMBER(icu_0_r);
-	DECLARE_WRITE8_MEMBER(icu_0_w);
-	DECLARE_READ8_MEMBER(icu_1_r);
-	DECLARE_WRITE8_MEMBER(icu_1_w);
 
 	void install_peripheral_io();
 
@@ -81,10 +76,10 @@ public:
 		}
 	}
 
-	required_device<pit8253_device> m_pit;
-	required_device<upd71071_v53_device> m_dma_71071mode;
-	required_device<pic8259_device> m_upd71059;
-	required_device<i8251_device> m_upd71051;
+	required_device<pit8253_device> m_v53tcu;
+	required_device<upd71071_v53_device> m_v53dmau;
+	required_device<pic8259_device> m_v53icu;
+	required_device<v53_scu_device> m_v53scu;
 
 	DECLARE_WRITE_LINE_MEMBER(dreq0_trampoline_w);
 	DECLARE_WRITE_LINE_MEMBER(dreq1_trampoline_w);

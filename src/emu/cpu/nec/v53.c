@@ -3,7 +3,7 @@
 // V33 / V33A cores with onboard peripherals
 
 // Interrupt Controller is uPD71059 equivalent (a PIC8259 clone?)
-// DMA Controller can operate in modes providing a subset of the uPD71071 or uPD71037 functionality (some modes unavailable / settings ignored) (uPD71071 mode is an extended am9517a, uPD71037 mode is ??)
+// DMA Controller can operate in modes providing a subset of the uPD71071 or uPD71037 functionality (some modes unavailable / settings ignored) (uPD71071 mode is an extended 8237A, uPD71037 mode is plain 8237A)
 // Serial Controller is based on the uPD71051 but with some changes (i8251 clone?)
 // Timer Unit is functionally identical to uPD71054 (which in turn is said to be the same as a pit8253)
 
@@ -216,7 +216,7 @@ void v53_base_device::install_peripheral_io()
 		}
 		else // uPD71071 mode
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x0f, read8_delegate(FUNC(upd71071_v53_device::read), (upd71071_v53_device*)m_dma_71071mode), write8_delegate(FUNC(upd71071_v53_device::write),  (upd71071_v53_device*)m_dma_71071mode), 0xffff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x0f, read8_delegate(FUNC(upd71071_v53_device::read), (upd71071_v53_device*)m_v53dmau), write8_delegate(FUNC(upd71071_v53_device::write),  (upd71071_v53_device*)m_v53dmau), 0xffff);
 		}
 	}
 
@@ -231,9 +231,7 @@ void v53_base_device::install_peripheral_io()
 		}
 		else
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::icu_0_r), this), write8_delegate(FUNC(v53_base_device::icu_0_w), this), 0x00ff);
-			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::icu_1_r), this), write8_delegate(FUNC(v53_base_device::icu_1_w), this), 0x00ff);
-
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x03, read8_delegate(FUNC(pic8259_device::read), (pic8259_device*)m_v53icu), write8_delegate(FUNC(pic8259_device::write), (pic8259_device*)m_v53icu), 0x00ff);
 		}
 	}
 
@@ -277,31 +275,7 @@ void v53_base_device::install_peripheral_io()
 
 }
 
-/*** ICU ***/
 
-
-
-READ8_MEMBER(v53_base_device::icu_0_r)
-{
-	printf("v53: icu_0_r\n");
-	return 0;
-}
-
-WRITE8_MEMBER(v53_base_device::icu_0_w)
-{
-	printf("v53: icu_0_w %02x\n", data);
-}
-
-READ8_MEMBER(v53_base_device::icu_1_r)
-{
-	printf("v53: icu_1_r\n");
-	return 0;
-}
-
-WRITE8_MEMBER(v53_base_device::icu_1_w)
-{
-	printf("v53: icu_1_w %02x\n", data);
-}
 
 /*** SCU ***/
 
@@ -346,15 +320,15 @@ WRITE8_MEMBER(v53_base_device::scu_simk_w)
 
 /*** TCU ***/
 
-WRITE8_MEMBER(v53_base_device::tmu_tct0_w) { m_pit->write(space, 0, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tct1_w) { m_pit->write(space, 1, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tct2_w) { m_pit->write(space, 2, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_pit->write(space, 3, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct0_w) { m_v53tcu->write(space, 0, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct1_w) { m_v53tcu->write(space, 1, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tct2_w) { m_v53tcu->write(space, 2, data); }
+WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_v53tcu->write(space, 3, data); }
 
 
-READ8_MEMBER(v53_base_device::tmu_tst0_r) {	return m_pit->read(space, 0); }
-READ8_MEMBER(v53_base_device::tmu_tst1_r) {	return m_pit->read(space, 1); }
-READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_pit->read(space, 2); }
+READ8_MEMBER(v53_base_device::tmu_tst0_r) {	return m_v53tcu->read(space, 0); }
+READ8_MEMBER(v53_base_device::tmu_tst1_r) {	return m_v53tcu->read(space, 1); }
+READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_v53tcu->read(space, 2); }
 
 /*** DMA ***/
 
@@ -363,7 +337,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq0_trampoline_w)
 {
 	if (!(m_SCTL & 0x02))
 	{
-		m_dma_71071mode->dreq0_w(state);
+		m_v53dmau->dreq0_w(state);
 	}
 	else
 	{
@@ -375,7 +349,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq1_trampoline_w)
 {
 	if (!(m_SCTL & 0x02))
 	{
-		m_dma_71071mode->dreq1_w(state);
+		m_v53dmau->dreq1_w(state);
 	}
 	else
 	{
@@ -387,7 +361,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq2_trampoline_w)
 {
 	if (!(m_SCTL & 0x02))
 	{
-		m_dma_71071mode->dreq2_w(state);
+		m_v53dmau->dreq2_w(state);
 	}
 	else
 	{
@@ -399,7 +373,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq3_trampoline_w)
 {
 	if (!(m_SCTL & 0x02))
 	{
-		m_dma_71071mode->dreq3_w(state);
+		m_v53dmau->dreq3_w(state);
 	}
 	else
 	{
@@ -411,7 +385,7 @@ WRITE_LINE_MEMBER(v53_base_device::hack_trampoline_w)
 {
 	if (!(m_SCTL & 0x02))
 	{
-		m_dma_71071mode->hack_w(state);
+		m_v53dmau->hack_w(state);
 	}
 	else
 	{
@@ -459,7 +433,7 @@ ADDRESS_MAP_END
 WRITE_LINE_MEMBER(v53_base_device::dma_hrq_changed)
 {
 	// pass this back to the driver? / expose externally? 
-	m_dma_71071mode->hack_w(state);
+	m_v53dmau->hack_w(state);
 }
 
 WRITE8_MEMBER(v53_base_device::dma_io_3_w)
@@ -481,7 +455,7 @@ READ8_MEMBER(v53_base_device::get_pic_ack)
 
 WRITE_LINE_MEMBER( v53_base_device::upd71059_irq_w)
 {
-	printf("upd71059_irq_w %d", state);
+	printf("upd71059_irq_w %d\n", state);
 }
 
 static MACHINE_CONFIG_FRAGMENT( v53 )
@@ -489,7 +463,7 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_PIT8253_CLK0(16000000/2/8)
 	//MCFG_PIT8253_OUT0_HANDLER(WRITELINE(v53_base_device, pit_out0))
 
-	MCFG_DEVICE_ADD("upd71071dma", UPD71071_V53, 4000000)
+	MCFG_DEVICE_ADD("upd71071dma", V53_DMAU, 4000000)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(v53_base_device, dma_hrq_changed))
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(v53_base_device, dma_io_3_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(v53_base_device, dma_memin_r))
@@ -497,7 +471,7 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	
 	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, upd71059_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
 
-	MCFG_DEVICE_ADD("upd71051", I8251, 0) 
+	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0) 
 
 MACHINE_CONFIG_END
 
@@ -510,10 +484,10 @@ machine_config_constructor v53_base_device::device_mconfig_additions() const
 v53_base_device::v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, offs_t fetch_xor, UINT8 prefetch_size, UINT8 prefetch_cycles, UINT32 chip_type)
 	: nec_common_device(mconfig, type, name, tag, owner, clock, shortname, true, fetch_xor, prefetch_size, prefetch_cycles, chip_type),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 16, 16, 0, ADDRESS_MAP_NAME( v53_internal_port_map ) ),
-	m_pit(*this, "pit"),
-	m_dma_71071mode(*this, "upd71071dma"),
-	m_upd71059(*this, "upd71059pic"),
-	m_upd71051(*this, "upd71051")
+	m_v53tcu(*this, "pit"),
+	m_v53dmau(*this, "upd71071dma"),
+	m_v53icu(*this, "upd71059pic"),
+	m_v53scu(*this, "v53scu")
 {
 }
 
