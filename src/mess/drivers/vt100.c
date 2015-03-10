@@ -753,12 +753,13 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 	ROM_LOAD( "23-070b1.e71", 0x0300, 0x0100, NO_DUMP) // 82s135, vector prom
 	ROM_LOAD( "23-582a2.e93", 0x0400, 0x0100, NO_DUMP) // 82s129, ras/erase prom
 ROM_END
+#endif
 
 ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // does not have integrated STP or AVO populated
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-028e4-00.e71", 0x0000, 0x2000, NO_DUMP) // rom is unique to vt101; "CN55004N 8232 // DEC TP03 // 23-028E4-00" 24-pin mask rom (mc68764 pinout)
+	ROM_LOAD( "23-028e4-00.e71", 0x0000, 0x2000, CRC(fccce02c) SHA1(f3e3e93a857443685b816cab4fb52e34c0bc72b1)) // rom is unique to vt101; "CN55004N 8232 // DEC TP03 // 23-028E4-00" 24-pin mask rom (mc68764 pinout)
 	//e69 socket is empty/unpopulated on vt101?
 	//e67 socket is empty/unpopulated on vt101?
 
@@ -766,7 +767,7 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
 	ROM_LOAD_OPTIONAL( "23-094e2-00.e4", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
 ROM_END
-#endif
+
 
 ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // has integrated STP and AVO both populated
@@ -820,7 +821,7 @@ ROM_END
 COMP( 1978, vt100,    0,      0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100",GAME_NOT_WORKING)
 //COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100-Wx", GAME_NOT_WORKING)
 //COMP( 1978, vt100stp, vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", GAME_NOT_WORKING)
-//COMP( 1981, vt101,    0,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT101", GAME_NOT_WORKING)
+COMP( 1981, vt101,    vt102,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT101", GAME_NOT_WORKING)
 COMP( 1981, vt102,    0,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT102", GAME_NOT_WORKING)
 //COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT103", GAME_NOT_WORKING)
 COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT105", GAME_NOT_WORKING)

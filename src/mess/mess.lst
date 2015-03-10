@@ -1637,7 +1637,7 @@ pdp1      // 1961 DEC PDP1
 vt100 // 1978 Digital Equipment Corporation
 //vt100wp // 1978 Digital Equipment Corporation
 //vt100stp // 1978 Digital Equipment Corporation
-//vt101 // 1981 Digital Equipment Corporation
+vt101 // 1981 Digital Equipment Corporation
 vt102 // 1981 Digital Equipment Corporation
 //vt103 // 1979 Digital Equipment Corporation
 vt105 // 1978 Digital Equipment Corporation
@@ -1656,7 +1656,7 @@ vt520 // 1994 Digital Equipment Corporation
 //vt525
 vk100 // 1980 Digital Equipment Corporation
 dectalk // 1982 Digital Equipment Corporation
-//vt240
+//vt240 // 1983 Digital Equipment Corporation
 //vt241
 mc7105 // Elektronika MC7105
 rainbow100a  // 1982 DEC Rainbow 100-A
