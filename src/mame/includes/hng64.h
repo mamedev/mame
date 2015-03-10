@@ -354,7 +354,14 @@ public:
 	int m_vertsrom_size;
 	void reset_sound();
 	void reset_net();
-	WRITE16_MEMBER(hng64_sound_port_0008_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
+
+	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
+	DECLARE_READ8_MEMBER(dma_memr_cb);
+	DECLARE_WRITE8_MEMBER(dma_iow3_cb);
+	WRITE_LINE_MEMBER(tcu_tm0_cb);
+	WRITE_LINE_MEMBER(tcu_tm1_cb);
+	WRITE_LINE_MEMBER(tcu_tm2_cb);
 
 };
 

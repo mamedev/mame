@@ -153,8 +153,8 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
 
 
-	m_audiocpu->dreq3_trampoline_w(data&1);
-//	m_audiocpu->hack_trampoline_w(1);
+	m_audiocpu->dreq3_w(data&1);
+//	m_audiocpu->hack_w(1);
 
 }
 
@@ -162,11 +162,56 @@ static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
 	AM_RANGE(0x0008, 0x0009) AM_WRITE( hng64_sound_port_0008_w )
 ADDRESS_MAP_END
 
+WRITE_LINE_MEMBER(hng64_state::dma_hreq_cb)
+{
+	m_audiocpu->hack_w(1);
+}
+
+READ8_MEMBER(hng64_state::dma_memr_cb)
+{
+	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);;
+}
+
+WRITE8_MEMBER(hng64_state::dma_iow3_cb)
+{
+	// currently it reads a block of 0x20 '0x00' values from a very specific block of RAM where there is a 0x20 space in the data and transfers them repeatedly, I assume
+	// this is some kind of buffer for the audio or DSP and eventually will be populated with other values...
+	// if this comes to life maybe something interesting is happening!
+	if (data!=0x00) printf("dma_iow3_cb %02x\n", data);
+}
+
+WRITE_LINE_MEMBER(hng64_state::tcu_tm0_cb)
+{
+	// this goes high once near startup
+	printf("tcu_tm0_cb %02x\n", state);
+}
+
+WRITE_LINE_MEMBER(hng64_state::tcu_tm1_cb)
+{
+	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
+//	printf("tcu_tm1_cb %02x\n", state);
+}
+
+WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
+{
+	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
+//	printf("tcu_tm2_cb %02x\n", state);
+}
+
+
 
 MACHINE_CONFIG_FRAGMENT( hng64_audio )
 	MCFG_CPU_ADD("audiocpu", V53A, 16000000)              // V53A, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
 	MCFG_CPU_IO_MAP(hng_sound_io)
+	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(hng64_state, dma_hreq_cb))
+	MCFG_V53_DMAU_IN_MEMR_CB(READ8(hng64_state, dma_memr_cb))
+	MCFG_V53_DMAU_OUT_IOW_3_CB(WRITE8(hng64_state,dma_iow3_cb))
+
+	MCFG_V53_TCU_OUT0_HANDLER(WRITELINE(hng64_state, tcu_tm0_cb))
+	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(hng64_state, tcu_tm1_cb))
+	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(hng64_state, tcu_tm2_cb))
+
 MACHINE_CONFIG_END
 
 	
