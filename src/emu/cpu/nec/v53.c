@@ -181,11 +181,23 @@ void v53_base_device::device_reset()
 	m_DULA = 0x00;
 	m_OPHA = 0x00;
 
+	m_simk = 0x03;
 }
 
 void v53_base_device::device_start()
 {
 	nec_common_device::device_start();
+
+	m_txd_handler.resolve_safe();
+	m_rts_handler.resolve_safe();
+	m_dtr_handler.resolve_safe();
+	m_rxrdy_handler.resolve_safe();
+	m_txrdy_handler.resolve_safe();
+	m_txempty_handler.resolve_safe();
+
+	m_out0_handler.resolve_safe();
+	m_out1_handler.resolve_safe();
+	m_out2_handler.resolve_safe();
 }
 
 void v53_base_device::install_peripheral_io()
@@ -265,9 +277,9 @@ void v53_base_device::install_peripheral_io()
 		}
 		else
 		{
-			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_base_device::scu_srb_r), this), write8_delegate(FUNC(v53_base_device::scu_stb_w), this), 0x00ff);
-			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_base_device::scu_sst_r), this), write8_delegate(FUNC(v53_base_device::scu_scm_w), this), 0x00ff);
-			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8_delegate(FUNC(v53_base_device::scu_smd_w), this), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x00, base+0x01, read8_delegate(FUNC(v53_scu_device::data_r), (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::data_w), (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_readwrite_handler(base+0x02, base+0x03, read8_delegate(FUNC(v53_scu_device::status_r),  (v53_scu_device*)m_v53scu), write8_delegate(FUNC(v53_scu_device::command_w),  (v53_scu_device*)m_v53scu), 0x00ff);
+			space(AS_IO).install_write_handler(base+0x04, base+0x05, write8_delegate(FUNC(v53_scu_device::mode_w), (v53_scu_device*)m_v53scu), 0x00ff);
 			space(AS_IO).install_readwrite_handler(base+0x06, base+0x07, read8_delegate(FUNC(v53_base_device::scu_simk_r), this), write8_delegate(FUNC(v53_base_device::scu_simk_w), this), 0x00ff);
 
 		}
@@ -279,42 +291,54 @@ void v53_base_device::install_peripheral_io()
 
 /*** SCU ***/
 
-READ8_MEMBER(v53_base_device::scu_srb_r)
-{
-	printf("v53: scu_srb_r\n");
-	return 0;
-}
-
-WRITE8_MEMBER(v53_base_device::scu_stb_w)
-{
-	printf("v53: scu_stb_w %02x\n", data);
-}
-
-READ8_MEMBER(v53_base_device::scu_sst_r)
-{
-	printf("v53: scu_sst_r\n");
-	return 0;
-}
-
-WRITE8_MEMBER(v53_base_device::scu_scm_w)
-{
-	printf("v53: scu_scm_w %02x\n", data);
-}
-
-WRITE8_MEMBER(v53_base_device::scu_smd_w)
-{
-	printf("v53: scu_smd_w %02x\n", data);
-}
 
 READ8_MEMBER(v53_base_device::scu_simk_r)
 {
 	printf("v53: scu_simk_r\n");
-	return 0;
+	return m_simk;
 }
 
 WRITE8_MEMBER(v53_base_device::scu_simk_w)
 {
+	m_simk = data;
 	printf("v53: scu_simk_w %02x\n", data);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::scu_txd_trampoline_cb)
+{
+	m_txd_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::scu_dtr_trampoline_cb)
+{
+	m_dtr_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::scu_rts_trampoline_cb)
+{
+	m_rts_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::scu_rxrdy_trampoline_cb)
+{
+	// should we mask this here based on m_simk? it can mask the interrupt
+	m_rxrdy_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::scu_txrdy_trampoline_cb)
+{
+	// should we mask this here based on m_simk? it can mask the interrupt
+	m_txrdy_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::scu_txempty_trampoline_cb)
+{
+	m_txempty_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::scu_syndet_trampoline_cb)
+{
+	m_syndet_handler(state);
 }
 
 
@@ -329,6 +353,24 @@ WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_v53tcu->write(space, 3, data); }
 READ8_MEMBER(v53_base_device::tmu_tst0_r) {	return m_v53tcu->read(space, 0); }
 READ8_MEMBER(v53_base_device::tmu_tst1_r) {	return m_v53tcu->read(space, 1); }
 READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_v53tcu->read(space, 2); }
+
+
+WRITE_LINE_MEMBER(v53_base_device::tcu_out0_trampoline_cb)
+{
+	m_out0_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::tcu_out1_trampoline_cb)
+{
+	m_out1_handler(state);
+}
+
+WRITE_LINE_MEMBER(v53_base_device::tcu_out2_trampoline_cb)
+{
+	m_out2_handler(state);
+}
+
+
 
 /*** DMA ***/
 
@@ -459,9 +501,15 @@ WRITE_LINE_MEMBER( v53_base_device::upd71059_irq_w)
 }
 
 static MACHINE_CONFIG_FRAGMENT( v53 )
+
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	//MCFG_PIT8253_OUT0_HANDLER(WRITELINE(v53_base_device, pit_out0))
+	MCFG_PIT8253_CLK0(1000000) // todo
+	MCFG_PIT8253_CLK1(1000000) // todo
+	MCFG_PIT8253_CLK2(1000000) // todo
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE( v53_base_device, tcu_out0_trampoline_cb ))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( v53_base_device, tcu_out1_trampoline_cb ))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( v53_base_device, tcu_out2_trampoline_cb ))
+
 
 	MCFG_DEVICE_ADD("upd71071dma", V53_DMAU, 4000000)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(v53_base_device, dma_hrq_changed))
@@ -472,6 +520,13 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, upd71059_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
 
 	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0) 
+	MCFG_I8251_TXD_HANDLER(WRITELINE(v53_base_device, scu_txd_trampoline_cb))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(v53_base_device, scu_dtr_trampoline_cb))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(v53_base_device, scu_rts_trampoline_cb))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(v53_base_device,scu_rxrdy_trampoline_cb))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(v53_base_device,scu_txrdy_trampoline_cb))
+	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(v53_base_device, scu_txempty_trampoline_cb))
+	MCFG_I8251_SYNDET_HANDLER(WRITELINE(v53_base_device, scu_syndet_trampoline_cb))
 
 MACHINE_CONFIG_END
 
@@ -487,7 +542,19 @@ v53_base_device::v53_base_device(const machine_config &mconfig, device_type type
 	m_v53tcu(*this, "pit"),
 	m_v53dmau(*this, "upd71071dma"),
 	m_v53icu(*this, "upd71059pic"),
-	m_v53scu(*this, "v53scu")
+	m_v53scu(*this, "v53scu"),
+	// SCU
+	m_txd_handler(*this),
+	m_dtr_handler(*this),
+	m_rts_handler(*this),
+	m_rxrdy_handler(*this),
+	m_txrdy_handler(*this),
+	m_txempty_handler(*this),
+	m_syndet_handler(*this),
+	// TCU
+	m_out0_handler(*this),
+	m_out1_handler(*this),
+	m_out2_handler(*this)
 {
 }
 
