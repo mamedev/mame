@@ -3,6 +3,8 @@ ifndef config
   config=release
 endif
 
+override undefine TARGET
+
 ifndef verbose
   SILENT = @
 endif

@@ -7,7 +7,8 @@
 -- default when folks build using the makefile. That way they don't have to
 -- worry about the /scripts argument and all that.
 --
-
+	premake.make.undefine = { "TARGET" }
+	
 	solution "genie"
 		configurations {
 			"Release",
