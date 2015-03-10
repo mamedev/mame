@@ -461,11 +461,7 @@ WRITE16_MEMBER(m72_state::loht_sample_trigger_w)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::xmultiplm72_sample_trigger_w)
-{
-	static const int a[3] = { 0x0000, 0x0020, 0x1a40 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m_audio->set_sample_start(a[data & 0xff]);
-}
+
 
 WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
 {
@@ -634,13 +630,7 @@ static const UINT8 loht_code[CODE_LEN] =
 static const UINT8 loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
 												0xfb,0xac,0xd4,0x6d, 0x6d,0x5b,0x77,0xc0, 0x00,0x00 };
 
-/* X Multiply */
-static const UINT8 xmultiplm72_code[CODE_LEN] =
-{
-	0xea,0x30,0x02,0x00,0x0e    // jmp  0e00:$0230
-};
-static const UINT8 xmultiplm72_crc[CRC_LEN] =  {    0x73,0x82,0x4e,0x3f, 0xfc,0x56,0x59,0x06,
-												0x05,0x48,0xa8,0xf4, 0x00,0x00 };
+
 
 /* Dragon Breed */
 static const UINT8 dbreedm72_code[CODE_LEN] =
@@ -739,11 +729,6 @@ DRIVER_INIT_MEMBER(m72_state,loht)
 	memset(m_videoram2,0,0x4000);
 }
 
-DRIVER_INIT_MEMBER(m72_state,xmultiplm72)
-{
-	install_protection_handler(xmultiplm72_code,xmultiplm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::xmultiplm72_sample_trigger_w),this));
-}
 
 DRIVER_INIT_MEMBER(m72_state,dbreedm72)
 {
@@ -1851,6 +1836,11 @@ static MACHINE_CONFIG_DERIVED( xmultiplm72, m72_base )
 
 	
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
+
+	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
+	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  m72_mcu_int)
+
 MACHINE_CONFIG_END
 
 
@@ -2935,7 +2925,7 @@ ROM_START( xmultiplm72 )
 	ROM_LOAD16_BYTE( "cl0.l0",       0x40000, 0x10000, CRC(06a9e213) SHA1(9831c110814642703d6e71d49848d854095b7d3a) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "xmultipl_i8751h.bin",  0x00000, 0x01000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -3535,7 +3525,7 @@ GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_875
 GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
 
 GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, driver_device, 0,           ROT0,   "Irem", "X Multiply (World, M81)", GAME_NO_COCKTAIL )
-GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, m72_state,     xmultiplm72, ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
+GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, m72_state,     m72_8751, ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
 
 GAME( 1989, dbreed,      0,        dbreed,      dbreed,   driver_device, 0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreedm72,   dbreed,   dbreedm72,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL )
