@@ -1826,7 +1826,7 @@ static MACHINE_CONFIG_DERIVED( rtype, m72_base )
 	MCFG_DEVICE_REMOVE("dac")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xmultiplm72, m72_base )
+static MACHINE_CONFIG_DERIVED( xmultiplm72, m72_8751 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xmultiplm72_map)
 
@@ -1836,11 +1836,6 @@ static MACHINE_CONFIG_DERIVED( xmultiplm72, m72_base )
 
 	
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,xmultipl)
-
-	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  m72_mcu_int)
-
 MACHINE_CONFIG_END
 
 
@@ -2307,7 +2302,7 @@ ROM_START( bchopper )
 	ROM_LOAD16_BYTE( "c-l3-b.rom",   0x60000, 0x10000, CRC(11562221) SHA1(a2f136a487fb6f30350e8d1e26c0729eb0686c7d) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "bchopper_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -2664,7 +2659,7 @@ ROM_START( loht )
 	ROM_LOAD16_BYTE( "tom_c-l3-",    0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "loht_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -2991,7 +2986,7 @@ ROM_START( dbreedm72 )
 	ROM_LOAD16_BYTE( "db_c-l0.rom",  0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "dbreedm72_i8751.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -3273,7 +3268,7 @@ ROM_START( dkgensanm72 )
 	ROM_LOAD16_BYTE( "ge72-l3.bin",  0x60000, 0x10000, CRC(23d303a5) SHA1(b62010f34d71afb590deae458493454f9af38f7c) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "dkgenm72_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -3391,7 +3386,7 @@ ROM_START( airduel )
 	ROM_LOAD16_BYTE( "ad-c-l3.bin",  0x40000, 0x20000, CRC(9dd343f7) SHA1(9f499936b6d3807aa5b5c18e9811c73c9a2c99f9) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "airduel_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -3450,6 +3445,9 @@ ROM_START( gallop )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
 	ROM_LOAD16_BYTE( "cc-c-l3.bin",  0x40000, 0x20000, CRC(acd3278e) SHA1(83d7ddfbdb4bc9548a179b728351a21b3b0ac134) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "gallop_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "cc-c-00.bin",  0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )  /* sprites */
@@ -3525,7 +3523,7 @@ GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_875
 GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
 
 GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, driver_device, 0,           ROT0,   "Irem", "X Multiply (World, M81)", GAME_NO_COCKTAIL )
-GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, m72_state,     m72_8751, ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
+GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
 
 GAME( 1989, dbreed,      0,        dbreed,      dbreed,   driver_device, 0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )
 GAME( 1989, dbreedm72,   dbreed,   dbreedm72,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL )
