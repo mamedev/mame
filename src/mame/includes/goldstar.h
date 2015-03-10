@@ -54,9 +54,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_goldstar_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_goldstar_reel3_tile_info);
 
-	void do_blockswaps(UINT8* ROM);
-	void dump_to_file(UINT8* ROM);
-
 	int m_dataoffset;
 
 	required_shared_ptr<UINT8> m_fg_vidram;
@@ -195,24 +192,14 @@ public:
 	DECLARE_DRIVER_INIT(cb3);
 	DECLARE_DRIVER_INIT(cb3e);
 	DECLARE_DRIVER_INIT(cherrys);
-
-protected:
-	UINT8 decrypt(UINT8 cipherText, UINT16 address);
-};
-
-
-class chrygld_state : public goldstar_state
-{
-public:
-	chrygld_state(const machine_config &mconfig, device_type type, const char *tag) :
-		goldstar_state(mconfig, type, tag)
-	{
-	}
-
 	DECLARE_DRIVER_INIT(chrygld);
 	DECLARE_DRIVER_INIT(chry10);
 
 protected:
+	void do_blockswaps(UINT8* ROM);
+	void dump_to_file(UINT8* ROM);
+
+	UINT8 cb3_decrypt(UINT8 cipherText, UINT16 address);
 	UINT8 chry10_decrypt(UINT8 cipherText);
 };
 
