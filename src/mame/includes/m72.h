@@ -124,8 +124,8 @@ public:
 	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(majtitle_scan_rows);
-	DECLARE_MACHINE_START(m72);
-	DECLARE_MACHINE_RESET(m72);
+	void machine_start();
+	void machine_reset();
 	DECLARE_VIDEO_START(m72);
 	DECLARE_MACHINE_RESET(xmultipl);
 	DECLARE_VIDEO_START(xmultipl);
