@@ -27,7 +27,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_READ8_MEMBER(kbcdata_r);
 	DECLARE_WRITE8_MEMBER(kbcdata_w);
-	DECLARE_WRITE8_MEMBER(kbcstat_w);
 
 	UINT8 m_sysctl, m_pa, m_kbcdata;
 	bool m_kbcibf;
