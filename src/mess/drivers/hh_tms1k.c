@@ -2148,7 +2148,7 @@ ROM_START( ebball3 )
 	ROM_LOAD( "mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_ebball3_mpla.pla", 0, 867, CRC(325ae490) SHA1(f542d66ec7b46d7ab061c078f6443b920c01e189) )
+	ROM_LOAD( "tms1100_ebball3_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ebball3_opla.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
 ROM_END

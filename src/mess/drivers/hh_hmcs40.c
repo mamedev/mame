@@ -8,30 +8,32 @@
 
   serial  device    etc.
 ----------------------------------------------------------------
- *04      HD38800A  1980, Gakken Heiankyo Alien
  *07      HD38750A  1979, Bambino Knock-Em Out Boxing (ET-06B)
  @08      HD38750A  1979, Bambino Basketball (ET-05)
- @13      HD38820A  1981, Entex Galaxian 2
+ *45      HD38750A  1981, Vtech Invaders
+ *58      HD38750A  1982, Ludotronic(Hanzawa) Grand Prix Turbo
+ *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
+
+ *04      HD38800A  1980, Gakken Heiankyo Alien
  *23      HD38800A  198?, Tomy Kingman
- @23      HD38820A  1981, Entex Pac Man 2
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster (DM-21Z)
- @28      HD38820A  1981, Coleco Pac-Man (ver 1)
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
+ *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
+ *43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon
+ *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
+ @70      HD38800A  1982, Coleco Galaxian
+
+ @13      HD38820A  1981, Entex Galaxian 2
+ @23      HD38820A  1981, Entex Pac Man 2
+ @28      HD38820A  1981, Coleco Pac-Man (ver 1)
  @29      HD38820A  1981, Coleco Pac-Man (ver 2)
  *32      HD38820A  198?, Gakken Super Cobra
- *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
  *38      HD38820A  1982, Entex Crazy Climber
- *43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon
  *43      HD38820A  1982, Entex Turtles (have dump, +COP411 for audio)
- *45      HD38750A  1981, Vtech Invaders
  @45      HD38820A  1982, Coleco Donkey Kong
  @49      HD38820A  1983, Bandai Zackman
- *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
- *58      HD38750A  1982, Ludotronic(Hanzawa) Grand Prix Turbo
- *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
- @70      HD38800A  1982, Coleco Galaxian
  @70      HD38820A  1983, Parker Brothers Q*Bert
  @88      HD38820A  1984, Tomy Tron (THN-02)
 
