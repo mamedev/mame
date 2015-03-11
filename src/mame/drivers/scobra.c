@@ -1237,6 +1237,7 @@ ROM_START( hustlerb3 )
 	ROM_LOAD( "billiard_ic3.a3", 0x2000, 0x2000, CRC(bec503b1) SHA1(cdbe650b829cd4424141058467cd64cfffe1b1e1) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
+	// the frogger below which appears to be the same hw had no sound roms either.. I suspect something else is going on here
 	ROM_LOAD( "hustler.6",    0x0000, 0x0800, BAD_DUMP CRC(7a946544) SHA1(7ee2ad3fdf996f08534fb87fc02b619c168f420c) ) // not found on board - taken from parent
 	ROM_LOAD( "hustler.7",    0x0800, 0x0800, BAD_DUMP CRC(3db57351) SHA1(e5075a7130a80d2bf24f0556c2589dff0625ee60) ) // not found on board - taken from parent
 
@@ -1250,6 +1251,28 @@ ROM_START( hustlerb3 )
 	ROM_REGION( 0x0020, "user1", 0 ) /* decode PROMs */
 	ROM_LOAD( "ic7.b3", 0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )
 ROM_END
+
+// https://www.youtube.com/watch?v=r7di0_Yt1l8
+ROM_START( froggerv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rana_ic4.ic4",   0x0000, 0x2000, CRC(ed39f6d8) SHA1(8ca60be30dfc5c54fbc129fa0024987d853aad39) )
+	ROM_LOAD( "rana_ic3.ic3",   0x2000, 0x2000, CRC(f8313d5d) SHA1(76f8e382d5cfad4eafbcd8d42bc9a9f03a5eb5f8) )
+
+	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASE00 )
+	// no roms for 2nd z80 present, has very different sound to original.. 
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "rana_ic11.ic11",  0x0000, 0x0800, CRC(a1199087) SHA1(4492b021a6b5ae9a9e2ab97914ce1a5e5e5b64ab) )
+	ROM_LOAD( "rana_ic12.ic12",  0x0800, 0x0800, CRC(c1690dfc) SHA1(c6fdb1b9ec4fb7da2566b0c71e3e2f931cdece68) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic10",     0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	ROM_REGION( 0x0020, "user1", 0 ) /* decode PROMs */
+	ROM_LOAD( "ic7",      0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )
+ROM_END
+
+
 
 ROM_START( hustlerb4 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // identical to hustlerb but in 6 roms instead of 3
@@ -1347,3 +1370,5 @@ GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,      
 
 GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+
+GAME( 1981, froggerv, frogger,   hustlerb3, hustlerb3, scramble_state,  hustlerd,     ROT90,  "bootleg (Videotron / Gamepack)",     "Frogger (Videotron bootleg)", GAME_NOT_WORKING )
