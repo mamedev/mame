@@ -41,31 +41,31 @@ PALETTE_INIT_MEMBER(ssozumo_state, ssozumo)
 	}
 }
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_videoram_w)
+WRITE8_MEMBER(ssozumo_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_colorram_w)
+WRITE8_MEMBER(ssozumo_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_videoram2_w)
+WRITE8_MEMBER(ssozumo_state::videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_colorram2_w)
+WRITE8_MEMBER(ssozumo_state::colorram2_w)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_paletteram_w)
+WRITE8_MEMBER(ssozumo_state::paletteram_w)
 {
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;
@@ -98,12 +98,12 @@ WRITE8_MEMBER(ssozumo_state::ssozumo_paletteram_w)
 	m_palette->set_pen_color(offs2 + 64, rgb_t(r, g, b));
 }
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_scroll_w)
+WRITE8_MEMBER(ssozumo_state::scroll_w)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_flipscreen_w)
+WRITE8_MEMBER(ssozumo_state::flipscreen_w)
 {
 	flip_screen_set(data & 0x80);
 }
@@ -138,19 +138,16 @@ void ssozumo_state::video_start()
 
 void ssozumo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		if (spriteram[offs] & 0x01)
+		if (m_spriteram[offs] & 0x01)
 		{
-			int code = spriteram[offs + 1] + ((spriteram[offs] & 0xf0) << 4);
-			int color = (spriteram[offs] & 0x08) >> 3;
-			int flipx = spriteram[offs] & 0x04;
-			int flipy = spriteram[offs] & 0x02;
-			int sx = 239 - spriteram[offs + 3];
-			int sy = (240 - spriteram[offs + 2]) & 0xff;
+			int code = m_spriteram[offs + 1] + ((m_spriteram[offs] & 0xf0) << 4);
+			int color = (m_spriteram[offs] & 0x08) >> 3;
+			int flipx = m_spriteram[offs] & 0x04;
+			int flipy = m_spriteram[offs] & 0x02;
+			int sx = 239 - m_spriteram[offs + 3];
+			int sy = (240 - m_spriteram[offs + 2]) & 0xff;
 
 			if (flip_screen())
 			{
@@ -169,7 +166,7 @@ void ssozumo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 ssozumo_state::screen_update_ssozumo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 ssozumo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

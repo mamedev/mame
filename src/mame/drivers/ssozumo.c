@@ -14,7 +14,13 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 #include "sound/dac.h"
 #include "includes/ssozumo.h"
 
-WRITE8_MEMBER(ssozumo_state::ssozumo_sh_command_w)
+
+void ssozumo_state::machine_start()
+{
+	save_item(NAME(m_sound_nmi_mask));
+}
+
+WRITE8_MEMBER(ssozumo_state::sh_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
@@ -24,18 +30,18 @@ WRITE8_MEMBER(ssozumo_state::ssozumo_sh_command_w)
 static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ssozumo_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ssozumo_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x3400, 0x35ff) AM_RAM
 	AM_RANGE(0x3600, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(ssozumo_flipscreen_w)
-	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_WRITE(ssozumo_sh_command_w)
-	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE(ssozumo_scroll_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(flipscreen_w)
+	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_WRITE(sh_command_w)
+	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE(scroll_w)
 	AM_RANGE(0x4030, 0x4030) AM_READ_PORT("DSW1")
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
-	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(ssozumo_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -69,8 +75,8 @@ static INPUT_PORTS_START( ssozumo )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssozumo_state,coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssozumo_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssozumo_state, coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssozumo_state, coin_inserted, 0)
 
 	PORT_START("P2")    /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -202,7 +208,7 @@ static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8 - 1, 1*8, 31*8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update_ssozumo)
+	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssozumo)
@@ -281,4 +287,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, driver_device, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", 0 )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, driver_device, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", GAME_SUPPORTS_SAVE )
