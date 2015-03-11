@@ -18,6 +18,7 @@
  @MP1030   TMS1100  1980, APF Mathemagician
  @MP1204   TMS1100  1980, Entex Baseball 3
  *MP1221   TMS1100  1980, Entex Raise The Devil
+ *MP2139   ?        1982, Gakken Galaxy Invader 1000
  *MP2788   ?        1980, Bandai Flight Time
  @MP3226   TMS1000  1978, Milton Bradley Simon
  *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
@@ -1016,15 +1017,15 @@ WRITE16_MEMBER(hh_tms1k_state::ebball3_write_o)
 
 
 /* physical button layout and labels is like this:
-   
-    main device (batter side):            remote pitcher:                                  
-                                                                                                 
+
+    main device (batter side):            remote pitcher:
+
                           MAN
-    PRO                    |              [FAST BALL]  [CHANGE UP]    [CURVE]  [SLIDER]    
+    PRO                    |              [FAST BALL]  [CHANGE UP]    [CURVE]  [SLIDER]
      |                  OFF|
      o                     o                   [STEAL DEFENSE]           [KNUCKLER]
     AM                    AUTO
-    
+
     [BUNT]  [BATTER]  [STEAL]
 */
 

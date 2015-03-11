@@ -234,6 +234,10 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   * PCB label Emix Corp. ET-03
   * NEC uCOM-43 MCU, labeled D553C 031
   * green VFD display Emix-102
+  
+  Press the Kick button to start the game, an automatic sequence follows.
+  Then choose a formation(A,B,C) and either pass the ball, and/or start
+  running. For more information, refer to the official manual.
 
   NOTE!: MESS external artwork is recommended
 
@@ -283,23 +287,25 @@ WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
 static INPUT_PORTS_START( ssfball )
 	PORT_START("IN.0") // F3 port B3
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Formation A")
 
 	PORT_START("IN.1") // G3 port B3
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.2") // port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Kick/Display")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Formation C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Formation B")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // multiplexed, handled in ssfball_input_b_r
 
 	PORT_START("IN.3") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Pass")
 INPUT_PORTS_END
 
 
@@ -340,7 +346,7 @@ MACHINE_CONFIG_END
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label Emix Corp. ET-12
   * NEC uCOM-43 MCU, labeled D553C 055
-  * blue VFD display Emix-104
+  * blue VFD display Emix-104 (some versions had a green display)
 
   NOTE!: MESS external artwork is recommended
 
@@ -388,35 +394,50 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_plate_w)
 }
 
 
+/* physical button layout and labels is like this:
+    
+    * left = P1 side *                                         * right = P2 side * (note: in 1P mode, switch sides between turns)
+
+    [  JUMP  ]  [ HIGH ]        (players sw)                   [ HIGH ]  [  JUMP  ]
+                                1<--->2         [START/
+    [STRAIGHT]  [MEDIUM]                         RESET]        [MEDIUM]  [STRAIGHT]
+                                1<---OFF--->2
+    [ STOOP  ]  [ LOW  ]        (skill lvl sw)                 [ LOW  ]  [ STOOP  ]
+*/
+
 static INPUT_PORTS_START( splasfgt )
 	PORT_START("IN.0") // G0 port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P1 Position Straight")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1 Position Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1 Position Stoop")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // G1 port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("P1 Beam High")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("P1 Beam Medium")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 Beam Low")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // G2 port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("P2 Position Straight")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P2 Position Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("P2 Position Stoop")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // G3 port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON11 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON12 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("P2 Beam High")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P2 Beam Medium")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("P2 Beam Low")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON13 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON14 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // start
+	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -546,9 +567,8 @@ MACHINE_CONFIG_END
   The initial release of this game was in 1979, known as Pro-Tennis,
   it has a D553 instead of D552, with just a little over 50% ROM used.
 
-  This is an early VFD simple electronic tennis game. Player 1 is on the right
-  side, player 2 or CPU on the left. Each player has six possible positions
-  where to hit the ball. A backdrop behind the VFD shows a tennis court.
+  This is an early VFD simple electronic tennis game. Each player has six possible
+  positions where to hit the ball. A backdrop behind the VFD shows a tennis court.
 
   NOTE!: MESS external artwork is recommended
 
@@ -590,6 +610,8 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_port_e_w)
 
 
 /* Pro-Tennis physical button layout and labels is like this:
+    
+    * left = P2/CPU side *    * right = P1 side *
 
     [SERVE] [1] [2] [3]       [3] [2] [1] [SERVE]
             [4] [5] [6]       [6] [5] [4]
@@ -601,12 +623,12 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_START("IN.0") // E0 port A/B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Serve")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Serve")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("P1 Button 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("P1 Button 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P1 Button 2")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("P1 Button 5")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("P1 Button 3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Button 6")
 
 	PORT_START("IN.1") // E1 port A/B
 	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, tmtennis_difficulty_switch, NULL)
@@ -616,12 +638,12 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_CONFNAME( 0x02, 0x00, "Players" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("P2 Button 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P2 Button 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("P2 Button 2")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 Button 5")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("P2 Button 3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 6")
 INPUT_PORTS_END
 
 
@@ -933,8 +955,8 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, ssfball,   0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1980, splasfgt,  0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1979, ssfball,   0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, splasfgt,  0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1982, edracula,  0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
