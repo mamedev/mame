@@ -26,6 +26,7 @@ public:
 	DECLARE_WRITE8_MEMBER(goldstar_lamps_w);
 	DECLARE_WRITE8_MEMBER(cb3_lamps_w);
 	DECLARE_WRITE8_MEMBER(pkrmast_lamps_w);
+	DECLARE_WRITE8_MEMBER(pkrmast_coincount_w);
 	DECLARE_WRITE8_MEMBER(ladylinr_outport_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fg_atrram_w);

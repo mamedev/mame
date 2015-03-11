@@ -705,6 +705,28 @@ WRITE8_MEMBER(goldstar_state::pkrmast_lamps_w)
 		popmessage("lamps: %02X", data);
 }
 
+WRITE8_MEMBER(goldstar_state::pkrmast_coincount_w)
+{
+/*  bits
+  7654 3210
+  ---- ---x  Coin Out counter
+  ---- x---  Coin D counter
+  ---x ----  Coin C counter
+  --x- ----  Key In counter
+  -x-- ----  Coin A counter
+  x--- -xx-  Unused in Crazy Bonus
+*/
+
+	coin_counter_w(machine(), 0, data & 0x40);  /* Counter 1 Coin A */
+	coin_counter_w(machine(), 1, data & 0x20);  /* Counter 2 Key In */
+	coin_counter_w(machine(), 2, data & 0x10);  /* Counter 3 Coin C */
+	coin_counter_w(machine(), 3, data & 0x08);  /* Counter 4 Coin D */
+	coin_counter_w(machine(), 4, data & 0x01);  /* Counter 5 Payout */
+
+	if (data & 0x86)
+		popmessage("counters: %02X", data);
+}
+
 static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
@@ -720,6 +742,7 @@ static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW3-1")
 	AM_RANGE(0x22, 0x22) AM_WRITE(pkrmast_lamps_w)
 
+	AM_RANGE(0x24, 0x24) AM_WRITE(pkrmast_coincount_w)
 	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW1")
 	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
@@ -1248,6 +1271,33 @@ INPUT_PORTS_START( cmv4_dsw5 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( cb3_dsw1 )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Game Style" )                PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, "Tokens" )
+	PORT_DIPSETTING(    0x00, "Ticket" )
+	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" )         PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, "Active Low" )
+	PORT_DIPSETTING(    0x00, "Active High" )
+	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )               PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, "Payout Switch" )
+	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPNAME( 0x08, 0x08, "'7' In Double Up Game" )     PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, "Loss" )
+	PORT_DIPSETTING(    0x00, "Even" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game" )            PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )                   PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0xc0, "8" )
+	PORT_DIPSETTING(    0x80, "16" )
+	PORT_DIPSETTING(    0x40, "32" )
+	PORT_DIPSETTING(    0x00, "64" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cb3_dsw3 )
 	PORT_INCLUDE( cmv4_dsw3 )
 	PORT_MODIFY("DSW3")
@@ -1284,23 +1334,23 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cb3_dsw5 )
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )   PORT_DIPLOCATION("DSW5:1")      /* not checked */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )   PORT_DIPLOCATION("DSW5:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )     PORT_DIPLOCATION("DSW5:2,3")    /* not working */
+	PORT_DIPNAME( 0x06, 0x06, "Coin In Limit" )     PORT_DIPLOCATION("DSW5:2,3")
 	PORT_DIPSETTING(    0x06, "1,000" )
 	PORT_DIPSETTING(    0x04, "5,000" )
 	PORT_DIPSETTING(    0x02, "10,000" )
 	PORT_DIPSETTING(    0x00, "20,000" )
-	PORT_DIPNAME( 0x18, 0x10, "Coin Out Rate" )     PORT_DIPLOCATION("DSW5:4,5")    /* not checked */
+	PORT_DIPNAME( 0x18, 0x10, "Coin Out Rate" )     PORT_DIPLOCATION("DSW5:4,5")
 	PORT_DIPSETTING(    0x00, "100 Credits / 1 Pulse" )
 	PORT_DIPSETTING(    0x08, "100 Credits / 5 Pulses" )
 	PORT_DIPSETTING(    0x10, "100 Credits / 10 Pulses" )
 	PORT_DIPSETTING(    0x18, "100 Credits / 100 Pulses" )
-	PORT_DIPNAME( 0x20, 0x20, "W-Up Girl" )         PORT_DIPLOCATION("DSW5:6")      /* not working */
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Girl" )    PORT_DIPLOCATION("DSW5:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin In Rate" )      PORT_DIPLOCATION("DSW5:7,8")    /* not checked */
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin In Rate" )      PORT_DIPLOCATION("DSW5:7,8")
 	PORT_DIPSETTING(    0xc0, "100 Credits / 1 Pulse" )
 	PORT_DIPSETTING(    0x40, "100 Credits / 5 Pulses" )
 	PORT_DIPSETTING(    0x80, "100 Credits / 10 Pulses" )
@@ -1866,26 +1916,15 @@ static INPUT_PORTS_START( chrygld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Game Style" )        PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, "Tokens" )
-	PORT_DIPSETTING(    0x00, "Ticket" )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x02, "Active Low" )
-	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:3")
-	PORT_DIPSETTING(    0x04, "Payout Switch" )
-	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, "Loss" )
-	PORT_DIPSETTING(    0x00, "Even" )
-	PORT_DIPNAME( 0x10, 0x10, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x10, "80%" )
-	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x20, 0x20, "W-UP Game" )         PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Bet Max" )           PORT_DIPLOCATION("DSW1:7,8")
+	PORT_INCLUDE( cb3_dsw1 )
+	PORT_MODIFY("DSW1")
+	/* Game Style not checked */
+	/* Hopper Out Switch not checked */
+	/* Payout Mode not checked */
+	/* '7' In Double Up Game not checked */
+	/* Double Up Game Pay Rate OK */
+	/* Double Up Game OK */
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Max" )                   PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0xc0, "8" )
 	PORT_DIPSETTING(    0x80, "16" )
 	PORT_DIPSETTING(    0x40, "32" )
@@ -2474,30 +2513,14 @@ static INPUT_PORTS_START( chry10 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Game Style" )        PORT_DIPLOCATION("DSW1:1")  /* OK */
-	PORT_DIPSETTING(    0x01, "Tokens" )
-	PORT_DIPSETTING(    0x00, "Ticket" )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:2")  /* OK */
-	PORT_DIPSETTING(    0x02, "Active Low" )
-	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:3")  /* OK */
-	PORT_DIPSETTING(    0x04, "Payout Switch" )
-	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, "Loss" )
-	PORT_DIPSETTING(    0x00, "Even" )
-	PORT_DIPNAME( 0x10, 0x10, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:5")  /* OK */
-	PORT_DIPSETTING(    0x10, "80%" )
-	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x20, 0x20, "W-UP Game" )         PORT_DIPLOCATION("DSW1:6")  /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Bet Max" )           PORT_DIPLOCATION("DSW1:7,8")    /* OK */
-	PORT_DIPSETTING(    0xc0, "8" )
-	PORT_DIPSETTING(    0x80, "16" )
-	PORT_DIPSETTING(    0x40, "32" )
-	PORT_DIPSETTING(    0x00, "64" )
+	PORT_INCLUDE( cb3_dsw1 )
+	/* Game Style not checked */
+	/* Hopper Out Switch not checked */
+	/* Payout Mode not checked */
+	/* '7' In Double Up Game not checked */
+	/* Double Up Game Pay Rate OK */
+	/* Double Up Game OK */
+	/* Bet Max OK */
 
 	PORT_INCLUDE( cmv4_dsw2 )
 	PORT_MODIFY("DSW2")
@@ -2551,7 +2574,7 @@ static INPUT_PORTS_START( chry10 )
 	/* DSW5-1 not checked */
 	/* Coin In Limit not working */
 	/* Coin Out Rate not checked */
-	/* W-Up Girl not working */
+	/* Double Up Girl not working (always shows face in demo) */
 	/* Coin In Rate not checked */
 INPUT_PORTS_END
 
@@ -2580,31 +2603,14 @@ static INPUT_PORTS_START( ncb3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_CODE(KEYCODE_D) PORT_NAME("P2 - Stop 3 / Small / Info / Card 1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 - Start / Stop All / Card 4")
 
-	/* to check DIP switches... */
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Game Style" )        PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, "Tokens" )
-	PORT_DIPSETTING(    0x00, "Ticket" )
-	PORT_DIPNAME( 0x02, 0x02, "Hopper Out Switch" ) PORT_DIPLOCATION("DSW1:2")
-	PORT_DIPSETTING(    0x02, "Active Low" )
-	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x04, 0x04, "Payout Mode" )       PORT_DIPLOCATION("DSW1:3")
-	PORT_DIPSETTING(    0x04, "Payout Switch" )
-	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x08, 0x00, "W-UP '7'" )          PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, "Loss" )
-	PORT_DIPSETTING(    0x00, "Even" )
-	PORT_DIPNAME( 0x10, 0x10, "W-UP Pay Rate" )     PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x10, "80%" )
-	PORT_DIPSETTING(    0x00, "90%" )
-	PORT_DIPNAME( 0x20, 0x20, "W-UP Game" )         PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, "Bet Max" )           PORT_DIPLOCATION("DSW1:7,8")
-	PORT_DIPSETTING(    0xc0, "8" )
-	PORT_DIPSETTING(    0x80, "16" )
-	PORT_DIPSETTING(    0x40, "32" )
-	PORT_DIPSETTING(    0x00, "64" )
+	PORT_INCLUDE( cb3_dsw1 )
+	/* Game Style not checked */
+	/* Hopper Out Switch not checked */
+	/* Payout Mode not checked */
+	/* '7' In Double Up Game not checked */
+	/* Double Up Game Pay Rate OK */
+	/* Double Up Game OK */
+	/* Bet Max OK */
 
 	PORT_INCLUDE( cmv4_dsw2 )
 	PORT_MODIFY("DSW2")
@@ -2630,7 +2636,7 @@ static INPUT_PORTS_START( ncb3 )
 	/* DSW5-1 not checked */
 	/* Coin In Limit not working */
 	/* Coin Out Rate not checked */
-	/* W-Up Girl not working */
+	/* Double Up Girl not working (always shows face in demo) */
 	/* Coin In Rate not checked */
 INPUT_PORTS_END
 
@@ -5915,15 +5921,9 @@ static INPUT_PORTS_START( crazybon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
+	PORT_INCLUDE( cmv4_coins )
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Unused coin switch */
 
 	PORT_INCLUDE( cmv4_service )
 
@@ -5934,9 +5934,9 @@ static INPUT_PORTS_START( crazybon )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Coin Out Rate" )             PORT_DIPLOCATION("DSW1:3")      /* OK */
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
