@@ -507,7 +507,7 @@ ROM_START( superwng )
 	ROM_LOAD( "3.5m",         0x2000, 0x2000, CRC(3b08bd19) SHA1(2020e2835df86a6a279bbf9d013a489f0e32a4bd) )
 	ROM_LOAD( "4.5p",         0x4000, 0x2000, CRC(6a49746d) SHA1(f5cd5eb77f60972a3897243f9ee3d61aac0878fc) )
 	ROM_LOAD( "5.5r",         0x6000, 0x2000, CRC(ebd23487) SHA1(16e8faf989aa80dbf9934450ec4ba642a6f88c63) )
-	ROM_LOAD( "6.8s",         0x4000, 0x4000, BAD_DUMP CRC(774433e0) SHA1(82b10d797581c14914bcce320f2aa5d3fb1fba33) ) // banked but probably bad..
+	ROM_LOAD( "6.8s",         0x8000, 0x4000, BAD_DUMP CRC(774433e0) SHA1(82b10d797581c14914bcce320f2aa5d3fb1fba33) ) // banked but probably bad..
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.1a",         0x0000, 0x2000, CRC(a70aa39e) SHA1(b03de65d7bd020eb77495997128dce5ccbdbefac) )
