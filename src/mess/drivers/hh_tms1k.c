@@ -1058,10 +1058,10 @@ INPUT_PORTS_END
 
 void hh_tms1k_state::ebball3_set_clock()
 {
-	// MCU clock is from an RC circuit oscillating by default at ~375kHz,
-	// but on PRO, the difficulty switch adds an extra capacitor to Vdd to speed
-	// it up to unknown, let's assume ~425kHz.
-	m_maincpu->set_unscaled_clock(m_inp_matrix[3]->read() & 1 ? 425000 : 375000);
+	// MCU clock is from an RC circuit(R=47K, C=33pf) oscillating by default at ~340kHz,
+	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
+	// it up to around ~440kHz.
+	m_maincpu->set_unscaled_clock(m_inp_matrix[3]->read() & 1 ? 440000 : 340000);
 }
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::ebball3_difficulty_switch)
@@ -1078,7 +1078,7 @@ MACHINE_RESET_MEMBER(hh_tms1k_state, ebball3)
 static MACHINE_CONFIG_START( ebball3, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 375000) // RC osc. R=47K, C=33pf -> ~375kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 340000) // see ebball3_set_clock
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball3_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball3_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball3_write_o))

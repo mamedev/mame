@@ -5,9 +5,11 @@
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
-	<element name="led" defstate="0">
+	<element name="led" defstate="2">
 		<disk state="0"><color red="0.1" green="0.2" blue="0.2" /></disk>
 		<disk state="1"><color red="0.5" green="1.0" blue="1.0" /></disk>
+
+		<disk state="2"><color red="0" green="0" blue="0" /></disk>
 	</element>
 
 
