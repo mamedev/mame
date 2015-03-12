@@ -72,9 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(telcom_high_r);
 	DECLARE_READ8_MEMBER(speed_low_r);
 	DECLARE_READ8_MEMBER(speed_high_r);
-	DECLARE_READ8_MEMBER(m6545_status_r);
 	DECLARE_WRITE8_MEMBER(m6545_index_w);
-	DECLARE_READ8_MEMBER(m6545_data_r);
 	DECLARE_WRITE8_MEMBER(m6545_data_w);
 	DECLARE_READ8_MEMBER(video_low_r);
 	DECLARE_READ8_MEMBER(video_high_r);
@@ -138,7 +136,6 @@ private:
 	UINT8 m_mbee256_was_pressed[15];
 	UINT8 m_mbee256_q[20];
 	UINT8 m_mbee256_q_pos;
-	UINT8 m_sy6545_status;
 	UINT8 m_sy6545_reg[32];
 	UINT8 m_sy6545_ind;
 	UINT8 m_fdc_rq;

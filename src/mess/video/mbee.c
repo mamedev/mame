@@ -6,6 +6,38 @@
 
     Rewritten by Robbbert
 
+    Operation of old keyboard:
+    The design is taken from the SY6545 Application Note AN3. As the CRTC
+    renders the picture, the MA lines also scan the keyboard. When a keydown
+    is detected, the lightpen pin is activated, which sets bit 6 of the status
+    register. The CPU continuously monitors this register. Once bit 6 is set,
+    the CPU needs to determine which key is pressed. It firstly clears bit 6,
+    then sets port 0B to 1. This prevents the CRTC from scanning the keyboard
+    and causing interference. Next, the CPU writes an address to regs 18,19 and
+    then instigates the transparent access. This checks one keyboard row, which
+    if the pressed key is found, will once again set bit 6. If not found, the
+    next row will be checked. Once found, the CPU clears bit 6 and port 0B, then
+    works out the ascii key code of the pressed key.
+
+    Tests of old keyboard. Start mbeeic.
+    1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
+       it should only fire bullets. If it sometimes starts turning,
+       thrusting or using the shield, then there is a problem.
+
+    2. Load SCAVENGER and make sure it doesn't go to the next level
+       until you find the Exit.
+
+    3. At the Basic prompt, type in EDASM press enter. At the memory size
+       prompt press enter. Now, make sure the keyboard works properly.
+
+    Old keyboard ToDo:
+    - Occasional characters dropped while typing
+    - Lots of characters dropped when pasting
+    - On mbee128p, Simply Write doesn't accept any input
+
+    New keyboard ToDo:
+    - On mbeett, various problems caused by phantom characters.
+
 ****************************************************************************/
 
 
@@ -156,55 +188,54 @@ void mbee_state::oldkb_matrix_r(UINT16 offs)
 {
 	if (m_has_oldkb)
 	{
-		offs &= 0x3f0; // safety check
 		UINT8 port = (offs >> 7) & 7;
 		UINT8 bit = (offs >> 4) & 7;
 		UINT8 extra = 0;
 		UINT8 data = m_io_oldkb[port]->read();
-		if ((port == 0) || (port == 2) || (port == 3))
-			extra = m_io_x7->read();
-		else
-		if (port == 7)
-			extra = data;
-		
-		bool keydown  = ( data >> bit ) & 1;
+		bool keydown  = BIT(data, bit);
 
 		// This adds premium-style cursor keys to the old keyboard.
 		// They are used by the pc85 menu. Premium keyboards already
 		// have these keys fitted.
-		if (!keydown && !m_is_premium && extra)
+		if (!keydown && !m_is_premium)
 		{
-			if BIT(extra, 0) // cursor up
-			{
-				if( port == 7 && bit == 1 ) keydown = 1;
-				if( port == 0 && bit == 5 ) keydown = 1; // control E
-			}
+			if ((port == 0) || (port == 2) || (port == 3))
+				extra = m_io_x7->read();
 			else
-			if BIT(extra, 2) // cursor down
+			if (port == 7)
+				extra = data;
+
+			if (extra)
 			{
-				if( port == 7 && bit == 1 ) keydown = 1;
-				if( port == 3 && bit == 0 ) keydown = 1; // control X
-			}
-			else
-			if BIT(extra, 3) // cursor left
-			{
-				if( port == 7 && bit == 1 ) keydown = 1;
-				if( port == 2 && bit == 3 ) keydown = 1; // control S
-			}
-			else
-			if BIT(extra, 6) // cursor right
-			{
-				if( port == 7 && bit == 1 ) keydown = 1;
-				if( port == 0 && bit == 4 ) keydown = 1; // control D
+				if BIT(extra, 0) // cursor up
+				{
+					if( port == 7 && bit == 1 ) keydown = 1;
+					if( port == 0 && bit == 5 ) keydown = 1; // control E
+				}
+				else
+				if BIT(extra, 2) // cursor down
+				{
+					if( port == 7 && bit == 1 ) keydown = 1;
+					if( port == 3 && bit == 0 ) keydown = 1; // control X
+				}
+				else
+				if BIT(extra, 3) // cursor left
+				{
+					if( port == 7 && bit == 1 ) keydown = 1;
+					if( port == 2 && bit == 3 ) keydown = 1; // control S
+				}
+				else
+				if BIT(extra, 6) // cursor right
+				{
+					if( port == 7 && bit == 1 ) keydown = 1;
+					if( port == 0 && bit == 4 ) keydown = 1; // control D
+				}
 			}
 		}
 
 		if( keydown )
-		{
-			m_sy6545_reg[17] = offs;
-			m_sy6545_reg[16] = (offs >> 8) & 0x3f;
-			m_sy6545_status |= 0x40; //lpen_strobe
-		}
+			m_crtc->assert_light_pen_input(); //lpen_strobe
+
 	}
 }
 
@@ -223,43 +254,6 @@ void mbee_state::oldkb_scan( UINT16 param )
 
 ************************************************************/
 
-READ8_MEMBER( mbee_state::m6545_status_r )
-{
-	const rectangle &visarea = m_screen->visible_area();
-
-	UINT8 data = m_sy6545_status; // bit 6 = lpen strobe, bit 7 = update strobe
-	int y = m_screen->vpos();
-
-	if( y < visarea.min_y || y > visarea.max_y )
-		data |= 0x20;   /* vertical blanking */
-
-	return data;
-}
-
-READ8_MEMBER( mbee_state::m6545_data_r )
-{
-	UINT16 addr;
-	UINT8 data = m_crtc->register_r( space, 0 );
-
-	switch( m_sy6545_ind )
-	{
-	case 16:
-	case 17:
-		m_sy6545_status &= 0x80; // turn off lpen_strobe
-		break;
-	case 31:
-		// This firstly pushes the contents of the transparent registers onto the MA lines,
-		// then increments the address, then sets update strobe on.
-		addr = (m_sy6545_reg[18] << 8) | m_sy6545_reg[19];
-		oldkb_matrix_r(addr);
-		m_sy6545_reg[19]++;
-		if (!m_sy6545_reg[19]) m_sy6545_reg[18]++;
-		m_sy6545_status |= 0x80; // update_strobe
-		break;
-	}
-	return data;
-}
-
 WRITE8_MEMBER ( mbee_state::m6545_index_w )
 {
 	data &= 0x1f;
@@ -270,7 +264,6 @@ WRITE8_MEMBER ( mbee_state::m6545_index_w )
 WRITE8_MEMBER ( mbee_state::m6545_data_w )
 {
 	static const UINT8 sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
-	UINT16 addr = 0;
 
 	switch( m_sy6545_ind )
 	{
@@ -278,15 +271,6 @@ WRITE8_MEMBER ( mbee_state::m6545_data_w )
 		data &= 0x3f; // select alternate character set
 		if( m_sy6545_reg[12] != data )
 			memcpy(m_p_gfxram, memregion("gfx")->base() + (((data & 0x30) == 0x20) << 11), 0x800);
-		break;
-	case 31:
-		// This firstly pushes the contents of the transparent registers onto the MA lines,
-		// then increments the address, then sets update strobe on.
-		addr = (m_sy6545_reg[18] << 8) | m_sy6545_reg[19];
-		oldkb_matrix_r(addr);
-		m_sy6545_reg[19]++;
-		if (!m_sy6545_reg[19]) m_sy6545_reg[18]++;
-		m_sy6545_status |= 0x80; // update_strobe
 		break;
 	}
 	m_sy6545_reg[m_sy6545_ind] = data & sy6545_mask[m_sy6545_ind];  /* save data in register */
@@ -337,8 +321,10 @@ UINT32 mbee_state::screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitma
 
 MC6845_ON_UPDATE_ADDR_CHANGED( mbee_state::crtc_update_addr )
 {
-// not sure what goes in here - parameters passed are device, address, strobe
+// parameters passed are device, address, strobe(always 0)
 // not used on 256TC
+
+	oldkb_matrix_r(address);
 }
 
 
@@ -496,13 +482,16 @@ PALETTE_INIT_MEMBER( mbee_state, premium )
 	UINT8 i, r, b, g;
 
 	/* set up 8 low intensity colours */
-	for (i = 0; i < 8; i++)
+	for (i = 0; i < 7; i++)
 	{
 		r = BIT(i, 0) ? 0xc0 : 0;
 		g = BIT(i, 1) ? 0xc0 : 0;
 		b = BIT(i, 2) ? 0xc0 : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+
+	// colour 8 is dark grey, rather than black
+	palette.set_pen_color(8, rgb_t(96, 96, 96));
 
 	/* set up 8 high intensity colours */
 	for (i = 9; i < 16; i++)

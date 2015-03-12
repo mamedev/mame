@@ -180,7 +180,7 @@ TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
 	if (m_b2)
 		m_pio->port_b_write(pio_port_b_r(generic_space(),0,0xff));
 
-	timer_set(attotime::from_hz(10), TIMER_MBEE_NEWKB);
+	timer_set(attotime::from_hz(50), TIMER_MBEE_NEWKB);
 }
 
 READ8_MEMBER( mbee_state::port18_r )
