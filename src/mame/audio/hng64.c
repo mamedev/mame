@@ -130,8 +130,23 @@ WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 void hng64_state::reset_sound()
 {
 	UINT8 *RAM = (UINT8*)m_soundram;
-	membank("bank1")->set_base(&RAM[0x1f0000]); // allows us to boot
-	membank("bank2")->set_base(&RAM[0x1f0000]); // seems to be the right default for most games (initial area jumps to a DI here)
+	membank("bank0")->set_base(&RAM[0x1f0000]);
+	membank("bank1")->set_base(&RAM[0x1f0000]);
+	membank("bank2")->set_base(&RAM[0x1f0000]);
+	membank("bank3")->set_base(&RAM[0x1f0000]);
+	membank("bank4")->set_base(&RAM[0x1f0000]);
+	membank("bank5")->set_base(&RAM[0x1f0000]);
+	membank("bank6")->set_base(&RAM[0x1f0000]);
+	membank("bank7")->set_base(&RAM[0x1f0000]);
+	membank("bank8")->set_base(&RAM[0x1f0000]);
+	membank("bank9")->set_base(&RAM[0x1f0000]);
+	membank("banka")->set_base(&RAM[0x1f0000]);
+	membank("bankb")->set_base(&RAM[0x1f0000]);
+	membank("bankc")->set_base(&RAM[0x1f0000]);
+	membank("bankd")->set_base(&RAM[0x1f0000]);
+	membank("banke")->set_base(&RAM[0x1f0000]);
+	membank("bankf")->set_base(&RAM[0x1f0000]);
+
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -142,9 +157,22 @@ void hng64_state::reset_sound()
 
 
 static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank2")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM // tmp, roadedge
-	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank0")
+	AM_RANGE(0x10000, 0x1ffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x20000, 0x2ffff) AM_RAMBANK("bank2")
+	AM_RANGE(0x30000, 0x3ffff) AM_RAMBANK("bank3")
+	AM_RANGE(0x40000, 0x4ffff) AM_RAMBANK("bank4")
+	AM_RANGE(0x50000, 0x5ffff) AM_RAMBANK("bank5")
+	AM_RANGE(0x60000, 0x6ffff) AM_RAMBANK("bank6")
+	AM_RANGE(0x70000, 0x7ffff) AM_RAMBANK("bank7")
+	AM_RANGE(0x80000, 0x8ffff) AM_RAMBANK("bank8")
+	AM_RANGE(0x90000, 0x9ffff) AM_RAMBANK("bank9")
+	AM_RANGE(0xa0000, 0xaffff) AM_RAMBANK("banka")
+	AM_RANGE(0xb0000, 0xbffff) AM_RAMBANK("bankb")
+	AM_RANGE(0xc0000, 0xcffff) AM_RAMBANK("bankc")
+	AM_RANGE(0xd0000, 0xdffff) AM_RAMBANK("bankd")
+	AM_RANGE(0xe0000, 0xeffff) AM_RAMBANK("banke")
+	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bankf")
 ADDRESS_MAP_END
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
@@ -193,6 +221,27 @@ WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 
 	// the 2 early games don't do this.. maybe all banks actuallly default to that region tho?
 	// the sound code on those games seems buggier anyway.
+	UINT8 *RAM = (UINT8*)m_soundram;
+
+	int bank = data & 0x1f;
+
+	if (offset == 0x0) membank("bank0")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x1) membank("bank1")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x2) membank("bank2")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x3) membank("bank3")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x4) membank("bank4")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x5) membank("bank5")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x6) membank("bank6")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x7) membank("bank7")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x8) membank("bank8")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0x9) membank("bank9")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0xa) membank("banka")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0xb) membank("bankb")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0xc) membank("bankc")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0xd) membank("bankd")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0xe) membank("banke")->set_base(&RAM[bank*0x10000]);
+	if (offset == 0xf) membank("bankf")->set_base(&RAM[bank*0x10000]);
+
 }
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0102_w)
