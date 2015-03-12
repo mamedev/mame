@@ -61,7 +61,7 @@
 # CYGWIN_BUILD = 1
 
 # set this to the minimum DirectInput version to support (7 or 8)
-# DIRECTINPUT = 8
+DIRECTINPUT = 8
 
 # uncomment next line to use SDL library for sound and video output
 # USE_SDL = 1
