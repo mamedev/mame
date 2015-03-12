@@ -98,7 +98,6 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(outport0_w);
-	DECLARE_WRITE8_MEMBER(outport1_w);
 	DECLARE_WRITE8_MEMBER(girl_scroll_w);
 	DECLARE_WRITE8_MEMBER(background_col_w);
 

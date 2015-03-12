@@ -179,20 +179,35 @@ READ8_MEMBER(goldstar_state::protection_r)
 WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
 {
 /*  bits
-  7654 3210
-  ---- ---x  Bet Red / Card 2.
-  ---- --x-  Stop 3 / Small / Info / Card 1
-  ---- -x--  Bet Blue / Double / Card 3
-  ---- x---  Stop 1 / Take
-  ---x ----  Stop 2 / Big / Bonus
-  --x- ----  Start / Stop All / Card 4
+  7654 3210     goldstar
+  ---- ---x     Bet Red / Card 2.
+  ---- --x-     Stop 3 / Small / Info / Card 1
+  ---- -x--     Bet Blue / Double / Card 3
+  ---- x---     Stop 1 / Take
+  ---x ----     Stop 2 / Big / Bonus
+  --x- ----     Start / Stop All / Card 4
+
+  7654 3210     cm/cmaster  cmpacman/cmtetris   tonypok         schery97        pokonl97        match98
+  ---- ---x                                                     stop/big        bet 10/big      hit/stop
+  ---- --x-     d-up        d-up                big/small       d-up            d-up
+  ---- -x--     take        take/stop           take/d-up       take/select     take/select     take
+  ---- x---     bet         bet                 bet             bet             bet 1           bet
+  ---x ----     info        info                                small           small
+  --x- ----     start       start               deal            start           start           start
+  -x-- ----                                     hold
+
+  all cm/cmaster use the same scheme
+  tonypok uses lamps to indicate current button functions rather than active buttons
+  skill98 is like schery97 but doesn't activate bit 0 for stop
+  nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
 */
-	output_set_lamp_value(0, (data) & 1);       /* Bet Red / Card 2 */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Stop 3 / Small / Info / Card 1 */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Bet Blue / Double / Card 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Stop 1 / Take */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 2 / Big / Bonus */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All / Card 4 */
+	output_set_lamp_value(0, (data >> 0) & 1);
+	output_set_lamp_value(1, (data >> 1) & 1);
+	output_set_lamp_value(2, (data >> 2) & 1);
+	output_set_lamp_value(3, (data >> 3) & 1);
+	output_set_lamp_value(4, (data >> 4) & 1);
+	output_set_lamp_value(5, (data >> 5) & 1);
+	output_set_lamp_value(6, (data >> 6) & 1);
 
 //  popmessage("lamps: %02X", data);
 }
@@ -207,6 +222,8 @@ WRITE8_MEMBER(goldstar_state::cb3_lamps_w)
   ---- x---  Red Bet
   ---x ----  Stop 3 / Small / Info
   --x- ----  Start / Stop All
+
+  TODO: there are two sets of lamps for the two players at 0xf850 and 0xf860 - handle them independently
 */
 	output_set_lamp_value(0, (data) & 1);       /* Stop 2 / Big */
 	output_set_lamp_value(1, (data >> 1) & 1);  /* Blue Bet / Double */
@@ -614,12 +631,6 @@ static ADDRESS_MAP_START( wcherry_readwriteport, AS_IO, 8, goldstar_state )
 */
 
 
-WRITE8_MEMBER(cmaster_state::outport1_w)
-{
-	/* lamps? */
-	//popmessage("outport1: %02X", data);
-}
-
 static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
 
@@ -675,7 +686,7 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)       /* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE(outport1_w)       /* output port */
+	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w) /* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(girl_scroll_w)
 ADDRESS_MAP_END
@@ -765,7 +776,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)       /* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE(outport1_w)       /* output port */
+	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w) /* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -778,7 +789,7 @@ static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)       /* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE(outport1_w)       /* output port */
+	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w) /* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 ADDRESS_MAP_END
 
@@ -2075,7 +2086,7 @@ static INPUT_PORTS_START( tonypok )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Big / Red")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / W-Up")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Take")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Hold 5 / Bet")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Small / Black")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Deal")
 
@@ -7152,7 +7163,7 @@ static MACHINE_CONFIG_START( cm, cmaster_state )
 	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,cherrym)
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -7166,11 +7177,6 @@ static MACHINE_CONFIG_DERIVED( cmasterc, cm )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
 MACHINE_CONFIG_END
 
-#ifdef UNUSED_CODE
-static MACHINE_CONFIG_DERIVED( cmasterc, cmnobmp )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cm)
-MACHINE_CONFIG_END
-#endif
 
 static MACHINE_CONFIG_START( cmast91, goldstar_state )
 
