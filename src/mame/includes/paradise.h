@@ -44,18 +44,25 @@ public:
 	int m_sprite_inc;
 	int m_irq_count;
 
-	DECLARE_WRITE8_MEMBER(paradise_rombank_w);
-	DECLARE_WRITE8_MEMBER(torus_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(paradise_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(tgtball_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(paradise_palette_w);
-	DECLARE_WRITE8_MEMBER(paradise_vram_0_w);
-	DECLARE_WRITE8_MEMBER(paradise_palbank_w);
-	DECLARE_WRITE8_MEMBER(paradise_vram_1_w);
-	DECLARE_WRITE8_MEMBER(paradise_vram_2_w);
-	DECLARE_WRITE8_MEMBER(paradise_pixmap_w);
-	DECLARE_WRITE8_MEMBER(paradise_priority_w);
+	// common
+	DECLARE_WRITE8_MEMBER(rombank_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(palbank_w);
+	DECLARE_WRITE8_MEMBER(vram_0_w);
+	DECLARE_WRITE8_MEMBER(vram_1_w);
+	DECLARE_WRITE8_MEMBER(vram_2_w);
+	DECLARE_WRITE8_MEMBER(pixmap_w);
+	DECLARE_WRITE8_MEMBER(priority_w);
+	
+	// paradise specific
 	DECLARE_WRITE8_MEMBER(paradise_okibank_w);
+	
+	// torus specific
+	DECLARE_WRITE8_MEMBER(torus_coin_counter_w);
+
+	// tgtball specific
+	DECLARE_WRITE8_MEMBER(tgtball_flipscreen_w);
 
 	DECLARE_DRIVER_INIT(torus);
 	DECLARE_DRIVER_INIT(paradise);
@@ -73,7 +80,7 @@ public:
 	UINT32 screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(paradise_irq);
+	INTERRUPT_GEN_MEMBER(irq);
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

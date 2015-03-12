@@ -51,7 +51,7 @@ DIPSW-A
                       | Very Hard  |           |on |on |           |
 --------------------------------------------------------------------
                       |    99%     |                   |off|off|   |*
- Minimum Percetage to |    90%     |                   |on |off|   |
+ Minimum Percentage to|    90%     |                   |on |off|   |
  Complete for Win or  |    80%     |                   |off|on |   |
 majority @ end of time|    70%     |                   |on |on |   |
 --------------------------------------------------------------------
@@ -84,7 +84,6 @@ DIPSW-B
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/paradise.h"
-#include "sound/okim6295.h"
 
 /***************************************************************************
 
@@ -92,10 +91,10 @@ DIPSW-B
 
 ***************************************************************************/
 
-WRITE8_MEMBER(paradise_state::paradise_rombank_w)
+WRITE8_MEMBER(paradise_state::rombank_w)
 {
 	int bank = data;
-	int bank_n = memregion("maincpu")->bytes() / 0x4000 - 1;
+	int bank_n = memregion("maincpu")->bytes() / 0x4000;
 
 	if (bank >= bank_n)
 	{
@@ -103,7 +102,7 @@ WRITE8_MEMBER(paradise_state::paradise_rombank_w)
 		bank %= bank_n;
 	}
 
-	membank("bank1")->set_entry(bank);
+	membank("prgbank")->set_entry(bank);
 }
 
 WRITE8_MEMBER(paradise_state::paradise_okibank_w)
@@ -119,63 +118,53 @@ WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 	coin_counter_w(machine(), 0, data ^ 0xff);
 }
 
-#define STANDARD_MAP    \
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */   \
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    /* ROM (banked) */ \
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paradise_vram_2_w) AM_SHARE("vram_2") /* Background */ \
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paradise_vram_1_w) AM_SHARE("vram_1") /* Midground */ \
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_SHARE("vram_0") /* Foreground */
+static ADDRESS_MAP_START( base_map, AS_PROGRAM, 8, paradise_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("prgbank")    /* ROM (banked) */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2") /* Background */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") /* Midground */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") /* Foreground */
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paradise_map, AS_PROGRAM, 8, paradise_state )
-	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
 	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xe100, 0xffff) AM_RAM // RAM
+	AM_IMPORT_FROM(base_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tgtball_map, AS_PROGRAM, 8, paradise_state )
-	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
 	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xda00, 0xffff) AM_RAM // RAM
+	AM_IMPORT_FROM(base_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_map, AS_PROGRAM, 8, paradise_state )
-	STANDARD_MAP
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xe000, 0xffff) AM_RAM // RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_SHARE("paletteram")    // Palette
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)  // Layers priority
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)    // Flip Screen
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w)   // Layers palette bank
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)   // ROM bank
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w)   // OKI 1 samples bank
-	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)  // OKI 0
-	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
-	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
-	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  // OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_SHARE("videoram")   // Pixmap
+	AM_IMPORT_FROM(base_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_SHARE("paletteram")    // Palette
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)  // Layers priority
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)    // Flip Screen
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w)   // Layers palette bank
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)   // ROM bank
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")    // Palette
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(priority_w)  // Layers priority
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(flipscreen_w)    // Flip Screen
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(palbank_w)   // Layers palette bank
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(rombank_w)   // ROM bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)  // OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_SHARE("videoram")   // Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(pixmap_w) AM_SHARE("videoram")   // Pixmap
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
+	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w)   // OKI 1 samples bank
+	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  // OKI 1
+	AM_IMPORT_FROM(torus_io_map)
 ADDRESS_MAP_END
 
 
@@ -670,11 +659,9 @@ GFXDECODE_END
 
 void paradise_state::machine_start()
 {
-	int bank_n = memregion("maincpu")->bytes() / 0x4000 - 1;
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
-	membank("bank1")->configure_entries(3, bank_n - 3, &ROM[0x10000], 0x4000);
+	int bank_n = memregion("maincpu")->bytes() / 0x4000;
+	
+	membank("prgbank")->configure_entries(0, bank_n, memregion("maincpu")->base(), 0x4000);
 
 	save_item(NAME(m_palbank));
 	save_item(NAME(m_priority));
@@ -685,12 +672,10 @@ void paradise_state::machine_reset()
 {
 	m_palbank = 0;
 	m_priority = 0;
-
 	m_irq_count = 0;
-
 }
 
-INTERRUPT_GEN_MEMBER(paradise_state::paradise_irq)
+INTERRUPT_GEN_MEMBER(paradise_state::irq)
 {
 	if (m_irq_count<300)
 		m_irq_count++;
@@ -704,7 +689,7 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)          /* Z8400B - 6mhz Verified */
 	MCFG_CPU_PROGRAM_MAP(paradise_map)
 	MCFG_CPU_IO_MAP(paradise_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(paradise_state, paradise_irq, 4*54)    /* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
+	MCFG_CPU_PERIODIC_INT_DRIVER(paradise_state, irq, 4*54)    /* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
 
 
 	/* video hardware */
@@ -751,19 +736,12 @@ static MACHINE_CONFIG_DERIVED( torus, paradise )
 	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( madball, paradise )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(torus_map)
-	MCFG_CPU_IO_MAP(torus_io_map)
+static MACHINE_CONFIG_DERIVED( madball, torus )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", madball)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
-
-	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( penky, paradise )
@@ -771,7 +749,6 @@ static MACHINE_CONFIG_DERIVED( penky, paradise )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(torus_map)
-	MCFG_CPU_IO_MAP(paradise_io_map)
 MACHINE_CONFIG_END
 
 
@@ -829,9 +806,8 @@ The year is not shown but must be >= 1994, since the development system
 ***************************************************************************/
 
 ROM_START( paradise )
-	ROM_REGION( 0x44000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "u128", 0x00000, 0x0c000, CRC(8e5b5a24) SHA1(a4e559d9329f8a7a9d12cd90d98d0525958085d8) )
-	ROM_CONTINUE(     0x10000, 0x34000    )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "u128", 0x00000, 0x40000, CRC(8e5b5a24) SHA1(a4e559d9329f8a7a9d12cd90d98d0525958085d8) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
@@ -856,9 +832,8 @@ ROM_START( paradise )
 ROM_END
 
 ROM_START( paradlx )
-	ROM_REGION( 0x44000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "8.u128", 0x00000, 0x0c000, CRC(3a45ac9e) SHA1(24e1b508ef582c8429e09929fea387f3a137f0e3) )
-	ROM_CONTINUE(     0x10000, 0x34000    )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "8.u128", 0x00000, 0x40000, CRC(3a45ac9e) SHA1(24e1b508ef582c8429e09929fea387f3a137f0e3) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "6.u114", 0x00000, 0x40000, CRC(d0341838) SHA1(fa400486968bd6b5a805fb79a970bb280ee24662) )
@@ -885,9 +860,8 @@ ROM_END
 
 
 ROM_START( para2dx )
-	ROM_REGION( 0x44000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "pdx2_u128.bin", 0x00000, 0x0c000, CRC(4cbd22e1) SHA1(ad69663109d3127f6472797ec8763097da94b7d4) )
-	ROM_CONTINUE(     0x10000, 0x34000    )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "pdx2_u128.bin", 0x00000, 0x40000, CRC(4cbd22e1) SHA1(ad69663109d3127f6472797ec8763097da94b7d4) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "pdx2_u114.bin", 0x00000, 0x40000, CRC(3634b086) SHA1(6d079efb7be4fbe51d95d1f6b2c44dafdacb6016) )
@@ -956,9 +930,8 @@ Notes:
 ***************************************************************************/
 
 ROM_START( tgtball )
-	ROM_REGION( 0x44000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "rom7.u128", 0x00000, 0x0c000, CRC(8dbeab12) SHA1(7181c23459990aecbe2d13377aaf19f65108eac6) )
-	ROM_CONTINUE(          0x10000, 0x34000 )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "rom7.u128", 0x00000, 0x40000, CRC(8dbeab12) SHA1(7181c23459990aecbe2d13377aaf19f65108eac6) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
@@ -983,9 +956,8 @@ ROM_START( tgtball )
 ROM_END
 
 ROM_START( tgtballa )
-	ROM_REGION( 0x44000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "yunsung.u128", 0x00000, 0x0c000, CRC(cb0f3d46) SHA1(b56c4abbd4248074c1559a0f1902d2ea11cb01a8) )
-	ROM_CONTINUE(             0x10000, 0x34000 )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "yunsung.u128", 0x00000, 0x40000, CRC(cb0f3d46) SHA1(b56c4abbd4248074c1559a0f1902d2ea11cb01a8) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
@@ -1049,9 +1021,8 @@ Notes, the clocks should be the same as other boards of this era/type. IE:
 ***************************************************************************/
 
 ROM_START( penky )
-	ROM_REGION( 0x44000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "yunsung.u128", 0x00000, 0x0c000, CRC(57baeada) SHA1(360fd2d352b201e57436ed9c9f0510a052452738) )
-	ROM_CONTINUE(             0x10000, 0x34000 )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "yunsung.u128", 0x00000, 0x40000, CRC(57baeada) SHA1(360fd2d352b201e57436ed9c9f0510a052452738) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT) /* 16x16x8 Sprites */
 	ROM_LOAD( "yunsung.u114", 0x00000, 0x80000, CRC(cb6b1cfd) SHA1(22406f70fc2ad839d5ca4d00d503a2857b295cf5) )
@@ -1123,9 +1094,8 @@ All roms had a Yun Sung label with no other ID markings or numbers
 */
 
 ROM_START( torus )
-	ROM_REGION( 0x14000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "yunsung.u1", 0x00000, 0xc000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
-	ROM_CONTINUE(           0x10000, 0x4000 )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "yunsung.u1", 0x00000, 0x40000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "yunsung.u67", 0x00000, 0x40000, CRC(5b60ce9f) SHA1(d5c091145e0bae7cd776e642ea17895d086ed2b0) )
@@ -1201,9 +1171,8 @@ All roms read with manufacturer's IDs and routines
 */
 
 ROM_START( madball ) /* Models in swimsuits only, no nudity */
-	ROM_REGION( 0x24000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "p.u1", 0x00000, 0xc000, CRC(73008425) SHA1(6eded60fd5c637a63783247c858d999d5974d378) )
-	ROM_CONTINUE(     0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "p.u1", 0x00000, 0x20000, CRC(73008425) SHA1(6eded60fd5c637a63783247c858d999d5974d378) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "2.u67", 0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
@@ -1225,9 +1194,8 @@ ROM_START( madball ) /* Models in swimsuits only, no nudity */
 ROM_END
 
 ROM_START( madballn ) /* Even numbered stages show topless models.  Is nudity controlled by a dipswitch? */
-	ROM_REGION( 0x24000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "u1.bin", 0x00000, 0xc000, CRC(531fa919) SHA1(0eafc663b9ad50d0dfc5491fe96c9bcf30483991) )
-	ROM_CONTINUE(       0x10000, 0x14000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "u1.bin", 0x00000, 0x20000, CRC(531fa919) SHA1(0eafc663b9ad50d0dfc5491fe96c9bcf30483991) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "2.u67", 0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
