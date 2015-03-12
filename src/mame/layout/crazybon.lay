@@ -203,50 +203,50 @@
 
 <!-- define lamps -->
 
-		<bezel name="lamp0" element="start_b">
+		<bezel name="lamp1" element="start_b">
 			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp0" element="start">
+		<bezel name="lamp1" element="start">
 			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
 
-		<bezel name="lamp1" element="bet_b">
+		<bezel name="lamp3" element="bet_b">
 			<bounds x="0.05" y="3.08" width="0.40" height="0.24" />
 		</bezel>
-		<bezel name="lamp1" element="bet">
+		<bezel name="lamp3" element="bet">
 			<bounds x="0.07" y="3.10" width="0.36" height="0.20" />
 		</bezel>
 
 
-		<bezel name="lamp2" element="stop_b">
+		<bezel name="lamp4" element="stop_b">
 			<bounds x="1.4" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp2" element="stop">
+		<bezel name="lamp4" element="stop">
 			<bounds x="1.42" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
 
-		<bezel name="lamp3" element="dup_b">
+		<bezel name="lamp5" element="dup_b">
 			<bounds x="0.65" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp3" element="dup">
+		<bezel name="lamp5" element="dup">
 			<bounds x="0.67" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
 
-		<bezel name="lamp4" element="stop_b">
+		<bezel name="lamp6" element="stop_b">
 			<bounds x="2.7" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp4" element="small">
+		<bezel name="lamp6" element="small">
 			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
 
-		<bezel name="lamp5" element="stop_b">
+		<bezel name="lamp7" element="stop_b">
 			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp5" element="big">
+		<bezel name="lamp7" element="big">
 			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 

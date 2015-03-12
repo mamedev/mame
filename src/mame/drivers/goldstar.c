@@ -179,21 +179,23 @@ READ8_MEMBER(goldstar_state::protection_r)
 WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
 {
 /*  bits
-  7654 3210     goldstar
-  ---- ---x     Bet Red / Card 2.
-  ---- --x-     Stop 3 / Small / Info / Card 1
-  ---- -x--     Bet Blue / Double / Card 3
-  ---- x---     Stop 1 / Take
-  ---x ----     Stop 2 / Big / Bonus
-  --x- ----     Start / Stop All / Card 4
+  7654 3210     goldstar                            crazybon
+  ---- ---x     Bet Red / Card 2
+  ---- --x-     Stop 3 / Small / Info / Card 1      Start
+  ---- -x--     Bet Blue / Double Up / Card 3
+  ---- x---     Stop 1 / Take                       Bet
+  ---x ----     Stop 2 / Big / Bonus                Stop All / Take Score
+  --x- ----     Start / Stop All / Card 4           Double Up
+  -x-- ----                                         Small / Info
+  x--- ----                                         Big
 
-  7654 3210     cm/cmaster  cmpacman/cmtetris   tonypok         schery97        pokonl97        match98
-  ---- ---x                                                     stop/big        bet 10/big      hit/stop
-  ---- --x-     d-up        d-up                big/small       d-up            d-up
-  ---- -x--     take        take/stop           take/d-up       take/select     take/select     take
-  ---- x---     bet         bet                 bet             bet             bet 1           bet
-  ---x ----     info        info                                small           small
-  --x- ----     start       start               deal            start           start           start
+  7654 3210     cm/cmaster  cmpacman/cmtetris   tonypok     schery97        pokonl97        match98
+  ---- ---x                                                 stop/big        bet 10/big      hit/stop
+  ---- --x-     d-up        d-up                big/small   d-up            d-up
+  ---- -x--     take        take/stop           take/d-up   take/select     take/select     take
+  ---- x---     bet         bet                 bet         bet             bet 1           bet
+  ---x ----     info        info                            small           small
+  --x- ----     start       start               deal        start           start           start
   -x-- ----                                     hold
 
   all cm/cmaster use the same scheme
@@ -208,6 +210,7 @@ WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
 	output_set_lamp_value(4, (data >> 4) & 1);
 	output_set_lamp_value(5, (data >> 5) & 1);
 	output_set_lamp_value(6, (data >> 6) & 1);
+	output_set_lamp_value(7, (data >> 7) & 1);
 
 //  popmessage("lamps: %02X", data);
 }
@@ -692,30 +695,6 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, cmaster_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(goldstar_state::pkrmast_lamps_w)
-{
-/*  bits
-  7654 3210
-  ---- --x-  Start
-  ---- x---  Bet
-  ---x ----  Stop All / Take Score
-  --x- ----  Double Up
-  -x-- ----  Small / Info
-  x--- ----  Big
-  ---- -x-x  Unused in Crazy Bonus
-*/
-
-	output_set_lamp_value(0, (data >> 1) & 1);  /* Start */
-	output_set_lamp_value(1, (data >> 3) & 1);  /* Bet */
-	output_set_lamp_value(2, (data >> 4) & 1);  /* Stop All / Take Score */
-	output_set_lamp_value(3, (data >> 5) & 1);  /* Double Up */
-	output_set_lamp_value(4, (data >> 6) & 1);  /* Small / Info */
-	output_set_lamp_value(5, (data >> 7) & 1);  /* Big */
-
-	if (data & 0x05)
-		popmessage("lamps: %02X", data);
-}
-
 WRITE8_MEMBER(goldstar_state::pkrmast_coincount_w)
 {
 /*  bits
@@ -751,7 +730,7 @@ static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW3-0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW3-1")
-	AM_RANGE(0x22, 0x22) AM_WRITE(pkrmast_lamps_w)
+	AM_RANGE(0x22, 0x22) AM_WRITE(goldstar_lamps_w)
 
 	AM_RANGE(0x24, 0x24) AM_WRITE(pkrmast_coincount_w)
 	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW1")
