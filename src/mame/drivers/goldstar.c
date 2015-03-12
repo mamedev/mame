@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( star100_readport, AS_IO, 8, sanghopm_state )
 	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW2")
 	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW3")
 
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP                // writting 0's and 1's constantly. seems watchdog feeder.
+	AM_RANGE(0xf0, 0xf0) AM_WRITENOP                // Writing 0's and 1's constantly.  Watchdog feeder?
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(enable_w)         // enable/disable reels register.
 
 ADDRESS_MAP_END
@@ -681,21 +681,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, cmaster_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Inputs */
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)       /* output port */
-	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w) /* output port */
-	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(girl_scroll_w)
-ADDRESS_MAP_END
-
-
-WRITE8_MEMBER(goldstar_state::pkrmast_coincount_w)
+WRITE8_MEMBER(goldstar_state::cm_coincount_w)
 {
 /*  bits
   7654 3210
@@ -704,7 +690,9 @@ WRITE8_MEMBER(goldstar_state::pkrmast_coincount_w)
   ---x ----  Coin C counter
   --x- ----  Key In counter
   -x-- ----  Coin A counter
-  x--- -xx-  Unused in Crazy Bonus
+  x--- -xx-  unknown
+
+  interestingly there is no counter for coin B in the cm/cmaster games
 */
 
 	coin_counter_w(machine(), 0, data & 0x40);  /* Counter 1 Coin A */
@@ -716,6 +704,20 @@ WRITE8_MEMBER(goldstar_state::pkrmast_coincount_w)
 	if (data & 0x86)
 		popmessage("counters: %02X", data);
 }
+
+static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, cmaster_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Inputs */
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
+	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(girl_scroll_w)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -732,9 +734,11 @@ static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW3-1")
 	AM_RANGE(0x22, 0x22) AM_WRITE(goldstar_lamps_w)
 
-	AM_RANGE(0x24, 0x24) AM_WRITE(pkrmast_coincount_w)
+	AM_RANGE(0x24, 0x24) AM_WRITE(cm_coincount_w)
 	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW1")
 	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW2")
+
+	AM_RANGE(0xf0, 0xf0) AM_WRITENOP    /* Writing 0's and 1's constantly.  Watchdog feeder? */
 ADDRESS_MAP_END
 
 
@@ -753,9 +757,9 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)       /* output port */
-	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w) /* output port */
+	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -766,9 +770,9 @@ static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)       /* output port */
-	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w) /* output port */
+	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 ADDRESS_MAP_END
 
