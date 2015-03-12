@@ -158,8 +158,67 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 
 }
 
+WRITE16_MEMBER(hng64_state::hng64_sound_select_w)
+{
+	// seems to write values in the format xxyy where yy is 0x00-0x1f and xx is oten 00/01/0a
+	// there are said to be 32 audio channels, so maybe the lower byte is the channel?
+
+//	printf("hng64_sound_select_w")
+	COMBINE_DATA(&m_audiochannel);
+}
+
+WRITE16_MEMBER(hng64_state::hng64_sound_data_02_w)
+{
+	m_audiodat[m_audiochannel].dat[2] = data;
+//	printf("write port 0x0002 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+}
+
+WRITE16_MEMBER(hng64_state::hng64_sound_data_04_w)
+{
+	m_audiodat[m_audiochannel].dat[1] = data;
+//	printf("write port 0x0004 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+}
+WRITE16_MEMBER(hng64_state::hng64_sound_data_06_w)
+{
+	m_audiodat[m_audiochannel].dat[0] = data;
+//	printf("write port 0x0006 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+}
+
+// but why not just use the V33/V53 XA mode??
+WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
+{
+	printf("%08x hng64_sound_bank_w? %02x %04x\n", space.device().safe_pc(), offset, data);
+	// buriki writes 0x3f to 0x200 before jumping to the low addresses..
+	// where it expects to find data from 0x1f0000
+
+	// the 2 early games don't do this.. maybe all banks actuallly default to that region tho?
+	// the sound code on those games seems buggier anyway.
+}
+
+WRITE16_MEMBER(hng64_state::hng64_sound_port_0102_w)
+{
+	printf("hng64_port 0x0102 %04x\n", data);
+}
+
+WRITE16_MEMBER(hng64_state::hng64_sound_port_0080_w)
+{
+	printf("hng64_port 0x0080 %04x\n", data);
+}
+
 static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE( hng64_sound_select_w )
+	AM_RANGE(0x0002, 0x0003) AM_WRITE( hng64_sound_data_02_w )
+	AM_RANGE(0x0004, 0x0005) AM_WRITE( hng64_sound_data_04_w )
+	AM_RANGE(0x0006, 0x0007) AM_WRITE( hng64_sound_data_06_w )
 	AM_RANGE(0x0008, 0x0009) AM_WRITE( hng64_sound_port_0008_w )
+	// a 8 c used too?
+
+	AM_RANGE(0x0080, 0x0081) AM_WRITE( hng64_sound_port_0080_w )
+
+	AM_RANGE(0x0102, 0x0103) AM_WRITE( hng64_sound_port_0102_w )
+
+	AM_RANGE(0x0200, 0x021f) AM_WRITE( hng64_sound_bank_w ) // ??
+
 ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(hng64_state::dma_hreq_cb)

@@ -359,9 +359,26 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
 	DECLARE_READ8_MEMBER(dma_memr_cb);
 	DECLARE_WRITE8_MEMBER(dma_iow3_cb);
-	WRITE_LINE_MEMBER(tcu_tm0_cb);
-	WRITE_LINE_MEMBER(tcu_tm1_cb);
-	WRITE_LINE_MEMBER(tcu_tm2_cb);
+	DECLARE_WRITE_LINE_MEMBER(tcu_tm0_cb);
+	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
+	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
+
+	UINT16 m_audiochannel;
+	
+	struct hng64_48bit_data {
+		UINT16 dat[3];
+	};
+
+	hng64_48bit_data m_audiodat[0x10000];
+
+	DECLARE_WRITE16_MEMBER(hng64_sound_select_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_data_02_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_data_04_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_data_06_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0102_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
+
 
 };
 
