@@ -154,7 +154,7 @@ No.  PCB Label  IC Markings               IC Package
 03   ASIC6      NEO64-CVR                 QFP120
 04   ASIC9      NEO64-CAL                 QFP208
 05   BROM1      MBM29F400B-12             TSOP48  (archived as BROM1.BIN)
-06   CPU2       NEC D70326AGJ-16 V53A     QFP120
+06   CPU2       NEC D70236AGJ-16 V53A     QFP120
 07   DRAM1      HY51V18164BJC-60          SOJ42
 08   DRAM2      HY51V18164BJC-60          SOJ42
 09   DRAM3      HY51V18164BJC-60          SOJ42
