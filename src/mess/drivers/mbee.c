@@ -410,6 +410,12 @@ static INPUT_PORTS_START( mbee )
 	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	// monochrome monitor could be used
+	PORT_CONFNAME( 0x30, 0x00, "Monitor type")
+	PORT_CONFSETTING(    0x00, "Colour")
+	PORT_CONFSETTING(    0x10, "Green")
+	PORT_CONFSETTING(    0x20, "Amber")
+	PORT_CONFSETTING(    0x30, "White")
 	// Wire links on motherboard
 	PORT_CONFNAME( 0xc0, 0x00, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
@@ -427,6 +433,12 @@ static INPUT_PORTS_START( mbee128 )
 	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	// monochrome monitor could be used
+	PORT_CONFNAME( 0x30, 0x00, "Monitor type")
+	PORT_CONFSETTING(    0x00, "Colour")
+	PORT_CONFSETTING(    0x10, "Green")
+	PORT_CONFSETTING(    0x20, "Amber")
+	PORT_CONFSETTING(    0x30, "White")
 	// Wire links on motherboard
 	PORT_CONFNAME( 0xc0, 0x40, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
@@ -591,7 +603,7 @@ static const gfx_layout mbee_charlayout =
 };
 
 static GFXDECODE_START( mono )
-	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 96, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( standard )
@@ -634,7 +646,9 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mono)
-	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette") // usually sold with amber or green monitor
+
+	MCFG_PALETTE_ADD("palette", 100)
+	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, mono)
 
@@ -649,7 +663,7 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mono_update_row)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
 
@@ -692,7 +706,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", standard)
 
-	MCFG_PALETTE_ADD("palette", 96)
+	MCFG_PALETTE_ADD("palette", 100)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, standard)
@@ -708,7 +722,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, colour_update_row)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
 
@@ -738,7 +752,6 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", premium)
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))

@@ -235,7 +235,6 @@ void mbee_state::oldkb_matrix_r(UINT16 offs)
 
 		if( keydown )
 			m_crtc->assert_light_pen_input(); //lpen_strobe
-
 	}
 }
 
@@ -291,14 +290,17 @@ VIDEO_START_MEMBER( mbee_state, mono )
 {
 	m_p_videoram = memregion("videoram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
+	m_p_colorram = 0;
+	m_p_attribram = 0;
 	m_is_premium = 0;
 }
 
 VIDEO_START_MEMBER( mbee_state, standard )
 {
 	m_p_videoram = memregion("videoram")->base();
-	m_p_colorram = memregion("colorram")->base();
 	m_p_gfxram = memregion("gfx")->base()+0x1000;
+	m_p_colorram = memregion("colorram")->base();
+	m_p_attribram = 0;
 	m_is_premium = 0;
 }
 
@@ -328,56 +330,26 @@ MC6845_ON_UPDATE_ADDR_CHANGED( mbee_state::crtc_update_addr )
 }
 
 
-/* monochrome bee */
-MC6845_UPDATE_ROW( mbee_state::mono_update_row )
+MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)           // for each character
-	{
-		UINT8 inv=0;
-		mem = (ma + x) & 0x7ff;
-		chr = m_p_videoram[mem];
-
-		oldkb_scan(x+ma);
-
-		/* process cursor */
-		if (x == cursor_x)
-			inv ^= m_sy6545_cursor[ra];          // cursor scan row
-
-		/* get pattern of pixels for that character scanline */
-		gfx = m_p_gfxram[(chr<<4) | ra] ^ inv;
-
-		/* Display a scanline of a character (8 pixels) */
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
-		*p++ = palette[BIT(gfx, 5)];
-		*p++ = palette[BIT(gfx, 4)];
-		*p++ = palette[BIT(gfx, 3)];
-		*p++ = palette[BIT(gfx, 2)];
-		*p++ = palette[BIT(gfx, 1)];
-		*p++ = palette[BIT(gfx, 0)];
-	}
-}
-
-/* colour bee */
-MC6845_UPDATE_ROW( mbee_state::colour_update_row )
-{
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 inv,attr,gfx,fg,bg,col;
-	UINT16 mem,x,chr;
+	// colours
 	UINT8 colourm = (m_08 & 0x0e) >> 1;
+	UINT8 monopal = (m_io_config->read() & 0x30) >> 4;
+	// if colour chosen on mono bee, default to amber
+	if (!monopal && !m_p_colorram)
+		monopal = 2;
+
 	UINT32 *p = &bitmap.pix32(y);
+	UINT8 inv, attr=0, gfx, fg=96+monopal, bg=96, col=0;
+	UINT16 mem, x, chr;
 
 	for (x = 0; x < x_count; x++)           // for each character
 	{
 		inv = 0;
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];
-		col = m_p_colorram[mem];                     // read a byte of colour
 
 		if BIT(m_1c, 7) // premium graphics enabled?
 		{
@@ -403,15 +375,20 @@ MC6845_UPDATE_ROW( mbee_state::colour_update_row )
 		gfx = m_p_gfxram[(chr<<4) | ra] ^ inv;
 
 		// get colours
-		if (m_is_premium)
+		if (!monopal)
 		{
-			fg = col & 15;
-			bg = col >> 4;
-		}
-		else
-		{
-			fg = (col & 0x1f) | 64;
-			bg = ((col & 0xe0) >> 2) | colourm;
+			col = m_p_colorram[mem];                     // read a byte of colour
+
+			if (m_is_premium)
+			{
+				fg = col & 15;
+				bg = col >> 4;
+			}
+			else
+			{
+				fg = (col & 0x1f) | 64;
+				bg = ((col & 0xe0) >> 2) | colourm;
+			}
 		}
 
 		/* Display a scanline of a character (8 pixels) */
@@ -474,6 +451,12 @@ PALETTE_INIT_MEMBER( mbee_state, standard )
 		b = fglevel[(BIT(k, 0))|(BIT(k, 3)<<1)];
 		palette.set_pen_color(i|64, rgb_t(r, g, b));
 	}
+
+	// monochrome palette
+	palette.set_pen_color(96, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(97, rgb_t(0x00, 0xff, 0x00)); // green
+	palette.set_pen_color(98, rgb_t(0xf7, 0xaa, 0x00)); // amber
+	palette.set_pen_color(99, rgb_t(0xff, 0xff, 0xff)); // white
 }
 
 
@@ -501,4 +484,10 @@ PALETTE_INIT_MEMBER( mbee_state, premium )
 		b = BIT(i, 2) ? 0xff : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+
+	// monochrome palette
+	palette.set_pen_color(96, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(97, rgb_t(0x00, 0xff, 0x00)); // green
+	palette.set_pen_color(98, rgb_t(0xf7, 0xaa, 0x00)); // amber
+	palette.set_pen_color(99, rgb_t(0xff, 0xff, 0xff)); // white
 }
