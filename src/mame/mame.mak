@@ -2673,10 +2673,17 @@ $(DRIVERS)/gts80b.o:    $(LAYOUT)/gts80b.lh
 $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 
 $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
+			$(LAYOUT)/bingowng.lh \
 			$(LAYOUT)/cherryb3.lh \
-			$(LAYOUT)/lucky8.lh \
+			$(LAYOUT)/cmaster.lh \
+			$(LAYOUT)/cmasterb.lh \
+			$(LAYOUT)/cmasterc.lh \
+			$(LAYOUT)/cmv4.lh \
 			$(LAYOUT)/crazybon.lh \
-			$(LAYOUT)/bingowng.lh
+			$(LAYOUT)/lucky8.lh \
+			$(LAYOUT)/nfb96.lh \
+			$(LAYOUT)/pokonl97.lh \
+			$(LAYOUT)/roypok96.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
 
