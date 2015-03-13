@@ -126,8 +126,8 @@
 			<color red="0.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="DEAL" state="1">
-			<color red="0.0" green="1.0" blue="0.0" />
+		<text string="DRAW" state="1">
+			<color red="0.0" green="0.6" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 		<rect state="0">
@@ -138,7 +138,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
 		<text string="DRAW" state="0">
-			<color red="0.0" green="1.0" blue="0.0" />
+			<color red="0.0" green="0.6" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
