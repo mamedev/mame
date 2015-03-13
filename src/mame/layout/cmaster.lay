@@ -32,7 +32,7 @@
 		<rect state="0">
 			<color red="0.5" green="0.0" blue="0.0" />
 		</rect>
-		<text string="SMALL">
+		<text string="SMALL/INFO">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>

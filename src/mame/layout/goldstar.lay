@@ -242,50 +242,50 @@
 
 <!-- define lamps -->
 
-		<bezel name="lamp0" element="betred_b">
+		<bezel name="lamp0" element="betred_b" inputtag="IN0" inputmask="0x04">
 			<bounds x="2.05" y="3.08" width="0.50" height="0.34" />
 		</bezel>
-		<bezel name="lamp0" element="betred">
+		<bezel name="lamp0" element="betred" inputtag="IN0" inputmask="0x04">
 			<bounds x="2.07" y="3.10" width="0.46" height="0.30" />
 		</bezel>
 
 
-		<bezel name="lamp1" element="stop_b">
+		<bezel name="lamp1" element="stop_b" inputtag="IN0" inputmask="0x08">
 			<bounds x="1.25" y="3.08" width="0.50" height="0.34" />
 		</bezel>
-		<bezel name="lamp1" element="stop3">
+		<bezel name="lamp1" element="stop3" inputtag="IN0" inputmask="0x08">
 			<bounds x="1.27" y="3.10" width="0.46" height="0.30" />
 		</bezel>
 
 
-		<bezel name="lamp2" element="betblue_b">
+		<bezel name="lamp2" element="betblue_b" inputtag="IN0" inputmask="0x10">
 			<bounds x="2.65" y="3.08" width="0.50" height="0.34" />
 		</bezel>
-		<bezel name="lamp2" element="betblue">
+		<bezel name="lamp2" element="betblue" inputtag="IN0" inputmask="0x10">
 			<bounds x="2.67" y="3.10" width="0.46" height="0.30" />
 		</bezel>
 
 
-		<bezel name="lamp3" element="stop_b">
+		<bezel name="lamp3" element="stop_b" inputtag="IN0" inputmask="0x20">
 			<bounds x="0.05" y="3.08" width="0.50" height="0.34" />
 		</bezel>
-		<bezel name="lamp3" element="stop1">
+		<bezel name="lamp3" element="stop1" inputtag="IN0" inputmask="0x20">
 			<bounds x="0.07" y="3.10" width="0.46" height="0.30" />
 		</bezel>
 
 
-		<bezel name="lamp4" element="stop_b">
+		<bezel name="lamp4" element="stop_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="0.65" y="3.08" width="0.50" height="0.34" />
 		</bezel>
-		<bezel name="lamp4" element="stop2">
+		<bezel name="lamp4" element="stop2" inputtag="IN0" inputmask="0x40">
 			<bounds x="0.67" y="3.10" width="0.46" height="0.30" />
 		</bezel>
 
 
-		<bezel name="lamp5" element="start_b">
+		<bezel name="lamp5" element="start_b" inputtag="IN0" inputmask="0x80">
 			<bounds x="3.45" y="3.08" width="0.50" height="0.34" />
 		</bezel>
-		<bezel name="lamp5" element="start">
+		<bezel name="lamp5" element="start" inputtag="IN0" inputmask="0x80">
 			<bounds x="3.47" y="3.10" width="0.46" height="0.30" />
 		</bezel>
 

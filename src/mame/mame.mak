@@ -2683,8 +2683,10 @@ $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
 			$(LAYOUT)/crazybon.lh \
 			$(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/nfb96.lh \
+			$(LAYOUT)/nfb96tx.lh \
 			$(LAYOUT)/pokonl97.lh \
 			$(LAYOUT)/roypok96.lh \
+			$(LAYOUT)/skill98.lh \
 			$(LAYOUT)/tonypok.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
