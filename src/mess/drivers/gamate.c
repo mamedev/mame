@@ -9,10 +9,6 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-//#include "rendlay.h"
 #include "includes/gamate.h"
 #include "ui/ui.h"
 
