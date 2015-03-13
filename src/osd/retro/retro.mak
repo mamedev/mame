@@ -45,7 +45,7 @@ DEFS += -DOSD_RETRO
 MINISRC = $(SRC)/osd/$(OSD)
 MINIOBJ = $(OBJ)/osd/$(OSD)
 
-LIBCOOBJ = $(OBJ)/osd/$(OSD)/libretro-sdk/libco
+LIBCOOBJ = $(OBJ)/osd/$(OSD)/libretro-common/libco
 
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
@@ -57,7 +57,7 @@ OBJDIRS += $(MINIOBJ) $(LIBCOOBJ) \
 	$(OSDOBJ)/modules/midi
 
 ifeq ($(VRENDER),opengl)
-GLOBJ = $(OBJ)/osd/$(OSD)/libretro-sdk/glsym
+GLOBJ = $(OBJ)/osd/$(OSD)/libretro-common/glsym
 OBJDIRS += $(GLOBJ)
 endif
 
