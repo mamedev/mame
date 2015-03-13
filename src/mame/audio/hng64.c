@@ -14,11 +14,14 @@ buriki    (#)SNK R&D Center (R) HYPER NEOGEO64 Sound Driver Ver 1.15. (#)Copyrig
 
 The earlier revisions appear to have 2 banks of code (there are vectors at the end of the 0x1e0000 block and the 0x1f0000 block)
 
-Those first two revisions also spam the entire range of I/O ports with values several times on startup causing some unexpected
-writes to the V53 internal registers.  The important ones are reinitialized after this however, I'm guessing this is harmless
-on real hardware, as the code flow seems to be correct.
+If the banking setup is wrong then those first two revisions also spam the entire range of I/O ports with values several times
+on startup causing some unexpected writes to the V53 internal registers.
 
 data structures look very similar between all of them
+
+IRQ mask register on the internal interrupt controller is set to 0xd8
+
+so levels 0,1,2,5 are unmasked
 
 */
 
@@ -298,6 +301,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm1_cb)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
 //	printf("tcu_tm1_cb %02x\n", state);
+	m_audiocpu->set_input_line(0, state? ASSERT_LINE:CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
