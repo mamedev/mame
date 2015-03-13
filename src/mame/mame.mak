@@ -2678,12 +2678,14 @@ $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
 			$(LAYOUT)/cmaster.lh \
 			$(LAYOUT)/cmasterb.lh \
 			$(LAYOUT)/cmasterc.lh \
+			$(LAYOUT)/cmpacman.lh \
 			$(LAYOUT)/cmv4.lh \
 			$(LAYOUT)/crazybon.lh \
 			$(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/nfb96.lh \
 			$(LAYOUT)/pokonl97.lh \
-			$(LAYOUT)/roypok96.lh
+			$(LAYOUT)/roypok96.lh \
+			$(LAYOUT)/tonypok.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
 
