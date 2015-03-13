@@ -40,12 +40,13 @@ endif
 ifeq ($(config),release)
   OBJDIR     = obj/Release
   TARGETDIR  = ../../bin/darwin
-  TARGET     = $(TARGETDIR)/genie
+  override TARGET     = $(TARGETDIR)/genie
   DEFINES   += -DNDEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
   INCLUDES  += -I../../src/host/lua-5.2.3/src
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os -mmacosx-version-min=10.4
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
+  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   ALL_LDFLAGS   += $(LDFLAGS) -L. -Wl,-x -mmacosx-version-min=10.4
   LDDEPS    +=
@@ -115,12 +116,13 @@ endif
 ifeq ($(config),debug)
   OBJDIR     = obj/Debug
   TARGETDIR  = ../../bin/darwin
-  TARGET     = $(TARGETDIR)/genie
+  override TARGET     = $(TARGETDIR)/genie
   DEFINES   += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
   INCLUDES  += -I../../src/host/lua-5.2.3/src
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g -mmacosx-version-min=10.4
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
+  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   ALL_LDFLAGS   += $(LDFLAGS) -L. -mmacosx-version-min=10.4
   LDDEPS    +=
@@ -190,12 +192,13 @@ endif
 ifeq ($(config),releaseuniv32)
   OBJDIR     = obj/Universal32/Release
   TARGETDIR  = ../../bin/darwin
-  TARGET     = $(TARGETDIR)/genie
+  override TARGET     = $(TARGETDIR)/genie
   DEFINES   += -DNDEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
   INCLUDES  += -I../../src/host/lua-5.2.3/src
   ALL_CPPFLAGS  += $(CPPFLAGS)  $(DEFINES) $(INCLUDES)
   ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os -arch i386 -arch ppc -mmacosx-version-min=10.4
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
+  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   ALL_LDFLAGS   += $(LDFLAGS) -L. -Wl,-x -arch i386 -arch ppc -mmacosx-version-min=10.4
   LDDEPS    +=
@@ -265,12 +268,13 @@ endif
 ifeq ($(config),debuguniv32)
   OBJDIR     = obj/Universal32/Debug
   TARGETDIR  = ../../bin/darwin
-  TARGET     = $(TARGETDIR)/genie
+  override TARGET     = $(TARGETDIR)/genie
   DEFINES   += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_MACOSX
   INCLUDES  += -I../../src/host/lua-5.2.3/src
   ALL_CPPFLAGS  += $(CPPFLAGS)  $(DEFINES) $(INCLUDES)
   ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g -arch i386 -arch ppc -mmacosx-version-min=10.4
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(ALL_CFLAGS)
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
+  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -mmacosx-version-min=10.4
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   ALL_LDFLAGS   += $(LDFLAGS) -L. -arch i386 -arch ppc -mmacosx-version-min=10.4
   LDDEPS    +=
