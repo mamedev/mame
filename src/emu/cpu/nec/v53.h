@@ -235,14 +235,16 @@ public:
 
 
 	DECLARE_READ8_MEMBER(get_pic_ack);
-	DECLARE_WRITE_LINE_MEMBER(upd71059_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
+
 
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
-	
+	virtual void execute_set_input(int inputnum, int state);
+
 	required_device<pit8253_device> m_v53tcu;
 	required_device<upd71071_v53_device> m_v53dmau;
 	required_device<pic8259_device> m_v53icu;
@@ -284,7 +286,6 @@ protected:
 	devcb_write_line   m_out_dack_2_cb;
 	devcb_write_line   m_out_dack_3_cb;
 	
-
 
 
 };
