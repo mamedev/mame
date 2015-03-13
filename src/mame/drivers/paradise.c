@@ -1094,8 +1094,8 @@ All roms had a Yun Sung label with no other ID markings or numbers
 */
 
 ROM_START( torus )
-	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "yunsung.u1", 0x00000, 0x40000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* Z80 Code */
+	ROM_LOAD( "yunsung.u1", 0x00000, 0x10000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "yunsung.u67", 0x00000, 0x40000, CRC(5b60ce9f) SHA1(d5c091145e0bae7cd776e642ea17895d086ed2b0) )
