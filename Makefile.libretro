@@ -644,7 +644,7 @@ INCPATH += \
 	-I$(3RDPARTY)/lua/src \
 	-I$(SRC)/osd \
 	-I$(SRC)/osd/$(OSD) \
-	-I$(SRC)/osd/$(OSD)/libretro-sdk/include
+	-I$(SRC)/osd/$(OSD)/libretro-common/include
 
 
 #-------------------------------------------------
