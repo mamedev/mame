@@ -3,6 +3,8 @@
 /*
 
   Hitachi HMCS40 MCU family disassembler
+  
+  NOTE: start offset(basepc) is $3F, not 0
 
 */
 
@@ -41,19 +43,19 @@ static const char *const s_mnemonics[] =
 	"NOP", "?"
 };
 
-// number of bits per opcode parameter, -3 means (XY) parameter
+// number of bits per opcode parameter, 99 means (XY) parameter, negative means reversed bit-order
 static const INT8 s_bits[] =
 {
 	0, 0, 0, 0, 0, 4,
-	0, 0, 4, 4, 0, 0, 0, 0, -3,
-	-3, -3, -3, -3, -3, -3,
-	4, 4, 4,
-	4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	4, 4, 0, 0, 4, 0, 0,
+	0, 0, -4, -4, 0, 0, 0, 0, 99,
+	99, 99, 99, 99, 99, 99,
+	-4, -4, -4,
+	-4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	-4, -4, 0, 0, -4, 0, 0,
 	2, 2, 2,
 	6, 6, 5, 3, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
-	0, 0, 0, 4, 4, 3, 3, 3, 3, 3,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0,
+	0, 0, 0, -4, -4, 3, 3, 3, 3, 3,
 	0, 0
 };
 
@@ -186,7 +188,7 @@ CPU_DISASSEMBLE(hmcs40)
 	INT8 bits = s_bits[instr];
 	
 	// special case for (XY) opcode
-	if (bits == -3)
+	if (bits == 99)
 	{
 		dst += sprintf(dst, "%s", s_mnemonics[instr]);
 
@@ -196,17 +198,29 @@ CPU_DISASSEMBLE(hmcs40)
 			dst += sprintf(dst, "Y");
 	}
 	else
+	{
 		dst += sprintf(dst, "%-6s ", s_mnemonics[instr]);
 	
-	// opcode parameter
-	if (bits > 0)
-	{
-		UINT8 param = op & ((1 << bits) - 1);
-
-		if (bits > 5)
-			dst += sprintf(dst, "$%02X", param);
-		else
-			dst += sprintf(dst, "%d", param);
+		// opcode parameter
+		if (bits != 0)
+		{
+			UINT8 param = op;
+			
+			// reverse bits
+			if (bits < 0)
+			{
+				param = BITSWAP8(param,0,1,2,3,4,5,6,7);
+				param >>= (8 + bits);
+				bits = -bits;
+			}
+			
+			param &= ((1 << bits) - 1);
+			
+			if (bits > 5)
+				dst += sprintf(dst, "$%02X", param);
+			else
+				dst += sprintf(dst, "%d", param);
+		}
 	}
 	
 	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;

@@ -78,7 +78,8 @@ protected:
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 2; }
-	virtual UINT32 execute_input_lines() const { return 1; }
+	virtual UINT32 execute_input_lines() const { return 2+1; } // 3rd one is internal
+	virtual void execute_set_input(int line, int state);
 	virtual void execute_run();
 
 	// device_memory_interface overrides
@@ -86,7 +87,7 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2+1; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	void state_string_export(const device_state_entry &entry, astring &string);
 
@@ -107,6 +108,9 @@ protected:
 	UINT16 m_stack[4];  // max 4
 	UINT16 m_op;        // current opcode
 	UINT16 m_prev_op;
+	UINT8 m_i;          // 4-bit immediate opcode param
+	int m_eint_line;    // which input_line caused an interrupt
+	emu_timer *m_timer;
 	int m_icount;
 	
 	UINT16 m_pc;        // Program Counter
@@ -118,8 +122,16 @@ protected:
 	UINT8 m_spx;        // 1/3/4-bit SPX register
 	UINT8 m_y;          // 4-bit Y register
 	UINT8 m_spy;        // 4-bit SPY register
-	UINT8 m_s;          // Status F/F
+	UINT8 m_s;          // Status F/F (F/F = flip-flop)
 	UINT8 m_c;          // Carry F/F
+	UINT8 m_tc;         // Timer/Counter
+	UINT8 m_cf;         // CF F/F (timer mode or counter mode)
+	UINT8 m_ie;         // I/E(Interrupt Enable) F/F
+	UINT8 m_iri;        // external interrupt pending I/RI F/F
+	UINT8 m_irt;        // timer interrupt pending I/RT F/F
+	UINT8 m_if[2];      // external interrupt mask IF0,1 F/F
+	UINT8 m_tf;         // timer interrupt mask TF F/F
+	UINT8 m_int[2];     // INT0/1 pins state
 	UINT8 m_r[8];       // R outputs state
 	UINT16 m_d;         // D pins state
 
@@ -141,6 +153,11 @@ protected:
 	virtual void write_r(int index, UINT8 data);
 	virtual int read_d(int index);
 	virtual void write_d(int index, int state);
+
+	void reset_prescaler();
+	TIMER_CALLBACK_MEMBER( simple_timer_cb );
+	void increment_tc();
+	void do_interrupt();
 
 	// opcode handlers
 	void op_illegal();

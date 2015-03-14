@@ -184,6 +184,9 @@ void hmcs40_cpu_device::device_start()
 	m_prgmask = (1 << m_prgwidth) - 1;
 	m_datamask = (1 << m_datawidth) - 1;
 	m_pcmask = (1 << m_pcwidth) - 1;
+
+	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hmcs40_cpu_device::simple_timer_cb), this));
+	reset_prescaler();
 	
 	m_read_r0.resolve_safe(0);
 	m_read_r1.resolve_safe(0);
@@ -210,6 +213,8 @@ void hmcs40_cpu_device::device_start()
 	memset(m_stack, 0, sizeof(m_stack));
 	m_op = 0;
 	m_prev_op = 0;
+	m_i = 0;
+	m_eint_line = 0;
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_page = 0;
@@ -221,6 +226,13 @@ void hmcs40_cpu_device::device_start()
 	m_spy = 0;
 	m_s = 1;
 	m_c = 0;
+	m_tc = 0;
+	m_cf = 0;
+	m_ie = 0;
+	m_iri = m_irt = 0;
+	memset(m_if, 0, sizeof(m_if));
+	m_tf = 0;
+	memset(m_int, 0, sizeof(m_int));
 	memset(m_r, 0, sizeof(m_r));
 	m_d = 0;
 
@@ -228,6 +240,8 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_stack));
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
+	save_item(NAME(m_i));
+	save_item(NAME(m_eint_line));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_page));
@@ -239,6 +253,15 @@ void hmcs40_cpu_device::device_start()
 	save_item(NAME(m_spy));
 	save_item(NAME(m_s));
 	save_item(NAME(m_c));
+	save_item(NAME(m_tc));
+	save_item(NAME(m_cf));
+	save_item(NAME(m_ie));
+	save_item(NAME(m_iri));
+	save_item(NAME(m_irt));
+	save_item(NAME(m_if));
+	save_item(NAME(m_tf));
+	save_item(NAME(m_int));
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_d));
 
@@ -275,6 +298,12 @@ void hmcs40_cpu_device::device_reset()
 	
 	for (int i = 0; i < 8; i++)
 		hmcs40_cpu_device::write_r(i, 0);
+	
+	// clear interrupts
+	m_cf = 0;
+	m_ie = 0;
+	m_iri = m_irt = 0;
+	m_if[0] = m_if[1] = m_tf = 1;
 }
 
 
@@ -347,7 +376,7 @@ UINT8 hmcs43_cpu_device::read_r(int index)
 	index &= 7;
 	
 	if (index >= 2)
-		logerror("%s read from %s port R%d at $%04X\n", tag(), (index >= 4) ? "unknown" : "output", index, m_prev_pc << 1);
+		logerror("%s read from %s port R%d at $%04X\n", tag(), (index >= 4) ? "unknown" : "output", index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -359,7 +388,7 @@ void hmcs43_cpu_device::write_r(int index, UINT8 data)
 	if (index != 0 && index < 4)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc << 1);
+		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
 }
 
 int hmcs43_cpu_device::read_d(int index)
@@ -367,7 +396,7 @@ int hmcs43_cpu_device::read_d(int index)
 	index &= 15;
 	
 	if (index >= 4)
-		logerror("%s read from output pin D%d at $%04X\n", tag(), index, m_prev_pc << 1);
+		logerror("%s read from output pin D%d at $%04X\n", tag(), index, m_prev_pc);
 
 	return hmcs40_cpu_device::read_d(index);
 }
@@ -381,7 +410,7 @@ UINT8 hmcs44_cpu_device::read_r(int index)
 	index &= 7;
 	
 	if (index >= 6)
-		logerror("%s read from unknown port R%d at $%04X\n", tag(), index, m_prev_pc << 1);
+		logerror("%s read from unknown port R%d at $%04X\n", tag(), index, m_prev_pc);
 	
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -393,7 +422,7 @@ void hmcs44_cpu_device::write_r(int index, UINT8 data)
 	if (index < 6)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc << 1);
+		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
 }
 
 // HMCS45:
@@ -405,7 +434,7 @@ UINT8 hmcs45_cpu_device::read_r(int index)
 	index &= 7;
 	
 	if (index >= 6)
-		logerror("%s read from %s port R%d at $%04X\n", tag(), (index == 7) ? "unknown" : "output", index, m_prev_pc << 1);
+		logerror("%s read from %s port R%d at $%04X\n", tag(), (index == 7) ? "unknown" : "output", index, m_prev_pc);
 	
 	return hmcs40_cpu_device::read_r(index);
 }
@@ -417,7 +446,83 @@ void hmcs45_cpu_device::write_r(int index, UINT8 data)
 	if (index != 7)
 		hmcs40_cpu_device::write_r(index, data);
 	else
-		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc << 1);
+		logerror("%s ineffective write to port R%d = $%X at $%04X\n", tag(), index, data & 0xf, m_prev_pc);
+}
+
+
+
+//-------------------------------------------------
+//  interrupt/timer handling
+//-------------------------------------------------
+
+void hmcs40_cpu_device::do_interrupt()
+{
+	m_icount--;
+	push_stack();
+	
+	// line 0/1 for external interrupt, let's use 2 for t/c interrupt
+	int line = (m_iri) ? m_eint_line : 2;
+	
+	// vector $3f, on page 0(timer/counter), or page 1(external)
+	// external interrupt has priority over t/c interrupt
+	m_pc = 0x3f | (m_iri ? 0x40 : 0);
+	m_iri = m_irt = 0;
+	m_ie = 0;
+
+	standard_irq_callback(line);
+}
+
+void hmcs40_cpu_device::execute_set_input(int line, int state)
+{
+	if (line != 0 && line != 1)
+		return;
+	state = (state) ? 1 : 0;
+	
+	// external interrupt request on rising edge
+	if (state && !m_int[line])
+	{
+		if (!m_if[line])
+		{
+			m_eint_line = line;
+			m_iri = 1;
+			m_if[line] = 1;
+		}
+		
+		// clock tc if it is in counter mode
+		if (m_cf && line == 1)
+			increment_tc();
+	}
+	
+	m_int[line] = state;
+}
+
+void hmcs40_cpu_device::reset_prescaler()
+{
+	// reset 6-bit timer prescaler
+	attotime base = attotime::from_hz(unscaled_clock() / 4 / 64);
+	m_timer->adjust(base);
+}
+
+TIMER_CALLBACK_MEMBER( hmcs40_cpu_device::simple_timer_cb )
+{
+	// timer prescaler overflow
+	if (!m_cf)
+		increment_tc();
+	
+	reset_prescaler();
+}
+
+void hmcs40_cpu_device::increment_tc()
+{
+	// increment timer/counter
+	m_tc = (m_tc + 1) & 0xf;
+	
+	// timer interrupt request on overflow
+	if (m_tc == 0 && !m_tf)
+	{
+		m_irt = 1;
+		m_tf = 1;
+	}
 }
 
 
@@ -451,6 +556,10 @@ void hmcs40_cpu_device::execute_run()
 		if ((m_prev_op & 0x3e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
 
+		// check/handle interrupt
+		else if (m_ie && (m_iri || m_irt))
+			do_interrupt();
+
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
@@ -458,15 +567,67 @@ void hmcs40_cpu_device::execute_run()
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
+		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for immediate param
 		increment_pc();
+
+/*
+
+op_ayy();  - 
+op_syy();  - 
+op_am();   - 34 234 4c
+op_sm()???:- 234
+op_daa();  - 46
+op_das();  - 45
+op_nega(); - 
+op_anem(); - 324 124
+op_bnem(); - 267 024
+op_alem(); - 324 124
+op_blem(); - 267 024
+op_lay();  - 118
+
+*/
 
 		// handle opcode
 		switch (m_op)
 		{
+			case 0x118:
+				op_lay(); // probably lay
+				break;
+			case 0x267:
+				op_blem(); break; // bnem or blem
+			case 0x124:
+				op_alem(); // alem or anem
+				break;
+			case 0x324:
+				op_anem(); break; // "
+			case 0x024:
+				//op_nega();
+				//op_am();
+				op_illegal();
+				break;
+			case 0x234:
+				// sm?
+#if 0
+				m_a = ram_r() - m_a;
+				m_s = ~m_a >> 4 & 1;
+				m_a &= 0xf;
+#else
+				op_am();
+#endif
+				break;
+			case 0x04c:
+				op_illegal();
+				//m_c ^= 1;
+				//op_lat();
+				break;
+
+
+
+
 			/* 0x000 */
 			
 			case 0x000: case 0x001: case 0x002: case 0x003:
-				op_xsp(); break;
+/* ok */		op_xsp(); break;
 			case 0x004: case 0x005: case 0x006: case 0x007:
 				op_sem(); break;
 			case 0x008: case 0x009: case 0x00a: case 0x00b:
@@ -490,7 +651,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x050:
 				op_lya(); break;
 			case 0x054:
-				op_iy(); break;
+/* ok */		op_iy(); break;
 			case 0x060:
 				op_lba(); break;
 			case 0x064:
@@ -513,7 +674,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x0a2:
 				op_seif0(); break;
 			case 0x0a4:
-				op_seie(); break;
+/* ok */		op_seie(); break;
 			case 0x0a5:
 				op_setf(); break;
 
@@ -526,14 +687,14 @@ void hmcs40_cpu_device::execute_run()
 				op_lbr(); break;
 			case 0x0f0: case 0x0f1: case 0x0f2: case 0x0f3: case 0x0f4: case 0x0f5: case 0x0f6: case 0x0f7:
 			case 0x0f8: case 0x0f9: case 0x0fa: case 0x0fb: case 0x0fc: case 0x0fd: case 0x0fe: case 0x0ff:
-				op_xamr(); break;
+/* ok */		op_xamr(); break;
 			
 			
 			/* 0x100 */
 			
-			case 0x110: case 0x111:
+/* ok */	case 0x110: case 0x111:
 				op_lmaiy(); break;
-			case 0x114: case 0x115:
+/* ok */	case 0x114: case 0x115:
 				op_lmady(); break;
 			case 0x120:
 				op_or(); break;
@@ -549,7 +710,7 @@ void hmcs40_cpu_device::execute_run()
 /* ok */		op_lbi(); break;
 			case 0x170: case 0x171: case 0x172: case 0x173: case 0x174: case 0x175: case 0x176: case 0x177:
 			case 0x178: case 0x179: case 0x17a: case 0x17b: case 0x17c: case 0x17d: case 0x17e: case 0x17f:
-				op_lti(); break;
+/* ok */		op_lti(); break;
 			
 			case 0x1a0:
 				op_tif1(); break;
@@ -580,40 +741,40 @@ void hmcs40_cpu_device::execute_run()
 			case 0x204: case 0x205: case 0x206: case 0x207:
 				op_rem(); break;
 			case 0x208: case 0x209: case 0x20a: case 0x20b:
-				op_xma(); break;
+/* ok */		op_xma(); break;
 			case 0x210: case 0x211: case 0x212: case 0x213: case 0x214: case 0x215: case 0x216: case 0x217:
 			case 0x218: case 0x219: case 0x21a: case 0x21b: case 0x21c: case 0x21d: case 0x21e: case 0x21f:
 				op_mnei(); break;
 			case 0x220: case 0x221: case 0x222: case 0x223:
 /* ok */		op_xmb(); break;
 			case 0x224:
-				op_rotr(); break;
+/* ok */		op_rotr(); break;
 			case 0x225:
-				op_rotl(); break;
+/* ok */		op_rotl(); break;
 			case 0x230:
 				op_smc(); break;
 			case 0x23c:
 				op_lat(); break;
 			
 			case 0x240:
-				op_laspx(); break;
+/* ok */		op_laspx(); break;
 			case 0x24f:
 				op_tc(); break;
 			case 0x250:
-				op_laspy(); break;
+/* ok */		op_laspy(); break;
 			case 0x254:
 				op_dy(); break;
 			case 0x260:
-				op_lab(); break;
+/* ok */		op_lab(); break;
 			case 0x264:
 				op_db(); break;
 			case 0x270: case 0x271: case 0x272: case 0x273: case 0x274: case 0x275: case 0x276: case 0x277:
 			case 0x278: case 0x279: case 0x27a: case 0x27b: case 0x27c: case 0x27d: case 0x27e: case 0x27f:
-				op_alei(); break;
+/* ok */		op_alei(); break;
 
 			case 0x280: case 0x281: case 0x282: case 0x283: case 0x284: case 0x285: case 0x286: case 0x287:
 			case 0x288: case 0x289: case 0x28a: case 0x28b: case 0x28c: case 0x28d: case 0x28e: case 0x28f:
-				op_ynei(); break;
+/* ok */		op_ynei(); break;
 			case 0x290:
 /* ok */		op_red(); break;
 			case 0x2a0:
@@ -625,7 +786,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x2a4:
 				op_reie(); break;
 			case 0x2a5:
-				op_retf(); break;
+/* ok */		op_retf(); break;
 
 			case 0x2c0: case 0x2c1: case 0x2c2: case 0x2c3: case 0x2c4: case 0x2c5: case 0x2c6: case 0x2c7:
 /* ok */		op_lra(); break;
@@ -651,7 +812,7 @@ void hmcs40_cpu_device::execute_run()
 /* ok */		op_p(); break;
 
 			case 0x3a4:
-				op_rtni(); break;
+/* ok */		op_rtni(); break;
 			case 0x3a7:
 /* ok */		op_rtn(); break;
 
