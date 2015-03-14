@@ -6,7 +6,7 @@ static float rtfps=60.0;
 static int max_width=0;
 static int max_height=0;
 
-static char option_mouse[50];     
+static char option_mouse[50];
 static char option_cheats[50];
 static char option_nag[50];
 static char option_info[50];
@@ -379,7 +379,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    info->geometry.max_height = 1200;
 
    if (log_cb)
-      log_cb(RETRO_LOG_INFO, "AV_INFO: max_width=%d max_height=%d\n",info->geometry.max_width,info->geometry.max_height);   
+      log_cb(RETRO_LOG_INFO, "AV_INFO: max_width=%d max_height=%d\n",info->geometry.max_width,info->geometry.max_height);
 
    info->geometry.aspect_ratio = rtaspect;
 

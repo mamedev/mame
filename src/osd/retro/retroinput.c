@@ -140,7 +140,7 @@ enum
         RETROPAD_L3,
         RETROPAD_R3,
         RETROPAD_TOTAL
-}; 
+};
 
 input_item_id PAD_DIR[4][4]={
 	{ITEM_ID_UP,ITEM_ID_DOWN,ITEM_ID_LEFT,ITEM_ID_RIGHT },
@@ -165,7 +165,7 @@ static const char *Buttons_Name[MAX_BUTTONS]=
         "A",		//8
         "X",		//9
         "L",		//10
-        "R",		//11	
+        "R",		//11
         "L2",		//12
         "R2",		//13
         "L3",		//14
@@ -294,44 +294,44 @@ void retro_poll_mame_input(void)
 
 	input_poll_cb();
 
-   if (mouse_enable)
-   {
-	//MOUSE
-      	static int mbL=0,mbR=0;
-      	int mouse_l;
-      	int mouse_r;
-      	int16_t mouse_x;
-      	int16_t mouse_y;
+	if (mouse_enable)
+	{
+		//MOUSE
+		static int mbL=0,mbR=0;
+		int mouse_l;
+		int mouse_r;
+		int16_t mouse_x;
+		int16_t mouse_y;
 
-      	mouse_x = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
-      	mouse_y = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
-      	mouse_l = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT);
-      	mouse_r = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT);
-      	mouseLX=mouse_x*INPUT_RELATIVE_PER_PIXEL;;
-      	mouseLY=mouse_y*INPUT_RELATIVE_PER_PIXEL;;
+		mouse_x = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
+		mouse_y = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
+		mouse_l = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT);
+		mouse_r = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT);
+		mouseLX=mouse_x*INPUT_RELATIVE_PER_PIXEL;;
+		mouseLY=mouse_y*INPUT_RELATIVE_PER_PIXEL;;
 
-      	if(mbL==0 && mouse_l)
-      	{
-      	   mbL=1;		
-      	   mouseBUT[0]=0x80;
-      	}
-      	else if(mbL==1 && !mouse_l)
-      	{	
-      	   mouseBUT[0]=0;
-      	   mbL=0;
-      	}
+		if(mbL==0 && mouse_l)
+		{
+			mbL=1;
+			mouseBUT[0]=0x80;
+		}
+		else if(mbL==1 && !mouse_l)
+		{
+			mouseBUT[0]=0;
+			mbL=0;
+		}
 
-      	if(mbR==0 && mouse_r)
-      	{
-      	   mbR=1;
-      	   mouseBUT[1]=1;
-      	}
-      	else if(mbR==1 && !mouse_r)
-      	{
-      	   mouseBUT[1]=0;
-      	   mbR=0;
-      	}
-   }
+		if(mbR==0 && mouse_r)
+		{
+			mbR=1;
+			mouseBUT[1]=1;
+		}
+		else if(mbR==1 && !mouse_r)
+		{
+			mouseBUT[1]=0;
+			mbR=0;
+		}
+	}
 
 	//KBD
 	//TODO: handle mods:SHIFT/CTRL/ALT/META/NUMLOCK/CAPSLOCK/SCROLLOCK
@@ -356,9 +356,9 @@ void retro_poll_mame_input(void)
 			joystate[j].button[i] = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0,i)?0x80:0;
 
 		joystate[j].a1[0] = 2*(input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X));
-	      	joystate[j].a1[1] = 2*(input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y));
-	      	joystate[j].a2[0] = 2*(input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X));
-	      	joystate[j].a2[1] = 2*(input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y));
+		joystate[j].a1[1] = 2*(input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y));
+		joystate[j].a2[0] = 2*(input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X));
+		joystate[j].a2[1] = 2*(input_state_cb(j, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y));
 	}
 
 }
@@ -535,7 +535,7 @@ static void Input_Binding(running_machine &machine){
 	Buttons_mapping[3]=RETROPAD_B;
 	Buttons_mapping[4]=RETROPAD_A;
 	Buttons_mapping[5]=RETROPAD_R;
-    
+
    }
    else
    if (
@@ -552,7 +552,7 @@ static void Input_Binding(running_machine &machine){
          (core_stricmp(machine.system().parent, "fightfev") == 0) ||
          (core_stricmp(machine.system().parent, "galaxyfg") == 0) ||
          (core_stricmp(machine.system().parent, "garou") == 0) ||
-         (core_stricmp(machine.system().parent, "gowcaizr") == 0) ||  
+         (core_stricmp(machine.system().parent, "gowcaizr") == 0) ||
          (core_stricmp(machine.system().parent, "neogeo") == 0) ||
          (core_stricmp(machine.system().parent, "karnovr") == 0) ||
          (core_stricmp(machine.system().parent, "kizuna") == 0) ||
@@ -578,11 +578,11 @@ static void Input_Binding(running_machine &machine){
          (core_stricmp(machine.system().parent, "lastblad") == 0) ||
          (core_stricmp(machine.system().parent, "lastbld2") == 0) ||
          (core_stricmp(machine.system().parent, "ninjamas") == 0) ||
-         (core_stricmp(machine.system().parent, "rotd") == 0) ||        
+         (core_stricmp(machine.system().parent, "rotd") == 0) ||
          (core_stricmp(machine.system().parent, "rbff1") == 0) ||
          (core_stricmp(machine.system().parent, "rbff2") == 0) ||
          (core_stricmp(machine.system().parent, "rbffspec") == 0) ||
-         (core_stricmp(machine.system().parent, "savagere") == 0) ||      
+         (core_stricmp(machine.system().parent, "savagere") == 0) ||
          (core_stricmp(machine.system().parent, "sengoku3") == 0) ||
          (core_stricmp(machine.system().parent, "samsho") == 0) ||
          (core_stricmp(machine.system().parent, "samsho2") == 0) ||
@@ -590,11 +590,11 @@ static void Input_Binding(running_machine &machine){
          (core_stricmp(machine.system().parent, "samsho4") == 0) ||
          (core_stricmp(machine.system().parent, "samsho5") == 0) ||
          (core_stricmp(machine.system().parent, "samsh5sp") == 0) ||
-         (core_stricmp(machine.system().parent, "svc") == 0) ||  
+         (core_stricmp(machine.system().parent, "svc") == 0) ||
          (core_stricmp(machine.system().parent, "viewpoin") == 0) ||
          (core_stricmp(machine.system().parent, "wakuwak7") == 0) ||
          (core_stricmp(machine.system().parent, "wh1") == 0) ||
-         (core_stricmp(machine.system().parent, "wh2") == 0) ||  
+         (core_stricmp(machine.system().parent, "wh2") == 0) ||
          (core_stricmp(machine.system().parent, "wh2j") == 0) ||
          (core_stricmp(machine.system().parent, "whp") == 0)
       )

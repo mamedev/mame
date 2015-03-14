@@ -27,7 +27,7 @@ retro_osd_interface::~retro_osd_interface()
 }
 
 void retro_osd_interface::osd_exit()
-{	
+{
 	if (log_cb)
 		log_cb(RETRO_LOG_INFO, "OSD exit called\n");
 
@@ -37,7 +37,7 @@ void retro_osd_interface::osd_exit()
 #endif
 
 	osd_common_t::osd_exit();
-	
+
 /*
 	global_free(Pad_device[0]);
 	global_free(Pad_device[1]);
@@ -65,10 +65,10 @@ void retro_osd_interface::init(running_machine &machine)
 
 	if (log_cb)
 		log_cb(RETRO_LOG_INFO, "Screen orientation: %s\n",(machine.system().flags & ORIENTATION_SWAP_XY) ? "VERTICAL" : "HORIZONTAL");
-	
+
     orient  = (machine.system().flags & ORIENTATION_MASK);
 	vertical = (machine.system().flags & ORIENTATION_SWAP_XY);
-        
+
     gamRot = (ROT270 == orient) ? 1 : gamRot;
     gamRot = (ROT180 == orient) ? 2 : gamRot;
     gamRot = (ROT90  == orient) ? 3 : gamRot;
@@ -83,12 +83,12 @@ void retro_osd_interface::init(running_machine &machine)
 	int width,height;
 	our_target->compute_visible_area(1000,1000,1,ROT0,width,height);
 	rtaspect=(float)width/(float)height;
-	
+
 	rtfps = ATTOSECONDS_TO_HZ(machine.first_screen()->refresh_attoseconds());
-	
+
 	if (log_cb)
 		log_cb(RETRO_LOG_DEBUG, "Screen width=%d height=%d, aspect=%d/%d=%f\n",rtwi,rthe,width,height,rtaspect);
-	
+
 	NEWGAME_FROM_OSD=1;
 	if (log_cb)
 		log_cb(RETRO_LOG_INFO, "OSD initialization complete\n");
@@ -134,12 +134,12 @@ void retro_osd_interface::update(bool skip_redraw)
       if (FirstTimeUpdate == 1)
       {
 
-         FirstTimeUpdate++;			
+         FirstTimeUpdate++;
          //write_log("game screen w=%i h=%i  rowPixels=%i\n", minwidth, minheight,minwidth );
 
          rtwi=minwidth;
          rthe=minheight;
-         topw=minwidth;			
+         topw=minwidth;
 
          int gamRot=0;
          orient  = (machine().system().flags & ORIENTATION_MASK);
@@ -184,10 +184,10 @@ void retro_osd_interface::update(bool skip_redraw)
       software_renderer<UINT32, 0,0,0, 16,8,0>::draw_primitives(primlist, surfptr, minwidth, minheight,minwidth );
 #endif
 
-#endif    
+#endif
 
       primlist.release_lock();
-   } 
+   }
 	else
     		draw_this_frame = false;
 
@@ -198,8 +198,8 @@ void retro_osd_interface::update(bool skip_redraw)
 	}
 
    co_switch(mainThread);
-}  
- 
+}
+
 //============================================================
 //  customize_input_type_list
 //============================================================

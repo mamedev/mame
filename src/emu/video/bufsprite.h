@@ -62,7 +62,6 @@ public:
 	#ifndef __LIBRETRO__
 	_Type *buffer() { return m_buffered; }
 	#else
-		
 		_Type *buffer()
 		{
 			extern bool nobuffer_enable;
@@ -88,7 +87,7 @@ public:
 			return m_spriteram;
 		else
 			return m_buffered;
-	#endif 
+	#endif
 
 	}
 

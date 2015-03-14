@@ -35,7 +35,7 @@ const char core[] = "ume";
 #include "render.c"
 #ifndef HAVE_GL
 #include "rendersw.inc"
-#else 
+#else
 static int init3d=1;
 #endif
 //============================================================
@@ -462,21 +462,21 @@ int executeGame(char* path)
 
    Extract_AllPath(path);
 
-#ifdef WANT_MAME	
+#ifdef WANT_MAME
    //find if the driver exists for MgameName, if not, exit
    if (getGameInfo(MgameName, &gameRot, &driverIndex,&arcade) == 0)
    {
       if (log_cb)
          log_cb(RETRO_LOG_ERROR, "Driver not found: %s\n",MgameName);
       return -2;
-   }	
+   }
 #else
    //find if the driver exists for MgameName, if not, check if a driver exists for MsystemName, if not, exit
-   if (getGameInfo(MgameName, &gameRot, &driverIndex,&arcade) == 0) 
+   if (getGameInfo(MgameName, &gameRot, &driverIndex,&arcade) == 0)
    {
       if (log_cb)
          log_cb(RETRO_LOG_ERROR, "Driver not found %s\n",MgameName);
-      if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) == 0) 
+      if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) == 0)
       {
          if (log_cb)
             log_cb(RETRO_LOG_ERROR, "System not found: %s\n",MsystemName);
@@ -488,14 +488,14 @@ int executeGame(char* path)
    if(arcade==true)
    {
       if (log_cb)
-         log_cb(RETRO_LOG_ERROR, "System not found: %s\n",MsystemName);	         	
+         log_cb(RETRO_LOG_ERROR, "System not found: %s\n",MsystemName);
 
       // test system
-      if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) != 0) 
+      if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) != 0)
          arcade=false;
    }
 
-#endif	
+#endif
 
    // useless ?
    if (tate)
@@ -542,7 +542,7 @@ int executeGame(char* path)
 
 #ifdef WANT_MAME
    sprintf(tmp_dir, "%s", MgamePath);
-   Add_Option((char*)(tmp_dir));		   
+   Add_Option((char*)(tmp_dir));
    if(!boot_to_osd_enable)
       Add_Option(MgameName);
 
@@ -551,12 +551,12 @@ int executeGame(char* path)
    if(!boot_to_osd_enable)
    {
       sprintf(tmp_dir, "%s", MgamePath);
-      Add_Option((char*)(tmp_dir));		   
+      Add_Option((char*)(tmp_dir));
       if(softlist_enable)
       {
          if(!arcade)
          {
-            Add_Option(MsystemName);   
+            Add_Option(MsystemName);
             if(!boot_to_bios_enable)
             {
                if(!softlist_auto)
@@ -571,26 +571,26 @@ int executeGame(char* path)
       {
          if (strcmp(mediaType, "-rom") == 0)
             Add_Option(MgameName);
-         else 
+         else
          {
             Add_Option(MsystemName);
             Add_Option((char*)mediaType);
             Add_Option((char*)gameName);
-         }    
+         }
       }
    }
    else
    {
       sprintf(tmp_dir, "%s;%s", MgamePath,MparentPath);
-      Add_Option((char*)(tmp_dir));		   	
+      Add_Option((char*)(tmp_dir));
    }
 
 
 
-#endif 	 	 
+#endif
 
    return 0;
-} 
+}
 
 /* Args for experimental_commandline */
 static char ARGUV[32][1024];
@@ -637,7 +637,7 @@ void parse_cmdline(const char *argv)
                //... do something with the word ...
                for (c2=0, p2 = start_of_word; p2 < p; p2++, c2++)
                   ARGUV[ARGUC][c2] = (unsigned char) *p2;
-               ARGUC++; 
+               ARGUC++;
 
                state = DULL; /* back to "not in word, not in string" state */
             }
@@ -651,12 +651,12 @@ void parse_cmdline(const char *argv)
                /*... do something with the word ... */
                for (c2=0,p2 = start_of_word; p2 <p; p2++,c2++)
                   ARGUV[ARGUC][c2] = (unsigned char) *p2;
-               ARGUC++; 
+               ARGUC++;
 
                state = DULL; /* back to "not in word, not in string" state */
             }
             continue; /* either still IN_WORD or we handled the end above */
-      }	
+      }
    }
 
 }
@@ -689,7 +689,7 @@ int executeGame_cmd(char* path)
       if (parseSystemName(path, MsystemName) ==0)
       {
          write_log("parse systemname failed! path=%s\n", path);
-         strcpy(MsystemName,path );		
+         strcpy(MsystemName,path );
       }
    }
 
@@ -722,13 +722,13 @@ int executeGame_cmd(char* path)
       {
          /* test system */
          if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) == 0)
-            write_log("System not found: %s\n", MsystemName);   		         	
+            write_log("System not found: %s\n", MsystemName);
          else
          {
-            write_log("System found: %s\n", MsystemName);   
+            write_log("System found: %s\n", MsystemName);
             arcade=false;
          }
-      } 
+      }
    }
 
    Set_Default_Option();
@@ -744,8 +744,8 @@ int executeGame_cmd(char* path)
          Add_Option((char*)"-createconfig");
       else
       {
-         Add_Option((char*)"-rp");	
-         Add_Option((char*)g_rom_dir);	
+         Add_Option((char*)"-rp");
+         Add_Option((char*)g_rom_dir);
          if(!arcade)
             Add_Option(MsystemName);
          Add_Option(MgameName);

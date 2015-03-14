@@ -73,7 +73,7 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
 	$(OSDOBJ)/modules/sync/sync_retro.o \
 	$(MINIOBJ)/../modules/midi/none.o \
-	$(OSDOBJ)/modules/osdmodule.o 
+	$(OSDOBJ)/modules/osdmodule.o
 
 ifdef NOASM
 OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
@@ -100,7 +100,7 @@ ifeq ($(DISABLE_MIDI_ON), 0)
 endif
 OSDOBJS += $(OSDOBJ)/modules/midi/none.o
 
-OSDOBJS += $(LIBCOOBJ)/libco.o 
+OSDOBJS += $(LIBCOOBJ)/libco.o
 
 ifeq ($(VRENDER),opengl)
 OSDOBJS += $(GLOBJ)/rglgen.o

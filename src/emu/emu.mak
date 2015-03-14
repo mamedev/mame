@@ -251,7 +251,7 @@ include $(EMUSRC)/bus/bus.mak
 # core optional library
 #-------------------------------------------------
 
-$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) 
+$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS)
 $(LIBOPTIONAL2): $(MACHINEOBJS) $(NETLISTOBJS)
 $(LIBBUS): $(BUSOBJS)
 

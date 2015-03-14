@@ -79,7 +79,7 @@ int osd_get_num_processors(void)
 	processors = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 	return processors;
-	
+
 #endif
 }
 

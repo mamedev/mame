@@ -58,7 +58,7 @@ msg_queue_t *msg_queue_new(size_t size)
 
    queue->size = size + 1;
    queue->elems = (struct queue_elem**)
-      calloc(queue->size,sizeof(struct queue_elem*)); 
+      calloc(queue->size,sizeof(struct queue_elem*));
 
    if (!queue->elems)
    {
@@ -173,11 +173,11 @@ const char *msg_queue_pull(msg_queue_t *queue)
    struct queue_elem *front  = NULL, *last = NULL,
                      *parent = NULL, *child = NULL;
    size_t tmp_ptr = 1;
-    
+
    (void)parent;
    (void)child;
    (void)tmp_ptr;
-    
+
    /* Nothing in queue. */
    if (!queue || queue->ptr == 1)
       return NULL;

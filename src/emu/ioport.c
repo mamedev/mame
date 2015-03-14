@@ -484,6 +484,7 @@ static const char_info charinfo[] =
 	{ UCHAR_MAMEKEY(CANCEL),    "Break",        NULL }      // Break/Pause key
 };
 
+
 int autofire_delay;
 int autofire_toggle;
 

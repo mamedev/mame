@@ -528,9 +528,7 @@ private:
 	FPTR                    m_function;         // first item can be one of two things:
 												//    if even, it's a pointer to the function
 												//    if odd, it's the byte offset into the vtable
-
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
-
 };
 
 #endif

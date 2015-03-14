@@ -47,7 +47,7 @@ static void copy_to_memory (running_machine &machine, int cpu, int addr, UINT8 *
 
 	for (i=0; i<num_bytes; i++)
 	{
-    		targetspace->write_byte(addr+i, source[i]);
+		targetspace->write_byte(addr+i, source[i]);
 	}
 }
 
@@ -104,7 +104,7 @@ static UINT32 hexstr2num (const char **pString)
 			{
 				/* not a hexadecimal digit */
 				/* safety check for premature EOL */
-				if (!c) 
+				if (!c)
 					string = NULL;
 				break;
 			}
@@ -126,9 +126,9 @@ static int is_mem_range (const char *pBuf)
 	for(;;)
 	{
 		c = *pBuf++;
-		if (c == 0) 
+		if (c == 0)
 			return 0; /* premature EOL */
-		if (c == ':') 
+		if (c == ':')
 			break;
 	}
 
@@ -142,7 +142,7 @@ static int matching_game_name (const char *pBuf, const char *name)
 {
 	while (*name)
 	{
-		if (*name++ != *pBuf++) 
+		if (*name++ != *pBuf++)
 			return 0;
 	}
 	return (*pBuf == ':');
@@ -197,8 +197,8 @@ static void hiscore_free (void)
 static void hiscore_load (running_machine &machine)
 {
 	file_error filerr;
-  	emu_file f(machine.options().hiscore_directory(), OPEN_FLAG_READ);
-  	filerr = f.open(machine.basename(), ".hi");				
+	emu_file f(machine.options().hiscore_directory(), OPEN_FLAG_READ);
+	filerr = f.open(machine.basename(), ".hi");
 	state.hiscores_have_been_loaded = 1;
 
 	if (filerr == FILERR_NONE)
@@ -272,7 +272,7 @@ static TIMER_CALLBACK( hiscore_periodic )
 /* call hiscore_close when done playing game */
 void hiscore_close (running_machine &machine)
 {
-	if (state.hiscores_have_been_loaded) 
+	if (state.hiscores_have_been_loaded)
 		hiscore_save(machine);
 	hiscore_free();
 }
@@ -286,7 +286,7 @@ const char core[] = "mame";
 const char core[] = "mess";
 #elif defined(WANT_UME)
 const char core[] = "ume";
-#endif 
+#endif
 #endif*/
 
 #ifdef __WIN32__
@@ -322,7 +322,7 @@ void hiscore_init (running_machine &machine)
 		}
 	}
 
-	
+
 	state.mem_range = NULL;
 	emu_file f(OPEN_FLAG_READ);
 #ifdef __LIBRETRO__
@@ -386,13 +386,13 @@ void hiscore_init (running_machine &machine)
 			else
 			{
 				/* line is a game name */
-				if (mode == FETCH_DATA) 
+				if (mode == FETCH_DATA)
 					break;
 			}
 		}
 		f.close();
 	}
-	
+
 	timer = machine.scheduler().timer_alloc(FUNC(hiscore_periodic));
 	timer->adjust(machine.first_screen()->frame_period(), 0, machine.first_screen()->frame_period());
 

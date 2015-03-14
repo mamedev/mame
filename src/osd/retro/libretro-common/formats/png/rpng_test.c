@@ -95,7 +95,7 @@ static bool rpng_nbio_load_image_argb(const char *path, uint32_t **data,
       ret = false;
       goto end;
    }
-   
+
    rpng_nbio_load_image_argb_process(rpng, data, width, height);
 
 end:

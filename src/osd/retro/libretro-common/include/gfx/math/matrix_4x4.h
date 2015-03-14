@@ -24,7 +24,7 @@
 #define __LIBRETRO_SDK_GFX_MATH_MATRIX_4X4_H__
 
 /* Column-major matrix (OpenGL-style).
- * Reimplements functionality from FF OpenGL pipeline to be able 
+ * Reimplements functionality from FF OpenGL pipeline to be able
  * to work on GLES 2.0 and modern GL variants.
  */
 

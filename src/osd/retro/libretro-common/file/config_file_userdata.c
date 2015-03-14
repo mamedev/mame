@@ -112,7 +112,7 @@ int config_userdata_get_string(void *userdata, const char *key_str,
    if (got)
    {
       *output = str;
-      return true; 
+      return true;
    }
 
    *output = strdup(default_output);

@@ -70,7 +70,7 @@
  * path_get_extension:
  * @path               : path
  *
- * Gets extension of file. Only '.'s 
+ * Gets extension of file. Only '.'s
  * after the last slash are considered.
  *
  * Returns: extension part from the path.
@@ -190,7 +190,7 @@ bool path_file_exists(const char *path)
  * fill_pathname:
  * @out_path           : output path
  * @in_path            : input  path
- * @replace            : what to replace 
+ * @replace            : what to replace
  * @size               : buffer size of output path
  *
  * FIXME: Verify
@@ -202,10 +202,10 @@ bool path_file_exists(const char *path)
  * Only '.'s after the last slash are considered as extensions.
  * If no '.' is present, in_path and replace will simply be concatenated.
  * 'size' is buffer size of 'out_path'.
- * E.g.: in_path = "/foo/bar/baz/boo.c", replace = ".asm" => 
- * out_path = "/foo/bar/baz/boo.asm" 
+ * E.g.: in_path = "/foo/bar/baz/boo.c", replace = ".asm" =>
+ * out_path = "/foo/bar/baz/boo.asm"
  * E.g.: in_path = "/foo/bar/baz/boo.c", replace = ""     =>
- * out_path = "/foo/bar/baz/boo" 
+ * out_path = "/foo/bar/baz/boo"
  */
 void fill_pathname(char *out_path, const char *in_path,
       const char *replace, size_t size)
@@ -226,7 +226,7 @@ void fill_pathname(char *out_path, const char *in_path,
  * fill_pathname_noext:
  * @out_path           : output path
  * @in_path            : input  path
- * @replace            : what to replace 
+ * @replace            : what to replace
  * @size               : buffer size of output path
  *
  * Appends a filename extension 'replace' to 'in_path', and outputs
@@ -256,7 +256,7 @@ static char *find_last_slash(const char *str)
    return (char*)slash;
 }
 
-/** 
+/**
  * fill_pathname_slash:
  * @path               : path
  * @size               : size of path
@@ -308,7 +308,7 @@ void fill_pathname_dir(char *in_dir, const char *in_basename,
 
 /**
  * fill_pathname_base:
- * @out                : output path         
+ * @out                : output path
  * @in_path            : input path
  * @size               : size of output path
  *
@@ -344,7 +344,7 @@ void fill_pathname_base(char *out, const char *in_path, size_t size)
 
 /**
  * fill_pathname_basedir:
- * @out_dir            : output directory        
+ * @out_dir            : output directory
  * @in_path            : input path
  * @size               : size of output directory
  *
@@ -361,7 +361,7 @@ void fill_pathname_basedir(char *out_dir,
 
 /**
  * fill_pathname_parent_dir:
- * @out_dir            : output directory        
+ * @out_dir            : output directory
  * @in_dir             : input directory
  * @size               : size of output directory
  *
@@ -381,10 +381,10 @@ void fill_pathname_parent_dir(char *out_dir,
  * @ext                : extension of output filename
  * @size               : buffer size of output filename
  *
- * Creates a 'dated' filename prefixed by 'RetroArch', and 
+ * Creates a 'dated' filename prefixed by 'RetroArch', and
  * concatenates extension (@ext) to it.
  *
- * E.g.: 
+ * E.g.:
  * out_filename = "RetroArch-{month}{day}-{Hours}{Minutes}.{@ext}"
  **/
 void fill_dated_filename(char *out_filename,
@@ -400,7 +400,7 @@ void fill_dated_filename(char *out_filename,
 
 /**
  * path_basedir:
- * @path               : path           
+ * @path               : path
  *
  * Extracts base directory by mutating path.
  * Keeps trailing '/'.
@@ -620,12 +620,12 @@ void fill_pathname_resolve_relative(char *out_path,
 /**
  * fill_pathname_join:
  * @out_path           : output path
- * @dir                : directory   
+ * @dir                : directory
  * @path               : path
  * @size               : size of output path
  *
  * Joins a directory (@dir) and path (@path) together.
- * Makes sure not to get  two consecutive slashes 
+ * Makes sure not to get  two consecutive slashes
  * between directory and path.
  **/
 void fill_pathname_join(char *out_path,
@@ -642,12 +642,12 @@ void fill_pathname_join(char *out_path,
 /**
  * fill_pathname_join_delim:
  * @out_path           : output path
- * @dir                : directory   
+ * @dir                : directory
  * @path               : path
- * @delim              : delimiter 
+ * @delim              : delimiter
  * @size               : size of output path
  *
- * Joins a directory (@dir) and path (@path) together 
+ * Joins a directory (@dir) and path (@path) together
  * using the given delimiter (@delim).
  **/
 void fill_pathname_join_delim(char *out_path, const char *dir,
@@ -691,7 +691,7 @@ void fill_short_pathname_representation(char* out_rep,
     */
    if(last_hash != NULL)
    {
-      /* We check whether something is actually 
+      /* We check whether something is actually
        * after the hash to avoid going over the buffer.
        */
       rarch_assert(strlen(last_hash) > 1);

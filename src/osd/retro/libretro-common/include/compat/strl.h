@@ -35,7 +35,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* Avoid possible naming collisions during link since 
+/* Avoid possible naming collisions during link since
  * we prefer to use the actual name. */
 #define strlcpy(dst, src, size) strlcpy_rarch__(dst, src, size)
 

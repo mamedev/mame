@@ -72,7 +72,7 @@ static bool png_parse_ihdr(uint8_t *buf,
    if (ihdr->width == 0 || ihdr->height == 0)
       GOTO_END_ERROR();
 
-   if (ihdr->color_type == 2 || 
+   if (ihdr->color_type == 2 ||
          ihdr->color_type == 4 || ihdr->color_type == 6)
    {
       if (ihdr->depth != 8 && ihdr->depth != 16)
@@ -147,7 +147,7 @@ static bool png_realloc_idat(const struct png_chunk *chunk, struct idat_buffer *
    return true;
 }
 
-static bool png_read_plte_into_buf(uint8_t *buf, 
+static bool png_read_plte_into_buf(uint8_t *buf,
       uint32_t *buffer, unsigned entries)
 {
    unsigned i;
@@ -289,10 +289,10 @@ bool rpng_nbio_load_image_argb_process(struct rpng_t *rpng,
    *height = rpng->ihdr.height;
 #ifdef GEKKO
    /* we often use these in textures, make sure they're 32-byte aligned */
-   *data = (uint32_t*)memalign(32, rpng->ihdr.width * 
+   *data = (uint32_t*)memalign(32, rpng->ihdr.width *
          rpng->ihdr.height * sizeof(uint32_t));
 #else
-   *data = (uint32_t*)malloc(rpng->ihdr.width * 
+   *data = (uint32_t*)malloc(rpng->ihdr.width *
          rpng->ihdr.height * sizeof(uint32_t));
 #endif
    if (!*data)
@@ -325,7 +325,7 @@ bool rpng_nbio_load_image_argb_start(struct rpng_t *rpng)
 
    if (!rpng)
       return false;
-   
+
    for (i = 0; i < 8; i++)
       header[i] = rpng->buff_data[i];
 

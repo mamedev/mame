@@ -259,7 +259,7 @@ static bool rpng_save_image(const char *path,
       /* Try every filtering method, and choose the method
        * which has most entries as zero.
        *
-       * This is probably not very optimal, but it's very 
+       * This is probably not very optimal, but it's very
        * simple to implement.
        */
       unsigned none_score  = count_sad(rgba_line, width * bpp);

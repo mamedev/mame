@@ -25,14 +25,14 @@ static const GLfloat vertex_data[] = {
    1.0, 1.0, 0.0, 1.0,
 //TEXCOORD
    0, 0,
-   1, 0, 
-   0, 1, 
-   1, 1, 
+   1, 0,
+   0, 1,
+   1, 1,
 };
 
 static const char *vertex_shader[] = {
    "attribute vec2 aVertex;",
-   "attribute vec2 aTexCoord;\n", 
+   "attribute vec2 aTexCoord;\n",
    "attribute vec4 aColor;",
    "varying vec4 color;",
    "varying vec2 vTex;\n",
@@ -52,7 +52,7 @@ static const char *fragment_shader[] = {
    "uniform sampler2D sTex0;\n",
    "void main() {",
    "   vec4 texColor = texture2D(sTex0, vTex) * color * uUseTexture ;\n",
-   "   vec4 vertColor = color * (1.0 - uUseTexture);\n", 
+   "   vec4 vertColor = color * (1.0 - uUseTexture);\n",
    "   gl_FragColor =  texColor + vertColor;\n",
    "}",
 };
@@ -389,7 +389,7 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 }
 
 static texture_info *texture_create(const render_texinfo *texsource, UINT32 flags)
-{	
+{
 	texture_info *texture;
 
 	// allocate a new texture
@@ -430,7 +430,7 @@ static texture_info *texture_create(const render_texinfo *texsource, UINT32 flag
 			glTexParameteri(texture->texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(texture->texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		}
-	
+
 			// set wrapping mode appropriately
 			if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
 			{
@@ -499,15 +499,15 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 					default:
 						osd_printf_error("Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
 						break;
-				}			
-		}		
-	
+				}
+		}
+
 		glBindTexture(texture->texTarget, texture->texture);
 
 		// and upload the image
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texsource->width, texsource->height,
 						GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, texture->data);
-	
+
 }
 
 
@@ -546,7 +546,7 @@ static texture_info *texture_find(retro_info *retro, const render_primitive *pri
 }
 
 static texture_info * texture_update(const render_primitive *prim, int shaderIdx)
-{	
+{
 	texture_info *texture = texture_find(retro, prim);
 	int texBound = 0;
 
@@ -568,7 +568,7 @@ static texture_info * texture_update(const render_primitive *prim, int shaderIdx
 
 			// if we found it, but with a different seqid, copy the data
 			texture_set_data(texture, &prim->texture, prim->flags);
-			texBound=1;			
+			texBound=1;
 		}
 
 		if (!texBound) {
@@ -621,7 +621,7 @@ static void compile_program(void)
    	glShaderSource(frag, ARRAY_SIZE(fragment_shader), fragment_shader, 0);
    	glCompileShader(vert);
    	glCompileShader(frag);
-	
+
 	glAttachShader(prog, vert);
    	glAttachShader(prog, frag);
 
@@ -634,7 +634,7 @@ static void compile_program(void)
 static void setup_vao(void)
 {
    	glUseProgram(prog);
-	
+
 	//setup_loc
    	glUniform1i(glGetUniformLocation(prog, "sTex0"), 0);
    	vloc = glGetAttribLocation(prog, "aVertex");
@@ -657,10 +657,10 @@ static void context_reset(void)
    	fprintf(stderr, "Context reset!\n");
    	rglgen_resolve_symbols(hw_render.get_proc_address);
    	compile_program();
-   	setup_vao(); 
+   	setup_vao();
 
    	glDisable(GL_DEPTH_TEST);
-   	
+
 	destroy_all_textures();
 }
 
@@ -671,7 +671,7 @@ static void context_destroy(void)
    	glDeleteBuffers(1,&vbo);
    	vbo = 0;
    	glDeleteProgram(prog);
-   	prog = 0;   
+   	prog = 0;
 
 }
 
@@ -680,7 +680,7 @@ INLINE float round_nearest(float f)
 	return floor(f + 0.5f);
 }
 
-static void do_glflush(){  
+static void do_glflush(){
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -698,8 +698,8 @@ static void do_glflush(){
    			glBindBuffer(GL_ARRAY_BUFFER, 0);\
    			glUniform1f(utloc,UseTexture );
 
-static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth,int minheight){  
-	
+static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth,int minheight){
+
 	texture_info *texture=NULL;
 
 	if(init3d==1){
@@ -736,7 +736,7 @@ static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth
 	}
 
   	glBindFramebuffer(GL_FRAMEBUFFER, hw_render.get_current_framebuffer());
-   	glViewport(0, 0, minwidth, minheight); 
+   	glViewport(0, 0, minwidth, minheight);
 
 		for (const render_primitive *prim = primlst.first(); prim != NULL; prim = prim->next())
       {
@@ -788,7 +788,7 @@ static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth
 			glcols[0]=prim->color.r;
 			glcols[1]=prim->color.g;
 			glcols[2]=prim->color.b;
-			glcols[3]=prim->color.a;		
+			glcols[3]=prim->color.a;
 			glcols[4]=prim->color.r;
 			glcols[5]=prim->color.g;
 			glcols[6]=prim->color.b;
@@ -861,12 +861,12 @@ static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth
 
 			glDisableVertexAttribArray(vloc);
 			glDisableVertexAttribArray(cloc);
-	
+
 		}
 		else{
 
    			glUseProgram(prog);
-			
+
 			texture = texture_update( prim, 0);
 
 			glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
@@ -874,7 +874,7 @@ static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth
 			glverts[2]=2*(prim->bounds.x1/minwidth-0.5);
 			glverts[3]=2*(prim->bounds.y0/minheight-0.5);
 			glverts[4]=2*(prim->bounds.x0/minwidth-0.5);
-			glverts[5]=2*(prim->bounds.y1/minheight-0.5);	
+			glverts[5]=2*(prim->bounds.y1/minheight-0.5);
 			glverts[6]=2*(prim->bounds.x1/minwidth-0.5);
 			glverts[7]=2*(prim->bounds.y1/minheight-0.5);
 

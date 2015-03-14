@@ -55,7 +55,7 @@ static bool png_read_chunk(FILE *file, struct png_chunk *chunk)
    if (!chunk->data)
       return false;
 
-   if (fread(chunk->data, 1, chunk->size + 
+   if (fread(chunk->data, 1, chunk->size +
             sizeof(uint32_t), file) != (chunk->size + sizeof(uint32_t)))
    {
       free(chunk->data);
@@ -98,7 +98,7 @@ static bool png_parse_ihdr_fio(FILE *file,
    if (ihdr->width == 0 || ihdr->height == 0)
       GOTO_END_ERROR();
 
-   if (ihdr->color_type == 2 || 
+   if (ihdr->color_type == 2 ||
          ihdr->color_type == 4 || ihdr->color_type == 6)
    {
       if (ihdr->depth != 8 && ihdr->depth != 16)
@@ -233,7 +233,7 @@ bool rpng_load_image_argb(const char *path, uint32_t **data,
       GOTO_END_ERROR();
 
    /* feof() apparently isn't triggered after a seek (IEND). */
-   for (pos = ftell(file); 
+   for (pos = ftell(file);
          pos < file_len && pos >= 0; pos = ftell(file))
    {
       struct png_chunk chunk = {0};

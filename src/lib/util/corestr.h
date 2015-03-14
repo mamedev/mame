@@ -27,11 +27,13 @@ int core_stricmp(const char *s1, const char *s2);
 /* this macro prevents people from using stricmp directly */
 #undef stricmp
 #define stricmp !MUST_USE_CORE_STRICMP_INSTEAD!
+
 #ifndef __ANDROID__
 /* this macro prevents people from using strcasecmp directly */
 #undef strcasecmp
 #define strcasecmp !MUST_USE_CORE_STRICMP_INSTEAD!
 #endif
+
 
 /* since strnicmp is not part of the standard, we use this instead */
 int core_strnicmp(const char *s1, const char *s2, size_t n);
@@ -39,11 +41,13 @@ int core_strnicmp(const char *s1, const char *s2, size_t n);
 /* this macro prevents people from using strnicmp directly */
 #undef strnicmp
 #define strnicmp !MUST_USE_CORE_STRNICMP_INSTEAD!
+
 #ifndef __ANDROID__
 /* this macro prevents people from using strncasecmp directly */
 #undef strncasecmp
 #define strncasecmp !MUST_USE_CORE_STRNICMP_INSTEAD!
 #endif
+
 
 /* since strdup is not part of the standard, we use this instead - free with osd_free() */
 char *core_strdup(const char *str);

@@ -49,16 +49,16 @@
 
 static int qstrcmp_plain(const void *a_, const void *b_)
 {
-   const struct string_list_elem *a = (const struct string_list_elem*)a_; 
-   const struct string_list_elem *b = (const struct string_list_elem*)b_; 
+   const struct string_list_elem *a = (const struct string_list_elem*)a_;
+   const struct string_list_elem *b = (const struct string_list_elem*)b_;
 
    return strcasecmp(a->data, b->data);
 }
 
 static int qstrcmp_dir(const void *a_, const void *b_)
 {
-   const struct string_list_elem *a = (const struct string_list_elem*)a_; 
-   const struct string_list_elem *b = (const struct string_list_elem*)b_; 
+   const struct string_list_elem *a = (const struct string_list_elem*)a_;
+   const struct string_list_elem *b = (const struct string_list_elem*)b_;
    int a_type = a->attr.i;
    int b_type = b->attr.i;
 

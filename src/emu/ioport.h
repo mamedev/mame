@@ -369,6 +369,7 @@ enum ioport_type
 		IPT_UI_LOAD_STATE,
 		IPT_UI_TAPE_START,
 		IPT_UI_TAPE_STOP,
+
 		IPT_UI_TOGGLE_AUTOFIRE,			// autofire toggle button
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,

@@ -37,7 +37,7 @@
 #define ATTR_PURE               __attribute__((pure))
 #define ATTR_CONST              __attribute__((const))
 #ifdef __LIBRETRO__
-#define ATTR_FORCE_INLINE		
+#define ATTR_FORCE_INLINE
 #else
 #define ATTR_FORCE_INLINE       __attribute__((always_inline))
 #endif

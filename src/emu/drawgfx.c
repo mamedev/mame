@@ -16,6 +16,7 @@
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
+
 #ifdef SDLMAME_ARM
 //FIXME ARM VS X86 structure Alignment -> sizeof(NO_PRIORITY) != 3
 UINT8 no_priority_size_is_wrong[1];
@@ -23,6 +24,7 @@ UINT8 no_priority_size_is_wrong[1];
 // if this line errors during compile, the size of NO_PRIORITY is wrong and I need to use something else
 UINT8 no_priority_size_is_wrong[2 * (sizeof(NO_PRIORITY) == 3) - 1];
 #endif
+
 bitmap_ind8 drawgfx_dummy_priority_bitmap;
 
 

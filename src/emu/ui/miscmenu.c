@@ -558,7 +558,7 @@ void ui_menu_autofire::handle()
 
 	/* process the menu */
 	const ui_menu_event *menu_event = process(0);
-	
+
 	/* handle events */
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{

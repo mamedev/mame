@@ -144,7 +144,7 @@ static bool gen_filter_sinc(struct scaler_ctx *ctx)
 {
    int x_pos, x_step, y_pos, y_step;
    double phase_mul_horiz, phase_mul_vert;
-   /* Need to expand the filter when downsampling 
+   /* Need to expand the filter when downsampling
     * to get a proper low-pass effect. */
    const int sinc_size      = 8 * ((ctx->in_width > ctx->out_width)
          ? next_pow2(ctx->in_width / ctx->out_width) : 1);
@@ -182,7 +182,7 @@ static bool validate_filter(struct scaler_ctx *ctx)
    {
       if (ctx->horiz.filter_pos[i] > max_w_pos || ctx->horiz.filter_pos[i] < 0)
       {
-         fprintf(stderr, "Out X = %d => In X = %d\n", i, ctx->horiz.filter_pos[i]); 
+         fprintf(stderr, "Out X = %d => In X = %d\n", i, ctx->horiz.filter_pos[i]);
          return false;
       }
    }
@@ -193,7 +193,7 @@ static bool validate_filter(struct scaler_ctx *ctx)
    {
       if (ctx->vert.filter_pos[i] > max_h_pos || ctx->vert.filter_pos[i] < 0)
       {
-         fprintf(stderr, "Out Y = %d => In Y = %d\n", i, ctx->vert.filter_pos[i]); 
+         fprintf(stderr, "Out Y = %d => In Y = %d\n", i, ctx->vert.filter_pos[i]);
          return false;
       }
    }

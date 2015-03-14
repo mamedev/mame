@@ -52,11 +52,11 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SNAPSHOT_DIRECTORY,                         "snap",      OPTION_STRING,     "directory to save screenshots" },
 	{ OPTION_DIFF_DIRECTORY,                             "diff",      OPTION_STRING,     "directory to save hard drive image difference files" },
 	{ OPTION_COMMENT_DIRECTORY,                          "comments",  OPTION_STRING,     "directory to save debugger comments" },
-	
+
 	// MKCHAMP - ADDING CFG OPTION TO SPECIFY HISCORE DIRECTORY..."hi" BY DEFAULT
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
 	{ OPTION_HISCORE_DIRECTORY,                          "hi",        OPTION_STRING,     "directory to save hiscores" },
- 
+
 	// state/playback options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE STATE/PLAYBACK OPTIONS" },
 	{ OPTION_STATE,                                      NULL,        OPTION_STRING,     "saved state to load" },
