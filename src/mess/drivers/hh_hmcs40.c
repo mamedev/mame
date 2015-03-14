@@ -15,7 +15,7 @@
  *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
 
  *04      HD38800A  1980, Gakken Heiankyo Alien
- *23      HD38800A  198?, Tomy Kingman
+ @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster (DM-21Z)
@@ -336,7 +336,7 @@ WRITE8_MEMBER(hh_hmcs40_state::alnattck_plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT32 plate = BITSWAP16((UINT16)m_plate,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15) | (m_plate & 0xf0000);
+	UINT32 plate = BITSWAP16(m_plate,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15) | (m_plate & 0xf0000);
 	
 	display_matrix(20, 10, plate, m_grid);
 }
@@ -624,6 +624,41 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Tomy Kingman (manufactured in Japan)
+  * boards are labeled THF-01II 2E138E01/2E128E02
+  * Hitachi HD38800B23 MCU
+  * cyan/red/blue VFD display Futaba DM-65ZK 3A
+  
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+static INPUT_PORTS_START( kingman )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( kingman, hh_hmcs40_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+
+//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tomy(tronic) Tron (manufactured in Japan)
   * boards are labeled THN-02 2E114E07
   * Hitachi HD38800A88 MCU
@@ -739,6 +774,13 @@ ROM_START( pbqbert )
 ROM_END
 
 
+ROM_START( kingman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b23", 0x0000, 0x1000, CRC(f8dfe14f) SHA1(660610d92ae7e5f92bddf5a3bcc2296b2ec3946b) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( tmtron )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38800a88", 0x0000, 0x1000, CRC(33db9670) SHA1(d6f747a59356526698784047bcfdbb59e79b9a23) )
@@ -763,4 +805,5 @@ CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
-CONS( 1982, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )

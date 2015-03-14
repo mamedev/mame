@@ -2352,13 +2352,22 @@ ROM_START( puzznicj )
 	ROM_LOAD( "c20-05.ic3", 0x0000, 0x0144, CRC(f90e5594) SHA1(6181bb25b77028bb150c84bdc073f0457efd7eaa) ) // Confirmed/Matches Japan Set
 ROM_END
 
-ROM_START( puzznici ) /* bootleg */
+ROM_START( puzznici ) /* bootleg (original main board, bootleg sub-board without MCU) */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1.ic11",  0x00000, 0x20000, CRC(4612f5e0) SHA1(dc07a365414666568537d31ef01b58f2362cadaf) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "u10.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
 	ROM_LOAD16_BYTE( "3.ic9",     0x00001, 0x20000, CRC(2bf5232a) SHA1(a8fc06bb8bae2ca6bd21e3a96c9ed38bb356d5d7) )
+ROM_END
+
+ROM_START( puzznicb ) /* bootleg (original main board, bootleg sub-board without MCU) */
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic11.bin",  0x00000, 0x20000, CRC(2510df4d) SHA1(534327e3d7f847b6c0effc5fd0fb9f5da9b0d3b1) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // this has the bad line in tile 1 fixed (unused I believe) are we sure the roms used in the original sets are a good dump?
+	ROM_LOAD16_BYTE( "ic10.bin",  0x00000, 0x10000, CRC(be12749a) SHA1(c67d1a434486843a6776d89e905362b7db595d8d) )
+	ROM_LOAD16_BYTE( "ic9.bin",   0x00001, 0x10000, CRC(0f183340) SHA1(9eef7de801eb9763313f55a38e567b92fca3bfa6) )
 ROM_END
 
 /*
@@ -2588,13 +2597,13 @@ GAME( 1989, flipull,   plotting, plotting,  plotting,  driver_device, 0,        
 GAME( 1989, puzznic,   0,        puzznic,   puzznic,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   driver_device, 0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   driver_device, 0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
+GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   driver_device, 0,         ROT0,   "bootleg", "Puzznic (bootleg)", 0 )
 
 GAME( 1990, horshoes,  0,        horshoes,  horshoes,  driver_device, 0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 
 GAME( 1990, palamed,   0,        palamed,   palamed,   driver_device, 0,         ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 
 GAME( 1993, cachat,    0,        cachat,    cachat,    driver_device, 0,         ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
-
 GAME( 1993, tubeit,    cachat,   cachat,    tubeit,    driver_device, 0,         ROT0,   "bootleg", "Tube-It", 0 ) // No (c) message
 
 GAME( 199?, cubybop,   0,        cachat,    cubybop,   driver_device, 0,         ROT0,   "Hot-B", "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
@@ -2603,6 +2612,6 @@ GAME( 1992, plgirls,   0,        cachat,    plgirls,   driver_device, 0,        
 GAME( 1992, lagirl,    plgirls,  cachat,    plgirls,   driver_device, 0,         ROT270, "bootleg", "LA Girl", 0 ) // bootleg hardware with changed title & backgrounds
 
 GAME( 1993, plgirls2,  0,        cachat,    plgirls2,  driver_device, 0,         ROT270, "Hot-B", "Play Girls 2", 0 )
-GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  driver_device, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", 0 ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts the same)
+GAME( 1993, plgirls2b, plgirls2, cachat,    plgirls2,  driver_device, 0,         ROT270, "bootleg", "Play Girls 2 (bootleg)", GAME_IMPERFECT_GRAPHICS ) // bootleg hardware (regular Z80 etc. instead of TC0090LVC, but acts almost the same - scroll offset problems)
 
 GAME( 1990, evilston,  0,        evilston,  evilston,  driver_device, 0,         ROT270, "Spacy Industrial, Ltd.", "Evil Stone", GAME_IMPERFECT_SOUND ) // not Taito PCB, just uses TC0090LVC

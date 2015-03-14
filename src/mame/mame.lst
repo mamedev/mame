@@ -2283,7 +2283,8 @@ champwru        // C01 (c) 1989 Taito America Corporation (US)
 champwrj        // C01 (c) 1989 Taito Corporation (Japan)
 puzznic         // C20 (c) 1989 Taito Corporation (Japan)
 puzznicj        // C20 (c) 1989 Taito Corporation (Japan)
-puzznici        // C20 (c) 1989 Taito Corporation (Japan)
+puzznici        // bootleg
+puzznicb        // bootleg
 horshoes        // C47 (c) 1990 Taito America Corporation (US)
 palamed         // C63 (c) 1990 Taito Corporation (Japan)
 cachat          // ??? (c) 1993 Taito Corporation (Japan)
@@ -11237,6 +11238,7 @@ peip0120        // (c) 1987 IGT - International Game Technology
 pemg0183        // (c) 1994 IGT - International Game Technology
 pemg0252        // (c) 1994 IGT - International Game Technology
 pebe0014        // (c) 1994 IGT - International Game Technology
+pebe0014a       // (c) 1994 IGT - International Game Technology
 peke0017        // (c) 1994 IGT - International Game Technology
 peke1012        // (c) 1994 IGT - International Game Technology
 peke1013        // (c) 1994 IGT - International Game Technology
@@ -11265,7 +11267,9 @@ peps0631        // (c) 1996 IGT - International Game Technology
 peps0716        // (c) 1996 IGT - International Game Technology
 pex0002p        // (c) 1995 IGT - International Game Technology
 pex0002pa       // (c) 1995 IGT - International Game Technology
+pex0006p        // (c) 1995 IGT - International Game Technology
 pex0040p        // (c) 1995 IGT - International Game Technology
+pex0042p        // (c) 1995 IGT - International Game Technology
 pex0045p        // (c) 1995 IGT - International Game Technology
 pex0046p        // (c) 1995 IGT - International Game Technology
 pex0054p        // (c) 1995 IGT - International Game Technology
@@ -11328,6 +11332,10 @@ pex0725p        // (c) 1995 IGT - International Game Technology
 pex0726p        // (c) 1995 IGT - International Game Technology
 pex0727p        // (c) 1995 IGT - International Game Technology
 pex0763p        // (c) 1995 IGT - International Game Technology
+pex0764p        // (c) 1995 IGT - International Game Technology
+pex2010p        // (c) 1995 IGT - International Game Technology
+pex2016p        // (c) 1995 IGT - International Game Technology
+pex2017p        // (c) 1995 IGT - International Game Technology
 pex2018p        // (c) 1995 IGT - International Game Technology
 pex2025p        // (c) 1995 IGT - International Game Technology
 pex2026p        // (c) 1995 IGT - International Game Technology
@@ -11336,7 +11344,9 @@ pex2029p        // (c) 1995 IGT - International Game Technology
 pex2031p        // (c) 1995 IGT - International Game Technology
 pex2035p        // (c) 1995 IGT - International Game Technology
 pex2036p        // (c) 1995 IGT - International Game Technology
+pex2037p        // (c) 1995 IGT - International Game Technology
 pex2038p        // (c) 1995 IGT - International Game Technology
+pex2039p        // (c) 1995 IGT - International Game Technology
 pex2040p        // (c) 1995 IGT - International Game Technology
 pex2042p        // (c) 1995 IGT - International Game Technology
 pex2043p        // (c) 1995 IGT - International Game Technology
@@ -11358,6 +11368,7 @@ pex2241p        // (c) 1995 IGT - International Game Technology
 pex2244p        // (c) 1995 IGT - International Game Technology
 pex2245p        // (c) 1995 IGT - International Game Technology
 pex2245pa       // (c) 1995 IGT - International Game Technology
+pex2247p        // (c) 1995 IGT - International Game Technology
 pex2250p        // (c) 1995 IGT - International Game Technology
 pex2251p        // (c) 1995 IGT - International Game Technology
 pex2272p        // (c) 1995 IGT - International Game Technology
@@ -11374,6 +11385,7 @@ pex2310p        // (c) 1995 IGT - International Game Technology
 pex2314p        // (c) 1995 IGT - International Game Technology
 pex2374p        // (c) 1995 IGT - International Game Technology
 pex2377p        // (c) 1995 IGT - International Game Technology
+pex2386p        // (c) 1995 IGT - International Game Technology
 pex2419p        // (c) 1995 IGT - International Game Technology
 pex2420p        // (c) 1995 IGT - International Game Technology
 pex2421p        // (c) 1995 IGT - International Game Technology

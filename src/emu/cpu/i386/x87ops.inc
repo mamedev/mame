@@ -2185,13 +2185,41 @@ void i386_device::x87_fprem(UINT8 modrm)
 	}
 	else
 	{
-		floatx80 a = ST(0);
-		floatx80 b = ST(1);
+		floatx80 a0 = ST(0);
+		floatx80 b1 = ST(1);
 
 		m_x87_sw &= ~X87_SW_C2;
 
-		// TODO: Implement Cx bits
-		result = floatx80_rem(a, b);
+		//int d=extractFloatx80Exp(a0)-extractFloatx80Exp(b1);
+		int d = (a0.high & 0x7FFF) - (b1.high & 0x7FFF);
+		if (d < 64) {
+			floatx80 t=floatx80_div(a0, b1);
+			int64 q = floatx80_to_int64_round_to_zero(t);
+			floatx80 qf = int64_to_floatx80(q);
+			floatx80 tt = floatx80_mul(b1, qf);
+			result = floatx80_sub(a0, tt);
+			// C2 already 0
+			m_x87_sw &= ~(X87_SW_C0|X87_SW_C3|X87_SW_C1);
+			if (q & 1)
+				m_x87_sw |= X87_SW_C1;
+			if (q & 2)
+				m_x87_sw |= X87_SW_C3;
+			if (q & 4)
+				m_x87_sw |= X87_SW_C0;
+		}
+		else {
+			m_x87_sw |= X87_SW_C2;
+			int n = 63;
+			int e = 1 << (d - n);
+			floatx80 ef = int32_to_floatx80(e);
+			floatx80 t=floatx80_div(a0, b1);
+			floatx80 td = floatx80_div(t, ef);
+			int64 qq = floatx80_to_int64_round_to_zero(td);
+			floatx80 qqf = int64_to_floatx80(qq);
+			floatx80 tt = floatx80_mul(b1, qqf);
+			floatx80 ttt = floatx80_mul(tt, ef);
+			result = floatx80_sub(a0, ttt);
+		}
 	}
 
 	if (x87_check_exceptions())
@@ -2411,7 +2439,7 @@ void i386_device::x87_fpatan(UINT8 modrm)
 	else
 	{
 		// TODO: Inaccurate
-		double val = atan(fx80_to_double(ST(1)) / fx80_to_double(ST(0)));
+		double val = atan2(fx80_to_double(ST(1)) , fx80_to_double(ST(0)));
 		result = double_to_fx80(val);
 	}
 
@@ -4519,7 +4547,7 @@ void i386_device::x87_fsave(UINT8 modrm)
 	}
 
 	for (int i = 0; i < 8; ++i)
-		x87_write_stack(i, READ80(ea + i*10), FALSE);
+		WRITE80(ea + i*10, ST(i));
 
 	CYCLES((m_cr[0] & 1) ? 56 : 67);
 }
@@ -4575,7 +4603,7 @@ void i386_device::x87_frstor(UINT8 modrm)
 	}
 
 	for (int i = 0; i < 8; ++i)
-		WRITE80(ea + i*10, ST(i));
+		x87_write_stack(i, READ80(ea + i*10), FALSE);
 
 	CYCLES((m_cr[0] & 1) ? 34 : 44);
 }

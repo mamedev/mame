@@ -34,7 +34,7 @@ void hmcs40_cpu_device::push_stack()
 
 void hmcs40_cpu_device::op_illegal()
 {
-	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc << 1);
+	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc);
 }
 
 
@@ -110,13 +110,13 @@ void hmcs40_cpu_device::op_lya()
 void hmcs40_cpu_device::op_lxi()
 {
 	// LXI i: Load X from Immediate
-	m_x = m_op & 0xf;
+	m_x = m_i;
 }
 
 void hmcs40_cpu_device::op_lyi()
 {
 	// LYI i: Load Y from Immediate
-	m_y = m_op & 0xf;
+	m_y = m_i;
 }
 
 void hmcs40_cpu_device::op_iy()
@@ -223,20 +223,20 @@ void hmcs40_cpu_device::op_lmady()
 void hmcs40_cpu_device::op_lmiiy()
 {
 	// LMIIY i: Load Memory from Immediate, Increment Y
-	ram_w(m_op & 0xf);
+	ram_w(m_i);
 	op_iy();
 }
 
 void hmcs40_cpu_device::op_lai()
 {
 	// LAI i: Load A from Immediate
-	m_a = m_op & 0xf;
+	m_a = m_i;
 }
 
 void hmcs40_cpu_device::op_lbi()
 {
 	// LBI i: Load B from Immediate
-	m_b = m_op & 0xf;
+	m_b = m_i;
 }
 
 
@@ -245,7 +245,7 @@ void hmcs40_cpu_device::op_lbi()
 void hmcs40_cpu_device::op_ai()
 {
 	// AI i: Add Immediate to A
-	m_a += (m_op & 0xf);
+	m_a += (m_i);
 	m_s = m_a >> 4 & 1;
 	m_a &= 0xf;
 }
@@ -368,13 +368,13 @@ void hmcs40_cpu_device::op_or()
 void hmcs40_cpu_device::op_mnei()
 {
 	// MNEI i: Memory Not Equal to Immediate
-	m_s = (ram_r() != (m_op & 0xf));
+	m_s = (ram_r() != (m_i));
 }
 
 void hmcs40_cpu_device::op_ynei()
 {
 	// YNEI i: Y Not Equal to Immediate
-	m_s = (m_y != (m_op & 0xf));
+	m_s = (m_y != (m_i));
 }
 
 void hmcs40_cpu_device::op_anem()
@@ -392,7 +392,7 @@ void hmcs40_cpu_device::op_bnem()
 void hmcs40_cpu_device::op_alei()
 {
 	// ALEI i: A Less or Equal to Immediate
-	m_s = (m_a <= (m_op & 0xf));
+	m_s = (m_a <= (m_i));
 }
 
 void hmcs40_cpu_device::op_alem()
@@ -458,7 +458,7 @@ void hmcs40_cpu_device::op_lpu()
 	if (m_s)
 		m_page = m_op & 0x1f;
 	else
-		m_op = 0;
+		m_op = 0; // fake nop
 }
 
 void hmcs40_cpu_device::op_tbr()
@@ -480,115 +480,118 @@ void hmcs40_cpu_device::op_rtn()
 void hmcs40_cpu_device::op_seie()
 {
 	// SEIE: Set I/E
-	op_illegal();
+	m_ie = 1;
 }
 
 void hmcs40_cpu_device::op_seif0()
 {
 	// SEIF0: Set IF0
-	op_illegal();
+	m_if[0] = 1;
 }
 
 void hmcs40_cpu_device::op_seif1()
 {
 	// SEIF1: Set IF1
-	op_illegal();
+	m_if[1] = 1;
 }
 
 void hmcs40_cpu_device::op_setf()
 {
 	// SETF: Set TF
-	op_illegal();
+	m_tf = 1;
 }
 
 void hmcs40_cpu_device::op_secf()
 {
 	// SECF: Set CF
-	op_illegal();
+	m_cf = 1;
 }
 
 void hmcs40_cpu_device::op_reie()
 {
 	// REIE: Reset I/E
-	op_illegal();
+	m_ie = 0;
 }
 
 void hmcs40_cpu_device::op_reif0()
 {
 	// REIF0: Reset IF0
-	op_illegal();
+	m_if[0] = 0;
 }
 
 void hmcs40_cpu_device::op_reif1()
 {
 	// REIF1: Reset IF1
-	op_illegal();
+	m_if[1] = 0;
 }
 
 void hmcs40_cpu_device::op_retf()
 {
 	// RETF: Reset TF
-	op_illegal();
+	m_tf = 0;
 }
 
 void hmcs40_cpu_device::op_recf()
 {
 	// RECF: Reset CF
-	op_illegal();
+	m_cf = 0;
 }
 
 void hmcs40_cpu_device::op_ti0()
 {
 	// TI0: Test INT0
-	op_illegal();
+	m_s = m_int[0];
 }
 
 void hmcs40_cpu_device::op_ti1()
 {
 	// TI1: Test INT1
-	op_illegal();
+	m_s = m_int[1];
 }
 
 void hmcs40_cpu_device::op_tif0()
 {
 	// TIF0: Test IF0
-	op_illegal();
+	m_s = m_if[0];
 }
 
 void hmcs40_cpu_device::op_tif1()
 {
 	// TIF1: Test IF1
-	op_illegal();
+	m_s = m_if[1];
 }
 
 void hmcs40_cpu_device::op_ttf()
 {
 	// TTF: Test TF
-	op_illegal();
+	m_s = m_tf;
 }
 
 void hmcs40_cpu_device::op_lti()
 {
 	// LTI i: Load Timer/Counter from Immediate
-	op_illegal();
+	m_tc = m_i;
+	reset_prescaler();
 }
 
 void hmcs40_cpu_device::op_lta()
 {
 	// LTA: Load Timer/Counter from A
-	op_illegal();
+	m_tc = m_a;
+	reset_prescaler();
 }
 
 void hmcs40_cpu_device::op_lat()
 {
 	// LAT: Load A from Timer/Counter
-	op_illegal();
+	m_a = m_tc;
 }
 
 void hmcs40_cpu_device::op_rtni()
 {
 	// RTNI: Return from Interrupt
-	op_illegal();
+	op_seie();
+	op_rtn();
 }
 
 
@@ -615,13 +618,13 @@ void hmcs40_cpu_device::op_td()
 void hmcs40_cpu_device::op_sedd()
 {
 	// SEDD n: Set Discrete I/O Latch Direct
-	write_d(m_op & 0xf, 1);
+	write_d(m_i, 1);
 }
 
 void hmcs40_cpu_device::op_redd()
 {
 	// REDD n: Reset Discrete I/O Latch Direct
-	write_d(m_op & 0xf, 0);
+	write_d(m_i, 0);
 }
 
 void hmcs40_cpu_device::op_lar()
