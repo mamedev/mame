@@ -152,11 +152,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(jankenmn_hopper_status_r);
-	DECLARE_WRITE8_MEMBER(jankenmn_lamps1_w);
-	DECLARE_WRITE8_MEMBER(jankenmn_lamps2_w);
-	DECLARE_WRITE8_MEMBER(jankenmn_lamps3_w);
 	required_device<cpu_device> m_maincpu;
+	
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
+	DECLARE_WRITE8_MEMBER(lamps3_w);
+	
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
 };
 
 
@@ -167,7 +169,7 @@ public:
 static const UINT8 led_map[16] = // 7748 IC?
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-WRITE8_MEMBER(jankenmn_state::jankenmn_lamps1_w)
+WRITE8_MEMBER(jankenmn_state::lamps1_w)
 {
 	// hand state: d0: rock, d1: scissors, d2: paper
 	output_set_lamp_value(8, (data & 7) != 0);
@@ -183,7 +185,7 @@ WRITE8_MEMBER(jankenmn_state::jankenmn_lamps1_w)
 	// d3: ? (only set if game is over)
 }
 
-WRITE8_MEMBER(jankenmn_state::jankenmn_lamps2_w)
+WRITE8_MEMBER(jankenmn_state::lamps2_w)
 {
 	// button LEDs: d1: paper, d2: scissors, d3: rock
 	output_set_lamp_value(2, data >> 3 & 1);
@@ -202,7 +204,7 @@ WRITE8_MEMBER(jankenmn_state::jankenmn_lamps2_w)
 	output_set_digit_value(0, led_map[data & 1]);
 }
 
-WRITE8_MEMBER(jankenmn_state::jankenmn_lamps3_w)
+WRITE8_MEMBER(jankenmn_state::lamps3_w)
 {
 	// d1: blue rotating lamp on top of cab
 	output_set_lamp_value(15, data >> 1 & 1);
@@ -220,7 +222,7 @@ WRITE8_MEMBER(jankenmn_state::jankenmn_lamps3_w)
 	// d0, d6, d7: N/C?
 }
 
-CUSTOM_INPUT_MEMBER(jankenmn_state::jankenmn_hopper_status_r)
+CUSTOM_INPUT_MEMBER(jankenmn_state::hopper_status_r)
 {
 	// temp workaround, needs hopper
 	return machine().rand();
@@ -257,7 +259,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state,jankenmn_hopper_status_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
@@ -315,13 +317,13 @@ static MACHINE_CONFIG_START( jankenmn, jankenmn_state )
 	/* (10-13) Mode 0 - Ports A & B set as input, high C & low C as output. */
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, jankenmn_lamps3_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps3_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
 	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("dac", dac_device, write_unsigned8))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jankenmn_state, jankenmn_lamps1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, jankenmn_lamps2_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(jankenmn_state, lamps1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps2_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -359,4 +361,4 @@ ROM_END
 *********************************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT                 ROT    COMPANY    FULLNAME                   FLAGS...  LAYOUT */
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, driver_device, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", 0,        layout_jankenmn )
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, driver_device, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", GAME_SUPPORTS_SAVE,        layout_jankenmn )
