@@ -2411,7 +2411,7 @@ void i386_device::x87_fpatan(UINT8 modrm)
 	else
 	{
 		// TODO: Inaccurate
-		double val = atan(fx80_to_double(ST(1)) / fx80_to_double(ST(0)));
+		double val = atan2(fx80_to_double(ST(1)) , fx80_to_double(ST(0)));
 		result = double_to_fx80(val);
 	}
 
