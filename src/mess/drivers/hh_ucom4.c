@@ -19,7 +19,7 @@
  *128     uPD650C  1982, Roland TR-606
   133     uPD650C  1982, Roland TB-303
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
- *202     uPD553C  1982, Epoch Astro Command
+ @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
@@ -87,6 +87,10 @@ public:
 	DECLARE_READ8_MEMBER(splasfgt_input_b_r);
 	DECLARE_WRITE8_MEMBER(splasfgt_grid_w);
 	DECLARE_WRITE8_MEMBER(splasfgt_plate_w);
+
+	void astrocmd_display();
+	DECLARE_WRITE8_MEMBER(astrocmd_grid_w);
+	DECLARE_WRITE8_MEMBER(astrocmd_plate_w);
 
 	DECLARE_WRITE8_MEMBER(edracula_grid_w);
 	DECLARE_WRITE8_MEMBER(edracula_plate_w);
@@ -476,6 +480,102 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Epoch Astro Command (manufactured in Japan)
+  * PCB label 96111
+  * NEC uCOM-43 MCU, labeled D553C 202
+  * cyan/red VFD display NEC FIP9AM20T NO.42, with color overlay
+
+  known releases:
+  - Japan: Astro Command
+  - USA: Astro Command, published by Tandy
+  - UK: Scramble, published by Grandstand
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+void hh_ucom4_state::astrocmd_display()
+{
+	UINT32 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
+
+	display_matrix(17, 9, plate, grid);
+}
+
+WRITE8_MEMBER(hh_ucom4_state::astrocmd_grid_w)
+{
+	// C,D(,E3): vfd matrix grid
+	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+
+	astrocmd_display();
+}
+
+WRITE8_MEMBER(hh_ucom4_state::astrocmd_plate_w)
+{
+	// E01,F,G,H,I: vfd matrix plate
+	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	if (offset == NEC_UCOM4_PORTE)
+	{
+		// E2: speaker out
+		m_speaker->level_w(data >> 2 & 1);
+		
+		// E3: vfd matrix grid 8
+		astrocmd_grid_w(space, offset, data >> 3 & 1);
+	}
+	else
+		astrocmd_display();
+}
+
+
+static INPUT_PORTS_START( astrocmd )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+
+	PORT_START("IN.1") // port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( astrocmd, hh_ucom4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
+	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, astrocmd_grid_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, astrocmd_grid_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Epoch Dracula (manufactured in Japan)
   * PCB label 96121
   * NEC uCOM-43 MCU, labeled D553C 206
@@ -719,7 +819,7 @@ MACHINE_CONFIG_END
 
 void hh_ucom4_state::tmpacman_display()
 {
-	UINT8 grid = BITSWAP8((UINT8)m_grid,0,1,2,3,4,5,6,7);
+	UINT32 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
 	
 	display_matrix(19, 8, plate | 0x100, grid); // plate 8 (maze) is always on
@@ -929,9 +1029,15 @@ ROM_START( splasfgt )
 ROM_END
 
 
+ROM_START( astrocmd )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
+ROM_END
+
+
 ROM_START( edracula )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-206", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
+	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
 ROM_END
 
 
@@ -958,6 +1064,7 @@ ROM_END
 CONS( 1979, ssfball,   0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1980, splasfgt,  0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
+CONS( 1982, astrocmd,  0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1982, edracula,  0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1980, tmtennis,  0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
