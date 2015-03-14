@@ -46,8 +46,8 @@ ifeq ($(TARGET),)
 endif
 
 TARGET_NAME := $(TARGET)
-EXE = 
-LIBS = 
+EXE =
+LIBS =
 
 ifeq ($(TARGET), mess)
 	CORE_DEFINE := -DWANT_MESS
@@ -102,7 +102,7 @@ VRENDER ?= soft
 # Unix
 ifeq ($(platform), unix)
 	TARGETLIB := $(TARGET_NAME)_libretro.so
-	TARGETOS=linux  
+	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
 	CCOMFLAGS += $(fpic) -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
@@ -117,10 +117,10 @@ ifeq ($(platform), unix)
 	NATIVECC = g++
 	NATIVECFLAGS = -std=gnu99
 	BASELIBS +=  -lpthread
-	CC_AS = gcc 
+	CC_AS = gcc
 	CC = g++
 	AR = @ar
-	LD = g++ 
+	LD = g++
 	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++ -lpthread -ldl
 	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
@@ -142,13 +142,13 @@ ifeq ($(platform), unix)
 else ifeq ($(platform), android)
 	armplatform := 1
 	TARGETLIB := $(TARGET_NAME)_libretro.so
-	TARGETOS=linux  
+	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
 	CC_AS = @arm-linux-androideabi-gcc
 	CC = @arm-linux-androideabi-g++
 	AR = @arm-linux-androideabi-ar
-	LD = @arm-linux-androideabi-g++ 
+	LD = @arm-linux-androideabi-g++
 	FORCE_DRC_C_BACKEND = 1
 	CCOMFLAGS += -fPIC -mstructure-size-boundary=32 -mthumb-interwork -falign-functions=16 -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
 	PLATCFLAGS += -march=armv7-a -mfloat-abi=softfp -DANDROID -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DSDLMAME_ARM -DRETRO_SETJMP_HACK
@@ -161,9 +161,9 @@ else ifeq ($(platform), android)
 	NATIVELD = g++
 	NATIVELDFLAGS = -Wl,--warn-common -lstdc++
 	NATIVECC = g++
-	NATIVECFLAGS = -std=gnu99 
+	NATIVECFLAGS = -std=gnu99
 	CCOMFLAGS += $(PLATCFLAGS)
-	LIBS += -lstdc++ 
+	LIBS += -lstdc++
 	#-lpthread
 
 # OS X
@@ -231,7 +231,7 @@ else ifeq ($(platform), ios)
 else ifeq ($(platform), qnx)
 	armplatform := 1
 	TARGETLIB := $(TARGET_NAME)_libretro_qnx.so
-	TARGETOS=linux  
+	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
 
@@ -481,7 +481,7 @@ CROSS_BUILD_OSD = $(OSD)
 # FORCE_DRC_C_BACKEND = 1
 
 #-------------------------------------------------
-# specify build options; see each option below 
+# specify build options; see each option below
 # for details
 #-------------------------------------------------
 
@@ -554,7 +554,7 @@ ifeq ($(PTR64),1)
 DEFS += -DPTR64
 endif
 
-DEFS += -DNDEBUG 
+DEFS += -DNDEBUG
 
 # need to ensure FLAC functions are statically linked
 ifeq ($(BUILD_FLAC),1)
@@ -618,7 +618,7 @@ CONLYFLAGS += \
 
 # warnings only applicable to OBJ-C compiles
 COBJFLAGS += \
-	-Wpointer-arith 
+	-Wpointer-arith
 
 # warnings only applicable to C++ compiles
 CPPONLYFLAGS += \
@@ -730,7 +730,7 @@ JPEG_LIB =
 endif
 
 # add SQLite3 library
-SQLITE3_LIB = $(OBJ)/libsqlite3.a 
+SQLITE3_LIB = $(OBJ)/libsqlite3.a
 
 # add SoftFloat floating point emulation library
 SOFTFLOAT = $(OBJ)/libsoftfloat.a
@@ -862,13 +862,13 @@ ifeq ($(NATIVE),0)
 ifeq ($(BUILDTOOLS_CUSTOM),1)
 $(OBJ)/build/file2str:
 	mkdir -p $(OBJ)/build
-	cp -R prec-build/file2str $(OBJ)/build 
+	cp -R prec-build/file2str $(OBJ)/build
 
 $(OBJ)/build/m68kmake:
-	cp -R prec-build/m68kmake $(OBJ)/build 
+	cp -R prec-build/m68kmake $(OBJ)/build
 
 $(OBJ)/build/png2bdc:
-	cp -R prec-build/png2bdc $(OBJ)/build 
+	cp -R prec-build/png2bdc $(OBJ)/build
 
 $(OBJ)/build/makedep:
 	cp -R prec-build/makedep $(OBJ)/build
@@ -877,7 +877,7 @@ $(OBJ)/build/makelist:
 	cp -R prec-build/makelist $(OBJ)/build
 
 $(OBJ)/build/verinfo:
-	cp -R prec-build/verinfo $(OBJ)/build 
+	cp -R prec-build/verinfo $(OBJ)/build
 
 $(OBJ)/build/makemak:
 	cp -R prec-build/makemak $(OBJ)/build
