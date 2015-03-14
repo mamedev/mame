@@ -23,6 +23,10 @@ IRQ mask register on the internal interrupt controller is set to 0xd8
 
 so levels 0,1,2,5 are unmasked
 
+returning random values / triggering random interrupts eventually results in a situation
+where the CPU stops writing to the sound related addresses and starts reading / masking the
+serial comms register.
+
 */
 
 
@@ -191,15 +195,17 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 
 READ16_MEMBER(hng64_state::hng64_sound_port_0004_r)
 {
+	// it writes the channel select before reading this.. so either it works on channels, or the command..
 	// read in irq5
-	logerror("%08x: hng64_sound_port_0004_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
+	printf("%08x: hng64_sound_port_0004_r mask (%04x) chn %04x\n", space.device().safe_pc(), mem_mask, m_audiochannel);
 	return rand();
 }
 
 READ16_MEMBER(hng64_state::hng64_sound_port_0006_r)
 {
+	// it writes the channel select before reading this.. so either it works on channels, or the command..
 	// read in irq5
-	logerror("%08x: hng64_sound_port_0006_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
+	printf("%08x: hng64_sound_port_0006_r mask (%04x)  chn %04x\n", space.device().safe_pc(), mem_mask, m_audiochannel);
 	return rand();
 }
 
@@ -212,28 +218,60 @@ READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 
 WRITE16_MEMBER(hng64_state::hng64_sound_select_w)
 {
-	// seems to write values in the format xxyy where yy is 0x00-0x1f and xx is oten 00/01/0a
-	// there are said to be 32 audio channels, so maybe the lower byte is the channel?
+	// I'm guessing these addresses are the sound chip / DSP?
 
-//	logerror("hng64_sound_select_w")
+	// ---- ---- 000c cccc
+	// c = channel
+
+	if (data & 0x00e0) printf("hng64_sound_select_w unknown channel %02x\n", data & 0x00ff);
+
+	UINT8 command = data >> 8;
+
+	switch (command)
+	{
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03: // 00003fffffff (startup only?)
+	case 0x04: // doesn't use 6
+	case 0x05: // 00003fffffff (mostly, often)
+	case 0x06: // 00007ff0ffff mostly
+	case 0x07: // 0000000f0708 etc. (low values)
+	case 0x08: // doesn't write to 2/4/6 with this set??
+	case 0x09: // doesn't write to 2/4/6 with this set??
+	case 0x0a: // random looking values
+
+		break;
+
+	default:
+		printf("hng64_sound_select_w unrecognized command %02x\n", command);
+		break;
+	}
+
 	COMBINE_DATA(&m_audiochannel);
 }
 
 WRITE16_MEMBER(hng64_state::hng64_sound_data_02_w)
 {
 	m_audiodat[m_audiochannel].dat[2] = data;
-//	logerror("write port 0x0002 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+
+//	if ((m_audiochannel & 0xff00) == 0x0a00)
+//		printf("write port 0x0002 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
 }
 
 WRITE16_MEMBER(hng64_state::hng64_sound_data_04_w)
 {
 	m_audiodat[m_audiochannel].dat[1] = data;
-//	logerror("write port 0x0004 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+
+//	if ((m_audiochannel & 0xff00) == 0x0a00)
+//		printf("write port 0x0004 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
 }
 WRITE16_MEMBER(hng64_state::hng64_sound_data_06_w)
 {
 	m_audiodat[m_audiochannel].dat[0] = data;
-//	logerror("write port 0x0006 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+
+//	if ((m_audiochannel & 0xff00) == 0x0a00)
+//		printf("write port 0x0006 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
 }
 
 // but why not just use the V33/V53 XA mode??
@@ -377,7 +415,12 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
 //	logerror("tcu_tm2_cb %02x\n", state);
-	m_audiocpu->set_input_line(2, state? ASSERT_LINE:CLEAR_LINE); // not accurate, just so we have a trigger
+
+	// NOT ACCURATE, just so that all the interrupts get triggered for now.
+	static int i = 0;
+	m_audiocpu->set_input_line(i, state? ASSERT_LINE:CLEAR_LINE); 
+	i++;
+	if (i == 3) i = 0;
 }
 
 
