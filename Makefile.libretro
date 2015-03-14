@@ -813,10 +813,10 @@ tools: maketree $(TOOLS)
 maketree: $(sort $(OBJDIRS))
 
 clean: $(OSDCLEAN)
-ifeq ($(PARTIAL),1)	
+ifeq ($(PARTIAL),1)
 	@echo Deleting object tree $(OBJ)...
 	$(RM) -r obj/osd/*
-else	
+else
 	@echo Deleting object tree $(OBJ)...
 	$(RM) -r obj/*
 endif
