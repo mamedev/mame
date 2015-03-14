@@ -437,6 +437,9 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lilprof )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ti30 )
 	PORT_START("IN.0") // O0
@@ -717,6 +720,17 @@ static MACHINE_CONFIG_DERIVED( wizatron, t9base )
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( lilprof, t9base )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
+//	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, lilprof_read_k))
+//	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof_write_o))
+//	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, lilprof_write_r))
+
+	MCFG_DEFAULT_LAYOUT(layout_wizatron)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( ti30, t9base )
 
@@ -776,6 +790,20 @@ ROM_START( wizatron )
 	ROM_LOAD( "tms0970_wizatron_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
 ROM_END
 
+ROM_START( lilprof )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_lilprof_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_lilprof_mpla.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0970_lilprof_opla.pla", 0, 352, CRC(03f509c4) SHA1(691554a55db0c5950df848077095f23a991b1909) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0970_lilprof_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
+ROM_END
+
 ROM_START( ti30 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "tmc0981nl", 0x0000, 0x1000, CRC(41298a14) SHA1(06f654c70add4044a612d3a38b0c2831c188fd0c) )
@@ -824,6 +852,7 @@ COMP( 1974, tisr16,   0, 0, tisr16,   tisr16,   driver_device, 0, "Texas Instrum
 
 COMP( 1976, ti1270,   0, 0, ti1270,   ti1270,   driver_device, 0, "Texas Instruments", "TI-1270", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1977, wizatron, 0, 0, wizatron, wizatron, driver_device, 0, "Texas Instruments", "Wiz-A-Tron", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1978, lilprof , 0, 0, lilprof,  lilprof,  driver_device, 0, "Texas Instruments", "Little Professor", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // 1978 version, original is from 1976
 
 COMP( 1976, ti30,     0, 0, ti30,     ti30,     driver_device, 0, "Texas Instruments", "TI-30", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1977, tiprog,   0, 0, ti30,     tiprog,   driver_device, 0, "Texas Instruments", "TI Programmer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
