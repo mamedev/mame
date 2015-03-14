@@ -723,7 +723,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( lilprof, t9base )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
+	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
 //	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, lilprof_read_k))
 //	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof_write_o))
 //	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, lilprof_write_r))
@@ -852,7 +852,7 @@ COMP( 1974, tisr16,   0, 0, tisr16,   tisr16,   driver_device, 0, "Texas Instrum
 
 COMP( 1976, ti1270,   0, 0, ti1270,   ti1270,   driver_device, 0, "Texas Instruments", "TI-1270", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1977, wizatron, 0, 0, wizatron, wizatron, driver_device, 0, "Texas Instruments", "Wiz-A-Tron", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1978, lilprof , 0, 0, lilprof,  lilprof,  driver_device, 0, "Texas Instruments", "Little Professor", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // 1978 version, original is from 1976
+COMP( 1978, lilprof , 0, 0, lilprof,  lilprof,  driver_device, 0, "Texas Instruments", "Little Professor", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_NOT_WORKING ) // 1978 version, original is from 1976
 
 COMP( 1976, ti30,     0, 0, ti30,     ti30,     driver_device, 0, "Texas Instruments", "TI-30", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1977, tiprog,   0, 0, ti30,     tiprog,   driver_device, 0, "Texas Instruments", "TI Programmer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
