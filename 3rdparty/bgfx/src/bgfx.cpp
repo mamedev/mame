@@ -972,16 +972,16 @@ namespace bgfx
 			m_viewRemap[ii] = ii;
 		}
 
-		memset(m_fb, 0xff, sizeof(m_fb) );
-		memset(m_clear, 0, sizeof(m_clear) );
-		memset(m_rect, 0, sizeof(m_rect) );
+		memset(m_fb,   0xff, sizeof(m_fb) );
+		memset(m_clear,   0, sizeof(m_clear) );
+		memset(m_rect,    0, sizeof(m_rect) );
 		memset(m_scissor, 0, sizeof(m_scissor) );
-		memset(m_seq, 0, sizeof(m_seq) );
+		memset(m_seq,     0, sizeof(m_seq) );
 		memset(m_seqMask, 0, sizeof(m_seqMask) );
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(m_rect); ++ii)
 		{
-			m_rect[ii].m_width = 1;
+			m_rect[ii].m_width  = 1;
 			m_rect[ii].m_height = 1;
 		}
 
@@ -1347,6 +1347,9 @@ namespace bgfx
 	extern RendererContextI* rendererCreateD3D12();
 	extern void rendererDestroyD3D12();
 
+	extern RendererContextI* rendererCreateVK();
+	extern void rendererDestroyVK();
+
 	struct RendererCreator
 	{
 		RendererCreateFn  createFn;
@@ -1363,6 +1366,7 @@ namespace bgfx
 		{ rendererCreateD3D12, rendererDestroyD3D12, BGFX_RENDERER_DIRECT3D12_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D12 }, // Direct3D12
 		{ rendererCreateGL,    rendererDestroyGL,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGLES   }, // OpenGLES
 		{ rendererCreateGL,    rendererDestroyGL,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGL     }, // OpenGL
+		{ rendererCreateVK,    rendererDestroyVK,    BGFX_RENDERER_VULKAN_NAME,     !!BGFX_CONFIG_RENDERER_VULKAN     }, // Vulkan
 	};
 	BX_STATIC_ASSERT(BX_COUNTOF(s_rendererCreator) == RendererType::Count);
 
@@ -1445,6 +1449,10 @@ again:
 				else if (s_rendererCreator[RendererType::OpenGLES].supported)
 				{
 					_type = RendererType::OpenGLES;
+				}
+				else if (s_rendererCreator[RendererType::Vulkan].supported)
+				{
+					_type = RendererType::Vulkan;
 				}
 			}
 			else if (BX_ENABLED(0

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Sean Riddle, Kevin Horton
 /***************************************************************************
 
   This driver is a collection of simple dedicated handheld and tabletop
@@ -13,10 +13,16 @@
 --------------------------------------------------------------------
  @CP0904A  TMS0970  1977, Milton Bradley Comp IV
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
- @MP0914   TMS1000  1978, Entex Baseball 1
+ *MP0168   TMS1000? 1979, Conic Basketball
+ @MP0914   TMS1000  1979, Entex Baseball 1
  @MP1030   TMS1100  1980, APF Mathemagician
+ @MP1204   TMS1100  1980, Entex Baseball 3
+ *MP1221   TMS1100  1980, Entex Raise The Devil
+ *MP2139   ?        1982, Gakken Galaxy Invader 1000
+ *MP2788   ?        1980, Bandai Flight Time
  @MP3226   TMS1000  1978, Milton Bradley Simon
- @MP3403   TMS1100  1978, Marx Electronic Bowling
+ *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
+  MP3403   TMS1100  1978, Marx Electronic Bowling
  @MP3404   TMS1100  1978, Parker Brothers Merlin
  @MP3405   TMS1100  1979, Coleco Amaze-A-Tron
  @MP3438A  TMS1100  1979, Kenner Star Wars Electronic Battle Command
@@ -31,6 +37,8 @@
   MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
  @MP6100A  TMS0980  1979, Ideal Electronic Detective
  @MP6101B  TMS0980  1979, Parker Brothers Stop Thief
+ *MP6361   ?        1983, Defender Strikes
+ *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
  *MP7332   TMS1400  1981, Milton Bradley Dark Tower
@@ -42,7 +50,7 @@
   M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
   M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
 
-  CD7282SL TMS1100  1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100  1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
@@ -68,7 +76,7 @@
 #include "bankshot.lh"
 #include "cnsector.lh"
 #include "ebball.lh"
-#include "elecbowl.lh"
+#include "ebball3.lh"
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
@@ -147,6 +155,14 @@ public:
 	DECLARE_WRITE16_MEMBER(ebball_write_r);
 	DECLARE_WRITE16_MEMBER(ebball_write_o);
 
+	void ebball3_display();
+	DECLARE_READ8_MEMBER(ebball3_read_k);
+	DECLARE_WRITE16_MEMBER(ebball3_write_r);
+	DECLARE_WRITE16_MEMBER(ebball3_write_o);
+	void ebball3_set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(ebball3_difficulty_switch);
+	DECLARE_MACHINE_RESET(ebball3);
+
 	DECLARE_READ8_MEMBER(elecdet_read_k);
 	DECLARE_WRITE16_MEMBER(elecdet_write_r);
 	DECLARE_WRITE16_MEMBER(elecdet_write_o);
@@ -155,10 +171,6 @@ public:
 	DECLARE_READ8_MEMBER(starwbc_read_k);
 	DECLARE_WRITE16_MEMBER(starwbc_write_r);
 	DECLARE_WRITE16_MEMBER(starwbc_write_o);
-
-	DECLARE_READ8_MEMBER(elecbowl_read_k);
-	DECLARE_WRITE16_MEMBER(elecbowl_write_r);
-	DECLARE_WRITE16_MEMBER(elecbowl_write_o);
 
 	DECLARE_READ8_MEMBER(comp4_read_k);
 	DECLARE_WRITE16_MEMBER(comp4_write_r);
@@ -899,6 +911,7 @@ static INPUT_PORTS_START( ebball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
+
 static MACHINE_CONFIG_START( ebball, hh_tms1k_state )
 
 	/* basic machine hardware */
@@ -909,6 +922,171 @@ static MACHINE_CONFIG_START( ebball, hh_tms1k_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+
+/***************************************************************************
+
+  Entex Electronic Baseball 3
+  * boards are labeled: Zeny
+  * TMS1100NLL 6007 MP1204 (die labeled MP1204)
+  * 2*SN75492N LED display driver
+  
+  This is another improvement over Entex Baseball, where gameplay is a bit more
+  varied, and it keeps up with score and innings. Like the others, the pitcher
+  controls are on a separate joypad.
+
+
+  lamp translation table: led zz from game PCB = MESS lampyx:
+  note: unlabeled panel leds are listed here as Sz, Bz, Oz, Iz, z left-to-right
+  
+    00 = -        10 = lamp75   20 = lamp72
+    01 = lamp60   11 = lamp65   21 = lamp84
+    02 = lamp61   12 = lamp55   22 = lamp85
+    03 = lamp62   13 = lamp52   23 = lamp90
+    04 = lamp63   14 = lamp80   24 = lamp92
+    05 = lamp73   15 = lamp81   25 = lamp91
+    06 = lamp53   16 = lamp51   26 = lamp93
+    07 = lamp74   17 = lamp82   27 = lamp95
+    08 = lamp64   18 = lamp83   28 = lamp94
+    09 = lamp54   19 = lamp50
+
+    S1,S2: lamp40,41
+    B1-B3: lamp30-32
+    O1,O2: lamp42,43
+    I1-I6: lamp20-25, I7-I9: lamp33-35
+
+***************************************************************************/
+
+void hh_tms1k_state::ebball3_display()
+{
+	m_display_maxx = 7;
+	m_display_maxy = 10+2;
+
+	// update current state
+	for (int y = 0; y < 10; y++)
+		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+
+	// R0,R1 are normal 7segs
+	m_7seg_mask[0] = m_7seg_mask[1] = 0x7f;
+	
+	// R4,R7 contain segments(only F and B) for the two other digits
+	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
+	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
+	m_7seg_mask[10] = m_7seg_mask[11] = 0x22;
+	
+	display_update();
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
+{
+	return read_inputs(3);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball3_write_r)
+{
+	// R0-R2: input mux
+	m_inp_mux = data & 7;
+	
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+	
+	// R0-R9: led columns
+	m_r = data;
+	ebball3_display();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball3_write_o)
+{
+	// O0-O6: led row
+	// O7: N/C
+	m_o = data & 0x7f;
+	ebball3_display();
+}
+
+
+/* physical button layout and labels is like this:
+
+    main device (batter side):            remote pitcher:
+
+                          MAN
+    PRO                    |              [FAST BALL]  [CHANGE UP]    [CURVE]  [SLIDER]
+     |                  OFF|
+     o                     o                   [STEAL DEFENSE]           [KNUCKLER]
+    AM                    AUTO
+
+    [BUNT]  [BATTER]  [STEAL]
+*/
+
+static INPUT_PORTS_START( ebball3 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Slider")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Curve")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Knuckler")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Steal")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Steal Defense")
+
+	PORT_START("IN.2") // R2
+	PORT_CONFNAME( 0x01, 0x01, "Pitcher" )
+	PORT_CONFSETTING(    0x01, "Auto" )
+	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Bunt")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // fake
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, ebball3_difficulty_switch, NULL)
+	PORT_CONFSETTING(    0x00, "Amateur" )
+	PORT_CONFSETTING(    0x01, "Professional" )
+INPUT_PORTS_END
+
+
+void hh_tms1k_state::ebball3_set_clock()
+{
+	// MCU clock is from an RC circuit(R=47K, C=33pf) oscillating by default at ~340kHz,
+	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
+	// it up to around ~440kHz.
+	m_maincpu->set_unscaled_clock(m_inp_matrix[3]->read() & 1 ? 440000 : 340000);
+}
+
+INPUT_CHANGED_MEMBER(hh_tms1k_state::ebball3_difficulty_switch)
+{
+	ebball3_set_clock();
+}
+
+MACHINE_RESET_MEMBER(hh_tms1k_state, ebball3)
+{
+	machine_reset();
+	ebball3_set_clock();
+}
+
+static MACHINE_CONFIG_START( ebball3, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 340000) // see ebball3_set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball3_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball3_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball3_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ebball3)
+
+	MCFG_MACHINE_RESET_OVERRIDE(hh_tms1k_state, ebball3)
 
 	/* no video! */
 
@@ -1133,100 +1311,6 @@ static MACHINE_CONFIG_START( starwbc, hh_tms1k_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_starwbc)
-
-	/* no video! */
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
-  Marx Series 300 Electronic Bowling Game
-  * TMS1100NLL MP3403 DBS 7836 SINGAPORE
-
-  10 lamps for bowling pins + 3 more bulbs, and 7segs for frame number and
-  scores. Board size is 10-12" by 6-8".
-
-  some clues:
-  - it's from 1978
-  - Merlin is MP3404, Amaze-A-Tron is MP3405, this one is MP3403
-  - it plays some short jingles (you need to be lucky with button mashing)
-
-***************************************************************************/
-
-READ8_MEMBER(hh_tms1k_state::elecbowl_read_k)
-{
-	return read_inputs(4);
-}
-
-WRITE16_MEMBER(hh_tms1k_state::elecbowl_write_r)
-{
-	// R4-R7: input mux
-	m_inp_mux = data >> 4 & 0xf;
-
-	// R9: speaker out
-	m_speaker->level_w(data >> 9 & 1);
-
-	// R10: maybe a switch or other button row?
-	// others: ?
-}
-
-WRITE16_MEMBER(hh_tms1k_state::elecbowl_write_o)
-{
-	// ?
-}
-
-static INPUT_PORTS_START( elecbowl )
-	PORT_START("IN.0") // R4
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)
-
-	PORT_START("IN.1") // R5
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)
-
-	PORT_START("IN.2") // R6
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) // reset/newgame?
-
-	PORT_START("IN.3") // R7
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)
-INPUT_PORTS_END
-
-
-static const UINT16 elecbowl_output_pla[0x20] =
-{
-	/* O output PLA configuration currently unknown */
-	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
-};
-
-static MACHINE_CONFIG_START( elecbowl, hh_tms1k_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 300000) // approximation - unknown freq
-	MCFG_TMS1XXX_OUTPUT_PLA(elecbowl_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, elecbowl_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, elecbowl_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, elecbowl_write_o))
 
 	/* no video! */
 
@@ -2102,6 +2186,17 @@ ROM_START( ebball )
 ROM_END
 
 
+ROM_START( ebball3 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_ebball3_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ebball3_opla.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
+ROM_END
+
+
 ROM_START( elecdet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp6100a", 0x0000, 0x1000, CRC(6f396bb8) SHA1(1f104d4ca9bee0d4572be4779b7551dfe20c4f04) )
@@ -2135,17 +2230,6 @@ ROM_START( starwbcp )
 	ROM_LOAD( "tms1100_starwbc_mpla.pla", 0, 867, CRC(03574895) SHA1(04407cabfb3adee2ee5e4218612cb06c12c540f4) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_starwbc_opla.pla", 0, 365, CRC(d358a76d) SHA1(06b60b207540e9b726439141acadea9aba718013) )
-ROM_END
-
-
-ROM_START( elecbowl )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "mp3403", 0x0000, 0x0800, CRC(9eabaa7d) SHA1(b1f54587ed7f2bbf3a5d49075c807296384c2b06) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, BAD_DUMP CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) ) // not verified
-	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1100_elecbowl_opla.pla", 0, 365, NO_DUMP )
 ROM_END
 
 
@@ -2270,20 +2354,19 @@ CONS( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF
 CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
-CONS( 1978, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE ) // or 1979?
+CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
+CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // unplayable without game cards
 
 CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
 CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (prototype)", GAME_SUPPORTS_SAVE )
 
-CONS( 1978, elecbowl,  0,        0, elecbowl,  elecbowl,  driver_device, 0, "Marx", "Electronic Bowling", GAME_SUPPORTS_SAVE | GAME_MECHANICAL | GAME_NOT_WORKING )
-
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // unplayable without writing board
-CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin", GAME_SUPPORTS_SAVE )
+CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )
 CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE ) // unplayable without game board
 CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE )

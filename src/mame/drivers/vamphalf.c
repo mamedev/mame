@@ -163,9 +163,6 @@ public:
 	DECLARE_WRITE32_MEMBER(wyvernwg_snd_w);
 	DECLARE_WRITE16_MEMBER(misncrft_snd_w);
 
-	DECLARE_READ32_MEMBER(yorijori_1c_r);
-	DECLARE_WRITE32_MEMBER(yorijori_1c_w);
-	DECLARE_READ32_MEMBER(yorijori_10_r);
 
 	DECLARE_READ8_MEMBER(qs1000_p1_r);
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
@@ -377,20 +374,7 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 	}
 }
 
-READ32_MEMBER(vamphalf_state::yorijori_10_r)
-{
-	printf("yorijori_10_r %08x\n", space.device().safe_pc());
-	return 0xffffffff;
-}
-READ32_MEMBER(vamphalf_state::yorijori_1c_r)
-{
-//  printf("yorijori_1c_r %08x\n", space.device().safe_pc());
-	return 0x00;// 0xaa;
-}
-WRITE32_MEMBER(vamphalf_state::yorijori_1c_w)
-{
-//  printf("yorijori_1c_w %08x %08x\n", space.device().safe_pc(), data);
-}
+
 
 WRITE32_MEMBER( vamphalf_state::wyvernwg_snd_w )
 {
@@ -583,10 +567,7 @@ static ADDRESS_MAP_START( boonggab_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x744, 0x747) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( yorijori_io, AS_IO, 32, vamphalf_state )
-	AM_RANGE(0x010, 0x013) AM_READ(yorijori_10_r)
-	AM_RANGE(0x01c, 0x01f) AM_READWRITE(yorijori_1c_r,yorijori_1c_w)
 ADDRESS_MAP_END
 
 /*
@@ -2084,10 +2065,10 @@ ROM_START( yorijori )
 	ROM_RELOAD(      0x60000, 0x20000 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(9299ce36) SHA1(cd8a9e2619da93e2015704230e8189a6ae52de69) )
+	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(16584ff2) SHA1(69dce8c33b246b4327b330233116c1b72a8b7e84) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(b5d1892f) SHA1(20afcd00a506ec0fd1c4fffb2d9c853c8dc61e2e) )
+	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fe0485ef) SHA1(bd1a26aa386803df8e8e137ea5d5a2cdd6ad1197) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "snd2", 0x000000, 0x200000, CRC(8d9a8795) SHA1(482acb3beafc9baa43284c54ac36086c57098465) )
@@ -2773,10 +2754,10 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 1;
 
-	UINT8 *romx = (UINT8 *)memregion("user1")->base();
+//	UINT8 *romx = (UINT8 *)memregion("user1")->base();
 	// prevent code dying after a trap 33 by patching it out, why?
-	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
-	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
+//	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
+//	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");

@@ -1776,6 +1776,7 @@ OBJDIRS += $(CPUOBJ)/nec
 CPUOBJS += $(CPUOBJ)/nec/nec.o
 CPUOBJS += $(CPUOBJ)/nec/v25.o
 CPUOBJS += $(CPUOBJ)/nec/v25sfr.o
+CPUOBJS += $(CPUOBJ)/nec/v53.o
 DASMOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
@@ -2371,7 +2372,8 @@ OBJDIRS += $(CPUOBJ)/z80
 CPUOBJS += $(CPUOBJ)/z80/z80.o \
 	$(CPUOBJ)/z80/z80daisy.o \
 	$(CPUOBJ)/z80/tmpz84c011.o \
-	$(CPUOBJ)/z80/tmpz84c015.o
+	$(CPUOBJ)/z80/tmpz84c015.o \
+	$(CPUOBJ)/z80/kl5c80a12.o
 
 DASMOBJS += $(CPUOBJ)/z80/z80dasm.o
 endif

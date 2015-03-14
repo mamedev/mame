@@ -1637,7 +1637,7 @@ pdp1      // 1961 DEC PDP1
 vt100 // 1978 Digital Equipment Corporation
 //vt100wp // 1978 Digital Equipment Corporation
 //vt100stp // 1978 Digital Equipment Corporation
-//vt101 // 1981 Digital Equipment Corporation
+vt101 // 1981 Digital Equipment Corporation
 vt102 // 1981 Digital Equipment Corporation
 //vt103 // 1979 Digital Equipment Corporation
 vt105 // 1978 Digital Equipment Corporation
@@ -1656,7 +1656,7 @@ vt520 // 1994 Digital Equipment Corporation
 //vt525
 vk100 // 1980 Digital Equipment Corporation
 dectalk // 1982 Digital Equipment Corporation
-//vt240
+//vt240 // 1983 Digital Equipment Corporation
 //vt241
 mc7105 // Elektronika MC7105
 rainbow100a  // 1982 DEC Rainbow 100-A
@@ -2173,7 +2173,17 @@ ngenb38     // 1991
 386i        // 199?
 
 // Dedicated handhelds/tabletops
+bambball    // Bambino
+packmon     // Bandai
+zackman     // Bandai
 alnattck    // Coleco
+cdkong      // Coleco
+cgalaxn     // Coleco
+cpacman     // Coleco
+cpacmanr1   //
+egalaxn2    // Entex
+epacman2    // Entex
+pbqbert     // Parker Brothers
 tmtron      // Tomy
 
 maniac      // Ideal
@@ -2182,10 +2192,10 @@ mathmagi    // APF
 amaztron    // Coleco
 tc4         // Coleco
 ebball      // Entex
+ebball3     // Entex
 elecdet     // Ideal
 starwbc     // Kenner
 starwbcp    // Kenner (prototype)
-elecbowl    // Marx
 comp4       // Milton Bradley
 simon       // Milton Bradley
 cnsector    // Parker Bros
@@ -2196,11 +2206,14 @@ bankshot    // Parker Bros
 splitsec    // Parker Bros
 tandy12     // Tandy Radio Shack
 
+ssfball     // Bambino
+splasfgt    // Bambino
 edracula    // Epoch
 tmpacman    // Tomy
 tmtennis    // Tomy
 alnchase    // Tomy
 
+elecbowl    // Marx
 wildfire    // Parker Bros
 
 

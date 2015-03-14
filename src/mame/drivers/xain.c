@@ -173,7 +173,7 @@ inline int xain_state::scanline_to_vcount(int scanline)
 		return (vcount - 0x18) | 0x100;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(xain_state::xain_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(xain_state::scanline)
 {
 	int scanline = param;
 	int screen_height = m_screen->height();
@@ -209,24 +209,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(xain_state::xain_scanline)
 	}
 }
 
-WRITE8_MEMBER(xain_state::xainCPUA_bankswitch_w)
+WRITE8_MEMBER(xain_state::cpuA_bankswitch_w)
 {
 	m_pri = data & 0x7;
 	membank("bank1")->set_entry((data >> 3) & 1);
 }
 
-WRITE8_MEMBER(xain_state::xainCPUB_bankswitch_w)
+WRITE8_MEMBER(xain_state::cpuB_bankswitch_w)
 {
 	membank("bank2")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(xain_state::xain_sound_command_w)
+WRITE8_MEMBER(xain_state::sound_command_w)
 {
 	soundlatch_byte_w(space,offset,data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(xain_state::xain_main_irq_w)
+WRITE8_MEMBER(xain_state::main_irq_w)
 {
 	switch (offset)
 	{
@@ -245,23 +245,23 @@ WRITE8_MEMBER(xain_state::xain_main_irq_w)
 	}
 }
 
-WRITE8_MEMBER(xain_state::xain_irqA_assert_w)
+WRITE8_MEMBER(xain_state::irqA_assert_w)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(xain_state::xain_irqB_clear_w)
+WRITE8_MEMBER(xain_state::irqB_clear_w)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(xain_state::xain_68705_r)
+READ8_MEMBER(xain_state::m68705_r)
 {
 	m_mcu_ready = 1;
 	return m_from_mcu;
 }
 
-WRITE8_MEMBER(xain_state::xain_68705_w)
+WRITE8_MEMBER(xain_state::m68705_w)
 {
 	m_from_main = data;
 	m_mcu_accept = 0;
@@ -270,7 +270,7 @@ WRITE8_MEMBER(xain_state::xain_68705_w)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(xain_state::xain_vblank_r)
+CUSTOM_INPUT_MEMBER(xain_state::vblank_r)
 {
 	return m_vblank;
 }
@@ -282,27 +282,27 @@ CUSTOM_INPUT_MEMBER(xain_state::xain_vblank_r)
 
 ***************************************************************************/
 
-READ8_MEMBER(xain_state::xain_68705_port_a_r)
+READ8_MEMBER(xain_state::m68705_port_a_r)
 {
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(xain_state::xain_68705_port_a_w)
+WRITE8_MEMBER(xain_state::m68705_port_a_w)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(xain_state::xain_68705_ddr_a_w)
+WRITE8_MEMBER(xain_state::m68705_ddr_a_w)
 {
 	m_ddr_a = data;
 }
 
-READ8_MEMBER(xain_state::xain_68705_port_b_r)
+READ8_MEMBER(xain_state::m68705_port_b_r)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(xain_state::xain_68705_port_b_w)
+WRITE8_MEMBER(xain_state::m68705_port_b_w)
 {
 	if ((m_ddr_b & 0x02) && (~data & 0x02))
 	{
@@ -325,12 +325,12 @@ WRITE8_MEMBER(xain_state::xain_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(xain_state::xain_68705_ddr_b_w)
+WRITE8_MEMBER(xain_state::m68705_ddr_b_w)
 {
 	m_ddr_b = data;
 }
 
-READ8_MEMBER(xain_state::xain_68705_port_c_r)
+READ8_MEMBER(xain_state::m68705_port_c_r)
 {
 	m_port_c_in = 0;
 
@@ -342,12 +342,12 @@ READ8_MEMBER(xain_state::xain_68705_port_c_r)
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER(xain_state::xain_68705_port_c_w)
+WRITE8_MEMBER(xain_state::m68705_port_c_w)
 {
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER(xain_state::xain_68705_ddr_c_w)
+WRITE8_MEMBER(xain_state::m68705_ddr_c_w)
 {
 	m_ddr_c = data;
 }
@@ -385,26 +385,26 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_SHARE("charram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_SHARE("bgram1")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(xain_bgram0_w) AM_SHARE("bgram0")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bgram1_w) AM_SHARE("bgram1")
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(bgram0_w) AM_SHARE("bgram0")
 	AM_RANGE(0x3800, 0x397f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("P1")
-	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(xain_scrollxP1_w)
+	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(scrollxP1_w)
 	AM_RANGE(0x3a01, 0x3a01) AM_READ_PORT("P2")
 	AM_RANGE(0x3a02, 0x3a02) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3a02, 0x3a03) AM_WRITE(xain_scrollyP1_w)
+	AM_RANGE(0x3a02, 0x3a03) AM_WRITE(scrollyP1_w)
 	AM_RANGE(0x3a03, 0x3a03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)
-	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(xain_scrollxP0_w)
+	AM_RANGE(0x3a04, 0x3a04) AM_READ(m68705_r)
+	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
 	AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
-	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(xain_scrollyP0_w)
-	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
-	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(xain_main_irq_w)
-	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(xain_flipscreen_w)
-	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(xain_68705_w)
-	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
+	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(scrollyP0_w)
+	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(sound_command_w)
+	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(main_irq_w)
+	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(m68705_w)
+	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(cpuA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -413,21 +413,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(irqA_assert_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(irqB_clear_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(cpuB_bankswitch_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, xain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(xain_68705_port_a_r, xain_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(xain_68705_port_b_r, xain_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(xain_68705_port_c_r, xain_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(xain_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(xain_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(xain_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m68705_port_a_r, m68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(m68705_port_b_r, m68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m68705_port_c_r, m68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(m68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(m68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(m68705_ddr_c_w)
 //  AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
 //  AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
@@ -513,8 +513,8 @@ static INPUT_PORTS_START( xsleena )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
-	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state,mcu_status_r, NULL)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state,xain_vblank_r, NULL)   /* VBLANK */
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, mcu_status_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, vblank_r, NULL)   /* VBLANK */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -549,18 +549,31 @@ static GFXDECODE_START( xain )
 GFXDECODE_END
 
 
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(xain_state::irqhandler)
-{
-	m_audiocpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void xain_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
 	membank("bank2")->configure_entries(0, 2, memregion("sub")->base()  + 0x4000, 0xc000);
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
+	
+	save_item(NAME(m_vblank));
+	
+	if (m_mcu)
+	{
+		save_item(NAME(m_from_main));
+		save_item(NAME(m_from_mcu));
+		save_item(NAME(m_ddr_a));
+		save_item(NAME(m_ddr_b));
+		save_item(NAME(m_ddr_c));
+		save_item(NAME(m_port_a_out));
+		save_item(NAME(m_port_b_out));
+		save_item(NAME(m_port_c_out));
+		save_item(NAME(m_port_a_in));
+		save_item(NAME(m_port_b_in));
+		save_item(NAME(m_port_c_in));
+		save_item(NAME(m_mcu_ready));
+		save_item(NAME(m_mcu_accept));
+	}
 }
 
 static MACHINE_CONFIG_START( xsleena, xain_state )
@@ -568,7 +581,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, xain_scanline, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cpu_map_B)
@@ -585,7 +598,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   /* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update_xain)
+	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xain)
@@ -596,7 +609,7 @@ static MACHINE_CONFIG_START( xsleena, xain_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, MCU_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(xain_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -835,7 +848,7 @@ ROM_START( xsleenab )
 ROM_END
 
 
-GAME( 1986, xsleena,  0,       xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito license)", "Xain'd Sleena (World)", 0 )
-GAME( 1986, xsleenaj, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan", "Xain'd Sleena (Japan)", 0 )
-GAME( 1986, solrwarr, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)", 0 )
-GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", 0 )
+GAME( 1986, xsleena,  0,       xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito license)", "Xain'd Sleena (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, xsleenaj, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan", "Xain'd Sleena (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, solrwarr, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", GAME_SUPPORTS_SAVE )

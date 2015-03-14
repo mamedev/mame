@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Kevin Horton
 /***************************************************************************
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices.
@@ -7,16 +7,21 @@
 
   known chips:
   
-  serial  device  etc.
------------------------------------------------
- @048     uPD552  1980, Tomy Tennis
- *085     uPD650  1980, Roland TR-808
-  102     uPD553  1981, Bandai Block Out
- *128     uPD650  1982, Roland TR-606
-  133     uPD650  1982, Roland TB-303
- @160     uPD553  1982, Tomy Pac Man
- @206     uPD553  1982, Epoch Dracula
- @258     uPD553  1984, Tomy Alien Chase
+  serial  device   etc.
+----------------------------------------------------------------
+ @031     uPD553C  1979, Bambino Superstar Football (ET-03)
+ *042     uPD552C  1979, Tomy Space Attack
+ @048     uPD552C  1980, Tomy Tennis (TN-04)
+ @055     uPD553C  1980, Bambino Laser Fight (ET-12)
+ *085     uPD650C  1980, Roland TR-808
+ *102     uPD553C  1981, Bandai Block Out
+ *127     uPD650C  198?  Sony OA-S1100 Typecorder (subcpu, have dump)
+ *128     uPD650C  1982, Roland TR-606
+  133     uPD650C  1982, Roland TB-303
+ @160     uPD553C  1982, Tomy Pac Man (TN-08)
+ *202     uPD553C  1982, Epoch Astro Command
+ @206     uPD553C  1982, Epoch Dracula
+ @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
@@ -26,11 +31,7 @@
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"
 
-// test-layouts - use external artwork
-#include "alnchase.lh"
-#include "edracula.lh"
-#include "tmpacman.lh"
-#include "tmtennis.lh"
+#include "hh_ucom4_test.lh" // test-layout - use external artwork
 
 
 class hh_ucom4_state : public driver_device
@@ -48,10 +49,11 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<3> m_inp_matrix; // max 3
+	optional_ioport_array<5> m_inp_matrix; // max 5
 	optional_device<speaker_sound_device> m_speaker;
 	
 	// misc common
+	UINT8 m_port[9];
 	UINT16 m_inp_mux;
 
 	UINT8 read_inputs(int columns);
@@ -76,9 +78,18 @@ public:
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// game-specific handlers
+	void ssfball_display();
+	DECLARE_READ8_MEMBER(ssfball_input_b_r);
+	DECLARE_WRITE8_MEMBER(ssfball_grid_w);
+	DECLARE_WRITE8_MEMBER(ssfball_plate_w);
+
+	void splasfgt_display();
+	DECLARE_READ8_MEMBER(splasfgt_input_b_r);
+	DECLARE_WRITE8_MEMBER(splasfgt_grid_w);
+	DECLARE_WRITE8_MEMBER(splasfgt_plate_w);
+
 	DECLARE_WRITE8_MEMBER(edracula_grid_w);
 	DECLARE_WRITE8_MEMBER(edracula_plate_w);
-	DECLARE_WRITE8_MEMBER(edracula_port_i_w);
 	
 	DECLARE_READ8_MEMBER(tmtennis_input_r);
 	DECLARE_WRITE8_MEMBER(tmtennis_grid_w);
@@ -91,11 +102,9 @@ public:
 	void tmpacman_display();
 	DECLARE_WRITE8_MEMBER(tmpacman_grid_w);
 	DECLARE_WRITE8_MEMBER(tmpacman_plate_w);
-	DECLARE_WRITE8_MEMBER(tmpacman_port_e_w);
 	
 	DECLARE_READ8_MEMBER(alnchase_input_r);
-	DECLARE_WRITE8_MEMBER(alnchase_display_w);
-	DECLARE_WRITE8_MEMBER(alnchase_port_e_w);
+	DECLARE_WRITE8_MEMBER(alnchase_output_w);
 };
 
 
@@ -107,6 +116,7 @@ void hh_ucom4_state::machine_start()
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
 	
+	memset(m_port, 0, sizeof(m_port));
 	m_inp_mux = 0;
 	m_grid = 0;
 	m_plate = 0;
@@ -121,6 +131,7 @@ void hh_ucom4_state::machine_start()
 	save_item(NAME(m_display_decay));
 	save_item(NAME(m_7seg_mask));
 
+	save_item(NAME(m_port));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
 	save_item(NAME(m_plate));
@@ -219,6 +230,252 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
 /***************************************************************************
 
+  Bambino Superstar Football (manufactured in Japan)
+  * PCB label Emix Corp. ET-03
+  * NEC uCOM-43 MCU, labeled D553C 031
+  * green VFD display Emix-102
+  
+  Press the Kick button to start the game, an automatic sequence follows.
+  Then choose a formation(A,B,C) and either pass the ball, and/or start
+  running. For more information, refer to the official manual.
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+void hh_ucom4_state::ssfball_display()
+{
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
+	display_matrix(16, 9, plate, m_grid);
+}
+
+READ8_MEMBER(hh_ucom4_state::ssfball_input_b_r)
+{
+	// B: input port 2, where B3 is multiplexed
+	return m_inp_matrix[2]->read() | read_inputs(2);
+}
+
+WRITE8_MEMBER(hh_ucom4_state::ssfball_grid_w)
+{
+	// C,D(,E): vfd matrix grid 0-7(,8)
+	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+
+	ssfball_display();
+}
+
+WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
+{
+	m_port[offset] = data;
+	
+	// E,F,G,H,I(not all!): vfd matrix plate
+	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	
+	// F3,G3: input mux + speaker
+	m_inp_mux = (m_port[NEC_UCOM4_PORTF] >> 3 & 1) | (m_port[NEC_UCOM4_PORTG] >> 2 & 2);
+	m_speaker->level_w(m_inp_mux);
+	
+	// E3: vfd matrix grid 8
+	if (offset == NEC_UCOM4_PORTE)
+		ssfball_grid_w(space, offset, data >> 3 & 1);
+	else
+		ssfball_display();
+}
+
+
+static INPUT_PORTS_START( ssfball )
+	PORT_START("IN.0") // F3 port B3
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Formation A")
+
+	PORT_START("IN.1") // G3 port B3
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
+
+	PORT_START("IN.2") // port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Kick/Display")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Formation C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Formation B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // multiplexed, handled in ssfball_input_b_r
+
+	PORT_START("IN.3") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Pass")
+INPUT_PORTS_END
+
+
+static const INT16 ssfball_speaker_levels[] = { 0, 32767, -32768, 0 };
+
+static MACHINE_CONFIG_START( ssfball, hh_ucom4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_UCOM4_READ_A_CB(IOPORT("IN.3"))
+	MCFG_UCOM4_READ_B_CB(READ8(hh_ucom4_state, ssfball_input_b_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, ssfball_grid_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, ssfball_grid_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, ssfball_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bambino Space Laser Fight (manufactured in Japan)
+  * PCB label Emix Corp. ET-12
+  * NEC uCOM-43 MCU, labeled D553C 055
+  * blue VFD display Emix-104 (some versions had a green display)
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+void hh_ucom4_state::splasfgt_display()
+{
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
+	display_matrix(16, 9, plate, m_grid);
+}
+
+READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
+{
+	// B: multiplexed buttons
+	return read_inputs(4);
+}
+
+WRITE8_MEMBER(hh_ucom4_state::splasfgt_grid_w)
+{
+	// G,H,I0: vfd matrix grid
+	int shift = (offset - NEC_UCOM4_PORTG) * 4;
+	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+	
+	// G(grid 0-3): input mux
+	m_inp_mux = m_grid & 0xf;
+	
+	// I2: vfd matrix plate 6
+	if (offset == NEC_UCOM4_PORTI)
+		m_plate = (m_plate & 0xffff) | (data << 14 & 0x10000);
+
+	splasfgt_display();
+}
+
+WRITE8_MEMBER(hh_ucom4_state::splasfgt_plate_w)
+{
+	// C,D,E,F23: vfd matrix plate
+	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	
+	// F01: speaker out
+	if (offset == NEC_UCOM4_PORTF)
+		m_speaker->level_w(data & 3);
+	
+	ssfball_display();
+}
+
+
+/* physical button layout and labels is like this:
+    
+    * left = P1 side *                                         * right = P2 side * (note: in 1P mode, switch sides between turns)
+
+    [  JUMP  ]  [ HIGH ]        (players sw)                   [ HIGH ]  [  JUMP  ]
+                                1<--->2         [START/
+    [STRAIGHT]  [MEDIUM]                         RESET]        [MEDIUM]  [STRAIGHT]
+                                1<---OFF--->2
+    [ STOOP  ]  [ LOW  ]        (skill lvl sw)                 [ LOW  ]  [ STOOP  ]
+*/
+
+static INPUT_PORTS_START( splasfgt )
+	PORT_START("IN.0") // G0 port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P1 Position Straight")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1 Position Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1 Position Stoop")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // G1 port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("P1 Beam High")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("P1 Beam Medium")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 Beam Low")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // G2 port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("P2 Position Straight")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P2 Position Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("P2 Position Stoop")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // G3 port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("P2 Beam High")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P2 Beam Medium")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("P2 Beam Low")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // port A
+	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static const INT16 splasfgt_speaker_levels[] = { 0, 32767, -32768, 0 };
+
+static MACHINE_CONFIG_START( splasfgt, hh_ucom4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_UCOM4_READ_A_CB(IOPORT("IN.4"))
+	MCFG_UCOM4_READ_B_CB(READ8(hh_ucom4_state, splasfgt_input_b_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, splasfgt_grid_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, splasfgt_grid_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, splasfgt_grid_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, splasfgt_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Epoch Dracula (manufactured in Japan)
   * PCB label 96121
   * NEC uCOM-43 MCU, labeled D553C 206
@@ -244,19 +501,15 @@ WRITE8_MEMBER(hh_ucom4_state::edracula_grid_w)
 
 WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
 {
-	// E-H,I01: vfd matrix plate
+	// I2: speaker out
+	if (offset == NEC_UCOM4_PORTI)
+		m_speaker->level_w(data >> 2 & 1);
+
+	// E,F,G,H,I01: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	display_matrix(18, 8, m_plate, m_grid);
-}
-
-WRITE8_MEMBER(hh_ucom4_state::edracula_port_i_w)
-{
-	edracula_plate_w(space, offset, data & 3);
-
-	// I2: speaker out
-	m_speaker->level_w(data >> 2 & 1);
 }
 
 
@@ -287,10 +540,10 @@ static MACHINE_CONFIG_START( edracula, hh_ucom4_state )
 	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
 	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, edracula_port_i_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_edracula)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* no video! */
 
@@ -314,9 +567,8 @@ MACHINE_CONFIG_END
   The initial release of this game was in 1979, known as Pro-Tennis,
   it has a D553 instead of D552, with just a little over 50% ROM used.
 
-  This is an early VFD simple electronic tennis game. Player 1 is on the right
-  side, player 2 or CPU on the left. Each player has six possible positions
-  where to hit the ball. A backdrop behind the VFD shows a tennis court.
+  This is an early VFD simple electronic tennis game. Each player has six possible
+  positions where to hit the ball. A backdrop behind the VFD shows a tennis court.
 
   NOTE!: MESS external artwork is recommended
 
@@ -324,13 +576,13 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
 {
-	// A,B: buttons
+	// A,B: multiplexed buttons
 	return ~read_inputs(2) >> (offset*4);
 }
 
 WRITE8_MEMBER(hh_ucom4_state::tmtennis_grid_w)
 {
-	// G-I: vfd matrix grid
+	// G,H,I: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
@@ -339,7 +591,7 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_grid_w)
 
 WRITE8_MEMBER(hh_ucom4_state::tmtennis_plate_w)
 {
-	// C-F: vfd matrix plate
+	// C,D,F: vfd matrix plate
 	if (offset == NEC_UCOM4_PORTF) offset--;
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
@@ -349,7 +601,7 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_plate_w)
 
 WRITE8_MEMBER(hh_ucom4_state::tmtennis_port_e_w)
 {
-	// E0,E1: input mux
+	// E01: input mux
 	// E2: speaker out
 	// E3: N/C
 	m_inp_mux = data & 3;
@@ -358,6 +610,8 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_port_e_w)
 
 
 /* Pro-Tennis physical button layout and labels is like this:
+    
+    * left = P2/CPU side *    * right = P1 side *
 
     [SERVE] [1] [2] [3]       [3] [2] [1] [SERVE]
             [4] [5] [6]       [6] [5] [4]
@@ -369,12 +623,12 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_START("IN.0") // E0 port A/B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Serve")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Serve")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("P1 Button 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("P1 Button 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P1 Button 2")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("P1 Button 5")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("P1 Button 3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Button 6")
 
 	PORT_START("IN.1") // E1 port A/B
 	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, tmtennis_difficulty_switch, NULL)
@@ -384,12 +638,12 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_CONFNAME( 0x02, 0x00, "Players" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("P2 Button 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P2 Button 4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("P2 Button 2")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 Button 5")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("P2 Button 3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 6")
 INPUT_PORTS_END
 
 
@@ -426,7 +680,7 @@ static MACHINE_CONFIG_START( tmtennis, hh_ucom4_state )
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, tmtennis_grid_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tmtennis)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	MCFG_MACHINE_RESET_OVERRIDE(hh_ucom4_state, tmtennis)
 
@@ -482,19 +736,15 @@ WRITE8_MEMBER(hh_ucom4_state::tmpacman_grid_w)
 
 WRITE8_MEMBER(hh_ucom4_state::tmpacman_plate_w)
 {
-	// E023,F-I: vfd matrix plate
+	// E1: speaker out
+	if (offset == NEC_UCOM4_PORTE)
+		m_speaker->level_w(data >> 1 & 1);
+
+	// E023,F,G,H,I: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	tmpacman_display();
-}
-
-WRITE8_MEMBER(hh_ucom4_state::tmpacman_port_e_w)
-{
-	// E1: speaker out
-	m_speaker->level_w(data >> 1 & 1);
-
-	tmpacman_plate_w(space, offset, data);
 }
 
 
@@ -521,14 +771,14 @@ static MACHINE_CONFIG_START( tmpacman, hh_ucom4_state )
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, tmpacman_grid_w))
 	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, tmpacman_grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, tmpacman_port_e_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
 	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
 	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
 	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tmpacman)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* no video! */
 
@@ -547,7 +797,7 @@ MACHINE_CONFIG_END
   Tomy Alien Chase (manufactured in Japan)
   * boards are labeled TN-16 2E121B01
   * NEC uCOM-43 MCU, labeled D553C 258
-  * red/green VFD display NEC FIP9AM24T with color overlay, 2-sided*
+  * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
 
   *Player one views the VFD from the front (grid+filament side) while the
   opposite player views it from the back side (through the conductive traces),
@@ -566,7 +816,7 @@ READ8_MEMBER(hh_ucom4_state::alnchase_input_r)
 	return read_inputs(2);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::alnchase_display_w)
+WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 {
 	if (offset <= NEC_UCOM4_PORTE)
 	{
@@ -577,24 +827,20 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_display_w)
 		// C0(grid 0): input enable PL1
 		// D0(grid 4): input enable PL2
 		m_inp_mux = (m_grid & 1) | (m_grid >> 3 & 2);
+		
+		// E1: speaker out
+		if (offset == NEC_UCOM4_PORTE)
+			m_speaker->level_w(data >> 1 & 1);
 	}
 
 	if (offset >= NEC_UCOM4_PORTE)
 	{
-		// E23,F-I: vfd matrix plate
+		// E23,F,G,H,I: vfd matrix plate
 		int shift = (offset - NEC_UCOM4_PORTE) * 4;
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
 	}
 
 	display_matrix(17, 9, m_plate, m_grid);
-}
-
-WRITE8_MEMBER(hh_ucom4_state::alnchase_port_e_w)
-{
-	// E1: speaker out
-	m_speaker->level_w(data >> 1 & 1);
-
-	alnchase_display_w(space, offset, data);
 }
 
 
@@ -642,16 +888,16 @@ static MACHINE_CONFIG_START( alnchase, hh_ucom4_state )
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
 	MCFG_UCOM4_READ_A_CB(READ8(hh_ucom4_state, alnchase_input_r))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, alnchase_display_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, alnchase_display_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, alnchase_port_e_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, alnchase_display_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, alnchase_display_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, alnchase_display_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, alnchase_display_w))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_alnchase)
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
 
 	/* no video! */
 
@@ -670,6 +916,18 @@ MACHINE_CONFIG_END
   Game driver(s)
 
 ***************************************************************************/
+
+ROM_START( ssfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+ROM_END
+
+
+ROM_START( splasfgt )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
+ROM_END
+
 
 ROM_START( edracula )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -697,6 +955,9 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1979, ssfball,   0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, splasfgt,  0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+
 CONS( 1982, edracula,  0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1980, tmtennis,  0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )

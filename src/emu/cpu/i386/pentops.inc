@@ -3,6 +3,7 @@
 // Pentium+ specific opcodes
 
 extern flag float32_is_nan( float32 a ); // since its not defined in softfloat.h
+extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
 
 void i386_device::MMXPROLOG()
 {
@@ -1119,6 +1120,18 @@ void i386_device::pentium_maskmovq_r64_r64()  // Opcode 0f f7
 			WRITE8(ea+n, MMX(s).b[n]);
 }
 
+void i386_device::sse_maskmovdqu_r128_r128()  // Opcode 66 0f f7
+{
+	int s,m,n;
+	UINT8 modm = FETCH();
+	UINT32 ea = GetEA(7, 0); // ds:di/edi/rdi register
+	s=(modm >> 3) & 7;
+	m=modm & 7;
+	for (n=0;n < 16;n++)
+		if (XMM(m).b[n] & 127)
+			WRITE8(ea+n, XMM(s).b[n]);
+}
+
 void i386_device::pentium_popcnt_r16_rm16()    // Opcode f3 0f b8
 {
 	UINT16 src;
@@ -1202,6 +1215,15 @@ INLINE INT16 SaturatedSignedDwordToSignedWord(INT32 dword)
 	return (INT16)dword;
 }
 
+INLINE UINT16 SaturatedSignedDwordToUnsignedWord(INT32 dword)
+{
+	if (dword > 65535)
+		return 65535;
+	if (dword < 0)
+		return 0;
+	return (UINT16)dword;
+}
+
 void i386_device::mmx_group_0f71()  // Opcode 0f 71
 {
 	UINT8 modm = FETCH();
@@ -1234,6 +1256,31 @@ void i386_device::mmx_group_0f71()  // Opcode 0f 71
 	}
 }
 
+void i386_device::sse_group_660f71()  // Opcode 66 0f 71
+{
+	UINT8 modm = FETCH();
+	UINT8 imm8 = FETCH();
+	if (modm >= 0xc0) {
+		switch ((modm & 0x38) >> 3)
+		{
+			case 2: // psrlw
+				for (int n = 0; n < 8;n++)
+					XMM(modm & 7).w[n] = XMM(modm & 7).w[n] >> imm8;
+				break;
+			case 4: // psraw
+				for (int n = 0; n < 8;n++)
+					XMM(modm & 7).s[n] = XMM(modm & 7).s[n] >> imm8;
+				break;
+			case 6: // psllw
+				for (int n = 0; n < 8;n++)
+					XMM(modm & 7).w[n] = XMM(modm & 7).w[n] << imm8;
+				break;
+			default:
+				report_invalid_modrm("mmx_group660f71", modm);
+		}
+	}
+}
+
 void i386_device::mmx_group_0f72()  // Opcode 0f 72
 {
 	UINT8 modm = FETCH();
@@ -1256,6 +1303,31 @@ void i386_device::mmx_group_0f72()  // Opcode 0f 72
 				break;
 			default:
 				report_invalid_modrm("mmx_group0f72", modm);
+		}
+	}
+}
+
+void i386_device::sse_group_660f72()  // Opcode 66 0f 72
+{
+	UINT8 modm = FETCH();
+	UINT8 imm8 = FETCH();
+	if (modm >= 0xc0) {
+		switch ((modm & 0x38) >> 3)
+		{
+			case 2: // psrld
+				for (int n = 0; n < 4;n++)
+					XMM(modm & 7).d[n] = XMM(modm & 7).d[n] >> imm8;
+				break;
+			case 4: // psrad
+				for (int n = 0; n < 4;n++)
+					XMM(modm & 7).i[n] = XMM(modm & 7).i[n] >> imm8;
+				break;
+			case 6: // pslld
+				for (int n = 0; n < 4;n++)
+					XMM(modm & 7).d[n] = XMM(modm & 7).d[n] << imm8;
+				break;
+			default:
+				report_invalid_modrm("mmx_group660f72", modm);
 		}
 	}
 }
@@ -2623,14 +2695,14 @@ void i386_device::sse_cvtpi2ps_r128_rm64() // Opcode 0f 2a
 	UINT8 modrm = FETCH();
 	MMXPROLOG();
 	if( modrm >= 0xc0 ) {
-		XMM((modrm >> 3) & 0x7).f[0] = MMX(modrm & 0x7).i[0];
-		XMM((modrm >> 3) & 0x7).f[1] = MMX(modrm & 0x7).i[1];
+		XMM((modrm >> 3) & 0x7).f[0] = (float)MMX(modrm & 0x7).i[0];
+		XMM((modrm >> 3) & 0x7).f[1] = (float)MMX(modrm & 0x7).i[1];
 	} else {
 		MMX_REG r;
 		UINT32 ea = GetEA(modrm, 0);
 		READMMX(ea, r);
-		XMM((modrm >> 3) & 0x7).f[0] = r.i[0];
-		XMM((modrm >> 3) & 0x7).f[1] = r.i[1];
+		XMM((modrm >> 3) & 0x7).f[0] = (float)r.i[0];
+		XMM((modrm >> 3) & 0x7).f[1] = (float)r.i[1];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2821,7 +2893,31 @@ void i386_device::sse_movups_r128_rm128() // Opcode 0f 10
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_movupd_r128_rm128() // Opcode 66 0f 10
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7) = XMM(modrm & 0x7);
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, XMM((modrm >> 3) & 0x7)); // address does not need to be 16-byte aligned
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_movups_rm128_r128() // Opcode 0f 11
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM(modrm & 0x7) = XMM((modrm >> 3) & 0x7);
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		WRITEXMM(ea, XMM((modrm >> 3) & 0x7)); // address does not need to be 16-byte aligned
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movupd_rm128_r128() // Opcode 66 0f 11
 {
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
@@ -2848,7 +2944,33 @@ void i386_device::sse_movlps_r128_m64() // Opcode 0f 12
 	}
 }
 
+void i386_device::sse_movlpd_r128_m64() // Opcode 66 0f 12
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		CYCLES(1);     // TODO: correct cycle count
+	} else {
+		// MOVLPS opcode
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM_LO64(ea, XMM((modrm >> 3) & 0x7));
+		CYCLES(1);     // TODO: correct cycle count
+	}
+}
+
 void i386_device::sse_movlps_m64_r128() // Opcode 0f 13
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		// unsupported by cpu
+		CYCLES(1);     // TODO: correct cycle count
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		WRITEXMM_LO64(ea, XMM((modrm >> 3) & 0x7));
+		CYCLES(1);     // TODO: correct cycle count
+	}
+}
+
+void i386_device::sse_movlpd_m64_r128() // Opcode 66 0f 13
 {
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
@@ -2876,7 +2998,34 @@ void i386_device::sse_movhps_r128_m64() // Opcode 0f 16
 	}
 }
 
+void i386_device::sse_movhpd_r128_m64() // Opcode 66 0f 16
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		// unsupported by cpu
+		CYCLES(1);     // TODO: correct cycle count
+	} else {
+		// MOVHPS opcode
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM_HI64(ea, XMM((modrm >> 3) & 0x7));
+		CYCLES(1);     // TODO: correct cycle count
+	}
+}
+
 void i386_device::sse_movhps_m64_r128() // Opcode 0f 17
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		// unsupported by cpu
+		CYCLES(1);     // TODO: correct cycle count
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		WRITEXMM_HI64(ea, XMM((modrm >> 3) & 0x7));
+		CYCLES(1);     // TODO: correct cycle count
+	}
+}
+
+void i386_device::sse_movhpd_m64_r128() // Opcode 66 0f 17
 {
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
@@ -2926,6 +3075,18 @@ void i386_device::sse_movmskps_r32_r128() // Opcode 0f 50
 		b=b | ((XMM(modrm & 0x7).d[1] >> 30) & 2);
 		b=b | ((XMM(modrm & 0x7).d[2] >> 29) & 4);
 		b=b | ((XMM(modrm & 0x7).d[3] >> 28) & 8);
+		STORE_REG32(modrm, b);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movmskpd_r32_r128() // Opcode 66 0f 50
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int b;
+		b=(XMM(modrm & 0x7).q[0] >> 63) & 1;
+		b=b | ((XMM(modrm & 0x7).q[1] >> 62) & 2);
 		STORE_REG32(modrm, b);
 	}
 	CYCLES(1);     // TODO: correct cycle count
@@ -3079,6 +3240,32 @@ void i386_device::sse_pmovmskb_r32_r64() // Opcode 0f d7
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_pmovmskb_r32_r128() // Opcode 66 0f d7
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		UINT32 b;
+		b=(XMM(modrm & 0x7).b[0] >> 7) & 1;
+		b=b | ((XMM(modrm & 0x7).b[1] >> 6) & 2);
+		b=b | ((XMM(modrm & 0x7).b[2] >> 5) & 4);
+		b=b | ((XMM(modrm & 0x7).b[3] >> 4) & 8);
+		b=b | ((XMM(modrm & 0x7).b[4] >> 3) & 16);
+		b=b | ((XMM(modrm & 0x7).b[5] >> 2) & 32);
+		b=b | ((XMM(modrm & 0x7).b[6] >> 1) & 64);
+		b=b | ((XMM(modrm & 0x7).b[7] >> 0) & 128);
+		b=b | ((XMM(modrm & 0x7).b[8] << 1) & 256);
+		b=b | ((XMM(modrm & 0x7).b[9] << 2) & 512);
+		b=b | ((XMM(modrm & 0x7).b[10] << 3) & 1024);
+		b=b | ((XMM(modrm & 0x7).b[11] << 4) & 2048);
+		b=b | ((XMM(modrm & 0x7).b[12] << 5) & 4096);
+		b=b | ((XMM(modrm & 0x7).b[13] << 6) & 8192);
+		b=b | ((XMM(modrm & 0x7).b[14] << 7) & 16384);
+		b=b | ((XMM(modrm & 0x7).b[15] << 8) & 32768);
+		STORE_REG32(modrm, b);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_xorps() // Opcode 0f 57
 {
 	UINT8 modrm = FETCH();
@@ -3095,6 +3282,22 @@ void i386_device::sse_xorps() // Opcode 0f 57
 		XMM((modrm >> 3) & 0x7).d[1] = XMM((modrm >> 3) & 0x7).d[1] ^ src.d[1];
 		XMM((modrm >> 3) & 0x7).d[2] = XMM((modrm >> 3) & 0x7).d[2] ^ src.d[2];
 		XMM((modrm >> 3) & 0x7).d[3] = XMM((modrm >> 3) & 0x7).d[3] ^ src.d[3];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_xorpd_r128_rm128() // Opcode 66 0f 57
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] ^ XMM(modrm & 0x7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] ^ XMM(modrm & 0x7).q[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] ^ src.q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] ^ src.q[1];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -3195,6 +3398,22 @@ void i386_device::sse_andps_r128_rm128() // Opcode 0f 54
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_andpd_r128_rm128() // Opcode 66 0f 54
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] & XMM(modrm & 0x7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] & XMM(modrm & 0x7).q[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] & src.q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] & src.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_andnps_r128_rm128() // Opcode 0f 55
 {
 	UINT8 modrm = FETCH();
@@ -3211,7 +3430,39 @@ void i386_device::sse_andnps_r128_rm128() // Opcode 0f 55
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_andnpd_r128_rm128() // Opcode 66 0f 55
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0] = ~(XMM((modrm >> 3) & 0x7).q[0]) & XMM(modrm & 0x7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = ~(XMM((modrm >> 3) & 0x7).q[1]) & XMM(modrm & 0x7).q[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).q[0] = ~(XMM((modrm >> 3) & 0x7).q[0]) & src.q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = ~(XMM((modrm >> 3) & 0x7).q[1]) & src.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_orps_r128_rm128() // Opcode 0f 56
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] | XMM(modrm & 0x7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] | XMM(modrm & 0x7).q[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] | src.q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] | src.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_orpd_r128_rm128() // Opcode 66 0f 56
 {
 	UINT8 modrm = FETCH();
 	if( modrm >= 0xc0 ) {
@@ -3280,6 +3531,19 @@ INLINE float sse_min_single(float src1, float src2)
 	return src2;
 }
 
+INLINE double sse_min_double(double src1, double src2)
+{
+	/*if ((src1 == 0) && (src2 == 0))
+	    return src2;
+	if (src1 = SNaN)
+	    return src2;
+	if (src2 = SNaN)
+	    return src2;*/
+	if (src1 < src2)
+		return src1;
+	return src2;
+}
+
 void i386_device::sse_minps() // Opcode 0f 5d
 {
 	UINT8 modrm = FETCH();
@@ -3321,6 +3585,19 @@ void i386_device::sse_divps() // Opcode 0f 5e
 }
 
 INLINE float sse_max_single(float src1, float src2)
+{
+	/*if ((src1 == 0) && (src2 == 0))
+	    return src2;
+	if (src1 = SNaN)
+	    return src2;
+	if (src2 = SNaN)
+	    return src2;*/
+	if (src1 > src2)
+		return src1;
+	return src2;
+}
+
+INLINE double sse_max_double(double src1, double src2)
 {
 	/*if ((src1 == 0) && (src2 == 0))
 	    return src2;
@@ -3516,6 +3793,43 @@ void i386_device::sse_comiss_r128_r128m32() // Opcode 0f 2f
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_comisd_r128_r128m64() // Opcode 66 0f 2f
+{
+	float64 a,b;
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		a = XMM((modrm >> 3) & 0x7).q[0];
+		b = XMM(modrm & 0x7).q[0];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		a = XMM((modrm >> 3) & 0x7).q[0];
+		b = src.q[0];
+	}
+	m_OF=0;
+	m_SF=0;
+	m_AF=0;
+	if (float64_is_nan(a) || float64_is_nan(b))
+	{
+		m_ZF = 1;
+		m_PF = 1;
+		m_CF = 1;
+	}
+	else
+	{
+		m_ZF = 0;
+		m_PF = 0;
+		m_CF = 0;
+		if (float64_eq(a, b))
+			m_ZF = 1;
+		if (float64_lt(a, b))
+			m_CF = 1;
+	}
+	// should generate exception when at least one of the operands is either QNaN or SNaN
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 {
 	float32 a,b;
@@ -3547,6 +3861,43 @@ void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 		if (float32_eq(a, b))
 			m_ZF = 1;
 		if (float32_lt(a, b))
+			m_CF = 1;
+	}
+	// should generate exception when at least one of the operands is SNaN
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_ucomisd_r128_r128m64() // Opcode 66 0f 2e
+{
+	float64 a,b;
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		a = XMM((modrm >> 3) & 0x7).q[0];
+		b = XMM(modrm & 0x7).q[0];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		a = XMM((modrm >> 3) & 0x7).q[0];
+		b = src.q[0];
+	}
+	m_OF=0;
+	m_SF=0;
+	m_AF=0;
+	if (float64_is_nan(a) || float64_is_nan(b))
+	{
+		m_ZF = 1;
+		m_PF = 1;
+		m_CF = 1;
+	}
+	else
+	{
+		m_ZF = 0;
+		m_PF = 0;
+		m_CF = 0;
+		if (float64_eq(a, b))
+			m_ZF = 1;
+		if (float64_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is SNaN
@@ -3590,6 +3941,34 @@ void i386_device::sse_shufps() // Opcode 0f c6
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_shufpd_r128_rm128_i8() // Opcode 66 0f c6
+{
+	UINT8 modrm = FETCH();
+	UINT8 sel = FETCH();
+	int m1,m2;
+	int s,d;
+	m1=sel & 1;
+	m2=(sel >> 1) & 1;
+	s=modrm & 0x7;
+	d=(modrm >> 3) & 0x7;
+	if( modrm >= 0xc0 ) {
+		UINT64 t1,t2;
+		t1=XMM(d).q[m1];
+		t2=XMM(s).q[m2];
+		XMM(d).q[0]=t1;
+		XMM(d).q[1]=t2;
+	} else {
+		UINT64 t1;
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		t1=XMM(d).q[m1];
+		XMM(d).q[0]=t1;
+		XMM(d).q[1]=src.q[m2];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_unpcklps_r128_rm128() // Opcode 0f 14
 {
 	UINT8 modrm = FETCH();
@@ -3614,6 +3993,25 @@ void i386_device::sse_unpcklps_r128_rm128() // Opcode 0f 14
 		XMM(d).d[3]=src.d[1];
 		XMM(d).d[2]=t2;
 		XMM(d).d[1]=src.d[0];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_unpcklpd_r128_rm128() // Opcode 66 0f 14
+{
+	UINT8 modrm = FETCH();
+	int s,d;
+	s=modrm & 0x7;
+	d=(modrm >> 3) & 0x7;
+	if( modrm >= 0xc0 ) {
+		XMM(d).q[1]=XMM(s).q[0];
+		XMM(d).q[0]=XMM(d).q[0];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM(d).q[1]=src.q[0];
+		XMM(d).q[0]=XMM(d).q[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -3648,6 +4046,25 @@ void i386_device::sse_unpckhps_r128_rm128() // Opcode 0f 15
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_unpckhpd_r128_rm128() // Opcode 66 0f 15
+{
+	UINT8 modrm = FETCH();
+	int s,d;
+	s=modrm & 0x7;
+	d=(modrm >> 3) & 0x7;
+	if( modrm >= 0xc0 ) {
+		XMM(d).q[0]=XMM(d).q[1];
+		XMM(d).q[1]=XMM(s).q[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM(d).q[0]=XMM(d).q[1];
+		XMM(d).q[1]=src.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 INLINE bool sse_issingleordered(float op1, float op2)
 {
 	// TODO: true when at least one of the two source operands being compared is a NaN
@@ -3660,12 +4077,24 @@ INLINE bool sse_issingleunordered(float op1, float op2)
 	return !((op1 != op1) || (op1 != op2));
 }
 
+INLINE bool sse_isdoubleordered(double op1, double op2)
+{
+	// TODO: true when at least one of the two source operands being compared is a NaN
+	return (op1 != op1) || (op1 != op2);
+}
+
+INLINE bool sse_isdoubleunordered(double op1, double op2)
+{
+	// TODO: true when neither source operand is a NaN
+	return !((op1 != op1) || (op1 != op2));
+}
+
 void i386_device::sse_predicate_compare_single(UINT8 imm8, XMM_REG d, XMM_REG s)
 {
 	switch (imm8 & 7)
 	{
 	case 0:
-		s.d[0]=s.f[0] == s.f[0] ? 0xffffffff : 0;
+		d.d[0]=d.f[0] == s.f[0] ? 0xffffffff : 0;
 		d.d[1]=d.f[1] == s.f[1] ? 0xffffffff : 0;
 		d.d[2]=d.f[2] == s.f[2] ? 0xffffffff : 0;
 		d.d[3]=d.f[3] == s.f[3] ? 0xffffffff : 0;
@@ -3715,12 +4144,51 @@ void i386_device::sse_predicate_compare_single(UINT8 imm8, XMM_REG d, XMM_REG s)
 	}
 }
 
+void i386_device::sse_predicate_compare_double(UINT8 imm8, XMM_REG d, XMM_REG s)
+{
+	switch (imm8 & 7)
+	{
+	case 0:
+		d.q[0]=d.f64[0] == s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[1]=d.f64[1] == s.f64[1] ? 0xffffffffffffffff : 0;
+		break;
+	case 1:
+		d.q[0]=d.f64[0] < s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[1]=d.f64[1] < s.f64[1] ? 0xffffffffffffffff : 0;
+		break;
+	case 2:
+		d.q[0]=d.f64[0] <= s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[1]=d.f64[1] <= s.f64[1] ? 0xffffffffffffffff : 0;
+		break;
+	case 3:
+		d.q[0]=sse_isdoubleunordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
+		d.q[1]=sse_isdoubleunordered(d.f64[1], s.f64[1]) ? 0xffffffffffffffff : 0;
+		break;
+	case 4:
+		d.q[0]=d.f64[0] != s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[1]=d.f64[1] != s.f64[1] ? 0xffffffffffffffff : 0;
+		break;
+	case 5:
+		d.q[0]=d.f64[0] < s.f64[0] ? 0 : 0xffffffffffffffff;
+		d.q[1]=d.f64[1] < s.f64[1] ? 0 : 0xffffffffffffffff;
+		break;
+	case 6:
+		d.q[0]=d.f64[0] <= s.f64[0] ? 0 : 0xffffffffffffffff;
+		d.q[1]=d.f64[1] <= s.f64[1] ? 0 : 0xffffffffffffffff;
+		break;
+	case 7:
+		d.q[0]=sse_isdoubleordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
+		d.q[1]=sse_isdoubleordered(d.f64[1], s.f64[1]) ? 0xffffffffffffffff : 0;
+		break;
+	}
+}
+
 void i386_device::sse_predicate_compare_single_scalar(UINT8 imm8, XMM_REG d, XMM_REG s)
 {
 	switch (imm8 & 7)
 	{
 	case 0:
-		s.d[0]=s.f[0] == s.f[0] ? 0xffffffff : 0;
+		d.d[0]=d.f[0] == s.f[0] ? 0xffffffff : 0;
 		break;
 	case 1:
 		d.d[0]=d.f[0] < s.f[0] ? 0xffffffff : 0;
@@ -3746,6 +4214,37 @@ void i386_device::sse_predicate_compare_single_scalar(UINT8 imm8, XMM_REG d, XMM
 	}
 }
 
+void i386_device::sse_predicate_compare_double_scalar(UINT8 imm8, XMM_REG d, XMM_REG s)
+{
+	switch (imm8 & 7)
+	{
+	case 0:
+		d.q[0]=d.f64[0] == s.f64[0] ? 0xffffffffffffffff : 0;
+		break;
+	case 1:
+		d.q[0]=d.f64[0] < s.f64[0] ? 0xffffffffffffffff : 0;
+		break;
+	case 2:
+		d.q[0]=d.f64[0] <= s.f64[0] ? 0xffffffffffffffff : 0;
+		break;
+	case 3:
+		d.q[0]=sse_isdoubleunordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
+		break;
+	case 4:
+		d.q[0]=d.f64[0] != s.f64[0] ? 0xffffffffffffffff : 0;
+		break;
+	case 5:
+		d.q[0]=d.f64[0] < s.f64[0] ? 0 : 0xffffffffffffffff;
+		break;
+	case 6:
+		d.q[0]=d.f64[0] <= s.f64[0] ? 0 : 0xffffffffffffffff;
+		break;
+	case 7:
+		d.q[0]=sse_isdoubleordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
+		break;
+	}
+}
+
 void i386_device::sse_cmpps_r128_rm128_i8() // Opcode 0f c2
 {
 	UINT8 modrm = FETCH();
@@ -3763,6 +4262,27 @@ void i386_device::sse_cmpps_r128_rm128_i8() // Opcode 0f c2
 		READXMM(ea, s);
 		d=(modrm >> 3) & 0x7;
 		sse_predicate_compare_single(imm8, XMM(d), s);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cmppd_r128_rm128_i8() // Opcode 66 0f c2
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		UINT8 imm8 = FETCH();
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		sse_predicate_compare_double(imm8, XMM(d), XMM(s));
+	} else {
+		int d;
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		UINT8 imm8 = FETCH();
+		READXMM(ea, s);
+		d=(modrm >> 3) & 0x7;
+		sse_predicate_compare_double(imm8, XMM(d), s);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -3908,6 +4428,22 @@ void i386_device::sse_pminub_r64_rm64() // Opcode 0f da
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_pminub_r128_rm128() // Opcode 66 0f da
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n] = XMM((modrm >> 3) & 0x7).b[n] < XMM(modrm & 0x7).b[n] ? XMM((modrm >> 3) & 0x7).b[n] : XMM(modrm & 0x7).b[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n] = XMM((modrm >> 3) & 0x7).b[n] < s.b[n] ? XMM((modrm >> 3) & 0x7).b[n] : s.b[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_pmaxub_r64_rm64() // Opcode 0f de
 {
 	int n;
@@ -4034,6 +4570,22 @@ void i386_device::sse_pmuludq_r64_rm64() // Opcode 0f f4
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_pmuludq_r128_rm128() // Opcode 66 0f f4
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0] = (UINT64)XMM((modrm >> 3) & 0x7).d[0] * (UINT64)XMM(modrm & 0x7).d[0];
+		XMM((modrm >> 3) & 0x7).q[1] = (UINT64)XMM((modrm >> 3) & 0x7).d[2] * (UINT64)XMM(modrm & 0x7).d[2];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		XMM((modrm >> 3) & 0x7).q[0] = (UINT64)XMM((modrm >> 3) & 0x7).d[0] * (UINT64)s.d[0];
+		XMM((modrm >> 3) & 0x7).q[1] = (UINT64)XMM((modrm >> 3) & 0x7).d[2] * (UINT64)s.d[2];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_psadbw_r64_rm64() // Opcode 0f f6
 {
 	int n;
@@ -4072,6 +4624,81 @@ void i386_device::sse_psubq_r64_rm64()  // Opcode 0f fb
 	CYCLES(1);     // TODO: correct cycle count
 }
 
+void i386_device::sse_psubq_r128_rm128()  // Opcode 66 0f fb
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] - XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] - XMM(modrm & 7).q[1];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] - s.q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] - s.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pshufd_r128_rm128_i8() // Opcode 66 0f 70
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM_REG t;
+		int s,d;
+		UINT8 imm8 = FETCH();
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		t.q[0]=XMM(s).q[0];
+		t.q[1]=XMM(s).q[1];
+		XMM(d).d[0]=t.d[imm8 & 3];
+		XMM(d).d[1]=t.d[(imm8 >> 2) & 3];
+		XMM(d).d[2]=t.d[(imm8 >> 4) & 3];
+		XMM(d).d[3]=t.d[(imm8 >> 6) & 3];
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		UINT8 imm8 = FETCH();
+		READXMM(ea, s);
+		XMM(d).d[0]=s.d[(imm8 & 3)];
+		XMM(d).d[1]=s.d[((imm8 >> 2) & 3)];
+		XMM(d).d[2]=s.d[((imm8 >> 4) & 3)];
+		XMM(d).d[3]=s.d[((imm8 >> 6) & 3)];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pshuflw_r128_rm128_i8() // Opcode f2 0f 70
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM_REG t;
+		int s,d;
+		UINT8 imm8 = FETCH();
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		t.q[0]=XMM(s).q[0];
+		XMM(d).q[1]=XMM(s).q[1];
+		XMM(d).w[0]=t.w[imm8 & 3];
+		XMM(d).w[1]=t.w[(imm8 >> 2) & 3];
+		XMM(d).w[2]=t.w[(imm8 >> 4) & 3];
+		XMM(d).w[3]=t.w[(imm8 >> 6) & 3];
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		UINT8 imm8 = FETCH();
+		READXMM(ea, s);
+		XMM(d).q[1]=s.q[1];
+		XMM(d).w[0]=s.w[imm8 & 3];
+		XMM(d).w[1]=s.w[(imm8 >> 2) & 3];
+		XMM(d).w[2]=s.w[(imm8 >> 4) & 3];
+		XMM(d).w[3]=s.w[(imm8 >> 6) & 3];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
 void i386_device::sse_pshufhw_r128_rm128_i8() // Opcode f3 0f 70
 {
 	UINT8 modrm = FETCH();
@@ -4100,4 +4727,1660 @@ void i386_device::sse_pshufhw_r128_rm128_i8() // Opcode f3 0f 70
 		XMM(d).w[7]=s.w[4 + ((imm8 >> 6) & 3)];
 	}
 	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_packsswb_r128_rm128() // Opcode 66 0f 63
+{
+	UINT8 modrm = FETCH();
+	if (modrm >= 0xc0) {
+		XMM_REG t;
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		t.q[0] = XMM(s).q[0];
+		t.q[1] = XMM(s).q[1];
+		for (int n = 0; n < 8; n++)
+			XMM(d).c[n] = SaturatedSignedWordToSignedByte(XMM(d).s[n]);
+		for (int n = 0; n < 8; n++)
+			XMM(d).c[n+8] = SaturatedSignedWordToSignedByte(t.s[n]);
+	}
+	else {
+		XMM_REG s;
+		int d = (modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n = 0; n < 8; n++)
+			XMM(d).c[n] = SaturatedSignedWordToSignedByte(XMM(d).s[n]);
+		for (int n = 0; n < 8; n++)
+			XMM(d).c[n + 8] = SaturatedSignedWordToSignedByte(s.s[n]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_packssdw_r128_rm128() // Opcode 66 0f 6b
+{
+	UINT8 modrm = FETCH();
+	if (modrm >= 0xc0) {
+		XMM_REG t;
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		t.q[0] = XMM(s).q[0];
+		t.q[1] = XMM(s).q[1];
+		XMM(d).s[0] = SaturatedSignedDwordToSignedWord(XMM(d).i[0]);
+		XMM(d).s[1] = SaturatedSignedDwordToSignedWord(XMM(d).i[1]);
+		XMM(d).s[2] = SaturatedSignedDwordToSignedWord(XMM(d).i[2]);
+		XMM(d).s[3] = SaturatedSignedDwordToSignedWord(XMM(d).i[3]);
+		XMM(d).s[4] = SaturatedSignedDwordToSignedWord(t.i[0]);
+		XMM(d).s[5] = SaturatedSignedDwordToSignedWord(t.i[1]);
+		XMM(d).s[6] = SaturatedSignedDwordToSignedWord(t.i[2]);
+		XMM(d).s[7] = SaturatedSignedDwordToSignedWord(t.i[3]);
+	}
+	else {
+		XMM_REG s;
+		int d = (modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		XMM(d).s[0] = SaturatedSignedDwordToSignedWord(XMM(d).i[0]);
+		XMM(d).s[1] = SaturatedSignedDwordToSignedWord(XMM(d).i[1]);
+		XMM(d).s[2] = SaturatedSignedDwordToSignedWord(XMM(d).i[2]);
+		XMM(d).s[3] = SaturatedSignedDwordToSignedWord(XMM(d).i[3]);
+		XMM(d).s[4] = SaturatedSignedDwordToSignedWord(s.i[0]);
+		XMM(d).s[5] = SaturatedSignedDwordToSignedWord(s.i[1]);
+		XMM(d).s[6] = SaturatedSignedDwordToSignedWord(s.i[2]);
+		XMM(d).s[7] = SaturatedSignedDwordToSignedWord(s.i[3]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pcmpgtb_r128_rm128() // Opcode 66 0f 64
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		for (int c=0;c <= 15;c++)
+			XMM(d).b[c]=(XMM(d).c[c] > XMM(s).c[c]) ? 0xff : 0;
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int c=0;c <= 15;c++)
+			XMM(d).b[c]=(XMM(d).c[c] > s.c[c]) ? 0xff : 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pcmpgtw_r128_rm128() // Opcode 66 0f 65
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		for (int c=0;c <= 7;c++)
+			XMM(d).w[c]=(XMM(d).s[c] > XMM(s).s[c]) ? 0xffff : 0;
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int c=0;c <= 7;c++)
+			XMM(d).w[c]=(XMM(d).s[c] > s.s[c]) ? 0xffff : 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pcmpgtd_r128_rm128() // Opcode 66 0f 66
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		for (int c=0;c <= 3;c++)
+			XMM(d).d[c]=(XMM(d).i[c] > XMM(s).i[c]) ? 0xffffffff : 0;
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int c=0;c <= 3;c++)
+			XMM(d).d[c]=(XMM(d).i[c] > s.i[c]) ? 0xffffffff : 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_packuswb_r128_rm128() // Opcode 66 0f 67
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM_REG t;
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		t.q[0] = XMM(s).q[0];
+		t.q[1] = XMM(s).q[1];
+		for (int n = 0; n < 8;n++)
+			XMM(d).b[n]=SaturatedSignedWordToUnsignedByte(XMM(d).s[n]);
+		for (int n = 0; n < 8;n++)
+			XMM(d).b[n+8]=SaturatedSignedWordToUnsignedByte(t.s[n]);
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n = 0; n < 8;n++)
+			XMM(d).b[n]=SaturatedSignedWordToUnsignedByte(XMM(d).s[n]);
+		for (int n = 0; n < 8;n++)
+			XMM(d).b[n+8]=SaturatedSignedWordToUnsignedByte(s.s[n]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_punpckhbw_r128_rm128() // Opcode 66 0f 68
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM_REG t;
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		t.q[1] = XMM(s).q[1];
+		for (int n = 0; n < 16; n += 2) {
+			XMM(d).b[n]=XMM(d).b[8+(n >> 1)];
+			XMM(d).b[n+1]=t.b[8+(n >> 1)];
+		}
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n = 0; n < 16; n += 2) {
+			XMM(d).b[n]=XMM(d).b[8+(n >> 1)];
+			XMM(d).b[n+1]=s.b[8+(n >> 1)];
+		}
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_punpckhwd_r128_rm128() // Opcode 66 0f 69
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM_REG t;
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		t.q[1] = XMM(s).q[1];
+		for (int n = 0; n < 8; n += 2) {
+			XMM(d).w[n]=XMM(d).w[4+(n >> 1)];
+			XMM(d).w[n+1]=t.w[4+(n >> 1)];
+		}
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n = 0; n < 8; n += 2) {
+			XMM(d).w[n]=XMM(d).w[4+(n >> 1)];
+			XMM(d).w[n+1]=s.w[4+(n >> 1)];
+		}
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_unpckhdq_r128_rm128() // Opcode 66 0f 6a
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM_REG t;
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		t.q[1] = XMM(s).q[1];
+		XMM(d).d[0]=XMM(d).d[2];
+		XMM(d).d[1]=t.d[2];
+		XMM(d).d[2]=XMM(d).d[3];
+		XMM(d).d[3]=t.d[3];
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		XMM(d).d[0]=XMM(d).d[2];
+		XMM(d).d[1]=s.d[2];
+		XMM(d).d[2]=XMM(d).d[3];
+		XMM(d).d[3]=s.d[3];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_punpckhqdq_r128_rm128() // Opcode 66 0f 6d
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM_REG t;
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		t.q[1] = XMM(s).q[1];
+		XMM(d).q[0]=XMM(d).q[1];
+		XMM(d).q[1]=t.q[1];
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		XMM(d).q[0]=XMM(d).q[1];
+		XMM(d).q[1]=s.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pcmpeqb_r128_rm128() // Opcode 66 0f 74
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		for (int c=0;c <= 15;c++)
+			XMM(d).b[c]=(XMM(d).c[c] == XMM(s).c[c]) ? 0xff : 0;
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int c=0;c <= 15;c++)
+			XMM(d).b[c]=(XMM(d).c[c] == s.c[c]) ? 0xff : 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pcmpeqw_r128_rm128() // Opcode 66 0f 75
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		for (int c=0;c <= 7;c++)
+			XMM(d).w[c]=(XMM(d).s[c] == XMM(s).s[c]) ? 0xffff : 0;
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int c=0;c <= 7;c++)
+			XMM(d).w[c]=(XMM(d).s[c] == s.s[c]) ? 0xffff : 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pcmpeqd_r128_rm128() // Opcode 66 0f 76
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		for (int c=0;c <= 3;c++)
+			XMM(d).d[c]=(XMM(d).i[c] == XMM(s).i[c]) ? 0xffffffff : 0;
+	} else {
+		XMM_REG s;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int c=0;c <= 3;c++)
+			XMM(d).d[c]=(XMM(d).i[c] == s.i[c]) ? 0xffffffff : 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddq_r128_rm128()  // Opcode 66 0f d4
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		XMM(d).q[0]=XMM(d).q[0]+XMM(s).q[0];
+		XMM(d).q[1]=XMM(d).q[1]+XMM(s).q[1];
+	} else {
+		XMM_REG src;
+		int d=(modrm >> 3) & 0x7;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM(d).q[0]=XMM(d).q[0]+src.q[0];
+		XMM(d).q[1]=XMM(d).q[1]+src.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pmullw_r128_rm128()  // Opcode 66 0f d5
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		for (int n = 0; n < 8;n++)
+			XMM(d).w[n]=(UINT32)((INT32)XMM(d).s[n]*(INT32)XMM(s).s[n]) & 0xffff;
+	} else {
+		XMM_REG src;
+		int d;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		d=(modrm >> 3) & 0x7;
+		for (int n = 0; n < 8;n++)
+			XMM(d).w[n]=(UINT32)((INT32)XMM(d).s[n]*(INT32)src.s[n]) & 0xffff;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddb_r128_rm128()  // Opcode 66 0f fc
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] + XMM(modrm & 7).b[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] + s.b[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddw_r128_rm128()  // Opcode 66 0f fd
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] + XMM(modrm & 7).w[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] + s.w[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddd_r128_rm128()  // Opcode 66 0f fe
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 4;n++)
+			XMM((modrm >> 3) & 0x7).d[n]=XMM((modrm >> 3) & 0x7).d[n] + XMM(modrm & 7).d[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 4;n++)
+			XMM((modrm >> 3) & 0x7).d[n]=XMM((modrm >> 3) & 0x7).d[n] + s.d[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psubusb_r128_rm128()  // Opcode 66 0f d8
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] < XMM(modrm & 7).b[n] ? 0 : XMM((modrm >> 3) & 0x7).b[n]-XMM(modrm & 7).b[n];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] < src.b[n] ? 0 : XMM((modrm >> 3) & 0x7).b[n]-src.b[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psubusw_r128_rm128()  // Opcode 66 0f d9
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] < XMM(modrm & 7).w[n] ? 0 : XMM((modrm >> 3) & 0x7).w[n]-XMM(modrm & 7).w[n];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] < src.w[n] ? 0 : XMM((modrm >> 3) & 0x7).w[n]-src.w[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pand_r128_rm128()  // Opcode 66 0f db
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] & XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] & XMM(modrm & 7).q[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] & src.q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] & src.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pandn_r128_rm128()  // Opcode 66 0f df
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0]=(~XMM((modrm >> 3) & 0x7).q[0]) & XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=(~XMM((modrm >> 3) & 0x7).q[1]) & XMM(modrm & 7).q[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).q[0]=(~XMM((modrm >> 3) & 0x7).q[0]) & src.q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=(~XMM((modrm >> 3) & 0x7).q[1]) & src.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddusb_r128_rm128()  // Opcode 66 0f dc
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] > (0xff-XMM(modrm & 7).b[n]) ? 0xff : XMM((modrm >> 3) & 0x7).b[n]+XMM(modrm & 7).b[n];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] > (0xff-src.b[n]) ? 0xff : XMM((modrm >> 3) & 0x7).b[n]+src.b[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddusw_r128_rm128()  // Opcode 66 0f dd
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] > (0xffff-XMM(modrm & 7).w[n]) ? 0xffff : XMM((modrm >> 3) & 0x7).w[n]+XMM(modrm & 7).w[n];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] > (0xffff-src.w[n]) ? 0xffff : XMM((modrm >> 3) & 0x7).w[n]+src.w[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pmaxub_r128_rm128() // Opcode 66 0f de
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n] = XMM((modrm >> 3) & 0x7).b[n] > XMM(modrm & 0x7).b[n] ? XMM((modrm >> 3) & 0x7).b[n] : XMM(modrm & 0x7).b[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n] = XMM((modrm >> 3) & 0x7).b[n] > s.b[n] ? XMM((modrm >> 3) & 0x7).b[n] : s.b[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pmulhuw_r128_rm128()  // Opcode 66 0f e4
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=((UINT32)XMM((modrm >> 3) & 0x7).w[n]*(UINT32)XMM(modrm & 7).w[n]) >> 16;
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=((UINT32)XMM((modrm >> 3) & 0x7).w[n]*(UINT32)s.w[n]) >> 16;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pmulhw_r128_rm128()  // Opcode 66 0f e5
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=(UINT32)((INT32)XMM((modrm >> 3) & 0x7).s[n]*(INT32)XMM(modrm & 7).s[n]) >> 16;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=(UINT32)((INT32)XMM((modrm >> 3) & 0x7).s[n]*(INT32)src.s[n]) >> 16;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psubsb_r128_rm128()  // Opcode 66 0f e8
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).c[n]=SaturatedSignedWordToSignedByte((INT16)XMM((modrm >> 3) & 0x7).c[n] - (INT16)XMM(modrm & 7).c[n]);
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).c[n]=SaturatedSignedWordToSignedByte((INT16)XMM((modrm >> 3) & 0x7).c[n] - (INT16)s.c[n]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psubsw_r128_rm128()  // Opcode 66 0f e9
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n]=SaturatedSignedDwordToSignedWord((INT32)XMM((modrm >> 3) & 0x7).s[n] - (INT32)XMM(modrm & 7).s[n]);
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n]=SaturatedSignedDwordToSignedWord((INT32)XMM((modrm >> 3) & 0x7).s[n] - (INT32)s.s[n]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pminsw_r128_rm128() // Opcode 66 0f ea
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n] = XMM((modrm >> 3) & 0x7).s[n] < XMM(modrm & 0x7).s[n] ? XMM((modrm >> 3) & 0x7).s[n] : XMM(modrm & 0x7).s[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n] = XMM((modrm >> 3) & 0x7).s[n] < s.s[n] ? XMM((modrm >> 3) & 0x7).s[n] : s.s[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pmaxsw_r128_rm128() // Opcode 66 0f ee
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n] = XMM((modrm >> 3) & 0x7).s[n] > XMM(modrm & 0x7).s[n] ? XMM((modrm >> 3) & 0x7).s[n] : XMM(modrm & 0x7).s[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n] = XMM((modrm >> 3) & 0x7).s[n] > s.s[n] ? XMM((modrm >> 3) & 0x7).s[n] : s.s[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddsb_r128_rm128()  // Opcode 66 0f ec
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).c[n]=SaturatedSignedWordToSignedByte((INT16)XMM((modrm >> 3) & 0x7).c[n] + (INT16)XMM(modrm & 7).c[n]);
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).c[n]=SaturatedSignedWordToSignedByte((INT16)XMM((modrm >> 3) & 0x7).c[n] + (INT16)s.c[n]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_paddsw_r128_rm128()  // Opcode 66 0f ed
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n]=SaturatedSignedDwordToSignedWord((INT32)XMM((modrm >> 3) & 0x7).s[n] + (INT32)XMM(modrm & 7).s[n]);
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n]=SaturatedSignedDwordToSignedWord((INT32)XMM((modrm >> 3) & 0x7).s[n] + (INT32)s.s[n]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_por_r128_rm128()  // Opcode 66 0f eb
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] | XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] | XMM(modrm & 7).q[1];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] | s.q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] | s.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pxor_r128_rm128()  // Opcode 66 0f ef
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] ^ XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] ^ XMM(modrm & 7).q[1];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] ^ s.q[0];
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] ^ s.q[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pmaddwd_r128_rm128()  // Opcode 66 0f f5
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 4;n++)
+			XMM((modrm >> 3) & 0x7).i[n]=(INT32)XMM((modrm >> 3) & 0x7).s[n]*(INT32)XMM(modrm & 7).s[n]+
+										(INT32)XMM((modrm >> 3) & 0x7).s[n]*(INT32)XMM(modrm & 7).s[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 4;n++)
+			XMM((modrm >> 3) & 0x7).i[n]=(INT32)XMM((modrm >> 3) & 0x7).s[n]*(INT32)s.s[n]+
+										(INT32)XMM((modrm >> 3) & 0x7).s[n]*(INT32)s.s[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psubb_r128_rm128()  // Opcode 66 0f f8
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] - XMM(modrm & 7).b[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] - s.b[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psubw_r128_rm128()  // Opcode 66 0f f9
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] - XMM(modrm & 7).w[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] - s.w[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psubd_r128_rm128()  // Opcode 66 0f fa
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 4;n++)
+			XMM((modrm >> 3) & 0x7).d[n]=XMM((modrm >> 3) & 0x7).d[n] - XMM(modrm & 7).d[n];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 4;n++)
+			XMM((modrm >> 3) & 0x7).d[n]=XMM((modrm >> 3) & 0x7).d[n] - s.d[n];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psadbw_r128_rm128() // Opcode 66 0f f6
+{
+	INT32 temp;
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		temp=0;
+		for (int n=0;n < 8;n++)
+			temp += abs((INT32)XMM((modrm >> 3) & 0x7).b[n] - (INT32)XMM(modrm & 0x7).b[n]);
+		XMM((modrm >> 3) & 0x7).l[0]=(UINT64)temp & 0xffff;
+		temp=0;
+		for (int n=8;n < 16;n++)
+			temp += abs((INT32)XMM((modrm >> 3) & 0x7).b[n] - (INT32)XMM(modrm & 0x7).b[n]);
+		XMM((modrm >> 3) & 0x7).l[1]=(UINT64)temp & 0xffff;
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		temp=0;
+		for (int n=0;n < 8;n++)
+			temp += abs((INT32)XMM((modrm >> 3) & 0x7).b[n] - (INT32)s.b[n]);
+		XMM((modrm >> 3) & 0x7).l[0]=(UINT64)temp & 0xffff;
+		temp=0;
+		for (int n=8;n < 16;n++)
+			temp += abs((INT32)XMM((modrm >> 3) & 0x7).b[n] - (INT32)s.b[n]);
+		XMM((modrm >> 3) & 0x7).l[1]=(UINT64)temp & 0xffff;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pavgb_r128_rm128() // Opcode 66 0f e0
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n] = ((UINT16)XMM((modrm >> 3) & 0x7).b[n] + (UINT16)XMM(modrm & 0x7).b[n] + 1) >> 1;
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 16;n++)
+			XMM((modrm >> 3) & 0x7).b[n] = ((UINT16)XMM((modrm >> 3) & 0x7).b[n] + (UINT16)s.b[n] + 1) >> 1;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pavgw_r128_rm128() // Opcode 66 0f e3
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n] = ((UINT32)XMM((modrm >> 3) & 0x7).w[n] + (UINT32)XMM(modrm & 0x7).w[n] + 1) >> 1;
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		for (int n=0;n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n] = ((UINT32)XMM((modrm >> 3) & 0x7).w[n] + (UINT32)s.w[n] + 1) >> 1;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psrlw_r128_rm128()  // Opcode 66 0f d1
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		for (int n=0; n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] >> count;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		int count=(int)src.q[0];
+		for (int n=0; n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] >> count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psrld_r128_rm128()  // Opcode 66 0f d2
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).d[0]=XMM((modrm >> 3) & 0x7).d[0] >> count;
+		XMM((modrm >> 3) & 0x7).d[1]=XMM((modrm >> 3) & 0x7).d[1] >> count;
+		XMM((modrm >> 3) & 0x7).d[2]=XMM((modrm >> 3) & 0x7).d[2] >> count;
+		XMM((modrm >> 3) & 0x7).d[3]=XMM((modrm >> 3) & 0x7).d[3] >> count;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		int count=(int)src.q[0];
+		XMM((modrm >> 3) & 0x7).d[0]=XMM((modrm >> 3) & 0x7).d[0] >> count;
+		XMM((modrm >> 3) & 0x7).d[1]=XMM((modrm >> 3) & 0x7).d[1] >> count;
+		XMM((modrm >> 3) & 0x7).d[2]=XMM((modrm >> 3) & 0x7).d[2] >> count;
+		XMM((modrm >> 3) & 0x7).d[3]=XMM((modrm >> 3) & 0x7).d[3] >> count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psrlq_r128_rm128()  // Opcode 66 0f d3
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] >> count;
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] >> count;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		int count=(int)src.q[0];
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] >> count;
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] >> count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psllw_r128_rm128()  // Opcode 66 0f f1
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		for (int n=0; n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] << count;
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		int count=(int)s.q[0];
+		for (int n=0; n < 8;n++)
+			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] << count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_pslld_r128_rm128()  // Opcode 66 0f f2
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).d[0]=XMM((modrm >> 3) & 0x7).d[0] << count;
+		XMM((modrm >> 3) & 0x7).d[1]=XMM((modrm >> 3) & 0x7).d[1] << count;
+		XMM((modrm >> 3) & 0x7).d[2]=XMM((modrm >> 3) & 0x7).d[2] << count;
+		XMM((modrm >> 3) & 0x7).d[3]=XMM((modrm >> 3) & 0x7).d[3] << count;
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		int count=(int)s.q[0];
+		XMM((modrm >> 3) & 0x7).d[0]=XMM((modrm >> 3) & 0x7).d[0] << count;
+		XMM((modrm >> 3) & 0x7).d[1]=XMM((modrm >> 3) & 0x7).d[1] << count;
+		XMM((modrm >> 3) & 0x7).d[2]=XMM((modrm >> 3) & 0x7).d[2] << count;
+		XMM((modrm >> 3) & 0x7).d[3]=XMM((modrm >> 3) & 0x7).d[3] << count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psllq_r128_rm128()  // Opcode 66 0f f3
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] << count;
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] << count;
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, s);
+		int count=(int)s.q[0];
+		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] << count;
+		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] << count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psraw_r128_rm128()  // Opcode 66 0f e1
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		for (int n=0; n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n]=XMM((modrm >> 3) & 0x7).s[n] >> count;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		int count=(int)src.q[0];
+		for (int n=0; n < 8;n++)
+			XMM((modrm >> 3) & 0x7).s[n]=XMM((modrm >> 3) & 0x7).s[n] >> count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_psrad_r128_rm128()  // Opcode 66 0f e2
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int count=(int)XMM(modrm & 7).q[0];
+		XMM((modrm >> 3) & 0x7).i[0]=XMM((modrm >> 3) & 0x7).i[0] >> count;
+		XMM((modrm >> 3) & 0x7).i[1]=XMM((modrm >> 3) & 0x7).i[1] >> count;
+		XMM((modrm >> 3) & 0x7).i[2]=XMM((modrm >> 3) & 0x7).i[2] >> count;
+		XMM((modrm >> 3) & 0x7).i[3]=XMM((modrm >> 3) & 0x7).i[3] >> count;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		int count=(int)src.q[0];
+		XMM((modrm >> 3) & 0x7).i[0]=XMM((modrm >> 3) & 0x7).i[0] >> count;
+		XMM((modrm >> 3) & 0x7).i[1]=XMM((modrm >> 3) & 0x7).i[1] >> count;
+		XMM((modrm >> 3) & 0x7).i[2]=XMM((modrm >> 3) & 0x7).i[2] >> count;
+		XMM((modrm >> 3) & 0x7).i[3]=XMM((modrm >> 3) & 0x7).i[3] >> count;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movntdq_m128_r128()  // Opcode 66 0f e7
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		CYCLES(1);     // unsupported
+	} else {
+		// since cache is not implemented
+		UINT32 ea = GetEA(modrm, 0);
+		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
+		CYCLES(1);     // TODO: correct cycle count
+	}
+}
+
+void i386_device::sse_cvttpd2dq_r128_rm128()  // Opcode 66 0f e6
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).i[0]=(INT32)XMM((modrm >> 3) & 0x7).f64[0];
+		XMM((modrm >> 3) & 0x7).i[1]=(INT32)XMM((modrm >> 3) & 0x7).f64[1];
+		XMM((modrm >> 3) & 0x7).q[1] = 0;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).i[0]=(INT32)src.f64[0];
+		XMM((modrm >> 3) & 0x7).i[1]=(INT32)src.f64[1];
+		XMM((modrm >> 3) & 0x7).q[1] = 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movq_r128m64_r128()  // Opcode 66 0f d6
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM(modrm & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0];
+		XMM(modrm & 0x7).q[1] = 0;
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		WRITE64(ea, XMM((modrm >> 3) & 0x7).q[0]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_addsubpd_r128_rm128()  // Opcode 66 0f d0
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s, d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		XMM(d).f64[0]=XMM(d).f64[0]-XMM(s).f64[0];
+		XMM(d).f64[1]=XMM(d).f64[1]+XMM(s).f64[1];
+	} else {
+		XMM_REG src;
+		int d;
+		UINT32 ea = GetEA(modrm, 0);
+		d=(modrm >> 3) & 0x7;
+		READXMM(ea, src);
+		XMM(d).f64[0]=XMM(d).f64[0]-src.f64[0];
+		XMM(d).f64[1]=XMM(d).f64[1]+src.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_haddpd_r128_rm128()  // Opcode 66 0f 7c
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s, d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		XMM(d).f64[0]=XMM(d).f64[0]+XMM(d).f64[1];
+		XMM(d).f64[1]=XMM(s).f64[0]+XMM(s).f64[1];
+	} else {
+		XMM_REG src;
+		int d;
+		UINT32 ea = GetEA(modrm, 0);
+		d=(modrm >> 3) & 0x7;
+		READXMM(ea, src);
+		XMM(d).f64[0]=XMM(d).f64[0]+XMM(d).f64[1];
+		XMM(d).f64[1]=src.f64[0]+src.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_hsubpd_r128_rm128()  // Opcode 66 0f 7d
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s, d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		XMM(d).f64[0]=XMM(d).f64[0]-XMM(d).f64[1];
+		XMM(d).f64[1]=XMM(s).f64[0]-XMM(s).f64[1];
+	} else {
+		XMM_REG src;
+		int d;
+		UINT32 ea = GetEA(modrm, 0);
+		d=(modrm >> 3) & 0x7;
+		READXMM(ea, src);
+		XMM(d).f64[0]=XMM(d).f64[0]-XMM(d).f64[1];
+		XMM(d).f64[1]=src.f64[0]-src.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_sqrtpd_r128_rm128()  // Opcode 66 0f 51
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s, d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		XMM(d).f64[0]=sqrt(XMM(s).f64[0]);
+		XMM(d).f64[1]=sqrt(XMM(s).f64[1]);
+	} else {
+		XMM_REG src;
+		int d;
+		UINT32 ea = GetEA(modrm, 0);
+		d=(modrm >> 3) & 0x7;
+		READXMM(ea, src);
+		XMM(d).f64[0]=sqrt(src.f64[0]);
+		XMM(d).f64[1]=sqrt(src.f64[1]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvtpi2pd_r128_rm64()  // Opcode 66 0f 2a
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		MMXPROLOG();
+		XMM((modrm >> 3) & 0x7).f64[0] = (double)MMX(modrm & 0x7).i[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = (double)MMX(modrm & 0x7).i[1];
+	} else {
+		MMX_REG r;
+		UINT32 ea = GetEA(modrm, 0);
+		READMMX(ea, r);
+		XMM((modrm >> 3) & 0x7).f64[0] = (double)r.i[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = (double)r.i[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvttpd2pi_r64_rm128()  // Opcode 66 0f 2c
+{
+	UINT8 modrm = FETCH();
+	MMXPROLOG();
+	if( modrm >= 0xc0 ) {
+		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
+		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
+	} else {
+		XMM_REG r;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, r);
+		MMX((modrm >> 3) & 0x7).i[0] = r.f64[0];
+		MMX((modrm >> 3) & 0x7).i[1] = r.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvtpd2pi_r64_rm128()  // Opcode 66 0f 2d
+{
+	UINT8 modrm = FETCH();
+	MMXPROLOG();
+	if( modrm >= 0xc0 ) {
+		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
+		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
+	} else {
+		XMM_REG r;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, r);
+		MMX((modrm >> 3) & 0x7).i[0] = r.f64[0];
+		MMX((modrm >> 3) & 0x7).i[1] = r.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvtpd2ps_r128_rm128()  // Opcode 66 0f 5a
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f[0] = (float)XMM(modrm & 0x7).f64[0];
+		XMM((modrm >> 3) & 0x7).f[1] = (float)XMM(modrm & 0x7).f64[1];
+		XMM((modrm >> 3) & 0x7).q[1] = 0;
+	} else {
+		XMM_REG r;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, r);
+		XMM((modrm >> 3) & 0x7).f[0] = (float)r.f64[0];
+		XMM((modrm >> 3) & 0x7).f[1] = (float)r.f64[1];
+		XMM((modrm >> 3) & 0x7).q[1] = 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvtps2dq_r128_rm128()  // Opcode 66 0f 5b
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f[0];
+		XMM((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f[1];
+		XMM((modrm >> 3) & 0x7).i[2] = XMM(modrm & 0x7).f[2];
+		XMM((modrm >> 3) & 0x7).i[3] = XMM(modrm & 0x7).f[3];
+	} else {
+		XMM_REG r;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, r);
+		XMM((modrm >> 3) & 0x7).i[0] = r.f[0];
+		XMM((modrm >> 3) & 0x7).i[1] = r.f[1];
+		XMM((modrm >> 3) & 0x7).i[2] = r.f[2];
+		XMM((modrm >> 3) & 0x7).i[3] = r.f[3];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_addpd_r128_rm128()  // Opcode 66 0f 58
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] + XMM(modrm & 0x7).f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] + XMM(modrm & 0x7).f64[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] + src.f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] + src.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_mulpd_r128_rm128()  // Opcode 66 0f 59
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] * XMM(modrm & 0x7).f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] * XMM(modrm & 0x7).f64[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] * src.f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] * src.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_subpd_r128_rm128()  // Opcode 66 0f 5c
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] - XMM(modrm & 0x7).f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] - XMM(modrm & 0x7).f64[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] - src.f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] - src.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_minpd_r128_rm128()  // Opcode 66 0f 5d
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
+		XMM((modrm >> 3) & 0x7).f64[1] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[1], XMM(modrm & 0x7).f64[1]);
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[0], src.f64[0]);
+		XMM((modrm >> 3) & 0x7).f64[1] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[1], src.f64[1]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_divpd_r128_rm128()  // Opcode 66 0f 5e
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] / XMM(modrm & 0x7).f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] / XMM(modrm & 0x7).f64[1];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] / src.f64[0];
+		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] / src.f64[1];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_maxpd_r128_rm128()  // Opcode 66 0f 5f
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
+		XMM((modrm >> 3) & 0x7).f64[1] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[1], XMM(modrm & 0x7).f64[1]);
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[0], src.f64[0]);
+		XMM((modrm >> 3) & 0x7).f64[1] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[1], src.f64[1]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movntpd_m128_r128()  // Opcode 66 0f 2b
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		// unsupported by cpu
+		CYCLES(1);     // TODO: correct cycle count
+	} else {
+		// since cache is not implemented
+		UINT32 ea = GetEA(modrm, 0);
+		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
+		CYCLES(1);     // TODO: correct cycle count
+	}
+}
+
+void i386_device::sse_movapd_r128_rm128()  // Opcode 66 0f 28
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7) = XMM(modrm & 0x7);
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, XMM((modrm >> 3) & 0x7));
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movapd_rm128_r128()  // Opcode 66 0f 29
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM(modrm & 0x7) = XMM((modrm >> 3) & 0x7);
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		WRITEXMM(ea, XMM((modrm >> 3) & 0x7));
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movsd_r128_r128m64() // Opcode f2 0f 10
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM_LO64(ea, XMM((modrm >> 3) & 0x7));
+		XMM((modrm >> 3) & 0x7).q[1] = 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movsd_r128m64_r128() // Opcode f2 0f 11
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM(modrm & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0];
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		WRITEXMM_LO64(ea, XMM((modrm >> 3) & 0x7));
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movddup_r128_r128m64() // Opcode f2 0f 12
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[0];
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM_LO64(ea, XMM((modrm >> 3) & 0x7));
+		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[0];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvtsi2sd_r128_rm32() // Opcode f2 0f 2a
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = (INT32)LOAD_RM32(modrm);
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		XMM((modrm >> 3) & 0x7).f64[0] = (INT32)READ32(ea);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvttsd2si_r32_r128m64() // Opcode f2 0f 2c
+{
+	INT32 src;
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		src = (INT32)XMM(modrm & 0x7).f64[0];
+	} else { // otherwise is a memory address
+		XMM_REG t;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM_LO64(ea, t);
+		src = (INT32)t.f64[0];
+	}
+	STORE_REG32(modrm, (UINT32)src);
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvtsd2si_r32_r128m64() // Opcode f2 0f 2d
+{
+	INT32 src;
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		src = (INT32)XMM(modrm & 0x7).f64[0];
+	} else { // otherwise is a memory address
+		XMM_REG t;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM_LO64(ea, t);
+		src = (INT32)t.f64[0];
+	}
+	STORE_REG32(modrm, (UINT32)src);
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_sqrtsd_r128_r128m64() // Opcode f2 0f 51
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s, d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		XMM(d).f64[0]=sqrt(XMM(s).f64[0]);
+	} else {
+		XMM_REG src;
+		int d;
+		UINT32 ea = GetEA(modrm, 0);
+		d=(modrm >> 3) & 0x7;
+		READXMM(ea, src);
+		XMM(d).f64[0]=sqrt(src.f64[0]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_addsd_r128_r128m64() // Opcode f2 0f 58
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] + XMM(modrm & 0x7).f64[0];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] + src.f64[0];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_mulsd_r128_r128m64() // Opcode f2 0f 59
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] * XMM(modrm & 0x7).f64[0];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] * src.f64[0];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cvtsd2ss_r128_r128m64() // Opcode f2 0f 5a
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f[0] = XMM(modrm & 0x7).f64[0];
+	} else {
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM_LO64(ea, s);
+		XMM((modrm >> 3) & 0x7).f[0] = s.f64[0];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_subsd_r128_r128m64() // Opcode f2 0f 5c
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] - XMM(modrm & 0x7).f64[0];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] - src.f64[0];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_minsd_r128_r128m64() // Opcode f2 0f 5d
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[0], src.f64[0]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_divsd_r128_r128m64() // Opcode f2 0f 5e
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] / XMM(modrm & 0x7).f64[0];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] / src.f64[0];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_maxsd_r128_r128m64() // Opcode f2 0f 5f
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f64[0] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[0], src.f64[0]);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_haddps_r128_rm128() // Opcode f2 0f 7c
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s, d;
+		float f1, f2, f3, f4;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		f1=XMM(d).f[0]+XMM(d).f[1];
+		f2=XMM(d).f[2]+XMM(d).f[3];
+		f3=XMM(s).f[0]+XMM(s).f[1];
+		f4=XMM(s).f[2]+XMM(s).f[3];
+		XMM(d).f[0]=f1;
+		XMM(d).f[1]=f2;
+		XMM(d).f[2]=f3;
+		XMM(d).f[3]=f4;
+	} else {
+		XMM_REG src;
+		int d;
+		float f1, f2;
+		UINT32 ea = GetEA(modrm, 0);
+		d=(modrm >> 3) & 0x7;
+		READXMM(ea, src);
+		f1=XMM(d).f[0]+XMM(d).f[1];
+		f2=XMM(d).f[2]+XMM(d).f[3];
+		XMM(d).f[0]=f1;
+		XMM(d).f[1]=f2;
+		XMM(d).f[2]=src.f[0]+src.f[1];
+		XMM(d).f[3]=src.f[2]+src.f[3];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_hsubps_r128_rm128() // Opcode f2 0f 7d
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s, d;
+		float f1, f2, f3, f4;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		f1=XMM(d).f[0]-XMM(d).f[1];
+		f2=XMM(d).f[2]-XMM(d).f[3];
+		f3=XMM(s).f[0]-XMM(s).f[1];
+		f4=XMM(s).f[2]-XMM(s).f[3];
+		XMM(d).f[0]=f1;
+		XMM(d).f[1]=f2;
+		XMM(d).f[2]=f3;
+		XMM(d).f[3]=f4;
+	} else {
+		XMM_REG src;
+		int d;
+		float f1, f2;
+		UINT32 ea = GetEA(modrm, 0);
+		d=(modrm >> 3) & 0x7;
+		READXMM(ea, src);
+		f1=XMM(d).f[0]-XMM(d).f[1];
+		f2=XMM(d).f[2]-XMM(d).f[3];
+		XMM(d).f[0]=f1;
+		XMM(d).f[1]=f2;
+		XMM(d).f[2]=src.f[0]-src.f[1];
+		XMM(d).f[3]=src.f[2]-src.f[3];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_cmpsd_r128_r128m64_i8() // Opcode f2 0f c2
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		int s,d;
+		UINT8 imm8 = FETCH();
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
+		sse_predicate_compare_double_scalar(imm8, XMM(d), XMM(s));
+	} else {
+		int d;
+		XMM_REG s;
+		UINT32 ea = GetEA(modrm, 0);
+		UINT8 imm8 = FETCH();
+		READXMM_LO64(ea, s);
+		d=(modrm >> 3) & 0x7;
+		sse_predicate_compare_double_scalar(imm8, XMM(d), s);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_addsubps_r128_rm128() // Opcode f2 0f d0
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).f[0]=XMM((modrm >> 3) & 0x7).f[0] - XMM(modrm & 0x7).f[0];
+		XMM((modrm >> 3) & 0x7).f[1]=XMM((modrm >> 3) & 0x7).f[1] + XMM(modrm & 0x7).f[1];
+		XMM((modrm >> 3) & 0x7).f[2]=XMM((modrm >> 3) & 0x7).f[2] - XMM(modrm & 0x7).f[2];
+		XMM((modrm >> 3) & 0x7).f[3]=XMM((modrm >> 3) & 0x7).f[3] + XMM(modrm & 0x7).f[3];
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).f[0]=XMM((modrm >> 3) & 0x7).f[0] - src.f[0];
+		XMM((modrm >> 3) & 0x7).f[1]=XMM((modrm >> 3) & 0x7).f[1] + src.f[1];
+		XMM((modrm >> 3) & 0x7).f[2]=XMM((modrm >> 3) & 0x7).f[2] - src.f[2];
+		XMM((modrm >> 3) & 0x7).f[3]=XMM((modrm >> 3) & 0x7).f[3] + src.f[3];
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_movdq2q_r64_r128() // Opcode f2 0f d6
+{
+	UINT8 modrm = FETCH();
+	MMXPROLOG();
+	if( modrm >= 0xc0 ) {
+		MMX((modrm >> 3) & 0x7).q = XMM(modrm & 0x7).q[0];
+		CYCLES(1);     // TODO: correct cycle count
+	} else {
+		// unsupported by cpu
+		CYCLES(1);     // TODO: correct cycle count
+	}
+}
+
+void i386_device::sse_cvtpd2dq_r128_rm128() // Opcode f2 0f e6
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		XMM((modrm >> 3) & 0x7).i[0]=(INT32)XMM((modrm >> 3) & 0x7).f64[0];
+		XMM((modrm >> 3) & 0x7).i[1]=(INT32)XMM((modrm >> 3) & 0x7).f64[1];
+		XMM((modrm >> 3) & 0x7).q[1] = 0;
+	} else {
+		XMM_REG src;
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, src);
+		XMM((modrm >> 3) & 0x7).i[0]=(INT32)src.f64[0];
+		XMM((modrm >> 3) & 0x7).i[1]=(INT32)src.f64[1];
+		XMM((modrm >> 3) & 0x7).q[1] = 0;
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::sse_lddqu_r128_m128() // Opcode f2 0f f0
+{
+	UINT8 modrm = FETCH();
+	if( modrm >= 0xc0 ) {
+		// unsupported by cpu
+		CYCLES(1);     // TODO: correct cycle count
+	} else {
+		UINT32 ea = GetEA(modrm, 0);
+		READXMM(ea, XMM((modrm >> 3) & 0x7));
+	}
 }

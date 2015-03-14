@@ -5,6 +5,7 @@
 --
 
 	premake.make.cpp = { }
+	premake.make.override = { }
 	local cpp = premake.make.cpp
 	local make = premake.make
 
@@ -224,9 +225,9 @@
 		-- if this platform requires a special compiler or linker, list it here
 		cpp.platformtools(cfg, cc)
 
-		_p('  OBJDIR     = %s', _MAKE.esc(cfg.objectsdir))
-		_p('  TARGETDIR  = %s', _MAKE.esc(cfg.buildtarget.directory))
-		_p('  TARGET     = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
+		_p('  ' .. (table.contains(premake.make.override,"OBJDIR") and "override " or "") ..    'OBJDIR     = %s', _MAKE.esc(cfg.objectsdir))
+		_p('  ' .. (table.contains(premake.make.override,"TARGETDIR") and "override " or "") .. 'TARGETDIR  = %s', _MAKE.esc(cfg.buildtarget.directory))
+		_p('  ' .. (table.contains(premake.make.override,"TARGET") and "override " or "") ..    'TARGET     = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
 		_p('  DEFINES   +=%s', make.list(cc.getdefines(cfg.defines)))
 		_p('  INCLUDES  +=%s', make.list(cc.getincludedirs(cfg.includedirs)))
 

@@ -25,6 +25,10 @@
 #include "includes/shuuz.h"
 
 
+void shuuz_state::machine_start()
+{
+	save_item(NAME(m_cur));
+}
 
 /*************************************
  *
@@ -245,10 +249,8 @@ static MACHINE_CONFIG_START( shuuz, shuuz_state )
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(shuuz_state, screen_update_shuuz)
+	MCFG_SCREEN_UPDATE_DRIVER(shuuz_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(shuuz_state,shuuz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -340,5 +342,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz, driver_device,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", 0 )
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, driver_device, 0, ROT0, "Atari Games", "Shuuz (version 7.1)", 0 )
+GAME( 1990, shuuz,  0,     shuuz, shuuz, driver_device,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", GAME_SUPPORTS_SAVE )
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, driver_device, 0, ROT0, "Atari Games", "Shuuz (version 7.1)", GAME_SUPPORTS_SAVE )

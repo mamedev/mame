@@ -16,7 +16,7 @@ inline void hmcs40_cpu_device::ram_w(UINT8 data)
 
 void hmcs40_cpu_device::pop_stack()
 {
-	m_pc = m_stack[0] & m_prgmask;
+	m_pc = m_stack[0] & m_pcmask;
 	for (int i = 0; i < m_stack_levels-1; i++)
 		m_stack[i] = m_stack[i+1];
 }
@@ -28,14 +28,15 @@ void hmcs40_cpu_device::push_stack()
 	m_stack[0] = m_pc;
 }
 
-void hmcs40_cpu_device::op_illegal()
-{
-	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_pc);
-}
-
 
 
 // instruction set
+
+void hmcs40_cpu_device::op_illegal()
+{
+	logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc << 1);
+}
+
 
 // Register-to-Register Instruction
 
@@ -74,10 +75,18 @@ void hmcs40_cpu_device::op_xamr()
 	// XAMR m: Exchange A and MR(m)
 	
 	// determine MR(Memory Register) location
-	UINT8 y = m_op & 0xf;
-	UINT8 x = (y > 3) ? 0xf : (y + 12);
-	UINT8 address = (x << 4 | y) & m_datamask;
+	UINT8 address = m_op & 0xf;
 	
+	// HMCS42: MR0 on file 0, MR4-MR15 on file 4 (there is no file 1-3)
+	// HMCS43: MR0-MR3 on file 0-3, MR4-MR15 on file 4
+	if (m_family == FAMILY_HMCS42 || m_family == FAMILY_HMCS43)
+		address |= (address < 4) ? (address << 4) : 0x40;
+	
+	// HMCS44/45/46/47: all on last file
+	else
+		address |= 0xf0;
+	
+	address &= m_datamask;
 	UINT8 old_a = m_a;
 	m_a = m_data->read_byte(address) & 0xf;
 	m_data->write_byte(address, old_a & 0xf);
@@ -140,27 +149,21 @@ void hmcs40_cpu_device::op_syy()
 	m_y &= 0xf;
 }
 
-void hmcs40_cpu_device::op_xspx()
+void hmcs40_cpu_device::op_xsp()
 {
-	// XSPX: Exchange X and SPX
-	UINT8 old_x = m_x;
-	m_x = m_spx;
-	m_spx = old_x;
-}
-
-void hmcs40_cpu_device::op_xspy()
-{
-	// XSPY: Exchange Y and SPY
-	UINT8 old_y = m_y;
-	m_y = m_spy;
-	m_spy = old_y;
-}
-
-void hmcs40_cpu_device::op_xspxy()
-{
-	// XSPXY: Exchange X and SPX, Y and SPY
-	op_xspx();
-	op_xspy();
+	// XSP (XY): Exchange X and SPX, Y and SPY, or NOP if 0
+	if (m_op & 1)
+	{
+		UINT8 old_x = m_x;
+		m_x = m_spx;
+		m_spx = old_x;
+	}
+	if (m_op & 2)
+	{
+		UINT8 old_y = m_y;
+		m_y = m_spy;
+		m_spy = old_y;
+	}
 }
 
 
@@ -170,14 +173,14 @@ void hmcs40_cpu_device::op_lam()
 {
 	// LAM (XY): Load A from Memory
 	m_a = ram_r();
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lbm()
 {
 	// LBM (XY): Load B from Memory
 	m_b = ram_r();
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_xma()
@@ -186,7 +189,7 @@ void hmcs40_cpu_device::op_xma()
 	UINT8 old_a = m_a;
 	m_a = ram_r();
 	ram_w(old_a);
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_xmb()
@@ -195,7 +198,7 @@ void hmcs40_cpu_device::op_xmb()
 	UINT8 old_b = m_b;
 	m_b = ram_r();
 	ram_w(old_b);
-	op_xspxy();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lmaiy()
@@ -203,7 +206,7 @@ void hmcs40_cpu_device::op_lmaiy()
 	// LMAIY (X): Load Memory from A, Increment Y
 	ram_w(m_a);
 	op_iy();
-	op_xspx();
+	op_xsp();
 }
 
 void hmcs40_cpu_device::op_lmady()
@@ -211,7 +214,7 @@ void hmcs40_cpu_device::op_lmady()
 	// LMADY (X): Load Memory from A, Decrement Y
 	ram_w(m_a);
 	op_dy();
-	op_xspx();
+	op_xsp();
 }
 
 
@@ -422,7 +425,7 @@ void hmcs40_cpu_device::op_rem()
 void hmcs40_cpu_device::op_tm()
 {
 	// TM n: Test Memory Bit
-	m_s = ((ram_r() & (1 << (m_op & 3))) != 0);
+	m_s = ram_r() >> (m_op & 3) & 1;
 }
 
 
@@ -461,7 +464,8 @@ void hmcs40_cpu_device::op_lpu()
 void hmcs40_cpu_device::op_tbr()
 {
 	// TBR p: Table Branch
-	m_pc = (m_a | m_b << 4 | m_c << 8 | ((m_op & 7) << 9)) & m_prgmask;
+	UINT16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
+	m_pc = address & m_pcmask;
 }
 
 void hmcs40_cpu_device::op_rtn()
@@ -593,67 +597,76 @@ void hmcs40_cpu_device::op_rtni()
 void hmcs40_cpu_device::op_sed()
 {
 	// SED: Set Discrete I/O Latch
-	op_illegal();
+	write_d(m_y, 1);
 }
 
 void hmcs40_cpu_device::op_red()
 {
 	// RED: Reset Discrete I/O Latch
-	op_illegal();
+	write_d(m_y, 0);
 }
 
 void hmcs40_cpu_device::op_td()
 {
 	// TD: Test Discrete I/O Latch
-	op_illegal();
+	m_s = read_d(m_y);
 }
 
 void hmcs40_cpu_device::op_sedd()
 {
 	// SEDD n: Set Discrete I/O Latch Direct
-	op_illegal();
+	write_d(m_op & 0xf, 1);
 }
 
 void hmcs40_cpu_device::op_redd()
 {
 	// REDD n: Reset Discrete I/O Latch Direct
-	op_illegal();
+	write_d(m_op & 0xf, 0);
 }
 
 void hmcs40_cpu_device::op_lar()
 {
 	// LAR p: Load A from R-Port Register
-	op_illegal();
+	m_a = read_r(m_op & 7);
 }
 
 void hmcs40_cpu_device::op_lbr()
 {
 	// LBR p: Load B from R-Port Register
-	op_illegal();
+	m_b = read_r(m_op & 7);
 }
 
 void hmcs40_cpu_device::op_lra()
 {
 	// LRA p: Load R-Port Register from A
-	op_illegal();
+	write_r(m_op & 7, m_a);
 }
 
 void hmcs40_cpu_device::op_lrb()
 {
 	// LRB p: Load R-Port Register from B
-	op_illegal();
+	write_r(m_op & 7, m_b);
 }
 
 void hmcs40_cpu_device::op_p()
 {
 	// P p: Pattern Generation
-	op_illegal();
-}
-
-
-// Control Instruction
-
-void hmcs40_cpu_device::op_nop()
-{
-	// NOP: No Operation
+	m_icount--;
+	UINT16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
+	UINT16 o = m_program->read_word((address & m_prgmask) << 1);
+	
+	// destination is determined by the 2 highest bits
+	if (o & 0x100)
+	{
+		// B3 B2 B1 B0 A0 A1 A2 A3
+		m_a = BITSWAP8((UINT8)o,7,6,5,4,0,1,2,3) & 0xf;
+		m_b = o >> 4 & 0xf;
+	}
+	if (o & 0x200)
+	{
+		// R20 R21 R22 R23 R30 R31 R32 R33
+		o = BITSWAP8((UINT8)o,0,1,2,3,4,5,6,7);
+		write_r(2, o & 0xf);
+		write_r(3, o >> 4 & 0xf);
+	}
 }

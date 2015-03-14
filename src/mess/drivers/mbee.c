@@ -5,17 +5,15 @@
 
     system driver
     Juergen Buchmueller, Jan 2000
+    Robbbert 2008-2015
 
-    Brett Selwood, Andrew Davies (technical assistance)
+    Assistance from:
+    Brett Selwood, Andrew Davies; E.J.Wordsworth (owner of Microbee Systems),
+    nama, ChickenMan, and the author of the "ubee512" emulator.
 
-    Various additions by Robbbert.
+    Keyboard notes are in video/microbee.c
 
-    Thanks to the author of the "ubee512" emulator for his help.
-
-    TeleTerm roms dumped by ejwords. The correct slots found by ubee512 author.
-    Swedish roms dumped by nama. The correct slots found by ubee512 author.
-
-    Please note: the rom version 1.31 which appears to fit the 256TC is actually
+    256tc: The 1.31 rom version which appears to fit the 256TC is actually
     part of the Z80 emulation in the Matilda model. If you fit this rom into a real
     256TC, the floppy disk will not be detected.
 
@@ -24,7 +22,7 @@
 
     Floppy formats:
     - All disks are the standard CPCEMU 'dsk' format.
-    - Types are 9cm 80 track, and 13cm 40 track (single or double sided)
+    - Types are 9/13cm 40/80 track (single or double sided)
     - 13cm has been specified as QD to prevent a nasty crash if an 80-track disk was mounted
     - The tracks/sector layout is the same regardless of size
     - Although certain models came with particular drives as standard, users could add
@@ -77,17 +75,6 @@
       intrq and drq are OR'd together, then gated to bit 7 of the data bus whenever
       port 48 is activated on read. There are no interrupts used.
 
-    Tests of old keyboard. Start mbeeic.
-    1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
-       it should only fire bullets. If it sometimes starts turning,
-       thrusting or using the shield, then there is a problem.
-
-    2. Load SCAVENGER and make sure it doesn't go to the next level
-       until you find the Exit.
-
-    3. At the Basic prompt, type in EDASM press enter. At the memory size
-       prompt press enter. Now, make sure the keyboard works properly.
-
     How to use the config switch for PIO B7:
     - Teleterm: Must use RTC. Anything else makes teleterm go crazy.
     - 256TC, 128, 128p: Doesn't seem to matter, leave at the default.
@@ -95,30 +82,27 @@
     - Other rom-based models: "VS" to make the Telcom clock work, or "Tied high".
     - 56k: not sure yet, leave as "Tied high" until more is known.
 
-    How to use programs that need functions keys on models that use the old
-    keyboard (for example, to run Simply Write on a 128k model).
-    Press Ctrl+Shift+number, eg for F1 press hold down Ctrl Shift, press 1.
-
 ***************************************************************************
 
     TODO/not working:
 
     - 256tc: Paste ignores shift key
-    - All others: Paste drops most characters, shift operates randomly.
+    - All others: Paste drops most characters.
 
     - various fdc issues:
         - B drive doesn't work with most disks.
         - some disks cause MESS to freeze.
         - ENMF pin missing from wd_fdc.
         - incorrect timing for track register causes 256tc failure to boot a disk.
-        - 56k model takes 120 seconds to boot a disk if loaded via command line.
 
-    - mbeeppc, mbee128p: In Basic, keyboard loses characters. Works fine in Wordbee.
+    - Simply Write has keyboard problems (in 128k, no keys work).
 
     - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
       crashes due to a bug in z80pio emulation.
 
-    - 256tc: Keyboard ROM U60 needs to be dumped.
+    - 256tc: the Intro disk doesn't work
+
+    - 256tc, Teleterm: Keyboard CPU inbuilt ROM needs to be dumped.
     - 128k, 64k: PALs need to be dumped for the bankswitching.
 
     - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
@@ -127,6 +111,8 @@
     - Mouse: a few programs support the use of a serial mouse which interfaced
              directly to the Z80PIO. However there's little info to be found.
              PIO B3 to ground activates the mouse pointer in Shell v3.01.
+
+    - Hard drive (10MB) & controller
 
 *******************************************************************************/
 
@@ -143,7 +129,7 @@
 
 static ADDRESS_MAP_START(mbee_mem, AS_PROGRAM, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(video_low_r, video_low_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(video_high_r, video_high_w)
@@ -218,8 +204,8 @@ static ADDRESS_MAP_START(mbee_io, AS_IO, 8, mbee_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x10) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeeic_io, AS_IO, 8, mbee_state)
@@ -230,8 +216,8 @@ static ADDRESS_MAP_START(mbeeic_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x09, 0x09) AM_WRITENOP /* Listed as "Colour Wait Off" or "USART 2651" but doesn't appear in the schematics */
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0x10) AM_WRITE(port0a_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0x10) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mbeepc_io, AS_IO, 8, mbee_state)
@@ -240,8 +226,8 @@ static ADDRESS_MAP_START(mbeepc_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
 	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff10) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff10) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_low_r, port0a_w)
 	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
 ADDRESS_MAP_END
@@ -252,8 +238,8 @@ static ADDRESS_MAP_START(mbeeppc_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff10) AM_READWRITE(port08_r, port08_w)
 	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff10) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff10) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 	AM_RANGE(0x001c, 0x001c) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
 	AM_RANGE(0x000a, 0x000a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_low_r, port0a_w)
 	AM_RANGE(0x010a, 0x010a) AM_MIRROR(0xfe10) AM_READWRITE(telcom_high_r, port0a_w)
@@ -267,8 +253,8 @@ static ADDRESS_MAP_START(mbeett_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0007, 0x0007) AM_MIRROR(0xff00) AM_READ(port07_r)
 	AM_RANGE(0x0008, 0x0008) AM_MIRROR(0xff00) AM_READWRITE(port08_r, port08_w)
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(port18_r)
 	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
 	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xfe00) AM_READ(speed_low_r)
@@ -285,8 +271,8 @@ static ADDRESS_MAP_START(mbee56_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r, port08_w)
 	AM_RANGE(0x09, 0x09) AM_WRITENOP
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
 ADDRESS_MAP_END
@@ -301,8 +287,8 @@ static ADDRESS_MAP_START(mbee128_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(port08_r, port08_w)
 	AM_RANGE(0x09, 0x09) AM_WRITENOP
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(port0b_w)
-	AM_RANGE(0x0c, 0x0c) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x0d, 0x0d) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 	AM_RANGE(0x1c, 0x1f) AM_READWRITE(port1c_r, port1c_w)
 	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("fdc", wd2793_t, read, write)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE(fdc_status_r, fdc_motor_w)
@@ -320,8 +306,8 @@ static ADDRESS_MAP_START(mbee256_io, AS_IO, 8, mbee_state)
 	AM_RANGE(0x0209, 0x0209) AM_MIRROR(0xfd00) AM_READ(speed_high_r)
 	AM_RANGE(0x0009, 0x0009) AM_MIRROR(0xff00) AM_WRITENOP
 	AM_RANGE(0x000b, 0x000b) AM_MIRROR(0xff00) AM_WRITE(port0b_w)
-	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_READWRITE(m6545_status_r, m6545_index_w)
-	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_READWRITE(m6545_data_r, m6545_data_w)
+	AM_RANGE(0x000c, 0x000c) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(m6545_index_w)
+	AM_RANGE(0x000d, 0x000d) AM_MIRROR(0xff00) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(m6545_data_w)
 	// AM_RANGE(0x0010, 0x0013) AM_MIRROR(0xff00) Optional SN76489AN audio chip
 	AM_RANGE(0x0018, 0x001b) AM_MIRROR(0xff00) AM_READ(port18_r)
 	AM_RANGE(0x001c, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(port1c_r, port1c_w)
@@ -333,7 +319,7 @@ static ADDRESS_MAP_START(mbee256_io, AS_IO, 8, mbee_state)
 	// AM_RANGE(0x0068, 0x006f) AM_MIRROR(0xff00) Reserved for 8530 SCC (unused)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( mbee )
+static INPUT_PORTS_START( oldkb )
 	PORT_START("X.0") /* IN0 KEY ROW 0 [000] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("@") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('@') PORT_CHAR('`')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHAR(0x01)
@@ -366,7 +352,7 @@ static INPUT_PORTS_START( mbee )
 
 	PORT_START("X.3") /* IN3 KEY ROW 3 [180] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0x18)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('u') PORT_CHAR('Y') PORT_CHAR(0x19)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_CHAR(0x19)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{') PORT_CHAR(0x1b)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|') PORT_CHAR(0x1c)
@@ -387,8 +373,8 @@ static INPUT_PORTS_START( mbee )
 	PORT_START("X.5") /* IN5 KEY ROW 5 [280] */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8 (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("; +") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(": *") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(": *") PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("; +") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("- =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
@@ -413,24 +399,50 @@ static INPUT_PORTS_START( mbee )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Right)") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+INPUT_PORTS_END
 
-	PORT_START("EXTRA") /* IN8 extra keys (non-premium keyboard only) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Up)") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Down)") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Left)") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Right)") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("(Insert)") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+static INPUT_PORTS_START( mbee )
+
+	PORT_INCLUDE( oldkb )
 
 	// Autorun on quickload
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	// monochrome monitor could be used
+	PORT_CONFNAME( 0x30, 0x00, "Monitor type")
+	PORT_CONFSETTING(    0x00, "Colour")
+	PORT_CONFSETTING(    0x10, "Green")
+	PORT_CONFSETTING(    0x20, "Amber")
+	PORT_CONFSETTING(    0x30, "White")
 	// Wire links on motherboard
-	PORT_CONFNAME( 0xc0, 0x80, "PIO B7")
+	PORT_CONFNAME( 0xc0, 0x00, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
 	PORT_CONFSETTING(    0x40, "RTC") // optional board usually not fitted
+	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
+	PORT_CONFSETTING(    0xc0, "Reserved for net")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mbee128 )
+
+	PORT_INCLUDE( oldkb )
+
+	// Autorun on quickload
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	// monochrome monitor could be used
+	PORT_CONFNAME( 0x30, 0x00, "Monitor type")
+	PORT_CONFSETTING(    0x00, "Colour")
+	PORT_CONFSETTING(    0x10, "Green")
+	PORT_CONFSETTING(    0x20, "Amber")
+	PORT_CONFSETTING(    0x30, "White")
+	// Wire links on motherboard
+	PORT_CONFNAME( 0xc0, 0x40, "PIO B7")
+	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
+	PORT_CONFSETTING(    0x40, "RTC") // RTC IRQ for clock
 	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
 	PORT_CONFSETTING(    0xc0, "Reserved for net")
 INPUT_PORTS_END
@@ -591,7 +603,7 @@ static const gfx_layout mbee_charlayout =
 };
 
 static GFXDECODE_START( mono )
-	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 96, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( standard )
@@ -634,7 +646,9 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mono)
-	MCFG_PALETTE_ADD_MONOCHROME_AMBER("palette") // usually sold with amber or green monitor
+
+	MCFG_PALETTE_ADD("palette", 100)
+	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, mono)
 
@@ -649,12 +663,12 @@ static MACHINE_CONFIG_START( mbee, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, mono_update_row)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
 
-	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
-	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
+	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 3)
+	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 3)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("z80pio", z80pio_device, strobe_a))
@@ -692,7 +706,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", standard)
 
-	MCFG_PALETTE_ADD("palette", 96)
+	MCFG_PALETTE_ADD("palette", 100)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, standard)
 
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, standard)
@@ -708,7 +722,7 @@ static MACHINE_CONFIG_START( mbeeic, mbee_state )
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_13_5MHz / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, colour_update_row)
+	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
 
@@ -738,7 +752,6 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", premium)
 	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
@@ -860,7 +873,7 @@ ROM_START( mbeeic )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc )
@@ -886,7 +899,7 @@ ROM_START( mbeepc )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85 )
@@ -916,7 +929,7 @@ ROM_START( mbeepc85 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85b )
@@ -947,7 +960,7 @@ ROM_START( mbeepc85b )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeepc85s )
@@ -976,7 +989,7 @@ ROM_START( mbeepc85s )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbeett )
@@ -1030,7 +1043,7 @@ ROM_START( mbeeppc )
 	ROM_RELOAD( 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
@@ -1047,7 +1060,7 @@ ROM_START( mbee56 )
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
@@ -1068,7 +1081,7 @@ ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
 	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(4e779985) SHA1(cd2579cf65032c30b3fe7d6d07b89d4633687481) )   /* video switching prom, not needed for emulation purposes */
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 ROM_END
 
 ROM_START( mbee128p ) // Premium 128K
@@ -1096,7 +1109,7 @@ ROM_START( mbee128p ) // Premium 128K
 	ROM_RELOAD( 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
@@ -1118,7 +1131,7 @@ ROM_START( mbee256 ) // 256tc
 	ROM_COPY( "gfx", 0x1000, 0x0000, 0x1000 )
 
 	ROM_REGION( 0x0800, "videoram", ROMREGION_ERASE00 )
-	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "colorram", ROMREGION_ERASEVAL(2))
 	ROM_REGION( 0x0800, "attrib", ROMREGION_ERASE00 )
 ROM_END
 
@@ -1138,6 +1151,6 @@ COMP( 1985, mbeepc85s,mbee,     0,      mbeepc,   mbee,     mbee_state,  mbeepc8
 COMP( 1986, mbeeppc,  mbee,     0,      mbeeppc,  mbee,     mbee_state,  mbeeppc,    "Applied Technology",  "Microbee Premium PC85" , 0 )
 COMP( 1986, mbeett,   mbee,     0,      mbeett,   mbee256,  mbee_state,  mbeett,     "Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
 COMP( 1986, mbee56,   mbee,     0,      mbee56,   mbee,     mbee_state,  mbee56,     "Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
-COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee,     mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Standard" , GAME_NOT_WORKING )
-COMP( 1986, mbee128p, mbee,     0,      mbee128p, mbee,     mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Premium" , GAME_NOT_WORKING )
+COMP( 1986, mbee128,  mbee,     0,      mbee128,  mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Standard" , GAME_NOT_WORKING )
+COMP( 1986, mbee128p, mbee,     0,      mbee128p, mbee128,  mbee_state,  mbee128,    "Applied Technology",  "Microbee 128k Premium" , GAME_NOT_WORKING )
 COMP( 1987, mbee256,  mbee,     0,      mbee256,  mbee256,  mbee_state,  mbee256,    "Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )

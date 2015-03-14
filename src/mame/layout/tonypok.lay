@@ -1,0 +1,418 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+<!--
+		Poker Master (Tony-Poker) control panel
+		May or may not match arrangement/colour of real control panel
+		Written by Vas Crabb.
+-->
+
+<!-- define button-lamps -->
+
+	<element name="hold1" defstate="0">
+		<text string="SMALL/BLACK" state="1">
+			<color red="0.3" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 1" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold2" defstate="0">
+		<text string="BIG/RED" state="1">
+			<color red="0.3" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 2" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold3" defstate="0">
+		<text string="DOUBLE" state="1">
+			<color red="0.3" green="0.15" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 3" state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold4" defstate="0">
+		<text string="TAKE" state="1">
+			<color red="0.3" green="0.15" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 4" state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="hold5" defstate="0">
+		<text string="BET" state="1">
+			<color red="0.3" green="0.0" blue="0.3" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 5" state="1">
+			<color red="1.0" green="0.0" blue="1.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="small" defstate="0">
+		<text string="SMALL/BLACK" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 1" state="1">
+			<color red="0.3" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="big" defstate="0">
+		<text string="BIG/RED" state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 2" state="1">
+			<color red="0.3" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="dup" defstate="0">
+		<text string="DOUBLE" state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 3" state="1">
+			<color red="0.3" green="0.15" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="take" defstate="0">
+		<text string="TAKE" state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 4" state="1">
+			<color red="0.3" green="0.15" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet" defstate="0">
+		<text string="BET" state="1">
+			<color red="1.0" green="0.0" blue="1.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 5" state="1">
+			<color red="0.3" green="0.0" blue="0.3" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="start" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.15" blue="0.0" />
+		</rect>
+		<text string="START" state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DRAW" state="1">
+			<color red="0.0" green="0.6" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+		<rect state="0">
+			<color red="0.0" green="0.15" blue="0.0" />
+		</rect>
+		<text string="START" state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DRAW" state="0">
+			<color red="0.0" green="0.6" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+
+<!-- define basic elements -->
+
+	<element name="cpanel">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="small_b" defstate="0">
+		<rect state="1">
+			<color red="0.1" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="small_g" defstate="0">
+		<rect state="1">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="SMALL/BLACK" state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 1" state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="big_g" defstate="0">
+		<rect state="1">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BIG/RED" state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 2" state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="dup_b" defstate="0">
+		<rect state="1">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="dup_g" defstate="0">
+		<rect state="1">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="DOUBLE" state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 3" state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="take_g" defstate="0">
+		<rect state="1">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="TAKE" state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 4" state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet_b" defstate="0">
+		<rect state="1">
+			<color red="0.1" green="0.0" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.0" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="bet_g" defstate="0">
+		<rect state="1">
+			<color red="0.15" green="0.0" blue="0.15" />
+		</rect>
+		<text string="BET" state="0">
+			<color red="0.15" green="0.0" blue="0.15" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="HOLD 5" state="0">
+			<color red="0.15" green="0.0" blue="0.15" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="start_b" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.1" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+
+
+<!-- define cpanel degradee elements -->
+
+
+	<element name="cpanel1">
+		<rect>
+			<color red="0.20" green="0.20" blue="0.20" />
+		</rect>
+	</element>
+
+	<element name="cpanel2">
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
+	</element>
+
+	<element name="cpanel3">
+		<rect>
+			<color red="0.10" green="0.10" blue="0.10" />
+		</rect>
+	</element>
+
+	<element name="cpanel4">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+
+<!-- define background -->
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel element="cpanel">
+			<bounds left="0" right="4" top="3" bottom="3.40" />
+		</bezel>
+
+		<bezel element="cpanel1">
+			<bounds left="0" right="4" top="3.01" bottom="3.39" />
+		</bezel>
+
+		<bezel element="cpanel2">
+			<bounds left="0" right="4" top="3.02" bottom="3.38" />
+		</bezel>
+
+		<bezel element="cpanel3">
+			<bounds left="0" right="4" top="3.03" bottom="3.37" />
+		</bezel>
+
+		<bezel element="cpanel4">
+			<bounds left="0" right="4" top="3.04" bottom="3.36" />
+		</bezel>
+
+		<bezel element="cpanel">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+		</bezel>
+
+
+<!-- define lamps -->
+
+		<bezel element="small_b" inputtag="IN0" inputmask="0x40">
+			<bounds x="0.05" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="small_g" inputtag="IN0" inputmask="0x40">
+			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="small_g" inputtag="IN0" inputmask="0x40">
+			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp1" element="small" inputtag="IN0" inputmask="0x40">
+			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="hold1" inputtag="IN0" inputmask="0x40">
+			<bounds x="0.07" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+
+		<bezel element="small_b" inputtag="IN0" inputmask="0x04">
+			<bounds x="0.70" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="big_g" inputtag="IN0" inputmask="0x04">
+			<bounds x="0.72" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="big_g" inputtag="IN0" inputmask="0x04">
+			<bounds x="0.72" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp1" element="big" inputtag="IN0" inputmask="0x04">
+			<bounds x="0.72" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="hold2" inputtag="IN0" inputmask="0x04">
+			<bounds x="0.72" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+
+		<bezel element="dup_b" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.35" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="dup_g" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.37" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="dup_g" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.37" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp2" element="dup" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.37" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="hold3" inputtag="IN0" inputmask="0x08">
+			<bounds x="1.37" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+
+		<bezel element="dup_b" inputtag="IN0" inputmask="0x10">
+			<bounds x="2" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="take_g" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.02" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="take_g" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.02" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp2" element="take" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.02" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="hold4" inputtag="IN0" inputmask="0x10">
+			<bounds x="2.02" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+
+		<bezel element="bet_b" inputtag="IN0" inputmask="0x20">
+			<bounds x="2.65" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="bet_g" inputtag="IN0" inputmask="0x20">
+			<bounds x="2.67" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="bet_g" inputtag="IN0" inputmask="0x20">
+			<bounds x="2.67" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp3" element="bet" inputtag="IN0" inputmask="0x20">
+			<bounds x="2.67" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+		<bezel name="lamp6" element="hold5" inputtag="IN0" inputmask="0x20">
+			<bounds x="2.67" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+
+		<bezel element="start_b" inputtag="IN0" inputmask="0x80">
+			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp5" element="start" inputtag="IN0" inputmask="0x80">
+			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+	</view>
+</mamelayout>

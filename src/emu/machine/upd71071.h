@@ -88,7 +88,7 @@ private:
 	devcb_write_line   m_out_dack_3_cb;
 	int m_hreq;
 	int m_eop;
-	required_device<cpu_device> m_cpu;
+	optional_device<cpu_device> m_cpu;
 };
 
 extern const device_type UPD71071;

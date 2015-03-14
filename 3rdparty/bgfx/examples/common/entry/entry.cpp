@@ -34,6 +34,45 @@ namespace entry
 	}
 #endif // ENTRY_CONFIG_IMPLEMENT_DEFAULT_ALLOCATOR
 
+	char keyToAscii(Key::Enum _key, uint8_t _modifiers)
+	{
+		const bool isAscii = (Key::Key0 <= _key && _key <= Key::KeyZ)
+						  || (Key::Esc  <= _key && _key <= Key::Minus);
+		if (!isAscii)
+		{
+			return '\0';
+		}
+
+		const bool isNumber = (Key::Key0 <= _key && _key <= Key::Key9);
+		if (isNumber)
+		{
+			return '0' + (_key - Key::Key0);
+		}
+
+		const bool isChar = (Key::KeyA <= _key && _key <= Key::KeyZ);
+		if (isChar)
+		{
+			enum { ShiftMask = Modifier::LeftShift|Modifier::RightShift };
+
+			const bool shift = !!(_modifiers&ShiftMask);
+			return (shift ? 'A' : 'a') + (_key - Key::KeyA);
+		}
+
+		switch (_key)
+		{
+		case Key::Esc:       return 0x1b;
+		case Key::Return:    return '\n';
+		case Key::Tab:       return '\t';
+		case Key::Space:     return ' ';
+		case Key::Backspace: return 0x08;
+		case Key::Plus:      return '+';
+		case Key::Minus:     return '-';
+		default:             break;
+		}
+
+		return '\0';
+	}
+
 	bool setOrToggle(uint32_t& _flags, const char* _name, uint32_t _bit, int _first, int _argc, char const* const* _argv)
 	{
 		if (0 == strcmp(_argv[_first], _name) )

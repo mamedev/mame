@@ -3993,15 +3993,19 @@ ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
-    Sonic the Hedgehog
-    protected
+    Sonic the Hedgehog - Protected (FD1149  SEGA 317-0213)
+
+Sega ROM BD ID# 834-9496
+        ROM BD. 837-8393-01
+     I/O BD NO. 837-8685
+
 */
 ROM_START( sonic )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
-	ROM_LOAD_x4( "epr-c-87.ic17",        0x000000, 0x020000, CRC(25e3c27e) SHA1(8f173cd5c7c817dcccdcad9be5781cfaa081d73e) )
-	ROM_LOAD_x4( "epr-c-86.ic8",         0x080000, 0x020000, CRC(efe9524c) SHA1(8020e734704a8f989919ee5ad92f70035de717f0) )
-	ROM_LOAD16_BYTE_x2( "epr-c-81.ic18", 0x100000, 0x040000, CRC(65b06c25) SHA1(9f524012a7adbc71737f90fc556f0ce9adc2bcf8) )
-	ROM_LOAD16_BYTE_x2( "epr-c-80.ic9",  0x100001, 0x040000, CRC(2db66fd2) SHA1(54582c0d5977649a38fc3a2c0fe4d7b1959abc76) )
+	ROM_LOAD_x4( "epr-15787c.ic17",        0x000000, 0x020000, CRC(25e3c27e) SHA1(8f173cd5c7c817dcccdcad9be5781cfaa081d73e) )
+	ROM_LOAD_x4( "epr-15786c.ic8",         0x080000, 0x020000, CRC(efe9524c) SHA1(8020e734704a8f989919ee5ad92f70035de717f0) )
+	ROM_LOAD16_BYTE_x2( "epr-15781c.ic18", 0x100000, 0x040000, CRC(65b06c25) SHA1(9f524012a7adbc71737f90fc556f0ce9adc2bcf8) )
+	ROM_LOAD16_BYTE_x2( "epr-15780c.ic9",  0x100001, 0x040000, CRC(2db66fd2) SHA1(54582c0d5977649a38fc3a2c0fe4d7b1959abc76) )
 
 	ROM_REGION( 0x500000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD_x4( "epr-15785.ic36", 0x100000, 0x040000, CRC(0fe7422e) SHA1(b7eaf4736ba155965317bb4ef3b33fc122635151) )

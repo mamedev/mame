@@ -13,7 +13,15 @@
 
 
 // I/O ports setup
-#define MCFG_HMCS40_READ_A_CB(_devcb) \
+
+// max 8 4-bit R ports
+#define MCFG_HMCS40_READ_R_CB(R, _devcb) \
+	hmcs40_cpu_device::set_read_r##R##_callback(*device, DEVCB_##_devcb);
+#define MCFG_HMCS40_WRITE_R_CB(R, _devcb) \
+	hmcs40_cpu_device::set_write_r##R##_callback(*device, DEVCB_##_devcb);
+
+// 16-bit discrete
+#define MCFG_HMCS40_READ_D_CB(_devcb) \
 	hmcs40_cpu_device::set_read_d_callback(*device, DEVCB_##_devcb);
 #define MCFG_HMCS40_WRITE_D_CB(_devcb) \
 	hmcs40_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
@@ -24,18 +32,41 @@ class hmcs40_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	hmcs40_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int family, UINT16 polarity, int stack_levels, int pcwidth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, 0, program)
+		, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
 		, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
-		, m_prgwidth(prgwidth-1)
+		, m_pcwidth(pcwidth)
+		, m_prgwidth(prgwidth)
 		, m_datawidth(datawidth)
+		, m_family(family)
+		, m_polarity(polarity)
 		, m_stack_levels(stack_levels)
+		, m_read_r0(*this), m_read_r1(*this), m_read_r2(*this), m_read_r3(*this), m_read_r4(*this), m_read_r5(*this), m_read_r6(*this), m_read_r7(*this)
+		, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this), m_write_r5(*this), m_write_r6(*this), m_write_r7(*this)
 		, m_read_d(*this)
 		, m_write_d(*this)
 	{ }
 
 	// static configuration helpers
+	template<class _Object> static devcb_base &set_read_r0_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r0.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_r1_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r1.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_r2_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r2.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_r3_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r3.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_r4_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r4.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_r5_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r5.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_r6_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r6.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_r7_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_r7.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_write_r0_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r0.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r1_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r1.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r2_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r2.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r3_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r3.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r4_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r4.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r5_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r5.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r6_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r6.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_r7_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_r7.set_callback(object); }
+
 	template<class _Object> static devcb_base &set_read_d_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_read_d.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<hmcs40_cpu_device &>(device).m_write_d.set_callback(object); }
 
@@ -54,8 +85,8 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config :((spacenum == AS_DATA) ? &m_data_config : NULL); }
 
 	// device_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 2; }
+	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 2+1; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 	void state_string_export(const device_state_entry &entry, astring &string);
 
@@ -64,19 +95,22 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
+	int m_pcwidth;      // Program Counter bit-width
 	int m_prgwidth;
 	int m_datawidth;
+	int m_pcmask;
 	int m_prgmask;
 	int m_datamask;
-	int m_xmask;
+	int m_family;       // MCU family (42-47)
+	UINT16 m_polarity;  // i/o polarity (pmos vs cmos)
 	int m_stack_levels; // number of callstack levels
 	UINT16 m_stack[4];  // max 4
-	UINT16 m_op;
+	UINT16 m_op;        // current opcode
 	UINT16 m_prev_op;
-	UINT16 m_arg;
 	int m_icount;
 	
 	UINT16 m_pc;        // Program Counter
+	UINT16 m_prev_pc;
 	UINT8 m_page;       // LPU prepared page
 	UINT8 m_a;          // 4-bit Accumulator
 	UINT8 m_b;          // 4-bit B register
@@ -86,21 +120,31 @@ protected:
 	UINT8 m_spy;        // 4-bit SPY register
 	UINT8 m_s;          // Status F/F
 	UINT8 m_c;          // Carry F/F
+	UINT8 m_r[8];       // R outputs state
+	UINT16 m_d;         // D pins state
 
 	// i/o handlers
+	devcb_read8 m_read_r0, m_read_r1, m_read_r2, m_read_r3, m_read_r4, m_read_r5, m_read_r6, m_read_r7;
+	devcb_write8 m_write_r0, m_write_r1, m_write_r2, m_write_r3, m_write_r4, m_write_r5, m_write_r6, m_write_r7;
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
 
 	// misc internal helpers
 	void increment_pc();
-	void fetch_arg();
-
+	
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
 	void pop_stack();
 	void push_stack();
 
+	virtual UINT8 read_r(int index);
+	virtual void write_r(int index, UINT8 data);
+	virtual int read_d(int index);
+	virtual void write_d(int index, int state);
+
 	// opcode handlers
+	void op_illegal();
+
 	void op_lab();
 	void op_lba();
 	void op_lay();
@@ -116,9 +160,7 @@ protected:
 	void op_dy();
 	void op_ayy();
 	void op_syy();
-	void op_xspx();
-	void op_xspy();
-	void op_xspxy();
+	void op_xsp();
 
 	void op_lam();
 	void op_lbm();
@@ -196,37 +238,133 @@ protected:
 	void op_lra();
 	void op_lrb();
 	void op_p();
-
-	void op_nop();
-	void op_illegal();
 };
 
 
-class hd38750_device : public hmcs40_cpu_device
+class hmcs43_cpu_device : public hmcs40_cpu_device
+{
+public:
+	hmcs43_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+
+protected:
+	// overrides
+	virtual UINT8 read_r(int index);
+	virtual void write_r(int index, UINT8 data);
+	virtual int read_d(int index);
+};
+
+class hd38750_device : public hmcs43_cpu_device
 {
 public:
 	hd38750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class hd38755_device : public hmcs43_cpu_device
+{
+public:
+	hd38755_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
-class hd38800_device : public hmcs40_cpu_device
+class hd44750_device : public hmcs43_cpu_device
+{
+public:
+	hd44750_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44758_device : public hmcs43_cpu_device
+{
+public:
+	hd44758_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class hmcs44_cpu_device : public hmcs40_cpu_device
+{
+public:
+	hmcs44_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+
+protected:
+	// overrides
+	virtual UINT8 read_r(int index);
+	virtual void write_r(int index, UINT8 data);
+};
+
+class hd38800_device : public hmcs44_cpu_device
 {
 public:
 	hd38800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class hd38805_device : public hmcs44_cpu_device
+{
+public:
+	hd38805_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
-class hd38820_device : public hmcs40_cpu_device
+class hd44801_device : public hmcs44_cpu_device
+{
+public:
+	hd44801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44808_device : public hmcs44_cpu_device
+{
+public:
+	hd44808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class hmcs45_cpu_device : public hmcs40_cpu_device
+{
+public:
+	hmcs45_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT16 polarity, const char *shortname);
+
+protected:
+	// overrides
+	virtual UINT8 read_r(int index);
+	virtual void write_r(int index, UINT8 data);
+};
+
+class hd38820_device : public hmcs45_cpu_device
 {
 public:
 	hd38820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class hd38825_device : public hmcs45_cpu_device
+{
+public:
+	hd38825_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44820_device : public hmcs45_cpu_device
+{
+public:
+	hd44820_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class hd44828_device : public hmcs45_cpu_device
+{
+public:
+	hd44828_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 
 extern const device_type HD38750;
+extern const device_type HD38755;
+extern const device_type HD44750;
+extern const device_type HD44758;
+
 extern const device_type HD38800;
+extern const device_type HD38805;
+extern const device_type HD44801;
+extern const device_type HD44808;
+
 extern const device_type HD38820;
+extern const device_type HD38825;
+extern const device_type HD44820;
+extern const device_type HD44828;
 
 
 #endif /* _HMCS40_H_ */

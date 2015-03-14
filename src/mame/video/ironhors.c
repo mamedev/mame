@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  ironhors.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -76,19 +76,19 @@ PALETTE_INIT_MEMBER(ironhors_state, ironhors)
 	}
 }
 
-WRITE8_MEMBER(ironhors_state::ironhors_videoram_w)
+WRITE8_MEMBER(ironhors_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::ironhors_colorram_w)
+WRITE8_MEMBER(ironhors_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::ironhors_charbank_w)
+WRITE8_MEMBER(ironhors_state::charbank_w)
 {
 	if (m_charbank != (data & 0x03))
 	{
@@ -101,7 +101,7 @@ WRITE8_MEMBER(ironhors_state::ironhors_charbank_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(ironhors_state::ironhors_palettebank_w)
+WRITE8_MEMBER(ironhors_state::palettebank_w)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -115,10 +115,10 @@ WRITE8_MEMBER(ironhors_state::ironhors_palettebank_w)
 	/* bit 6 unknown - set after game over */
 
 	if (data & 0x88)
-		popmessage("ironhors_palettebank_w %02x",data);
+		popmessage("palettebank_w %02x",data);
 }
 
-WRITE8_MEMBER(ironhors_state::ironhors_flipscreen_w)
+WRITE8_MEMBER(ironhors_state::flipscreen_w)
 {
 	if (flip_screen() != (~data & 0x08))
 	{
@@ -230,7 +230,7 @@ void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 ironhors_state::screen_update_ironhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int row;
 

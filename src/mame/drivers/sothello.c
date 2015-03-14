@@ -72,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(subcpu_status_r);
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 
+    virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
@@ -98,9 +99,13 @@ public:
 
 /* main Z80 */
 
+void sothello_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
+}
+
 WRITE8_MEMBER(sothello_state::bank_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
 	int bank=0;
 	switch(data^0xff)
 	{
@@ -109,7 +114,7 @@ WRITE8_MEMBER(sothello_state::bank_w)
 		case 4: bank=2; break;
 		case 8: bank=3; break;
 	}
-	membank("bank1")->set_base(&RAM[bank*0x4000+0x10000]);
+    membank("bank1")->set_entry(bank);
 }
 
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
@@ -400,9 +405,9 @@ MACHINE_CONFIG_END
 
 ROM_START( sothello )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "3.7c",   0x0000, 0x8000, CRC(47f97bd4) SHA1(52c9638f098fdcf66903fad7dafe3ab171758572) )
-	ROM_LOAD( "4.8c",   0x10000, 0x8000, CRC(a98414e9) SHA1(6d14e1f9c79b95101e0aa101034f398af09d7f32) )
-	ROM_LOAD( "5.9c",   0x18000, 0x8000, CRC(e5b5d61e) SHA1(2e4b3d85f41d0796a4d61eae40dd824769e1db86) )
+	ROM_LOAD( "3.7c",   0x00000, 0x8000, CRC(47f97bd4) SHA1(52c9638f098fdcf66903fad7dafe3ab171758572) )
+	ROM_LOAD( "4.8c",   0x08000, 0x8000, CRC(a98414e9) SHA1(6d14e1f9c79b95101e0aa101034f398af09d7f32) )
+	ROM_LOAD( "5.9c",   0x10000, 0x8000, CRC(e5b5d61e) SHA1(2e4b3d85f41d0796a4d61eae40dd824769e1db86) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "1.7a",   0x0000, 0x8000, CRC(6951536a) SHA1(64d07a692d6a167334c825dc173630b02584fdf6) )

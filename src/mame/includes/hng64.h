@@ -1,5 +1,6 @@
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"
+#include "cpu/nec/v53.h"
 
 enum
 {
@@ -29,6 +30,7 @@ struct blit_parameters
 	hng64trans_t        drawformat;
 };
 
+#define HNG64_MASTER_CLOCK 50000000
 
 ///////////////
 // 3d Engine //
@@ -101,7 +103,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_comm(*this, "comm"),
+		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
 		m_cart(*this, "cart"),
@@ -125,7 +127,7 @@ public:
 	{ }
 	
 	required_device<mips3_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<v53a_device> m_audiocpu;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
 	required_shared_ptr<UINT32> m_mainram;
@@ -337,8 +339,6 @@ public:
 
 	void drawShaded( struct polygon *p);
 
-	void hng64_patch_bios_region(int region);
-
 	void printPacket(const UINT16* packet, int hex);
 	void matmul4(float *product, const float *a, const float *b);
 	void vecmatmul4(float *product, const float *a, const float *b);
@@ -352,6 +352,47 @@ public:
 	UINT8 *m_texturerom;
 	UINT16* m_vertsrom;
 	int m_vertsrom_size;
+	void reset_sound();
+	void reset_net();
 
+	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
+	DECLARE_READ8_MEMBER(dma_memr_cb);
+	DECLARE_WRITE8_MEMBER(dma_iow3_cb);
+	DECLARE_WRITE_LINE_MEMBER(tcu_tm0_cb);
+	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
+	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
+
+	UINT16 m_audiochannel;
+	
+	struct hng64_48bit_data {
+		UINT16 dat[3];
+	};
+
+	hng64_48bit_data m_audiodat[0x10000];
+
+	DECLARE_WRITE16_MEMBER(hng64_sound_select_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_data_02_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_data_04_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_data_06_w);
+
+	DECLARE_READ16_MEMBER(hng64_sound_port_0004_r);
+	DECLARE_READ16_MEMBER(hng64_sound_port_0006_r);
+
+	DECLARE_READ16_MEMBER(hng64_sound_port_0008_r);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
+
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_000a_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_000c_w);
+
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
+
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0100_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0102_w);
+	DECLARE_READ16_MEMBER(hng64_sound_port_0104_r);
+	DECLARE_READ16_MEMBER(hng64_sound_port_0106_r);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0108_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
+
+	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
 };
 

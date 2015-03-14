@@ -82,7 +82,6 @@ public:
 	DECLARE_WRITE16_MEMBER(nspirit_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(imgfight_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(loht_sample_trigger_w);
-	DECLARE_WRITE16_MEMBER(xmultiplm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(dbreedm72_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(airduel_sample_trigger_w);
 	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
@@ -112,8 +111,6 @@ public:
 	DECLARE_DRIVER_INIT(bchopper);
 	DECLARE_DRIVER_INIT(gallop);
 	DECLARE_DRIVER_INIT(m72_8751);
-	DECLARE_DRIVER_INIT(xmultiplm72);
-	DECLARE_DRIVER_INIT(mrheli);
 	DECLARE_DRIVER_INIT(dbreedm72);
 	DECLARE_DRIVER_INIT(airduel);
 	DECLARE_DRIVER_INIT(nspirit);
@@ -125,8 +122,8 @@ public:
 	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(majtitle_scan_rows);
-	DECLARE_MACHINE_START(m72);
-	DECLARE_MACHINE_RESET(m72);
+	void machine_start();
+	void machine_reset();
 	DECLARE_VIDEO_START(m72);
 	DECLARE_MACHINE_RESET(xmultipl);
 	DECLARE_VIDEO_START(xmultipl);

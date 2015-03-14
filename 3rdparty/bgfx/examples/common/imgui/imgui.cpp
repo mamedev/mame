@@ -813,6 +813,7 @@ struct Imgui
 	void beginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, char _inputChar, uint8_t _view)
 	{
 		IMGUI_beginFrame(_mx, _my, _button, _width, _height, _inputChar, _view);
+		nvgViewId(m_nvg, _view);
 
 		m_view = _view;
 		m_viewWidth = _width;
@@ -1405,7 +1406,7 @@ struct Imgui
 		{
 			const size_t cursor = size_t(strlen(_str));
 
-			if (m_char == 0x08) //backspace
+			if (m_char == 0x08 || m_char == 0x7f) //backspace or delete
 			{
 				_str[cursor-1] = '\0';
 			}

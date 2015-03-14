@@ -1423,4 +1423,4 @@ COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, driver_device, 0,  
 COMP( 1979, vbrc,       0,          0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBRC/7002)",  GAME_NOT_WORKING )
 COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, driver_device, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
 COMP( 1980, bridgec3,   vbrc,       0,      bridgec,   bridgec, driver_device,      0,      "Fidelity Electronics",   "Bridge Challenger 3 (model 7014)", GAME_NOT_WORKING )
-COMP( 1980, vsc,        0,          0,      vsc,   vsc, driver_device,      0,      "Fidelity Electronics",   "Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )
+COMP( 1980, vsc,        0,          0,      vsc,   vsc, driver_device,      0,      "Fidelity Electronics",   "Voice Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK )

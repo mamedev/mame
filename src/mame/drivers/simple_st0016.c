@@ -31,6 +31,11 @@ Dips verified for Neratte Chu (nratechu) from manual
  *
  *************************************/
 
+void st0016_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
+}
+
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -76,8 +81,8 @@ WRITE8_MEMBER(st0016_state::mux_select_w)
 
 WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 {
-	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
-//  st0016_rom_bank=data;
+    membank("bank1")->set_entry(data);
+    // st0016_rom_bank = data;
 }
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )

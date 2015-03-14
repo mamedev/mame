@@ -49,6 +49,7 @@ namespace bgfx
 			Direct3D12,   //!< Direct3D 12.0
 			OpenGLES,     //!< OpenGL ES 2.0+
 			OpenGL,       //!< OpenGL 2.1+
+			Vulkan,       //!< Vulkan
 
 			Count
 		};
@@ -142,6 +143,7 @@ namespace bgfx
 			RG32,
 			RG32F,
 			BGRA8,
+			RGBA8,
 			RGBA16,
 			RGBA16F,
 			RGBA32,

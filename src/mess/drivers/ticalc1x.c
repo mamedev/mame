@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap
+// copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
   Texas Instruments TMS1xxx/0970/0980 handheld calculators (mostly single-chip)

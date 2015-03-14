@@ -50,10 +50,14 @@ class hotblock_state : public driver_device
 public:
 	hotblock_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram")  { }
 
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_vram;
 
@@ -63,21 +67,21 @@ public:
 
 	/* memory */
 	UINT8    m_pal[0x10000];
-	DECLARE_READ8_MEMBER(hotblock_video_read);
-	DECLARE_READ8_MEMBER(hotblock_port4_r);
-	DECLARE_WRITE8_MEMBER(hotblock_port4_w);
-	DECLARE_WRITE8_MEMBER(hotblock_port0_w);
-	DECLARE_WRITE8_MEMBER(hotblock_video_write);
+	
+	DECLARE_READ8_MEMBER(video_read);
+	DECLARE_READ8_MEMBER(port4_r);
+	DECLARE_WRITE8_MEMBER(port4_w);
+	DECLARE_WRITE8_MEMBER(port0_w);
+	DECLARE_WRITE8_MEMBER(video_write);
+	
 	virtual void video_start();
-	UINT32 screen_update_hotblock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(hotblocks_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 
-READ8_MEMBER(hotblock_state::hotblock_video_read)
+READ8_MEMBER(hotblock_state::video_read)
 {
 	/* right?, anything else?? */
 	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
@@ -91,14 +95,14 @@ READ8_MEMBER(hotblock_state::hotblock_video_read)
 }
 
 /* port 4 is some kind of eeprom / storage .. used to store the scores */
-READ8_MEMBER(hotblock_state::hotblock_port4_r)
+READ8_MEMBER(hotblock_state::port4_r)
 {
 //  osd_printf_debug("port4_r\n");
 	return 0x00;
 }
 
 
-WRITE8_MEMBER(hotblock_state::hotblock_port4_w)
+WRITE8_MEMBER(hotblock_state::port4_w)
 {
 //  osd_printf_debug("port4_w: pc = %06x : data %04x\n", space.device().safe_pc(), data);
 //  popmessage("port4_w: pc = %06x : data %04x", space.device().safe_pc(), data);
@@ -108,14 +112,14 @@ WRITE8_MEMBER(hotblock_state::hotblock_port4_w)
 
 
 
-WRITE8_MEMBER(hotblock_state::hotblock_port0_w)
+WRITE8_MEMBER(hotblock_state::port0_w)
 {
 //  popmessage("port4_w: pc = %06x : data %04x", space.device().safe_pc(), data);
 
 	m_port0 = data;
 }
 
-WRITE8_MEMBER(hotblock_state::hotblock_video_write)
+WRITE8_MEMBER(hotblock_state::video_write)
 {
 	/* right?, anything else?? */
 	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
@@ -130,13 +134,13 @@ WRITE8_MEMBER(hotblock_state::hotblock_video_write)
 
 static ADDRESS_MAP_START( hotblock_map, AS_PROGRAM, 8, hotblock_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(hotblock_video_read, hotblock_video_write) AM_SHARE("vram")
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(video_read, video_write) AM_SHARE("vram")
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotblock_io, AS_IO, 8, hotblock_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(hotblock_port0_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(hotblock_port4_r, hotblock_port4_w)
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(port0_w)
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r, port4_w)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
@@ -146,9 +150,11 @@ ADDRESS_MAP_END
 void hotblock_state::video_start()
 {
 	save_item(NAME(m_pal));
+	save_item(NAME(m_port0));
+	save_item(NAME(m_port4)); //stored but not read for now
 }
 
-UINT32 hotblock_state::screen_update_hotblock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 hotblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x, count;
 	int i;
@@ -200,18 +206,13 @@ static INPUT_PORTS_START( hotblock )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(hotblock_state::hotblocks_irq)/* right? */
-{
-	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static MACHINE_CONFIG_START( hotblock, hotblock_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hotblock_map)
 	MCFG_CPU_IO_MAP(hotblock_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hotblock_state,  hotblocks_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", hotblock_state, nmi_line_pulse) /* right? */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -219,7 +220,7 @@ static MACHINE_CONFIG_START( hotblock, hotblock_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024,1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update_hotblock)
+	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -240,4 +241,4 @@ ROM_START( hotblock )
 	ROM_LOAD( "hotblk6.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
 ROM_END
 
-GAME( 1993, hotblock, 0,        hotblock, hotblock, driver_device, 0, ROT0,  "NIX?", "Hot Blocks - Tetrix II", 0 )
+GAME( 1993, hotblock, 0,        hotblock, hotblock, driver_device, 0, ROT0,  "NIX?", "Hot Blocks - Tetrix II", GAME_SUPPORTS_SAVE )
