@@ -536,17 +536,3 @@ void osd_thread_wait_free(osd_thread *thread)
 	free(thread);
 #endif
 }
-
-//============================================================
-//  osd_process_kill
-//============================================================
-/*
-void osd_process_kill(void)
-{
-#if defined(WIN32)
-   TerminateProcess(GetCurrentProcess(), -1);
-#else
-	kill(getpid(), SIGKILL);
-#endif
-}
-*/
