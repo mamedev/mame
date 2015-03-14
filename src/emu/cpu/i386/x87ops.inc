@@ -4519,7 +4519,7 @@ void i386_device::x87_fsave(UINT8 modrm)
 	}
 
 	for (int i = 0; i < 8; ++i)
-		x87_write_stack(i, READ80(ea + i*10), FALSE);
+		WRITE80(ea + i*10, ST(i));
 
 	CYCLES((m_cr[0] & 1) ? 56 : 67);
 }
@@ -4575,7 +4575,7 @@ void i386_device::x87_frstor(UINT8 modrm)
 	}
 
 	for (int i = 0; i < 8; ++i)
-		WRITE80(ea + i*10, ST(i));
+		x87_write_stack(i, READ80(ea + i*10), FALSE);
 
 	CYCLES((m_cr[0] & 1) ? 34 : 44);
 }
