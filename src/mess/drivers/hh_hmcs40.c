@@ -677,7 +677,37 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+// hardware is identical to Galaxian 2, so we can use those handlers
+// note: plate numbers are 0-23, not 1-24(with 0 always-on)
+
 static INPUT_PORTS_START( epacman2 )
+	PORT_START("IN.0") // D1 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // "
+
+	PORT_START("IN.1") // D2 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY // "
+
+	PORT_START("IN.2") // D3 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Skill Control")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Demo Light Test")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // D4 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Skill" )
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x0c, 0x00, "Players" )
+	PORT_CONFSETTING(    0x08, "0 (Demo)" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
 
@@ -685,8 +715,16 @@ static MACHINE_CONFIG_START( epacman2, hh_hmcs40_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_HMCS40_READ_R_CB(0, READ8(hh_hmcs40_state, egalaxn2_input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, egalaxn2_grid_w))
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
