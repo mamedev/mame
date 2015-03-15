@@ -37,6 +37,7 @@
 #include "devdelegate.h"
 
 // memory and address spaces
+// renamed by libretro: Android has a memory.h system header conflict
 #include "emumemory.h"
 #include "addrmap.h"
 #include "memarray.h"

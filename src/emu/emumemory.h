@@ -2,9 +2,12 @@
 // copyright-holders:Aaron Giles,Olivier Galibert
 /***************************************************************************
 
-    memory.h
+    emumemory.h
 
     Functions which handle device memory accesses.
+
+	File is named memory.h in mamedev/mame, renamed by libretro because
+	Android has a system header named memory.h which causes conflicts.
 
 ***************************************************************************/
 
