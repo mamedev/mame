@@ -287,7 +287,7 @@ const char core[] = "mess";
 #elif defined(WANT_UME)
 const char core[] = "ume";
 #endif
-#endif*/
+#endif
 
 #ifdef __WIN32__
 const char slash = '\\';
