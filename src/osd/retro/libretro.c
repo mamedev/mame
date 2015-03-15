@@ -1,13 +1,13 @@
 void retro_poll_mame_input(void);
 
-static int rtwi       = 320,
-static int rthe       = 240,
+static int rtwi       = 320;
+static int rthe       = 240;
 static int topw       = 1600;
 static float rtaspect = 0;
 static float rtfps    = 60.0;
 static int max_width  = 0;
 static int max_height = 0;
-int SHIFTON           = -1
+int SHIFTON           = -1;
 int NEWGAME_FROM_OSD  = 0;
 char RPATH[512];
 
