@@ -534,8 +534,8 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_START("IN.0") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Missile")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bomb")
 
 	PORT_START("IN.1") // port B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
@@ -1064,7 +1064,7 @@ ROM_END
 CONS( 1979, ssfball,   0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1980, splasfgt,  0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-CONS( 1982, astrocmd,  0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1982, astrocmd,  0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, edracula,  0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1980, tmtennis,  0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
