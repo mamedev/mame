@@ -1,4 +1,4 @@
-void retro_poll_mame_input();
+void retro_poll_mame_input(void);
 
 static int rtwi       = 320,
 static int rthe       = 240,
@@ -400,21 +400,22 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 static void retro_wrap_emulator()
 {
-    mmain(1,RPATH);
+   mmain(1,RPATH);
 
-    pauseg=-1;
+   pauseg=-1;
 
-    environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0);
+   environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0);
 
-    // Were done here
-    co_switch(mainThread);
+   // Were done here
+   co_switch(mainThread);
 
-    // Dead emulator, but libco says not to return
-    while(true)
-    {
-        LOGI("Running a dead emulator.");
-        co_switch(mainThread);
-    }
+   // Dead emulator, but libco says not to return
+   while(true)
+   {
+      if (log_cb)
+         log_cb(RETRO_LOG_ERROR, "Running a dead emulator.\n");
+      co_switch(mainThread);
+   }
 }
 
 void retro_init (void)
@@ -486,13 +487,11 @@ void retro_init (void)
 
 void retro_deinit(void)
 {
-   if(emuThread)
+   if (emuThread)
    {
       co_delete(emuThread);
       emuThread = 0;
    }
-
-   LOGI("Retro DeInit\n");
 }
 
 void retro_reset (void)
@@ -536,12 +535,6 @@ void retro_run (void)
     co_switch(emuThread);
 }
 
-void prep_retro_rotation(int rot)
-{
-   LOGI("Rotation:%d\n",rot);
-   environ_cb(RETRO_ENVIRONMENT_SET_ROTATION, &rot);
-}
-
 bool retro_load_game(const struct retro_game_info *info)
 {
     char basename[256];
@@ -581,13 +574,11 @@ bool retro_load_game(const struct retro_game_info *info)
 
 void retro_unload_game(void)
 {
-   if(pauseg==0)
+   if (pauseg == 0)
    {
       pauseg=-1;
       co_switch(emuThread);
    }
-
-   LOGI("Retro unload_game\n");
 }
 
 /* Stubs */

@@ -12,8 +12,6 @@
 
 #include "libretro.h"
 
-#include "log.h"
-
 #ifdef _WIN32
 char slash = '\\';
 #else
@@ -712,7 +710,8 @@ int executeGame_cmd(char* path)
    /* split the path to directory and the name without the zip extension */
    if (parsePath(Only1Arg?path:ARGUV[ARGUC-1], MgamePath, MgameName) == 0)
    {
-      write_log("parse path failed! path=%s\n", path);
+      if (log_cb)
+      log_cb(RETRO_LOG_ERROR, "parse path failed! path=%s.\n", path);
       strcpy(MgameName,path );
    }
 
@@ -721,7 +720,8 @@ int executeGame_cmd(char* path)
       /* split the path to directory and the name without the zip extension */
       if (parseSystemName(path, MsystemName) ==0)
       {
-         write_log("parse systemname failed! path=%s\n", path);
+         if (log_cb)
+            log_cb(RETRO_LOG_ERROR, "parse systemname failed! path=%s\n", path);
          strcpy(MsystemName,path );
       }
    }
@@ -731,16 +731,22 @@ int executeGame_cmd(char* path)
    {
       /* handle -cc/-createconfig case */
       if(CreateConf)
-         write_log("create an %s config\n", core);
+      {
+         if (log_cb)
+            log_cb(RETRO_LOG_INFO, "Create an %s config\n", core);
+      }
       else
       {
-         write_log("game not found: %s\n", MgameName);
+         if (log_cb)
+            log_cb(RETRO_LOG_WARN, "Game not found: %s\n", MgameName);
+
          if(Only1Arg)
          {
             //test if system exist (based on parent path)
             if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) == 0)
             {
-               write_log("driver not found: %s\n", MsystemName);
+               if (log_cb)
+                  log_cb(RETRO_LOG_ERROR, "Driver not found: %s\n", MsystemName);
                return -2;
             }
          }
@@ -755,10 +761,14 @@ int executeGame_cmd(char* path)
       {
          /* test system */
          if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) == 0)
-            write_log("System not found: %s\n", MsystemName);
+         {
+            if (log_cb)
+               log_cb(RETRO_LOG_ERROR, "System not found: %s\n", MsystemName);
+         }
          else
          {
-            write_log("System found: %s\n", MsystemName);
+            if (log_cb)
+               log_cb(RETRO_LOG_INFO, "System found: %s\n", MsystemName);
             arcade=false;
          }
       }

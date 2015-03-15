@@ -76,7 +76,6 @@ void retro_osd_interface::init(running_machine &machine)
     // initialize the subsystems
 	osd_common_t::init_subsystems();
 
-	//prep_retro_rotation(gamRot);
 	our_target->compute_minimum_size(rtwi, rthe);
 	topw=rtwi;
 	//Equivalent to rtaspect=our_target->view_by_index((our_target->view()))->effective_aspect(render_layer_config layer_config())
@@ -135,7 +134,11 @@ void retro_osd_interface::update(bool skip_redraw)
       {
 
          FirstTimeUpdate++;
-         //write_log("game screen w=%i h=%i  rowPixels=%i\n", minwidth, minheight,minwidth );
+
+#if 0
+         if (log_cb)
+            log_cb(RETRO_LOG_INFO, "game screen w=%i h=%i  rowPixels=%i\n", minwidth, minheight, minwidth);
+#endif
 
          rtwi=minwidth;
          rthe=minheight;
@@ -148,9 +151,6 @@ void retro_osd_interface::update(bool skip_redraw)
          gamRot = (ROT270 == orient) ? 1 : gamRot;
          gamRot = (ROT180 == orient) ? 2 : gamRot;
          gamRot = (ROT90  == orient) ? 3 : gamRot;
-
-         //prep_retro_rotation(gamRot);
-
       }
 
       if (minwidth != rtwi || minheight != rthe || minwidth != topw )
