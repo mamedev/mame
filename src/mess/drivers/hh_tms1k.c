@@ -136,74 +136,74 @@ public:
 	
 	// game-specific handlers
 	void mathmagi_display();
-	DECLARE_READ8_MEMBER(mathmagi_read_k);
 	DECLARE_WRITE16_MEMBER(mathmagi_write_r);
 	DECLARE_WRITE16_MEMBER(mathmagi_write_o);
+	DECLARE_READ8_MEMBER(mathmagi_read_k);
 
 	void amaztron_display();
-	DECLARE_READ8_MEMBER(amaztron_read_k);
 	DECLARE_WRITE16_MEMBER(amaztron_write_r);
 	DECLARE_WRITE16_MEMBER(amaztron_write_o);
+	DECLARE_READ8_MEMBER(amaztron_read_k);
 
 	void tc4_display();
-	DECLARE_READ8_MEMBER(tc4_read_k);
 	DECLARE_WRITE16_MEMBER(tc4_write_r);
 	DECLARE_WRITE16_MEMBER(tc4_write_o);
+	DECLARE_READ8_MEMBER(tc4_read_k);
 
 	void ebball_display();
-	DECLARE_READ8_MEMBER(ebball_read_k);
 	DECLARE_WRITE16_MEMBER(ebball_write_r);
 	DECLARE_WRITE16_MEMBER(ebball_write_o);
+	DECLARE_READ8_MEMBER(ebball_read_k);
 
 	void ebball3_display();
-	DECLARE_READ8_MEMBER(ebball3_read_k);
 	DECLARE_WRITE16_MEMBER(ebball3_write_r);
 	DECLARE_WRITE16_MEMBER(ebball3_write_o);
+	DECLARE_READ8_MEMBER(ebball3_read_k);
 	void ebball3_set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(ebball3_difficulty_switch);
 	DECLARE_MACHINE_RESET(ebball3);
 
-	DECLARE_READ8_MEMBER(elecdet_read_k);
 	DECLARE_WRITE16_MEMBER(elecdet_write_r);
 	DECLARE_WRITE16_MEMBER(elecdet_write_o);
+	DECLARE_READ8_MEMBER(elecdet_read_k);
 
 	void starwbc_display();
-	DECLARE_READ8_MEMBER(starwbc_read_k);
 	DECLARE_WRITE16_MEMBER(starwbc_write_r);
 	DECLARE_WRITE16_MEMBER(starwbc_write_o);
+	DECLARE_READ8_MEMBER(starwbc_read_k);
 
-	DECLARE_READ8_MEMBER(comp4_read_k);
 	DECLARE_WRITE16_MEMBER(comp4_write_r);
 	DECLARE_WRITE16_MEMBER(comp4_write_o);
+	DECLARE_READ8_MEMBER(comp4_read_k);
 
-	DECLARE_READ8_MEMBER(simon_read_k);
 	DECLARE_WRITE16_MEMBER(simon_write_r);
 	DECLARE_WRITE16_MEMBER(simon_write_o);
+	DECLARE_READ8_MEMBER(simon_read_k);
 
-	DECLARE_READ8_MEMBER(cnsector_read_k);
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);
+	DECLARE_READ8_MEMBER(cnsector_read_k);
 
-	DECLARE_READ8_MEMBER(merlin_read_k);
 	DECLARE_WRITE16_MEMBER(merlin_write_r);
 	DECLARE_WRITE16_MEMBER(merlin_write_o);
+	DECLARE_READ8_MEMBER(merlin_read_k);
 
-	DECLARE_READ8_MEMBER(stopthief_read_k);
 	DECLARE_WRITE16_MEMBER(stopthief_write_r);
 	DECLARE_WRITE16_MEMBER(stopthief_write_o);
+	DECLARE_READ8_MEMBER(stopthief_read_k);
 
-	DECLARE_READ8_MEMBER(bankshot_read_k);
 	DECLARE_WRITE16_MEMBER(bankshot_write_r);
 	DECLARE_WRITE16_MEMBER(bankshot_write_o);
+	DECLARE_READ8_MEMBER(bankshot_read_k);
 
-	DECLARE_READ8_MEMBER(splitsec_read_k);
 	DECLARE_WRITE16_MEMBER(splitsec_write_r);
 	DECLARE_WRITE16_MEMBER(splitsec_write_o);
+	DECLARE_READ8_MEMBER(splitsec_read_k);
 
 	void tandy12_display();
-	DECLARE_READ8_MEMBER(tandy12_read_k);
 	DECLARE_WRITE16_MEMBER(tandy12_write_r);
 	DECLARE_WRITE16_MEMBER(tandy12_write_o);
+	DECLARE_READ8_MEMBER(tandy12_read_k);
 };
 
 
@@ -408,11 +408,6 @@ void hh_tms1k_state::mathmagi_display()
 	display_update();
 }
 
-READ8_MEMBER(hh_tms1k_state::mathmagi_read_k)
-{
-	return read_inputs(6);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_r)
 {
 	// R3,R5-R7,R9,R10: input mux
@@ -429,6 +424,11 @@ WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_o)
 	// O0: N/C
 	data = (data << 1 & 0xfe) | (data >> 7 & 1); // because opla is unknown
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::mathmagi_read_k)
+{
+	return read_inputs(6);
 }
 
 
@@ -568,15 +568,6 @@ void hh_tms1k_state::amaztron_display()
 	display_update();
 }
 
-READ8_MEMBER(hh_tms1k_state::amaztron_read_k)
-{
-	UINT8 k = read_inputs(6);
-
-	// the 5th column is tied to K4+K8
-	if (k & 0x10) k |= 0xc;
-	return k & 0xf;
-}
-
 WRITE16_MEMBER(hh_tms1k_state::amaztron_write_r)
 {
 	// R0-R5: input mux
@@ -596,6 +587,15 @@ WRITE16_MEMBER(hh_tms1k_state::amaztron_write_o)
 	// O7: N/C
 	m_o = data & 0x7f;
 	amaztron_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::amaztron_read_k)
+{
+	UINT8 k = read_inputs(6);
+
+	// the 5th column is tied to K4+K8
+	if (k & 0x10) k |= 0xc;
+	return k & 0xf;
 }
 
 
@@ -711,17 +711,6 @@ void hh_tms1k_state::tc4_display()
 	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
 }
 
-READ8_MEMBER(hh_tms1k_state::tc4_read_k)
-{
-	UINT8 k = read_inputs(6);
-
-	// read from cartridge
-	if (m_inp_mux & 0x200)
-		k |= m_inp_matrix[6]->read();
-
-	return k;
-}
-
 WRITE16_MEMBER(hh_tms1k_state::tc4_write_r)
 {
 	// R10: speaker out
@@ -742,6 +731,17 @@ WRITE16_MEMBER(hh_tms1k_state::tc4_write_o)
 	// O0-O7: led row
 	m_o = data;
 	tc4_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::tc4_read_k)
+{
+	UINT8 k = read_inputs(6);
+
+	// read from cartridge
+	if (m_inp_mux & 0x200)
+		k |= m_inp_matrix[6]->read();
+
+	return k;
 }
 
 
@@ -853,12 +853,6 @@ void hh_tms1k_state::ebball_display()
 	display_matrix(7, 9, ~m_o, m_r);
 }
 
-READ8_MEMBER(hh_tms1k_state::ebball_read_k)
-{
-	// note: K8(Vss row) is always on
-	return m_inp_matrix[5]->read() | read_inputs(5);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
 {
 	// R1-R5: input mux
@@ -878,6 +872,12 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
 	// O7: N/C
 	m_o = data;
 	ebball_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball_read_k)
+{
+	// note: K8(Vss row) is always on
+	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
 
@@ -989,11 +989,6 @@ void hh_tms1k_state::ebball3_display()
 	display_update();
 }
 
-READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
-{
-	return read_inputs(3);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::ebball3_write_r)
 {
 	// R0-R2: input mux
@@ -1013,6 +1008,11 @@ WRITE16_MEMBER(hh_tms1k_state::ebball3_write_o)
 	// O7: N/C
 	m_o = data & 0x7f;
 	ebball3_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
+{
+	return read_inputs(3);
 }
 
 
@@ -1113,12 +1113,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::elecdet_read_k)
-{
-	// note: the Vss row is always on
-	return m_inp_matrix[4]->read() | read_inputs(4);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::elecdet_write_r)
 {
 	// R7,R8: speaker on
@@ -1139,6 +1133,12 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_o)
 	// O0-O6: led segments A-G
 	// O7: speaker out
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::elecdet_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[4]->read() | read_inputs(4);
 }
 
 
@@ -1233,11 +1233,6 @@ void hh_tms1k_state::starwbc_display()
 	display_matrix(8, 10, m_o, m_r);
 }
 
-READ8_MEMBER(hh_tms1k_state::starwbc_read_k)
-{
-	return read_inputs(5);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::starwbc_write_r)
 {
 	// R0,R1,R3,R5,R7: input mux
@@ -1256,6 +1251,11 @@ WRITE16_MEMBER(hh_tms1k_state::starwbc_write_o)
 	// O0-O7: led row
 	m_o = (data << 4 & 0xf0) | (data >> 4 & 0x0f);
 	starwbc_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::starwbc_read_k)
+{
+	return read_inputs(5);
 }
 
 
@@ -1339,11 +1339,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::comp4_read_k)
-{
-	return read_inputs(3);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::comp4_write_r)
 {
 	// leds:
@@ -1365,6 +1360,11 @@ WRITE16_MEMBER(hh_tms1k_state::comp4_write_o)
 	// other bits: N/C
 	m_o = data;
 	display_matrix(11, 1, m_r, m_o);
+}
+
+READ8_MEMBER(hh_tms1k_state::comp4_read_k)
+{
+	return read_inputs(3);
 }
 
 
@@ -1422,11 +1422,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::simon_read_k)
-{
-	return read_inputs(4);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
 {
 	// R4-R8 go through an 75494 IC first:
@@ -1448,6 +1443,11 @@ WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
 WRITE16_MEMBER(hh_tms1k_state::simon_write_o)
 {
 	// N/C
+}
+
+READ8_MEMBER(hh_tms1k_state::simon_read_k)
+{
+	return read_inputs(4);
 }
 
 
@@ -1514,11 +1514,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
-{
-	return read_inputs(5);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 {
 	m_display_maxx = 8;
@@ -1544,6 +1539,11 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_o)
 	
 	// O0-O7: digit segments
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
+{
+	return read_inputs(5);
 }
 
 
@@ -1622,11 +1622,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::merlin_read_k)
-{
-	return read_inputs(4);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::merlin_write_r)
 {
 	/* leds:
@@ -1649,6 +1644,11 @@ WRITE16_MEMBER(hh_tms1k_state::merlin_write_o)
 	// O0-O3: input mux
 	// O7: N/C
 	m_inp_mux = data & 0xf;
+}
+
+READ8_MEMBER(hh_tms1k_state::merlin_read_k)
+{
+	return read_inputs(4);
 }
 
 
@@ -1716,12 +1716,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
-{
-	// note: the Vss row is always on
-	return m_inp_matrix[2]->read() | read_inputs(2);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 {
 	m_display_maxx = 7;
@@ -1749,6 +1743,12 @@ WRITE16_MEMBER(hh_tms1k_state::stopthief_write_o)
 	// O3: speaker out
 	// O0-O2,O4-O7: led segments A-G
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
 
@@ -1824,11 +1824,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::bankshot_read_k)
-{
-	return read_inputs(2);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::bankshot_write_r)
 {
 	// R0: speaker out
@@ -1848,6 +1843,11 @@ WRITE16_MEMBER(hh_tms1k_state::bankshot_write_o)
 	// O7: N/C
 	m_o = data;
 	display_matrix(7, 11, m_o, m_r);
+}
+
+READ8_MEMBER(hh_tms1k_state::bankshot_read_k)
+{
+	return read_inputs(2);
 }
 
 
@@ -1931,11 +1931,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::splitsec_read_k)
-{
-	return read_inputs(2);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::splitsec_write_r)
 {
 	// R8: speaker out
@@ -1956,6 +1951,12 @@ WRITE16_MEMBER(hh_tms1k_state::splitsec_write_o)
 	m_o = data;
 	display_matrix(7, 8, m_o, m_r);
 }
+
+READ8_MEMBER(hh_tms1k_state::splitsec_read_k)
+{
+	return read_inputs(2);
+}
+
 
 static INPUT_PORTS_START( splitsec )
 	PORT_START("IN.0") // R9
@@ -2021,11 +2022,6 @@ void hh_tms1k_state::tandy12_display()
 	display_matrix(13, 1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00), 1);
 }
 
-READ8_MEMBER(hh_tms1k_state::tandy12_read_k)
-{
-	return read_inputs(5);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::tandy12_write_r)
 {
 	// R10: speaker out
@@ -2043,6 +2039,11 @@ WRITE16_MEMBER(hh_tms1k_state::tandy12_write_o)
 {
 	m_o = data;
 	tandy12_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::tandy12_read_k)
+{
+	return read_inputs(5);
 }
 
 

@@ -79,14 +79,14 @@ public:
 
 	// game-specific handlers
 	void ssfball_display();
-	DECLARE_READ8_MEMBER(ssfball_input_b_r);
 	DECLARE_WRITE8_MEMBER(ssfball_grid_w);
 	DECLARE_WRITE8_MEMBER(ssfball_plate_w);
+	DECLARE_READ8_MEMBER(ssfball_input_b_r);
 
 	void splasfgt_display();
-	DECLARE_READ8_MEMBER(splasfgt_input_b_r);
 	DECLARE_WRITE8_MEMBER(splasfgt_grid_w);
 	DECLARE_WRITE8_MEMBER(splasfgt_plate_w);
+	DECLARE_READ8_MEMBER(splasfgt_input_b_r);
 
 	void astrocmd_display();
 	DECLARE_WRITE8_MEMBER(astrocmd_grid_w);
@@ -95,10 +95,10 @@ public:
 	DECLARE_WRITE8_MEMBER(edracula_grid_w);
 	DECLARE_WRITE8_MEMBER(edracula_plate_w);
 	
-	DECLARE_READ8_MEMBER(tmtennis_input_r);
 	DECLARE_WRITE8_MEMBER(tmtennis_grid_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_plate_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_port_e_w);
+	DECLARE_READ8_MEMBER(tmtennis_input_r);
 	void tmtennis_set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(tmtennis_difficulty_switch);
 	DECLARE_MACHINE_RESET(tmtennis);
@@ -107,8 +107,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tmpacman_grid_w);
 	DECLARE_WRITE8_MEMBER(tmpacman_plate_w);
 	
-	DECLARE_READ8_MEMBER(alnchase_input_r);
 	DECLARE_WRITE8_MEMBER(alnchase_output_w);
+	DECLARE_READ8_MEMBER(alnchase_input_r);
 };
 
 
@@ -253,12 +253,6 @@ void hh_ucom4_state::ssfball_display()
 	display_matrix(16, 9, plate, m_grid);
 }
 
-READ8_MEMBER(hh_ucom4_state::ssfball_input_b_r)
-{
-	// B: input port 2, where B3 is multiplexed
-	return m_inp_matrix[2]->read() | read_inputs(2);
-}
-
 WRITE8_MEMBER(hh_ucom4_state::ssfball_grid_w)
 {
 	// C,D(,E): vfd matrix grid 0-7(,8)
@@ -285,6 +279,12 @@ WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
 		ssfball_grid_w(space, offset, data >> 3 & 1);
 	else
 		ssfball_display();
+}
+
+READ8_MEMBER(hh_ucom4_state::ssfball_input_b_r)
+{
+	// B: input port 2, where B3 is multiplexed
+	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
 
@@ -362,12 +362,6 @@ void hh_ucom4_state::splasfgt_display()
 	display_matrix(16, 9, plate, m_grid);
 }
 
-READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
-{
-	// B: multiplexed buttons
-	return read_inputs(4);
-}
-
 WRITE8_MEMBER(hh_ucom4_state::splasfgt_grid_w)
 {
 	// G,H,I0: vfd matrix grid
@@ -395,6 +389,12 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_plate_w)
 		m_speaker->level_w(data & 3);
 	
 	ssfball_display();
+}
+
+READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
+{
+	// B: multiplexed buttons
+	return read_inputs(4);
 }
 
 
@@ -674,12 +674,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
-{
-	// A,B: multiplexed buttons
-	return ~read_inputs(2) >> (offset*4);
-}
-
 WRITE8_MEMBER(hh_ucom4_state::tmtennis_grid_w)
 {
 	// G,H,I: vfd matrix grid
@@ -706,6 +700,12 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_port_e_w)
 	// E3: N/C
 	m_inp_mux = data & 3;
 	m_speaker->level_w(data >> 2 & 1);
+}
+
+READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
+{
+	// A,B: multiplexed buttons
+	return ~read_inputs(2) >> (offset*4);
 }
 
 
@@ -910,12 +910,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_ucom4_state::alnchase_input_r)
-{
-	// A: buttons
-	return read_inputs(2);
-}
-
 WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 {
 	if (offset <= NEC_UCOM4_PORTE)
@@ -941,6 +935,12 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 	}
 
 	display_matrix(17, 9, m_plate, m_grid);
+}
+
+READ8_MEMBER(hh_ucom4_state::alnchase_input_r)
+{
+	// A: buttons
+	return read_inputs(2);
 }
 
 

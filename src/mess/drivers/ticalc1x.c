@@ -70,26 +70,26 @@ public:
 	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 	
 	// calculator-specific handlers
-	DECLARE_READ8_MEMBER(tisr16_read_k);
+	void tisr16_display_update();
 	DECLARE_WRITE16_MEMBER(tisr16_write_o);
 	DECLARE_WRITE16_MEMBER(tisr16_write_r);
-	void tisr16_display_update();
+	DECLARE_READ8_MEMBER(tisr16_read_k);
 
-	DECLARE_READ8_MEMBER(ti1270_read_k);
 	DECLARE_WRITE16_MEMBER(ti1270_write_o);
 	DECLARE_WRITE16_MEMBER(ti1270_write_r);
+	DECLARE_READ8_MEMBER(ti1270_read_k);
 
-	DECLARE_READ8_MEMBER(wizatron_read_k);
 	DECLARE_WRITE16_MEMBER(wizatron_write_o);
 	DECLARE_WRITE16_MEMBER(wizatron_write_r);
+	DECLARE_READ8_MEMBER(wizatron_read_k);
 
-	DECLARE_READ8_MEMBER(lilprof_read_k);
 	DECLARE_WRITE16_MEMBER(lilprof_write_o);
 	DECLARE_WRITE16_MEMBER(lilprof_write_r);
+	DECLARE_READ8_MEMBER(lilprof_read_k);
 
-	DECLARE_READ8_MEMBER(ti30_read_k);
 	DECLARE_WRITE16_MEMBER(ti30_write_o);
 	DECLARE_WRITE16_MEMBER(ti30_write_r);
+	DECLARE_READ8_MEMBER(ti30_read_k);
 };
 
 
@@ -262,11 +262,6 @@ void ticalc1x_state::tisr16_display_update()
 	display_update();
 }
 
-READ8_MEMBER(ticalc1x_state::tisr16_read_k)
-{
-	return read_inputs(11);
-}
-
 WRITE16_MEMBER(ticalc1x_state::tisr16_write_r)
 {
 	// R0-R10: input mux
@@ -280,6 +275,11 @@ WRITE16_MEMBER(ticalc1x_state::tisr16_write_o)
 	// O0-O7: digit segments
 	m_o = data;
 	tisr16_display_update();
+}
+
+READ8_MEMBER(ticalc1x_state::tisr16_read_k)
+{
+	return read_inputs(11);
 }
 
 
@@ -379,11 +379,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(ticalc1x_state::ti1270_read_k)
-{
-	return read_inputs(6);
-}
-
 WRITE16_MEMBER(ticalc1x_state::ti1270_write_r)
 {
 	// R0-R7: select digit (right-to-left)
@@ -396,6 +391,11 @@ WRITE16_MEMBER(ticalc1x_state::ti1270_write_o)
 	// O0-O7: digit segments
 	m_inp_mux = (data >> 1 & 0x1f) | (data >> 2 & 0x20);
 	m_o = data;
+}
+
+READ8_MEMBER(ticalc1x_state::ti1270_read_k)
+{
+	return read_inputs(6);
 }
 
 
@@ -465,11 +465,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(ticalc1x_state::wizatron_read_k)
-{
-	return read_inputs(4);
-}
-
 WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
 {
 	// note: 6th digit is custom(not 7seg), for math symbols, and 3rd digit
@@ -487,6 +482,11 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
 	// O7: N/C
 	m_inp_mux = data >> 1 & 0xf;
 	m_o = data & 0x7f;
+}
+
+READ8_MEMBER(ticalc1x_state::wizatron_read_k)
+{
+	return read_inputs(4);
 }
 
 
@@ -544,11 +544,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(ticalc1x_state::lilprof_read_k)
-{
-	return read_inputs(5);
-}
-
 WRITE16_MEMBER(ticalc1x_state::lilprof_write_r)
 {
 	// update leds state
@@ -576,6 +571,11 @@ WRITE16_MEMBER(ticalc1x_state::lilprof_write_o)
 	// O7: 6th digit
 	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
 	m_o = data;
+}
+
+READ8_MEMBER(ticalc1x_state::lilprof_read_k)
+{
+	return read_inputs(5);
 }
 
 
@@ -642,12 +642,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(ticalc1x_state::ti30_read_k)
-{
-	// note: the Vss row is always on
-	return m_inp_matrix[7]->read() | read_inputs(7);
-}
-
 WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
 {
 	// note: 1st digit only has segments B,F,G,DP
@@ -663,6 +657,12 @@ WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
 	// O0-O7: digit segments
 	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
 	m_o = data;
+}
+
+READ8_MEMBER(ticalc1x_state::ti30_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[7]->read() | read_inputs(7);
 }
 
 

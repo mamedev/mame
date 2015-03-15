@@ -93,13 +93,13 @@ public:
 
 	// game-specific handlers
 	DECLARE_WRITE8_MEMBER(alnattck_plate_w);
-	DECLARE_READ16_MEMBER(alnattck_d_r);
 	DECLARE_WRITE16_MEMBER(alnattck_d_w);
+	DECLARE_READ16_MEMBER(alnattck_d_r);
 	
 	void egalaxn2_display();
-	DECLARE_READ8_MEMBER(egalaxn2_input_r);
 	DECLARE_WRITE8_MEMBER(egalaxn2_plate_w);
 	DECLARE_WRITE16_MEMBER(egalaxn2_grid_w);
+	DECLARE_READ8_MEMBER(egalaxn2_input_r);
 };
 
 
@@ -347,12 +347,6 @@ WRITE8_MEMBER(hh_hmcs40_state::alnattck_plate_w)
 	display_matrix(20, 10, plate, m_grid);
 }
 
-READ16_MEMBER(hh_hmcs40_state::alnattck_d_r)
-{
-	// D5: inputs
-	return (read_inputs(7) & 1) << 5;
-}
-
 WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
 {
 	// D4: speaker out
@@ -366,6 +360,12 @@ WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
 	
 	// D0-D3: plate 16-19 (update display there)
 	alnattck_plate_w(space, 4, data & 0xf);
+}
+
+READ16_MEMBER(hh_hmcs40_state::alnattck_d_r)
+{
+	// D5: inputs
+	return (read_inputs(7) & 1) << 5;
 }
 
 
