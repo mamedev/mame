@@ -108,10 +108,10 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 	
 	// misc common
-	UINT16 m_r;
-	UINT16 m_o;
-	UINT16 m_inp_mux;
-	bool m_power_on;
+	UINT16 m_r;                         // MCU R-pins data
+	UINT16 m_o;                         // MCU O-pins data
+	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	bool m_power_on;                    // TMS0980 power-on state
 
 	UINT8 read_inputs(int columns);
 	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
@@ -121,14 +121,14 @@ public:
 	virtual void machine_reset();
 
 	// display common
-	int m_display_wait;
-	int m_display_maxy;
-	int m_display_maxx;
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
 	
-	UINT32 m_display_state[0x20];
-	UINT32 m_display_cache[0x20];
-	UINT8 m_display_decay[0x20][0x20];
-	UINT16 m_7seg_mask[0x20];
+	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_7seg_mask[0x20];           // if not 0, display matrix row is a 7seg, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();

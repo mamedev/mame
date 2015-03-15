@@ -48,20 +48,20 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	UINT8 m_b;
-	UINT8 m_c;
+	UINT8 m_b;                          // MCU port B data
+	UINT8 m_c;                          // MCU port C data
 
 	virtual void machine_start();
 
 	// display common
-	int m_display_wait;
-	int m_display_maxy;
-	int m_display_maxx;
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
 	
-	UINT32 m_display_state[0x20];
-	UINT32 m_display_cache[0x20];
-	UINT8 m_display_decay[0x20][0x20];
-	UINT16 m_7seg_mask[0x20];
+	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_7seg_mask[0x20];           // if not 0, display matrix row is a 7seg, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
