@@ -162,7 +162,7 @@ cothread_t emuThread;
 //  RETRO
 //============================================================
 
-#include "retromapper.c"
+#include "libretro.c"
 #include "retroinput.c"
 #include "retroosd.c"
 

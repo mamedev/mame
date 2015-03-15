@@ -1,10 +1,15 @@
 void retro_poll_mame_input();
 
-static int rtwi=320,rthe=240,topw=1600; // DEFAULT TEXW/TEXH/PITCH
-static float rtaspect=0;
-static float rtfps=60.0;
-static int max_width=0;
-static int max_height=0;
+static int rtwi       = 320,
+static int rthe       = 240,
+static int topw       = 1600;
+static float rtaspect = 0;
+static float rtfps    = 60.0;
+static int max_width  = 0;
+static int max_height = 0;
+int SHIFTON           = -1
+int NEWGAME_FROM_OSD  = 0;
+char RPATH[512];
 
 static char option_mouse[50];
 static char option_cheats[50];
@@ -25,9 +30,6 @@ static char option_throttle[50];
 static char option_nobuffer[50];
 static char option_saves[50];
 
-int SHIFTON=-1,NEWGAME_FROM_OSD=0;
-char RPATH[512];
-
 const char *retro_save_directory;
 const char *retro_system_directory;
 const char *retro_content_directory;
@@ -35,14 +37,15 @@ const char *retro_content_directory;
 retro_log_printf_t log_cb;
 
 extern "C" int mmain(int argc, const char *argv);
+
 extern bool draw_this_frame;
 
 #ifdef M16B
-    uint16_t videoBuffer[1600*1200];
-    #define LOG_PIXEL_BYTES 1
+uint16_t videoBuffer[1600*1200];
+#define LOG_PIXEL_BYTES 1
 #else
-    unsigned int videoBuffer[1600*1200];
-    #define LOG_PIXEL_BYTES 2*1
+unsigned int videoBuffer[1600*1200];
+#define LOG_PIXEL_BYTES 2*1
 #endif
 
 retro_video_refresh_t video_cb = NULL;
@@ -66,10 +69,10 @@ void retro_set_audio_sample(retro_audio_sample_t cb) { }
 
 void retro_set_environment(retro_environment_t cb)
 {
-   sprintf(option_mouse,"%s_%s",core,"mouse_enable");
-   sprintf(option_cheats,"%s_%s",core,"cheats_enable");
-   sprintf(option_nag,"%s_%s",core,"hide_nagscreen");
-   sprintf(option_info,"%s_%s",core,"hide_infoscreen");
+   sprintf(option_mouse, "%s_%s", core, "mouse_enable");
+   sprintf(option_cheats, "%s_%s", core, "cheats_enable");
+   sprintf(option_nag, "%s_%s",core,"hide_nagscreen");
+   sprintf(option_info, "%s_%s",core,"hide_infoscreen");
    sprintf(option_warnings,"%s_%s",core,"hide_warnings");
    sprintf(option_renderer,"%s_%s",core,"alternate_renderer");
    sprintf(option_osd,"%s_%s",core,"boot_to_osd");
@@ -86,18 +89,19 @@ void retro_set_environment(retro_environment_t cb)
    sprintf(option_nobuffer,"%s_%s",core,"nobuffer");
 
    static const struct retro_variable vars[] = {
-    //some ifdefs are redundant but I wanted to have these options in a logical order
-    //common for MAME/MESS/UME
+    /* some ifdefs are redundant but I wanted 
+     * to have these options in a logical order
+     * common for MAME/MESS/UME. */
 
     { option_read_config, "Read configuration; disabled|enabled" },
 
-    // ONLY FOR MESS/UME
+    /* ONLY FOR MESS/UME */
 #if !defined(WANT_MAME)
     { option_write_config, "Write configuration; disabled|enabled" },
     { option_saves, "Save state naming; game|system" },
 #endif
 
-    //common for MAME/MESS/UME
+    /* common for MAME/MESS/UME */
     { option_auto_save, "Auto save/load states; disabled|enabled" },
     { option_mouse, "Enable in-game mouse; disabled|enabled" },
     { option_throttle, "Enable throttle; disabled|enabled" },
@@ -108,7 +112,7 @@ void retro_set_environment(retro_environment_t cb)
     { option_warnings, "Hide warnings screen; disabled|enabled" },
     { option_renderer, "Alternate render method; disabled|enabled" },
 
-    // ONLY FOR MESS/UME
+    /* ONLY FOR MESS/UME */
 #if !defined(WANT_MAME)
     { option_softlist, "Enable softlists; enabled|disabled" },
     { option_softlist_media, "Softlist automatic media type; enabled|disabled" },
@@ -120,7 +124,7 @@ void retro_set_environment(retro_environment_t cb)
     { option_bios, "Boot to BIOS; disabled|enabled" },
 #endif
 
-    //common for MAME/MESS/UME
+    /* common for MAME/MESS/UME */
     { option_osd, "Boot to OSD; disabled|enabled" },
     { option_cli, "Boot from CLI; disabled|enabled" },
     { NULL, NULL },
@@ -413,71 +417,70 @@ static void retro_wrap_emulator()
     }
 }
 
-void retro_init (void){
-
-       // initialize logger interface
-       struct retro_log_callback log;
-       if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
-           log_cb = log.log;
-       else
-           log_cb = NULL;
-
-#ifndef M16B
-       enum retro_pixel_format fmt =RETRO_PIXEL_FORMAT_XRGB8888;
+void retro_init (void)
+{
+   struct retro_log_callback log;
+   const char *system_dir = NULL;
+   const char *content_dir = NULL;
+   const char *save_dir = NULL;
+#ifdef M16B
+   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
 #else
-       enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
+   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
 #endif
 
-       const char *system_dir = NULL;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
+      log_cb = log.log;
+   else
+      log_cb = NULL;
 
-       if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_dir) && system_dir)
-       {
-            // if defined, use the system directory
-            retro_system_directory=system_dir;
-       }
-       if (log_cb)
-           log_cb(RETRO_LOG_INFO, "SYSTEM_DIRECTORY: %s", retro_system_directory);
+   if (environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_dir) && system_dir)
+   {
+      /* if defined, use the system directory */
+      retro_system_directory = system_dir;
+   }
 
-       const char *content_dir = NULL;
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "SYSTEM_DIRECTORY: %s", retro_system_directory);
 
-       if (environ_cb(RETRO_ENVIRONMENT_GET_CONTENT_DIRECTORY, &content_dir) && content_dir)
-       {
-           // if defined, use the system directory
-           retro_content_directory=content_dir;
-       }
-       if (log_cb)
-           log_cb(RETRO_LOG_INFO, "CONTENT_DIRECTORY: %s", retro_content_directory);
+   if (environ_cb(RETRO_ENVIRONMENT_GET_CONTENT_DIRECTORY, &content_dir) && content_dir)
+   {
+      // if defined, use the system directory
+      retro_content_directory=content_dir;
+   }
 
-       const char *save_dir = NULL;
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "CONTENT_DIRECTORY: %s", retro_content_directory);
 
-       if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
-       {
-           // If save directory is defined use it, otherwise use system directory
-           retro_save_directory = *save_dir ? save_dir : retro_system_directory;
 
-       }
-       else
-       {
-           // make retro_save_directory the same in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY is not implemented by the frontend
-           retro_save_directory=retro_system_directory;
-       }
-       if (log_cb)
-           log_cb(RETRO_LOG_INFO, "SAVE_DIRECTORY: %s", retro_save_directory);
+   if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
+   {
+      // If save directory is defined use it, otherwise use system directory
+      retro_save_directory = *save_dir ? save_dir : retro_system_directory;
 
-        if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
-        {
-           if (log_cb)
-              log_cb(RETRO_LOG_ERROR, "pixel format not supported");
-           exit(0);
-        }
+   }
+   else
+   {
+      // make retro_save_directory the same in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY is not implemented by the frontend
+      retro_save_directory=retro_system_directory;
+   }
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "SAVE_DIRECTORY: %s", retro_save_directory);
 
-        if(!emuThread && !mainThread)
-        {
-            mainThread = co_active();
-            emuThread = co_create(65536*sizeof(void*), retro_wrap_emulator);
-        }
-        //sprintf(retro_system_directory,"%s%c",retro_system_directory,slash);
-        //sprintf(retro_save_directory,"%s%c",retro_system_directory,slash);
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+   {
+      if (log_cb)
+         log_cb(RETRO_LOG_ERROR, "pixel format not supported");
+      exit(0);
+   }
+
+   if(!emuThread && !mainThread)
+   {
+      mainThread = co_active();
+      emuThread  = co_create(65536 * sizeof(void*), retro_wrap_emulator);
+   }
+   //sprintf(retro_system_directory,"%s%c",retro_system_directory,slash);
+   //sprintf(retro_save_directory,"%s%c",retro_system_directory,slash);
 
 }
 
@@ -497,34 +500,37 @@ void retro_reset (void)
    mame_reset = 1;
 }
 
-
-
 void retro_run (void)
 {
    bool updated = false;
+
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated)
       check_variables();
 
-   if(NEWGAME_FROM_OSD==1)
+   if (NEWGAME_FROM_OSD == 1)
    {
       struct retro_system_av_info ninfo;
+
       retro_get_system_av_info(&ninfo);
 
       environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &ninfo);
 
-      printf("ChangeAV: w:%d h:%d ra:%f \n",ninfo.geometry.base_width,ninfo.geometry.base_height,ninfo.geometry.aspect_ratio);
+      if (log_cb)
+      log_cb(RETRO_LOG_INFO, "ChangeAV: w:%d h:%d ra:%f.\n",
+            ninfo.geometry.base_width, ninfo.geometry.base_height, ninfo.geometry.aspect_ratio);
+
       NEWGAME_FROM_OSD=0;
    }
 
     retro_poll_mame_input();
 
 #ifdef HAVE_GL
-do_glflush();
+    do_glflush();
 #else
     if (draw_this_frame)
-            video_cb(videoBuffer,rtwi, rthe, topw << LOG_PIXEL_BYTES);
+       video_cb(videoBuffer, rtwi, rthe, topw << LOG_PIXEL_BYTES);
     else
-            video_cb(NULL,rtwi, rthe, topw << LOG_PIXEL_BYTES);
+       video_cb(NULL, rtwi, rthe, topw << LOG_PIXEL_BYTES);
 #endif
 
     co_switch(emuThread);
@@ -538,32 +544,33 @@ void prep_retro_rotation(int rot)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
+    char basename[256];
+
     check_variables();
 
 #ifdef M16B
-    memset(videoBuffer,0,1600*1200*2);
+    memset(videoBuffer, 0, 1600*1200*2);
 #else
-    memset(videoBuffer,0,1600*1200*2*2);
+    memset(videoBuffer, 0, 1600*1200*2*2);
 #endif
 
 #if defined(HAVE_GL)
 #ifdef GLES
-   hw_render.context_type = RETRO_HW_CONTEXT_OPENGLES2;
+    hw_render.context_type = RETRO_HW_CONTEXT_OPENGLES2;
 #else
-   hw_render.context_type = RETRO_HW_CONTEXT_OPENGL;
+    hw_render.context_type = RETRO_HW_CONTEXT_OPENGL;
 #endif
-   hw_render.context_reset = context_reset;
-   hw_render.context_destroy = context_destroy;
-/*
-   hw_render.depth = true;
-   hw_render.stencil = true;
-   hw_render.bottom_left_origin = true;
-*/
-   if (!environ_cb(RETRO_ENVIRONMENT_SET_HW_RENDER, &hw_render))
-      return false;
+    hw_render.context_reset = context_reset;
+    hw_render.context_destroy = context_destroy;
+    /*
+       hw_render.depth = true;
+       hw_render.stencil = true;
+       hw_render.bottom_left_origin = true;
+       */
+    if (!environ_cb(RETRO_ENVIRONMENT_SET_HW_RENDER, &hw_render))
+       return false;
 #endif
 
-    char basename[256];
     extract_basename(basename, info->path, sizeof(basename));
     extract_directory(g_rom_dir, info->path, sizeof(g_rom_dir));
     strcpy(RPATH,info->path);
@@ -574,25 +581,25 @@ bool retro_load_game(const struct retro_game_info *info)
 
 void retro_unload_game(void)
 {
-    if(pauseg==0)
-    {
-        pauseg=-1;
-            co_switch(emuThread);
-    }
+   if(pauseg==0)
+   {
+      pauseg=-1;
+      co_switch(emuThread);
+   }
 
-    LOGI("Retro unload_game\n");
+   LOGI("Retro unload_game\n");
 }
 
-// Stubs
-size_t retro_serialize_size(void){ return 0; }
-bool retro_serialize(void *data, size_t size){ return false; }
-bool retro_unserialize(const void * data, size_t size){ return false; }
+/* Stubs */
+size_t retro_serialize_size(void) { return 0; }
+bool retro_serialize(void *data, size_t size) { return false; }
+bool retro_unserialize(const void * data, size_t size) { return false; }
 
-unsigned retro_get_region (void) {return RETRO_REGION_NTSC;}
-void *retro_get_memory_data(unsigned type) {return 0;}
-size_t retro_get_memory_size(unsigned type) {return 0;}
-bool retro_load_game_special(unsigned game_type, const struct retro_game_info *info, size_t num_info){return false;}
-void retro_cheat_reset(void){}
-void retro_cheat_set(unsigned unused, bool unused1, const char* unused2){}
-void retro_set_controller_port_device(unsigned in_port, unsigned device){}
+unsigned retro_get_region (void) { return RETRO_REGION_NTSC; }
+void *retro_get_memory_data(unsigned type) { return 0; }
+size_t retro_get_memory_size(unsigned type) { return 0; }
+bool retro_load_game_special(unsigned game_type, const struct retro_game_info *info, size_t num_info) {return false; }
+void retro_cheat_reset(void) {}
+void retro_cheat_set(unsigned unused, bool unused1, const char* unused2) {}
+void retro_set_controller_port_device(unsigned in_port, unsigned device) {}
 
