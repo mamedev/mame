@@ -28,24 +28,15 @@ retro_osd_interface::~retro_osd_interface()
 
 void retro_osd_interface::osd_exit()
 {
-	if (log_cb)
-		log_cb(RETRO_LOG_INFO, "OSD exit called\n");
+   if (log_cb)
+      log_cb(RETRO_LOG_INFO, "OSD exit called\n");
 
 #if defined(HAVE_GL)
-	destroy_all_textures();
-	if (NULL!=retro)free(retro);
+   destroy_all_textures();
+   if (NULL!=retro)free(retro);
 #endif
 
-	osd_common_t::osd_exit();
-
-/*
-	global_free(Pad_device[0]);
-	global_free(Pad_device[1]);
-	global_free(joy_device[0]);
-	global_free(joy_device[1]);
-	global_free(retrokbd_device);
-	global_free(mouse_device);
-*/
+   osd_common_t::osd_exit();
 }
 
 void retro_osd_interface::init(running_machine &machine)
@@ -53,8 +44,12 @@ void retro_osd_interface::init(running_machine &machine)
 	int gamRot=0;
 
 #if defined(HAVE_GL)
-	// allocate memory for our structures
-	retro = (retro_info *) malloc(sizeof(*retro));
+	/* allocate memory for our structures */
+	retro = (retro_info *)malloc(sizeof(*retro));
+
+   if (!retro)
+      return;
+
 	memset(retro, 0, sizeof(*retro));
 #endif
 
@@ -73,12 +68,13 @@ void retro_osd_interface::init(running_machine &machine)
     gamRot = (ROT180 == orient) ? 2 : gamRot;
     gamRot = (ROT90  == orient) ? 3 : gamRot;
 
-    // initialize the subsystems
+    /* initialize the subsystems */
 	osd_common_t::init_subsystems();
 
 	our_target->compute_minimum_size(rtwi, rthe);
 	topw=rtwi;
-	//Equivalent to rtaspect=our_target->view_by_index((our_target->view()))->effective_aspect(render_layer_config layer_config())
+
+	/*Equivalent to rtaspect=our_target->view_by_index((our_target->view()))->effective_aspect(render_layer_config layer_config()) */
 	int width,height;
 	our_target->compute_visible_area(1000,1000,1,ROT0,width,height);
 	rtaspect=(float)width/(float)height;
@@ -117,10 +113,11 @@ void retro_osd_interface::update(bool skip_redraw)
 
    if (!skip_redraw)
    {
+      int minwidth, minheight;
 
       draw_this_frame = true;
-      // get the minimum width/height for the current layout
-      int minwidth, minheight;
+
+      /* get the minimum width/height for the current layout */
 
       if (alternate_renderer==false)
          our_target->compute_minimum_size(minwidth, minheight);
@@ -132,6 +129,7 @@ void retro_osd_interface::update(bool skip_redraw)
 
       if (FirstTimeUpdate == 1)
       {
+         int gamRot = 0;
 
          FirstTimeUpdate++;
 
@@ -144,7 +142,6 @@ void retro_osd_interface::update(bool skip_redraw)
          rthe=minheight;
          topw=minwidth;
 
-         int gamRot=0;
          orient  = (machine().system().flags & ORIENTATION_MASK);
          vertical = (machine().system().flags & ORIENTATION_SWAP_XY);
 
@@ -166,12 +163,14 @@ void retro_osd_interface::update(bool skip_redraw)
          rthe = 1200;
       }
 
-      // make that the size of our target
+      /* make that the size of our target */
       our_target->set_bounds(rtwi,rthe);
-      // get the list of primitives for the target at the current size
+
+      /* get the list of primitives for the target at the current size */
+     
       render_primitive_list &primlist = our_target->get_primitives();
 
-      // lock them, and then render them
+      /* lock them, and then render them */
       primlist.acquire_lock();
 
 #ifdef	HAVE_GL

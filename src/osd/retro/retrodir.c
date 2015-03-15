@@ -55,13 +55,14 @@ struct osd_directory
 
 static char *build_full_path(const char *path, const char *file)
 {
-   char *ret = (char *) osd_malloc_array(strlen(path)+strlen(file)+2);
-   char *p = ret;
+   char *ret = (char*)osd_malloc_array(strlen(path)+strlen(file)+2);
+   char *p   = ret;
 
    strcpy(p, path);
-   p += strlen(path);
-   *p++ = PATHSEPCH;
+   p        += strlen(path);
+   *p++      = PATHSEPCH;
    strcpy(p, file);
+
    return ret;
 }
 
@@ -90,7 +91,6 @@ static osd_dir_entry_type get_attributes_enttype(int attributes, char *path)
    }
 }
 #else
-
 static osd_dir_entry_type get_attributes_stat(const char *file)
 {
 	sdl_stat st;
@@ -119,65 +119,65 @@ static UINT64 osd_get_file_size(const char *file)
 
 osd_directory *osd_opendir(const char *dirname)
 {
-	osd_directory *dir = NULL;
-	char *tmpstr, *envstr;
-	int i, j;
+   osd_directory *dir = NULL;
+   char *tmpstr, *envstr;
+   int i, j;
 
-	dir = (osd_directory *) osd_malloc(sizeof(osd_directory));
-	if (dir)
-	{
-		memset(dir, 0, sizeof(osd_directory));
-		dir->fd = NULL;
-	}
+   dir = (osd_directory *) osd_malloc(sizeof(osd_directory));
+   if (dir)
+   {
+      memset(dir, 0, sizeof(osd_directory));
+      dir->fd = NULL;
+   }
 
-	tmpstr = (char *) osd_malloc_array(strlen(dirname)+1);
-	strcpy(tmpstr, dirname);
+   tmpstr = (char *) osd_malloc_array(strlen(dirname)+1);
+   strcpy(tmpstr, dirname);
 
-	if (tmpstr[0] == '$')
-	{
-		char *envval;
-		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
+   if (tmpstr[0] == '$')
+   {
+      char *envval;
+      envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
 
-		strcpy(envstr, tmpstr);
+      strcpy(envstr, tmpstr);
 
-		i = 0;
-		while (envstr[i] != PATHSEPCH && envstr[i] != INVPATHSEPCH && envstr[i] != 0 && envstr[i] != '.')
-		{
-			i++;
-		}
+      i = 0;
+      while (envstr[i] != PATHSEPCH && envstr[i] != INVPATHSEPCH && envstr[i] != 0 && envstr[i] != '.')
+      {
+         i++;
+      }
 
-		envstr[i] = '\0';
+      envstr[i] = '\0';
 
-		envval = (char*)osd_getenv(&envstr[1]);
-		if (envval != NULL)
-		{
-			j = strlen(envval) + strlen(tmpstr) + 1;
-			osd_free(tmpstr);
-			tmpstr = (char *) osd_malloc_array(j);
+      envval = (char*)osd_getenv(&envstr[1]);
+      if (envval != NULL)
+      {
+         j = strlen(envval) + strlen(tmpstr) + 1;
+         osd_free(tmpstr);
+         tmpstr = (char *) osd_malloc_array(j);
 
-			// start with the value of $HOME
-			strcpy(tmpstr, envval);
-			// replace the null with a path separator again
-			envstr[i] = PATHSEPCH;
-			// append it
-			strcat(tmpstr, &envstr[i]);
-		}
-		else
-			fprintf(stderr, "Warning: osd_opendir environment variable %s not found.\n", envstr);
-		osd_free(envstr);
-	}
+         /* start with the value of $HOME */
+         strcpy(tmpstr, envval);
+         /* replace the null with a path separator again */
+         envstr[i] = PATHSEPCH;
+         /* append it */
+         strcat(tmpstr, &envstr[i]);
+      }
+      else
+         fprintf(stderr, "Warning: osd_opendir environment variable %s not found.\n", envstr);
+      osd_free(envstr);
+   }
 
-	dir->fd = opendir(tmpstr);
-	dir->path = tmpstr;
+   dir->fd = opendir(tmpstr);
+   dir->path = tmpstr;
 
-	if (dir && (dir->fd == NULL))
-	{
-		osd_free(dir->path);
-		osd_free(dir);
-		dir = NULL;
-	}
+   if (dir && (dir->fd == NULL))
+   {
+      osd_free(dir->path);
+      osd_free(dir);
+      dir = NULL;
+   }
 
-	return dir;
+   return dir;
 }
 
 
@@ -187,22 +187,22 @@ osd_directory *osd_opendir(const char *dirname)
 
 const osd_directory_entry *osd_readdir(osd_directory *dir)
 {
-	char *temp;
-	dir->data = sdl_readdir(dir->fd);
+   char *temp;
+   dir->data = sdl_readdir(dir->fd);
 
-	if (dir->data == NULL)
-		return NULL;
+   if (dir->data == NULL)
+      return NULL;
 
-	dir->ent.name = dir->data->d_name;
-	temp = build_full_path(dir->path, dir->data->d_name);
-	#if HAS_DT_XXX
-	dir->ent.type = get_attributes_enttype(dir->data->d_type, temp);
-	#else
-	dir->ent.type = get_attributes_stat(temp);
-	#endif
-	dir->ent.size = osd_get_file_size(temp);
-	osd_free(temp);
-	return &dir->ent;
+   dir->ent.name = dir->data->d_name;
+   temp = build_full_path(dir->path, dir->data->d_name);
+#if HAS_DT_XXX
+   dir->ent.type = get_attributes_enttype(dir->data->d_type, temp);
+#else
+   dir->ent.type = get_attributes_stat(temp);
+#endif
+   dir->ent.size = osd_get_file_size(temp);
+   osd_free(temp);
+   return &dir->ent;
 }
 
 
@@ -212,8 +212,8 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 
 void osd_closedir(osd_directory *dir)
 {
-	if (dir->fd != NULL)
-		closedir(dir->fd);
-	osd_free(dir->path);
-	osd_free(dir);
+   if (dir->fd != NULL)
+      closedir(dir->fd);
+   osd_free(dir->path);
+   osd_free(dir);
 }
