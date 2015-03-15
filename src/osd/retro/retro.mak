@@ -69,6 +69,7 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrodir.o \
 	$(MINIOBJ)/retrofile.o \
 	$(MINIOBJ)/retroos.o \
+	$(MINIOBJ)/retromain.o \
 	$(MINIOBJ)/../modules/font/font_none.o \
 	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
 	$(OSDOBJ)/modules/sync/sync_retro.o \
@@ -117,5 +118,5 @@ endif
 
 $(LIBOCORE): $(OSDCOREOBJS)
 
-#$(LIBOSD): $(OSDOBJS)
+$(LIBOSD): $(OSDOBJS)
 

@@ -660,7 +660,7 @@ LIBDASM = $(OBJ)/$(TARGET)/$(SUBTARGET)/libdasm.a
 LIBBUS = $(OBJ)/$(TARGET)/$(SUBTARGET)/libbus.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
-LIBOSD = $(OBJ)/osd/retro/retromain.o $(OSDOBJS)
+LIBOSD = $(OSDOBJS)
 
 VERSIONOBJ = $(OBJ)/version.o
 EMUINFOOBJ = $(OBJ)/$(TARGET)/$(TARGET).o
