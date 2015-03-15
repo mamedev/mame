@@ -26,6 +26,9 @@ const char core[] = "mame";
 const char core[] = "mess";
 #elif defined(WANT_UME)
 const char core[] = "ume";
+#else
+/* fallback */
+const char core[] = "mame";
 #endif
 
 #if !defined(HAVE_GL) && !defined(HAVE_RGB32)
