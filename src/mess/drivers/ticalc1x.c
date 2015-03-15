@@ -232,11 +232,16 @@ INPUT_CHANGED_MEMBER(ticalc1x_state::tms0980_power_button)
 
 /***************************************************************************
 
-  I/O
+  Minidrivers (I/O, Inputs, Machine Config)
 
 ***************************************************************************/
 
-// SR-16: TMS1000 MCU labeled TMS1001NL. die labeled 1001A
+/***************************************************************************
+
+  TI SR-16
+  * TMS1000 MCU labeled TMS1001NL. die labeled 1001A
+
+***************************************************************************/
 
 void ticalc1x_state::tisr16_display_update()
 {
@@ -272,90 +277,6 @@ WRITE16_MEMBER(ticalc1x_state::tisr16_write_o)
 	tisr16_display_update();
 }
 
-
-// TI-1270: TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A. die labeled 0970D-74A
-
-READ8_MEMBER(ticalc1x_state::ti1270_read_k)
-{
-	return read_inputs(6);
-}
-
-WRITE16_MEMBER(ticalc1x_state::ti1270_write_r)
-{
-	// R0-R7: select digit (right-to-left)
-	display_matrix_7seg(8, 8, m_o, data, 0xff);
-}
-
-WRITE16_MEMBER(ticalc1x_state::ti1270_write_o)
-{
-	// O1-O5,O7: input mux
-	// O0-O7: digit segments
-	m_inp_mux = (data >> 1 & 0x1f) | (data >> 2 & 0x20);
-	m_o = data;
-}
-
-
-// WIZ-A-TRON (educational toy): TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS. die labeled 0970F-07B
-
-READ8_MEMBER(ticalc1x_state::wizatron_read_k)
-{
-	return read_inputs(4);
-}
-
-WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
-{
-	// note: 3rd digit is custom(not 7seg), for math symbols, and 6th digit
-	// only has A and G for =, though some newer revisions use a custom digit too.
-	m_7seg_mask[3] = 0x41;
-	
-	// R0-R8: select digit (right-to-left)
-	display_matrix_7seg(8, 9, m_o, data, 0x7f);
-}
-
-WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
-{
-	// O1-O4: input mux
-	// O0-O6: digit segments A-G
-	// O7: N/C
-	m_inp_mux = data >> 1 & 0xf;
-	m_o = data & 0x7f;
-}
-
-
-// TI-30: TMS0980 MCU labeled TMC0981NL. die labeled 0980B-81F
-// TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT. die labeled 0980B-83
-// TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
-
-READ8_MEMBER(ticalc1x_state::ti30_read_k)
-{
-	// note: the Vss row is always on
-	return m_inp_matrix[7]->read() | read_inputs(7);
-}
-
-WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
-{
-	// note: 1st digit only has segments B,F,G,DP
-	m_7seg_mask[0] = 0xe2;
-
-	// R0-R8: select digit
-	display_matrix_7seg(8, 9, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data, 0xff);
-}
-
-WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
-{
-	// O0-O2,O4-O7: input mux
-	// O0-O7: digit segments
-	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
-	m_o = data;
-}
-
-
-
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
 
 static INPUT_PORTS_START( tisr16 )
 	PORT_START("IN.0") // R0
@@ -426,6 +347,53 @@ static INPUT_PORTS_START( tisr16 )
 INPUT_PORTS_END
 
 
+static MACHINE_CONFIG_START( tisr16, ticalc1x_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // guessed
+	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, tisr16_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, tisr16_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, tisr16_write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tisr16)
+
+	/* no video! */
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-1270
+  * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A. die labeled 0970D-74A
+
+***************************************************************************/
+
+READ8_MEMBER(ticalc1x_state::ti1270_read_k)
+{
+	return read_inputs(6);
+}
+
+WRITE16_MEMBER(ticalc1x_state::ti1270_write_r)
+{
+	// R0-R7: select digit (right-to-left)
+	display_matrix_7seg(8, 8, m_o, data, 0xff);
+}
+
+WRITE16_MEMBER(ticalc1x_state::ti1270_write_o)
+{
+	// O1-O5,O7: input mux
+	// O0-O7: digit segments
+	m_inp_mux = (data >> 1 & 0x1f) | (data >> 2 & 0x20);
+	m_o = data;
+}
+
+
 static INPUT_PORTS_START( ti1270 )
 	PORT_START("IN.0") // O1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
@@ -465,6 +433,58 @@ static INPUT_PORTS_START( ti1270 )
 INPUT_PORTS_END
 
 
+static MACHINE_CONFIG_START( ti1270, ticalc1x_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
+	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti1270_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti1270_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti1270_write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ti1270)
+
+	/* no video! */
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  TI WIZ-A-TRON (educational toy)
+  * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS. die labeled 0970F-07B
+
+***************************************************************************/
+
+READ8_MEMBER(ticalc1x_state::wizatron_read_k)
+{
+	return read_inputs(4);
+}
+
+WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
+{
+	// note: 3rd digit is custom(not 7seg), for math symbols, and 6th digit
+	// only has A and G for =, though some newer revisions use a custom digit too.
+	m_7seg_mask[3] = 0x41;
+	
+	// R0-R8: select digit (right-to-left)
+	display_matrix_7seg(8, 9, m_o, data, 0x7f);
+}
+
+WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
+{
+	// O1-O4: input mux
+	// O0-O6: digit segments A-G
+	// O7: N/C
+	m_inp_mux = data >> 1 & 0xf;
+	m_o = data & 0x7f;
+}
+
+
 static INPUT_PORTS_START( wizatron )
 	PORT_START("IN.0") // O1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("CLEAR")
@@ -491,8 +511,58 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( lilprof )
-INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( wizatron, ticalc1x_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
+	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, wizatron_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, wizatron_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, wizatron_write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_wizatron)
+
+	/* no video! */
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Majestic-line calculators:
+  * TI-30: TMS0980 MCU labeled TMC0981NL. die labeled 0980B-81F
+  * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT. die labeled 0980B-83
+  * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
+
+***************************************************************************/
+
+READ8_MEMBER(ticalc1x_state::ti30_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[7]->read() | read_inputs(7);
+}
+
+WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
+{
+	// note: 1st digit only has segments B,F,G,DP
+	m_7seg_mask[0] = 0xe2;
+
+	// R0-R8: select digit
+	display_matrix_7seg(8, 9, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data, 0xff);
+}
+
+WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
+{
+	// O0-O2,O4-O7: input mux
+	// O0-O7: digit segments
+	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
+	m_o = data;
+}
 
 
 static INPUT_PORTS_START( ti30 )
@@ -676,72 +746,7 @@ static INPUT_PORTS_START( tibusan1 )
 INPUT_PORTS_END
 
 
-
-/***************************************************************************
-
-  Machine Config(s)
-
-***************************************************************************/
-
-static MACHINE_CONFIG_START( tisr16, ticalc1x_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, tisr16_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, tisr16_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, tisr16_write_r))
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
-
-	MCFG_DEFAULT_LAYOUT(layout_tisr16)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_START( t9base, ticalc1x_state )
-
-	/* basic machine hardware */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
-
-	/* no video! */
-
-	/* no sound! */
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( ti1270, t9base )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti1270_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti1270_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti1270_write_r))
-
-	MCFG_DEFAULT_LAYOUT(layout_ti1270)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( wizatron, t9base )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, wizatron_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, wizatron_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, wizatron_write_r))
-
-	MCFG_DEFAULT_LAYOUT(layout_wizatron)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( lilprof, t9base )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
-//	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, lilprof_read_k))
-//	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof_write_o))
-//	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, lilprof_write_r))
-
-	MCFG_DEFAULT_LAYOUT(layout_wizatron)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( ti30, t9base )
+static MACHINE_CONFIG_START( ti30, ticalc1x_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed
@@ -750,9 +755,43 @@ static MACHINE_CONFIG_DERIVED( ti30, t9base )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti30_write_r))
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(ticalc1x_state, tms0980_auto_power_off))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti30)
+
+	/* no video! */
+
+	/* no sound! */
 MACHINE_CONFIG_END
 
+
+
+
+
+
+
+static INPUT_PORTS_START( lilprof )
+INPUT_PORTS_END
+
+
+
+
+
+
+static MACHINE_CONFIG_START( lilprof, ticalc1x_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
+//	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, lilprof_read_k))
+//	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof_write_o))
+//	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, lilprof_write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_wizatron)
+
+	/* no video! */
+
+	/* no sound! */
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -771,6 +810,7 @@ ROM_START( tisr16 )
 	ROM_LOAD( "tms1000_sr16_opla.pla", 0, 365, CRC(29b08739) SHA1(d55f01e40a2d493d45ea422f12e63b01bcde08fb) )
 ROM_END
 
+
 ROM_START( ti1270 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms0974nl", 0x0000, 0x0400, CRC(48e09b4b) SHA1(17f27167164df223f9f06082ece4c3fc3900eda3) )
@@ -784,6 +824,7 @@ ROM_START( ti1270 )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0970_ti1270_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
 ROM_END
+
 
 ROM_START( wizatron )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -799,6 +840,7 @@ ROM_START( wizatron )
 	ROM_LOAD( "tms0970_wizatron_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
 ROM_END
 
+
 ROM_START( lilprof )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
@@ -812,6 +854,7 @@ ROM_START( lilprof )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0970_lilprof_spla.pla", 0, 157, CRC(56c37a4f) SHA1(18ecc20d2666e89673739056483aed5a261ae927) )
 ROM_END
+
 
 ROM_START( ti30 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -827,6 +870,7 @@ ROM_START( ti30 )
 	ROM_LOAD( "tms0980_ti30_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
 
+
 ROM_START( tibusan1 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "tmc0982nl", 0x0000, 0x1000, CRC(6954560a) SHA1(6c153a0c9239a811e3514a43d809964c06f8f88e) )
@@ -840,6 +884,7 @@ ROM_START( tibusan1 )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_tibusan1_spla.pla", 0, 157, CRC(399aa481) SHA1(72c56c58fde3fbb657d69647a9543b5f8fc74279) )
 ROM_END
+
 
 ROM_START( tiprog )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -857,12 +902,13 @@ ROM_END
 
 
 
-COMP( 1974, tisr16,   0, 0, tisr16,   tisr16,   driver_device, 0, "Texas Instruments", "SR-16 (Texas Instruments)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16 (Texas Instruments)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
-COMP( 1976, ti1270,   0, 0, ti1270,   ti1270,   driver_device, 0, "Texas Instruments", "TI-1270", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1977, wizatron, 0, 0, wizatron, wizatron, driver_device, 0, "Texas Instruments", "Wiz-A-Tron", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1978, lilprof , 0, 0, lilprof,  lilprof,  driver_device, 0, "Texas Instruments", "Little Professor", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_NOT_WORKING ) // 1978 version, original is from 1976
+COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1977, wizatron,  0,        0, wizatron,  wizatron,  driver_device, 0, "Texas Instruments", "Wiz-A-Tron", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1978, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Texas Instruments", "Little Professor", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_NOT_WORKING ) // 1978 version, original is from 1976
 
-COMP( 1976, ti30,     0, 0, ti30,     ti30,     driver_device, 0, "Texas Instruments", "TI-30", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1977, tiprog,   0, 0, ti30,     tiprog,   driver_device, 0, "Texas Instruments", "TI Programmer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, tibusan1, 0, 0, ti30,     tibusan1, driver_device, 0, "Texas Instruments", "TI Business Analyst-I", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1976, ti30,      0,        0, ti30,      ti30,      driver_device, 0, "Texas Instruments", "TI-30", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,        0, ti30,      tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1979, tibusan1,  0,        0, ti30,      tibusan1,  driver_device, 0, "Texas Instruments", "TI Business Analyst-I", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
