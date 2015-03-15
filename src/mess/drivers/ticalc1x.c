@@ -61,13 +61,13 @@ public:
 	int m_display_maxx;                 // display matrix number of columns
 	
 	UINT32 m_display_state[0x20];	    // display matrix rows data
-	UINT16 m_7seg_mask[0x20];           // if not 0, display matrix row is a 7seg, mask indicates connected segments
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
-	void display_matrix_7seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 _7segmask);
+	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 	
 	// calculator-specific handlers
 	DECLARE_READ8_MEMBER(tisr16_read_k);
@@ -101,7 +101,7 @@ void ticalc1x_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_7seg_mask, ~0, sizeof(m_7seg_mask)); // !
+	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 	
 	m_o = 0;
 	m_r = 0;
@@ -116,7 +116,7 @@ void ticalc1x_state::machine_start()
 	save_item(NAME(m_display_state));
 	save_item(NAME(m_display_cache));
 	save_item(NAME(m_display_decay));
-	save_item(NAME(m_7seg_mask));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
@@ -164,8 +164,8 @@ void ticalc1x_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
-			if (m_7seg_mask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
@@ -186,7 +186,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ticalc1x_state::display_decay_tick)
 	display_update();
 }
 
-void ticalc1x_state::display_matrix_7seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 _7segmask)
+void ticalc1x_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
@@ -195,7 +195,7 @@ void ticalc1x_state::display_matrix_7seg(int maxx, int maxy, UINT32 setx, UINT32
 	UINT32 colmask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 	{
-		m_7seg_mask[y] &= _7segmask;
+		m_display_segmask[y] &= segmask;
 		m_display_state[y] = (sety >> y & 1) ? (setx & colmask) : 0;
 	}
 	
@@ -387,7 +387,7 @@ READ8_MEMBER(ticalc1x_state::ti1270_read_k)
 WRITE16_MEMBER(ticalc1x_state::ti1270_write_r)
 {
 	// R0-R7: select digit (right-to-left)
-	display_matrix_7seg(8, 8, m_o, data, 0xff);
+	display_matrix_seg(8, 8, m_o, data, 0xff);
 }
 
 WRITE16_MEMBER(ticalc1x_state::ti1270_write_o)
@@ -474,10 +474,10 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
 {
 	// note: 6th digit is custom(not 7seg), for math symbols, and 3rd digit
 	// only has A and G for =, though some newer revisions use a custom digit too.
-	m_7seg_mask[3] = 0x41;
+	m_display_segmask[3] = 0x41;
 	
 	// R0-R8: select digit (right-to-left)
-	display_matrix_7seg(8, 9, m_o, data, 0x7f);
+	display_matrix_seg(8, 9, m_o, data, 0x7f);
 }
 
 WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
@@ -651,10 +651,10 @@ READ8_MEMBER(ticalc1x_state::ti30_read_k)
 WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
 {
 	// note: 1st digit only has segments B,F,G,DP
-	m_7seg_mask[0] = 0xe2;
+	m_display_segmask[0] = 0xe2;
 
 	// R0-R8: select digit
-	display_matrix_7seg(8, 9, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data, 0xff);
+	display_matrix_seg(8, 9, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data, 0xff);
 }
 
 WRITE16_MEMBER(ticalc1x_state::ti30_write_o)

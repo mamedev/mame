@@ -83,7 +83,7 @@ public:
 	UINT64 m_plate;                     // VFD current column data
 	
 	UINT64 m_display_state[0x20];	    // display matrix rows data
-	UINT16 m_7seg_mask[0x20];           // if not 0, display matrix row is a 7seg, mask indicates connected segments
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT64 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x40];  // (internal use)
 
@@ -104,7 +104,7 @@ void hh_hmcs40_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
 	m_inp_mux = 0;
 	m_grid = 0;
@@ -118,7 +118,7 @@ void hh_hmcs40_state::machine_start()
 	save_item(NAME(m_display_state));
 	save_item(NAME(m_display_cache));
 	save_item(NAME(m_display_decay));
-	save_item(NAME(m_7seg_mask));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
@@ -160,8 +160,8 @@ void hh_hmcs40_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
-			if (m_7seg_mask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)

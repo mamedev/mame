@@ -126,7 +126,7 @@ public:
 	int m_display_maxx;                 // display matrix number of columns
 	
 	UINT32 m_display_state[0x20];	    // display matrix rows data
-	UINT16 m_7seg_mask[0x20];           // if not 0, display matrix row is a 7seg, mask indicates connected segments
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
@@ -215,7 +215,7 @@ void hh_tms1k_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
 	m_o = 0;
 	m_r = 0;
@@ -230,7 +230,7 @@ void hh_tms1k_state::machine_start()
 	save_item(NAME(m_display_state));
 	save_item(NAME(m_display_cache));
 	save_item(NAME(m_display_decay));
-	save_item(NAME(m_7seg_mask));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
@@ -291,8 +291,8 @@ void hh_tms1k_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
-			if (m_7seg_mask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
@@ -395,7 +395,7 @@ void hh_tms1k_state::mathmagi_display()
 	// R0-R7: 7seg leds
 	for (int y = 0; y < 8; y++)
 	{
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (m_r >> y & 1) ? (m_o >> 1) : 0;
 	}
 
@@ -558,7 +558,7 @@ void hh_tms1k_state::amaztron_display()
 	// R8,R9: select digit
 	for (int y = 0; y < 2; y++)
 	{
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (m_r >> (y + 8) & 1) ? m_o : 0;
 	}
 	
@@ -705,7 +705,7 @@ void hh_tms1k_state::tc4_display()
 	// R5,7,8,9 are 7segs
 	for (int y = 0; y < 10; y++)
 		if (y >= 5 && y <= 9 && y != 6)
-			m_7seg_mask[y] = 0x7f;
+			m_display_segmask[y] = 0x7f;
 	
 	// update current state (note: R6 as extra column!)
 	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
@@ -848,7 +848,7 @@ MACHINE_CONFIG_END
 void hh_tms1k_state::ebball_display()
 {
 	// R8 is a 7seg
-	m_7seg_mask[8] = 0x7f;
+	m_display_segmask[8] = 0x7f;
 	
 	display_matrix(7, 9, ~m_o, m_r);
 }
@@ -979,12 +979,12 @@ void hh_tms1k_state::ebball3_display()
 		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
 
 	// R0,R1 are normal 7segs
-	m_7seg_mask[0] = m_7seg_mask[1] = 0x7f;
+	m_display_segmask[0] = m_display_segmask[1] = 0x7f;
 	
 	// R4,R7 contain segments(only F and B) for the two other digits
 	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
 	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
-	m_7seg_mask[10] = m_7seg_mask[11] = 0x22;
+	m_display_segmask[10] = m_display_segmask[11] = 0x22;
 	
 	display_update();
 }
@@ -1126,7 +1126,7 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_r)
 
 	// R0-R6: select digit
 	for (int y = 0; y < 7; y++)
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 
 	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
 }
@@ -1228,7 +1228,7 @@ MACHINE_CONFIG_END
 void hh_tms1k_state::starwbc_display()
 {
 	// R6,R8 are 7segs
-	m_7seg_mask[6] = m_7seg_mask[8] = 0x7f;
+	m_display_segmask[6] = m_display_segmask[8] = 0x7f;
 	
 	display_matrix(8, 10, m_o, m_r);
 }
@@ -1527,7 +1527,7 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 	// R0-R5: select digit (right-to-left)
 	for (int y = 0; y < 6; y++)
 	{
-		m_7seg_mask[y] = 0xff;
+		m_display_segmask[y] = 0xff;
 		m_display_state[y] = (data >> y & 1) ? m_o : 0;
 	}
 
@@ -1731,7 +1731,7 @@ WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
 	for (int y = 0; y < m_display_maxy; y++)
 	{
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (data >> y & 1) ? o : 0;
 	}
 
