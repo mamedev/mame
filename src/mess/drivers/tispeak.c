@@ -899,24 +899,6 @@ ROM_END
 
 ROM_START( snmath )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	// typed in from patent 4946391, verified with source code
-	// BTANB note: Mix It does not work at all, this is an original bug in the prototype. There are probably other minor bugs too.
-	ROM_LOAD( "us4946391_t2074", 0x0000, 0x1000, CRC(011f0c2d) SHA1(d2e14d72e03ca864abd51da78ffb71a9da82f624) )
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as cd2704
-	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // "
-
-	ROM_REGION( 0x8000, "tms6100", 0 )
-	ROM_LOAD( "cd2392.vsm", 0x0000, 0x4000, CRC(4ed2e920) SHA1(8896f29e25126c1e4d9a47c9a325b35dddecc61f) )
-	ROM_LOAD( "cd2393.vsm", 0x4000, 0x4000, CRC(571d5b5a) SHA1(83284755d9b77267d320b5b87fdc39f352433715) )
-ROM_END
-
-ROM_START( snmatha )
-	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "cd2708n2l", 0x0000, 0x1000, CRC(35937360) SHA1(69c362c75bb459056c09c7fab37c91040485474b) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
@@ -932,6 +914,24 @@ ROM_START( snmatha )
 	ROM_RELOAD(             0x5000, 0x1000 )
 	ROM_RELOAD(             0x6000, 0x1000 )
 	ROM_RELOAD(             0x7000, 0x1000 )
+ROM_END
+
+ROM_START( snmathp )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	// typed in from patent 4946391, verified with source code
+	// BTANB note: Mix It does not work at all, this is an original bug in the prototype. There are probably other minor bugs too.
+	ROM_LOAD( "us4946391_t2074", 0x0000, 0x1000, CRC(011f0c2d) SHA1(d2e14d72e03ca864abd51da78ffb71a9da82f624) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as cd2704
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // "
+
+	ROM_REGION( 0x8000, "tms6100", 0 )
+	ROM_LOAD( "cd2392.vsm", 0x0000, 0x4000, CRC(4ed2e920) SHA1(8896f29e25126c1e4d9a47c9a325b35dddecc61f) )
+	ROM_LOAD( "cd2393.vsm", 0x4000, 0x4000, CRC(571d5b5a) SHA1(83284755d9b77267d320b5b87fdc39f352433715) )
 ROM_END
 
 
@@ -951,14 +951,14 @@ ROM_END
 
 
 
-COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
-COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/prototype)", GAME_IMPERFECT_SOUND )
+COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // incomplete dump, uses prototype MCU ROM
+COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // incomplete dump, uses prototype MCU ROM
+COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // incomplete dump, uses prototype MCU ROM
+COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // incomplete dump, uses prototype MCU ROM
 COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
 
-COMP( 1980, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
-COMP( 1986, snmatha,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_IMPERFECT_SOUND )
+COMP( 1986, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_IMPERFECT_SOUND )
+COMP( 1980, snmathp,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/prototype)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 
 COMP( 1979, lantutor,   0,       0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
