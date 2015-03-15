@@ -37,6 +37,7 @@ BUILD += \
 	$(MAKEMAK_TARGET) \
 
 
+
 #-------------------------------------------------
 # makedep
 #-------------------------------------------------
@@ -51,7 +52,7 @@ MAKEDEPOBJS = \
 
 $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
 
 
@@ -66,12 +67,11 @@ MAKEMAKOBJS = \
 	$(OBJ)/lib/util/corefile.o \
 	$(OBJ)/lib/util/corestr.o \
 	$(OBJ)/lib/util/unicode.o \
-	$(OBJ)/lib/util/tagmap.o
-
+	$(OBJ)/lib/util/tagmap.o \
 
 $(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
 
 else
