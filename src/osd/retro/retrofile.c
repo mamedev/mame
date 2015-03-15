@@ -19,7 +19,8 @@
 #include <errno.h>
 
 // MAME headers
-#include "retrofile.h"
+#include "../sdl/sdlfile.h"
+#include "retroos.h"
 
 
 //============================================================

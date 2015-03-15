@@ -12,7 +12,6 @@
 #define _XOPEN_SOURCE 500
 #endif
 
-//#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #ifndef __USE_BSD
@@ -48,10 +47,10 @@ typedef struct stat64 sdl_stat;
 
 struct osd_directory
 {
-	osd_directory_entry ent;
-	sdl_dirent *data;
-	DIR *fd;
-	char *path;
+   osd_directory_entry ent;
+   sdl_dirent *data;
+   DIR *fd;
+   char *path;
 };
 
 static char *build_full_path(const char *path, const char *file)
@@ -83,8 +82,7 @@ static osd_dir_entry_type get_attributes_enttype(int attributes, char *path)
 
             if ( stat(path, &s) != 0 )
                return ENTTYPE_OTHER;
-            else
-               return S_ISDIR(s.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
+            return S_ISDIR(s.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
          }
 
       default:
