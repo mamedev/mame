@@ -40,16 +40,12 @@ static int init3d=1;
 #else
 #include "rendersw.inc"
 #endif
+
 //============================================================
 //  CONSTANTS
 //============================================================
-#define MAX_BUTTONS 16
 
-#ifdef DEBUG_LOG
-# define LOG(msg) fprintf(stderr, "%s\n", msg)
-#else
-# define LOG(msg)
-#endif
+#define MAX_BUTTONS 16
 
 //============================================================
 //  GLOBALS
@@ -62,16 +58,16 @@ typedef struct joystate_t
    int a2[2];
 }Joystate;
 
-// rendering target
+/* rendering target */
 static render_target *our_target = NULL;
 
-// input device
+/* input device */
 static input_device *retrokbd_device; // KEYBD
 static input_device *mouse_device;    // MOUSE
 static input_device *joy_device[4];// JOY0/JOY1/JOY2/JOY3
 static input_device *Pad_device[4];// PAD0/PAD1/PAD2/PAD3
 
-// state
+/* state */
 static UINT16 retrokbd_state[RETROK_LAST];
 static int mouseLX,mouseLY;
 static int mouseBUT[4];
@@ -81,7 +77,7 @@ static int ui_ipt_pushchar=-1;
 
 static int mame_reset = -1;
 
-// core options
+/* core options */
 bool hide_nagscreen = false;
 bool hide_warnings = false;
 bool nobuffer_enable = false;
@@ -326,7 +322,9 @@ static int getGameInfo(char* gameName, int* rotation, int* driverIndex,bool *Arc
       gameFound = 1;
 
       if (log_cb)
-         log_cb(RETRO_LOG_INFO, "Game name: %s, Game description: %s\n",driver_list::driver(num).name, driver_list::driver(num).description);
+         log_cb(RETRO_LOG_INFO, "Game name: %s, Game description: %s\n",
+               driver_list::driver(num).name,
+               driver_list::driver(num).description);
    }
    else
    {
@@ -444,7 +442,9 @@ void Set_Path_Option(void)
    int i;
    char tmp_dir[256];
 
-   //Setup path Option according to retro (save/system) directory or current if NULL
+   /*Setup path option according to retro (save/system) directory,
+    * or current if NULL. */
+
    for(i = 0; i < NB_OPTPATH; i++)
    {
       Add_Option((char*)(opt_name[i]));
@@ -458,7 +458,7 @@ void Set_Path_Option(void)
       }
       else
       {
-         if(retro_system_directory!=NULL)
+         if(retro_system_directory)
             sprintf(tmp_dir, "%s%c%s%c%s", retro_system_directory, slash, core, slash,dir_name[i]);
          else
             sprintf(tmp_dir, "%s%c%s%c%s%c", ".", slash, core, slash,dir_name[i],slash);
@@ -498,7 +498,9 @@ int executeGame(char* path)
       return -2;
    }
 #else
-   //find if the driver exists for MgameName, if not, check if a driver exists for MsystemName, if not, exit
+   /* Find if the driver exists for MgameName.
+    * If not, check if a driver exists for MsystemName.
+    * Otherwise, exit. */
    if (getGameInfo(MgameName, &gameRot, &driverIndex,&arcade) == 0)
    {
       if (log_cb)
@@ -511,8 +513,8 @@ int executeGame(char* path)
       }
    }
 
-   // handle case where Arcade game exist and game on a System also
-   if(arcade==true)
+   /* Handle case where Arcade game exists and game on a System also. */
+   if(arcade == true)
    {
       if (log_cb)
          log_cb(RETRO_LOG_ERROR, "System not found: %s\n",MsystemName);
@@ -524,10 +526,10 @@ int executeGame(char* path)
 
 #endif
 
-   // useless ?
+   /* useless ? */
    if (tate)
    {
-      //horizontal game
+      /* horizontal game */
       if (gameRot == ROT0)
          screenRot = 1;
       else if (gameRot &  ORIENTATION_FLIP_X)
@@ -553,7 +555,7 @@ int executeGame(char* path)
 
    Set_Path_Option();
 
-   // useless ?
+   /* useless ? */
    if (tate)
    {
       if (screenRot == 3)
@@ -579,6 +581,7 @@ int executeGame(char* path)
    {
       sprintf(tmp_dir, "%s", MgamePath);
       Add_Option((char*)(tmp_dir));
+
       if(softlist_enable)
       {
          if(!arcade)
@@ -641,6 +644,7 @@ void parse_cmdline(const char *argv)
    for (p = buffer; *p != '\0'; p++)
    {
       c = (unsigned char) *p; /* convert to unsigned char for is* functions */
+
       switch (state)
       {
          case DULL:
@@ -698,7 +702,7 @@ int executeGame_cmd(char* path)
    int driverIndex;
    int gameRot=0;
    bool CreateConf = (strcmp(ARGUV[0],"-cc") == 0 || strcmp(ARGUV[0],"-createconfig") == 0) ? 1 : 0;
-   bool Only1Arg   = (ARGUC == 1)?1:0;
+   bool Only1Arg   = (ARGUC == 1) ? 1 : 0;
 
    FirstTimeUpdate = 1;
 
@@ -750,7 +754,8 @@ int executeGame_cmd(char* path)
                return -2;
             }
          }
-         else return -2;
+         else
+            return -2;
       }
    }
 
@@ -852,7 +857,6 @@ int mmain(int argc, const char *argv)
    result = frontend.execute(PARAMCOUNT, ( char **)xargv_cmd);
 
    xargv_cmd[PARAMCOUNT - 2] = NULL;
-
 
    return 1;
 }
