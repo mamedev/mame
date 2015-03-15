@@ -76,6 +76,8 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/../modules/midi/none.o \
 	$(OSDOBJ)/modules/osdmodule.o
 
+INCPATH += -I$(SRC)/osd/retro/libretro-common/include
+
 ifdef NOASM
 OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
 else
