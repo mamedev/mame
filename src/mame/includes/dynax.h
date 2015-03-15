@@ -186,12 +186,14 @@ public:
 	DECLARE_WRITE8_MEMBER(dynax_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_dest_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_dest_w);
+	DECLARE_WRITE8_MEMBER(mjembase_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_backpen_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette01_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_palette01_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette45_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette23_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_palette23_w);
+	DECLARE_WRITE8_MEMBER(mjembase_blit_palette23_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette67_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palbank_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_palbank_w);
@@ -213,6 +215,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
+	DECLARE_WRITE8_MEMBER(mjembase_priority_w);
 
 	DECLARE_DRIVER_INIT(mjelct3);
 	DECLARE_DRIVER_INIT(blktouch);
@@ -264,6 +267,7 @@ public:
 	DECLARE_MACHINE_START(jantouki);
 	DECLARE_VIDEO_START(jantouki);
 	DECLARE_VIDEO_START(mjelctrn);
+	DECLARE_VIDEO_START(mjembase);
 	DECLARE_VIDEO_START(mjdialq2);
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);
