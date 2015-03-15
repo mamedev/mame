@@ -180,7 +180,7 @@ SRC2HTMLOBJS = \
 
 $(BIN)src2html$(EXE): $(SRC2HTMLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(BASELIBS) $(OBJ)/libflac.a -o $@
+	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 
 
 
@@ -220,4 +220,5 @@ NLTOOLOBJS = \
 $(BIN)nltool$(EXE): $(NLTOOLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
+
 
