@@ -34,6 +34,7 @@
  *43      HD38820A  1982, Entex Turtles (have dump, +COP411 for audio)
  @45      HD38820A  1982, Coleco Donkey Kong
  @49      HD38820A  1983, Bandai Zackman
+ @61      HD38820A  1983, Coleco Ms. Pac-Man
  @70      HD38820A  1983, Parker Brothers Q*Bert
  @88      HD38820A  1984, Tomy Tron (THN-02)
 
@@ -79,16 +80,16 @@ public:
 	int m_display_maxx;                 // display matrix number of columns
 	
 	UINT32 m_grid;                      // VFD current row data
-	UINT32 m_plate;                     // VFD current column data
+	UINT64 m_plate;                     // VFD current column data
 	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT64 m_display_state[0x20];	    // display matrix rows data
 	UINT16 m_7seg_mask[0x20];           // if not 0, display matrix row is a 7seg, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+	UINT64 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x40];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
 
 	// game-specific handlers
 	DECLARE_WRITE8_MEMBER(alnattck_plate_w);
@@ -137,7 +138,7 @@ void hh_hmcs40_state::machine_start()
 
 void hh_hmcs40_state::display_update()
 {
-	UINT32 active_state[0x20];
+	UINT64 active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -181,13 +182,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
 	display_update();
 }
 
-void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	UINT64 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
 	
@@ -522,6 +523,41 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Coleco Ms. Pac-Man (manufactured in Taiwan)
+  * board label Coleco 911171
+  * Hitachi HD38820A61 MCU
+  * cyan/red VFD display Futaba DM-60Z 3I, with color overlay
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+static INPUT_PORTS_START( cmspacmn )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( cmspacmn, hh_hmcs40_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+
+//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Entex Galaxian 2 (manufactured in Japan)
   * Hitachi HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
@@ -753,6 +789,13 @@ ROM_START( cpacmanr1 )
 ROM_END
 
 
+ROM_START( cmspacmn )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a61", 0x0000, 0x1000, CRC(76276318) SHA1(9d6ff3f49b4cdaee5c9e238c1ed638bfb9b99aa7) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( egalaxn2 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38820a13", 0x0000, 0x1000, CRC(112b721b) SHA1(4a185bc57ea03fe64f61f7db4da37b16eeb0cb54) )
@@ -800,6 +843,7 @@ CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Colec
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
