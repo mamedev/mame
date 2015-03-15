@@ -383,15 +383,15 @@ void Extract_AllPath(char *srcpath)
 
 void Add_Option(const char* option)
 {
-   static int first=0;
+   static int first = 0;
 
-   if(first == 0)
+   if (first == 0)
    {
       PARAMCOUNT=0;
       first++;
    }
 
-   sprintf(XARGV[PARAMCOUNT++], "%s\0", option);
+   sprintf(XARGV[PARAMCOUNT++], "%s", option);
 }
 
 void Set_Default_Option(void)
