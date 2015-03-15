@@ -112,12 +112,9 @@ ifeq ($(platform), unix)
 		LIBS += -lGL
 	endif
 	LDFLAGS +=  $(fpic) $(SHARED)
-	NATIVELD = g++
-	NATIVELDFLAGS = -Wl,--warn-common -lstdc++ -Wl,--no-undefined
 	NATIVECC = g++
 	NATIVECFLAGS = -std=gnu99
 	BASELIBS +=  -lpthread
-	CC_AS = gcc
 	CC = g++
 	AR = @ar
 	LD = g++
@@ -145,7 +142,6 @@ else ifeq ($(platform), android)
 	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
-	CC_AS = @arm-linux-androideabi-gcc
 	CC = @arm-linux-androideabi-g++
 	AR = @arm-linux-androideabi-ar
 	LD = @arm-linux-androideabi-g++
@@ -158,8 +154,6 @@ else ifeq ($(platform), android)
 		GLES = 1
 	endif
 	LDFLAGS += -Wl,--fix-cortex-a8 -llog $(fpic) $(SHARED)
-	NATIVELD = g++
-	NATIVELDFLAGS = -Wl,--warn-common -lstdc++
 	NATIVECC = g++
 	NATIVECFLAGS = -std=gnu99
 	CCOMFLAGS += $(PLATCFLAGS)
@@ -175,11 +169,9 @@ else ifeq ($(platform), osx)
 	LDFLAGSEMULATOR +=  -stdlib=$(LIBCXX)
 	PLATCFLAGS += $(fpic)
 	SHARED := -dynamiclib
-	CC_AS = cc
 	CXX_AS = c++
 	CC = $(CXX_AS) -stdlib=$(LIBCXX)
 	LD = $(CXX_AS) -stdlib=$(LIBCXX)
-	NATIVELD = $(CXX_AS) -stdlib=$(LIBCXX)
 	NATIVECC = $(CXX_AS)
 	LDFLAGS +=  $(fpic) $(SHARED)
 	AR = @ar
@@ -214,12 +206,10 @@ else ifeq ($(platform), ios)
 	LIBCXX := libc++
 
 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
-	CC_AS = cc
 	CXX_AS := c++
 	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
 	LD = $(CC) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
-	NATIVELD = $(CXX_AS) -stdlib=$(LIBCXX)
 	NATIVECC = $(CXX_AS)
 	PYTHON ?= @python
 	CFLAGS += -DIOS
@@ -319,11 +309,8 @@ else ifneq (,$(findstring armv,$(platform)))
 	CCOMFLAGS += $(fpic) -mstructure-size-boundary=32 -falign-functions=16 -fsigned-char -finline -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
 	PLATCFLAGS += -march=armv7-a -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DSDLMAME_ARM -DRETRO_SETJMP_HACK
 	LDFLAGS += -Wl,--fix-cortex-a8 -Wl,--no-as-needed $(fpic) $(SHARED)
-	NATIVELD = g++
-	NATIVELDFLAGS = -Wl,--warn-common -lstdc++ -Wl,--no-undefined
 	NATIVECC = g++
 	NATIVECFLAGS = -std=gnu99
-	CC_AS = gcc
 	CC = g++
 	AR = @ar
 	LD = g++
@@ -359,8 +346,6 @@ else ifeq ($(platform), wincross)
 	TARGETOS = win32
 	CC ?= g++
 	LD ?= g++
-	NATIVELD = $(LD)
-	CC_AS ?= gcc
 	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
 	CCOMFLAGS += -D__WIN32__
 	LDFLAGS += $(SHARED)
@@ -381,8 +366,6 @@ else
 	TARGETOS = win32
 	CC = g++
 	LD = g++
-	NATIVELD = $(LD)
-	CC_AS = gcc
 	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
 	CCOMFLAGS += -D__WIN32__
 	LDFLAGS += $(SHARED)
@@ -898,7 +881,7 @@ $(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOP
 
 ifeq ($(armplatform), 1)
 $(LIBCOOBJ)/armeabi_asm.o:
-	$(CC_AS) -I$(SRC)/osd/$(OSD)/libretro-common/include -c $(SRC)/osd/$(OSD)/libretro-common/libco/armeabi_asm.S -o $(LIBCOOBJ)/armeabi_asm.o
+	$(CC) -I$(SRC)/osd/$(OSD)/libretro-common/include -c $(SRC)/osd/$(OSD)/libretro-common/libco/armeabi_asm.S -o $(LIBCOOBJ)/armeabi_asm.o
 endif
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
