@@ -14,7 +14,9 @@
 
 #include "emu.h"
 #include "cpu/tms0980/tms0980.h"
+#include "sound/speaker.h"
 
+// internal artwork
 #include "ti1270.lh"
 #include "ti30.lh"
 #include "tisr16.lh"
@@ -27,20 +29,46 @@ public:
 	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_button_matrix(*this, "IN")
+		m_inp_matrix(*this, "IN"),
+		m_speaker(*this, "speaker"),
+		m_display_wait(33),
+		m_display_maxy(1),
+		m_display_maxx(0)
 	{ }
 
+	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<11> m_button_matrix; // up to 11 rows
+	optional_ioport_array<11> m_inp_matrix; // max 11
+	optional_device<speaker_sound_device> m_speaker;
 
-	UINT16 m_r;
-	UINT16 m_o;
-	bool m_power_on;
+	// misc common
+	UINT16 m_r;                         // MCU R-pins data
+	UINT16 m_o;                         // MCU O-pins data
+	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	bool m_power_on;                    // TMS0980 power-on state
 
-	UINT16 m_display_state[0x10];
-	UINT16 m_display_cache[0x10];
-	UINT8 m_display_decay[0x100];
+	UINT8 read_inputs(int columns);
+	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
+	DECLARE_WRITE_LINE_MEMBER(tms0980_auto_power_off);
 
+	virtual void machine_reset();
+	virtual void machine_start();
+
+	// display common
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
+	
+	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_7seg_mask[0x20];           // if not 0, display matrix row is a 7seg, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+
+	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_update();
+	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	
+	// calculator-specific handlers
 	DECLARE_READ8_MEMBER(tisr16_read_k);
 	DECLARE_WRITE16_MEMBER(tisr16_write_o);
 	DECLARE_WRITE16_MEMBER(tisr16_write_r);
@@ -57,61 +85,86 @@ public:
 	DECLARE_READ8_MEMBER(ti30_read_k);
 	DECLARE_WRITE16_MEMBER(ti30_write_o);
 	DECLARE_WRITE16_MEMBER(ti30_write_r);
-
-	DECLARE_INPUT_CHANGED_MEMBER(power_button);
-	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-
-	virtual void machine_reset();
-	virtual void machine_start();
 };
+
+
+// machine_start/reset
+
+void ticalc1x_state::machine_start()
+{
+	// zerofill
+	memset(m_display_state, 0, sizeof(m_display_state));
+	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_decay, 0, sizeof(m_display_decay));
+	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
+	
+	m_o = 0;
+	m_r = 0;
+	m_inp_mux = 0;
+	m_power_on = false;
+
+	// register for savestates
+	save_item(NAME(m_display_maxy));
+	save_item(NAME(m_display_maxx));
+	save_item(NAME(m_display_wait));
+
+	save_item(NAME(m_display_state));
+	save_item(NAME(m_display_cache));
+	save_item(NAME(m_display_decay));
+	save_item(NAME(m_7seg_mask));
+
+	save_item(NAME(m_o));
+	save_item(NAME(m_r));
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_power_on));
+}
+
+void ticalc1x_state::machine_reset()
+{
+	m_power_on = true;
+}
 
 
 
 /***************************************************************************
 
-  LED Display
+  Helper Functions
 
 ***************************************************************************/
 
-// Devices with TMS09x0 strobe the outputs very fast, it is unnoticeable to the user.
+// The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
-
-// decay time, in steps of 1ms
-#define DISPLAY_DECAY_TIME 50
 
 void ticalc1x_state::display_update()
 {
-	UINT16 active_state[0x10];
+	UINT32 active_state[0x20];
 
-	for (int i = 0; i < 0x10; i++)
+	for (int y = 0; y < m_display_maxy; y++)
 	{
-		active_state[i] = 0;
+		active_state[y] = 0;
 
-		for (int j = 0; j < 0x10; j++)
+		for (int x = 0; x < m_display_maxx; x++)
 		{
-			int di = j << 4 | i;
-
 			// turn on powered segments
-			if (m_power_on && m_display_state[i] >> j & 1)
-				m_display_decay[di] = DISPLAY_DECAY_TIME;
+			if (m_power_on && m_display_state[y] >> x & 1)
+				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[di] != 0) ? 1 : 0;
-			active_state[i] |= (ds << j);
+			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			active_state[y] |= (ds << x);
 		}
 	}
 
 	// on difference, send to output
-	for (int i = 0; i < 0x10; i++)
-		if (m_display_cache[i] != active_state[i])
+	for (int y = 0; y < m_display_maxy; y++)
+		if (m_display_cache[y] != active_state[y])
 		{
-			output_set_digit_value(i, active_state[i]);
+			if (m_7seg_mask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
 
-			for (int j = 0; j < 8; j++)
-				output_set_lamp_value(i*10 + j, active_state[i] >> j & 1);
+			const int mul = (m_display_maxx <= 10) ? 10 : 100;
+			for (int x = 0; x < m_display_maxx; x++)
+				output_set_lamp_value(y * mul + x, active_state[y] >> x & 1);
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
@@ -120,11 +173,56 @@ void ticalc1x_state::display_update()
 TIMER_DEVICE_CALLBACK_MEMBER(ticalc1x_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
-	for (int i = 0; i < 0x100; i++)
-		if (!(m_display_state[i & 0xf] >> (i>>4) & 1) && m_display_decay[i])
-			m_display_decay[i]--;
-
+	for (int y = 0; y < m_display_maxy; y++)
+		for (int x = 0; x < m_display_maxx; x++)
+			if (!(m_display_state[y] >> x & 1) && m_display_decay[y][x] != 0)
+				m_display_decay[y][x]--;
+	
 	display_update();
+}
+
+void ticalc1x_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
+
+	// update current state
+	UINT32 mask = (1 << maxx) - 1;
+	for (int y = 0; y < maxy; y++)
+		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
+	
+	display_update();
+}
+
+
+UINT8 ticalc1x_state::read_inputs(int columns)
+{
+	UINT8 ret = 0;
+
+	// read selected input rows
+	for (int i = 0; i < columns; i++)
+		if (m_inp_mux >> i & 1)
+			ret |= m_inp_matrix[i]->read();
+
+	return ret;
+}
+
+
+// devices with a TMS0980 can auto power-off
+
+WRITE_LINE_MEMBER(ticalc1x_state::tms0980_auto_power_off)
+{
+	if (state)
+	{
+		m_power_on = false;
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+}
+
+INPUT_CHANGED_MEMBER(ticalc1x_state::tms0980_power_button)
+{
+	m_power_on = (bool)(FPTR)param;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -159,7 +257,7 @@ READ8_MEMBER(ticalc1x_state::tisr16_read_k)
 	// read selected button rows
 	for (int i = 0; i < 11; i++)
 		if (m_r >> i & 1)
-			k |= m_button_matrix[i]->read();
+			k |= m_inp_matrix[i]->read();
 
 	return k;
 }
@@ -191,16 +289,22 @@ READ8_MEMBER(ticalc1x_state::ti1270_read_k)
 	// read selected button rows
 	for (int i = 0; i < 7; i++)
 		if (m_o >> (i+1) & 1)
-			k |= m_button_matrix[i]->read();
+			k |= m_inp_matrix[i]->read();
 
 	return k;
 }
 
 WRITE16_MEMBER(ticalc1x_state::ti1270_write_r)
 {
+	m_display_maxx = 8;
+	m_display_maxy = 8;
+
 	// R0-R7: select digit (right-to-left)
 	for (int i = 0; i < 8; i++)
+	{
+		m_7seg_mask[i] = 0xff;
 		m_display_state[i] = (data >> i & 1) ? m_o : 0;
+	}
 
 	display_update();
 }
@@ -222,17 +326,23 @@ READ8_MEMBER(ticalc1x_state::wizatron_read_k)
 	// read selected button rows
 	for (int i = 0; i < 4; i++)
 		if (m_o >> (i+1) & 1)
-			k |= m_button_matrix[i]->read();
+			k |= m_inp_matrix[i]->read();
 
 	return k;
 }
 
 WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
 {
+	m_display_maxx = 8;
+	m_display_maxy = 9;
+
 	// R0-R8: select digit (right-to-left)
 	// note: 3rd digit is custom(not 7seg), for math symbols
 	for (int i = 0; i < 9; i++)
+	{
+		m_7seg_mask[i] = 0x7f;
 		m_display_state[i] = (data >> i & 1) ? m_o : 0;
+	}
 
 	// 6th digit only has A and G for =
 	m_display_state[3] &= 0x41;
@@ -256,22 +366,28 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
 READ8_MEMBER(ticalc1x_state::ti30_read_k)
 {
 	// the Vss row is always on
-	UINT8 k = m_button_matrix[8]->read();
+	UINT8 k = m_inp_matrix[8]->read();
 
 	// read selected button rows
 	for (int i = 0; i < 8; i++)
 		if (m_o >> i & 1)
-			k |= m_button_matrix[i]->read();
+			k |= m_inp_matrix[i]->read();
 
 	return k;
 }
 
 WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
 {
+	m_display_maxx = 8;
+	m_display_maxy = 9;
+
 	// R0-R8: select digit
 	UINT8 o = BITSWAP8(m_o,7,5,2,1,4,0,6,3);
 	for (int i = 0; i < 9; i++)
+	{
+		m_7seg_mask[i] = 0xff;
 		m_display_state[i] = (data >> i & 1) ? o : 0;
+	}
 
 	// 1st digit only has segments B,F,G,DP
 	m_display_state[0] &= 0xe2;
@@ -293,12 +409,6 @@ WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
   Inputs
 
 ***************************************************************************/
-
-INPUT_CHANGED_MEMBER(ticalc1x_state::power_button)
-{
-	m_power_on = (bool)(FPTR)param;
-	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
-}
 
 static INPUT_PORTS_START( tisr16 )
 	PORT_START("IN.0") // R0
@@ -496,11 +606,11 @@ static INPUT_PORTS_START( ti30 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.8") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, tms0980_power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, tms0980_power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -559,11 +669,11 @@ static INPUT_PORTS_START( tiprog )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.8") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, tms0980_power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, tms0980_power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -623,11 +733,11 @@ static INPUT_PORTS_START( tibusan1 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.8") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, tms0980_power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2"  " UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e" UTF8_POW_X)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, tms0980_power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -637,44 +747,6 @@ INPUT_PORTS_END
   Machine Config(s)
 
 ***************************************************************************/
-
-WRITE_LINE_MEMBER(ticalc1x_state::auto_power_off)
-{
-	// TMS0980 auto power-off opcode
-	if (state)
-	{
-		m_power_on = false;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-}
-
-
-void ticalc1x_state::machine_reset()
-{
-	m_power_on = true;
-}
-
-void ticalc1x_state::machine_start()
-{
-	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-
-	m_r = 0;
-	m_o = 0;
-	m_power_on = false;
-
-	// register for savestates
-	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_cache));
-	save_item(NAME(m_display_decay));
-
-	save_item(NAME(m_r));
-	save_item(NAME(m_o));
-	save_item(NAME(m_power_on));
-}
-
 
 static MACHINE_CONFIG_START( tisr16, ticalc1x_state )
 
@@ -739,7 +811,7 @@ static MACHINE_CONFIG_DERIVED( ti30, t9base )
 	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti30_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti30_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti30_write_r))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(ticalc1x_state, auto_power_off))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(ticalc1x_state, tms0980_auto_power_off))
 
 	MCFG_DEFAULT_LAYOUT(layout_ti30)
 MACHINE_CONFIG_END
