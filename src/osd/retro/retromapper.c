@@ -512,7 +512,7 @@ void retro_run (void)
 
       environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &ninfo);
 
-      printf("ChangeAV: w:%d h:%d ra:%f %f \n",ninfo.geometry.base_width,ninfo.geometry.base_height,ninfo.geometry.aspect_ratio);
+      printf("ChangeAV: w:%d h:%d ra:%f \n",ninfo.geometry.base_width,ninfo.geometry.base_height,ninfo.geometry.aspect_ratio);
       NEWGAME_FROM_OSD=0;
    }
 
