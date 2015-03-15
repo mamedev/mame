@@ -49,11 +49,11 @@ MAKEDEPOBJS = \
 	$(OBJ)/lib/util/unicode.o \
 	$(OBJ)/lib/util/tagmap.o \
 
-$(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB)
+$(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-#$(LIBOCORE)
+
 
 #-------------------------------------------------
 # makemak
@@ -69,7 +69,7 @@ MAKEMAKOBJS = \
 	$(OBJ)/lib/util/tagmap.o
 
 
-$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(FLAC_LIB) $(7Z_LIB)
+$(MAKEMAK_TARGET): $(MAKEMAKOBJS) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
