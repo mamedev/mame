@@ -148,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_pic16_state::display_decay_tick)
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
 		for (int x = 0; x < m_display_maxx; x++)
-			if (!(m_display_state[y] >> x & 1) && m_display_decay[y][x] != 0)
+			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 	
 	display_update();

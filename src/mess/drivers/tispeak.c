@@ -951,14 +951,14 @@ ROM_END
 
 
 
-COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
-COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
+COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
 
-COMP( 1980, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
-COMP( 1986, snmatha,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US set 2)", GAME_IMPERFECT_SOUND )
+COMP( 1980, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
+COMP( 1986, snmatha,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_IMPERFECT_SOUND )
 
 COMP( 1979, lantutor,   0,       0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )

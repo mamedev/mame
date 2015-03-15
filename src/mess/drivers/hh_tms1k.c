@@ -111,11 +111,11 @@ public:
 	UINT16 m_r;                         // MCU R-pins data
 	UINT16 m_o;                         // MCU O-pins data
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
-	bool m_power_on;                    // TMS0980 power-on state
+	bool m_power_on;
 
 	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
-	DECLARE_WRITE_LINE_MEMBER(tms0980_auto_power_off);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -307,7 +307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
 		for (int x = 0; x < m_display_maxx; x++)
-			if (!(m_display_state[y] >> x & 1) && m_display_decay[y][x] != 0)
+			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 	
 	display_update();
@@ -342,7 +342,7 @@ UINT8 hh_tms1k_state::read_inputs(int columns)
 
 // devices with a TMS0980 can auto power-off
 
-WRITE_LINE_MEMBER(hh_tms1k_state::tms0980_auto_power_off)
+WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
 {
 	if (state)
 	{
@@ -351,7 +351,7 @@ WRITE_LINE_MEMBER(hh_tms1k_state::tms0980_auto_power_off)
 	}
 }
 
-INPUT_CHANGED_MEMBER(hh_tms1k_state::tms0980_power_button)
+INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	m_power_on = (bool)(FPTR)param;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
@@ -1182,11 +1182,11 @@ static INPUT_PORTS_START( elecdet )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.4") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("End Turn")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -1197,7 +1197,7 @@ static MACHINE_CONFIG_START( elecdet, hh_tms1k_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, elecdet_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, elecdet_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, elecdet_write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, tms0980_auto_power_off))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_elecdet)
@@ -1778,11 +1778,11 @@ static INPUT_PORTS_START( stopthief )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.2") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Tip")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Arrest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( stopthief, hh_tms1k_state )
@@ -1792,7 +1792,7 @@ static MACHINE_CONFIG_START( stopthief, hh_tms1k_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, stopthief_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, stopthief_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, stopthief_write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, tms0980_auto_power_off))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_stopthie)
