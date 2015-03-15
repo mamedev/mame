@@ -86,7 +86,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_FILTER ";glfilter;flt",       "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
 	{ OSDOPTION_PRESCALE,                     "1",    OPTION_INTEGER,                 "scale screen rendering by this amount in software" },
 
-#if USE_OPENGL
+#ifdef USE_OPENGL
 	// OpenGL specific options
 	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
 	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",    OPTION_BOOLEAN, "force power of two textures  (default no)" },
