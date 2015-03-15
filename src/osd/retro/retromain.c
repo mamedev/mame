@@ -127,13 +127,13 @@ int PARAMCOUNT=0;
 // path configuration
 #define NB_OPTPATH 12
 
-static const char *dir_name[NB_OPTPATH]={
+static const char *dir_name[NB_OPTPATH]= {
     "cfg","nvram","hi"/*,"memcard"*/,"input",
     "states" ,"snaps","diff","samples",
     "artwork","cheat","ini","hash"
 };
 
-static const char *opt_name[NB_OPTPATH]={
+static const char *opt_name[NB_OPTPATH]= {
     "-cfg_directory","-nvram_directory","-hiscore_directory",/*"-memcard_directory",*/"-input_directory",
     "-state_directory" ,"-snapshot_directory","-diff_directory","-samplepath",
     "-artpath","-cheatpath","-inipath","-hashpath"
@@ -172,7 +172,9 @@ cothread_t emuThread;
 
 static void extract_basename(char *buf, const char *path, size_t size)
 {
+   char *ext = NULL;
    const char *base = strrchr(path, '/');
+
    if (!base)
       base = strrchr(path, '\\');
    if (!base)
@@ -184,17 +186,20 @@ static void extract_basename(char *buf, const char *path, size_t size)
    strncpy(buf, base, size - 1);
    buf[size - 1] = '\0';
 
-   char *ext = strrchr(buf, '.');
+   ext = strrchr(buf, '.');
    if (ext)
       *ext = '\0';
 }
 
 static void extract_directory(char *buf, const char *path, size_t size)
 {
+   char *base = NULL;
+
    strncpy(buf, path, size - 1);
    buf[size - 1] = '\0';
 
-   char *base = strrchr(buf, '/');
+   base = strrchr(buf, '/');
+
    if (!base)
       base = strrchr(buf, '\\');
 
@@ -208,13 +213,13 @@ static int parsePath(char* path, char* gamePath, char* gameName)
 {
    int i;
    int slashIndex = -1;
-   int dotIndex = -1;
-   int len = strlen(path);
+   int dotIndex   = -1;
+   int len        = strlen(path);
 
    if (len < 1)
       return 0;
 
-   for (i = len - 1; i >=0; i--)
+   for (i = len - 1; i >= 0; i--)
    {
       if (path[i] == slash)
       {
@@ -238,8 +243,7 @@ static int parsePath(char* path, char* gamePath, char* gameName)
 
 static int parseSystemName(char* path, char* systemName)
 {
-   int i;
-   int j=0;
+   int i, j = 0;
    int slashIndex[2]={-1,-1};
    int len = strlen(path);
 
@@ -269,15 +273,14 @@ static int parseSystemName(char* path, char* systemName)
 
 static int parseParentPath(char* path, char* parentPath)
 {
-   int i;
-   int j=0;
-   int slashIndex[2]={-1,-1};
+   int i, j = 0;
+   int slashIndex[2] = {-1,-1};
    int len = strlen(path);
 
    if (len < 1)
       return 0;
 
-   for (i = len - 1; i >=0; i--)
+   for (i = len - 1; i >= 0; i--)
    {
       if (j<2)
       {
@@ -306,7 +309,7 @@ static int getGameInfo(char* gameName, int* rotation, int* driverIndex,bool *Arc
 
    if (num != -1)
    {
-      if(driver_list::driver(num).flags& GAME_TYPE_ARCADE)
+      if (driver_list::driver(num).flags & GAME_TYPE_ARCADE)
       {
          *Arcade=TRUE;
          if (log_cb)
@@ -343,6 +346,7 @@ void Extract_AllPath(char *srcpath)
 
    //split the path to directory and the name without the zip extension
    result = parsePath(srcpath, MgamePath, MgameName);
+
    if (result == 0)
    {
       strcpy(MgameName,srcpath);
