@@ -483,11 +483,9 @@ ifdef PROFILER
 DEFS += -DMAME_PROFILER
 endif
 
-# dine USE_NETWORK if networking is enabled (not OS/2 and hasn't been disabled)
-ifneq ($(TARGETOS),os2)
+# define USE_NETWORK if networking is enabled (hasn't been disabled)
 ifndef DONT_USE_NETWORK
 DEFS += -DUSE_NETWORK
-endif
 endif
 
 # need to ensure FLAC functions are statically linked

@@ -63,6 +63,10 @@
 #pragma warning (disable : 4204)  // missing c99 support
 #endif
 
+#ifdef __OS2__
+#define _MMAP_DECLARED          // Prevent dummy mmap() declaration in stdio.h
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <assert.h>
