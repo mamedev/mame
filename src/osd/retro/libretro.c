@@ -12,21 +12,21 @@
 #include "drivenum.h"
 
 #include "libretro.h"
+#include "libretro_shared.h"
 
-#include <libco.h>
+/* forward decls / externs / prototypes */
+bool experimental_cmdline;
 
-int pauseg = 0;
+int retro_pause = 0;
 
-cothread_t mainThread;
-cothread_t emuThread;
+static cothread_t mainThread;
+static cothread_t emuThread;
 
-void retro_poll_mame_input(void);
-
-static int rtwi       = 320;
-static int rthe       = 240;
-static int topw       = 1600;
-static float rtaspect = 0;
-static float rtfps    = 60.0;
+int fb_width   = 320;
+int fb_height  = 240;
+int fb_pitch   = 1600;
+float retro_aspect = 0;
+float retro_fps = 60.0;
 #if 0
 static int max_width  = 0;
 static int max_height = 0;
@@ -118,7 +118,7 @@ static void extract_directory(char *buf, const char *path, size_t size)
       buf[0] = '\0';
 }
 
-static retro_input_state_t input_state_cb = NULL;
+retro_input_state_t input_state_cb = NULL;
 retro_audio_sample_batch_t audio_batch_cb = NULL;
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
@@ -436,8 +436,8 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    check_variables();
 
-   info->geometry.base_width  = rtwi;
-   info->geometry.base_height = rthe;
+   info->geometry.base_width  = fb_width;
+   info->geometry.base_height = fb_height;
 
    if (log_cb)
       log_cb(RETRO_LOG_INFO, "AV_INFO: width=%d height=%d\n",info->geometry.base_width,info->geometry.base_height);
@@ -448,16 +448,16 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    if (log_cb)
       log_cb(RETRO_LOG_INFO, "AV_INFO: max_width=%d max_height=%d\n",info->geometry.max_width,info->geometry.max_height);
 
-   info->geometry.aspect_ratio = rtaspect;
+   info->geometry.aspect_ratio = retro_aspect;
 
    if (log_cb)
-      log_cb(RETRO_LOG_INFO, "AV_INFO: aspect_ratio=%f\n",info->geometry.aspect_ratio);
+      log_cb(RETRO_LOG_INFO, "AV_INFO: aspect_ratio = %f\n",info->geometry.aspect_ratio);
 
-   info->timing.fps = rtfps;
+   info->timing.fps            = retro_fps;
    info->timing.sample_rate    = 48000.0;
 
    if (log_cb)
-      log_cb(RETRO_LOG_INFO, "AV_INFO: fps=%f sample_rate=%f\n",info->timing.fps,info->timing.sample_rate);
+      log_cb(RETRO_LOG_INFO, "AV_INFO: fps = %f sample_rate = %f\n",info->timing.fps,info->timing.sample_rate);
 
 }
 
@@ -465,7 +465,7 @@ static void retro_wrap_emulator(void)
 {
    mmain(1,RPATH);
 
-   pauseg = -1;
+   retro_pause = -1;
 
    environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0);
 
@@ -584,18 +584,22 @@ void retro_run (void)
       NEWGAME_FROM_OSD=0;
    }
 
-    retro_poll_mame_input();
+   input_poll_cb();
+
+   process_mouse_state();
+   process_keyboard_state();
+   process_joypad_state();
 
 #ifdef HAVE_GL
-    do_glflush();
+   do_glflush();
 #else
-    if (draw_this_frame)
-       video_cb(videoBuffer, rtwi, rthe, topw << LOG_PIXEL_BYTES);
-    else
-       video_cb(NULL, rtwi, rthe, topw << LOG_PIXEL_BYTES);
+   if (draw_this_frame)
+      video_cb(videoBuffer, fb_width, fb_height, fb_pitch << LOG_PIXEL_BYTES);
+   else
+      video_cb(NULL, fb_width, fb_height, fb_pitch << LOG_PIXEL_BYTES);
 #endif
 
-    co_switch(emuThread);
+   co_switch(emuThread);
 }
 
 bool retro_load_game(const struct retro_game_info *info)
@@ -638,9 +642,9 @@ bool retro_load_game(const struct retro_game_info *info)
 
 void retro_unload_game(void)
 {
-   if (pauseg == 0)
+   if (retro_pause == 0)
    {
-      pauseg = -1;
+      retro_pause = -1;
       co_switch(emuThread);
    }
 }
@@ -658,3 +662,12 @@ void retro_cheat_reset(void) {}
 void retro_cheat_set(unsigned unused, bool unused1, const char* unused2) {}
 void retro_set_controller_port_device(unsigned in_port, unsigned device) {}
 
+void retro_switch_to_main_thread(void)
+{
+	co_switch(mainThread);
+}
+
+void *retro_get_fb_ptr(void)
+{
+   return videoBuffer;
+}
