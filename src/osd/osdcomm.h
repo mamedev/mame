@@ -36,7 +36,7 @@
 #define ATTR_MALLOC             __attribute__((malloc))
 #define ATTR_PURE               __attribute__((pure))
 #define ATTR_CONST              __attribute__((const))
-#ifdef __LIBRETRO__
+#ifdef OSD_RETRO
 #define ATTR_FORCE_INLINE
 #else
 #define ATTR_FORCE_INLINE       __attribute__((always_inline))

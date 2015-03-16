@@ -19,7 +19,7 @@
 #include "ui/ui.h"
 #include "mongoose/mongoose.h"
 
-#ifdef __LIBRETRO__
+#ifdef OSD_RETRO
 #ifdef __ANDROID__
 #undef _L
 #endif
@@ -1019,7 +1019,7 @@ void lua_engine::initialize()
 
 void lua_engine::start_console()
 {
-#ifndef __LIBRETRO__
+#ifndef OSD_RETRO
 	mg_start_thread(::serve_lua, this);
 #endif
 }

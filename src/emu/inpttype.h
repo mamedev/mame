@@ -166,7 +166,7 @@ void construct_core_types_P2(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, BUTTON2,             "P2 Button 2",            input_seq(KEYCODE_S, input_seq::or_code, JOYCODE_BUTTON2_INDEXED(1), input_seq::or_code, MOUSECODE_BUTTON3_INDEXED(1), input_seq::or_code, GUNCODE_BUTTON2_INDEXED(1)) )
 	INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, BUTTON3,             "P2 Button 3",            input_seq(KEYCODE_Q, input_seq::or_code, JOYCODE_BUTTON3_INDEXED(1), input_seq::or_code, MOUSECODE_BUTTON2_INDEXED(1)) )
 	INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, BUTTON4,             "P2 Button 4",            input_seq(KEYCODE_W, input_seq::or_code, JOYCODE_BUTTON4_INDEXED(1)) )
-#ifdef __LIBRETRO__
+#ifdef OSD_RETRO
 	INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, BUTTON5, "P2 Button 5", input_seq(KEYCODE_I, input_seq::or_code, JOYCODE_BUTTON5_INDEXED(1)) )
 	INPUT_PORT_DIGITAL_TYPE( 2, PLAYER2, BUTTON6, "P2 Button 6", input_seq(KEYCODE_K, input_seq::or_code, JOYCODE_BUTTON6_INDEXED(1)) )
 #else

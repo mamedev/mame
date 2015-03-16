@@ -306,7 +306,7 @@ UINT32 ui_manager::set_handler(ui_callback callback, UINT32 param)
 //  various startup screens
 //-------------------------------------------------
 
-#ifdef __LIBRETRO__
+#ifdef OSD_RETRO
 extern bool hide_nagscreen;
 extern bool hide_warnings;
 #endif
@@ -329,7 +329,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 	show_gameinfo = show_warnings = show_disclaimer = FALSE;
 	#endif
 
-	#ifdef __LIBRETRO__
+	#ifdef OSD_RETRO
 	if(hide_nagscreen)
 		show_disclaimer = FALSE;
 	if(hide_warnings)
