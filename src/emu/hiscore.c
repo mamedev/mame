@@ -286,6 +286,8 @@ const char core[] = "mame";
 const char core[] = "mess";
 #elif defined(WANT_UME)
 const char core[] = "ume";
+#else
+const char core[] = "mame";
 #endif
 #endif
 
