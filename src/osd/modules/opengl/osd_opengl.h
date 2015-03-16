@@ -91,8 +91,6 @@
 
 #ifdef _MSC_VER
 	extern "C" {
-#else
-	{
 #endif
 		struct osd_gl_dispatch
 		{
@@ -100,7 +98,9 @@
 			#include "osd_opengl.h"
 			#undef GET_GLFUNC
 		};
-	}
+#ifdef _MSC_VER
+ 	}
+#endif
 
 	#undef OSD_GL
 	#undef OSD_GL_UNUSED
