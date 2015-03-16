@@ -47,8 +47,6 @@ OBJDIRS += \
 #-------------------------------------------------
 # emulator core objects
 #-------------------------------------------------
-EMUOBJS += \
-			 $(EMUOBJ)/hiscore.o \
 
 EMUOBJS = \
 	$(EMUOBJ)/hashfile.o \
@@ -155,6 +153,9 @@ EMUOBJS = \
 	$(EMUOBJ)/profiler.o \
 	$(EMUOBJ)/webengine.o \
 	$(OSDOBJ)/osdnet.o \
+
+EMUOBJS += \
+			 $(EMUOBJ)/hiscore.o \
 
 EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/filter.o \
