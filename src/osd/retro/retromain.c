@@ -9,6 +9,7 @@
 #include "render.h"
 #include "ui/ui.h"
 #include "uiinput.h"
+#include "drivenum.h"
 
 #include "libretro.h"
 
@@ -32,8 +33,6 @@ const char core[] = "mame";
 #if !defined(HAVE_GL) && !defined(HAVE_RGB32)
 #define M16B
 #endif
-
-#include "render.c"
 
 #ifdef HAVE_GL
 static int init3d=1;
