@@ -18,7 +18,7 @@
 
 #include "libretro.h"
 
-extern int pauseg;
+extern int retro_pause;
 extern retro_audio_sample_batch_t audio_batch_cb;
 
 //============================================================
