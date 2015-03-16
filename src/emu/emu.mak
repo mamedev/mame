@@ -47,7 +47,7 @@ OBJDIRS += \
 #-------------------------------------------------
 # emulator core objects
 #-------------------------------------------------
-EMUOBJS = \
+EMUOBJS += \
 			 $(EMUOBJ)/hiscore.o \
 
 EMUOBJS = \
