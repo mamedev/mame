@@ -278,7 +278,7 @@ void hiscore_close (running_machine &machine)
 }
 
 //libretro patch
-#if defined (__LIBRETRO__)
+#if defined (OSD_RETRO)
 extern const char *retro_system_directory;
 #if defined(WANT_MAME)
 const char core[] = "mame";
@@ -325,7 +325,7 @@ void hiscore_init (running_machine &machine)
 
 	state.mem_range = NULL;
 	emu_file f(OPEN_FLAG_READ);
-#ifdef __LIBRETRO__
+#ifdef OSD_RETRO
 	static char path[200];
 	sprintf(path,"%s%c%s%c",retro_system_directory,slash,core,slash);
 	filerr = f.open(path, "hiscore", ".dat");
