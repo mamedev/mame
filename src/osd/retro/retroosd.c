@@ -33,7 +33,9 @@ void retro_osd_interface::osd_exit()
 
 #if defined(HAVE_GL)
    destroy_all_textures();
-   if (NULL!=retro)free(retro);
+   if (retro)
+      free(retro);
+   retro = NULL:
 #endif
 
    osd_common_t::osd_exit();
