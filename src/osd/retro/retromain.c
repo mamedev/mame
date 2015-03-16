@@ -1605,7 +1605,7 @@ void retro_osd_interface::update(bool skip_redraw)
    {
       int minwidth, minheight;
 
-      retro_draw_frame_enable(true);
+      retro_frame_draw_enable(true);
 
       /* get the minimum width/height for the current layout */
 
@@ -1678,7 +1678,7 @@ void retro_osd_interface::update(bool skip_redraw)
       primlist.release_lock();
    }
 	else
-      retro_draw_frame_enable(false);
+      retro_frame_draw_enable(false);
 
 	if(ui_ipt_pushchar!=-1)
    {
