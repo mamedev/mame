@@ -555,7 +555,7 @@ $(LIBOBJ)/lua/%.o: $(3RDPARTY)/lua/src/%.c | $(OSPREBUILD)
 
 $(LIBOBJ)/lua/lsqlite3/%.o: $(3RDPARTY)/lsqlite3/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) -fPIC $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -I$(3RDPARTY)/lua/src -I$(3RDPARTY) $(LUA_FLAGS) -c $< -o $@
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -I$(3RDPARTY)/lua/src -I$(3RDPARTY) $(LUA_FLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # web library objects
