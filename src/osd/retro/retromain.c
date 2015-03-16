@@ -381,7 +381,7 @@ void Extract_AllPath(char *srcpath)
 
 }
 
-void Add_Option(const char* option)
+static void Add_Option(const char* option)
 {
    static int first = 0;
 
@@ -394,7 +394,7 @@ void Add_Option(const char* option)
    sprintf(XARGV[PARAMCOUNT++], "%s", option);
 }
 
-void Set_Default_Option(void)
+static void Set_Default_Option(void)
 {
    //some hardcoded default Options
 
@@ -437,7 +437,7 @@ void Set_Default_Option(void)
    }
 }
 
-void Set_Path_Option(void)
+static void Set_Path_Option(void)
 {
    int i;
    char tmp_dir[256];
@@ -473,7 +473,7 @@ void Set_Path_Option(void)
 //  main
 //============================================================
 
-int executeGame(char* path)
+static int execute_game(char* path)
 {
    unsigned i;
    char tmp_dir[256];
@@ -626,7 +626,7 @@ int executeGame(char* path)
 static char ARGUV[32][1024];
 static unsigned char ARGUC=0;
 
-void parse_cmdline(const char *argv)
+static void parse_cmdline(const char *argv)
 {
    int c,c2;
    char *p,*p2,*start_of_word;
@@ -696,7 +696,7 @@ void parse_cmdline(const char *argv)
 
 }
 
-int executeGame_cmd(char* path)
+static int execute_game_cmd(char* path)
 {
    unsigned i;
    int driverIndex;
@@ -828,13 +828,13 @@ int mmain(int argc, const char *argv)
       if (log_cb)
          log_cb(RETRO_LOG_INFO, "Starting game from command line:%s\n",gameName);
 
-      result = executeGame_cmd(ARGUV[ARGUC-1]);
+      result = execute_game_cmd(ARGUV[ARGUC-1]);
    }
    else
    {
       if (log_cb)
          log_cb(RETRO_LOG_INFO, "Starting game:%s\n",gameName);
-      result = executeGame(gameName);
+      result = execute_game(gameName);
    }
 
    if (result < 0)
@@ -860,4 +860,3 @@ int mmain(int argc, const char *argv)
 
    return 1;
 }
-
