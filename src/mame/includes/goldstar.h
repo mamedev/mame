@@ -21,10 +21,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(lucky8_lamps_w);
+	DECLARE_WRITE8_MEMBER(p1_lamps_w);
+	DECLARE_WRITE8_MEMBER(p2_lamps_w);
 	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
-	DECLARE_WRITE8_MEMBER(goldstar_lamps_w);
-	DECLARE_WRITE8_MEMBER(cb3_lamps_w);
 	DECLARE_WRITE8_MEMBER(cm_coincount_w);
 	DECLARE_WRITE8_MEMBER(ladylinr_outport_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);

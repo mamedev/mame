@@ -2675,6 +2675,7 @@ $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
 			$(LAYOUT)/bingowng.lh \
 			$(LAYOUT)/cherryb3.lh \
+			$(LAYOUT)/chrygld.lh \
 			$(LAYOUT)/cmaster.lh \
 			$(LAYOUT)/cmasterb.lh \
 			$(LAYOUT)/cmasterc.lh \
