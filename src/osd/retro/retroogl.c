@@ -14,47 +14,47 @@ GLfloat UseTexture=0.0f;
 
 static const GLfloat vertex_data[] = {
 //VERTEX
-   -1.0, -1.0,
-    1.0, -1.0,
-   -1.0,  1.0,
-    1.0,  1.0,
+	-1.0, -1.0,
+	1.0, -1.0,
+	-1.0,  1.0,
+	1.0,  1.0,
 //COLOR
-   1.0, 0.0, 0.0, 1.0,
-   1.0, 0.0, 1.0, 1.0,
-   0.0, 1.0, 1.0, 1.0,
-   1.0, 1.0, 0.0, 1.0,
+	1.0, 0.0, 0.0, 1.0,
+	1.0, 0.0, 1.0, 1.0,
+	0.0, 1.0, 1.0, 1.0,
+	1.0, 1.0, 0.0, 1.0,
 //TEXCOORD
-   0, 0,
-   1, 0,
-   0, 1,
-   1, 1,
+	0, 0,
+	1, 0,
+	0, 1,
+	1, 1,
 };
 
 static const char *vertex_shader[] = {
-   "attribute vec2 aVertex;",
-   "attribute vec2 aTexCoord;\n",
-   "attribute vec4 aColor;",
-   "varying vec4 color;",
-   "varying vec2 vTex;\n",
-   "void main() {",
-   "  gl_Position = vec4(aVertex, 0.0, 1.0);",
-   "  vTex =  aTexCoord ; color = aColor;"
-   "}",
+	"attribute vec2 aVertex;\n",
+	"attribute vec2 aTexCoord;\n",
+	"attribute vec4 aColor;\n",
+	"varying vec4 color;\n",
+	"varying vec2 vTex;\n",
+	"void main() {\n",
+	"  gl_Position = vec4(aVertex, 0.0, 1.0);\n",
+	"  vTex =  aTexCoord ; color = aColor;\n",
+	"}",
 };
 
 static const char *fragment_shader[] = {
-   "#ifdef GL_ES\n",
-   "precision mediump float;\n",
-   "#endif\n",
-   "varying vec2 vTex;\n",
-   "varying vec4 color;\n",
-   "uniform float uUseTexture;\n",
-   "uniform sampler2D sTex0;\n",
-   "void main() {",
-   "   vec4 texColor = texture2D(sTex0, vTex) * color * uUseTexture ;\n",
-   "   vec4 vertColor = color * (1.0 - uUseTexture);\n",
-   "   gl_FragColor =  texColor + vertColor;\n",
-   "}",
+	"#ifdef GL_ES\n",
+	"precision mediump float;\n",
+	"#endif\n",
+	"varying vec2 vTex;\n",
+	"varying vec4 color;\n",
+	"uniform float uUseTexture;\n",
+	"uniform sampler2D sTex0;\n",
+	"void main() {",
+	"   vec4 texColor = texture2D(sTex0, vTex) * color * uUseTexture ;\n",
+	"   vec4 vertColor = color * (1.0 - uUseTexture);\n",
+	"   gl_FragColor =  texColor + vertColor;\n",
+	"}",
 };
 
 #ifdef PTR64
@@ -587,7 +587,7 @@ static void destroy_all_textures(){
 	if (retro == NULL)
 			return;
 
-    glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 
 	i=0;
 	while (i<HASH_SIZE+OVERFLOW_SIZE)
@@ -614,65 +614,64 @@ static void destroy_all_textures(){
 static void compile_program(void)
 {
 	prog = glCreateProgram();
-   	GLuint vert = glCreateShader(GL_VERTEX_SHADER);
-   	GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint vert = glCreateShader(GL_VERTEX_SHADER);
+	GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
 
-   	glShaderSource(vert, ARRAY_SIZE(vertex_shader), vertex_shader, 0);
-   	glShaderSource(frag, ARRAY_SIZE(fragment_shader), fragment_shader, 0);
-   	glCompileShader(vert);
-   	glCompileShader(frag);
+	glShaderSource(vert, ARRAY_SIZE(vertex_shader), vertex_shader, 0);
+	glShaderSource(frag, ARRAY_SIZE(fragment_shader), fragment_shader, 0);
+	glCompileShader(vert);
+	glCompileShader(frag);
 
 	glAttachShader(prog, vert);
-   	glAttachShader(prog, frag);
+	glAttachShader(prog, frag);
 
-   	glLinkProgram(prog);
+	glLinkProgram(prog);
 
-   	glDeleteShader(vert);
-   	glDeleteShader(frag);
+	glDeleteShader(vert);
+	glDeleteShader(frag);
 }
 
 static void setup_vao(void)
 {
-   	glUseProgram(prog);
+	glUseProgram(prog);
 
 	//setup_loc
-   	glUniform1i(glGetUniformLocation(prog, "sTex0"), 0);
-   	vloc = glGetAttribLocation(prog, "aVertex");
-   	tloc = glGetAttribLocation(prog, "aTexCoord");
-   	cloc = glGetAttribLocation(prog, "aColor");
+	glUniform1i(glGetUniformLocation(prog, "sTex0"), 0);
+	vloc = glGetAttribLocation(prog, "aVertex");
+	tloc = glGetAttribLocation(prog, "aTexCoord");
+	cloc = glGetAttribLocation(prog, "aColor");
 	utloc= glGetUniformLocation(prog, "uUseTexture");
 
 	//setup_vbo
-   	glGenBuffers(1, &vbo);
+	glGenBuffers(1, &vbo);
 
-   	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-   	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STREAM_DRAW);
-   	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STREAM_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-   	glUseProgram(0);
+	glUseProgram(0);
 }
 
 static void context_reset(void)
 {
-   	fprintf(stderr, "Context reset!\n");
-   	rglgen_resolve_symbols(hw_render.get_proc_address);
-   	compile_program();
-   	setup_vao();
+	fprintf(stderr, "Context reset!\n");
+	rglgen_resolve_symbols(hw_render.get_proc_address);
+	compile_program();
+	setup_vao();
 
-   	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 
 	destroy_all_textures();
 }
 
 static void context_destroy(void)
 {
-   	fprintf(stderr, "Context destroy!\n");
+	fprintf(stderr, "Context destroy!\n");
 
-   	glDeleteBuffers(1,&vbo);
-   	vbo = 0;
-   	glDeleteProgram(prog);
-   	prog = 0;
-
+	glDeleteBuffers(1,&vbo);
+	vbo = 0;
+	glDeleteProgram(prog);
+	prog = 0;
 }
 
 INLINE float round_nearest(float f)
@@ -688,15 +687,15 @@ static void do_glflush(){
 }
 
 #define prep_vertex_attrib()\
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);\
-   			glVertexAttribPointer(vloc, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);\
-   			glEnableVertexAttribArray(vloc);\
-   			glVertexAttribPointer(cloc, 4, GL_FLOAT, GL_FALSE, 0, (void*)(8 * sizeof(GLfloat)));\
-   			glEnableVertexAttribArray(cloc);\
-   			glVertexAttribPointer(tloc, 2, GL_FLOAT, GL_FALSE, 0,  (void*)(24 * sizeof(GLfloat)) );\
-   			glEnableVertexAttribArray(tloc);\
-   			glBindBuffer(GL_ARRAY_BUFFER, 0);\
-   			glUniform1f(utloc,UseTexture );
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);\
+		glVertexAttribPointer(vloc, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);\
+		glEnableVertexAttribArray(vloc);\
+		glVertexAttribPointer(cloc, 4, GL_FLOAT, GL_FALSE, 0, (void*)(8 * sizeof(GLfloat)));\
+		glEnableVertexAttribArray(cloc);\
+		glVertexAttribPointer(tloc, 2, GL_FLOAT, GL_FALSE, 0,  (void*)(24 * sizeof(GLfloat)) );\
+		glEnableVertexAttribArray(tloc);\
+		glBindBuffer(GL_ARRAY_BUFFER, 0);\
+		glUniform1f(utloc,UseTexture );
 
 static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth,int minheight){
 
@@ -735,204 +734,196 @@ static void gl_draw_primitives(const render_primitive_list &primlst,int minwidth
 		destroy_all_textures();
 	}
 
-  	glBindFramebuffer(GL_FRAMEBUFFER, hw_render.get_current_framebuffer());
-   	glViewport(0, 0, minwidth, minheight);
+	glBindFramebuffer(GL_FRAMEBUFFER, hw_render.get_current_framebuffer());
+	glViewport(0, 0, minwidth, minheight);
 
-		for (const render_primitive *prim = primlst.first(); prim != NULL; prim = prim->next())
-      {
-	 	 UseTexture=0.0;
+	for (const render_primitive *prim = primlst.first(); prim != NULL; prim = prim->next())
+	{
+		UseTexture=0.0;
 
-         switch (prim->type)
-         {
-
+		switch (prim->type)
+		{
 			case render_primitive::LINE:
+				glUseProgram(prog);
 
-		glUseProgram(prog);
+				set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
 
-		set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
+				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
+				{
+					//GLPOINT
 
-		if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
-		{
-			//GLPOINT
+					glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
+					glverts[1]=2*(prim->bounds.y0/minheight-0.5);
+					glcols[0]=prim->color.r;
+					glcols[1]=prim->color.g;
+					glcols[2]=prim->color.b;
+					glcols[3]=prim->color.a;
 
-			glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
-			glverts[1]=2*(prim->bounds.y0/minheight-0.5);
-			glcols[0]=prim->color.r;
-			glcols[1]=prim->color.g;
-			glcols[2]=prim->color.b;
-			glcols[3]=prim->color.a;
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts)/4, &glverts[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts)/4, &glverts[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols)/4, &glcols[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    			glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols)/4, &glcols[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
+					prep_vertex_attrib();
 
-			prep_vertex_attrib();
+					glDrawArrays(GL_POINTS, 0, 1);
 
-			glDrawArrays(GL_POINTS, 0, 1);
+					glDisableVertexAttribArray(vloc);
+					glDisableVertexAttribArray(cloc);
 
-			glDisableVertexAttribArray(vloc);
-			glDisableVertexAttribArray(cloc);
+				}
+				else
+				{
+					glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
+					glverts[1]=2*(prim->bounds.y0/minheight-0.5);
+					glverts[2]=2*(prim->bounds.x1/minwidth-0.5);
+					glverts[3]=2*(prim->bounds.y1/minheight-0.5);
 
+					glcols[0]=prim->color.r;
+					glcols[1]=prim->color.g;
+					glcols[2]=prim->color.b;
+					glcols[3]=prim->color.a;
+					glcols[4]=prim->color.r;
+					glcols[5]=prim->color.g;
+					glcols[6]=prim->color.b;
+					glcols[7]=prim->color.a;
+
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts)/2, &glverts[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols)/2, &glcols[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					prep_vertex_attrib();
+
+					glDrawArrays(GL_LINES, 0, 2);
+
+					glDisableVertexAttribArray(vloc);
+					glDisableVertexAttribArray(cloc);
+				}
+				break;
+
+			case render_primitive::QUAD:
+
+				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+				set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
+
+				if (!prim->texture.base) {
+					glUseProgram(prog);
+
+					glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
+					glverts[1]=2*(prim->bounds.y0/minheight-0.5);
+					glverts[2]=2*(prim->bounds.x1/minwidth-0.5);
+					glverts[3]=2*(prim->bounds.y0/minheight-0.5);
+					glverts[6]=2*(prim->bounds.x1/minwidth-0.5);
+					glverts[7]=2*(prim->bounds.y1/minheight-0.5);
+					glverts[4]=2*(prim->bounds.x0/minwidth-0.5);
+					glverts[5]=2*(prim->bounds.y1/minheight-0.5);
+
+					glcols[0]=prim->color.r;
+					glcols[1]=prim->color.g;
+					glcols[2]=prim->color.b;
+					glcols[3]=prim->color.a;
+					glcols[4]=prim->color.r;
+					glcols[5]=prim->color.g;
+					glcols[6]=prim->color.b;
+					glcols[7]=prim->color.a;
+					glcols[8]=prim->color.r;
+					glcols[9]=prim->color.g;
+					glcols[10]=prim->color.b;
+					glcols[11]=prim->color.a;
+					glcols[12]=prim->color.r;
+					glcols[13]=prim->color.g;
+					glcols[14]=prim->color.b;
+					glcols[15]=prim->color.a;
+
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts), &glverts[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols), &glcols[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					prep_vertex_attrib();
+
+					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+					glDisableVertexAttribArray(vloc);
+					glDisableVertexAttribArray(cloc);
+				} else {
+					glUseProgram(prog);
+
+					texture = texture_update( prim, 0);
+
+					glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
+					glverts[1]=2*(prim->bounds.y0/minheight-0.5);
+					glverts[2]=2*(prim->bounds.x1/minwidth-0.5);
+					glverts[3]=2*(prim->bounds.y0/minheight-0.5);
+					glverts[4]=2*(prim->bounds.x0/minwidth-0.5);
+					glverts[5]=2*(prim->bounds.y1/minheight-0.5);
+					glverts[6]=2*(prim->bounds.x1/minwidth-0.5);
+					glverts[7]=2*(prim->bounds.y1/minheight-0.5);
+
+					glcols[0]=prim->color.r;
+					glcols[1]=prim->color.g;
+					glcols[2]=prim->color.b;
+					glcols[3]=prim->color.a;
+					glcols[4]=prim->color.r;
+					glcols[5]=prim->color.g;
+					glcols[6]=prim->color.b;
+					glcols[7]=prim->color.a;
+					glcols[8]=prim->color.r;
+					glcols[9]=prim->color.g;
+					glcols[10]=prim->color.b;
+					glcols[11]=prim->color.a;
+					glcols[12]=prim->color.r;
+					glcols[13]=prim->color.g;
+					glcols[14]=prim->color.b;
+					glcols[15]=prim->color.a;
+
+					glvtexs[0] = prim->texcoords.tl.u;
+					glvtexs[1] = prim->texcoords.tl.v;
+					glvtexs[2] = prim->texcoords.tr.u;
+					glvtexs[3] = prim->texcoords.tr.v;
+					glvtexs[4] = prim->texcoords.bl.u;
+					glvtexs[5] = prim->texcoords.bl.v;
+					glvtexs[6] = prim->texcoords.br.u;
+					glvtexs[7] = prim->texcoords.br.v;
+
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts), &glverts[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols), &glcols[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					glBindBuffer(GL_ARRAY_BUFFER, vbo);
+					glBufferSubData(GL_ARRAY_BUFFER, 24 * sizeof(GLfloat), sizeof(glvtexs), &glvtexs[0]);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					UseTexture=1.0;
+					prep_vertex_attrib();
+
+					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+					glDisableVertexAttribArray(vloc);
+					glDisableVertexAttribArray(cloc);
+					glDisableVertexAttribArray(tloc);
+
+					if ( texture )
+						glDisable(texture->texTarget);
+				}
+				break;
+
+			default:
+				throw emu_fatalerror("Unexpected render_primitive type");
 		}
-		else
-		{
-			glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
-			glverts[1]=2*(prim->bounds.y0/minheight-0.5);
-			glverts[2]=2*(prim->bounds.x1/minwidth-0.5);
-			glverts[3]=2*(prim->bounds.y1/minheight-0.5);
-
-			glcols[0]=prim->color.r;
-			glcols[1]=prim->color.g;
-			glcols[2]=prim->color.b;
-			glcols[3]=prim->color.a;
-			glcols[4]=prim->color.r;
-			glcols[5]=prim->color.g;
-			glcols[6]=prim->color.b;
-			glcols[7]=prim->color.a;
-
-    			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts)/2, &glverts[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    			glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols)/2, &glcols[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			prep_vertex_attrib();
-
-			glDrawArrays(GL_LINES, 0, 2);
-
-			glDisableVertexAttribArray(vloc);
-			glDisableVertexAttribArray(cloc);
-		}
-
-               break;
-
-          case render_primitive::QUAD:
-
-		glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-		set_blendmode(PRIMFLAG_GET_BLENDMODE(prim->flags));
-
-                if (!prim->texture.base){
-
-			glUseProgram(prog);
-
-			glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
-			glverts[1]=2*(prim->bounds.y0/minheight-0.5);
-			glverts[2]=2*(prim->bounds.x1/minwidth-0.5);
-			glverts[3]=2*(prim->bounds.y0/minheight-0.5);
-			glverts[6]=2*(prim->bounds.x1/minwidth-0.5);
-			glverts[7]=2*(prim->bounds.y1/minheight-0.5);
-			glverts[4]=2*(prim->bounds.x0/minwidth-0.5);
-			glverts[5]=2*(prim->bounds.y1/minheight-0.5);
-
-			glcols[0]=prim->color.r;
-			glcols[1]=prim->color.g;
-			glcols[2]=prim->color.b;
-			glcols[3]=prim->color.a;
-			glcols[4]=prim->color.r;
-			glcols[5]=prim->color.g;
-			glcols[6]=prim->color.b;
-			glcols[7]=prim->color.a;
-			glcols[8]=prim->color.r;
-			glcols[9]=prim->color.g;
-			glcols[10]=prim->color.b;
-			glcols[11]=prim->color.a;
-			glcols[12]=prim->color.r;
-			glcols[13]=prim->color.g;
-			glcols[14]=prim->color.b;
-			glcols[15]=prim->color.a;
-
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts), &glverts[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-   			glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols), &glcols[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			prep_vertex_attrib();
-
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-			glDisableVertexAttribArray(vloc);
-			glDisableVertexAttribArray(cloc);
-
-		}
-		else{
-
-   			glUseProgram(prog);
-
-			texture = texture_update( prim, 0);
-
-			glverts[0]=2*(prim->bounds.x0/minwidth-0.5);
-			glverts[1]=2*(prim->bounds.y0/minheight-0.5);
-			glverts[2]=2*(prim->bounds.x1/minwidth-0.5);
-			glverts[3]=2*(prim->bounds.y0/minheight-0.5);
-			glverts[4]=2*(prim->bounds.x0/minwidth-0.5);
-			glverts[5]=2*(prim->bounds.y1/minheight-0.5);
-			glverts[6]=2*(prim->bounds.x1/minwidth-0.5);
-			glverts[7]=2*(prim->bounds.y1/minheight-0.5);
-
-			glcols[0]=prim->color.r;
-			glcols[1]=prim->color.g;
-			glcols[2]=prim->color.b;
-			glcols[3]=prim->color.a;
-			glcols[4]=prim->color.r;
-			glcols[5]=prim->color.g;
-			glcols[6]=prim->color.b;
-			glcols[7]=prim->color.a;
-			glcols[8]=prim->color.r;
-			glcols[9]=prim->color.g;
-			glcols[10]=prim->color.b;
-			glcols[11]=prim->color.a;
-			glcols[12]=prim->color.r;
-			glcols[13]=prim->color.g;
-			glcols[14]=prim->color.b;
-			glcols[15]=prim->color.a;
-
-			glvtexs[0] = prim->texcoords.tl.u;
-			glvtexs[1] = prim->texcoords.tl.v;
-			glvtexs[2] = prim->texcoords.tr.u;
-			glvtexs[3] = prim->texcoords.tr.v;
-			glvtexs[4] = prim->texcoords.bl.u;
-			glvtexs[5] = prim->texcoords.bl.v;
-			glvtexs[6] = prim->texcoords.br.u;
-			glvtexs[7] = prim->texcoords.br.v;
-
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glverts), &glverts[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-   			glBufferSubData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), sizeof(glcols), &glcols[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-   			glBufferSubData(GL_ARRAY_BUFFER, 24 * sizeof(GLfloat), sizeof(glvtexs), &glvtexs[0]);
-    			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			UseTexture=1.0;
-			prep_vertex_attrib();
-
-   			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-			glDisableVertexAttribArray(vloc);
-			glDisableVertexAttribArray(cloc);
-			glDisableVertexAttribArray(tloc);
-
-			if ( texture )glDisable(texture->texTarget);
-
-		}
-               break;
-
-            default:
-               throw emu_fatalerror("Unexpected render_primitive type");
-         }
-      }
-
+	}
 }

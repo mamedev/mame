@@ -212,8 +212,8 @@ static void hiscore_load (running_machine &machine)
 			if (data)
 			{
 				/*  this buffer will almost certainly be small
-                  	enough to be dynamically allocated, but let's
-                  	avoid memory trashing just in case */
+					enough to be dynamically allocated, but let's
+					avoid memory trashing just in case */
           			f.read(data, mem_range->num_bytes);
 				copy_to_memory (machine,mem_range->cpu, mem_range->addr, data, mem_range->num_bytes);
 				global_free_array(data);
@@ -227,8 +227,8 @@ static void hiscore_load (running_machine &machine)
 static void hiscore_save (running_machine &machine)
 {
 	file_error filerr;
-  	emu_file f(machine.options().hiscore_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-  	filerr = f.open(machine.basename(), ".hi");
+	emu_file f(machine.options().hiscore_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	filerr = f.open(machine.basename(), ".hi");
 
 	if (filerr == FILERR_NONE)
 	{
@@ -303,7 +303,7 @@ void hiscore_init (running_machine &machine)
 	memory_range *mem_range = state.mem_range;
 	address_space *initspace;
 	file_error filerr;
-  	const char *name = machine.system().name;
+	const char *name = machine.system().name;
 	state.hiscores_have_been_loaded = 0;
 
 	while (mem_range)
@@ -319,7 +319,7 @@ void hiscore_init (running_machine &machine)
 		{
 			initspace = &machine.cpu[mem_range->cpu]->memory().space(AS_PROGRAM);
 			initspace->write_byte(mem_range->addr, ~mem_range->start_value);
-		  	initspace->write_byte(mem_range->addr + mem_range->num_bytes-1, ~mem_range->end_value);
+			initspace->write_byte(mem_range->addr + mem_range->num_bytes-1, ~mem_range->end_value);
 			mem_range = mem_range->next;
 		}
 	}

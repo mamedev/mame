@@ -965,7 +965,7 @@ void Extract_AllPath(char *srcpath)
 {
    int result_value =0;
 
-   /* Split the path to directory 
+   /* Split the path to directory
     * and the name without the zip extension. */
    int result = parsePath(srcpath, MgamePath, MgameName);
 
@@ -977,7 +977,7 @@ void Extract_AllPath(char *srcpath)
          log_cb(RETRO_LOG_ERROR, "Error parsing game path: %s\n",srcpath);
    }
 
-   /* Split the path to directory and 
+   /* Split the path to directory and
     * the name without the zip extension. */
    result = parseSystemName(srcpath, MsystemName);
    if (result == 0)
@@ -1664,7 +1664,7 @@ void retro_osd_interface::update(bool skip_redraw)
       our_target->set_bounds(fb_width, fb_height);
 
       /* get the list of primitives for the target at the current size */
-     
+
       render_primitive_list &primlist = our_target->get_primitives();
 
       /* lock them, and then render them */
