@@ -114,6 +114,9 @@ OSDOBJS += $(GLOBJ)/glsym_gl.o
 endif
 endif
 
+LIBS += -lpthread
+BASELIBS += -lpthread
+
 #-------------------------------------------------
 # rules for building the libaries
 #-------------------------------------------------
