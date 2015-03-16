@@ -126,3 +126,11 @@ $(LIBOCORE): $(OSDCOREOBJS)
 
 $(LIBOSD): $(OSDOBJS)
 
+# Override to force libco to build as C
+$(LIBCOOBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) $(INCPATH) -c $< -o $@
+	ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+	endif
+
