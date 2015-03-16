@@ -15,7 +15,6 @@
 #include "libretro_shared.h"
 
 /* forward decls / externs / prototypes */
-bool experimental_cmdline;
 
 int retro_pause = 0;
 
