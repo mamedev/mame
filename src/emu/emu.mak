@@ -46,8 +46,9 @@ OBJDIRS += \
 
 #-------------------------------------------------
 # emulator core objects
-# MKCHAMP - ADDED hiscore.o TO LIST TO COMPILE THE HISCORE PIECE
 #-------------------------------------------------
+EMUOBJS = \
+			 $(EMUOBJ)/hiscore.o \
 
 EMUOBJS = \
 	$(EMUOBJ)/hashfile.o \
@@ -89,7 +90,6 @@ EMUOBJS = \
 	$(EMUOBJ)/emupal.o \
 	$(EMUOBJ)/fileio.o \
 	$(EMUOBJ)/hash.o \
-	$(EMUOBJ)/hiscore.o \
 	$(EMUOBJ)/image.o \
 	$(EMUOBJ)/info.o \
 	$(EMUOBJ)/input.o \
@@ -251,8 +251,7 @@ include $(EMUSRC)/bus/bus.mak
 # core optional library
 #-------------------------------------------------
 
-$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS)
-$(LIBOPTIONAL2): $(MACHINEOBJS) $(NETLISTOBJS)
+$(LIBOPTIONAL): $(CPUOBJS) $(SOUNDOBJS) $(VIDEOOBJS) $(MACHINEOBJS) $(NETLISTOBJS)
 $(LIBBUS): $(BUSOBJS)
 
 #-------------------------------------------------
@@ -279,3 +278,4 @@ $(EMUOBJ)/rendlay.o:    $(EMULAYOUT)/dualhovu.lh \
 						$(EMULAYOUT)/noscreens.lh \
 
 $(EMUOBJ)/video.o:      $(EMULAYOUT)/snap.lh
+
