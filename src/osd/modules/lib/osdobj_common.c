@@ -179,7 +179,9 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, NETDEV_PCAP);
 	REGISTER_MODULE(m_mod_man, NETDEV_NONE);
 
+#ifndef NO_USE_MIDI
 	REGISTER_MODULE(m_mod_man, MIDI_PM);
+#endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
 
 	// after initialization we know which modules are supported
