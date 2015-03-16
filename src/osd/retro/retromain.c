@@ -30,6 +30,10 @@ const char core[] = "ume";
 const char core[] = "mame";
 #endif
 
+/* Args for experimental_commandline */
+static char ARGUV[32][1024];
+static unsigned char ARGUC=0;
+
 #if !defined(HAVE_GL) && !defined(HAVE_RGB32)
 #define M16B
 #endif
@@ -138,19 +142,6 @@ int opt_type[NB_OPTPATH]={ // 0 for save_dir | 1 for system_dir
     1,1,1,1
 };
 
-static void extract_basename(char *buf, const char *path, size_t size);
-static void extract_directory(char *buf, const char *path, size_t size);
-
-//============================================================
-//  LIBCO
-//============================================================
-#include <libco.h>
-
-int pauseg = 0;
-
-cothread_t mainThread;
-cothread_t emuThread;
-
 //============================================================
 //  RETRO
 //============================================================
@@ -161,46 +152,6 @@ cothread_t emuThread;
 //============================================================
 //  main
 //============================================================
-
-static void extract_basename(char *buf, const char *path, size_t size)
-{
-   char *ext = NULL;
-   const char *base = strrchr(path, '/');
-
-   if (!base)
-      base = strrchr(path, '\\');
-   if (!base)
-      base = path;
-
-   if (*base == '\\' || *base == '/')
-      base++;
-
-   strncpy(buf, base, size - 1);
-   buf[size - 1] = '\0';
-
-   ext = strrchr(buf, '.');
-   if (ext)
-      *ext = '\0';
-}
-
-static void extract_directory(char *buf, const char *path, size_t size)
-{
-   char *base = NULL;
-
-   strncpy(buf, path, size - 1);
-   buf[size - 1] = '\0';
-
-   base = strrchr(buf, '/');
-
-   if (!base)
-      base = strrchr(buf, '\\');
-
-   if (base)
-      *base = '\0';
-   else
-      buf[0] = '\0';
-}
-
 static int parsePath(char* path, char* gamePath, char* gameName)
 {
    int i;
@@ -625,17 +576,10 @@ static int execute_game(char* path)
       sprintf(tmp_dir, "%s;%s", MgamePath,MparentPath);
       Add_Option((char*)(tmp_dir));
    }
-
-
-
 #endif
 
    return 0;
 }
-
-/* Args for experimental_commandline */
-static char ARGUV[32][1024];
-static unsigned char ARGUC=0;
 
 static void parse_cmdline(const char *argv)
 {
@@ -706,7 +650,6 @@ static void parse_cmdline(const char *argv)
             continue; /* either still IN_WORD or we handled the end above */
       }
    }
-
 }
 
 static int execute_game_cmd(char* path)
@@ -821,7 +764,6 @@ static int execute_game_cmd(char* path)
 
    return 0;
 }
-
 
 #ifdef __cplusplus
 extern "C"

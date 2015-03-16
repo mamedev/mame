@@ -1,3 +1,25 @@
+#include <unistd.h>
+#include <stdint.h>
+#include <string.h>
+
+#include "osdepend.h"
+
+#include "emu.h"
+#include "clifront.h"
+#include "render.h"
+#include "ui/ui.h"
+#include "uiinput.h"
+#include "drivenum.h"
+
+#include "libretro.h"
+
+#include <libco.h>
+
+int pauseg = 0;
+
+cothread_t mainThread;
+cothread_t emuThread;
+
 void retro_poll_mame_input(void);
 
 static int rtwi       = 320;
@@ -56,6 +78,45 @@ retro_environment_t environ_cb = NULL;
 #if defined(HAVE_GL)
 #include "retroogl.c"
 #endif
+
+static void extract_basename(char *buf, const char *path, size_t size)
+{
+   char *ext = NULL;
+   const char *base = strrchr(path, '/');
+
+   if (!base)
+      base = strrchr(path, '\\');
+   if (!base)
+      base = path;
+
+   if (*base == '\\' || *base == '/')
+      base++;
+
+   strncpy(buf, base, size - 1);
+   buf[size - 1] = '\0';
+
+   ext = strrchr(buf, '.');
+   if (ext)
+      *ext = '\0';
+}
+
+static void extract_directory(char *buf, const char *path, size_t size)
+{
+   char *base = NULL;
+
+   strncpy(buf, path, size - 1);
+   buf[size - 1] = '\0';
+
+   base = strrchr(buf, '/');
+
+   if (!base)
+      base = strrchr(buf, '\\');
+
+   if (base)
+      *base = '\0';
+   else
+      buf[0] = '\0';
+}
 
 static retro_input_state_t input_state_cb = NULL;
 retro_audio_sample_batch_t audio_batch_cb = NULL;
