@@ -1583,8 +1583,6 @@ void retro_osd_interface::init(running_machine &machine)
    retro_switch_to_main_thread();
 }
 
-bool draw_this_frame;
-
 void retro_osd_interface::update(bool skip_redraw)
 {
 
@@ -1607,7 +1605,7 @@ void retro_osd_interface::update(bool skip_redraw)
    {
       int minwidth, minheight;
 
-      draw_this_frame = true;
+      retro_draw_frame_enable(true);
 
       /* get the minimum width/height for the current layout */
 
@@ -1615,8 +1613,8 @@ void retro_osd_interface::update(bool skip_redraw)
          our_target->compute_minimum_size(minwidth, minheight);
       else
       {
-         minwidth=1600;
-         minheight=1200;
+         minwidth  = 1600;
+         minheight = 1200;
       }
 
       if (FirstTimeUpdate == 1)
@@ -1680,7 +1678,7 @@ void retro_osd_interface::update(bool skip_redraw)
       primlist.release_lock();
    }
 	else
-    		draw_this_frame = false;
+      retro_draw_frame_enable(false);
 
 	if(ui_ipt_pushchar!=-1)
    {

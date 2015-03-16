@@ -62,7 +62,7 @@ retro_log_printf_t log_cb;
 
 extern "C" int mmain(int argc, const char *argv);
 
-extern bool draw_this_frame;
+static bool draw_this_frame;
 
 #ifdef M16B
 uint16_t videoBuffer[1600*1200];
@@ -670,4 +670,9 @@ void retro_switch_to_main_thread(void)
 void *retro_get_fb_ptr(void)
 {
    return videoBuffer;
+}
+
+void retro_frame_draw_enable(bool enable)
+{
+   draw_this_frame = enable;
 }

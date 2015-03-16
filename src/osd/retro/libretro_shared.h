@@ -67,6 +67,8 @@ extern retro_input_state_t input_state_cb;
 
 void retro_switch_to_main_thread(void);
 
+void retro_frame_draw_enable(bool enable);
+
 void *retro_get_fb_ptr(void);
 
 void process_keyboard_state(void);
@@ -74,5 +76,6 @@ void process_keyboard_state(void);
 void process_joypad_state(void);
 
 void process_mouse_state(void);
+
 
 #endif
