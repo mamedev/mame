@@ -145,9 +145,9 @@ static void extract_directory(char *buf, const char *path, size_t size);
 //============================================================
 //  LIBCO
 //============================================================
-int pauseg=0;
-
 #include <libco.h>
+
+int pauseg = 0;
 
 cothread_t mainThread;
 cothread_t emuThread;
@@ -155,7 +155,6 @@ cothread_t emuThread;
 //============================================================
 //  RETRO
 //============================================================
-
 #include "libretro.c"
 #include "retroinput.c"
 #include "retroosd.c"
@@ -298,8 +297,10 @@ static int parseParentPath(char* path, char* parentPath)
 static int getGameInfo(char* gameName, int* rotation, int* driverIndex,bool *Arcade)
 {
    int gameFound = 0;
-   int num=driver_list::find(gameName);
-   log_cb(RETRO_LOG_DEBUG, "Searching for driver %s\n",gameName);
+   int num = driver_list::find(gameName);
+
+   if (log_cb)
+      log_cb(RETRO_LOG_DEBUG, "Searching for driver %s\n",gameName);
 
    if (num != -1)
    {
@@ -338,10 +339,11 @@ static int getGameInfo(char* gameName, int* rotation, int* driverIndex,bool *Arc
 
 void Extract_AllPath(char *srcpath)
 {
-   int result = 0, result_value =0;
+   int result_value =0;
 
-   //split the path to directory and the name without the zip extension
-   result = parsePath(srcpath, MgamePath, MgameName);
+   /* Split the path to directory 
+    * and the name without the zip extension. */
+   int result = parsePath(srcpath, MgamePath, MgameName);
 
    if (result == 0)
    {
@@ -351,7 +353,8 @@ void Extract_AllPath(char *srcpath)
          log_cb(RETRO_LOG_ERROR, "Error parsing game path: %s\n",srcpath);
    }
 
-   //split the path to directory and the name without the zip extension
+   /* Split the path to directory and 
+    * the name without the zip extension. */
    result = parseSystemName(srcpath, MsystemName);
    if (result == 0)
    {
@@ -360,8 +363,10 @@ void Extract_AllPath(char *srcpath)
       if (log_cb)
          log_cb(RETRO_LOG_ERROR, "Error parsing system name: %s\n",srcpath);
    }
-   //get the parent path
+
+   /* Get the parent path. */
    result = parseParentPath(srcpath, MparentPath);
+
    if (result == 0)
    {
       strcpy(MparentPath,srcpath );
@@ -396,7 +401,7 @@ static void Add_Option(const char* option)
 
 static void Set_Default_Option(void)
 {
-   //some hardcoded default Options
+   /* some hardcoded default options. */
 
    Add_Option(core);
 
@@ -408,26 +413,33 @@ static void Set_Default_Option(void)
    Add_Option("-joystick");
    Add_Option("-samplerate");
    Add_Option("48000");
+
    if(cheats_enable)
       Add_Option("-cheat");
    else
       Add_Option("-nocheat");
+
    if(mouse_enable)
       Add_Option("-mouse");
    else
       Add_Option("-nomouse");
+
    if(hide_gameinfo)
       Add_Option("-skip_gameinfo");
    else
       Add_Option("-noskip_gameinfo");
+
    if(write_config_enable)
       Add_Option("-writeconfig");
+
    if(read_config_enable)
       Add_Option("-readconfig");
    else
       Add_Option("-noreadconfig");
+
    if(auto_save_enable)
       Add_Option("-autosave");
+
    if(game_specific_saves_enable)
    {
       char option[50];
