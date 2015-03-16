@@ -26,10 +26,12 @@
 //============================================================
 //  GLOBAL IDENTIFIERS
 //============================================================
-/*
+
+#if 0
 extern const char *sdlfile_socket_identifier;
 extern const char *sdlfile_ptty_identifier;
-*/
+#endif
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -77,10 +79,9 @@ file_error error_to_file_error(UINT32 error)
       case ENFILE:
       case EMFILE:
          return FILERR_TOO_MANY_FILES;
-
-      default:
-         return FILERR_FAILURE;
    }
+
+   return FILERR_FAILURE;
 }
 
 
@@ -111,30 +112,32 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
       filerr = FILERR_OUT_OF_MEMORY;
       goto error;
    }
-   /*
-      if (sdl_check_socket_path(path))
-      {
+
+#if 0
+   if (sdl_check_socket_path(path))
+   {
       (*file)->type = SDLFILE_SOCKET;
       filerr = sdl_open_socket(path, openflags, file, filesize);
       goto error;
-      }
+   }
 
-      if (strlen(sdlfile_ptty_identifier) > 0 && strncmp(path, sdlfile_ptty_identifier, strlen(sdlfile_ptty_identifier)) == 0)
-      {
+   if (strlen(sdlfile_ptty_identifier) > 0 && strncmp(path, sdlfile_ptty_identifier, strlen(sdlfile_ptty_identifier)) == 0)
+   {
       (*file)->type = SDLFILE_PTTY;
       filerr = sdl_open_ptty(path, openflags, file, filesize);
       goto error;
-      }
-      */
+   }
+#endif
+
    (*file)->type = SDLFILE_FILE;
 
-   // convert the path into something compatible
+   /* convert the path into something compatible */
    dst = (*file)->filename;
    for (src = path; *src != 0; src++)
       *dst++ = (*src == INVPATHSEPCH) ? PATHSEPCH : *src;
    *dst++ = 0;
 
-   // select the file open modes
+   /* select the file open modes */
    if (openflags & OPEN_FLAG_WRITE)
    {
       access = (openflags & OPEN_FLAG_READ) ? O_RDWR : O_WRONLY;
@@ -153,7 +156,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
    tmpstr = (char *) osd_malloc_array(strlen((*file)->filename)+1);
    strcpy(tmpstr, (*file)->filename);
 
-   // does path start with an environment variable?
+   /* does path start with an environment variable? */
    if (tmpstr[0] == '$')
    {
       char *envval;
@@ -170,7 +173,8 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
       envstr[i] = '\0';
 
       envval = (char*)osd_getenv(&envstr[1]);
-      if (envval != NULL)
+
+      if (envval)
       {
          j = strlen(envval) + strlen(tmpstr) + 1;
          osd_free(tmpstr);
@@ -204,7 +208,8 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
       if ((openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
       {
          char *pathsep = strrchr(tmpstr, PATHSEPCH);
-         if (pathsep != NULL)
+
+         if (pathsep)
          {
             int error;
 
@@ -289,18 +294,18 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 
          return FILERR_NONE;
          break;
-         /*
-            case SDLFILE_SOCKET:
-            return sdl_read_socket(file, buffer, offset, count, actual);
-            break;
+#if 0
+      case SDLFILE_SOCKET:
+         return sdl_read_socket(file, buffer, offset, count, actual);
+         break;
 
-            case SDLFILE_PTTY:
-            return sdl_read_ptty(file, buffer, offset, count, actual);
-            break;
-            */
-      default:
-         return FILERR_FAILURE;
+      case SDLFILE_PTTY:
+         return sdl_read_ptty(file, buffer, offset, count, actual);
+         break;
+#endif
    }
+
+   return FILERR_FAILURE;
 }
 
 
@@ -401,7 +406,7 @@ static UINT32 create_path_recursive(char *path)
 
 	/* if there's still a separator, 
     * and it's not the root, nuke it and recurse. */
-	if (sep != NULL && sep > path && sep[0] != ':' && sep[-1] != PATHSEPCH)
+	if (sep && sep > path && sep[0] != ':' && sep[-1] != PATHSEPCH)
 	{
 		*sep = 0;
 		filerr = create_path_recursive(path);

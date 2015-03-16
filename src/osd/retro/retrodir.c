@@ -85,10 +85,9 @@ static osd_dir_entry_type get_attributes_enttype(int attributes, char *path)
                return ENTTYPE_OTHER;
             return S_ISDIR(s.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
          }
-
-      default:
-         return ENTTYPE_OTHER;
    }
+
+   return ENTTYPE_OTHER;
 }
 #else
 static osd_dir_entry_type get_attributes_stat(const char *file)
@@ -100,8 +99,8 @@ static osd_dir_entry_type get_attributes_stat(const char *file)
 
 	if (S_ISDIR(st.st_mode))
 		return ENTTYPE_DIR;
-	else
-		return ENTTYPE_FILE;
+
+   return ENTTYPE_FILE;
 }
 #endif
 
@@ -190,7 +189,7 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
    char *temp;
    dir->data = sdl_readdir(dir->fd);
 
-   if (dir->data == NULL)
+   if (!dir->data)
       return NULL;
 
    dir->ent.name = dir->data->d_name;
@@ -212,7 +211,7 @@ const osd_directory_entry *osd_readdir(osd_directory *dir)
 
 void osd_closedir(osd_directory *dir)
 {
-   if (dir->fd != NULL)
+   if (dir->fd)
       closedir(dir->fd);
    osd_free(dir->path);
    osd_free(dir);

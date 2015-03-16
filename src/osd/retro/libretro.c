@@ -140,7 +140,7 @@ static void check_variables(void)
 {
    struct retro_variable var = {0};
 
-   var.key = option_cli;
+   var.key   = option_cli;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -151,7 +151,7 @@ static void check_variables(void)
          experimental_cmdline = false;
    }
 
-   var.key = option_mouse;
+   var.key   = option_mouse;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -162,7 +162,7 @@ static void check_variables(void)
          mouse_enable = true;
    }
 
-   var.key = option_throttle;
+   var.key   = option_throttle;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -173,7 +173,7 @@ static void check_variables(void)
          throttle_enable = true;
    }
 
-   var.key = option_nobuffer;
+   var.key   = option_nobuffer;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -184,7 +184,7 @@ static void check_variables(void)
          nobuffer_enable = true;
    }
 
-   var.key = option_cheats;
+   var.key   = option_cheats;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -195,7 +195,7 @@ static void check_variables(void)
          cheats_enable = true;
    }
 
-   var.key = option_nag;
+   var.key   = option_nag;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -206,7 +206,7 @@ static void check_variables(void)
          hide_nagscreen = true;
    }
 
-   var.key = option_info;
+   var.key   = option_info;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -217,7 +217,7 @@ static void check_variables(void)
          hide_gameinfo = true;
    }
 
-   var.key = option_warnings;
+   var.key   = option_warnings;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -228,7 +228,7 @@ static void check_variables(void)
          hide_warnings = true;
    }
 
-   var.key = option_renderer;
+   var.key   = option_renderer;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -243,7 +243,7 @@ static void check_variables(void)
       }
    }
 
-   var.key = option_osd;
+   var.key   = option_osd;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -265,7 +265,7 @@ static void check_variables(void)
          read_config_enable = true;
    }
 
-   var.key = option_auto_save;
+   var.key   = option_auto_save;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -276,7 +276,7 @@ static void check_variables(void)
          auto_save_enable = true;
    }
 
-   var.key = option_saves;
+   var.key   = option_saves;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -289,7 +289,7 @@ static void check_variables(void)
 
 #if !defined(WANT_MAME)
 
-   var.key = option_media;
+   var.key   = option_media;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -297,7 +297,7 @@ static void check_variables(void)
       sprintf(mediaType,"-%s",var.value);
    }
 
-   var.key = option_softlist;
+   var.key   = option_softlist;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -308,7 +308,7 @@ static void check_variables(void)
          softlist_enable = false;
    }
 
-   var.key = option_softlist_media;
+   var.key   = option_softlist_media;
    var.value = NULL;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
@@ -354,33 +354,33 @@ void retro_get_system_info(struct retro_system_info *info)
    memset(info, 0, sizeof(*info));
 
 #if defined(WANT_MAME)
-   info->library_name = "MAME 2015";
+   info->library_name     = "MAME 2015";
 #elif defined(WANT_MESS)
-   info->library_name = "MESS 2015";
+   info->library_name     = "MESS 2015";
 #elif defined(WANT_UME)
-   info->library_name = "UME 2015";
+   info->library_name     = "UME 2015";
 #else
-   info->library_name = "N/D";
+   info->library_name     = "N/D";
 #endif
 
-   info->library_version = "Git";
+   info->library_version  = "Git";
    info->valid_extensions = "zip|chd|7z";
-   info->need_fullpath = true;
-   info->block_extract = true;
+   info->need_fullpath    = true;
+   info->block_extract    = true;
 }
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    check_variables();
 
-   info->geometry.base_width = rtwi;
+   info->geometry.base_width  = rtwi;
    info->geometry.base_height = rthe;
 
    if (log_cb)
       log_cb(RETRO_LOG_INFO, "AV_INFO: width=%d height=%d\n",info->geometry.base_width,info->geometry.base_height);
 
-   info->geometry.max_width = 1600;
-   info->geometry.max_height = 1200;
+   info->geometry.max_width   = 1600;
+   info->geometry.max_height  = 1200;
 
    if (log_cb)
       log_cb(RETRO_LOG_INFO, "AV_INFO: max_width=%d max_height=%d\n",info->geometry.max_width,info->geometry.max_height);
@@ -391,25 +391,25 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
       log_cb(RETRO_LOG_INFO, "AV_INFO: aspect_ratio=%f\n",info->geometry.aspect_ratio);
 
    info->timing.fps = rtfps;
-   info->timing.sample_rate = 48000.0;
+   info->timing.sample_rate    = 48000.0;
 
    if (log_cb)
       log_cb(RETRO_LOG_INFO, "AV_INFO: fps=%f sample_rate=%f\n",info->timing.fps,info->timing.sample_rate);
 
 }
 
-static void retro_wrap_emulator()
+static void retro_wrap_emulator(void)
 {
    mmain(1,RPATH);
 
-   pauseg=-1;
+   pauseg = -1;
 
    environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0);
 
-   // Were done here
+   /* Were done here. */
    co_switch(mainThread);
 
-   // Dead emulator, but libco says not to return
+   /* Dead emulator, but libco says not to return. */
    while(true)
    {
       if (log_cb)
@@ -456,13 +456,16 @@ void retro_init (void)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &save_dir) && save_dir)
    {
-      // If save directory is defined use it, otherwise use system directory
+      /* If save directory is defined use it, 
+       * otherwise use system directory. */
       retro_save_directory = *save_dir ? save_dir : retro_system_directory;
 
    }
    else
    {
-      // make retro_save_directory the same in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY is not implemented by the frontend
+      /* make retro_save_directory the same,
+       * in case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY 
+       * is not implemented by the frontend. */
       retro_save_directory=retro_system_directory;
    }
    if (log_cb)
@@ -480,9 +483,6 @@ void retro_init (void)
       mainThread = co_active();
       emuThread  = co_create(65536 * sizeof(void*), retro_wrap_emulator);
    }
-   //sprintf(retro_system_directory,"%s%c",retro_system_directory,slash);
-   //sprintf(retro_save_directory,"%s%c",retro_system_directory,slash);
-
 }
 
 void retro_deinit(void)
@@ -515,8 +515,8 @@ void retro_run (void)
       environ_cb(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &ninfo);
 
       if (log_cb)
-      log_cb(RETRO_LOG_INFO, "ChangeAV: w:%d h:%d ra:%f.\n",
-            ninfo.geometry.base_width, ninfo.geometry.base_height, ninfo.geometry.aspect_ratio);
+         log_cb(RETRO_LOG_INFO, "ChangeAV: w:%d h:%d ra:%f.\n",
+               ninfo.geometry.base_width, ninfo.geometry.base_height, ninfo.geometry.aspect_ratio);
 
       NEWGAME_FROM_OSD=0;
    }
@@ -569,14 +569,15 @@ bool retro_load_game(const struct retro_game_info *info)
     strcpy(RPATH,info->path);
 
     co_switch(emuThread);
-    return 1;
+
+    return true;
 }
 
 void retro_unload_game(void)
 {
    if (pauseg == 0)
    {
-      pauseg=-1;
+      pauseg = -1;
       co_switch(emuThread);
    }
 }
