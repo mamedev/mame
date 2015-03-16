@@ -1442,6 +1442,13 @@ static int execute_game_cmd(char* path)
 #ifdef __cplusplus
 extern "C"
 #endif
+
+#if 0
+int main(int argc, char **argv)
+{
+}
+#endif
+
 int mmain(int argc, const char *argv)
 {
    unsigned i;
