@@ -45,7 +45,6 @@ ifeq ($(TARGET),)
 	TARGET = mame
 endif
 
-TARGET_NAME := $(TARGET)
 EXE =
 LIBS =
 
@@ -101,7 +100,7 @@ VRENDER ?= soft
 
 # Unix
 ifeq ($(platform), unix)
-	TARGETLIB := $(TARGET_NAME)_libretro.so
+	TARGETLIB := $(TARGET)_libretro.so
 	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
@@ -138,7 +137,7 @@ ifeq ($(platform), unix)
 # Android
 else ifeq ($(platform), android)
 	armplatform := 1
-	TARGETLIB := $(TARGET_NAME)_libretro.so
+	TARGETLIB := $(TARGET)_libretro.so
 	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
@@ -162,7 +161,7 @@ else ifeq ($(platform), android)
 
 # OS X
 else ifeq ($(platform), osx)
-	TARGETLIB := $(TARGET_NAME)_libretro.dylib
+	TARGETLIB := $(TARGET)_libretro.dylib
 	TARGETOS = macosx
 	fpic := -fPIC -mmacosx-version-min=10.7
 	LIBCXX := libstdc++
@@ -199,7 +198,7 @@ else ifeq ($(platform), osx)
 else ifeq ($(platform), ios)
 	armplatform := 1
 	FORCE_DRC_C_BACKEND = 1
-	TARGETLIB := $(TARGET_NAME)_libretro_ios.dylib
+	TARGETLIB := $(TARGET)_libretro_ios.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
 	TARGETOS = macosx
@@ -220,7 +219,7 @@ else ifeq ($(platform), ios)
 # QNX
 else ifeq ($(platform), qnx)
 	armplatform := 1
-	TARGETLIB := $(TARGET_NAME)_libretro_qnx.so
+	TARGETLIB := $(TARGET)_libretro_qnx.so
 	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
@@ -232,7 +231,7 @@ else ifeq ($(platform), qnx)
 
 # PS3
 else ifeq ($(platform), ps3)
-	TARGETLIB := $(TARGET_NAME)_libretro_ps3.a
+	TARGETLIB := $(TARGET)_libretro_ps3.a
 	CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
 	AR = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-ar.exe
 	CFLAGS += -DBLARGG_BIG_ENDIAN=1 -D__ppc__
@@ -242,7 +241,7 @@ else ifeq ($(platform), ps3)
 
 # sncps3
 else ifeq ($(platform), sncps3)
-	TARGETLIB := $(TARGET_NAME)_libretro_ps3.a
+	TARGETLIB := $(TARGET)_libretro_ps3.a
 	CC = $(CELL_SDK)/host-win32/sn/bin/ps3ppusnc.exe
 	AR = $(CELL_SDK)/host-win32/sn/bin/ps3snarl.exe
 	CFLAGS += -DBLARGG_BIG_ENDIAN=1 -D__ppc__
@@ -252,7 +251,7 @@ else ifeq ($(platform), sncps3)
 
 # Lightweight PS3 Homebrew SDK
 else ifeq ($(platform), psl1ght)
-	TARGETLIB := $(TARGET_NAME)_libretro_psl1ght.a
+	TARGETLIB := $(TARGET)_libretro_psl1ght.a
 	CC = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
 	AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
 	CFLAGS += -DBLARGG_BIG_ENDIAN=1 -D__ppc__
@@ -262,7 +261,7 @@ else ifeq ($(platform), psl1ght)
 
 # PSP
 else ifeq ($(platform), psp1)
-	TARGETLIB := $(TARGET_NAME)_libretro_psp1.a
+	TARGETLIB := $(TARGET)_libretro_psp1.a
 	CC = psp-g++$(EXE_EXT)
 	AR = psp-ar$(EXE_EXT)
 	CFLAGS += -DPSP -G0
@@ -271,7 +270,7 @@ else ifeq ($(platform), psp1)
 
 # Xbox 360
 else ifeq ($(platform), xenon)
-	TARGETLIB := $(TARGET_NAME)_libretro_xenon360.a
+	TARGETLIB := $(TARGET)_libretro_xenon360.a
 	CC = xenon-g++$(EXE_EXT)
 	AR = xenon-ar$(EXE_EXT)
 	CFLAGS += -D__LIBXENON__ -m32 -D__ppc__
@@ -281,7 +280,7 @@ else ifeq ($(platform), xenon)
 
 # Nintendo Game Cube
 else ifeq ($(platform), ngc)
-	TARGETLIB := $(TARGET_NAME)_libretro_ngc.a
+	TARGETLIB := $(TARGET)_libretro_ngc.a
 	CC = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	CFLAGS += -DGEKKO -DHW_DOL -mrvl -mcpu=750 -meabi -mhard-float -DBLARGG_BIG_ENDIAN=1 -D__ppc__
@@ -291,7 +290,7 @@ else ifeq ($(platform), ngc)
 
 # Nintendo Wii
 else ifeq ($(platform), wii)
-	TARGETLIB := $(TARGET_NAME)_libretro_wii.a
+	TARGETLIB := $(TARGET)_libretro_wii.a
 	CC = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DBLARGG_BIG_ENDIAN=1 -D__ppc__
@@ -302,7 +301,7 @@ else ifeq ($(platform), wii)
 # ARM
 else ifneq (,$(findstring armv,$(platform)))
 	armplatform := 1
-	TARGETLIB := $(TARGET_NAME)_libretro.so
+	TARGETLIB := $(TARGET)_libretro.so
 	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
@@ -342,7 +341,7 @@ else ifneq (,$(findstring armv,$(platform)))
 
 # Windows cross compiler
 else ifeq ($(platform), wincross)
-	TARGETLIB := $(TARGET_NAME)_libretro.dll
+	TARGETLIB := $(TARGET)_libretro.dll
 	TARGETOS = win32
 	CC ?= g++
 	LD ?= g++
@@ -362,7 +361,7 @@ else ifeq ($(platform), wincross)
 
 # Windows
 else
-	TARGETLIB := $(TARGET_NAME)_libretro.dll
+	TARGETLIB := $(TARGET)_libretro.dll
 	TARGETOS = win32
 	CC = g++
 	LD = g++
@@ -651,7 +650,6 @@ OBJDIRS = $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
 
 LIBEMU = $(OBJ)/libemu.a
 LIBOPTIONAL = $(OBJ)/$(TARGET)/$(SUBTARGET)/liboptional.a
-LIBOPTIONAL2 = $(OBJ)/$(TARGET)/$(SUBTARGET)/liboptional2.a
 LIBDASM = $(OBJ)/$(TARGET)/$(SUBTARGET)/libdasm.a
 LIBBUS = $(OBJ)/$(TARGET)/$(SUBTARGET)/libbus.a
 LIBUTIL = $(OBJ)/libutil.a
@@ -866,7 +864,7 @@ endif
 # executable targets and dependencies
 #-------------------------------------------------
 
-$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBOPTIONAL2) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
+$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $(TARGETLIB)
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
