@@ -303,25 +303,40 @@ public:
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
 		m_cart(*this, "cartslot"),
-		m_button_matrix(*this, "IN")
+		m_button_matrix(*this, "IN"),
+		m_display_wait(33),
+		m_display_maxy(1),
+		m_display_maxx(0)
 	{ }
 
+	// devices
 	required_device<tms0270_cpu_device> m_maincpu;
 	required_device<tms5100_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<9> m_button_matrix;
 
-	UINT16 m_r;
-	UINT16 m_o;
+	// misc common
+	UINT16 m_r;                         // MCU R-pins data
+	UINT16 m_o;                         // MCU O-pins data
 	int m_power_on;
+	int m_filament_on;
 
-	UINT16 m_display_state[0x10];
-	UINT16 m_display_cache[0x10];
-	UINT8 m_display_decay[0x100];
-	void display_update();
+	// display common
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
+	
+	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_update();
+	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 
+	// cartridge
 	UINT32 m_cart_max_size;
 	UINT8* m_cart_base;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
@@ -386,47 +401,39 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 ***************************************************************************/
 
-// The device strobes the filament-enable very fast, it is unnoticeable to the user.
+// The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
-
-// decay time, in steps of 1ms
-#define DISPLAY_DECAY_TIME 40
 
 void tispeak_state::display_update()
 {
-	int filament_on = (m_r & 0x8000) ? 1 : 0;
-	UINT16 active_state[0x10];
+	UINT32 active_state[0x20];
 
-	for (int i = 0; i < 0x10; i++)
+	for (int y = 0; y < m_display_maxy; y++)
 	{
-		// update current state
-		m_display_state[i] = (m_r >> i & 1) ? m_o : 0;
+		active_state[y] = 0;
 
-		active_state[i] = 0;
-
-		for (int j = 0; j < 0x10; j++)
+		for (int x = 0; x < m_display_maxx; x++)
 		{
-			int di = j << 4 | i;
-
 			// turn on powered segments
-			if (m_power_on && filament_on && m_display_state[i] >> j & 1)
-				m_display_decay[di] = DISPLAY_DECAY_TIME;
+			if (m_power_on && m_filament_on && m_display_state[y] >> x & 1)
+				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[di] != 0) ? 1 : 0;
-			active_state[i] |= (ds << j);
+			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			active_state[y] |= (ds << x);
 		}
 	}
 
 	// on difference, send to output
-	for (int i = 0; i < 0x10; i++)
-		if (m_display_cache[i] != active_state[i])
+	for (int y = 0; y < m_display_maxy; y++)
+		if (m_display_cache[y] != active_state[y])
 		{
-			output_set_digit_value(i, active_state[i] & 0x3fff);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
-			// lampxyy where x=digit, y=segment
-			for (int j = 0; j < 0x10; j++)
-				output_set_lamp_value(i*100 + j, active_state[i] >> j & 1);
+			const int mul = (m_display_maxx <= 10) ? 10 : 100;
+			for (int x = 0; x < m_display_maxx; x++)
+				output_set_lamp_value(y * mul + x, active_state[y] >> x & 1);
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
@@ -435,10 +442,27 @@ void tispeak_state::display_update()
 TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
-	for (int i = 0; i < 0x100; i++)
-		if (!(m_display_state[i & 0xf] >> (i>>4) & 1) && m_display_decay[i])
-			m_display_decay[i]--;
+	for (int y = 0; y < m_display_maxy; y++)
+		for (int x = 0; x < m_display_maxx; x++)
+			if (m_display_decay[y][x] != 0)
+				m_display_decay[y][x]--;
+	
+	display_update();
+}
 
+void tispeak_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
+
+	// update current state
+	UINT32 colmask = (1 << maxx) - 1;
+	for (int y = 0; y < maxy; y++)
+	{
+		m_display_segmask[y] &= segmask;
+		m_display_state[y] = (sety >> y & 1) ? (setx & colmask) : 0;
+	}
+	
 	display_update();
 }
 
@@ -467,15 +491,17 @@ READ8_MEMBER(tispeak_state::snspell_read_k)
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
-	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
-	// R15: filament on (handled in leds_update)
+	// R15: filament on
+	m_filament_on = data & 0x8000;
+	
 	// R13: power-off request, on falling edge
 	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
 		power_off();
 
+	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
 	// other bits: MCU internal use
-	m_r = data;
-	display_update();
+	m_r = data & 0x21ff;
+	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
@@ -483,8 +509,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-
-	display_update();
+	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
 }
 
 
@@ -505,8 +530,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[AP],E,G,A (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
-
-	display_update();
+	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
 }
 
 
@@ -515,8 +539,9 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 {
 	// same as default, except R13 is used for an extra digit
-	m_r = data;
-	display_update();
+	m_filament_on = data & 0x8000;
+	m_r = data & 0x21ff;
+	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
 }
 
 
@@ -708,19 +733,27 @@ void tispeak_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
+	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 
 	m_r = 0;
 	m_o = 0;
 	m_power_on = 0;
+	m_filament_on = 0;
 
 	// register for savestates
+	save_item(NAME(m_display_maxy));
+	save_item(NAME(m_display_maxx));
+	save_item(NAME(m_display_wait));
+
 	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_cache));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 	save_item(NAME(m_power_on));
+	save_item(NAME(m_filament_on));
 
 	// init cartridge
 	if (m_cart != NULL && m_cart->exists())
@@ -899,24 +932,6 @@ ROM_END
 
 ROM_START( snmath )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	// typed in from patent 4946391, verified with source code
-	// BTANB note: Mix It does not work at all, this is an original bug in the prototype. There are probably other minor bugs too.
-	ROM_LOAD( "us4946391_t2074", 0x0000, 0x1000, CRC(011f0c2d) SHA1(d2e14d72e03ca864abd51da78ffb71a9da82f624) )
-
-	ROM_REGION( 1246, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
-	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as cd2704
-	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // "
-
-	ROM_REGION( 0x8000, "tms6100", 0 )
-	ROM_LOAD( "cd2392.vsm", 0x0000, 0x4000, CRC(4ed2e920) SHA1(8896f29e25126c1e4d9a47c9a325b35dddecc61f) )
-	ROM_LOAD( "cd2393.vsm", 0x4000, 0x4000, CRC(571d5b5a) SHA1(83284755d9b77267d320b5b87fdc39f352433715) )
-ROM_END
-
-ROM_START( snmatha )
-	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "cd2708n2l", 0x0000, 0x1000, CRC(35937360) SHA1(69c362c75bb459056c09c7fab37c91040485474b) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
@@ -932,6 +947,24 @@ ROM_START( snmatha )
 	ROM_RELOAD(             0x5000, 0x1000 )
 	ROM_RELOAD(             0x6000, 0x1000 )
 	ROM_RELOAD(             0x7000, 0x1000 )
+ROM_END
+
+ROM_START( snmathp )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	// typed in from patent 4946391, verified with source code
+	// BTANB note: Mix It does not work at all, this is an original bug in the prototype. There are probably other minor bugs too.
+	ROM_LOAD( "us4946391_t2074", 0x0000, 0x1000, CRC(011f0c2d) SHA1(d2e14d72e03ca864abd51da78ffb71a9da82f624) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as cd2704
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // "
+
+	ROM_REGION( 0x8000, "tms6100", 0 )
+	ROM_LOAD( "cd2392.vsm", 0x0000, 0x4000, CRC(4ed2e920) SHA1(8896f29e25126c1e4d9a47c9a325b35dddecc61f) )
+	ROM_LOAD( "cd2393.vsm", 0x4000, 0x4000, CRC(571d5b5a) SHA1(83284755d9b77267d320b5b87fdc39f352433715) )
 ROM_END
 
 
@@ -951,14 +984,14 @@ ROM_END
 
 
 
-COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
-COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
+COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
 
-COMP( 1980, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US prototype)", GAME_IMPERFECT_SOUND ) // also US set 1
-COMP( 1986, snmatha,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US set 2)", GAME_IMPERFECT_SOUND )
+COMP( 1986, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+COMP( 1980, snmathp,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
-COMP( 1979, lantutor,   0,       0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+COMP( 1979, lantutor,   0,       0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

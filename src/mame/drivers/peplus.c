@@ -5477,7 +5477,7 @@ ROM_START( pex0045p ) /* Superboard : Standard Draw Poker (10's or Better) (X000
 PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
   P8A      1     1    3    4    5   8  25  50 300    800
-  % Range: 84.6-86.6%  Optimum: 98.6%  Hit Frequency: 49.2%
+  % Range: 84.6-86.6%  Optimum: 88.6%  Hit Frequency: 49.2%
      Programs Available: PP0045, X000045P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7664,7 +7664,7 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  SF  RF  RF      (Bonus)
   % Range: 92.6-94.6%  Optimum: 98.6%  Hit Frequency: 45.0%
      Programs Available: X002111P
 
-NOTE: Royal Flush bonus is 800 times max bet, Sequential Royal Flush is 10000 times max bet
+NOTE: Royal Flush bonus is 800 x MAX bet, Sequential Royal Flush is 10000 x MAX bet
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /* 09/05/95   @ IGT  L95-2452 */
@@ -9253,8 +9253,9 @@ Jacks or Better      P11A      96.10%
 Joker Poker          P17A      95.50%
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00025.u67",   0x00000, 0x10000, CRC(5d39ff71) SHA1(0a5f67e61ae0e8a08cc551ab4271ffc97c343ae3) )
-
+	ROM_LOAD( "xmp00025.u67",   0x00000, 0x10000, CRC(5d39ff71) SHA1(0a5f67e61ae0e8a08cc551ab4271ffc97c343ae3) ) /* International multi currency version - Auto Hold always on */
+	/* Also compatible with XMP00002, XMP00003, XMP00004, XMP00006 and XMP00024 programs */
+	
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "xm00013p.u66",   0x00000, 0x10000, CRC(4fde73f9) SHA1(f8eb6fb0585e8df9a7eb2ddc65bb20b120753d7a) )
 

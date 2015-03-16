@@ -189,7 +189,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, NETDEV_NONE);
 #endif
 
-#ifndef OSD_RETRO
+#ifndef NO_USE_MIDI
 	REGISTER_MODULE(m_mod_man, MIDI_PM);
 #endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);

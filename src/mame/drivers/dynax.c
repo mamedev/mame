@@ -24,6 +24,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 90 Mj Campus Hunting       D3312108L1-1 D23SUB1      Z80   AY8912        YM2413 M5205       RAM
 90 Hana Jingi              no number    D3312108L1-2 Z80   AY8912        YM2413 M5205       RAM
 90 7jigen no Youseitachi   D3707198L1   D23SUB1      Z80   AY8912        YM2413 M5205       RAM
+89 Mj Electromagnetic Base D3803248L1                Z80   AY8912        YM2413 M5205       RAM
 90 Mj Electron Base                                  Z80   AY8912        YM2413             RAM
 90 Mj X-Tal/Diamond 7      D4005208L1-1 D23SUB       Z80   AY8912        YM2413 M5205       RAM
 90 Mj Neruton Haikujiradan D4005208L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205       RAM
@@ -33,6 +34,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
+91 Mj Ougon No Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
 94 Mj Reach (bootleg)      bootleg                   TLCS  AY8910        YM2413       M6242 PROM  Battery
@@ -555,7 +557,7 @@ static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW1
+	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW0
 	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
 	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
@@ -640,7 +642,7 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE("ym2413", ym2413_device, write)        //
 
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW1
+	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW0
 	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
 	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 
@@ -1044,7 +1046,7 @@ READ8_MEMBER(dynax_state::mjelctrn_keyboard_1_r)
 READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
 {
 	int dsw = (m_keyb & 0xc0) >> 6;
-	static const char *const dswnames[] = { "DSW0", "DSW1", "DSW3", "DSW4" };
+	static const char *const dswnames[] = { "DSW0", "DSW1", "DSW2", "DSW3" };
 
 	return ioport(dswnames[dsw])->read();
 }
@@ -1090,6 +1092,39 @@ static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0xe5, 0xe5 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
 	AM_RANGE( 0xe6, 0xe6 ) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
 	AM_RANGE( 0xe7, 0xe7 ) AM_WRITE(hnoridur_palbank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mjembase_io_map, AS_IO, 8, dynax_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE("ym2413", ym2413_device, write)       //
+	AM_RANGE( 0x06, 0x06 ) AM_DEVREAD("aysnd", ay8910_device, data_r)        // AY8910, dsw0
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)       //
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
+	AM_RANGE( 0x11, 0x12 ) AM_WRITE(mjelctrn_blitter_ack_w) //?
+	AM_RANGE( 0x1c, 0x1c ) AM_READ_PORT("DSW1")
+	AM_RANGE( 0x1e, 0x1e ) AM_READ_PORT("DSW2")
+	AM_RANGE( 0x20, 0x20 ) AM_WRITE(hanamai_keyboard_w)         // keyboard row select
+	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("COINS")                // Coins
+	AM_RANGE( 0x22, 0x22 ) AM_READ(mjelctrn_keyboard_1_r)       // P2
+	AM_RANGE( 0x23, 0x23 ) AM_READ(hanamai_keyboard_0_r)        // P1
+	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT("DSW3")
+//  AM_RANGE( 0x40, 0x40 ) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x41, 0x41 ) AM_WRITENOP   // CRT Controller
+	AM_RANGE( 0x61, 0x67 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
+	AM_RANGE( 0x80, 0x80 ) AM_WRITE(dynax_flipscreen_w)         // Flip Screen
+	AM_RANGE( 0x81, 0x81 ) AM_WRITE(hanamai_layer_half_w)       // half of the interleaved layer to write to
+	AM_RANGE( 0x82, 0x82 ) AM_WRITE(hnoridur_layer_half2_w)     //
+	AM_RANGE( 0x83, 0x83 ) AM_WRITE(dynax_coincounter_0_w)      // Coin Counters
+	AM_RANGE( 0x84, 0x84 ) AM_WRITE(dynax_coincounter_1_w)      //
+	AM_RANGE( 0xa0, 0xa0 ) AM_WRITE(hnoridur_rombank_w)         // BANK ROM Select
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(dynax_blit_pen_w)           // Destination Pen
+	AM_RANGE( 0xc1, 0xc1 ) AM_WRITE(mjembase_blit_dest_w)       // Destination Layer
+	AM_RANGE( 0xc2, 0xc2 ) AM_WRITE(dynax_blit_palette01_w)     // Layers Palettes
+	AM_RANGE( 0xc3, 0xc3 ) AM_WRITE(mjembase_blit_palette23_w)  //
+	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE(mjembase_priority_w)        // layer priority and enable
+	AM_RANGE( 0xc5, 0xc5 ) AM_WRITE(dynax_blit_backpen_w)       // Background Color
+	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(yarunara_blit_romregion_w)  // Blitter ROM bank
+	AM_RANGE( 0xc7, 0xc7 ) AM_WRITE(hnoridur_palbank_w)
 ADDRESS_MAP_END
 
 
@@ -3026,9 +3061,9 @@ static INPUT_PORTS_START( jantouki )
 	PORT_DIPSETTING(    0x02, "11:00" )
 	PORT_DIPSETTING(    0x01, "11:30" )
 	PORT_DIPSETTING(    0x00, "12:00" )
-	PORT_DIPNAME( 0x08, 0x08, "Moles On Gal's Face" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Nudity" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )	// Moles On Gal's Face
 	PORT_DIPNAME( 0x10, 0x10, "Buy Screen Bonus Points" ) /* Sets your points to 100 every time you arrive at the screen for buying special items. */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3094,6 +3129,131 @@ static INPUT_PORTS_START( jantouki )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( mjembase )
+	PORT_START("DSW2")  /* DIP1, 7c20 (port $1e) */
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x01, "53" )
+	PORT_DIPSETTING(    0x02, "56" )
+	PORT_DIPSETTING(    0x03, "59" )
+	PORT_DIPSETTING(    0x04, "62" )
+	PORT_DIPSETTING(    0x05, "65" )
+	PORT_DIPSETTING(    0x06, "68" )
+	PORT_DIPSETTING(    0x07, "71" )
+	PORT_DIPSETTING(    0x08, "75" )
+	PORT_DIPSETTING(    0x09, "78" )
+	PORT_DIPSETTING(    0x0a, "81" )
+	PORT_DIPSETTING(    0x0b, "84" )
+	PORT_DIPSETTING(    0x0c, "87" )
+	PORT_DIPSETTING(    0x0d, "90" )
+	PORT_DIPSETTING(    0x0e, "93" )
+	PORT_DIPSETTING(    0x0f, "96" )
+	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")  /* DIP2, 7c21 (port $1c) */
+	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
+	PORT_DIPSETTING(    0x03, "0" ) // 20
+	PORT_DIPSETTING(    0x00, "1" ) // 32
+	PORT_DIPSETTING(    0x01, "2" ) // 64
+	PORT_DIPSETTING(    0x02, "3" ) // c8
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x30, 0x30, "Min Pay?" )
+	PORT_DIPSETTING(    0x30, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x40, 0x40, "Allow Coin Out" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Win A Prize?" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW0")  /* DIP3, 7c22 (port $06, AY) */ /* note that these are in reverse order wrt the others */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DonDen Key" )
+	PORT_DIPSETTING(    0x02, "A" )
+	PORT_DIPSETTING(    0x00, "Flip Flop" )
+	PORT_DIPNAME( 0x04, 0x04, "Draw New Tile" )
+	PORT_DIPSETTING(    0x00, "Automatic" )
+	PORT_DIPSETTING(    0x04, "Manual" )
+	PORT_DIPNAME( 0x08, 0x08, "Win Rate?" )
+	PORT_DIPSETTING(    0x08, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	PORT_DIPNAME( 0x10, 0x10, "YAKU times" )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0xe0, 0xe0, "YAKUMAN Bonus" )
+	PORT_DIPSETTING(    0xe0, "Cut" )
+	PORT_DIPSETTING(    0x60, "1 T" )
+	PORT_DIPSETTING(    0xa0, "300" )
+	PORT_DIPSETTING(    0x20, "500" )
+	PORT_DIPSETTING(    0xc0, "700" )
+	PORT_DIPSETTING(    0x40, "1000" )
+//  PORT_DIPSETTING(    0x80, "1000" )
+//  PORT_DIPSETTING(    0x00, "1000" )
+
+	PORT_START("DSW3")  /* DIP4, 7c23 (port $24) */
+	PORT_DIPNAME( 0x01, 0x01, "Last Chance" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Pay Rate?" )
+	PORT_DIPSETTING(    0x02, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	PORT_DIPNAME( 0x04, 0x04, "Choose Bonus" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "In-Game Bet?" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "In-Game Music" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Select Girl" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Nudity" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )	// Moles On Gal's Face
+
+	PORT_START("FAKE")  /* IN10 - Fake DSW */
+	PORT_DIPNAME( 0xff, 0xff, "Allow Bets" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0xff, DEF_STR( On ) )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_4) // Pay
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )   // 18B
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )             // Test
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )   // Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    )   // Note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )   // Coin
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )   // Service
+
+	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
 
 
@@ -3163,7 +3323,7 @@ static INPUT_PORTS_START( mjelct3 )
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
-	PORT_START("DSW3")  /* 7c22 (select = 80) */
+	PORT_START("DSW2")  /* 7c22 (select = 80) */
 	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x07, "Cut" )
 	PORT_DIPSETTING(    0x06, "1 T" )
@@ -3189,7 +3349,7 @@ static INPUT_PORTS_START( mjelct3 )
 	PORT_DIPSETTING(    0x80, "None (Part 2)" )
 	PORT_DIPSETTING(    0x00, "Super Express (Part 3)" )
 
-	PORT_START("DSW4")  /* 7c23 (select = c0) */
+	PORT_START("DSW3")  /* 7c23 (select = c0) */
 	PORT_DIPNAME( 0x01, 0x01, "Last Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -3211,9 +3371,9 @@ static INPUT_PORTS_START( mjelct3 )
 	PORT_DIPNAME( 0x40, 0x40, "Select Girl" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Moles On Gal's Face" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Nudity" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )	// Moles On Gal's Face
 
 	PORT_START("FAKE")  /* IN10 - Fake DSW */
 	PORT_DIPNAME( 0xff, 0xff, "Allow Bets" )
@@ -3288,7 +3448,7 @@ static INPUT_PORTS_START( mjelctrn )
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
-	PORT_START("DSW3") /* 7c22 (select = 80) */
+	PORT_START("DSW2") /* 7c22 (select = 80) */
 	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x07, "Cut" )
 	PORT_DIPSETTING(    0x06, "1 T" )
@@ -3314,7 +3474,7 @@ static INPUT_PORTS_START( mjelctrn )
 	PORT_DIPSETTING(    0x80, "None (Part 2)" )
 	PORT_DIPSETTING(    0x00, "???? (Part 4)" )
 
-	PORT_START("DSW4") // 7c23 (select = c0)
+	PORT_START("DSW3") // 7c23 (select = c0)
 	PORT_DIPNAME( 0x01, 0x01, "Last Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -3413,7 +3573,7 @@ static INPUT_PORTS_START( majxtal7 )
 
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 
-	PORT_START("DSW3") /* select = 80 */
+	PORT_START("DSW2") /* select = 80 */
 	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x07, "Cut" )
 	PORT_DIPSETTING(    0x06, "1 T" )
@@ -3439,7 +3599,7 @@ static INPUT_PORTS_START( majxtal7 )
 	PORT_DIPSETTING(    0x80, "X-Tal" )
 	PORT_DIPSETTING(    0x00, "Diamond" )
 
-	PORT_START("DSW4") /* select = c0 */
+	PORT_START("DSW3") /* select = c0 */
 	PORT_DIPNAME( 0x01, 0x01, "Last Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -3533,9 +3693,9 @@ static INPUT_PORTS_START( neruton )
 
 	PORT_INCLUDE( MAHJONG_KEYS )
 
-	/* 2008-06 FP: the following are needed to make happy the read handlers shared with mjelctrn*/
+	/* 2008-06 FP: the following are needed to make happy the read handlers shared with mjelctrn */
+	PORT_START("DSW2")
 	PORT_START("DSW3")
-	PORT_START("DSW4")
 	PORT_START("FAKE")
 INPUT_PORTS_END
 
@@ -4482,6 +4642,14 @@ static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjelctrn)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mjembase, hnoridur )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
+	MCFG_CPU_IO_MAP(mjembase_io_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  mjelctrn_vblank_interrupt)   /* IM 2 needs a vector on the data bus */
+
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjembase)
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                     Neruton
@@ -5821,6 +5989,37 @@ ROM_START( mjelctrb )
 	ROM_LOAD( "eb-02.rom", 0x00000, 0x80000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
+/***************************************************************************
+
+Mahjong Electromagnetic Base
+DYNAX D3803248L1
+
+AY-3-8912?, MSM5205?
+HD46505SP?, Dynax blitter? (rest of the chips are scratched)
+4 x DSW8, 28-way connector
+
+***************************************************************************/
+
+ROM_START( mjembase )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "dynax_3815.20a", 0x00000, 0x20000, CRC(35b35b48) SHA1(9966804337a7c6de160a09087e1fea3b0a515fe4) )
+	ROM_RELOAD(                 0x10000, 0x20000 )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
+	ROM_LOAD( "dynax_3803.7c",  0x000000, 0x20000, CRC(5480c4f8) SHA1(8f533683eb08281f50247c17e7ccfcfd2d8f1937) )
+	ROM_LOAD( "dynax_3802.6c",  0x020000, 0x20000, CRC(ba27976a) SHA1(cb9ce82054b7568507807a891ada3d39adf094d2) )
+	ROM_LOAD( "dynax_3801.5c",  0x040000, 0x20000, CRC(84a013ac) SHA1(3d5c196f7474bb13d9b724befec3de7f247953e3) )
+	ROM_LOAD( "dynax_3804.1a",  0x060000, 0x20000, CRC(8c055525) SHA1(8e31bef48a8b89e79ecb8b71855bc20036667561) )
+	ROM_LOAD( "dynax_3805.3a",  0x080000, 0x20000, CRC(a27b2063) SHA1(9da26086832f047c65ad88147e65d1f65e9b7677) )
+	ROM_LOAD( "dynax_3806.5a",  0x0a0000, 0x20000, CRC(42486764) SHA1(217ea04fad8853b03522474a70a322642a5301a5) )
+	ROM_LOAD( "dynax_3807.6a",  0x0c0000, 0x20000, CRC(c29abf8f) SHA1(79e05fc0decd450622189ce1c8681c4442c566b0) )
+	ROM_LOAD( "dynax_3808.7a",  0x0e0000, 0x20000, CRC(72efcd62) SHA1(9b84043fc9b2dcaf97a58aba0ba4ce27ee64381c) )
+
+	ROM_REGION( 0x040000, "gfx2", 0 )   // blitter data
+	ROM_LOAD( "dynax_3809.9a",  0x000000, 0x20000, CRC(7c239069) SHA1(71c8b437a555ab48ce600ff283d50e0a21e9f8eb) )
+	ROM_LOAD( "dynax_381a.10a", 0x020000, 0x20000, CRC(72c092c7) SHA1(3a4f1cd56c9544dcd4689e385c98407c45ac894c) )
+ROM_END
+
 
 /*
 
@@ -6340,7 +6539,7 @@ ROM_START( tenkai )
 	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
 	// does not exist _anywhere_ in this rom dump, and in this way some girls won't show correctly (such as the 3rd one)
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from tenkaid
+	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonpaib
 	ROM_LOAD( "taicom01.15b", 0x080000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
@@ -6533,96 +6732,12 @@ ROM_START( tenkaicb )
 	// it doesn't need the internal rom from tenkai
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from tenkaid
+	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, BAD_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // not dumped, rom taken from ougonpaib
 	ROM_LOAD( "rom.u12",    0x80000, 0x80000, BAD_DUMP CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
 	ROM_LOAD( "taicom02.11b", 0x00000, 0x80000, BAD_DUMP CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) ) // not dumped, rom taken from tenkai
 	ROM_LOAD( "rom.u13",      0x80000, 0x80000, BAD_DUMP CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) ) // either this was dumped half size, or the above rom was missing from the pcb
-ROM_END
-
-/***************************************************************************
-
-Mahjong Tenkaigen (? PCB is not working)
-
-PCB Layout
-----------
-
-|-------------------------------------------|
-|     4558  3.579545MHz             BATTERY |
-|uPC1241H  VOL  K-663A   DSW   DSW   6264   |
-|                        DSW   DSW  TYDG001 |
-|   DSW     NL-002    YM2149  PAL           |
-|1                                          |
-|8            6116                 TMP91C640|
-|W                                          |
-|A                         TYDG004  TYDG002 |
-|Y             PAL                          |
-|                                           |
-|                                           |
-|                          TYDG005  TYDG003 |
-|          PAL                              |
-|                      PAL                  |
-|1                PAL                       |
-|0                                          |
-|W  81461  81461  TK-101                    |
-|A  81461  81461                            |
-|Y  81461  81461  21.245MHz                 |
-|-------------------------------------------|
-
-romcmp tenkaid tenkaibb:
-
-tydg002.u8              lzc-01.u6    [1/2]      IDENTICAL
-tydg005.u19             lzc-01.u6    [2/2]      IDENTICAL
-
-tydg001.u11  [1/4]      tdh-12m.u11  [odd 2/2]  6.478882%
-tydg001.u11  [2/4]      lzc-03.u15   [odd]      31.292725%
-tydg001.u11  [3/4]      tdh-12m.u11  [even 2/2] 55.366516%
-tydg001.u11  [4/4]      lzc-03.u15   [even]     59.931946%
-
-tydg003.u6   [1/2]      lzc-02.u19   [3/4]      2.625275%
-tydg003.u6   [2/2]      lzc-02.u19   [2/4]      1.834488%
-
-tydg004.u21  [1/2]      lzc-02.u19   [1/4]      3.769302%
-tydg004.u21  [2/2]      lzc-02.u19   [4/4]      14.524460%
-
-romcmp tenkaid tenkai:
-
-tydg005.u19             taicom01.15b            IDENTICAL
-
-tydg001.u11  [1/4]      taicom00.2c  [1/4]      26.155090%
-tydg001.u11  [2/4]      taicom00.2c  [3/4]      22.038269%
-tydg001.u11  [3/4]      taicom00.2c  [2/4]      4.237366%
-tydg001.u11  [4/4]      taicom00.2c  [4/4]      59.855652%
-
-tydg002.u8   [4/4]      taicom03.13b [2/4]      4.472351%
-
-tydg003.u6   [1/4]      taicom02.11b [3/4]      2.860260%
-tydg003.u6   [2/4]      taicom03.13b [3/4]      6.129456%
-tydg003.u6   [3/4]      taicom02.11b [2/4]      2.205658%
-
-tydg004.u21  [1/4]      taicom02.11b [1/4]      5.610657%
-tydg004.u21  [2/4]      taicom03.13b [1/4]      1.743317%
-tydg004.u21  [3/4]      taicom02.11b [4/4]      2.343750%
-tydg004.u21  [4/4]      taicom03.13b [4/4]      24.230194%
-
-***************************************************************************/
-
-ROM_START( tenkaid )
-	ROM_REGION( 0x90000, "maincpu", 0 )
-	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
-	ROM_RELOAD(                   0x10000, 0x40000 )
-	ROM_RELOAD(                   0x50000, 0x40000 )
-	// tenkai internal rom is incompatible with the code of this set
-	ROM_LOAD( "tenkaid_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
-	ROM_LOAD( "tydg002.u8",  0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
-	ROM_LOAD( "tydg003.u6",  0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
-	ROM_LOAD( "tydg004.u21", 0x00000, 0x80000, CRC(b7d49d04) SHA1(756c35bbe207b5bfc6e05d6da99a7ad5a3453506) )
-	ROM_LOAD( "tydg005.u19", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
 ROM_END
 
 /***************************************************************************
@@ -6653,6 +6768,79 @@ ROM_START( tenkaie )
 	ROM_LOAD( "lzc-02.rom", 0x000000, 0x100000, CRC(90a19443) SHA1(8f593c00e39dd5acc76b058591019d117967a17b) )
 ROM_END
 
+/***************************************************************************
+
+Mahjong Ougon No Pai
+DYNAX D6209038L1-0
+
+AY-3-8910A, rest of the chips are scratched
+2 x DSW10, 2 x DSW8, 1 x DSW4, Battery
+
+***************************************************************************/
+
+ROM_START( ougonpai )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "dynax_6201b.2c", 0x00000, 0x40000, CRC(18ef8eda) SHA1(48a3e4566b0a86db907602fd235c01d96eddec23) )
+	ROM_RELOAD(                 0x10000, 0x40000 )
+	ROM_RELOAD(                 0x50000, 0x40000 )
+	ROM_LOAD( "ougonpai_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
+	ROM_LOAD( "dynax_6202.11b", 0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )  // = tydg002.u8 (ougonpaib)
+	ROM_LOAD( "dynax_6203.13b", 0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )  // = tydg003.u6 (ougonpaib)
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
+	ROM_LOAD( "dynax_6204.14b", 0x00000, 0x80000, CRC(4142f94b) SHA1(9982f12333973b307c210e39310eafc88b8620e1) )  // ~= tydg004.u21 (ougonpaib)
+	ROM_LOAD( "dynax_6205.15b", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )  // = tydg005.u19 (ougonpaib)
+ROM_END
+
+/***************************************************************************
+
+Mahjong Ougon No Pai (bootleg, PCB is not working)
+
+PCB Layout
+----------
+
+|-------------------------------------------|
+|     4558  3.579545MHz             BATTERY |
+|uPC1241H  VOL  K-663A   DSW   DSW   6264   |
+|                        DSW   DSW  TYDG001 |
+|   DSW     NL-002    YM2149  PAL           |
+|1                                          |
+|8            6116                 TMP91C640|
+|W                                          |
+|A                         TYDG004  TYDG002 |
+|Y             PAL                          |
+|                                           |
+|                                           |
+|                          TYDG005  TYDG003 |
+|          PAL                              |
+|                      PAL                  |
+|1                PAL                       |
+|0                                          |
+|W  81461  81461  TK-101                    |
+|A  81461  81461                            |
+|Y  81461  81461  21.245MHz                 |
+|-------------------------------------------|
+
+***************************************************************************/
+
+ROM_START( ougonpaib )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
+	ROM_RELOAD(                   0x10000, 0x40000 )
+	ROM_RELOAD(                   0x50000, 0x40000 )
+	// tenkai internal rom is incompatible with the code of this set
+	ROM_LOAD( "ougonpaib_tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   // blitter data
+	ROM_LOAD( "tydg002.u8",  0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) ) // = lzc-01.u6 [1/2]
+	ROM_LOAD( "tydg003.u6",  0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   // blitter data
+	ROM_LOAD( "tydg004.u21", 0x00000, 0x80000, CRC(b7d49d04) SHA1(756c35bbe207b5bfc6e05d6da99a7ad5a3453506) )
+	ROM_LOAD( "tydg005.u19", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) ) // = taicom01.15b = lzc-01.u6 [2/2]
+ROM_END
 
 /***************************************************************************
 
@@ -6913,6 +7101,7 @@ GAME( 1991, yarunara, 0,        yarunara, yarunara, driver_device, 0,        ROT
 GAME( 1991, mjangels, 0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  GAME_SUPPORTS_SAVE )
 GAME( 1992, quiztvqq, 0,        quiztvqq, quiztvqq, driver_device, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               GAME_SUPPORTS_SAVE )
 GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    GAME_SUPPORTS_SAVE )
+GAME( 1989, mjembase, mjelctrn, mjembase, mjembase, dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electromagnetic Base",                                  GAME_SUPPORTS_SAVE )
 GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    GAME_SUPPORTS_SAVE )
 GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              GAME_SUPPORTS_SAVE )
 GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           GAME_SUPPORTS_SAVE )
@@ -6925,8 +7114,9 @@ GAME( 1991, tenkai,   0,        tenkai,   tenkai,   driver_device, 0,        ROT
 GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 GAME_SUPPORTS_SAVE )
 GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 GAME_SUPPORTS_SAVE )
-GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 1)",                                     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     GAME_SUPPORTS_SAVE )
+GAME( 1991, ougonpai, 0,        tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Pai",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Pai (bootleg)",                                GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state,   mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       GAME_SUPPORTS_SAVE )
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            GAME_NO_COCKTAIL | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // not a dynax board. proms?
 GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

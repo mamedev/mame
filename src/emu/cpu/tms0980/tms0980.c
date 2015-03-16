@@ -163,6 +163,7 @@ const device_type TMS0980 = &device_creator<tms0980_cpu_device>; // 28-pin DIP, 
 // - 32-term microinstructions PLA between the RAM and ROM, supporting 15 microinstructions
 // - 16-term output PLA and segment PLA above the RAM (rotate opla 90 degrees)
 const device_type TMS0970 = &device_creator<tms0970_cpu_device>; // 28-pin DIP, 11 R pins
+const device_type TMS1990 = &device_creator<tms1990_cpu_device>; // 28-pin DIP, ? R pins..
 // TMS0950 is same?
 
 // TMS0270 on the other hand, is a TMS0980 with earrings and a new hat. The new changes look like a quick afterthought, almost hacky
@@ -262,6 +263,10 @@ tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char
 
 tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
+
+tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms0970_cpu_device(mconfig, TMS1990, "TMS1990", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1990", __FILE__)
 { }
 
 

@@ -16,12 +16,12 @@
 <!-- build screen -->
 
 	<view name="Test Layout">
-		<bounds left="0" right="64" top="0" bottom="64" />
+		<bounds left="0" right="64" top="0" bottom="80" />
 		<bezel element="static_black">
-			<bounds left="0" right="64" top="0" bottom="64" />
+			<bounds left="0" right="64" top="0" bottom="80" />
 		</bezel>
 
-	<!-- max 16*32 matrix -->
+	<!-- max 16*40 matrix -->
 
 		<bezel name="lamp0" element="led"><bounds x="0" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp1" element="led"><bounds x="0" y="2" width="1" height="1" /></bezel>
@@ -55,6 +55,14 @@
 		<bezel name="lamp29" element="led"><bounds x="0" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp30" element="led"><bounds x="0" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp31" element="led"><bounds x="0" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp32" element="led"><bounds x="0" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp33" element="led"><bounds x="0" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp34" element="led"><bounds x="0" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp35" element="led"><bounds x="0" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp36" element="led"><bounds x="0" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp37" element="led"><bounds x="0" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp38" element="led"><bounds x="0" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp39" element="led"><bounds x="0" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp100" element="led"><bounds x="2" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp101" element="led"><bounds x="2" y="2" width="1" height="1" /></bezel>
@@ -88,6 +96,14 @@
 		<bezel name="lamp129" element="led"><bounds x="2" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp130" element="led"><bounds x="2" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp131" element="led"><bounds x="2" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp132" element="led"><bounds x="2" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp133" element="led"><bounds x="2" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp134" element="led"><bounds x="2" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp135" element="led"><bounds x="2" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp136" element="led"><bounds x="2" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp137" element="led"><bounds x="2" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp138" element="led"><bounds x="2" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp139" element="led"><bounds x="2" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp200" element="led"><bounds x="4" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp201" element="led"><bounds x="4" y="2" width="1" height="1" /></bezel>
@@ -121,6 +137,14 @@
 		<bezel name="lamp229" element="led"><bounds x="4" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp230" element="led"><bounds x="4" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp231" element="led"><bounds x="4" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp232" element="led"><bounds x="4" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp233" element="led"><bounds x="4" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp234" element="led"><bounds x="4" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp235" element="led"><bounds x="4" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp236" element="led"><bounds x="4" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp237" element="led"><bounds x="4" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp238" element="led"><bounds x="4" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp239" element="led"><bounds x="4" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp300" element="led"><bounds x="6" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp301" element="led"><bounds x="6" y="2" width="1" height="1" /></bezel>
@@ -154,6 +178,14 @@
 		<bezel name="lamp329" element="led"><bounds x="6" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp330" element="led"><bounds x="6" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp331" element="led"><bounds x="6" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp332" element="led"><bounds x="6" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp333" element="led"><bounds x="6" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp334" element="led"><bounds x="6" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp335" element="led"><bounds x="6" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp336" element="led"><bounds x="6" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp337" element="led"><bounds x="6" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp338" element="led"><bounds x="6" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp339" element="led"><bounds x="6" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp400" element="led"><bounds x="8" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp401" element="led"><bounds x="8" y="2" width="1" height="1" /></bezel>
@@ -187,6 +219,14 @@
 		<bezel name="lamp429" element="led"><bounds x="8" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp430" element="led"><bounds x="8" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp431" element="led"><bounds x="8" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp432" element="led"><bounds x="8" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp433" element="led"><bounds x="8" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp434" element="led"><bounds x="8" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp435" element="led"><bounds x="8" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp436" element="led"><bounds x="8" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp437" element="led"><bounds x="8" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp438" element="led"><bounds x="8" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp439" element="led"><bounds x="8" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp500" element="led"><bounds x="10" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp501" element="led"><bounds x="10" y="2" width="1" height="1" /></bezel>
@@ -220,6 +260,14 @@
 		<bezel name="lamp529" element="led"><bounds x="10" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp530" element="led"><bounds x="10" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp531" element="led"><bounds x="10" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp532" element="led"><bounds x="10" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp533" element="led"><bounds x="10" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp534" element="led"><bounds x="10" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp535" element="led"><bounds x="10" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp536" element="led"><bounds x="10" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp537" element="led"><bounds x="10" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp538" element="led"><bounds x="10" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp539" element="led"><bounds x="10" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp600" element="led"><bounds x="12" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp601" element="led"><bounds x="12" y="2" width="1" height="1" /></bezel>
@@ -253,6 +301,14 @@
 		<bezel name="lamp629" element="led"><bounds x="12" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp630" element="led"><bounds x="12" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp631" element="led"><bounds x="12" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp632" element="led"><bounds x="12" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp633" element="led"><bounds x="12" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp634" element="led"><bounds x="12" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp635" element="led"><bounds x="12" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp636" element="led"><bounds x="12" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp637" element="led"><bounds x="12" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp638" element="led"><bounds x="12" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp639" element="led"><bounds x="12" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp700" element="led"><bounds x="14" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp701" element="led"><bounds x="14" y="2" width="1" height="1" /></bezel>
@@ -286,6 +342,14 @@
 		<bezel name="lamp729" element="led"><bounds x="14" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp730" element="led"><bounds x="14" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp731" element="led"><bounds x="14" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp732" element="led"><bounds x="14" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp733" element="led"><bounds x="14" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp734" element="led"><bounds x="14" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp735" element="led"><bounds x="14" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp736" element="led"><bounds x="14" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp737" element="led"><bounds x="14" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp738" element="led"><bounds x="14" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp739" element="led"><bounds x="14" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp800" element="led"><bounds x="16" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp801" element="led"><bounds x="16" y="2" width="1" height="1" /></bezel>
@@ -319,6 +383,14 @@
 		<bezel name="lamp829" element="led"><bounds x="16" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp830" element="led"><bounds x="16" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp831" element="led"><bounds x="16" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp832" element="led"><bounds x="16" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp833" element="led"><bounds x="16" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp834" element="led"><bounds x="16" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp835" element="led"><bounds x="16" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp836" element="led"><bounds x="16" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp837" element="led"><bounds x="16" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp838" element="led"><bounds x="16" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp839" element="led"><bounds x="16" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp900" element="led"><bounds x="18" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp901" element="led"><bounds x="18" y="2" width="1" height="1" /></bezel>
@@ -352,6 +424,14 @@
 		<bezel name="lamp929" element="led"><bounds x="18" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp930" element="led"><bounds x="18" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp931" element="led"><bounds x="18" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp932" element="led"><bounds x="18" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp933" element="led"><bounds x="18" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp934" element="led"><bounds x="18" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp935" element="led"><bounds x="18" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp936" element="led"><bounds x="18" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp937" element="led"><bounds x="18" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp938" element="led"><bounds x="18" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp939" element="led"><bounds x="18" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp1000" element="led"><bounds x="20" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp1001" element="led"><bounds x="20" y="2" width="1" height="1" /></bezel>
@@ -385,6 +465,14 @@
 		<bezel name="lamp1029" element="led"><bounds x="20" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp1030" element="led"><bounds x="20" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp1031" element="led"><bounds x="20" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp1032" element="led"><bounds x="20" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp1033" element="led"><bounds x="20" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp1034" element="led"><bounds x="20" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp1035" element="led"><bounds x="20" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp1036" element="led"><bounds x="20" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp1037" element="led"><bounds x="20" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp1038" element="led"><bounds x="20" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp1039" element="led"><bounds x="20" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp1100" element="led"><bounds x="22" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp1101" element="led"><bounds x="22" y="2" width="1" height="1" /></bezel>
@@ -418,6 +506,14 @@
 		<bezel name="lamp1129" element="led"><bounds x="22" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp1130" element="led"><bounds x="22" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp1131" element="led"><bounds x="22" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp1132" element="led"><bounds x="22" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp1133" element="led"><bounds x="22" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp1134" element="led"><bounds x="22" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp1135" element="led"><bounds x="22" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp1136" element="led"><bounds x="22" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp1137" element="led"><bounds x="22" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp1138" element="led"><bounds x="22" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp1139" element="led"><bounds x="22" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp1200" element="led"><bounds x="24" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp1201" element="led"><bounds x="24" y="2" width="1" height="1" /></bezel>
@@ -451,6 +547,14 @@
 		<bezel name="lamp1229" element="led"><bounds x="24" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp1230" element="led"><bounds x="24" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp1231" element="led"><bounds x="24" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp1232" element="led"><bounds x="24" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp1233" element="led"><bounds x="24" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp1234" element="led"><bounds x="24" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp1235" element="led"><bounds x="24" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp1236" element="led"><bounds x="24" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp1237" element="led"><bounds x="24" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp1238" element="led"><bounds x="24" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp1239" element="led"><bounds x="24" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp1300" element="led"><bounds x="26" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp1301" element="led"><bounds x="26" y="2" width="1" height="1" /></bezel>
@@ -484,6 +588,14 @@
 		<bezel name="lamp1329" element="led"><bounds x="26" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp1330" element="led"><bounds x="26" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp1331" element="led"><bounds x="26" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp1332" element="led"><bounds x="26" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp1333" element="led"><bounds x="26" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp1334" element="led"><bounds x="26" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp1335" element="led"><bounds x="26" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp1336" element="led"><bounds x="26" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp1337" element="led"><bounds x="26" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp1338" element="led"><bounds x="26" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp1339" element="led"><bounds x="26" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp1400" element="led"><bounds x="28" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp1401" element="led"><bounds x="28" y="2" width="1" height="1" /></bezel>
@@ -517,6 +629,14 @@
 		<bezel name="lamp1429" element="led"><bounds x="28" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp1430" element="led"><bounds x="28" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp1431" element="led"><bounds x="28" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp1432" element="led"><bounds x="28" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp1433" element="led"><bounds x="28" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp1434" element="led"><bounds x="28" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp1435" element="led"><bounds x="28" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp1436" element="led"><bounds x="28" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp1437" element="led"><bounds x="28" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp1438" element="led"><bounds x="28" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp1439" element="led"><bounds x="28" y="78" width="1" height="1" /></bezel>
 
 		<bezel name="lamp1500" element="led"><bounds x="30" y="0" width="1" height="1" /></bezel>
 		<bezel name="lamp1501" element="led"><bounds x="30" y="2" width="1" height="1" /></bezel>
@@ -550,6 +670,14 @@
 		<bezel name="lamp1529" element="led"><bounds x="30" y="58" width="1" height="1" /></bezel>
 		<bezel name="lamp1530" element="led"><bounds x="30" y="60" width="1" height="1" /></bezel>
 		<bezel name="lamp1531" element="led"><bounds x="30" y="62" width="1" height="1" /></bezel>
+		<bezel name="lamp1532" element="led"><bounds x="30" y="64" width="1" height="1" /></bezel>
+		<bezel name="lamp1533" element="led"><bounds x="30" y="66" width="1" height="1" /></bezel>
+		<bezel name="lamp1534" element="led"><bounds x="30" y="68" width="1" height="1" /></bezel>
+		<bezel name="lamp1535" element="led"><bounds x="30" y="70" width="1" height="1" /></bezel>
+		<bezel name="lamp1536" element="led"><bounds x="30" y="72" width="1" height="1" /></bezel>
+		<bezel name="lamp1537" element="led"><bounds x="30" y="74" width="1" height="1" /></bezel>
+		<bezel name="lamp1538" element="led"><bounds x="30" y="76" width="1" height="1" /></bezel>
+		<bezel name="lamp1539" element="led"><bounds x="30" y="78" width="1" height="1" /></bezel>
 
 
 	</view>

@@ -34,6 +34,7 @@
  *43      HD38820A  1982, Entex Turtles (have dump, +COP411 for audio)
  @45      HD38820A  1982, Coleco Donkey Kong
  @49      HD38820A  1983, Bandai Zackman
+ @61      HD38820A  1983, Coleco Ms. Pac-Man
  @70      HD38820A  1983, Parker Brothers Q*Bert
  @88      HD38820A  1984, Tomy Tron (THN-02)
 
@@ -67,33 +68,38 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 	
 	// misc common
-	UINT16 m_inp_mux;
+	UINT16 m_inp_mux;                   // multiplexed inputs mask
 
 	UINT16 read_inputs(int columns);
 
 	virtual void machine_start();
 
 	// display common
-	int m_display_wait;
-	int m_display_maxy;
-	int m_display_maxx;
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
 	
-	UINT32 m_grid;
-	UINT32 m_plate;
+	UINT32 m_grid;                      // VFD current row data
+	UINT64 m_plate;                     // VFD current column data
 	
-	UINT32 m_display_state[0x20];
-	UINT32 m_display_cache[0x20];
-	UINT8 m_display_decay[0x20][0x20];
-	UINT16 m_7seg_mask[0x20];
+	UINT64 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	UINT64 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x40];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
 
 	// game-specific handlers
 	DECLARE_WRITE8_MEMBER(alnattck_plate_w);
-	DECLARE_READ16_MEMBER(alnattck_d_r);
 	DECLARE_WRITE16_MEMBER(alnattck_d_w);
+	DECLARE_READ16_MEMBER(alnattck_d_r);
+	
+	void egalaxn2_display();
+	DECLARE_WRITE8_MEMBER(egalaxn2_plate_w);
+	DECLARE_WRITE16_MEMBER(egalaxn2_grid_w);
+	DECLARE_READ8_MEMBER(egalaxn2_input_r);
 };
 
 
@@ -103,7 +109,7 @@ void hh_hmcs40_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
 	m_inp_mux = 0;
 	m_grid = 0;
@@ -115,9 +121,9 @@ void hh_hmcs40_state::machine_start()
 	save_item(NAME(m_display_wait));
 
 	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_cache));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
-	save_item(NAME(m_7seg_mask));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
@@ -137,7 +143,7 @@ void hh_hmcs40_state::machine_start()
 
 void hh_hmcs40_state::display_update()
 {
-	UINT32 active_state[0x20];
+	UINT64 active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -159,8 +165,8 @@ void hh_hmcs40_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
-			if (m_7seg_mask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
@@ -175,19 +181,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
 		for (int x = 0; x < m_display_maxx; x++)
-			if (!(m_display_state[y] >> x & 1) && m_display_decay[y][x] != 0)
+			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 	
 	display_update();
 }
 
-void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	UINT64 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
 	
@@ -341,12 +347,6 @@ WRITE8_MEMBER(hh_hmcs40_state::alnattck_plate_w)
 	display_matrix(20, 10, plate, m_grid);
 }
 
-READ16_MEMBER(hh_hmcs40_state::alnattck_d_r)
-{
-	// D5: inputs
-	return (read_inputs(7) & 1) << 5;
-}
-
 WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
 {
 	// D4: speaker out
@@ -360,6 +360,12 @@ WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
 	
 	// D0-D3: plate 16-19 (update display there)
 	alnattck_plate_w(space, 4, data & 0xf);
+}
+
+READ16_MEMBER(hh_hmcs40_state::alnattck_d_r)
+{
+	// D5: inputs
+	return (read_inputs(7) & 1) << 5;
 }
 
 
@@ -522,6 +528,41 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Coleco Ms. Pac-Man (manufactured in Taiwan)
+  * board label Coleco 911171
+  * Hitachi HD38820A61 MCU
+  * cyan/red VFD display Futaba DM-60Z 3I, with color overlay
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+static INPUT_PORTS_START( cmspacmn )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( cmspacmn, hh_hmcs40_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+
+//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Entex Galaxian 2 (manufactured in Japan)
   * Hitachi HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
@@ -530,7 +571,71 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+void hh_hmcs40_state::egalaxn2_display()
+{
+	UINT32 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
+	
+	display_matrix(24, 15, plate, grid);
+}
+
+WRITE16_MEMBER(hh_hmcs40_state::egalaxn2_grid_w)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+	
+	// D1-D4: input mux
+	m_inp_mux = data >> 1 & 0xf;
+	
+	// D1-D15: vfd matrix grid
+	m_grid = data >> 1;
+	egalaxn2_display();
+}
+
+WRITE8_MEMBER(hh_hmcs40_state::egalaxn2_plate_w)
+{
+	// R10-R63: vfd matrix plate
+	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	egalaxn2_display();
+}
+
+READ8_MEMBER(hh_hmcs40_state::egalaxn2_input_r)
+{
+	// R0x: multiplexed inputs
+	return read_inputs(4);
+}
+
+
 static INPUT_PORTS_START( egalaxn2 )
+	PORT_START("IN.0") // D1 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
+
+	PORT_START("IN.1") // D2 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY // "
+
+	PORT_START("IN.2") // D3 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // D4 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Skill" )
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x0c, 0x00, "Players" )
+	PORT_CONFSETTING(    0x08, "0 (Demo)" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
 
@@ -538,8 +643,16 @@ static MACHINE_CONFIG_START( egalaxn2, hh_hmcs40_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_HMCS40_READ_R_CB(0, READ8(hh_hmcs40_state, egalaxn2_input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, egalaxn2_grid_w))
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -564,7 +677,37 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+// hardware is identical to Galaxian 2, so we can use those handlers
+// note: plate numbers are 0-23, not 1-24(with 0 always-on)
+
 static INPUT_PORTS_START( epacman2 )
+	PORT_START("IN.0") // D1 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // "
+
+	PORT_START("IN.1") // D2 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY // "
+
+	PORT_START("IN.2") // D3 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Skill Control")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Demo Light Test")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // D4 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Skill" )
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x0c, 0x00, "Players" )
+	PORT_CONFSETTING(    0x08, "0 (Demo)" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
 INPUT_PORTS_END
 
 
@@ -572,8 +715,16 @@ static MACHINE_CONFIG_START( epacman2, hh_hmcs40_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_HMCS40_READ_R_CB(0, READ8(hh_hmcs40_state, egalaxn2_input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(hh_hmcs40_state, egalaxn2_plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, egalaxn2_grid_w))
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -753,6 +904,13 @@ ROM_START( cpacmanr1 )
 ROM_END
 
 
+ROM_START( cmspacmn )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a61", 0x0000, 0x1000, CRC(76276318) SHA1(9d6ff3f49b4cdaee5c9e238c1ed638bfb9b99aa7) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( egalaxn2 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38820a13", 0x0000, 0x1000, CRC(112b721b) SHA1(4a185bc57ea03fe64f61f7db4da37b16eeb0cb54) )
@@ -800,6 +958,7 @@ CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Colec
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )

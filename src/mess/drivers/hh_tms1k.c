@@ -108,27 +108,27 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 	
 	// misc common
-	UINT16 m_r;
-	UINT16 m_o;
-	UINT16 m_inp_mux;
+	UINT16 m_r;                         // MCU R-pins data
+	UINT16 m_o;                         // MCU O-pins data
+	UINT16 m_inp_mux;                   // multiplexed inputs mask
 	bool m_power_on;
 
 	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(tms0980_power_button);
-	DECLARE_WRITE_LINE_MEMBER(tms0980_auto_power_off);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	// display common
-	int m_display_wait;
-	int m_display_maxy;
-	int m_display_maxx;
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
 	
-	UINT32 m_display_state[0x20];
-	UINT32 m_display_cache[0x20];
-	UINT8 m_display_decay[0x20][0x20];
-	UINT16 m_7seg_mask[0x20];
+	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
@@ -136,74 +136,74 @@ public:
 	
 	// game-specific handlers
 	void mathmagi_display();
-	DECLARE_READ8_MEMBER(mathmagi_read_k);
 	DECLARE_WRITE16_MEMBER(mathmagi_write_r);
 	DECLARE_WRITE16_MEMBER(mathmagi_write_o);
+	DECLARE_READ8_MEMBER(mathmagi_read_k);
 
 	void amaztron_display();
-	DECLARE_READ8_MEMBER(amaztron_read_k);
 	DECLARE_WRITE16_MEMBER(amaztron_write_r);
 	DECLARE_WRITE16_MEMBER(amaztron_write_o);
+	DECLARE_READ8_MEMBER(amaztron_read_k);
 
 	void tc4_display();
-	DECLARE_READ8_MEMBER(tc4_read_k);
 	DECLARE_WRITE16_MEMBER(tc4_write_r);
 	DECLARE_WRITE16_MEMBER(tc4_write_o);
+	DECLARE_READ8_MEMBER(tc4_read_k);
 
 	void ebball_display();
-	DECLARE_READ8_MEMBER(ebball_read_k);
 	DECLARE_WRITE16_MEMBER(ebball_write_r);
 	DECLARE_WRITE16_MEMBER(ebball_write_o);
+	DECLARE_READ8_MEMBER(ebball_read_k);
 
 	void ebball3_display();
-	DECLARE_READ8_MEMBER(ebball3_read_k);
 	DECLARE_WRITE16_MEMBER(ebball3_write_r);
 	DECLARE_WRITE16_MEMBER(ebball3_write_o);
+	DECLARE_READ8_MEMBER(ebball3_read_k);
 	void ebball3_set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(ebball3_difficulty_switch);
 	DECLARE_MACHINE_RESET(ebball3);
 
-	DECLARE_READ8_MEMBER(elecdet_read_k);
 	DECLARE_WRITE16_MEMBER(elecdet_write_r);
 	DECLARE_WRITE16_MEMBER(elecdet_write_o);
+	DECLARE_READ8_MEMBER(elecdet_read_k);
 
 	void starwbc_display();
-	DECLARE_READ8_MEMBER(starwbc_read_k);
 	DECLARE_WRITE16_MEMBER(starwbc_write_r);
 	DECLARE_WRITE16_MEMBER(starwbc_write_o);
+	DECLARE_READ8_MEMBER(starwbc_read_k);
 
-	DECLARE_READ8_MEMBER(comp4_read_k);
 	DECLARE_WRITE16_MEMBER(comp4_write_r);
 	DECLARE_WRITE16_MEMBER(comp4_write_o);
+	DECLARE_READ8_MEMBER(comp4_read_k);
 
-	DECLARE_READ8_MEMBER(simon_read_k);
 	DECLARE_WRITE16_MEMBER(simon_write_r);
 	DECLARE_WRITE16_MEMBER(simon_write_o);
+	DECLARE_READ8_MEMBER(simon_read_k);
 
-	DECLARE_READ8_MEMBER(cnsector_read_k);
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);
+	DECLARE_READ8_MEMBER(cnsector_read_k);
 
-	DECLARE_READ8_MEMBER(merlin_read_k);
 	DECLARE_WRITE16_MEMBER(merlin_write_r);
 	DECLARE_WRITE16_MEMBER(merlin_write_o);
+	DECLARE_READ8_MEMBER(merlin_read_k);
 
-	DECLARE_READ8_MEMBER(stopthief_read_k);
 	DECLARE_WRITE16_MEMBER(stopthief_write_r);
 	DECLARE_WRITE16_MEMBER(stopthief_write_o);
+	DECLARE_READ8_MEMBER(stopthief_read_k);
 
-	DECLARE_READ8_MEMBER(bankshot_read_k);
 	DECLARE_WRITE16_MEMBER(bankshot_write_r);
 	DECLARE_WRITE16_MEMBER(bankshot_write_o);
+	DECLARE_READ8_MEMBER(bankshot_read_k);
 
-	DECLARE_READ8_MEMBER(splitsec_read_k);
 	DECLARE_WRITE16_MEMBER(splitsec_write_r);
 	DECLARE_WRITE16_MEMBER(splitsec_write_o);
+	DECLARE_READ8_MEMBER(splitsec_read_k);
 
 	void tandy12_display();
-	DECLARE_READ8_MEMBER(tandy12_read_k);
 	DECLARE_WRITE16_MEMBER(tandy12_write_r);
 	DECLARE_WRITE16_MEMBER(tandy12_write_o);
+	DECLARE_READ8_MEMBER(tandy12_read_k);
 };
 
 
@@ -215,7 +215,7 @@ void hh_tms1k_state::machine_start()
 	memset(m_display_state, 0, sizeof(m_display_state));
 	memset(m_display_cache, 0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
 	m_o = 0;
 	m_r = 0;
@@ -228,9 +228,9 @@ void hh_tms1k_state::machine_start()
 	save_item(NAME(m_display_wait));
 
 	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_cache));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
-	save_item(NAME(m_7seg_mask));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_o));
 	save_item(NAME(m_r));
@@ -291,8 +291,8 @@ void hh_tms1k_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
-			if (m_7seg_mask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
@@ -307,7 +307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
 		for (int x = 0; x < m_display_maxx; x++)
-			if (!(m_display_state[y] >> x & 1) && m_display_decay[y][x] != 0)
+			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 	
 	display_update();
@@ -342,7 +342,7 @@ UINT8 hh_tms1k_state::read_inputs(int columns)
 
 // devices with a TMS0980 can auto power-off
 
-WRITE_LINE_MEMBER(hh_tms1k_state::tms0980_auto_power_off)
+WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
 {
 	if (state)
 	{
@@ -351,7 +351,7 @@ WRITE_LINE_MEMBER(hh_tms1k_state::tms0980_auto_power_off)
 	}
 }
 
-INPUT_CHANGED_MEMBER(hh_tms1k_state::tms0980_power_button)
+INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 {
 	m_power_on = (bool)(FPTR)param;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
@@ -395,7 +395,7 @@ void hh_tms1k_state::mathmagi_display()
 	// R0-R7: 7seg leds
 	for (int y = 0; y < 8; y++)
 	{
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (m_r >> y & 1) ? (m_o >> 1) : 0;
 	}
 
@@ -406,11 +406,6 @@ void hh_tms1k_state::mathmagi_display()
 		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
 
 	display_update();
-}
-
-READ8_MEMBER(hh_tms1k_state::mathmagi_read_k)
-{
-	return read_inputs(6);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_r)
@@ -429,6 +424,11 @@ WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_o)
 	// O0: N/C
 	data = (data << 1 & 0xfe) | (data >> 7 & 1); // because opla is unknown
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::mathmagi_read_k)
+{
+	return read_inputs(6);
 }
 
 
@@ -558,7 +558,7 @@ void hh_tms1k_state::amaztron_display()
 	// R8,R9: select digit
 	for (int y = 0; y < 2; y++)
 	{
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (m_r >> (y + 8) & 1) ? m_o : 0;
 	}
 	
@@ -566,15 +566,6 @@ void hh_tms1k_state::amaztron_display()
 	m_display_state[2] = m_r >> 6 & 3;
 	
 	display_update();
-}
-
-READ8_MEMBER(hh_tms1k_state::amaztron_read_k)
-{
-	UINT8 k = read_inputs(6);
-
-	// the 5th column is tied to K4+K8
-	if (k & 0x10) k |= 0xc;
-	return k & 0xf;
 }
 
 WRITE16_MEMBER(hh_tms1k_state::amaztron_write_r)
@@ -596,6 +587,15 @@ WRITE16_MEMBER(hh_tms1k_state::amaztron_write_o)
 	// O7: N/C
 	m_o = data & 0x7f;
 	amaztron_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::amaztron_read_k)
+{
+	UINT8 k = read_inputs(6);
+
+	// the 5th column is tied to K4+K8
+	if (k & 0x10) k |= 0xc;
+	return k & 0xf;
 }
 
 
@@ -705,21 +705,10 @@ void hh_tms1k_state::tc4_display()
 	// R5,7,8,9 are 7segs
 	for (int y = 0; y < 10; y++)
 		if (y >= 5 && y <= 9 && y != 6)
-			m_7seg_mask[y] = 0x7f;
+			m_display_segmask[y] = 0x7f;
 	
 	// update current state (note: R6 as extra column!)
 	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
-}
-
-READ8_MEMBER(hh_tms1k_state::tc4_read_k)
-{
-	UINT8 k = read_inputs(6);
-
-	// read from cartridge
-	if (m_inp_mux & 0x200)
-		k |= m_inp_matrix[6]->read();
-
-	return k;
 }
 
 WRITE16_MEMBER(hh_tms1k_state::tc4_write_r)
@@ -742,6 +731,17 @@ WRITE16_MEMBER(hh_tms1k_state::tc4_write_o)
 	// O0-O7: led row
 	m_o = data;
 	tc4_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::tc4_read_k)
+{
+	UINT8 k = read_inputs(6);
+
+	// read from cartridge
+	if (m_inp_mux & 0x200)
+		k |= m_inp_matrix[6]->read();
+
+	return k;
 }
 
 
@@ -848,15 +848,9 @@ MACHINE_CONFIG_END
 void hh_tms1k_state::ebball_display()
 {
 	// R8 is a 7seg
-	m_7seg_mask[8] = 0x7f;
+	m_display_segmask[8] = 0x7f;
 	
 	display_matrix(7, 9, ~m_o, m_r);
-}
-
-READ8_MEMBER(hh_tms1k_state::ebball_read_k)
-{
-	// note: K8(Vss row) is always on
-	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
@@ -878,6 +872,12 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
 	// O7: N/C
 	m_o = data;
 	ebball_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball_read_k)
+{
+	// note: K8(Vss row) is always on
+	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
 
@@ -979,19 +979,14 @@ void hh_tms1k_state::ebball3_display()
 		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
 
 	// R0,R1 are normal 7segs
-	m_7seg_mask[0] = m_7seg_mask[1] = 0x7f;
+	m_display_segmask[0] = m_display_segmask[1] = 0x7f;
 	
 	// R4,R7 contain segments(only F and B) for the two other digits
 	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
 	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
-	m_7seg_mask[10] = m_7seg_mask[11] = 0x22;
+	m_display_segmask[10] = m_display_segmask[11] = 0x22;
 	
 	display_update();
-}
-
-READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
-{
-	return read_inputs(3);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball3_write_r)
@@ -1013,6 +1008,11 @@ WRITE16_MEMBER(hh_tms1k_state::ebball3_write_o)
 	// O7: N/C
 	m_o = data & 0x7f;
 	ebball3_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
+{
+	return read_inputs(3);
 }
 
 
@@ -1113,12 +1113,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::elecdet_read_k)
-{
-	// note: the Vss row is always on
-	return m_inp_matrix[4]->read() | read_inputs(4);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::elecdet_write_r)
 {
 	// R7,R8: speaker on
@@ -1126,7 +1120,7 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_r)
 
 	// R0-R6: select digit
 	for (int y = 0; y < 7; y++)
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 
 	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
 }
@@ -1139,6 +1133,12 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_o)
 	// O0-O6: led segments A-G
 	// O7: speaker out
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::elecdet_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[4]->read() | read_inputs(4);
 }
 
 
@@ -1182,11 +1182,11 @@ static INPUT_PORTS_START( elecdet )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.4") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("End Turn")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -1197,7 +1197,7 @@ static MACHINE_CONFIG_START( elecdet, hh_tms1k_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, elecdet_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, elecdet_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, elecdet_write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, tms0980_auto_power_off))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_elecdet)
@@ -1228,14 +1228,9 @@ MACHINE_CONFIG_END
 void hh_tms1k_state::starwbc_display()
 {
 	// R6,R8 are 7segs
-	m_7seg_mask[6] = m_7seg_mask[8] = 0x7f;
+	m_display_segmask[6] = m_display_segmask[8] = 0x7f;
 	
 	display_matrix(8, 10, m_o, m_r);
-}
-
-READ8_MEMBER(hh_tms1k_state::starwbc_read_k)
-{
-	return read_inputs(5);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::starwbc_write_r)
@@ -1256,6 +1251,11 @@ WRITE16_MEMBER(hh_tms1k_state::starwbc_write_o)
 	// O0-O7: led row
 	m_o = (data << 4 & 0xf0) | (data >> 4 & 0x0f);
 	starwbc_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::starwbc_read_k)
+{
+	return read_inputs(5);
 }
 
 
@@ -1339,11 +1339,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::comp4_read_k)
-{
-	return read_inputs(3);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::comp4_write_r)
 {
 	// leds:
@@ -1365,6 +1360,11 @@ WRITE16_MEMBER(hh_tms1k_state::comp4_write_o)
 	// other bits: N/C
 	m_o = data;
 	display_matrix(11, 1, m_r, m_o);
+}
+
+READ8_MEMBER(hh_tms1k_state::comp4_read_k)
+{
+	return read_inputs(3);
 }
 
 
@@ -1422,11 +1422,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::simon_read_k)
-{
-	return read_inputs(4);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
 {
 	// R4-R8 go through an 75494 IC first:
@@ -1448,6 +1443,11 @@ WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
 WRITE16_MEMBER(hh_tms1k_state::simon_write_o)
 {
 	// N/C
+}
+
+READ8_MEMBER(hh_tms1k_state::simon_read_k)
+{
+	return read_inputs(4);
 }
 
 
@@ -1514,11 +1514,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
-{
-	return read_inputs(5);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 {
 	m_display_maxx = 8;
@@ -1527,7 +1522,7 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 	// R0-R5: select digit (right-to-left)
 	for (int y = 0; y < 6; y++)
 	{
-		m_7seg_mask[y] = 0xff;
+		m_display_segmask[y] = 0xff;
 		m_display_state[y] = (data >> y & 1) ? m_o : 0;
 	}
 
@@ -1544,6 +1539,11 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_o)
 	
 	// O0-O7: digit segments
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
+{
+	return read_inputs(5);
 }
 
 
@@ -1622,11 +1622,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::merlin_read_k)
-{
-	return read_inputs(4);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::merlin_write_r)
 {
 	/* leds:
@@ -1649,6 +1644,11 @@ WRITE16_MEMBER(hh_tms1k_state::merlin_write_o)
 	// O0-O3: input mux
 	// O7: N/C
 	m_inp_mux = data & 0xf;
+}
+
+READ8_MEMBER(hh_tms1k_state::merlin_read_k)
+{
+	return read_inputs(4);
 }
 
 
@@ -1716,12 +1716,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
-{
-	// note: the Vss row is always on
-	return m_inp_matrix[2]->read() | read_inputs(2);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 {
 	m_display_maxx = 7;
@@ -1731,7 +1725,7 @@ WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
 	for (int y = 0; y < m_display_maxy; y++)
 	{
-		m_7seg_mask[y] = 0x7f;
+		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (data >> y & 1) ? o : 0;
 	}
 
@@ -1749,6 +1743,12 @@ WRITE16_MEMBER(hh_tms1k_state::stopthief_write_o)
 	// O3: speaker out
 	// O0-O2,O4-O7: led segments A-G
 	m_o = data;
+}
+
+READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
 
@@ -1778,11 +1778,11 @@ static INPUT_PORTS_START( stopthief )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.2") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Tip")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Arrest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Clue")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, tms0980_power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( stopthief, hh_tms1k_state )
@@ -1792,7 +1792,7 @@ static MACHINE_CONFIG_START( stopthief, hh_tms1k_state )
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, stopthief_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, stopthief_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, stopthief_write_o))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, tms0980_auto_power_off))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_stopthie)
@@ -1824,11 +1824,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::bankshot_read_k)
-{
-	return read_inputs(2);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::bankshot_write_r)
 {
 	// R0: speaker out
@@ -1848,6 +1843,11 @@ WRITE16_MEMBER(hh_tms1k_state::bankshot_write_o)
 	// O7: N/C
 	m_o = data;
 	display_matrix(7, 11, m_o, m_r);
+}
+
+READ8_MEMBER(hh_tms1k_state::bankshot_read_k)
+{
+	return read_inputs(2);
 }
 
 
@@ -1931,11 +1931,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_tms1k_state::splitsec_read_k)
-{
-	return read_inputs(2);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::splitsec_write_r)
 {
 	// R8: speaker out
@@ -1956,6 +1951,12 @@ WRITE16_MEMBER(hh_tms1k_state::splitsec_write_o)
 	m_o = data;
 	display_matrix(7, 8, m_o, m_r);
 }
+
+READ8_MEMBER(hh_tms1k_state::splitsec_read_k)
+{
+	return read_inputs(2);
+}
+
 
 static INPUT_PORTS_START( splitsec )
 	PORT_START("IN.0") // R9
@@ -2021,11 +2022,6 @@ void hh_tms1k_state::tandy12_display()
 	display_matrix(13, 1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00), 1);
 }
 
-READ8_MEMBER(hh_tms1k_state::tandy12_read_k)
-{
-	return read_inputs(5);
-}
-
 WRITE16_MEMBER(hh_tms1k_state::tandy12_write_r)
 {
 	// R10: speaker out
@@ -2043,6 +2039,11 @@ WRITE16_MEMBER(hh_tms1k_state::tandy12_write_o)
 {
 	m_o = data;
 	tandy12_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::tandy12_read_k)
+{
+	return read_inputs(5);
 }
 
 

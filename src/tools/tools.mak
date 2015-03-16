@@ -217,7 +217,8 @@ NLTOOLOBJS = \
 	$(TOOLSOBJ)/nltool.o \
 	$(NETLISTOBJS) \
 
-$(BIN)nltool$(EXE): $(NLTOOLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+# TODO: Visual Studio wants $(FLAC_LIB) and $(7Z_LIB) during linking...
+$(BIN)nltool$(EXE): $(NLTOOLOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT) $(FLAC_LIB) $(7Z_LIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 

@@ -156,110 +156,248 @@
 
 
 	<element name="cpanel1">
-		<rect>
-			<color red="0.20" green="0.20" blue="0.20" />
-		</rect>
+		<rect><color red="0.20" green="0.20" blue="0.20" /></rect>
 	</element>
 
 	<element name="cpanel2">
-		<rect>
-			<color red="0.15" green="0.15" blue="0.15" />
-		</rect>
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
 	</element>
 
 	<element name="cpanel3">
-		<rect>
-			<color red="0.10" green="0.10" blue="0.10" />
-		</rect>
+		<rect><color red="0.10" green="0.10" blue="0.10" /></rect>
 	</element>
 
 	<element name="cpanel4">
-		<rect>
-			<color red="0.05" green="0.05" blue="0.05" />
-		</rect>
+		<rect><color red="0.05" green="0.05" blue="0.05" /></rect>
 	</element>
 
 
+	<view name="Button Lamps">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
 <!-- define background -->
 
-	<view name="Button Lamps">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
+		<bezel element="cpanel"><bounds left="0" right="4" top="3" bottom="3.80" /></bezel>
 
-		<bezel element="cpanel">
-			<bounds left="0" right="4" top="3" bottom="3.40" />
-		</bezel>
+		<bezel element="cpanel1"><bounds left="0" right="4" top="3.01" bottom="3.39" /></bezel>
+		<bezel element="cpanel2"><bounds left="0" right="4" top="3.02" bottom="3.38" /></bezel>
+		<bezel element="cpanel3"><bounds left="0" right="4" top="3.03" bottom="3.37" /></bezel>
+		<bezel element="cpanel4"><bounds left="0" right="4" top="3.04" bottom="3.36" /></bezel>
+		<bezel element="cpanel"><bounds left="0" right="4" top="3.05" bottom="3.35" /></bezel>
 
-		<bezel element="cpanel1">
-			<bounds left="0" right="4" top="3.01" bottom="3.39" />
-		</bezel>
-
-		<bezel element="cpanel2">
-			<bounds left="0" right="4" top="3.02" bottom="3.38" />
-		</bezel>
-
-		<bezel element="cpanel3">
-			<bounds left="0" right="4" top="3.03" bottom="3.37" />
-		</bezel>
-
-		<bezel element="cpanel4">
-			<bounds left="0" right="4" top="3.04" bottom="3.36" />
-		</bezel>
-
-		<bezel element="cpanel">
-			<bounds left="0" right="4" top="3.05" bottom="3.35" />
-		</bezel>
+		<bezel element="cpanel1"><bounds left="0" right="4" top="3.41" bottom="3.79" /></bezel>
+		<bezel element="cpanel2"><bounds left="0" right="4" top="3.42" bottom="3.78" /></bezel>
+		<bezel element="cpanel3"><bounds left="0" right="4" top="3.43" bottom="3.77" /></bezel>
+		<bezel element="cpanel4"><bounds left="0" right="4" top="3.44" bottom="3.76" /></bezel>
+		<bezel element="cpanel"><bounds left="0" right="4" top="3.45" bottom="3.75" /></bezel>
 
 
 <!-- define lamps -->
 
-		<bezel name="lamp0" element="stop_b">
+		<bezel name="lamp0" element="stop_b" inputtag="IN0" inputmask="0x04">
 			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp0" element="stop2">
+		<bezel name="lamp0" element="stop2" inputtag="IN0" inputmask="0x04">
 			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
-
-		<bezel name="lamp1" element="dup_b">
+		<bezel name="lamp1" element="dup_b" inputtag="IN0" inputmask="0x08">
 			<bounds x="0.65" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp1" element="dup">
+		<bezel name="lamp1" element="dup" inputtag="IN0" inputmask="0x08">
 			<bounds x="0.67" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
-
-		<bezel name="lamp2" element="stop_b">
+		<bezel name="lamp2" element="stop_b" inputtag="IN0" inputmask="0x10">
 			<bounds x="1.4" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp2" element="stop1">
+		<bezel name="lamp2" element="stop1" inputtag="IN0" inputmask="0x10">
 			<bounds x="1.42" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
-
-		<bezel name="lamp3" element="bet_b">
+		<bezel name="lamp3" element="bet_b" inputtag="IN0" inputmask="0x20">
 			<bounds x="0.05" y="3.08" width="0.40" height="0.24" />
 		</bezel>
-		<bezel name="lamp3" element="bet">
+		<bezel name="lamp3" element="bet" inputtag="IN0" inputmask="0x20">
 			<bounds x="0.07" y="3.10" width="0.36" height="0.20" />
 		</bezel>
 
-
-		<bezel name="lamp4" element="stop_b">
+		<bezel name="lamp4" element="stop_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.7" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp4" element="stop3">
+		<bezel name="lamp4" element="stop3" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
-
-		<bezel name="lamp5" element="start_b">
+		<bezel name="lamp5" element="start_b" inputtag="IN0" inputmask="0x80">
 			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
 		</bezel>
-		<bezel name="lamp5" element="start">
+		<bezel name="lamp5" element="start" inputtag="IN0" inputmask="0x80">
 			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
 		</bezel>
 
+
+		<bezel name="lamp8" element="stop_b" inputtag="IN3" inputmask="0x04">
+			<bounds x="2.05" y="3.48" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp8" element="stop2" inputtag="IN3" inputmask="0x04">
+			<bounds x="2.07" y="3.50" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp9" element="dup_b" inputtag="IN3" inputmask="0x08">
+			<bounds x="0.65" y="3.48" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp9" element="dup" inputtag="IN3" inputmask="0x08">
+			<bounds x="0.67" y="3.50" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp10" element="stop_b" inputtag="IN3" inputmask="0x10">
+			<bounds x="1.4" y="3.48" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp10" element="stop1" inputtag="IN3" inputmask="0x10">
+			<bounds x="1.42" y="3.50" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp11" element="bet_b" inputtag="IN3" inputmask="0x20">
+			<bounds x="0.05" y="3.48" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp11" element="bet" inputtag="IN3" inputmask="0x20">
+			<bounds x="0.07" y="3.50" width="0.36" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp12" element="stop_b" inputtag="IN3" inputmask="0x40">
+			<bounds x="2.7" y="3.48" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp12" element="stop3" inputtag="IN3" inputmask="0x40">
+			<bounds x="2.72" y="3.50" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp13" element="start_b" inputtag="IN3" inputmask="0x80">
+			<bounds x="3.45" y="3.48" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp13" element="start" inputtag="IN3" inputmask="0x80">
+			<bounds x="3.47" y="3.50" width="0.46" height="0.20" />
+		</bezel>
 	</view>
+
+
+	<view name="P1 Button Lamps">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
+<!-- define background -->
+
+		<bezel element="cpanel"><bounds left="0" right="4" top="3" bottom="3.40" /></bezel>
+
+		<bezel element="cpanel1"><bounds left="0" right="4" top="3.01" bottom="3.39" /></bezel>
+		<bezel element="cpanel2"><bounds left="0" right="4" top="3.02" bottom="3.38" /></bezel>
+		<bezel element="cpanel3"><bounds left="0" right="4" top="3.03" bottom="3.37" /></bezel>
+		<bezel element="cpanel4"><bounds left="0" right="4" top="3.04" bottom="3.36" /></bezel>
+		<bezel element="cpanel"><bounds left="0" right="4" top="3.05" bottom="3.35" /></bezel>
+
+
+<!-- define lamps -->
+
+		<bezel name="lamp0" element="stop_b" inputtag="IN0" inputmask="0x04">
+			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp0" element="stop2" inputtag="IN0" inputmask="0x04">
+			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp1" element="dup_b" inputtag="IN0" inputmask="0x08">
+			<bounds x="0.65" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="dup" inputtag="IN0" inputmask="0x08">
+			<bounds x="0.67" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp2" element="stop_b" inputtag="IN0" inputmask="0x10">
+			<bounds x="1.4" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="stop1" inputtag="IN0" inputmask="0x10">
+			<bounds x="1.42" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp3" element="bet_b" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.05" y="3.08" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="bet" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.07" y="3.10" width="0.36" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp4" element="stop_b" inputtag="IN0" inputmask="0x40">
+			<bounds x="2.7" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp4" element="stop3" inputtag="IN0" inputmask="0x40">
+			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp5" element="start_b" inputtag="IN0" inputmask="0x80">
+			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp5" element="start" inputtag="IN0" inputmask="0x80">
+			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+	</view>
+
+
+	<view name="P2 Button Lamps">
+		<screen index="0"><bounds left="0" top="0" right="4" bottom="3" /></screen>
+
+<!-- define background -->
+
+		<bezel element="cpanel"><bounds left="0" right="4" top="3" bottom="3.40" /></bezel>
+
+		<bezel element="cpanel1"><bounds left="0" right="4" top="3.01" bottom="3.39" /></bezel>
+		<bezel element="cpanel2"><bounds left="0" right="4" top="3.02" bottom="3.38" /></bezel>
+		<bezel element="cpanel3"><bounds left="0" right="4" top="3.03" bottom="3.37" /></bezel>
+		<bezel element="cpanel4"><bounds left="0" right="4" top="3.04" bottom="3.36" /></bezel>
+		<bezel element="cpanel"><bounds left="0" right="4" top="3.05" bottom="3.35" /></bezel>
+
+
+<!-- define lamps -->
+
+		<bezel name="lamp8" element="stop_b" inputtag="IN3" inputmask="0x04">
+			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp8" element="stop2" inputtag="IN3" inputmask="0x04">
+			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp9" element="dup_b" inputtag="IN3" inputmask="0x08">
+			<bounds x="0.65" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp9" element="dup" inputtag="IN3" inputmask="0x08">
+			<bounds x="0.67" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp10" element="stop_b" inputtag="IN3" inputmask="0x10">
+			<bounds x="1.4" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp10" element="stop1" inputtag="IN3" inputmask="0x10">
+			<bounds x="1.42" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp11" element="bet_b" inputtag="IN3" inputmask="0x20">
+			<bounds x="0.05" y="3.08" width="0.40" height="0.24" />
+		</bezel>
+		<bezel name="lamp11" element="bet" inputtag="IN3" inputmask="0x20">
+			<bounds x="0.07" y="3.10" width="0.36" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp12" element="stop_b" inputtag="IN3" inputmask="0x40">
+			<bounds x="2.7" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp12" element="stop3" inputtag="IN3" inputmask="0x40">
+			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp13" element="start_b" inputtag="IN3" inputmask="0x80">
+			<bounds x="3.45" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp13" element="start" inputtag="IN3" inputmask="0x80">
+			<bounds x="3.47" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+	</view>
+
 </mamelayout>

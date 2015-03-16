@@ -27,6 +27,74 @@
 	hmcs40_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
 
+enum
+{
+	HMCS40_PORT_R0X = 0,
+	HMCS40_PORT_R1X,
+	HMCS40_PORT_R2X,
+	HMCS40_PORT_R3X,
+	HMCS40_PORT_R4X,
+	HMCS40_PORT_R5X,
+	HMCS40_PORT_R6X,
+	HMCS40_PORT_R7X
+};
+
+
+// pinout reference
+
+/*
+            _________________
+    D3   1 |*                | 42 D2
+    D4   2 |                 | 41 D1
+    D5   3 |                 | 40 D0
+    D6   4 |                 | 39 R33
+    D7   5 |                 | 38 R32
+    D8   6 |                 | 37 R31
+    D9   7 |                 | 36 R30
+    D10  8 |                 | 35 R23          .......................................
+    D11  9 |                 | 34 R22         :
+    D12 10 |     HD38750     | 33 R21         :
+    D13 11 |     HD38800     | 32 R20         :
+    D14 12 |                 | 31 INT1        :
+    D15 13 |                 | 30 INT0        :                     _________________
+  Vdisp 14 |                 | 29 R13         :             D4   1 |*                | 64 D3
+  RESET 15 |                 | 28 R12         :             D5   2 |                 | 63 D2
+    Vbb 16 |                 | 27 R11         :             D6   3 |                 | 62 D1
+    Vdd 17 |                 | 26 R10         :             D7   4 |                 | 61 D0
+    OSC 18 |                 | 25 R03         :             D8   5 |                 | 60 R63
+   <NC> 19 |                 | 24 R02         :             D9   6 |                 | 59 R62
+  /TEST 20 |                 | 23 R01         :             <NC> 7 |                 | 58 <NC>
+    Vss 21 |_________________| 22 R00         :             <NC> 8 |                 | 57 <NC>
+                                                            <NC> 9 |                 | 56 <NC>
+                                                            D10 10 |                 | 55 R61
+            D8 D7 D6 D5 D4    <NC>D3 D2 D1 D0               D11 11 |                 | 54 R60
+             5  4  3  2  1     54 53 52 51 50               D12 12 |                 | 53 R33
+            __________________________________              D13 13 |                 | 52 R32
+           /                                  |             D14 14 |                 | 51 R31
+    D9   6 |                                  | 49 R63      D15 15 |                 | 50 R30
+    D10  7 |                                  | 48 R62      R40 16 |                 | 49 R23
+    D11  8 |                                  | 47 R61      R41 17 |                 | 48 R22
+    D12  9 |                                  | 46 R60      R42 18 |                 | 47 R21
+    D13 10 |                                  | 45 R33      R43 19 |                 | 46 R20
+    D14 11 |                                  | 44 R32      R50 20 |                 | 45 INT1
+    D15 12 |                                  | 43 R31      R51 21 |                 | 44 INT0
+    R40 13 |             HD38820              | 42 R30      R52 22 |    HD38820      | 43 R13
+    R41 14 |             (FP-54 pkg)          | 41 R23      R53 23 |    (DP-64S pkg) | 42 R12
+    R42 15 |                                  | 40 R22    Vdisp 24 |                 | 41 <NC>
+    R43 16 |                                  | 39 R21     <NC> 25 |                 | 40 <NC>
+    R50 17 |                                  | 38 R20    RESET 26 |                 | 39 <NC>
+    R51 18 |                                  | 37 INT1     Vbb 27 |                 | 38 R11
+    R52 19 |                                  | 36 INT0     Vdd 28 |                 | 37 R10
+    R53 20 |                                  | 35 R13      OSC 29 |                 | 36 R03
+  Vdisp 21 |                                  | 34 R12     <NC> 30 |                 | 35 R02
+  RESET 22 |                                  | 33 R11    /TEST 31 |                 | 34 R01
+           |__________________________________|             Vss 32 |_________________| 33 R00
+
+            23 24 25 26 27     28 29 30 31 32
+            Vbb | OSC | Vss    R00 | R02 | R10
+               Vdd   /TEST        R01   R03
+*/
+
 
 class hmcs40_cpu_device : public cpu_device
 {
@@ -76,6 +144,8 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 4); } // "
 	virtual UINT32 execute_min_cycles() const { return 1; }
 	virtual UINT32 execute_max_cycles() const { return 2; }
 	virtual UINT32 execute_input_lines() const { return 2+1; } // 3rd one is internal

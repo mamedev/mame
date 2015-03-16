@@ -157,6 +157,7 @@
 
 #include "bingowng.lh"
 #include "cherryb3.lh"
+#include "chrygld.lh"
 #include "cmaster.lh"
 #include "cmasterb.lh"
 #include "cmasterc.lh"
@@ -187,16 +188,16 @@ READ8_MEMBER(goldstar_state::protection_r)
 	return data[m_dataoffset++];
 }
 
-WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
+WRITE8_MEMBER(goldstar_state::p1_lamps_w)
 {
 /*  bits
-  7654 3210     goldstar                            crazybon
-  ---- ---x     Bet Red / Card 2
-  ---- --x-     Stop 3 / Small / Info / Card 1      Start
-  ---- -x--     Bet Blue / Double Up / Card 3
-  ---- x---     Stop 1 / Take                       Bet
-  ---x ----     Stop 2 / Big / Bonus                Stop All / Take Score
-  --x- ----     Start / Stop All / Card 4           Double Up
+  7654 3210     goldstar                            crazybon                ncb3/cb3a               lucky8/bingowng
+  ---- ---x     Bet Red / Card 2                                            Stop 2 / Big
+  ---- --x-     Stop 3 / Small / Info / Card 1      Start                   Blue Bet / Double       D-UP
+  ---- -x--     Bet Blue / Double Up / Card 3                               Stop 1/Take             TAKE
+  ---- x---     Stop 1 / Take                       Bet                     Red Bet                 BET
+  ---x ----     Stop 2 / Big / Bonus                Stop All / Take Score   Stop 3 / Small / Info   INFO
+  --x- ----     Start / Stop All / Card 4           Double Up               Start / Stop All        START
   -x-- ----                                         Small / Info
   x--- ----                                         Big
 
@@ -223,30 +224,21 @@ WRITE8_MEMBER(goldstar_state::goldstar_lamps_w)
 	output_set_lamp_value(6, (data >> 6) & 1);
 	output_set_lamp_value(7, (data >> 7) & 1);
 
-//  popmessage("lamps: %02X", data);
+//  popmessage("p1 lamps: %02X", data);
 }
 
-WRITE8_MEMBER(goldstar_state::cb3_lamps_w)
+WRITE8_MEMBER(goldstar_state::p2_lamps_w)
 {
-/*  bits
-  7654 3210
-  ---- ---x  Stop 2 / Big
-  ---- --x-  Blue Bet / Double
-  ---- -x--  Stop 1 / Take
-  ---- x---  Red Bet
-  ---x ----  Stop 3 / Small / Info
-  --x- ----  Start / Stop All
+	output_set_lamp_value(8 + 0, (data >> 0) & 1);
+	output_set_lamp_value(8 + 1, (data >> 1) & 1);
+	output_set_lamp_value(8 + 2, (data >> 2) & 1);
+	output_set_lamp_value(8 + 3, (data >> 3) & 1);
+	output_set_lamp_value(8 + 4, (data >> 4) & 1);
+	output_set_lamp_value(8 + 5, (data >> 5) & 1);
+	output_set_lamp_value(8 + 6, (data >> 6) & 1);
+	output_set_lamp_value(8 + 7, (data >> 7) & 1);
 
-  TODO: there are two sets of lamps for the two players at 0xf850 and 0xf860 - handle them independently
-*/
-	output_set_lamp_value(0, (data) & 1);       /* Stop 2 / Big */
-	output_set_lamp_value(1, (data >> 1) & 1);  /* Blue Bet / Double */
-	output_set_lamp_value(2, (data >> 2) & 1);  /* Stop 1 / Take */
-	output_set_lamp_value(3, (data >> 3) & 1);  /* Red Bet */
-	output_set_lamp_value(4, (data >> 4) & 1);  /* Stop 3 / Small / Info */
-	output_set_lamp_value(5, (data >> 5) & 1);  /* Start / Stop All */
-
-//  popmessage("lamps: %02X", data);
+//  popmessage("p2 lamps: %02X", data);
 }
 
 
@@ -275,7 +267,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf900, 0xf900) AM_WRITE(goldstar_lamps_w)
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -543,8 +535,8 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, cb3_state )
 
 	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0xf850, 0xf850) AM_WRITE(cb3_lamps_w)      /* Control Set 1 lamps */
-	AM_RANGE(0xf860, 0xf860) AM_WRITE(cb3_lamps_w)      /* Control Set 2 lamps */
+	AM_RANGE(0xf850, 0xf850) AM_WRITE(p1_lamps_w)       /* Control Set 1 lamps */
+	AM_RANGE(0xf860, 0xf860) AM_WRITE(p2_lamps_w)       /* Control Set 2 lamps */
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
@@ -724,7 +716,7 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(girl_scroll_w)
 ADDRESS_MAP_END
@@ -743,7 +735,7 @@ static ADDRESS_MAP_START( pkrmast_portmap, AS_IO, 8, goldstar_state )
 
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW3-0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW3-1")
-	AM_RANGE(0x22, 0x22) AM_WRITE(goldstar_lamps_w)
+	AM_RANGE(0x22, 0x22) AM_WRITE(p1_lamps_w)
 
 	AM_RANGE(0x24, 0x24) AM_WRITE(cm_coincount_w)
 	AM_RANGE(0x25, 0x25) AM_READ_PORT("DSW1")
@@ -770,7 +762,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -783,23 +775,10 @@ static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, cmaster_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(outport0_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(cm_coincount_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(goldstar_lamps_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(background_col_w)
 ADDRESS_MAP_END
 
-
-WRITE8_MEMBER(goldstar_state::lucky8_lamps_w)
-{
-	/* lamps */
-	output_set_lamp_value(0, (data >> 1) & 1);  /* D-UP Lamp */
-	output_set_lamp_value(1, (data >> 2) & 1);  /* TAKE Lamp */
-	output_set_lamp_value(2, (data >> 3) & 1);  /* BET Lamp */
-	output_set_lamp_value(3, (data >> 4) & 1);  /* INFO Lamp */
-	output_set_lamp_value(4, (data >> 5) & 1);  /* START Lamp */
-
-//  popmessage("lucky8_lamps_w %02x\n", data);
-
-}
 
 static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -818,7 +797,8 @@ static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_lamps_w)
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
+	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -885,7 +865,7 @@ static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input Port */
 	AM_RANGE(0xb830, 0xb830) AM_WRITENOP                                                /* no ay8910 */
 	AM_RANGE(0xb840, 0xb840) AM_WRITENOP                                                /* no ay8910 */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_lamps_w)
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -945,7 +925,7 @@ static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)             /* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_lamps_w)
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)                /* sound */
 //  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)    /* Other PPI initialized? */
 	AM_RANGE(0xd000, 0xefff) AM_ROM
@@ -6957,56 +6937,6 @@ PALETTE_INIT_MEMBER(goldstar_state, lucky8)
 }
 
 
-static MACHINE_CONFIG_START( chrygld, cb3_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ncb3_map)
-	MCFG_CPU_IO_MAP(ncb3_readwriteport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))   //Player2 controls, confirmed
-
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
-
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chry10)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(goldstar_state,cm)
-	MCFG_NVRAM_ADD_1FILL("nvram")
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
-
 static MACHINE_CONFIG_START( ncb3, cb3_state )
 
 	/* basic machine hardware */
@@ -7064,6 +6994,10 @@ static MACHINE_CONFIG_DERIVED( cb3e, ncb3 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3e)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( chrygld, ncb3 )
+	MCFG_GFXDECODE_MODIFY("gfxdecode", chry10)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
 MACHINE_CONFIG_END
@@ -7071,7 +7005,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cm97, ncb3 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
 MACHINE_CONFIG_END
-
 
 
 static MACHINE_CONFIG_START( wcherry, goldstar_state )
@@ -7121,7 +7054,6 @@ static MACHINE_CONFIG_START( wcherry, goldstar_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
-
 
 
 static MACHINE_CONFIG_START( cm, cmaster_state )
@@ -12946,8 +12878,8 @@ DRIVER_INIT_MEMBER(goldstar_state, wcherry)
 GAMEL( 199?, goldstar,  0,        goldstar, goldstar, goldstar_state, goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
 GAMEL( 199?, goldstbl,  goldstar, goldstbl, goldstar, driver_device,  0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
 GAME(  199?, moonlght,  goldstar, moonlght, goldstar, driver_device,  0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
-GAME(  199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
-GAME(  199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
+GAMEL( 199?, chrygld,   0,        chrygld,  chrygld,  cb3_state,      chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0,                 layout_chrygld )
+GAMEL( 199?, chry10,    0,        chrygld,  chry10,   cb3_state,      chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
 GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,         ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING )
@@ -12962,7 +12894,7 @@ GAMEL( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3_state,      cb3,      
 GAMEL( 199?, cb3b,      ncb3,     cherrys,  ncb3,     cb3_state,      cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
 GAME(  199?, cb3c,      ncb3,     cb3c,     chrygld,  cb3_state,      cb3,       ROT0, "bootleg",           "Cherry Bonus III (alt, set 2)",               GAME_NOT_WORKING)
 GAMEL( 199?, cb3d,      ncb3,     ncb3,     ncb3,     driver_device,  0,         ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
-GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_cherryb3 )
+GAMEL( 199?, cb3e,      ncb3,     cb3e,     chrygld,  cb3_state,      cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
 
 GAME(  1996, cmast97,   ncb3,     cm97,     chrygld,  driver_device,  0,         ROT0, "Dyna",              "Cherry Master '97",                           GAME_NOT_WORKING) // fix prom decode
 

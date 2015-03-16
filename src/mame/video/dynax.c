@@ -121,6 +121,15 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
 	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3));
 }
 
+/*
+mjelctrn:	7 d e -> 1 - 4 8
+mjembase:	b d e -> - 2 4 8
+*/
+WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
+{
+	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 2, 3, 1, 0));
+}
+
 
 /* Background Color */
 WRITE8_MEMBER(dynax_state::dynax_blit_backpen_w)
@@ -172,6 +181,11 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
 {
 	m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	LOG(("P23=%02X ", data));
+}
+
+WRITE8_MEMBER(dynax_state::mjembase_blit_palette23_w)
+{
+	dynax_blit_palette23_w(space, offset, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4), mem_mask);
 }
 
 
@@ -729,6 +743,7 @@ WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
 static const int priority_hnoridur[8] = { 0x0231, 0x2103, 0x3102, 0x2031, 0x3021, 0x1302, 0x2310, 0x1023 };
 static const int priority_mcnpshnt[8] = { 0x3210, 0x2103, 0x3102, 0x2031, 0x3021, 0x1302, 0x2310, 0x1023 };
 static const int priority_mjelctrn[8] = { 0x0231, 0x0321, 0x2031, 0x2301, 0x3021, 0x3201 ,0x0000, 0x0000 }; // this game doesn't use (hasn't?) layer 1
+static const int priority_mjembase[8] = { 0x0231, 0x2031, 0x0321, 0x3021, 0x2301, 0x3201 ,0x0000, 0x0000 }; // this game doesn't use (hasn't?) layer 1
 
 
 void dynax_state::dynax_common_reset()
@@ -937,6 +952,14 @@ VIDEO_START_MEMBER(dynax_state,mjelctrn)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjelctrn;
+	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
+}
+
+VIDEO_START_MEMBER(dynax_state,mjembase)
+{
+	VIDEO_START_CALL_MEMBER(hnoridur);
+
+	m_priority_table = priority_mjembase;
 	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
@@ -1151,6 +1174,17 @@ WRITE8_MEMBER(dynax_state::tenkai_priority_w)
 {
 	m_hanamai_priority = BITSWAP8(data, 3, 2, 1, 0, 4, 7, 5, 6);
 }
+
+/*
+mjembase:	priority: 00 08 10 18 20 28; enable: 1,2,4
+Convert to:
+mjelctrn:	priority: 00 20 10 40 30 50; enable: 1,2,8
+*/
+WRITE8_MEMBER(dynax_state::mjembase_priority_w)
+{
+	m_hanamai_priority = BITSWAP8(data, 6, 5, 4, 3, 2, 7, 1, 0);
+}
+
 
 int dynax_state::debug_mask()
 {
