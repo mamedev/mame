@@ -422,7 +422,7 @@ void retro_get_system_info(struct retro_system_info *info)
 #elif defined(WANT_UME)
    info->library_name     = "UME 2015";
 #else
-   info->library_name     = "N/D";
+   info->library_name     = "MAME 2015";
 #endif
 
    info->library_version  = "Git";
