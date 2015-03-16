@@ -157,14 +157,14 @@ osd_common_t::~osd_common_t()
 
 void osd_common_t::register_options()
 {
-#ifndef __LIBRETRO__
+#ifndef RETRO_OSD
 	REGISTER_MODULE(m_mod_man, FONT_OSX);
 	REGISTER_MODULE(m_mod_man, FONT_WINDOWS);
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
 #endif
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
-#ifdef __LIBRETRO__
+#ifdef RETRO_OSD
 	REGISTER_MODULE(m_mod_man, SOUND_RETRO);
 #else
 	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
@@ -173,7 +173,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 #endif
 
-#ifndef __LIBRETRO__
+#ifndef RETRO_OSD
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
 #endif
@@ -183,13 +183,13 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 
-#ifndef __LIBRETRO__
+#ifndef RETRO_OSD
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);
 	REGISTER_MODULE(m_mod_man, NETDEV_PCAP);
 	REGISTER_MODULE(m_mod_man, NETDEV_NONE);
 #endif
 
-#ifndef __LIBRETRO__
+#ifndef RETRO_OSD
 	REGISTER_MODULE(m_mod_man, MIDI_PM);
 #endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
