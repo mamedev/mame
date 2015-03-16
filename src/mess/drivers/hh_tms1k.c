@@ -17,8 +17,10 @@
  @MP0914   TMS1000  1979, Entex Baseball 1
  *MP0923   TMS1000? 1979, Entex Baseball 2
  @MP1030   TMS1100  1980, APF Mathemagician
+ *MP1133   ?        1979, Kosmos Astro
  @MP1204   TMS1100  1980, Entex Baseball 3
  *MP1221   TMS1100  1980, Entex Raise The Devil
+ *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  *MP2139   ?        1982, Gakken Galaxy Invader 1000
  *MP2788   ?        1980, Bandai Flight Time
  @MP3226   TMS1000  1978, Milton Bradley Simon
@@ -33,10 +35,13 @@
   MP3457   TMS1100  1979, MicroVision cartridge: Mindbuster
   MP3474   TMS1100  1979, MicroVision cartridge: Vegas Slots
   MP3475   TMS1100  1979, MicroVision cartridge: Bowling
- *MP3476   TMS1100? 1979, Milton Bradley Super Simon
+ *MP3476   TMS1100  1979, Milton Bradley Super Simon
   MP3479   TMS1100  1980, MicroVision cartridge: Baseball
   MP3481   TMS1100  1979, MicroVision cartridge: Connect Four
   MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
+  M34009   TMS1100  1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M34000, ..)
+  M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
+  M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
  @MP6100A  TMS0980  1979, Ideal Electronic Detective
  @MP6101B  TMS0980  1979, Parker Brothers Stop Thief
  *MP6361   ?        1983, Defender Strikes
@@ -48,11 +53,7 @@
 
   inconsistent:
   
-  M34009   TMS1100  1981, MicroVision cartridge: Alien Raiders
-  M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
-  M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
-
- @CD7282SL TMS1100  1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
