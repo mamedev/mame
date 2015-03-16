@@ -629,7 +629,6 @@ static unsigned char ARGUC=0;
 static void parse_cmdline(const char *argv)
 {
    int c,c2;
-   char *p,*p2,*start_of_word;
    static char buffer[512*4];
    enum states
    {
@@ -637,6 +636,9 @@ static void parse_cmdline(const char *argv)
       IN_WORD,
       IN_STRING
    } state = DULL;
+   char *p  = NULL;
+   char *p2 = NULL;
+   char *start_of_word = NULL;
 
    strcpy(buffer,argv);
    strcat(buffer," \0");
@@ -671,7 +673,7 @@ static void parse_cmdline(const char *argv)
                /* word goes from start_of_word to p-1 */
                //... do something with the word ...
                for (c2=0, p2 = start_of_word; p2 < p; p2++, c2++)
-                  ARGUV[ARGUC][c2] = (unsigned char) *p2;
+                  ARGUV[ARGUC][c2] = (unsigned char)*p2;
                ARGUC++;
 
                state = DULL; /* back to "not in word, not in string" state */

@@ -5,8 +5,10 @@ static int rthe       = 240;
 static int topw       = 1600;
 static float rtaspect = 0;
 static float rtfps    = 60.0;
+#if 0
 static int max_width  = 0;
 static int max_height = 0;
+#endif
 int SHIFTON           = -1;
 int NEWGAME_FROM_OSD  = 0;
 char RPATH[512];
