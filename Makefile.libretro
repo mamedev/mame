@@ -706,9 +706,6 @@ LIBS += -ljpeg
 JPEG_LIB =
 endif
 
-# add SQLite3 library
-SQLITE3_LIB = $(OBJ)/libsqlite3.a
-
 # add SoftFloat floating point emulation library
 SOFTFLOAT = $(OBJ)/libsoftfloat.a
 
@@ -718,6 +715,16 @@ FORMATS_LIB = $(OBJ)/libformats.a
 # add LUA library
 LUA_LIB = $(OBJ)/liblua.a
 
+# add SQLite3 library
+BUILD_SQLITE3 = 1
+ifeq ($(BUILD_SQLITE3),1)
+SQLITE3_LIB = $(OBJ)/libsqlite3.a
+else
+LIBS += -lsqlite3
+SQLITE3_LIB =
+endif
+
+
 # add PortMidi MIDI library
 ifeq ($(BUILD_MIDILIB),1)
 INCPATH += -I$(SRC)/lib/portmidi
@@ -725,6 +732,10 @@ MIDI_LIB = $(OBJ)/libportmidi.a
 else
 #LIBS += -lportmidi
 MIDI_LIB =
+endif
+
+ifneq (,$(findstring clang,$(CC)))
+LIBS += -lstdc++ -lpthread
 endif
 
 #-------------------------------------------------
@@ -748,6 +759,11 @@ BUILDSRC = $(SRC)/build
 BUILDOBJ = $(OBJ)/build
 BUILDOUT = $(BUILDOBJ)
 
+ifdef NATIVE_OBJ
+BUILDOUT = $(NATIVE_OBJ)/build
+endif # NATIVE_OBJ
+
+
 #-------------------------------------------------
 # include the various .mak files
 #-------------------------------------------------
@@ -768,6 +784,17 @@ include $(SRC)/regtests/regtests.mak
 # combine the various definitions to one
 CCOMFLAGS += $(INCPATH)
 CDEFS = $(DEFS)
+
+# TODO: -x c++ should not be hard-coded
+CPPCHECKFLAGS = $(CDEFS) $(INCPATH) -x c++ --enable=style
+
+#-------------------------------------------------
+# sanity check OSD additions
+#-------------------------------------------------
+
+ifeq (,$(findstring -DOSD_,$(CDEFS)))
+$(error $(OSD).mak should have defined -DOSD_)
+endif
 
 #-------------------------------------------------
 # primary targets
@@ -790,11 +817,10 @@ tools: maketree $(TOOLS)
 maketree: $(sort $(OBJDIRS))
 
 clean: $(OSDCLEAN)
-ifeq ($(PARTIAL),1)
 	@echo Deleting object tree $(OBJ)...
+ifeq ($(PARTIAL),1)
 	$(RM) -r obj/osd/*
 else
-	@echo Deleting object tree $(OBJ)...
 	$(RM) -r obj/*
 endif
 	@echo Deleting $(EMULATOR)...
@@ -802,12 +828,21 @@ endif
 	@echo Deleting $(TOOLS)...
 	$(RM) $(TOOLS)
 	@echo Deleting dependencies...
+	$(RM) depend_emu.mak
 	$(RM) depend_mame.mak
 	$(RM) depend_mess.mak
 	$(RM) depend_ume.mak
-	@echo Deleting build targets...
+ifdef MAP
+	@echo Deleting $(FULLNAME).map...
+	$(RM) $(FULLNAME).map
+endif
+ifdef SYMBOLS
+	@echo Deleting $(FULLNAME).sym...
+	$(RM) $(FULLNAME).sym
+endif
 ifneq ($(PARTIAL),1)
 # 	TODO: We should do this smarter at some point
+	@echo Deleting build targets...
 	$(RM) *_libretro.so *_libretro.dylib *_libretro.dll
 endif
 
@@ -819,6 +854,10 @@ checkautodetect:
 
 tests: $(REGTESTS)
 
+mak: maketree $(MAKEMAK_TARGET)
+	@echo Rebuilding $(SUBTARGET).mak...
+	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst -I. -I$(SRC)/emu -I$(SRC)/mame -I$(SRC)/mame/layout -I$(SRC)/mess -I$(SRC)/mess/layout $(SRC) > $(SUBTARGET).mak
+	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst > $(SUBTARGET).lst
 
 #-------------------------------------------------
 # directory targets
@@ -864,10 +903,44 @@ endif
 # executable targets and dependencies
 #-------------------------------------------------
 
+EXECUTABLE_DEFINED = 1
+ifndef EXECUTABLE_DEFINED
+
+ifeq ($(BUSES),)
+LIBBUS =
+endif
+
+EMULATOROBJLIST = $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(BGFX_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
+
+ifeq ($(TARGETOS),emscripten)
+EMULATOROBJ = $(EMULATOROBJLIST:.a=.bc)
+else
+EMULATOROBJ = $(EMULATOROBJLIST)
+endif
+
+$(EMULATOR): $(VERSIONOBJ) $(EMULATOROBJ)
+	@echo Linking $@...
+ifeq ($(TARGETOS),emscripten)
+# Emscripten's linker seems to be stricter about the ordering of files
+	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) -Wl,--start-group $(EMULATOROBJ) -Wl,--end-group $(LIBS) -o $@
+else
+	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $(EMULATOROBJ) $(LIBS) -o $@
+endif
+ifeq ($(TARGETOS),win32)
+ifdef SYMBOLS
+ifndef MSVC_BUILD
+	$(OBJDUMP) --section=.text --line-numbers --syms --demangle $@ >$(FULLNAME).sym
+endif
+endif
+endif
+
+endif
+
 $(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $(TARGETLIB)
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
+
 
 #-------------------------------------------------
 # generic rules
@@ -879,37 +952,79 @@ $(LIBCOOBJ)/armeabi_asm.o:
 endif
 
 $(OBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.o: $(OBJ)/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.pp: $(SRC)/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
-	@$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
+	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
 $(OBJ)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
 	@echo Converting $<...
-	@$(PYTHON) $(SRC)/build/png2bdc.py $< $(OBJ)/temp.bdc
-	@$(PYTHON) $(SRC)/build/file2str.py $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
+	$(PYTHON) $(SRC)/build/png2bdc.py $< $(OBJ)/temp.bdc
+	$(PYTHON) $(SRC)/build/file2str.py $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
 
 $(DRIVLISTOBJ): $(DRIVLISTSRC)
+	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
-$(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
+$(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(SRC)/build/makelist.py
 	@echo Building driver list $<...
 	$(PYTHON) $(SRC)/build/makelist.py $< >$@
 
+ifeq ($(TARGETOS),emscripten)
+# Avoid using .a files with Emscripten, link to bitcode instead
+$(OBJ)/%.a:
+	@echo Linking $@...
+	$(RM) $@
+	$(LD) $^ -o $@
+$(OBJ)/%.bc: $(OBJ)/%.a
+	@cp $< $@
+else
 $(OBJ)/%.a:
 	@echo Archiving $@...
 	$(RM) $@
 	$(AR) $(ARFLAGS) $@ $^
+endif
+
+ifeq ($(TARGETOS),macosx)
+$(OBJ)/%.o: $(SRC)/%.m | $(OSPREBUILD)
+	@echo Objective-C compiling $<...
+	$(CC) $(CDEFS) $(COBJFLAGS) $(CCOMFLAGS) $(INCPATH) -c $< -o $@
+endif
+
+
+
+#-------------------------------------------------
+# optional dependencies file
+#-------------------------------------------------
 
 -include depend_emu.mak
 -include depend_$(TARGET).mak
