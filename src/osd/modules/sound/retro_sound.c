@@ -51,7 +51,7 @@ public:
 
 void sound_retro::update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
 {
-   if (pauseg != -1)
+   if (retro_pause != -1)
       audio_batch_cb(buffer, samples_this_frame);
 }
 
