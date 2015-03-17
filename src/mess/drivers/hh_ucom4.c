@@ -17,10 +17,11 @@
  *102     uPD553C  1981, Bandai Block Out
  *127     uPD650C  198?  Sony OA-S1100 Typecorder (subcpu, have dump)
  *128     uPD650C  1982, Roland TR-606
-  133     uPD650C  1982, Roland TB-303
+  133     uPD650C  1982, Roland TB-303 -> tb303.c
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
  @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
+ *209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)

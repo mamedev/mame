@@ -15,14 +15,17 @@
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
  *MP0168   TMS1000? 1979, Conic Basketball
  @MP0914   TMS1000  1979, Entex Baseball 1
+ *MP0923   TMS1000? 1979, Entex Baseball 2
  @MP1030   TMS1100  1980, APF Mathemagician
+ *MP1133   ?        1979, Kosmos Astro
  @MP1204   TMS1100  1980, Entex Baseball 3
  *MP1221   TMS1100  1980, Entex Raise The Devil
+ *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  *MP2139   ?        1982, Gakken Galaxy Invader 1000
  *MP2788   ?        1980, Bandai Flight Time
  @MP3226   TMS1000  1978, Milton Bradley Simon
  *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
-  MP3403   TMS1100  1978, Marx Electronic Bowling
+  MP3403   TMS1100  1978, Marx Electronic Bowling -> elecbowl.c
  @MP3404   TMS1100  1978, Parker Brothers Merlin
  @MP3405   TMS1100  1979, Coleco Amaze-A-Tron
  @MP3438A  TMS1100  1979, Kenner Star Wars Electronic Battle Command
@@ -32,9 +35,13 @@
   MP3457   TMS1100  1979, MicroVision cartridge: Mindbuster
   MP3474   TMS1100  1979, MicroVision cartridge: Vegas Slots
   MP3475   TMS1100  1979, MicroVision cartridge: Bowling
+ *MP3476   TMS1100  1979, Milton Bradley Super Simon
   MP3479   TMS1100  1980, MicroVision cartridge: Baseball
   MP3481   TMS1100  1979, MicroVision cartridge: Connect Four
   MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
+  M34009   TMS1100  1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M34000, ..)
+  M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
+  M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
  @MP6100A  TMS0980  1979, Ideal Electronic Detective
  @MP6101B  TMS0980  1979, Parker Brothers Stop Thief
  *MP6361   ?        1983, Defender Strikes
@@ -46,11 +53,7 @@
 
   inconsistent:
   
-  M34009   TMS1100  1981, MicroVision cartridge: Alien Raiders
-  M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
-  M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
-
- @CD7282SL TMS1100  1981, Tandy-12 (serial is similar to TI Speak & Spell series?)
+ @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
@@ -2358,7 +2361,7 @@ CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Col
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 
-CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // unplayable without game cards
+CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
 
 CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
 CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (prototype)", GAME_SUPPORTS_SAVE )
@@ -2366,11 +2369,14 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
 
-CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // unplayable without writing board
+CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )
-CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE ) // unplayable without game board
+CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", GAME_SUPPORTS_SAVE ) // ***
 CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE )
 
-CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE ) // partially unplayable without cards/dice/..
+CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE ) // some of the minigames: ***
+
+// ***: As far as MESS is concerned, the game is emulated fine. But for it to be playable, it requires interaction
+// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

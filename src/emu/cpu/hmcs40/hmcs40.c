@@ -556,8 +556,8 @@ void hmcs40_cpu_device::execute_run()
 		if ((m_prev_op & 0x3e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
 
-		// check/handle interrupt
-		else if (m_ie && (m_iri || m_irt))
+		// check/handle interrupt, but not in the middle of a long jump
+		if (m_ie && (m_iri || m_irt) && (m_op & 0x3e0) != 0x340)
 			do_interrupt();
 
 		// remember previous state
