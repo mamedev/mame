@@ -45,3 +45,8 @@ release-linux: $(GENIE)
 	$(SILENT) git checkout src/host/version.h
 
 release: release-$(OS)
+
+dist: release
+	cp bin/linux/genie       ../bx/tools/bin/linux/
+	cp bin/windows/genie.exe ../bx/tools/bin/windows/
+	cp bin/darwin/genie      ../bx/tools/bin/darwin/
