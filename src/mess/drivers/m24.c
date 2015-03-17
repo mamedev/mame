@@ -4,7 +4,7 @@
 #include "cpu/tms7000/tms7000.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "machine/pckeybrd.h"
+#include "machine/m24_kbd.h"
 #include "machine/mm58274c.h"
 #include "includes/genpc.h"
 
@@ -15,11 +15,13 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
-		m_kbc(*this, "kbc")
+		m_kbc(*this, "kbc"),
+		m_keyboard(*this, "keyboard")
 	{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<cpu_device> m_kbc;
+	required_device<m24_keyboard_device> m_keyboard;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -27,19 +29,30 @@ public:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_READ8_MEMBER(kbcdata_r);
 	DECLARE_WRITE8_MEMBER(kbcdata_w);
+	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
 
-	UINT8 m_sysctl, m_pa, m_kbcdata;
-	bool m_kbcibf;
+	void machine_reset();
+
+	UINT8 m_sysctl, m_pa, m_kbcin, m_kbcout;
+	bool m_kbcibf, m_kbdata;
 };
+
+void m24_state::machine_reset()
+{
+	m_sysctl = 0;
+	m_pa = 0x40;
+	m_kbcibf = false;
+	m_kbdata = true;
+}
 
 READ8_MEMBER(m24_state::keyboard_r)
 {
 	switch(offset)
 	{
 		case 0:
-			m_pa &= ~0x40;
+			m_pa |= 0x40;
 			m_mb->m_pic8259->ir1_w(0);
-			return m_kbcdata;
+			return m_kbcout;
 		case 1:
 			return m_sysctl;
 		case 2:
@@ -57,41 +70,49 @@ WRITE8_MEMBER(m24_state::keyboard_w)
 		case 0:
 			m_kbc->set_input_line(TMS7000_INT1_LINE, ASSERT_LINE);
 			m_kbcibf = true;
-			m_kbcdata = data;
+			m_kbcin = data;
 			break;
 		case 1:
 			m_sysctl = data;
 			m_mb->m_pit8253->write_gate2(BIT(data, 0));
 			m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
 			if(BIT(data, 6))
-				m_pa |= 2;
+				m_pa |= 4;
 			else
-				m_pa &= ~2;
+				m_pa &= ~4;
 			break;
 	}
 }
 
 READ8_MEMBER(m24_state::pa_r)
 {
-	return m_pa;
+	return m_pa & (m_kbdata ? 0xff : 0xfd);
 }
 
 WRITE8_MEMBER(m24_state::pb_w)
 {
+	m_keyboard->clock_w(!BIT(data, 0));
+	m_keyboard->data_w(!BIT(data, 1));
+	m_pa = (m_pa & ~3) | (~data & 3);
 }
 
 READ8_MEMBER(m24_state::kbcdata_r)
 {
 	m_kbc->set_input_line(TMS7000_INT1_LINE, CLEAR_LINE);
 	m_kbcibf = false;
-	return m_kbcdata;
+	return m_kbcin;
 }
 
 WRITE8_MEMBER(m24_state::kbcdata_w)
 {
-	m_pa |= 0x40;
+	m_pa &= ~0x40;
 	m_mb->m_pic8259->ir1_w(1);
-	m_kbcdata = data;
+	m_kbcout = data;
+}
+
+WRITE_LINE_MEMBER(m24_state::kbcin_w)
+{
+	m_kbdata = state;
 }
 
 static ADDRESS_MAP_START( m24_map, AS_PROGRAM, 16, m24_state )
@@ -159,8 +180,6 @@ static INPUT_PORTS_START( m24 )
 	PORT_DIPSETTING(    0x4000, "2" )
 	PORT_DIPSETTING(    0x8000, "3" )
 	PORT_DIPSETTING(    0xc000, "4" )
-
-	PORT_INCLUDE(pc_keyboard)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( olivetti, m24_state )
@@ -185,6 +204,9 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 	MCFG_CPU_PROGRAM_MAP(kbc_map)
 	MCFG_CPU_IO_MAP(kbc_io)
 
+	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
+	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(m24_state, kbcin_w))
+
 	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // ?
 	MCFG_MM58274C_DAY1(1)   // ?
@@ -199,7 +221,7 @@ ROM_START( m24 )
 	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
 
 	ROM_REGION(0x800, "kbc", 0)
-	ROM_LOAD("PDBD.tms2516.KeyboardMCUReplacementDaughterboard_10U", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
+	ROM_LOAD("pdbd.tms2516.keyboardmcureplacementdaughterboard_10u", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
 ROM_START( m240 )
@@ -209,7 +231,7 @@ ROM_START( m240 )
 
 	// is this one the same?
 	ROM_REGION(0x800, "kbc", 0)
-	ROM_LOAD("PDBD.tms2516.KeyboardMCUReplacementDaughterboard_10U", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
+	ROM_LOAD("pdbd.tms2516.keyboardmcureplacementdaughterboard_10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
 COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M24", GAME_NOT_WORKING)

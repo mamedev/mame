@@ -1436,7 +1436,7 @@ void i960_cpu_device::execute_op(UINT32 opcode)
 			case 0xd: // cosr
 				m_icount -= 406;
 				t1f = get_1_rif(opcode);
-				set_rif(opcode, sin(t1f));
+				set_rif(opcode, cos(t1f));
 				break;
 
 			case 0xe: // tanr
