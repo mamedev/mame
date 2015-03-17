@@ -835,6 +835,9 @@ void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 		have_vib = true;
 	}
 
+	// Do we have a broken VIB? The Pascal disks are known to have such incomplete VIBs
+	if (heads == 0 || sector_count == 0) have_vib = false;
+
 	// We're also checking the size of the image
 	int cell_size1 = 0;
 	int sector_count1 = 0;
