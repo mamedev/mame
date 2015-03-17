@@ -152,6 +152,8 @@ video_manager::video_manager(running_machine &machine)
 	filename = machine.options().avi_write();
 	if (filename[0] != 0)
 		begin_recording(filename, MF_AVI);
+	
+	m_dummy_recording = machine.options().dummy_write();
 
 	// if no screens, create a periodic timer to drive updates
 	if (machine.first_screen() == NULL)
@@ -1232,7 +1234,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 void video_manager::record_frame()
 {
 	// ignore if nothing to do
-	if (m_mng_file == NULL && m_avi_file == NULL)
+	if (m_mng_file == NULL && m_avi_file == NULL && !m_dummy_recording)
 		return;
 
 	// start the profiler and get the current time
