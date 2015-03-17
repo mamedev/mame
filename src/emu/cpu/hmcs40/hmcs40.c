@@ -570,6 +570,9 @@ void hmcs40_cpu_device::execute_run()
 		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for immediate param
 		increment_pc();
 
+		// handle opcode
+		switch (m_op)
+		{
 /*
 
 op_ayy();  - 
@@ -585,41 +588,64 @@ op_alem(); - 324 124
 op_blem(); - 267 024
 op_lay();  - 118
 
+
 */
 
-		// handle opcode
-		switch (m_op)
-		{
 			case 0x118:
 				op_lay(); // probably lay
 				break;
+			
+			case 0x046:
+				op_daa();
+				break;
+			case 0x045:
+				op_das();
+				break;
+
+
 			case 0x267:
-				op_blem(); break; // bnem or blem
+				op_blem(); // bnem or blem
+				break;
+
 			case 0x124:
 				op_alem(); // alem or anem
 				break;
 			case 0x324:
-				op_anem(); break; // "
+				op_anem(); // "
+				break;
+
 			case 0x024:
 				//op_nega();
 				//op_am();
 				op_illegal();
 				break;
-			case 0x234:
-				// sm?
-#if 0
-				m_a = ram_r() - m_a;
-				m_s = ~m_a >> 4 & 1;
-				m_a &= 0xf;
-#else
-				op_am();
-#endif
+
+			case 0x04b:
+				op_illegal();
+				//op_rec();
 				break;
 			case 0x04c:
-				op_illegal();
-				//m_c ^= 1;
-				//op_lat();
+				op_rec();
 				break;
+
+			case 0x030:
+				op_amc();
+				break;
+			case 0x034:
+				//op_illegal();
+				op_amc(); // mirror?
+				break;
+
+			case 0x230:
+				op_smc();
+				break;
+			case 0x234:
+				//op_illegal();
+				op_smc(); // mirror?
+				break;
+
+
+
 
 
 
@@ -637,15 +663,11 @@ op_lay();  - 118
 /* ok */		op_lmiiy(); break;
 			case 0x020: case 0x021: case 0x022: case 0x023:
 				op_lbm(); break;
-			case 0x030:
-				op_amc(); break;
 			case 0x03c:
 				op_lta(); break;
 			
 			case 0x040:
 /* ok */		op_lxa(); break;
-			case 0x04b:
-				op_rec(); break;
 			case 0x04f:
 				op_sec(); break;
 			case 0x050:
@@ -751,8 +773,6 @@ op_lay();  - 118
 /* ok */		op_rotr(); break;
 			case 0x225:
 /* ok */		op_rotl(); break;
-			case 0x230:
-				op_smc(); break;
 			case 0x23c:
 				op_lat(); break;
 			
