@@ -632,6 +632,8 @@ static void Input_Binding(running_machine &machine)
                            (core_stricmp(machine.system().parent, "sf2") == 0) ||
                            (core_stricmp(machine.system().name, "ssf2") == 0) ||
                            (core_stricmp(machine.system().parent, "ssf2") == 0) ||
+                           (core_stricmp(machine.system().name, "ssf2t") == 0) ||
+                           (core_stricmp(machine.system().parent, "ssf2t") == 0) ||
                            (core_stricmp(machine.system().name, "sfa") == 0) ||
                            (core_stricmp(machine.system().parent, "sfa") == 0) ||
                            (core_stricmp(machine.system().name, "sfa2") == 0) ||
