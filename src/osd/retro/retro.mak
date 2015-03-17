@@ -134,3 +134,8 @@ $(LIBCOOBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
 	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
 	endif
 
+ifeq ($(armplatform), 1)
+$(LIBCOOBJ)/armeabi_asm.o:
+	$(CC) -I$(SRC)/osd/$(OSD)/libretro-common/include -c $(SRC)/osd/$(OSD)/libretro-common/libco/armeabi_asm.S -o $(LIBCOOBJ)/armeabi_asm.o
+endif
+
