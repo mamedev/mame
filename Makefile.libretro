@@ -110,7 +110,7 @@ ifeq ($(platform), osx)
 	SHARED := -dynamiclib
 #	CXX_AS = c++
 #	CC = $(CXX_AS) -stdlib=$(LIBCXX)
-#	LD = $(CXX_AS) -stdlib=$(LIBCXX)
+	LD = $(CXX) -stdlib=$(LIBCXX)
 #	NATIVECC = $(CXX_AS)
 	LDFLAGS +=  $(fpic) $(SHARED)
 	AR = @ar
