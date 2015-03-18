@@ -21,6 +21,8 @@ static thread_local long long co_active_buffer[64];
 static thread_local cothread_t co_active_handle = 0;
 #ifndef CO_USE_INLINE_ASM
 static void (*co_swap)(cothread_t, cothread_t) = 0;
+#else
+void co_swap(cothread_t, cothread_t);
 #endif
 
 #ifdef _WIN32
@@ -113,7 +115,29 @@ void co_init(void)
    mprotect((void*)base, size, PROT_READ | PROT_WRITE | PROT_EXEC);
 }
 #else
-void co_init(void) {}
+__asm__(
+".intel_syntax noprefix\n"
+".globl co_swap        \n"
+"co_swap:              \n"
+".globl _co_swap       \n" /* OSX ABI is different from Linux. */
+"_co_swap:             \n"
+"mov [rsi],rsp         \n"
+"mov [rsi+0x08],rbp    \n"
+"mov [rsi+0x10],rbx    \n"
+"mov [rsi+0x18],r12    \n"
+"mov [rsi+0x20],r13    \n"
+"mov [rsi+0x28],r14    \n"
+"mov [rsi+0x30],r15    \n"
+"mov rsp,[rdi]         \n"
+"mov rbp,[rdi+0x08]    \n"
+"mov rbx,[rdi+0x10]    \n"
+"mov r12,[rdi+0x18]    \n"
+"mov r13,[rdi+0x20]    \n"
+"mov r14,[rdi+0x28]    \n"
+"mov r15,[rdi+0x30]    \n"
+"ret                   \n"
+".att_syntax           \n"
+);
 #endif
 #endif
 
@@ -162,42 +186,11 @@ void co_delete(cothread_t handle)
    free(handle);
 }
 
-#ifndef CO_USE_INLINE_ASM
 void co_switch(cothread_t handle)
 {
   register cothread_t co_previous_handle = co_active_handle;
   co_swap(co_active_handle = handle, co_previous_handle);
 }
-#else
-#ifdef __APPLE__
-#define ASM_PREFIX "_"
-#else
-#define ASM_PREFIX ""
-#endif
-__asm__(
-".intel_syntax noprefix         \n"
-".globl " ASM_PREFIX "co_switch              \n"
-ASM_PREFIX "co_switch:                     \n"
-"mov rsi, [rip+" ASM_PREFIX "co_active_handle]\n"
-"mov [rsi],rsp                  \n"
-"mov [rsi+0x08],rbp             \n"
-"mov [rsi+0x10],rbx             \n"
-"mov [rsi+0x18],r12             \n"
-"mov [rsi+0x20],r13             \n"
-"mov [rsi+0x28],r14             \n"
-"mov [rsi+0x30],r15             \n"
-"mov [rip+" ASM_PREFIX "co_active_handle], rdi\n"
-"mov rsp,[rdi]                  \n"
-"mov rbp,[rdi+0x08]             \n"
-"mov rbx,[rdi+0x10]             \n"
-"mov r12,[rdi+0x18]             \n"
-"mov r13,[rdi+0x20]             \n"
-"mov r14,[rdi+0x28]             \n"
-"mov r15,[rdi+0x30]             \n"
-"ret                            \n"
-".att_syntax                    \n"
-);
-#endif
 
 #ifdef __cplusplus
 }
