@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  suprloco.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -98,6 +98,8 @@ void suprloco_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suprloco_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_scroll_rows(32);
+	
+	save_item(NAME(m_control));
 }
 
 
@@ -108,13 +110,13 @@ void suprloco_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(suprloco_state::suprloco_videoram_w)
+WRITE8_MEMBER(suprloco_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(suprloco_state::suprloco_scrollram_w)
+WRITE8_MEMBER(suprloco_state::scrollram_w)
 {
 	int adj = flip_screen() ? -8 : 8;
 
@@ -122,7 +124,7 @@ WRITE8_MEMBER(suprloco_state::suprloco_scrollram_w)
 	m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
-WRITE8_MEMBER(suprloco_state::suprloco_control_w)
+WRITE8_MEMBER(suprloco_state::control_w)
 {
 	/* There is probably a palette select in here */
 
@@ -148,7 +150,7 @@ WRITE8_MEMBER(suprloco_state::suprloco_control_w)
 }
 
 
-READ8_MEMBER(suprloco_state::suprloco_control_r)
+READ8_MEMBER(suprloco_state::control_r)
 {
 	return m_control;
 }
@@ -256,7 +258,7 @@ void suprloco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 suprloco_state::screen_update_suprloco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);
