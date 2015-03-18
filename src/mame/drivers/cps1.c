@@ -9352,6 +9352,43 @@ ROM_START( cworld2ja )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
 ROM_END
 
+/* B-Board 91634B-2  - all roms have 91634B on the labels */
+ROM_START( cworld2jb )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "q5 - 23_91634b.8f", 0x00000, 0x80000, CRC(709f577f) SHA1(3e0615d01f22eb1bf75cbd26dc80ca5a6d08120e) )
+	ROM_LOAD16_WORD_SWAP( "q5 - 22_91634b.7f", 0x80000, 0x80000, CRC(93248458) SHA1(9dcdc6838f52efc9a0a6333fd0d734946db12dbd) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "q5 - 01_91634b.3a", 0x000000, 0x80000, CRC(09d0e7ce) SHA1(ea502b975986222acce82ce8396348af72e1df72) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "q5 - 02_91634b.4a", 0x000002, 0x80000, CRC(22e4ce9a) SHA1(9e49aec8e1d6d15a68da63e69765b82fd53a9562) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "q5 - 03_91634b.5a", 0x000004, 0x80000, CRC(f7b3aed6) SHA1(bdfb4d5988307b07ad878ac9129954d14da8769b) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "q5 - 04_91634b.6a", 0x000006, 0x80000, CRC(520c6c88) SHA1(19ba8ca3d75aae71cdf471e6307e86a5df8a2851) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "q5 - 09_91634b.12a", 0x00000, 0x08000, CRC(e14dc524) SHA1(0020a9002572002458fbfe45e8a959cb90de3f03) )
+	ROM_CONTINUE(           0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "q5 - 18_91634b.11c", 0x00000, 0x20000, CRC(d10c1b68) SHA1(2423241f3340d8ab1b6bf9514ca8c3bba1273873) )
+	ROM_LOAD( "q5 - 19_91634b.12c", 0x20000, 0x20000, CRC(7d17e496) SHA1(a274b94ec4f042dddc239ecb9ac2e1e2375f5eb2) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "q563b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 ) // checkme
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0117, CRC(0d182081) SHA1(475b3d417785da4bc512cce2b274bb00d4cc6792) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+ROM_END
+
 /* B-Board 89624B-3 */
 ROM_START( varth )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -11718,6 +11755,7 @@ GAME( 1992, sf2koryu,    sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  
 GAME( 1992, sf2dongb,    sf2ce,    cps1_12MHz, sf2,      cps_state,   sf2dongb, ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dongfang Bubai protection, bootleg)", GAME_SUPPORTS_SAVE ) // 920313 - based on World version
 GAME( 1992, cworld2j,    0,        cps1_12MHz, cworld2j, cps_state,   cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611)", GAME_SUPPORTS_SAVE )
 GAME( 1992, cworld2ja,   cworld2j, cps1_12MHz, cworld2j, cps_state,   cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 90629B-3, no battery)", GAME_SUPPORTS_SAVE )
+GAME( 1992, cworld2jb,   cworld2j, cps1_12MHz, cworld2j, cps_state,   cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 91634B-2)", GAME_SUPPORTS_SAVE )
 GAME( 1992, varth,       0,        cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (World 920714)", GAME_SUPPORTS_SAVE )  // "ETC"    // 12MHz verified
 GAME( 1992, varthr1,     varth,    cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (World 920612)", GAME_SUPPORTS_SAVE )  // "ETC"
 GAME( 1992, varthu,      varth,    cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom (Romstar license)", "Varth: Operation Thunderstorm (USA 920612)", GAME_SUPPORTS_SAVE )

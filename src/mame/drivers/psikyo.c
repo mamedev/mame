@@ -1406,6 +1406,40 @@ ROM_START( btlkroad )
 
 ROM_END
 
+
+ROM_START( btlkroadk )
+
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD32_WORD_SWAP( "4(dot).u46", 0x000000, 0x040000, CRC(e724d429) SHA1(8b5f80366fd22d6f7e7d8a9623de4fe231303267) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "5(dot).u39", 0x000002, 0x040000, CRC(c0d65765) SHA1(a6a26e6b9693a2ef245e9aaa4c9daa888aebb360)) // 3&2
+
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_LOAD( "3(k).u71", 0x00000, 0x20000, CRC(e0f0c597) SHA1(cc337633f1f579baf0f8ba1dd65c5d51122a7e97) )
+
+	ROM_REGION( 0x700000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(282d89c3) SHA1(3b4b17f4a37efa2f7e232488aaba7c77d10c84d2) )
+	ROM_LOAD( "u24.bin",  0x200000, 0x200000, CRC(bbe9d3d1) SHA1(9da0b0b993e8271a8119e9c2f602e52325983f79) )
+	ROM_LOAD( "u15.bin",  0x400000, 0x200000, CRC(d4d1b07c) SHA1(232109db8f6e137fbc8826f38a96057067cb19dc) )
+//  ROM_LOAD( "u25.bin",  0x600000, 0x100000  NOT PRESENT
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
+	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
+
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(30d541ed) SHA1(6f7fb5f5ecbce7c086185392de164ebb6887e780) )
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "tibpal16l8.u69", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "tibpal16l8.u19", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+
+ROM_END
+
 /***************************************************************************
 
                             Strikers 1945 (Japan, unprotected)
@@ -1956,18 +1990,22 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
 
 ***************************************************************************/
 
-/* Working Games */
 GAME( 1993, samuraia, 0,        sngkace,  samuraia, psikyo_state, sngkace,  ROT270, "Psikyo", "Samurai Aces (World)", GAME_SUPPORTS_SAVE ) // Banpresto?
 GAME( 1993, sngkace,  samuraia, sngkace,  sngkace, psikyo_state,  sngkace,  ROT270, "Psikyo", "Sengoku Ace (Japan)", GAME_SUPPORTS_SAVE ) // Banpresto?
+
 GAME( 1994, gunbird,  0,        gunbird,  gunbird, psikyo_state,  gunbird,  ROT270, "Psikyo", "Gunbird (World)", GAME_SUPPORTS_SAVE )
 GAME( 1994, gunbirdk, gunbird,  gunbird,  gunbirdj, psikyo_state, gunbird,  ROT270, "Psikyo", "Gunbird (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1994, gunbirdj, gunbird,  gunbird,  gunbirdj, psikyo_state, gunbird,  ROT270, "Psikyo", "Gunbird (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1994, btlkroad, 0,        gunbird,  btlkroad, psikyo_state, gunbird,  ROT0,   "Psikyo", "Battle K-Road", GAME_SUPPORTS_SAVE )
+GAME( 1994, btlkroadk, btlkroad,gunbird,  btlkroad, psikyo_state, gunbird,  ROT0,   "Psikyo", "Battle K-Road (Korean PCB)", GAME_SUPPORTS_SAVE ) // game code is still multi-region, but sound rom appears to be Korea specific at least
+
 GAME( 1995, s1945,    0,        s1945,    s1945, psikyo_state,    s1945,    ROT270, "Psikyo", "Strikers 1945 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945a,   s1945,    s1945,    s1945a, psikyo_state,   s1945a,   ROT270, "Psikyo", "Strikers 1945 (Japan / World)", GAME_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
 GAME( 1995, s1945j,   s1945,    s1945,    s1945j, psikyo_state,   s1945j,   ROT270, "Psikyo", "Strikers 1945 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j, psikyo_state,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945k,   s1945,    s1945,    s1945j, psikyo_state,   s1945,    ROT270, "Psikyo", "Strikers 1945 (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945bl,  s1945,    s1945bl,  s1945bl, psikyo_state,  s1945bl,  ROT270, "bootleg","Strikers 1945 (Hong Kong, bootleg)", GAME_SUPPORTS_SAVE )
+
 GAME( 1996, tengai,   0,        s1945,    tengai, psikyo_state,   tengai,   ROT0,   "Psikyo", "Tengai (World)", GAME_SUPPORTS_SAVE )
 GAME( 1996, tengaij,  tengai,   s1945,    tengaij, psikyo_state,  tengai,   ROT0,   "Psikyo", "Sengoku Blade: Sengoku Ace Episode II / Tengai", GAME_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
