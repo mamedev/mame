@@ -37,94 +37,6 @@ endif
 
 VRENDER ?= soft
 
-#
-############################################################################
-##################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
-############################################################################
-#
-#ifndef TARGET
-#TARGET = mame
-#endif
-#
-#ifndef SUBTARGET
-#SUBTARGET = $(TARGET)
-#endif
-#
-##TARGET=mame
-##SUBTARGET=mame
-#
-#OSD=retro
-#
-#NOWERROR = 1
-#
-#ifndef PARTIAL
-#PARTIAL = 0
-#endif
-#
-##-------------------------------------------------
-## specify core target: mame, mess, etc.
-## specify subtarget: mame, mess, tiny, etc.
-## build rules will be included from
-## src/$(TARGET)/$(SUBTARGET).mak
-##-------------------------------------------------
-#
-##-------------------------------------------------
-## specify OSD layer: windows, sdl, etc.
-## build rules will be included from
-## src/osd/$(OSD)/$(OSD).mak
-##-------------------------------------------------
-#
-#CROSS_BUILD_OSD = $(OSD)
-#
-##-------------------------------------------------
-## configure name of final executable
-##-------------------------------------------------
-#
-## uncomment and specify prefix to be added to the name
-## PREFIX =
-#
-## uncomment and specify suffix to be added to the name
-## SUFFIX =
-#
-#
-#
-##-------------------------------------------------
-## specify architecture-specific optimizations
-##-------------------------------------------------
-#
-## uncomment and specify architecture-specific optimizations here
-## some examples:
-##   ARCHOPTS = -march=pentiumpro  # optimize for I686
-##   ARCHOPTS = -march=core2       # optimize for Core 2
-##   ARCHOPTS = -march=native      # optimize for local machine (auto detect)
-##   ARCHOPTS = -mcpu=G4           # optimize for G4
-## note that we leave this commented by default so that you can
-## configure this in your environment and never have to think about it
-## ARCHOPTS =
-#
-#
-#
-##-------------------------------------------------
-## specify program options; see each option below
-## for details
-##-------------------------------------------------
-#
-## uncomment the force the universal DRC to always use the C backend
-## you may need to do this if your target architecture does not have
-## a native backend
-## FORCE_DRC_C_BACKEND = 1
-#
-##-------------------------------------------------
-## specify build options; see each option below
-## for details
-##-------------------------------------------------
-#
-#
-## specify optimization level or leave commented to use the default
-## (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
-#OPTIMIZE = 3
-#
-#
 ############################################################################
 ###################   END USER-CONFIGURABLE OPTIONS   ######################
 ############################################################################
@@ -139,69 +51,13 @@ VRENDER ?= soft
 #OBJDUMP = @objdump
 #PYTHON ?= @python2
 #
-##-------------------------------------------------
-## form the name of the executable
-##-------------------------------------------------
-#
-## reset all internal prefixes/suffixes
-#SUFFIX64 =
-#SUFFIXDEBUG =
-#SUFFIXPROFILE =
-#
-## 64-bit builds get a '64' suffix
-#ifeq ($(PTR64),1)
-#SUFFIX64 = 64
-#endif
-#
-## add an EXE suffix to get the final emulator name
-#EMULATOR = $(TARGET)
-#
-##-------------------------------------------------
-## source and object locations
-##-------------------------------------------------
-#
-## all sources are under the src/ directory
-#SRC = src
-#
-## all 3rd party sources are under the 3rdparty/ directory
-#3RDPARTY = 3rdparty
-#
 ## build the targets in different object dirs, so they can co-exist
 #ifeq ($(NATIVE),1)
 #OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 #else
 #OBJ = obj/$(PREFIX)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 #endif
-##-------------------------------------------------
-## compile-time definitions
-##-------------------------------------------------
-## map the INLINE to something digestible by GCC
-#DEFS += -DINLINE="static inline"
 #
-## define LSB_FIRST if we are a little-endian target
-#ifndef BIGENDIAN
-#DEFS += -DLSB_FIRST
-#endif
-#
-## define PTR64 if we are a 64-bit target
-#ifeq ($(PTR64),1)
-#DEFS += -DPTR64
-#endif
-#
-#DEFS += -DNDEBUG
-#
-## need to ensure FLAC functions are statically linked
-#ifeq ($(BUILD_FLAC),1)
-#DEFS += -DFLAC__NO_DLL
-#endif
-#
-## define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
-#ifneq ($(BUILD_JPEGLIB),1)
-#DEFS += -DUSE_SYSTEM_JPEGLIB
-#endif
-#
-## To support casting in Lua 5.3
-#DEFS += -DLUA_COMPAT_APIINTCASTS
 #
 ## CFLAGS is defined based on C or C++ targets
 ## (remember, expansion only happens when used, so doing it here is ok)
@@ -210,11 +66,6 @@ VRENDER ?= soft
 ## we compile C-only to C89 standard with GNU extensions
 ## we compile C++ code to C++98 standard with GNU extensions
 ##CONLYFLAGS += -std=gnu89
-#ifeq ($(platform), osx)
-#CONLYFLAGS += -ansi
-#else
-#CONLYFLAGS += -std=gnu89
-#endif
 #CPPONLYFLAGS += -x c++ -std=gnu++98
 #COBJFLAGS += -x objective-c++
 #
@@ -613,7 +464,9 @@ endif
 override EMULATOR = $(TARGET)
 NOWERROR = 1
 OSD = retro
- NO_USE_MIDI = 1
+OPTIMIZE = 3
+NO_USE_MIDI = 1
+DEFS += -DNDEBUG
 INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
 
 include makefile
@@ -623,40 +476,40 @@ DEFS += $(CORE_DEFINE)
 
 
 ## Unix
-#ifeq ($(platform), unix)
-#	TARGETLIB := $(TARGET)_libretro.so
-#	TARGETOS=linux
-#	fpic := -fPIC
-#	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
-#	CCOMFLAGS += $(fpic) -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
-#	PLATCFLAGS +=  -DALIGN_INTS -DALIGN_SHORTS -fstrict-aliasing -fno-merge-constants  $(fpic)
+ifeq ($(platform), unix)
+	TARGETLIB := $(TARGET)_libretro.so
+	TARGETOS=linux
+	fpic := -fPIC
+	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
+	CCOMFLAGS += $(fpic) -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
+	PLATCFLAGS +=  -DALIGN_INTS -DALIGN_SHORTS -fstrict-aliasing -fno-merge-constants  $(fpic)
 #	ifeq ($(VRENDER),opengl)
 #		PLATCFLAGS += -DHAVE_GL
 #		LIBS += -lGL
 #	endif
-#	LDFLAGS +=  $(fpic) $(SHARED)
+	LDFLAGS +=  $(fpic) $(SHARED)
 #	NATIVECC = g++
 #	NATIVECFLAGS = -std=gnu99
-#	BASELIBS +=  -lpthread
-#	CC = g++
-#	AR = @ar
-#	LD = g++
+	BASELIBS +=  -lpthread
+	CC = g++
+	AR = @ar
+	LD = g++
 #	CCOMFLAGS += $(PLATCFLAGS)
-#	LIBS += -lstdc++ -lpthread -ldl
-#	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-#		PTR64 = 1
-#	endif
-#	ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-#		PTR64 = 1
-#	endif
-#	ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-#		PTR64 = 1
-#	endif
-#	ifneq (,$(findstring ppc,$(UNAME)))
-#		BIGENDIAN=1
-#	else
-#		PLATCFLAGS += -DLSB_FIRST
-#	endif
+	LIBS += -lstdc++ -lpthread -ldl
+	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
+		PTR64 = 1
+	endif
+	ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
+		PTR64 = 1
+	endif
+	ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
+		PTR64 = 1
+	endif
+	ifneq (,$(findstring ppc,$(UNAME)))
+		BIGENDIAN=1
+	else
+		PLATCFLAGS += -DLSB_FIRST
+	endif
 #
 ## Android
 #else ifeq ($(platform), android)
@@ -684,9 +537,7 @@ DEFS += $(CORE_DEFINE)
 #	#-lpthread
 #
 ## OS X
-#else ifeq ($(platform), osx)
-# FIXME: remove the line below, uncomment the one above when the above blocks are enabled
-ifeq ($(platform), osx)
+else ifeq ($(platform), osx)
 	TARGETLIB := $(TARGET)_libretro.dylib
 	TARGETOS = macosx
 	fpic := -fPIC -mmacosx-version-min=10.7
@@ -908,6 +759,11 @@ ifeq ($(platform), osx)
 #
 endif
 
+ifeq ($(platform), osx)
+CONLYFLAGS += -ansi
+else
+CONLYFLAGS += -std=gnu89
+endif
 
 
 clean: clean-libretro
