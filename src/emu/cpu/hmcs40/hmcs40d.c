@@ -96,7 +96,7 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 	mLBM,   mLBM,   mLBM,   mLBM,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
 	mAMC,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mLTA,   mILL,   mILL,   mILL,
 	/* 0x040 */
-	mLXA,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mREC,   mILL,   mILL,   mILL,   mSEC,
+	mLXA,   mILL,   mILL,   mILL,   mILL,   mDAS,   mDAA,   mILL,   mILL,   mILL,   mILL,   mILL,   mREC,   mILL,   mILL,   mSEC,
 	mLYA,   mILL,   mILL,   mILL,   mIY,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
 	mLBA,   mILL,   mILL,   mILL,   mIB,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
 	mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,
@@ -142,7 +142,7 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 	/* 0x240 */
 	mLASPX, mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mTC,
 	mLASPY, mILL,   mILL,   mILL,   mDY,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mLAB,   mILL,   mILL,   mILL,   mDB,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	mLAB,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mDB,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
 	mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,
 	/* 0x280 */
 	mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,
