@@ -117,10 +117,10 @@ public:
 	m_maria(*this, "maria"),
 	m_io_joysticks(*this, "joysticks"),
 	m_io_buttons(*this, "buttons"),
-	m_io_vblank(*this, "vblank"),
 	m_io_console_buttons(*this, "console_buttons"),
 	m_cart(*this, "cartslot"),
-	m_screen(*this, "screen") { }
+	m_screen(*this, "screen"),
+	m_bios(*this, "maincpu") { }
 
 	int m_lines;
 	int m_ispal;
@@ -131,8 +131,6 @@ public:
 	int m_p1_one_button;
 	int m_p2_one_button;
 	int m_bios_enabled;
-
-	UINT8 *m_bios;
 
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
 	DECLARE_WRITE8_MEMBER(ram0_w);
@@ -158,10 +156,10 @@ protected:
 	required_device<atari_maria_device> m_maria;
 	required_ioport m_io_joysticks;
 	required_ioport m_io_buttons;
-	required_ioport m_io_vblank;
 	required_ioport m_io_console_buttons;
 	required_device<a78_cart_slot_device> m_cart;
 	required_device<screen_device> m_screen;
+	required_region_ptr<UINT8> m_bios;
 };
 
 
@@ -282,18 +280,17 @@ READ8_MEMBER(a7800_state::bios_or_cart_r)
 static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x300) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0020, 0x003f) AM_MIRROR(0x300) AM_DEVREADWRITE("maria", atari_maria_device, read, write)
-	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("ram0")     // RAM (6116 block 0)
-	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("ram1")     // RAM (6116 block 1)
+	AM_RANGE(0x0040, 0x00ff) AM_RAMBANK("zpmirror") // mirror of 0x2040-0x20ff, for zero page
+	AM_RANGE(0x0140, 0x01ff) AM_RAMBANK("spmirror") // mirror of 0x2140-0x21ff, for stack page
 	AM_RANGE(0x0280, 0x02ff) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x0480, 0x04ff) AM_MIRROR(0x100) AM_RAMBANK("riot_ram")
-	AM_RANGE(0x1800, 0x27ff) AM_RAMBANK("main_ram")
-
-	AM_RANGE(0x2040, 0x20ff) AM_RAMBANK("ram0")     // mirror (6116 block 0)
-	AM_RANGE(0x2140, 0x21ff) AM_RAMBANK("ram1")     // mirror (6116 block 1)
-
-	AM_RANGE(0x2800, 0x2fff) AM_RAMBANK("mirror")   // these should mirror "main_ram" (according to docs)
-	AM_RANGE(0x3000, 0x37ff) AM_RAMBANK("mirror")   // but system have issues in such case...
-	AM_RANGE(0x3800, 0x3fff) AM_RAMBANK("mirror")
+	AM_RANGE(0x0480, 0x04ff) AM_RAM AM_SHARE("riot_ram") AM_MIRROR(0x100)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("6116_1")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("6116_2") AM_MIRROR(0x0800)
+                             // According to the official Software Guide, the RAM at 0x2000 is
+                             // repeatedly mirrored up to 0x3fff, but this is evidently incorrect
+                             // because the High Score Cartridge maps ROM at 0x3000-0x3fff
+                             // Hardware tests show that only the mirror at 0x2800-0x2fff actually
+                             // exists, and only on some hardware (MARIA? motherboard?) revisions
 	AM_RANGE(0x4000, 0xffff) AM_DEVWRITE("cartslot", a78_cart_slot_device, write_40xx)
 	AM_RANGE(0x4000, 0xbfff) AM_DEVREAD("cartslot", a78_cart_slot_device, read_40xx)
 	AM_RANGE(0xc000, 0xffff) AM_READ(bios_or_cart_r)    // here also the BIOS can be accessed
@@ -321,10 +318,6 @@ static INPUT_PORTS_START( a7800 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON1)       PORT_PLAYER(1)
 	PORT_BIT(0xF0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("vblank")
-	PORT_BIT(0x7F, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 
 	PORT_START("console_buttons")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Reset")         PORT_CODE(KEYCODE_R)
@@ -1306,13 +1299,17 @@ PALETTE_INIT_MEMBER(a7800_state,a7800p)
 
 void a7800_state::machine_start()
 {
-	m_bios = machine().root_device().memregion("maincpu")->base() + 0xc000;
 	save_item(NAME(m_p1_one_button));
 	save_item(NAME(m_p2_one_button));
 	save_item(NAME(m_bios_enabled));
 	save_item(NAME(m_ctrl_lock));
 	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_maria_flag));
+
+	// set up RAM mirrors
+	UINT8 *ram = reinterpret_cast<UINT8 *>(memshare("6116_2")->ptr());
+	membank("zpmirror")->set_base(ram + 0x0040);
+	membank("spmirror")->set_base(ram + 0x0140);
 
 	// install additional handlers, if needed
 	if (m_cart->exists())
@@ -1420,16 +1417,16 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( a7800 )
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS( 0, "a7800", "Atari 7800" )
-	ROMX_LOAD("7800.u7", 0xf000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
+	ROMX_LOAD("7800.u7", 0x3000, 0x1000, CRC(5d13730c) SHA1(d9d134bb6b36907c615a594cc7688f7bfcef5b43), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "a7800pr", "Atari 7800 (prototype with Asteroids)" )
-	ROMX_LOAD("c300558-001a.u7", 0xc000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(2))
+	ROMX_LOAD("c300558-001a.u7", 0x0000, 0x4000, CRC(a0e10edf) SHA1(14584b1eafe9721804782d4b1ac3a4a7313e455f), ROM_BIOS(2))
 ROM_END
 
 ROM_START( a7800p )
-	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("7800pal.rom", 0xc000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("7800pal.rom", 0x0000, 0x4000, CRC(d5b61170) SHA1(5a140136a16d1d83e4ff32a19409ca376a8df874))
 ROM_END
 
 
