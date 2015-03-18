@@ -459,6 +459,7 @@ void hmcs40_cpu_device::do_interrupt()
 {
 	m_icount--;
 	push_stack();
+	m_ie = 0;
 	
 	// line 0/1 for external interrupt, let's use 2 for t/c interrupt
 	int line = (m_iri) ? m_eint_line : 2;
@@ -466,8 +467,10 @@ void hmcs40_cpu_device::do_interrupt()
 	// vector $3f, on page 0(timer/counter), or page 1(external)
 	// external interrupt has priority over t/c interrupt
 	m_pc = 0x3f | (m_iri ? 0x40 : 0);
-	m_iri = m_irt = 0;
-	m_ie = 0;
+	if (m_iri)
+		m_iri = 0;
+	else
+		m_irt = 0;
 
 	standard_irq_callback(line);
 }
@@ -554,7 +557,12 @@ void hmcs40_cpu_device::execute_run()
 		
 		// LPU is handled 1 cycle later
 		if ((m_prev_op & 0x3e0) == 0x340)
+		{
+			if ((m_op & 0x1c0) != 0x1c0)
+				logerror("%s LPU without BR/CAL at $%04X\n", tag(), m_prev_pc);
+
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
+		}
 
 		// check/handle interrupt, but not in the middle of a long jump
 		if (m_ie && (m_iri || m_irt) && (m_op & 0x3e0) != 0x340)
@@ -567,7 +575,7 @@ void hmcs40_cpu_device::execute_run()
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
-		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for immediate param
+		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for immediate param (except for XAMR?)
 		increment_pc();
 
 		// handle opcode
@@ -633,7 +641,8 @@ op_lay();  - 118
 				break;
 			case 0x034:
 				//op_illegal();
-				op_amc(); // mirror?
+				//op_amc(); // mirror?
+				op_am();
 				break;
 
 			case 0x230:
@@ -641,7 +650,8 @@ op_lay();  - 118
 				break;
 			case 0x234:
 				//op_illegal();
-				op_smc(); // mirror?
+				//op_smc(); // mirror?
+				op_nega();
 				break;
 
 
