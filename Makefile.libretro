@@ -619,12 +619,8 @@ SUBTARGET = tiny
 
 include makefile
 
-CONLYFLAGS += -fpermissive
 CPPONLYFLAGS += -fpermissive
 DEFS += $(CORE_DEFINE)
-fpic := -fPIC
-SHARED := -dynamiclib
-LDFLAGS += $(fpic) $(SHARED)
 
 
 ## Unix
