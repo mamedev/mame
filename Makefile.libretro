@@ -483,10 +483,10 @@ ifeq ($(platform), unix)
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
 	CCOMFLAGS += $(fpic) -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
 	PLATCFLAGS +=  -DALIGN_INTS -DALIGN_SHORTS -fstrict-aliasing -fno-merge-constants  $(fpic)
-#	ifeq ($(VRENDER),opengl)
-#		PLATCFLAGS += -DHAVE_GL
-#		LIBS += -lGL
-#	endif
+	ifeq ($(VRENDER),opengl)
+		PLATCFLAGS += -DHAVE_GL
+		LIBS += -lGL
+	endif
 	LDFLAGS +=  $(fpic) $(SHARED)
 #	NATIVECC = g++
 #	NATIVECFLAGS = -std=gnu99
@@ -494,7 +494,7 @@ ifeq ($(platform), unix)
 	CC = g++
 	AR = @ar
 	LD = g++
-#	CCOMFLAGS += $(PLATCFLAGS)
+	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++ -lpthread -ldl
 	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 		PTR64 = 1
