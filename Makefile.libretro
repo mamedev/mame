@@ -615,7 +615,6 @@ NOWERROR = 1
 OSD = retro
  NO_USE_MIDI = 1
 INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
-SUBTARGET = tiny
 
 include makefile
 
