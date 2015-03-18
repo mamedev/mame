@@ -617,7 +617,8 @@ OSD = retro
 INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
 SUBTARGET = tiny
 
--include makefile
+include makefile
+
 CONLYFLAGS += -fpermissive
 CPPONLYFLAGS += -fpermissive
 DEFS += $(CORE_DEFINE)
