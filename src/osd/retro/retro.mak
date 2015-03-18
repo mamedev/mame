@@ -128,11 +128,11 @@ $(LIBOSD): $(OSDOBJS)
 
 # Override to force libco to build as C
 $(LIBCOOBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
-	@echo Compiling $<...
+	@echo Compiling $< FOR C ONLY...
 	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) $(INCPATH) -c $< -o $@
-	ifdef CPPCHECK
+ifdef CPPCHECK
 	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
-	endif
+endif
 
 ifeq ($(armplatform), 1)
 $(LIBCOOBJ)/armeabi_asm.o:

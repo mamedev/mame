@@ -37,9 +37,12 @@ endif
 
 VRENDER ?= soft
 
-############################################################################
-###################   END USER-CONFIGURABLE OPTIONS   ######################
-############################################################################
+
+##
+## OLD MAKEFILE.LIBRETRO STUFF
+## Feel free to remove stuff from here as you become certain we don't need it
+## in the new Makefile.libretro
+##
 #
 ##-------------------------------------------------
 ## platform-specific definitions
@@ -58,183 +61,8 @@ VRENDER ?= soft
 #OBJ = obj/$(PREFIX)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
 #endif
 #
-#
-## CFLAGS is defined based on C or C++ targets
-## (remember, expansion only happens when used, so doing it here is ok)
-#CFLAGS = $(CCOMFLAGS) $(CPPONLYFLAGS)
-#
-## we compile C-only to C89 standard with GNU extensions
-## we compile C++ code to C++98 standard with GNU extensions
-##CONLYFLAGS += -std=gnu89
-#CPPONLYFLAGS += -x c++ -std=gnu++98
-#COBJFLAGS += -x objective-c++
-#
-## this speeds it up a bit by piping between the preprocessor/compiler/assembler
-#CCOMFLAGS += -pipe
-#
-## add the optimization flag
-#CCOMFLAGS += -O$(OPTIMIZE)
-#
-## add the error warning flag
-#ifndef NOWERROR
-#CCOMFLAGS += -Werror
-#endif
-#
-## if we are optimizing, include optimization options
-#ifneq ($(OPTIMIZE),0)
-#CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
-#endif
-#
-## add a basic set of warnings
-#CCOMFLAGS += \
-#	-Wall \
-#	-Wcast-align \
-#	-Wundef \
-#	-Wformat-security \
-#	-Wwrite-strings \
-#	-Wno-sign-compare \
-#	-Wno-conversion
-#
-## warnings only applicable to C compiles
-#CONLYFLAGS += \
-#	-Wpointer-arith \
-#	-Wbad-function-cast \
-#	-Wstrict-prototypes
-#
-## warnings only applicable to OBJ-C compiles
-#COBJFLAGS += \
-#	-Wpointer-arith
-#
-## warnings only applicable to C++ compiles
-#CPPONLYFLAGS += \
-#	-Woverloaded-virtual
-#
-## This should silence some warnings on GCC/Clang
-#include $(SRC)/build/cc_detection.mak
-#
-##-------------------------------------------------
-## include paths
-##-------------------------------------------------
-#
-## add core include paths
-#INCPATH += \
-#	-I$(SRC)/$(TARGET) \
-#	-I$(OBJ)/$(TARGET)/layout \
-#	-I$(SRC)/emu \
-#	-I$(OBJ)/emu \
-#	-I$(OBJ)/emu/layout \
-#	-I$(SRC)/lib/util \
-#	-I$(SRC)/lib \
-#	-I$(3RDPARTY) \
-#	-I$(3RDPARTY)/lua/src \
-#	-I$(SRC)/osd \
-#	-I$(SRC)/osd/$(OSD) \
-#	-I$(SRC)/osd/$(OSD)/libretro-common/include
-#
-#
-##-------------------------------------------------
-## archiving flags
-##-------------------------------------------------
-#
-#
-##-------------------------------------------------
-## linking flags
-##-------------------------------------------------
-#
-#
-##-------------------------------------------------
-## define the standard object directory; other
-## projects can add their object directories to
-## this variable
-##-------------------------------------------------
-#
-#OBJDIRS = $(OBJ) $(OBJ)/$(TARGET)/$(SUBTARGET)
-#
-#
-##-------------------------------------------------
-## define standard libarires for CPU and sounds
-##-------------------------------------------------
-#
-#LIBEMU = $(OBJ)/libemu.a
-#LIBOPTIONAL = $(OBJ)/$(TARGET)/$(SUBTARGET)/liboptional.a
-#LIBDASM = $(OBJ)/$(TARGET)/$(SUBTARGET)/libdasm.a
-#LIBBUS = $(OBJ)/$(TARGET)/$(SUBTARGET)/libbus.a
-#LIBUTIL = $(OBJ)/libutil.a
-#LIBOCORE = $(OBJ)/libocore.a
-#LIBOSD = $(OBJ)/libosd.a
-#
-#VERSIONOBJ = $(OBJ)/version.o
-#EMUINFOOBJ = $(OBJ)/$(TARGET)/$(TARGET).o
-#DRIVLISTSRC = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.c
-#DRIVLISTOBJ = $(OBJ)/$(TARGET)/$(SUBTARGET)/drivlist.o
-#
-#
-#
-##-------------------------------------------------
-## either build or link against the included
-## libraries
-##-------------------------------------------------
-#
-#
-## add expat XML library
-#ifeq ($(BUILD_EXPAT),1)
-#INCPATH += -I$(3RDPARTY)/expat/lib
-#EXPAT = $(OBJ)/libexpat.a
-#else
-#LIBS += -lexpat
-#EXPAT =
-#endif
-#
-## add ZLIB compression library
-#ifeq ($(BUILD_ZLIB),1)
-#INCPATH += -I$(3RDPARTY)/zlib
-#ZLIB = $(OBJ)/libz.a
-#else
-#LIBS += -lz
-#ZLIB =
-#endif
-#
-## add flac library
-#ifeq ($(BUILD_FLAC),1)
-#INCPATH += -I$(SRC)/lib/util -I$(3RDPARTY)/libflac/src/libFLAC/include
-#FLAC_LIB = $(OBJ)/libflac.a
-## $(OBJ)/libflac++.a
-#else
-#LIBS += -lFLAC
-#FLAC_LIB =
-#endif
-#
-## add jpeglib image library
-#ifeq ($(BUILD_JPEGLIB),1)
-#INCPATH += -I$(3RDPARTY)/libjpeg
-#JPEG_LIB = $(OBJ)/libjpeg.a
-#else
-#LIBS += -ljpeg
-#JPEG_LIB =
-#endif
-#
-## add SoftFloat floating point emulation library
-#SOFTFLOAT = $(OBJ)/libsoftfloat.a
-#
-## add formats emulation library
-#FORMATS_LIB = $(OBJ)/libformats.a
-#
-## add LUA library
-#LUA_LIB = $(OBJ)/liblua.a
-#
-## add web library
-#WEB_LIB = $(OBJ)/libweb.a
-#
-## add SQLite3 library
-#BUILD_SQLITE3 = 1
-#ifeq ($(BUILD_SQLITE3),1)
-#SQLITE3_LIB = $(OBJ)/libsqlite3.a
-#else
-#LIBS += -lsqlite3
-#SQLITE3_LIB =
-#endif
-#
-#
+# -iKarith- PortMidi is in mamedev's makefile, but we disable it.  Should
+#  someday fix that.
 ## add PortMidi MIDI library
 #ifeq ($(BUILD_MIDILIB),1)
 #INCPATH += -I$(SRC)/lib/portmidi
@@ -258,8 +86,6 @@ VRENDER ?= soft
 #all: default tools
 #
 #tests: maketree jedutil$(EXE_EXT) chdman$(EXE_EXT)
-#
-#7Z_LIB = $(OBJ)/lib7z.a
 #
 ##-------------------------------------------------
 ## defines needed by multiple make files
@@ -291,29 +117,7 @@ VRENDER ?= soft
 #include $(SRC)/tools/tools.mak
 #include $(SRC)/regtests/regtests.mak
 #
-## combine the various definitions to one
-#CCOMFLAGS += $(INCPATH)
-#CDEFS = $(DEFS)
-#
-## TODO: -x c++ should not be hard-coded
-#CPPCHECKFLAGS = $(CDEFS) $(INCPATH) -x c++ --enable=style
-#
-##-------------------------------------------------
-## sanity check OSD additions
-##-------------------------------------------------
-#
-#ifeq (,$(findstring -DOSD_,$(CDEFS)))
-#$(error $(OSD).mak should have defined -DOSD_)
-#endif
-#
-##-------------------------------------------------
-## primary targets
-##-------------------------------------------------
-#
-#emulator: maketree $(BUILD) $(EMULATOR)
-#
 #buildtools: maketree $(BUILD)
-#
 #ifeq ($(NATIVE),1)
 #	mkdir prec-build
 #	cp -R $(OBJ)/build/* prec-build/
@@ -322,52 +126,6 @@ VRENDER ?= soft
 #	$(RM) -r $(OBJ)/libutil.a
 #	$(RM) -r $(OBJ)/libocore.a
 #endif
-#tools: maketree $(TOOLS)
-#
-#maketree: $(sort $(OBJDIRS))
-#
-#clean: $(OSDCLEAN)
-#	@echo Deleting object tree $(OBJ)...
-#ifeq ($(PARTIAL),1)
-#	$(RM) -r obj/osd/*
-#else
-#	$(RM) -r obj/*
-#endif
-#	@echo Deleting $(EMULATOR)...
-#	$(RM) $(EMULATOR)
-#	@echo Deleting $(TOOLS)...
-#	$(RM) $(TOOLS)
-#	@echo Deleting dependencies...
-#	$(RM) depend_emu.mak
-#	$(RM) depend_mame.mak
-#	$(RM) depend_mess.mak
-#	$(RM) depend_ume.mak
-#ifdef MAP
-#	@echo Deleting $(FULLNAME).map...
-#	$(RM) $(FULLNAME).map
-#endif
-#ifdef SYMBOLS
-#	@echo Deleting $(FULLNAME).sym...
-#	$(RM) $(FULLNAME).sym
-#endif
-#ifneq ($(PARTIAL),1)
-## 	TODO: We should do this smarter at some point
-#	@echo Deleting build targets...
-#	$(RM) *_libretro.so *_libretro.dylib *_libretro.dll
-#endif
-#
-#checkautodetect:
-#	@echo TARGETOS=$(TARGETOS)
-#	@echo PTR64=$(PTR64)
-#	@echo BIGENDIAN=$(BIGENDIAN)
-#	@echo UNAME="$(UNAME)"
-#
-#tests: $(REGTESTS)
-#
-#mak: maketree $(MAKEMAK_TARGET)
-#	@echo Rebuilding $(SUBTARGET).mak...
-#	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst -I. -I$(SRC)/emu -I$(SRC)/mame -I$(SRC)/mame/layout -I$(SRC)/mess -I$(SRC)/mess/layout $(SRC) > $(SUBTARGET).mak
-#	$(MAKEMAK) $(SRC)/targets/$(SUBTARGET).lst > $(SUBTARGET).lst
 #
 ##-------------------------------------------------
 ## directory targets
