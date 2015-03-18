@@ -63,13 +63,18 @@ struct png_ihdr
 
 struct rpng_process_t
 {
+   bool initialized;
    bool adam7_pass_initialized;
    bool pass_initialized;
    uint32_t *data;
+   uint32_t *palette;
    struct png_ihdr ihdr;
    uint8_t *prev_scanline;
    uint8_t *decoded_scanline;
    uint8_t *inflate_buf;
+   size_t restore_buf_size;
+   size_t adam7_restore_buf_size;
+   size_t data_restore_buf_size;
    size_t inflate_buf_size;
    unsigned bpp;
    unsigned pitch;
@@ -108,7 +113,7 @@ void rpng_nbio_load_image_free(struct rpng_t *rpng);
 bool rpng_nbio_load_image_argb_iterate(uint8_t *buf,
       struct rpng_t *rpng);
 
-bool rpng_nbio_load_image_argb_process(struct rpng_t *rpng,
+int rpng_nbio_load_image_argb_process(struct rpng_t *rpng,
       uint32_t **data, unsigned *width, unsigned *height);
 
 bool rpng_nbio_load_image_argb_start(struct rpng_t *rpng);
