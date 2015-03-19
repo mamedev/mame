@@ -459,6 +459,7 @@ void hmcs40_cpu_device::do_interrupt()
 {
 	m_icount--;
 	push_stack();
+	m_ie = 0;
 	
 	// line 0/1 for external interrupt, let's use 2 for t/c interrupt
 	int line = (m_iri) ? m_eint_line : 2;
@@ -466,8 +467,10 @@ void hmcs40_cpu_device::do_interrupt()
 	// vector $3f, on page 0(timer/counter), or page 1(external)
 	// external interrupt has priority over t/c interrupt
 	m_pc = 0x3f | (m_iri ? 0x40 : 0);
-	m_iri = m_irt = 0;
-	m_ie = 0;
+	if (m_iri)
+		m_iri = 0;
+	else
+		m_irt = 0;
 
 	standard_irq_callback(line);
 }
@@ -554,7 +557,12 @@ void hmcs40_cpu_device::execute_run()
 		
 		// LPU is handled 1 cycle later
 		if ((m_prev_op & 0x3e0) == 0x340)
+		{
+			if ((m_op & 0x1c0) != 0x1c0)
+				logerror("%s LPU without BR/CAL at $%04X\n", tag(), m_prev_pc);
+
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
+		}
 
 		// check/handle interrupt, but not in the middle of a long jump
 		if (m_ie && (m_iri || m_irt) && (m_op & 0x3e0) != 0x340)
@@ -567,59 +575,46 @@ void hmcs40_cpu_device::execute_run()
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
-		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for immediate param
+		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for immediate param (except for XAMR?)
 		increment_pc();
-
-/*
-
-op_ayy();  - 
-op_syy();  - 
-op_am();   - 34 234 4c
-op_sm()???:- 234
-op_daa();  - 46
-op_das();  - 45
-op_nega(); - 
-op_anem(); - 324 124
-op_bnem(); - 267 024
-op_alem(); - 324 124
-op_blem(); - 267 024
-op_lay();  - 118
-
-*/
 
 		// handle opcode
 		switch (m_op)
 		{
+			// unknown: lay, ayy, syy, am, anem, alem, bnem, blem, nega
+			
 			case 0x118:
 				op_lay(); // probably lay
 				break;
-			case 0x267:
-				op_blem(); break; // bnem or blem
+			case 0x034:
+				op_am(); // probably am
+				break;
+
+
 			case 0x124:
-				op_alem(); // alem or anem
+				op_illegal();
+				//op_alem(); // alem or anem
+				//op_ayy();
 				break;
 			case 0x324:
-				op_anem(); break; // "
+				op_illegal();
+				//op_anem(); // "
+				break;
+
 			case 0x024:
+				op_illegal();
 				//op_nega();
-				//op_am();
-				op_illegal();
 				break;
+
+
+
 			case 0x234:
-				// sm?
-#if 0
-				m_a = ram_r() - m_a;
-				m_s = ~m_a >> 4 & 1;
-				m_a &= 0xf;
-#else
-				op_am();
-#endif
-				break;
-			case 0x04c:
 				op_illegal();
-				//m_c ^= 1;
-				//op_lat();
+				//op_nega();
 				break;
+
+
+
 
 
 
@@ -638,16 +633,20 @@ op_lay();  - 118
 			case 0x020: case 0x021: case 0x022: case 0x023:
 				op_lbm(); break;
 			case 0x030:
-				op_amc(); break;
+/* ok */		op_amc(); break;
 			case 0x03c:
 				op_lta(); break;
 			
 			case 0x040:
 /* ok */		op_lxa(); break;
-			case 0x04b:
-				op_rec(); break;
+			case 0x045:
+/* ok */		op_das(); break;
+			case 0x046:
+/* ok */		op_daa(); break;
+			case 0x04c:
+/* ok */		op_rec(); break;
 			case 0x04f:
-				op_sec(); break;
+/* ok */		op_sec(); break;
 			case 0x050:
 				op_lya(); break;
 			case 0x054:
@@ -752,7 +751,7 @@ op_lay();  - 118
 			case 0x225:
 /* ok */		op_rotl(); break;
 			case 0x230:
-				op_smc(); break;
+/* ok */		op_smc(); break;
 			case 0x23c:
 				op_lat(); break;
 			
@@ -766,7 +765,7 @@ op_lay();  - 118
 				op_dy(); break;
 			case 0x260:
 /* ok */		op_lab(); break;
-			case 0x264:
+			case 0x267:
 				op_db(); break;
 			case 0x270: case 0x271: case 0x272: case 0x273: case 0x274: case 0x275: case 0x276: case 0x277:
 			case 0x278: case 0x279: case 0x27a: case 0x27b: case 0x27c: case 0x27d: case 0x27e: case 0x27f:

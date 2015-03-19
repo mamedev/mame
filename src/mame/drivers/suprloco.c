@@ -5,7 +5,7 @@ Super Locomotive
 driver by Zsolt Vasvari
 
 TODO:
-- Bit 5 in suprloco_control_w is pulsed when loco turns "super". This is supposed
+- Bit 5 in control_w is pulsed when loco turns "super". This is supposed
   to make red parts of sprites blink to purple, it's not clear how this is
   implemented in hardware, there's a hack to support it.
 
@@ -25,7 +25,7 @@ Sega PCB 834-5137
 #include "sound/sn76496.h"
 #include "includes/suprloco.h"
 
-WRITE8_MEMBER(suprloco_state::suprloco_soundport_w)
+WRITE8_MEMBER(suprloco_state::soundport_w)
 {
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -42,11 +42,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P2")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(suprloco_soundport_w)
-	AM_RANGE(0xe801, 0xe801) AM_READWRITE(suprloco_control_r, suprloco_control_w)
-	AM_RANGE(0xf000, 0xf6ff) AM_RAM_WRITE(suprloco_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundport_w)
+	AM_RANGE(0xe801, 0xe801) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0xf000, 0xf6ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xf700, 0xf7df) AM_RAM /* unused */
-	AM_RANGE(0xf7e0, 0xf7ff) AM_RAM_WRITE(suprloco_scrollram_w) AM_SHARE("scrollram")
+	AM_RANGE(0xf7e0, 0xf7ff) AM_RAM_WRITE(scrollram_w) AM_SHARE("scrollram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -175,7 +175,7 @@ static MACHINE_CONFIG_START( suprloco, suprloco_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update_suprloco)
+	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprloco)
@@ -297,5 +297,5 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 
 
 
-GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", 0 )
-GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive", 0 )
+GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", GAME_SUPPORTS_SAVE )
+GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive", GAME_SUPPORTS_SAVE )
