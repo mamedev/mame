@@ -8,7 +8,11 @@
 #endif
 
 #if !defined(HAVE_GL) && !defined(HAVE_RGB32)
+
+#ifndef M16B
 #define M16B
+#endif
+
 #endif
 
 #ifndef M16B
