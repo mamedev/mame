@@ -226,13 +226,14 @@ NO_USE_MIDI = 1
 DEFS += -DNDEBUG
 INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
 
+PYTHON ?= @python2
+
 include makefile
 
 CPPONLYFLAGS += -fpermissive
 DEFS += $(CORE_DEFINE)
 
 
-PYTHON ?= @python2
 ## Unix
 ifeq ($(platform), unix)
 	TARGETLIB := $(TARGET)_libretro.so
