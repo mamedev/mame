@@ -3,9 +3,7 @@
 #include <string.h>
 
 #include "osdepend.h"
-
 #include "emu.h"
-#include "clifront.h"
 #include "render.h"
 #include "ui/ui.h"
 #include "uiinput.h"
@@ -13,6 +11,12 @@
 
 #include "libretro.h"
 #include "retroosd.h"
+
+#include "clifront.h"
+#include "modules/lib/osdobj_common.h"
+#include "modules/lib/osdlib.h"
+#include "modules/osdmodule.h"
+#include "modules/font/font_module.h"
 
 #include "libretro_shared.h"
 
