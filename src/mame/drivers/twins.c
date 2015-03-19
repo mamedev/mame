@@ -306,6 +306,44 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static ADDRESS_MAP_START( spider_io, AS_IO, 16, twins_state )
+	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
+	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
+	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(port6_pal0_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0010, 0x0011) AM_WRITE(porte_paloff0_w)
+ADDRESS_MAP_END
+
+
+static MACHINE_CONFIG_START( spider, twins_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", V30, 8000000)
+	MCFG_CPU_PROGRAM_MAP(twins_map)
+	MCFG_CPU_IO_MAP(spider_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320,256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+
+	MCFG_VIDEO_START_OVERRIDE(twins_state,twins)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
 
 ROM_START( twins )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -337,5 +375,13 @@ ROM_START( twinsa )
 	ROM_LOAD16_BYTE( "hp.bin", 0x000001, 0x080000, CRC(aaf74b83) SHA1(09bd76b9fc5cb7ba6ffe1a2581ffd5633fe440b3) )
 ROM_END
 
+ROM_START( spider )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "20.bin", 0x000001, 0x080000, CRC(25e15f11) SHA1(b728f35c817f60a294e38d66559da8977b94a1f5) )
+	ROM_LOAD16_BYTE( "21.bin", 0x000000, 0x080000, CRC(ff224206) SHA1(d8d45850983542e811facc917d016841fc56a97f) )
+ROM_END
+
 GAME( 1994, twins,  0,     twins,  twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1994, twinsa, twins, twinsa, twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 2)", GAME_SUPPORTS_SAVE )
+
+GAME( 1994, spider,  0,     spider,  twins, driver_device, 0, ROT0, "Buena Vision", "Spider", GAME_NOT_WORKING )
