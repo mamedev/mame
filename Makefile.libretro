@@ -319,7 +319,6 @@ else ifeq ($(platform), osx)
 #	NATIVECC = $(CXX_AS)
 	LDFLAGS +=  $(fpic) $(SHARED)
 	AR = @ar
-	PYTHON ?= @python
 	ifeq ($(COMMAND_MODE),"legacy")
 		ARFLAGS = -crs
 	endif
