@@ -441,6 +441,7 @@ else
 	## Windows
 	TARGETLIB := $(TARGET)_libretro.dll
 	TARGETOS = win32
+	REALCC=gcc
 	CC = g++
 	LD = g++
 	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
