@@ -108,30 +108,36 @@
      6Mhz XIN     9        20        D2
      6Mhz XOUT   10        19        D1
      AUDOUT      11        18        D0
-     NC          12        17        GND
+     NC(recheck!)12        17        GND
      AUDOUT(inv) 13        16        VCC
      GND         14        15        ? tied to pin 16 (VCC) through a resistor (pullup?)
 
      Pinout based on guesses and information in "Electronic Speech Synthesis" by Geoff Bristow
      (ISBN 0-07-007912-9, pages 148-152), and the data on page 233 of the Nec APC technical manual at
      http://bitsavers.trailing-edge.com/pdf/nec/APC/819-000100-1003_APC_System_Reference_Guide_Apr83.pdf
+     I/O pin purpose based on testing by kevtris.
      [x] is unsure:
-     PB3          1        28        PB2
-     PB4(/ALE)    2        27        PB1
-     PB5(/RD)     3        26        PB0
-     PB6(/WR)     4        25        D7(PA7)
-     PB7(/CS)     5        24        D6(PA6)
-     /RESET       6        23        D5(PA5)
-     [TEST?]      7        22        D4(PA4)
-     VCC          8        21        D3(PA3)
-     XI(CLK)      9        20        D2(PA2)
-     XO          10        19        D1(PA1)
-     D/A OUT +   11        18        D0(PA0)
-     [D/A VREF]  12        17        CH2
-     D/A OUT -   13        16        /EXTINT
-     GND         14        15        CH1 tied to pin 16 (VCC) through a resistor, on APC to VCC thru a 12k resistor and thru a 10uf cap to gnd
+     PB3        <>  1        28 <>     PB2
+     PB4(/ALE)  <>  2        27 <>     PB1
+     PB5(/RD)   <>  3        26 <>     PB0
+     PB6(/WR)   <>  4        25 <>     D7(PA7)
+     PB7(/CS)   <>  5        24 <>     D6(PA6)
+     /RESET     ->  6        23 <>     D5(PA5)
+     [/TSTOUT?] <-  7        22 <>     D4(PA4)
+     VCC        --  8        21 <>     D3(PA3)
+     XI(CLK)    ->  9        20 <>     D2(PA2)
+     XO         <- 10        19 <>     D1(PA1)
+     D/A OUT +  <- 11        18 <>     D0(PA0)
+     D/A POWER  -- 12        17 <-     CH2
+     D/A OUT -  <- 13        16 <>     /EXTINT and [/TSTOUT2?] (test out is related to pin 15 state)
+     GND        -- 14        15 <-     CH1 tied to pin 16 (VCC) through a resistor, on APC to VCC thru a 12k resistor and thru a 10uf cap to gnd
 
-    CH1 and CH2 are some sort of mode selects?
+    CH1 and CH2 are mode selects, purpose based on testing by kevtris:
+    CH1 CH2
+    H   L   - 'master' mode, pb4-pb7 are i/o? /EXTINT is an input
+    L   L   - 'slave' mode where pb4-pb7 are /ale /rd /wr /cs? /EXTINT may be an output in this mode?
+    X   H   - test mode: the 512 byte 16-bit wide ROM is output sequentially on pins pa7-pa0 and pb7-pb0 for the high and low bytes of each word respectively
+    D/A POWER is the FET source for the D/A OUT+ and D/A OUT- push-pull dac drains; it should be tied to VCC or thereabouts
 
     In the SCV (info from plgDavid):
     pin  5 is tied to the !SCPU pin on the Epoch TV chip pin 29 (0x3600 writes)
