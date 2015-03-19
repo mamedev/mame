@@ -458,8 +458,7 @@ else
 	endif
 	EXE = .exe
 	LIBS += -lws2_32
-	# We may need to += this, but we should not = it
-	#DEFS = -DCRLF=3
+	# FIXME: Check if TARGETOS does this in makefile for you
 	DEFS += -DX64_WINDOWS_ABI
 	ifneq ($(findstring MINGW,$(shell uname -a)),)
 		PTR64=1
