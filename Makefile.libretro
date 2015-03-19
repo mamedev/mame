@@ -52,7 +52,6 @@ VRENDER ?= soft
 #MD = -mkdir$(EXE_EXT)
 #RM = @rm -f
 #OBJDUMP = @objdump
-#PYTHON ?= @python2
 #
 ## build the targets in different object dirs, so they can co-exist
 #ifeq ($(NATIVE),1)
@@ -233,6 +232,7 @@ CPPONLYFLAGS += -fpermissive
 DEFS += $(CORE_DEFINE)
 
 
+PYTHON ?= @python2
 ## Unix
 ifeq ($(platform), unix)
 	TARGETLIB := $(TARGET)_libretro.so
