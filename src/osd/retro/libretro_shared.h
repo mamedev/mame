@@ -7,6 +7,16 @@
 #define MAX_BUTTONS 16
 #endif
 
+#if !defined(HAVE_GL) && !defined(HAVE_RGB32)
+#define M16B
+#endif
+
+#ifndef M16B
+#define PIXEL_TYPE UINT32
+#else
+#define PIXEL_TYPE UINT16
+#endif
+
 extern int NEWGAME_FROM_OSD;
 
 extern char g_rom_dir[1024];

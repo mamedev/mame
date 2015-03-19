@@ -120,10 +120,6 @@ int opt_type[NB_OPTPATH]={ // 0 for save_dir | 1 for system_dir
     1,1,1,1
 };
 
-#if !defined(HAVE_GL) && !defined(HAVE_RGB32)
-#define M16B
-#endif
-
 #ifdef HAVE_GL
 static int init3d=1;
 #else
@@ -1506,12 +1502,6 @@ int mmain(int argc, const char *argv)
 #include "../../emu/drawgfx.h"
 #include "osdepend.h"
 
-#ifndef M16B
-#define PIXEL_TYPE UINT32
-#else
-#define PIXEL_TYPE UINT16
-#endif
-
 //FIX ME DO CLEAN EXIT
 //============================================================
 //  constructor
@@ -1676,7 +1666,7 @@ void retro_osd_interface::update(bool skip_redraw)
       /* lock them, and then render them */
       primlist.acquire_lock();
 
-#ifdef	HAVE_GL
+#ifdef HAVE_GL
       gl_draw_primitives(primlist, fb_width, fb_height);
 #else
       UINT8 *surfptr = (UINT8 *)retro_get_fb_ptr();
