@@ -376,15 +376,11 @@
 
 					local dir
 					local start = iif(cfg.name, 2, 1)
-					for v = start, num_variations do
+					for v = start, iif(cfg.flags.SingleOutputDir,num_variations-1,num_variations) do
 						dir = cfg_dirs[cfg][v]
 						if hit_counts[dir] == 1 then break end
 					end
-					if (cfg.flags.SingleOutputDir) then
-						cfg.objectsdir = cfg.objdir or cfg.project.objdir or "obj"
-					else
-						cfg.objectsdir = path.getrelative(cfg.location, dir)
-					end
+					cfg.objectsdir = path.getrelative(cfg.location, dir)
 				end
 			end
 		end		
