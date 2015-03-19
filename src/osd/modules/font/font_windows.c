@@ -169,90 +169,95 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
 	// create a DIB to render to
 	BYTE *bits;
 	HBITMAP dib = CreateDIBSection(dummyDC, &info, DIB_RGB_COLORS, reinterpret_cast<VOID **>(&bits), NULL, 0);
-	HGDIOBJ oldbitmap = SelectObject(dummyDC, dib);
 
-	// clear the bitmap
-	int rowbytes = bmwidth / 8;
-	memset(bits, 0, rowbytes * bmheight);
-
-	// now draw the character
-	WCHAR tempchar = chnum;
-	SetTextColor(dummyDC, RGB(0xff, 0xff, 0xff));
-	SetBkColor(dummyDC, RGB(0x00, 0x00, 0x00));
-	ExtTextOutW(dummyDC, 50 + abc.abcA, 50, ETO_OPAQUE, NULL, &tempchar, 1, NULL);
-
-	// characters are expected to be full-height
-	rectangle actbounds;
-	actbounds.min_y = 50;
-	actbounds.max_y = 50 + metrics.tmHeight - 1;
-
-	// determine the actual left of the character
-	for (actbounds.min_x = 0; actbounds.min_x < rowbytes; actbounds.min_x++)
+	if (dib)
 	{
-		BYTE *offs = bits + actbounds.min_x;
-		UINT8 summary = 0;
-		for (int y = 0; y < bmheight; y++)
-			summary |= offs[y * rowbytes];
-		if (summary != 0)
-		{
-			actbounds.min_x *= 8;
-			if (!(summary & 0x80)) actbounds.min_x++;
-			if (!(summary & 0xc0)) actbounds.min_x++;
-			if (!(summary & 0xe0)) actbounds.min_x++;
-			if (!(summary & 0xf0)) actbounds.min_x++;
-			if (!(summary & 0xf8)) actbounds.min_x++;
-			if (!(summary & 0xfc)) actbounds.min_x++;
-			if (!(summary & 0xfe)) actbounds.min_x++;
-			break;
-		}
-	}
+		HGDIOBJ oldbitmap = SelectObject(dummyDC, dib);
 
-	// determine the actual right of the character
-	for (actbounds.max_x = rowbytes - 1; actbounds.max_x >= 0; actbounds.max_x--)
-	{
-		BYTE *offs = bits + actbounds.max_x;
-		UINT8 summary = 0;
-		for (int y = 0; y < bmheight; y++)
-			summary |= offs[y * rowbytes];
-		if (summary != 0)
-		{
-			actbounds.max_x *= 8;
-			if (summary & 0x7f) actbounds.max_x++;
-			if (summary & 0x3f) actbounds.max_x++;
-			if (summary & 0x1f) actbounds.max_x++;
-			if (summary & 0x0f) actbounds.max_x++;
-			if (summary & 0x07) actbounds.max_x++;
-			if (summary & 0x03) actbounds.max_x++;
-			if (summary & 0x01) actbounds.max_x++;
-			break;
-		}
-	}
+		// clear the bitmap
+		int rowbytes = bmwidth / 8;
+		memset(bits, 0, rowbytes * bmheight);
 
-	// allocate a new bitmap
-	if (actbounds.max_x >= actbounds.min_x && actbounds.max_y >= actbounds.min_y)
-	{
-		bitmap.allocate(actbounds.max_x + 1 - actbounds.min_x, actbounds.max_y + 1 - actbounds.min_y);
+		// now draw the character
+		WCHAR tempchar = chnum;
+		SetTextColor(dummyDC, RGB(0xff, 0xff, 0xff));
+		SetBkColor(dummyDC, RGB(0x00, 0x00, 0x00));
+		ExtTextOutW(dummyDC, 50 + abc.abcA, 50, ETO_OPAQUE, NULL, &tempchar, 1, NULL);
 
-		// copy the bits into it
-		for (int y = 0; y < bitmap.height(); y++)
+		// characters are expected to be full-height
+		rectangle actbounds;
+		actbounds.min_y = 50;
+		actbounds.max_y = 50 + metrics.tmHeight - 1;
+
+		// determine the actual left of the character
+		for (actbounds.min_x = 0; actbounds.min_x < rowbytes; actbounds.min_x++)
 		{
-			UINT32 *dstrow = &bitmap.pix32(y);
-			UINT8 *srcrow = &bits[(y + actbounds.min_y) * rowbytes];
-			for (int x = 0; x < bitmap.width(); x++)
+			BYTE *offs = bits + actbounds.min_x;
+			UINT8 summary = 0;
+			for (int y = 0; y < bmheight; y++)
+				summary |= offs[y * rowbytes];
+			if (summary != 0)
 			{
-				int effx = x + actbounds.min_x;
-				dstrow[x] = ((srcrow[effx / 8] << (effx % 8)) & 0x80) ? rgb_t(0xff, 0xff, 0xff, 0xff) : rgb_t(0x00, 0xff, 0xff, 0xff);
+				actbounds.min_x *= 8;
+				if (!(summary & 0x80)) actbounds.min_x++;
+				if (!(summary & 0xc0)) actbounds.min_x++;
+				if (!(summary & 0xe0)) actbounds.min_x++;
+				if (!(summary & 0xf0)) actbounds.min_x++;
+				if (!(summary & 0xf8)) actbounds.min_x++;
+				if (!(summary & 0xfc)) actbounds.min_x++;
+				if (!(summary & 0xfe)) actbounds.min_x++;
+				break;
 			}
 		}
 
-		// set the final offset values
-		xoffs = actbounds.min_x - (50 + abc.abcA);
-		yoffs = actbounds.max_y - (50 + metrics.tmAscent);
+		// determine the actual right of the character
+		for (actbounds.max_x = rowbytes - 1; actbounds.max_x >= 0; actbounds.max_x--)
+		{
+			BYTE *offs = bits + actbounds.max_x;
+			UINT8 summary = 0;
+			for (int y = 0; y < bmheight; y++)
+				summary |= offs[y * rowbytes];
+			if (summary != 0)
+			{
+				actbounds.max_x *= 8;
+				if (summary & 0x7f) actbounds.max_x++;
+				if (summary & 0x3f) actbounds.max_x++;
+				if (summary & 0x1f) actbounds.max_x++;
+				if (summary & 0x0f) actbounds.max_x++;
+				if (summary & 0x07) actbounds.max_x++;
+				if (summary & 0x03) actbounds.max_x++;
+				if (summary & 0x01) actbounds.max_x++;
+				break;
+			}
+		}
+
+		// allocate a new bitmap
+		if (actbounds.max_x >= actbounds.min_x && actbounds.max_y >= actbounds.min_y)
+		{
+			bitmap.allocate(actbounds.max_x + 1 - actbounds.min_x, actbounds.max_y + 1 - actbounds.min_y);
+
+			// copy the bits into it
+			for (int y = 0; y < bitmap.height(); y++)
+			{
+				UINT32 *dstrow = &bitmap.pix32(y);
+				UINT8 *srcrow = &bits[(y + actbounds.min_y) * rowbytes];
+				for (int x = 0; x < bitmap.width(); x++)
+				{
+					int effx = x + actbounds.min_x;
+					dstrow[x] = ((srcrow[effx / 8] << (effx % 8)) & 0x80) ? rgb_t(0xff, 0xff, 0xff, 0xff) : rgb_t(0x00, 0xff, 0xff, 0xff);
+				}
+			}
+
+			// set the final offset values
+			xoffs = actbounds.min_x - (50 + abc.abcA);
+			yoffs = actbounds.max_y - (50 + metrics.tmAscent);
+		}
+
+		// de-select the font and release the DC
+		SelectObject(dummyDC, oldbitmap);
+		DeleteObject(dib);
 	}
 
-	// de-select the font and release the DC
-	SelectObject(dummyDC, oldbitmap);
-	DeleteObject(dib);
 	SelectObject(dummyDC, oldfont);
 	DeleteDC(dummyDC);
 	return bitmap.valid();
