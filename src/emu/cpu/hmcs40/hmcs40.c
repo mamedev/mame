@@ -581,7 +581,18 @@ void hmcs40_cpu_device::execute_run()
 		// handle opcode
 		switch (m_op)
 		{
-			// unknown: lay, ayy, syy, am, anem, alem, bnem, blem, nega
+			// unknown:
+			/*
+				lay  118
+				ayy  058
+				syy  258
+				am   034
+				anem 124/324/024/234
+				alem
+				bnem
+				blem
+				nega 244
+			*/
 			
 			case 0x118:
 				op_lay(); // probably lay
@@ -592,26 +603,25 @@ void hmcs40_cpu_device::execute_run()
 
 
 			case 0x124:
-				op_illegal();
-				//op_alem(); // alem or anem
-				//op_ayy();
+				//op_illegal();
+				op_alem();
 				break;
 			case 0x324:
-				op_illegal();
-				//op_anem(); // "
+				//op_illegal();
+				op_anem();
 				break;
 
 			case 0x024:
-				op_illegal();
-				//op_nega();
+				//op_illegal();
+				op_bnem();
 				break;
-
-
-
 			case 0x234:
-				op_illegal();
-				//op_nega();
+				//op_illegal();
+				op_blem();
 				break;
+
+
+
 
 
 
