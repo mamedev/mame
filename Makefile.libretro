@@ -158,12 +158,25 @@ INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
 # $(PYTHON) needs to be python 2.x
 ifeq ($(platform), unix)
 	override PYTHON ?= python2
+	TARGETOS=linux
+else ifeq ($(platform), android)
+	TARGETOS=linux
 else ifeq ($(platform), osx)
 	override PYTHON ?= python
+	TARGETOS = macosx
 else ifeq ($(platform), ios)
 	override PYTHON ?= python
+	TARGETOS = macosx
+else ifeq ($(platform), qnx)
+	TARGETOS=linux
+else ifneq (,$(findstring armv,$(platform)))
+	TARGETOS=linux
+else ifeq ($(platform), wincross)
+	TARGETOS = win32
 else
+	# The else condition here is win32
 	override PYTHON ?= python
+	TARGETOS = win32
 endif
 
 include makefile
@@ -175,7 +188,6 @@ DEFS += $(CORE_DEFINE)
 ## Unix
 ifeq ($(platform), unix)
 	TARGETLIB := $(TARGET)_libretro.so
-	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
 	CCOMFLAGS += $(fpic) -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
@@ -213,7 +225,6 @@ ifeq ($(platform), unix)
 #else ifeq ($(platform), android)
 #	armplatform := 1
 #	TARGETLIB := $(TARGET)_libretro.so
-#	TARGETOS=linux
 #	fpic := -fPIC
 #	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
 #	CC = @arm-linux-androideabi-g++
@@ -237,7 +248,6 @@ ifeq ($(platform), unix)
 ## OS X
 else ifeq ($(platform), osx)
 	TARGETLIB := $(TARGET)_libretro.dylib
-	TARGETOS = macosx
 	fpic := -fPIC -mmacosx-version-min=10.7
 	LIBCXX := libstdc++
 	LDFLAGSEMULATOR +=  -stdlib=$(LIBCXX)
@@ -276,7 +286,6 @@ else ifeq ($(platform), osx)
 #	TARGETLIB := $(TARGET)_libretro_ios.dylib
 #	fpic := -fPIC
 #	SHARED := -dynamiclib
-#	TARGETOS = macosx
 #	LIBCXX := libc++
 #
 #	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
@@ -295,7 +304,6 @@ else ifeq ($(platform), osx)
 else ifeq ($(platform), qnx)
 	armplatform := 1
 	TARGETLIB := $(TARGET)_libretro_qnx.so
-	TARGETOS=linux
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
 
@@ -380,7 +388,6 @@ else ifeq ($(platform), qnx)
 #else ifneq (,$(findstring armv,$(platform)))
 #	armplatform := 1
 #	TARGETLIB := $(TARGET)_libretro.so
-#	TARGETOS=linux
 #	fpic := -fPIC
 #	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T -Wl,--no-undefined
 #	CCOMFLAGS += $(fpic) -mstructure-size-boundary=32 -falign-functions=16 -fsigned-char -finline -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
@@ -420,7 +427,6 @@ else ifeq ($(platform), qnx)
 ## Windows cross compiler
 #else ifeq ($(platform), wincross)
 #	TARGETLIB := $(TARGET)_libretro.dll
-#	TARGETOS = win32
 #	CC ?= g++
 #	LD ?= g++
 #	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
@@ -440,7 +446,6 @@ else ifeq ($(platform), qnx)
 else
 	## Windows
 	TARGETLIB := $(TARGET)_libretro.dll
-	TARGETOS = win32
 	REALCC=gcc
 	CC = g++
 	LD = g++
