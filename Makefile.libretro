@@ -226,7 +226,14 @@ NO_USE_MIDI = 1
 DEFS += -DNDEBUG
 INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
 
-override PYTHON = python2
+# $(PYTHON) needs to be python 2.x
+ifeq ($(platform), unix)
+	override PYTHON ?= python2
+else ifeq ($(platform), osx)
+	override PYTHON ?= python
+else
+	override PYTHON ?= python
+endif
 
 include makefile
 
