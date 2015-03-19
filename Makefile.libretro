@@ -453,7 +453,8 @@ else
 	endif
 	EXE = .exe
 	LIBS += -lws2_32
-	DEFS = -DCRLF=3
+	# We may need to += this, but we should not = it
+	#DEFS = -DCRLF=3
 	DEFS += -DX64_WINDOWS_ABI
 	ifneq ($(findstring MINGW,$(shell uname -a)),)
 		PTR64=1
