@@ -198,8 +198,6 @@ ifeq ($(platform), unix)
 	endif
 	LDFLAGS +=  $(fpic) $(SHARED)
 	REALCC = cc
-#	NATIVECC = g++
-#	NATIVECFLAGS = -std=gnu99
 	BASELIBS +=  -lpthread
 	CC = g++
 	AR = @ar
@@ -239,8 +237,6 @@ ifeq ($(platform), unix)
 #		GLES = 1
 #	endif
 #	LDFLAGS += -Wl,--fix-cortex-a8 -llog $(fpic) $(SHARED)
-#	NATIVECC = g++
-#	NATIVECFLAGS = -std=gnu99
 #	CCOMFLAGS += $(PLATCFLAGS)
 #	LIBS += -lstdc++
 #	#-lpthread
@@ -257,7 +253,6 @@ else ifeq ($(platform), osx)
 	REALCC = cc
 	CC = $(CXX_AS) -stdlib=$(LIBCXX)
 	LD = $(CXX_AS) -stdlib=$(LIBCXX)
-#	NATIVECC = $(CXX_AS)
 	LDFLAGS +=  $(fpic) $(SHARED)
 	AR = @ar
 	ifeq ($(COMMAND_MODE),"legacy")
@@ -294,7 +289,6 @@ else ifeq ($(platform), osx)
 #	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
 #	LD = $(CC) -stdlib=$(LIBCXX)
 #	LDFLAGS +=  $(fpic) $(SHARED)
-#	NATIVECC = $(CXX_AS)
 #	CFLAGS += -DIOS
 #	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
 #	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
@@ -393,8 +387,6 @@ else ifeq ($(platform), qnx)
 #	CCOMFLAGS += $(fpic) -mstructure-size-boundary=32 -falign-functions=16 -fsigned-char -finline -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
 #	PLATCFLAGS += -march=armv7-a -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DSDLMAME_ARM -DRETRO_SETJMP_HACK
 #	LDFLAGS += -Wl,--fix-cortex-a8 -Wl,--no-as-needed $(fpic) $(SHARED)
-#	NATIVECC = g++
-#	NATIVECFLAGS = -std=gnu99
 #	CC = g++
 #	AR = @ar
 #	LD = g++
@@ -426,29 +418,29 @@ else ifeq ($(platform), qnx)
 #
 ## Windows cross compiler
 #else ifeq ($(platform), wincross)
-#	TARGETLIB := $(TARGET)_libretro.dll
-#	CC ?= g++
-#	LD ?= g++
-#	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
-#	CCOMFLAGS += -D__WIN32__
-#	LDFLAGS += $(SHARED)
-#	ifeq ($(VRENDER),opengl)
-#		CCOMFLAGS += -DHAVE_GL
-#		LIBS += -lopengl32
-#	endif
-#	EXE = .exe
-#	#LIBS += -lpthread
-#	DEFS = -DCRLF=3
-#	ifneq (,$(findstring mingw64-w64,$(PATH)))
-#		PTR64=1
-#	endif
-#
+	TARGETLIB := $(TARGET)_libretro.dll
+	# You're going to have to pass REALCC=<whatever> on the cmdline for wincross
+	REALCC = gcc
+	CC ?= g++
+	LD ?= $(CC)
+	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
+	CCOMFLAGS += -D__WIN32__
+	LDFLAGS += $(SHARED)
+	ifeq ($(VRENDER),opengl)
+		CCOMFLAGS += -DHAVE_GL
+		LIBS += -lopengl32
+	endif
+	EXE = .exe
+	ifneq (,$(findstring mingw64-w64,$(PATH)))
+		PTR64=1
+	endif
+
 else
 	## Windows
 	TARGETLIB := $(TARGET)_libretro.dll
-	REALCC=gcc
+	REALCC = gcc
 	CC = g++
-	LD = g++
+	LD = $(CC)
 	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
 	CCOMFLAGS += -D__WIN32__
 	LDFLAGS += $(SHARED)
