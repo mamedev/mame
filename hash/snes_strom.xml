@@ -9,7 +9,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0112-JPN" />
 		<info name="release" value="19960927" />
-		<info name="alt_title" value="美少女戦士セーラームーン セー ラースターズ ~ふわふわパニック2" />
+		<info name="alt_title" value="美少女戦士セーラームーン セーラースターズ ~ふわふわパニック2" />
 		<part name="cart" interface="st_cart">
 
 			<feature name="slot" value="strom" />
@@ -57,7 +57,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0109-JPN" />
 		<info name="release" value="19960823" />
-		<info name="alt_title" value="激走戦隊カーレンジャー 全開!レー サー戦士" />
+		<info name="alt_title" value="激走戦隊カーレンジャー 全開!レーサー戦士" />
 		<part name="cart" interface="st_cart">
 
 			<feature name="slot" value="strom" />
@@ -121,7 +121,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0111-JPN" />
 		<info name="release" value="19960927" />
-		<info name="alt_title" value="SDガンダムジェネレーション コロ ニー格闘記" />
+		<info name="alt_title" value="SDガンダムジェネレーション コロニー格闘記" />
 		<part name="cart" interface="st_cart">
 
 			<feature name="slot" value="strom" />
@@ -153,7 +153,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0104-JPN" />
 		<info name="release" value="19960726" />
-		<info name="alt_title" value="SDガンダムジェネレーション一年戦争記" />
+		<info name="alt_title" value="SDガンダムジェネレーション 一年戦争記" />
 		<part name="cart" interface="st_cart">
 
 			<feature name="slot" value="strom" />
@@ -169,7 +169,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0110-JPN" />
 		<info name="release" value="19960927" />
-		<info name="alt_title" value="SDガンダムジェネレーション ザン スカール戦記" />
+		<info name="alt_title" value="SDガンダムジェネレーション ザンスカール戦記" />
 		<part name="cart" interface="st_cart">
 
 			<feature name="slot" value="strom" />
@@ -185,7 +185,7 @@
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SFT-0101-JPN" />
 		<info name="release" value="19960628" />
-		<info name="alt_title" value="SDウルトラバトル ウルトラマン伝 説" />
+		<info name="alt_title" value="SDウルトラバトル ウルトラマン伝説" />
 		<part name="cart" interface="st_cart">
 
 			<feature name="slot" value="strom" />
