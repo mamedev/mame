@@ -13,6 +13,14 @@
 #define _GNU_SOURCE     // for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
 #endif
 
+#ifndef _WIN32
+#define _WIN32
+
+#ifndef WIN32
+#define WIN32
+#endif
+#endif
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
