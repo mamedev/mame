@@ -48,11 +48,6 @@ VRENDER ?= soft
 ## platform-specific definitions
 ##-------------------------------------------------
 #
-## utilities
-#MD = -mkdir$(EXE_EXT)
-#RM = @rm -f
-#OBJDUMP = @objdump
-#
 ## build the targets in different object dirs, so they can co-exist
 #ifeq ($(NATIVE),1)
 #OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
@@ -71,10 +66,6 @@ VRENDER ?= soft
 #MIDI_LIB =
 #endif
 #
-#ifneq (,$(findstring clang,$(CC)))
-#LIBS += -lstdc++ -lpthread
-#endif
-#
 ##-------------------------------------------------
 ## 'default' target needs to go here, before the
 ## include files which define additional targets
@@ -90,31 +81,12 @@ VRENDER ?= soft
 ## defines needed by multiple make files
 ##-------------------------------------------------
 #
-#BUILDSRC = $(SRC)/build
-#BUILDOBJ = $(OBJ)/build
-#BUILDOUT = $(BUILDOBJ)
-#
 #ifdef NATIVE_OBJ
 #BUILDOUT = $(NATIVE_OBJ)/build
 #endif # NATIVE_OBJ
 #
 #
 ##-------------------------------------------------
-## include the various .mak files
-##-------------------------------------------------
-#
-## include OSD-specific rules first
-#include $(SRC)/osd/$(OSD)/$(OSD).mak
-#
-## then the various core pieces
-#include $(SRC)/build/build.mak
-#include $(SRC)/$(TARGET)/$(SUBTARGET).mak
-#-include $(SRC)/$(TARGET)/osd/$(OSD)/$(OSD).mak
-#include $(SRC)/emu/emu.mak
-#include $(SRC)/lib/lib.mak
-#-include $(SRC)/osd/$(CROSS_BUILD_OSD)/build.mak
-#include $(SRC)/tools/tools.mak
-#include $(SRC)/regtests/regtests.mak
 #
 #buildtools: maketree $(BUILD)
 #ifeq ($(NATIVE),1)
@@ -126,12 +98,6 @@ VRENDER ?= soft
 #	$(RM) -r $(OBJ)/libocore.a
 #endif
 #
-##-------------------------------------------------
-## directory targets
-##-------------------------------------------------
-#
-#$(sort $(OBJDIRS)):
-#	$(MD) -p $@
 #
 #BUILDTOOLS_CUSTOM = 0
 #
@@ -166,43 +132,6 @@ VRENDER ?= soft
 #	cp -R prec-build/makemak $(OBJ)/build
 #endif
 #endif
-##-------------------------------------------------
-## executable targets and dependencies
-##-------------------------------------------------
-#
-#EXECUTABLE_DEFINED = 1
-#ifndef EXECUTABLE_DEFINED
-#
-#ifeq ($(BUSES),)
-#LIBBUS =
-#endif
-#
-#EMULATOROBJLIST = $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(BGFX_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
-#
-#ifeq ($(TARGETOS),emscripten)
-#EMULATOROBJ = $(EMULATOROBJLIST:.a=.bc)
-#else
-#EMULATOROBJ = $(EMULATOROBJLIST)
-#endif
-#
-#$(EMULATOR): $(VERSIONOBJ) $(EMULATOROBJ)
-#	@echo Linking $@...
-#ifeq ($(TARGETOS),emscripten)
-## Emscripten's linker seems to be stricter about the ordering of files
-#	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) -Wl,--start-group $(EMULATOROBJ) -Wl,--end-group $(LIBS) -o $@
-#else
-#	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $(EMULATOROBJ) $(LIBS) -o $@
-#endif
-#ifeq ($(TARGETOS),win32)
-#ifdef SYMBOLS
-#ifndef MSVC_BUILD
-#	$(OBJDUMP) --section=.text --line-numbers --syms --demangle $@ >$(FULLNAME).sym
-#endif
-#endif
-#endif
-#
-#endif
-#
 
 ###########################################################################
 
@@ -230,6 +159,8 @@ INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
 ifeq ($(platform), unix)
 	override PYTHON ?= python2
 else ifeq ($(platform), osx)
+	override PYTHON ?= python
+else ifeq ($(platform), ios)
 	override PYTHON ?= python
 else
 	override PYTHON ?= python
@@ -350,30 +281,33 @@ else ifeq ($(platform), osx)
 #
 #	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 #	CXX_AS := c++
+#	REALCC = cc -arch armv7 -sysroot $(IOSSDK)
 #	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
 #	LD = $(CC) -stdlib=$(LIBCXX)
 #	LDFLAGS +=  $(fpic) $(SHARED)
 #	NATIVECC = $(CXX_AS)
-#	PYTHON ?= @python
 #	CFLAGS += -DIOS
 #	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
 #	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
 #	CCOMFLAGS += $(PLATCFLAGS)
 #
 ## QNX
-#else ifeq ($(platform), qnx)
-#	armplatform := 1
-#	TARGETLIB := $(TARGET)_libretro_qnx.so
-#	TARGETOS=linux
-#	fpic := -fPIC
-#	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
-#
-#	CC = qcc -Vgcc_ntoarmv7le
-#	AR = qcc -Vgcc_ntoarmv7le
-#	CFLAGS += -D__BLACKBERRY_QNX__
-#	LIBS += -lstdc++ -lpthread
-#
+else ifeq ($(platform), qnx)
+	armplatform := 1
+	TARGETLIB := $(TARGET)_libretro_qnx.so
+	TARGETOS=linux
+	fpic := -fPIC
+	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
+
+	CC = qcc -Vgcc_ntoarmv7le
+	REALCC = qcc -Vgcc_ntoarmv7le
+	AR = qcc -Vgcc_ntoarmv7le
+	CFLAGS += -D__BLACKBERRY_QNX__
+	LIBS += -lstdc++ -lpthread
+
 ## PS3
+# mame isn't likely to run very well on PS3, but if you want to make it work,
+# these blocks are a start (don't forget to set REALCC as well)
 #else ifeq ($(platform), ps3)
 #	TARGETLIB := $(TARGET)_libretro_ps3.a
 #	CC = $(CELL_SDK)/host-win32/ppu/bin/ppu-lv2-gcc.exe
