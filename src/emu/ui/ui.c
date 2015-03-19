@@ -306,9 +306,11 @@ UINT32 ui_manager::set_handler(ui_callback callback, UINT32 param)
 //  various startup screens
 //-------------------------------------------------
 
+#if 0
 #ifdef OSD_RETRO
 extern bool hide_nagscreen;
 extern bool hide_warnings;
+#endif
 #endif
 
 void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
@@ -329,12 +331,14 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 	show_gameinfo = show_warnings = show_disclaimer = FALSE;
 	#endif
 
+#if 0
 	#ifdef OSD_RETRO
 	if(hide_nagscreen)
 		show_disclaimer = FALSE;
 	if(hide_warnings)
 		show_warnings = FALSE;
 	#endif
+#endif
 
 	// loop over states
 	set_handler(handler_ingame, 0);

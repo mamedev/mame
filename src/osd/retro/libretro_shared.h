@@ -77,5 +77,15 @@ void process_joypad_state(void);
 
 void process_mouse_state(void);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+   
+int mmain(int argc, const char *argv);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

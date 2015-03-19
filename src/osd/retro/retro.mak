@@ -69,8 +69,6 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrodir.o \
 	$(MINIOBJ)/retrofile.o \
 	$(MINIOBJ)/retroos.o \
-	$(MINIOBJ)/retromain.o \
-	$(MINIOBJ)/libretro.o \
 	$(MINIOBJ)/../modules/font/font_none.o \
 	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
 	$(OSDOBJ)/modules/sync/sync_retro.o \
@@ -92,6 +90,8 @@ endif
 OSDOBJS = \
 	$(MINIOBJ)/../modules/sound/retro_sound.o \
 	$(MINIOBJ)/../modules/sound/none.o \
+	$(MINIOBJ)/libretro.o \
+	$(MINIOBJ)/retromain.o \
 	$(MINIOBJ)/../modules/debugger/none.o \
 	$(MINIOBJ)/../modules/debugger/debugint.o \
 	$(MINIOBJ)/../modules/debugger/debugint.o \

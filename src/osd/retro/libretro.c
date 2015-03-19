@@ -59,8 +59,6 @@ const char *retro_content_directory;
 
 retro_log_printf_t log_cb;
 
-extern "C" int mmain(int argc, const char *argv);
-
 static bool draw_this_frame;
 
 #ifdef M16B
