@@ -247,6 +247,7 @@ ifeq ($(platform), unix)
 		LIBS += -lGL
 	endif
 	LDFLAGS +=  $(fpic) $(SHARED)
+	REALCC = cc
 #	NATIVECC = g++
 #	NATIVECFLAGS = -std=gnu99
 	BASELIBS +=  -lpthread
@@ -305,6 +306,7 @@ else ifeq ($(platform), osx)
 	PLATCFLAGS += $(fpic)
 	SHARED := -dynamiclib
 	CXX_AS = c++
+	REALCC = cc
 	CC = $(CXX_AS) -stdlib=$(LIBCXX)
 	LD = $(CXX_AS) -stdlib=$(LIBCXX)
 #	NATIVECC = $(CXX_AS)

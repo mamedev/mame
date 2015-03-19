@@ -98,7 +98,7 @@ $(OBJ)/libexpat.a: $(EXPATOBJS)
 
 $(LIBOBJ)/expat/%.o: $(3RDPARTY)/expat/lib/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
+	$(REALCC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
 
 
 
@@ -279,7 +279,7 @@ $(OBJ)/libz.a: $(ZLIBOBJS)
 
 $(LIBOBJ)/zlib/%.o: $(3RDPARTY)/zlib/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) $(ZLIBOPTS) -c $< -o $@
+	$(REALCC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) $(ZLIBOPTS) -c $< -o $@
 
 
 
@@ -302,7 +302,7 @@ $(LIBOBJ)/softfloat/fsincos.o: $(3RDPARTY)/softfloat/fsincos.c $(3RDPARTY)/softf
 
 $(LIBOBJ)/softfloat/%.o: $(3RDPARTY)/softfloat/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+	$(REALCC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # libJPEG library objects
@@ -360,7 +360,7 @@ $(OBJ)/libjpeg.a: $(LIBJPEGOBJS)
 
 $(LIBOBJ)/libjpeg/%.o: $(3RDPARTY)/libjpeg/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/libjpeg -c $< -o $@
+	$(REALCC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/libjpeg -c $< -o $@
 
 
 
@@ -407,7 +407,7 @@ $(OBJ)/libflac.a: $(LIBFLACOBJS)
 
 $(LIBOBJ)/libflac/%.o: $(3RDPARTY)/libflac/src/libFLAC/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CONLYFLAGS) $(CCOMFLAGS) $(FLACOPTS) -I$(3RDPARTY)/libflac/include -I$(3RDPARTY)/libflac/src/libFLAC/include -c $< -o $@
+	$(REALCC) $(CDEFS) $(CONLYFLAGS) $(CCOMFLAGS) $(FLACOPTS) -I$(3RDPARTY)/libflac/include -I$(3RDPARTY)/libflac/src/libFLAC/include -c $< -o $@
 
 
 
@@ -441,7 +441,7 @@ $(OBJ)/lib7z.a: $(LIB7ZOBJS)
 
 $(LIBOBJ)/lib7z/%.o: $(3RDPARTY)/lzma/C/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(7ZOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/lzma/C -c $< -o $@
+	$(REALCC) $(CDEFS) $(7ZOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(3RDPARTY)/lzma/C -c $< -o $@
 
 #-------------------------------------------------
 # portmidi library objects
@@ -486,7 +486,7 @@ $(OBJ)/libportmidi.a: $(LIBPMOBJS)
 
 $(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) $(INCPATH) -I$(3RDPARTY)/portmidi/pm_common -I$(3RDPARTY)/portmidi/porttime -c $< -o $@
+	$(REALCC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) $(INCPATH) -I$(3RDPARTY)/portmidi/pm_common -I$(3RDPARTY)/portmidi/porttime -c $< -o $@
 
 ifeq ($(TARGETOS),macosx)
 $(LIBOBJ)/portmidi/%.o: $(3RDPARTY)/portmidi/%.m | $(OSPREBUILD)
@@ -551,11 +551,11 @@ endif
 
 $(LIBOBJ)/lua/%.o: $(3RDPARTY)/lua/src/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
+	$(REALCC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
 
 $(LIBOBJ)/lua/lsqlite3/%.o: $(3RDPARTY)/lsqlite3/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -I$(3RDPARTY)/lua/src -I$(3RDPARTY) $(LUA_FLAGS) -c $< -o $@
+	$(REALCC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -I$(3RDPARTY)/lua/src -I$(3RDPARTY) $(LUA_FLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # web library objects
@@ -575,7 +575,7 @@ $(LIBOBJ)/jsoncpp/%.o: $(3RDPARTY)/jsoncpp/src/lib_json/%.cpp | $(OSPREBUILD)
 
 $(LIBOBJ)/mongoose/%.o: $(3RDPARTY)/mongoose/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CFLAGS) -I$(3RDPARTY)/mongoose -DNS_STACK_SIZE=0 -DMONGOOSE_ENABLE_THREADS -c $< -o $@
+	$(REALCC) $(CDEFS) $(CFLAGS) -I$(3RDPARTY)/mongoose -DNS_STACK_SIZE=0 -DMONGOOSE_ENABLE_THREADS -c $< -o $@
 
 #-------------------------------------------------
 # SQLite3 library objects
@@ -602,7 +602,7 @@ endif
 
 $(LIBOBJ)/sqlite3/sqlite3.o: $(3RDPARTY)/sqlite3/sqlite3.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -Wno-bad-function-cast -Wno-undef -I$(3RDPARTY)/sqlite3 $(SQLITE3_FLAGS) -c $< -o $@
+	$(REALCC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -Wno-bad-function-cast -Wno-undef -I$(3RDPARTY)/sqlite3 $(SQLITE3_FLAGS) -c $< -o $@
 
 #-------------------------------------------------
 # BGFX library objects
