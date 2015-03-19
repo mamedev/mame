@@ -461,6 +461,9 @@ else
 	endif
 endif
 
+# FIXME: Figure out why retro.mak setting this isn't sticking
+DEFS += -DOSD_RETRO
+
 ifeq ($(platform), osx)
 CONLYFLAGS += -ansi
 else
