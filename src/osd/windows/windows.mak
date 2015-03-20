@@ -237,10 +237,8 @@ endif
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
-ifdef MSVC_BUILD
 ifdef DEBUG
 LDFLAGS += /NODEFAULTLIB:LIBCMT
-endif
 endif
 
 # add some VC++-specific defines
@@ -254,7 +252,7 @@ msvcclean:
 	$(RM) *.lib
 	$(RM) *.exp
 
-endif
+endif # MSVC_BUILD
 
 
 #-------------------------------------------------
