@@ -4807,12 +4807,14 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPSETTING(    0x09, "77% / 82%" )
 	PORT_DIPSETTING(    0x0a, "80% / 85%" )
 	PORT_DIPSETTING(    0x0f, "83% / 88%" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Bet" )                   PORT_DIPLOCATION("DSW2:5")          /* OK */
-	PORT_DIPSETTING(    0x10, "64" )
-	PORT_DIPSETTING(    0x00, "40 (20)" )   /* shows 20 in settings screen but limits to 40 in gameplay */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )                   PORT_DIPLOCATION("DSW2:5,6")        /* OK */
+	PORT_DIPSETTING(    0x00, "10 (5)" )    PORT_CONDITION("DSW3",0x80,EQUALS,0x80) /* shows 5 in settings screen but limits at 10 in gameplay */
+	PORT_DIPSETTING(    0x10, "20 (10)" )   PORT_CONDITION("DSW3",0x80,EQUALS,0x80) /* shows 10 in settings screen but limits at 20 in gameplay */
+	PORT_DIPSETTING(    0x20, "40 (20)" )   PORT_CONDITION("DSW3",0x80,EQUALS,0x80) /* shows 20 in settings screen but limits at 40 in gameplay */
+	PORT_DIPSETTING(    0x00, "5" )         PORT_CONDITION("DSW3",0x80,EQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "10" )        PORT_CONDITION("DSW3",0x80,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "20" )        PORT_CONDITION("DSW3",0x80,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "64" )                                                /* always individual irrespective of DSW3-8 */
 	PORT_DIPNAME( 0x40, 0x40, "Min. Bet For Bonus Play" )   PORT_DIPLOCATION("DSW2:7")          /* OK */
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x40, "16" )
@@ -4852,9 +4854,9 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")          /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Max Bet Type" )              PORT_DIPLOCATION("DSW3:8")          /* OK */
+	PORT_DIPSETTING(    0x80, "Total" )        /* Max Bet applies to total of BET-A and BET-B unless set to 64 */
+	PORT_DIPSETTING(    0x00, "Individual" )   /* Max Bet applies individually to each of BET-A and BET-B */
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:1")
@@ -4923,11 +4925,14 @@ static INPUT_PORTS_START( unkch3 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Bet Maximum" )               PORT_DIPLOCATION("DSW2:5,6")    /* OK */
-	PORT_DIPSETTING(    0x00, "10 (5)" )    /* shows 5 in settings screen but limits at 10 in gameplay */
-	PORT_DIPSETTING(    0x10, "20 (10)" )   /* shows 10 in settings screen but limits at 20 in gameplay */
-	PORT_DIPSETTING(    0x20, "40 (20)" )   /* shows 20 in settings screen but limits at 40 in gameplay */
-	PORT_DIPSETTING(    0x30, "64" )
+	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )                   PORT_DIPLOCATION("DSW2:5,6")        /* OK */
+	PORT_DIPSETTING(    0x00, "10 (5)" )    PORT_CONDITION("DSW3",0x80,EQUALS,0x80) /* shows 5 in settings screen but limits at 10 in gameplay */
+	PORT_DIPSETTING(    0x10, "20 (10)" )   PORT_CONDITION("DSW3",0x80,EQUALS,0x80) /* shows 10 in settings screen but limits at 20 in gameplay */
+	PORT_DIPSETTING(    0x20, "40 (20)" )   PORT_CONDITION("DSW3",0x80,EQUALS,0x80) /* shows 20 in settings screen but limits at 40 in gameplay */
+	PORT_DIPSETTING(    0x00, "5" )         PORT_CONDITION("DSW3",0x80,EQUALS,0x00)
+	PORT_DIPSETTING(    0x10, "10" )        PORT_CONDITION("DSW3",0x80,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "20" )        PORT_CONDITION("DSW3",0x80,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "64" )                                                /* always individual irrespective of DSW3-8 */
 	PORT_DIPNAME( 0x40, 0x40, "Min. Bet For Bonus Play" )   PORT_DIPLOCATION("DSW2:7")          /* OK - called 'Bet Minimum' in settings screen */
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x40, "16" )
@@ -4957,9 +4962,9 @@ static INPUT_PORTS_START( unkch3 )
 	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")      /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Max Bet Type" )              PORT_DIPLOCATION("DSW3:8")          /* OK */
+	PORT_DIPSETTING(    0x80, "Total" )        /* Max Bet applies to total of BET-A and BET-B unless set to 64 */
+	PORT_DIPSETTING(    0x00, "Individual" )   /* Max Bet applies individually to each of BET-A and BET-B */
 
 	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:1")
@@ -5013,7 +5018,7 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )                PORT_DIPLOCATION("DSW1:5")          /* OK */
 	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x60, 0x60, "Super Jackpot" )             PORT_DIPLOCATION("DSW1:6,7")        /* OK - shows in test mode but always seems to be enabled in gameplay */
+	PORT_DIPNAME( 0x60, 0x60, "Super Jackpot" )             PORT_DIPLOCATION("DSW1:6,7")        /* shows in test mode but always seems to be enabled in gameplay */
 	PORT_DIPSETTING(    0x60, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, "5%" )
 	PORT_DIPSETTING(    0x00, "10%" )
@@ -5036,12 +5041,11 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPSETTING(    0x09, "77% / 82%" )
 	PORT_DIPSETTING(    0x0a, "80% / 85%" )
 	PORT_DIPSETTING(    0x0f, "83% / 88%" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Bet" )                   PORT_DIPLOCATION("DSW2:5")          /* OK */
-	PORT_DIPSETTING(    0x00, "32" )
-	PORT_DIPSETTING(    0x10, "64" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Max Bet" )                   PORT_DIPLOCATION("DSW2:5,6")        /* OK */
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x10, "16" )
+	PORT_DIPSETTING(    0x20, "32" )
+	PORT_DIPSETTING(    0x30, "64" )
 	PORT_DIPNAME( 0x40, 0x40, "Min. Bet For Bonus Play" )   PORT_DIPLOCATION("DSW2:7")          /* OK */
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x40, "16" )
@@ -12849,6 +12853,10 @@ DRIVER_INIT_MEMBER(cb3_state, cherrys)
 /* todo: remove these patches! */
 DRIVER_INIT_MEMBER(unkch_state, unkch1)
 {
+	// game stores $02 at ($D75C) and expects it to change
+	// missing interrupt?  before enabling interrupts so could only be NMI
+	// peripheral with RAM access?
+	// something other than RAM there?
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9d52] = 0x00;
 	ROM[0x9d53] = 0x00;
@@ -12856,6 +12864,10 @@ DRIVER_INIT_MEMBER(unkch_state, unkch1)
 
 DRIVER_INIT_MEMBER(unkch_state, unkch3)
 {
+	// game stores $04 at ($D77F) and expects it to change
+	// missing interrupt?  before enabling interrupts so could only be NMI
+	// peripheral with RAM access?
+	// something other than RAM there?
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9b86] = 0x00;
 	ROM[0x9b87] = 0x00;
@@ -12863,6 +12875,10 @@ DRIVER_INIT_MEMBER(unkch_state, unkch3)
 
 DRIVER_INIT_MEMBER(unkch_state, unkch4)
 {
+	// game stores $02 at ($D75C) and expects it to change
+	// missing interrupt?  before enabling interrupts so could only be NMI
+	// peripheral with RAM access?
+	// something other than RAM there?
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9a6e] = 0x00;
 	ROM[0x9a6f] = 0x00;
