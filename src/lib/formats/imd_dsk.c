@@ -279,13 +279,13 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/imd_dsk.h
+    formats/imd_dsk.c
 
     IMD disk images
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror
 #include "imd_dsk.h"
 
 imd_format::imd_format()
