@@ -71,8 +71,7 @@ ifeq ($(platform), unix)
 	TARGETOS=linux
 else ifeq ($(platform), android)
 	TARGETOS=linux
-else
-ifeq ($(platform), osx)
+else ifeq ($(platform), osx)
 	TARGETOS = macosx
 	PYTHON ?= @python
 else ifeq ($(platform), ios)
@@ -205,25 +204,24 @@ else ifeq ($(platform), osx)
 	PLATCFLAGS += -DSDLMAME_NO64BITIO -DOSX
 	CCOMFLAGS += $(PLATCFLAGS)
 ## iOS
-#else ifeq ($(platform), ios)
-#	armplatform := 1
-#	FORCE_DRC_C_BACKEND = 1
-#	TARGETLIB := $(TARGET)_libretro_ios.dylib
-#	fpic := -fPIC
-#	SHARED := -dynamiclib
-#	LIBCXX := libc++
-#
-#	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
-#	CXX_AS := c++
-#	REALCC = cc -arch armv7 -sysroot $(IOSSDK)
-#	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
-#	LD = $(CC) -stdlib=$(LIBCXX)
-#	LDFLAGS +=  $(fpic) $(SHARED)
-#	CFLAGS += -DIOS
-#	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
-#	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
-#	CCOMFLAGS += $(PLATCFLAGS)
-#
+else ifeq ($(platform), ios)
+	armplatform := 1
+	FORCE_DRC_C_BACKEND = 1
+	TARGETLIB := $(TARGET)_libretro_ios.dylib
+	fpic := -fPIC
+	SHARED := -dynamiclib
+	LIBCXX := libc++
+
+	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
+	CXX_AS := c++
+	REALCC = cc -arch armv7 -sysroot $(IOSSDK)
+	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
+	LD = $(CC) -stdlib=$(LIBCXX)
+	LDFLAGS +=  $(fpic) $(SHARED)
+	CFLAGS += -DIOS
+	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
+	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
+	CCOMFLAGS += $(PLATCFLAGS)
 ## QNX
 else ifeq ($(platform), qnx)
 	armplatform := 1
@@ -347,7 +345,7 @@ else ifeq ($(platform), qnx)
 #	LIBS += -lstdc++ -lpthread -ldl
 #
 ## Windows cross compiler
-#else ifeq ($(platform), wincross)
+else ifeq ($(platform), wincross)
 	TARGETLIB := $(TARGET)_libretro.dll
 	# You're going to have to pass REALCC=<whatever> on the cmdline for wincross
 	REALCC = gcc
