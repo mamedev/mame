@@ -15,6 +15,7 @@
 #define __EMUCORE_H__
 
 // standard C includes
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -30,27 +31,6 @@
 // standard C++ includes
 #include <exception>
 #include <typeinfo>
-
-// TODO: make the assert replacement and especially assert_always work again
-#include <assert.h>
-#define assert_always(x, msg) assert(x)
-
-/*
-// standard assertion macros
-#undef assert
-#undef assert_always
-
-#if defined(MAME_DEBUG_FAST)
-#define assert(x)               do { } while (0)
-#define assert_always(x, msg)   do { } while (0)
-#elif defined(MAME_DEBUG)
-#define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
-#else
-#define assert(x)               do { } while (0)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#endif
-*/
 
 // core system includes
 #include "osdcomm.h"
@@ -233,6 +213,22 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 // this macro wraps a function 'x' and can be used to pass a function followed by its name
 #define FUNC(x) &x, #x
 #define FUNC_NULL NULL, "(null)"
+
+
+// standard assertion macros
+#undef assert
+#undef assert_always
+
+#if defined(MAME_DEBUG_FAST)
+#define assert(x)               do { } while (0)
+#define assert_always(x, msg)   do { } while (0)
+#elif defined(MAME_DEBUG)
+#define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#else
+#define assert(x)               do { } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
+#endif
 
 
 // macros to convert radians to degrees and degrees to radians
