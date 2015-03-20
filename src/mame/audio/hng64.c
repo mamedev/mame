@@ -21,11 +21,18 @@ data structures look very similar between all of them
 
 IRQ mask register on the internal interrupt controller is set to 0xd8
 
-so levels 0,1,2,5 are unmasked
+so levels 0,1,2,5 are unmasked, vectors get set during the sound CPU init code.
 
-returning random values / triggering random interrupts eventually results in a situation
-where the CPU stops writing to the sound related addresses and starts reading / masking the
-serial comms register.
+ level 0/1 irq (fatfurwa) starts at 0xd277 (both the same vector)
+ serial comms related, maybe to get commands from main CPU if not done with shared ram?
+
+ level 2 irq (fatfurwa) 0xdd20
+ simple routine increases counter in RAM, maybe hooked to one / all of the timer irqs
+
+ level 5 irq: (fatfurwa) starts at 0xc1e1
+ largest irq, does things with ports 100 / 102 / 104 / 106, 10a  (not 108 directly tho)
+
+ no other irqs (or the NMI) are valid.
 
 */
 

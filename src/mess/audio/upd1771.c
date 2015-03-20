@@ -91,7 +91,7 @@
     uPD1776C: mentioned in the bristow book, implements VSRSSS speech concatenation
               (see US Patent 4577343 which is a patent on this VSRSSS implementation)
     uPD1771C-006: used in NEC APC for sound as the "MPU"
-            -011: used on Firefox F-4 handheld
+            -011: used on Firefox F-4/Astro Thunder handheld
             -015: unknown, known to exist from part scalper sites only.
             -017: used on Epoch Super Cassete Vision for sound; This audio driver HLEs that part only.
 
