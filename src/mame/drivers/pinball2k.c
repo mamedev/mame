@@ -5,7 +5,6 @@
 
     TODO:
         - Everything!
-        - BIOS hangs waiting for port 0400h to return 0x80.  If you make that happy it jumps off into the weeds.
         - MediaGX features should be moved out to machine/ and shared with mediagx.c once we know what these games need
 
     Hardware:
