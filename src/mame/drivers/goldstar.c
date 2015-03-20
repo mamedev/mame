@@ -172,6 +172,7 @@
 #include "roypok96.lh"
 #include "skill98.lh"
 #include "tonypok.lh"
+#include "unkch.lh"
 
 
 WRITE8_MEMBER(goldstar_state::protection_w)
@@ -225,6 +226,7 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   tonypok uses lamps to indicate current button functions rather than active buttons
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
+  all unkch use the same scheme, these sets use crude PWM to dim lamps which requires better lamp simulation
 */
 	output_set_lamp_value(0, (data >> 0) & 1);
 	output_set_lamp_value(1, (data >> 1) & 1);
@@ -13074,10 +13076,10 @@ GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,        
 GAME( 2003, nfm,       0,        nfm,      nfb96bl,   driver_device,  0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)", GAME_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99" probably hacks of a 1994 version of Cherry Bonus / Cherry Master (Super Cherry Master?)
-GAME( 1999, unkch1,   0,         unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", GAME_NOT_WORKING )
-GAME( 1999, unkch2,   unkch1,    unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           GAME_NOT_WORKING )
-GAME( 1999, unkch3,   unkch1,    unkch,    unkch3,    unkch_state,    unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", GAME_NOT_WORKING ) // cards have been hacked to look like barrels, girl removed?
-GAME( 1999, unkch4,   unkch1,    unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         GAME_NOT_WORKING ) // by 'Toy System' Hungary
+GAMEL(1999, unkch1,   0,         unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", GAME_NOT_WORKING,     layout_unkch )
+GAMEL(1999, unkch2,   unkch1,    unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           GAME_NOT_WORKING,     layout_unkch )
+GAMEL(1999, unkch3,   unkch1,    unkch,    unkch3,    unkch_state,    unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", GAME_NOT_WORKING,     layout_unkch ) // cards have been hacked to look like barrels, girl removed?
+GAMEL(1999, unkch4,   unkch1,    unkch,    unkch4,    unkch_state,    unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         GAME_NOT_WORKING,     layout_unkch ) // by 'Toy System' Hungary
 
 
 /* Stealth sets.
