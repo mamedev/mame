@@ -242,7 +242,7 @@ public:
 	const char *record() const { return value(OPTION_RECORD); }
 	const char *mng_write() const { return value(OPTION_MNGWRITE); }
 	const char *avi_write() const { return value(OPTION_AVIWRITE); }
-	const char *dummy_write() const { return value(OPTION_DUMMYWRITE); }
+	bool dummy_write() const { return bool_value(OPTION_DUMMYWRITE); }
 	const char *wav_write() const { return value(OPTION_WAVWRITE); }
 	const char *snap_name() const { return value(OPTION_SNAPNAME); }
 	const char *snap_size() const { return value(OPTION_SNAPSIZE); }
