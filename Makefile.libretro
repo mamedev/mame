@@ -95,8 +95,13 @@ else ifeq ($(platform), osx)
 	TARGETOS = macosx
 	PYTHON ?= @python
 else ifeq ($(platform), ios)
+	# To build for iOS, do this:
+	# make -f Makefile.libretro clean
+	# make -f Makefile.libretro platform=ios
+	# it recurses for native buildtools, then builds with CROSS_BUILD=1
 	TARGETOS = macosx
 	PTR64 = 0
+	CROSS_BUILD = 1
 	PYTHON ?= @python
 	FORCE_DRC_C_BACKEND = 1
 else ifeq ($(platform), qnx)
@@ -117,6 +122,16 @@ endif
 PYTHON ?= @python2
 override PYTHON := $(PYTHON)
 
+retro-default: maketree retro-buildtools emulator
+
+ifeq ($(CROSS_BUILD),1)
+# Recursive make call without specifying platform so that host compilers are
+# used for buildtools. Must use Makefile.libretro here because of REALCC.
+retro-buildtools:
+	$(MAKE) -f Makefile.libretro buildtools
+else
+retro-buildtools: buildtools
+endif
 
 # ============================================================================
 # Any settings/overrides that affect the logic of the upstream mame makefile
@@ -205,12 +220,6 @@ else ifeq ($(platform), osx)
 	CCOMFLAGS += $(PLATCFLAGS)
 ## iOS
 else ifeq ($(platform), ios)
-	# iOS does not at this moment build from libretro-super
-	# To build it, do:
-	# make -f Makefile.libretro clean
-	# make -f Makefile.libretro platform=osx buildtools
-	# make -f Makefile.libretro CROSS_BUILD=1 platform=ios emulator
-	# TODO: HOST_CC/TARGET_CC ?
 	armplatform := 1
 	TARGETLIB := $(TARGET)_libretro_ios.dylib
 	fpic := -fPIC
