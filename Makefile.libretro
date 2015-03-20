@@ -201,6 +201,12 @@ else ifeq ($(platform), osx)
 	CCOMFLAGS += $(PLATCFLAGS)
 ## iOS
 else ifeq ($(platform), ios)
+	# iOS does not at this moment build from libretro-super
+	# To build it, do:
+	# make -f Makefile.libretro clean
+	# make -f Makefile.libretro platform=osx buildtools
+	# make -f Makefile.libretro CROSS_BUILD=1 platform=ios emulator
+	# TODO: HOST_CC/TARGET_CC ?
 	armplatform := 1
 	TARGETLIB := $(TARGET)_libretro_ios.dylib
 	fpic := -fPIC
