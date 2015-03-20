@@ -254,12 +254,9 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(unk_r);
-
+	DECLARE_WRITE8_MEMBER(coincount_w);
 	DECLARE_WRITE8_MEMBER(unkcm_0x02_w);
 	DECLARE_WRITE8_MEMBER(unkcm_0x03_w);
-	DECLARE_WRITE8_MEMBER(unkcm_0x11_w);
-	DECLARE_WRITE8_MEMBER(unkcm_0x12_w);
 
 	DECLARE_WRITE8_MEMBER(reel1_attrram_w);
 	DECLARE_WRITE8_MEMBER(reel2_attrram_w);
