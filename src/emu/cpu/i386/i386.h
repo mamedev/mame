@@ -962,6 +962,7 @@ struct I386_CALL_GATE
 	void pentium_cmovg_r32_rm32();
 	void pentium_movnti_m16_r16();
 	void pentium_movnti_m32_r32();
+	void i386_cyrix_special();
 	void i386_cyrix_unknown();
 	void pentium_cmpxchg8b_m64();
 	void pentium_movntq_m64_r64();
@@ -1004,6 +1005,12 @@ struct I386_CALL_GATE
 	void mmx_paddw_r64_rm64();
 	void mmx_paddd_r64_rm64();
 	void mmx_emms();
+	void i386_cyrix_svdc();
+	void i386_cyrix_rsdc();
+	void i386_cyrix_svldt();
+	void i386_cyrix_rsldt();
+	void i386_cyrix_svts();
+	void i386_cyrix_rsts();
 	void mmx_movd_r64_rm32();
 	void mmx_movq_r64_rm64();
 	void mmx_movd_rm32_r64();

@@ -1062,6 +1062,18 @@ void i386_device::pentium_movnti_m32_r32() // Opcode 0f c3
 	}
 }
 
+void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
+{
+/*
+0f 3a		BB0_RESET (set BB0 pointer = base)
+0f 3b		BB1_RESET (set BB1 pointer = base)
+0f 3c		CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
+0f 3d		CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
+*/
+
+	CYCLES(1);
+}
+
 void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
 {
 	logerror("Unemulated 0x0f 0x74 opcode called\n");
@@ -1967,6 +1979,262 @@ void i386_device::mmx_emms() // Opcode 0f 77
 {
 	m_x87_tw = 0xffff; // tag word = 0xffff
 	// TODO
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::i386_cyrix_svdc() // Opcode 0f 78
+{
+	UINT8 modrm = FETCH();
+
+	if( modrm < 0xc0 ) {
+		UINT32 ea = GetEA(modrm,0);
+		int index = (modrm >> 3) & 7;
+		int limit;
+		switch (index)
+		{
+			case 0:
+			{
+				index = ES;
+				break;
+			}
+
+			case 2:
+			{
+				index = SS;
+				break;
+			}
+
+			case 3:
+			{
+				index = DS;
+				break;
+			}
+
+			case 4:
+			{
+				index = FS;
+				break;
+			}
+
+			case 5:
+			{
+				index = GS;
+				break;
+			}
+
+			default:
+			{
+				i386_trap(6, 0, 0);
+			}
+		}
+
+		limit = m_sreg[index].limit;
+
+		if (m_sreg[index].flags & 0x8000) //G bit
+		{
+			limit >>= 12;
+		}
+
+		WRITE16(ea + 0, limit);
+		WRITE32(ea + 2, m_sreg[index].base);
+		WRITE16(ea + 5, m_sreg[index].flags); //replace top 8 bits of base
+		WRITE8(ea + 7, m_sreg[index].base >> 24);
+		WRITE16(ea + 8, m_sreg[index].selector);
+	} else {
+		i386_trap(6, 0, 0);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::i386_cyrix_rsdc() // Opcode 0f 79
+{
+	UINT8 modrm = FETCH();
+
+	if( modrm < 0xc0 ) {
+		UINT32 ea = GetEA(modrm,0);
+		int index = (modrm >> 3) & 7;
+		UINT16 flags;
+		UINT32 base;
+		UINT32 limit;
+		switch (index)
+		{
+			case 0:
+			{
+				index = ES;
+				break;
+			}
+
+			case 2:
+			{
+				index = SS;
+				break;
+			}
+
+			case 3:
+			{
+				index = DS;
+				break;
+			}
+
+			case 4:
+			{
+				index = FS;
+				break;
+			}
+
+			case 5:
+			{
+				index = GS;
+				break;
+			}
+
+			default:
+			{
+				i386_trap(6, 0, 0);
+			}
+		}
+
+		base = (READ32(ea + 2) & 0x00ffffff) | (READ8(ea + 7) << 24);
+		flags = READ16(ea + 5);
+		limit = READ16(ea + 0) | ((flags & 3) << 16);
+
+		if (flags & 0x8000) //G bit
+		{
+			limit = (limit << 12) | 0xfff;
+		}
+
+		m_sreg[index].selector = READ16(ea + 8);
+		m_sreg[index].flags = flags;
+		m_sreg[index].base = base;
+		m_sreg[index].limit = limit;
+	} else {
+		i386_trap(6, 0, 0);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::i386_cyrix_svldt() // Opcode 0f 7a
+{
+	if ( PROTECTED_MODE && !V8086_MODE )
+	{
+		UINT8 modrm = FETCH();
+
+		if( !(modrm & 0xf8) ) {
+			UINT32 ea = GetEA(modrm,0);
+			UINT32 limit = m_ldtr.limit;
+
+			if (m_ldtr.flags & 0x8000) //G bit
+			{
+				limit >>= 12;
+			}
+
+			WRITE16(ea + 0, limit);
+			WRITE32(ea + 2, m_ldtr.base);
+			WRITE16(ea + 5, m_ldtr.flags); //replace top 8 bits of base
+			WRITE8(ea + 7, m_ldtr.base >> 24);
+			WRITE16(ea + 8, m_ldtr.segment);
+		} else {
+			i386_trap(6, 0, 0);
+		}
+	} else {
+		i386_trap(6, 0, 0);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::i386_cyrix_rsldt() // Opcode 0f 7b
+{
+	if ( PROTECTED_MODE && !V8086_MODE )
+	{
+		if(m_CPL)
+			FAULT(FAULT_GP,0)
+
+		UINT8 modrm = FETCH();
+
+		if( !(modrm & 0xf8) ) {
+			UINT32 ea = GetEA(modrm,0);
+			UINT16 flags = READ16(ea + 5);
+			UINT32 base = (READ32(ea + 2) | 0x00ffffff) | (READ8(ea + 7) << 24);
+			UINT32 limit = READ16(ea + 0) | ((flags & 3) << 16);
+			I386_SREG seg;
+
+			if (flags & 0x8000) //G bit
+			{
+				limit = (limit << 12) | 0xfff;
+			}
+
+			memset(&seg, 0, sizeof(seg));
+			seg.selector = READ16(ea + 8);
+			i386_load_protected_mode_segment(&seg,NULL);
+			m_ldtr.limit = limit;
+			m_ldtr.base = base;
+			m_ldtr.flags = flags;
+		} else {
+			i386_trap(6, 0, 0);
+		}
+	} else {
+		i386_trap(6, 0, 0);
+	}
+	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::i386_cyrix_svts() // Opcode 0f 7c
+{
+	if ( PROTECTED_MODE )
+	{
+		UINT8 modrm = FETCH();
+
+		if( !(modrm & 0xf8) ) {
+			UINT32 ea = GetEA(modrm,0);
+			UINT32 limit = m_task.limit;
+
+			if (m_task.flags & 0x8000) //G bit
+			{
+				limit >>= 12;
+			}
+
+			WRITE16(ea + 0, limit);
+			WRITE32(ea + 2, m_task.base);
+			WRITE16(ea + 5, m_task.flags); //replace top 8 bits of base
+			WRITE8(ea + 7, m_task.base >> 24);
+			WRITE16(ea + 8, m_task.segment);
+		} else {
+			i386_trap(6, 0, 0);
+		}
+	} else {
+		i386_trap(6, 0, 0);
+	}
+}
+
+void i386_device::i386_cyrix_rsts() // Opcode 0f 7d
+{
+	if ( PROTECTED_MODE )
+	{
+		if(m_CPL)
+			FAULT(FAULT_GP,0)
+
+		UINT8 modrm = FETCH();
+
+		if( !(modrm & 0xf8) ) {
+			UINT32 ea = GetEA(modrm,0);
+			UINT16 flags = READ16(ea + 5);
+			UINT32 base = (READ32(ea + 2) | 0x00ffffff) | (READ8(ea + 7) << 24);
+			UINT32 limit = READ16(ea + 0) | ((flags & 3) << 16);
+
+			if (flags & 0x8000) //G bit
+			{
+				limit = (limit << 12) | 0xfff;
+			}
+			m_task.segment = READ16(ea + 8);
+			m_task.limit = limit;
+			m_task.base = base;
+			m_task.flags = flags;
+		} else {
+			i386_trap(6, 0, 0);
+		}
+	} else {
+		i386_trap(6, 0, 0);
+	}
 	CYCLES(1);     // TODO: correct cycle count
 }
 
