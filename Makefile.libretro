@@ -39,7 +39,9 @@ endif
 # This affects whether or not the retro OSD is built for OpenGL
 VRENDER ?= soft
 
-# Mame needs PTR64 defined on 64 bit processors
+# Mame needs PTR64 defined on 64 bit processors, we guess at it if you aren't
+# cross-compiling.  If you ARE, you need to set it yourself.
+ifneq ($(CROSS_BUILD),1)
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 	PTR64 = 1
 endif
@@ -48,6 +50,7 @@ ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
 endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 	PTR64 = 1
+endif
 endif
 
 # If we define this, MAME's makefile will not define final linking rules
@@ -71,8 +74,11 @@ override EMULATOR = $(TARGET)
 NOWERROR = 1
 OSD = retro
 OPTIMIZE = 3
-override NO_USE_MIDI = 1
 DEFS += -DNDEBUG
+
+# We don't do midi in libretro yet (and portmidi doesn't support eg, iOS)
+NO_USE_MIDI = 1
+override MIDI_LIB =
 
 # Upstream makefile fails to add this to INCPATH, bug?
 INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
