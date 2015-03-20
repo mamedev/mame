@@ -2,8 +2,8 @@
 -- base/bake.lua
 --
 -- Takes all the configuration information provided by the project scripts
--- and stored in the solution->project->block hierarchy and flattens it all 
--- down into one object per configuration. These objects are cached with the 
+-- and stored in the solution->project->block hierarchy and flattens it all
+-- down into one object per configuration. These objects are cached with the
 -- project, and can be retrieved by calling the getconfig() or eachconfig().
 --
 -- Copyright (c) 2008-2011 Jason Perkins and the Premake project
@@ -15,7 +15,7 @@
 
 -- do not copy these fields into the configurations
 
-	local nocopy = 
+	local nocopy =
 	{
 		blocks    = true,
 		keywords  = true,
@@ -25,11 +25,11 @@
 
 -- do not cascade these fields from projects to configurations
 
-	local nocascade = 
+	local nocascade =
 	{
 		makesettings = true,
 	}
-		
+
 -- leave these paths as absolute, rather than converting to project relative
 
 	local keeprelative =
@@ -47,7 +47,7 @@
 
 	function premake.getactiveterms()
 		local terms = { _action = _ACTION:lower(), os = os.get() }
-		
+
 		-- add option keys or values
 		for key, value in pairs(_OPTIONS) do
 			if value ~= "" then
@@ -56,15 +56,15 @@
 				table.insert(terms, key:lower())
 			end
 		end
-		
+
 		return terms
 	end
-	
-	
+
+
 --
 -- Test a single configuration block keyword against a list of terms.
 -- The terms are a mix of key/value pairs. The keyword is tested against
--- the values; on a match, the corresponding key is returned. This 
+-- the values; on a match, the corresponding key is returned. This
 -- enables testing for required values in iskeywordsmatch(), below.
 --
 
@@ -73,7 +73,7 @@
 		if keyword:startswith("not ") then
 			return not premake.iskeywordmatch(keyword:sub(5), terms)
 		end
-		
+
 		for _, pattern in ipairs(keyword:explode(" or ")) do
 			for termkey, term in pairs(terms) do
 				if term:match(pattern) == term then
@@ -82,9 +82,9 @@
 			end
 		end
 	end
-	
-	
-		
+
+
+
 --
 -- Checks a set of configuration block keywords against a list of terms.
 -- The required flag is used by the file configurations: only blocks
@@ -104,7 +104,7 @@
 				hasrequired = true
 			end
 		end
-		
+
 		if terms.required and not hasrequired then
 			return false
 		else
@@ -125,15 +125,15 @@
 	local function adjustpaths(location, obj)
 		function adjustpathlist(list)
 			for i, p in ipairs(list) do
-				list[i] = path.getrelative(location, p) 
+				list[i] = path.getrelative(location, p)
 			end
 		end
-		
+
 		for name, value in pairs(obj) do
 			local field = premake.fields[name]
 			if field and value and not keeprelative[name] then
 				if field.kind == "path" then
-					obj[name] = path.getrelative(location, value) 
+					obj[name] = path.getrelative(location, value)
 				elseif field.kind == "dirlist" or field.kind == "filelist" then
 					adjustpathlist(value)
 				elseif field.kind == "keypath" then
@@ -144,8 +144,8 @@
 			end
 		end
 	end
-	
-	
+
+
 
 --
 -- Merge all of the fields from one object into another. String values are overwritten,
@@ -176,21 +176,21 @@
 
 	local function removevalues(tbl, removes)
 		for i=#tbl,1,-1 do
-            for _, pattern in ipairs(removes) do
-                if pattern == tbl[i] then
-                    table.remove(tbl, i)
-                    break
-                end
-            end
-        end
+			for _, pattern in ipairs(removes) do
+				if pattern == tbl[i] then
+					table.remove(tbl, i)
+					break
+				end
+			end
+		end
 	end
-	
+
 	local function mergeobject(dest, src)
 		-- if there's nothing to add, quick out
-		if not src then 
-			return 
+		if not src then
+			return
 		end
-		
+
 		for fieldname, value in pairs(src) do
 			if not nocopy[fieldname] then
 				-- fields that are included in the API are merged...
@@ -207,7 +207,7 @@
 					else
 						dest[fieldname] = value
 					end
-				
+
 				-- ...everything else is just copied as-is
 				else
 					dest[fieldname] = value
@@ -215,8 +215,8 @@
 			end
 		end
 	end
-	
-	
+
+
 
 --
 -- Merges the settings from a solution's or project's list of configuration blocks,
@@ -245,33 +245,33 @@
 		if pltname ~= "Native" then
 			key = key .. pltname
 		end
-		
+
 		-- add the configuration and platform to the block filter terms
 		terms.config = (cfgname or ""):lower()
 		terms.platform = pltname:lower()
-		
+
 		-- build the configuration base by merging the solution and project level settings
 		local cfg = {}
 		mergeobject(cfg, basis[key])
 		adjustpaths(obj.location, cfg)
 		mergeobject(cfg, obj)
-		
+
 		-- add `kind` to the filter terms
-		if (cfg.kind) then 
+		if (cfg.kind) then
 			terms['kind']=cfg.kind:lower()
 		end
-		
+
 		-- now add in any blocks that match the filter terms
 		for _, blk in ipairs(obj.blocks) do
 			if (premake.iskeywordsmatch(blk.keywords, terms))then
 				mergeobject(cfg, blk)
-				if (cfg.kind and not cfg.terms.kind) then 
+				if (cfg.kind and not cfg.terms.kind) then
 					cfg.terms['kind'] = cfg.kind:lower()
 					terms['kind'] = cfg.kind:lower()
 				end
 			end
 		end
-		
+
 		-- package it all up and add it to the result set
 		cfg.name      = cfgname
 		cfg.platform  = pltname
@@ -280,9 +280,9 @@
 		end
 		dest[key] = cfg
 	end
-	
-	
-		
+
+
+
 --
 -- Collapse a solution or project object down to a canonical set of configuration settings,
 -- keyed by configuration block/platform pairs, and taking into account the current
@@ -300,15 +300,15 @@
 	local function collapse(obj, basis)
 		local result = {}
 		basis = basis or {}
-		
+
 		-- find the solution, which contains the configuration and platform lists
 		local sln = obj.solution or obj
 
-		-- build a set of configuration filter terms; only those configuration blocks 
+		-- build a set of configuration filter terms; only those configuration blocks
 		-- with a matching set of keywords will be included in the merged results
 		local terms = premake.getactiveterms()
 
-		-- build a project-level configuration. 
+		-- build a project-level configuration.
 		merge(result, obj, basis, terms)--this adjusts terms
 
 		-- now build configurations for each build config/platform pair
@@ -322,7 +322,7 @@
 				end
 			end
 		end
-		
+
 		return result
 	end
 
@@ -339,12 +339,12 @@
 
 	local function builduniquedirs()
 		local num_variations = 4
-		
+
 		-- Start by listing out each possible object directory for each configuration.
 		-- Keep a count of how many times each path gets used across the session.
 		local cfg_dirs = {}
 		local hit_counts = {}
-		
+
 		for sln in premake.solution.each() do
 			for _, prj in ipairs(sln.projects) do
 				for _, cfg in pairs(prj.__configs) do
@@ -355,7 +355,7 @@
 					dirs[3] = path.join(dirs[2], cfg.name)
 					dirs[4] = path.join(dirs[3], cfg.project.name)
 					cfg_dirs[cfg] = dirs
-					
+
 					-- configurations other than the root should bias toward a more
 					-- description path, including the platform or config name
 					local start = iif(cfg.name, 2, 1)
@@ -367,7 +367,7 @@
 				end
 			end
 		end
-		
+
 		-- Now assign an object directory to each configuration, skipping those
 		-- that are in use somewhere else in the session
 		for sln in premake.solution.each() do
@@ -383,10 +383,10 @@
 					cfg.objectsdir = path.getrelative(cfg.location, dir)
 				end
 			end
-		end		
-		
+		end
+
 	end
-	
+
 
 
 --
@@ -410,24 +410,24 @@
 
 				end
 			end
-		end		
+		end
 	end
-		
+
   	local function getCfgKind(cfg)
   		if(cfg.kind) then
   			return cfg.kind;
   		end
-  		
+
   		if(cfg.project.__configs[""] and cfg.project.__configs[""].kind) then
   			return cfg.project.__configs[""].kind;
   		end
-  		
+
   		return nil
   	end
-  
+
   	local function getprojrec(dstArray, foundList, cfg, cfgname, searchField, bLinkage)
   		if(not cfg) then return end
-  		
+
   		local foundUsePrjs = {};
   		for _, useName in ipairs(cfg[searchField]) do
   			local testName = useName:lower();
@@ -443,7 +443,7 @@
   						end
   					end
   				end
-  
+
   				--Must connect to a usage project.
   				if(theUseProj) then
   					foundList[testName] = true;
@@ -458,7 +458,7 @@
   				end
   			end
   		end
-  		
+
   		for _, usePrj in ipairs(foundUsePrjs) do
   			--Links can only recurse through static libraries.
   			if((searchField ~= "links") or
@@ -468,7 +468,7 @@
   			end
   		end
   	end
-  
+
   --
   -- This function will recursively get all projects that the given configuration has in its "uses"
   -- field. The return values are a list of tables. Each table in that list contains the following:
@@ -486,27 +486,27 @@
   		local dstArray = {};
   		local foundList = {};
   		foundList[cfg.project.name:lower()] = true;
-  
+
   		--First, follow the uses recursively.
   		getprojrec(dstArray, foundList, cfg, cfgname, "uses", false);
-  		
+
   		--Next, go through all of the usage projects and recursively get their links.
   		--But only if they're not already there. Get the links as linkage-only.
   		local linkArray = {};
   		for prjName, prjEntry in pairs(dstArray) do
-  			getprojrec(linkArray, foundList, prjEntry.usageProj.__configs[cfgname], cfgname, 
+  			getprojrec(linkArray, foundList, prjEntry.usageProj.__configs[cfgname], cfgname,
   				"links", true);
   		end
-  		
+
   		--Copy from linkArray into dstArray.
   		for prjName, prjEntry in pairs(linkArray) do
   			dstArray[prjName] = prjEntry;
   		end
-  		
+
   		return dstArray;
   	end
-  	
-  	
+
+
   	local function isnameofproj(cfg, strName)
   		local sln = cfg.project.solution;
   		local strTest = strName:lower();
@@ -515,18 +515,18 @@
   				return true;
   			end
   		end
-  		
+
   		return false;
   	end
-	
-	
+
+
   --
   -- Copies the field from dstCfg to srcCfg.
   --
   	local function copydependentfield(srcCfg, dstCfg, strSrcField)
   		local srcField = premake.fields[strSrcField];
   		local strDstField = strSrcField;
-  		
+
   		if type(srcCfg[strSrcField]) == "table" then
   			--handle paths.
   			if (srcField.kind == "dirlist" or srcField.kind == "filelist") and
@@ -560,8 +560,8 @@
   			end
   		end
   	end
-  	
-	
+
+
   --
   -- This function will take the list of project entries and apply their usage project data
   -- to the given configuration. It will copy compiling information for the projects that are
@@ -569,15 +569,15 @@
   -- the source project is not a static library. It won't copy linking information
   -- if the project is in this solution; instead it will add that project to the configuration's
   -- links field, expecting that Premake will handle the rest.
-  --	
+  --
   	local function copyusagedata(cfg, cfgname, linkToProjs)
   		local myPrj = cfg.project;
   		local bIsStaticLib = (getCfgKind(cfg) == "StaticLib");
-  		
+
   		for prjName, prjEntry in pairs(linkToProjs) do
   			local srcPrj = prjEntry.usageProj;
   			local srcCfg = srcPrj.__configs[cfgname];
-  
+
   			for name, field in pairs(premake.fields) do
   				if(srcCfg[name]) then
   					if(field.usagecopy) then
@@ -594,7 +594,7 @@
   					end
   				end
   			end
-  
+
   			if((not bIsStaticLib) and prjEntry.proj) then
   				table.insert(cfg.links, prjEntry.proj.name);
   			end
@@ -605,9 +605,9 @@
 --
 -- Main function, controls the process of flattening the configurations.
 --
-		
+
 	function premake.bake.buildconfigs()
-	
+
 		-- convert project path fields to be relative to project location
 		for sln in premake.solution.each() do
 			for _, prj in ipairs(sln.projects) do
@@ -619,9 +619,9 @@
 			end
 			sln.location = sln.location or sln.basedir
 		end
-		
+
 		-- collapse configuration blocks, so that there is only one block per build
-		-- configuration/platform pair, filtered to the current operating environment		
+		-- configuration/platform pair, filtered to the current operating environment
 		for sln in premake.solution.each() do
 			local basis = collapse(sln)
 			for _, prj in ipairs(sln.projects) do
@@ -630,8 +630,8 @@
 					bake.postprocess(prj, cfg)
 				end
 			end
-		end	
-		
+		end
+
 		-- This loop finds the projects that a configuration is connected to
 		-- via its "uses" field. It will then copy any usage project information from that
 		-- usage project to the configuration in question.
@@ -644,7 +644,7 @@
 					end
 				end
 			end
-		end		
+		end
 
 		-- Remove all usage projects.
 		for sln in premake.solution.each() do
@@ -654,20 +654,20 @@
 					table.insert(removeList, 1, index); --Add in reverse order.
 				end
 			end
-			
+
 			for _, index in ipairs(removeList) do
 				table.remove(sln.projects, index);
 			end
 		end
-		
+
 		-- assign unique object directories to each configuration
 		builduniquedirs()
-		
+
 		-- walk it again and build the targets and unique directories
 		buildtargets(cfg)
 
 	end
-	
+
 
 --
 -- Post-process a project configuration, applying path fix-ups and other adjustments
@@ -683,10 +683,10 @@
 		cfg.project   = prj
 		cfg.shortname = premake.getconfigname(cfg.name, cfg.platform, true)
 		cfg.longname  = premake.getconfigname(cfg.name, cfg.platform)
-		
+
 		-- set the project location, if not already set
 		cfg.location = cfg.location or cfg.basedir
-		
+
 		-- figure out the target system
 		local platform = premake.platforms[cfg.platform]
 		if platform.iscrosscompiler then
@@ -694,28 +694,28 @@
 		else
 			cfg.system = os.get()
 		end
-		
+
 		-- adjust the kind as required by the target system
 		if cfg.kind == "SharedLib" and platform.nosharedlibs then
 			cfg.kind = "StaticLib"
 		end
-		
+
 		-- remove excluded files from the file list
 		local files = { }
 		for _, fname in ipairs(cfg.files) do
-			local excluded = false
-			for _, exclude in ipairs(cfg.excludes) do
-				excluded = (fname == exclude)
-				if (excluded) then break end
+			local removed = false
+			for _, removefname in ipairs(cfg.removefiles) do
+				removed = (fname == removefname)
+				if (removed) then break end
 			end
-						
-			if (not excluded) then
+
+			if (not removed) then
 				table.insert(files, fname)
 			end
 		end
 		cfg.files = files
 
-		-- fixup the data		
+		-- fixup the data
 		for name, field in pairs(premake.fields) do
 			-- re-key flag fields for faster lookups
 			if field.isflags then

@@ -8,7 +8,7 @@
 -- worry about the /scripts argument and all that.
 --
 	premake.make.override = { "TARGET" }
-	
+
 	solution "genie"
 		configurations {
 			"Release",
@@ -33,15 +33,15 @@
 			"../**.lua",
 			"../src/**.h",
 			"../src/**.c",
-			"../src/host/scripts.c"
+			"../src/host/scripts.c",
 		}
 
-		excludes {
+		removefiles {
 			"../src/premake.lua",
 			"../src/host/lua-5.2.3/src/lua.c",
 			"../src/host/lua-5.2.3/src/luac.c",
 			"../src/host/lua-5.2.3/**.lua",
-			"../src/host/lua-5.2.3/etc/*.c"
+			"../src/host/lua-5.2.3/etc/*.c",
 		}
 
 		configuration "Debug"
