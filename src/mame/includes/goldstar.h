@@ -255,7 +255,6 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(coincount_w);
-	DECLARE_WRITE8_MEMBER(unkcm_0x02_w);
 	DECLARE_WRITE8_MEMBER(unkcm_0x03_w);
 
 	DECLARE_WRITE8_MEMBER(reel1_attrram_w);

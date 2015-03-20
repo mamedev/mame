@@ -209,6 +209,17 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   ---x ----     info        info                            small           small/end
   --x- ----     start       start               deal        start           start           start
   -x-- ----                                     hold
+  x--- ----
+
+  7654 3210     unkch1
+  ---- ---x     bet-a/stop 2
+  ---- --x-     start/stop all
+  ---- -x--     info/small/stop 3
+  ---- x---     big
+  ---x ----     bet-b/d-up
+  --x- ----     take/stop 1
+  -x-- ----
+  x--- ----     always on
 
   all cm/cmaster use the same scheme
   tonypok uses lamps to indicate current button functions rather than active buttons
@@ -976,11 +987,6 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 		popmessage("coin counters: %02x", data);
 }
 
-WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
-{
-	//popmessage("unkcm_0x02_w %02x", data);
-}
-
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
 {
 	//popmessage("unkcm_0x03_w %02x", data);
@@ -995,7 +1001,7 @@ static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, unkch_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(coincount_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(unkcm_0x03_w)
 
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("IN0")
