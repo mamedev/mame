@@ -36,7 +36,7 @@
 #   POSSIBILITY OF SUCH DAMAGE.
 #
 ###########################################################################
-DEFS += -DOSD_RETRO -DNO_USE_MIDI
+DEFS += -DOSD_RETRO
 
 #-------------------------------------------------
 # object and source roots
