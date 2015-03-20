@@ -45,6 +45,7 @@ VRENDER ?= soft
 EXECUTABLE_DEFINED = 1
 
 # Dunno if MAME ever used this, but the retro OSD does for now
+TARGET ?= mame
 ifeq ($(TARGET), mess)
 	CORE_DEFINE := -DWANT_MESS
 else ifeq ($(TARGET), mame)
@@ -61,7 +62,7 @@ override EMULATOR = $(TARGET)
 NOWERROR = 1
 OSD = retro
 OPTIMIZE = 3
-NO_USE_MIDI = 1
+override NO_USE_MIDI = 1
 DEFS += -DNDEBUG
 
 # Upstream makefile fails to add this to INCPATH, bug?
@@ -214,7 +215,7 @@ else ifeq ($(platform), ios)
 
 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 	CXX_AS := c++
-	REALCC = cc -arch armv7 -sysroot $(IOSSDK)
+	REALCC = cc -arch armv7 -isysroot $(IOSSDK)
 	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
 	LD = $(CC) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
