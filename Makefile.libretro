@@ -10,7 +10,8 @@
 #
 ###########################################################################
 
-UNAME=$(shell uname -a)
+# Try to determine libretro $(platform) if not provided to us
+UNAME = $(shell uname -a)
 ifeq ($(platform),)
 	platform = unix
 	ifeq ($(UNAME),)
@@ -25,16 +26,17 @@ ifeq ($(platform),)
 endif
 
 
+# libretro always wants dependencies compiled static when possible
 BUILD_EXPAT = 1
 BUILD_FLAC = 1
 BUILD_JPEGLIB = 1
-
 ifneq ($(platform), android)
 	BUILD_ZLIB = 1
 else
 	BUILD_ZLIB = 0
 endif
 
+# This affects whether or not the retro OSD is built for OpenGL
 VRENDER ?= soft
 
 
@@ -135,10 +137,11 @@ VRENDER ?= soft
 
 ###########################################################################
 
+
 # If we define this, MAME's makefile will not define final linking rules
 EXECUTABLE_DEFINED = 1
 
-# MAME doesn't need this, bit libretro still does
+# Dunno if MAME ever used this, but the retro OSD does for now
 ifeq ($(TARGET), mess)
 	CORE_DEFINE := -DWANT_MESS
 else ifeq ($(TARGET), mame)
@@ -147,26 +150,31 @@ else
 	CORE_DEFINE := -DWANT_UME
 endif
 
+# Ensure $(EMULATOR) has no suffixes
+# FIXME: Should this be $(TARGETLIB)?  Probably...
 override EMULATOR = $(TARGET)
+
+# libretro's preferred settings
 NOWERROR = 1
 OSD = retro
 OPTIMIZE = 3
 NO_USE_MIDI = 1
 DEFS += -DNDEBUG
+
+# Upstream makefile fails to add this to INCPATH, bug?
 INCPATH += -I$(3RDPARTY)/libflac/src/libFLAC/include
 
-# $(PYTHON) needs to be python 2.x
 ifeq ($(platform), unix)
-	override PYTHON ?= python2
 	TARGETOS=linux
 else ifeq ($(platform), android)
 	TARGETOS=linux
-else ifeq ($(platform), osx)
-	override PYTHON ?= python
+else
+ifeq ($(platform), osx)
 	TARGETOS = macosx
+	PYTHON ?= @python
 else ifeq ($(platform), ios)
-	override PYTHON ?= python
 	TARGETOS = macosx
+	PYTHON ?= @python
 else ifeq ($(platform), qnx)
 	TARGETOS=linux
 else ifneq (,$(findstring armv,$(platform)))
@@ -174,10 +182,16 @@ else ifneq (,$(findstring armv,$(platform)))
 else ifeq ($(platform), wincross)
 	TARGETOS = win32
 else
-	# The else condition here is win32
-	override PYTHON ?= python
+# it's win32
 	TARGETOS = win32
 endif
+
+# Upstream uses @python, but they require 2.x for now.  They do that because
+# some OSes (basically Apple) don't install 2.7 as python2.  @python2 is the
+# "right" choice anywhere else, unless the user says otherwise. If that's not
+# okay for a given $(platform), PYTHON ?= something in the block above.
+PYTHON ?= @python2
+override PYTHON := $(PYTHON)
 
 include makefile
 
@@ -204,6 +218,7 @@ ifeq ($(platform), unix)
 	LD = g++
 	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++ -lpthread -ldl
+	# FIXME: Move PTR64 stuff outside of platform testing?
 	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 		PTR64 = 1
 	endif
@@ -225,6 +240,7 @@ ifeq ($(platform), unix)
 #	TARGETLIB := $(TARGET)_libretro.so
 #	fpic := -fPIC
 #	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
+#	REALCC = @arm-linux-androideabi-gcc
 #	CC = @arm-linux-androideabi-g++
 #	AR = @arm-linux-androideabi-ar
 #	LD = @arm-linux-androideabi-g++
@@ -249,6 +265,7 @@ else ifeq ($(platform), osx)
 	LDFLAGSEMULATOR +=  -stdlib=$(LIBCXX)
 	PLATCFLAGS += $(fpic)
 	SHARED := -dynamiclib
+	# Uses gcc or clang, whichever is default
 	CXX_AS = c++
 	REALCC = cc
 	CC = $(CXX_AS) -stdlib=$(LIBCXX)
@@ -258,6 +275,7 @@ else ifeq ($(platform), osx)
 	ifeq ($(COMMAND_MODE),"legacy")
 		ARFLAGS = -crs
 	endif
+	# FIXME: Move PTR64 stuff outside of platform testing?
 	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 		PTR64 = 1
 	endif
@@ -451,6 +469,7 @@ else
 	EXE = .exe
 	LIBS += -lws2_32
 	# FIXME: Check if TARGETOS does this in makefile for you
+	#        Also I'm not sure the PTR64 stuff is being done right
 	DEFS += -DX64_WINDOWS_ABI
 	ifneq ($(findstring MINGW,$(shell uname -a)),)
 		PTR64=1
@@ -464,17 +483,20 @@ CONLYFLAGS += -std=gnu89
 endif
 
 
+# Upstream cleans $(OBJ) which may not get everything
 clean: clean-libretro
 clean-libretro:
 	@echo Deleting object tree obj...
 	$(RM) -r obj/*
 
+# retro OSD varies between mame, mess, ume so clean it between each
 clean-osd:
 	@echo Deleting object tree obj/osd...
 	$(RM) -r obj/osd/*
 
+# This replaces the $(EMULATOR) rule in makefile, so if that changes you may
+# need to modify this recipe accordingly.
 $(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $(TARGETLIB)
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
-
