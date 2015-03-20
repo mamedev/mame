@@ -39,7 +39,16 @@ endif
 # This affects whether or not the retro OSD is built for OpenGL
 VRENDER ?= soft
 
-
+# Mame needs PTR64 defined on 64 bit processors
+ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
+	PTR64 = 1
+endif
+ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
+	PTR64 = 1
+endif
+ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
+	PTR64 = 1
+endif
 
 # If we define this, MAME's makefile will not define final linking rules
 EXECUTABLE_DEFINED = 1
@@ -130,16 +139,6 @@ ifeq ($(platform), unix)
 	LD = g++
 	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++ -lpthread -ldl
-	# FIXME: Move PTR64 stuff outside of platform testing?
-	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-		PTR64 = 1
-	endif
-	ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-		PTR64 = 1
-	endif
-	ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-		PTR64 = 1
-	endif
 	ifneq (,$(findstring ppc,$(UNAME)))
 		BIGENDIAN=1
 	else
@@ -186,16 +185,6 @@ else ifeq ($(platform), osx)
 	AR = @ar
 	ifeq ($(COMMAND_MODE),"legacy")
 		ARFLAGS = -crs
-	endif
-	# FIXME: Move PTR64 stuff outside of platform testing?
-	ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-		PTR64 = 1
-	endif
-	ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-		PTR64 = 1
-	endif
-	ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-		PTR64 = 1
 	endif
 	ifneq (,$(findstring Power,$(UNAME)))
 		BIGENDIAN=1
