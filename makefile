@@ -474,6 +474,9 @@ endif
 # define MAME_DEBUG if we are a debugging build
 ifdef DEBUG
 DEFS += -DMAME_DEBUG
+ifdef FASTDEBUG
+DEFS += -DMAME_DEBUG_FAST
+endif
 else
 DEFS += -DNDEBUG 
 endif
@@ -496,10 +499,6 @@ endif
 # define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
 ifneq ($(BUILD_JPEGLIB),1)
 DEFS += -DUSE_SYSTEM_JPEGLIB
-endif
-
-ifdef FASTDEBUG
-DEFS += -DMAME_DEBUG_FAST
 endif
 
 # To support casting in Lua 5.3
