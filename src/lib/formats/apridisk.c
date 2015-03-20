@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#include "emu.h"
+#include "emu.h" // fatalerror
 #include "apridisk.h"
 #include "imageutl.h"
 #include "coretmpl.h"

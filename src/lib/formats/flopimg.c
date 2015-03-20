@@ -13,7 +13,7 @@
 #include <limits.h>
 #include <assert.h>
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror
 #include "osdcore.h"
 #include "ioprocs.h"
 #include "flopimg.h"
