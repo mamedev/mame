@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h" // offs_t
+#include <assert.h>
+
 #include "formats/d71_dsk.h"
 
 d71_format::d71_format() : d64_format(formats)
