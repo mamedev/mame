@@ -97,12 +97,12 @@ OSDOBJS = \
 	$(MINIOBJ)/../modules/debugger/debugint.o \
 	$(OSDOBJ)/modules/lib/osdobj_common.o
 
-DISABLE_MIDI_ON = 1
-
-ifeq ($(DISABLE_MIDI_ON), 0)
+ifdef NO_USE_MIDI
+	DEFS += -DNO_USE_MIDI
+	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
+else
 	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
 endif
-OSDOBJS += $(OSDOBJ)/modules/midi/none.o
 
 OSDOBJS += $(LIBCOOBJ)/libco.o
 
