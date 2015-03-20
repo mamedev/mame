@@ -18,9 +18,11 @@ endif
 ifeq (posix,$(SHELLTYPE))
   MKDIR = $(SILENT) mkdir -p "$(1)"
   COPY  = $(SILENT) cp -fR "$(1)" "$(2)"
+  RM= $(SILENT) rm -f "$(1)"
 else
   MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || exit 0
   COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))"
+  RM    = $(SILENT) del /F "$(subst /,\\,$(1))" 2> nul || exit 0
 endif
 
 CC  = gcc
@@ -43,8 +45,8 @@ ifeq ($(config),release)
   INCLUDES  += -I../../src/host/lua-5.2.3/src
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)
-  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
+  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   ALL_LDFLAGS   += $(LDFLAGS) -L. -s -rdynamic
   LDDEPS    +=
@@ -119,8 +121,8 @@ ifeq ($(config),debug)
   INCLUDES  += -I../../src/host/lua-5.2.3/src
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
   ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)
-  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
+  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
   ALL_LDFLAGS   += $(LDFLAGS) -L. -rdynamic
   LDDEPS    +=
@@ -210,9 +212,7 @@ $(TARGETDIR):
 
 $(OBJDIRS):
 	@echo Creating $(OBJDIR)
-	-$(call MKDIR,$(OBJDIR))
-	-$(call MKDIR,$(OBJDIR)/src/host/lua-5.2.3/src)
-	-$(call MKDIR,$(OBJDIR)/src/host)
+	-$(call MKDIR,$@)
 
 clean:
 	@echo Cleaning genie

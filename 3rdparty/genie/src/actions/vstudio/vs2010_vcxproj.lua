@@ -262,20 +262,20 @@
 
 	local function compile_language(cfg)
 		if cfg.options.ForceCPP then
-			_p(3,'<CompileAs>CompileAsCpp</CompileAs>')	
+			_p(3,'<CompileAs>CompileAsCpp</CompileAs>')
 		else
 			if cfg.language == "C" then
 				_p(3,'<CompileAs>CompileAsC</CompileAs>')
 			end
 		end
 	end
-	
+
 	local function forcedinclude_files(indent,cfg)
 		if #cfg.forcedincludes > 0 then
 			_p(indent,'<ForcedIncludeFiles>%s</ForcedIncludeFiles>'
 					,premake.esc(path.translate(table.concat(cfg.forcedincludes, ";"), '\\')))
 		end
-	end	
+	end
 
 	local function vs10_clcompile(cfg)
 		_p(2,'<ClCompile>')
@@ -343,7 +343,7 @@
 		end
 
 		compile_language(cfg)
-		
+
 		forcedinclude_files(3,cfg);
 		_p(2,'</ClCompile>')
 	end
@@ -484,6 +484,15 @@
 
 
 
+	function exists(table, fine)
+		for _, value in ipairs(table) do
+			if value == find then return true end
+		end
+
+		return false
+	end
+
+
 --
 -- Retrieve a list of files for a particular build group, one of
 -- "ClInclude", "ClCompile", "ResourceCompile", and "None".
@@ -505,7 +514,9 @@
 				if path.iscppfile(file.name) then
 					table.insert(sortedfiles.ClCompile, file)
 				elseif path.iscppheader(file.name) then
-					table.insert(sortedfiles.ClInclude, file)
+					if not exists(prj.removefiles, file) then
+						table.insert(sortedfiles.ClInclude, file)
+					end
 				elseif path.isresourcefile(file.name) then
 					table.insert(sortedfiles.ResourceCompile, file)
 				else
@@ -594,13 +605,36 @@
 					end
 				end
 
-				-- Per configuration excludes
-				for _, vsconfig in ipairs(configs) do
-					local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
-					for _, exclude in ipairs(cfg.excludes) do
+				-- Global exclude
+				local excluded = false
+				for _, exclude in ipairs(prj.excludes) do
+					if exclude == file.name then
+						for _, vsconfig in ipairs(configs) do
+							local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
+							_p(3, '<ExcludedFromBuild '
+								.. if_config_and_platform()
+								.. '>true</ExcludedFromBuild>'
+								, premake.esc(vsconfig.name)
+								)
+						end
+						excluded = true
+						break
+					end
+				end
 
-						if exclude == file.name then
-							_p(3, '<ExcludedFromBuild ' .. if_config_and_platform() .. '>true</ExcludedFromBuild>', premake.esc(vsconfig.name))
+				if not excluded then
+					-- Per configuration excludes
+					for _, vsconfig in ipairs(configs) do
+						local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
+						for _, exclude in ipairs(cfg.excludes) do
+
+							if exclude == file.name then
+								_p(3, '<ExcludedFromBuild '
+									.. if_config_and_platform()
+									.. '>true</ExcludedFromBuild>'
+									, premake.esc(vsconfig.name)
+									)
+							end
 						end
 					end
 				end
@@ -739,7 +773,7 @@
 		io.eol = "\r\n"
 		_p('<?xml version="1.0" encoding="utf-8"?>')
 		_p('<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">')
-		
+
 		_p(1,'<Identity Name="' .. prj.uuid .. '"')
 		_p(2,'Publisher="CN=Unknown"')
 		_p(2,'Version="1.0.0.0" />')

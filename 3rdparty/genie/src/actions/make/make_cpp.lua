@@ -89,6 +89,7 @@
 			if (not prj.options.ArchiveSplit) then		
 				_p('\t$(SILENT) $(LINKCMD) $(OBJECTS)')
 			else
+				_p('\t$(call RM,$(TARGET))')
 				_p('\t@$(call max_args,$(LINKCMD),'.. prj.archivesplit_size ..',$(OBJECTS))')
 				_p('\t$(SILENT) $(LINKCMD_NDX)')
 			end
@@ -112,10 +113,7 @@
 		if (not prj.solution.messageskip) or (not table.contains(prj.solution.messageskip, "SkipCreatingMessage")) then
 			_p('\t@echo Creating $(OBJDIR)')
 		end
-		_p('\t-$(call MKDIR,$(OBJDIR))')
-		for dir, _ in pairs(objdirs) do
-			_p('\t-$(call MKDIR,$(OBJDIR)/%s)', dir)
-		end
+		_p('\t-$(call MKDIR,$@)')
 		_p('')
 
 		-- Mac OS X specific targets
@@ -194,9 +192,11 @@
 		_p('ifeq (posix,$(SHELLTYPE))')
 		_p('  MKDIR = $(SILENT) mkdir -p "$(1)"')
 		_p('  COPY  = $(SILENT) cp -fR "$(1)" "$(2)"')
+		_p('  RM	= $(SILENT) rm -f "$(1)"')
 		_p('else')
 		_p('  MKDIR = $(SILENT) mkdir "$(subst /,\\\\,$(1))" 2> nul || exit 0')
 		_p('  COPY  = $(SILENT) copy /Y "$(subst /,\\\\,$(1))" "$(subst /,\\\\,$(2))"')
+		_p('  RM    = $(SILENT) del /F "$(subst /,\\\\,$(1))" 2> nul || exit 0')
 		_p('endif')
 		_p('')
 
