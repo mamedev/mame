@@ -8,6 +8,8 @@
 
 ******************************************************************************/
 
+#include <assert.h>
+
 #include "palette.h"
 #include <stdlib.h>
 #include <math.h>

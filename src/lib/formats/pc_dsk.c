@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "formats/pc_dsk.h"
 #include "formats/basicdsk.h"

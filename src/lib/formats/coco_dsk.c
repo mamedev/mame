@@ -8,6 +8,7 @@
 
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 
 #include "formats/coco_dsk.h"
 #include "formats/basicdsk.h"

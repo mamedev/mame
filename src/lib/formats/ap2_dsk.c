@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "ap2_dsk.h"
 #include "basicdsk.h"

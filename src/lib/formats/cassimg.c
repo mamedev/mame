@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "imageutl.h"
 #include "cassimg.h"

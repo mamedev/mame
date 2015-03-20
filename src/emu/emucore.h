@@ -31,6 +31,21 @@
 #include <exception>
 #include <typeinfo>
 
+// standard assertion macros
+#undef assert
+#undef assert_always
+
+#ifdef MAME_DEBUG_FAST
+#define assert(x)               ((void)0)
+#define assert_always(x, msg)   ((void)0)
+#elif MAME_DEBUG
+#define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#else
+#define assert(x)               do { } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
+#endif
+
 // core system includes
 #include "osdcomm.h"
 #include "astring.h"
@@ -212,19 +227,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 // this macro wraps a function 'x' and can be used to pass a function followed by its name
 #define FUNC(x) &x, #x
 #define FUNC_NULL NULL, "(null)"
-
-
-// standard assertion macros
-#undef assert
-#undef assert_always
-
-#ifdef MAME_DEBUG
-#define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
-#else
-#define assert(x)               do { } while (0)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#endif
 
 
 // macros to convert radians to degrees and degrees to radians

@@ -58,6 +58,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "avhuff.h"
 #include "huffman.h"
 #include "chd.h"

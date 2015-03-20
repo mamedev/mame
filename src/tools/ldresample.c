@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <new>
+#include <assert.h>
 #include "bitmap.h"
 #include "chd.h"
 #include "avhuff.h"
