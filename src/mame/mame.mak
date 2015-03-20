@@ -2688,7 +2688,8 @@ $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
 			$(LAYOUT)/pokonl97.lh \
 			$(LAYOUT)/roypok96.lh \
 			$(LAYOUT)/skill98.lh \
-			$(LAYOUT)/tonypok.lh
+			$(LAYOUT)/tonypok.lh \
+			$(LAYOUT)/unkch.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
 
