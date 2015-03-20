@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "svi_cas.h"
 
 #define CAS_PERIOD_0        (37)

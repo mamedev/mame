@@ -10,6 +10,8 @@
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "pmd_cas.h"
 
 #define WAVEENTRY_LOW  -32768

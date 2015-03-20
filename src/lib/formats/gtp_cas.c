@@ -4,6 +4,8 @@
 
     Miodrag Milanovic
 */
+#include <assert.h>
+
 #include "gtp_cas.h"
 
 

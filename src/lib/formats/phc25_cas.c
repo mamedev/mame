@@ -29,6 +29,8 @@ enough to make it work.
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "phc25_cas.h"
 
 #define WAVEENTRY_LOW  -32768

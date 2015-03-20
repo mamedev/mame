@@ -29,6 +29,8 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 
 *****************************************************************************/
 
+#include <assert.h>
+
 #include "zx81_p.h"
 
 

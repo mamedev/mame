@@ -11,6 +11,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <assert.h>
 #include "options.h"
 #include "astring.h"
 

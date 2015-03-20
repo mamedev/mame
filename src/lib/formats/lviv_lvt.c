@@ -1,4 +1,6 @@
 /* .LVT tape images */
+#include <assert.h>
+
 #include "lviv_lvt.h"
 
 #define WAVEENTRY_LOW  -32768
