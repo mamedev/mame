@@ -15,7 +15,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <time.h>
-#include <assert.h>
 #include <stdarg.h>
 
 #include "corestr.h"

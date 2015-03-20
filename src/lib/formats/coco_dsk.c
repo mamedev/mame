@@ -7,7 +7,6 @@
 *********************************************************************/
 
 #include <string.h>
-#include <assert.h>
 #include <time.h>
 
 #include "formats/coco_dsk.h"

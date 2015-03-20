@@ -6,9 +6,9 @@
 
 ***************************************************************************/
 
-#include <assert.h>
 #include "imgterrs.h"
 #include "osdcomm.h"
+#include <assert.h>
 
 static const char *const msgs[] =
 {

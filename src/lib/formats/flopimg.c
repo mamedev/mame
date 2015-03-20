@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <assert.h>
 #include <limits.h>
 
 #include "emu.h"
