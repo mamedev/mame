@@ -31,18 +31,44 @@
 #include <exception>
 #include <typeinfo>
 
-// TODO: make the assert replacement and especially assert_always work again
-#include <assert.h>
-#define assert_always(x, msg) assert(x)
+// needed for OSD macros
+#include "osdcomm.h"
 
-/*
+
+
+//**************************************************************************
+//  EXCEPTION CLASSES
+//**************************************************************************
+
+// emu_exception is the base class for all emu-related exceptions
+class emu_exception : public std::exception { };
+
+
+// emu_fatalerror is a generic fatal exception that provides an error string
+class emu_fatalerror : public emu_exception
+{
+public:
+	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3);
+	emu_fatalerror(const char *format, va_list ap);
+	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4);
+	emu_fatalerror(int _exitcode, const char *format, va_list ap);
+
+	const char *string() const { return text; }
+	int exitcode() const { return code; }
+
+private:
+	char text[1024];
+	int code;
+};
+
+
 // standard assertion macros
 #undef assert
 #undef assert_always
 
 #if defined(MAME_DEBUG_FAST)
 #define assert(x)               do { } while (0)
-#define assert_always(x, msg)   do { } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #elif defined(MAME_DEBUG)
 #define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
@@ -50,10 +76,10 @@
 #define assert(x)               do { } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
 #endif
-*/
+
+
 
 // core system includes
-#include "osdcomm.h"
 #include "astring.h"
 #include "emualloc.h"
 #include "corestr.h"
@@ -280,33 +306,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 		(BIT(val,B11) << 11) | (BIT(val,B10) << 10) | (BIT(val, B9) <<  9) | (BIT(val, B8) <<  8) | \
 		(BIT(val, B7) <<  7) | (BIT(val, B6) <<  6) | (BIT(val, B5) <<  5) | (BIT(val, B4) <<  4) | \
 		(BIT(val, B3) <<  3) | (BIT(val, B2) <<  2) | (BIT(val, B1) <<  1) | (BIT(val, B0) <<  0))
-
-
-
-//**************************************************************************
-//  EXCEPTION CLASSES
-//**************************************************************************
-
-// emu_exception is the base class for all emu-related exceptions
-class emu_exception : public std::exception { };
-
-
-// emu_fatalerror is a generic fatal exception that provides an error string
-class emu_fatalerror : public emu_exception
-{
-public:
-	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3);
-	emu_fatalerror(const char *format, va_list ap);
-	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4);
-	emu_fatalerror(int _exitcode, const char *format, va_list ap);
-
-	const char *string() const { return text; }
-	int exitcode() const { return code; }
-
-private:
-	char text[1024];
-	int code;
-};
 
 
 
