@@ -106,7 +106,8 @@ video_manager::video_manager(running_machine &machine)
 		m_avi_file(NULL),
 		m_avi_frame_period(attotime::zero),
 		m_avi_next_frame_time(attotime::zero),
-		m_avi_frame(0)
+		m_avi_frame(0),
+		m_dummy_recording(false)
 {
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_manager::exit), this));
