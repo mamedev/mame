@@ -40,103 +40,6 @@ endif
 VRENDER ?= soft
 
 
-##
-## OLD MAKEFILE.LIBRETRO STUFF
-## Feel free to remove stuff from here as you become certain we don't need it
-## in the new Makefile.libretro
-##
-#
-##-------------------------------------------------
-## platform-specific definitions
-##-------------------------------------------------
-#
-## build the targets in different object dirs, so they can co-exist
-#ifeq ($(NATIVE),1)
-#OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
-#else
-#OBJ = obj/$(PREFIX)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
-#endif
-#
-# -iKarith- PortMidi is in mamedev's makefile, but we disable it.  Should
-#  someday fix that.
-## add PortMidi MIDI library
-#ifeq ($(BUILD_MIDILIB),1)
-#INCPATH += -I$(SRC)/lib/portmidi
-#MIDI_LIB = $(OBJ)/libportmidi.a
-#else
-##LIBS += -lportmidi
-#MIDI_LIB =
-#endif
-#
-##-------------------------------------------------
-## 'default' target needs to go here, before the
-## include files which define additional targets
-##-------------------------------------------------
-#
-#default: maketree buildtools emulator
-#
-#all: default tools
-#
-#tests: maketree jedutil$(EXE_EXT) chdman$(EXE_EXT)
-#
-##-------------------------------------------------
-## defines needed by multiple make files
-##-------------------------------------------------
-#
-#ifdef NATIVE_OBJ
-#BUILDOUT = $(NATIVE_OBJ)/build
-#endif # NATIVE_OBJ
-#
-#
-##-------------------------------------------------
-#
-#buildtools: maketree $(BUILD)
-#ifeq ($(NATIVE),1)
-#	mkdir prec-build
-#	cp -R $(OBJ)/build/* prec-build/
-#	$(RM) -r $(OBJ)/osd
-#	$(RM) -r $(OBJ)/lib/util
-#	$(RM) -r $(OBJ)/libutil.a
-#	$(RM) -r $(OBJ)/libocore.a
-#endif
-#
-#
-#BUILDTOOLS_CUSTOM = 0
-#
-#ifeq ($(platform), android)
-#BUILDTOOLS_CUSTOM = 1
-#else ifeq ($(platform), ios)
-#BUILDTOOLS_CUSTOM = 1
-#endif
-#
-#ifeq ($(NATIVE),0)
-#ifeq ($(BUILDTOOLS_CUSTOM),1)
-#$(OBJ)/build/file2str:
-#	mkdir -p $(OBJ)/build
-#	cp -R prec-build/file2str $(OBJ)/build
-#
-#$(OBJ)/build/m68kmake:
-#	cp -R prec-build/m68kmake $(OBJ)/build
-#
-#$(OBJ)/build/png2bdc:
-#	cp -R prec-build/png2bdc $(OBJ)/build
-#
-#$(OBJ)/build/makedep:
-#	cp -R prec-build/makedep $(OBJ)/build
-#
-#$(OBJ)/build/makelist:
-#	cp -R prec-build/makelist $(OBJ)/build
-#
-#$(OBJ)/build/verinfo:
-#	cp -R prec-build/verinfo $(OBJ)/build
-#
-#$(OBJ)/build/makemak:
-#	cp -R prec-build/makemak $(OBJ)/build
-#endif
-#endif
-
-###########################################################################
-
 
 # If we define this, MAME's makefile will not define final linking rules
 EXECUTABLE_DEFINED = 1
@@ -193,11 +96,20 @@ endif
 PYTHON ?= @python2
 override PYTHON := $(PYTHON)
 
+
+# ============================================================================
+# Any settings/overrides that affect the logic of the upstream mame makefile
+# must be set above here.
+
 include makefile
+
+# Anything below here is processed after mame's makefile logic is processed.
+# Remember that $(VAR) is expanded at runtime, unless used in a simple-type
+# := assignment.  Variables can be appended
+# ============================================================================
 
 CPPONLYFLAGS += -fpermissive
 DEFS += $(CORE_DEFINE)
-
 
 ## Unix
 ifeq ($(platform), unix)
@@ -500,3 +412,102 @@ $(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOP
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $(TARGETLIB)
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
+
+
+## OLD MAKEFILE.LIBRETRO STUFF
+##
+## The rest of this file contains commented bits of legacy Makefile.libretro
+## which might be useful as we finish this new one.  Feel free to remove stuff
+## below here that you're confident we don't need anymore.
+#
+##-------------------------------------------------
+## platform-specific definitions
+##-------------------------------------------------
+#
+## build the targets in different object dirs, so they can co-exist
+#ifeq ($(NATIVE),1)
+#OBJ = obj/$(PREFIX)$(OSD)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
+#else
+#OBJ = obj/$(PREFIX)$(SUFFIXDEBUG)$(SUFFIXPROFILE)
+#endif
+#
+# -iKarith- PortMidi is in mamedev's makefile, but we disable it.  Should
+#  someday fix that.
+## add PortMidi MIDI library
+#ifeq ($(BUILD_MIDILIB),1)
+#INCPATH += -I$(SRC)/lib/portmidi
+#MIDI_LIB = $(OBJ)/libportmidi.a
+#else
+##LIBS += -lportmidi
+#MIDI_LIB =
+#endif
+#
+##-------------------------------------------------
+## 'default' target needs to go here, before the
+## include files which define additional targets
+##-------------------------------------------------
+#
+#default: maketree buildtools emulator
+#
+#all: default tools
+#
+#tests: maketree jedutil$(EXE_EXT) chdman$(EXE_EXT)
+#
+##-------------------------------------------------
+## defines needed by multiple make files
+##-------------------------------------------------
+#
+#ifdef NATIVE_OBJ
+#BUILDOUT = $(NATIVE_OBJ)/build
+#endif # NATIVE_OBJ
+#
+#
+##-------------------------------------------------
+#
+#buildtools: maketree $(BUILD)
+#ifeq ($(NATIVE),1)
+#	mkdir prec-build
+#	cp -R $(OBJ)/build/* prec-build/
+#	$(RM) -r $(OBJ)/osd
+#	$(RM) -r $(OBJ)/lib/util
+#	$(RM) -r $(OBJ)/libutil.a
+#	$(RM) -r $(OBJ)/libocore.a
+#endif
+#
+#
+#BUILDTOOLS_CUSTOM = 0
+#
+#ifeq ($(platform), android)
+#BUILDTOOLS_CUSTOM = 1
+#else ifeq ($(platform), ios)
+#BUILDTOOLS_CUSTOM = 1
+#endif
+#
+#ifeq ($(NATIVE),0)
+#ifeq ($(BUILDTOOLS_CUSTOM),1)
+#$(OBJ)/build/file2str:
+#	mkdir -p $(OBJ)/build
+#	cp -R prec-build/file2str $(OBJ)/build
+#
+#$(OBJ)/build/m68kmake:
+#	cp -R prec-build/m68kmake $(OBJ)/build
+#
+#$(OBJ)/build/png2bdc:
+#	cp -R prec-build/png2bdc $(OBJ)/build
+#
+#$(OBJ)/build/makedep:
+#	cp -R prec-build/makedep $(OBJ)/build
+#
+#$(OBJ)/build/makelist:
+#	cp -R prec-build/makelist $(OBJ)/build
+#
+#$(OBJ)/build/verinfo:
+#	cp -R prec-build/verinfo $(OBJ)/build
+#
+#$(OBJ)/build/makemak:
+#	cp -R prec-build/makemak $(OBJ)/build
+#endif
+#endif
+
+###########################################################################
+
