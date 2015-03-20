@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include "emu.h" // offs_t
+#include "emu.h" // BIT
 #include "astring.h"
 #include "formats/ccvf_dsk.h"
 
@@ -99,7 +99,7 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	int start = 0, end = 0;
 	astring line;
-	offs_t byteoffs = 0;
+	UINT32 byteoffs = 0;
 	char hex[3] = {0};
 
 	do {
