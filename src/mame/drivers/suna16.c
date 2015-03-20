@@ -25,7 +25,6 @@ Year + Game                 By      Board      Hardware
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
@@ -39,7 +38,7 @@ Year + Game                 By      Board      Hardware
 
 ***************************************************************************/
 
-WRITE16_MEMBER(suna16_state::suna16_soundlatch_w)
+WRITE16_MEMBER(suna16_state::soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -92,11 +91,11 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 static ADDRESS_MAP_START( bssoccer_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM // ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // RAM
-	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)  // Banked Palette
+	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE(paletteram_r, paletteram_w)  // Banked Palette
 	AM_RANGE(0x400200, 0x400fff) AM_RAM //
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)   // To Sound CPU
-	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE(suna16_flipscreen_w)   // Flip Screen
+	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)   // To Sound CPU
+	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)   // Flip Screen
 	AM_RANGE(0xa00004, 0xa00005) AM_READ_PORT("P3") AM_WRITE(bssoccer_leds_w)   // Leds
 	AM_RANGE(0xa00006, 0xa00007) AM_READ_PORT("P4") AM_WRITENOP // ? IRQ 1 Ack
 	AM_RANGE(0xa00008, 0xa00009) AM_READ_PORT("DSW1") AM_WRITENOP   // ? IRQ 2 Ack
@@ -148,12 +147,12 @@ WRITE8_MEMBER(suna16_state::uballoon_prot_w)
 static ADDRESS_MAP_START( uballoon_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM // RAM
-	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w) // Banked Palette
+	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE(paletteram_r, paletteram_w) // Banked Palette
 	AM_RANGE(0x200200, 0x200fff) AM_RAM //
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)   // To Sound CPU
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)   // To Sound CPU
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE(suna16_flipscreen_w) // Flip Screen
+	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE(flipscreen_w) // Flip Screen
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("DSW2")
 	AM_RANGE(0x600008, 0x600009) AM_WRITE(uballoon_leds_w)  // Leds
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITENOP    // ? IRQ 1 Ack
@@ -168,11 +167,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sunaq_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)   // To Sound CPU
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2") AM_WRITE(suna16_flipscreen_w)   // Flip Screen
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)   // To Sound CPU
+	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2") AM_WRITE(flipscreen_w)   // Flip Screen
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500006, 0x500007) AM_READ_PORT("DSW2")               // (unused?)
-	AM_RANGE(0x540000, 0x5401ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)
+	AM_RANGE(0x540000, 0x5401ff) AM_READWRITE(paletteram_r, paletteram_w)
 	AM_RANGE(0x540200, 0x540fff) AM_RAM   // RAM
 	AM_RANGE(0x580000, 0x583fff) AM_RAM // RAM
 	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_SHARE("spriteram")   // Sprites
@@ -202,17 +201,22 @@ WRITE8_MEMBER(suna16_state::bestbest_prot_w)
 static ADDRESS_MAP_START( bestbest_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM AM_MIRROR(0xc0000)        // ROM
 	AM_RANGE( 0x200000, 0x2fffff ) AM_ROM AM_REGION("user1", 0)     // ROM
-	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)     // To Sound CPU
+	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)     // To Sound CPU
 	AM_RANGE( 0x500002, 0x500003 ) AM_READ_PORT("P2") AM_WRITE(bestbest_flipscreen_w)   // P2 + Coins, Flip Screen
 	AM_RANGE( 0x500004, 0x500005 ) AM_READ_PORT("DSW") AM_WRITE(bestbest_coin_w)        // Coin Counter
 	AM_RANGE( 0x500008, 0x500009 ) AM_WRITE8(bestbest_prot_w, 0x00ff)       // Protection
 	AM_RANGE( 0x500018, 0x500019 ) AM_READ8(bestbest_prot_r, 0x00ff)        // "
-	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w )  // Banked(?) Palette
+	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE(paletteram_r, paletteram_w )  // Banked(?) Palette
 	AM_RANGE( 0x541000, 0x54ffff ) AM_RAM                                                       //
 	AM_RANGE( 0x580000, 0x58ffff ) AM_RAM                           // RAM
 	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_SHARE("spriteram") // Sprites (Chip 1)
 	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_SHARE("spriteram2")    // Sprites (Chip 2)
 ADDRESS_MAP_END
+
+MACHINE_START_MEMBER(suna16_state,bestbest)
+{
+    save_item(NAME(m_prot));
+}
 
 
 /***************************************************************************
@@ -330,11 +334,11 @@ ADDRESS_MAP_END
 
 /* 2 DACs per CPU - 4 bits per sample */
 
-WRITE8_MEMBER(suna16_state::bssoccer_DAC1_w)
+WRITE8_MEMBER(suna16_state::DAC1_w)
 {
 	m_dac1->write_unsigned8( (data & 0xf) * 0x11 );
 }
-WRITE8_MEMBER(suna16_state::bssoccer_DAC2_w)
+WRITE8_MEMBER(suna16_state::DAC2_w)
 {
 	m_dac2->write_unsigned8( (data & 0xf) * 0x11 );
 }
@@ -350,8 +354,8 @@ WRITE8_MEMBER(suna16_state::bssoccer_DAC4_w)
 static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)    // From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_WRITE(bssoccer_DAC1_w)  // 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_WRITE(bssoccer_DAC2_w)  // 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_WRITE(DAC1_w)  // 2 x DAC
+	AM_RANGE(0x01, 0x01) AM_WRITE(DAC2_w)  // 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
@@ -387,14 +391,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)    // From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_WRITE(bssoccer_DAC1_w)  // 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_WRITE(bssoccer_DAC2_w)  // 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_WRITE(DAC1_w)  // 2 x DAC
+	AM_RANGE(0x01, 0x01) AM_WRITE(DAC2_w)  // 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)  // Rom Bank
 ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
     membank("bank1")->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+	
+	save_item(NAME(m_prot));
 }
 
 MACHINE_RESET_MEMBER(suna16_state,uballoon)
@@ -415,8 +421,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bestbest_pcm_1_iomap, AS_IO, 8, suna16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ (soundlatch2_byte_r    )   // From The Sound Z80
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x02) AM_WRITE(bssoccer_DAC1_w)  // 2 x DAC
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x02) AM_WRITE(bssoccer_DAC2_w)  // 2 x DAC
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x02) AM_WRITE(DAC1_w)  // 2 x DAC
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x02) AM_WRITE(DAC2_w)  // 2 x DAC
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -830,7 +836,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
+	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
@@ -890,7 +896,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
+	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
@@ -939,7 +945,7 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update_suna16)
+	MCFG_SCREEN_UPDATE_DRIVER(suna16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suna16)
@@ -986,6 +992,8 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	/* 2nd PCM Z80 missing */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	
+	MCFG_MACHINE_START_OVERRIDE(suna16_state, bestbest)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1357,8 +1365,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest,  0,        bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", 0 )
-GAME( 1994, sunaq,     0,        sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", 0 )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)", 0 )
-GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", 0 )
-GAME( 1996, uballoon,  0,        uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", 0 )
+GAME( 1994, bestbest,  0,        bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", GAME_SUPPORTS_SAVE )
+GAME( 1994, sunaq,     0,        sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", GAME_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", GAME_SUPPORTS_SAVE )
+GAME( 1996, uballoon,  0,        uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", GAME_SUPPORTS_SAVE )
