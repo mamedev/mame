@@ -15,6 +15,7 @@
 #define __EMUCORE_H__
 
 // standard C includes
+#include <assert.h> // make sure this is included before we try redefining assert
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
