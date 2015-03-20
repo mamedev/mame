@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 #include "osdcore.h"
 #include "astring.h"
 #include "corefile.h"

@@ -7,6 +7,7 @@
 **************************************************************************/
 
 #include <string.h>
+#include <assert.h>
 #include "sord_cas.h"
 
 #define SORDM5_WAVESAMPLES_HEADER  1

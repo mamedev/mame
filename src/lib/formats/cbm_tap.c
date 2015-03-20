@@ -92,6 +92,8 @@ Unfortunately, I have no such a .tap file to test, so my implementation
 below could be not working.  FP ]
 */
 
+#include <assert.h>
+
 #include "cbm_tap.h"
 
 

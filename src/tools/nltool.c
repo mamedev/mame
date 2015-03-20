@@ -11,6 +11,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sstream>
+#include <assert.h>
 #include "astring.h"
 #include "corefile.h"
 #include "corestr.h"

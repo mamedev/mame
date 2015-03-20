@@ -2,6 +2,8 @@
  * Fujitsu FM-7 series cassette handling
  */
 
+#include <assert.h>
+
 #include "fm7_cas.h"
 
 #define WAVE_HIGH        0x5a9e

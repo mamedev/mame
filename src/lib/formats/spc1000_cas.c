@@ -21,6 +21,8 @@ IPL: This seems a quickload format containing RAM dump, not a real tape
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "spc1000_cas.h"
 
 #define WAVEENTRY_LOW  -32768

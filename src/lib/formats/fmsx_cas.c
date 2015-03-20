@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "formats/fmsx_cas.h"
 
 

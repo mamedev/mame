@@ -7,6 +7,9 @@ For more information see:
 - http://www.jupiter-ace.co.uk/doc_AceTapeFormat.html
 
 ********************************************************************/
+
+#include <assert.h>
+
 #include "ace_tap.h"
 
 

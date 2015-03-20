@@ -7,6 +7,8 @@ Current state: Not working. Only the sync signal and 0x66 byte get
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "formats/cgen_cas.h"
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"

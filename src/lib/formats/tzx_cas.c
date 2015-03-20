@@ -38,6 +38,8 @@ We are currently using the numbers from the TZX specification...
 
 */
 
+#include <assert.h>
+
 #include "tzx_cas.h"
 
 

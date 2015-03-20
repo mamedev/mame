@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "wavfile.h"
 #include "cassimg.h"

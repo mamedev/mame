@@ -12,6 +12,7 @@ Not nice, but it works...
 
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 
 #include <zlib.h>
 #include "uef_cas.h"

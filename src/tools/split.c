@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 #include "astring.h"
 #include "corefile.h"
 #include "corestr.h"

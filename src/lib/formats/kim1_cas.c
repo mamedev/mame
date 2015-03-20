@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "kim1_cas.h"
 
 #define SMPLO   -32768
