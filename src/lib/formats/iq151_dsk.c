@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/iq151_dsk.h"
 
 iq151_format::iq151_format() : upd765_format(formats)

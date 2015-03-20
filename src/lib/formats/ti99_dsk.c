@@ -41,10 +41,11 @@
  *
  ********************************************************************/
 
-#include "emu.h"
 #include <string.h>
 #include <time.h>
+#include <assert.h>
 
+#include "emu.h" // logerror
 #include "imageutl.h"
 #include "ti99_dsk.h"
 

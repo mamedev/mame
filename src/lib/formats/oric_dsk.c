@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // logerror
 #include "formats/oric_dsk.h"
 
 oric_dsk_format::oric_dsk_format()

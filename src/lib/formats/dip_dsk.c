@@ -14,7 +14,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "dip_dsk.h"
 
 dip_format::dip_format()

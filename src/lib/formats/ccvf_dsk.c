@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // offs_t
+#include "astring.h"
 #include "formats/ccvf_dsk.h"
 
 ccvf_format::ccvf_format()

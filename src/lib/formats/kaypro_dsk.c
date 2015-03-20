@@ -16,7 +16,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/kaypro_dsk.h"
 
 kayproii_format::kayproii_format() : upd765_format(formats)

@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // offs_t
 #include "formats/d80_dsk.h"
 
 d80_format::d80_format() : d64_format(file_formats)

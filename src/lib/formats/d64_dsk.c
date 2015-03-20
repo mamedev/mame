@@ -10,7 +10,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // offs_t, emu_fatalerror, fatalerror
 #include "formats/d64_dsk.h"
 
 d64_format::d64_format()
