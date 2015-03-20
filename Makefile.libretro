@@ -465,18 +465,13 @@ endif
 
 
 clean: clean-libretro
-
 clean-libretro:
-ifeq ($(PARTIAL),1)
-	@echo Deleting object tree obj/osd...
-	$(RM) -r obj/osd/*
-# 	TODO: We should do this smarter at some point
-	@echo Deleting build targets...
-	$(RM) *_libretro.so *_libretro.dylib *_libretro.dll
-else
 	@echo Deleting object tree obj...
 	$(RM) -r obj/*
-endif
+
+clean-osd:
+	@echo Deleting object tree obj/osd...
+	$(RM) -r obj/osd/*
 
 $(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
