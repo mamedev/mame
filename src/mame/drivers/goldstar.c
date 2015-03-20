@@ -117,6 +117,16 @@
   Nominated for the *WORST* hacked gambling game EVER!
 
 
+  * unkch sets
+
+  unkch4 always crashes if you insert coins while already credited.  unkch1 and
+  unkch2 show the same behaviour only if you enable the Super Jackpot feature with
+  DSW2-6/7.
+
+  unkch3 has a handy input test mode.  To access it, first enable it with DSW4-5,
+  then hold the Settings button (9) during boot.
+
+
   * Crazy Bonus (crazybon):
 
   Appears to be from a bootleg conversion set for Poker Master (pokrmast).  There
@@ -127,7 +137,7 @@
   This is a stealth set that hides behind a fake Windows ME desktop if DSW2-6 is
   off.  Push Start followed by Bet five time to access the game.  It will return
   to the desktop after the game is over.  Colours currently appear to be bad on
-  the desktop screen.
+  the desktop screen.  DSW3-8 disables the button sequence for accessing the game.
 
   Judging from the contents of the graphics ROMs and the Stats screens, there's a
   poker game buried in there, but there's apparently no way to access it.
@@ -2019,8 +2029,8 @@ static INPUT_PORTS_START( chryangl )
 	PORT_DIPSETTING(    0x10, "C-Type" )
 	PORT_DIPSETTING(    0x00, "D-Type" )
 	PORT_DIPNAME( 0x20, 0x20, "Min. Bet For Bonus Play" )   PORT_DIPLOCATION("DSW4:6")
-	PORT_DIPSETTING(    0x20, "16 Bet" )
-	PORT_DIPSETTING(    0x00, "8 Bet" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x20, "16" )
 	PORT_DIPNAME( 0x40, 0x40, "Reel Speed" )                PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
@@ -4760,31 +4770,31 @@ static INPUT_PORTS_START( unkch )
 	out exactly how to make it repeatable... */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Game Level" )            PORT_DIPLOCATION("DSW1:1,2")        /* OK */
+	PORT_DIPNAME( 0x03, 0x03, "Game Level" )                PORT_DIPLOCATION("DSW1:1,2")        /* OK */
 	PORT_DIPSETTING(    0x03, "Easy" )
 	PORT_DIPSETTING(    0x02, "Mid 1" )
 	PORT_DIPSETTING(    0x01, "Mid 2" )
 	PORT_DIPSETTING(    0x00, "Hard" )
-	PORT_DIPNAME( 0x04, 0x04, "Punti" )                 PORT_DIPLOCATION("DSW1:3")          /* OK */
+	PORT_DIPNAME( 0x04, 0x04, "Punti" )                     PORT_DIPLOCATION("DSW1:3")          /* OK */
 	PORT_DIPSETTING(    0x04, "Ticket" )
 	PORT_DIPSETTING(    0x00, "Gettoni" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )            PORT_DIPLOCATION("DSW1:5")          /* OK */
+	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )                PORT_DIPLOCATION("DSW1:5")          /* OK */
 	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x60, 0x60, "Super Jackpot" )         PORT_DIPLOCATION("DSW1:6,7")        /* OK */
+	PORT_DIPNAME( 0x60, 0x60, "Super Jackpot" )             PORT_DIPLOCATION("DSW1:6,7")        /* OK */
 	PORT_DIPSETTING(    0x60, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, "5%" )
 	PORT_DIPSETTING(    0x00, "10%" )
 	PORT_DIPSETTING(    0x40, "20%" )
-	PORT_DIPNAME( 0x80, 0x80, "Bet Step On 8" )         PORT_DIPLOCATION("DSW1:8")          /* OK */
+	PORT_DIPNAME( 0x80, 0x80, "Bet Step On 8" )             PORT_DIPLOCATION("DSW1:8")          /* OK */
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, "Main/Bonus Game Rate" )  PORT_DIPLOCATION("DSW2:1,2,3,4")    /* OK - all other values are 83% / 88% */
+	PORT_DIPNAME( 0x0f, 0x0f, "Main/Bonus Game Rate" )      PORT_DIPLOCATION("DSW2:1,2,3,4")    /* OK - all other values are 83% / 88% */
 	PORT_DIPSETTING(    0x00, "50% / 55%" )
 	PORT_DIPSETTING(    0x01, "53% / 58%" )
 	PORT_DIPSETTING(    0x02, "56% / 61%" )
@@ -4797,29 +4807,29 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPSETTING(    0x09, "77% / 82%" )
 	PORT_DIPSETTING(    0x0a, "80% / 85%" )
 	PORT_DIPSETTING(    0x0f, "83% / 88%" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Bet" )               PORT_DIPLOCATION("DSW2:5")          /* OK */
+	PORT_DIPNAME( 0x10, 0x10, "Max Bet" )                   PORT_DIPLOCATION("DSW2:5")          /* OK */
 	PORT_DIPSETTING(    0x10, "64" )
 	PORT_DIPSETTING(    0x00, "40 (20)" )   /* shows 20 in settings screen but limits to 40 in gameplay */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x40, 0x40, "Min. Bet For Bonus Play" )   PORT_DIPLOCATION("DSW2:7")          /* OK */
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x40, "16" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Coin A Rate" )           PORT_DIPLOCATION("DSW3:1,2")        /* OK */
+	PORT_DIPNAME( 0x03, 0x03, "Coin A Rate" )               PORT_DIPLOCATION("DSW3:1,2")        /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x02, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )
-	PORT_DIPNAME( 0x04, 0x04, "Gettoni/Ticket" )        PORT_DIPLOCATION("DSW3:3")          /* OK */
+	PORT_DIPNAME( 0x04, 0x04, "Gettoni/Ticket" )            PORT_DIPLOCATION("DSW3:3")          /* OK */
 	PORT_DIPSETTING(    0x04, "20/200" )
 	PORT_DIPSETTING(    0x00, "10/100" )
-	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )           PORT_DIPLOCATION("DSW3:4,5")        /* OK */
+	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )               PORT_DIPLOCATION("DSW3:4,5")        /* OK */
 	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 5*5 */
 	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 5*10 */
 	PORT_DIPSETTING(    0x10, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 5*20 */
@@ -4836,146 +4846,146 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPSETTING(    0x08, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
 	PORT_DIPSETTING(    0x10, "1 Coin/1,000 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*20 */
 	PORT_DIPSETTING(    0x18, "1 Coin/2,500 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*50 */
-	PORT_DIPNAME( 0x20, 0x20, "Coin B Enable" )         PORT_DIPLOCATION("DSW3:6")          /* OK */
+	PORT_DIPNAME( 0x20, 0x20, "Coin B Enable" )             PORT_DIPLOCATION("DSW3:6")          /* OK */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )           PORT_DIPLOCATION("DSW3:7")          /* OK */
+	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")          /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Super Jackpot Half" )    PORT_DIPLOCATION("DSW4:4")          /* OK */
+	PORT_DIPNAME( 0x08, 0x08, "Super Jackpot Half" )        PORT_DIPLOCATION("DSW4:4")          /* OK */
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "Red Game Credit" )       PORT_DIPLOCATION("DSW4:6,7")        /* OK */
+	PORT_DIPNAME( 0x60, 0x60, "Red Game Credit" )           PORT_DIPLOCATION("DSW4:6,7")        /* OK */
 	PORT_DIPSETTING(    0x40, "0" )
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPSETTING(    0x60, "20" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Cherry/Bell Bonus" )         PORT_DIPLOCATION("DSW4:8")          /* OK */
+	PORT_DIPSETTING(    0x80, "x6 / x3" )
+	PORT_DIPSETTING(    0x00, "x9 / x5" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkch3 )
 	PORT_INCLUDE( unkch_controls )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Game Level" )            PORT_DIPLOCATION("DSW1:1,2")    /* OK */
+	PORT_DIPNAME( 0x03, 0x03, "Game Level" )                PORT_DIPLOCATION("DSW1:1,2")    /* OK */
 	PORT_DIPSETTING(    0x03, "Easy" )
 	PORT_DIPSETTING(    0x02, "Mid 1" )
 	PORT_DIPSETTING(    0x01, "Mid 2" )
 	PORT_DIPSETTING(    0x00, "Hard" )
-	PORT_DIPNAME( 0x04, 0x04, "Punti Unit" )            PORT_DIPLOCATION("DSW1:3")      /* OK */
+	PORT_DIPNAME( 0x04, 0x04, "Punti Unit" )                PORT_DIPLOCATION("DSW1:3")      /* OK */
 	PORT_DIPSETTING(    0x00, "500" )
 	PORT_DIPSETTING(    0x04, "1000" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )            PORT_DIPLOCATION("DSW1:5")      /* OK */
+	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )                PORT_DIPLOCATION("DSW1:5")      /* OK */
 	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Bet Maximum" )           PORT_DIPLOCATION("DSW2:5,6")    /* OK */
+	PORT_DIPNAME( 0x30, 0x30, "Bet Maximum" )               PORT_DIPLOCATION("DSW2:5,6")    /* OK */
 	PORT_DIPSETTING(    0x00, "10 (5)" )    /* shows 5 in settings screen but limits at 10 in gameplay */
 	PORT_DIPSETTING(    0x10, "20 (10)" )   /* shows 10 in settings screen but limits at 20 in gameplay */
 	PORT_DIPSETTING(    0x20, "40 (20)" )   /* shows 20 in settings screen but limits at 40 in gameplay */
 	PORT_DIPSETTING(    0x30, "64" )
-	PORT_DIPNAME( 0x40, 0x40, "Bet Minimum" )           PORT_DIPLOCATION("DSW2:7")      /* shows in settings screen but has no effect */
+	PORT_DIPNAME( 0x40, 0x40, "Min. Bet For Bonus Play" )   PORT_DIPLOCATION("DSW2:7")          /* OK - called 'Bet Minimum' in settings screen */
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x40, "16" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown) )       PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown) )           PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Coin B Enable" )         PORT_DIPLOCATION("DSW3:6")      /* OK */
+	PORT_DIPNAME( 0x20, 0x20, "Coin B Enable" )             PORT_DIPLOCATION("DSW3:6")      /* OK */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )           PORT_DIPLOCATION("DSW3:7")      /* OK */
+	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")      /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Test Mode" )             PORT_DIPLOCATION("DSW4:5")      /* OK */
+	PORT_DIPNAME( 0x10, 0x10, "Test Mode" )                 PORT_DIPLOCATION("DSW4:5")      /* OK */
 	PORT_DIPSETTING(    0x10, "Disable" )
 	PORT_DIPSETTING(    0x00, "Enable" )    /* hold 'Settings' on reset to access */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Cherry/Bell Bonus" )         PORT_DIPLOCATION("DSW4:8")          /* OK */
+	PORT_DIPSETTING(    0x80, "x6 / x3" )
+	PORT_DIPSETTING(    0x00, "x9 / x5" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkch4 )
@@ -4989,31 +4999,31 @@ static INPUT_PORTS_START( unkch4 )
 	out exactly how to make it repeatable... */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Game Level" )            PORT_DIPLOCATION("DSW1:1,2")        /* OK */
+	PORT_DIPNAME( 0x03, 0x03, "Game Level" )                PORT_DIPLOCATION("DSW1:1,2")        /* OK */
 	PORT_DIPSETTING(    0x03, "Easy" )
 	PORT_DIPSETTING(    0x02, "Mid 1" )
 	PORT_DIPSETTING(    0x01, "Mid 2" )
 	PORT_DIPSETTING(    0x00, "Hard" )
-	PORT_DIPNAME( 0x04, 0x04, "Punti" )                 PORT_DIPLOCATION("DSW1:3")          /* OK */
+	PORT_DIPNAME( 0x04, 0x04, "Punti" )                     PORT_DIPLOCATION("DSW1:3")          /* OK */
 	PORT_DIPSETTING(    0x04, "Ticket" )
 	PORT_DIPSETTING(    0x00, "Gettoni" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )            PORT_DIPLOCATION("DSW1:5")          /* OK */
+	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )                PORT_DIPLOCATION("DSW1:5")          /* OK */
 	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
-	PORT_DIPNAME( 0x60, 0x60, "Super Jackpot" )         PORT_DIPLOCATION("DSW1:6,7")        /* OK */
+	PORT_DIPNAME( 0x60, 0x60, "Super Jackpot" )             PORT_DIPLOCATION("DSW1:6,7")        /* OK - shows in test mode but always seems to be enabled in gameplay */
 	PORT_DIPSETTING(    0x60, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, "5%" )
 	PORT_DIPSETTING(    0x00, "10%" )
 	PORT_DIPSETTING(    0x40, "20%" )
-	PORT_DIPNAME( 0x80, 0x80, "Bet Step On 8" )         PORT_DIPLOCATION("DSW1:8")          /* OK */
+	PORT_DIPNAME( 0x80, 0x80, "Bet Step On 8" )             PORT_DIPLOCATION("DSW1:8")          /* OK */
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0f, 0x0f, "Main/Bonus Game Rate" )  PORT_DIPLOCATION("DSW2:1,2,3,4")    /* OK - all other values are 83% / 88% */
+	PORT_DIPNAME( 0x0f, 0x0f, "Main/Bonus Game Rate" )      PORT_DIPLOCATION("DSW2:1,2,3,4")    /* OK - all other values are 83% / 88% */
 	PORT_DIPSETTING(    0x00, "50% / 55%" )
 	PORT_DIPSETTING(    0x01, "53% / 58%" )
 	PORT_DIPSETTING(    0x02, "56% / 61%" )
@@ -5026,29 +5036,29 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPSETTING(    0x09, "77% / 82%" )
 	PORT_DIPSETTING(    0x0a, "80% / 85%" )
 	PORT_DIPSETTING(    0x0f, "83% / 88%" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Bet" )               PORT_DIPLOCATION("DSW2:5")          /* OK */
+	PORT_DIPNAME( 0x10, 0x10, "Max Bet" )                   PORT_DIPLOCATION("DSW2:5")          /* OK */
 	PORT_DIPSETTING(    0x00, "32" )
 	PORT_DIPSETTING(    0x10, "64" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x40, 0x40, "Min. Bet For Bonus Play" )   PORT_DIPLOCATION("DSW2:7")          /* OK */
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x40, "16" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Coin A Rate" )           PORT_DIPLOCATION("DSW3:1,2")        /* OK */
+	PORT_DIPNAME( 0x03, 0x03, "Coin A Rate" )               PORT_DIPLOCATION("DSW3:1,2")        /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x02, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )           PORT_DIPLOCATION("DSW3:4,5")        /* OK */
+	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )               PORT_DIPLOCATION("DSW3:4,5")        /* OK */
 	PORT_DIPSETTING(    0x00, "1 Coin/40 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*5 */
 	PORT_DIPSETTING(    0x08, "1 Coin/80 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*10 */
 	PORT_DIPSETTING(    0x10, "1 Coin/160 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*20 */
@@ -5065,7 +5075,7 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPSETTING(    0x08, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
 	PORT_DIPSETTING(    0x10, "1 Coin/1,000 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*20 */
 	PORT_DIPSETTING(    0x18, "1 Coin/2,500 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*50 */
-	PORT_DIPNAME( 0x20, 0x20, "Coin C Rate" )           PORT_DIPLOCATION("DSW3:6")          /* OK */
+	PORT_DIPNAME( 0x20, 0x20, "Coin C Rate" )               PORT_DIPLOCATION("DSW3:6")          /* OK */
 	PORT_DIPSETTING(    0x00, "1 Coin/40 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*5 */
 	PORT_DIPSETTING(    0x20, "1 Coin/80 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*10 */
 	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*5 */
@@ -5074,7 +5084,7 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPSETTING(    0x20, "1 Coin/200 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*10 */
 	PORT_DIPSETTING(    0x00, "1 Coin/250 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*5 */
 	PORT_DIPSETTING(    0x20, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
-	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )           PORT_DIPLOCATION("DSW3:7")          /* OK */
+	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")          /* OK */
 	PORT_DIPSETTING(    0x00, "1 Coin/80 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*10 */
 	PORT_DIPSETTING(    0x40, "1 Coin/160 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*20 */
 	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*10 */
@@ -5083,35 +5093,35 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPSETTING(    0x40, "1 Coin/400 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*20 */
 	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
 	PORT_DIPSETTING(    0x40, "1 Coin/1,000 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*20 */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW4:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Cherry/Bell Bonus" )         PORT_DIPLOCATION("DSW4:8")          /* OK */
+	PORT_DIPSETTING(    0x80, "x6 / x3" )
+	PORT_DIPSETTING(    0x00, "x9 / x5" )
 INPUT_PORTS_END
 
 
