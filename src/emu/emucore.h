@@ -67,7 +67,10 @@ private:
 #undef assert
 #undef assert_always
 
-#ifdef MAME_DEBUG
+#if defined(MAME_DEBUG_FAST)
+#define assert(x)               do { } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#elif defined(MAME_DEBUG)
 #define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
