@@ -79,7 +79,6 @@
 #define __DELEGATE_H__
 
 // standard C++ includes
-#include <assert.h>
 #include <exception>
 #include <typeinfo>
 
