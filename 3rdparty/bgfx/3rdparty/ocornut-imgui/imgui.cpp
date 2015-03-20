@@ -353,6 +353,9 @@
 #endif
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wunused-function"          // warning: 'xxxx' defined but not used
+#pragma GCC diagnostic ignored "-Wunused-parameter"         // warning: unused parameter ‘xxxx’
+#pragma GCC diagnostic ignored "-Wtype-limits"              // warning: comparison is always true due to limited range of data type
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"      // warning: ‘xxxx’ may be used uninitialized in this function
 #endif
 
 //-------------------------------------------------------------------------
