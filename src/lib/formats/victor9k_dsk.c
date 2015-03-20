@@ -97,7 +97,7 @@
                                        zone.
 */
 
-#include "emu.h"
+#include "emu.h" // logerror, BIT, emu_fatalerror
 #include "formats/victor9k_dsk.h"
 
 victor9k_format::victor9k_format()

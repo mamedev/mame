@@ -7,8 +7,8 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
-#include "emu.h"
 #include "imageutl.h"
 #include "flopimg.h"
 

@@ -13,7 +13,6 @@
 #ifndef __CBM_CRT__
 #define __CBM_CRT__
 
-#include "emu.h"
 #include "formats/imageutl.h"
 
 

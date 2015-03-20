@@ -1,4 +1,4 @@
-#include "emu.h"
+#include <assert.h>
 #include "ipf_dsk.h"
 
 const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;

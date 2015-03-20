@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/excali64_dsk.h"
 
 excali64_format::excali64_format() : wd177x_format(formats)

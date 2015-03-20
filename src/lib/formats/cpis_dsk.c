@@ -7,8 +7,8 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
-#include "emu.h"
 #include "formats/cpis_dsk.h"
 #include "formats/basicdsk.h"
 

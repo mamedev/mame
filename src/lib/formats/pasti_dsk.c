@@ -1,4 +1,4 @@
-#include "emu.h"
+#include "emu.h" // logerror
 #include "pasti_dsk.h"
 
 // Pasti format supported using the documentation at

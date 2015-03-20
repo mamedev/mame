@@ -31,7 +31,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "fdd_dsk.h"
 
 fdd_format::fdd_format()

@@ -27,7 +27,8 @@
          FORMAT A: /F:160 on DOS; turn MEDIACHK ON
 ************************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "flopimg.h"
 #include "formats/rx50_dsk.h"
 

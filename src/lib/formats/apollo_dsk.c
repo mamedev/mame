@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/apollo_dsk.h"
 
 apollo_format::apollo_format() : upd765_format(formats)

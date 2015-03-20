@@ -13,7 +13,7 @@
  */
 
 #include <string.h>
-#include "emu.h"
+#include <assert.h>
 #include "flopimg.h"
 
 #define BUFSZ           512     // new input buffer

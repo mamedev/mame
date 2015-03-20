@@ -10,7 +10,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror, offs_t
 #include "formats/g64_dsk.h"
 
 #define G64_FORMAT_HEADER   "GCR-1541"

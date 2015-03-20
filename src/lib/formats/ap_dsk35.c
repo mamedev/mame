@@ -97,6 +97,7 @@
 *********************************************************************/
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "emu.h"
 #include "ap_dsk35.h"

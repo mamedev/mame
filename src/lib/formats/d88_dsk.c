@@ -27,7 +27,8 @@
  *
  */
 
-#include "emu.h"
+ #include <assert.h>
+ 
 #include "flopimg.h"
 #include "imageutl.h"
 

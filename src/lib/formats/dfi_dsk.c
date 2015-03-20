@@ -11,7 +11,7 @@
  * Correctly note exact index timing.
  */
 
-#include "emu.h"
+ #include "emu.h" // fatalerror
 #include "dfi_dsk.h"
 #include <zlib.h>
 #define NUMBER_OF_MULTIREADS 3

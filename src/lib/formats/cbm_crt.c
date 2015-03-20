@@ -39,6 +39,9 @@
 
 *********************************************************************/
 
+#include "emu.h" // offs_t, fatalerror
+#include "astring.h"
+#include "corefile.h"
 #include "cbm_crt.h"
 
 
