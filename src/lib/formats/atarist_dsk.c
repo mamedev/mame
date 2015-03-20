@@ -6,6 +6,8 @@
 
 *********************************************************************/
 
+#include <assert.h>
+
 #include "formats/atarist_dsk.h"
 #include "formats/basicdsk.h"
 

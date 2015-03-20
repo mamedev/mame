@@ -1,4 +1,4 @@
-#include "coretmpl.h"
+#include "emu.h"
 #include "sound/wavwrite.h"
 
 struct wav_file

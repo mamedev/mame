@@ -8,6 +8,8 @@
 
 *********************************************************************/
 
+#include <assert.h>
+
 #include "formats/ami_dsk.h"
 
 adf_format::adf_format() : floppy_image_format_t()

@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include "corestr.h"
 

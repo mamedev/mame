@@ -6,6 +6,8 @@
 
 ****************************************************************************/
 
+#include <assert.h>
+
 #include "osdcore.h"
 #include "corefile.h"
 #include "chdcd.h"

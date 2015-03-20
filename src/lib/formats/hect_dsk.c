@@ -6,6 +6,8 @@
 
 *********************************************************************/
 
+#include <assert.h>
+
 #include "formats/hect_dsk.h"
 #include "formats/basicdsk.h"
 

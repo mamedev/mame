@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "chd.h"
 #include "avhuff.h"
 #include "hashing.h"

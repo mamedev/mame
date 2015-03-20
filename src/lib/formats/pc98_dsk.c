@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "formats/pc98_dsk.h"
 

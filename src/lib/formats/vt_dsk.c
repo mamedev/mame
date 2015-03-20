@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "formats/vt_dsk.h"
 #include "formats/basicdsk.h"
 
