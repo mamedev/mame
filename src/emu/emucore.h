@@ -31,6 +31,11 @@
 #include <exception>
 #include <typeinfo>
 
+// TODO: make the assert replacement and especially assert_always work again
+#include <assert.h>
+#define assert_always(x, msg) assert(x)
+
+/*
 // standard assertion macros
 #undef assert
 #undef assert_always
@@ -45,6 +50,7 @@
 #define assert(x)               do { } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
 #endif
+*/
 
 // core system includes
 #include "osdcomm.h"
