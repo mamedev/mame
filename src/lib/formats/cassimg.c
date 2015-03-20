@@ -6,7 +6,6 @@
 
 *********************************************************************/
 
-#include <assert.h>
 #include <string.h>
 
 #include "imageutl.h"
