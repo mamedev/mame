@@ -69,48 +69,81 @@ Note:
 
 ***************************************************************************/
 
+void srmp2_state::machine_start()
+{
+	save_item(NAME(m_adpcm_bank));
+	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_sptr));
+	save_item(NAME(m_adpcm_eptr));
+	save_item(NAME(m_iox.mux));
+	save_item(NAME(m_iox.ff));
+	save_item(NAME(m_iox.data));
+}
+
 MACHINE_START_MEMBER(srmp2_state,srmp2)
 {
-	iox_t &iox = m_iox;
-
-	iox.reset = 0x1f;
-	iox.ff_event = -1;
-	iox.ff_1 = 0x00;
+	machine_start();
+	
+	m_iox.reset = 0x1f;
+	m_iox.ff_event = -1;
+	m_iox.ff_1 = 0x00;
 	/* note: protection in srmp1/mjyuugi/ponchin is never checked, assume to be the same */
-	iox.protcheck[0] = 0x60; iox.protlatch[0] = 0x2a;
-	iox.protcheck[1] = -1;   iox.protlatch[1] = -1;
-	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
-	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
+	m_iox.protcheck[0] = 0x60; m_iox.protlatch[0] = 0x2a;
+	m_iox.protcheck[1] = -1;   m_iox.protlatch[1] = -1;
+	m_iox.protcheck[2] = -1;   m_iox.protlatch[2] = -1;
+	m_iox.protcheck[3] = -1;   m_iox.protlatch[3] = -1;
+	
+	save_item(NAME(m_color_bank));
 }
 
 MACHINE_START_MEMBER(srmp2_state,srmp3)
 {
-	iox_t &iox = m_iox;
-
-	iox.reset = 0xc8;
-	iox.ff_event = 0xef;
-	iox.ff_1 = -1;
-	iox.protcheck[0] = 0x49; iox.protlatch[0] = 0xc9;
-	iox.protcheck[1] = 0x4c; iox.protlatch[1] = 0x00;
-	iox.protcheck[2] = 0x1c; iox.protlatch[2] = 0x04;
-	iox.protcheck[3] = 0x45; iox.protlatch[3] = 0x00;
+	machine_start();
+	
+	m_iox.reset = 0xc8;
+	m_iox.ff_event = 0xef;
+	m_iox.ff_1 = -1;
+	m_iox.protcheck[0] = 0x49; m_iox.protlatch[0] = 0xc9;
+	m_iox.protcheck[1] = 0x4c; m_iox.protlatch[1] = 0x00;
+	m_iox.protcheck[2] = 0x1c; m_iox.protlatch[2] = 0x04;
+	m_iox.protcheck[3] = 0x45; m_iox.protlatch[3] = 0x00;
     
     membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
+	
+	save_item(NAME(m_gfx_bank));
 }
 
 MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 {
-	iox_t &iox = m_iox;
-
-	iox.reset = 0xc8;
-	iox.ff_event = 0xff;
-	iox.ff_1 = -1;
-	iox.protcheck[0] = 0x43; iox.protlatch[0] = 0x9a;
-	iox.protcheck[1] = 0x45; iox.protlatch[1] = 0x00;
-	iox.protcheck[2] = -1;   iox.protlatch[2] = -1;
-	iox.protcheck[3] = -1;   iox.protlatch[3] = -1;
+	machine_start();
+	
+	m_iox.reset = 0xc8;
+	m_iox.ff_event = 0xff;
+	m_iox.ff_1 = -1;
+	m_iox.protcheck[0] = 0x43; m_iox.protlatch[0] = 0x9a;
+	m_iox.protcheck[1] = 0x45; m_iox.protlatch[1] = 0x00;
+	m_iox.protcheck[2] = -1;   m_iox.protlatch[2] = -1;
+	m_iox.protcheck[3] = -1;   m_iox.protlatch[3] = -1;
 
     membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
+	
+	save_item(NAME(m_gfx_bank));
+}
+
+MACHINE_START_MEMBER(srmp2_state,mjyuugi)
+{
+	machine_start();
+	
+	m_iox.reset = 0x1f;
+	m_iox.ff_event = -1;
+	m_iox.ff_1 = 0x00;
+	/* note: protection in srmp1/mjyuugi/ponchin is never checked, assume to be the same */
+	m_iox.protcheck[0] = 0x60; m_iox.protlatch[0] = 0x2a;
+	m_iox.protcheck[1] = -1;   m_iox.protlatch[1] = -1;
+	m_iox.protcheck[2] = -1;   m_iox.protlatch[2] = -1;
+	m_iox.protcheck[3] = -1;   m_iox.protlatch[3] = -1;
+
+	save_item(NAME(m_gfx_bank));
 }
 
 /***************************************************************************
@@ -207,7 +240,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
 }
 
 
-WRITE_LINE_MEMBER(srmp2_state::srmp2_adpcm_int)
+WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 {
 	UINT8 *ROM = memregion("adpcm")->base();
 
@@ -270,32 +303,30 @@ UINT8 srmp2_state::iox_key_matrix_calc(UINT8 p_side)
 
 READ8_MEMBER(srmp2_state::iox_mux_r)
 {
-	iox_t &iox = m_iox;
-
 	/* first off check any pending protection value */
 	{
 		int i;
 
 		for(i=0;i<4;i++)
 		{
-			if(iox.protcheck[i] == -1)
+			if(m_iox.protcheck[i] == -1)
 				continue; //skip
 
-			if(iox.data == iox.protcheck[i])
+			if(m_iox.data == m_iox.protcheck[i])
 			{
-				iox.data = 0; //clear write latch
-				return iox.protlatch[i];
+				m_iox.data = 0; //clear write latch
+				return m_iox.protlatch[i];
 			}
 		}
 	}
 
-	if(iox.ff == 0)
+	if(m_iox.ff == 0)
 	{
-		if(iox.mux != 1 && iox.mux != 2 && iox.mux != 4)
+		if(m_iox.mux != 1 && m_iox.mux != 2 && m_iox.mux != 4)
 			return 0xff; //unknown command
 
 		/* both side checks */
-		if(iox.mux == 1)
+		if(m_iox.mux == 1)
 		{
 			UINT8 p1_side = iox_key_matrix_calc(0);
 			UINT8 p2_side = iox_key_matrix_calc(4);
@@ -307,7 +338,7 @@ READ8_MEMBER(srmp2_state::iox_mux_r)
 		}
 
 		/* check individual input side */
-		return iox_key_matrix_calc((iox.mux == 2) ? 0 : 4);
+		return iox_key_matrix_calc((m_iox.mux == 2) ? 0 : 4);
 	}
 
 	return ioport("SERVICE")->read() & 0xff;
@@ -320,7 +351,6 @@ READ8_MEMBER(srmp2_state::iox_status_r)
 
 WRITE8_MEMBER(srmp2_state::iox_command_w)
 {
-	iox_t &iox = m_iox;
 	/*
 	bit wise command port apparently
 	0x01: selects both sides
@@ -328,23 +358,22 @@ WRITE8_MEMBER(srmp2_state::iox_command_w)
 	0x04: selects p2 side
 	*/
 
-	iox.mux = data;
-	iox.ff = 0; // this also set flip flop back to 0
+	m_iox.mux = data;
+	m_iox.ff = 0; // this also set flip flop back to 0
 }
 
 WRITE8_MEMBER(srmp2_state::iox_data_w)
 {
-	iox_t &iox = m_iox;
-	iox.data = data;
+	m_iox.data = data;
 
-	if(data == iox.reset && iox.reset != -1) //resets device
-		iox.ff = 0;
+	if(data == m_iox.reset && m_iox.reset != -1) //resets device
+		m_iox.ff = 0;
 
-	if(data == iox.ff_event && iox.ff_event != -1) // flip flop event
-		iox.ff ^= 1;
+	if(data == m_iox.ff_event && m_iox.ff_event != -1) // flip flop event
+		m_iox.ff ^= 1;
 
-	if(data == iox.ff_1 && iox.ff_1 != -1) // set flip flop to 1
-		iox.ff = 1;
+	if(data == m_iox.ff_1 && m_iox.ff_1 != -1) // set flip flop to 1
+		m_iox.ff = 1;
 }
 
 WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
@@ -1163,7 +1192,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, srmp2_adpcm_int))            /* IRQ handler */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1185,6 +1214,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_PALETTE("palette")
+	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1210,7 +1240,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, srmp2_adpcm_int))            /* IRQ handler */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1232,13 +1262,14 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
 	MCFG_CPU_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
 
-	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
+	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_PALETTE("palette")
+	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1262,7 +1293,7 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, srmp2_adpcm_int))            /* IRQ handler */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
@@ -1537,11 +1568,11 @@ ROM_END
 
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)",  0 )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)",  0 )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)",  0 )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, driver_device, 0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)",  0 )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)",        0 )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)",        0 )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", 0 )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", 0 )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, driver_device, 0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", GAME_SUPPORTS_SAVE )
