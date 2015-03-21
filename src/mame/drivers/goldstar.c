@@ -146,7 +146,7 @@
 
   * Crazy Bonus (crazybon):
 
-  Appears to be from a bootleg conversion set for Poker Master (pokrmast).  There
+  Appears to be from a bootleg conversion set for Poker Master (pkrmast).  There
   is another undumped bootleg conversion set advertised that displays Spirit or
   Dyna copyright depending on DIP settings and has both poker and slots games (the
   set in MAME displays "Crazy Co." copyright and only has a slots game).
@@ -7717,6 +7717,8 @@ static MACHINE_CONFIG_START( unkch, unkch_state )
 	MCFG_CPU_IO_MAP(unkch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", unkch_state, vblank_irq)
 
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -7729,8 +7731,6 @@ static MACHINE_CONFIG_START( unkch, unkch_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unkch)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	//MCFG_NVRAM_HANDLER(goldstar)
 
 	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
