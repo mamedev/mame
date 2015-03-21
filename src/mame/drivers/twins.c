@@ -66,7 +66,6 @@ public:
 	twins_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
 		m_palette(*this, "palette"),
 		m_i2cmem(*this, "i2cmem"),
@@ -74,7 +73,6 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_paletteram;
 	required_device<palette_device> m_palette;
 	optional_device<i2cmem_device> m_i2cmem;
@@ -86,6 +84,7 @@ public:
 	DECLARE_WRITE16_MEMBER(porte_paloff0_w);
 	DECLARE_WRITE16_MEMBER(spider_paloff0_w);
 	DECLARE_WRITE16_MEMBER(spider_blitter_w);
+	DECLARE_READ16_MEMBER(spider_blitter_r);
 
 	DECLARE_READ16_MEMBER(spider_port_18_r);
 	DECLARE_READ16_MEMBER(spider_port_1e_r);
@@ -94,13 +93,25 @@ public:
 	int m_spriteswidth;
 	int m_spritesaddr;
 
+	UINT16 m_mainram[0x10000 / 2];
+	UINT16 m_videoram[0x10000 / 2];
 
 	DECLARE_VIDEO_START(twins);
 	DECLARE_VIDEO_START(twinsa);
 	UINT32 screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	virtual void machine_start();
+	UINT16* m_rom16;
+	UINT8* m_rom8;
+
 };
 
 
+void twins_state::machine_start()
+{
+	m_rom16 = (UINT16*)memregion("maincpu")->base();
+	m_rom8 = memregion("maincpu")->base();
+}
 
 /* port 4 is eeprom */
 READ16_MEMBER(twins_state::twins_port4_r)
@@ -152,6 +163,24 @@ WRITE16_MEMBER(twins_state::porte_paloff0_w)
 	m_paloff = 0;
 }
 
+READ16_MEMBER(twins_state::spider_blitter_r)
+{
+	if (offset <= 0x10000 / 2)
+	{
+		return m_mainram[offset&0x7fff];
+	}
+	else if (offset <= 0x20000 / 2)
+	{
+		return m_videoram[offset&0x7fff];
+	}
+	else
+	{
+		UINT16 *src = m_rom16;
+		return src[offset];
+	}
+}
+
+
 WRITE16_MEMBER(twins_state::spider_blitter_w)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
@@ -159,15 +188,15 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 
 	if (m_spritesinit == 1)
 	{
-	//	printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
+		printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
 	}
 	else if (m_spritesinit == 2)
 	{
-//		printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
-		m_spriteswidth = offset;
+		printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
+		m_spriteswidth = offset & 0xff;
 		if (m_spriteswidth == 0)
 			m_spriteswidth = 80;
 
@@ -176,32 +205,41 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 	}
 	else
 	{
-		UINT8 *src = memregion( "maincpu" )->base();
-
-	//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
-		offset &=0x7fff;
-
-		for (int i = 0; i < m_spriteswidth; i++)
+		if (offset <= 0x10000 / 2)
 		{
-			UINT16 data = (src[m_spritesaddr+1] << 8) | src[m_spritesaddr];
-			m_spritesaddr += 2;
-
-			m_videoram[offset] = data;
-			offset++;
-			offset &= 0x7fff;
+			COMBINE_DATA(&m_mainram[offset&0x7fff]);
 		}
+		else if (offset <= 0x20000 / 2)
+		{
+			COMBINE_DATA(&m_videoram[offset&0x7fff]);
+		}
+		else if (offset <= 0x30000 / 2)
+		{
+			UINT8 *src = m_rom8;
 
+			//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+			offset &= 0x7fff;
 
+			for (int i = 0; i < m_spriteswidth; i++)
+			{
+				UINT16 data = (src[(m_spritesaddr*2) + 1] << 8) | src[(m_spritesaddr*2)];
+				m_spritesaddr ++;
+
+				m_videoram[offset] = data;
+				offset++;
+				offset &= 0x7fff;
+			}
+		}
+		else
+		{
+			printf("spider_blitter_w unhandled RAM access %08x %04x %04x", offset * 2, data, mem_mask);
+		}
 	}
-
-
 }
 
 
 static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_WRITE(spider_blitter_w)
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(spider_blitter_r, spider_blitter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
@@ -226,7 +264,7 @@ UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(m_palette->black_pen());
 
 	count=0;
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
+	UINT8 *videoram = (UINT8*)m_videoram;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
