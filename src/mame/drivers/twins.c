@@ -28,7 +28,7 @@ Notes:
 
 
 
-seems a similar board to hotblocks
+seems a similar board to Hot Blocks
 
 same TPC1020 AFN-084C chip
 same 24c02 eeprom
@@ -46,12 +46,19 @@ takes a long time to boot (eeprom?)
 Electronic Devices was printed on rom labels
 1994 date string is in ROM
 
+Spider seems to have some kind of sprites / blitter that works the same as as Table Tennis Champ (ttchamp.c)
+Spider must also have some ROM banking, or the blitter must be able to access non-cpu visible space, the title logo is at 0x00000 in ROM
+
+Twins (set 2) is significantly changed hardware.
+
+
 */
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
-
+#include "machine/i2cmem.h"
+#include "video/ramdac.h"
 
 class twins_state : public driver_device
 {
@@ -61,23 +68,26 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_i2cmem(*this, "i2cmem")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_paletteram;
+	optional_shared_ptr<UINT16> m_paletteram;
 	required_device<palette_device> m_palette;
+	optional_device<i2cmem_device> m_i2cmem;
 	UINT16 m_paloff;
 	DECLARE_READ16_MEMBER(twins_port4_r);
 	DECLARE_WRITE16_MEMBER(twins_port4_w);
-	DECLARE_WRITE16_MEMBER(port6_pal0_w);
+	DECLARE_WRITE16_MEMBER(twins_pal_w);
+	DECLARE_WRITE16_MEMBER(spider_pal_w);
 	DECLARE_WRITE16_MEMBER(porte_paloff0_w);
-	DECLARE_WRITE16_MEMBER(twinsa_port4_w);
-	DECLARE_READ16_MEMBER(twinsa_unk_r);
+	DECLARE_WRITE16_MEMBER(spider_paloff0_w);
+
 	DECLARE_VIDEO_START(twins);
 	DECLARE_VIDEO_START(twinsa);
 	UINT32 screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_twinsa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -85,22 +95,50 @@ public:
 /* port 4 is eeprom */
 READ16_MEMBER(twins_state::twins_port4_r)
 {
-	return 0xffff;
+// doesn't work??
+//	printf("%08x: twins_port4_r %04x\n", space.device().safe_pc(), mem_mask);
+//	return m_i2cmem->read_sda();// | 0xfffe;
+
+	return 0x0001;
 }
 
 WRITE16_MEMBER(twins_state::twins_port4_w)
 {
+//	printf("%08x: twins_port4_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	int i2c_clk = BIT(data, 1);
+	int i2c_mem = BIT(data, 0);
+	m_i2cmem->write_scl(i2c_clk);
+	m_i2cmem->write_sda(i2c_mem);
 }
 
-WRITE16_MEMBER(twins_state::port6_pal0_w)
+WRITE16_MEMBER(twins_state::twins_pal_w)
 {
 	COMBINE_DATA(&m_paletteram[m_paloff]);
+
+	{
+		int dat,r,g,b;
+		dat = m_paletteram[m_paloff];
+
+		r = dat & 0x1f;
+		r = BITSWAP8(r,7,6,5,0,1,2,3,4);
+
+		g = (dat>>5) & 0x1f;
+		g = BITSWAP8(g,7,6,5,0,1,2,3,4);
+
+		b = (dat>>10) & 0x1f;
+		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
+
+		m_palette->set_pen_color(m_paloff, pal5bit(r),pal5bit(g),pal5bit(b));
+
+	}
+
 	m_paloff = (m_paloff + 1) & 0xff;
 }
 
 /* ??? weird ..*/
 WRITE16_MEMBER(twins_state::porte_paloff0_w)
 {
+//	printf("porte_paloff0_w %04x\n", data);
 	m_paloff = 0;
 }
 
@@ -114,7 +152,7 @@ static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(port6_pal0_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(twins_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
 ADDRESS_MAP_END
 
@@ -127,27 +165,9 @@ VIDEO_START_MEMBER(twins_state,twins)
 UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x,count;
-	int i;
 	static const int xxx=320,yyy=204;
 
 	bitmap.fill(m_palette->black_pen());
-
-	for (i=0;i<0x100;i++)
-	{
-		int dat,r,g,b;
-		dat = m_paletteram[i];
-
-		r = dat & 0x1f;
-		r = BITSWAP8(r,7,6,5,0,1,2,3,4);
-
-		g = (dat>>5) & 0x1f;
-		g = BITSWAP8(g,7,6,5,0,1,2,3,4);
-
-		b = (dat>>10) & 0x1f;
-		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
-
-		m_palette->set_pen_color(i, pal5bit(r),pal5bit(g),pal5bit(b));
-	}
 
 	count=0;
 	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
@@ -201,6 +221,8 @@ static MACHINE_CONFIG_START( twins, twins_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 	MCFG_SCREEN_PALETTE("palette")
+	
+	MCFG_24C02_ADD("i2cmem")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -224,56 +246,19 @@ VIDEO_START_MEMBER(twins_state,twinsa)
 	m_paloff = 0;
 }
 
-UINT32 twins_state::screen_update_twinsa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int y,x,count;
-	int i;
-	static const int xxx=320,yyy=204;
-
-	bitmap.fill(m_palette->black_pen());
-
-	for (i=0;i<0x1000-3;i+=3)
-	{
-		int r,g,b;
-		r = m_paletteram[i];
-		g = m_paletteram[i+1];
-		b = m_paletteram[i+2];
-
-		m_palette->set_pen_color(i/3, pal6bit(r), pal6bit(g), pal6bit(b));
-	}
-
-	count=0;
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram.target());
-	for (y=0;y<yyy;y++)
-	{
-		for(x=0;x<xxx;x++)
-		{
-			bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count)];
-			count++;
-		}
-	}
-	return 0;
-}
-
-WRITE16_MEMBER(twins_state::twinsa_port4_w)
-{
-	m_paletteram[m_paloff&0xfff] = data;
-	m_paloff++;
-//  printf("paloff %04x\n",m_paloff);
-}
-
-READ16_MEMBER(twins_state::twinsa_unk_r)
-{
-	return 0xffff;
-}
 
 static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE(twinsa_unk_r, porte_paloff0_w)
-	AM_RANGE(0x0002, 0x0003) AM_WRITE(porte_paloff0_w)
-	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0000, 0x0001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
+	AM_RANGE(0x0002, 0x0003) AM_DEVWRITE8("ramdac",ramdac_device,mask_w,0x00ff)
+	AM_RANGE(0x0004, 0x0005) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
 	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE8("aysnd", ay8910_device, address_w, 0x00ff)
 	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("aysnd", ay8910_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, twins_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
@@ -290,10 +275,14 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twinsa)
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	MCFG_RAMDAC_SPLIT_READ(0)
+	
+	MCFG_24C02_ADD("i2cmem")
 
 	MCFG_VIDEO_START_OVERRIDE(twins_state,twinsa)
 
@@ -306,13 +295,48 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+WRITE16_MEMBER(twins_state::spider_pal_w)
+{
+	// ths first write doesn't appear to be a palette value
+	if (m_paloff!=0)
+	{
+		COMBINE_DATA(&m_paletteram[m_paloff-1]);
+		int dat,r,g,b;
+		dat = m_paletteram[m_paloff-1];
+
+		r = dat & 0x1f;
+		g = (dat>>5) & 0x1f;
+		b = (dat>>10) & 0x1f;
+		m_palette->set_pen_color(m_paloff-1, pal5bit(r),pal5bit(g),pal5bit(b));
+	}
+	else
+	{
+	//	printf("first palette write %04x\n", data);
+	}
+	
+	m_paloff++;
+
+	if (m_paloff == 0x101)
+		m_paloff = 0;
+}
+
+
+WRITE16_MEMBER(twins_state::spider_paloff0_w) // probably not..
+{
+//	printf("porte_paloff0_w %04x\n", data);
+//	m_paloff = 0;
+}
+
 static ADDRESS_MAP_START( spider_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(port6_pal0_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0010, 0x0011) AM_WRITE(porte_paloff0_w)
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(spider_pal_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0010, 0x0011) AM_WRITE(spider_paloff0_w)
 ADDRESS_MAP_END
+
+
+
 
 
 static MACHINE_CONFIG_START( spider, twins_state )
@@ -334,6 +358,8 @@ static MACHINE_CONFIG_START( spider, twins_state )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(twins_state,twins)
+	
+	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -341,6 +367,7 @@ static MACHINE_CONFIG_START( spider, twins_state )
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
