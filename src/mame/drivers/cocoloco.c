@@ -190,19 +190,24 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
-	UINT8 *m_videoram;
-	UINT8 m_videobank;
-	DECLARE_READ8_MEMBER(cocoloco_vram_r);
-	DECLARE_WRITE8_MEMBER(cocoloco_vram_w);
-	DECLARE_WRITE8_MEMBER(cocoloco_vbank_w);
-	DECLARE_WRITE8_MEMBER(cocoloco_vram_clear_w);
-	DECLARE_WRITE8_MEMBER(cocoloco_coin_counter_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(cocoloco);
-	UINT32 screen_update_cocoloco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	
+	UINT8 *m_videoram;
+	UINT8 m_videobank;
+	
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(vbank_w);
+	DECLARE_WRITE8_MEMBER(vram_clear_w);
+	DECLARE_WRITE8_MEMBER(coincounter_w);
+	
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	
+	virtual void video_start();
+	DECLARE_PALETTE_INIT(cocoloco);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /***********************************
@@ -284,9 +289,12 @@ PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
 void cocoloco_state::video_start()
 {
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x2000 * 8);
+
+	save_pointer(NAME(m_videoram), 0x2000 * 8);
+	save_item(NAME(m_videobank));
 }
 
-UINT32 cocoloco_state::screen_update_cocoloco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, count, xi;
 
@@ -318,12 +326,12 @@ UINT32 cocoloco_state::screen_update_cocoloco(screen_device &screen, bitmap_ind1
 }
 
 
-READ8_MEMBER( cocoloco_state::cocoloco_vram_r )
+READ8_MEMBER( cocoloco_state::vram_r )
 {
 	return m_videoram[offset|0x0000] | m_videoram[offset|0x2000] | m_videoram[offset|0x4000] | m_videoram[offset|0x6000];
 }
 
-WRITE8_MEMBER( cocoloco_state::cocoloco_vram_w )
+WRITE8_MEMBER( cocoloco_state::vram_w )
 {
 	m_videoram[offset|0x0000] = (m_videobank == 0) ? data : 0;
 	m_videoram[offset|0x2000] = (m_videobank & 2) ? data : 0;
@@ -331,12 +339,12 @@ WRITE8_MEMBER( cocoloco_state::cocoloco_vram_w )
 	m_videoram[offset|0x6000] = (m_videobank & 8) ? data : 0;
 }
 
-WRITE8_MEMBER( cocoloco_state::cocoloco_vbank_w )
+WRITE8_MEMBER( cocoloco_state::vbank_w )
 {
 	m_videobank = data;
 }
 
-WRITE8_MEMBER( cocoloco_state::cocoloco_vram_clear_w )
+WRITE8_MEMBER( cocoloco_state::vram_clear_w )
 {
 	/* ??? */
 //  for(int i=0;i<0x8000;i++)
@@ -346,7 +354,7 @@ WRITE8_MEMBER( cocoloco_state::cocoloco_vram_clear_w )
 }
 
 
-WRITE8_MEMBER( cocoloco_state::cocoloco_coin_counter_w )
+WRITE8_MEMBER( cocoloco_state::coincounter_w )
 {
 /*  - bits -
     7654 3210
@@ -367,14 +375,14 @@ WRITE8_MEMBER( cocoloco_state::cocoloco_coin_counter_w )
 
 static ADDRESS_MAP_START( cocoloco_map, AS_PROGRAM, 8, cocoloco_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(cocoloco_vram_r, cocoloco_vram_w)     // 256 x 256 x 1
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(vram_r, vram_w)     // 256 x 256 x 1
 	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("ay8910", ay8910_device, data_r)
 	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x6003, 0x6003) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(cocoloco_vbank_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(cocoloco_coin_counter_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(vbank_w)
+	AM_RANGE(0x8005, 0x8005) AM_WRITE(coincounter_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
-	AM_RANGE(0xa005, 0xa005) AM_WRITE(cocoloco_vram_clear_w)
+	AM_RANGE(0xa005, 0xa005) AM_WRITE(vram_clear_w)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -465,7 +473,7 @@ static MACHINE_CONFIG_START( cocoloco, cocoloco_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256) /* TODO: not accurate, ~50 Hz */
-	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update_cocoloco)
+	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10)
@@ -519,5 +527,5 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE          INIT   ROT     COMPANY         FULLNAME        FLAGS  */
-GAME( 198?, cocoloco,  0,       cocoloco, cocoloco, driver_device, 0,     ROT90, "Petaco S.A.",  "Coco Loco",     0 )
+/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE          INIT   ROT     COMPANY         FULLNAME      FLAGS  */
+GAME( 198?, cocoloco,  0,       cocoloco, cocoloco, driver_device, 0,     ROT90, "Petaco S.A.",  "Coco Loco", GAME_SUPPORTS_SAVE )
