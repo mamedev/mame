@@ -17,7 +17,7 @@
  @MP0914   TMS1000  1979, Entex Baseball 1
  *MP0923   TMS1000? 1979, Entex Baseball 2
  @MP1030   TMS1100  1980, APF Mathemagician
- *MP1133   ?        1979, Kosmos Astro
+ *MP1133   TMS1470  1979, Kosmos Astro
  @MP1204   TMS1100  1980, Entex Baseball 3
  *MP1221   TMS1100  1980, Entex Raise The Devil
  *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
@@ -216,7 +216,7 @@ void hh_tms1k_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
