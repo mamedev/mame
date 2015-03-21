@@ -1,3 +1,8 @@
+#include "emu.h"
+
+#include "machine/ticket.h"
+
+
 class goldstar_state : public driver_device
 {
 public:
@@ -250,7 +255,8 @@ public:
 		goldstar_state(mconfig, type, tag),
 		m_reel1_attrram(*this, "reel1_attrram"),
 		m_reel2_attrram(*this, "reel2_attrram"),
-		m_reel3_attrram(*this, "reel3_attrram")
+		m_reel3_attrram(*this, "reel3_attrram"),
+		m_ticket_dispenser(*this, "tickets")
 	{
 	}
 
@@ -283,4 +289,6 @@ private:
 
 	UINT8 m_vblank_irq_enable;
 	UINT8 m_vidreg;
+
+	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };
