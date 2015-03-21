@@ -119,10 +119,6 @@
 
   * unkch sets
 
-  unkch4 always crashes if you insert coins while already credited.  unkch1 and
-  unkch2 show the same behaviour only if you enable the Super Jackpot feature with
-  DSW2-6/7.
-
   unkch3 has a handy input test mode.  To access it, first enable it with DSW4-5,
   then hold the Settings button (9) during boot.
 
@@ -222,21 +218,10 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
   -x-- ----                                     hold
   x--- ----
 
-  7654 3210     unkch1
-  ---- ---x     bet-a/stop 2
-  ---- --x-     start/stop all
-  ---- -x--     info/small/stop 3
-  ---- x---     big
-  ---x ----     bet-b/d-up
-  --x- ----     take/stop 1
-  -x-- ----
-  x--- ----     always on
-
   all cm/cmaster use the same scheme
   tonypok uses lamps to indicate current button functions rather than active buttons
   skill98 is like schery97 but doesn't activate bit 0 for stop
   nfb96, roypok96 and nc96 sets are like schery97 but they don't activate bit 2 for select
-  all unkch use the same scheme, these sets use crude PWM to dim lamps which requires better lamp simulation
 */
 	output_set_lamp_value(0, (data >> 0) & 1);
 	output_set_lamp_value(1, (data >> 1) & 1);
@@ -999,6 +984,34 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 		popmessage("coin counters: %02x", data);
 }
 
+WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
+{
+/*  bits
+  7654 3210
+  ---- ---x     button lamp: Bet-A / Stop 2
+  ---- --x-     button lamp: Start / Stop All
+  ---- -x--     button lamp: Info / Small / Stop 3
+  ---- x---     button lamp: Big
+  ---x ----     button lamp: Bet-B / D-Up
+  --x- ----     button lamp: Take / Stop 1
+  -x-- ----     unknown/unused
+  x--- ----     vblank IRQ enable
+
+  these sets use crude PWM to dim lamp 2 which requires filament physics simulation to work properly
+*/
+
+	//popmessage("unkcm_0x02_w %02x", data);
+
+	m_vblank_irq_enable = data & 0x80;
+
+	output_set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* Info / Small / Stop 3 */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* Big */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* Bet-B / D-Up */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
+}
+
 WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
 {
 	//popmessage("unkcm_0x03_w %02x", data);
@@ -1013,7 +1026,7 @@ static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, unkch_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x01, 0x01) AM_WRITE(coincount_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(p1_lamps_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(unkcm_0x03_w)
 
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("IN0")
@@ -7230,6 +7243,7 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
+
 INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
 {
 	if (m_nmi_enable)
@@ -7672,14 +7686,20 @@ static MACHINE_CONFIG_DERIVED( nfm, amcoe2 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", nfm)
 MACHINE_CONFIG_END
 
+
+INTERRUPT_GEN_MEMBER(unkch_state::vblank_irq)
+{
+	if (m_vblank_irq_enable)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( unkch, unkch_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(unkch_map)
 	MCFG_CPU_IO_MAP(unkch_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", unkch_state, vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -12854,9 +12874,8 @@ DRIVER_INIT_MEMBER(cb3_state, cherrys)
 DRIVER_INIT_MEMBER(unkch_state, unkch1)
 {
 	// game stores $02 at ($D75C) and expects it to change
-	// missing interrupt?  before enabling interrupts so could only be NMI
-	// peripheral with RAM access?
-	// something other than RAM there?
+	// possibly expecting stack to grow to this point in NMI handler?
+	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9d52] = 0x00;
 	ROM[0x9d53] = 0x00;
@@ -12865,9 +12884,8 @@ DRIVER_INIT_MEMBER(unkch_state, unkch1)
 DRIVER_INIT_MEMBER(unkch_state, unkch3)
 {
 	// game stores $04 at ($D77F) and expects it to change
-	// missing interrupt?  before enabling interrupts so could only be NMI
-	// peripheral with RAM access?
-	// something other than RAM there?
+	// possibly expecting stack to grow to this point in NMI handler?
+	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9b86] = 0x00;
 	ROM[0x9b87] = 0x00;
@@ -12876,9 +12894,8 @@ DRIVER_INIT_MEMBER(unkch_state, unkch3)
 DRIVER_INIT_MEMBER(unkch_state, unkch4)
 {
 	// game stores $02 at ($D75C) and expects it to change
-	// missing interrupt?  before enabling interrupts so could only be NMI
-	// peripheral with RAM access?
-	// something other than RAM there?
+	// possibly expecting stack to grow to this point in NMI handler?
+	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
 	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9a6e] = 0x00;
 	ROM[0x9a6f] = 0x00;

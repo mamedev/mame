@@ -255,6 +255,7 @@ public:
 	}
 
 	DECLARE_WRITE8_MEMBER(coincount_w);
+	DECLARE_WRITE8_MEMBER(unkcm_0x02_w);
 	DECLARE_WRITE8_MEMBER(unkcm_0x03_w);
 
 	DECLARE_WRITE8_MEMBER(reel1_attrram_w);
@@ -268,6 +269,8 @@ public:
 	DECLARE_VIDEO_START(unkch);
 	UINT32 screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
 protected:
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
@@ -278,5 +281,6 @@ private:
 	required_shared_ptr<UINT8> m_reel2_attrram;
 	required_shared_ptr<UINT8> m_reel3_attrram;
 
+	UINT8 m_vblank_irq_enable;
 	UINT8 m_vidreg;
 };
