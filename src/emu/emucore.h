@@ -214,11 +214,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #define FUNC(x) &x, #x
 #define FUNC_NULL NULL, "(null)"
 
-#ifndef REGRESSION_TESTING
-
-#define assert_always(x, msg)    do { if (!(x)) { fprintf(stderr, "%s:%d: Assert failure: %s: %s\n", __FILE__, __LINE__, msg, #x); abort(); }} while (0)
-
-#else
 
 // standard assertion macros
 #undef assert
@@ -233,8 +228,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #else
 #define assert(x)               do { } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#endif
-
 #endif
 
 
