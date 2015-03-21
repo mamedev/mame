@@ -165,11 +165,11 @@ WRITE16_MEMBER(twins_state::porte_paloff0_w)
 
 READ16_MEMBER(twins_state::spider_blitter_r)
 {
-	if (offset <= 0x10000 / 2)
+	if (offset < 0x10000 / 2)
 	{
 		return m_mainram[offset&0x7fff];
 	}
-	else if (offset <= 0x20000 / 2)
+	else if (offset < 0x20000 / 2)
 	{
 		return m_videoram[offset&0x7fff];
 	}
@@ -188,14 +188,14 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 
 	if (m_spritesinit == 1)
 	{
-		printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
+	//	printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
 	}
 	else if (m_spritesinit == 2)
 	{
-		printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
+	//	printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
 		if (m_spriteswidth == 0)
 			m_spriteswidth = 80;
@@ -205,19 +205,19 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 	}
 	else
 	{
-		if (offset <= 0x10000 / 2)
+		if (offset < 0x10000 / 2)
 		{
 			COMBINE_DATA(&m_mainram[offset&0x7fff]);
 		}
-		else if (offset <= 0x20000 / 2)
+		else if (offset < 0x20000 / 2)
 		{
 			COMBINE_DATA(&m_videoram[offset&0x7fff]);
 		}
-		else if (offset <= 0x30000 / 2)
+		else if (offset < 0x30000 / 2)
 		{
 			UINT8 *src = m_rom8;
 
-			//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
