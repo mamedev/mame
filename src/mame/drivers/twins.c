@@ -69,7 +69,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
 		m_palette(*this, "palette"),
-		m_i2cmem(*this, "i2cmem")
+		m_i2cmem(*this, "i2cmem"),
+		m_spritesinit(0)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -84,6 +85,15 @@ public:
 	DECLARE_WRITE16_MEMBER(spider_pal_w);
 	DECLARE_WRITE16_MEMBER(porte_paloff0_w);
 	DECLARE_WRITE16_MEMBER(spider_paloff0_w);
+	DECLARE_WRITE16_MEMBER(spider_blitter_w);
+
+	DECLARE_READ16_MEMBER(spider_port_18_r);
+	DECLARE_READ16_MEMBER(spider_port_1e_r);
+	DECLARE_WRITE16_MEMBER(spider_port_1c_w);
+	int m_spritesinit;
+	int m_spriteswidth;
+	int m_spritesaddr;
+
 
 	DECLARE_VIDEO_START(twins);
 	DECLARE_VIDEO_START(twinsa);
@@ -142,10 +152,56 @@ WRITE16_MEMBER(twins_state::porte_paloff0_w)
 	m_paloff = 0;
 }
 
+WRITE16_MEMBER(twins_state::spider_blitter_w)
+{
+	// this is very strange, we use the offset (address bits) not data bits to set values..
+	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
+
+	if (m_spritesinit == 1)
+	{
+	//	printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
+
+		m_spritesinit = 2;
+		m_spritesaddr = offset;
+	}
+	else if (m_spritesinit == 2)
+	{
+//		printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
+		m_spriteswidth = offset;
+		if (m_spriteswidth == 0)
+			m_spriteswidth = 80;
+
+		m_spritesinit = 0;
+
+	}
+	else
+	{
+		UINT8 *src = memregion( "maincpu" )->base();
+
+	//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		offset &=0x7fff;
+
+		for (int i = 0; i < m_spriteswidth; i++)
+		{
+			UINT16 data = (src[m_spritesaddr+1] << 8) | src[m_spritesaddr];
+			m_spritesaddr += 2;
+
+			m_videoram[offset] = data;
+			offset++;
+			offset &= 0x7fff;
+		}
+
+
+	}
+
+
+}
+
+
 static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x20000, 0xfffff) AM_ROM
+	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_WRITE(spider_blitter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
@@ -321,11 +377,34 @@ WRITE16_MEMBER(twins_state::spider_pal_w)
 }
 
 
-WRITE16_MEMBER(twins_state::spider_paloff0_w) // probably not..
+WRITE16_MEMBER(twins_state::spider_paloff0_w)
 {
-//	printf("porte_paloff0_w %04x\n", data);
-//	m_paloff = 0;
+	// this seems to be video ram banking
 }
+
+WRITE16_MEMBER(twins_state::spider_port_1c_w)
+{
+	// done before the 'sprite' read / writes
+	// might clear a buffer?
+}
+
+
+READ16_MEMBER(twins_state::spider_port_18_r)
+{
+//	printf("spider_port_18_r %04x\n", mem_mask);
+
+	m_spritesinit = 1;
+
+	return 0xff;
+}
+
+READ16_MEMBER(twins_state::spider_port_1e_r)
+{
+	// done before each sprite pixel 'write'
+	// the data read is the data written, but only reads one pixel??
+	return 0xff;
+}
+
 
 static ADDRESS_MAP_START( spider_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
@@ -333,6 +412,12 @@ static ADDRESS_MAP_START( spider_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(spider_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0010, 0x0011) AM_WRITE(spider_paloff0_w)
+
+	AM_RANGE(0x0018, 0x0019) AM_READ(spider_port_18_r)
+	AM_RANGE(0x001c, 0x001d) AM_WRITE(spider_port_1c_w)
+	AM_RANGE(0x001e, 0x001f) AM_READ(spider_port_1e_r)
+
+
 ADDRESS_MAP_END
 
 
