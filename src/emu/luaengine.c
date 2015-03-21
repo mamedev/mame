@@ -130,7 +130,7 @@ lua_engine::hook::hook()
 	cb = -1;
 }
 
-#ifdef SDLMAME_SOLARIS
+#if defined(SDLMAME_SOLARIS) || defined(__ANDROID__)
 #undef _L
 #endif
 
