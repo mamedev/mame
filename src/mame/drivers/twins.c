@@ -69,7 +69,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_palette(*this, "palette"),
 		m_i2cmem(*this, "i2cmem"),
-		m_spritesinit(0)
+		m_spritesinit(0),
+		m_videorambank(0)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -88,6 +89,7 @@ public:
 
 	DECLARE_READ16_MEMBER(spider_port_18_r);
 	DECLARE_READ16_MEMBER(spider_port_1e_r);
+	DECLARE_WRITE16_MEMBER(spider_port_1a_w);
 	DECLARE_WRITE16_MEMBER(spider_port_1c_w);
 	int m_spritesinit;
 	int m_spriteswidth;
@@ -95,10 +97,13 @@ public:
 
 	UINT16 m_mainram[0x10000 / 2];
 	UINT16 m_videoram[0x10000 / 2];
+	UINT16 m_videoram2[0x10000 / 2];
+	UINT16 m_videorambank;
 
 	DECLARE_VIDEO_START(twins);
 	DECLARE_VIDEO_START(twinsa);
 	UINT32 screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_spider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start();
 	UINT16* m_rom16;
@@ -165,13 +170,19 @@ WRITE16_MEMBER(twins_state::porte_paloff0_w)
 
 READ16_MEMBER(twins_state::spider_blitter_r)
 {
+	UINT16* vram;
+	if (m_videorambank & 1)
+		vram = m_videoram2;
+	else
+		vram = m_videoram;
+
 	if (offset < 0x10000 / 2)
 	{
 		return m_mainram[offset&0x7fff];
 	}
 	else if (offset < 0x20000 / 2)
 	{
-		return m_videoram[offset&0x7fff];
+		return vram[offset&0x7fff];
 	}
 	else
 	{
@@ -185,6 +196,11 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
 	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
+	UINT16* vram;
+	if (m_videorambank & 1)
+		vram = m_videoram2;
+	else
+		vram = m_videoram;
 
 	if (m_spritesinit == 1)
 	{
@@ -211,7 +227,7 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 		}
 		else if (offset < 0x20000 / 2)
 		{
-			COMBINE_DATA(&m_videoram[offset&0x7fff]);
+			COMBINE_DATA(&vram[offset&0x7fff]);
 		}
 		else if (offset < 0x30000 / 2)
 		{
@@ -222,11 +238,23 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 
 			for (int i = 0; i < m_spriteswidth; i++)
 			{
-				UINT16 data = (src[(m_spritesaddr*2) + 1] << 8) | src[(m_spritesaddr*2)];
-				m_spritesaddr ++;
+				UINT8 data;
+				
+				data = (src[(m_spritesaddr * 2) + 1]);
+	
+				if (data)
+					vram[offset] = (vram[offset] & 0x00ff) | data << 8;
 
-				m_videoram[offset] = data;
+
+				data = src[(m_spritesaddr*2)];
+			
+				if (data)
+					vram[offset] = (vram[offset] & 0xff00) | data;
+
+
+				m_spritesaddr ++;				
 				offset++;
+
 				offset &= 0x7fff;
 			}
 		}
@@ -276,6 +304,38 @@ UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+UINT32 twins_state::screen_update_spider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int y,x,count;
+	static const int xxx=320,yyy=204;
+
+	bitmap.fill(m_palette->black_pen());
+
+	count=0;
+	UINT8 *videoram = (UINT8*)m_videoram;
+	for (y=0;y<yyy;y++)
+	{
+		for(x=0;x<xxx;x++)
+		{
+			bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count)];
+			count++;
+		}
+	}
+
+	count = 0;
+	videoram = (UINT8*)m_videoram2;
+	for (y=0;y<yyy;y++)
+	{
+		for(x=0;x<xxx;x++)
+		{
+			UINT8 pixel = videoram[BYTE_XOR_LE(count)];
+			if (pixel) bitmap.pix16(y, x) = pixel;
+			count++;
+		}
+	}
+
+	return 0;
+}
 
 static INPUT_PORTS_START(twins)
 	PORT_START("P1")    /* 8bit */
@@ -418,19 +478,40 @@ WRITE16_MEMBER(twins_state::spider_pal_w)
 WRITE16_MEMBER(twins_state::spider_paloff0_w)
 {
 	// this seems to be video ram banking
+	COMBINE_DATA(&m_videorambank);
 }
+
+WRITE16_MEMBER(twins_state::spider_port_1a_w)
+{
+	// writes 1
+}
+
 
 WRITE16_MEMBER(twins_state::spider_port_1c_w)
 {
 	// done before the 'sprite' read / writes
 	// might clear a buffer?
+	
+	// game is only animating sprites at 30fps, maybe there's some double buffering too?
+
+	UINT16* vram;
+	if (m_videorambank & 1)
+		vram = m_videoram2;
+	else
+		vram = m_videoram;
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		vram[i] = 0x0000;
+	}
+
 }
 
 
 READ16_MEMBER(twins_state::spider_port_18_r)
 {
-//	printf("spider_port_18_r %04x\n", mem_mask);
-
+	// read before each blitter command
+	// seems to put the bus in a state where the next 2 bus access offsets (anywhere) are the blitter params
 	m_spritesinit = 1;
 
 	return 0xff;
@@ -452,6 +533,7 @@ static ADDRESS_MAP_START( spider_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0010, 0x0011) AM_WRITE(spider_paloff0_w)
 
 	AM_RANGE(0x0018, 0x0019) AM_READ(spider_port_18_r)
+	AM_RANGE(0x001a, 0x001b) AM_WRITE(spider_port_1a_w)
 	AM_RANGE(0x001c, 0x001d) AM_WRITE(spider_port_1c_w)
 	AM_RANGE(0x001e, 0x001f) AM_READ(spider_port_1e_r)
 
@@ -475,7 +557,7 @@ static MACHINE_CONFIG_START( spider, twins_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
+	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_spider)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
