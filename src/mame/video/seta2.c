@@ -108,7 +108,7 @@
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::seta2_vregs_w)
+WRITE16_MEMBER(seta2_state::vregs_w)
 {
 	/* 02/04 = horizontal display start/end
 	           mj4simai = 0065/01E5 (0180 visible area)
@@ -441,7 +441,7 @@ void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(seta2_state,seta2)
+void seta2_state::video_start()
 {
 	m_gfxdecode->gfx(2)->set_granularity(16);
 	m_gfxdecode->gfx(3)->set_granularity(16);
@@ -452,26 +452,23 @@ VIDEO_START_MEMBER(seta2_state,seta2)
 
 	m_xoffset = 0;
 	m_yoffset = 0;
-
-	//TODO:FIX
-	//save_pointer(NAME(m_vregs), 0x40);
 }
 
-VIDEO_START_MEMBER(seta2_state,seta2_xoffset)
+VIDEO_START_MEMBER(seta2_state,xoffset)
 {
-	VIDEO_START_CALL_MEMBER(seta2);
-
+	video_start();
+	
 	m_xoffset = 0x200;
 }
 
-VIDEO_START_MEMBER(seta2_state,seta2_yoffset)
+VIDEO_START_MEMBER(seta2_state,yoffset)
 {
-	VIDEO_START_CALL_MEMBER(seta2);
-
+	video_start();
+	
 	m_yoffset = 0x10;
 }
 
-UINT32 seta2_state::screen_update_seta2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// Black or pen 0?
 	bitmap.fill(m_palette->pen(0), cliprect);
@@ -482,7 +479,7 @@ UINT32 seta2_state::screen_update_seta2(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-void seta2_state::screen_eof_seta2(screen_device &screen, bool state)
+void seta2_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

@@ -88,6 +88,14 @@ okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+okim9810_device::okim_voice *okim9810_device::get_voice(int which)
+{
+	which &= 8;
+	if (which < OKIM9810_VOICES)
+		return &m_voice[which];
+
+	return NULL;
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -103,8 +111,35 @@ void okim9810_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 
 	// save state stuff
-	// m_TMP_register
-	// m_voice
+	save_item(NAME(m_TMP_register));
+	save_item(NAME(m_global_volume));
+	save_item(NAME(m_filter_type));
+	save_item(NAME(m_output_level));
+	
+	for  (int i = 0; i < OKIM9810_VOICES; i++)
+	{
+		okim_voice *voice = get_voice(i);
+		
+		save_item(NAME(voice->m_adpcm.m_signal), i);
+		save_item(NAME(voice->m_adpcm.m_step), i);
+		save_item(NAME(voice->m_adpcm2.m_signal), i);
+		save_item(NAME(voice->m_adpcm2.m_step), i);
+		save_item(NAME(voice->m_playbackAlgo), i);
+		save_item(NAME(voice->m_looping), i);
+		save_item(NAME(voice->m_startFlags), i);
+		save_item(NAME(voice->m_endFlags), i);
+		save_item(NAME(voice->m_base_offset), i);
+		save_item(NAME(voice->m_count), i);
+		save_item(NAME(voice->m_samplingFreq), i);
+		save_item(NAME(voice->m_playing), i);
+		save_item(NAME(voice->m_sample), i);
+		save_item(NAME(voice->m_channel_volume), i);
+		save_item(NAME(voice->m_pan_volume_left), i);
+		save_item(NAME(voice->m_pan_volume_right), i);
+		save_item(NAME(voice->m_startSample), i);
+		save_item(NAME(voice->m_endSample), i);
+		save_item(NAME(voice->m_interpSampleNum), i);
+	}
 }
 
 

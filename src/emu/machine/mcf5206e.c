@@ -672,7 +672,7 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 	debuglogtimer("timer1_callback\n");
 	m_TER1 |= 0x02;
 
-	timer1->adjust(attotime::from_msec(10)); // completely made up value just to fire our timers for now
+	m_timer1->adjust(attotime::from_msec(10)); // completely made up value just to fire our timers for now
 }
 
 
@@ -703,11 +703,11 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 
 		if (m_TMR1 & 0x0001)
 		{
-			timer1->adjust(attotime::from_seconds(1)); // completely made up value just to fire our timers for now
+			m_timer1->adjust(attotime::from_seconds(1)); // completely made up value just to fire our timers for now
 		}
 		else
 		{
-			timer1->adjust(attotime::never);
+			m_timer1->adjust(attotime::never);
 		}
 
 
@@ -859,8 +859,26 @@ void mcf5206e_peripheral_device::device_start()
 {
 	init_regs(true);
 
-	timer1 = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( mcf5206e_peripheral_device::timer1_callback ), this) );
-
+	m_timer1 = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( mcf5206e_peripheral_device::timer1_callback ), this) );
+	
+	save_item(NAME(m_ICR));
+	save_item(NAME(m_CSAR));
+	save_item(NAME(m_CSMR));
+	save_item(NAME(m_CSCR));
+	save_item(NAME(m_DMCR));
+	save_item(NAME(m_PAR));
+	save_item(NAME(m_TMR1));
+	save_item(NAME(m_TRR1));
+	save_item(NAME(m_TER1));
+	save_item(NAME(m_TCN1));
+	save_item(NAME(m_PPDDR));
+	save_item(NAME(m_PPDAT));
+	save_item(NAME(m_IMR));
+	save_item(NAME(m_MBCR));
+	save_item(NAME(m_MBSR));
+	save_item(NAME(m_MFDR));
+	save_item(NAME(m_MBDR));
+	save_item(NAME(m_coldfire_regs));
 }
 
 void mcf5206e_peripheral_device::device_reset()
@@ -868,7 +886,7 @@ void mcf5206e_peripheral_device::device_reset()
 	m_cpu = (cpu_device*)machine().device(":maincpu"); // hack. this device should really be attached to a modern CPU core
 
 	init_regs(false);
-	timer1->adjust(attotime::never);
+	m_timer1->adjust(attotime::never);
 }
 
 READ32_MEMBER(mcf5206e_peripheral_device::dev_r)
