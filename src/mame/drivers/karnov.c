@@ -215,8 +215,13 @@ void karnov_state::chelnov_i8751_w( int data )
 	if (data == 0x100 && m_microcontroller_id == CHELNOVJ)   /* Japan version */
 		m_i8751_return = 0x71a;
 
-	if (data >= 0x6000 && data < 0x8000)
-		m_i8751_return = 1;  /* patched */
+	if ((data & 0xe000) == 0x6000) {
+		if (data & 0x1000) {
+			m_i8751_return = ((data & 0x0f) + ((data >> 4) & 0x0f)) * ((data >> 8) & 0x0f);
+		} else {
+			m_i8751_return = (data & 0x0f) * (((data >> 8) & 0x0f) + ((data >> 4) & 0x0f));
+		}
+	}
 
 	if ((data & 0xf000) == 0x1000) m_i8751_level = 1;        /* Level 1 */
 	if ((data & 0xf000) == 0x2000) m_i8751_level++;      /* Level Increment */
@@ -1283,7 +1288,6 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 
 	m_microcontroller_id = CHELNOV;
 	m_coin_mask = 0xe0;
-	RAM[0x0a26/2] = 0x4e71;  /* removes a protection lookup table */
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
@@ -1293,7 +1297,6 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 
 	m_microcontroller_id = CHELNOVU;
 	m_coin_mask = 0xe0;
-	RAM[0x0a26/2] = 0x4e71;  /* removes a protection lookup table */
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
@@ -1303,7 +1306,6 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovj)
 
 	m_microcontroller_id = CHELNOVJ;
 	m_coin_mask = 0xe0;
-	RAM[0x0a2e/2] = 0x4e71;  /* removes a protection lookup table */
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
