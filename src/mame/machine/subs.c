@@ -9,8 +9,19 @@
 
 
 /***************************************************************************
-subs_init_machine
+machine initialization
 ***************************************************************************/
+
+void subs_state::machine_start()
+{
+	save_item(NAME(m_steering_buf1));
+	save_item(NAME(m_steering_buf2));
+	save_item(NAME(m_steering_val1));
+	save_item(NAME(m_steering_val2));
+	save_item(NAME(m_last_val_1));
+	save_item(NAME(m_last_val_2));
+}
+
 void subs_state::machine_reset()
 {
 	m_steering_buf1 = 0;
@@ -20,9 +31,9 @@ void subs_state::machine_reset()
 }
 
 /***************************************************************************
-subs_interrupt
+interrupt
 ***************************************************************************/
-INTERRUPT_GEN_MEMBER(subs_state::subs_interrupt)
+INTERRUPT_GEN_MEMBER(subs_state::interrupt)
 {
 	/* only do NMI interrupt if not in TEST mode */
 	if ((ioport("IN1")->read() & 0x40)==0x40)
@@ -36,7 +47,7 @@ When D7 is high, the steering wheel has moved.
 If D6 is high, it moved left.  If D6 is low, it moved right.
 Be sure to keep returning a direction until steer_reset is called.
 ***************************************************************************/
-int subs_state::subs_steering_1()
+int subs_state::steering_1()
 {
 	int this_val;
 	int delta;
@@ -64,7 +75,7 @@ int subs_state::subs_steering_1()
 	return m_steering_val1;
 }
 
-int subs_state::subs_steering_2()
+int subs_state::steering_2()
 {
 	int this_val;
 	int delta;
@@ -93,18 +104,18 @@ int subs_state::subs_steering_2()
 }
 
 /***************************************************************************
-subs_steer_reset
+steer_reset
 ***************************************************************************/
-WRITE8_MEMBER(subs_state::subs_steer_reset_w)
+WRITE8_MEMBER(subs_state::steer_reset_w)
 {
 	m_steering_val1 = 0x00;
 	m_steering_val2 = 0x00;
 }
 
 /***************************************************************************
-subs_control_r
+control_r
 ***************************************************************************/
-READ8_MEMBER(subs_state::subs_control_r)
+READ8_MEMBER(subs_state::control_r)
 {
 	int inport = ioport("IN0")->read();
 
@@ -114,19 +125,19 @@ READ8_MEMBER(subs_state::subs_control_r)
 		case 0x01:      return ((inport & 0x02) << 6);  /* diag hold */
 		case 0x02:      return ((inport & 0x04) << 5);  /* slam */
 		case 0x03:      return ((inport & 0x08) << 4);  /* spare */
-		case 0x04:      return ((subs_steering_1() & 0x40) << 1);  /* steer dir 1 */
-		case 0x05:      return ((subs_steering_1() & 0x80) << 0);  /* steer flag 1 */
-		case 0x06:      return ((subs_steering_2() & 0x40) << 1);  /* steer dir 2 */
-		case 0x07:      return ((subs_steering_2() & 0x80) << 0);  /* steer flag 2 */
+		case 0x04:      return ((steering_1() & 0x40) << 1);  /* steer dir 1 */
+		case 0x05:      return ((steering_1() & 0x80) << 0);  /* steer flag 1 */
+		case 0x06:      return ((steering_2() & 0x40) << 1);  /* steer dir 2 */
+		case 0x07:      return ((steering_2() & 0x80) << 0);  /* steer flag 2 */
 	}
 
 	return 0;
 }
 
 /***************************************************************************
-subs_coin_r
+coin_r
 ***************************************************************************/
-READ8_MEMBER(subs_state::subs_coin_r)
+READ8_MEMBER(subs_state::coin_r)
 {
 	int inport = ioport("IN1")->read();
 
@@ -146,9 +157,9 @@ READ8_MEMBER(subs_state::subs_coin_r)
 }
 
 /***************************************************************************
-subs_options_r
+options_r
 ***************************************************************************/
-READ8_MEMBER(subs_state::subs_options_r)
+READ8_MEMBER(subs_state::options_r)
 {
 	int opts = ioport("DSW")->read();
 
@@ -164,17 +175,17 @@ READ8_MEMBER(subs_state::subs_options_r)
 }
 
 /***************************************************************************
-subs_lamp1_w
+lamp1_w
 ***************************************************************************/
-WRITE8_MEMBER(subs_state::subs_lamp1_w)
+WRITE8_MEMBER(subs_state::lamp1_w)
 {
 	set_led_status(machine(), 0,~offset & 1);
 }
 
 /***************************************************************************
-subs_lamp2_w
+lamp2_w
 ***************************************************************************/
-WRITE8_MEMBER(subs_state::subs_lamp2_w)
+WRITE8_MEMBER(subs_state::lamp2_w)
 {
 	set_led_status(machine(), 1,~offset & 1);
 }
