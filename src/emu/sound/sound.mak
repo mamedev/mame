@@ -161,6 +161,15 @@ ifneq ($(filter SB0400,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/sb0400.o
 endif
 
+#-------------------------------------------------
+# Creative Labs Ensonic AudioPCI97 ES1373
+#@src/emu/sound/es1373.h,SOUNDS += ES1373
+#-------------------------------------------------
+
+ifneq ($(filter ES1373,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/es1373.o
+endif
+
 
 
 #-------------------------------------------------
