@@ -40,7 +40,7 @@ Year + Game                       System    Protection
     Peek-a-Boo!                     D       Inputs
 ---------------------------------------------------------------------
 
-NOTE: Chimera Beast is the game game missing a dump of it's priority PROM
+NOTE: Chimera Beast is the only game missing a dump of its priority PROM
 
 
 Hardware    Main CPU    Sound CPU   Sound Chips
@@ -92,8 +92,8 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
                                 --------------
 
 - There is a 512 byte PROM in the video section (differs by game) that
-  controls the priorities. This prom is currently missing for two games,
-  so we have to use fake data for those two (64th Street & Chimera Beast).
+  controls the priorities. This prom is currently missing for one game,
+  so we have to use fake data for it (Chimera Beast).
 
 - Making the M6295 status register return 0 fixes the music tempo in
   avspirit, 64street, astyanax etc. but makes most of the effects in
@@ -106,6 +106,11 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 
 - 64street: player characters in attract mode doesn't move at all, protection?
   they move on the real PCB
+
+- tshingen: unemulated mosaic effect when killing enemies with the flashing sword.
+  See https://youtu.be/m4ZH0v8UqWs
+  The effect can be tested in e.g. stdragon and p47 test mode:
+  See https://youtu.be/zo3FTCqkNBc and https://youtu.be/dEqH017YBzw
 
 - Understand a handful of unknown bits in video regs
 
@@ -4130,8 +4135,8 @@ GAME( 1988, p47,      0,        system_A,          p47,      driver_device,  0, 
 GAME( 1988, p47j,     p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", 0 )
 GAME( 1988, p47je,    p47,      system_A,          p47,      driver_device,  0,        ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", 0 )
 GAME( 1988, kickoff,  0,        system_A,          kickoff,  driver_device,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
-GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", 0 )
-GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", 0 )
+GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, kazan,    0,        system_A,          kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
 GAME( 1988, iganinju, kazan,    system_A,          kazan,    megasys1_state, iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, astyanax, ROT0,   "Jaleco", "The Astyanax", 0 )
