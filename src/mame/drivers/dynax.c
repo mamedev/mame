@@ -4346,7 +4346,7 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
 static MACHINE_CONFIG_START( cdracula, dynax_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/4) /* 5.3693175MHz measured */
 	MCFG_CPU_PROGRAM_MAP(cdracula_mem_map)
 	MCFG_CPU_IO_MAP(cdracula_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
@@ -4358,7 +4358,7 @@ static MACHINE_CONFIG_START( cdracula, dynax_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(58.56)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16, 512-16-1, 16, 256-1)
@@ -4373,7 +4373,7 @@ static MACHINE_CONFIG_START( cdracula, dynax_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH) /* 1MHz measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -5035,7 +5035,7 @@ Castle Of Dracula
 
 Not a Dynax board:
 
-GoldStar Z8400A PS (4 MHz 40-pin plastic DIP)
+GoldStar Z8400A PS (40-pin plastic DIP)
 GoldStar GM68B45S
 TI TPC1020AFN-084C
 OKI M6295 (second OKI spot is unpopulated)
@@ -5043,6 +5043,12 @@ OKI M6295 (second OKI spot is unpopulated)
 PAL16L8ACN
 4 MHz & 21.47727 MHz XTALs
 
+Clocks:
+    Z80 - 5.359MHz measured (21.47727MHz/4)
+  M6295 - 1Mhz (4Mhz/4)
+
+ V-SYNC - 58.560 Hz
+ H-SYNC - 15.41 KHz
 ***************************************************************************/
 
 ROM_START( cdracula )
