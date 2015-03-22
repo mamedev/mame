@@ -74,38 +74,36 @@
 
 	<!-- outer bezel -->
 
-		<bezel element="text_count"><bounds x="2.6" y="2" width="8" height="3" /></bezel>
+		<bezel element="text_count"><bounds x="16" y="2" width="8" height="3" /></bezel>
 
-		<bezel element="text_s"><bounds x="2.5" y="7.2" width="2" height="2.5" /></bezel>
-		<bezel name="lamp40" element="led"><bounds x="6" y="7" width="3" height="3" /></bezel>
-		<bezel name="lamp41" element="led"><bounds x="10" y="7" width="3" height="3" /></bezel>
+		<bezel element="text_s"><bounds x="12.5" y="7.2" width="2" height="2.5" /></bezel>
+		<bezel name="lamp40" element="led"><bounds x="16" y="7" width="3" height="3" /></bezel>
+		<bezel name="lamp41" element="led"><bounds x="20" y="7" width="3" height="3" /></bezel>
 
-		<bezel element="text_b"><bounds x="2.5" y="11.2" width="2" height="2.5" /></bezel>
-		<bezel name="lamp50" element="led"><bounds x="6" y="11" width="3" height="3" /></bezel>
-		<bezel name="lamp51" element="led"><bounds x="10" y="11" width="3" height="3" /></bezel>
-		<bezel name="lamp52" element="led"><bounds x="14" y="11" width="3" height="3" /></bezel>
+		<bezel element="text_b"><bounds x="12.5" y="11.2" width="2" height="2.5" /></bezel>
+		<bezel name="lamp50" element="led"><bounds x="16" y="11" width="3" height="3" /></bezel>
+		<bezel name="lamp51" element="led"><bounds x="20" y="11" width="3" height="3" /></bezel>
+		<bezel name="lamp52" element="led"><bounds x="24" y="11" width="3" height="3" /></bezel>
 
-		<bezel element="text_o"><bounds x="2.5" y="15.2" width="2" height="2.5" /></bezel>
-		<bezel name="lamp42" element="led"><bounds x="6" y="15" width="3" height="3" /></bezel>
-		<bezel name="lamp43" element="led"><bounds x="10" y="15" width="3" height="3" /></bezel>
+		<bezel element="text_o"><bounds x="12.5" y="15.2" width="2" height="2.5" /></bezel>
+		<bezel name="lamp42" element="led"><bounds x="16" y="15" width="3" height="3" /></bezel>
+		<bezel name="lamp43" element="led"><bounds x="20" y="15" width="3" height="3" /></bezel>
 
-		<bezel element="text_inning"><bounds x="20" y="2" width="12" height="3" /></bezel>
-		<bezel name="digit0" element="digit"><bounds x="22" y="9" width="6" height="9" /></bezel>
+		<bezel element="text_inning"><bounds x="52" y="2" width="12" height="3" /></bezel>
+		<bezel element="text_visitor"><bounds x="66" y="2" width="13" height="3" /></bezel>
+		<bezel element="text_home2"><bounds x="82" y="2" width="13" height="3" /></bezel>
 
-		<bezel element="text_home2"><bounds x="85" y="2" width="13" height="3" /></bezel>
-		<bezel element="text_visitor"><bounds x="71" y="2" width="14" height="3" /></bezel>
+		<bezel element="static_white2"><bounds x="79.5" y="2" width="0.5" height="16" /></bezel>
 
-		<bezel element="static_white2"><bounds x="71.5" y="6.5" width="26.5" height="0.5" /></bezel>
-		<bezel element="static_white2"><bounds x="84.5" y="6.6" width="0.5" height="13.9" /></bezel>
+		<bezel name="digit0" element="digit"><bounds x="54" y="7" width="7.333" height="11" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="70" y="7" width="7.333" height="11" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="86" y="7" width="7.333" height="11" /></bezel>
 
-		<bezel name="digit1" element="digit"><bounds x="76.5" y="12" width="6" height="9" /></bezel>
-		<bezel name="digit2" element="digit"><bounds x="90" y="12" width="6" height="9" /></bezel>
+		<bezel name="lamp33" element="led"><bounds x="66" y="7" width="3" height="3" /></bezel>
+		<bezel name="lamp32" element="led"><bounds x="82" y="7" width="3" height="3" /></bezel>
 
-		<bezel name="lamp33" element="led"><bounds x="78.3" y="8" width="3" height="3" /></bezel>
-		<bezel name="lamp32" element="led"><bounds x="91.8" y="8" width="3" height="3" /></bezel>
-
-		<bezel name="lamp31" element="led"><bounds x="72.5" y="15" width="3" height="3" /></bezel>
-		<bezel name="lamp30" element="led"><bounds x="86" y="15" width="3" height="3" /></bezel>
+		<bezel name="lamp31" element="led"><bounds x="66" y="13" width="3" height="3" /></bezel>
+		<bezel name="lamp30" element="led"><bounds x="82" y="13" width="3" height="3" /></bezel>
 
 
 	<!-- board -->

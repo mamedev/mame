@@ -48,7 +48,7 @@
  *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
- *MP7332   TMS1400  1981, Milton Bradley Dark Tower
+ @MP7332   TMS1400  1981, Milton Bradley Dark Tower
  @MP7334   TMS1400  1981, Coleco Total Control 4
 
   inconsistent:
@@ -84,9 +84,10 @@
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
+#include "mbdtower.lh"
 #include "merlin.lh" // clickable
 #include "simon.lh" // clickable
-#include "ssimon.lh" // clickable
+#include "ssimon.lh"
 #include "splitsec.lh"
 #include "starwbc.lh"
 #include "stopthie.lh"
@@ -193,6 +194,10 @@ public:
 	DECLARE_WRITE16_MEMBER(ssimon_write_r);
 	DECLARE_WRITE16_MEMBER(ssimon_write_o);
 	DECLARE_READ8_MEMBER(ssimon_read_k);
+
+	DECLARE_WRITE16_MEMBER(mbdtower_write_r);
+	DECLARE_WRITE16_MEMBER(mbdtower_write_o);
+	DECLARE_READ8_MEMBER(mbdtower_read_k);
 
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);
@@ -1678,6 +1683,56 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Milton Bradley Dark Tower
+  * TMS1400 MP7332-N2LL (die labeled MP7332)
+
+  x
+
+***************************************************************************/
+
+WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_r)
+{
+}
+
+WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_o)
+{
+}
+
+READ8_MEMBER(hh_tms1k_state::mbdtower_read_k)
+{
+	return 0;
+}
+
+
+static INPUT_PORTS_START( mbdtower )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( mbdtower, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, 400000) // approximation - RC osc. R=43K, C=56pf, but unknown RC curve
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, mbdtower_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, mbdtower_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, mbdtower_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Code Name: Sector, by Bob Doyle
   * TMS0970 MCU, MP0905BNL ZA0379 (die labeled 0970F-05B)
 
@@ -2455,6 +2510,17 @@ ROM_START( ssimon )
 ROM_END
 
 
+ROM_START( mbdtower )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7332", 0x0000, 0x1000, CRC(ebeab91a) SHA1(7edbff437da371390fa8f28b3d183f833eaa9be9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_mbdtower_opla.pla", 0, 557, CRC(64c84697) SHA1(72ce6d24cedf9c606f1742cd5620f75907246e87) )
+ROM_END
+
+
 ROM_START( cnsector )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
@@ -2562,6 +2628,7 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1981, mbdtower,  0,        0, mbdtower,  mbdtower,  driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // ***
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )
