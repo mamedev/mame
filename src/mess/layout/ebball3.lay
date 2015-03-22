@@ -121,7 +121,7 @@
 
 	<!-- outer bezel -->
 
-		<bezel element="text_count"><bounds x="6" y="2" width="8" height="3" /></bezel>
+		<bezel element="text_count"><bounds x="2.6" y="2" width="8" height="3" /></bezel>
 
 		<bezel element="text_s"><bounds x="2.5" y="7.2" width="2" height="2.5" /></bezel>
 		<bezel name="lamp40" element="led"><bounds x="6" y="7" width="3" height="3" /></bezel>
@@ -155,6 +155,8 @@
 		<bezel name="digit10" element="digit"><bounds x="84" y="1.5" width="6" height="9" /></bezel>
 		<bezel name="digit1" element="digit"><bounds x="90" y="1.5" width="6" height="9" /></bezel>
 		<bezel element="text_v"><bounds x="85" y="7.3" width="3" height="3" /></bezel>
+
+		<bezel element="static_white2"><bounds x="82.5" y="1.5" width="0.5" height="9" /></bezel>
 
 
 	<!-- board -->
