@@ -78,6 +78,10 @@ public:
 	DECLARE_WRITE16_MEMBER(paloff_w);
 	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
 	DECLARE_WRITE16_MEMBER(paldat_w);
+
+	DECLARE_WRITE16_MEMBER(port10_w);
+	UINT16 m_port10;
+
 	DECLARE_DRIVER_INIT(ttchamp);
 
 	DECLARE_READ16_MEMBER(ttchamp_blit_start_r);
@@ -85,7 +89,12 @@ public:
 	DECLARE_READ16_MEMBER(ttchamp_mem_r);
 	DECLARE_WRITE16_MEMBER(ttchamp_mem_w);
 
-	UINT16 m_videoram[0x10000 / 2];
+	UINT16 m_videoram0[0x10000 / 2];
+	UINT16 m_videoram1[0x10000 / 2];
+	UINT16 m_videoram2[0x10000 / 2];
+
+
+
 	UINT16 m_mainram[0x10000 / 2];
 
 	int m_spritesinit;
@@ -116,6 +125,7 @@ void ttchamp_state::video_start()
 
 UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	logerror("update\n");
 	int y,x,count;
 
 	static const int xxx=320,yyy=204;
@@ -123,7 +133,7 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 	bitmap.fill(m_palette->black_pen());
 
 	count=0;
-	UINT8 *videoram = (UINT8*)m_videoram;
+	UINT8 *videoram = (UINT8*)m_videoram0;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -132,6 +142,41 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 			count++;
 		}
 	}
+
+	count=0;
+	videoram = (UINT8*)m_videoram1;
+	for (y=0;y<yyy;y++)
+	{
+		for(x=0;x<xxx;x++)
+		{
+			UINT8 pix = videoram[BYTE_XOR_LE(count)];
+			if (pix) bitmap.pix16(y, x) = pix+0x200;
+			count++;
+		}
+	}
+
+	count=0;
+	videoram = (UINT8*)m_videoram2;
+	for (y=0;y<yyy;y++)
+	{
+		for(x=0;x<xxx;x++)
+		{
+			UINT8 pix = videoram[BYTE_XOR_LE(count)];
+			if (pix) bitmap.pix16(y, x) = pix+0x000;
+			count++;
+		}
+	}
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		// how are layers cleared?
+		// I think it actually does more blit operations with
+		// different bits of m_port10 set to redraw the backgrounds using the video ram data as a source rather than ROM - notice the garbage you see behind 'sprites' right now
+		// this method also removes the text layer, which we don't want
+		m_videoram1[i] = 0x0000;
+		m_videoram2[i] = 0x0000;
+	}
+
 	return 0;
 }
 
@@ -151,11 +196,20 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 
 READ16_MEMBER(ttchamp_state::ttchamp_mem_r)
 {
+	// bits 0xf0 are used too, so this is likely wrong.
+
 	UINT16* vram;
-//	if (m_videorambank & 1)
-//		vram = m_videoram2;
-//	else
-		vram = m_videoram;
+	if ((m_port10&0xf) == 0x00)
+		vram = m_videoram0;
+	else if ((m_port10&0xf)  == 0x01)
+		vram = m_videoram1;
+	else if ((m_port10&0xf)  == 0x03)
+		vram = m_videoram2;
+	else
+	{
+		printf("unhandled video bank %02x\n", m_port10);
+		vram = m_videoram2;
+	}
 
 	if (offset < 0x10000 / 2)
 	{
@@ -176,11 +230,22 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
 	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
+
+	// bits 0xf0 are used too, so this is likely wrong.
+
 	UINT16* vram;
-//	if (m_videorambank & 1)
-//		vram = m_videoram2;
-//	else
-		vram = m_videoram;
+	if ((m_port10&0xf)  == 0x00)
+		vram = m_videoram0;
+	else if ((m_port10&0xf)  == 0x01)
+		vram = m_videoram1;
+	else if ((m_port10&0xf)  == 0x03)
+		vram = m_videoram2;
+	else
+	{
+		printf("unhandled video bank %02x\n", m_port10);
+		vram = m_videoram2;
+	}
+
 
 	if (m_spritesinit == 1)
 	{
@@ -216,6 +281,9 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 			UINT8 *src = m_rom8;
 
+			if (m_port10 & 2) // NO, wrong for the portraits
+				src += 0x100000;
+
 		//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
@@ -243,7 +311,7 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 		}
 		else
 		{
-			printf("spider_blitter_w unhandled RAM access %08x %04x %04x\n", offset * 2, data, mem_mask);
+			logerror("spider_blitter_w unhandled RAM access %08x %04x %04x\n", offset * 2, data, mem_mask);
 		}
 	}
 }
@@ -258,23 +326,28 @@ static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(ttchamp_mem_r, ttchamp_mem_w)
 ADDRESS_MAP_END
 
+WRITE16_MEMBER(ttchamp_state::port10_w)
+{
+	COMBINE_DATA(&m_port10);
+}
+
+
 static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITENOP
+//	AM_RANGE(0x0000, 0x0001) AM_WRITENOP
 
 	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
 
 
 	AM_RANGE(0x0018, 0x0019) AM_READ(ttchamp_blit_start_r)
-//  AM_RANGE(0x001e, 0x001f) AM_READ(peno_rand2)
+	AM_RANGE(0x001e, 0x001f) AM_READNOP // read before each line is blit
 
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
 	AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w)
 
-//  AM_RANGE(0x0010, 0x0010) AM_WRITE(pcup_prgbank_w)
-	AM_RANGE(0x0010, 0x0011) AM_WRITENOP
+	AM_RANGE(0x0010, 0x0011) AM_WRITE(port10_w)
 
-	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
+//	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
 
 //	AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP
 ADDRESS_MAP_END
@@ -406,5 +479,5 @@ DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 //	membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart", "Table Tennis Champions (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_NOT_WORKING|GAME_NO_SOUND ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_NOT_WORKING|GAME_NO_SOUND ) // this only has Palencia Elektronik advertising boards
