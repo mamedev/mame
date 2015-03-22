@@ -15,7 +15,7 @@
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
  *MP0168   TMS1000? 1979, Conic Basketball
  @MP0914   TMS1000  1979, Entex Baseball 1
- *MP0923   TMS1000? 1979, Entex Baseball 2
+ @MP0923   TMS1000  1979, Entex Baseball 2
  @MP1030   TMS1100  1980, APF Mathemagician
  *MP1133   TMS1470  1979, Kosmos Astro
  @MP1204   TMS1100  1980, Entex Baseball 3
@@ -79,6 +79,7 @@
 #include "bankshot.lh"
 #include "cnsector.lh"
 #include "ebball.lh"
+#include "ebball2.lh"
 #include "ebball3.lh"
 #include "elecdet.lh"
 #include "comp4.lh"
@@ -157,6 +158,10 @@ public:
 	DECLARE_WRITE16_MEMBER(ebball_write_r);
 	DECLARE_WRITE16_MEMBER(ebball_write_o);
 	DECLARE_READ8_MEMBER(ebball_read_k);
+
+	DECLARE_WRITE16_MEMBER(ebball2_write_r);
+	DECLARE_WRITE16_MEMBER(ebball2_write_o);
+	DECLARE_READ8_MEMBER(ebball2_read_k);
 
 	void ebball3_display();
 	DECLARE_WRITE16_MEMBER(ebball3_write_r);
@@ -934,6 +939,67 @@ static MACHINE_CONFIG_START( ebball, hh_tms1k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+
+
+
+
+/***************************************************************************
+
+  Entex Electronic Baseball 2
+  * TMS1000 MP0923 (die labeled MP0923)
+
+
+  lamp translation table: led zz from game PCB = MESS lampyx:
+  
+    00 = -        10 = lamp94   20 = lamp74   30 = lamp50
+    01 = lamp53   11 = lamp93   21 = lamp75   31 = lamp51
+    02 = lamp07   12 = lamp92   22 = lamp80   32 = lamp52
+    03 = lamp17   13 = lamp62   23 = lamp81   33 = lamp40
+    04 = lamp27   14 = lamp70   24 = lamp82   34 = lamp41
+    05 = lamp97   15 = lamp71   25 = lamp83   35 = lamp31
+    06 = lamp90   16 = lamp61   26 = lamp84   36 = lamp30
+    07 = lamp95   17 = lamp72   27 = lamp85   37 = lamp33
+    08 = lamp63   18 = lamp73   28 = lamp42   38 = lamp32
+    09 = lamp91   19 = lamp60   29 = lamp43
+
+***************************************************************************/
+
+WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
+{
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball2_write_o)
+{
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball2_read_k)
+{
+	return 0;
+}
+
+
+static INPUT_PORTS_START( ebball2 )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( ebball2, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball2_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball2_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball2_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ebball)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -2190,6 +2256,17 @@ ROM_START( ebball )
 ROM_END
 
 
+ROM_START( ebball2 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0923", 0x0000, 0x0400, CRC(077acfe2) SHA1(a294ce7614b2cdb01c754a7a50d60d807e3f0939) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ebball2_mpla.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ebball2_opla.pla", 0, 365, CRC(adcd73d1) SHA1(d69e590d288ef99293d86716498f3971528e30de) )
+ROM_END
+
+
 ROM_START( ebball3 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
@@ -2359,6 +2436,7 @@ CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Col
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
+CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
