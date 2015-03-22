@@ -159,6 +159,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ebball_write_o);
 	DECLARE_READ8_MEMBER(ebball_read_k);
 
+	void ebball2_display();
 	DECLARE_WRITE16_MEMBER(ebball2_write_r);
 	DECLARE_WRITE16_MEMBER(ebball2_write_o);
 	DECLARE_READ8_MEMBER(ebball2_read_k);
@@ -946,14 +947,20 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Electronic Baseball 2
-  * TMS1000 MP0923 (die labeled MP0923)
+  * boards are labeled: ZENY
+  * TMS1000 MCU, MP0923 (die labeled MP0923)
+  
+  The Japanese version was published by Gakken, black casing instead of white.
+  
+  The sequel to Entex Baseball, this version keeps up with score and innings.
+  As its predecessor, the pitcher controls are on a separate joypad.
 
 
   lamp translation table: led zz from game PCB = MESS lampyx:
   
     00 = -        10 = lamp94   20 = lamp74   30 = lamp50
     01 = lamp53   11 = lamp93   21 = lamp75   31 = lamp51
-    02 = lamp07   12 = lamp92   22 = lamp80   32 = lamp52
+    02 = lamp7    12 = lamp92   22 = lamp80   32 = lamp52
     03 = lamp17   13 = lamp62   23 = lamp81   33 = lamp40
     04 = lamp27   14 = lamp70   24 = lamp82   34 = lamp41
     05 = lamp97   15 = lamp71   25 = lamp83   35 = lamp31
@@ -964,16 +971,38 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+void hh_tms1k_state::ebball2_display()
+{
+	// the first 3 are 7segs
+	for (int y = 0; y < 3; y++)
+		m_display_segmask[y] = 0x7f;
+	
+	display_matrix(8, 10, ~m_o, m_r);
+}
+
 WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
 {
+	// R3-R6: input mux
+	m_inp_mux = data >> 3 & 0xf;
+	
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+	
+	// R0-R9: led columns
+	m_r = data;
+	ebball2_display();
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball2_write_o)
 {
+	// O0-O7: led row/segment
+	m_o = data;
+	ebball2_display();
 }
 
 READ8_MEMBER(hh_tms1k_state::ebball2_read_k)
 {
+	if (m_inp_mux&1) return 2;
 	return 0;
 }
 
@@ -991,7 +1020,7 @@ static MACHINE_CONFIG_START( ebball2, hh_tms1k_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball2_write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_ebball)
+	MCFG_DEFAULT_LAYOUT(layout_ebball2)
 
 	/* no video! */
 
@@ -1008,13 +1037,12 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Electronic Baseball 3
-  * boards are labeled: Zeny
+  * boards are labeled: ZENY
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
   * 2*SN75492N LED display driver
   
   This is another improvement over Entex Baseball, where gameplay is a bit more
-  varied, and it keeps up with score and innings. Like the others, the pitcher
-  controls are on a separate joypad.
+  varied. Like the others, the pitcher controls are on a separate joypad.
 
 
   lamp translation table: led zz from game PCB = MESS lampyx:
@@ -1575,7 +1603,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Parker Brothers Code Name: Sector, by Bob Doyle
-  * MP0905BNL ZA0379 (die labeled 0970F-05B)
+  * TMS0970 MCU, MP0905BNL ZA0379 (die labeled 0970F-05B)
 
   This is a tabletop submarine pursuit game. A grid board and small toy
   boats are used to remember your locations (a Paint app should be ok too).
@@ -2067,7 +2095,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
-  * TMS1100 CD7282SL
+  * TMS1100 MCU, labeled CD7282SL
 
   This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
   by the Japanese company Mego Corp. in 1980, which in turn is a mix of Merlin
