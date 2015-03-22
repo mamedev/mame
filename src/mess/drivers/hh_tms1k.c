@@ -35,7 +35,7 @@
   MP3457   TMS1100  1979, MicroVision cartridge: Mindbuster
   MP3474   TMS1100  1979, MicroVision cartridge: Vegas Slots
   MP3475   TMS1100  1979, MicroVision cartridge: Bowling
- *MP3476   TMS1100  1979, Milton Bradley Super Simon
+ @MP3476   TMS1100  1979, Milton Bradley Super Simon
   MP3479   TMS1100  1980, MicroVision cartridge: Baseball
   MP3481   TMS1100  1979, MicroVision cartridge: Connect Four
   MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
@@ -86,6 +86,7 @@
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
 #include "simon.lh" // clickable
+#include "ssimon.lh" // clickable
 #include "splitsec.lh"
 #include "starwbc.lh"
 #include "stopthie.lh"
@@ -188,6 +189,10 @@ public:
 	DECLARE_WRITE16_MEMBER(simon_write_r);
 	DECLARE_WRITE16_MEMBER(simon_write_o);
 	DECLARE_READ8_MEMBER(simon_read_k);
+
+	DECLARE_WRITE16_MEMBER(ssimon_write_r);
+	DECLARE_WRITE16_MEMBER(ssimon_write_o);
+	DECLARE_READ8_MEMBER(ssimon_read_k);
 
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);
@@ -1535,7 +1540,7 @@ MACHINE_CONFIG_END
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
   instead of the TMS1000. This one has been decapped too, but we couldn't
   find an internal ROM. It is possibly a cost-reduced custom ASIC specifically
-  for Simon. The semi-sequel Super Simon uses a TMS1100.
+  for Simon. The semi-sequel Super Simon uses a TMS1100 (see next minidriver).
 
 ***************************************************************************/
 
@@ -1607,6 +1612,57 @@ static MACHINE_CONFIG_START( simon, hh_tms1k_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_simon)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Milton Bradley Super Simon
+  * TMS1100 MP3476NLL (die labeled MP3476)
+
+  x
+
+***************************************************************************/
+
+WRITE16_MEMBER(hh_tms1k_state::ssimon_write_r)
+{
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ssimon_write_o)
+{
+	// N/C
+}
+
+READ8_MEMBER(hh_tms1k_state::ssimon_read_k)
+{
+	return 0;
+}
+
+
+static INPUT_PORTS_START( ssimon )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( ssimon, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ssimon_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ssimon_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ssimon_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ssimon)
 
 	/* no video! */
 
@@ -2383,8 +2439,19 @@ ROM_START( simon )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_simon_mpla.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1000_simon_opla.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
+ROM_END
+
+
+ROM_START( ssimon )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "mp3476", 0x0000, 0x800, CRC(98200571) SHA1(cbd0bcfc11a534aa0be5d011584cdcac58ff437a) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1100_ssimon_opla.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
 ROM_END
 
 
@@ -2494,6 +2561,7 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
+CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )
