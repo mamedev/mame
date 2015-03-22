@@ -859,7 +859,7 @@ void hh_tms1k_state::ebball_display()
 	// R8 is a 7seg
 	m_display_segmask[8] = 0x7f;
 	
-	display_matrix(7, 9, ~m_o, m_r);
+	display_matrix(7, 9, m_o, m_r);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
@@ -879,7 +879,7 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
 {
 	// O0-O6: led row
 	// O7: N/C
-	m_o = data;
+	m_o = ~data;
 	ebball_display();
 }
 
@@ -977,7 +977,7 @@ void hh_tms1k_state::ebball2_display()
 	for (int y = 0; y < 3; y++)
 		m_display_segmask[y] = 0x7f;
 	
-	display_matrix(8, 10, ~m_o, m_r);
+	display_matrix(8, 10, m_o, m_r);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
@@ -989,25 +989,45 @@ WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
 	m_speaker->level_w(data >> 10 & 1);
 	
 	// R0-R9: led columns
-	m_r = data;
+	m_r = data ^ 0x7f;
 	ebball2_display();
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball2_write_o)
 {
 	// O0-O7: led row/segment
-	m_o = data;
+	m_o = ~data;
 	ebball2_display();
 }
 
 READ8_MEMBER(hh_tms1k_state::ebball2_read_k)
 {
-	if (m_inp_mux&1) return 2;
-	return 0;
+	return read_inputs(4);
 }
 
 
 static INPUT_PORTS_START( ebball2 )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Pitcher" )
+	PORT_CONFSETTING(    0x02, "Auto" )
+	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
+
+	PORT_START("IN.1") // R4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Steal")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Slider")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Knuckler")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Curve")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 

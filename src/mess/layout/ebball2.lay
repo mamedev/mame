@@ -113,15 +113,15 @@
 		<bezel element="disk_black"><bounds x="91.3" y="44.7" width="10" height="10" /></bezel>
 		<bezel name="lamp81" element="led"><bounds x="2.2" y="48.2" width="3" height="3" /></bezel>
 		<bezel name="lamp85" element="led"><bounds x="94.8" y="48.2" width="3" height="3" /></bezel>
-		<bezel element="text_triple"><bounds x="2.2" y="44.5" width="3" height="2.5" /></bezel>
-		<bezel element="text_double"><bounds x="94.8" y="44.5" width="3" height="2.5" /></bezel>
+		<bezel element="text_single"><bounds x="2.2" y="44.5" width="3" height="2.5" /></bezel>
+		<bezel element="text_single"><bounds x="94.8" y="44.5" width="3" height="2.5" /></bezel>
 
 		<bezel element="disk_black"><bounds x="18.5" y="26.5" width="10" height="10" /></bezel>
 		<bezel element="disk_black"><bounds x="71.5" y="26.5" width="10" height="10" /></bezel>
 		<bezel name="lamp82" element="led"><bounds x="22" y="30" width="3" height="3" /></bezel>
 		<bezel name="lamp84" element="led"><bounds x="75" y="30" width="3" height="3" /></bezel>
-		<bezel element="text_single"><bounds x="22" y="26.3" width="3" height="2.5" /></bezel>
-		<bezel element="text_single"><bounds x="75" y="26.3" width="3" height="2.5" /></bezel>
+		<bezel element="text_triple"><bounds x="22" y="26.3" width="3" height="2.5" /></bezel>
+		<bezel element="text_double"><bounds x="75" y="26.3" width="3" height="2.5" /></bezel>
 
 		<bezel element="disk_white2"><bounds x="45" y="20" width="10" height="10" /></bezel>
 		<bezel element="disk_black"><bounds x="45.5" y="20.5" width="9" height="9" /></bezel>
