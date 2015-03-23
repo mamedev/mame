@@ -195,9 +195,13 @@ public:
 	DECLARE_WRITE16_MEMBER(ssimon_write_o);
 	DECLARE_READ8_MEMBER(ssimon_read_k);
 
+	bool m_dtower_motor_on;
+	bool m_dtower_sensor;
+	void mbdtower_display();
 	DECLARE_WRITE16_MEMBER(mbdtower_write_r);
 	DECLARE_WRITE16_MEMBER(mbdtower_write_o);
 	DECLARE_READ8_MEMBER(mbdtower_read_k);
+	DECLARE_MACHINE_START(mbdtower);
 
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);
@@ -1540,7 +1544,8 @@ MACHINE_CONFIG_END
   Milton Bradley Simon, created by Ralph Baer
 
   Revision A hardware:
-  * TMS1000 (die labeled MP3226), DS75494 lamp driver
+  * TMS1000 (die labeled MP3226)
+  * DS75494 lamp driver
 
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
   instead of the TMS1000. This one has been decapped too, but we couldn't
@@ -1684,29 +1689,101 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Dark Tower
-  * TMS1400 MP7332-N2LL (die labeled MP7332)
+  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
+  * SN75494N MOS-to-LED digit driver
 
   x
 
 ***************************************************************************/
 
+void hh_tms1k_state::mbdtower_display()
+{
+}
+
 WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_r)
 {
+	// R0-R2: input mux
+	m_inp_mux = data & 7;
+	
+	// R3: N/C
+	// R4: 75494 enable (speaker, lamps, digit select go through that IC)
+	// R5-R7: tower lamps
+	// R8: rotation sensor led
+	// R9: motor on
+	
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_o)
 {
+	// O0-O6: led segments A-G
+	// O7: digit select
+	m_o = data;
 }
 
 READ8_MEMBER(hh_tms1k_state::mbdtower_read_k)
 {
-	return 0;
+	// rotation sensor is on K8
+	
+	return read_inputs(3);
 }
 
 
+/* physical button layout and labels is like this:
+
+    (green)     (l.blue)    (red)
+    [YES/       [REPEAT]    [NO/
+     BUY]                    END]
+    
+    (yellow)    (blue)      (white)
+    [HAGGLE]    [BAZAAR]    [CLEAR]
+    
+    (blue)      (blue)      (blue)
+    [TOMB/      [MOVE]      [SANCTUARY/
+     RUIN]                   CITADEL]
+    
+    (orange)    (blue)      (d.yellow)
+    [DARK       [FRONTIER]  [INVENTORY]
+     TOWER]
+*/
+
 static INPUT_PORTS_START( mbdtower )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Inventory")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("No/End")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Clear")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Sanctuary/Citadel")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Frontier")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Repeat")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Bazaar")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Move")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Dark Tower")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Yes/Buy")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Haggle")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Tomb/Ruin")
 INPUT_PORTS_END
 
+
+/* tower motor simulation:
+
+*/
+
+MACHINE_START_MEMBER(hh_tms1k_state, mbdtower)
+{
+	machine_start();
+	
+	// zerofill/register for savestates
+	m_dtower_motor_on = false;
+	m_dtower_sensor = false;
+	
+	save_item(NAME(m_dtower_motor_on));
+	save_item(NAME(m_dtower_sensor));
+}
 
 static MACHINE_CONFIG_START( mbdtower, hh_tms1k_state )
 
@@ -1718,6 +1795,8 @@ static MACHINE_CONFIG_START( mbdtower, hh_tms1k_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
+
+	MCFG_MACHINE_START_OVERRIDE(hh_tms1k_state, mbdtower)
 
 	/* no video! */
 
