@@ -33,7 +33,11 @@ public:
 
 	// required overrides
 	virtual void reset();
+#ifdef ANDROID
+	virtual int execute(uml::code_handle &entry) __attribute__((optimize("-O0")));
+#else
 	virtual int execute(uml::code_handle &entry);
+#endif
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst);
 	virtual bool hash_exists(UINT32 mode, UINT32 pc);
 	virtual void get_info(drcbe_info &info);
