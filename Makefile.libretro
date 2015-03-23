@@ -10,18 +10,20 @@
 #
 ###########################################################################
 
-# Try to determine libretro $(platform) if not provided to us
+# Try to determine libretro $(platform) if it's either not provided to us,
+# or if the user explicitly passes platform="" (i.e., for native buildtools
+# in a cross-compile)
 UNAME = $(shell uname -a)
 ifeq ($(platform),)
-	platform = unix
+	override platform = unix
 	ifeq ($(UNAME),)
-		platform = win
+		override platform = win
 	else ifneq ($(findstring MINGW,$(UNAME)),)
-		platform = win
+		override platform = win
 	else ifneq ($(findstring Darwin,$(UNAME)),)
-		platform = osx
+		override platform = osx
 	else ifneq ($(findstring win,$(UNAME)),)
-		platform = win
+		override platform = win
 	endif
 endif
 
@@ -127,8 +129,13 @@ retro-default: maketree retro-buildtools emulator
 ifeq ($(CROSS_BUILD),1)
 # Recursive make call without specifying platform so that host compilers are
 # used for buildtools. Must use Makefile.libretro here because of REALCC.
+
+HOST_CC ?= cc
+HOST_CXX ?= c++
+
 retro-buildtools:
-	$(MAKE) -f Makefile.libretro buildtools
+
+	$(MAKE) -f Makefile.libretro platform="" CC=$(HOST_CXX) REALCC=$(HOST_CC) retro-buildtools
 else
 retro-buildtools: buildtools
 endif
@@ -161,9 +168,10 @@ ifeq ($(platform), unix)
 	LDFLAGS +=  $(fpic) $(SHARED)
 	REALCC = cc
 	BASELIBS +=  -lpthread
-	CC = g++
-	AR = @ar
-	LD = g++
+	REALCC := gcc
+	CC := g++
+	AR := @ar
+	LD := g++
 	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++ -lpthread -ldl
 	ifneq (,$(findstring ppc,$(UNAME)))
@@ -179,10 +187,10 @@ else ifeq ($(platform), android)
 	TARGETLIB := $(TARGET)_libretro.so
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
-	REALCC = @arm-linux-androideabi-gcc
-	CC = @arm-linux-androideabi-g++
-	AR = @arm-linux-androideabi-ar
-	LD = @arm-linux-androideabi-g++
+	REALCC := @arm-linux-androideabi-gcc
+	CC := @arm-linux-androideabi-g++
+	AR := @arm-linux-androideabi-ar
+	LD := @arm-linux-androideabi-g++
 	CCOMFLAGS += -fPIC -mstructure-size-boundary=32 -mthumb-interwork -falign-functions=16 -fsigned-char -finline  -fno-common -fno-builtin -fweb -frename-registers -falign-functions=16
 	PLATCFLAGS += -march=armv7-a -mfloat-abi=softfp -DANDROID -DALIGN_INTS -DALIGN_SHORTS -DLSB_FIRST -fstrict-aliasing -fno-merge-constants -DSDLMAME_NO64BITIO -DSDLMAME_ARM -DRETRO_SETJMP_HACK
 	ifeq ($(VRENDER),opengl)
@@ -202,12 +210,12 @@ else ifeq ($(platform), osx)
 	PLATCFLAGS += $(fpic)
 	SHARED := -dynamiclib
 	# Uses gcc or clang, whichever is default
-	CXX_AS = c++
-	REALCC = cc
-	CC = $(CXX_AS) -stdlib=$(LIBCXX)
-	LD = $(CXX_AS) -stdlib=$(LIBCXX)
+	CXX_AS := c++
+	REALCC := cc
+	CC := $(CXX_AS) -stdlib=$(LIBCXX)
+	LD := $(CXX_AS) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
-	AR = @ar
+	AR := @ar
 	ifeq ($(COMMAND_MODE),"legacy")
 		ARFLAGS = -crs
 	endif
@@ -243,9 +251,9 @@ else ifeq ($(platform), qnx)
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=src/osd/retro/link.T
 
-	CC = qcc -Vgcc_ntoarmv7le
-	REALCC = qcc -Vgcc_ntoarmv7le
-	AR = qcc -Vgcc_ntoarmv7le
+	CC := qcc -Vgcc_ntoarmv7le
+	REALCC := qcc -Vgcc_ntoarmv7le
+	AR := qcc -Vgcc_ntoarmv7le
 	CFLAGS += -D__BLACKBERRY_QNX__
 	LIBS += -lstdc++ -lpthread
 
@@ -362,9 +370,9 @@ else ifeq ($(platform), qnx)
 else ifeq ($(platform), wincross)
 	TARGETLIB := $(TARGET)_libretro.dll
 	# You're going to have to pass REALCC=<whatever> on the cmdline for wincross
-	REALCC = gcc
-	CC ?= g++
-	LD ?= $(CC)
+	REALCC := gcc
+	CC := g++
+	LD := $(CC)
 	SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=src/osd/retro/link.T
 	CCOMFLAGS += -D__WIN32__
 	LDFLAGS += $(SHARED)
