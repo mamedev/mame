@@ -215,14 +215,14 @@ WRITE32_MEMBER (vrc4373_device::master_io_w)
 // PCI Target Window 1
 READ32_MEMBER (vrc4373_device::target1_r)
 {
-	UINT32 result = this->space(AS_PROGRAM).read_dword(m_target1_laddr | (offset*4), mem_mask);
+	UINT32 result = m_cpu->space(AS_PROGRAM).read_dword(m_target1_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_TARGET)
 		logerror("%06X:nile target1 read from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (vrc4373_device::target1_w)
 {
-	this->space(AS_PROGRAM).write_dword(m_target1_laddr | (offset*4), data, mem_mask);
+	m_cpu->space(AS_PROGRAM).write_dword(m_target1_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_TARGET)
 		logerror("%06X:nile target1 write to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 }
@@ -230,14 +230,14 @@ WRITE32_MEMBER (vrc4373_device::target1_w)
 // PCI Target Window 2
 READ32_MEMBER (vrc4373_device::target2_r)
 {
-	UINT32 result = this->space(AS_PROGRAM).read_dword(m_target2_laddr | (offset*4), mem_mask);
+	UINT32 result = m_cpu->space(AS_PROGRAM).read_dword(m_target2_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_TARGET)
 		logerror("%06X:nile target2 read from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (vrc4373_device::target2_w)
 {
-	this->space(AS_PROGRAM).write_dword(m_target2_laddr | (offset*4), data, mem_mask);
+	m_cpu->space(AS_PROGRAM).write_dword(m_target2_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_TARGET)
 		logerror("%06X:nile target2 write to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 }
