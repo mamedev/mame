@@ -32,6 +32,7 @@ public:
 
 private:
 	astring m_warnings;
+	bool m_curr_selected;
 };
 
 #endif  /* __UI_FILEMNGR_H__ */
