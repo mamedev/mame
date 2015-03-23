@@ -41,28 +41,6 @@ endif
 # This affects whether or not the retro OSD is built for OpenGL
 VRENDER ?= soft
 
-# Mame needs PTR64 defined on 64 bit processors, we guess at it if you aren't
-# cross-compiling.  If you ARE, you need to set it yourself.
-ifneq ($(CROSS_BUILD),1)
-
-ifndef ($(PTR64)
-	PTR64 = 0
-ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-	PTR64 = 1
-endif
-ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-	PTR64 = 1
-endif
-ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-	PTR64 = 1
-endif
-ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
-	PTR64 = 1
-endif
-
-endif # PTR64
-endif # CROSS_BUILD
-
 # If we define this, MAME's makefile will not define final linking rules
 EXECUTABLE_DEFINED = 1
 
@@ -99,6 +77,7 @@ else ifeq ($(platform), android)
 	TARGETOS=linux
 	PTR64 = 0
 	FORCE_DRC_C_BACKEND = 1
+	CROSS_BUILD = 1
 else ifeq ($(platform), osx)
 	TARGETOS = macosx
 	PYTHON ?= @python
@@ -122,6 +101,28 @@ else
 # it's win32
 	TARGETOS = win32
 endif
+
+# Mame needs PTR64 defined on 64 bit processors, we guess at it if you aren't
+# cross-compiling.  If you ARE, you need to set it yourself.
+ifneq ($(CROSS_BUILD),1)
+
+ifndef ($(PTR64)
+	PTR64 = 0
+ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
+	PTR64 = 1
+endif
+ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
+	PTR64 = 1
+endif
+ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
+	PTR64 = 1
+endif
+ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
+	PTR64 = 1
+endif
+
+endif # PTR64
+endif # CROSS_BUILD
 
 # Upstream uses @python, but they require 2.x for now.  They do that because
 # some OSes (basically Apple) don't install 2.7 as python2.  @python2 is the
