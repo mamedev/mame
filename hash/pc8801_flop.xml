@@ -9657,6 +9657,20 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		</part>
 	</software>
 
+	<software name="doordmk2a" cloneof="doordmk2">
+		<description>Door Door mkII (Alt)</description>
+		<year>1985</year>
+		<publisher>エニックス (Enix)</publisher>
+		<!-- PC8801 -->
+		<info name="release" value="198502xx"/>
+		<info name="alt_title" value="ドアドア mk2"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348624">
+				<rom name="door door mkii.d88" size="348624" crc="50c65512" sha1="247a29b6f40fe90851c569f50660b877cca8258f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dororo">
 		<description>Dororo - Jigoku Emaki no Shou</description>
 		<year>1988</year>

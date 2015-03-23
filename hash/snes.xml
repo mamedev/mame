@@ -627,7 +627,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-	<software name="batmanrnjs" cloneof="batmanrn">
+	<software name="batmanrnjp" cloneof="batmanrn">
 		<!-- d4s -->
 		<description>Batman Returns (Jpn, Prototype)</description>
 		<year>1993</year>
@@ -6159,7 +6159,7 @@ more investigation needed...
 	</software>
 
 	<software name="ardyligtu" cloneof="ardyligt">
-		<description>Ardy Light Foot (USA)</description>
+		<description>Ardy Lightfoot (USA)</description>
 		<year>1996</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="M/SNS-A9-USA" />
@@ -25753,7 +25753,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="sgboyj">
+	<software name="sgboyj" cloneof="sgboy">
 		<description>Super Game Boy (Jpn)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -25780,7 +25780,7 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="sgboyj1">
+	<software name="sgboyj1" cloneof="sgboy">
 		<description>Super Game Boy (Jpn, Alt)</description> <!-- Alternate hardware -->
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -34600,7 +34600,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="barbieva">
+	<software name="barbvac">
 		<description>Barbie Vacation Adventure (USA, Prototype)</description>
 		<year>1994</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -34916,7 +34916,7 @@ List of unclassified roms
 	</software>
 
 	<software name="beautyp" cloneof="beauty">
-		<description>Beauty and the Beast (Euro, Prototype)</description>
+		<description>Disney's Beauty and the Beast (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34928,7 +34928,7 @@ List of unclassified roms
 	</software>
 
 	<software name="beauty">
-		<description>Beauty and the Beast (Euro)</description>
+		<description>Disney's Beauty and the Beast (Euro)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43401,7 +43401,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="joemacj">
+	<software name="joemacj" cloneof="joemac">
 		<description>Joe &amp; Mac - Tatakae Genshijin (Jpn)</description>
 		<year>1991</year>
 		<publisher>Data East</publisher>
@@ -43636,7 +43636,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="jstrikeu">
+	<software name="jstrikeu" cloneof="jstrike">
 		<description>Jungle Strike (USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -43649,7 +43649,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="jstrikej">
+	<software name="jstrikej" cloneof="jstrike">
 		<description>Jungle Strike - Uketsugareta Kyouki (Jpn)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -52093,6 +52093,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="targa" cloneof="rrr2">
+		<description>Targa (Prototype)</description>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="targa.sfc" size="4194304" crc="19fba1d4" sha1="6052dcc6bc0d10413669e0da74f02bf9de99d7a7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="returndd" cloneof="sddragon">
 		<description>Return of Double Dragon (Jpn)</description>
 		<year>1992</year>
@@ -57680,7 +57692,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="spangj">
+	<software name="spangj" cloneof="spang">
 		<description>Super Pang (Jpn)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
@@ -62236,6 +62248,20 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="wolfn3du" cloneof="wolfn3d">
+		<description>Wolfenstein 3D (USA)</description>
+		<year>1994</year>
+		<publisher>Imagineer</publisher>
+		<info name="release" value="199403xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="wolfenstein 3d (usa).sfc" size="1048576" crc="6582a8f5" sha1="88fe872eb984af84f8ca7633ef5bd3904a2baeb4" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wolfn3dup" cloneof="wolfn3d">
 		<description>Wolfenstein 3D (USA, Prototype)</description>
 		<year>1994</year>
@@ -62248,16 +62274,14 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="wolfn3du" cloneof="wolfn3d">
-		<description>Wolfenstein 3D (USA)</description>
+	<software name="wolfn3dup2" cloneof="wolfn3d">
+		<description>Wolfenstein 3D (USA, Prototype 2)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
-		<info name="release" value="199403xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="wolfenstein 3d (usa).sfc" size="1048576" crc="6582a8f5" sha1="88fe872eb984af84f8ca7633ef5bd3904a2baeb4" offset="0x000000" />
+				<rom name="wolf3d-beta2.sfc" size="1048576" crc="2bebdb00" sha1="837b0181f2e9cf75728330ed1d3400e9b6f5212d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -63675,7 +63699,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="sgboyju">
+	<software name="sgboyju" cloneof="sgboy">
 		<description>Super Game Boy (Jpn, USA, Rev. A)</description>
 		<year>199?</year>
 		<publisher>Nintendo</publisher>
