@@ -84,8 +84,8 @@ else ifeq ($(platform), osx)
 else ifeq ($(platform), ios)
 	# To build for iOS, do this:
 	# make -f Makefile.libretro clean
+	# make -f Makefile.libretro platform="" buildtools
 	# make -f Makefile.libretro platform=ios
-	# it recurses for native buildtools, then builds with CROSS_BUILD=1
 	TARGETOS = macosx
 	PTR64 = 0
 	CROSS_BUILD = 1
