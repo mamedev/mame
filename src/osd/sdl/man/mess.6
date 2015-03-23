@@ -16,7 +16,7 @@
 .\" http://www.mess.org/
 .\"
 .\"
-.TH MESS 6 2015-01-18 0.158 "The Multiple Emulator Super System (MESS)"
+.TH MESS 6 2015-03-23 0.160 "The Multiple Emulator Super System (MESS)"
 .\"
 .\"
 .\" NAME chapter
@@ -463,6 +463,9 @@ The intention is that this PNG can be loaded via an artwork file with
 a low alpha (e.g, 0.1\-0.2 seems to work well) and blended over the
 entire screen. The PNG files are saved in the snap directory under
 the system/burnin\-<screen.name>.png. The default is OFF (\-noburnin).
+.TP
+.B \-[no]dummywrite
+Indicates whether a snapshot should be created with each frame.
 .\"
 .\" *******************************************************
 .SS Performance options
@@ -661,7 +664,7 @@ needs adjustment. This option requires a float argument in the range of
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-video\fR [\fIsoft\fR|\fIopengl\fR|\fIopengl16\fR|\fInone\fR]
+.B \-video\fR [\fIsoft\fR|\fIopengl\fR|\fInone\fR]
 Specifies which video subsystem to use for drawing:
 .br
 \fBsoft\fR  uses software rendering, which is slower but more compatible.
@@ -669,9 +672,6 @@ Specifies which video subsystem to use for drawing:
 \fBopengl\fR  uses OpenGL and your graphics accelerator to speed up many
 aspects of drawing MESS including compositing artwork, overlays, and
 bezels, as well as stretching the image to fit your screen.
-.br
-\fBopengl16\fR  uses alternate OpenGL code, which should provide faster
-output on some cards.
 .br
 \fBnone\fR  does no drawing and is intended for CPU benchmarking.
 .br
