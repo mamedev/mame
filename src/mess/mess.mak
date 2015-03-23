@@ -2143,6 +2143,7 @@ $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/ebball3.lh \
                             $(MESS_LAYOUT)/elecdet.lh \
                             $(MESS_LAYOUT)/mathmagi.lh \
+                            $(MESS_LAYOUT)/mbdtower.lh \
                             $(MESS_LAYOUT)/merlin.lh \
                             $(MESS_LAYOUT)/simon.lh \
                             $(MESS_LAYOUT)/ssimon.lh \

@@ -121,7 +121,7 @@
 
 	<!-- outer bezel -->
 
-		<bezel element="text_count"><bounds x="2.6" y="2" width="8" height="3" /></bezel>
+		<bezel element="text_count"><bounds x="6" y="2" width="8" height="3" /></bezel>
 
 		<bezel element="text_s"><bounds x="2.5" y="7.2" width="2" height="2.5" /></bezel>
 		<bezel name="lamp40" element="led"><bounds x="6" y="7" width="3" height="3" /></bezel>

@@ -1,8 +1,4 @@
-/* Peno Cup?
-
-no idea if this is the real title, I just see a large Peno Cup logo in the 2/3 roms
-
-looks like some kind of ping pong / tennis game?
+/* Table Tennis Champions ?
 
  ___________________________________________________
 |        __     _________ __________   __________  |
@@ -35,9 +31,32 @@ looks like some kind of ping pong / tennis game?
 The PCB is Spanish and manufacured by Gamart.
 
 
---- Need to work out how the program rom is banked
---- hw is similar to hotblock and twins
+Table tennis Championships by Gamart 1995
 
+This game come from Gamart,an obscure spanish software house.
+Hardware info:
+main cpu: V30
+sound chip: oki6295
+custom chip: tpc1020bfn x2
+osc: 16 mhz
+Rom files definition:
+ttennis2/3 main program
+ttennis1 adpcm data
+ttennis4/5 graphics
+*there is a pic16c84 that i cannot dump because my programmer doesn't support it.
+
+Dumped by tirino73 >isolani (at) interfree.it<
+
+
+
+
+- works in a very similar way to 'Spider' (twins.c) 
+  including the blitter (seems to be doubled up hardware tho, twice as many layers?)
+- need to work out how it selects between upper/lower
+  program roms as blitter source
+- PIC is probably for sound
+- more than one layer
+- layer clearing
 
 */
 
@@ -53,36 +72,38 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
-	UINT16* m_peno_vram;
 	UINT16* m_peno_mainram;
 
 	UINT16 m_paloff;
 	DECLARE_WRITE16_MEMBER(paloff_w);
 	DECLARE_WRITE16_MEMBER(pcup_prgbank_w);
 	DECLARE_WRITE16_MEMBER(paldat_w);
-	DECLARE_READ16_MEMBER(peno_rand);
-	DECLARE_READ16_MEMBER(peno_rand2);
+
+	DECLARE_WRITE16_MEMBER(port10_w);
+	UINT16 m_port10;
+
 	DECLARE_DRIVER_INIT(ttchamp);
 
-	DECLARE_WRITE16_MEMBER( penocup_vid_w )
-	{
-		offset &=0x7fff;
-		COMBINE_DATA(&m_peno_vram[offset]);
-	}
+	DECLARE_READ16_MEMBER(ttchamp_blit_start_r);
 
-	DECLARE_READ16_MEMBER( penocup_mainram_r )
-	{
-		return m_peno_mainram[offset];
-	}
+	DECLARE_READ16_MEMBER(ttchamp_mem_r);
+	DECLARE_WRITE16_MEMBER(ttchamp_mem_w);
 
-	DECLARE_WRITE16_MEMBER( penocup_mainram_w )
-	{
-		offset &=0x7fff;
-		COMBINE_DATA(&m_peno_mainram[offset]);
-//      COMBINE_DATA(&m_peno_vram[offset]);
-	}
+	UINT16 m_videoram0[0x10000 / 2];
+	UINT16 m_videoram1[0x10000 / 2];
+	UINT16 m_videoram2[0x10000 / 2];
 
 
+
+	UINT16 m_mainram[0x10000 / 2];
+
+	int m_spritesinit;
+	int m_spriteswidth;
+	int m_spritesaddr;
+
+	virtual void machine_start();
+	UINT16* m_rom16;
+	UINT8* m_rom8;
 
 	virtual void video_start();
 	UINT32 screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -91,38 +112,28 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-
+void ttchamp_state::machine_start()
+{
+	m_rom16 = (UINT16*)memregion("maincpu")->base();
+	m_rom8 = memregion("maincpu")->base();
+}
 
 void ttchamp_state::video_start()
 {
-	m_peno_vram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
-	m_peno_mainram = (UINT16*)auto_alloc_array_clear(machine(), UINT16, 0x10000/2);
-
-
 
 }
 
 UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	logerror("update\n");
 	int y,x,count;
-//  int i;
+
 	static const int xxx=320,yyy=204;
 
 	bitmap.fill(m_palette->black_pen());
 
-//  for (i=0;i<256;i++)
-//  {
-//      int dat,r,g,b;
-//      dat=(hotblock_pal[i*2+1]<<8)|hotblock_pal[i*2];
-//
-//      b = (dat>>10)&0x1f;
-//      g = (dat>>5)&0x1f;
-//      r = (dat>>0)&0x1f;
-//      m_palette->set_pen_color(i,pal5bit(r),pal5bit(g),pal5bit(b));
-//  }
-
 	count=0;
-	UINT8 *videoram = (UINT8*)m_peno_vram;
+	UINT8 *videoram = (UINT8*)m_videoram0;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
@@ -131,6 +142,41 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 			count++;
 		}
 	}
+
+	count=0;
+	videoram = (UINT8*)m_videoram1;
+	for (y=0;y<yyy;y++)
+	{
+		for(x=0;x<xxx;x++)
+		{
+			UINT8 pix = videoram[BYTE_XOR_LE(count)];
+			if (pix) bitmap.pix16(y, x) = pix+0x200;
+			count++;
+		}
+	}
+
+	count=0;
+	videoram = (UINT8*)m_videoram2;
+	for (y=0;y<yyy;y++)
+	{
+		for(x=0;x<xxx;x++)
+		{
+			UINT8 pix = videoram[BYTE_XOR_LE(count)];
+			if (pix) bitmap.pix16(y, x) = pix+0x000;
+			count++;
+		}
+	}
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		// how are layers cleared?
+		// I think it actually does more blit operations with
+		// different bits of m_port10 set to redraw the backgrounds using the video ram data as a source rather than ROM - notice the garbage you see behind 'sprites' right now
+		// this method also removes the text layer, which we don't want
+		m_videoram1[i] = 0x0000;
+		m_videoram2[i] = 0x0000;
+	}
+
 	return 0;
 }
 
@@ -140,71 +186,171 @@ WRITE16_MEMBER(ttchamp_state::paloff_w)
 	COMBINE_DATA(&m_paloff);
 }
 
-#ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(ttchamp_state::pcup_prgbank_w)
-{
-	int bank;
-	UINT8 *ROM1 = memregion("user1")->base();
-
-	if (ACCESSING_BITS_0_7)
-	{
-		bank = (data>>4) &0x07;
-		membank("bank2")->set_base(&ROM1[0x80000*(bank)]);
-	}
-}
-#endif
 
 WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
 	m_palette->set_pen_color(m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
-READ16_MEMBER(ttchamp_state::peno_rand)
+
+
+READ16_MEMBER(ttchamp_state::ttchamp_mem_r)
 {
-	return 0xffff;// machine().rand();
+	// bits 0xf0 are used too, so this is likely wrong.
+
+	UINT16* vram;
+	if ((m_port10&0xf) == 0x00)
+		vram = m_videoram0;
+	else if ((m_port10&0xf)  == 0x01)
+		vram = m_videoram1;
+	else if ((m_port10&0xf)  == 0x03)
+		vram = m_videoram2;
+	else
+	{
+		printf("unhandled video bank %02x\n", m_port10);
+		vram = m_videoram2;
+	}
+
+	if (offset < 0x10000 / 2)
+	{
+		return m_mainram[offset&0x7fff];
+	}
+	else if (offset < 0x20000 / 2)
+	{
+		return vram[offset&0x7fff];
+	}
+	else
+	{
+		UINT16 *src = m_rom16 + (0x100000/2); // can the CPU ever see the lower bank?
+		return src[offset];
+	}
 }
 
-#ifdef UNUSED_FUNCTION
-READ16_MEMBER(ttchamp_state::peno_rand2)
+WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 {
-	return machine().rand();
+	// this is very strange, we use the offset (address bits) not data bits to set values..
+	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
+
+	// bits 0xf0 are used too, so this is likely wrong.
+
+	UINT16* vram;
+	if ((m_port10&0xf)  == 0x00)
+		vram = m_videoram0;
+	else if ((m_port10&0xf)  == 0x01)
+		vram = m_videoram1;
+	else if ((m_port10&0xf)  == 0x03)
+		vram = m_videoram2;
+	else
+	{
+		printf("unhandled video bank %02x\n", m_port10);
+		vram = m_videoram2;
+	}
+
+
+	if (m_spritesinit == 1)
+	{
+	//	printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
+
+		m_spritesinit = 2;
+		m_spritesaddr = offset;
+	}
+	else if (m_spritesinit == 2)
+	{
+	//	printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
+		m_spriteswidth = offset & 0xff;
+		if (m_spriteswidth == 0)
+			m_spriteswidth = 80;
+
+		m_spritesinit = 0;
+
+	}
+	else
+	{
+		if (offset < 0x10000 / 2)
+		{
+			COMBINE_DATA(&m_mainram[offset&0x7fff]);
+		}
+		else if (offset < 0x20000 / 2)
+		{
+			COMBINE_DATA(&vram[offset&0x7fff]);
+		}
+		else if (offset < 0x40000 / 2)
+		{
+			// 0x30000-0x3ffff and 0x40000-0x4ffff seem to be used here?
+			offset &= 0x7fff;
+
+			UINT8 *src = m_rom8;
+
+			if (m_port10 & 2) // NO, wrong for the portraits
+				src += 0x100000;
+
+		//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+			offset &= 0x7fff;
+
+			for (int i = 0; i < m_spriteswidth; i++)
+			{
+				UINT8 data;
+				
+				data = (src[(m_spritesaddr * 2) + 1]);
+	
+				if (data)
+					vram[offset] = (vram[offset] & 0x00ff) | data << 8;
+
+
+				data = src[(m_spritesaddr*2)];
+			
+				if (data)
+					vram[offset] = (vram[offset] & 0xff00) | data;
+
+
+				m_spritesaddr ++;				
+				offset++;
+
+				offset &= 0x7fff;
+			}
+		}
+		else
+		{
+			logerror("spider_blitter_w unhandled RAM access %08x %04x %04x\n", offset * 2, data, mem_mask);
+		}
+	}
 }
-#endif
+
+READ16_MEMBER(ttchamp_state::ttchamp_blit_start_r)
+{
+	m_spritesinit = 1;
+	return 0xff;
+}
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_READWRITE(penocup_mainram_r, penocup_mainram_w)
-
-	/* 0x10000 - 0x1ffff is where it writes most image stuff, but other address get written to 0 where the left edge of 'sprites' would be? why? bad code execution, or some kind of write address based blitter?
-	see for example the lines written down the side of where the (not displayed) CREDIT text would go, as well as beside the actual credit number.. also ingame if you can get it to start
-	*/
-
-	AM_RANGE(0x10000, 0xfffff) AM_WRITE(penocup_vid_w)
-
-	// how are these banked? what are the bank sizes? data needed for startup is at 0x20000-0x2ffff (strings) and 0x30000-0x3ffff (code) the rest seems to be graphics..
-	AM_RANGE(0x00000, 0x7ffff) AM_ROMBANK("bank1") // ?
-	AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(ttchamp_mem_r, ttchamp_mem_w)
 ADDRESS_MAP_END
 
+WRITE16_MEMBER(ttchamp_state::port10_w)
+{
+	COMBINE_DATA(&m_port10);
+}
+
+
 static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITENOP
+//	AM_RANGE(0x0000, 0x0001) AM_WRITENOP
 
 	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
 
-//  AM_RANGE(0x0018, 0x0019) AM_READ(peno_rand2)
-//  AM_RANGE(0x001e, 0x001f) AM_READ(peno_rand2)
+
+	AM_RANGE(0x0018, 0x0019) AM_READ(ttchamp_blit_start_r)
+	AM_RANGE(0x001e, 0x001f) AM_READNOP // read before each line is blit
 
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
 	AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w)
 
-//  AM_RANGE(0x0010, 0x0010) AM_WRITE(pcup_prgbank_w)
-	AM_RANGE(0x0010, 0x0011) AM_WRITENOP
+	AM_RANGE(0x0010, 0x0011) AM_WRITE(port10_w)
 
-	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
+//	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
 
-	AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP
+//	AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START(ttchamp)
@@ -299,39 +445,12 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 MACHINE_CONFIG_END
 
 ROM_START( ttchamp )
-
-	/* hopefully this is a good dump */
-
-	ROM_REGION16_LE( 0x200000, "user1", 0 )
+	ROM_REGION16_LE( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x080000,  CRC(6a6c6d75) SHA1(3742b82462176d77732a69e142db9e6f61f25dc5) )
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x080000,  CRC(6062c0b2) SHA1(c5f0ac58c847ce2588c805f40180f2586a6477b7) )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
 	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x080000,  CRC(fdbf9b28) SHA1(2d260555586097c8a396f65111f55ace801c7a5d) )
 
-	/* dumps below are bad dumps */
-
-	/* dump a */
-//  ROM_REGION( 0x200000, "user1", 0 )
-//  ROM_LOAD16_BYTE( "27c040_dump_a.2", 0x000000, 0x080000, BAD_DUMP CRC(791d68c8) SHA1(641c989d50e95ac3ff7c87d148cfab44abbdc774) )
-//  ROM_LOAD16_BYTE( "27c040_dump_a.3", 0x000001, 0x080000, BAD_DUMP CRC(00c81241) SHA1(899d4d1566f5f5d2967b6a8ec7dca60833846bbe) )
-//  ROM_LOAD16_BYTE( "27c040_dump_a.4", 0x100000, 0x080000, BAD_DUMP CRC(11af50f6) SHA1(1e5b6cc5c5a6c1ec302b2de7ce40c9ebfb349b46) )
-//  ROM_LOAD16_BYTE( "27c040_dump_a.5", 0x100001, 0x080000, BAD_DUMP CRC(f6b87231) SHA1(3db461c0858c207e8a3dfd822c99d28e3a26b4ee) )
-
-	/* dump b */
-//  ROM_REGION( 0x200000, "user2", 0 )
-//  ROM_LOAD16_BYTE( "27c040_dump_b.2", 0x000000, 0x080000, BAD_DUMP CRC(df1f2618) SHA1(7c6abb7a6ec55c49b95809f003d217f1ea758729) )
-//  ROM_LOAD16_BYTE( "27c040_dump_b.3", 0x000001, 0x080000, BAD_DUMP CRC(0292ca69) SHA1(fe3b0e78d9e946d8f8a86e8246e5a94483f44ce1) )
-//  ROM_LOAD16_BYTE( "27c040_dump_b.4", 0x100000, 0x080000, BAD_DUMP CRC(f6bcadc6) SHA1(d8c61c207175d67f4229103696dc2a4447af2ba4) )
-//  ROM_LOAD16_BYTE( "27c040_dump_b.5", 0x100001, 0x080000, BAD_DUMP CRC(b872747c) SHA1(24d2aa2603a71cdfd3d45608177bb60ab7cfe8a2) )
-
-	/* dump c */
-//  ROM_REGION( 0x200000, "user3", 0 )
-//  ROM_LOAD16_BYTE( "27c040_dump_c.2", 0x000000, 0x080000, BAD_DUMP CRC(be70adc7) SHA1(fe439caa54856c75ef310e456a7e61b15321031d) )
-//  ROM_LOAD16_BYTE( "27c040_dump_c.3", 0x000001, 0x080000, BAD_DUMP CRC(8e3b3396) SHA1(f47243041b9283712e34ea58fa2456c35785c5ee) )
-//  ROM_LOAD16_BYTE( "27c040_dump_c.4", 0x100000, 0x080000, BAD_DUMP CRC(34ab75e9) SHA1(779f03139b336cdc46f4d00bf3fd9e6de79942e2) )
-//  ROM_LOAD16_BYTE( "27c040_dump_c.5", 0x100001, 0x080000, BAD_DUMP CRC(3e7b3533) SHA1(433439c2b8a8e54bb20fc3c1690d3f183c6fa6f6) )
-
-	/* these were the same in each dump..*/
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* not verified if this is correct yet, seems very empty, maybe protected */
 	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280,  CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
 
@@ -339,30 +458,8 @@ ROM_START( ttchamp )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
 ROM_END
 
-/*
-
-Table tennis Championships by Gamart 1995
-
-This game come from Gamart,an obscure spanish software house.
-Hardware info:
-main cpu: V30
-sound chip: oki6295
-custom chip: tpc1020bfn x2
-osc: 16 mhz
-Rom files definition:
-ttennis2/3 main program
-ttennis1 adpcm data
-ttennis4/5 graphics
-*there is a pic16c84 that i cannot dump because my programmer doesn't support it.
-
-Dumped by tirino73 >isolani (at) interfree.it<
-
-*/
-
 ROM_START( ttchampa )
-	/* this is from a different board */
-
-	ROM_REGION16_LE( 0x200000, "user1", 0 )
+	ROM_REGION16_LE( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ttennis2.bin", 0x000000, 0x080000,  CRC(b060e72c) SHA1(376e71bb4b1687fec4b719cbc5a7b25b64d159ac) )
 	ROM_LOAD16_BYTE( "ttennis3.bin", 0x000001, 0x080000,  CRC(33e085a8) SHA1(ea6af05690b4b0803c303a3c858df10e4d907fb1) )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
@@ -377,10 +474,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 {
-	UINT8 *ROM1 = memregion("user1")->base();
-	membank("bank1")->set_base(&ROM1[0x100000]);
-	membank("bank2")->set_base(&ROM1[0x180000]);
+//	UINT8 *ROM1 = memregion("user1")->base();
+//	membank("bank1")->set_base(&ROM1[0x100000]);
+//	membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart", "Table Tennis Champions (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_NOT_WORKING|GAME_NO_SOUND ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_NOT_WORKING|GAME_NO_SOUND ) // this only has Palencia Elektronik advertising boards

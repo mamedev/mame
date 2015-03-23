@@ -1255,6 +1255,7 @@ MACHINEOBJS += $(MACHINEOBJ)/lpc.o
 MACHINEOBJS += $(MACHINEOBJ)/lpc-acpi.o
 MACHINEOBJS += $(MACHINEOBJ)/lpc-rtc.o
 MACHINEOBJS += $(MACHINEOBJ)/lpc-pit.o
+MACHINEOBJS += $(MACHINEOBJ)/vrc4373.o
 endif
 
 #-------------------------------------------------
