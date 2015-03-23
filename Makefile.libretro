@@ -238,7 +238,7 @@ else ifeq ($(platform), ios)
 	TARGETLIB := $(TARGET)_libretro_ios.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
-	LIBCXX := libc++
+	LIBCXX := libstdc++
 
 	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 	CXX_AS := c++
