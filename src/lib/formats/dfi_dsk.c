@@ -16,13 +16,13 @@
 #include <zlib.h>
 #define NUMBER_OF_MULTIREADS 3
 // threshholds for brickwall windowing
-//define MIN_CLOCKS 65
+//define DFI_MIN_CLOCKS 65
 // number_please apple2 wants 40 min
-#define MIN_CLOCKS 60
+#define DFI_MIN_CLOCKS 60
 //define MAX_CLOCKS 260
-#define MAX_CLOCKS 270
-#define MIN_THRESH (MIN_CLOCKS*(clock_rate/25000000))
-#define MAX_THRESH (MAX_CLOCKS*(clock_rate/25000000))
+#define DFI_MAX_CLOCKS 270
+#define MIN_THRESH (DFI_MIN_CLOCKS*(clock_rate/25000000))
+#define MAX_THRESH (DFI_MAX_CLOCKS*(clock_rate/25000000))
 // constants to help guess clockrate and rpm
 // constant is 25mhz / 6 revolutions per second (360rpm) = 4166667 +- 2.5%
 #define REV25_MIN 4062500

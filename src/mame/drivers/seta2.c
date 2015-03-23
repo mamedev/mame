@@ -115,6 +115,7 @@ reelquak:
 #include "machine/ticket.h"
 #include "machine/mcf5206e.h"
 
+
 /***************************************************************************
 
 
@@ -123,7 +124,7 @@ reelquak:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::seta2_sound_bank_w)
+WRITE16_MEMBER(seta2_state::sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -169,8 +170,8 @@ static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")  // Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
+	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(sound_bank_w)       // Samples Banks
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -207,8 +208,8 @@ static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM                             // cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")  // Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
+	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(sound_bank_w)       // Samples Banks
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -216,6 +217,11 @@ ADDRESS_MAP_END
 /***************************************************************************
                       Wakakusamonogatari Mahjong Yonshimai
 ***************************************************************************/
+
+MACHINE_START_MEMBER(seta2_state, mj4simai)
+{
+	save_item(NAME(m_keyboard_row));
+}
 
 READ16_MEMBER(seta2_state::mj4simai_p1_r)
 {
@@ -260,11 +266,11 @@ static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP                        // Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
+	AM_RANGE(0x600300, 0x60030f) AM_WRITE(sound_bank_w)       // Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")   // Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")  // Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -283,11 +289,11 @@ static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700200, 0x700201) AM_WRITENOP                        // Leds? Coins?
 	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x700310, 0x70031f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
+	AM_RANGE(0x700310, 0x70031f) AM_WRITE(sound_bank_w)       // Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")              // Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")              // Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -306,11 +312,11 @@ static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP                        // Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
+	AM_RANGE(0x600300, 0x60030f) AM_WRITE(sound_bank_w)       // Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")          // Video Registers
+	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")          // Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -346,7 +352,7 @@ static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                                 // RAM
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")                   // DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")                   // DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE(seta2_sound_bank_w)           // Samples Banks
+	AM_RANGE(0x400300, 0x40030f) AM_WRITE(sound_bank_w)           // Samples Banks
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")                     // P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")                     // P2
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(pzlbowl_coins_r,pzlbowl_coin_counter_w)   // Coins + Protection?
@@ -354,7 +360,7 @@ static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)          // Protection
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0x840000, 0x84ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")              // Video Registers
+	AM_RANGE(0x860000, 0x86003f) AM_WRITE(vregs_w) AM_SHARE("vregs")              // Video Registers
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
 ADDRESS_MAP_END
@@ -371,7 +377,7 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM                             // RAM
 	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x500300, 0x50030f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
+	AM_RANGE(0x500300, 0x50030f) AM_WRITE(sound_bank_w)       // Samples Banks
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")             // Coins
@@ -380,7 +386,7 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	//AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")
+	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
 ADDRESS_MAP_END
@@ -435,11 +441,11 @@ static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x400200, 0x400201) AM_WRITE(reelquak_coin_w)          // Coin Counters / IRQ Ack
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")               // DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE(seta2_sound_bank_w)       // Samples Banks
+	AM_RANGE(0x400300, 0x40030f) AM_WRITE(sound_bank_w)       // Samples Banks
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")              // Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")              // Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)      // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -453,7 +459,7 @@ static ADDRESS_MAP_START( namcostr_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("spriteram")       // Sprites
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")  // Video Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(vregs_w) AM_SHARE("vregs")  // Video Registers
 	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("tmp68301", tmp68301_device, regs_r, regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -483,7 +489,7 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")             // DSW 1
 	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")          // Buttons
 
-	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE(seta2_sound_bank_w )    // Samples Banks
+	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE(sound_bank_w )    // Samples Banks
 
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("GUN1")             // P1
 	AM_RANGE( 0x580000, 0x580001 ) AM_READ_PORT("GUN2")             // P2
@@ -495,7 +501,7 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 
 	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_SHARE("spriteram") // Sprites
 	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // Palette
-	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(seta2_vregs_w) AM_SHARE("vregs")    // Video Registers
+	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(vregs_w) AM_SHARE("vregs")    // Video Registers
 
 	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 
@@ -579,6 +585,11 @@ void funcube_touchscreen_device::device_start()
 	emu_timer *tm = timer_alloc(0);
 	tm->adjust(attotime::from_ticks(1, clock()), 0, attotime::from_ticks(1, clock()));
 	m_tx_cb.resolve_safe();
+	
+	save_item(NAME(m_button_state));
+	save_item(NAME(m_serial_pos));
+	save_item(NAME(m_serial));
+	device_serial_interface::register_save_state(machine().save(), this);
 }
 
 void funcube_touchscreen_device::device_reset()
@@ -693,7 +704,7 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 
 	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_SHARE("spriteram")
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")  // Palette
-	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(seta2_vregs_w, 0xffffffff ) AM_SHARE("vregs")
+	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(vregs_w, 0xffffffff ) AM_SHARE("vregs")
 
 	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
 
@@ -712,7 +723,7 @@ static ADDRESS_MAP_START( funcube2_map, AS_PROGRAM, 32, seta2_state )
 
 	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE16(spriteram16_word_r,  spriteram16_word_w, 0xffffffff ) AM_SHARE("spriteram")
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(seta2_vregs_w, 0xffffffff ) AM_SHARE("vregs")
+	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE16(vregs_w, 0xffffffff ) AM_SHARE("vregs")
 
 	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
 
@@ -2101,15 +2112,13 @@ static MACHINE_CONFIG_START( seta2, seta2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
-	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
+	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seta2)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2121,12 +2130,8 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mj4simai, seta2 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
+	MCFG_MACHINE_START_OVERRIDE(seta2_state, mj4simai)
 
-	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 MACHINE_CONFIG_END
 
 
@@ -2164,7 +2169,7 @@ static MACHINE_CONFIG_DERIVED( myangel, seta2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2_yoffset)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2176,7 +2181,7 @@ static MACHINE_CONFIG_DERIVED( myangel2, seta2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2_yoffset)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,yoffset)
 MACHINE_CONFIG_END
 
 
@@ -2214,7 +2219,7 @@ static MACHINE_CONFIG_DERIVED( reelquak, seta2 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x80, 0x170-1)
 
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2_xoffset)
+	MCFG_VIDEO_START_OVERRIDE(seta2_state,xoffset)
 MACHINE_CONFIG_END
 
 
@@ -2249,7 +2254,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(seta2_state,funcube)
+MACHINE_START_MEMBER(seta2_state, funcube)
+{
+	save_item(NAME(m_funcube_coin_start_cycles));
+	save_item(NAME(m_funcube_hopper_motor));
+}
+
+MACHINE_RESET_MEMBER(seta2_state, funcube)
 {
 	m_funcube_coin_start_cycles = 0;
 	m_funcube_hopper_motor = 0;
@@ -2272,7 +2283,8 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube )
+	MCFG_MACHINE_START_OVERRIDE(seta2_state, funcube)
+	MCFG_MACHINE_RESET_OVERRIDE(seta2_state, funcube)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2280,15 +2292,13 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
-	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
+	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2333,15 +2343,13 @@ static MACHINE_CONFIG_START( namcostr, seta2_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update_seta2)
-	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof_seta2)
+	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(seta2_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
 	MCFG_PALETTE_ADD("palette", 0x8000+0xf0)    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_VIDEO_START_OVERRIDE(seta2_state,seta2)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

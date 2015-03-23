@@ -37,14 +37,12 @@ PALETTE_INIT_MEMBER(srmp2_state,srmp3)
 	}
 }
 
-int srmp3_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
+SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp2_state::srmp3_gfxbank_callback)
 {
-	srmp2_state *state = machine.driver_data<srmp2_state>();
-
 	if (code & 0x2000)
 	{
 		code = (code & 0x1fff);
-		code += ((state->m_gfx_bank + 1) * 0x2000);
+		code += ((m_gfx_bank + 1) * 0x2000);
 	}
 
 	return code;
@@ -77,8 +75,6 @@ UINT32 srmp2_state::screen_update_srmp3(screen_device &screen, bitmap_ind16 &bit
 	m_seta001->set_bg_xoffsets( -0x01, 0x10 );
 	m_seta001->set_bg_yoffsets( -0x06, 0x06 );
 
-	m_seta001->set_gfxbank_callback( srmp3_gfxbank_callback );
-
 	m_seta001->draw_sprites(screen,bitmap,cliprect,0x1000, 1);
 	return 0;
 }
@@ -92,8 +88,6 @@ UINT32 srmp2_state::screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &b
 	m_seta001->set_bg_yoffsets( 0x09, 0x07 );
 
 	m_seta001->set_spritelimit( 0x1ff-6 );
-
-	m_seta001->set_gfxbank_callback( srmp3_gfxbank_callback );
 
 	m_seta001->draw_sprites(screen,bitmap,cliprect,0x1000, 1);
 	return 0;

@@ -107,8 +107,9 @@ void h8_device::device_start()
 	}
 
 	save_item(NAME(PPC));
-	save_item(NAME(PC));
 	save_item(NAME(NPC));
+	save_item(NAME(PC));
+	save_item(NAME(PIR));
 	save_item(NAME(IR));
 	save_item(NAME(R));
 	save_item(NAME(EXR));

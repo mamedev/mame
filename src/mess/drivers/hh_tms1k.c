@@ -15,9 +15,9 @@
  @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
  *MP0168   TMS1000? 1979, Conic Basketball
  @MP0914   TMS1000  1979, Entex Baseball 1
- *MP0923   TMS1000? 1979, Entex Baseball 2
+ @MP0923   TMS1000  1979, Entex Baseball 2
  @MP1030   TMS1100  1980, APF Mathemagician
- *MP1133   ?        1979, Kosmos Astro
+ *MP1133   TMS1470  1979, Kosmos Astro
  @MP1204   TMS1100  1980, Entex Baseball 3
  *MP1221   TMS1100  1980, Entex Raise The Devil
  *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
@@ -35,7 +35,7 @@
   MP3457   TMS1100  1979, MicroVision cartridge: Mindbuster
   MP3474   TMS1100  1979, MicroVision cartridge: Vegas Slots
   MP3475   TMS1100  1979, MicroVision cartridge: Bowling
- *MP3476   TMS1100  1979, Milton Bradley Super Simon
+ @MP3476   TMS1100  1979, Milton Bradley Super Simon
   MP3479   TMS1100  1980, MicroVision cartridge: Baseball
   MP3481   TMS1100  1979, MicroVision cartridge: Connect Four
   MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
@@ -48,7 +48,7 @@
  *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
- *MP7332   TMS1400  1981, Milton Bradley Dark Tower
+ @MP7332   TMS1400  1981, Milton Bradley Dark Tower
  @MP7334   TMS1400  1981, Coleco Total Control 4
 
   inconsistent:
@@ -79,12 +79,15 @@
 #include "bankshot.lh"
 #include "cnsector.lh"
 #include "ebball.lh"
+#include "ebball2.lh"
 #include "ebball3.lh"
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
+#include "mbdtower.lh"
 #include "merlin.lh" // clickable
 #include "simon.lh" // clickable
+#include "ssimon.lh"
 #include "splitsec.lh"
 #include "starwbc.lh"
 #include "stopthie.lh"
@@ -158,6 +161,11 @@ public:
 	DECLARE_WRITE16_MEMBER(ebball_write_o);
 	DECLARE_READ8_MEMBER(ebball_read_k);
 
+	void ebball2_display();
+	DECLARE_WRITE16_MEMBER(ebball2_write_r);
+	DECLARE_WRITE16_MEMBER(ebball2_write_o);
+	DECLARE_READ8_MEMBER(ebball2_read_k);
+
 	void ebball3_display();
 	DECLARE_WRITE16_MEMBER(ebball3_write_r);
 	DECLARE_WRITE16_MEMBER(ebball3_write_o);
@@ -182,6 +190,14 @@ public:
 	DECLARE_WRITE16_MEMBER(simon_write_r);
 	DECLARE_WRITE16_MEMBER(simon_write_o);
 	DECLARE_READ8_MEMBER(simon_read_k);
+
+	DECLARE_WRITE16_MEMBER(ssimon_write_r);
+	DECLARE_WRITE16_MEMBER(ssimon_write_o);
+	DECLARE_READ8_MEMBER(ssimon_read_k);
+
+	DECLARE_WRITE16_MEMBER(mbdtower_write_r);
+	DECLARE_WRITE16_MEMBER(mbdtower_write_o);
+	DECLARE_READ8_MEMBER(mbdtower_read_k);
 
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);
@@ -216,7 +232,7 @@ void hh_tms1k_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
@@ -853,7 +869,7 @@ void hh_tms1k_state::ebball_display()
 	// R8 is a 7seg
 	m_display_segmask[8] = 0x7f;
 	
-	display_matrix(7, 9, ~m_o, m_r);
+	display_matrix(7, 9, m_o, m_r);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
@@ -873,7 +889,7 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
 {
 	// O0-O6: led row
 	// O7: N/C
-	m_o = data;
+	m_o = ~data;
 	ebball_display();
 }
 
@@ -938,17 +954,125 @@ MACHINE_CONFIG_END
 
 
 
+/***************************************************************************
+
+  Entex Electronic Baseball 2
+  * boards are labeled: ZENY
+  * TMS1000 MCU, MP0923 (die labeled MP0923)
+  
+  The Japanese version was published by Gakken, black casing instead of white.
+  
+  The sequel to Entex Baseball, this version keeps up with score and innings.
+  As its predecessor, the pitcher controls are on a separate joypad.
+
+
+  lamp translation table: led zz from game PCB = MESS lampyx:
+  
+    00 = -        10 = lamp94   20 = lamp74   30 = lamp50
+    01 = lamp53   11 = lamp93   21 = lamp75   31 = lamp51
+    02 = lamp7    12 = lamp92   22 = lamp80   32 = lamp52
+    03 = lamp17   13 = lamp62   23 = lamp81   33 = lamp40
+    04 = lamp27   14 = lamp70   24 = lamp82   34 = lamp41
+    05 = lamp97   15 = lamp71   25 = lamp83   35 = lamp31
+    06 = lamp90   16 = lamp61   26 = lamp84   36 = lamp30
+    07 = lamp95   17 = lamp72   27 = lamp85   37 = lamp33
+    08 = lamp63   18 = lamp73   28 = lamp42   38 = lamp32
+    09 = lamp91   19 = lamp60   29 = lamp43
+
+***************************************************************************/
+
+void hh_tms1k_state::ebball2_display()
+{
+	// the first 3 are 7segs
+	for (int y = 0; y < 3; y++)
+		m_display_segmask[y] = 0x7f;
+	
+	display_matrix(8, 10, m_o, m_r);
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
+{
+	// R3-R6: input mux
+	m_inp_mux = data >> 3 & 0xf;
+	
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+	
+	// R0-R9: led columns
+	m_r = data ^ 0x7f;
+	ebball2_display();
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ebball2_write_o)
+{
+	// O0-O7: led row/segment
+	m_o = ~data;
+	ebball2_display();
+}
+
+READ8_MEMBER(hh_tms1k_state::ebball2_read_k)
+{
+	return read_inputs(4);
+}
+
+
+static INPUT_PORTS_START( ebball2 )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Pitcher" )
+	PORT_CONFSETTING(    0x02, "Auto" )
+	PORT_CONFSETTING(    0x00, "Manual" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fast Ball")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
+
+	PORT_START("IN.1") // R4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Steal")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Change Up")
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Slider")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Knuckler")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Curve")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( ebball2, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball2_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball2_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball2_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ebball2)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
 
 /***************************************************************************
 
   Entex Electronic Baseball 3
-  * boards are labeled: Zeny
+  * boards are labeled: ZENY
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
   * 2*SN75492N LED display driver
   
   This is another improvement over Entex Baseball, where gameplay is a bit more
-  varied, and it keeps up with score and innings. Like the others, the pitcher
-  controls are on a separate joypad.
+  varied. Like the others, the pitcher controls are on a separate joypad.
 
 
   lamp translation table: led zz from game PCB = MESS lampyx:
@@ -1421,7 +1545,7 @@ MACHINE_CONFIG_END
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
   instead of the TMS1000. This one has been decapped too, but we couldn't
   find an internal ROM. It is possibly a cost-reduced custom ASIC specifically
-  for Simon. The semi-sequel Super Simon uses a TMS1100.
+  for Simon. The semi-sequel Super Simon uses a TMS1100 (see next minidriver).
 
 ***************************************************************************/
 
@@ -1508,8 +1632,109 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Milton Bradley Super Simon
+  * TMS1100 MP3476NLL (die labeled MP3476)
+
+  x
+
+***************************************************************************/
+
+WRITE16_MEMBER(hh_tms1k_state::ssimon_write_r)
+{
+}
+
+WRITE16_MEMBER(hh_tms1k_state::ssimon_write_o)
+{
+	// N/C
+}
+
+READ8_MEMBER(hh_tms1k_state::ssimon_read_k)
+{
+	return 0;
+}
+
+
+static INPUT_PORTS_START( ssimon )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( ssimon, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ssimon_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ssimon_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ssimon_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ssimon)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Milton Bradley Dark Tower
+  * TMS1400 MP7332-N2LL (die labeled MP7332)
+
+  x
+
+***************************************************************************/
+
+WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_r)
+{
+}
+
+WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_o)
+{
+}
+
+READ8_MEMBER(hh_tms1k_state::mbdtower_read_k)
+{
+	return 0;
+}
+
+
+static INPUT_PORTS_START( mbdtower )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( mbdtower, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, 400000) // approximation - RC osc. R=43K, C=56pf, but unknown RC curve
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, mbdtower_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, mbdtower_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, mbdtower_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Code Name: Sector, by Bob Doyle
-  * MP0905BNL ZA0379 (die labeled 0970F-05B)
+  * TMS0970 MCU, MP0905BNL ZA0379 (die labeled 0970F-05B)
 
   This is a tabletop submarine pursuit game. A grid board and small toy
   boats are used to remember your locations (a Paint app should be ok too).
@@ -2001,7 +2226,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
-  * TMS1100 CD7282SL
+  * TMS1100 MCU, labeled CD7282SL
 
   This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
   by the Japanese company Mego Corp. in 1980, which in turn is a mix of Merlin
@@ -2190,6 +2415,17 @@ ROM_START( ebball )
 ROM_END
 
 
+ROM_START( ebball2 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0923", 0x0000, 0x0400, CRC(077acfe2) SHA1(a294ce7614b2cdb01c754a7a50d60d807e3f0939) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ebball2_mpla.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ebball2_opla.pla", 0, 365, CRC(adcd73d1) SHA1(d69e590d288ef99293d86716498f3971528e30de) )
+ROM_END
+
+
 ROM_START( ebball3 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp1204", 0x0000, 0x0800, CRC(987a29ba) SHA1(9481ae244152187d85349d1a08e439e798182938) )
@@ -2258,8 +2494,30 @@ ROM_START( simon )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_simon_mpla.pla", 0, 867, CRC(52f7c1f1) SHA1(dbc2634dcb98eac173ad0209df487cad413d08a5) )
-	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
 	ROM_LOAD( "tms1000_simon_opla.pla", 0, 365, CRC(2943c71b) SHA1(bd5bb55c57e7ba27e49c645937ec1d4e67506601) )
+ROM_END
+
+
+ROM_START( ssimon )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "mp3476", 0x0000, 0x800, CRC(98200571) SHA1(cbd0bcfc11a534aa0be5d011584cdcac58ff437a) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "tms1100_ssimon_opla.pla", 0, 365, CRC(0fea09b0) SHA1(27a56fcf2b490e9a7dbbc6ad48cc8aaca4cada94) )
+ROM_END
+
+
+ROM_START( mbdtower )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7332", 0x0000, 0x1000, CRC(ebeab91a) SHA1(7edbff437da371390fa8f28b3d183f833eaa9be9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_mbdtower_opla.pla", 0, 557, CRC(64c84697) SHA1(72ce6d24cedf9c606f1742cd5620f75907246e87) )
 ROM_END
 
 
@@ -2359,6 +2617,7 @@ CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Col
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
+CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
@@ -2368,6 +2627,8 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
+CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1981, mbdtower,  0,        0, mbdtower,  mbdtower,  driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // ***
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )

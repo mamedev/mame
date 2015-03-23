@@ -117,7 +117,7 @@ void hh_ucom4_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
@@ -351,7 +351,7 @@ MACHINE_CONFIG_END
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label Emix Corp. ET-12
   * NEC uCOM-43 MCU, labeled D553C 055
-  * blue VFD display Emix-104 (some versions had a green display)
+  * cyan VFD display Emix-104, with color overlay (blue or green overlay, depending on region)
 
   NOTE!: MESS external artwork is recommended
 

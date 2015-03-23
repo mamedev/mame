@@ -69,17 +69,17 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
 #define RLT_XTAL           XTAL_12MHz
 
-READ16_MEMBER(rltennis_state::rlt_io_r)
+READ16_MEMBER(rltennis_state::io_r)
 {
 	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); /* top 3 bits controls smaple address update */
 }
 
-WRITE16_MEMBER(rltennis_state::rlt_snd1_w)
+WRITE16_MEMBER(rltennis_state::snd1_w)
 {
 	COMBINE_DATA(&m_data760000);
 }
 
-WRITE16_MEMBER(rltennis_state::rlt_snd2_w)
+WRITE16_MEMBER(rltennis_state::snd2_w)
 {
 	COMBINE_DATA(&m_data740000);
 }
@@ -88,15 +88,15 @@ static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16, rltennis_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x700000, 0x70000f) AM_WRITE(rlt_blitter_w)
+	AM_RANGE(0x700000, 0x70000f) AM_WRITE(blitter_w)
 	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
 	AM_RANGE(0x720002, 0x720003) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
 	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
-	AM_RANGE(0x740000, 0x740001) AM_WRITE(rlt_snd1_w)
-	AM_RANGE(0x760000, 0x760001) AM_WRITE(rlt_snd2_w)
+	AM_RANGE(0x740000, 0x740001) AM_WRITE(snd1_w)
+	AM_RANGE(0x760000, 0x760001) AM_WRITE(snd2_w)
 	AM_RANGE(0x780000, 0x780001) AM_WRITENOP    /* sound control, unknown, usually = 0x0044 */
 	AM_RANGE(0x7a0000, 0x7a0003) AM_READNOP     /* unknown, read only at boot time*/
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(rlt_io_r)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(io_r)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
@@ -144,7 +144,7 @@ TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 	m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
-INTERRUPT_GEN_MEMBER(rltennis_state::rltennis_interrupt)
+INTERRUPT_GEN_MEMBER(rltennis_state::interrupt)
 {
 	++m_unk_counter; /* frame counter? verify */
 	device.execute().set_input_line(4, HOLD_LINE);
@@ -157,6 +157,14 @@ void rltennis_state::machine_start()
 	m_samples_2 = memregion("samples2")->base();
 	m_gfx =  memregion("gfx1")->base();
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rltennis_state::sample_player),this));
+	
+	save_item(NAME(m_data760000));
+	save_item(NAME(m_data740000));
+	save_item(NAME(m_dac_counter));
+	save_item(NAME(m_sample_rom_offset_1));
+	save_item(NAME(m_sample_rom_offset_2));
+	save_item(NAME(m_offset_shift));
+	save_item(NAME(m_unk_counter));
 }
 
 void rltennis_state::machine_reset()
@@ -172,13 +180,13 @@ static MACHINE_CONFIG_START( rltennis, rltennis_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
 	MCFG_CPU_PROGRAM_MAP(rltennis_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rltennis_state,  rltennis_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", rltennis_state, interrupt)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( RLT_REFRESH_RATE )
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0,319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(rltennis_state, screen_update_rltennis)
+	MCFG_SCREEN_UPDATE_DRIVER(rltennis_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -221,4 +229,4 @@ ROM_START( rltennis )
 	ROM_LOAD( "tennis_3.u52", 0x00000, 0x80000, CRC(517dcd0e) SHA1(b2703e185ee8cf7e115ea07151e7bee8be34948b) )
 ROM_END
 
-GAME( 1993, rltennis,    0, rltennis,    rltennis, driver_device,    0, ROT0,  "TCH", "Reality Tennis", GAME_IMPERFECT_GRAPHICS)
+GAME( 1993, rltennis,    0, rltennis,    rltennis, driver_device,    0, ROT0,  "TCH", "Reality Tennis", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

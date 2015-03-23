@@ -315,7 +315,7 @@ void hmcs40_cpu_device::device_reset()
 UINT8 hmcs40_cpu_device::read_r(int index)
 {
 	index &= 7;
-	UINT8 inp = 0xf;
+	UINT8 inp = 0;
 	
 	switch (index)
 	{
@@ -575,7 +575,7 @@ void hmcs40_cpu_device::execute_run()
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
-		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR)
+		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR, REDD, SEDD)
 		increment_pc();
 
 		// handle opcode

@@ -600,6 +600,16 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/video/voodoo_pci.h,VIDEOS += VOODOO_PCI
+#-------------------------------------------------
+
+ifneq ($(filter VOODOO_PCI,$(VIDEOS)),)
+VIDEOOBJS+= $(VIDEOOBJ)/voodoo_pci.o
+endif
+
+
+#-------------------------------------------------
+#
 #@src/emu/video/crtc_ega.h,VIDEOS += CRTC_EGA
 #-------------------------------------------------
 

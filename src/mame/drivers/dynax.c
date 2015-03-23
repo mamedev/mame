@@ -5,7 +5,7 @@ Some Dynax games using the second version of their blitter
 driver by Luca Elia and Nicola Salmoria
 
 CPU:    Z80 or TLCS90
-Sound:  [AY] + [YM] + [YM] + [M5205]
+Sound:  [AY] + [YM] + [YM] + [M5205] / M6295
 VDP:    HD46505SP (6845) (CRT controller)
 Custom: TC17G032AP-0246 (blitter)
 
@@ -37,8 +37,9 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Ougon No Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
+94 Castle Of Dracula                                 Z80   M6295                            PROM  Blitter is an FPGA
 94 Mj Reach (bootleg)      bootleg                   TLCS  AY8910        YM2413       M6242 PROM  Battery
-94 Maya                                              Z80          YM2203                    PROM
+94 Maya                                              Z80          YM2203                    PROM  Blitter is an FPGA
 96 Mj Raijinhai DX         D10010318L1  D10502168    TLCS  AY8910                     M6242 PROM  Undumped TMP91P640 Code, Battery
 9? Inca                                              Z80          YM2203                    PROM
 ---------------------------------------------------------------------------------------------------------------------
@@ -439,6 +440,11 @@ WRITE8_MEMBER(dynax_state::yarunara_layer_half2_w)
 {
 	hnoridur_layer_half2_w(space, 0, data >> 1);
 }
+
+static ADDRESS_MAP_START( cdracula_mem_map, AS_PROGRAM, 8, dynax_state )
+	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
+	AM_RANGE( 0xc000, 0xffff ) AM_RAM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprtmtch_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
@@ -1540,6 +1546,48 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                                Castle Of Dracula
+***************************************************************************/
+
+WRITE8_MEMBER(dynax_state::cdracula_sound_rombank_w)
+{
+//  logerror("%s: sound bank = %02x\n", machine().describe_context(), data);
+
+	int num_banks = memregion("oki")->bytes() / 0x40000;
+	if (data < num_banks)
+		m_oki->set_bank_base(data * 0x40000);
+	else
+		logerror("%s: warning, invalid sound bank = %02x\n", machine().describe_context(), data);
+}
+
+static ADDRESS_MAP_START( cdracula_io_map, AS_IO, 8, dynax_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x01, 0x07 ) AM_WRITE(cdracula_blitter_rev2_w)       // Blitter + Destination Layers
+	AM_RANGE( 0x10, 0x10 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE( 0x11, 0x11 ) AM_NOP	// unpopulated oki
+//  AM_RANGE( 0x12, 0x12 ) AM_WRITENOP   // CRT Controller
+//  AM_RANGE( 0x13, 0x13 ) AM_WRITENOP   // CRT Controller
+	AM_RANGE( 0x20, 0x20 ) AM_READ_PORT("P1")                 // P1
+	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("P2")                 // P2
+	AM_RANGE( 0x22, 0x22 ) AM_READ_PORT("COINS")              // Coins
+	AM_RANGE( 0x30, 0x30 ) AM_WRITE(dynax_layer_enable_w)     // Layers Enable
+//	AM_RANGE( 0x31, 0x31 ) AM_WRITE(dynax_rombank_w)          // BANK ROM Select
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE(dynax_blit_pen_w)         // Destination Pen
+	AM_RANGE( 0x33, 0x33 ) AM_WRITE(dynax_blit_flags_w)       // Flags + Do Blit
+	AM_RANGE( 0x34, 0x34 ) AM_WRITE(dynax_blit_palette01_w)   // Layers Palettes (Low Bits)
+	AM_RANGE( 0x35, 0x35 ) AM_WRITE(dynax_blit_palette23_w)   //
+	AM_RANGE( 0x36, 0x36 ) AM_WRITE(dynax_blit_backpen_w)     // Background Color
+	AM_RANGE( 0x37, 0x37 ) AM_WRITE(dynax_vblank_ack_w)       // VBlank IRQ Ack
+	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_flipscreen_w)       // Flip Screen
+	AM_RANGE( 0x44, 0x44 ) AM_WRITE(jantouki_blitter_ack_w)   // Blitter IRQ Ack
+	AM_RANGE( 0x45, 0x45 ) AM_WRITE(dynax_blit_palbank_w)     // Layers Palettes (High Bit)
+	AM_RANGE( 0x60, 0x60 ) AM_READ_PORT("DSW2")
+	AM_RANGE( 0x61, 0x61 ) AM_READ_PORT("DSW1")
+	AM_RANGE( 0x6b, 0x6b ) AM_WRITE(cdracula_sound_rombank_w) // OKI Bank
+ADDRESS_MAP_END
+
+
+/***************************************************************************
 
 
                                 Input Ports
@@ -1962,6 +2010,85 @@ static INPUT_PORTS_START( HANAFUDA_KEYS_BET_ALT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 #endif
+
+static INPUT_PORTS_START( cdracula )
+	PORT_START("P1")
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // erase on highscore entry
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("P2")
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // erase on highscore entry
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("COINS")
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(10)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+
+	PORT_START("DSW1")	// port $61 -> c217
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )    PORT_DIPLOCATION( "SW1:1,2" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy )    ) // 44
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal )  ) // 47
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard )    ) // 4a
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) ) // 4d
+	PORT_DIPNAME( 0x0c, 0x08, "Time" )                   PORT_DIPLOCATION( "SW1:3,4" )
+	PORT_DIPSETTING(    0x0c, "120 sec" )
+	PORT_DIPSETTING(    0x08, "90 sec" )
+	PORT_DIPSETTING(    0x04, "60 sec" )
+	PORT_DIPSETTING(    0x00, "60 sec (duplicate)" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )         PORT_DIPLOCATION( "SW1:5" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x20, 0x20, "Max Lives" )              PORT_DIPLOCATION( "SW1:6" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 1-7" )            PORT_DIPLOCATION( "SW1:7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                  PORT_DIPLOCATION( "SW1:8" )  
+
+	PORT_START("DSW2")	// port $60 -> c216
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )       PORT_DIPLOCATION( "SW2:1,2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-3" )            PORT_DIPLOCATION( "SW2:3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Reset Tiles After Miss" ) PORT_DIPLOCATION( "SW2:4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-5" )            PORT_DIPLOCATION( "SW2:5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )   PORT_DIPLOCATION( "SW2:6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )             PORT_DIPLOCATION( "SW2:7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Graphics Test" )          PORT_DIPLOCATION( "SW2:8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanamai )
 	PORT_START("DSW0")
@@ -4213,6 +4340,45 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
 }
 
 /***************************************************************************
+                                Castle Of Dracula
+***************************************************************************/
+
+static MACHINE_CONFIG_START( cdracula, dynax_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/4) /* 5.3693175MHz measured */
+	MCFG_CPU_PROGRAM_MAP(cdracula_mem_map)
+	MCFG_CPU_IO_MAP(cdracula_io_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
+
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
+	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
+
+//	MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(16, 512-16-1, 16, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_cdracula)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 512)
+
+	MCFG_PALETTE_INIT_OWNER(dynax_state,sprtmtch)            // static palette
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,hanamai)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH) /* 1MHz measured */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
                                 Hana no Mai
 ***************************************************************************/
 
@@ -4860,6 +5026,52 @@ MACHINE_CONFIG_END
 
 
 ***************************************************************************/
+
+
+/***************************************************************************
+
+Castle Of Dracula
+1994 Y.S.E.
+
+Not a Dynax board:
+
+GoldStar Z8400A PS (40-pin plastic DIP)
+GoldStar GM68B45S
+TI TPC1020AFN-084C
+OKI M6295 (second OKI spot is unpopulated)
+2 x DSW8, 28-way connector
+PAL16L8ACN
+4 MHz & 21.47727 MHz XTALs
+
+Clocks:
+    Z80 - 5.359MHz measured (21.47727MHz/4)
+  M6295 - 1Mhz (4Mhz/4)
+
+ V-SYNC - 58.560 Hz
+ H-SYNC - 15.41 KHz
+***************************************************************************/
+
+ROM_START( cdracula )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "escape.u202", 0x000000, 0x10000, CRC(92ceb689) SHA1(1b5d6cd51fc961f1b9a7b99d9ba48da8ea2e503b) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )    // blitter data
+	ROM_LOAD( "escape.u214", 0x00000, 0x40000, CRC(52c2f3bc) SHA1(764fb447d749c1b83d2bb6bcd517949a1cd76593) )
+	ROM_LOAD( "escape.u212", 0x40000, 0x40000, CRC(df536e91) SHA1(2c988e7793b2665d8ebb12a8f80a9aefdd3ed1dd) )
+	ROM_LOAD( "escape.u210", 0x80000, 0x40000, CRC(d3f5bac2) SHA1(d81ac3ca159985b0a79d02ebe707b46fdeaefe64) )
+
+	ROM_REGION( 0xc0000, "oki", 0 )
+	ROM_LOAD( "escape.ua", 0x00000, 0x20000, CRC(2f25be27) SHA1(9b7653ae9ebfd4a301d786c5c731478774e5171d) )
+	ROM_LOAD( "escape.ub", 0x20000, 0x20000, CRC(536a8dd0) SHA1(1ec226b0cd4d1320cdfce0a447ea0e481b85a802) )
+	ROM_LOAD( "escape.uc", 0x40000, 0x20000, CRC(393fa285) SHA1(654ab2fb92efa28f65bcc7c70a9fae2e43657309) )
+	ROM_LOAD( "escape.ud", 0x60000, 0x20000, CRC(eff474af) SHA1(7ab1f0079d051c9b0c4aa566a4d92032c7060d8e) )
+	ROM_LOAD( "escape.ue", 0x80000, 0x20000, CRC(0f9dc93b) SHA1(a3b33795cf07882ecc80d9afa5174e771ee0df08) )
+	ROM_FILL(              0xa0000, 0x20000, 0 )
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "82s147an.u26", 0x000, 0x200, CRC(1a3fe146) SHA1(7d1b4dd66fc95ea5ed584f0bb571cca09fe519b0) ) // FIXED BITS (00xxxxxx)
+	ROM_LOAD( "82s147an.u25", 0x200, 0x200, CRC(31791990) SHA1(526c0d516f290dc6cc2ec76d9bcec8c900e2ae10) )
+ROM_END
 
 
 /***************************************************************************
@@ -7118,5 +7330,6 @@ GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT
 GAME( 1991, ougonpai, 0,        tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Ougon No Pai",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1991, ougonpaib,ougonpai, tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Ougon No Pai (bootleg)",                                GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state,   mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1994, cdracula, 0,        cdracula, cdracula, driver_device, 0,        ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             GAME_SUPPORTS_SAVE ) // not a dynax board
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            GAME_NO_COCKTAIL | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // not a dynax board. proms?
 GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

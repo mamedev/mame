@@ -2139,11 +2139,14 @@ $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/cnsector.lh \
                             $(MESS_LAYOUT)/comp4.lh \
                             $(MESS_LAYOUT)/ebball.lh \
+                            $(MESS_LAYOUT)/ebball2.lh \
                             $(MESS_LAYOUT)/ebball3.lh \
                             $(MESS_LAYOUT)/elecdet.lh \
                             $(MESS_LAYOUT)/mathmagi.lh \
+                            $(MESS_LAYOUT)/mbdtower.lh \
                             $(MESS_LAYOUT)/merlin.lh \
                             $(MESS_LAYOUT)/simon.lh \
+                            $(MESS_LAYOUT)/ssimon.lh \
                             $(MESS_LAYOUT)/splitsec.lh \
                             $(MESS_LAYOUT)/starwbc.lh \
                             $(MESS_LAYOUT)/stopthie.lh \

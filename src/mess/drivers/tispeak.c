@@ -731,7 +731,7 @@ void tispeak_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 

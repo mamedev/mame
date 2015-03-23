@@ -119,13 +119,34 @@
 
   * unkch sets
 
+  In unkch1/unkch2 the payout rate is set with a combination of DSW1-3 (Punti)
+  and DSW3-3 (Gettoni/Ticket).  If Punti is set to Ticket, the payout rate is
+  the second number of the Gettoni/Ticket setting (100 or 200).  If Punti is set
+  to Gettoni, the payout rate is the first number of the Gettoni/Ticket setting
+  (10 or 20).  If your points/credits aren't a multiple of the payout rate, you
+  lose the remainder.  If you hit Key Out when your points/credits are less than
+  100, you get nothing at all.  If Gettoni/Ticket is set to 20/200 and you hit
+  Key Out when credits/points are at least 100 but less than 200, tickets will
+  be dispensed continuously until you insert another coin - game bug or MAME
+  bug?
+
+  Payout rate in unkch3 seems to be set with DSW1-3 (Punti) directly.  This game
+  also seems to be able to easily get into a state where tickets are dispensed
+  continuously.  Maybe there's something more complicated about the ticket
+  dispenser hookup that we're missing?
+
+  In unkch4 the payout rate is set with DSW1-3 (Punti) - 100 for Ticket and 10
+  for Gettoni.  It's also nice enough to let you keep the remainder if you hit
+  Key Out when your credits/points aren't a multiple of 100.  This is the only
+  set that doesn't have issues with dispensing tickets continuously
+
   unkch3 has a handy input test mode.  To access it, first enable it with DSW4-5,
   then hold the Settings button (9) during boot.
 
 
   * Crazy Bonus (crazybon):
 
-  Appears to be from a bootleg conversion set for Poker Master (pokrmast).  There
+  Appears to be from a bootleg conversion set for Poker Master (pkrmast).  There
   is another undumped bootleg conversion set advertised that displays Spirit or
   Dyna copyright depending on DIP settings and has both poker and slots games (the
   set in MAME displays "Crazy Co." copyright and only has a slots game).
@@ -972,16 +993,22 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 {
 /*
   7654 3210
+  ---- --x-  Payout counter (rate set with DIP switches)
   ---- -x--  Credit counter (1 pulse/10 credits)
   ---- x---  Key In counter
-  xxxx --xx  Unknown
+  --xx ----  used for something during ticket dispensing
+  x--- ----  Ticket Dispenser Motor
+  -x-- ---x  unused/unknown
 
 */
+
+	m_ticket_dispenser->write(space, offset, data & 0x80);
+
 	coin_counter_w(machine(), 0, data & 0x04);  /* Credit counter */
 	coin_counter_w(machine(), 1, data & 0x08);  /* Key In counter */
+	coin_counter_w(machine(), 2, data & 0x02);  /* payout counter */
 
-	if (data & 0xf3)
-		popmessage("coin counters: %02x", data);
+	//popmessage("coin counters: %02x", data);
 }
 
 WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
@@ -4763,9 +4790,7 @@ static INPUT_PORTS_START( unkch_controls )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  /* Trips "call attendant" state if activated while credited - something to do with hopper out? */
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("tickets", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -4791,9 +4816,9 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPNAME( 0x04, 0x04, "Punti" )                     PORT_DIPLOCATION("DSW1:3")          /* OK */
 	PORT_DIPSETTING(    0x04, "Ticket" )
 	PORT_DIPSETTING(    0x00, "Gettoni" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Ticket Dispenser" )          PORT_DIPLOCATION("DSW1:4")          /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )                PORT_DIPLOCATION("DSW1:5")          /* OK */
 	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
@@ -4836,15 +4861,15 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Coin A Rate" )               PORT_DIPLOCATION("DSW3:1,2")        /* OK */
+	PORT_DIPNAME( 0x03, 0x00, "Coin A Rate" )               PORT_DIPLOCATION("DSW3:1,2")        /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x02, "1 Coin/20 Credits" )
 	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )
-	PORT_DIPNAME( 0x04, 0x04, "Gettoni/Ticket" )            PORT_DIPLOCATION("DSW3:3")          /* OK */
-	PORT_DIPSETTING(    0x04, "20/200" )
+	PORT_DIPNAME( 0x04, 0x00, "Gettoni/Ticket" )            PORT_DIPLOCATION("DSW3:3")          /* OK */
 	PORT_DIPSETTING(    0x00, "10/100" )
-	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )               PORT_DIPLOCATION("DSW3:4,5")        /* OK */
+	PORT_DIPSETTING(    0x04, "20/200" )
+	PORT_DIPNAME( 0x18, 0x00, "Key In Rate" )               PORT_DIPLOCATION("DSW3:4,5")        /* OK */
 	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 5*5 */
 	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 5*10 */
 	PORT_DIPSETTING(    0x10, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 5*20 */
@@ -4861,13 +4886,13 @@ static INPUT_PORTS_START( unkch )
 	PORT_DIPSETTING(    0x08, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
 	PORT_DIPSETTING(    0x10, "1 Coin/1,000 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*20 */
 	PORT_DIPSETTING(    0x18, "1 Coin/2,500 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*50 */
-	PORT_DIPNAME( 0x20, 0x20, "Coin B Enable" )             PORT_DIPLOCATION("DSW3:6")          /* OK */
+	PORT_DIPNAME( 0x20, 0x00, "Coin B Enable" )             PORT_DIPLOCATION("DSW3:6")          /* OK */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")          /* OK */
+	PORT_DIPNAME( 0x40, 0x00, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")          /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x80, "Max Bet Type" )              PORT_DIPLOCATION("DSW3:8")          /* OK */
+	PORT_DIPNAME( 0x80, 0x00, "Max Bet Type" )              PORT_DIPLOCATION("DSW3:8")          /* OK */
 	PORT_DIPSETTING(    0x80, "Total" )        /* Max Bet applies to total of BET-A and BET-B unless set to 64 */
 	PORT_DIPSETTING(    0x00, "Individual" )   /* Max Bet applies individually to each of BET-A and BET-B */
 
@@ -4909,9 +4934,9 @@ static INPUT_PORTS_START( unkch3 )
 	PORT_DIPNAME( 0x04, 0x04, "Punti Unit" )                PORT_DIPLOCATION("DSW1:3")      /* OK */
 	PORT_DIPSETTING(    0x00, "500" )
 	PORT_DIPSETTING(    0x04, "1000" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Ticket Dispenser" )          PORT_DIPLOCATION("DSW1:4")      /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )                PORT_DIPLOCATION("DSW1:5")      /* OK */
 	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
@@ -4954,28 +4979,28 @@ static INPUT_PORTS_START( unkch3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:2")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:5")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Coin B Enable" )             PORT_DIPLOCATION("DSW3:6")      /* OK */
+	PORT_DIPNAME( 0x20, 0x00, "Coin B Enable" )             PORT_DIPLOCATION("DSW3:6")      /* OK */
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")      /* OK */
+	PORT_DIPNAME( 0x40, 0x00, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")      /* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x80, "Max Bet Type" )              PORT_DIPLOCATION("DSW3:8")          /* OK */
+	PORT_DIPNAME( 0x80, 0x00, "Max Bet Type" )              PORT_DIPLOCATION("DSW3:8")      /* OK */
 	PORT_DIPSETTING(    0x80, "Total" )        /* Max Bet applies to total of BET-A and BET-B unless set to 64 */
 	PORT_DIPSETTING(    0x00, "Individual" )   /* Max Bet applies individually to each of BET-A and BET-B */
 
@@ -5001,7 +5026,7 @@ static INPUT_PORTS_START( unkch3 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Cherry/Bell Bonus" )         PORT_DIPLOCATION("DSW4:8")          /* OK */
+	PORT_DIPNAME( 0x80, 0x80, "Cherry/Bell Bonus" )         PORT_DIPLOCATION("DSW4:8")      /* OK */
 	PORT_DIPSETTING(    0x80, "x6 / x3" )
 	PORT_DIPSETTING(    0x00, "x9 / x5" )
 INPUT_PORTS_END
@@ -5023,11 +5048,11 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPSETTING(    0x01, "Mid 2" )
 	PORT_DIPSETTING(    0x00, "Hard" )
 	PORT_DIPNAME( 0x04, 0x04, "Punti" )                     PORT_DIPLOCATION("DSW1:3")          /* OK */
-	PORT_DIPSETTING(    0x04, "Ticket" )
-	PORT_DIPSETTING(    0x00, "Gettoni" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, "Ticket" )    /* payout rate 100 */
+	PORT_DIPSETTING(    0x00, "Gettoni" )   /* payout rate 10 */
+	PORT_DIPNAME( 0x08, 0x08, "Ticket Dispenser" )          PORT_DIPLOCATION("DSW1:4")          /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x10, 0x10, "Reel Speed" )                PORT_DIPLOCATION("DSW1:5")          /* OK */
 	PORT_DIPSETTING(    0x10, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
@@ -5067,50 +5092,41 @@ static INPUT_PORTS_START( unkch4 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Coin A Rate" )               PORT_DIPLOCATION("DSW3:1,2")        /* OK */
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_8C ) )
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x02, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )               PORT_DIPLOCATION("DSW3:4,5")        /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/40 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*5 */
-	PORT_DIPSETTING(    0x08, "1 Coin/80 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*10 */
-	PORT_DIPSETTING(    0x10, "1 Coin/160 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*20 */
-	PORT_DIPSETTING(    0x18, "1 Coin/400 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*50 */
-	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*5 */
-	PORT_DIPSETTING(    0x08, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*10 */
-	PORT_DIPSETTING(    0x10, "1 Coin/200 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*20 */
-	PORT_DIPSETTING(    0x18, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*50 */
-	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*5 */
-	PORT_DIPSETTING(    0x08, "1 Coin/200 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*10 */
-	PORT_DIPSETTING(    0x10, "1 Coin/400 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*20 */
-	PORT_DIPSETTING(    0x18, "1 Coin/1,000 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*50 */
-	PORT_DIPSETTING(    0x00, "1 Coin/250 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*5 */
-	PORT_DIPSETTING(    0x08, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
-	PORT_DIPSETTING(    0x10, "1 Coin/1,000 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*20 */
-	PORT_DIPSETTING(    0x18, "1 Coin/2,500 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*50 */
-	PORT_DIPNAME( 0x20, 0x20, "Coin C Rate" )               PORT_DIPLOCATION("DSW3:6")          /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/40 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*5 */
-	PORT_DIPSETTING(    0x20, "1 Coin/80 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*10 */
-	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*5 */
-	PORT_DIPSETTING(    0x20, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*10 */
-	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*5 */
-	PORT_DIPSETTING(    0x20, "1 Coin/200 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*10 */
-	PORT_DIPSETTING(    0x00, "1 Coin/250 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*5 */
-	PORT_DIPSETTING(    0x20, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
-	PORT_DIPNAME( 0x40, 0x40, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")          /* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/80 Credits" )     PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*10 */
-	PORT_DIPSETTING(    0x40, "1 Coin/160 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x00) /* 8*20 */
-	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*10 */
-	PORT_DIPSETTING(    0x40, "1 Coin/200 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x01) /* 10*20 */
-	PORT_DIPSETTING(    0x00, "1 Coin/200 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*10 */
-	PORT_DIPSETTING(    0x40, "1 Coin/400 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x02) /* 20*20 */
-	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*10 */
-	PORT_DIPSETTING(    0x40, "1 Coin/1,000 Credits" )  PORT_CONDITION("DSW3",0x03,EQUALS,0x03) /* 50*20 */
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPNAME( 0x07, 0x00, "Coin A Rate" )               PORT_DIPLOCATION("DSW3:1,2,3")      /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0x05, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin/50 Credits" )
+	PORT_DIPNAME( 0x18, 0x00, "Key In Rate" )               PORT_DIPLOCATION("DSW3:4,5")        /* OK */
+	PORT_DIPSETTING(    0x00, "5x Coin A" )
+	PORT_DIPSETTING(    0x08, "10x Coin A" )
+	PORT_DIPSETTING(    0x10, "20x Coin A" )
+	PORT_DIPSETTING(    0x18, "50x Coin A" )
+	PORT_DIPNAME( 0x20, 0x00, "Coin C Rate" )               PORT_DIPLOCATION("DSW3:6")          /* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )        PORT_CONDITION("DSW3",0x07,EQUALS,0x00) /* 1*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/10 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x00) /* 1*10 */
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x01) /* 2*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/20 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x01) /* 2*10 */
+	PORT_DIPSETTING(    0x00, "1 Coin/20 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x02) /* 4*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/40 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x02) /* 4*10 */
+	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x03) /* 5*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/50 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x03) /* 5*10 */
+	PORT_DIPSETTING(    0x00, "1 Coin/40 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x04) /* 8*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/80 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x04) /* 8*10 */
+	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )     PORT_CONDITION("DSW3",0x07,EQUALS,0x05) /* 10*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x07,EQUALS,0x05) /* 10*10 */
+	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )    PORT_CONDITION("DSW3",0x07,EQUALS,0x06) /* 20*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/200 Credits" )    PORT_CONDITION("DSW3",0x07,EQUALS,0x06) /* 20*10 */
+	PORT_DIPSETTING(    0x00, "1 Coin/250 Credits" )    PORT_CONDITION("DSW3",0x07,EQUALS,0x07) /* 50*5 */
+	PORT_DIPSETTING(    0x20, "1 Coin/500 Credits" )    PORT_CONDITION("DSW3",0x07,EQUALS,0x07) /* 50*10 */
+	PORT_DIPNAME( 0x40, 0x00, "Coin B Rate" )               PORT_DIPLOCATION("DSW3:7")          /* OK */
+	PORT_DIPSETTING(    0x00, "1x Coin C" )
+	PORT_DIPSETTING(    0x40, "2x Coin C" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -7701,6 +7717,8 @@ static MACHINE_CONFIG_START( unkch, unkch_state )
 	MCFG_CPU_IO_MAP(unkch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", unkch_state, vblank_irq)
 
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -7714,8 +7732,6 @@ static MACHINE_CONFIG_START( unkch, unkch_state )
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	//MCFG_NVRAM_HANDLER(goldstar)
-
 	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
 
 	/* sound hardware */
@@ -7724,6 +7740,9 @@ static MACHINE_CONFIG_START( unkch, unkch_state )
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* payout hardware */
+	MCFG_TICKET_DISPENSER_ADD("tickets", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 MACHINE_CONFIG_END
 
 

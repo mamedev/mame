@@ -43,7 +43,8 @@ Dynasty Wars (USA, B-Board 89624B-?)                               89624B-?   TK
 Tenchi wo Kurau (Japan)                                            88622B-3   TK22B            LWIO  88622-C-2    CPS-B-02  DL-0411-10002  None
 Tenchi wo Kurau (Japan Resale Ver.)                                91634B-2   TK163B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
-Willow (USA Old Ver.)                                        1989  89624B-3   WL24B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
+Willow (World)                                               1989  89624B-3   WL24B            LWIO  88622-C-4    CPS-B-03  DL-0411-10003  None
+Willow (USA Old Ver.)                                              89624B-3   WL24B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
 Willow (USA)                                                       89624B-3   WL24B            LWIO  88622-C-2/4  CPS-B-03  DL-0411-10003  None
 Willow (Japan)                                                     88622B-3   WL22B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
 
@@ -141,6 +142,8 @@ Street Fighter II': Champion Edition (Japan 920513)                91634B-2   S9
 Street Fighter II': Champion Edition (Japan 920803)                91634B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Adventure Quiz Capcom World 2* (Japan 920611)                1992  89625B-1   Q522B            LWIO  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Adventure Quiz Capcom World 2* (Japan 920611)                      91634B-2   Q563B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Adventure Quiz Capcom World 2 (Japan 920611)                       90629B-3   Q529B            IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 
 Varth: Operation Thunderstorm (World 920612)                 1992  89624B-?   VA24B            IOB1  ?            CPS-B-04  DL-0411-10005
 Varth: Operation Thunderstorm (World 920714)                       89624B-3   VA24B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
@@ -1399,7 +1402,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"dynwarj",     CPS_B_02,     mapper_TK22B },
 	{"dynwarjr",    CPS_B_21_DEF, mapper_TK22B },   // wrong, this set uses TK163B, still not dumped
 	{"willow",      CPS_B_03,     mapper_WL24B },
-	{"willowo",     CPS_B_03,     mapper_WL24B },
+	{"willowu",     CPS_B_03,     mapper_WL24B },
+	{"willowuo",    CPS_B_03,     mapper_WL24B },
 	{"willowj",     CPS_B_03,     mapper_WL24B },   // wrong, this set uses WL22B, still not dumped
 	{"ffight",      CPS_B_04,     mapper_S224B },
 	{"ffighta",     CPS_B_04,     mapper_S224B },
@@ -1531,8 +1535,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"varthu",      CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthj",      CPS_B_21_BT5, mapper_VA22B },   /* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
 	{"cworld2j",    CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },   /* (ports 36, 34 probably leftover input code from another game) */
-	{"cworld2ja",   CPS_B_21_DEF, mapper_Q522B }, // patched set, no battery, could be desuicided
-	{"cworld2jb",   CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 }, // actually Q563B
+	{"cworld2ja",   CPS_B_21_DEF, mapper_Q522B }, // patched set, no battery, could be desuicided // wrong, this set uses Q529B, still not dumped
+	{"cworld2jb",   CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 }, // wrong, this set uses Q563B, still not dumped
 	{"wof",         CPS_B_21_QS1, mapper_TK263B },
 	{"wofr1",       CPS_B_21_DEF, mapper_TK263B },  // patched set coming from a desuicided board?
 	{"wofa",        CPS_B_21_DEF, mapper_TK263B },  // patched set coming from a desuicided board?

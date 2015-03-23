@@ -55,7 +55,7 @@ static const INT8 s_bits[] =
 	2, 2, 2,
 	6, 6, 5, 3, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -4, 0, 0, 0,
-	0, 0, 0, -4, -4, 3, 3, 3, 3, 3,
+	0, 0, 0, 4, 4, 3, 3, 3, 3, 3,
 	0, 0
 };
 
@@ -87,96 +87,98 @@ static const INT16 s_next_pc[0x40] =
 };
 
 
+#define m mILL
 static const UINT8 hmcs40_mnemonic[0x400] =
 {
-/*  0       1       2       3       4       5       6       7       8       9       A       B       C       D       E       F	   */
+/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x000 */
-	mNOP,   mXSP,   mXSP,   mXSP,   mSEM,   mSEM,   mSEM,   mSEM,   mLAM,   mLAM,   mLAM,   mLAM,   mILL,   mILL,   mILL,   mILL,
-	mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY, mLMIIY,
-	mLBM,   mLBM,   mLBM,   mLBM,   mBLEM,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mAMC,   mILL,   mILL,   mILL,   mAM,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mLTA,   mILL,   mILL,   mILL,
+	mNOP,  mXSP,  mXSP,  mXSP,  mSEM,  mSEM,  mSEM,  mSEM,  mLAM,  mLAM,  mLAM,  mLAM,  m,     m,     m,     m,  
+	mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,
+	mLBM,  mLBM,  mLBM,  mLBM,  mBLEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mAMC,  m,     m,     m,     mAM,   m,     m,     m,     m,     m,     m,     m,     mLTA,  m,     m,     m,  
 	/* 0x040 */
-	mLXA,   mILL,   mILL,   mILL,   mILL,   mDAS,   mDAA,   mILL,   mILL,   mILL,   mILL,   mILL,   mREC,   mILL,   mILL,   mSEC,
-	mLYA,   mILL,   mILL,   mILL,   mIY,    mILL,   mILL,   mILL,   mAYY,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mLBA,   mILL,   mILL,   mILL,   mIB,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,   mLAI,
+	mLXA,  m,     m,     m,     m,     mDAS,  mDAA,  m,     m,     m,     m,     m,     mREC,  m,     m,     mSEC,
+	mLYA,  m,     m,     m,     mIY,   m,     m,     m,     mAYY,  m,     m,     m,     m,     m,     m,     m,  
+	mLBA,  m,     m,     m,     mIB,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,
 	/* 0x080 */
-	mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,    mAI,
-	mSED,   mILL,   mILL,   mILL,   mTD,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mSEIF1, mSECF,  mSEIF0, mILL,   mSEIE,  mSETF,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,
+	mSED,  m,     m,     m,     mTD,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mSEIF1,mSECF, mSEIF0,m,     mSEIE, mSETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 	/* 0x0c0 */
-	mLAR,   mLAR,   mLAR,   mLAR,   mLAR,   mLAR,   mLAR,   mLAR,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,  mSEDD,
-	mLBR,   mLBR,   mLBR,   mLBR,   mLBR,   mLBR,   mLBR,   mLBR,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,  mXAMR,
+	mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  m,     m,     m,     m,     m,     m,     m,     m,  
+	mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD,
+	mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  m,     m,     m,     m,     m,     m,     m,     m,  
+	mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR,
 
-/*  0       1       2       3       4       5       6       7       8       9       A       B       C       D       E       F	   */
+/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x100 */
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mLMAIY, mLMAIY, mILL,   mILL,   mLMADY, mLMADY, mILL,   mILL,   mLAY,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mOR,    mILL,   mILL,   mILL,   mANEM,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mLMAIY,mLMAIY,m,     m,     mLMADY,mLMADY,m,     m,     mLAY,  m,     m,     m,     m,     m,     m,     m,  
+	mOR,   m,     m,     m,     mANEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 	/* 0x140 */
-	mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,   mLXI,
-	mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,   mLYI,
-	mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,   mLBI,
-	mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,   mLTI,
+	mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,
+	mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,
+	mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,
+	mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,
 	/* 0x180 */
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mTIF1,  mTI1,   mTIF0,  mTI0,   mILL,   mTTF,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mTIF1, mTI1,  mTIF0, mTI0,  m,     mTTF,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 	/* 0x1c0 */
-	mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,
-	mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,
-	mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,
-	mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,    mBR,
+	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
+	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
+	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
+	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
 
-/*  0       1       2       3       4       5       6       7       8       9       A       B       C       D       E       F	   */
+/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x200 */
-	mTM,    mTM,    mTM,    mTM,    mREM,   mREM,   mREM,   mREM,   mXMA,   mXMA,   mXMA,   mXMA,   mILL,   mILL,   mILL,   mILL,
-	mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,  mMNEI,
-	mXMB,   mXMB,   mXMB,   mXMB,   mROTR,  mROTL,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mSMC,   mILL,   mILL,   mILL,   mALEM,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mLAT,   mILL,   mILL,   mILL,
+	mTM,   mTM,   mTM,   mTM,   mREM,  mREM,  mREM,  mREM,  mXMA,  mXMA,  mXMA,  mXMA,  m,     m,     m,     m,  
+	mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI,
+	mXMB,  mXMB,  mXMB,  mXMB,  mROTR, mROTL, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mSMC,  m,     m,     m,     mALEM, m,     m,     m,     m,     m,     m,     m,     mLAT,  m,     m,     m,  
 	/* 0x240 */
-	mLASPX, mILL,   mILL,   mILL,   mNEGA,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mTC,
-	mLASPY, mILL,   mILL,   mILL,   mDY,    mILL,   mILL,   mILL,   mSYY,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mLAB,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mDB,    mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,  mALEI,
+	mLASPX,m,     m,     m,     mNEGA, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     mTC,
+	mLASPY,m,     m,     m,     mDY,   m,     m,     m,     mSYY,  m,     m,     m,     m,     m,     m,     m,  
+	mLAB,  m,     m,     m,     m,     m,     m,     mDB,   m,     m,     m,     m,     m,     m,     m,     m,  
+	mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI,
 	/* 0x280 */
-	mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,  mYNEI,
-	mRED,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mREIF1, mRECF,  mREIF0, mILL,   mREIE,  mRETF,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI,
+	mRED,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mREIF1,mRECF, mREIF0,m,     mREIE, mRETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 	/* 0x2c0 */
-	mLRA,   mLRA,   mLRA,   mLRA,   mLRA,   mLRA,   mLRA,   mLRA,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,  mREDD,
-	mLRB,   mLRB,   mLRB,   mLRB,   mLRB,   mLRB,   mLRB,   mLRB,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  m,     m,     m,     m,     m,     m,     m,     m,  
+	mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD,
+	mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 
-/*  0       1       2       3       4       5       6       7       8       9       A       B       C       D       E       F	   */
+/*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x300 */
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mCOMB,  mILL,   mILL,   mILL,   mBNEM,  mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mCOMB, m,     m,     m,     mBNEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 	/* 0x340 */
-	mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,
-	mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,   mLPU,
-	mTBR,   mTBR,   mTBR,   mTBR,   mTBR,   mTBR,   mTBR,   mTBR,   mP,     mP,     mP,     mP,     mP,     mP,     mP,     mP,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,
+	mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,
+	mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mP,    mP,    mP,    mP,    mP,    mP,    mP,    mP,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 	/* 0x380 */
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mRTNI,  mILL,   mILL,   mRTN,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
-	mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,   mILL,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     mRTNI, m,     m,     mRTN,  m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
 	/* 0x3c0 */
-	mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,
-	mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,
-	mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,
-	mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL,   mCAL
+	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
+	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
+	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
+	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL
 };
+#undef m
 
 
 

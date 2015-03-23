@@ -67,6 +67,7 @@ public:
 	DECLARE_READ16_MEMBER(astrocorp_unk_r);
 	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
 	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
+	DECLARE_DRIVER_INIT(astoneag);
 	DECLARE_DRIVER_INIT(showhanc);
 	DECLARE_DRIVER_INIT(showhand);
 	DECLARE_VIDEO_START(astrocorp);
@@ -1148,13 +1149,164 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
 #endif
 }
 
+DRIVER_INIT_MEMBER(astrocorp_state,astoneag)
+{
+#if 0
+	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	UINT16 x;
+	int i;
+
+	for (i = 0x25100/2; i < 0x25200/2; i++)
+	{
+		x = 0x0000;
+		if (  (i & 0x0001) )					x |= 0x0200;
+		if (  (i & 0x0004) && !(i & 0x0001) )	x |= 0x0080;
+		if (  (i & 0x0040) ||  (i & 0x0001) )	x |= 0x0040;
+		if (  (i & 0x0010) && !(i & 0x0001) )	x |= 0x0020;
+		if ( !(i & 0x0020) ||  (i & 0x0001) )	x |= 0x0010;
+		if (  (i & 0x0002) ||  (i & 0x0001) )	x |= 0x0008;
+		if (  (i & 0x0008) && !(i & 0x0001) )	x |= 0x0004;
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0002;
+		if (  (i & 0x0040) && !(i & 0x0001) )	x |= 0x0001;
+		rom[i] ^= x;
+	}
+
+/*
+	for (i = 0x25300/2; i < 0x25400/2; i++)
+	{
+		x = 0x1300;
+		rom[i] ^= x;
+	}
+*/
+
+	for (i = 0x25400/2; i < 0x25500/2; i++)
+	{
+		x = 0x4200;
+		if (  (i & 0x0001) )					x |= 0x0400;
+		if (  (i & 0x0020) && !(i & 0x0001) )	x |= 0x0080;
+		if ( !(i & 0x0010) ||  (i & 0x0001) )	x |= 0x0040;
+		if (  (i & 0x0040) && !(i & 0x0001) )	x |= 0x0020;
+		if ( !(i & 0x0004) ||  (i & 0x0001) )	x |= 0x0010;
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0004;
+		if (  (i & 0x0008) && !(i & 0x0001) )	x |= 0x0002;
+		if (  (i & 0x0002) ||  (i & 0x0001) )	x |= 0x0001;
+		rom[i] ^= x;
+	}
+
+	for (i = 0x25500/2; i < 0x25600/2; i++)
+	{
+		x = 0x4200;
+		if (  (i & 0x0001) )					x |= 0x0400;
+		if (  (i & 0x0010) && !(i & 0x0001) )	x |= 0x0080;
+		if (  (i & 0x0040) && !(i & 0x0001) )	x |= 0x0040;
+		if ( !(i & 0x0002) && !(i & 0x0001) )	x |= 0x0020;
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0010;
+		if (  (i & 0x0008) && !(i & 0x0001) )	x |= 0x0008;
+		if (  (i & 0x0020) && !(i & 0x0001) )	x |= 0x0004;
+		if (  (i & 0x0004) && !(i & 0x0001) )	x |= 0x0002;
+		if (  (i & 0x0001) )					x |= 0x0001;
+		rom[i] ^= x;
+	}
+
+/*
+	for (i = 0x25700/2; i < 0x25800/2; i++)
+	{
+		x = 0x6800;
+		if ( !(i & 0x0001) )					x |= 0x8000;
+
+		if ( !(i & 0x0040) || ((i & 0x0001) || !(i & 0x0001)) )					x |= 0x0100;
+
+		rom[i] ^= x;
+	}
+*/
+
+	for (i = 0x25800/2; i < 0x25900/2; i++)
+	{
+		x = 0x8300;
+		if (  (i & 0x0040) ||  (i & 0x0001) )	x |= 0x2000;
+		if (  (i & 0x0002) ||  (i & 0x0001) )	x |= 0x0080;
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0040;
+		if (  (i & 0x0020) && !(i & 0x0001) )	x |= 0x0020;
+		if ( !(i & 0x0004) ||  (i & 0x0001) )	x |= 0x0010;
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0008;
+		if (  (i & 0x0010) && !(i & 0x0001) )	x |= 0x0004;
+		if (  (i & 0x0008) && !(i & 0x0001) )	x |= 0x0002;
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0001;
+		rom[i] ^= x;
+	}
+
+//	for (i = 0x25900/2; i < 0x25a00/2; i++)
+
+	for (i = 0x25c00/2; i < 0x25d00/2; i++)
+	{
+		// changed from 25400
+//		x = 0x4200;
+		x = 0x4000;
+//		if (  (i & 0x0001) )					x |= 0x0400;
+		if (  (i & 0x0020) && !(i & 0x0001) )	x |= 0x0080;
+		if ( !(i & 0x0010) ||  (i & 0x0001) )	x |= 0x0040;
+		if (  (i & 0x0040) && !(i & 0x0001) )	x |= 0x0020;
+		if ( !(i & 0x0004) ||  (i & 0x0001) )	x |= 0x0010;
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0004;
+		if (  (i & 0x0008) && !(i & 0x0001) )	x |= 0x0002;
+		if (  (i & 0x0002) ||  (i & 0x0001) )	x |= 0x0001;
+		rom[i] ^= x;
+	}
+
+/*
+	for (i = 0x25d00/2; i < 0x25e00/2; i++)
+	{
+		x = 0x4000;
+		if ( !(i & 0x0040) )									x |= 0x0800;
+
+		if ( !(i & 0x0040) && !(i & 0x0001) )	x |= 0x0100;	// almost!!
+
+		if ( ((i & 0x0040)&&((i & 0x0020)||(i & 0x0010))) || !(i & 0x0001) )	x |= 0x0200;	// almost!!
+		if ( (!(i & 0x0040) || !(i & 0x0008)) && !(i & 0x0001) )	x |= 0x0008;
+		if (  (i & 0x0040) || !(i & 0x0020) ||  (i & 0x0001) )	x |= 0x0001;	// almost!!
+		rom[i] ^= x;
+	}
+*/
+
+/*
+	for (i = 0x25e00/2; i < 0x25f00/2; i++)
+	{
+		x = 0xa600;
+
+		if (  (i & 0x0040) &&  (i & 0x0001) )	x |= 0x4000;
+		if (  (i & 0x0040) &&  (i & 0x0001) )	x |= 0x0800;
+		if ( !(i & 0x0001) )					x |= 0x0100;
+
+		if ( (  (i & 0x0040) &&  (i & 0x0008) && !(i & 0x0001)) ||
+		     ( !(i & 0x0040) && ((i & 0x0004) ^ (i & 0x0002)) && !(i & 0x0001) ) )	x |= 0x0002;	// almost!!
+
+		if ( !(i & 0x0040) || !(i & 0x0002) ||  (i & 0x0001) )	x |= 0x0001;
+		rom[i] ^= x;
+	}
+*/
+
+	for (i = 0x26f00/2; i < 0x27000/2; i++)
+	{
+		x = 0xb94c;
+		rom[i] ^= x;
+	}
+
+	for (i = 0x27000/2; i < 0x27100/2; i++)
+	{
+		x = 0x5f10;
+		rom[i] ^= x;
+	}
+
+#endif
+}
+
 GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, showhand, ROT0, "Astro Corp.",        "Show Hand (Italy)",                GAME_SUPPORTS_SAVE )
 GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",         GAME_SUPPORTS_SAVE )
 GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",  GAME_SUPPORTS_SAVE )
 GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",           GAME_SUPPORTS_SAVE )
 
 // Encrypted games (not working):
-GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)", GAME_NOT_WORKING )
+GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, astrocorp_state, astoneag, ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)", GAME_NOT_WORKING )
 GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",            GAME_NOT_WORKING )
 GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",            GAME_NOT_WORKING )
 GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, driver_device,   0,        ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",   GAME_NOT_WORKING )

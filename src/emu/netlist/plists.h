@@ -199,7 +199,7 @@ private:
 // pnamedlist_t: a simple list
 // ----------------------------------------------------------------------------------------
 
-#ifdef SDLMAME_SOLARIS
+#if defined(SDLMAME_SOLARIS) || defined(__ANDROID__)
 #undef _C
 #endif
 

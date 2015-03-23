@@ -119,39 +119,45 @@ class sub_state : public driver_device
 public:
 	sub_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_attr(*this, "attr"),
 		m_vid(*this, "vid"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_scrolly(*this, "scrolly"),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_scrolly(*this, "scrolly") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vid;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_scrolly;
+	
 	UINT8 m_nmi_en;
-	DECLARE_WRITE8_MEMBER(subm_to_sound_w);
+	
+	DECLARE_WRITE8_MEMBER(to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	virtual void video_start();
+	
+	virtual void machine_start();
 	DECLARE_PALETTE_INIT(sub);
-	UINT32 screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(subm_sound_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_irq);
 };
 
-void sub_state::video_start()
+void sub_state::machine_start()
 {
+	save_item(NAME(m_nmi_en));
 }
 
-UINT32 sub_state::screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
@@ -255,7 +261,7 @@ static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0xf060, 0xf060) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(sub_state::subm_to_sound_w)
+WRITE8_MEMBER(sub_state::to_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
@@ -268,7 +274,7 @@ WRITE8_MEMBER(sub_state::nmi_mask_w)
 
 static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r) AM_WRITE(subm_to_sound_w) // to/from sound CPU
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r) AM_WRITE(to_sound_w) // to/from sound CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
@@ -425,7 +431,7 @@ PALETTE_INIT_MEMBER(sub_state, sub)
 }
 
 
-INTERRUPT_GEN_MEMBER(sub_state::subm_sound_irq)
+INTERRUPT_GEN_MEMBER(sub_state::sound_irq)
 {
 	if(m_nmi_en)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -442,7 +448,7 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_CPU_ADD("soundcpu", Z80,MASTER_CLOCK/6)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(subm_sound_map)
 	MCFG_CPU_IO_MAP(subm_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sub_state, subm_sound_irq,  120) //???
+	MCFG_CPU_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
 
 
 	/* video hardware */
@@ -451,7 +457,7 @@ static MACHINE_CONFIG_START( sub, sub_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update_sub)
+	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sub)
@@ -502,4 +508,4 @@ ROM_START( sub )
 	ROM_LOAD( "prom pos c8 n82s129",      0x0600, 0x100, CRC(351e1ef8) SHA1(530c9012ff5abda1c4ba9787ca999ca1ae1a893d) )
 ROM_END
 
-GAME( 1985, sub,  0,    sub, sub, driver_device,  0, ROT270, "Sigma Enterprises Inc.", "Submarine (Sigma)", GAME_NO_COCKTAIL )
+GAME( 1985, sub,  0,    sub, sub, driver_device,  0, ROT270, "Sigma Enterprises Inc.", "Submarine (Sigma)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
