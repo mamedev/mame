@@ -97,6 +97,7 @@ ifeq ($(platform), unix)
 	TARGETOS=linux
 else ifeq ($(platform), android)
 	TARGETOS=linux
+	PTR64 = 0
 	FORCE_DRC_C_BACKEND = 1
 else ifeq ($(platform), osx)
 	TARGETOS = macosx
