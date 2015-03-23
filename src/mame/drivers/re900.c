@@ -87,26 +87,33 @@ class re900_state : public driver_device
 public:
 	re900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_rom(*this, "rom"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_rom(*this, "rom") { }
+
+	required_device<cpu_device> m_maincpu;
 
 	required_shared_ptr<UINT8> m_rom;
+
+	// re900 specific
 	UINT8 m_psg_pa;
 	UINT8 m_psg_pb;
 	UINT8 m_mux_data;
 	UINT8 m_ledant;
 	UINT8 m_player;
 	UINT8 m_stat_a;
+	
+	// common
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
-	DECLARE_WRITE8_MEMBER(re900_watchdog_reset_w);
+	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
+	
+	// re900 specific
 	DECLARE_READ8_MEMBER(re_psg_portA_r);
 	DECLARE_READ8_MEMBER(re_psg_portB_r);
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
-	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
+	
 	DECLARE_DRIVER_INIT(re900);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -219,7 +226,7 @@ WRITE8_MEMBER(re900_state::cpu_port_0_w)
 //  output_set_lamp_value(8,1 ^ ( (data >> 5) & 1)); /* Cont. Ent */
 }
 
-WRITE8_MEMBER(re900_state::re900_watchdog_reset_w)
+WRITE8_MEMBER(re900_state::watchdog_reset_w)
 {
 	//watchdog_reset_w(space,0,0); /* To do! */
 }
@@ -240,17 +247,11 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("tms9128", tms9928a_device, register_write)
 	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ay_re900", ay8910_device, address_data_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVREAD("ay_re900", ay8910_device, data_r)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(re900_watchdog_reset_w)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_WRITE(cpu_port_0_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_NOP
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_NOP
 ADDRESS_MAP_END
-
-
-WRITE_LINE_MEMBER(re900_state::vdp_interrupt)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
-}
 
 
 /************************
@@ -380,7 +381,7 @@ static MACHINE_CONFIG_START( re900, re900_state )
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(re900_state, vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9128", tms9128_device, screen_update )
 
@@ -431,6 +432,13 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 	m_player = 1;
 	m_stat_a = 1;
 	m_psg_pa = m_psg_pb = m_mux_data = m_ledant = 0;
+	
+	save_item(NAME(m_psg_pa));
+	save_item(NAME(m_psg_pb));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_ledant));
+	save_item(NAME(m_player));
+	save_item(NAME(m_stat_a));
 }
 
 
@@ -439,5 +447,5 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 *************************/
 
 /*     YEAR  NAME   PARENT MACHINE INPUT  INIT   ROT     COMPANY                    FULLNAME            FLAGS LAYOUT */
-GAMEL( 1993, re900, 0,     re900,  re900, re900_state, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    0,    layout_re900)
-GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900_state, re900, ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", 0)
+GAMEL( 1993, re900, 0,     re900,  re900, re900_state,   re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    GAME_SUPPORTS_SAVE,    layout_re900)
+GAME ( 1994, bs94 , 0,     bs94,   bs94 , driver_device, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", GAME_SUPPORTS_SAVE )
