@@ -1,3 +1,6 @@
+#include "video/decmxc06.h"
+
+
 class thedeep_state : public driver_device
 {
 public:
@@ -12,7 +15,9 @@ public:
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_scroll(*this, "scroll"),
-		m_scroll2(*this, "scroll2")  { }
+		m_scroll2(*this, "scroll2"),
+		m_spritegen(*this, "spritegen")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -25,6 +30,7 @@ public:
 	required_shared_ptr<UINT8> m_vram_1;
 	required_shared_ptr<UINT8> m_scroll;
 	required_shared_ptr<UINT8> m_scroll2;
+	required_device<deco_mxc06_device> m_spritegen;
 
 	int m_nmi_enable;
 	UINT8 m_protection_command;
@@ -59,7 +65,6 @@ public:
 	DECLARE_PALETTE_INIT(thedeep);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
