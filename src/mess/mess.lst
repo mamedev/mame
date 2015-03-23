@@ -2204,7 +2204,6 @@ starwbcp    // Kenner (prototype)
 comp4       // Milton Bradley
 simon       // Milton Bradley
 ssimon      // Milton Bradley
-mbdtower    // Milton Bradley
 cnsector    // Parker Bros
 merlin      // Parker Bros
 stopthie    // Parker Bros
@@ -2212,6 +2211,9 @@ stopthiep   // Parker Bros (prototype)
 bankshot    // Parker Bros
 splitsec    // Parker Bros
 tandy12     // Tandy Radio Shack
+
+elecbowl    // Marx
+mbdtower    // Milton Bradley
 
 ssfball     // Bambino
 splasfgt    // Bambino
@@ -2221,7 +2223,6 @@ tmpacman    // Tomy
 tmtennis    // Tomy
 alnchase    // Tomy
 
-elecbowl    // Marx
 wildfire    // Parker Bros
 
 

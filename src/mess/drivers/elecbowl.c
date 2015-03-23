@@ -16,7 +16,6 @@
 ***************************************************************************/
 
 #include "includes/hh_tms1k.h"
-
 #include "elecbowl.lh"
 
 
@@ -27,9 +26,9 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
 
 protected:
 	virtual void machine_start();
@@ -41,18 +40,6 @@ protected:
   I/O
 
 ***************************************************************************/
-
-READ8_MEMBER(elecbowl_state::read_k)
-{
-	UINT8 k = 0;
-
-	// read selected input rows
-	for (int i = 0; i < 4; i++)
-		if (m_inp_mux >> i & 1)
-			k |= m_inp_matrix[i]->read();
-
-	return k;
-}
 
 WRITE16_MEMBER(elecbowl_state::write_r)
 {
@@ -69,6 +56,11 @@ WRITE16_MEMBER(elecbowl_state::write_r)
 WRITE16_MEMBER(elecbowl_state::write_o)
 {
 	// ?
+}
+
+READ8_MEMBER(elecbowl_state::read_k)
+{
+	return read_inputs(4);
 }
 
 

@@ -112,14 +112,6 @@ public:
 	DECLARE_WRITE16_MEMBER(ssimon_write_o);
 	DECLARE_READ8_MEMBER(ssimon_read_k);
 
-	bool m_dtower_motor_on;
-	bool m_dtower_sensor;
-	void mbdtower_display();
-	DECLARE_WRITE16_MEMBER(mbdtower_write_r);
-	DECLARE_WRITE16_MEMBER(mbdtower_write_o);
-	DECLARE_READ8_MEMBER(mbdtower_read_k);
-	DECLARE_MACHINE_START(mbdtower);
-
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);
 	DECLARE_READ8_MEMBER(cnsector_read_k);

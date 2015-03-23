@@ -48,7 +48,7 @@
  *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
- @MP7332   TMS1400  1981, Milton Bradley Dark Tower
+  MP7332   TMS1400  1981, Milton Bradley Dark Tower -> mbdtower.c
  @MP7334   TMS1400  1981, Coleco Total Control 4
 
   inconsistent:
@@ -82,7 +82,6 @@
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
-#include "mbdtower.lh"
 #include "merlin.lh" // clickable
 #include "simon.lh" // clickable
 #include "ssimon.lh"
@@ -1538,130 +1537,6 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Milton Bradley Dark Tower
-  * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
-  * SN75494N MOS-to-LED digit driver
-
-  x
-
-***************************************************************************/
-
-void hh_tms1k_state::mbdtower_display()
-{
-}
-
-WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_r)
-{
-	// R0-R2: input mux
-	m_inp_mux = data & 7;
-	
-	// R3: N/C
-	// R4: 75494 enable (speaker, lamps, digit select go through that IC)
-	// R5-R7: tower lamps
-	// R8: rotation sensor led
-	// R9: motor on
-	
-	// R10: speaker out
-	m_speaker->level_w(data >> 10 & 1);
-}
-
-WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_o)
-{
-	// O0-O6: led segments A-G
-	// O7: digit select
-	m_o = data;
-}
-
-READ8_MEMBER(hh_tms1k_state::mbdtower_read_k)
-{
-	// rotation sensor is on K8
-	
-	return read_inputs(3);
-}
-
-
-/* physical button layout and labels is like this:
-
-    (green)     (l.blue)    (red)
-    [YES/       [REPEAT]    [NO/
-     BUY]                    END]
-    
-    (yellow)    (blue)      (white)
-    [HAGGLE]    [BAZAAR]    [CLEAR]
-    
-    (blue)      (blue)      (blue)
-    [TOMB/      [MOVE]      [SANCTUARY/
-     RUIN]                   CITADEL]
-    
-    (orange)    (blue)      (d.yellow)
-    [DARK       [FRONTIER]  [INVENTORY]
-     TOWER]
-*/
-
-static INPUT_PORTS_START( mbdtower )
-	PORT_START("IN.0") // R0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Inventory")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_NAME("No/End")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Clear")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Sanctuary/Citadel")
-
-	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Frontier")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_NAME("Repeat")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Bazaar")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Move")
-
-	PORT_START("IN.2") // R2
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Dark Tower")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_NAME("Yes/Buy")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Haggle")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Tomb/Ruin")
-INPUT_PORTS_END
-
-
-/* tower motor simulation:
-
-*/
-
-MACHINE_START_MEMBER(hh_tms1k_state, mbdtower)
-{
-	machine_start();
-	
-	// zerofill/register for savestates
-	m_dtower_motor_on = false;
-	m_dtower_sensor = false;
-	
-	save_item(NAME(m_dtower_motor_on));
-	save_item(NAME(m_dtower_sensor));
-}
-
-static MACHINE_CONFIG_START( mbdtower, hh_tms1k_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 400000) // approximation - RC osc. R=43K, C=56pf, but unknown RC curve
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, mbdtower_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, mbdtower_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, mbdtower_write_o))
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
-
-	MCFG_MACHINE_START_OVERRIDE(hh_tms1k_state, mbdtower)
-
-	/* no video! */
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
   Parker Brothers Code Name: Sector, by Bob Doyle
   * TMS0970 MCU, MP0905BNL ZA0379 (die labeled 0970F-05B)
 
@@ -2439,17 +2314,6 @@ ROM_START( ssimon )
 ROM_END
 
 
-ROM_START( mbdtower )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7332", 0x0000, 0x1000, CRC(ebeab91a) SHA1(7edbff437da371390fa8f28b3d183f833eaa9be9) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_mbdtower_opla.pla", 0, 557, CRC(64c84697) SHA1(72ce6d24cedf9c606f1742cd5620f75907246e87) )
-ROM_END
-
-
 ROM_START( cnsector )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
@@ -2557,7 +2421,6 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-CONS( 1981, mbdtower,  0,        0, mbdtower,  mbdtower,  driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // ***
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )
