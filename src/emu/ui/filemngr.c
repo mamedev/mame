@@ -33,6 +33,8 @@ ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_cont
 		m_warnings.cpy(warnings);
 	else
 		m_warnings.reset();
+
+	m_curr_selected = FALSE;
 }
 
 
@@ -165,12 +167,16 @@ void ui_menu_file_manager::handle()
 	if (event != NULL && event->itemref != NULL && event->iptkey == IPT_UI_SELECT)
 	{
 		if ((FPTR)event->itemref == 1)
-			machine().schedule_hard_reset();
+		{
+			if (m_curr_selected)
+				machine().schedule_hard_reset();
+		}
 		else
 		{
 			selected_device = (device_image_interface *) event->itemref;
 			if (selected_device != NULL)
 			{
+				m_curr_selected = TRUE;
 				ui_menu::stack_push(selected_device->get_selection_menu(machine(), container));
 
 				// reset the existing menu
