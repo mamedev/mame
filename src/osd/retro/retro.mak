@@ -38,6 +38,8 @@
 ###########################################################################
 DEFS += -DOSD_RETRO
 
+CCOMFLAGS += -include $(SRC)/osd/retro/retroprefix.h
+
 #-------------------------------------------------
 # object and source roots
 #-------------------------------------------------
@@ -115,8 +117,10 @@ OSDOBJS += $(GLOBJ)/glsym_gl.o
 endif
 endif
 
+ifneq ($(platform),android)
 LIBS += -lpthread
 BASELIBS += -lpthread
+endif
 
 #-------------------------------------------------
 # rules for building the libaries

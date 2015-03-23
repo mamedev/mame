@@ -590,12 +590,15 @@ endif
 # add a basic set of warnings
 CCOMFLAGS += \
 	-Wall \
-	-Wcast-align \
 	-Wundef \
 	-Wformat-security \
 	-Wwrite-strings \
 	-Wno-sign-compare \
 	-Wno-conversion
+
+CCOMFLAGS_INCOMPATIBLE ?= -Wcast-align
+
+CCOMFLAGS += $(CCOMFLAGS_INCOMPATIBLE)
 
 # warnings only applicable to C compiles
 CONLYFLAGS += \
