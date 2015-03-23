@@ -15,40 +15,25 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "cpu/tms0980/tms0980.h"
-#include "sound/speaker.h"
+#include "includes/hh_tms1k.h"
 
-// internal artwork
 #include "elecbowl.lh"
 
 
-class elecbowl_state : public driver_device
+class elecbowl_state : public hh_tms1k_state
 {
 public:
 	elecbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN"),
-		m_speaker(*this, "speaker")
+		: hh_tms1k_state(mconfig, type, tag)
 	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_ioport_array<4> m_inp_matrix;
-	required_device<speaker_sound_device> m_speaker;
-	
-	UINT16 m_r;
-	UINT16 m_o;
-	UINT16 m_inp_mux;
 
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 
+protected:
 	virtual void machine_start();
 };
-
 
 
 /***************************************************************************
@@ -130,15 +115,7 @@ INPUT_PORTS_END
 
 void elecbowl_state::machine_start()
 {
-	// zerofill
-	m_o = 0;
-	m_r = 0;
-	m_inp_mux = 0;
-
-	// register for savestates
-	save_item(NAME(m_o));
-	save_item(NAME(m_r));
-	save_item(NAME(m_inp_mux));
+	hh_tms1k_state::machine_start();
 }
 
 
