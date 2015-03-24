@@ -61,6 +61,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RECORD ";rec",                              NULL,        OPTION_STRING,     "record an input file" },
 	{ OPTION_MNGWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write a MNG movie of the current session" },
 	{ OPTION_AVIWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write an AVI movie of the current session" },
+#ifdef MAME_DEBUG
+	{ OPTION_DUMMYWRITE,                                 "0",         OPTION_BOOLEAN,    "indicates if a snapshot should be created if each frame" },
+#endif
 	{ OPTION_WAVWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write a WAV file of the current session" },
 	{ OPTION_SNAPNAME,                                   "%g/%i",     OPTION_STRING,     "override of the default snapshot/movie naming; %g == gamename, %i == index" },
 	{ OPTION_SNAPSIZE,                                   "auto",      OPTION_STRING,     "specify snapshot/movie resolution (<width>x<height>) or 'auto' to use minimal size " },
@@ -68,7 +71,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SNAPBILINEAR,                               "1",         OPTION_BOOLEAN,    "specify if the snapshot/movie should have bilinear filtering applied" },
 	{ OPTION_STATENAME,                                  "%g",        OPTION_STRING,     "override of the default state subfolder naming; %g == gamename" },
 	{ OPTION_BURNIN,                                     "0",         OPTION_BOOLEAN,    "create burn-in snapshots for each screen" },
-	{ OPTION_DUMMYWRITE,                                 "0",         OPTION_BOOLEAN,    "indicates if a snapshot should be created if each frame" },
 
 	// performance options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE PERFORMANCE OPTIONS" },

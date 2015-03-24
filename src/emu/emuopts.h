@@ -73,7 +73,9 @@ enum
 #define OPTION_RECORD               "record"
 #define OPTION_MNGWRITE             "mngwrite"
 #define OPTION_AVIWRITE             "aviwrite"
+#ifdef MAME_DEBUG
 #define OPTION_DUMMYWRITE           "dummywrite"
+#endif
 #define OPTION_WAVWRITE             "wavwrite"
 #define OPTION_SNAPNAME             "snapname"
 #define OPTION_SNAPSIZE             "snapsize"
@@ -242,7 +244,9 @@ public:
 	const char *record() const { return value(OPTION_RECORD); }
 	const char *mng_write() const { return value(OPTION_MNGWRITE); }
 	const char *avi_write() const { return value(OPTION_AVIWRITE); }
+#ifdef MAME_DEBUG
 	bool dummy_write() const { return bool_value(OPTION_DUMMYWRITE); }
+#endif
 	const char *wav_write() const { return value(OPTION_WAVWRITE); }
 	const char *snap_name() const { return value(OPTION_SNAPNAME); }
 	const char *snap_size() const { return value(OPTION_SNAPSIZE); }
