@@ -128,10 +128,10 @@ static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
 ADDRESS_MAP_END
     
 static ADDRESS_MAP_START(kb_io_map , AS_IO , 8 , imds2_state)
-    AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_WRITE(imds2_state::imds2_kb_port_p1_w)
-    AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READ(imds2_state::imds2_kb_port_p2_r)
-    AM_RANGE(MCS48_PORT_T0 , MCS48_PORT_T0) AM_READ(imds2_state::imds2_kb_port_t0_r)
-    AM_RANGE(MCS48_PORT_T1 , MCS48_PORT_T1) AM_READ(imds2_state::imds2_kb_port_t1_r)
+    AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_WRITE(imds2_kb_port_p1_w)
+    AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READ(imds2_kb_port_p2_r)
+    AM_RANGE(MCS48_PORT_T0 , MCS48_PORT_T0) AM_READ(imds2_kb_port_t0_r)
+    AM_RANGE(MCS48_PORT_T1 , MCS48_PORT_T1) AM_READ(imds2_kb_port_t1_r)
 ADDRESS_MAP_END
     
 imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
