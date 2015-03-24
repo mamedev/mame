@@ -205,7 +205,7 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 		}
 	}
 	
-
+#if 0
 	for (int i = 0; i < 0x8000; i++)
 	{
 		// how are layers cleared?
@@ -215,7 +215,8 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 	//	m_videoram1[i] = 0x0000;
 	//	m_videoram2[i] = 0x0000;
 	}
-
+#endif
+	
 	return 0;
 }
 
@@ -381,7 +382,21 @@ READ16_MEMBER(ttchamp_state::ttchamp_blit_start_r)
 
 WRITE16_MEMBER(ttchamp_state::port10_w)
 {
+	UINT8 res;
 	COMBINE_DATA(&m_port10);
+	
+	res = m_port10 & 0xf0;
+	/* Assume that both bits clears layers. */
+	if(res == 0x30)
+	{
+		for (int i = 0; i < 0x8000; i++)
+		{
+			m_videoram0[i] = 0x0000;
+			m_videoram2[i] = 0x0000;
+		}
+	}
+	else if(res != 0)
+		printf("Check me, i/o 0x10 used with %02x\n",res);
 }
 
 WRITE16_MEMBER(ttchamp_state::port20_w)
@@ -389,11 +404,11 @@ WRITE16_MEMBER(ttchamp_state::port20_w)
 	printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	// seems to somehow be tied to layer clear
 	// might also depend on layer selected with 0x10 tho? written after it
-	for (int i = 0; i < 0x8000; i++)
+	/*for (int i = 0; i < 0x8000; i++)
 	{
 	//	m_videoram0[i] = 0x0000;
 		m_videoram2[i] = 0x0000;
-	}
+	}*/
 
 }
 
