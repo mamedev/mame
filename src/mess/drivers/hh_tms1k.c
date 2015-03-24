@@ -24,6 +24,7 @@
  *MP2139   ?        1982, Gakken Galaxy Invader 1000
  *MP2788   ?        1980, Bandai Flight Time
  @MP3226   TMS1000  1978, Milton Bradley Simon
+ *MP3301   TMS1000  1979, Milton Bradley Bigtrak
  *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
   MP3403   TMS1100  1978, Marx Electronic Bowling -> elecbowl.c
  @MP3404   TMS1100  1978, Parker Brothers Merlin
@@ -730,7 +731,7 @@ void hh_tms1k_state::ebball_display()
 	// R8 is a 7seg
 	m_display_segmask[8] = 0x7f;
 	
-	display_matrix(7, 9, m_o, m_r);
+	display_matrix(7, 9, ~m_o, m_r);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
@@ -750,7 +751,7 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
 {
 	// O0-O6: led row
 	// O7: N/C
-	m_o = ~data;
+	m_o = data;
 	ebball_display();
 }
 
@@ -848,7 +849,7 @@ void hh_tms1k_state::ebball2_display()
 	for (int y = 0; y < 3; y++)
 		m_display_segmask[y] = 0x7f;
 	
-	display_matrix(8, 10, m_o, m_r);
+	display_matrix(8, 10, ~m_o, m_r ^ 0x7f);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
@@ -860,14 +861,14 @@ WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
 	m_speaker->level_w(data >> 10 & 1);
 	
 	// R0-R9: led columns
-	m_r = data ^ 0x7f;
+	m_r = data;
 	ebball2_display();
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ebball2_write_o)
 {
 	// O0-O7: led row/segment
-	m_o = ~data;
+	m_o = data;
 	ebball2_display();
 }
 
