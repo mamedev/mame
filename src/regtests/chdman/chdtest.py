@@ -5,12 +5,15 @@ import hashlib
 import shutil
 
 def runProcess(cmd):
+	#print " ".join(cmd)
 	process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	(stdout, stderr) = process.communicate()
 	if not isinstance(stdout, str): # python 3
 		stdout = stdout.decode('latin-1')
 	if not isinstance(stderr, str): # python 3
 		stderr = stderr.decode('latin-1')
+	#if stderr:
+	#	print stderr
 	return process.returncode, stdout, stderr
 	
 def compareInfo(info1, info2):
