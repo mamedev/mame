@@ -154,7 +154,9 @@ video_manager::video_manager(running_machine &machine)
 	if (filename[0] != 0)
 		begin_recording(filename, MF_AVI);
 	
+#ifdef MAME_DEBUG
 	m_dummy_recording = machine.options().dummy_write();
+#endif
 
 	// if no screens, create a periodic timer to drive updates
 	if (machine.first_screen() == NULL)
