@@ -590,7 +590,6 @@ endif
 # add a basic set of warnings
 CCOMFLAGS += \
 	-Wall \
-	-Wundef \
 	-Wformat-security \
 	-Wwrite-strings \
 	-Wno-sign-compare \
@@ -816,7 +815,7 @@ MIDI_LIB =
 endif
 
 ifneq (,$(findstring clang,$(CC)))
-LIBS += -lstdc++ -lpthread
+LIBS += -lstdc++
 endif
 
 #-------------------------------------------------
