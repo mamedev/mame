@@ -248,9 +248,8 @@ else ifeq ($(platform), ios)
 	CC = $(CXX_AS) -arch armv7 -isysroot $(IOSSDK)
 	LD = $(CC) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
-	CFLAGS += -DIOS
 	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
-	PLATCFLAGS += -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
+	PLATCFLAGS += -marm -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
 	CCOMFLAGS += $(PLATCFLAGS)
 ## QNX
 else ifeq ($(platform), qnx)
@@ -428,6 +427,8 @@ clean: clean-libretro
 clean-libretro:
 	@echo Deleting object tree obj...
 	$(RM) -r obj/*
+	@echo Deleting old build products...
+	$(RM) *.dll *.so *.dylib
 
 # retro OSD varies between mame, mess, ume so clean it between each
 clean-osd:
