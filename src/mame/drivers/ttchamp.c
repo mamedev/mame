@@ -99,7 +99,7 @@ public:
 	DECLARE_WRITE16_MEMBER(ttchamp_mem_w);
 
 	UINT16 m_videoram0[0x10000 / 2];
-	UINT16 m_videoram1[0x10000 / 2];
+//	UINT16 m_videoram1[0x10000 / 2];
 	UINT16 m_videoram2[0x10000 / 2];
 
 
@@ -141,18 +141,23 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 	static const int xxx=320,yyy=204;
 
 	bitmap.fill(m_palette->black_pen());
-
+	UINT8 *videoramfg;
+	UINT8* videorambg;
+	
 	count=0;
-	UINT8 *videoram = (UINT8*)m_videoram0;
+	videorambg = (UINT8*)m_videoram0;
+	videoramfg = (UINT8*)m_videoram2;
+
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			/*if(hotblock_port0&0x40)*/bitmap.pix16(y, x) = videoram[BYTE_XOR_LE(count)]+0x300;
+			bitmap.pix16(y, x) = videorambg[BYTE_XOR_LE(count)]+0x300;
 			count++;
 		}
 	}
-
+	
+	/*
 	count=0;
 	videoram = (UINT8*)m_videoram1;
 	for (y=0;y<yyy;y++)
@@ -164,18 +169,42 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 			count++;
 		}
 	}
-
+	*/
+	
 	count=0;
-	videoram = (UINT8*)m_videoram2;
 	for (y=0;y<yyy;y++)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			UINT8 pix = videoram[BYTE_XOR_LE(count)];
-			if (pix) bitmap.pix16(y, x) = pix+0x000;
+			UINT8 pix = videoramfg[BYTE_XOR_LE(count)];
+			if (pix)
+			{
+				// first pen values seem to be special
+				// see char select and shadows ingame
+				// pen 0 = transparent
+				// pen 1 = blend 1
+				// pen 2 = blend 2
+				// pen 3 = ??
+
+				if (pix == 0x01) // blend mode 1
+				{
+					UINT8 pix = videorambg[BYTE_XOR_LE(count)];
+					bitmap.pix16(y, x) = pix + 0x200;
+				}
+				else if (pix == 0x02) // blend mode 2
+				{
+					UINT8 pix = videorambg[BYTE_XOR_LE(count)];
+					bitmap.pix16(y, x) = pix + 0x100;
+				}
+				else
+				{
+					bitmap.pix16(y, x) = pix + 0x000;
+				}
+			}
 			count++;
 		}
 	}
+	
 
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -183,8 +212,8 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 		// I think it actually does more blit operations with
 		// different bits of m_port10 set to redraw the backgrounds using the video ram data as a source rather than ROM - notice the garbage you see behind 'sprites' right now
 		// this method also removes the text layer, which we don't want
-		m_videoram1[i] = 0x0000;
-		m_videoram2[i] = 0x0000;
+	//	m_videoram1[i] = 0x0000;
+	//	m_videoram2[i] = 0x0000;
 	}
 
 	return 0;
@@ -199,10 +228,6 @@ WRITE16_MEMBER(ttchamp_state::paloff_w)
 
 WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
-	// maybe 4 layers of 0x100 each?
-	// middle palettes seem to have special meaning tho, maybe blending? it's a darker copy ingame, and red/blue shades on char select
-	// based on screenshot references the highlighted player portraits should be appear in shades of red/blue
-
 	// 0x8000 of offset is sometimes set
 	m_palette->set_pen_color(m_paloff & 0x3ff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
@@ -216,7 +241,7 @@ READ16_MEMBER(ttchamp_state::ttchamp_mem_r)
 	if ((m_port10&0xf) == 0x00)
 		vram = m_videoram0;
 	else if ((m_port10&0xf)  == 0x01)
-		vram = m_videoram1;
+		vram = m_videoram2;
 	else if ((m_port10&0xf)  == 0x03)
 		vram = m_videoram2;
 	else
@@ -251,7 +276,7 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 	if ((m_port10&0xf)  == 0x00)
 		vram = m_videoram0;
 	else if ((m_port10&0xf)  == 0x01)
-		vram = m_videoram1;
+		vram = m_videoram2;
 	else if ((m_port10&0xf)  == 0x03)
 		vram = m_videoram2;
 	else
@@ -272,8 +297,6 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 	{
 	//	printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
-		if (m_spriteswidth == 0)
-			m_spriteswidth = 80;
 
 		m_spritesinit = 0;
 
@@ -303,22 +326,30 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 			for (int i = 0; i < m_spriteswidth; i++)
 			{
-				UINT8 data;
-				
-				data = (src[(m_spritesaddr * 2) + 1]);
-	
-				if (data)
-					vram[offset] = (vram[offset] & 0x00ff) | data << 8;
+				if ((m_port10 & 0xf) == 0x01) // this is set when moving objects are cleared, although not screen clears?
+				{
+					vram[offset] = 0x0000;
+					offset++;
+				}
+				else
+				{
+					UINT8 data;
+
+					data = (src[(m_spritesaddr * 2) + 1]);
+
+					if (data)
+						vram[offset] = (vram[offset] & 0x00ff) | data << 8;
 
 
-				data = src[(m_spritesaddr*2)];
-			
-				if (data)
-					vram[offset] = (vram[offset] & 0xff00) | data;
+					data = src[(m_spritesaddr * 2)];
+
+					if (data)
+						vram[offset] = (vram[offset] & 0xff00) | data;
 
 
-				m_spritesaddr ++;				
-				offset++;
+					m_spritesaddr++;
+					offset++;
+				}
 
 				offset &= 0x7fff;
 			}
@@ -356,6 +387,14 @@ WRITE16_MEMBER(ttchamp_state::port10_w)
 WRITE16_MEMBER(ttchamp_state::port20_w)
 {
 	printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	// seems to somehow be tied to layer clear
+	// might also depend on layer selected with 0x10 tho? written after it
+	for (int i = 0; i < 0x8000; i++)
+	{
+	//	m_videoram0[i] = 0x0000;
+		m_videoram2[i] = 0x0000;
+	}
+
 }
 
 WRITE16_MEMBER(ttchamp_state::port62_w)
