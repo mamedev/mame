@@ -1,4 +1,5 @@
-/* Table Tennis Champions ?
+/* Table Tennis Champions
+   (c) 1995 Gamart
 
  ___________________________________________________
 |        __     _________ __________   __________  |
@@ -45,7 +46,7 @@ ttennis1 adpcm data
 ttennis4/5 graphics
 *there is a pic16c84 that i cannot dump because my programmer doesn't support it.
 
-Dumped by tirino73 >isolani (at) interfree.it<
+Dumped by tirino73
 
 
 
@@ -54,7 +55,8 @@ Dumped by tirino73 >isolani (at) interfree.it<
   including the blitter (seems to be doubled up hardware tho, twice as many layers?)
 - need to work out how it selects between upper/lower
   program roms as blitter source
-- PIC is probably for sound
+- PIC is not for sound, what is is for?
+- eeprom? (I don't see one, maybe PIC is used for settings?)
 - more than one layer
 - layer clearing
 
@@ -80,6 +82,13 @@ public:
 	DECLARE_WRITE16_MEMBER(paldat_w);
 
 	DECLARE_WRITE16_MEMBER(port10_w);
+
+	DECLARE_WRITE16_MEMBER(port20_w);
+	DECLARE_WRITE16_MEMBER(port62_w);
+	
+	DECLARE_READ16_MEMBER(port1e_r);
+
+
 	UINT16 m_port10;
 
 	DECLARE_DRIVER_INIT(ttchamp);
@@ -190,7 +199,12 @@ WRITE16_MEMBER(ttchamp_state::paloff_w)
 
 WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
-	m_palette->set_pen_color(m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+	// maybe 4 layers of 0x100 each?
+	// middle palettes seem to have special meaning tho, maybe blending? it's a darker copy ingame, and red/blue shades on char select
+	// based on screenshot references the highlighted player portraits should be appear in shades of red/blue
+
+	// 0x8000 of offset is sometimes set
+	m_palette->set_pen_color(m_paloff & 0x3ff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 
@@ -249,14 +263,14 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 	if (m_spritesinit == 1)
 	{
-	//	printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
+	//	printf("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
 	}
 	else if (m_spritesinit == 2)
 	{
-	//	printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
+	//	printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
 		if (m_spriteswidth == 0)
 			m_spriteswidth = 80;
@@ -274,9 +288,9 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 		{
 			COMBINE_DATA(&vram[offset&0x7fff]);
 		}
-		else if (offset < 0x40000 / 2)
+		else if ((offset >= 0x30000 / 2) && (offset < 0x40000 / 2))
 		{
-			// 0x30000-0x3ffff and 0x40000-0x4ffff seem to be used here?
+			// 0x30000-0x3ffff used, on Spider it's 0x20000-0x2ffff
 			offset &= 0x7fff;
 
 			UINT8 *src = m_rom8;
@@ -284,7 +298,7 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 			if (m_port10 & 2) // NO, wrong for the portraits
 				src += 0x100000;
 
-		//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		//	printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", space.device().safe_pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
@@ -311,9 +325,21 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 		}
 		else
 		{
-			logerror("spider_blitter_w unhandled RAM access %08x %04x %04x\n", offset * 2, data, mem_mask);
+			// sometimes happens, why? special meanings? wrong interpretation of something else?
+			printf("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 		}
 	}
+}
+
+
+
+static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
+	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(ttchamp_mem_r, ttchamp_mem_w)
+ADDRESS_MAP_END
+
+READ16_MEMBER(ttchamp_state::port1e_r)
+{
+	return 0xff;
 }
 
 READ16_MEMBER(ttchamp_state::ttchamp_blit_start_r)
@@ -322,35 +348,43 @@ READ16_MEMBER(ttchamp_state::ttchamp_blit_start_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(ttchamp_mem_r, ttchamp_mem_w)
-ADDRESS_MAP_END
-
 WRITE16_MEMBER(ttchamp_state::port10_w)
 {
 	COMBINE_DATA(&m_port10);
 }
 
+WRITE16_MEMBER(ttchamp_state::port20_w)
+{
+	printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+}
+
+WRITE16_MEMBER(ttchamp_state::port62_w)
+{
+	printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+}
 
 static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
-//	AM_RANGE(0x0000, 0x0001) AM_WRITENOP
+	AM_RANGE(0x0000, 0x0001) AM_WRITENOP // startup only
 
 	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
 
 	AM_RANGE(0x0006, 0x0007) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
-	AM_RANGE(0x0018, 0x0019) AM_READ(ttchamp_blit_start_r)
-	AM_RANGE(0x001e, 0x001f) AM_READNOP // read before each line is blit
+	AM_RANGE(0x0018, 0x0019) AM_READ(ttchamp_blit_start_r) // read before using bus write offset as blit parameters
+	AM_RANGE(0x001e, 0x001f) AM_READ(port1e_r) // read before some blit operations (but not all)
 
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
-	AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w)
+	AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w) // bit 0x8000 sometimes gets set, why?
 
 	AM_RANGE(0x0010, 0x0011) AM_WRITE(port10_w)
 
-//	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
+	AM_RANGE(0x0020, 0x0021) AM_WRITE(port20_w)
 
-//	AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP
+//	AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP // eeprom (PIC?) / settings?
+
+	AM_RANGE(0x0062, 0x0063) AM_WRITE(port62_w)
+
 ADDRESS_MAP_END
 
 
@@ -441,7 +475,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ttchamp_state, screen_update_ttchamp)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	MCFG_PALETTE_ADD("palette", 0x400)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
