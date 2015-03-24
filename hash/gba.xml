@@ -12294,6 +12294,17 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
+	<software name="dune">
+		<description>Frank Herbert's Dune - Ornithopter Assault (Prototype)</description>
+		<year>200?</year>
+		<publisher>Cryo</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="dune-ornithopter-assault-gba-cancelled.bin" size="4194304" crc="298d627b" sha1="1d317fb050f6d5b850f4b88b72f3420cb175edf3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eyebehol">
 		<description>Dungeons &amp; Dragons - Eye of the Beholder (Euro)</description>
 		<year>2002</year>
