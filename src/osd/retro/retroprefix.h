@@ -39,5 +39,5 @@ static __inline double log2(double x) { return log(x) * M_LOG2E; }
 #elif defined(ANDROID)
 #include <math.h>
 
-static inline double log2(double x) { return log(x) * M_LOG2E; }
+//static inline double log2(double x) { return log(x) * M_LOG2E; }
 #endif

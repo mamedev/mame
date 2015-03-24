@@ -206,7 +206,7 @@ else ifeq ($(platform), android)
 		LIBS += -lGLESv2
 		GLES = 1
 	endif
-	LDFLAGS += -Wl,--fix-cortex-a8 -llog $(fpic) $(SHARED)
+	LDFLAGS += -Wl,--fix-cortex-a8 -Wl,--no-undefined -llog $(fpic) $(SHARED)
 	CCOMFLAGS += $(PLATCFLAGS)
 	LIBS += -lstdc++
 ## OS X
