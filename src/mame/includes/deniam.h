@@ -69,7 +69,6 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void set_bg_page( int page, int value );
 	void set_fg_page( int page, int value );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu; // system 16c does not have sound CPU
 	required_device<okim6295_device> m_oki;

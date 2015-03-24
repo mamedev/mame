@@ -23,8 +23,8 @@
 	<view name="Internal Layout">
 		<bounds left="0" right="50" top="0" bottom="15" />
 
-		<bezel name="lamp0" element="lamp_red"><bounds x="3.5" y="6" width="3" height="3" /></bezel>
-		<bezel name="lamp1" element="lamp_green"><bounds x="13.5" y="6" width="3" height="3" /></bezel>
+		<bezel name="lamp20" element="lamp_red"><bounds x="3.5" y="6" width="3" height="3" /></bezel>
+		<bezel name="lamp21" element="lamp_green"><bounds x="13.5" y="6" width="3" height="3" /></bezel>
 
 		<bezel name="digit1" element="digit"><bounds x="30" y="0" width="10" height="15" /></bezel>
 		<bezel name="digit0" element="digit"><bounds x="40" y="0" width="10" height="15" /></bezel>

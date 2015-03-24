@@ -1,26 +1,46 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 //============================================================
 //
-//  strconv.c - SDL (POSIX) string conversion
-//
-//  Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
-//  SDLMAME by Olivier Galibert and R. Belmont
+//  strconv.c - Win32 string conversion
 //
 //============================================================
 
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
-
-#include <stdlib.h>
 
 // MAMEOS headers
 #include "strconv.h"
 #include "unicode.h"
 
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+//============================================================
+//  astring_from_utf8
+//============================================================
+
+CHAR *astring_from_utf8(const char *utf8string)
+{
+	WCHAR *wstring;
+	int char_count;
+	CHAR *result;
+
+	// convert MAME string (UTF-8) to UTF-16
+	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
+	wstring = (WCHAR *)alloca(char_count * sizeof(*wstring));
+	MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, wstring, char_count);
+
+	// convert UTF-16 to "ANSI code page" string
+	char_count = WideCharToMultiByte(CP_ACP, 0, wstring, -1, NULL, 0, NULL, NULL);
+	result = (CHAR *)osd_malloc_array(char_count * sizeof(*result));
+	if (result != NULL)
+		WideCharToMultiByte(CP_ACP, 0, wstring, -1, result, char_count, NULL, NULL);
+
+	return result;
+}
+
+
 //============================================================
 //  utf8_from_astring
 //============================================================
@@ -45,6 +65,26 @@ char *utf8_from_astring(const CHAR *astring)
 	return result;
 }
 
+
+//============================================================
+//  wstring_from_utf8
+//============================================================
+
+WCHAR *wstring_from_utf8(const char *utf8string)
+{
+	int char_count;
+	WCHAR *result;
+
+	// convert MAME string (UTF-8) to UTF-16
+	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
+	result = (WCHAR *)osd_malloc_array(char_count * sizeof(*result));
+	if (result != NULL)
+		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
+
+	return result;
+}
+
+
 //============================================================
 //  utf8_from_wstring
 //============================================================
@@ -62,7 +102,24 @@ char *utf8_from_wstring(const WCHAR *wstring)
 
 	return result;
 }
-#endif
+
+//============================================================
+//  osd_uchar_from_osdchar
+//============================================================
+
+int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
+{
+	WCHAR wch;
+
+	count = MIN(count, IsDBCSLeadByte(*osdchar) ? 2 : 1);
+	if (MultiByteToWideChar(CP_ACP, 0, osdchar, (DWORD)count, &wch, 1) != 0)
+		*uchar = wch;
+	else
+		*uchar = 0;
+	return (int) count;
+}
+
+#else
 
 //============================================================
 //  osd_uchar_from_osdchar
@@ -80,3 +137,5 @@ int osd_uchar_from_osdchar(unicode_char *uchar, const char *osdchar, size_t coun
 
 	return count;
 }
+
+#endif

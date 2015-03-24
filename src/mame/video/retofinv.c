@@ -103,6 +103,9 @@ void retofinv_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(retofinv_state::fg_get_tile_info),this),tilemap_mapper_delegate(FUNC(retofinv_state::tilemap_scan),this),8,8,36,28);
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
+
+	save_item(NAME(m_fg_bank));
+	save_item(NAME(m_bg_bank));
 }
 
 
@@ -113,19 +116,19 @@ void retofinv_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(retofinv_state::retofinv_bg_videoram_w)
+WRITE8_MEMBER(retofinv_state::bg_videoram_w)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_fg_videoram_w)
+WRITE8_MEMBER(retofinv_state::fg_videoram_w)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(retofinv_state::retofinv_gfx_ctrl_w)
+WRITE8_MEMBER(retofinv_state::gfx_ctrl_w)
 {
 	switch (offset)
 	{
@@ -214,7 +217,7 @@ void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 
 
 
-UINT32 retofinv_state::screen_update_retofinv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 retofinv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap);

@@ -154,7 +154,7 @@ No.  PCB Label  IC Markings               IC Package
 03   ASIC6      NEO64-CVR                 QFP120
 04   ASIC9      NEO64-CAL                 QFP208
 05   BROM1      MBM29F400B-12             TSOP48  (archived as BROM1.BIN)
-06   CPU2       NEC D70326AGJ-16 V53A     QFP120
+06   CPU2       NEC D70236AGJ-16 V53A     QFP120
 07   DRAM1      HY51V18164BJC-60          SOJ42
 08   DRAM2      HY51V18164BJC-60          SOJ42
 09   DRAM3      HY51V18164BJC-60          SOJ42
@@ -224,16 +224,7 @@ Games that use the LVS-DG1 cart: Road's Edge
 
 Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition, Buriki One, SS 64 II
 
-Other games not dumped yet     : Samurai Spirits 64 / Samurai Shodown 64
-                                 Samurai Spirits II: Asura Zanmaden / Samurai Shodown: Warrior's Rage
-                                 Off Beat Racer / Xtreme Rally
-                                 Beast Busters: Second Nightmare
-                                 Garou Densetsu 64: Wild Ambition (=Fatal Fury Wild Ambition)*
-                                 Round Trip RV (=Road's Edge)*
-
-                               * Different regions might use the same roms, not known yet
-
-                               There might be Rev.A boards for Buriki and Round Trip
+There might be Rev.A boards for Buriki and Round Trip, we have Rev. B
 
 pr = program
 sc = scroll characters?
@@ -444,18 +435,16 @@ And the Korean board only plays Samurai Shodown games (wont play Buriki One
 or Fatal Fury for example).
 */
 
-#define DUMP_SOUNDPRG  0
 
-#define MASTER_CLOCK 50000000
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/nec/nec.h"
 #include "cpu/mips/mips3.h"
 #include "machine/nvram.h"
 #include "includes/hng64.h"
 
 /* TODO: NOT measured! */
-#define PIXEL_CLOCK         ((MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
+#define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
 
 #define HTOTAL              (0x200+0x100)
 #define HBEND               (0)
@@ -812,129 +801,6 @@ WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 }
 
 
-// Hardware calls these '3d buffers'
-//   They're only read during the startup check of fatfurwa.  Z-buffer memory?  Front buffer, back buffer?
-//   They're definitely mirrored in the startup test.  Elsemi says:
-//   <ElSemi> 30100000-3011ffff is framebuffer A0
-//   <ElSemi> 30120000-3013ffff is framebuffer A1
-//   <ElSemi> 30140000-3015ffff is ZBuffer A
-READ32_MEMBER(hng64_state::hng64_3d_1_r)
-{
-	return m_3d_1[offset];
-}
-
-WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
-{
-	COMBINE_DATA (&m_3d_1[offset]);
-}
-
-READ32_MEMBER(hng64_state::hng64_3d_2_r)
-{
-	return m_3d_2[offset];
-}
-
-WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
-{
-	COMBINE_DATA (&m_3d_2[offset]);
-}
-
-// The 3d 'display list'
-WRITE32_MEMBER(hng64_state::dl_w)
-{
-	UINT32 *hng64_dl = m_dl;
-	//UINT16 packet3d[16];
-
-	COMBINE_DATA(&hng64_dl[offset]);
-
-#if 0
-	if (offset == 0x08 || offset == 0x7f || // Special buggers.
-		offset == 0x10 || offset == 0x18 ||
-		offset == 0x20 || offset == 0x28 ||
-		offset == 0x30 || offset == 0x38 ||
-		offset == 0x40 || offset == 0x48 ||
-		offset == 0x50 || offset == 0x58 ||
-		offset == 0x60 || offset == 0x68 ||
-		offset == 0x70 || offset == 0x78)
-	{
-		// Create a 3d packet
-		UINT16 packetStart = offset - 0x08;
-		if (offset == 0x7f) packetStart += 1;
-
-		for (i = 0; i < 0x08; i++)
-		{
-			packet3d[i*2+0] = (hng64_dl[packetStart+i] & 0xffff0000) >> 16;
-			packet3d[i*2+1] = (hng64_dl[packetStart+i] & 0x0000ffff);
-		}
-
-		// Send it off to the 3d subsystem.
-		hng64_command3d(machine(), packet3d);
-	}
-#endif
-}
-
-#if 0
-READ32_MEMBER(hng64_state::dl_r)
-{
-	//osd_printf_debug("dl R (%08x) : %x %x\n", space.device().safe_pc(), offset, hng64_dl[offset]);
-	//usrintf_showmessage("dl R (%08x) : %x %x", space.device().safe_pc(), offset, hng64_dl[offset]);
-	return hng64_dl[offset];
-}
-#endif
-
-TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
-{
-// ...
-	m_set_irq(0x0008);
-}
-
-/* TODO: different param for both Samurai games, less FIFO to process? */
-WRITE32_MEMBER(hng64_state::dl_upload_w)
-{
-	// this handles 3d to fb upload
-	UINT16 packet3d[16];
-
-	for(int packetStart=0;packetStart<0x200/4;packetStart+=8)
-	{
-		// Create a 3d packet
-		//UINT16 packetStart = offset - 0x08;
-		//if (offset == 0x7f) packetStart += 1;
-
-		for (int i = 0; i < 0x08; i++)
-		{
-			packet3d[i*2+0] = (m_dl[packetStart+i] & 0xffff0000) >> 16;
-			packet3d[i*2+1] = (m_dl[packetStart+i] & 0x0000ffff);
-		}
-
-		// Send it off to the 3d subsystem.
-		hng64_command3d(machine(), packet3d);
-	}
-
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
-}
-
-/* Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown */
-WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
-{
-	//if(data & 2) // swap buffers
-	//{
-	//  clear3d();
-	//}
-
-//  printf("%02x\n",data);
-
-//  if(data & 1) // process DMA from 3d FIFO to framebuffer
-
-//  if(data & 4) // reset buffer count
-}
-
-#ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(hng64_state::activate_3d_buffer)
-{
-	COMBINE_DATA (&active_3d_buffer[offset]);
-	osd_printf_debug("COMBINED %d\n", active_3d_buffer[offset]);
-}
-#endif
-
 // Transition Control memory.
 WRITE32_MEMBER(hng64_state::tcram_w)
 {
@@ -989,133 +855,9 @@ READ32_MEMBER(hng64_state::unk_vreg_r)
 //  return ++m_unk_vreg_toggle;
 }
 
-/***** I don't think there is a soundram2, having it NOT hooked up causes xrally to copy the sound program to the expected location, see memory map note *****/
 
-WRITE32_MEMBER(hng64_state::hng64_soundram2_w)
-{
-	// xrally uploads the sound program here, and 00 in the usual hng64_soundram_w straight after it??
-	logerror("hng64_soundram2_w %08x: %08x %08x\n", offset, data, mem_mask);
-
-	UINT32 mem_mask32 = mem_mask;
-	UINT32 data32 = data;
-
-	/* swap data around.. keep the v55 happy */
-	data = data32 >> 16;
-	data = FLIPENDIAN_INT16(data);
-	mem_mask = mem_mask32 >> 16;
-	mem_mask = FLIPENDIAN_INT16(mem_mask);
-	COMBINE_DATA(&m_soundram2[offset * 2 + 0]);
-
-	data = data32 & 0xffff;
-	data = FLIPENDIAN_INT16(data);
-	mem_mask = mem_mask32 & 0xffff;
-	mem_mask = FLIPENDIAN_INT16(mem_mask);
-	COMBINE_DATA(&m_soundram2[offset * 2 + 1]);
-
-	if (DUMP_SOUNDPRG)
-	{
-		if (offset==0x7ffff)
-		{
-			logerror("dumping sound program in m_soundram2\n");
-			FILE *fp;
-			char filename[256];
-			sprintf(filename,"soundram2_%s", space.machine().system().name);
-			fp=fopen(filename, "w+b");
-			if (fp)
-			{
-				fwrite((UINT8*)m_soundram2, 0x80000*4, 1, fp);
-				fclose(fp);
-			}
-		}
-	}
-}
-
-READ32_MEMBER(hng64_state::hng64_soundram2_r)
-{
-	UINT16 datalo = m_soundram2[offset * 2 + 0];
-	UINT16 datahi = m_soundram2[offset * 2 + 1];
-
-	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
-}
 
 /************************************************************************************************************/
-
-WRITE32_MEMBER(hng64_state::hng64_soundram_w)
-{
-	//logerror("hng64_soundram_w %08x: %08x %08x\n", offset, data, mem_mask);
-
-	UINT32 mem_mask32 = mem_mask;
-	UINT32 data32 = data;
-
-	/* swap data around.. keep the v55 happy */
-	data = data32 >> 16;
-	data = FLIPENDIAN_INT16(data);
-	mem_mask = mem_mask32 >> 16;
-	mem_mask = FLIPENDIAN_INT16(mem_mask);
-	COMBINE_DATA(&m_soundram[offset * 2 + 0]);
-
-	data = data32 & 0xffff;
-	data = FLIPENDIAN_INT16(data);
-	mem_mask = mem_mask32 & 0xffff;
-	mem_mask = FLIPENDIAN_INT16(mem_mask);
-	COMBINE_DATA(&m_soundram[offset * 2 + 1]);
-
-	if (DUMP_SOUNDPRG)
-	{
-		if (offset==0x7ffff)
-		{
-			logerror("dumping sound program in m_soundram\n");
-			FILE *fp;
-			char filename[256];
-			sprintf(filename,"soundram_%s", space.machine().system().name);
-			fp=fopen(filename, "w+b");
-			if (fp)
-			{
-				fwrite((UINT8*)m_soundram, 0x80000*4, 1, fp);
-				fclose(fp);
-			}
-		}
-	}
-}
-
-
-READ32_MEMBER(hng64_state::hng64_soundram_r)
-{
-	UINT16 datalo = m_soundram[offset * 2 + 0];
-	UINT16 datahi = m_soundram[offset * 2 + 1];
-
-	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
-}
-
-WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
-{
-	if (mem_mask&0xffff0000)
-	{
-		int cmd = data >> 16;
-		// I guess it's only one of the bits, the commands are inverse of each other
-		if (cmd==0x55AA)
-		{
-			printf("soundcpu ON\n");
-			m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		}
-		else if (cmd==0xAA55)
-		{
-			printf("soundcpu OFF\n");
-			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		}
-		else
-		{
-			printf("unknown hng64_soundcpu_enable_w cmd %04x\n", cmd);
-		}
-	}
-
-	if (mem_mask&0x0000ffff)
-	{
-			printf("unknown hng64_soundcpu_enable_w %08x %08x\n", data, mem_mask);
-	}
-}
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
@@ -1173,10 +915,17 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 <ElSemi> 0xBF800000-0xBF808000 S-RAM
 <ElSemi> 0x60000000-0x60001000 Comm dualport ram
 */
+
+WRITE32_MEMBER(hng64_state::hng64_vregs_w)
+{
+//	printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+	COMBINE_DATA(&m_videoregs[offset]);
+}
+
 static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("user3", 0) AM_SHARE("cart")
+	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("gameprg", 0) AM_SHARE("cart")
 
 	// Ports
 	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r, hng64_sysregs_w) AM_SHARE("sysregs")
@@ -1196,10 +945,10 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
-	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_SHARE("videoregs")
+	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_SHARE("dl")  // 3d Display List
+	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
 	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
@@ -1210,8 +959,8 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r, hng64_3d_2_w) AM_SHARE("3d_2")  // 3D Display Buffer B
 
 	// Sound
-//  AM_RANGE(0x60000000, 0x601fffff) AM_READWRITE(hng64_soundram2_r, hng64_soundram2_w) // if this area acts as RAM then xrally will copy the sound program here and blank out the usual area below.  None of the other games test this as sound ram (usually just write to the first byte) -- maybe it's actually unmapped?
-	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)   // uploads the v53 sound program here, elsewhere on ss64-2
+	AM_RANGE(0x60000000, 0x601fffff) AM_READWRITE(hng64_soundram2_r, hng64_soundram2_w) // actually seems unmapped, see note in audio/hng64.c
+	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
 //  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP    // ??
@@ -1231,135 +980,6 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	/* a0000000-a3ffffff */
 ADDRESS_MAP_END
 
-/*
-0x6010: tests RAM at [3]8000
-
-*/
-
-UINT8 hng64_state::read_comm_data(UINT32 offset)
-{
-	if((offset & 0x10000) == 0)
-		return m_comm_rom[offset & 0xffff];
-
-	if(offset & 0x10000)
-		return m_comm_ram[(offset & 0xffff)];
-
-	printf("%08x\n",offset);
-	return 0xff;
-}
-
-void hng64_state::write_comm_data(UINT32 offset,UINT8 data)
-{
-	if((offset & 0x10000) == 0)
-	{
-		//m_comm_rom[offset];
-		return;
-	}
-	if(offset & 0x10000)
-	{
-		m_comm_ram[offset & 0xffff] = data;
-		return;
-	}
-
-
-	printf("%08x %02x\n",offset,data);
-
-}
-
-READ8_MEMBER(hng64_state::hng64_comm_space_r)
-{
-	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
-		return m_comm_rom[offset];
-
-	for(int i=0;i<5;i++)
-	{
-		if(offset >= m_mmub[i] && offset <= m_mmub[i+1]-1)
-			return read_comm_data(m_mmua[i]|offset);
-	}
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(hng64_state::hng64_comm_space_w)
-{
-	if((offset & 0xfc00) == 0) // B0 is fixed at 0-0x3ff
-		return;// m_comm_rom[offset];
-
-	for(int i=0;i<5;i++)
-	{
-		if(offset >= m_mmub[i] && offset <= m_mmub[i+1]-1)
-		{
-			write_comm_data(m_mmua[i]|offset,data);
-			return;
-		}
-	}
-}
-
-READ8_MEMBER(hng64_state::hng64_comm_mmu_r)
-{
-	return m_mmu_regs[offset];
-}
-
-#define MMUA (m_mmu_regs[(offset&~1)+0]>>6)|(m_mmu_regs[(offset&~1)+1]<<2)
-#define MMUB (m_mmu_regs[(offset&~1)+0]&0x3f)
-
-WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
-{
-	m_mmu_regs[offset] = data;
-
-	/* cheap: avoid to overwrite read only params*/
-	if((offset & 6) == 6)
-	{
-		m_mmu_regs[6] = m_mmu_regs[6] & 0x3f;
-		m_mmu_regs[7] = 0xf0;
-
-	}
-
-	{
-		m_mmua[offset/2+1] = (m_mmu_regs[(offset&~1)+0]>>6)|(m_mmu_regs[(offset&~1)+1]<<2);
-		m_mmua[offset/2+1]*= 0x400;
-		m_mmub[offset/2+1] = (m_mmu_regs[(offset&~1)+0]&0x3f);
-		m_mmub[offset/2+1]++;
-		m_mmub[offset/2+1]*= 0x400;
-		//printf("%d A %08x B %04x\n",offset/2,m_mmua[offset/2],m_mmub[offset/2]);
-		//printf("A %04x B %02x\n",MMUA,MMUB);
-	}
-}
-
-static ADDRESS_MAP_START( hng_comm_map, AS_PROGRAM, 8, hng64_state )
-	AM_RANGE(0x0000,0xffff) AM_READWRITE(hng64_comm_space_r, hng64_comm_space_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hng_comm_io_map, AS_IO, 8, hng64_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	/* Reserved for the KL5C80 internal hardware */
-	AM_RANGE(0x00, 0x07) AM_READWRITE(hng64_comm_mmu_r,hng64_comm_mmu_w )
-//  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */
-//  AM_RANGE(0x20,0x25) AM_READWRITE        /* Timer/Counter B */           /* hng64 writes here */
-//  AM_RANGE(0x27,0x27) AM_NOP              /* Reserved */
-//  AM_RANGE(0x28,0x2b) AM_READWRITE        /* Timer/Counter A */           /* hng64 writes here */
-//  AM_RANGE(0x2c,0x2f) AM_READWRITE        /* Parallel port A */
-//  AM_RANGE(0x30,0x33) AM_READWRITE        /* Parallel port B */
-//  AM_RANGE(0x34,0x37) AM_READWRITE        /* Interrupt controller */      /* hng64 writes here */
-//  AM_RANGE(0x38,0x39) AM_READWRITE        /* Serial port */               /* hng64 writes here */
-//  AM_RANGE(0x3a,0x3b) AM_READWRITE        /* System control register */   /* hng64 writes here */
-//  AM_RANGE(0x3c,0x3f) AM_NOP              /* Reserved */
-
-	/* General IO */
-	AM_RANGE(0x50,0x57) AM_READWRITE(hng64_com_share_r, hng64_com_share_w)
-//  AM_RANGE(0x72,0x72) AM_WRITE            /* dunno yet */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("bank2")
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM // tmp, roadedge
-	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
-	AM_RANGE(0xc002, 0xc003) AM_NOP // buriki one fills the log, wants 0xffff
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hng64 )
 	PORT_START("VBLANK")
@@ -1730,7 +1350,7 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
 GFXDECODE_END
 
-static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfxregionsize)
+static void hng64_reorder( UINT8* gfxregion, size_t gfxregionsize)
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
@@ -1750,37 +1370,12 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
 {
-	hng64_reorder(machine(), memregion("scrtile")->base(), memregion("scrtile")->bytes());
+	hng64_reorder(memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
-#define HACK_REGION
-#ifdef HACK_REGION
-static void hng64_patch_bios_region(running_machine& machine, int region)
-{
-	UINT8 *rom = machine.root_device().memregion("user1")->base();
-
-	if ((rom[0x4000]==0xff) && (rom[0x4001] == 0xff))
-	{
-		// both?
-		rom[0x4002] = region;
-		rom[0x4003] = region;
-
-	}
-}
-#endif
 
 DRIVER_INIT_MEMBER(hng64_state,hng64)
 {
-	// region hacking, english error messages are more useful to us, but no english bios is dumped...
-#ifdef HACK_REGION
-// versions according to fatal fury test mode
-//  hng64_patch_bios_region(machine(), 0); // 'Others Ver' (invalid?)
-	hng64_patch_bios_region(machine(), 1); // Japan
-//  hng64_patch_bios_region(machine(), 2); // USA
-//  hng64_patch_bios_region(machine(), 3); // Korea
-//  hng64_patch_bios_region(machine(), 4); // 'Others'
-#endif
-
 	/* 1 meg of virtual address space for the com cpu */
 	m_com_virtual_mem = auto_alloc_array(machine(), UINT8, 0x100000);
 	m_com_op_base     = auto_alloc_array(machine(), UINT8, 0x10000);
@@ -1902,21 +1497,18 @@ void hng64_state::machine_start()
 
 	m_comm_rom = memregion("user2")->base();
 	m_comm_ram = auto_alloc_array(machine(),UINT8,0x10000);
+
+
+	for (int i = 0; i < 0x38 / 4; i++)
+	{
+		m_videoregs[i] = 0xdeadbeef;
+	}
+		
 }
 
 
 void hng64_state::machine_reset()
 {
-	/* Sound CPU */
-	UINT8 *RAM = (UINT8*)m_soundram;
-	membank("bank1")->set_base(&RAM[0x1f0000]); // allows us to boot
-	membank("bank2")->set_base(&RAM[0x1f0000]); // seems to be the right default for most games (initial area jumps to a DI here)
-	m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-//  m_comm->set_input_line(INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
-//  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
-
 	// "Display List" init - ugly
 //  m_activeBuffer = 0;
 
@@ -1924,27 +1516,23 @@ void hng64_state::machine_reset()
 	m_mcu_fake_time = 0;
 	m_mcu_en = 0;
 
-	m_mmub[0] = 0;
-	m_mmub[5] = 0; // rolls back to 0xffff
+	reset_net();
+	reset_sound();
 }
 
+MACHINE_CONFIG_EXTERN(hng64_audio);
+MACHINE_CONFIG_EXTERN(hng64_network);
 
-static MACHINE_CONFIG_START( hng64, hng64_state )
-
+static MACHINE_CONFIG_START(hng64, hng64_state)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK)     // actually R4300
+	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_CPU_PROGRAM_MAP(hng_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", V33, 8000000)              // v53, 16? mhz!
-	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
-	MCFG_CPU_IO_MAP(hng_sound_io)
 
-	MCFG_CPU_ADD("comm", Z80,MASTER_CLOCK/4)        /* KL5C80A12CFP - binary compatible with Z80. */
-	MCFG_CPU_PROGRAM_MAP(hng_comm_map)
-	MCFG_CPU_IO_MAP(hng_comm_io_map)
+
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1958,19 +1546,38 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MCFG_SCREEN_VBLANK_DRIVER(hng64_state, screen_eof_hng64)
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
+
+	MCFG_FRAGMENT_ADD( hng64_audio )
+	MCFG_FRAGMENT_ADD( hng64_network )
+
 MACHINE_CONFIG_END
+
+#define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios+1)) /* Note '+1' */
+
+// all BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, or only the MCU internal ROM
+#define HNG64_BIOS \
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */ \
+	ROM_SYSTEM_BIOS( 0, "japan", "Japan" ) \
+	ROM_LOAD_HNG64_BIOS( 0, "brom1.bin",         0x00000, 0x080000, CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) ) \
+	ROM_SYSTEM_BIOS( 1, "us", "USA" ) \
+	ROM_LOAD_HNG64_BIOS( 1, "bios_us.bin",        0x00000, 0x080000,  CRC(ab5948d6) SHA1(f8b940c1ae5ce2d3b2cd0c9bfaf6e5b063cec06e) ) \
+	ROM_SYSTEM_BIOS( 2, "export", "Export" ) \
+	ROM_LOAD_HNG64_BIOS( 2, "bios_export.bin",        0x00000, 0x080000, CRC(bbf07ec6) SHA1(5656aa077f6a6d43953f15b5123eea102a9d5313) ) \
+	ROM_SYSTEM_BIOS( 3, "korea", "Korea" ) \
+	ROM_LOAD_HNG64_BIOS( 3, "bios_korea.bin",        0x00000, 0x080000, CRC(ac953e2e) SHA1(f502188ef252b7c9d04934c4b525730a116de48b) ) \
+	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
+	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
+	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
+	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
 
 
 ROM_START( hng64 )
 	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	HNG64_BIOS
 
 	/* To placate MAME */
-	ROM_REGION32_LE( 0x2000000, "user3", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x2000000, "gameprg", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "scrtile", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "sprtile", ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF )
@@ -1980,15 +1587,9 @@ ROM_END
 
 
 ROM_START( roadedge )
-	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
-	/* END BIOS */
+	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
 	ROM_LOAD32_WORD( "001pr01b.81", 0x0000000, 0x400000, CRC(effbac30) SHA1(c1bddf3e511a8950f65ac7e452f81dbc4b7fd977) )
 	ROM_LOAD32_WORD( "001pr02b.82", 0x0000002, 0x400000, CRC(b9aa4ad3) SHA1(9ab3c896dbdc45560b7127486e2db6ca3b15a057) )
 
@@ -2039,15 +1640,9 @@ ROM_END
 
 
 ROM_START( sams64 )
-	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
-	/* END BIOS */
+	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
 	ROM_LOAD32_WORD( "002-pro1a.81", 0x0000000, 0x400000, CRC(e5b907c5) SHA1(83637ffaa9031d41a5bed3397a519d1dfa8052cb) )
 	ROM_LOAD32_WORD( "002-pro2a.82", 0x0000002, 0x400000, CRC(803ed2eb) SHA1(666db47886a316e68b911311e5db3bc0f5b8a34d) )
 	ROM_LOAD32_WORD( "002-pro3a.83", 0x0800000, 0x400000, CRC(582156a7) SHA1(a7bbbd472a53072cbfaed5d41d4265123c9e3f3d) )
@@ -2100,15 +1695,9 @@ ROM_END
 
 
 ROM_START( xrally )
-	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
-	/* END BIOS */
+	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
 	ROM_LOAD32_WORD( "003-pr01a.81", 0x0000000, 0x400000, CRC(4e160388) SHA1(08fba66d0f0dab47f7db5bc7d411f4fc0e8219c8) )
 	ROM_LOAD32_WORD( "003-pr02a.82", 0x0000002, 0x400000, CRC(c4dd4f18) SHA1(4db0e6d5cabd9e4f82d5905556174b9eff8ad4d9) )
 
@@ -2148,15 +1737,9 @@ ROM_END
 
 
 ROM_START( bbust2 )
-	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
-	/* END BIOS */
+	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
 	ROM_LOAD32_WORD( "004-pr01a.81", 0x0000000, 0x400000, CRC(7b836ece) SHA1(7a4a08251f1dd66c368ac203f5a006266e77f73d) )
 	ROM_LOAD32_WORD( "004-pr02a.82", 0x0000002, 0x400000, CRC(8c55a988) SHA1(d9a61ac3d8550ce0ee6aab374c9f024912163180) )
 	ROM_LOAD32_WORD( "004-pr03a.83", 0x0800000, 0x400000, CRC(f25a82dd) SHA1(74c0a03021ef424e0b9c3c818be297d2967b3012) )
@@ -2202,15 +1785,9 @@ ROM_END
 
 
 ROM_START( sams64_2 )
-	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
-	/* END BIOS */
+	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
 	ROM_LOAD32_WORD( "005pr01a.81", 0x0000000, 0x400000, CRC(a69d7700) SHA1(a580783a109bc3e24248d70bcd67f62dd7d8a5dd) )
 	ROM_LOAD32_WORD( "005pr02a.82", 0x0000002, 0x400000, CRC(38b9e6b3) SHA1(d1dad8247d920cc66854a0096e1c7845842d2e1c) )
 	ROM_LOAD32_WORD( "005pr03a.83", 0x0800000, 0x400000, CRC(0bc738a8) SHA1(79893b0e1c4a31e02ab385c4382684245975ae8f) )
@@ -2280,15 +1857,9 @@ ROM_END
 
 
 ROM_START( fatfurwa )
-	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
-	/* END BIOS */
+	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
 	ROM_LOAD32_WORD( "006pr01a.81", 0x0000000, 0x400000, CRC(3830efa1) SHA1(9d8c941ccb6cbe8d138499cf9d335db4ac7a9ec0) )
 	ROM_LOAD32_WORD( "006pr02a.82", 0x0000002, 0x400000, CRC(8d5de84e) SHA1(e3ae014263f370c2836f62ab323f1560cb3a9cf0) )
 	ROM_LOAD32_WORD( "006pr03a.83", 0x0800000, 0x400000, CRC(c811b458) SHA1(7d94e0df501fb086b2e5cf08905d7a3adc2c6472) )
@@ -2351,15 +1922,9 @@ ROM_END
 
 
 ROM_START( buriki )
-	/* BIOS */
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
-	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
-	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
-	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
-	/* END BIOS */
+	HNG64_BIOS
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 )
+	ROM_REGION32_LE( 0x2000000, "gameprg", 0 )
 	ROM_LOAD32_WORD( "007pr01b.81", 0x0000000, 0x400000, CRC(a31202f5) SHA1(c657729b292d394ced021a0201a1c5608a7118ba) )
 	ROM_LOAD32_WORD( "007pr02b.82", 0x0000002, 0x400000, CRC(a563fed6) SHA1(9af9a021beb814e35df968abe5a99225a124b5eb) )
 	ROM_LOAD32_WORD( "007pr03a.83", 0x0800000, 0x400000, CRC(da5f6105) SHA1(5424cf5289cef66e301e968b4394e551918fe99b) )

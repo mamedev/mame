@@ -22,8 +22,6 @@
         * Quantum Fireball CX 6.4GB IDE HDD (C/H/S 13328/15/63)
 
     TODO:
-        * Proper VR4373 implementation
-        * Proper PCI bus implementation
         * PCI peripherals
 
     NOTES:
@@ -38,6 +36,8 @@
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
 #include "audio/dcs.h"
+#include "machine/pci.h"
+#include "machine/vrc4373.h"
 
 
 class atlantis_state : public driver_device
@@ -103,17 +103,6 @@ UINT32 atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atlantis_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM // 8 MB main RAM
-	// 04000000 - PCI slot (ActionTec modem, ROM dump TBD)
-	// 08000000 - PLX9050 chip (Zeus interface?)
-	// 0F000000 - VR4373 ("Nile 3") registers
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
-ADDRESS_MAP_END
-
-
-
 
 /*************************************
  *
@@ -136,8 +125,9 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)    // clock is TRUSTED
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_PCI_ROOT_ADD(                ":pci")
+	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
 
@@ -167,7 +157,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( mwskins )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
+	ROM_REGION32_LE( 0x80000, ":pci:00.0", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "ide:0:hdd:image" )
@@ -175,7 +165,7 @@ ROM_START( mwskins )
 ROM_END
 
 ROM_START( mwskinsa )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
+	ROM_REGION32_LE( 0x80000, ":pci:00.0", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "ide:0:hdd:image" )
@@ -183,7 +173,7 @@ ROM_START( mwskinsa )
 ROM_END
 
 ROM_START( mwskinso )
-	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* 512k for R4310 code */
+	ROM_REGION32_LE( 0x80000, ":pci:00.0", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
 
 	DISK_REGION( "ide:0:hdd:image" )

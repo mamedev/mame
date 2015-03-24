@@ -81,14 +81,3 @@ char *osd_get_clipboard_text(void)
 	// can't support clipboards generically
 	return NULL;
 }
-
-
-//============================================================
-//  osd_get_slider_list
-//============================================================
-
-const void *osd_get_slider_list()
-{
-	// nothing to slide in mini OSD
-	return NULL;
-}

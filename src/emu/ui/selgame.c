@@ -17,6 +17,7 @@
 #include "cheat.h"
 #include "uiinput.h"
 #include "ui/selgame.h"
+#include "ui/inputmap.h"
 #include "ui/miscmenu.h"
 #include "audit.h"
 #include "crsshair.h"
@@ -156,7 +157,7 @@ void ui_menu_select_game::inkey_select(const ui_menu_event *menu_event)
 		media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
 		// if everything looks good, schedule the new driver
-		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
+		if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE || summary == media_auditor::NONE_NEEDED)
 		{
 			machine().manager().schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
@@ -238,7 +239,7 @@ void ui_menu_select_game::populate()
 					emulator_info::get_gamesnoun(),
 					emulator_info::get_configname(),
 					emulator_info::get_appname(),emulator_info::get_appname() );
-		item_append(txt.cstr(), NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+		item_append(txt, NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
 		return;
 	}
 

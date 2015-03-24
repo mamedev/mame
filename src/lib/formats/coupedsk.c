@@ -6,7 +6,8 @@
 
 **************************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/coupedsk.h"
 #include "flopimg.h"
 

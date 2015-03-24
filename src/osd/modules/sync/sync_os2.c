@@ -80,6 +80,8 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 	osd_scalable_lock *lock;
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
+	if (lock == NULL)
+		return NULL;
 
 	memset(lock, 0, sizeof(*lock));
 	lock->slot[0].haslock = TRUE;
@@ -197,6 +199,8 @@ osd_lock *osd_lock_alloc(void)
 	osd_lock *lock;
 
 	lock = (osd_lock *)calloc(1, sizeof(osd_lock));
+	if (lock == NULL)
+		return NULL;
 
 	lock->holder = 0;
 	lock->count = 0;
@@ -335,6 +339,8 @@ osd_event *osd_event_alloc(int manualreset, int initialstate)
 	osd_event *ev;
 
 	ev = (osd_event *)calloc(1, sizeof(osd_event));
+	if (ev == NULL)
+		return NULL;
 
 	DosCreateMutexSem(NULL, &ev->hmtx, 0, FALSE);
 	DosCreateEventSem(NULL, &ev->hev, 0, initialstate);
@@ -381,11 +387,17 @@ void osd_event_reset(osd_event *event)
 int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
 	ULONG rc;
+	ULONG timeout_param;
+
+	if (timeout == OSD_EVENT_WAIT_INFINITE)
+		timeout_param = SEM_INDEFINITE_WAIT;
+	else
+		timeout_param = timeout * 1000 / osd_ticks_per_second();
 
 	if(event->autoreset)
 		DosRequestMutexSem(event->hmtx, -1);
 
-	rc = DosWaitEventSem(event->hev, timeout * 1000 / osd_ticks_per_second());
+	rc = DosWaitEventSem(event->hev, timeout_param);
 
 	if(event->autoreset)
 	{
@@ -416,6 +428,8 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	osd_thread *thread;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	if (thread == NULL)
+		return NULL;
 	thread->callback = callback;
 	thread->param = cbparam;
 	thread->thread = _beginthread(worker_thread_entry, NULL, 65535, thread);
@@ -464,16 +478,4 @@ void osd_thread_wait_free(osd_thread *thread)
 
 	DosWaitThread(&tid, 0);
 	free(thread);
-}
-
-//============================================================
-//  osd_process_kill
-//============================================================
-
-void osd_process_kill(void)
-{
-	PPIB ppib;
-
-	DosGetInfoBlocks(NULL, &ppib);
-	DosKillProcess(DKP_PROCESSTREE, ppib->pib_ulpid);
 }

@@ -1787,11 +1787,6 @@ WRITE8_MEMBER(alpha68k_state::porta_w)
 	m_sound_pa_latch = data & 1;
 }
 
-WRITE_LINE_MEMBER(alpha68k_state::ym3812_irq)
-{
-	m_audiocpu->set_input_line(0, (state) ? HOLD_LINE : CLEAR_LINE);
-}
-
 
 /******************************************************************************/
 
@@ -2061,7 +2056,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(alpha68k_state, ym3812_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2296,7 +2291,7 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(alpha68k_state, ym3812_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

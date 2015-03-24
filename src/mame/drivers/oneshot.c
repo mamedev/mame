@@ -327,11 +327,6 @@ static GFXDECODE_START( oneshot )
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(oneshot_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void oneshot_state::machine_start()
 {
 	save_item(NAME(m_gun_x_p1));
@@ -381,7 +376,7 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(oneshot_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

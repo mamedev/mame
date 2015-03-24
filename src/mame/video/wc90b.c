@@ -62,19 +62,19 @@ void wc90b_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wc90b_state::wc90b_bgvideoram_w)
+WRITE8_MEMBER(wc90b_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(wc90b_state::wc90b_fgvideoram_w)
+WRITE8_MEMBER(wc90b_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(wc90b_state::wc90b_txvideoram_w)
+WRITE8_MEMBER(wc90b_state::txvideoram_w)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -121,7 +121,7 @@ void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	}
 }
 
-UINT32 wc90b_state::screen_update_wc90b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 wc90b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,8 * (m_scroll2x[0] & 0x7f) + 256 - 4 + (m_scroll_x_lo[0] & 0x07));
 	m_bg_tilemap->set_scrolly(0,m_scroll2y[0] + 1 + ((m_scroll2x[0] & 0x80) ? 256 : 0));

@@ -16,7 +16,7 @@ ATTR_COLD netlist_generic_diode::netlist_generic_diode()
 	set_param(1e-15, 1, 1e-15);
 }
 
-ATTR_COLD void netlist_generic_diode::set_param(const double Is, const double n, double gmin)
+ATTR_COLD void netlist_generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
 {
 	m_Is = Is;
 	m_n = n;
@@ -157,7 +157,7 @@ NETLIB_UPDATE(POT)
 
 NETLIB_UPDATE_PARAM(POT)
 {
-	double v = m_Dial.Value();
+	nl_double v = m_Dial.Value();
 	if (m_DialIsLog.Value())
 		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
 
@@ -221,8 +221,8 @@ NETLIB_START(D)
 
 NETLIB_UPDATE_PARAM(D)
 {
-	double Is = m_model.model_value("Is", 1e-15);
-	double n = m_model.model_value("N", 1);
+	nl_double Is = m_model.model_value("Is", 1e-15);
+	nl_double n = m_model.model_value("N", 1);
 
 	m_D.set_param(Is, n, netlist().gmin());
 }

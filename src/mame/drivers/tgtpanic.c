@@ -18,18 +18,29 @@ class tgtpanic_state : public driver_device
 public:
 	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_ram(*this, "ram") { }
 
-	required_shared_ptr<UINT8> m_ram;
-	UINT8 m_color;
-	DECLARE_WRITE8_MEMBER(color_w);
-	UINT32 screen_update_tgtpanic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	
+	required_shared_ptr<UINT8> m_ram;
+	
+	UINT8 m_color;
+	
+	DECLARE_WRITE8_MEMBER(color_w);
+	
+	virtual void machine_start();
+	
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+
+void tgtpanic_state::machine_start()
+{
+	save_item(NAME(m_color));
+}
 
 /*************************************
  *
@@ -37,7 +48,7 @@ public:
  *
  *************************************/
 
-UINT32 tgtpanic_state::screen_update_tgtpanic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 tgtpanic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 colors[4];
 	UINT32 offs;
@@ -146,7 +157,7 @@ static MACHINE_CONFIG_START( tgtpanic, tgtpanic_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* Unverified */
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 192 - 1, 0, 192 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(tgtpanic_state, screen_update_tgtpanic)
+	MCFG_SCREEN_UPDATE_DRIVER(tgtpanic_state, screen_update)
 MACHINE_CONFIG_END
 
 
@@ -168,4 +179,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, driver_device, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND_HW )
+GAME( 1996, tgtpanic, 0, tgtpanic, tgtpanic, driver_device, 0, ROT0, "Konami", "Target Panic", GAME_NO_SOUND_HW | GAME_SUPPORTS_SAVE )

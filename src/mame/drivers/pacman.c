@@ -6616,6 +6616,11 @@ DRIVER_INIT_MEMBER(pacman_state,mspacman)
 	membank("bank1")->set_entry(1);
 }
 
+DRIVER_INIT_MEMBER(pacman_state, mschamp)
+{
+	save_item(NAME(m_counter));
+}
+
 DRIVER_INIT_MEMBER(pacman_state,woodpek)
 {
 	int i, len;
@@ -6844,8 +6849,8 @@ GAME( 1981, mspacii,  mspacman, woodpek,  mspacman, pacman_state,  mspacii,  ROT
 GAME( 1981, mspacii2, mspacman, woodpek,  mspacman, pacman_state,  mspacii,  ROT90,  "bootleg (Orca)", "Ms. Pac-Man II (Orca bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacgal,   mspacman, woodpek,  mspacman, driver_device, 0,        ROT90,  "hack", "Pac-Gal", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacpls, mspacman, woodpek,  mspacpls, driver_device, 0,        ROT90,  "hack", "Ms. Pac-Man Plus", GAME_SUPPORTS_SAVE )
-GAME( 1992, mschamp,  mspacman, mschamp,  mschamp,  driver_device, 0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Zola-Puc Gal", GAME_SUPPORTS_SAVE ) /* Rayglo version */
-GAME( 1995, mschamps, mspacman, mschamp,  mschamp,  driver_device, 0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Super Zola-Puc Gal", GAME_SUPPORTS_SAVE )
+GAME( 1992, mschamp,  mspacman, mschamp,  mschamp,  pacman_state,  mschamp,  ROT90,  "hack", "Ms. Pacman Champion Edition / Zola-Puc Gal", GAME_SUPPORTS_SAVE ) /* Rayglo version */
+GAME( 1995, mschamps, mspacman, mschamp,  mschamp,  pacman_state,  mschamp,  ROT90,  "hack", "Ms. Pacman Champion Edition / Super Zola-Puc Gal", GAME_SUPPORTS_SAVE )
 
 // These bootlegs have MADE IN GREECE clearly visible and etched into the PCBs. They were very common in Spain with several operators having their own versions.
 // Based on the PCBs and copyright dates shown they  were produced late 80s / early 90s. Usually they run a version of Ms. Pacman, but were sometimes converted back to regular Pac-Man

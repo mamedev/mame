@@ -1,5 +1,10 @@
 
-typedef int (*seta001_gfxbank_callback_func)(running_machine &machine, UINT16 code, UINT8 color);
+typedef device_delegate<int (UINT16 code, UINT8 color)> gfxbank_cb_delegate;
+
+#define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(UINT16 code, UINT8 color)
+
+#define MCFG_SETA001_SPRITE_GFXBANK_CB(_class, _method) \
+	seta001_device::set_gfxbank_callback(*device, gfxbank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 class seta001_device : public device_t
 {
@@ -9,6 +14,7 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
+	static void set_gfxbank_callback(device_t &device, gfxbank_cb_delegate callback) { downcast<seta001_device &>(device).m_gfxbank_cb = callback; }
 
 	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
 
@@ -46,8 +52,6 @@ public:
 
 	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); };
 
-	void set_gfxbank_callback(seta001_gfxbank_callback_func callback) { m_bankcallback = callback; };
-
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -59,7 +63,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	seta001_gfxbank_callback_func m_bankcallback;
+	gfxbank_cb_delegate m_gfxbank_cb;
 
 	// configuration
 	int m_fg_flipxoffs, m_fg_noflipxoffs;

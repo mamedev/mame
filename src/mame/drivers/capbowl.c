@@ -103,7 +103,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(capbowl_state::capbowl_interrupt)
+INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
 {
 	if (ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);    /* trigger self test */
@@ -121,8 +121,8 @@ void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch (id)
 	{
-	case TIMER_CAPBOWL_UPDATE:
-		capbowl_update(ptr, param);
+	case TIMER_UPDATE:
+		update(ptr, param);
 		break;
 	default:
 		assert_always(FALSE, "Unknown id in capbowl_state::device_timer");
@@ -130,14 +130,14 @@ void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-TIMER_CALLBACK_MEMBER(capbowl_state::capbowl_update)
+TIMER_CALLBACK_MEMBER(capbowl_state::update)
 {
 	int scanline = param;
 
 	m_screen->update_partial(scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	timer_set(m_screen->time_until_pos(scanline), TIMER_CAPBOWL_UPDATE, scanline);
+	m_update_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -190,26 +190,11 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
  *
  *************************************/
 
-WRITE8_MEMBER(capbowl_state::capbowl_sndcmd_w)
+WRITE8_MEMBER(capbowl_state::sndcmd_w)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_byte_w(space, offset, data);
 }
-
-
-
-/*************************************
- *
- *  Handler called by the 2203 emulator
- *  when the internal timers cause an IRQ
- *
- *************************************/
-
-WRITE_LINE_MEMBER(capbowl_state::firqhandler)
-{
-	m_audiocpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 
 /*************************************
@@ -223,8 +208,8 @@ static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(tms34061_r, tms34061_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndcmd_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w) AM_READNOP   /* + watchdog */
 	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)         /* + other inputs */
 	AM_RANGE(0x7800, 0x7800) AM_READ(track_1_r)         /* + other inputs */
@@ -236,8 +221,8 @@ static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_SHARE("rowaddress")
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(tms34061_r, tms34061_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndcmd_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w) AM_READNOP    /* + watchdog */
 	AM_RANGE(0x7000, 0x7000) AM_READ(track_0_r)         /* + other inputs */
 	AM_RANGE(0x7800, 0x7800) AM_READ(track_1_r)         /* + other inputs */
@@ -301,31 +286,21 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  TMS34061 interfacing
- *
- *************************************/
-
-WRITE_LINE_MEMBER(capbowl_state::generate_tms34061_interrupt)
-{
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
-}
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
 
 void capbowl_state::machine_start()
 {
+	m_update_timer = timer_alloc(TIMER_UPDATE);
+	
 	save_item(NAME(m_blitter_addr));
-	save_item(NAME(m_last_trackball_val[0]));
-	save_item(NAME(m_last_trackball_val[1]));
+	save_item(NAME(m_last_trackball_val));
 }
 
 void capbowl_state::machine_reset()
 {
-	timer_set(m_screen->time_until_pos(32), TIMER_CAPBOWL_UPDATE, 32);
+	m_update_timer->adjust(m_screen->time_until_pos(32), 32);
 
 	m_blitter_addr = 0;
 	m_last_trackball_val[0] = 0;
@@ -338,7 +313,7 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  capbowl_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
 
 	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
@@ -354,18 +329,18 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 	MCFG_SCREEN_SIZE(360, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 244)
 	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_UPDATE_DRIVER(capbowl_state, screen_update_capbowl)
+	MCFG_SCREEN_UPDATE_DRIVER(capbowl_state, screen_update)
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
 	MCFG_TMS34061_VRAM_SIZE(0x10000) /* size of video RAM */
-	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(capbowl_state, generate_tms34061_interrupt))      /* interrupt gen callback */
+	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", M6809_FIRQ_LINE))      /* interrupt gen callback */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(capbowl_state, firqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("ticket", ticket_dispenser_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("ticket", ticket_dispenser_device, write))  /* Also a status LED. See memory map above */
 	MCFG_SOUND_ROUTE(0, "mono", 0.07)
@@ -492,9 +467,9 @@ DRIVER_INIT_MEMBER(capbowl_state,capbowl)
  *
  *************************************/
 
-GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", 0 )
-GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", 0 )
-GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", 0 )
-GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", 0 )
-GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling", 0 )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, driver_device, 0,        ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )
+GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", GAME_SUPPORTS_SAVE )
+GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling", GAME_SUPPORTS_SAVE )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, driver_device, 0,        ROT270, "P&P Marketing", "Bowl-O-Rama", GAME_SUPPORTS_SAVE )

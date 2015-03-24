@@ -146,12 +146,12 @@ WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(sidepckt_state::sidepckt_i8751_r)
+READ8_MEMBER(sidepckt_state::i8751_r)
 {
 	return m_i8751_return;
 }
 
-WRITE8_MEMBER(sidepckt_state::sidepckt_i8751_w)
+WRITE8_MEMBER(sidepckt_state::i8751_w)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
@@ -193,9 +193,9 @@ WRITE8_MEMBER(sidepckt_state::sidepckt_i8751_w)
 
 static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM // ???
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2100, 0x24ff) AM_RAM // ???
@@ -204,9 +204,9 @@ static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x300c, 0x300c) AM_READNOP AM_WRITE(sidepckt_flipscreen_w)
-	AM_RANGE(0x3014, 0x3014) AM_READ(sidepckt_i8751_r)
-	AM_RANGE(0x3018, 0x3018) AM_WRITE(sidepckt_i8751_w)
+	AM_RANGE(0x300c, 0x300c) AM_READNOP AM_WRITE(flipscreen_w)
+	AM_RANGE(0x3014, 0x3014) AM_READ(i8751_r)
+	AM_RANGE(0x3018, 0x3018) AM_WRITE(i8751_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -377,7 +377,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update_sidepckt)
+	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sidepckt)
@@ -488,6 +488,12 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 	m_prot_table[0] = sidepckt_prot_table_1;
 	m_prot_table[1] = sidepckt_prot_table_2;
 	m_prot_table[2] = sidepckt_prot_table_3;
+
+	save_item(NAME(m_i8751_return));
+	save_item(NAME(m_current_ptr));
+	save_item(NAME(m_current_table));
+	save_item(NAME(m_in_math));
+	save_item(NAME(m_math_param));
 }
 
 DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
@@ -495,9 +501,15 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 	m_prot_table[0] = sidepcktj_prot_table_1;
 	m_prot_table[1] = sidepcktj_prot_table_2;
 	m_prot_table[2] = sidepcktj_prot_table_3;
+
+	save_item(NAME(m_i8751_return));
+	save_item(NAME(m_current_ptr));
+	save_item(NAME(m_current_table));
+	save_item(NAME(m_in_math));
+	save_item(NAME(m_math_param));
 }
 
 
-GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL )
-GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, driver_device,  0,         ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, driver_device,  0,         ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

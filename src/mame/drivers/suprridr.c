@@ -89,6 +89,12 @@
 #include "sound/ay8910.h"
 
 
+void suprridr_state::machine_start()
+{
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_sound_data));
+}
+
 /*************************************
  *
  *  Interrupt generation
@@ -164,8 +170,8 @@ WRITE8_MEMBER(suprridr_state::coin_lock_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(suprridr_bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(suprridr_fgram_w) AM_SHARE("fgram")
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0x9800, 0x983f) AM_RAM
 	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
@@ -173,12 +179,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xb002, 0xb003) AM_WRITE(coin_lock_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(suprridr_flipx_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(suprridr_flipy_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(flipx_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(flipy_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(sound_data_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(suprridr_fgdisable_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(suprridr_fgscrolly_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(suprridr_bgscrolly_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(fgdisable_w)
+	AM_RANGE(0xc802, 0xc802) AM_WRITE(fgscrolly_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(bgscrolly_w)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
@@ -223,12 +229,12 @@ ADDRESS_MAP_END
 #define SUPRRIDR_P1_CONTROL_PORT_TAG    ("CONTP1")
 #define SUPRRIDR_P2_CONTROL_PORT_TAG    ("CONTP2")
 
-CUSTOM_INPUT_MEMBER(suprridr_state::suprridr_control_r)
+CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
 {
 	UINT32 ret;
 
 	/* screen flip multiplexes controls */
-	if (suprridr_is_screen_flipped())
+	if (is_screen_flipped())
 		ret = ioport(SUPRRIDR_P2_CONTROL_PORT_TAG)->read();
 	else
 		ret = ioport(SUPRRIDR_P1_CONTROL_PORT_TAG)->read();
@@ -239,7 +245,7 @@ CUSTOM_INPUT_MEMBER(suprridr_state::suprridr_control_r)
 
 static INPUT_PORTS_START( suprridr )
 	PORT_START("INPUTS")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, suprridr_state,suprridr_control_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, suprridr_state, control_r, NULL)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -353,7 +359,7 @@ static MACHINE_CONFIG_START( suprridr, suprridr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update_suprridr)
+	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprridr)
@@ -423,4 +429,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, suprridr, 0, suprridr, suprridr, driver_device, 0, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", GAME_IMPERFECT_SOUND )
+GAME( 1983, suprridr, 0, suprridr, suprridr, driver_device, 0, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

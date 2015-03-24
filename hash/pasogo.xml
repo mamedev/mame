@@ -1,38 +1,99 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pasogo" description="Koei PasoGo cartridges">
-	<!-- KS-1010. Contians 8M SOP44 ROM, 62256 SOP32 RAM, Microchip 1081N (reset IC?watchdog?battery-power-switcher?) and 3V battery. -->
+
+<!--
+  Koei PasoGo (パソ碁) undumped games (as listed on the back cover of the cart instruction booklet)
+
+  94年度三大タイトル挑戦手合集 (94 Nendo San Dai Title Chousen Teaishuu)
+  歴代棋聖戦名曲集 (Rekidai Kisei Sen Meikyokushuu)
+  棋界覇王伝・古典編 (Kikai Haoh Den - Koten-hen)
+  棋界覇王伝・現代編 (Kikai Haoh Den - Gendai-hen)
+  
+  The undumped cart numbers are KS-1005, KS-1006, KS-1007 and KS-1008
+  For the remaining undumped games, the game to cart number match is unknown.
+  -->
+
+	<!-- KS-1001: Contains 8M SOP44 ROM, 62256 SOP32 RAM, Microchip 1081N (reset IC?watchdog?battery-power-switcher?) and 3V battery. -->
+	<software name="taikyoku">
+		<description>Taikyoku-kun I</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="KS-1001"/>
+		<info name="alt_title" value="対局くん I"/>
+		<part name="cart" interface="pasogo_cart">
+			<dataarea name="rom" width="16" endianness="little" size="1048576">
+				<rom name="ks-1001.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39" offset="00000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- KS-1002: Contains 4M SOP40 ROM only. -->
+	<software name="tanostd1">
+		<description>Tanoshii Tsumego Dai-1-kan</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="KS-1002"/>
+		<info name="alt_title" value="楽しい詰碁・第1巻"/>
+		<part name="cart" interface="pasogo_cart">
+			<dataarea name="rom" width="16" endianness="little" size="524288">
+				<rom name="ks-1002.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- KS-1003: Contains 4M SOP40 ROM only. -->
+	<software name="tanostd2">
+		<description>Tanoshii Tsumego Dai-2-kan</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="KS-1003"/>
+		<info name="alt_title" value="楽しい詰碁・第2巻"/>
+		<part name="cart" interface="pasogo_cart">
+			<dataarea name="rom" width="16" endianness="little" size="524288">
+				<rom name="ks-1003.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- KS-1004: Contains 4M SOP40 ROM only. -->
+	<software name="igmks1">
+		<description>Igo Meikyokushuu - Dai-1-kan</description>
+		<year>1996</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="KS-1004"/>
+		<info name="alt_title" value="囲碁名局集・第1巻"/>
+		<part name="cart" interface="pasogo_cart">
+			<dataarea name="rom" width="16" endianness="little" size="524288">
+				<rom name="ks-1004.ic4" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- KS-1009: Contains 8M SOP44 ROM, 62256 SOP32 RAM, Microchip 1081N (reset IC?watchdog?battery-power-switcher?) and 3V battery. -->
 	<software name="dgoban">
 		<description>Denshi Goban</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
+		<info name="serial" value="KS-1009"/>
+		<info name="alt_title" value="電子碁盤"/>
 		<part name="cart" interface="pasogo_cart">
 			<dataarea name="rom" width="16" endianness="little" size="1048576">
-				<rom name="ks-1010.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39" offset="00000000" />
+				<rom name="ks-1009.ic4" size="1048576" crc="b6a3f97c" sha1="2de63b05ec93a4ba3ea55ba131c0706927a5bf39" offset="00000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- KS-1004. Contains 4M SOP40 ROM only. -->
-	<software name="igmks1">
-		<description>Igo Meikyokushuu - Dai Ikkan</description>
-		<year>1996</year>
-		<publisher>Koei</publisher>
-		<part name="cart" interface="pasogo_cart">
-			<dataarea name="rom" width="16" endianness="little" size="524288">
-				<rom name="yrm0442m-184s" size="524288" crc="32f9c38a" sha1="1be82afcdf5e2d1a0e873fda4161e663d7a53a85" offset="00000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- KS-1009. Contains 4M SOP40 ROM only. -->
+	<!-- KS-1010: Contains 4M SOP40 ROM only. -->
 	<software name="tnt1">
-		<description>Tsuyoku Naru Tesuji - Dai Ikkan</description>
+		<description>Tsuyoku Naru Tesuji - Dai-1-kan</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
+		<info name="serial" value="KS-1010"/>
+		<info name="alt_title" value="強くなる手筋・第1巻"/>
 		<part name="cart" interface="pasogo_cart">
 			<dataarea name="rom" width="16" endianness="little" size="524288">
-				<rom name="ks-1009.ic4" size="524288" crc="3e70fca6" sha1="c46cdc9e01f2f5c66b2523e1d30355e51c839f27" offset="00000000" />
+				<rom name="ks-1010.ic4" size="524288" crc="3e70fca6" sha1="c46cdc9e01f2f5c66b2523e1d30355e51c839f27" offset="00000000" />
 			</dataarea>
 		</part>
 	</software>

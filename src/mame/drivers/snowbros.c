@@ -185,6 +185,13 @@ WRITE16_MEMBER(snowbros_state::semicom_soundcmd_w)
 	if (ACCESSING_BITS_0_7) soundlatch_byte_w(space,0,data & 0xff);
 }
 
+READ16_MEMBER(snowbros_state::toto_read)
+{
+	int pc = space.device().safe_pc();
+	if ((pc!= 0x3f010) && (pc!= 0x38008)) printf("toto prot %08x %04x\n", pc, mem_mask);
+	return 0x0700;
+}
+
 /* Snow Bros Memory Map */
 
 static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
@@ -443,24 +450,24 @@ void snowbros_state::sb3_play_music(int data)
 	}
 }
 
-void snowbros_state::sb3_play_sound (okim6295_device *oki, int data)
+void snowbros_state::sb3_play_sound (int data)
 {
-	int status = oki->read_status();
+	int status = m_oki->read_status();
 
 	if ((status&0x01)==0x00)
 	{
-		oki->write_command(0x80|data);
-		oki->write_command(0x00|0x12);
+		m_oki->write_command(0x80|data);
+		m_oki->write_command(0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		oki->write_command(0x80|data);
-		oki->write_command(0x00|0x22);
+		m_oki->write_command(0x80|data);
+		m_oki->write_command(0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		oki->write_command(0x80|data);
-		oki->write_command(0x00|0x42);
+		m_oki->write_command(0x80|data);
+		m_oki->write_command(0x00|0x42);
 	}
 
 
@@ -479,7 +486,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(m_oki, data);
+			sb3_play_sound(data);
 		}
 
 		if (data>=0x22 && data<=0x31)
@@ -489,7 +496,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(m_oki, data-0x30);
+			sb3_play_sound(data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)
@@ -1535,12 +1542,6 @@ static GFXDECODE_START( hyperpac )
 	GFXDECODE_ENTRY( "gfx1", 0, hyperpac_tilelayout,  0, 16 )
 GFXDECODE_END
 
-/* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(snowbros_state::irqhandler)
-{
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 {
 	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
@@ -1592,7 +1593,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snowbros_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1704,7 +1705,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	/* sound hardware */
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snowbros_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
@@ -1953,6 +1954,21 @@ ROM_START( snowbroswb )
 	ROM_LOAD16_BYTE( "wb08.bin",     0x40001, 0x10000, CRC(9497b88c) SHA1(367c6106276f3816528341f11f3a97ae458d25cd) )
 	ROM_LOAD16_BYTE( "wb10.bin",     0x60000, 0x10000, CRC(5fa22b1e) SHA1(1164003d873e9738a3ca133cce689c7120061e3c) )
 	ROM_LOAD16_BYTE( "wb09.bin",     0x60001, 0x10000, CRC(9be718ca) SHA1(5c195e4f13efbdb229201d2408d018861bf389cc) )
+ROM_END
+
+ROM_START( toto )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u60.5j",  0x00000, 0x20000, CRC(39203792) SHA1(4c8d560be02a514cbf91774c7a0b4a95cf573356) )
+	ROM_LOAD16_BYTE( "u51.4j",  0x00001, 0x20000, CRC(7b846cd4) SHA1(04aa0bbaab4303fb08dff52d5515f7e764f1be6d))
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* 64k for z80 sound code */
+	ROM_LOAD( "u46.4c",   0x0000, 0x8000, CRC(77b1ef42) SHA1(75e3c8c2b687669cc56f972dd7375dab5185859c) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "u107.8k",          0x00000, 0x20000, CRC(4486153b) SHA1(a6dc0c17bf2328ab725bce4aaa0a413a42129fb0) )
+	ROM_LOAD( "u108.8l",          0x20000, 0x20000, CRC(3286cf5f) SHA1(133366b0e10ab86111247cbedf329e8e3a7f2148) )
+	ROM_LOAD( "u109.8m",          0x40000, 0x20000, CRC(464d7251) SHA1(f03ee54e9301ea87de4171cecdbad4a5e17929c4) )
+	ROM_LOAD( "u110.8n",          0x60000, 0x20000, CRC(7dea56df) SHA1(7e7b9238837c6f4221cff416a2de21723d2c9272) )
 ROM_END
 
 /* Barko */
@@ -2837,6 +2853,9 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
 		memcpy(src,buffer,len);
 	}
+
+	save_item(NAME(m_sb3_music_is_playing));
+	save_item(NAME(m_sb3_music));
 }
 
 READ16_MEMBER(snowbros_state::_3in1_read)
@@ -2866,42 +2885,81 @@ DRIVER_INIT_MEMBER(snowbros_state,pzlbreak)
 
 
 
-GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", 0 )
-GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", 0 )
-GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", 0 )
-GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 4)", 0 )
-GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (Japan)", 0 )
-GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan (Dooyong license)",      "Snow Bros. - Nick & Tom (Dooyong license)", 0 )
-GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
-GAME( 1990, snowbroswb,snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg",                        "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", 0 ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
+DRIVER_INIT_MEMBER(snowbros_state,toto)
+{
+	// every single rom has bits 0x10 and 0x08 swapped
+	UINT8 *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+	}
+
+	src = memregion("gfx1")->base();
+	len = memregion("gfx1")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+	}
+
+	src = memregion("soundcpu")->base();
+	len = memregion("soundcpu")->bytes();
+
+	for (int i = 0; i < len; i++)
+	{
+		src[i] = BITSWAP8(src[i], 7, 6, 5, 3, 4, 2, 1, 0);
+	}
+
+	// protection? (just return 0x07)
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x500006, 0x500007, read16_delegate(FUNC(snowbros_state::toto_read),this));
+}
+
+DRIVER_INIT_MEMBER(snowbros_state, hyperpac)
+{
+	save_item(NAME(m_semicom_prot_offset));
+}
+
+
+GAME( 1990, snowbros,  0,        snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, snowbrosa, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 4)", GAME_SUPPORTS_SAVE )
+GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, driver_device, 0, ROT0, "Toaplan (Dooyong license)",      "Snow Bros. - Nick & Tom (Dooyong license)", GAME_SUPPORTS_SAVE )
+GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", GAME_SUPPORTS_SAVE )
+GAME( 1990, snowbroswb,snowbros, wintbob,  snowbros, driver_device, 0, ROT0, "bootleg",                        "Snow Bros. - Nick & Tom (The Winter Bobble hardware bootleg)", GAME_SUPPORTS_SAVE ) // this was probably unhacked back from the more common Winter Bobble to make it look more original
+
+GAME( 1996, toto,      0,        snowbros, snowbros, snowbros_state, toto, ROT0, "SoftClub",                    "Come Back Toto", GAME_SUPPORTS_SAVE ) // modified from 'snowbros' code
 
 // none of the games below are on genuine SnowBros hardware, but they clone the functionality of it.
 
 // SemiCom / Jeil titles are protected, a dumb MCU copies code into RAM at startup, some also check for a specific return value from an address on startup.
-GAME( 1993, finalttr, 0,        finalttr,     finalttr, driver_device,  0,        ROT0, "Jeil Computer System", "Final Tetris", 0 )
-GAME( 1995, hyperpac, 0,        semicom_mcu,  hyperpac, driver_device,  0,        ROT0, "SemiCom",              "Hyper Pacman", 0 )
-GAME( 1995, hyperpacb,hyperpac, semicom,      hyperpac, driver_device,  0,        ROT0, "bootleg",              "Hyper Pacman (bootleg)", 0 )
-GAME( 1996, cookbib2, 0,        semiprot,     cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2", 0 )
-GAME( 1996, toppyrap, 0,        semiprot,     toppyrap, driver_device,  0,        ROT0, "SemiCom",              "Toppy & Rappy", 0 )
-GAME( 1997, cookbib3, 0,        semiprot,     cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", 0 )
-GAME( 1997, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", 0 )
-GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", 0 )
-GAME( 1997, pzlbreak, 0,        semiprot,     pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom",              "Puzzle Break", 0 )
-GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More", 0 )
-GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More Plus", 0 )
-GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", 0 )
+GAME( 1993, finalttr, 0,        finalttr,     finalttr, driver_device,  0,        ROT0, "Jeil Computer System", "Final Tetris", GAME_SUPPORTS_SAVE )
+GAME( 1995, hyperpac, 0,        semicom_mcu,  hyperpac, snowbros_state, hyperpac, ROT0, "SemiCom",              "Hyper Pacman", GAME_SUPPORTS_SAVE )
+GAME( 1995, hyperpacb,hyperpac, semicom,      hyperpac, driver_device,  0,        ROT0, "bootleg",              "Hyper Pacman (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1996, cookbib2, 0,        semiprot,     cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2", GAME_SUPPORTS_SAVE )
+GAME( 1996, toppyrap, 0,        semiprot,     toppyrap, driver_device,  0,        ROT0, "SemiCom",              "Toppy & Rappy", GAME_SUPPORTS_SAVE )
+GAME( 1997, cookbib3, 0,        semiprot,     cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", GAME_SUPPORTS_SAVE )
+GAME( 1997, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", GAME_SUPPORTS_SAVE )
+GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", GAME_SUPPORTS_SAVE )
+GAME( 1997, pzlbreak, 0,        semiprot,     pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom",              "Puzzle Break", GAME_SUPPORTS_SAVE )
+GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More", GAME_SUPPORTS_SAVE )
+GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More Plus", GAME_SUPPORTS_SAVE )
+GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", GAME_SUPPORTS_SAVE )
 // This is very similar to the SemiCom titles, but unprotected.
-GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , 0)
+GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , GAME_SUPPORTS_SAVE )
 
-GAME( 1995, honeydol, 0,        honeydol, honeydol, driver_device, 0, ROT0, "Barko Corp.", "Honey Dolls", 0 ) // based on snowbros code..
+GAME( 1995, honeydol, 0,        honeydol, honeydol, driver_device, 0, ROT0, "Barko Corp.", "Honey Dolls", GAME_SUPPORTS_SAVE ) // based on snowbros code..
 
-GAME( 1995, twinadv,  0,        twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", 0 )
-GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", 0 )
+GAME( 1995, twinadv,  0,        twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", GAME_SUPPORTS_SAVE )
+GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv, driver_device,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", GAME_SUPPORTS_SAVE )
 
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg
 // it is possible this 'ball boy' is the original bootleg, with snwobro3 being a hack of that, and the ballboy set we have a further hack of that
 // there is also a later 2004 version with 3 player support
 // these use an MCU to drive the sound
-GAME( 2002, snowbro3, 0,        snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ) // hacked from SnowBros code but released as an original game
-GAME( 2003, ballboy,  snowbro3, snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", GAME_IMPERFECT_SOUND )
+GAME( 2002, snowbro3, 0,        snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
+GAME( 2003, ballboy,  snowbro3, snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

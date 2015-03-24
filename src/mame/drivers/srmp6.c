@@ -107,6 +107,7 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
 	DECLARE_DRIVER_INIT(INIT);
+    virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette();
@@ -306,6 +307,11 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
     Main CPU memory handlers
 ***************************************************************************/
 
+void srmp6_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 16, memregion("nile")->base(), 0x200000);
+}
+
 WRITE16_MEMBER(srmp6_state::srmp6_input_select_w)
 {
 	m_input_select = data & 0x0f;
@@ -313,7 +319,7 @@ WRITE16_MEMBER(srmp6_state::srmp6_input_select_w)
 
 READ16_MEMBER(srmp6_state::srmp6_inputs_r)
 {
-	if (offset == 0)            // DSW
+	if (offset == 0) // DSW
 		return ioport("DSW")->read();
 
 	switch (m_input_select) // inputs
@@ -334,9 +340,8 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 	{
 		case 0x5e/2: // bank switch, used by ROM check
 		{
-			const UINT8 *rom = memregion("nile")->base();
-			LOG(("%x\n",data));
-			membank("bank1")->set_base((UINT16 *)(rom + (data & 0x0f)*0x200000));
+            LOG(("%x\n",data));
+            membank("bank1")->set_entry(data & 0x0f);
 			break;
 		}
 
@@ -544,7 +549,7 @@ READ16_MEMBER(srmp6_state::srmp6_irq_ack_r)
 static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM                 // work RAM
-	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")        // banked ROM (used by ROM check)
+	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")    // banked ROM (used by ROM check)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)     // inputs

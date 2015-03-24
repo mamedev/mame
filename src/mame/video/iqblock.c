@@ -41,6 +41,8 @@ void iqblock_state::video_start()
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scroll_cols(64);
+
+	save_item(NAME(m_videoenable));
 }
 
 
@@ -51,19 +53,19 @@ void iqblock_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(iqblock_state::iqblock_fgvideoram_w)
+WRITE8_MEMBER(iqblock_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(iqblock_state::iqblock_bgvideoram_w)
+WRITE8_MEMBER(iqblock_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(iqblock_state::iqblock_fgscroll_w)
+WRITE8_MEMBER(iqblock_state::fgscroll_w)
 {
 	m_fg_tilemap->set_scrolly(offset,data);
 }
@@ -76,7 +78,7 @@ WRITE8_MEMBER(iqblock_state::iqblock_fgscroll_w)
 
 ***************************************************************************/
 
-UINT32 iqblock_state::screen_update_iqblock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 iqblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!m_videoenable) return 0;
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);

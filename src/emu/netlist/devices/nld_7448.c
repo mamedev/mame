@@ -78,7 +78,7 @@ NETLIB_START(7448_sub)
 	register_output("f", m_f);
 	register_output("g", m_g);
 
-	save(NAME(m_state));
+	save(NLNAME(m_state));
 }
 
 NETLIB_RESET(7448_sub)
@@ -98,7 +98,7 @@ NETLIB_UPDATE(7448_sub)
 
 NETLIB_FUNC_VOID(7448_sub, update_outputs, (UINT8 v))
 {
-	assert(v<16);
+	nl_assert(v<16);
 	if (v != m_state)
 	{
 		// max transfer time is 100 NS */

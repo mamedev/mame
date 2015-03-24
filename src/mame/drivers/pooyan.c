@@ -24,7 +24,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pooyan_state::pooyan_interrupt)
+INTERRUPT_GEN_MEMBER(pooyan_state::interrupt)
 {
 	if (m_irq_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -47,8 +47,8 @@ WRITE8_MEMBER(pooyan_state::irq_enable_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pooyan_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pooyan_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram2")
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)
 	AM_RANGE(0xa183, 0xa183) AM_MIRROR(0x5e78) AM_WRITENOP // ???
-	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE(pooyan_flipscreen_w)
+	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE(flipscreen_w)
 ADDRESS_MAP_END
 
 
@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pooyan_state,  pooyan_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pooyan_state,  interrupt)
 
 
 	/* video hardware */
@@ -195,7 +195,7 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pooyan_state, screen_update_pooyan)
+	MCFG_SCREEN_UPDATE_DRIVER(pooyan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pooyan)

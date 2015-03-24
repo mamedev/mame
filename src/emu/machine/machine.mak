@@ -1221,15 +1221,6 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/omti5100.h,MACHINES += OMTI5100
-#-------------------------------------------------
-
-ifneq ($(filter OMTI5100,$(MACHINES)),)
-MACHINEOBJS += $(MACHINEOBJ)/omti5100.o
-endif
-
-#-------------------------------------------------
-#
 #@src/emu/machine/pcf8593.h,MACHINES += PCF8593
 #-------------------------------------------------
 
@@ -1264,6 +1255,7 @@ MACHINEOBJS += $(MACHINEOBJ)/lpc.o
 MACHINEOBJS += $(MACHINEOBJ)/lpc-acpi.o
 MACHINEOBJS += $(MACHINEOBJ)/lpc-rtc.o
 MACHINEOBJS += $(MACHINEOBJ)/lpc-pit.o
+MACHINEOBJS += $(MACHINEOBJ)/vrc4373.o
 endif
 
 #-------------------------------------------------

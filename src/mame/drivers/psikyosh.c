@@ -756,12 +756,6 @@ static INPUT_PORTS_START( mjgtaste )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(psikyosh_state::irqhandler)
-{
-	m_maincpu->set_input_line(12, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void psikyosh_state::machine_start()
 {
 	membank("gfxbank")->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);
@@ -784,7 +778,6 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
@@ -799,7 +792,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyosh_state, irqhandler))
+	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -819,9 +812,10 @@ static MACHINE_CONFIG_DERIVED( psikyo5_240, psikyo3v1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ps5_map)
 
+	/* Measured Hsync 16.165 KHz, Vsync 61.68 Hz */
 	/* Ideally this would be driven off the video register. However, it doesn't changeat runtime and MAME will pick a better screen resolution if it knows upfront */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 443, 0, 40*8, 262, 0, 30*8)
 MACHINE_CONFIG_END
 
 

@@ -77,21 +77,28 @@ class pipeline_state : public driver_device
 public:
 	pipeline_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_vram1(*this, "vram1"),
-		m_vram2(*this, "vram2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_vram1(*this, "vram1"),
+		m_vram2(*this, "vram2") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<UINT8> m_vram1;
+	required_shared_ptr<UINT8> m_vram2;
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
-	required_shared_ptr<UINT8> m_vram1;
-	required_shared_ptr<UINT8> m_vram2;
+
 	UINT8 m_vidctrl;
 	UINT8 *m_palram;
 	UINT8 m_toMCU;
 	UINT8 m_fromMCU;
 	UINT8 m_ddrA;
+
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram1_w);
 	DECLARE_WRITE8_MEMBER(mcu_portA_w);
@@ -100,17 +107,26 @@ public:
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
+
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(pipeline);
-	UINT32 screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
+
+void pipeline_state::machine_start()
+{
+	save_item(NAME(m_toMCU));
+	save_item(NAME(m_fromMCU));
+	save_item(NAME(m_ddrA));
+}
 
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
 {
@@ -137,9 +153,12 @@ void pipeline_state::video_start()
 	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pipeline_state::get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,64,32 );
 	m_tilemap2->set_transparent_pen(0);
+
+	save_item(NAME(m_vidctrl));
+	save_pointer(NAME(m_palram), 0x1000);
 }
 
-UINT32 pipeline_state::screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 pipeline_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap1->draw(screen, bitmap, cliprect, 0,0);
 	m_tilemap2->draw(screen, bitmap, cliprect, 0,0);
@@ -377,7 +396,7 @@ static MACHINE_CONFIG_START( pipeline, pipeline_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(pipeline_state, screen_update_pipeline)
+	MCFG_SCREEN_UPDATE_DRIVER(pipeline_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipeline)
@@ -424,4 +443,4 @@ ROM_START( pipeline )
 	ROM_LOAD( "82s123.u79", 0x00200, 0x00020,CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-GAME( 1990, pipeline, 0, pipeline, pipeline, driver_device, 0, ROT0, "Daehyun Electronics", "Pipeline",GAME_NO_SOUND )
+GAME( 1990, pipeline, 0, pipeline, pipeline, driver_device, 0, ROT0, "Daehyun Electronics", "Pipeline", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

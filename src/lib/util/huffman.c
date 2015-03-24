@@ -97,6 +97,7 @@
 ***************************************************************************/
 
 #include <stdlib.h>
+#include <assert.h>
 
 #include "coretmpl.h"
 #include "huffman.h"

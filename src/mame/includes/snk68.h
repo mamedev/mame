@@ -54,7 +54,6 @@ public:
 	UINT32 screen_update_pow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void common_video_start();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;

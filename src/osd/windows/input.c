@@ -574,7 +574,7 @@ bool wininput_should_hide_mouse(void)
 		return false;
 
 	// if the window has a menu, no
-	if (win_window_list != NULL && win_has_menu(win_window_list))
+	if (win_window_list != NULL && win_window_list->win_has_menu())
 		return false;
 
 	// otherwise, yes
@@ -1488,7 +1488,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	device_info *devinfo;
 	HRESULT result;
 
-	if (win_window_list != NULL && win_has_menu(win_window_list)) {
+	if (win_window_list != NULL && win_window_list->win_has_menu()) {
 		cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 	}
 	// allocate and link in a new device

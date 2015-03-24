@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  mosaic.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -56,13 +56,13 @@ void mosaic_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mosaic_state::mosaic_fgvideoram_w)
+WRITE8_MEMBER(mosaic_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(mosaic_state::mosaic_bgvideoram_w)
+WRITE8_MEMBER(mosaic_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -70,7 +70,7 @@ WRITE8_MEMBER(mosaic_state::mosaic_bgvideoram_w)
 
 
 
-UINT32 mosaic_state::screen_update_mosaic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mosaic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

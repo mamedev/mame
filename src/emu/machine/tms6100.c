@@ -28,6 +28,19 @@
        VSS       | 14           15 |  NC
                  +-----------------+
 
+     TMS6125:
+
+                 +---------+
+       DATA/ADD1 | 1    16 |  NC
+       DATA/ADD2 | 2    15 |  NC
+       DATA/ADD4 | 3    14 |  NC
+       DATA/ADD8 | 4    13 |  NC
+       CLK       | 5    12 |  VDD
+       NC        | 6    11 |  /CS
+       NC        | 7    10 |  M1
+       M0        | 8     9 |  VSS
+                 +---------+
+
     M58819 (from radarscope schematics):
 
                  +-----------------+

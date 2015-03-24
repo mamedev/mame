@@ -6,10 +6,10 @@
 
 ****************************************************************************/
 
-#include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "pool.h"
 #include "corestr.h"

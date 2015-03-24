@@ -27,8 +27,8 @@ TILEMAP_MAPPER_MEMBER(vball_state::background_scan)
 
 TILE_GET_INFO_MEMBER(vball_state::get_bg_tile_info)
 {
-	UINT8 code = m_vb_videoram[tile_index];
-	UINT8 attr = m_vb_attribram[tile_index];
+	UINT8 code = m_videoram[tile_index];
+	UINT8 attr = m_attribram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			code + ((attr & 0x1f) << 8) + (m_gfxset<<8),
 			(attr >> 5) & 0x7,
@@ -42,63 +42,60 @@ void vball_state::video_start()
 
 	m_bg_tilemap->set_scroll_rows(32);
 	m_gfxset=0;
-	m_vb_bgprombank=0xff;
-	m_vb_spprombank=0xff;
+	m_bgprombank=0xff;
+	m_spprombank=0xff;
+
+	save_item(NAME(m_scrollx_hi));
+	save_item(NAME(m_scrolly_hi));
+	save_item(NAME(m_scrollx_lo));
+	save_item(NAME(m_gfxset));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_bgprombank));
+	save_item(NAME(m_spprombank));
 }
 
-WRITE8_MEMBER(vball_state::vb_videoram_w)
+WRITE8_MEMBER(vball_state::videoram_w)
 {
-	m_vb_videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-#ifdef UNUSED_FUNCTION
-READ8_MEMBER(vball_state::vb_attrib_r)
+WRITE8_MEMBER(vball_state::attrib_w)
 {
-	return m_vb_attribram[offset];
-}
-#endif
-
-WRITE8_MEMBER(vball_state::vb_attrib_w)
-{
-	m_vb_attribram[offset] = data;
+	m_attribram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void vball_state::vb_bgprombank_w( int bank )
+void vball_state::bgprombank_w( int bank )
 {
 	int i;
 	UINT8* color_prom;
 
-	if (bank==m_vb_bgprombank) return;
+	if (bank==m_bgprombank) return;
 
 	color_prom = memregion("proms")->base() + bank*0x80;
 	for (i=0;i<128;i++, color_prom++) {
 		m_palette->set_pen_color(i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 						pal4bit(color_prom[0x800] >> 0));
 	}
-	m_vb_bgprombank=bank;
+	m_bgprombank=bank;
 }
 
-void vball_state::vb_spprombank_w( int bank )
+void vball_state::spprombank_w( int bank )
 {
 	int i;
 	UINT8* color_prom;
 
-	if (bank==m_vb_spprombank) return;
+	if (bank==m_spprombank) return;
 
 	color_prom = memregion("proms")->base()+0x400 + bank*0x80;
 	for (i=128;i<256;i++,color_prom++)  {
 		m_palette->set_pen_color(i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 						pal4bit(color_prom[0x800] >> 0));
 	}
-	m_vb_spprombank=bank;
+	m_spprombank=bank;
 }
 
-void vball_state::vb_mark_all_dirty(  )
-{
-	m_bg_tilemap->mark_all_dirty();
-}
 
 #define DRAW_SPRITE( order, sx, sy ) gfx->transpen(bitmap,\
 					cliprect, \
@@ -150,16 +147,16 @@ void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 #undef DRAW_SPRITE
 
-UINT32 vball_state::screen_update_vb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
-	m_bg_tilemap->set_scrolly(0,m_vb_scrolly_hi + *m_vb_scrolly_lo);
+	m_bg_tilemap->set_scrolly(0,m_scrolly_hi + *m_scrolly_lo);
 
 	/*To get linescrolling to work properly, we must ignore the 1st two scroll values, no idea why! -SJE */
 	for (i = 2; i < 256; i++) {
-		m_bg_tilemap->set_scrollx(i,m_vb_scrollx[i-2]);
-		//logerror("scrollx[%d] = %d\n",i,m_vb_scrollx[i]);
+		m_bg_tilemap->set_scrollx(i,m_scrollx[i-2]);
+		//logerror("scrollx[%d] = %d\n",i,m_scrollx[i]);
 	}
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);

@@ -92,6 +92,12 @@
 
 machine_manager* machine_manager::m_manager = NULL;
 
+osd_interface &machine_manager::osd() const
+{
+	return m_osd;
+}
+
+
 machine_manager* machine_manager::instance(emu_options &options,osd_interface &osd)
 {
 	if(!m_manager)
@@ -280,6 +286,16 @@ void CLIB_DECL popmessage(const char *format, ...)
 
 		// pop it in the UI
 		machine_manager::instance()->machine()->ui().popup_time(temp.len() / 40 + 2, "%s", temp.cstr());
+		
+		/*
+		// also write to error.log
+		logerror("popmessage: %s\n", temp.cstr());
+		
+#ifdef MAME_DEBUG
+		// and to command-line in a DEBUG build
+		osd_printf_info("popmessage: %s\n", temp.cstr());
+#endif
+		*/
 	}
 }
 

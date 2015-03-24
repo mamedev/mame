@@ -148,6 +148,11 @@ CPUS += IE15
 CPUS += 8X300
 CPUS += ALTO2
 #CPUS += W65816
+CPUS += ARC
+CPUS += ARCOMPACT
+CPUS += AMIS2000
+CPUS += UCOM4
+CPUS += HMCS40
 
 #-------------------------------------------------
 # specify available sound cores
@@ -273,6 +278,7 @@ SOUNDS += MOS7360
 #SOUNDS += VRC6
 SOUNDS += SB0400
 SOUNDS += AC97
+SOUNDS += ES1373
 
 #-------------------------------------------------
 # specify available video cores
@@ -323,6 +329,7 @@ VIDEOS += PSX
 VIDEOS += RAMDAC
 #VIDEOS += S2636
 VIDEOS += SAA5050
+VIDEOS += SCN2674
 #VIDEOS += SED1200
 #VIDEOS += SED1330
 #VIDEOS += SED1520
@@ -340,6 +347,7 @@ VIDEOS += TMS9928A
 VIDEOS += V9938
 #VIDEOS += VIC4567
 VIDEOS += VOODOO
+VIDEOS += VOODOO_PCI
 
 #-------------------------------------------------
 # specify available machine cores
@@ -545,7 +553,7 @@ MACHINES += UPD1990A
 MACHINES += UPD4992
 MACHINES += UPD4701
 MACHINES += UPD7002
-#MACHINES += UPD71071
+MACHINES += UPD71071
 MACHINES += UPD765
 MACHINES += V3021
 MACHINES += WD_FDC
@@ -572,6 +580,7 @@ MACHINES += STEPPERS
 #MACHINES += CORVUSHD
 #MACHINES += WOZFDC
 #MACHINES += DIABLO_HD
+
 
 #-------------------------------------------------
 # specify available bus cores
@@ -956,7 +965,6 @@ $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu4crystal.o \
 	$(DRIVERS)/mpu4bwb.o \
 	$(DRIVERS)/mpu4misc.o \
-	$(VIDEO)/scn2674.o \
 	$(DRIVERS)/mpu5hw.o $(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
 	$(MACHINE)/meters.o \
@@ -1257,7 +1265,7 @@ $(MAMEOBJ)/itech.a: \
 	$(DRIVERS)/capbowl.o $(VIDEO)/capbowl.o \
 	$(DRIVERS)/itech8.o $(MACHINE)/slikshot.o $(VIDEO)/itech8.o \
 	$(DRIVERS)/itech32.o $(VIDEO)/itech32.o \
-	$(DRIVERS)/iteagle.o \
+	$(DRIVERS)/iteagle.o $(MACHINE)/iteagle_fpga.o \
 
 $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/aeroboto.o $(VIDEO)/aeroboto.o \
@@ -1342,7 +1350,6 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/firebeat.o $(MACHINE)/midikbd.o \
 	$(DRIVERS)/flkatck.o $(VIDEO)/flkatck.o \
 	$(DRIVERS)/gberet.o $(VIDEO)/gberet.o \
-	$(DRIVERS)/gbusters.o $(VIDEO)/gbusters.o \
 	$(DRIVERS)/gijoe.o $(VIDEO)/gijoe.o \
 	$(DRIVERS)/gradius3.o $(VIDEO)/gradius3.o \
 	$(DRIVERS)/gticlub.o \
@@ -1721,7 +1728,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/monacogp.o \
 	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/powervr2.o $(MACHINE)/naomi.o \
 	$(MACHINE)/naomig1.o $(MACHINE)/naomibd.o $(MACHINE)/naomirom.o $(MACHINE)/naomigd.o \
-	$(MACHINE)/naomicrypt.o $(MACHINE)/naomim1.o $(MACHINE)/naomim2.o $(MACHINE)/naomim4.o \
+	$(MACHINE)/naomim1.o $(MACHINE)/naomim2.o $(MACHINE)/naomim4.o \
 	$(MACHINE)/315-5881_crypt.o \
 	$(MACHINE)/awboard.o \
 	$(MACHINE)/mie.o $(MACHINE)/maple-dc.o $(MACHINE)/mapledev.o $(MACHINE)/dc-ctrl.o $(MACHINE)/jvs13551.o \
@@ -1747,7 +1754,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/sg1000a.o \
 	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
-	$(DRIVERS)/stv.o $(MACHINE)/stvprot.o $(MACHINE)/decathlt.o \
+	$(DRIVERS)/stv.o $(MACHINE)/stvprot.o $(MACHINE)/315-5838_317-0229_comp.o \
 	$(DRIVERS)/suprloco.o $(VIDEO)/suprloco.o \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
 	$(DRIVERS)/system16.o $(VIDEO)/system16.o \
@@ -1824,7 +1831,7 @@ $(MAMEOBJ)/sigma.a: \
 $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/bbusters.o $(VIDEO)/bbusters.o \
 	$(DRIVERS)/dmndrby.o \
-	$(DRIVERS)/hng64.o $(VIDEO)/hng64.o \
+	$(DRIVERS)/hng64.o $(VIDEO)/hng64.o $(AUDIO)/hng64.o $(MACHINE)/hng64_net.o $(VIDEO)/hng64_3d.o $(VIDEO)/hng64_sprite.o \
 	$(DRIVERS)/lasso.o $(VIDEO)/lasso.o \
 	$(DRIVERS)/mainsnk.o $(VIDEO)/mainsnk.o \
 	$(DRIVERS)/munchmo.o $(VIDEO)/munchmo.o \
@@ -2668,9 +2675,23 @@ $(DRIVERS)/gts80b.o:    $(LAYOUT)/gts80b.lh
 $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 
 $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
+			$(LAYOUT)/bingowng.lh \
 			$(LAYOUT)/cherryb3.lh \
+			$(LAYOUT)/chrygld.lh \
+			$(LAYOUT)/cmaster.lh \
+			$(LAYOUT)/cmasterb.lh \
+			$(LAYOUT)/cmasterc.lh \
+			$(LAYOUT)/cmpacman.lh \
+			$(LAYOUT)/cmv4.lh \
+			$(LAYOUT)/crazybon.lh \
 			$(LAYOUT)/lucky8.lh \
-			$(LAYOUT)/bingowng.lh
+			$(LAYOUT)/nfb96.lh \
+			$(LAYOUT)/nfb96tx.lh \
+			$(LAYOUT)/pokonl97.lh \
+			$(LAYOUT)/roypok96.lh \
+			$(LAYOUT)/skill98.lh \
+			$(LAYOUT)/tonypok.lh \
+			$(LAYOUT)/unkch.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
 

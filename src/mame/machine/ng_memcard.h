@@ -36,11 +36,11 @@ public:
 
 	virtual iodevice_t image_type() const { return IO_MEMCARD; }
 
-	virtual bool is_readable()  const { return 1; }
-	virtual bool is_writeable() const { return 1; }
-	virtual bool is_creatable() const { return 1; }
-	virtual bool must_be_loaded() const { return 0; }
-	virtual bool is_reset_on_load() const { return 0; }
+	virtual bool is_readable()  const { return true; }
+	virtual bool is_writeable() const { return true; }
+	virtual bool is_creatable() const { return true; }
+	virtual bool must_be_loaded() const { return false; }
+	virtual bool is_reset_on_load() const { return false; }
 	virtual const char *file_extensions() const { return "neo"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 

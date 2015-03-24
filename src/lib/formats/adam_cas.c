@@ -1,4 +1,6 @@
 
+#include <assert.h>
+
 #include "cassimg.h"
 #include "adam_cas.h"
 

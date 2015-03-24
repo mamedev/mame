@@ -14,6 +14,8 @@
 #ifndef __UI_IMGCNTRL_H__
 #define __UI_IMGCNTRL_H__
 
+#include "drivenum.h"
+
 // ======================> ui_menu_control_device_image
 
 class ui_menu_control_device_image : public ui_menu {
@@ -25,8 +27,8 @@ public:
 
 protected:
 	enum {
-		START_FILE, START_OTHER_PART, START_SOFTLIST, 
-		SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART, 
+		START_FILE, START_OTHER_PART, START_SOFTLIST,
+		SELECT_PARTLIST, SELECT_ONE_PART, SELECT_OTHER_PART,
 		SELECT_FILE, CREATE_FILE, CREATE_CONFIRM, CHECK_CREATE, DO_CREATE, SELECT_SOFTLIST,
 		LAST_ID
 	};

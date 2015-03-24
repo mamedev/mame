@@ -54,6 +54,9 @@ lynx      // Atari Lynx Handheld
 jaguar  // Atari Jaguar
 jaguarcd  // Atari Jaguar CD
 
+//BancTec
+banctec // BancTec ESeries panel
+
 // Nintendo
 nes       // Nintendo Entertainment System
 nespal    // Nintendo Entertainment System PAL
@@ -214,8 +217,6 @@ dina      // Telegames Dina
 prsarcde  // Telegames Personal Arcade
 adam      // Coleco Adam
 
-amaztron
-
 // NEC
 pce    // PC/Engine NEC 1987-1993
 tg16      // Turbo Grafix-16  NEC 1989-1993
@@ -298,9 +299,7 @@ intvsrs   // Intellivision (Sears License) - 19??
 intvoice      // Mattel Intellivision + IntelliVoice expansion - 1982
 
 // Milton Bradley
-comp4
 microvsn  // MicroVision - 1979
-simon
 
 // Entex
 advision  // Adventurevision
@@ -359,6 +358,7 @@ mu100r  // 1997 MU-100 Rackable version
 fb01    // 1986 FB-01
 
 // Roland
+tb303
 mt32
 cm32l
 d110
@@ -771,12 +771,15 @@ europc  // 1988 Schneider Euro PC (CGA or Hercules)
 compc1  // 1984 Commodore PC-1
 pc10iii // 1987 Commodore PC-10 III
 pc7000  // 1985 Sharp PC-7000
-pcd     // Siemens PC-D
 olypeopl // Olympia People PC
 sx16    // Sanyo SX-16
 mbc16   // Sanyo MBC-16
 ataripc3
 ssam88s
+
+// Non-PC msdos
+pcd     // Siemens PC-D
+slicer  // 1983 Slicer Computers
 
 // PC Junior
 ibmpcjr   // 1984 IBM PC Jr
@@ -1072,7 +1075,8 @@ snspelluka
 snspelljp
 ladictee
 snmath
-snmatha
+snmathp
+lantutor
 
 // Texas Instruments Calculators
 tisr16    // 1974 SR-16
@@ -1081,6 +1085,8 @@ ti30      // 1976 TI-30
 tiprog
 tibusan1
 wizatron
+lilprof
+lilprof78
 ti73      // 1990 TI-73
 ti74      // 1985 TI-74
 ti95      // 1986 TI-95
@@ -1165,7 +1171,6 @@ m5p
 // APF Electronics Inc.
 apfm1000
 apfimag
-mathmagi
 
 // Tatung
 einstein
@@ -1209,8 +1214,8 @@ mbeepc85s   // Microbee 32 PC85 (Swedish)
 mbeeppc // Microbee 32 PPC85
 mbeett  // Microbee Teleterm
 mbee56  // Microbee 56K (CP/M)
-mbee64  // Microbee 64K (CP/M)
-mbee128 // Microbee 128K (CP/M)
+mbee128 // Microbee 128K standard (CP/M)
+mbee128p // Microbee 128K premium (CP/M)
 mbee256 // Microbee 256TC (CP/M)
 
 // Tandy / Radio Shack
@@ -1232,7 +1237,6 @@ ht108064 // Hradstechnika Szvetkezet HT-1080Z/64
 radionic  // Radionic
 tandy2k
 tandy2khd
-tandy12
 
 coco      // Color Computer
 cocoe    // Color Computer (Extended BASIC 1.0)
@@ -1319,6 +1323,7 @@ gl5005x // Genius Leader 5005X (Germany)
 gmtt     // 1998 Genius Master Table Top (Germany)
 gbs5505x // 2001 Genius BrainStation 5505X (Germany)
 prestige // PreComputer Prestige Elite
+gwnf     // Genius Winner Notebook Fun (Germany)
 gl6000sl // Genius Leader 6000SL (Germany)
 gl7007sl // Genius Leader 7007SL (Germany)
 glcolor  // Genius Leader Color (Germany)
@@ -1326,7 +1331,9 @@ glmcolor // Genius Leader Magic Color (Germany)
 glscolor // Genius Leader Super Color (Germany)
 gjrstar3 // Genius Junior Redstar 3 (Germany)
 gj4000   // Genius Junior 4000 (Germany)
+gjmovie  // Genius Junior Movie (Germany)
 gjrstar  // Genius Junior Redstar(Germany)
+gjrstar2 // Genius Junior Redstar 2 (Germany)
 gj5000   // Genius Junior 5000 (Germany)
 gl6600cx // Genius Leader 6600CX (Germany)
 glpn     // Genius Leader Power Notebook (Germany)
@@ -1632,7 +1639,7 @@ pdp1      // 1961 DEC PDP1
 vt100 // 1978 Digital Equipment Corporation
 //vt100wp // 1978 Digital Equipment Corporation
 //vt100stp // 1978 Digital Equipment Corporation
-//vt101 // 1981 Digital Equipment Corporation
+vt101 // 1981 Digital Equipment Corporation
 vt102 // 1981 Digital Equipment Corporation
 //vt103 // 1979 Digital Equipment Corporation
 vt105 // 1978 Digital Equipment Corporation
@@ -1650,13 +1657,14 @@ vt320 // 1987 Digital Equipment Corporation
 vt520 // 1994 Digital Equipment Corporation
 //vt525
 vk100 // 1980 Digital Equipment Corporation
-dectalk // 1982 Digital Equipment Corporation
-//vt240
+dectalk // 1983 Digital Equipment Corporation
+//vt240 // 1983 Digital Equipment Corporation
 //vt241
 mc7105 // Elektronika MC7105
 rainbow100a  // 1982 DEC Rainbow 100-A
 rainbow     // 1983 DEC Rainbow 100-B
 rainbow190  // 1985 DEC Rainbow 190
+//dtc03 // 1985 Digital Equipment Corporation
 
 // Memotech
 mtx512  // 1983 Memotech MTX 512
@@ -2092,6 +2100,8 @@ swtpc09i  // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
 swtpc09u  // S09, DMF2 Floppy UNIBUG rom - UniFLEX
 swtpc09d3 // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
 
+// Intel
+imds2 // Intellec MDS series-II
 
 //***************Games******************************************************
 // Computer Electronic
@@ -2109,7 +2119,6 @@ sexpertb // 1988 Novag Expert B Chess Computer
 sfortec  // 1989 Novag Super Forte C Chess Computer
 sexpertc // 1989 Novag Super Expert C Chess Computer
 diablo68 // 1991 Novag Diablo 68000 Chess Computer
-
 
 // Hegener & Glaser Munich
 //mephisto  // Mephisto 1 - roms needed - not in driver
@@ -2168,10 +2177,63 @@ ngen        // 1983
 ngenb38     // 1991
 386i        // 199?
 
+// Dedicated handhelds/tabletops
+bambball    // Bambino
+packmon     // Bandai
+zackman     // Bandai
+alnattck    // Coleco
+cdkong      // Coleco
+cgalaxn     // Coleco
+cpacman     // Coleco
+cpacmanr1   //
+cmspacmn    // Coleco
+egalaxn2    // Entex
+epacman2    // Entex
+pbqbert     // Parker Brothers
+kingman     // Tomy
+tmtron      // Tomy
+
+maniac      // Ideal
+
+mathmagi    // APF
+amaztron    // Coleco
+tc4         // Coleco
+ebball      // Entex
+ebball2     // Entex
+ebball3     // Entex
+elecdet     // Ideal
+starwbc     // Kenner
+starwbcp    // Kenner (prototype)
+comp4       // Milton Bradley
+simon       // Milton Bradley
+//ssimon      // Milton Bradley
+cnsector    // Parker Bros
+merlin      // Parker Bros
+stopthie    // Parker Bros
+stopthiep   // Parker Bros (prototype)
+bankshot    // Parker Bros
+splitsec    // Parker Bros
+tandy12     // Tandy Radio Shack
+
+elecbowl    // Marx
+mbdtower    // Milton Bradley
+
+ssfball     // Bambino
+splasfgt    // Bambino
+astrocmd    // Epoch
+edracula    // Epoch
+tmpacman    // Tomy
+tmtennis    // Tomy
+alnchase    // Tomy
+
+wildfire    // Parker Bros
+
+
 //********** Misc **********************************************************
 
 ssem // Manchester Small-Scale Experimental Machine, "Baby"
 craft // Craft, by [lft]
+
 
 //********** To sort (mostly skeleton drivers) *****************************
 
@@ -2260,11 +2322,6 @@ swyft
 mmd1
 mmd2
 mpf1p
-cnsector
-starwbc
-starwbcp
-stopthie
-stopthiep
 amico2k
 jtc
 jtces88
@@ -2378,6 +2435,7 @@ dm500
 cgc7900
 hr16
 hr16b
+mmt8
 sr16
 vidbrain
 cd2650
@@ -2525,7 +2583,6 @@ dvk_ksm
 asmapro
 asma2k
 altos5
-merlin
 ts802
 ts802h
 ts803h
@@ -2595,4 +2652,3 @@ leapstertv
 excali64
 bitgrpha
 bitgrphb
-unk3403

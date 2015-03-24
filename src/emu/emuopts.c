@@ -61,6 +61,9 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RECORD ";rec",                              NULL,        OPTION_STRING,     "record an input file" },
 	{ OPTION_MNGWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write a MNG movie of the current session" },
 	{ OPTION_AVIWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write an AVI movie of the current session" },
+#ifdef MAME_DEBUG
+	{ OPTION_DUMMYWRITE,                                 "0",         OPTION_BOOLEAN,    "indicates if a snapshot should be created if each frame" },
+#endif
 	{ OPTION_WAVWRITE,                                   NULL,        OPTION_STRING,     "optional filename to write a WAV file of the current session" },
 	{ OPTION_SNAPNAME,                                   "%g/%i",     OPTION_STRING,     "override of the default snapshot/movie naming; %g == gamename, %i == index" },
 	{ OPTION_SNAPSIZE,                                   "auto",      OPTION_STRING,     "specify snapshot/movie resolution (<width>x<height>) or 'auto' to use minimal size " },
@@ -150,6 +153,10 @@ const options_entry emu_options::s_option_entries[] =
 
 	// debugging options
 	{ NULL,                                              NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },
+	{ OPTION_VERBOSE ";v",                               "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
+	{ OPTION_LOG,                                        "0",         OPTION_BOOLEAN,    "generate an error.log file" },
+	{ OPTION_OSLOG,                                      "0",         OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ OPTION_DEBUG ";d",                                 "0",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ OPTION_UPDATEINPAUSE,                              "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 	{ OPTION_DEBUGSCRIPT,                                NULL,        OPTION_STRING,     "script for debugger" },
 
@@ -187,9 +194,9 @@ const options_entry emu_options::s_option_entries[] =
 //-------------------------------------------------
 
 emu_options::emu_options()
+: core_options()
 {
-	add_entries(s_option_entries);
-	add_osd_options();
+	add_entries(emu_options::s_option_entries);
 }
 
 
@@ -274,6 +281,8 @@ void emu_options::update_slot_options()
 			}
 		}
 	}
+	while (add_slot_options(false));
+	add_device_options(false);
 }
 
 
@@ -361,8 +370,6 @@ bool emu_options::parse_slot_devices(int argc, char *argv[], astring &error_stri
 	do {
 		num = options_count();
 		update_slot_options();
-		while (add_slot_options(false));
-		add_device_options(false);
 		result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
 	} while (num != options_count());
 
@@ -498,23 +505,9 @@ void emu_options::set_system_name(const char *name)
 		do {
 			num = options_count();
 			update_slot_options();
-			while (add_slot_options(false));
-			add_device_options(false);
 		} while(num != options_count());
 	}
 }
-
-
-//-------------------------------------------------
-//  device_option - return the value of the
-//  device-specific option
-//-------------------------------------------------
-
-const char *emu_options::device_option(device_image_interface &image)
-{
-	return value(image.instance_name());
-}
-
 
 //-------------------------------------------------
 //  parse_one_ini - parse a single INI file

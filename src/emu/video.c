@@ -20,7 +20,7 @@
 
 #include "snap.lh"
 
-
+#include "osdepend.h"
 
 //**************************************************************************
 //  DEBUGGING
@@ -106,7 +106,8 @@ video_manager::video_manager(running_machine &machine)
 		m_avi_file(NULL),
 		m_avi_frame_period(attotime::zero),
 		m_avi_next_frame_time(attotime::zero),
-		m_avi_frame(0)
+		m_avi_frame(0),
+		m_dummy_recording(false)
 {
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_manager::exit), this));
@@ -152,6 +153,10 @@ video_manager::video_manager(running_machine &machine)
 	filename = machine.options().avi_write();
 	if (filename[0] != 0)
 		begin_recording(filename, MF_AVI);
+	
+#ifdef MAME_DEBUG
+	m_dummy_recording = machine.options().dummy_write();
+#endif
 
 	// if no screens, create a periodic timer to drive updates
 	if (machine.first_screen() == NULL)
@@ -1048,7 +1053,7 @@ void video_manager::recompute_speed(const attotime &emutime)
 			if (filerr == FILERR_NONE)
 				save_snapshot(machine().first_screen(), file);
 		}
-
+		//printf("Scheduled exit at %f\n", emutime.as_double());
 		// schedule our demise
 		machine().schedule_exit();
 	}
@@ -1232,7 +1237,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 void video_manager::record_frame()
 {
 	// ignore if nothing to do
-	if (m_mng_file == NULL && m_avi_file == NULL)
+	if (m_mng_file == NULL && m_avi_file == NULL && !m_dummy_recording)
 		return;
 
 	// start the profiler and get the current time

@@ -5,12 +5,11 @@
 
     TODO:
         - Everything!
-        - BIOS hangs waiting for port 0400h to return 0x80.  If you make that happy it jumps off into the weeds.
         - MediaGX features should be moved out to machine/ and shared with mediagx.c once we know what these games need
 
     Hardware:
-        - Cyrix MediaGX processor/VGA
-        - Cyrix CX5520 northbridge?
+        - Cyrix MediaGX processor/VGA (northbridge)
+        - Cyrix CX5520 (southbridge)
         - VS9824AG SuperI/O standard PC I/O chip
         - 1 ISA, 2 PCI slots, 2 IDE headers
         - "Prism" PCI card with PLX PCI9052 PCI-to-random stuff bridge
@@ -83,6 +82,10 @@ public:
 	DECLARE_WRITE32_MEMBER(ad1847_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
+	DECLARE_READ32_MEMBER(port400_r);
+	DECLARE_WRITE32_MEMBER(port400_w);
+	DECLARE_READ32_MEMBER(port800_r);
+	DECLARE_WRITE32_MEMBER(port800_w);
 	DECLARE_DRIVER_INIT(pinball2k);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -415,6 +418,24 @@ WRITE8_MEMBER(pinball2k_state::io20_w)
 	}
 }
 
+READ32_MEMBER(pinball2k_state::port400_r)
+{
+	return 0x8000;
+}
+
+WRITE32_MEMBER(pinball2k_state::port400_w)
+{
+}
+
+READ32_MEMBER(pinball2k_state::port800_r)
+{
+	return 0x80;
+}
+
+WRITE32_MEMBER(pinball2k_state::port800_w)
+{
+}
+
 READ32_MEMBER(pinball2k_state::parallel_port_r)
 {
 	UINT32 r = 0;
@@ -467,6 +488,8 @@ static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, pinball2k_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
+	AM_RANGE(0x0400, 0x0403) AM_READWRITE(port400_r, port400_w)
+	AM_RANGE(0x0800, 0x0803) AM_READWRITE(port800_r, port800_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 ADDRESS_MAP_END
 

@@ -12,28 +12,28 @@ Video hardware driver by Uki
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::xxmissio_scroll_x_w)
+WRITE8_MEMBER(xxmissio_state::scroll_x_w)
 {
 	m_xscroll = data;
 }
-WRITE8_MEMBER(xxmissio_state::xxmissio_scroll_y_w)
+WRITE8_MEMBER(xxmissio_state::scroll_y_w)
 {
 	m_yscroll = data;
 }
 
-WRITE8_MEMBER(xxmissio_state::xxmissio_flipscreen_w)
+WRITE8_MEMBER(xxmissio_state::flipscreen_w)
 {
 	m_flipscreen = data & 0x01;
 }
 
-WRITE8_MEMBER(xxmissio_state::xxmissio_bgram_w)
+WRITE8_MEMBER(xxmissio_state::bgram_w)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
 
 	m_bgram[offset] = data;
 }
-READ8_MEMBER(xxmissio_state::xxmissio_bgram_r)
+READ8_MEMBER(xxmissio_state::bgram_r)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
 	offset = (offset & 0x7e0) | x;
@@ -69,6 +69,10 @@ void xxmissio_state::video_start()
 	m_bg_tilemap->set_scrolldx(2, 12);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	save_item(NAME(m_flipscreen));
 }
 
 
@@ -122,7 +126,7 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 xxmissio_state::screen_update_xxmissio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	machine().tilemap().mark_all_dirty();
 	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);

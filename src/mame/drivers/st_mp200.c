@@ -769,7 +769,7 @@ ROM_END
 /*--------------------------------
 / Split Second #144
 /-------------------------------*/
-ROM_START(splitsec)
+ROM_START(spltsecp)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "cpu_u1.716", 0x1000, 0x0800, CRC(c6ff9aa9) SHA1(39f80faca16c869ac14df7c5fc3dfa80b47dad95))
 	ROM_LOAD( "cpu_u5.716", 0x1800, 0x0800, CRC(fda74efc) SHA1(31becc243ada23e2f4d17927985772c9fcf8a3c3))
@@ -929,7 +929,7 @@ GAME(1980,  seawitch,   0,          st_mp200,   mp200, st_mp200_state,   st_mp20
 GAME(1980,  nineball,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Nine Ball", GAME_IS_SKELETON_MECHANICAL)
 GAME(1981,  lightnin,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Lightning", GAME_IS_SKELETON_MECHANICAL)
 GAME(1980,  stargzr,    0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Stargazer", GAME_IS_SKELETON_MECHANICAL)
-GAME(1981,  splitsec,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Split Second", GAME_IS_SKELETON_MECHANICAL)
+GAME(1981,  spltsecp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Split Second (Pinball)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1981,  catacomp,   0,          st_mp201,   mp200, st_mp200_state,   st_mp201,   ROT0, "Stern", "Catacomb (Pinball)", GAME_IS_SKELETON_MECHANICAL)
 GAME(1982,  dragfist,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Dragonfist", GAME_IS_SKELETON_MECHANICAL)
 GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state,   st_mp200,   ROT0, "Stern", "Lazer Lord", GAME_IS_SKELETON_MECHANICAL)

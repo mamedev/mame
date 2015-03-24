@@ -1,0 +1,65 @@
+-------------------------------------------------------------------------
+
+ROLAND SOUNDCANVAS SOUND SET FOR GENERAL MIDI AND GS FORMAT
+
+The Roland SoundCanvas Sound Set includes the necessary sounds to make a 
+complete General MIDI compatible sound set.  It also includes additional 
+sounds necessary to make a complete GS Format compatible sound set.
+
+WHAT IS THE GS FORMAT?
+
+The GS Format is a standardized set of specifications for sound sources 
+that defines the manner in which multitimbral sound generating devices 
+will respond to MIDI messages.  The GS Format also complies with General 
+MIDI System Level 1.
+
+The GS Format also defines a number of other details over and above the 
+features of General MIDI.  These include unique specifications for sound 
+and functions available for tone editing, effects, and other specifications 
+concerning the manner in which sound sources will respond to MIDI messages.  
+Any device that is equipped with GS Format sound sources can faithfully 
+reproduce both General MIDI sound recordings and GS Format MIDI sound 
+recordings.
+
+HOW TO CONTACT ROLAND:
+
+For more information, please contact:
+
+Roland Corporation U.S.
+7200 Dominion Circle
+Los Angeles, CA  90040-3696
+
+Phone:	(323) 890-3700
+Fax:	(323) 890-3701
+
+COPYRIGHT NOTICE AND LICENSE LIMITATIONS
+
+Roland GS Sound Set/Microsoft (P) 1996 Roland Corporation U.S.
+
+The Roland GS Sound Set/Microsoft, the "Sample Set", incorporates the 
+Roland SoundCanvas Sound Set. Roland Corporation U.S. owns the Sample Set 
+and all copyrights pertaining thereto and has licensed the Sample Set for 
+use solely on Microsoft operating system products and Microsoft Application 
+Products.  
+
+Roland reserves all rights to the Sample Set not expressly granted by Roland 
+Corporation U.S. or by Microsoft under the terms of Microsoft's End User 
+License Agreement.
+
+The Sample Set may only be redistributed with your software application as a 
+part of a Microsoft operating system product installation and under the terms
+of Microsoft's End User License Agreement. The Sample Set may not be
+separated from the Microsoft operating system product; the Sample Set may
+only be installed by the Microsoft installation procedure for the associated
+Microsoft operating system product or for an associated software development
+kit.  All other uses of the Sample Set require a separate written license
+from Roland Corporation U.S.
+
+The Sample Set may not be used, copied or redistributed in hardware ROM or 
+similar technology of any device without prior express written permission
+from an authorized representative of Roland Corporation U.S. The Sample
+Set may not be redistributed with any Musical Instrument . A "Musical
+Instrument" is any device that is capable of generating musical sounds
+without being directly connected to a computer with a licensed Microsoft
+operating system product. You may not modify the Sample Set under any
+circumstances.

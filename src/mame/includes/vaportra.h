@@ -23,15 +23,6 @@ public:
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_generic_paletteram2_16(*this, "paletteram2") { }
 
-	/* memory pointers */
-	UINT16 *  m_pf1_rowscroll;
-	UINT16 *  m_pf2_rowscroll;
-	UINT16 *  m_pf3_rowscroll;
-	UINT16 *  m_pf4_rowscroll;
-
-	/* misc */
-	UINT16    m_priority[2];
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -40,8 +31,12 @@ public:
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<palette_device> m_palette;
+
 	required_shared_ptr<UINT16> m_generic_paletteram_16;
 	required_shared_ptr<UINT16> m_generic_paletteram2_16;
+
+	/* misc */
+	UINT16    m_priority[2];
 
 	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
 	DECLARE_READ16_MEMBER(vaportra_control_r);
@@ -49,10 +44,13 @@ public:
 	DECLARE_WRITE16_MEMBER(vaportra_priority_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_rg_w);
 	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);
+
 	DECLARE_DRIVER_INIT(vaportra);
 	virtual void machine_start();
 	virtual void machine_reset();
+
 	UINT32 screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol( int offset );
+
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };

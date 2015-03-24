@@ -447,7 +447,49 @@ WRITE16_MEMBER(megasys1_state::megasys1_vregs_A_w)
 
 }
 
+/* Used by monkelf */
+WRITE16_MEMBER(megasys1_state::megasys1_vregs_monkelf_w)
+{
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 
+	switch (offset)
+	{
+		case 0x000/2   :    m_active_layers = new_data; break;
+
+		case 0x008/2+0 :    m_scrollx[2] = new_data;    break;
+		case 0x008/2+1 :    m_scrolly[2] = new_data;    break;
+		case 0x008/2+2 :    megasys1_set_vreg_flag(2, new_data);        break;
+
+		// code in routine $280 does this. protection?
+		case 0x200/2+0 :    m_scrollx[0] = new_data - (((new_data & 0x0f) > 0x0d) ? 0x10 : 0); break;
+		case 0x200/2+1 :    m_scrolly[0] = new_data;    break;
+		case 0x200/2+2 :    megasys1_set_vreg_flag(0, new_data);        break;
+
+		// code in routine $280 does this. protection?
+		case 0x208/2+0 :    m_scrollx[1] = new_data - (((new_data & 0x0f) > 0x0b) ? 0x10 : 0); break;
+		case 0x208/2+1 :    m_scrolly[1] = new_data;    break;
+		case 0x208/2+2 :    megasys1_set_vreg_flag(1, new_data);        break;
+
+		case 0x100/2   :    m_sprite_flag = new_data;       break;
+
+		case 0x300/2   :    m_screen_flag = new_data;
+							if (m_audiocpu)
+							{
+								if (new_data & 0x10)
+									m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+								else
+									m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+							}
+							break;
+
+		case 0x308/2   :    soundlatch_word_w(space,0,new_data,0xffff);
+							m_audiocpu->set_input_line(4, HOLD_LINE);
+							break;
+
+		default      :  SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
+	}
+
+}
 
 
 /* Used by MS1-C only */
@@ -684,10 +726,6 @@ struct priority
 
 static const struct priority priorities[] =
 {
-	{   "64street",
-		{ 0x04132,0x03142,0x14032,0x04132,0xfffff,0x04132,0xfffff,0xfffff,
-			0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
-	},
 	{   "chimerab",
 		{ 0x14032,0x04132,0x14032,0x04132,0xfffff,0xfffff,0xfffff,0xfffff,
 			0xfffff,0xfffff,0x01324,0xfffff,0xfffff,0xfffff,0xfffff,0xfffff }
@@ -739,8 +777,7 @@ static const struct priority priorities[] =
     the bottom layer's opaque pens, but above its transparent
     pens.
 */
-
-PALETTE_INIT_MEMBER(megasys1_state,megasys1)
+void megasys1_state::megasys1_priority_create()
 {
 	const UINT8 *color_prom = memregion("proms")->base();
 	int pri_code, offset, i, order;
@@ -898,6 +935,11 @@ PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 #endif
 
 
+}
+
+PALETTE_INIT_MEMBER(megasys1_state,megasys1)
+{
+	megasys1_priority_create();
 }
 
 

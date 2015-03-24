@@ -3,9 +3,17 @@
 /************************************************************************************
 
 California Chase (c) 1999 The Game Room
+Eggs Playing Chicken (c) 2002 The Game Room
 Host Invaders (c) 1998 The Game Room
 
 driver by Angelo Salese & Grull Osgo
+
+Hardware is known as "AUSCOM System 1" hardware.
+
+Other games known to be on this hardware (if ever finished):
+- Agro (c) The Game Room
+- Tiger Odds (c) The Game Room
+- one other unnamed/unfinished game
 
 TODO:
 - get Win 98 to boot (most of Windows 98 copy is damaged inside current HDD dump);

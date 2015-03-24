@@ -11,27 +11,27 @@ class diode
 {
 public:
 	diode() : m_Is(1e-15), m_VT(0.0258), m_VT_inv(1.0 / m_VT) {}
-	diode(const double Is, const double n)
+	diode(const nl_double Is, const nl_double n)
 	{
 		m_Is = Is;
 		m_VT = 0.0258 * n;
 		m_VT_inv = 1.0 / m_VT;
 	}
-	void set(const double Is, const double n)
+	void set(const nl_double Is, const nl_double n)
 	{
 		m_Is = Is;
 		m_VT = 0.0258 * n;
 		m_VT_inv = 1.0 / m_VT;
 	}
-	double I(const double V) const { return m_Is * exp(V * m_VT_inv) - m_Is; }
-	double g(const double V) const { return m_Is * m_VT_inv * exp(V * m_VT_inv); }
-	double V(const double I) const { return log(1.0 + I / m_Is) * m_VT; }
-	double gI(const double I) const { return m_VT_inv * (I + m_Is); }
+	nl_double I(const nl_double V) const { return m_Is * exp(V * m_VT_inv) - m_Is; }
+	nl_double g(const nl_double V) const { return m_Is * m_VT_inv * exp(V * m_VT_inv); }
+	nl_double V(const nl_double I) const { return log(1.0 + I / m_Is) * m_VT; }
+	nl_double gI(const nl_double I) const { return m_VT_inv * (I + m_Is); }
 
 private:
-	double m_Is;
-	double m_VT;
-	double m_VT_inv;
+	nl_double m_Is;
+	nl_double m_VT;
+	nl_double m_VT_inv;
 };
 
 
@@ -75,7 +75,7 @@ NETLIB_START(QBJT_switch)
 	connect(m_RB.m_P, m_BC_dummy.m_P);
 	connect(m_RC.m_P, m_BC_dummy.m_N);
 
-	save(NAME(m_state_on));
+	save(NLNAME(m_state_on));
 
 	m_RB.set(netlist().gmin(), 0.0, 0.0);
 	m_RC.set(netlist().gmin(), 0.0, 0.0);
@@ -85,14 +85,14 @@ NETLIB_START(QBJT_switch)
 	m_state_on = 0;
 
 	{
-		double IS = m_model.model_value("IS", 1e-15);
-		double BF = m_model.model_value("BF", 100);
-		double NF = m_model.model_value("NF", 1);
-		//double VJE = m_model.dValue("VJE", 0.75);
+		nl_double IS = m_model.model_value("IS", 1e-15);
+		nl_double BF = m_model.model_value("BF", 100);
+		nl_double NF = m_model.model_value("NF", 1);
+		//nl_double VJE = m_model.dValue("VJE", 0.75);
 
 		set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
 
-		double alpha = BF / (1.0 + BF);
+		nl_double alpha = BF / (1.0 + BF);
 
 		diode d(IS, NF);
 
@@ -155,12 +155,12 @@ NETLIB_START(QBJT_EB)
 	m_gD_BC.save("m_D_BC", *this);
 
 	{
-		double IS = m_model.model_value("IS", 1e-15);
-		double BF = m_model.model_value("BF", 100);
-		double NF = m_model.model_value("NF", 1);
-		double BR = m_model.model_value("BR", 1);
-		double NR = m_model.model_value("NR", 1);
-		//double VJE = m_model.dValue("VJE", 0.75);
+		nl_double IS = m_model.model_value("IS", 1e-15);
+		nl_double BF = m_model.model_value("BF", 100);
+		nl_double NF = m_model.model_value("NF", 1);
+		nl_double BR = m_model.model_value("BR", 1);
+		nl_double NR = m_model.model_value("NR", 1);
+		//nl_double VJE = m_model.dValue("VJE", 0.75);
 
 		set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
 		//printf("type %s\n", m_model.model_type().cstr());

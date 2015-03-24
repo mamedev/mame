@@ -90,8 +90,13 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 
 	// convert the path into something Windows compatible
 	dst = (*file)->filename;
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
+	for (src = t_path; *src != 0; src++)
+		*dst++ = (*src == '/') ? '\\' : *src;
+#else
 	for (src = t_path; *src != 0; src++)
 		*dst++ = *src;//(*src == '/') ? '\\' : *src;
+#endif
 	*dst++ = 0;
 
 	// select the file open modes
@@ -118,7 +123,6 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	if ((*file)->handle == INVALID_HANDLE_VALUE)
 	{
 		DWORD error = GetLastError();
-
 		// create the path if necessary
 		if (error == ERROR_PATH_NOT_FOUND && (openflags & OPEN_FLAG_CREATE) && (openflags & OPEN_FLAG_CREATE_PATHS))
 		{
@@ -375,23 +379,6 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 		*cylinders *= 2;
 	}
 	return TRUE;
-}
-
-
-//============================================================
-//  osd_uchar_from_osdchar
-//============================================================
-
-int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
-{
-	WCHAR wch;
-
-	count = MIN(count, IsDBCSLeadByte(*osdchar) ? 2 : 1);
-	if (MultiByteToWideChar(CP_ACP, 0, osdchar, (DWORD)count, &wch, 1) != 0)
-		*uchar = wch;
-	else
-		*uchar = 0;
-	return (int) count;
 }
 
 

@@ -1114,19 +1114,15 @@ static MACHINE_CONFIG_DERIVED( mk4, midzeus )
 	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
 MACHINE_CONFIG_END
 
-READ8_MEMBER(midzeus_state::PIC16C5X_T0_clk_r)
+READ_LINE_MEMBER(midzeus_state::PIC16C5X_T0_clk_r)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START( pic_io_map, AS_IO, 8, midzeus_state )
-	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
-ADDRESS_MAP_END
-
 
 static MACHINE_CONFIG_DERIVED( invasn, midzeus )
 	MCFG_CPU_ADD("pic", PIC16C57, 8000000)  /* ? */
-	MCFG_CPU_IO_MAP(pic_io_map)
+	MCFG_PIC16C5x_T0_CB(READLINE(midzeus_state, PIC16C5X_T0_clk_r))
 
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_UPPER(468/* or 488 */)

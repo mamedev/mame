@@ -314,13 +314,6 @@ static GFXDECODE_START( crospang )
 	GFXDECODE_ENTRY( "gfx1", 0, tlayout,       0, 64 )  /* Sprites 16x16 */
 GFXDECODE_END
 
-
-WRITE_LINE_MEMBER(crospang_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
-
 void crospang_state::machine_start()
 {
 	save_item(NAME(m_bestri_tilebank));
@@ -372,7 +365,7 @@ static MACHINE_CONFIG_START( crospang, crospang_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(crospang_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

@@ -134,6 +134,7 @@ public:
 	DECLARE_READ32_MEMBER(irq_ack_clear);
 	DECLARE_DRIVER_INIT(speglsht);
 	DECLARE_MACHINE_RESET(speglsht);
+    virtual void machine_start();
 	DECLARE_VIDEO_START(speglsht);
 	UINT32 screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
@@ -157,10 +158,15 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, speglsht_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("shared")
 ADDRESS_MAP_END
 
+void speglsht_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
+}
+
 // common rombank? should go in machine/st0016 with larger address space exposed?
 WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
 {
-	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
+    membank("bank1")->set_entry(data);
 }
 
 
@@ -416,7 +422,6 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	MCFG_PALETTE_ADD("palette", 16*16*4+1)
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
-
 MACHINE_CONFIG_END
 
 ROM_START( speglsht )
@@ -433,9 +438,7 @@ ROM_START( speglsht )
 	ROM_REGION( 0x200000, "user2",0)
 	ROM_LOAD32_WORD( "sx004-05.u34", 0x000000, 0x100000, CRC(f3c69468) SHA1(81daef6d0596cb67bb6f87b39874aae1b1ffe6a6) ) /* Noted as "RD0" IE: R3000 Data 0 */
 	ROM_LOAD32_WORD( "sx004-06.u35", 0x000002, 0x100000, CRC(5af78e44) SHA1(0131d50348fef80c2b100d74b7c967c6a710d548) ) /* Noted as "RD1" */
-
 ROM_END
-
 
 
 DRIVER_INIT_MEMBER(speglsht_state,speglsht)

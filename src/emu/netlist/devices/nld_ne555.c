@@ -10,10 +10,10 @@
 #define R_OFF (1E20)
 #define R_ON (25)   // Datasheet states a maximum discharge of 200mA, R = 5V / 0.2
 
-inline double NETLIB_NAME(NE555)::clamp(const double v, const double a, const double b)
+inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a, const nl_double b)
 {
-	double ret = v;
-	double vcc = TERMANALOG(m_R1.m_P);
+	nl_double ret = v;
+	nl_double vcc = TERMANALOG(m_R1.m_P);
 
 	if (ret >  vcc - a)
 		ret = vcc - a;
@@ -42,7 +42,7 @@ NETLIB_START(NE555)
 	connect(m_R2.m_N, m_R3.m_P);
 	connect(m_RDIS.m_N, m_R3.m_N);
 
-	save(NAME(m_last_out));
+	save(NLNAME(m_last_out));
 }
 
 NETLIB_RESET(NE555)
@@ -64,7 +64,7 @@ NETLIB_UPDATE(NE555)
 {
 	// FIXME: assumes GND is connected to 0V.
 
-	double vt = clamp(TERMANALOG(m_R2.m_P), 0.7, 1.4);
+	nl_double vt = clamp(TERMANALOG(m_R2.m_P), 0.7, 1.4);
 	bool bthresh = (INPANALOG(m_THRES) > vt);
 	bool btrig = (INPANALOG(m_TRIG) > clamp(TERMANALOG(m_R2.m_N), 0.7, 1.4));
 	bool out = m_last_out;

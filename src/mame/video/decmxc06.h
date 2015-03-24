@@ -11,6 +11,12 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int region);
+	static void set_ram_size(device_t &device, int size)
+	{
+		deco_mxc06_device &dev = downcast<deco_mxc06_device &>(device);
+		dev.m_ramsize = size;
+	}
+
 
 	void set_gfxregion(int region) { m_gfxregion = region; };
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram16, int pri_mask, int pri_val, int col_mask );
@@ -23,6 +29,7 @@ protected:
 
 	UINT8 m_gfxregion;
 	int m_priority_type; // just so we can support the existing drivers without converting everything to pdrawgfx just yet
+	int m_ramsize;
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -36,3 +43,6 @@ extern const device_type DECO_MXC06;
 
 #define MCFG_DECO_MXC06_PALETTE(_palette_tag) \
 	deco_mxc06_device::static_set_palette_tag(*device, "^" _palette_tag);
+
+#define MCFG_DECO_MXC06_RAMSIZE(_size) \
+	deco_mxc06_device::set_ram_size(*device, _size);

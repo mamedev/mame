@@ -86,19 +86,19 @@ void sidepckt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(sidepckt_state::sidepckt_videoram_w)
+WRITE8_MEMBER(sidepckt_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::sidepckt_colorram_w)
+WRITE8_MEMBER(sidepckt_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::sidepckt_flipscreen_w)
+WRITE8_MEMBER(sidepckt_state::flipscreen_w)
 {
 	int flipscreen = data;
 	machine().tilemap().set_flip_all(flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
@@ -113,21 +113,18 @@ WRITE8_MEMBER(sidepckt_state::sidepckt_flipscreen_w)
 
 void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0;offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0;offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx,sy,code,color,flipx,flipy;
 
-		code = spriteram[offs+3] + ((spriteram[offs+1] & 0x03) << 8);
-		color = (spriteram[offs+1] & 0xf0) >> 4;
+		code = m_spriteram[offs+3] + ((m_spriteram[offs+1] & 0x03) << 8);
+		color = (m_spriteram[offs+1] & 0xf0) >> 4;
 
-		sx = spriteram[offs+2]-2;
-		sy = spriteram[offs];
+		sx = m_spriteram[offs+2]-2;
+		sy = m_spriteram[offs];
 
-		flipx = spriteram[offs+1] & 0x08;
-		flipy = spriteram[offs+1] & 0x04;
+		flipx = m_spriteram[offs+1] & 0x08;
+		flipy = m_spriteram[offs+1] & 0x04;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
@@ -144,7 +141,7 @@ void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 }
 
 
-UINT32 sidepckt_state::screen_update_sidepckt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sidepckt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(bitmap,cliprect);

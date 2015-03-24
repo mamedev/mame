@@ -15,13 +15,12 @@
 #define __EMUCORE_H__
 
 // standard C includes
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
-#include <sstream>
 
 // some cleanups for Solaris for things defined in stdlib.h
 #ifdef SDLMAME_SOLARIS
@@ -220,7 +219,10 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #undef assert
 #undef assert_always
 
-#ifdef MAME_DEBUG
+#if defined(MAME_DEBUG_FAST)
+#define assert(x)               do { } while (0)
+#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
+#elif defined(MAME_DEBUG)
 #define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
@@ -289,65 +291,10 @@ class emu_exception : public std::exception { };
 class emu_fatalerror : public emu_exception
 {
 public:
-	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3)
-		: code(0)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			va_list ap;
-			va_start(ap, format);
-			vsprintf(text, format, ap);
-			va_end(ap);
-		}
-		osd_break_into_debugger(text);
-	}
-
-	emu_fatalerror(const char *format, va_list ap)
-		: code(0)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			vsprintf(text, format, ap);
-		}
-		osd_break_into_debugger(text);
-	}
-
-	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4)
-		: code(_exitcode)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			va_list ap;
-			va_start(ap, format);
-			vsprintf(text, format, ap);
-			va_end(ap);
-		}
-	}
-
-	emu_fatalerror(int _exitcode, const char *format, va_list ap)
-		: code(_exitcode)
-	{
-		if (format == NULL)
-		{
-			text[0] = '\0';
-		}
-		else
-		{
-			vsprintf(text, format, ap);
-		}
-	}
+	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3);
+	emu_fatalerror(const char *format, va_list ap);
+	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4);
+	emu_fatalerror(int _exitcode, const char *format, va_list ap);
 
 	const char *string() const { return text; }
 	int exitcode() const { return code; }
@@ -420,26 +367,6 @@ inline _Dest downcast(_Source &src)
 
 ATTR_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
 ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
-
-inline void fatalerror(const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	emu_fatalerror error(format, ap);
-	va_end(ap);
-	throw error;
-}
-
-inline void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	emu_fatalerror error(exitcode, format, ap);
-	va_end(ap);
-	throw error;
-}
-
-
 
 //**************************************************************************
 //  INLINE FUNCTIONS

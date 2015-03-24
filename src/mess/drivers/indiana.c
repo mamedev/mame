@@ -85,7 +85,7 @@ static MACHINE_CONFIG_START( indiana, indiana_state )
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA16, 0)
-	MCFG_ISA16_CPU(":"M68K_TAG)
+	MCFG_ISA16_CPU(":" M68K_TAG)
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa1", indiana_isa_cards, "vga", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa2", indiana_isa_cards, "fdc_at", false)

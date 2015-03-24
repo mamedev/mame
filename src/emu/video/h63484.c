@@ -2001,6 +2001,8 @@ WRITE8_MEMBER( h63484_device::data_w )
 void h63484_device::device_start()
 {
 	m_display_cb.bind_relative_to(*owner());
+
+	register_save_state();
 }
 
 //-------------------------------------------------
@@ -2124,4 +2126,65 @@ UINT32 h63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 	}
 	return 0;
+}
+
+void h63484_device::register_save_state()
+{
+	save_item(NAME(m_ar));
+	save_item(NAME(m_vreg));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_ptr));
+	save_item(NAME(m_fifo_r));
+	save_item(NAME(m_fifo_r_ptr));
+	save_item(NAME(m_cr));
+	save_item(NAME(m_pr));
+	save_item(NAME(m_param_ptr));
+	save_item(NAME(m_rwp));
+	save_item(NAME(m_rwp_dn));
+	save_item(NAME(m_org_dpa));
+	save_item(NAME(m_org_dn));
+	save_item(NAME(m_org_dpd));
+	save_item(NAME(m_cl0));
+	save_item(NAME(m_cl1));
+	save_item(NAME(m_ccmp));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_cpx));
+	save_item(NAME(m_cpy));
+	save_item(NAME(m_mwr));
+	save_item(NAME(m_mwr_chr));
+	save_item(NAME(m_sar));
+	save_item(NAME(m_sda));
+	save_item(NAME(m_pram));
+	save_item(NAME(m_dn));
+	save_item(NAME(m_ccr));
+	save_item(NAME(m_omr));
+	save_item(NAME(m_edg));
+	save_item(NAME(m_dcr));
+	save_item(NAME(m_hc));
+	save_item(NAME(m_hds));
+	save_item(NAME(m_hdw));
+	save_item(NAME(m_hws));
+	save_item(NAME(m_hww));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_hsw));
+	save_item(NAME(m_vc));
+	save_item(NAME(m_vws));
+	save_item(NAME(m_vww));
+	save_item(NAME(m_vds));
+	save_item(NAME(m_vsw));
+	save_item(NAME(m_ppy));
+	save_item(NAME(m_pzcy));
+	save_item(NAME(m_ppx));
+	save_item(NAME(m_pzcx));
+	save_item(NAME(m_psx));
+	save_item(NAME(m_pex));
+	save_item(NAME(m_pzx));
+	save_item(NAME(m_psy));
+	save_item(NAME(m_pzy));
+	save_item(NAME(m_pey));
+	save_item(NAME(m_xmin));
+	save_item(NAME(m_ymin));
+	save_item(NAME(m_xmax));
+	save_item(NAME(m_ymax));
 }

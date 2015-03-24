@@ -2177,11 +2177,11 @@ void m68881_ftrap(m68000_base_device *m68k)
 		// trap here
 		m68ki_exception_trap(m68k, EXCEPTION_TRAPV);
 	}
-	else	// fall through, requires eating the operand
+	else    // fall through, requires eating the operand
 	{
 		switch (m68k->ir & 0x7)
 		{
-			case 2:	// word operand
+			case 2: // word operand
 				OPER_I_16(m68k);
 				break;
 
@@ -2189,9 +2189,8 @@ void m68881_ftrap(m68000_base_device *m68k)
 				OPER_I_32(m68k);
 				break;
 
-			case 4:	// no operand
+			case 4: // no operand
 				break;
 		}
 	}
 }
-

@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/nanos_dsk.h"
 
 nanos_format::nanos_format() : upd765_format(formats)

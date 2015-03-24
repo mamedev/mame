@@ -85,7 +85,6 @@ public:
 
 
 	UINT32 screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(livequiz_irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -607,15 +606,6 @@ void midas_state::machine_reset()
 {
 }
 
-
-
-
-WRITE_LINE_MEMBER(midas_state::livequiz_irqhandler)
-{
-	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
-}
-
-
 void midas_state::screen_eof_midas(screen_device &screen, bool state)
 {
 	if (state) m_sprgen->buffer_vram();
@@ -647,7 +637,6 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(midas_state, livequiz_irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -681,7 +670,6 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(midas_state, livequiz_irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END

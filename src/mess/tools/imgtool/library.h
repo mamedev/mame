@@ -16,7 +16,6 @@
 #define LIBRARY_H
 
 #include <time.h>
-#include <assert.h>
 
 #include "corestr.h"
 #include "opresolv.h"

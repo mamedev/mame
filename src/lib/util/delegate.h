@@ -79,7 +79,6 @@
 #define __DELEGATE_H__
 
 // standard C++ includes
-#include <assert.h>
 #include <exception>
 #include <typeinfo>
 
@@ -98,6 +97,8 @@
 	#if ((defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && (__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#elif defined(SDLMAME_EMSCRIPTEN)
+		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+	#elif defined(SDLMAME_ARM)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#else
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL

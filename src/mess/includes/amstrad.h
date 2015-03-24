@@ -23,6 +23,7 @@
 #include "bus/cpc/symbfac2.h"
 #include "bus/cpc/amdrum.h"
 #include "bus/cpc/playcity.h"
+#include "bus/cpc/smartwatch.h"
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "bus/centronics/ctronics.h"

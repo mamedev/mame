@@ -178,9 +178,6 @@ public:
 	DECLARE_READ8_MEMBER(pia_gb_portb_r);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
-	DECLARE_WRITE8_MEMBER(ic3ss_o1_callback);
-	DECLARE_WRITE8_MEMBER(ic3ss_o2_callback);
-	DECLARE_WRITE8_MEMBER(ic3ss_o3_callback);
 	DECLARE_DRIVER_INIT(m4default_alt);
 	DECLARE_DRIVER_INIT(crystali);
 	DECLARE_DRIVER_INIT(m4tst2);

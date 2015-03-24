@@ -103,14 +103,14 @@ static const struct prot_data tkdensha_data =
 };
 
 
-void tecmosys_state::tecmosys_prot_reset()
+void tecmosys_state::prot_reset()
 {
 	m_device_read_ptr = 0;
 	m_device_status = DS_IDLE;
 	m_device_value = 0xff;
 }
 
-void tecmosys_state::tecmosys_prot_init(int which)
+void tecmosys_state::prot_init(int which)
 {
 	switch (which)
 	{
@@ -119,10 +119,10 @@ void tecmosys_state::tecmosys_prot_init(int which)
 	case 2: m_device_data = &tkdensha_data; break;
 	}
 
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(tecmosys_state::tecmosys_prot_reset),this));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(tecmosys_state::prot_reset),this));
 }
 
-READ16_MEMBER(tecmosys_state::tecmosys_prot_status_r)
+READ16_MEMBER(tecmosys_state::prot_status_r)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -134,13 +134,13 @@ READ16_MEMBER(tecmosys_state::tecmosys_prot_status_r)
 	return 0xc0; // simulation is always ready
 }
 
-WRITE16_MEMBER(tecmosys_state::tecmosys_prot_status_w)
+WRITE16_MEMBER(tecmosys_state::prot_status_w)
 {
 	// deroon clears the status in one place.
 }
 
 
-READ16_MEMBER(tecmosys_state::tecmosys_prot_data_r)
+READ16_MEMBER(tecmosys_state::prot_data_r)
 {
 	// prot appears to be read-ready for two consecutive reads
 	// but returns 0xff for subsequent reads.
@@ -151,7 +151,7 @@ READ16_MEMBER(tecmosys_state::tecmosys_prot_data_r)
 }
 
 
-WRITE16_MEMBER(tecmosys_state::tecmosys_prot_data_w)
+WRITE16_MEMBER(tecmosys_state::prot_data_w)
 {
 	// Only LSB
 	data >>= 8;

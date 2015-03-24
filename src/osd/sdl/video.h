@@ -12,6 +12,8 @@
 #ifndef __SDLVIDEO__
 #define __SDLVIDEO__
 
+#include "osdsdl.h"
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -21,28 +23,11 @@
 enum {
 	VIDEO_MODE_SOFT = 0,
 	VIDEO_MODE_OPENGL,
-	VIDEO_MODE_SDL2ACCEL
+	VIDEO_MODE_SDL2ACCEL,
+	VIDEO_MODE_BGFX
 };
 
 #define VIDEO_SCALE_MODE_NONE       (0)
-
-// texture formats
-// This used to be an enum, but these are now defines so we can use them as
-// preprocessor conditionals
-#define SDL_TEXFORMAT_ARGB32            (0) // non-16-bit textures or specials
-#define SDL_TEXFORMAT_RGB32             (1)
-#define SDL_TEXFORMAT_RGB32_PALETTED    (2)
-#define SDL_TEXFORMAT_YUY16             (3)
-#define SDL_TEXFORMAT_YUY16_PALETTED    (4)
-#define SDL_TEXFORMAT_PALETTE16         (5)
-#define SDL_TEXFORMAT_RGB15             (6)
-#define SDL_TEXFORMAT_RGB15_PALETTED    (7)
-#define SDL_TEXFORMAT_PALETTE16A        (8)
-// special texture formats for 16bpp texture destination support, do not use
-// to address the tex properties / tex functions arrays!
-#define SDL_TEXFORMAT_PALETTE16_ARGB1555    (16)
-#define SDL_TEXFORMAT_RGB15_ARGB1555        (17)
-#define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555   (18)
 
 #define GLSL_SHADER_MAX 10
 
@@ -50,52 +35,149 @@ enum {
 //  TYPE DEFINITIONS
 //============================================================
 
-struct sdl_mode
+class osd_dim
 {
-	int                 width;
-	int                 height;
+public:
+	osd_dim(const int &w, const int &h)
+	: m_w(w), m_h(h)
+	{
+	}
+	int width() const { return m_w; }
+	int height() const { return m_h; }
+
+	bool operator!=(const osd_dim &other) { return (m_w != other.width()) || (m_h != other.height()); }
+	bool operator==(const osd_dim &other) { return (m_w == other.width()) && (m_h == other.height()); }
+private:
+	int m_w;
+	int m_h;
 };
 
-struct sdl_monitor_info
+class osd_rect
 {
-	sdl_monitor_info  * next;                   // pointer to next monitor in list
-#ifdef PTR64
-	UINT64              handle;                 // handle to the monitor
-#else
-	UINT32              handle;                 // handle to the monitor
+public:
+	osd_rect()
+	: m_x(0), m_y(0), m_d(0,0)
+	{
+	}
+	osd_rect(const int x, const int y, const int &w, const int &h)
+	: m_x(x), m_y(y), m_d(w,h)
+	{
+	}
+	osd_rect(const int x, const int y, const osd_dim &d)
+	: m_x(x), m_y(y), m_d(d)
+	{
+	}
+	int top() const { return m_y; }
+	int left() const { return m_x; }
+	int width() const { return m_d.width(); }
+	int height() const { return m_d.height(); }
+
+	osd_dim dim() const { return m_d; }
+
+	int bottom() const { return m_y + m_d.height(); }
+	int right() const { return m_x + m_d.width(); }
+
+	osd_rect move_by(int dx, int dy) const { return osd_rect(m_x + dx, m_y + dy, m_d); }
+	osd_rect resize(int w, int h) const { return osd_rect(m_x, m_y, w, h); }
+
+private:
+	int m_x;
+	int m_y;
+	osd_dim m_d;
+};
+
+inline osd_rect SDL_Rect_to_osd_rect(const SDL_Rect &r)
+{
+	return osd_rect(r.x, r.y, r.w, r.h);
+}
+
+class osd_monitor_info
+{
+public:
+
+#if 0
+	osd_monitor_info()
+	: m_next(NULL), m_handle(NULL), m_aspect(0.0f)
+		{
+			strcpy(m_name, "");
+		}
 #endif
-	int                 monitor_width;
-	int                 monitor_height;
-	char                monitor_device[64];
-	float               aspect;                 // computed/configured aspect ratio of the physical device
-	int                 center_width;           // width of first physical screen for centering
-	int                 center_height;          // height of first physical screen for centering
-	int                 monitor_x;              // X position of this monitor in virtual desktop space (SDL virtual space has them all horizontally stacked, not real geometry)
+	osd_monitor_info(void *handle, const char *monitor_device, float aspect)
+	: m_next(NULL), m_handle(handle), m_aspect(aspect)
+	{
+		strncpy(m_name, monitor_device, ARRAY_LENGTH(m_name) - 1);
+	}
+
+	virtual ~osd_monitor_info() { }
+
+	const void *oshandle() { return m_handle; }
+
+	const osd_rect &position_size() { refresh(); return m_pos_size; }
+	const osd_rect &usuable_position_size() { refresh(); return m_usuable_pos_size; }
+
+	const char *devicename() { refresh(); return m_name[0] ? m_name : "UNKNOWN"; }
+
+	float aspect();
+
+	void set_aspect(const float a) { m_aspect = a; }
+	bool is_primary() { refresh(); return m_is_primary; }
+
+	osd_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
+
+	static osd_monitor_info *pick_monitor(sdl_options &options, int index);
+	static osd_monitor_info *list;
+
+	// FIXME: should be private!
+	osd_monitor_info    *m_next;                   // pointer to next monitor in list
+protected:
+	virtual void refresh() = 0;
+	osd_rect			m_pos_size;
+	osd_rect			m_usuable_pos_size;
+	bool				m_is_primary;
+	char                m_name[64];
+private:
+
+	void *              m_handle;                 // handle to the monitor
+	float               m_aspect;                 // computed/configured aspect ratio of the physical device
 };
 
 
-struct sdl_window_config
+class sdl_monitor_info : public osd_monitor_info
 {
-	float               aspect;                     // decoded aspect ratio
-	int                 width;                      // decoded width
-	int                 height;                     // decoded height
-	int                 depth;                      // decoded depth
-	int                 refresh;                    // decoded refresh
+public:
+#if 0
+	sdl_monitor_info()
+	: m_next(NULL), m_handle(0), m_aspect(0.0f)
+		{}
+#endif
+	sdl_monitor_info(const UINT64 handle, const char *monitor_device, float aspect)
+	: osd_monitor_info(&m_handle, monitor_device, aspect), m_handle(handle)
+	{
+		refresh();
+	}
+
+	// STATIC
+	static void init();
+	static void exit();
+#if !defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
+	static void add_primary_monitor(void *data);
+#endif
+#if defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
+	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
+#endif
+private:
+	void virtual refresh();
+
+	UINT64              m_handle;                 // handle to the monitor
 };
 
-
-struct sdl_video_config
+struct osd_video_config
 {
-	// performance options
-	int                 novideo;                // don't draw, for pure CPU benchmarking
-
 	// global configuration
 	int                 windowed;               // start windowed?
-	int                 prescale;               // prescale factor (not currently supported)
-	int                 keepaspect;             // keep aspect ratio?
+	int                 prescale;                   // prescale factor
+	int                 keepaspect;                 // keep aspect ratio
 	int                 numscreens;             // number of screens
-	int                 centerh;
-	int                 centerv;
 
 	// hardware options
 	int                 mode;           // output mode
@@ -103,13 +185,16 @@ struct sdl_video_config
 	int                 syncrefresh;    // sync only to refresh rate
 	int                 switchres;      // switch resolutions
 
-	int                 fullstretch;
+	int                 fullstretch;	// FXIME: implement in windows!
 
-	// vector options
-	float               beamwidth;      // beam width
+	// ddraw options
+	int                 hwstretch;                  // stretch using the hardware
+
+	// d3d, accel, opengl
+	int                 filter;                     // enable filtering
+	//int                 filter;         // enable filtering, disabled if glsl_filter>0
 
 	// OpenGL options
-	int                 filter;         // enable filtering, disabled if glsl_filter>0
 	int                 glsl;
 	int                 glsl_filter;        // glsl filtering, >0 disables filter
 	char *              glsl_shader_mamebm[GLSL_SHADER_MAX]; // custom glsl shader set, mame bitmap
@@ -120,6 +205,20 @@ struct sdl_video_config
 	int                 vbo;
 	int                 allowtexturerect;   // allow GL_ARB_texture_rectangle, default: no
 	int                 forcepow2texture;   // force power of two textures, default: no
+
+	// dd, d3d
+	int                 triplebuf;                  // triple buffer
+
+	//============================================================
+	// SDL - options
+	//============================================================
+	int                 novideo;                // don't draw, for pure CPU benchmarking
+
+	int                 centerh;
+	int                 centerv;
+
+	// vector options
+	float               beamwidth;      // beam width
 
 	// perftest
 	int                 perftest;       // print out real video fps
@@ -135,14 +234,6 @@ struct sdl_video_config
 //  GLOBAL VARIABLES
 //============================================================
 
-extern sdl_video_config video_config;
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-void sdlvideo_monitor_refresh(sdl_monitor_info *monitor);
-float sdlvideo_monitor_get_aspect(sdl_monitor_info *monitor);
-sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 monitor); //FIXME: Remove? not referenced
+extern osd_video_config video_config;
 
 #endif

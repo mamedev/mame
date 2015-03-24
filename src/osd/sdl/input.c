@@ -41,12 +41,6 @@
 #undef DELETE
 #endif
 
-// Emscripten requires the SDL2 API for keyboard inputs, but nothing else
-#ifdef SDLMAME_EMSCRIPTEN
-#undef SDLMAME_SDL2
-#define SDLMAME_SDL2 1
-#endif
-
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -498,13 +492,6 @@ static kt_table sdl_key_trans_table[] =
 };
 #endif
 
-#if defined(SDLMAME_EMSCRIPTEN)
-#undef GET_WINDOW
-#undef GET_FOCUS_WINDOW
-#define GET_WINDOW(ev) sdl_window_list
-#define GET_FOCUS_WINDOW(ev) sdl_window_list
-#endif
-
 struct key_lookup_table
 {
 	int code;
@@ -678,7 +665,7 @@ static void devmap_init(running_machine &machine, device_map_t *devmap, const ch
 		sprintf(defname, "%s%d", opt, dev + 1);
 
 		dev_name = machine.options().value(defname);
-		if (dev_name && *dev_name && strcmp(dev_name,SDLOPTVAL_AUTO))
+		if (dev_name && *dev_name && strcmp(dev_name,OSDOPTVAL_AUTO))
 		{
 			devmap->map[dev].name = remove_spaces(machine, dev_name);
 			osd_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, devmap->map[dev].name);
@@ -731,7 +718,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 	{
 		char *joy_name;
 
-#if (SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (SDLMAME_SDL2)
 		joy = SDL_JoystickOpen(physical_stick);
 		joy_name = remove_spaces(machine, SDL_JoystickName(joy));
 		SDL_JoystickClose(joy);
@@ -1416,7 +1403,7 @@ bool sdl_osd_interface::input_init()
 	}
 
 	// get Sixaxis special mode info
-	sixaxis_mode = downcast<sdl_options &>(machine().options()).sixaxis();
+	sixaxis_mode = options().sixaxis();
 
 	// register the joysticks
 	sdlinput_register_joysticks(machine());
@@ -1473,7 +1460,7 @@ void sdl_osd_interface::input_exit()
 //  sdlinput_get_focus_window
 //============================================================
 
-sdl_window_info *sdlinput_get_focus_window(running_machine &machine)
+sdl_window_info *sdlinput_get_focus_window()
 {
 	if (focus_window)  // only be set on SDL >= 1.3
 		return focus_window;
@@ -1538,16 +1525,16 @@ INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 //  sdlinput_poll
 //============================================================
 
-#if (SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (SDLMAME_SDL2)
 INLINE sdl_window_info * window_from_id(Uint32 windowID)
 {
 	sdl_window_info *w;
 	SDL_Window *window = SDL_GetWindowFromID(windowID);
 
-	for (w = sdl_window_list; w != NULL; w = w->next)
+	for (w = sdl_window_list; w != NULL; w = w->m_next)
 	{
 		//printf("w->window_id: %d\n", w->window_id);
-		if (w->sdl_window == window)
+		if (w->sdl_window() == window)
 		{
 			return w;
 		}
@@ -1562,13 +1549,13 @@ INLINE void resize_all_windows(void)
 
 	if (SDL13_COMBINE_RESIZE)
 	{
-		for (w = sdl_window_list; w != NULL; w = w->next)
+		for (w = sdl_window_list; w != NULL; w = w->m_next)
 		{
-			if (w->resize_width && w->resize_height && ((now - w->last_resize) > osd_ticks_per_second() / 10))
+			if (w->m_resize_width && w->m_resize_height && ((now - w->m_last_resize) > osd_ticks_per_second() / 10))
 			{
-				w->window_resize(w->resize_width, w->resize_height);
-				w->resize_width = 0;
-				w->resize_height = 0;
+				w->resize(w->m_resize_width, w->m_resize_height);
+				w->m_resize_width = 0;
+				w->m_resize_height = 0;
 			}
 		}
 	}
@@ -1576,7 +1563,7 @@ INLINE void resize_all_windows(void)
 
 #endif
 
-void sdlinput_process_events_buf(running_machine &machine)
+void sdlinput_process_events_buf()
 {
 	SDL_Event event;
 
@@ -1596,6 +1583,8 @@ void sdlinput_process_events_buf(running_machine &machine)
 		}
 		osd_lock_release(input_lock);
 	}
+	else
+		SDL_PumpEvents();
 }
 
 
@@ -1758,8 +1747,11 @@ void sdlinput_poll(running_machine &machine)
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[0]);
 #endif
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
-#if (!SDLMAME_SDL2)
-			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char) event.key.keysym.unicode);
+#if (SDLMAME_SDL2)
+			if (event.key.keysym.sym < 0x20)
+				ui_input_push_char_event(machine, sdl_window_list->target(), event.key.keysym.sym);
+#else
+			ui_input_push_char_event(machine, sdl_window_list->target(), (unicode_char) event.key.keysym.unicode);
 #endif
 			break;
 		case SDL_KEYUP:
@@ -1859,16 +1851,16 @@ void sdlinput_poll(running_machine &machine)
 				int cx, cy;
 				osd_ticks_t click = osd_ticks() * 1000 / osd_ticks_per_second();
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
-				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
-					ui_input_push_mouse_down_event(machine, window->target, cx, cy);
+					ui_input_push_mouse_down_event(machine, window->target(), cx, cy);
 					// FIXME Parameter ?
 					if ((click-last_click < 250)
 							&& (cx >= last_x - 4 && cx <= last_x  + 4)
 							&& (cy >= last_y - 4 && cy <= last_y  + 4) )
 					{
 						last_click = 0;
-						ui_input_push_mouse_double_click_event(machine, window->target, cx, cy);
+						ui_input_push_mouse_double_click_event(machine, window->target(), cx, cy);
 					}
 					else
 					{
@@ -1893,9 +1885,9 @@ void sdlinput_poll(running_machine &machine)
 				int cx, cy;
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.button);
 
-				if (window != NULL && window->xy_to_render_target(window, event.button.x,event.button.y, &cx, &cy) )
+				if (window != NULL && window->xy_to_render_target(event.button.x,event.button.y, &cx, &cy) )
 				{
-					ui_input_push_mouse_up_event(machine, window->target, cx, cy);
+					ui_input_push_mouse_up_event(machine, window->target(), cx, cy);
 				}
 			}
 			break;
@@ -1918,8 +1910,8 @@ void sdlinput_poll(running_machine &machine)
 				int cx=-1, cy=-1;
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
 
-				if (window != NULL && window->xy_to_render_target(window, event.motion.x, event.motion.y, &cx, &cy) )
-					ui_input_push_mouse_move_event(machine, window->target, cx, cy);
+				if (window != NULL && window->xy_to_render_target(event.motion.x, event.motion.y, &cx, &cy) )
+					ui_input_push_mouse_move_event(machine, window->target(), cx, cy);
 			}
 			break;
 		case SDL_JOYBALLMOTION:
@@ -1928,31 +1920,32 @@ void sdlinput_poll(running_machine &machine)
 			devinfo->joystick.balls[event.jball.ball * 2] = event.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
 			devinfo->joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
 			break;
-#if (!SDLMAME_SDL2) || defined(SDLMAME_EMSCRIPTEN)
+#if (!SDLMAME_SDL2)
 		case SDL_APPMOUSEFOCUS:
 			app_has_mouse_focus = event.active.gain;
 			if (!event.active.gain)
 			{
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.motion);
-				ui_input_push_mouse_leave_event(machine, window->target);
+				ui_input_push_mouse_leave_event(machine, window->target());
 			}
 			break;
 		case SDL_QUIT:
 			machine.schedule_exit();
 			break;
 		case SDL_VIDEORESIZE:
-			sdl_window_list->window_resize(event.resize.w, event.resize.h);
+			sdl_window_list->resize(event.resize.w, event.resize.h);
 			break;
 #else
 		case SDL_TEXTINPUT:
 			if (*event.text.text)
 			{
 				sdl_window_info *window = GET_FOCUS_WINDOW(&event.text);
+				//printf("Focus window is %p - wl %p\n", window, sdl_window_list);
 				unicode_char result;
 				if (window != NULL )
 				{
 					osd_uchar_from_osdchar(&result, event.text.text, 1);
-					ui_input_push_char_event(machine, window->target, result);
+					ui_input_push_char_event(machine, window->target(), result);
 				}
 			}
 			break;
@@ -1969,33 +1962,32 @@ void sdlinput_poll(running_machine &machine)
 				machine.schedule_exit();
 				break;
 			case  SDL_WINDOWEVENT_LEAVE:
-				ui_input_push_mouse_leave_event(machine, window->target);
+				ui_input_push_mouse_leave_event(machine, window->target());
 				app_has_mouse_focus = 0;
 				break;
 			case SDL_WINDOWEVENT_MOVED:
-				window->window_clear();
+				window->notify_changed();
 				focus_window = window;
 				break;
 			case SDL_WINDOWEVENT_RESIZED:
 				if (SDL13_COMBINE_RESIZE)
 				{
-					window->resize_width = event.window.data1;
-					window->resize_height = event.window.data2;
-					window->last_resize = osd_ticks();
+					window->m_resize_width = event.window.data1;
+					window->m_resize_height = event.window.data2;
+					window->m_last_resize = osd_ticks();
 				}
 				else
 				{
 #ifndef SDLMAME_WIN32
-				    /* FIXME: SDL2 sends some spurious resize events on Ubuntu
-				     * while in fullscreen mode. Ignore them for now.
-				     */
-				    if (!window->fullscreen())
+					/* FIXME: SDL2 sends some spurious resize events on Ubuntu
+					 * while in fullscreen mode. Ignore them for now.
+					 */
+					if (!window->fullscreen())
 #endif
-				    {
-	                    //printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
-	                    if (event.window.data1 != window->width || event.window.data2 != window->height)
-	                        window->window_resize(event.window.data1, event.window.data2);
-				    }
+					{
+						//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
+						window->resize(event.window.data1, event.window.data2);
+					}
 				}
 				focus_window = window;
 				break;
@@ -2014,7 +2006,7 @@ void sdlinput_poll(running_machine &machine)
 #endif
 		}
 	}
-#if (SDLMAME_SDL2) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (SDLMAME_SDL2)
 	resize_all_windows();
 #endif
 }
@@ -2025,7 +2017,7 @@ void sdlinput_poll(running_machine &machine)
 //============================================================
 
 
-void  sdlinput_release_keys(running_machine &machine)
+void  sdlinput_release_keys()
 {
 	// FIXME: SDL >= 1.3 will nuke the window event buffer when
 	// a window is closed. This will leave keys in a pressed
@@ -2049,7 +2041,7 @@ void  sdlinput_release_keys(running_machine &machine)
 //  sdlinput_should_hide_mouse
 //============================================================
 
-int sdlinput_should_hide_mouse(running_machine &machine)
+int sdlinput_should_hide_mouse()
 {
 	// if we are paused, no
 	if (input_paused)
@@ -2086,7 +2078,7 @@ void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> 
 		{
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				uimode = downcast<sdl_options &>(machine().options()).ui_mode_key();
+				uimode = options().ui_mode_key();
 				if(!strcmp(uimode,"auto"))
 				{
 					#if defined(__APPLE__) && defined(__MACH__)

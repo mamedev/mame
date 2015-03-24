@@ -71,16 +71,14 @@ machine_config_constructor a2bus_themill_device::device_mconfig_additions() cons
 a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
-	m_6809(*this, M6809_TAG),
-	m_6502space(NULL)
+	m_6809(*this, M6809_TAG)
 {
 }
 
 a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, A2BUS_THEMILL, "Stellation Two The Mill", tag, owner, clock, "a2themill", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
-	m_6809(*this, M6809_TAG),
-	m_6502space(NULL)
+	m_6809(*this, M6809_TAG)
 {
 }
 
@@ -102,7 +100,6 @@ void a2bus_themill_device::device_start()
 void a2bus_themill_device::device_reset()
 {
 	m_bEnabled = false;
-	m_6502space = NULL;
 	m_flipAddrSpace = false;
 	m_6809Mode = false;
 	m_status = 0xc0;    // OS9 loader relies on this
@@ -135,8 +132,6 @@ void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
 		case 2: // 6809 reset
 			if (data & 0x80)
 			{
-				// steal the 6502's address space
-				m_6502space = &space;
 				m_6809->reset();
 
 				m_6809->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -241,45 +236,42 @@ void a2bus_themill_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
 
 READ8_MEMBER( a2bus_themill_device::dma_r )
 {
-	if (m_6502space)
+	if (m_6809Mode)
 	{
-		if (m_6809Mode)
+		if (offset <= 0xafff)
 		{
-			if (offset <= 0xafff)
-			{
-				return m_6502space->read_byte(offset+0x1000);
-			}
-			else if (offset <= 0xbfff)
-			{
-				return m_6502space->read_byte((offset&0xfff) + 0xd000);
-			}
-			else if (offset <= 0xcfff)
-			{
-				return m_6502space->read_byte((offset&0xfff) + 0xe000);
-			}
-			else if (offset <= 0xdfff)
-			{
-				return m_6502space->read_byte((offset&0xfff) + 0xf000);
-			}
-			else if (offset <= 0xefff)
-			{
-				return m_6502space->read_byte((offset&0xfff) + 0xc000);
-			}
-			else    // 6809 Fxxx -> 6502 ZP
-			{
-				return m_6502space->read_byte(offset&0xfff);
-			}
+			return slot_dma_read(space, offset+0x1000);
+		}
+		else if (offset <= 0xbfff)
+		{
+			return slot_dma_read(space, (offset&0xfff) + 0xd000);
+		}
+		else if (offset <= 0xcfff)
+		{
+			return slot_dma_read(space, (offset&0xfff) + 0xe000);
+		}
+		else if (offset <= 0xdfff)
+		{
+			return slot_dma_read(space, (offset&0xfff) + 0xf000);
+		}
+		else if (offset <= 0xefff)
+		{
+			return slot_dma_read(space, (offset&0xfff) + 0xc000);
+		}
+		else    // 6809 Fxxx -> 6502 ZP
+		{
+			return slot_dma_read(space, offset&0xfff);
+		}
+	}
+	else
+	{
+		if (m_flipAddrSpace)
+		{
+			return slot_dma_read(space, offset^0x8000);
 		}
 		else
 		{
-			if (m_flipAddrSpace)
-			{
-				return m_6502space->read_byte(offset^0x8000);
-			}
-			else
-			{
-				return m_6502space->read_byte(offset);
-			}
+			return slot_dma_read(space, offset);
 		}
 	}
 
@@ -293,45 +285,42 @@ READ8_MEMBER( a2bus_themill_device::dma_r )
 
 WRITE8_MEMBER( a2bus_themill_device::dma_w )
 {
-	if (m_6502space)
+	if (m_6809Mode)
 	{
-		if (m_6809Mode)
+		if (offset <= 0xafff)
 		{
-			if (offset <= 0xafff)
-			{
-				m_6502space->write_byte(offset+0x1000, data);
-			}
-			else if (offset <= 0xbfff)
-			{
-				m_6502space->write_byte((offset&0xfff) + 0xd000, data);
-			}
-			else if (offset <= 0xcfff)
-			{
-				m_6502space->write_byte((offset&0xfff) + 0xe000, data);
-			}
-			else if (offset <= 0xdfff)
-			{
-				m_6502space->write_byte((offset&0xfff) + 0xf000, data);
-			}
-			else if (offset <= 0xefff)
-			{
-				m_6502space->write_byte((offset&0xfff) + 0xc000, data);
-			}
-			else    // 6809 Fxxx -> 6502 ZP
-			{
-				m_6502space->write_byte(offset&0xfff, data);
-			}
+			slot_dma_write(space, offset+0x1000, data);
+		}
+		else if (offset <= 0xbfff)
+		{
+			slot_dma_write(space, (offset&0xfff) + 0xd000, data);
+		}
+		else if (offset <= 0xcfff)
+		{
+			slot_dma_write(space, (offset&0xfff) + 0xe000, data);
+		}
+		else if (offset <= 0xdfff)
+		{
+			slot_dma_write(space, (offset&0xfff) + 0xf000, data);
+		}
+		else if (offset <= 0xefff)
+		{
+			slot_dma_write(space, (offset&0xfff) + 0xc000, data);
+		}
+		else    // 6809 Fxxx -> 6502 ZP
+		{
+			slot_dma_write(space, offset&0xfff, data);
+		}
+	}
+	else
+	{
+		if (m_flipAddrSpace)
+		{
+			slot_dma_write(space, offset^0x8000, data);
 		}
 		else
 		{
-			if (m_flipAddrSpace)
-			{
-				m_6502space->write_byte(offset^0x8000, data);
-			}
-			else
-			{
-				m_6502space->write_byte(offset, data);
-			}
+			slot_dma_write(space, offset, data);
 		}
 	}
 }

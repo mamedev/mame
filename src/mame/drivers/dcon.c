@@ -26,13 +26,13 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8bfff) AM_RAM
 
-	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE(dcon_background_w) AM_SHARE("back_data")
-	AM_RANGE(0x8c800, 0x8cfff) AM_RAM_WRITE(dcon_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(dcon_midground_w) AM_SHARE("mid_data")
-	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(dcon_text_w) AM_SHARE("textram")
+	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE(background_w) AM_SHARE("back_data")
+	AM_RANGE(0x8c800, 0x8cfff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(midground_w) AM_SHARE("mid_data")
+	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(text_w) AM_SHARE("textram")
 	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(dcon_gfxbank_w)
+	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(gfxbank_w)
 
 	AM_RANGE(0xa0000, 0xa000d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
@@ -403,5 +403,5 @@ DRIVER_INIT_MEMBER(dcon_state,sdgndmps)
 }
 
 
-GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", GAME_NO_COCKTAIL )
-GAME( 1992, dcon,     0, dcon,     dcon, driver_device,     0,        ROT0, "Success",            "D-Con", GAME_NO_COCKTAIL )
+GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, dcon_state, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, dcon,     0, dcon,     dcon, driver_device,     0,        ROT0, "Success",            "D-Con", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

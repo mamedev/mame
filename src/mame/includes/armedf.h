@@ -1,3 +1,4 @@
+#include "includes/nb1414m4.h"
 #include "video/bufsprite.h"
 
 class armedf_state : public driver_device
@@ -7,6 +8,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_extra(*this, "extra"),
+		m_nb1414m4(*this, "nb1414m4"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
@@ -18,6 +20,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_extra;
+	optional_device<nb1414m4_device> m_nb1414m4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -27,7 +30,7 @@ public:
 	required_shared_ptr<UINT16> m_spr_pal_clut;
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_bg_videoram;
-	UINT16 m_legion_cmd[4]; // legiono only!
+	UINT16 m_legion_cmd[4]; // legionjb only!
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
@@ -52,7 +55,7 @@ public:
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
 	DECLARE_WRITE16_MEMBER(irq_lv1_ack_w);
 	DECLARE_WRITE16_MEMBER(irq_lv2_ack_w);
-	DECLARE_WRITE8_MEMBER(legiono_fg_scroll_w);
+	DECLARE_WRITE8_MEMBER(legionjb_fg_scroll_w);
 	DECLARE_READ8_MEMBER(blitter_txram_r);
 	DECLARE_WRITE8_MEMBER(blitter_txram_w);
 	DECLARE_WRITE8_MEMBER(fg_scrollx_w);
@@ -75,7 +78,7 @@ public:
 	DECLARE_DRIVER_INIT(armedf);
 	DECLARE_DRIVER_INIT(legion);
 	DECLARE_DRIVER_INIT(terrafu);
-	DECLARE_DRIVER_INIT(legiono);
+	DECLARE_DRIVER_INIT(legionjb);
 	DECLARE_DRIVER_INIT(kozure);
 	DECLARE_DRIVER_INIT(terraf);
 	DECLARE_DRIVER_INIT(terrafjb);

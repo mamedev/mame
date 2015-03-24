@@ -1,16 +1,15 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 //============================================================
 //
 //  main.c - Win32 main program
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
-//  SDLMAME by Olivier Galibert and R. Belmont
-//
 //============================================================
 
 // standard windows headers
+#ifdef OSD_SDL
 #define _WIN32_WINNT 0x0400
+#endif
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
@@ -38,10 +37,12 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 	int i, rc;
 	char **utf8_argv;
 
+#ifdef OSD_SDL
 #ifdef MALLOC_DEBUG
 {
 	extern int winalloc_in_main_code;
 	winalloc_in_main_code = TRUE;
+#endif
 #endif
 
 	/* convert arguments to UTF-8 */
@@ -63,6 +64,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 		osd_free(utf8_argv[i]);
 	free(utf8_argv);
 
+#ifdef OSD_SDL
 #ifdef MALLOC_DEBUG
 	{
 		void check_unfreed_mem(void);
@@ -70,6 +72,7 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 	}
 	winalloc_in_main_code = FALSE;
 }
+#endif
 #endif
 
 	return rc;

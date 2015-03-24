@@ -22,7 +22,7 @@ NETLIB_START(74153sub)
 
 	m_chan = 0;
 
-	save(NAME(m_chan));
+	save(NLNAME(m_chan));
 }
 
 NETLIB_RESET(74153sub)

@@ -1,10 +1,28 @@
 /***************************************************************************
 
-    Super Contra / Thunder Cross
+    Super Contra  (GX775) (c) 1988 Konami
+    Thunder Cross (GX873) (c) 1988 Konami
+    Gang Busters  (GX878) (c) 1988 Konami
 
     driver by Bryan McPhail, Manuel Abadia
 
     K052591 emulation by Eddie Edwards
+
+    These three games run on very similar boards, to the extent that
+    Thunder Cross and Gang Busters share the same schematics with
+    callouts ("USED ONLY GX873" or "USED ONLY GX878") to indicate the
+    per-game differences.
+
+    Super Contra uses an external latch for program ROM banking
+    instead of the builtin banking of the Konami custom CPU,
+    and is the only one of the three games that uses sprite shadows.
+
+    Thunder Cross has no 007232 sound chip, and has a 052591 PMC,
+    a programmable custom chip also used by S.P.Y. and Hexion.
+    Here it's used for collision detection.
+
+    Gang Busters uses the 052526 custom CPU instead of 052001, and
+    has slightly different tile ROM addressing.
 
 - There was a set in MAME at one time that was given the setname (thndrxja)
   which is supposedly a later revision of the japanese set currently in MAME.
@@ -21,7 +39,7 @@
 #include "includes/thunderx.h"
 
 
-INTERRUPT_GEN_MEMBER(thunderx_state::scontra_interrupt)
+INTERRUPT_GEN_MEMBER(thunderx_state::vblank_interrupt)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
@@ -39,59 +57,35 @@ void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-READ8_MEMBER(thunderx_state::scontra_bankedram_r)
-{
-	if (m_palette_selected)
-		return m_paletteram[offset];
-	else
-		return m_ram[offset];
-}
+#define VERBOSE 0
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#define PMC_BK (m_1f98_latch & 0x02)
 
-WRITE8_MEMBER(thunderx_state::scontra_bankedram_w)
+READ8_MEMBER(thunderx_state::pmc_r)
 {
-	if (m_palette_selected)
-		m_palette->write(space, offset, data);
-	else
-		m_ram[offset] = data;
-}
-
-READ8_MEMBER(thunderx_state::thunderx_bankedram_r)
-{
-	if (m_rambank & 0x01)
-		return m_ram[offset];
-	else if (m_rambank & 0x10)
+	if (PMC_BK)
 	{
-		if (m_pmcbank)
-		{
-//          logerror("%04x read pmcram %04x\n",space.device().safe_pc(),offset);
-			return m_pmcram[offset];
-		}
-		else
-		{
-			logerror("%04x read pmc internal ram %04x\n",space.device().safe_pc(),offset);
-			return 0;
-		}
+//      logerror("%04x read pmcram %04x\n",space.device().safe_pc(),offset);
+		return m_pmcram[offset];
 	}
 	else
-		return m_paletteram[offset];
+	{
+		LOG(("%04x read pmc internal ram %04x\n",space.device().safe_pc(),offset));
+		return 0;
+	}
 }
 
-WRITE8_MEMBER(thunderx_state::thunderx_bankedram_w)
+WRITE8_MEMBER(thunderx_state::pmc_w)
 {
-	if (m_rambank & 0x01)
-		m_ram[offset] = data;
-	else if (m_rambank & 0x10)
+	if (PMC_BK)
 	{
-		if (m_pmcbank)
-		{
-			logerror("%04x pmcram %04x = %02x\n",space.device().safe_pc(),offset,data);
-			m_pmcram[offset] = data;
-		}
-		else
-			logerror("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data);
+		LOG(("%04x pmcram %04x = %02x\n",space.device().safe_pc(),offset,data));
+		m_pmcram[offset] = data;
 	}
 	else
-		m_palette->write(space, offset, data);
+	{
+		LOG(("%04x pmc internal ram %04x = %02x\n",space.device().safe_pc(),offset,data));
+	}
 }
 
 /*
@@ -283,23 +277,33 @@ void thunderx_state::calculate_collisions(  )
 	run_collisions(X0, Y0, X1, Y1, CM, HM);
 }
 
-READ8_MEMBER(thunderx_state::thunderx_1f98_r)
+WRITE8_MEMBER(thunderx_state::scontra_1f98_w)
 {
-	return m_1f98_data;
+	// bit 0 = enable char ROM reading through the video RAM
+	m_k052109->set_rmrd_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+
+	m_1f98_latch = data;
+}
+
+READ8_MEMBER(thunderx_state::_1f98_r)
+{
+	// thunderx and gbusters read from here during the gfx rom test...
+	// though it doesn't look like it should be readable based on the schematics
+	return m_1f98_latch;
 }
 
 WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 {
 	// logerror("%04x: 1f98_w %02x\n", space.device().safe_pc(),data);
 
-	/* bit 0 = enable char ROM reading through the video RAM */
+	// bit 0 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* bit 1 = PMC-BK */
-	m_pmcbank = (data & 0x02) >> 1;
+	// bit 1 = PMC BK (select PMC program or data RAM)
+	// handled in pmc_r() and pmc_w()
 
-	/* bit 2 = do collision detection when 0->1 */
-	if ((data & 4) && !(m_1f98_data & 4))
+	// bit 2 = PMC START (do collision detection when 0->1)
+	if ((data & 4) && !(m_1f98_latch & 4))
 	{
 		calculate_collisions();
 
@@ -307,57 +311,60 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 		timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100), TIMER_THUNDERX_FIRQ);
 	}
 
-	m_1f98_data = data;
+	m_1f98_latch = data;
 }
 
 WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	int offs;
+	// bits 0-3 select ROM bank at 6000-7fff
+    m_rombank->set_entry(data & 0x0f);
 
-//logerror("%04x: bank switch %02x\n",space.device().safe_pc(),data);
+	// bit 4 selects work RAM or palette RAM at 5800-5fff
+	m_bank5800->set_bank((data & 0x10) >> 4);
 
-	/* bits 0-3 ROM bank */
-	offs = 0x10000 + (data & 0x0f)*0x2000;
-	membank("bank1")->set_base(&RAM[offs] );
-
-	/* bit 4 select work RAM or palette RAM at 5800-5fff */
-	m_palette_selected = ~data & 0x10;
-
-	/* bits 5/6 coin counters */
+	// bits 5-6 coin counters
 	coin_counter_w(machine(), 0, data & 0x20);
 	coin_counter_w(machine(), 1, data & 0x40);
 
-	/* bit 7 controls layer priority */
+	// bit 7 controls layer priority
 	m_priority = data & 0x80;
 }
 
 WRITE8_MEMBER(thunderx_state::thunderx_videobank_w)
 {
-	//logerror("%04x: select video ram bank %02x\n",space.device().safe_pc(),data);
-	/* 0x01 = work RAM at 4000-5fff */
-	/* 0x00 = palette at 5800-5fff */
-	/* 0x10 = unknown RAM at 5800-5fff */
-	m_rambank = data;
+	// 0x01 = work RAM at 4000-5fff
+	// 0x00 = palette at 5800-5fff
+	// 0x10 = PMC at 5800-5fff
+	m_bank5800->set_bank(data & 0x10 ? 2 : (data & 0x1));
 
-	/* bits 1/2 coin counters */
+	/* bits 1-2 coin counters */
 	coin_counter_w(machine(), 0, data & 0x02);
 	coin_counter_w(machine(), 1, data & 0x04);
 
-	/* bit 3 controls layer priority (seems to be always 1) */
+	/* bit 3 controls layer priority */
 	m_priority = data & 0x08;
 }
 
-WRITE8_MEMBER(thunderx_state::thunderx_sh_irqtrigger_w)
+WRITE8_MEMBER(thunderx_state::gbusters_videobank_w)
+{
+	// same as thunderx without the PMC
+	m_bank5800->set_bank(data & 0x1);
+
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x04);
+
+	m_priority = data & 0x08;
+}
+
+WRITE8_MEMBER(thunderx_state::sh_irqtrigger_w)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(thunderx_state::scontra_snd_bankswitch_w)
+WRITE8_MEMBER(thunderx_state::k007232_bankswitch_w)
 {
-	/* b3-b2: bank for chanel B */
-	/* b1-b0: bank for chanel A */
-
+	/* b3-b2: bank for channel B */
+	/* b1-b0: bank for channel A */
 	int bank_A = (data & 0x03);
 	int bank_B = ((data >> 2) & 0x03);
 	m_k007232->set_bank(bank_A, bank_B);
@@ -393,7 +400,7 @@ WRITE8_MEMBER(thunderx_state::k052109_051960_w)
 static ADDRESS_MAP_START( scontra_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(scontra_bankswitch_w) /* bankswitch control + coin counters */
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)     /* cause interrupt on audio CPU */
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(sh_irqtrigger_w)     /* cause interrupt on audio CPU */
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
@@ -401,49 +408,50 @@ static ADDRESS_MAP_START( scontra_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(thunderx_1f98_w)
+	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(_1f98_r, scontra_1f98_w)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)       /* video RAM + sprite RAM */
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(scontra_bankedram_r, scontra_bankedram_w) AM_SHARE("ram")         /* palette + work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bank5800", address_map_bank_device, amap8)  /* palette + work RAM + PMC */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(thunderx_videobank_w)
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)     /* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
-	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
-	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(thunderx_1f98_r, thunderx_1f98_w) /* registers */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-
-	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(thunderx_bankedram_r, thunderx_bankedram_w) AM_SHARE("ram")           /* palette + work RAM + unknown RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(_1f98_r, thunderx_1f98_w) /* registers */
+	AM_IMPORT_FROM(scontra_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scontra_sound_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                 /* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM                 /* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)         /* soundlatch_byte_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)        /* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)       /* YM2151 */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(scontra_snd_bankswitch_w) /* 007232 bank select */
+static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, thunderx_state )
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_videobank_w)
+	AM_IMPORT_FROM(scontra_map)
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( scontra_bank5800_map, AS_PROGRAM, 8, thunderx_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( thunderx_bank5800_map, AS_PROGRAM, 8, thunderx_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(pmc_r, pmc_w) AM_SHARE("pmcram")
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( thunderx_sound_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( scontra_sound_map, AS_PROGRAM, 8, thunderx_state )
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(k007232_bankswitch_w)
+	AM_IMPORT_FROM(thunderx_sound_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -500,23 +508,9 @@ static INPUT_PORTS_START( scontra )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thunderx )
-	PORT_START("SYSTEM")
-	KONAMI8_SYSTEM_10
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( scontra )
 
-	PORT_START("P1")
-	KONAMI8_B12_UNK(1)
-
-	PORT_START("P2")
-	KONAMI8_B12_UNK(2)
-
-	PORT_START("DSW1")
-	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
-	/* "No Coin B" = coins produce sound, but no effect on coin counter */
-
-	PORT_START("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
@@ -539,7 +533,7 @@ static INPUT_PORTS_START( thunderx )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")
+	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -561,6 +555,42 @@ static INPUT_PORTS_START( thnderxj )
 	PORT_DIPSETTING(    0x00, "50000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gbusters )
+	PORT_INCLUDE( scontra )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x04, 0x04, "Bullets" )           PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "60" )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "50k, 200k, Every 400k" )
+	PORT_DIPSETTING(    0x10, "70k, 250k, Every 500k" )
+	PORT_DIPSETTING(    0x08, "50k Only" )
+	PORT_DIPSETTING(    0x00, "70k Only" )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" ) /* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" ) /* Listed as "Unused" */
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 /***************************************************************************
 
@@ -574,41 +604,25 @@ WRITE8_MEMBER(thunderx_state::volume_callback)
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-MACHINE_START_MEMBER(thunderx_state,scontra)
+void thunderx_state::machine_start()
 {
-	m_paletteram.resize(0x800);
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-
-	save_item(NAME(m_paletteram));
+	save_item(NAME(m_1f98_latch));
 	save_item(NAME(m_priority));
-	save_item(NAME(m_1f98_data));
-	save_item(NAME(m_palette_selected));
-	save_item(NAME(m_rambank));
-	save_item(NAME(m_pmcbank));
-}
 
-MACHINE_START_MEMBER(thunderx_state,thunderx)
-{
+	// verified from both scontra and thunderx/gbusters schematics
+	// banks 4-7 must mirror banks 0-3 for gbusters rom test to pass
 	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
-	membank("bank1")->configure_entries(12, 4, &ROM[0x08000], 0x2000);
-	membank("bank1")->set_entry(0);
-
-	memset(m_pmcram, 0, sizeof(m_pmcram));
-
-	MACHINE_START_CALL_MEMBER(scontra);
-
-	save_item(NAME(m_pmcram));
+	m_rombank->configure_entries(0, 4, &ROM[0], 0x2000);
+	m_rombank->configure_entries(4, 4, &ROM[0], 0x2000);
+	m_rombank->configure_entries(8, 8, &ROM[0x10000], 0x2000);
 }
 
-MACHINE_RESET_MEMBER(thunderx_state, scontra)
+void thunderx_state::machine_reset()
 {
+	m_rombank->set_entry(0);
+	m_bank5800->set_bank(0);
+	m_1f98_latch = 0;
 	m_priority = 0;
-	m_1f98_data = 0;
-	m_palette_selected = 0;
-	m_rambank = 0;
-	m_pmcbank = 0;
 }
 
 static MACHINE_CONFIG_START( scontra, thunderx_state )
@@ -616,13 +630,17 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(scontra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  scontra_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(thunderx_state, scontra)
-	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state, scontra)
+	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(scontra_bank5800_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -630,7 +648,7 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(thunderx_state, screen_update_scontra)
+	MCFG_SCREEN_UPDATE_DRIVER(thunderx_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -659,53 +677,38 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 MACHINE_CONFIG_END
 
 
-WRITE8_MEMBER( thunderx_state::thunderx_banking_callback )
+WRITE8_MEMBER( thunderx_state::banking_callback )
 {
 	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
-	membank("bank1")->set_entry(((data & 0x0f) ^ 0x08));
+	m_rombank->set_entry(data & 0x0f);
 }
 
-static MACHINE_CONFIG_START( thunderx, thunderx_state )
+static MACHINE_CONFIG_DERIVED( thunderx, scontra )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
+	MCFG_DEVICE_MODIFY("maincpu")     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(thunderx_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  scontra_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, thunderx_banking_callback))
+	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
+	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(thunderx_sound_map)
 
-	MCFG_MACHINE_START_OVERRIDE(thunderx_state, thunderx)
-	MCFG_MACHINE_RESET_OVERRIDE(thunderx_state, scontra)
+	MCFG_DEVICE_MODIFY("bank5800")
+	MCFG_DEVICE_PROGRAM_MAP(thunderx_bank5800_map)
+	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(thunderx_state, screen_update_scontra)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_DEVICE_REMOVE("k007232")
+MACHINE_CONFIG_END
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+static MACHINE_CONFIG_DERIVED( gbusters, scontra )
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(thunderx_state, tile_callback)
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")     /* 052526 */
+	MCFG_CPU_PROGRAM_MAP(gbusters_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(thunderx_state, banking_callback))
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_CB(thunderx_state, sprite_callback)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_YM2151_ADD("ymsnd", 3579545)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_DEVICE_MODIFY("k052109")
+	MCFG_K052109_CB(thunderx_state, gbusters_tile_callback)
 MACHINE_CONFIG_END
 
 
@@ -716,10 +719,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( scontra )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "775-e02.k11",     0x10000, 0x08000, CRC(a61c0ead) SHA1(9a0aadc8d3538fc1d88b761753fffcac8923a218) )   /* banked ROM */
-	ROM_CONTINUE(            0x08000, 0x08000 )             /* fixed ROM */
-	ROM_LOAD( "775-e03.k13",     0x20000, 0x10000, CRC(00b02622) SHA1(caf1da53815e437e3fb952d29e71f2c314684cd9) )   /* banked ROM */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "775-e02.k11",     0x00000, 0x10000, CRC(a61c0ead) SHA1(9a0aadc8d3538fc1d88b761753fffcac8923a218) )   /* banked + fixed ROM */
+	ROM_LOAD( "775-e03.k13",     0x10000, 0x10000, CRC(00b02622) SHA1(caf1da53815e437e3fb952d29e71f2c314684cd9) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "775-c01.bin", 0x00000, 0x08000, CRC(0ced785a) SHA1(1eebe005a968fbaac595c168499107e34763976c) )
@@ -771,10 +773,9 @@ ROM_START( scontra )
 ROM_END
 
 ROM_START( scontraj )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "775-f02.bin", 0x10000, 0x08000, CRC(8d5933a7) SHA1(e13ec62a4209b790b609429d98620ec0d07bd0ee) )   /* banked ROM */
-	ROM_CONTINUE(            0x08000, 0x08000 )             /* fixed ROM */
-	ROM_LOAD( "775-f03.bin", 0x20000, 0x10000, CRC(1ef63d80) SHA1(8fa41038ec2928f9572d0d4511a4bb3a3d8de06d) )   /* banked ROM */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "775-f02.bin", 0x00000, 0x10000, CRC(8d5933a7) SHA1(e13ec62a4209b790b609429d98620ec0d07bd0ee) )   /* banked + fixed ROM */
+	ROM_LOAD( "775-f03.bin", 0x10000, 0x10000, CRC(1ef63d80) SHA1(8fa41038ec2928f9572d0d4511a4bb3a3d8de06d) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the SOUND CPU */
 	ROM_LOAD( "775-c01.bin", 0x00000, 0x08000, CRC(0ced785a) SHA1(1eebe005a968fbaac595c168499107e34763976c) )
@@ -826,10 +827,9 @@ ROM_START( scontraj )
 ROM_END
 
 ROM_START( thunderx )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-s03.k15", 0x10000, 0x10000, CRC(2aec2699) SHA1(8f52703a6a1ba6417c484925192ce697af9c73f1) )
-	ROM_LOAD( "873-s02.k13", 0x20000, 0x08000, CRC(6619333a) SHA1(1961658d528b0870c57f1cb78e016fb881f50392) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-s02.k13", 0x00000, 0x10000, CRC(6619333a) SHA1(1961658d528b0870c57f1cb78e016fb881f50392) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-s03.k15", 0x10000, 0x10000, CRC(2aec2699) SHA1(8f52703a6a1ba6417c484925192ce697af9c73f1) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
@@ -859,10 +859,9 @@ ROM_START( thunderx )
 ROM_END
 
 ROM_START( thunderxa ) /* Alternate Starting stage then the other 2 sets, Perhaps a US set? */
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-k03.k15", 0x10000, 0x10000, CRC(276817ad) SHA1(34b1beecf2a4c54dd7cd150c5d83b44f67be288a) )
-	ROM_LOAD( "873-k02.k13", 0x20000, 0x08000, CRC(80cc1c45) SHA1(881bc6eea94671e8c3fdb7a10b0e742b18cb7212) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-k02.k13", 0x00000, 0x10000, CRC(80cc1c45) SHA1(881bc6eea94671e8c3fdb7a10b0e742b18cb7212) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-k03.k15", 0x10000, 0x10000, CRC(276817ad) SHA1(34b1beecf2a4c54dd7cd150c5d83b44f67be288a) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-h01.f8",    0x0000, 0x8000, CRC(990b7a7c) SHA1(0965e7350c6006a9652cea0f24d836b4979910fd) )
@@ -892,10 +891,9 @@ ROM_START( thunderxa ) /* Alternate Starting stage then the other 2 sets, Perhap
 ROM_END
 
 ROM_START( thunderxb ) /* Set had no labels, same starting stage as parent set */
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-03.k15", 0x10000, 0x10000, CRC(36680a4e) SHA1(9b3b6bf75a9c04e764448cd958277bd081cc4a53) )
-	ROM_LOAD( "873-02.k13", 0x20000, 0x08000, CRC(c58b2c34) SHA1(4050d2edc579ffedba3d40782a08e43ac89b1b86) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-02.k13", 0x00000, 0x10000, CRC(c58b2c34) SHA1(4050d2edc579ffedba3d40782a08e43ac89b1b86) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-03.k15", 0x10000, 0x10000, CRC(36680a4e) SHA1(9b3b6bf75a9c04e764448cd958277bd081cc4a53) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
@@ -925,10 +923,9 @@ ROM_START( thunderxb ) /* Set had no labels, same starting stage as parent set *
 ROM_END
 
 ROM_START( thunderxj )
-	ROM_REGION( 0x28000, "maincpu", 0 ) /* ROMs + banked RAM */
-	ROM_LOAD( "873-n03.k15", 0x10000, 0x10000, CRC(a01e2e3e) SHA1(eba0d95dc0c5eed18743a96e4bbda5e60d5d9c97) )
-	ROM_LOAD( "873-n02.k13", 0x20000, 0x08000, CRC(55afa2cc) SHA1(5fb9df0c7c7c0c2029dbe0f3c1e0340234a03e8a) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "873-n02.k13", 0x00000, 0x10000, CRC(55afa2cc) SHA1(5fb9df0c7c7c0c2029dbe0f3c1e0340234a03e8a) )   /* banked + fixed ROM */
+	ROM_LOAD( "873-n03.k15", 0x10000, 0x10000, CRC(a01e2e3e) SHA1(eba0d95dc0c5eed18743a96e4bbda5e60d5d9c97) )   /* banked ROM */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
@@ -957,6 +954,77 @@ ROM_START( thunderxj )
 	ROM_LOAD( "873a08.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) )    /* priority encoder (not used) */
 ROM_END
 
+ROM_START( gbusters )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "878n02.k13", 0x00000, 0x10000, CRC(51697aaa) SHA1(1e6461e2e5e871d44085623a890158a4c1c4c404) )   /* banked + fixed ROM */
+	ROM_LOAD( "878j03.k15", 0x10000, 0x10000, CRC(3943a065) SHA1(6b0863f4182e6c973adfaa618f096bd4cc9b7b6d) )   /* banked ROM */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
+
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
+	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
+
+	ROM_REGION( 0x80000, "k051960", 0 )     /* sprites */
+	ROM_LOAD32_WORD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) )
+	ROM_LOAD32_WORD( "878c06.k5", 0x00002, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) )
+
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
+	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "878a09.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) ) /* priority encoder (not used) */
+ROM_END
+
+ROM_START( gbustersa )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "878_02.k13", 0x00000, 0x10000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version leter */
+	ROM_LOAD( "878_03.k15", 0x10000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version leter */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
+
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
+	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
+
+	ROM_REGION( 0x80000, "k051960", 0 )     /* sprites */
+	ROM_LOAD32_WORD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) )
+	ROM_LOAD32_WORD( "878c06.k5", 0x00002, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) )
+
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
+	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "878a09.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) ) /* priority encoder (not used) */
+ROM_END
+
+ROM_START( crazycop )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
+	ROM_LOAD( "878m02.k13", 0x00000, 0x10000, CRC(9c1c9f52) SHA1(7a60ad20aac92da8258b43b04f8c7f27bb71f1df) )   /* banked + fixed ROM */
+	ROM_LOAD( "878j03.k15", 0x10000, 0x10000, CRC(3943a065) SHA1(6b0863f4182e6c973adfaa618f096bd4cc9b7b6d) )   /* banked ROM */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
+
+	ROM_REGION( 0x80000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "878c07.h27", 0x00000, 0x40000, CRC(eeed912c) SHA1(b2e27610b38f3fc9c2cdad600b03c8bae4fb9138) )
+	ROM_LOAD32_WORD( "878c08.k27", 0x00002, 0x40000, CRC(4d14626d) SHA1(226b1d83fb82586302be0a67737a427475856537) )
+
+	ROM_REGION( 0x80000, "k051960", 0 )     /* sprites */
+	ROM_LOAD32_WORD( "878c05.h5", 0x00000, 0x40000, CRC(01f4aea5) SHA1(124123823be6bd597805484539d821aaaadde2c0) )
+	ROM_LOAD32_WORD( "878c06.k5", 0x00002, 0x40000, CRC(edfaaaaf) SHA1(67468c4ce47e8d43d58de8d3b50b048c66508156) )
+
+	ROM_REGION( 0x40000, "k007232", 0 ) /* samples for 007232 */
+	ROM_LOAD( "878c04.d5",  0x00000, 0x40000, CRC(9e982d1c) SHA1(a5b611c67b0f2ac50c679707931ee12ebbf72ebe) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "878a09.f20",   0x0000, 0x0100, CRC(e2d09a1b) SHA1(a9651e137486b2df367c39eb43f52d0833589e87) ) /* priority encoder (not used) */
+ROM_END
+
+
+
 /***************************************************************************/
 
 GAME( 1988, scontra,   0,        scontra,  scontra, driver_device,  0, ROT90, "Konami", "Super Contra", GAME_SUPPORTS_SAVE )
@@ -965,3 +1033,6 @@ GAME( 1988, thunderx,  0,        thunderx, thunderx, driver_device, 0, ROT0,  "K
 GAME( 1988, thunderxa, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, thunderxb, thunderx, thunderx, thunderx, driver_device, 0, ROT0,  "Konami", "Thunder Cross (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, driver_device, 0, ROT0,  "Konami", "Thunder Cross (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, gbusters,  0,        gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 1)", GAME_SUPPORTS_SAVE ) /* N02 & J03 program roms */
+GAME( 1988, gbustersa, gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Gang Busters (set 2)", GAME_SUPPORTS_SAVE ) /* unknown region program roms */
+GAME( 1988, crazycop,  gbusters, gbusters, gbusters, driver_device, 0, ROT90, "Konami", "Crazy Cop (Japan)", GAME_SUPPORTS_SAVE )    /* M02 & J03 program roms */

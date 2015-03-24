@@ -889,6 +889,12 @@ ROM_START( cops )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "cops_sys.dat", 0x0000, 0x8000, CRC(0060e5d0) SHA1(b8c9f6fde6a315e33fa7946e5d3bb4ea2fbe76a8) )
+
+	DISK_REGION( "audiocd" )
+		DISK_IMAGE_READONLY( "copscd", 0, NO_DUMP )
+
+	DISK_REGION( "laserdisc" )
+		DISK_IMAGE_READONLY( "cops", 0, NO_DUMP )
 ROM_END
 
 ROM_START( copsuk )
@@ -897,6 +903,12 @@ ROM_START( copsuk )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "cops_sys.dat", 0x0000, 0x8000, CRC(0060e5d0) SHA1(b8c9f6fde6a315e33fa7946e5d3bb4ea2fbe76a8) )
+
+	DISK_REGION( "audiocd" )
+		DISK_IMAGE_READONLY( "copscd", 0, NO_DUMP )
+
+	DISK_REGION( "laserdisc" )
+		DISK_IMAGE_READONLY( "cops", 0, NO_DUMP )
 ROM_END
 
 ROM_START( revlatns )
@@ -905,6 +917,9 @@ ROM_START( revlatns )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "revelations_sys.bin", 0x0000, 0x8000, CRC(43e5e3ec) SHA1(fa44b102b5aa7ad2421c575abdc67f1c29f23bc1) )
+
+	DISK_REGION( "laserdisc" )
+		DISK_IMAGE_READONLY( "revlatns", 0, NO_DUMP )
 ROM_END
 
 

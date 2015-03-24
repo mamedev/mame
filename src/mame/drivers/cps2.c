@@ -474,6 +474,32 @@ Notes:
                                   and C only. Both FlashROMs are located on the same side of the SIMM.
 
 
+Q-Sound Amp board
+
+CAPCOM CPB-001A
+|--------------------|
+| B Rch Lch          |
+|                    |
+|      IC1           |
+|                    |
+| IC3      IC2       |
+|                    |
+|                    |
+|                    |
+|                    |
+|       ||||         |
+|--------------------|
+
+Notes:
+      2 RCA cables from A-board CN L/R go in at the top. The audio goes through
+      Mitsumi MM1326 series "Q Expander" ICs responsible for creating the 3D stereo
+      effect. The 4-pin connector at the bottom goes to the cabinet speakers.
+
+      IC1 - don't know yet which chip is which
+      IC2 - "
+      IC3 - "
+
+
 Communication Board
 
 TOURNAMENT CAPCOM 93656D-3

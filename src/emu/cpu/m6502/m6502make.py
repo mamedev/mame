@@ -15,7 +15,8 @@ def load_opcodes(fname):
     logging.info("load_opcodes: %s", fname)
     try:
         f = open(fname, "rU")
-    except Exception, err:
+    except Exception:
+        err = sys.exc_info()[1]
         logging.error("cannot read opcodes file %s [%s]", fname, err)
         sys.exit(1)
 
@@ -37,7 +38,8 @@ def load_disp(fname):
     states = []
     try:
         f = open(fname, "rU")
-    except Exception, err:
+    except Exception:
+        err = sys.exc_info()[1]
         logging.error("cannot read display file %s [%s]", fname, err)
         sys.exit(1)
     for line in f:
@@ -66,7 +68,7 @@ FULL_EAT_ALL="""\
 """
 
 FULL_MEMORY="""\
-\tif(icount == 0) { inst_substate = %(substate)s; return; }
+\tif(icount <= 0) { inst_substate = %(substate)s; return; }
 %(ins)s
 \ticount--;
 """
@@ -95,7 +97,7 @@ case %(substate)s:;
 """
 
 PARTIAL_MEMORY="""\
-\tif(icount == 0) { inst_substate = %(substate)s; return; }
+\tif(icount <= 0) { inst_substate = %(substate)s; return; }
 case %(substate)s:
 %(ins)s
 \ticount--;
@@ -226,7 +228,8 @@ def save(fname, device, opcodes, states):
     logging.info("saving: %s", fname)
     try:
         f = open(fname, "w")
-    except Exception, err:
+    except Exception:
+        err = sys.exc_info()[1]
         logging.error("cannot write file %s [%s]", fname, err)
         sys.exit(1)
     save_opcodes(f,device, opcodes)

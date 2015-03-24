@@ -124,7 +124,6 @@ public:
 	{
 		UINT16 latch_horz;
 		UINT16 latch_vert;
-		UINT16 current_horz;
 		UINT16 current_vert;
 		UINT8 last_visible_line;
 		UINT8 interlace_count;
@@ -250,7 +249,9 @@ public:
 	inline void draw_blend(UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens);
 	void refresh_scanline(bitmap_rgb32 &bitmap, UINT16 curline);
 
-	void latch_counters();
+	inline INT16 current_x() { return m_screen->hpos() / m_htmult; }
+	inline INT16 current_y() { return m_screen->vpos(); }
+	void set_latch_hv(INT16 x, INT16 y);
 	void dynamic_res_change();
 	inline UINT32 get_vram_address();
 	UINT8 dbg_video(UINT16 curline);

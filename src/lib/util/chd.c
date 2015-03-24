@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "chd.h"
 #include "avhuff.h"
 #include "hashing.h"
@@ -2664,6 +2666,11 @@ void chd_file_compressor::async_read()
 
 		// advance the read pointer
 		m_read_done_offset += numbytes;
+	}
+	catch (chd_error& err)
+	{
+		fprintf(stderr, "CHD error occured: %s\n", chd_file::error_string(err));
+		m_read_error = true;
 	}
 	catch (std::exception& ex)
 	{

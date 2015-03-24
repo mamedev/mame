@@ -160,7 +160,7 @@ protected:
 	virtual void verror(pstring msg, int line_num, pstring line);
 private:
 
-	double eval_param(const token_t tok);
+	nl_double eval_param(const token_t tok);
 
 	token_id_t m_tok_param_left;
 	token_id_t m_tok_param_right;

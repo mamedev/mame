@@ -166,7 +166,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 HIGHWAYMAN's notes:
 
-after adding the mechanized attack u.s. roms i suspect that there is more than just a few bytes changed ;-)
+after adding the mechanized attack u.s. roms I suspect that there is more than just a few bytes changed ;-)
 
 
 RansAckeR's notes:
@@ -236,6 +236,12 @@ Country :
 
 
 /******************************************************************************/
+
+void bbusters_state::machine_start()
+{
+	save_item(NAME(m_sound_status));
+	save_item(NAME(m_gun_select));
+}
 
 READ16_MEMBER(bbusters_state::sound_status_r)
 {
@@ -321,13 +327,13 @@ READ16_MEMBER(bbusters_state::mechatt_gun_r)
 static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_SHARE("videoram")
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(video_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM     /* service mode */
 	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x0a9000, 0x0affff) AM_RAM     /* service mode */
-	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbusters_pf1_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_SHARE("pf2_data")
+	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(pf1_w) AM_SHARE("pf1_data")
+	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(pf2_w) AM_SHARE("pf2_data")
 	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM     /* service mode */
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
 	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
@@ -351,12 +357,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x000000, 0x06ffff) AM_ROM
 	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_SHARE("videoram")
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(video_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITENOP
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf1_w) AM_SHARE("pf1_data")
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(pf1_w) AM_SHARE("pf1_data")
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_SHARE("pf2_data")
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(pf2_w) AM_SHARE("pf2_data")
 	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
@@ -638,12 +644,6 @@ static GFXDECODE_START( mechatt )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,   768, 16 )
 GFXDECODE_END
 
-/******************************************************************************/
-
-WRITE_LINE_MEMBER(bbusters_state::sound_irq)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /******************************************************************************/
 
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(bbusters_state, sound_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -727,7 +727,7 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(bbusters_state, sound_irq))
+	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1018,10 +1018,10 @@ ROM_END
 /******************************************************************************/
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
-GAME( 1989, bbusters, 0,        bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1989, bbustersu,bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, bbusters, 0,        bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1989, mechatt,  0,        mechatt,  mechatt,  driver_device, 0, ROT0,  "SNK", "Mechanized Attack (World)", 0 )
-GAME( 1989, mechattj, mechatt,  mechatt,  mechattj, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (Japan)", 0 )
-GAME( 1989, mechattu, mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US)", 0 )
-GAME( 1989, mechattu1,mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", 0 )
+GAME( 1989, mechatt,  0,        mechatt,  mechatt,  driver_device, 0, ROT0,  "SNK", "Mechanized Attack (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mechattj, mechatt,  mechatt,  mechattj, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mechattu, mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mechattu1,mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US, Version 1, Single Player)", GAME_SUPPORTS_SAVE )

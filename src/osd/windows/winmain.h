@@ -6,8 +6,12 @@
 //
 //============================================================
 
+#ifndef __WINDOWS_WINMAIN_H__
+#define __WINDOWS_WINMAIN_H__
+
 #include "clifront.h"
 #include "osdepend.h"
+#include "modules/lib/osdobj_common.h"
 
 
 //============================================================
@@ -23,14 +27,10 @@
 #define WINOPTION_PROFILE               "profile"
 
 // video options
-#define WINOPTION_PRESCALE              "prescale"
 #define WINOPTION_MENU                  "menu"
 
 // DirectDraw-specific options
 #define WINOPTION_HWSTRETCH             "hwstretch"
-
-// Direct3D-specific options
-#define WINOPTION_FILTER                "filter"
 
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE               "hlsl_enable"
@@ -113,7 +113,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class windows_options : public cli_options
+class windows_options : public osd_options
 {
 public:
 	// construction/destruction
@@ -128,14 +128,10 @@ public:
 	int profile() const { return int_value(WINOPTION_PROFILE); }
 
 	// video options
-	int prescale() const { return int_value(WINOPTION_PRESCALE); }
 	bool menu() const { return bool_value(WINOPTION_MENU); }
 
 	// DirectDraw-specific options
 	bool hwstretch() const { return bool_value(WINOPTION_HWSTRETCH); }
-
-	// Direct3D-specific options
-	bool filter() const { return bool_value(WINOPTION_FILTER); }
 
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
@@ -234,11 +230,11 @@ private:
 //  TYPE DEFINITIONS
 //============================================================
 
-class windows_osd_interface : public osd_interface
+class windows_osd_interface : public osd_common_t
 {
 public:
 	// construction/destruction
-	windows_osd_interface();
+	windows_osd_interface(windows_options &options);
 	virtual ~windows_osd_interface();
 
 	// general overridables
@@ -251,14 +247,7 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
-	// font overridables
-	virtual osd_font font_open(const char *name, int &height);
-	virtual void font_close(osd_font font);
-	virtual bool font_get_bitmap(osd_font font, unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
-
 	virtual void video_register();
-	virtual void sound_register();
-	virtual void debugger_register();
 
 	virtual bool video_init();
 	virtual bool window_init();
@@ -266,20 +255,19 @@ public:
 	virtual void input_pause();
 	virtual void input_resume();
 	virtual bool output_init();
-	#ifdef USE_NETWORK
-	virtual bool network_init();
-	#endif
 
 	virtual void video_exit();
 	virtual void window_exit();
 	virtual void input_exit();
 	virtual void output_exit();
-	#ifdef USE_NETWORK
-	virtual void network_exit();
-	#endif
+
+	void extract_video_config();
+
+	windows_options &options() { return m_options; }
 
 private:
 	void osd_exit();
+	windows_options &m_options;
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };
@@ -304,3 +292,5 @@ extern int osd_num_processors;
 // use this to ping the watchdog
 void winmain_watchdog_ping(void);
 void winmain_dump_stack();
+
+#endif

@@ -56,16 +56,16 @@ TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_1){ get_tile_info(tileinfo, ti
 TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
 TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
 
-inline void fuuki16_state::fuuki16_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
+inline void fuuki16_state::vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
 {
 	COMBINE_DATA(&m_vram[_N_][offset]);
 	m_tilemap[_N_]->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_0_w){ fuuki16_vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_1_w){ fuuki16_vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_2_w){ fuuki16_vram_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(offset, data, mem_mask, 3); }
+WRITE16_MEMBER(fuuki16_state::vram_0_w){ vram_w(offset, data, mem_mask, 0); }
+WRITE16_MEMBER(fuuki16_state::vram_1_w){ vram_w(offset, data, mem_mask, 1); }
+WRITE16_MEMBER(fuuki16_state::vram_2_w){ vram_w(offset, data, mem_mask, 2); }
+WRITE16_MEMBER(fuuki16_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -112,7 +112,7 @@ void fuuki16_state::video_start()
 
                                 Screen Drawing
 
-    Video Registers (fuuki16_vregs):
+    Video Registers (vregs):
 
         00.w        Layer 0 Scroll Y
         02.w        Layer 0 Scroll X
@@ -127,13 +127,13 @@ void fuuki16_state::video_start()
         1c.w        Trigger a level 5 irq on this raster line
         1e.w        ? $3390/$3393 (Flip Screen Off/On), $0040 is buffer for tilemap 2 or 3
 
-    Priority Register (fuuki16_priority):
+    Priority Register (priority):
 
         fedc ba98 7654 3---
         ---- ---- ---- -210     Layer Order
 
 
-    Unknown Registers (fuuki16_unknown):
+    Unknown Registers (unknown):
 
         00.w        ? $0200/$0201   (Flip Screen Off/On)
         02.w        ? $f300/$0330
@@ -141,7 +141,7 @@ void fuuki16_state::video_start()
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-void fuuki16_state::fuuki16_draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
+void fuuki16_state::draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
 	int buffer = (m_vregs[0x1e / 2] & 0x40);
 
@@ -157,7 +157,7 @@ void fuuki16_state::fuuki16_draw_layer( screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
-UINT32 fuuki16_state::screen_update_fuuki16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 fuuki16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 layer0_scrollx, layer0_scrolly;
 	UINT16 layer1_scrollx, layer1_scrolly;
@@ -208,15 +208,15 @@ UINT32 fuuki16_state::screen_update_fuuki16(screen_device &screen, bitmap_ind16 
 	/* The backmost tilemap decides the background color(s) but sprites can
 	   go below the opaque pixels of that tilemap. We thus need to mark the
 	   transparent pixels of this layer with a different priority value */
-//  fuuki16_draw_layer(machine(), bitmap, cliprect, tm_back, TILEMAP_DRAW_OPAQUE, 0);
+//  draw_layer(screen, bitmap, cliprect, tm_back, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Actually, bg colour is simply the last pen i.e. 0x1fff -pjp */
 	bitmap.fill((0x800 * 4) - 1, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	fuuki16_draw_layer(screen, bitmap, cliprect, tm_back,   0, 1);
-	fuuki16_draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
-	fuuki16_draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
+	draw_layer(screen, bitmap, cliprect, tm_back,   0, 1);
+	draw_layer(screen, bitmap, cliprect, tm_middle, 0, 2);
+	draw_layer(screen, bitmap, cliprect, tm_front,  0, 4);
 
 	m_fuukivid->draw_sprites(screen, bitmap, cliprect, flip_screen(), 0);
 

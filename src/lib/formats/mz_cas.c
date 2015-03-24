@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 #include "mz_cas.h"
 
 #ifndef VERBOSE

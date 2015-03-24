@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <new>
+#include <assert.h>
 #include "zippath.h"
 #include "unzip.h"
 #include "corestr.h"

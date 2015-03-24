@@ -209,7 +209,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
 			if ( supported_screen_heights[i] != m_current_screen_height )
 			{
 				m_current_screen_height = supported_screen_heights[i];
-//              machine.first_screen()->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * m_current_screen_height );
+//              m_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * m_current_screen_height );
 			}
 		}
 	}
@@ -226,7 +226,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 			if ( supported_screen_heights[i] != m_current_screen_height )
 			{
 				m_current_screen_height = supported_screen_heights[i];
-//              machine.first_screen()->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * m_current_screen_height );
+//              m_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * m_current_screen_height );
 			}
 		}
 	}
@@ -316,6 +316,8 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
 	m_maincpu->reset();
+
+	save_item(NAME(m_current_screen_height));
 }
 
 
@@ -541,5 +543,5 @@ ROM_END
 #define rom_a2600p rom_a2600
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME */
-CONS( 1977, a2600,  0,      0,      a2600,  a2600, driver_device,   0,      "Atari",    "Atari 2600 (NTSC)" , 0)
-CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, driver_device,   0,      "Atari",    "Atari 2600 (PAL)",   0)
+CONS( 1977, a2600,  0,      0,      a2600,  a2600, driver_device,   0,      "Atari",    "Atari 2600 (NTSC)" , GAME_SUPPORTS_SAVE )
+CONS( 1978, a2600p, a2600,  0,      a2600p, a2600, driver_device,   0,      "Atari",    "Atari 2600 (PAL)",   GAME_SUPPORTS_SAVE )

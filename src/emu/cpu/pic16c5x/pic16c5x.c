@@ -110,10 +110,17 @@ pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type
 		, ( ( program_width == 9 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_9) : ( ( program_width == 10 ) ? ADDRESS_MAP_NAME(pic16c5x_rom_10) : ADDRESS_MAP_NAME(pic16c5x_rom_11) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_width, 0
 		, ( ( data_width == 5 ) ? ADDRESS_MAP_NAME(pic16c5x_ram_5) : ADDRESS_MAP_NAME(pic16c5x_ram_7) ) )
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5, 0)
 	, m_reset_vector((program_width == 9) ? 0x1ff : ((program_width == 10) ? 0x3ff : 0x7ff))
 	, m_picmodel(picmodel)
+	, m_temp_config(0)
 	, m_picRAMmask((data_width == 5) ? 0x1f : 0x7f)
+	, m_read_a(*this)
+	, m_read_b(*this)
+	, m_read_c(*this)
+	, m_write_a(*this)
+	, m_write_b(*this)
+	, m_write_c(*this)
+	, m_read_t0(*this)
 {
 }
 
@@ -161,17 +168,10 @@ void pic16c5x_device::update_internalram_ptr()
 #define PIC16C5x_RDOP(A)         (m_direct->read_decrypted_word((A)<<1))
 #define PIC16C5x_RAM_RDMEM(A)    ((UINT8)m_data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (m_data->write_byte(A,V))
-#define PIC16C5x_In(Port)        ((UINT8)m_io->read_byte((Port)))
-#define PIC16C5x_Out(Port,Value) (m_io->write_byte((Port),Value))
-/************  Read the state of the T0 Clock input signal  ************/
-#define PIC16C5x_T0_In           (m_io->read_byte(PIC16C5x_T0))
 
 #define M_RDRAM(A)      (((A) < 8) ? m_internalram[A] : PIC16C5x_RAM_RDMEM(A))
 #define M_WRTRAM(A,V)   do { if ((A) < 8) m_internalram[A] = (V); else PIC16C5x_RAM_WRMEM(A,V); } while (0)
 #define M_RDOP(A)       PIC16C5x_RDOP(A)
-#define P_IN(A)         PIC16C5x_In(A)
-#define P_OUT(A,V)      PIC16C5x_Out(A,V)
-#define S_T0_IN         PIC16C5x_T0_In
 #define ADDR_MASK       0x7ff
 
 
@@ -332,17 +332,17 @@ UINT8 pic16c5x_device::GET_REGFILE(offs_t addr) /* Read from internal memory */
 					break;
 		case 04:    data = (FSR | (UINT8)(~m_picRAMmask));
 					break;
-		case 05:    data = P_IN(0);
+		case 05:    data = m_read_a(PIC16C5x_PORTA, 0xff);
 					data &= m_TRISA;
 					data |= ((UINT8)(~m_TRISA) & PORTA);
 					data &= 0x0f;       /* 4-bit port (only lower 4 bits used) */
 					break;
-		case 06:    data = P_IN(1);
+		case 06:    data = m_read_b(PIC16C5x_PORTB, 0xff);
 					data &= m_TRISB;
 					data |= ((UINT8)(~m_TRISB) & PORTB);
 					break;
 		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
-						data = P_IN(2);
+						data = m_read_c(PIC16C5x_PORTC, 0xff);
 						data &= m_TRISC;
 						data |= ((UINT8)(~m_TRISC) & PORTC);
 					}
@@ -384,12 +384,14 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, UINT8 data)    /* Write to inte
 		case 04:    FSR = (data | (UINT8)(~m_picRAMmask));
 					break;
 		case 05:    data &= 0x0f;       /* 4-bit port (only lower 4 bits used) */
-					P_OUT(0,data & (UINT8)(~m_TRISA)); PORTA = data;
+					m_write_a(PIC16C5x_PORTA, data & (UINT8)(~m_TRISA), 0xff);
+					PORTA = data;
 					break;
-		case 06:    P_OUT(1,data & (UINT8)(~m_TRISB)); PORTB = data;
+		case 06:    m_write_b(PIC16C5x_PORTB, data & (UINT8)(~m_TRISB), 0xff);
+					PORTB = data;
 					break;
 		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
-						P_OUT(2,data & (UINT8)(~m_TRISC));
+						m_write_c(PIC16C5x_PORTC, data & (UINT8)(~m_TRISC), 0xff);
 						PORTC = data;
 					}
 					else {      /* PIC16C54, PIC16C56, PIC16C58 */
@@ -665,12 +667,12 @@ void pic16c5x_device::tris()
 	switch(m_opcode.b.l & 0x7)
 	{
 		case 05:    if   (m_TRISA == m_W) break;
-					else { m_TRISA = m_W | 0xf0; P_OUT(0,PORTA & (UINT8)(~m_TRISA) & 0x0f); break; }
+					else { m_TRISA = m_W | 0xf0; m_write_a(PIC16C5x_PORTA, PORTA & (UINT8)(~m_TRISA) & 0x0f, 0xff); break; }
 		case 06:    if   (m_TRISB == m_W) break;
-					else { m_TRISB = m_W; P_OUT(1,PORTB & (UINT8)(~m_TRISB)); break; }
+					else { m_TRISB = m_W; m_write_b(PIC16C5x_PORTB, PORTB & (UINT8)(~m_TRISB), 0xff); break; }
 		case 07:    if ((m_picmodel == 0x16C55) || (m_picmodel == 0x16C57)) {
 						if   (m_TRISC == m_W) break;
-						else { m_TRISC = m_W; P_OUT(2,PORTC & (UINT8)(~m_TRISC)); break; }
+						else { m_TRISC = m_W; m_write_c(PIC16C5x_PORTC, PORTC & (UINT8)(~m_TRISC), 0xff); break; }
 					}
 					else {
 						illegal(); break;
@@ -783,12 +785,28 @@ const pic16c5x_device::pic16c5x_opcode pic16c5x_device::s_opcode_00x[16]=
  *  Inits CPU emulation
  ****************************************************************************/
 
+enum
+{
+	PIC16C5x_PC=1, PIC16C5x_STK0, PIC16C5x_STK1, PIC16C5x_FSR,
+	PIC16C5x_W,    PIC16C5x_ALU,  PIC16C5x_STR,  PIC16C5x_OPT,
+	PIC16C5x_TMR0, PIC16C5x_PRTA, PIC16C5x_PRTB, PIC16C5x_PRTC,
+	PIC16C5x_WDT,  PIC16C5x_TRSA, PIC16C5x_TRSB, PIC16C5x_TRSC,
+	PIC16C5x_PSCL
+};
+
 void pic16c5x_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	
+	m_read_a.resolve_safe(0);
+	m_read_b.resolve_safe(0);
+	m_read_c.resolve_safe(0);
+	m_write_a.resolve_safe();
+	m_write_b.resolve_safe();
+	m_write_c.resolve_safe();
+	m_read_t0.resolve_safe(0);
 
 	/* ensure the internal ram pointers are set before get_info is called */
 	update_internalram_ptr();
@@ -955,10 +973,10 @@ void pic16c5x_device::pic16c5x_soft_reset()
 	pic16c5x_reset_regs();
 }
 
-void pic16c5x_device::pic16c5x_set_config(int data)
+void pic16c5x_device::pic16c5x_set_config(UINT16 data)
 {
 	logerror("Writing %04x to the PIC16C5x config register\n",data);
-	m_temp_config = (data & 0xfff);
+	m_temp_config = data;
 }
 
 
@@ -1071,8 +1089,7 @@ void pic16c5x_device::execute_run()
 			}
 
 			if (T0CS) {                     /* Count mode */
-				T0_in = S_T0_IN;
-				if (T0_in) T0_in = 1;
+				T0_in = m_read_t0() ? 1 : 0;
 				if (T0SE) {                 /* Count falling edge T0 input */
 					if (FALLING_EDGE_T0) {
 						pic16c5x_update_timer(1);

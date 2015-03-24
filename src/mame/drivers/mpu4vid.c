@@ -277,8 +277,7 @@ public:
 	DECLARE_MACHINE_START(mpu4_vid);
 	DECLARE_MACHINE_RESET(mpu4_vid);
 	DECLARE_VIDEO_START(mpu4_vid);
-	UINT32 screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
+	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
@@ -297,6 +296,8 @@ public:
 	DECLARE_WRITE8_MEMBER( vidcharacteriser_w );
 	DECLARE_READ8_MEMBER( vidcharacteriser_r );
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
+	DECLARE_WRITE8_MEMBER( vram_w );
+	DECLARE_READ8_MEMBER( vram_r );
 };
 
 /*************************************
@@ -324,7 +325,6 @@ WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
 {
 	m_videocpu->set_input_line(1, m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_videocpu->set_input_line(2, m_m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	m_videocpu->set_input_line(3, m_scn2674->get_irq_state() ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */
@@ -384,55 +384,30 @@ static const gfx_layout mpu4_vid_char_8x8_layout =
 	8*32
 };
 
-
-/* double height */
-static const gfx_layout mpu4_vid_char_8x16_layout =
+WRITE8_MEMBER(mpu4vid_state::vram_w)
 {
-	8,16,
-	0x1000, /* 0x1000 tiles (128k of GFX RAM, 0x20 bytes per tile) */
-	4,
-	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*32, 0*32, 1*32, 1*32, 2*32, 2*32, 3*32, 3*32, 4*32, 4*32, 5*32, 5*32, 6*32, 6*32, 7*32, 7*32},
-	8*32
-};
+	m_vid_mainram[offset] = data | (m_vid_mainram[offset] & 0xff00);
+}
 
-
-/* double width */
-static const gfx_layout mpu4_vid_char_16x8_layout =
+READ8_MEMBER(mpu4vid_state::vram_r)
 {
-	16,8,
-	0x1000, /* 0x1000 tiles (128k of GFX RAM, 0x20 bytes per tile) */
-	4,
-	{ 0,8,16,24 },
-	{ 0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32},
-	8*32
-};
+	return m_vid_mainram[offset];
+}
 
+static ADDRESS_MAP_START( mpu4_vram, AS_0, 8, mpu4vid_state )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(vram_r, vram_w)
+ADDRESS_MAP_END
 
-/* double height & width */
-static const gfx_layout mpu4_vid_char_16x16_layout =
+SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 {
-	16,16,
-	0x1000,  /* 0x1000 tiles (128k of GFX RAM, 0x20 bytes per tile) */
-	4,
-	{ 0,8,16,24 },
-	{ 0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7 },
-	{ 0*32, 0*32, 1*32, 1*32, 2*32, 2*32, 3*32, 3*32, 4*32, 4*32, 5*32, 5*32, 6*32, 6*32, 7*32, 7*32},
-	8*32
-};
-
-
-
-
-UINT32 mpu4vid_state::screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	m_scn2674->scn2574_draw(machine(), bitmap, cliprect, m_vid_mainram );
-
-	return 0;
+	if(!lg)
+	{
+		UINT16 tile = m_vid_mainram[address & 0x7fff];
+		const UINT8 *line = m_gfxdecode->gfx(m_gfx_index+0)->get_data(tile & 0xfff);
+		int offset = m_gfxdecode->gfx(m_gfx_index+0)->rowbytes() * linecount;
+		for(int i = 0; i < 8; i++)
+			bitmap.pix32(y, x + i) = (tile >> 12) ? m_palette->pen(line[offset + i]) : m_palette->black_pen();
+	}
 }
 
 
@@ -447,17 +422,11 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 	COMBINE_DATA(&m_vid_vidram[offset]);
 	offset <<= 1;
 	m_gfxdecode->gfx(m_gfx_index+0)->mark_dirty(offset/0x20);
-	m_gfxdecode->gfx(m_gfx_index+1)->mark_dirty(offset/0x20);
-	m_gfxdecode->gfx(m_gfx_index+2)->mark_dirty(offset/0x20);
-	m_gfxdecode->gfx(m_gfx_index+3)->mark_dirty(offset/0x20);
 }
 
 
 VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 {
-	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
-	  All Barcrest stuff uses 8x8, son unless the BwB is different, we don't need to */
-
 	m_vid_vidram.allocate(0x20000/2);
 
 	memset(m_vid_vidram,0,0x20000);
@@ -471,13 +440,6 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(m_gfx_index+0, global_alloc(gfx_element(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+1, global_alloc(gfx_element(m_palette, mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+2, global_alloc(gfx_element(m_palette, mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
-	m_gfxdecode->set_gfx(m_gfx_index+3, global_alloc(gfx_element(m_palette, mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0)));
-
-	m_scn2674->init_stuff();
-
-
 }
 
 
@@ -1283,13 +1245,13 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
@@ -1303,11 +1265,11 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM /* The Mating Game has an extra 256kB RAM on the program card */
 //  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
@@ -1325,13 +1287,13 @@ static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
 //  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
@@ -1343,13 +1305,13 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
 	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, mpu4_vid_scn2674_r, mpu4_vid_scn2674_w,0x00ff)
+	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
@@ -1383,12 +1345,6 @@ ADDRESS_MAP_END
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mpu4vid_state::scanline_timer_callback)
-{
-	m_scn2674->scn2674_do_scanline(machine(), param);
-}
-
-
 static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
@@ -1403,13 +1359,16 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, (63*8)+(0)-1, 0, (37*8)+0-1)
 
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DRIVER(mpu4vid_state, screen_update_mpu4_vid)
+	MCFG_SCREEN_UPDATE_DEVICE("scn2674_vid", scn2674_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 
-	MCFG_SCN2674_VIDEO_ADD("scn2674_vid", 0, WRITELINE(mpu4vid_state, update_mpu68_interrupts));
-	MCFG_SCN2674_GFXDECODE("gfxdecode")
-	MCFG_SCN2674_PALETTE("palette")
+	MCFG_SCN2674_VIDEO_ADD("scn2674_vid", 0, INPUTLINE("video", 3))
+	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, mpu4_vram)
+
 
 	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
 	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
@@ -1444,9 +1403,6 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_rxd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_dcd))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
-
-	// for the video timing
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", mpu4vid_state, scanline_timer_callback, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )

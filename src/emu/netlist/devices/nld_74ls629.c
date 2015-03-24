@@ -49,9 +49,9 @@ NETLIB_START(SN74LS629clk)
 
 	reset();
 
-	save(NAME(m_enableq));
-	save(NAME(m_inc));
-	save(NAME(m_out));
+	save(NLNAME(m_enableq));
+	save(NLNAME(m_inc));
+	save(NLNAME(m_out));
 }
 
 NETLIB_RESET(SN74LS629clk)
@@ -104,22 +104,22 @@ NETLIB_UPDATE(SN74LS629)
 {
 	{
 		// recompute
-		double  freq;
-		double  v_freq_2, v_freq_3, v_freq_4;
-		double  v_freq = INPANALOG(m_FC);
-		double  v_rng = INPANALOG(m_RNG);
+		nl_double  freq;
+		nl_double  v_freq_2, v_freq_3, v_freq_4;
+		nl_double  v_freq = INPANALOG(m_FC);
+		nl_double  v_rng = INPANALOG(m_RNG);
 
 		/* coefficients */
-		const double k1 = 1.9904769024796283E+03;
-		const double k2 = 1.2070059213983407E+03;
-		const double k3 = 1.3266985579561108E+03;
-		const double k4 = -1.5500979825922698E+02;
-		const double k5 = 2.8184536266938172E+00;
-		const double k6 = -2.3503421582744556E+02;
-		const double k7 = -3.3836786704527788E+02;
-		const double k8 = -1.3569136703258670E+02;
-		const double k9 = 2.9914575453819188E+00;
-		const double k10 = 1.6855569086173170E+00;
+		const nl_double k1 = 1.9904769024796283E+03;
+		const nl_double k2 = 1.2070059213983407E+03;
+		const nl_double k3 = 1.3266985579561108E+03;
+		const nl_double k4 = -1.5500979825922698E+02;
+		const nl_double k5 = 2.8184536266938172E+00;
+		const nl_double k6 = -2.3503421582744556E+02;
+		const nl_double k7 = -3.3836786704527788E+02;
+		const nl_double k8 = -1.3569136703258670E+02;
+		const nl_double k9 = 2.9914575453819188E+00;
+		const nl_double k10 = 1.6855569086173170E+00;
 
 		/* scale due to input resistance */
 

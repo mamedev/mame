@@ -58,14 +58,14 @@ def runViewJedTests(tests, jedUtilApp):
     for test in tests:
         command = [jedUtilApp, "-view", test.jedFile, test.name]
         if VERBOSE:
-            print "Viewing the JED file: %s" % (test.jedFile)
-            print "Command: %s" % ((" ").join(command))
+            print("Viewing the JED file: %s" % test.jedFile)
+            print("Command: %s" % " ".join(command))
 
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdout,stderr) = process.communicate()
         
         if stderr:
-            print "Error: JED test named " + test.name + " failed during viewing (" + stderr.strip() + ")."
+            print("Error: JED test named " + test.name + " failed during viewing (" + stderr.decode('latin-1').strip() + ").")
 
         fp = open(test.outputFile, "wb")
         fp.write(stdout)
@@ -84,12 +84,12 @@ def main():
     else:		
         jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "jedutil"))
 
-    if (VERBOSE):
-        print "JED Path:      %s" % jedsPath
-        print "Baseline Path: %s" % baselinePath
-        print "Output Path:   %s" % outputPath
-        print "jedutil App:   %s" % jedUtilApp
-        print
+    if VERBOSE:
+        print("JED Path:      %s" % jedsPath)
+        print("Baseline Path: %s" % baselinePath)
+        print("Output Path:   %s" % outputPath)
+        print("jedutil App:   %s" % jedUtilApp)
+        print('')
 
 
     # Insure everything exists
@@ -97,21 +97,21 @@ def main():
         not os.path.exists(jedsPath) or
         not os.path.exists(baselinePath) or
         not os.path.exists(jedUtilApp)):
-        print "One of the above paths does not exist.  Aborting. %s" % jedUtilApp
+        print("One of the above paths does not exist.  Aborting. %s" % jedUtilApp)
         return 3
 
 
     # Gather the tests
     tests = findJedTests(jedsPath, baselinePath, outputPath)
     if not len(tests):
-        print "No tests found!"
+        print("No tests found!")
         return 2
 
 
     # Setup the output paths
-    if (VERBOSE):
-        print "Cleaning the output directory"
-        print
+    if VERBOSE:
+        print("Cleaning the output directory")
+        print('')
     if os.path.exists(outputPath):
         shutil.rmtree(outputPath)
     os.makedirs(outputPath)
@@ -129,15 +129,15 @@ def main():
     success = True
     for test in tests:
         if VERBOSE:
-            print "Diffing the output from viewing the JED file: %s" % os.path.basename(test.jedFile)
+            print("Diffing the output from viewing the JED file: %s" % os.path.basename(test.jedFile))
         if not filecmp.cmp(test.outputFile, test.baselineFile):
             success = False
-            print "Test %s failed" % os.path.basename(test.jedFile)
+            print("Test %s failed" % os.path.basename(test.jedFile))
 
 
     # Report
     if success:
-        print "All tests ran successfully."
+        print("All tests ran successfully.")
         return 0
 
 

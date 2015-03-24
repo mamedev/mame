@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_bg_tile_info)
 	{
 		color = ((int)rand()) & 0x0f;
 	}
-	if (attr&0x80)  //al the roofs of all buildings have this bit set. What's this ???
+	if (attr&0x80)  //all the roofs of all buildings have this bit set. What's this ???
 	{
 		color = ((int)rand()) & 0x0f;
 	}
@@ -82,8 +82,10 @@ void tankbust_state::video_start()
 	/* scrollable */
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tankbust_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-
 	m_txt_tilemap->set_transparent_pen(0);
+	
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
 }
 
 
@@ -93,39 +95,25 @@ void tankbust_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tankbust_state::tankbust_background_videoram_w)
+WRITE8_MEMBER(tankbust_state::background_videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
-READ8_MEMBER(tankbust_state::tankbust_background_videoram_r)
-{
-	return m_videoram[offset];
-}
 
-WRITE8_MEMBER(tankbust_state::tankbust_background_colorram_w)
+WRITE8_MEMBER(tankbust_state::background_colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
-READ8_MEMBER(tankbust_state::tankbust_background_colorram_r)
-{
-	return m_colorram[offset];
-}
 
-WRITE8_MEMBER(tankbust_state::tankbust_txtram_w)
+WRITE8_MEMBER(tankbust_state::txtram_w)
 {
 	m_txtram[offset] = data;
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
-READ8_MEMBER(tankbust_state::tankbust_txtram_r)
-{
-	return m_txtram[offset];
-}
 
-
-
-WRITE8_MEMBER(tankbust_state::tankbust_xscroll_w)
+WRITE8_MEMBER(tankbust_state::xscroll_w)
 {
 	if( m_xscroll[offset] != data )
 	{
@@ -141,7 +129,7 @@ WRITE8_MEMBER(tankbust_state::tankbust_xscroll_w)
 }
 
 
-WRITE8_MEMBER(tankbust_state::tankbust_yscroll_w)
+WRITE8_MEMBER(tankbust_state::yscroll_w)
 {
 	if( m_yscroll[offset] != data )
 	{
@@ -178,19 +166,16 @@ spriteram format (4 bytes per sprite):
 
 void tankbust_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy;
 
-		code  = spriteram[offs+0] & 0x3f;
-		flipy = spriteram[offs+0] & 0x40;
-		flipx = spriteram[offs+0] & 0x80;
+		code  = m_spriteram[offs+0] & 0x3f;
+		flipy = m_spriteram[offs+0] & 0x40;
+		flipx = m_spriteram[offs+0] & 0x80;
 
-		sy = (240- spriteram[offs+1]) - 14;
-		sx = (spriteram[offs+2] & 0x01) * 256 + spriteram[offs+3] - 7;
+		sy = (240- m_spriteram[offs+1]) - 14;
+		sx = (m_spriteram[offs+2] & 0x01) * 256 + m_spriteram[offs+3] - 7;
 
 		color = 0;
 
@@ -202,13 +187,13 @@ void tankbust_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		//0x40 - not used
 		//0x80 - not used
 #if 0
-		if ((spriteram[offs+2] & 0x02))
+		if ((m_spriteram[offs+2] & 0x02))
 		{
 			code = ((int)rand()) & 63;
 		}
 #endif
 
-		if ((spriteram[offs+1]!=4)) //otherwise - ghost sprites
+		if ((m_spriteram[offs+1]!=4)) //otherwise - ghost sprites
 		{
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				code, color,
@@ -219,12 +204,10 @@ void tankbust_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 tankbust_state::screen_update_tankbust(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tankbust_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #if 0
-	int i;
-
-	for (i=0; i<0x800; i++)
+	for (int i=0; i<0x800; i++)
 	{
 		int tile_attrib = m_colorram[i];
 

@@ -5,6 +5,7 @@
 
 #include "pstring.h"
 #include <cstdio>
+#include <stdlib.h>
 
 
 // The following will work on linux, however not on Windows ....
@@ -13,7 +14,6 @@
 //pstring::str_t *pstring::m_zero = new(pstring::m_pool, 0) pstring::str_t(0);
 
 pblockpool pstring::m_pool;
-
 pstring::str_t pstring::m_zero;
 
 /*
@@ -108,9 +108,9 @@ int pstring::pcmpi(const char *lhs, const char *rhs, int count) const
 	return 1;
 }
 
-double pstring::as_double(bool *error) const
+nl_double pstring::as_double(bool *error) const
 {
-	double ret;
+	nl_double ret;
 	char *e = NULL;
 
 	if (error != NULL)
@@ -124,7 +124,7 @@ double pstring::as_double(bool *error) const
 
 long pstring::as_long(bool *error) const
 {
-	double ret;
+	nl_double ret;
 	char *e = NULL;
 
 	if (error != NULL)

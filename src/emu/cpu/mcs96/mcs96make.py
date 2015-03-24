@@ -58,8 +58,8 @@ class Macro:
             values.append(tokens[i])
         for i in range(0, len(self.source)):
             line = self.source[i]
-            for i in range(0, len(self.params)):
-                line = line.replace(self.params[i], values[i])
+            for j in range(0, len(self.params)):
+                line = line.replace(self.params[j], values[j])
             target.add_source_line(line)
 
 class OpcodeList:
@@ -70,11 +70,12 @@ class OpcodeList:
         self.macros = {}
         try:
             f = open(fname, "rU")
-        except Exception, err:
-            print "Cannot read opcodes file %s [%s]" % (fname, err)
+        except Exception:
+            err = sys.exc_info()[1]
+            sys.stderr.write("Cannot read opcodes file %s [%s]\n" % (fname, err))
             sys.exit(1)
 
-        opc = None
+        inf = None
         for line in f:
             if line.startswith("#"):
                 continue
@@ -152,12 +153,12 @@ class OpcodeList:
             opc = None
             if i >= 0x100 and i-0x100+0xfe00 in self.opcode_per_id:
                 opc = self.opcode_per_id[i-0x100+0xfe00]
-            if opc == None and (i & 0xff) in self.opcode_per_id:
+            if opc is None and (i & 0xff) in self.opcode_per_id:
                 opc = self.opcode_per_id[i & 0xff]
-            if opc != None:
+            if opc is not None:
                 nm = opc.name + "_" + opc.amode
                 if opc.is_196:
-                    nm = nm + "_196"
+                    nm += "_196"
                 print >>f, "\tcase 0x%03x: %s_full(); break;" % (i, nm)
         print >>f, "\tcase 0x200: fetch_full(); break;"
         print >>f, "\tcase 0x201: fetch_noirq_full(); break;"
@@ -174,8 +175,9 @@ def main(argv):
     
     try:
         f = open(argv[3], "w")
-    except Exception, err:
-        logging.error("cannot write file %s [%s]", fname, err)
+    except Exception:
+        err = sys.exc_info()[1]
+        sys.stderr.write("cannot write file %s [%s]\n" % (argv[3], err))
         sys.exit(1)
     
     if t != "mcs96":

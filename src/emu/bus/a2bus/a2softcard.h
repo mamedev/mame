@@ -44,7 +44,6 @@ protected:
 private:
 	bool m_bEnabled;
 	bool m_FirstZ80Boot;
-	address_space *m_6502space;
 };
 
 // device type definition

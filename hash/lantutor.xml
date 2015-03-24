@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="lantutor" description="Language Tutor modules">
+
+
+	<software name="french">
+		<description>French</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="lantutor">
+			<dataarea name="rom" size="0x10000">
+				<rom name="cd2327.vsm" size="0x4000" crc="207aa27d" sha1="e5012c48b20f9b49a00f6fe8ee5719df1cbf04b4" offset="0x0000" />
+				<rom name="cd2328.vsm" size="0x4000" crc="768980d0" sha1="085ba873c83d25790b090a9a8797183c6664d03c" offset="0x4000" />
+				<rom name="cd2329.vsm" size="0x4000" crc="c8583a4b" sha1="3a4f2e42b4ab63e5bfdbd98eb40706f940491015" offset="0x8000" />
+				<rom name="cd2330.vsm" size="0x4000" crc="52ac969f" sha1="3a9e3db62f2ef3aedd5f4cd4bd21dccecfecf02f" offset="0xc000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="german">
+		<description>German</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="lantutor">
+			<dataarea name="rom" size="0x10000">
+				<rom name="cd2331.vsm" size="0x4000" crc="a1e9290b" sha1="1163f7695e0727c6058684ea7f7c52d432f3fb7c" offset="0x0000" />
+				<rom name="cd2332.vsm" size="0x4000" crc="b8ef4eed" sha1="0eccd98c81498caa166f7164c9563ef95412ffd7" offset="0x4000" />
+				<rom name="cd2333.vsm" size="0x4000" crc="c989eaf2" sha1="26e644523b318cefb0fe46c7886cd0746afa438c" offset="0x8000" />
+				<rom name="cd2334.vsm" size="0x4000" crc="54bbb9c8" sha1="32fb22397b2cd30490cecf3d978a24b4def389db" offset="0xc000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spanish">
+		<description>Spanish</description>
+		<year>1979</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="cart" interface="lantutor">
+			<dataarea name="rom" size="0x10000">
+<!--            <rom name="cd2315.vsm" size="0x4000" crc="" sha1="" offset="0x0000" /> -->
+<!--            <rom name="cd2316.vsm" size="0x4000" crc="" sha1="" offset="0x4000" /> -->
+				<rom name="cd2317.vsm" size="0x4000" crc="53231c0b" sha1="472117c3d0e28437fa8faa054f98088e06efc2a1" offset="0x8000" />
+				<rom name="cd2318.vsm" size="0x4000" crc="6c0727bc" sha1="132e39755b122f2cbec6f3e767f5d256a9c1e7ae" offset="0xc000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

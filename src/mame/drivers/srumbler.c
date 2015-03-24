@@ -17,7 +17,7 @@
 #include "includes/srumbler.h"
 
 
-WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
+WRITE8_MEMBER(srumbler_state::bankswitch_w)
 {
 	/*
 	  banking is controlled by two PROMs. 0000-4fff is mapped to the same
@@ -27,30 +27,34 @@ WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
 	  Note that 5000-8fff can be either ROM or RAM, so we should handle
 	  that as well to be 100% accurate.
 	 */
-	int i;
-	UINT8 *ROM = memregion("user1")->base();
 	UINT8 *prom1 = memregion("proms")->base() + (data & 0xf0);
 	UINT8 *prom2 = memregion("proms")->base() + 0x100 + ((data & 0x0f) << 4);
 
-	for (i = 0x05;i < 0x10;i++)
+	for (int i = 0x05;i < 0x10;i++)
 	{
+        /* bit 2 of prom1 selects ROM or RAM - not supported */
 		int bank = ((prom1[i] & 0x03) << 4) | (prom2[i] & 0x0f);
-		char bankname[10];
-		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
+        char bankname[10];
 		sprintf(bankname, "%04x", i*0x1000);
-		membank(bankname)->set_base(&ROM[bank*0x1000]);
+        membank(bankname)->set_entry(bank);
 	}
 }
 
 void srumbler_state::machine_start()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	/* initialize banked ROM pointers */
-	srumbler_bankswitch_w(space,0,0);
+    for (int i = 0x05; i < 0x10; i++)
+	{
+        char bankname[10];
+		sprintf(bankname, "%04x", i*0x1000);
+        membank(bankname)->configure_entries(0, 64, memregion("user1")->base(), 0x1000);
+	}
+
+    /* initialize banked ROM pointers */
+	bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::srumbler_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::interrupt)
 {
 	int scanline = param;
 
@@ -74,17 +78,17 @@ Ignore the warnings about writing to unmapped memory.
 static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM  /* RAM (of 1 sort or another) */
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(srumbler_background_w) AM_SHARE("backgroundram")
-	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE(srumbler_bankswitch_w)
-	AM_RANGE(0x4009, 0x4009) AM_READ_PORT("P1") AM_WRITE(srumbler_4009_w)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(background_w) AM_SHARE("backgroundram")
+	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE(bankswitch_w)
+	AM_RANGE(0x4009, 0x4009) AM_READ_PORT("P1") AM_WRITE(_4009_w)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("P2")
 	AM_RANGE(0x400b, 0x400b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x400c, 0x400c) AM_READ_PORT("DSW2")
-	AM_RANGE(0x400a, 0x400d) AM_WRITE(srumbler_scroll_w)
+	AM_RANGE(0x400a, 0x400d) AM_WRITE(scroll_w)
 	AM_RANGE(0x400e, 0x400e) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000") AM_WRITE(srumbler_foreground_w) AM_SHARE("foregroundram") /* Banked ROM */
+	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000") AM_WRITE(foreground_w) AM_SHARE("foregroundram") /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000") /* Banked ROM */
-	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP    /* Video RAM 2 ??? (not used) */
+	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP        /* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000") /* Banked ROM */
 	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000") /* Banked ROM */
@@ -238,7 +242,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(srumbler_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, srumbler_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(srumbler_sound_map)
@@ -253,7 +257,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8, (64-10)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update_srumbler)
+	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -460,7 +464,7 @@ ROM_END
 
 
 
-GAME( 1986, srumbler,  0,        srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", 0 )
-GAME( 1986, srumbler2, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", 0 )
-GAME( 1986, srumbler3, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", 0 )
-GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "Rush & Crash (Japan)", 0 )
+GAME( 1986, srumbler,  0,        srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, srumbler2, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, srumbler3, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "Rush & Crash (Japan)", GAME_SUPPORTS_SAVE )

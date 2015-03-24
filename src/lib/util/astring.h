@@ -32,7 +32,7 @@ public:
 	~astring();
 
 	// construction with copy
-	astring(const char *string) { init().cpy(string); }
+	astring(const char *string) { init(); if(string) cpy(string); }
 	astring(const char *string, int length) { init().cpy(string, length); }
 	astring(const char *str1, const char *str2) { init().cpy(str1).cat(str2); }
 	astring(const char *str1, const char *str2, const char *str3) { init().cpy(str1).cat(str2).cat(str3); }

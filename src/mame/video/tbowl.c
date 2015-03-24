@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,col,0);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_txvideoram_w)
+WRITE8_MEMBER(tbowl_state::txvideoram_w)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -38,28 +38,28 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1,tileno,col,0);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bg2videoram_w)
+WRITE8_MEMBER(tbowl_state::bg2videoram_w)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bgxscroll_lo)
+WRITE8_MEMBER(tbowl_state::bgxscroll_lo)
 {
 	m_xscroll = (m_xscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bgxscroll_hi)
+WRITE8_MEMBER(tbowl_state::bgxscroll_hi)
 {
 	m_xscroll = (m_xscroll & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bgyscroll_lo)
+WRITE8_MEMBER(tbowl_state::bgyscroll_lo)
 {
 	m_yscroll = (m_yscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bgyscroll_hi)
+WRITE8_MEMBER(tbowl_state::bgyscroll_hi)
 {
 	m_yscroll = (m_yscroll & 0x00ff) | (data << 8);
 }
@@ -78,28 +78,28 @@ TILE_GET_INFO_MEMBER(tbowl_state::get_bg2_tile_info)
 	SET_TILE_INFO_MEMBER(2,tileno,col,0);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bgvideoram_w)
+WRITE8_MEMBER(tbowl_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bg2xscroll_lo)
+WRITE8_MEMBER(tbowl_state::bg2xscroll_lo)
 {
 	m_bg2xscroll = (m_bg2xscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bg2xscroll_hi)
+WRITE8_MEMBER(tbowl_state::bg2xscroll_hi)
 {
 	m_bg2xscroll = (m_bg2xscroll & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bg2yscroll_lo)
+WRITE8_MEMBER(tbowl_state::bg2yscroll_lo)
 {
 	m_bg2yscroll = (m_bg2yscroll & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tbowl_state::tbowl_bg2yscroll_hi)
+WRITE8_MEMBER(tbowl_state::bg2yscroll_hi)
 {
 	m_bg2yscroll = (m_bg2yscroll & 0x00ff) | (data << 8);
 }
@@ -116,11 +116,16 @@ void tbowl_state::video_start()
 	m_tx_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg2_tilemap->set_transparent_pen(0);
+	
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	save_item(NAME(m_bg2xscroll));
+	save_item(NAME(m_bg2yscroll));
 }
 
 
 
-UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tbowl_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_xscroll );
 	m_bg_tilemap->set_scrolly(0, m_yscroll );
@@ -138,7 +143,7 @@ UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-UINT32 tbowl_state::screen_update_tbowl_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tbowl_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_xscroll+32*8 );
 	m_bg_tilemap->set_scrolly(0, m_yscroll );

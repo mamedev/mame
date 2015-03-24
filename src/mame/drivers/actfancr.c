@@ -273,32 +273,13 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE_LINE_MEMBER(actfancr_state::sound_irq)
-{
-	m_audiocpu->set_input_line(0, state); /* IRQ */
-}
-
-/******************************************************************************/
-
-MACHINE_START_MEMBER(actfancr_state,actfancr)
-{
-}
-
 MACHINE_START_MEMBER(actfancr_state,triothep)
 {
-	MACHINE_START_CALL_MEMBER(actfancr);
-
 	save_item(NAME(m_trio_control_select));
-}
-
-MACHINE_RESET_MEMBER(actfancr_state,actfancr)
-{
-	m_flipscreen = 0;
 }
 
 MACHINE_RESET_MEMBER(actfancr_state,triothep)
 {
-	MACHINE_RESET_CALL_MEMBER(actfancr);
 	m_trio_control_select = 0;
 }
 
@@ -313,9 +294,6 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 
 	MCFG_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
-
-	MCFG_MACHINE_START_OVERRIDE(actfancr_state,actfancr)
-	MCFG_MACHINE_RESET_OVERRIDE(actfancr_state,actfancr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -353,7 +331,7 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(actfancr_state, sound_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
@@ -409,7 +387,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(actfancr_state, sound_irq))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) /* verified on pcb */

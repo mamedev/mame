@@ -544,7 +544,7 @@ void ins8250_uart_device::device_start()
 	set_tra_rate(0);
 	set_rcv_rate(0);
 
-	device_serial_interface::register_save_state(machine().save(), name(), tag());
+	device_serial_interface::register_save_state(machine().save(), this);
 	save_item(NAME(m_regs.thr));
 	save_item(NAME(m_regs.rbr));
 	save_item(NAME(m_regs.ier));

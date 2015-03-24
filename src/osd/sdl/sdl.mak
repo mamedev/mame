@@ -48,8 +48,7 @@ NO_USE_XINPUT = 1
 # this will also add a rpath to the executable
 # MESA_INSTALL_ROOT = /usr/local/dfb_GL
 
-# uncomment the next line to build a binary using
-# GL-dispatching.
+# uncomment the next line to build a binary using GL-dispatching.
 # This option takes precedence over MESA_INSTALL_ROOT
 
 USE_DISPATCH_GL = 1
@@ -80,20 +79,23 @@ SDL_FRAMEWORK_PATH = /Library/Frameworks/
 # uncomment to use SDL1.2 (depracated)
 # SDL_LIBVER = sdl
 
+# uncomment to use BGFX
+
+# USE_BGFX = 1
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-# default to SDL2 for non-OS/2, non-Emscripten builds now
+# add a define identifying the target osd
+DEFS += -DOSD_SDL
+
+# default to SDL2 for non-OS/2 builds now
 ifndef SDL_LIBVER
 ifneq ($(TARGETOS),os2)
-ifneq ($(TARGETOS),emscripten)
 SDL_LIBVER = sdl2
-else
-SDL_LIBVER = sdl
-endif
 else
 SDL_LIBVER = sdl
 endif
@@ -209,8 +211,11 @@ SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
 
 ifndef NO_USE_MIDI
-INCPATH += `pkg-config --cflags alsa`
-LIBS += `pkg-config --libs alsa`
+ALSACFLAGS := $(shell pkg-config --cflags alsa)
+ALSALIBS := $(shell pkg-config --libs alsa)
+
+INCPATH += $(ALSACFLAGS)
+LIBS += $(ALSALIBS)
 endif
 
 endif
@@ -238,13 +243,16 @@ BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 LIBS += -lutil
 NO_USE_MIDI = 1
+SDL_NETWORK = pcap
 endif
 
 ifeq ($(TARGETOS),solaris)
 BASE_TARGETOS = unix
-DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
+#DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
+DEFS += -DNO_AFFINITY_NP
 SYNC_IMPLEMENTATION = tc
 NO_USE_MIDI = 1
+NO_USE_QTDEBUG = 1
 endif
 
 ifeq ($(TARGETOS),haiku)
@@ -278,7 +286,29 @@ LIBS += -framework CoreAudio -framework CoreMIDI
 endif
 
 ifdef NO_USE_QTDEBUG
-DEBUGOBJS = $(OSDOBJ)/modules/debugger/debugosx.o
+
+OBJDIRS += $(OSDOBJ)/modules/debugger/osx
+
+DEBUGOBJS = \
+	$(OSDOBJ)/modules/debugger/debugosx.o \
+	$(OSDOBJ)/modules/debugger/osx/breakpointsview.o \
+	$(OSDOBJ)/modules/debugger/osx/consoleview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugcommandhistory.o \
+	$(OSDOBJ)/modules/debugger/osx/debugconsole.o \
+	$(OSDOBJ)/modules/debugger/osx/debugview.o \
+	$(OSDOBJ)/modules/debugger/osx/debugwindowhandler.o \
+	$(OSDOBJ)/modules/debugger/osx/deviceinfoviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/devicesviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/disassemblyview.o \
+	$(OSDOBJ)/modules/debugger/osx/disassemblyviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/errorlogview.o \
+	$(OSDOBJ)/modules/debugger/osx/errorlogviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/memoryview.o \
+	$(OSDOBJ)/modules/debugger/osx/memoryviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/pointsviewer.o \
+	$(OSDOBJ)/modules/debugger/osx/registersview.o \
+	$(OSDOBJ)/modules/debugger/osx/watchpointsview.o
+
 endif
 
 SYNC_IMPLEMENTATION = ntc
@@ -331,7 +361,7 @@ SDLMAIN = $(SDLOBJ)/main.o
 # needed for unidasm
 LDFLAGS += -Wl,--allow-multiple-definition
 SDL_NETWORK = pcap
-INCPATH += -I$(SRC)/lib/winpcap
+INCPATH += -I$(3RDPARTY)/winpcap/Include
 
 # enable UNICODE
 DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
@@ -391,8 +421,15 @@ endif
 SDLSRC = $(SRC)/osd/$(OSD)
 SDLOBJ = $(OBJ)/osd/$(OSD)
 
-OBJDIRS += $(SDLOBJ) $(OSDOBJ)/modules/sync
-
+OBJDIRS += $(SDLOBJ) \
+	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/lib \
+	$(OSDOBJ)/modules/midi \
+	$(OSDOBJ)/modules/font \
+	$(OSDOBJ)/modules/netdev \
+	$(OSDOBJ)/modules/opengl \
+	$(OSDOBJ)/modules/render
+	
 #-------------------------------------------------
 # OSD core library
 #-------------------------------------------------
@@ -403,9 +440,10 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdlfile.o     \
 	$(SDLOBJ)/sdlptty_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlsocket.o   \
-	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o    \
 	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o \
-	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o
+	$(OSDOBJ)/modules/lib/osdlib_$(SDLOS_TARGETOS).o \
+	$(OSDOBJ)/modules/sync/sync_$(SYNC_IMPLEMENTATION).o \
+	$(OSDOBJ)/modules/osdmodule.o \
 
 ifdef NOASM
 OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
@@ -419,35 +457,39 @@ OSDOBJS = \
 	$(SDLMAIN) \
 	$(SDLOBJ)/sdlmain.o \
 	$(SDLOBJ)/input.o \
+	$(OSDOBJ)/modules/sound/js_sound.o  \
+	$(OSDOBJ)/modules/sound/direct_sound.o  \
 	$(OSDOBJ)/modules/sound/sdl_sound.o  \
+	$(OSDOBJ)/modules/sound/none.o  \
 	$(SDLOBJ)/video.o \
-	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \
 	$(SDLOBJ)/output.o \
 	$(SDLOBJ)/watchdog.o \
-
-ifeq ($(BASE_TARGETOS),win32)
-	OSDOBJS += $(OSDOBJ)/modules/sound/direct_sound.o
-endif
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/font/font_sdl.o \
+	$(OSDOBJ)/modules/font/font_windows.o \
+	$(OSDOBJ)/modules/font/font_osx.o \
+	$(OSDOBJ)/modules/font/font_none.o \
+	$(OSDOBJ)/modules/netdev/taptun.o \
+	$(OSDOBJ)/modules/netdev/pcap.o \
+	$(OSDOBJ)/modules/netdev/none.o \
+	$(OSDOBJ)/modules/midi/portmidi.o \
+	$(OSDOBJ)/modules/midi/none.o \
+	$(OSDOBJ)/modules/render/drawsdl.o \
 
 ifdef NO_USE_MIDI
-DEFS += -DDISABLE_MIDI=1
+	DEFS += -DNO_USE_MIDI
+else
 endif
 
 # Add SDL2.0 support
 
 ifeq ($(SDL_LIBVER),sdl2)
-OSDOBJS += $(SDLOBJ)/draw13.o
+OSDOBJS += $(OSDOBJ)/modules/render/draw13.o
 endif
 
 # add an ARCH define
 DEFS += -DSDLMAME_ARCH="$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION)
-
-# Add JavaScript sound module for Emscripten compiles
-
-ifeq ($(TARGETOS),emscripten)
-OSDOBJS += $(OSDOBJ)/modules/sound/js_sound.o
-endif
 
 #-------------------------------------------------
 # Generic defines and additions
@@ -501,6 +543,24 @@ ifeq ($(TARGETOS),macosx)
 OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 SDLOS_TARGETOS = macosx
 
+ifeq ($(TARGET),mame)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifeq ($(TARGET),mess)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifeq ($(TARGET),ume)
+MACOSX_EMBED_INFO_PLIST = 1
+endif
+ifdef MACOSX_EMBED_INFO_PLIST
+INFOPLIST = $(SDLOBJ)/$(TARGET)-Info.plist
+LDFLAGSEMULATOR += -sectcreate __TEXT __info_plist $(INFOPLIST)
+$(EMULATOR): $(INFOPLIST)
+$(INFOPLIST): $(SRC)/build/verinfo.py $(SRC)/version.c
+	@echo Emitting $@...
+	$(PYTHON) $(SRC)/build/verinfo.py -b $(TARGET) -p -o $@ $(SRC)/version.c
+endif
+
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
 ifeq ($(SDL_LIBVER),sdl2)
@@ -518,10 +578,14 @@ else
 
 # files (header files are #include "SDL/something.h", so the extra "/SDL"
 # causes a significant problem)
-INCPATH += `$(SDL_CONFIG) --cflags | sed 's:/SDL::'`
-CCOMFLAGS += -DNO_SDL_GLEXT
+SDLCFLAGS := $(shell $(SDL_CONFIG) --cflags | sed 's:/SDL::')
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
-LIBS += `$(SDL_CONFIG) --libs | sed 's/-lSDLmain//'` -lpthread -framework Cocoa -framework OpenGL
+SDLLIBS := $(shell $(SDL_CONFIG) --libs | sed 's/-lSDLmain//')
+
+INCPATH += $(SDLCFLAGS)
+CCOMFLAGS += -DNO_SDL_GLEXT
+LIBS += $(SDLLIBS) -lpthread -framework Cocoa -framework OpenGL
+BASELIBS += $(SDLLIBS) -lpthread -framework Cocoa -framework OpenGL
 DEFS += -DMACOSX_USE_LIBSDL
 endif   # MACOSX_USE_LIBSDL
 
@@ -560,14 +624,14 @@ ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
 
-# Don't pull in the system includes if we are compiling for Emscripten, which has its own headers
-ifneq ($(TARGETOS),emscripten)
-INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
-endif
-CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
+SDLINCLUDES := $(shell $(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g')
+SDLDEFINES := $(shell $(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g')
+SDLLIBS := $(shell $(SDL_CONFIG) --libs)
 
-BASELIBS += `$(SDL_CONFIG) --libs`
-LIBS += `$(SDL_CONFIG) --libs`
+INCPATH += $(SDLINCLUDES)
+CCOMFLAGS += $(SDLDEFINES)
+BASELIBS += $(SDLLIBS)
+LIBS += $(SDLLIBS)
 
 ifeq ($(SDL_LIBVER),sdl2)
 ifdef SDL_INSTALL_ROOT
@@ -576,10 +640,13 @@ INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
 endif
 endif
 
+FONTCONFIGCFLAGS := $(shell pkg-config --cflags fontconfig)
+FONTCONFIGLIBS := $(shell pkg-config --libs fontconfig)
+
 ifneq ($(TARGETOS),emscripten)
-INCPATH += `pkg-config --cflags fontconfig`
+INCPATH += $(FONTCONFIGCFLAGS)
 endif
-LIBS += `pkg-config --libs fontconfig`
+LIBS += $(FONTCONFIGLIBS)
 
 ifeq ($(SDL_LIBVER),sdl2)
 LIBS += -lSDL2_ttf
@@ -587,11 +654,21 @@ else
 LIBS += -lSDL_ttf
 endif
 
+# FIXME: should be dealt with elsewhere
 # libs that Haiku doesn't want but are mandatory on *IX
 ifneq ($(TARGETOS),haiku)
-BASELIBS += -lm -lutil -lpthread
-LIBS += -lm -lutil -lpthread
+BASELIBS += -lm -lpthread
+LIBS += -lm -lpthread
+ifneq ($(TARGETOS),solaris)
+BASELIBS += -lutil
+LIBS += -lutil
+else
+SUPPORTSM32M64 = 1
+BASELIBS += -lsocket -lnsl
+LIBS += -lsocket -lnsl
 endif
+endif
+
 
 endif # not Mac OS X
 
@@ -634,9 +711,7 @@ ifeq ($(BASE_TARGETOS),win32)
 OSDCOREOBJS += $(SDLMAIN)
 
 ifdef SDL_INSTALL_ROOT
-ifneq ($(TARGETOS),emscripten)
 INCPATH += -I$(SDL_INSTALL_ROOT)/include
-endif
 LIBS += -L$(SDL_INSTALL_ROOT)/lib
 #-Wl,-rpath,$(SDL_INSTALL_ROOT)/lib
 endif
@@ -657,10 +732,11 @@ MOC = @moc
 endif
 
 ifeq ($(SDL_LIBVER),sdl2)
-LIBS += -lSDL2 -lImm32 -lversion -lole32 -loleaut32 -static
-BASELIBS += -lImm32 -lversion -lole32 -loleaut32 -static
+LIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
+BASELIBS += -lSDL2 -limm32 -lversion -lole32 -loleaut32 -lws2_32 -static
 else
-LIBS += -lSDL -static
+LIBS += -lSDL -lws2_32 -static
+BASELIBS += -lSDL -lws2_32 -static
 endif
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 BASELIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
@@ -672,8 +748,12 @@ endif   # Win32
 
 ifeq ($(BASE_TARGETOS),os2)
 
-INCPATH += `sdl-config --cflags`
-LIBS += `sdl-config --libs` -lpthread
+SDLCFLAGS := $(shell sdl-config --cflags)
+SDLLIBS := $(shell sdl-config --libs)
+
+INCPATH += $(SDLCFLAGS)
+LIBS += $(SDLLIBS) -lpthread
+BASELIBS += $(SDLLIBS) -lpthread
 
 endif # OS2
 
@@ -683,28 +763,32 @@ endif # OS2
 
 ifndef NO_USE_QTDEBUG
 $(OSDOBJ)/%.moc.c: $(OSDSRC)/%.h
-	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
+	$(MOC) $(MOCINCPATH) $< -o $@
 
 DEBUGOBJS = \
-	$(OSDOBJ)/modules/debugger/debugqt.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtview.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtview.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtlogwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdasmwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmainwindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtmemorywindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtbreakpointswindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceswindow.moc.o \
-	$(OSDOBJ)/modules/debugger/qt/debugqtdeviceinformationwindow.moc.o
+	$(OSDOBJ)/modules/debugger/qt/debuggerview.o \
+	$(OSDOBJ)/modules/debugger/qt/windowqt.o \
+	$(OSDOBJ)/modules/debugger/qt/logwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/dasmwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/mainwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/memorywindow.o \
+	$(OSDOBJ)/modules/debugger/qt/breakpointswindow.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceswindow.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceinformationwindow.o \
+	$(OSDOBJ)/modules/debugger/qt/debuggerview.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/windowqt.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/logwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/dasmwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/mainwindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/memorywindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/breakpointswindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceswindow.moc.o \
+	$(OSDOBJ)/modules/debugger/qt/deviceinformationwindow.moc.o
+
+DEFS += -DUSE_QTDEBUG=1
+
+else
+DEFS += -DUSE_QTDEBUG=0
 endif
 
 ifeq ($(NO_DEBUGGER),1)
@@ -713,6 +797,25 @@ else
 OSDOBJS += $(DEBUGOBJS)
 endif # NO_DEBUGGER
 
+# Always add these
+OSDOBJS += \
+	$(OSDOBJ)/modules/debugger/none.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/debugger/debugwin.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o
+
+#-------------------------------------------------
+# BGFX
+#-------------------------------------------------
+
+ifdef USE_BGFX
+DEFS += -DUSE_BGFX
+OSDOBJS += $(OSDOBJ)/modules/render/drawbgfx.o
+INCPATH += -I$(3RDPARTY)/bgfx/include -I$(3RDPARTY)/bx/include
+USE_DISPATCH_GL = 0
+BGFX_LIB = $(OBJ)/libbgfx.a
+endif
+
 #-------------------------------------------------
 # OPENGL
 #-------------------------------------------------
@@ -720,7 +823,11 @@ endif # NO_DEBUGGER
 ifeq ($(NO_OPENGL),1)
 DEFS += -DUSE_OPENGL=0
 else
-OSDOBJS += $(SDLOBJ)/drawogl.o $(SDLOBJ)/gl_shader_tool.o $(SDLOBJ)/gl_shader_mgr.o
+OSDOBJS += \
+	$(OSDOBJ)/modules/render/drawogl.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
+	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
+	
 DEFS += -DUSE_OPENGL=1
 ifeq ($(USE_DISPATCH_GL),1)
 DEFS += -DUSE_DISPATCH_GL=1
@@ -753,8 +860,11 @@ endif
 
 # The newer debugger uses QT
 ifndef NO_USE_QTDEBUG
-INCPATH += `pkg-config QtGui --cflags`
-LIBS += `pkg-config QtGui --libs`
+QTCFLAGS := $(shell pkg-config --cflags QtGui)
+QTLIBS := $(shell pkg-config --libs QtGui)
+
+INCPATH += $(QTCFLAGS)
+LIBS += $(QTLIBS)
 endif
 
 # some systems still put important things in a different prefix
@@ -783,29 +893,21 @@ endif # USE_XINPUT
 # Network (TAP/TUN)
 #-------------------------------------------------
 
-OSDOBJS += $(SDLOBJ)/netdev.o
-
 ifndef DONT_USE_NETWORK
 
 ifeq ($(SDL_NETWORK),taptun)
-OSDOBJS += $(SDLOBJ)/netdev_tap.o
 
-DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_TAPTUN
+DEFS += -DSDLMAME_NET_TAPTUN
 endif
 
 ifeq ($(SDL_NETWORK),pcap)
 
-ifeq ($(TARGETOS),macosx)
-OSDOBJS += $(SDLOBJ)/netdev_pcap_osx.o
-else
-OSDOBJS += $(SDLOBJ)/netdev_pcap.o
-endif
+DEFS += -DSDLMAME_NET_PCAP
 
-DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_PCAP
-
-ifneq ($(TARGETOS),win32)
-LIBS += -lpcap
-endif
+# dynamically linked ...
+#ifneq ($(TARGETOS),win32)
+#LIBS += -lpcap
+#endif
 
 endif # ifeq ($(SDL_NETWORK),pcap)
 
@@ -829,10 +931,10 @@ $(OBJ)/emu/video/tms9927.o : CCOMFLAGS += -Wno-error
 endif # solaris
 
 # drawSDL depends on the core software renderer, so make sure it exists
-$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.inc $(SDLSRC)/drawogl.c
+$(OSDOBJ)/modules/render/drawsdl.o : $(SRC)/emu/rendersw.inc $(OSDSRC)/modules/render/drawogl.c
 
 # draw13 depends on blit13.h
-$(SDLOBJ)/draw13.o : $(SDLSRC)/blit13.h
+$(OSDOBJ)/modules/render/draw13.o : $(OSDSRC)/modules/render/blit13.h
 
 #$(OSDCOREOBJS): $(SDLSRC)/sdl.mak
 
@@ -849,7 +951,7 @@ $(LIBOSD): $(OSDOBJS)
 #-------------------------------------------------
 
 TOOLS += \
-	testkeys$(EXE)
+	$(BIN)testkeys$(EXE)
 
 $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 	@echo Compiling $<...
@@ -858,7 +960,7 @@ $(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c
 TESTKEYSOBJS = \
 	$(SDLOBJ)/testkeys.o \
 
-testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
+$(BIN)testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(BASELIBS) -o $@
 

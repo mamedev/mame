@@ -6,6 +6,8 @@
 
 ****************************************************************************/
 
+#include <assert.h>
+
 #include "osdcore.h"
 #include "corefile.h"
 #include "chdcd.h"
@@ -87,6 +89,7 @@ const int MODE_GDI = 2;
 #define OPTION_VERBOSE "verbose"
 #define OPTION_FIX "fix"
 #define OPTION_NUMPROCESSORS "numprocessors"
+#define OPTION_SIZE "size"
 
 
 //**************************************************************************
@@ -528,6 +531,7 @@ static const option_description s_options[] =
 	{ OPTION_NO_CHECKSUM,           "nocs", false, ": do not include this metadata information in the overall SHA-1" },
 	{ OPTION_FIX,                   "f",    false, ": fix the SHA-1 if it is incorrect" },
 	{ OPTION_VERBOSE,               "v",    false, ": output additional information" },
+	{ OPTION_SIZE,                  "s",    true, ": <bytes>: size of the output file" },
 };
 
 
@@ -579,6 +583,7 @@ static const command_description s_commands[] =
 			OPTION_COMPRESSION,
 			OPTION_IDENT,
 			OPTION_CHS,
+			OPTION_SIZE,
 			OPTION_SECTOR_SIZE,
 			OPTION_NUMPROCESSORS
 		}
@@ -900,11 +905,6 @@ static void guess_chs(astring *filename, UINT64 filesize, int sectorsize, UINT32
 	// if we have no length to work with, we can't guess
 	if (filesize == 0)
 		report_error(1, "Can't guess CHS values because there is no input file");
-
-	// validate the size
-	if (filesize % sectorsize != 0)
-		report_error(1, "Can't guess CHS values because data size is not divisible by %d", sectorsize);
-	;
 
 	// now find a valid value
 	for (UINT32 totalsectors = filesize / sectorsize; ; totalsectors++)
@@ -1687,10 +1687,23 @@ static void do_create_hd(parameters_t &params)
 	parse_hunk_size(params, sector_size, hunk_size);
 
 	// process input start/end (needs to know hunk_size)
+	UINT64 filesize = 0;
 	UINT64 input_start = 0;
 	UINT64 input_end = 0;
 	if (input_file != NULL)
+	{
 		parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
+		filesize = input_end - input_start;
+	}
+	else
+	{
+		astring *size_str = params.find(OPTION_SIZE);
+		if (size_str != NULL)
+		{
+			if (sscanf(*size_str, "%" I64FMT"d", &filesize) != 1)
+				report_error(1, "Invalid size string");
+		}
+	}
 
 	// process compression
 	chd_codec_type compression[4];
@@ -1747,12 +1760,16 @@ static void do_create_hd(parameters_t &params)
 			report_error(1, "Error parsing hard disk metadata in parent CHD");
 	}
 
+	// validate the size
+	if (filesize % sector_size != 0)
+		report_error(1, "Data size is not divisible by sector size %d", sector_size);
+
 	// if no CHS values, try to guess them
 	if (cylinders == 0)
 	{
-		if (input_file == NULL && input_end - input_start == 0)
+		if (input_file == NULL && filesize == 0)
 			report_error(1, "Blank hard drives must specify either a length or a set of CHS values");
-		guess_chs(input_file_str, input_end - input_start, sector_size, cylinders, heads, sectors, sector_size);
+		guess_chs(input_file_str, filesize, sector_size, cylinders, heads, sectors, sector_size);
 	}
 	UINT32 totalsectors = cylinders * heads * sectors;
 
@@ -1767,7 +1784,7 @@ static void do_create_hd(parameters_t &params)
 		if (input_start != 0 || input_end != core_fsize(input_file))
 		{
 			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
-			printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
+			printf("Input length: %s\n", big_int_string(tempstr, filesize));
 		}
 	}
 	printf("Compression:  %s\n", compression_string(tempstr, compression));
@@ -2573,7 +2590,10 @@ static void do_extract_ld(parameters_t &params)
 			// read the hunk into the buffers
 			chd_error err = input_chd.read_hunk(framenum, NULL);
 			if (err != CHDERR_NONE)
-				report_error(1, "Error reading hunk %" I64FMT "d from CHD file (%s): %s\n", framenum, params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
+			{
+				UINT64 filepos = core_ftell(input_chd);
+				report_error(1, "Error reading hunk %" I64FMT "d at offset %" I64FMT "d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->cstr(), chd_file::error_string(err));
+			}
 
 			// write audio
 			for (int chnum = 0; chnum < channels; chnum++)
@@ -2908,8 +2928,14 @@ int CLIB_DECL main(int argc, char *argv[])
 				(*s_commands[cmdnum].handler)(parameters);
 				return 0;
 			}
+			catch (chd_error &err)
+			{
+				fprintf(stderr, "CHD error occured (main): %s\n", chd_file::error_string(err));
+				return 1;
+			}
 			catch (fatal_error &err)
 			{
+				fprintf(stderr, "Fatal error occured: %d\n", err.error());
 				return err.error();
 			}
 			catch (std::exception& ex)

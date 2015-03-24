@@ -86,7 +86,7 @@ bool sdl_osd_interface::output_init()
 		output = fdopen(fildes, "w");
 
 		osd_printf_verbose("output: opened output notifier file %s\n", SDLMAME_OUTPUT);
-		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), machine().system().name);
+		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), this->machine().system().name);
 		fflush(output);
 	}
 

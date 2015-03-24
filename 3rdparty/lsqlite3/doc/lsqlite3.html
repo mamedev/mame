@@ -1,0 +1,893 @@
+<HTML>
+<HEAD>
+<TITLE>LuaSQLite 3</TITLE>
+<LINK REV="made" HREF="mailto:unknown@du216771.users">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#overview">OVERVIEW</A></LI>
+	<LI><A HREF="#download">DOWNLOAD</A></LI>
+	<LI><A HREF="#installation">INSTALLATION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#verification tests">VERIFICATION TESTS</A></LI>
+	<LI><A HREF="#reference">REFERENCE</A></LI>
+	<LI><A HREF="#sqlite3 functions">SQLite3 functions</A></LI>
+	<UL>
+
+		<LI><A HREF="#sqlite3.complete">sqlite3.complete</A></LI>
+		<LI><A HREF="#sqlite3.open">sqlite3.open</A></LI>
+		<LI><A HREF="#sqlite3.open_memory">sqlite3.open_memory</A></LI>
+		<LI><A HREF="#sqlite3.temp_directory">sqlite3.temp_directory</A></LI>
+		<LI><A HREF="#sqlite3.version">sqlite3.version</A></LI>
+	</UL>
+
+	<LI><A HREF="#database methods">Database methods</A></LI>
+	<UL>
+
+		<LI><A HREF="#db:busy_handler">db:busy_handler</A></LI>
+		<LI><A HREF="#db:busy_timeout">db:busy_timeout</A></LI>
+		<LI><A HREF="#db:changes">db:changes</A></LI>
+		<LI><A HREF="#db:close">db:close</A></LI>
+		<LI><A HREF="#db:close_vm">db:close_vm</A></LI>
+		<LI><A HREF="#db:create_aggregate">db:create_aggregate</A></LI>
+		<LI><A HREF="#db:create_collation">db:create_collation</A></LI>
+		<LI><A HREF="#db:create_function">db:create_function</A></LI>
+		<LI><A HREF="#db:errcode">db:errcode</A></LI>
+		<LI><A HREF="#db:errmsg">db:errmsg</A></LI>
+		<LI><A HREF="#db:exec">db:exec</A></LI>
+		<LI><A HREF="#db:interrupt">db:interrupt</A></LI>
+		<LI><A HREF="#db:isopen">db:isopen</A></LI>
+		<LI><A HREF="#db:last_insert_rowid">db:last_insert_rowid</A></LI>
+		<LI><A HREF="#db:nrows">db:nrows</A></LI>
+		<LI><A HREF="#db:prepare">db:prepare</A></LI>
+		<LI><A HREF="#db:progress_handler">db:progress_handler</A></LI>
+		<LI><A HREF="#db:rows">db:rows</A></LI>
+		<LI><A HREF="#db:total_changes">db:total_changes</A></LI>
+		<LI><A HREF="#db:trace">db:trace</A></LI>
+		<LI><A HREF="#db:urows">db:urows</A></LI>
+	</UL>
+
+	<LI><A HREF="#methods for prepared statements">Methods for prepared statements</A></LI>
+	<UL>
+
+		<LI><A HREF="#stmt:bind">stmt:bind</A></LI>
+		<LI><A HREF="#stmt:bind_blob">stmt:bind_blob</A></LI>
+		<LI><A HREF="#stmt:bind_names">stmt:bind_names</A></LI>
+		<LI><A HREF="#stmt:bind_parameter_count">stmt:bind_parameter_count</A></LI>
+		<LI><A HREF="#stmt:bind_parameter_name">stmt:bind_parameter_name</A></LI>
+		<LI><A HREF="#stmt:bind_values">stmt:bind_values</A></LI>
+		<LI><A HREF="#stmt:columns">stmt:columns</A></LI>
+		<LI><A HREF="#stmt:finalize">stmt:finalize</A></LI>
+		<LI><A HREF="#stmt:get_name">stmt:get_name</A></LI>
+		<LI><A HREF="#stmt:get_named_types">stmt:get_named_types</A></LI>
+		<LI><A HREF="#stmt:get_named_values">stmt:get_named_values</A></LI>
+		<LI><A HREF="#stmt:get_names">stmt:get_names</A></LI>
+		<LI><A HREF="#stmt:get_type">stmt:get_type</A></LI>
+		<LI><A HREF="#stmt:get_types">stmt:get_types</A></LI>
+		<LI><A HREF="#stmt:get_unames">stmt:get_unames</A></LI>
+		<LI><A HREF="#stmt:get_utypes">stmt:get_utypes</A></LI>
+		<LI><A HREF="#stmt:get_uvalues">stmt:get_uvalues</A></LI>
+		<LI><A HREF="#stmt:get_value">stmt:get_value</A></LI>
+		<LI><A HREF="#stmt:get_values">stmt:get_values</A></LI>
+		<LI><A HREF="#stmt:isopen">stmt:isopen</A></LI>
+		<LI><A HREF="#stmt:nrows">stmt:nrows</A></LI>
+		<LI><A HREF="#stmt:reset">stmt:reset</A></LI>
+		<LI><A HREF="#stmt:rows">stmt:rows</A></LI>
+		<LI><A HREF="#stmt:step">stmt:step</A></LI>
+		<LI><A HREF="#stmt:urows">stmt:urows</A></LI>
+	</UL>
+
+	<LI><A HREF="#methods for callback contexts">Methods for callback contexts</A></LI>
+	<UL>
+
+		<LI><A HREF="#context:aggregate_count">context:aggregate_count</A></LI>
+		<LI><A HREF="#context:get_aggregate_data">context:get_aggregate_data</A></LI>
+		<LI><A HREF="#context:set_aggregate_data">context:set_aggregate_data</A></LI>
+		<LI><A HREF="#context:result">context:result</A></LI>
+		<LI><A HREF="#context:result_null">context:result_null</A></LI>
+		<LI><A HREF="#context:result_number">context:result_number</A></LI>
+		<LI><A HREF="#context:result_int">context:result_int</A></LI>
+		<LI><A HREF="#context:result_text">context:result_text</A></LI>
+		<LI><A HREF="#context:result_blob">context:result_blob</A></LI>
+		<LI><A HREF="#context:result_error">context:result_error</A></LI>
+		<LI><A HREF="#context:user_data">context:user_data</A></LI>
+	</UL>
+
+	<LI><A HREF="#numerical error and result codes">Numerical error and result codes</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#credits">CREDITS</A></LI>
+	<LI><A HREF="#license">LICENSE</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P><STRONG>LuaSQLite 3</STRONG> - a Lua 5.1 wrapper for the SQLite3 library</P>
+<P>
+<HR>
+<H1><A NAME="overview">OVERVIEW</A></H1>
+<P><STRONG>LuaSQLite 3</STRONG> is a thin wrapper around the public domain SQLite3
+database engine.</P>
+<P>The <CODE>lsqlite3</CODE> module supports the creation and manipulation of 
+SQLite3 databases. After a <CODE>require('lsqlite3')</CODE> the exported 
+functions are called with prefix <CODE>sqlite3</CODE>. However, most sqlite3 
+functions are called via an object-oriented interface to either 
+database or SQL statement objects; see below for details.</P>
+<P>This documentation does not attempt to describe how SQLite3 itself
+works, it just describes the Lua binding and the available functions.
+For more information about the SQL features supported by SQLite3 and
+details about the syntax of SQL statements and queries, please see the
+<STRONG>SQLite3 documentation</STRONG> <A HREF="http://www.sqlite.org/">http://www.sqlite.org/</A>. Using some of the
+advanced features (how to use callbacks, for instance) will require 
+some familiarity with the SQLite3 API.</P>
+<P>
+<HR>
+<H1><A NAME="download">DOWNLOAD</A></H1>
+<P><STRONG>LuaSQLite 3</STRONG> source code can be downloaded from its 
+LuaForge (<A HREF="http://luaforge.net/projects/luasqlite/">http://luaforge.net/projects/luasqlite/</A>) page.</P>
+<P>You will also need to build or obtain an SQLite3 loadable library 
+(DLL or .so). See <A HREF="http://www.sqlite.org/">http://www.sqlite.org/</A> for obtaining SQLite3 
+source code or downloading a binary SQLite3 library.</P>
+<P>
+<HR>
+<H1><A NAME="installation">INSTALLATION</A></H1>
+<P>A <EM>Makefile</EM> is provided; it assumes an SQLite3 library is already
+installed.</P>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>The distribution contains an <EM>examples</EM> directory. The unit tests
+also show some example use.</P>
+<P>
+<HR>
+<H1><A NAME="verification tests">VERIFICATION TESTS</A></H1>
+<P>The distribution contains some units tests using Michael Roth's
+<CODE>lunit</CODE> (which is also included). Some of the tests were also derived 
+from Michael's <STRONG>lua-sqlite3</STRONG> module, and more unit tests added by 
+Doug Currie.</P>
+<P>The distribution also contains some functional tests by Tiago.</P>
+<P>This version of <CODE>lsqlite3</CODE> was tested with SQLite 3.4.2.</P>
+<P>
+<HR>
+<H1><A NAME="reference">REFERENCE</A></H1>
+<P>
+<HR>
+<H1><A NAME="sqlite3 functions">SQLite3 functions</A></H1>
+<P>
+<H2><A NAME="sqlite3.complete">sqlite3.complete</A></H2>
+<PRE>
+        sqlite3.complete(sql)</PRE>
+<P>Returns true if the string <CODE>sql</CODE> comprises one or more complete SQL
+statements and false otherwise.</P>
+<P>
+<H2><A NAME="sqlite3.open">sqlite3.open</A></H2>
+<PRE>
+        sqlite3.open(filename)</PRE>
+<P>Opens (or creates if it does not exist) an SQLite database with name
+<CODE>filename</CODE> and returns its handle as userdata (the returned object 
+should be used for all further method calls in connection with this 
+specific database, see <A HREF="#database methods">Database methods</A>). Example:</P>
+<PRE>
+        myDB=sqlite3.open('MyDatabase.sqlite3')  -- open
+        -- do some database calls...
+        myDB:close()  -- close</PRE>
+<P>In case of an error, the function returns nil, an error code and an
+error message.</P>
+<P>
+<H2><A NAME="sqlite3.open_memory">sqlite3.open_memory</A></H2>
+<PRE>
+        sqlite3.open_memory()</PRE>
+<P>Opens an SQLite database <STRONG>in memory</STRONG> and returns its handle as
+userdata. In case of an error, the function returns nil, an error code
+and an error message. (In-memory databases are volatile as they are
+never stored on disk.)</P>
+<P>
+<H2><A NAME="sqlite3.temp_directory">sqlite3.temp_directory</A></H2>
+<PRE>
+        sqlite3.temp_directory([temp])</PRE>
+<P>Sets or queries the directory used by SQLite for temporary files. If
+string <CODE>temp</CODE> is a directory name or nil, the temporary directory is 
+set accordingly and the old value is returned. If <CODE>temp</CODE> is missing, 
+the function simply returns the current temporary directory.</P>
+<P>
+<H2><A NAME="sqlite3.version">sqlite3.version</A></H2>
+<PRE>
+        sqlite3.version()</PRE>
+<P>Returns a string with SQLite version information, in the form 'x.y[.z]'.</P>
+<P>
+<HR>
+<H1><A NAME="database methods">Database methods</A></H1>
+<P>After opening a database with <A HREF="#sqlite3.open"><CODE>sqlite3.open()</CODE></A> or 
+<A HREF="#sqlite3.open_memory"><CODE>sqlite3.open_memory()</CODE></A>
+the returned database object should be used for all further method calls
+in connection with that database. An open database object supports the
+following methods.</P>
+<P>
+<H2><A NAME="db:busy_handler">db:busy_handler</A></H2>
+<PRE>
+        db:busy_handler([func[,udata]])</PRE>
+<P>Sets or removes a busy handler for a database. <CODE>func</CODE> is either a Lua
+function that implements the busy handler or nil to remove a previously
+set handler. This function returns nothing.</P>
+<P>The handler function is called with two parameters: <CODE>udata</CODE> and the 
+number of (re-)tries for a pending transaction. It should return nil, 
+false or 0 if the transaction is to be aborted. All other values will 
+result in another attempt to perform the transaction. (See the SQLite
+documentation for important hints about writing busy handlers.)</P>
+<P>
+<H2><A NAME="db:busy_timeout">db:busy_timeout</A></H2>
+<PRE>
+        db:busy_timeout(t)</PRE>
+<P>Sets a busy handler that waits for <CODE>t</CODE> milliseconds if a transaction 
+cannot proceed. Calling this function will remove any busy handler set 
+by <A HREF="#db:busy_handler"><CODE>db:busy_handler()</CODE></A>; calling it with an argument 
+less than or equal to 0 will turn off all busy handlers.</P>
+<P>
+<H2><A NAME="db:changes">db:changes</A></H2>
+<PRE>
+        db:changes()</PRE>
+<P>This function returns the number of database rows that were changed (or
+inserted or deleted) by the most recent SQL statement. Only changes that
+are directly specified by INSERT, UPDATE, or DELETE statements are
+counted. Auxiliary changes caused by triggers are not counted. Use
+<A HREF="#db:total_changes"><CODE>db:total_changes()</CODE></A> to find the total number of 
+changes.</P>
+<P>
+<H2><A NAME="db:close">db:close</A></H2>
+<PRE>
+        db:close()</PRE>
+<P>Closes a database. All SQL statements prepared using 
+<A HREF="#db:prepare"><CODE>db:prepare()</CODE></A> should
+have been finalized before this function is called. The function returns
+<CODE>sqlite3.OK</CODE> on success or else a numerical error code (see the list of
+<A HREF="#numerical error and result codes">Numerical error and result codes</A>).</P>
+<P>
+<H2><A NAME="db:close_vm">db:close_vm</A></H2>
+<PRE>
+        db:close_vm(temponly)</PRE>
+<P>Finalizes all statements that have not been explicitly finalized. If
+<CODE>temponly</CODE> is true, only internal, temporary statements are finalized.
+This function returns nothing.</P>
+<P>
+<H2><A NAME="db:create_aggregate">db:create_aggregate</A></H2>
+<PRE>
+        db:create_aggregate(name,nargs,step,final)</PRE>
+<P>This function creates an aggregate callback function. Aggregates perform
+an operation over all rows in a query. <CODE>name</CODE> is a string with the name 
+of the aggregate function as given in an SQL statement; <CODE>nargs</CODE> is the 
+number of arguments this call will provide. <CODE>step</CODE> is the actual Lua 
+function that gets called once for every row; it should accept a function 
+context (see <A HREF="#methods for callback contexts">Methods for callback contexts</A>) plus the same number of
+parameters as given in <CODE>nargs</CODE>. <CODE>final</CODE> is a function that is called 
+once after all rows have been processed; it receives one argument, the
+function context.</P>
+<P>The function context can be used inside the two callback functions to
+communicate with SQLite3. Here is a simple example:</P>
+<PRE>
+        db:exec[=[
+          CREATE TABLE numbers(num1,num2);
+          INSERT INTO numbers VALUES(1,11);
+          INSERT INTO numbers VALUES(2,22);
+          INSERT INTO numbers VALUES(3,33);
+        ]=]
+        local num_sum=0
+        local function oneRow(context,num)  -- add one column in all rows
+          num_sum=num_sum+num
+        end
+        local function afterLast(context)   -- return sum after last row has been processed
+          context:result_number(num_sum)
+          num_sum=0
+        end
+        db:create_aggregate(&quot;do_the_sums&quot;,1,oneRow,afterLast)
+        for sum in db:urows('SELECT do_the_sums(num1) FROM numbers') do print(&quot;Sum of col 1:&quot;,sum) end
+        for sum in db:urows('SELECT do_the_sums(num2) FROM numbers') do print(&quot;Sum of col 2:&quot;,sum) end</PRE>
+<P>This prints:</P>
+<PRE>
+        Sum of col 1:   6
+        Sum of col 2:   66</PRE>
+<P>
+<H2><A NAME="db:create_collation">db:create_collation</A></H2>
+<PRE>
+        db:create_collation(name,func)</PRE>
+<P>This creates a collation callback. A collation callback is used to
+establish a collation order, mostly for string comparisons and sorting
+purposes. <CODE>name</CODE> is a string with the name of the collation to be created;
+<CODE>func</CODE> is a function that accepts two string arguments, compares them 
+and returns 0 if both strings are identical, -1 if the first argument is
+lower in the collation order than the second and 1 if the first argument
+is higher in the collation order than the second. A simple example:</P>
+<PRE>
+        local function collate(s1,s2)
+          s1=s1:lower()
+          s2=s2:lower()
+          if s1==s2 then return 0
+          elseif s1&lt;s2 then return -1
+          else return 1 end
+        end
+        db:exec[=[
+          CREATE TABLE test(id INTEGER PRIMARY KEY,content COLLATE CINSENS);
+          INSERT INTO test VALUES(NULL,'hello world');
+          INSERT INTO test VALUES(NULL,'Buenos dias');
+          INSERT INTO test VALUES(NULL,'HELLO WORLD');
+        ]=]
+        db:create_collation('CINSENS',collate)
+        for row in db:nrows('SELECT * FROM test') do print(row.id,row.content) end</PRE>
+<P>
+<H2><A NAME="db:create_function">db:create_function</A></H2>
+<PRE>
+        db:create_function(name,nargs,func)</PRE>
+<P>This function creates a callback function. Callback function are called
+by SQLite3 once for every row in a query. <CODE>name</CODE> is a string with the 
+name of the callback function as given in an SQL statement; <CODE>nargs</CODE> is 
+the number of arguments this call will provide. <CODE>func</CODE> is the actual Lua
+function that gets called once for every row; it should accept a
+function context (see <A HREF="#methods for callback contexts">Methods for callback contexts</A>) plus the same
+number of parameters as given in nargs. Here is an example:</P>
+<PRE>
+        db:exec'CREATE TABLE test(col1,col2,col3)'
+        db:exec'INSERT INTO test VALUES(1,2,4)'
+        db:exec'INSERT INTO test VALUES(2,4,9)'
+        db:exec'INSERT INTO test VALUES(3,6,16)'
+        db:create_function('sum_cols',3,function(ctx,a,b,c)
+          ctx:result_number(a+b+c)
+        end))
+        for col1,col2,col3,sum in db:urows('SELECT *,sum_cols(col1,col2,col3) FROM test') do
+          util.printf('%2i+%2i+%2i=%2i\n',col1,col2,col3,sum)
+        end</PRE>
+<P>
+<H2><A NAME="db:errcode">db:errcode</A></H2>
+<PRE>
+        db:errcode()
+        db:error_code()</PRE>
+<P>Returns the numerical result code (or extended result code) for the most
+recent failed call associated with database db. See
+<A HREF="#numerical error and result codes">Numerical error and result codes</A> for details.</P>
+<P>
+<H2><A NAME="db:errmsg">db:errmsg</A></H2>
+<PRE>
+        db:errmsg()
+        db:error_message()</PRE>
+<P>Returns a string that contains an error message for the most recent
+failed call associated with database db.</P>
+<P>
+<H2><A NAME="db:exec">db:exec</A></H2>
+<PRE>
+        db:exec(sql[,func[,udata]])
+        db:execute(sql[,func[,udata]])</PRE>
+<P>Compiles and executes the SQL <CODE>statement(s)</CODE> given in string <CODE>sql</CODE>. The
+statements are simply executed one after the other and not stored. The
+function returns <CODE>sqlite3.OK</CODE> on success or else a numerical error code
+(see <A HREF="#numerical error and result codes">Numerical error and result codes</A>).</P>
+<P>If one or more of the SQL statements are queries, then the callback
+function specified in <CODE>func</CODE> is invoked once for each row of the query
+result (if <CODE>func</CODE> is nil, no callback is invoked). The callback receives
+four arguments: <CODE>udata</CODE> (the third parameter of the <CODE>db:exec()</CODE> call), 
+the number of columns in the row, a table with the column values and 
+another table with the column names. The callback function should return 
+0. If the callback returns a non-zero value then the query is aborted, 
+all subsequent SQL statements are skipped and <CODE>db:exec()</CODE> returns
+<CODE>sqlite3.ABORT</CODE>. Here is a simple example:</P>
+<PRE>
+        sql=[=[
+          CREATE TABLE numbers(num1,num2,str);
+          INSERT INTO numbers VALUES(1,11,&quot;ABC&quot;);
+          INSERT INTO numbers VALUES(2,22,&quot;DEF&quot;);
+          INSERT INTO numbers VALUES(3,33,&quot;UVW&quot;);
+          INSERT INTO numbers VALUES(4,44,&quot;XYZ&quot;);
+          SELECT * FROM numbers;
+        ]=]
+        function showrow(udata,cols,values,names)
+          assert(udata=='test_udata')
+          print('exec:')
+          for i=1,cols do print('',names[i],values[i]) end
+          return 0
+        end
+        db:exec(sql,showrow,'test_udata')</PRE>
+<P>
+<H2><A NAME="db:interrupt">db:interrupt</A></H2>
+<PRE>
+        db:interrupt()</PRE>
+<P>This function causes any pending database operation to abort and return
+at the next opportunity. This function returns nothing.</P>
+<P>
+<H2><A NAME="db:isopen">db:isopen</A></H2>
+<PRE>
+        db:isopen()</PRE>
+<P>Returns true if database db is open, false otherwise.</P>
+<P>
+<H2><A NAME="db:last_insert_rowid">db:last_insert_rowid</A></H2>
+<PRE>
+        db:last_insert_rowid()</PRE>
+<P>This function returns the rowid of the most recent INSERT into the
+database. If no inserts have ever occurred, 0 is returned. (Each row in
+an SQLite table has a unique 64-bit signed integer key called the
+'rowid'. This id is always available as an undeclared column named
+ROWID, OID, or _ROWID_. If the table has a column of type INTEGER
+PRIMARY KEY then that column is another alias for the rowid.)</P>
+<P>If an INSERT occurs within a trigger, then the rowid of the inserted row
+is returned as long as the trigger is running. Once the trigger
+terminates, the value returned reverts to the last value inserted before
+the trigger fired.</P>
+<P>
+<H2><A NAME="db:nrows">db:nrows</A></H2>
+<PRE>
+        db:nrows(sql)</PRE>
+<P>Creates an iterator that returns the successive rows selected by the SQL
+statement given in string <CODE>sql</CODE>. Each call to the iterator returns a 
+table in which the named fields correspond to the columns in the database.
+Here is an example:</P>
+<PRE>
+        db:exec[=[
+          CREATE TABLE numbers(num1,num2);
+          INSERT INTO numbers VALUES(1,11);
+          INSERT INTO numbers VALUES(2,22);
+          INSERT INTO numbers VALUES(3,33);
+        ]=]
+        for a in db:nrows('SELECT * FROM numbers') do table.print(a) end</PRE>
+<P>This script prints:</P>
+<PRE>
+        num2: 11
+        num1: 1
+        num2: 22
+        num1: 2
+        num2: 33
+        num1: 3</PRE>
+<P>
+<H2><A NAME="db:prepare">db:prepare</A></H2>
+<PRE>
+        db:prepare(sql)</PRE>
+<P>This function compiles the SQL statement in string <CODE>sql</CODE> into an internal
+representation and returns this as userdata. The returned object should
+be used for all further method calls in connection with this specific
+SQL statement (see <A HREF="#methods for prepared statements">Methods for prepared statements</A>).</P>
+<P>
+<H2><A NAME="db:progress_handler">db:progress_handler</A></H2>
+<PRE>
+        db:progress_handler(n,func,udata)</PRE>
+<P>This function installs a callback function <CODE>func</CODE> that is invoked
+periodically during long-running calls to <A HREF="#db:exec"><CODE>db:exec()</CODE></A>
+or <A HREF="#stmt:step"><CODE>stmt:step()</CODE></A>. The
+progress callback is invoked once for every <CODE>n</CODE> internal operations, 
+where <CODE>n</CODE> is the first argument to this function. <CODE>udata</CODE> is passed to 
+the progress callback function each time it is invoked. If a call to
+<CODE>db:exec()</CODE> or <CODE>stmt:step()</CODE> results in fewer than <CODE>n</CODE> operations 
+being executed, then the progress callback is never invoked. Only a 
+single progress callback function may be registered for each opened 
+database and a call to this function will overwrite any previously set 
+callback function. To remove the progress callback altogether, pass nil 
+as the second argument.</P>
+<P>If the progress callback returns a result other than 0, then the current
+query is immediately terminated, any database changes are rolled back
+and the containing <CODE>db:exec()</CODE> or <CODE>stmt:step()</CODE> call returns
+<CODE>sqlite3.INTERRUPT</CODE>. This feature can be used to cancel long-running
+queries.</P>
+<P>
+<H2><A NAME="db:rows">db:rows</A></H2>
+<PRE>
+        db:rows(sql)</PRE>
+<P>Creates an iterator that returns the successive rows selected by the SQL
+statement given in string <CODE>sql</CODE>. Each call to the iterator returns a table
+in which the numerical indices 1 to n correspond to the selected columns
+1 to n in the database. Here is an example:</P>
+<PRE>
+        db:exec[=[
+          CREATE TABLE numbers(num1,num2);
+          INSERT INTO numbers VALUES(1,11);
+          INSERT INTO numbers VALUES(2,22);
+          INSERT INTO numbers VALUES(3,33);
+        ]=]
+        for a in db:rows('SELECT * FROM numbers') do table.print(a) end</PRE>
+<P>This script prints:</P>
+<PRE>
+        1: 1
+        2: 11
+        1: 2
+        2: 22
+        1: 3
+        2: 33</PRE>
+<P>
+<H2><A NAME="db:total_changes">db:total_changes</A></H2>
+<PRE>
+        db:total_changes()</PRE>
+<P>This function returns the number of database rows that have been
+modified by INSERT, UPDATE or DELETE statements since the database was
+opened. This includes UPDATE, INSERT and DELETE statements executed as
+part of trigger programs. All changes are counted as soon as the
+statement that produces them is completed by calling either 
+<A HREF="#stmt:reset"><CODE>stmt:reset()</CODE></A> or <A HREF="#stmt:finalize"><CODE>stmt:finalize()</CODE></A>.</P>
+<P>
+<H2><A NAME="db:trace">db:trace</A></H2>
+<PRE>
+        db:trace(func,udata)</PRE>
+<P>This function installs a trace callback handler. <CODE>func</CODE> is a Lua
+function that is called by SQLite3 just before the evaluation of an SQL
+statement. This callback receives two arguments: the first is the 
+<CODE>udata</CODE> argument used when the callback was installed; the second is a 
+string with the SQL statement about to be executed.</P>
+<P>
+<H2><A NAME="db:urows">db:urows</A></H2>
+<PRE>
+        db:urows(sql)</PRE>
+<P>Creates an iterator that returns the successive rows selected by the SQL
+statement given in string <CODE>sql</CODE>. Each call to the iterator returns the
+values that correspond to the columns in the currently selected row.
+Here is an example:</P>
+<PRE>
+        db:exec[=[
+          CREATE TABLE numbers(num1,num2);
+          INSERT INTO numbers VALUES(1,11);
+          INSERT INTO numbers VALUES(2,22);
+          INSERT INTO numbers VALUES(3,33);
+        ]=]
+        for num1,num2 in db:urows('SELECT * FROM numbers') do print(num1,num2) end</PRE>
+<P>This script prints:</P>
+<PRE>
+        1       11
+        2       22
+        3       33</PRE>
+<P>
+<HR>
+<H1><A NAME="methods for prepared statements">Methods for prepared statements</A></H1>
+<P>After creating a prepared statement with <A HREF="#db:prepare"><CODE>db:prepare()</CODE></A> 
+the returned statement object should be used for all further calls in 
+connection with that statement. Statement objects support the following 
+methods.</P>
+<P>
+<H2><A NAME="stmt:bind">stmt:bind</A></H2>
+<PRE>
+        stmt:bind(n[,value])</PRE>
+<P>Binds value to statement parameter <CODE>n</CODE>. If the type of value is string 
+or number, it is bound as text or double, respectively. If <CODE>value</CODE> is a
+boolean or nil or missing, any previous binding is removed. The function
+returns <CODE>sqlite3.OK</CODE> on success or else a numerical error code (see
+<A HREF="#numerical error and result codes">Numerical error and result codes</A>).</P>
+<P>
+<H2><A NAME="stmt:bind_blob">stmt:bind_blob</A></H2>
+<PRE>
+        stmt:bind_blob(n,blob)</PRE>
+<P>Binds string <CODE>blob</CODE> (which can be a binary string) as a blob to 
+statement parameter <CODE>n</CODE>. The function returns <CODE>sqlite3.OK</CODE> on success 
+or else a numerical error code (see <A HREF="#numerical error and result codes">Numerical error and result codes</A>).</P>
+<P>
+<H2><A NAME="stmt:bind_names">stmt:bind_names</A></H2>
+<PRE>
+        stmt:bind_names(nametable)</PRE>
+<P>Binds the values in <CODE>nametable</CODE> to statement parameters. If the 
+statement parameters are named (i.e., of the form ``:AAA'' or ``$AAA'') 
+then this function looks for appropriately named fields in <CODE>nametable</CODE>; 
+if the statement parameters are
+not named, it looks for numerical fields 1 to the number of statement
+parameters. The function returns <CODE>sqlite3.OK</CODE> on success or else a
+numerical error code (see <A HREF="#numerical error and result codes">Numerical error and result codes</A>).</P>
+<P>
+<H2><A NAME="stmt:bind_parameter_count">stmt:bind_parameter_count</A></H2>
+<PRE>
+        stmt:bind_parameter_count()</PRE>
+<P>Returns the largest statement parameter index in prepared statement 
+<CODE>stmt</CODE>. When the statement parameters are of the forms ``:AAA'' or ``?'', 
+then they are assigned sequentially increasing numbers beginning with 
+one, so the value returned is the number of parameters. However if the 
+same statement parameter name is used multiple times, each occurrence 
+is given the same number, so the value returned is the number of unique 
+statement parameter names.</P>
+<P>If statement parameters of the form ``?NNN'' are used (where NNN is an 
+integer) then there might be gaps in the numbering and the value 
+returned by this interface is the index of the statement parameter with 
+the largest index value.</P>
+<P>
+<H2><A NAME="stmt:bind_parameter_name">stmt:bind_parameter_name</A></H2>
+<PRE>
+        stmt:bind_parameter_name(n)</PRE>
+<P>Returns the name of the <CODE>n</CODE>-th parameter in prepared statement <CODE>stmt</CODE>. 
+Statement parameters of the form ``:AAA'' or ``@AAA'' or ``$VVV'' have a name 
+which  is the string ``:AAA'' or ``@AAA'' or ``$VVV''. In other words, the 
+initial ``:'' or ``$'' or ``@'' is included as part of the name. Parameters 
+of the form ``?'' or ``?NNN'' have no name. The first bound parameter has 
+an index of 1.
+If the value <CODE>n</CODE> is out of range or if the <CODE>n</CODE>-th parameter is
+nameless, then nil is returned. The function returns <CODE>sqlite3.OK</CODE> on
+success or else a numerical error code (see
+<A HREF="#numerical error and result codes">Numerical error and result codes</A>)</P>
+<P>
+<H2><A NAME="stmt:bind_values">stmt:bind_values</A></H2>
+<PRE>
+        stmt:bind_values(value1,value2,...,valueN)</PRE>
+<P>Binds the given values to statement parameters. The function returns
+<CODE>sqlite3.OK</CODE> on success or else a numerical error code (see
+<A HREF="#numerical error and result codes">Numerical error and result codes</A>).</P>
+<P>
+<H2><A NAME="stmt:columns">stmt:columns</A></H2>
+<PRE>
+        stmt:columns()</PRE>
+<P>Returns the number of columns in the result set returned by statement
+stmt or 0 if the statement does not return data (for example an UPDATE).</P>
+<P>
+<H2><A NAME="stmt:finalize">stmt:finalize</A></H2>
+<PRE>
+        stmt:finalize()</PRE>
+<P>This function frees prepared statement stmt. If the statement was
+executed successfully, or not executed at all, then <CODE>sqlite3.OK</CODE> is
+returned. If execution of the statement failed then an error code is
+returned.</P>
+<P>
+<H2><A NAME="stmt:get_name">stmt:get_name</A></H2>
+<PRE>
+        stmt:get_name(n)</PRE>
+<P>Returns the name of column <CODE>n</CODE> in the result set of statement stmt. (The
+left-most column is number 0.)</P>
+<P>
+<H2><A NAME="stmt:get_named_types">stmt:get_named_types</A></H2>
+<PRE>
+        stmt:get_named_types()</PRE>
+<P>Returns a table with the names and types of all columns in the result
+set of statement stmt.</P>
+<P>
+<H2><A NAME="stmt:get_named_values">stmt:get_named_values</A></H2>
+<PRE>
+        stmt:get_named_values()</PRE>
+<P>This function returns a table with names and values of all columns in
+the current result row of a query.</P>
+<P>
+<H2><A NAME="stmt:get_names">stmt:get_names</A></H2>
+<PRE>
+        stmt:get_names()</PRE>
+<P>This function returns an array with the names of all columns in the
+result set returned by statement stmt.</P>
+<P>
+<H2><A NAME="stmt:get_type">stmt:get_type</A></H2>
+<PRE>
+        stmt:get_type(n)</PRE>
+<P>Returns the type of column <CODE>n</CODE> in the result set of statement stmt. (The
+left-most column is number 0.)</P>
+<P>
+<H2><A NAME="stmt:get_types">stmt:get_types</A></H2>
+<PRE>
+        stmt:get_types()</PRE>
+<P>This function returns an array with the types of all columns in the
+result set returned by statement stmt.</P>
+<P>
+<H2><A NAME="stmt:get_unames">stmt:get_unames</A></H2>
+<PRE>
+        stmt:get_unames()</PRE>
+<P>This function returns a list with the names of all columns in the result
+set returned by statement stmt.</P>
+<P>
+<H2><A NAME="stmt:get_utypes">stmt:get_utypes</A></H2>
+<PRE>
+        stmt:get_utypes()</PRE>
+<P>This function returns a list with the types of all columns in the result
+set returned by statement stmt.</P>
+<P>
+<H2><A NAME="stmt:get_uvalues">stmt:get_uvalues</A></H2>
+<PRE>
+        stmt:get_uvalues()</PRE>
+<P>This function returns a list with the values of all columns in the
+current result row of a query.</P>
+<P>
+<H2><A NAME="stmt:get_value">stmt:get_value</A></H2>
+<PRE>
+        stmt:get_value(n)</PRE>
+<P>Returns the value of column <CODE>n</CODE> in the result set of statement stmt. (The
+left-most column is number 0.)</P>
+<P>
+<H2><A NAME="stmt:get_values">stmt:get_values</A></H2>
+<PRE>
+        stmt:get_values()</PRE>
+<P>This function returns an array with the values of all columns in the
+result set returned by statement stmt.</P>
+<P>
+<H2><A NAME="stmt:isopen">stmt:isopen</A></H2>
+<PRE>
+        stmt:isopen()</PRE>
+<P>Returns true if stmt has not yet been finalized, false otherwise.</P>
+<P>
+<H2><A NAME="stmt:nrows">stmt:nrows</A></H2>
+<PRE>
+        stmt:nrows()</PRE>
+<P>Returns an function that iterates over the names and values of the
+result set of statement <CODE>stmt</CODE>. Each iteration returns a table with the
+names and values for the current row.
+This is the prepared statement equivalent of <A HREF="#db:nrows"><CODE>db:nrows()</CODE></A>.</P>
+<P>
+<H2><A NAME="stmt:reset">stmt:reset</A></H2>
+<PRE>
+        stmt:reset()</PRE>
+<P>This function resets SQL statement <CODE>stmt</CODE>, so that it is ready to be
+re-executed. Any statement variables that had values bound to them using
+the <CODE>stmt:bind*()</CODE> functions retain their values.</P>
+<P>
+<H2><A NAME="stmt:rows">stmt:rows</A></H2>
+<PRE>
+        stmt:rows()</PRE>
+<P>Returns an function that iterates over the values of the result set of
+statement stmt. Each iteration returns an array with the values for the
+current row.
+This is the prepared statement equivalent of <A HREF="#db:rows"><CODE>db:rows()</CODE></A>.</P>
+<P>
+<H2><A NAME="stmt:step">stmt:step</A></H2>
+<PRE>
+        stmt:step()</PRE>
+<P>This function must be called to evaluate the (next iteration of the)
+prepared statement stmt. It will return one of the following values:</P>
+<UL>
+<LI>
+<CODE>sqlite3.BUSY</CODE>: the engine was unable to acquire the locks needed. If the
+statement is a COMMIT or occurs outside of an explicit transaction, then
+you can retry the statement. If the statement is not a COMMIT and occurs
+within a explicit transaction then you should rollback the transaction
+before continuing.
+<P></P>
+<LI>
+<CODE>sqlite3.DONE</CODE>: the statement has finished executing successfully.
+<A HREF="#stmt:step"><CODE>stmt:step()</CODE></A> should not be called again on this statement 
+without first calling <A HREF="#stmt:reset"><CODE>stmt:reset()</CODE></A> to reset the virtual 
+machine back to the initial state.
+<P></P>
+<LI>
+<CODE>sqlite3.ROW</CODE>: this is returned each time a new row of data is ready for
+processing by the caller. The values may be accessed using the column
+access functions. <A HREF="#stmt:step"><CODE>stmt:step()</CODE></A> can be called again to 
+retrieve the next row of data.
+<P></P>
+<LI>
+<CODE>sqlite3.ERROR</CODE>: a run-time error (such as a constraint violation) has
+occurred. <A HREF="#stmt:step"><CODE>stmt:step()</CODE></A> should not be called again. More 
+information may be found by calling <A HREF="#db:errmsg"><CODE>db:errmsg()</CODE></A>. A more 
+specific error 
+code (can be obtained by calling <A HREF="#stmt:reset"><CODE>stmt:reset()</CODE></A>.
+<P></P>
+<LI>
+<CODE>sqlite3.MISUSE</CODE>: the function was called inappropriately, perhaps 
+because the statement has already been finalized or a previous call to
+<A HREF="#stmt:step"><CODE>stmt:step()</CODE></A> has returned <CODE>sqlite3.ERROR</CODE> or 
+<CODE>sqlite3.DONE</CODE>.
+<P></P></UL>
+<P>
+<H2><A NAME="stmt:urows">stmt:urows</A></H2>
+<PRE>
+        stmt:urows()</PRE>
+<P>Returns an function that iterates over the values of the result set of
+statement stmt. Each iteration returns the values for the current row.
+This is the prepared statement equivalent of <A HREF="#db:urows"><CODE>db:urows()</CODE></A>.</P>
+<P>
+<HR>
+<H1><A NAME="methods for callback contexts">Methods for callback contexts</A></H1>
+<P>A callback context is available as a parameter inside the callback
+functions <A HREF="#db:create_aggregate"><CODE>db:create_aggregate()</CODE></A> and 
+<A HREF="#db:create_function"><CODE>db:create_function()</CODE></A>. It can be used
+to get further information about the state of a query.</P>
+<P>
+<H2><A NAME="context:aggregate_count">context:aggregate_count</A></H2>
+<PRE>
+        context:aggregate_count()</PRE>
+<P>Returns the number of calls to the aggregate step function.</P>
+<P>
+<H2><A NAME="context:get_aggregate_data">context:get_aggregate_data</A></H2>
+<PRE>
+        context:get_aggregate_data()</PRE>
+<P>Returns the user-definable data field for callback funtions.</P>
+<P>
+<H2><A NAME="context:set_aggregate_data">context:set_aggregate_data</A></H2>
+<PRE>
+        context:set_aggregate_data(udata)</PRE>
+<P>Set the user-definable data field for callback funtions to <CODE>udata</CODE>.</P>
+<P>
+<H2><A NAME="context:result">context:result</A></H2>
+<PRE>
+        context:result(res)</PRE>
+<P>This function sets the result of a callback function to res. The type of
+the result depends on the type of res and is either a number or a string
+or nil. All other values will raise an error message.</P>
+<P>
+<H2><A NAME="context:result_null">context:result_null</A></H2>
+<PRE>
+        context:result_null()</PRE>
+<P>This function sets the result of a callback function to nil. It returns
+nothing.</P>
+<P>
+<H2><A NAME="context:result_number">context:result_number</A></H2>
+<PRE>
+        context:result_number(number)
+        context:result_double(number)</PRE>
+<P>This function sets the result of a callback function to the value
+<CODE>number</CODE>. It returns nothing.</P>
+<P>
+<H2><A NAME="context:result_int">context:result_int</A></H2>
+<PRE>
+        context:result_int(number)</PRE>
+<P>This function sets the result of a callback function to the integer
+value in <CODE>number</CODE>. It returns nothing.</P>
+<P>
+<H2><A NAME="context:result_text">context:result_text</A></H2>
+<PRE>
+        context:result_text(str)</PRE>
+<P>This function sets the result of a callback function to the string in
+<CODE>str</CODE>. It returns nothing.</P>
+<P>
+<H2><A NAME="context:result_blob">context:result_blob</A></H2>
+<PRE>
+        context:result_blob(blob)</PRE>
+<P>This function sets the result of a callback function to the binary
+string in <CODE>blob</CODE>. It returns nothing.</P>
+<P>
+<H2><A NAME="context:result_error">context:result_error</A></H2>
+<PRE>
+        context:result_error(err)</PRE>
+<P>This function sets the result of a callback function to the error value
+in <CODE>err</CODE>. It returns nothing.</P>
+<P>
+<H2><A NAME="context:user_data">context:user_data</A></H2>
+<PRE>
+        context:user_data()</PRE>
+<P>Returns the userdata parameter given in the call to install the callback
+function (see <A HREF="#db:create_aggregate"><CODE>db:create_aggregate()</CODE></A> and 
+<A HREF="#db:create_function"><CODE>db:create_function()</CODE></A> for details).</P>
+<P>
+<HR>
+<H1><A NAME="numerical error and result codes">Numerical error and result codes</A></H1>
+<P>The following constants are defined by module sqlite3:</P>
+<PRE>
+        OK: 0          ERROR: 1       INTERNAL: 2    PERM: 3        ABORT: 4
+        BUSY: 5        LOCKED: 6      NOMEM: 7       READONLY: 8    INTERRUPT: 9
+        IOERR: 10      CORRUPT: 11    NOTFOUND: 12   FULL: 13       CANTOPEN: 14
+        PROTOCOL: 15   EMPTY: 16      SCHEMA: 17     TOOBIG: 18     CONSTRAINT: 19
+        MISMATCH: 20   MISUSE: 21     NOLFS: 22      FORMAT: 24     RANGE: 25
+        NOTADB: 26     ROW: 100       DONE: 101</PRE>
+<P>For details about their exact meaning please see the <STRONG>SQLite3
+documentation</STRONG> <A HREF="http://www.sqlite.org/">http://www.sqlite.org/</A>.</P>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>This is <CODE>lsqlite3</CODE> subversion 6, also known as ``devel-0.6''.</P>
+<P>
+<HR>
+<H1><A NAME="credits">CREDITS</A></H1>
+<P><CODE>lsqlite3</CODE> was developed by Tiago Dionizio and Doug Currie with 
+contributions from Thomas Lauer and Michael Roth.</P>
+<P>This documentation is based on the ``(very) preliminary'' documents
+for the Idle-SQLite3 database module. Thanks to Thomas Lauer for
+making it available.</P>
+<P>
+<HR>
+<H1><A NAME="license">LICENSE</A></H1>
+<PRE>
+    /************************************************************************
+    * lsqlite3                                                              *
+    * Copyright (C) 2002-2007 Tiago Dionizio, Doug Currie                   *
+    * All rights reserved.                                                  *
+    * Author    : Tiago Dionizio &lt;tiago.dionizio@ist.utl.pt&gt;                *
+    * Author    : Doug Currie &lt;doug.currie@alum.mit.edu&gt;                    *
+    * Library   : lsqlite3 - a SQLite 3 database binding for Lua 5          *
+    *                                                                       *
+    * Permission is hereby granted, free of charge, to any person obtaining *
+    * a copy of this software and associated documentation files (the       *
+    * &quot;Software&quot;), to deal in the Software without restriction, including   *
+    * without limitation the rights to use, copy, modify, merge, publish,   *
+    * distribute, sublicense, and/or sell copies of the Software, and to    *
+    * permit persons to whom the Software is furnished to do so, subject to *
+    * the following conditions:                                             *
+    *                                                                       *
+    * The above copyright notice and this permission notice shall be        *
+    * included in all copies or substantial portions of the Software.       *
+    *                                                                       *
+    * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,       *
+    * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF    *
+    * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.*
+    * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY  *
+    * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,  *
+    * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     *
+    * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                *
+    ************************************************************************/</PRE>
+
+</BODY>
+
+</HTML>

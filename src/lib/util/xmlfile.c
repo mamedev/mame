@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "xmlfile.h"
 #include <ctype.h>
 #include <expat.h>

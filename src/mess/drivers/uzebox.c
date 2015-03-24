@@ -9,7 +9,6 @@
     TODO:
     - Sound
     - SDCard
-    - Mouse
 
 ****************************************************************************/
 
@@ -18,6 +17,7 @@
 #include "sound/dac.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/snes_ctrl/ctrl.h"
 
 // overclocked to 8 * NTSC burst frequency
 #define MASTER_CLOCK 28618180
@@ -30,11 +30,15 @@ public:
 	uzebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_ctrl1(*this, "ctrl1"),
+		m_ctrl2(*this, "ctrl2")
 	{ }
 
 	required_device<avr8_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
+	required_device<snes_control_port_device> m_ctrl1;
+	required_device<snes_control_port_device> m_ctrl2;
 
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
@@ -59,7 +63,6 @@ private:
 	UINT8           m_port_b;
 	UINT8           m_port_c;
 	UINT8           m_port_d;
-	UINT16          m_joy_data[2];
 	bitmap_rgb32    m_bitmap;
 };
 
@@ -80,7 +83,6 @@ void uzebox_state::machine_reset()
 	m_port_b = 0;
 	m_port_c = 0;
 	m_port_d = 0;
-	m_joy_data[0] = m_joy_data[1] = 0;
 }
 
 
@@ -92,22 +94,15 @@ WRITE8_MEMBER(uzebox_state::port_a_w)
 	//  ---- --x-   SNES controller P2 data
 	//  ---- ---x   SNES controller P1 data
 
+	m_ctrl1->write_strobe(BIT(data, 2));
+	m_ctrl2->write_strobe(BIT(data, 2));
+
 	UINT8 changed = m_port_a ^ data;
-
-	if (changed & data & 0x04)
+	if ((changed & data & 0x08) || (changed & (~data) & 0x04))
 	{
-		m_joy_data[0] = ioport("P1")->read();
-		m_joy_data[1] = ioport("P2")->read();
-	}
-	else if (changed & 0x08)
-	{
-		if (changed & data & 0x08)
-		{
-			m_joy_data[0] >>= 1;
-			m_joy_data[1] >>= 1;
-		}
-
-		m_port_a = (m_joy_data[0] & 0x01) | ((m_joy_data[1] & 0x01) << 1);
+		m_port_a &= ~0x03;
+		m_port_a |= m_ctrl1->read_pin4() ? 0 : 0x01;
+		m_port_a |= m_ctrl2->read_pin4() ? 0 : 0x02;
 	}
 
 	m_port_a = (data & 0x0c) | (m_port_a & 0x03);
@@ -207,36 +202,6 @@ ADDRESS_MAP_END
 \****************************************************/
 
 static INPUT_PORTS_START( uzebox )
-	PORT_START( "P1" )
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button Y") PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT ) PORT_NAME("P1 Select") PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Button X") PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Button L") PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Button R") PORT_PLAYER(1)
-	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START( "P2" )
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button Y") PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT ) PORT_NAME("P2 Select") PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Button A") PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Button X") PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Button L") PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Button R") PORT_PLAYER(2)
-	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("AD725_CE")
 	PORT_CONFNAME( 0x01, 0x00, "AD725 CE" )
 	PORT_CONFSETTING( 0x00, "VCC" )
@@ -323,6 +288,9 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_GENERIC_EXTENSIONS("bin,uze")
 	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(uzebox_state, uzebox_cart)
+
+	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")
+	MCFG_SNES_CONTROL_PORT_ADD("ctrl2", snes_control_port_devices, "joypad")
 
 	MCFG_SOFTWARE_LIST_ADD("eprom_list","uzebox")
 MACHINE_CONFIG_END

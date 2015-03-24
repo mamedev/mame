@@ -2601,7 +2601,7 @@ ROM_END
 #define GAME_FLAGS GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL
 
 //Adder 2
-GAME( 1996, m_tppokr        , 0         ,  scorpion1_adder2 , toppoker  , bfm_sc1_state, toppoker       , 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_FLAGS )
+GAME( 1996, m_tppokr        , 0         ,  scorpion1_adder2 , toppoker  , bfm_sc1_state, toppoker       , 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
 
 
 /********************************************************************************************************************************************************************************************************************

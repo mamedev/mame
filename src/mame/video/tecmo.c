@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(tecmo_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(tecmo_state,tecmo)
+void tecmo_state::video_start()
 {
 	if (m_video_type == 2)  /* gemini */
 	{
@@ -94,6 +94,9 @@ VIDEO_START_MEMBER(tecmo_state,tecmo)
 
 	m_bg_tilemap->set_scrolldx(-48,256+48);
 	m_fg_tilemap->set_scrolldx(-48,256+48);
+
+	save_item(NAME(m_fgscroll));
+	save_item(NAME(m_bgscroll));
 }
 
 
@@ -104,25 +107,25 @@ VIDEO_START_MEMBER(tecmo_state,tecmo)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tecmo_state::tecmo_txvideoram_w)
+WRITE8_MEMBER(tecmo_state::txvideoram_w)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_fgvideoram_w)
+WRITE8_MEMBER(tecmo_state::fgvideoram_w)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_bgvideoram_w)
+WRITE8_MEMBER(tecmo_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_fgscroll_w)
+WRITE8_MEMBER(tecmo_state::fgscroll_w)
 {
 	m_fgscroll[offset] = data;
 
@@ -130,7 +133,7 @@ WRITE8_MEMBER(tecmo_state::tecmo_fgscroll_w)
 	m_fg_tilemap->set_scrolly(0, m_fgscroll[2]);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_bgscroll_w)
+WRITE8_MEMBER(tecmo_state::bgscroll_w)
 {
 	m_bgscroll[offset] = data;
 
@@ -138,7 +141,7 @@ WRITE8_MEMBER(tecmo_state::tecmo_bgscroll_w)
 	m_bg_tilemap->set_scrolly(0, m_bgscroll[2]);
 }
 
-WRITE8_MEMBER(tecmo_state::tecmo_flipscreen_w)
+WRITE8_MEMBER(tecmo_state::flipscreen_w)
 {
 	flip_screen_set(data & 1);
 }
@@ -153,7 +156,7 @@ WRITE8_MEMBER(tecmo_state::tecmo_flipscreen_w)
 
 
 
-UINT32 tecmo_state::screen_update_tecmo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tecmo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0x100, cliprect);

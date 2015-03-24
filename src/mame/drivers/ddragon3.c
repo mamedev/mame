@@ -1168,6 +1168,44 @@ ROM_START( ctribe1 )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
+ROM_START( ctribeo ) // only main program code differs from ctribe1 set
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
+	ROM_LOAD16_BYTE( "28a16-1.ic26", 0x00001, 0x20000, CRC(d108f36f) SHA1(af53fa441b9ddfc639abb573864a9b351633c6B7) )
+	ROM_LOAD16_BYTE( "28a15-1.ic25", 0x00000, 0x20000, CRC(3f5693a3) SHA1(2d4516506ad1d68ac45242fe149bba1b4b53eb45) )
+	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	/* No EVEN rom! */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
+	ROM_LOAD( "28a10-0.ic89", 0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* Background */
+	ROM_LOAD16_BYTE( "28j7-0.ic11",  0x000001, 0x40000, CRC(a8b773f1) SHA1(999e41dfeb3fb937da769c4a33bb29bf4076dc63) )
+	ROM_LOAD16_BYTE( "28j6-0.ic13",  0x000000, 0x40000, CRC(617530fc) SHA1(b9155ed0ae1437bf4d0b7a95e769bc05a820ecec) )
+	ROM_LOAD16_BYTE( "28j5-0.ic12",  0x080001, 0x40000, CRC(cef0a821) SHA1(c7a35048d5ebf3f09abf9d27f91d12adc03befeb) )
+	ROM_LOAD16_BYTE( "28j4-0.ic14",  0x080000, 0x40000, CRC(b84fda09) SHA1(3ae0c0ec6c398dea17e248b017ea3e2f6c3571e1) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   /* Sprites */
+	ROM_LOAD( "28j3-0.ic77",  0x000000, 0x80000, CRC(1ac2a461) SHA1(17436f5dcf29041ca5f470dfae538e4fc12153cc) )
+	ROM_LOAD( "28a14-0.ic60", 0x080000, 0x10000, CRC(972faddb) SHA1(f2b211e8f8301667e6c9a3ce9612e39b16e66a67) )
+	ROM_LOAD( "28j2-0.ic78",  0x100000, 0x80000, CRC(8c796707) SHA1(7417ad0413083876ed65a8612845ccb0d2717530) )
+	ROM_LOAD( "28a13-0.ic61", 0x180000, 0x10000, CRC(eb3ab374) SHA1(db66cb7976c111fa76a3a211e96ad1d7b78ce0ad) )
+	ROM_LOAD( "28j1-0.ic97",  0x200000, 0x80000, CRC(1c9badbd) SHA1(d28f6d684d88448eaa3feae0bba2f5a836d89bd7) )
+	ROM_LOAD( "28a12-0.ic85", 0x280000, 0x10000, CRC(c602ac97) SHA1(44440739636b684c6dcac837f59664120c9ba5f3) )
+	ROM_LOAD( "28j0-0.ic98",  0x300000, 0x80000, CRC(ba73c49e) SHA1(830099027ede1f7c56bb0bf3cdef3018b92e0b87) )
+	ROM_LOAD( "28a11-0.ic86", 0x380000, 0x10000, CRC(4da1d8e5) SHA1(568e9e8d00f1b1ca27c28df5fc0ffc74ad91da7e) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* ADPCM Samples */
+	ROM_LOAD( "28j9-0.ic83", 0x00000, 0x20000, CRC(f92a7f4a) SHA1(3717ef64876be9ada378b449749918ce9072073a) )
+	ROM_LOAD( "28j8-0.ic82", 0x20000, 0x20000, CRC(1a3a0b39) SHA1(8847530027cf4be03ffbc6d78dee97b459d03a04) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
+ROM_END
+
+
+
+
+
 ROM_START( ctribej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28j16-02.26", 0x00001, 0x20000, CRC(658b8568) SHA1(899682f6ab28b184654c51c1169216974043f1b9) )
@@ -1443,6 +1481,7 @@ GAME( 1990, ddragon3b,ddragon3, ddragon3b,ddragon3b, driver_device,0, ROT0, "boo
 
 GAME( 1990, ctribe,   0,        ctribe,   ctribe, driver_device,   0, ROT0, "Technos Japan", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe, driver_device,   0, ROT0, "Technos Japan", "The Combatribes (US set 1?)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribeo,  ctribe,   ctribe,   ctribe, driver_device,   0, ROT0, "Technos Japan", "The Combatribes (US, older)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribej,  ctribe,   ctribe,   ctribe, driver_device,   0, ROT0, "Technos Japan", "The Combatribes (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribeb, driver_device,  0, ROT0, "bootleg", "The Combatribes (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribeb2, ctribe,   ctribe,   ctribeb, driver_device,  0, ROT0, "bootleg", "The Combatribes (bootleg set 2)", GAME_SUPPORTS_SAVE )

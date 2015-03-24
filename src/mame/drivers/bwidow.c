@@ -310,6 +310,10 @@ CUSTOM_INPUT_MEMBER(bwidow_state::clock_r)
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
+READ8_MEMBER(bwidow_state::bwidowp_in_r)
+{
+	return (ioport("IN4")->read() & 0x0f) | ((ioport("IN3")->read() & 0x0f) << 4);
+}
 
 /*************************************
  *
@@ -386,6 +390,25 @@ static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( bwidowp_map, AS_PROGRAM, 8, bwidow_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
+	AM_RANGE(0x0810, 0x081f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
+	AM_RANGE(0x1000, 0x1000) AM_READ(bwidowp_in_r)
+	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("avg", avg_device, go_w)
+	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("avg", avg_device, reset_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(bwidow_misc_w) /* coin counters, leds */
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x4000)
+	AM_RANGE(0x4800, 0x6fff) AM_ROM
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
+	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x9800, 0x9800) AM_WRITENOP /* ? written once at startup */
+	AM_RANGE(0xa000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacduel_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
@@ -492,7 +515,6 @@ static INPUT_PORTS_START( bwidow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( gravitar )
 	PORT_START("IN0")
@@ -729,6 +751,12 @@ static MACHINE_CONFIG_START( bwidow, bwidow_state )
 
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( bwidowp, bwidow )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bwidowp_map)
+
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( gravitar, bwidow )
 
 	/* basic machine hardware */
@@ -792,6 +820,30 @@ ROM_START( bwidow )
 	/* AVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "136002-125.n4",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+ROM_END
+
+ROM_START( bwidowp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	/* Vector ROM */
+	ROM_LOAD( "vg4800",  0x4800, 0x0800, CRC(12c0e382) SHA1(b0a899d013ad00ff5f861da9897780c5f0c5d221) )
+	ROM_LOAD( "vg5000",  0x5000, 0x1000, CRC(7009106a) SHA1(d41d147eccb2bb4e0a3e9bb184c2bfd09c80b92f) )
+	ROM_RELOAD( 0x6000, 0x1000 )
+	/* Program ROM */
+	ROM_LOAD( "a000",  0xa000, 0x1000, CRC(ebe0ace2) SHA1(fa919797c243d06761e3fa04b548679b310f0542) )
+	ROM_LOAD( "b000",  0xb000, 0x1000, CRC(b14f33e2) SHA1(f8b2c6cc6907b379786e246ccd559316d3edffb3) )
+	ROM_LOAD( "c000",  0xc000, 0x1000, CRC(79b8af00) SHA1(53e31962d2124bfe06afc6374d5fb2d87bf9e952) )
+	ROM_LOAD( "d000",  0xd000, 0x1000, CRC(10ac77c3) SHA1(f7b832974c224341f67fc4c3d151d8978774b462) )
+	ROM_LOAD( "e000",  0xe000, 0x1000, CRC(dfdda385) SHA1(ac77411722842033027b1717ac1b494507153e55) )
+	ROM_RELOAD(                  0xf000, 0x1000 )   /* for reset/interrupt vectors */
+
+	/* AVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "avgsmr",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+
+	/* Proms */
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "negrom.lo", 0x0000, 0x0100, CRC(aeb9cde1) SHA1(d4fe4f59481f21260b4c1ce9779574784eccb460) )
+	ROM_LOAD_NIB_HIGH( "negrom.hi", 0x0000, 0x0100, CRC(08f0112b) SHA1(a457f2968a343891818d271231f61b17b7826c53) )
 ROM_END
 
 ROM_START( gravitar )
@@ -1009,6 +1061,7 @@ GAME( 1980, spacduel, 0,        spacduel, spacduel, driver_device, 0, ROT0, "Ata
 GAME( 1980, spacduel1,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (version 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spacduel0,spacduel, spacduel, spacduel, driver_device, 0, ROT0, "Atari", "Space Duel (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1982, bwidow,   0,        bwidow,   bwidow, driver_device,   0, ROT0, "Atari", "Black Widow", GAME_SUPPORTS_SAVE )
+GAME( 1982, bwidowp,  bwidow,   bwidowp,  bwidow, driver_device,   0, ROT0, "Atari", "Black Widow (prototype)", GAME_NOT_WORKING )
 GAME( 1982, gravitar, 0,        gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 3)", GAME_SUPPORTS_SAVE )
 GAME( 1982, gravitar2,gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, gravitar1,gravitar, gravitar, gravitar, driver_device, 0, ROT0, "Atari", "Gravitar (version 1)", GAME_SUPPORTS_SAVE )

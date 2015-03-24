@@ -422,9 +422,8 @@ static const code_string_table itemid_token_table[] =
 
 // standard joystick mappings
 const char          joystick_map_8way[] = "7778...4445";
-const char          joystick_map_4way_sticky[] = "s8.4s8.44s8.4445";
 const char          joystick_map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
-
+// const char          joystick_map_4way_sticky[] = "s8.4s8.44s8.4445";
 
 
 //**************************************************************************

@@ -130,6 +130,7 @@ public:
 	UINT8 default_bios() const { return m_default_bios; }
 	UINT8 system_bios() const { return m_system_bios; }
 	astring default_bios_tag() const { return m_default_bios_tag; }
+	astring parameter(const char *tag) const;
 
 	// interface helpers
 	device_interface *first_interface() const { return m_interface_list; }
@@ -191,9 +192,9 @@ public:
 
 	// state saving interfaces
 	template<typename _ItemType>
-	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != NULL); m_save->save_item(name(), tag(), index, value, valname); }
+	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != NULL); m_save->save_item(this, name(), tag(), index, value, valname); }
 	template<typename _ItemType>
-	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(name(), tag(), index, value, valname, count); }
+	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug; }

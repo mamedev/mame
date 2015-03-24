@@ -10,6 +10,7 @@
 #include "bus/generic/carts.h"
 
 #include "machine/315-5881_crypt.h"
+#include "machine/315-5838_317-0229_comp.h"
 
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
@@ -701,7 +702,8 @@ public:
 		: saturn_state(mconfig, type, tag),
 		m_adsp(*this, "adsp"),
 		m_adsp_pram(*this, "adsp_pram"),
-		m_cryptdevice(*this, "315_5881")
+		m_cryptdevice(*this, "315_5881"),
+		m_5838crypt(*this, "315_5838")
 	{
 	}
 
@@ -798,47 +800,23 @@ public:
 
 	// protection specific variables and functions (see machine/stvprot.c)
 	UINT32 m_abus_protenable;
-	UINT32 m_abus_prot_addr;
 	UINT32 m_abus_protkey;
 
 	UINT32 m_a_bus[4];
-	UINT32 m_ctrl_index;
-	UINT32 m_internal_counter;
-	UINT8 m_char_offset; //helper to jump the decoding of the NULL chars.
-
-	UINT32 (*m_prot_readback)(address_space&,int,UINT32);
 
 	DECLARE_READ32_MEMBER( common_prot_r );
 	DECLARE_WRITE32_MEMBER( common_prot_w );
 
 	void install_common_protection();
-
-	void install_twcup98_protection();
-	void install_sss_protection();
-	void install_astrass_protection();
-	void install_rsgun_protection();
-	void install_elandore_protection();
-	void install_ffreveng_protection();
-
 	void stv_register_protection_savestates();
 
-	// Decathlete specific variables and functions (see machine/decathlt.c)
-	UINT32 m_decathlt_protregs[4];
-	UINT32 m_decathlt_lastcount;
-	UINT32 m_decathlt_part;
-	UINT32 m_decathlt_prot_uploadmode;
-	UINT32 m_decathlt_prot_uploadoffset;
-	UINT16 m_decathlt_prottable1[24];
-	UINT16 m_decathlt_prottable2[128];
 
-	DECLARE_READ32_MEMBER( decathlt_prot_r );
-	DECLARE_WRITE32_MEMBER( decathlt_prot1_w );
-	DECLARE_WRITE32_MEMBER( decathlt_prot2_w );
-	void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which);
-	void install_decathlt_protection();
 
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
+	optional_device<sega_315_5838_comp_device> m_5838crypt;
 	UINT16 crypt_read_callback(UINT32 addr);
+	UINT16 crypt_read_callback_ch1(UINT32 addr);
+	UINT16 crypt_read_callback_ch2(UINT32 addr);
 };
 
 

@@ -35,6 +35,29 @@ Notes:
 #include "includes/retofinv.h"
 
 
+void retofinv_state::machine_start()
+{
+	save_item(NAME(m_main_irq_mask));
+	save_item(NAME(m_sub_irq_mask));
+	save_item(NAME(m_cpu2_m6000));
+
+	if (m_68705 != NULL) // only for the parent (with MCU)
+	{
+		save_item(NAME(m_from_main));
+		save_item(NAME(m_from_mcu));
+		save_item(NAME(m_mcu_sent));
+		save_item(NAME(m_main_sent));
+		save_item(NAME(m_portA_in));
+		save_item(NAME(m_portA_out));
+		save_item(NAME(m_ddrA));
+		save_item(NAME(m_portB_in));
+		save_item(NAME(m_portB_out));
+		save_item(NAME(m_ddrB));
+		save_item(NAME(m_portC_in));
+		save_item(NAME(m_portC_out));
+		save_item(NAME(m_ddrC));
+	}
+}
 
 WRITE8_MEMBER(retofinv_state::cpu1_reset_w)
 {
@@ -99,14 +122,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM /* space for diagnostic ROM? The code looks */
 									/* for a string here, and jumps if it's present */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xb800, 0xb802) AM_WRITE(retofinv_gfx_ctrl_w)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xb800, 0xb802) AM_WRITE(gfx_ctrl_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc002, 0xc002) AM_READNOP /* bit 7 must be 0, otherwise game resets */
-	AM_RANGE(0xc003, 0xc003) AM_READ(retofinv_mcu_status_r)
+	AM_RANGE(0xc003, 0xc003) AM_READ(mcu_status_r)
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("DSW2")
@@ -119,16 +142,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(cpu1_reset_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(soundcommand_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ(retofinv_mcu_r)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(retofinv_mcu_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ(mcu_r)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(mcu_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(retofinv_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)
 ADDRESS_MAP_END
 
@@ -144,12 +167,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, retofinv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(retofinv_68705_portA_r, retofinv_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(retofinv_68705_portB_r, retofinv_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(retofinv_68705_portC_r, retofinv_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(retofinv_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(retofinv_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(retofinv_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mcu_portA_r, mcu_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mcu_portB_r, mcu_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(mcu_portC_r, mcu_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(mcu_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(mcu_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(mcu_ddrC_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -367,7 +390,7 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update_retofinv)
+	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", retofinv)
@@ -501,6 +524,6 @@ ROM_END
 
 
 
-GAME( 1985, retofinv, 0,        retofinv, retofinv, driver_device, 0, ROT90, "Taito Corporation", "Return of the Invaders", 0 )
-GAME( 1985, retofinv1,retofinv, retofinb, retofinv, driver_device, 0, ROT90, "bootleg", "Return of the Invaders (bootleg set 1)", 0 )
-GAME( 1985, retofinv2,retofinv, retofinb, retofin2, driver_device, 0, ROT90, "bootleg", "Return of the Invaders (bootleg set 2)", 0 )
+GAME( 1985, retofinv, 0,        retofinv, retofinv, driver_device, 0, ROT90, "Taito Corporation", "Return of the Invaders", GAME_SUPPORTS_SAVE )
+GAME( 1985, retofinv1,retofinv, retofinb, retofinv, driver_device, 0, ROT90, "bootleg", "Return of the Invaders (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, retofinv2,retofinv, retofinb, retofin2, driver_device, 0, ROT90, "bootleg", "Return of the Invaders (bootleg set 2)", GAME_SUPPORTS_SAVE )

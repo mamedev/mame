@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
-#include "emu.h"
+#include <assert.h>
 #include "flopimg.h"
 
 struct imddsk_tag
@@ -279,13 +279,13 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 // copyright-holders:Olivier Galibert
 /*********************************************************************
 
-    formats/imd_dsk.h
+    formats/imd_dsk.c
 
     IMD disk images
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror
 #include "imd_dsk.h"
 
 imd_format::imd_format()

@@ -6,6 +6,8 @@
 
 *********************************************************************/
 
+#include <assert.h>
+
 #include "formats/vtech1_dsk.h"
 
 static FLOPPY_IDENTIFY( vtech1_dsk_identify )

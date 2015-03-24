@@ -51,7 +51,7 @@ ioport_constructor sms_rapid_fire_device::device_input_ports() const
 //-------------------------------------------------
 
 sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, SMS_RAPID_FIRE, "Rapid Fire", tag, owner, clock, "sms_rapid_fire", __FILE__),
+	device_t(mconfig, SMS_RAPID_FIRE, "Sega SMS Rapid Fire", tag, owner, clock, "sms_rapid_fire", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_rfire_sw(*this, "rfu_sw"),
 	m_subctrl_port(*this, "ctrl"),

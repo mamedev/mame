@@ -10,7 +10,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror
 #include "formats/g64_dsk.h"
 
 #define G64_FORMAT_HEADER   "GCR-1541"
@@ -53,7 +53,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	for (int track = 0; track < track_count; track++)
 	{
-		offs_t track_offset = pick_integer_le(img, TRACK_OFFSET + (track * 4), 4);
+		UINT32 track_offset = pick_integer_le(img, TRACK_OFFSET + (track * 4), 4);
 
 		if (!track_offset)
 			continue;
@@ -61,7 +61,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if (track_offset > size)
 			throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, track_offset);
 
-		offs_t speed_zone = pick_integer_le(img, SPEED_ZONE + (track * 4), 4);
+		UINT32 speed_zone = pick_integer_le(img, SPEED_ZONE + (track * 4), 4);
 
 		if (speed_zone > 3)
 			throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
@@ -102,9 +102,9 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 
 	dynamic_buffer trackbuf(TRACK_LENGTH-2);
 	for (int track = 0; track < 84; track++) {
-		offs_t tpos = TRACK_OFFSET + track * 4;
-		offs_t spos = SPEED_ZONE + track * 4;
-		offs_t dpos = TRACK_DATA + tracks_written * TRACK_LENGTH;
+		UINT32 tpos = TRACK_OFFSET + track * 4;
+		UINT32 spos = SPEED_ZONE + track * 4;
+		UINT32 dpos = TRACK_DATA + tracks_written * TRACK_LENGTH;
 
 		io_generic_write_filler(io, 0x00, tpos, 4);
 		io_generic_write_filler(io, 0x00, spos, 4);

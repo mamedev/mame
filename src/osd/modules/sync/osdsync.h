@@ -1,6 +1,6 @@
 //============================================================
 //
-//  winsync.h - Windows core synchronization functions
+//  osdsync.h - Core synchronization functions
 //
 //  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -10,9 +10,14 @@
 #ifndef __OSDSYNC__
 #define __OSDSYNC__
 
+#include "osdcomm.h"
+#include "osdcore.h"
+
 /***************************************************************************
     SYNCHRONIZATION INTERFACES - Events
 ***************************************************************************/
+
+#define OSD_EVENT_WAIT_INFINITE -1
 
 /* osd_event is an opaque type which represents a setable/resetable event */
 
@@ -169,19 +174,6 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask);
         None.
 -----------------------------------------------------------------------------*/
 void osd_thread_wait_free(osd_thread *thread);
-
-/*-----------------------------------------------------------------------------
-    osd_process_kill: kill the current process
-
-    Parameters:
-
-        None.
-
-    Return value:
-
-        None.
------------------------------------------------------------------------------*/
-void osd_process_kill(void);
 
 //============================================================
 //  Scalable Locks

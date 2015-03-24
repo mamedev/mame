@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/tandy2k_dsk.h"
 
 tandy2k_format::tandy2k_format() : upd765_format(formats)

@@ -14,18 +14,18 @@ XX Mission (c) 1986 UPL
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::xxmissio_bank_sel_w)
+WRITE8_MEMBER(xxmissio_state::bank_sel_w)
 {
 	membank("bank1")->set_entry(data & 7);
 }
 
-CUSTOM_INPUT_MEMBER(xxmissio_state::xxmissio_status_r)
+CUSTOM_INPUT_MEMBER(xxmissio_state::status_r)
 {
 	int bit_mask = (FPTR)param;
 	return (m_status & bit_mask) ? 1 : 0;
 }
 
-WRITE8_MEMBER(xxmissio_state::xxmissio_status_m_w)
+WRITE8_MEMBER(xxmissio_state::status_m_w)
 {
 	switch (data)
 	{
@@ -44,7 +44,7 @@ WRITE8_MEMBER(xxmissio_state::xxmissio_status_m_w)
 	}
 }
 
-WRITE8_MEMBER(xxmissio_state::xxmissio_status_s_w)
+WRITE8_MEMBER(xxmissio_state::status_s_w)
 {
 	switch (data)
 	{
@@ -63,22 +63,24 @@ WRITE8_MEMBER(xxmissio_state::xxmissio_status_s_w)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(xxmissio_state::xxmissio_interrupt_m)
+INTERRUPT_GEN_MEMBER(xxmissio_state::interrupt_m)
 {
 	m_status &= ~0x20;
-	device.execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(xxmissio_state::xxmissio_interrupt_s)
+INTERRUPT_GEN_MEMBER(xxmissio_state::interrupt_s)
 {
 	m_status &= ~0x10;
-	device.execute().set_input_line(0, HOLD_LINE);
+	m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 void xxmissio_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
 	membank("bank1")->set_entry(0);
+
+	save_item(NAME(m_status));
 }
 
 /****************************************************************************/
@@ -92,11 +94,11 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(status_m_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("fgram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(bgram_r, bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -112,16 +114,16 @@ static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
 
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(xxmissio_bank_sel_w)
+	AM_RANGE(0x8006, 0x8006) AM_WRITE(bank_sel_w)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_s_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(status_s_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("fgram") AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE("bgram") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("bgram") AM_READWRITE(bgram_r, bgram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("spriteram") AM_RAM
 
 	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -196,14 +198,14 @@ static INPUT_PORTS_START( xxmissio )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Shown as "Unused" in the manual */
 
 	PORT_START("STATUS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x01)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x04)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x10)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x20)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x40)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state,xxmissio_status_r, (void *)0x80)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x04)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x10)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x20)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x40)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x80)
 INPUT_PORTS_END
 
 /****************************************************************************/
@@ -258,11 +260,11 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */
 	MCFG_CPU_PROGRAM_MAP(map1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xxmissio_state,  xxmissio_interrupt_m)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", xxmissio_state,  interrupt_m)
 
 	MCFG_CPU_ADD("sub", Z80,12000000/4) /* 3.0MHz */
 	MCFG_CPU_PROGRAM_MAP(map2)
-	MCFG_CPU_PERIODIC_INT_DRIVER(xxmissio_state, xxmissio_interrupt_s, 2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(xxmissio_state, interrupt_s, 2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -273,7 +275,7 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update_xxmissio)
+	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxmissio)
@@ -293,8 +295,8 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 12000000/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(xxmissio_state, xxmissio_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(xxmissio_state, xxmissio_scroll_y_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(xxmissio_state, scroll_x_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(xxmissio_state, scroll_y_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -326,4 +328,4 @@ ROM_START( xxmissio )
 	ROM_LOAD16_BYTE( "xx11.4b", 0x0001,  0x8000, CRC(d9dd827c) SHA1(aea3a5abd871adf7f75ad4d6cc57eff0833135c7) )
 ROM_END
 
-GAME( 1986, xxmissio, 0, xxmissio, xxmissio, driver_device, 0, ROT90, "UPL", "XX Mission", 0 )
+GAME( 1986, xxmissio, 0, xxmissio, xxmissio, driver_device, 0, ROT90, "UPL", "XX Mission", GAME_SUPPORTS_SAVE )

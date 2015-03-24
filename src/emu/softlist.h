@@ -10,7 +10,6 @@
 #define __SOFTLIST_H_
 
 #include "ui/menu.h"
-#include "expat.h"
 #include "cstrpool.h"
 
 

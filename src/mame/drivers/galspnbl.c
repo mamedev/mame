@@ -204,13 +204,6 @@ static GFXDECODE_START( galspnbl )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(galspnbl_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
-
 void galspnbl_state::machine_start()
 {
 }
@@ -252,7 +245,7 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* Use value from Super Pinball Action - NEEDS VERIFICATION!! */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(galspnbl_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */

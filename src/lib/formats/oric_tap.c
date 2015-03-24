@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "oric_tap.h"
 
 #define ORIC_WAV_DEBUG 0

@@ -29,6 +29,23 @@ VIDEO_START_MEMBER(spectrum_state,ts2068)
 	m_frame_invert_count = 30;
 }
 
+void spectrum_state::screen_eof_timex(screen_device &screen, bool state)
+{
+	// rising edge
+	if (state)
+	{
+		spectrum_UpdateBorderBitmap();
+
+		m_frame_number++;
+
+		if (m_frame_number >= m_frame_invert_count)
+		{
+			m_frame_number = 0;
+			m_flash_invert = !m_flash_invert;
+		}
+	}
+}
+
 
 /*******************************************************************
  *

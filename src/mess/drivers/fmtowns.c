@@ -15,6 +15,8 @@
             1024 sprites (16x16), rendered direct to VRAM
             16 colour text mode, rendered direct to VRAM
 
+    Later models add an unknown single channel 16-bit PCM/ADPCM (FreshTV, SJ, MX), and CL-GD543x Windows accelerator chipsets (SJ)
+
 
     Fujitsu FM-Towns Marty
 

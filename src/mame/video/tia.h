@@ -199,6 +199,8 @@ private:
 	bitmap_ind16 *helper[3];
 
 	UINT16 screen_height;
+
+	void register_save_state();
 };
 
 class tia_pal_video_device : public tia_video_device

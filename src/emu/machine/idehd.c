@@ -179,6 +179,10 @@ void ata_mass_storage_device::device_start()
 	ata_hle_device::device_start();
 
 	save_item(NAME(m_can_identify_device));
+	save_item(NAME(m_num_cylinders));
+	save_item(NAME(m_num_sectors));
+	save_item(NAME(m_num_heads));
+
 	save_item(NAME(m_cur_lba));
 	save_item(NAME(m_sectors_until_int));
 	save_item(NAME(m_master_password_enable));

@@ -311,9 +311,7 @@ CPU68 PCB:
 
 INT32 namcos21_state::read_pointrom_data(unsigned offset)
 {
-	const INT32 *pPointData = (INT32 *)memregion( "point" )->base();
-	INT32 result = pPointData[offset];
-	return result;
+	return m_ptrom24[offset];
 }
 
 READ16_MEMBER(namcos21_state::namcos21_video_enable_r)
@@ -1168,8 +1166,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dsp_pointrom_addr_w)
 
 READ16_MEMBER(namcos21_state::winrun_dsp_pointrom_data_r)
 {
-	UINT16 *ptrom = (UINT16 *)memregion("point")->base();
-	return ptrom[m_winrun_pointrom_addr++];
+	return m_ptrom16[m_winrun_pointrom_addr++];
 }
 
 WRITE16_MEMBER(namcos21_state::winrun_dsp_complete_w)
@@ -1645,7 +1642,7 @@ ROM_START( aircomb )
 	ROM_LOAD16_BYTE( "ac1-edata1-u.3c", 0x000000, 0x80000, CRC(a9547509) SHA1(1bc663cec03b60ad968896bbc2546f02efda135e) )
 	ROM_LOAD16_BYTE( "ac1-edata1-l.1c", 0x000001, 0x80000, CRC(a87087dd) SHA1(cd9b83a8f07886ab44e4ded68002b44338777e8c) )
 
-	ROM_REGION32_BE( 0x400000, "point", ROMREGION_ERASE00)       /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00)       /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "ac1-poi-h.2f",  0x000001, 0x80000, CRC(573bbc3b) SHA1(371be12b915db6872049f18980c1b55544cfc445) ) /* most significant */
 	ROM_LOAD32_BYTE( "ac1-poi-lu.2k", 0x000002, 0x80000, CRC(d99084b9) SHA1(c604d60a2162af7610e5ff7c1aa4195f7df82efe) )
 	ROM_LOAD32_BYTE( "ac1-poi-ll.2n", 0x000003, 0x80000, CRC(abb32307) SHA1(8e936ba99479215dd33a951d81ec2b04020dfd62) ) /* least significant */
@@ -1706,7 +1703,7 @@ ROM_START( aircombj )
 	ROM_LOAD16_BYTE( "ac1-edata1-u.3c", 0x000000, 0x80000, CRC(a9547509) SHA1(1bc663cec03b60ad968896bbc2546f02efda135e) )
 	ROM_LOAD16_BYTE( "ac1-edata1-l.1c", 0x000001, 0x80000, CRC(a87087dd) SHA1(cd9b83a8f07886ab44e4ded68002b44338777e8c) )
 
-	ROM_REGION32_BE( 0x400000, "point", ROMREGION_ERASE00)       /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00)       /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "ac1-poi-h.2f",  0x000001, 0x80000, CRC(573bbc3b) SHA1(371be12b915db6872049f18980c1b55544cfc445) ) /* most significant */
 	ROM_LOAD32_BYTE( "ac1-poi-lu.2k", 0x000002, 0x80000, CRC(d99084b9) SHA1(c604d60a2162af7610e5ff7c1aa4195f7df82efe) )
 	ROM_LOAD32_BYTE( "ac1-poi-ll.2n", 0x000003, 0x80000, CRC(abb32307) SHA1(8e936ba99479215dd33a951d81ec2b04020dfd62) ) /* least significant */
@@ -1767,7 +1764,7 @@ ROM_START( cybsled )
 	ROM_LOAD16_BYTE( "cy1-edata0-u.3b", 0x000000, 0x80000, CRC(77452533) SHA1(48fc199bcc1beb23c714eebd9b09b153c980170b) )
 	ROM_LOAD16_BYTE( "cy1-edata0-l.1b", 0x000001, 0x80000, CRC(e812e290) SHA1(719e0a026ae8ef63d0d0269b67669ea9b4d950dd) )
 
-	ROM_REGION32_BE( 0x400000, "point", ROMREGION_ERASE00)       /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00)       /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "cy1-poi-h1.2f",  0x000001, 0x80000, CRC(eaf8bac3) SHA1(7a2caf6672af158b4a23ce4626342d1f17d1a4e4) )    /* most significant */
 	ROM_LOAD32_BYTE( "cy1-poi-lu1.2k", 0x000002, 0x80000, CRC(c544a8dc) SHA1(4cce5f2ab3519b4aa7edbdd15b2d79a7fdcade3c) )
 	ROM_LOAD32_BYTE( "cy1-poi-ll1.2n", 0x000003, 0x80000, CRC(30acb99b) SHA1(a28dcb3e5405f166644f6353a903c1143ee268f1) )    /* least significant */
@@ -1826,7 +1823,7 @@ ROM_START( cybsledj )
 	ROM_LOAD16_BYTE( "cy1-edata0-u.3b", 0x000000, 0x80000, CRC(77452533) SHA1(48fc199bcc1beb23c714eebd9b09b153c980170b) )
 	ROM_LOAD16_BYTE( "cy1-edata0-l.1b", 0x000001, 0x80000, CRC(e812e290) SHA1(719e0a026ae8ef63d0d0269b67669ea9b4d950dd) )
 
-	ROM_REGION32_BE( 0x400000, "point", ROMREGION_ERASE00)       /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00)       /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "cy1-poi-h1.2f",  0x000001, 0x80000, CRC(eaf8bac3) SHA1(7a2caf6672af158b4a23ce4626342d1f17d1a4e4) )    /* most significant */
 	ROM_LOAD32_BYTE( "cy1-poi-lu1.2k", 0x000002, 0x80000, CRC(c544a8dc) SHA1(4cce5f2ab3519b4aa7edbdd15b2d79a7fdcade3c) )
 	ROM_LOAD32_BYTE( "cy1-poi-ll1.2n", 0x000003, 0x80000, CRC(30acb99b) SHA1(a28dcb3e5405f166644f6353a903c1143ee268f1) )    /* least significant */
@@ -1887,7 +1884,7 @@ We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom
 	ROM_LOAD16_BYTE( "de1-data-u.3a",  0x00000, 0x80000, CRC(fe65d2ab) SHA1(dbe962dda7efa60357fa3a684a265aaad49df5b5) )
 	ROM_LOAD16_BYTE( "de1-data-l.1a",  0x00001, 0x80000, CRC(9bb37aca) SHA1(7f5dffc95cadcf12f53ff7944920afc25ed3cf68) )
 
-	ROM_REGION16_BE( 0xc0000, "point", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0xc0000, "point16", 0 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "de1-pt0-ub.8j", 0x00000, 0x20000, CRC(3b6b746d) SHA1(40c992ef4cf5187b30aba42c5fe7ce0f8f02bee0) )
 	ROM_LOAD16_BYTE( "de1-pt0-lb.8d", 0x00001, 0x20000, CRC(9c5c477e) SHA1(c8ae8a663227d636d35bd5f432d23f05d6695942) )
 	ROM_LOAD16_BYTE( "de1-pt1-u.8l",  0x40000, 0x20000, CRC(23bc72a1) SHA1(083e2955ae2f88d1ad461517b47054d64375b46e) )
@@ -1937,7 +1934,7 @@ ROM_START( starblad )
 
 	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
 
-	ROM_REGION32_BE( 0x400000, "point", ROMREGION_ERASE00) /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00) /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "st1-pt0-h.bin", 0x000001, 0x80000, CRC(84eb355f) SHA1(89a248b8be2e0afcee29ba4c4c9cca65d5fb246a) )
 	ROM_LOAD32_BYTE( "st1-pt0-u.bin", 0x000002, 0x80000, CRC(1956cd0a) SHA1(7d21b3a59f742694de472c545a1f30c3d92e3390) )
 	ROM_LOAD32_BYTE( "st1-pt0-l.bin", 0x000003, 0x80000, CRC(ff577049) SHA1(1e1595174094e88d5788753d05ce296c1f7eca75) )
@@ -1990,7 +1987,7 @@ ROM_START( starbladj )
 
 	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
 
-	ROM_REGION32_BE( 0x400000, "point", ROMREGION_ERASE00) /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00) /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "st1-pt0-h.bin", 0x000001, 0x80000, CRC(84eb355f) SHA1(89a248b8be2e0afcee29ba4c4c9cca65d5fb246a) )
 	ROM_LOAD32_BYTE( "st1-pt0-u.bin", 0x000002, 0x80000, CRC(1956cd0a) SHA1(7d21b3a59f742694de472c545a1f30c3d92e3390) )
 	ROM_LOAD32_BYTE( "st1-pt0-l.bin", 0x000003, 0x80000, CRC(ff577049) SHA1(1e1595174094e88d5788753d05ce296c1f7eca75) )
@@ -2047,7 +2044,7 @@ ROM_START( solvalou )
 
 	ROM_REGION16_BE( 0x100000, "edata", ROMREGION_ERASEFF )
 
-	ROM_REGION32_BE( 0x400000, "point", ROMREGION_ERASE00)       /* 24bit signed point data */
+	ROM_REGION32_BE( 0x400000, "point24", ROMREGION_ERASE00)       /* 24bit signed point data */
 	ROM_LOAD32_BYTE( "sv1-pt0-h.bin", 0x000001, 0x80000, CRC(3be21115) SHA1(c9f30353c1216f64199f87cd34e787efd728e739) ) /* most significant */
 	ROM_LOAD32_BYTE( "sv1-pt0-u.bin", 0x000002, 0x80000, CRC(4aacfc42) SHA1(f0e179e057183b41744ca429764f44306f0ce9bf) )
 	ROM_LOAD32_BYTE( "sv1-pt0-l.bin", 0x000003, 0x80000, CRC(6a4dddff) SHA1(9ed182d21d328c6a684ee6658a9dfcf3f3dd8646) ) /* least significant */
@@ -2095,7 +2092,7 @@ ROM_START( winrun )
 	ROM_LOAD16_BYTE( "wr1-gd0u-2.1p",  0x00000, 0x40000, CRC(9752eef5) SHA1(d6df0faf9c2696247bdf463f53c1e474ec595dd0) )
 	ROM_LOAD16_BYTE( "wr1-gd0l-2.3p",  0x00001, 0x40000, CRC(349c95cc) SHA1(8898eecf5918485ec683900520f123483077df28) )
 
-	ROM_REGION16_BE( 0x80000, "point", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "wr1-pt0u.8j", 0x00000, 0x20000, CRC(7ec4cf6b) SHA1(92ec92567b9f7321efb4a3724cbcdba216eb22f9) )
 	ROM_LOAD16_BYTE( "wr1-pt0l.8d", 0x00001, 0x20000, CRC(58c14b73) SHA1(e34a26866cd870743e166669f7fa5915a82104e9) )
 
@@ -2163,7 +2160,7 @@ ROM_START( winrungp )
 	ROM_LOAD16_BYTE( "sg1-gd1-u.1s", 0x80000, 0x40000, CRC(271db29b) SHA1(8b35fcf273b9aec28d4c606c41c0626dded697e1) )
 	ROM_LOAD16_BYTE( "sg1-gd1-l.3s", 0x80001, 0x40000, CRC(a6c4da96) SHA1(377dbf21a1bede01de16708c96c112abab4417ce) )
 
-	ROM_REGION16_BE( 0x80000, "point", 0 ) /* 3d objects */
+	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* 3d objects */
 	ROM_LOAD16_BYTE( "sg1-pt0-u.8j", 0x00000, 0x20000, CRC(160c3634) SHA1(485d20d6cc459f17d77682201dee07bdf76bf343) )
 	ROM_LOAD16_BYTE( "sg1-pt0-l.8d", 0x00001, 0x20000, CRC(b5a665bf) SHA1(5af6ec492f31395c0492e14590b025b120067b8d) )
 	ROM_LOAD16_BYTE( "sg1-pt1-u.8l", 0x40000, 0x20000, CRC(b63d3006) SHA1(78e78619766b0fd91b1e830cfb066495d6773981) )
@@ -2212,7 +2209,7 @@ ROM_START( winrun91 )
 	ROM_LOAD16_BYTE( "r911-gd1u.1s", 0x80000, 0x40000, CRC(17e5a61c) SHA1(272ebd7daa56847f1887809535362331b5465dec) )
 	ROM_LOAD16_BYTE( "r911-gd1l.3s", 0x80001, 0x40000, CRC(64df59a2) SHA1(1e9d0945b94780bb0be16803e767466d2cda07e8) )
 
-	ROM_REGION16_BE( 0x80000, "point", 0 ) /* winrun91 - 3d objects */
+	ROM_REGION16_BE( 0x80000, "point16", 0 ) /* winrun91 - 3d objects */
 	ROM_LOAD16_BYTE( "r911-pt0u.8j", 0x00000, 0x20000, CRC(abf512a6) SHA1(e86288039d6c4dedfa95b11cb7e4b87637f90c09) ) /* Version on SYSTEM21B CPU only has R911 PTU @ 8W */
 	ROM_LOAD16_BYTE( "r911-pt0l.8d", 0x00001, 0x20000, CRC(ac8d468c) SHA1(d1b457a19a5d3259d0caf933f42b3a02b485867b) ) /* and R911 PTL @ 12W with rom type 27C020 */
 	ROM_LOAD16_BYTE( "r911-pt1u.8l", 0x40000, 0x20000, CRC(7e5dab74) SHA1(5bde219d5b4305d38d17b494b2e759f05d05329f) )

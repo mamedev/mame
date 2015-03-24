@@ -7,7 +7,6 @@ Speed Attack! (c) 1984 Seta Kikaku Corp.
 driver by Pierpaolo Prazzoli & Angelo Salese, based on early work by David Haywood
 
 TODO:
- - Video emulation requires a major conversion to the HD46505SP C.R.T. chip (MC6845 clone)
  - It's possible that there is only one coin chute and not two,needs a real board to know
    more about it.
 
@@ -79,10 +78,17 @@ PS / PD :  key matrix
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "video/mc6845.h"
 #include "includes/speedatk.h"
 
 #define MASTER_CLOCK XTAL_12MHz
+
+void speedatk_state::machine_start()
+{
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_km_status));
+	save_item(NAME(m_coin_settings));
+	save_item(NAME(m_coin_impulse));
+}
 
 UINT8 speedatk_state::iox_key_matrix_calc(UINT8 p_side)
 {
@@ -175,14 +181,14 @@ static ADDRESS_MAP_START( speedatk_mem, AS_PROGRAM, 8, speedatk_state )
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(speedatk_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(speedatk_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( speedatk_io, AS_IO, 8, speedatk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_6845_w) //h46505 address / data routing
+	AM_RANGE(0x00, 0x01) AM_WRITE(m6845_w) //h46505 address / data routing
 	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
@@ -285,7 +291,7 @@ static GFXDECODE_START( speedatk )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout_3bpp,   0, 32 )
 GFXDECODE_END
 
-WRITE8_MEMBER(speedatk_state::speedatk_output_w)
+WRITE8_MEMBER(speedatk_state::output_w)
 {
 	m_flip_scr = data & 0x80;
 
@@ -308,7 +314,7 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update_speedatk)
+	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16)   /* hand tuned to get ~60 fps */
@@ -325,7 +331,7 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(speedatk_state, speedatk_output_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(speedatk_state, output_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -350,4 +356,4 @@ ROM_START( speedatk )
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, driver_device, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", 0 )
+GAME( 1984, speedatk, 0, speedatk, speedatk, driver_device, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", GAME_SUPPORTS_SAVE )

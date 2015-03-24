@@ -12,12 +12,28 @@ Issues:
 #include "sound/ay8910.h"
 #include "includes/rollrace.h"
 
-READ8_MEMBER(rollrace_state::ra_fake_d800_r)
+
+void rollrace_state::machine_start()
+{
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_bkgpage));
+	save_item(NAME(m_bkgflip));
+	save_item(NAME(m_chrbank));
+	save_item(NAME(m_bkgpen));
+	save_item(NAME(m_bkgcol));
+	save_item(NAME(m_flipy));
+	save_item(NAME(m_flipx));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_sound_nmi_mask));
+}
+
+READ8_MEMBER(rollrace_state::fake_d800_r)
 {
 	return 0x51;
 }
 
-WRITE8_MEMBER(rollrace_state::ra_fake_d800_w)
+WRITE8_MEMBER(rollrace_state::fake_d800_w)
 {
 /*  logerror("d900: %02X\n",data);*/
 }
@@ -38,24 +54,24 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROM          /* only rollace2 */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
-	AM_RANGE(0xd900, 0xd900) AM_READWRITE(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
+	AM_RANGE(0xd900, 0xd900) AM_READWRITE(fake_d800_r,fake_d800_w) /* protection ??*/
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(rollrace_backgroundcolor_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(backgroundcolor_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(rollrace_bkgpen_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE(rollrace_backgroundpage_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(rollrace_flipy_w)
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(bkgpen_w)
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE(backgroundpage_w)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE(flipy_w)
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(rollrace_flipx_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flipx_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xfc02, 0xfc03) AM_WRITENOP /* coin counters */
-	AM_RANGE(0xfc04, 0xfc05) AM_WRITE(rollrace_charbank_w)
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(rollrace_spritebank_w)
+	AM_RANGE(0xfc04, 0xfc05) AM_WRITE(charbank_w)
+	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(spritebank_w)
 ADDRESS_MAP_END
 
 
@@ -235,7 +251,7 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update_rollrace)
+	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
@@ -413,6 +429,6 @@ ROM_START( rollace2 )
 ROM_END
 
 
-GAME( 1983, fightrol, 0,        rollrace, rollrace, driver_device, 0, ROT270, "Kaneko (Taito license)", "Fighting Roller", GAME_IMPERFECT_SOUND )
-GAME( 1983, rollace,  fightrol, rollrace, rollrace, driver_device, 0, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1983, rollace2, fightrol, rollace2, rollrace, driver_device, 0, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1983, fightrol, 0,        rollrace, rollrace, driver_device, 0, ROT270, "Kaneko (Taito license)", "Fighting Roller", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, rollace,  fightrol, rollrace, rollrace, driver_device, 0, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, rollace2, fightrol, rollace2, rollrace, driver_device, 0, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

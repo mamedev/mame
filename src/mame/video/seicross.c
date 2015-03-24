@@ -54,13 +54,13 @@ PALETTE_INIT_MEMBER(seicross_state, seicross)
 	}
 }
 
-WRITE8_MEMBER(seicross_state::seicross_videoram_w)
+WRITE8_MEMBER(seicross_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(seicross_state::seicross_colorram_w)
+WRITE8_MEMBER(seicross_state::colorram_w)
 {
 	/* bit 5 of the address is not used for color memory. There is just */
 	/* 512k of memory; every two consecutive rows share the same memory */
@@ -94,44 +94,42 @@ void seicross_state::video_start()
 
 void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *spriteram_2 = m_spriteram2;
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int x = spriteram[offs + 3];
+		int x = m_spriteram[offs + 3];
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
-				spriteram[offs + 1] & 0x0f,
-				spriteram[offs] & 0x40,spriteram[offs] & 0x80,
-				x,240-spriteram[offs + 2],0);
+				(m_spriteram[offs] & 0x3f) + ((m_spriteram[offs + 1] & 0x10) << 2) + 128,
+				m_spriteram[offs + 1] & 0x0f,
+				m_spriteram[offs] & 0x40,m_spriteram[offs] & 0x80,
+				x,240-m_spriteram[offs + 2],0);
 		if(x>0xf0)
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
-					spriteram[offs + 1] & 0x0f,
-					spriteram[offs] & 0x40,spriteram[offs] & 0x80,
-					x-256,240-spriteram[offs + 2],0);
+					(m_spriteram[offs] & 0x3f) + ((m_spriteram[offs + 1] & 0x10) << 2) + 128,
+					m_spriteram[offs + 1] & 0x0f,
+					m_spriteram[offs] & 0x40,m_spriteram[offs] & 0x80,
+					x-256,240-m_spriteram[offs + 2],0);
 	}
 
 	for (offs = m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int x = spriteram_2[offs + 3];
+		int x = m_spriteram2[offs + 3];
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
-				spriteram_2[offs + 1] & 0x0f,
-				spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
-				x,240-spriteram_2[offs + 2],0);
+				(m_spriteram2[offs] & 0x3f) + ((m_spriteram2[offs + 1] & 0x10) << 2),
+				m_spriteram2[offs + 1] & 0x0f,
+				m_spriteram2[offs] & 0x40,m_spriteram2[offs] & 0x80,
+				x,240-m_spriteram2[offs + 2],0);
 		if(x>0xf0)
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
-					spriteram_2[offs + 1] & 0x0f,
-					spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
-					x-256,240-spriteram_2[offs + 2],0);
+					(m_spriteram2[offs] & 0x3f) + ((m_spriteram2[offs + 1] & 0x10) << 2),
+					m_spriteram2[offs + 1] & 0x0f,
+					m_spriteram2[offs] & 0x40,m_spriteram2[offs] & 0x80,
+					x-256,240-m_spriteram2[offs + 2],0);
 	}
 }
 
-UINT32 seicross_state::screen_update_seicross(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 seicross_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int col;
 

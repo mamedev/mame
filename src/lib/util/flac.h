@@ -17,7 +17,7 @@
 #include "corefile.h"
 
 #ifdef FLAC__NO_DLL
-#include "../../lib/libflac/include/FLAC/all.h"
+#include "libflac/include/FLAC/all.h"
 #else
 #include <FLAC/all.h>
 #endif

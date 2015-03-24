@@ -37,7 +37,6 @@ public:
 			m_paletteram(*this, "paletteram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
-			m_nmk112(*this, "nmk112"),
 			m_oki(*this, "oki"),
 			m_int_timer(*this, "int_timer"),
 			m_int_timer_left(*this, "int_timer_left"),
@@ -122,7 +121,6 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<nmk112_device> m_nmk112;
 	optional_device<okim6295_device> m_oki;
 	required_device<timer_device> m_int_timer;
 	optional_device<timer_device> m_int_timer_left;

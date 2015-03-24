@@ -24,11 +24,11 @@
 #undef None
 #endif
 
-#include "lua/lua.hpp"
-#include "lua/lib/lualibs.h"
-#include "lua/bridge/LuaBridge.h"
-
 struct lua_State;
+namespace luabridge
+{
+	class LuaRef;
+}
 
 class lua_engine
 {
@@ -105,13 +105,19 @@ private:
 
 	// "emu.machine" namespace
 	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
-	static luabridge::LuaRef l_dev_get_memspaces(const device_t *d);
 	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
+	static luabridge::LuaRef l_dev_get_states(const device_t *d);
+	static UINT64 l_state_get_value(const device_state_entry *d);
+	static void l_state_set_value(device_state_entry *d, UINT64 v);
+	static luabridge::LuaRef l_dev_get_memspaces(const device_t *d);
 	struct lua_addr_space {
 		template<typename T> int l_mem_read(lua_State *L);
+		template<typename T> int l_mem_write(lua_State *L);
 	};
 	static luabridge::LuaRef l_machine_get_screens(const running_machine *r);
 	struct lua_screen {
+		int l_height(lua_State *L);
+		int l_width(lua_State *L);
 		int l_draw_box(lua_State *L);
 		int l_draw_line(lua_State *L);
 		int l_draw_text(lua_State *L);

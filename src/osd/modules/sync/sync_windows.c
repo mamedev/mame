@@ -239,8 +239,14 @@ void osd_event_reset(osd_event *event)
 
 int osd_event_wait(osd_event *event, osd_ticks_t timeout)
 {
-	int ret = WaitForSingleObject((HANDLE) event, timeout * 1000 / osd_ticks_per_second());
-	return ( ret == WAIT_OBJECT_0);
+	DWORD timeout_param;
+	if (timeout == OSD_EVENT_WAIT_INFINITE)
+		timeout_param = INFINITE;
+	else
+		timeout_param = timeout * 1000 / osd_ticks_per_second();
+
+	int ret = WaitForSingleObject((HANDLE) event, timeout_param);
+	return (ret == WAIT_OBJECT_0);
 }
 
 //============================================================
@@ -265,9 +271,16 @@ osd_thread *osd_thread_create(osd_thread_callback callback, void *cbparam)
 	uintptr_t handle;
 
 	thread = (osd_thread *)calloc(1, sizeof(osd_thread));
+	if (thread == NULL)
+		return NULL;
 	thread->callback = callback;
 	thread->param = cbparam;
 	handle = _beginthreadex(NULL, 0, worker_thread_entry, thread, 0, NULL);
+	if (handle == 0)
+	{
+		free(thread);
+		return NULL;
+	}
 	thread->handle = (HANDLE) handle;
 	return thread;
 }
@@ -306,15 +319,6 @@ int osd_thread_cpu_affinity(osd_thread *thread, UINT32 mask)
 }
 
 //============================================================
-//  osd_process_kill
-//============================================================
-
-void osd_process_kill(void)
-{
-	TerminateProcess(GetCurrentProcess(), -1);
-}
-
-//============================================================
 //  Scalable Locks
 //============================================================
 
@@ -323,6 +327,8 @@ osd_scalable_lock *osd_scalable_lock_alloc(void)
 	osd_scalable_lock *lock;
 
 	lock = (osd_scalable_lock *)calloc(1, sizeof(*lock));
+	if (lock == NULL)
+		return NULL;
 
 	memset(lock, 0, sizeof(*lock));
 #if USE_SCALABLE_LOCKS

@@ -121,6 +121,15 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
 	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3));
 }
 
+/*
+mjelctrn:	7 d e -> 1 - 4 8
+mjembase:	b d e -> - 2 4 8
+*/
+WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
+{
+	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 2, 3, 1, 0));
+}
+
 
 /* Background Color */
 WRITE8_MEMBER(dynax_state::dynax_blit_backpen_w)
@@ -174,6 +183,11 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
 	LOG(("P23=%02X ", data));
 }
 
+WRITE8_MEMBER(dynax_state::mjembase_blit_palette23_w)
+{
+	dynax_blit_palette23_w(space, offset, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4), mem_mask);
+}
+
 
 /* Layer 6&7 Palettes (Low Bits) */
 WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
@@ -200,7 +214,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_palbank_w)
 }
 
 
-/* Which half of the layers to write two (interleaved games only) */
+/* Which half of the layers to write to (interleaved games only) */
 WRITE8_MEMBER(dynax_state::hanamai_layer_half_w)
 {
 	m_hanamai_layer_half = (~data) & 1;
@@ -366,7 +380,15 @@ void dynax_state::blitter_plot_pixel( int layer, int mask, int x, int y, int pen
 	}
 }
 
+/*
+	Flags:
 
+    7654 ----   -
+    ---- 3---   Rotation = SWAPXY + FLIPY
+    ---- -2--   -
+    ---- --1-   0 = Ignore the pens specified in ROM, draw everything with the pen supplied as parameter
+    ---- ---0   Clear
+*/
 int dynax_state::blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags )
 {
 	UINT8 cmd;
@@ -688,6 +710,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blitter_rev2_w)
 }
 
 
+// two blitters/screens
 WRITE8_MEMBER(dynax_state::jantouki_blitter_rev2_w)
 {
 	switch (offset)
@@ -716,6 +739,44 @@ WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
 	}
 }
 
+// first register does not trigger a blit, it sets the destination
+WRITE8_MEMBER(dynax_state::cdracula_blitter_rev2_w)
+{
+	switch (offset)
+	{
+		case 0:
+			LOG(("DD=%02X ", data));
+
+			if (data & 0xf0)
+			{
+				hanamai_layer_half_w(space, offset, 0, mem_mask);
+				dynax_blit_dest_w(space, offset, data >> 4, mem_mask);
+			}
+			if (data & 0x0f)
+			{
+				hanamai_layer_half_w(space, offset, 1, mem_mask);
+				dynax_blit_dest_w(space, offset, data & 0x0f, mem_mask);
+			}
+			break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
+		case 6: dynax_blit_scroll_w(space, 0, data); break;
+	}
+}
+
+WRITE8_MEMBER(dynax_state::dynax_blit_flags_w)
+{
+	LOG(("FLG=%02X ", data));
+
+	int flags = (data & 0x08) ? 0x08 : 0x00;
+	flags    |= (data & 0x10) ? 0x02 : 0x00;
+	flags    |= (data & 0x80) ? 0x01 : 0x00;
+
+	dynax_blitter_start(flags);
+}
 
 /***************************************************************************
 
@@ -729,6 +790,7 @@ WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
 static const int priority_hnoridur[8] = { 0x0231, 0x2103, 0x3102, 0x2031, 0x3021, 0x1302, 0x2310, 0x1023 };
 static const int priority_mcnpshnt[8] = { 0x3210, 0x2103, 0x3102, 0x2031, 0x3021, 0x1302, 0x2310, 0x1023 };
 static const int priority_mjelctrn[8] = { 0x0231, 0x0321, 0x2031, 0x2301, 0x3021, 0x3201 ,0x0000, 0x0000 }; // this game doesn't use (hasn't?) layer 1
+static const int priority_mjembase[8] = { 0x0231, 0x2031, 0x0321, 0x3021, 0x2301, 0x3201 ,0x0000, 0x0000 }; // this game doesn't use (hasn't?) layer 1
 
 
 void dynax_state::dynax_common_reset()
@@ -937,6 +999,14 @@ VIDEO_START_MEMBER(dynax_state,mjelctrn)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjelctrn;
+	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
+}
+
+VIDEO_START_MEMBER(dynax_state,mjembase)
+{
+	VIDEO_START_CALL_MEMBER(hnoridur);
+
+	m_priority_table = priority_mjembase;
 	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
@@ -1152,6 +1222,17 @@ WRITE8_MEMBER(dynax_state::tenkai_priority_w)
 	m_hanamai_priority = BITSWAP8(data, 3, 2, 1, 0, 4, 7, 5, 6);
 }
 
+/*
+mjembase:	priority: 00 08 10 18 20 28; enable: 1,2,4
+Convert to:
+mjelctrn:	priority: 00 20 10 40 30 50; enable: 1,2,8
+*/
+WRITE8_MEMBER(dynax_state::mjembase_priority_w)
+{
+	m_hanamai_priority = BITSWAP8(data, 6, 5, 4, 3, 2, 7, 1, 0);
+}
+
+
 int dynax_state::debug_mask()
 {
 #ifdef MAME_DEBUG
@@ -1366,5 +1447,26 @@ UINT32 dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &
 
 	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(bitmap, cliprect, 0);
 	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(bitmap, cliprect, 1);
+	return 0;
+}
+
+
+UINT32 dynax_state::screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int layers_ctrl = ~m_layer_enable;
+
+	if (debug_viewer(bitmap,cliprect))
+		return 0;
+
+	layers_ctrl &= debug_mask();
+
+	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
+
+	m_extra_scroll_y = -8;
+
+	if (BIT(layers_ctrl, 3))   hanamai_copylayer(bitmap, cliprect, 3);
+	if (BIT(layers_ctrl, 1))   hanamai_copylayer(bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 2))   hanamai_copylayer(bitmap, cliprect, 2);
+	if (BIT(layers_ctrl, 0))   hanamai_copylayer(bitmap, cliprect, 0);
 	return 0;
 }

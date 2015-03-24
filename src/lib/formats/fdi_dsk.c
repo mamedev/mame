@@ -14,6 +14,7 @@
 
 */
 
+#include <assert.h>
 #include "imageutl.h"
 #include "flopimg.h"
 

@@ -98,6 +98,8 @@ private:
 private:
 	required_region_ptr<INT16> m_rom;
 
+	UINT32 m_rommask;
+
 	sound_stream *m_stream;
 
 	double m_env_ar_table[0x9f];

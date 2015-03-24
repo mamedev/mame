@@ -192,7 +192,6 @@ DRIVER_INIT_MEMBER(naomi_state,naomi)
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
 	create_pic_from_retdat();
@@ -201,18 +200,35 @@ DRIVER_INIT_MEMBER(naomi_state,naomi)
 DRIVER_INIT_MEMBER(naomi_state,naomi2)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
-	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
 	create_pic_from_retdat();
+}
+
+INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
+{
+	m_mp_mux = newval;
+}
+CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
+{
+	const char *tagptr = (const char *)param;
+	UINT8 retval = 0;
+
+	for (int i = 0x80; i >= 0x08; i >>= 1)
+	{
+		if (m_mp_mux & i)
+			retval |= ioport(tagptr)->read_safe(0);
+		tagptr += strlen(tagptr) + 1;
+	}
+	return retval;
 }
 
 DRIVER_INIT_MEMBER(naomi_state,naomi_mp)
 {
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
+	m_mp_mux = 0;
 
 	create_pic_from_retdat();
 }
@@ -221,7 +237,6 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
 	create_pic_from_retdat();
@@ -231,8 +246,8 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd_mp)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
-	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
+	m_mp_mux = 0;
 
 	create_pic_from_retdat();
 }

@@ -1,6 +1,8 @@
 
 /*
 
+	am9517a.c is a more complete implementation of this, the uPD71071 appears to be a clone of it
+
     NEC uPD71071 DMA Controller
     Used on the Fujitsu FM-Towns
 
@@ -29,6 +31,8 @@
             Self-explanatory, I hope. :)
             NOTE: Datasheet clearly shows this as 24-bit, with register 7 unused.
             But the FM-Towns definitely uses reg 7 as bits 24-31.
+			The documentation on the V53A manual doesn't show these bits either, maybe it's
+			an external connection on the FMT? might be worth checking overflow behavior etc.
 
     0x08:
     0x09:   Device Control register (16-bit)
@@ -73,6 +77,9 @@
     0x0f:   Mask register
             bit 0-3: DMARQ mask
             bits 1 and 0 only in MTM transfers
+			
+	Note, the uPD71071 compatible mode of the V53 CPU differs from a real uPD71071 in the following ways
+
 
 
 */
@@ -162,7 +169,6 @@ void upd71071_device::device_start()
 TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 {
 	// single byte or word transfer
-	address_space& space = m_cpu->space(AS_PROGRAM);
 	int channel = param;
 	UINT16 data = 0;  // data to transfer
 
@@ -190,7 +196,17 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 						data = m_dma_read_3_cb(0);
 					break;
 			}
-			space.write_byte(m_reg.address_current[channel], data & 0xff);
+
+			if (m_cpu)
+			{
+				address_space& space = m_cpu->space(AS_PROGRAM);
+				space.write_byte(m_reg.address_current[channel], data & 0xff);
+			}
+			else
+			{
+				printf("upd71071_device: dma_transfer_timer - write to memory, no dest space %02x\n", data & 0xff);
+			}
+
 			if (m_reg.mode_control[channel] & 0x20)  // Address direction
 				m_reg.address_current[channel]--;
 			else
@@ -208,7 +224,17 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 			}
 			break;
 		case 0x08:  // memory -> I/O
-			data = space.read_byte(m_reg.address_current[channel]);
+			if (m_cpu)
+			{
+				address_space& space = m_cpu->space(AS_PROGRAM);
+				data = space.read_byte(m_reg.address_current[channel]);
+			}
+			else
+			{
+				printf("upd71071_device: dma_transfer_timer - read from memory, no src space\n");
+				data = 0x00;
+			}
+
 			switch (channel)
 			{
 				case 0:

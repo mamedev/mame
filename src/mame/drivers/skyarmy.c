@@ -34,46 +34,59 @@ class skyarmy_state : public driver_device
 public:
 	skyarmy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
-		m_scrollram(*this, "scrollram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_scrollram(*this, "scrollram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scrollram;
+
 	tilemap_t* m_tilemap;
 	int m_nmi;
-	DECLARE_WRITE8_MEMBER(skyarmy_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(skyarmy_flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(skyarmy_videoram_w);
-	DECLARE_WRITE8_MEMBER(skyarmy_colorram_w);
+
+	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	TILE_GET_INFO_MEMBER(get_skyarmy_tile_info);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(skyarmy);
-	UINT32 screen_update_skyarmy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(skyarmy_nmi_source);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(nmi_source);
 };
 
-WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_x_w)
+void skyarmy_state::machine_start()
+{
+	save_item(NAME(m_nmi));
+}
+
+WRITE8_MEMBER(skyarmy_state::flip_screen_x_w)
 {
 	flip_screen_x_set(data & 0x01);
 }
 
-WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_y_w)
+WRITE8_MEMBER(skyarmy_state::flip_screen_y_w)
 {
 	flip_screen_y_set(data & 0x01);
 }
 
-TILE_GET_INFO_MEMBER(skyarmy_state::get_skyarmy_tile_info)
+TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int attr = BITSWAP8(m_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
@@ -81,13 +94,13 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_skyarmy_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
-WRITE8_MEMBER(skyarmy_state::skyarmy_videoram_w)
+WRITE8_MEMBER(skyarmy_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skyarmy_state::skyarmy_colorram_w)
+WRITE8_MEMBER(skyarmy_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -124,14 +137,13 @@ PALETTE_INIT_MEMBER(skyarmy_state, skyarmy)
 
 void skyarmy_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(skyarmy_state::get_skyarmy_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(skyarmy_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
 }
 
 
-UINT32 skyarmy_state::screen_update_skyarmy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 skyarmy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
 	int sx, sy, flipx, flipy, offs,pal;
 	int i;
 
@@ -142,15 +154,15 @@ UINT32 skyarmy_state::screen_update_skyarmy(screen_device &screen, bitmap_ind16 
 
 	for (offs = 0 ; offs < 0x40; offs+=4)
 	{
-		pal = BITSWAP8(spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
+		pal = BITSWAP8(m_spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
-		sx = spriteram[offs+3];
-		sy = 240-(spriteram[offs]+1);
-		flipy = (spriteram[offs+1]&0x80)>>7;
-		flipx = (spriteram[offs+1]&0x40)>>6;
+		sx = m_spriteram[offs+3];
+		sy = 240-(m_spriteram[offs]+1);
+		flipy = (m_spriteram[offs+1]&0x80)>>7;
+		flipx = (m_spriteram[offs+1]&0x40)>>6;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-			spriteram[offs+1]&0x3f,
+			m_spriteram[offs+1]&0x3f,
 			pal,
 			flipx,flipy,
 			sx,sy,0);
@@ -159,7 +171,7 @@ UINT32 skyarmy_state::screen_update_skyarmy(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(skyarmy_state::skyarmy_nmi_source)
+INTERRUPT_GEN_MEMBER(skyarmy_state::nmi_source)
 {
 	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -174,8 +186,8 @@ WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
 static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_SHARE("videoram") /* Video RAM */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_SHARE("colorram") /* Color RAM */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") /* Video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram") /* Color RAM */
 	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("scrollram")  /* Scroll RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
@@ -183,8 +195,8 @@ static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
-	AM_RANGE(0xa005, 0xa005) AM_WRITE(skyarmy_flip_screen_x_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(skyarmy_flip_screen_y_w)
+	AM_RANGE(0xa005, 0xa005) AM_WRITE(flip_screen_x_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(flip_screen_y_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -286,7 +298,7 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 	MCFG_CPU_PROGRAM_MAP(skyarmy_map)
 	MCFG_CPU_IO_MAP(skyarmy_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyarmy_state,  irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(skyarmy_state, skyarmy_nmi_source, 650)    /* Hz */
+	MCFG_CPU_PERIODIC_INT_DRIVER(skyarmy_state, nmi_source, 650)    /* Hz */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -294,7 +306,7 @@ static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8,32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8,32*8-1,1*8,31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update_skyarmy)
+	MCFG_SCREEN_UPDATE_DRIVER(skyarmy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyarmy)
@@ -327,4 +339,4 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, driver_device, 0, ROT90, "Shoei", "Sky Army", GAME_NO_COCKTAIL )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, driver_device, 0, ROT90, "Shoei", "Sky Army", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

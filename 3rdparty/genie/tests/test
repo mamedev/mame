@@ -1,0 +1,2 @@
+#!/bin/sh
+cd `dirname $0` && ../bin/debug/premake4 /scripts=../src $1 $2 $3 test

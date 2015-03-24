@@ -47,7 +47,7 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 #include "includes/vulgus.h"
 
 
-INTERRUPT_GEN_MEMBER(vulgus_state::vulgus_vblank_irq)
+INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h - vblank */
 }
@@ -62,12 +62,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP // ?
 	AM_RANGE(0xc802, 0xc803) AM_RAM AM_SHARE("scroll_low")
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(vulgus_c804_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(vulgus_palette_bank_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(c804_w)
+	AM_RANGE(0xc805, 0xc805) AM_WRITE(palette_bank_w)
 	AM_RANGE(0xc902, 0xc903) AM_RAM AM_SHARE("scroll_high")
 	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vulgus_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vulgus_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -213,7 +213,7 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vulgus_state, vulgus_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vulgus_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -225,7 +225,7 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update_vulgus)
+	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vulgus)
@@ -371,6 +371,6 @@ ROM_END
 
 
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus, driver_device, 0, ROT270, "Capcom", "Vulgus (set 1)", 0 )
-GAME( 1984, vulgusa, vulgus, vulgus, vulgus, driver_device, 0, ROT90,  "Capcom", "Vulgus (set 2)", 0 )
-GAME( 1984, vulgusj, vulgus, vulgus, vulgus, driver_device, 0, ROT270, "Capcom", "Vulgus (Japan?)", 0 )
+GAME( 1984, vulgus,  0,      vulgus, vulgus, driver_device, 0, ROT270, "Capcom", "Vulgus (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, vulgusa, vulgus, vulgus, vulgus, driver_device, 0, ROT90,  "Capcom", "Vulgus (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, vulgusj, vulgus, vulgus, vulgus, driver_device, 0, ROT270, "Capcom", "Vulgus (Japan?)", GAME_SUPPORTS_SAVE )

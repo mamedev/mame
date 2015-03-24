@@ -162,7 +162,6 @@ public:
 	INTERRUPT_GEN_MEMBER(gondo_interrupt);
 	INTERRUPT_GEN_MEMBER(oscar_interrupt);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
 
 protected:

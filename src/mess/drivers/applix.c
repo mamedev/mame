@@ -5,8 +5,6 @@
     Applix 1616 computer
 
     See for docs: http;//www.microbee-mspp.org.au
-    You need to sign up and make an introductory thread.
-    Then you will be granted permission to visit the repository.
 
     First revealed to the world in December 1986 issue of Electronics Today
     International (ETI) an Australian electronics magazine which is now defunct.
@@ -936,7 +934,7 @@ DRIVER_INIT_MEMBER(applix_state, applix)
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", GAME_NOT_WORKING )
+COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Applix Pty Ltd", "Applix 1616", 0 )
 
 
 

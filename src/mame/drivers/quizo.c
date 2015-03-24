@@ -35,16 +35,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	required_device<cpu_device> m_maincpu;
+
 	UINT8 *m_videoram;
 	UINT8 m_port60;
 	UINT8 m_port70;
+
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
+
 	DECLARE_DRIVER_INIT(quizo);
 	DECLARE_PALETTE_INIT(quizo);
-	UINT32 screen_update_quizo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -82,16 +86,15 @@ PALETTE_INIT_MEMBER(quizo_state, quizo)
 	}
 }
 
-UINT32 quizo_state::screen_update_quizo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 quizo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
 	int x,y;
 	for(y=0;y<200;y++)
 	{
 		for(x=0;x<80;x++)
 		{
-			int data=videoram[y*80+x];
-			int data1=videoram[y*80+x+0x4000];
+			int data=m_videoram[y*80+x];
+			int data1=m_videoram[y*80+x+0x4000];
 			int pix;
 
 			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
@@ -115,9 +118,8 @@ UINT32 quizo_state::screen_update_quizo(screen_device &screen, bitmap_ind16 &bit
 
 WRITE8_MEMBER(quizo_state::vram_w)
 {
-	UINT8 *videoram = m_videoram;
 	int bank=(m_port70&8)?1:0;
-	videoram[offset+bank*0x4000]=data;
+	m_videoram[offset+bank*0x4000]=data;
 }
 
 WRITE8_MEMBER(quizo_state::port70_w)
@@ -133,7 +135,7 @@ WRITE8_MEMBER(quizo_state::port60_w)
 		data=0;
 	}
 	m_port60=data;
-	membank("bank1")->set_base(&memregion("user1")->base()[rombankLookup[data]*0x4000] );
+	membank("bank1")->set_entry(rombankLookup[data]);
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, quizo_state )
@@ -218,7 +220,7 @@ static MACHINE_CONFIG_START( quizo, quizo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quizo_state, screen_update_quizo)
+	MCFG_SCREEN_UPDATE_DRIVER(quizo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
@@ -265,7 +267,12 @@ ROM_END
 DRIVER_INIT_MEMBER(quizo_state,quizo)
 {
 	m_videoram=auto_alloc_array(machine(), UINT8, 0x4000*2);
+	membank("bank1")->configure_entries(0, 6, memregion("user1")->base(), 0x4000);
+
+	save_pointer(NAME(m_videoram), 0x4000*2);
+	//save_item(NAME(m_port60));
+	save_item(NAME(m_port70));
 }
 
-GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )
-GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", 0 )
+GAME( 1985, quizo,  0,       quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, quizoa, quizo,   quizo,  quizo, quizo_state,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", GAME_SUPPORTS_SAVE )

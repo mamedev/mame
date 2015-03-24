@@ -514,7 +514,7 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
 
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;
-	int i, y, y_index, src_y_index, row_index, row_zoom;
+	int y_index, src_y_index, row_index, row_zoom;
 
 	/* I have a fairly strong feeling these should be UINT32's, x_index is
 	   falling through from max +ve to max -ve quite a lot in this routine */
@@ -524,7 +524,6 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
 	UINT16 scanline[512];
 	UINT16 row_colbank, row_scroll;
 	int flipscreen = 0; /* n/a */
-	int machine_flip = 0;   /* for  ROT 180 ? */
 
 	UINT16 screen_width = cliprect.width();
 	UINT16 min_y = cliprect.min_y;
@@ -558,12 +557,7 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
 		y_index = 0;
 	}
 
-	if (!machine_flip)
-		y = min_y;
-	else
-		y = max_y;
-
-	do
+	for (int y = min_y; y <= max_y; y++)
 	{
 		int a;
 
@@ -598,7 +592,7 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
 		{
-			for (i = 0; i < screen_width; i++)
+			for (int i = 0; i < screen_width; i++)
 			{
 				*dst16++ = src16[(x_index >> 16) & width_mask] + row_colbank;
 				x_index += x_step;
@@ -606,7 +600,7 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
 		}
 		else
 		{
-			for (i = 0; i < screen_width; i++)
+			for (int i = 0; i < screen_width; i++)
 			{
 				if (tsrc[(x_index >> 16) & width_mask])
 					*dst16++ = src16[(x_index >> 16) & width_mask] + row_colbank;
@@ -619,10 +613,7 @@ void wgp_state::wgp_piv_layer_draw( screen_device &screen, bitmap_ind16 &bitmap,
 		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
 
 		y_index += zoomy;
-		if (!machine_flip) y++; else y--;
 	}
-	while ((!machine_flip && y <= max_y) || (machine_flip && y >= min_y));
-
 }
 
 

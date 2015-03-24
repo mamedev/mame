@@ -14,7 +14,6 @@
 #ifndef __UI_MAINMENU_H__
 #define __UI_MAINMENU_H__
 
-#include "crsshair.h"
 #include "drivenum.h"
 
 class ui_menu_main : public ui_menu {
@@ -35,7 +34,7 @@ private:
 		GAME_INFO,
 		IMAGE_MENU_IMAGE_INFO,
 		IMAGE_MENU_FILE_MANAGER,
-		MESS_MENU_TAPE_CONTROL,
+		TAPE_CONTROL,
 		SLOT_DEVICES,
 		NETWORK_DEVICES,
 		KEYBOARD_MODE,

@@ -50,28 +50,30 @@ device_serial_interface::~device_serial_interface()
 {
 }
 
-void device_serial_interface::register_save_state(save_manager &save, const char *module, const char *tag)
+void device_serial_interface::register_save_state(save_manager &save, device_t *device)
 {
-	save.save_item(module, tag, 0, NAME(m_df_start_bit_count));
-	save.save_item(module, tag, 0, NAME(m_df_word_length));
-	save.save_item(module, tag, 0, NAME(m_df_parity));
-	save.save_item(module, tag, 0, NAME(m_df_stop_bit_count));
-	save.save_item(module, tag, 0, NAME(m_rcv_register_data));
-	save.save_item(module, tag, 0, NAME(m_rcv_flags));
-	save.save_item(module, tag, 0, NAME(m_rcv_bit_count_received));
-	save.save_item(module, tag, 0, NAME(m_rcv_bit_count));
-	save.save_item(module, tag, 0, NAME(m_rcv_byte_received));
-	save.save_item(module, tag, 0, NAME(m_rcv_framing_error));
-	save.save_item(module, tag, 0, NAME(m_rcv_parity_error));
-	save.save_item(module, tag, 0, NAME(m_tra_register_data));
-	save.save_item(module, tag, 0, NAME(m_tra_flags));
-	save.save_item(module, tag, 0, NAME(m_tra_bit_count_transmitted));
-	save.save_item(module, tag, 0, NAME(m_tra_bit_count));
-	save.save_item(module, tag, 0, NAME(m_rcv_rate));
-	save.save_item(module, tag, 0, NAME(m_tra_rate));
-	save.save_item(module, tag, 0, NAME(m_rcv_line));
-	save.save_item(module, tag, 0, NAME(m_tra_clock_state));
-	save.save_item(module, tag, 0, NAME(m_rcv_clock_state));
+	const char *module = device->name();
+	const char *tag = device->tag();
+	save.save_item(device, module, tag, 0, NAME(m_df_start_bit_count));
+	save.save_item(device, module, tag, 0, NAME(m_df_word_length));
+	save.save_item(device, module, tag, 0, NAME(m_df_parity));
+	save.save_item(device, module, tag, 0, NAME(m_df_stop_bit_count));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_register_data));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_flags));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_bit_count_received));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_bit_count));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_byte_received));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_framing_error));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_parity_error));
+	save.save_item(device, module, tag, 0, NAME(m_tra_register_data));
+	save.save_item(device, module, tag, 0, NAME(m_tra_flags));
+	save.save_item(device, module, tag, 0, NAME(m_tra_bit_count_transmitted));
+	save.save_item(device, module, tag, 0, NAME(m_tra_bit_count));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_rate));
+	save.save_item(device, module, tag, 0, NAME(m_tra_rate));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_line));
+	save.save_item(device, module, tag, 0, NAME(m_tra_clock_state));
+	save.save_item(device, module, tag, 0, NAME(m_rcv_clock_state));
 }
 
 void device_serial_interface::interface_pre_start()

@@ -931,6 +931,7 @@ BUSOBJS += $(BUSOBJ)/a2bus/corvfdc01.o
 BUSOBJS += $(BUSOBJ)/a2bus/corvfdc02.o
 BUSOBJS += $(BUSOBJ)/a2bus/ramcard16k.o
 BUSOBJS += $(BUSOBJ)/a2bus/ramcard128k.o
+BUSOBJS += $(BUSOBJ)/a2bus/ezcgi.o
 endif
 
 #-------------------------------------------------
@@ -1087,6 +1088,31 @@ endif
 
 #-------------------------------------------------
 #
+#@src/emu/bus/nes_ctrl/ctrl.h,BUSES += NES_CTRL
+#-------------------------------------------------
+
+ifneq ($(filter NES_CTRL,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/nes_ctrl
+BUSOBJS += $(BUSOBJ)/nes_ctrl/ctrl.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/joypad.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/4score.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/arkpaddle.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/bcbattle.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/ftrainer.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/fckeybrd.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/hori.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/konamihs.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/miracle.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/mjpanel.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/pachinko.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/partytap.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/powerpad.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/suborkey.o
+BUSOBJS += $(BUSOBJ)/nes_ctrl/zapper.o
+endif
+
+#-------------------------------------------------
+#
 #@src/emu/bus/snes/snes_slot.h,BUSES += SNES
 #-------------------------------------------------
 
@@ -1105,6 +1131,24 @@ BUSOBJS += $(BUSOBJ)/snes/sgb.o
 BUSOBJS += $(BUSOBJ)/snes/spc7110.o
 BUSOBJS += $(BUSOBJ)/snes/sufami.o
 BUSOBJS += $(BUSOBJ)/snes/upd.o
+endif
+
+#-------------------------------------------------
+#
+#@src/emu/bus/snes_ctrl/ctrl.h,BUSES += SNES_CTRL
+#-------------------------------------------------
+
+ifneq ($(filter SNES_CTRL,$(BUSES)),)
+OBJDIRS += $(BUSOBJ)/snes_ctrl
+BUSOBJS += $(BUSOBJ)/snes_ctrl/ctrl.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/bcbattle.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/joypad.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/miracle.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/mouse.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/multitap.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/pachinko.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/sscope.o
+BUSOBJS += $(BUSOBJ)/snes_ctrl/twintap.o
 endif
 
 #-------------------------------------------------
@@ -1266,12 +1310,12 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/bus/gamegear/gear2gear.h,BUSES += GAMEGEAR
+#@src/emu/bus/gamegear/ggext.h,BUSES += GAMEGEAR
 #-------------------------------------------------
 
 ifneq ($(filter GAMEGEAR,$(BUSES)),)
 OBJDIRS += $(BUSOBJ)/gamegear
-BUSOBJS += $(BUSOBJ)/gamegear/gear2gear.o
+BUSOBJS += $(BUSOBJ)/gamegear/ggext.o
 BUSOBJS += $(BUSOBJ)/gamegear/smsctrladp.o
 endif
 
@@ -1328,6 +1372,7 @@ BUSOBJS += $(BUSOBJ)/cpc/mface2.o
 BUSOBJS += $(BUSOBJ)/cpc/symbfac2.o
 BUSOBJS += $(BUSOBJ)/cpc/amdrum.o
 BUSOBJS += $(BUSOBJ)/cpc/playcity.o
+BUSOBJS += $(BUSOBJ)/cpc/smartwatch.o
 endif
 
 #-------------------------------------------------
@@ -1409,6 +1454,7 @@ BUSOBJS += $(BUSOBJ)/scsi/d9060hd.o
 BUSOBJS += $(BUSOBJ)/scsi/sa1403d.o
 BUSOBJS += $(BUSOBJ)/scsi/s1410.o
 BUSOBJS += $(BUSOBJ)/scsi/pc9801_sasi.o
+BUSOBJS += $(BUSOBJ)/scsi/omti5100.o
 endif
 
 #-------------------------------------------------

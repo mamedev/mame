@@ -32,9 +32,9 @@ NETLIB_START(74123)
 	connect(m_RN.m_P, m_RP.m_N);
 	connect(m_CV, m_RN.m_P);
 
-	save(NAME(m_last_trig));
-	save(NAME(m_state));
-	save(NAME(m_KP));
+	save(NLNAME(m_last_trig));
+	save(NLNAME(m_state));
+	save(NLNAME(m_KP));
 
 	m_KP = 1.0 / (1.0 + exp(m_K.Value()));
 }
@@ -69,7 +69,7 @@ NETLIB_UPDATE(74123)
 
 	if (m_state == 1)
 	{
-		const double vLow = m_KP * TERMANALOG(m_RP.m_P);
+		const nl_double vLow = m_KP * TERMANALOG(m_RP.m_P);
 		if (INPANALOG(m_CV) < vLow)
 		{
 			m_RN.set_R(R_OFF);
@@ -78,7 +78,7 @@ NETLIB_UPDATE(74123)
 	}
 	else if (m_state == 2)
 	{
-		const double vHigh = TERMANALOG(m_RP.m_P) * (1.0 - m_KP);
+		const nl_double vHigh = TERMANALOG(m_RP.m_P) * (1.0 - m_KP);
 		if (INPANALOG(m_CV) > vHigh)
 		{
 			m_RP.set_R(R_OFF);

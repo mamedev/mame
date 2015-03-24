@@ -269,8 +269,7 @@ class Instruction:
                 if v in flags_fixed:
                     #print "@@@@", f
                     vals.append("%s=%d" % (v, flags_fixed[v]))
-            out = []
-            out.append("case %d: // %s %s" % (no, self._name, " ".join(vals)))
+            out = ["case %d: // %s %s" % (no, self._name, " ".join(vals))]
             for line in self.PreprocessRunString():
                 out.append(self.ExpandCintrp(line, flags_fixed))
             out.append("  break;")
@@ -416,8 +415,9 @@ def EmitCintrp(f, ins_list):
 ins_list = LoadLst(sys.argv[1])
 try:
     f = open(sys.argv[2], "w")
-except Exception, err:
-    logging.error("cannot write file %s [%s]", fname, err)
+except Exception:
+    err = sys.exc_info()[1]
+    sys.stderr.write("cannot write file %s [%s]\n" % (sys.argv[2], err))
     sys.exit(1)
 
 EmitDasm(f, ins_list)

@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "svi_dsk.h"
 #include "basicdsk.h"

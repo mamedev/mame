@@ -150,7 +150,6 @@ public:
 	void toaplan1_driver_savestate();
 	void demonwld_driver_savestate();
 	void vimana_driver_savestate();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(toaplan1_reset_callback);
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

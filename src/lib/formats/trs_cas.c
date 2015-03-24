@@ -4,6 +4,8 @@ Support for TRS80 .cas cassette images
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "formats/trs_cas.h"
 
 #define SILENCE 0

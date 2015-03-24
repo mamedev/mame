@@ -42,16 +42,11 @@ PALETTE_INIT_MEMBER(pastelg_state, pastelg)
 	}
 }
 
-WRITE8_MEMBER(pastelg_state::pastelg_clut_w)
-{
-	m_clut[offset] = data;
-}
-
 /******************************************************************************
 
 
 ******************************************************************************/
-int pastelg_state::pastelg_blitter_src_addr_r(address_space &space)
+int pastelg_state::pastelg_blitter_src_addr_r()
 {
 	return m_blitter_src_addr;
 }
@@ -288,7 +283,19 @@ void pastelg_state::video_start()
 	int height = m_screen->height();
 
 	m_videoram = auto_alloc_array_clear(machine(), UINT8, width * height);
-	m_clut = auto_alloc_array(machine(), UINT8, 0x10);
+
+	save_item(NAME(m_blitter_desty));
+	save_item(NAME(m_blitter_sizex));
+	save_item(NAME(m_blitter_sizey));
+	save_item(NAME(m_blitter_src_addr));
+	save_item(NAME(m_gfxrom));
+	save_item(NAME(m_dispflag));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_blitter_direction_x));
+	save_item(NAME(m_blitter_direction_y));
+	save_item(NAME(m_palbank));
+	save_pointer(NAME(m_videoram), width*height);
+	save_item(NAME(m_flipscreen_old));
 }
 
 /******************************************************************************

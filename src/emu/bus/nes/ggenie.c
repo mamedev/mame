@@ -48,6 +48,13 @@ void nes_ggenie_device::device_start()
 	save_item(NAME(m_gg_bypass));
 }
 
+void nes_ggenie_device::pcb_start(running_machine &machine, UINT8 *ciram_ptr, bool cart_mounted)
+{
+	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
+	if (m_ggslot->m_cart)
+		m_ggslot->pcb_start(m_ciram);
+}
+
 void nes_ggenie_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -58,10 +65,7 @@ void nes_ggenie_device::pcb_reset()
 	m_gg_bypass = 0;
 
 	if (m_ggslot->m_cart)
-	{
-		m_ggslot->pcb_start(m_ciram);
 		m_ggslot->m_cart->pcb_reset();
-	}
 }
 
 

@@ -13,7 +13,7 @@ zooming might be wrong (only used on title logo?)
 #include "includes/taotaido.h"
 
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */
-WRITE16_MEMBER(taotaido_state::taotaido_sprite_character_bank_select_w)
+WRITE16_MEMBER(taotaido_state::sprite_character_bank_select_w)
 {
 	if(ACCESSING_BITS_8_15)
 		m_sprite_character_bank_select[offset*2] = data >> 8;
@@ -27,7 +27,7 @@ WRITE16_MEMBER(taotaido_state::taotaido_sprite_character_bank_select_w)
 
 /* the tilemap */
 
-WRITE16_MEMBER(taotaido_state::taotaido_tileregs_w)
+WRITE16_MEMBER(taotaido_state::tileregs_w)
 {
 	switch (offset)
 	{
@@ -52,13 +52,13 @@ WRITE16_MEMBER(taotaido_state::taotaido_tileregs_w)
 	}
 }
 
-WRITE16_MEMBER(taotaido_state::taotaido_bgvideoram_w)
+WRITE16_MEMBER(taotaido_state::bgvideoram_w)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(taotaido_state::taotaido_bg_tile_info)
+TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
 {
 	int code = m_bgram[tile_index]&0x01ff;
 	int bank = (m_bgram[tile_index]&0x0e00)>>9;
@@ -72,14 +72,14 @@ TILE_GET_INFO_MEMBER(taotaido_state::taotaido_bg_tile_info)
 			0);
 }
 
-TILEMAP_MAPPER_MEMBER(taotaido_state::taotaido_tilemap_scan_rows)
+TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return row*0x40 + (col&0x3f) + ((col&0x40)<<6);
 }
 
 
-UINT32 taotaido_state::taotaido_tile_callback( UINT32 code )
+UINT32 taotaido_state::tile_callback( UINT32 code )
 {
 	code = m_spriteram2_older[code&0x7fff];
 
@@ -96,7 +96,7 @@ UINT32 taotaido_state::taotaido_tile_callback( UINT32 code )
 
 void taotaido_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taotaido_state::taotaido_bg_tile_info),this),tilemap_mapper_delegate(FUNC(taotaido_state::taotaido_tilemap_scan_rows),this),16,16,128,64);
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taotaido_state::bg_tile_info),this),tilemap_mapper_delegate(FUNC(taotaido_state::tilemap_scan_rows),this),16,16,128,64);
 
 	m_spriteram_old = auto_alloc_array(machine(), UINT16, 0x2000/2);
 	m_spriteram_older = auto_alloc_array(machine(), UINT16, 0x2000/2);
@@ -104,10 +104,12 @@ void taotaido_state::video_start()
 	m_spriteram2_old = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	m_spriteram2_older = auto_alloc_array(machine(), UINT16, 0x10000/2);
 
+	save_item(NAME(m_sprite_character_bank_select));
+	save_item(NAME(m_video_bank_select));
 }
 
 
-UINT32 taotaido_state::screen_update_taotaido(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 taotaido_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  m_bg_tilemap->set_scrollx(0,(m_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
 //  m_bg_tilemap->set_scrolly(0,(m_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
@@ -133,7 +135,7 @@ UINT32 taotaido_state::screen_update_taotaido(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void taotaido_state::screen_eof_taotaido(screen_device &screen, bool state)
+void taotaido_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

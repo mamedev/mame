@@ -9,6 +9,8 @@
 #include "pstring.h"
 #include "nl_util.h"
 
+#include <stdlib.h> // FIXME: only included for atof
+
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
 netlist_logic_family_desc_t netlist_family_TTL =
@@ -150,7 +152,7 @@ netlist_base_t::~netlist_base_t()
 	{
 		if (!m_nets[i]->isRailNet())
 		{
-			delete m_nets[i];
+			global_free(m_nets[i]);
 		}
 	}
 
@@ -164,11 +166,11 @@ netlist_base_t::~netlist_base_t()
 ATTR_COLD void netlist_base_t::save_register()
 {
 	save(static_cast<pstate_callback_t &>(m_queue), "m_queue");
-	save(NAME(m_time));
+	save(NLNAME(m_time));
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT const double netlist_base_t::gmin() const
+ATTR_HOT const nl_double netlist_base_t::gmin() const
 {
 	return solver()->gmin();
 }
@@ -450,6 +452,7 @@ ATTR_COLD void netlist_device_t::register_param(const pstring &sname, C &param, 
 }
 
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_double_t &param, const double initialVal);
+template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_double_t &param, const float initialVal);
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_int_t &param, const int initialVal);
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_logic_t &param, const int initialVal);
 template ATTR_COLD void netlist_device_t::register_param(const pstring &sname, netlist_param_str_t &param, const char * const initialVal);
@@ -529,7 +532,7 @@ ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 
 ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)
 {
-	assert(m_railterminal == NULL);
+	nl_assert(m_railterminal == NULL);
 	m_railterminal = &mr;
 }
 
@@ -545,12 +548,12 @@ ATTR_COLD void netlist_net_t::rebuild_list()
 
 ATTR_COLD void netlist_net_t::save_register()
 {
-	save(NAME(m_time));
-	save(NAME(m_active));
-	save(NAME(m_in_queue));
-	save(NAME(m_cur_Analog));
-	save(NAME(m_cur_Q));
-	save(NAME(m_new_Q));
+	save(NLNAME(m_time));
+	save(NLNAME(m_active));
+	save(NLNAME(m_in_queue));
+	save(NLNAME(m_cur_Analog));
+	save(NLNAME(m_cur_Q));
+	save(NLNAME(m_new_Q));
 	netlist_object_t::save_register();
 }
 
@@ -569,7 +572,7 @@ ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t 
 ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
-	assert(this->isRailNet());
+	nl_assert(this->isRailNet());
 
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
@@ -707,8 +710,8 @@ ATTR_COLD void netlist_analog_net_t::reset()
 
 ATTR_COLD void netlist_analog_net_t::save_register()
 {
-	save(NAME(m_DD_n_m_1));
-	save(NAME(m_h_n_m_1));
+	save(NLNAME(m_DD_n_m_1));
+	save(NLNAME(m_h_n_m_1));
 	netlist_net_t::save_register();
 }
 
@@ -803,9 +806,9 @@ ATTR_COLD void netlist_terminal_t::reset()
 
 ATTR_COLD void netlist_terminal_t::save_register()
 {
-	save(NAME(m_Idr1));
-	save(NAME(m_go1));
-	save(NAME(m_gt1));
+	save(NLNAME(m_Idr1));
+	save(NLNAME(m_go1));
+	save(NLNAME(m_gt1));
 	netlist_core_terminal_t::save_register();
 }
 
@@ -872,7 +875,7 @@ ATTR_COLD netlist_analog_output_t::netlist_analog_output_t()
 	net().as_analog().m_cur_Analog = 0.98;
 }
 
-ATTR_COLD void netlist_analog_output_t::initial(const double val)
+ATTR_COLD void netlist_analog_output_t::initial(const nl_double val)
 {
 	net().as_analog().m_cur_Analog = val * 0.99;
 }
@@ -929,7 +932,7 @@ ATTR_COLD const pstring netlist_param_model_t::model_type() const
 }
 
 
-ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const double defval) const
+ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, const nl_double defval) const
 {
 	pstring tmp = this->Value();
 	// .model 1N914 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75 mfg=OnSemi type=silicon)
@@ -943,7 +946,7 @@ ATTR_COLD double netlist_param_model_t::model_value(const pstring &entity, const
 		if (pequal < 0)
 			netlist().error("parameter %s misformat in model %s temp %s\n", entity.cstr(), Value().cstr(), tmp.cstr());
 		tmp = tmp.substr(pequal+1);
-		double factor = 1.0;
+		nl_double factor = 1.0;
 		switch (*(tmp.right(1).cstr()))
 		{
 			case 'm': factor = 1e-3; break;
@@ -997,24 +1000,4 @@ NETLIB_UPDATE(mainclock)
 	// this is only called during setup ...
 	net.toggle_new_Q();
 	net.set_time(netlist().time() + m_inc);
-}
-
-// ----------------------------------------------------------------------------------------
-// net_device_t_base_factory
-// ----------------------------------------------------------------------------------------
-
-ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::term_param_list()
-{
-	if (m_def_param.startsWith("+"))
-		return nl_util::split(m_def_param.substr(1), ",");
-	else
-		return nl_util::pstring_list();
-}
-
-ATTR_COLD const nl_util::pstring_list net_device_t_base_factory::def_params()
-{
-	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-		return nl_util::pstring_list();
-	else
-		return nl_util::split(m_def_param, ",");
 }

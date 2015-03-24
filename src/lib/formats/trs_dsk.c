@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 #include "trs_dsk.h"
 #include "basicdsk.h"
 #include "coco_dsk.h"

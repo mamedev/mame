@@ -1,6 +1,8 @@
 /* .PTP Microkey Primo tape images */
 
 
+#include <assert.h>
+
 #include "primoptp.h"
 
 

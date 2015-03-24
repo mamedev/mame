@@ -3,6 +3,8 @@
     Tape support for RK format
 
 */
+#include <assert.h>
+
 #include "rk_cas.h"
 
 

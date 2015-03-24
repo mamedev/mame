@@ -22,6 +22,18 @@ To do:
 #include "includes/tankbust.h"
 
 
+void tankbust_state::machine_start()
+{
+    membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+    membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x18000, 0x2000);
+	
+	save_item(NAME(m_latch));
+	save_item(NAME(m_timer1));
+	save_item(NAME(m_e0xx_data));
+	save_item(NAME(m_variable_data));
+	save_item(NAME(m_irq_mask));
+}
+
 //port A of ay8910#0
 
 TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
@@ -29,18 +41,18 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
 	m_latch = param;
 }
 
-WRITE8_MEMBER(tankbust_state::tankbust_soundlatch_w)
+WRITE8_MEMBER(tankbust_state::soundlatch_w)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundlatch_callback),this), data);
 }
 
-READ8_MEMBER(tankbust_state::tankbust_soundlatch_r)
+READ8_MEMBER(tankbust_state::soundlatch_r)
 {
 	return m_latch;
 }
 
 //port B of ay8910#0
-READ8_MEMBER(tankbust_state::tankbust_soundtimer_r)
+READ8_MEMBER(tankbust_state::soundtimer_r)
 {
 	int ret;
 
@@ -59,7 +71,7 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
 
 
 
-WRITE8_MEMBER(tankbust_state::tankbust_e0xx_w)
+WRITE8_MEMBER(tankbust_state::e0xx_w)
 {
 	m_e0xx_data[offset] = data;
 
@@ -95,9 +107,10 @@ WRITE8_MEMBER(tankbust_state::tankbust_e0xx_w)
 
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
+        membank("bank1")->set_entry(data & 1);
+
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
-		membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
-		membank("bank2")->set_base(memregion("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
+		membank("bank2")->set_entry(data & 1); /* verified (the game will reset after the "game over" otherwise) */
 		break;
 	}
 }
@@ -176,16 +189,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_SHARE("txtram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(background_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txtram_w) AM_SHARE("txtram")
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe007) AM_READWRITE(debug_output_area_r, tankbust_e0xx_w)
-	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("INPUTS") AM_WRITE(tankbust_yscroll_w)
+	AM_RANGE(0xe000, 0xe007) AM_READWRITE(debug_output_area_r, e0xx_w)
+	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("INPUTS") AM_WRITE(yscroll_w)
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSW")
-	AM_RANGE(0xe801, 0xe802) AM_WRITE(tankbust_xscroll_w)
-	AM_RANGE(0xe803, 0xe803) AM_READWRITE(some_changing_input, tankbust_soundlatch_w)   /*unknown. Game expects this to change so this is not player input */
+	AM_RANGE(0xe801, 0xe802) AM_WRITE(xscroll_w)
+	AM_RANGE(0xe803, 0xe803) AM_READWRITE(some_changing_input, soundlatch_w)   /*unknown. Game expects this to change so this is not player input */
 	AM_RANGE(0xe804, 0xe804) AM_WRITENOP    /* watchdog ? ; written in long-lasting loops */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
@@ -334,7 +347,7 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	MCFG_SCREEN_SIZE   ( 64*8, 32*8 )
 	MCFG_SCREEN_VISIBLE_AREA  ( 16*8, 56*8-1, 1*8, 31*8-1 )
 //  MCFG_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update_tankbust)
+	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbust )
@@ -346,8 +359,8 @@ static MACHINE_CONFIG_START( tankbust, tankbust_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/16)  /* Verified on PCB */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(tankbust_state, tankbust_soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(tankbust_state, tankbust_soundtimer_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(tankbust_state, soundlatch_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(tankbust_state, soundtimer_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/16)  /* Verified on PCB */
@@ -402,4 +415,4 @@ ROM_START( tankbust )
 ROM_END
 
 
-GAME( 1985, tankbust,    0,       tankbust, tankbust, driver_device,  0, ROT90, "Valadon Automation", "Tank Busters", 0 )
+GAME( 1985, tankbust,    0,       tankbust, tankbust, driver_device,  0, ROT90, "Valadon Automation", "Tank Busters", GAME_SUPPORTS_SAVE )

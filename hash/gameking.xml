@@ -10,8 +10,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="2004.bin" size="0x20000" crc="ff4a99e2" sha1="b5dea250829224ce8cf18ec310ad503cb928667f" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="2004.bin" size="131072" crc="ff4a99e2" sha1="b5dea250829224ce8cf18ec310ad503cb928667f" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,8 +21,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="adventure legend carlo.bin" size="0x20000" crc="7d61d215" sha1="741684b5379d4be732a98beace5d09f37ff19bbf" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="adventure legend carlo.bin" size="131072" crc="7d61d215" sha1="741684b5379d4be732a98beace5d09f37ff19bbf" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,8 +32,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="aries.bin" size="0x20000" crc="b854f1f2" sha1="1ad7a325aba2cf3593165b53e7ae3973388335f7" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="aries.bin" size="131072" crc="b854f1f2" sha1="1ad7a325aba2cf3593165b53e7ae3973388335f7" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43,8 +43,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="dino adventure legend.bin" size="0x20000" crc="2df0c1e6" sha1="df4b5dc80a758d9e3c9b00384e3099ad8331faad" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="dino adventure legend.bin" size="131072" crc="2df0c1e6" sha1="df4b5dc80a758d9e3c9b00384e3099ad8331faad" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -54,8 +54,30 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="duck man.bin" size="0x20000" crc="9d12950a" sha1="376606097f66105d1a9e97e9793362f6f1e3b1a7" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="duck man.bin" size="131072" crc="9d12950a" sha1="376606097f66105d1a9e97e9793362f6f1e3b1a7" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1_2k4" supported="no">
+		<description>F1-2004 Racing</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="f1-2004 racing.bin" size="131072" crc="dae3a18d" sha1="939931d1eed8a353fb0cd065612479b52ee36242" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feichun7" supported="no">
+		<description>Feichuan VII</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="feichuan vii.bin" size="131072" crc="f94715f1" sha1="98b1cd7d3d1fe1b1341bef0b2f7d4ae0052fdb01" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -65,8 +87,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="happy ball.bin" size="0x20000" crc="79d4e738" sha1="fc14712260ed6e3d6313055046546d37b7c838d2" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="happy ball.bin" size="131072" crc="79d4e738" sha1="fc14712260ed6e3d6313055046546d37b7c838d2" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -76,8 +98,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="happy killer.bin" size="0x20000" crc="9fd7ec65" sha1="705309829ee87689793c15be1f781d52471908d6" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="happy killer.bin" size="131072" crc="9fd7ec65" sha1="705309829ee87689793c15be1f781d52471908d6" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -87,8 +109,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="lanneret.bin" size="0x20000" crc="249df6a5" sha1="bcf92ab85cc97ffe94d6a363a87b0b5de62c3c66" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="lanneret.bin" size="131072" crc="249df6a5" sha1="bcf92ab85cc97ffe94d6a363a87b0b5de62c3c66" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -98,8 +120,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="penguin.bin" size="0x20000" crc="8c7b81c9" sha1="2f253b6ab6f6b9fc114ffca120d13df2e1e5f860" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="penguin.bin" size="131072" crc="8c7b81c9" sha1="2f253b6ab6f6b9fc114ffca120d13df2e1e5f860" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -109,19 +131,30 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="popper.bin" size="0x20000" crc="a704617b" sha1="314931548578303e5e80a2bcb03c92472cb014d9" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="popper.bin" size="131072" crc="a704617b" sha1="314931548578303e5e80a2bcb03c92472cb014d9" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sthero" supported="no">
+	<software name="soldier" supported="no">
+		<description>Soldier</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="soldier.bin" size="131072" crc="0a1ac0ed" sha1="590e2ed2b72ad2e3a8c1d6b115c7c9acabf9aa63" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shero" supported="no">
 		<description>Street Hero</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="street hero.bin" size="0x20000" crc="9e0fe489" sha1="2c442126999e4b112a48e42a82dfa9ad9d6efa22" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="street hero.bin" size="131072" crc="9e0fe489" sha1="2c442126999e4b112a48e42a82dfa9ad9d6efa22" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -131,8 +164,8 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="supermotor.bin" size="0x20000" crc="6290b94b" sha1="0c3011da35170241637907bb23d79355db38f343" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="supermotor.bin" size="131072" crc="6290b94b" sha1="0c3011da35170241637907bb23d79355db38f343" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -142,12 +175,10 @@
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="0x20000">
-				<rom name="trojan legend.bin" size="0x20000" crc="7ce3975e" sha1="e925e4f28efc85ce69fb504b85a98a60883aa30d" offset="0x00000" />
+			<dataarea name="rom" size="131072">
+				<rom name="trojan legend.bin" size="131072" crc="7ce3975e" sha1="e925e4f28efc85ce69fb504b85a98a60883aa30d" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
-
-
 
 </softwarelist>

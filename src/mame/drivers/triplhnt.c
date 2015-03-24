@@ -4,10 +4,6 @@ Atari Triple Hunt Driver
 
   Calibrate controls in service mode the first time you run this game.
 
-To Do:
- The 3 different overlays need to be found, scanned and added as artwork
- to really make the game complete.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -358,4 +354,4 @@ ROM_START( triplhnt )
 ROM_END
 
 
-GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, triplhnt, 0, "Atari", "Triple Hunt", 0 )
+GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, triplhnt, 0, "Atari", "Triple Hunt", GAME_REQUIRES_ARTWORK )

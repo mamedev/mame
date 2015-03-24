@@ -39,6 +39,9 @@
 
 *********************************************************************/
 
+#include "emu.h" // fatalerror
+#include "astring.h"
+#include "corefile.h"
 #include "cbm_crt.h"
 
 
@@ -202,8 +205,8 @@ bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, 
 
 bool cbm_crt_read_data(core_file* file, UINT8 *roml, UINT8 *romh)
 {
-	offs_t roml_offset = 0;
-	offs_t romh_offset = 0;
+	UINT32 roml_offset = 0;
+	UINT32 romh_offset = 0;
 
 	core_fseek(file, CRT_HEADER_LENGTH, SEEK_SET);
 

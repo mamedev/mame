@@ -402,11 +402,6 @@ static GFXDECODE_START( spbactnp )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(spbactn_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state);
-}
-
 static MACHINE_CONFIG_START( spbactn, spbactn_state )
 
 	/* basic machine hardware */
@@ -443,7 +438,7 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(spbactn_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
@@ -494,7 +489,7 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(spbactn_state, irqhandler))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH)

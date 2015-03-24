@@ -98,6 +98,7 @@ enum
 #define ALWAYS64            0x400
 #define SPECIAL64           0x800
 #define SPECIAL64_ENT(x)    (SPECIAL64 | ((x) << 24))
+#define GROUP_MOD           0x1000
 
 struct I386_OPCODE {
 	const char *mnemonic;
@@ -425,10 +426,7 @@ static const I386_OPCODE i386_opcode_table2[256] =
 		"movupd\0"
 		"movsd\0"
 		"movss",            MODRM|VAR_NAME4,PARAM_XMMM,         PARAM_XMM,          0               },
-	{"movlps\0"
-		"movlpd\0"
-		"movddup\0"
-		"movsldup",     MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
+	{"group0F12",      GROUP|GROUP_MOD, 0,                  0,                  0                   },
 	{"movlps\0"
 		"movlpd\0"
 		"???\0"
@@ -441,14 +439,11 @@ static const I386_OPCODE i386_opcode_table2[256] =
 		"unpckhpd\0"
 		"???\0"
 		"???",              MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
+	{ "group0F16",     GROUP|GROUP_MOD, 0,                  0,                  0                   },
 	{"movhps\0"
 		"movhpd\0"
 		"???\0"
-		"movshdup",     MODRM|VAR_NAME4,PARAM_XMMM,         PARAM_XMM,          0               },
-	{"movhps\0"
-		"movhpd\0"
-		"???\0"
-		"???",              MODRM|VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
+		"???",              MODRM|VAR_NAME4,PARAM_XMMM,          PARAM_XMM,         0               },
 	{"group0F18",       GROUP,          0,                  0,                  0               },
 	{"nop_hint",        0,              PARAM_RMPTR8,               0,                  0               },
 	{"nop_hint",        0,              PARAM_RMPTR8,               0,                  0               },
@@ -1810,6 +1805,46 @@ static const I386_OPCODE group0F0D_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
+static const I386_OPCODE group0F12_table[4] =
+{
+	{ "movlps\0"
+		"movlpd\0"
+		"movddup\0"
+		"movsldup",     VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
+	{ "movlps\0"
+		"movlpd\0"
+		"movddup\0"
+		"movsldup",     VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
+	{ "movlps\0"
+		"movlpd\0"
+		"movddup\0"
+		"movsldup",     VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               },
+	{ "movhlps\0"
+		"???\0"
+		"movddup\0"
+		"movsldup",     VAR_NAME4,PARAM_XMM,          PARAM_XMMM,         0               }
+};
+
+static const I386_OPCODE group0F16_table[4] =
+{
+	{ "movhps\0"
+		"movhpd\0"
+		"???\0"
+		"movshdup",     VAR_NAME4,PARAM_XMM,         PARAM_XMMM,          0               },
+	{ "movhps\0"
+		"movhpd\0"
+		"???\0"
+		"movshdup",     VAR_NAME4,PARAM_XMM,         PARAM_XMMM,          0               },
+	{ "movhps\0"
+		"movhpd\0"
+		"???\0"
+		"movshdup",     VAR_NAME4,PARAM_XMM,         PARAM_XMMM,          0               },
+	{ "movlhps\0"
+		"movhpd\0"
+		"???\0"
+		"movshdup",     VAR_NAME4,PARAM_XMM,         PARAM_XMMM,          0               }
+};
+
 static const I386_OPCODE group0F18_table[8] =
 {
 	{"prefetchnta",     0,              PARAM_RM8,          0,                  0               },
@@ -1916,6 +1951,8 @@ static const GROUP_OP group_op_table[] =
 	{ "group0F00",          group0F00_table         },
 	{ "group0F01",          group0F01_table         },
 	{ "group0F0D",          group0F0D_table         },
+	{ "group0F12",          group0F12_table         },
+	{ "group0F16",          group0F16_table         },
 	{ "group0F18",          group0F18_table         },
 	{ "group0F71",          group0F71_table         },
 	{ "group0F72",          group0F72_table         },
@@ -1954,6 +1991,7 @@ static UINT8 curmode;
 
 #define MODRM_REG1  ((modrm >> 3) & 0x7)
 #define MODRM_REG2  (modrm & 0x7)
+#define MODRM_MOD   ((modrm >> 6) & 0x3)
 
 INLINE UINT8 FETCH(void)
 {
@@ -2959,7 +2997,10 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 			handle_modrm( modrm_string );
 			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
 				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
-					decode_opcode( s, &group_op_table[i].opcode[MODRM_REG1], op1 );
+					if (op->flags & GROUP_MOD)
+						decode_opcode( s, &group_op_table[i].opcode[MODRM_MOD], op1 );
+					else
+						decode_opcode( s, &group_op_table[i].opcode[MODRM_REG1], op1 );
 					return;
 				}
 			}

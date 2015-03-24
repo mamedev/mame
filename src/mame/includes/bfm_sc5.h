@@ -16,7 +16,6 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 
 	DECLARE_DRIVER_INIT(sc5);
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_ym_irqhandler);
 	DECLARE_READ8_MEMBER( sc5_10202F0_r );
 	DECLARE_WRITE8_MEMBER( sc5_10202F0_w );
 	DECLARE_WRITE16_MEMBER( sc5_duart_w );

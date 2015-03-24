@@ -14,18 +14,18 @@ void skydiver_state::machine_reset()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* reset all latches */
-	skydiver_start_lamp_1_w(space, 0, 0);
-	skydiver_start_lamp_2_w(space, 0, 0);
-	skydiver_lamp_s_w(space, 0, 0);
-	skydiver_lamp_k_w(space, 0, 0);
-	skydiver_lamp_y_w(space, 0, 0);
-	skydiver_lamp_d_w(space, 0, 0);
+	start_lamp_1_w(space, 0, 0);
+	start_lamp_2_w(space, 0, 0);
+	lamp_s_w(space, 0, 0);
+	lamp_k_w(space, 0, 0);
+	lamp_y_w(space, 0, 0);
+	lamp_d_w(space, 0, 0);
 	output_set_value("lampi", 0);
 	output_set_value("lampv", 0);
 	output_set_value("lampe", 0);
 	output_set_value("lampr", 0);
-	skydiver_width_w(space, 0, 0);
-	skydiver_coin_lockout_w(space, 0, 0);
+	width_w(space, 0, 0);
+	coin_lockout_w(space, 0, 0);
 }
 
 
@@ -52,6 +52,9 @@ TILE_GET_INFO_MEMBER(skydiver_state::get_tile_info)
 void skydiver_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(skydiver_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+
+	save_item(NAME(m_nmion));
+	save_item(NAME(m_width));
 }
 
 
@@ -61,68 +64,68 @@ void skydiver_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(skydiver_state::skydiver_videoram_w)
+WRITE8_MEMBER(skydiver_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-READ8_MEMBER(skydiver_state::skydiver_wram_r)
+READ8_MEMBER(skydiver_state::wram_r)
 {
 	return m_videoram[offset | 0x380];
 }
 
-WRITE8_MEMBER(skydiver_state::skydiver_wram_w)
+WRITE8_MEMBER(skydiver_state::wram_w)
 {
 	m_videoram[offset | 0x0380] = data;
 }
 
 
-WRITE8_MEMBER(skydiver_state::skydiver_width_w)
+WRITE8_MEMBER(skydiver_state::width_w)
 {
 	m_width = offset;
 }
 
 
-WRITE8_MEMBER(skydiver_state::skydiver_coin_lockout_w)
+WRITE8_MEMBER(skydiver_state::coin_lockout_w)
 {
 	coin_lockout_global_w(machine(), !offset);
 }
 
 
-WRITE8_MEMBER(skydiver_state::skydiver_start_lamp_1_w)
+WRITE8_MEMBER(skydiver_state::start_lamp_1_w)
 {
 	set_led_status(machine(), 0, offset);
 }
 
-WRITE8_MEMBER(skydiver_state::skydiver_start_lamp_2_w)
+WRITE8_MEMBER(skydiver_state::start_lamp_2_w)
 {
 	set_led_status(machine(), 1, offset);
 }
 
 
-WRITE8_MEMBER(skydiver_state::skydiver_lamp_s_w)
+WRITE8_MEMBER(skydiver_state::lamp_s_w)
 {
 	output_set_value("lamps", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::skydiver_lamp_k_w)
+WRITE8_MEMBER(skydiver_state::lamp_k_w)
 {
 	output_set_value("lampk", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::skydiver_lamp_y_w)
+WRITE8_MEMBER(skydiver_state::lamp_y_w)
 {
 	output_set_value("lampy", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::skydiver_lamp_d_w)
+WRITE8_MEMBER(skydiver_state::lamp_d_w)
 {
 	output_set_value("lampd", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::skydiver_2000_201F_w)
+WRITE8_MEMBER(skydiver_state::_2000_201F_w)
 {
 	int bit = offset & 0x01;
 
@@ -198,7 +201,7 @@ void skydiver_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-UINT32 skydiver_state::screen_update_skydiver(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 skydiver_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 

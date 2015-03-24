@@ -8,7 +8,7 @@
 
 
 # imgtool executable name
-IMGTOOL = imgtool$(EXE)
+IMGTOOL = $(BIN)imgtool$(EXE)
 
 # add path to imgtool headers
 INCPATH += -I$(MESSSRC)/tools/imgtool

@@ -88,7 +88,6 @@ Dip locations verified from manual for:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/kaneko16.h"
-#include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "machine/kaneko_hit.h"
@@ -106,12 +105,12 @@ Dip locations verified from manual for:
 
 MACHINE_RESET_MEMBER(kaneko16_state,gtmr)
 {
-	VIEW2_2_pri = 1;
+	m_VIEW2_2_pri = 1;
 }
 
 MACHINE_RESET_MEMBER(kaneko16_state,mgcrystl)
 {
-	VIEW2_2_pri = 0;
+	m_VIEW2_2_pri = 0;
 }
 
 
@@ -159,38 +158,34 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 
 READ16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_r)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
 	/* Each 2149 register is mapped to a different address */
-	ay8910->address_w(space,0,offset);
-	return ay8910->data_r(space,0);
+	m_ym2149_1->address_w(space,0,offset);
+	return m_ym2149_1->data_r(space,0);
 }
 
 WRITE16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_w)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
 	/* Each 2149 register is mapped to a different address */
-	ay8910->address_w(space,0,offset);
+	m_ym2149_1->address_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) ay8910->data_w(space,0, data       & 0xff);
-	else                ay8910->data_w(space,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) m_ym2149_1->data_w(space,0, data       & 0xff);
+	else                m_ym2149_1->data_w(space,0,(data >> 8) & 0xff);
 }
 
 READ16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_r)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
 	/* Each 2149 register is mapped to a different address */
-	ay8910->address_w(space,0,offset);
-	return ay8910->data_r(space,0);
+	m_ym2149_2->address_w(space,0,offset);
+	return m_ym2149_2->data_r(space,0);
 }
 
 WRITE16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_w)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
 	/* Each 2149 register is mapped to a different address */
-	ay8910->address_w(space,0,offset);
+	m_ym2149_2->address_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) ay8910->data_w(space,0, data       & 0xff);
-	else                ay8910->data_w(space,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) m_ym2149_2->data_w(space,0, data       & 0xff);
+	else                m_ym2149_2->data_w(space,0,(data >> 8) & 0xff);
 }
 
 
@@ -1714,12 +1709,12 @@ static MACHINE_CONFIG_START( berlwall, kaneko16_berlwall_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ay1", YM2149, 1000000)
+	MCFG_SOUND_ADD("ym2149_1", YM2149, 1000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1000000)
+	MCFG_SOUND_ADD("ym2149_2", YM2149, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
@@ -1778,10 +1773,10 @@ static MACHINE_CONFIG_START( bakubrkr, kaneko16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", YM2149, XTAL_12MHz/6) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2149_1", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ay2", YM2149, XTAL_12MHz/6) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2149_2", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -2034,10 +2029,10 @@ static MACHINE_CONFIG_START( mgcrystl, kaneko16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", YM2149, XTAL_12MHz/6) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2149_1", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ay2", YM2149, XTAL_12MHz/6) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2149_2", YM2149, XTAL_12MHz/6) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(kaneko16_state, eeprom_r))    /* inputs  A:  0,EEPROM bit read */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -3961,33 +3956,33 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 ***************************************************************************/
 
-GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", 0 )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", 0 )
-GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", 0 )
+GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall", GAME_SUPPORTS_SAVE )
+GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko",                 "The Berlin Wall (bootleg ?)", GAME_SUPPORTS_SAVE )
+GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", GAME_SUPPORTS_SAVE )
 
 
 
-GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", 0 )
-GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", 0 )
-GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", 0 )
-GAME( 1992, blazeon,  0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "Atlus",  "Blaze On (Japan)", 0 )
-GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Explosive Breaker", 0 )
-GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", 0 )
+GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", GAME_SUPPORTS_SAVE )
+GAME( 1992, blazeon,  0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "Atlus",  "Blaze On (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Explosive Breaker", GAME_SUPPORTS_SAVE )
+GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", 0 )
-GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", 0 )
-GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", 0 )
-GAME( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", 0 )
-GAME( 1994, gtmra,    gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", 0 )
-GAME( 1994, gtmre,    gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", 0 )
-GAME( 1994, gtmrusa,  gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", 0 ) // U.S.A version seems part of the title, rather than region
-GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", 0 )
-GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", 0 )
-GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", 0 )
+GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", GAME_SUPPORTS_SAVE )
+GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", GAME_SUPPORTS_SAVE )
+GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", GAME_SUPPORTS_SAVE )
+GAME( 1994, gtmra,    gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", GAME_SUPPORTS_SAVE )
+GAME( 1994, gtmre,    gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", GAME_SUPPORTS_SAVE )
+GAME( 1994, gtmrusa,  gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", GAME_SUPPORTS_SAVE ) // U.S.A version seems part of the title, rather than region
+GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", GAME_SUPPORTS_SAVE )
+GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", GAME_SUPPORTS_SAVE )
+GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", 0 )
-GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", 0 )
-GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", 0 )
-GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL )
-GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL )
-GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL )
+GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", GAME_SUPPORTS_SAVE )
+GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

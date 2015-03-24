@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<element name="lamp_disk" defstate="0">
+		<disk state="1"><color red="1.0" green="0.24" blue="0.26" /></disk>
+		<disk state="0"><color red="0.15" green="0.043" blue="0.047" /></disk>
+	</element>
+	<element name="lamp_rect" defstate="0">
+		<rect state="1"><color red="1.0" green="0.24" blue="0.26" /></rect>
+		<rect state="0"><color red="0.15" green="0.043" blue="0.047" /></rect>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="18" top="0" bottom="28" />
+		<bezel element="static_black">
+			<bounds left="0" right="18" top="0" bottom="28" />
+		</bezel>
+
+	<!-- maze of lamps -->
+
+		<bezel name="lamp0" element="lamp_rect"><bounds x="2" y="1" width="4" height="1" /></bezel>
+		<bezel name="lamp2" element="lamp_rect"><bounds x="7" y="1" width="4" height="1" /></bezel>
+		<bezel name="lamp4" element="lamp_rect"><bounds x="12" y="1" width="4" height="1" /></bezel>
+
+		<bezel name="lamp10" element="lamp_rect"><bounds x="1" y="2" width="1" height="4" /></bezel>
+		<bezel name="lamp1" element="lamp_disk"><bounds x="3" y="3" width="2" height="2" /></bezel>
+		<bezel name="lamp12" element="lamp_rect"><bounds x="6" y="2" width="1" height="4" /></bezel>
+		<bezel name="lamp3" element="lamp_disk"><bounds x="8" y="3" width="2" height="2" /></bezel>
+		<bezel name="lamp14" element="lamp_rect"><bounds x="11" y="2" width="1" height="4" /></bezel>
+		<bezel name="lamp5" element="lamp_disk"><bounds x="13" y="3" width="2" height="2" /></bezel>
+		<bezel name="lamp16" element="lamp_rect"><bounds x="16" y="2" width="1" height="4" /></bezel>
+
+		<bezel name="lamp11" element="lamp_rect"><bounds x="2" y="6" width="4" height="1" /></bezel>
+		<bezel name="lamp13" element="lamp_rect"><bounds x="7" y="6" width="4" height="1" /></bezel>
+		<bezel name="lamp15" element="lamp_rect"><bounds x="12" y="6" width="4" height="1" /></bezel>
+
+		<bezel name="lamp20" element="lamp_rect"><bounds x="1" y="7" width="1" height="4" /></bezel>
+		<bezel name="lamp21" element="lamp_disk"><bounds x="3" y="8" width="2" height="2" /></bezel>
+		<bezel name="lamp22" element="lamp_rect"><bounds x="6" y="7" width="1" height="4" /></bezel>
+		<bezel name="lamp23" element="lamp_disk"><bounds x="8" y="8" width="2" height="2" /></bezel>
+		<bezel name="lamp24" element="lamp_rect"><bounds x="11" y="7" width="1" height="4" /></bezel>
+		<bezel name="lamp25" element="lamp_disk"><bounds x="13" y="8" width="2" height="2" /></bezel>
+		<bezel name="lamp26" element="lamp_rect"><bounds x="16" y="7" width="1" height="4" /></bezel>
+
+		<bezel name="lamp31" element="lamp_rect"><bounds x="2" y="11" width="4" height="1" /></bezel>
+		<bezel name="lamp33" element="lamp_rect"><bounds x="7" y="11" width="4" height="1" /></bezel>
+		<bezel name="lamp35" element="lamp_rect"><bounds x="12" y="11" width="4" height="1" /></bezel>
+
+		<bezel name="lamp30" element="lamp_rect"><bounds x="1" y="12" width="1" height="4" /></bezel>
+		<bezel name="lamp41" element="lamp_disk"><bounds x="3" y="13" width="2" height="2" /></bezel>
+		<bezel name="lamp32" element="lamp_rect"><bounds x="6" y="12" width="1" height="4" /></bezel>
+		<bezel name="lamp43" element="lamp_disk"><bounds x="8" y="13" width="2" height="2" /></bezel>
+		<bezel name="lamp34" element="lamp_rect"><bounds x="11" y="12" width="1" height="4" /></bezel>
+		<bezel name="lamp45" element="lamp_disk"><bounds x="13" y="13" width="2" height="2" /></bezel>
+		<bezel name="lamp36" element="lamp_rect"><bounds x="16" y="12" width="1" height="4" /></bezel>
+
+		<bezel name="lamp51" element="lamp_rect"><bounds x="2" y="16" width="4" height="1" /></bezel>
+		<bezel name="lamp53" element="lamp_rect"><bounds x="7" y="16" width="4" height="1" /></bezel>
+		<bezel name="lamp55" element="lamp_rect"><bounds x="12" y="16" width="4" height="1" /></bezel>
+
+		<bezel name="lamp40" element="lamp_rect"><bounds x="1" y="17" width="1" height="4" /></bezel>
+		<bezel name="lamp61" element="lamp_disk"><bounds x="3" y="18" width="2" height="2" /></bezel>
+		<bezel name="lamp42" element="lamp_rect"><bounds x="6" y="17" width="1" height="4" /></bezel>
+		<bezel name="lamp63" element="lamp_disk"><bounds x="8" y="18" width="2" height="2" /></bezel>
+		<bezel name="lamp44" element="lamp_rect"><bounds x="11" y="17" width="1" height="4" /></bezel>
+		<bezel name="lamp65" element="lamp_disk"><bounds x="13" y="18" width="2" height="2" /></bezel>
+		<bezel name="lamp46" element="lamp_rect"><bounds x="16" y="17" width="1" height="4" /></bezel>
+
+		<bezel name="lamp71" element="lamp_rect"><bounds x="2" y="21" width="4" height="1" /></bezel>
+		<bezel name="lamp73" element="lamp_rect"><bounds x="7" y="21" width="4" height="1" /></bezel>
+		<bezel name="lamp75" element="lamp_rect"><bounds x="12" y="21" width="4" height="1" /></bezel>
+
+		<bezel name="lamp50" element="lamp_rect"><bounds x="1" y="22" width="1" height="4" /></bezel>
+		<bezel name="lamp60" element="lamp_disk"><bounds x="3" y="23" width="2" height="2" /></bezel>
+		<bezel name="lamp52" element="lamp_rect"><bounds x="6" y="22" width="1" height="4" /></bezel>
+		<bezel name="lamp62" element="lamp_disk"><bounds x="8" y="23" width="2" height="2" /></bezel>
+		<bezel name="lamp54" element="lamp_rect"><bounds x="11" y="22" width="1" height="4" /></bezel>
+		<bezel name="lamp64" element="lamp_disk"><bounds x="13" y="23" width="2" height="2" /></bezel>
+		<bezel name="lamp56" element="lamp_rect"><bounds x="16" y="22" width="1" height="4" /></bezel>
+
+		<bezel name="lamp70" element="lamp_rect"><bounds x="2" y="26" width="4" height="1" /></bezel>
+		<bezel name="lamp72" element="lamp_rect"><bounds x="7" y="26" width="4" height="1" /></bezel>
+		<bezel name="lamp74" element="lamp_rect"><bounds x="12" y="26" width="4" height="1" /></bezel>
+
+	</view>
+</mamelayout>

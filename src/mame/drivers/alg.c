@@ -810,7 +810,7 @@ GAME( 1995, fastdraw_130,fastdraw, alg_r2,   alg_2p, alg_state, palr6,    ROT90,
 	/* works ok but uses right player (2) controls only for trigger and holster */
 
 /* NOVA games on ALG hardware with own address scramble */
-GAME( 199?, aplatoon, alg_bios, alg_r2,   alg, alg_state,    aplatoon, ROT0,  "Nova?", "Platoon V.?.? US", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, aplatoon, alg_bios, alg_r2,   alg, alg_state,    aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Web Picmatic games PAL tv standard, own rom board */
 GAME( 1993, zortonbr, alg_bios, picmatic, alg, alg_state,    pal,     ROT0,  "Web Picmatic", "Zorton Brothers (Los Justicieros)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )

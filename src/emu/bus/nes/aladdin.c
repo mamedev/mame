@@ -325,8 +325,8 @@ WRITE8_MEMBER(nes_aladdin_device::write_h)
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START(ade_cart)
-	SLOT_INTERFACE("algn", NES_ALGN_ROM)
-	SLOT_INTERFACE("algq", NES_ALGQ_ROM)
+	SLOT_INTERFACE_INTERNAL("algn", NES_ALGN_ROM)
+	SLOT_INTERFACE_INTERNAL("algq", NES_ALGQ_ROM)
 SLOT_INTERFACE_END
 
 

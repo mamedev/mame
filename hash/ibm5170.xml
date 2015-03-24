@@ -1447,6 +1447,22 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="msdos4m">
+		<description>MS-DOS 4.0M</description>
+		<year>1985</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="msdos400m-disk1.img" size="368640" crc="67848d5c" sha1="9e44fc3ed1f689c4136a08d48f9efa156cbaf250" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="msdos400m-disk2-unpatched.img" size="368640" crc="85a8cb6c" sha1="88d8ec84a6e24f2c918508dc65de0cdee182a48e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos401">
 		<description>MS-DOS 4.01</description>
 		<year>1988</year>

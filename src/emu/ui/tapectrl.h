@@ -2,7 +2,7 @@
 
     ui/tapectrl.h
 
-    MESS's tape control
+    Tape control
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -17,10 +17,10 @@
 #include "imagedev/cassette.h"
 #include "ui/devctrl.h"
 
-class ui_menu_mess_tape_control : public ui_menu_device_control<cassette_image_device> {
+class ui_menu_tape_control : public ui_menu_device_control<cassette_image_device> {
 public:
-	ui_menu_mess_tape_control(running_machine &machine, render_container *container, cassette_image_device *device);
-	virtual ~ui_menu_mess_tape_control();
+	ui_menu_tape_control(running_machine &machine, render_container *container, cassette_image_device *device);
+	virtual ~ui_menu_tape_control();
 	virtual void populate();
 	virtual void handle();
 

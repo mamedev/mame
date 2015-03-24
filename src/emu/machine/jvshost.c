@@ -48,14 +48,13 @@ void jvs_host::commit_raw()
 	// - have the message length without the two header bytes but with the checksum byte in the second byte
 	// - have at least one command byte
 	if(send_size < 3 || send_buffer[0] == 0x00 || send_buffer[1] != send_size-1) {
-		logerror("JVS checksum error\n");
-		// "This message is crap" doesn't exist so call it checksum error
-		recv_buffer[0] = 0x00;
-		recv_buffer[1] = 0x02;
-		recv_buffer[2] = 0x03;
-		recv_size = 3;
-
-	} else {
+				logerror("JVS checksum error\n");
+				// "This message is crap" doesn't exist so call it checksum error
+				recv_buffer[0] = 0x00;
+				recv_buffer[1] = 0x02;
+				recv_buffer[2] = 0x03;
+				recv_size = 3;
+		} else {
 		if(first_device) {
 			first_device->message(send_buffer[0], send_buffer+2, send_size-2, recv_buffer+2, recv_size);
 			recv_is_encoded = false;
@@ -117,10 +116,13 @@ void jvs_host::encode(UINT8 *buffer, UINT32 &size)
 	if(!size)
 		return;
 	UINT32 add = 1;
+	UINT8 sum = 0;
+	for(UINT32 i=0; i<size; i++)
+		sum += buffer[i];
+	buffer[size++] = sum;
 	for(UINT32 i=0; i<size; i++)
 		if(buffer[i] == 0xd0 || buffer[i] == 0xe0)
 			add++;
-	UINT32 nsize = size+add;
 	for(UINT32 i=size; i; i--) {
 		UINT8 t = buffer[i-1];
 		if(t == 0xd0 || t == 0xe0) {
@@ -131,11 +133,7 @@ void jvs_host::encode(UINT8 *buffer, UINT32 &size)
 			buffer[i+add-1] = t;
 	}
 	buffer[0] = 0xe0;
-	UINT8 sum = 0;
-	for(UINT32 i=1; i<nsize; i++)
-		sum += buffer[i];
-	buffer[nsize++] = sum;
-	size = nsize;
+	size += add;
 }
 
 void jvs_host::decode(UINT8 *buffer, UINT32 &size)
@@ -143,7 +141,7 @@ void jvs_host::decode(UINT8 *buffer, UINT32 &size)
 	if(!size)
 		return;
 	UINT32 pos = 0;
-	for(UINT32 i=0; i<size-1; i++) {
+	for(UINT32 i=0; i<size; i++) {
 		UINT8 t = buffer[i];
 		if(!i && t == 0xe0)
 			continue;
@@ -153,5 +151,5 @@ void jvs_host::decode(UINT8 *buffer, UINT32 &size)
 		}
 		buffer[pos++] = t;
 	}
-	size = pos;
+	size = pos ? pos - 1 : 0;
 }

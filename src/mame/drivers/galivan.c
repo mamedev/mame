@@ -32,7 +32,6 @@ Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 #include "sound/dac.h"
 #include "sound/3526intf.h"
 #include "includes/galivan.h"
-#include "includes/nb1414m4.h"
 
 
 WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
@@ -91,7 +90,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(galivan_state::blit_trigger_w)
 {
-	nb_1414m4_exec(space,(m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
+	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
 
 static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8, galivan_state )
@@ -473,6 +472,8 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
 
+	MCFG_DEVICE_ADD("nb1414m4", NB1414M4, 0)
+
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -505,7 +506,10 @@ static MACHINE_CONFIG_START( ninjemak, galivan_state )
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_DERIVED(youmab, ninjemak)
 
+	MCFG_DEVICE_REMOVE("nb1414m4")
+MACHINE_CONFIG_END
 /***************************************************************************
 
   Game driver(s)
@@ -763,7 +767,7 @@ ROM_START( ninjemak )
 	ROM_LOAD( "ninjemak.7",   0x0000, 0x4000, CRC(80c20d36) SHA1(f20724754824030d62059388f3ea2224f5b7a60e) )
 	ROM_LOAD( "ninjemak.6",   0x4000, 0x4000, CRC(1da7a651) SHA1(5307452058164a0bc39d144dd204627a9ead7543) )
 
-	ROM_REGION( 0x4000, "blit_data", 0 )    /* data for mcu/blitter? */
+	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter? */
 	ROM_LOAD( "ninjemak.5",   0x0000, 0x4000, CRC(5f91dd30) SHA1(3513c0a2e4ca83f602cacad6af9c07fe9e4b16a1) )    /* text layer data */
 
 	ROM_REGION( 0x0400, "proms", 0 )    /* Region 3 - color data */
@@ -805,7 +809,7 @@ ROM_START( youma )
 	ROM_LOAD( "ninjemak.7",   0x0000, 0x4000, CRC(80c20d36) SHA1(f20724754824030d62059388f3ea2224f5b7a60e) )
 	ROM_LOAD( "ninjemak.6",   0x4000, 0x4000, CRC(1da7a651) SHA1(5307452058164a0bc39d144dd204627a9ead7543) )
 
-	ROM_REGION( 0x4000, "blit_data", 0 )    /* data for mcu/blitter? */
+	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter? */
 	ROM_LOAD( "ync-5.bin",    0x0000, 0x4000, CRC(993e4ab2) SHA1(aceafc83b36db4db923d27f77ad045e626678bae) )    /* text layer data */
 
 	ROM_REGION( 0x0400, "proms", 0 )    /* Region 3 - color data */
@@ -847,7 +851,7 @@ ROM_START( youma2 )
 	ROM_LOAD( "ninjemak.7",   0x0000, 0x4000, CRC(80c20d36) SHA1(f20724754824030d62059388f3ea2224f5b7a60e) )
 	ROM_LOAD( "ninjemak.6",   0x4000, 0x4000, CRC(1da7a651) SHA1(5307452058164a0bc39d144dd204627a9ead7543) )
 
-	ROM_REGION( 0x4000, "blit_data", 0 )    /* data for mcu/blitter? */
+	ROM_REGION( 0x4000, "nb1414m4", 0 )    /* data for mcu/blitter? */
 	ROM_LOAD( "5.15d",    0x0000, 0x4000, CRC(1b4f64aa) SHA1(2cb2db946bf93e0928d6aa2e2dd29acb92981567) )    /* text layer data x */
 
 	ROM_REGION( 0x0400, "proms", 0 )    /* Region 3 - color data */
@@ -1093,5 +1097,5 @@ GAME( 1986, dangarb,  dangar,   galivan,  dangarb, driver_device,  0, ROT270, "b
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, driver_device, 0, ROT270, "Nichibutsu",   "Ninja Emaki (US)", GAME_SUPPORTS_SAVE|GAME_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, driver_device, 0, ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan)", GAME_SUPPORTS_SAVE|GAME_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, driver_device, 0, ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan, alt)", GAME_SUPPORTS_SAVE|GAME_UNEMULATED_PROTECTION )
-GAME( 1986, youmab,   ninjemak, ninjemak, ninjemak, galivan_state, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_UNEMULATED_PROTECTION ) // player is invincible
-GAME( 1986, youmab2,  ninjemak, ninjemak, ninjemak, galivan_state, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_UNEMULATED_PROTECTION ) // ""
+GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_UNEMULATED_PROTECTION ) // player is invincible
+GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, galivan_state, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_UNEMULATED_PROTECTION ) // ""

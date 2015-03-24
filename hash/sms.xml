@@ -3369,6 +3369,17 @@
 		</part>
 	</software>
 
+	<software name="jangpun2">
+		<description>Jang Pung II (Kor)</description>
+		<year>1993</year>
+		<publisher>Sieco</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="jang pung ii (kr).bin" size="524288" crc="929222c4" sha1="10a5095513efebae3d045b217caa7a520e66f26f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jangpun3">
 		<description>Jang Pung 3 (Kor)</description>
 		<year>1994</year>
@@ -5428,6 +5439,18 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="sky jaguar (kr).bin" size="32768" crc="5b8e65e4" sha1="6ce290d59f14e9be5711d932095909abc0d681d1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyjag1" cloneof="skyjag">
+		<description>Sky Jaguar (Kor, Clover)</description>
+		<year>199?</year>
+		<publisher>Clover</publisher>
+		<info name="alt_title" value="스카이쟈가"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sky jaguar [clover] (kr).bin" size="32768" crc="e3f260ca" sha1="7eb9e296b674c4cda935e7c5b58eb3dad3aa322f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -60,7 +60,7 @@
 #include "emu.h"
 #include "includes/suna16.h"
 
-WRITE16_MEMBER(suna16_state::suna16_flipscreen_w)
+WRITE16_MEMBER(suna16_state::flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -92,14 +92,16 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 void suna16_state::video_start()
 {
 	m_paletteram = auto_alloc_array(machine(), UINT16, m_palette->entries());
+	
+	save_item(NAME(m_color_bank));
 }
 
-READ16_MEMBER(suna16_state::suna16_paletteram16_r)
+READ16_MEMBER(suna16_state::paletteram_r)
 {
 	return m_paletteram[offset + m_color_bank * 256];
 }
 
-WRITE16_MEMBER(suna16_state::suna16_paletteram16_w)
+WRITE16_MEMBER(suna16_state::paletteram_w)
 {
 	offset += m_color_bank * 256;
 	data = COMBINE_DATA(&m_paletteram[offset]);
@@ -117,11 +119,10 @@ WRITE16_MEMBER(suna16_state::suna16_paletteram16_w)
 
 void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx)
 {
-	int offs;
 	int max_x = m_screen->width() - 8;
 	int max_y = m_screen->height() - 8;
 
-	for ( offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
+	for ( int offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
 	{
 		int srcpg, srcx,srcy, dimx,dimy;
 		int tile_x, tile_xinc, tile_xstart;
@@ -213,7 +214,7 @@ void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 ***************************************************************************/
 
-UINT32 suna16_state::screen_update_suna16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 suna16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);

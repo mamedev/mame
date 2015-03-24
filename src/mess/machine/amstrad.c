@@ -2842,7 +2842,7 @@ void amstrad_state::enumerate_roms()
 	int i;
 	bool slot3 = false,slot7 = false;
 
-	if(m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
+	if (m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
 	{
 		UINT8 *crt = m_region_cart->base();
 		int bank_mask = (m_cart->get_rom_size() / 0x4000) - 1;
@@ -2918,7 +2918,7 @@ void amstrad_state::enumerate_roms()
 
 void amstrad_state::amstrad_common_init()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_aleste_mode = 0;
 
@@ -2928,30 +2928,30 @@ void amstrad_state::amstrad_common_init()
 	m_GateArray_RamConfiguration = 0;
 	m_gate_array.hsync_counter = 2;
 
-	space.install_read_bank(0x0000, 0x1fff, "bank1");
-	space.install_read_bank(0x2000, 0x3fff, "bank2");
+/*  space.install_read_bank(0x0000, 0x1fff, "bank1");
+    space.install_read_bank(0x2000, 0x3fff, "bank2");
 
-	space.install_read_bank(0x4000, 0x5fff, "bank3");
-	space.install_read_bank(0x6000, 0x7fff, "bank4");
+    space.install_read_bank(0x4000, 0x5fff, "bank3");
+    space.install_read_bank(0x6000, 0x7fff, "bank4");
 
-	space.install_read_bank(0x8000, 0x9fff, "bank5");
-	space.install_read_bank(0xa000, 0xbfff, "bank6");
+    space.install_read_bank(0x8000, 0x9fff, "bank5");
+    space.install_read_bank(0xa000, 0xbfff, "bank6");
 
-	space.install_read_bank(0xc000, 0xdfff, "bank7");
-	space.install_read_bank(0xe000, 0xffff, "bank8");
+    space.install_read_bank(0xc000, 0xdfff, "bank7");
+    space.install_read_bank(0xe000, 0xffff, "bank8");
 
-	space.install_write_bank(0x0000, 0x1fff, "bank9");
-	space.install_write_bank(0x2000, 0x3fff, "bank10");
+    space.install_write_bank(0x0000, 0x1fff, "bank9");
+    space.install_write_bank(0x2000, 0x3fff, "bank10");
 
-	space.install_write_bank(0x4000, 0x5fff, "bank11");
-	space.install_write_bank(0x6000, 0x7fff, "bank12");
+    space.install_write_bank(0x4000, 0x5fff, "bank11");
+    space.install_write_bank(0x6000, 0x7fff, "bank12");
 
-	space.install_write_bank(0x8000, 0x9fff, "bank13");
-	space.install_write_bank(0xa000, 0xbfff, "bank14");
+    space.install_write_bank(0x8000, 0x9fff, "bank13");
+    space.install_write_bank(0xa000, 0xbfff, "bank14");
 
-	space.install_write_bank(0xc000, 0xdfff, "bank15");
-	space.install_write_bank(0xe000, 0xffff, "bank16");
-
+    space.install_write_bank(0xc000, 0xdfff, "bank15");
+    space.install_write_bank(0xe000, 0xffff, "bank16");
+*/
 	enumerate_roms();
 
 	m_maincpu->reset();
@@ -3034,6 +3034,8 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 
 	astring region_tag;
 	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	if (!m_region_cart) // this should never happen, since we make carts mandatory!
+		m_region_cart = memregion("maincpu");
 }
 
 
@@ -3076,6 +3078,8 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 
 	astring region_tag;
 	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	if (!m_region_cart) // this should never happen, since we make carts mandatory!
+		m_region_cart = memregion("maincpu");
 }
 
 MACHINE_RESET_MEMBER(amstrad_state,gx4000)

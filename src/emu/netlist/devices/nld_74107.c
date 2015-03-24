@@ -11,9 +11,9 @@ NETLIB_START(74107Asub)
 	register_output("Q", m_Q);
 	register_output("QQ", m_QQ);
 
-	save(NAME(m_Q1));
-	save(NAME(m_Q2));
-	save(NAME(m_F));
+	save(NLNAME(m_Q1));
+	save(NLNAME(m_Q2));
+	save(NLNAME(m_F));
 }
 
 NETLIB_RESET(74107Asub)

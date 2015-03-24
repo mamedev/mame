@@ -14,6 +14,18 @@
 
 /******************************************************************************/
 
+
+void tecmo16_state::save_state()
+{
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_scroll_x_w));
+	save_item(NAME(m_scroll_y_w));
+	save_item(NAME(m_scroll2_x_w));
+	save_item(NAME(m_scroll2_y_w));
+	save_item(NAME(m_scroll_char_x_w));
+	save_item(NAME(m_scroll_char_y_w));
+}
+
 TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
 {
 	int tile = m_videoram[tile_index] & 0x1fff;
@@ -70,6 +82,8 @@ void tecmo16_state::video_start()
 	m_tx_tilemap->set_scrolly(0,-16);
 	m_flipscreen = 0;
 	m_game_is_riot = 0;
+
+	save_state();
 }
 
 VIDEO_START_MEMBER(tecmo16_state,ginkun)
@@ -90,6 +104,8 @@ VIDEO_START_MEMBER(tecmo16_state,ginkun)
 	m_tx_tilemap->set_transparent_pen(0);
 	m_flipscreen = 0;
 	m_game_is_riot = 0;
+
+	save_state();
 }
 
 VIDEO_START_MEMBER(tecmo16_state,riot)
@@ -111,42 +127,44 @@ VIDEO_START_MEMBER(tecmo16_state,riot)
 	m_tx_tilemap->set_scrolldy(-16,-16);
 	m_flipscreen = 0;
 	m_game_is_riot = 1;
+
+	save_state();
 }
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_videoram_w)
+WRITE16_MEMBER(tecmo16_state::videoram_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_colorram_w)
+WRITE16_MEMBER(tecmo16_state::colorram_w)
 {
 	COMBINE_DATA(&m_colorram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_videoram2_w)
+WRITE16_MEMBER(tecmo16_state::videoram2_w)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_colorram2_w)
+WRITE16_MEMBER(tecmo16_state::colorram2_w)
 {
 	COMBINE_DATA(&m_colorram2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_charram_w)
+WRITE16_MEMBER(tecmo16_state::charram_w)
 {
 	COMBINE_DATA(&m_charram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_flipscreen_w)
+WRITE16_MEMBER(tecmo16_state::flipscreen_w)
 {
 	m_flipscreen = data & 0x01;
 	flip_screen_set(m_flipscreen);
@@ -154,37 +172,37 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_flipscreen_w)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_x_w)
+WRITE16_MEMBER(tecmo16_state::scroll_x_w)
 {
 	COMBINE_DATA(&m_scroll_x_w);
 	m_fg_tilemap->set_scrollx(0,m_scroll_x_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_y_w)
+WRITE16_MEMBER(tecmo16_state::scroll_y_w)
 {
 	COMBINE_DATA(&m_scroll_y_w);
 	m_fg_tilemap->set_scrolly(0,m_scroll_y_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_scroll2_x_w)
+WRITE16_MEMBER(tecmo16_state::scroll2_x_w)
 {
 	COMBINE_DATA(&m_scroll2_x_w);
 	m_bg_tilemap->set_scrollx(0,m_scroll2_x_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_scroll2_y_w)
+WRITE16_MEMBER(tecmo16_state::scroll2_y_w)
 {
 	COMBINE_DATA(&m_scroll2_y_w);
 	m_bg_tilemap->set_scrolly(0,m_scroll2_y_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_char_x_w)
+WRITE16_MEMBER(tecmo16_state::scroll_char_x_w)
 {
 	COMBINE_DATA(&m_scroll_char_x_w);
 	m_tx_tilemap->set_scrollx(0,m_scroll_char_x_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_char_y_w)
+WRITE16_MEMBER(tecmo16_state::scroll_char_y_w)
 {
 	COMBINE_DATA(&m_scroll_char_y_w);
 	m_tx_tilemap->set_scrolly(0,m_scroll_char_y_w-16);
@@ -195,7 +213,7 @@ WRITE16_MEMBER(tecmo16_state::tecmo16_scroll_char_y_w)
 
 /******************************************************************************/
 
-UINT32 tecmo16_state::screen_update_tecmo16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 tecmo16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_tile_bitmap_bg.fill(0, cliprect);
 	m_tile_bitmap_fg.fill(0, cliprect);

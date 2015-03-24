@@ -141,12 +141,15 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
  The alternative option of allowing sprites to render a priority level higher than tilemaps breaks at least the
  'Welcome to..' screen in Batrider after selecting your character.
 
+ Batrider Gob-Robo boss however definitely requires SPRITES to still have 16 levels of priority against other
+ sprites, see http://mametesters.org/view.php?id=5832
+
  It is unknown if the current solution breaks anything.  The majority of titles don't make extensive use of the
  priority system.
 
 */
-#define GP9001_PRIMASK (0x000e)
-
+#define GP9001_PRIMASK (0x000f)
+#define GP9001_PRIMASK_TMAPS (0x000e)
 
 WRITE16_MEMBER( gp9001vdp_device::gp9001_bg_tmap_w )
 {
@@ -171,8 +174,8 @@ DEVICE_ADDRESS_MAP_START( map, 16, gp9001vdp_device )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(gp9001_bg_tmap_w) AM_SHARE("vram_bg")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(gp9001_fg_tmap_w) AM_SHARE("vram_fg")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(gp9001_top_tmap_w) AM_SHARE("vram_top")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x0800)
+//  AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
 ADDRESS_MAP_END
 
 
@@ -885,7 +888,7 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap
 			int realx = (x+scrollx)&0x1ff;
 
 			UINT16 pixdat = srcptr[realx];
-			UINT8 pixpri = ((pixdat & (GP9001_PRIMASK<<12))>>12);
+			UINT8 pixpri = ((pixdat & (GP9001_PRIMASK_TMAPS<<12))>>12);
 
 			if (pri_enable[pixpri])
 			{

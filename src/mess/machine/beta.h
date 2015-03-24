@@ -10,7 +10,7 @@
 #ifndef __BETA_H__
 #define __BETA_H__
 
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 
 #define BETA_DISK_TAG   "beta"
@@ -32,16 +32,12 @@ public:
 	DECLARE_WRITE8_MEMBER(track_w);
 	DECLARE_WRITE8_MEMBER(sector_w);
 	DECLARE_WRITE8_MEMBER(data_w);
-
-	DECLARE_WRITE_LINE_MEMBER(wd179x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(wd179x_drq_w);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	int is_active();
 	void enable();
 	void disable();
-	void clear_status();
 
-	UINT8 m_betadisk_status;
 	UINT8 m_betadisk_active;
 
 protected:
@@ -52,8 +48,11 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
-	// internal state
-	wd2793_device *m_wd179x;
+	required_device<wd2793_t> m_wd179x;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
 };
 
 extern const device_type BETA_DISK;

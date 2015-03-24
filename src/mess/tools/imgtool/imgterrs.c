@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include <assert.h>
+#include "imgtool.h"
 #include "imgterrs.h"
 #include "osdcomm.h"
 

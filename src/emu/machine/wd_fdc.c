@@ -273,7 +273,8 @@ void wd_fdc_t::seek_continue()
 			}
 
 			if(main_state == SEEK && track == data) {
-				sub_state = SEEK_DONE;
+				sub_state = SEEK_WAIT_STABILIZATION_TIME;
+				delay_cycles(t_gen, 30000);
 			}
 
 			if(sub_state == SPINUP_DONE) {
@@ -887,7 +888,7 @@ void wd_fdc_t::interrupt_start()
 	if(!(command & 0x0f)) {
 		intrq_cond = 0;
 	} else {
-		intrq_cond = (intrq_cond & I_IMM) | (command & 0x07);
+		intrq_cond = (intrq_cond & I_IMM) | (command & 0x0f);
 	}
 
 	if(intrq_cond & I_IMM) {

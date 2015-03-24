@@ -54,90 +54,77 @@ TCH-SS9.u34     "     /               AB2Bh
 
 ******************************************************************************/
 
-READ8_MEMBER(speedspn_state::speedspn_irq_ack_r)
+READ8_MEMBER(speedspn_state::irq_ack_r)
 {
 	// I think this simply acknowledges the IRQ #0, it's read within the handler and the
 	//  value is discarded
 	return 0;
 }
 
-WRITE8_MEMBER(speedspn_state::speedspn_banked_rom_change)
+WRITE8_MEMBER(speedspn_state::rombank_w)
 {
-	/* is this weird banking some form of protection? */
-
-	UINT8 *rom = memregion("maincpu")->base();
-	int addr;
-
-	switch (data)
+	if (data > 8)
 	{
-		case 0: addr = 0x28000; break;
-		case 1: addr = 0x14000; break;
-		case 2: addr = 0x1c000; break;
-		case 3: addr = 0x54000; break;
-		case 4: addr = 0x48000; break;
-		case 5: addr = 0x3c000; break;
-		case 6: addr = 0x18000; break;
-		case 7: addr = 0x4c000; break;
-		case 8: addr = 0x50000; break;
-		default:
-			popmessage ("Unmapped Bank Write %02x", data);
-			addr = 0;
-			break;
+		popmessage ("Unmapped Bank Write %02x", data);
+		data = 0;
 	}
-
-	membank("bank1")->set_base(&rom[addr + 0x8000]);
+	m_prgbank->set_entry(data);
 }
 
 /*** SOUND RELATED ***********************************************************/
 
-WRITE8_MEMBER(speedspn_state::speedspn_sound_w)
+WRITE8_MEMBER(speedspn_state::sound_w)
 {
 	soundlatch_byte_w(space, 1, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(speedspn_state::oki_banking_w)
+WRITE8_MEMBER(speedspn_state::okibank_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 3));
+	m_okibank->set_entry(data & 3);
 }
 
 /*** MEMORY MAPS *************************************************************/
 
 /* main cpu */
 
-static ADDRESS_MAP_START( speedspn_map, AS_PROGRAM, 8, speedspn_state )
+static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* RAM COLOUR */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(speedspn_attram_w) AM_SHARE("attram")
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(speedspn_vidram_r,speedspn_vidram_w)  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(attram_w) AM_SHARE("attram")
+	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vidram_r, vidram_w)  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM                                             /* RAM PROGRAM */
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")                                        /* banked ROM */
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("prgbank")                              /* banked ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( speedspn_io_map, AS_IO, 8, speedspn_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, speedspn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_WRITE(speedspn_global_display_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(display_disable_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("P1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2") AM_WRITE(speedspn_banked_rom_change)
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1") AM_WRITE(speedspn_sound_w)
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2") AM_WRITE(rombank_w)
+	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1") AM_WRITE(sound_w)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW2")
-	AM_RANGE(0x16, 0x16) AM_READ(speedspn_irq_ack_r) // @@@ could be watchdog, value is discarded
-	AM_RANGE(0x17, 0x17) AM_WRITE(speedspn_banked_vidram_change)
+	AM_RANGE(0x16, 0x16) AM_READ(irq_ack_r) // @@@ could be watchdog, value is discarded
+	AM_RANGE(0x17, 0x17) AM_WRITE(vidram_bank_w)
 ADDRESS_MAP_END
 
 /* sound cpu */
 
-static ADDRESS_MAP_START( speedspn_sound_map, AS_PROGRAM, 8, speedspn_state )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( oki_map, AS_0, 8, speedspn_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
 
 /*** INPUT PORT **************************************************************/
 
@@ -265,17 +252,36 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
+void speedspn_state::machine_start()
+{
+	/* is this weird banking some form of protection? */
+	UINT8 *rom = memregion("maincpu")->base();
+	m_prgbank->configure_entry(0, &rom[0x28000]);
+	m_prgbank->configure_entry(1, &rom[0x14000]);
+	m_prgbank->configure_entry(2, &rom[0x1c000]);
+	m_prgbank->configure_entry(3, &rom[0x54000]);
+	m_prgbank->configure_entry(4, &rom[0x48000]);
+	m_prgbank->configure_entry(5, &rom[0x3c000]);
+	m_prgbank->configure_entry(6, &rom[0x18000]);
+	m_prgbank->configure_entry(7, &rom[0x4c000]);
+	m_prgbank->configure_entry(8, &rom[0x50000]);
+	m_prgbank->set_entry(0);
+
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x20000);
+	m_okibank->set_entry(0);
+}
+
 
 static MACHINE_CONFIG_START( speedspn, speedspn_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,6000000)      /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(speedspn_map)
-	MCFG_CPU_IO_MAP(speedspn_io_map)
+	MCFG_CPU_PROGRAM_MAP(program_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedspn_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,6000000)        /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(speedspn_sound_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -283,7 +289,7 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(speedspn_state, screen_update_speedspn)
+	MCFG_SCREEN_UPDATE_DRIVER(speedspn_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", speedspn)
@@ -295,33 +301,21 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 
 	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
 /*** ROM LOADING *************************************************************/
 
 ROM_START( speedspn )
-	ROM_REGION( 0x088000, "maincpu", 0 )    /* CPU1 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* CPU1 code */
 	/* most of this is probably actually banked */
-	ROM_LOAD( "tch-ss1.u78", 0x00000, 0x008000, CRC(41b6b45b) SHA1(d969119959db4cc3be50f188bfa41e4b4896eaca) ) /* fixed code */
-	ROM_CONTINUE(            0x10000, 0x078000 ) /* banked data */
+	ROM_LOAD( "tch-ss1.u78", 0x00000, 0x080000, CRC(41b6b45b) SHA1(d969119959db4cc3be50f188bfa41e4b4896eaca) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* CPU2 code */
 	ROM_LOAD( "tch-ss2.u96", 0x00000, 0x10000, CRC(4611fd0c) SHA1(b49ad6a8be6ccfef0b2ed187fb3b008fb7eeb2b5) ) // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x080000, "user1", 0 )  /* Samples */
+	ROM_REGION( 0x080000, "oki", 0 )  /* Samples */
 	ROM_LOAD( "tch-ss3.u95", 0x00000, 0x080000, CRC(1c9deb5e) SHA1(89f01a8e8bdb0eee47e9195b312d2e65d41d3548) )
-
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* GFX */
 	ROM_LOAD( "tch-ss4.u70", 0x00000, 0x020000, CRC(41517859) SHA1(3c5102e41c5a70e02ed88ea43ca63edf13f4c1b9) )
@@ -338,4 +332,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1994, speedspn, 0, speedspn, speedspn, driver_device, 0, ROT180, "TCH", "Speed Spin", 0 )
+GAME( 1994, speedspn, 0, speedspn, speedspn, driver_device, 0, ROT180, "TCH", "Speed Spin", GAME_SUPPORTS_SAVE )

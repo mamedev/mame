@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "imgtool.h"
 #include "modules.h"
 
 #ifndef MODULES_RECURSIVE

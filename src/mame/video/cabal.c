@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  cabal.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -48,7 +48,7 @@ void cabal_state::video_start()
 
 /**************************************************************************/
 
-WRITE16_MEMBER(cabal_state::cabal_flipscreen_w)
+WRITE16_MEMBER(cabal_state::flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -60,13 +60,13 @@ WRITE16_MEMBER(cabal_state::cabal_flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(cabal_state::cabal_background_videoram16_w)
+WRITE16_MEMBER(cabal_state::background_videoram_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(cabal_state::cabal_text_videoram16_w)
+WRITE16_MEMBER(cabal_state::text_videoram_w)
 {
 	COMBINE_DATA(&m_colorram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
@@ -97,13 +97,11 @@ WRITE16_MEMBER(cabal_state::cabal_text_videoram16_w)
 void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs,data0,data1,data2;
-	UINT16 *spriteram16 = m_spriteram;
-
 	for( offs = m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4 )
 	{
-		data0 = spriteram16[offs];
-		data1 = spriteram16[offs+1];
-		data2 = spriteram16[offs+2];
+		data0 = m_spriteram[offs];
+		data1 = m_spriteram[offs+1];
+		data2 = m_spriteram[offs+2];
 
 		if( data0 & 0x100 )
 		{
@@ -134,7 +132,7 @@ void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-UINT32 cabal_state::screen_update_cabal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 cabal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_background_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(bitmap,cliprect);

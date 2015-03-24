@@ -18,6 +18,7 @@
 #endif
 
 #include "watchdog.h"
+#include "modules/lib/osdlib.h"
 
 static void *watchdog_thread(void *param)
 {

@@ -25,6 +25,8 @@ header and leader bytes.
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "sorc_cas.h"
 
 #define WAVEENTRY_LOW  -32768

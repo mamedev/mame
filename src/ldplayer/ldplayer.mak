@@ -67,12 +67,11 @@ BUSES += MIDI
 #-------------------------------------------------
 
 DRVLIBS = \
-	$(EMUDRIVERS)/emudummy.o \
-	$(LDPOBJ)/ldplayer.o \
+	$(EMUDRIVERS)/emudummy.o
 
 
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
 
-$(LDPOBJ)/ldplayer.o:   $(LAYOUT)/pr8210.lh \
+$(LDPOBJ)/ldplayer.o:   $(LAYOUT)/pr8210.lh

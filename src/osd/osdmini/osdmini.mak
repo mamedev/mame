@@ -37,7 +37,10 @@
 #
 ###########################################################################
 
-
+# add a define identifying the target osd
+DEFS += -DOSD_MINI
+DEFS += -DUSE_QTDEBUG=0
+DEFS += -DUSE_SDL=0
 #-------------------------------------------------
 # object and source roots
 #-------------------------------------------------
@@ -48,9 +51,13 @@ MINIOBJ = $(OBJ)/osd/$(OSD)
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(MINIOBJ) $(OSDOBJ)/modules/sync
-
-
+OBJDIRS += $(MINIOBJ) \
+	$(OSDOBJ)/modules/sync \
+	$(OSDOBJ)/modules/lib \
+	$(OSDOBJ)/modules/sound \
+	$(OSDOBJ)/modules/midi \
+	$(OSDOBJ)/modules/font \
+	$(OSDOBJ)/modules/netdev
 
 #-------------------------------------------------
 # OSD core library
@@ -63,13 +70,33 @@ OSDCOREOBJS = \
 	$(MINIOBJ)/minisync.o \
 	$(MINIOBJ)/minitime.o \
 	$(OSDOBJ)/modules/sync/work_mini.o \
+	$(OSDOBJ)/modules/osdmodule.o \
 
 #-------------------------------------------------
 # OSD mini library
 #-------------------------------------------------
 
 OSDOBJS = \
-	$(MINIOBJ)/minimain.o
+	$(MINIOBJ)/minimain.o \
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/midi/portmidi.o \
+	$(OSDOBJ)/modules/midi/none.o \
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/sound/js_sound.o  \
+	$(OSDOBJ)/modules/sound/direct_sound.o  \
+	$(OSDOBJ)/modules/sound/sdl_sound.o  \
+	$(OSDOBJ)/modules/sound/none.o  \
+	$(OSDOBJ)/modules/font/font_sdl.o \
+	$(OSDOBJ)/modules/font/font_windows.o \
+	$(OSDOBJ)/modules/font/font_osx.o \
+	$(OSDOBJ)/modules/font/font_none.o \
+	$(OSDOBJ)/modules/netdev/pcap.o \
+	$(OSDOBJ)/modules/netdev/taptun.o \
+	$(OSDOBJ)/modules/netdev/none.o \
+	$(OSDOBJ)/modules/debugger/debugwin.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/debugger/debugqt.o \
+	$(OSDOBJ)/modules/debugger/none.o \
 
 ifeq ($(OS),Windows_NT)
 LIBS += -lwinmm -lwsock32

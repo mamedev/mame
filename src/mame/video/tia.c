@@ -430,6 +430,8 @@ void tia_video_device::device_start()
 	helper[0] = auto_bitmap_ind16_alloc(machine(), cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[1] = auto_bitmap_ind16_alloc(machine(), cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[2] = auto_bitmap_ind16_alloc(machine(), cx, TIA_MAX_SCREEN_HEIGHT);
+
+	register_save_state();
 }
 
 
@@ -665,13 +667,13 @@ int tia_video_device::collision_check(UINT8* p1, UINT8* p2, int x1, int x2)
 
 int tia_video_device::current_x()
 {
-	return 3 * ((machine().firstcpu->total_cycles() - frame_cycles) % 76) - 68;
+	return 3 * ((machine().device<cpu_device>("maincpu")->total_cycles() - frame_cycles) % 76) - 68;
 }
 
 
 int tia_video_device::current_y()
 {
-	return (machine().firstcpu->total_cycles() - frame_cycles) / 76;
+	return (machine().device<cpu_device>("maincpu")->total_cycles() - frame_cycles) / 76;
 }
 
 
@@ -1010,7 +1012,7 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 
 WRITE8_MEMBER( tia_video_device::WSYNC_w )
 {
-	int cycles = machine().firstcpu->total_cycles() - frame_cycles;
+	int cycles = machine().device<cpu_device>("maincpu")->total_cycles() - frame_cycles;
 
 	if (cycles % 76)
 	{
@@ -1051,7 +1053,7 @@ WRITE8_MEMBER( tia_video_device::VBLANK_w )
 {
 	if (data & 0x80)
 	{
-		paddle_start = machine().firstcpu->total_cycles();
+		paddle_start = machine().device<cpu_device>("maincpu")->total_cycles();
 	}
 	if ( ! ( VBLANK & 0x40 ) ) {
 		INPT4 = 0x80;
@@ -1804,7 +1806,7 @@ WRITE8_MEMBER( tia_video_device::GRP1_w )
 
 READ8_MEMBER( tia_video_device::INPT_r )
 {
-	UINT64 elapsed = machine().firstcpu->total_cycles() - paddle_start;
+	UINT64 elapsed = machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start;
 	UINT16 input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( !m_read_input_port_cb.isnull() )
 	{
@@ -2176,4 +2178,91 @@ void tia_video_device::device_reset()
 	CXM0P = 0;
 	COLUBK = 0;
 	COLUPF = 0;
+}
+
+
+void tia_video_device::register_save_state()
+{
+	save_item(NAME(p0gfx.start_pixel));
+	save_item(NAME(p0gfx.start_drawing));
+	save_item(NAME(p0gfx.size));
+	save_item(NAME(p0gfx.skipclip));
+	save_item(NAME(p1gfx.start_pixel));
+	save_item(NAME(p1gfx.start_drawing));
+	save_item(NAME(p1gfx.size));
+	save_item(NAME(p1gfx.skipclip));
+	save_item(NAME(frame_cycles));
+	save_item(NAME(paddle_start));
+	save_item(NAME(horzP0));
+	save_item(NAME(horzP1));
+	save_item(NAME(horzM0));
+	save_item(NAME(horzM1));
+	save_item(NAME(horzBL));
+	save_item(NAME(motclkP0));
+	save_item(NAME(motclkP1));
+	save_item(NAME(motclkM0));
+	save_item(NAME(motclkM1));
+	save_item(NAME(motclkBL));
+	save_item(NAME(startP0));
+	save_item(NAME(startP1));
+	save_item(NAME(startM0));
+	save_item(NAME(startM1));
+	save_item(NAME(skipclipP0));
+	save_item(NAME(skipclipP1));
+	save_item(NAME(skipM0delay));
+	save_item(NAME(skipM1delay));
+	save_item(NAME(current_bitmap));
+	save_item(NAME(prev_x));
+	save_item(NAME(prev_y));
+	save_item(NAME(VSYNC));
+	save_item(NAME(VBLANK));
+	save_item(NAME(COLUP0));
+	save_item(NAME(COLUP1));
+	save_item(NAME(COLUBK));
+	save_item(NAME(COLUPF));
+	save_item(NAME(CTRLPF));
+	save_item(NAME(GRP0));
+	save_item(NAME(GRP1));
+	save_item(NAME(REFP0));
+	save_item(NAME(REFP1));
+	save_item(NAME(HMP0));
+	save_item(NAME(HMP1));
+	save_item(NAME(HMM0));
+	save_item(NAME(HMM1));
+	save_item(NAME(HMBL));
+	save_item(NAME(VDELP0));
+	save_item(NAME(VDELP1));
+	save_item(NAME(VDELBL));
+	save_item(NAME(NUSIZ0));
+	save_item(NAME(NUSIZ1));
+	save_item(NAME(ENAM0));
+	save_item(NAME(ENAM1));
+	save_item(NAME(ENABL));
+	save_item(NAME(CXM0P));
+	save_item(NAME(CXM1P));
+	save_item(NAME(CXP0FB));
+	save_item(NAME(CXP1FB));
+	save_item(NAME(CXM0FB));
+	save_item(NAME(CXM1FB));
+	save_item(NAME(CXBLPF));
+	save_item(NAME(CXPPMM));
+	save_item(NAME(RESMP0));
+	save_item(NAME(RESMP1));
+	save_item(NAME(PF0));
+	save_item(NAME(PF1));
+	save_item(NAME(PF2));
+	save_item(NAME(INPT4));
+	save_item(NAME(INPT5));
+	save_item(NAME(prevGRP0));
+	save_item(NAME(prevGRP1));
+	save_item(NAME(prevENABL));
+	save_item(NAME(HMOVE_started));
+	save_item(NAME(HMOVE_started_previous));
+	save_item(NAME(HMP0_latch));
+	save_item(NAME(HMP1_latch));
+	save_item(NAME(HMM0_latch));
+	save_item(NAME(HMM1_latch));
+	save_item(NAME(HMBL_latch));
+	save_item(NAME(REFLECT));
+	save_item(NAME(NUSIZx_changed));
 }

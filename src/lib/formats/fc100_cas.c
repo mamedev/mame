@@ -10,6 +10,8 @@ it's all a guess.
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "fc100_cas.h"
 
 #define WAVEENTRY_LOW  -32768

@@ -24,6 +24,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
 	required_shared_ptr<UINT8> m_scroll_low;
 	required_shared_ptr<UINT8> m_scroll_high;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -33,15 +34,20 @@ public:
 	int m_palette_bank;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(vulgus_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(vulgus_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(vulgus_c804_w);
-	DECLARE_WRITE8_MEMBER(vulgus_palette_bank_w);
+
+	DECLARE_WRITE8_MEMBER(fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(c804_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(vulgus);
-	UINT32 screen_update_vulgus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vulgus_vblank_irq);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };

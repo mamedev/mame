@@ -54,7 +54,7 @@ public:
 	// getters
 	const char *expression() { return m_expression.string(); }
 	UINT8 bytes_per_chunk() { flush_updates(); return m_bytes_per_chunk; }
-	UINT8 chunks_per_row() { flush_updates(); return m_chunks_per_row; }
+	UINT32 chunks_per_row() { flush_updates(); return m_chunks_per_row; }
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
 	bool physical() const { return m_no_translation; }

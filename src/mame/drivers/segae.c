@@ -956,8 +956,8 @@ UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 
 
 		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{
-			dest_ptr[x] = ( y1_ptr[x] ) ? vdp1_ptr[x] : vdp2_ptr[x];
-//dest_ptr[x] = y1_ptr[x] ? 0xFF0000 : 0x00FF00;
+			dest_ptr[x] = ( y1_ptr[x] ) ? vdp2_ptr[x] : vdp1_ptr[x];
+			//dest_ptr[x] = y1_ptr[x] ? 0x00FF00 : 0xFF0000;
 		}
 	}
 

@@ -32,7 +32,7 @@ NETLIB_UPDATE_PARAM(r2r_dac)
 
 	update_dev();
 
-	double V = m_VIN.Value() / (double) (1 << m_num.Value()) * (double) m_val.Value();
+	nl_double V = m_VIN.Value() / (double) (1 << m_num.Value()) * (double) m_val.Value();
 
 	this->set(1.0 / m_R.Value(), V, 0.0);
 }

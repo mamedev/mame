@@ -15,26 +15,40 @@
 #define __PIC16C5X_H__
 
 
-
-
-/**************************************************************************
- *  Internal Clock divisor
- *
- *  External Clock is divided internally by 4 for the instruction cycle
- *  times. (Each instruction cycle passes through 4 machine states). This
- *  is handled by the cpu execution engine.
- */
-
+// i/o ports
 enum
 {
-	PIC16C5x_PC=1, PIC16C5x_STK0, PIC16C5x_STK1, PIC16C5x_FSR,
-	PIC16C5x_W,    PIC16C5x_ALU,  PIC16C5x_STR,  PIC16C5x_OPT,
-	PIC16C5x_TMR0, PIC16C5x_PRTA, PIC16C5x_PRTB, PIC16C5x_PRTC,
-	PIC16C5x_WDT,  PIC16C5x_TRSA, PIC16C5x_TRSB, PIC16C5x_TRSC,
-	PIC16C5x_PSCL
+	PIC16C5x_PORTA = 0,
+	PIC16C5x_PORTB,
+	PIC16C5x_PORTC
 };
 
-#define PIC16C5x_T0     0x10
+// port a, 4 bits, 2-way
+#define MCFG_PIC16C5x_READ_A_CB(_devcb) \
+	pic16c5x_device::set_read_a_callback(*device, DEVCB_##_devcb);
+#define MCFG_PIC16C5x_WRITE_A_CB(_devcb) \
+	pic16c5x_device::set_write_a_callback(*device, DEVCB_##_devcb);
+
+// port b, 8 bits, 2-way
+#define MCFG_PIC16C5x_READ_B_CB(_devcb) \
+	pic16c5x_device::set_read_b_callback(*device, DEVCB_##_devcb);
+#define MCFG_PIC16C5x_WRITE_B_CB(_devcb) \
+	pic16c5x_device::set_write_b_callback(*device, DEVCB_##_devcb);
+
+// port c, 8 bits, 2-way
+#define MCFG_PIC16C5x_READ_C_CB(_devcb) \
+	pic16c5x_device::set_read_c_callback(*device, DEVCB_##_devcb);
+#define MCFG_PIC16C5x_WRITE_C_CB(_devcb) \
+	pic16c5x_device::set_write_c_callback(*device, DEVCB_##_devcb);
+
+// T0 pin (readline)
+#define MCFG_PIC16C5x_T0_CB(_devcb) \
+	pic16c5x_device::set_t0_callback(*device, DEVCB_##_devcb);
+
+// CONFIG register
+#define MCFG_PIC16C5x_SET_CONFIG(_data) \
+	pic16c5x_device::set_config_static(*device, _data);
+
 
 
 extern const device_type PIC16C54;
@@ -50,12 +64,26 @@ public:
 	// construction/destruction
 	pic16c5x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int program_width, int data_width, int picmodel);
 
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_read_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_a.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_b.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_c.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_write_a_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_a.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_b_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_b.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_c_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_write_c.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_t0_callback(device_t &device, _Object object) { return downcast<pic16c5x_device &>(device).m_read_t0.set_callback(object); }
+
 	/****************************************************************************
 	 *  Function to configure the CONFIG register. This is actually hard-wired
 	 *  during ROM programming, so should be called in the driver INIT, with
 	 *  the value if known (available in HEX dumps of the ROM).
 	 */
-	void pic16c5x_set_config(int data);
+	void pic16c5x_set_config(UINT16 data);
+	
+	// or with a macro
+	static void set_config_static(device_t &device, UINT16 data) { downcast<pic16c5x_device &>(device).m_temp_config = data; }
 
 protected:
 	// device-level overrides
@@ -63,6 +91,13 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	/**************************************************************************
+	 *  Internal Clock divisor
+	 *
+	 *  External Clock is divided internally by 4 for the instruction cycle
+	 *  times. (Each instruction cycle passes through 4 machine states). This
+	 *  is handled by the cpu execution engine.
+	 */
 	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return (clocks + 4 - 1) / 4; }
 	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return (cycles * 4); }
 	virtual UINT32 execute_min_cycles() const { return 1; }
@@ -74,7 +109,7 @@ protected:
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL );
 	}
 
 	// device_state_interface overrides
@@ -90,7 +125,6 @@ protected:
 private:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
 
 	/******************** CPU Internal Registers *******************/
 	UINT16  m_PC;
@@ -121,7 +155,15 @@ private:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
-	address_space *m_io;
+	
+	// i/o handlers
+	devcb_read8 m_read_a;
+	devcb_read8 m_read_b;
+	devcb_read8 m_read_c;
+	devcb_write8 m_write_a;
+	devcb_write8 m_write_b;
+	devcb_write8 m_write_c;
+	devcb_read_line m_read_t0;
 
 	// For debugger
 	int m_debugger_temp;

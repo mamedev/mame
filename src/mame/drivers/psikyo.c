@@ -378,11 +378,6 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(psikyo_state::sound_irq)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 READ8_MEMBER(psikyo_state::psikyo_soundlatch_r)
 {
 	return m_soundlatch;
@@ -1061,7 +1056,7 @@ static MACHINE_CONFIG_START( sngkace, psikyo_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(psikyo_state, sound_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1107,7 +1102,7 @@ static MACHINE_CONFIG_START( gunbird, psikyo_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(psikyo_state, sound_irq))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1153,11 +1148,6 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-WRITE_LINE_MEMBER(psikyo_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( s1945, psikyo_state )
 
 	/* basic machine hardware */
@@ -1192,7 +1182,7 @@ static MACHINE_CONFIG_START( s1945, psikyo_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyo_state, irqhandler))
+	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1231,9 +1221,8 @@ ROM_START( samuraia )
 	ROM_LOAD32_WORD_SWAP( "4-u127.bin", 0x000000, 0x040000, CRC(8c9911ca) SHA1(821ba648b9a1d495c600cbf4606f2dbddc6f9e6f) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u126.bin", 0x000002, 0x040000, CRC(d20c3ef0) SHA1(264e5a7e45e130a9e7152468733337668dc5b65f) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(00a546cb) SHA1(30a8679b49928d5fcbe58b5eecc2ebd08173adf8) )
@@ -1256,9 +1245,8 @@ ROM_START( sngkace )
 	ROM_LOAD32_WORD_SWAP( "1-u127.bin", 0x000000, 0x040000, CRC(6c45b2f8) SHA1(08473297e174f3a6d67043f3b16f4e6b9c68b826) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u126.bin", 0x000002, 0x040000, CRC(845a6760) SHA1(3b8fed294e28d9d8ef5cb5ec88b9ade396146a48) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(00a546cb) SHA1(30a8679b49928d5fcbe58b5eecc2ebd08173adf8) )
@@ -1300,9 +1288,8 @@ ROM_START( gunbird )
 	ROM_LOAD32_WORD_SWAP( "4.u46", 0x000000, 0x040000, CRC(b78ec99d) SHA1(399b79931652d9df1632cd4d7ec3d214e473a5c3) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5.u39", 0x000002, 0x040000, CRC(925f095d) SHA1(301a536119a0320a756e9c6e51fb10e36b90ef16) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3.u71",     0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x700000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(7d7e8a00) SHA1(9f35f5b54ae928e9bf2aa6ad4604f669857955ec) )
@@ -1333,9 +1320,8 @@ ROM_START( gunbirdk )
 	ROM_LOAD32_WORD_SWAP( "1k.u46", 0x000000, 0x080000, CRC(745cee52) SHA1(6c5bb92c92c55f882484417bc1aa580684019610) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2k.u39", 0x000002, 0x080000, CRC(669632fb) SHA1(885dea42e6da35e9166a208b18dbd930642c26cd) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "k3.u71",    0x00000, 0x20000, CRC(11994055) SHA1(619776c178361f23de37ff14e87284ec0f1f4f10) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x700000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(7d7e8a00) SHA1(9f35f5b54ae928e9bf2aa6ad4604f669857955ec) )
@@ -1363,9 +1349,8 @@ ROM_START( gunbirdj )
 	ROM_LOAD32_WORD_SWAP( "1.u46", 0x000000, 0x040000, CRC(474abd69) SHA1(27f37333075f9c92849101aad4875e69004d747b) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2.u39", 0x000002, 0x040000, CRC(3e3e661f) SHA1(b5648546f390539b0f727a9a62d1b9516254ae21) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3.u71",     0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x700000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(7d7e8a00) SHA1(9f35f5b54ae928e9bf2aa6ad4604f669857955ec) )
@@ -1394,9 +1379,42 @@ ROM_START( btlkroad )
 	ROM_LOAD32_WORD_SWAP( "4-u46.bin", 0x000000, 0x040000, CRC(8a7a28b4) SHA1(f7197be673dfd0ddf46998af81792b81d8fe9fbf) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u39.bin", 0x000002, 0x040000, CRC(933561fa) SHA1(f6f3b1e14b1cfeca26ef8260ac4771dc1531c357) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(22411fab) SHA1(1094cb51712e40ae65d0082b408572bdec06ae8b) )
-	ROM_RELOAD(            0x10000, 0x20000             )
+
+	ROM_REGION( 0x700000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(282d89c3) SHA1(3b4b17f4a37efa2f7e232488aaba7c77d10c84d2) )
+	ROM_LOAD( "u24.bin",  0x200000, 0x200000, CRC(bbe9d3d1) SHA1(9da0b0b993e8271a8119e9c2f602e52325983f79) )
+	ROM_LOAD( "u15.bin",  0x400000, 0x200000, CRC(d4d1b07c) SHA1(232109db8f6e137fbc8826f38a96057067cb19dc) )
+//  ROM_LOAD( "u25.bin",  0x600000, 0x100000  NOT PRESENT
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
+	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
+
+	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
+
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
+	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(30d541ed) SHA1(6f7fb5f5ecbce7c086185392de164ebb6887e780) )
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "tibpal16l8.u69", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "tibpal16l8.u19", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+
+ROM_END
+
+
+ROM_START( btlkroadk )
+
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD32_WORD_SWAP( "4(dot).u46", 0x000000, 0x040000, CRC(e724d429) SHA1(8b5f80366fd22d6f7e7d8a9623de4fe231303267) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "5(dot).u39", 0x000002, 0x040000, CRC(c0d65765) SHA1(a6a26e6b9693a2ef245e9aaa4c9daa888aebb360)) // 3&2
+
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_LOAD( "3(k).u71", 0x00000, 0x20000, CRC(e0f0c597) SHA1(cc337633f1f579baf0f8ba1dd65c5d51122a7e97) )
 
 	ROM_REGION( 0x700000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(282d89c3) SHA1(3b4b17f4a37efa2f7e232488aaba7c77d10c84d2) )
@@ -1443,9 +1461,8 @@ ROM_START( s1945jn )
 	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x080000, CRC(45fa8086) SHA1(f1753b9420596f4b828c77e877a044ba5fb01b28) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x080000, CRC(0152ab8c) SHA1(2aef4cb88341b35f20bb551716f1e5ac2731e9ba) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(e3e366bd) SHA1(1f5b5909745802e263a896265ea365df76d3eaa5) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
@@ -1574,9 +1591,8 @@ ROM_START( s1945 )
 	ROM_LOAD32_WORD_SWAP( "2s.u40", 0x000000, 0x040000, CRC(9b10062a) SHA1(cf963bba157422b659d8d64b4493eb7d69cd07b7) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3s.u41", 0x000002, 0x040000, CRC(f87e871a) SHA1(567167c7fcfb622f78e211d74b04060c3d29d6b7) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU? */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
@@ -1604,9 +1620,8 @@ ROM_START( s1945a )
 	ROM_LOAD32_WORD_SWAP( "4-u40.bin", 0x000000, 0x040000, CRC(29ffc217) SHA1(12dc3cb32253c3908f4c440c627a0e1b32ee7cac) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u41.bin", 0x000002, 0x040000, CRC(c3d3fb64) SHA1(4388586bc0a6f3d62366b3c38b8b23f8a03dbf15) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU? */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
@@ -1634,9 +1649,8 @@ ROM_START( s1945j )
 	ROM_LOAD32_WORD_SWAP( "1-u40.bin", 0x000000, 0x040000, CRC(c00eb012) SHA1(080dae010ca83548ebdb3324585d15e48baf0541) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u41.bin", 0x000002, 0x040000, CRC(3f5a134b) SHA1(18bb3bb1e1adadcf522795f5cf7d4dc5a5dd1f30) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
@@ -1664,9 +1678,8 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 	ROM_LOAD32_WORD_SWAP( "10.u40", 0x000000, 0x040000, CRC(5a32af36) SHA1(2eada37fd043c097a11bcf4e3e0bebb473bbc0df) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "9.u41",  0x000002, 0x040000, CRC(29cc6d7d) SHA1(aeee9e88922c25c75885483d115e064c6b71540b) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
@@ -1716,9 +1729,8 @@ ROM_START( tengai )
 	ROM_LOAD32_WORD_SWAP( "5-u40.bin", 0x000000, 0x080000, CRC(90088195) SHA1(8ec48d581ecd14b3dad36edc65d5a273324cf3c1) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "4-u41.bin", 0x000002, 0x080000, CRC(0d53196c) SHA1(454bb4695b13ce44ca5dac7c6d4142a8b9afa798) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
@@ -1746,9 +1758,8 @@ ROM_START( tengaij )
 	ROM_LOAD32_WORD_SWAP( "2-u40.bin", 0x000000, 0x080000, CRC(ab6fe58a) SHA1(6687a3af192b3eab60d75ca286ebb8e0636297b5) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3-u41.bin", 0x000002, 0x080000, CRC(02e42e39) SHA1(6cdb7b1cebab50c0a44cd60cd437f0e878ccac5c) ) // 3&2
 
-	ROM_REGION( 0x030000, "audiocpu", 0 )       /* Sound CPU Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
-	ROM_RELOAD(            0x10000, 0x20000             )
 
 	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
@@ -1802,7 +1813,7 @@ DRIVER_INIT_MEMBER(psikyo_state,sngkace)
 	m_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
 	/* setup audiocpu banks */
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 
 	/* Enable other regions */
 #if 0
@@ -1859,7 +1870,7 @@ DRIVER_INIT_MEMBER(psikyo_state,tengai)
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(psikyo_state,gunbird)
@@ -1874,7 +1885,7 @@ DRIVER_INIT_MEMBER(psikyo_state,gunbird)
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
 
@@ -1896,7 +1907,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945)
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945a)
@@ -1917,7 +1928,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945j)
@@ -1938,7 +1949,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
@@ -1953,7 +1964,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
@@ -1979,18 +1990,22 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
 
 ***************************************************************************/
 
-/* Working Games */
 GAME( 1993, samuraia, 0,        sngkace,  samuraia, psikyo_state, sngkace,  ROT270, "Psikyo", "Samurai Aces (World)", GAME_SUPPORTS_SAVE ) // Banpresto?
 GAME( 1993, sngkace,  samuraia, sngkace,  sngkace, psikyo_state,  sngkace,  ROT270, "Psikyo", "Sengoku Ace (Japan)", GAME_SUPPORTS_SAVE ) // Banpresto?
+
 GAME( 1994, gunbird,  0,        gunbird,  gunbird, psikyo_state,  gunbird,  ROT270, "Psikyo", "Gunbird (World)", GAME_SUPPORTS_SAVE )
 GAME( 1994, gunbirdk, gunbird,  gunbird,  gunbirdj, psikyo_state, gunbird,  ROT270, "Psikyo", "Gunbird (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1994, gunbirdj, gunbird,  gunbird,  gunbirdj, psikyo_state, gunbird,  ROT270, "Psikyo", "Gunbird (Japan)", GAME_SUPPORTS_SAVE )
+
 GAME( 1994, btlkroad, 0,        gunbird,  btlkroad, psikyo_state, gunbird,  ROT0,   "Psikyo", "Battle K-Road", GAME_SUPPORTS_SAVE )
+GAME( 1994, btlkroadk, btlkroad,gunbird,  btlkroad, psikyo_state, gunbird,  ROT0,   "Psikyo", "Battle K-Road (Korean PCB)", GAME_SUPPORTS_SAVE ) // game code is still multi-region, but sound rom appears to be Korea specific at least
+
 GAME( 1995, s1945,    0,        s1945,    s1945, psikyo_state,    s1945,    ROT270, "Psikyo", "Strikers 1945 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945a,   s1945,    s1945,    s1945a, psikyo_state,   s1945a,   ROT270, "Psikyo", "Strikers 1945 (Japan / World)", GAME_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
 GAME( 1995, s1945j,   s1945,    s1945,    s1945j, psikyo_state,   s1945j,   ROT270, "Psikyo", "Strikers 1945 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j, psikyo_state,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945k,   s1945,    s1945,    s1945j, psikyo_state,   s1945,    ROT270, "Psikyo", "Strikers 1945 (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1995, s1945bl,  s1945,    s1945bl,  s1945bl, psikyo_state,  s1945bl,  ROT270, "bootleg","Strikers 1945 (Hong Kong, bootleg)", GAME_SUPPORTS_SAVE )
+
 GAME( 1996, tengai,   0,        s1945,    tengai, psikyo_state,   tengai,   ROT0,   "Psikyo", "Tengai (World)", GAME_SUPPORTS_SAVE )
 GAME( 1996, tengaij,  tengai,   s1945,    tengaij, psikyo_state,  tengai,   ROT0,   "Psikyo", "Sengoku Blade: Sengoku Ace Episode II / Tengai", GAME_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World

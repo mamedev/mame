@@ -43,7 +43,7 @@ static const discrete_lfsr_desc skydiver_lfsr =
 
 DISCRETE_SOUND_START(skydiver)
 	/************************************************/
-	/* skydiver  Effects Relataive Gain Table       */
+	/* skydiver  Effects Relative Gain Table        */
 	/*                                              */
 	/* Effect  V-ampIn  Gain ratio        Relative  */
 	/* Note     3.8     3.8/260.5          1000.0   */

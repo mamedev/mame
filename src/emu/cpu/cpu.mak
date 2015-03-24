@@ -79,6 +79,9 @@ endif
 
 $(CPUOBJ)/8x300/8x300.o:    $(CPUSRC)/8x300/8x300.c \
 							$(CPUSRC)/8x300/8x300.h
+
+
+
 #-------------------------------------------------
 # ARCangent A4
 #@src/emu/cpu/arc/arc.h,CPUS += ARC
@@ -92,6 +95,8 @@ endif
 
 $(CPUOBJ)/arc/arc.o:  $(CPUSRC)/arc/arc.c \
 			$(CPUSRC)/arc/arc.h
+
+
 
 #-------------------------------------------------
 # ARcompact (ARCtangent-A5, ARC 600, ARC 700)
@@ -129,6 +134,8 @@ $(CPUOBJ)/arcompact/arcompact_common.o:  $(CPUSRC)/arcompact/arcompact_common.c 
 $(CPUOBJ)/arcompact/arcompact.inc: $(CPUSRC)/arcompact/arcompact_make.py
 	@echo Generating arcompact source .inc files...
 	$(PYTHON) $(CPUSRC)/arcompact/arcompact_make.py $@
+
+
 
 #-------------------------------------------------
 # Acorn ARM series
@@ -173,6 +180,8 @@ $(CPUOBJ)/arm7/arm7thmb.o:  $(CPUSRC)/arm7/arm7thmb.c \
 						$(CPUSRC)/arm7/arm7help.h \
 						$(CPUSRC)/arm7/arm7core.h \
 
+
+
 #-------------------------------------------------
 # Advanced Digital Chips SE3208
 #@src/emu/cpu/se3208/se3208.h,CPUS += SE3208
@@ -186,6 +195,26 @@ endif
 
 $(CPUOBJ)/se3208/se3208.o:  $(CPUSRC)/se3208/se3208.c \
 							$(CPUSRC)/se3208/se3208.h
+
+
+
+#-------------------------------------------------
+# American Microsystems, Inc.(AMI) S2000 series
+#@src/emu/cpu/amis2000/amis2000.h,CPUS += AMIS2000
+#-------------------------------------------------
+
+ifneq ($(filter AMIS2000,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/amis2000
+CPUOBJS += $(CPUOBJ)/amis2000/amis2000.o
+DASMOBJS += $(CPUOBJ)/amis2000/amis2000d.o
+endif
+
+$(CPUOBJ)/amis2000/amis2000.o:  $(CPUSRC)/amis2000/amis2000.h \
+								$(CPUSRC)/amis2000/amis2000.c \
+								$(CPUSRC)/amis2000/amis2000op.inc
+
+$(CPUOBJ)/amis2000/amis2000d.o: $(CPUSRC)/amis2000/amis2000.h \
+								$(CPUSRC)/amis2000/amis2000d.c
 
 
 
@@ -712,6 +741,8 @@ $(CPUOBJ)/h8/h8s2600.inc: $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst
 	@echo Generating H8S/2600 source file...
 	$(PYTHON) $(CPUSRC)/h8/h8make.py $(CPUSRC)/h8/h8.lst s26 $@
 
+
+
 #-------------------------------------------------
 # Hitachi HCD62121
 #@src/emu/cpu/hcd62121/hcd62121.h,CPUS += HCD62121
@@ -726,6 +757,27 @@ endif
 $(CPUOBJ)/hcd62121/hcd62121.o:  $(CPUSRC)/hcd62121/hcd62121.c \
 							$(CPUSRC)/hcd62121/hcd62121.h \
 							$(CPUSRC)/hcd62121/hcd62121_ops.h
+
+
+
+#-------------------------------------------------
+# Hitachi HMCS40 series
+#@src/emu/cpu/hmcs40/hmcs40.h,CPUS += HMCS40
+#-------------------------------------------------
+
+ifneq ($(filter HMCS40,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/hmcs40
+CPUOBJS += $(CPUOBJ)/hmcs40/hmcs40.o
+DASMOBJS += $(CPUOBJ)/hmcs40/hmcs40d.o
+endif
+
+$(CPUOBJ)/hmcs40/hmcs40.o:      $(CPUSRC)/hmcs40/hmcs40.h \
+								$(CPUSRC)/hmcs40/hmcs40.c \
+								$(CPUSRC)/hmcs40/hmcs40op.inc
+
+$(CPUOBJ)/hmcs40/hmcs40d.o:     $(CPUSRC)/hmcs40/hmcs40.h \
+								$(CPUSRC)/hmcs40/hmcs40d.c
+
 
 
 #-------------------------------------------------
@@ -749,6 +801,8 @@ $(CPUOBJ)/sh2/sh2.o:    $(CPUSRC)/sh2/sh2.c \
 $(CPUOBJ)/sh2/sh2fe.o:  $(CPUSRC)/sh2/sh2fe.c \
 			$(CPUSRC)/sh2/sh2.h \
 			$(CPUSRC)/sh2/sh2comn.h
+
+
 
 #-------------------------------------------------
 # Hitachi SH4
@@ -794,6 +848,8 @@ $(CPUOBJ)/sh4/sh4dmac.o: $(CPUSRC)/sh4/sh4dmac.c \
 			$(CPUSRC)/sh4/sh4regs.h \
 			$(CPUSRC)/sh4/sh4comn.h \
 			$(CPUSRC)/sh4/sh3comn.h
+
+
 
 #-------------------------------------------------
 # Hudsonsoft 6280
@@ -1720,6 +1776,7 @@ OBJDIRS += $(CPUOBJ)/nec
 CPUOBJS += $(CPUOBJ)/nec/nec.o
 CPUOBJS += $(CPUOBJ)/nec/v25.o
 CPUOBJS += $(CPUOBJ)/nec/v25sfr.o
+CPUOBJS += $(CPUOBJ)/nec/v53.o
 DASMOBJS += $(CPUOBJ)/nec/necdasm.o
 endif
 
@@ -1835,6 +1892,25 @@ $(CPUOBJ)/upd7810/upd7810_opcodes.o: $(CPUSRC)/upd7810/upd7810_opcodes.c \
 $(CPUOBJ)/upd7810/upd7810.o:    $(CPUSRC)/upd7810/upd7810.c \
 								$(CPUSRC)/upd7810/upd7810.h \
 								$(CPUSRC)/upd7810/upd7810_macros.h
+
+
+#-------------------------------------------------
+# NEC uCOM-4 series
+#@src/emu/cpu/ucom4/ucom4.h,CPUS += UCOM4
+#-------------------------------------------------
+
+ifneq ($(filter UCOM4,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ucom4
+CPUOBJS += $(CPUOBJ)/ucom4/ucom4.o
+DASMOBJS += $(CPUOBJ)/ucom4/ucom4d.o
+endif
+
+$(CPUOBJ)/ucom4/ucom4.o:        $(CPUSRC)/ucom4/ucom4.h \
+								$(CPUSRC)/ucom4/ucom4.c \
+								$(CPUSRC)/ucom4/ucom4op.inc
+
+$(CPUOBJ)/ucom4/ucom4d.o:       $(CPUSRC)/ucom4/ucom4.h \
+								$(CPUSRC)/ucom4/ucom4d.c
 
 
 #-------------------------------------------------
@@ -2296,7 +2372,8 @@ OBJDIRS += $(CPUOBJ)/z80
 CPUOBJS += $(CPUOBJ)/z80/z80.o \
 	$(CPUOBJ)/z80/z80daisy.o \
 	$(CPUOBJ)/z80/tmpz84c011.o \
-	$(CPUOBJ)/z80/tmpz84c015.o
+	$(CPUOBJ)/z80/tmpz84c015.o \
+	$(CPUOBJ)/z80/kl5c80a12.o
 
 DASMOBJS += $(CPUOBJ)/z80/z80dasm.o
 endif

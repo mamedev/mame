@@ -992,14 +992,14 @@ class ioport_field
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static const int FIELD_FLAG_UNUSED = 0x01;      // set if this field is unused but relevant to other games on the same hw
-	static const int FIELD_FLAG_COCKTAIL = 0x02;    // set if this field is relevant only for cocktail cabinets
-	static const int FIELD_FLAG_TOGGLE = 0x04;      // set if this field should behave as a toggle
-	static const int FIELD_FLAG_ROTATED = 0x08;     // set if this field represents a rotated control
-	static const int ANALOG_FLAG_REVERSE = 0x10;    // analog only: reverse the sense of the axis
-	static const int ANALOG_FLAG_RESET = 0x20;      // analog only: always preload in->default for relative axes, returning only deltas
-	static const int ANALOG_FLAG_WRAPS = 0x40;      // analog only: positional count wraps around
-	static const int ANALOG_FLAG_INVERT = 0x80;     // analog only: bitwise invert bits
+	static const int FIELD_FLAG_UNUSED =   0x0001;    // set if this field is unused but relevant to other games on the same hw
+	static const int FIELD_FLAG_COCKTAIL = 0x0002;    // set if this field is relevant only for cocktail cabinets
+	static const int FIELD_FLAG_TOGGLE =   0x0004;    // set if this field should behave as a toggle
+	static const int FIELD_FLAG_ROTATED =  0x0008;    // set if this field represents a rotated control
+	static const int ANALOG_FLAG_REVERSE = 0x0010;    // analog only: reverse the sense of the axis
+	static const int ANALOG_FLAG_RESET =   0x0020;    // analog only: always preload in->default for relative axes, returning only deltas
+	static const int ANALOG_FLAG_WRAPS =   0x0040;    // analog only: positional count wraps around
+	static const int ANALOG_FLAG_INVERT =  0x0080;    // analog only: bitwise invert bits
 
 public:
 	// construction/destruction

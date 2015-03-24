@@ -8,14 +8,16 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "chd.h"
 #include "hashing.h"
 #include "avhuff.h"
 #include "flac.h"
 #include "cdrom.h"
 #include <zlib.h>
-#include "lib7z/LzmaEnc.h"
-#include "lib7z/LzmaDec.h"
+#include "lzma/C/LzmaEnc.h"
+#include "lzma/C/LzmaDec.h"
 #include <new>
 
 

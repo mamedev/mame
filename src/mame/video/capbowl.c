@@ -15,7 +15,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(capbowl_state::capbowl_tms34061_w)
+WRITE8_MEMBER(capbowl_state::tms34061_w)
 {
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
@@ -30,7 +30,7 @@ WRITE8_MEMBER(capbowl_state::capbowl_tms34061_w)
 }
 
 
-READ8_MEMBER(capbowl_state::capbowl_tms34061_r)
+READ8_MEMBER(capbowl_state::tms34061_r)
 {
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
@@ -123,10 +123,8 @@ inline rgb_t capbowl_state::pen_for_pixel( UINT8 *src, UINT8 pix )
 }
 
 
-UINT32 capbowl_state::screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 capbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
 	/* first get the current display state */
 	m_tms34061->get_display_state();
 
@@ -138,12 +136,12 @@ UINT32 capbowl_state::screen_update_capbowl(screen_device &screen, bitmap_rgb32 
 	}
 
 	/* now regenerate the bitmap */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT8 *src = &m_tms34061->m_display.vram[256 * y];
 		UINT32 *dest = &bitmap.pix32(y);
 
-		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
 			UINT8 pix = src[32 + (x / 2)];
 			*dest++ = pen_for_pixel(src, pix >> 4);

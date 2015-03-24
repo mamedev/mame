@@ -1622,6 +1622,8 @@ ROM_END
 
 This game runs on dedicated hardware.
 
+Possibly bootlegged by Hafasonic?
+
 CPU Board
 ---------
 
@@ -2394,7 +2396,7 @@ GAME( 1980, cclimbroper, cclimber, cclimber, cclimber, driver_device,  0,       
 GAME( 1981, ckong,       0,        cclimber, ckong, driver_device,    0,        ROT270, "Kyoei / Falcon", "Crazy Kong", 0 ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
 GAME( 1981, ckongalc,    ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", 0 )
 GAME( 1981, monkeyd,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
-GAME( 1981, dking,       ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", 0 )
+GAME( 1981, dking,       ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", 0 ) // supposedly, possibly by Hafasonic?
 GAME( 1981, ckongdks,    ckong,    cclimber, ckong, cclimber_state,   dking,    ROT270, "bootleg", "Donkey Kong (Spanish Crazy Kong bootleg)", 0 )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused

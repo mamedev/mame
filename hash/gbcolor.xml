@@ -23650,6 +23650,21 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 -->
 
+	<software name="emochndx" supported="partial">
+		<description>Emo Cheng DX (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_licheng" />
+			<!-- cartridge ram -->
+			<dataarea name="rom"  size="4194304">
+				<rom name="e mo cheng dx (sintax) (unl).bin" size="4194304" crc="5c388c6d" sha1="7919fe7b54a5bc53ebacc13dd338be9e841dadf7" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shuihusslc" cloneof="shuihuss">
 		<description>Shui Hu Shen Shou (Chi, Li Cheng)</description>
 		<year>200?</year>
@@ -24104,7 +24119,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="digimon crystal ii (unlicensed, english) [raw dump].gbc" size="2097152" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
+				<rom name="digimon crystal ii (unlicensed, english) [raw dump].bin" size="2097152" crc="685e76df" sha1="4e981044ac3a40d7a9cd63b79d5982b4b4e670a5" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24120,7 +24135,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
+				<rom name="lao fuzi chuanqi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="aeca45be" sha1="b7193fcb8b9b8958a2522be0d1a3874cffc1e1db" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24136,7 +24151,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
+				<rom name="yuenan zhanyi x - shenru dihou (unlicensed, chinese) [raw dump].bin" size="2097152" crc="602951a6" sha1="6703e9f68b989c976e93bd2eb63f884ceaff63f1" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24152,7 +24167,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
 			<dataarea name="rom"  size="2097152">
-				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].gbc" size="2097152" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
+				<rom name="qi long zhu z 3 (dragon ball - advance adventure) (unlicensed, chinese) [raw dump].bin" size="2097152" crc="ccfdd63a" sha1="4f3b63cd11522b6fb291661f4d918601d95138e0" offset="0" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -24353,7 +24368,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- this is a sprite hack (based on Golden Sun by Camelot) of another syntax game "Castlevania DX", currently undumped -->
+<!-- this is a sprite hack (based on Golden Sun by Camelot) of another sintax game "Castlevania DX", currently undumped -->
 <!-- ingame title uses 黃金の太陽, so I romanized it in the Jpn way rather than in the Chinese way... -->
 	<software name="hjtaiyou">
 		<description>Pian Wai Zhang Huang Jin no Taiyou - Feng Yin De Yuan Gu Lian Jin Shu (Chi)</description>
@@ -24370,7 +24385,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		</part>
 	</software>
 
-<!-- this is a sprite hack (based on Dragon Quest by Enix) of another syntax game "Castlevania DX", currently undumped -->
+<!-- this is a sprite hack (based on Dragon Quest by Enix) of another sintax game "Castlevania DX", currently undumped -->
 	<software name="dquest8">
 		<description>Yong Zhe Dou E Long VIII (Chi)</description>
 		<year>200?</year>
@@ -24607,7 +24622,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 	<software name="taikong" cloneof="firmbaby">
 	<!-- 4MB rom with crc 5b49af92 is taizou's cracked version running on base MBC5 -->
-		<description>Tai Kong Bao Bei (Chi, Syntax)</description>
+		<description>Tai Kong Bao Bei (Chi, Sintax)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
 		<info name="alt_title" value="太空寶貝"/>

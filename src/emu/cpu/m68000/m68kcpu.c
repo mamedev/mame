@@ -699,7 +699,7 @@ static void m68k_cause_bus_error(m68000_base_device *m68k)
 	{
 		/* only the 68010 throws this unique type-1000 frame */
 		m68ki_stack_frame_1000(m68k, REG_PPC(m68k), sr, EXCEPTION_BUS_ERROR);
-	} 
+	}
 	else if (m68k->mmu_tmp_buserror_address == REG_PPC(m68k))
 	{
 		m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC(m68k), m68k->mmu_tmp_buserror_address);
@@ -2478,10 +2478,11 @@ void m68000_base_device::clear_all()
 	mmu_tmp_buserror_rw = 0;
 
 	for (int i=0;i<M68K_IC_SIZE;i++)
+	{
 		ic_address[i] = 0;
-
-	for (int i=0;i<M68K_IC_SIZE;i++)
 		ic_data[i] = 0;
+		ic_valid[i] = false;
+	}
 
 	internal = 0;
 }

@@ -8,12 +8,23 @@
 #ifndef NL_DICE_COMPAT_H_
 #define NL_DICE_COMPAT_H_
 
+#include "netlist/devices/net_lib.h"
+
 /* --------------------------------------------------------------------
  * Compatibility macros for DICE netlists ...
  * -------------------------------------------------------------------- */
 
-//#define CHIP(_n, _t) netlist.register_dev(NET_NEW(_t ## _dip), _n);
-#define CHIP(_n, _t) setup.register_dev( new nld_ ## _t ## _dip(), _n);
+/*
+ * define NETLIST_DEVELOPMENT in IDEs before including this header file
+ * to get compile time errors on unknown devices. This should only be
+ * a temporary support and not be used in commits.
+ */
+
+#ifdef NETLIST_DEVELOPMENT
+#define CHIP(_n, _t) setup.register_dev( nl_alloc(nld_ ## _t ## _dip), _n);
+#else
+#define CHIP(_n, _t) setup.register_dev(NETLIB_NAME_STR(_t ## _dip), _n);
+#endif
 
 #define CONNECTION( ... ) CONNECTIONY( CONNECTIONX( __VA_ARGS__ ) )
 #define CONNECTIONY(_a) _a
@@ -30,17 +41,17 @@
 struct Mono555Desc
 {
 public:
-		double r, c;
+		nl_double r, c;
 
-		Mono555Desc(double res, double cap) : r(res), c(cap) { }
+		Mono555Desc(nl_double res, nl_double cap) : r(res), c(cap) { }
 };
 
 struct SeriesRCDesc
 {
 public:
-		double r, c;
+		nl_double r, c;
 
-		SeriesRCDesc(double res, double cap) : r(res), c(cap) { }
+		SeriesRCDesc(nl_double res, nl_double cap) : r(res), c(cap) { }
 };
 
 #define CHIP_555_Mono(_name,  _pdesc)   \

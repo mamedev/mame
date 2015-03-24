@@ -742,7 +742,7 @@ ROM_START( mp_col3 ) /* Columns 3 */
 	MEGAPLAY_BIOS
 ROM_END
 
-ROM_START( mp_gaxe2 ) /* Golden Axe 2 */
+ROM_START( mp_gaxe2 ) /* Golden Axe 2, revision B */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ep15179b.ic2", 0x000000, 0x040000, CRC(00d97b84) SHA1(914bbf566ddf940aab67b92af237d251650ddadf) )
 	ROM_LOAD16_BYTE( "ep15178b.ic1", 0x000001, 0x040000, CRC(2ea576db) SHA1(6d96b948243533de1f488b1f80e0d5431a4f1f53) )
@@ -750,6 +750,19 @@ ROM_START( mp_gaxe2 ) /* Golden Axe 2 */
 
 	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
 	ROM_LOAD( "ep15175-02b.ic3", 0x000000, 0x08000, CRC(3039b653) SHA1(b19874c74d0fc0cca1169f62e5e74f0e8ca83679) ) // 15175-02b.ic3
+
+	ROM_REGION( 0x20000, "mtbios", 0 ) /* Bios */
+	MEGAPLAY_BIOS
+ROM_END
+
+ROM_START( mp_gaxe2a ) /* Golden Axe 2 */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-15179.ic2", 0x000000, 0x040000, CRC(d35f1a35) SHA1(3105cd3b55f65337863703db04527fe298fc04e0) )
+	ROM_LOAD16_BYTE( "epr-15178.ic1", 0x000001, 0x040000, CRC(2c6b6b76) SHA1(25577f49ecad451c217da9cacbd78ffca9dca24e) )
+	/* Game Instruction rom copied to 0x300000 - 0x310000 (odd / even bytes equal) */
+
+	ROM_REGION( 0x8000, "user1", 0 ) /* Game Instructions */
+	ROM_LOAD( "epr-15175-02.ic3", 0x000000, 0x08000, CRC(cfc87f91) SHA1(110609094aa6d848bec613faa0558db7ad272b77) )
 
 	ROM_REGION( 0x20000, "mtbios", 0 ) /* Bios */
 	MEGAPLAY_BIOS
@@ -928,7 +941,8 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 
 /* -- */ GAME( 1993, megaplay, 0,        megaplay, megaplay, mplay_state, megaplay, ROT0, "Sega",                  "Mega Play BIOS", GAME_IS_BIOS_ROOT )
 /* 01 */ GAME( 1993, mp_sonic, megaplay, megaplay, mp_sonic, mplay_state, megaplay, ROT0, "Sega",                  "Sonic The Hedgehog (Mega Play)" , 0 )
-/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
+/* 02 */ GAME( 1993, mp_gaxe2, megaplay, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play) (Rev B)" , 0 )
+/* 02 */ GAME( 1993, mp_gaxe2a,mp_gaxe2, megaplay, mp_gaxe2, mplay_state, megaplay, ROT0, "Sega",                  "Golden Axe II (Mega Play)" , 0 )
 /* 03 */ GAME( 1993, mp_gslam, megaplay, megaplay, mp_gslam, mplay_state, megaplay, ROT0, "Sega",                  "Grand Slam (Mega Play)",0  )
 /* 04 */ GAME( 1993, mp_twc,   megaplay, megaplay, mp_twc, mplay_state,   megaplay, ROT0, "Sega",                  "Tecmo World Cup (Mega Play)" , 0 )
 /* 05 */ GAME( 1993, mp_sor2,  megaplay, megaplay, mp_sor2, mplay_state,  megaplay, ROT0, "Sega",                  "Streets of Rage II (Mega Play)" , 0 )

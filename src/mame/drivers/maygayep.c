@@ -50,7 +50,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(maygayep);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 // bp 29e58 in ep_simp reads the 'INITIALISE . . .' string
@@ -101,11 +100,6 @@ DRIVER_INIT_MEMBER(maygayep_state,maygayep)
 
 }
 
-WRITE_LINE_MEMBER(maygayep_state::irqhandler)
-{
-}
-
-
 static MACHINE_CONFIG_START( maygayep, maygayep_state )
 	MCFG_CPU_ADD("maincpu", H83002, 16000000 )
 	MCFG_CPU_PROGRAM_MAP( maygayep_map )
@@ -113,7 +107,6 @@ static MACHINE_CONFIG_START( maygayep, maygayep_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 10000000 )
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(maygayep_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -60,6 +60,12 @@ void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	memcpy(data, init, sizeof(init));
 }
 
+void seicross_state::machine_start()
+{
+	save_item(NAME(m_portb));
+	save_item(NAME(m_irq_mask));
+}
+
 void seicross_state::machine_reset()
 {
 	/* start with the protection mcu halted */
@@ -68,18 +74,19 @@ void seicross_state::machine_reset()
 
 
 
-READ8_MEMBER(seicross_state::friskyt_portB_r)
+READ8_MEMBER(seicross_state::portB_r)
 {
 	return (m_portb & 0x9f) | (ioport("DEBUG")->read_safe(0) & 0x60);
 }
 
-WRITE8_MEMBER(seicross_state::friskyt_portB_w)
+WRITE8_MEMBER(seicross_state::portB_w)
 {
 	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
 	/* bit 0 is IRQ enable */
 	m_irq_mask = data & 1;
 
 	/* bit 1 flips screen */
+	flip_screen_set(data & 2);
 
 	/* bit 2 resets the microcontroller */
 	if (((m_portb & 4) == 0) && (data & 4))
@@ -98,10 +105,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8820, 0x887f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(seicross_videoram_w) AM_SHARE("videoram") /* video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") /* video RAM */
 	AM_RANGE(0x9800, 0x981f) AM_RAM AM_SHARE("row_scroll")
 	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(seicross_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")        /* IN0 */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")        /* IN1 */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("TEST")       /* test */
@@ -390,7 +397,7 @@ static MACHINE_CONFIG_START( no_nvram, seicross_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* frames per second, vblank duration */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update_seicross)
+	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seicross)
@@ -401,8 +408,8 @@ static MACHINE_CONFIG_START( no_nvram, seicross_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1536000)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, friskyt_portB_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, friskyt_portB_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, portB_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DAC_ADD("dac")
@@ -600,9 +607,9 @@ DRIVER_INIT_MEMBER(seicross_state,friskytb)
 }
 
 
-GAME( 1981, friskyt,  0,        nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", GAME_NO_COCKTAIL )
-GAME( 1981, friskyta, friskyt,  nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", GAME_NO_COCKTAIL )
-GAME( 1981, friskytb, friskyt,  nvram,    friskyt, seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", GAME_NO_COCKTAIL ) // protection mcu runs encrypted opcodes
-GAME( 1982, radrad,   0,        no_nvram, radrad, driver_device,   0,        ROT0,  "Nichibutsu USA", "Radical Radial", GAME_NO_COCKTAIL )
-GAME( 1984, seicross, 0,        no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Seicross", GAME_NO_COCKTAIL )
-GAME( 1984, sectrzon, seicross, no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", GAME_NO_COCKTAIL )
+GAME( 1981, friskyt,  0,        nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, friskyta, friskyt,  nvram,    friskyt, driver_device,  0,        ROT0,  "Nichibutsu", "Frisky Tom (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, friskytb, friskyt,  nvram,    friskyt, seicross_state, friskytb, ROT0,  "Nichibutsu", "Frisky Tom (set 3, encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // protection mcu runs encrypted opcodes
+GAME( 1982, radrad,   0,        no_nvram, radrad, driver_device,   0,        ROT0,  "Nichibutsu USA", "Radical Radial", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, seicross, 0,        no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Seicross", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, sectrzon, seicross, no_nvram, seicross, driver_device, 0,        ROT90, "Nichibutsu / Alice", "Sector Zone", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -42,7 +42,7 @@
 
 /*******************************************************************************/
 
-WRITE8_MEMBER(shootout_state::shootout_bankswitch_w)
+WRITE8_MEMBER(shootout_state::bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
@@ -53,12 +53,12 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE8_MEMBER(shootout_state::shootout_flipscreen_w)
+WRITE8_MEMBER(shootout_state::flipscreen_w)
 {
 	flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER(shootout_state::shootout_coin_counter_w)
+WRITE8_MEMBER(shootout_state::coincounter_w)
 {
 	coin_counter_w(machine(), 0, data);
 }
@@ -67,14 +67,14 @@ WRITE8_MEMBER(shootout_state::shootout_coin_counter_w)
 
 static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(shootout_bankswitch_w)
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(shootout_flipscreen_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(shootout_coin_counter_w)
+	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(bankswitch_w)
+	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(flipscreen_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(coincounter_w)
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x1004, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -85,11 +85,11 @@ static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(coincounter_w)
 	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -229,15 +229,7 @@ static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(shootout_state::shootout_snd_irq)
-{
-	m_audiocpu->set_input_line(0, state);
-}
 
-WRITE_LINE_MEMBER(shootout_state::shootout_snd2_irq)
-{
-	m_maincpu->set_input_line(0, state);
-}
 
 static MACHINE_CONFIG_START( shootout, shootout_state )
 
@@ -265,7 +257,7 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(shootout_state, shootout_snd_irq))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -293,9 +285,9 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(shootout_state, shootout_snd2_irq))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shootout_state, shootout_bankswitch_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shootout_state, shootout_flipscreen_w))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shootout_state, bankswitch_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shootout_state, flipscreen_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -398,6 +390,6 @@ DRIVER_INIT_MEMBER(shootout_state,shootout)
 }
 
 
-GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA", "Shoot Out (US)", 0)
-GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)", 0 )
-GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", 0 )
+GAME( 1985, shootout,  0,        shootout, shootout, shootout_state, shootout, ROT0, "Data East USA", "Shoot Out (US)", GAME_SUPPORTS_SAVE )
+GAME( 1985, shootoutj, shootout, shootouj, shootouj, shootout_state, shootout, ROT0, "Data East Corporation", "Shoot Out (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, shootoutb, shootout, shootouk, shootout, shootout_state, shootout, ROT0, "bootleg", "Shoot Out (Korean Bootleg)", GAME_SUPPORTS_SAVE )

@@ -382,6 +382,7 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 					else
 						string->catprintf("NOT FOUND (%s)\n", shared_device->shortname());
 				}
+				best_new_status = NOTFOUND;
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND_NODUMP:
@@ -420,6 +421,7 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 
 	// find the file and checksum it, getting the file length along the way
 	emu_file file(m_enumerator.options().media_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
+	file.set_restrict_to_mediapath(true);
 	path_iterator path(m_searchpath);
 	astring curpath;
 	while (path.next(curpath, record.name()))

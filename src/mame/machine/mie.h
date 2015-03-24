@@ -61,6 +61,7 @@ public:
 	DECLARE_READ8_MEMBER(jvs_status_r);
 	DECLARE_WRITE8_MEMBER(jvs_control_w);
 	DECLARE_READ8_MEMBER(jvs_sense_r);
+	DECLARE_WRITE8_MEMBER(jvs_lcr_w);
 
 	DECLARE_READ8_MEMBER(read_ff);
 	DECLARE_READ8_MEMBER(read_00);
@@ -106,6 +107,7 @@ private:
 	UINT8 gpiodir, gpio_val[8];
 	UINT8 irq_enable, irq_pending, maple_irqlevel;
 	UINT8 jvs_control, jvs_dest;
+	UINT8 jvs_lcr;
 
 	void raise_irq(int level);
 	void recalc_irq();

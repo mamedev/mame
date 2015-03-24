@@ -88,16 +88,16 @@ READ8_MEMBER(mosaic_state::gfire2_protection_r)
 static ADDRESS_MAP_START( mosaic_map, AS_PROGRAM, 8, mosaic_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x20000, 0x21fff) AM_RAM
-	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x24000, 0x241ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gfire2_map, AS_PROGRAM, 8, mosaic_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x17fff) AM_RAM
-	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x24000, 0x241ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( mosaic, mosaic_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update_mosaic)
+	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mosaic)
@@ -338,6 +338,6 @@ ROM_END
 
 
 
-GAME( 1990, mosaic,  0,      mosaic, mosaic, driver_device, 0, ROT0, "Space", "Mosaic", 0 )
-GAME( 1990, mosaica, mosaic, mosaic, mosaic, driver_device, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", 0 )
-GAME( 1992, gfire2,  0,      gfire2, gfire2, driver_device, 0, ROT0, "Topis Corp", "Golden Fire II", 0 )
+GAME( 1990, mosaic,  0,      mosaic, mosaic, driver_device, 0, ROT0, "Space", "Mosaic", GAME_SUPPORTS_SAVE )
+GAME( 1990, mosaica, mosaic, mosaic, mosaic, driver_device, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", GAME_SUPPORTS_SAVE )
+GAME( 1992, gfire2,  0,      gfire2, gfire2, driver_device, 0, ROT0, "Topis Corp", "Golden Fire II", GAME_SUPPORTS_SAVE )

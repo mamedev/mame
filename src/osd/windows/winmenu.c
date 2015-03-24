@@ -21,7 +21,7 @@
 
 LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	return winwindow_video_window_proc(wnd, message, wparam, lparam);
+	return win_window_info::video_window_proc(wnd, message, wparam, lparam);
 }
 
 //============================================================

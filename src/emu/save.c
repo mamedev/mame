@@ -147,7 +147,7 @@ void save_manager::register_postload(save_prepost_delegate func)
 //  memory
 //-------------------------------------------------
 
-void save_manager::save_memory(const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
+void save_manager::save_memory(device_t *device, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
 {
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
@@ -183,7 +183,7 @@ void save_manager::save_memory(const char *module, const char *tag, UINT32 index
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname, valsize, valcount)), insert_after);
+	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname, device, module, tag ? tag : "", index, valsize, valcount)), insert_after);
 }
 
 
@@ -213,6 +213,17 @@ save_error save_manager::check_file(running_machine &machine, emu_file &file, co
 	return validate_header(header, gamename, sig, errormsg, "");
 }
 
+//-------------------------------------------------
+//  dispatch_postload - invoke all registered
+//  postload callbacks for updates
+//-------------------------------------------------
+
+
+void save_manager::dispatch_postload()
+{
+	for (state_callback *func = m_postload_list.first(); func != NULL; func = func->next())
+		func->m_func();
+}
 
 //-------------------------------------------------
 //  read_file - read the data from a file
@@ -253,12 +264,22 @@ save_error save_manager::read_file(emu_file &file)
 	}
 
 	// call the post-load functions
-	for (state_callback *func = m_postload_list.first(); func != NULL; func = func->next())
-		func->m_func();
+	dispatch_postload();
 
 	return STATERR_NONE;
 }
 
+//-------------------------------------------------
+//  dispatch_presave - invoke all registered
+//  presave callbacks for updates
+//-------------------------------------------------
+
+
+void save_manager::dispatch_presave()
+{
+	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
+		func->m_func();
+}
 
 //-------------------------------------------------
 //  write_file - writes the data to a file
@@ -287,8 +308,7 @@ save_error save_manager::write_file(emu_file &file)
 	file.compress(FCOMPRESS_MEDIUM);
 
 	// call the pre-save functions
-	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
-		func->m_func();
+	dispatch_presave();
 
 	// then write all the data
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
@@ -399,10 +419,14 @@ save_manager::state_callback::state_callback(save_prepost_delegate callback)
 //  state_entry - constructor
 //-------------------------------------------------
 
-save_manager::state_entry::state_entry(void *data, const char *name, UINT8 size, UINT32 count)
+state_entry::state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, UINT8 size, UINT32 count)
 	: m_next(NULL),
 		m_data(data),
 		m_name(name),
+		m_device(device),
+		m_module(module),
+		m_tag(tag),
+		m_index(index),
 		m_typesize(size),
 		m_typecount(count),
 		m_offset(0)
@@ -415,7 +439,7 @@ save_manager::state_entry::state_entry(void *data, const char *name, UINT8 size,
 //  block of  data
 //-------------------------------------------------
 
-void save_manager::state_entry::flip_data()
+void state_entry::flip_data()
 {
 	UINT16 *data16;
 	UINT32 *data32;
