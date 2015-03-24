@@ -1383,6 +1383,7 @@ $(MESSOBJ)/matsushi.a:          \
 	$(MESS_DRIVERS)/myb3k.o     \
 
 $(MESSOBJ)/mb.a:                \
+	$(MESS_DRIVERS)/mbdtower.o  \
 	$(MESS_DRIVERS)/microvsn.o  \
 
 $(MESSOBJ)/mchester.a:          \
@@ -2143,7 +2144,6 @@ $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/ebball3.lh \
                             $(MESS_LAYOUT)/elecdet.lh \
                             $(MESS_LAYOUT)/mathmagi.lh \
-                            $(MESS_LAYOUT)/mbdtower.lh \
                             $(MESS_LAYOUT)/merlin.lh \
                             $(MESS_LAYOUT)/simon.lh \
                             $(MESS_LAYOUT)/ssimon.lh \
@@ -2162,6 +2162,7 @@ $(MESS_DRIVERS)/lc80.o:     $(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/llc.o:      $(MESS_LAYOUT)/llc1.lh
 $(MESS_DRIVERS)/lynx.o:     $(MESS_LAYOUT)/lynx.lh
 $(MESS_DRIVERS)/mac.o:      $(MESS_LAYOUT)/mac.lh
+$(MESS_DRIVERS)/mbdtower.o: $(MESS_LAYOUT)/mbdtower.lh
 $(MESS_MACHINE)/megacd.o:   $(MESS_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh

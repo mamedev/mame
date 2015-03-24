@@ -170,7 +170,15 @@ void hh_hmcs40_state::display_update()
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
-				output_set_lamp_value(y * mul + x, active_state[y] >> x & 1);
+			{
+				int state = active_state[y] >> x & 1;
+				output_set_lamp_value(y * mul + x, state);
+
+				// bit coords for svg2lay
+				char buf[10];
+				sprintf(buf, "%d.%d", y, x);
+				output_set_value(buf, state);
+			}
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));

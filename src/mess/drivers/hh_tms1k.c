@@ -48,7 +48,7 @@
  *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
- @MP7332   TMS1400  1981, Milton Bradley Dark Tower
+  MP7332   TMS1400  1981, Milton Bradley Dark Tower -> mbdtower.c
  @MP7334   TMS1400  1981, Coleco Total Control 4
 
   inconsistent:
@@ -70,9 +70,7 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "cpu/tms0980/tms0980.h"
-#include "sound/speaker.h"
+#include "includes/hh_tms1k.h"
 
 // internal artwork
 #include "amaztron.lh"
@@ -84,7 +82,6 @@
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
-#include "mbdtower.lh"
 #include "merlin.lh" // clickable
 #include "simon.lh" // clickable
 #include "ssimon.lh"
@@ -93,137 +90,6 @@
 #include "stopthie.lh"
 #include "tandy12.lh" // clickable
 #include "tc4.lh"
-
-
-class hh_tms1k_state : public driver_device
-{
-public:
-	hh_tms1k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN"),
-		m_speaker(*this, "speaker"),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
-	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
-	optional_device<speaker_sound_device> m_speaker;
-	
-	// misc common
-	UINT16 m_r;                         // MCU R-pins data
-	UINT16 m_o;                         // MCU O-pins data
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
-	bool m_power_on;
-
-	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(power_button);
-	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
-
-	virtual void machine_start();
-	virtual void machine_reset();
-
-	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
-	
-	// game-specific handlers
-	void mathmagi_display();
-	DECLARE_WRITE16_MEMBER(mathmagi_write_r);
-	DECLARE_WRITE16_MEMBER(mathmagi_write_o);
-	DECLARE_READ8_MEMBER(mathmagi_read_k);
-
-	void amaztron_display();
-	DECLARE_WRITE16_MEMBER(amaztron_write_r);
-	DECLARE_WRITE16_MEMBER(amaztron_write_o);
-	DECLARE_READ8_MEMBER(amaztron_read_k);
-
-	void tc4_display();
-	DECLARE_WRITE16_MEMBER(tc4_write_r);
-	DECLARE_WRITE16_MEMBER(tc4_write_o);
-	DECLARE_READ8_MEMBER(tc4_read_k);
-
-	void ebball_display();
-	DECLARE_WRITE16_MEMBER(ebball_write_r);
-	DECLARE_WRITE16_MEMBER(ebball_write_o);
-	DECLARE_READ8_MEMBER(ebball_read_k);
-
-	void ebball2_display();
-	DECLARE_WRITE16_MEMBER(ebball2_write_r);
-	DECLARE_WRITE16_MEMBER(ebball2_write_o);
-	DECLARE_READ8_MEMBER(ebball2_read_k);
-
-	void ebball3_display();
-	DECLARE_WRITE16_MEMBER(ebball3_write_r);
-	DECLARE_WRITE16_MEMBER(ebball3_write_o);
-	DECLARE_READ8_MEMBER(ebball3_read_k);
-	void ebball3_set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(ebball3_difficulty_switch);
-	DECLARE_MACHINE_RESET(ebball3);
-
-	DECLARE_WRITE16_MEMBER(elecdet_write_r);
-	DECLARE_WRITE16_MEMBER(elecdet_write_o);
-	DECLARE_READ8_MEMBER(elecdet_read_k);
-
-	void starwbc_display();
-	DECLARE_WRITE16_MEMBER(starwbc_write_r);
-	DECLARE_WRITE16_MEMBER(starwbc_write_o);
-	DECLARE_READ8_MEMBER(starwbc_read_k);
-
-	DECLARE_WRITE16_MEMBER(comp4_write_r);
-	DECLARE_WRITE16_MEMBER(comp4_write_o);
-	DECLARE_READ8_MEMBER(comp4_read_k);
-
-	DECLARE_WRITE16_MEMBER(simon_write_r);
-	DECLARE_WRITE16_MEMBER(simon_write_o);
-	DECLARE_READ8_MEMBER(simon_read_k);
-
-	DECLARE_WRITE16_MEMBER(ssimon_write_r);
-	DECLARE_WRITE16_MEMBER(ssimon_write_o);
-	DECLARE_READ8_MEMBER(ssimon_read_k);
-
-	DECLARE_WRITE16_MEMBER(mbdtower_write_r);
-	DECLARE_WRITE16_MEMBER(mbdtower_write_o);
-	DECLARE_READ8_MEMBER(mbdtower_read_k);
-
-	DECLARE_WRITE16_MEMBER(cnsector_write_r);
-	DECLARE_WRITE16_MEMBER(cnsector_write_o);
-	DECLARE_READ8_MEMBER(cnsector_read_k);
-
-	DECLARE_WRITE16_MEMBER(merlin_write_r);
-	DECLARE_WRITE16_MEMBER(merlin_write_o);
-	DECLARE_READ8_MEMBER(merlin_read_k);
-
-	DECLARE_WRITE16_MEMBER(stopthief_write_r);
-	DECLARE_WRITE16_MEMBER(stopthief_write_o);
-	DECLARE_READ8_MEMBER(stopthief_read_k);
-
-	DECLARE_WRITE16_MEMBER(bankshot_write_r);
-	DECLARE_WRITE16_MEMBER(bankshot_write_o);
-	DECLARE_READ8_MEMBER(bankshot_read_k);
-
-	DECLARE_WRITE16_MEMBER(splitsec_write_r);
-	DECLARE_WRITE16_MEMBER(splitsec_write_o);
-	DECLARE_READ8_MEMBER(splitsec_read_k);
-
-	void tandy12_display();
-	DECLARE_WRITE16_MEMBER(tandy12_write_r);
-	DECLARE_WRITE16_MEMBER(tandy12_write_o);
-	DECLARE_READ8_MEMBER(tandy12_read_k);
-};
 
 
 // machine_start/reset
@@ -270,19 +136,6 @@ void hh_tms1k_state::machine_reset()
 
 ***************************************************************************/
 
-// LED segments
-enum
-{
-	lA = 0x01,
-	lB = 0x02,
-	lC = 0x04,
-	lD = 0x08,
-	lE = 0x10,
-	lF = 0x20,
-	lG = 0x40,
-	lDP = 0x80
-};
-
 // The device may strobe the outputs very fast, it is unnoticeable to the user.
 // To prevent flickering here, we need to simulate a decay.
 
@@ -315,7 +168,15 @@ void hh_tms1k_state::display_update()
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
-				output_set_lamp_value(y * mul + x, active_state[y] >> x & 1);
+			{
+				int state = active_state[y] >> x & 1;
+				output_set_lamp_value(y * mul + x, state);
+
+				// bit coords for svg2lay
+				char buf[10];
+				sprintf(buf, "%d.%d", y, x);
+				output_set_value(buf, state);
+			}
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
@@ -1540,7 +1401,8 @@ MACHINE_CONFIG_END
   Milton Bradley Simon, created by Ralph Baer
 
   Revision A hardware:
-  * TMS1000 (die labeled MP3226), DS75494 lamp driver
+  * TMS1000 (die labeled MP3226)
+  * DS75494 lamp driver
 
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
   instead of the TMS1000. This one has been decapped too, but we couldn't
@@ -1668,56 +1530,6 @@ static MACHINE_CONFIG_START( ssimon, hh_tms1k_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ssimon)
-
-	/* no video! */
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
-  Milton Bradley Dark Tower
-  * TMS1400 MP7332-N2LL (die labeled MP7332)
-
-  x
-
-***************************************************************************/
-
-WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_r)
-{
-}
-
-WRITE16_MEMBER(hh_tms1k_state::mbdtower_write_o)
-{
-}
-
-READ8_MEMBER(hh_tms1k_state::mbdtower_read_k)
-{
-	return 0;
-}
-
-
-static INPUT_PORTS_START( mbdtower )
-INPUT_PORTS_END
-
-
-static MACHINE_CONFIG_START( mbdtower, hh_tms1k_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 400000) // approximation - RC osc. R=43K, C=56pf, but unknown RC curve
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, mbdtower_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, mbdtower_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, mbdtower_write_o))
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
 
 	/* no video! */
 
@@ -2510,17 +2322,6 @@ ROM_START( ssimon )
 ROM_END
 
 
-ROM_START( mbdtower )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7332", 0x0000, 0x1000, CRC(ebeab91a) SHA1(7edbff437da371390fa8f28b3d183f833eaa9be9) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_mbdtower_opla.pla", 0, 557, CRC(64c84697) SHA1(72ce6d24cedf9c606f1742cd5620f75907246e87) )
-ROM_END
-
-
 ROM_START( cnsector )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
@@ -2628,7 +2429,6 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-CONS( 1981, mbdtower,  0,        0, mbdtower,  mbdtower,  driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // ***
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )

@@ -2757,6 +2757,7 @@ bgaregganv      // (c) 1996 Raizing/8ing
 bgareggat2      // (c) 1996 Raizing/8ing
 bgareggacn      // (c) 1996 Raizing/8ing
 bgareggabl      // hack
+bgareggabla     // hack
 batrider        // (c) 1998 Raizing/8ing
 batrideru       // (c) 1998 Raizing/8ing
 batriderc       // (c) 1998 Raizing/8ing
@@ -5284,6 +5285,7 @@ mt_soni2        // 62
 megaplay
 mp_sonic        // 01
 mp_gaxe2        // 02
+mp_gaxe2a       // 02
 mp_gslam        // 03
 mp_twc          // 04
 mp_sor2         // 05

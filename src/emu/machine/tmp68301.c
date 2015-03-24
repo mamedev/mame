@@ -99,8 +99,15 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 		device_memory_interface(mconfig, *this),
 		m_in_parallel_cb(*this),
 		m_out_parallel_cb(*this),
+		m_imr(0),
+		m_iisr(0),
+		m_scr(0),
+		m_pdir(0),
 		m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, NULL, *ADDRESS_MAP_NAME(tmp68301_regs))
 {
+	memset(m_regs, 0, sizeof(m_regs));
+	memset(m_IE, 0, sizeof(m_IE));
+	memset(m_irq_vector, 0, sizeof(m_irq_vector));
 }
 
 

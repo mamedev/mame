@@ -39,17 +39,18 @@ video is not banked in this case instead palette data is sent to the ports
 strange palette format.
 
 todo:
-hook up eeprom
-takes a long time to boot (eeprom?)
-
+hook up eeprom (doesn't seem to work when hooked up??)
+Twins set 1 takes a long time to boot (eeprom?)
+Improve blitter / clear logic for Spider.
 
 Electronic Devices was printed on rom labels
 1994 date string is in ROM
 
-Spider seems to have some kind of sprites / blitter that works the same as as Table Tennis Champ (ttchamp.c)
-Spider must also have some ROM banking, or the blitter must be able to access non-cpu visible space, the title logo is at 0x00000 in ROM
+Spider PCB appears almost identical but uses additional 'blitter' features.
+It is possible the Twins PCB has them too and doesn't use them.
 
-Twins (set 2) is significantly changed hardware.
+
+Twins (set 2) is significantly changed hardware, uses a regular RAMDAC hookup for plaette etc.
 
 
 */
@@ -281,8 +282,18 @@ ADDRESS_MAP_END
 VIDEO_START_MEMBER(twins_state,twins)
 {
 	save_item(NAME(m_paloff));
-	m_paloff = 0;
+
+	save_item(NAME(m_spritesinit));
+	save_item(NAME(m_spriteswidth));
+	save_item(NAME(m_spritesaddr));
+	save_item(NAME(m_mainram));
+	save_item(NAME(m_videoram));
+	save_item(NAME(m_videoram2));
+	save_item(NAME(m_videorambank));
 }
+
+
+
 
 UINT32 twins_state::screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -399,6 +410,7 @@ VIDEO_START_MEMBER(twins_state,twinsa)
 	save_item(NAME(m_paloff));
 	m_paloff = 0;
 }
+
 
 
 static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
@@ -616,4 +628,4 @@ ROM_END
 GAME( 1994, twins,  0,     twins,  twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1994, twinsa, twins, twinsa, twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, spider,  0,     spider,  twins, driver_device, 0, ROT0, "Buena Vision", "Spider", GAME_NOT_WORKING )
+GAME( 1994, spider,  0,     spider,  twins, driver_device, 0, ROT0, "Buena Vision", "Spider", GAME_IMPERFECT_GRAPHICS )

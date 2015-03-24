@@ -109,95 +109,6 @@ void thedeep_state::video_start()
 
 /***************************************************************************
 
-                                Sprites Drawing
-
-Offset:     Bits:       Value:
-
-    0                   Y (low bits, 0 is bottom)
-
-    1       7-------    Enable
-            -6------    Flip Y
-            --5-----    Flip X ? (unused)
-            ---43---    Height: 1,2,4 or 8 tiles
-            -----21-    Width: 1,2,4 or 8 tiles*
-            -------0    Y (High bit)
-
-    2                   Code (low bits)
-
-    3                   Code (high bits)
-
-    4                   X (low bits, 0 is right)
-
-    5       7654----    Color
-            ----321-
-            -------0    X (High bit)
-
-    6                   Unused
-
-    7                   Unused
-
-* a sprite of width N uses N consecutive sprites. The first one specifies
-  all the data, the following ones only the tile code and color.
-
-***************************************************************************/
-
-void thedeep_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	UINT8 *s = m_spriteram, *end = s + m_spriteram.bytes();
-
-	while (s < end)
-	{
-		int code,color,sx,sy,flipx,flipy,nx,ny,x,y,attr;
-
-		attr    =    s[1];
-		if (!(attr & 0x80)) {   s+=8;   continue;   }
-
-		sx      =    s[4];
-		sy      =    s[0];
-
-		color   =    s[5];
-
-		flipx   =   attr & 0x00;    // ?
-		flipy   =   attr & 0x40;
-
-		nx = 1 << ((attr & 0x06) >> 1);
-		ny = 1 << ((attr & 0x18) >> 3);
-
-		if (color & 1)  sx -= 256;
-		if (attr  & 1)  sy -= 256;
-
-		if (flip_screen())
-		{
-			flipx = !flipx;
-			flipy = !flipy;
-			sy = sy - 8;
-		}
-		else
-		{
-			sx = 240 - sx;
-			sy = 240 - sy - ny * 16 + 16;
-		}
-
-		for (x = 0; (x < nx) && (s < end);  x++,s+=8)
-		{
-			code    =    s[2] + (s[3] << 8);
-			color   =    s[5] >> 4;
-
-			for (y = 0; y < ny; y++)
-			{
-				m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						code + (flipy ? (ny - y - 1) :  y),
-						color,
-						flipx,flipy,
-						sx + x * (flipx ? 16 : -16), sy + y * 16,0 );
-			}
-		}
-	}
-}
-
-
-/***************************************************************************
-
                                 Screen Drawing
 
 ***************************************************************************/
@@ -219,7 +130,8 @@ UINT32 thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_tilemap_0->draw(screen, bitmap, cliprect, 0,0);
-	draw_sprites(bitmap,cliprect);
+	m_spritegen->draw_sprites(bitmap, cliprect,  reinterpret_cast<UINT16 *>(m_spriteram.target()), 0x00, 0x00, 0x0f);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
+

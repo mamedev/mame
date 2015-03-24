@@ -21,8 +21,8 @@ HW info :
   f800      ??
 
  Scroll RAM contains x and y offsets for each tileline,
- as well as other data (priroities ? additional flags ?)
- All moving obejcts (cars, etc) are displayed on tilemap 3.
+ as well as other data (priorities ? additional flags ?)
+ All moving objects (cars, etc) are displayed on tilemap 3.
 
  ------------------------------------
  Cheat :  $e210 - timer
@@ -34,6 +34,11 @@ HW info :
 #include "sound/ay8910.h"
 #include "includes/ssrj.h"
 
+void ssrj_state::machine_start()
+{
+	save_item(NAME(m_oldport));
+}
+
 void ssrj_state::machine_reset()
 {
 	UINT8 *rom = memregion("maincpu")->base();
@@ -42,7 +47,7 @@ void ssrj_state::machine_reset()
 	m_oldport = 0x80;
 }
 
-READ8_MEMBER(ssrj_state::ssrj_wheel_r)
+READ8_MEMBER(ssrj_state::wheel_r)
 {
 	int port = ioport("IN1")->read() - 0x80;
 	int retval = port - m_oldport;
@@ -53,14 +58,14 @@ READ8_MEMBER(ssrj_state::ssrj_wheel_r)
 
 static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8, ssrj_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_SHARE("vram1")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_SHARE("vram2")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vram2_w) AM_SHARE("vram2")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("vram3")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_SHARE("vram4")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vram4_w) AM_SHARE("vram4")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
-	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
+	AM_RANGE(0xf001, 0xf001) AM_READ(wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
 	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
 	AM_RANGE(0xf401, 0xf401) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -141,8 +146,8 @@ static MACHINE_CONFIG_START( ssrj, ssrj_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
-	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update_ssrj)
-	MCFG_SCREEN_VBLANK_DRIVER(ssrj_state, screen_eof_ssrj)
+	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update)
+	MCFG_SCREEN_VBLANK_DRIVER(ssrj_state, screen_eof)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssrj)
@@ -179,4 +184,4 @@ ROM_START( ssrj )
 
 ROM_END
 
-GAME( 1985, ssrj,  0,       ssrj,  ssrj, driver_device,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)",GAME_WRONG_COLORS|GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, ssrj,  0,       ssrj,  ssrj, driver_device,  0, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
