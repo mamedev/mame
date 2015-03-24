@@ -2,13 +2,22 @@
 // copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+
   Milton Bradley Dark Tower
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
     (assume same ROM contents between revisions)
   * SN75494N MOS-to-LED digit driver
   * rotating reel + lightsensor
 
-  x
+  This is a board game, it obviously requires game pieces and the board.
+  The emulated part is the centerpiece, a black tower with a rotating card
+  panel and LED digits for displaying health, amount of gold, etc. As far
+  as MESS is concerned, the game works fine.
+  
+  To start up the game, first press [MOVE], the machine now does a self-test.
+  Then select level and number of players and the game will start. Read the
+  official manual on how to play the game.
 
 ***************************************************************************/
 
@@ -72,6 +81,7 @@ void mbdtower_state::mbdtower_display()
 		display_matrix(7, 3, 0, 0);
 	}
 }
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 {
@@ -235,7 +245,7 @@ void mbdtower_state::machine_start()
 static MACHINE_CONFIG_START( mbdtower, mbdtower_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 400000) // approximation - RC osc. R=43K, C=56pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pf, but unknown RC curve
 	MCFG_TMS1XXX_READ_K_CB(READ8(mbdtower_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mbdtower_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mbdtower_state, write_o))
@@ -271,4 +281,4 @@ ROM_START( mbdtower )
 ROM_END
 
 
-CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL | GAME_NOT_WORKING )

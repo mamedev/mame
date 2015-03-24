@@ -2,6 +2,8 @@
 // copyright-holders:hap, Kevin Horton
 /***************************************************************************
 
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+
   Marx Series 300 Electronic Bowling Game
   * TMS1100NLL MP3403 DBS 7836 SINGAPORE
 
@@ -158,4 +160,4 @@ ROM_START( elecbowl )
 ROM_END
 
 
-CONS( 1978, elecbowl, 0, 0, elecbowl, elecbowl, driver_device, 0, "Marx", "Electronic Bowling", GAME_SUPPORTS_SAVE | GAME_MECHANICAL | GAME_NOT_WORKING )
+CONS( 1978, elecbowl, 0, 0, elecbowl, elecbowl, driver_device, 0, "Marx", "Electronic Bowling (Marx)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL | GAME_NOT_WORKING )
