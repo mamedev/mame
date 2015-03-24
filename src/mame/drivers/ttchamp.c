@@ -62,7 +62,7 @@ Dumped by tirino73 >isolani (at) interfree.it<
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-
+#include "sound/okim6295.h"
 
 class ttchamp_state : public driver_device
 {
@@ -92,6 +92,7 @@ public:
 	UINT16 m_videoram0[0x10000 / 2];
 	UINT16 m_videoram1[0x10000 / 2];
 	UINT16 m_videoram2[0x10000 / 2];
+
 
 
 
@@ -191,7 +192,6 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
 	m_palette->set_pen_color(m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
-
 
 
 READ16_MEMBER(ttchamp_state::ttchamp_mem_r)
@@ -338,6 +338,7 @@ static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
 	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
 
+	AM_RANGE(0x0006, 0x0007) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x0018, 0x0019) AM_READ(ttchamp_blit_start_r)
 	AM_RANGE(0x001e, 0x001f) AM_READNOP // read before each line is blit
@@ -442,6 +443,11 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 ROM_START( ttchamp )
@@ -451,10 +457,10 @@ ROM_START( ttchamp )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
 	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x080000,  CRC(fdbf9b28) SHA1(2d260555586097c8a396f65111f55ace801c7a5d) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* not verified if this is correct yet, seems very empty, maybe protected */
-	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280,  CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
+	ROM_REGION( 0x10000, "cpu1", 0 ) // read protected, only half the data is valid
+	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280,  BAD_DUMP CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
 
-	ROM_REGION( 0x40000, "samples", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
 ROM_END
 
@@ -465,10 +471,10 @@ ROM_START( ttchampa )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
 	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x080000,  CRC(fdbf9b28) SHA1(2d260555586097c8a396f65111f55ace801c7a5d) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) /* not verified if this is correct yet, seems very empty, maybe protected */
-	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280,  CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
+	ROM_REGION( 0x10000, "cpu1", 0 ) // read protected, only half the data is valid
+	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280, BAD_DUMP CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
 
-	ROM_REGION( 0x40000, "samples", 0 )
+	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
 ROM_END
 
@@ -479,5 +485,5 @@ DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 //	membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_NOT_WORKING|GAME_NO_SOUND ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_NOT_WORKING|GAME_NO_SOUND ) // this only has Palencia Elektronik advertising boards
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_NOT_WORKING ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_NOT_WORKING ) // this only has Palencia Elektronik advertising boards
