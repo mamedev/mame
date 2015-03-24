@@ -79,7 +79,7 @@ inline void i8257_device::dma_request(int channel, int state)
 	}
 	else
 	{
-		m_request &= ~1 << channel;
+            m_request &= ~(1 << channel);
 	}
 	trigger(1);
 }

@@ -2099,6 +2099,8 @@ swtpc09i  // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
 swtpc09u  // S09, DMF2 Floppy UNIBUG rom - UniFLEX
 swtpc09d3 // S09, DMF3 Floppy UNIBUG U3 rom - UniFLEX U3
 
+// Intel
+imds2 // Intellec MDS series-II
 
 //***************Games******************************************************
 // Computer Electronic

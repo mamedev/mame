@@ -1335,6 +1335,7 @@ $(MESSOBJ)/intel.a:             \
 	$(MESS_DRIVERS)/rex6000.o   \
 	$(MESS_DRIVERS)/sdk85.o     \
 	$(MESS_DRIVERS)/sdk86.o     \
+        $(MESS_DRIVERS)/imds2.o     \
 
 $(MESSOBJ)/imp.a:               \
 	$(MESS_DRIVERS)/tim011.o    \
