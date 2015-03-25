@@ -1253,4 +1253,3 @@ GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,      
 
 GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
-

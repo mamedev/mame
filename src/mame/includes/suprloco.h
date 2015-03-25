@@ -9,7 +9,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram") { }
-		
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -17,7 +17,7 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_scrollram;
-	
+
 	tilemap_t *m_bg_tilemap;
 	int m_control;
 
@@ -26,13 +26,13 @@ public:
 	DECLARE_WRITE8_MEMBER(scrollram_w);
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(control_r);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(suprloco);
 	DECLARE_DRIVER_INIT(suprloco);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
 	void draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number);

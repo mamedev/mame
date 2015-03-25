@@ -10,7 +10,7 @@ Hardware a bit (interrupts, sound) similar to mouser as well
 TODO:
 - unused rom 6.8s (located on the pcb near the gfx rom 7.8p, but contains
   data (similar to the one in roms 4.5p and 5.5r)
-  
+
   The game currently crashes after the bonus round rather than moving on to
   the next level, it writes 01 to 0xa187 which is probably ROM bank, however
   banking the ROM in there results in the game crashing anyway, and looking
@@ -101,7 +101,7 @@ WRITE8_MEMBER(superwng_state::superwng_unk_a187_w)
 
 WRITE8_MEMBER(superwng_state::superwng_unk_a185_w)
 {
-//	printf("superwng_unk_a185_w %02x\n", data);
+//  printf("superwng_unk_a185_w %02x\n", data);
 }
 
 TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
@@ -456,7 +456,7 @@ void superwng_state::machine_start()
 	save_item(NAME(m_tile_bank));
 	save_item(NAME(m_sound_byte));
 	save_item(NAME(m_nmi_enable));
-    membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base()+0x4000, 0x4000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base()+0x4000, 0x4000);
 }
 
 void superwng_state::machine_reset()

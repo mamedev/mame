@@ -6,7 +6,7 @@
 
 
   known chips:
-  
+
   serial  device   etc.
 ----------------------------------------------------------------
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
@@ -52,7 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<5> m_inp_matrix; // max 5
 	optional_device<speaker_sound_device> m_speaker;
-	
+
 	// misc common
 	UINT8 m_port[9];                    // MCU port A-I write data
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
@@ -65,11 +65,11 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
+
 	UINT32 m_grid;                      // VFD current row data
 	UINT32 m_plate;                     // VFD current column data
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
@@ -95,7 +95,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(edracula_grid_w);
 	DECLARE_WRITE8_MEMBER(edracula_plate_w);
-	
+
 	DECLARE_WRITE8_MEMBER(tmtennis_grid_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_plate_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_port_e_w);
@@ -107,7 +107,7 @@ public:
 	void tmpacman_display();
 	DECLARE_WRITE8_MEMBER(tmpacman_grid_w);
 	DECLARE_WRITE8_MEMBER(tmpacman_plate_w);
-	
+
 	DECLARE_WRITE8_MEMBER(alnchase_output_w);
 	DECLARE_READ8_MEMBER(alnchase_input_r);
 };
@@ -120,7 +120,7 @@ void hh_ucom4_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-	
+
 	memset(m_port, 0, sizeof(m_port));
 	m_inp_mux = 0;
 	m_grid = 0;
@@ -203,7 +203,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_ucom4_state::display_decay_tick)
 		for (int x = 0; x < m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
 }
 
@@ -216,7 +216,7 @@ void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
-	
+
 	display_update();
 }
 
@@ -247,7 +247,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   * PCB label Emix Corp. ET-03
   * NEC uCOM-43 MCU, labeled D553C 031
   * green VFD display Emix-102
-  
+
   Press the Kick button to start the game, an automatic sequence follows.
   Then choose a formation(A,B,C) and either pass the ball, and/or start
   running. For more information, refer to the official manual.
@@ -274,15 +274,15 @@ WRITE8_MEMBER(hh_ucom4_state::ssfball_grid_w)
 WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
 {
 	m_port[offset] = data;
-	
+
 	// E,F,G,H,I(not all!): vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// F3,G3: input mux + speaker
 	m_inp_mux = (m_port[NEC_UCOM4_PORTF] >> 3 & 1) | (m_port[NEC_UCOM4_PORTG] >> 2 & 2);
 	m_speaker->level_w(m_inp_mux);
-	
+
 	// E3: vfd matrix grid 8
 	if (offset == NEC_UCOM4_PORTE)
 		ssfball_grid_w(space, offset, data >> 3 & 1);
@@ -376,10 +376,10 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_grid_w)
 	// G,H,I0: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	
+
 	// G(grid 0-3): input mux
 	m_inp_mux = m_grid & 0xf;
-	
+
 	// I2: vfd matrix plate 6
 	if (offset == NEC_UCOM4_PORTI)
 		m_plate = (m_plate & 0xffff) | (data << 14 & 0x10000);
@@ -392,11 +392,11 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_plate_w)
 	// C,D,E,F23: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// F01: speaker out
 	if (offset == NEC_UCOM4_PORTF)
 		m_speaker->level_w(data & 3);
-	
+
 	ssfball_display();
 }
 
@@ -408,7 +408,7 @@ READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
 
 
 /* physical button layout and labels is like this:
-    
+
     * left = P1 side *                                         * right = P2 side * (note: in 1P mode, switch sides between turns)
 
     [  JUMP  ]  [ HIGH ]        (players sw)                   [ HIGH ]  [  JUMP  ]
@@ -530,7 +530,7 @@ WRITE8_MEMBER(hh_ucom4_state::astrocmd_plate_w)
 	{
 		// E2: speaker out
 		m_speaker->level_w(data >> 2 & 1);
-		
+
 		// E3: vfd matrix grid 8
 		astrocmd_grid_w(space, offset, data >> 3 & 1);
 	}
@@ -719,7 +719,7 @@ READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
 
 
 /* Pro-Tennis physical button layout and labels is like this:
-    
+
     * left = P2/CPU side *    * right = P1 side *
 
     [SERVE] [1] [2] [3]       [3] [2] [1] [SERVE]
@@ -818,7 +818,7 @@ MACHINE_CONFIG_END
   - USA: Pac Man
   - UK: Puckman (Tomy), and also published by Grandstand as Munchman
   - Australia: Pac Man-1, published by Futuretronics
-  
+
   The game will start automatically after turning it on. This Pac Man refuses
   to eat dots with his butt, you can only eat them going right-to-left.
 
@@ -830,7 +830,7 @@ void hh_ucom4_state::tmpacman_display()
 {
 	UINT32 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
-	
+
 	display_matrix(19, 8, plate | 0x100, grid); // plate 8 (maze) is always on
 }
 
@@ -930,7 +930,7 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 		// C0(grid 0): input enable PL1
 		// D0(grid 4): input enable PL2
 		m_inp_mux = (m_grid & 1) | (m_grid >> 3 & 2);
-		
+
 		// E1: speaker out
 		if (offset == NEC_UCOM4_PORTE)
 			m_speaker->level_w(data >> 1 & 1);

@@ -123,15 +123,15 @@ void twins_state::machine_start()
 READ16_MEMBER(twins_state::twins_port4_r)
 {
 // doesn't work??
-//	printf("%08x: twins_port4_r %04x\n", space.device().safe_pc(), mem_mask);
-//	return m_i2cmem->read_sda();// | 0xfffe;
+//  printf("%08x: twins_port4_r %04x\n", space.device().safe_pc(), mem_mask);
+//  return m_i2cmem->read_sda();// | 0xfffe;
 
 	return 0x0001;
 }
 
 WRITE16_MEMBER(twins_state::twins_port4_w)
 {
-//	printf("%08x: twins_port4_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+//  printf("%08x: twins_port4_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	int i2c_clk = BIT(data, 1);
 	int i2c_mem = BIT(data, 0);
 	m_i2cmem->write_scl(i2c_clk);
@@ -165,7 +165,7 @@ WRITE16_MEMBER(twins_state::twins_pal_w)
 /* ??? weird ..*/
 WRITE16_MEMBER(twins_state::porte_paloff0_w)
 {
-//	printf("porte_paloff0_w %04x\n", data);
+//  printf("porte_paloff0_w %04x\n", data);
 	m_paloff = 0;
 }
 
@@ -205,14 +205,14 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 
 	if (m_spritesinit == 1)
 	{
-	//	printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
+	//  printf("spider_blitter_w %08x %04x %04x (init?) (base?)\n", offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
 	}
 	else if (m_spritesinit == 2)
 	{
-	//	printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
+	//  printf("spider_blitter_w %08x %04x %04x (init2) (width?)\n", offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
 		if (m_spriteswidth == 0)
 			m_spriteswidth = 80;
@@ -234,26 +234,26 @@ WRITE16_MEMBER(twins_state::spider_blitter_w)
 		{
 			UINT8 *src = m_rom8;
 
-		//	printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		//  printf("spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
 			{
 				UINT8 data;
-				
+
 				data = (src[(m_spritesaddr * 2) + 1]);
-	
+
 				if (data)
 					vram[offset] = (vram[offset] & 0x00ff) | data << 8;
 
 
 				data = src[(m_spritesaddr*2)];
-			
+
 				if (data)
 					vram[offset] = (vram[offset] & 0xff00) | data;
 
 
-				m_spritesaddr ++;				
+				m_spritesaddr ++;
 				offset++;
 
 				offset &= 0x7fff;
@@ -386,7 +386,7 @@ static MACHINE_CONFIG_START( twins, twins_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_24C02_ADD("i2cmem")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -447,7 +447,7 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 	MCFG_RAMDAC_SPLIT_READ(0)
-	
+
 	MCFG_24C02_ADD("i2cmem")
 
 	MCFG_VIDEO_START_OVERRIDE(twins_state,twinsa)
@@ -477,9 +477,9 @@ WRITE16_MEMBER(twins_state::spider_pal_w)
 	}
 	else
 	{
-	//	printf("first palette write %04x\n", data);
+	//  printf("first palette write %04x\n", data);
 	}
-	
+
 	m_paloff++;
 
 	if (m_paloff == 0x101)
@@ -503,7 +503,7 @@ WRITE16_MEMBER(twins_state::spider_port_1c_w)
 {
 	// done before the 'sprite' read / writes
 	// might clear a buffer?
-	
+
 	// game is only animating sprites at 30fps, maybe there's some double buffering too?
 
 	UINT16* vram;
@@ -575,7 +575,7 @@ static MACHINE_CONFIG_START( spider, twins_state )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	MCFG_VIDEO_START_OVERRIDE(twins_state,twins)
-	
+
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */

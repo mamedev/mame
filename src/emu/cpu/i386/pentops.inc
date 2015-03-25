@@ -1065,10 +1065,10 @@ void i386_device::pentium_movnti_m32_r32() // Opcode 0f c3
 void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
 {
 /*
-0f 3a		BB0_RESET (set BB0 pointer = base)
-0f 3b		BB1_RESET (set BB1 pointer = base)
-0f 3c		CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
-0f 3d		CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
+0f 3a       BB0_RESET (set BB0 pointer = base)
+0f 3b       BB1_RESET (set BB1 pointer = base)
+0f 3c       CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
+0f 3d       CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
 */
 
 	CYCLES(1);

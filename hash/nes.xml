@@ -57391,7 +57391,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Union Bond</publisher>
 		<info name="serial" value="G-0005"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nanjing" />	<!--  header actually says 164... -->
+			<feature name="slot" value="nanjing" /> <!--  header actually says 164... -->
 			<feature name="pcb" value="UNL-NANJING" />
 			<dataarea name="prg" size="524288">
 				<rom name="ying tao xiao wan zi (g-005) (ch).prg" size="524288" crc="8209ba79" sha1="fa56608d8dcf5a144dd1fc81282cd86fd51060fe" offset="00000" status="baddump" />
@@ -75420,7 +75420,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fk23ca" />	<!-- UNIF header pointed to FK23C, but the menu does not appear with that mapper... investigate! -->
+			<feature name="slot" value="fk23ca" />  <!-- UNIF header pointed to FK23C, but the menu does not appear with that mapper... investigate! -->
 			<feature name="pcb" value="BMC-FK23C" />
 			<dataarea name="prg" size="8388608">
 				<rom name="120-in-1 (unl)[u].prg" size="8388608" crc="678de5aa" sha1="01da22ddf1897b47d6b03ecb4ff0c093f9b39dfc" offset="00000" status="baddump" />

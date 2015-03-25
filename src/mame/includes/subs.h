@@ -42,7 +42,7 @@ public:
 	int m_steering_val2;
 	int m_last_val_1;
 	int m_last_val_2;
-	
+
 	DECLARE_WRITE8_MEMBER(steer_reset_w);
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_READ8_MEMBER(coin_r);
@@ -56,16 +56,16 @@ public:
 	DECLARE_WRITE8_MEMBER(crash_w);
 	DECLARE_WRITE8_MEMBER(explode_w);
 	DECLARE_WRITE8_MEMBER(noise_reset_w);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(subs);
-	
+
 	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt);
-	
+
 	int steering_1();
 	int steering_2();
 };

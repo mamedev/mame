@@ -191,12 +191,12 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 {
-//	logerror("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
+//  logerror("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
 
 
 	m_audiocpu->dreq3_w(data&1);
-//	m_audiocpu->hack_w(1);
+//  m_audiocpu->hack_w(1);
 
 }
 
@@ -262,23 +262,23 @@ WRITE16_MEMBER(hng64_state::hng64_sound_data_02_w)
 {
 	m_audiodat[m_audiochannel].dat[2] = data;
 
-//	if ((m_audiochannel & 0xff00) == 0x0a00)
-//		printf("write port 0x0002 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+//  if ((m_audiochannel & 0xff00) == 0x0a00)
+//      printf("write port 0x0002 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
 }
 
 WRITE16_MEMBER(hng64_state::hng64_sound_data_04_w)
 {
 	m_audiodat[m_audiochannel].dat[1] = data;
 
-//	if ((m_audiochannel & 0xff00) == 0x0a00)
-//		printf("write port 0x0004 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+//  if ((m_audiochannel & 0xff00) == 0x0a00)
+//      printf("write port 0x0004 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
 }
 WRITE16_MEMBER(hng64_state::hng64_sound_data_06_w)
 {
 	m_audiodat[m_audiochannel].dat[0] = data;
 
-//	if ((m_audiochannel & 0xff00) == 0x0a00)
-//		printf("write port 0x0006 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
+//  if ((m_audiochannel & 0xff00) == 0x0a00)
+//      printf("write port 0x0006 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
 }
 
 // but why not just use the V33/V53 XA mode??
@@ -414,18 +414,18 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm0_cb)
 WRITE_LINE_MEMBER(hng64_state::tcu_tm1_cb)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
-//	logerror("tcu_tm1_cb %02x\n", state);
+//  logerror("tcu_tm1_cb %02x\n", state);
 	m_audiocpu->set_input_line(5, state? ASSERT_LINE:CLEAR_LINE); // not accurate, just so we have a trigger
 }
 
 WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
-//	logerror("tcu_tm2_cb %02x\n", state);
+//  logerror("tcu_tm2_cb %02x\n", state);
 
 	// NOT ACCURATE, just so that all the interrupts get triggered for now.
 	static int i = 0;
-	m_audiocpu->set_input_line(i, state? ASSERT_LINE:CLEAR_LINE); 
+	m_audiocpu->set_input_line(i, state? ASSERT_LINE:CLEAR_LINE);
 	i++;
 	if (i == 3) i = 0;
 }
@@ -445,5 +445,3 @@ MACHINE_CONFIG_FRAGMENT( hng64_audio )
 	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(hng64_state, tcu_tm2_cb))
 
 MACHINE_CONFIG_END
-
-	

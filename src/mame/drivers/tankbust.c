@@ -24,9 +24,9 @@ To do:
 
 void tankbust_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
-    membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x18000, 0x2000);
-	
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x18000, 0x2000);
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_timer1));
 	save_item(NAME(m_e0xx_data));
@@ -107,7 +107,7 @@ WRITE8_MEMBER(tankbust_state::e0xx_w)
 
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
-        membank("bank1")->set_entry(data & 1);
+		membank("bank1")->set_entry(data & 1);
 
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
 		membank("bank2")->set_entry(data & 1); /* verified (the game will reset after the "game over" otherwise) */

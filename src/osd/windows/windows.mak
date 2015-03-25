@@ -406,9 +406,9 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/render/drawogl.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
-	
+
 OBJDIRS += \
-	$(OSDOBJ)/modules/opengl 
+	$(OSDOBJ)/modules/opengl
 
 DEFS += -DUSE_OPENGL=1
 

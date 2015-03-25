@@ -2491,7 +2491,7 @@ void ssv_state::init(int interrupt_ultrax)
 								( (i & 1) ? (8 << 16) : 0 ) ;
 	enable_video(1);
 	m_interrupt_ultrax = interrupt_ultrax;
-	
+
 	save_item(NAME(m_requested_int));
 	save_item(NAME(m_irq_enable));
 }

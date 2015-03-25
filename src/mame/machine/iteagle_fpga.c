@@ -35,15 +35,15 @@ void iteagle_fpga_device::device_start()
 
 	add_map(sizeof(m_ctrl_regs), M_IO, FUNC(iteagle_fpga_device::ctrl_map));
 	// ctrl defaults to base address 0x00000000
-	bank_infos[0].adr = 0x00000000 & (~(bank_infos[0].size - 1));	
+	bank_infos[0].adr = 0x00000000 & (~(bank_infos[0].size - 1));
 
 	add_map(sizeof(m_fpga_regs), M_IO, FUNC(iteagle_fpga_device::fpga_map));
 	// fpga defaults to base address 0x00000300
-	bank_infos[1].adr = 0x00000300 & (~(bank_infos[1].size - 1));	
+	bank_infos[1].adr = 0x00000300 & (~(bank_infos[1].size - 1));
 
 	add_map(sizeof(m_rtc_regs), M_MEM, FUNC(iteagle_fpga_device::rtc_map));
 	// RTC defaults to base address 0x000c0000
-	bank_infos[2].adr = 0x000c0000 & (~(bank_infos[2].size - 1));	
+	bank_infos[2].adr = 0x000c0000 & (~(bank_infos[2].size - 1));
 }
 
 void iteagle_fpga_device::device_reset()
@@ -106,7 +106,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 			if (LOG_FPGA && (m_prev_reg != offset && m_prev_reg != (0x08/4)))
 				logerror("%s:fpga read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
-		case 0x04/4: 
+		case 0x04/4:
 			result =  (result & 0xFF0FFFFF) | (machine().root_device().ioport("SW5")->read()<<20); // Resolution
 			if (LOG_FPGA)
 				logerror("%s:fpga read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
@@ -183,7 +183,7 @@ WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
 
 	COMBINE_DATA(&m_rtc_regs[offset]);
 	switch (offset) {
-		case 0x7F8/4: // M48T02 time			
+		case 0x7F8/4: // M48T02 time
 			if (data & mem_mask & 0x40) {
 				// get the current date/time from the core
 				machine().current_datetime(systime);
@@ -191,7 +191,7 @@ WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
 				raw[1] = dec_2_bcd(systime.local_time.second);
 				raw[2] = dec_2_bcd(systime.local_time.minute);
 				raw[3] = dec_2_bcd(systime.local_time.hour);
-			
+
 				raw[4] = dec_2_bcd((systime.local_time.weekday != 0) ? systime.local_time.weekday : 7);
 				raw[5] = dec_2_bcd(systime.local_time.mday);
 				raw[6] = dec_2_bcd(systime.local_time.month + 1);
@@ -199,10 +199,10 @@ WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
 				m_rtc_regs[0x7F8/4] = (raw[3]<<24) | (raw[2]<<16) | (raw[1]<<8) | (raw[0] <<0);
 				//m_rtc_regs[0x7FC/4] = (raw[7]<<24) | (raw[6]<<16) | (raw[5]<<8) | (raw[4] <<0);
 				m_rtc_regs[0x7FC/4] = (0x95<<24) | (raw[6]<<16) | (raw[5]<<8) | (raw[4] <<0);
-			}	
+			}
 			if (LOG_RTC)
 				logerror("%s:RTC write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
-			
+
 			break;
 		default:
 			if (LOG_RTC)
@@ -249,7 +249,7 @@ void iteagle_eeprom_device::device_reset()
 	pci_device::device_reset();
 }
 
-READ32_MEMBER( iteagle_eeprom_device::eeprom_r )	
+READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
 {
 	UINT32 result = 0;
 
@@ -257,7 +257,7 @@ READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
 		case 0xC/4: // I2C Handler
 			if (ACCESSING_BITS_16_23) {
 				result = m_eeprom->do_read()<<(16+3);
-			}	else {
+			}   else {
 				if (LOG_EEPROM)
 					logerror("%s:eeprom read from offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			}
@@ -270,7 +270,7 @@ READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )	
+WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 {
 	switch (offset) {
 		case 0xC/4: // I2C Handler
@@ -278,7 +278,7 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 				m_eeprom->di_write((data  & 0x040000) >> (16+2));
 				m_eeprom->cs_write((data  & 0x020000) ? ASSERT_LINE : CLEAR_LINE);
 				m_eeprom->clk_write((data & 0x010000) ? ASSERT_LINE : CLEAR_LINE);
-			}	else {
+			}   else {
 				if (LOG_EEPROM)
 					logerror("%s:eeprom write to offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			}

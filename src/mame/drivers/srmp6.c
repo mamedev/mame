@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
 	DECLARE_DRIVER_INIT(INIT);
-    virtual void machine_start();
+	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette();
@@ -309,7 +309,7 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 
 void srmp6_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 16, memregion("nile")->base(), 0x200000);
+	membank("bank1")->configure_entries(0, 16, memregion("nile")->base(), 0x200000);
 }
 
 WRITE16_MEMBER(srmp6_state::srmp6_input_select_w)
@@ -340,8 +340,8 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 	{
 		case 0x5e/2: // bank switch, used by ROM check
 		{
-            LOG(("%x\n",data));
-            membank("bank1")->set_entry(data & 0x0f);
+			LOG(("%x\n",data));
+			membank("bank1")->set_entry(data & 0x0f);
 			break;
 		}
 

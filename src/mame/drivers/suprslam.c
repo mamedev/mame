@@ -115,7 +115,7 @@ WRITE8_MEMBER(suprslam_state::pending_command_clear_w)
 
 WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 {
-    membank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 /*** MEMORY MAPS *************************************************************/
@@ -285,7 +285,7 @@ void suprslam_state::machine_start()
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_pending_command));
 
-    membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
 }
 
 void suprslam_state::machine_reset()

@@ -429,7 +429,7 @@ OBJDIRS += $(SDLOBJ) \
 	$(OSDOBJ)/modules/netdev \
 	$(OSDOBJ)/modules/opengl \
 	$(OSDOBJ)/modules/render
-	
+
 #-------------------------------------------------
 # OSD core library
 #-------------------------------------------------
@@ -827,7 +827,7 @@ OSDOBJS += \
 	$(OSDOBJ)/modules/render/drawogl.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_tool.o \
 	$(OSDOBJ)/modules/opengl/gl_shader_mgr.o
-	
+
 DEFS += -DUSE_OPENGL=1
 ifeq ($(USE_DISPATCH_GL),1)
 DEFS += -DUSE_DISPATCH_GL=1

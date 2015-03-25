@@ -326,8 +326,8 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
@@ -454,7 +454,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::display_decay_tick)
 		for (int x = 0; x < m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
 }
 
@@ -470,7 +470,7 @@ void tispeak_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 s
 		m_display_segmask[y] &= segmask;
 		m_display_state[y] = (sety >> y & 1) ? (setx & colmask) : 0;
 	}
-	
+
 	display_update();
 }
 
@@ -501,7 +501,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
 	// R15: filament on
 	m_filament_on = data & 0x8000;
-	
+
 	// R13: power-off request, on falling edge
 	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
 		power_off();

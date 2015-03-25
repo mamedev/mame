@@ -21,14 +21,14 @@ public:
 		m_ps5_palette_ram_tx(*this, "palette_ram_tx")
 
 	{ }
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<address_map_bank_device> m_vrambank;
 	optional_device<jaleco_blend_device> m_blend;
-	
+
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_bg_videoram;
@@ -78,7 +78,7 @@ public:
 	DECLARE_VIDEO_START(psychic5);
 	DECLARE_VIDEO_START(bombsa);
 	DECLARE_VIDEO_RESET(psychic5);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	UINT32 screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -293,7 +293,7 @@ INPUT_PORTS_END
 void capbowl_state::machine_start()
 {
 	m_update_timer = timer_alloc(TIMER_UPDATE);
-	
+
 	save_item(NAME(m_blitter_addr));
 	save_item(NAME(m_last_trackball_val));
 }

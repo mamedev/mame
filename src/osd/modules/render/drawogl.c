@@ -281,50 +281,50 @@ private:
 
 	int setupPixelFormat(HDC hDC)
 	{
-	    PIXELFORMATDESCRIPTOR pfd = {
-	        sizeof(PIXELFORMATDESCRIPTOR),  /* size */
-	        1,                              /* version */
-	        PFD_SUPPORT_OPENGL |
-	        PFD_DRAW_TO_WINDOW |
-	        PFD_DOUBLEBUFFER,               /* support double-buffering */
-	        PFD_TYPE_RGBA,                  /* color type */
-	        32,                             /* prefered color depth */
-	        0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
-	        0,                              /* no alpha buffer */
-	        0,                              /* alpha bits (ignored) */
-	        0,                              /* no accumulation buffer */
-	        0, 0, 0, 0,                     /* accum bits (ignored) */
-	        16,                             /* depth buffer */
-	        0,                              /* no stencil buffer */
-	        0,                              /* no auxiliary buffers */
-	        PFD_MAIN_PLANE,                 /* main layer */
-	        0,                              /* reserved */
-	        0, 0, 0,                        /* no layer, visible, damage masks */
-	    };
-	    int pixelFormat;
+		PIXELFORMATDESCRIPTOR pfd = {
+			sizeof(PIXELFORMATDESCRIPTOR),  /* size */
+			1,                              /* version */
+			PFD_SUPPORT_OPENGL |
+			PFD_DRAW_TO_WINDOW |
+			PFD_DOUBLEBUFFER,               /* support double-buffering */
+			PFD_TYPE_RGBA,                  /* color type */
+			32,                             /* prefered color depth */
+			0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+			0,                              /* no alpha buffer */
+			0,                              /* alpha bits (ignored) */
+			0,                              /* no accumulation buffer */
+			0, 0, 0, 0,                     /* accum bits (ignored) */
+			16,                             /* depth buffer */
+			0,                              /* no stencil buffer */
+			0,                              /* no auxiliary buffers */
+			PFD_MAIN_PLANE,                 /* main layer */
+			0,                              /* reserved */
+			0, 0, 0,                        /* no layer, visible, damage masks */
+		};
+		int pixelFormat;
 
-	    pixelFormat = ChoosePixelFormat(hDC, &pfd);
-	    if (pixelFormat == 0) {
-	        strcpy(m_error, "ChoosePixelFormat failed");
-	        return 1;
-	    }
+		pixelFormat = ChoosePixelFormat(hDC, &pfd);
+		if (pixelFormat == 0) {
+			strcpy(m_error, "ChoosePixelFormat failed");
+			return 1;
+		}
 
-	    if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
-	        strcpy(m_error, "SetPixelFormat failed.");
-	        return 1;
-	    }
-	    return 0;
+		if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
+			strcpy(m_error, "SetPixelFormat failed.");
+			return 1;
+		}
+		return 0;
 	}
 
 	bool WGLExtensionSupported(const char *extension_name)
 	{
-	    //if (pfn_wglGetExtensionsStringEXT != NULL)
-	    //	printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
+		//if (pfn_wglGetExtensionsStringEXT != NULL)
+		//  printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
 
-	    if (pfn_wglGetExtensionsStringEXT != NULL && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != NULL)
-	        return true;
-	    else
-	    	return false;
+		if (pfn_wglGetExtensionsStringEXT != NULL && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != NULL)
+			return true;
+		else
+			return false;
 	}
 
 	HGLRC m_context;
@@ -589,7 +589,7 @@ private:
 	int             m_height;
 	osd_dim         m_blit_dim;
 
-	osd_gl_context	*m_gl_context;
+	osd_gl_context  *m_gl_context;
 
 	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
 	// 3D info (GL mode only)

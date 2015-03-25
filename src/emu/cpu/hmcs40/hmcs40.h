@@ -182,7 +182,7 @@ protected:
 	int m_eint_line;    // which input_line caused an interrupt
 	emu_timer *m_timer;
 	int m_icount;
-	
+
 	UINT16 m_pc;        // Program Counter
 	UINT16 m_prev_pc;
 	UINT8 m_page;       // LPU prepared page
@@ -213,7 +213,7 @@ protected:
 
 	// misc internal helpers
 	void increment_pc();
-	
+
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
 	void pop_stack();

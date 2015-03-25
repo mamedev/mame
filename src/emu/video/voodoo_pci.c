@@ -56,7 +56,7 @@ void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_wind
 				return;
 		if(UINT32(bi.adr) == UINT32(~(bi.size - 1)))
 			return;
-	
+
 		UINT64 start;
 		address_space *space;
 		if(bi.flags & M_IO) {

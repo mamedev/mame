@@ -66,7 +66,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<7> m_inp_matrix; // max 7
 	optional_device<speaker_sound_device> m_speaker;
-	
+
 	// misc common
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 
@@ -78,11 +78,11 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
+
 	UINT32 m_grid;                      // VFD current row data
 	UINT64 m_plate;                     // VFD current column data
-	
-	UINT64 m_display_state[0x20];	    // display matrix rows data
+
+	UINT64 m_display_state[0x20];       // display matrix rows data
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT64 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x40];  // (internal use)
@@ -95,7 +95,7 @@ public:
 	DECLARE_WRITE8_MEMBER(alnattck_plate_w);
 	DECLARE_WRITE16_MEMBER(alnattck_d_w);
 	DECLARE_READ16_MEMBER(alnattck_d_r);
-	
+
 	void egalaxn2_display();
 	DECLARE_WRITE8_MEMBER(egalaxn2_plate_w);
 	DECLARE_WRITE16_MEMBER(egalaxn2_grid_w);
@@ -110,7 +110,7 @@ void hh_hmcs40_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-	
+
 	m_inp_mux = 0;
 	m_grid = 0;
 	m_plate = 0;
@@ -191,7 +191,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
 		for (int x = 0; x < m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
 }
 
@@ -204,7 +204,7 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 set
 	UINT64 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
-	
+
 	display_update();
 }
 
@@ -249,7 +249,7 @@ static MACHINE_CONFIG_START( bambball, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -284,7 +284,7 @@ static MACHINE_CONFIG_START( packmon, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -318,7 +318,7 @@ static MACHINE_CONFIG_START( zackman, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -351,7 +351,7 @@ WRITE8_MEMBER(hh_hmcs40_state::alnattck_plate_w)
 
 	// update display
 	UINT32 plate = BITSWAP16(m_plate,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15) | (m_plate & 0xf0000);
-	
+
 	display_matrix(20, 10, plate, m_grid);
 }
 
@@ -359,13 +359,13 @@ WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
-	
+
 	// D7-D13: input mux
 	m_inp_mux = data >> 7 & 0x7f;
 
 	// D6-D15: vfd matrix grid
 	m_grid = data >> 6 & 0x3ff;
-	
+
 	// D0-D3: plate 16-19 (update display there)
 	alnattck_plate_w(space, 4, data & 0xf);
 }
@@ -449,7 +449,7 @@ static MACHINE_CONFIG_START( cdkong, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( cgalaxn, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -519,7 +519,7 @@ static MACHINE_CONFIG_START( cpacman, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( cmspacmn, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -583,7 +583,7 @@ void hh_hmcs40_state::egalaxn2_display()
 {
 	UINT32 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
-	
+
 	display_matrix(24, 15, plate, grid);
 }
 
@@ -591,10 +591,10 @@ WRITE16_MEMBER(hh_hmcs40_state::egalaxn2_grid_w)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
-	
+
 	// D1-D4: input mux
 	m_inp_mux = data >> 1 & 0xf;
-	
+
 	// D1-D15: vfd matrix grid
 	m_grid = data >> 1;
 	egalaxn2_display();
@@ -766,7 +766,7 @@ static MACHINE_CONFIG_START( pbqbert, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -787,7 +787,7 @@ MACHINE_CONFIG_END
   * boards are labeled THF-01II 2E138E01/2E128E02
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
-  
+
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
@@ -801,7 +801,7 @@ static MACHINE_CONFIG_START( kingman, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -836,7 +836,7 @@ static MACHINE_CONFIG_START( tmtron, hh_hmcs40_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
 
-//	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */

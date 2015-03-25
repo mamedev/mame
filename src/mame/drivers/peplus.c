@@ -9256,7 +9256,7 @@ Joker Poker          P17A      95.50%
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00025.u67",   0x00000, 0x10000, CRC(5d39ff71) SHA1(0a5f67e61ae0e8a08cc551ab4271ffc97c343ae3) ) /* International multi currency version - Auto Hold always on */
 	/* Also compatible with XMP00002, XMP00003, XMP00004, XMP00006 and XMP00024 programs */
-	
+
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "xm00013p.u66",   0x00000, 0x10000, CRC(4fde73f9) SHA1(f8eb6fb0585e8df9a7eb2ddc65bb20b120753d7a) )
 

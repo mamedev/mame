@@ -1153,8 +1153,8 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 
 #ifdef SDLMAME_MACOSX
 	/* FIMXE: On OSX, SDL_WINDOW_FULLSCREEN_DESKTOP seems to be more reliable.
-	 * 		  It however creates issues with white borders, i.e. the screen clear
-	 * 		  does not work. This happens both with opengl and accel.
+	 *        It however creates issues with white borders, i.e. the screen clear
+	 *        does not work. This happens both with opengl and accel.
 	 */
 #endif
 

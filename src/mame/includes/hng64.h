@@ -125,7 +125,7 @@ public:
 		m_generic_paletteram_32(*this, "paletteram")
 
 	{ }
-	
+
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
 	required_device<cpu_device> m_comm;
@@ -363,7 +363,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
 
 	UINT16 m_audiochannel;
-	
+
 	struct hng64_48bit_data {
 		UINT16 dat[3];
 	};
@@ -395,4 +395,3 @@ public:
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
 };
-

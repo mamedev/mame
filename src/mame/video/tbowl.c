@@ -116,7 +116,7 @@ void tbowl_state::video_start()
 	m_tx_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg2_tilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	save_item(NAME(m_bg2xscroll));

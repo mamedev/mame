@@ -54,10 +54,10 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_2_w);
 	DECLARE_WRITE8_MEMBER(pixmap_w);
 	DECLARE_WRITE8_MEMBER(priority_w);
-	
+
 	// paradise specific
 	DECLARE_WRITE8_MEMBER(paradise_okibank_w);
-	
+
 	// torus specific
 	DECLARE_WRITE8_MEMBER(torus_coin_counter_w);
 

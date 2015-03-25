@@ -84,7 +84,7 @@ void seta001_device::device_start()
 	m_spritelimit = 0x1ff;
 
 	m_bgflag = 0x00;
-	
+
 	m_gfxbank_cb.bind_relative_to(*owner());
 
 	save_item(NAME(m_bgflag));

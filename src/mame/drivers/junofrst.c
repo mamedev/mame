@@ -105,11 +105,11 @@ public:
 	required_device<filter_rc_device> m_filter_0_0;
 	required_device<filter_rc_device> m_filter_0_1;
 	required_device<filter_rc_device> m_filter_0_2;
-	
+
 	UINT8    m_blitterdata[4];
 	int      m_i8039_status;
 	int      m_last_irq;
-	
+
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(bankselect_w);
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);

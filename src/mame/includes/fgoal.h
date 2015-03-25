@@ -15,7 +15,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram")	{ }
+		m_video_ram(*this, "video_ram") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(xpos_w);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(_80_r);
-	
+
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
 	virtual void machine_start();

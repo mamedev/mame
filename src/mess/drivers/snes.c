@@ -1005,9 +1005,9 @@ WRITE8_MEMBER( snes_console_state::pfest94_lo_w )
  *************************************/
 
 static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, snes_console_state )
-//	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes20_lo_r, snes20_lo_w)
+//  AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes20_lo_r, snes20_lo_w)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-//	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes20_hi_r, snes20_hi_w)
+//  AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes20_hi_r, snes20_hi_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spc_map, AS_PROGRAM, 8, snes_console_state )
@@ -1196,7 +1196,7 @@ void snes_console_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snes_console_state::snes20_lo_r),this), write8_delegate(FUNC(snes_console_state::snes20_lo_w),this));
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snes_console_state::snes20_hi_r),this), write8_delegate(FUNC(snes_console_state::snes20_hi_w),this));
 		m_maincpu->set_5a22_map();
-		
+
 		m_type = m_cartslot->get_type();
 
 		switch (m_type)

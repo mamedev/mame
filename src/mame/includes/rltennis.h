@@ -18,7 +18,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac_1;
 	required_device<dac_device> m_dac_2;
-	
+
 	UINT16 m_blitter[RLT_NUM_BLITTER_REGS];
 	INT32 m_data760000;
 	INT32 m_data740000;
@@ -41,7 +41,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);

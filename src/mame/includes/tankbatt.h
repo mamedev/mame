@@ -18,11 +18,11 @@ public:
 
 	required_shared_ptr<UINT8> m_bulletsram;
 	required_shared_ptr<UINT8> m_videoram;
-	
+
 	int m_nmi_enable;
 	int m_sound_enable;
 	tilemap_t *m_bg_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ8_MEMBER(in1_r);
@@ -36,17 +36,17 @@ public:
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(coinlockout_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
-	
-	
+
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(tankbatt);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

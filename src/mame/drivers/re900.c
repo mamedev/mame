@@ -101,18 +101,18 @@ public:
 	UINT8 m_ledant;
 	UINT8 m_player;
 	UINT8 m_stat_a;
-	
+
 	// common
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
 	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
-	
+
 	// re900 specific
 	DECLARE_READ8_MEMBER(re_psg_portA_r);
 	DECLARE_READ8_MEMBER(re_psg_portB_r);
 	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
-	
+
 	DECLARE_DRIVER_INIT(re900);
 };
 
@@ -432,7 +432,7 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 	m_player = 1;
 	m_stat_a = 1;
 	m_psg_pa = m_psg_pb = m_mux_data = m_ledant = 0;
-	
+
 	save_item(NAME(m_psg_pa));
 	save_item(NAME(m_psg_pb));
 	save_item(NAME(m_mux_data));

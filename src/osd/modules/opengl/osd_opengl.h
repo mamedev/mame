@@ -61,11 +61,11 @@
 		virtual const char *LastErrorMsg() = 0;
 		virtual void *getProcAddress(const char *proc) = 0;
 		/*
-		 * 	0 for immediate updates,
-		 * 	1 for updates synchronized with the vertical retrace,
-		 * 	-1 for late swap tearing
+		 *  0 for immediate updates,
+		 *  1 for updates synchronized with the vertical retrace,
+		 *  -1 for late swap tearing
 		 *
-		 * 	returns -1 if swap interval is not supported
+		 *  returns -1 if swap interval is not supported
 		 *
 		 */
 		virtual int SetSwapInterval(const int swap) = 0;
@@ -99,7 +99,7 @@
 			#undef GET_GLFUNC
 		};
 #ifdef _MSC_VER
- 	}
+	}
 #endif
 
 	#undef OSD_GL

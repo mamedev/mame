@@ -918,7 +918,7 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 
 WRITE32_MEMBER(hng64_state::hng64_vregs_w)
 {
-//	printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+//  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
 }
 
@@ -1503,7 +1503,7 @@ void hng64_state::machine_start()
 	{
 		m_videoregs[i] = 0xdeadbeef;
 	}
-		
+
 }
 
 
@@ -1569,8 +1569,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
-
+	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 
 ROM_START( hng64 )
 	/* BIOS */

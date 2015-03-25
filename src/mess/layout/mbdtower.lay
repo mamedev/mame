@@ -22,7 +22,7 @@
 		<text state="6" string="WARRIOR"><color red="0.0" green="0.0" blue="0.0" /></text>
 		<text state="7" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
-	
+
 	<element name="card2" defstate="0">
 		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<text state="0" string="LOST"><color red="0.0" green="0.0" blue="0.0" /></text>
@@ -76,7 +76,7 @@
 
 		<bezel name="digit1" element="digit"><bounds x="10" y="3" width="10" height="15" /></bezel>
 		<bezel name="digit2" element="digit"><bounds x="20" y="3" width="10" height="15" /></bezel>
-	
+
 	<!-- card lamps -->
 
 		<bezel element="static_white"><bounds x="1" y="28" width="38" height="25" /></bezel>

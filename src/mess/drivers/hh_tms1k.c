@@ -5,7 +5,7 @@
   This driver is a collection of simple dedicated handheld and tabletop
   toys based around the TMS1000 MCU series. Anything more complex or clearly
   part of a series is (or will be) in its own driver.
-  
+
   Let's use this driver for a list of known devices and their serials,
   excluding TI's own products (see for example ticalc1x.c, tispeak.c)
 
@@ -53,7 +53,7 @@
  @MP7334   TMS1400  1981, Coleco Total Control 4
 
   inconsistent:
-  
+
  @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
@@ -102,7 +102,7 @@ void hh_tms1k_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-	
+
 	m_o = 0;
 	m_r = 0;
 	m_inp_mux = 0;
@@ -190,7 +190,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
 		for (int x = 0; x < m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
 }
 
@@ -203,7 +203,7 @@ void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
-	
+
 	display_update();
 }
 
@@ -293,7 +293,7 @@ WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_r)
 {
 	// R3,R5-R7,R9,R10: input mux
 	m_inp_mux = (data >> 3 & 1) | (data >> 4 & 0xe) | (data >> 5 & 0x30);
-	
+
 	// +others:
 	m_r = data;
 	mathmagi_display();
@@ -442,10 +442,10 @@ void hh_tms1k_state::amaztron_display()
 		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (m_r >> (y + 8) & 1) ? m_o : 0;
 	}
-	
+
 	// R6,R7: lamps (-> lamp20,21)
 	m_display_state[2] = m_r >> 6 & 3;
-	
+
 	display_update();
 }
 
@@ -453,7 +453,7 @@ WRITE16_MEMBER(hh_tms1k_state::amaztron_write_r)
 {
 	// R0-R5: input mux
 	m_inp_mux = data & 0x3f;
-	
+
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
@@ -582,12 +582,12 @@ MACHINE_CONFIG_END
 void hh_tms1k_state::tc4_display()
 {
 	m_display_wait = 50;
-	
+
 	// R5,7,8,9 are 7segs
 	for (int y = 0; y < 10; y++)
 		if (y >= 5 && y <= 9 && y != 6)
 			m_display_segmask[y] = 0x7f;
-	
+
 	// update current state (note: R6 as extra column!)
 	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
 }
@@ -600,7 +600,7 @@ WRITE16_MEMBER(hh_tms1k_state::tc4_write_r)
 	// R0-R5: input mux
 	// R9: to cartridge slot
 	m_inp_mux = data & 0x23f;
-	
+
 	// R6: led column 8
 	// +other columns
 	m_r = data;
@@ -699,13 +699,13 @@ MACHINE_CONFIG_END
 
   Entex Electronic Baseball (1)
   * TMS1000NLP MP0914 (die labeled MP0914A)
-  
+
   This is a handheld LED baseball game. One player controls the batter, the CPU
   or other player controls the pitcher. Pitcher throw buttons are on a 'joypad'
   obtained from a compartment in the back. Player scores are supposed to be
   written down manually, the game doesn't save scores or innings (this annoyance
   was resolved in the sequel). For more information, refer to the official manual.
-  
+
   The overlay graphic is known to have 2 versions: one where the field players
   are denoted by words ("left", "center", "short", etc), and an alternate one
   with little guys drawn next to the LEDs.
@@ -730,7 +730,7 @@ void hh_tms1k_state::ebball_display()
 {
 	// R8 is a 7seg
 	m_display_segmask[8] = 0x7f;
-	
+
 	display_matrix(7, 9, ~m_o, m_r);
 }
 
@@ -738,10 +738,10 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
 {
 	// R1-R5: input mux
 	m_inp_mux = data >> 1 & 0x1f;
-	
+
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
-	
+
 	// R0-R8: led columns
 	m_r = data;
 	ebball_display();
@@ -821,15 +821,15 @@ MACHINE_CONFIG_END
   Entex Electronic Baseball 2
   * boards are labeled: ZENY
   * TMS1000 MCU, MP0923 (die labeled MP0923)
-  
+
   The Japanese version was published by Gakken, black casing instead of white.
-  
+
   The sequel to Entex Baseball, this version keeps up with score and innings.
   As its predecessor, the pitcher controls are on a separate joypad.
 
 
   lamp translation table: led zz from game PCB = MESS lampyx:
-  
+
     00 = -        10 = lamp94   20 = lamp74   30 = lamp50
     01 = lamp53   11 = lamp93   21 = lamp75   31 = lamp51
     02 = lamp7    12 = lamp92   22 = lamp80   32 = lamp52
@@ -848,7 +848,7 @@ void hh_tms1k_state::ebball2_display()
 	// the first 3 are 7segs
 	for (int y = 0; y < 3; y++)
 		m_display_segmask[y] = 0x7f;
-	
+
 	display_matrix(8, 10, ~m_o, m_r ^ 0x7f);
 }
 
@@ -856,10 +856,10 @@ WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
 {
 	// R3-R6: input mux
 	m_inp_mux = data >> 3 & 0xf;
-	
+
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
-	
+
 	// R0-R9: led columns
 	m_r = data;
 	ebball2_display();
@@ -932,14 +932,14 @@ MACHINE_CONFIG_END
   * boards are labeled: ZENY
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
   * 2*SN75492N LED display driver
-  
+
   This is another improvement over Entex Baseball, where gameplay is a bit more
   varied. Like the others, the pitcher controls are on a separate joypad.
 
 
   lamp translation table: led zz from game PCB = MESS lampyx:
   note: unlabeled panel leds are listed here as Sz, Bz, Oz, Iz, z left-to-right
-  
+
     00 = -        10 = lamp75   20 = lamp72
     01 = lamp60   11 = lamp65   21 = lamp84
     02 = lamp61   12 = lamp55   22 = lamp85
@@ -969,12 +969,12 @@ void hh_tms1k_state::ebball3_display()
 
 	// R0,R1 are normal 7segs
 	m_display_segmask[0] = m_display_segmask[1] = 0x7f;
-	
+
 	// R4,R7 contain segments(only F and B) for the two other digits
 	m_display_state[10] = (m_display_state[4] & 0x20) | (m_display_state[7] & 0x02);
 	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
 	m_display_segmask[10] = m_display_segmask[11] = 0x22;
-	
+
 	display_update();
 }
 
@@ -982,10 +982,10 @@ WRITE16_MEMBER(hh_tms1k_state::ebball3_write_r)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
-	
+
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
-	
+
 	// R0-R9: led columns
 	m_r = data;
 	ebball3_display();
@@ -1118,7 +1118,7 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_o)
 {
 	// O0,O1,O4,O6: input mux
 	m_inp_mux = (data & 3) | (data >> 2 & 4) | (data >> 3 & 8);
-	
+
 	// O0-O6: led segments A-G
 	// O7: speaker out
 	m_o = data;
@@ -1218,7 +1218,7 @@ void hh_tms1k_state::starwbc_display()
 {
 	// R6,R8 are 7segs
 	m_display_segmask[6] = m_display_segmask[8] = 0x7f;
-	
+
 	display_matrix(8, 10, m_o, m_r);
 }
 
@@ -1569,7 +1569,7 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 
 	// R6-R9: direction leds (-> lamp60-63)
 	m_display_state[6] = data >> 6 & 0xf;
-	
+
 	display_update();
 }
 
@@ -1577,7 +1577,7 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_o)
 {
 	// O0-O4: input mux
 	m_inp_mux = data & 0x1f;
-	
+
 	// O0-O7: digit segments
 	m_o = data;
 }
@@ -1646,7 +1646,7 @@ MACHINE_CONFIG_END
   Parker Bros Merlin handheld game, by Bob Doyle
   * TMS1100NLL MP3404A-N2
   * red LEDs and 1-bit sound
-  
+
   Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
   The one with dark-blue case is the rare sequel Master Merlin. More sequels
   followed too, but on other hardware.
@@ -1780,7 +1780,7 @@ WRITE16_MEMBER(hh_tms1k_state::stopthief_write_o)
 {
 	// O0,O6: input mux
 	m_inp_mux = (data & 1) | (data >> 5 & 2);
-	
+
 	// O3: speaker out
 	// O0-O2,O4-O7: led segments A-G
 	m_o = data;

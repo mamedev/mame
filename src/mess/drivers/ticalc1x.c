@@ -59,8 +59,8 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
@@ -68,7 +68,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
-	
+
 	// calculator-specific handlers
 	void tisr16_display();
 	DECLARE_WRITE16_MEMBER(tisr16_write_o);
@@ -105,7 +105,7 @@ void ticalc1x_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
-	
+
 	m_o = 0;
 	m_r = 0;
 	m_inp_mux = 0;
@@ -193,7 +193,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ticalc1x_state::display_decay_tick)
 		for (int x = 0; x < m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
 }
 
@@ -209,7 +209,7 @@ void ticalc1x_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 
 		m_display_segmask[y] &= segmask;
 		m_display_state[y] = (sety >> y & 1) ? (setx & colmask) : 0;
 	}
-	
+
 	display_update();
 }
 
@@ -482,11 +482,11 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
 	//   \./    GAB
 	//   ---     F
 	//   /.\    EDC
-	
+
 	// 3rd digit only has A and G for =, though some newer hardware revisions
 	// (goes for both wizatron and lilprof) use a custom equals-sign digit here
 	m_display_segmask[3] = 0x41;
-	
+
 	// R0-R8: select digit (right-to-left)
 	display_matrix_seg(7, 9, m_o, data, 0x7f);
 }
@@ -557,7 +557,7 @@ MACHINE_CONFIG_END
 
   TI Little Professor (1976 version)
   * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS. die labeled 0970D-75C
-  
+
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
   one is older).
 
@@ -631,7 +631,7 @@ WRITE16_MEMBER(ticalc1x_state::lilprof78_write_r)
 
 	// 3rd digit A/G(equals sign) is from O7
 	m_display_state[3] = (m_o & 0x80) ? 0x41 : 0;
-	
+
 	// 6th digit is a custom 7seg for math symbols (see wizatron_write_r)
 	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
 

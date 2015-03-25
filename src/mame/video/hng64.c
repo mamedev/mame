@@ -660,7 +660,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// xrally's pink tilemaps make me think this is a tilemap enable bit.
 	// fatfurwa makes me think otherwise.
-//	if (!(tileregs & 0x0040)) return;
+//  if (!(tileregs & 0x0040)) return;
 
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
@@ -1251,4 +1251,3 @@ void hng64_state::video_start()
 	m_vertsrom = (UINT16*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 }
-

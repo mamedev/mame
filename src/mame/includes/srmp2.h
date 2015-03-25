@@ -21,7 +21,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<seta001_device> m_seta001;
 	required_device<msm5205_device> m_msm;
-	
+
 	int m_color_bank;
 	int m_gfx_bank;
 	int m_adpcm_bank;
@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mjyuugi_adpcm_bank_w);
 	DECLARE_READ8_MEMBER(mjyuugi_irq2_ack_r);
 	DECLARE_READ8_MEMBER(mjyuugi_irq4_ack_r);
-	
+
 	// rmgoldyh
 	DECLARE_WRITE8_MEMBER(rmgoldyh_rombank_w);
 

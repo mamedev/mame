@@ -57,7 +57,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	
+
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_vram;
 
@@ -67,15 +67,15 @@ public:
 
 	/* memory */
 	UINT8    m_pal[0x10000];
-	
+
 	DECLARE_READ8_MEMBER(video_read);
 	DECLARE_READ8_MEMBER(port4_r);
 	DECLARE_WRITE8_MEMBER(port4_w);
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_WRITE8_MEMBER(video_write);
-	
+
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

@@ -10,13 +10,13 @@
 	downcast<vrc4373_device *>(device)->set_cpu_tag(_cpu_tag);
 
 #define VRC4373_PAGESHIFT 12
-	
+
 /* NILE 3 registers 0x000-0x0ff */
-#define NREG_BMCR         	(0x000/4)
-#define NREG_SIMM1       	  (0x004/4)
-#define NREG_SIMM2       	  (0x008/4)
-#define NREG_SIMM3       	  (0x00C/4)
-#define NREG_SIMM4       	  (0x010/4)
+#define NREG_BMCR           (0x000/4)
+#define NREG_SIMM1            (0x004/4)
+#define NREG_SIMM2            (0x008/4)
+#define NREG_SIMM3            (0x00C/4)
+#define NREG_SIMM4            (0x010/4)
 #define NREG_PCIMW1         (0x014/4)
 #define NREG_PCIMW2         (0x018/4)
 #define NREG_PCITW1         (0x01C/4)
@@ -57,7 +57,7 @@ public:
 	void set_cpu_tag(const char *tag);
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32);
-	
+
 	DECLARE_READ32_MEMBER(  pcictrl_r);
 	DECLARE_WRITE32_MEMBER( pcictrl_w);
 	//cpu bus registers
@@ -76,7 +76,7 @@ public:
 	virtual DECLARE_ADDRESS_MAP(target1_map, 32);
 	DECLARE_READ32_MEMBER (target1_r);
 	DECLARE_WRITE32_MEMBER(target1_w);
-	
+
 	virtual DECLARE_ADDRESS_MAP(target2_map, 32);
 	DECLARE_READ32_MEMBER (target2_r);
 	DECLARE_WRITE32_MEMBER(target2_w);

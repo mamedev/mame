@@ -153,11 +153,11 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(lamps3_w);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
 };
 

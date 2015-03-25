@@ -42,12 +42,12 @@ public:
 	UINT8 m_bg_status;
 	UINT8 m_flipscreen;
 	UINT16 m_palette_intensity;
-	
+
 	// argus specific
 	UINT8 *m_dummy_bg0ram;
 	int m_lowbitscroll;
 	int m_prvscrollx;
-	
+
 	// butasan specific
 	UINT8 *m_butasan_txram;
 	UINT8 *m_butasan_bg0ram;
@@ -57,17 +57,17 @@ public:
 	UINT8 m_butasan_page_latch;
 	UINT8 m_butasan_bg1_status;
 	UINT8 m_butasan_unknown;
-	
+
 	// valtric specific
 	UINT8 m_valtric_mosaic;
 	bitmap_rgb32 m_mosaicbitmap;
 	UINT8 m_valtric_unknown;
 	int m_mosaic;
-	
+
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg0_tilemap;
 	tilemap_t *m_bg1_tilemap;
-	
+
 	// common
 	DECLARE_WRITE8_MEMBER(bankselect_w);
 	DECLARE_WRITE8_MEMBER(valtric_mosaic_w);
@@ -94,7 +94,7 @@ public:
 	DECLARE_WRITE8_MEMBER(valtric_bg_status_w);
 	DECLARE_WRITE8_MEMBER(valtric_paletteram_w);
 	DECLARE_WRITE8_MEMBER(valtric_unknown_w);
-	
+
 	TILE_GET_INFO_MEMBER(argus_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(argus_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(argus_get_bg1_tile_info);
@@ -103,7 +103,7 @@ public:
 	TILE_GET_INFO_MEMBER(butasan_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
-	
+
 	virtual void machine_start();
 	DECLARE_VIDEO_START(argus);
 	DECLARE_VIDEO_RESET(argus);
@@ -111,28 +111,28 @@ public:
 	DECLARE_VIDEO_RESET(valtric);
 	DECLARE_VIDEO_START(butasan);
 	DECLARE_VIDEO_RESET(butasan);
-	
+
 	UINT32 screen_update_argus(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(butasan_scanline);
-	
+
 	void reset_common();
 	void change_palette(int color, int lo_offs, int hi_offs);
 	void change_bg_palette(int color, int lo_offs, int hi_offs);
 	void bg_setting();
-	
+
 	// argus specific
 	void argus_bg0_scroll_handle();
 	void argus_write_dummy_rams(int dramoffs, int vromoffs);
 	void argus_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
-	
+
 	// butasan specific
 	void butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void butasan_log_vram();
-	
+
 	// valtric specific
 	void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);

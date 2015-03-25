@@ -4,7 +4,7 @@
  Morten Shearman Kirkegaard morten+gamate@afdelingp.dk
  Juan F??lix Mateos vectrex@hackermesh.org
 
- nmi unknown 
+ nmi unknown
  bomb blast top status line missing
  ******************************************************************************/
 
@@ -84,7 +84,7 @@ private:
 WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
 {
 	logerror("%.6f protection write %x %x address:%x data:%x shift:%d\n",machine().time().as_double(), offset, data, card_protection.address, card_protection.cartridge_byte, card_protection.bit_shifter);
-  
+
 	switch (offset)
 	{
 	case 0:
@@ -118,7 +118,7 @@ READ8_MEMBER( gamate_state::gamate_cart_protection_r )
 		ret=(card_protection.cartridge_byte&0x80) ? 2 : 0;
 		if (card_protection.bit_shifter==7 && !card_protection.failed)
 		{ // now protection chip on cartridge activates cartridge chip select on cpu accesses
-//			m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r)); // next time I will try to get this working
+//          m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r)); // next time I will try to get this working
 		}
 		card_protection.cartridge_byte<<=1;
 	}
@@ -318,12 +318,12 @@ void gamate_state::machine_start()
 	m_cart_ptr = memregion("maincpu")->base() + 0x6000;
 	if (m_cart->exists())
 	{
-//		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
+//      m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, READ8_DELEGATE(gamate_state, gamate_cart_protection_r));
 		m_cart_ptr = m_cart->get_rom_base();
 		membank("bankmulti")->set_base(m_cart->get_rom_base()+1);
 		membank("bank")->set_base(m_cart->get_rom_base()+0x4000); // bankswitched games in reality no offset
 	}
-//	m_bios[0xdf1]=0xea; m_bios[0xdf2]=0xea; // default bios: $47 protection readback
+//  m_bios[0xdf1]=0xea; m_bios[0xdf2]=0xea; // default bios: $47 protection readback
 	card_protection.set=false;
 	bank_multi=0;
 	card_protection.unprotected=false;
@@ -400,4 +400,3 @@ ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT      COMPANY    FULLNAME */
 CONS( 19??, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0)
-

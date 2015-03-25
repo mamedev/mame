@@ -57,8 +57,8 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
@@ -79,7 +79,7 @@ void hh_pic16_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-	
+
 	m_b = 0;
 	m_c = 0;
 
@@ -158,7 +158,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_pic16_state::display_decay_tick)
 		for (int x = 0; x < m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
 }
 
@@ -171,7 +171,7 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
-	
+
 	display_update();
 }
 
@@ -199,14 +199,14 @@ WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
 		m_c = data;
 	else
 		m_b = data;
-	
+
 	// d7: speaker out
 	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
 
 	// d0-d6: 7seg
 	m_display_maxx = 7;
 	m_display_maxy = 2;
-	
+
 	m_display_segmask[offset] = 0x7f;
 	m_display_state[offset] = ~data & 0x7f;
 	display_update();

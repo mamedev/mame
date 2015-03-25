@@ -187,7 +187,7 @@ void hmcs40_cpu_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hmcs40_cpu_device::simple_timer_cb), this));
 	reset_prescaler();
-	
+
 	m_read_r0.resolve_safe(0);
 	m_read_r1.resolve_safe(0);
 	m_read_r2.resolve_safe(0);
@@ -196,7 +196,7 @@ void hmcs40_cpu_device::device_start()
 	m_read_r5.resolve_safe(0);
 	m_read_r6.resolve_safe(0);
 	m_read_r7.resolve_safe(0);
-	
+
 	m_write_r0.resolve_safe();
 	m_write_r1.resolve_safe();
 	m_write_r2.resolve_safe();
@@ -290,15 +290,15 @@ void hmcs40_cpu_device::device_reset()
 {
 	m_pc = m_pcmask;
 	m_prev_op = m_op = 0;
-	
+
 	// clear i/o
 	m_d = m_polarity;
 	for (int i = 0; i < 16; i++)
 		hmcs40_cpu_device::write_d(i, 0);
-	
+
 	for (int i = 0; i < 8; i++)
 		hmcs40_cpu_device::write_r(i, 0);
-	
+
 	// clear interrupts
 	m_cf = 0;
 	m_ie = 0;
@@ -316,7 +316,7 @@ UINT8 hmcs40_cpu_device::read_r(int index)
 {
 	index &= 7;
 	UINT8 inp = 0;
-	
+
 	switch (index)
 	{
 		case 0: inp = m_read_r0(index, 0xff); break;
@@ -328,7 +328,7 @@ UINT8 hmcs40_cpu_device::read_r(int index)
 		case 6: inp = m_read_r6(index, 0xff); break;
 		case 7: inp = m_read_r7(index, 0xff); break;
 	}
-	
+
 	return ((inp ^ m_polarity) | m_r[index]) & 0xf;
 }
 
@@ -337,7 +337,7 @@ void hmcs40_cpu_device::write_r(int index, UINT8 data)
 	index &= 7;
 	data = (data ^ m_polarity) & 0xf;
 	m_r[index] = data;
-	
+
 	switch (index)
 	{
 		case 0: m_write_r0(index, data, 0xff); break;
@@ -354,7 +354,7 @@ void hmcs40_cpu_device::write_r(int index, UINT8 data)
 int hmcs40_cpu_device::read_d(int index)
 {
 	index &= 15;
-	
+
 	return ((m_read_d(index, 0xffff) ^ m_polarity) | m_d) >> index & 1;
 }
 
@@ -362,7 +362,7 @@ void hmcs40_cpu_device::write_d(int index, int state)
 {
 	index &= 15;
 	state = (((state) ? 1 : 0) ^ m_polarity) & 1;
-	
+
 	m_d = (m_d & ~(1 << index)) | state << index;
 	m_write_d(index, m_d, 0xffff);
 }
@@ -374,7 +374,7 @@ void hmcs40_cpu_device::write_d(int index, int state)
 UINT8 hmcs43_cpu_device::read_r(int index)
 {
 	index &= 7;
-	
+
 	if (index >= 2)
 		logerror("%s read from %s port R%d at $%04X\n", tag(), (index >= 4) ? "unknown" : "output", index, m_prev_pc);
 
@@ -394,7 +394,7 @@ void hmcs43_cpu_device::write_r(int index, UINT8 data)
 int hmcs43_cpu_device::read_d(int index)
 {
 	index &= 15;
-	
+
 	if (index >= 4)
 		logerror("%s read from output pin D%d at $%04X\n", tag(), index, m_prev_pc);
 
@@ -408,10 +408,10 @@ int hmcs43_cpu_device::read_d(int index)
 UINT8 hmcs44_cpu_device::read_r(int index)
 {
 	index &= 7;
-	
+
 	if (index >= 6)
 		logerror("%s read from unknown port R%d at $%04X\n", tag(), index, m_prev_pc);
-	
+
 	return hmcs40_cpu_device::read_r(index);
 }
 
@@ -432,10 +432,10 @@ void hmcs44_cpu_device::write_r(int index, UINT8 data)
 UINT8 hmcs45_cpu_device::read_r(int index)
 {
 	index &= 7;
-	
+
 	if (index >= 6)
 		logerror("%s read from %s port R%d at $%04X\n", tag(), (index == 7) ? "unknown" : "output", index, m_prev_pc);
-	
+
 	return hmcs40_cpu_device::read_r(index);
 }
 
@@ -460,10 +460,10 @@ void hmcs40_cpu_device::do_interrupt()
 	m_icount--;
 	push_stack();
 	m_ie = 0;
-	
+
 	// line 0/1 for external interrupt, let's use 2 for t/c interrupt
 	int line = (m_iri) ? m_eint_line : 2;
-	
+
 	// vector $3f, on page 0(timer/counter), or page 1(external)
 	// external interrupt has priority over t/c interrupt
 	m_pc = 0x3f | (m_iri ? 0x40 : 0);
@@ -480,7 +480,7 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 	if (line != 0 && line != 1)
 		return;
 	state = (state) ? 1 : 0;
-	
+
 	// external interrupt request on rising edge
 	if (state && !m_int[line])
 	{
@@ -490,12 +490,12 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 			m_iri = 1;
 			m_if[line] = 1;
 		}
-		
+
 		// clock tc if it is in counter mode
 		if (m_cf && line == 1)
 			increment_tc();
 	}
-	
+
 	m_int[line] = state;
 }
 
@@ -511,7 +511,7 @@ TIMER_CALLBACK_MEMBER( hmcs40_cpu_device::simple_timer_cb )
 	// timer prescaler overflow
 	if (!m_cf)
 		increment_tc();
-	
+
 	reset_prescaler();
 }
 
@@ -519,7 +519,7 @@ void hmcs40_cpu_device::increment_tc()
 {
 	// increment timer/counter
 	m_tc = (m_tc + 1) & 0xf;
-	
+
 	// timer interrupt request on overflow
 	if (m_tc == 0 && !m_tf)
 	{
@@ -554,7 +554,7 @@ void hmcs40_cpu_device::execute_run()
 	while (m_icount > 0)
 	{
 		m_icount--;
-		
+
 		// LPU is handled 1 cycle later
 		if ((m_prev_op & 0x3e0) == 0x340)
 		{
@@ -571,7 +571,7 @@ void hmcs40_cpu_device::execute_run()
 		// remember previous state
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
-		
+
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
@@ -582,7 +582,7 @@ void hmcs40_cpu_device::execute_run()
 		switch (m_op)
 		{
 			/* 0x000 */
-			
+
 			case 0x000: case 0x001: case 0x002: case 0x003:
 				op_xsp(); break;
 			case 0x004: case 0x005: case 0x006: case 0x007:
@@ -602,7 +602,7 @@ void hmcs40_cpu_device::execute_run()
 				op_am(); break;
 			case 0x03c:
 				op_lta(); break;
-			
+
 			case 0x040:
 				op_lxa(); break;
 			case 0x045:
@@ -626,7 +626,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x070: case 0x071: case 0x072: case 0x073: case 0x074: case 0x075: case 0x076: case 0x077:
 			case 0x078: case 0x079: case 0x07a: case 0x07b: case 0x07c: case 0x07d: case 0x07e: case 0x07f:
 				op_lai(); break;
-			
+
 			case 0x080: case 0x081: case 0x082: case 0x083: case 0x084: case 0x085: case 0x086: case 0x087:
 			case 0x088: case 0x089: case 0x08a: case 0x08b: case 0x08c: case 0x08d: case 0x08e: case 0x08f:
 				op_ai(); break;
@@ -655,10 +655,10 @@ void hmcs40_cpu_device::execute_run()
 			case 0x0f0: case 0x0f1: case 0x0f2: case 0x0f3: case 0x0f4: case 0x0f5: case 0x0f6: case 0x0f7:
 			case 0x0f8: case 0x0f9: case 0x0fa: case 0x0fb: case 0x0fc: case 0x0fd: case 0x0fe: case 0x0ff:
 				op_xamr(); break;
-			
-			
+
+
 			/* 0x100 */
-			
+
 			case 0x110: case 0x111:
 				op_lmaiy(); break;
 			case 0x114: case 0x115:
@@ -682,7 +682,7 @@ void hmcs40_cpu_device::execute_run()
 			case 0x170: case 0x171: case 0x172: case 0x173: case 0x174: case 0x175: case 0x176: case 0x177:
 			case 0x178: case 0x179: case 0x17a: case 0x17b: case 0x17c: case 0x17d: case 0x17e: case 0x17f:
 				op_lti(); break;
-			
+
 			case 0x1a0:
 				op_tif1(); break;
 			case 0x1a1:
@@ -706,7 +706,7 @@ void hmcs40_cpu_device::execute_run()
 
 
 			/* 0x200 */
-			
+
 			case 0x200: case 0x201: case 0x202: case 0x203:
 				op_tm(); break;
 			case 0x204: case 0x205: case 0x206: case 0x207:
@@ -728,7 +728,7 @@ void hmcs40_cpu_device::execute_run()
 				op_alem(); break;
 			case 0x23c:
 				op_lat(); break;
-			
+
 			case 0x240:
 				op_laspx(); break;
 			case 0x244:
@@ -804,8 +804,8 @@ void hmcs40_cpu_device::execute_run()
 			case 0x3f0: case 0x3f1: case 0x3f2: case 0x3f3: case 0x3f4: case 0x3f5: case 0x3f6: case 0x3f7:
 			case 0x3f8: case 0x3f9: case 0x3fa: case 0x3fb: case 0x3fc: case 0x3fd: case 0x3fe: case 0x3ff:
 				op_cal(); break;
-			
-			
+
+
 			default:
 				op_illegal(); break;
 		} /* big switch */

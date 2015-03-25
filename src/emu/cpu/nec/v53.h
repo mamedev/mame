@@ -131,7 +131,7 @@ public:
 
 	UINT8 m_SCTL;
 	UINT8 m_OPSEL;
-	
+
 	UINT8 m_SULA;
 	UINT8 m_TULA;
 	UINT8 m_IULA;
@@ -151,10 +151,10 @@ public:
 	template<class _Object> static devcb_base &set_syndet_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_syndet_handler.set_callback(object); }
 	DECLARE_WRITE_LINE_MEMBER(scu_txd_trampoline_cb) { m_txd_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(scu_dtr_trampoline_cb) { m_dtr_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(scu_rts_trampoline_cb) {	m_rts_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER(scu_rts_trampoline_cb) {  m_rts_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(scu_rxrdy_trampoline_cb) { m_rxrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
 	DECLARE_WRITE_LINE_MEMBER(scu_txrdy_trampoline_cb) { m_txrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
-	DECLARE_WRITE_LINE_MEMBER(scu_txempty_trampoline_cb) {	m_txempty_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER(scu_txempty_trampoline_cb) {  m_txempty_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(scu_syndet_trampoline_cb) { m_syndet_handler(state); }
 
 	// TCU
@@ -165,9 +165,9 @@ public:
 	DECLARE_READ8_MEMBER(tmu_tst2_r);
 	DECLARE_WRITE8_MEMBER(tmu_tct2_w);
 	DECLARE_WRITE8_MEMBER(tmu_tmd_w);
-//	static void set_clk0(device_t &device, double clk0) { downcast<v53_base_device &>(device).m_clk0 = clk0; }
-//	static void set_clk1(device_t &device, double clk1) { downcast<v53_base_device &>(device).m_clk1 = clk1; }
-//	static void set_clk2(device_t &device, double clk2) { downcast<v53_base_device &>(device).m_clk2 = clk2; }
+//  static void set_clk0(device_t &device, double clk0) { downcast<v53_base_device &>(device).m_clk0 = clk0; }
+//  static void set_clk1(device_t &device, double clk1) { downcast<v53_base_device &>(device).m_clk1 = clk1; }
+//  static void set_clk2(device_t &device, double clk2) { downcast<v53_base_device &>(device).m_clk2 = clk2; }
 	template<class _Object> static devcb_base &set_out0_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out0_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_out1_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out1_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_out2_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out2_handler.set_callback(object); }
@@ -195,7 +195,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hreq_trampoline_cb) { m_out_hreq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(eop_trampoline_cb) { m_out_eop_cb(state); }
 	DECLARE_READ8_MEMBER(dma_memr_trampoline_r) { return m_in_memr_cb(space, offset); }
-	DECLARE_WRITE8_MEMBER(dma_memw_trampoline_w) {	m_out_memw_cb(space, offset, data); }
+	DECLARE_WRITE8_MEMBER(dma_memw_trampoline_w) {  m_out_memw_cb(space, offset, data); }
 	DECLARE_READ8_MEMBER(dma_io_0_trampoline_r) { return m_in_ior_0_cb(space, offset); }
 	DECLARE_READ8_MEMBER(dma_io_1_trampoline_r) { return m_in_ior_1_cb(space, offset); }
 	DECLARE_READ8_MEMBER(dma_io_2_trampoline_r) { return m_in_ior_2_cb(space, offset); }
@@ -204,10 +204,10 @@ public:
 	DECLARE_WRITE8_MEMBER(dma_io_1_trampoline_w) { m_out_iow_1_cb(space, offset, data); }
 	DECLARE_WRITE8_MEMBER(dma_io_2_trampoline_w) { m_out_iow_2_cb(space, offset, data); }
 	DECLARE_WRITE8_MEMBER(dma_io_3_trampoline_w) { m_out_iow_3_cb(space, offset, data); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack0_trampoline_w) {	m_out_dack_0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack1_trampoline_w) {	m_out_dack_1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack2_trampoline_w) {	m_out_dack_2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack3_trampoline_w) {	m_out_dack_3_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack0_trampoline_w) { m_out_dack_0_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack1_trampoline_w) { m_out_dack_1_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack2_trampoline_w) { m_out_dack_2_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(dma_dack3_trampoline_w) { m_out_dack_3_cb(state); }
 
 
 	DECLARE_WRITE_LINE_MEMBER(dreq0_w);
@@ -221,7 +221,7 @@ public:
 	void install_peripheral_io();
 
 	const address_space_config m_io_space_config;
-	
+
 	const address_space_config *memory_space_config(address_spacenum spacenum) const
 	{
 		switch (spacenum)
@@ -260,9 +260,9 @@ protected:
 	devcb_write_line m_syndet_handler;
 
 	// TCU
-//	double m_clk0;
-//	double m_clk1;
-//	double m_clk2;
+//  double m_clk0;
+//  double m_clk1;
+//  double m_clk2;
 	devcb_write_line m_out0_handler;
 	devcb_write_line m_out1_handler;
 	devcb_write_line m_out2_handler;
@@ -285,7 +285,7 @@ protected:
 	devcb_write_line   m_out_dack_1_cb;
 	devcb_write_line   m_out_dack_2_cb;
 	devcb_write_line   m_out_dack_3_cb;
-	
+
 
 
 };

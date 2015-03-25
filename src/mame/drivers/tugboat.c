@@ -49,7 +49,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_ram;
 
 	UINT8 m_hd46505_0_reg[18];
@@ -58,18 +58,18 @@ public:
 	int m_reg1;
 	int m_ctrl;
 	emu_timer *m_interrupt_timer;
-	
+
 	DECLARE_WRITE8_MEMBER(hd46505_0_w);
 	DECLARE_WRITE8_MEMBER(hd46505_1_w);
 	DECLARE_WRITE8_MEMBER(score_w);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void machine_reset();
 	DECLARE_PALETTE_INIT(tugboat);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		int addr,int gfx0,int gfx1,int transparency);
@@ -82,7 +82,7 @@ protected:
 void tugboat_state::machine_start()
 {
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
-	
+
 	save_item(NAME(m_hd46505_0_reg));
 	save_item(NAME(m_hd46505_1_reg));
 	save_item(NAME(m_reg0));

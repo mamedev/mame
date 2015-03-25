@@ -115,11 +115,11 @@ void okim9810_device::device_start()
 	save_item(NAME(m_global_volume));
 	save_item(NAME(m_filter_type));
 	save_item(NAME(m_output_level));
-	
+
 	for  (int i = 0; i < OKIM9810_VOICES; i++)
 	{
 		okim_voice *voice = get_voice(i);
-		
+
 		save_item(NAME(voice->m_adpcm.m_signal), i);
 		save_item(NAME(voice->m_adpcm.m_step), i);
 		save_item(NAME(voice->m_adpcm2.m_signal), i);

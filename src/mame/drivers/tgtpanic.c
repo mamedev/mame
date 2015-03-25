@@ -24,15 +24,15 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	
+
 	required_shared_ptr<UINT8> m_ram;
-	
+
 	UINT8 m_color;
-	
+
 	DECLARE_WRITE8_MEMBER(color_w);
-	
+
 	virtual void machine_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 

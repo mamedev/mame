@@ -24,12 +24,12 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 
 void vigilant_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 WRITE8_MEMBER(vigilant_state::vigilant_bank_select_w)
 {
-    membank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 /***************************************************************************

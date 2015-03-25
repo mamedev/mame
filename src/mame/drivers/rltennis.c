@@ -157,7 +157,7 @@ void rltennis_state::machine_start()
 	m_samples_2 = memregion("samples2")->base();
 	m_gfx =  memregion("gfx1")->base();
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rltennis_state::sample_player),this));
-	
+
 	save_item(NAME(m_data760000));
 	save_item(NAME(m_data740000));
 	save_item(NAME(m_dac_counter));

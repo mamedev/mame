@@ -548,7 +548,7 @@ static MACHINE_CONFIG_START( argus, argus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", argus)
 	MCFG_PALETTE_ADD("palette", 896)
-	
+
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,argus)
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", valtric)
 	MCFG_PALETTE_ADD("palette", 768)
-	
+
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,valtric)
@@ -640,7 +640,7 @@ static MACHINE_CONFIG_START( butasan, argus_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", butasan)
 	MCFG_PALETTE_ADD("palette", 768)
-	
+
 	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(argus_state,butasan)

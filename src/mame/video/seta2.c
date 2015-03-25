@@ -457,14 +457,14 @@ void seta2_state::video_start()
 VIDEO_START_MEMBER(seta2_state,xoffset)
 {
 	video_start();
-	
+
 	m_xoffset = 0x200;
 }
 
 VIDEO_START_MEMBER(seta2_state,yoffset)
 {
 	video_start();
-	
+
 	m_yoffset = 0x10;
 }
 
