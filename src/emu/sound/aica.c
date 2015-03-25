@@ -1079,9 +1079,13 @@ INT32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	UINT32 addr1,addr2,addr_select;                                   // current and next sample addresses
 	UINT32 *addr[2]      = {&addr1, &addr2};                          // used for linear interpolation
 	UINT32 *slot_addr[2] = {&(slot->cur_addr), &(slot->nxt_addr)};    //
+	UINT32 chanlea = LEA(slot);
 
 	if(SSCTL(slot)!=0)  //no FM or noise yet
 		return 0;
+
+	if(PCMS(slot) == 3) // Red Dog music relies on this
+		chanlea = (chanlea + 3) & ~3;
 
 	if(PLFOS(slot)!=0)
 	{
@@ -1130,7 +1134,7 @@ INT32 aica_device::UpdateSlot(AICA_SLOT *slot)
 		int cur_sample;       //current ADPCM sample
 		int nxt_sample;       //next ADPCM sample
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
-		UINT32 steps_to_go = addr2, curstep = slot->curstep;
+		UINT32 steps_to_go = addr1 > addr2 ? chanlea : addr2, curstep = slot->curstep;
 
 		if (slot->adbase)
 		{
@@ -1186,19 +1190,19 @@ INT32 aica_device::UpdateSlot(AICA_SLOT *slot)
 		switch(LPCTL(slot))
 		{
 		case 0: //no loop
-			if(*addr[addr_select]>=LSA(slot) && *addr[addr_select]>=LEA(slot))
+			if(*addr[addr_select]>=LSA(slot) && *addr[addr_select]>=chanlea)
 			{
 				StopSlot(slot,0);
 			}
 			break;
 		case 1: //normal loop
-			if(*addr[addr_select]>=LEA(slot))
+			if(*addr[addr_select]>=chanlea)
 			{
 				slot->lpend = 1;
-				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
+				rem_addr = *slot_addr[addr_select] - (chanlea<<SHIFT);
 				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
 
-				if(PCMS(slot)>=2)
+				if(PCMS(slot)>=2 && addr_select == 0)
 				{
 					// restore the state @ LSA - the sampler will naturally walk to (LSA + remainder)
 					slot->adbase = &m_AICARAM[SA(slot)+(LSA(slot)/2)];

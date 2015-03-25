@@ -1421,10 +1421,10 @@ WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
 	// R7 -> 75494 IN2 -> blue lamp
 	display_matrix(4, 1, data >> 4, 1);
 
-	// R8 -> 75494 IN0 -> speaker
+	// R8 -> 75494 IN0 -> speaker out
 	m_speaker->level_w(data >> 8 & 1);
 
-	// R0,R1,R2,R9: input mux
+	// R0-R2,R9: input mux
 	// R3: GND
 	// other bits: N/C
 	m_inp_mux = (data & 7) | (data >> 6 & 8);
@@ -1450,19 +1450,19 @@ static INPUT_PORTS_START( simon )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Green Button")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Red Button")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Yellow Button")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Blue Button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Green Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Yellow Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Blue Button")
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Last")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Longest")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Last")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Longest")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // R9
-	PORT_CONFNAME( 0x0f, 0x01, "Skill Level")
+	PORT_CONFNAME( 0x0f, 0x02, "Skill Level")
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x04, "2" )
 	PORT_CONFSETTING(    0x08, "3" )
@@ -1504,6 +1504,17 @@ MACHINE_CONFIG_END
 
 WRITE16_MEMBER(hh_tms1k_state::ssimon_write_r)
 {
+	// R0-R3,R9,R10: input mux
+	m_inp_mux = (data & 0xf) | (data >> 5 & 0x30);
+	
+	// R4: yellow lamps
+	// R5: green lamps
+	// R6: blue lamps
+	// R7: red lamps
+	display_matrix(4, 1, data >> 4, 1);
+	
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
 }
 
 WRITE16_MEMBER(hh_tms1k_state::ssimon_write_o)
@@ -1513,18 +1524,62 @@ WRITE16_MEMBER(hh_tms1k_state::ssimon_write_o)
 
 READ8_MEMBER(hh_tms1k_state::ssimon_read_k)
 {
-	return 0;
+	return read_inputs(6);
 }
 
 
 static INPUT_PORTS_START( ssimon )
+	PORT_START("IN.0") // R0
+	PORT_CONFNAME( 0x0f, 0x01, "Game Select")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFSETTING(    0x08, "4" )
+	PORT_CONFSETTING(    0x00, "5" )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Yellow Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Green Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Blue Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Red Button")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Last")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Longest")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Decision")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Yellow Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Green Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Blue Button")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Red Button")
+
+	PORT_START("IN.4") // R9
+	PORT_CONFNAME( 0x0f, 0x02, "Skill Level")
+	PORT_CONFSETTING(    0x00, "Head-to-Head" ) // this sets R10 K2, see below
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+	PORT_CONFSETTING(    0x08, "3" )
+	PORT_CONFSETTING(    0x01, "4" )
+
+	PORT_START("IN.5") // R10
+	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x02, 0x00, IPT_SPECIAL ) PORT_CONDITION("IN.4", 0x0f, NOTEQUALS, 0x00)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // fake
+	PORT_CONFNAME( 0x03, 0x00, "Speed" ) //PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, ssimon_speed_switch, NULL)
+	PORT_CONFSETTING(    0x00, "Simple" )
+	PORT_CONFSETTING(    0x01, "Normal" )
+	PORT_CONFSETTING(    0x02, "Super" )
 INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( ssimon, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // x
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // x
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ssimon_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ssimon_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ssimon_write_o))
