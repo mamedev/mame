@@ -73,6 +73,22 @@
 // Huge thanks to Dave Mabry for dumping IOC firmware, KB firmware and character generator. This driver would not
 // exist without his dumps.
 // (https://web.archive.org/web/20080509062332/http://www.s100-manuals.com/intel/IOC_iMDX_511_Upgrade.zip)
+//
+// Basic usage / test info:
+// To use the system set DIP switches to:
+// Floppy present
+// IOC mode Diagnostic
+// Keyboard present
+// and reset the system. The built-in diagnostic mode should start.
+//
+// Another test is loading ISIS-II (the Intel OS for this system). Floppy image
+// 9500007-07_ISIS-II_OPERATING_SYSTEM_DISKETTE_Ver_4.3.IMD
+// To load it, the "IOC mode" should be set to "On line", the floppy image
+// should be mounted and the system reset. After a few seconds the ISIS-II
+// prompt should appear. A command that could be tried is "DIR" that lists
+// the content of floppy disk.
+// Please note that the message "FAILURE -- PIO NOT RESPONDING" is normal
+// as the support for PIO isn't implemented yet
 
 #include "includes/imds2.h"
 
