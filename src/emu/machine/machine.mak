@@ -1369,7 +1369,7 @@ endif
 
 #-------------------------------------------------
 #
-#@src/emu/machine/64h156.h,MACHINES += RP5C15
+#@src/emu/machine/64h156.h,MACHINES += R64H156
 #-------------------------------------------------
 
 ifneq ($(filter R64H156,$(MACHINES)),)
