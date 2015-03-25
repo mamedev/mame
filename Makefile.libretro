@@ -249,7 +249,7 @@ else ifeq ($(platform), ios)
 	LD = $(CC) -stdlib=$(LIBCXX)
 	LDFLAGS +=  $(fpic) $(SHARED)
 	LDFLAGSEMULATOR += -stdlib=$(LIBCXX)
-	PLATCFLAGS += -marm -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
+	PLATCFLAGS += -mfloat-abi=softfp -marm -DSDLMAME_NO64BITIO -DIOS -DSDLMAME_ARM -DHAVE_POSIX_MEMALIGN
 	CCOMFLAGS += $(PLATCFLAGS)
 ## QNX
 else ifeq ($(platform), qnx)
