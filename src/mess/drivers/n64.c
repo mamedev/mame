@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	MCFG_GENERIC_LOAD(n64_mess_state, n64_cart)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","n64")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "n64")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( n64dd, n64 )
@@ -354,6 +354,9 @@ static MACHINE_CONFIG_DERIVED( n64dd, n64 )
 	MCFG_GENERIC_LOAD(n64_mess_state, n64_cart)
 
 	MCFG_QUICKLOAD_ADD("quickload", n64_mess_state, n64dd, "bin,dsk", 0)
+	MCFG_QUICKLOAD_INTERFACE("n64dd_disk")
+
+	MCFG_SOFTWARE_LIST_ADD("dd_list", "n64dd")
 MACHINE_CONFIG_END
 
 ROM_START( n64 )
