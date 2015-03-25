@@ -2012,7 +2012,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 	}
 
 	// exiting VBL, handle interrupts and DMA triggers
-	if (scanline == 224)
+	if (scanline == 160)
 	{
 		// FIXME: some games are very picky with this trigger!
 		// * Mario & Luigi SuperStar Saga loses pieces of gfx for 225-227.
