@@ -293,14 +293,14 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
+		
 	}
 	else if (m_spritesinit == 2)
 	{
 	//	printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
-
+		
 		m_spritesinit = 0;
-
 	}
 	else
 	{
@@ -337,14 +337,16 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 					UINT8 data;
 
 					data = (src[(m_spritesaddr * 2) + 1]);
-
-					if (data)
+					//data |= vram[offset] >> 8;
+				
+					/* bit 1 actually enables transparent pen */
+					if (data || (m_port10 & 2) == 0)
 						vram[offset] = (vram[offset] & 0x00ff) | data << 8;
 
-
 					data = src[(m_spritesaddr * 2)];
+					//data |= vram[offset] & 0xff;
 
-					if (data)
+					if (data || (m_port10 & 2) == 0)
 						vram[offset] = (vram[offset] & 0xff00) | data;
 
 
