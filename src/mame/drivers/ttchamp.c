@@ -90,6 +90,7 @@ public:
 
 
 	UINT16 m_port10;
+	UINT8 m_rombank;
 
 	DECLARE_DRIVER_INIT(ttchamp);
 
@@ -101,7 +102,6 @@ public:
 	UINT16 m_videoram0[0x10000 / 2];
 //	UINT16 m_videoram1[0x10000 / 2];
 	UINT16 m_videoram2[0x10000 / 2];
-
 
 
 
@@ -299,8 +299,9 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 	{
 	//	printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
+		//printf("%08x\n",(offset*2) & 0xfff00);
 		
-		m_spritesinit = 0;
+		m_spritesinit = 3;
 	}
 	else
 	{
@@ -314,12 +315,20 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 		}
 		else if ((offset >= 0x30000 / 2) && (offset < 0x40000 / 2))
 		{
+			if(m_spritesinit != 3)
+			{
+				printf("blitter bus write but blitter unselected? %08x %04x\n",offset*2,data);
+				return;
+			}
+			
+			m_spritesinit = 0;
+
 			// 0x30000-0x3ffff used, on Spider it's 0x20000-0x2ffff
 			offset &= 0x7fff;
 
 			UINT8 *src = m_rom8;
 
-			if (m_port10 & 2) // NO, wrong for the portraits
+			if (m_rombank)
 				src += 0x100000;
 
 		//	printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", space.device().safe_pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
@@ -371,8 +380,10 @@ static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(ttchamp_mem_r, ttchamp_mem_w)
 ADDRESS_MAP_END
 
+/* Re-use same parameters as before (one-shot) */
 READ16_MEMBER(ttchamp_state::port1e_r)
 {
+	m_spritesinit = 3;
 	return 0xff;
 }
 
@@ -401,26 +412,22 @@ WRITE16_MEMBER(ttchamp_state::port10_w)
 		printf("Check me, i/o 0x10 used with %02x\n",res);
 }
 
+/* selects upper bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port20_w)
 {
 	printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
-	// seems to somehow be tied to layer clear
-	// might also depend on layer selected with 0x10 tho? written after it
-	/*for (int i = 0; i < 0x8000; i++)
-	{
-	//	m_videoram0[i] = 0x0000;
-		m_videoram2[i] = 0x0000;
-	}*/
-
+	m_rombank = 1;
 }
 
+/* selects lower bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port62_w)
 {
 	printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	m_rombank = 0;
 }
 
 static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITENOP // startup only
+	AM_RANGE(0x0000, 0x0001) AM_WRITENOP // startup only, nmi enable?
 
 	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
