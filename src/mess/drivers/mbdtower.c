@@ -92,7 +92,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 		
 		// give it some time to spin out when it's turned off
 		if (m_r & 0x200)
-			m_motor_decay += (m_motor_decay < 6);
+			m_motor_decay += (m_motor_decay < 4);
 		else if (m_motor_decay > 0)
 			m_motor_decay--;
 		else
@@ -112,11 +112,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 	
 	/* 3 display cards per hole, like this:
 	
-	    (0)                <---- display increments this way <----                    (7)
+	    (0)                <---- display increments this way <----                   (7)
 
-	    VICTORY    WIZARD         DRAGON    GOLD KEY     SCOUT    WARRIOR   (void)    CURSED
-	    WARRIORS   BAZAAR CLOSED  SWORD     SILVER KEY   HEALER   FOOD      (void)    LOST
-	    BRIGANDS   KEY MISSING    PEGASUS   BRASS KEY    GOLD     BEAST     (void)    PLAGUE
+	    CURSED   VICTORY    WIZARD         DRAGON    GOLD KEY     SCOUT    WARRIOR   (void)    
+	    LOST     WARRIORS   BAZAAR CLOSED  SWORD     SILVER KEY   HEALER   FOOD      (void)    
+	    PLAGUE   BRIGANDS   KEY MISSING    PEGASUS   BRASS KEY    GOLD     BEAST     (void)    
 	*/
 	int card_pos = m_motor_pos >> 4 & 7;
 	if (card_pos != (m_motor_pos_prev >> 4 & 7))
@@ -281,4 +281,4 @@ ROM_START( mbdtower )
 ROM_END
 
 
-CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL | GAME_NOT_WORKING )
+CONS( 1981, mbdtower, 0, 0, mbdtower, mbdtower, driver_device, 0, "Milton Bradley", "Dark Tower (Milton Bradley)", GAME_SUPPORTS_SAVE | GAME_MECHANICAL )
