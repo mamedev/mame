@@ -511,6 +511,7 @@ private:
 	UINT64 get_cop2_creg(int idx);
 	void set_cop2_creg(int idx, UINT64 val);
 	void handle_cop2(UINT32 op);
+	void handle_integer_divide_by_zero(UINT32 op);
 	void lwl_be(UINT32 op);
 	void lwr_be(UINT32 op);
 	void ldl_be(UINT32 op);
@@ -756,6 +757,7 @@ private:
 #define MIPS3DRC_STRICT_COP2        0x0008          /* validate all COP2 instructions */
 #define MIPS3DRC_FLUSH_PC           0x0010          /* flush the PC value before each memory access */
 #define MIPS3DRC_CHECK_OVERFLOWS    0x0020          /* actually check overflows on add/sub instructions */
+#define MIPS3DRC_ACCURATE_DIVZERO   0x0040          /* load correct values into HI/LO on integer divide-by-zero */
 
 #define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)

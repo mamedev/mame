@@ -2054,15 +2054,79 @@ int mips3_device::generate_special(drcuml_block *block, compiler_state *compiler
 			return TRUE;
 
 		case 0x1a:  /* DIV - MIPS I */
-			UML_DIVS(block, I0, I1, R32(RSREG), R32(RTREG));                // divs    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT(block, LO64, I0, SIZE_DWORD);                                 // dsext   lo,i0,dword
-			UML_DSEXT(block, HI64, I1, SIZE_DWORD);                                 // dsext   hi,i1,dword
+		{
+			if (m_drcoptions & MIPS3DRC_ACCURATE_DIVZERO)
+			{
+				code_label divzero, done;
+
+				UML_CMP(block, R32(RTREG), 0);                                      // cmp     <rtreg>, 0
+				UML_JMPc(block, COND_E, divzero = compiler->labelnum++);			// jmp     divzero,E
+
+				UML_DIVS(block, I0, I1, R32(RSREG), R32(RTREG));                    // divs    i0,i1,<rsreg>,<rtreg>
+				UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+				UML_DSEXT(block, HI64, I1, SIZE_DWORD);                             // dsext   hi,i1,dword
+				UML_JMP(block, done = compiler->labelnum++);                        // jmp     done
+
+				UML_LABEL(block, divzero);                                          // divzero:
+				if (m_flavor != MIPS3_TYPE_VR4300)
+				{
+					UML_MOVc(block, COND_L, I0, 0x00000001);                        // mov     i0,0x00000001,L
+					UML_MOVc(block, COND_GE, I0, 0xffffffff);                       // mov     i0,0xffffffff,GE
+				}
+				else
+				{
+					UML_MOVc(block, COND_L, I0, 0x80000001);                        // mov     i0,0x80000001,L
+					UML_MOVc(block, COND_GE, I0, 0x7fffffff);                       // mov     i0,0x7fffffff,GE
+				}
+				UML_DSEXT(block, HI64, R32(RSREG), SIZE_DWORD);                     // dsext   hi,<rsreg>,dword
+				UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+
+				UML_LABEL(block, done);                                             // done:
+			}
+			else
+			{
+				UML_DIVS(block, I0, I1, R32(RSREG), R32(RTREG));                    // divs    i0,i1,<rsreg>,<rtreg>
+				UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+				UML_DSEXT(block, HI64, I1, SIZE_DWORD);                             // dsext   hi,i1,dword
+			}
 			return TRUE;
+		}
 
 		case 0x1b:  /* DIVU - MIPS I */
-			UML_DIVU(block, I0, I1, R32(RSREG), R32(RTREG));                // divu    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT(block, LO64, I0, SIZE_DWORD);                                 // dsext   lo,i0,dword
-			UML_DSEXT(block, HI64, I1, SIZE_DWORD);                                 // dsext   hi,i1,dword
+			if (m_drcoptions & MIPS3DRC_ACCURATE_DIVZERO)
+			{
+				code_label divzero, done;
+
+				UML_CMP(block, R32(RTREG), 0);                                      // cmp     <rtreg>, 0
+				UML_JMPc(block, COND_E, divzero = compiler->labelnum++);			// jmp     divzero,E
+
+				UML_DIVU(block, I0, I1, R32(RSREG), R32(RTREG));                    // divu    i0,i1,<rsreg>,<rtreg>
+				UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+				UML_DSEXT(block, HI64, I1, SIZE_DWORD);                             // dsext   hi,i1,dword
+				UML_JMP(block, done = compiler->labelnum++);                        // jmp     done
+
+				UML_LABEL(block, divzero);                                          // divzero:
+				if (m_flavor != MIPS3_TYPE_VR4300)
+				{
+					UML_MOVc(block, COND_L, I0, 0x00000001);                        // mov     i0,0x00000001,L
+					UML_MOVc(block, COND_GE, I0, 0xffffffff);                       // mov     i0,0xffffffff,GE
+				}
+				else
+				{
+					UML_MOVc(block, COND_L, I0, 0x80000001);                        // mov     i0,0x80000001,L
+					UML_MOVc(block, COND_GE, I0, 0x7fffffff);                       // mov     i0,0x7fffffff,GE
+				}
+				UML_DSEXT(block, HI64, R32(RSREG), SIZE_DWORD);                     // dsext   hi,<rsreg>,dword
+				UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+
+				UML_LABEL(block, done);                                             // done:
+			}
+			else
+			{
+				UML_DIVU(block, I0, I1, R32(RSREG), R32(RTREG));                    // divu    i0,i1,<rsreg>,<rtreg>
+				UML_DSEXT(block, LO64, I0, SIZE_DWORD);                             // dsext   lo,i0,dword
+				UML_DSEXT(block, HI64, I1, SIZE_DWORD);                             // dsext   hi,i1,dword
+			}
 			return TRUE;
 
 		case 0x1e:  /* DDIV - MIPS III */
