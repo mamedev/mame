@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <new>
+#include <assert.h>
 #include "coretmpl.h"
 #include "aviio.h"
 #include "avhuff.h"

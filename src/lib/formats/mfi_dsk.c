@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#include "emu.h"
+#include <assert.h>
+
 #include "mfi_dsk.h"
 #include <zlib.h>
 

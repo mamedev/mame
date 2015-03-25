@@ -4,7 +4,8 @@
 What is it?
 -----------
 
-Cross-platform rendering library.
+Cross-platform, graphics API agnostic, "Bring Your Own Engine/Framework" style
+rendering library.
 
 Supported rendering backends:
 
@@ -319,18 +320,27 @@ Building
 Steps bellow are for default build system inside bgfx repository. There is
 alterative way to build bgfx and examples with [fips](https://github.com/floooh/fips-bgfx/#fips-bgfx).
 
-### Prerequisites
-
-Windows users download GnuWin32 utilities from:  
-[http://gnuwin32.sourceforge.net/packages/make.htm](http://gnuwin32.sourceforge.net/packages/make.htm)  
-[http://gnuwin32.sourceforge.net/packages/coreutils.htm](http://gnuwin32.sourceforge.net/packages/coreutils.htm)  
-[http://gnuwin32.sourceforge.net/packages/libiconv.htm](http://gnuwin32.sourceforge.net/packages/libiconv.htm)  
-[http://gnuwin32.sourceforge.net/packages/libintl.htm](http://gnuwin32.sourceforge.net/packages/libintl.htm)
-
 ### Getting source
 
 	git clone git://github.com/bkaradzic/bx.git
 	git clone git://github.com/bkaradzic/bgfx.git
+
+### Quick start (Windows with Visual Studio)
+
+Enter bgfx directory:
+
+	cd bgfx
+
+Generate Visual Studio 2013 project files:
+
+	..\bx\tools\bin\windows\genie vs2013
+
+Open bgfx solution in Visual Studio 2013:
+
+	start .build\projects\vs2013\bgfx.sln
+
+### Generating project files for all targets
+
 	cd bgfx
 	make
 
@@ -360,6 +370,12 @@ Download Native Client SDK from:
 	setx NACL_SDK_ROOT <path to Native Client SDK directory>
 
 ### Prerequisites for Windows
+
+Windows users download GnuWin32 utilities from:  
+[http://gnuwin32.sourceforge.net/packages/make.htm](http://gnuwin32.sourceforge.net/packages/make.htm)  
+[http://gnuwin32.sourceforge.net/packages/coreutils.htm](http://gnuwin32.sourceforge.net/packages/coreutils.htm)  
+[http://gnuwin32.sourceforge.net/packages/libiconv.htm](http://gnuwin32.sourceforge.net/packages/libiconv.htm)  
+[http://gnuwin32.sourceforge.net/packages/libintl.htm](http://gnuwin32.sourceforge.net/packages/libintl.htm)
 
 When building on Windows, you have to set DXSDK_DIR environment variable to
 point to DirectX SDK directory.

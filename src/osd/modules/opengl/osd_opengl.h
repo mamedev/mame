@@ -89,16 +89,25 @@
 	#define OSD_GL(ret,func,params) ret (APIENTRY *func) params;
 	#define OSD_GL_UNUSED(ret,func,params)
 
-	struct osd_gl_dispatch
-	{
-		#define GET_GLFUNC 1
-		#include "osd_opengl.h"
-		#undef GET_GLFUNC
-	};
+#ifdef _MSC_VER
+	extern "C" {
+#endif
+		struct osd_gl_dispatch
+		{
+			#define GET_GLFUNC 1
+			#include "osd_opengl.h"
+			#undef GET_GLFUNC
+		};
+#ifdef _MSC_VER
+ 	}
+#endif
 
 	#undef OSD_GL
 	#undef OSD_GL_UNUSED
 
+#ifdef _MSC_VER
+	extern "C" osd_gl_dispatch *gl_dispatch;
+#endif
 	extern osd_gl_dispatch *gl_dispatch;
 
 	/*

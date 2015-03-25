@@ -8,8 +8,9 @@
 
 ***************************************************************************/
 
-#include "flac.h"
 #include <assert.h>
+
+#include "flac.h"
 #include <new>
 
 

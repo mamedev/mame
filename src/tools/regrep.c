@@ -11,6 +11,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <new>
+#include <assert.h>
 #include "osdcore.h"
 #include "png.h"
 

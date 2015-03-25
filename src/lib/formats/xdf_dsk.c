@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/xdf_dsk.h"
 
 xdf_format::xdf_format() : upd765_format(formats)

@@ -2483,26 +2483,41 @@ render_target *render_manager::target_by_index(int index) const
 //  fonts
 //-------------------------------------------------
 
-float render_manager::ui_aspect()
+float render_manager::ui_aspect(render_container *rc)
 {
-	int orient = orientation_add(m_ui_target->orientation(), m_ui_container->orientation());
+	int orient = 0;
+	float aspect = 1.0f;
 
-	// based on the orientation of the target, compute height/width or width/height
-	float aspect;
-	if (!(orient & ORIENTATION_SWAP_XY))
-		aspect = (float)m_ui_target->height() / (float)m_ui_target->width();
-	else
-		aspect = (float)m_ui_target->width() / (float)m_ui_target->height();
+	if (rc == m_ui_container || rc == NULL) {
+		// ui container, aggregated multi-screen target
 
-	// if we have a valid pixel aspect, apply that and return
-	if (m_ui_target->pixel_aspect() != 0.0f)
-		return aspect / m_ui_target->pixel_aspect();
+		orient = orientation_add(m_ui_target->orientation(), m_ui_container->orientation());
+		// based on the orientation of the target, compute height/width or width/height
+		if (!(orient & ORIENTATION_SWAP_XY))
+			   aspect = (float)m_ui_target->height() / (float)m_ui_target->width();
+		else
+			   aspect = (float)m_ui_target->width() / (float)m_ui_target->height();
 
-	// if not, clamp for extreme proportions
+		// if we have a valid pixel aspect, apply that and return
+		if (m_ui_target->pixel_aspect() != 0.0f)
+			   return (aspect / m_ui_target->pixel_aspect());
+	} else {
+		// single screen container
+
+		orient = rc->orientation();
+		// based on the orientation of the target, compute height/width or width/height
+		if (!(orient & ORIENTATION_SWAP_XY))
+			aspect = (float)rc->screen()->visible_area().height() / (float)rc->screen()->visible_area().width();
+		else
+			aspect = (float)rc->screen()->visible_area().width() / (float)rc->screen()->visible_area().height();
+	}
+
+	// clamp for extreme proportions
 	if (aspect < 0.66f)
 		aspect = 0.66f;
 	if (aspect > 1.5f)
 		aspect = 1.5f;
+
 	return aspect;
 }
 

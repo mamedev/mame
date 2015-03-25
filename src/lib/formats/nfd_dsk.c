@@ -77,7 +77,8 @@
 
  *********************************************************************/
 
-#include "emu.h"
+ #include <assert.h>
+ 
 #include "nfd_dsk.h"
 
 nfd_format::nfd_format()

@@ -83,9 +83,9 @@ void seta001_device::device_start()
 	m_colorbase = 0;
 	m_spritelimit = 0x1ff;
 
-	m_bankcallback = NULL;
-
 	m_bgflag = 0x00;
+	
+	m_gfxbank_cb.bind_relative_to(*owner());
 
 	save_item(NAME(m_bgflag));
 	save_item(NAME(m_spritectrl));
@@ -237,7 +237,7 @@ void seta001_device::draw_background( bitmap_ind16 &bitmap, const rectangle &cli
 	int max_y   =   0xf0;
 
 	// HACKS
-	// used in conjuntion with setac_type
+	// used in conjunction with setac_type
 	int col0;       /* Kludge, needed for krzybowl and kiwame */
 	switch (ctrl & 0x0f)
 	{
@@ -372,7 +372,7 @@ void seta001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitma
 		flipx = ctrl_pointer[i] & 0x80;
 		flipy = ctrl_pointer[i] & 0x40;
 
-		if (m_bankcallback) code = m_bankcallback(machine(), code, color_pointer[i]);
+		if (!m_gfxbank_cb.isnull()) code = m_gfxbank_cb(code, color_pointer[i]);
 
 		color %= total_color_codes;
 

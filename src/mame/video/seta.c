@@ -523,7 +523,7 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 	m_tilemap_1->set_transparent_pen(0);
 }
 
-int setac_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
+SETA001_SPRITE_GFXBANK_CB_MEMBER(seta_state::setac_gfxbank_callback)
 {
 	int bank    =   (color & 0x06) >> 1;
 	code = (code & 0x3fff) + (bank * 0x4000);
@@ -549,10 +549,6 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 	// position kludges
 	m_seta001->set_fg_xoffsets(m_global_offsets->sprite_offs[1], m_global_offsets->sprite_offs[0]);
 	m_seta001->set_fg_yoffsets( -0x0a, 0x0e );
-
-	// banking
-	m_seta001->set_gfxbank_callback( setac_gfxbank_callback );
-
 }
 
 

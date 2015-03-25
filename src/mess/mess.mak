@@ -1335,6 +1335,7 @@ $(MESSOBJ)/intel.a:             \
 	$(MESS_DRIVERS)/rex6000.o   \
 	$(MESS_DRIVERS)/sdk85.o     \
 	$(MESS_DRIVERS)/sdk86.o     \
+        $(MESS_DRIVERS)/imds2.o     \
 
 $(MESSOBJ)/imp.a:               \
 	$(MESS_DRIVERS)/tim011.o    \
@@ -1383,6 +1384,7 @@ $(MESSOBJ)/matsushi.a:          \
 	$(MESS_DRIVERS)/myb3k.o     \
 
 $(MESSOBJ)/mb.a:                \
+	$(MESS_DRIVERS)/mbdtower.o  \
 	$(MESS_DRIVERS)/microvsn.o  \
 
 $(MESSOBJ)/mchester.a:          \
@@ -1477,6 +1479,7 @@ $(MESSOBJ)/novag.a:             \
 $(MESSOBJ)/olivetti.a:          \
 	$(MESS_DRIVERS)/m20.o       \
 	$(MESS_DRIVERS)/m24.o       \
+	$(MESS_MACHINE)/m24_kbd.o   \
 
 $(MESSOBJ)/omnibyte.a:          \
 	$(MESS_DRIVERS)/msbc1.o     \
@@ -2138,11 +2141,13 @@ $(MESS_DRIVERS)/hh_tms1k.o: $(MESS_LAYOUT)/amaztron.lh \
                             $(MESS_LAYOUT)/cnsector.lh \
                             $(MESS_LAYOUT)/comp4.lh \
                             $(MESS_LAYOUT)/ebball.lh \
+                            $(MESS_LAYOUT)/ebball2.lh \
                             $(MESS_LAYOUT)/ebball3.lh \
                             $(MESS_LAYOUT)/elecdet.lh \
                             $(MESS_LAYOUT)/mathmagi.lh \
                             $(MESS_LAYOUT)/merlin.lh \
                             $(MESS_LAYOUT)/simon.lh \
+                            $(MESS_LAYOUT)/ssimon.lh \
                             $(MESS_LAYOUT)/splitsec.lh \
                             $(MESS_LAYOUT)/starwbc.lh \
                             $(MESS_LAYOUT)/stopthie.lh \
@@ -2158,6 +2163,7 @@ $(MESS_DRIVERS)/lc80.o:     $(MESS_LAYOUT)/lc80.lh
 $(MESS_DRIVERS)/llc.o:      $(MESS_LAYOUT)/llc1.lh
 $(MESS_DRIVERS)/lynx.o:     $(MESS_LAYOUT)/lynx.lh
 $(MESS_DRIVERS)/mac.o:      $(MESS_LAYOUT)/mac.lh
+$(MESS_DRIVERS)/mbdtower.o: $(MESS_LAYOUT)/mbdtower.lh
 $(MESS_MACHINE)/megacd.o:   $(MESS_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh

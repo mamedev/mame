@@ -7,8 +7,8 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
-#include "emu.h"
 #include "imageutl.h"
 #include "flopimg.h"
 
@@ -264,7 +264,6 @@ FLOPPY_CONSTRUCT( dsk_dsk_construct )
 	return FLOPPY_ERROR_SUCCESS;
 }
 
-#include "emu.h"
 #include "dsk_dsk.h"
 
 #define DSK_FORMAT_HEADER   "MV - CPC"

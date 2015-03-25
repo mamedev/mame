@@ -3,6 +3,8 @@
     Tape support for Orao  TAP format
 
 */
+#include <assert.h>
+
 #include "orao_cas.h"
 
 

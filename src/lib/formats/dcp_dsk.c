@@ -20,7 +20,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "dcp_dsk.h"
 
 dcp_format::dcp_format()

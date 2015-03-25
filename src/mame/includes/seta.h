@@ -234,4 +234,5 @@ public:
 	void uPD71054_timer_init(  );
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(utoukond_ym3438_interrupt);
+	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 };

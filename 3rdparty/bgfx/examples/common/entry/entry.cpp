@@ -60,15 +60,17 @@ namespace entry
 
 		switch (_key)
 		{
-		case Key::Esc:       { return 0x1b; } break;
-		case Key::Return:    { return 0x0d; } break;
-		case Key::Tab:       { return 0x09; } break;
-		case Key::Space:     { return 0xa0; } break;
-		case Key::Backspace: { return 0x08; } break;
-		case Key::Plus:      { return 0x2b; } break;
-		case Key::Minus:     { return 0x2d; } break;
-		default:        { return '\0'; } break;
+		case Key::Esc:       return 0x1b;
+		case Key::Return:    return '\n';
+		case Key::Tab:       return '\t';
+		case Key::Space:     return ' ';
+		case Key::Backspace: return 0x08;
+		case Key::Plus:      return '+';
+		case Key::Minus:     return '-';
+		default:             break;
 		}
+
+		return '\0';
 	}
 
 	bool setOrToggle(uint32_t& _flags, const char* _name, uint32_t _bit, int _first, int _argc, char const* const* _argv)

@@ -436,6 +436,11 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(thedeep_state, thedeep)
 
+	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	deco_mxc06_device::set_gfx_region(*device, 0);
+	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	MCFG_DECO_MXC06_PALETTE("palette")
+	MCFG_DECO_MXC06_RAMSIZE(0x400)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

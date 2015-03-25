@@ -59,6 +59,36 @@ enum
 };
 
 
+// pinout reference
+
+/*
+            _______   _______
+    CL1  1 |*      \_/       | 42 CL0
+    PC0  2 |                 | 41 Vgg
+    PC1  3 |                 | 40 PB3
+    PC2  4 |                 | 39 PB2
+    PC3  5 |                 | 38 PB1
+   /INT  6 |                 | 37 PB0
+  RESET  7 |                 | 36 PA3
+    PD0  8 |                 | 35 PA2
+    PD1  9 |     uPD552      | 34 PA1
+    PD2 10 |     uPD553      | 33 PA0
+    PD3 11 |     uPD650*     | 32 PI2
+    PE0 12 |                 | 31 PI1
+    PE1 13 |                 | 30 PI0
+    PE2 14 |                 | 29 PH3
+    PE3 15 |                 | 28 PH2
+    PF0 16 |                 | 27 PH1
+    PF1 17 |                 | 26 PH0
+    PF2 18 |                 | 25 PG3
+    PF3 19 |                 | 24 PG2
+   TEST 20 |                 | 23 PG1
+    Vss 21 |_________________| 22 PG0
+
+  *: pin 21 is Vcc, pin 41 is Vss
+
+*/
+
 
 class ucom4_cpu_device : public cpu_device
 {

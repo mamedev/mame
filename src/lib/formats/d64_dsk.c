@@ -10,7 +10,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror, fatalerror
 #include "formats/d64_dsk.h"
 
 d64_format::d64_format()
@@ -167,7 +167,7 @@ floppy_image_format_t::desc_e* d64_format::get_sector_desc(const format &f, int 
 	return desc;
 }
 
-void d64_format::build_sector_description(const format &f, UINT8 *sectdata, offs_t sect_offs, offs_t error_offs, desc_s *sectors, int sector_count) const
+void d64_format::build_sector_description(const format &f, UINT8 *sectdata, UINT32 sect_offs, UINT32 error_offs, desc_s *sectors, int sector_count) const
 {
 	for (int i = 0; i < sector_count; i++) {
 		sectors[i].data = sectdata + sect_offs;

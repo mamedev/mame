@@ -130,7 +130,7 @@ lua_engine::hook::hook()
 	cb = -1;
 }
 
-#ifdef SDLMAME_SOLARIS
+#if defined(SDLMAME_SOLARIS) || defined(__ANDROID__)
 #undef _L
 #endif
 
@@ -639,11 +639,13 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 7), 7, "outline color (integer) expected");
 
 	// retrieve all parameters
+	int sc_width = sc->visible_area().width();
+	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
-	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
-	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->visible_area().width()) , 1.0f);
-	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->visible_area().height()), 1.0f);
+	x1 = MIN(MAX(0, lua_tointeger(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	y1 = MIN(MAX(0, lua_tointeger(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	x2 = MIN(MAX(0, lua_tointeger(L, 4)), sc_width-1) / static_cast<float>(sc_width);
+	y2 = MIN(MAX(0, lua_tointeger(L, 5)), sc_height-1) / static_cast<float>(sc_height);
 	UINT32 bgcolor = lua_tounsigned(L, 6);
 	UINT32 fgcolor = lua_tounsigned(L, 7);
 
@@ -675,11 +677,13 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 6), 6, "color (integer) expected");
 
 	// retrieve all parameters
+	int sc_width = sc->visible_area().width();
+	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
-	y1 = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
-	x2 = MIN(lua_tounsigned(L, 4) / static_cast<float>(sc->visible_area().width()) , 1.0f);
-	y2 = MIN(lua_tounsigned(L, 5) / static_cast<float>(sc->visible_area().height()), 1.0f);
+	x1 = MIN(MAX(0, lua_tointeger(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	y1 = MIN(MAX(0, lua_tointeger(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	x2 = MIN(MAX(0, lua_tointeger(L, 4)), sc_width-1) / static_cast<float>(sc_width);
+	y2 = MIN(MAX(0, lua_tointeger(L, 5)), sc_height-1) / static_cast<float>(sc_height);
 	UINT32 color = lua_tounsigned(L, 6);
 
 	// draw the line
@@ -705,8 +709,10 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
 
 	// retrieve all parameters
-	float x = MIN(lua_tounsigned(L, 2) / static_cast<float>(sc->visible_area().width()) , 1.0f);
-	float y = MIN(lua_tounsigned(L, 3) / static_cast<float>(sc->visible_area().height()), 1.0f);
+	int sc_width = sc->visible_area().width();
+	int sc_height = sc->visible_area().height();
+	float x = MIN(MAX(0, lua_tointeger(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	float y = MIN(MAX(0, lua_tointeger(L, 3)), sc_height-1) / static_cast<float>(sc_height);
 	const char *msg = luaL_checkstring(L,4);
 	// TODO: add optional parameters (colors, etc.)
 

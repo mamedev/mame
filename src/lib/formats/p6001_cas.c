@@ -2,6 +2,8 @@
  * NEC PC-6001 cassette format handling
  */
 
+#include <assert.h>
+
 #include "p6001_cas.h"
 
 #define WAVE_HIGH        0x5a9e

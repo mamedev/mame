@@ -97,7 +97,7 @@
                                        zone.
 */
 
-#include "emu.h"
+#include "emu.h" // logerror, BIT, emu_fatalerror
 #include "formats/victor9k_dsk.h"
 
 victor9k_format::victor9k_format()
@@ -237,7 +237,7 @@ floppy_image_format_t::desc_e* victor9k_format::get_sector_desc(const format &f,
 	return desc;
 }
 
-void victor9k_format::build_sector_description(const format &f, UINT8 *sectdata, offs_t sect_offs, desc_s *sectors, int sector_count) const
+void victor9k_format::build_sector_description(const format &f, UINT8 *sectdata, UINT32 sect_offs, desc_s *sectors, int sector_count) const
 {
 	for (int i = 0; i < sector_count; i++) {
 		sectors[i].data = sectdata + sect_offs;

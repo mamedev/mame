@@ -27,11 +27,11 @@
 
   - Reworked inputs to match the standard poker inputs names/layout.
   - Hooked the payout switch.
-  - Hooked a watchdog circuitery, that seems intended to reset
+  - Hooked a watchdog circuitry, that seems intended to reset
      the game and/or an external device.
   - Added machine start & reset.
   - All clocks pre defined.
-  - Added ay8910 interfase as a preliminary attempt to analyze the unknown
+  - Added ay8910 interface as a preliminary attempt to analyze the unknown
      port writes when these ports are set as input.
   - Figured out the following DIP switches:
      Auto Bet (No, Yes).
@@ -72,18 +72,24 @@ class supdrapo_state : public driver_device
 public:
 	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_col_line(*this, "col_line"),
-		m_videoram(*this, "videoram"),
-		m_char_bank(*this, "char_bank"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_col_line(*this, "col_line"),
+		m_videoram(*this, "videoram"),
+		m_char_bank(*this, "char_bank") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	
 	required_shared_ptr<UINT8> m_col_line;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_char_bank;
+	
 	UINT8 m_wdog;
-	DECLARE_READ8_MEMBER(sdpoker_rng_r);
+	
+	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(wdog8000_w);
 	DECLARE_WRITE8_MEMBER(debug8004_w);
 	DECLARE_WRITE8_MEMBER(debug7c00_w);
@@ -91,14 +97,13 @@ public:
 	DECLARE_WRITE8_MEMBER(payout_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(supdrapo);
-	UINT32 screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -111,7 +116,7 @@ void supdrapo_state::video_start()
 }
 
 
-UINT32 supdrapo_state::screen_update_supdrapo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 	int count;
@@ -171,7 +176,7 @@ PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
                             R/W Handlers
 **********************************************************************/
 
-READ8_MEMBER(supdrapo_state::sdpoker_rng_r)
+READ8_MEMBER(supdrapo_state::rng_r)
 {
 	return machine().rand();
 }
@@ -251,6 +256,7 @@ WRITE8_MEMBER(supdrapo_state::payout_w)
 
 void supdrapo_state::machine_start()
 {
+	save_item(NAME(m_wdog));
 }
 
 
@@ -282,7 +288,7 @@ static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8, supdrapo_state )
 	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("SW1")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("SW2")
 	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
+	AM_RANGE(0x9400, 0x9400) AM_READ(rng_r)
 	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
@@ -453,7 +459,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update_supdrapo)
+	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supdrapo)
@@ -600,6 +606,6 @@ ROM_END
 **********************************************************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY                               FULLNAME                   FLAGS... */
-GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)", 0 )
-GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation / Jeutel", "Super Draw Poker (set 2)", 0 )
-GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "bootleg", "Super Draw Poker (bootleg)", 0 )
+GAME( 1983, supdrapo,  0,        supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation (Stern Electronics license)", "Super Draw Poker (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, supdrapoa, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "Valadon Automation / Jeutel", "Super Draw Poker (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, supdrapob, supdrapo, supdrapo, supdrapo, driver_device, 0,    ROT90, "bootleg", "Super Draw Poker (bootleg)", GAME_SUPPORTS_SAVE )

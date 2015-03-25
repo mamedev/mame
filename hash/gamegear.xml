@@ -648,7 +648,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="barbie">
+	<software name="barbiesm">
 		<description>Barbie Super Model (Prototype)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
@@ -3222,7 +3222,7 @@ a certain item) -->
 	</software>
 
 	<software name="hyokkohj">
-		<description>Hyokkori Hyoutanjima - Hyoutanjima no Daikoukai (Jpn)</description>
+		<description>Hyokkori Hyoutan-jima - Hyoutan-jima no Daikoukai (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3218"/>

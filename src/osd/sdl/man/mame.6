@@ -13,7 +13,7 @@
 .\" and updated by Andrew Burton <burtona@gol.com>, July 2003
 .\"
 .\"
-.TH MAME 6 2015-01-18 0.158 "MAME \- The Multiple Arcade Machine Emulator"
+.TH MAME 6 2015-03-23 0.160 "MAME \- The Multiple Arcade Machine Emulator"
 .\"
 .\"
 .\" NAME chapter
@@ -646,7 +646,7 @@ needs adjustment. This option requires a float argument in the range of
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-video\fR [\fIsoft\fR|\fIopengl\fR|\fIopengl16\fR|\fInone\fR]
+.B \-video\fR [\fIsoft\fR|\fIopengl\fR|\fInone\fR]
 Specifies which video subsystem to use for drawing:
 .br
 \fBsoft\fR  uses software rendering, which is slower but more compatible.
@@ -654,8 +654,6 @@ Specifies which video subsystem to use for drawing:
 \fBopengl\fR  uses OpenGL and your graphics accelerator to speed up many
 aspects of drawing MAME including compositing artwork, overlays, and
 bezels, as well as stretching the image to fit your screen.
-.br
-\fBopengl16\fR  uses alternate OpenGL code, which should provide faster
 output on some cards.
 .br
 \fBnone\fR  does no drawing and is intended for CPU benchmarking.

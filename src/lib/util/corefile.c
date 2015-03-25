@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <assert.h>
+
 #include "corefile.h"
 #include "unicode.h"
 #include <zlib.h>

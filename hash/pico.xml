@@ -25,8 +25,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * クッキングピコ セット - Cooking Pico Set (Sega Toys - 1999xxxx - HPC-6076)
 * スージーちゃんとマービー おてつだい だ～いすき! - Susie-chan to Mabi - Otetsudai Daisuki! (Sega Toys - 200010xx - HPC-6089)
 * パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
-* アンパンマンのはじめてマウスピコ アンパンマンとパソコンれんしゅう! <同梱> - Anpanman no Hajimete Mouse Pico with Anpanman to Pasokon renshuu! (Sega Toys - 20020124 - HPC-6102)
-* ECCジュニアの はじめてえいご Vol.3 - Happy Birthday, Patty! パティちゃんのお誕生日 - ECC Junior no Hajimete Eigo Vol. 3 - Happy Birthday, Patty! - Patty-chan no Otanjoubi (Sega Toys - 20020307 - HPC-6105)
 * ECCジュニアの はじめてえいご Vol.4 - Patty Loves Animals 動物大好き、パティちゃん - ECC Junior no Hajimete Eigo Vol. 4 - Patty Loves Animals - Doubutsu Daisuki, Patty-chan (Sega Toys - 200207xx - HPC-6106)
 * ECCジュニアの はじめてえいご Vol.5 - Merry Christmas, Patty! メリークリスマス、パティちゃん - ECC Junior no Hajimete Eigo Vol. 5 - Merry Christmas, Patty! - Merry Christmas, Patty-chan (Sega Toys - 200207xx - HPC-6107)
 * ECCジュニアの はじめてえいご Vol.6 - Patty Goes to the Amusement Park パティちゃん遊園地に行く - ECC Junior no Hajimete Eigo Vol. 6 - Patty Goes to the Amusement Park - Patty-chan Yuuenchi ni Iku (Sega Toys - 200207xx - HPC-6108)
@@ -436,6 +434,26 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="ic1" value="PICO-9516S" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pico-9516s.ic1" size="1048576" crc="68bc6c65" sha1="94d3c164524fd9b5667bcba7a6533993b673366a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anpanpc">
+		<description>Anpanman to Pasokon Renshuu! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6102"/>
+		<info name="release" value="20020124"/>
+		<info name="alt_title" value="アンパンマンのはじめてマウスピコ アンパンマンとパソコンれんしゅう! ~ Anpanman no Hajimete Mouse Pico with Anpanman to Pasokon renshuu!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-2???" />
+			<feature name="ic1" value="9K0-0050" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74" />
+			<feature name="ic4" value="HC125" />
+			<feature name="ic5" value="9K0-0003" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0050.ic1" size="2097152" crc="7080cc7a" sha1="0df483eaa1ab7d1c56b0a2ede6b385ed14393e46" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1165,8 +1183,8 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="pcb" value="9B1-0006B" />
 			<feature name="u1" value="EPOXY BLOCK U1" />
 			<feature name="u2" value="74HC00D" />
-			<dataarea name="rom" size="2097152">
-				<rom name="epoxy block u1.u1" size="2097152" crc="8e13270b" sha1="7c9e0a595cd0d53b970d8d4a1037d668c36dd103" offset="0" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="4194304">
+				<rom name="epoxy block u1.u1" size="4194304" crc="2650e0c1" sha1="2e69a43afe121ad394667fb784bc7203d9df2a12" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1182,8 +1200,25 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			<feature name="pcb" value="9B1-0005B" />
 			<feature name="u1" value="EPOXY BLOCK U1" />
 			<feature name="u2" value="74HC00D" />
-			<dataarea name="rom" size="2097152">
-				<rom name="epoxy block u1.u1" size="2097152" crc="97a5b8d7" sha1="c9c19b1c4e21e4a7f2a65cd4c810b0b7194107bf" offset="0" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="4194304">
+				<rom name="epoxy block u1.u1" size="4194304" crc="c867237a" sha1="f69cc420cc178d1efd9c76c853a9aa8d8cc24091" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecc3">
+		<description>ECC Junior no Hajimete Eigo Vol. 3 - Happy Birthday, Patty! - Patty-chan no o-Tanjoubi (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6105" />
+		<info name="release" value="20020307"/>
+		<info name="alt_title" value="ECCジュニアの はじめてえいご Vol.3 - Happy Birthday, Patty! パティちゃんのお誕生日"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="9B1-0005A" />
+			<feature name="ic1" value="9K0-0059" />
+			<feature name="ic2" value="HC00" />
+			<dataarea name="rom" size="4194304">
+				<rom name="9k0-0059.ic1" size="4194304" crc="a7faf67c" sha1="25527816ebea51395b1abf011e3784eb24662d78" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

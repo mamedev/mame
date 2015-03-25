@@ -9553,7 +9553,7 @@
 		</part>
 	</software>
 
-	<software name="dball3">
+	<software name="dball3a" cloneof="dball3">
 		<description>Dragon Ball 3 - Gokuu Den (Jpn)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
@@ -17078,7 +17078,7 @@
 	</software>
 
 	<software name="hyokkohj">
-		<description>Hyokkori Hyoutan Jima - Nazo no Kaizokusen (Jpn)</description>
+		<description>Hyokkori Hyoutan-jima - Nazo no Kaizokusen (Jpn)</description>
 		<year>1992</year>
 		<publisher>Yutaka</publisher>
 		<info name="serial" value="SHI-HV"/>
@@ -45102,6 +45102,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="dball3">
+		<description>Dragon Ball 3 - Gokuu Den (Jpn, Rev. A)</description>
+		<year>1989</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="BA-DB3"/>
+		<info name="release" value="19891027"/>
+		<info name="alt_title" value="ドラゴンボール3 悟空伝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fcg" />
+			<feature name="pcb" value="BANDAI-FCG-2" />
+			<dataarea name="prg" size="131072">
+				<rom name="dragon ball 3 - gokuu den (japan) (rev 1).prg" size="131072" crc="6c6c2feb" sha1="c53b57f311f2d0b76773afb45085c7e7d9cb156d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="dragon3-chr" size="262144" crc="c515b027" sha1="2912dc0bc88f7a0b5f7cc574c7333052bb5bd57d" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dninja" cloneof="baddudes">
 		<description>Dragon Ninja (Jpn, Rev. A)</description>
 		<year>1989</year>
@@ -45822,7 +45841,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="gegegep" cloneof="ninjakid" supported="no">
-		<description>GeGeGe no Kitarou - Youkai Dai Makyou (Jpn, Prototype)</description>
+		<description>GeGeGe no Kitarou - Youkai Daimakyou (Jpn, Prototype)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50349,6 +50368,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="0.chr" size="32768" crc="75ce915a" sha1="5dc790274ce46a56f968e898d8ec80c45ba6dc07" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wangphz">
+		<description>Wang Pai Hai Zhan (Chi)</description>
+		<year>19??</year>
+		<publisher>TCL</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="32768">
+				<rom name="[tcl] wang pai hai zhan (c).chr" size="32768" crc="4eb93fe5" sha1="8be64dcac2d5d44481f33e8759e917b3f09ab4a8" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="[tcl] wang pai hai zhan (c).prg" size="65536" crc="29648491" sha1="3b91875d887433244f2d1f3d3f56ff9abffeb8bd" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -55148,6 +55183,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="kdgsfc" supported="no">
+		<description>Kou Dai Guai Shou - Fei Cui Ban (Chi)</description>
+		<year>19??</year>
+		<publisher>Shenzen Jincota</publisher>
+		<info name="serial" value="KT-1063"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<dataarea name="prg" size="1048576">
+				<rom name="[kt-1063] kou dai guai shou - fei cui ban (c).prg" size="1048576" crc="5464d7f8" sha1="8e783d45d05e4a30db3355d8ad1ae4a2f5385530" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 16k VRAM on cartridge? -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hundunds" supported="no">
 		<description>Yong Zhe Hei An Shi Jie - Hun Dun De Shi Jie (Chi)</description>
 		<year>19??</year>
@@ -55164,6 +55220,69 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdgszs" supported="partial">
+		<description>Kou Dai Guai Shou - Zuan Shi Ban (KT-008 PCB)</description>
+		<year>19??</year>
+		<publisher>Shenzen Jincota</publisher>
+		<info name="alt_title" value="口袋怪兽 - 钻石版 ~ Pokemon Diamond"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon platinum (kt-008 pcb)(ch)[!].prg" size="1048576" crc="4d735cb1" sha1="7bdc865f0123a643cbfb7645957cf6cc0e30677e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdgszz" cloneof="kdgszs" supported="partial">
+		<description>Kou Dai Guai Shou - Zhen Zhu Ban (KT-008 PCB, Alt)</description>
+		<year>19??</year>
+		<publisher>Shenzen Jincota</publisher>
+		<info name="alt_title" value="口袋怪兽 - 珍珠版 ~ Pokemon Pearl"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon platinum alt title 1 (kt-008 pcb)(ch)[!].prg" size="1048576" crc="4f427110" sha1="d88dfadb681a61dfa36177afbec07364ed6c0011" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdgsbj" cloneof="kdgszs" supported="partial">
+		<description>Kou Dai Guai Shou - Bai jin Ban (KT-008 PCB, Alt 2)</description>
+		<year>19??</year>
+		<publisher>Shenzen Jincota</publisher>
+		<info name="alt_title" value="口袋怪兽 - 白金版 ~ Pokemon Platinum"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon platinum alt title 2 (kt-008 pcb)(ch)[!].prg" size="1048576" crc="e001de16" sha1="6d57879ec66a523882813bcc0bc69d5bc8ff0ed0" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
@@ -55931,7 +56050,29 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ040] 三国志-吕布传 ~ San Guo Zhi - Lu Bu Zhuan -->
+	<software name="sanguolv">
+		<description>San Guo Zhi - Lv Bu Zhuan (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ040"/>
+		<info name="alt_title" value="三国志-吕布传"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nanjing" />
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="2097152">
+				<rom name="[nj040] san guo zhi lv bu zhuan (c).prg" size="2097152" crc="696d98e3" sha1="e8e147af40757b1dfb7d776b7908909cd8bfd9dc" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- [NJ041] 倚天剑传奇 ~ Yi Tian Jian Chuan Ji -->
 
 	<software name="zshhzlr">
@@ -56111,7 +56252,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- [NJ052] 宠物宝宝 ~ Chong Wu Bao Bao (Pet Baby?)-->
-<!-- [NJ053] 换装人 ~ Huan Zhuang Ren [or NJ040?] -->
+
+	<software name="gardman">
+		<description>Gardman (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ053"/>
+		<info name="alt_title" value="换装人 ~ Huan Zhuang Ren (Box?)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="[nj053] gardman (c).chr" size="262144" crc="0ed7bf39" sha1="3ec7da76d3edf1085a96958159565f909181ab2b" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="[nj053] gardman (c).prg" size="262144" crc="59e52e93" sha1="b736e911328c0c9b346d2c006376321d984fbe31" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="primitiv">
 		<description>Primitive (Chi)</description>
@@ -56131,7 +56289,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ055] 原始人2 ~ Yuan Shi Ren 2 [or NJ039?] -->
+	<software name="primitv2">
+		<description>Primitive II (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ055 (or NJ039?)"/>
+		<info name="alt_title" value="原始人2 ~ Yuan Shi Ren 2 (Box?)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="[nj055] primitive ii (c).chr" size="262144" crc="1e200b6d" sha1="11709802eccb8c6fd9d9be996ccd5f04a5e8cc51" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="[nj055] primitive ii (c).prg" size="262144" crc="e98f45d7" sha1="e75613a2f553946823d38339b553d336f3c5a502" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="zeldac">
 		<description>Zelda - Shen Qi De Mao Zi (Chi)</description>
@@ -56712,7 +56886,30 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- [NJ089] 笑傲江湖群侠记 ~ Xiao Ao Jian Ghu Xia Ji -->
-<!-- [NJ090] 勇者传说 ~ Yong Zhe Chuan Shuo -->
+
+	<software name="yongzcs" supported="no">
+		<description>Yong Zhe Chuan Shuo (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ090"/>
+		<info name="alt_title" value="勇者传说"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nanjing" />
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="[nj090] yong zhe chuan shuo (c).prg" size="524288" crc="f814ec57" sha1="caa5b056c7cee9b8822647a69d2e9aa949e8e9c0" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- [NJ091] 仙剑问情 ~ Xian Jian Wen Qing -->
 <!-- [NJ092] 游戏宝贝 ~ You Xi Bao Bei -->
 <!-- [NJ093] 鹿鼎记 ~ Lu Ding Ji -->
@@ -56975,8 +57172,29 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="koudaigs" supported="partial">
-		<description>Kou Dai Guai Shou (Chi)</description>
+	<software name="koudaigs">
+		<description>Kou Dai Guai Shou (Chi, Pokemon Diamond, ABC-51PCB)</description>
+		<year>19??</year>
+		<publisher>HengGedianzi?</publisher>
+		<info name="alt_title" value="口袋怪兽 ~ Pokemon (Title screen) / Pokemon Diamond (Box?)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon diamond (hengge, abc-51pcb, mmc3 based 8m)(ch)[!].prg" size="1048576" crc="5f4f0b07" sha1="8cb9657d92619452afe3b8606c2d2647de22b1d7" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koudaig2" supported="partial">
+		<description>Kou Dai Guai Shou (Chi, Pokemon Diamond II)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi?</publisher>
 		<info name="alt_title" value="口袋怪兽 ~ Pokemon (Title screen) / Pokemon Diamond II (Box?)"/>
@@ -56990,6 +57208,90 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="vram" size="8192">
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koudaig3">
+		<description>Kou Dai Guai Shou III (Chi, ABC-51PCB)</description>
+		<year>19??</year>
+		<publisher>HengGedianzi?</publisher>
+		<info name="alt_title" value="口袋怪兽 III ~ Pokemon III (Title screen) / Pokemon Diamond III (Box?)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon diamond iii (hengge, abc-51pcb, mmc3 based 8m)(ch)[!].prg" size="1048576" crc="a78f5f44" sha1="739f655e4865e137bd802461b413c030213ae3c7" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdgslb1">
+		<description>Kou Dai Guai Shou - Luye Ban (Chi, BBC-21 PCB)</description>
+		<year>19??</year>
+		<publisher>HengGedianzi?</publisher>
+		<info name="alt_title" value="口袋怪兽 - 绿叶版 ~ Pokemon Leaf Green (Title screen) / Pokemon Leaf Green I (Box?)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon leaf green i (hengge, bbc-21 pcb, mmc3 based 8m)(ch)[!].prg" size="1048576" crc="12966327" sha1="7bc49b8baa11dd68e79e4f336b718e08bd70af35" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdgslb2">
+		<description>Kou Dai Yao Guai - Luye Ban (Chi, BBC-2 PCB)</description>
+		<year>19??</year>
+		<publisher>HengGedianzi?</publisher>
+		<info name="alt_title" value="口袋妖怪 - 绿叶版 ~ Pokemon Leaf Green (Title screen) / Pokemon Leaf Green II (Box?)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon leaf green ii (hengge, bbc-2 pcb, mmc3 based 8m)(ch)[!].prg" size="1048576" crc="d634be5b" sha1="e9ffe4f2bd3531a068ba4be5a98e581d04e3fb13" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdgslb3">
+		<description>Kou Dai Guai Shou - Luye Ban (Chi, BBC-21 PCB, Alt Title)</description>
+		<year>19??</year>
+		<publisher>HengGedianzi?</publisher>
+		<info name="alt_title" value="口袋怪兽 - 绿叶版 ~ Pokemon Leaf Green (Title screen) / Pokemon Leaf Green III (Box?)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon leaf green iii (hengge, bbc-21 pcb, mmc3 based 8m)(ch)[!].prg" size="1048576" crc="2aaf0049" sha1="30af7cf0010646f1b10aa658244a348725e55e8d" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
@@ -57072,6 +57374,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="WAIXING-PS2" />
 			<dataarea name="prg" size="524288">
 				<rom name="da hua xi you (ch).prg" size="524288" crc="a64eda7e" sha1="99afcc520fb2b316e503e2b7adadaa9fa02f1ab8" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yingtaox">
+		<description>Ying Tao Xiao Wan Zi (Asia)</description>
+		<year>19??</year>
+		<publisher>Union Bond</publisher>
+		<info name="serial" value="G-0005"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nanjing" />	<!--  header actually says 164... -->
+			<feature name="pcb" value="UNL-NANJING" />
+			<dataarea name="prg" size="524288">
+				<rom name="ying tao xiao wan zi (g-005) (ch).prg" size="524288" crc="8209ba79" sha1="fa56608d8dcf5a144dd1fc81282cd86fd51060fe" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -63134,6 +63457,22 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+	<software name="dstorma" cloneof="dstorm">
+		<description>Desert Storm (Chi, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="desert storm (unl) [a].chr" size="262144" crc="504643f5" sha1="4abf868bf937c3ef78049f9806db18d2f52723d3" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="desert storm (unl) [a].prg" size="131072" crc="bb733f11" sha1="de8bdb60d48d15cf52bd59e51bac4a5f4a732ed5" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dianmali">
 		<description>Dian Shi Ma Li (Chi)</description>
 		<year>19??</year>
@@ -63420,6 +63759,22 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="[waixing] happy biqi iii (c) (wxn decrypted).prg" size="262144" crc="ac5c3a2a" sha1="a751a848653849a69bda304baa8de99c6af9869d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="happybiqa" cloneof="happybiq" supported="no">
+		<description>Happy Biqi - The World Fighter (Chi, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="happy biqui - the world fighter (unl).chr" size="262144" crc="592556a4" sha1="a8932eff6c22b597f82d86ff916d2073a2fd6f70" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="happy biqui - the world fighter (unl).prg" size="262144" crc="398410ad" sha1="5c3f12b834eb1760bcfceb1bc752be0e7bec994d" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64317,6 +64672,22 @@ All musics were removed in this game.
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sangrybr" supported="no">
+		<description>Super Angry Birds (Unl)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="super angry birds (unl).chr" size="131072" crc="5b64f663" sha1="b9be8b3835514bc03dd24d281313c7ef4bc5f245" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="super angry birds (unl).prg" size="262144" crc="4d8c2369" sha1="f52541aca55a04344ac4656a1e20a69332d89d8e" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -75044,6 +75415,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_120" supported="partial">
+		<description>120 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fk23ca" />	<!-- UNIF header pointed to FK23C, but the menu does not appear with that mapper... investigate! -->
+			<feature name="pcb" value="BMC-FK23C" />
+			<dataarea name="prg" size="8388608">
+				<rom name="120-in-1 (unl)[u].prg" size="8388608" crc="678de5aa" sha1="01da22ddf1897b47d6b03ecb4ff0c093f9b39dfc" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_126" supported="no">
 		<description>126 in 1</description>
 		<year>19??</year>
@@ -75133,10 +75520,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="15-in-1 (ga23c8003 pcb)[p1][!].chr" size="524288" crc="67f7bfa9" sha1="7adab1e9c7f2a83b7a9f17f926f685997067f291" offset="0" status="baddump" />
+				<rom name="15-in-1 (ga23c8003 pcb)[p1][!].chr" size="524288" crc="67f7bfa9" sha1="7adab1e9c7f2a83b7a9f17f926f685997067f291" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="15-in-1 (ga23c8003 pcb)[p1][!].prg" size="524288" crc="a9d35715" sha1="16c67727575e4136920c6ba90bf3dc796e45173b" offset="0" status="baddump" />
+				<rom name="15-in-1 (ga23c8003 pcb)[p1][!].prg" size="524288" crc="a9d35715" sha1="16c67727575e4136920c6ba90bf3dc796e45173b" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -75149,10 +75536,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="15-in-1 (ga23c8003 pcb)[p2][!].chr" size="524288" crc="7e0b6710" sha1="b53fba3996e217ef78127669faa658da1d3a54e7" offset="0" status="baddump" />
+				<rom name="15-in-1 (ga23c8003 pcb)[p2][!].chr" size="524288" crc="7e0b6710" sha1="b53fba3996e217ef78127669faa658da1d3a54e7" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="15-in-1 (ga23c8003 pcb)[p2][!].prg" size="524288" crc="1ae43c8b" sha1="acbb6389c20b5f60392ae830c8c93f09c592eed5" offset="0" status="baddump" />
+				<rom name="15-in-1 (ga23c8003 pcb)[p2][!].prg" size="524288" crc="1ae43c8b" sha1="acbb6389c20b5f60392ae830c8c93f09c592eed5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -75385,10 +75772,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="sg_boog" />
 			<feature name="pcb" value="SUPERGAME-BOOGERMAN" />
 			<dataarea name="chr" size="524288">
-				<rom name="2-in-1 super 808 (unl)[p1][!].chr" size="524288" crc="65b3e791" sha1="7f342d5fa4d20649f8e2dfbf062111196a0e4893" offset="0" status="baddump" />
+				<rom name="2-in-1 super 808 (unl)[p1][!].chr" size="524288" crc="65b3e791" sha1="7f342d5fa4d20649f8e2dfbf062111196a0e4893" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="2-in-1 super 808 (unl)[p1][!].prg" size="524288" crc="83f509f1" sha1="ad99c8a7628173dfd34b7c4a4d71cd725281dba4" offset="0" status="baddump" />
+				<rom name="2-in-1 super 808 (unl)[p1][!].prg" size="524288" crc="83f509f1" sha1="ad99c8a7628173dfd34b7c4a4d71cd725281dba4" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -75401,10 +75788,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].chr" size="524288" crc="2847abcc" sha1="69f2c63ab1c9f2dbca4b42e93c2e4f6ddfea3bf4" offset="0" status="baddump" />
+				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].chr" size="524288" crc="2847abcc" sha1="69f2c63ab1c9f2dbca4b42e93c2e4f6ddfea3bf4" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].prg" size="524288" crc="c0d460ef" sha1="aa33965c25c259152d77a0d7eaf426ebc703ffea" offset="0" status="baddump" />
+				<rom name="2-in-1 1996 super hik gold card (nt-803)[p1][!].prg" size="524288" crc="c0d460ef" sha1="aa33965c25c259152d77a0d7eaf426ebc703ffea" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -75642,10 +76029,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="3-in-1 (bn096)[p1][!].chr" size="524288" crc="0a0e2cee" sha1="a7fcd8f1e5bbcb66ea9dfaaa3e718a74734382bb" offset="0" status="baddump" />
+				<rom name="3-in-1 (bn096)[p1][!].chr" size="524288" crc="0a0e2cee" sha1="a7fcd8f1e5bbcb66ea9dfaaa3e718a74734382bb" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="3-in-1 (bn096)[p1][!].prg" size="524288" crc="4f4b13e4" sha1="4c88ddf9fe96219eba92bdabefb2608994aa90e2" offset="0" status="baddump" />
+				<rom name="3-in-1 (bn096)[p1][!].prg" size="524288" crc="4f4b13e4" sha1="4c88ddf9fe96219eba92bdabefb2608994aa90e2" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -75661,10 +76048,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="3-in-1 (k3011)[p1][!].chr" size="524288" crc="c889ef91" sha1="9133dc92fbfce54c55727ac8ce46c254d870627f" offset="0" status="baddump" />
+				<rom name="3-in-1 (k3011)[p1][!].chr" size="524288" crc="c889ef91" sha1="9133dc92fbfce54c55727ac8ce46c254d870627f" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="3-in-1 (k3011)[p1][!].prg" size="524288" crc="0ac22fdc" sha1="be8d3cf7bf71db7e09e91e2b616cfe6fa819148c" offset="0" status="baddump" />
+				<rom name="3-in-1 (k3011)[p1][!].prg" size="524288" crc="0ac22fdc" sha1="be8d3cf7bf71db7e09e91e2b616cfe6fa819148c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -75677,10 +76064,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="3-in-1 (mr028)[p1][!].chr" size="524288" crc="95bacc6b" sha1="06d25e9568c371700fbcec35827f1d56acbae618" offset="0" status="baddump" />
+				<rom name="3-in-1 (mr028)[p1][!].chr" size="524288" crc="95bacc6b" sha1="06d25e9568c371700fbcec35827f1d56acbae618" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="3-in-1 (mr028)[p1][!].prg" size="524288" crc="5c296341" sha1="fe8566facb6978508663b4ddbc56fcb1118f6b57" offset="0" status="baddump" />
+				<rom name="3-in-1 (mr028)[p1][!].prg" size="524288" crc="5c296341" sha1="fe8566facb6978508663b4ddbc56fcb1118f6b57" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -75696,10 +76083,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="3-in-1 (mr029)[p1][!].chr" size="524288" crc="613639e5" sha1="1159f62640059c5af676d035be345830295dac8e" offset="0" status="baddump" />
+				<rom name="3-in-1 (mr029)[p1][!].chr" size="524288" crc="613639e5" sha1="1159f62640059c5af676d035be345830295dac8e" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="3-in-1 (mr029)[p1][!].prg" size="524288" crc="2fc793d6" sha1="b924fea9fb1f65d6ab5b8cc1b535736197cea6a4" offset="0" status="baddump" />
+				<rom name="3-in-1 (mr029)[p1][!].prg" size="524288" crc="2fc793d6" sha1="b924fea9fb1f65d6ab5b8cc1b535736197cea6a4" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -75747,10 +76134,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="3-in-1 (8096 pcb)[p1][!].chr" size="524288" crc="430c6871" sha1="d317c2fe4c2cee10928a4ffbf110ca6ee128bb21" offset="0" status="baddump" />
+				<rom name="3-in-1 (8096 pcb)[p1][!].chr" size="524288" crc="430c6871" sha1="d317c2fe4c2cee10928a4ffbf110ca6ee128bb21" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="3-in-1 (8096 pcb)[p1][!].prg" size="524288" crc="bdf37c73" sha1="236391a1c462c5e6ff51def11b69319d0a7751cf" offset="0" status="baddump" />
+				<rom name="3-in-1 (8096 pcb)[p1][!].prg" size="524288" crc="bdf37c73" sha1="236391a1c462c5e6ff51def11b69319d0a7751cf" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -75847,10 +76234,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="4-in-1 (k4303)[p1][!].chr" size="524288" crc="a6e62a93" sha1="e1d930f92473c43095b5254856c06d0124c97f5e" offset="0" status="baddump" />
+				<rom name="4-in-1 (k4303)[p1][!].chr" size="524288" crc="a6e62a93" sha1="e1d930f92473c43095b5254856c06d0124c97f5e" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 (k4303)[p1][!].prg" size="524288" crc="a59b6181" sha1="056a7a411211079a91632bc0f54adfb351978b2a" offset="0" status="baddump" />
+				<rom name="4-in-1 (k4303)[p1][!].prg" size="524288" crc="a59b6181" sha1="056a7a411211079a91632bc0f54adfb351978b2a" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -76218,10 +76605,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="fk23c" />
 			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
-				<rom name="4-in-1 (bs-8088)[p1][!].chr" size="1048576" crc="ff3e4986" sha1="c5f683398ad56d6d0f622d680150ed2b2cb6819e" offset="0" status="baddump" />
+				<rom name="4-in-1 (bs-8088)[p1][!].chr" size="1048576" crc="ff3e4986" sha1="c5f683398ad56d6d0f622d680150ed2b2cb6819e" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
-				<rom name="4-in-1 (bs-8088)[p1][!].prg" size="1048576" crc="82872d67" sha1="10567ba5848c1ca8821a3815b91537e4101eb05f" offset="0" status="baddump" />
+				<rom name="4-in-1 (bs-8088)[p1][!].prg" size="1048576" crc="82872d67" sha1="10567ba5848c1ca8821a3815b91537e4101eb05f" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -76234,10 +76621,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="fk23ca" />
 			<feature name="pcb" value="BMC-FK23CA" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="524288">
-				<rom name="4-in-1 (fk-8008)[p1][!].chr" size="524288" crc="728641c2" sha1="af719cb6687e29935a8e11bc1046fbc2868f9c0f" offset="0" status="baddump" />
+				<rom name="4-in-1 (fk-8008)[p1][!].chr" size="524288" crc="728641c2" sha1="af719cb6687e29935a8e11bc1046fbc2868f9c0f" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 (fk-8008)[p1][!].prg" size="524288" crc="cde95a72" sha1="71cdd444d98a25ae030e0e40446492ff7cbe0c08" offset="0" status="baddump" />
+				<rom name="4-in-1 (fk-8008)[p1][!].prg" size="524288" crc="cde95a72" sha1="71cdd444d98a25ae030e0e40446492ff7cbe0c08" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -76250,10 +76637,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="fk23c" />
 			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
-				<rom name="4-in-1 (fk-8050)[p1][!].chr" size="1048576" crc="31c94555" sha1="225eba69706605525bf7f26ee7487ec0311327af" offset="0" status="baddump" />
+				<rom name="4-in-1 (fk-8050)[p1][!].chr" size="1048576" crc="31c94555" sha1="225eba69706605525bf7f26ee7487ec0311327af" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
-				<rom name="4-in-1 (fk-8050)[p1][!].prg" size="1048576" crc="e326ebe1" sha1="31e40a7daa78ea80fe791c5e95070d78c6876351" offset="0" status="baddump" />
+				<rom name="4-in-1 (fk-8050)[p1][!].prg" size="1048576" crc="e326ebe1" sha1="31e40a7daa78ea80fe791c5e95070d78c6876351" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -76266,10 +76653,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="fk23c" />
 			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="524288">
-				<rom name="4-in-1 (kt-3445ab)[p1].chr" size="524288" crc="b2ca3bbc" sha1="84bff553437983a5b06c4e145d0fe1629aab99dc" offset="0" status="baddump" />
+				<rom name="4-in-1 (kt-3445ab)[p1].chr" size="524288" crc="b2ca3bbc" sha1="84bff553437983a5b06c4e145d0fe1629aab99dc" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 (kt-3445ab)[p1].prg" size="524288" crc="ec34291b" sha1="7d8919948f98f6933f771b1bedd1a18ab9fe8e68" offset="0" status="baddump" />
+				<rom name="4-in-1 (kt-3445ab)[p1].prg" size="524288" crc="ec34291b" sha1="7d8919948f98f6933f771b1bedd1a18ab9fe8e68" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -76282,10 +76669,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_15in1" />
 			<feature name="pcb" value="BMC-15IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="4-in-1 (ok-411)[p1][!].chr" size="524288" crc="b9300c30" sha1="90cef987aac482e7402891892779847cffaa6ef0" offset="0" status="baddump" />
+				<rom name="4-in-1 (ok-411)[p1][!].chr" size="524288" crc="b9300c30" sha1="90cef987aac482e7402891892779847cffaa6ef0" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 (ok-411)[p1][!].prg" size="524288" crc="08ad4796" sha1="96f57a5e8f352d9545ebb259e9c15e581d01cb43" offset="0" status="baddump" />
+				<rom name="4-in-1 (ok-411)[p1][!].prg" size="524288" crc="08ad4796" sha1="96f57a5e8f352d9545ebb259e9c15e581d01cb43" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -76346,13 +76733,33 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="4-in-1 (yh441)[p1][!].chr" size="524288" crc="7163d09f" sha1="73b3e3339a01dc07fb0521d564e774dd9243fbba" offset="0" status="baddump" />
+				<rom name="4-in-1 (yh441)[p1][!].chr" size="524288" crc="7163d09f" sha1="73b3e3339a01dc07fb0521d564e774dd9243fbba" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="4-in-1 (yh441)[p1][!].prg" size="524288" crc="c4e0a3df" sha1="deb18537765e32de3074d6816c5236a9bdf68a6c" offset="0" status="baddump" />
+				<rom name="4-in-1 (yh441)[p1][!].prg" size="524288" crc="c4e0a3df" sha1="deb18537765e32de3074d6816c5236a9bdf68a6c" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!--  also 20-in-1 KY2001, 228-in-1, 999999-in-1 via DipSwitches -->
+	<software name="mc_4y481" supported="partial">
+		<description>4 in 1 (YH-481)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fk23ca" />
+			<feature name="pcb" value="BMC-FK23CA" />
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 yh-481 (20-in-1 ky2001, 228-in-1, 999999-in-1)(unl)[!].chr" size="524288" crc="34a1cd85" sha1="9cee7136c3a9e7b8bde094d089305486a608a329" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 yh-481 (20-in-1 ky2001, 228-in-1, 999999-in-1)(unl)[!].prg" size="524288" crc="7157f19f" sha1="700c9668fa680526f833df575d59ee76ac69a12a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -76681,10 +77088,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="fk23c" />
 			<feature name="pcb" value="BMC-FK23C" /> <!-- header says mapper 176, but it's wrong -->
 			<dataarea name="chr" size="1048576">
-				<rom name="5-in-1 (k5003)[p1][!].chr" size="1048576" crc="f3cf76f3" sha1="8bd4bddc62116f857c19c3ce90af509ca5f0f621" offset="0" status="baddump" />
+				<rom name="5-in-1 (k5003)[p1][!].chr" size="1048576" crc="f3cf76f3" sha1="8bd4bddc62116f857c19c3ce90af509ca5f0f621" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
-				<rom name="5-in-1 (k5003)[p1][!].prg" size="1048576" crc="a5597469" sha1="6347771fccc1ad7d7b43b1c61785fcc8a894ab2c" offset="0" status="baddump" />
+				<rom name="5-in-1 (k5003)[p1][!].prg" size="1048576" crc="a5597469" sha1="6347771fccc1ad7d7b43b1c61785fcc8a894ab2c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -76895,10 +77302,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_11160" />
 			<feature name="pcb" value="BMC-11160" />
 			<dataarea name="chr" size="131072">
-				<rom name="6-in-1 (mgc-023)[u][!].chr" size="131072" crc="9660700e" sha1="68181b5f172aed2fa9ab8799cf15755d3157be53" offset="0" status="baddump" />
+				<rom name="6-in-1 (mgc-023)[u][!].chr" size="131072" crc="9660700e" sha1="68181b5f172aed2fa9ab8799cf15755d3157be53" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="6-in-1 (mgc-023)[u][!].prg" size="131072" crc="b5dc7ef2" sha1="f79a2f974259128c6805e394e86791cd4a887357" offset="0" status="baddump" />
+				<rom name="6-in-1 (mgc-023)[u][!].prg" size="131072" crc="b5dc7ef2" sha1="f79a2f974259128c6805e394e86791cd4a887357" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -77045,10 +77452,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="7-in-1 (k7603)[p1][!].chr" size="524288" crc="ab3f1aef" sha1="d39144159d92ad204362737c9fea7f95079356d6" offset="0" status="baddump" />
+				<rom name="7-in-1 (k7603)[p1][!].chr" size="524288" crc="ab3f1aef" sha1="d39144159d92ad204362737c9fea7f95079356d6" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="7-in-1 (k7603)[p1][!].prg" size="524288" crc="d34a7815" sha1="5bdaa47849484ecb14d2fb1889db94f9133812d6" offset="0" status="baddump" />
+				<rom name="7-in-1 (k7603)[p1][!].prg" size="524288" crc="d34a7815" sha1="5bdaa47849484ecb14d2fb1889db94f9133812d6" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -77483,10 +77890,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="9-in-1 (860824 pcb)[p1][!].chr" size="524288" crc="b73df4a0" sha1="88230a6ca159b2d865778246e6d3bed32c08855b" offset="0" status="baddump" />
+				<rom name="9-in-1 (860824 pcb)[p1][!].chr" size="524288" crc="b73df4a0" sha1="88230a6ca159b2d865778246e6d3bed32c08855b" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="9-in-1 (860824 pcb)[p1][!].prg" size="524288" crc="9ccd7a04" sha1="a4e133664461082101cd2981460823b0a023c476" offset="0" status="baddump" />
+				<rom name="9-in-1 (860824 pcb)[p1][!].prg" size="524288" crc="9ccd7a04" sha1="a4e133664461082101cd2981460823b0a023c476" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -77734,10 +78141,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="1048576">
-				<rom name="gold 7-in-1 hik (ak456, 8195 pcb)[p1][!].chr" size="1048576" crc="8c897546" sha1="6d073abe9747890e334c789b4f8d874449723c00" offset="0" status="baddump" />
+				<rom name="gold 7-in-1 hik (ak456, 8195 pcb)[p1][!].chr" size="1048576" crc="8c897546" sha1="6d073abe9747890e334c789b4f8d874449723c00" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
-				<rom name="gold 7-in-1 hik (ak456, 8195 pcb)[p1][!].prg" size="1048576" crc="8bfc64ce" sha1="1d9f7cf20036ba353f244b65a4d5938cda649360" offset="0" status="baddump" />
+				<rom name="gold 7-in-1 hik (ak456, 8195 pcb)[p1][!].prg" size="1048576" crc="8bfc64ce" sha1="1d9f7cf20036ba353f244b65a4d5938cda649360" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -77753,10 +78160,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="1048576">
-				<rom name="golden 7-in-1 (ml-600)[p1][!].chr" size="1048576" crc="bf2df909" sha1="9d4dd01af6bc05765421ce1abf24069e5b85eb32" offset="0" status="baddump" />
+				<rom name="golden 7-in-1 (ml-600)[p1][!].chr" size="1048576" crc="bf2df909" sha1="9d4dd01af6bc05765421ce1abf24069e5b85eb32" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="1048576">
-				<rom name="golden 7-in-1 (ml-600)[p1][!].prg" size="1048576" crc="61b7ee16" sha1="bacf75f4f0b210f4c5b85f269b04088fe582d276" offset="0" status="baddump" />
+				<rom name="golden 7-in-1 (ml-600)[p1][!].prg" size="1048576" crc="61b7ee16" sha1="bacf75f4f0b210f4c5b85f269b04088fe582d276" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -77788,10 +78195,10 @@ be better to redump them properly. -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="king series super 4-in-1 (k4m03)[p1][!].chr" size="524288" crc="e28a883b" sha1="8ae692741f2447a963539825dda7a88d03f7a836" offset="0" status="baddump" />
+				<rom name="king series super 4-in-1 (k4m03)[p1][!].chr" size="524288" crc="e28a883b" sha1="8ae692741f2447a963539825dda7a88d03f7a836" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="king series super 4-in-1 (k4m03)[p1][!].prg" size="524288" crc="008553f5" sha1="103612a4fb608a02498ba29a8db9c906d90936e5" offset="0" status="baddump" />
+				<rom name="king series super 4-in-1 (k4m03)[p1][!].prg" size="524288" crc="008553f5" sha1="103612a4fb608a02498ba29a8db9c906d90936e5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -77993,10 +78400,10 @@ to check why this is different -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="super 1998 3-in-1 (nt-008 pcb)[p1][!].chr" size="524288" crc="992e0196" sha1="9bea118f9d076affad778ef11ed71023ae46fbb9" offset="0" status="baddump" />
+				<rom name="super 1998 3-in-1 (nt-008 pcb)[p1][!].chr" size="524288" crc="992e0196" sha1="9bea118f9d076affad778ef11ed71023ae46fbb9" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="super 1998 3-in-1 (nt-008 pcb)[p1][!].prg" size="524288" crc="80e778b7" sha1="2eeaaa87213a962a046a8a3b5e677ac1f5333ace" offset="0" status="baddump" />
+				<rom name="super 1998 3-in-1 (nt-008 pcb)[p1][!].prg" size="524288" crc="80e778b7" sha1="2eeaaa87213a962a046a8a3b5e677ac1f5333ace" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -78012,10 +78419,10 @@ to check why this is different -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="super 1998 3-in-1 (vt-850, nt-008 pcb)[p1][!].chr" size="524288" crc="dcb6ee22" sha1="8a3ee636efd849c4a99bd5d85aad10c308e9051d" offset="0" status="baddump" />
+				<rom name="super 1998 3-in-1 (vt-850, nt-008 pcb)[p1][!].chr" size="524288" crc="dcb6ee22" sha1="8a3ee636efd849c4a99bd5d85aad10c308e9051d" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="super 1998 3-in-1 (vt-850, nt-008 pcb)[p1][!].prg" size="524288" crc="78a0ff55" sha1="99d1c96eef9129218d395bfbf3aa708291b4d691" offset="0" status="baddump" />
+				<rom name="super 1998 3-in-1 (vt-850, nt-008 pcb)[p1][!].prg" size="524288" crc="78a0ff55" sha1="99d1c96eef9129218d395bfbf3aa708291b4d691" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -78114,10 +78521,10 @@ to check why this is different -->
 			<feature name="slot" value="bmc_gold7in1" />
 			<feature name="pcb" value="BMC-GOLD-7IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="super 3-in-1 (nt-903)[p1][!].chr" size="524288" crc="12c44fb3" sha1="a16f98308430daf5e58fbee4e005078b5eb90c23" offset="0" status="baddump" />
+				<rom name="super 3-in-1 (nt-903)[p1][!].chr" size="524288" crc="12c44fb3" sha1="a16f98308430daf5e58fbee4e005078b5eb90c23" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="super 3-in-1 (nt-903)[p1][!].prg" size="524288" crc="e253a02e" sha1="c244d1593b3ba4af2ec9f453a5441fe88271adaf" offset="0" status="baddump" />
+				<rom name="super 3-in-1 (nt-903)[p1][!].prg" size="524288" crc="e253a02e" sha1="c244d1593b3ba4af2ec9f453a5441fe88271adaf" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -78284,10 +78691,10 @@ to check why this is different -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="super 4-in-1 (kg899a pcb)[p1][!].chr" size="524288" crc="726c892c" sha1="7cd7c160d643698a9becac11a06eab9c0a9bb744" offset="0" status="baddump" />
+				<rom name="super 4-in-1 (kg899a pcb)[p1][!].chr" size="524288" crc="726c892c" sha1="7cd7c160d643698a9becac11a06eab9c0a9bb744" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="super 4-in-1 (kg899a pcb)[p1][!].prg" size="524288" crc="c4114a1f" sha1="b69561e9148f50aaf43ae5b80e0e959cac3d10b3" offset="0" status="baddump" />
+				<rom name="super 4-in-1 (kg899a pcb)[p1][!].prg" size="524288" crc="c4114a1f" sha1="b69561e9148f50aaf43ae5b80e0e959cac3d10b3" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78300,10 +78707,10 @@ to check why this is different -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="super 4-in-1 (kg899a pcb)[p2][!].chr" size="524288" crc="3a366fa3" sha1="bcdf49cf0ec4da15c0bb9c9833bc1dd9882ab750" offset="0" status="baddump" />
+				<rom name="super 4-in-1 (kg899a pcb)[p2][!].chr" size="524288" crc="3a366fa3" sha1="bcdf49cf0ec4da15c0bb9c9833bc1dd9882ab750" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="super 4-in-1 (kg899a pcb)[p2][!].prg" size="524288" crc="e18afea1" sha1="d35d20a0ce478405817abbcca094bfc6dd94c2dc" offset="0" status="baddump" />
+				<rom name="super 4-in-1 (kg899a pcb)[p2][!].prg" size="524288" crc="e18afea1" sha1="d35d20a0ce478405817abbcca094bfc6dd94c2dc" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78606,10 +79013,10 @@ to check why this is different -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="super tv game 2-in-1 (vt-414 pcb)[p1][!].chr" size="524288" crc="1b71bc82" sha1="8793f752cda849d8ec7146dadb8b8db03975bcec" offset="0" status="baddump" />
+				<rom name="super tv game 2-in-1 (vt-414 pcb)[p1][!].chr" size="524288" crc="1b71bc82" sha1="8793f752cda849d8ec7146dadb8b8db03975bcec" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="super tv game 2-in-1 (vt-414 pcb)[p1][!].prg" size="524288" crc="cdd56270" sha1="63a7fee290b5cfd6280b54aa786c84bb5db3f9f5" offset="0" status="baddump" />
+				<rom name="super tv game 2-in-1 (vt-414 pcb)[p1][!].prg" size="524288" crc="cdd56270" sha1="63a7fee290b5cfd6280b54aa786c84bb5db3f9f5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78622,10 +79029,10 @@ to check why this is different -->
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
 			<dataarea name="chr" size="524288">
-				<rom name="super tv game 3-in-1 (vt-414 pcb)[p1][!].chr" size="524288" crc="00bbe2dd" sha1="424bcbbf51369ed44a486ddf8865315617a7d7e9" offset="0" status="baddump" />
+				<rom name="super tv game 3-in-1 (vt-414 pcb)[p1][!].chr" size="524288" crc="00bbe2dd" sha1="424bcbbf51369ed44a486ddf8865315617a7d7e9" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="super tv game 3-in-1 (vt-414 pcb)[p1][!].prg" size="524288" crc="e30e458e" sha1="6299182f53a7ef77e902d563407a47f40c5dc1e0" offset="0" status="baddump" />
+				<rom name="super tv game 3-in-1 (vt-414 pcb)[p1][!].prg" size="524288" crc="e30e458e" sha1="6299182f53a7ef77e902d563407a47f40c5dc1e0" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -79135,7 +79542,7 @@ that the real dumps might surface -->
 			<feature name="slot" value="onebus" />
 			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
-				<rom name="power joy navigator 50-in-1 (unl)[u][!].prg" size="4194304" crc="d1bbadd4" sha1="2186c71bcedf6c2eedf58233faa26fca9586aa40" offset="0" status="baddump" />
+				<rom name="power joy navigator 50-in-1 (unl)[u][!].prg" size="4194304" crc="d1bbadd4" sha1="2186c71bcedf6c2eedf58233faa26fca9586aa40" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -79151,7 +79558,7 @@ that the real dumps might surface -->
 			<feature name="slot" value="onebus" />
 			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
-				<rom name="power joy supermax 30-in-1 (unl)[u][!].prg" size="4194304" crc="947ac898" sha1="08bb99a8ad39c56780bc66f4e0a9830fba7372dc" offset="0" status="baddump" />
+				<rom name="power joy supermax 30-in-1 (unl)[u][!].prg" size="4194304" crc="947ac898" sha1="08bb99a8ad39c56780bc66f4e0a9830fba7372dc" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -79167,7 +79574,7 @@ that the real dumps might surface -->
 			<feature name="slot" value="onebus" />
 			<feature name="pcb" value="UNL-OneBus" />
 			<dataarea name="prg" size="4194304">
-				<rom name="power joy supermax 60-in-1 (unl)[u][!].prg" size="4194304" crc="1ab45228" sha1="d148924afc39fc588235331a1a30df6e0d8e1e18" offset="0" status="baddump" />
+				<rom name="power joy supermax 60-in-1 (unl)[u][!].prg" size="4194304" crc="1ab45228" sha1="d148924afc39fc588235331a1a30df6e0d8e1e18" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -79241,14 +79648,78 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
+	<software name="mc_138cb" supported="no">
+		<description>138-in-1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="flop" size="4194304">
+				<rom name="138-in-1 coolbaby (coolboy rs-5, pcb060-10009011v1.3)(unl)[u][!].bin" size="4194304" crc="6b5b1a1a" sha1="2df0cd717bd0de0b0c973ac356426ddbb0d736fa" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7x6ss" supported="no">
+		<description>777777-in-1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)(Unl)[U][!]</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="flop" size="1048576">
+				<rom name="777777-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin" size="1048576" crc="7790c21a" sha1="f320f3dd18b88ae5f65bb51f58d4cb869997bab3" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8x6ss" supported="no">
+		<description>888888-in-1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="1051873">
+				<rom name="888888-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin" size="1051873" crc="47149d0b" sha1="5a8733886b550e3235dd90fb415b5a602e967f91" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_9x6sa" supported="no">
+		<description>999999-in-1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="prg" size="2097152">
+				<rom name="999999-in-1 (8 bit slim station, newpxp-dvt22-a pcb)(unl)[u][!].bin" size="2097152" crc="6a47c6a0" sha1="b4dd376167a57dbee3dea70eb16f1a38e16bcdaa" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="mc_cb400" supported="no">
 		<description>CoolBoy 400 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="onebus" />
-			<feature name="pcb" value="UNL-OneBus" />
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
 			<dataarea name="prg" size="33554432">
 				<rom name="rom.prg" size="33554432" crc="da8f37f1" sha1="bc5a2777a04b58219702a2a32e1e6a04cc0a5c5a" offset="00000" />
 			</dataarea>
@@ -79257,6 +79728,39 @@ that the real dumps might surface -->
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="mc_cb400a" cloneof="mc_cb400" supported="no">
+		<description>CoolBoy 400-in-1 (Alt Version, 403 games)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="coolboy 400-in-1 (alt version, 403 games)(unl)[u][!].cbp" size="33554432" crc="6a98c5ee" sha1="f5de587420d0ad4e8fdff6b4ba32a940f1fe35bd" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sg360" supported="no">
+		<description>Super Game 360-in-1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="coolboy" />
+			<feature name="pcb" value="UNL-COOLBOY" />
+			<dataarea name="prg" size="33554432">
+				<rom name="super game 360-in-1 (unl)[u][!].cbp" size="33554432" crc="f1371c17" sha1="77bdc59514e12910aee73c69e563a69f47675a2a" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="mc_gx121" supported="no">
 		<description>Games Xplosion 121 in 1</description>
@@ -79273,6 +79777,32 @@ that the real dumps might surface -->
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- TO SORT AND RENAME PROPERLY!!! -->
+
+	<software name="pokehg" supported="partial">
+		<description>Pokemon HeartGold (KT-008 PCB)</description>
+		<year>19??</year>
+		<publisher>Shenzen Jincota</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="pokemon heartgold (kt-008 pcb)(ch)[!].prg" size="1048576" crc="61fc4d20" sha1="6545611c3704b8624343f4bdab7c1096523a1ac9" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="16384">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up ? -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
 
 <!-- Romless passthrough cart for the unit containing VRAM + barcode reader + EEPROM + subslot -->
 	<software name="datach">
@@ -79337,3 +79867,4 @@ that the real dumps might surface -->
 	</software>
 
 </softwarelist>
+

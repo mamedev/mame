@@ -355,9 +355,7 @@ void adsp21062_device::device_start()
 		m_lcstack[i] = 0;
 		m_lastack[i] = 0;
 	}
-	m_lstkp = 0;
 	m_pcstk = 0;
-	m_pcstkp = 0;
 	m_laddr.addr = m_laddr.code = m_laddr.loop_type = 0;
 	m_curlcntr = 0;
 	m_lcntr = 0;
@@ -682,6 +680,8 @@ void adsp21062_device::device_reset()
 	m_idle = 0;
 	m_stky = 0x5400000;
 
+	m_lstkp = 0;
+	m_pcstkp = 0;
 	m_interrupt_active = 0;
 }
 

@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
 #include "pc98fdi_dsk.h"
 
 pc98fdi_format::pc98fdi_format()

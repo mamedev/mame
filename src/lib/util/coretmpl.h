@@ -13,7 +13,6 @@
 #ifndef __CORETMPL_H__
 #define __CORETMPL_H__
 
-#include <assert.h>
 #include "osdcore.h"
 #include "corealloc.h"
 

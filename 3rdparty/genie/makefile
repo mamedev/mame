@@ -41,7 +41,12 @@ release-linux: $(GENIE)
 	$(SILENT) $(GENIE) release
 	$(SILENT) make -C build/gmake.darwin  clean all CC=x86_64-apple-darwin13-clang++
 	$(SILENT) make -C build/gmake.linux   clean all
-	$(SILENT) make -C build/gmake.windows clean all CC=x86_64-w64-mingw32-gcc
+	$(SILENT) make -C build/gmake.windows clean all CC=i686-w64-mingw32-gcc
 	$(SILENT) git checkout src/host/version.h
 
 release: release-$(OS)
+
+dist: release
+	cp bin/linux/genie       ../bx/tools/bin/linux/
+	cp bin/windows/genie.exe ../bx/tools/bin/windows/
+	cp bin/darwin/genie      ../bx/tools/bin/darwin/

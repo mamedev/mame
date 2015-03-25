@@ -48,20 +48,20 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	UINT8 m_b;
-	UINT8 m_c;
+	UINT8 m_b;                          // MCU port B data
+	UINT8 m_c;                          // MCU port C data
 
 	virtual void machine_start();
 
 	// display common
-	int m_display_wait;
-	int m_display_maxy;
-	int m_display_maxx;
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
 	
-	UINT32 m_display_state[0x20];
-	UINT32 m_display_cache[0x20];
-	UINT8 m_display_decay[0x20][0x20];
-	UINT16 m_7seg_mask[0x20];
+	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
@@ -76,9 +76,9 @@ void hh_pic16_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
 	m_b = 0;
 	m_c = 0;
@@ -89,9 +89,9 @@ void hh_pic16_state::machine_start()
 	save_item(NAME(m_display_wait));
 
 	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_cache));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
-	save_item(NAME(m_7seg_mask));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_b));
 	save_item(NAME(m_c));
@@ -132,12 +132,20 @@ void hh_pic16_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
-			if (m_7seg_mask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
-				output_set_lamp_value(y * mul + x, active_state[y] >> x & 1);
+			{
+				int state = active_state[y] >> x & 1;
+				output_set_lamp_value(y * mul + x, state);
+
+				// bit coords for svg2lay
+				char buf[10];
+				sprintf(buf, "%d.%d", y, x);
+				output_set_value(buf, state);
+			}
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
@@ -148,7 +156,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_pic16_state::display_decay_tick)
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
 		for (int x = 0; x < m_display_maxx; x++)
-			if (!(m_display_state[y] >> x & 1) && m_display_decay[y][x] != 0)
+			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 	
 	display_update();
@@ -199,7 +207,7 @@ WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
 	m_display_maxx = 7;
 	m_display_maxy = 2;
 	
-	m_7seg_mask[offset] = 0x7f;
+	m_display_segmask[offset] = 0x7f;
 	m_display_state[offset] = ~data & 0x7f;
 	display_update();
 }

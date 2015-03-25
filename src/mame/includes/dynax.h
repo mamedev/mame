@@ -125,6 +125,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hanamai_keyboard_w);
 	DECLARE_WRITE8_MEMBER(dynax_rombank_w);
 	DECLARE_WRITE8_MEMBER(jantouki_sound_rombank_w);
+	DECLARE_WRITE8_MEMBER(cdracula_sound_rombank_w);
 	DECLARE_WRITE8_MEMBER(hnoridur_rombank_w);
 	DECLARE_WRITE8_MEMBER(hnoridur_palbank_w);
 	DECLARE_WRITE8_MEMBER(hnoridur_palette_w);
@@ -186,12 +187,15 @@ public:
 	DECLARE_WRITE8_MEMBER(dynax_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_dest_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_dest_w);
+	DECLARE_WRITE8_MEMBER(mjembase_blit_dest_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_backpen_w);
+	DECLARE_WRITE8_MEMBER(dynax_blit_flags_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette01_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_palette01_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette45_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette23_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blit_palette23_w);
+	DECLARE_WRITE8_MEMBER(mjembase_blit_palette23_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palette67_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit_palbank_w);
 	DECLARE_WRITE8_MEMBER(dynax_blit2_palbank_w);
@@ -209,10 +213,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dynax_blit2_scroll_w);
 	DECLARE_WRITE8_MEMBER(dynax_blitter_rev2_w);
 	DECLARE_WRITE8_MEMBER(tenkai_blitter_rev2_w);
+	DECLARE_WRITE8_MEMBER(cdracula_blitter_rev2_w);
 	DECLARE_WRITE8_MEMBER(jantouki_blitter_rev2_w);
 	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
+	DECLARE_WRITE8_MEMBER(mjembase_priority_w);
 
 	DECLARE_DRIVER_INIT(mjelct3);
 	DECLARE_DRIVER_INIT(blktouch);
@@ -226,6 +232,7 @@ public:
 	UINT32 screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jantouki_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
@@ -264,6 +271,7 @@ public:
 	DECLARE_MACHINE_START(jantouki);
 	DECLARE_VIDEO_START(jantouki);
 	DECLARE_VIDEO_START(mjelctrn);
+	DECLARE_VIDEO_START(mjembase);
 	DECLARE_VIDEO_START(mjdialq2);
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);

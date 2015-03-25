@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 #include "thom_dsk.h"
 #include "basicdsk.h"
 

@@ -6,7 +6,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/trd_dsk.h"
 
 trd_format::trd_format() : wd177x_format(formats)

@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/ql_dsk.h"
 
 ql_format::ql_format() : wd177x_format(formats)

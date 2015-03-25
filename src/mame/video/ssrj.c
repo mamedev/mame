@@ -3,7 +3,7 @@
 
 /* tilemap 1 */
 
-WRITE8_MEMBER(ssrj_state::ssrj_vram1_w)
+WRITE8_MEMBER(ssrj_state::vram1_w)
 {
 	m_vram1[offset] = data;
 	m_tilemap1->mark_tile_dirty(offset>>1);
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info1)
 
 /* tilemap 2 */
 
-WRITE8_MEMBER(ssrj_state::ssrj_vram2_w)
+WRITE8_MEMBER(ssrj_state::vram2_w)
 {
 	m_vram2[offset] = data;
 	m_tilemap2->mark_tile_dirty(offset>>1);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info2)
 
 /* tilemap 4 */
 
-WRITE8_MEMBER(ssrj_state::ssrj_vram4_w)
+WRITE8_MEMBER(ssrj_state::vram4_w)
 {
 	m_vram4[offset] = data;
 	m_tilemap4->mark_tile_dirty(offset>>1);
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info4)
 TODO: This table is nowhere near as accurate. If you bother, here's how colors should be:
 -"START" sign is red with dark blue background.
 -Sidewalk is yellow-ish.
--first opponents have swapped colors (blue/yellow ?nstead of yellow/blue)
+-first opponents have swapped colors (blue/yellow instead of yellow/blue)
 -after the first stage, houses have red/white colors.
 */
 
@@ -270,7 +270,7 @@ PALETTE_INIT_MEMBER(ssrj_state, ssrj)
 			palette.set_pen_color(i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
-UINT32 ssrj_state::screen_update_ssrj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 ssrj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap1->set_scrollx(0, 0xff-m_scrollram[2] );
 	m_tilemap1->set_scrolly(0, m_scrollram[0] );
@@ -282,7 +282,7 @@ UINT32 ssrj_state::screen_update_ssrj(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-void ssrj_state::screen_eof_ssrj(screen_device &screen, bool state)
+void ssrj_state::screen_eof(screen_device &screen, bool state)
 {
 	// rising edge
 	if (state)

@@ -9,6 +9,7 @@
 
 #include <string.h>
 
+#include "imgtool.h"
 #include "library.h"
 #include "pool.h"
 

@@ -354,7 +354,6 @@ public:
 	int m_vertsrom_size;
 	void reset_sound();
 	void reset_net();
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
 
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
 	DECLARE_READ8_MEMBER(dma_memr_cb);
@@ -375,10 +374,25 @@ public:
 	DECLARE_WRITE16_MEMBER(hng64_sound_data_02_w);
 	DECLARE_WRITE16_MEMBER(hng64_sound_data_04_w);
 	DECLARE_WRITE16_MEMBER(hng64_sound_data_06_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0102_w);
+
+	DECLARE_READ16_MEMBER(hng64_sound_port_0004_r);
+	DECLARE_READ16_MEMBER(hng64_sound_port_0006_r);
+
+	DECLARE_READ16_MEMBER(hng64_sound_port_0008_r);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
+
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_000a_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_000c_w);
+
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
 
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0100_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0102_w);
+	DECLARE_READ16_MEMBER(hng64_sound_port_0104_r);
+	DECLARE_READ16_MEMBER(hng64_sound_port_0106_r);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_0108_w);
+	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
 
+	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
 };
 

@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/tiki100_dsk.h"
 
 tiki100_format::tiki100_format() : wd177x_format(formats)

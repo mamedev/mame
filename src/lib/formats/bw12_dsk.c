@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/bw12_dsk.h"
 
 bw12_format::bw12_format() : upd765_format(formats)

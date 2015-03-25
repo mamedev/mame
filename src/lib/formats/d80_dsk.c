@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/d80_dsk.h"
 
 d80_format::d80_format() : d64_format(file_formats)

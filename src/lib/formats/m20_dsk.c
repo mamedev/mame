@@ -13,8 +13,8 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
-#include "emu.h"
 #include "m20_dsk.h"
 #include "basicdsk.h"
 
@@ -180,7 +180,6 @@ LEGACY_FLOPPY_OPTIONS_END
 
 *********************************************************************/
 
-#include "emu.h"
 #include "formats/m20_dsk.h"
 
 m20_format::m20_format()

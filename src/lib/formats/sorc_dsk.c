@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include <string.h>
+#include <assert.h>
 
 #include "sorc_dsk.h"
 #include "basicdsk.h"

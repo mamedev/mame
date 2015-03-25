@@ -215,6 +215,8 @@ void v53_base_device::device_start()
 	m_out_dack_1_cb.resolve_safe();
 	m_out_dack_2_cb.resolve_safe();
 	m_out_dack_3_cb.resolve_safe();
+
+	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(pic8259_device::inta_cb), (pic8259_device*)m_v53icu));
 }
 
 void v53_base_device::install_peripheral_io()
@@ -447,10 +449,33 @@ READ8_MEMBER(v53_base_device::get_pic_ack)
 	return 0;
 }
 
-WRITE_LINE_MEMBER( v53_base_device::upd71059_irq_w)
+
+
+// the external interface provides no external access to the usual IRQ line of the V33, everything goes through the interrupt controller
+void v53_base_device::execute_set_input(int irqline, int state)
 {
-	printf("upd71059_irq_w %d\n", state);
+	switch (irqline)
+	{
+		case INPUT_LINE_IRQ0: m_v53icu->ir0_w(state); break;
+		case INPUT_LINE_IRQ1: m_v53icu->ir1_w(state); break;
+		case INPUT_LINE_IRQ2: m_v53icu->ir2_w(state); break;
+		case INPUT_LINE_IRQ3: m_v53icu->ir3_w(state); break;
+		case INPUT_LINE_IRQ4: m_v53icu->ir4_w(state); break;
+		case INPUT_LINE_IRQ5: m_v53icu->ir5_w(state); break;
+		case INPUT_LINE_IRQ6: m_v53icu->ir6_w(state); break;
+		case INPUT_LINE_IRQ7: m_v53icu->ir7_w(state); break;
+
+		case INPUT_LINE_NMI: nec_common_device::execute_set_input(irqline, state); break;
+		case NEC_INPUT_LINE_POLL: nec_common_device::execute_set_input(irqline, state); break;
+	}
 }
+
+// for hooking the interrupt controller output up to the core
+WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
+{
+	nec_common_device::execute_set_input(0, state);
+}
+
 
 static MACHINE_CONFIG_FRAGMENT( v53 )
 
@@ -461,6 +486,7 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE( v53_base_device, tcu_out0_trampoline_cb ))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( v53_base_device, tcu_out1_trampoline_cb ))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( v53_base_device, tcu_out2_trampoline_cb ))
+	
 
 	MCFG_DEVICE_ADD("upd71071dma", V53_DMAU, 4000000)
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(v53_base_device, hreq_trampoline_cb))
@@ -481,7 +507,9 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(v53_base_device, dma_dack3_trampoline_w))
 
 	
-	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, upd71059_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
+	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, internal_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
+
+
 
 	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0) 
 	MCFG_I8251_TXD_HANDLER(WRITELINE(v53_base_device, scu_txd_trampoline_cb))

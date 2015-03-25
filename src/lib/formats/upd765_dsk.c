@@ -8,7 +8,7 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include "emu.h" // emu_fatalerror
 #include "formats/upd765_dsk.h"
 
 upd765_format::upd765_format(const format *_formats)

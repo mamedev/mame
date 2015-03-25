@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/naslite_dsk.h"
 
 naslite_format::naslite_format() : upd765_format(formats)

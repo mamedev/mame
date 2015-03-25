@@ -88,13 +88,13 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_1)
 			TILE_FLIPYX( attr >> 14 ));
 }
 
-WRITE16_MEMBER(realbrk_state::realbrk_vram_0_w)
+WRITE16_MEMBER(realbrk_state::vram_0_w)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(realbrk_state::realbrk_vram_1_w)
+WRITE16_MEMBER(realbrk_state::vram_1_w)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset/2);
@@ -123,7 +123,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 			0);
 }
 
-WRITE16_MEMBER(realbrk_state::realbrk_vram_2_w)
+WRITE16_MEMBER(realbrk_state::vram_2_w)
 {
 	COMBINE_DATA(&m_vram_2[offset]);
 	m_tilemap_2->mark_tile_dirty(offset);
@@ -154,6 +154,8 @@ void realbrk_state::video_start()
 
 	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(),32,32);
 	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(),32,32);
+	
+	save_item(NAME(m_disable_video));
 }
 
 /***************************************************************************
@@ -167,7 +169,7 @@ void realbrk_state::video_start()
     of a sprite to be drawn. 0x300 items of the list seem to be used.
 
     Each sprite is made of several 16x16 tiles (from 1 to 32x32) and
-    can be zoomed / shrinked in size.
+    can be zoomed / shrunk in size.
 
     There are two set of tiles: with 256 or 16 colors.
 
@@ -203,7 +205,6 @@ void realbrk_state::video_start()
 
 void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
 	int max_x = m_screen->width();
@@ -220,9 +221,9 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		UINT16 *s;
 
-		if (spriteram16[offs] & 0x8000) continue;
+		if (m_spriteram[offs] & 0x8000) continue;
 
-		s       =       &spriteram16[(spriteram16[offs] & 0x3ff) * 16/2];
+		s       =       &m_spriteram[(m_spriteram[offs] & 0x3ff) * 16/2];
 
 		sy      =       s[ 0 ];
 		sx      =       s[ 1 ];
@@ -365,7 +366,6 @@ void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
 void realbrk_state::dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer)
 {
-	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
 	int max_x = m_screen->width();
@@ -380,9 +380,9 @@ void realbrk_state::dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &
 
 		UINT16 *s;
 
-		if (spriteram16[offs] & 0x8000) continue;
+		if (m_spriteram[offs] & 0x8000) continue;
 
-		s       =       &spriteram16[(spriteram16[offs] & 0x3ff) * 16/2];
+		s       =       &m_spriteram[(m_spriteram[offs] & 0x3ff) * 16/2];
 
 		sy      =       s[ 0 ];
 		sx      =       s[ 1 ];
@@ -467,7 +467,7 @@ void realbrk_state::dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &
 
 ***************************************************************************/
 
-WRITE16_MEMBER(realbrk_state::realbrk_vregs_w)
+WRITE16_MEMBER(realbrk_state::vregs_w)
 {
 	UINT16 old_data = m_vregs[offset];
 	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
@@ -478,7 +478,7 @@ WRITE16_MEMBER(realbrk_state::realbrk_vregs_w)
 	}
 }
 
-UINT32 realbrk_state::screen_update_realbrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 realbrk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

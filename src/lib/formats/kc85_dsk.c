@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/kc85_dsk.h"
 
 kc85_format::kc85_format() : upd765_format(formats)

@@ -312,6 +312,12 @@ protected:
 	virtual void op_tdo();
 };
 
+class tms1990_cpu_device : public tms0970_cpu_device
+{
+public:
+	tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 
 class tms0980_cpu_device : public tms0970_cpu_device
 {
@@ -394,6 +400,7 @@ extern const device_type TMS1370;
 extern const device_type TMS1400;
 extern const device_type TMS1470;
 extern const device_type TMS0970;
+extern const device_type TMS1990;
 extern const device_type TMS0980;
 extern const device_type TMS0270;
 

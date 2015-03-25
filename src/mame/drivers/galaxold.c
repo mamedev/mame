@@ -2876,10 +2876,10 @@ ROM_START( froggerv )
 	ROM_LOAD( "rana_ic12.ic12",  0x0800, 0x0800, CRC(c1690dfc) SHA1(c6fdb1b9ec4fb7da2566b0c71e3e2f931cdece68) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "ic10",     0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	ROM_LOAD( "ic10",     0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )  // SN74288 or equivalent BPROM
 
 	ROM_REGION( 0x0020, "user1", 0 ) /* decode PROMs */
-	ROM_LOAD( "ic7",      0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )
+	ROM_LOAD( "ic7",      0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )  // SN74288 or equivalent BPROM
 ROM_END
 
 

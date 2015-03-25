@@ -8,7 +8,8 @@
 
 *********************************************************************/
 
-#include "emu.h"
+#include <assert.h>
+
 #include "formats/m5_dsk.h"
 
 m5_format::m5_format() : upd765_format(formats)

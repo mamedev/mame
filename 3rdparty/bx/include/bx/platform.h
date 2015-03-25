@@ -19,11 +19,13 @@
 #define BX_PLATFORM_LINUX      0
 #define BX_PLATFORM_NACL       0
 #define BX_PLATFORM_OSX        0
+#define BX_PLATFORM_PS4        0
 #define BX_PLATFORM_QNX        0
 #define BX_PLATFORM_RPI        0
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
 #define BX_PLATFORM_XBOX360    0
+#define BX_PLATFORM_XBOXONE    0
 
 #define BX_CPU_ARM  0
 #define BX_CPU_JIT  0
@@ -120,6 +122,9 @@
 #if defined(_XBOX_VER)
 #	undef  BX_PLATFORM_XBOX360
 #	define BX_PLATFORM_XBOX360 1
+#elif defined (_DURANGO)
+#	undef  BX_PLATFORM_XBOXONE
+#	define BX_PLATFORM_XBOXONE 1
 #elif defined(_WIN32) || defined(_WIN64)
 // http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
 #	ifndef NOMINMAX
@@ -173,6 +178,9 @@
 #elif defined(EMSCRIPTEN)
 #	undef  BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN 1
+#elif defined(__ORBIS__)
+#	undef  BX_PLATFORM_PS4
+#	define BX_PLATFORM_PS4 1
 #elif defined(__QNX__)
 #	undef  BX_PLATFORM_QNX
 #	define BX_PLATFORM_QNX 1
@@ -242,6 +250,8 @@
 				BX_STRINGIZE(BX_PLATFORM_NACL)
 #elif BX_PLATFORM_OSX
 #	define BX_PLATFORM_NAME "OSX"
+#elif BX_PLATFORM_PS4
+#	define BX_PLATFORM_NAME "PlayStation 4"
 #elif BX_PLATFORM_QNX
 #	define BX_PLATFORM_NAME "QNX"
 #elif BX_PLATFORM_RPI
@@ -250,6 +260,10 @@
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT
 #	define BX_PLATFORM_NAME "WinRT"
+#elif BX_PLATFORM_XBOX360
+#	define BX_PLATFORM_NAME "Xbox 360"
+#elif BX_PLATFORM_XBOXONE
+#	define BX_PLATFORM_NAME "Xbox One"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM

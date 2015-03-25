@@ -41,11 +41,11 @@
  *
  ********************************************************************/
 
-#include "emu.h"
 #include <string.h>
-#include <assert.h>
 #include <time.h>
+#include <assert.h>
 
+#include "emu.h" // logerror
 #include "imageutl.h"
 #include "ti99_dsk.h"
 
@@ -834,6 +834,9 @@ void ti99_sdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 		if (TRACE) logerror("ti99_dsk: VIB says that this disk is %s density with %d sectors per track, %d tracks, and %d heads\n", (cell_size==4000)? "single": ((cell_size==2000)? "double" : "high"), sector_count, vib.tracksperside, heads);
 		have_vib = true;
 	}
+
+	// Do we have a broken VIB? The Pascal disks are known to have such incomplete VIBs
+	if (heads == 0 || sector_count == 0) have_vib = false;
 
 	// We're also checking the size of the image
 	int cell_size1 = 0;

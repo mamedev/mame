@@ -34,6 +34,8 @@ SVT - The full explanation may be found on the Solace web site,
 
 ********************************************************************/
 
+#include <assert.h>
+
 #include "sol_cas.h"
 
 #define WAVEENTRY_LOW  -32768

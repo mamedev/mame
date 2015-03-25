@@ -278,6 +278,7 @@ SOUNDS += MOS7360
 #SOUNDS += VRC6
 SOUNDS += SB0400
 SOUNDS += AC97
+SOUNDS += ES1373
 
 #-------------------------------------------------
 # specify available video cores
@@ -346,6 +347,7 @@ VIDEOS += TMS9928A
 VIDEOS += V9938
 #VIDEOS += VIC4567
 VIDEOS += VOODOO
+VIDEOS += VOODOO_PCI
 
 #-------------------------------------------------
 # specify available machine cores
@@ -1263,7 +1265,7 @@ $(MAMEOBJ)/itech.a: \
 	$(DRIVERS)/capbowl.o $(VIDEO)/capbowl.o \
 	$(DRIVERS)/itech8.o $(MACHINE)/slikshot.o $(VIDEO)/itech8.o \
 	$(DRIVERS)/itech32.o $(VIDEO)/itech32.o \
-	$(DRIVERS)/iteagle.o \
+	$(DRIVERS)/iteagle.o $(MACHINE)/iteagle_fpga.o \
 
 $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/aeroboto.o $(VIDEO)/aeroboto.o \
@@ -2675,15 +2677,21 @@ $(DRIVERS)/lbeach.o:    $(LAYOUT)/lbeach.lh
 $(DRIVERS)/goldstar.o:  $(LAYOUT)/goldstar.lh \
 			$(LAYOUT)/bingowng.lh \
 			$(LAYOUT)/cherryb3.lh \
+			$(LAYOUT)/chrygld.lh \
 			$(LAYOUT)/cmaster.lh \
 			$(LAYOUT)/cmasterb.lh \
 			$(LAYOUT)/cmasterc.lh \
+			$(LAYOUT)/cmpacman.lh \
 			$(LAYOUT)/cmv4.lh \
 			$(LAYOUT)/crazybon.lh \
 			$(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/nfb96.lh \
+			$(LAYOUT)/nfb96tx.lh \
 			$(LAYOUT)/pokonl97.lh \
-			$(LAYOUT)/roypok96.lh
+			$(LAYOUT)/roypok96.lh \
+			$(LAYOUT)/skill98.lh \
+			$(LAYOUT)/tonypok.lh \
+			$(LAYOUT)/unkch.lh
 
 $(DRIVERS)/grchamp.o:   $(LAYOUT)/grchamp.lh
 

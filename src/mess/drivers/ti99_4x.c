@@ -351,6 +351,12 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_START("ALPHA") /* one more port for Alpha line */
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
+	/* another version of Alpha Lock which is non-toggling; this is useful when we want to attach
+	    a real TI keyboard for input. For home computers, the Alpha Lock / Shift Lock was a physically
+	    locking key. */
+	PORT_START("ALPHA1")
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alpha Lock non-toggle") PORT_CODE(KEYCODE_RWIN)
+
 INPUT_PORTS_END
 
 
@@ -462,7 +468,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 			// the line enough to make the TMS9901 sense the low level.
 			// A reported, feasible fix was to cut the line and insert a diode
 			// below the Alphalock key.
-			if ((ioport("ALPHABUG")!=0) && (m_model!=MODEL_4)) answer |= ioport("ALPHA")->read();
+			if ((ioport("ALPHABUG")!=0) && (m_model!=MODEL_4)) answer |= (ioport("ALPHA")->read() | ioport("ALPHA1")->read());
 		}
 		else
 		{
@@ -470,7 +476,7 @@ READ8_MEMBER( ti99_4x_state::read_by_9901 )
 		}
 		if (m_check_alphalock)  // never true for TI-99/4
 		{
-			answer &= ~(ioport("ALPHA")->read());
+			answer &= ~(ioport("ALPHA")->read() | ioport("ALPHA1")->read());
 		}
 		answer = (answer << 3);
 		if (m_int1 == CLEAR_LINE) answer |= 0x02;

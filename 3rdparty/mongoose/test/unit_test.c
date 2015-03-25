@@ -120,8 +120,8 @@ static const char *test_parse_http_message() {
   ASSERT(strcmp(ri.http_version, "1.1") == 0);
   ASSERT(ri.num_headers == 0);
 
-  ASSERT(parse_http_message(req2, sizeof(req2) - 1, &ri) == -1);
-  ASSERT(parse_http_message(req6, 0, &ri) == -1);
+  ASSERT(parse_http_message(req2, sizeof(req2) - 1, &ri) == (size_t) ~0);
+  ASSERT(parse_http_message(req6, 0, &ri) == (size_t) ~0);
   ASSERT(parse_http_message(req8, sizeof(req8) - 1, &ri) == sizeof(req8) - 1);
 
   // TODO(lsm): Fix this. Header value may span multiple lines.
@@ -198,17 +198,19 @@ static const char *test_match_prefix(void) {
 }
 
 static const char *test_remove_double_dots() {
-  struct { char before[20], after[20]; } data[] = {
+  struct { char before[30], after[30]; } data[] = {
     {"////a", "/a"},
-    {"/.....", "/."},
-    {"/......", "/"},
+    {"/.....", "/....."},
+    {"/......", "/......"},
     {"...", "..."},
-    {"/...///", "/./"},
+    {"/...///", "/.../"},
     {"/a...///", "/a.../"},
     {"/.x", "/.x"},
     {"/\\", "/"},
     {"/a\\", "/a\\"},
-    {"/a\\\\...", "/a\\."},
+    {"/a\\\\...", "/a\\..."},
+    {"foo/x..y/././y/../../..", "foo/x..y/y/"},
+    {"foo/..x", "foo/..x"},
   };
   size_t i;
 
@@ -261,6 +263,7 @@ static const char *test_url_decode(void) {
   ASSERT(strcmp(buf, "a ") == 0);
 
   ASSERT(mg_url_decode("%61", 1, buf, sizeof(buf), 1) == 1);
+  printf("[%s]\n", buf);
   ASSERT(strcmp(buf, "%") == 0);
 
   ASSERT(mg_url_decode("%61", 2, buf, sizeof(buf), 1) == 2);

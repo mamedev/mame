@@ -17,10 +17,11 @@
  *102     uPD553C  1981, Bandai Block Out
  *127     uPD650C  198?  Sony OA-S1100 Typecorder (subcpu, have dump)
  *128     uPD650C  1982, Roland TR-606
-  133     uPD650C  1982, Roland TB-303
+  133     uPD650C  1982, Roland TB-303 -> tb303.c
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
- *202     uPD553C  1982, Epoch Astro Command
+ @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
+ *209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
@@ -53,25 +54,25 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 	
 	// misc common
-	UINT8 m_port[9];
-	UINT16 m_inp_mux;
+	UINT8 m_port[9];                    // MCU port A-I write data
+	UINT16 m_inp_mux;                   // multiplexed inputs mask
 
 	UINT8 read_inputs(int columns);
 
 	virtual void machine_start();
 
 	// display common
-	int m_display_wait;
-	int m_display_maxy;
-	int m_display_maxx;
+	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                 // display matrix number of rows
+	int m_display_maxx;                 // display matrix number of columns
 	
-	UINT32 m_grid;
-	UINT32 m_plate;
+	UINT32 m_grid;                      // VFD current row data
+	UINT32 m_plate;                     // VFD current column data
 	
-	UINT32 m_display_state[0x20];
-	UINT32 m_display_cache[0x20];
-	UINT8 m_display_decay[0x20][0x20];
-	UINT16 m_7seg_mask[0x20];
+	UINT32 m_display_state[0x20];	    // display matrix rows data
+	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	UINT32 m_display_cache[0x20];       // (internal use)
+	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
@@ -79,22 +80,26 @@ public:
 
 	// game-specific handlers
 	void ssfball_display();
-	DECLARE_READ8_MEMBER(ssfball_input_b_r);
 	DECLARE_WRITE8_MEMBER(ssfball_grid_w);
 	DECLARE_WRITE8_MEMBER(ssfball_plate_w);
+	DECLARE_READ8_MEMBER(ssfball_input_b_r);
 
 	void splasfgt_display();
-	DECLARE_READ8_MEMBER(splasfgt_input_b_r);
 	DECLARE_WRITE8_MEMBER(splasfgt_grid_w);
 	DECLARE_WRITE8_MEMBER(splasfgt_plate_w);
+	DECLARE_READ8_MEMBER(splasfgt_input_b_r);
+
+	void astrocmd_display();
+	DECLARE_WRITE8_MEMBER(astrocmd_grid_w);
+	DECLARE_WRITE8_MEMBER(astrocmd_plate_w);
 
 	DECLARE_WRITE8_MEMBER(edracula_grid_w);
 	DECLARE_WRITE8_MEMBER(edracula_plate_w);
 	
-	DECLARE_READ8_MEMBER(tmtennis_input_r);
 	DECLARE_WRITE8_MEMBER(tmtennis_grid_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_plate_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_port_e_w);
+	DECLARE_READ8_MEMBER(tmtennis_input_r);
 	void tmtennis_set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(tmtennis_difficulty_switch);
 	DECLARE_MACHINE_RESET(tmtennis);
@@ -103,8 +108,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tmpacman_grid_w);
 	DECLARE_WRITE8_MEMBER(tmpacman_plate_w);
 	
-	DECLARE_READ8_MEMBER(alnchase_input_r);
 	DECLARE_WRITE8_MEMBER(alnchase_output_w);
+	DECLARE_READ8_MEMBER(alnchase_input_r);
 };
 
 
@@ -112,9 +117,9 @@ void hh_ucom4_state::machine_start()
 {
 	// zerofill
 	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, 0, sizeof(m_display_cache));
+	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_7seg_mask, 0, sizeof(m_7seg_mask));
+	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 	
 	memset(m_port, 0, sizeof(m_port));
 	m_inp_mux = 0;
@@ -127,9 +132,9 @@ void hh_ucom4_state::machine_start()
 	save_item(NAME(m_display_wait));
 
 	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_cache));
+	/* save_item(NAME(m_display_cache)); */ // don't save!
 	save_item(NAME(m_display_decay));
-	save_item(NAME(m_7seg_mask));
+	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_port));
 	save_item(NAME(m_inp_mux));
@@ -172,12 +177,20 @@ void hh_ucom4_state::display_update()
 	for (int y = 0; y < m_display_maxy; y++)
 		if (m_display_cache[y] != active_state[y])
 		{
-			if (m_7seg_mask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_7seg_mask[y]);
+			if (m_display_segmask[y] != 0)
+				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
 			for (int x = 0; x < m_display_maxx; x++)
-				output_set_lamp_value(y * mul + x, active_state[y] >> x & 1);
+			{
+				int state = active_state[y] >> x & 1;
+				output_set_lamp_value(y * mul + x, state);
+
+				// bit coords for svg2lay
+				char buf[10];
+				sprintf(buf, "%d.%d", y, x);
+				output_set_value(buf, state);
+			}
 		}
 
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
@@ -188,7 +201,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_ucom4_state::display_decay_tick)
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
 		for (int x = 0; x < m_display_maxx; x++)
-			if (!(m_display_state[y] >> x & 1) && m_display_decay[y][x] != 0)
+			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 	
 	display_update();
@@ -249,12 +262,6 @@ void hh_ucom4_state::ssfball_display()
 	display_matrix(16, 9, plate, m_grid);
 }
 
-READ8_MEMBER(hh_ucom4_state::ssfball_input_b_r)
-{
-	// B: input port 2, where B3 is multiplexed
-	return m_inp_matrix[2]->read() | read_inputs(2);
-}
-
 WRITE8_MEMBER(hh_ucom4_state::ssfball_grid_w)
 {
 	// C,D(,E): vfd matrix grid 0-7(,8)
@@ -281,6 +288,12 @@ WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
 		ssfball_grid_w(space, offset, data >> 3 & 1);
 	else
 		ssfball_display();
+}
+
+READ8_MEMBER(hh_ucom4_state::ssfball_input_b_r)
+{
+	// B: input port 2, where B3 is multiplexed
+	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
 
@@ -346,7 +359,7 @@ MACHINE_CONFIG_END
   Bambino Space Laser Fight (manufactured in Japan)
   * PCB label Emix Corp. ET-12
   * NEC uCOM-43 MCU, labeled D553C 055
-  * blue VFD display Emix-104 (some versions had a green display)
+  * cyan VFD display Emix-104, with color overlay (blue or green overlay, depending on region)
 
   NOTE!: MESS external artwork is recommended
 
@@ -356,12 +369,6 @@ void hh_ucom4_state::splasfgt_display()
 {
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
 	display_matrix(16, 9, plate, m_grid);
-}
-
-READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
-{
-	// B: multiplexed buttons
-	return read_inputs(4);
 }
 
 WRITE8_MEMBER(hh_ucom4_state::splasfgt_grid_w)
@@ -391,6 +398,12 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_plate_w)
 		m_speaker->level_w(data & 3);
 	
 	ssfball_display();
+}
+
+READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
+{
+	// B: multiplexed buttons
+	return read_inputs(4);
 }
 
 
@@ -467,6 +480,102 @@ static MACHINE_CONFIG_START( splasfgt, hh_ucom4_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SPEAKER_LEVELS(4, splasfgt_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Epoch Astro Command (manufactured in Japan)
+  * PCB label 96111
+  * NEC uCOM-43 MCU, labeled D553C 202
+  * cyan/red VFD display NEC FIP9AM20T NO.42, with color overlay
+
+  known releases:
+  - Japan: Astro Command
+  - USA: Astro Command, published by Tandy
+  - UK: Scramble, published by Grandstand
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+void hh_ucom4_state::astrocmd_display()
+{
+	UINT32 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
+
+	display_matrix(17, 9, plate, grid);
+}
+
+WRITE8_MEMBER(hh_ucom4_state::astrocmd_grid_w)
+{
+	// C,D(,E3): vfd matrix grid
+	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+
+	astrocmd_display();
+}
+
+WRITE8_MEMBER(hh_ucom4_state::astrocmd_plate_w)
+{
+	// E01,F,G,H,I: vfd matrix plate
+	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	if (offset == NEC_UCOM4_PORTE)
+	{
+		// E2: speaker out
+		m_speaker->level_w(data >> 2 & 1);
+		
+		// E3: vfd matrix grid 8
+		astrocmd_grid_w(space, offset, data >> 3 & 1);
+	}
+	else
+		astrocmd_display();
+}
+
+
+static INPUT_PORTS_START( astrocmd )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Missile")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bomb")
+
+	PORT_START("IN.1") // port B
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( astrocmd, hh_ucom4_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
+	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, astrocmd_grid_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, astrocmd_grid_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -574,12 +683,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
-{
-	// A,B: multiplexed buttons
-	return ~read_inputs(2) >> (offset*4);
-}
-
 WRITE8_MEMBER(hh_ucom4_state::tmtennis_grid_w)
 {
 	// G,H,I: vfd matrix grid
@@ -606,6 +709,12 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_port_e_w)
 	// E3: N/C
 	m_inp_mux = data & 3;
 	m_speaker->level_w(data >> 2 & 1);
+}
+
+READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
+{
+	// A,B: multiplexed buttons
+	return ~read_inputs(2) >> (offset*4);
 }
 
 
@@ -719,7 +828,7 @@ MACHINE_CONFIG_END
 
 void hh_ucom4_state::tmpacman_display()
 {
-	UINT8 grid = BITSWAP8((UINT8)m_grid,0,1,2,3,4,5,6,7);
+	UINT32 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
 	
 	display_matrix(19, 8, plate | 0x100, grid); // plate 8 (maze) is always on
@@ -750,10 +859,10 @@ WRITE8_MEMBER(hh_ucom4_state::tmpacman_plate_w)
 
 static INPUT_PORTS_START( tmpacman )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // 4 separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_16WAY // "
 
 	PORT_START("IN.1") // port B
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
@@ -810,12 +919,6 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ8_MEMBER(hh_ucom4_state::alnchase_input_r)
-{
-	// A: buttons
-	return read_inputs(2);
-}
-
 WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 {
 	if (offset <= NEC_UCOM4_PORTE)
@@ -843,6 +946,12 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 	display_matrix(17, 9, m_plate, m_grid);
 }
 
+READ8_MEMBER(hh_ucom4_state::alnchase_input_r)
+{
+	// A: buttons
+	return read_inputs(2);
+}
+
 
 /* physical button layout and labels is like this:
 
@@ -867,9 +976,9 @@ static INPUT_PORTS_START( alnchase )
 
 	PORT_START("IN.1") // D0 port A
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) // on non-mirrored view, swap P2 left/right
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
 
 	PORT_START("IN.2") // port B
 	PORT_CONFNAME( 0x01, 0x01, "Players" )
@@ -929,9 +1038,15 @@ ROM_START( splasfgt )
 ROM_END
 
 
+ROM_START( astrocmd )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
+ROM_END
+
+
 ROM_START( edracula )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-206", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
+	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
 ROM_END
 
 
@@ -958,6 +1073,7 @@ ROM_END
 CONS( 1979, ssfball,   0,        0, ssfball,  ssfball,  driver_device, 0, "Bambino", "Superstar Football", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1980, splasfgt,  0,        0, splasfgt, splasfgt, driver_device, 0, "Bambino", "Space Laser Fight", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
+CONS( 1982, astrocmd,  0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, edracula,  0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1980, tmtennis,  0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )

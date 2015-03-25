@@ -1,3 +1,8 @@
+#include "emu.h"
+
+#include "machine/ticket.h"
+
+
 class goldstar_state : public driver_device
 {
 public:
@@ -21,10 +26,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(lucky8_lamps_w);
+	DECLARE_WRITE8_MEMBER(p1_lamps_w);
+	DECLARE_WRITE8_MEMBER(p2_lamps_w);
 	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
-	DECLARE_WRITE8_MEMBER(goldstar_lamps_w);
-	DECLARE_WRITE8_MEMBER(cb3_lamps_w);
 	DECLARE_WRITE8_MEMBER(cm_coincount_w);
 	DECLARE_WRITE8_MEMBER(ladylinr_outport_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
@@ -251,16 +255,14 @@ public:
 		goldstar_state(mconfig, type, tag),
 		m_reel1_attrram(*this, "reel1_attrram"),
 		m_reel2_attrram(*this, "reel2_attrram"),
-		m_reel3_attrram(*this, "reel3_attrram")
+		m_reel3_attrram(*this, "reel3_attrram"),
+		m_ticket_dispenser(*this, "tickets")
 	{
 	}
 
-	DECLARE_READ8_MEMBER(unk_r);
-
+	DECLARE_WRITE8_MEMBER(coincount_w);
 	DECLARE_WRITE8_MEMBER(unkcm_0x02_w);
 	DECLARE_WRITE8_MEMBER(unkcm_0x03_w);
-	DECLARE_WRITE8_MEMBER(unkcm_0x11_w);
-	DECLARE_WRITE8_MEMBER(unkcm_0x12_w);
 
 	DECLARE_WRITE8_MEMBER(reel1_attrram_w);
 	DECLARE_WRITE8_MEMBER(reel2_attrram_w);
@@ -273,6 +275,8 @@ public:
 	DECLARE_VIDEO_START(unkch);
 	UINT32 screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+
 protected:
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
@@ -283,5 +287,8 @@ private:
 	required_shared_ptr<UINT8> m_reel2_attrram;
 	required_shared_ptr<UINT8> m_reel3_attrram;
 
+	UINT8 m_vblank_irq_enable;
 	UINT8 m_vidreg;
+
+	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };

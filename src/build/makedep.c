@@ -11,6 +11,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <zlib.h>
+#include <assert.h>
 #include "osdcore.h"
 #include "astring.h"
 #include "corefile.h"
