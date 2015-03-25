@@ -2,6 +2,9 @@ CCOMFLAGS += \
 	-Wno-cast-align \
 	-Wno-tautological-compare
 
+# caused by dynamic_array being generally awful
+CCOMFLAGS += -Wno-dynamic-class-memaccess
+
 # caused by obj/sdl64d/emu/cpu/tms57002/tms57002.inc
 CCOMFLAGS += -Wno-self-assign-field
 
