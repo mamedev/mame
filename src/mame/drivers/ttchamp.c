@@ -53,12 +53,11 @@ Dumped by tirino73
 
 - works in a very similar way to 'Spider' (twins.c)
   including the blitter (seems to be doubled up hardware tho, twice as many layers?)
-- need to work out how it selects between upper/lower
-  program roms as blitter source
 - PIC is not for sound, what is is for?
 - eeprom? (I don't see one, maybe PIC is used for settings?)
-- more than one layer
-- layer clearing
+- Convert this to a blitter device, and share it with twins.c
+- A bunch of spurious RAM writes to ROM area (genuine bug? left-overs?)
+
 
 */
 
@@ -335,15 +334,22 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 			for (int i = 0; i < m_spriteswidth; i++)
 			{
-				if ((m_port10 & 0xf) == 0x01) // this is set when moving objects are cleared, although not screen clears?
+				if (m_port10 & 0x30) // this is set when moving objects are cleared, although not screen clears?
 				{
-					vram[offset] = 0x0000;
+					/* guess: assume that bit 4 is for layer 0 and bit 5 for layer 1 
+					   (according to 0x21 setted at the "Clubs League" color fade-out) 
+					*/
+					if(m_port10 & 0x10)
+						m_videoram0[offset] = 0x0000;
+					if(m_port10 & 0x20)
+						m_videoram2[offset] = 0x0000;
+
 					offset++;
 				}
 				else
 				{
 					UINT8 data;
-
+										
 					data = (src[(m_spritesaddr * 2) + 1]);
 					//data |= vram[offset] >> 8;
 
@@ -352,7 +358,6 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 						vram[offset] = (vram[offset] & 0x00ff) | data << 8;
 
 					data = src[(m_spritesaddr * 2)];
-					//data |= vram[offset] & 0xff;
 
 					if (data || (m_port10 & 2) == 0)
 						vram[offset] = (vram[offset] & 0xff00) | data;
@@ -392,36 +397,28 @@ READ16_MEMBER(ttchamp_state::ttchamp_blit_start_r)
 	return 0xff;
 }
 
+/* blitter mode select */
 WRITE16_MEMBER(ttchamp_state::port10_w)
 {
-	UINT8 res;
+	/*
+	 --xx ---- fill enable
+	 ---- --x- opacity enable (Gamart logo)
+	 ---- ---x layer select
+	*/
 	COMBINE_DATA(&m_port10);
-
-	res = m_port10 & 0xf0;
-	/* Assume that both bits clears layers. */
-	if(res == 0x30)
-	{
-		for (int i = 0; i < 0x8000; i++)
-		{
-			m_videoram0[i] = 0x0000;
-			m_videoram2[i] = 0x0000;
-		}
-	}
-	else if(res != 0)
-		printf("Check me, i/o 0x10 used with %02x\n",res);
 }
 
 /* selects upper bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port20_w)
 {
-	printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	//printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	m_rombank = 1;
 }
 
 /* selects lower bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port62_w)
 {
-	printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	//printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	m_rombank = 0;
 }
 
@@ -581,5 +578,5 @@ DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 //  membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_NOT_WORKING ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_NOT_WORKING ) // this only has Palencia Elektronik advertising boards
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", 0 ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", 0 ) // this only has Palencia Elektronik advertising boards
