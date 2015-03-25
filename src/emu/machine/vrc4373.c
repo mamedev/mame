@@ -13,17 +13,17 @@ ADDRESS_MAP_END
 
 // cpu i/f map
 DEVICE_ADDRESS_MAP_START(cpu_map, 32, vrc4373_device)
-	AM_RANGE(0x00000000, 0x0000007b) AM_READWRITE(    vrc4373_device::cpu_if_r,          vrc4373_device::cpu_if_w)
+	AM_RANGE(0x00000000, 0x0000007b) AM_READWRITE(    cpu_if_r,          cpu_if_w)
 ADDRESS_MAP_END
 
 // Target Window 1 map
 DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc4373_device)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    vrc4373_device::target1_r,          vrc4373_device::target1_w)
+	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target1_r,          target1_w)
 ADDRESS_MAP_END
 
 // Target Window 2 map
 DEVICE_ADDRESS_MAP_START(target2_map, 32, vrc4373_device)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    vrc4373_device::target2_r,          vrc4373_device::target2_w)
+	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target2_r,          target2_w)
 ADDRESS_MAP_END
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
