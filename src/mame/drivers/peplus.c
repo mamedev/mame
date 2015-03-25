@@ -8020,7 +8020,7 @@ Black Jack as in Jack of Spades/Clubs, not 21       With With
 PayTable   Js+ 2PR  STR  FL  FH  4K  SF  4K  4K  4A  4K   4K   4A  RF (Bonus)
 -----------------------------------------------------------------------------
  P870BB     1   1    3    4   7   9  50  25  80 160 160  400  400 400   800
-  % Range: 95.4-97.4%  Optimum: 99.4%  Hit Frequency: ???%
+  % Range: 95.4-97.4%  Optimum: 99.4%  Hit Frequency: 43.2%
      Programs Available: X002272P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8047,7 +8047,7 @@ Black Jack as in Jack of Spades/Clubs, not 21       With With
 PayTable   Js+ 2PR  STR  FL  FH  4K  SF  4K  4K  4A  4K   4K   4A  RF (Bonus)
 -----------------------------------------------------------------------------
  P873BB     1   1    3    4   5   8  50  25  80 160 160  400  400 400   800
-  % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: ???%
+  % Range: 92.0-94.0%  Optimum: 96.0%  Hit Frequency: 44.8%
      Programs Available: X002275P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8074,7 +8074,7 @@ Black Jack as in Jack of Spades/Clubs, not 21       With With
 PayTable   Js+ 2PR  STR  FL  FH  4K  SF  4K  4K  4A  4K   4K   4A  RF (Bonus)
 -----------------------------------------------------------------------------
  P874BB     1   1    3    4   5   7  50  25  80 160 160  400  400 400   800
-  % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: ???%
+  % Range: 91.0-93.0%  Optimum: 95.0%  Hit Frequency: 44.9%
      Programs Available: X002276P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
