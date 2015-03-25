@@ -27,6 +27,21 @@ Compatibility list (as per 26-jun-2013)
 - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
 - vtennisg: crashes after stage screen.
 
+(25-mar-2015)
+- sl2007:
+0C04697A: MOV.L   @($28,R14),R0 ;8c167734
+0C04697C: TST     R0,R0
+0C04697E: BT      $0C046998
+0C046980: BRA     $0C046990
+0C04698E: BT      $0C046998
+0C046990: MOV.L   @($28,R14),R3
+0C046992: MOV     #$FD,R5
+0C046994: JSR     R3
+0C046608: NOP
+0C04660A: BRA     $0C04660A ;tight loops there, NOP-ing this opcode makes to go further, perhaps not supposed to go here in the first place?
+0C046608: NOP
+
+
 TODO (general):
     - all games that uses YUV just updates one frame then dies, why?
     - Some SH to ARM sound streaming doesn't work (used by ADX compression system)
