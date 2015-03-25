@@ -43,7 +43,7 @@ TODO:
 ***************************************************************************/
 
 
-WRITE16_MEMBER(powerins_state::powerins_okibank_w)
+WRITE16_MEMBER(powerins_state::okibank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -58,7 +58,7 @@ WRITE16_MEMBER(powerins_state::powerins_okibank_w)
 	}
 }
 
-WRITE16_MEMBER(powerins_state::powerins_soundlatch_w)
+WRITE16_MEMBER(powerins_state::soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -76,16 +76,16 @@ static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w)                                // Flip Screen
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(flipscreen_w)                                // Flip Screen
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP                                                    // ? always 1
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)                                  // Tiles Banking (VRAM 0)
-	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w)                                // Sound Latch
-	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)                                   // Sound
+	AM_RANGE(0x100018, 0x100019) AM_WRITE(tilebank_w)                                  // Tiles Banking (VRAM 0)
+	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(soundlatch_w)                                // Sound Latch
+	AM_RANGE(0x100030, 0x100031) AM_WRITE(okibank_w)                                   // Sound
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_SHARE("vctrl_0")                             // VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_SHARE("vram_0")     // VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_SHARE("vram_1")     // VRAM 1
-	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)                                    // Mirror of VRAM 1?
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")     // VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")     // VRAM 1
+	AM_RANGE(0x171000, 0x171fff) AM_WRITE(vram_1_w)                                    // Mirror of VRAM 1?
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("spriteram")                                   // RAM + Sprites
 ADDRESS_MAP_END
 
@@ -96,17 +96,17 @@ static ADDRESS_MAP_START( powerina_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w)                                // Flip Screen
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(flipscreen_w)                                // Flip Screen
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP                                                    // ? always 1
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)                                  // Tiles Banking (VRAM 0)
+	AM_RANGE(0x100018, 0x100019) AM_WRITE(tilebank_w)                                  // Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITENOP                                                    // Sound Latch, NOPed since there is no sound cpu
-	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)                                   // Sound
+	AM_RANGE(0x100030, 0x100031) AM_WRITE(okibank_w)                                   // Sound
 	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)     // (used by powerina)
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_SHARE("vctrl_0")                             // VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_SHARE("vram_0")     // VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_SHARE("vram_1")     // VRAM 1
-	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)                                    // Mirror of VRAM 1?
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")     // VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")     // VRAM 1
+	AM_RANGE(0x171000, 0x171fff) AM_WRITE(vram_1_w)                                    // Mirror of VRAM 1?
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("spriteram")                                   // RAM + Sprites
 ADDRESS_MAP_END
 
@@ -311,14 +311,14 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-void powerins_state::machine_reset()
+void powerins_state::machine_start()
 {
-	m_oki_bank = -1;    // samples bank "unitialised"
+	save_item(NAME(m_oki_bank));
 }
 
-WRITE_LINE_MEMBER(powerins_state::irqhandler)
+void powerins_state::machine_reset()
 {
-	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_oki_bank = -1;    // samples bank "uninitialised"
 }
 
 static MACHINE_CONFIG_START( powerins, powerins_state )
@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update_powerins)
+	MCFG_SCREEN_UPDATE_DRIVER(powerins_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerins)
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( powerins, powerins_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 12000000 / 8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(powerins_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -701,7 +701,7 @@ ROM_END
 
 
 /* all supported sets give a 93.10.20 date */
-GAME( 1993, powerins,  0,        powerins, powerins, driver_device, 0, ROT0, "Atlus", "Power Instinct (USA)", 0 )
-GAME( 1993, powerinsj, powerins, powerins, powerinj, driver_device, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", 0 )
-GAME( 1993, powerinsa, powerins, powerina, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", 0 )
-GAME( 1993, powerinsb, powerins, powerinb, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", 0 )
+GAME( 1993, powerins,  0,        powerins, powerins, driver_device, 0, ROT0, "Atlus", "Power Instinct (USA)", GAME_SUPPORTS_SAVE )
+GAME( 1993, powerinsj, powerins, powerins, powerinj, driver_device, 0, ROT0, "Atlus", "Gouketsuji Ichizoku (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, powerinsa, powerins, powerina, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1993, powerinsb, powerins, powerinb, powerins, driver_device, 0, ROT0, "bootleg", "Power Instinct (USA, bootleg set 2)", GAME_SUPPORTS_SAVE )
