@@ -161,7 +161,7 @@ void gba_state::dma_exec(FPTR ch)
 	else
 	{
 //      if (dst >= 0x6000000 && dst <= 0x6017fff)
-//          printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (PC %x) (%s)\n", (int)ch, src, dst, ctrl, cnt, activecpu_get_pc(), ((ctrl>>10) & 1) ? "32" : "16");
+//		printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (%s)\n", (int)ch, src, dst, ctrl, cnt, ((ctrl>>10) & 1) ? "32" : "16");
 	}
 
 	for (int i = 0; i < cnt; i++)
@@ -1559,7 +1559,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 				ch = offset / 3;
 
-//              printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", activecpu_get_pc(), ch, data, offset%3, ~mem_mask);
+//				printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", space.device().safe_pc(), ch, data, offset%3, ~mem_mask);
 
 				if (((offset % 3) == 2) && ((~mem_mask & 0xffff0000) == 0))
 				{
@@ -1961,23 +1961,25 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 	if (scanline < 160)
 	{
 		draw_scanline(scanline);
-	}
-	m_DISPSTAT |= DISPSTAT_HBL;
-	if ((m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
-	{
-		request_irq(INT_HBL);
-	}
 
-	for (ch = 0; ch < 4; ch++)
-	{
-		ctrl = m_dma_regs[(ch*3)+2]>>16;
-
-		// HBL-triggered DMA?
-		if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x2000))
+		if ((m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
 		{
-			dma_exec(ch);
+			request_irq(INT_HBL);
+		}
+
+		for (ch = 0; ch < 4; ch++)
+		{
+			ctrl = m_dma_regs[(ch*3)+2]>>16;
+
+			// HBL-triggered DMA?
+			if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x2000))
+			{
+				dma_exec(ch);
+			}
 		}
 	}
+
+	m_DISPSTAT |= DISPSTAT_HBL;
 
 	m_hbl_timer->adjust(attotime::never);
 }
@@ -1995,6 +1997,28 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 	if (scanline >= 160 && scanline < 227)
 	{
 		m_DISPSTAT |= DISPSTAT_VBL;
+
+		// VBL IRQ and DMA on line 160
+		if (scanline == 160)
+		{
+			int ch, ctrl;
+
+			if (m_DISPSTAT & DISPSTAT_VBL_IRQ_EN)
+			{
+				request_irq(INT_VBL);
+			}
+
+			for (ch = 0; ch < 4; ch++)
+			{
+				ctrl = m_dma_regs[(ch*3)+2]>>16;
+
+				// VBL-triggered DMA?
+				if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x1000))
+				{
+					dma_exec(ch);
+				}
+			}
+		}
 	}
 	else
 	{
@@ -2008,50 +2032,6 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 		if (m_DISPSTAT & DISPSTAT_VCNT_IRQ_EN)
 		{
 			request_irq(INT_VCNT);
-		}
-	}
-
-	// exiting VBL, handle interrupts and DMA triggers
-	if (scanline == 224)
-	{
-		// FIXME: some games are very picky with this trigger!
-		// * Mario & Luigi SuperStar Saga loses pieces of gfx for 225-227.
-		// * Driver 2 does not work with values > 217.
-		// * Prince of Persia Sands of Time, Rayman Hoodlum's Revenge, Rayman 3 breaks for large
-		//   values (say > 200, but exact threshold varies).
-		// * Scooby-Doo Unmasked and Mystery Mayhem have problems with large values (missing dialogue
-		//   text).
-		// * Nicktoons Racign does not start with 227; and it resets before going to the race with
-		//   values > 206.
-		// * Phil of Future does not start for values > 221.
-		// * Sabrina Teenage Witch does not even reach the Ubi Soft logo if we use the VBL exit value
-		//   227; it does not display title screen graphics when using 225-226; the intro is broken
-		//   with anything between 207-224.
-		// * Anstoss Action and Ueki no Housoku have broken graphics for values > 223.
-		// However, taking smaller values breaks raster effects in a LOT of games (e.g. Castlevania
-		// series, Final Fantasy series, Tales of Phantasia, Banjo Pilot, NES 'collections' by Hudson,
-		// Jaleco and Technos, plus tons of racing games, which show garbage in the lower half of the
-		// screen with smaller values).
-		// Already choosing 224 instead of 227 makes some glitches to appear in the bottom scanlines.
-		// Other test cases are EA Sport games (like FIFA or Madden) which have various degrees of
-		// glitchness depending on the value used here.
-		// More work on IRQs is definitely necessary!
-		int ch, ctrl;
-
-		if (m_DISPSTAT & DISPSTAT_VBL_IRQ_EN)
-		{
-			request_irq(INT_VBL);
-		}
-
-		for (ch = 0; ch < 4; ch++)
-		{
-			ctrl = m_dma_regs[(ch*3)+2]>>16;
-
-			// VBL-triggered DMA?
-			if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x1000))
-			{
-				dma_exec(ch);
-			}
 		}
 	}
 
