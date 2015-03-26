@@ -251,6 +251,7 @@ SOUNDS["ESQPUMP"] = true
 SOUNDS["VRC6"] = true
 SOUNDS["SB0400"] = true
 SOUNDS["AC97"] = true
+SOUNDS["ES1373"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -320,6 +321,7 @@ VIDEOS["UPD7227"] = true
 VIDEOS["V9938"] = true
 VIDEOS["VIC4567"] = true
 VIDEOS["VOODOO"] = true
+VIDEOS["VOODOO_PCI"] = true
 VIDEOS["SCN2674"] = true
 
 --------------------------------------------------
