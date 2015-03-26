@@ -154,6 +154,12 @@ newoption {
 	description = "Generate a link map.",
 } 
 
+newoption {
+	trigger = "FORCE_DRC_C_BACKEND",
+	description = "Force DRC C backend.",
+} 
+
+
 local os_version = str_to_version(_OPTIONS["os_version"])
 USE_BGFX = 1
 if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
@@ -337,6 +343,19 @@ configuration { }
 		"FLAC__NO_DLL",
 	}
 
+	-- fixme -- need to make this work for other target architectures (PPC)
+	if _OPTIONS["FORCE_DRC_C_BACKEND"]==nil then
+		configuration { "x64" }
+			defines {
+				"NATIVE_DRC=drcbe_x64",
+			}
+		configuration { "x32" }
+			defines {
+				"NATIVE_DRC=drcbe_x86",
+			}
+		configuration {  }
+	end
+	
 -- define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
 --ifneq ($(BUILD_JPEGLIB),1)
 --DEFS += -DUSE_SYSTEM_JPEGLIB
