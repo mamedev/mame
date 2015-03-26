@@ -707,7 +707,6 @@ function createProjects(_target, _subtarget)
 		MAME_DIR .. "src/mess/drivers/korgm1.*",
 		MAME_DIR .. "src/mess/tools/**.*",
 		MAME_DIR .. "src/mess/**.rc",
-		MAME_DIR .. "src/mame/**.rc",
 	}
 	
 end
