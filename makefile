@@ -19,10 +19,10 @@ ifdef TOOLS
 PARAMS+= --with-tools
 endif
 ifdef CC
-PARAMS+= --CC=$(CC)
+PARAMS+= --CC='$(CC)'
 endif
 ifdef LD
-PARAMS+= --LD=$(LD)
+PARAMS+= --LD='$(LD)'
 endif
 
 #-------------------------------------------------
