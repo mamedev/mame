@@ -36,18 +36,6 @@ if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RS
 	}
 end
 
--- fixme -- need to make this work for other target architectures (PPC)
-
---ifndef FORCE_DRC_C_BACKEND
-configuration { "x64" }
-	defines { "NATIVE_DRC=drcbe_x64" }
-	
-configuration { "x32" }
-	defines { "NATIVE_DRC=drcbe_x86" }
---endif
-configuration { }
-
-
 --------------------------------------------------
 -- Signetics 8X300 / Scientific Micro Systems SMS300
 --@src/emu/cpu/8x300/8x300.h,CPUS += 8X300
