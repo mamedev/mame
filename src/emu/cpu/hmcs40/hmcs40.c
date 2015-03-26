@@ -557,12 +557,7 @@ void hmcs40_cpu_device::execute_run()
 
 		// LPU is handled 1 cycle later
 		if ((m_prev_op & 0x3e0) == 0x340)
-		{
-			if ((m_op & 0x1c0) != 0x1c0)
-				logerror("%s LPU without BR/CAL at $%04X\n", tag(), m_prev_pc);
-
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
-		}
 
 		// check/handle interrupt, but not in the middle of a long jump
 		if (m_ie && (m_iri || m_irt) && (m_op & 0x3e0) != 0x340)
