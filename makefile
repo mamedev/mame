@@ -15,6 +15,16 @@
 #################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
 ###########################################################################
 
+PARAMS=--distro=$(DISTRO)
+ifdef TOOLS
+PARAMS+= --with-tools
+endif
+ifdef CC
+PARAMS+= --CC=$(CC)
+endif
+ifdef LD
+PARAMS+= --LD=$(LD)
+endif
 
 #-------------------------------------------------
 # specify core target: mame, mess, etc.
@@ -231,11 +241,6 @@ endif
 GENIE=3rdparty/genie/bin/$(OS)/genie
 
 SILENT?=@
-
-PARAMS=--distro=$(DISTRO)
-ifdef TOOLS
-PARAMS+= --with-tools
-endif
 
 all: $(GENIE) $(TARGETOS)_$(ARCHITECTURE)
 

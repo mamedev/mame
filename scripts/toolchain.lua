@@ -330,6 +330,13 @@ function toolchain(_buildDir)
 		end
 	end
 
+	if (_OPTIONS["CC"] ~= nil) then
+		premake.gcc.cc  = _OPTIONS["CC"]
+	end
+	if (_OPTIONS["LD"] ~= nil) then
+		premake.gcc.cxx  = _OPTIONS["LD"]
+	end	
+	
 	configuration {} -- reset configuration
 
 

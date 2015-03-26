@@ -104,6 +104,16 @@ newoption {
 	value = "",
 }
 
+newoption {
+	trigger = "CC",
+	description = "CC replacement",
+}
+
+newoption {
+	trigger = "LD",
+	description = "LD replacement",
+}
+
 local os_version = str_to_version(_OPTIONS["os_version"])
 USE_BGFX = 1
 if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
