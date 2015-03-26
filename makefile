@@ -21,6 +21,9 @@ endif
 ifdef CC
 PARAMS+= --CC='$(CC)'
 endif
+ifdef CXX
+PARAMS+= --CXX='$(CXX)'
+endif
 ifdef LD
 PARAMS+= --LD='$(LD)'
 endif

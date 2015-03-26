@@ -110,6 +110,11 @@ newoption {
 }
 
 newoption {
+	trigger = "CXX",
+	description = "CXX replacement",
+}
+
+newoption {
 	trigger = "LD",
 	description = "LD replacement",
 }
