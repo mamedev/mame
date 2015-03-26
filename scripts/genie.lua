@@ -70,6 +70,20 @@ newoption {
 }
 
 newoption {
+	trigger = "distro",
+	description = "Choose distribution",
+	allowed = {
+		{ "generic", 		   "generic"         	},
+		{ "debian-stable",     "debian-stable"      },
+		{ "ubuntu-intrepid",   "ubuntu-intrepid"    },
+		{ "gcc44-generic",     "gcc44-generic"   	},
+		{ "gcc45-generic",     "gcc45-generic"     	},
+		{ "gcc46-generic",     "gcc46-generic" 		},
+		{ "gcc47-generic",     "gcc47-generic"      },
+	},
+}
+
+newoption {
 	trigger = "target",
 	description = "Building target",
 }
@@ -491,6 +505,17 @@ configuration { "linux-*" }
 			"X11",
 			"Xinerama",
 		}
+		defines 
+		{
+			"DISTRO=" .. _OPTIONS["distro"] ,
+		}
+		if _OPTIONS["distro"]=="debian-stable" then
+			defines 
+			{
+				"NO_AFFINITY_NP",
+			}
+		end
+
 
 configuration { "osx*" }
 

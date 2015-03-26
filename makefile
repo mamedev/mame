@@ -136,6 +136,50 @@ ifdef PTR64
 ARCHITECTURE = x64
 endif
 
+
+PYTHON = @python
+CC = @gcc
+LD = @g++
+
+#-------------------------------------------------
+# distribution may change things
+#-------------------------------------------------
+
+ifeq ($(DISTRO),)
+DISTRO = generic
+else
+ifeq ($(DISTRO),debian-stable)
+else
+ifeq ($(DISTRO),ubuntu-intrepid)
+# Force gcc-4.2 on ubuntu-intrepid
+CC = @gcc -V 4.2
+LD = @g++-4.2
+else
+ifeq ($(DISTRO),gcc44-generic)
+CC = @gcc-4.4
+LD = @g++-4.4
+else
+ifeq ($(DISTRO),gcc45-generic)
+CC = @gcc-4.5
+LD = @g++-4.5
+else
+ifeq ($(DISTRO),gcc46-generic)
+CC = @gcc-4.6
+LD = @g++-4.6
+else
+ifeq ($(DISTRO),gcc47-generic)
+CC = @gcc-4.7
+LD = @g++-4.7
+else
+$(error DISTRO $(DISTRO) unknown)
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+
 # extension for executables
 EXE =
 
@@ -164,9 +208,6 @@ endif
 
 GENDIR = build/generated
 
-PYTHON = @python
-CC = @gcc
-LD = @g++
 # all sources are under the src/ directory
 SRC = src
 
@@ -191,9 +232,9 @@ GENIE=3rdparty/genie/bin/$(OS)/genie
 
 SILENT?=@
 
-PARAMS= 
+PARAMS=--distro=$(DISTRO)
 ifdef TOOLS
-PARAMS=--with-tools
+PARAMS+= --with-tools
 endif
 
 all: $(GENIE) $(TARGETOS)_$(ARCHITECTURE)

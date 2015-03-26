@@ -148,6 +148,28 @@ function toolchain(_buildDir)
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then
+			-- Force gcc-4.2 on ubuntu-intrepid
+			if _OPTIONS["distro"]=="ubuntu-intrepid" then
+				premake.gcc.cc   = "@gcc -V 4.2"
+				premake.gcc.cxx  = "@g++-4.2"
+			end		
+			if _OPTIONS["distro"]=="gcc44-generic" then
+				premake.gcc.cc   = "@gcc-4.4"
+				premake.gcc.cxx  = "@g++-4.4"
+			end					
+			if _OPTIONS["distro"]=="gcc45-generic" then
+				premake.gcc.cc   = "@gcc-4.5"
+				premake.gcc.cxx  = "@g++-4.5"
+			end					
+			if _OPTIONS["distro"]=="gcc46-generic" then
+				premake.gcc.cc   = "@gcc-4.6"
+				premake.gcc.cxx  = "@g++-4.6"
+			end					
+			if _OPTIONS["distro"]=="gcc47-generic" then
+				premake.gcc.cc   = "@gcc-4.7"
+				premake.gcc.cxx  = "@g++-4.7"
+			end	
+			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-linux")
 		end
 
