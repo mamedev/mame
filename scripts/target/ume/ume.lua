@@ -700,7 +700,7 @@ function createProjects(_target, _subtarget)
 		MAME_DIR .. "src/mess/**.*",
 		MAME_DIR .. "src/emu/machine/nsc810.*", 
 	}
-	excludes {
+	removefiles {
 		MAME_DIR .. "src/mame/mame.c",
 		MAME_DIR .. "src/mame/etc/*.*",
 		MAME_DIR .. "src/mess/mess.c",

@@ -220,6 +220,8 @@ project "lua"
 			"LUA_32BITS",
 		}
 	end
+	
+	configuration { }
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
@@ -229,9 +231,10 @@ project "lua"
 		MAME_DIR .. "3rdparty/lua/**.c",
 		MAME_DIR .. "3rdparty/lua/**.h",
 	}
-	excludes {
-		MAME_DIR .. "3rdparty/lua/lua.c",
-		MAME_DIR .. "3rdparty/lua/luac.c",
+	
+	removefiles {
+		MAME_DIR .. "3rdparty/lua/src/lua.c",
+		MAME_DIR .. "3rdparty/lua/src/luac.c",
 	}
 
 project "lsqlite3"
@@ -307,7 +310,7 @@ project "sqllite3"
 		MAME_DIR .. "3rdparty/sqlite3/**.h",
 	}
 
-	excludes {
+	removefiles {
 		MAME_DIR .. "3rdparty/sqlite3/shell.c",
 	}
 
@@ -416,4 +419,7 @@ project "bgfx"
 			MAME_DIR .. "3rdparty/bgfx/src/*.mm",
 		}
 	end
+	removefiles {
+		MAME_DIR .. "3rdparty/bgfx/src/amalgamated.cpp",
+	}
 end
