@@ -193,7 +193,10 @@ end
 		"ExtraWarnings",
 		"FatalWarnings",
 	}
-
+	configuration { "Debug" }
+		flags {
+			"Symbols",
+		}	
 	configuration {}
 	
 msgcompile ("Compiling $(subst ../../../,,$<)...")
@@ -602,7 +605,6 @@ configuration { "nacl*" }
 
 configuration { "linux-*" }
 		linkoptions {
-			"-Wl,--gc-sections",
 			"`sdl2-config --libs`",
 		}
 		links {
@@ -647,7 +649,6 @@ configuration { "mingw*" }
 			"main=utf8_main",
 		}
 		linkoptions {
-			"-Wl,--gc-sections",
 			"-static-libgcc",
 			"-static-libstdc++",
 			"-municode",
