@@ -518,7 +518,6 @@ configuration { "linux-*" }
 
 
 configuration { "osx*" }
-
 		links {
 			"Cocoa.framework",
 			"OpenGL.framework",
