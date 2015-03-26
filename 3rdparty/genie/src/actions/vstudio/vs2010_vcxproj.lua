@@ -477,19 +477,7 @@
 				vc2010.link(cfg)
 				event_hooks(cfg)
 			_p(1,'</ItemDefinitionGroup>')
-
-
 		end
-	end
-
-
-
-	function exists(table, fine)
-		for _, value in ipairs(table) do
-			if value == find then return true end
-		end
-
-		return false
 	end
 
 
@@ -506,7 +494,7 @@
 				ClInclude = {},
 				None = {},
 				ResourceCompile = {},
-                AppxManifest = {}
+				AppxManifest = {}
 			}
 
 			local foundAppxManifest = false
@@ -514,19 +502,19 @@
 				if path.iscppfile(file.name) then
 					table.insert(sortedfiles.ClCompile, file)
 				elseif path.iscppheader(file.name) then
-					if not exists(prj.removefiles, file) then
+					if not table.icontains(prj.removefiles, file) then
 						table.insert(sortedfiles.ClInclude, file)
 					end
 				elseif path.isresourcefile(file.name) then
 					table.insert(sortedfiles.ResourceCompile, file)
 				else
-                    local ext = path.getextension(file.name):lower()
-                    if ext == ".appxmanifest" then
+					local ext = path.getextension(file.name):lower()
+					if ext == ".appxmanifest" then
 						foundAppxManifest = true
-                        table.insert(sortedfiles.AppxManifest, file)
-                    else
-					    table.insert(sortedfiles.None, file)
-                    end
+						table.insert(sortedfiles.AppxManifest, file)
+					else
+						table.insert(sortedfiles.None, file)
+					end
 				end
 			end
 
@@ -557,7 +545,7 @@
 		vc2010.compilerfilesgroup(prj)
 		vc2010.simplefilesgroup(prj, "None")
 		vc2010.simplefilesgroup(prj, "ResourceCompile")
-        vc2010.simplefilesgroup(prj, "AppxManifest")
+		vc2010.simplefilesgroup(prj, "AppxManifest")
 	end
 
 
@@ -566,13 +554,13 @@
 		if #files > 0  then
 			_p(1,'<ItemGroup>')
 			for _, file in ipairs(files) do
-                if subtype then
-                    _p(2,'<%s Include=\"%s\">', section, path.translate(file.name, "\\"))
-                    _p(3,'<SubType>%s</SubType>', subtype)
-                    _p(2,'</%s>', section)
-                else
-				    _p(2,'<%s Include=\"%s\" />', section, path.translate(file.name, "\\"))
-                end
+				if subtype then
+					_p(2,'<%s Include=\"%s\">', section, path.translate(file.name, "\\"))
+					_p(3,'<SubType>%s</SubType>', subtype)
+					_p(2,'</%s>', section)
+				else
+					_p(2,'<%s Include=\"%s\" />', section, path.translate(file.name, "\\"))
+				end
 			end
 			_p(1,'</ItemGroup>')
 		end
@@ -605,37 +593,15 @@
 					end
 				end
 
-				-- Global exclude
-				local excluded = false
-				for _, exclude in ipairs(prj.excludes) do
-					if exclude == file.name then
-						for _, vsconfig in ipairs(configs) do
-							local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
-							_p(3, '<ExcludedFromBuild '
-								.. if_config_and_platform()
-								.. '>true</ExcludedFromBuild>'
-								, premake.esc(vsconfig.name)
-								)
-						end
-						excluded = true
-						break
-					end
-				end
-
-				if not excluded then
-					-- Per configuration excludes
-					for _, vsconfig in ipairs(configs) do
-						local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
-						for _, exclude in ipairs(cfg.excludes) do
-
-							if exclude == file.name then
-								_p(3, '<ExcludedFromBuild '
-									.. if_config_and_platform()
-									.. '>true</ExcludedFromBuild>'
-									, premake.esc(vsconfig.name)
-									)
-							end
-						end
+				local excluded = table.icontains(prj.excludes, file.name)
+				for _, vsconfig in ipairs(configs) do
+					local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
+					if excluded or table.icontains(cfg.excludes, file.name) then
+						_p(3, '<ExcludedFromBuild '
+							.. if_config_and_platform()
+							.. '>true</ExcludedFromBuild>'
+							, premake.esc(vsconfig.name)
+							)
 					end
 				end
 

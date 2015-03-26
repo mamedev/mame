@@ -253,6 +253,7 @@
 		-- build the configuration base by merging the solution and project level settings
 		local cfg = {}
 		mergeobject(cfg, basis[key])
+
 		adjustpaths(obj.location, cfg)
 		mergeobject(cfg, obj)
 
@@ -376,7 +377,7 @@
 
 					local dir
 					local start = iif(cfg.name, 2, 1)
-					for v = start, iif(cfg.flags.SingleOutputDir,num_variations-1,num_variations) do
+					for v = start, iif(cfg.flags.SingleOutputDir==true,num_variations-1,num_variations) do
 						dir = cfg_dirs[cfg][v]
 						if hit_counts[dir] == 1 then break end
 					end
@@ -701,15 +702,13 @@
 		end
 
 		-- remove excluded files from the file list
-		local files = { }
+		local removefiles = cfg.removefiles
+		if _ACTION == 'gmake' then
+			removefiles = table.join(removefiles, cfg.excludes)
+		end
+		local files = {}
 		for _, fname in ipairs(cfg.files) do
-			local removed = false
-			for _, removefname in ipairs(cfg.removefiles) do
-				removed = (fname == removefname)
-				if (removed) then break end
-			end
-
-			if (not removed) then
+			if not table.icontains(removefiles, fname) then
 				table.insert(files, fname)
 			end
 		end

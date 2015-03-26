@@ -1,10 +1,2 @@
 bin
 build/*/obj
-scripts/obj
-*.sln
-*.suo
-*.vcxproj
-*.vcxproj.filters
-*.vcxproj.user
-*.opensdf
-*.sdf

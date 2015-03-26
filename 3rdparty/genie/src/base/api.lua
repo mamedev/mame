@@ -810,13 +810,16 @@
 		end
 
 		-- list value types get a remove() call too
-		if info.kind == "list" or
-		   info.kind == "dirlist" or
-		   info.kind == "filelist" or
-		   info.kind == "absolutefilelist"
+		if info.kind == "list"
+		or info.kind == "dirlist"
+		or info.kind == "filelist"
+		or info.kind == "absolutefilelist"
 		then
-			_G["remove"..name] = function(value)
-				premake.remove(name, value)
+			if  name ~= "removefiles"
+			and name ~= "files" then
+				_G["remove"..name] = function(value)
+					premake.remove(name, value)
+				end
 			end
 		end
 	end

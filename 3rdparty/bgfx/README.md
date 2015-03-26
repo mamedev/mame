@@ -432,6 +432,13 @@ Configuration is `<platform>-<debug/release>[32/64]`. For example:
 	linux-release32, nacl-debug64, nacl-arm-debug, pnacl-release, 
 	android-release, etc.
 
+Amalgamated build
+-----------------
+
+For ease of integration to other build system bgfx library can be built with
+single .cpp file. It's only necessary to build [src/amalgamated.cpp](https://github.com/bkaradzic/bgfx/blob/master/src/amalgamated.cpp)
+inside different build system.
+
 OculusVR integration
 --------------------
 
@@ -567,6 +574,11 @@ Using bgfx with SDL example:
 with examples:
 
 	genie --with-sdl vs2012
+
+**NOTE** Special care is necessary to make custom windowing to work with
+multithreaded renderer. Each platform has rules about where renderer can be and
+how multithreading interacts with context/device. To disable multithreaded
+render use `BGFX_CONFIG_MULTITHREDED=0` preprocessor define.
 
 Tools
 -----

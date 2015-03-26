@@ -73,20 +73,20 @@
 			_p('endef')
 			_p('')
 		end
-		
+
 		-- target build rule
 		_p('$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES)')
-		
-		if prj.kind == "StaticLib" then		
+
+		if prj.kind == "StaticLib" then
 			if prj.msgarchiving then
 				_p('\t@echo ' .. prj.msgarchiving)
 			else
 				_p('\t@echo Archiving %s', prj.name)
-			end		
-			if (not prj.archivesplit_size) then 
+			end
+			if (not prj.archivesplit_size) then
 				prj.archivesplit_size=200
 			end
-			if (not prj.options.ArchiveSplit) then		
+			if (not prj.options.ArchiveSplit) then
 				_p('\t$(SILENT) $(LINKCMD) $(OBJECTS)')
 			else
 				_p('\t$(call RM,$(TARGET))')
@@ -98,7 +98,7 @@
 				_p('\t@echo ' .. prj.msglinking)
 			else
 				_p('\t@echo Linking %s', prj.name)
-			end		
+			end
 			_p('\t$(SILENT) $(LINKCMD)')
 		end
 		_p('\t$(POSTBUILDCMDS)')
@@ -109,9 +109,16 @@
 		_p('$(TARGETDIR):')
 		premake.make_mkdirrule("$(TARGETDIR)")
 
-		_p('$(OBJDIRS):')
 		if (not prj.solution.messageskip) or (not table.contains(prj.solution.messageskip, "SkipCreatingMessage")) then
-			_p('\t@echo Creating $(OBJDIR)')
+		_p('objdirmessage:')
+		_p('\t@echo Creating $(OBJDIR)')
+		_p('')
+		end
+
+		if (not prj.solution.messageskip) or (not table.contains(prj.solution.messageskip, "SkipCreatingMessage")) then
+		_p('$(OBJDIRS): objdirmessage')
+		else
+		_p('$(OBJDIRS):')
 		end
 		_p('\t-$(call MKDIR,$@)')
 		_p('')
@@ -246,14 +253,8 @@
 		for _, file in ipairs(prj.files) do
 			if path.iscppfile(file) then
 				-- check if file is excluded.
-				local excluded = false
-				for _, exclude in ipairs(cfg.excludes) do
-					excluded = (exclude == file)
-					if (excluded) then break end
-				end
-				
-				-- if not excluded, add it.
-				if excluded == false then
+				if not table.icontains(cfg.excludes, file) then
+					-- if not excluded, add it.
 					_p('\t$(OBJDIR)/%s.o \\'
 						, _MAKE.esc(path.trimdots(path.removeext(file)))
 						)

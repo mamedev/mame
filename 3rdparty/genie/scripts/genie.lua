@@ -36,7 +36,7 @@
 			"../src/host/scripts.c",
 		}
 
-		removefiles {
+		excludes {
 			"../src/premake.lua",
 			"../src/host/lua-5.2.3/src/lua.c",
 			"../src/host/lua-5.2.3/src/luac.c",

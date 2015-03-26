@@ -10,7 +10,7 @@
 #	include <bx/timer.h>
 #	include <bx/uint32_t.h>
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 	static char s_viewName[BGFX_CONFIG_MAX_VIEWS][BGFX_CONFIG_MAX_VIEW_NAME];
 
@@ -417,6 +417,7 @@ namespace bgfx
 			EXT_blend_color,
 			EXT_blend_minmax,
 			EXT_blend_subtract,
+			EXT_color_buffer_half_float,
 			EXT_compressed_ETC1_RGB8_sub_texture,
 			EXT_debug_label,
 			EXT_debug_marker,
@@ -491,10 +492,12 @@ namespace bgfx
 			OES_vertex_half_float,
 			OES_vertex_type_10_10_10_2,
 
+			WEBGL_color_buffer_float,
 			WEBGL_compressed_texture_etc1,
 			WEBGL_compressed_texture_s3tc,
 			WEBGL_compressed_texture_pvrtc,
 			WEBGL_depth_texture,
+			WEBGL_draw_buffers,
 
 			WEBKIT_EXT_texture_filter_anisotropic,
 			WEBKIT_WEBGL_compressed_texture_s3tc,
@@ -578,6 +581,7 @@ namespace bgfx
 		{ "EXT_blend_color",                       BGFX_CONFIG_RENDERER_OPENGL >= 31, true  },
 		{ "EXT_blend_minmax",                      BGFX_CONFIG_RENDERER_OPENGL >= 14, true  },
 		{ "EXT_blend_subtract",                    BGFX_CONFIG_RENDERER_OPENGL >= 14, true  },
+		{ "EXT_color_buffer_half_float",           false,                             true  }, // GLES2 extension.
 		{ "EXT_compressed_ETC1_RGB8_sub_texture",  false,                             true  }, // GLES2 extension.
 		{ "EXT_debug_label",                       false,                             true  },
 		{ "EXT_debug_marker",                      false,                             true  },
@@ -652,10 +656,12 @@ namespace bgfx
 		{ "OES_vertex_half_float",                 false,                             true  },
 		{ "OES_vertex_type_10_10_10_2",            false,                             true  },
 
+		{ "WEBGL_color_buffer_float",              false,                             true  },
 		{ "WEBGL_compressed_texture_etc1",         false,                             true  },
 		{ "WEBGL_compressed_texture_s3tc",         false,                             true  },
 		{ "WEBGL_compressed_texture_pvrtc",        false,                             true  },
 		{ "WEBGL_depth_texture",                   false,                             true  },
+		{ "WEBGL_draw_buffers",                    false,                             true  },
 
 		{ "WEBKIT_EXT_texture_filter_anisotropic", false,                             true  },
 		{ "WEBKIT_WEBGL_compressed_texture_s3tc",  false,                             true  },
@@ -1294,7 +1300,8 @@ namespace bgfx
 
 			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
 			||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30)
-			||  s_extension[Extension::EXT_draw_buffers].m_supported)
+			||  s_extension[Extension::EXT_draw_buffers  ].m_supported
+			||  s_extension[Extension::WEBGL_draw_buffers].m_supported)
 			{
 				g_caps.maxFBAttachments = bx::uint32_min(glGet(GL_MAX_COLOR_ATTACHMENTS), BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS);
 			}
@@ -2579,14 +2586,14 @@ namespace bgfx
 
 	RendererContextGL* s_renderGL;
 
-	RendererContextI* rendererCreateGL()
+	RendererContextI* rendererCreate()
 	{
 		s_renderGL = BX_NEW(g_allocator, RendererContextGL);
 		s_renderGL->init();
 		return s_renderGL;
 	}
 
-	void rendererDestroyGL()
+	void rendererDestroy()
 	{
 		s_renderGL->shutdown();
 		BX_DELETE(g_allocator, s_renderGL);
@@ -2662,6 +2669,7 @@ namespace bgfx
 			GLENUM(GL_RENDERBUFFER);
 
 			GLENUM(GL_INVALID_ENUM);
+			GLENUM(GL_INVALID_FRAMEBUFFER_OPERATION);
 			GLENUM(GL_INVALID_VALUE);
 			GLENUM(GL_INVALID_OPERATION);
 			GLENUM(GL_OUT_OF_MEMORY);
@@ -3794,7 +3802,10 @@ namespace bgfx
 
 					if (usesFragData)
 					{
-						BX_WARN(s_extension[Extension::EXT_draw_buffers].m_supported, "EXT_draw_buffers is used but not supported by GLES2 driver.");
+						BX_WARN(s_extension[Extension::EXT_draw_buffers  ].m_supported
+							||  s_extension[Extension::WEBGL_draw_buffers].m_supported
+							, "EXT_draw_buffers is used but not supported by GLES2 driver."
+							);
 						writeString(&writer
 							, "#extension GL_EXT_draw_buffers : enable\n"
 							);
@@ -5354,21 +5365,21 @@ namespace bgfx
 
 		GL_CHECK(glFrameTerminatorGREMEDY() );
 	}
-} // namespace bgfx
+} } // namespace bgfx
 
 #else
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
-	RendererContextI* rendererCreateGL()
+	RendererContextI* rendererCreate()
 	{
 		return NULL;
 	}
 
-	void rendererDestroyGL()
+	void rendererDestroy()
 	{
 	}
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // (BGFX_CONFIG_RENDERER_OPENGLES || BGFX_CONFIG_RENDERER_OPENGL)
 

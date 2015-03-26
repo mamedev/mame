@@ -19,14 +19,6 @@ namespace bgfx
 #	define BGFX_CHECK_RENDER_THREAD()
 #endif // BGFX_CONFIG_MULTITHREADED && !BX_PLATFORM_OSX && !BX_PLATFORM_IOS
 
-#define BGFX_CHECK_HANDLE(_handle, _max) \
-			BX_CHECK(isValid(_handle) \
-				&& _handle.idx < _max \
-				, "Invalid handle. %d (< %d " #_max ")" \
-				, _handle.idx \
-				, _max \
-				);
-
 #if BX_PLATFORM_ANDROID
 	::ANativeWindow* g_bgfxAndroidWindow = NULL;
 
@@ -44,18 +36,22 @@ namespace bgfx
 #elif BX_PLATFORM_LINUX
 	void*    g_bgfxX11Display;
 	uint32_t g_bgfxX11Window;
+	void*    g_bgfxGLX;
 
-	void x11SetDisplayWindow(void* _display, uint32_t _window)
+	void x11SetDisplayWindow(void* _display, uint32_t _window, void* _glx)
 	{
 		g_bgfxX11Display = _display;
 		g_bgfxX11Window  = _window;
+		g_bgfxGLX        = _glx;
 	}
 #elif BX_PLATFORM_OSX
 	void* g_bgfxNSWindow = NULL;
+	void* g_bgfxNSGL = NULL;
 
-	void osxSetNSWindow(void* _window)
+	void osxSetNSWindow(void* _window, void* _nsgl)
 	{
 		g_bgfxNSWindow = _window;
+		g_bgfxNSGL     = _nsgl;
 	}
 #elif BX_PLATFORM_WINDOWS
 	::HWND g_bgfxHwnd = NULL;
@@ -1332,23 +1328,21 @@ namespace bgfx
 	typedef RendererContextI* (*RendererCreateFn)();
 	typedef void (*RendererDestroyFn)();
 
-	extern RendererContextI* rendererCreateNULL();
-	extern void rendererDestroyNULL();
+#define BGFX_RENDERER_CONTEXT(_namespace) \
+			namespace _namespace \
+			{ \
+				extern RendererContextI* rendererCreate(); \
+				extern void rendererDestroy(); \
+			}
 
-	extern RendererContextI* rendererCreateGL();
-	extern void rendererDestroyGL();
+	BGFX_RENDERER_CONTEXT(noop);
+	BGFX_RENDERER_CONTEXT(d3d9);
+	BGFX_RENDERER_CONTEXT(d3d11);
+	BGFX_RENDERER_CONTEXT(d3d12);
+	BGFX_RENDERER_CONTEXT(gl);
+	BGFX_RENDERER_CONTEXT(vk);
 
-	extern RendererContextI* rendererCreateD3D9();
-	extern void rendererDestroyD3D9();
-
-	extern RendererContextI* rendererCreateD3D11();
-	extern void rendererDestroyD3D11();
-
-	extern RendererContextI* rendererCreateD3D12();
-	extern void rendererDestroyD3D12();
-
-	extern RendererContextI* rendererCreateVK();
-	extern void rendererDestroyVK();
+#undef BGFX_RENDERER_CONTEXT
 
 	struct RendererCreator
 	{
@@ -1360,13 +1354,13 @@ namespace bgfx
 
 	static const RendererCreator s_rendererCreator[] =
 	{
-		{ rendererCreateNULL,  rendererDestroyNULL,  BGFX_RENDERER_NULL_NAME,       !!BGFX_CONFIG_RENDERER_NULL       }, // Null
-		{ rendererCreateD3D9,  rendererDestroyD3D9,  BGFX_RENDERER_DIRECT3D9_NAME,  !!BGFX_CONFIG_RENDERER_DIRECT3D9  }, // Direct3D9
-		{ rendererCreateD3D11, rendererDestroyD3D11, BGFX_RENDERER_DIRECT3D11_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D11 }, // Direct3D11
-		{ rendererCreateD3D12, rendererDestroyD3D12, BGFX_RENDERER_DIRECT3D12_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D12 }, // Direct3D12
-		{ rendererCreateGL,    rendererDestroyGL,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGLES   }, // OpenGLES
-		{ rendererCreateGL,    rendererDestroyGL,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGL     }, // OpenGL
-		{ rendererCreateVK,    rendererDestroyVK,    BGFX_RENDERER_VULKAN_NAME,     !!BGFX_CONFIG_RENDERER_VULKAN     }, // Vulkan
+		{ noop::rendererCreate,  noop::rendererDestroy,  BGFX_RENDERER_NULL_NAME,       !!BGFX_CONFIG_RENDERER_NULL       }, // Null
+		{ d3d9::rendererCreate,  d3d9::rendererDestroy,  BGFX_RENDERER_DIRECT3D9_NAME,  !!BGFX_CONFIG_RENDERER_DIRECT3D9  }, // Direct3D9
+		{ d3d11::rendererCreate, d3d11::rendererDestroy, BGFX_RENDERER_DIRECT3D11_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D11 }, // Direct3D11
+		{ d3d12::rendererCreate, d3d12::rendererDestroy, BGFX_RENDERER_DIRECT3D12_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D12 }, // Direct3D12
+		{ gl::rendererCreate,    gl::rendererDestroy,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGLES   }, // OpenGLES
+		{ gl::rendererCreate,    gl::rendererDestroy,    BGFX_RENDERER_OPENGL_NAME,     !!BGFX_CONFIG_RENDERER_OPENGL     }, // OpenGL
+		{ vk::rendererCreate,    vk::rendererDestroy,    BGFX_RENDERER_VULKAN_NAME,     !!BGFX_CONFIG_RENDERER_VULKAN     }, // Vulkan
 	};
 	BX_STATIC_ASSERT(BX_COUNTOF(s_rendererCreator) == RendererType::Count);
 
@@ -2770,21 +2764,18 @@ again:
 	void setUniform(UniformHandle _handle, const void* _value, uint16_t _num)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_UNIFORMS);
 		s_ctx->setUniform(_handle, _value, _num);
 	}
 
 	void setIndexBuffer(IndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_INDEX_BUFFERS);
 		s_ctx->setIndexBuffer(_handle, _firstIndex, _numIndices);
 	}
 
 	void setIndexBuffer(DynamicIndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_INDEX_BUFFERS);
 		s_ctx->setIndexBuffer(_handle, _firstIndex, _numIndices);
 	}
 
@@ -2809,14 +2800,12 @@ again:
 	void setVertexBuffer(VertexBufferHandle _handle, uint32_t _startVertex, uint32_t _numVertices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_VERTEX_BUFFERS);
 		s_ctx->setVertexBuffer(_handle, _startVertex, _numVertices);
 	}
 
 	void setVertexBuffer(DynamicVertexBufferHandle _handle, uint32_t _numVertices)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_VERTEX_BUFFERS);
 		s_ctx->setVertexBuffer(_handle, _numVertices);
 	}
 
@@ -2842,21 +2831,18 @@ again:
 	void setInstanceDataBuffer(VertexBufferHandle _handle, uint32_t _startVertex, uint32_t _num)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_VERTEX_BUFFERS);
 		s_ctx->setInstanceDataBuffer(_handle, _startVertex, _num);
 	}
 
 	void setInstanceDataBuffer(DynamicVertexBufferHandle _handle, uint32_t _startVertex, uint32_t _num)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_VERTEX_BUFFERS);
 		s_ctx->setInstanceDataBuffer(_handle, _startVertex, _num);
 	}
 
 	void setProgram(ProgramHandle _handle)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_PROGRAMS);
 		s_ctx->setProgram(_handle);
 	}
 
@@ -2881,28 +2867,24 @@ again:
 	void setBuffer(uint8_t _stage, IndexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_INDEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 
 	void setBuffer(uint8_t _stage, VertexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_VERTEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 
 	void setBuffer(uint8_t _stage, DynamicIndexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_INDEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 
 	void setBuffer(uint8_t _stage, DynamicVertexBufferHandle _handle, Access::Enum _access)
 	{
 		BGFX_CHECK_MAIN_THREAD();
-		BGFX_CHECK_HANDLE(_handle, BGFX_CONFIG_MAX_DYNAMIC_VERTEX_BUFFERS);
 		s_ctx->setBuffer(_stage, _handle, _access);
 	}
 

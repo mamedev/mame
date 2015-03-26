@@ -3,22 +3,27 @@
 -- Additions to Lua's built-in table functions.
 -- Copyright (c) 2002-2008 Jason Perkins and the Premake project
 --
-	
+
 
 --
 -- Returns true if the table contains the specified value.
 --
 
 	function table.contains(t, value)
-		for _,v in pairs(t) do
-			if (v == value) then
-				return true
-			end
+		for _, v in pairs(t) do
+			if v == value then return true end
 		end
 		return false
 	end
-	
-		
+
+	function table.icontains(t, value)
+		for _, v in ipairs(t) do
+			if v == value then return true end
+		end
+		return false
+	end
+
+
 --
 -- Enumerates an array of objects and returns a new table containing
 -- only the value of one particular field.
@@ -31,8 +36,8 @@
 		end
 		return result
 	end
-	
-	
+
+
 
 --
 -- Flattens a hierarchy of tables into a single array containing all
@@ -41,7 +46,7 @@
 
 	function table.flatten(arr)
 		local result = { }
-		
+
 		local function flatten(arr)
 			for _, v in ipairs(arr) do
 				if type(v) == "table" then
@@ -51,7 +56,7 @@
 				end
 			end
 		end
-		
+
 		flatten(arr)
 		return result
 	end
@@ -75,7 +80,7 @@
 
 --
 -- Inserts a value of array of values into a table. If the value is
--- itself a table, its contents are enumerated and added instead. So 
+-- itself a table, its contents are enumerated and added instead. So
 -- these inputs give these outputs:
 --
 --   "x" -> { "x" }
@@ -156,7 +161,7 @@
 		end
 		return result
 	end
-	
+
 
 
 --
@@ -179,5 +184,5 @@
 		end
 		return result
 	end
-	
-		
+
+
