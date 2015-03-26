@@ -462,11 +462,11 @@ end
 if _OPTIONS["MAP"] then
 	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 		linkoptions {
-			"-Wl,-Map," .. _OPTIONS["target"] .. ".map"
+			"-Wl,-Map," .. "../../../" .. _OPTIONS["target"] .. ".map"
 		}
 	else
 		linkoptions {
-			"-Wl,-Map," .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".map"
+			"-Wl,-Map," .. "../../../"  .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".map"
 		}
 
 	end	
