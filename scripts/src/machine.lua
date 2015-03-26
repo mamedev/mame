@@ -1,0 +1,2387 @@
+---------------------------------------------------------------------------
+--
+--   machine.lua
+--
+--   Rules for building machine cores
+--
+--   Copyright Nicola Salmoria and the MAME Team.
+--   Visit http://mamedev.org for licensing and usage restrictions.
+--
+----------------------------------------------------------------------------
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/akiko.h,MACHINES += AKIKO
+---------------------------------------------------
+
+if (MACHINES["AKIKO"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/akiko.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/autoconfig.h,MACHINES += AUTOCONFIG
+---------------------------------------------------
+
+if (MACHINES["AUTOCONFIG"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/autoconfig.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/cr511b.h,MACHINES += CR511B
+---------------------------------------------------
+
+if (MACHINES["CR511B"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/cr511b.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/dmac.h,MACHINES += DMAC
+---------------------------------------------------
+
+if (MACHINES["DMAC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/dmac.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/gayle.h,MACHINES += GAYLE
+---------------------------------------------------
+
+if (MACHINES["GAYLE"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/gayle.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/40105.h,MACHINES += CMOS40105
+---------------------------------------------------
+
+if (MACHINES["CMOS40105"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/40105.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/53c7xx.h,MACHINES += NCR53C7XX
+---------------------------------------------------
+
+if (MACHINES["NCR53C7XX"]~=null) then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/emu/machine/53c7xx.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/53c810.h,MACHINES += LSI53C810
+---------------------------------------------------
+
+if (MACHINES["LSI53C810"]~=null) then
+	MACHINES["SCSI"] = true
+	files {
+		MAME_DIR .. "src/emu/machine/53c810.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/6522via.h,MACHINES += 6522VIA
+---------------------------------------------------
+
+if (MACHINES["6522VIA"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/6522via.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/6525tpi.h,MACHINES += TPI6525
+---------------------------------------------------
+
+if (MACHINES["TPI6525"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/6525tpi.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/6532riot.h,MACHINES += RIOT6532
+---------------------------------------------------
+
+if (MACHINES["RIOT6532"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/6532riot.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/6821pia.h,MACHINES += 6821PIA
+---------------------------------------------------
+
+if (MACHINES["6821PIA"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/6821pia.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/6840ptm.h,MACHINES += 6840PTM
+---------------------------------------------------
+
+if (MACHINES["6840PTM"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/6840ptm.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/6850acia.h,MACHINES += ACIA6850
+---------------------------------------------------
+
+if (MACHINES["ACIA6850"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/6850acia.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/68561mpcc.h,MACHINES += 68561MPCC
+---------------------------------------------------
+
+if (MACHINES["68561MPCC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/68561mpcc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc68681.h,MACHINES += 68681
+---------------------------------------------------
+
+if (MACHINES["68681"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc68681.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/7200fifo.h,MACHINES += 7200FIFO
+---------------------------------------------------
+
+if (MACHINES["7200FIFO"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/7200fifo.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/74123.h,MACHINES += TTL74123
+---------------------------------------------------
+
+if (MACHINES["TTL74123"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/74123.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/74145.h,MACHINES += TTL74145
+---------------------------------------------------
+
+if (MACHINES["TTL74145"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/74145.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/74148.h,MACHINES += TTL74148
+---------------------------------------------------
+
+if (MACHINES["TTL74148"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/74148.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/74153.h,MACHINES += TTL74153
+---------------------------------------------------
+
+if (MACHINES["TTL74153"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/74153.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/74181.h,MACHINES += TTL74181
+---------------------------------------------------
+
+if (MACHINES["TTL74181"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/74181.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/7474.h,MACHINES += TTL7474
+---------------------------------------------------
+
+if (MACHINES["TTL7474"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/7474.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/8042kbdc.h,MACHINES += KBDC8042
+---------------------------------------------------
+
+if (MACHINES["KBDC8042"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/8042kbdc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/8530scc.h,MACHINES += 8530SCC
+---------------------------------------------------
+
+if (MACHINES["8530SCC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/8530scc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/aakart.h,MACHINES += AAKARTDEV
+---------------------------------------------------
+
+if (MACHINES["AAKARTDEV"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/aakart.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/adc0808.h,MACHINES += ADC0808
+---------------------------------------------------
+
+if (MACHINES["ADC0808"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/adc0808.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/adc083x.h,MACHINES += ADC083X
+---------------------------------------------------
+
+if (MACHINES["ADC083X"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/adc083x.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/adc1038.h,MACHINES += ADC1038
+---------------------------------------------------
+
+if (MACHINES["ADC1038"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/adc1038.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/adc1213x.h,MACHINES += ADC1213X
+---------------------------------------------------
+
+if (MACHINES["ADC1213X"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/adc1213x.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/aicartc.h,MACHINES += AICARTC
+---------------------------------------------------
+
+if (MACHINES["AICARTC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/aicartc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/am53cf96.h,MACHINES += AM53CF96
+---------------------------------------------------
+
+if (MACHINES["AM53CF96"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/am53cf96.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/am9517a.h,MACHINES += AM9517A
+---------------------------------------------------
+
+if (MACHINES["AM9517A"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/am9517a.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/amigafdc.h,MACHINES += AMIGAFDC
+---------------------------------------------------
+
+if (MACHINES["AMIGAFDC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/amigafdc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/at28c16.h,MACHINES += AT28C16
+---------------------------------------------------
+
+if (MACHINES["AT28C16"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/at28c16.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/at29040a.h,MACHINES += AT29040
+---------------------------------------------------
+
+if (MACHINES["AT29040"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/at29040a.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/at45dbxx.h,MACHINES += AT45DBXX
+---------------------------------------------------
+
+if (MACHINES["AT45DBXX"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/at45dbxx.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ataflash.h,MACHINES += ATAFLASH
+---------------------------------------------------
+
+if (MACHINES["ATAFLASH"]~=null) then
+	MACHINES["IDE"] = true
+	MACHINES["PCCARD"] = true
+	files {
+		MAME_DIR .. "src/emu/machine/ataflash.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ay31015.h,MACHINES += AY31015
+---------------------------------------------------
+
+if (MACHINES["AY31015"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ay31015.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/bankdev.h,MACHINES += BANKDEV
+---------------------------------------------------
+
+if (MACHINES["BANKDEV"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/bankdev.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/cdp1852.h,MACHINES += CDP1852
+---------------------------------------------------
+
+if (MACHINES["CDP1852"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/cdp1852.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/cdp1871.h,MACHINES += CDP1871
+---------------------------------------------------
+
+if (MACHINES["CDP1871"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/cdp1871.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/com8116.h,MACHINES += COM8116
+---------------------------------------------------
+
+if (MACHINES["COM8116"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/com8116.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/cr589.h,MACHINES += CR589
+---------------------------------------------------
+
+if (MACHINES["CR589"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/cr589.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/cs4031.h,MACHINES += CS4031
+---------------------------------------------------
+
+if (MACHINES["CS4031"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/cs4031.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/cs8221.h,MACHINES += CS8221
+---------------------------------------------------
+
+if (MACHINES["CS8221"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/cs8221.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ds1204.h,MACHINES += DS1204
+---------------------------------------------------
+
+if (MACHINES["DS1204"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ds1204.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ds1302.h,MACHINES += DS1302
+---------------------------------------------------
+
+if (MACHINES["DS1302"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ds1302.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ds1315.h,MACHINES += DS1315
+---------------------------------------------------
+
+if (MACHINES["DS1315"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ds1315.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ds2401.h,MACHINES += DS2401
+---------------------------------------------------
+
+if (MACHINES["DS2401"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ds2401.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ds2404.h,MACHINES += DS2404
+---------------------------------------------------
+
+if (MACHINES["DS2404"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ds2404.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ds75160a.h,MACHINES += DS75160A
+---------------------------------------------------
+
+if (MACHINES["DS75160A"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ds75160a.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ds75161a.h,MACHINES += DS75161A
+---------------------------------------------------
+
+if (MACHINES["DS75161A"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ds75161a.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/e0516.h,MACHINES += E0516
+---------------------------------------------------
+
+if (MACHINES["E0516"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/e0516.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/e05a03.h,MACHINES += E05A03
+---------------------------------------------------
+
+if (MACHINES["E05A03"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/e05a03.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/e05a30.h,MACHINES += E05A30
+---------------------------------------------------
+
+if (MACHINES["E05A30"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/e05a30.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/eeprom.h,MACHINES += EEPROMDEV
+--@src/emu/machine/eepromser.h,MACHINES += EEPROMDEV
+--@src/emu/machine/eeprompar.h,MACHINES += EEPROMDEV
+---------------------------------------------------
+
+if (MACHINES["EEPROMDEV"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/eeprom.*",
+		MAME_DIR .. "src/emu/machine/eepromser.*",
+		MAME_DIR .. "src/emu/machine/eeprompar.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/er2055.h,MACHINES += ER2055
+---------------------------------------------------
+
+if (MACHINES["ER2055"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/er2055.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/f3853.h,MACHINES += F3853
+---------------------------------------------------
+
+if (MACHINES["F3853"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/f3853.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/hd63450.h,MACHINES += HD63450
+---------------------------------------------------
+
+if (MACHINES["HD63450"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/hd63450.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/hd64610.h,MACHINES += HD64610
+---------------------------------------------------
+
+if (MACHINES["HD64610"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/hd64610.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i2cmem.h,MACHINES += I2CMEM
+---------------------------------------------------
+
+if (MACHINES["I2CMEM"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i2cmem.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8155.h,MACHINES += I8155
+---------------------------------------------------
+
+if (MACHINES["I8155"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8155.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8212.h,MACHINES += I8212
+---------------------------------------------------
+
+if (MACHINES["I8212"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8212.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8214.h,MACHINES += I8214
+---------------------------------------------------
+
+if (MACHINES["I8214"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8214.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8243.h,MACHINES += I8243
+---------------------------------------------------
+
+if (MACHINES["I8243"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8243.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8251.h,MACHINES += I8251
+---------------------------------------------------
+
+if (MACHINES["I8251"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8251.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8257.h,MACHINES += I8257
+---------------------------------------------------
+
+if (MACHINES["I8257"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8257.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8271.h,MACHINES += I8271
+---------------------------------------------------
+
+if (MACHINES["I8271"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8271.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8279.h,MACHINES += I8279
+---------------------------------------------------
+
+if (MACHINES["I8279"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8279.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8355.h,MACHINES += I8355
+---------------------------------------------------
+
+if (MACHINES["I8355"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8355.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i80130.h,MACHINES += I80130
+---------------------------------------------------
+
+if (MACHINES["I80130"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i80130.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/atadev.h,MACHINES += IDE
+--@src/emu/machine/ataintf.h,MACHINES += IDE
+---------------------------------------------------
+
+if (MACHINES["IDE"]~=null) then
+	MACHINES["T10"] = true
+	files {
+		MAME_DIR .. "src/emu/machine/atadev.*",
+		MAME_DIR .. "src/emu/machine/atahle.*",
+		MAME_DIR .. "src/emu/machine/ataintf.*",
+		MAME_DIR .. "src/emu/machine/atapicdr.*",
+		MAME_DIR .. "src/emu/machine/atapihle.*",
+		MAME_DIR .. "src/emu/machine/idectrl.*",
+		MAME_DIR .. "src/emu/machine/idehd.*",
+		MAME_DIR .. "src/emu/machine/vt83c461.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/im6402.h,MACHINES += IM6402
+---------------------------------------------------
+
+if (MACHINES["IM6402"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/im6402.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ins8154.h,MACHINES += INS8154
+---------------------------------------------------
+
+if (MACHINES["INS8154"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ins8154.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ins8250.h,MACHINES += INS8250
+---------------------------------------------------
+
+if (MACHINES["INS8250"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ins8250.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/intelfsh.h,MACHINES += INTELFLASH
+---------------------------------------------------
+
+if (MACHINES["INTELFLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/intelfsh.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/jvsdev.h,MACHINES += JVS
+--@src/emu/machine/jvshost.h,MACHINES += JVS
+---------------------------------------------------
+
+if (MACHINES["JVS"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/jvsdev.*",
+		MAME_DIR .. "src/emu/machine/jvshost.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/k033906.h,MACHINES += K033906
+---------------------------------------------------
+
+if (MACHINES["K033906"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/k033906.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/k053252.h,MACHINES += K053252
+---------------------------------------------------
+
+if (MACHINES["K053252"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/k053252.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/k056230.h,MACHINES += K056230
+---------------------------------------------------
+
+if (MACHINES["K056230"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/k056230.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/kb3600.h,MACHINES += KB3600
+---------------------------------------------------
+
+if (MACHINES["KB3600"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/kb3600.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/kr2376.h,MACHINES += KR2376
+---------------------------------------------------
+
+if (MACHINES["KR2376"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/kr2376.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/latch8.h,MACHINES += LATCH8
+---------------------------------------------------
+
+if (MACHINES["LATCH8"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/latch8.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/lc89510.h,MACHINES += LC89510
+---------------------------------------------------
+
+if (MACHINES["LC89510"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/lc89510.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ldpr8210.h,MACHINES += LDPR8210
+---------------------------------------------------
+
+if (MACHINES["LDPR8210"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ldpr8210.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ldstub.h,MACHINES += LDSTUB
+---------------------------------------------------
+
+if (MACHINES["LDSTUB"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ldstub.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ldv1000.h,MACHINES += LDV1000
+---------------------------------------------------
+
+if (MACHINES["LDV1000"]~=null) then
+	MACHINES["Z80CTC"] = true
+	MACHINES["I8255"] = true
+	files {
+		MAME_DIR .. "src/emu/machine/ldv1000.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ldvp931.h,MACHINES += LDVP931
+---------------------------------------------------
+
+if (MACHINES["LDVP931"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ldvp931.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/lh5810.h,MACHINES += LH5810
+---------------------------------------------------
+
+if (MACHINES["LH5810"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/lh5810.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/linflash.h,MACHINES += LINFLASH
+---------------------------------------------------
+
+if (MACHINES["LINFLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/linflash.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/m6m80011ap.h,MACHINES += M6M80011AP
+---------------------------------------------------
+
+if (MACHINES["M6M80011AP"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/m6m80011ap.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/matsucd.h,MACHINES += MATSUCD
+---------------------------------------------------
+
+if (MACHINES["MATSUCD"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/matsucd.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mb14241.h,MACHINES += MB14241
+---------------------------------------------------
+
+if (MACHINES["MB14241"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mb14241.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mb3773.h,MACHINES += MB3773
+---------------------------------------------------
+
+if (MACHINES["MB3773"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mb3773.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mb8421.h,MACHINES += MB8421
+---------------------------------------------------
+
+if (MACHINES["MB8421"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mb8421.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mb87078.h,MACHINES += MB87078
+---------------------------------------------------
+
+if (MACHINES["MB87078"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mb87078.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mb8795.h,MACHINES += MB8795
+---------------------------------------------------
+
+if (MACHINES["MB8795"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mb8795.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mb89352.h,MACHINES += MB89352
+---------------------------------------------------
+
+if (MACHINES["MB89352"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mb89352.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mb89371.h,MACHINES += MB89371
+---------------------------------------------------
+
+if (MACHINES["MB89371"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mb89371.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc146818.h,MACHINES += MC146818
+---------------------------------------------------
+
+if (MACHINES["MC146818"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc146818.*",
+		MAME_DIR .. "src/emu/machine/ds128x.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc2661.h,MACHINES += MC2661
+---------------------------------------------------
+
+if (MACHINES["MC2661"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc2661.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc6843.h,MACHINES += MC6843
+---------------------------------------------------
+
+if (MACHINES["MC6843"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc6843.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc6846.h,MACHINES += MC6846
+---------------------------------------------------
+
+if (MACHINES["MC6846"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc6846.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc6852.h,MACHINES += MC6852
+---------------------------------------------------
+
+if (MACHINES["MC6852"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc6852.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc6854.h,MACHINES += MC6854
+---------------------------------------------------
+
+if (MACHINES["MC6854"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc6854.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc68328.h,MACHINES += MC68328
+---------------------------------------------------
+
+if (MACHINES["MC68328"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc68328.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mc68901.h,MACHINES += MC68901
+---------------------------------------------------
+
+if (MACHINES["MC68901"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mc68901.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mccs1850.h,MACHINES += MCCS1850
+---------------------------------------------------
+
+if (MACHINES["MCCS1850"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mccs1850.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/68307.h,MACHINES += M68307
+---------------------------------------------------
+
+if (MACHINES["M68307"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/68307.*",
+		MAME_DIR .. "src/emu/machine/68307sim.*",
+		MAME_DIR .. "src/emu/machine/68307bus.*",
+		MAME_DIR .. "src/emu/machine/68307tmu.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/68340.h,MACHINES += M68340
+---------------------------------------------------
+
+if (MACHINES["M68340"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/68340.*",
+		MAME_DIR .. "src/emu/machine/68340sim.*",
+		MAME_DIR .. "src/emu/machine/68340dma.*",
+		MAME_DIR .. "src/emu/machine/68340ser.*",
+		MAME_DIR .. "src/emu/machine/68340tmu.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mcf5206e.h,MACHINES += MCF5206E
+---------------------------------------------------
+
+if (MACHINES["MCF5206E"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mcf5206e.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/microtch.h,MACHINES += MICROTOUCH
+---------------------------------------------------
+
+if (MACHINES["MICROTOUCH"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/microtch.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mm58274c.h,MACHINES += MM58274C
+---------------------------------------------------
+
+if (MACHINES["MM58274C"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mm58274c.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mm74c922.h,MACHINES += MM74C922
+---------------------------------------------------
+
+if (MACHINES["MM74C922"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mm74c922.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos6526.h,MACHINES += MOS6526
+---------------------------------------------------
+
+if (MACHINES["MOS6526"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos6526.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos6529.h,MACHINES += MOS6529
+---------------------------------------------------
+
+if (MACHINES["MOS6529"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos6529.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos6702.h,MACHINES += MOS6702
+---------------------------------------------------
+
+if (MACHINES["MOS6702"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos6702.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos8706.h,MACHINES += MOS8706
+---------------------------------------------------
+
+if (MACHINES["MOS8706"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos8706.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos8722.h,MACHINES += MOS8722
+---------------------------------------------------
+
+if (MACHINES["MOS8722"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos8722.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos8726.h,MACHINES += MOS8726
+---------------------------------------------------
+
+if (MACHINES["MOS8726"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos8726.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos6530.h,MACHINES += MIOT6530
+---------------------------------------------------
+
+if (MACHINES["MIOT6530"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos6530.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mos6551.h,MACHINES += MOS6551
+---------------------------------------------------
+
+if (MACHINES["MOS6551"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mos6551.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/msm5832.h,MACHINES += MSM5832
+---------------------------------------------------
+
+if (MACHINES["MSM5832"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/msm5832.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/msm58321.h,MACHINES += MSM58321
+---------------------------------------------------
+
+if (MACHINES["MSM58321"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/msm58321.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/msm6242.h,MACHINES += MSM6242
+---------------------------------------------------
+
+if (MACHINES["MSM6242"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/msm6242.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ncr539x.h,MACHINES += NCR539x
+---------------------------------------------------
+
+if (MACHINES["NCR539x"]~=null) then
+	MACHINES["SCSI"] = true
+	files {
+		MAME_DIR .. "src/emu/machine/ncr539x.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/nmc9306.h,MACHINES += NMC9306
+---------------------------------------------------
+
+if (MACHINES["NMC9306"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/nmc9306.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/nscsi_bus.h,MACHINES += NSCSI
+--@src/emu/machine/nscsi_cb.h,MACHINES += NSCSI
+--@src/emu/machine/nscsi_cd.h,MACHINES += NSCSI
+--@src/emu/machine/nscsi_hd.h,MACHINES += NSCSI
+--@src/emu/machine/nscsi_s1410.h,MACHINES += NSCSI
+---------------------------------------------------
+
+if (MACHINES["NSCSI"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/nscsi_bus.*",
+		MAME_DIR .. "src/emu/machine/nscsi_cb.*",
+		MAME_DIR .. "src/emu/machine/nscsi_cd.*",
+		MAME_DIR .. "src/emu/machine/nscsi_hd.*",
+		MAME_DIR .. "src/emu/machine/nscsi_s1410.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pcf8593.h,MACHINES += PCF8593
+---------------------------------------------------
+
+if (MACHINES["PCF8593"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pcf8593.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/lpci.h,MACHINES += LPCI
+---------------------------------------------------
+
+if (MACHINES["LPCI"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/lpci.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pci.h,MACHINES += PCI
+---------------------------------------------------
+
+if (MACHINES["PCI"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pci.*",
+		MAME_DIR .. "src/emu/machine/pci-usb.*",
+		MAME_DIR .. "src/emu/machine/pci-sata.*",
+		MAME_DIR .. "src/emu/machine/pci-apic.*",
+		MAME_DIR .. "src/emu/machine/pci-smbus.*",
+		MAME_DIR .. "src/emu/machine/i82541.*",
+		MAME_DIR .. "src/emu/machine/i82875p.*",
+		MAME_DIR .. "src/emu/machine/i6300esb.*",
+		MAME_DIR .. "src/emu/machine/lpc.*",
+		MAME_DIR .. "src/emu/machine/lpc-acpi.*",
+		MAME_DIR .. "src/emu/machine/lpc-rtc.*",
+		MAME_DIR .. "src/emu/machine/lpc-pit.*",
+		MAME_DIR .. "src/emu/machine/vrc4373.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pckeybrd.h,MACHINES += PCKEYBRD
+---------------------------------------------------
+
+if (MACHINES["PCKEYBRD"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pckeybrd.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pic8259.h,MACHINES += PIC8259
+---------------------------------------------------
+
+if (MACHINES["PIC8259"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pic8259.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pit8253.h,MACHINES += PIT8253
+---------------------------------------------------
+
+if (MACHINES["PIT8253"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pit8253.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pla.h,MACHINES += PLA
+---------------------------------------------------
+
+if (MACHINES["PLA"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pla.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/r10696.h,MACHINES += R10696
+---------------------------------------------------
+
+if (MACHINES["R10696"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/r10696.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/r10788.h,MACHINES += R10788
+---------------------------------------------------
+
+if (MACHINES["R10788"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/r10788.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ra17xx.h,MACHINES += RA17XX
+---------------------------------------------------
+
+if (MACHINES["RA17XX"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ra17xx.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/rf5c296.h,MACHINES += RF5C296
+---------------------------------------------------
+
+if (MACHINES["RF5C296"]~=null) then
+	MACHINES["PCCARD"] = true
+	files {	
+		MAME_DIR .. "src/emu/machine/rf5c296.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/roc10937.h,MACHINES += ROC10937
+---------------------------------------------------
+
+if (MACHINES["ROC10937"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/roc10937.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/rp5c01.h,MACHINES += RP5C01
+---------------------------------------------------
+
+if (MACHINES["RP5C01"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/rp5c01.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/rp5c15.h,MACHINES += RP5C15
+---------------------------------------------------
+
+if (MACHINES["RP5C15"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/rp5c15.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/rp5h01.h,MACHINES += RP5H01
+---------------------------------------------------
+
+if (MACHINES["RP5H01"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/rp5h01.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/64h156.h,MACHINES += R64H156
+---------------------------------------------------
+
+if (MACHINES["R64H156"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/64h156.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/rtc4543.h,MACHINES += RTC4543
+---------------------------------------------------
+
+if (MACHINES["RTC4543"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/rtc4543.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/rtc65271.h,MACHINES += RTC65271
+---------------------------------------------------
+
+if (MACHINES["RTC65271"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/rtc65271.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/rtc9701.h,MACHINES += RTC9701
+---------------------------------------------------
+
+if (MACHINES["RTC9701"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/rtc9701.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/s2636.h,MACHINES += S2636
+---------------------------------------------------
+
+if (MACHINES["S2636"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/s2636.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/s3520cf.h,MACHINES += S3520CF
+---------------------------------------------------
+
+if (MACHINES["S3520CF"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/s3520cf.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/s3c2400.h,MACHINES += S3C2400
+---------------------------------------------------
+
+if (MACHINES["S3C2400"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/s3c2400.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/s3c2410.h,MACHINES += S3C2410
+---------------------------------------------------
+
+if (MACHINES["S3C2410"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/s3c2410.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/s3c44b0.h,MACHINES += S3C44B0
+---------------------------------------------------
+
+if (MACHINES["S3C44B0"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/s3c44b0.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/s3c2440.h,MACHINES += S3C2440
+---------------------------------------------------
+
+if (MACHINES["S3C2440"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/s3c2440.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/saturn.h,MACHINES += SATURN
+---------------------------------------------------
+
+if (MACHINES["SATURN"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/saturn.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/serflash.h,MACHINES += SERFLASH
+---------------------------------------------------
+
+if (MACHINES["SERFLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/serflash.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/smc91c9x.h,MACHINES += SMC91C9X
+---------------------------------------------------
+
+if (MACHINES["SMC91C9X"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/smc91c9x.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/smpc.h,MACHINES += SMPC
+---------------------------------------------------
+
+if (MACHINES["SMPC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/smpc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/stvcd.h,MACHINES += STVCD
+---------------------------------------------------
+
+if (MACHINES["STVCD"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/stvcd.*",
+	}
+end
+
+---------------------------------------------------
+--
+--
+---------------------------------------------------
+
+if (BUSES["SCSI"]~=null) then
+	MACHINES["T10"] = true
+end
+
+if (MACHINES["T10"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/t10mmc.*",
+		MAME_DIR .. "src/emu/machine/t10sbc.*",
+		MAME_DIR .. "src/emu/machine/t10spc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/tc009xlvc.h,MACHINES += TC0091LVC
+---------------------------------------------------
+
+if (MACHINES["TC0091LVC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/tc009xlvc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/timekpr.h,MACHINES += TIMEKPR
+---------------------------------------------------
+
+if (MACHINES["TIMEKPR"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/timekpr.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/tmp68301.h,MACHINES += TMP68301
+---------------------------------------------------
+
+if (MACHINES["TMP68301"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/tmp68301.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/tms5501.h,MACHINES += TMS5501
+---------------------------------------------------
+
+if (MACHINES["TMS5501"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/tms5501.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/tms6100.h,MACHINES += TMS6100
+---------------------------------------------------
+
+if (MACHINES["TMS6100"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/tms6100.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/tms9901.h,MACHINES += TMS9901
+---------------------------------------------------
+
+if (MACHINES["TMS9901"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/tms9901.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/tms9902.h,MACHINES += TMS9902
+---------------------------------------------------
+
+if (MACHINES["TMS9902"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/tms9902.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/upd1990a.h,MACHINES += UPD1990A
+---------------------------------------------------
+
+if (MACHINES["UPD1990A"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/upd1990a.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/upd4992.h,MACHINES += UPD4992
+---------------------------------------------------
+
+if (MACHINES["UPD4992"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/upd4992.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/upd4701.h,MACHINES += UPD4701
+---------------------------------------------------
+
+if (MACHINES["UPD4701"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/upd4701.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/upd7002.h,MACHINES += UPD7002
+---------------------------------------------------
+
+if (MACHINES["UPD7002"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/upd7002.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/upd71071.h,MACHINES += UPD71071
+---------------------------------------------------
+
+if (MACHINES["UPD71071"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/upd71071.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/upd765.h,MACHINES += UPD765
+---------------------------------------------------
+
+if (MACHINES["UPD765"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/upd765.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/v3021.h,MACHINES += V3021
+---------------------------------------------------
+
+if (MACHINES["V3021"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/v3021.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/wd_fdc.h,MACHINES += WD_FDC
+---------------------------------------------------
+
+if (MACHINES["WD_FDC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/wd_fdc.*",
+		MAME_DIR .. "src/emu/machine/fdc_pll.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/wd11c00_17.h,MACHINES += WD11C00_17
+---------------------------------------------------
+
+if (MACHINES["WD11C00_17"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/wd11c00_17.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/wd17xx.h,MACHINES += WD17XX
+---------------------------------------------------
+
+if (MACHINES["WD17XX"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/wd17xx.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/wd2010.h,MACHINES += WD2010
+---------------------------------------------------
+
+if (MACHINES["WD2010"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/wd2010.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/wd33c93.h,MACHINES += WD33C93
+---------------------------------------------------
+
+if (MACHINES["WD33C93"]~=null) then
+	MACHINES["SCSI"] = true
+	files {
+		MAME_DIR .. "src/emu/machine/wd33c93.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/wd7600.h,MACHINES += WD7600
+---------------------------------------------------
+
+if (MACHINES["WD7600"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/wd7600.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/x2212.h,MACHINES += X2212
+---------------------------------------------------
+
+if (MACHINES["X2212"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/x2212.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/x76f041.h,MACHINES += X76F041
+---------------------------------------------------
+
+if (MACHINES["X76F041"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/x76f041.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/x76f100.h,MACHINES += X76F100
+---------------------------------------------------
+
+if (MACHINES["X76F100"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/x76f100.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ym2148.h,MACHINES += YM2148
+---------------------------------------------------
+
+if (MACHINES["YM2148"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ym2148.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/z80ctc.h,MACHINES += Z80CTC
+---------------------------------------------------
+
+if (MACHINES["Z80CTC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/z80ctc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/z80dart.h,MACHINES += Z80DART
+---------------------------------------------------
+
+if (MACHINES["Z80DART"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/z80dart.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/z80dma.h,MACHINES += Z80DMA
+---------------------------------------------------
+
+if (MACHINES["Z80DMA"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/z80dma.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/z80pio.h,MACHINES += Z80PIO
+---------------------------------------------------
+
+if (MACHINES["Z80PIO"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/z80pio.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/z80sti.h,MACHINES += Z80STI
+---------------------------------------------------
+
+if (MACHINES["Z80STI"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/z80sti.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/z8536.h,MACHINES += Z8536
+---------------------------------------------------
+
+if (MACHINES["Z8536"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/z8536.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pccard.h,MACHINES += PCCARD
+---------------------------------------------------
+
+if (MACHINES["PCCARD"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pccard.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/i8255.h,MACHINES += I8255
+---------------------------------------------------
+
+if (MACHINES["I8255"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/i8255.*",
+		MAME_DIR .. "src/emu/machine/mb89363b.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ncr5380.h,MACHINES += NCR5380
+---------------------------------------------------
+
+if (MACHINES["NCR5380"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ncr5380.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ncr5380n.h,MACHINES += NCR5380N
+---------------------------------------------------
+
+if (MACHINES["NCR5380N"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ncr5380n.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ncr5389.h,MACHINES += NCR5390
+---------------------------------------------------
+
+if (MACHINES["NCR5390"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ncr5390.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mm58167.h,MACHINES += MM58167
+---------------------------------------------------
+
+if (MACHINES["MM58167"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mm58167.*",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/emu/machine/dp8390.h,MACHINES += DP8390
+---------------------------------------------------
+
+if (MACHINES["DP8390"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/dp8390.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pc_lpt.h,MACHINES += PC_LPT
+---------------------------------------------------
+
+if (MACHINES["PC_LPT"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pc_lpt.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pc_fdc.h,MACHINES += PC_FDC
+---------------------------------------------------
+
+if (MACHINES["PC_FDC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pc_fdc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/mpu401.h,MACHINES += MPU401
+---------------------------------------------------
+
+if (MACHINES["MPU401"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/mpu401.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/at_keybc.h,MACHINES += AT_KEYBC
+---------------------------------------------------
+
+if (MACHINES["AT_KEYBC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/at_keybc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/smc92x4.h,MACHINES += SMC92X4
+---------------------------------------------------
+
+if (MACHINES["SMC92X4"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/smc92x4.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/hdc9234.h,MACHINES += HDC9234
+---------------------------------------------------
+
+if (MACHINES["HDC9234"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/hdc9234.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/ti99_hd.h,MACHINES += TI99_HD
+---------------------------------------------------
+
+if (MACHINES["TI99_HD"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/ti99_hd.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/strata.h,MACHINES += STRATA
+---------------------------------------------------
+
+if (MACHINES["STRATA"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/strata.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/steppers.h,MACHINES += STEPPERS
+---------------------------------------------------
+
+if (MACHINES["STEPPERS"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/steppers.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/corvushd.h,MACHINES += CORVUSHD
+---------------------------------------------------
+if (MACHINES["CORVUSHD"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/corvushd.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/wozfdc.h,MACHINES += WOZFDC
+---------------------------------------------------
+if (MACHINES["WOZFDC"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/wozfdc.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/diablo_hd.h,MACHINES += DIABLO_HD
+---------------------------------------------------
+if (MACHINES["DIABLO_HD"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/diablo_hd.*",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/emu/machine/fdc37c665gt.h,MACHINES += FDC37C665GT
+---------------------------------------------------
+
+if (MACHINES["FDC37C665GT"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/fdc37c665gt.*",
+	}
+end
