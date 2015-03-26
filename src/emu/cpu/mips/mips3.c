@@ -2454,20 +2454,22 @@ inline void mips3_device::handle_integer_divide_by_zero(UINT32 op)
 	{
 		if (RSVAL32 >= 0)
 		{
-			LOVAL64 = -1;
+			LOVAL64 = (INT32)0x7fffffff;
 		}
 		else
 		{
-			LOVAL64 = 1;
+			LOVAL64 = (INT32)0x80000001;
 		}
 	}
 	else
 	{
 		if (RSVAL32 >= 0)
 		{
+			LOVAL64 = -1;
 		}
 		else
 		{
+			LOVAL64 = 1;
 		}
 	}
 }
