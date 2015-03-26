@@ -407,10 +407,12 @@ configuration { }
 				}
 			end
 		else
-			buildoptions {
-				"-Wno-unused-result",
-			}
-			
+			if (version >= 40400) then
+				buildoptions {
+					"-Wno-unused-result",
+				}
+			end 
+
 			if (version >= 40700) then
 				buildoptions {
 					"-Wno-narrowing",
