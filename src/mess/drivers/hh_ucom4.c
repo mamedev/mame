@@ -304,7 +304,7 @@ static INPUT_PORTS_START( ssfball )
 
 	PORT_START("IN.1") // G3 port B3
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x08, "2" )
 
@@ -447,7 +447,7 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_CONFNAME( 0x01, 0x00, "Players" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )

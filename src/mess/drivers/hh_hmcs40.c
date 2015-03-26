@@ -92,9 +92,13 @@ public:
 	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
 
 	// game-specific handlers
+	DECLARE_WRITE8_MEMBER(bambball_plate_w);
+	DECLARE_WRITE16_MEMBER(bambball_grid_w);
+	DECLARE_READ8_MEMBER(bambball_input_r);
+
 	DECLARE_WRITE8_MEMBER(alnattck_plate_w);
-	DECLARE_WRITE16_MEMBER(alnattck_d_w);
-	DECLARE_READ16_MEMBER(alnattck_d_r);
+	DECLARE_WRITE16_MEMBER(alnattck_grid_w);
+	DECLARE_READ16_MEMBER(alnattck_input_r);
 
 	void egalaxn2_display();
 	DECLARE_WRITE8_MEMBER(egalaxn2_plate_w);
@@ -231,16 +235,74 @@ UINT16 hh_hmcs40_state::read_inputs(int columns)
 
 /***************************************************************************
 
-  Bambino Basketball (manufactured in Japan)
+  Bambino Basketball - Dribble Away (manufactured in Japan)
   * boards are labeled Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
-  * green VFD display Emix-106
+  * green VFD display Emix-106, with bezel overlay
 
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
 
+WRITE8_MEMBER(hh_hmcs40_state::bambball_plate_w)
+{
+	// R1x-R3x, D0-D3: vfd matrix plate
+	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT32 plate = BITSWAP16(m_plate,13,8,4,12,9,10,14,1,7,0,15,11,6,3,5,2);
+
+	display_matrix(16, 9, plate, m_grid);
+}
+
+WRITE16_MEMBER(hh_hmcs40_state::bambball_grid_w)
+{
+	// D4: speaker out
+	m_speaker->level_w(data >> 4 & 1);
+
+	// D7-D10: input mux
+	m_inp_mux = data >> 7 & 0xf;
+
+	// D7-D15: vfd matrix grid
+	m_grid = data >> 7 & 0x1ff;
+
+	// D0-D3: plates (update display there)
+	bambball_plate_w(space, 3 + HMCS40_PORT_R1X, data & 0xf);
+}
+
+READ8_MEMBER(hh_hmcs40_state::bambball_input_r)
+{
+	// R0x: inputs
+	return read_inputs(4);
+}
+
+
 static INPUT_PORTS_START( bambball )
+	PORT_START("IN.0") // D7 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Dribble Low")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Dribble Medium")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Dribble High")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Shoot")
+
+	PORT_START("IN.1") // D8 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // "
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // D9 port R0x
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Display")
+
+	PORT_START("IN.3") // D10 port R0x
+	PORT_CONFNAME( 0x07, 0x01, "Skill Level")
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x04, "3" )
+	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFSETTING(    0x08, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
 
@@ -248,8 +310,13 @@ static MACHINE_CONFIG_START( bambball, hh_hmcs40_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation - RC osc.
+	MCFG_HMCS40_READ_R_CB(0, READ8(hh_hmcs40_state, bambball_input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, bambball_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, bambball_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, bambball_plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, bambball_grid_w))
 
-//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -269,7 +336,7 @@ MACHINE_CONFIG_END
   Bandai Packri Monster (manufactured in Japan)
   * board label DM-21ZA2
   * Hitachi HD38800A27 MCU
-  * cyan/red/green VFD display Futaba DM-21ZK 2B
+  * cyan/red/green VFD display Futaba DM-21ZK 2B, with bezel overlay
 
   NOTE!: MESS external artwork is recommended
 
@@ -355,7 +422,7 @@ WRITE8_MEMBER(hh_hmcs40_state::alnattck_plate_w)
 	display_matrix(20, 10, plate, m_grid);
 }
 
-WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
+WRITE16_MEMBER(hh_hmcs40_state::alnattck_grid_w)
 {
 	// D4: speaker out
 	m_speaker->level_w(data >> 4 & 1);
@@ -370,7 +437,7 @@ WRITE16_MEMBER(hh_hmcs40_state::alnattck_d_w)
 	alnattck_plate_w(space, 4, data & 0xf);
 }
 
-READ16_MEMBER(hh_hmcs40_state::alnattck_d_r)
+READ16_MEMBER(hh_hmcs40_state::alnattck_input_r)
 {
 	// D5: inputs
 	return (read_inputs(7) & 1) << 5;
@@ -411,8 +478,8 @@ static MACHINE_CONFIG_START( alnattck, hh_hmcs40_state )
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, alnattck_plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, alnattck_plate_w))
 	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, alnattck_plate_w))
-	MCFG_HMCS40_READ_D_CB(READ16(hh_hmcs40_state, alnattck_d_r))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, alnattck_d_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, alnattck_grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(hh_hmcs40_state, alnattck_input_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
@@ -956,7 +1023,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Basketball (Bambino)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Basketball - Dribble Away", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
