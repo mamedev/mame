@@ -253,12 +253,11 @@ int arm7_cpu_device::storeInc(UINT32 pat, UINT32 rbv, int mode)
 } /* storeInc */
 
 
-// classic CV: 3005aa0 does the DMA thing
 int arm7_cpu_device::storeDec(UINT32 pat, UINT32 rbv, int mode)
 {
 	int i, result = 0, cnt;
 
-	// pre-count the # of registers doing DMA
+	// pre-count the # of registers being stored
 	for (i = 15; i >= 0; i--)
 	{
 		if ((pat >> i) & 1)
