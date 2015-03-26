@@ -501,9 +501,6 @@ configuration { "osx*" }
 			"SDL2.framework",
 			"pthread",
 		}
-		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/osd/sdl/" .. _OPTIONS["target"] .. "-Info.plist"
-		}
 
 
 configuration { "mingw*" }

@@ -14,6 +14,11 @@ function mainProject(_target, _subtarget)
 		"NoManifest",
 	}
 
+	configuration { "osx*" }
+		linkoptions {
+			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/osd/sdl/" .. _OPTIONS["target"] .. "-Info.plist"
+		}
+
 	configuration { "mingw*" }
 		if _OPTIONS["osd"]=="sdl" then
 			targetprefix "sdl"
@@ -73,7 +78,7 @@ function mainProject(_target, _subtarget)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mame/layout",
 		GEN_DIR  .. "ldplayer/layout",
-		GEN_DIR .. "osd/windows",
+		GEN_DIR  .. "osd/windows",
 	}
 
 	includeosd()

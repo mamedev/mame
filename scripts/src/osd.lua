@@ -193,6 +193,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 			--else
 			MAME_DIR .. "src/osd/modules/sync/work_osd.*",
 		}
+		if _OPTIONS["targetos"]=="macosx" then
+			files {
+				MAME_DIR .. "src/osd/sdl/osxutils.m",
+			}
+		end
 	end
 	if _OPTIONS["osd"]=="windows" then
 		includedirs {
