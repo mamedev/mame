@@ -304,7 +304,7 @@ CLANG_VERSION:=$(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^
 PYTHON_AVAILABLE:=$(shell python --version > NUL 2>&1 && echo python)
 CHECK_CLANG:=
 else
-GCC_VERSION:=$(shell gcc -dumpversion 2> /dev/null)
+GCC_VERSION:=$(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
 CLANG_VERSION:=$(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
 PYTHON_AVAILABLE:=$(shell python --version > /dev/null 2>&1 && echo python)
 CHECK_CLANG:=$(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
@@ -724,3 +724,4 @@ $(GENDIR)/mess/drivers/ymmu100.inc: $(SRC)/mess/drivers/ymmu100.ppm $(SRC)/build
 
 $(GENDIR)/%.moc.c: $(SRC)/%.h
 	$(SILENT) $(MOC) $(MOCINCPATH) $< -o $@
+	
