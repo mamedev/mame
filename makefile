@@ -15,7 +15,6 @@
 #################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
 ###########################################################################
 
-PARAMS=--distro=$(DISTRO)
 ifdef TOOLS
 PARAMS+= --with-tools
 endif
@@ -189,6 +188,8 @@ endif
 endif
 endif
 endif
+
+PARAMS+= --distro=$(DISTRO)
 
 # extension for executables
 EXE =
