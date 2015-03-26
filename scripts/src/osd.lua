@@ -50,7 +50,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		if _OPTIONS["targetos"]=="macosx" then
 			files {
 				--MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.m",
-				MAME_DIR .. "src/osd/sdl/osxutils.m",
 				MAME_DIR .. "src/osd/modules/debugger/*.m",
 				MAME_DIR .. "src/osd/modules/debugger/osx/*.m",
 				MAME_DIR .. "src/osd/modules/debugger/osx/*.h",
@@ -175,6 +174,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 		includedirs {
 			MAME_DIR .. "src/osd/sdl",
 		}
+		if _OPTIONS["targetos"]=="macosx" then
+			files {
+				MAME_DIR .. "src/osd/sdl/osxutils.m",
+			}
+		end
 		files {
 			MAME_DIR .. "src/osd/sdl/strconv.*",
 			MAME_DIR .. "src/osd/sdl/sdldir.*",
