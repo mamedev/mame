@@ -49,6 +49,7 @@ elseif _OPTIONS["osd"]=="sdl" then
 		defines {
 			"OSD_SDL",
 			"SDLMAME_UNIX",
+			"SDLMAME_X11",
 			"SDLMAME_SDL2=1",
 			"USE_XINPUT=0",
 			"USE_OPENGL=1",
