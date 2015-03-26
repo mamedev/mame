@@ -175,7 +175,7 @@ CLANG_VERSION:=$(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^
 PYTHON_AVAILABLE:=$(shell python --version > NUL 2>&1 && echo python)
 else
 GCC_VERSION:=$(shell gcc -dumpversion 2> /dev/null)
-CLANG_VERSION:=$(clang --version  2> /dev/null | grep '[0-9]\.[0-9]' -o | head -n 1)
+CLANG_VERSION:=$(shell clang --version  2> /dev/null | grep '[0-9]\.[0-9]' -o | head -n 1)
 PYTHON_AVAILABLE:=$(shell python --version > /dev/null 2>&1 && echo python)
 endif
 
