@@ -391,7 +391,8 @@ GEN_FOLDERS :=  \
 	$(GENDIR)/mess/layout/ \
 	$(GENDIR)/mess/drivers/ \
 	$(GENDIR)/ldplayer/layout/ \
-	$(GENDIR)/osd/windows/) \
+	$(GENDIR)/osd/windows/ \
+	$(GENDIR)/osd/sdl/ \
 	$(GENDIR)/emu/cpu/arcompact/ \
 	$(GENDIR)/emu/cpu/h8/ \
 	$(GENDIR)/emu/cpu/mcs96/ \
@@ -435,8 +436,26 @@ endif
 endif
 
 ifndef COMPILE
-generate: $(GENIE) $(GEN_FOLDERS) $(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) $(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES)) $(GENDIR)/emu/uismall.fh $(GENDIR)/osd/windows/$(TARGET)vers.rc $(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c $(GENDIR)/mess/drivers/ymmu100.inc
-generate: $(GENIE) $(GEN_FOLDERS) $(GENDIR)/emu/cpu/arcompact/arcompact.inc $(GENDIR)/emu/cpu/h8/h8.inc $(GENDIR)/emu/cpu/h8/h8h.inc $(GENDIR)/emu/cpu/h8/h8s2000.inc $(GENDIR)/emu/cpu/h8/h8s2600.inc $(GENDIR)/emu/cpu/mcs96/mcs96.inc $(GENDIR)/emu/cpu/mcs96/i8x9x.inc $(GENDIR)/emu/cpu/mcs96/i8xc196.inc $(GENDIR)/emu/cpu/m6502/deco16.inc $(GENDIR)/emu/cpu/m6502/m4510.inc $(GENDIR)/emu/cpu/m6502/m6502.inc $(GENDIR)/emu/cpu/m6502/m65c02.inc $(GENDIR)/emu/cpu/m6502/m65ce02.inc $(GENDIR)/emu/cpu/m6502/m6509.inc $(GENDIR)/emu/cpu/m6502/m6510.inc $(GENDIR)/emu/cpu/m6502/n2a03.inc $(GENDIR)/emu/cpu/m6502/r65c02.inc $(GENDIR)/emu/cpu/m6502/m740.inc $(GENDIR)/emu/cpu/m6809/m6809.inc $(GENDIR)/emu/cpu/m6809/hd6309.inc $(GENDIR)/emu/cpu/m6809/konami.inc $(GENDIR)/emu/cpu/tms57002/tms57002.inc $(GENDIR)/m68kmake$(EXE) $(GENDIR)/emu/cpu/m68000/m68kops.c
+generate: \
+		$(GENIE) \
+		$(GEN_FOLDERS) \
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
+		$(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES)) \
+		$(GENDIR)/emu/uismall.fh \
+		$(GENDIR)/osd/windows/$(TARGET)vers.rc \
+		$(GENDIR)/osd/sdl/$(TARGET)-Info.plist \
+		$(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c \
+		$(GENDIR)/mess/drivers/ymmu100.inc
+generate: \
+		$(GENIE) \
+		$(GEN_FOLDERS) \
+		$(GENDIR)/emu/cpu/arcompact/arcompact.inc \
+		$(GENDIR)/emu/cpu/h8/h8.inc $(GENDIR)/emu/cpu/h8/h8h.inc $(GENDIR)/emu/cpu/h8/h8s2000.inc $(GENDIR)/emu/cpu/h8/h8s2600.inc \
+		$(GENDIR)/emu/cpu/mcs96/mcs96.inc $(GENDIR)/emu/cpu/mcs96/i8x9x.inc $(GENDIR)/emu/cpu/mcs96/i8xc196.inc \
+		$(GENDIR)/emu/cpu/m6502/deco16.inc $(GENDIR)/emu/cpu/m6502/m4510.inc $(GENDIR)/emu/cpu/m6502/m6502.inc $(GENDIR)/emu/cpu/m6502/m65c02.inc $(GENDIR)/emu/cpu/m6502/m65ce02.inc $(GENDIR)/emu/cpu/m6502/m6509.inc $(GENDIR)/emu/cpu/m6502/m6510.inc $(GENDIR)/emu/cpu/m6502/n2a03.inc $(GENDIR)/emu/cpu/m6502/r65c02.inc $(GENDIR)/emu/cpu/m6502/m740.inc \
+		$(GENDIR)/emu/cpu/m6809/m6809.inc $(GENDIR)/emu/cpu/m6809/hd6309.inc $(GENDIR)/emu/cpu/m6809/konami.inc \
+		$(GENDIR)/emu/cpu/tms57002/tms57002.inc \
+		$(GENDIR)/m68kmake$(EXE) $(GENDIR)/emu/cpu/m68000/m68kops.c
 	@echo Generating ...
 else
 generate:
@@ -453,7 +472,11 @@ $(GENDIR)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
 
 $(GENDIR)/osd/windows/$(TARGET)vers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -b $(TARGET) $(SRC)/version.c > $@
+	$(PYTHON) $(SRC)/build/verinfo.py -r -b $(TARGET) $(SRC)/version.c > $@
+
+$(GENDIR)/osd/sdl/$(TARGET)-Info.plist: $(SRC)/build/verinfo.py $(SRC)/version.c
+	@echo Emitting $@...
+	$(PYTHON) $(SRC)/build/verinfo.py -p -b $(TARGET) $(SRC)/version.c > $@
 
 $(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c: $(SRC)/$(TARGET)/$(SUBTARGET).lst $(SRC)/build/makelist.py
 	@echo Building driver list $<...
