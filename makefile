@@ -381,6 +381,7 @@ GEN_FOLDERS :=  \
 	$(GENDIR)/mame/layout/ \
 	$(GENDIR)/mess/layout/ \
 	$(GENDIR)/mess/drivers/ \
+	$(GENDIR)/ldplayer/layout/ \
 	$(GENDIR)/osd/windows/) \
 	$(GENDIR)/emu/cpu/arcompact/ \
 	$(GENDIR)/emu/cpu/h8/ \
@@ -396,7 +397,7 @@ $(GEN_FOLDERS):
 	-$(call MKDIR,$@)
 	
 
-LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/mame/layout/*.lay) $(wildcard $(SRC)/mess/layout/*.lay)
+LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/mame/layout/*.lay) $(wildcard $(SRC)/mess/layout/*.lay) $(wildcard $(SRC)/ldplayer/layout/*.lay)
 
 ifeq ($(TARGETOS),macosx)
 MOC_FILES=

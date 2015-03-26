@@ -72,6 +72,7 @@ function mainProject(_target, _subtarget)
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mame/layout",
+		GEN_DIR  .. "ldplayer/layout",
 		GEN_DIR .. "osd/windows",
 	}
 
