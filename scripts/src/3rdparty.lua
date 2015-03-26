@@ -384,6 +384,11 @@ project "bgfx"
 			MAME_DIR .. "3rdparty/bx/include/compat/mingw",
 		}
 
+	configuration { "osx*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/osx",
+		}
+	
 	configuration { }
 
 	defines {
