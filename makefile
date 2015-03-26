@@ -476,7 +476,6 @@ endif
 
 endif
 
-ifndef COMPILE
 generate: \
 		$(GENIE) \
 		$(GEN_FOLDERS) \
@@ -497,11 +496,7 @@ generate: \
 		$(GENDIR)/emu/cpu/m6809/m6809.inc $(GENDIR)/emu/cpu/m6809/hd6309.inc $(GENDIR)/emu/cpu/m6809/konami.inc \
 		$(GENDIR)/emu/cpu/tms57002/tms57002.inc \
 		$(GENDIR)/m68kmake$(EXE) $(GENDIR)/emu/cpu/m68000/m68kops.c
-	@echo Generating ...
-else
-generate:
-	@echo Skip generating ...
-endif
+
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
 	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
