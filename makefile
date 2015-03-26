@@ -132,6 +132,10 @@ endif
 
 endif # TARGET_OS
 
+ifdef PTR64
+ARCHITECTURE = x64
+endif
+
 # extension for executables
 EXE =
 
