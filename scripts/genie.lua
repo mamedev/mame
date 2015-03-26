@@ -407,6 +407,10 @@ configuration { }
 				}
 			end
 		else
+			buildoptions {
+				"-Wno-unused-result",
+			}
+			
 			if (version >= 40700) then
 				buildoptions {
 					"-Wno-narrowing",
@@ -417,7 +421,6 @@ configuration { }
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 				buildoptions {
 					"-Wno-unused-variable",
-					"-Wno-unused-result",
 					"-Wno-array-bounds"
 				}
 			end
