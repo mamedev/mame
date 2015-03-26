@@ -108,10 +108,10 @@ else:
     comments = "Multiple Arcade Machine Emulator"
     company_name = "MAME Team"
     file_description = "Multiple Arcade Machine Emulator"
-    internal_name = "MAME"
-    original_filename = "MAME"
-    product_name = "MAME"
-    bundle_identifier = "org.mamedev.mame"
+    internal_name = "MAME" if build == "mame" else build
+    original_filename = "MAME" if build == "mame" else build
+    product_name = "MAME" if build == "mame" else build
+    bundle_identifier = "org.mamedev." + build
 
 legal_copyright = "Copyright Nicola Salmoria and the MAME team"
 

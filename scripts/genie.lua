@@ -493,7 +493,6 @@ configuration { "linux-*" }
 		}
 
 configuration { "osx*" }
-
 		links {
 			"Cocoa.framework",
 			"OpenGL.framework",
@@ -501,6 +500,9 @@ configuration { "osx*" }
 			"CoreMIDI.framework",
 			"SDL2.framework",
 			"pthread",
+		}
+		linkoptions {
+			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/osd/sdl/" .. _OPTIONS["target"] .. "-Info.plist"
 		}
 
 
