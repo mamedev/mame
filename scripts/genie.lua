@@ -193,7 +193,7 @@ end
 		"ExtraWarnings",
 		"FatalWarnings",
 	}
-	configuration { "Debug" }
+	configuration { "Debug", "vs*" }
 		flags {
 			"Symbols",
 		}	
@@ -415,12 +415,11 @@ if _OPTIONS["PROFILE"] then
 		"-pg",
 	}
 end
-if _OPTIONS["SYMBOLS"]==nil then
-	if _OPTIONS["targetos"]=="macosx" then
-		linkoptions {
-			"-s",
-		}
-	end
+
+if _OPTIONS["SYMBOLS"]~=nil then
+	flags {
+		"Symbols",
+	}	
 end
 
 --# add the optimization flag
