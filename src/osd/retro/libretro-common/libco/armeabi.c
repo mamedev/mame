@@ -22,9 +22,6 @@ extern "C" {
 static thread_local uint32_t co_active_buffer[64];
 static thread_local cothread_t co_active_handle;
 
-/* ASM */
-void co_switch_arm(cothread_t handle, cothread_t current);
-
 static void crash(void)
 {
    /* Called only if cothread_t entrypoint returns. */
@@ -71,18 +68,17 @@ void co_delete(cothread_t handle)
 {
    free(handle);
 }
- 
+
 void co_switch(cothread_t handle)
 {
-   cothread_t co_previous_handle = co_active();
+   register void *p1 asm ("r1") = co_active_handle;
    co_active_handle = handle;
    asm (
-      "  stmia %1!, {r4, r5, r6, r7, r8, r9, r10, r11, sp, lr}\n"
-      "  ldmia %0!, {r4, r5, r6, r7, r8, r9, r10, r11, sp, pc}\n"
-      :: "r"(co_active_handle),"r"(co_previous_handle));
+      "  stmia r1!, {r4, r5, r6, r7, r8, r9, r10, r11, sp, lr}\n"
+      "  ldmia r0!, {r4, r5, r6, r7, r8, r9, r10, r11, sp, pc}\n"
+      :: "r"(p1));
 }
 
 #ifdef __cplusplus
 }
 #endif
-
