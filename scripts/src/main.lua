@@ -14,6 +14,14 @@ function mainProject(_target, _subtarget)
 		"NoManifest",
 	}
 
+	if _OPTIONS["SYMBOLS"] then
+		configuration { "mingw*" }
+			postbuildcommands {
+				"$(SILENT) echo Dumping symbols.",
+				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
+			}
+	end
+
 	configuration { "osx*" }
 		linkoptions {
 			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/osd/sdl/" .. _OPTIONS["target"] .. "-Info.plist"
