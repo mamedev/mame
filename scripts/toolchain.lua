@@ -24,7 +24,8 @@ newoption {
 		{ "mingw-clang",   "MinGW (clang compiler)" },
 		{ "nacl",          "Native Client"          },
 		{ "nacl-arm",      "Native Client - ARM"    },
-		{ "osx",           "OSX"                    },
+		{ "osx",           "OSX (GCC compiler)"     },
+		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "pnacl",         "Native Client - PNaCl"  },
 		{ "qnx-arm",       "QNX/Blackberry - ARM"   },
 		{ "rpi",           "RaspberryPi"            },
@@ -255,6 +256,10 @@ function toolchain(_buildDir)
 				premake.gcc.ar  = osxToolchain .. "ar"
 			end
 			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
+		end
+
+		if "osx-clang" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _ACTION .. "-osx-clang")
 		end
 
 		if "pnacl" == _OPTIONS["gcc"] then
@@ -631,14 +636,14 @@ function toolchain(_buildDir)
 	configuration { "pnacl", "Release" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
-	configuration { "osx", "x32" }
+	configuration { "osx*", "x32" }
 		targetdir (_buildDir .. "osx32_clang" .. "/bin")
 		objdir (_buildDir .. "osx32_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
 
-	configuration { "osx", "x64" }
+	configuration { "osx*", "x64" }
 		targetdir (_buildDir .. "osx64_clang" .. "/bin")
 		objdir (_buildDir .. "osx64_clang" .. "/obj")
 		buildoptions {

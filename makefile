@@ -302,12 +302,20 @@ ifeq ($(OS),windows)
 GCC_VERSION:=$(shell gcc -dumpversion 2> NUL)
 CLANG_VERSION:=$(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^0-9,.]//g")
 PYTHON_AVAILABLE:=$(shell python --version > NUL 2>&1 && echo python)
+CHECK_CLANG:=
 else
 GCC_VERSION:=$(shell gcc -dumpversion 2> /dev/null)
-CLANG_VERSION:=$(shell clang --version  2> /dev/null | grep '[0-9]\.[0-9]' -o | head -n 1)
+CLANG_VERSION:=$(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
 PYTHON_AVAILABLE:=$(shell python --version > /dev/null 2>&1 && echo python)
+CHECK_CLANG:=$(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
-
+ifneq ($(CHECK_CLANG),)
+ifeq ($(ARCHITECTURE),x64)
+ARCHITECTURE=x64_clang
+else
+ARCHITECTURE=x86_clang
+endif
+endif
 ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
 endif
@@ -494,6 +502,18 @@ ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/gmake-osx config=$(CONFIG)32
+
+macosx_x64_clang: generate
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+endif
+	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/gmake-osx-clang config=$(CONFIG)64
+
+macosx_x86_clang: generate
+ifndef COMPILE
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+endif
+	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/gmake-osx-clang config=$(CONFIG)32
 
 $(GENIE):
 	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(OS) -f genie.make
