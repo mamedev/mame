@@ -17,7 +17,7 @@ links {
 	"utils",
 	"expat",
 	"zlib",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -51,7 +51,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -85,7 +85,7 @@ links {
 	"utils",
 	"expat",
 	"zlib",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -123,7 +123,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",	
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -158,7 +158,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",	
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -191,7 +191,7 @@ links {
 	"utils",
 	"expat",
 	"zlib",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -223,7 +223,7 @@ links {
 	"utils",
 	"expat",
 	"zlib",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -255,7 +255,7 @@ links {
 	"utils",
 	"expat",
 	"zlib",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -289,7 +289,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -321,7 +321,7 @@ links {
 	"utils",
 	"expat",
 	"zlib",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -355,7 +355,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -392,7 +392,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -429,7 +429,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {
@@ -466,7 +466,7 @@ links {
 	"zlib",
 	"flac",
 	"7z",
-	"ocore",
+	"ocore_" .. _OPTIONS["osd"],
 }
 
 includedirs {

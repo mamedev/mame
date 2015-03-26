@@ -187,6 +187,11 @@ GENIE=3rdparty/genie/bin/$(OS)/genie
 
 SILENT?=@
 
+PARAMS= 
+ifdef TOOLS
+PARAMS=--with-tools
+endif
+
 all: $(GENIE) $(TARGETOS)_$(ARCHITECTURE)
 
 windows_x64: generate
@@ -194,7 +199,7 @@ ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=mingw64-gcc --targetos=windows --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --targetos=windows --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake 
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
@@ -203,7 +208,7 @@ ifndef MINGW32
 	$(error MINGW32 is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=mingw32-gcc --targetos=windows --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw32-gcc --targetos=windows --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
@@ -212,7 +217,7 @@ ifndef CLANG
 	$(error CLANG is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=mingw-clang --targetos=windows --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --targetos=windows --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
 	
@@ -221,33 +226,33 @@ ifndef CLANG
 	$(error CLANG is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=mingw-clang --targetos=windows --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --targetos=windows --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 vs2010: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2010
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2010
 
 vs2012: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2012
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2012
 
 vs2012_intel: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) --vs=intel-15 vs2012
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) --vs=intel-15 vs2012
 
 vs2012_xp: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) --vs=vs2012-xp vs2012
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) --vs=vs2012-xp vs2012
 
 vs2013: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
 
 vs2013_intel: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --vs=intel-15 --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --vs=intel-15 --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
 
 vs2013_xp: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --vs=vs2013-xp --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --vs=vs2013-xp --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
 
 vs2015: generate
-	$(SILENT) $(GENIE) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2015
+	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2015
 
 android-arm: generate
 ifndef ANDROID_NDK_ARM
@@ -332,37 +337,37 @@ endif
 
 linux_x64: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=linux-gcc --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-linux config=$(CONFIG)64
 
 linux_x86: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=linux-gcc --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-linux config=$(CONFIG)32
 
 linux_x64_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=linux-clang --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-linux-clang config=$(CONFIG)64
 
 linux_x86_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=linux-clang --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-linux-clang config=$(CONFIG)32
 
 macosx_x64: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=osx --targetos=macosx --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --targetos=macosx --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-osx config=$(CONFIG)64
 
 macosx_x86: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=osx --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C .build/projects/gmake-osx config=$(CONFIG)32
 

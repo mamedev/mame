@@ -97,6 +97,9 @@ if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
 end
 GEN_DIR = MAME_BUILD_DIR .. "generated/"
 
+if (_OPTIONS["target"] == nil) then return false end
+if (_OPTIONS["subtarget"] == nil) then return false end
+
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	solution (_OPTIONS["target"])
 else
