@@ -48,24 +48,19 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 
-WRITE16_MEMBER(powerins_state::flipscreen_w)
+WRITE8_MEMBER(powerins_state::flipscreen_w)
 {
-	if (ACCESSING_BITS_0_7) flip_screen_set(data & 1 );
+	flip_screen_set(data & 1 );
 }
 
-WRITE16_MEMBER(powerins_state::tilebank_w)
+WRITE8_MEMBER(powerins_state::tilebank_w)
 {
-	if (ACCESSING_BITS_0_7)
+	if (data != m_tile_bank)
 	{
-		if (data != m_tile_bank)
-		{
-			m_tile_bank = data;     // Tiles Bank (VRAM 0)
-			m_tilemap_0->mark_all_dirty();
-		}
+		m_tile_bank = data;     // Tiles Bank (VRAM 0)
+		m_tilemap_0->mark_all_dirty();
 	}
 }
-
-
 
 
 /***************************************************************************

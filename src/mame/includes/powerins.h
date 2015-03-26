@@ -27,23 +27,21 @@ public:
 
 	tilemap_t *m_tilemap_0;
 	tilemap_t *m_tilemap_1;
-	int m_oki_bank;
 	int m_tile_bank;
 
-	DECLARE_WRITE16_MEMBER(okibank_w);
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(tilebank_w);
+	DECLARE_WRITE8_MEMBER(powerinsa_okibank_w);
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(tilebank_w);
 	DECLARE_WRITE16_MEMBER(vram_0_w);
 	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_READ8_MEMBER(powerinb_fake_ym2203_r);
+	DECLARE_READ8_MEMBER(powerinsb_fake_ym2203_r);
+
+	DECLARE_MACHINE_START(powerinsa);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILEMAP_MAPPER_MEMBER(get_memory_offset_0);
 	
-	virtual void machine_start();
-	virtual void machine_reset();
 	virtual void video_start();
 	
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
