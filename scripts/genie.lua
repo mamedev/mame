@@ -114,6 +114,41 @@ newoption {
 	description = "LD replacement",
 }
 
+newoption {
+	trigger = "PROFILE",
+	description = "Enable profiling.",
+} 
+
+newoption {
+	trigger = "SYMBOLS",
+	description = "Enable symbols.",
+} 
+
+newoption {
+	trigger = "SYMLEVEL",
+	description = "Symbols level.",
+} 
+
+newoption {
+	trigger = "PROFILER",
+	description = "Include the internal profiler.",
+} 
+
+newoption {
+	trigger = "OPTIMIZE",
+	description = "Optimization level.",
+} 
+
+newoption {
+	trigger = "ARCHOPTS",
+	description = "ARCHOPTS.",
+} 
+
+newoption {
+	trigger = "MAP",
+	description = "Generate a link map.",
+} 
+
 local os_version = str_to_version(_OPTIONS["os_version"])
 USE_BGFX = 1
 if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
@@ -180,21 +215,39 @@ configuration { "gmake" }
 
 configuration { "x64", "Release" }
 	targetsuffix "64"
+	if _OPTIONS["PROFILE"] then
+		targetsuffix "64p"
+	end
 
 configuration { "x64", "Debug" }
 	targetsuffix "64d"
-
+	if _OPTIONS["PROFILE"] then
+		targetsuffix "64dp"
+	end
+	
 configuration { "x32", "Release" }
 	targetsuffix ""
-
+	if _OPTIONS["PROFILE"] then
+		targetsuffix "p"
+	end
+	
 configuration { "x32", "Debug" }
 	targetsuffix "d"
-
+	if _OPTIONS["PROFILE"] then
+		targetsuffix "dp"
+	end
+	
 configuration { "Native", "Release" }
 	targetsuffix ""
+	if _OPTIONS["PROFILE"] then
+		targetsuffix "p"
+	end
 
 configuration { "Native", "Debug" }
 	targetsuffix "d"
+	if _OPTIONS["PROFILE"] then
+		targetsuffix "dp"
+	end
 
 configuration { }
 
@@ -235,8 +288,13 @@ configuration { "vs*" }
 configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
-		"MAME_PROFILER", -- define MAME_PROFILER if we are a profiling build
 	}
+	if _OPTIONS["PROFILER"] then
+		defines{
+			"MAME_PROFILER", -- define MAME_PROFILER if we are a profiling build
+		}
+	end
+
 configuration { "Release" }
 	defines {
 		"NDEBUG",
@@ -312,19 +370,26 @@ configuration { }
 		}
 	end
 -- add -g if we need symbols, and ensure we have frame pointers
---ifdef SYMBOLS
---CCOMFLAGS += -g$(SYMLEVEL) -fno-omit-frame-pointer -fno-optimize-sibling-calls
---endif
+if _OPTIONS["SYMBOLS"]~=nil then
+	buildoptions {
+		"-g" .. _OPTIONS["SYMLEVEL"],
+		"-fno-omit-frame-pointer",
+		"-fno-optimize-sibling-calls",
+	}
+end
 
 --# we need to disable some additional implicit optimizations for profiling
---ifdef PROFILE
---CCOMFLAGS += -mno-omit-leaf-frame-pointer
---endif
-
+if _OPTIONS["PROFILE"] then
+	buildoptions {
+		"-mno-omit-leaf-frame-pointer",
+	}
+end
 -- add -v if we need verbose build information
---ifdef VERBOSE
---CCOMFLAGS += -v
---endif
+if _OPTIONS["VERBOSE"] then
+	buildoptions {
+		"-v",
+	}
+end
 
 -- only show deprecation warnings when enabled
 --ifndef DEPRECATED
@@ -334,13 +399,25 @@ configuration { }
 --endif
 
 -- add profiling information for the compiler
---ifdef PROFILE
---CCOMFLAGS += -pg
---endif
+if _OPTIONS["PROFILE"] then
+	buildoptions {
+		"-pg",
+	}
+	linkoptions {
+		"-pg",
+	}
+end
+if _OPTIONS["SYMBOLS"]==nil then
+	if _OPTIONS["targetos"]=="macosx" then
+		linkoptions {
+			"-s",
+		}
+	end
+end
 
 --# add the optimization flag
 	buildoptions {
-		"-O3",
+		"-O".. _OPTIONS["OPTIMIZE"],
 		"-fno-strict-aliasing"
 	}
 
@@ -352,12 +429,20 @@ configuration { }
 
 
 -- if we are optimizing, include optimization options
---ifneq ($(OPTIMIZE),0)
---CCOMFLAGS += -fno-strict-aliasing $(ARCHOPTS)
+--ifneq ($(),0)
+if _OPTIONS["OPTIMIZE"] then
+	buildoptions {
+		"-fno-strict-aliasing" 
+	}
+	if _OPTIONS["ARCHOPTS"] then	
+		buildoptions {
+			_OPTIONS["ARCHOPTS"]
+		}
+	end
 --ifdef LTO
 --CCOMFLAGS += -flto
 --endif
---endif
+end
 
 --ifdef SSE2
 --CCOMFLAGS += -msse2
@@ -368,6 +453,20 @@ configuration { }
 --else
 --CCOMFLAGS += -Wno-unknown-pragmas
 --endif
+
+if _OPTIONS["MAP"] then
+	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+		linkoptions {
+			"-Wl,-Map," .. _OPTIONS["target"] .. ".map"
+		}
+	else
+		linkoptions {
+			"-Wl,-Map," .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".map"
+		}
+
+	end	
+end
+
 	buildoptions {
 		"-Wno-unknown-pragmas",
 	}

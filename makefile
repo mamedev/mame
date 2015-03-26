@@ -191,6 +191,76 @@ endif
 
 PARAMS+= --distro=$(DISTRO)
 
+#-------------------------------------------------
+# sanity check the configuration
+#-------------------------------------------------
+
+# enable symbols as it is useless without them
+ifdef SANITIZE
+SYMBOLS = 1
+endif
+
+# profiler defaults to on for DEBUG builds
+ifdef DEBUG
+ifndef PROFILER
+PROFILER = 1
+endif
+endif
+
+# allow gprof profiling as well, which overrides the internal PROFILER
+# also enable symbols as it is useless without them
+ifdef PROFILE
+PROFILER =
+SYMBOLS = 1
+ifndef SYMLEVEL
+SYMLEVEL = 1
+endif
+endif
+
+# specify a default optimization level if none explicitly stated
+ifndef OPTIMIZE
+ifndef SYMBOLS
+OPTIMIZE = 3
+else
+OPTIMIZE = 0
+endif
+endif
+
+# set the symbols level
+ifdef SYMBOLS
+ifndef SYMLEVEL
+SYMLEVEL = 2
+endif
+endif
+
+ifdef SYMBOLS
+PARAMS+= --SYMBOLS=$(SYMBOLS)
+endif
+
+ifdef SYMLEVEL
+PARAMS+= --SYMLEVEL=$(SYMLEVEL)
+endif
+
+ifdef PROFILER
+PARAMS+= --PROFILER=$(PROFILER)
+endif
+
+ifdef PROFILE
+PARAMS+= --PROFILE=$(PROFILE)
+endif
+
+ifdef OPTIMIZE
+PARAMS+= --OPTIMIZE=$(OPTIMIZE)
+endif
+
+ifdef ARCHOPTS
+PARAMS+= --ARCHOPTS=$(ARCHOPTS)
+endif
+
+ifdef MAP
+PARAMS+= --MAP=$(MAP)
+endif
+
 # extension for executables
 EXE =
 
