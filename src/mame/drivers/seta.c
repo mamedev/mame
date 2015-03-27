@@ -10376,6 +10376,36 @@ ROM_START( daioh1 )
 	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
 ROM_END
 
+ROM_START( daiohc )
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "15.u3", 0x000000, 0x040000, CRC(14616abb) SHA1(1ff5331b0de60230baa4ced58bec6a954cb599d5) )
+	ROM_CONTINUE   (          0x100000, 0x040000  )
+	ROM_LOAD16_BYTE( "14.u4", 0x000001, 0x040000, CRC(a029f991) SHA1(5d341fe5b3ac3bdda1d8e7cc8e6a260f04d00aa1) )
+	ROM_CONTINUE   (          0x100001, 0x040000  )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD(  "9.u9",  0x000000, 0x080000, CRC(4444cbd4) SHA1(e039cd7e7093d399bc39aa4d355a03250e087fb3) )
+	ROM_LOAD( "10.u10", 0x080000, 0x080000, CRC(1d88d20b) SHA1(3cf95041d0876a4ef378651783e53cee1994ed3d) )
+	ROM_LOAD( "11.u11", 0x100000, 0x080000, CRC(3e41de61) SHA1(7d3ddf3780bbe99b13937d75cbdbfb58449301a6) )
+	ROM_LOAD( "12.u12", 0x180000, 0x080000, CRC(f35e3341) SHA1(9260460e1823d157201de02557c7136ef898cfb3) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
+	ROM_LOAD( "5.u5", 0x000000, 0x080000, CRC(aaa5e41e) SHA1(fe362ec083cb13732ea07003a4a1a9c63d382f4b) )
+	ROM_LOAD( "6.u6", 0x080000, 0x080000, CRC(9ad8b4b4) SHA1(b6e4cff160ae0efe6f3fd0df9a8a618957c3ce61) )
+	ROM_LOAD( "7.u7", 0x100000, 0x080000, CRC(babf194a) SHA1(ef838aab2d651c10553fb87552c67f289a8ac83d) )
+	ROM_LOAD( "8.u8", 0x180000, 0x080000, CRC(2db65290) SHA1(4f4d65e984fad7bb1d886de67bc50645798282bb) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
+	ROM_LOAD( "1.u1", 0x000000, 0x080000, CRC(30f81f99) SHA1(9c164c798c7e869e92505d9d85f06f4a1c9a9528) )
+	ROM_LOAD( "2.u2", 0x080000, 0x080000, CRC(3b3e0f4e) SHA1(740afe4eefea480f941dd80a03392592d8d4b084) )
+	ROM_LOAD( "3.u3", 0x100000, 0x080000, CRC(c5eef1c1) SHA1(d4b3188b39bad5c7a2c7b7dbc91a79c7ee80a3a1) )
+	ROM_LOAD( "4.u4", 0x180000, 0x080000, CRC(851115b6) SHA1(b8e1e22231d131085c90afcf30ff35a2866edff5) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "data.u69", 0x000000, 0x080000, CRC(21e4f093) SHA1(f0420d158dc5d182e41b6fb2ea3af6baf88bacb8) )
+	ROM_LOAD( "data.u70", 0x080000, 0x080000, CRC(593c3c58) SHA1(475fb530a6d23269cb0aea6e294291c7463b57a2) )
+ROM_END
+
 ROM_START( daiohloc )
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "prg_even.u3", 0x000000, 0x040000, CRC(3c97b976) SHA1(5850bf71b594a25f3e2de16f2933078c4a0dc518) )
@@ -11548,6 +11578,7 @@ GAME( 1993, atehate,  0,        atehate,  atehate, driver_device,  0,        ROT
 
 GAME( 1993, daioh,    0,        daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh", 0 )
 GAME( 1993, daioh1,   daioh,    daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (set 1)", 0 )
+GAME( 1993, daiohc,   daioh,    wrofaero, daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (War Of Aero Conversion?)", 0 )
 GAME( 1993, daiohloc, daioh,    daiohloc, daiohloc, driver_device, 0,        ROT270, "Athena",                 "Daioh (location test ver)", 0 )
 
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
