@@ -804,6 +804,40 @@ configuration { "vs*" }
 			"/wd4371",
 			"/wd4548",
 		}
+if _OPTIONS["vs"]=="intel-15" then
+		buildoptions {
+			"/Qwd9", 
+			"/Qwd82",
+			"/Qwd111",
+			"/Qwd128",
+			"/Qwd177",
+			"/Qwd181",
+			"/Qwd185",
+			"/Qwd280",
+			"/Qwd344",
+			"/Qwd411",
+			"/Qwd869",
+			"/Qwd2545",
+			"/Qwd2553",
+			"/Qwd2557", 
+			"/Qwd3280", 
+
+			"/Qwd170",
+			"/Qwd188",
+
+			"/Qwd63", 
+			"/Qwd177",
+			"/Qwd186",
+			"/Qwd488",
+			"/Qwd1478",
+			"/Qwd1879",
+			"/Qwd3291",
+			"/Qwd1195",
+			"/Qwd1786",
+			"/Qwd592", -- For lua, false positive?
+		}
+end
+
 		linkoptions {
 			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
 		}
