@@ -1962,11 +1962,6 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 	{
 		draw_scanline(scanline);
 
-		if ((m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
-		{
-			request_irq(INT_HBL);
-		}
-
 		for (ch = 0; ch < 4; ch++)
 		{
 			ctrl = m_dma_regs[(ch*3)+2]>>16;
@@ -1977,6 +1972,11 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 				dma_exec(ch);
 			}
 		}
+	}
+
+	if ((m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
+	{
+		request_irq(INT_HBL);
 	}
 
 	m_DISPSTAT |= DISPSTAT_HBL;
