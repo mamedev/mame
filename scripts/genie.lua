@@ -550,6 +550,11 @@ end
 				}
 			end
 		else
+			if (version == 40201) then
+				buildoptions {
+					"-Wno-cast-align"
+				}
+			end 
 			if (version >= 40400) then
 				buildoptions {
 					"-Wno-unused-result",
