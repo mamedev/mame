@@ -515,13 +515,13 @@ endif
 
 macosx_x64_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx-clang config=$(CONFIG)64
 
 macosx_x86_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx-clang config=$(CONFIG)32
 
