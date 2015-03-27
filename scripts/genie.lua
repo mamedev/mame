@@ -267,17 +267,17 @@ if _OPTIONS["osd"]=="windows" then
 	forcedincludes {
 		MAME_DIR .. "src/osd/windows/winprefix.h"
 	}
-	configuration { "x64" }
-		defines {
-			"X64_WINDOWS_ABI",
-		}
-	configuration { } 
 elseif _OPTIONS["osd"]=="sdl" then
 	forcedincludes {
 		MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 	}
 end
 
+configuration { "mingw* or vs*", "x64" }
+	defines {
+		"X64_WINDOWS_ABI",
+	}
+configuration { }
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
 
