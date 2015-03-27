@@ -1,0 +1,114 @@
+/******************************************************************************
+
+    tiny.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+******************************************************************************/
+
+// Sega ST-V games
+stvbios
+				// 1994.07 Sports Fishing
+gaxeduel        // 1995.02 Golden Axe the Duel
+suikoenb        // 1995.03 Suiko Enbu (Data East)
+bakubaku        // 1995.04 Bakubaku Animal
+vfremix         // 1995.06 Virtua Fighter Remix
+ejihon          // 1995.07 Ejihon Tantei Jimusyo
+finlarch        // 1995.07 Final Arch
+sfish2j         // 1995.08 Sports Fishing 2 (Japan)
+shanhigw        // 1995.08 Shanghai Banri no Choujou
+sandor          // 1995.11 Nido Aru Koto wa Sando-R
+kiwames         // 1995.11 Pro Mahjong Kiwame S (Athena)
+sfish2          // 1995.11 Sports Fishing 2 (Export)
+critcrsh        // 1995.?? Critter Crusher
+				// 1995.12 Tatakott
+batmanfr        // 1996.02 Batman Forever (Acclaim)
+fhboxers        // 1996.02 Funky Head Boxers
+vfkids          // 1996.03 Virtua Fighter Kids
+pblbeach        // 1996.03 Pebble Beach the Great Shot (T&E Soft)
+introdon        // 1996.04 Karaoke Quiz Intro Dondon (Sunsoft / Success)
+smleague        // 1996.04 Super Major League
+decathlt        // 1996.05 Decathlete
+decathlto       // 1996.05 Decathlete
+dnmtdeka        // 1996.07 Dynamite Deka
+mausuke         // 1996.07 Mausuke no Ojama the World (Data East)
+diehard         // 1996.08 Die Hard Arcade
+sokyugrt        // 1996.09 Soukyuu Gurentai (Raizing / 8ing)
+prikura         // 1996.10 Prikura Daisakusen (Atlus)
+magzun          // 1996.11 Magical Zunou Power
+puyosun         // 1996.12 Puyo Puyo SUN (Compile)
+colmns97        // 1997.01 Columns 97
+shienryu        // 1997.02 Shienryu (Warashi)
+vmahjong        // 1997.02 Virtual Mahjong (Micronet)
+pclub2kc        // 1997.02 Print Club Kome Kome Club
+pclub2fc        // 1997.04 Print Club 2 Felix The Cat
+groovef         // 1997.05 Groove on Fight (Atlus)
+nclubv3         // 1997.07 Name Club Ver. 3
+pclb2elk        // 1997.07 Print Club Custom
+pclub2          // 1997.09 Print Club 2
+thunt           // 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License))
+thuntk
+winterht        // 1997.10 Winter Heat (Data East)
+pclb297w        // 1997.10 Print Club 2 '97 Winter Ver
+pclub298        // 1997.10 Print Club 2 '98 Spring Ver
+cotton2         // 1997.11 Cotton 2 (Success)
+hanagumi        // 1997.11 Sakura Taisen Hanagumi Taisen Columns
+findlove        // 1997.12 Find Love (Daiki / FCF)
+maruchan        // 1997.12 Maruchan de Goo!!!
+techbowl        // 1997.12 Technical Bowling
+znpwfv          // 1997.12 Zen Nippon Pro Wrestling featuring Virtua
+seabass         // 1998.02 Sea Bass Fishing (A wave Inc (Able License))
+sasissu         // 1998.02 Taisen Tanto-R Sasissu!!
+				// 1998.03 Bass Master Challenge
+twcup98         // 1998.04 Tecmo World Cup '98 (Tecmo)
+grdforce        // 1998.05 Guardian Force (Success)
+rsgun           // 1998.05 Radient Silver Gun (Treasure)
+astrass         // 1998.06 Astra Super Stars (Sunsoft)
+myfairld        // 1998.07 My Fair Lady (Micronet)
+othellos        // 1998.07 Othello Shiyouyo (Success)
+pclubol         // 1998.07 Print Club Olive
+pclb298a        // 1998.08 Print Club 2 '98 Autumn Ver
+cottonbm        // 1998.09 Cotton Boomerang (Success)
+stress          // 1998.10 Stress Busters
+elandore        // 1998.11 Touryuu Densetsu Elandore (Sai-Mate)
+sss             // 1998.12 Steep Slope Sliders (Capcom / Cave / Victor)
+micrombc        // 1999.03 Microman Battle Charge
+pclub2v3        // 1999.03 Print Club 2 Vol. 3
+sanjeon         // 1999.04 Sanjun Sujun (Sega / Deniam)
+danchih         // 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License))
+ffreveng        // 1999.09 Final Fight Revenge (Capcom)
+pclubpok        // 1999.11 Print Club Pokemon
+pclubor         // 1999.11 Print Club Goukakenran
+danchiq         // 2000.12 Danchi de Quiz Okusan Yontaku Desuyo! (Altron)
