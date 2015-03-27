@@ -10404,6 +10404,9 @@ ROM_START( daiohc )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "data.u69", 0x000000, 0x080000, CRC(21e4f093) SHA1(f0420d158dc5d182e41b6fb2ea3af6baf88bacb8) )
 	ROM_LOAD( "data.u70", 0x080000, 0x080000, CRC(593c3c58) SHA1(475fb530a6d23269cb0aea6e294291c7463b57a2) )
+
+	ROM_REGION( 0x200, "gals", 0 )
+	ROM_LOAD( "gal.u14",  0x000000, 0x117, CRC(b972b479) SHA1(50da73b4cc7b9c0ff8fb19b2c34d05a4dbc8f0cb) )
 ROM_END
 
 ROM_START( daiohloc )
