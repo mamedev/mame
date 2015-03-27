@@ -535,7 +535,11 @@ end
 				"-Wno-dynamic-class-memaccess",
 				"-Wno-self-assign-field",
 			}
-			
+			if (version >= 30200) then
+				buildoptions {
+					"-Wno-unused-value",
+				}
+			end	
 			if (version >= 30400) then
 				buildoptions {
 					"-Wno-inline-new-delete",

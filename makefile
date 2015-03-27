@@ -154,8 +154,6 @@ endif
 
 
 PYTHON = @python
-CC = @gcc
-LD = @g++
 
 #-------------------------------------------------
 # distribution may change things
@@ -167,25 +165,14 @@ else
 ifeq ($(DISTRO),debian-stable)
 else
 ifeq ($(DISTRO),ubuntu-intrepid)
-# Force gcc-4.2 on ubuntu-intrepid
-CC = @gcc -V 4.2
-LD = @g++-4.2
 else
 ifeq ($(DISTRO),gcc44-generic)
-CC = @gcc-4.4
-LD = @g++-4.4
 else
 ifeq ($(DISTRO),gcc45-generic)
-CC = @gcc-4.5
-LD = @g++-4.5
 else
 ifeq ($(DISTRO),gcc46-generic)
-CC = @gcc-4.6
-LD = @g++-4.6
 else
 ifeq ($(DISTRO),gcc47-generic)
-CC = @gcc-4.7
-LD = @g++-4.7
 else
 $(error DISTRO $(DISTRO) unknown)
 endif
@@ -313,13 +300,17 @@ CLANG_VERSION:=$(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' 
 PYTHON_AVAILABLE:=$(shell python --version > /dev/null 2>&1 && echo python)
 CHECK_CLANG:=$(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
-ifneq ($(CHECK_CLANG),)
+
+ifeq ($(TARGETOS),macosx)
+ifneq (,$(findstring 3.,$(CLANG_VERSION)))
 ifeq ($(ARCHITECTURE),x64)
 ARCHITECTURE=x64_clang
 else
 ARCHITECTURE=x86_clang
 endif
 endif
+endif
+
 ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
 endif
