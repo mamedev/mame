@@ -154,12 +154,26 @@ newoption {
 	description = "Force DRC C backend.",
 } 
 
+newoption {
+	trigger = "USE_BGFX",
+	description = "Use of BGFX.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+} 
+
 
 local os_version = str_to_version(_OPTIONS["os_version"])
+
 USE_BGFX = 1
 if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
 	USE_BGFX = 0
 end
+if(_OPTIONS["USE_BGFX"]~=nil) then
+	USE_BGFX = tonumber(_OPTIONS["USE_BGFX"])
+end
+
 GEN_DIR = MAME_BUILD_DIR .. "generated/"
 
 if (_OPTIONS["target"] == nil) then return false end

@@ -272,6 +272,9 @@ ifdef MAP
 PARAMS+= --MAP=$(MAP)
 endif
 
+ifdef USE_BGFX
+PARAMS+= --USE_BGFX=$(USE_BGFX)
+endif
 # extension for executables
 EXE =
 
