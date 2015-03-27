@@ -60,9 +60,9 @@ newoption {
 	description = "Set iOS target version (default: 8.0).",
 }
 
-function toolchain(_buildDir)
+function toolchain(_buildDir, _subDir)
 
-	location (_buildDir .. "projects/" .. _ACTION)
+	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
 
 	local androidPlatform = "android-14"
 	if _OPTIONS["with-android"] then
@@ -90,7 +90,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-gcc"
 			premake.gcc.cxx = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-g++"
 			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-android-arm")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-arm")
 		end
 
 		if "android-mips" == _OPTIONS["gcc"] then
@@ -102,7 +102,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-gcc"
 			premake.gcc.cxx = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-g++"
 			premake.gcc.ar  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-android-mips")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-mips")
 		end
 
 		if "android-x86" == _OPTIONS["gcc"] then
@@ -114,7 +114,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-gcc"
 			premake.gcc.cxx = "$(ANDROID_NDK_X86)/bin/i686-linux-android-g++"
 			premake.gcc.ar  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-android-x86")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-android-x86")
 		end
 
 		if "asmjs" == _OPTIONS["gcc"] then
@@ -127,25 +127,25 @@ function toolchain(_buildDir)
 			premake.gcc.cxx  = "$(EMSCRIPTEN)/em++"
 			premake.gcc.ar   = "$(EMSCRIPTEN)/emar"
 			premake.gcc.llvm = true
-			location (_buildDir .. "projects/" .. _ACTION .. "-asmjs")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-asmjs")
 		end
 
 		if "freebsd" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _ACTION .. "-freebsd")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-freebsd")
 		end
 
 		if "ios-arm" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-ios-arm")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ios-arm")
 		end
 
 		if "ios-simulator" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-ios-simulator")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ios-simulator")
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then
@@ -171,14 +171,14 @@ function toolchain(_buildDir)
 				premake.gcc.cxx  = "@g++-4.7"
 			end	
 			premake.gcc.ar  = "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-linux")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
 		end
 
 		if "linux-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "clang"
 			premake.gcc.cxx = "clang++"
 			premake.gcc.ar  = "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-linux-clang")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux-clang")
 		end
 
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
@@ -188,7 +188,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = "$(MINGW32)/bin/i686-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW32)/bin/i686-w64-mingw32-g++"
 			premake.gcc.ar  = "$(MINGW32)/bin/ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-mingw32-gcc")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw32-gcc")
 		end
 
 		if "mingw64-gcc" == _OPTIONS["gcc"] then
@@ -198,7 +198,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = "$(MINGW64)/bin/x86_64-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW64)/bin/x86_64-w64-mingw32-g++"
 			premake.gcc.ar  = "$(MINGW64)/bin/ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-mingw64-gcc")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw64-gcc")
 		end
 
 
@@ -207,7 +207,7 @@ function toolchain(_buildDir)
 			premake.gcc.cxx  = "$(CLANG)/bin/clang++"
 			premake.gcc.ar   = "$(CLANG)/bin/llvm-ar"
 			premake.gcc.llvm = true
-			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-clang")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-mingw-clang")
 		end
 
 		if "nacl" == _OPTIONS["gcc"] then
@@ -226,7 +226,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = naclToolchain .. "gcc"
 			premake.gcc.cxx = naclToolchain .. "g++"
 			premake.gcc.ar  = naclToolchain .. "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-nacl")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-nacl")
 		end
 
 		if "nacl-arm" == _OPTIONS["gcc"] then
@@ -245,7 +245,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = naclToolchain .. "gcc"
 			premake.gcc.cxx = naclToolchain .. "g++"
 			premake.gcc.ar  = naclToolchain .. "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-nacl-arm")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-nacl-arm")
 		end
 
 		if "osx" == _OPTIONS["gcc"] then
@@ -255,11 +255,11 @@ function toolchain(_buildDir)
 				premake.gcc.cxx = osxToolchain .. "clang++"
 				premake.gcc.ar  = osxToolchain .. "ar"
 			end
-			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx")
 		end
 
 		if "osx-clang" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _ACTION .. "-osx-clang")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx-clang")
 		end
 
 		if "pnacl" == _OPTIONS["gcc"] then
@@ -278,7 +278,7 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = naclToolchain .. "clang"
 			premake.gcc.cxx = naclToolchain .. "clang++"
 			premake.gcc.ar  = naclToolchain .. "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-pnacl")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-pnacl")
 		end
 
 		if "qnx-arm" == _OPTIONS["gcc"] then
@@ -290,48 +290,48 @@ function toolchain(_buildDir)
 			premake.gcc.cc  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
 			premake.gcc.cxx = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++"
 			premake.gcc.ar  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-qnx-arm")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-qnx-arm")
 		end
 
 		if "rpi" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _ACTION .. "-rpi")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
 		end
 	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
-			location (_buildDir .. "projects/" .. _ACTION .. "-clang")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
 		end
 
 		if "winphone8" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v110_wp80"
-			location (_buildDir .. "projects/" .. _ACTION .. "-winphone8")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winphone8")
 		end
 
 		if "winphone81" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v120_wp81"
 			platforms { "ARM" }
-			location (_buildDir .. "projects/" .. _ACTION .. "-winphone81")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winphone81")
 		end
 
 		if "intel-14" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "Intel C++ Compiler XE 14.0"
-			location (_buildDir .. "projects/" .. _ACTION .. "-intel")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
 		end
 
 		if "intel-15" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
-			location (_buildDir .. "projects/" .. _ACTION .. "-intel")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
 		end
 
 		if ("vs2012-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v110_xp")
-			location (_buildDir .. "projects/" .. _ACTION .. "-xp")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
 		
 		if ("vs2013-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
-			location (_buildDir .. "projects/" .. _ACTION .. "-xp")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
 	end
 

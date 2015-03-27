@@ -205,11 +205,11 @@ end
 		}	
 	configuration {}
 	
-msgcompile ("Compiling $(subst ../../../,,$<)...")
+msgcompile ("Compiling $(subst ../,,$<)...")
 
-msgcompile_objc ("Objective-C compiling $(subst ../../../,,$<)...")
+msgcompile_objc ("Objective-C compiling $(subst ../,,$<)...")
 
-msgresource ("Compiling resources $(subst ../../../,,$<)...")
+msgresource ("Compiling resources $(subst ../,,$<)...")
 
 msglinking ("Linking $(notdir $@)...")
 
@@ -483,11 +483,11 @@ end
 if _OPTIONS["MAP"] then
 	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 		linkoptions {
-			"-Wl,-Map," .. "../../../" .. _OPTIONS["target"] .. ".map"
+			"-Wl,-Map," .. "../../../../" .. _OPTIONS["target"] .. ".map"
 		}
 	else
 		linkoptions {
-			"-Wl,-Map," .. "../../../"  .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".map"
+			"-Wl,-Map," .. "../../../../"  .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".map"
 		}
 
 	end	
@@ -580,7 +580,14 @@ end
 --	CCOMFLAGS += -Wno-cast-align
 --endif
 
-if not toolchain(MAME_BUILD_DIR) then
+local subdir
+if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+	subdir = _OPTIONS["target"]
+else
+	subdir = _OPTIONS["target"] .. _OPTIONS["subtarget"] 
+end	
+
+if not toolchain(MAME_BUILD_DIR, subdir) then
 	return -- no action specified
 end
 	
