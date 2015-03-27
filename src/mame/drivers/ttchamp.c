@@ -58,7 +58,7 @@ Dumped by tirino73
 
 Notes
 I think the PIC is used to interface with battry backed RAM instead of an EEPROM,
-we currently attempt to simulate this as the PIC is read protected.
+we currently simulate this as the PIC is read protected.
 
 
 
@@ -264,9 +264,10 @@ READ16_MEMBER(ttchamp_state::ttchamp_pic_r)
 //	printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
 	if (picmodex == PIC_SET_READLATCH)
 	{
-		printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
+//		printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
 		picmodex = PIC_IDLE;
-		return m_pic_latched;
+
+		return m_pic_latched << 8;
 
 	}
 	return 0x00;
@@ -297,11 +298,14 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_pic_w)
 		{
 			picmodex = PIC_IDLE;
 			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
-			printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
+	//		printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
 		}
 		else if (data == 0x22) // next data to latch
 		{
-			m_pic_latched = m_bakram[m_pic_readaddr];
+			// why does it read twice as many addresses, forcing us to shift the
+			// address by 1 to give correct results? maybe it can read 'previous' data' too?
+			m_pic_latched = m_bakram[m_pic_readaddr>>1];
+
 //			printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
 			picmodex = PIC_SET_READLATCH; // waiting to read...
 		}
@@ -672,10 +676,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 {
-//  UINT8 *ROM1 = memregion("user1")->base();
-//  membank("bank1")->set_base(&ROM1[0x100000]);
-//  membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
+// only the graphics differ between the two sets, code section is the same
 GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", 0 ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
 GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", 0 ) // this only has Palencia Elektronik advertising boards

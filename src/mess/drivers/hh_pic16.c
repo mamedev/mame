@@ -65,6 +65,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
+	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// game-specific handlers
@@ -162,10 +163,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_pic16_state::display_decay_tick)
 	display_update();
 }
 
-void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_pic16_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
+}
+
+void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+{
+	set_display_size(maxx, maxy);
 
 	// update current state
 	UINT32 mask = (1 << maxx) - 1;
@@ -204,11 +210,10 @@ WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
 	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
 
 	// d0-d6: 7seg
-	m_display_maxx = 7;
-	m_display_maxy = 2;
-
 	m_display_segmask[offset] = 0x7f;
 	m_display_state[offset] = ~data & 0x7f;
+
+	set_display_size(7, 2);
 	display_update();
 }
 

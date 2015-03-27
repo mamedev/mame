@@ -2,6 +2,8 @@
 // copyright-holders:hap, Sean Riddle
 /***************************************************************************
 
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+
   Texas Instruments TMS1xxx/0970/0980 handheld calculators (mostly single-chip)
 
   Refer to their official manuals on how to use them.
@@ -13,9 +15,7 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "cpu/tms0980/tms0980.h"
-#include "sound/speaker.h"
+#include "includes/hh_tms1k.h"
 
 // internal artwork
 #include "ti1270.lh"
@@ -24,49 +24,13 @@
 #include "wizatron.lh"
 
 
-class ticalc1x_state : public driver_device
+class ticalc1x_state : public hh_tms1k_state
 {
 public:
 	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN"),
-		m_speaker(*this, "speaker"),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
+		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<11> m_inp_matrix; // max 11
-	optional_device<speaker_sound_device> m_speaker;
-
-	// misc common
-	UINT16 m_r;                         // MCU R-pins data
-	UINT16 m_o;                         // MCU O-pins data
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
-	bool m_power_on;
-
-	UINT8 read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(power_button);
-	DECLARE_WRITE_LINE_MEMBER(auto_power_off);
-
-	virtual void machine_reset();
-	virtual void machine_start();
-
-	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns
-
-	UINT32 m_display_state[0x20];       // display matrix rows data
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
 	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 
 	// calculator-specific handlers
@@ -93,155 +57,24 @@ public:
 	DECLARE_WRITE16_MEMBER(ti30_write_o);
 	DECLARE_WRITE16_MEMBER(ti30_write_r);
 	DECLARE_READ8_MEMBER(ti30_read_k);
+
+protected:
+	virtual void machine_start();
 };
 
 
-// machine_start/reset
-
 void ticalc1x_state::machine_start()
 {
-	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, ~0, sizeof(m_display_cache));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
+	hh_tms1k_state::machine_start();
 	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
-
-	m_o = 0;
-	m_r = 0;
-	m_inp_mux = 0;
-	m_power_on = false;
-
-	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	/* save_item(NAME(m_display_cache)); */ // don't save!
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
-	save_item(NAME(m_o));
-	save_item(NAME(m_r));
-	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_power_on));
-}
-
-void ticalc1x_state::machine_reset()
-{
-	m_power_on = true;
-}
-
-
-
-/***************************************************************************
-
-  Helper Functions
-
-***************************************************************************/
-
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void ticalc1x_state::display_update()
-{
-	UINT32 active_state[0x20];
-
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		active_state[y] = 0;
-
-		for (int x = 0; x < m_display_maxx; x++)
-		{
-			// turn on powered segments
-			if (m_power_on && m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
-
-			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state[y] |= (ds << x);
-		}
-	}
-
-	// on difference, send to output
-	for (int y = 0; y < m_display_maxy; y++)
-		if (m_display_cache[y] != active_state[y])
-		{
-			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
-
-			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x < m_display_maxx; x++)
-			{
-				int state = active_state[y] >> x & 1;
-				output_set_lamp_value(y * mul + x, state);
-
-				// bit coords for svg2lay
-				char buf[10];
-				sprintf(buf, "%d.%d", y, x);
-				output_set_value(buf, state);
-			}
-		}
-
-	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(ticalc1x_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x < m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-
-	display_update();
 }
 
 void ticalc1x_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
 {
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-
-	// update current state
-	UINT32 colmask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-	{
 		m_display_segmask[y] &= segmask;
-		m_display_state[y] = (sety >> y & 1) ? (setx & colmask) : 0;
-	}
 
-	display_update();
-}
-
-
-UINT8 ticalc1x_state::read_inputs(int columns)
-{
-	UINT8 ret = 0;
-
-	// read selected input rows
-	for (int i = 0; i < columns; i++)
-		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
-
-	return ret;
-}
-
-
-// devices with a TMS0980 can auto power-off
-
-WRITE_LINE_MEMBER(ticalc1x_state::auto_power_off)
-{
-	if (state)
-	{
-		m_power_on = false;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-}
-
-INPUT_CHANGED_MEMBER(ticalc1x_state::power_button)
-{
-	m_power_on = (bool)(FPTR)param;
-	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+	display_matrix(maxx, maxy, setx, sety);
 }
 
 
@@ -269,8 +102,7 @@ void ticalc1x_state::tisr16_display()
 	m_display_state[11] = m_display_state[10] << 5 & 0x40;
 	m_display_state[10] &= 0x40;
 	
-	m_display_maxx = 8;
-	m_display_maxy = 12;
+	set_display_size(8, 12);
 	display_update();
 }
 
@@ -372,7 +204,7 @@ static MACHINE_CONFIG_START( tisr16, ticalc1x_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, tisr16_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, tisr16_write_r))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tisr16)
 
 	/* no video! */
@@ -548,7 +380,7 @@ static MACHINE_CONFIG_START( ti1270, ticalc1x_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti1270_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti1270_write_r))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
 
 	/* no video! */
@@ -632,7 +464,7 @@ static MACHINE_CONFIG_START( wizatron, ticalc1x_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, wizatron_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, wizatron_write_r))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
 	/* no video! */
@@ -692,7 +524,7 @@ static MACHINE_CONFIG_START( lilprof, ticalc1x_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, wizatron_write_r))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
 	/* no video! */
@@ -706,8 +538,11 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  TI Little Professor (1978 version, same as 1980 version)
+  TI Little Professor (1978 version)
   * TMS1990 MCU labeled TMC1993NL. die labeled 1990C-c3C
+  
+  1978 re-release, with on/off and level select on buttons instead of
+  switches. The casing was slightly revised in 1980 again, but same rom.
 
 ***************************************************************************/
 
@@ -726,8 +561,7 @@ WRITE16_MEMBER(ticalc1x_state::lilprof78_write_r)
 	// 6th digit is a custom 7seg for math symbols (see wizatron_write_r)
 	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
 
-	m_display_maxx = 7;
-	m_display_maxy = 9;
+	set_display_size(7, 9);
 	display_update();
 }
 
@@ -788,7 +622,7 @@ static MACHINE_CONFIG_START( lilprof78, ticalc1x_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof78_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, lilprof78_write_r))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
 
 	/* no video! */
@@ -1023,7 +857,7 @@ static MACHINE_CONFIG_START( ti30, ticalc1x_state )
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti30_write_r))
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(ticalc1x_state, auto_power_off))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ticalc1x_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti30)
 
 	/* no video! */
