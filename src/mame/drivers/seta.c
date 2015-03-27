@@ -53,6 +53,7 @@ P0-081A  (BP933KA)      93 Mobile Suit Gundam                   Banpresto
 P0-083A  (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
 P0-092A                 93 Daioh                                Athena
 P0-072-2 (prototype)    93 Daioh(prototype)                     Athena
+?        (93111A)       93 Daioh(conversion)                    Athena
 P0-096A  (BP934KA)      93 Kamen Rider                          Banpresto
 P0-097A                 93 Oishii Puzzle ..                     Sunsoft + Atlus
 bootleg                 9? Triple Fun (4)                       bootleg (Comad?)
@@ -9924,7 +9925,6 @@ ROM_START( metafox )
 	ROM_LOAD( "up001014", 0x080000, 0x080000, CRC(fca6315e) SHA1(cef2385ec43f8b7a2d655b42c18ef44e46ff7364) )
 ROM_END
 
-
 ROM_START( drgnunit )
 	ROM_REGION( 0x0c0000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "prg-e.bin", 0x000000, 0x020000, CRC(728447df) SHA1(8bdc52a4cc5f36794a47f963545bdaa26c9acd6b) )
@@ -10008,8 +10008,6 @@ ROM_START( thunderlbl )
 	ROM_LOAD16_BYTE( "23.a5", 0x040000, 0x020000, CRC(b97a7b56) SHA1(c08d3586d489947af21f3493356e3a88d79746e8) )
 	ROM_LOAD16_BYTE( "22.a3", 0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
 ROM_END
-
-
 
 /*
 
@@ -10269,8 +10267,6 @@ ROM_START( blockcarb )
 	ROM_LOAD( "tl8.bin",  0x000000, 0x010000, CRC(d09d7c7a) SHA1(8e8532be08818c855d9c3ce45716eb07cfab5767) )    //cpu prg
 ROM_END
 
-
-
 ROM_START( qzkklogy )
 	ROM_REGION( 0x0c0000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "3.u27", 0x000000, 0x020000, CRC(b8c27cde) SHA1(4c36076801b6c915888b925c1e37d772bab1bb02) )
@@ -10465,6 +10461,39 @@ ROM_START( daiohp ) /* Found on the same P0-072-2 PCB as the Blandia prototype *
 	ROM_LOAD( "dec2x.u206", 0x000600, 0x104, CRC(35afbba8) SHA1(ce1cc0f75467a1ce6444250d741e70c2ed8d4c14) )
 	ROM_LOAD( "pcon2.u110", 0x000800, 0x104, CRC(082882c2) SHA1(78385047ed8b1e2c11926c5ce8dea40450b0d0b0) )
 	ROM_LOAD( "sc.u116",    0x000A00, 0x104, CRC(e57bfde9) SHA1(33632d007c8e48d756fc920985f82ae32dcd63e6) )
+ROM_END
+
+ROM_START( daiohc ) /* Found on a 93111A PCB - same PCB as War of Areo & J. J. Squawkers */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "15.u3", 0x000000, 0x040000, CRC(14616abb) SHA1(1ff5331b0de60230baa4ced58bec6a954cb599d5) )
+	ROM_CONTINUE   (          0x100000, 0x040000  )
+	ROM_LOAD16_BYTE( "14.u4", 0x000001, 0x040000, CRC(a029f991) SHA1(5d341fe5b3ac3bdda1d8e7cc8e6a260f04d00aa1) )
+	ROM_CONTINUE   (          0x100001, 0x040000  )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD(  "9.u9",  0x000000, 0x080000, CRC(4444cbd4) SHA1(e039cd7e7093d399bc39aa4d355a03250e087fb3) ) /* connects to U63 & U64 through a riser card */
+	ROM_LOAD( "10.u10", 0x080000, 0x080000, CRC(1d88d20b) SHA1(3cf95041d0876a4ef378651783e53cee1994ed3d) )
+ 	ROM_LOAD( "11.u11", 0x100000, 0x080000, CRC(3e41de61) SHA1(7d3ddf3780bbe99b13937d75cbdbfb58449301a6) )
+	ROM_LOAD( "12.u12", 0x180000, 0x080000, CRC(f35e3341) SHA1(9260460e1823d157201de02557c7136ef898cfb3) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
+	ROM_LOAD( "5.u5", 0x000000, 0x080000, CRC(aaa5e41e) SHA1(fe362ec083cb13732ea07003a4a1a9c63d382f4b) ) /* connects to U66 through a riser card */
+	ROM_LOAD( "6.u6", 0x080000, 0x080000, CRC(9ad8b4b4) SHA1(b6e4cff160ae0efe6f3fd0df9a8a618957c3ce61) )
+	ROM_LOAD( "7.u7", 0x100000, 0x080000, CRC(babf194a) SHA1(ef838aab2d651c10553fb87552c67f289a8ac83d) )
+	ROM_LOAD( "8.u8", 0x180000, 0x080000, CRC(2db65290) SHA1(4f4d65e984fad7bb1d886de67bc50645798282bb) )
+	
+	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
+	ROM_LOAD( "1.u1", 0x000000, 0x080000, CRC(30f81f99) SHA1(9c164c798c7e869e92505d9d85f06f4a1c9a9528) ) /* connects to U68 through a riser card */
+	ROM_LOAD( "2.u2", 0x080000, 0x080000, CRC(3b3e0f4e) SHA1(740afe4eefea480f941dd80a03392592d8d4b084) )
+	ROM_LOAD( "3.u3", 0x100000, 0x080000, CRC(c5eef1c1) SHA1(d4b3188b39bad5c7a2c7b7dbc91a79c7ee80a3a1) )
+	ROM_LOAD( "4.u4", 0x180000, 0x080000, CRC(851115b6) SHA1(b8e1e22231d131085c90afcf30ff35a2866edff5) )
+	
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "data.u69", 0x000000, 0x080000, CRC(21e4f093) SHA1(f0420d158dc5d182e41b6fb2ea3af6baf88bacb8) )
+	ROM_LOAD( "data.u70", 0x080000, 0x080000, CRC(593c3c58) SHA1(475fb530a6d23269cb0aea6e294291c7463b57a2) )
+
+	ROM_REGION( 0x200, "gals", 0 )
+	ROM_LOAD( "gal.u14",  0x000000, 0x117, CRC(b972b479) SHA1(50da73b4cc7b9c0ff8fb19b2c34d05a4dbc8f0cb) )
 ROM_END
 
 ROM_START( msgundam )
@@ -11592,6 +11621,7 @@ GAME( 1993, atehate,  0,        atehate,  atehate, driver_device,  0,        ROT
 GAME( 1993, daioh,    0,        daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh", 0 )
 GAME( 1993, daioha,   daioh,    daioh,    daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,   daioh,    daiohp,   daiohp,   driver_device, 0,        ROT270, "Athena",                 "Daioh (prototype)", 0 )
+GAME( 1993, daiohc,   daioh,    wrofaero, daioh,    driver_device, 0,        ROT270, "Athena",                 "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
