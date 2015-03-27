@@ -18,15 +18,6 @@
 ifdef TOOLS
 PARAMS+= --with-tools
 endif
-ifdef CC
-PARAMS+= --CC='$(CC)'
-endif
-ifdef CXX
-PARAMS+= --CXX='$(CXX)'
-endif
-ifdef LD
-PARAMS+= --LD='$(LD)'
-endif
 
 #-------------------------------------------------
 # specify core target: mame, mess, etc.
@@ -154,6 +145,8 @@ endif
 
 
 PYTHON = @python
+CC = @gcc
+LD = @g++
 
 #-------------------------------------------------
 # distribution may change things
@@ -165,14 +158,25 @@ else
 ifeq ($(DISTRO),debian-stable)
 else
 ifeq ($(DISTRO),ubuntu-intrepid)
+# Force gcc-4.2 on ubuntu-intrepid
+CC = @gcc -V 4.2
+LD = @g++-4.2
 else
 ifeq ($(DISTRO),gcc44-generic)
+CC = @gcc-4.4
+LD = @g++-4.4
 else
 ifeq ($(DISTRO),gcc45-generic)
+CC = @gcc-4.5
+LD = @g++-4.5
 else
 ifeq ($(DISTRO),gcc46-generic)
+CC = @gcc-4.6
+LD = @g++-4.6
 else
 ifeq ($(DISTRO),gcc47-generic)
+CC = @gcc-4.7
+LD = @g++-4.7
 else
 $(error DISTRO $(DISTRO) unknown)
 endif
@@ -184,6 +188,19 @@ endif
 endif
 
 PARAMS+= --distro=$(DISTRO)
+
+ifdef OVERRIDE_CC
+PARAMS+= --CC='$(OVERRIDE_CC)'
+CC = $(OVERRIDE_CC)
+endif
+ifdef OVERRIDE_CXX
+PARAMS+= --CXX='$(OVERRIDE_CXX)'
+CXX = $(OVERRIDE_CXX)
+endif
+ifdef OVERRIDE_LD
+PARAMS+= --LD='$(OVERRIDE_LD)'
+LD = $(OVERRIDE_LD)
+endif
 
 #-------------------------------------------------
 # sanity check the configuration
