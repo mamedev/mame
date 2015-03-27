@@ -61,8 +61,7 @@ protected:
 void mbdtower_state::mbdtower_display()
 {
 	// declare display matrix size and the 2 7segs
-	m_display_maxx = 7;
-	m_display_maxy = 3;
+	set_display_size(7, 3);
 	m_display_segmask[1] = m_display_segmask[2] = 0x7f;
 
 	// update current state

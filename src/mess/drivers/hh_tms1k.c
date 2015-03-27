@@ -194,10 +194,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
 	display_update();
 }
 
-void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_tms1k_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
+}
+
+void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+{
+	set_display_size(maxx, maxy);
 
 	// update current state
 	UINT32 mask = (1 << maxx) - 1;
@@ -270,9 +275,6 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 
 void hh_tms1k_state::mathmagi_display()
 {
-	m_display_maxx = 8;
-	m_display_maxy = 11;
-
 	// R0-R7: 7seg leds
 	for (int y = 0; y < 8; y++)
 	{
@@ -286,6 +288,7 @@ void hh_tms1k_state::mathmagi_display()
 	for (int y = 8; y < 11; y++)
 		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
 
+	set_display_size(8, 11);
 	display_update();
 }
 
@@ -433,9 +436,6 @@ MACHINE_CONFIG_END
 
 void hh_tms1k_state::amaztron_display()
 {
-	m_display_maxx = 8;
-	m_display_maxy = 3;
-
 	// R8,R9: select digit
 	for (int y = 0; y < 2; y++)
 	{
@@ -446,6 +446,7 @@ void hh_tms1k_state::amaztron_display()
 	// R6,R7: lamps (-> lamp20,21)
 	m_display_state[2] = m_r >> 6 & 3;
 
+	set_display_size(8, 3);
 	display_update();
 }
 
@@ -960,9 +961,6 @@ MACHINE_CONFIG_END
 
 void hh_tms1k_state::ebball3_display()
 {
-	m_display_maxx = 7;
-	m_display_maxy = 10+2;
-
 	// update current state
 	for (int y = 0; y < 10; y++)
 		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
@@ -975,6 +973,7 @@ void hh_tms1k_state::ebball3_display()
 	m_display_state[11] = ((m_display_state[4] & 0x10) | (m_display_state[7] & 0x01)) << 1;
 	m_display_segmask[10] = m_display_segmask[11] = 0x22;
 
+	set_display_size(7, 10+2);
 	display_update();
 }
 
@@ -1612,9 +1611,6 @@ MACHINE_CONFIG_END
 
 WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 {
-	m_display_maxx = 8;
-	m_display_maxy = 7;
-
 	// R0-R5: select digit (right-to-left)
 	for (int y = 0; y < 6; y++)
 	{
@@ -1625,6 +1621,7 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 	// R6-R9: direction leds (-> lamp60-63)
 	m_display_state[6] = data >> 6 & 0xf;
 
+	set_display_size(8, 7);
 	display_update();
 }
 
@@ -1814,17 +1811,15 @@ MACHINE_CONFIG_END
 
 WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 {
-	m_display_maxx = 7;
-	m_display_maxy = 3;
-
 	// R0-R2: select digit
 	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
-	for (int y = 0; y < m_display_maxy; y++)
+	for (int y = 0; y < 3; y++)
 	{
 		m_display_segmask[y] = 0x7f;
 		m_display_state[y] = (data >> y & 1) ? o : 0;
 	}
 
+	set_display_size(7, 3);
 	display_update();
 
 	// R3-R8: speaker on

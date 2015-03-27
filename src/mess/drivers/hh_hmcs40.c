@@ -89,6 +89,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
+	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety);
 
 	// game-specific handlers
@@ -199,10 +200,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
 	display_update();
 }
 
-void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety)
+void hh_hmcs40_state::set_display_size(int maxx, int maxy)
 {
 	m_display_maxx = maxx;
 	m_display_maxy = maxy;
+}
+
+void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 sety)
+{
+	set_display_size(maxx, maxy);
 
 	// update current state
 	UINT64 mask = (1 << maxx) - 1;

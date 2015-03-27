@@ -30,7 +30,7 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
+	optional_ioport_array<11> m_inp_matrix; // max 11
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
@@ -55,6 +55,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
+	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// game-specific handlers
