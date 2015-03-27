@@ -75,7 +75,7 @@ function mainProject(_target, _subtarget)
 	links{
 		"ocore_" .. _OPTIONS["osd"],
 	}
-	dofile("src/osd_cfg.lua")
+	dofile("src/osd/" .. _OPTIONS["osd"] .. "_cfg.lua")
 	
 	includedirs {
 		MAME_DIR .. "src/emu",

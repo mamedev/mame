@@ -47,11 +47,6 @@ newoption {
 newoption {
 	trigger = "osd",
 	description = "Choose target OSD",
-	allowed = {
-		{ "osdmini",   "mini dummy OSD"         },
-		{ "sdl",       "SDL"			        },
-		{ "windows",   "Windows"                },
-	},
 }
 
 newoption {
@@ -221,7 +216,7 @@ if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .
 	error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 end
 dofile (path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-	
+
 configuration { "gmake" }
 	flags {
 		"SingleOutputDir",
@@ -817,7 +812,11 @@ dofile(path.join("src", "lib.lua"))
 
 group "core"
 
-dofile(path.join("src", "osd.lua"))
+if (not os.isfile(path.join("src", "osd",  _OPTIONS["osd"] .. ".lua"))) then
+	error("Unsupported value '" .. _OPTIONS["osd"] .. "' for OSD")
+end
+
+dofile(path.join("src", "osd", _OPTIONS["osd"] .. ".lua"))
 dofile(path.join("src", "emu.lua"))
 emuProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
