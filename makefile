@@ -145,7 +145,11 @@ endif
 endif # TARGET_OS
 
 ifdef PTR64
+ifeq ($(PTR64),1)
 ARCHITECTURE = x64
+else
+ARCHITECTURE = x86
+endif
 endif
 
 
