@@ -53,10 +53,13 @@ Dumped by tirino73
 
 - works in a very similar way to 'Spider' (twins.c)
   including the blitter (seems to be doubled up hardware tho, twice as many layers?)
-- PIC is not for sound, what is is for?
-- eeprom? (I don't see one, maybe PIC is used for settings?)
 - Convert this to a blitter device, and share it with twins.c
 - A bunch of spurious RAM writes to ROM area (genuine bug? left-overs?)
+
+Notes
+I think the PIC is used to interface with battry backed RAM instead of an EEPROM,
+we currently attempt to simulate this as the PIC is read protected.
+
 
 
 */
@@ -64,6 +67,7 @@ Dumped by tirino73
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 class ttchamp_state : public driver_device
 {
@@ -87,6 +91,8 @@ public:
 
 	DECLARE_READ16_MEMBER(port1e_r);
 
+	DECLARE_READ16_MEMBER(ttchamp_pic_r);
+	DECLARE_WRITE16_MEMBER(ttchamp_pic_w);
 
 	UINT16 m_port10;
 	UINT8 m_rombank;
@@ -99,10 +105,26 @@ public:
 	DECLARE_WRITE16_MEMBER(ttchamp_mem_w);
 
 	UINT16 m_videoram0[0x10000 / 2];
-//  UINT16 m_videoram1[0x10000 / 2];
 	UINT16 m_videoram2[0x10000 / 2];
 
 
+	enum picmode
+	{
+		PIC_IDLE = 0,
+		PIC_SET_READADDRESS = 1,
+		PIC_SET_WRITEADDRESS = 2,
+		PIC_SET_WRITELATCH = 3,
+		PIC_SET_READLATCH = 4,
+
+	} picmodex;
+
+
+	int m_pic_readaddr;
+	int m_pic_writeaddr;
+	int m_pic_latched;
+	int m_pic_writelatched;
+
+	UINT8* m_bakram;
 
 	UINT16 m_mainram[0x10000 / 2];
 
@@ -125,6 +147,12 @@ void ttchamp_state::machine_start()
 {
 	m_rom16 = (UINT16*)memregion("maincpu")->base();
 	m_rom8 = memregion("maincpu")->base();
+
+	picmodex = PIC_IDLE;
+
+	m_bakram = auto_alloc_array(machine(), UINT8, 0x100);
+	machine().device<nvram_device>("backram")->set_base(m_bakram, 0x100);
+
 }
 
 void ttchamp_state::video_start()
@@ -229,6 +257,75 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
 	// 0x8000 of offset is sometimes set
 	m_palette->set_pen_color(m_paloff & 0x3ff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+}
+
+READ16_MEMBER(ttchamp_state::ttchamp_pic_r)
+{
+//	printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
+	if (picmodex == PIC_SET_READLATCH)
+	{
+		printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
+		picmodex = PIC_IDLE;
+		return m_pic_latched;
+
+	}
+	return 0x00;
+
+}
+
+WRITE16_MEMBER(ttchamp_state::ttchamp_pic_w)
+{
+//	printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, picmodex);
+	if (picmodex == PIC_IDLE)
+	{
+		if (data == 0x11)
+		{
+			picmodex = PIC_SET_READADDRESS;
+//			printf("state = SET_READADDRESS\n");
+		}
+		else if (data == 0x12)
+		{
+			picmodex = PIC_SET_WRITELATCH;
+//			printf("latch write data.. \n" );
+		}
+		else if (data == 0x20)
+		{
+			picmodex = PIC_SET_WRITEADDRESS;
+//			printf("state = PIC_SET_WRITEADDRESS\n");
+		}
+		else if (data == 0x21) // write latched data
+		{
+			picmodex = PIC_IDLE;
+			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
+			printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
+		}
+		else if (data == 0x22) // next data to latch
+		{
+			m_pic_latched = m_bakram[m_pic_readaddr];
+//			printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
+			picmodex = PIC_SET_READLATCH; // waiting to read...
+		}
+		else
+		{
+//			printf("unknown\n");
+		}
+	}
+	else if (picmodex == PIC_SET_READADDRESS)
+	{
+		m_pic_readaddr = data;
+		picmodex = PIC_IDLE;
+	}
+	else if (picmodex == PIC_SET_WRITEADDRESS)
+	{
+		m_pic_writeaddr = data;
+		picmodex = PIC_IDLE;
+	}
+	else if (picmodex == PIC_SET_WRITELATCH)
+	{
+		m_pic_writelatched = data;
+		picmodex = PIC_IDLE;
+	}
+
 }
 
 
@@ -440,7 +537,7 @@ static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
 
 	AM_RANGE(0x0020, 0x0021) AM_WRITE(port20_w)
 
-//  AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP // eeprom (PIC?) / settings?
+	AM_RANGE(0x0034, 0x0035) AM_READWRITE(ttchamp_pic_r, ttchamp_pic_w)
 
 	AM_RANGE(0x0062, 0x0063) AM_WRITE(port62_w)
 
@@ -535,6 +632,8 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
+	
+	MCFG_NVRAM_ADD_0FILL("backram")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
