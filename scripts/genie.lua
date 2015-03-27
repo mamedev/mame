@@ -273,11 +273,14 @@ elseif _OPTIONS["osd"]=="sdl" then
 	}
 end
 
-configuration { "mingw* or vs*", "x64" }
+if _OPTIONS["targetos"]=="windows" then
+configuration { "x64" }
 	defines {
 		"X64_WINDOWS_ABI",
 	}
 configuration { }
+end
+
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
 
