@@ -135,7 +135,7 @@ Speak & Math:
       Apparently QA never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
-    - MCU: CD2708
+    - MCU: CD2708, labeled CD2708N2L (die labeled TMC0270F 2708A)
     - TMS51xx(1/2): 16KB CD2381
     - TMS51xx(2/2): 4KB CD2614
 
@@ -149,7 +149,7 @@ Speak & Math:
 Speak & Read:
 
     Speak & Read (US), 1980
-    - MCU: CD2705**
+    - MCU: CD2705, labeled CD2705B-N2L (die labeled TMC0270E 2705B) - 2nd revision?
     - TMS51xx(1/2): 16KB CD2394 (rev.A)
     - TMS51xx(2/2): 16KB CD2395 (rev.A)
 
@@ -693,28 +693,44 @@ static INPUT_PORTS_START( snmath )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( snread )
+	PORT_INCLUDE( snspell )
+	
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Word Zapper")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Word Maker")
+	
+	PORT_MODIFY("IN.8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Read It")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)1)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( lantutor )
 	PORT_INCLUDE( snspell )
 
-	PORT_MODIFY("IN.5") // R5
+	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Diacritical")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Space")
 
-	PORT_MODIFY("IN.6") // R6
+	PORT_MODIFY("IN.6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("5")
 
-	PORT_MODIFY("IN.7") // R7
+	PORT_MODIFY("IN.7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0")
 
-	PORT_MODIFY("IN.8") // Vss!
+	PORT_MODIFY("IN.8")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("Translate")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Learn")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Phrase")
@@ -818,6 +834,20 @@ static MACHINE_CONFIG_DERIVED( snspell, snmath )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( snread, snmath )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snread")
+	MCFG_GENERIC_EXTENSIONS("vsm")
+	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "snread")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( lantutor, snmath )
 
 	/* basic machine hardware */
@@ -851,7 +881,7 @@ ROM_START( snspell )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0271
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -867,7 +897,7 @@ ROM_START( snspella )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // placeholder, use the one we have
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -882,7 +912,7 @@ ROM_START( snspelluk )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0271
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -898,7 +928,7 @@ ROM_START( snspelluka )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // placeholder, use the one we have
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -913,7 +943,7 @@ ROM_START( snspelljp )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0271
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -929,7 +959,7 @@ ROM_START( ladictee )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // placeholder, use the one we have
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // placeholder, use the one we have
 
@@ -945,7 +975,7 @@ ROM_START( snmath )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) )
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) )
 
@@ -966,13 +996,30 @@ ROM_START( snmathp )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as cd2704
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // "
+	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // taken from cd2708, need to verify if it's same as cd2704
 
 	ROM_REGION( 0x8000, "tms6100", 0 )
 	ROM_LOAD( "cd2392.vsm", 0x0000, 0x4000, CRC(4ed2e920) SHA1(8896f29e25126c1e4d9a47c9a325b35dddecc61f) )
 	ROM_LOAD( "cd2393.vsm", 0x4000, 0x4000, CRC(571d5b5a) SHA1(83284755d9b77267d320b5b87fdc39f352433715) )
+ROM_END
+
+
+ROM_START( snread )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cd2705b-n2l", 0x0000, 0x1000, CRC(c235636e) SHA1(57b24dd8414bf76ec786a51d10cb8a5898b60e18) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_cd2705_opla.pla", 0, 1246, CRC(bf859848) SHA1(66b297fbf534968fa6db7413b99ef0e81cc35ddc) )
+
+	ROM_REGION( 0xc000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "cd2394a.vsm", 0x0000, 0x4000, CRC(cbb0e2b1) SHA1(5e322c683baf806523de171310258ae371671327) )
+	ROM_LOAD( "cd2395a.vsm", 0x4000, 0x4000, CRC(3d519504) SHA1(76b19ba5a9a3486005e09c98e8a6abc8b88288dd) )
 ROM_END
 
 
@@ -983,7 +1030,7 @@ ROM_START( lantutor )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0275
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // taken from snspell, mostly looks correct
 
@@ -1001,5 +1048,7 @@ COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell, 
 
 COMP( 1986, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 COMP( 1980, snmathp,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+
+COMP( 1980, snread,     0,       0, snread,   snread,   tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 
 COMP( 1979, lantutor,   0,       0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
