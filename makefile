@@ -415,7 +415,7 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=android-arm --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-arm config=$(CONFIG)
 
@@ -427,7 +427,7 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=android-mips --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-mips config=$(CONFIG)
 
@@ -439,7 +439,7 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=android-x86 --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-x86 config=$(CONFIG)
 
@@ -448,7 +448,7 @@ ifndef EMSCRIPTEN
 	$(error EMSCRIPTEN is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=asmjs --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-asmjs config=$(CONFIG)
 
@@ -457,7 +457,7 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=nacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl config=$(CONFIG)64
 
@@ -466,7 +466,7 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=nacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl config=$(CONFIG)32
 
@@ -475,7 +475,7 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=nacl-arm --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl-arm config=$(CONFIG)
 
@@ -484,7 +484,7 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) --gcc=pnacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-pnacl config=$(CONFIG)
 
