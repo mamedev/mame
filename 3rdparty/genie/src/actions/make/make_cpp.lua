@@ -243,7 +243,7 @@
 		cpp.pchconfig(cfg)
 
 		-- CPPFLAGS, CFLAGS, CXXFLAGS, and RESFLAGS
-		cpp.flags(cfg, cc)
+		cpp.flags(prj, cfg, cc)
 
 		-- write out libraries, linker flags, and the link command
 		cpp.linker(prj, cfg, cc)
@@ -314,7 +314,7 @@
 -- Configurations
 --
 
-	function cpp.flags(cfg, cc)
+	function cpp.flags(prj, cfg, cc)
 
 		if cfg.pchheader and not cfg.flags.NoPCH then
 			_p('  FORCE_INCLUDE += -include $(OBJDIR)/$(notdir $(PCH))')
@@ -325,7 +325,11 @@
 					,premake.esc(table.concat(cfg.forcedincludes, ";")))
 		end
 
-		_p('  ALL_CPPFLAGS  += $(CPPFLAGS) %s $(DEFINES) $(INCLUDES)', table.concat(cc.getcppflags(cfg), " "))
+		if (not prj.options.NoDependency) then 
+			_p('  ALL_CPPFLAGS  += $(CPPFLAGS) %s $(DEFINES) $(INCLUDES)', table.concat(cc.getcppflags(cfg), " "))
+		else
+			_p('  ALL_CPPFLAGS  += $(CPPFLAGS) $(DEFINES) $(INCLUDES)')
+		end
 
 		_p('  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_c)))
 		_p('  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_cpp)))
@@ -457,9 +461,13 @@
 					_p('\t@echo $(notdir $<)')
 				end
 				if (path.isobjcfile(file)) then
-					_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.o=%%.d) -c "$<"')
+					if (not prj.options.NoDependency) then 
+						_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.o=%%.d) -c "$<"')
+					else
+						_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"')
+					end
 				else
-					cpp.buildcommand(path.iscfile(file) and not prj.options.ForceCPP, "o")
+					cpp.buildcommand(prj, path.iscfile(file) and not prj.options.ForceCPP, "o")
 				end
 				_p('')
 			elseif (path.getextension(file) == ".rc") then
@@ -475,7 +483,11 @@
 		end
 	end
 
-	function cpp.buildcommand(iscfile, objext)
+	function cpp.buildcommand(prj, iscfile, objext)
 		local flags = iif(iscfile, '$(CC) $(ALL_CFLAGS)', '$(CXX) $(ALL_CXXFLAGS)')
-		_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.%s=%%.d) -c "$<"', flags, objext)
+		if (not prj.options.NoDependency) then 
+			_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.%s=%%.d) -c "$<"', flags, objext)
+		else
+			_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -c "$<"', flags)
+		end
 	end

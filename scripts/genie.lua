@@ -203,6 +203,10 @@ end
 
 	language "C++"
 
+	options {
+		"NoDependency",
+	}
+	
 	flags {
 		"StaticRuntime",
 		"Unicode",
