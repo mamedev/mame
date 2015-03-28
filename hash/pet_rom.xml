@@ -104,6 +104,18 @@
 		</part>
 	</software>
 
+	<software name="mcterm110" cloneof="mcterm">
+		<description>McTerm 1.10</description>
+		<year>1981</year>
+		<publisher>Madison Computer</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="mcterm110-9000.bin" size="0x800" crc="7ff92c17" sha1="4df7e96cf49a5bbbad60eef8dd0449b5233c2c20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcterm120" cloneof="mcterm">
 		<description>McTerm 1.20</description>
 		<year>1981</year>
