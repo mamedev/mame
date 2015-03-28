@@ -280,6 +280,22 @@ ifdef NOWERROR
 PARAMS+= --NOWERROR=$(NOWERROR)
 endif
 
+ifdef TARGET
+PARAMS+= --target=$(TARGET)
+endif
+
+ifdef SUBTARGET
+PARAMS+= --subtarget=$(SUBTARGET)
+endif
+
+ifdef OSD
+PARAMS+= --osd=$(OSD)
+endif
+
+ifdef TARGETOS
+PARAMS+= --targetos=$(TARGETOS)
+endif
+
 # extension for executables
 EXE =
 
@@ -357,7 +373,7 @@ ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --targetos=windows --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake 
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake 
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
@@ -366,7 +382,7 @@ ifndef MINGW32
 	$(error MINGW32 is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw32-gcc --targetos=windows --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw32-gcc --gcc_version=$(GCC_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
@@ -375,7 +391,7 @@ ifndef CLANG
 	$(error CLANG is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --targetos=windows --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
 	
@@ -384,33 +400,33 @@ ifndef CLANG
 	$(error CLANG is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --targetos=windows --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 vs2010: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2010
+	$(SILENT) $(GENIE) $(PARAMS) vs2010
 
 vs2012: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2012
+	$(SILENT) $(GENIE) $(PARAMS) vs2012
 
 vs2012_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) --vs=intel-15 vs2012
+	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2012
 
 vs2012_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) --vs=vs2012-xp vs2012
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2012-xp vs2012
 
 vs2013: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) vs2013
 
 vs2013_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --vs=intel-15 --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --vs=intel-15 vs2013
 
 vs2013_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --vs=vs2013-xp --target=$(TARGET) --subtarget=$(SUBTARGET) vs2013
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-xp vs2013
 
 vs2015: generate
-	$(SILENT) $(GENIE) $(PARAMS) --targetos=$(TARGETOS) --osd=windows --target=$(TARGET) --subtarget=$(SUBTARGET) vs2015
+	$(SILENT) $(GENIE) $(PARAMS) vs2015
 
 android-arm: generate
 ifndef ANDROID_NDK_ARM
@@ -420,7 +436,7 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-arm config=$(CONFIG)
 
@@ -432,7 +448,7 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-mips config=$(CONFIG)
 
@@ -444,7 +460,7 @@ ifndef ANDROID_NDK_ROOT
 	$(error ANDROID_NDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --osd=osdmini --target=$(TARGET) --gcc_version=4.8 --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-x86 config=$(CONFIG)
 
@@ -453,7 +469,7 @@ ifndef EMSCRIPTEN
 	$(error EMSCRIPTEN is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-asmjs config=$(CONFIG)
 
@@ -462,7 +478,7 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl config=$(CONFIG)64
 
@@ -471,7 +487,7 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl config=$(CONFIG)32
 
@@ -480,7 +496,7 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl-arm config=$(CONFIG)
 
@@ -489,55 +505,55 @@ ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 --osd=osdmini --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-pnacl config=$(CONFIG)
 
 linux_x64: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux config=$(CONFIG)64
 
 linux_x86: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux config=$(CONFIG)32
 
 linux_x64_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux-clang config=$(CONFIG)64
 
 linux_x86_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --targetos=$(TARGETOS) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux-clang config=$(CONFIG)32
 
 macosx_x64: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --targetos=macosx --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx config=$(CONFIG)64
 
 macosx_x86: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(GCC_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --os_version=$(DARWIN_VERSION) --gcc_version=$(GCC_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx config=$(CONFIG)32
 
 macosx_x64_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx-clang config=$(CONFIG)64
 
 macosx_x86_clang: generate
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --targetos=macosx --os_version=$(DARWIN_VERSION) --osd=$(OSD) --gcc_version=$(CLANG_VERSION) --target=$(TARGET) --subtarget=$(SUBTARGET) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --os_version=$(DARWIN_VERSION) --gcc_version=$(CLANG_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx-clang config=$(CONFIG)32
 
