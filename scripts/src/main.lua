@@ -5,7 +5,7 @@ function mainProject(_target, _subtarget)
 		project (_target .. _subtarget)
 	end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
-	kind "ConsoleApp"	
+	kind "ConsoleApp"
 
 	options {
 		"ForceCPP",
@@ -27,21 +27,15 @@ function mainProject(_target, _subtarget)
 			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/osd/sdl/" .. _OPTIONS["target"] .. "-Info.plist"
 		}
 
-	configuration { "mingw*" }
+	configuration { "mingw*" or "vs*" }
 		if _OPTIONS["osd"]=="sdl" then
 			targetprefix "sdl"
 		end
 		targetextension ".exe"
-		
-	configuration { "vs*" }
-		if _OPTIONS["osd"]=="sdl" then
-			targetprefix "sdl"
-		end
-		targetextension ".exe"
-		
+
 	configuration { "asmjs" }
 		targetextension ".bc"  
-		
+
 	configuration { }
 		targetdir(MAME_DIR)
 
@@ -76,7 +70,7 @@ function mainProject(_target, _subtarget)
 		"ocore_" .. _OPTIONS["osd"],
 	}
 	dofile("src/osd/" .. _OPTIONS["osd"] .. "_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame",
@@ -99,9 +93,9 @@ function mainProject(_target, _subtarget)
 				rcfile,
 			}
 		else
-		files {
-			MAME_DIR .. "src/osd/windows/mame.rc",
-		}
+			files {
+				MAME_DIR .. "src/osd/windows/mame.rc",
+			}
 		end
 	end
 
