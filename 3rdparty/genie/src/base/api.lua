@@ -12,6 +12,12 @@
 
 	premake.fields =
 	{
+		aftercompilefile =
+		{
+			kind  = "string",
+			scope = "config",
+		},
+
 		archivesplit_size =
 		{
 			kind  = "string",

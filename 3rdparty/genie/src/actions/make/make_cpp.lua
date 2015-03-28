@@ -463,6 +463,9 @@
 				if (path.isobjcfile(file)) then
 					if (not prj.options.NoDependency) then 
 						_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.o=%%.d) -c "$<"')
+						if prj.aftercompilefile then
+							_p('%s',prj.aftercompilefile)
+						end						
 					else
 						_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"')
 					end
@@ -487,6 +490,9 @@
 		local flags = iif(iscfile, '$(CC) $(ALL_CFLAGS)', '$(CXX) $(ALL_CXXFLAGS)')
 		if (not prj.options.NoDependency) then 
 			_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -MF $(@:%%.%s=%%.d) -c "$<"', flags, objext)
+			if prj.aftercompilefile then
+				_p('%s',prj.aftercompilefile)
+			end
 		else
 			_p('\t$(SILENT) %s $(FORCE_INCLUDE) -o "$@" -c "$<"', flags)
 		end
