@@ -140,6 +140,11 @@ newoption {
 } 
 
 newoption {
+	trigger = "NOWERROR",
+	description = "NOWERROR",
+} 
+
+newoption {
 	trigger = "USE_BGFX",
 	description = "Use of BGFX.",
 	allowed = {
@@ -191,8 +196,14 @@ end
 	configuration { "vs*" }
 	flags {
 		"ExtraWarnings",
+	}
+	if _OPTIONS["NOWERROR"]==nil then
+	flags{
 		"FatalWarnings",
 	}
+	end
+	
+	
 	configuration { "Debug", "vs*" }
 		flags {
 			"Symbols",
@@ -440,11 +451,11 @@ end
 	}
 
 	-- add the error warning flag
-	--ifndef NOWERROR
+if _OPTIONS["NOWERROR"]==nil then
 	buildoptions {
 		"-Werror",
 	}
-
+end
 
 -- if we are optimizing, include optimization options
 --ifneq ($(),0)

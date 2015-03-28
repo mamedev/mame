@@ -275,6 +275,11 @@ endif
 ifdef USE_BGFX
 PARAMS+= --USE_BGFX=$(USE_BGFX)
 endif
+
+ifdef NOWERROR
+PARAMS+= --NOWERROR=$(NOWERROR)
+endif
+
 # extension for executables
 EXE =
 
