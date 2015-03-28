@@ -584,11 +584,6 @@ GEN_FOLDERS :=  \
 	$(GENDIR)/emu/cpu/tms57002/ \
 	$(GENDIR)/osd/modules/debugger/qt/ \
 
-	
-$(GEN_FOLDERS):
-	-$(call MKDIR,$@)
-	
-
 LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/mame/layout/*.lay) $(wildcard $(SRC)/mess/layout/*.lay) $(wildcard $(SRC)/ldplayer/layout/*.lay)
 
 ifeq ($(TARGETOS),macosx)
@@ -616,6 +611,13 @@ endif
 endif
 
 endif
+
+ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
+include src/osd/$(OSD)/$(OSD).mak
+endif
+
+$(GEN_FOLDERS):
+	-$(call MKDIR,$@)
 
 generate: \
 		$(GENIE) \
