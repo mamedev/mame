@@ -33,7 +33,6 @@ static ADDRESS_MAP_START( mpf1_map, AS_PROGRAM, 8, mpf1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpf1b_map, AS_PROGRAM, 8, mpf1_state )
@@ -438,7 +437,7 @@ DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
 		}
 	}
 
-	return 0;
+	return address;
 }
 
 DRIVER_INIT_MEMBER(mpf1_state,mpf1)
