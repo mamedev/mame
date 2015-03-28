@@ -42,4 +42,5 @@ files {
 	MAME_DIR .. "src/emu/netlist/devices/nld_legacy.c",
 	MAME_DIR .. "src/emu/netlist/devices/net_lib.c",
 	MAME_DIR .. "src/emu/netlist/devices/nld_log.c",
+	MAME_DIR .. "src/emu/netlist/devices/nld_system.c",
 }
