@@ -678,6 +678,16 @@ configuration { "mingw*" }
 			"-static-libstdc++",
 			"-municode",
 		}
+if _OPTIONS["osd"]=="sdl" then
+		links {
+			"opengl32",
+			"SDL2",
+			"Imm32",
+			"version",
+			"ole32",
+			"oleaut32",
+		}
+end
 		links {
 			"user32",
 			"gdi32",

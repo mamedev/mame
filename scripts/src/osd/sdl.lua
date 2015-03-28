@@ -16,14 +16,6 @@ configuration { "mingw*" }
 			"-Wl,--allow-multiple-definition",
 			"-static"
 		}
-		links {
-			"opengl32",
-			"SDL2",
-			"Imm32",
-			"version",
-			"ole32",
-			"oleaut32",
-		}
 
 configuration { }
 
