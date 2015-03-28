@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  route16.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -9,6 +9,12 @@
 #include "emu.h"
 #include "includes/route16.h"
 
+void route16_state::video_start()
+{
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_palette_1));
+	save_item(NAME(m_palette_2));
+}
 
 /*************************************
  *
@@ -16,7 +22,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(route16_state::route16_out0_w)
+WRITE8_MEMBER(route16_state::out0_w)
 {
 	m_palette_1 = data & 0x1f;
 
@@ -24,7 +30,7 @@ WRITE8_MEMBER(route16_state::route16_out0_w)
 }
 
 
-WRITE8_MEMBER(route16_state::route16_out1_w)
+WRITE8_MEMBER(route16_state::out1_w)
 {
 	m_palette_2 = data & 0x1f;
 
