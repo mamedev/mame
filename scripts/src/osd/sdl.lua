@@ -25,6 +25,8 @@ configuration { "mingw*" }
 			"oleaut32",
 		}
 
+configuration { }
+
 
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
