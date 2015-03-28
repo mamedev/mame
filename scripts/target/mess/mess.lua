@@ -836,7 +836,7 @@ function linkProjects_mess_mess(_target, _subtarget)
 		"zenith",
 		"zpa",
 		"zvt",
-		"shared",
+		"messshared",
 	}
 	if (_target=="mess") then
 	links {
@@ -968,7 +968,7 @@ end
 -- the following files are general components and
 -- shared across a number of drivers
 --------------------------------------------------
-createMESSProjects(_target, _subtarget, "shared")
+createMESSProjects(_target, _subtarget, "messshared")
 files { 
 	MAME_DIR .. "src/mess/audio/mea8000.c",     
 	MAME_DIR .. "src/mess/machine/appldriv.c",  
