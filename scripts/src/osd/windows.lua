@@ -1,3 +1,16 @@
+function includeosd()
+	includedirs {
+		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/osd/windows",
+	}
+end
+
+
+forcedincludes {
+	MAME_DIR .. "src/osd/windows/winprefix.h"
+}
+
+
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind "StaticLib"

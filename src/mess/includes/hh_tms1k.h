@@ -112,6 +112,9 @@ public:
 	DECLARE_WRITE16_MEMBER(ssimon_write_r);
 	DECLARE_WRITE16_MEMBER(ssimon_write_o);
 	DECLARE_READ8_MEMBER(ssimon_read_k);
+	void ssimon_set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(ssimon_speed_switch);
+	DECLARE_MACHINE_RESET(ssimon);
 
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);

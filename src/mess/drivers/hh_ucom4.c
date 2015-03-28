@@ -265,6 +265,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 void hh_ucom4_state::ssfball_display()
 {
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
+
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -374,6 +375,7 @@ MACHINE_CONFIG_END
 void hh_ucom4_state::splasfgt_display()
 {
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
+
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -511,7 +513,7 @@ MACHINE_CONFIG_END
 
 void hh_ucom4_state::astrocmd_display()
 {
-	UINT32 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
 
 	display_matrix(17, 9, plate, grid);
@@ -611,7 +613,7 @@ WRITE8_MEMBER(hh_ucom4_state::edracula_grid_w)
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
-	display_matrix(18, 8, m_plate, m_grid);
+	display_matrix(18+1, 8, m_plate, m_grid);
 }
 
 WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
@@ -623,8 +625,9 @@ WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
 	// E,F,G,H,I01: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	m_plate |= 1 << 18; // for always-on plates
 
-	display_matrix(18, 8, m_plate, m_grid);
+	display_matrix(18+1, 8, m_plate, m_grid);
 }
 
 
@@ -767,7 +770,7 @@ void hh_ucom4_state::tmtennis_set_clock()
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
 	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
 	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock(m_inp_matrix[1]->read() & 0x100 ? 260000 : 360000);
+	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
 }
 
 INPUT_CHANGED_MEMBER(hh_ucom4_state::tmtennis_difficulty_switch)
@@ -834,10 +837,11 @@ MACHINE_CONFIG_END
 
 void hh_ucom4_state::tmpacman_display()
 {
-	UINT32 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	UINT16 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
+	plate |= 0x100; // plate 8(maze) is always on
 
-	display_matrix(19, 8, plate | 0x100, grid); // plate 8 (maze) is always on
+	display_matrix(19, 8, plate, grid);
 }
 
 WRITE8_MEMBER(hh_ucom4_state::tmpacman_grid_w)
@@ -947,9 +951,10 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 		// E23,F,G,H,I: vfd matrix plate
 		int shift = (offset - NEC_UCOM4_PORTE) * 4;
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
+		m_plate |= 1 << 17; // for always-on plates
 	}
 
-	display_matrix(17, 9, m_plate, m_grid);
+	display_matrix(17+1, 9, m_plate, m_grid);
 }
 
 READ8_MEMBER(hh_ucom4_state::alnchase_input_r)

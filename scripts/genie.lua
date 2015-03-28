@@ -5,21 +5,6 @@ local MAME_BUILD_DIR = (MAME_DIR .. "build/")
 local naclToolchain = ""
 
 
-function includeosd()
-	includedirs {
-		MAME_DIR .. "src/osd",
-	}
-	if _OPTIONS["osd"]=="windows" then
-		includedirs {
-			MAME_DIR .. "src/osd/windows",
-		}
-	else
-		includedirs {
-			MAME_DIR .. "src/osd/sdl",
-		}
-	end
-end
-
 function str_to_version (str)
 	local val = 0
 	if (str == nil or str == '') then
@@ -276,16 +261,6 @@ configuration { }
 
 dofile ("toolchain.lua")
 
-
-if _OPTIONS["osd"]=="windows" then
-	forcedincludes {
-		MAME_DIR .. "src/osd/windows/winprefix.h"
-	}
-elseif _OPTIONS["osd"]=="sdl" then
-	forcedincludes {
-		MAME_DIR .. "src/osd/sdl/sdlprefix.h"
-	}
-end
 
 if _OPTIONS["targetos"]=="windows" then
 configuration { "x64" }
@@ -608,12 +583,12 @@ end
 
 local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-	subdir = _OPTIONS["target"]
+	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"]
 else
-	subdir = _OPTIONS["target"] .. _OPTIONS["subtarget"] 
+	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"] .. _OPTIONS["subtarget"] 
 end	
 
-if not toolchain(MAME_BUILD_DIR, subdir) then
+if not toolchain(_OPTIONS["osd"], MAME_BUILD_DIR, subdir) then
 	return -- no action specified
 end
 	
@@ -703,20 +678,16 @@ configuration { "mingw*" }
 			"-static-libstdc++",
 			"-municode",
 		}
-		if _OPTIONS["osd"]=="sdl" then
-			linkoptions {
-				"-Wl,--allow-multiple-definition",
-				"-static"
-			}
-			links {
-				"opengl32",
-				"SDL2",
-				"Imm32",
-				"version",
-				"ole32",
-				"oleaut32",
-			}
-		end
+if _OPTIONS["osd"]=="sdl" then
+		links {
+			"opengl32",
+			"SDL2",
+			"Imm32",
+			"version",
+			"ole32",
+			"oleaut32",
+		}
+end
 		links {
 			"user32",
 			"gdi32",
@@ -871,17 +842,19 @@ configuration { "x64", "vs*" }
 
 configuration { }
 
+
 group "libs"
+
+if (not os.isfile(path.join("src", "osd",  _OPTIONS["osd"] .. ".lua"))) then
+	error("Unsupported value '" .. _OPTIONS["osd"] .. "' for OSD")
+end
+dofile(path.join("src", "osd", _OPTIONS["osd"] .. ".lua"))
+
 dofile(path.join("src", "3rdparty.lua"))
 dofile(path.join("src", "lib.lua"))
 
 group "core"
 
-if (not os.isfile(path.join("src", "osd",  _OPTIONS["osd"] .. ".lua"))) then
-	error("Unsupported value '" .. _OPTIONS["osd"] .. "' for OSD")
-end
-
-dofile(path.join("src", "osd", _OPTIONS["osd"] .. ".lua"))
 dofile(path.join("src", "emu.lua"))
 emuProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 

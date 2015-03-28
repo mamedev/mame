@@ -1,3 +1,25 @@
+function includeosd()
+	includedirs {
+		MAME_DIR .. "src/osd",
+		MAME_DIR .. "src/osd/sdl",
+	}
+end
+
+
+forcedincludes {
+	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
+}
+
+
+configuration { "mingw*" }
+		linkoptions {
+			"-Wl,--allow-multiple-definition",
+			"-static"
+		}
+
+configuration { }
+
+
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind "StaticLib"

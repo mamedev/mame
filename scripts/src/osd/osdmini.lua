@@ -1,3 +1,10 @@
+function includeosd()
+	includedirs {
+		MAME_DIR .. "src/osd",
+	}
+end
+
+
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
