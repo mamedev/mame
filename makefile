@@ -610,10 +610,7 @@ generate: \
 		$(GENDIR)/osd/windows/$(TARGET)vers.rc \
 		$(GENDIR)/osd/sdl/$(TARGET)-Info.plist \
 		$(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c \
-		$(GENDIR)/mess/drivers/ymmu100.inc
-generate: \
-		$(GENIE) \
-		$(GEN_FOLDERS) \
+		$(GENDIR)/mess/drivers/ymmu100.inc \
 		$(GENDIR)/emu/cpu/arcompact/arcompact.inc \
 		$(GENDIR)/emu/cpu/h8/h8.inc $(GENDIR)/emu/cpu/h8/h8h.inc $(GENDIR)/emu/cpu/h8/h8s2000.inc $(GENDIR)/emu/cpu/h8/h8s2600.inc \
 		$(GENDIR)/emu/cpu/mcs96/mcs96.inc $(GENDIR)/emu/cpu/mcs96/i8x9x.inc $(GENDIR)/emu/cpu/mcs96/i8xc196.inc \
