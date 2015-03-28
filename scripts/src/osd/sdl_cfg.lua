@@ -58,9 +58,9 @@ if _OPTIONS["targetos"]=="linux" then
 		'QtCore',
 	}
 
-	--linkoptions {
-	--	'$(shell pkg-config --libs QtGui)',
-	--}
+	linkoptions {
+		'$(shell pkg-config --libs QtGui)',
+	}
 end
 
 if _OPTIONS["targetos"]=="macosx" then
