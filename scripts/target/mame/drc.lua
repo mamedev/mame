@@ -83,10 +83,10 @@ function createProjects(_target, _subtarget)
 	includeosd()
 
 	files{
-	MAME_DIR .. "src/mame/drivers/stv.*",
-	MAME_DIR .. "src/mame/machine/stvprot.*",
-	MAME_DIR .. "src/mame/machine/315-5838_317-0229_comp.*",
-	MAME_DIR .. "src/mame/machine/315-5881_crypt.*",
+	MAME_DIR .. "src/mame/drivers/stv.c",
+	MAME_DIR .. "src/mame/machine/stvprot.c",
+	MAME_DIR .. "src/mame/machine/315-5838_317-0229_comp.c",
+	MAME_DIR .. "src/mame/machine/315-5881_crypt.c",
 	}
 end
 

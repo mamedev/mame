@@ -1,3 +1,7 @@
+--------------------------------------------------
+-- expat library objects
+--------------------------------------------------
+
 project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
@@ -7,9 +11,14 @@ project "expat"
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/expat/lib/**.c",
-		MAME_DIR .. "3rdparty/expat/lib/**.h",
+		MAME_DIR .. "3rdparty/expat/lib/xmlparse.c",
+		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
+		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
+
+--------------------------------------------------
+-- zlib library objects
+--------------------------------------------------
 
 project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
@@ -31,19 +40,23 @@ project "zlib"
 		}
 
 	files {
-		MAME_DIR .. "3rdparty/zlib/adler32.*",
-		MAME_DIR .. "3rdparty/zlib/compress.*",
-		MAME_DIR .. "3rdparty/zlib/crc32.*",
-		MAME_DIR .. "3rdparty/zlib/deflate.*",
-		MAME_DIR .. "3rdparty/zlib/inffast.*",
-		MAME_DIR .. "3rdparty/zlib/inflate.*",
-		MAME_DIR .. "3rdparty/zlib/infback.*",
-		MAME_DIR .. "3rdparty/zlib/inftrees.*",
-		MAME_DIR .. "3rdparty/zlib/trees.*",
-		MAME_DIR .. "3rdparty/zlib/uncompr.*",
-		MAME_DIR .. "3rdparty/zlib/zutil.*",
+		MAME_DIR .. "3rdparty/zlib/adler32.c",
+		MAME_DIR .. "3rdparty/zlib/compress.c",
+		MAME_DIR .. "3rdparty/zlib/crc32.c",
+		MAME_DIR .. "3rdparty/zlib/deflate.c",
+		MAME_DIR .. "3rdparty/zlib/inffast.c",
+		MAME_DIR .. "3rdparty/zlib/inflate.c",
+		MAME_DIR .. "3rdparty/zlib/infback.c",
+		MAME_DIR .. "3rdparty/zlib/inftrees.c",
+		MAME_DIR .. "3rdparty/zlib/trees.c",
+		MAME_DIR .. "3rdparty/zlib/uncompr.c",
+		MAME_DIR .. "3rdparty/zlib/zutil.c",
 	}
 
+--------------------------------------------------
+-- SoftFloat library objects
+--------------------------------------------------
+	
 project "softfloat"
 	uuid "04fbf89e-4761-4cf2-8a12-64500cf0c5c5"
 	kind "StaticLib"
@@ -62,62 +75,71 @@ project "softfloat"
 	includeosd()
 	
 	files {
-		MAME_DIR .. "3rdparty/softfloat/**.c",
-		MAME_DIR .. "3rdparty/softfloat/**.h",
+		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
+		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
+		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
+
+--------------------------------------------------
+-- libJPEG library objects
+--------------------------------------------------
 
 project "jpeg"
 	uuid "447c6800-dcfd-4c48-b72a-a8223bb409ca"
 	kind "StaticLib"
 
 	files {
-		MAME_DIR .. "3rdparty/libjpeg/jaricom.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcapimin.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcapistd.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcarith.*",
-		MAME_DIR .. "3rdparty/libjpeg/jccoefct.*",
-		MAME_DIR .. "3rdparty/libjpeg/jccolor.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcdctmgr.*",
-		MAME_DIR .. "3rdparty/libjpeg/jchuff.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcinit.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcmainct.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcmarker.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcmaster.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcomapi.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcparam.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcprepct.*",
-		MAME_DIR .. "3rdparty/libjpeg/jcsample.*",
-		MAME_DIR .. "3rdparty/libjpeg/jctrans.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdapimin.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdapistd.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdarith.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdatadst.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdatasrc.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdcoefct.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdcolor.*",
-		MAME_DIR .. "3rdparty/libjpeg/jddctmgr.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdhuff.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdinput.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdmainct.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdmarker.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdmaster.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdmerge.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdpostct.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdsample.*",
-		MAME_DIR .. "3rdparty/libjpeg/jdtrans.*",
-		MAME_DIR .. "3rdparty/libjpeg/jerror.*",
-		MAME_DIR .. "3rdparty/libjpeg/jfdctflt.*",
-		MAME_DIR .. "3rdparty/libjpeg/jfdctfst.*",
-		MAME_DIR .. "3rdparty/libjpeg/jfdctint.*",
-		MAME_DIR .. "3rdparty/libjpeg/jidctflt.*",
-		MAME_DIR .. "3rdparty/libjpeg/jidctfst.*",
-		MAME_DIR .. "3rdparty/libjpeg/jidctint.*",
-		MAME_DIR .. "3rdparty/libjpeg/jquant1.*",
-		MAME_DIR .. "3rdparty/libjpeg/jquant2.*",
-		MAME_DIR .. "3rdparty/libjpeg/jutils.*",
-		MAME_DIR .. "3rdparty/libjpeg/jmemmgr.*",
-		MAME_DIR .. "3rdparty/libjpeg/jmemansi.*",
+		MAME_DIR .. "3rdparty/libjpeg/jaricom.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcapimin.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcapistd.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcarith.c",
+		MAME_DIR .. "3rdparty/libjpeg/jccoefct.c",
+		MAME_DIR .. "3rdparty/libjpeg/jccolor.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcdctmgr.c",
+		MAME_DIR .. "3rdparty/libjpeg/jchuff.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcinit.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcmainct.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcmarker.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcmaster.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcomapi.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcparam.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcprepct.c",
+		MAME_DIR .. "3rdparty/libjpeg/jcsample.c",
+		MAME_DIR .. "3rdparty/libjpeg/jctrans.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdapimin.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdapistd.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdarith.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdatadst.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdatasrc.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdcoefct.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdcolor.c",
+		MAME_DIR .. "3rdparty/libjpeg/jddctmgr.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdhuff.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdinput.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdmainct.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdmarker.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdmaster.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdmerge.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdpostct.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdsample.c",
+		MAME_DIR .. "3rdparty/libjpeg/jdtrans.c",
+		MAME_DIR .. "3rdparty/libjpeg/jerror.c",
+		MAME_DIR .. "3rdparty/libjpeg/jfdctflt.c",
+		MAME_DIR .. "3rdparty/libjpeg/jfdctfst.c",
+		MAME_DIR .. "3rdparty/libjpeg/jfdctint.c",
+		MAME_DIR .. "3rdparty/libjpeg/jidctflt.c",
+		MAME_DIR .. "3rdparty/libjpeg/jidctfst.c",
+		MAME_DIR .. "3rdparty/libjpeg/jidctint.c",
+		MAME_DIR .. "3rdparty/libjpeg/jquant1.c",
+		MAME_DIR .. "3rdparty/libjpeg/jquant2.c",
+		MAME_DIR .. "3rdparty/libjpeg/jutils.c",
+		MAME_DIR .. "3rdparty/libjpeg/jmemmgr.c",
+		MAME_DIR .. "3rdparty/libjpeg/jmemansi.c",
 	}
+
+--------------------------------------------------
+-- libflac library objects
+--------------------------------------------------
 
 project "flac"
 	uuid "b6fc19e8-073a-4541-bb7b-d24b548d424a"
@@ -152,23 +174,26 @@ project "flac"
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitmath.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitreader.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitwriter.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/cpu.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/crc.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/float.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/format.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/md5.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/memory.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_decoder.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.*",
-		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.*",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitmath.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitreader.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/bitwriter.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/cpu.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/crc.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/fixed.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/float.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/format.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/lpc.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/md5.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/memory.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_decoder.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
+		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
 	}
 
+--------------------------------------------------
+-- lib7z library objects
+--------------------------------------------------
 
 project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
@@ -181,26 +206,29 @@ project "7z"
 		}
 
 	files {
-			MAME_DIR .. "3rdparty/lzma/C/7zBuf.*",
-			MAME_DIR .. "3rdparty/lzma/C/7zBuf2.*",
-			MAME_DIR .. "3rdparty/lzma/C/7zCrc.*",
-			MAME_DIR .. "3rdparty/lzma/C/7zCrcOpt.*",
-			MAME_DIR .. "3rdparty/lzma/C/7zDec.*",
-			MAME_DIR .. "3rdparty/lzma/C/7zIn.*",
-			MAME_DIR .. "3rdparty/lzma/C/CpuArch.*",
-			MAME_DIR .. "3rdparty/lzma/C/LzmaDec.*",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma2Dec.*",
-			MAME_DIR .. "3rdparty/lzma/C/LzmaEnc.*",
-			MAME_DIR .. "3rdparty/lzma/C/Lzma2Enc.*",
-			MAME_DIR .. "3rdparty/lzma/C/LzFind.*",
-			MAME_DIR .. "3rdparty/lzma/C/Bra.*",
-			MAME_DIR .. "3rdparty/lzma/C/Bra86.*",
-			MAME_DIR .. "3rdparty/lzma/C/Bcj2.*",
-			MAME_DIR .. "3rdparty/lzma/C/Ppmd7.*",
-			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Dec.*",
-			MAME_DIR .. "3rdparty/lzma/C/7zStream.*",
+			MAME_DIR .. "3rdparty/lzma/C/7zBuf.c",
+			MAME_DIR .. "3rdparty/lzma/C/7zBuf2.c",
+			MAME_DIR .. "3rdparty/lzma/C/7zCrc.c",
+			MAME_DIR .. "3rdparty/lzma/C/7zCrcOpt.c",
+			MAME_DIR .. "3rdparty/lzma/C/7zDec.c",
+			MAME_DIR .. "3rdparty/lzma/C/7zIn.c",
+			MAME_DIR .. "3rdparty/lzma/C/CpuArch.c",
+			MAME_DIR .. "3rdparty/lzma/C/LzmaDec.c",
+			MAME_DIR .. "3rdparty/lzma/C/Lzma2Dec.c",
+			MAME_DIR .. "3rdparty/lzma/C/LzmaEnc.c",
+			MAME_DIR .. "3rdparty/lzma/C/Lzma2Enc.c",
+			MAME_DIR .. "3rdparty/lzma/C/LzFind.c",
+			MAME_DIR .. "3rdparty/lzma/C/Bra.c",
+			MAME_DIR .. "3rdparty/lzma/C/Bra86.c",
+			MAME_DIR .. "3rdparty/lzma/C/Bcj2.c",
+			MAME_DIR .. "3rdparty/lzma/C/Ppmd7.c",
+			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Dec.c",
+			MAME_DIR .. "3rdparty/lzma/C/7zStream.c",
 		}
 
+--------------------------------------------------
+-- LUA library objects
+--------------------------------------------------
 
 project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
@@ -228,15 +256,45 @@ project "lua"
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/lua/**.c",
-		MAME_DIR .. "3rdparty/lua/**.h",
-	}
-	
-	removefiles {
-		MAME_DIR .. "3rdparty/lua/src/lua.c",
-		MAME_DIR .. "3rdparty/lua/src/luac.c",
+		MAME_DIR .. "3rdparty/lua/src/lapi.c",
+		MAME_DIR .. "3rdparty/lua/src/lcode.c",
+		MAME_DIR .. "3rdparty/lua/src/lctype.c",
+		MAME_DIR .. "3rdparty/lua/src/ldebug.c",
+		MAME_DIR .. "3rdparty/lua/src/ldo.c",
+		MAME_DIR .. "3rdparty/lua/src/ldump.c",
+		MAME_DIR .. "3rdparty/lua/src/lfunc.c",
+		MAME_DIR .. "3rdparty/lua/src/lgc.c",
+		MAME_DIR .. "3rdparty/lua/src/llex.c",
+		MAME_DIR .. "3rdparty/lua/src/lmem.c",
+		MAME_DIR .. "3rdparty/lua/src/lobject.c",
+		MAME_DIR .. "3rdparty/lua/src/lopcodes.c",
+		MAME_DIR .. "3rdparty/lua/src/lparser.c",
+		MAME_DIR .. "3rdparty/lua/src/lstate.c",
+		MAME_DIR .. "3rdparty/lua/src/lstring.c",
+		MAME_DIR .. "3rdparty/lua/src/ltable.c",
+		MAME_DIR .. "3rdparty/lua/src/ltm.c",
+		MAME_DIR .. "3rdparty/lua/src/lundump.c",
+		MAME_DIR .. "3rdparty/lua/src/lvm.c",
+		MAME_DIR .. "3rdparty/lua/src/lzio.c",
+		MAME_DIR .. "3rdparty/lua/src/lauxlib.c",
+		MAME_DIR .. "3rdparty/lua/src/lbaselib.c",
+		MAME_DIR .. "3rdparty/lua/src/lbitlib.c",
+		MAME_DIR .. "3rdparty/lua/src/lcorolib.c",
+		MAME_DIR .. "3rdparty/lua/src/ldblib.c",
+		MAME_DIR .. "3rdparty/lua/src/liolib.c",
+		MAME_DIR .. "3rdparty/lua/src/lmathlib.c",
+		MAME_DIR .. "3rdparty/lua/src/loslib.c",
+		MAME_DIR .. "3rdparty/lua/src/lstrlib.c",
+		MAME_DIR .. "3rdparty/lua/src/ltablib.c",
+		MAME_DIR .. "3rdparty/lua/src/loadlib.c",
+		MAME_DIR .. "3rdparty/lua/src/linit.c",
+		MAME_DIR .. "3rdparty/lua/src/lutf8lib.c",
 	}
 
+--------------------------------------------------
+-- sqlite3 lua library objects
+--------------------------------------------------
+	
 project "lsqlite3"
 	uuid "1d84edab-94cf-48fb-83ee-b75bc697660e"
 	kind "StaticLib"
@@ -255,6 +313,10 @@ project "lsqlite3"
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 	}
 
+--------------------------------------------------
+-- mongoose library objects
+--------------------------------------------------
+
 project "mongoose"
 	uuid "ff05b529-2b6f-4166-9dff-5fe2aef89c40"
 	kind "StaticLib"
@@ -272,9 +334,12 @@ project "mongoose"
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/mongoose/*.c",
-		MAME_DIR .. "3rdparty/mongoose/*.h",
+		MAME_DIR .. "3rdparty/mongoose/mongoose.c",
 	}
+
+--------------------------------------------------
+-- jsoncpp library objects
+--------------------------------------------------
 
 project "jsoncpp"
 	uuid "ae023ff3-d712-4e54-adc5-3b56a148650f"
@@ -289,9 +354,15 @@ project "jsoncpp"
 	}
 
 	files {
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/*.cpp",
-		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/*.h",
+		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_reader.cpp",
+		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_value.cpp",
+		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
+		
 	}
+
+--------------------------------------------------
+-- SQLite3 library objects
+--------------------------------------------------
 
 project "sqllite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
@@ -306,15 +377,12 @@ project "sqllite3"
 	configuration { }
 
 	files {
-		MAME_DIR .. "3rdparty/sqlite3/**.c",
-		MAME_DIR .. "3rdparty/sqlite3/**.h",
+		MAME_DIR .. "3rdparty/sqlite3/sqlite3.c",
 	}
 
-	removefiles {
-		MAME_DIR .. "3rdparty/sqlite3/shell.c",
-	}
-
-
+--------------------------------------------------
+-- portmidi library objects
+--------------------------------------------------
 
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
@@ -335,34 +403,43 @@ project "portmidi"
 	configuration { }
 
 	files {
-		MAME_DIR .. "3rdparty/portmidi/pm_common/*.c",
-		MAME_DIR .. "3rdparty/portmidi/pm_common/*.h",
-		MAME_DIR .. "3rdparty/portmidi/porttime/porttime.*",
-	}
+		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
+		MAME_DIR .. "3rdparty/portmidi/pm_common/pmutil.c",
+		MAME_DIR .. "3rdparty/portmidi/porttime/porttime.c",
+		}
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
-			MAME_DIR .. "3rdparty/portmidi/pm_win/*.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_win/*.h",
-			MAME_DIR .. "3rdparty/portmidi/porttime/ptwinmm.*",
+			MAME_DIR .. "3rdparty/portmidi/porttime/ptwinmm.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_win/pmwin.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_win/pmwinmm.c",
+			MAME_DIR .. "3rdparty/portmidi/porttime/ptwinmm.c",
 		}
 	end
 
 	if _OPTIONS["targetos"]=="linux" then
 		files {
-			MAME_DIR .. "3rdparty/portmidi/pm_linux/*.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_linux/*.h",
-			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.*",
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinux.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/pmlinuxalsa.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_linux/finddefault.c",
+			MAME_DIR .. "3rdparty/portmidi/porttime/ptlinux.c",
 		}
 	end
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/*.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/*.h",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/*.m",
-			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.*",
+			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmac.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmacosxcm.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_mac/finddefault.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_mac/readbinaryplist.c",
+			MAME_DIR .. "3rdparty/portmidi/pm_mac/osxsupport.m",
+			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end
+	
+--------------------------------------------------
+-- BGFX library objects
+--------------------------------------------------
+	
 if (USE_BGFX == 1) then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
@@ -400,26 +477,38 @@ project "bgfx"
 		"__STDC_CONSTANT_MACROS",
 	}
 	files {
-		MAME_DIR .. "3rdparty/bgfx/src/*.h",
-		MAME_DIR .. "3rdparty/bgfx/src/*.cpp",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/camera.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/cube_atlas.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/font_manager.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_buffer_manager.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.*",
-		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.*",
+		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/glcontext_ppapi.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/image.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/ovr.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_null.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderdoc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/vertexdecl.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/bgfx_utils.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/bounds.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/camera.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/cube_atlas.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/font/font_manager.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_buffer_manager.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/font/text_metrics.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/font/utf8.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
+		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "3rdparty/bgfx/src/*.mm",
+			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
+			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
+			
 		}
 	end
-	removefiles {
-		MAME_DIR .. "3rdparty/bgfx/src/amalgamated.cpp",
-	}
 end

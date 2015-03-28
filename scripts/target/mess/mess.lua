@@ -894,70 +894,70 @@ function createProjects(_target, _subtarget)
 
 createMESSProjects(_target, _subtarget, "mameshared")
 files { 
-	MAME_DIR .. "src/mame/machine/archimds.*",  
-	MAME_DIR .. "src/mame/video/archimds.*",    
-	MAME_DIR .. "src/mame/machine/amiga.*",     
-	MAME_DIR .. "src/mame/video/amiga.*",       
-	MAME_DIR .. "src/mame/video/amigaaga.*",    
-	MAME_DIR .. "src/mame/video/tia.*",         
-	MAME_DIR .. "src/mame/machine/atari.*",     
-	MAME_DIR .. "src/mame/video/atari.*",       
-	MAME_DIR .. "src/mame/video/antic.*",       
-	MAME_DIR .. "src/mame/video/gtia.*",        
-	MAME_DIR .. "src/mame/drivers/jaguar.*",    
-	MAME_DIR .. "src/mame/audio/jaguar.*",      
-	MAME_DIR .. "src/mame/video/jaguar.*",      
-	MAME_DIR .. "src/mame/video/astrocde.*",    
-	MAME_DIR .. "src/mame/machine/kabuki.*",    
-	MAME_DIR .. "src/mame/video/pk8000.*",      
-	MAME_DIR .. "src/mame/video/ppu2c0x.*",     
-	MAME_DIR .. "src/mame/machine/snes.*",      
-	MAME_DIR .. "src/mame/audio/snes_snd.*",    
-	MAME_DIR .. "src/mame/machine/n64.*",       
-	MAME_DIR .. "src/mame/video/n64.*",         
-	MAME_DIR .. "src/mame/video/rdpblend.*",    
-	MAME_DIR .. "src/mame/video/rdptpipe.*",    
-	MAME_DIR .. "src/mame/video/rdpspn16.*",    
-	MAME_DIR .. "src/mame/machine/megadriv.*",  
-	MAME_DIR .. "src/mame/drivers/naomi.*",     
-	MAME_DIR .. "src/mame/machine/awboard.*",   
-	MAME_DIR .. "src/mame/machine/dc.*",        
-	MAME_DIR .. "src/mame/machine/dc-ctrl.*",   
-	MAME_DIR .. "src/mame/machine/gdrom.*",     
-	MAME_DIR .. "src/mame/machine/jvs13551.*",  
-	MAME_DIR .. "src/mame/machine/maple-dc.*",  
-	MAME_DIR .. "src/mame/machine/mapledev.*",  
-	MAME_DIR .. "src/mame/machine/mie.*",       
-	MAME_DIR .. "src/mame/machine/naomi.*",     
-	MAME_DIR .. "src/mame/machine/naomibd.*",   
-	MAME_DIR .. "src/mame/machine/naomig1.*",   
-	MAME_DIR .. "src/mame/machine/naomigd.*",   
-	MAME_DIR .. "src/mame/machine/naomim1.*",   
-	MAME_DIR .. "src/mame/machine/naomim2.*",   
-	MAME_DIR .. "src/mame/machine/naomim4.*",   
-	MAME_DIR .. "src/mame/machine/naomirom.*",  
-	MAME_DIR .. "src/mame/machine/315-5881_crypt.*",  
-	MAME_DIR .. "src/mame/video/powervr2.*",    
-	MAME_DIR .. "src/mame/drivers/neogeo.*",    
-	MAME_DIR .. "src/mame/machine/neoboot.*",   
-	MAME_DIR .. "src/mame/machine/neocrypt.*",  
-	MAME_DIR .. "src/mame/machine/neoprot.*",   
-	MAME_DIR .. "src/mame/machine/ng_memcard.*",
-	MAME_DIR .. "src/mame/video/neogeo.*",      
-	MAME_DIR .. "src/mame/video/neogeo_spr.*",  
-	MAME_DIR .. "src/mame/drivers/cdi.*",       
-	MAME_DIR .. "src/mame/machine/cdi070.*",    
-	MAME_DIR .. "src/mame/machine/cdicdic.*",   
-	MAME_DIR .. "src/mame/machine/cdislave.*",  
-	MAME_DIR .. "src/mame/video/mcd212.*",      
-	MAME_DIR .. "src/mame/drivers/3do.*",       
-	MAME_DIR .. "src/mame/machine/3do.*",       
-	MAME_DIR .. "src/mame/drivers/konamim2.*",  
-	MAME_DIR .. "src/mame/drivers/vectrex.*",   
-	MAME_DIR .. "src/mame/machine/vectrex.*",   
-	MAME_DIR .. "src/mame/video/vectrex.*",     
-	MAME_DIR .. "src/mame/drivers/cps1.*",      
-	MAME_DIR .. "src/mame/video/cps1.*",        
+	MAME_DIR .. "src/mame/machine/archimds.c",  
+	MAME_DIR .. "src/mame/video/archimds.c",    
+	MAME_DIR .. "src/mame/machine/amiga.c",     
+	MAME_DIR .. "src/mame/video/amiga.c",       
+	MAME_DIR .. "src/mame/video/amigaaga.c",    
+	MAME_DIR .. "src/mame/video/tia.c",         
+	MAME_DIR .. "src/mame/machine/atari.c",     
+	MAME_DIR .. "src/mame/video/atari.c",       
+	MAME_DIR .. "src/mame/video/antic.c",       
+	MAME_DIR .. "src/mame/video/gtia.c",        
+	MAME_DIR .. "src/mame/drivers/jaguar.c",    
+	MAME_DIR .. "src/mame/audio/jaguar.c",      
+	MAME_DIR .. "src/mame/video/jaguar.c",      
+	MAME_DIR .. "src/mame/video/astrocde.c",    
+	MAME_DIR .. "src/mame/machine/kabuki.c",    
+	MAME_DIR .. "src/mame/video/pk8000.c",      
+	MAME_DIR .. "src/mame/video/ppu2c0x.c",     
+	MAME_DIR .. "src/mame/machine/snes.c",      
+	MAME_DIR .. "src/mame/audio/snes_snd.c",    
+	MAME_DIR .. "src/mame/machine/n64.c",       
+	MAME_DIR .. "src/mame/video/n64.c",         
+	MAME_DIR .. "src/mame/video/rdpblend.c",    
+	MAME_DIR .. "src/mame/video/rdptpipe.c",    
+	MAME_DIR .. "src/mame/video/rdpspn16.c",    
+	MAME_DIR .. "src/mame/machine/megadriv.c",  
+	MAME_DIR .. "src/mame/drivers/naomi.c",     
+	MAME_DIR .. "src/mame/machine/awboard.c",   
+	MAME_DIR .. "src/mame/machine/dc.c",        
+	MAME_DIR .. "src/mame/machine/dc-ctrl.c",   
+	MAME_DIR .. "src/mame/machine/gdrom.c",     
+	MAME_DIR .. "src/mame/machine/jvs13551.c",  
+	MAME_DIR .. "src/mame/machine/maple-dc.c",  
+	MAME_DIR .. "src/mame/machine/mapledev.c",  
+	MAME_DIR .. "src/mame/machine/mie.c",       
+	MAME_DIR .. "src/mame/machine/naomi.c",     
+	MAME_DIR .. "src/mame/machine/naomibd.c",   
+	MAME_DIR .. "src/mame/machine/naomig1.c",   
+	MAME_DIR .. "src/mame/machine/naomigd.c",   
+	MAME_DIR .. "src/mame/machine/naomim1.c",   
+	MAME_DIR .. "src/mame/machine/naomim2.c",   
+	MAME_DIR .. "src/mame/machine/naomim4.c",   
+	MAME_DIR .. "src/mame/machine/naomirom.c",  
+	MAME_DIR .. "src/mame/machine/315-5881_crypt.c",  
+	MAME_DIR .. "src/mame/video/powervr2.c",    
+	MAME_DIR .. "src/mame/drivers/neogeo.c",    
+	MAME_DIR .. "src/mame/machine/neoboot.c",   
+	MAME_DIR .. "src/mame/machine/neocrypt.c",  
+	MAME_DIR .. "src/mame/machine/neoprot.c",   
+	MAME_DIR .. "src/mame/machine/ng_memcard.c",
+	MAME_DIR .. "src/mame/video/neogeo.c",      
+	MAME_DIR .. "src/mame/video/neogeo_spr.c",  
+	MAME_DIR .. "src/mame/drivers/cdi.c",       
+	MAME_DIR .. "src/mame/machine/cdi070.c",    
+	MAME_DIR .. "src/mame/machine/cdicdic.c",   
+	MAME_DIR .. "src/mame/machine/cdislave.c",  
+	MAME_DIR .. "src/mame/video/mcd212.c",      
+	MAME_DIR .. "src/mame/drivers/3do.c",       
+	MAME_DIR .. "src/mame/machine/3do.c",       
+	MAME_DIR .. "src/mame/drivers/konamim2.c",  
+	MAME_DIR .. "src/mame/drivers/vectrex.c",   
+	MAME_DIR .. "src/mame/machine/vectrex.c",   
+	MAME_DIR .. "src/mame/video/vectrex.c",     
+	MAME_DIR .. "src/mame/drivers/cps1.c",      
+	MAME_DIR .. "src/mame/video/cps1.c",        
 }
 
 --------------------------------------------------
@@ -966,14 +966,14 @@ files {
 --------------------------------------------------
 createMESSProjects(_target, _subtarget, "shared")
 files { 
-	MAME_DIR .. "src/mess/audio/mea8000.*",     
-	MAME_DIR .. "src/mess/machine/appldriv.*",  
-	MAME_DIR .. "src/mess/machine/applefdc.*",  
-	MAME_DIR .. "src/mess/machine/microdrv.*",  
-	MAME_DIR .. "src/mess/machine/smartmed.*",  
-	MAME_DIR .. "src/mess/machine/sonydriv.*",  
-	MAME_DIR .. "src/mess/machine/teleprinter.*", 
-	MAME_DIR .. "src/mess/machine/z80bin.*",    
+	MAME_DIR .. "src/mess/audio/mea8000.c",     
+	MAME_DIR .. "src/mess/machine/appldriv.c",  
+	MAME_DIR .. "src/mess/machine/applefdc.c",  
+	MAME_DIR .. "src/mess/machine/microdrv.c",  
+	MAME_DIR .. "src/mess/machine/smartmed.c",  
+	MAME_DIR .. "src/mess/machine/sonydriv.c",  
+	MAME_DIR .. "src/mess/machine/teleprinter.c", 
+	MAME_DIR .. "src/mess/machine/z80bin.c",    
 }
 --------------------------------------------------
 -- manufacturer-specific groupings for drivers
@@ -981,1670 +981,1670 @@ files {
 
 createMESSProjects(_target, _subtarget, "acorn")
 files {             
-	MAME_DIR .. "src/mess/drivers/a310.*",      
-	MAME_DIR .. "src/mess/drivers/a6809.*",     
-	MAME_DIR .. "src/mess/drivers/acrnsys1.*",  
-	MAME_DIR .. "src/mess/drivers/atom.*",      
-	MAME_DIR .. "src/mess/drivers/bbc.*",
-	MAME_DIR .. "src/mess/machine/bbc.*",
-	MAME_DIR .. "src/mess/video/bbc.*", 
-	MAME_DIR .. "src/mess/drivers/bbcbc.*",     
-	MAME_DIR .. "src/mess/drivers/electron.*",
-	MAME_DIR .. "src/mess/machine/electron.*",
-	MAME_DIR .. "src/mess/video/electron.*", 
-	MAME_DIR .. "src/mess/drivers/riscpc.*",    
-	MAME_DIR .. "src/mess/drivers/z88.*",
-	MAME_DIR .. "src/mess/machine/upd65031.*",
-	MAME_DIR .. "src/mess/video/z88.*", 
+	MAME_DIR .. "src/mess/drivers/a310.c",      
+	MAME_DIR .. "src/mess/drivers/a6809.c",     
+	MAME_DIR .. "src/mess/drivers/acrnsys1.c",  
+	MAME_DIR .. "src/mess/drivers/atom.c",      
+	MAME_DIR .. "src/mess/drivers/bbc.c",
+	MAME_DIR .. "src/mess/machine/bbc.c",
+	MAME_DIR .. "src/mess/video/bbc.c", 
+	MAME_DIR .. "src/mess/drivers/bbcbc.c",     
+	MAME_DIR .. "src/mess/drivers/electron.c",
+	MAME_DIR .. "src/mess/machine/electron.c",
+	MAME_DIR .. "src/mess/video/electron.c", 
+	MAME_DIR .. "src/mess/drivers/riscpc.c",    
+	MAME_DIR .. "src/mess/drivers/z88.c",
+	MAME_DIR .. "src/mess/machine/upd65031.c",
+	MAME_DIR .. "src/mess/video/z88.c", 
 }
 
 createMESSProjects(_target, _subtarget, "act")
 files {               
-	MAME_DIR .. "src/mess/drivers/apricot.*",   
-	MAME_DIR .. "src/mess/drivers/apricotf.*",  
-	MAME_DIR .. "src/mess/drivers/apricotp.*",  
-	MAME_DIR .. "src/mess/machine/apricotkb.*", 
-	MAME_DIR .. "src/mess/drivers/victor9k.*",
-	MAME_DIR .. "src/mess/machine/victor9kb.*",
-	MAME_DIR .. "src/mess/machine/victor9k_fdc.*", 
+	MAME_DIR .. "src/mess/drivers/apricot.c",   
+	MAME_DIR .. "src/mess/drivers/apricotf.c",  
+	MAME_DIR .. "src/mess/drivers/apricotp.c",  
+	MAME_DIR .. "src/mess/machine/apricotkb.c", 
+	MAME_DIR .. "src/mess/drivers/victor9k.c",
+	MAME_DIR .. "src/mess/machine/victor9kb.c",
+	MAME_DIR .. "src/mess/machine/victor9k_fdc.c", 
 }
 
 createMESSProjects(_target, _subtarget, "adc")
 files {               
-	MAME_DIR .. "src/mess/drivers/super6.*",    
-	MAME_DIR .. "src/mess/drivers/superslave.*",
+	MAME_DIR .. "src/mess/drivers/super6.c",    
+	MAME_DIR .. "src/mess/drivers/superslave.c",
 }
 
 createMESSProjects(_target, _subtarget, "alesis")
 files {            
-	MAME_DIR .. "src/mess/drivers/alesis.*",
-	MAME_DIR .. "src/mess/audio/alesis.*",
-	MAME_DIR .. "src/mess/video/alesis.*", 
+	MAME_DIR .. "src/mess/drivers/alesis.c",
+	MAME_DIR .. "src/mess/audio/alesis.c",
+	MAME_DIR .. "src/mess/video/alesis.c", 
 }
 
 createMESSProjects(_target, _subtarget, "altos")
 files {             
-	MAME_DIR .. "src/mess/drivers/altos5.*",    
+	MAME_DIR .. "src/mess/drivers/altos5.c",    
 }
 
 createMESSProjects(_target, _subtarget, "amiga")
 files {             
-	MAME_DIR .. "src/mess/drivers/amiga.*",
-	MAME_DIR .. "src/mess/machine/amigakbd.*", 
+	MAME_DIR .. "src/mess/drivers/amiga.c",
+	MAME_DIR .. "src/mess/machine/amigakbd.c", 
 }
 
 createMESSProjects(_target, _subtarget, "amstrad")
 files {           
-	MAME_DIR .. "src/mess/drivers/amstrad.*",
-	MAME_DIR .. "src/mess/machine/amstrad.*", 
-	MAME_DIR .. "src/mess/drivers/amstr_pc.*",  
-	MAME_DIR .. "src/mess/drivers/nc.*",
-	MAME_DIR .. "src/mess/machine/nc.*",
-	MAME_DIR .. "src/mess/video/nc.*", 
-	MAME_DIR .. "src/mess/drivers/pc1512.*",
-	MAME_DIR .. "src/mess/machine/pc1512kb.*",
-	MAME_DIR .. "src/mess/video/pc1512.*", 
-	MAME_DIR .. "src/mess/drivers/pcw.*",
-	MAME_DIR .. "src/mess/video/pcw.*", 
-	MAME_DIR .. "src/mess/drivers/pcw16.*",
-	MAME_DIR .. "src/mess/video/pcw16.*", 
-	MAME_DIR .. "src/mess/drivers/pda600.*",    
+	MAME_DIR .. "src/mess/drivers/amstrad.c",
+	MAME_DIR .. "src/mess/machine/amstrad.c", 
+	MAME_DIR .. "src/mess/drivers/amstr_pc.c",  
+	MAME_DIR .. "src/mess/drivers/nc.c",
+	MAME_DIR .. "src/mess/machine/nc.c",
+	MAME_DIR .. "src/mess/video/nc.c", 
+	MAME_DIR .. "src/mess/drivers/pc1512.c",
+	MAME_DIR .. "src/mess/machine/pc1512kb.c",
+	MAME_DIR .. "src/mess/video/pc1512.c", 
+	MAME_DIR .. "src/mess/drivers/pcw.c",
+	MAME_DIR .. "src/mess/video/pcw.c", 
+	MAME_DIR .. "src/mess/drivers/pcw16.c",
+	MAME_DIR .. "src/mess/video/pcw16.c", 
+	MAME_DIR .. "src/mess/drivers/pda600.c",    
 }
 
 createMESSProjects(_target, _subtarget, "apf")
 files {               
-	MAME_DIR .. "src/mess/drivers/apf.*",       
+	MAME_DIR .. "src/mess/drivers/apf.c",       
 }
 
 createMESSProjects(_target, _subtarget, "apollo")
 files {            
-	MAME_DIR .. "src/mess/drivers/apollo.*",
-	MAME_DIR .. "src/mess/machine/apollo.*",
-	MAME_DIR .. "src/mess/machine/apollo_dbg.*",
-	MAME_DIR .. "src/mess/machine/apollo_kbd.*",
-	MAME_DIR .. "src/mess/video/apollo.*", 
+	MAME_DIR .. "src/mess/drivers/apollo.c",
+	MAME_DIR .. "src/mess/machine/apollo.c",
+	MAME_DIR .. "src/mess/machine/apollo_dbg.c",
+	MAME_DIR .. "src/mess/machine/apollo_kbd.c",
+	MAME_DIR .. "src/mess/video/apollo.c", 
 }
 
 createMESSProjects(_target, _subtarget, "apple")
 files {             
-	MAME_DIR .. "src/mess/drivers/apple1.*",
-	MAME_DIR .. "src/mess/machine/apple1.*",
-	MAME_DIR .. "src/mess/video/apple1.*", 
-	MAME_DIR .. "src/mess/drivers/apple2.*",
-	MAME_DIR .. "src/mess/drivers/apple2e.*",
-	MAME_DIR .. "src/mess/machine/apple2.*",
-	MAME_DIR .. "src/mess/video/apple2.*", 
-	MAME_DIR .. "src/mess/drivers/tk2000.*",    
-	MAME_DIR .. "src/mess/drivers/apple2gs.*",
-	MAME_DIR .. "src/mess/machine/apple2gs.*",
-	MAME_DIR .. "src/mess/video/apple2gs.*", 
-	MAME_DIR .. "src/mess/drivers/apple3.*",
-	MAME_DIR .. "src/mess/machine/apple3.*",
-	MAME_DIR .. "src/mess/video/apple3.*", 
-	MAME_DIR .. "src/mess/drivers/lisa.*",
-	MAME_DIR .. "src/mess/machine/lisa.*", 
-	MAME_DIR .. "src/mess/drivers/mac.*",
-	MAME_DIR .. "src/mess/audio/mac.*",
-	MAME_DIR .. "src/mess/machine/egret.*",
-	MAME_DIR .. "src/mess/machine/mac.*",
-	MAME_DIR .. "src/mess/machine/macadb.*",
-	MAME_DIR .. "src/mess/machine/macrtc.*",
-	MAME_DIR .. "src/mess/machine/mackbd.*",
-	MAME_DIR .. "src/mess/machine/swim.*",
-	MAME_DIR .. "src/mess/video/mac.*", 
-	MAME_DIR .. "src/mess/drivers/macpci.*",
-	MAME_DIR .. "src/mess/machine/macpci.*", 
-	MAME_DIR .. "src/mess/machine/cuda.*",      
+	MAME_DIR .. "src/mess/drivers/apple1.c",
+	MAME_DIR .. "src/mess/machine/apple1.c",
+	MAME_DIR .. "src/mess/video/apple1.c", 
+	MAME_DIR .. "src/mess/drivers/apple2.c",
+	MAME_DIR .. "src/mess/drivers/apple2e.c",
+	MAME_DIR .. "src/mess/machine/apple2.c",
+	MAME_DIR .. "src/mess/video/apple2.c", 
+	MAME_DIR .. "src/mess/drivers/tk2000.c",    
+	MAME_DIR .. "src/mess/drivers/apple2gs.c",
+	MAME_DIR .. "src/mess/machine/apple2gs.c",
+	MAME_DIR .. "src/mess/video/apple2gs.c", 
+	MAME_DIR .. "src/mess/drivers/apple3.c",
+	MAME_DIR .. "src/mess/machine/apple3.c",
+	MAME_DIR .. "src/mess/video/apple3.c", 
+	MAME_DIR .. "src/mess/drivers/lisa.c",
+	MAME_DIR .. "src/mess/machine/lisa.c", 
+	MAME_DIR .. "src/mess/drivers/mac.c",
+	MAME_DIR .. "src/mess/audio/mac.c",
+	MAME_DIR .. "src/mess/machine/egret.c",
+	MAME_DIR .. "src/mess/machine/mac.c",
+	MAME_DIR .. "src/mess/machine/macadb.c",
+	MAME_DIR .. "src/mess/machine/macrtc.c",
+	MAME_DIR .. "src/mess/machine/mackbd.c",
+	MAME_DIR .. "src/mess/machine/swim.c",
+	MAME_DIR .. "src/mess/video/mac.c", 
+	MAME_DIR .. "src/mess/drivers/macpci.c",
+	MAME_DIR .. "src/mess/machine/macpci.c", 
+	MAME_DIR .. "src/mess/machine/cuda.c",      
 }
 
 createMESSProjects(_target, _subtarget, "applied")
 files {           
-	MAME_DIR .. "src/mess/drivers/mbee.*",
-	MAME_DIR .. "src/mess/machine/mbee.*",
-	MAME_DIR .. "src/mess/video/mbee.*", 
+	MAME_DIR .. "src/mess/drivers/mbee.c",
+	MAME_DIR .. "src/mess/machine/mbee.c",
+	MAME_DIR .. "src/mess/video/mbee.c", 
 }
 
 createMESSProjects(_target, _subtarget, "arcadia")
 files {           
-	MAME_DIR .. "src/mess/drivers/arcadia.*",
-	MAME_DIR .. "src/mess/audio/arcadia.*",
-	MAME_DIR .. "src/mess/video/arcadia.*", 
+	MAME_DIR .. "src/mess/drivers/arcadia.c",
+	MAME_DIR .. "src/mess/audio/arcadia.c",
+	MAME_DIR .. "src/mess/video/arcadia.c", 
 }
 
 createMESSProjects(_target, _subtarget, "ascii")
 files {             
-	MAME_DIR .. "src/mess/drivers/msx.*",
-	MAME_DIR .. "src/mess/machine/msx.*",
-	MAME_DIR .. "src/mess/machine/msx_matsushita.*",
-	MAME_DIR .. "src/mess/machine/msx_s1985.*",
-	MAME_DIR .. "src/mess/machine/msx_switched.*",
-	MAME_DIR .. "src/mess/machine/msx_systemflags.*", 
+	MAME_DIR .. "src/mess/drivers/msx.c",
+	MAME_DIR .. "src/mess/machine/msx.c",
+	MAME_DIR .. "src/mess/machine/msx_matsushita.c",
+	MAME_DIR .. "src/mess/machine/msx_s1985.c",
+	MAME_DIR .. "src/mess/machine/msx_switched.c",
+	MAME_DIR .. "src/mess/machine/msx_systemflags.c", 
 }
 
 createMESSProjects(_target, _subtarget, "at")
 files {                
-	MAME_DIR .. "src/mess/drivers/at.*",
-	MAME_DIR .. "src/mess/machine/at.*", 
-	MAME_DIR .. "src/mess/drivers/ct486.*",     
+	MAME_DIR .. "src/mess/drivers/at.c",
+	MAME_DIR .. "src/mess/machine/at.c", 
+	MAME_DIR .. "src/mess/drivers/ct486.c",     
 }
 
 createMESSProjects(_target, _subtarget, "atari")
 files {             
-	MAME_DIR .. "src/mess/drivers/a2600.*",     
-	MAME_DIR .. "src/mess/drivers/a7800.*",
-	MAME_DIR .. "src/mess/video/maria.*", 
-	MAME_DIR .. "src/mess/drivers/atari400.*",
-	MAME_DIR .. "src/mess/machine/atarifdc.*", 
-	MAME_DIR .. "src/mess/drivers/atarist.*",
-	MAME_DIR .. "src/mess/video/atarist.*", 
-	MAME_DIR .. "src/mess/drivers/lynx.*",
-	MAME_DIR .. "src/mess/audio/lynx.*",
-	MAME_DIR .. "src/mess/machine/lynx.*", 
-	MAME_DIR .. "src/mess/drivers/portfoli.*",  
+	MAME_DIR .. "src/mess/drivers/a2600.c",     
+	MAME_DIR .. "src/mess/drivers/a7800.c",
+	MAME_DIR .. "src/mess/video/maria.c", 
+	MAME_DIR .. "src/mess/drivers/atari400.c",
+	MAME_DIR .. "src/mess/machine/atarifdc.c", 
+	MAME_DIR .. "src/mess/drivers/atarist.c",
+	MAME_DIR .. "src/mess/video/atarist.c", 
+	MAME_DIR .. "src/mess/drivers/lynx.c",
+	MAME_DIR .. "src/mess/audio/lynx.c",
+	MAME_DIR .. "src/mess/machine/lynx.c", 
+	MAME_DIR .. "src/mess/drivers/portfoli.c",  
 }
 
 createMESSProjects(_target, _subtarget, "att")
 files {               
-	MAME_DIR .. "src/mess/drivers/unixpc.*",    
+	MAME_DIR .. "src/mess/drivers/unixpc.c",    
 }
 
 createMESSProjects(_target, _subtarget, "bally")
 files {             
-	MAME_DIR .. "src/mess/drivers/astrocde.*",  
+	MAME_DIR .. "src/mess/drivers/astrocde.c",  
 }
 
 createMESSProjects(_target, _subtarget, "banctec")
 files {           
-	MAME_DIR .. "src/mess/drivers/banctec.*",   
+	MAME_DIR .. "src/mess/drivers/banctec.c",   
 }
 
 createMESSProjects(_target, _subtarget, "bandai")
 files {            
-	MAME_DIR .. "src/mess/drivers/sv8000.*",    
-	MAME_DIR .. "src/mess/drivers/rx78.*",      
-	MAME_DIR .. "src/mess/drivers/wswan.*",
-	MAME_DIR .. "src/mess/audio/wswan_snd.*",
-	MAME_DIR .. "src/mess/machine/wswan.*",
-	MAME_DIR .. "src/mess/video/wswan_video.*", 
+	MAME_DIR .. "src/mess/drivers/sv8000.c",    
+	MAME_DIR .. "src/mess/drivers/rx78.c",      
+	MAME_DIR .. "src/mess/drivers/wswan.c",
+	MAME_DIR .. "src/mess/audio/wswan_snd.c",
+	MAME_DIR .. "src/mess/machine/wswan.c",
+	MAME_DIR .. "src/mess/video/wswan_video.c", 
 }
 
 createMESSProjects(_target, _subtarget, "be")
 files {                
-	MAME_DIR .. "src/mess/drivers/bebox.*",
-	MAME_DIR .. "src/mess/machine/bebox.*", 
+	MAME_DIR .. "src/mess/drivers/bebox.c",
+	MAME_DIR .. "src/mess/machine/bebox.c", 
 }
 
 createMESSProjects(_target, _subtarget, "bnpo")
 files {              
-	MAME_DIR .. "src/mess/drivers/b2m.*",
-	MAME_DIR .. "src/mess/machine/b2m.*",
-	MAME_DIR .. "src/mess/video/b2m.*", 
+	MAME_DIR .. "src/mess/drivers/b2m.c",
+	MAME_DIR .. "src/mess/machine/b2m.c",
+	MAME_DIR .. "src/mess/video/b2m.c", 
 }
 
 createMESSProjects(_target, _subtarget, "bondwell")
 files {          
-	MAME_DIR .. "src/mess/drivers/bw12.*",      
-	MAME_DIR .. "src/mess/drivers/bw2.*",       
+	MAME_DIR .. "src/mess/drivers/bw12.c",      
+	MAME_DIR .. "src/mess/drivers/bw2.c",       
 }
 
 createMESSProjects(_target, _subtarget, "booth")
 files {             
-	MAME_DIR .. "src/mess/drivers/apexc.*",     
+	MAME_DIR .. "src/mess/drivers/apexc.c",     
 }
 
 createMESSProjects(_target, _subtarget, "camputers")
 files {         
-	MAME_DIR .. "src/mess/drivers/camplynx.*",  
+	MAME_DIR .. "src/mess/drivers/camplynx.c",  
 }
 
 createMESSProjects(_target, _subtarget, "canon")
 files {             
-	MAME_DIR .. "src/mess/drivers/cat.*",       
-	MAME_DIR .. "src/mess/drivers/x07.*",       
+	MAME_DIR .. "src/mess/drivers/cat.c",       
+	MAME_DIR .. "src/mess/drivers/x07.c",       
 }
 
 createMESSProjects(_target, _subtarget, "cantab")
 files {            
-	MAME_DIR .. "src/mess/drivers/ace.*",       
+	MAME_DIR .. "src/mess/drivers/ace.c",       
 }
 
 createMESSProjects(_target, _subtarget, "casio")
 files {             
-	MAME_DIR .. "src/mess/drivers/casloopy.*",  
-	MAME_DIR .. "src/mess/drivers/cfx9850.*",   
-	MAME_DIR .. "src/mess/drivers/fp200.*",     
-	MAME_DIR .. "src/mess/drivers/fp1100.*",    
-	MAME_DIR .. "src/mess/drivers/fp6000.*",    
-	MAME_DIR .. "src/mess/drivers/pb1000.*",    
-	MAME_DIR .. "src/mess/drivers/pv1000.*",    
-	MAME_DIR .. "src/mess/drivers/pv2000.*",    
+	MAME_DIR .. "src/mess/drivers/casloopy.c",  
+	MAME_DIR .. "src/mess/drivers/cfx9850.c",   
+	MAME_DIR .. "src/mess/drivers/fp200.c",     
+	MAME_DIR .. "src/mess/drivers/fp1100.c",    
+	MAME_DIR .. "src/mess/drivers/fp6000.c",    
+	MAME_DIR .. "src/mess/drivers/pb1000.c",    
+	MAME_DIR .. "src/mess/drivers/pv1000.c",    
+	MAME_DIR .. "src/mess/drivers/pv2000.c",    
 }
 
 createMESSProjects(_target, _subtarget, "cbm")
 files {               
-	MAME_DIR .. "src/mess/drivers/c128.*",      
-	MAME_DIR .. "src/mess/drivers/c64.*",       
-	MAME_DIR .. "src/mess/drivers/c64dtv.*",    
-	MAME_DIR .. "src/mess/drivers/c65.*", 
-	MAME_DIR .. "src/mess/drivers/c900.*",      
-	MAME_DIR .. "src/mess/drivers/cbm2.*",      
-	MAME_DIR .. "src/mess/drivers/clcd.*",      
-	MAME_DIR .. "src/mess/drivers/pet.*",       
-	MAME_DIR .. "src/mess/drivers/plus4.*",     
-	MAME_DIR .. "src/mess/drivers/vic10.*",     
-	MAME_DIR .. "src/mess/drivers/vic20.*",     
-	MAME_DIR .. "src/mess/machine/cbm_snqk.*",  
+	MAME_DIR .. "src/mess/drivers/c128.c",      
+	MAME_DIR .. "src/mess/drivers/c64.c",       
+	MAME_DIR .. "src/mess/drivers/c64dtv.c",    
+	MAME_DIR .. "src/mess/drivers/c65.c", 
+	MAME_DIR .. "src/mess/drivers/c900.c",      
+	MAME_DIR .. "src/mess/drivers/cbm2.c",      
+	MAME_DIR .. "src/mess/drivers/clcd.c",      
+	MAME_DIR .. "src/mess/drivers/pet.c",       
+	MAME_DIR .. "src/mess/drivers/plus4.c",     
+	MAME_DIR .. "src/mess/drivers/vic10.c",     
+	MAME_DIR .. "src/mess/drivers/vic20.c",     
+	MAME_DIR .. "src/mess/machine/cbm_snqk.c",  
 }
 
 createMESSProjects(_target, _subtarget, "cccp")
 files {              
-	MAME_DIR .. "src/mess/drivers/argo.*",      
-	MAME_DIR .. "src/mess/drivers/cm1800.*",    
-	MAME_DIR .. "src/mess/drivers/lviv.*",
-	MAME_DIR .. "src/mess/machine/lviv.*",
-	MAME_DIR .. "src/mess/video/lviv.*", 
-	MAME_DIR .. "src/mess/drivers/mikro80.*",
-	MAME_DIR .. "src/mess/machine/mikro80.*",
-	MAME_DIR .. "src/mess/video/mikro80.*", 
-	MAME_DIR .. "src/mess/drivers/pk8000.*",    
-	MAME_DIR .. "src/mess/drivers/pk8020.*",
-	MAME_DIR .. "src/mess/machine/pk8020.*",
-	MAME_DIR .. "src/mess/video/pk8020.*", 
-	MAME_DIR .. "src/mess/drivers/pyl601.*",    
-	MAME_DIR .. "src/mess/drivers/sm1800.*",    
-	MAME_DIR .. "src/mess/drivers/uknc.*",      
-	MAME_DIR .. "src/mess/drivers/unior.*",     
-	MAME_DIR .. "src/mess/drivers/ut88.*",
-	MAME_DIR .. "src/mess/machine/ut88.*",
-	MAME_DIR .. "src/mess/video/ut88.*", 
-	MAME_DIR .. "src/mess/drivers/vector06.*",
-	MAME_DIR .. "src/mess/machine/vector06.*",
-	MAME_DIR .. "src/mess/video/vector06.*", 
-	MAME_DIR .. "src/mess/drivers/vta2000.*",   
+	MAME_DIR .. "src/mess/drivers/argo.c",      
+	MAME_DIR .. "src/mess/drivers/cm1800.c",    
+	MAME_DIR .. "src/mess/drivers/lviv.c",
+	MAME_DIR .. "src/mess/machine/lviv.c",
+	MAME_DIR .. "src/mess/video/lviv.c", 
+	MAME_DIR .. "src/mess/drivers/mikro80.c",
+	MAME_DIR .. "src/mess/machine/mikro80.c",
+	MAME_DIR .. "src/mess/video/mikro80.c", 
+	MAME_DIR .. "src/mess/drivers/pk8000.c",    
+	MAME_DIR .. "src/mess/drivers/pk8020.c",
+	MAME_DIR .. "src/mess/machine/pk8020.c",
+	MAME_DIR .. "src/mess/video/pk8020.c", 
+	MAME_DIR .. "src/mess/drivers/pyl601.c",    
+	MAME_DIR .. "src/mess/drivers/sm1800.c",    
+	MAME_DIR .. "src/mess/drivers/uknc.c",      
+	MAME_DIR .. "src/mess/drivers/unior.c",     
+	MAME_DIR .. "src/mess/drivers/ut88.c",
+	MAME_DIR .. "src/mess/machine/ut88.c",
+	MAME_DIR .. "src/mess/video/ut88.c", 
+	MAME_DIR .. "src/mess/drivers/vector06.c",
+	MAME_DIR .. "src/mess/machine/vector06.c",
+	MAME_DIR .. "src/mess/video/vector06.c", 
+	MAME_DIR .. "src/mess/drivers/vta2000.c",   
 }
 
 createMESSProjects(_target, _subtarget, "cce")
 files {               
-	MAME_DIR .. "src/mess/drivers/mc1000.*",    
+	MAME_DIR .. "src/mess/drivers/mc1000.c",    
 }
 
 createMESSProjects(_target, _subtarget, "ccs")
 files {               
-	MAME_DIR .. "src/mess/drivers/ccs2810.*",   
-	MAME_DIR .. "src/mess/drivers/ccs300.*",    
+	MAME_DIR .. "src/mess/drivers/ccs2810.c",   
+	MAME_DIR .. "src/mess/drivers/ccs300.c",    
 }
 
 createMESSProjects(_target, _subtarget, "chromatics")
 files {        
-	MAME_DIR .. "src/mess/drivers/cgc7900.*",
-	MAME_DIR .. "src/mess/video/cgc7900.*", 
+	MAME_DIR .. "src/mess/drivers/cgc7900.c",
+	MAME_DIR .. "src/mess/video/cgc7900.c", 
 }
 
 createMESSProjects(_target, _subtarget, "coleco")
 files {            
-	MAME_DIR .. "src/mess/drivers/adam.*",      
-	MAME_DIR .. "src/mess/drivers/coleco.*",    
-	MAME_DIR .. "src/mess/machine/coleco.*",    
+	MAME_DIR .. "src/mess/drivers/adam.c",      
+	MAME_DIR .. "src/mess/drivers/coleco.c",    
+	MAME_DIR .. "src/mess/machine/coleco.c",    
 }
 
 createMESSProjects(_target, _subtarget, "cromemco")
 files {          
-	MAME_DIR .. "src/mess/drivers/c10.*",       
-	MAME_DIR .. "src/mess/drivers/mcb216.*",    
+	MAME_DIR .. "src/mess/drivers/c10.c",       
+	MAME_DIR .. "src/mess/drivers/mcb216.c",    
 }
 
 createMESSProjects(_target, _subtarget, "comx")
 files {              
-	MAME_DIR .. "src/mess/drivers/comx35.*",
-	MAME_DIR .. "src/mess/video/comx35.*", 
+	MAME_DIR .. "src/mess/drivers/comx35.c",
+	MAME_DIR .. "src/mess/video/comx35.c", 
 }
 
 createMESSProjects(_target, _subtarget, "concept")
 files {           
-	MAME_DIR .. "src/mess/drivers/concept.*",
-	MAME_DIR .. "src/mess/machine/concept.*", 
+	MAME_DIR .. "src/mess/drivers/concept.c",
+	MAME_DIR .. "src/mess/machine/concept.c", 
 }
 
 createMESSProjects(_target, _subtarget, "conitec")
 files {           
-	MAME_DIR .. "src/mess/drivers/prof180x.*",  
-	MAME_DIR .. "src/mess/drivers/prof80.*",
-	MAME_DIR .. "src/mess/machine/prof80mmu.*", 
+	MAME_DIR .. "src/mess/drivers/prof180x.c",  
+	MAME_DIR .. "src/mess/drivers/prof80.c",
+	MAME_DIR .. "src/mess/machine/prof80mmu.c", 
 }
 
 createMESSProjects(_target, _subtarget, "cybiko")
 files {            
-	MAME_DIR .. "src/mess/drivers/cybiko.*",
-	MAME_DIR .. "src/mess/machine/cybiko.*", 
+	MAME_DIR .. "src/mess/drivers/cybiko.c",
+	MAME_DIR .. "src/mess/machine/cybiko.c", 
 }
 
 createMESSProjects(_target, _subtarget, "dai")
 files {               
-	MAME_DIR .. "src/mess/drivers/dai.*",
-	MAME_DIR .. "src/mess/audio/dai_snd.*",
-	MAME_DIR .. "src/mess/machine/dai.*",
-	MAME_DIR .. "src/mess/video/dai.*", 
+	MAME_DIR .. "src/mess/drivers/dai.c",
+	MAME_DIR .. "src/mess/audio/dai_snd.c",
+	MAME_DIR .. "src/mess/machine/dai.c",
+	MAME_DIR .. "src/mess/video/dai.c", 
 }
 
 createMESSProjects(_target, _subtarget, "ddr")
 files {               
-	MAME_DIR .. "src/mess/drivers/ac1.*",
-	MAME_DIR .. "src/mess/machine/ac1.*",
-	MAME_DIR .. "src/mess/video/ac1.*", 
-	MAME_DIR .. "src/mess/drivers/bcs3.*",      
-	MAME_DIR .. "src/mess/drivers/c80.*",       
-	MAME_DIR .. "src/mess/drivers/huebler.*",   
-	MAME_DIR .. "src/mess/drivers/jtc.*",       
-	MAME_DIR .. "src/mess/drivers/kramermc.*",
-	MAME_DIR .. "src/mess/machine/kramermc.*",
-	MAME_DIR .. "src/mess/video/kramermc.*", 
-	MAME_DIR .. "src/mess/drivers/llc.*",
-	MAME_DIR .. "src/mess/machine/llc.*",
-	MAME_DIR .. "src/mess/video/llc.*", 
-	MAME_DIR .. "src/mess/drivers/nanos.*",     
-	MAME_DIR .. "src/mess/drivers/pcm.*",       
-	MAME_DIR .. "src/mess/drivers/vcs80.*",     
-	MAME_DIR .. "src/mess/machine/k7659kb.*",   
+	MAME_DIR .. "src/mess/drivers/ac1.c",
+	MAME_DIR .. "src/mess/machine/ac1.c",
+	MAME_DIR .. "src/mess/video/ac1.c", 
+	MAME_DIR .. "src/mess/drivers/bcs3.c",      
+	MAME_DIR .. "src/mess/drivers/c80.c",       
+	MAME_DIR .. "src/mess/drivers/huebler.c",   
+	MAME_DIR .. "src/mess/drivers/jtc.c",       
+	MAME_DIR .. "src/mess/drivers/kramermc.c",
+	MAME_DIR .. "src/mess/machine/kramermc.c",
+	MAME_DIR .. "src/mess/video/kramermc.c", 
+	MAME_DIR .. "src/mess/drivers/llc.c",
+	MAME_DIR .. "src/mess/machine/llc.c",
+	MAME_DIR .. "src/mess/video/llc.c", 
+	MAME_DIR .. "src/mess/drivers/nanos.c",     
+	MAME_DIR .. "src/mess/drivers/pcm.c",       
+	MAME_DIR .. "src/mess/drivers/vcs80.c",     
+	MAME_DIR .. "src/mess/machine/k7659kb.c",   
 }
 
 createMESSProjects(_target, _subtarget, "dec")
 files {               
-	MAME_DIR .. "src/mess/drivers/dct11em.*",   
-	MAME_DIR .. "src/mess/drivers/dectalk.*",   
-	MAME_DIR .. "src/mess/drivers/pdp11.*",     
-	MAME_DIR .. "src/mess/drivers/vax11.*",     
-	MAME_DIR .. "src/mess/drivers/rainbow.*",   
-	MAME_DIR .. "src/mess/drivers/vk100.*",     
-	MAME_DIR .. "src/mess/drivers/vt100.*",     
-	MAME_DIR .. "src/mess/drivers/vt220.*",     
-	MAME_DIR .. "src/mess/drivers/vt240.*",     
-	MAME_DIR .. "src/mess/drivers/vt320.*",     
-	MAME_DIR .. "src/mess/drivers/vt520.*",     
-	MAME_DIR .. "src/mess/machine/dec_lk201.*", 
-	MAME_DIR .. "src/mess/machine/rx01.*",      
-	MAME_DIR .. "src/mess/video/vtvideo.*",     
+	MAME_DIR .. "src/mess/drivers/dct11em.c",   
+	MAME_DIR .. "src/mess/drivers/dectalk.c",   
+	MAME_DIR .. "src/mess/drivers/pdp11.c",     
+	MAME_DIR .. "src/mess/drivers/vax11.c",     
+	MAME_DIR .. "src/mess/drivers/rainbow.c",   
+	MAME_DIR .. "src/mess/drivers/vk100.c",     
+	MAME_DIR .. "src/mess/drivers/vt100.c",     
+	MAME_DIR .. "src/mess/drivers/vt220.c",     
+	MAME_DIR .. "src/mess/drivers/vt240.c",     
+	MAME_DIR .. "src/mess/drivers/vt320.c",     
+	MAME_DIR .. "src/mess/drivers/vt520.c",     
+	MAME_DIR .. "src/mess/machine/dec_lk201.c", 
+	MAME_DIR .. "src/mess/machine/rx01.c",      
+	MAME_DIR .. "src/mess/video/vtvideo.c",     
 }
 
 createMESSProjects(_target, _subtarget, "dicksmth")
 files {          
-	MAME_DIR .. "src/mess/drivers/super80.*",
-	MAME_DIR .. "src/mess/machine/super80.*",
-	MAME_DIR .. "src/mess/video/super80.*", 
+	MAME_DIR .. "src/mess/drivers/super80.c",
+	MAME_DIR .. "src/mess/machine/super80.c",
+	MAME_DIR .. "src/mess/video/super80.c", 
 }
 
 createMESSProjects(_target, _subtarget, "dms")
 files {               
-	MAME_DIR .. "src/mess/drivers/dms5000.*",   
-	MAME_DIR .. "src/mess/drivers/dms86.*",     
-	MAME_DIR .. "src/mess/drivers/zsbc3.*",     
+	MAME_DIR .. "src/mess/drivers/dms5000.c",   
+	MAME_DIR .. "src/mess/drivers/dms86.c",     
+	MAME_DIR .. "src/mess/drivers/zsbc3.c",     
 }
 
 createMESSProjects(_target, _subtarget, "dragon")
 files {            
-	MAME_DIR .. "src/mess/drivers/dgn_beta.*",
-	MAME_DIR .. "src/mess/machine/dgn_beta.*",
-	MAME_DIR .. "src/mess/video/dgn_beta.*", 
+	MAME_DIR .. "src/mess/drivers/dgn_beta.c",
+	MAME_DIR .. "src/mess/machine/dgn_beta.c",
+	MAME_DIR .. "src/mess/video/dgn_beta.c", 
 }
 
 createMESSProjects(_target, _subtarget, "drc")
 files {               
-	MAME_DIR .. "src/mess/drivers/zrt80.*",     
+	MAME_DIR .. "src/mess/drivers/zrt80.c",     
 }
 
 createMESSProjects(_target, _subtarget, "eaca")
 files {              
-	MAME_DIR .. "src/mess/drivers/cgenie.*",
-	MAME_DIR .. "src/mess/machine/cgenie.*",
-	MAME_DIR .. "src/mess/video/cgenie.*", 
+	MAME_DIR .. "src/mess/drivers/cgenie.c",
+	MAME_DIR .. "src/mess/machine/cgenie.c",
+	MAME_DIR .. "src/mess/video/cgenie.c", 
 }
 
 createMESSProjects(_target, _subtarget, "einis")
 files {             
-	MAME_DIR .. "src/mess/drivers/pecom.*",
-	MAME_DIR .. "src/mess/machine/pecom.*",
-	MAME_DIR .. "src/mess/video/pecom.*", 
+	MAME_DIR .. "src/mess/drivers/pecom.c",
+	MAME_DIR .. "src/mess/machine/pecom.c",
+	MAME_DIR .. "src/mess/video/pecom.c", 
 }
 
 createMESSProjects(_target, _subtarget, "elektrka")
 files {          
-	MAME_DIR .. "src/mess/drivers/bk.*",
-	MAME_DIR .. "src/mess/machine/bk.*",
-	MAME_DIR .. "src/mess/video/bk.*", 
-	MAME_DIR .. "src/mess/drivers/dvk_ksm.*",
-	MAME_DIR .. "src/mess/machine/ms7004.*", 
-	MAME_DIR .. "src/mess/drivers/mk85.*",      
-	MAME_DIR .. "src/mess/drivers/mk90.*",      
+	MAME_DIR .. "src/mess/drivers/bk.c",
+	MAME_DIR .. "src/mess/machine/bk.c",
+	MAME_DIR .. "src/mess/video/bk.c", 
+	MAME_DIR .. "src/mess/drivers/dvk_ksm.c",
+	MAME_DIR .. "src/mess/machine/ms7004.c", 
+	MAME_DIR .. "src/mess/drivers/mk85.c",      
+	MAME_DIR .. "src/mess/drivers/mk90.c",      
 }
 
 createMESSProjects(_target, _subtarget, "elektor")
 files {           
-	MAME_DIR .. "src/mess/drivers/ec65.*",      
-	MAME_DIR .. "src/mess/drivers/elekscmp.*",  
-	MAME_DIR .. "src/mess/drivers/junior.*",    
+	MAME_DIR .. "src/mess/drivers/ec65.c",      
+	MAME_DIR .. "src/mess/drivers/elekscmp.c",  
+	MAME_DIR .. "src/mess/drivers/junior.c",    
 }
 
 createMESSProjects(_target, _subtarget, "ensoniq")
 files {           
-	MAME_DIR .. "src/mess/drivers/esq1.*",      
-	MAME_DIR .. "src/mess/drivers/esq5505.*",   
-	MAME_DIR .. "src/mess/drivers/esqasr.*",    
-	MAME_DIR .. "src/mess/drivers/esqkt.*",     
-	MAME_DIR .. "src/mess/drivers/esqmr.*",     
-	MAME_DIR .. "src/mess/drivers/mirage.*",    
-	MAME_DIR .. "src/mess/machine/esqpanel.*",  
-	MAME_DIR .. "src/mess/machine/esqvfd.*",    
+	MAME_DIR .. "src/mess/drivers/esq1.c",      
+	MAME_DIR .. "src/mess/drivers/esq5505.c",   
+	MAME_DIR .. "src/mess/drivers/esqasr.c",    
+	MAME_DIR .. "src/mess/drivers/esqkt.c",     
+	MAME_DIR .. "src/mess/drivers/esqmr.c",     
+	MAME_DIR .. "src/mess/drivers/mirage.c",    
+	MAME_DIR .. "src/mess/machine/esqpanel.c",  
+	MAME_DIR .. "src/mess/machine/esqvfd.c",    
 }
 
 createMESSProjects(_target, _subtarget, "enterprise")
 files {        
-	MAME_DIR .. "src/mess/drivers/ep64.*",
-	MAME_DIR .. "src/mess/audio/dave.*",
-	MAME_DIR .. "src/mess/video/nick.*", 
+	MAME_DIR .. "src/mess/drivers/ep64.c",
+	MAME_DIR .. "src/mess/audio/dave.c",
+	MAME_DIR .. "src/mess/video/nick.c", 
 }
 
 createMESSProjects(_target, _subtarget, "entex")
 files {             
-	MAME_DIR .. "src/mess/drivers/advision.*",
-	MAME_DIR .. "src/mess/machine/advision.*",
-	MAME_DIR .. "src/mess/video/advision.*", 
+	MAME_DIR .. "src/mess/drivers/advision.c",
+	MAME_DIR .. "src/mess/machine/advision.c",
+	MAME_DIR .. "src/mess/video/advision.c", 
 }
 
 createMESSProjects(_target, _subtarget, "epoch")
 files {             
-	MAME_DIR .. "src/mess/drivers/gamepock.*",
-	MAME_DIR .. "src/mess/machine/gamepock.*", 
-	MAME_DIR .. "src/mess/drivers/scv.*",
-	MAME_DIR .. "src/mess/audio/upd1771.*", 
+	MAME_DIR .. "src/mess/drivers/gamepock.c",
+	MAME_DIR .. "src/mess/machine/gamepock.c", 
+	MAME_DIR .. "src/mess/drivers/scv.c",
+	MAME_DIR .. "src/mess/audio/upd1771.c", 
 }
 
 createMESSProjects(_target, _subtarget, "epson")
 files {             
-	MAME_DIR .. "src/mess/drivers/hx20.*",      
-	MAME_DIR .. "src/mess/drivers/px4.*",       
-	MAME_DIR .. "src/mess/drivers/px8.*",       
-	MAME_DIR .. "src/mess/drivers/qx10.*",
-	MAME_DIR .. "src/mess/machine/qx10kbd.*", 
+	MAME_DIR .. "src/mess/drivers/hx20.c",      
+	MAME_DIR .. "src/mess/drivers/px4.c",       
+	MAME_DIR .. "src/mess/drivers/px8.c",       
+	MAME_DIR .. "src/mess/drivers/qx10.c",
+	MAME_DIR .. "src/mess/machine/qx10kbd.c", 
 }
 
 createMESSProjects(_target, _subtarget, "exidy")
 files {             
-	MAME_DIR .. "src/mess/machine/sorcerer.*",
-	MAME_DIR .. "src/mess/drivers/sorcerer.*", 
-	MAME_DIR .. "src/mess/machine/micropolis.*",
+	MAME_DIR .. "src/mess/machine/sorcerer.c",
+	MAME_DIR .. "src/mess/drivers/sorcerer.c", 
+	MAME_DIR .. "src/mess/machine/micropolis.c",
 }
 
 createMESSProjects(_target, _subtarget, "fairch")
 files {            
-	MAME_DIR .. "src/mess/drivers/channelf.*",
-	MAME_DIR .. "src/mess/audio/channelf.*",
-	MAME_DIR .. "src/mess/video/channelf.*", 
+	MAME_DIR .. "src/mess/drivers/channelf.c",
+	MAME_DIR .. "src/mess/audio/channelf.c",
+	MAME_DIR .. "src/mess/video/channelf.c", 
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")
 files {          
-	MAME_DIR .. "src/mess/drivers/csc.*",       
-	MAME_DIR .. "src/mess/drivers/fidelz80.*",  
+	MAME_DIR .. "src/mess/drivers/csc.c",       
+	MAME_DIR .. "src/mess/drivers/fidelz80.c",  
 }
 
 createMESSProjects(_target, _subtarget, "fujitsu")
 files {           
-	MAME_DIR .. "src/mess/drivers/fmtowns.*",
-	MAME_DIR .. "src/mess/video/fmtowns.*",
-	MAME_DIR .. "src/mess/machine/fm_scsi.*", 
-	MAME_DIR .. "src/mess/drivers/fm7.*",
-	MAME_DIR .. "src/mess/video/fm7.*", 
+	MAME_DIR .. "src/mess/drivers/fmtowns.c",
+	MAME_DIR .. "src/mess/video/fmtowns.c",
+	MAME_DIR .. "src/mess/machine/fm_scsi.c", 
+	MAME_DIR .. "src/mess/drivers/fm7.c",
+	MAME_DIR .. "src/mess/video/fm7.c", 
 }
 
 createMESSProjects(_target, _subtarget, "funtech")
 files {           
-	MAME_DIR .. "src/mess/drivers/supracan.*",  
+	MAME_DIR .. "src/mess/drivers/supracan.c",  
 }
 
 createMESSProjects(_target, _subtarget, "galaxy")
 files {            
-	MAME_DIR .. "src/mess/drivers/galaxy.*",
-	MAME_DIR .. "src/mess/machine/galaxy.*",
-	MAME_DIR .. "src/mess/video/galaxy.*", 
+	MAME_DIR .. "src/mess/drivers/galaxy.c",
+	MAME_DIR .. "src/mess/machine/galaxy.c",
+	MAME_DIR .. "src/mess/video/galaxy.c", 
 }
 
 createMESSProjects(_target, _subtarget, "gamepark")
 files {          
-	MAME_DIR .. "src/mess/drivers/gp2x.*",      
-	MAME_DIR .. "src/mess/drivers/gp32.*",      
+	MAME_DIR .. "src/mess/drivers/gp2x.c",      
+	MAME_DIR .. "src/mess/drivers/gp32.c",      
 }
 
 createMESSProjects(_target, _subtarget, "gi")
 files {                
-	MAME_DIR .. "src/mess/drivers/hh_pic16.*",  
+	MAME_DIR .. "src/mess/drivers/hh_pic16.c",  
 }
 
 createMESSProjects(_target, _subtarget, "grundy")
 files {            
-	MAME_DIR .. "src/mess/drivers/newbrain.*",
-	MAME_DIR .. "src/mess/video/newbrain.*", 
+	MAME_DIR .. "src/mess/drivers/newbrain.c",
+	MAME_DIR .. "src/mess/video/newbrain.c", 
 }
 
 createMESSProjects(_target, _subtarget, "hartung")
 files {           
-	MAME_DIR .. "src/mess/drivers/gmaster.*",   
+	MAME_DIR .. "src/mess/drivers/gmaster.c",   
 }
 
 createMESSProjects(_target, _subtarget, "heathkit")
 files {          
-	MAME_DIR .. "src/mess/drivers/et3400.*",    
-	MAME_DIR .. "src/mess/drivers/h8.*",        
-	MAME_DIR .. "src/mess/drivers/h19.*",       
-	MAME_DIR .. "src/mess/drivers/h89.*",       
+	MAME_DIR .. "src/mess/drivers/et3400.c",    
+	MAME_DIR .. "src/mess/drivers/h8.c",        
+	MAME_DIR .. "src/mess/drivers/h19.c",       
+	MAME_DIR .. "src/mess/drivers/h89.c",       
 }
 
 createMESSProjects(_target, _subtarget, "hegener")
 files {           
-	MAME_DIR .. "src/mess/drivers/glasgow.*",   
-	MAME_DIR .. "src/mess/drivers/mephisto.*",  
-	MAME_DIR .. "src/mess/drivers/mmodular.*",  
-	MAME_DIR .. "src/mess/drivers/stratos.*",   
-	MAME_DIR .. "src/mess/machine/mboard.*",    
+	MAME_DIR .. "src/mess/drivers/glasgow.c",   
+	MAME_DIR .. "src/mess/drivers/mephisto.c",  
+	MAME_DIR .. "src/mess/drivers/mmodular.c",  
+	MAME_DIR .. "src/mess/drivers/stratos.c",   
+	MAME_DIR .. "src/mess/machine/mboard.c",    
 }
 
 createMESSProjects(_target, _subtarget, "hitachi")
 files {           
-	MAME_DIR .. "src/mess/drivers/b16.*",       
-	MAME_DIR .. "src/mess/drivers/bmjr.*",      
-	MAME_DIR .. "src/mess/drivers/bml3.*",      
-	MAME_DIR .. "src/mess/drivers/hh_hmcs40.*", 
+	MAME_DIR .. "src/mess/drivers/b16.c",       
+	MAME_DIR .. "src/mess/drivers/bmjr.c",      
+	MAME_DIR .. "src/mess/drivers/bml3.c",      
+	MAME_DIR .. "src/mess/drivers/hh_hmcs40.c", 
 }
 
 createMESSProjects(_target, _subtarget, "homebrew")
 files {          
-	MAME_DIR .. "src/mess/drivers/4004clk.*",   
-	MAME_DIR .. "src/mess/drivers/68ksbc.*",    
-	MAME_DIR .. "src/mess/drivers/craft.*",     
-	MAME_DIR .. "src/mess/drivers/homez80.*",   
-	MAME_DIR .. "src/mess/drivers/p112.*",      
-	MAME_DIR .. "src/mess/drivers/phunsy.*",    
-	MAME_DIR .. "src/mess/drivers/pimps.*",     
-	MAME_DIR .. "src/mess/drivers/ravens.*",    
-	MAME_DIR .. "src/mess/drivers/sbc6510.*",   
-	MAME_DIR .. "src/mess/drivers/sitcom.*",    
-	MAME_DIR .. "src/mess/drivers/slc1.*",      
-	MAME_DIR .. "src/mess/drivers/uzebox.*",    
-	MAME_DIR .. "src/mess/drivers/z80dev.*",    
+	MAME_DIR .. "src/mess/drivers/4004clk.c",   
+	MAME_DIR .. "src/mess/drivers/68ksbc.c",    
+	MAME_DIR .. "src/mess/drivers/craft.c",     
+	MAME_DIR .. "src/mess/drivers/homez80.c",   
+	MAME_DIR .. "src/mess/drivers/p112.c",      
+	MAME_DIR .. "src/mess/drivers/phunsy.c",    
+	MAME_DIR .. "src/mess/drivers/pimps.c",     
+	MAME_DIR .. "src/mess/drivers/ravens.c",    
+	MAME_DIR .. "src/mess/drivers/sbc6510.c",   
+	MAME_DIR .. "src/mess/drivers/sitcom.c",    
+	MAME_DIR .. "src/mess/drivers/slc1.c",      
+	MAME_DIR .. "src/mess/drivers/uzebox.c",    
+	MAME_DIR .. "src/mess/drivers/z80dev.c",    
 }
 
 createMESSProjects(_target, _subtarget, "homelab")
 files {           
-	MAME_DIR .. "src/mess/drivers/homelab.*",   
+	MAME_DIR .. "src/mess/drivers/homelab.c",   
 }
 
 createMESSProjects(_target, _subtarget, "hp")
 files {                
-	MAME_DIR .. "src/mess/drivers/hp16500.*",   
-	MAME_DIR .. "src/mess/drivers/hp48.*",      
-	MAME_DIR .. "src/mess/machine/hp48.*",      
-	MAME_DIR .. "src/mess/video/hp48.*",        
-	MAME_DIR .. "src/mess/drivers/hp49gp.*",    
-	MAME_DIR .. "src/mess/drivers/hp9845.*",    
-	MAME_DIR .. "src/mess/drivers/hp9k.*",      
-	MAME_DIR .. "src/mess/drivers/hp9k_3xx.*",  
+	MAME_DIR .. "src/mess/drivers/hp16500.c",   
+	MAME_DIR .. "src/mess/drivers/hp48.c",      
+	MAME_DIR .. "src/mess/machine/hp48.c",      
+	MAME_DIR .. "src/mess/video/hp48.c",        
+	MAME_DIR .. "src/mess/drivers/hp49gp.c",    
+	MAME_DIR .. "src/mess/drivers/hp9845.c",    
+	MAME_DIR .. "src/mess/drivers/hp9k.c",      
+	MAME_DIR .. "src/mess/drivers/hp9k_3xx.c",  
 }
 
 createMESSProjects(_target, _subtarget, "hec2hrp")
 files {           
-	MAME_DIR .. "src/mess/drivers/hec2hrp.*",   
-	MAME_DIR .. "src/mess/machine/hec2hrp.*",   
-	MAME_DIR .. "src/mess/machine/hecdisk2.*",  
-	MAME_DIR .. "src/mess/video/hec2video.*",   
-	MAME_DIR .. "src/mess/drivers/interact.*",  
+	MAME_DIR .. "src/mess/drivers/hec2hrp.c",   
+	MAME_DIR .. "src/mess/machine/hec2hrp.c",   
+	MAME_DIR .. "src/mess/machine/hecdisk2.c",  
+	MAME_DIR .. "src/mess/video/hec2video.c",   
+	MAME_DIR .. "src/mess/drivers/interact.c",  
 }
 
 createMESSProjects(_target, _subtarget, "intel")
 files {             
-	MAME_DIR .. "src/mess/drivers/basic52.*",   
-	MAME_DIR .. "src/mess/drivers/imds.*",      
-	MAME_DIR .. "src/mess/drivers/ipc.*",       
-	MAME_DIR .. "src/mess/drivers/ipds.*",      
-	MAME_DIR .. "src/mess/drivers/isbc.*",
-	MAME_DIR .. "src/mess/machine/isbc_215g.*", 
-	MAME_DIR .. "src/mess/drivers/rex6000.*",   
-	MAME_DIR .. "src/mess/drivers/sdk85.*",     
-	MAME_DIR .. "src/mess/drivers/sdk86.*",   
-	MAME_DIR .. "src/mess/drivers/imds2.*",  
+	MAME_DIR .. "src/mess/drivers/basic52.c",   
+	MAME_DIR .. "src/mess/drivers/imds.c",      
+	MAME_DIR .. "src/mess/drivers/ipc.c",       
+	MAME_DIR .. "src/mess/drivers/ipds.c",      
+	MAME_DIR .. "src/mess/drivers/isbc.c",
+	MAME_DIR .. "src/mess/machine/isbc_215g.c", 
+	MAME_DIR .. "src/mess/drivers/rex6000.c",   
+	MAME_DIR .. "src/mess/drivers/sdk85.c",     
+	MAME_DIR .. "src/mess/drivers/sdk86.c",   
+	MAME_DIR .. "src/mess/drivers/imds2.c",  
 }
 
 createMESSProjects(_target, _subtarget, "imp")
 files {               
-	MAME_DIR .. "src/mess/drivers/tim011.*",    
-	MAME_DIR .. "src/mess/drivers/tim100.*",    
+	MAME_DIR .. "src/mess/drivers/tim011.c",    
+	MAME_DIR .. "src/mess/drivers/tim100.c",    
 }
 
 createMESSProjects(_target, _subtarget, "interton")
 files {          
-	MAME_DIR .. "src/mess/drivers/vc4000.*",
-	MAME_DIR .. "src/mess/audio/vc4000snd.*",
-	MAME_DIR .. "src/mess/video/vc4000.*", 
+	MAME_DIR .. "src/mess/drivers/vc4000.c",
+	MAME_DIR .. "src/mess/audio/vc4000snd.c",
+	MAME_DIR .. "src/mess/video/vc4000.c", 
 }
 
 createMESSProjects(_target, _subtarget, "intv")
 files {              
-	MAME_DIR .. "src/mess/drivers/intv.*",
-	MAME_DIR .. "src/mess/machine/intv.*",
-	MAME_DIR .. "src/mess/video/intv.*",
-	MAME_DIR .. "src/mess/video/stic.*", 
+	MAME_DIR .. "src/mess/drivers/intv.c",
+	MAME_DIR .. "src/mess/machine/intv.c",
+	MAME_DIR .. "src/mess/video/intv.c",
+	MAME_DIR .. "src/mess/video/stic.c", 
 }
 
 createMESSProjects(_target, _subtarget, "isc")
 files {               
-	MAME_DIR .. "src/mess/drivers/compucolor.*",
+	MAME_DIR .. "src/mess/drivers/compucolor.c",
 }
 
 createMESSProjects(_target, _subtarget, "kaypro")
 files {            
-	MAME_DIR .. "src/mess/drivers/kaypro.*",
-	MAME_DIR .. "src/mess/machine/kaypro.*",
-	MAME_DIR .. "src/mess/machine/kay_kbd.*",
-	MAME_DIR .. "src/mess/video/kaypro.*", 
+	MAME_DIR .. "src/mess/drivers/kaypro.c",
+	MAME_DIR .. "src/mess/machine/kaypro.c",
+	MAME_DIR .. "src/mess/machine/kay_kbd.c",
+	MAME_DIR .. "src/mess/video/kaypro.c", 
 }
 
 createMESSProjects(_target, _subtarget, "koei")
 files {              
-	MAME_DIR .. "src/mess/drivers/pasogo.*",    
+	MAME_DIR .. "src/mess/drivers/pasogo.c",    
 }
 
 createMESSProjects(_target, _subtarget, "kyocera")
 files {           
-	MAME_DIR .. "src/mess/drivers/kyocera.*",
-	MAME_DIR .. "src/mess/video/kyocera.*", 
+	MAME_DIR .. "src/mess/drivers/kyocera.c",
+	MAME_DIR .. "src/mess/video/kyocera.c", 
 }
 
 createMESSProjects(_target, _subtarget, "luxor")
 files {             
-	MAME_DIR .. "src/mess/drivers/abc80.*",
-	MAME_DIR .. "src/mess/machine/abc80kb.*",
-	MAME_DIR .. "src/mess/video/abc80.*", 
-	MAME_DIR .. "src/mess/drivers/abc80x.*",
-	MAME_DIR .. "src/mess/video/abc800.*",
-	MAME_DIR .. "src/mess/video/abc802.*",
-	MAME_DIR .. "src/mess/video/abc806.*", 
-	MAME_DIR .. "src/mess/drivers/abc1600.*",
-	MAME_DIR .. "src/mess/machine/abc1600mac.*",
-	MAME_DIR .. "src/mess/video/abc1600.*", 
+	MAME_DIR .. "src/mess/drivers/abc80.c",
+	MAME_DIR .. "src/mess/machine/abc80kb.c",
+	MAME_DIR .. "src/mess/video/abc80.c", 
+	MAME_DIR .. "src/mess/drivers/abc80x.c",
+	MAME_DIR .. "src/mess/video/abc800.c",
+	MAME_DIR .. "src/mess/video/abc802.c",
+	MAME_DIR .. "src/mess/video/abc806.c", 
+	MAME_DIR .. "src/mess/drivers/abc1600.c",
+	MAME_DIR .. "src/mess/machine/abc1600mac.c",
+	MAME_DIR .. "src/mess/video/abc1600.c", 
 }
 
 createMESSProjects(_target, _subtarget, "magnavox")
 files {          
-	MAME_DIR .. "src/mess/drivers/odyssey2.*",  
+	MAME_DIR .. "src/mess/drivers/odyssey2.c",  
 }
 
 createMESSProjects(_target, _subtarget, "makerbot")
 files {          
-	MAME_DIR .. "src/mess/drivers/replicator.*",
+	MAME_DIR .. "src/mess/drivers/replicator.c",
 }
 
 createMESSProjects(_target, _subtarget, "marx")
 files {              
-	MAME_DIR .. "src/mess/drivers/elecbowl.*",  
+	MAME_DIR .. "src/mess/drivers/elecbowl.c",  
 }
 
 createMESSProjects(_target, _subtarget, "mattel")
 files {            
-	MAME_DIR .. "src/mess/drivers/aquarius.*",
-	MAME_DIR .. "src/mess/video/aquarius.*", 
-	MAME_DIR .. "src/mess/drivers/juicebox.*",  
-	MAME_DIR .. "src/mess/drivers/hyperscan.*", 
+	MAME_DIR .. "src/mess/drivers/aquarius.c",
+	MAME_DIR .. "src/mess/video/aquarius.c", 
+	MAME_DIR .. "src/mess/drivers/juicebox.c",  
+	MAME_DIR .. "src/mess/drivers/hyperscan.c", 
 }
 
 createMESSProjects(_target, _subtarget, "matsushi")
 files {          
-	MAME_DIR .. "src/mess/drivers/jr100.*",     
-	MAME_DIR .. "src/mess/drivers/jr200.*",     
-	MAME_DIR .. "src/mess/drivers/myb3k.*",     
+	MAME_DIR .. "src/mess/drivers/jr100.c",     
+	MAME_DIR .. "src/mess/drivers/jr200.c",     
+	MAME_DIR .. "src/mess/drivers/myb3k.c",     
 }
 
 createMESSProjects(_target, _subtarget, "mb")
 files {                
-	MAME_DIR .. "src/mess/drivers/mbdtower.*",
-	MAME_DIR .. "src/mess/drivers/microvsn.*",  
+	MAME_DIR .. "src/mess/drivers/mbdtower.c",
+	MAME_DIR .. "src/mess/drivers/microvsn.c",  
 }
 
 createMESSProjects(_target, _subtarget, "mchester")
 files {          
-	MAME_DIR .. "src/mess/drivers/ssem.*",      
+	MAME_DIR .. "src/mess/drivers/ssem.c",      
 }
 
 createMESSProjects(_target, _subtarget, "memotech")
 files {          
-	MAME_DIR .. "src/mess/drivers/mtx.*",
-	MAME_DIR .. "src/mess/machine/mtx.*", 
+	MAME_DIR .. "src/mess/drivers/mtx.c",
+	MAME_DIR .. "src/mess/machine/mtx.c", 
 }
 
 createMESSProjects(_target, _subtarget, "mgu")
 files {               
-	MAME_DIR .. "src/mess/drivers/irisha.*",    
+	MAME_DIR .. "src/mess/drivers/irisha.c",    
 }
 
 createMESSProjects(_target, _subtarget, "microkey")
 files {          
-	MAME_DIR .. "src/mess/drivers/primo.*",
-	MAME_DIR .. "src/mess/machine/primo.*",
-	MAME_DIR .. "src/mess/video/primo.*", 
+	MAME_DIR .. "src/mess/drivers/primo.c",
+	MAME_DIR .. "src/mess/machine/primo.c",
+	MAME_DIR .. "src/mess/video/primo.c", 
 }
 
 createMESSProjects(_target, _subtarget, "mit")
 files {               
-	MAME_DIR .. "src/mess/drivers/tx0.*",
-	MAME_DIR .. "src/mess/video/crt.*",
-	MAME_DIR .. "src/mess/video/tx0.*", 
+	MAME_DIR .. "src/mess/drivers/tx0.c",
+	MAME_DIR .. "src/mess/video/crt.c",
+	MAME_DIR .. "src/mess/video/tx0.c", 
 }
 
 createMESSProjects(_target, _subtarget, "mits")
 files {              
-	MAME_DIR .. "src/mess/drivers/altair.*",    
-	MAME_DIR .. "src/mess/drivers/mits680b.*",  
+	MAME_DIR .. "src/mess/drivers/altair.c",    
+	MAME_DIR .. "src/mess/drivers/mits680b.c",  
 }
 
 createMESSProjects(_target, _subtarget, "mitsubishi")
 files {        
-	MAME_DIR .. "src/mess/drivers/multi8.*",    
-	MAME_DIR .. "src/mess/drivers/multi16.*",   
+	MAME_DIR .. "src/mess/drivers/multi8.c",    
+	MAME_DIR .. "src/mess/drivers/multi16.c",   
 }
 
 createMESSProjects(_target, _subtarget, "morrow")
 files {            
-	MAME_DIR .. "src/mess/drivers/microdec.*",  
-	MAME_DIR .. "src/mess/drivers/mpz80.*",     
-	MAME_DIR .. "src/mess/drivers/tricep.*",    
+	MAME_DIR .. "src/mess/drivers/microdec.c",  
+	MAME_DIR .. "src/mess/drivers/mpz80.c",     
+	MAME_DIR .. "src/mess/drivers/tricep.c",    
 }
 
 createMESSProjects(_target, _subtarget, "mos")
 files {               
-	MAME_DIR .. "src/mess/drivers/kim1.*",      
+	MAME_DIR .. "src/mess/drivers/kim1.c",      
 }
 
 createMESSProjects(_target, _subtarget, "motorola")
 files {          
-	MAME_DIR .. "src/mess/drivers/m6805evs.*",  
-	MAME_DIR .. "src/mess/drivers/mekd2.*",     
+	MAME_DIR .. "src/mess/drivers/m6805evs.c",  
+	MAME_DIR .. "src/mess/drivers/mekd2.c",     
 }
 
 createMESSProjects(_target, _subtarget, "multitch")
 files {          
-	MAME_DIR .. "src/mess/drivers/mkit09.*",    
-	MAME_DIR .. "src/mess/drivers/mpf1.*",      
+	MAME_DIR .. "src/mess/drivers/mkit09.c",    
+	MAME_DIR .. "src/mess/drivers/mpf1.c",      
 }
 
 createMESSProjects(_target, _subtarget, "nakajima")
 files {          
-	MAME_DIR .. "src/mess/drivers/nakajies.*",  
+	MAME_DIR .. "src/mess/drivers/nakajies.c",  
 }
 
 createMESSProjects(_target, _subtarget, "nascom")
 files {            
-	MAME_DIR .. "src/mess/drivers/nascom1.*",
-	MAME_DIR .. "src/mess/machine/nascom1.*",
-	MAME_DIR .. "src/mess/video/nascom1.*", 
+	MAME_DIR .. "src/mess/drivers/nascom1.c",
+	MAME_DIR .. "src/mess/machine/nascom1.c",
+	MAME_DIR .. "src/mess/video/nascom1.c", 
 }
 
 createMESSProjects(_target, _subtarget, "ne")
 files {                
-	MAME_DIR .. "src/mess/drivers/z80ne.*",
-	MAME_DIR .. "src/mess/machine/z80ne.*", 
+	MAME_DIR .. "src/mess/drivers/z80ne.c",
+	MAME_DIR .. "src/mess/machine/z80ne.c", 
 }
 
 createMESSProjects(_target, _subtarget, "nec")
 files {               
-	MAME_DIR .. "src/mess/drivers/apc.*",       
-	MAME_DIR .. "src/mess/drivers/pce.*",
-	MAME_DIR .. "src/mess/machine/pce.*",
-	MAME_DIR .. "src/mess/machine/pce_cd.*", 
-	MAME_DIR .. "src/mess/drivers/pcfx.*",      
-	MAME_DIR .. "src/mess/drivers/pc6001.*",    
-	MAME_DIR .. "src/mess/drivers/pc8401a.*",
-	MAME_DIR .. "src/mess/video/pc8401a.*",
-	MAME_DIR .. "src/mess/drivers/pc8001.*", 
-	MAME_DIR .. "src/mess/drivers/pc8801.*",    
-	MAME_DIR .. "src/mess/drivers/pc88va.*",    
-	MAME_DIR .. "src/mess/drivers/pc100.*",     
-	MAME_DIR .. "src/mess/drivers/pc9801.*",
-	MAME_DIR .. "src/mess/machine/pc9801_26.*",
-	MAME_DIR .. "src/mess/machine/pc9801_86.*",
-	MAME_DIR .. "src/mess/machine/pc9801_118.*",
-	MAME_DIR .. "src/mess/machine/pc9801_cbus.*",
-	MAME_DIR .. "src/mess/machine/pc9801_kbd.*", 
-	MAME_DIR .. "src/mess/drivers/tk80bs.*",    
-	MAME_DIR .. "src/mess/drivers/hh_ucom4.*",  
+	MAME_DIR .. "src/mess/drivers/apc.c",       
+	MAME_DIR .. "src/mess/drivers/pce.c",
+	MAME_DIR .. "src/mess/machine/pce.c",
+	MAME_DIR .. "src/mess/machine/pce_cd.c", 
+	MAME_DIR .. "src/mess/drivers/pcfx.c",      
+	MAME_DIR .. "src/mess/drivers/pc6001.c",    
+	MAME_DIR .. "src/mess/drivers/pc8401a.c",
+	MAME_DIR .. "src/mess/video/pc8401a.c",
+	MAME_DIR .. "src/mess/drivers/pc8001.c", 
+	MAME_DIR .. "src/mess/drivers/pc8801.c",    
+	MAME_DIR .. "src/mess/drivers/pc88va.c",    
+	MAME_DIR .. "src/mess/drivers/pc100.c",     
+	MAME_DIR .. "src/mess/drivers/pc9801.c",
+	MAME_DIR .. "src/mess/machine/pc9801_26.c",
+	MAME_DIR .. "src/mess/machine/pc9801_86.c",
+	MAME_DIR .. "src/mess/machine/pc9801_118.c",
+	MAME_DIR .. "src/mess/machine/pc9801_cbus.c",
+	MAME_DIR .. "src/mess/machine/pc9801_kbd.c", 
+	MAME_DIR .. "src/mess/drivers/tk80bs.c",    
+	MAME_DIR .. "src/mess/drivers/hh_ucom4.c",  
 }
 
 createMESSProjects(_target, _subtarget, "netronic")
 files {          
-	MAME_DIR .. "src/mess/drivers/elf.*",       
-	MAME_DIR .. "src/mess/drivers/exp85.*",     
+	MAME_DIR .. "src/mess/drivers/elf.c",       
+	MAME_DIR .. "src/mess/drivers/exp85.c",     
 }
 
 createMESSProjects(_target, _subtarget, "next")
 files {              
-	MAME_DIR .. "src/mess/drivers/next.*",
-	MAME_DIR .. "src/mess/machine/nextkbd.*",
-	MAME_DIR .. "src/mess/machine/nextmo.*", 
+	MAME_DIR .. "src/mess/drivers/next.c",
+	MAME_DIR .. "src/mess/machine/nextkbd.c",
+	MAME_DIR .. "src/mess/machine/nextmo.c", 
 }
 
 createMESSProjects(_target, _subtarget, "nintendo")
 files {          
-	MAME_DIR .. "src/mess/drivers/gb.*",
-	MAME_DIR .. "src/mess/audio/gb.*",
-	MAME_DIR .. "src/mess/machine/gb.*",
-	MAME_DIR .. "src/mess/video/gb_lcd.*", 
-	MAME_DIR .. "src/mess/drivers/gba.*",
-	MAME_DIR .. "src/mess/video/gba.*", 
-	MAME_DIR .. "src/mess/drivers/n64.*",       
-	MAME_DIR .. "src/mess/drivers/nes.*",
-	MAME_DIR .. "src/mess/machine/nes.*",
-	MAME_DIR .. "src/mess/video/nes.*", 
-	MAME_DIR .. "src/mess/drivers/pokemini.*",  
-	MAME_DIR .. "src/mess/drivers/snes.*",
-	MAME_DIR .. "src/mess/machine/snescx4.*", 
-	MAME_DIR .. "src/mess/drivers/vboy.*",
-	MAME_DIR .. "src/mess/audio/vboy.*", 
+	MAME_DIR .. "src/mess/drivers/gb.c",
+	MAME_DIR .. "src/mess/audio/gb.c",
+	MAME_DIR .. "src/mess/machine/gb.c",
+	MAME_DIR .. "src/mess/video/gb_lcd.c", 
+	MAME_DIR .. "src/mess/drivers/gba.c",
+	MAME_DIR .. "src/mess/video/gba.c", 
+	MAME_DIR .. "src/mess/drivers/n64.c",       
+	MAME_DIR .. "src/mess/drivers/nes.c",
+	MAME_DIR .. "src/mess/machine/nes.c",
+	MAME_DIR .. "src/mess/video/nes.c", 
+	MAME_DIR .. "src/mess/drivers/pokemini.c",  
+	MAME_DIR .. "src/mess/drivers/snes.c",
+	MAME_DIR .. "src/mess/machine/snescx4.c", 
+	MAME_DIR .. "src/mess/drivers/vboy.c",
+	MAME_DIR .. "src/mess/audio/vboy.c", 
 }
 
 createMESSProjects(_target, _subtarget, "nokia")
 files {             
-	MAME_DIR .. "src/mess/drivers/mikromik.*",
-	MAME_DIR .. "src/mess/machine/mm1kb.*",
-	MAME_DIR .. "src/mess/video/mikromik.*", 
+	MAME_DIR .. "src/mess/drivers/mikromik.c",
+	MAME_DIR .. "src/mess/machine/mm1kb.c",
+	MAME_DIR .. "src/mess/video/mikromik.c", 
 }
 
 createMESSProjects(_target, _subtarget, "northstar")
 files {         
-	MAME_DIR .. "src/mess/drivers/horizon.*",   
+	MAME_DIR .. "src/mess/drivers/horizon.c",   
 }
 
 createMESSProjects(_target, _subtarget, "novag")
 files {             
-	MAME_DIR .. "src/mess/drivers/mk1.*",       
-	MAME_DIR .. "src/mess/drivers/mk2.*",       
-	MAME_DIR .. "src/mess/drivers/ssystem3.*",
-	MAME_DIR .. "src/mess/video/ssystem3.*", 
-	MAME_DIR .. "src/mess/drivers/supercon.*",  
+	MAME_DIR .. "src/mess/drivers/mk1.c",       
+	MAME_DIR .. "src/mess/drivers/mk2.c",       
+	MAME_DIR .. "src/mess/drivers/ssystem3.c",
+	MAME_DIR .. "src/mess/video/ssystem3.c", 
+	MAME_DIR .. "src/mess/drivers/supercon.c",  
 }
 
 createMESSProjects(_target, _subtarget, "olivetti")
 files {          
-	MAME_DIR .. "src/mess/drivers/m20.*",       
-	MAME_DIR .. "src/mess/drivers/m24.*",
-	MAME_DIR .. "src/mess/machine/m24_kbd.*",
+	MAME_DIR .. "src/mess/drivers/m20.c",       
+	MAME_DIR .. "src/mess/drivers/m24.c",
+	MAME_DIR .. "src/mess/machine/m24_kbd.c",
 }
 
 createMESSProjects(_target, _subtarget, "omnibyte")
 files {          
-	MAME_DIR .. "src/mess/drivers/msbc1.*",     
-	MAME_DIR .. "src/mess/drivers/ob68k1a.*",   
+	MAME_DIR .. "src/mess/drivers/msbc1.c",     
+	MAME_DIR .. "src/mess/drivers/ob68k1a.c",   
 }
 
 createMESSProjects(_target, _subtarget, "orion")
 files {             
-	MAME_DIR .. "src/mess/drivers/orion.*",
-	MAME_DIR .. "src/mess/machine/orion.*",
-	MAME_DIR .. "src/mess/video/orion.*", 
+	MAME_DIR .. "src/mess/drivers/orion.c",
+	MAME_DIR .. "src/mess/machine/orion.c",
+	MAME_DIR .. "src/mess/video/orion.c", 
 }
 
 createMESSProjects(_target, _subtarget, "osborne")
 files {           
-	MAME_DIR .. "src/mess/drivers/osborne1.*",
-	MAME_DIR .. "src/mess/machine/osborne1.*", 
-	MAME_DIR .. "src/mess/drivers/osbexec.*",   
-	MAME_DIR .. "src/mess/drivers/vixen.*",     
+	MAME_DIR .. "src/mess/drivers/osborne1.c",
+	MAME_DIR .. "src/mess/machine/osborne1.c", 
+	MAME_DIR .. "src/mess/drivers/osbexec.c",   
+	MAME_DIR .. "src/mess/drivers/vixen.c",     
 }
 
 createMESSProjects(_target, _subtarget, "osi")
 files {               
-	MAME_DIR .. "src/mess/drivers/osi.*",
-	MAME_DIR .. "src/mess/video/osi.*", 
+	MAME_DIR .. "src/mess/drivers/osi.c",
+	MAME_DIR .. "src/mess/video/osi.c", 
 }
 
 createMESSProjects(_target, _subtarget, "palm")
 files {              
-	MAME_DIR .. "src/mess/drivers/palm.*",      
-	MAME_DIR .. "src/mess/drivers/palmz22.*",   
+	MAME_DIR .. "src/mess/drivers/palm.c",      
+	MAME_DIR .. "src/mess/drivers/palmz22.c",   
 }
 
 createMESSProjects(_target, _subtarget, "parker")
 files {            
-	MAME_DIR .. "src/mess/drivers/wildfire.*",  
+	MAME_DIR .. "src/mess/drivers/wildfire.c",  
 }
 
 createMESSProjects(_target, _subtarget, "pitronic")
 files {          
-	MAME_DIR .. "src/mess/drivers/beta.*",      
+	MAME_DIR .. "src/mess/drivers/beta.c",      
 }
 
 createMESSProjects(_target, _subtarget, "pc")
 files {                
-	MAME_DIR .. "src/mess/drivers/asst128.*",   
-	MAME_DIR .. "src/mess/drivers/europc.*",    
-	MAME_DIR .. "src/mess/drivers/genpc.*",
-	MAME_DIR .. "src/mess/machine/genpc.*", 
-	MAME_DIR .. "src/mess/drivers/ibmpc.*",     
-	MAME_DIR .. "src/mess/drivers/ibmpcjr.*",   
-	MAME_DIR .. "src/mess/drivers/pc.*",        
-	MAME_DIR .. "src/mess/drivers/tandy1t.*",
-	MAME_DIR .. "src/mess/video/pc_t1t.*", 
+	MAME_DIR .. "src/mess/drivers/asst128.c",   
+	MAME_DIR .. "src/mess/drivers/europc.c",    
+	MAME_DIR .. "src/mess/drivers/genpc.c",
+	MAME_DIR .. "src/mess/machine/genpc.c", 
+	MAME_DIR .. "src/mess/drivers/ibmpc.c",     
+	MAME_DIR .. "src/mess/drivers/ibmpcjr.c",   
+	MAME_DIR .. "src/mess/drivers/pc.c",        
+	MAME_DIR .. "src/mess/drivers/tandy1t.c",
+	MAME_DIR .. "src/mess/video/pc_t1t.c", 
 }
 
 createMESSProjects(_target, _subtarget, "pdp1")
 files {              
-	MAME_DIR .. "src/mess/drivers/pdp1.*",
-	MAME_DIR .. "src/mess/video/pdp1.*", 
+	MAME_DIR .. "src/mess/drivers/pdp1.c",
+	MAME_DIR .. "src/mess/video/pdp1.c", 
 }
 
 createMESSProjects(_target, _subtarget, "pel")
 files {               
-	MAME_DIR .. "src/mess/drivers/galeb.*",
-	MAME_DIR .. "src/mess/video/galeb.*", 
-		MAME_DIR .. "src/mess/drivers/orao.*",
-	MAME_DIR .. "src/mess/machine/orao.*",
-	MAME_DIR .. "src/mess/video/orao.*", 
+	MAME_DIR .. "src/mess/drivers/galeb.c",
+	MAME_DIR .. "src/mess/video/galeb.c", 
+		MAME_DIR .. "src/mess/drivers/orao.c",
+	MAME_DIR .. "src/mess/machine/orao.c",
+	MAME_DIR .. "src/mess/video/orao.c", 
 }
 
 createMESSProjects(_target, _subtarget, "philips")
 files {           
-	MAME_DIR .. "src/mess/drivers/p2000t.*",
-	MAME_DIR .. "src/mess/machine/p2000t.*",
-	MAME_DIR .. "src/mess/video/p2000m.*", 
-	MAME_DIR .. "src/mess/drivers/vg5k.*",      
+	MAME_DIR .. "src/mess/drivers/p2000t.c",
+	MAME_DIR .. "src/mess/machine/p2000t.c",
+	MAME_DIR .. "src/mess/video/p2000m.c", 
+	MAME_DIR .. "src/mess/drivers/vg5k.c",      
 }
 
 createMESSProjects(_target, _subtarget, "poly88")
 files {            
-	MAME_DIR .. "src/mess/drivers/poly88.*",
-	MAME_DIR .. "src/mess/machine/poly88.*",
-	MAME_DIR .. "src/mess/video/poly88.*", 
+	MAME_DIR .. "src/mess/drivers/poly88.c",
+	MAME_DIR .. "src/mess/machine/poly88.c",
+	MAME_DIR .. "src/mess/video/poly88.c", 
 }
 
 createMESSProjects(_target, _subtarget, "psion")
 files {             
-	MAME_DIR .. "src/mess/drivers/psion.*",
-	MAME_DIR .. "src/mess/machine/psion_pack.*", 
+	MAME_DIR .. "src/mess/drivers/psion.c",
+	MAME_DIR .. "src/mess/machine/psion_pack.c", 
 }
 
 createMESSProjects(_target, _subtarget, "radio")
 files {             
-	MAME_DIR .. "src/mess/drivers/apogee.*",    
-	MAME_DIR .. "src/mess/drivers/mikrosha.*",  
-	MAME_DIR .. "src/mess/drivers/partner.*",
-	MAME_DIR .. "src/mess/machine/partner.*", 
-	MAME_DIR .. "src/mess/drivers/radio86.*",
-	MAME_DIR .. "src/mess/machine/radio86.*", 
+	MAME_DIR .. "src/mess/drivers/apogee.c",    
+	MAME_DIR .. "src/mess/drivers/mikrosha.c",  
+	MAME_DIR .. "src/mess/drivers/partner.c",
+	MAME_DIR .. "src/mess/machine/partner.c", 
+	MAME_DIR .. "src/mess/drivers/radio86.c",
+	MAME_DIR .. "src/mess/machine/radio86.c", 
 }
 
 createMESSProjects(_target, _subtarget, "rca")
 files {               
-	MAME_DIR .. "src/mess/drivers/microkit.*",  
-	MAME_DIR .. "src/mess/drivers/studio2.*",   
-	MAME_DIR .. "src/mess/drivers/vip.*",       
+	MAME_DIR .. "src/mess/drivers/microkit.c",  
+	MAME_DIR .. "src/mess/drivers/studio2.c",   
+	MAME_DIR .. "src/mess/drivers/vip.c",       
 }
 
 createMESSProjects(_target, _subtarget, "rm")
 files {                
-	MAME_DIR .. "src/mess/drivers/rm380z.*",
-	MAME_DIR .. "src/mess/machine/rm380z.*",
-	MAME_DIR .. "src/mess/video/rm380z.*", 
-	MAME_DIR .. "src/mess/drivers/rmnimbus.*",
-	MAME_DIR .. "src/mess/machine/rmnimbus.*",
-	MAME_DIR .. "src/mess/video/rmnimbus.*",
-	MAME_DIR .. "src/mess/machine/rmnkbd.*", 
+	MAME_DIR .. "src/mess/drivers/rm380z.c",
+	MAME_DIR .. "src/mess/machine/rm380z.c",
+	MAME_DIR .. "src/mess/video/rm380z.c", 
+	MAME_DIR .. "src/mess/drivers/rmnimbus.c",
+	MAME_DIR .. "src/mess/machine/rmnimbus.c",
+	MAME_DIR .. "src/mess/video/rmnimbus.c",
+	MAME_DIR .. "src/mess/machine/rmnkbd.c", 
 }
 
 createMESSProjects(_target, _subtarget, "robotron")
 files {          
-	MAME_DIR .. "src/mess/drivers/a5105.*",     
-	MAME_DIR .. "src/mess/drivers/a51xx.*",     
-	MAME_DIR .. "src/mess/drivers/a7150.*",     
-	MAME_DIR .. "src/mess/drivers/k1003.*",     
-	MAME_DIR .. "src/mess/drivers/k8915.*",     
-	MAME_DIR .. "src/mess/drivers/rt1715.*",    
-	MAME_DIR .. "src/mess/drivers/z1013.*",     
-	MAME_DIR .. "src/mess/drivers/z9001.*",     
+	MAME_DIR .. "src/mess/drivers/a5105.c",     
+	MAME_DIR .. "src/mess/drivers/a51xx.c",     
+	MAME_DIR .. "src/mess/drivers/a7150.c",     
+	MAME_DIR .. "src/mess/drivers/k1003.c",     
+	MAME_DIR .. "src/mess/drivers/k8915.c",     
+	MAME_DIR .. "src/mess/drivers/rt1715.c",    
+	MAME_DIR .. "src/mess/drivers/z1013.c",     
+	MAME_DIR .. "src/mess/drivers/z9001.c",     
 }
 
 createMESSProjects(_target, _subtarget, "roland")
 files {            
-	MAME_DIR .. "src/mess/drivers/rmt32.*",     
-	MAME_DIR .. "src/mess/drivers/rd110.*",     
-	MAME_DIR .. "src/mess/drivers/rsc55.*",     
-	MAME_DIR .. "src/mess/drivers/tb303.*",     
+	MAME_DIR .. "src/mess/drivers/rmt32.c",     
+	MAME_DIR .. "src/mess/drivers/rd110.c",     
+	MAME_DIR .. "src/mess/drivers/rsc55.c",     
+	MAME_DIR .. "src/mess/drivers/tb303.c",     
 }
 
 createMESSProjects(_target, _subtarget, "rockwell")
 files {          
-	MAME_DIR .. "src/mess/drivers/aim65.*",
-	MAME_DIR .. "src/mess/machine/aim65.*", 
-	MAME_DIR .. "src/mess/drivers/aim65_40.*",  
+	MAME_DIR .. "src/mess/drivers/aim65.c",
+	MAME_DIR .. "src/mess/machine/aim65.c", 
+	MAME_DIR .. "src/mess/drivers/aim65_40.c",  
 }
 
 createMESSProjects(_target, _subtarget, "sage")
 files {              
-	MAME_DIR .. "src/mess/drivers/sage2.*",     
+	MAME_DIR .. "src/mess/drivers/sage2.c",     
 }
 
 createMESSProjects(_target, _subtarget, "samcoupe")
 files {          
-	MAME_DIR .. "src/mess/drivers/samcoupe.*",
-	MAME_DIR .. "src/mess/machine/samcoupe.*",
-	MAME_DIR .. "src/mess/video/samcoupe.*", 
+	MAME_DIR .. "src/mess/drivers/samcoupe.c",
+	MAME_DIR .. "src/mess/machine/samcoupe.c",
+	MAME_DIR .. "src/mess/video/samcoupe.c", 
 }
 
 createMESSProjects(_target, _subtarget, "samsung")
 files {           
-	MAME_DIR .. "src/mess/drivers/spc1000.*",   
+	MAME_DIR .. "src/mess/drivers/spc1000.c",   
 }
 
 createMESSProjects(_target, _subtarget, "sanyo")
 files {             
-	MAME_DIR .. "src/mess/drivers/mbc200.*",    
-	MAME_DIR .. "src/mess/drivers/mbc55x.*",    
-	MAME_DIR .. "src/mess/machine/mbc55x.*",    
-	MAME_DIR .. "src/mess/video/mbc55x.*",      
-	MAME_DIR .. "src/mess/drivers/phc25.*",     
+	MAME_DIR .. "src/mess/drivers/mbc200.c",    
+	MAME_DIR .. "src/mess/drivers/mbc55x.c",    
+	MAME_DIR .. "src/mess/machine/mbc55x.c",    
+	MAME_DIR .. "src/mess/video/mbc55x.c",      
+	MAME_DIR .. "src/mess/drivers/phc25.c",     
 }
 
 createMESSProjects(_target, _subtarget, "sega")
 files {              
-	MAME_DIR .. "src/mess/drivers/dccons.*",
-	MAME_DIR .. "src/mess/machine/dccons.*", 
-	MAME_DIR .. "src/mess/drivers/megadriv.*",  
-	MAME_DIR .. "src/mess/drivers/saturn.*",    
-	MAME_DIR .. "src/mess/drivers/segapico.*",  
-	MAME_DIR .. "src/mess/drivers/sg1000.*",    
-	MAME_DIR .. "src/mess/drivers/sms.*",
-	MAME_DIR .. "src/mess/machine/sms.*", 
-	MAME_DIR .. "src/mess/drivers/svmu.*",      
-	MAME_DIR .. "src/mess/machine/mega32x.*",   
-	MAME_DIR .. "src/mess/machine/megacd.*",    
-	MAME_DIR .. "src/mess/machine/megacdcd.*",  
+	MAME_DIR .. "src/mess/drivers/dccons.c",
+	MAME_DIR .. "src/mess/machine/dccons.c", 
+	MAME_DIR .. "src/mess/drivers/megadriv.c",  
+	MAME_DIR .. "src/mess/drivers/saturn.c",    
+	MAME_DIR .. "src/mess/drivers/segapico.c",  
+	MAME_DIR .. "src/mess/drivers/sg1000.c",    
+	MAME_DIR .. "src/mess/drivers/sms.c",
+	MAME_DIR .. "src/mess/machine/sms.c", 
+	MAME_DIR .. "src/mess/drivers/svmu.c",      
+	MAME_DIR .. "src/mess/machine/mega32x.c",   
+	MAME_DIR .. "src/mess/machine/megacd.c",    
+	MAME_DIR .. "src/mess/machine/megacdcd.c",  
 }
 
 createMESSProjects(_target, _subtarget, "sgi")
 files {               
-	MAME_DIR .. "src/mess/machine/sgi.*",       
-	MAME_DIR .. "src/mess/drivers/sgi_ip2.*",   
-	MAME_DIR .. "src/mess/drivers/sgi_ip6.*",   
-	MAME_DIR .. "src/mess/drivers/ip20.*",      
-	MAME_DIR .. "src/mess/drivers/ip22.*",      
-	MAME_DIR .. "src/mess/video/newport.*",     
+	MAME_DIR .. "src/mess/machine/sgi.c",       
+	MAME_DIR .. "src/mess/drivers/sgi_ip2.c",   
+	MAME_DIR .. "src/mess/drivers/sgi_ip6.c",   
+	MAME_DIR .. "src/mess/drivers/ip20.c",      
+	MAME_DIR .. "src/mess/drivers/ip22.c",      
+	MAME_DIR .. "src/mess/video/newport.c",     
 }
 
 createMESSProjects(_target, _subtarget, "sharp")
 files {             
-	MAME_DIR .. "src/mess/video/mz700.*",       
-	MAME_DIR .. "src/mess/drivers/mz700.*",     
-	MAME_DIR .. "src/mess/drivers/pc1500.*",    
-	MAME_DIR .. "src/mess/drivers/pocketc.*",   
-	MAME_DIR .. "src/mess/video/pc1401.*",      
-	MAME_DIR .. "src/mess/machine/pc1401.*",    
-	MAME_DIR .. "src/mess/video/pc1403.*",      
-	MAME_DIR .. "src/mess/machine/pc1403.*",    
-	MAME_DIR .. "src/mess/video/pc1350.*",      
-	MAME_DIR .. "src/mess/machine/pc1350.*",    
-	MAME_DIR .. "src/mess/video/pc1251.*",      
-	MAME_DIR .. "src/mess/machine/pc1251.*",    
-	MAME_DIR .. "src/mess/video/pocketc.*",     
-	MAME_DIR .. "src/mess/machine/mz700.*",     
-	MAME_DIR .. "src/mess/drivers/x68k.*",      
-	MAME_DIR .. "src/mess/video/x68k.*",        
-	MAME_DIR .. "src/mess/machine/x68k_hdc.*",  
-	MAME_DIR .. "src/mess/machine/x68k_kbd.*",  
-	MAME_DIR .. "src/mess/drivers/mz80.*",      
-	MAME_DIR .. "src/mess/video/mz80.*",        
-	MAME_DIR .. "src/mess/machine/mz80.*",      
-	MAME_DIR .. "src/mess/drivers/mz2000.*",    
-	MAME_DIR .. "src/mess/drivers/x1.*",        
-	MAME_DIR .. "src/mess/machine/x1.*",        
-	MAME_DIR .. "src/mess/drivers/x1twin.*",    
-	MAME_DIR .. "src/mess/drivers/mz2500.*",    
-	MAME_DIR .. "src/mess/drivers/mz3500.*",    
-	MAME_DIR .. "src/mess/drivers/pce220.*",    
-	MAME_DIR .. "src/mess/machine/pce220_ser.*",
-	MAME_DIR .. "src/mess/drivers/mz6500.*",    
-	MAME_DIR .. "src/mess/drivers/zaurus.*",    
+	MAME_DIR .. "src/mess/video/mz700.c",       
+	MAME_DIR .. "src/mess/drivers/mz700.c",     
+	MAME_DIR .. "src/mess/drivers/pc1500.c",    
+	MAME_DIR .. "src/mess/drivers/pocketc.c",   
+	MAME_DIR .. "src/mess/video/pc1401.c",      
+	MAME_DIR .. "src/mess/machine/pc1401.c",    
+	MAME_DIR .. "src/mess/video/pc1403.c",      
+	MAME_DIR .. "src/mess/machine/pc1403.c",    
+	MAME_DIR .. "src/mess/video/pc1350.c",      
+	MAME_DIR .. "src/mess/machine/pc1350.c",    
+	MAME_DIR .. "src/mess/video/pc1251.c",      
+	MAME_DIR .. "src/mess/machine/pc1251.c",    
+	MAME_DIR .. "src/mess/video/pocketc.c",     
+	MAME_DIR .. "src/mess/machine/mz700.c",     
+	MAME_DIR .. "src/mess/drivers/x68k.c",      
+	MAME_DIR .. "src/mess/video/x68k.c",        
+	MAME_DIR .. "src/mess/machine/x68k_hdc.c",  
+	MAME_DIR .. "src/mess/machine/x68k_kbd.c",  
+	MAME_DIR .. "src/mess/drivers/mz80.c",      
+	MAME_DIR .. "src/mess/video/mz80.c",        
+	MAME_DIR .. "src/mess/machine/mz80.c",      
+	MAME_DIR .. "src/mess/drivers/mz2000.c",    
+	MAME_DIR .. "src/mess/drivers/x1.c",        
+	MAME_DIR .. "src/mess/machine/x1.c",        
+	MAME_DIR .. "src/mess/drivers/x1twin.c",    
+	MAME_DIR .. "src/mess/drivers/mz2500.c",    
+	MAME_DIR .. "src/mess/drivers/mz3500.c",    
+	MAME_DIR .. "src/mess/drivers/pce220.c",    
+	MAME_DIR .. "src/mess/machine/pce220_ser.c",
+	MAME_DIR .. "src/mess/drivers/mz6500.c",    
+	MAME_DIR .. "src/mess/drivers/zaurus.c",    
 }
 
 createMESSProjects(_target, _subtarget, "sinclair")
 files {          
-	MAME_DIR .. "src/mess/video/spectrum.*",    
-	MAME_DIR .. "src/mess/video/timex.*",       
-	MAME_DIR .. "src/mess/video/zx.*",          
-	MAME_DIR .. "src/mess/drivers/zx.*",        
-	MAME_DIR .. "src/mess/machine/zx.*",        
-	MAME_DIR .. "src/mess/drivers/spectrum.*",  
-	MAME_DIR .. "src/mess/drivers/spec128.*",   
-	MAME_DIR .. "src/mess/drivers/timex.*",     
-	MAME_DIR .. "src/mess/drivers/specpls3.*",  
-	MAME_DIR .. "src/mess/drivers/scorpion.*",  
-	MAME_DIR .. "src/mess/drivers/atm.*",       
-	MAME_DIR .. "src/mess/drivers/pentagon.*",  
-	MAME_DIR .. "src/mess/machine/beta.*",      
-	MAME_DIR .. "src/mess/machine/spec_snqk.*", 
-	MAME_DIR .. "src/mess/drivers/ql.*",        
-	MAME_DIR .. "src/mess/machine/qimi.*",      
-	MAME_DIR .. "src/mess/video/zx8301.*",      
-	MAME_DIR .. "src/mess/machine/zx8302.*",    
+	MAME_DIR .. "src/mess/video/spectrum.c",    
+	MAME_DIR .. "src/mess/video/timex.c",       
+	MAME_DIR .. "src/mess/video/zx.c",          
+	MAME_DIR .. "src/mess/drivers/zx.c",        
+	MAME_DIR .. "src/mess/machine/zx.c",        
+	MAME_DIR .. "src/mess/drivers/spectrum.c",  
+	MAME_DIR .. "src/mess/drivers/spec128.c",   
+	MAME_DIR .. "src/mess/drivers/timex.c",     
+	MAME_DIR .. "src/mess/drivers/specpls3.c",  
+	MAME_DIR .. "src/mess/drivers/scorpion.c",  
+	MAME_DIR .. "src/mess/drivers/atm.c",       
+	MAME_DIR .. "src/mess/drivers/pentagon.c",  
+	MAME_DIR .. "src/mess/machine/beta.c",      
+	MAME_DIR .. "src/mess/machine/spec_snqk.c", 
+	MAME_DIR .. "src/mess/drivers/ql.c",        
+	MAME_DIR .. "src/mess/machine/qimi.c",      
+	MAME_DIR .. "src/mess/video/zx8301.c",      
+	MAME_DIR .. "src/mess/machine/zx8302.c",    
 }
 
 createMESSProjects(_target, _subtarget, "siemens")
 files {           
-	MAME_DIR .. "src/mess/drivers/pcd.*",       
-	MAME_DIR .. "src/mess/machine/pcd_kbd.*",   
+	MAME_DIR .. "src/mess/drivers/pcd.c",       
+	MAME_DIR .. "src/mess/machine/pcd_kbd.c",   
 }
 
 createMESSProjects(_target, _subtarget, "slicer")
 files {            
-	MAME_DIR .. "src/mess/drivers/slicer.*",    
+	MAME_DIR .. "src/mess/drivers/slicer.c",    
 }
 
 createMESSProjects(_target, _subtarget, "snk")
 files {               
-	MAME_DIR .. "src/mess/drivers/ng_aes.*",    
-	MAME_DIR .. "src/mess/drivers/ngp.*",
-	MAME_DIR .. "src/mess/video/k1ge.*", 
+	MAME_DIR .. "src/mess/drivers/ng_aes.c",    
+	MAME_DIR .. "src/mess/drivers/ngp.c",
+	MAME_DIR .. "src/mess/video/k1ge.c", 
 }
 
 createMESSProjects(_target, _subtarget, "sony")
 files {              
-	MAME_DIR .. "src/mess/drivers/pockstat.*",
-	MAME_DIR .. "src/mess/drivers/psx.*",
-	MAME_DIR .. "src/mess/machine/psxcd.*", 
-	MAME_DIR .. "src/mess/drivers/pve500.*",    
-	MAME_DIR .. "src/mess/drivers/smc777.*",    
+	MAME_DIR .. "src/mess/drivers/pockstat.c",
+	MAME_DIR .. "src/mess/drivers/psx.c",
+	MAME_DIR .. "src/mess/machine/psxcd.c", 
+	MAME_DIR .. "src/mess/drivers/pve500.c",    
+	MAME_DIR .. "src/mess/drivers/smc777.c",    
 }
 
 createMESSProjects(_target, _subtarget, "sord")
 files {              
-	MAME_DIR .. "src/mess/drivers/m5.*",        
+	MAME_DIR .. "src/mess/drivers/m5.c",        
 }
 
 createMESSProjects(_target, _subtarget, "special")
 files {           
-	MAME_DIR .. "src/mess/drivers/special.*",
-	MAME_DIR .. "src/mess/audio/specimx_snd.*",
-	MAME_DIR .. "src/mess/machine/special.*",
-	MAME_DIR .. "src/mess/video/special.*", 
+	MAME_DIR .. "src/mess/drivers/special.c",
+	MAME_DIR .. "src/mess/audio/specimx_snd.c",
+	MAME_DIR .. "src/mess/machine/special.c",
+	MAME_DIR .. "src/mess/video/special.c", 
 }
 
 createMESSProjects(_target, _subtarget, "sun")
 files {               
-	MAME_DIR .. "src/mess/drivers/sun1.*",      
-	MAME_DIR .. "src/mess/drivers/sun2.*",      
-	MAME_DIR .. "src/mess/drivers/sun3.*",      
-	MAME_DIR .. "src/mess/drivers/sun4.*",      
+	MAME_DIR .. "src/mess/drivers/sun1.c",      
+	MAME_DIR .. "src/mess/drivers/sun2.c",      
+	MAME_DIR .. "src/mess/drivers/sun3.c",      
+	MAME_DIR .. "src/mess/drivers/sun4.c",      
 }
 
 createMESSProjects(_target, _subtarget, "svi")
 files {               
-	MAME_DIR .. "src/mess/drivers/svi318.*",
-	MAME_DIR .. "src/mess/machine/svi318.*", 
+	MAME_DIR .. "src/mess/drivers/svi318.c",
+	MAME_DIR .. "src/mess/machine/svi318.c", 
 }
 
 createMESSProjects(_target, _subtarget, "svision")
 files {           
-	MAME_DIR .. "src/mess/drivers/svision.*",
-	MAME_DIR .. "src/mess/audio/svis_snd.*", 
+	MAME_DIR .. "src/mess/drivers/svision.c",
+	MAME_DIR .. "src/mess/audio/svis_snd.c", 
 }
 
 createMESSProjects(_target, _subtarget, "swtpc09")
 files {           
-	MAME_DIR .. "src/mess/drivers/swtpc09.*",
-	MAME_DIR .. "src/mess/machine/swtpc09.*", 
+	MAME_DIR .. "src/mess/drivers/swtpc09.c",
+	MAME_DIR .. "src/mess/machine/swtpc09.c", 
 }
 
 createMESSProjects(_target, _subtarget, "synertec")
 files {          
-	MAME_DIR .. "src/mess/drivers/sym1.*",      
+	MAME_DIR .. "src/mess/drivers/sym1.c",      
 }
 
 createMESSProjects(_target, _subtarget, "ta")
 files {                
-	MAME_DIR .. "src/mess/drivers/alphatro.*",  
+	MAME_DIR .. "src/mess/drivers/alphatro.c",  
 }
 
 createMESSProjects(_target, _subtarget, "tandberg")
 files {          
-	MAME_DIR .. "src/mess/drivers/tdv2324.*",   
+	MAME_DIR .. "src/mess/drivers/tdv2324.c",   
 }
 
 createMESSProjects(_target, _subtarget, "tangerin")
 files {          
-	MAME_DIR .. "src/mess/drivers/microtan.*",
-	MAME_DIR .. "src/mess/machine/microtan.*",
-	MAME_DIR .. "src/mess/video/microtan.*", 
-	MAME_DIR .. "src/mess/drivers/oric.*",
+	MAME_DIR .. "src/mess/drivers/microtan.c",
+	MAME_DIR .. "src/mess/machine/microtan.c",
+	MAME_DIR .. "src/mess/video/microtan.c", 
+	MAME_DIR .. "src/mess/drivers/oric.c",
 }
 
 createMESSProjects(_target, _subtarget, "tatung")
 files {            
-	MAME_DIR .. "src/mess/drivers/einstein.*",
-	MAME_DIR .. "src/mess/machine/einstein.*", 
+	MAME_DIR .. "src/mess/drivers/einstein.c",
+	MAME_DIR .. "src/mess/machine/einstein.c", 
 }
 
 createMESSProjects(_target, _subtarget, "teamconc")
 files {          
-	MAME_DIR .. "src/mess/drivers/comquest.*",
-	MAME_DIR .. "src/mess/video/comquest.*", 
+	MAME_DIR .. "src/mess/drivers/comquest.c",
+	MAME_DIR .. "src/mess/video/comquest.c", 
 }
 
 createMESSProjects(_target, _subtarget, "tektroni")
 files {          
-	MAME_DIR .. "src/mess/drivers/tek405x.*",   
-	MAME_DIR .. "src/mess/drivers/tek410x.*",   
+	MAME_DIR .. "src/mess/drivers/tek405x.c",   
+	MAME_DIR .. "src/mess/drivers/tek410x.c",   
 }
 
 createMESSProjects(_target, _subtarget, "telenova")
 files {          
-	MAME_DIR .. "src/mess/drivers/compis.*",
-	MAME_DIR .. "src/mess/machine/compiskb.*", 
+	MAME_DIR .. "src/mess/drivers/compis.c",
+	MAME_DIR .. "src/mess/machine/compiskb.c", 
 }
 
 createMESSProjects(_target, _subtarget, "telercas")
 files {          
-	MAME_DIR .. "src/mess/drivers/tmc1800.*",
-	MAME_DIR .. "src/mess/video/tmc1800.*", 
-	MAME_DIR .. "src/mess/drivers/tmc600.*",
-	MAME_DIR .. "src/mess/video/tmc600.*", 
-	MAME_DIR .. "src/mess/drivers/tmc2000e.*",  
+	MAME_DIR .. "src/mess/drivers/tmc1800.c",
+	MAME_DIR .. "src/mess/video/tmc1800.c", 
+	MAME_DIR .. "src/mess/drivers/tmc600.c",
+	MAME_DIR .. "src/mess/video/tmc600.c", 
+	MAME_DIR .. "src/mess/drivers/tmc2000e.c",  
 }
 
 createMESSProjects(_target, _subtarget, "televideo")
 files {         
-	MAME_DIR .. "src/mess/drivers/ts802.*",     
-	MAME_DIR .. "src/mess/drivers/ts803.*",     
-	MAME_DIR .. "src/mess/drivers/ts816.*",     
-	MAME_DIR .. "src/mess/drivers/tv950.*",     
+	MAME_DIR .. "src/mess/drivers/ts802.c",     
+	MAME_DIR .. "src/mess/drivers/ts803.c",     
+	MAME_DIR .. "src/mess/drivers/ts816.c",     
+	MAME_DIR .. "src/mess/drivers/tv950.c",     
 }
 
 createMESSProjects(_target, _subtarget, "tem")
 files {               
-	MAME_DIR .. "src/mess/drivers/tec1.*",      
+	MAME_DIR .. "src/mess/drivers/tec1.c",      
 }
 
 createMESSProjects(_target, _subtarget, "tesla")
 files {             
-	MAME_DIR .. "src/mess/drivers/ondra.*",
-	MAME_DIR .. "src/mess/machine/ondra.*",
-	MAME_DIR .. "src/mess/video/ondra.*", 
-	MAME_DIR .. "src/mess/drivers/pmd85.*",
-	MAME_DIR .. "src/mess/machine/pmd85.*",
-	MAME_DIR .. "src/mess/video/pmd85.*", 
-	MAME_DIR .. "src/mess/drivers/pmi80.*",     
-	MAME_DIR .. "src/mess/drivers/sapi1.*",     
+	MAME_DIR .. "src/mess/drivers/ondra.c",
+	MAME_DIR .. "src/mess/machine/ondra.c",
+	MAME_DIR .. "src/mess/video/ondra.c", 
+	MAME_DIR .. "src/mess/drivers/pmd85.c",
+	MAME_DIR .. "src/mess/machine/pmd85.c",
+	MAME_DIR .. "src/mess/video/pmd85.c", 
+	MAME_DIR .. "src/mess/drivers/pmi80.c",     
+	MAME_DIR .. "src/mess/drivers/sapi1.c",     
 }
 
 createMESSProjects(_target, _subtarget, "test")
 files {              
-	MAME_DIR .. "src/mess/drivers/test_t400.*", 
-	MAME_DIR .. "src/mess/drivers/zexall.*",    
+	MAME_DIR .. "src/mess/drivers/test_t400.c", 
+	MAME_DIR .. "src/mess/drivers/zexall.c",    
 }
 
 createMESSProjects(_target, _subtarget, "thomson")
 files {           
-	MAME_DIR .. "src/mess/drivers/thomson.*",
-	MAME_DIR .. "src/mess/machine/thomson.*",
-	MAME_DIR .. "src/mess/machine/thomflop.*",
-	MAME_DIR .. "src/mess/video/thomson.*", 
+	MAME_DIR .. "src/mess/drivers/thomson.c",
+	MAME_DIR .. "src/mess/machine/thomson.c",
+	MAME_DIR .. "src/mess/machine/thomflop.c",
+	MAME_DIR .. "src/mess/video/thomson.c", 
 }
 
 createMESSProjects(_target, _subtarget, "ti")
 files {                
-	MAME_DIR .. "src/mess/drivers/avigo.*",
-	MAME_DIR .. "src/mess/video/avigo.*", 
-	MAME_DIR .. "src/mess/drivers/cc40.*",      
-	MAME_DIR .. "src/mess/drivers/evmbug.*",    
-	MAME_DIR .. "src/mess/drivers/exelv.*",     
-	MAME_DIR .. "src/mess/drivers/geneve.*",    
-	MAME_DIR .. "src/mess/drivers/ticalc1x.*",  
-	MAME_DIR .. "src/mess/drivers/tispeak.*",   
-	MAME_DIR .. "src/mess/drivers/ti74.*",      
-	MAME_DIR .. "src/mess/drivers/ti85.*",
-	MAME_DIR .. "src/mess/machine/ti85.*",
-	MAME_DIR .. "src/mess/video/ti85.*", 
-	MAME_DIR .. "src/mess/drivers/ti89.*",      
-	MAME_DIR .. "src/mess/drivers/ti99_2.*",    
-	MAME_DIR .. "src/mess/drivers/ti99_4x.*",   
-	MAME_DIR .. "src/mess/drivers/ti99_4p.*",   
-	MAME_DIR .. "src/mess/drivers/ti99_8.*",    
-	MAME_DIR .. "src/mess/drivers/ti990_4.*",   
-	MAME_DIR .. "src/mess/drivers/ti990_10.*",  
-	MAME_DIR .. "src/mess/drivers/tm990189.*",  
-	MAME_DIR .. "src/mess/machine/ti99/990_dk.*", 
-	MAME_DIR .. "src/mess/machine/ti99/990_hd.*", 
-	MAME_DIR .. "src/mess/machine/ti99/990_tap.*", 
-	MAME_DIR .. "src/mess/machine/ti99/datamux.*", 
-	MAME_DIR .. "src/mess/machine/ti99/genboard.*", 
-	MAME_DIR .. "src/mess/machine/ti99/grom.*", 
-	MAME_DIR .. "src/mess/machine/ti99/gromport.*", 
-	MAME_DIR .. "src/mess/machine/ti99/handset.*", 
-	MAME_DIR .. "src/mess/machine/ti99/joyport.*", 
-	MAME_DIR .. "src/mess/machine/ti99/mapper8.*", 
-	MAME_DIR .. "src/mess/machine/ti99/mecmouse.*", 
-	MAME_DIR .. "src/mess/machine/ti99/speech8.*", 
-	MAME_DIR .. "src/mess/machine/ti99/videowrp.*", 
-	MAME_DIR .. "src/mess/video/733_asr.*",     
-	MAME_DIR .. "src/mess/video/911_vdt.*",     
-	MAME_DIR .. "src/mess/drivers/hh_tms1k.*",  
+	MAME_DIR .. "src/mess/drivers/avigo.c",
+	MAME_DIR .. "src/mess/video/avigo.c", 
+	MAME_DIR .. "src/mess/drivers/cc40.c",      
+	MAME_DIR .. "src/mess/drivers/evmbug.c",    
+	MAME_DIR .. "src/mess/drivers/exelv.c",     
+	MAME_DIR .. "src/mess/drivers/geneve.c",    
+	MAME_DIR .. "src/mess/drivers/ticalc1x.c",  
+	MAME_DIR .. "src/mess/drivers/tispeak.c",   
+	MAME_DIR .. "src/mess/drivers/ti74.c",      
+	MAME_DIR .. "src/mess/drivers/ti85.c",
+	MAME_DIR .. "src/mess/machine/ti85.c",
+	MAME_DIR .. "src/mess/video/ti85.c", 
+	MAME_DIR .. "src/mess/drivers/ti89.c",      
+	MAME_DIR .. "src/mess/drivers/ti99_2.c",    
+	MAME_DIR .. "src/mess/drivers/ti99_4x.c",   
+	MAME_DIR .. "src/mess/drivers/ti99_4p.c",   
+	MAME_DIR .. "src/mess/drivers/ti99_8.c",    
+	MAME_DIR .. "src/mess/drivers/ti990_4.c",   
+	MAME_DIR .. "src/mess/drivers/ti990_10.c",  
+	MAME_DIR .. "src/mess/drivers/tm990189.c",  
+	MAME_DIR .. "src/mess/machine/ti99/990_dk.c", 
+	MAME_DIR .. "src/mess/machine/ti99/990_hd.c", 
+	MAME_DIR .. "src/mess/machine/ti99/990_tap.c", 
+	MAME_DIR .. "src/mess/machine/ti99/datamux.c", 
+	MAME_DIR .. "src/mess/machine/ti99/genboard.c", 
+	MAME_DIR .. "src/mess/machine/ti99/grom.c", 
+	MAME_DIR .. "src/mess/machine/ti99/gromport.c", 
+	MAME_DIR .. "src/mess/machine/ti99/handset.c", 
+	MAME_DIR .. "src/mess/machine/ti99/joyport.c", 
+	MAME_DIR .. "src/mess/machine/ti99/mapper8.c", 
+	MAME_DIR .. "src/mess/machine/ti99/mecmouse.c", 
+	MAME_DIR .. "src/mess/machine/ti99/speech8.c", 
+	MAME_DIR .. "src/mess/machine/ti99/videowrp.c", 
+	MAME_DIR .. "src/mess/video/733_asr.c",     
+	MAME_DIR .. "src/mess/video/911_vdt.c",     
+	MAME_DIR .. "src/mess/drivers/hh_tms1k.c",  
 }
 
 createMESSProjects(_target, _subtarget, "tiger")
 files {             
-	MAME_DIR .. "src/mess/drivers/gamecom.*",
-	MAME_DIR .. "src/mess/machine/gamecom.*",
-	MAME_DIR .. "src/mess/video/gamecom.*", 
+	MAME_DIR .. "src/mess/drivers/gamecom.c",
+	MAME_DIR .. "src/mess/machine/gamecom.c",
+	MAME_DIR .. "src/mess/video/gamecom.c", 
 }
 
 createMESSProjects(_target, _subtarget, "tigertel")
 files {          
-	MAME_DIR .. "src/mess/drivers/gizmondo.*",
-	MAME_DIR .. "src/mess/machine/docg3.*", 
+	MAME_DIR .. "src/mess/drivers/gizmondo.c",
+	MAME_DIR .. "src/mess/machine/docg3.c", 
 }
 
 createMESSProjects(_target, _subtarget, "tiki")
 files {              
-	MAME_DIR .. "src/mess/drivers/tiki100.*",   
+	MAME_DIR .. "src/mess/drivers/tiki100.c",   
 }
 
 createMESSProjects(_target, _subtarget, "tomy")
 files {              
-	MAME_DIR .. "src/mess/drivers/tutor.*",     
+	MAME_DIR .. "src/mess/drivers/tutor.c",     
 }
 
 createMESSProjects(_target, _subtarget, "toshiba")
 files {           
-	MAME_DIR .. "src/mess/drivers/pasopia.*",   
-	MAME_DIR .. "src/mess/drivers/pasopia7.*",  
-	MAME_DIR .. "src/mess/drivers/paso1600.*",  
+	MAME_DIR .. "src/mess/drivers/pasopia.c",   
+	MAME_DIR .. "src/mess/drivers/pasopia7.c",  
+	MAME_DIR .. "src/mess/drivers/paso1600.c",  
 }
 
 createMESSProjects(_target, _subtarget, "trainer")
 files {           
-	MAME_DIR .. "src/mess/drivers/amico2k.*",   
-	MAME_DIR .. "src/mess/drivers/babbage.*",   
-	MAME_DIR .. "src/mess/drivers/bob85.*",     
-	MAME_DIR .. "src/mess/drivers/cvicny.*",    
-	MAME_DIR .. "src/mess/drivers/dolphunk.*",  
-	MAME_DIR .. "src/mess/drivers/instruct.*",  
-	MAME_DIR .. "src/mess/drivers/mk14.*",      
-	MAME_DIR .. "src/mess/drivers/pro80.*",     
-	MAME_DIR .. "src/mess/drivers/savia84.*",   
-	MAME_DIR .. "src/mess/drivers/selz80.*",    
-	MAME_DIR .. "src/mess/drivers/tk80.*",      
+	MAME_DIR .. "src/mess/drivers/amico2k.c",   
+	MAME_DIR .. "src/mess/drivers/babbage.c",   
+	MAME_DIR .. "src/mess/drivers/bob85.c",     
+	MAME_DIR .. "src/mess/drivers/cvicny.c",    
+	MAME_DIR .. "src/mess/drivers/dolphunk.c",  
+	MAME_DIR .. "src/mess/drivers/instruct.c",  
+	MAME_DIR .. "src/mess/drivers/mk14.c",      
+	MAME_DIR .. "src/mess/drivers/pro80.c",     
+	MAME_DIR .. "src/mess/drivers/savia84.c",   
+	MAME_DIR .. "src/mess/drivers/selz80.c",    
+	MAME_DIR .. "src/mess/drivers/tk80.c",      
 }
 
 createMESSProjects(_target, _subtarget, "trs")
 files {               
-	MAME_DIR .. "src/mess/drivers/coco12.*",    
-	MAME_DIR .. "src/mess/drivers/coco3.*",     
-	MAME_DIR .. "src/mess/drivers/dragon.*",    
-	MAME_DIR .. "src/mess/drivers/mc10.*",      
-	MAME_DIR .. "src/mess/machine/6883sam.*",   
-	MAME_DIR .. "src/mess/machine/coco.*",      
-	MAME_DIR .. "src/mess/machine/coco12.*",    
-	MAME_DIR .. "src/mess/machine/coco3.*",     
-	MAME_DIR .. "src/mess/machine/coco_vhd.*",  
-	MAME_DIR .. "src/mess/machine/dragon.*",    
-	MAME_DIR .. "src/mess/machine/dgnalpha.*",  
-	MAME_DIR .. "src/mess/video/gime.*",        
-	MAME_DIR .. "src/mess/drivers/trs80.*",
-	MAME_DIR .. "src/mess/machine/trs80.*",
-	MAME_DIR .. "src/mess/video/trs80.*", 
-	MAME_DIR .. "src/mess/drivers/trs80m2.*",
-	MAME_DIR .. "src/mess/machine/trs80m2kb.*", 
-	MAME_DIR .. "src/mess/drivers/tandy2k.*",
-	MAME_DIR .. "src/mess/machine/tandy2kb.*", 
+	MAME_DIR .. "src/mess/drivers/coco12.c",    
+	MAME_DIR .. "src/mess/drivers/coco3.c",     
+	MAME_DIR .. "src/mess/drivers/dragon.c",    
+	MAME_DIR .. "src/mess/drivers/mc10.c",      
+	MAME_DIR .. "src/mess/machine/6883sam.c",   
+	MAME_DIR .. "src/mess/machine/coco.c",      
+	MAME_DIR .. "src/mess/machine/coco12.c",    
+	MAME_DIR .. "src/mess/machine/coco3.c",     
+	MAME_DIR .. "src/mess/machine/coco_vhd.c",  
+	MAME_DIR .. "src/mess/machine/dragon.c",    
+	MAME_DIR .. "src/mess/machine/dgnalpha.c",  
+	MAME_DIR .. "src/mess/video/gime.c",        
+	MAME_DIR .. "src/mess/drivers/trs80.c",
+	MAME_DIR .. "src/mess/machine/trs80.c",
+	MAME_DIR .. "src/mess/video/trs80.c", 
+	MAME_DIR .. "src/mess/drivers/trs80m2.c",
+	MAME_DIR .. "src/mess/machine/trs80m2kb.c", 
+	MAME_DIR .. "src/mess/drivers/tandy2k.c",
+	MAME_DIR .. "src/mess/machine/tandy2kb.c", 
 }
 
 createMESSProjects(_target, _subtarget, "ultratec")
 files {          
-	MAME_DIR .. "src/mess/drivers/minicom.*",   
+	MAME_DIR .. "src/mess/drivers/minicom.c",   
 }
 
 createMESSProjects(_target, _subtarget, "unisys")
 files {            
-	MAME_DIR .. "src/mess/drivers/univac.*",    
+	MAME_DIR .. "src/mess/drivers/univac.c",    
 }
 
 createMESSProjects(_target, _subtarget, "veb")
 files {               
-	MAME_DIR .. "src/mess/drivers/chessmst.*",  
-	MAME_DIR .. "src/mess/drivers/kc.*",
-	MAME_DIR .. "src/mess/machine/kc.*",
-	MAME_DIR .. "src/mess/machine/kc_keyb.*",
-	MAME_DIR .. "src/mess/video/kc.*", 
-	MAME_DIR .. "src/mess/drivers/lc80.*",      
-	MAME_DIR .. "src/mess/drivers/mc80.*",
-	MAME_DIR .. "src/mess/machine/mc80.*",
-	MAME_DIR .. "src/mess/video/mc80.*", 
-	MAME_DIR .. "src/mess/drivers/poly880.*",   
-	MAME_DIR .. "src/mess/drivers/sc1.*",       
-	MAME_DIR .. "src/mess/drivers/sc2.*",       
+	MAME_DIR .. "src/mess/drivers/chessmst.c",  
+	MAME_DIR .. "src/mess/drivers/kc.c",
+	MAME_DIR .. "src/mess/machine/kc.c",
+	MAME_DIR .. "src/mess/machine/kc_keyb.c",
+	MAME_DIR .. "src/mess/video/kc.c", 
+	MAME_DIR .. "src/mess/drivers/lc80.c",      
+	MAME_DIR .. "src/mess/drivers/mc80.c",
+	MAME_DIR .. "src/mess/machine/mc80.c",
+	MAME_DIR .. "src/mess/video/mc80.c", 
+	MAME_DIR .. "src/mess/drivers/poly880.c",   
+	MAME_DIR .. "src/mess/drivers/sc1.c",       
+	MAME_DIR .. "src/mess/drivers/sc2.c",       
 }
 
 createMESSProjects(_target, _subtarget, "vidbrain")
 files {          
-	MAME_DIR .. "src/mess/drivers/vidbrain.*",
-	MAME_DIR .. "src/mess/video/uv201.*", 
+	MAME_DIR .. "src/mess/drivers/vidbrain.c",
+	MAME_DIR .. "src/mess/video/uv201.c", 
 }
 
 createMESSProjects(_target, _subtarget, "videoton")
 files {          
-	MAME_DIR .. "src/mess/drivers/tvc.*",
-	MAME_DIR .. "src/mess/audio/tvc_snd.*", 
+	MAME_DIR .. "src/mess/drivers/tvc.c",
+	MAME_DIR .. "src/mess/audio/tvc_snd.c", 
 }
 
 createMESSProjects(_target, _subtarget, "visual")
 files {            
-	MAME_DIR .. "src/mess/drivers/v1050.*",
-	MAME_DIR .. "src/mess/machine/v1050kb.*",
-	MAME_DIR .. "src/mess/video/v1050.*", 
+	MAME_DIR .. "src/mess/drivers/v1050.c",
+	MAME_DIR .. "src/mess/machine/v1050kb.c",
+	MAME_DIR .. "src/mess/video/v1050.c", 
 }
 
 createMESSProjects(_target, _subtarget, "votrax")
 files {            
-	MAME_DIR .. "src/mess/drivers/votrpss.*",   
-	MAME_DIR .. "src/mess/drivers/votrtnt.*",   
+	MAME_DIR .. "src/mess/drivers/votrpss.c",   
+	MAME_DIR .. "src/mess/drivers/votrtnt.c",   
 }
 
 createMESSProjects(_target, _subtarget, "vtech")
 files {             
-	MAME_DIR .. "src/mess/drivers/crvision.*",  
-	MAME_DIR .. "src/mess/drivers/geniusiq.*",  
-	MAME_DIR .. "src/mess/drivers/laser3k.*",   
-	MAME_DIR .. "src/mess/drivers/lcmate2.*",   
-	MAME_DIR .. "src/mess/drivers/pc4.*",
-	MAME_DIR .. "src/mess/video/pc4.*", 
-	MAME_DIR .. "src/mess/drivers/pc2000.*",    
-	MAME_DIR .. "src/mess/drivers/pitagjr.*",   
-	MAME_DIR .. "src/mess/drivers/prestige.*",  
-	MAME_DIR .. "src/mess/drivers/vtech1.*",    
-	MAME_DIR .. "src/mess/drivers/vtech2.*",
-	MAME_DIR .. "src/mess/machine/vtech2.*",
-	MAME_DIR .. "src/mess/video/vtech2.*", 
-	MAME_DIR .. "src/mess/drivers/socrates.*",
-	MAME_DIR .. "src/mess/audio/socrates.*", 
+	MAME_DIR .. "src/mess/drivers/crvision.c",  
+	MAME_DIR .. "src/mess/drivers/geniusiq.c",  
+	MAME_DIR .. "src/mess/drivers/laser3k.c",   
+	MAME_DIR .. "src/mess/drivers/lcmate2.c",   
+	MAME_DIR .. "src/mess/drivers/pc4.c",
+	MAME_DIR .. "src/mess/video/pc4.c", 
+	MAME_DIR .. "src/mess/drivers/pc2000.c",    
+	MAME_DIR .. "src/mess/drivers/pitagjr.c",   
+	MAME_DIR .. "src/mess/drivers/prestige.c",  
+	MAME_DIR .. "src/mess/drivers/vtech1.c",    
+	MAME_DIR .. "src/mess/drivers/vtech2.c",
+	MAME_DIR .. "src/mess/machine/vtech2.c",
+	MAME_DIR .. "src/mess/video/vtech2.c", 
+	MAME_DIR .. "src/mess/drivers/socrates.c",
+	MAME_DIR .. "src/mess/audio/socrates.c", 
 }
 
 createMESSProjects(_target, _subtarget, "wang")
 files {              
-	MAME_DIR .. "src/mess/drivers/wangpc.*",
-	MAME_DIR .. "src/mess/machine/wangpckb.*", 
+	MAME_DIR .. "src/mess/drivers/wangpc.c",
+	MAME_DIR .. "src/mess/machine/wangpckb.c", 
 }
 
 createMESSProjects(_target, _subtarget, "wavemate")
 files {          
-	MAME_DIR .. "src/mess/drivers/bullet.*",    
-	MAME_DIR .. "src/mess/drivers/jupiter.*",   
+	MAME_DIR .. "src/mess/drivers/bullet.c",    
+	MAME_DIR .. "src/mess/drivers/jupiter.c",   
 }
 
 createMESSProjects(_target, _subtarget, "xerox")
 files {             
-	MAME_DIR .. "src/mess/drivers/xerox820.*",
-	MAME_DIR .. "src/mess/machine/x820kb.*", 
-	MAME_DIR .. "src/mess/drivers/bigbord2.*",  
-	MAME_DIR .. "src/mess/drivers/alto2.*",     
+	MAME_DIR .. "src/mess/drivers/xerox820.c",
+	MAME_DIR .. "src/mess/machine/x820kb.c", 
+	MAME_DIR .. "src/mess/drivers/bigbord2.c",  
+	MAME_DIR .. "src/mess/drivers/alto2.c",     
 }
 
 createMESSProjects(_target, _subtarget, "xussrpc")
 files {           
-	MAME_DIR .. "src/mess/drivers/ec184x.*",    
-	MAME_DIR .. "src/mess/drivers/iskr103x.*",  
-	MAME_DIR .. "src/mess/drivers/mc1502.*",    
-	MAME_DIR .. "src/mess/drivers/poisk1.*",
-	MAME_DIR .. "src/mess/video/poisk1.*", 
+	MAME_DIR .. "src/mess/drivers/ec184x.c",    
+	MAME_DIR .. "src/mess/drivers/iskr103x.c",  
+	MAME_DIR .. "src/mess/drivers/mc1502.c",    
+	MAME_DIR .. "src/mess/drivers/poisk1.c",
+	MAME_DIR .. "src/mess/video/poisk1.c", 
 }
 
 createMESSProjects(_target, _subtarget, "yamaha")
 files {            
-	MAME_DIR .. "src/mess/drivers/ymmu100.*",   
-	MAME_DIR .. "src/mess/drivers/fb01.*",      
+	MAME_DIR .. "src/mess/drivers/ymmu100.c",   
+	MAME_DIR .. "src/mess/drivers/fb01.c",      
 }
 
 createMESSProjects(_target, _subtarget, "zenith")
 files {            
-	MAME_DIR .. "src/mess/drivers/z100.*",      
+	MAME_DIR .. "src/mess/drivers/z100.c",      
 }
 
 createMESSProjects(_target, _subtarget, "zpa")
 files {               
-	MAME_DIR .. "src/mess/drivers/iq151.*",     
+	MAME_DIR .. "src/mess/drivers/iq151.c",     
 }
 
 createMESSProjects(_target, _subtarget, "zvt")
 files {               
-	MAME_DIR .. "src/mess/drivers/pp01.*",
-	MAME_DIR .. "src/mess/machine/pp01.*",
-	MAME_DIR .. "src/mess/video/pp01.*", 
+	MAME_DIR .. "src/mess/drivers/pp01.c",
+	MAME_DIR .. "src/mess/machine/pp01.c",
+	MAME_DIR .. "src/mess/video/pp01.c", 
 }
 
 createMESSProjects(_target, _subtarget, "skeleton")
 files {          
-	MAME_DIR .. "src/mess/drivers/alphasma.*",  
-	MAME_DIR .. "src/mess/drivers/ampro.*",     
-	MAME_DIR .. "src/mess/drivers/amust.*",     
-	MAME_DIR .. "src/mess/drivers/applix.*",    
-	MAME_DIR .. "src/mess/drivers/attache.*",   
-	MAME_DIR .. "src/mess/drivers/ax20.*",      
-	MAME_DIR .. "src/mess/drivers/beehive.*",   
-	MAME_DIR .. "src/mess/drivers/binbug.*",    
-	MAME_DIR .. "src/mess/drivers/besta.*",     
-	MAME_DIR .. "src/mess/drivers/bitgraph.*",  
-	MAME_DIR .. "src/mess/drivers/br8641.*",    
-	MAME_DIR .. "src/mess/drivers/busicom.*",
-	MAME_DIR .. "src/mess/video/busicom.*", 
-	MAME_DIR .. "src/mess/drivers/chaos.*",     
-	MAME_DIR .. "src/mess/drivers/chesstrv.*",  
-	MAME_DIR .. "src/mess/drivers/cd2650.*",    
-	MAME_DIR .. "src/mess/drivers/cdc721.*",    
-	MAME_DIR .. "src/mess/drivers/codata.*",    
-	MAME_DIR .. "src/mess/drivers/cortex.*",    
-	MAME_DIR .. "src/mess/drivers/cosmicos.*",  
-	MAME_DIR .. "src/mess/drivers/cp1.*",       
-	MAME_DIR .. "src/mess/drivers/cxhumax.*",   
-	MAME_DIR .. "src/mess/drivers/czk80.*",     
-	MAME_DIR .. "src/mess/drivers/d6800.*",     
-	MAME_DIR .. "src/mess/drivers/d6809.*",     
-	MAME_DIR .. "src/mess/drivers/digel804.*",  
-	MAME_DIR .. "src/mess/drivers/dim68k.*",    
-	MAME_DIR .. "src/mess/drivers/dm7000.*",    
-	MAME_DIR .. "src/mess/drivers/dmv.*",
-	MAME_DIR .. "src/mess/machine/dmv_keyb.*", 
-	MAME_DIR .. "src/mess/drivers/dps1.*",      
-	MAME_DIR .. "src/mess/drivers/dsb46.*",     
-	MAME_DIR .. "src/mess/drivers/dual68.*",    
-	MAME_DIR .. "src/mess/drivers/eacc.*",      
-	MAME_DIR .. "src/mess/drivers/elwro800.*",  
-	MAME_DIR .. "src/mess/drivers/eti660.*",    
-	MAME_DIR .. "src/mess/drivers/excali64.*",  
-	MAME_DIR .. "src/mess/drivers/fanucs15.*",  
-	MAME_DIR .. "src/mess/drivers/fanucspmg.*", 
-	MAME_DIR .. "src/mess/drivers/fc100.*",     
-	MAME_DIR .. "src/mess/drivers/fk1.*",       
-	MAME_DIR .. "src/mess/drivers/ft68m.*",     
-	MAME_DIR .. "src/mess/drivers/gamate.*",
-	MAME_DIR .. "src/mess/audio/gamate.*", 
-	MAME_DIR .. "src/mess/drivers/gameking.*",  
-	MAME_DIR .. "src/mess/drivers/gimix.*",     
-	MAME_DIR .. "src/mess/drivers/grfd2301.*",  
-	MAME_DIR .. "src/mess/drivers/harriet.*",   
-	MAME_DIR .. "src/mess/drivers/hprot1.*",    
-	MAME_DIR .. "src/mess/drivers/hpz80unk.*",  
-	MAME_DIR .. "src/mess/drivers/ht68k.*",     
-	MAME_DIR .. "src/mess/drivers/hunter2.*", 
-	MAME_DIR .. "src/emu/machine/nsc810.*", 
-	MAME_DIR .. "src/mess/drivers/ibm6580.*",   
-	MAME_DIR .. "src/mess/drivers/ie15.*",
-	MAME_DIR .. "src/mess/machine/ie15_kbd.*", 
-	MAME_DIR .. "src/mess/drivers/if800.*",     
-	MAME_DIR .. "src/mess/drivers/imsai.*",     
-	MAME_DIR .. "src/mess/drivers/indiana.*",   
-	MAME_DIR .. "src/mess/drivers/itt3030.*",   
-	MAME_DIR .. "src/mess/drivers/jade.*",      
-	MAME_DIR .. "src/mess/drivers/jonos.*",     
-	MAME_DIR .. "src/mess/drivers/konin.*",     
-	MAME_DIR .. "src/mess/drivers/leapster.*",  
-	MAME_DIR .. "src/mess/drivers/lft.*",       
-	MAME_DIR .. "src/mess/drivers/lola8a.*",    
-	MAME_DIR .. "src/mess/drivers/m79152pc.*",  
-	MAME_DIR .. "src/mess/drivers/mccpm.*",     
-	MAME_DIR .. "src/mess/drivers/mes.*",       
-	MAME_DIR .. "src/mess/drivers/mice.*",      
-	MAME_DIR .. "src/mess/drivers/micronic.*",  
-	MAME_DIR .. "src/mess/drivers/mini2440.*",  
-	MAME_DIR .. "src/mess/drivers/mmd1.*",      
-	MAME_DIR .. "src/mess/drivers/mod8.*",      
-	MAME_DIR .. "src/mess/drivers/modellot.*",  
-	MAME_DIR .. "src/mess/drivers/molecular.*", 
-	MAME_DIR .. "src/mess/drivers/ms0515.*",    
-	MAME_DIR .. "src/mess/drivers/ms9540.*",    
-	MAME_DIR .. "src/mess/drivers/mstation.*",  
-	MAME_DIR .. "src/mess/drivers/mx2178.*",    
-	MAME_DIR .. "src/mess/drivers/mycom.*",     
-	MAME_DIR .. "src/mess/drivers/myvision.*",  
-	MAME_DIR .. "src/mess/drivers/ngen.*",
-	MAME_DIR .. "src/mess/machine/ngen_kb.*", 
-	MAME_DIR .. "src/mess/drivers/octopus.*",   
-	MAME_DIR .. "src/mess/drivers/onyx.*",      
-	MAME_DIR .. "src/mess/drivers/okean240.*",  
-	MAME_DIR .. "src/mess/drivers/p8k.*",       
-	MAME_DIR .. "src/mess/drivers/pegasus.*",   
-	MAME_DIR .. "src/mess/drivers/pencil2.*",   
-	MAME_DIR .. "src/mess/drivers/pes.*",       
-	MAME_DIR .. "src/mess/drivers/pipbug.*",    
-	MAME_DIR .. "src/mess/drivers/plan80.*",    
-	MAME_DIR .. "src/mess/drivers/pm68k.*",     
-	MAME_DIR .. "src/mess/drivers/poly.*",      
-	MAME_DIR .. "src/mess/drivers/pt68k4.*",    
-	MAME_DIR .. "src/mess/drivers/ptcsol.*",    
-	MAME_DIR .. "src/mess/drivers/pulsar.*",    
-	MAME_DIR .. "src/mess/drivers/pv9234.*",    
-	MAME_DIR .. "src/mess/drivers/qtsbc.*",     
-	MAME_DIR .. "src/mess/drivers/rvoice.*",    
-	MAME_DIR .. "src/mess/drivers/sacstate.*",  
-	MAME_DIR .. "src/mess/drivers/sbrain.*",    
-	MAME_DIR .. "src/mess/drivers/seattle.*",   
-	MAME_DIR .. "src/mess/drivers/sh4robot.*",  
-	MAME_DIR .. "src/mess/drivers/softbox.*",   
-	MAME_DIR .. "src/mess/drivers/swtpc.*",     
-	MAME_DIR .. "src/mess/drivers/sys2900.*",   
-	MAME_DIR .. "src/mess/drivers/systec.*",    
-	MAME_DIR .. "src/mess/drivers/tavernie.*",  
-	MAME_DIR .. "src/mess/drivers/tecnbras.*",  
-	MAME_DIR .. "src/mess/drivers/terak.*",     
-	MAME_DIR .. "src/mess/drivers/ti630.*",     
-	MAME_DIR .. "src/mess/drivers/tsispch.*",   
-	MAME_DIR .. "src/mess/drivers/unistar.*",   
-	MAME_DIR .. "src/mess/drivers/v6809.*",     
-	MAME_DIR .. "src/mess/drivers/vector4.*",   
-	MAME_DIR .. "src/mess/drivers/vii.*",       
-	MAME_DIR .. "src/mess/drivers/wicat.*",     
-	MAME_DIR .. "src/mess/drivers/xor100.*",    
-	MAME_DIR .. "src/mess/drivers/xavix.*",     
-	MAME_DIR .. "src/mess/drivers/zorba.*",     
+	MAME_DIR .. "src/mess/drivers/alphasma.c",  
+	MAME_DIR .. "src/mess/drivers/ampro.c",     
+	MAME_DIR .. "src/mess/drivers/amust.c",     
+	MAME_DIR .. "src/mess/drivers/applix.c",    
+	MAME_DIR .. "src/mess/drivers/attache.c",   
+	MAME_DIR .. "src/mess/drivers/ax20.c",      
+	MAME_DIR .. "src/mess/drivers/beehive.c",   
+	MAME_DIR .. "src/mess/drivers/binbug.c",    
+	MAME_DIR .. "src/mess/drivers/besta.c",     
+	MAME_DIR .. "src/mess/drivers/bitgraph.c",  
+	MAME_DIR .. "src/mess/drivers/br8641.c",    
+	MAME_DIR .. "src/mess/drivers/busicom.c",
+	MAME_DIR .. "src/mess/video/busicom.c", 
+	MAME_DIR .. "src/mess/drivers/chaos.c",     
+	MAME_DIR .. "src/mess/drivers/chesstrv.c",  
+	MAME_DIR .. "src/mess/drivers/cd2650.c",    
+	MAME_DIR .. "src/mess/drivers/cdc721.c",    
+	MAME_DIR .. "src/mess/drivers/codata.c",    
+	MAME_DIR .. "src/mess/drivers/cortex.c",    
+	MAME_DIR .. "src/mess/drivers/cosmicos.c",  
+	MAME_DIR .. "src/mess/drivers/cp1.c",       
+	MAME_DIR .. "src/mess/drivers/cxhumax.c",   
+	MAME_DIR .. "src/mess/drivers/czk80.c",     
+	MAME_DIR .. "src/mess/drivers/d6800.c",     
+	MAME_DIR .. "src/mess/drivers/d6809.c",     
+	MAME_DIR .. "src/mess/drivers/digel804.c",  
+	MAME_DIR .. "src/mess/drivers/dim68k.c",    
+	MAME_DIR .. "src/mess/drivers/dm7000.c",    
+	MAME_DIR .. "src/mess/drivers/dmv.c",
+	MAME_DIR .. "src/mess/machine/dmv_keyb.c", 
+	MAME_DIR .. "src/mess/drivers/dps1.c",      
+	MAME_DIR .. "src/mess/drivers/dsb46.c",     
+	MAME_DIR .. "src/mess/drivers/dual68.c",    
+	MAME_DIR .. "src/mess/drivers/eacc.c",      
+	MAME_DIR .. "src/mess/drivers/elwro800.c",  
+	MAME_DIR .. "src/mess/drivers/eti660.c",    
+	MAME_DIR .. "src/mess/drivers/excali64.c",  
+	MAME_DIR .. "src/mess/drivers/fanucs15.c",  
+	MAME_DIR .. "src/mess/drivers/fanucspmg.c", 
+	MAME_DIR .. "src/mess/drivers/fc100.c",     
+	MAME_DIR .. "src/mess/drivers/fk1.c",       
+	MAME_DIR .. "src/mess/drivers/ft68m.c",     
+	MAME_DIR .. "src/mess/drivers/gamate.c",
+	MAME_DIR .. "src/mess/audio/gamate.c", 
+	MAME_DIR .. "src/mess/drivers/gameking.c",  
+	MAME_DIR .. "src/mess/drivers/gimix.c",     
+	MAME_DIR .. "src/mess/drivers/grfd2301.c",  
+	MAME_DIR .. "src/mess/drivers/harriet.c",   
+	MAME_DIR .. "src/mess/drivers/hprot1.c",    
+	MAME_DIR .. "src/mess/drivers/hpz80unk.c",  
+	MAME_DIR .. "src/mess/drivers/ht68k.c",     
+	MAME_DIR .. "src/mess/drivers/hunter2.c", 
+	MAME_DIR .. "src/emu/machine/nsc810.c", 
+	MAME_DIR .. "src/mess/drivers/ibm6580.c",   
+	MAME_DIR .. "src/mess/drivers/ie15.c",
+	MAME_DIR .. "src/mess/machine/ie15_kbd.c", 
+	MAME_DIR .. "src/mess/drivers/if800.c",     
+	MAME_DIR .. "src/mess/drivers/imsai.c",     
+	MAME_DIR .. "src/mess/drivers/indiana.c",   
+	MAME_DIR .. "src/mess/drivers/itt3030.c",   
+	MAME_DIR .. "src/mess/drivers/jade.c",      
+	MAME_DIR .. "src/mess/drivers/jonos.c",     
+	MAME_DIR .. "src/mess/drivers/konin.c",     
+	MAME_DIR .. "src/mess/drivers/leapster.c",  
+	MAME_DIR .. "src/mess/drivers/lft.c",       
+	MAME_DIR .. "src/mess/drivers/lola8a.c",    
+	MAME_DIR .. "src/mess/drivers/m79152pc.c",  
+	MAME_DIR .. "src/mess/drivers/mccpm.c",     
+	MAME_DIR .. "src/mess/drivers/mes.c",       
+	MAME_DIR .. "src/mess/drivers/mice.c",      
+	MAME_DIR .. "src/mess/drivers/micronic.c",  
+	MAME_DIR .. "src/mess/drivers/mini2440.c",  
+	MAME_DIR .. "src/mess/drivers/mmd1.c",      
+	MAME_DIR .. "src/mess/drivers/mod8.c",      
+	MAME_DIR .. "src/mess/drivers/modellot.c",  
+	MAME_DIR .. "src/mess/drivers/molecular.c", 
+	MAME_DIR .. "src/mess/drivers/ms0515.c",    
+	MAME_DIR .. "src/mess/drivers/ms9540.c",    
+	MAME_DIR .. "src/mess/drivers/mstation.c",  
+	MAME_DIR .. "src/mess/drivers/mx2178.c",    
+	MAME_DIR .. "src/mess/drivers/mycom.c",     
+	MAME_DIR .. "src/mess/drivers/myvision.c",  
+	MAME_DIR .. "src/mess/drivers/ngen.c",
+	MAME_DIR .. "src/mess/machine/ngen_kb.c", 
+	MAME_DIR .. "src/mess/drivers/octopus.c",   
+	MAME_DIR .. "src/mess/drivers/onyx.c",      
+	MAME_DIR .. "src/mess/drivers/okean240.c",  
+	MAME_DIR .. "src/mess/drivers/p8k.c",       
+	MAME_DIR .. "src/mess/drivers/pegasus.c",   
+	MAME_DIR .. "src/mess/drivers/pencil2.c",   
+	MAME_DIR .. "src/mess/drivers/pes.c",       
+	MAME_DIR .. "src/mess/drivers/pipbug.c",    
+	MAME_DIR .. "src/mess/drivers/plan80.c",    
+	MAME_DIR .. "src/mess/drivers/pm68k.c",     
+	MAME_DIR .. "src/mess/drivers/poly.c",      
+	MAME_DIR .. "src/mess/drivers/pt68k4.c",    
+	MAME_DIR .. "src/mess/drivers/ptcsol.c",    
+	MAME_DIR .. "src/mess/drivers/pulsar.c",    
+	MAME_DIR .. "src/mess/drivers/pv9234.c",    
+	MAME_DIR .. "src/mess/drivers/qtsbc.c",     
+	MAME_DIR .. "src/mess/drivers/rvoice.c",    
+	MAME_DIR .. "src/mess/drivers/sacstate.c",  
+	MAME_DIR .. "src/mess/drivers/sbrain.c",    
+	MAME_DIR .. "src/mess/drivers/seattle.c",   
+	MAME_DIR .. "src/mess/drivers/sh4robot.c",  
+	MAME_DIR .. "src/mess/drivers/softbox.c",   
+	MAME_DIR .. "src/mess/drivers/swtpc.c",     
+	MAME_DIR .. "src/mess/drivers/sys2900.c",   
+	MAME_DIR .. "src/mess/drivers/systec.c",    
+	MAME_DIR .. "src/mess/drivers/tavernie.c",  
+	MAME_DIR .. "src/mess/drivers/tecnbras.c",  
+	MAME_DIR .. "src/mess/drivers/terak.c",     
+	MAME_DIR .. "src/mess/drivers/ti630.c",     
+	MAME_DIR .. "src/mess/drivers/tsispch.c",   
+	MAME_DIR .. "src/mess/drivers/unistar.c",   
+	MAME_DIR .. "src/mess/drivers/v6809.c",     
+	MAME_DIR .. "src/mess/drivers/vector4.c",   
+	MAME_DIR .. "src/mess/drivers/vii.c",       
+	MAME_DIR .. "src/mess/drivers/wicat.c",     
+	MAME_DIR .. "src/mess/drivers/xor100.c",    
+	MAME_DIR .. "src/mess/drivers/xavix.c",     
+	MAME_DIR .. "src/mess/drivers/zorba.c",     
 }
 
 end

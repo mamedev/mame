@@ -16,11 +16,11 @@
 
 if (BUSES["A7800"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/a7800/a78_slot.*",
-		MAME_DIR .. "src/emu/bus/a7800/rom.*",
-		MAME_DIR .. "src/emu/bus/a7800/hiscore.*",
-		MAME_DIR .. "src/emu/bus/a7800/xboard.*",
-		MAME_DIR .. "src/emu/bus/a7800/cpuwiz.*",
+		MAME_DIR .. "src/emu/bus/a7800/a78_slot.c",
+		MAME_DIR .. "src/emu/bus/a7800/rom.c",
+		MAME_DIR .. "src/emu/bus/a7800/hiscore.c",
+		MAME_DIR .. "src/emu/bus/a7800/xboard.c",
+		MAME_DIR .. "src/emu/bus/a7800/cpuwiz.c",
 	}
 end
 
@@ -32,10 +32,10 @@ end
 
 if (BUSES["A800"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/a800/a800_slot.*",
-		MAME_DIR .. "src/emu/bus/a800/rom.*",
-		MAME_DIR .. "src/emu/bus/a800/oss.*",
-		MAME_DIR .. "src/emu/bus/a800/sparta.*",
+		MAME_DIR .. "src/emu/bus/a800/a800_slot.c",
+		MAME_DIR .. "src/emu/bus/a800/rom.c",
+		MAME_DIR .. "src/emu/bus/a800/oss.c",
+		MAME_DIR .. "src/emu/bus/a800/sparta.c",
 	}
 end
 
@@ -47,8 +47,8 @@ end
 
 if (BUSES["A8SIO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/a8sio/a8sio.*",
-		MAME_DIR .. "src/emu/bus/a8sio/cassette.*",
+		MAME_DIR .. "src/emu/bus/a8sio/a8sio.c",
+		MAME_DIR .. "src/emu/bus/a8sio/cassette.c",
 	}
 end
 
@@ -60,19 +60,19 @@ end
 
 if (BUSES["ABCBUS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/abcbus/abcbus.*",
-		MAME_DIR .. "src/emu/bus/abcbus/abc890.*",
-		MAME_DIR .. "src/emu/bus/abcbus/dos.*",
-		MAME_DIR .. "src/emu/bus/abcbus/fd2.*",
-		MAME_DIR .. "src/emu/bus/abcbus/hdc.*",
-		MAME_DIR .. "src/emu/bus/abcbus/lux10828.*",
-		MAME_DIR .. "src/emu/bus/abcbus/lux21046.*",
-		MAME_DIR .. "src/emu/bus/abcbus/lux21056.*",
-		MAME_DIR .. "src/emu/bus/abcbus/lux4105.*",
-		MAME_DIR .. "src/emu/bus/abcbus/uni800.*",
-		MAME_DIR .. "src/emu/bus/abcbus/sio.*",
-		MAME_DIR .. "src/emu/bus/abcbus/slutprov.*",
-		MAME_DIR .. "src/emu/bus/abcbus/turbo.*",
+		MAME_DIR .. "src/emu/bus/abcbus/abcbus.c",
+		MAME_DIR .. "src/emu/bus/abcbus/abc890.c",
+		MAME_DIR .. "src/emu/bus/abcbus/dos.c",
+		MAME_DIR .. "src/emu/bus/abcbus/fd2.c",
+		MAME_DIR .. "src/emu/bus/abcbus/hdc.c",
+		MAME_DIR .. "src/emu/bus/abcbus/lux10828.c",
+		MAME_DIR .. "src/emu/bus/abcbus/lux21046.c",
+		MAME_DIR .. "src/emu/bus/abcbus/lux21056.c",
+		MAME_DIR .. "src/emu/bus/abcbus/lux4105.c",
+		MAME_DIR .. "src/emu/bus/abcbus/uni800.c",
+		MAME_DIR .. "src/emu/bus/abcbus/sio.c",
+		MAME_DIR .. "src/emu/bus/abcbus/slutprov.c",
+		MAME_DIR .. "src/emu/bus/abcbus/turbo.c",
 	}
 end
 
@@ -84,10 +84,10 @@ end
 
 if (BUSES["ADAM"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/adam/exp.*",
-		MAME_DIR .. "src/emu/bus/adam/adamlink.*",
-		MAME_DIR .. "src/emu/bus/adam/ide.*",
-		MAME_DIR .. "src/emu/bus/adam/ram.*",
+		MAME_DIR .. "src/emu/bus/adam/exp.c",
+		MAME_DIR .. "src/emu/bus/adam/adamlink.c",
+		MAME_DIR .. "src/emu/bus/adam/ide.c",
+		MAME_DIR .. "src/emu/bus/adam/ram.c",
 	}
 end
 
@@ -99,12 +99,12 @@ end
 
 if (BUSES["ADAMNET"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/adamnet/adamnet.*",
-		MAME_DIR .. "src/emu/bus/adamnet/ddp.*",
-		MAME_DIR .. "src/emu/bus/adamnet/fdc.*",
-		MAME_DIR .. "src/emu/bus/adamnet/kb.*",
-		MAME_DIR .. "src/emu/bus/adamnet/printer.*",
-		MAME_DIR .. "src/emu/bus/adamnet/spi.*",
+		MAME_DIR .. "src/emu/bus/adamnet/adamnet.c",
+		MAME_DIR .. "src/emu/bus/adamnet/ddp.c",
+		MAME_DIR .. "src/emu/bus/adamnet/fdc.c",
+		MAME_DIR .. "src/emu/bus/adamnet/kb.c",
+		MAME_DIR .. "src/emu/bus/adamnet/printer.c",
+		MAME_DIR .. "src/emu/bus/adamnet/spi.c",
 	}
 end
 
@@ -116,8 +116,8 @@ end
 
 if (BUSES["APF"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/apf/slot.*",
-		MAME_DIR .. "src/emu/bus/apf/rom.*",
+		MAME_DIR .. "src/emu/bus/apf/slot.c",
+		MAME_DIR .. "src/emu/bus/apf/rom.c",
 	}
 end
 
@@ -129,8 +129,8 @@ end
 
 if (BUSES["ARCADIA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/arcadia/slot.*",
-		MAME_DIR .. "src/emu/bus/arcadia/rom.*",
+		MAME_DIR .. "src/emu/bus/arcadia/slot.c",
+		MAME_DIR .. "src/emu/bus/arcadia/rom.c",
 	}
 end
 
@@ -142,10 +142,10 @@ end
 
 if (BUSES["ASTROCADE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/astrocde/slot.*",
-		MAME_DIR .. "src/emu/bus/astrocde/rom.*",
-		MAME_DIR .. "src/emu/bus/astrocde/exp.*",
-		MAME_DIR .. "src/emu/bus/astrocde/ram.*",
+		MAME_DIR .. "src/emu/bus/astrocde/slot.c",
+		MAME_DIR .. "src/emu/bus/astrocde/rom.c",
+		MAME_DIR .. "src/emu/bus/astrocde/exp.c",
+		MAME_DIR .. "src/emu/bus/astrocde/ram.c",
 	}
 end
 
@@ -157,8 +157,8 @@ end
 
 if (BUSES["BW2"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/bw2/exp.*",
-		MAME_DIR .. "src/emu/bus/bw2/ramcard.*",
+		MAME_DIR .. "src/emu/bus/bw2/exp.c",
+		MAME_DIR .. "src/emu/bus/bw2/ramcard.c",
 	}
 end
 
@@ -171,77 +171,77 @@ end
 
 if (BUSES["C64"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/c64/exp.*",
-		MAME_DIR .. "src/emu/bus/c64/c128_comal80.*",
-		MAME_DIR .. "src/emu/bus/c64/comal80.*",
-		MAME_DIR .. "src/emu/bus/c64/cpm.*",
-		MAME_DIR .. "src/emu/bus/c64/currah_speech.*",
-		MAME_DIR .. "src/emu/bus/c64/dela_ep256.*",
-		MAME_DIR .. "src/emu/bus/c64/dela_ep64.*",
-		MAME_DIR .. "src/emu/bus/c64/dela_ep7x8.*",
-		MAME_DIR .. "src/emu/bus/c64/dinamic.*",
-		MAME_DIR .. "src/emu/bus/c64/dqbb.*",
-		MAME_DIR .. "src/emu/bus/c64/easy_calc_result.*",
-		MAME_DIR .. "src/emu/bus/c64/easyflash.*",
-		MAME_DIR .. "src/emu/bus/c64/epyx_fast_load.*",
-		MAME_DIR .. "src/emu/bus/c64/exos.*",
-		MAME_DIR .. "src/emu/bus/c64/fcc.*",
-		MAME_DIR .. "src/emu/bus/c64/final.*",
-		MAME_DIR .. "src/emu/bus/c64/final3.*",
-		MAME_DIR .. "src/emu/bus/c64/fun_play.*",
-		MAME_DIR .. "src/emu/bus/c64/georam.*",
-		MAME_DIR .. "src/emu/bus/c64/ide64.*",
-		MAME_DIR .. "src/emu/bus/c64/ieee488.*",
-		MAME_DIR .. "src/emu/bus/c64/kingsoft.*",
-		MAME_DIR .. "src/emu/bus/c64/mach5.*",
-		MAME_DIR .. "src/emu/bus/c64/magic_desk.*",
-		MAME_DIR .. "src/emu/bus/c64/magic_formel.*",
-		MAME_DIR .. "src/emu/bus/c64/magic_voice.*",
-		MAME_DIR .. "src/emu/bus/c64/midi_maplin.*",
-		MAME_DIR .. "src/emu/bus/c64/midi_namesoft.*",
-		MAME_DIR .. "src/emu/bus/c64/midi_passport.*",
-		MAME_DIR .. "src/emu/bus/c64/midi_sci.*",
-		MAME_DIR .. "src/emu/bus/c64/midi_siel.*",
-		MAME_DIR .. "src/emu/bus/c64/mikro_assembler.*",
-		MAME_DIR .. "src/emu/bus/c64/multiscreen.*",
-		MAME_DIR .. "src/emu/bus/c64/music64.*",
-		MAME_DIR .. "src/emu/bus/c64/neoram.*",
-		MAME_DIR .. "src/emu/bus/c64/ocean.*",
-		MAME_DIR .. "src/emu/bus/c64/pagefox.*",
-		MAME_DIR .. "src/emu/bus/c64/partner.*",
-		MAME_DIR .. "src/emu/bus/c64/prophet64.*",
-		MAME_DIR .. "src/emu/bus/c64/ps64.*",
-		MAME_DIR .. "src/emu/bus/c64/reu.*",
-		MAME_DIR .. "src/emu/bus/c64/rex.*",
-		MAME_DIR .. "src/emu/bus/c64/rex_ep256.*",
-		MAME_DIR .. "src/emu/bus/c64/ross.*",
-		MAME_DIR .. "src/emu/bus/c64/sfx_sound_expander.*",
-		MAME_DIR .. "src/emu/bus/c64/silverrock.*",
-		MAME_DIR .. "src/emu/bus/c64/simons_basic.*",
-		MAME_DIR .. "src/emu/bus/c64/stardos.*",
-		MAME_DIR .. "src/emu/bus/c64/std.*",
-		MAME_DIR .. "src/emu/bus/c64/structured_basic.*",
-		MAME_DIR .. "src/emu/bus/c64/super_explode.*",
-		MAME_DIR .. "src/emu/bus/c64/super_games.*",
-		MAME_DIR .. "src/emu/bus/c64/supercpu.*",
-		MAME_DIR .. "src/emu/bus/c64/sw8k.*",
-		MAME_DIR .. "src/emu/bus/c64/swiftlink.*",
-		MAME_DIR .. "src/emu/bus/c64/system3.*",
-		MAME_DIR .. "src/emu/bus/c64/tdos.*",
-		MAME_DIR .. "src/emu/bus/c64/turbo232.*",
-		MAME_DIR .. "src/emu/bus/c64/vizastar.*",
-		MAME_DIR .. "src/emu/bus/c64/vw64.*",
-		MAME_DIR .. "src/emu/bus/c64/warp_speed.*",
-		MAME_DIR .. "src/emu/bus/c64/westermann.*",
-		MAME_DIR .. "src/emu/bus/c64/xl80.*",
-		MAME_DIR .. "src/emu/bus/c64/zaxxon.*",
-		MAME_DIR .. "src/emu/bus/c64/user.*",
-		MAME_DIR .. "src/emu/bus/c64/4dxh.*",
-		MAME_DIR .. "src/emu/bus/c64/4ksa.*",
-		MAME_DIR .. "src/emu/bus/c64/4tba.*",
-		MAME_DIR .. "src/emu/bus/c64/16kb.*",
-		MAME_DIR .. "src/emu/bus/c64/bn1541.*",
-		MAME_DIR .. "src/emu/bus/c64/geocable.*",
+		MAME_DIR .. "src/emu/bus/c64/exp.c",
+		MAME_DIR .. "src/emu/bus/c64/c128_comal80.c",
+		MAME_DIR .. "src/emu/bus/c64/comal80.c",
+		MAME_DIR .. "src/emu/bus/c64/cpm.c",
+		MAME_DIR .. "src/emu/bus/c64/currah_speech.c",
+		MAME_DIR .. "src/emu/bus/c64/dela_ep256.c",
+		MAME_DIR .. "src/emu/bus/c64/dela_ep64.c",
+		MAME_DIR .. "src/emu/bus/c64/dela_ep7x8.c",
+		MAME_DIR .. "src/emu/bus/c64/dinamic.c",
+		MAME_DIR .. "src/emu/bus/c64/dqbb.c",
+		MAME_DIR .. "src/emu/bus/c64/easy_calc_result.c",
+		MAME_DIR .. "src/emu/bus/c64/easyflash.c",
+		MAME_DIR .. "src/emu/bus/c64/epyx_fast_load.c",
+		MAME_DIR .. "src/emu/bus/c64/exos.c",
+		MAME_DIR .. "src/emu/bus/c64/fcc.c",
+		MAME_DIR .. "src/emu/bus/c64/final.c",
+		MAME_DIR .. "src/emu/bus/c64/final3.c",
+		MAME_DIR .. "src/emu/bus/c64/fun_play.c",
+		MAME_DIR .. "src/emu/bus/c64/georam.c",
+		MAME_DIR .. "src/emu/bus/c64/ide64.c",
+		MAME_DIR .. "src/emu/bus/c64/ieee488.c",
+		MAME_DIR .. "src/emu/bus/c64/kingsoft.c",
+		MAME_DIR .. "src/emu/bus/c64/mach5.c",
+		MAME_DIR .. "src/emu/bus/c64/magic_desk.c",
+		MAME_DIR .. "src/emu/bus/c64/magic_formel.c",
+		MAME_DIR .. "src/emu/bus/c64/magic_voice.c",
+		MAME_DIR .. "src/emu/bus/c64/midi_maplin.c",
+		MAME_DIR .. "src/emu/bus/c64/midi_namesoft.c",
+		MAME_DIR .. "src/emu/bus/c64/midi_passport.c",
+		MAME_DIR .. "src/emu/bus/c64/midi_sci.c",
+		MAME_DIR .. "src/emu/bus/c64/midi_siel.c",
+		MAME_DIR .. "src/emu/bus/c64/mikro_assembler.c",
+		MAME_DIR .. "src/emu/bus/c64/multiscreen.c",
+		MAME_DIR .. "src/emu/bus/c64/music64.c",
+		MAME_DIR .. "src/emu/bus/c64/neoram.c",
+		MAME_DIR .. "src/emu/bus/c64/ocean.c",
+		MAME_DIR .. "src/emu/bus/c64/pagefox.c",
+		MAME_DIR .. "src/emu/bus/c64/partner.c",
+		MAME_DIR .. "src/emu/bus/c64/prophet64.c",
+		MAME_DIR .. "src/emu/bus/c64/ps64.c",
+		MAME_DIR .. "src/emu/bus/c64/reu.c",
+		MAME_DIR .. "src/emu/bus/c64/rex.c",
+		MAME_DIR .. "src/emu/bus/c64/rex_ep256.c",
+		MAME_DIR .. "src/emu/bus/c64/ross.c",
+		MAME_DIR .. "src/emu/bus/c64/sfx_sound_expander.c",
+		MAME_DIR .. "src/emu/bus/c64/silverrock.c",
+		MAME_DIR .. "src/emu/bus/c64/simons_basic.c",
+		MAME_DIR .. "src/emu/bus/c64/stardos.c",
+		MAME_DIR .. "src/emu/bus/c64/std.c",
+		MAME_DIR .. "src/emu/bus/c64/structured_basic.c",
+		MAME_DIR .. "src/emu/bus/c64/super_explode.c",
+		MAME_DIR .. "src/emu/bus/c64/super_games.c",
+		MAME_DIR .. "src/emu/bus/c64/supercpu.c",
+		MAME_DIR .. "src/emu/bus/c64/sw8k.c",
+		MAME_DIR .. "src/emu/bus/c64/swiftlink.c",
+		MAME_DIR .. "src/emu/bus/c64/system3.c",
+		MAME_DIR .. "src/emu/bus/c64/tdos.c",
+		MAME_DIR .. "src/emu/bus/c64/turbo232.c",
+		MAME_DIR .. "src/emu/bus/c64/vizastar.c",
+		MAME_DIR .. "src/emu/bus/c64/vw64.c",
+		MAME_DIR .. "src/emu/bus/c64/warp_speed.c",
+		MAME_DIR .. "src/emu/bus/c64/westermann.c",
+		MAME_DIR .. "src/emu/bus/c64/xl80.c",
+		MAME_DIR .. "src/emu/bus/c64/zaxxon.c",
+		MAME_DIR .. "src/emu/bus/c64/user.c",
+		MAME_DIR .. "src/emu/bus/c64/4dxh.c",
+		MAME_DIR .. "src/emu/bus/c64/4ksa.c",
+		MAME_DIR .. "src/emu/bus/c64/4tba.c",
+		MAME_DIR .. "src/emu/bus/c64/16kb.c",
+		MAME_DIR .. "src/emu/bus/c64/bn1541.c",
+		MAME_DIR .. "src/emu/bus/c64/geocable.c",
 	}
 end
 
@@ -254,11 +254,11 @@ end
 
 if (BUSES["CBM2"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/cbm2/exp.*",
-		MAME_DIR .. "src/emu/bus/cbm2/24k.*",
-		MAME_DIR .. "src/emu/bus/cbm2/hrg.*",
-		MAME_DIR .. "src/emu/bus/cbm2/std.*",
-		MAME_DIR .. "src/emu/bus/cbm2/user.*",
+		MAME_DIR .. "src/emu/bus/cbm2/exp.c",
+		MAME_DIR .. "src/emu/bus/cbm2/24k.c",
+		MAME_DIR .. "src/emu/bus/cbm2/hrg.c",
+		MAME_DIR .. "src/emu/bus/cbm2/std.c",
+		MAME_DIR .. "src/emu/bus/cbm2/user.c",
 	}
 end
 
@@ -270,16 +270,16 @@ end
 
 if (BUSES["CBMIEC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/cbmiec/cbmiec.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/c1541.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/c1571.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/c1581.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/c64_nl10.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/cmdhd.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/diag264_lb_iec.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/fd2000.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/interpod.*",
-		MAME_DIR .. "src/emu/bus/cbmiec/serialbox.*",
+		MAME_DIR .. "src/emu/bus/cbmiec/cbmiec.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1541.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1571.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/c1581.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/c64_nl10.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/cmdhd.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/diag264_lb_iec.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/fd2000.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/interpod.c",
+		MAME_DIR .. "src/emu/bus/cbmiec/serialbox.c",
 	}
 end
 
@@ -291,8 +291,8 @@ end
 
 if (BUSES["CHANNELF"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/chanf/slot.*",
-		MAME_DIR .. "src/emu/bus/chanf/rom.*",
+		MAME_DIR .. "src/emu/bus/chanf/slot.c",
+		MAME_DIR .. "src/emu/bus/chanf/rom.c",
 	}
 end
 
@@ -304,15 +304,15 @@ end
 
 if (BUSES["COMX35"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/comx35/exp.*",
-		MAME_DIR .. "src/emu/bus/comx35/clm.*",
-		MAME_DIR .. "src/emu/bus/comx35/expbox.*",
-		MAME_DIR .. "src/emu/bus/comx35/eprom.*",
-		MAME_DIR .. "src/emu/bus/comx35/fdc.*",
-		MAME_DIR .. "src/emu/bus/comx35/joycard.*",
-		MAME_DIR .. "src/emu/bus/comx35/printer.*",
-		MAME_DIR .. "src/emu/bus/comx35/ram.*",
-		MAME_DIR .. "src/emu/bus/comx35/thermal.*",
+		MAME_DIR .. "src/emu/bus/comx35/exp.c",
+		MAME_DIR .. "src/emu/bus/comx35/clm.c",
+		MAME_DIR .. "src/emu/bus/comx35/expbox.c",
+		MAME_DIR .. "src/emu/bus/comx35/eprom.c",
+		MAME_DIR .. "src/emu/bus/comx35/fdc.c",
+		MAME_DIR .. "src/emu/bus/comx35/joycard.c",
+		MAME_DIR .. "src/emu/bus/comx35/printer.c",
+		MAME_DIR .. "src/emu/bus/comx35/ram.c",
+		MAME_DIR .. "src/emu/bus/comx35/thermal.c",
 	}
 end
 
@@ -324,11 +324,11 @@ end
 
 if (BUSES["COLECO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/coleco/ctrl.*",
-		MAME_DIR .. "src/emu/bus/coleco/hand.*",
-		MAME_DIR .. "src/emu/bus/coleco/sac.*",
-		MAME_DIR .. "src/emu/bus/coleco/exp.*",
-		MAME_DIR .. "src/emu/bus/coleco/std.*",
+		MAME_DIR .. "src/emu/bus/coleco/ctrl.c",
+		MAME_DIR .. "src/emu/bus/coleco/hand.c",
+		MAME_DIR .. "src/emu/bus/coleco/sac.c",
+		MAME_DIR .. "src/emu/bus/coleco/exp.c",
+		MAME_DIR .. "src/emu/bus/coleco/std.c",
 	}
 end
 
@@ -340,8 +340,8 @@ end
 
 if (BUSES["CRVISION"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/crvision/slot.*",
-		MAME_DIR .. "src/emu/bus/crvision/rom.*",
+		MAME_DIR .. "src/emu/bus/crvision/slot.c",
+		MAME_DIR .. "src/emu/bus/crvision/rom.c",
 	}
 end
 
@@ -353,15 +353,15 @@ end
 
 if (BUSES["DMV"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/dmv/dmvbus.*",
-		MAME_DIR .. "src/emu/bus/dmv/k210.*",
-		MAME_DIR .. "src/emu/bus/dmv/k220.*",
-		MAME_DIR .. "src/emu/bus/dmv/k230.*",
-		MAME_DIR .. "src/emu/bus/dmv/k233.*",
-		MAME_DIR .. "src/emu/bus/dmv/k801.*",
-		MAME_DIR .. "src/emu/bus/dmv/k803.*",
-		MAME_DIR .. "src/emu/bus/dmv/k806.*",
-		MAME_DIR .. "src/emu/bus/dmv/ram.*",
+		MAME_DIR .. "src/emu/bus/dmv/dmvbus.c",
+		MAME_DIR .. "src/emu/bus/dmv/k210.c",
+		MAME_DIR .. "src/emu/bus/dmv/k220.c",
+		MAME_DIR .. "src/emu/bus/dmv/k230.c",
+		MAME_DIR .. "src/emu/bus/dmv/k233.c",
+		MAME_DIR .. "src/emu/bus/dmv/k801.c",
+		MAME_DIR .. "src/emu/bus/dmv/k803.c",
+		MAME_DIR .. "src/emu/bus/dmv/k806.c",
+		MAME_DIR .. "src/emu/bus/dmv/ram.c",
 	}
 end
 
@@ -373,8 +373,8 @@ end
 
 if (BUSES["ECBBUS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/ecbbus/ecbbus.*",
-		MAME_DIR .. "src/emu/bus/ecbbus/grip.*",
+		MAME_DIR .. "src/emu/bus/ecbbus/ecbbus.c",
+		MAME_DIR .. "src/emu/bus/ecbbus/grip.c",
 	}
 end
 
@@ -386,8 +386,8 @@ end
 
 if (BUSES["ECONET"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/econet/econet.*",
-		MAME_DIR .. "src/emu/bus/econet/e01.*",
+		MAME_DIR .. "src/emu/bus/econet/econet.c",
+		MAME_DIR .. "src/emu/bus/econet/e01.c",
 	}
 end
 
@@ -399,8 +399,8 @@ end
 
 if (BUSES["EP64"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/ep64/exp.*",
-		MAME_DIR .. "src/emu/bus/ep64/exdos.*",
+		MAME_DIR .. "src/emu/bus/ep64/exp.c",
+		MAME_DIR .. "src/emu/bus/ep64/exdos.c",
 	}
 end
 
@@ -412,10 +412,10 @@ end
 
 if (BUSES["GENERIC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/generic/slot.*",
-		MAME_DIR .. "src/emu/bus/generic/carts.*",
-		MAME_DIR .. "src/emu/bus/generic/ram.*",
-		MAME_DIR .. "src/emu/bus/generic/rom.*",
+		MAME_DIR .. "src/emu/bus/generic/slot.c",
+		MAME_DIR .. "src/emu/bus/generic/carts.c",
+		MAME_DIR .. "src/emu/bus/generic/ram.c",
+		MAME_DIR .. "src/emu/bus/generic/rom.c",
 	}
 end
 
@@ -427,17 +427,17 @@ end
 
 if (BUSES["IEEE488"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/ieee488/ieee488.*",
-		MAME_DIR .. "src/emu/bus/ieee488/c2031.*",
-		MAME_DIR .. "src/emu/bus/ieee488/c2040.*",
-		MAME_DIR .. "src/emu/bus/ieee488/c2040fdc.*",
-		MAME_DIR .. "src/emu/bus/ieee488/c8050.*",
-		MAME_DIR .. "src/emu/bus/ieee488/c8050fdc.*",
-		MAME_DIR .. "src/emu/bus/ieee488/c8280.*",
-		MAME_DIR .. "src/emu/bus/ieee488/d9060.*",
-		MAME_DIR .. "src/emu/bus/ieee488/softbox.*",
-		MAME_DIR .. "src/emu/bus/ieee488/hardbox.*",
-		MAME_DIR .. "src/emu/bus/ieee488/shark.*",
+		MAME_DIR .. "src/emu/bus/ieee488/ieee488.c",
+		MAME_DIR .. "src/emu/bus/ieee488/c2031.c",
+		MAME_DIR .. "src/emu/bus/ieee488/c2040.c",
+		MAME_DIR .. "src/emu/bus/ieee488/c2040fdc.c",
+		MAME_DIR .. "src/emu/bus/ieee488/c8050.c",
+		MAME_DIR .. "src/emu/bus/ieee488/c8050fdc.c",
+		MAME_DIR .. "src/emu/bus/ieee488/c8280.c",
+		MAME_DIR .. "src/emu/bus/ieee488/d9060.c",
+		MAME_DIR .. "src/emu/bus/ieee488/softbox.c",
+		MAME_DIR .. "src/emu/bus/ieee488/hardbox.c",
+		MAME_DIR .. "src/emu/bus/ieee488/shark.c",
 	}
 end
 
@@ -449,15 +449,15 @@ end
 
 if (BUSES["IQ151"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/iq151/iq151.*",
-		MAME_DIR .. "src/emu/bus/iq151/disc2.*",
-		MAME_DIR .. "src/emu/bus/iq151/grafik.*",
-		MAME_DIR .. "src/emu/bus/iq151/minigraf.*",
-		MAME_DIR .. "src/emu/bus/iq151/ms151a.*",
-		MAME_DIR .. "src/emu/bus/iq151/rom.*",
-		MAME_DIR .. "src/emu/bus/iq151/staper.*",
-		MAME_DIR .. "src/emu/bus/iq151/video32.*",
-		MAME_DIR .. "src/emu/bus/iq151/video64.*",
+		MAME_DIR .. "src/emu/bus/iq151/iq151.c",
+		MAME_DIR .. "src/emu/bus/iq151/disc2.c",
+		MAME_DIR .. "src/emu/bus/iq151/grafik.c",
+		MAME_DIR .. "src/emu/bus/iq151/minigraf.c",
+		MAME_DIR .. "src/emu/bus/iq151/ms151a.c",
+		MAME_DIR .. "src/emu/bus/iq151/rom.c",
+		MAME_DIR .. "src/emu/bus/iq151/staper.c",
+		MAME_DIR .. "src/emu/bus/iq151/video32.c",
+		MAME_DIR .. "src/emu/bus/iq151/video64.c",
 	}
 end
 
@@ -469,8 +469,8 @@ end
 
 if (BUSES["IMI7000"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/imi7000/imi7000.*",
-		MAME_DIR .. "src/emu/bus/imi7000/imi5000h.*",
+		MAME_DIR .. "src/emu/bus/imi7000/imi7000.c",
+		MAME_DIR .. "src/emu/bus/imi7000/imi5000h.c",
 	}
 end
 
@@ -482,10 +482,10 @@ end
 
 if (BUSES["INTV"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/intv/slot.*",
-		MAME_DIR .. "src/emu/bus/intv/rom.*",
-		MAME_DIR .. "src/emu/bus/intv/voice.*",
-		MAME_DIR .. "src/emu/bus/intv/ecs.*",
+		MAME_DIR .. "src/emu/bus/intv/slot.c",
+		MAME_DIR .. "src/emu/bus/intv/rom.c",
+		MAME_DIR .. "src/emu/bus/intv/voice.c",
+		MAME_DIR .. "src/emu/bus/intv/ecs.c",
 	}
 end
 
@@ -497,57 +497,57 @@ end
 
 if (BUSES["ISA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/isa/isa.*",
-		MAME_DIR .. "src/emu/bus/isa/isa_cards.*",
-		MAME_DIR .. "src/emu/bus/isa/mda.*",
-		MAME_DIR .. "src/emu/bus/isa/wdxt_gen.*",
-		MAME_DIR .. "src/emu/bus/isa/adlib.*",
-		MAME_DIR .. "src/emu/bus/isa/com.*",
-		MAME_DIR .. "src/emu/bus/isa/fdc.*",
-		MAME_DIR .. "src/emu/bus/isa/mufdc.*",
-		MAME_DIR .. "src/emu/bus/isa/finalchs.*",
-		MAME_DIR .. "src/emu/bus/isa/gblaster.*",
-		MAME_DIR .. "src/emu/bus/isa/gus.*",
-		MAME_DIR .. "src/emu/bus/isa/sb16.*",
-		MAME_DIR .. "src/emu/bus/isa/hdc.*",
-		MAME_DIR .. "src/emu/bus/isa/ibm_mfc.*",
-		MAME_DIR .. "src/emu/bus/isa/mpu401.*",
-		MAME_DIR .. "src/emu/bus/isa/sblaster.*",
-		MAME_DIR .. "src/emu/bus/isa/stereo_fx.*",
-		MAME_DIR .. "src/emu/bus/isa/ssi2001.*",
-		MAME_DIR .. "src/emu/bus/isa/ide.*",
-		MAME_DIR .. "src/emu/bus/isa/xtide.*",
-		MAME_DIR .. "src/emu/bus/isa/side116.*",
-		MAME_DIR .. "src/emu/bus/isa/aha1542.*",
-		MAME_DIR .. "src/emu/bus/isa/wd1002a_wx1.*",
-		MAME_DIR .. "src/emu/bus/isa/dectalk.*",
-		MAME_DIR .. "src/emu/bus/isa/pds.*",
-		MAME_DIR .. "src/emu/bus/isa/omti8621.*",
-		MAME_DIR .. "src/emu/bus/isa/cga.*",
-		MAME_DIR .. "src/emu/bus/isa/svga_cirrus.*",
-		MAME_DIR .. "src/emu/bus/isa/ega.*",
-		MAME_DIR .. "src/emu/bus/isa/vga.*",
-		MAME_DIR .. "src/emu/bus/isa/vga_ati.*",
-		MAME_DIR .. "src/emu/bus/isa/mach32.*",
-		MAME_DIR .. "src/emu/bus/isa/svga_tseng.*",
-		MAME_DIR .. "src/emu/bus/isa/svga_s3.*",
-		MAME_DIR .. "src/emu/bus/isa/s3virge.*",
-		MAME_DIR .. "src/emu/bus/isa/pc1640_iga.*",
-		MAME_DIR .. "src/emu/bus/isa/3c503.*",
-		MAME_DIR .. "src/emu/bus/isa/ne1000.*",
-		MAME_DIR .. "src/emu/bus/isa/ne2000.*",
-		MAME_DIR .. "src/emu/bus/isa/3c505.*",
-		MAME_DIR .. "src/emu/bus/isa/lpt.*",
-		MAME_DIR .. "src/emu/bus/isa/p1_fdc.*",
-		MAME_DIR .. "src/emu/bus/isa/p1_hdc.*",
-		MAME_DIR .. "src/emu/bus/isa/p1_rom.*",
-		MAME_DIR .. "src/emu/bus/isa/mc1502_fdc.*",
-		MAME_DIR .. "src/emu/bus/isa/mc1502_rom.*",
-		MAME_DIR .. "src/emu/bus/isa/xsu_cards.*",
-		MAME_DIR .. "src/emu/bus/isa/sc499.*",
-		MAME_DIR .. "src/emu/bus/isa/aga.*",
-		MAME_DIR .. "src/emu/bus/isa/svga_trident.*",
-		MAME_DIR .. "src/emu/bus/isa/num9rev.*",
+		MAME_DIR .. "src/emu/bus/isa/isa.c",
+		MAME_DIR .. "src/emu/bus/isa/isa_cards.c",
+		MAME_DIR .. "src/emu/bus/isa/mda.c",
+		MAME_DIR .. "src/emu/bus/isa/wdxt_gen.c",
+		MAME_DIR .. "src/emu/bus/isa/adlib.c",
+		MAME_DIR .. "src/emu/bus/isa/com.c",
+		MAME_DIR .. "src/emu/bus/isa/fdc.c",
+		MAME_DIR .. "src/emu/bus/isa/mufdc.c",
+		MAME_DIR .. "src/emu/bus/isa/finalchs.c",
+		MAME_DIR .. "src/emu/bus/isa/gblaster.c",
+		MAME_DIR .. "src/emu/bus/isa/gus.c",
+		MAME_DIR .. "src/emu/bus/isa/sb16.c",
+		MAME_DIR .. "src/emu/bus/isa/hdc.c",
+		MAME_DIR .. "src/emu/bus/isa/ibm_mfc.c",
+		MAME_DIR .. "src/emu/bus/isa/mpu401.c",
+		MAME_DIR .. "src/emu/bus/isa/sblaster.c",
+		MAME_DIR .. "src/emu/bus/isa/stereo_fx.c",
+		MAME_DIR .. "src/emu/bus/isa/ssi2001.c",
+		MAME_DIR .. "src/emu/bus/isa/ide.c",
+		MAME_DIR .. "src/emu/bus/isa/xtide.c",
+		MAME_DIR .. "src/emu/bus/isa/side116.c",
+		MAME_DIR .. "src/emu/bus/isa/aha1542.c",
+		MAME_DIR .. "src/emu/bus/isa/wd1002a_wx1.c",
+		MAME_DIR .. "src/emu/bus/isa/dectalk.c",
+		MAME_DIR .. "src/emu/bus/isa/pds.c",
+		MAME_DIR .. "src/emu/bus/isa/omti8621.c",
+		MAME_DIR .. "src/emu/bus/isa/cga.c",
+		MAME_DIR .. "src/emu/bus/isa/svga_cirrus.c",
+		MAME_DIR .. "src/emu/bus/isa/ega.c",
+		MAME_DIR .. "src/emu/bus/isa/vga.c",
+		MAME_DIR .. "src/emu/bus/isa/vga_ati.c",
+		MAME_DIR .. "src/emu/bus/isa/mach32.c",
+		MAME_DIR .. "src/emu/bus/isa/svga_tseng.c",
+		MAME_DIR .. "src/emu/bus/isa/svga_s3.c",
+		MAME_DIR .. "src/emu/bus/isa/s3virge.c",
+		MAME_DIR .. "src/emu/bus/isa/pc1640_iga.c",
+		MAME_DIR .. "src/emu/bus/isa/3c503.c",
+		MAME_DIR .. "src/emu/bus/isa/ne1000.c",
+		MAME_DIR .. "src/emu/bus/isa/ne2000.c",
+		MAME_DIR .. "src/emu/bus/isa/3c505.c",
+		MAME_DIR .. "src/emu/bus/isa/lpt.c",
+		MAME_DIR .. "src/emu/bus/isa/p1_fdc.c",
+		MAME_DIR .. "src/emu/bus/isa/p1_hdc.c",
+		MAME_DIR .. "src/emu/bus/isa/p1_rom.c",
+		MAME_DIR .. "src/emu/bus/isa/mc1502_fdc.c",
+		MAME_DIR .. "src/emu/bus/isa/mc1502_rom.c",
+		MAME_DIR .. "src/emu/bus/isa/xsu_cards.c",
+		MAME_DIR .. "src/emu/bus/isa/sc499.c",
+		MAME_DIR .. "src/emu/bus/isa/aga.c",
+		MAME_DIR .. "src/emu/bus/isa/svga_trident.c",
+		MAME_DIR .. "src/emu/bus/isa/num9rev.c",
 	}
 end
 
@@ -558,9 +558,9 @@ end
 
 if (BUSES["ISBX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/isbx/isbx.*",
-		MAME_DIR .. "src/emu/bus/isbx/compis_fdc.*",
-		MAME_DIR .. "src/emu/bus/isbx/isbc_218a.*",
+		MAME_DIR .. "src/emu/bus/isbx/isbx.c",
+		MAME_DIR .. "src/emu/bus/isbx/compis_fdc.c",
+		MAME_DIR .. "src/emu/bus/isbx/isbc_218a.c",
 	}
 end
 
@@ -572,39 +572,39 @@ end
 
 if (BUSES["MSX_SLOT"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/msx_slot/bunsetsu.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/cartridge.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/disk.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/fs4600.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/music.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/panasonic08.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/rom.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/ram.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/ram_mm.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/slot.*",
-		MAME_DIR .. "src/emu/bus/msx_slot/sony08.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/arc.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/ascii.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/bm_012.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/cartridge.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/crossblaim.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/disk.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/dooly.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/fmpac.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/halnote.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/hfox.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/holy_quran.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/konami.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/korean.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio_kb.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/msxdos2.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/nomapper.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/rtype.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/superloderunner.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/super_swangi.*",
-		MAME_DIR .. "src/emu/bus/msx_cart/yamaha.*",
+		MAME_DIR .. "src/emu/bus/msx_slot/bunsetsu.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/cartridge.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/disk.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/fs4600.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/music.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/panasonic08.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/rom.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/ram.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/ram_mm.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/slot.c",
+		MAME_DIR .. "src/emu/bus/msx_slot/sony08.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/arc.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/ascii.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/bm_012.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/cartridge.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/crossblaim.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/disk.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/dooly.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/fmpac.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/halnote.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/hfox.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/holy_quran.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/konami.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/korean.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/majutsushi.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/msx_audio_kb.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/msxdos2.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/nomapper.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/rtype.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/superloderunner.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/super_swangi.c",
+		MAME_DIR .. "src/emu/bus/msx_cart/yamaha.c",
 	}
 end
 
@@ -616,11 +616,11 @@ end
 
 if (BUSES["KC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/kc/kc.*",
-		MAME_DIR .. "src/emu/bus/kc/d002.*",
-		MAME_DIR .. "src/emu/bus/kc/d004.*",
-		MAME_DIR .. "src/emu/bus/kc/ram.*",
-		MAME_DIR .. "src/emu/bus/kc/rom.*",
+		MAME_DIR .. "src/emu/bus/kc/kc.c",
+		MAME_DIR .. "src/emu/bus/kc/d002.c",
+		MAME_DIR .. "src/emu/bus/kc/d004.c",
+		MAME_DIR .. "src/emu/bus/kc/ram.c",
+		MAME_DIR .. "src/emu/bus/kc/rom.c",
 	}
 end
 
@@ -631,10 +631,10 @@ end
 
 if (BUSES["O2"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/odyssey2/slot.*",
-		MAME_DIR .. "src/emu/bus/odyssey2/rom.*",
-		MAME_DIR .. "src/emu/bus/odyssey2/chess.*",
-		MAME_DIR .. "src/emu/bus/odyssey2/voice.*",
+		MAME_DIR .. "src/emu/bus/odyssey2/slot.c",
+		MAME_DIR .. "src/emu/bus/odyssey2/rom.c",
+		MAME_DIR .. "src/emu/bus/odyssey2/chess.c",
+		MAME_DIR .. "src/emu/bus/odyssey2/voice.c",
 	}
 end
 
@@ -646,8 +646,8 @@ end
 
 if (BUSES["PC_JOY"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/pc_joy/pc_joy.*",
-		MAME_DIR .. "src/emu/bus/pc_joy/pc_joy_sw.*",
+		MAME_DIR .. "src/emu/bus/pc_joy/pc_joy.c",
+		MAME_DIR .. "src/emu/bus/pc_joy/pc_joy_sw.c",
 	}
 end
 
@@ -659,15 +659,15 @@ end
 
 if (BUSES["PC_KBD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/pc_kbd/pc_kbdc.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/keyboards.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/ec1841.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/iskr1030.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/keytro.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/msnat.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/pc83.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/pcat84.*",
-		MAME_DIR .. "src/emu/bus/pc_kbd/pcxt83.*",
+		MAME_DIR .. "src/emu/bus/pc_kbd/pc_kbdc.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/keyboards.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/ec1841.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/iskr1030.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/keytro.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/msnat.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/pc83.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/pcat84.c",
+		MAME_DIR .. "src/emu/bus/pc_kbd/pcxt83.c",
 	}
 end
 
@@ -681,17 +681,17 @@ end
 
 if (BUSES["PET"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/pet/cass.*",
-		MAME_DIR .. "src/emu/bus/pet/c2n.*",
-		MAME_DIR .. "src/emu/bus/pet/diag264_lb_tape.*",
-		MAME_DIR .. "src/emu/bus/pet/exp.*",
-		MAME_DIR .. "src/emu/bus/pet/64k.*",
-		MAME_DIR .. "src/emu/bus/pet/hsg.*",
-		MAME_DIR .. "src/emu/bus/pet/superpet.*",
-		MAME_DIR .. "src/emu/bus/pet/user.*",
-		MAME_DIR .. "src/emu/bus/pet/diag.*",
-		MAME_DIR .. "src/emu/bus/pet/petuja.*",
-		MAME_DIR .. "src/emu/bus/pet/cb2snd.*",
+		MAME_DIR .. "src/emu/bus/pet/cass.c",
+		MAME_DIR .. "src/emu/bus/pet/c2n.c",
+		MAME_DIR .. "src/emu/bus/pet/diag264_lb_tape.c",
+		MAME_DIR .. "src/emu/bus/pet/exp.c",
+		MAME_DIR .. "src/emu/bus/pet/64k.c",
+		MAME_DIR .. "src/emu/bus/pet/hsg.c",
+		MAME_DIR .. "src/emu/bus/pet/superpet.c",
+		MAME_DIR .. "src/emu/bus/pet/user.c",
+		MAME_DIR .. "src/emu/bus/pet/diag.c",
+		MAME_DIR .. "src/emu/bus/pet/petuja.c",
+		MAME_DIR .. "src/emu/bus/pet/cb2snd.c",
 	}
 end
 
@@ -704,12 +704,12 @@ end
 
 if (BUSES["PLUS4"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/plus4/exp.*",
-		MAME_DIR .. "src/emu/bus/plus4/c1551.*",
-		MAME_DIR .. "src/emu/bus/plus4/sid.*",
-		MAME_DIR .. "src/emu/bus/plus4/std.*",
-		MAME_DIR .. "src/emu/bus/plus4/user.*",
-		MAME_DIR .. "src/emu/bus/plus4/diag264_lb_user.*",
+		MAME_DIR .. "src/emu/bus/plus4/exp.c",
+		MAME_DIR .. "src/emu/bus/plus4/c1551.c",
+		MAME_DIR .. "src/emu/bus/plus4/sid.c",
+		MAME_DIR .. "src/emu/bus/plus4/std.c",
+		MAME_DIR .. "src/emu/bus/plus4/user.c",
+		MAME_DIR .. "src/emu/bus/plus4/diag264_lb_user.c",
 	}
 end
 
@@ -721,13 +721,13 @@ end
 
 if (BUSES["S100"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/s100/s100.*",
-		MAME_DIR .. "src/emu/bus/s100/dj2db.*",
-		MAME_DIR .. "src/emu/bus/s100/djdma.*",
-		MAME_DIR .. "src/emu/bus/s100/mm65k16s.*",
-		MAME_DIR .. "src/emu/bus/s100/nsmdsa.*",
-		MAME_DIR .. "src/emu/bus/s100/nsmdsad.*",
-		MAME_DIR .. "src/emu/bus/s100/wunderbus.*",
+		MAME_DIR .. "src/emu/bus/s100/s100.c",
+		MAME_DIR .. "src/emu/bus/s100/dj2db.c",
+		MAME_DIR .. "src/emu/bus/s100/djdma.c",
+		MAME_DIR .. "src/emu/bus/s100/mm65k16s.c",
+		MAME_DIR .. "src/emu/bus/s100/nsmdsa.c",
+		MAME_DIR .. "src/emu/bus/s100/nsmdsad.c",
+		MAME_DIR .. "src/emu/bus/s100/wunderbus.c",
 	}
 end
 
@@ -739,9 +739,9 @@ end
 
 if (BUSES["SPC1000"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/spc1000/exp.*",
-		MAME_DIR .. "src/emu/bus/spc1000/fdd.*",
-		MAME_DIR .. "src/emu/bus/spc1000/vdp.*",
+		MAME_DIR .. "src/emu/bus/spc1000/exp.c",
+		MAME_DIR .. "src/emu/bus/spc1000/fdd.c",
+		MAME_DIR .. "src/emu/bus/spc1000/vdp.c",
 	}
 end
 
@@ -753,8 +753,8 @@ end
 
 if (BUSES["TVC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/tvc/tvc.*",
-		MAME_DIR .. "src/emu/bus/tvc/hbf.*",
+		MAME_DIR .. "src/emu/bus/tvc/tvc.c",
+		MAME_DIR .. "src/emu/bus/tvc/hbf.c",
 	}
 end
 
@@ -766,8 +766,8 @@ end
 
 if (BUSES["VC4000"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vc4000/slot.*",
-		MAME_DIR .. "src/emu/bus/vc4000/rom.*",
+		MAME_DIR .. "src/emu/bus/vc4000/slot.c",
+		MAME_DIR .. "src/emu/bus/vc4000/rom.c",
 	}
 end
 
@@ -779,11 +779,11 @@ end
 
 if (BUSES["VCS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vcs/vcs_slot.*",
-		MAME_DIR .. "src/emu/bus/vcs/rom.*",
-		MAME_DIR .. "src/emu/bus/vcs/compumat.*",
-		MAME_DIR .. "src/emu/bus/vcs/dpc.*",
-		MAME_DIR .. "src/emu/bus/vcs/scharger.*",
+		MAME_DIR .. "src/emu/bus/vcs/vcs_slot.c",
+		MAME_DIR .. "src/emu/bus/vcs/rom.c",
+		MAME_DIR .. "src/emu/bus/vcs/compumat.c",
+		MAME_DIR .. "src/emu/bus/vcs/dpc.c",
+		MAME_DIR .. "src/emu/bus/vcs/scharger.c",
 	}
 end
 
@@ -795,13 +795,13 @@ end
 
 if (BUSES["VCS_CTRL"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vcs_ctrl/ctrl.*",
-		MAME_DIR .. "src/emu/bus/vcs_ctrl/joystick.*",
-		MAME_DIR .. "src/emu/bus/vcs_ctrl/joybooster.*",
-		MAME_DIR .. "src/emu/bus/vcs_ctrl/keypad.*",
-		MAME_DIR .. "src/emu/bus/vcs_ctrl/lightpen.*",
-		MAME_DIR .. "src/emu/bus/vcs_ctrl/paddles.*",
-		MAME_DIR .. "src/emu/bus/vcs_ctrl/wheel.*",
+		MAME_DIR .. "src/emu/bus/vcs_ctrl/ctrl.c",
+		MAME_DIR .. "src/emu/bus/vcs_ctrl/joystick.c",
+		MAME_DIR .. "src/emu/bus/vcs_ctrl/joybooster.c",
+		MAME_DIR .. "src/emu/bus/vcs_ctrl/keypad.c",
+		MAME_DIR .. "src/emu/bus/vcs_ctrl/lightpen.c",
+		MAME_DIR .. "src/emu/bus/vcs_ctrl/paddles.c",
+		MAME_DIR .. "src/emu/bus/vcs_ctrl/wheel.c",
 	}
 end
 
@@ -813,8 +813,8 @@ end
 
 if (BUSES["VECTREX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vectrex/slot.*",
-		MAME_DIR .. "src/emu/bus/vectrex/rom.*",
+		MAME_DIR .. "src/emu/bus/vectrex/slot.c",
+		MAME_DIR .. "src/emu/bus/vectrex/rom.c",
 	}
 end
 
@@ -826,8 +826,8 @@ end
 
 if (BUSES["VIC10"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vic10/exp.*",
-		MAME_DIR .. "src/emu/bus/vic10/std.*",
+		MAME_DIR .. "src/emu/bus/vic10/exp.c",
+		MAME_DIR .. "src/emu/bus/vic10/std.c",
 	}
 end
 
@@ -840,18 +840,18 @@ end
 
 if (BUSES["VIC20"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vic20/exp.*",
-		MAME_DIR .. "src/emu/bus/vic20/fe3.*",
-		MAME_DIR .. "src/emu/bus/vic20/megacart.*",
-		MAME_DIR .. "src/emu/bus/vic20/std.*",
-		MAME_DIR .. "src/emu/bus/vic20/vic1010.*",
-		MAME_DIR .. "src/emu/bus/vic20/vic1110.*",
-		MAME_DIR .. "src/emu/bus/vic20/vic1111.*",
-		MAME_DIR .. "src/emu/bus/vic20/vic1112.*",
-		MAME_DIR .. "src/emu/bus/vic20/vic1210.*",
-		MAME_DIR .. "src/emu/bus/vic20/user.*",
-		MAME_DIR .. "src/emu/bus/vic20/4cga.*",
-		MAME_DIR .. "src/emu/bus/vic20/vic1011.*",
+		MAME_DIR .. "src/emu/bus/vic20/exp.c",
+		MAME_DIR .. "src/emu/bus/vic20/fe3.c",
+		MAME_DIR .. "src/emu/bus/vic20/megacart.c",
+		MAME_DIR .. "src/emu/bus/vic20/std.c",
+		MAME_DIR .. "src/emu/bus/vic20/vic1010.c",
+		MAME_DIR .. "src/emu/bus/vic20/vic1110.c",
+		MAME_DIR .. "src/emu/bus/vic20/vic1111.c",
+		MAME_DIR .. "src/emu/bus/vic20/vic1112.c",
+		MAME_DIR .. "src/emu/bus/vic20/vic1210.c",
+		MAME_DIR .. "src/emu/bus/vic20/user.c",
+		MAME_DIR .. "src/emu/bus/vic20/4cga.c",
+		MAME_DIR .. "src/emu/bus/vic20/vic1011.c",
 	}
 end
 
@@ -863,10 +863,10 @@ end
 
 if (BUSES["VIDBRAIN"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vidbrain/exp.*",
-		MAME_DIR .. "src/emu/bus/vidbrain/std.*",
-		MAME_DIR .. "src/emu/bus/vidbrain/money_minder.*",
-		MAME_DIR .. "src/emu/bus/vidbrain/timeshare.*",
+		MAME_DIR .. "src/emu/bus/vidbrain/exp.c",
+		MAME_DIR .. "src/emu/bus/vidbrain/std.c",
+		MAME_DIR .. "src/emu/bus/vidbrain/money_minder.c",
+		MAME_DIR .. "src/emu/bus/vidbrain/timeshare.c",
 	}
 end
 
@@ -879,16 +879,16 @@ end
 
 if (BUSES["VIP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vip/byteio.*",
-		MAME_DIR .. "src/emu/bus/vip/vp620.*",
-		MAME_DIR .. "src/emu/bus/vip/exp.*",
-		MAME_DIR .. "src/emu/bus/vip/vp550.*",
-		MAME_DIR .. "src/emu/bus/vip/vp570.*",
-		MAME_DIR .. "src/emu/bus/vip/vp575.*",
-		MAME_DIR .. "src/emu/bus/vip/vp585.*",
-		MAME_DIR .. "src/emu/bus/vip/vp590.*",
-		MAME_DIR .. "src/emu/bus/vip/vp595.*",
-		MAME_DIR .. "src/emu/bus/vip/vp700.*",
+		MAME_DIR .. "src/emu/bus/vip/byteio.c",
+		MAME_DIR .. "src/emu/bus/vip/vp620.c",
+		MAME_DIR .. "src/emu/bus/vip/exp.c",
+		MAME_DIR .. "src/emu/bus/vip/vp550.c",
+		MAME_DIR .. "src/emu/bus/vip/vp570.c",
+		MAME_DIR .. "src/emu/bus/vip/vp575.c",
+		MAME_DIR .. "src/emu/bus/vip/vp585.c",
+		MAME_DIR .. "src/emu/bus/vip/vp590.c",
+		MAME_DIR .. "src/emu/bus/vip/vp595.c",
+		MAME_DIR .. "src/emu/bus/vip/vp700.c",
 	}
 end
 
@@ -900,15 +900,15 @@ end
 
 if (BUSES["WANGPC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/wangpc/wangpc.*",
-		MAME_DIR .. "src/emu/bus/wangpc/emb.*",
-		MAME_DIR .. "src/emu/bus/wangpc/lic.*",
-		MAME_DIR .. "src/emu/bus/wangpc/lvc.*",
-		MAME_DIR .. "src/emu/bus/wangpc/mcc.*",
-		MAME_DIR .. "src/emu/bus/wangpc/mvc.*",
-		MAME_DIR .. "src/emu/bus/wangpc/rtc.*",
-		MAME_DIR .. "src/emu/bus/wangpc/tig.*",
-		MAME_DIR .. "src/emu/bus/wangpc/wdc.*",
+		MAME_DIR .. "src/emu/bus/wangpc/wangpc.c",
+		MAME_DIR .. "src/emu/bus/wangpc/emb.c",
+		MAME_DIR .. "src/emu/bus/wangpc/lic.c",
+		MAME_DIR .. "src/emu/bus/wangpc/lvc.c",
+		MAME_DIR .. "src/emu/bus/wangpc/mcc.c",
+		MAME_DIR .. "src/emu/bus/wangpc/mvc.c",
+		MAME_DIR .. "src/emu/bus/wangpc/rtc.c",
+		MAME_DIR .. "src/emu/bus/wangpc/tig.c",
+		MAME_DIR .. "src/emu/bus/wangpc/wdc.c",
 	}
 end
 
@@ -920,10 +920,10 @@ end
 
 if (BUSES["Z88"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/z88/z88.*",
-		MAME_DIR .. "src/emu/bus/z88/flash.*",
-		MAME_DIR .. "src/emu/bus/z88/ram.*",
-		MAME_DIR .. "src/emu/bus/z88/rom.*",
+		MAME_DIR .. "src/emu/bus/z88/z88.c",
+		MAME_DIR .. "src/emu/bus/z88/flash.c",
+		MAME_DIR .. "src/emu/bus/z88/ram.c",
+		MAME_DIR .. "src/emu/bus/z88/rom.c",
 	}
 end
 
@@ -934,46 +934,46 @@ end
 
 if (BUSES["A2BUS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/a2bus/a2bus.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2lang.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2diskii.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2mockingboard.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2cffa.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2memexp.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2scsi.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2thunderclock.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2softcard.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2videoterm.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2ssc.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2swyft.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2eauxslot.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2themill.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2sam.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2alfam2.*",
-		MAME_DIR .. "src/emu/bus/a2bus/laser128.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2echoii.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2arcadebd.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2midi.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2vulcan.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2zipdrive.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2applicard.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2hsscsi.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2ultraterm.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2pic.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2estd80col.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2eext80col.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2eramworks3.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2corvus.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2diskiing.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2mcms.*",
-		MAME_DIR .. "src/emu/bus/a2bus/a2dx1.*",
-		MAME_DIR .. "src/emu/bus/a2bus/timemasterho.*",
-		MAME_DIR .. "src/emu/bus/a2bus/mouse.*",
-		MAME_DIR .. "src/emu/bus/a2bus/corvfdc01.*",
-		MAME_DIR .. "src/emu/bus/a2bus/corvfdc02.*",
-		MAME_DIR .. "src/emu/bus/a2bus/ramcard16k.*",
-		MAME_DIR .. "src/emu/bus/a2bus/ramcard128k.*",
-		MAME_DIR .. "src/emu/bus/a2bus/ezcgi.*",
+		MAME_DIR .. "src/emu/bus/a2bus/a2bus.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2lang.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2diskii.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2mockingboard.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2cffa.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2memexp.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2scsi.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2thunderclock.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2softcard.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2videoterm.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2ssc.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2swyft.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2eauxslot.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2themill.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2sam.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2alfam2.c",
+		MAME_DIR .. "src/emu/bus/a2bus/laser128.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2echoii.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2arcadebd.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2midi.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2vulcan.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2zipdrive.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2applicard.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2hsscsi.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2ultraterm.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2pic.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2estd80col.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2eext80col.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2eramworks3.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2corvus.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2diskiing.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2mcms.c",
+		MAME_DIR .. "src/emu/bus/a2bus/a2dx1.c",
+		MAME_DIR .. "src/emu/bus/a2bus/timemasterho.c",
+		MAME_DIR .. "src/emu/bus/a2bus/mouse.c",
+		MAME_DIR .. "src/emu/bus/a2bus/corvfdc01.c",
+		MAME_DIR .. "src/emu/bus/a2bus/corvfdc02.c",
+		MAME_DIR .. "src/emu/bus/a2bus/ramcard16k.c",
+		MAME_DIR .. "src/emu/bus/a2bus/ramcard128k.c",
+		MAME_DIR .. "src/emu/bus/a2bus/ezcgi.c",
 	}
 end
 
@@ -984,23 +984,23 @@ end
 
 if (BUSES["NUBUS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/nubus/nubus.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_48gc.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_cb264.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_vikbw.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_specpdq.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_m2hires.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_spec8.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_radiustpd.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_m2video.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_asntmc3b.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_image.*",
-		MAME_DIR .. "src/emu/bus/nubus/nubus_wsportrait.*",
-		MAME_DIR .. "src/emu/bus/nubus/pds30_cb264.*",
-		MAME_DIR .. "src/emu/bus/nubus/pds30_procolor816.*",
-		MAME_DIR .. "src/emu/bus/nubus/pds30_sigmalview.*",
-		MAME_DIR .. "src/emu/bus/nubus/pds30_30hr.*",
-		MAME_DIR .. "src/emu/bus/nubus/pds30_mc30.*",
+		MAME_DIR .. "src/emu/bus/nubus/nubus.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_48gc.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_cb264.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_vikbw.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_specpdq.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_m2hires.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_spec8.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_radiustpd.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_m2video.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_asntmc3b.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_image.c",
+		MAME_DIR .. "src/emu/bus/nubus/nubus_wsportrait.c",
+		MAME_DIR .. "src/emu/bus/nubus/pds30_cb264.c",
+		MAME_DIR .. "src/emu/bus/nubus/pds30_procolor816.c",
+		MAME_DIR .. "src/emu/bus/nubus/pds30_sigmalview.c",
+		MAME_DIR .. "src/emu/bus/nubus/pds30_30hr.c",
+		MAME_DIR .. "src/emu/bus/nubus/pds30_mc30.c",
 	}
 end
 
@@ -1011,15 +1011,15 @@ end
 
 if (BUSES["CENTRONICS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/centronics/ctronics.*",
-		MAME_DIR .. "src/emu/bus/centronics/comxpl80.*",
-		MAME_DIR .. "src/emu/bus/centronics/covox.*",
-		MAME_DIR .. "src/emu/bus/centronics/dsjoy.*",
-		MAME_DIR .. "src/emu/bus/centronics/epson_ex800.*",
-		MAME_DIR .. "src/emu/bus/centronics/epson_lx800.*",
-		MAME_DIR .. "src/emu/bus/centronics/epson_lx810l.*",
-		MAME_DIR .. "src/emu/bus/centronics/printer.*",
-		MAME_DIR .. "src/emu/bus/centronics/digiblst.*",
+		MAME_DIR .. "src/emu/bus/centronics/ctronics.c",
+		MAME_DIR .. "src/emu/bus/centronics/comxpl80.c",
+		MAME_DIR .. "src/emu/bus/centronics/covox.c",
+		MAME_DIR .. "src/emu/bus/centronics/dsjoy.c",
+		MAME_DIR .. "src/emu/bus/centronics/epson_ex800.c",
+		MAME_DIR .. "src/emu/bus/centronics/epson_lx800.c",
+		MAME_DIR .. "src/emu/bus/centronics/epson_lx810l.c",
+		MAME_DIR .. "src/emu/bus/centronics/printer.c",
+		MAME_DIR .. "src/emu/bus/centronics/digiblst.c",
 	}
 end
 
@@ -1030,14 +1030,14 @@ end
 
 if (BUSES["RS232"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/rs232/keyboard.*",
-		MAME_DIR .. "src/emu/bus/rs232/loopback.*",
-		MAME_DIR .. "src/emu/bus/rs232/null_modem.*",
-		MAME_DIR .. "src/emu/bus/rs232/printer.*",
-		MAME_DIR .. "src/emu/bus/rs232/rs232.*",
-		MAME_DIR .. "src/emu/bus/rs232/ser_mouse.*",
-		MAME_DIR .. "src/emu/bus/rs232/terminal.*",
-		MAME_DIR .. "src/emu/bus/rs232/xvd701.*",
+		MAME_DIR .. "src/emu/bus/rs232/keyboard.c",
+		MAME_DIR .. "src/emu/bus/rs232/loopback.c",
+		MAME_DIR .. "src/emu/bus/rs232/null_modem.c",
+		MAME_DIR .. "src/emu/bus/rs232/printer.c",
+		MAME_DIR .. "src/emu/bus/rs232/rs232.c",
+		MAME_DIR .. "src/emu/bus/rs232/ser_mouse.c",
+		MAME_DIR .. "src/emu/bus/rs232/terminal.c",
+		MAME_DIR .. "src/emu/bus/rs232/xvd701.c",
 	}
 end
 
@@ -1048,9 +1048,9 @@ end
 
 if (BUSES["MIDI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/midi/midi.*",
-		MAME_DIR .. "src/emu/bus/midi/midiinport.*",
-		MAME_DIR .. "src/emu/bus/midi/midioutport.*",
+		MAME_DIR .. "src/emu/bus/midi/midi.c",
+		MAME_DIR .. "src/emu/bus/midi/midiinport.c",
+		MAME_DIR .. "src/emu/bus/midi/midioutport.c",
 	}
 end
 
@@ -1061,14 +1061,14 @@ end
 
 if (BUSES["LPCI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/lpci/pci.*",
-		MAME_DIR .. "src/emu/bus/lpci/cirrus.*",
-		MAME_DIR .. "src/emu/bus/lpci/i82371ab.*",
-		MAME_DIR .. "src/emu/bus/lpci/i82371sb.*",
-		MAME_DIR .. "src/emu/bus/lpci/i82439tx.*",
-		MAME_DIR .. "src/emu/bus/lpci/northbridge.*",
-		MAME_DIR .. "src/emu/bus/lpci/southbridge.*",
-		MAME_DIR .. "src/emu/bus/lpci/mpc105.*",
+		MAME_DIR .. "src/emu/bus/lpci/pci.c",
+		MAME_DIR .. "src/emu/bus/lpci/cirrus.c",
+		MAME_DIR .. "src/emu/bus/lpci/i82371ab.c",
+		MAME_DIR .. "src/emu/bus/lpci/i82371sb.c",
+		MAME_DIR .. "src/emu/bus/lpci/i82439tx.c",
+		MAME_DIR .. "src/emu/bus/lpci/northbridge.c",
+		MAME_DIR .. "src/emu/bus/lpci/southbridge.c",
+		MAME_DIR .. "src/emu/bus/lpci/mpc105.c",
 	}
 end
 
@@ -1079,56 +1079,56 @@ end
 
 if (BUSES["NES"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/nes/nes_slot.*",
-		MAME_DIR .. "src/emu/bus/nes/nes_carts.*",
-		MAME_DIR .. "src/emu/bus/nes/2a03pur.*",
-		MAME_DIR .. "src/emu/bus/nes/act53.*",
-		MAME_DIR .. "src/emu/bus/nes/aladdin.*",
-		MAME_DIR .. "src/emu/bus/nes/ave.*",
-		MAME_DIR .. "src/emu/bus/nes/bandai.*",
-		MAME_DIR .. "src/emu/bus/nes/benshieng.*",
-		MAME_DIR .. "src/emu/bus/nes/bootleg.*",
-		MAME_DIR .. "src/emu/bus/nes/camerica.*",
-		MAME_DIR .. "src/emu/bus/nes/cne.*",
-		MAME_DIR .. "src/emu/bus/nes/cony.*",
-		MAME_DIR .. "src/emu/bus/nes/datach.*",
-		MAME_DIR .. "src/emu/bus/nes/discrete.*",
-		MAME_DIR .. "src/emu/bus/nes/disksys.*",
-		MAME_DIR .. "src/emu/bus/nes/event.*",
-		MAME_DIR .. "src/emu/bus/nes/ggenie.*",
-		MAME_DIR .. "src/emu/bus/nes/henggedianzi.*",
-		MAME_DIR .. "src/emu/bus/nes/hes.*",
-		MAME_DIR .. "src/emu/bus/nes/hosenkan.*",
-		MAME_DIR .. "src/emu/bus/nes/irem.*",
-		MAME_DIR .. "src/emu/bus/nes/jaleco.*",
-		MAME_DIR .. "src/emu/bus/nes/jy.*",
-		MAME_DIR .. "src/emu/bus/nes/kaiser.*",
-		MAME_DIR .. "src/emu/bus/nes/karastudio.*",
-		MAME_DIR .. "src/emu/bus/nes/konami.*",
-		MAME_DIR .. "src/emu/bus/nes/legacy.*",
-		MAME_DIR .. "src/emu/bus/nes/mmc1.*",
-		MAME_DIR .. "src/emu/bus/nes/mmc2.*",
-		MAME_DIR .. "src/emu/bus/nes/mmc3.*",
-		MAME_DIR .. "src/emu/bus/nes/mmc3_clones.*",
-		MAME_DIR .. "src/emu/bus/nes/mmc5.*",
-		MAME_DIR .. "src/emu/bus/nes/multigame.*",
-		MAME_DIR .. "src/emu/bus/nes/namcot.*",
-		MAME_DIR .. "src/emu/bus/nes/nanjing.*",
-		MAME_DIR .. "src/emu/bus/nes/ntdec.*",
-		MAME_DIR .. "src/emu/bus/nes/nxrom.*",
-		MAME_DIR .. "src/emu/bus/nes/pirate.*",
-		MAME_DIR .. "src/emu/bus/nes/pt554.*",
-		MAME_DIR .. "src/emu/bus/nes/racermate.*",
-		MAME_DIR .. "src/emu/bus/nes/rcm.*",
-		MAME_DIR .. "src/emu/bus/nes/rexsoft.*",
-		MAME_DIR .. "src/emu/bus/nes/sachen.*",
-		MAME_DIR .. "src/emu/bus/nes/somari.*",
-		MAME_DIR .. "src/emu/bus/nes/sunsoft.*",
-		MAME_DIR .. "src/emu/bus/nes/sunsoft_dcs.*",
-		MAME_DIR .. "src/emu/bus/nes/taito.*",
-		MAME_DIR .. "src/emu/bus/nes/tengen.*",
-		MAME_DIR .. "src/emu/bus/nes/txc.*",
-		MAME_DIR .. "src/emu/bus/nes/waixing.*",
+		MAME_DIR .. "src/emu/bus/nes/nes_slot.c",
+		MAME_DIR .. "src/emu/bus/nes/nes_carts.c",
+		MAME_DIR .. "src/emu/bus/nes/2a03pur.c",
+		MAME_DIR .. "src/emu/bus/nes/act53.c",
+		MAME_DIR .. "src/emu/bus/nes/aladdin.c",
+		MAME_DIR .. "src/emu/bus/nes/ave.c",
+		MAME_DIR .. "src/emu/bus/nes/bandai.c",
+		MAME_DIR .. "src/emu/bus/nes/benshieng.c",
+		MAME_DIR .. "src/emu/bus/nes/bootleg.c",
+		MAME_DIR .. "src/emu/bus/nes/camerica.c",
+		MAME_DIR .. "src/emu/bus/nes/cne.c",
+		MAME_DIR .. "src/emu/bus/nes/cony.c",
+		MAME_DIR .. "src/emu/bus/nes/datach.c",
+		MAME_DIR .. "src/emu/bus/nes/discrete.c",
+		MAME_DIR .. "src/emu/bus/nes/disksys.c",
+		MAME_DIR .. "src/emu/bus/nes/event.c",
+		MAME_DIR .. "src/emu/bus/nes/ggenie.c",
+		MAME_DIR .. "src/emu/bus/nes/henggedianzi.c",
+		MAME_DIR .. "src/emu/bus/nes/hes.c",
+		MAME_DIR .. "src/emu/bus/nes/hosenkan.c",
+		MAME_DIR .. "src/emu/bus/nes/irem.c",
+		MAME_DIR .. "src/emu/bus/nes/jaleco.c",
+		MAME_DIR .. "src/emu/bus/nes/jy.c",
+		MAME_DIR .. "src/emu/bus/nes/kaiser.c",
+		MAME_DIR .. "src/emu/bus/nes/karastudio.c",
+		MAME_DIR .. "src/emu/bus/nes/konami.c",
+		MAME_DIR .. "src/emu/bus/nes/legacy.c",
+		MAME_DIR .. "src/emu/bus/nes/mmc1.c",
+		MAME_DIR .. "src/emu/bus/nes/mmc2.c",
+		MAME_DIR .. "src/emu/bus/nes/mmc3.c",
+		MAME_DIR .. "src/emu/bus/nes/mmc3_clones.c",
+		MAME_DIR .. "src/emu/bus/nes/mmc5.c",
+		MAME_DIR .. "src/emu/bus/nes/multigame.c",
+		MAME_DIR .. "src/emu/bus/nes/namcot.c",
+		MAME_DIR .. "src/emu/bus/nes/nanjing.c",
+		MAME_DIR .. "src/emu/bus/nes/ntdec.c",
+		MAME_DIR .. "src/emu/bus/nes/nxrom.c",
+		MAME_DIR .. "src/emu/bus/nes/pirate.c",
+		MAME_DIR .. "src/emu/bus/nes/pt554.c",
+		MAME_DIR .. "src/emu/bus/nes/racermate.c",
+		MAME_DIR .. "src/emu/bus/nes/rcm.c",
+		MAME_DIR .. "src/emu/bus/nes/rexsoft.c",
+		MAME_DIR .. "src/emu/bus/nes/sachen.c",
+		MAME_DIR .. "src/emu/bus/nes/somari.c",
+		MAME_DIR .. "src/emu/bus/nes/sunsoft.c",
+		MAME_DIR .. "src/emu/bus/nes/sunsoft_dcs.c",
+		MAME_DIR .. "src/emu/bus/nes/taito.c",
+		MAME_DIR .. "src/emu/bus/nes/tengen.c",
+		MAME_DIR .. "src/emu/bus/nes/txc.c",
+		MAME_DIR .. "src/emu/bus/nes/waixing.c",
 	}
 end
 
@@ -1139,22 +1139,22 @@ end
 
 if (BUSES["NES_CTRL"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/nes_ctrl/ctrl.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/joypad.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/4score.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/arkpaddle.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/bcbattle.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/ftrainer.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/fckeybrd.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/hori.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/konamihs.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/miracle.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/mjpanel.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/pachinko.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/partytap.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/powerpad.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/suborkey.*",
-		MAME_DIR .. "src/emu/bus/nes_ctrl/zapper.*",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/ctrl.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/joypad.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/4score.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/arkpaddle.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/bcbattle.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/ftrainer.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/fckeybrd.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/hori.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/konamihs.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/miracle.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/mjpanel.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/pachinko.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/partytap.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/powerpad.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/suborkey.c",
+		MAME_DIR .. "src/emu/bus/nes_ctrl/zapper.c",
 	}
 end
 
@@ -1165,19 +1165,19 @@ end
 
 if (BUSES["SNES"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/snes/snes_slot.*",
-		MAME_DIR .. "src/emu/bus/snes/snes_carts.*",
-		MAME_DIR .. "src/emu/bus/snes/bsx.*",
-		MAME_DIR .. "src/emu/bus/snes/event.*",
-		MAME_DIR .. "src/emu/bus/snes/rom.*",
-		MAME_DIR .. "src/emu/bus/snes/rom21.*",
-		MAME_DIR .. "src/emu/bus/snes/sa1.*",
-		MAME_DIR .. "src/emu/bus/snes/sdd1.*",
-		MAME_DIR .. "src/emu/bus/snes/sfx.*",
-		MAME_DIR .. "src/emu/bus/snes/sgb.*",
-		MAME_DIR .. "src/emu/bus/snes/spc7110.*",
-		MAME_DIR .. "src/emu/bus/snes/sufami.*",
-		MAME_DIR .. "src/emu/bus/snes/upd.*",
+		MAME_DIR .. "src/emu/bus/snes/snes_slot.c",
+		MAME_DIR .. "src/emu/bus/snes/snes_carts.c",
+		MAME_DIR .. "src/emu/bus/snes/bsx.c",
+		MAME_DIR .. "src/emu/bus/snes/event.c",
+		MAME_DIR .. "src/emu/bus/snes/rom.c",
+		MAME_DIR .. "src/emu/bus/snes/rom21.c",
+		MAME_DIR .. "src/emu/bus/snes/sa1.c",
+		MAME_DIR .. "src/emu/bus/snes/sdd1.c",
+		MAME_DIR .. "src/emu/bus/snes/sfx.c",
+		MAME_DIR .. "src/emu/bus/snes/sgb.c",
+		MAME_DIR .. "src/emu/bus/snes/spc7110.c",
+		MAME_DIR .. "src/emu/bus/snes/sufami.c",
+		MAME_DIR .. "src/emu/bus/snes/upd.c",
 	}
 end
 
@@ -1188,15 +1188,15 @@ end
 
 if (BUSES["SNES_CTRL"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/snes_ctrl/ctrl.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/bcbattle.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/joypad.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/miracle.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/mouse.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/multitap.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/pachinko.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/sscope.*",
-		MAME_DIR .. "src/emu/bus/snes_ctrl/twintap.*",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/ctrl.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/bcbattle.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/joypad.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/miracle.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/mouse.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/multitap.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/pachinko.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/sscope.c",
+		MAME_DIR .. "src/emu/bus/snes_ctrl/twintap.c",
 	}
 end
 
@@ -1206,8 +1206,8 @@ end
 ---------------------------------------------------
 if (BUSES["VBOY"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vboy/slot.*",
-		MAME_DIR .. "src/emu/bus/vboy/rom.*",
+		MAME_DIR .. "src/emu/bus/vboy/slot.c",
+		MAME_DIR .. "src/emu/bus/vboy/rom.c",
 	}
 end
 
@@ -1218,15 +1218,15 @@ end
 
 if (BUSES["MEGADRIVE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/megadrive/md_slot.*",
-		MAME_DIR .. "src/emu/bus/megadrive/md_carts.*",
-		MAME_DIR .. "src/emu/bus/megadrive/eeprom.*",
-		MAME_DIR .. "src/emu/bus/megadrive/ggenie.*",
-		MAME_DIR .. "src/emu/bus/megadrive/jcart.*",
-		MAME_DIR .. "src/emu/bus/megadrive/rom.*",
-		MAME_DIR .. "src/emu/bus/megadrive/sk.*",
-		MAME_DIR .. "src/emu/bus/megadrive/stm95.*",
-		MAME_DIR .. "src/emu/bus/megadrive/svp.*",
+		MAME_DIR .. "src/emu/bus/megadrive/md_slot.c",
+		MAME_DIR .. "src/emu/bus/megadrive/md_carts.c",
+		MAME_DIR .. "src/emu/bus/megadrive/eeprom.c",
+		MAME_DIR .. "src/emu/bus/megadrive/ggenie.c",
+		MAME_DIR .. "src/emu/bus/megadrive/jcart.c",
+		MAME_DIR .. "src/emu/bus/megadrive/rom.c",
+		MAME_DIR .. "src/emu/bus/megadrive/sk.c",
+		MAME_DIR .. "src/emu/bus/megadrive/stm95.c",
+		MAME_DIR .. "src/emu/bus/megadrive/svp.c",
 	}
 end
 
@@ -1237,33 +1237,33 @@ end
 
 if (BUSES["NEOGEO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/neogeo/neogeo_slot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/neogeo_intf.*",
-		MAME_DIR .. "src/emu/bus/neogeo/neogeo_carts.*",
-		MAME_DIR .. "src/emu/bus/neogeo/neogeo_helper.*",
-		MAME_DIR .. "src/emu/bus/neogeo/banked_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/mslugx_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/mslugx_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/sma_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/sma_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/cmc_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/cmc_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/pcm2_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/pcm2_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/kof2002_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/kof2002_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/pvc_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/pvc_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/fatfury2_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/fatfury2_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/kof98_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/kof98_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/bootleg_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/bootleg_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/bootleg_hybrid_cart.*",
-		MAME_DIR .. "src/emu/bus/neogeo/sbp_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/kog_prot.*",
-		MAME_DIR .. "src/emu/bus/neogeo/rom.*",
+		MAME_DIR .. "src/emu/bus/neogeo/neogeo_slot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/neogeo_intf.c",
+		MAME_DIR .. "src/emu/bus/neogeo/neogeo_carts.c",
+		MAME_DIR .. "src/emu/bus/neogeo/neogeo_helper.c",
+		MAME_DIR .. "src/emu/bus/neogeo/banked_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/mslugx_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/mslugx_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/sma_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/sma_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/cmc_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/cmc_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/pcm2_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/pcm2_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/kof2002_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/kof2002_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/pvc_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/pvc_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/fatfury2_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/fatfury2_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/kof98_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/kof98_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/bootleg_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/bootleg_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/bootleg_hybrid_cart.c",
+		MAME_DIR .. "src/emu/bus/neogeo/sbp_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/kog_prot.c",
+		MAME_DIR .. "src/emu/bus/neogeo/rom.c",
 	}
 end
 
@@ -1275,10 +1275,10 @@ end
 
 if (BUSES["SATURN"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/saturn/sat_slot.*",
-		MAME_DIR .. "src/emu/bus/saturn/bram.*",
-		MAME_DIR .. "src/emu/bus/saturn/dram.*",
-		MAME_DIR .. "src/emu/bus/saturn/rom.*",
+		MAME_DIR .. "src/emu/bus/saturn/sat_slot.c",
+		MAME_DIR .. "src/emu/bus/saturn/bram.c",
+		MAME_DIR .. "src/emu/bus/saturn/dram.c",
+		MAME_DIR .. "src/emu/bus/saturn/rom.c",
 	}
 end
 
@@ -1289,10 +1289,10 @@ end
 
 if (BUSES["SEGA8"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/sega8/sega8_slot.*",
-		MAME_DIR .. "src/emu/bus/sega8/rom.*",
-		MAME_DIR .. "src/emu/bus/sega8/ccatch.*",
-		MAME_DIR .. "src/emu/bus/sega8/mgear.*",
+		MAME_DIR .. "src/emu/bus/sega8/sega8_slot.c",
+		MAME_DIR .. "src/emu/bus/sega8/rom.c",
+		MAME_DIR .. "src/emu/bus/sega8/ccatch.c",
+		MAME_DIR .. "src/emu/bus/sega8/mgear.c",
 	}
 end
 
@@ -1303,15 +1303,15 @@ end
 
 if (BUSES["SMS_CTRL"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/sms_ctrl/smsctrl.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/joypad.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/lphaser.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/paddle.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/rfu.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/sports.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/sportsjp.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/multitap.*",
-		MAME_DIR .. "src/emu/bus/sms_ctrl/graphic.*",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/smsctrl.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/joypad.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/lphaser.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/paddle.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/rfu.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/sports.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/sportsjp.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/multitap.c",
+		MAME_DIR .. "src/emu/bus/sms_ctrl/graphic.c",
 	}
 end
 
@@ -1322,8 +1322,8 @@ end
 
 if (BUSES["SMS_EXP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/sms_exp/smsexp.*",
-		MAME_DIR .. "src/emu/bus/sms_exp/gender.*",
+		MAME_DIR .. "src/emu/bus/sms_exp/smsexp.c",
+		MAME_DIR .. "src/emu/bus/sms_exp/gender.c",
 	}
 end
 
@@ -1334,22 +1334,22 @@ end
 
 if (BUSES["TI99PEB"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/ti99_peb/peribox.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/bwg.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/evpc.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/hfdc.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/horizon.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/hsgpl.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/memex.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/myarcmem.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/pcode.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/samsmem.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/spchsyn.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/ti_32kmem.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/ti_fdc.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/ti_rs232.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/tn_ide.*",
-		MAME_DIR .. "src/emu/bus/ti99_peb/tn_usbsm.*",
+		MAME_DIR .. "src/emu/bus/ti99_peb/peribox.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/bwg.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/evpc.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/hfdc.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/horizon.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/hsgpl.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/memex.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/myarcmem.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/pcode.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/samsmem.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/spchsyn.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/ti_32kmem.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/ti_fdc.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/ti_rs232.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/tn_ide.c",
+		MAME_DIR .. "src/emu/bus/ti99_peb/tn_usbsm.c",
 	}
 end
 
@@ -1360,9 +1360,9 @@ end
 
 if (BUSES["GAMEBOY"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/gameboy/gb_slot.*",
-		MAME_DIR .. "src/emu/bus/gameboy/rom.*",
-		MAME_DIR .. "src/emu/bus/gameboy/mbc.*",
+		MAME_DIR .. "src/emu/bus/gameboy/gb_slot.c",
+		MAME_DIR .. "src/emu/bus/gameboy/rom.c",
+		MAME_DIR .. "src/emu/bus/gameboy/mbc.c",
 	}
 end
 
@@ -1373,8 +1373,8 @@ end
 
 if (BUSES["GAMEGEAR"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/gamegear/ggext.*",
-		MAME_DIR .. "src/emu/bus/gamegear/smsctrladp.*",
+		MAME_DIR .. "src/emu/bus/gamegear/ggext.c",
+		MAME_DIR .. "src/emu/bus/gamegear/smsctrladp.c",
 	}
 end
 
@@ -1385,8 +1385,8 @@ end
 
 if (BUSES["GBA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/gba/gba_slot.*",
-		MAME_DIR .. "src/emu/bus/gba/rom.*",
+		MAME_DIR .. "src/emu/bus/gba/gba_slot.c",
+		MAME_DIR .. "src/emu/bus/gba/rom.c",
 	}
 end
 
@@ -1396,10 +1396,10 @@ end
 ---------------------------------------------------
 if (BUSES["BML3"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/bml3/bml3bus.*",
-		MAME_DIR .. "src/emu/bus/bml3/bml3mp1802.*",
-		MAME_DIR .. "src/emu/bus/bml3/bml3mp1805.*",
-		MAME_DIR .. "src/emu/bus/bml3/bml3kanji.*",
+		MAME_DIR .. "src/emu/bus/bml3/bml3bus.c",
+		MAME_DIR .. "src/emu/bus/bml3/bml3mp1802.c",
+		MAME_DIR .. "src/emu/bus/bml3/bml3mp1805.c",
+		MAME_DIR .. "src/emu/bus/bml3/bml3kanji.c",
 	}
 end
 
@@ -1409,13 +1409,13 @@ end
 ---------------------------------------------------
 if (BUSES["COCO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/coco/cococart.*",
-		MAME_DIR .. "src/emu/bus/coco/coco_232.*",
-		MAME_DIR .. "src/emu/bus/coco/coco_orch90.*",
-		MAME_DIR .. "src/emu/bus/coco/coco_pak.*",
-		MAME_DIR .. "src/emu/bus/coco/coco_fdc.*",
-		MAME_DIR .. "src/emu/bus/coco/coco_multi.*",
-		MAME_DIR .. "src/emu/bus/coco/coco_dwsock.*",
+		MAME_DIR .. "src/emu/bus/coco/cococart.c",
+		MAME_DIR .. "src/emu/bus/coco/coco_232.c",
+		MAME_DIR .. "src/emu/bus/coco/coco_orch90.c",
+		MAME_DIR .. "src/emu/bus/coco/coco_pak.c",
+		MAME_DIR .. "src/emu/bus/coco/coco_fdc.c",
+		MAME_DIR .. "src/emu/bus/coco/coco_multi.c",
+		MAME_DIR .. "src/emu/bus/coco/coco_dwsock.c",
 	}
 end
 
@@ -1425,16 +1425,16 @@ end
 ---------------------------------------------------
 if (BUSES["CPC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/cpc/cpcexp.*",
-		MAME_DIR .. "src/emu/bus/cpc/cpc_ssa1.*",
-		MAME_DIR .. "src/emu/bus/cpc/cpc_rom.*",
-		MAME_DIR .. "src/emu/bus/cpc/cpc_pds.*",
-		MAME_DIR .. "src/emu/bus/cpc/cpc_rs232.*",
-		MAME_DIR .. "src/emu/bus/cpc/mface2.*",
-		MAME_DIR .. "src/emu/bus/cpc/symbfac2.*",
-		MAME_DIR .. "src/emu/bus/cpc/amdrum.*",
-		MAME_DIR .. "src/emu/bus/cpc/playcity.*",
-		MAME_DIR .. "src/emu/bus/cpc/smartwatch.*",
+		MAME_DIR .. "src/emu/bus/cpc/cpcexp.c",
+		MAME_DIR .. "src/emu/bus/cpc/cpc_ssa1.c",
+		MAME_DIR .. "src/emu/bus/cpc/cpc_rom.c",
+		MAME_DIR .. "src/emu/bus/cpc/cpc_pds.c",
+		MAME_DIR .. "src/emu/bus/cpc/cpc_rs232.c",
+		MAME_DIR .. "src/emu/bus/cpc/mface2.c",
+		MAME_DIR .. "src/emu/bus/cpc/symbfac2.c",
+		MAME_DIR .. "src/emu/bus/cpc/amdrum.c",
+		MAME_DIR .. "src/emu/bus/cpc/playcity.c",
+		MAME_DIR .. "src/emu/bus/cpc/smartwatch.c",
 	}
 end
 
@@ -1444,9 +1444,9 @@ end
 ---------------------------------------------------
 if (BUSES["EPSON_SIO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/epson_sio/epson_sio.*",
-		MAME_DIR .. "src/emu/bus/epson_sio/pf10.*",
-		MAME_DIR .. "src/emu/bus/epson_sio/tf20.*",
+		MAME_DIR .. "src/emu/bus/epson_sio/epson_sio.c",
+		MAME_DIR .. "src/emu/bus/epson_sio/pf10.c",
+		MAME_DIR .. "src/emu/bus/epson_sio/tf20.c",
 	}
 end
 
@@ -1456,8 +1456,8 @@ end
 ---------------------------------------------------
 if (BUSES["PCE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/pce/pce_slot.*",
-		MAME_DIR .. "src/emu/bus/pce/pce_rom.*",
+		MAME_DIR .. "src/emu/bus/pce/pce_slot.c",
+		MAME_DIR .. "src/emu/bus/pce/pce_rom.c",
 	}
 end
 
@@ -1467,8 +1467,8 @@ end
 ---------------------------------------------------
 if (BUSES["SCV"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/scv/slot.*",
-		MAME_DIR .. "src/emu/bus/scv/rom.*",
+		MAME_DIR .. "src/emu/bus/scv/slot.c",
+		MAME_DIR .. "src/emu/bus/scv/rom.c",
 	}
 end
 
@@ -1478,9 +1478,9 @@ end
 ---------------------------------------------------
 if (BUSES["X68K"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/x68k/x68kexp.*",
-		MAME_DIR .. "src/emu/bus/x68k/x68k_neptunex.*",
-		MAME_DIR .. "src/emu/bus/x68k/x68k_scsiext.*",
+		MAME_DIR .. "src/emu/bus/x68k/x68kexp.c",
+		MAME_DIR .. "src/emu/bus/x68k/x68k_neptunex.c",
+		MAME_DIR .. "src/emu/bus/x68k/x68k_scsiext.c",
 	}
 end
 
@@ -1490,10 +1490,10 @@ end
 ---------------------------------------------------
 if (BUSES["ABCKB"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/abckb/abckb.*",
-		MAME_DIR .. "src/emu/bus/abckb/abc77.*",
-		MAME_DIR .. "src/emu/bus/abckb/abc99.*",
-		MAME_DIR .. "src/emu/bus/abckb/abc800kb.*",
+		MAME_DIR .. "src/emu/bus/abckb/abckb.c",
+		MAME_DIR .. "src/emu/bus/abckb/abc77.c",
+		MAME_DIR .. "src/emu/bus/abckb/abc99.c",
+		MAME_DIR .. "src/emu/bus/abckb/abc800kb.c",
 	}
 end
 
@@ -1503,7 +1503,7 @@ end
 ---------------------------------------------------
 if (BUSES["COMPUCOLOR"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/compucolor/floppy.*",
+		MAME_DIR .. "src/emu/bus/compucolor/floppy.c",
 	}
 end
 
@@ -1513,17 +1513,17 @@ end
 ---------------------------------------------------
 if (BUSES["SCSI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/scsi/scsi.*",
-		MAME_DIR .. "src/emu/bus/scsi/scsicd.*",
-		MAME_DIR .. "src/emu/bus/scsi/scsihd.*",
-		MAME_DIR .. "src/emu/bus/scsi/scsihle.*",
-		MAME_DIR .. "src/emu/bus/scsi/cdu76s.*",
-		MAME_DIR .. "src/emu/bus/scsi/acb4070.*",
-		MAME_DIR .. "src/emu/bus/scsi/d9060hd.*",
-		MAME_DIR .. "src/emu/bus/scsi/sa1403d.*",
-		MAME_DIR .. "src/emu/bus/scsi/s1410.*",
-		MAME_DIR .. "src/emu/bus/scsi/pc9801_sasi.*",
-		MAME_DIR .. "src/emu/bus/scsi/omti5100.*",
+		MAME_DIR .. "src/emu/bus/scsi/scsi.c",
+		MAME_DIR .. "src/emu/bus/scsi/scsicd.c",
+		MAME_DIR .. "src/emu/bus/scsi/scsihd.c",
+		MAME_DIR .. "src/emu/bus/scsi/scsihle.c",
+		MAME_DIR .. "src/emu/bus/scsi/cdu76s.c",
+		MAME_DIR .. "src/emu/bus/scsi/acb4070.c",
+		MAME_DIR .. "src/emu/bus/scsi/d9060hd.c",
+		MAME_DIR .. "src/emu/bus/scsi/sa1403d.c",
+		MAME_DIR .. "src/emu/bus/scsi/s1410.c",
+		MAME_DIR .. "src/emu/bus/scsi/pc9801_sasi.c",
+		MAME_DIR .. "src/emu/bus/scsi/omti5100.c",
 	}
 end
 
@@ -1533,8 +1533,8 @@ end
 ---------------------------------------------------
 if (BUSES["MACPDS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/macpds/macpds.*",
-		MAME_DIR .. "src/emu/bus/macpds/pds_tpdfpd.*",
+		MAME_DIR .. "src/emu/bus/macpds/macpds.c",
+		MAME_DIR .. "src/emu/bus/macpds/pds_tpdfpd.c",
 	}
 end
 
@@ -1544,9 +1544,9 @@ end
 ---------------------------------------------------
 if (BUSES["ORICEXT"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/oricext/oricext.*",
-		MAME_DIR .. "src/emu/bus/oricext/jasmin.*",
-		MAME_DIR .. "src/emu/bus/oricext/microdisc.*",
+		MAME_DIR .. "src/emu/bus/oricext/oricext.c",
+		MAME_DIR .. "src/emu/bus/oricext/jasmin.c",
+		MAME_DIR .. "src/emu/bus/oricext/microdisc.c",
 	}
 end
 
@@ -1557,9 +1557,9 @@ end
 
 if (BUSES["A1BUS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/a1bus/a1bus.*",
-		MAME_DIR .. "src/emu/bus/a1bus/a1cassette.*",
-		MAME_DIR .. "src/emu/bus/a1bus/a1cffa.*",
+		MAME_DIR .. "src/emu/bus/a1bus/a1bus.c",
+		MAME_DIR .. "src/emu/bus/a1bus/a1cassette.c",
+		MAME_DIR .. "src/emu/bus/a1bus/a1cffa.c",
 	}
 end
 
@@ -1570,13 +1570,13 @@ end
 
 if (BUSES["ZORRO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/amiga/zorro/zorro.*",
-		MAME_DIR .. "src/emu/bus/amiga/zorro/cards.*",
-		MAME_DIR .. "src/emu/bus/amiga/zorro/a2052.*",
-		MAME_DIR .. "src/emu/bus/amiga/zorro/a2232.*",
-		MAME_DIR .. "src/emu/bus/amiga/zorro/a590.*",
-		MAME_DIR .. "src/emu/bus/amiga/zorro/action_replay.*",
-		MAME_DIR .. "src/emu/bus/amiga/zorro/buddha.*",
+		MAME_DIR .. "src/emu/bus/amiga/zorro/zorro.c",
+		MAME_DIR .. "src/emu/bus/amiga/zorro/cards.c",
+		MAME_DIR .. "src/emu/bus/amiga/zorro/a2052.c",
+		MAME_DIR .. "src/emu/bus/amiga/zorro/a2232.c",
+		MAME_DIR .. "src/emu/bus/amiga/zorro/a590.c",
+		MAME_DIR .. "src/emu/bus/amiga/zorro/action_replay.c",
+		MAME_DIR .. "src/emu/bus/amiga/zorro/buddha.c",
 	}
 end
 
@@ -1587,22 +1587,22 @@ end
 
 if (BUSES["QL"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/ql/exp.*",
-		MAME_DIR .. "src/emu/bus/ql/cst_qdisc.*",
-		MAME_DIR .. "src/emu/bus/ql/cst_q_plus4.*",
-		MAME_DIR .. "src/emu/bus/ql/cumana_fdi.*",
-		MAME_DIR .. "src/emu/bus/ql/kempston_di.*",
-		MAME_DIR .. "src/emu/bus/ql/miracle_gold_card.*",
-		MAME_DIR .. "src/emu/bus/ql/mp_fdi.*",
-		MAME_DIR .. "src/emu/bus/ql/opd_basic_master.*",
-		MAME_DIR .. "src/emu/bus/ql/pcml_qdisk.*",
-		MAME_DIR .. "src/emu/bus/ql/qubide.*",
-		MAME_DIR .. "src/emu/bus/ql/sandy_superdisk.*",
-		MAME_DIR .. "src/emu/bus/ql/sandy_superqboard.*",
-		MAME_DIR .. "src/emu/bus/ql/trumpcard.*",
-		MAME_DIR .. "src/emu/bus/ql/rom.*",
-		MAME_DIR .. "src/emu/bus/ql/miracle_hd.*",
-		MAME_DIR .. "src/emu/bus/ql/std.*",
+		MAME_DIR .. "src/emu/bus/ql/exp.c",
+		MAME_DIR .. "src/emu/bus/ql/cst_qdisc.c",
+		MAME_DIR .. "src/emu/bus/ql/cst_q_plus4.c",
+		MAME_DIR .. "src/emu/bus/ql/cumana_fdi.c",
+		MAME_DIR .. "src/emu/bus/ql/kempston_di.c",
+		MAME_DIR .. "src/emu/bus/ql/miracle_gold_card.c",
+		MAME_DIR .. "src/emu/bus/ql/mp_fdi.c",
+		MAME_DIR .. "src/emu/bus/ql/opd_basic_master.c",
+		MAME_DIR .. "src/emu/bus/ql/pcml_qdisk.c",
+		MAME_DIR .. "src/emu/bus/ql/qubide.c",
+		MAME_DIR .. "src/emu/bus/ql/sandy_superdisk.c",
+		MAME_DIR .. "src/emu/bus/ql/sandy_superqboard.c",
+		MAME_DIR .. "src/emu/bus/ql/trumpcard.c",
+		MAME_DIR .. "src/emu/bus/ql/rom.c",
+		MAME_DIR .. "src/emu/bus/ql/miracle_hd.c",
+		MAME_DIR .. "src/emu/bus/ql/std.c",
 	}
 end
 
@@ -1613,12 +1613,12 @@ end
 
 if (BUSES["VTECH_MEMEXP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vtech/memexp/memexp.*",
-		MAME_DIR .. "src/emu/bus/vtech/memexp/carts.*",
-		MAME_DIR .. "src/emu/bus/vtech/memexp/floppy.*",
-		MAME_DIR .. "src/emu/bus/vtech/memexp/memory.*",
-		MAME_DIR .. "src/emu/bus/vtech/memexp/rs232.*",
-		MAME_DIR .. "src/emu/bus/vtech/memexp/wordpro.*",
+		MAME_DIR .. "src/emu/bus/vtech/memexp/memexp.c",
+		MAME_DIR .. "src/emu/bus/vtech/memexp/carts.c",
+		MAME_DIR .. "src/emu/bus/vtech/memexp/floppy.c",
+		MAME_DIR .. "src/emu/bus/vtech/memexp/memory.c",
+		MAME_DIR .. "src/emu/bus/vtech/memexp/rs232.c",
+		MAME_DIR .. "src/emu/bus/vtech/memexp/wordpro.c",
 	}
 end
 
@@ -1629,10 +1629,10 @@ end
 
 if (BUSES["VTECH_IOEXP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/vtech/ioexp/ioexp.*",
-		MAME_DIR .. "src/emu/bus/vtech/ioexp/carts.*",
-		MAME_DIR .. "src/emu/bus/vtech/ioexp/joystick.*",
-		MAME_DIR .. "src/emu/bus/vtech/ioexp/printer.*",
+		MAME_DIR .. "src/emu/bus/vtech/ioexp/ioexp.c",
+		MAME_DIR .. "src/emu/bus/vtech/ioexp/carts.c",
+		MAME_DIR .. "src/emu/bus/vtech/ioexp/joystick.c",
+		MAME_DIR .. "src/emu/bus/vtech/ioexp/printer.c",
 	}
 end
 
@@ -1643,8 +1643,8 @@ end
 
 if (BUSES["WSWAN"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/wswan/slot.*",
-		MAME_DIR .. "src/emu/bus/wswan/rom.*",
+		MAME_DIR .. "src/emu/bus/wswan/slot.c",
+		MAME_DIR .. "src/emu/bus/wswan/rom.c",
 	}
 end
 
@@ -1655,9 +1655,9 @@ end
 
 if (BUSES["PSX_CONTROLLER"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/bus/psx/ctlrport.*",
-		MAME_DIR .. "src/emu/bus/psx/analogue.*",
-		MAME_DIR .. "src/emu/bus/psx/multitap.*",
-		MAME_DIR .. "src/emu/bus/psx/memcard.*",
+		MAME_DIR .. "src/emu/bus/psx/ctlrport.c",
+		MAME_DIR .. "src/emu/bus/psx/analogue.c",
+		MAME_DIR .. "src/emu/bus/psx/multitap.c",
+		MAME_DIR .. "src/emu/bus/psx/memcard.c",
 	}
 end

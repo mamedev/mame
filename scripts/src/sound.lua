@@ -20,25 +20,25 @@
 
 if (SOUNDS["DAC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/dac.*",
+		MAME_DIR .. "src/emu/sound/dac.c",
 	}
 end
 
 if (SOUNDS["DMADAC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/dmadac.*",
+		MAME_DIR .. "src/emu/sound/dmadac.c",
 	}
 end
 
 if (SOUNDS["SPEAKER"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/speaker.*",
+		MAME_DIR .. "src/emu/sound/speaker.c",
 	}
 end
 
 if (SOUNDS["BEEP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/beep.*",
+		MAME_DIR .. "src/emu/sound/beep.c",
 	}
 end
 
@@ -51,7 +51,7 @@ end
 
 if (SOUNDS["CDDA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/cdda.*",
+		MAME_DIR .. "src/emu/sound/cdda.c",
 	}
 end
 
@@ -64,7 +64,7 @@ end
 
 if (SOUNDS["DISCRETE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/discrete.*",
+		MAME_DIR .. "src/emu/sound/discrete.c",
 	}
 end
 
@@ -75,7 +75,7 @@ end
 
 if (SOUNDS["AC97"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/pci-ac97.*",
+		MAME_DIR .. "src/emu/sound/pci-ac97.c",
 	}
 end
 
@@ -89,13 +89,13 @@ end
 
 if (SOUNDS["ASC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/asc.*",
+		MAME_DIR .. "src/emu/sound/asc.c",
 	}
 end
 
 if (SOUNDS["AWACS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/awacs.*",
+		MAME_DIR .. "src/emu/sound/awacs.c",
 	}
 end
 
@@ -108,14 +108,14 @@ end
 
 if (SOUNDS["POKEY"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/pokey.*",
+		MAME_DIR .. "src/emu/sound/pokey.c",
 	}
 end
 
 if (SOUNDS["TIA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/tiasound.*", 
-		MAME_DIR .. "src/emu/sound/tiaintf.*",
+		MAME_DIR .. "src/emu/sound/tiasound.c", 
+		MAME_DIR .. "src/emu/sound/tiaintf.c",
 	}
 end
 
@@ -128,7 +128,7 @@ end
 
 if (SOUNDS["AMIGA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/amiga.*",
+		MAME_DIR .. "src/emu/sound/amiga.c",
 	}
 end
 
@@ -141,7 +141,7 @@ end
 
 if (SOUNDS["ASTROCADE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/astrocde.*",
+		MAME_DIR .. "src/emu/sound/astrocde.c",
 	}
 end
 
@@ -155,7 +155,7 @@ end
 
 if (SOUNDS["AC97"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/pci-ac97.*",
+		MAME_DIR .. "src/emu/sound/pci-ac97.c",
 	}
 end
 -- CEM 3394 analog synthesizer chip
@@ -164,7 +164,7 @@ end
 
 if (SOUNDS["CEM3394"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/cem3394.*",
+		MAME_DIR .. "src/emu/sound/cem3394.c",
 	}
 end
 
@@ -177,7 +177,7 @@ end
 
 if (SOUNDS["SB0400"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/sb0400.*",
+		MAME_DIR .. "src/emu/sound/sb0400.c",
 	}
 end
 
@@ -189,7 +189,7 @@ end
 
 if (SOUNDS["ES1373"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/es1373.*",
+		MAME_DIR .. "src/emu/sound/es1373.c",
 	}
 end
 
@@ -200,7 +200,7 @@ end
 
 if (SOUNDS["BSMT2000"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/bsmt2000.*",
+		MAME_DIR .. "src/emu/sound/bsmt2000.c",
 	}
 end
 
@@ -213,7 +213,7 @@ end
 
 if (SOUNDS["ES5503"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/es5503.*",
+		MAME_DIR .. "src/emu/sound/es5503.c",
 	}
 end
 
@@ -226,7 +226,7 @@ end
 
 if (SOUNDS["ES5505"]~=null or SOUNDS["ES5506"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/es5506.*",
+		MAME_DIR .. "src/emu/sound/es5506.c",
 	}
 end
 
@@ -238,7 +238,7 @@ end
 
 if (SOUNDS["ESQPUMP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/esqpump.*",
+		MAME_DIR .. "src/emu/sound/esqpump.c",
 	}
 end
 
@@ -250,7 +250,7 @@ end
 
 if (SOUNDS["ES8712"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/es8712.*",
+		MAME_DIR .. "src/emu/sound/es8712.c",
 	}
 end
 
@@ -263,7 +263,7 @@ end
 
 if (SOUNDS["GAELCO_CG1V"]~=null or SOUNDS["GAELCO_GAE1"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/gaelco.*",
+		MAME_DIR .. "src/emu/sound/gaelco.c",
 	}
 end
 
@@ -275,7 +275,7 @@ end
 
 if (SOUNDS["CDP1863"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/cdp1863.*",
+		MAME_DIR .. "src/emu/sound/cdp1863.c",
 	}
 end
 
@@ -288,7 +288,7 @@ end
 
 if (SOUNDS["CDP1864"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/cdp1864.*",
+		MAME_DIR .. "src/emu/sound/cdp1864.c",
 	}
 end
 
@@ -301,7 +301,7 @@ end
 
 if (SOUNDS["CDP1869"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/cdp1869.*",
+		MAME_DIR .. "src/emu/sound/cdp1869.c",
 	}
 end
 
@@ -314,7 +314,7 @@ end
 
 if (SOUNDS["AY8910"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/ay8910.*",
+		MAME_DIR .. "src/emu/sound/ay8910.c",
 	}
 end
 
@@ -327,7 +327,7 @@ end
 
 if (SOUNDS["HC55516"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/hc55516.*",
+		MAME_DIR .. "src/emu/sound/hc55516.c",
 	}
 end
 
@@ -340,7 +340,7 @@ end
 
 if (SOUNDS["C6280"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/c6280.*",
+		MAME_DIR .. "src/emu/sound/c6280.c",
 	}
 end
 
@@ -353,7 +353,7 @@ end
 
 if (SOUNDS["ICS2115"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/ics2115.*",
+		MAME_DIR .. "src/emu/sound/ics2115.c",
 	}
 end
 
@@ -366,7 +366,7 @@ end
 
 if (SOUNDS["I5000_SND"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/i5000.*",
+		MAME_DIR .. "src/emu/sound/i5000.c",
 	}
 end
 
@@ -379,7 +379,7 @@ end
 
 if (SOUNDS["IREMGA20"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/iremga20.*",
+		MAME_DIR .. "src/emu/sound/iremga20.c",
 	}
 end
 
@@ -397,37 +397,37 @@ end
 
 if (SOUNDS["K005289"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/k005289.*",
+		MAME_DIR .. "src/emu/sound/k005289.c",
 	}
 end
 
 if (SOUNDS["K007232"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/k007232.*",
+		MAME_DIR .. "src/emu/sound/k007232.c",
 	}
 end
 
 if (SOUNDS["K051649"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/k051649.*",
+		MAME_DIR .. "src/emu/sound/k051649.c",
 	}
 end
 
 if (SOUNDS["K053260"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/k053260.*",
+		MAME_DIR .. "src/emu/sound/k053260.c",
 	}
 end
 
 if (SOUNDS["K054539"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/k054539.*",
+		MAME_DIR .. "src/emu/sound/k054539.c",
 	}
 end
 
 if (SOUNDS["K056800"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/k056800.*",
+		MAME_DIR .. "src/emu/sound/k056800.c",
 	}
 end
 
@@ -440,7 +440,7 @@ end
 
 if (SOUNDS["LMC1992"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/lmc1992.*",
+		MAME_DIR .. "src/emu/sound/lmc1992.c",
 	}
 end
 
@@ -453,7 +453,7 @@ end
 
 if (SOUNDS["MAS3507D"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/mas3507d.*",
+		MAME_DIR .. "src/emu/sound/mas3507d.c",
 	}
 end
 
@@ -466,7 +466,7 @@ end
 
 if (SOUNDS["MOS656X"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/mos6560.*",
+		MAME_DIR .. "src/emu/sound/mos6560.c",
 	}
 end
 
@@ -479,7 +479,7 @@ end
 
 if (SOUNDS["MOS7360"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/mos7360.*",
+		MAME_DIR .. "src/emu/sound/mos7360.c",
 	}
 end
 
@@ -495,25 +495,25 @@ end
 
 if (SOUNDS["NAMCO"]~=null or SOUNDS["NAMCO_15XX"]~=null or SOUNDS["NAMCO_CUS30"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/namco.*",
+		MAME_DIR .. "src/emu/sound/namco.c",
 	}
 end
 
 if (SOUNDS["NAMCO_63701X"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/n63701x.*",
+		MAME_DIR .. "src/emu/sound/n63701x.c",
 	}
 end
 
 if (SOUNDS["C140"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/c140.*",
+		MAME_DIR .. "src/emu/sound/c140.c",
 	}
 end
 
 if (SOUNDS["C352"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/c352.*",
+		MAME_DIR .. "src/emu/sound/c352.c",
 	}
 end
 
@@ -526,7 +526,7 @@ end
 
 if (SOUNDS["DIGITALKER"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/digitalk.*",
+		MAME_DIR .. "src/emu/sound/digitalk.c",
 	}
 end
 
@@ -539,7 +539,7 @@ end
 
 if (SOUNDS["NES_APU"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/nes_apu.*",
+		MAME_DIR .. "src/emu/sound/nes_apu.c",
 	}
 end
 
@@ -552,7 +552,7 @@ end
 
 if (SOUNDS["UPD7759"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/upd7759.*",
+		MAME_DIR .. "src/emu/sound/upd7759.c",
 	}
 end
 
@@ -570,43 +570,43 @@ end
 
 if (SOUNDS["OKIM6258"]~=null or SOUNDS["OKIM6295"]~=null or SOUNDS["OKIM9810"]~=null or SOUNDS["I5000_SND"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/okiadpcm.*",
+		MAME_DIR .. "src/emu/sound/okiadpcm.c",
 	}
 end
 
 if (SOUNDS["MSM5205"]~=null or SOUNDS["MSM6585"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/msm5205.*",
+		MAME_DIR .. "src/emu/sound/msm5205.c",
 	}
 end
 
 if (SOUNDS["MSM5232"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/msm5232.*",
+		MAME_DIR .. "src/emu/sound/msm5232.c",
 	}
 end
 
 if (SOUNDS["OKIM6376"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/okim6376.*",
+		MAME_DIR .. "src/emu/sound/okim6376.c",
 	}
 end
 
 if (SOUNDS["OKIM6295"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/okim6295.*",
+		MAME_DIR .. "src/emu/sound/okim6295.c",
 	}
 end
 
 if (SOUNDS["OKIM6258"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/okim6258.*",
+		MAME_DIR .. "src/emu/sound/okim6258.c",
 	}
 end
 
 if (SOUNDS["OKIM9810"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/okim9810.*",
+		MAME_DIR .. "src/emu/sound/okim9810.c",
 	}
 end
 
@@ -619,7 +619,7 @@ end
 
 if (SOUNDS["SAA1099"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/saa1099.*",
+		MAME_DIR .. "src/emu/sound/saa1099.c",
 	}
 end
 
@@ -632,7 +632,7 @@ end
 
 if (SOUNDS["QS1000"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/qs1000.*",
+		MAME_DIR .. "src/emu/sound/qs1000.c",
 	}
 end
 
@@ -645,9 +645,9 @@ end
 
 if (SOUNDS["QSOUND"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/qsound.*", 
-		MAME_DIR .. "src/emu/cpu/dsp16/dsp16.*",
-		MAME_DIR .. "src/emu/cpu/dsp16/dsp16dis.*",
+		MAME_DIR .. "src/emu/sound/qsound.c", 
+		MAME_DIR .. "src/emu/cpu/dsp16/dsp16.c",
+		MAME_DIR .. "src/emu/cpu/dsp16/dsp16dis.c",
 	}
 end
 
@@ -661,13 +661,13 @@ end
 
 if (SOUNDS["RF5C68"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/rf5c68.*",
+		MAME_DIR .. "src/emu/sound/rf5c68.c",
 	}
 end
 
 if (SOUNDS["RF5C400"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/rf5c400.*",
+		MAME_DIR .. "src/emu/sound/rf5c400.c",
 	}
 end
 
@@ -683,27 +683,27 @@ end
 
 if (SOUNDS["SEGAPCM"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/segapcm.*",
+		MAME_DIR .. "src/emu/sound/segapcm.c",
 	}
 end
 
 if (SOUNDS["MULTIPCM"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/multipcm.*",
+		MAME_DIR .. "src/emu/sound/multipcm.c",
 	}
 end
 
 if (SOUNDS["SCSP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/scsp.*",
-		MAME_DIR .. "src/emu/sound/scspdsp.*",
+		MAME_DIR .. "src/emu/sound/scsp.c",
+		MAME_DIR .. "src/emu/sound/scspdsp.c",
 	}
 end
 
 if (SOUNDS["AICA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/aica.*",
-		MAME_DIR .. "src/emu/sound/aicadsp.*",
+		MAME_DIR .. "src/emu/sound/aica.c",
+		MAME_DIR .. "src/emu/sound/aicadsp.c",
 	}
 end
 
@@ -716,19 +716,19 @@ end
 
 if (SOUNDS["ST0016"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/st0016.*",
+		MAME_DIR .. "src/emu/sound/st0016.c",
 	}
 end
 
 if (SOUNDS["NILE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/nile.*",
+		MAME_DIR .. "src/emu/sound/nile.c",
 	}
 end
 
 if (SOUNDS["X1_010"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/x1_010.*",
+		MAME_DIR .. "src/emu/sound/x1_010.c",
 	}
 end
 
@@ -741,10 +741,10 @@ end
 
 if (SOUNDS["SID6581"]~=null or SOUNDS["SID8580"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/mos6581.*",
-		MAME_DIR .. "src/emu/sound/sid.*",
-		MAME_DIR .. "src/emu/sound/sidenvel.*",
-		MAME_DIR .. "src/emu/sound/sidvoice.*",
+		MAME_DIR .. "src/emu/sound/mos6581.c",
+		MAME_DIR .. "src/emu/sound/sid.c",
+		MAME_DIR .. "src/emu/sound/sidenvel.c",
+		MAME_DIR .. "src/emu/sound/sidvoice.c",
 	}
 end
 
@@ -756,7 +756,7 @@ end
 
 if (SOUNDS["T6W28"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/t6w28.*",
+		MAME_DIR .. "src/emu/sound/t6w28.c",
 	}
 end
 
@@ -769,7 +769,7 @@ end
 
 if (SOUNDS["SNKWAVE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/snkwave.*",
+		MAME_DIR .. "src/emu/sound/snkwave.c",
 	}
 end
 
@@ -782,9 +782,9 @@ end
 
 if (SOUNDS["SPU"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/spu.*",
-		MAME_DIR .. "src/emu/sound/spu_tables.*",
-		MAME_DIR .. "src/emu/sound/spureverb.*",
+		MAME_DIR .. "src/emu/sound/spu.c",
+		MAME_DIR .. "src/emu/sound/spu_tables.c",
+		MAME_DIR .. "src/emu/sound/spureverb.c",
 	}
 end
 
@@ -796,7 +796,7 @@ end
 
 if (SOUNDS["SP0256"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/sp0256.*",
+		MAME_DIR .. "src/emu/sound/sp0256.c",
 	}
 end
 
@@ -809,7 +809,7 @@ end
 
 if (SOUNDS["SP0250"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/sp0250.*",
+		MAME_DIR .. "src/emu/sound/sp0250.c",
 	}
 end
 
@@ -821,7 +821,7 @@ end
 
 if (SOUNDS["S14001A"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/s14001a.*",
+		MAME_DIR .. "src/emu/sound/s14001a.c",
 	}
 end
 
@@ -834,7 +834,7 @@ end
 
 if (SOUNDS["SN76477"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/sn76477.*",
+		MAME_DIR .. "src/emu/sound/sn76477.c",
 	}
 end
 
@@ -847,7 +847,7 @@ end
 
 if (SOUNDS["SN76496"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/sn76496.*",
+		MAME_DIR .. "src/emu/sound/sn76496.c",
 	}
 end
 
@@ -860,7 +860,7 @@ end
 
 if (SOUNDS["TMS36XX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/tms36xx.*",
+		MAME_DIR .. "src/emu/sound/tms36xx.c",
 	}
 end
 
@@ -873,7 +873,7 @@ end
 
 if (SOUNDS["TMS3615"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/tms3615.*",
+		MAME_DIR .. "src/emu/sound/tms3615.c",
 	}
 end
 
@@ -886,7 +886,7 @@ end
 
 if (SOUNDS["TMS5110"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/tms5110.*",
+		MAME_DIR .. "src/emu/sound/tms5110.c",
 	}
 end
 
@@ -896,8 +896,8 @@ end
 ---------------------------------------------------
 if (SOUNDS["TMS5220"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/tms5220.*",
-		MAME_DIR .. "src/emu/machine/spchrom.*",
+		MAME_DIR .. "src/emu/sound/tms5220.c",
+		MAME_DIR .. "src/emu/machine/spchrom.c",
 	}
 end
 
@@ -909,7 +909,7 @@ end
 
 if (SOUNDS["T6721A"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/t6721a.*",
+		MAME_DIR .. "src/emu/sound/t6721a.c",
 	}
 end
 
@@ -922,7 +922,7 @@ end
 
 if (SOUNDS["TC8830F"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/tc8830f.*",
+		MAME_DIR .. "src/emu/sound/tc8830f.c",
 	}
 end
 
@@ -934,7 +934,7 @@ end
 
 if (SOUNDS["UPD7752"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/upd7752.*",
+		MAME_DIR .. "src/emu/sound/upd7752.c",
 	}
 end
 
@@ -946,7 +946,7 @@ end
 
 if (SOUNDS["VLM5030"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/vlm5030.*",
+		MAME_DIR .. "src/emu/sound/vlm5030.c",
 	}
 end
 
@@ -957,8 +957,8 @@ end
 
 if (SOUNDS["VOTRAX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/votrax.*",
-		MAME_DIR .. "src/emu/sound/samples.*",
+		MAME_DIR .. "src/emu/sound/votrax.c",
+		MAME_DIR .. "src/emu/sound/samples.c",
 	}
 end
 
@@ -971,7 +971,7 @@ end
 
 if (SOUNDS["VRENDER0"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/vrender0.*",
+		MAME_DIR .. "src/emu/sound/vrender0.c",
 	}
 end
 
@@ -984,7 +984,7 @@ end
 
 if (SOUNDS["WAVE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/wave.*",
+		MAME_DIR .. "src/emu/sound/wave.c",
 	}
 end
 
@@ -1008,92 +1008,92 @@ end
 
 if (SOUNDS["YM2151"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/2151intf.*",
-		MAME_DIR .. "src/emu/sound/ym2151.*",
+		MAME_DIR .. "src/emu/sound/2151intf.c",
+		MAME_DIR .. "src/emu/sound/ym2151.c",
 	}
 end
 
 if (SOUNDS["YM2203"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/2203intf.*",
-		MAME_DIR .. "src/emu/sound/ay8910.*",
-		MAME_DIR .. "src/emu/sound/fm.*",
+		MAME_DIR .. "src/emu/sound/2203intf.c",
+		MAME_DIR .. "src/emu/sound/ay8910.c",
+		MAME_DIR .. "src/emu/sound/fm.c",
 	}
 end
 
 if (SOUNDS["YM2413"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/2413intf.*",
-		MAME_DIR .. "src/emu/sound/ym2413.*",
+		MAME_DIR .. "src/emu/sound/2413intf.c",
+		MAME_DIR .. "src/emu/sound/ym2413.c",
 	}
 end
 
 if (SOUNDS["YM2608"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/2608intf.*", 
-		MAME_DIR .. "src/emu/sound/ay8910.*", 
-		MAME_DIR .. "src/emu/sound/fm.*", 
-		MAME_DIR .. "src/emu/sound/ymdeltat.*",
+		MAME_DIR .. "src/emu/sound/2608intf.c", 
+		MAME_DIR .. "src/emu/sound/ay8910.c", 
+		MAME_DIR .. "src/emu/sound/fm.c", 
+		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 	}
 end
 
 if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/2610intf.*", 
-		MAME_DIR .. "src/emu/sound/ay8910.*", 
-		MAME_DIR .. "src/emu/sound/fm.*", 
-		MAME_DIR .. "src/emu/sound/ymdeltat.*",
+		MAME_DIR .. "src/emu/sound/2610intf.c", 
+		MAME_DIR .. "src/emu/sound/ay8910.c", 
+		MAME_DIR .. "src/emu/sound/fm.c", 
+		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 	}
 end
 
 if (SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/2612intf.*", 
-		MAME_DIR .. "src/emu/sound/ay8910.*", 
-		MAME_DIR .. "src/emu/sound/fm2612.*",
+		MAME_DIR .. "src/emu/sound/2612intf.c", 
+		MAME_DIR .. "src/emu/sound/ay8910.c", 
+		MAME_DIR .. "src/emu/sound/fm2612.c",
 	}
 end
 
 if (SOUNDS["YM3812"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/3812intf.*", 
-		MAME_DIR .. "src/emu/sound/fmopl.*", 
-		MAME_DIR .. "src/emu/sound/ymdeltat.*",
+		MAME_DIR .. "src/emu/sound/3812intf.c", 
+		MAME_DIR .. "src/emu/sound/fmopl.c", 
+		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 	}
 end
 
 if (SOUNDS["YM3526"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/3526intf.*", 
-		MAME_DIR .. "src/emu/sound/fmopl.*", 
-		MAME_DIR .. "src/emu/sound/ymdeltat.*",
+		MAME_DIR .. "src/emu/sound/3526intf.c", 
+		MAME_DIR .. "src/emu/sound/fmopl.c", 
+		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 	}
 end
 
 if (SOUNDS["Y8950"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/8950intf.*", 
-		MAME_DIR .. "src/emu/sound/fmopl.*", 
-		MAME_DIR .. "src/emu/sound/ymdeltat.*",
+		MAME_DIR .. "src/emu/sound/8950intf.c", 
+		MAME_DIR .. "src/emu/sound/fmopl.c", 
+		MAME_DIR .. "src/emu/sound/ymdeltat.c",
 	}
 end
 
 if (SOUNDS["YMF262"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/ymf262.*", 
-		MAME_DIR .. "src/emu/sound/262intf.*",
+		MAME_DIR .. "src/emu/sound/ymf262.c", 
+		MAME_DIR .. "src/emu/sound/262intf.c",
 	}
 end
 
 if (SOUNDS["YMF271"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/ymf271.*",
+		MAME_DIR .. "src/emu/sound/ymf271.c",
 	}
 end
 
 if (SOUNDS["YMF278B"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/ymf278b.*",
+		MAME_DIR .. "src/emu/sound/ymf278b.c",
 	}
 end
 
@@ -1106,7 +1106,7 @@ end
 
 if (SOUNDS["YMZ280B"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/ymz280b.*",
+		MAME_DIR .. "src/emu/sound/ymz280b.c",
 	}
 end
 
@@ -1117,8 +1117,8 @@ end
 
 if (SOUNDS["YMZ770"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/ymz770.*", 
-		MAME_DIR .. "src/emu/sound/mpeg_audio.*",
+		MAME_DIR .. "src/emu/sound/ymz770.c", 
+		MAME_DIR .. "src/emu/sound/mpeg_audio.c",
 	}
 end
 
@@ -1129,7 +1129,7 @@ end
 
 if (SOUNDS["ZSG2"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/zsg2.*",
+		MAME_DIR .. "src/emu/sound/zsg2.c",
 	}
 end
 
@@ -1140,7 +1140,7 @@ end
 
 if (SOUNDS["VRC6"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/sound/vrc6.*",
+		MAME_DIR .. "src/emu/sound/vrc6.c",
 	}
 end
 

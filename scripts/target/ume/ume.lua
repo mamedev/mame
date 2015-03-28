@@ -696,18 +696,18 @@ function createProjects(_target, _subtarget)
 	includeosd()
 
 	files {
-		MAME_DIR .. "src/mame/**.*",
-		MAME_DIR .. "src/mess/**.*",
-		MAME_DIR .. "src/emu/machine/nsc810.*", 
+		MAME_DIR .. "src/mame/**.c",
+		MAME_DIR .. "src/mess/**.c",
+		MAME_DIR .. "src/emu/machine/nsc810.c", 
 	}
 	removefiles {
 		MAME_DIR .. "src/mame/mame.c",
-		MAME_DIR .. "src/mame/etc/*.*",
+		MAME_DIR .. "src/mame/etc/*.c",
 		MAME_DIR .. "src/mess/mess.c",
-		MAME_DIR .. "src/mess/drivers/c65_old.*",
-		MAME_DIR .. "src/mess/machine/c65_old.*",
-		MAME_DIR .. "src/mess/drivers/korgm1.*",
-		MAME_DIR .. "src/mess/tools/**.*",
+		MAME_DIR .. "src/mess/drivers/c65_old.c",
+		MAME_DIR .. "src/mess/machine/c65_old.c",
+		MAME_DIR .. "src/mess/drivers/korgm1.c",
+		MAME_DIR .. "src/mess/tools/**.c",
 		MAME_DIR .. "src/mess/**.rc",
 	}
 	

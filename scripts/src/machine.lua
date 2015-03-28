@@ -17,7 +17,7 @@
 
 if (MACHINES["AKIKO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/akiko.*",
+		MAME_DIR .. "src/emu/machine/akiko.c",
 	}
 end
 
@@ -29,7 +29,7 @@ end
 
 if (MACHINES["AUTOCONFIG"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/autoconfig.*",
+		MAME_DIR .. "src/emu/machine/autoconfig.c",
 	}
 end
 
@@ -41,7 +41,7 @@ end
 
 if (MACHINES["CR511B"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/cr511b.*",
+		MAME_DIR .. "src/emu/machine/cr511b.c",
 	}
 end
 
@@ -53,7 +53,7 @@ end
 
 if (MACHINES["DMAC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/dmac.*",
+		MAME_DIR .. "src/emu/machine/dmac.c",
 	}
 end
 
@@ -65,7 +65,7 @@ end
 
 if (MACHINES["GAYLE"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/gayle.*",
+		MAME_DIR .. "src/emu/machine/gayle.c",
 	}
 end
 
@@ -77,7 +77,7 @@ end
 
 if (MACHINES["CMOS40105"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/40105.*",
+		MAME_DIR .. "src/emu/machine/40105.c",
 	}
 end
 
@@ -90,7 +90,7 @@ end
 if (MACHINES["NCR53C7XX"]~=null) then
 	MACHINES["NSCSI"] = true
 	files {
-		MAME_DIR .. "src/emu/machine/53c7xx.*",
+		MAME_DIR .. "src/emu/machine/53c7xx.c",
 	}
 end
 
@@ -102,7 +102,7 @@ end
 if (MACHINES["LSI53C810"]~=null) then
 	MACHINES["SCSI"] = true
 	files {
-		MAME_DIR .. "src/emu/machine/53c810.*",
+		MAME_DIR .. "src/emu/machine/53c810.c",
 	}
 end
 
@@ -113,7 +113,7 @@ end
 
 if (MACHINES["6522VIA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/6522via.*",
+		MAME_DIR .. "src/emu/machine/6522via.c",
 	}
 end
 
@@ -124,7 +124,7 @@ end
 
 if (MACHINES["TPI6525"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/6525tpi.*",
+		MAME_DIR .. "src/emu/machine/6525tpi.c",
 	}
 end
 
@@ -135,7 +135,7 @@ end
 
 if (MACHINES["RIOT6532"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/6532riot.*",
+		MAME_DIR .. "src/emu/machine/6532riot.c",
 	}
 end
 
@@ -146,7 +146,7 @@ end
 
 if (MACHINES["6821PIA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/6821pia.*",
+		MAME_DIR .. "src/emu/machine/6821pia.c",
 	}
 end
 
@@ -157,7 +157,7 @@ end
 
 if (MACHINES["6840PTM"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/6840ptm.*",
+		MAME_DIR .. "src/emu/machine/6840ptm.c",
 	}
 end
 
@@ -168,7 +168,7 @@ end
 
 if (MACHINES["ACIA6850"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/6850acia.*",
+		MAME_DIR .. "src/emu/machine/6850acia.c",
 	}
 end
 
@@ -179,7 +179,7 @@ end
 
 if (MACHINES["68561MPCC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/68561mpcc.*",
+		MAME_DIR .. "src/emu/machine/68561mpcc.c",
 	}
 end
 
@@ -190,7 +190,7 @@ end
 
 if (MACHINES["68681"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc68681.*",
+		MAME_DIR .. "src/emu/machine/mc68681.c",
 	}
 end
 
@@ -201,7 +201,7 @@ end
 
 if (MACHINES["7200FIFO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/7200fifo.*",
+		MAME_DIR .. "src/emu/machine/7200fifo.c",
 	}
 end
 
@@ -212,7 +212,7 @@ end
 
 if (MACHINES["TTL74123"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/74123.*",
+		MAME_DIR .. "src/emu/machine/74123.c",
 	}
 end
 
@@ -223,7 +223,7 @@ end
 
 if (MACHINES["TTL74145"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/74145.*",
+		MAME_DIR .. "src/emu/machine/74145.c",
 	}
 end
 
@@ -234,7 +234,7 @@ end
 
 if (MACHINES["TTL74148"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/74148.*",
+		MAME_DIR .. "src/emu/machine/74148.c",
 	}
 end
 
@@ -245,7 +245,7 @@ end
 
 if (MACHINES["TTL74153"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/74153.*",
+		MAME_DIR .. "src/emu/machine/74153.c",
 	}
 end
 
@@ -256,7 +256,7 @@ end
 
 if (MACHINES["TTL74181"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/74181.*",
+		MAME_DIR .. "src/emu/machine/74181.c",
 	}
 end
 
@@ -267,7 +267,7 @@ end
 
 if (MACHINES["TTL7474"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/7474.*",
+		MAME_DIR .. "src/emu/machine/7474.c",
 	}
 end
 
@@ -278,7 +278,7 @@ end
 
 if (MACHINES["KBDC8042"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/8042kbdc.*",
+		MAME_DIR .. "src/emu/machine/8042kbdc.c",
 	}
 end
 
@@ -289,7 +289,7 @@ end
 
 if (MACHINES["8530SCC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/8530scc.*",
+		MAME_DIR .. "src/emu/machine/8530scc.c",
 	}
 end
 
@@ -300,7 +300,7 @@ end
 
 if (MACHINES["AAKARTDEV"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/aakart.*",
+		MAME_DIR .. "src/emu/machine/aakart.c",
 	}
 end
 
@@ -311,7 +311,7 @@ end
 
 if (MACHINES["ADC0808"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/adc0808.*",
+		MAME_DIR .. "src/emu/machine/adc0808.c",
 	}
 end
 
@@ -322,7 +322,7 @@ end
 
 if (MACHINES["ADC083X"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/adc083x.*",
+		MAME_DIR .. "src/emu/machine/adc083x.c",
 	}
 end
 
@@ -333,7 +333,7 @@ end
 
 if (MACHINES["ADC1038"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/adc1038.*",
+		MAME_DIR .. "src/emu/machine/adc1038.c",
 	}
 end
 
@@ -344,7 +344,7 @@ end
 
 if (MACHINES["ADC1213X"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/adc1213x.*",
+		MAME_DIR .. "src/emu/machine/adc1213x.c",
 	}
 end
 
@@ -355,7 +355,7 @@ end
 
 if (MACHINES["AICARTC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/aicartc.*",
+		MAME_DIR .. "src/emu/machine/aicartc.c",
 	}
 end
 
@@ -366,7 +366,7 @@ end
 
 if (MACHINES["AM53CF96"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/am53cf96.*",
+		MAME_DIR .. "src/emu/machine/am53cf96.c",
 	}
 end
 
@@ -377,7 +377,7 @@ end
 
 if (MACHINES["AM9517A"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/am9517a.*",
+		MAME_DIR .. "src/emu/machine/am9517a.c",
 	}
 end
 
@@ -388,7 +388,7 @@ end
 
 if (MACHINES["AMIGAFDC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/amigafdc.*",
+		MAME_DIR .. "src/emu/machine/amigafdc.c",
 	}
 end
 
@@ -399,7 +399,7 @@ end
 
 if (MACHINES["AT28C16"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/at28c16.*",
+		MAME_DIR .. "src/emu/machine/at28c16.c",
 	}
 end
 
@@ -410,7 +410,7 @@ end
 
 if (MACHINES["AT29040"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/at29040a.*",
+		MAME_DIR .. "src/emu/machine/at29040a.c",
 	}
 end
 
@@ -421,7 +421,7 @@ end
 
 if (MACHINES["AT45DBXX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/at45dbxx.*",
+		MAME_DIR .. "src/emu/machine/at45dbxx.c",
 	}
 end
 
@@ -434,7 +434,7 @@ if (MACHINES["ATAFLASH"]~=null) then
 	MACHINES["IDE"] = true
 	MACHINES["PCCARD"] = true
 	files {
-		MAME_DIR .. "src/emu/machine/ataflash.*",
+		MAME_DIR .. "src/emu/machine/ataflash.c",
 	}
 end
 
@@ -445,7 +445,7 @@ end
 
 if (MACHINES["AY31015"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ay31015.*",
+		MAME_DIR .. "src/emu/machine/ay31015.c",
 	}
 end
 
@@ -456,7 +456,7 @@ end
 
 if (MACHINES["BANKDEV"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/bankdev.*",
+		MAME_DIR .. "src/emu/machine/bankdev.c",
 	}
 end
 
@@ -467,7 +467,7 @@ end
 
 if (MACHINES["CDP1852"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/cdp1852.*",
+		MAME_DIR .. "src/emu/machine/cdp1852.c",
 	}
 end
 
@@ -478,7 +478,7 @@ end
 
 if (MACHINES["CDP1871"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/cdp1871.*",
+		MAME_DIR .. "src/emu/machine/cdp1871.c",
 	}
 end
 
@@ -489,7 +489,7 @@ end
 
 if (MACHINES["COM8116"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/com8116.*",
+		MAME_DIR .. "src/emu/machine/com8116.c",
 	}
 end
 
@@ -500,7 +500,7 @@ end
 
 if (MACHINES["CR589"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/cr589.*",
+		MAME_DIR .. "src/emu/machine/cr589.c",
 	}
 end
 
@@ -511,7 +511,7 @@ end
 
 if (MACHINES["CS4031"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/cs4031.*",
+		MAME_DIR .. "src/emu/machine/cs4031.c",
 	}
 end
 
@@ -522,7 +522,7 @@ end
 
 if (MACHINES["CS8221"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/cs8221.*",
+		MAME_DIR .. "src/emu/machine/cs8221.c",
 	}
 end
 
@@ -533,7 +533,7 @@ end
 
 if (MACHINES["DS1204"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ds1204.*",
+		MAME_DIR .. "src/emu/machine/ds1204.c",
 	}
 end
 
@@ -544,7 +544,7 @@ end
 
 if (MACHINES["DS1302"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ds1302.*",
+		MAME_DIR .. "src/emu/machine/ds1302.c",
 	}
 end
 
@@ -555,7 +555,7 @@ end
 
 if (MACHINES["DS1315"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ds1315.*",
+		MAME_DIR .. "src/emu/machine/ds1315.c",
 	}
 end
 
@@ -566,7 +566,7 @@ end
 
 if (MACHINES["DS2401"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ds2401.*",
+		MAME_DIR .. "src/emu/machine/ds2401.c",
 	}
 end
 
@@ -577,7 +577,7 @@ end
 
 if (MACHINES["DS2404"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ds2404.*",
+		MAME_DIR .. "src/emu/machine/ds2404.c",
 	}
 end
 
@@ -588,7 +588,7 @@ end
 
 if (MACHINES["DS75160A"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ds75160a.*",
+		MAME_DIR .. "src/emu/machine/ds75160a.c",
 	}
 end
 
@@ -599,7 +599,7 @@ end
 
 if (MACHINES["DS75161A"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ds75161a.*",
+		MAME_DIR .. "src/emu/machine/ds75161a.c",
 	}
 end
 
@@ -610,7 +610,7 @@ end
 
 if (MACHINES["E0516"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/e0516.*",
+		MAME_DIR .. "src/emu/machine/e0516.c",
 	}
 end
 
@@ -621,7 +621,7 @@ end
 
 if (MACHINES["E05A03"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/e05a03.*",
+		MAME_DIR .. "src/emu/machine/e05a03.c",
 	}
 end
 
@@ -632,7 +632,7 @@ end
 
 if (MACHINES["E05A30"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/e05a30.*",
+		MAME_DIR .. "src/emu/machine/e05a30.c",
 	}
 end
 
@@ -645,9 +645,9 @@ end
 
 if (MACHINES["EEPROMDEV"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/eeprom.*",
-		MAME_DIR .. "src/emu/machine/eepromser.*",
-		MAME_DIR .. "src/emu/machine/eeprompar.*",
+		MAME_DIR .. "src/emu/machine/eeprom.c",
+		MAME_DIR .. "src/emu/machine/eepromser.c",
+		MAME_DIR .. "src/emu/machine/eeprompar.c",
 	}
 end
 
@@ -658,7 +658,7 @@ end
 
 if (MACHINES["ER2055"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/er2055.*",
+		MAME_DIR .. "src/emu/machine/er2055.c",
 	}
 end
 
@@ -669,7 +669,7 @@ end
 
 if (MACHINES["F3853"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/f3853.*",
+		MAME_DIR .. "src/emu/machine/f3853.c",
 	}
 end
 
@@ -680,7 +680,7 @@ end
 
 if (MACHINES["HD63450"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/hd63450.*",
+		MAME_DIR .. "src/emu/machine/hd63450.c",
 	}
 end
 
@@ -691,7 +691,7 @@ end
 
 if (MACHINES["HD64610"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/hd64610.*",
+		MAME_DIR .. "src/emu/machine/hd64610.c",
 	}
 end
 
@@ -702,7 +702,7 @@ end
 
 if (MACHINES["I2CMEM"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i2cmem.*",
+		MAME_DIR .. "src/emu/machine/i2cmem.c",
 	}
 end
 
@@ -713,7 +713,7 @@ end
 
 if (MACHINES["I8155"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8155.*",
+		MAME_DIR .. "src/emu/machine/i8155.c",
 	}
 end
 
@@ -724,7 +724,7 @@ end
 
 if (MACHINES["I8212"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8212.*",
+		MAME_DIR .. "src/emu/machine/i8212.c",
 	}
 end
 
@@ -735,7 +735,7 @@ end
 
 if (MACHINES["I8214"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8214.*",
+		MAME_DIR .. "src/emu/machine/i8214.c",
 	}
 end
 
@@ -746,7 +746,7 @@ end
 
 if (MACHINES["I8243"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8243.*",
+		MAME_DIR .. "src/emu/machine/i8243.c",
 	}
 end
 
@@ -757,7 +757,7 @@ end
 
 if (MACHINES["I8251"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8251.*",
+		MAME_DIR .. "src/emu/machine/i8251.c",
 	}
 end
 
@@ -768,7 +768,7 @@ end
 
 if (MACHINES["I8257"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8257.*",
+		MAME_DIR .. "src/emu/machine/i8257.c",
 	}
 end
 
@@ -780,7 +780,7 @@ end
 
 if (MACHINES["I8271"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8271.*",
+		MAME_DIR .. "src/emu/machine/i8271.c",
 	}
 end
 
@@ -791,7 +791,7 @@ end
 
 if (MACHINES["I8279"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8279.*",
+		MAME_DIR .. "src/emu/machine/i8279.c",
 	}
 end
 
@@ -802,7 +802,7 @@ end
 
 if (MACHINES["I8355"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8355.*",
+		MAME_DIR .. "src/emu/machine/i8355.c",
 	}
 end
 
@@ -813,7 +813,7 @@ end
 
 if (MACHINES["I80130"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i80130.*",
+		MAME_DIR .. "src/emu/machine/i80130.c",
 	}
 end
 
@@ -826,14 +826,14 @@ end
 if (MACHINES["IDE"]~=null) then
 	MACHINES["T10"] = true
 	files {
-		MAME_DIR .. "src/emu/machine/atadev.*",
-		MAME_DIR .. "src/emu/machine/atahle.*",
-		MAME_DIR .. "src/emu/machine/ataintf.*",
-		MAME_DIR .. "src/emu/machine/atapicdr.*",
-		MAME_DIR .. "src/emu/machine/atapihle.*",
-		MAME_DIR .. "src/emu/machine/idectrl.*",
-		MAME_DIR .. "src/emu/machine/idehd.*",
-		MAME_DIR .. "src/emu/machine/vt83c461.*",
+		MAME_DIR .. "src/emu/machine/atadev.c",
+		MAME_DIR .. "src/emu/machine/atahle.c",
+		MAME_DIR .. "src/emu/machine/ataintf.c",
+		MAME_DIR .. "src/emu/machine/atapicdr.c",
+		MAME_DIR .. "src/emu/machine/atapihle.c",
+		MAME_DIR .. "src/emu/machine/idectrl.c",
+		MAME_DIR .. "src/emu/machine/idehd.c",
+		MAME_DIR .. "src/emu/machine/vt83c461.c",
 	}
 end
 
@@ -844,7 +844,7 @@ end
 
 if (MACHINES["IM6402"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/im6402.*",
+		MAME_DIR .. "src/emu/machine/im6402.c",
 	}
 end
 
@@ -855,7 +855,7 @@ end
 
 if (MACHINES["INS8154"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ins8154.*",
+		MAME_DIR .. "src/emu/machine/ins8154.c",
 	}
 end
 
@@ -866,7 +866,7 @@ end
 
 if (MACHINES["INS8250"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ins8250.*",
+		MAME_DIR .. "src/emu/machine/ins8250.c",
 	}
 end
 
@@ -877,7 +877,7 @@ end
 
 if (MACHINES["INTELFLASH"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/intelfsh.*",
+		MAME_DIR .. "src/emu/machine/intelfsh.c",
 	}
 end
 
@@ -889,8 +889,8 @@ end
 
 if (MACHINES["JVS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/jvsdev.*",
-		MAME_DIR .. "src/emu/machine/jvshost.*",
+		MAME_DIR .. "src/emu/machine/jvsdev.c",
+		MAME_DIR .. "src/emu/machine/jvshost.c",
 	}
 end
 
@@ -901,7 +901,7 @@ end
 
 if (MACHINES["K033906"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/k033906.*",
+		MAME_DIR .. "src/emu/machine/k033906.c",
 	}
 end
 
@@ -912,7 +912,7 @@ end
 
 if (MACHINES["K053252"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/k053252.*",
+		MAME_DIR .. "src/emu/machine/k053252.c",
 	}
 end
 
@@ -923,7 +923,7 @@ end
 
 if (MACHINES["K056230"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/k056230.*",
+		MAME_DIR .. "src/emu/machine/k056230.c",
 	}
 end
 
@@ -934,7 +934,7 @@ end
 
 if (MACHINES["KB3600"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/kb3600.*",
+		MAME_DIR .. "src/emu/machine/kb3600.c",
 	}
 end
 
@@ -945,7 +945,7 @@ end
 
 if (MACHINES["KR2376"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/kr2376.*",
+		MAME_DIR .. "src/emu/machine/kr2376.c",
 	}
 end
 
@@ -956,7 +956,7 @@ end
 
 if (MACHINES["LATCH8"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/latch8.*",
+		MAME_DIR .. "src/emu/machine/latch8.c",
 	}
 end
 
@@ -967,7 +967,7 @@ end
 
 if (MACHINES["LC89510"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/lc89510.*",
+		MAME_DIR .. "src/emu/machine/lc89510.c",
 	}
 end
 
@@ -978,7 +978,7 @@ end
 
 if (MACHINES["LDPR8210"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ldpr8210.*",
+		MAME_DIR .. "src/emu/machine/ldpr8210.c",
 	}
 end
 
@@ -989,7 +989,7 @@ end
 
 if (MACHINES["LDSTUB"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ldstub.*",
+		MAME_DIR .. "src/emu/machine/ldstub.c",
 	}
 end
 
@@ -1002,7 +1002,7 @@ if (MACHINES["LDV1000"]~=null) then
 	MACHINES["Z80CTC"] = true
 	MACHINES["I8255"] = true
 	files {
-		MAME_DIR .. "src/emu/machine/ldv1000.*",
+		MAME_DIR .. "src/emu/machine/ldv1000.c",
 	}
 end
 
@@ -1013,7 +1013,7 @@ end
 
 if (MACHINES["LDVP931"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ldvp931.*",
+		MAME_DIR .. "src/emu/machine/ldvp931.c",
 	}
 end
 
@@ -1024,7 +1024,7 @@ end
 
 if (MACHINES["LH5810"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/lh5810.*",
+		MAME_DIR .. "src/emu/machine/lh5810.c",
 	}
 end
 
@@ -1035,7 +1035,7 @@ end
 
 if (MACHINES["LINFLASH"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/linflash.*",
+		MAME_DIR .. "src/emu/machine/linflash.c",
 	}
 end
 
@@ -1046,7 +1046,7 @@ end
 
 if (MACHINES["M6M80011AP"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/m6m80011ap.*",
+		MAME_DIR .. "src/emu/machine/m6m80011ap.c",
 	}
 end
 
@@ -1057,7 +1057,7 @@ end
 
 if (MACHINES["MATSUCD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/matsucd.*",
+		MAME_DIR .. "src/emu/machine/matsucd.c",
 	}
 end
 
@@ -1068,7 +1068,7 @@ end
 
 if (MACHINES["MB14241"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mb14241.*",
+		MAME_DIR .. "src/emu/machine/mb14241.c",
 	}
 end
 
@@ -1079,7 +1079,7 @@ end
 
 if (MACHINES["MB3773"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mb3773.*",
+		MAME_DIR .. "src/emu/machine/mb3773.c",
 	}
 end
 
@@ -1090,7 +1090,7 @@ end
 
 if (MACHINES["MB8421"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mb8421.*",
+		MAME_DIR .. "src/emu/machine/mb8421.c",
 	}
 end
 
@@ -1101,7 +1101,7 @@ end
 
 if (MACHINES["MB87078"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mb87078.*",
+		MAME_DIR .. "src/emu/machine/mb87078.c",
 	}
 end
 
@@ -1112,7 +1112,7 @@ end
 
 if (MACHINES["MB8795"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mb8795.*",
+		MAME_DIR .. "src/emu/machine/mb8795.c",
 	}
 end
 
@@ -1123,7 +1123,7 @@ end
 
 if (MACHINES["MB89352"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mb89352.*",
+		MAME_DIR .. "src/emu/machine/mb89352.c",
 	}
 end
 
@@ -1134,7 +1134,7 @@ end
 
 if (MACHINES["MB89371"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mb89371.*",
+		MAME_DIR .. "src/emu/machine/mb89371.c",
 	}
 end
 
@@ -1145,8 +1145,8 @@ end
 
 if (MACHINES["MC146818"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc146818.*",
-		MAME_DIR .. "src/emu/machine/ds128x.*",
+		MAME_DIR .. "src/emu/machine/mc146818.c",
+		MAME_DIR .. "src/emu/machine/ds128x.c",
 	}
 end
 
@@ -1157,7 +1157,7 @@ end
 
 if (MACHINES["MC2661"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc2661.*",
+		MAME_DIR .. "src/emu/machine/mc2661.c",
 	}
 end
 
@@ -1168,7 +1168,7 @@ end
 
 if (MACHINES["MC6843"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc6843.*",
+		MAME_DIR .. "src/emu/machine/mc6843.c",
 	}
 end
 
@@ -1179,7 +1179,7 @@ end
 
 if (MACHINES["MC6846"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc6846.*",
+		MAME_DIR .. "src/emu/machine/mc6846.c",
 	}
 end
 
@@ -1190,7 +1190,7 @@ end
 
 if (MACHINES["MC6852"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc6852.*",
+		MAME_DIR .. "src/emu/machine/mc6852.c",
 	}
 end
 
@@ -1201,7 +1201,7 @@ end
 
 if (MACHINES["MC6854"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc6854.*",
+		MAME_DIR .. "src/emu/machine/mc6854.c",
 	}
 end
 
@@ -1212,7 +1212,7 @@ end
 
 if (MACHINES["MC68328"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc68328.*",
+		MAME_DIR .. "src/emu/machine/mc68328.c",
 	}
 end
 
@@ -1223,7 +1223,7 @@ end
 
 if (MACHINES["MC68901"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mc68901.*",
+		MAME_DIR .. "src/emu/machine/mc68901.c",
 	}
 end
 
@@ -1234,7 +1234,7 @@ end
 
 if (MACHINES["MCCS1850"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mccs1850.*",
+		MAME_DIR .. "src/emu/machine/mccs1850.c",
 	}
 end
 
@@ -1245,10 +1245,10 @@ end
 
 if (MACHINES["M68307"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/68307.*",
-		MAME_DIR .. "src/emu/machine/68307sim.*",
-		MAME_DIR .. "src/emu/machine/68307bus.*",
-		MAME_DIR .. "src/emu/machine/68307tmu.*",
+		MAME_DIR .. "src/emu/machine/68307.c",
+		MAME_DIR .. "src/emu/machine/68307sim.c",
+		MAME_DIR .. "src/emu/machine/68307bus.c",
+		MAME_DIR .. "src/emu/machine/68307tmu.c",
 	}
 end
 
@@ -1259,11 +1259,11 @@ end
 
 if (MACHINES["M68340"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/68340.*",
-		MAME_DIR .. "src/emu/machine/68340sim.*",
-		MAME_DIR .. "src/emu/machine/68340dma.*",
-		MAME_DIR .. "src/emu/machine/68340ser.*",
-		MAME_DIR .. "src/emu/machine/68340tmu.*",
+		MAME_DIR .. "src/emu/machine/68340.c",
+		MAME_DIR .. "src/emu/machine/68340sim.c",
+		MAME_DIR .. "src/emu/machine/68340dma.c",
+		MAME_DIR .. "src/emu/machine/68340ser.c",
+		MAME_DIR .. "src/emu/machine/68340tmu.c",
 	}
 end
 
@@ -1274,7 +1274,7 @@ end
 
 if (MACHINES["MCF5206E"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mcf5206e.*",
+		MAME_DIR .. "src/emu/machine/mcf5206e.c",
 	}
 end
 
@@ -1285,7 +1285,7 @@ end
 
 if (MACHINES["MICROTOUCH"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/microtch.*",
+		MAME_DIR .. "src/emu/machine/microtch.c",
 	}
 end
 
@@ -1296,7 +1296,7 @@ end
 
 if (MACHINES["MM58274C"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mm58274c.*",
+		MAME_DIR .. "src/emu/machine/mm58274c.c",
 	}
 end
 
@@ -1307,7 +1307,7 @@ end
 
 if (MACHINES["MM74C922"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mm74c922.*",
+		MAME_DIR .. "src/emu/machine/mm74c922.c",
 	}
 end
 
@@ -1318,7 +1318,7 @@ end
 
 if (MACHINES["MOS6526"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos6526.*",
+		MAME_DIR .. "src/emu/machine/mos6526.c",
 	}
 end
 
@@ -1329,7 +1329,7 @@ end
 
 if (MACHINES["MOS6529"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos6529.*",
+		MAME_DIR .. "src/emu/machine/mos6529.c",
 	}
 end
 
@@ -1340,7 +1340,7 @@ end
 
 if (MACHINES["MOS6702"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos6702.*",
+		MAME_DIR .. "src/emu/machine/mos6702.c",
 	}
 end
 
@@ -1351,7 +1351,7 @@ end
 
 if (MACHINES["MOS8706"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos8706.*",
+		MAME_DIR .. "src/emu/machine/mos8706.c",
 	}
 end
 
@@ -1362,7 +1362,7 @@ end
 
 if (MACHINES["MOS8722"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos8722.*",
+		MAME_DIR .. "src/emu/machine/mos8722.c",
 	}
 end
 
@@ -1373,7 +1373,7 @@ end
 
 if (MACHINES["MOS8726"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos8726.*",
+		MAME_DIR .. "src/emu/machine/mos8726.c",
 	}
 end
 
@@ -1384,7 +1384,7 @@ end
 
 if (MACHINES["MIOT6530"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos6530.*",
+		MAME_DIR .. "src/emu/machine/mos6530.c",
 	}
 end
 
@@ -1395,7 +1395,7 @@ end
 
 if (MACHINES["MOS6551"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mos6551.*",
+		MAME_DIR .. "src/emu/machine/mos6551.c",
 	}
 end
 
@@ -1406,7 +1406,7 @@ end
 
 if (MACHINES["MSM5832"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/msm5832.*",
+		MAME_DIR .. "src/emu/machine/msm5832.c",
 	}
 end
 
@@ -1417,7 +1417,7 @@ end
 
 if (MACHINES["MSM58321"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/msm58321.*",
+		MAME_DIR .. "src/emu/machine/msm58321.c",
 	}
 end
 
@@ -1428,7 +1428,7 @@ end
 
 if (MACHINES["MSM6242"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/msm6242.*",
+		MAME_DIR .. "src/emu/machine/msm6242.c",
 	}
 end
 
@@ -1440,7 +1440,7 @@ end
 if (MACHINES["NCR539x"]~=null) then
 	MACHINES["SCSI"] = true
 	files {
-		MAME_DIR .. "src/emu/machine/ncr539x.*",
+		MAME_DIR .. "src/emu/machine/ncr539x.c",
 	}
 end
 
@@ -1451,7 +1451,7 @@ end
 
 if (MACHINES["NMC9306"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/nmc9306.*",
+		MAME_DIR .. "src/emu/machine/nmc9306.c",
 	}
 end
 
@@ -1466,11 +1466,11 @@ end
 
 if (MACHINES["NSCSI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/nscsi_bus.*",
-		MAME_DIR .. "src/emu/machine/nscsi_cb.*",
-		MAME_DIR .. "src/emu/machine/nscsi_cd.*",
-		MAME_DIR .. "src/emu/machine/nscsi_hd.*",
-		MAME_DIR .. "src/emu/machine/nscsi_s1410.*",
+		MAME_DIR .. "src/emu/machine/nscsi_bus.c",
+		MAME_DIR .. "src/emu/machine/nscsi_cb.c",
+		MAME_DIR .. "src/emu/machine/nscsi_cd.c",
+		MAME_DIR .. "src/emu/machine/nscsi_hd.c",
+		MAME_DIR .. "src/emu/machine/nscsi_s1410.c",
 	}
 end
 
@@ -1481,7 +1481,7 @@ end
 
 if (MACHINES["PCF8593"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pcf8593.*",
+		MAME_DIR .. "src/emu/machine/pcf8593.c",
 	}
 end
 
@@ -1492,7 +1492,7 @@ end
 
 if (MACHINES["LPCI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/lpci.*",
+		MAME_DIR .. "src/emu/machine/lpci.c",
 	}
 end
 
@@ -1503,19 +1503,19 @@ end
 
 if (MACHINES["PCI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pci.*",
-		MAME_DIR .. "src/emu/machine/pci-usb.*",
-		MAME_DIR .. "src/emu/machine/pci-sata.*",
-		MAME_DIR .. "src/emu/machine/pci-apic.*",
-		MAME_DIR .. "src/emu/machine/pci-smbus.*",
-		MAME_DIR .. "src/emu/machine/i82541.*",
-		MAME_DIR .. "src/emu/machine/i82875p.*",
-		MAME_DIR .. "src/emu/machine/i6300esb.*",
-		MAME_DIR .. "src/emu/machine/lpc.*",
-		MAME_DIR .. "src/emu/machine/lpc-acpi.*",
-		MAME_DIR .. "src/emu/machine/lpc-rtc.*",
-		MAME_DIR .. "src/emu/machine/lpc-pit.*",
-		MAME_DIR .. "src/emu/machine/vrc4373.*",
+		MAME_DIR .. "src/emu/machine/pci.c",
+		MAME_DIR .. "src/emu/machine/pci-usb.c",
+		MAME_DIR .. "src/emu/machine/pci-sata.c",
+		MAME_DIR .. "src/emu/machine/pci-apic.c",
+		MAME_DIR .. "src/emu/machine/pci-smbus.c",
+		MAME_DIR .. "src/emu/machine/i82541.c",
+		MAME_DIR .. "src/emu/machine/i82875p.c",
+		MAME_DIR .. "src/emu/machine/i6300esb.c",
+		MAME_DIR .. "src/emu/machine/lpc.c",
+		MAME_DIR .. "src/emu/machine/lpc-acpi.c",
+		MAME_DIR .. "src/emu/machine/lpc-rtc.c",
+		MAME_DIR .. "src/emu/machine/lpc-pit.c",
+		MAME_DIR .. "src/emu/machine/vrc4373.c",
 	}
 end
 
@@ -1526,7 +1526,7 @@ end
 
 if (MACHINES["PCKEYBRD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pckeybrd.*",
+		MAME_DIR .. "src/emu/machine/pckeybrd.c",
 	}
 end
 
@@ -1537,7 +1537,7 @@ end
 
 if (MACHINES["PIC8259"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pic8259.*",
+		MAME_DIR .. "src/emu/machine/pic8259.c",
 	}
 end
 
@@ -1548,7 +1548,7 @@ end
 
 if (MACHINES["PIT8253"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pit8253.*",
+		MAME_DIR .. "src/emu/machine/pit8253.c",
 	}
 end
 
@@ -1559,7 +1559,7 @@ end
 
 if (MACHINES["PLA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pla.*",
+		MAME_DIR .. "src/emu/machine/pla.c",
 	}
 end
 
@@ -1570,7 +1570,7 @@ end
 
 if (MACHINES["R10696"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/r10696.*",
+		MAME_DIR .. "src/emu/machine/r10696.c",
 	}
 end
 
@@ -1581,7 +1581,7 @@ end
 
 if (MACHINES["R10788"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/r10788.*",
+		MAME_DIR .. "src/emu/machine/r10788.c",
 	}
 end
 
@@ -1592,7 +1592,7 @@ end
 
 if (MACHINES["RA17XX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ra17xx.*",
+		MAME_DIR .. "src/emu/machine/ra17xx.c",
 	}
 end
 
@@ -1604,7 +1604,7 @@ end
 if (MACHINES["RF5C296"]~=null) then
 	MACHINES["PCCARD"] = true
 	files {	
-		MAME_DIR .. "src/emu/machine/rf5c296.*",
+		MAME_DIR .. "src/emu/machine/rf5c296.c",
 	}
 end
 
@@ -1615,7 +1615,7 @@ end
 
 if (MACHINES["ROC10937"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/roc10937.*",
+		MAME_DIR .. "src/emu/machine/roc10937.c",
 	}
 end
 
@@ -1626,7 +1626,7 @@ end
 
 if (MACHINES["RP5C01"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/rp5c01.*",
+		MAME_DIR .. "src/emu/machine/rp5c01.c",
 	}
 end
 
@@ -1637,7 +1637,7 @@ end
 
 if (MACHINES["RP5C15"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/rp5c15.*",
+		MAME_DIR .. "src/emu/machine/rp5c15.c",
 	}
 end
 
@@ -1648,7 +1648,7 @@ end
 
 if (MACHINES["RP5H01"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/rp5h01.*",
+		MAME_DIR .. "src/emu/machine/rp5h01.c",
 	}
 end
 
@@ -1659,7 +1659,7 @@ end
 
 if (MACHINES["R64H156"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/64h156.*",
+		MAME_DIR .. "src/emu/machine/64h156.c",
 	}
 end
 
@@ -1670,7 +1670,7 @@ end
 
 if (MACHINES["RTC4543"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/rtc4543.*",
+		MAME_DIR .. "src/emu/machine/rtc4543.c",
 	}
 end
 
@@ -1681,7 +1681,7 @@ end
 
 if (MACHINES["RTC65271"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/rtc65271.*",
+		MAME_DIR .. "src/emu/machine/rtc65271.c",
 	}
 end
 
@@ -1692,7 +1692,7 @@ end
 
 if (MACHINES["RTC9701"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/rtc9701.*",
+		MAME_DIR .. "src/emu/machine/rtc9701.c",
 	}
 end
 
@@ -1703,7 +1703,7 @@ end
 
 if (MACHINES["S2636"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/s2636.*",
+		MAME_DIR .. "src/emu/machine/s2636.c",
 	}
 end
 
@@ -1714,7 +1714,7 @@ end
 
 if (MACHINES["S3520CF"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/s3520cf.*",
+		MAME_DIR .. "src/emu/machine/s3520cf.c",
 	}
 end
 
@@ -1725,7 +1725,7 @@ end
 
 if (MACHINES["S3C2400"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/s3c2400.*",
+		MAME_DIR .. "src/emu/machine/s3c2400.c",
 	}
 end
 
@@ -1736,7 +1736,7 @@ end
 
 if (MACHINES["S3C2410"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/s3c2410.*",
+		MAME_DIR .. "src/emu/machine/s3c2410.c",
 	}
 end
 
@@ -1747,7 +1747,7 @@ end
 
 if (MACHINES["S3C44B0"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/s3c44b0.*",
+		MAME_DIR .. "src/emu/machine/s3c44b0.c",
 	}
 end
 
@@ -1758,7 +1758,7 @@ end
 
 if (MACHINES["S3C2440"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/s3c2440.*",
+		MAME_DIR .. "src/emu/machine/s3c2440.c",
 	}
 end
 
@@ -1769,7 +1769,7 @@ end
 
 if (MACHINES["SATURN"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/saturn.*",
+		MAME_DIR .. "src/emu/machine/saturn.c",
 	}
 end
 
@@ -1780,7 +1780,7 @@ end
 
 if (MACHINES["SERFLASH"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/serflash.*",
+		MAME_DIR .. "src/emu/machine/serflash.c",
 	}
 end
 
@@ -1791,7 +1791,7 @@ end
 
 if (MACHINES["SMC91C9X"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/smc91c9x.*",
+		MAME_DIR .. "src/emu/machine/smc91c9x.c",
 	}
 end
 
@@ -1802,7 +1802,7 @@ end
 
 if (MACHINES["SMPC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/smpc.*",
+		MAME_DIR .. "src/emu/machine/smpc.c",
 	}
 end
 
@@ -1813,7 +1813,7 @@ end
 
 if (MACHINES["STVCD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/stvcd.*",
+		MAME_DIR .. "src/emu/machine/stvcd.c",
 	}
 end
 
@@ -1828,9 +1828,9 @@ end
 
 if (MACHINES["T10"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/t10mmc.*",
-		MAME_DIR .. "src/emu/machine/t10sbc.*",
-		MAME_DIR .. "src/emu/machine/t10spc.*",
+		MAME_DIR .. "src/emu/machine/t10mmc.c",
+		MAME_DIR .. "src/emu/machine/t10sbc.c",
+		MAME_DIR .. "src/emu/machine/t10spc.c",
 	}
 end
 
@@ -1841,7 +1841,7 @@ end
 
 if (MACHINES["TC0091LVC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/tc009xlvc.*",
+		MAME_DIR .. "src/emu/machine/tc009xlvc.c",
 	}
 end
 
@@ -1852,7 +1852,7 @@ end
 
 if (MACHINES["TIMEKPR"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/timekpr.*",
+		MAME_DIR .. "src/emu/machine/timekpr.c",
 	}
 end
 
@@ -1863,7 +1863,7 @@ end
 
 if (MACHINES["TMP68301"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/tmp68301.*",
+		MAME_DIR .. "src/emu/machine/tmp68301.c",
 	}
 end
 
@@ -1874,7 +1874,7 @@ end
 
 if (MACHINES["TMS5501"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/tms5501.*",
+		MAME_DIR .. "src/emu/machine/tms5501.c",
 	}
 end
 
@@ -1885,7 +1885,7 @@ end
 
 if (MACHINES["TMS6100"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/tms6100.*",
+		MAME_DIR .. "src/emu/machine/tms6100.c",
 	}
 end
 
@@ -1896,7 +1896,7 @@ end
 
 if (MACHINES["TMS9901"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/tms9901.*",
+		MAME_DIR .. "src/emu/machine/tms9901.c",
 	}
 end
 
@@ -1907,7 +1907,7 @@ end
 
 if (MACHINES["TMS9902"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/tms9902.*",
+		MAME_DIR .. "src/emu/machine/tms9902.c",
 	}
 end
 
@@ -1918,7 +1918,7 @@ end
 
 if (MACHINES["UPD1990A"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/upd1990a.*",
+		MAME_DIR .. "src/emu/machine/upd1990a.c",
 	}
 end
 
@@ -1929,7 +1929,7 @@ end
 
 if (MACHINES["UPD4992"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/upd4992.*",
+		MAME_DIR .. "src/emu/machine/upd4992.c",
 	}
 end
 
@@ -1941,7 +1941,7 @@ end
 
 if (MACHINES["UPD4701"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/upd4701.*",
+		MAME_DIR .. "src/emu/machine/upd4701.c",
 	}
 end
 
@@ -1952,7 +1952,7 @@ end
 
 if (MACHINES["UPD7002"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/upd7002.*",
+		MAME_DIR .. "src/emu/machine/upd7002.c",
 	}
 end
 
@@ -1963,7 +1963,7 @@ end
 
 if (MACHINES["UPD71071"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/upd71071.*",
+		MAME_DIR .. "src/emu/machine/upd71071.c",
 	}
 end
 
@@ -1974,7 +1974,7 @@ end
 
 if (MACHINES["UPD765"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/upd765.*",
+		MAME_DIR .. "src/emu/machine/upd765.c",
 	}
 end
 
@@ -1985,7 +1985,7 @@ end
 
 if (MACHINES["V3021"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/v3021.*",
+		MAME_DIR .. "src/emu/machine/v3021.c",
 	}
 end
 
@@ -1996,8 +1996,8 @@ end
 
 if (MACHINES["WD_FDC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/wd_fdc.*",
-		MAME_DIR .. "src/emu/machine/fdc_pll.*",
+		MAME_DIR .. "src/emu/machine/wd_fdc.c",
+		MAME_DIR .. "src/emu/machine/fdc_pll.c",
 	}
 end
 
@@ -2008,7 +2008,7 @@ end
 
 if (MACHINES["WD11C00_17"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/wd11c00_17.*",
+		MAME_DIR .. "src/emu/machine/wd11c00_17.c",
 	}
 end
 
@@ -2019,7 +2019,7 @@ end
 
 if (MACHINES["WD17XX"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/wd17xx.*",
+		MAME_DIR .. "src/emu/machine/wd17xx.c",
 	}
 end
 
@@ -2030,7 +2030,7 @@ end
 
 if (MACHINES["WD2010"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/wd2010.*",
+		MAME_DIR .. "src/emu/machine/wd2010.c",
 	}
 end
 
@@ -2042,7 +2042,7 @@ end
 if (MACHINES["WD33C93"]~=null) then
 	MACHINES["SCSI"] = true
 	files {
-		MAME_DIR .. "src/emu/machine/wd33c93.*",
+		MAME_DIR .. "src/emu/machine/wd33c93.c",
 	}
 end
 
@@ -2053,7 +2053,7 @@ end
 
 if (MACHINES["WD7600"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/wd7600.*",
+		MAME_DIR .. "src/emu/machine/wd7600.c",
 	}
 end
 
@@ -2064,7 +2064,7 @@ end
 
 if (MACHINES["X2212"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/x2212.*",
+		MAME_DIR .. "src/emu/machine/x2212.c",
 	}
 end
 
@@ -2075,7 +2075,7 @@ end
 
 if (MACHINES["X76F041"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/x76f041.*",
+		MAME_DIR .. "src/emu/machine/x76f041.c",
 	}
 end
 
@@ -2086,7 +2086,7 @@ end
 
 if (MACHINES["X76F100"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/x76f100.*",
+		MAME_DIR .. "src/emu/machine/x76f100.c",
 	}
 end
 
@@ -2097,7 +2097,7 @@ end
 
 if (MACHINES["YM2148"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ym2148.*",
+		MAME_DIR .. "src/emu/machine/ym2148.c",
 	}
 end
 
@@ -2108,7 +2108,7 @@ end
 
 if (MACHINES["Z80CTC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/z80ctc.*",
+		MAME_DIR .. "src/emu/machine/z80ctc.c",
 	}
 end
 
@@ -2119,7 +2119,7 @@ end
 
 if (MACHINES["Z80DART"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/z80dart.*",
+		MAME_DIR .. "src/emu/machine/z80dart.c",
 	}
 end
 
@@ -2130,7 +2130,7 @@ end
 
 if (MACHINES["Z80DMA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/z80dma.*",
+		MAME_DIR .. "src/emu/machine/z80dma.c",
 	}
 end
 
@@ -2141,7 +2141,7 @@ end
 
 if (MACHINES["Z80PIO"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/z80pio.*",
+		MAME_DIR .. "src/emu/machine/z80pio.c",
 	}
 end
 
@@ -2152,7 +2152,7 @@ end
 
 if (MACHINES["Z80STI"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/z80sti.*",
+		MAME_DIR .. "src/emu/machine/z80sti.c",
 	}
 end
 
@@ -2163,7 +2163,7 @@ end
 
 if (MACHINES["Z8536"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/z8536.*",
+		MAME_DIR .. "src/emu/machine/z8536.c",
 	}
 end
 
@@ -2174,7 +2174,7 @@ end
 
 if (MACHINES["PCCARD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pccard.*",
+		MAME_DIR .. "src/emu/machine/pccard.c",
 	}
 end
 
@@ -2185,8 +2185,8 @@ end
 
 if (MACHINES["I8255"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/i8255.*",
-		MAME_DIR .. "src/emu/machine/mb89363b.*",
+		MAME_DIR .. "src/emu/machine/i8255.c",
+		MAME_DIR .. "src/emu/machine/mb89363b.c",
 	}
 end
 
@@ -2197,7 +2197,7 @@ end
 
 if (MACHINES["NCR5380"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ncr5380.*",
+		MAME_DIR .. "src/emu/machine/ncr5380.c",
 	}
 end
 
@@ -2208,7 +2208,7 @@ end
 
 if (MACHINES["NCR5380N"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ncr5380n.*",
+		MAME_DIR .. "src/emu/machine/ncr5380n.c",
 	}
 end
 
@@ -2219,7 +2219,7 @@ end
 
 if (MACHINES["NCR5390"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ncr5390.*",
+		MAME_DIR .. "src/emu/machine/ncr5390.c",
 	}
 end
 
@@ -2230,7 +2230,7 @@ end
 
 if (MACHINES["MM58167"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mm58167.*",
+		MAME_DIR .. "src/emu/machine/mm58167.c",
 	}
 end
 
@@ -2242,7 +2242,7 @@ end
 
 if (MACHINES["DP8390"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/dp8390.*",
+		MAME_DIR .. "src/emu/machine/dp8390.c",
 	}
 end
 
@@ -2253,7 +2253,7 @@ end
 
 if (MACHINES["PC_LPT"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pc_lpt.*",
+		MAME_DIR .. "src/emu/machine/pc_lpt.c",
 	}
 end
 
@@ -2264,7 +2264,7 @@ end
 
 if (MACHINES["PC_FDC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/pc_fdc.*",
+		MAME_DIR .. "src/emu/machine/pc_fdc.c",
 	}
 end
 
@@ -2275,7 +2275,7 @@ end
 
 if (MACHINES["MPU401"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/mpu401.*",
+		MAME_DIR .. "src/emu/machine/mpu401.c",
 	}
 end
 
@@ -2286,7 +2286,7 @@ end
 
 if (MACHINES["AT_KEYBC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/at_keybc.*",
+		MAME_DIR .. "src/emu/machine/at_keybc.c",
 	}
 end
 
@@ -2297,7 +2297,7 @@ end
 
 if (MACHINES["SMC92X4"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/smc92x4.*",
+		MAME_DIR .. "src/emu/machine/smc92x4.c",
 	}
 end
 
@@ -2308,7 +2308,7 @@ end
 
 if (MACHINES["HDC9234"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/hdc9234.*",
+		MAME_DIR .. "src/emu/machine/hdc9234.c",
 	}
 end
 
@@ -2319,7 +2319,7 @@ end
 
 if (MACHINES["TI99_HD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/ti99_hd.*",
+		MAME_DIR .. "src/emu/machine/ti99_hd.c",
 	}
 end
 
@@ -2330,7 +2330,7 @@ end
 
 if (MACHINES["STRATA"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/strata.*",
+		MAME_DIR .. "src/emu/machine/strata.c",
 	}
 end
 
@@ -2341,7 +2341,7 @@ end
 
 if (MACHINES["STEPPERS"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/steppers.*",
+		MAME_DIR .. "src/emu/machine/steppers.c",
 	}
 end
 
@@ -2351,7 +2351,7 @@ end
 ---------------------------------------------------
 if (MACHINES["CORVUSHD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/corvushd.*",
+		MAME_DIR .. "src/emu/machine/corvushd.c",
 	}
 end
 
@@ -2361,7 +2361,7 @@ end
 ---------------------------------------------------
 if (MACHINES["WOZFDC"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/wozfdc.*",
+		MAME_DIR .. "src/emu/machine/wozfdc.c",
 	}
 end
 
@@ -2371,7 +2371,7 @@ end
 ---------------------------------------------------
 if (MACHINES["DIABLO_HD"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/diablo_hd.*",
+		MAME_DIR .. "src/emu/machine/diablo_hd.c",
 	}
 end
 
@@ -2382,6 +2382,6 @@ end
 
 if (MACHINES["FDC37C665GT"]~=null) then
 	files {
-		MAME_DIR .. "src/emu/machine/fdc37c665gt.*",
+		MAME_DIR .. "src/emu/machine/fdc37c665gt.c",
 	}
 end

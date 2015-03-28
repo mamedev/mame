@@ -367,8 +367,9 @@ includeosd()
 
 files {
 	MAME_DIR .. "src/tools/nltool.c",
-	MAME_DIR .. "src/emu/netlist/**.*",
 }
+
+dofile("netlist.lua")
 
 --------------------------------------------------
 -- castool
@@ -479,6 +480,37 @@ includedirs {
 includeosd()
 
 files {
-	MAME_DIR .. "src/mess/tools/imgtool/**.*",
+	MAME_DIR .. "src/mess/tools/imgtool/main.c",
+	MAME_DIR .. "src/mess/tools/imgtool/stream.c",
+	MAME_DIR .. "src/mess/tools/imgtool/library.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules.c",
+	MAME_DIR .. "src/mess/tools/imgtool/iflopimg.c",
+	MAME_DIR .. "src/mess/tools/imgtool/filter.c",
+	MAME_DIR .. "src/mess/tools/imgtool/filteoln.c",
+	MAME_DIR .. "src/mess/tools/imgtool/filtbas.c",
+	MAME_DIR .. "src/mess/tools/imgtool/imgtool.c",
+	MAME_DIR .. "src/mess/tools/imgtool/imgterrs.c",
+	MAME_DIR .. "src/mess/tools/imgtool/imghd.c", 
+	MAME_DIR .. "src/mess/tools/imgtool/charconv.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/amiga.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/macbin.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/rsdos.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/os9.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/mac.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/ti99.c", 
+	MAME_DIR .. "src/mess/tools/imgtool/modules/ti990hd.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/concept.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/fat.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/pc_flop.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/pc_hard.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/prodos.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/vzdos.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/thomson.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/macutil.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/cybiko.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/cybikoxt.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/psion.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/bml3.c",
+	MAME_DIR .. "src/mess/tools/imgtool/modules/hp48.c",
 }
 

@@ -34,20 +34,20 @@ project ("osd_" .. _OPTIONS["osd"])
 
 	files {
 		MAME_DIR .. "src/osd/osdmini/minimain.c",
-		MAME_DIR .. "src/osd/modules/lib/osdobj_common.*",
-		MAME_DIR .. "src/osd/modules/font/font_sdl.*",
-		MAME_DIR .. "src/osd/modules/font/font_windows.*",
-		MAME_DIR .. "src/osd/modules/font/font_osx.*",
-		MAME_DIR .. "src/osd/modules/font/font_none.*",
-		MAME_DIR .. "src/osd/modules/netdev/taptun.*",
-		MAME_DIR .. "src/osd/modules/netdev/pcap.*",
-		MAME_DIR .. "src/osd/modules/netdev/none.*",
-		MAME_DIR .. "src/osd/modules/midi/portmidi.*",
-		MAME_DIR .. "src/osd/modules/midi/none.*",
-		MAME_DIR .. "src/osd/modules/sound/js_sound.*",
-		MAME_DIR .. "src/osd/modules/sound/direct_sound.*",
-		MAME_DIR .. "src/osd/modules/sound/sdl_sound.*",
-		MAME_DIR .. "src/osd/modules/sound/none.*",
+		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
+		MAME_DIR .. "src/osd/modules/font/font_sdl.c",
+		MAME_DIR .. "src/osd/modules/font/font_windows.c",
+		MAME_DIR .. "src/osd/modules/font/font_osx.c",
+		MAME_DIR .. "src/osd/modules/font/font_none.c",
+		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
+		MAME_DIR .. "src/osd/modules/netdev/pcap.c",
+		MAME_DIR .. "src/osd/modules/netdev/none.c",
+		MAME_DIR .. "src/osd/modules/midi/portmidi.c",
+		MAME_DIR .. "src/osd/modules/midi/none.c",
+		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
+		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
+		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
+		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
 	
 project ("ocore_" .. _OPTIONS["osd"])
@@ -90,11 +90,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 	end
 
 	files {
-		MAME_DIR .. "src/osd/modules/osdmodule.*",
-		MAME_DIR .. "src/osd/osdmini/minidir.*",
-		MAME_DIR .. "src/osd/osdmini/minifile.*",
-		MAME_DIR .. "src/osd/osdmini/minimisc.*",
-		MAME_DIR .. "src/osd/osdmini/minisync.*",
-		MAME_DIR .. "src/osd/osdmini/minitime.*",
-		MAME_DIR .. "src/osd/modules/sync/work_mini.*",
+		MAME_DIR .. "src/osd/modules/osdmodule.c",
+		MAME_DIR .. "src/osd/osdmini/minidir.c",
+		MAME_DIR .. "src/osd/osdmini/minifile.c",
+		MAME_DIR .. "src/osd/osdmini/minimisc.c",
+		MAME_DIR .. "src/osd/osdmini/minisync.c",
+		MAME_DIR .. "src/osd/osdmini/minitime.c",
+		MAME_DIR .. "src/osd/modules/sync/work_mini.c",
 	}
