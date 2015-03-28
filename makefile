@@ -340,9 +340,9 @@ GENIE=3rdparty/genie/bin/$(OS)/genie
 SILENT?=@
 
 ifeq ($(TARGET),$(SUBTARGET))
-SUBDIR = $(TARGET)
+SUBDIR = $(OSD)/$(TARGET)
 else
-SUBDIR = $(TARGET)$(SUBTARGET)
+SUBDIR = $(OSD)/$(TARGET)$(SUBTARGET)
 endif
 
 all: $(GENIE) $(TARGETOS)_$(ARCHITECTURE)

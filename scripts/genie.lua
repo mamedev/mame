@@ -583,9 +583,9 @@ end
 
 local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-	subdir = _OPTIONS["target"]
+	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"]
 else
-	subdir = _OPTIONS["target"] .. _OPTIONS["subtarget"] 
+	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"] .. _OPTIONS["subtarget"] 
 end	
 
 if not toolchain(MAME_BUILD_DIR, subdir) then
