@@ -6,8 +6,8 @@ VIDEOS["TMS9928A"] = true
 
 BUSES["COLECO"] = true
 
-function createProjects(_target, _subtarget)
-	project ("tiny")
+function createProjects_mess_tiny(_target, _subtarget)
+	project ("mess_tiny")
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
 	uuid (os.uuid("drv-mess-tiny"))
@@ -34,8 +34,8 @@ function createProjects(_target, _subtarget)
 	}
 end
 
-function linkProjects(_target, _subtarget)
+function linkProjects_mess_tiny(_target, _subtarget)
 	links {
-		"tiny",
+		"mess_tiny",
 	}
 end

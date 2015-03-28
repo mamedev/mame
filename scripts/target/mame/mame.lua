@@ -649,7 +649,7 @@ BUSES["VECTREX"] = true
 -- the list of drivers
 --------------------------------------------------
 
-function linkProjects(_target, _subtarget)
+function linkProjects_mame_mame(_target, _subtarget)
 	links {
 		"acorn",
 		"alba",
@@ -775,7 +775,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 	includeosd()
 end
 	
-function createProjects(_target, _subtarget)
+function createProjects_mame_mame(_target, _subtarget)
 --------------------------------------------------
 -- the following files are general components and
 -- shared across a number of drivers

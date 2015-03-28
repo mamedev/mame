@@ -75,8 +75,8 @@ BUSES["CENTRONICS"] = true
 -- in tiny.c
 --------------------------------------------------
 
-function createProjects(_target, _subtarget)
-	project ("tiny")
+function createProjects_mame_tiny(_target, _subtarget)
+	project ("mame_tiny")
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
 	uuid (os.uuid("drv-mame-tiny"))
@@ -139,8 +139,8 @@ function createProjects(_target, _subtarget)
 	}
 end
 
-function linkProjects(_target, _subtarget)
+function linkProjects_mame_tiny(_target, _subtarget)
 	links {
-		"tiny",
+		"mame_tiny",
 	}
 end

@@ -650,7 +650,7 @@ BUSES["ZORRO"] = true
 -- comprise MESS plus messdriv.*", which contains
 -- the list of drivers
 --------------------------------------------------
-function linkProjects(_target, _subtarget)
+function linkProjects_mess_mess(_target, _subtarget)
 	links {
 		"acorn",
 		"act",
@@ -837,8 +837,12 @@ function linkProjects(_target, _subtarget)
 		"zpa",
 		"zvt",
 		"shared",
+	}
+	if (_target=="mess") then
+	links {
 		"mameshared",
 	}
+	end
 end
 
 function createMESSProjects(_target, _subtarget, _name)
@@ -867,7 +871,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	includeosd()
 end
 	
-function createProjects(_target, _subtarget)
+function createProjects_mess_mess(_target, _subtarget)
 --------------------------------------------------
 -- the following files are MAME components and
 -- shared across a number of drivers
@@ -891,7 +895,7 @@ function createProjects(_target, _subtarget)
 -- vectrex.c (MESS + MAME)
 -- cps1.c (MESS + MAME)
 --------------------------------------------------
-
+if (_target=="mess") then
 createMESSProjects(_target, _subtarget, "mameshared")
 files { 
 	MAME_DIR .. "src/mame/machine/archimds.c",  
@@ -959,7 +963,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cps1.c",      
 	MAME_DIR .. "src/mame/video/cps1.c",        
 }
-
+end
 --------------------------------------------------
 -- the following files are general components and
 -- shared across a number of drivers

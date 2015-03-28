@@ -39,7 +39,7 @@ function mainProject(_target, _subtarget)
 	configuration { }
 		targetdir(MAME_DIR)
 
-	linkProjects(_target, _subtarget)
+	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 	links {
 		"osd_" .. _OPTIONS["osd"],
 		"bus",
