@@ -226,7 +226,7 @@ end
 		}	
 	configuration {}
 	
-aftercompilefile ("\t$(SILENT) gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)\n\t$(SILENT) mv $(@:%.o=%.dep) $(@:%.o=%.d)")
+--aftercompilefile ("\t$(SILENT) gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)\n\t$(SILENT) mv $(@:%.o=%.dep) $(@:%.o=%.d)")
 	
 	
 msgcompile ("Compiling $(subst ../,,$<)...")
