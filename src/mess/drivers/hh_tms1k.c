@@ -1051,7 +1051,7 @@ void hh_tms1k_state::ebball3_set_clock()
 	// MCU clock is from an RC circuit(R=47K, C=33pf) oscillating by default at ~340kHz,
 	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
 	// it up to around ~440kHz.
-	m_maincpu->set_unscaled_clock(m_inp_matrix[3]->read() & 1 ? 440000 : 340000);
+	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 440000 : 340000);
 }
 
 INPUT_CHANGED_MEMBER(hh_tms1k_state::ebball3_difficulty_switch)
@@ -1570,23 +1570,46 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // fake
-	PORT_CONFNAME( 0x03, 0x00, "Speed" ) //PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, ssimon_speed_switch, NULL)
+	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, ssimon_speed_switch, NULL)
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
 	PORT_CONFSETTING(    0x02, "Super" )
 INPUT_PORTS_END
 
 
+void hh_tms1k_state::ssimon_set_clock()
+{
+	// MCU clock is from an RC circuit with C=100pf, R=x depending on speed switch:
+	// 0 Simple: R=51K -> ~200kHz
+	// 1 Normal: R=37K -> ~275kHz
+	// 2 Super:  R=22K -> ~400kHz
+	UINT8 inp = m_inp_matrix[6]->read();
+	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
+}
+
+INPUT_CHANGED_MEMBER(hh_tms1k_state::ssimon_speed_switch)
+{
+	ssimon_set_clock();
+}
+
+MACHINE_RESET_MEMBER(hh_tms1k_state, ssimon)
+{
+	machine_reset();
+	ssimon_set_clock();
+}
+
 static MACHINE_CONFIG_START( ssimon, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // x
+	MCFG_CPU_ADD("maincpu", TMS1100, 275000) // see ssimon_set_clock
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ssimon_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ssimon_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ssimon_write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ssimon)
+
+	MCFG_MACHINE_RESET_OVERRIDE(hh_tms1k_state, ssimon)
 
 	/* no video! */
 

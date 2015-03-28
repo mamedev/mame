@@ -770,7 +770,7 @@ void hh_ucom4_state::tmtennis_set_clock()
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
 	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
 	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock(m_inp_matrix[1]->read() & 0x100 ? 260000 : 360000);
+	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
 }
 
 INPUT_CHANGED_MEMBER(hh_ucom4_state::tmtennis_difficulty_switch)
