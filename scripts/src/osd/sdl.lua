@@ -56,6 +56,7 @@ project ("osd_" .. _OPTIONS["osd"])
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			--MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.m",
+			MAME_DIR .. "src/osd/modules/debugger/debugosx.m",
 			MAME_DIR .. "src/osd/modules/debugger/osx/breakpointsview.m",
 			MAME_DIR .. "src/osd/modules/debugger/osx/consoleview.m",
 			MAME_DIR .. "src/osd/modules/debugger/osx/debugcommandhistory.m",
