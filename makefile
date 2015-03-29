@@ -319,6 +319,20 @@ ifdef TARGETOS
 PARAMS+= --targetos=$(TARGETOS)
 endif
 
+ifdef USE_QT
+PARAMS+= --USE_QT=$(USE_QT)
+else
+ifneq ($(TARGETOS),macosx)
+PARAMS+= --USE_QT=1
+else
+PARAMS+= --USE_QT=0
+endif
+endif
+
+ifdef LDOPTS
+PARAMS+= --LDOPTS='$(LDOPTS)'
+endif
+
 # extension for executables
 EXE =
 

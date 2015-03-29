@@ -158,6 +158,11 @@ newoption {
 } 
 
 newoption {
+	trigger = "LDOPTS",
+	description = "Additional linker options",
+} 
+
+newoption {
 	trigger = "MAP",
 	description = "Generate a link map.",
 } 
@@ -181,6 +186,14 @@ newoption {
 	}
 } 
 
+newoption {
+	trigger = "USE_QT",
+	description = "Use of QT.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+} 
 
 local os_version = str_to_version(_OPTIONS["os_version"])
 
@@ -190,6 +203,11 @@ if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
 end
 if(_OPTIONS["USE_BGFX"]~=nil) then
 	USE_BGFX = tonumber(_OPTIONS["USE_BGFX"])
+end
+
+USE_QT = 1
+if(_OPTIONS["USE_QT"]~=nil) then
+	USE_QT = tonumber(_OPTIONS["USE_QT"])
 end
 
 GEN_DIR = MAME_BUILD_DIR .. "generated/"
@@ -514,6 +532,12 @@ end
 --CCOMFLAGS += -Wno-unknown-pragmas
 --endif
 
+if _OPTIONS["LDOPTS"] then
+		linkoptions {
+			_OPTIONS["LDOPTS"]
+		}
+end
+
 if _OPTIONS["MAP"] then
 	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 		linkoptions {
@@ -724,7 +748,7 @@ if _OPTIONS["osd"]=="sdl" then
 		links {
 			"opengl32",
 			"SDL2",
-			"Imm32",
+			"imm32",
 			"version",
 			"ole32",
 			"oleaut32",
