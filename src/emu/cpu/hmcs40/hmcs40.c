@@ -291,6 +291,12 @@ void hmcs40_cpu_device::device_reset()
 	m_pc = m_pcmask;
 	m_prev_op = m_op = 0;
 
+	// clear interrupts
+	m_cf = 0;
+	m_ie = 0;
+	m_iri = m_irt = 0;
+	m_if[0] = m_if[1] = m_tf = 1;
+
 	// clear i/o
 	m_d = m_polarity;
 	for (int i = 0; i < 16; i++)
@@ -298,12 +304,6 @@ void hmcs40_cpu_device::device_reset()
 
 	for (int i = 0; i < 8; i++)
 		hmcs40_cpu_device::write_r(i, 0);
-
-	// clear interrupts
-	m_cf = 0;
-	m_ie = 0;
-	m_iri = m_irt = 0;
-	m_if[0] = m_if[1] = m_tf = 1;
 }
 
 
