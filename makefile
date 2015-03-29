@@ -367,7 +367,7 @@ endif
 
 ifeq ($(TARGETOS),macosx)
 ifneq (,$(findstring 3.,$(CLANG_VERSION)))
-ifeq ($(ARCHITECTURE),x64)
+ifeq ($(ARCHITECTURE),_x64)
 ARCHITECTURE=_x64_clang
 else
 ARCHITECTURE=_x86_clang

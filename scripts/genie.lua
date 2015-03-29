@@ -702,14 +702,17 @@ configuration { "linux-*" }
 
 configuration { "osx*" }
 		links {
+			"SDL2.framework",
 			"Cocoa.framework",
 			"OpenGL.framework",
 			"CoreAudio.framework",
 			"CoreMIDI.framework",
-			"SDL2.framework",
 			"pthread",
 		}
 		buildoptions {
+			"-F/Library/Frameworks/",
+		}
+		linkoptions {
 			"-F/Library/Frameworks/",
 		}
 
