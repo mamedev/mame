@@ -946,7 +946,7 @@ ROM_START( lilprof78 )
 	ROM_LOAD( "tmc1993nl", 0x0000, 0x0400, CRC(e941316b) SHA1(7e1542045d1e731cea81a639c9ac9e91bb233b15) )
 
 	ROM_REGION( 782, "maincpu:ipla", 0 )
-	ROM_LOAD( "tms0970_lilprof78_ipla.pla", 0, 782, BAD_DUMP CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) ) // not verified
+	ROM_LOAD( "tms0970_lilprof78_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
 	ROM_REGION( 860, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0970_lilprof78_mpla.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
 	ROM_REGION( 352, "maincpu:opla", 0 )
