@@ -333,6 +333,40 @@ ifdef LDOPTS
 PARAMS+= --LDOPTS='$(LDOPTS)'
 endif
 
+#-------------------------------------------------
+# All scripts
+#-------------------------------------------------
+
+SCRIPTS = scripts/genie.lua \
+	scripts/src/lib.lua \
+	scripts/src/emu.lua \
+	scripts/src/machine.lua \
+	scripts/src/main.lua \
+	scripts/src/3rdparty.lua \
+	scripts/src/cpu.lua \
+	scripts/src/osd/windows_cfg.lua \
+	scripts/src/osd/sdl_cfg.lua \
+	scripts/src/osd/windows.lua \
+	scripts/src/osd/osdmini_cfg.lua \
+	scripts/src/osd/osdmini.lua \
+	scripts/src/sound.lua \
+	scripts/src/tools.lua \
+	scripts/src/video.lua \
+	scripts/src/bus.lua \
+	scripts/src/netlist.lua \
+	scripts/toolchain.lua \
+	scripts/target/ume/tiny.lua \
+	scripts/target/ume/ume.lua \
+	scripts/target/mess/tiny.lua \
+	scripts/target/mess/mess.lua \
+	scripts/target/ldplayer/ldplayer.lua \
+	scripts/target/mame/mame.lua \
+	scripts/target/mame/tiny.lua
+
+#-------------------------------------------------
+# Dependent stuff
+#-------------------------------------------------
+
 # extension for executables
 EXE =
 
@@ -360,6 +394,7 @@ else
 endif
 
 GENDIR = build/generated
+PROJECTDIR = build/projects/$(SUBDIR)
 
 # all sources are under the src/ directory
 SRC = src
@@ -412,7 +447,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake 
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
 windows: windows_x86
 
@@ -423,7 +458,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw32-gcc --gcc_version=$(GCC_VERSION) gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 windows_x64_clang: generate
 ifndef CLANG
@@ -432,7 +467,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
 	
 windows_x86_clang: generate
 ifndef CLANG
@@ -441,7 +476,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 vs2010: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2010
@@ -477,7 +512,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
 
 android-mips: generate
 ifndef ANDROID_NDK_MIPS
@@ -489,7 +524,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-mips config=$(CONFIG)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
 
 android-x86: generate
 ifndef ANDROID_NDK_X86
@@ -501,7 +536,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-android-x86 config=$(CONFIG)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
 
 asmjs: generate
 ifndef EMSCRIPTEN
@@ -510,7 +545,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-asmjs config=$(CONFIG)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
 
 
 nacl: nacl_x86
@@ -522,7 +557,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl config=$(CONFIG)64
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
 
 nacl_x86: generate
 ifndef NACL_SDK_ROOT
@@ -531,7 +566,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl config=$(CONFIG)32
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
 
 nacl-arm: generate
 ifndef NACL_SDK_ROOT
@@ -540,7 +575,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-nacl-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
 
 pnacl: generate
 ifndef NACL_SDK_ROOT
@@ -549,39 +584,41 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-pnacl config=$(CONFIG)
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
 
-linux_x64: generate
-ifndef COMPILE
+#-------------------------------------------------
+# linux_gcc
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
-endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux config=$(CONFIG)64
+
+linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
 
 linux: linux_x86
 
-linux_x86: generate
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
-endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux config=$(CONFIG)32
+linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
 
-linux_x64_clang: generate
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
-endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux-clang config=$(CONFIG)64
+#-------------------------------------------------
+# linux_clang
+#-------------------------------------------------
 
-linux_x86_clang: generate
-ifndef COMPILE
+$(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
-endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux-clang config=$(CONFIG)32
+
+linux_x64_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)64
+
+linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)32
 
 macosx_x64: generate
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx config=$(CONFIG)64
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)64
 
 macosx: macosx_x86
 
@@ -589,19 +626,19 @@ macosx_x86: generate
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --os_version=$(DARWIN_VERSION) --gcc_version=$(GCC_VERSION) gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx config=$(CONFIG)32
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)32
 
 macosx_x64_clang: generate
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx-clang config=$(CONFIG)64
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)64
 
 macosx_x86_clang: generate
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --os_version=$(DARWIN_VERSION) --gcc_version=$(CLANG_VERSION) gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx-clang config=$(CONFIG)32
+	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
 
 $(GENIE):
 	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
