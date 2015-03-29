@@ -52,6 +52,9 @@ It is possible the Twins PCB has them too and doesn't use them.
 
 Twins (set 2) is significantly changed hardware, uses a regular RAMDAC hookup for plaette etc.
 
+To access Service Mode in Spider you must boot with P1 Left and P1 Right held down,
+this requires the -joystick_contradictory switch on the commandline.
+
 
 */
 
@@ -506,11 +509,14 @@ WRITE16_MEMBER(twins_state::spider_port_1c_w)
 
 	// game is only animating sprites at 30fps, maybe there's some double buffering too?
 
+//  data written is always 00, only seems to want the upper layer to be cleared
+//  otherwise you get garbage sprites between rounds and the bg incorrectly wiped
+
 	UINT16* vram;
-	if (m_videorambank & 1)
+//	if (m_videorambank & 1)
 		vram = m_videoram2;
-	else
-		vram = m_videoram;
+//	else
+//		vram = m_videoram;
 
 	for (int i = 0; i < 0x8000; i++)
 	{
