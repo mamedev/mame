@@ -54,9 +54,8 @@ else
 	CORE_DEFINE := -DWANT_UME
 endif
 
-# Ensure $(EMULATOR) has no suffixes
-# FIXME: Should this be $(TARGETLIB)?  Probably...
-override EMULATOR = $(TARGET)
+# We build a library, not an executable
+override EMULATOR = $(TARGETLIB)
 
 # libretro's preferred settings
 NOWERROR = 1
