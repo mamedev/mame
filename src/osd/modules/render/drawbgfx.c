@@ -5,12 +5,12 @@
 //  drawbgfx.c - BGFX drawer
 //
 //============================================================
-
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
-// standard windows headers
 #define __STDC_LIMIT_MACROS
 #define __STDC_FORMAT_MACROS
 #define __STDC_CONSTANT_MACROS
+
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else

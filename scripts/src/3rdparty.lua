@@ -469,6 +469,11 @@ project "bgfx"
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
 	
+	configuration { "gmake" }
+		buildoptions {		
+			"-Wno-uninitialized",
+		}
+			
 	configuration { }
 
 	defines {
