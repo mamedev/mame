@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="abc80_cass" description="Luxor ABC 80 cassettes">
+
+	<software name="abcdemo">
+		<description>ABCDemo</description>
+		<year>2015</year>
+		<publisher>Genesis Project</publisher>
+
+		<part name="cass1" interface="abc80_cass">
+			<dataarea name="cass" size="10793090">
+				<rom name="genesisproject_abcdemo.wav" size="10793090" crc="7642349f" sha1="a0a808e9c9c5f3ca162ef22869600e1c735846c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

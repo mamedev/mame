@@ -1490,10 +1490,10 @@ void hng64_state::machine_start()
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
-	/* configure fast RAM regions for DRC */
-	m_maincpu->mips3drc_add_fastram(0x00000000, 0x00ffffff, FALSE, m_mainram);
-	m_maincpu->mips3drc_add_fastram(0x04000000, 0x05ffffff, TRUE,  m_cart);
-	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	/* configure fast RAM regions */
+	m_maincpu->add_fastram(0x00000000, 0x00ffffff, FALSE, m_mainram);
+	m_maincpu->add_fastram(0x04000000, 0x05ffffff, TRUE,  m_cart);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	m_comm_rom = memregion("user2")->base();
 	m_comm_ram = auto_alloc_array(machine(),UINT8,0x10000);
