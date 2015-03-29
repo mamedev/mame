@@ -56,7 +56,7 @@ project "zlib"
 --------------------------------------------------
 -- SoftFloat library objects
 --------------------------------------------------
-	
+
 project "softfloat"
 	uuid "04fbf89e-4761-4cf2-8a12-64500cf0c5c5"
 	kind "StaticLib"
@@ -73,7 +73,7 @@ project "softfloat"
 		MAME_DIR .. "3rdparty/expat/lib/",
 	}
 	includeosd()
-	
+
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
@@ -248,7 +248,7 @@ project "lua"
 			"LUA_32BITS",
 		}
 	end
-	
+
 	configuration { }
 
 	includedirs {
@@ -294,7 +294,7 @@ project "lua"
 --------------------------------------------------
 -- sqlite3 lua library objects
 --------------------------------------------------
-	
+
 project "lsqlite3"
 	uuid "1d84edab-94cf-48fb-83ee-b75bc697660e"
 	kind "StaticLib"
@@ -357,7 +357,7 @@ project "jsoncpp"
 		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_reader.cpp",
 		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_value.cpp",
 		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
-		
+
 	}
 
 --------------------------------------------------
@@ -392,7 +392,7 @@ project "portmidi"
 		MAME_DIR .. "3rdparty/portmidi/pm_common",
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
-	
+
 	includeosd()
 
 	configuration { "linux*" }
@@ -435,17 +435,17 @@ project "portmidi"
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end
-	
+
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
-	
+
 if (USE_BGFX == 1) then
 project "bgfx"
 	uuid "d3e7e119-35cf-4f4f-aba0-d3bdcd1b879a"
 	kind "StaticLib"
 
-	includedirs {		
+	includedirs {
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
@@ -468,12 +468,12 @@ project "bgfx"
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
-	
+
 	configuration { "gmake" }
-		buildoptions {		
+		buildoptions {
 			"-Wno-uninitialized",
 		}
-			
+
 	configuration { }
 
 	defines {
@@ -513,7 +513,7 @@ project "bgfx"
 		files {
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
-			
+
 		}
 	end
 end

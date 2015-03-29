@@ -39,4 +39,4 @@ chmod 666 /dev/net/tun
 ip tuntap add dev $TAP mode tap user $NAME pi
 ip link set $TAP up arp on
 ip addr replace dev $TAP $HOSTIP/32
-ip route replace $EMUIP via $HOSTIP dev $TAP 
+ip route replace $EMUIP via $HOSTIP dev $TAP

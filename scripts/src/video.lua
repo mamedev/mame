@@ -436,7 +436,7 @@ if (VIDEOS["MOS6566"]~=null) then
 end
 
 
-files {	
+files {
 	MAME_DIR .. "src/emu/video/cgapal.c",
 }
 

@@ -131,7 +131,7 @@ outputPath = os.path.join(currentDirectory, "output")
 tempPath = os.path.join(currentDirectory, "temp")
 if os.name == 'nt':
 	chdmanBin = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "chdman.exe"))
-else:		
+else:
 	chdmanBin = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "chdman"))
 
 if not os.path.exists(chdmanBin):
@@ -146,7 +146,7 @@ if not os.path.exists(outputPath):
 	sys.stderr.write(outputPath + " does not exist\n")
 	sys.exit(1)
 
-if os.path.exists(tempPath):	
+if os.path.exists(tempPath):
 	shutil.rmtree(tempPath)
 	
 failure = False
@@ -156,7 +156,7 @@ for root, dirs, files in os.walk(inputPath):
 		if d.startswith("."):
 			continue
 
-		command = ext = d.split("_", 2)[0]			
+		command = ext = d.split("_", 2)[0]
 		inFile = os.path.join(root, d, "in")
 		# TODO: make this better
 		outFile = os.path.join(root, d, "out.chd").replace("input", "output")

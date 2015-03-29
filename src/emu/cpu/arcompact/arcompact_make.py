@@ -68,7 +68,7 @@ def EmitGroup04_Flaghandler(f,funcname, opname, flagcondition, flaghandler):
 def EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler):
     print >>f, "	int size = 4;"
     
-    if breg_is_dst_only == 0:	
+    if breg_is_dst_only == 0:
         print >>f, "	UINT32 limm = 0;"
     
     print >>f, "/*	int got_limm = 0; */"
@@ -113,7 +113,7 @@ def EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, 
     print >>f, "	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */"
 
 def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler):
-    # the mode 0x00 handler  
+    # the mode 0x00 handler
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p00(OPS_32)" % funcname
     print >>f, "{"
     print >>f, "	int size = 4;"
@@ -178,7 +178,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
     print >>f, "}"
     print >>f, ""
     print >>f, ""
-    # the mode 0x01 handler    
+    # the mode 0x01 handler
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p01(OPS_32)" % funcname
     print >>f, "{"
     EmitGroup04_u5fragment(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, breg_is_dst_only, flagcondition, flaghandler)
@@ -190,7 +190,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
     print >>f, "}"
     print >>f, ""
     print >>f, ""
-    # the mode 0x10 handler 
+    # the mode 0x10 handler
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p10(OPS_32)" % funcname
     if ignore_a == 2:
         print >>f, "{"
@@ -208,7 +208,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, "	"
         print >>f, "	COMMON32_GET_breg;"
     
-        if flagcondition == -1:	
+        if flagcondition == -1:
             print >>f, "	COMMON32_GET_F;"
         
         print >>f, "	COMMON32_GET_s12;"
@@ -245,7 +245,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, "}"
     print >>f, ""
     print >>f, ""
-    # the mode 0x11 m0 handler    
+    # the mode 0x11 m0 handler
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m0(OPS_32)" % funcname
     if ignore_a == 2:
         print >>f, "{"
@@ -260,8 +260,8 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, "	return m_pc + (size >> 0);"
         print >>f, "}"
         print >>f, ""
-        print >>f, ""	
-    # the mode 0x11 m1 handler    
+        print >>f, ""
+    # the mode 0x11 m1 handler
     print >>f, "ARCOMPACT_RETTYPE arcompact_device::arcompact_handle%s_p11_m1(OPS_32)" % funcname
     if ignore_a == 2:
         print >>f, "{"
@@ -275,7 +275,7 @@ def EmitGroup04(f,funcname, opname, opexecute, opwrite, opwrite_alt, ignore_a, b
         print >>f, "	COMMON32_GET_CONDITION;"
         print >>f, "	if (!check_condition(condition))"
         print >>f, "		return m_pc + (size>>0);"
-        print >>f, ""		
+        print >>f, ""
         print >>f, "	%s" % opexecute
         print >>f, "	%s" % opwrite_alt
         print >>f, "	"

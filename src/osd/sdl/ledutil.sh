@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # ============================================================
-# 
+#
 #   ledutil.sh - Example script for output notifiers
-# 
+#
 #   Copyright Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
@@ -12,7 +12,7 @@
 #   a) Sets kbd leds if led0, led1, led2 is received
 #   b) Beeps if led0 is set to on (state=1)
 #   c) Writes a message when pause is received
-# 
+#
 #   use "sh ledutil.sh -h" to get more information
 #
 # ============================================================
@@ -27,7 +27,7 @@ paused=0
 while [ $# -gt 0 ]; do
 	case $1 in
 		-v)
-		  	verbose=1
+			verbose=1
 			;;
 		-a)
 			autoclose=1
@@ -35,12 +35,12 @@ while [ $# -gt 0 ]; do
 		-h)
 			echo "Usage: $myname [-a] [-v]"
 			echo ""
-			echo "  -a   Automatically close when sdlmame ends game" 
+			echo "  -a   Automatically close when sdlmame ends game"
 			echo "  -v   LOG all messages received"
 			echo "  -h   Get help"
 			echo ""
 			exit
-			;; 
+			;;
 		*)
 			echo "$myname: invalid option $1"
 			echo "Try \`$myname -h' for more information."
@@ -88,7 +88,7 @@ while true; do
 					echo Pause $paused!
 					;;
 			esac
-		fi	
+		fi
 	done
 	[ $autoclose = 1 ] && break;
 done

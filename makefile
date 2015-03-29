@@ -396,7 +396,7 @@ ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
 ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake 
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
@@ -419,7 +419,7 @@ ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
-	
+
 windows_x86_clang: generate
 ifndef CLANG
 	$(error CLANG is not set)
@@ -796,4 +796,3 @@ $(GENDIR)/mess/drivers/ymmu100.inc: $(SRC)/mess/drivers/ymmu100.ppm $(SRC)/build
 
 $(GENDIR)/%.moc.c: $(SRC)/%.h
 	$(SILENT) $(MOC) $(MOCINCPATH) $< -o $@
-	

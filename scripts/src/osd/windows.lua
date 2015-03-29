@@ -20,13 +20,13 @@ project ("osd_" .. _OPTIONS["osd"])
 	removeflags {
 		"SingleOutputDir",
 	}
-	
+
 	options {
 		"ForceCPP",
 	}
 
 	dofile("windows_cfg.lua")
-	
+
 	defines {
 		"DIRECTINPUT_VERSION=0x0800",
 		"DIRECT3D_VERSION=0x0900",
@@ -97,7 +97,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
-	
+
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
@@ -106,11 +106,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 		"ForceCPP",
 	}
 	removeflags {
-		"SingleOutputDir",	
+		"SingleOutputDir",
 	}
 
 	dofile("windows_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",

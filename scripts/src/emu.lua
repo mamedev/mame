@@ -189,18 +189,18 @@ function emuProject(_target, _subtarget)
 		GEN_DIR .. "emu/cpu/m68000",
 	}
 	includeosd()
-	
+
 	dofile(path.join("src", "cpu.lua"))
 
 	dofile(path.join("src", "sound.lua"))
-	
+
 	dofile(path.join("src", "netlist.lua"))
-	
+
 	dofile(path.join("src", "video.lua"))
 
 	dofile(path.join("src", "machine.lua"))
 
-	
+
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind "StaticLib"
@@ -225,10 +225,10 @@ function emuProject(_target, _subtarget)
 	}
 
 	includeosd()
-	
+
 	dofile(path.join("src", "bus.lua"))
-	
-	
+
+
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
 	kind "StaticLib"
@@ -247,9 +247,9 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "emu",
 	}
-	
+
 	includeosd()
-	
+
 	files {
 		disasm_files
 	}

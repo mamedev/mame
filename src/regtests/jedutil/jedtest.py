@@ -18,9 +18,9 @@ class JedTest:
         self.outputFile = ""
     
     def __repr__(self):
-        return "Name: %s\nJedFile: %s\nBaselineFile: %s\nOutputFile: %s" % (self.name, 
-                                                                            self.jedFile, 
-                                                                            self.baselineFile, 
+        return "Name: %s\nJedFile: %s\nBaselineFile: %s\nOutputFile: %s" % (self.name,
+                                                                            self.jedFile,
+                                                                            self.baselineFile,
                                                                             self.outputFile)
 
 
@@ -81,7 +81,7 @@ def main():
     outputPath = os.path.join(currentDirectory, "output")
     if os.name == 'nt':
         jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "jedutil.exe"))
-    else:		
+    else:
         jedUtilApp = os.path.normpath(os.path.join(currentDirectory, "..", "..", "..", "jedutil"))
 
     if VERBOSE:

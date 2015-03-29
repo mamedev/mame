@@ -44,13 +44,13 @@ project ("osd_" .. _OPTIONS["osd"])
 	removeflags {
 		"SingleOutputDir",
 	}
-	
+
 	options {
 		"ForceCPP",
 	}
 
 	dofile("sdl_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
@@ -160,7 +160,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
-	
+
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
@@ -170,11 +170,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	removeflags {
-		"SingleOutputDir",	
+		"SingleOutputDir",
 	}
 
 	dofile("sdl_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
