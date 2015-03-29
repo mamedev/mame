@@ -125,7 +125,7 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.c",
 			MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.c",
 			MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.c",
-			
+
 			GEN_DIR  .. "osd/modules/debugger/qt/debuggerview.moc.c",
 			GEN_DIR  .. "osd/modules/debugger/qt/windowqt.moc.c",
 			GEN_DIR  .. "osd/modules/debugger/qt/logwindow.moc.c",
@@ -212,7 +212,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	end
 
 	files {
-		MAME_DIR .. "src/osd/sdl/strconv.c",
+		MAME_DIR .. "src/osd/strconv.c",
 		MAME_DIR .. "src/osd/sdl/sdldir.c",
 		MAME_DIR .. "src/osd/sdl/sdlfile.c",
 		MAME_DIR .. "src/osd/sdl/sdlptty_" .. BASE_TARGETOS ..".c",

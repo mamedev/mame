@@ -6,7 +6,6 @@ if _OPTIONS["targetos"]=="windows" then
 	defines {
 		"OSD_SDL",
 		"SDLMAME_WIN32",
-		"X64_WINDOWS_ABI",
 		"UNICODE",
 		"_UNICODE",
 		"SDLMAME_SDL2=1",
