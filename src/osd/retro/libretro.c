@@ -146,7 +146,7 @@ void retro_set_environment(retro_environment_t cb)
    sprintf(option_auto_save,"%s_%s",core,"auto_save");
    sprintf(option_saves,"%s_%s",core,"saves");
    sprintf(option_throttle,"%s_%s",core,"throttle");
-   sprintf(option_nobuffer,"%s_%s",core,"nobuffer");
+  sprintf(option_nobuffer,"%s_%s",core,"nobuffer");
 
    static const struct retro_variable vars[] = {
     /* some ifdefs are redundant but I wanted 
@@ -166,10 +166,10 @@ void retro_set_environment(retro_environment_t cb)
     { option_mouse, "Enable in-game mouse; disabled|enabled" },
     { option_throttle, "Enable throttle; disabled|enabled" },
     { option_cheats, "Enable cheats; disabled|enabled" },
-    { option_nobuffer, "Nobuffer patch; disabled|enabled" },
-    { option_nag, "Hide nag screen; disabled|enabled" },
-    { option_info, "Hide gameinfo screen; disabled|enabled" },
-    { option_warnings, "Hide warnings screen; disabled|enabled" },
+//  { option_nobuffer, "Nobuffer patch; disabled|enabled" },
+//  { option_nag, "Hide nag screen; disabled|enabled" },
+//  { option_info, "Hide gameinfo screen; disabled|enabled" },
+//  { option_warnings, "Hide warnings screen; disabled|enabled" },
     { option_renderer, "Alternate render method; disabled|enabled" },
 
     /* ONLY FOR MESS/UME */
