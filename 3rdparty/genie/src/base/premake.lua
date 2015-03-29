@@ -21,7 +21,7 @@
 
 	function premake.generate(obj, filename, callback)
 		filename = premake.project.getfilename(obj, filename)
-		printf("Generating %s...", filename)
+		printf("Generating %s ...", filename)
 
 		local f, err = io.open(filename, "wb")
 		if (not f) then

@@ -241,15 +241,15 @@ end
 --aftercompilefile ("\t$(SILENT) gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)\n\t$(SILENT) mv $(@:%.o=%.dep) $(@:%.o=%.d)")
 	
 	
-msgcompile ("Compiling $(subst ../,,$<)...")
+msgcompile ("Compiling $(subst ../,,$<) ...")
 
-msgcompile_objc ("Objective-C compiling $(subst ../,,$<)...")
+msgcompile_objc ("Objective-C compiling $(subst ../,,$<) ...")
 
-msgresource ("Compiling resources $(subst ../,,$<)...")
+msgresource ("Compiling resources $(subst ../,,$<) ...")
 
-msglinking ("Linking $(notdir $@)...")
+msglinking ("Linking $(notdir $@) ...")
 
-msgarchiving ("Archiving $(notdir $@)...")
+msgarchiving ("Archiving $(notdir $@) ...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 

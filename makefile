@@ -669,24 +669,24 @@ generate: \
 		$(GENDIR)/m68kmake$(EXE) $(GENDIR)/emu/cpu/m68000/m68kops.c
 
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
-	@echo Converting $<...
+	@echo Converting $< ...
 	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
 $(GENDIR)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
-	@echo Converting $<...
+	@echo Converting $< ...
 	$(PYTHON) $(SRC)/build/png2bdc.py $< $(GENDIR)/temp.bdc
 	$(PYTHON) $(SRC)/build/file2str.py $(GENDIR)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
 
 $(GENDIR)/resource/$(TARGET)vers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
-	@echo Emitting $@...
+	@echo Emitting $@ ...
 	$(PYTHON) $(SRC)/build/verinfo.py -r -b $(TARGET) $(SRC)/version.c > $@
 
 $(GENDIR)/resource/$(TARGET)-Info.plist: $(SRC)/build/verinfo.py $(SRC)/version.c
-	@echo Emitting $@...
+	@echo Emitting $@ ...
 	$(PYTHON) $(SRC)/build/verinfo.py -p -b $(TARGET) $(SRC)/version.c > $@
 
 $(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c: $(SRC)/$(TARGET)/$(SUBTARGET).lst $(SRC)/build/makelist.py
-	@echo Building driver list $<...
+	@echo Building driver list $< ...
 	$(PYTHON) $(SRC)/build/makelist.py $< >$@
 
 # rule to generate the C files
@@ -783,7 +783,7 @@ $(GENDIR)/m68kmake.o: src/emu/cpu/m68000/m68kmake.c
 	$(SILENT) $(CC) -x c++ -std=gnu++98 -o "$@" -c "$<"
 
 $(GENDIR)/m68kmake$(EXE) : $(GENDIR)/m68kmake.o
-	@echo Linking $@...
+	@echo Linking $@ ...
 	$(LD) -lstdc++ $^ -o $@
 
 $(GENDIR)/emu/cpu/m68000/m68kops.c: $(GENDIR)/m68kmake$(EXE) $(SRC)/emu/cpu/m68000/m68k_in.c
@@ -791,7 +791,7 @@ $(GENDIR)/emu/cpu/m68000/m68kops.c: $(GENDIR)/m68kmake$(EXE) $(SRC)/emu/cpu/m680
 	$(SILENT) $(GENDIR)/m68kmake $(GENDIR)/emu/cpu/m68000 $(SRC)/emu/cpu/m68000/m68k_in.c
 
 $(GENDIR)/mess/drivers/ymmu100.inc: $(SRC)/mess/drivers/ymmu100.ppm $(SRC)/build/file2str.py
-	@echo Converting $<...
+	@echo Converting $< ...
 	@$(PYTHON) $(SRC)/build/file2str.py $(SRC)/mess/drivers/ymmu100.ppm $@ ymmu100_bkg UINT8
 
 $(GENDIR)/%.moc.c: $(SRC)/%.h
