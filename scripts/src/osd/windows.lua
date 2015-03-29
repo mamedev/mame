@@ -1,4 +1,8 @@
 function maintargetosdoptions(_target)
+	linkoptions {
+		"-municode",
+	}
+
 	local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
 
 	if os.isfile(rcfile) then

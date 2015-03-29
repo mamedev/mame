@@ -718,13 +718,9 @@ configuration { "osx*" }
 
 
 configuration { "mingw*" }
-		defines {
-			"main=utf8_main",
-		}
 		linkoptions {
 			"-static-libgcc",
 			"-static-libstdc++",
-			"-municode",
 		}
 if _OPTIONS["osd"]=="sdl" then
 		links {
@@ -751,9 +747,6 @@ end
 		}
 
 configuration { "vs*" }
-		defines {
-			"main=utf8_main",
-		}
 		defines {
 			"XML_STATIC",
 			"WIN32",
