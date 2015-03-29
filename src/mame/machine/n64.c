@@ -1458,7 +1458,7 @@ void n64_periphs::pi_dma_tick()
 	//pi_status |= 8; // Set INTERRUPT ?? Does this bit exist ??
 
 	if(update_bm)
-		dd_update_bm();	
+		dd_update_bm();
 
 	signal_rcp_interrupt(PI_INTERRUPT);
 
@@ -2189,7 +2189,7 @@ void n64_periphs::dd_update_bm()
 	{
 		if(((dd_track_reg & 0xFFF) == 6) && (dd_start_block == 0))
 		{
-			dd_status_reg &= ~DD_ASIC_STATUS_DREQ;		
+			dd_status_reg &= ~DD_ASIC_STATUS_DREQ;
 		}
 		else if(dd_current_reg < SECTORS_PER_BLOCK)
 		{
@@ -2239,7 +2239,7 @@ void n64_periphs::dd_write_sector()
 	sector += (dd_current_reg - 1) * ddZoneSecSize[dd_zone];
 
 	//logerror("Write Block %d, Sector %d\n", dd_start_block, dd_current_reg - 1);
-	
+
 	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
 	{
 		sector[i*4 + 0] = (dd_sector_data[i] >> 24) & 0xFF;
@@ -2492,12 +2492,12 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 			logerror("dd BM Status write\n");
 			dd_start_sector = (data >> 16) & 0xFF;
 			if(dd_start_sector == 0x00)
-			{			
+			{
 				dd_start_block = 0;
 				dd_current_reg = 0;
 			}
 			else if (dd_start_sector == 0x5A)
-			{	
+			{
 				dd_start_block = 1;
 				dd_current_reg = 0;
 			}
@@ -2620,8 +2620,8 @@ void n64_state::machine_start()
 
 	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS);
 
-	/* configure fast RAM regions for DRC */
-	dynamic_cast<mips3_device *>(machine().device("maincpu"))->mips3drc_add_fastram(0x00000000, 0x007fffff, FALSE, rdram);
+	/* configure fast RAM regions */
+	dynamic_cast<mips3_device *>(machine().device("maincpu"))->add_fastram(0x00000000, 0x007fffff, FALSE, rdram);
 
 	rsp_device *rsp = machine().device<rsp_device>("rsp");
 	rsp->rspdrc_set_options(RSPDRC_STRICT_VERIFY);
