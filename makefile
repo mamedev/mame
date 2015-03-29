@@ -83,7 +83,7 @@ endif
 #-------------------------------------------------
 # specify OS target, which further differentiates
 # the underlying OS; supported values are:
-# win32, unix, macosx, os2
+# windows, linux, macosx, os2
 #-------------------------------------------------
 
 ifndef TARGETOS
