@@ -1,6 +1,7 @@
 function maintargetosdoptions(_target)
 	if _OPTIONS["targetos"]=="windows" then
 		linkoptions{
+			"-municode",
 			"-L$(shell qmake -query QT_INSTALL_LIBS)",
 		}
 
@@ -26,13 +27,6 @@ function maintargetosdoptions(_target)
 		targetprefix "sdl"
 
 	configuration { }
-end
-
-
-if _OPTIONS["targetos"]=="windows" then
-	linkoptions {
-		"-municode",
-	}
 end
 
 
