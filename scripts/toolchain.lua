@@ -60,7 +60,7 @@ newoption {
 	description = "Set iOS target version (default: 8.0).",
 }
 
-function toolchain(_osd, _buildDir, _subDir)
+function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
 
@@ -352,37 +352,37 @@ function toolchain(_osd, _buildDir, _subDir)
 
 
 	configuration { "x32", "vs*" }
-		targetdir (_buildDir .. _osd .. "/win32_" .. _ACTION .. "/bin")
-		objdir (_buildDir .. _osd .. "/win32_" .. _ACTION .. "/obj")
+		targetdir (_buildDir .. "win32_" .. _ACTION .. "/bin")
+		objdir (_buildDir .. "win32_" .. _ACTION .. "/obj")
 
 	configuration { "x64", "vs*" }
 		defines { "_WIN64" }
-		targetdir (_buildDir .. _osd .. "/win64_" .. _ACTION .. "/bin")
-		objdir (_buildDir .. _osd .. "/win64_" .. _ACTION .. "/obj")
+		targetdir (_buildDir .. "win64_" .. _ACTION .. "/bin")
+		objdir (_buildDir .. "win64_" .. _ACTION .. "/obj")
 
 	configuration { "ARM", "vs*" }
-		targetdir (_buildDir .. _osd .. "/arm_" .. _ACTION .. "/bin")
-		objdir (_buildDir .. _osd .. "/arm_" .. _ACTION .. "/obj")
+		targetdir (_buildDir .. "arm_" .. _ACTION .. "/bin")
+		objdir (_buildDir .. "arm_" .. _ACTION .. "/obj")
 
 	configuration { "x32", "vs*-clang" }
-		targetdir (_buildDir .. _osd .. "/win32_" .. _ACTION .. "-clang/bin")
-		objdir (_buildDir .. _osd .. "/win32_" .. _ACTION .. "-clang/obj")
+		targetdir (_buildDir .. "win32_" .. _ACTION .. "-clang/bin")
+		objdir (_buildDir .. "win32_" .. _ACTION .. "-clang/obj")
 
 	configuration { "x64", "vs*-clang" }
-		targetdir (_buildDir .. _osd .. "/win64_" .. _ACTION .. "-clang/bin")
-		objdir (_buildDir .. _osd .. "/win64_" .. _ACTION .. "-clang/obj")
+		targetdir (_buildDir .. "win64_" .. _ACTION .. "-clang/bin")
+		objdir (_buildDir .. "win64_" .. _ACTION .. "-clang/obj")
 
 	configuration { "mingw*" }
 		defines { "WIN32" }
 
 	configuration { "x32", "mingw32-gcc" }
-		targetdir (_buildDir .. _osd .. "/win32_mingw-gcc" .. "/bin")
-		objdir (_buildDir .. _osd .. "/win32_mingw-gcc" .. "/obj")
+		targetdir (_buildDir .. "win32_mingw-gcc" .. "/bin")
+		objdir (_buildDir .. "win32_mingw-gcc" .. "/obj")
 		buildoptions { "-m32" }
 
 	configuration { "x64", "mingw64-gcc" }
-		targetdir (_buildDir .. _osd .. "/win64_mingw-gcc" .. "/bin")
-		objdir (_buildDir .. _osd .. "/win64_mingw-gcc" .. "/obj")
+		targetdir (_buildDir .. "win64_mingw-gcc" .. "/bin")
+		objdir (_buildDir .. "win64_mingw-gcc" .. "/obj")
 		buildoptions { "-m64" }
 		
 	configuration { "mingw-clang" }
@@ -392,8 +392,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		}
 
 	configuration { "x32", "mingw-clang" }
-		targetdir (_buildDir .. _osd .. "/win32_mingw-clang/bin")
-		objdir ( _buildDir .. _osd .. "/win32_mingw-clang/obj")
+		targetdir (_buildDir .. "win32_mingw-clang/bin")
+		objdir ( _buildDir .. "win32_mingw-clang/obj")
 		buildoptions { "-m32" }
 		buildoptions {
 			"-isystem$(MINGW32)/i686-w64-mingw32/include/c++",
@@ -402,8 +402,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		}
 		
 	configuration { "x64", "mingw-clang" }
-		targetdir (_buildDir .. _osd .. "/win64_mingw-clang/bin")
-		objdir (_buildDir .. _osd .. "/win64_mingw-clang/obj")
+		targetdir (_buildDir .. "win64_mingw-clang/bin")
+		objdir (_buildDir .. "win64_mingw-clang/obj")
 		buildoptions { "-m64" }
 		buildoptions {
 			"-isystem$(MINGW64)/x86_64-w64-mingw32/include/c++",
@@ -412,29 +412,29 @@ function toolchain(_osd, _buildDir, _subDir)
 		}		
 
 	configuration { "linux-gcc", "x32" }
-		targetdir (_buildDir .. _osd .. "/linux32_gcc" .. "/bin")
-		objdir (_buildDir .. _osd .. "/linux32_gcc" .. "/obj")
+		targetdir (_buildDir .. "linux32_gcc" .. "/bin")
+		objdir (_buildDir .. "linux32_gcc" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "linux-gcc", "x64" }
-		targetdir (_buildDir .. _osd .. "/linux64_gcc" .. "/bin")
-		objdir (_buildDir .. _osd .. "/linux64_gcc" .. "/obj")
+		targetdir (_buildDir .. "linux64_gcc" .. "/bin")
+		objdir (_buildDir .. "linux64_gcc" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
 
 	configuration { "linux-clang", "x32" }
-		targetdir (_buildDir .. _osd .. "/linux32_clang" .. "/bin")
-		objdir (_buildDir .. _osd .. "/linux32_clang" .. "/obj")
+		targetdir (_buildDir .. "linux32_clang" .. "/bin")
+		objdir (_buildDir .. "linux32_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "linux-clang", "x64" }
-		targetdir (_buildDir .. _osd .. "/linux64_clang" .. "/bin")
-		objdir (_buildDir .. _osd .. "/linux64_clang" .. "/obj")
+		targetdir (_buildDir .. "linux64_clang" .. "/bin")
+		objdir (_buildDir .. "linux64_clang" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
@@ -481,8 +481,8 @@ function toolchain(_osd, _buildDir, _subDir)
 
 
 	configuration { "android-arm" }
-		targetdir (_buildDir .. _osd .. "/android-arm" .. "/bin")
-		objdir (_buildDir .. _osd .. "/android-arm" .. "/obj")
+		targetdir (_buildDir .. "android-arm" .. "/bin")
+		objdir (_buildDir .. "android-arm" .. "/obj")
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a",
 			}
@@ -507,8 +507,8 @@ function toolchain(_osd, _buildDir, _subDir)
 			}
 
 	configuration { "android-mips" }
-		targetdir (_buildDir .. _osd .. "/android-mips" .. "/bin")
-		objdir (_buildDir .. _osd .. "/android-mips" .. "/obj")
+		targetdir (_buildDir .. "android-mips" .. "/bin")
+		objdir (_buildDir .. "android-mips" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips",
 		}
@@ -527,8 +527,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		}
 
 	configuration { "android-x86" }
-		targetdir (_buildDir .. _osd .. "/android-x86" .. "/bin")
-		objdir (_buildDir .. _osd .. "/android-x86" .. "/obj")
+		targetdir (_buildDir .. "android-x86" .. "/bin")
+		objdir (_buildDir .. "android-x86" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86",
 		}
@@ -553,8 +553,8 @@ function toolchain(_osd, _buildDir, _subDir)
 
 
 	configuration { "asmjs" }
-		targetdir (_buildDir .. _osd .. "/asmjs" .. "/bin")
-		objdir (_buildDir .. _osd .. "/asmjs" .. "/obj")
+		targetdir (_buildDir .. "asmjs" .. "/bin")
+		objdir (_buildDir .. "asmjs" .. "/obj")
 		buildoptions {
 			"-isystem$(EMSCRIPTEN)/system/include",
 			"-isystem$(EMSCRIPTEN)/system/include/compat",
@@ -571,8 +571,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		}
 
 	configuration { "freebsd" }
-		targetdir (_buildDir .. _osd .. "/freebsd" .. "/bin")
-		objdir (_buildDir .. _osd .. "/freebsd" .. "/obj")
+		targetdir (_buildDir .. "freebsd" .. "/bin")
+		objdir (_buildDir .. "freebsd" .. "/obj")
 
 	configuration { "nacl or nacl-arm or pnacl" }
 		buildoptions {
@@ -600,8 +600,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		}
 
 	configuration { "x32", "nacl" }
-		targetdir (_buildDir .. _osd .. "/nacl-x86" .. "/bin")
-		objdir (_buildDir .. _osd .. "/nacl-x86" .. "/obj")
+		targetdir (_buildDir .. "nacl-x86" .. "/bin")
+		objdir (_buildDir .. "nacl-x86" .. "/obj")
 
 	configuration { "x32", "nacl", "Debug" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Debug" }
@@ -610,8 +610,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release" }
 
 	configuration { "x64", "nacl" }
-		targetdir (_buildDir .. _osd .. "/nacl-x64" .. "/bin")
-		objdir (_buildDir .. _osd .. "/nacl-x64" .. "/obj")
+		targetdir (_buildDir .. "nacl-x64" .. "/bin")
+		objdir (_buildDir .. "nacl-x64" .. "/obj")
 
 	configuration { "x64", "nacl", "Debug" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Debug" }
@@ -620,8 +620,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release" }
 
 	configuration { "nacl-arm" }
-		targetdir (_buildDir .. _osd .. "/nacl-arm" .. "/bin")
-		objdir (_buildDir .. _osd .. "/nacl-arm" .. "/obj")
+		targetdir (_buildDir .. "nacl-arm" .. "/bin")
+		objdir (_buildDir .. "nacl-arm" .. "/obj")
 
 	configuration { "nacl-arm", "Debug" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Debug" }
@@ -630,8 +630,8 @@ function toolchain(_osd, _buildDir, _subDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Release" }
 
 	configuration { "pnacl" }
-		targetdir (_buildDir .. _osd .. "/pnacl" .. "/bin")
-		objdir (_buildDir .. _osd .. "/pnacl" .. "/obj")
+		targetdir (_buildDir .. "pnacl" .. "/bin")
+		objdir (_buildDir .. "pnacl" .. "/obj")
 
 	configuration { "pnacl", "Debug" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Debug" }
@@ -640,34 +640,34 @@ function toolchain(_osd, _buildDir, _subDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
 	configuration { "osx*", "x32" }
-		targetdir (_buildDir .. _osd .. "/osx32_clang" .. "/bin")
-		objdir (_buildDir .. _osd .. "/osx32_clang" .. "/obj")
+		targetdir (_buildDir .. "osx32_clang" .. "/bin")
+		objdir (_buildDir .. "osx32_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "osx*", "x64" }
-		targetdir (_buildDir .. _osd .. "/osx64_clang" .. "/bin")
-		objdir (_buildDir .. _osd .. "/osx64_clang" .. "/obj")
+		targetdir (_buildDir .. "osx64_clang" .. "/bin")
+		objdir (_buildDir .. "osx64_clang" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
 
 	configuration { "ios-arm" }
-		targetdir (_buildDir .. _osd .. "/ios-arm" .. "/bin")
-		objdir (_buildDir .. _osd .. "/ios-arm" .. "/obj")
+		targetdir (_buildDir .. "ios-arm" .. "/bin")
+		objdir (_buildDir .. "ios-arm" .. "/obj")
 
 	configuration { "ios-simulator" }
-		targetdir (_buildDir .. _osd .. "/ios-simulator" .. "/bin")
-		objdir (_buildDir .. _osd .. "/ios-simulator" .. "/obj")
+		targetdir (_buildDir .. "ios-simulator" .. "/bin")
+		objdir (_buildDir .. "ios-simulator" .. "/obj")
 
 	configuration { "qnx-arm" }
-		targetdir (_buildDir .. _osd .. "/qnx-arm" .. "/bin")
-		objdir (_buildDir .. _osd .. "/qnx-arm" .. "/obj")
+		targetdir (_buildDir .. "qnx-arm" .. "/bin")
+		objdir (_buildDir .. "qnx-arm" .. "/obj")
 
 	configuration { "rpi" }
-		targetdir (_buildDir .. _osd .. "/rpi" .. "/bin")
-		objdir (_buildDir .. _osd .. "/rpi" .. "/obj")
+		targetdir (_buildDir .. "rpi" .. "/bin")
+		objdir (_buildDir .. "rpi" .. "/obj")
 
 	configuration {} -- reset configuration
 

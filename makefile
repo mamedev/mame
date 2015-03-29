@@ -581,8 +581,6 @@ GEN_FOLDERS :=  \
 	$(GENDIR)/mess/layout/ \
 	$(GENDIR)/mess/drivers/ \
 	$(GENDIR)/ldplayer/layout/ \
-	$(GENDIR)/osd/windows/ \
-	$(GENDIR)/osd/sdl/ \
 	$(GENDIR)/emu/cpu/arcompact/ \
 	$(GENDIR)/emu/cpu/h8/ \
 	$(GENDIR)/emu/cpu/mcs96/ \
@@ -591,6 +589,7 @@ GEN_FOLDERS :=  \
 	$(GENDIR)/emu/cpu/m68000/ \
 	$(GENDIR)/emu/cpu/tms57002/ \
 	$(GENDIR)/osd/modules/debugger/qt/ \
+	$(GENDIR)/resource/
 
 LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/mame/layout/*.lay) $(wildcard $(SRC)/mess/layout/*.lay) $(wildcard $(SRC)/ldplayer/layout/*.lay)
 
@@ -633,8 +632,8 @@ generate: \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES)) \
 		$(GENDIR)/emu/uismall.fh \
-		$(GENDIR)/osd/windows/$(TARGET)vers.rc \
-		$(GENDIR)/osd/sdl/$(TARGET)-Info.plist \
+		$(GENDIR)/resource/$(TARGET)vers.rc \
+		$(GENDIR)/resource/$(TARGET)-Info.plist \
 		$(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c \
 		$(GENDIR)/mess/drivers/ymmu100.inc \
 		$(GENDIR)/emu/cpu/arcompact/arcompact.inc \
@@ -654,11 +653,11 @@ $(GENDIR)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
 	$(PYTHON) $(SRC)/build/png2bdc.py $< $(GENDIR)/temp.bdc
 	$(PYTHON) $(SRC)/build/file2str.py $(GENDIR)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
 
-$(GENDIR)/osd/windows/$(TARGET)vers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
+$(GENDIR)/resource/$(TARGET)vers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
 	$(PYTHON) $(SRC)/build/verinfo.py -r -b $(TARGET) $(SRC)/version.c > $@
 
-$(GENDIR)/osd/sdl/$(TARGET)-Info.plist: $(SRC)/build/verinfo.py $(SRC)/version.c
+$(GENDIR)/resource/$(TARGET)-Info.plist: $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
 	$(PYTHON) $(SRC)/build/verinfo.py -p -b $(TARGET) $(SRC)/version.c > $@
 

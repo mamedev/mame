@@ -1,15 +1,32 @@
-function includeosd()
-	includedirs {
-		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/osd/sdl",
-	}
+function maintargetosdoptions(_target)
+	if _OPTIONS["targetos"]=="windows" then
+		linkoptions{
+			"-L$(shell qmake -query QT_INSTALL_LIBS)",
+		}
+
+		links {
+			"qtmain",
+			"QtGui4",
+			"QtCore4",
+		}
+	end
+
+	if _OPTIONS["targetos"]=="linux" then
+		links {
+			'QtGui',
+			'QtCore',
+		}
+
+		linkoptions {
+			'$(shell pkg-config --libs QtGui)',
+		}
+	end
+
+	configuration { "mingw*" or "vs*" }
+		targetprefix "sdl"
+
+	configuration { }
 end
-
-
-forcedincludes {
-	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
-}
-
 
 configuration { "mingw*" }
 		linkoptions {

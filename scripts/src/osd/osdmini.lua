@@ -1,7 +1,4 @@
-function includeosd()
-	includedirs {
-		MAME_DIR .. "src/osd",
-	}
+function maintargetosdoptions(_target)
 end
 
 

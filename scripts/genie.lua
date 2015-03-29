@@ -34,6 +34,13 @@ function findfunction(x)
   end
 end
 
+function includeosd()
+	includedirs {
+		MAME_DIR .. "src/osd",
+	}
+end
+
+
 CPUS = {}
 SOUNDS  = {}
 MACHINES  = {}
@@ -618,7 +625,7 @@ else
 	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"] .. _OPTIONS["subtarget"] 
 end	
 
-if not toolchain(_OPTIONS["osd"], MAME_BUILD_DIR, subdir) then
+if not toolchain(MAME_BUILD_DIR, subdir) then
 	return -- no action specified
 end
 	

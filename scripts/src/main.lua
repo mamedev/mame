@@ -22,15 +22,7 @@ function mainProject(_target, _subtarget)
 			}
 	end
 
-	configuration { "osx*" }
-		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/osd/sdl/" .. _OPTIONS["target"] .. "-Info.plist"
-		}
-
 	configuration { "mingw*" or "vs*" }
-		if _OPTIONS["osd"]=="sdl" then
-			targetprefix "sdl"
-		end
 		targetextension ".exe"
 
 	configuration { "asmjs" }
@@ -69,34 +61,28 @@ function mainProject(_target, _subtarget)
 	links{
 		"ocore_" .. _OPTIONS["osd"],
 	}
-	dofile("src/osd/" .. _OPTIONS["osd"] .. "_cfg.lua")
+	maintargetosdoptions(_target)
 
 	includedirs {
 		MAME_DIR .. "src/emu",
-		MAME_DIR .. "src/mame",
+		MAME_DIR .. "src/" .. _target,
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/zlib",
-		GEN_DIR  .. "mame/layout",
-		GEN_DIR  .. "ldplayer/layout",
-		GEN_DIR  .. "osd/windows",
+		GEN_DIR  .. _target .. "/layout",
+		GEN_DIR  .. "resource",
 	}
 
 	includeosd()
 
-	if _OPTIONS["osd"]=="windows" then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
-		
-		if os.isfile(rcfile) then
-			files {
-				rcfile,
-			}
-		else
-			files {
-				MAME_DIR .. "src/osd/windows/mame.rc",
-			}
-		end
+	if _OPTIONS["targetos"]=="macosx" then
+		linkoptions {
+			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _OPTIONS["target"] .. "-Info.plist"
+		}
+	end
+
+	if _OPTIONS["targetos"]=="windows" then
 	end
 
 	files {
