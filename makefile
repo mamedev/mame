@@ -590,12 +590,12 @@ endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx-clang config=$(CONFIG)32
 
 $(GENIE):
-	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(OS) -f genie.make
+	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
 
 clean:
 	@echo Cleaning...
 	-@rm -rf build
-	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(OS) -f genie.make clean
+	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
 GEN_FOLDERS :=  \
 	$(GENDIR) \
