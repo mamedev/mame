@@ -51,7 +51,7 @@ BUSES["MIDI"] = true
 -- the list of drivers
 --------------------------------------------------
 
-function createProjects(_target, _subtarget)
+function createProjects_ldplayer_ldplayer(_target, _subtarget)
 	project ("drvldplayer")
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
@@ -78,7 +78,7 @@ function createProjects(_target, _subtarget)
 	}
 end
 
-function linkProjects(_target, _subtarget)
+function linkProjects_ldplayer_ldplayer(_target, _subtarget)
 	links {
 		"drvldplayer",
 	}
