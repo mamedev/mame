@@ -129,7 +129,6 @@ project ("ocore_" .. _OPTIONS["osd"])
 
 	files {
 		MAME_DIR .. "src/osd/strconv.c",
-		MAME_DIR .. "src/osd/modules/osdmodule.c",
 		MAME_DIR .. "src/osd/windows/main.c",
 		MAME_DIR .. "src/osd/windows/windir.c",
 		MAME_DIR .. "src/osd/windows/winfile.c",
@@ -138,7 +137,8 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows/winutil.c",
 		MAME_DIR .. "src/osd/windows/winclip.c",
 		MAME_DIR .. "src/osd/windows/winsocket.c",
+		MAME_DIR .. "src/osd/windows/winptty.c",
+		MAME_DIR .. "src/osd/modules/osdmodule.c",
 		MAME_DIR .. "src/osd/modules/sync/work_osd.c",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.c",
-		MAME_DIR .. "src/osd/windows/winptty.c",
 	}

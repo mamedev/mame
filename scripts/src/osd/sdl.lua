@@ -202,22 +202,13 @@ project ("ocore_" .. _OPTIONS["osd"])
 	end
 
 	files {
-		MAME_DIR .. "src/osd/modules/osdmodule.c",
-	}
-
-	if _OPTIONS["targetos"]=="macosx" then
-		files {
-			MAME_DIR .. "src/osd/sdl/osxutils.m",
-		}
-	end
-
-	files {
 		MAME_DIR .. "src/osd/strconv.c",
 		MAME_DIR .. "src/osd/sdl/sdldir.c",
 		MAME_DIR .. "src/osd/sdl/sdlfile.c",
 		MAME_DIR .. "src/osd/sdl/sdlptty_" .. BASE_TARGETOS ..".c",
 		MAME_DIR .. "src/osd/sdl/sdlsocket.c",
 		MAME_DIR .. "src/osd/sdl/sdlos_" .. SDLOS_TARGETOS .. ".c",
+		MAME_DIR .. "src/osd/modules/osdmodule.c",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".c",
 		MAME_DIR .. "src/osd/modules/sync/sync_" .. SYNC_IMPLEMENTATION .. ".c",
 		--ifdef NOASM
