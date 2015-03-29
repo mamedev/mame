@@ -15,8 +15,45 @@
 #################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
 ###########################################################################
 
-ifdef TOOLS
-PARAMS+= --with-tools
+#
+# Determine running OS
+#
+
+ifeq ($(OS),Windows_NT)
+OS=windows
+GENIEOS=windows
+else
+UNAME = $(shell uname -mps)
+GENIEOS=linux
+ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
+OS = linux
+endif
+ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
+OS = solaris
+endif
+ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
+OS = freebsd
+endif
+ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
+OS = freebsd
+endif
+ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
+OS = netbsd
+endif
+ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
+OS = openbsd
+endif
+ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
+OS=macosx
+GENIEOS=darwin
+DARWIN_VERSION = $(shell sw_vers -productVersion)
+endif
+ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
+OS = haiku
+endif
+ifndef OS
+$(error Unable to detect OS from uname -a: $(UNAME))
+endif
 endif
 
 #-------------------------------------------------
@@ -32,22 +69,6 @@ endif
 
 ifndef SUBTARGET
 SUBTARGET = $(TARGET)
-endif
-
-
-
-#-------------------------------------------------
-# specify OSD layer: windows, sdl, etc.
-# build rules will be included from
-# src/osd/$(OSD)/$(OSD).mak
-#-------------------------------------------------
-
-ifndef OSD
-ifeq ($(OS),Windows_NT)
-OSD = windows
-else
-OSD = sdl
-endif
 endif
 
 CONFIG = release
@@ -67,69 +88,34 @@ endif
 
 ifndef TARGETOS
 
-ifeq ($(OS),Windows_NT)
-
+ifeq ($(OS),windows)
 TARGETOS = windows
-OS=windows
 WINDRES = windres
 ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-ARCHITECTURE = x64
+ARCHITECTURE =_x64
 endif
 ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-ARCHITECTURE = x64
+ARCHITECTURE =_x64
 ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
 else
-ARCHITECTURE = x86
+ARCHITECTURE =_x86
 endif
 endif
-
 else
-WINDRES=x86_64-w64-mingw32-windres
-UNAME = $(shell uname -mps)
-OS=linux
-ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
-TARGETOS = linux
-endif
-ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
-TARGETOS = solaris
-endif
-ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
-TARGETOS = freebsd
-endif
-ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
-TARGETOS = freebsd
-endif
-ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
-TARGETOS = netbsd
-endif
-ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
-TARGETOS = openbsd
-endif
-ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
-TARGETOS = macosx
-OS=darwin
-DARWIN_VERSION = $(shell sw_vers -productVersion)
-endif
-ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
-TARGETOS = haiku
-endif
+WINDRES  = x86_64-w64-mingw32-windres
+UNAME    = $(shell uname -mps)
+TARGETOS = $(OS)
 
-ifndef TARGETOS
-$(error Unable to detect TARGETOS from uname -a: $(UNAME))
-endif
-
-ARCHITECTURE = x86
+ARCHITECTURE =_x86
 
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-ARCHITECTURE = x64
+ARCHITECTURE =_x64
 endif
-
 ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-ARCHITECTURE = x64
+ARCHITECTURE =_x64
 endif
-
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-ARCHITECTURE = x64
+ARCHITECTURE =_x64
 endif
 endif
 
@@ -139,9 +125,9 @@ endif # TARGET_OS
 
 ifdef PTR64
 ifeq ($(PTR64),1)
-ARCHITECTURE = x64
+ARCHITECTURE =_x64
 else
-ARCHITECTURE = x86
+ARCHITECTURE =_x86
 endif
 endif
 
@@ -149,6 +135,30 @@ endif
 PYTHON = @python
 CC = @gcc
 LD = @g++
+
+#-------------------------------------------------
+# specify OSD layer: windows, sdl, etc.
+# build rules will be included from
+# src/osd/$(OSD)/$(OSD).mak
+#-------------------------------------------------
+
+ifndef OSD
+
+OSD = osdmini
+
+ifeq ($(TARGETOS),windows)
+OSD = windows
+endif
+
+ifeq ($(TARGETOS),linux)
+OSD = sdl
+endif
+
+ifeq ($(TARGETOS),macosx)
+OSD = sdl
+endif
+endif
+
 
 #-------------------------------------------------
 # distribution may change things
@@ -252,6 +262,10 @@ SYMLEVEL = 2
 endif
 endif
 
+ifdef TOOLS
+PARAMS+= --with-tools
+endif
+
 ifdef SYMBOLS
 PARAMS+= --SYMBOLS=$(SYMBOLS)
 endif
@@ -353,9 +367,9 @@ endif
 ifeq ($(TARGETOS),macosx)
 ifneq (,$(findstring 3.,$(CLANG_VERSION)))
 ifeq ($(ARCHITECTURE),x64)
-ARCHITECTURE=x64_clang
+ARCHITECTURE=_x64_clang
 else
-ARCHITECTURE=x86_clang
+ARCHITECTURE=_x86_clang
 endif
 endif
 endif
@@ -364,7 +378,7 @@ ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
 endif
 
-GENIE=3rdparty/genie/bin/$(OS)/genie
+GENIE=3rdparty/genie/bin/$(GENIEOS)/genie
 
 SILENT?=@
 
@@ -374,7 +388,7 @@ else
 SUBDIR = $(OSD)/$(TARGET)$(SUBTARGET)
 endif
 
-all: $(GENIE) $(TARGETOS)_$(ARCHITECTURE)
+all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
 
 windows_x64: generate
 ifndef MINGW64
@@ -384,6 +398,8 @@ ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake 
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
+
+windows: windows_x86
 
 windows_x86: generate
 ifndef MINGW32
@@ -481,6 +497,9 @@ ifndef COMPILE
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-asmjs config=$(CONFIG)
 
+
+nacl: nacl_x86
+
 nacl_x64: generate
 ifndef NACL_SDK_ROOT
 	$(error NACL_SDK_ROOT is not set)
@@ -523,6 +542,8 @@ ifndef COMPILE
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-linux config=$(CONFIG)64
 
+linux: linux_x86
+
 linux_x86: generate
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
@@ -546,6 +567,8 @@ ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
 endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C build/projects/$(SUBDIR)/gmake-osx config=$(CONFIG)64
+
+macosx: macosx_x86
 
 macosx_x86: generate
 ifndef COMPILE
@@ -598,7 +621,7 @@ MOC_FILES=
 else
 MOC_FILES=$(wildcard $(SRC)/osd/modules/debugger/qt/*.h)
 
-ifeq ($(TARGETOS),windows)
+ifeq ($(OS),windows)
 MOC = moc
 ifneq ($(OSD),sdl)
 MOC_FILES=

@@ -61,14 +61,19 @@ newoption {
 	trigger = "targetos",
 	description = "Choose target OS",
 	allowed = {
-		{ "android",   "Android"          		},
-		{ "asmjs",     "Emscripten/asm.js"      },
-		{ "freebsd",   "FreeBSD"                },
-		{ "linux",     "Linux"   				},
-		{ "ios",       "iOS"              		},
-		{ "nacl",      "Native Client"          },
-		{ "macosx",    "OSX"                    },
-		{ "windows",   "Windows"                },
+		{ "android-arm",   "Android - ARM"          },
+		{ "android-mips",  "Android - MIPS"         },
+		{ "android-x86",   "Android - x86"          },
+		{ "asmjs",         "Emscripten/asm.js"      },
+		{ "freebsd",       "FreeBSD"                },
+		{ "nacl",          "Native Client"          },
+		{ "nacl-arm",      "Native Client - ARM"    },
+		{ "pnacl",         "Native Client - PNaCl"  },
+		{ "linux",     	   "Linux"   				},
+		{ "ios",           "iOS"              		},
+		{ "macosx",        "OSX"                    },
+		{ "windows",       "Windows"                },
+
 	},
 }
 
