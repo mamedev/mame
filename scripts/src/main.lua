@@ -3,7 +3,7 @@ function mainProject(_target, _subtarget)
 		project (_target)
 	else
 		project (_target .. _subtarget)
-	end	
+	end
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
 
@@ -26,7 +26,7 @@ function mainProject(_target, _subtarget)
 		targetextension ".exe"
 
 	configuration { "asmjs" }
-		targetextension ".bc"  
+		targetextension ".bc"
 
 	configuration { }
 		targetdir(MAME_DIR)

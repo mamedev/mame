@@ -757,11 +757,11 @@ function createMAMEProjects(_target, _subtarget, _name)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
 	uuid (os.uuid("drv-" .. _target .."_" .. _subtarget .. "_" .._name))
-	
+
 	options {
 		"ForceCPP",
 	}
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame",
@@ -774,7 +774,7 @@ function createMAMEProjects(_target, _subtarget, _name)
 
 	includeosd()
 end
-	
+
 function createProjects_mame_mame(_target, _subtarget)
 --------------------------------------------------
 -- the following files are general components and
@@ -2399,7 +2399,7 @@ files {
 	MAME_DIR .. "src/mame/video/blockade.c",
 	MAME_DIR .. "src/mame/drivers/calorie.c",
 	MAME_DIR .. "src/mame/drivers/chihiro.c",
-	MAME_DIR .. "src/mame/video/chihiro.c", 
+	MAME_DIR .. "src/mame/video/chihiro.c",
 	MAME_DIR .. "src/mame/drivers/coolridr.c",
 	MAME_DIR .. "src/mame/drivers/deniam.c",
 	MAME_DIR .. "src/mame/video/deniam.c",

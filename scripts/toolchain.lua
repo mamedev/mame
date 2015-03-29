@@ -153,23 +153,23 @@ function toolchain(_buildDir, _subDir)
 			if _OPTIONS["distro"]=="ubuntu-intrepid" then
 				premake.gcc.cc   = "@gcc -V 4.2"
 				premake.gcc.cxx  = "@g++-4.2"
-			end		
+			end
 			if _OPTIONS["distro"]=="gcc44-generic" then
 				premake.gcc.cc   = "@gcc-4.4"
 				premake.gcc.cxx  = "@g++-4.4"
-			end					
+			end
 			if _OPTIONS["distro"]=="gcc45-generic" then
 				premake.gcc.cc   = "@gcc-4.5"
 				premake.gcc.cxx  = "@g++-4.5"
-			end					
+			end
 			if _OPTIONS["distro"]=="gcc46-generic" then
 				premake.gcc.cc   = "@gcc-4.6"
 				premake.gcc.cxx  = "@g++-4.6"
-			end					
+			end
 			if _OPTIONS["distro"]=="gcc47-generic" then
 				premake.gcc.cc   = "@gcc-4.7"
 				premake.gcc.cxx  = "@g++-4.7"
-			end	
+			end
 			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
 		end
@@ -184,7 +184,7 @@ function toolchain(_buildDir, _subDir)
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW32") or not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
-			end		
+			end
 			premake.gcc.cc  = "$(MINGW32)/bin/i686-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW32)/bin/i686-w64-mingw32-g++"
 			premake.gcc.ar  = "$(MINGW32)/bin/ar"
@@ -194,7 +194,7 @@ function toolchain(_buildDir, _subDir)
 		if "mingw64-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW64") or not os.getenv("MINGW64") then
 				print("Set MINGW64 envrionment variable.")
-			end				
+			end
 			premake.gcc.cc  = "$(MINGW64)/bin/x86_64-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW64)/bin/x86_64-w64-mingw32-g++"
 			premake.gcc.ar  = "$(MINGW64)/bin/ar"
@@ -331,7 +331,7 @@ function toolchain(_buildDir, _subDir)
 			premake.vstudio.toolset = ("v110_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
-		
+
 		if ("vs2013-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
@@ -343,11 +343,11 @@ function toolchain(_buildDir, _subDir)
 	end
 	if (_OPTIONS["CXX"] ~= nil) then
 		premake.gcc.cxx  = _OPTIONS["CXX"]
-	end	
+	end
 	if (_OPTIONS["LD"] ~= nil) then
 		premake.gcc.ld  = _OPTIONS["LD"]
-	end	
-	
+	end
+
 	configuration {} -- reset configuration
 
 
@@ -384,7 +384,7 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "win64_mingw-gcc" .. "/bin")
 		objdir (_buildDir .. "win64_mingw-gcc" .. "/obj")
 		buildoptions { "-m64" }
-		
+
 	configuration { "mingw-clang" }
 		linkoptions {
 			"-Qunused-arguments",
@@ -400,7 +400,7 @@ function toolchain(_buildDir, _subDir)
 			"-isystem$(MINGW32)/i686-w64-mingw32/include/c++/i686-w64-mingw32",
 			"-isystem$(MINGW32)/i686-w64-mingw32/include",
 		}
-		
+
 	configuration { "x64", "mingw-clang" }
 		targetdir (_buildDir .. "win64_mingw-clang/bin")
 		objdir (_buildDir .. "win64_mingw-clang/obj")
@@ -409,7 +409,7 @@ function toolchain(_buildDir, _subDir)
 			"-isystem$(MINGW64)/x86_64-w64-mingw32/include/c++",
 			"-isystem$(MINGW64)/x86_64-w64-mingw32/include/c++/x86_64-w64-mingw32",
 			"-isystem$(MINGW64)/x86_64-w64-mingw32/include",
-		}		
+		}
 
 	configuration { "linux-gcc", "x32" }
 		targetdir (_buildDir .. "linux32_gcc" .. "/bin")
@@ -438,7 +438,7 @@ function toolchain(_buildDir, _subDir)
 		buildoptions {
 			"-m64",
 		}
-		
+
 	configuration { "android-*" }
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/include",
@@ -581,7 +581,7 @@ function toolchain(_buildDir, _subDir)
 			"-fdiagnostics-show-option",
 			"-fdata-sections",
 			"-ffunction-sections",
-			"-Wunused-value",			
+			"-Wunused-value",
 		}
 	configuration { "nacl or nacl-arm" }
 		includedirs {
@@ -589,10 +589,10 @@ function toolchain(_buildDir, _subDir)
 			"$(NACL_SDK_ROOT)/include/newlib",
 		}
 
-	configuration { "pnacl" }		
+	configuration { "pnacl" }
 		buildoptions {
 			"-Wno-tautological-undefined-compare",
-			"-Wno-cast-align",			
+			"-Wno-cast-align",
 		}
 		includedirs {
 			"$(NACL_SDK_ROOT)/include",

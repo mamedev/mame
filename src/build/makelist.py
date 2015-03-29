@@ -49,7 +49,7 @@ def parse_file(srcfile):
             if not all(((c >='a' and c<='z') or (c>='0' and c<='9') or c=='_') for c in drivname):
                sys.stderr.write("%s:%d - Invalid character in driver \"%s\"\n" % (srcfile,  linenum,  drivname))
                return 1
-            else:			   
+            else:
                drivlist.append(drivname)
     return 0
 

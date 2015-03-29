@@ -80,11 +80,11 @@ function createProjects_mame_tiny(_target, _subtarget)
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
 	uuid (os.uuid("drv-mame-tiny"))
-	
+
 	options {
 		"ForceCPP",
 	}
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame",
@@ -93,7 +93,7 @@ function createProjects_mame_tiny(_target, _subtarget)
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mame/layout",
-	}	
+	}
 
 	includeosd()
 

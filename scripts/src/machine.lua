@@ -1603,7 +1603,7 @@ end
 
 if (MACHINES["RF5C296"]~=null) then
 	MACHINES["PCCARD"] = true
-	files {	
+	files {
 		MAME_DIR .. "src/emu/machine/rf5c296.c",
 	}
 end

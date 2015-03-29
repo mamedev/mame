@@ -73,7 +73,7 @@ each letter abbreviates a single channel: *L* is for Luminance or Luma
 or Lightness which is the channel used in greyscale images; *R*, *G*,
 *B* stand for Red, Green, Blue, the components of a colour image; *A*
 stands for Alpha, the opacity channel (used for transparency effects,
-but higher values are more opaque, so it makes sense to call it 
+but higher values are more opaque, so it makes sense to call it
 opacity).
 
 A note on formats
@@ -2697,7 +2697,7 @@ def _main(argv):
         # Encode PNG to PPM
         png = Reader(file=infile)
         width,height,pixels,meta = png.asDirect()
-        write_pnm(outfile, width, height, pixels, meta) 
+        write_pnm(outfile, width, height, pixels, meta)
     else:
         # Encode PNM to PNG
         format, width, height, depth, maxval = \

@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Aaron Giles, Andrew Gardner
@@ -50,7 +50,7 @@
 ##
 ## Python note:
 ##   This is a near-literal translation of the original C++ code.  As such there
-##   are some very non-pythonic things done throughout.  The conversion was done 
+##   are some very non-pythonic things done throughout.  The conversion was done
 ##   this way so as to insure compatibility as much as possible given the small
 ##   number of test cases.
 ##
