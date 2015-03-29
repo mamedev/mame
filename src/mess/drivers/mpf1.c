@@ -259,7 +259,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	data &= m_special->read() & 1 ? 0xff : 0xbf;
 
 	/* bit 7, tape input */
-	data |= (m_cassette)->input() > 0 ? 0x80 : 0;
+	data |= ((m_cassette)->input() > 0) ? 0x80 : 0;
 
 	return data;
 }
