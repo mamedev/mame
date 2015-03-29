@@ -709,6 +709,9 @@ configuration { "osx*" }
 			"SDL2.framework",
 			"pthread",
 		}
+		buildoptions {
+			"-F/Library/Frameworks/",
+		}
 
 
 configuration { "mingw*" }
