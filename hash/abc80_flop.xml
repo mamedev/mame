@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="abc80" description="Luxor ABC 80 diskettes">
+<softwarelist name="abc80_flop" description="Luxor ABC 80 diskettes">
 
 	<software name="cpm" supported="no">
 		<description>CP/M BIOS 3.7</description>
@@ -67,6 +67,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="79143">
 				<rom name="fd2_bifak.imd" size="79143" crc="a741ad5d" sha1="a0cb8cc31a30fcbea258dd5249845819930e60c2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abcdemo">
+		<description>ABCDemo</description>
+		<year>2015</year>
+		<publisher>Genesis Project</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="genesisproject_abcdemo.dsk" size="163840" crc="29059d3c" sha1="55b38436a2d3cfe1caf8e35e44775402a1511eec" offset="0" />
 			</dataarea>
 		</part>
 	</software>
