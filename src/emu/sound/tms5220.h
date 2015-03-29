@@ -73,7 +73,7 @@ protected:
 private:
 	void register_for_save_states();
 	void data_write(int data);
-	void update_status_and_ints();
+	void update_fifo_status_and_ints();
 	int extract_bits(int count);
 	int status_read();
 	int ready_read();
