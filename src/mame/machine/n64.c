@@ -2146,7 +2146,7 @@ void n64_periphs::dd_update_bm()
 		return;
 	if(dd_write) // dd write, BM Mode 0
 	{
-		if((dd_current_reg == 0))
+		if(dd_current_reg == 0)
 		{
 			dd_current_reg += 1;
 			dd_status_reg |= DD_ASIC_STATUS_DREQ;
