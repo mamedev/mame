@@ -133,6 +133,8 @@ ARCHITECTURE = x64
 endif
 endif
 
+else
+CROSS_BUILD = 1
 endif # TARGET_OS
 
 ifdef PTR64
@@ -191,15 +193,21 @@ PARAMS+= --distro=$(DISTRO)
 
 ifdef OVERRIDE_CC
 PARAMS+= --CC='$(OVERRIDE_CC)'
+ifndef CROSS_BUILD
 CC = $(OVERRIDE_CC)
+endif
 endif
 ifdef OVERRIDE_CXX
 PARAMS+= --CXX='$(OVERRIDE_CXX)'
+ifndef CROSS_BUILD
 CXX = $(OVERRIDE_CXX)
+endif
 endif
 ifdef OVERRIDE_LD
 PARAMS+= --LD='$(OVERRIDE_LD)'
+ifndef CROSS_BUILD
 LD = $(OVERRIDE_LD)
+endif
 endif
 
 #-------------------------------------------------
@@ -299,10 +307,10 @@ endif
 # extension for executables
 EXE =
 
-ifeq ($(TARGETOS),windows)
+ifeq ($(OS),windows)
 EXE = .exe
 endif
-ifeq ($(TARGETOS),os2)
+ifeq ($(OS),os2)
 EXE = .exe
 endif
 
