@@ -12,4 +12,5 @@ defines {
 	"USE_DISPATCH_GL=1",
 	"DIRECTINPUT_VERSION=0x0800",
 	"SDLMAME_NET_PCAP",
+	"main=utf8_main",
 }

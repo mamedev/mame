@@ -726,23 +726,25 @@ configuration { "linux-*" }
 
 configuration { "osx*" }
 		links {
+			"SDL2.framework",
 			"Cocoa.framework",
 			"OpenGL.framework",
 			"CoreAudio.framework",
 			"CoreMIDI.framework",
-			"SDL2.framework",
 			"pthread",
+		}
+		buildoptions {
+			"-F/Library/Frameworks/",
+		}
+		linkoptions {
+			"-F/Library/Frameworks/",
 		}
 
 
 configuration { "mingw*" }
-		defines {
-			"main=utf8_main",
-		}
 		linkoptions {
 			"-static-libgcc",
 			"-static-libstdc++",
-			"-municode",
 		}
 if _OPTIONS["osd"]=="sdl" then
 		links {
@@ -769,9 +771,6 @@ end
 		}
 
 configuration { "vs*" }
-		defines {
-			"main=utf8_main",
-		}
 		defines {
 			"XML_STATIC",
 			"WIN32",

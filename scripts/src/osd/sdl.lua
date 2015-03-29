@@ -1,25 +1,28 @@
 function maintargetosdoptions(_target)
-	if (USE_QT == 1) then
-		if _OPTIONS["targetos"]=="windows" then
+	if _OPTIONS["targetos"]=="windows" then
+		linkoptions{
+			"-municode",
+		}
+		if (USE_QT == 1) then
 			linkoptions{
 				"-L$(shell qmake -query QT_INSTALL_LIBS)",
 			}
-
 			links {
 				"qtmain",
 				"QtGui4",
 				"QtCore4",
 			}
 		end
-
-		if _OPTIONS["targetos"]=="linux" then
+	end
+	if _OPTIONS["targetos"]=="linux" then
+		if (USE_QT == 1) then
 			links {
-				'QtGui',
-				'QtCore',
+				"QtGui",
+				"QtCore",
 			}
 
 			linkoptions {
-				'$(shell pkg-config --libs QtGui)',
+				"$(shell pkg-config --libs QtGui)",
 			}
 		end
 	end
@@ -29,6 +32,7 @@ function maintargetosdoptions(_target)
 
 	configuration { }
 end
+
 
 configuration { "mingw*" }
 		linkoptions {
