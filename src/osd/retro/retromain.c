@@ -616,56 +616,62 @@ static void Input_Binding(running_machine &machine)
                   }
                   else
                      if (
-                           (core_stricmp(machine.system().name, "vsav") == 0) ||
-                           (core_stricmp(machine.system().parent, "vsav") == 0) ||
-                           (core_stricmp(machine.system().name, "vsav2") == 0) ||
-                           (core_stricmp(machine.system().parent, "vsav2") == 0) ||
-                           (core_stricmp(machine.system().name, "mshvsf") == 0) ||
-                           (core_stricmp(machine.system().parent, "mshvsf") == 0) ||
+                           (core_stricmp(machine.system().name, "dstlk") == 0) ||
+                           (core_stricmp(machine.system().parent, "dstlk") == 0) ||
+                           (core_stricmp(machine.system().name, "hsf2") == 0) ||
+                           (core_stricmp(machine.system().parent, "hsf2") == 0) ||
                            (core_stricmp(machine.system().name, "msh") == 0) ||
                            (core_stricmp(machine.system().parent, "msh") == 0) ||
+                           (core_stricmp(machine.system().name, "mshvsf") == 0) ||
+                           (core_stricmp(machine.system().parent, "mshvsf") == 0) ||
                            (core_stricmp(machine.system().name, "mvsc") == 0) ||
                            (core_stricmp(machine.system().parent, "mvsc") == 0) ||
-                           (core_stricmp(machine.system().name, "xmcota") == 0) ||
-                           (core_stricmp(machine.system().parent, "xmcota") == 0) ||
+                           (core_stricmp(machine.system().name, "nwarr") == 0) ||
+                           (core_stricmp(machine.system().parent, "nwarr") == 0) ||
+                           (core_stricmp(machine.system().name, "rvschool") == 0) ||
+                           (core_stricmp(machine.system().parent, "rvschool") == 0) ||
                            (core_stricmp(machine.system().name, "sf2") == 0) ||
                            (core_stricmp(machine.system().parent, "sf2") == 0) ||
-                           (core_stricmp(machine.system().name, "ssf2") == 0) ||
-                           (core_stricmp(machine.system().parent, "ssf2") == 0) ||
-                           (core_stricmp(machine.system().name, "ssf2t") == 0) ||
-                           (core_stricmp(machine.system().parent, "ssf2t") == 0) ||
+                           (core_stricmp(machine.system().name, "sf2ce") == 0) ||
+                           (core_stricmp(machine.system().parent, "sf2ce") == 0) ||
+                           (core_stricmp(machine.system().name, "sf2hf") == 0) ||
+                           (core_stricmp(machine.system().parent, "sf2hf") == 0) ||
                            (core_stricmp(machine.system().name, "sfa") == 0) ||
                            (core_stricmp(machine.system().parent, "sfa") == 0) ||
                            (core_stricmp(machine.system().name, "sfa2") == 0) ||
                            (core_stricmp(machine.system().parent, "sfa2") == 0) ||
+                           (core_stricmp(machine.system().name, "sfa3") == 0) ||
+                           (core_stricmp(machine.system().parent, "sfa3") == 0) ||
+                           (core_stricmp(machine.system().name, "sfex") == 0) ||
+                           (core_stricmp(machine.system().parent, "sfex") == 0) ||
+                           (core_stricmp(machine.system().name, "sfex2") == 0) ||
+                           (core_stricmp(machine.system().parent, "sfex2") == 0) ||
+                           (core_stricmp(machine.system().name, "sfex2p") == 0) ||
+                           (core_stricmp(machine.system().parent, "sfex2p") == 0) ||
+                           (core_stricmp(machine.system().name, "sfexp") == 0) ||
+                           (core_stricmp(machine.system().parent, "sfexp") == 0) ||
                            (core_stricmp(machine.system().name, "sfiii") == 0) ||
                            (core_stricmp(machine.system().parent, "sfiii") == 0) ||
                            (core_stricmp(machine.system().name, "sfiii2") == 0) ||
                            (core_stricmp(machine.system().parent, "sfiii2") == 0) ||
                            (core_stricmp(machine.system().name, "sfiii3") == 0) ||
                            (core_stricmp(machine.system().parent, "sfiii3") == 0) ||
-                           (core_stricmp(machine.system().name, "xmvsf") == 0) ||
-                           (core_stricmp(machine.system().parent, "xmvsf") == 0) ||
                            (core_stricmp(machine.system().name, "sftm") == 0) ||
                            (core_stricmp(machine.system().parent, "sftm") == 0) ||
-                           (core_stricmp(machine.system().name, "dstlk") == 0) ||
-                           (core_stricmp(machine.system().parent, "dstlk") == 0) ||
-                           (core_stricmp(machine.system().name, "nwarr") == 0) ||
-                           (core_stricmp(machine.system().parent, "nwarr") == 0) ||
-                           (core_stricmp(machine.system().name, "sfex") == 0) ||
-                           (core_stricmp(machine.system().parent, "sfex") == 0) ||
-                           (core_stricmp(machine.system().name, "sfexp") == 0) ||
-                           (core_stricmp(machine.system().parent, "sfexp") == 0) ||
-                           (core_stricmp(machine.system().name, "sfex2") == 0) ||
-                           (core_stricmp(machine.system().parent, "sfex2") == 0) ||
-                           (core_stricmp(machine.system().name, "sfex2p") == 0) ||
-                           (core_stricmp(machine.system().parent, "sfex2p") == 0) ||
-                           (core_stricmp(machine.system().name, "rvschool") == 0) ||
-                           (core_stricmp(machine.system().parent, "rvschool") == 0) ||
+                           (core_stricmp(machine.system().name, "ssf2") == 0) ||
+                           (core_stricmp(machine.system().parent, "ssf2") == 0) ||
+                           (core_stricmp(machine.system().name, "ssf2t") == 0) ||
+                           (core_stricmp(machine.system().parent, "ssf2t") == 0) ||
                            (core_stricmp(machine.system().name, "starglad") == 0) ||
                            (core_stricmp(machine.system().parent, "starglad") == 0) ||
-                           (core_stricmp(machine.system().name, "sfa3") == 0) ||
-                           (core_stricmp(machine.system().parent, "sfa3") == 0)
+                           (core_stricmp(machine.system().name, "vsav") == 0) ||
+                           (core_stricmp(machine.system().parent, "vsav") == 0) ||
+                           (core_stricmp(machine.system().name, "vsav2") == 0) ||
+                           (core_stricmp(machine.system().parent, "vsav2") == 0) ||
+                           (core_stricmp(machine.system().name, "xmcota") == 0) ||
+                           (core_stricmp(machine.system().parent, "xmcota") == 0) ||
+                           (core_stricmp(machine.system().name, "xmvsf") == 0) ||
+                           (core_stricmp(machine.system().parent, "xmvsf") == 0)
                            )
                            {
                               /* Capcom CPS2 6-button fighting games */
