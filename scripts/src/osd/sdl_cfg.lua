@@ -13,6 +13,7 @@ if _OPTIONS["targetos"]=="windows" then
 		"USE_OPENGL=1",
 		"USE_QTDEBUG=1",
 		"SDLMAME_NET_PCAP",
+		"main=utf8_main",
 	}
 
 	buildoptions {

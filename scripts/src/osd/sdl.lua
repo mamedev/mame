@@ -28,6 +28,14 @@ function maintargetosdoptions(_target)
 	configuration { }
 end
 
+
+if _OPTIONS["targetos"]=="windows" then
+	linkoptions {
+		"-municode",
+	}
+end
+
+
 configuration { "mingw*" }
 		linkoptions {
 			"-Wl,--allow-multiple-definition",

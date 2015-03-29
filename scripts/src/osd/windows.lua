@@ -13,6 +13,11 @@ function maintargetosdoptions(_target)
 end
 
 
+linkoptions {
+	"-municode",
+}
+
+
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
