@@ -739,6 +739,9 @@ configuration { "osx*" }
 		linkoptions {
 			"-F/Library/Frameworks/",
 		}
+		flags {
+			"Symbols",
+		}
 
 
 configuration { "mingw*" }

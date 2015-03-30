@@ -677,10 +677,8 @@ GEN_FOLDERS :=  \
 	$(GENDIR) \
 	$(GENDIR)/$(TARGET)/$(SUBTARGET) \
 	$(GENDIR)/emu/layout/ \
-	$(GENDIR)/mame/layout/ \
-	$(GENDIR)/mess/layout/ \
+	$(GENDIR)/$(TARGET)/layout/ \
 	$(GENDIR)/mess/drivers/ \
-	$(GENDIR)/ldplayer/layout/ \
 	$(GENDIR)/emu/cpu/arcompact/ \
 	$(GENDIR)/emu/cpu/h8/ \
 	$(GENDIR)/emu/cpu/mcs96/ \
