@@ -1,6 +1,7 @@
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"
+#include "sound/l7a1045_l6028_dsp_a.h"
 
 enum
 {
@@ -362,21 +363,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
 
-	UINT16 m_audiochannel;
 
-	struct hng64_48bit_data {
-		UINT16 dat[3];
-	};
-
-	hng64_48bit_data m_audiodat[0x10000];
-
-	DECLARE_WRITE16_MEMBER(hng64_sound_select_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_02_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_04_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_06_w);
-
-	DECLARE_READ16_MEMBER(hng64_sound_port_0004_r);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0006_r);
 
 	DECLARE_READ16_MEMBER(hng64_sound_port_0008_r);
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
