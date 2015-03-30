@@ -96,25 +96,16 @@ other supported games as well.
 
 
 
-
-
-
 /***************************************************************************/
 
 void m72_state::machine_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::m72_scanline_interrupt),this));
-
-	save_item(NAME(m_mcu_sample_addr));
-	save_item(NAME(m_mcu_snd_cmd_latch));
+	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::scanline_interrupt),this));
 }
 
 MACHINE_START_MEMBER(m72_state,kengo)
 {
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::kengo_scanline_interrupt),this));
-
-	save_item(NAME(m_mcu_sample_addr));
-	save_item(NAME(m_mcu_snd_cmd_latch));
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
@@ -144,7 +135,7 @@ MACHINE_RESET_MEMBER(m72_state,kengo)
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::m72_scanline_interrupt)
+TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
 {
 	int scanline = param;
 
@@ -200,9 +191,6 @@ TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
 
 Protection emulation
 
-Currently only available for lohtb2, since this is the only game
-with a dumped 8751.
-
 The protection device does
 
 * provide startup code
@@ -221,7 +209,7 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 }
 
 
-WRITE16_MEMBER(m72_state::m72_main_mcu_sound_w)
+WRITE16_MEMBER(m72_state::main_mcu_sound_w)
 {
 	if (data & 0xfff0)
 		logerror("sound_w: %04x %04x\n", mem_mask, data);
@@ -233,7 +221,7 @@ WRITE16_MEMBER(m72_state::m72_main_mcu_sound_w)
 	}
 }
 
-WRITE16_MEMBER(m72_state::m72_main_mcu_w)
+WRITE16_MEMBER(m72_state::main_mcu_w)
 {
 	UINT16 val = m_protection_ram[offset];
 
@@ -255,7 +243,7 @@ WRITE16_MEMBER(m72_state::m72_main_mcu_w)
 		machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), (offset<<16) | val, m_protection_ram);
 }
 
-WRITE8_MEMBER(m72_state::m72_mcu_data_w)
+WRITE8_MEMBER(m72_state::mcu_data_w)
 {
 	UINT16 val;
 	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
@@ -264,7 +252,7 @@ WRITE8_MEMBER(m72_state::m72_mcu_data_w)
 	machine().scheduler().synchronize( timer_expired_delegate(FUNC(m72_state::delayed_ram16_w),this), ((offset >>1 ) << 16) | val, m_protection_ram);
 }
 
-READ8_MEMBER(m72_state::m72_mcu_data_r)
+READ8_MEMBER(m72_state::mcu_data_r)
 {
 	UINT8 ret;
 
@@ -279,38 +267,38 @@ READ8_MEMBER(m72_state::m72_mcu_data_r)
 	return ret;
 }
 
-INTERRUPT_GEN_MEMBER(m72_state::m72_mcu_int)
+INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
 {
 	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
 	m_mcu_snd_cmd_latch = 0x11;// | (machine.rand() & 1); /* 0x10 is special as well - FIXME */
 	device.execute().set_input_line(1, ASSERT_LINE);
 }
 
-READ8_MEMBER(m72_state::m72_mcu_sample_r)
+READ8_MEMBER(m72_state::mcu_sample_r)
 {
 	UINT8 sample;
 	sample = memregion("samples")->base()[m_mcu_sample_addr++];
 	return sample;
 }
 
-WRITE8_MEMBER(m72_state::m72_mcu_ack_w)
+WRITE8_MEMBER(m72_state::mcu_ack_w)
 {
 	m_mcu->set_input_line(1, CLEAR_LINE);
 	m_mcu_snd_cmd_latch = 0;
 }
 
-READ8_MEMBER(m72_state::m72_mcu_snd_r)
+READ8_MEMBER(m72_state::mcu_snd_r)
 {
 	return m_mcu_snd_cmd_latch;
 }
 
-READ8_MEMBER(m72_state::m72_mcu_port_r)
+READ8_MEMBER(m72_state::mcu_port_r)
 {
 	logerror("port read: %02x\n", offset);
 	return 0;
 }
 
-WRITE8_MEMBER(m72_state::m72_mcu_port_w)
+WRITE8_MEMBER(m72_state::mcu_port_w)
 {
 	if (offset == 1)
 	{
@@ -322,25 +310,19 @@ WRITE8_MEMBER(m72_state::m72_mcu_port_w)
 
 }
 
-WRITE8_MEMBER(m72_state::m72_mcu_low_w)
+WRITE8_MEMBER(m72_state::mcu_low_w)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
 	logerror("low: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
-WRITE8_MEMBER(m72_state::m72_mcu_high_w)
+WRITE8_MEMBER(m72_state::mcu_high_w)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
 	logerror("high: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
-WRITE8_MEMBER(m72_state::m72_snd_cpu_sample_w)
-{
-	//m_dac->write_signed8(data);
-	m_dac->write_unsigned8(data);
-}
-
-READ8_MEMBER(m72_state::m72_snd_cpu_sample_r)
+READ8_MEMBER(m72_state::snd_cpu_sample_r)
 {
 	return m_mcu_sample_latch;
 }
@@ -353,15 +335,20 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 
 	m_protection_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	program.install_read_bank(0xb0000, 0xbffff, "bank1");
-	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::m72_main_mcu_w),this));
-	membank("bank1")->set_base(m_protection_ram);
+	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::main_mcu_w),this));
+	membank("bank1")->configure_entry(0, m_protection_ram);
+	
+	save_pointer(NAME(m_protection_ram), 0x10000/2);
+	save_item(NAME(m_mcu_sample_latch));
+	save_item(NAME(m_mcu_sample_addr));
+	save_item(NAME(m_mcu_snd_cmd_latch));
 
 	//io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),this));
-	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),this));
+	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::main_mcu_sound_w),this));
 
 	/* sound cpu */
-	sndio.install_write_handler(0x82, 0x82, 0xff, 0, write8_delegate(FUNC(m72_state::m72_snd_cpu_sample_w),this));
-	sndio.install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::m72_snd_cpu_sample_r),this));
+	sndio.install_write_handler(0x82, 0x82, 0xff, 0, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
+	sndio.install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
 
 	/* lohtb2 */
 #if 0
@@ -697,7 +684,9 @@ void m72_state::install_protection_handler(const UINT8 *code,const UINT8 *crc)
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),this));
-	membank("bank1")->set_base(m_protection_ram);
+	membank("bank1")->configure_entry(0, m_protection_ram);
+	
+	save_pointer(NAME(m_protection_ram), 0x1000/2);
 }
 
 DRIVER_INIT_MEMBER(m72_state,bchopper)
@@ -808,10 +797,10 @@ static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )      \
 	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM                                 \
 	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM    /* work RAM */          \
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram") \
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")          \
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")     \
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")      \
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")      \
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")          \
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")     \
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")      \
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")      \
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)                         \
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM                                   \
 ADDRESS_MAP_END
@@ -828,10 +817,10 @@ static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x9c000, 0x9ffff) AM_RAM   /* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -840,22 +829,22 @@ static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x88000, 0x8bfff) AM_RAM   /* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w)
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -863,16 +852,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_SHARE("majtitle_rowscr")
-	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")  /* larger than the other games */
+	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")  /* larger than the other games */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd0000, 0xd3fff) AM_RAM   /* work RAM */
-	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(m72_irq_line_w)
+	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(irq_line_w)
 	AM_RANGE(0xe4000, 0xe4001) AM_WRITEONLY /* playfield enable? 1 during screen transitions, 0 otherwise */
-	AM_RANGE(0xec000, 0xec001) AM_WRITE(m72_dmaon_w)
+	AM_RANGE(0xec000, 0xec001) AM_WRITE(dmaon_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -881,37 +870,37 @@ static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM   /* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w)
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w)
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w)
 	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP  /* ??? */
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -921,14 +910,14 @@ static ADDRESS_MAP_START( m72_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w) /* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(port02_w) /* coin counters, reset sound cpu, other stuff? */
+	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
 	//AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 ADDRESS_MAP_END
 
@@ -939,10 +928,10 @@ static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
@@ -952,10 +941,10 @@ static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
@@ -965,10 +954,10 @@ static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
 	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
 ADDRESS_MAP_END
 
@@ -978,13 +967,13 @@ static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)  /* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
+	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
+	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16, m72_state )
@@ -993,10 +982,10 @@ static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
+	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
+	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
+	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
+	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
 //  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
@@ -1048,14 +1037,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, m72_state )
 	/* External access */
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m72_mcu_snd_r, m72_mcu_ack_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mcu_sample_r, mcu_low_w)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(mcu_high_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(mcu_snd_r, mcu_ack_w)
 	/* shared at b0000 - b0fff on the main cpu */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(mcu_data_r,mcu_data_w )
 
 	/* Ports */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(m72_mcu_port_r, m72_mcu_port_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(mcu_port_r, mcu_port_w)
 ADDRESS_MAP_END
 
 #define COIN_MODE_1 \
@@ -1793,7 +1782,7 @@ static MACHINE_CONFIG_START( m72_base, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m72)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,m72)
@@ -1811,7 +1800,7 @@ static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
 
 	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  m72_mcu_int)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 
 MACHINE_CONFIG_END
 
@@ -1926,7 +1915,7 @@ static MACHINE_CONFIG_START( rtype2, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m72)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,rtype2)
@@ -1957,7 +1946,7 @@ static MACHINE_CONFIG_START( dbreed, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m72)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharry)
@@ -1988,7 +1977,7 @@ static MACHINE_CONFIG_START( hharry, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m72)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharry)
@@ -2020,7 +2009,7 @@ static MACHINE_CONFIG_START( hharryu, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m72)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharryu)
@@ -2049,7 +2038,7 @@ static MACHINE_CONFIG_START( poundfor, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m72)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,poundfor)
@@ -2080,7 +2069,7 @@ static MACHINE_CONFIG_START( cosmccop, m72_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m72)
+	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,poundfor)
@@ -3502,51 +3491,51 @@ ROM_END
 // the program roms failing their tests.  This is why we still have simulation code for many games
 // despite having Japanese version MCU roms for several of them.  See notes next to the sets
 
-GAME( 1987, rtype,       0,        rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (World)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypej,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypejp,     rtype,    rtype,       rtypep,   driver_device, 0,           ROT0,   "Irem", "R-Type (Japan prototype)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypeu,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypeb,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL )
+GAME( 1987, rtype,       0,        rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, rtypej,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, rtypejp,     rtype,    rtype,       rtypep,   driver_device, 0,           ROT0,   "Irem", "R-Type (Japan prototype)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, rtypeu,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, rtypeb,      rtype,    rtype,       rtype,    driver_device, 0,           ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        m72,         bchopper, m72_state,     bchopper,    ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
-GAME( 1987, mrheli,      bchopper, m72_8751,    bchopper, m72_state,     m72_8751,    ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", GAME_NO_COCKTAIL )
+GAME( 1987, bchopper,    0,        m72,         bchopper, m72_state,     bchopper,    ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, mrheli,      bchopper, m72_8751,    bchopper, m72_state,     m72_8751,    ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1988, nspirit,     0,        m72,         nspirit,  m72_state,     nspirit,     ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit,  m72_state,     m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
+GAME( 1988, nspirit,     0,        m72,         nspirit,  m72_state,     nspirit,     ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, nspiritj,    nspirit,  m72_8751,    nspirit,  m72_state,     m72_8751,    ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
 
-GAME( 1988, imgfight,    0,        m72,         imgfight, m72_state,     imgfight,    ROT270, "Irem", "Image Fight (World, revision A)", 0 )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, imgfightj,   imgfight, m72_8751,    imgfight, m72_state,     m72_8751,    ROT270, "Irem", "Image Fight (Japan)", 0 )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
+GAME( 1988, imgfight,    0,        m72,         imgfight, m72_state,     imgfight,    ROT270, "Irem", "Image Fight (World, revision A)", GAME_SUPPORTS_SAVE )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, imgfightj,   imgfight, m72_8751,    imgfight, m72_state,     m72_8751,    ROT270, "Irem", "Image Fight (Japan)", GAME_SUPPORTS_SAVE )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
 
-GAME( 1989, loht,        0,        m72,         loht,     m72_state,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )         // fails rom check if used with Japan MCU rom (World version?)
-GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL ) // waits for japan warning screen, works with our mcu dump (Japan Version)
-GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", GAME_NO_COCKTAIL ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
-GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
+GAME( 1989, loht,        0,        m72,         loht,     m72_state,     loht,        ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
+GAME( 1989, lohtj,       loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // waits for japan warning screen, works with our mcu dump (Japan Version)
+GAME( 1989, lohtb2,      loht,     m72_8751,    loht,     m72_state,     m72_8751,    ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1989, lohtb,       loht,     m72,         loht,     driver_device, 0,           ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", GAME_NOT_WORKING| GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, driver_device, 0,           ROT0,   "Irem", "X Multiply (World, M81)", GAME_NO_COCKTAIL )
-GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL )
+GAME( 1989, xmultipl,    0,        xmultipl,    xmultipl, driver_device, 0,           ROT0,   "Irem", "X Multiply (World, M81)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, xmultiplm72, xmultipl, xmultiplm72, xmultipl, m72_state,     m72_8751,    ROT0,   "Irem", "X Multiply (Japan, M72)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1989, dbreed,      0,        dbreed,      dbreed,   driver_device, 0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )
-GAME( 1989, dbreedm72,   dbreed,   dbreedm72,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL )
+GAME( 1989, dbreed,      0,        dbreed,      dbreed,   driver_device, 0,           ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, dbreedm72,   dbreed,   dbreedm72,   dbreed,   m72_state,     dbreedm72,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1989, rtype2,      0,        rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II", GAME_NO_COCKTAIL )
-GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan)", GAME_NO_COCKTAIL )
-GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", GAME_NO_COCKTAIL )
+GAME( 1989, rtype2,      0,        rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, rtype2j,     rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, rtype2jc,    rtype2,   rtype2,      rtype2,   driver_device, 0,           ROT0,   "Irem", "R-Type II (Japan, revision C)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1990, majtitle,    0,        majtitle,    rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", GAME_NO_COCKTAIL )
-GAME( 1990, majtitlej,   majtitle, majtitle,    rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", GAME_NO_COCKTAIL )
+GAME( 1990, majtitle,    0,        majtitle,    rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, majtitlej,   majtitle, majtitle,    rtype2,   driver_device, 0,           ROT0,   "Irem", "Major Title (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1990, hharry,      0,        hharry,      hharry,   driver_device, 0,           ROT0,   "Irem", "Hammerin' Harry (World)", GAME_NO_COCKTAIL )
-GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US)", GAME_NO_COCKTAIL )
-GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", GAME_NO_COCKTAIL )
-GAME( 1990, dkgensanm72, hharry,   dkgenm72,    hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", GAME_NO_COCKTAIL )
+GAME( 1990, hharry,      0,        hharry,      hharry,   driver_device, 0,           ROT0,   "Irem", "Hammerin' Harry (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, hharryu,     hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem America", "Hammerin' Harry (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,     hharry,   driver_device, 0,           ROT0,   "Irem", "Daiku no Gensan (Japan, M82)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, dkgensanm72, hharry,   dkgenm72,    hharry,   m72_state,     dkgenm72,    ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1990, poundfor,    0,        poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (World)", GAME_NO_COCKTAIL )
-GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (Japan)", GAME_NO_COCKTAIL )
-GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem America", "Pound for Pound (US)", GAME_NO_COCKTAIL )
+GAME( 1990, poundfor,    0,        poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, poundforj,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem", "Pound for Pound (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1990, poundforu,   poundfor, poundfor,    poundfor, driver_device, 0,           ROT270, "Irem America", "Pound for Pound (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1990, airduel,     0,        m72,         airduel,  m72_state,     airduel,     ROT270, "Irem", "Air Duel (Japan)", 0 )
+GAME( 1990, airduel,     0,        m72,         airduel,  m72_state,     airduel,     ROT270, "Irem", "Air Duel (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   driver_device, 0,           ROT0,   "Irem", "Cosmic Cop (World)", GAME_NO_COCKTAIL )
-GAME( 1991, gallop,      cosmccop, m72,         gallop,   m72_state,     gallop,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan)", GAME_NO_COCKTAIL )
+GAME( 1991, cosmccop,    0,        cosmccop,    gallop,   driver_device, 0,           ROT0,   "Irem", "Cosmic Cop (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, gallop,      cosmccop, m72,         gallop,   m72_state,     gallop,      ROT0,   "Irem", "Gallop - Armed Police Unit (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, kengo,       0,        kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go", GAME_NO_COCKTAIL )
+GAME( 1991, kengo,       0,        kengo,       kengo,    driver_device, 0,           ROT0,   "Irem", "Ken-Go", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
