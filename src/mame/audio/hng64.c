@@ -371,6 +371,8 @@ MACHINE_CONFIG_FRAGMENT( hng64_audio )
 	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(hng64_state, tcu_tm1_cb))
 	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(hng64_state, tcu_tm2_cb))
 
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
 	MCFG_SOUND_ADD("l7a1045", L7A1045, 16000000 ) // ??
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)

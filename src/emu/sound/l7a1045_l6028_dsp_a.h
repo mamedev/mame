@@ -45,13 +45,14 @@ private:
 //	UINT16     m_key;
 //	INT8*      m_base;
 
-	UINT16 m_audiochannel;
+	UINT8 m_audiochannel;
+	UINT8 m_audioregister;
 
 	struct l7a1045_48bit_data {
 		UINT16 dat[3];
 	};
 
-	l7a1045_48bit_data m_audiodat[0x10000];
+	l7a1045_48bit_data m_audiodat[0x10][0x20];
 
 	DECLARE_WRITE16_MEMBER(l7a1045_sound_select_w);
 	DECLARE_WRITE16_MEMBER(l7a1045_sound_data_02_w);
