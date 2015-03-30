@@ -26,7 +26,7 @@
 			"StaticRuntime"
 		}
 		includedirs {
-			"../src/host/lua-5.2.3/src"
+			"../src/host/lua-5.3.0/src"
 		}
 
 		files {
@@ -38,10 +38,10 @@
 
 		excludes {
 			"../src/premake.lua",
-			"../src/host/lua-5.2.3/src/lua.c",
-			"../src/host/lua-5.2.3/src/luac.c",
-			"../src/host/lua-5.2.3/**.lua",
-			"../src/host/lua-5.2.3/etc/*.c",
+			"../src/host/lua-5.3.0/src/lua.c",
+			"../src/host/lua-5.3.0/src/luac.c",
+			"../src/host/lua-5.3.0/**.lua",
+			"../src/host/lua-5.3.0/etc/*.c",
 		}
 
 		configuration "Debug"

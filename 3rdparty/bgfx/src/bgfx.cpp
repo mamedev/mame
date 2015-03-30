@@ -888,7 +888,11 @@ namespace bgfx
 
 	static void dumpCaps()
 	{
-		BX_TRACE("Supported capabilities (%s):", s_ctx->m_renderCtx->getRendererName() );
+		BX_TRACE("Supported capabilities (renderer %s, vendor 0x%04x, device 0x%04x):"
+				, s_ctx->m_renderCtx->getRendererName()
+				, g_caps.vendorId
+				, g_caps.deviceId
+				);
 		for (uint32_t ii = 0; ii < BX_COUNTOF(s_capsFlags); ++ii)
 		{
 			if (0 != (g_caps.supported & s_capsFlags[ii].m_flag) )
@@ -1977,7 +1981,7 @@ again:
 		return s_rendererCreator[_type].name;
 	}
 
-	void init(RendererType::Enum _type, CallbackI* _callback, bx::ReallocatorI* _allocator)
+	void init(RendererType::Enum _type, uint16_t _vendorId, uint16_t _deviceId, CallbackI* _callback, bx::ReallocatorI* _allocator)
 	{
 		BX_CHECK(NULL == s_ctx, "bgfx is already initialized.");
 		BX_TRACE("Init...");
@@ -1989,6 +1993,8 @@ again:
 		g_caps.maxViews     = BGFX_CONFIG_MAX_VIEWS;
 		g_caps.maxDrawCalls = BGFX_CONFIG_MAX_DRAW_CALLS;
 		g_caps.maxFBAttachments = 1;
+		g_caps.vendorId = _vendorId;
+		g_caps.deviceId = _deviceId;
 
 		if (NULL != _allocator)
 		{
@@ -3012,9 +3018,11 @@ BGFX_C_API const char* bgfx_get_renderer_name(bgfx_renderer_type_t _type)
 	return bgfx::getRendererName(bgfx::RendererType::Enum(_type) );
 }
 
-BGFX_C_API void bgfx_init(bgfx_renderer_type_t _type, struct bgfx_callback_interface* _callback, struct bgfx_reallocator_interface* _allocator)
+BGFX_C_API void bgfx_init(bgfx_renderer_type_t _type, uint16_t _vendorId, uint16_t _deviceId, bgfx_callback_interface_t* _callback, bgfx_reallocator_interface_t* _allocator)
 {
 	return bgfx::init(bgfx::RendererType::Enum(_type)
+		, _vendorId
+		, _deviceId
 		, reinterpret_cast<bgfx::CallbackI*>(_callback)
 		, reinterpret_cast<bx::ReallocatorI*>(_allocator)
 		);

@@ -494,7 +494,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions_cpp {
 			"-std=c++0x",
-		}		
+		}
 		links {
 			"rt",
 			"dl",
@@ -558,7 +558,6 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-fPIC",
-			"-std=c++0x",
 			"-no-canonical-prefixes",
 			"-Wa,--noexecstack",
 			"-fstack-protector",
@@ -566,6 +565,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 			"-Wunused-value",
 			"-Wundef",
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -670,7 +672,6 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "nacl or nacl-arm or pnacl" }
 		buildoptions {
-			"-std=c++0x",
 			"-U__STRICT_ANSI__", -- strcasecmp, setenv, unsetenv,...
 			"-fno-stack-protector",
 			"-fdiagnostics-show-option",
@@ -678,6 +679,9 @@ function toolchain(_buildDir, _libDir)
 			"-ffunction-sections",
 			"-Wunused-value",
 			"-Wundef",
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
 		}
 		includedirs {
 			"$(NACL_SDK_ROOT)/include",
@@ -831,10 +835,12 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/qnx-arm") }
 --		includedirs { path.join(bxDir, "include/compat/qnx") }
 		buildoptions {
-			"-std=c++0x",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 			"-Wunused-value",
 			"-Wundef",
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
 		}
 
 	configuration { "rpi" }

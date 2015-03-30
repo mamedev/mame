@@ -14,7 +14,7 @@ Supported project generators:
 Download (stable)
 -----------------
 
-	version 242 (commit ce8f85701187fa48521ef0a6d38ac0f13726ae7b)
+	version 252 (commit 845287a25534f752aeb1d845a1208e54b8820be7)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -50,7 +50,7 @@ intention to keep it compatible with it.
  - Added search for default script. Default script name is changed to genie.lua
    (solution.lua and premake4.lua are also allowed), and it can be located in
    `scripts` directory.
- - Updated Lua from 5.1.4 to 5.2.3.
+ - Updated Lua from 5.1.4 to 5.3.0.
  - Disabled `SmallerTypeCheck` VS option when `ExtraWarnings` is set (need to
    move it into separate option).
  - New versioning scheme based on revision number from git.
@@ -117,7 +117,7 @@ state of Premake, it's just acknowledging the problem, and dealing with it.
 
 	GENie
 	Copyright (c) 2014 Branimir Karadžić, Neil Richardson, Mike Popoloski,
-	Drew Solomon, Ted de Munnik, Miodrag Milanović.
+	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without modification,

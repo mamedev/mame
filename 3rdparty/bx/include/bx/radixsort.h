@@ -30,14 +30,16 @@ namespace bx
 			memset(histogram, 0, sizeof(uint16_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
-			uint32_t key = keys[0];
-			uint32_t prevKey = key;
-			for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 			{
-				key = keys[ii];
-				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
-				++histogram[index];
-				sorted &= prevKey <= key;
+				uint32_t key = keys[0];
+				uint32_t prevKey = key;
+				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
+				{
+					key = keys[ii];
+					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+					++histogram[index];
+					sorted &= prevKey <= key;
+				}
 			}
 
 			if (sorted)
@@ -101,14 +103,16 @@ done:
 			memset(histogram, 0, sizeof(uint16_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
-			uint64_t key = keys[0];
-			uint64_t prevKey = key;
-			for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
 			{
-				key = keys[ii];
-				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
-				++histogram[index];
-				sorted &= prevKey <= key;
+				uint64_t key = keys[0];
+				uint64_t prevKey = key;
+				for (uint32_t ii = 0; ii < _size; ++ii, prevKey = key)
+				{
+					key = keys[ii];
+					uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
+					++histogram[index];
+					sorted &= prevKey <= key;
+				}
 			}
 
 			if (sorted)

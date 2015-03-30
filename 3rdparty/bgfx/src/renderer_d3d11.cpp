@@ -513,7 +513,10 @@ namespace bgfx { namespace d3d11
 			m_driverType = D3D_DRIVER_TYPE_HARDWARE;
 
 			IDXGIAdapter* adapter;
-			for (uint32_t ii = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters(ii, &adapter); ++ii)
+			for (uint32_t ii = 0
+				; DXGI_ERROR_NOT_FOUND != factory->EnumAdapters(ii, &adapter) && ii < BX_COUNTOF(g_caps.gpu)
+				; ++ii
+				)
 			{
 				DXGI_ADAPTER_DESC desc;
 				hr = adapter->GetDesc(&desc);
@@ -535,6 +538,19 @@ namespace bgfx { namespace d3d11
 						, desc.DedicatedSystemMemory
 						, desc.SharedSystemMemory
 						);
+
+					g_caps.gpu[ii].vendorId = (uint16_t)desc.VendorId;
+					g_caps.gpu[ii].deviceId = (uint16_t)desc.DeviceId;
+					++g_caps.numGPUs;
+
+					if ( (BGFX_PCI_ID_NONE != g_caps.vendorId ||             0 != g_caps.deviceId)
+					&&   (BGFX_PCI_ID_NONE == g_caps.vendorId || desc.VendorId == g_caps.vendorId)
+					&&   (               0 == g_caps.deviceId || desc.DeviceId == g_caps.deviceId) )
+					{
+						m_adapter = adapter;
+						m_adapter->AddRef();
+						m_driverType = D3D_DRIVER_TYPE_UNKNOWN;
+					}
 
 					if (BX_ENABLED(BGFX_CONFIG_DEBUG_PERFHUD)
 					&&  0 != strstr(description, "PerfHUD") )
@@ -594,6 +610,11 @@ namespace bgfx { namespace d3d11
 			}
 			BGFX_FATAL(SUCCEEDED(hr), Fatal::UnableToInitialize, "Unable to create Direct3D11 device.");
 
+			if (NULL != m_adapter)
+			{
+				DX_RELEASE(m_adapter, 2);
+			}
+
 			IDXGIDevice* device = NULL;
 			hr = E_FAIL;
 			for (uint32_t ii = 0; ii < BX_COUNTOF(s_deviceIIDs) && FAILED(hr); ++ii)
@@ -616,6 +637,8 @@ namespace bgfx { namespace d3d11
 
 			hr = adapter->GetDesc(&m_adapterDesc);
 			BGFX_FATAL(SUCCEEDED(hr), Fatal::UnableToInitialize, "Unable to create Direct3D11 device.");
+			g_caps.vendorId = (uint16_t)m_adapterDesc.VendorId;
+			g_caps.deviceId = (uint16_t)m_adapterDesc.DeviceId;
 
 #if BX_PLATFORM_WINRT
 			hr = adapter->GetParent(__uuidof(IDXGIFactory2), (void**)&m_factory);
@@ -734,7 +757,7 @@ namespace bgfx { namespace d3d11
 				{
 					D3D11_FEATURE_DATA_FORMAT_SUPPORT data; // D3D11_FEATURE_DATA_FORMAT_SUPPORT2
 					data.InFormat = s_textureFormat[ii].m_fmt;
-					HRESULT hr = m_device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT, &data, sizeof(data) );
+					hr = m_device->CheckFeatureSupport(D3D11_FEATURE_FORMAT_SUPPORT, &data, sizeof(data) );
 					if (SUCCEEDED(hr) )
 					{
 						support |= 0 != (data.OutFormatSupport & (0
@@ -3123,6 +3146,7 @@ namespace bgfx { namespace d3d11
 		uint32_t statsNumPrimsRendered[BX_COUNTOF(s_primInfo)] = {};
 		uint32_t statsNumInstances[BX_COUNTOF(s_primInfo)] = {};
 		uint32_t statsNumIndices = 0;
+		uint32_t statsKeyType[2] = {};
 
 		if (0 == (_render->m_debug&BGFX_DEBUG_IFH) )
 		{
@@ -3135,6 +3159,8 @@ namespace bgfx { namespace d3d11
 			for (int32_t item = 0, restartItem = numItems; item < numItems || restartItem < numItems;)
 			{
 				const bool isCompute = key.decode(_render->m_sortKeys[item], _render->m_viewRemap);
+				statsKeyType[isCompute]++;
+
 				const bool viewChanged = 0
 					|| key.m_view != view
 					|| item == numItems
@@ -3778,8 +3804,10 @@ namespace bgfx { namespace d3d11
 					);
 
 				double elapsedCpuMs = double(elapsed)*toMs;
-				tvm.printf(10, pos++, 0x8e, "  Draw calls: %4d / CPU %3.4f [ms]"
+				tvm.printf(10, pos++, 0x8e, "   Submitted: %4d (draw %4d, compute %4d) / CPU %3.4f [ms]"
 					, _render->m_num
+					, statsKeyType[0]
+					, statsKeyType[1]
 					, elapsedCpuMs
 					);
 				for (uint32_t ii = 0; ii < BX_COUNTOF(s_primName); ++ii)
