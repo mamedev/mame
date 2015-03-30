@@ -105,6 +105,15 @@ public:
 	DECLARE_WRITE16_MEMBER(alnattck_grid_w);
 	DECLARE_READ16_MEMBER(alnattck_input_r);
 
+	DECLARE_WRITE8_MEMBER(packmon_plate_w);
+	DECLARE_WRITE16_MEMBER(packmon_grid_w);
+	DECLARE_READ16_MEMBER(packmon_input_r);
+
+	DECLARE_WRITE8_MEMBER(zackman_plate_w);
+	DECLARE_WRITE16_MEMBER(zackman_grid_w);
+	void zackman_update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(zackman_input_changed);
+
 	void cdkong_display();
 	DECLARE_WRITE8_MEMBER(cdkong_plate_w);
 	DECLARE_WRITE16_MEMBER(cdkong_grid_w);
@@ -428,7 +437,61 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+WRITE8_MEMBER(hh_hmcs40_state::packmon_plate_w)
+{
+	// R0x-R3x, D0-D3: vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,0,1,2,3,4,5,6,19,18,17,16,15,14,13,12,11,10,9,8,7);
+
+	display_matrix(20, 10, plate, grid);
+}
+
+WRITE16_MEMBER(hh_hmcs40_state::packmon_grid_w)
+{
+	// D4: speaker out
+	m_speaker->level_w(data >> 4 & 1);
+
+	// D11-D15: input mux
+	m_inp_mux = data >> 11 & 0x1f;
+
+	// D6-D15: vfd matrix grid
+	m_grid = data >> 6 & 0x3ff;
+
+	// D0-D3: plate 9-12 (update display there)
+	packmon_plate_w(space, 4, data & 0xf);
+	
+	//             12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,13,14,15,16,17,18,19
+	// 23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+	// 23,22,21,20, 0, 1, 2, 3, 4, 5, 6,19,18,17,16,15,14,13,12,11,10, 9, 8, 7
+	
+}
+
+READ16_MEMBER(hh_hmcs40_state::packmon_input_r)
+{
+	// D5: multiplexed inputs
+	return read_inputs(5);
+}
+
+
 static INPUT_PORTS_START( packmon )
+	PORT_START("IN.0") // D11 line D5
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START )
+
+	PORT_START("IN.1") // D12 line D5
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+
+	PORT_START("IN.2") // D13 line D5
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+
+	PORT_START("IN.3") // D14 line D5
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.4") // D15 line D5
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 INPUT_PORTS_END
 
 
@@ -436,8 +499,14 @@ static MACHINE_CONFIG_START( packmon, hh_hmcs40_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(hh_hmcs40_state, packmon_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, packmon_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, packmon_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, packmon_plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, packmon_grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(hh_hmcs40_state, packmon_input_r))
 
-//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -462,7 +531,70 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+WRITE8_MEMBER(hh_hmcs40_state::zackman_plate_w)
+{
+	// R0x-R6x,D0,D1: vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	
+	//       13,12,nc,14,15,16,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,17,18,19,20,21,22,23,24,25,26,27,28
+	// 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+	// 31,30,27, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12
+	
+	// update display
+	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	UINT32 plate = BITSWAP32(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
+
+	display_matrix(29, 8, plate, grid);
+}
+
+WRITE16_MEMBER(hh_hmcs40_state::zackman_grid_w)
+{
+	// D2: speaker out
+	m_speaker->level_w(data >> 2 & 1);
+
+	// D11-D14: input mux
+	UINT8 inp_mux = data >> 11 & 0xf;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		zackman_update_int0();
+	}
+	
+	// D8-D15: vfd matrix grid
+	m_grid = data >> 8 & 0xff;
+	
+	// D0,D1: plate 12,13 (update display there)
+	zackman_plate_w(space, 7, data & 3);
+}
+
+void hh_hmcs40_state::zackman_update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(4));
+}
+
+
+INPUT_CHANGED_MEMBER(hh_hmcs40_state::zackman_input_changed)
+{
+	zackman_update_int0();
+}
+
 static INPUT_PORTS_START( zackman )
+	PORT_START("IN.0") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, zackman_input_changed, NULL)
+
+	PORT_START("IN.1") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, zackman_input_changed, NULL)
+
+	PORT_START("IN.2") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, zackman_input_changed, NULL)
+
+	PORT_START("IN.3") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, zackman_input_changed, NULL)
+
+	PORT_START("IN.4") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
 INPUT_PORTS_END
 
 
@@ -470,8 +602,16 @@ static MACHINE_CONFIG_START( zackman, hh_hmcs40_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(hh_hmcs40_state, zackman_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(hh_hmcs40_state, zackman_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(hh_hmcs40_state, zackman_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(hh_hmcs40_state, zackman_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(hh_hmcs40_state, zackman_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(hh_hmcs40_state, zackman_plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(hh_hmcs40_state, zackman_plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, zackman_grid_w))
 
-//  MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
 	/* no video! */
@@ -536,22 +676,22 @@ static INPUT_PORTS_START( alnattck )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x20, "2" )
 
-	PORT_START("IN.1") // D5 D8
+	PORT_START("IN.1") // D8 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
 
-	PORT_START("IN.2") // D5 D9
+	PORT_START("IN.2") // D9 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
-	PORT_START("IN.3") // D5 D10
+	PORT_START("IN.3") // D10 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 
-	PORT_START("IN.4") // D5 D11
+	PORT_START("IN.4") // D11 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
-	PORT_START("IN.5") // D5 D12
+	PORT_START("IN.5") // D12 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Move")
 
-	PORT_START("IN.6") // D5 D13
+	PORT_START("IN.6") // D13 line D5
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
