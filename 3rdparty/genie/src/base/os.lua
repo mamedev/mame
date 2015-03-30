@@ -77,7 +77,7 @@
 
 			table.insert(formats, "%s")
 			path = path or ""
-			if os.is64bit() and not os.is("macosx") then
+			if os.is64bit() then
 				path = path .. ":/lib64:/usr/lib64/:usr/local/lib64"
 			end
 			path = path .. ":/lib:/usr/lib:/usr/local/lib"
