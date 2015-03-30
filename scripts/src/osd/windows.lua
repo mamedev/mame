@@ -24,13 +24,13 @@ project ("osd_" .. _OPTIONS["osd"])
 	removeflags {
 		"SingleOutputDir",
 	}
-	
+
 	options {
 		"ForceCPP",
 	}
 
 	dofile("windows_cfg.lua")
-	
+
 	defines {
 		"DIRECTINPUT_VERSION=0x0800",
 		"DIRECT3D_VERSION=0x0900",
@@ -101,7 +101,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
-	
+
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
@@ -110,11 +110,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 		"ForceCPP",
 	}
 	removeflags {
-		"SingleOutputDir",	
+		"SingleOutputDir",
 	}
 
 	dofile("windows_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
@@ -146,3 +146,30 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sync/work_osd.c",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.c",
 	}
+
+
+--------------------------------------------------
+-- ledutil
+--------------------------------------------------
+
+if _OPTIONS["with-tools"] then
+	project("ledutil")
+		uuid ("061293ca-7290-44ac-b2b5-5913ae8dc9c0")
+		kind "ConsoleApp"
+
+		options {
+			"ForceCPP",
+		}
+
+		targetdir(MAME_DIR)
+
+		links {
+			"ocore_" .. _OPTIONS["osd"],
+		}
+
+		includeosd()
+
+		files {
+			MAME_DIR .. "src/osd/windows/ledutil.c",
+	}
+end
