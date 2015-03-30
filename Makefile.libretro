@@ -54,8 +54,8 @@ else
 	CORE_DEFINE := -DWANT_UME
 endif
 
-# We build a library, not an executable
-override EMULATOR = $(TARGETLIB)
+# Ensure $(EMULATOR) has no suffixes
+override EMULATOR = $(TARGET)
 
 # libretro's preferred settings
 NOWERROR = 1
@@ -420,6 +420,12 @@ else
 CONLYFLAGS += -std=gnu89
 endif
 
+# This replaces the $(EMULATOR) rule in makefile, so if that changes you may
+# need to modify this recipe accordingly.
+$(EMULATOR): clean-osd $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(OSDOBJS) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
+	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
+	@echo Linking $(TARGETLIB)
+	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
 
 # Upstream cleans $(OBJ) which may not get everything
 clean: clean-libretro
@@ -433,12 +439,5 @@ clean-libretro:
 clean-osd:
 	@echo Deleting object tree obj/osd...
 	$(RM) -r obj/osd/*
-
-# This replaces the $(EMULATOR) rule in makefile, so if that changes you may
-# need to modify this recipe accordingly.
-$(EMULATOR): clean-osd $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(OSDOBJS) $(LIBBUS) $(LIBOPTIONAL) $(LIBEMU) $(LIBDASM) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(LUA_LIB) $(SQLITE3_LIB) $(WEB_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
-	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
-	@echo Linking $(TARGETLIB)
-	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $(TARGETLIB)
 
 .PHONY: clean-osd
