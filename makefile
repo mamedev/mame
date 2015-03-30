@@ -351,10 +351,9 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/bus.lua \
 	scripts/src/netlist.lua \
 	scripts/toolchain.lua \
-	scripts/target/$(TARGET)/$(SUBTARGET).lua
-ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
-SCRIPTS+= src/osd/$(OSD)/$(OSD).mak
-endif
+	scripts/target/$(TARGET)/$(SUBTARGET).lua \
+	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
+	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
 ifdef REGENIE
 SCRIPTS+= regenie
 endif
@@ -719,6 +718,10 @@ endif
 
 ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak
+endif
+
+ifneq (,$(wildcard src/$(TARGET)/$(SUBTARGET).mak))
+include src/$(TARGET)/$(SUBTARGET).mak
 endif
 
 $(GEN_FOLDERS):
