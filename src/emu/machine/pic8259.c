@@ -152,11 +152,6 @@ READ8_MEMBER( pic8259_device::read )
 			if ( m_ocw3 & 0x04 )
 			{
 				/* Polling mode */
-				if ( m_isr & ~m_imr )
-				{
-					acknowledge();
-				}
-
 				if ( m_irr & ~m_imr )
 				{
 					/* check the various IRQs */
@@ -168,6 +163,7 @@ READ8_MEMBER( pic8259_device::read )
 							break;
 						}
 					}
+					acknowledge();
 				}
 			}
 			else
