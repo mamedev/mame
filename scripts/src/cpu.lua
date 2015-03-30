@@ -45,6 +45,9 @@ if (CPUS["8X300"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/8x300/8x300.c",
 	}
+end
+
+if (CPUS["8X300"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/8x300/8x300dasm.c")
 end
 
@@ -57,6 +60,9 @@ if (CPUS["ARC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/arc/arc.c",
 	}
+end
+
+if (CPUS["ARC"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/arc/arcdasm.c")
 end
 
@@ -70,6 +76,9 @@ if (CPUS["ARCOMPACT"]~=null) then
 		MAME_DIR .. "src/emu/cpu/arcompact/arcompact.c",
 		MAME_DIR .. "src/emu/cpu/arcompact/arcompact_execute.c",
 	}
+end
+
+if (CPUS["ARCOMPACT"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/arcompact/arcompactdasm.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/arcompact/arcompactdasm_dispatch.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/arcompact/arcompactdasm_ops.c")
@@ -87,6 +96,9 @@ if (CPUS["ARM"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/arm/arm.c",
 	}
+end
+
+if (CPUS["ARM"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/arm/armdasm.c")
 end
 
@@ -96,6 +108,9 @@ if (CPUS["ARM7"]~=null) then
 		MAME_DIR .. "src/emu/cpu/arm7/arm7thmb.c",
 		MAME_DIR .. "src/emu/cpu/arm7/arm7ops.c",
 	}
+end
+
+if (CPUS["ARM7"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/arm7/arm7dasm.c")
 end
 
@@ -108,6 +123,9 @@ if (CPUS["SE3208"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/se3208/se3208.c",
 	}
+end
+
+if (CPUS["SE3208"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/se3208/se3208dis.c")
 end
 
@@ -120,8 +138,12 @@ if (CPUS["AMIS2000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/amis2000/amis2000.c",
 	}
+end
+
+if (CPUS["AMIS2000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/amis2000/amis2000d.c")
 end
+
 --------------------------------------------------
 -- Alpha 8201
 ---@src/emu/cpu/alph8201/alph8201.h,CPUS += ALPHA8201
@@ -131,6 +153,9 @@ if (CPUS["ALPHA8201"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/alph8201/alph8201.c",
 	}
+end
+
+if (CPUS["ALPHA8201"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/alph8201/8201dasm.c")
 end
 
@@ -143,6 +168,9 @@ if (CPUS["ADSP21XX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/adsp2100/adsp2100.c",
 	}
+end
+
+if (CPUS["ADSP21XX"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/adsp2100/2100dasm.c")
 end
 
@@ -154,8 +182,11 @@ end
 if (CPUS["ADSP21062"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sharc/sharc.c",
-	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sharc/sharcdsm.c")
 	}
+end
+
+if (CPUS["ADSP21062"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sharc/sharcdsm.c")
 end
 
 --------------------------------------------------
@@ -167,6 +198,9 @@ if (CPUS["APEXC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/apexc/apexc.c",
 	}
+end
+
+if (CPUS["APEXC"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/apexc/apexcdsm.c")
 end
 
@@ -179,6 +213,9 @@ if (CPUS["DSP16A"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/dsp16/dsp16.c",
 	}
+end
+
+if (CPUS["DSP16A"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/dsp16/dsp16dis.c")
 end
 
@@ -191,6 +228,9 @@ if (CPUS["DSP32C"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/dsp32/dsp32.c",
 	}
+end
+
+if (CPUS["DSP32C"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/dsp32/dsp32dis.c")
 end
 
@@ -203,6 +243,9 @@ if (CPUS["ASAP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/asap/asap.c",
 	}
+end
+
+if (CPUS["ASAP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/asap/asapdasm.c")
 end
 
@@ -215,6 +258,9 @@ if (CPUS["AM29000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/am29000/am29000.c",
 	}
+end
+
+if (CPUS["AM29000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/am29000/am29dasm.c")
 end
 
@@ -227,6 +273,9 @@ if (CPUS["JAGUAR"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/jaguar/jaguar.c",
 	}
+end
+
+if (CPUS["JAGUAR"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/jaguar/jagdasm.c")
 end
 
@@ -239,6 +288,9 @@ if (CPUS["CUBEQCPU"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cubeqcpu/cubeqcpu.c",
 	}
+end
+
+if (CPUS["CUBEQCPU"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/cubeqcpu/cubedasm.c")
 end
 
@@ -262,6 +314,9 @@ if (CPUS["ESRIP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/esrip/esrip.c",
 	}
+end
+
+if (CPUS["ESRIP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/esrip/esripdsm.c")
 end
 
@@ -274,6 +329,9 @@ if (CPUS["COSMAC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cosmac/cosmac.c",
 	}
+end
+
+if (CPUS["COSMAC"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/cosmac/cosdasm.c")
 end
 
@@ -286,6 +344,9 @@ if (CPUS["COP400"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cop400/cop400.c",
 	}
+end
+
+if (CPUS["COP400"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/cop400/cop410ds.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/cop400/cop420ds.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/cop400/cop440ds.c")
@@ -300,6 +361,9 @@ if (CPUS["CP1610"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cp1610/cp1610.c",
 	}
+end
+
+if (CPUS["CP1610"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/cp1610/1610dasm.c")
 end
 
@@ -312,6 +376,9 @@ if (CPUS["CCPU"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ccpu/ccpu.c",
 	}
+end
+
+if (CPUS["CCPU"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/ccpu/ccpudasm.c")
 end
 
@@ -324,6 +391,9 @@ if (CPUS["T11"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/t11/t11.c",
 	}
+end
+
+if (CPUS["T11"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/t11/t11dasm.c")
 end
 
@@ -336,6 +406,9 @@ if (CPUS["F8"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/f8/f8.c",
 	}
+end
+
+if (CPUS["F8"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/f8/f8dasm.c")
 end
 
@@ -353,6 +426,9 @@ if (CPUS["G65816"]~=null) then
 		MAME_DIR .. "src/emu/cpu/g65816/g65816o3.c",
 		MAME_DIR .. "src/emu/cpu/g65816/g65816o4.c",
 	}
+end
+
+if (CPUS["G65816"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/g65816/g65816ds.c")
 end
 
@@ -394,6 +470,9 @@ if (CPUS["HCD62121"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hcd62121/hcd62121.c",
 	}
+end
+
+if (CPUS["HCD62121"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/hcd62121/hcd62121d.c")
 end
 
@@ -406,6 +485,9 @@ if (CPUS["HMCS40"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40.c",
 	}
+end
+
+if (CPUS["HMCS40"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40d.c")
 end
 
@@ -419,6 +501,9 @@ if (CPUS["SH2"]~=null) then
 		MAME_DIR .. "src/emu/cpu/sh2/sh2.c",
 		MAME_DIR .. "src/emu/cpu/sh2/sh2fe.c",
 	}
+end
+
+if (CPUS["SH2"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sh2/sh2dasm.c")
 end
 
@@ -435,6 +520,9 @@ if (CPUS["SH4"]~=null) then
 		MAME_DIR .. "src/emu/cpu/sh4/sh4tmu.c",
 		MAME_DIR .. "src/emu/cpu/sh4/sh4dmac.c",
 	}
+end
+
+if (CPUS["SH4"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sh4/sh4dasm.c")
 end
 
@@ -447,6 +535,9 @@ if (CPUS["H6280"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/h6280/h6280.c",
 	}
+end
+
+if (CPUS["H6280"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/h6280/6280dasm.c")
 end
 
@@ -459,6 +550,9 @@ if (CPUS["E1"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/e132xs/e132xs.c",
 	}
+end
+
+if (CPUS["E1"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/e132xs/32xsdasm.c")
 end
 
@@ -471,6 +565,9 @@ if (CPUS["IE15"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ie15/ie15.c",
 	}
+end
+
+if (CPUS["IE15"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/ie15/ie15dasm.c")
 end
 
@@ -483,6 +580,9 @@ if (CPUS["I4004"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i4004/i4004.c",
 	}
+end
+
+if (CPUS["I4004"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i4004/4004dasm.c")
 end
 
@@ -495,6 +595,9 @@ if (CPUS["I8008"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i8008/i8008.c",
 	}
+end
+
+if (CPUS["I8008"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i8008/8008dasm.c")
 end
 
@@ -507,6 +610,9 @@ if (CPUS["SCMP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/scmp/scmp.c",
 	}
+end
+
+if (CPUS["SCMP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/scmp/scmpdasm.c")
 end
 
@@ -519,6 +625,9 @@ if (CPUS["I8085"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i8085/i8085.c",
 	}
+end
+
+if (CPUS["I8085"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i8085/8085dasm.c")
 end
 
@@ -533,6 +642,9 @@ if (CPUS["I8089"]~=null) then
 		MAME_DIR .. "src/emu/cpu/i8089/i8089_channel.c",
 		MAME_DIR .. "src/emu/cpu/i8089/i8089_ops.c",
 	}
+end
+
+if (CPUS["I8089"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i8089/i8089_dasm.c")
 end
 
@@ -545,6 +657,9 @@ if (CPUS["MCS48"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mcs48/mcs48.c",
 	}
+end
+
+if (CPUS["MCS48"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mcs48/mcs48dsm.c")
 end
 
@@ -557,6 +672,9 @@ if (CPUS["MCS51"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mcs51/mcs51.c",
 	}
+end
+
+if (CPUS["MCS51"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mcs51/mcs51dasm.c")
 end
 
@@ -586,6 +704,9 @@ if (CPUS["I86"]~=null) then
 		MAME_DIR .. "src/emu/cpu/i86/i186.c",
 		MAME_DIR .. "src/emu/cpu/i86/i286.c",
 	}
+end
+
+if (CPUS["I86"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i386/i386dasm.c")
 end
 
@@ -593,6 +714,9 @@ if (CPUS["I386"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i386/i386.c",
 	}
+end
+
+if (CPUS["I386"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i386/i386dasm.c")
 end
 
@@ -605,6 +729,9 @@ if (CPUS["I860"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i860/i860.c",
 	}
+end
+
+if (CPUS["I860"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i860/i860dis.c")
 end
 
@@ -617,6 +744,9 @@ if (CPUS["I960"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i960/i960.c",
 	}
+end
+
+if (CPUS["I960"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/i960/i960dis.c")
 end
 
@@ -629,10 +759,13 @@ if (CPUS["LH5801"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/lh5801/lh5801.c",
 	}
-	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/lh5801/5801dasm.c")
 end
 
---------------------------------------------------
+if (CPUS["LH5801"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/lh5801/5801dasm.c")
+end
+--------
+------------------------------------------
 -- Manchester Small-Scale Experimental Machine
 ---@src/emu/cpu/ssem/ssem.h,CPUS += SSEM
 --------------------------------------------------
@@ -641,6 +774,9 @@ if (CPUS["SSEM"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ssem/ssem.c",
 	}
+end
+
+if (CPUS["SSEM"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/ssem/ssemdasm.c")
 end
 
@@ -653,6 +789,9 @@ if (CPUS["MB88XX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mb88xx/mb88xx.c",
 	}
+end
+
+if (CPUS["MB88XX"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mb88xx/mb88dasm.c")
 end
 
@@ -665,6 +804,9 @@ if (CPUS["MB86233"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mb86233/mb86233.c",
 	}
+end
+
+if (CPUS["MB86233"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mb86233/mb86233d.c")
 end
 
@@ -677,6 +819,9 @@ if (CPUS["MB86235"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mb86235/mb86235.c",
 	}
+end
+
+if (CPUS["MB86235"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mb86235/mb86235d.c")
 end
 
@@ -689,6 +834,9 @@ if (CPUS["PIC16C5X"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/pic16c5x/pic16c5x.c",
 	}
+end
+
+if (CPUS["PIC16C5X"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/pic16c5x/16c5xdsm.c")
 end
 
@@ -701,6 +849,9 @@ if (CPUS["PIC16C62X"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/pic16c62x/pic16c62x.c",
 	}
+end
+
+if (CPUS["PIC16C62X"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/pic16c62x/16c62xdsm.c")
 end
 
@@ -718,6 +869,9 @@ if (CPUS["MIPS"]~=null) then
 		MAME_DIR .. "src/emu/cpu/mips/mips3fe.c",
 		MAME_DIR .. "src/emu/cpu/mips/mips3drc.c",
 	}
+end
+
+if (CPUS["MIPS"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mips/r3kdasm.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mips/mips3dsm.c")
 end
@@ -737,6 +891,9 @@ if (CPUS["PSX"]~=null) then
 		MAME_DIR .. "src/emu/cpu/psx/rcnt.c",
 		MAME_DIR .. "src/emu/cpu/psx/sio.c",
 	}
+end
+
+if (CPUS["PSX"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/psx/psxdasm.c")
 end
 
@@ -753,6 +910,9 @@ if (CPUS["M37710"]~=null) then
 		MAME_DIR .. "src/emu/cpu/m37710/m37710o2.c",
 		MAME_DIR .. "src/emu/cpu/m37710/m37710o3.c",
 	}
+end
+
+if (CPUS["M37710"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/m37710/m7700ds.c")
 end
 
@@ -809,6 +969,9 @@ if (CPUS["M6800"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m6800/m6800.c",
 	}
+end
+
+if (CPUS["M6800"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/m6800/6800dasm.c")
 end
 
@@ -821,6 +984,9 @@ if (CPUS["M6805"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m6805/m6805.c",
 	}
+end
+
+if (CPUS["M6805"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/m6805/6805dasm.c")
 end
 
@@ -837,6 +1003,9 @@ if (CPUS["M6809"]~=null) then
 		MAME_DIR .. "src/emu/cpu/m6809/hd6309.c",
 		MAME_DIR .. "src/emu/cpu/m6809/konami.c",
 	}
+end
+
+if (CPUS["M6809"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/m6809/6809dasm.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/m6809/6309dasm.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/m6809/knmidasm.c")
@@ -851,6 +1020,9 @@ if (CPUS["MC68HC11"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mc68hc11/mc68hc11.c",
 	}
+end
+
+if (CPUS["MC68HC11"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mc68hc11/hc11dasm.c")
 end
 
@@ -864,6 +1036,9 @@ if (CPUS["M680X0"]~=null) then
 		MAME_DIR .. "src/emu/cpu/m68000/m68kcpu.c",
 		GEN_DIR .. "emu/cpu/m68000/m68kops.c",
 	}
+end
+
+if (CPUS["M680X0"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/m68000/m68kdasm.c")
 end
 
@@ -878,13 +1053,15 @@ if (CPUS["DSP56156"]~=null) then
 		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56mem.c",
 		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56pcu.c",
 	}
+end
+
+if (CPUS["DSP56156"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/dsp56k/dsp56dsm.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/dsp56k/opcode.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/dsp56k/inst.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/dsp56k/pmove.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/dsp56k/tables.c")
 end
-
 
 --------------------------------------------------
 -- PDP-1
@@ -898,6 +1075,9 @@ if (CPUS["PDP1"]~=null) then
 		MAME_DIR .. "src/emu/cpu/pdp1/pdp1.c",
 		MAME_DIR .. "src/emu/cpu/pdp1/tx0.c",
 	}
+end
+
+if (CPUS["PDP1"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/pdp1/pdp1dasm.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/pdp1/tx0dasm.c")
 end
@@ -913,6 +1093,9 @@ if (CPUS["POWERPC"]~=null) then
 		MAME_DIR .. "src/emu/cpu/powerpc/ppcfe.c",
 		MAME_DIR .. "src/emu/cpu/powerpc/ppcdrc.c",
 	}
+end
+
+if (CPUS["POWERPC"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/powerpc/ppc_dasm.c")
 end
 
@@ -929,6 +1112,9 @@ if (CPUS["NEC"]~=null) then
 		MAME_DIR .. "src/emu/cpu/nec/v25sfr.c",
 		MAME_DIR .. "src/emu/cpu/nec/v53.c",
 	}
+end
+
+if (CPUS["NEC"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/nec/necdasm.c")
 end
 
@@ -936,6 +1122,9 @@ if (CPUS["V30MZ"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/v30mz/v30mz.c",
 	}
+end
+
+if (CPUS["V30MZ"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/nec/necdasm.c")
 end
 
@@ -948,6 +1137,9 @@ if (CPUS["V60"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/v60/v60.c",
 	}
+end
+
+if (CPUS["V60"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/v60/v60d.c")
 end
 
@@ -960,6 +1152,9 @@ if (CPUS["V810"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/v810/v810.c",
 	}
+end
+
+if (CPUS["V810"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/v810/v810dasm.c")
 end
 
@@ -972,6 +1167,9 @@ if (CPUS["UPD7725"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/upd7725/upd7725.c",
 	}
+end
+
+if (CPUS["UPD7725"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/upd7725/dasm7725.c")
 end
 
@@ -986,6 +1184,9 @@ if (CPUS["UPD7810"]~=null) then
 		MAME_DIR .. "src/emu/cpu/upd7810/upd7810_opcodes.c",
 		MAME_DIR .. "src/emu/cpu/upd7810/upd7810_table.c",
 	}
+end
+
+if (CPUS["UPD7810"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/upd7810/upd7810_dasm.c")
 end
 
@@ -998,6 +1199,9 @@ if (CPUS["UCOM4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ucom4/ucom4.c",
 	}
+end
+
+if (CPUS["UCOM4"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/ucom4/ucom4d.c")
 end
 
@@ -1010,6 +1214,9 @@ if (CPUS["MINX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/minx/minx.c",
 	}
+end
+
+if (CPUS["MINX"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/minx/minxd.c")
 end
 
@@ -1026,6 +1233,9 @@ if (CPUS["RSP"]~=null) then
 		MAME_DIR .. "src/emu/cpu/rsp/rspcp2.c",
 		MAME_DIR .. "src/emu/cpu/rsp/rspcp2d.c",
 	}
+end
+
+if (CPUS["RSP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/rsp/rsp_dasm.c")
 end
 
@@ -1038,6 +1248,9 @@ if (CPUS["MN10200"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mn10200/mn10200.c",
 	}
+end
+
+if (CPUS["MN10200"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/mn10200/mn102dis.c")
 end
 
@@ -1050,6 +1263,9 @@ if (CPUS["SATURN"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/saturn/saturn.c",
 	}
+end
+
+if (CPUS["SATURN"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/saturn/saturnds.c")
 end
 
@@ -1062,6 +1278,9 @@ if (CPUS["S2650"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/s2650/s2650.c",
 	}
+end
+
+if (CPUS["S2650"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/s2650/2650dasm.c")
 end
 
@@ -1074,6 +1293,9 @@ if (CPUS["SC61860"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sc61860/sc61860.c",
 	}
+end
+
+if (CPUS["SC61860"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sc61860/scdasm.c")
 end
 
@@ -1086,6 +1308,9 @@ if (CPUS["SM8500"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sm8500/sm8500.c",
 	}
+end
+
+if (CPUS["SM8500"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/sm8500/sm8500d.c")
 end
 
@@ -1098,6 +1323,9 @@ if (CPUS["SPC700"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/spc700/spc700.c",
 	}
+end
+
+if (CPUS["SPC700"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/spc700/spc700ds.c")
 end
 
@@ -1110,6 +1338,9 @@ if (CPUS["SSP1601"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ssp1601/ssp1601.c",
 	}
+end
+
+if (CPUS["SSP1601"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/ssp1601/ssp1601d.c")
 end
 
@@ -1122,6 +1353,9 @@ if (CPUS["UNSP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/unsp/unsp.c",
 	}
+end
+
+if (CPUS["UNSP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/unsp/unspdasm.c")
 end
 
@@ -1134,6 +1368,9 @@ if (CPUS["AVR8"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/avr8/avr8.c",
 	}
+end
+
+if (CPUS["AVR8"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/avr8/avr8dasm.c")
 end
 
@@ -1146,6 +1383,9 @@ if (CPUS["TMS0980"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms0980/tms0980.c",
 	}
+end
+
+if (CPUS["TMS0980"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms0980/tms0980d.c")
 end
 
@@ -1158,6 +1398,9 @@ if (CPUS["TMS7000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms7000/tms7000.c",
 	}
+end
+
+if (CPUS["TMS7000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms7000/7000dasm.c")
 end
 
@@ -1176,6 +1419,9 @@ if (CPUS["TMS9900"]~=null) then
 		MAME_DIR .. "src/emu/cpu/tms9900/tms9995.c",
 		MAME_DIR .. "src/emu/cpu/tms9900/ti990_10.c",
 	}
+end
+
+if (CPUS["TMS9900"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms9900/9900dasm.c")
 end
 
@@ -1188,6 +1434,9 @@ if (CPUS["TMS340X0"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms34010/tms34010.c",
 	}
+end
+
+if (CPUS["TMS340X0"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms34010/34010dsm.c")
 end
 
@@ -1200,6 +1449,9 @@ if (CPUS["TMS32010"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32010/tms32010.c",
 	}
+end
+
+if (CPUS["TMS32010"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms32010/32010dsm.c")
 end
 
@@ -1212,6 +1464,9 @@ if (CPUS["TMS32025"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32025/tms32025.c",
 	}
+end
+
+if (CPUS["TMS32025"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms32025/32025dsm.c")
 end
 
@@ -1224,6 +1479,9 @@ if (CPUS["TMS32031"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32031/tms32031.c",
 	}
+end
+
+if (CPUS["TMS32031"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms32031/dis32031.c")
 end
 
@@ -1236,6 +1494,9 @@ if (CPUS["TMS32051"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32051/tms32051.c",
 	}
+end
+
+if (CPUS["TMS32051"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms32051/dis32051.c")
 end
 
@@ -1249,6 +1510,9 @@ if (CPUS["TMS32082"]~=null) then
 		MAME_DIR .. "src/emu/cpu/tms32082/tms32082.c",
 		MAME_DIR .. "src/emu/cpu/tms32082/mp_ops.c",
 	}
+end
+
+if (CPUS["TMS32082"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms32082/dis_mp.c")
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms32082/dis_pp.c")
 end
@@ -1263,6 +1527,9 @@ if (CPUS["TMS57002"]~=null) then
 		MAME_DIR .. "src/emu/cpu/tms57002/tms57002.c",
 		MAME_DIR .. "src/emu/cpu/tms57002/tms57kdec.c",
 	}
+end
+
+if (CPUS["TMS57002"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms57002/57002dsm.c")
 end
 
@@ -1286,6 +1553,9 @@ if (CPUS["TLCS900"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tlcs900/tlcs900.c",
 	}
+end
+
+if (CPUS["TLCS900"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tlcs900/dasm900.c")
 end
 
@@ -1302,6 +1572,9 @@ if (CPUS["Z80"]~=null) then
 		MAME_DIR .. "src/emu/cpu/z80/tmpz84c015.c",
 		MAME_DIR .. "src/emu/cpu/z80/kl5c80a12.c",
 	}
+end
+
+if (CPUS["Z80"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/z80/z80dasm.c")
 end
 
@@ -1314,6 +1587,9 @@ if (CPUS["LR35902"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/lr35902/lr35902.c",
 	}
+end
+
+if (CPUS["LR35902"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/lr35902/lr35902d.c")
 end
 
@@ -1327,6 +1603,9 @@ if (CPUS["Z180"]~=null) then
 		MAME_DIR .. "src/emu/cpu/z180/z180.c",
 		MAME_DIR .. "src/emu/cpu/z80/z80daisy.c",
 	}
+end
+
+if (CPUS["Z180"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/z180/z180dasm.c")
 end
 
@@ -1339,6 +1618,9 @@ if (CPUS["Z8000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/z8000/z8000.c",
 	}
+end
+
+if (CPUS["Z8000"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/z8000/8000dasm.c")
 end
 
@@ -1351,6 +1633,9 @@ if (CPUS["Z8"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/z8/z8.c",
 	}
+end
+
+if (CPUS["Z8"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/z8/z8dasm.c")
 end
 
@@ -1363,6 +1648,9 @@ if (CPUS["SUPERFX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/superfx/superfx.c",
 	}
+end
+
+if (CPUS["SUPERFX"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/superfx/sfx_dasm.c")
 end
 
@@ -1375,6 +1663,9 @@ if (CPUS["PPS4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/pps4/pps4.c",
 	}
+end
+
+if (CPUS["PPS4"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/pps4/pps4dasm.c")
 end
 
@@ -1387,6 +1678,9 @@ if (CPUS["HD61700"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hd61700/hd61700.c",
 	}
+end
+
+if (CPUS["HD61700"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/hd61700/hd61700d.c")
 end
 
@@ -1399,6 +1693,9 @@ if (CPUS["LC8670"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/lc8670/lc8670.c",
 	}
+end
+
+if (CPUS["LC8670"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/lc8670/lc8670dsm.c")
 end
 
@@ -1411,6 +1708,9 @@ if (CPUS["SCUDSP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/scudsp/scudsp.c",
 	}
+end
+
+if (CPUS["SCUDSP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/scudsp/scudspdasm.c")
 end
 
@@ -1423,6 +1723,9 @@ if (CPUS["SCORE"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/score/score.c",
 	}
+end
+
+if (CPUS["SCORE"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/score/scoredsm.c")
 end
 
@@ -1452,7 +1755,10 @@ if (CPUS["ALTO2"]~=null) then
 		MAME_DIR .. "src/emu/cpu/alto2/a2part.c",
 		MAME_DIR .. "src/emu/cpu/alto2/a2ram.c",
 		MAME_DIR .. "src/emu/cpu/alto2/a2roms.c",
-
 	}
+end
+
+if (CPUS["ALTO2"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/alto2/alto2dsm.c")
 end
+

@@ -102,6 +102,41 @@ files {
 -- unidasm
 --------------------------------------------------
 
+project("unidasm")
+uuid ("65f81d3b-299a-4b08-a3fa-d5241afa9fd1")
+kind "ConsoleApp"	
+
+options {
+	"ForceCPP",
+}
+
+configuration { }
+	targetdir(MAME_DIR)
+
+links {
+	"dasm",
+	"emu",
+	"utils",
+	"expat",
+	"zlib",
+	"flac",
+	"7z",	
+	"ocore_" .. _OPTIONS["osd"],
+}
+
+includedirs {
+	MAME_DIR .. "src/emu",
+	MAME_DIR .. "src/lib/util",
+	MAME_DIR .. "3rdparty",
+}
+
+includeosd()
+
+files {
+	MAME_DIR .. "src/tools/unidasm.c",
+}
+
+
 --------------------------------------------------
 -- ldresample
 --------------------------------------------------
