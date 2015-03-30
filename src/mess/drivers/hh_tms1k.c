@@ -261,6 +261,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
   * TMS1100 MCU, labeled MP1030
   * 2 x DS8870N - Hex LED Digit Driver
   * 2 x DS8861N - MOS-to-LED 5-Segment Driver
+  * 10-digit 7seg LED display(2 custom ones) + 4 LEDs, no sound
 
   This is a tabletop educational calculator. It came with plastic overlays
   for playing different kind of games. Refer to the manual on how to use it.
@@ -431,6 +432,8 @@ MACHINE_CONFIG_END
 
   Coleco Amaze-A-Tron, by Ralph Baer
   * TMS1100 MCU, labeled MP3405(die label too)
+  * 2-digit 7seg LED display + 2 LEDs(one red, one green), 1bit sound
+  * 5x5 pressure-sensitive playing board
 
   This is an electronic board game with a selection of 8 maze games,
   most of them for 2 players. A 5x5 playing grid and four markers are
@@ -557,6 +560,7 @@ MACHINE_CONFIG_END
 
   Coleco Total Control 4
   * TMS1400NLL MP7334-N2 (die labeled MP7334)
+  * 2x2-digit 7seg LED display + 4 LEDs, LED grid display, 1bit sound
 
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
@@ -704,6 +708,7 @@ MACHINE_CONFIG_END
 
   Entex Electronic Baseball (1)
   * TMS1000NLP MP0914 (die labeled MP0914A)
+  * 1 7seg LED, and other LEDs behind bezel, 1bit sound
 
   This is a handheld LED baseball game. One player controls the batter, the CPU
   or other player controls the pitcher. Pitcher throw buttons are on a 'joypad'
@@ -826,6 +831,7 @@ MACHINE_CONFIG_END
   Entex Electronic Baseball 2
   * boards are labeled: ZENY
   * TMS1000 MCU, MP0923 (die labeled MP0923)
+  * 3 7seg LEDs, and other LEDs behind bezel, 1bit sound
 
   The Japanese version was published by Gakken, black casing instead of white.
 
@@ -937,6 +943,7 @@ MACHINE_CONFIG_END
   * boards are labeled: ZENY
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
   * 2*SN75492N LED display driver
+  * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound
 
   This is another improvement over Entex Baseball, where gameplay is a bit more
   varied. Like the others, the pitcher controls are on a separate joypad.
@@ -1096,6 +1103,8 @@ MACHINE_CONFIG_END
 
   Ideal Electronic Detective
   * TMS0980NLL MP6100A (die labeled 0980B-00)
+  * 10-digit 7seg LED display, 1bit sound
+  
   hardware (and concept) is very similar to Parker Bros Stop Thief
 
   This is an electronic board game. It requires game cards with suspect info,
@@ -1210,6 +1219,7 @@ MACHINE_CONFIG_END
 
   Kenner Star Wars - Electronic Battle Command
   * TMS1100 MCU, labeled MP3438A
+  * 4x4 LED grid display + 2 separate LEDs and 2-digit 7segs, 1bit sound
 
   This is a small tabletop space-dogfighting game. To start the game,
   press BASIC/INTER/ADV and enter P#(number of players), then
@@ -1320,6 +1330,7 @@ MACHINE_CONFIG_END
 
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die labeled 4A0970D-04A)
+  * 10 LEDs behind bezel, no sound
 
   This is small tabletop Mastermind game; a code-breaking game where the player
   needs to find out the correct sequence of colours (numbers in our case).
@@ -1406,7 +1417,7 @@ MACHINE_CONFIG_END
 
   Revision A hardware:
   * TMS1000 (die labeled MP3226)
-  * DS75494 lamp driver
+  * DS75494 lamp driver, 4 big lamps, 1bit sound
 
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
   instead of the TMS1000. This one has been decapped too, but we couldn't
@@ -1500,8 +1511,10 @@ MACHINE_CONFIG_END
 
   Milton Bradley Super Simon
   * TMS1100 MP3476NLL (die labeled MP3476)
+  * 8 big lamps(2 turn on at same time), 1bit sound
 
-  x
+  The semi-squel to Simon, not as popular. It includes more game variations
+  and a 2-player head-to-head mode.
 
 ***************************************************************************/
 
@@ -1629,6 +1642,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Code Name: Sector, by Bob Doyle
   * TMS0970 MCU, MP0905BNL ZA0379 (die labeled 0970F-05B)
+  * 6-digit 7seg LED display + 4 LEDs for compass, no sound
 
   This is a tabletop submarine pursuit game. A grid board and small toy
   boats are used to remember your locations (a Paint app should be ok too).
@@ -1724,7 +1738,7 @@ MACHINE_CONFIG_END
 
   Parker Bros Merlin handheld game, by Bob Doyle
   * TMS1100NLL MP3404A-N2
-  * red LEDs and 1-bit sound
+  * 11 LEDs behind buttons, 1bit sound
 
   Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
   The one with dark-blue case is the rare sequel Master Merlin. More sequels
@@ -1829,6 +1843,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Stop Thief, by Bob Doyle
   * TMS0980NLL MP6101B (die labeled 0980B-01A)
+  * 3-digit 7seg LED display, 1bit sound
 
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
@@ -1931,6 +1946,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Bank Shot (known as Cue Ball in the UK), by Garry Kitchen
   * TMS1400NLL MP7313-N2 (die labeled MP7313)
+  * LED grid display, 1bit sound
 
   Bank Shot is an electronic pool game. To select a game, repeatedly press
   the [SELECT] button, then press [CUE UP] to start. Refer to the official
@@ -2022,6 +2038,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Split Second
   * TMS1400NLL MP7314-N2 (die labeled MP7314)
+  * LED grid display(default round LEDs, and rectangular shape ones), 1bit sound
 
   This is an electronic handheld reflex gaming device, it's straightforward
   to use. The included mini-games are:
@@ -2117,6 +2134,7 @@ MACHINE_CONFIG_END
 
   Tandy Radio Shack Computerized Arcade (1981, 1982, 1995)
   * TMS1100 MCU, labeled CD7282SL
+  * 12 lamps behind buttons, 1bit sound
 
   This handheld contains 12 minigames. It looks and plays like "Fabulous Fred"
   by the Japanese company Mego Corp. in 1980, which in turn is a mix of Merlin

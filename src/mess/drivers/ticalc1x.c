@@ -89,6 +89,7 @@ void ticalc1x_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 
 
   TI SR-16
   * TMS1000 MCU labeled TMS1001NL. die labeled 1000, 1001A
+  * 12-digit 7seg LED display
 
 ***************************************************************************/
 
@@ -220,7 +221,8 @@ MACHINE_CONFIG_END
 
   TI SR-16 II
   * TMS1000 MCU labeled TMS1016NL. die labeled 1000B, 1016A
-  
+  * 12-digit 7seg LED display
+
   A cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
 ***************************************************************************/
@@ -310,6 +312,7 @@ MACHINE_CONFIG_END
 
   TI-1270
   * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A. die labeled 0970D-74A
+  * 8-digit 7seg LED display
 
 ***************************************************************************/
 
@@ -396,6 +399,7 @@ MACHINE_CONFIG_END
 
   TI WIZ-A-TRON
   * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS. die labeled 0970F-07B
+  * 9-digit 7seg LED display(one custom digit)
 
 ***************************************************************************/
 
@@ -480,6 +484,7 @@ MACHINE_CONFIG_END
 
   TI Little Professor (1976 version)
   * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS. die labeled 0970D-75C
+  * 9-digit 7seg LED display(one custom digit)
 
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
   one is older).
@@ -540,6 +545,7 @@ MACHINE_CONFIG_END
 
   TI Little Professor (1978 version)
   * TMS1990 MCU labeled TMC1993NL. die labeled 1990C-c3C
+  * 9-digit 7seg LED display(one custom digit)
   
   1978 re-release, with on/off and level select on buttons instead of
   switches. The casing was slightly revised in 1980 again, but same rom.
@@ -640,6 +646,7 @@ MACHINE_CONFIG_END
   * TI-30(aka SR-40): TMS0980 MCU labeled TMC0981NL. die labeled 0980B-81F
   * TI Programmer: TMS0980 MCU labeled ZA0675NL, JP0983AT. die labeled 0980B-83
   * TI Business Analyst-I: TMS0980 MCU labeled TMC0982NL. die labeled 0980B-82F
+  * 9-digit 7seg LED display
 
 ***************************************************************************/
 
