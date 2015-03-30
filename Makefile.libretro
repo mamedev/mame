@@ -116,6 +116,9 @@ endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 	PTR64 = 1
 endif
+ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+	PTR64 = 1
+endif
 ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
 	PTR64 = 1
 endif
