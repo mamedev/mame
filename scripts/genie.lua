@@ -237,6 +237,7 @@ end
 		"StaticRuntime",
 		"Unicode",
 		"NoPCH",
+		"IgnoreLDFlags",
 	}
 	
 	configuration { "vs*" }

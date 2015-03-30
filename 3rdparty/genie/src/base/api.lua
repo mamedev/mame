@@ -134,6 +134,7 @@
 					FatalWarnings = 1,
 					FloatFast = 1,
 					FloatStrict = 1,
+					IgnoreLDFlags = 1,
 					Managed = 1,
 					MFC = 1,
 					NativeWChar = 1,

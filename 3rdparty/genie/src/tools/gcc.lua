@@ -164,8 +164,10 @@
 
 		local platform = platforms[cfg.platform]
 		table.insert(result, platform.flags)
-		table.insert(result, platform.ldflags)
-
+		if not cfg.flags.IgnoreLDFlags then
+			table.insert(result, platform.ldflags)
+		end
+		
 		return result
 	end
 
