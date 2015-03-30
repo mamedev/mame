@@ -441,7 +441,7 @@ regenie:
 # gmake-mingw64-gcc
 #-------------------------------------------------
 
-$(PROJECTDIR)/gmake-mingw64-gcc/Makefile: makefile $(SCRIPTS)
+$(PROJECTDIR)/gmake-mingw64-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
@@ -458,7 +458,7 @@ windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
 .PHONY: windows
 windows: windows_x86
 
-$(PROJECTDIR)/gmake-mingw32-gcc/Makefile: makefile $(SCRIPTS)
+$(PROJECTDIR)/gmake-mingw32-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef MINGW32
 	$(error MINGW32 is not set)
 endif
@@ -472,7 +472,7 @@ windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
 # gmake-mingw-clang
 #-------------------------------------------------
 
-$(PROJECTDIR)/gmake-mingw-clang/Makefile: makefile $(SCRIPTS)
+$(PROJECTDIR)/gmake-mingw-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef CLANG
 	$(error CLANG is not set)
 endif
@@ -598,7 +598,7 @@ endif
 # gmake-linux
 #-------------------------------------------------
 
-$(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS)
+$(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: linux_x64
@@ -616,7 +616,7 @@ linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
 # gmake-linux-clang
 #-------------------------------------------------
 
-$(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS)
+$(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: linux_x64_clang
@@ -631,7 +631,7 @@ linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
 # gmake-osx
 #-------------------------------------------------
 
-$(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS)
+$(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --os_version=$(DARWIN_VERSION) --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: macosx_x64
@@ -649,7 +649,7 @@ macosx_x86: generate $(PROJECTDIR)/gmake-osx/Makefile
 # gmake-osx-clang
 #-------------------------------------------------
 
-$(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS)
+$(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --os_version=$(DARWIN_VERSION) --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: macosx_x64_clang
