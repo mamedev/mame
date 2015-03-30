@@ -319,15 +319,14 @@ ifdef TARGETOS
 PARAMS+= --targetos=$(TARGETOS)
 endif
 
-ifdef USE_QT
-PARAMS+= --USE_QT=$(USE_QT)
-else
+ifndef USE_QT
 ifneq ($(TARGETOS),macosx)
-PARAMS+= --USE_QT=1
+USE_QT = 1
 else
-PARAMS+= --USE_QT=0
+USE_QT = 0
 endif
 endif
+PARAMS+= --USE_QT=$(USE_QT)
 
 ifdef LDOPTS
 PARAMS+= --LDOPTS='$(LDOPTS)'
@@ -337,6 +336,7 @@ endif
 # All scripts
 #-------------------------------------------------
 
+
 SCRIPTS = scripts/genie.lua \
 	scripts/src/lib.lua \
 	scripts/src/emu.lua \
@@ -344,24 +344,20 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/main.lua \
 	scripts/src/3rdparty.lua \
 	scripts/src/cpu.lua \
-	scripts/src/osd/windows_cfg.lua \
-	scripts/src/osd/sdl_cfg.lua \
-	scripts/src/osd/windows.lua \
-	scripts/src/osd/osdmini_cfg.lua \
-	scripts/src/osd/osdmini.lua \
+	$(wildcard scripts/src/osd/$(OSD)*.lua) \
 	scripts/src/sound.lua \
 	scripts/src/tools.lua \
 	scripts/src/video.lua \
 	scripts/src/bus.lua \
 	scripts/src/netlist.lua \
 	scripts/toolchain.lua \
-	scripts/target/ume/tiny.lua \
-	scripts/target/ume/ume.lua \
-	scripts/target/mess/tiny.lua \
-	scripts/target/mess/mess.lua \
-	scripts/target/ldplayer/ldplayer.lua \
-	scripts/target/mame/mame.lua \
-	scripts/target/mame/tiny.lua
+	scripts/target/$(TARGET)/$(SUBTARGET).lua
+ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
+SCRIPTS+= src/osd/$(OSD)/$(OSD).mak
+endif
+ifdef REGENIE
+SCRIPTS+= regenie
+endif
 
 #-------------------------------------------------
 # Dependent stuff
@@ -438,44 +434,57 @@ else
 SUBDIR = $(OSD)/$(TARGET)$(SUBTARGET)
 endif
 
+.PHONY: all clean regenie generate
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
+regenie:
 
-windows_x64: generate
+#-------------------------------------------------
+# gmake-mingw64-gcc
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-mingw64-gcc/Makefile: makefile $(SCRIPTS)
 ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
-ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake 
-endif
+
+.PHONY: windows_x64
+windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
+#-------------------------------------------------
+# gmake-mingw32-gcc
+#-------------------------------------------------
+
+.PHONY: windows
 windows: windows_x86
 
-windows_x86: generate
+$(PROJECTDIR)/gmake-mingw32-gcc/Makefile: makefile $(SCRIPTS)
 ifndef MINGW32
 	$(error MINGW32 is not set)
 endif
-ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw32-gcc --gcc_version=$(GCC_VERSION) gmake
-endif
+
+.PHONY: windows_x86
+windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
-windows_x64_clang: generate
+#-------------------------------------------------
+# gmake-mingw-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-mingw-clang/Makefile: makefile $(SCRIPTS)
 ifndef CLANG
 	$(error CLANG is not set)
 endif
-ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
-endif
+
+.PHONY: windows_x64_clang
+windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
 	
-windows_x86_clang: generate
-ifndef CLANG
-	$(error CLANG is not set)
-endif
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw-clang --gcc_version=$(CLANG_VERSION) gmake
-endif
+.PHONY: windows_x86_clang
+windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 vs2010: generate
@@ -587,58 +596,74 @@ endif
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
 
 #-------------------------------------------------
-# linux_gcc
+# gmake-linux
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-gcc --gcc_version=$(GCC_VERSION) gmake
 
+.PHONY: linux_x64
 linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
 
+.PHONY: linux
 linux: linux_x86
 
+.PHONY: linux_x86
 linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
 
 #-------------------------------------------------
-# linux_clang
+# gmake-linux-clang
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS)
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=linux-clang --gcc_version=$(CLANG_VERSION) gmake
 
+.PHONY: linux_x64_clang
 linux_x64_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)64
 
+.PHONY: linux_x86_clang
 linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)32
 
-macosx_x64: generate
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
-endif
+#-------------------------------------------------
+# gmake-osx
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --os_version=$(DARWIN_VERSION) --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: macosx_x64
+macosx_x64: generate $(PROJECTDIR)/gmake-osx/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)64
 
+.PHONY: macosx
 macosx: macosx_x86
 
-macosx_x86: generate
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --os_version=$(DARWIN_VERSION) --gcc_version=$(GCC_VERSION) gmake
-endif
+.PHONY: macosx_x86
+macosx_x86: generate $(PROJECTDIR)/gmake-osx/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)32
 
-macosx_x64_clang: generate
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
-endif
+#-------------------------------------------------
+# gmake-osx-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --os_version=$(DARWIN_VERSION) --gcc_version=$(CLANG_VERSION) gmake
+
+.PHONY: macosx_x64_clang
+macosx_x64_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)64
 
-macosx_x86_clang: generate
-ifndef COMPILE
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --os_version=$(DARWIN_VERSION) --gcc_version=$(CLANG_VERSION) gmake
-endif
+.PHONY: macosx_x86_clang
+macosx_x86_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
 	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
+
+#-------------------------------------------------
+# Clean/bootstrap
+#-------------------------------------------------
 
 $(GENIE):
 	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
@@ -666,9 +691,9 @@ GEN_FOLDERS :=  \
 	$(GENDIR)/osd/modules/debugger/qt/ \
 	$(GENDIR)/resource/
 
-LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/mame/layout/*.lay) $(wildcard $(SRC)/mess/layout/*.lay) $(wildcard $(SRC)/ldplayer/layout/*.lay)
+LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
-ifeq ($(TARGETOS),macosx)
+ifeq ($(USE_QT),0)
 MOC_FILES=
 else
 MOC_FILES=$(wildcard $(SRC)/osd/modules/debugger/qt/*.h)
