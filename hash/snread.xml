@@ -40,6 +40,30 @@
 		</part>
 	</software>
 
+	<software name="mknight">
+		<description>The Millionth Knight</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD3540"/>
+		<part name="cart" interface="snread">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd3540.vsm" size="0x4000" crc="80c4da54" sha1="5663c8548484499a55052bc712440e794c8ba543" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sealfly">
+		<description>The Seal That Could Fly</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<info name="serial" value="CD3535"/>
+		<part name="cart" interface="snread">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cd3535.vsm" size="0x4000" crc="0694525d" sha1="d7ce974ad70e05be50f8cba5aab0a0adbfb54f8b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="whoszoo">
 		<description>Who's Who at the Zoo</description>
 		<year>1980</year>
