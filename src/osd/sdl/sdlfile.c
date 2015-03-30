@@ -471,7 +471,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 
 static int osd_is_path_separator(char c)
 {
-	return (c == '/') || (c == '\\');
+	return (c == PATHSEPCH) || (c == INVPATHSEPCH);
 }
 
 //============================================================

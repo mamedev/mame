@@ -45,5 +45,3 @@ static __inline double log2(double x) { return log(x) * M_LOG2E; }
 #define min(x,y) fmin(x,y)
 #define max(x,y) fmax(x,y)
 #endif
-
-#define PATH_SEPARATOR      "\\"

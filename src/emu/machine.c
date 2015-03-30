@@ -1217,11 +1217,11 @@ astring &running_machine::nvram_filename(astring &result, device_t &device)
 		const char *software = image_parent_basename(&device);
 		if (software!=NULL && strlen(software)>0)
 		{
-			result.cat('\\').cat(software);
+			result.cat(PATH_SEPARATOR).cat(software);
 		}
 		astring tag(device.tag());
 		tag.del(0, 1).replacechr(':', '_');
-		result.cat('\\').cat(tag);
+		result.cat(PATH_SEPARATOR).cat(tag);
 	}
 	return result;
 }
