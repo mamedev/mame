@@ -21,7 +21,8 @@
  @MP1204   TMS1100  1980, Entex Baseball 3
  *MP1221   TMS1100  1980, Entex Raise The Devil
  *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
- *MP2139   ?        1982, Gakken Galaxy Invader 1000 (? note: VFD-capable)
+ *MP2105   TMS1370  1979, Gakken Poker, Entex Electronic Poker
+ *MP2139   TMS1370? 1982, Gakken Galaxy Invader 1000
  *MP2788   ?        1980, Bandai Flight Time (? note: VFD-capable)
  @MP3226   TMS1000  1978, Milton Bradley Simon
  *MP3301   TMS1000  1979, Milton Bradley Bigtrak
@@ -52,10 +53,11 @@
   MP7332   TMS1400  1981, Milton Bradley Dark Tower -> mbdtower.c
  @MP7334   TMS1400  1981, Coleco Total Control 4
  *MP7573   ?        1981, Entex Select-a-Game cartridge: Football (? note: 40-pin, VFD-capable)
- *M95041   ?        1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
 
   inconsistent:
 
+ *MPF553   TMS1670  1980, Entex Jackpot Gin Rummy Black Jack
+ *M95041   ?        1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
  @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
@@ -87,7 +89,7 @@
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
 #include "simon.lh" // clickable
-#include "ssimon.lh"
+#include "ssimon.lh" // clickable
 #include "splitsec.lh"
 #include "starwbc.lh"
 #include "stopthie.lh"
@@ -2504,7 +2506,7 @@ CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Ken
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
-CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE )
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )

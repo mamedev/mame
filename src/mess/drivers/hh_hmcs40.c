@@ -1169,7 +1169,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(hh_hmcs40_state::pbqbert_plate_w)
 {
-	// R0x-R3x,D8: vfd matrix plate
+	// R0x-R6x,D8: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	
@@ -1419,8 +1419,8 @@ CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Banda
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING ) // original version is Super Puck Monster, by Gakken
+CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING ) // "
 CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
