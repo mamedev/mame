@@ -405,8 +405,7 @@ project "portmidi"
 	files {
 		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
 		MAME_DIR .. "3rdparty/portmidi/pm_common/pmutil.c",
-		MAME_DIR .. "3rdparty/portmidi/porttime/porttime.c",
-		}
+	}
 
 	if _OPTIONS["targetos"]=="windows" then
 		files {
