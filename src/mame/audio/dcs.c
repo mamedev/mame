@@ -927,6 +927,7 @@ void dcs2_audio_device::device_start()
 	if (m_dram_in_mb != 0)
 	{
 		m_sounddata = auto_alloc_array(machine(), UINT16, m_dram_in_mb << (20-1));
+		save_pointer(NAME(m_sounddata), m_dram_in_mb << (20-1));
 		m_sounddata_words = (m_dram_in_mb << 20) / 2;
 	}
 	else
