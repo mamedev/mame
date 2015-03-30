@@ -69,7 +69,7 @@ public:
 	UINT32 m_grid;                      // VFD current row data
 	UINT32 m_plate;                     // VFD current column data
 
-	UINT32 m_display_state[0x20];       // display matrix rows data
+	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
@@ -162,7 +162,7 @@ void hh_ucom4_state::display_update()
 	{
 		active_state[y] = 0;
 
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 		{
 			// turn on powered segments
 			if (m_display_state[y] >> x & 1)
@@ -182,15 +182,25 @@ void hh_ucom4_state::display_update()
 				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x < m_display_maxx; x++)
+			for (int x = 0; x <= m_display_maxx; x++)
 			{
 				int state = active_state[y] >> x & 1;
-				output_set_lamp_value(y * mul + x, state);
-
-				// bit coords for svg2lay
-				char buf[10];
-				sprintf(buf, "%d.%d", y, x);
-				output_set_value(buf, state);
+				char buf1[0x10]; // lampyx
+				char buf2[0x10]; // y.x
+				
+				if (x == m_display_maxx)
+				{
+					// always-on if selected
+					sprintf(buf1, "lamp%da", y);
+					sprintf(buf2, "%d.a", y);
+				}
+				else
+				{
+					sprintf(buf1, "lamp%d", y * mul + x);
+					sprintf(buf2, "%d.%d", y, x);
+				}
+				output_set_value(buf1, state);
+				output_set_value(buf2, state);
 			}
 		}
 
@@ -201,7 +211,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_ucom4_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 
@@ -221,7 +231,7 @@ void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	// update current state
 	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
 	display_update();
 }
@@ -625,9 +635,8 @@ WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
 	// E,F,G,H,I01: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	m_plate |= 1 << 18; // for always-on plates
 
-	display_matrix(18+1, 8, m_plate, m_grid);
+	display_matrix(18, 8, m_plate, m_grid);
 }
 
 
@@ -839,7 +848,6 @@ void hh_ucom4_state::tmpacman_display()
 {
 	UINT16 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
-	plate |= 0x100; // plate 8(maze) is always on
 
 	display_matrix(19, 8, plate, grid);
 }
@@ -951,10 +959,9 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 		// E23,F,G,H,I: vfd matrix plate
 		int shift = (offset - NEC_UCOM4_PORTE) * 4;
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
-		m_plate |= 1 << 17; // for always-on plates
 	}
 
-	display_matrix(17+1, 9, m_plate, m_grid);
+	display_matrix(17, 9, m_plate, m_grid);
 }
 
 READ8_MEMBER(hh_ucom4_state::alnchase_input_r)

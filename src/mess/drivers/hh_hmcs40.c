@@ -86,7 +86,7 @@ public:
 	UINT32 m_grid;                      // VFD current row data
 	UINT64 m_plate;                     // VFD current column data
 
-	UINT64 m_display_state[0x20];       // display matrix rows data
+	UINT64 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT64 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x40];  // (internal use)
@@ -216,7 +216,7 @@ void hh_hmcs40_state::display_update()
 	{
 		active_state[y] = 0;
 
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 		{
 			// turn on powered segments
 			if (m_display_state[y] >> x & 1)
@@ -236,15 +236,25 @@ void hh_hmcs40_state::display_update()
 				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x < m_display_maxx; x++)
+			for (int x = 0; x <= m_display_maxx; x++)
 			{
 				int state = active_state[y] >> x & 1;
-				output_set_lamp_value(y * mul + x, state);
-
-				// bit coords for svg2lay
-				char buf[10];
-				sprintf(buf, "%d.%d", y, x);
-				output_set_value(buf, state);
+				char buf1[0x10]; // lampyx
+				char buf2[0x10]; // y.x
+				
+				if (x == m_display_maxx)
+				{
+					// always-on if selected
+					sprintf(buf1, "lamp%da", y);
+					sprintf(buf2, "%d.a", y);
+				}
+				else
+				{
+					sprintf(buf1, "lamp%d", y * mul + x);
+					sprintf(buf2, "%d.%d", y, x);
+				}
+				output_set_value(buf1, state);
+				output_set_value(buf2, state);
 			}
 		}
 
@@ -255,7 +265,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
 
@@ -275,7 +285,7 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 set
 	// update current state
 	UINT64 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
 	display_update();
 }
@@ -736,7 +746,6 @@ MACHINE_CONFIG_END
 void hh_hmcs40_state::cdkong_display()
 {
 	UINT32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4);
-	plate |= 0x800800; // plates 11,23 are always on
 
 	display_matrix(29, 11, plate, m_grid);
 }
@@ -953,7 +962,6 @@ WRITE8_MEMBER(hh_hmcs40_state::cpacman_plate_w)
 	
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
 	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
-	plate |= 0x2000; // plate 13(maze) is always on
 
 	display_matrix(27, 11, plate, grid);
 }
@@ -1048,13 +1056,12 @@ WRITE8_MEMBER(hh_hmcs40_state::cmspacmn_plate_w)
 
 	// update display
 	//                   22,17                               18,13
-	// 31,30,29,28,27,26, 6,11,23,21,20,19,15, 2, 1, 0,32,31,30,29,12, 9, 4, 8,25,26,27,28,16,10, 3, 5
+	//                    6,11,23,21,20,19,15, 2, 1, 0,32,31,30,29,12, 9, 4, 8,25,26,27,28,16,10, 3, 5
 	// 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 	// 14,13,12, 4, 5, 6, 7,24,23,25,22,21,20,13,24, 3,19,14,12,11,24, 2,10, 8, 7,25, 0, 9, 1,18,17,16
 	
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,1,0);
 	UINT64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16);
-	plate |= 0x1004080; // plates 7,14,24 are always on
 
 	display_matrix(33, 12, plate, grid);
 }
@@ -1144,9 +1151,8 @@ void hh_hmcs40_state::egalaxn2_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
-	plate |= 1 << 24; // for always-on plates
 
-	display_matrix(24+1, 15, plate, grid);
+	display_matrix(24, 15, plate, grid);
 }
 
 WRITE16_MEMBER(hh_hmcs40_state::egalaxn2_grid_w)
@@ -1331,7 +1337,6 @@ WRITE8_MEMBER(hh_hmcs40_state::pbqbert_plate_w)
 
 	// update display
 	UINT32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23);
-	plate |= 0x400000; // plate 22 is always on
 	
 	display_matrix(30, 8, plate, m_grid);
 }
