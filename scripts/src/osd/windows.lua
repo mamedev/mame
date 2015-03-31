@@ -171,5 +171,5 @@ if _OPTIONS["with-tools"] then
 
 		files {
 			MAME_DIR .. "src/osd/windows/ledutil.c",
-	}
+		}
 end

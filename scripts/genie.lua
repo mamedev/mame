@@ -50,7 +50,7 @@ BUSES  = {}
 newoption {
 	trigger = "with-tools",
 	description = "Enable building tools.",
-} 
+}
 
 newoption {
 	trigger = "osd",
@@ -709,8 +709,6 @@ configuration { "linux-*" }
 			"GL",
 			"m",
 			"util",
-			"X11",
-			"Xinerama",
 		}
 		defines 
 		{
@@ -726,18 +724,11 @@ configuration { "linux-*" }
 
 configuration { "osx*" }
 		links {
-			"SDL2.framework",
 			"Cocoa.framework",
 			"OpenGL.framework",
 			"CoreAudio.framework",
 			"CoreMIDI.framework",
 			"pthread",
-		}
-		buildoptions {
-			"-F/Library/Frameworks/",
-		}
-		linkoptions {
-			"-F/Library/Frameworks/",
 		}
 		flags {
 			"Symbols",
