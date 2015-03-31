@@ -101,6 +101,10 @@ public:
 	DECLARE_WRITE16_MEMBER(starwbc_write_o);
 	DECLARE_READ8_MEMBER(starwbc_read_k);
 
+	DECLARE_WRITE16_MEMBER(astro_write_r);
+	DECLARE_WRITE16_MEMBER(astro_write_o);
+	DECLARE_READ8_MEMBER(astro_read_k);
+
 	DECLARE_WRITE16_MEMBER(comp4_write_r);
 	DECLARE_WRITE16_MEMBER(comp4_write_o);
 	DECLARE_READ8_MEMBER(comp4_read_k);

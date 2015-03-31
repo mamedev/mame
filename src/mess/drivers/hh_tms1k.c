@@ -17,7 +17,7 @@
  @MP0914   TMS1000  1979, Entex Baseball 1
  @MP0923   TMS1000  1979, Entex Baseball 2
  @MP1030   TMS1100  1980, APF Mathemagician
- *MP1133   TMS1470  1979, Kosmos Astro
+ @MP1133   TMS1470  1979, Kosmos Astro
  @MP1204   TMS1100  1980, Entex Baseball 3
  *MP1221   TMS1100  1980, Entex Raise The Devil
  *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
@@ -50,6 +50,7 @@
  *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
  @MP7313   TMS1400  1980, Parker Brothers Bank Shot
  @MP7314   TMS1400  1980, Parker Brothers Split Second
+ *MP7324   TMS1400? 1985, Coleco Talking Teacher
   MP7332   TMS1400  1981, Milton Bradley Dark Tower -> mbdtower.c
  @MP7334   TMS1400  1981, Coleco Total Control 4
  *MP7573   ?        1981, Entex Select-a-Game cartridge: Football (? note: 40-pin, VFD-capable)
@@ -79,6 +80,7 @@
 
 // internal artwork
 #include "amaztron.lh"
+#include "astro.lh"
 #include "bankshot.lh"
 #include "cnsector.lh"
 #include "ebball.lh"
@@ -1338,6 +1340,54 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Kosmos Astro
+  * TMS1470NLHL MP1133 (die labeled TMS1400 MP1133)
+  * 9digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
+
+  x
+
+***************************************************************************/
+
+WRITE16_MEMBER(hh_tms1k_state::astro_write_r)
+{
+}
+
+WRITE16_MEMBER(hh_tms1k_state::astro_write_o)
+{
+}
+
+READ8_MEMBER(hh_tms1k_state::astro_read_k)
+{
+	return 0;
+}
+
+
+static INPUT_PORTS_START( astro )
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( astro, hh_tms1k_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1470, 400000) // approximation - RC osc. R=4.7K, C=33pf, but unknown RC curve
+	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, astro_read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, astro_write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, astro_write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_astro)
+
+	/* no video! */
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Milton Bradley Comp IV
   * TMC0904NL CP0904A (die labeled 4A0970D-04A)
   * 10 LEDs behind bezel, no sound
@@ -2391,6 +2441,17 @@ ROM_START( starwbcp )
 ROM_END
 
 
+ROM_START( astro )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp1133", 0x0000, 0x1000, CRC(bc21109c) SHA1(05a433cce587d5c0c2d28b5fda5f0853ea6726bf) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1400_astro_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_astro_opla.pla", 0, 557, CRC(eb08957e) SHA1(62ae0d13a1eaafb34f1b27d7df51441b400ccd56) )
+ROM_END
+
+
 ROM_START( comp4 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc0904nl_cp0904a", 0x0000, 0x0400, CRC(6233ee1b) SHA1(738e109b38c97804b4ec52bed80b00a8634ad453) )
@@ -2518,7 +2579,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
 CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
@@ -2531,6 +2592,8 @@ CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ide
 
 CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
 CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (prototype)", GAME_SUPPORTS_SAVE )
+
+COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kosmos", "Astro", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_NOT_WORKING )
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
