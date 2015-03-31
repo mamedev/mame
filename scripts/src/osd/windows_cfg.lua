@@ -1,7 +1,3 @@
-forcedincludes {
-	MAME_DIR .. "src/osd/windows/winprefix.h"
-}
-
 defines {
 	"UNICODE",
 	"_UNICODE",
@@ -13,4 +9,5 @@ defines {
 	"DIRECTINPUT_VERSION=0x0800",
 	"SDLMAME_NET_PCAP",
 	"main=utf8_main",
+	"_WIN32_WINNT=0x0501",
 }

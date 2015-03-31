@@ -242,4 +242,10 @@ static __inline double log2(double x) { return log(x) * M_LOG2E; }
 #endif
 #endif
 
+#ifdef __GNUC__
+#ifndef alloca
+#define alloca  __builtin_alloca
+#endif
+#endif
+
 #endif  /* __OSDCOMM_H__ */
