@@ -232,7 +232,6 @@ end
 
 configuration { "mingw*" }
 		linkoptions {
-			"-Wl,--allow-multiple-definition",
 			"-static"
 		}
 
