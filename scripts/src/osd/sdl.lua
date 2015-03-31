@@ -206,19 +206,6 @@ elseif _OPTIONS["targetos"]=="os2" then
 	SYNC_IMPLEMENTATION = "os2"
 end
 
-if _OPTIONS["NO_X11"]~="1" then
-	libdirs {
-		"/usr/X11/lib",
-		"/usr/X11R6/lib",
-		"/usr/openwin/lib",
-	}
-	if _OPTIONS["SDL_LIBVER"]=="sdl" then
-		links {
-			"X11",
-		}
-	end
-end
-
 if BASE_TARGETOS=="unix" then
 	if _OPTIONS["targetos"]=="macosx" then
 		links {
@@ -243,6 +230,21 @@ if BASE_TARGETOS=="unix" then
 			}
 		end
 	else
+		if _OPTIONS["NO_X11"]=="1" then
+			_OPTIONS["USE_QTDEBUG"] = "0"
+			USE_BGFX = 0
+		else
+			libdirs {
+				"/usr/X11/lib",
+				"/usr/X11R6/lib",
+				"/usr/openwin/lib",
+			}
+			if _OPTIONS["SDL_LIBVER"]=="sdl" then
+				links {
+					"X11",
+				}
+			end
+		end
 		linkoptions {
 			string.gsub(os.outputof(sdlconfigcmd() .. " --libs"), '[\r\n]+', ' '),
 		}
