@@ -922,6 +922,43 @@ WRITE32_MEMBER(hng64_state::hng64_vregs_w)
 	COMBINE_DATA(&m_videoregs[offset]);
 }
 
+READ16_MEMBER(hng64_state::main_sound_comms_r)
+{
+	switch(offset *2)
+	{
+		case 0x04:
+			return sound_latch[0];
+		case 0x06:
+			return sound_latch[1];
+		default:
+			printf("%08x R\n",offset*2);
+			break;
+	}
+	return 0;
+}
+
+WRITE16_MEMBER(hng64_state::main_sound_comms_w)
+{
+	switch(offset * 2)
+	{
+		case 0x00:
+			COMBINE_DATA(&main_latch[0]);
+			break;
+		case 0x02:
+			COMBINE_DATA(&main_latch[1]);
+			break;
+		case 0x08:
+			m_audiocpu->set_input_line(5, ASSERT_LINE);
+			if(data != 1)
+				printf("IRQ send %02x?\n",data);
+			break;
+		default:
+			printf("%02x %04x\n",offset*2,data);
+			break;
+	}
+}
+
+
 static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("mainram")
@@ -963,9 +1000,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
-//  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP    // ??
-//  AM_RANGE(0x68000004, 0x68000007) AM_READNOP     // ??
-//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITENOP    // ??
+	AM_RANGE(0x68000000, 0x6800000f) AM_READWRITE16(main_sound_comms_r,main_sound_comms_w,0xffffffff)
 	AM_RANGE(0x6f000000, 0x6f000003) AM_WRITE(hng64_soundcpu_enable_w)
 
 	// Communications

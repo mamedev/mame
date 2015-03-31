@@ -381,4 +381,9 @@ public:
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
+	DECLARE_READ16_MEMBER(main_sound_comms_r);
+	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
+	DECLARE_READ16_MEMBER(sound_comms_r);
+	DECLARE_WRITE16_MEMBER(sound_comms_w);
+	UINT16 main_latch[2],sound_latch[2];
 };

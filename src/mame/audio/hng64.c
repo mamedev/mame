@@ -205,7 +205,7 @@ READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 {
 	// read in irq5
 	logerror("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
-	return rand();
+	return 0;
 }
 
 
@@ -254,44 +254,45 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_000c_w)
 }
 
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0102_w)
-{
-	logerror("hng64_port 0x0102 %04x\n", data);
-}
-
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0080_w)
 {
 	logerror("hng64_port 0x0080 %04x\n", data);
 }
 
-READ16_MEMBER(hng64_state::hng64_sound_port_0106_r)
+
+WRITE16_MEMBER(hng64_state::sound_comms_w)
 {
-	// read in irq5
-	logerror("%08x: hng64_sound_port_0106_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
-	return rand();
+	switch(offset*2)
+	{
+		case 0x0:
+			COMBINE_DATA(&sound_latch[0]);
+			return;
+		case 0x2:
+			COMBINE_DATA(&sound_latch[1]);
+			return;
+		case 0xa:
+			/* correct? */
+			m_audiocpu->set_input_line(5, CLEAR_LINE);
+			if(data)
+				printf("IRQ ACK %02x?\n",data);
+			return; // intentional for log
+	}
+	
+	printf("SOUND W %02x %04x\n",offset*2,data);
 }
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_010a_w)
+READ16_MEMBER(hng64_state::sound_comms_r)
 {
-	logerror("%08x: hng64_port hng64_sound_port_010a_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
-}
-
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0108_w)
-{
-	logerror("%08x: hng64_port hng64_sound_port_0108_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
-}
-
-
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0100_w)
-{
-	logerror("%08x: hng64_port hng64_sound_port_0100_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
-}
-
-READ16_MEMBER(hng64_state::hng64_sound_port_0104_r)
-{
-	// read in irq5
-	logerror("%08x: hng64_sound_port_0104_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
-	return rand();
+	switch(offset*2)
+	{
+		case 0x04:
+			return main_latch[0];
+		case 0x06:
+			return main_latch[1];
+	}
+	printf("SOUND R %02x\n",offset*2);
+	
+	return 0;
 }
 
 static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
@@ -303,12 +304,7 @@ static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
 
 	AM_RANGE(0x0080, 0x0081) AM_WRITE( hng64_sound_port_0080_w )
 
-	AM_RANGE(0x0100, 0x0101) AM_WRITE( hng64_sound_port_0100_w )
-	AM_RANGE(0x0102, 0x0103) AM_WRITE( hng64_sound_port_0102_w ) // gets values of 0x0080 / 0x0081 / 0x0000 / 0x0001 depending on return from 0x0106 in irq5?
-	AM_RANGE(0x0104, 0x0105) AM_READ( hng64_sound_port_0104_r )
-	AM_RANGE(0x0106, 0x0107) AM_READ( hng64_sound_port_0106_r )
-	AM_RANGE(0x0108, 0x0109) AM_WRITE( hng64_sound_port_0108_w )
-	AM_RANGE(0x010a, 0x010b) AM_WRITE( hng64_sound_port_010a_w )
+	AM_RANGE(0x0100, 0x010f) AM_READWRITE( sound_comms_r,sound_comms_w )
 
 	AM_RANGE(0x0200, 0x021f) AM_WRITE( hng64_sound_bank_w ) // ??
 
@@ -342,7 +338,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm1_cb)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
 //  logerror("tcu_tm1_cb %02x\n", state);
-	m_audiocpu->set_input_line(5, state? ASSERT_LINE:CLEAR_LINE); // not accurate, just so we have a trigger
+	//m_audiocpu->set_input_line(5, state? ASSERT_LINE:CLEAR_LINE); // not accurate, just so we have a trigger
 }
 
 WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
@@ -351,10 +347,10 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 //  logerror("tcu_tm2_cb %02x\n", state);
 
 	// NOT ACCURATE, just so that all the interrupts get triggered for now.
-	static int i = 0;
-	m_audiocpu->set_input_line(i, state? ASSERT_LINE:CLEAR_LINE);
-	i++;
-	if (i == 3) i = 0;
+	//static int i = 0;
+	//m_audiocpu->set_input_line(i, state? ASSERT_LINE:CLEAR_LINE);
+	//i++;
+	//if (i == 3) i = 0;
 }
 
 

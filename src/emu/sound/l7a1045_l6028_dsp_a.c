@@ -307,7 +307,7 @@ READ16_MEMBER(l7a1045_sound_device::l7a1045_sound_port_0004_r)
 
 
 	}
-	return rand();
+	return 0;
 }
 
 READ16_MEMBER(l7a1045_sound_device::l7a1045_sound_port_0006_r)
