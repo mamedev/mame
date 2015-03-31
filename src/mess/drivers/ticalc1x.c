@@ -43,6 +43,10 @@ public:
 	DECLARE_WRITE16_MEMBER(ti1270_write_r);
 	DECLARE_READ8_MEMBER(ti1270_read_k);
 
+	DECLARE_WRITE16_MEMBER(ti1000_write_o);
+	DECLARE_WRITE16_MEMBER(ti1000_write_r);
+	DECLARE_READ8_MEMBER(ti1000_read_k);
+
 	DECLARE_WRITE16_MEMBER(wizatron_write_o);
 	DECLARE_WRITE16_MEMBER(wizatron_write_r);
 	DECLARE_READ8_MEMBER(wizatron_read_k);
@@ -397,6 +401,89 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  TI-1000
+  * TMS1990 MCU labeled TMC1991NL, die labeled 1991-91A
+  * 8-digit 7seg LED display
+
+***************************************************************************/
+
+WRITE16_MEMBER(ticalc1x_state::ti1000_write_r)
+{
+	// R0-R7: select digit (right-to-left)
+	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5);
+	display_matrix_seg(8, 8, o, data, 0xff);
+}
+
+WRITE16_MEMBER(ticalc1x_state::ti1000_write_o)
+{
+	// O0-O3,O5(?): input mux
+	// O0-O7: digit segments
+	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
+	m_o = data;
+}
+
+READ8_MEMBER(ticalc1x_state::ti1000_read_k)
+{
+	return read_inputs(5);
+}
+
+
+static INPUT_PORTS_START( ti1000 )
+	PORT_START("IN.0") // O0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.1") // O1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.2") // O2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	// note: even though power buttons are on the matrix, they are not CPU-controlled
+	PORT_START("IN.3") // O3 or O4?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.4") // O5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+INPUT_PORTS_END
+
+
+static MACHINE_CONFIG_START( ti1000, ticalc1x_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
+	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti1000_read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti1000_write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti1000_write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ti1270)
+
+	/* no video! */
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   TI WIZ-A-TRON
   * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS. die labeled 0970F-07B
   * 9-digit 7seg LED display(one custom digit)
@@ -573,7 +660,7 @@ WRITE16_MEMBER(ticalc1x_state::lilprof78_write_r)
 
 WRITE16_MEMBER(ticalc1x_state::lilprof78_write_o)
 {
-	// O0-O3,O5: input mux
+	// O0-O3,O5(?): input mux
 	// O0-O6: digit segments A-G
 	// O7: 6th digit
 	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
@@ -656,7 +743,8 @@ WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
 	m_display_segmask[0] = 0xe2;
 
 	// R0-R8: select digit
-	display_matrix_seg(8, 9, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data, 0xff);
+	UINT8 o = BITSWAP8(m_o,7,5,2,1,4,0,6,3);
+	display_matrix_seg(8, 9, o, data, 0xff);
 }
 
 WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
@@ -919,6 +1007,21 @@ ROM_START( ti1270 )
 ROM_END
 
 
+ROM_START( ti1000 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1991nl", 0x0000, 0x0400, CRC(2da5381d) SHA1(b5dc14553db2068ed48e130e5ec9109930d8cda9) )
+
+	ROM_REGION( 782, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0970_ti1000_ipla.pla", 0, 782, CRC(05306ef8) SHA1(60a0a3c49ce330bce0c27f15f81d61461d0432ce) )
+	ROM_REGION( 860, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0970_ti1000_mpla.pla", 0, 860, CRC(7f50ab2e) SHA1(bff3be9af0e322986f6e545b567c97d70e135c93) )
+	ROM_REGION( 352, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0970_ti1000_opla.pla", 0, 352, CRC(1d82061a) SHA1(90e4a4b0fb3b4ae5965da90479b7fed737ad8831) )
+	ROM_REGION( 157, "maincpu:spla", 0 )
+	ROM_LOAD( "tms0970_ti1000_spla.pla", 0, 157, CRC(234ca3a8) SHA1(76844dd87cb380a07c8fcbef143038087e98f138) )
+ROM_END
+
+
 ROM_START( wizatron )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "za0379", 0x0000, 0x0400, CRC(5a6af094) SHA1(b1f27e1f13f4db3b052dd50fb08dbf9c4d8db26e) )
@@ -1014,6 +1117,7 @@ COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Tex
 COMP( 1975, tisr16ii,  0,        0, tisr16ii,  tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
 COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1977, wizatron,  0,        0, wizatron,  wizatron,  driver_device, 0, "Texas Instruments", "Wiz-A-Tron", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Texas Instruments", "Little Professor (1976 version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
