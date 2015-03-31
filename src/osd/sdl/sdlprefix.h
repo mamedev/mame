@@ -80,9 +80,3 @@ struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which m
 #ifdef __GNUC__
 #define alloca  __builtin_alloca
 #endif
-
-//============================================================
-// misc.
-//============================================================
-
-#define PATH_SEPARATOR      "/"
