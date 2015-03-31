@@ -1,4 +1,9 @@
+dofile("modules.lua")
+
+
 function maintargetosdoptions(_target)
+	osdmodulestargetconf()
+
 	if _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then
 		libdirs {
 			path.join(_OPTIONS["MESA_INSTALL_ROOT"],"lib"),
@@ -32,22 +37,12 @@ function maintargetosdoptions(_target)
 				"SDL_ttf",
 			}
 		end
-		if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" then
-			links {
-				"GL"
-			}
-		end
 		linkoptions {
 			string.gsub(os.outputof("pkg-config --libs fontconfig"), '[\r\n]+', ' '),
 		}
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
-		if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" then
-			links {
-				"opengl32"
-			}
-		end
 		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
@@ -65,39 +60,6 @@ function maintargetosdoptions(_target)
 				"SDL2",
 			}
 		configuration {}
-
-		if (USE_QT == 1) then
-			linkoptions{
-				"-L$(shell qmake -query QT_INSTALL_LIBS)",
-			}
-			links {
-				"qtmain",
-				"QtGui4",
-				"QtCore4",
-			}
-		end
-	elseif _OPTIONS["targetos"]=="linux" then
-		if USE_QT == 1 then
-			linkoptions {
-				"$(shell pkg-config --libs QtGui)",
-			}
-			links {
-				"QtGui",
-				"QtCore",
-			}
-		end
-		if _OPTIONS["NO_USE_MIDI"]~="1" then
-			linkoptions {
-				string.gsub(os.outputof("pkg-config --libs alsa"), '[\r\n]+', ' '),
-			}
-		end
-	elseif _OPTIONS["targetos"]=="macosx" then
-		if _OPTIONS["NO_USE_MIDI"]~="1" then
-			links {
-				"CoreAudio.framework",
-				"CoreMIDI.framework",
-			}
-		end
 	elseif _OPTIONS["targetos"]=="haiku" then
 		links {
 			"network",
@@ -122,42 +84,8 @@ end
 
 
 newoption {
-	trigger = "NO_OPENGL",
-	description = "Disable use of OpenGL",
-	allowed = {
-		{ "0",  "Enable OpenGL"  },
-		{ "1",  "Disable OpenGL" },
-	},
-}
-
-if not _OPTIONS["NO_OPENGL"] then
-	if _OPTIONS["targetos"]=="os2" then
-		_OPTIONS["NO_OPENGL"] = "1"
-	else
-		_OPTIONS["NO_OPENGL"] = "0"
-	end
-end
-
-newoption {
-	trigger = "USE_DISPATCH_GL",
-	description = "Use GL-dispatching (takes precedence over MESA_INSTALL_ROOT)",
-	allowed = {
-		{ "0",  "Link to OpenGL library"  },
-		{ "1",  "Use GL-dispatching"      },
-	},
-}
-
-if not _OPTIONS["USE_DISPATCH_GL"] then
-	if USE_BGFX == 1 then
-		_OPTIONS["USE_DISPATCH_GL"] = "0"
-	else
-		_OPTIONS["USE_DISPATCH_GL"] = "1"
-	end
-end
-
-newoption {
 	trigger = "MESA_INSTALL_ROOT",
-	description = "link against specific GL-Library - also adds rpath to executable",
+	description = "link against specific GL-Library - also adds rpath to executable (overridden by USE_DISPATCH_GL)",
 }
 
 newoption {
@@ -188,23 +116,6 @@ newoption {
 
 if not _OPTIONS["NO_USE_XINPUT"] then
 	_OPTIONS["NO_USE_XINPUT"] = "1"
-end
-
-newoption {
-	trigger = "NO_USE_MIDI",
-	description = "Disable MIDI I/O",
-	allowed = {
-		{ "0",  "Enable MIDI"  },
-		{ "1",  "Disable MIDI" },
-	},
-}
-
-if not _OPTIONS["NO_USE_MIDI"] then
-	if _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="openbsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "emscripten" or _OPTIONS["targetos"] == "os2" then
-		_OPTIONS["NO_USE_MIDI"] = "1"
-	else
-		_OPTIONS["NO_USE_MIDI"] = "0"
-	end
 end
 
 newoption {
@@ -312,7 +223,6 @@ if BASE_TARGETOS=="unix" then
 	if _OPTIONS["targetos"]=="macosx" then
 		links {
 			"Cocoa.framework",
-			"OpenGL.framework",
 		}
 		if _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
 			linkoptions {
@@ -374,16 +284,9 @@ project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
 
-	removeflags {
-		"SingleOutputDir",
-	}
-	
-	options {
-		"ForceCPP",
-	}
-
 	dofile("sdl_cfg.lua")
-	
+	osdmodulesbuild()
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
@@ -391,9 +294,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/winpcap/Include",
-		MAME_DIR .. "3rdparty/bgfx/include",
-		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "src/osd/sdl",
 	}
 
@@ -439,66 +339,11 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl/window.c",
 		MAME_DIR .. "src/osd/sdl/output.c",
 		MAME_DIR .. "src/osd/sdl/watchdog.c",
-		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
 		MAME_DIR .. "src/osd/modules/render/drawsdl.c",
-		MAME_DIR .. "src/osd/modules/debugger/none.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugint.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugwin.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugqt.c",
-		MAME_DIR .. "src/osd/modules/font/font_sdl.c",
-		MAME_DIR .. "src/osd/modules/font/font_windows.c",
-		MAME_DIR .. "src/osd/modules/font/font_osx.c",
-		MAME_DIR .. "src/osd/modules/font/font_none.c",
-		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
-		MAME_DIR .. "src/osd/modules/netdev/pcap.c",
-		MAME_DIR .. "src/osd/modules/netdev/none.c",
-		MAME_DIR .. "src/osd/modules/midi/portmidi.c",
-		MAME_DIR .. "src/osd/modules/midi/none.c",
-		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
-	if _OPTIONS["NO_OPENGL"]~="1" then
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawogl.c",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.c",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.c",
-		}
-	end
 	if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 		files {
 			MAME_DIR .. "src/osd/modules/render/draw13.c",
-		}
-	end
-
-	if USE_QT == 1 then
-		files {
-			MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.c",
-			MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.c",
-
-			GEN_DIR  .. "osd/modules/debugger/qt/debuggerview.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/windowqt.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/logwindow.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/dasmwindow.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/mainwindow.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/memorywindow.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/breakpointswindow.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/deviceswindow.moc.c",
-			GEN_DIR  .. "osd/modules/debugger/qt/deviceinformationwindow.moc.c",
-		}
-	end
-
-	if USE_BGFX == 1 then
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawbgfx.c",
 		}
 	end
 
