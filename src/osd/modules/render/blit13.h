@@ -51,7 +51,7 @@ inline UINT32 pixel_ycc_to_rgb_pal(const UINT16 *pixel, const rgb_t *palette)
 
 
 #define FUNC_DEF(source) op(const source &src, const rgb_t *palbase) const
-#define FUNCTOR(name, x...) \
+#define FUNCTOR(name, x) \
 	template<typename _source, typename _dest> \
 	struct name { _dest FUNC_DEF(_source) { x } };
 

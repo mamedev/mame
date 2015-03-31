@@ -20,7 +20,9 @@
 
 // standard C headers
 #include <math.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 
 // MAME headers
 
