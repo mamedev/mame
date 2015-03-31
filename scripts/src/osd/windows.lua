@@ -8,6 +8,16 @@ function maintargetosdoptions(_target)
 		"-municode",
 	}
 
+	if _OPTIONS["DIRECTINPUT"] == "8" then
+		links {
+			"dinput8",
+		}
+	else
+		links {
+			"dinput",
+		}
+	end
+
 	local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
 
 	if os.isfile(rcfile) then
@@ -22,6 +32,20 @@ function maintargetosdoptions(_target)
 end
 
 
+newoption {
+	trigger = "DIRECTINPUT",
+	description = "Minimum DirectInput version to support",
+	allowed = {
+		{ "7",  "Support DirectInput 7 or later"  },
+		{ "8",  "Support DirectInput 8 or later" },
+	},
+}
+
+if not _OPTIONS["DIRECTINPUT"] then
+	_OPTIONS["DIRECTINPUT"] = "8"
+end
+
+
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
@@ -30,9 +54,18 @@ project ("osd_" .. _OPTIONS["osd"])
 	osdmodulesbuild()
 
 	defines {
-		"DIRECTINPUT_VERSION=0x0800",
 		"DIRECT3D_VERSION=0x0900",
 	}
+
+	if _OPTIONS["DIRECTINPUT"] == "8" then
+		defines {
+			"DIRECTINPUT_VERSION=0x0800",
+		}
+	else
+		defines {
+			"DIRECTINPUT_VERSION=0x0700",
+		}
+	end
 
 	includedirs {
 		MAME_DIR .. "src/emu",

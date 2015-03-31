@@ -721,7 +721,6 @@ end
 			"comctl32",
 			"shlwapi",
 			"wsock32",
-			"dinput8",
 			"comdlg32",
 		}
 
@@ -743,7 +742,6 @@ configuration { "vs*" }
 			"comctl32",
 			"shlwapi",
 			"wsock32",
-			"dinput8",
 			"comdlg32",
 		}
 
