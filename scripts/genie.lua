@@ -84,10 +84,6 @@ newoption {
 		{ "generic", 		   "generic"         	},
 		{ "debian-stable",     "debian-stable"      },
 		{ "ubuntu-intrepid",   "ubuntu-intrepid"    },
-		{ "gcc44-generic",     "gcc44-generic"   	},
-		{ "gcc45-generic",     "gcc45-generic"     	},
-		{ "gcc46-generic",     "gcc46-generic" 		},
-		{ "gcc47-generic",     "gcc47-generic"      },
 	},
 }
 
@@ -697,10 +693,6 @@ configuration { "nacl*" }
 configuration { "linux-*" }
 		links {
 			"dl",
-		}
-		defines 
-		{
-			"DISTRO=" .. _OPTIONS["distro"] ,
 		}
 		if _OPTIONS["distro"]=="debian-stable" then
 			defines 

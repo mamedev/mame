@@ -169,33 +169,7 @@ DISTRO := generic
 else
 ifeq ($(DISTRO),debian-stable)
 else
-ifeq ($(DISTRO),ubuntu-intrepid)
-# Force gcc-4.2 on ubuntu-intrepid
-CC := $(SILENT)gcc -V 4.2
-LD := $(SILENT)g++-4.2
-else
-ifeq ($(DISTRO),gcc44-generic)
-CC := $(SILENT)gcc-4.4
-LD := $(SILENT)g++-4.4
-else
-ifeq ($(DISTRO),gcc45-generic)
-CC := $(SILENT)gcc-4.5
-LD := $(SILENT)g++-4.5
-else
-ifeq ($(DISTRO),gcc46-generic)
-CC := $(SILENT)gcc-4.6
-LD := $(SILENT)g++-4.6
-else
-ifeq ($(DISTRO),gcc47-generic)
-CC := $(SILENT)gcc-4.7
-LD := $(SILENT)g++-4.7
-else
 $(error DISTRO $(DISTRO) unknown)
-endif
-endif
-endif
-endif
-endif
 endif
 endif
 

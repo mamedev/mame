@@ -154,22 +154,6 @@ function toolchain(_buildDir, _subDir)
 				premake.gcc.cc   = "@gcc -V 4.2"
 				premake.gcc.cxx  = "@g++-4.2"
 			end		
-			if _OPTIONS["distro"]=="gcc44-generic" then
-				premake.gcc.cc   = "@gcc-4.4"
-				premake.gcc.cxx  = "@g++-4.4"
-			end					
-			if _OPTIONS["distro"]=="gcc45-generic" then
-				premake.gcc.cc   = "@gcc-4.5"
-				premake.gcc.cxx  = "@g++-4.5"
-			end					
-			if _OPTIONS["distro"]=="gcc46-generic" then
-				premake.gcc.cc   = "@gcc-4.6"
-				premake.gcc.cxx  = "@g++-4.6"
-			end					
-			if _OPTIONS["distro"]=="gcc47-generic" then
-				premake.gcc.cc   = "@gcc-4.7"
-				premake.gcc.cxx  = "@g++-4.7"
-			end	
 			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
 		end
