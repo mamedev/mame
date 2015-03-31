@@ -13,6 +13,21 @@ function maintargetosdoptions(_target)
 		}
 	end
 
+	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" then
+		if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+			links {
+				"SDL2_ttf",
+			}
+		else
+			links {
+				"SDL_ttf",
+			}
+		end
+		linkoptions {
+			string.gsub(os.outputof("pkg-config --libs fontconfig"), '[\r\n]+', ' '),
+		}
+	end
+
 	if _OPTIONS["targetos"]=="windows" then
 		linkoptions{
 			"-municode",
@@ -44,6 +59,15 @@ function maintargetosdoptions(_target)
 		targetprefix "sdl"
 
 	configuration { }
+end
+
+
+function sdlconfigcmd()
+	if not _OPTIONS["SDL_INSTALL_ROOT"] then
+		return _OPTIONS["SDL_LIBVER"] .. "-config"
+	else
+		return _OPTIONS["SDL_INSTALL_ROOT"] .. "/bin/" .. _OPTIONS["SDL_LIBVER"] .. "-config"
+	end
 end
 
 
@@ -122,27 +146,87 @@ if not _OPTIONS["MACOSX_USE_LIBSDL"] then
 end
 
 
-if _OPTIONS["NO_X11"]~="1" and _OPTIONS["SDL_LIBVER"]=="sdl" then
-	links {
-		"X11"
-	}
+BASE_TARGETOS = "unix"
+SDLOS_TARGETOS = "unix"
+SYNC_IMPLEMENTATION = "tc"
+if _OPTIONS["targetos"]=="openbsd" then
+	SYNC_IMPLEMENTATION = "ntc"
+elseif _OPTIONS["targetos"]=="netbsd" then
+	SYNC_IMPLEMENTATION = "ntc"
+elseif _OPTIONS["targetos"]=="haiku" then
+	SYNC_IMPLEMENTATION = "ntc"
+elseif _OPTIONS["targetos"]=="emscripten" then
+	SYNC_IMPLEMENTATION = "mini"
+elseif _OPTIONS["targetos"]=="windows" then
+	BASE_TARGETOS = "win32"
+	SDLOS_TARGETOS = "win32"
+	SYNC_IMPLEMENTATION = "windows"
+elseif _OPTIONS["targetos"]=="macosx" then
+	SDLOS_TARGETOS = "macosx"
+	SYNC_IMPLEMENTATION = "ntc"
+elseif _OPTIONS["targetos"]=="os2" then
+	BASE_TARGETOS = "os2"
+	SDLOS_TARGETOS = "os2"
+	SYNC_IMPLEMENTATION = "os2"
 end
 
-if _OPTIONS["targetos"]=="macosx" and _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
-	buildoptions {
-		"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
-	}
+if _OPTIONS["NO_X11"]~="1" then
 	linkoptions {
-		"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
+		"-L/usr/X11/lib",
+		"-L/usr/X11R6/lib",
+		"-L/usr/openwin/lib",
 	}
-	if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+	if _OPTIONS["SDL_LIBVER"]=="sdl" then
 		links {
-			"SDL2.framework",
+			"X11",
 		}
+	end
+end
+
+if BASE_TARGETOS=="unix" then
+	if _OPTIONS["targetos"]=="macosx" then
+		links {
+			"Cocoa.framework",
+			"OpenGL.framework",
+		}
+		if _OPTIONS["MACOSX_USE_LIBSDL"]~="1" then
+			linkoptions {
+				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
+			}
+			if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+				links {
+					"SDL2.framework",
+				}
+			else
+				links {
+					"SDL.framework",
+				}
+			end
+		else
+			linkoptions {
+				string.gsub(os.outputof(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'"), '[\r\n]+', ' '),
+			}
+		end
 	else
-		links {
-			"SDL.framework",
+		linkoptions {
+			string.gsub(os.outputof(sdlconfigcmd() .. " --libs"), '[\r\n]+', ' '),
 		}
+		if _OPTIONS["targetos"]~="haiku" then
+			links {
+				"m",
+				"pthread",
+			}
+			if _OPTIONS["targetos"]=="solaris" then
+				links {
+					"socket",
+					"nsl",
+				}
+			else
+				links {
+					"util",
+				}
+			end
+		end
 	end
 end
 
@@ -350,6 +434,7 @@ if _OPTIONS["with-tools"] then
 		targetdir(MAME_DIR)
 
 		links {
+			"utils",
 			"ocore_" .. _OPTIONS["osd"],
 		}
 

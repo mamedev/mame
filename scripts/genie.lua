@@ -695,20 +695,10 @@ configuration { "nacl*" }
 	archivesplit_size "20"
 
 configuration { "linux-*" }
-		linkoptions {
-			"`sdl2-config --libs`",
-		}
 		links {
-			"pthread",
-			"SDL2",
-			"SDL2_ttf",
 			"asound",
 			"dl",
-			"fontconfig",
-			"freetype",
 			"GL",
-			"m",
-			"util",
 		}
 		defines 
 		{
@@ -724,8 +714,6 @@ configuration { "linux-*" }
 
 configuration { "osx*" }
 		links {
-			"Cocoa.framework",
-			"OpenGL.framework",
 			"CoreAudio.framework",
 			"CoreMIDI.framework",
 			"pthread",
