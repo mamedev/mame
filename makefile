@@ -293,15 +293,6 @@ ifdef TARGETOS
 PARAMS += --targetos=$(TARGETOS)
 endif
 
-ifndef USE_QT
-ifneq ($(TARGETOS),macosx)
-USE_QT := 1
-else
-USE_QT := 0
-endif
-endif
-PARAMS += --USE_QT=$(USE_QT)
-
 ifdef DONT_USE_NETWORK
 PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
 endif
@@ -314,6 +305,14 @@ ifdef USE_DISPATCH_GL
 PARAMS += --USE_DISPATCH_GL='$(USE_DISPATCH_GL)'
 endif
 
+ifdef NO_USE_MIDI
+PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
+endif
+
+ifdef USE_QTDEBUG
+PARAMS += --USE_QTDEBUG='$(USE_QTDEBUG)'
+endif
+
 ifdef MESA_INSTALL_ROOT
 PARAMS += --MESA_INSTALL_ROOT='$(MESA_INSTALL_ROOT)'
 endif
@@ -324,10 +323,6 @@ endif
 
 ifdef NO_USE_XINPUT
 PARAMS += --NO_USE_XINPUT='$(NO_USE_XINPUT)'
-endif
-
-ifdef NO_USE_MIDI
-PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
 endif
 
 ifdef SDL_LIBVER
@@ -710,16 +705,27 @@ GEN_FOLDERS :=  \
 
 LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
-ifeq ($(USE_QT),0)
-MOC_FILES=
-else
 MOC_FILES=$(wildcard $(SRC)/osd/modules/debugger/qt/*.h)
+ifneq ($(USE_QTDEBUG),1)
+ifeq ($(TARGETOS),macosx)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),solaris)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),haiku)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),emscripten)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),os2)
+MOC_FILES=
+endif
+endif
 
 ifeq ($(OS),windows)
 MOC = moc
-ifneq ($(OSD),sdl)
-MOC_FILES=
-endif
 else
 MOCTST = $(shell which moc-qt4 2>/dev/null)
 ifeq '$(MOCTST)' ''
@@ -734,7 +740,6 @@ MOC = $(MOCTST)
 endif
 endif
 
-endif
 
 ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak

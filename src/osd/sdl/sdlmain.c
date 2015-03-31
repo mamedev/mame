@@ -397,7 +397,6 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(LSB_FIRST);
 	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_DEBUG);
-	MACRO_VERBOSE(NO_DEBUGBER);
 	MACRO_VERBOSE(BIGENDIAN);
 	MACRO_VERBOSE(CPP_COMPILE);
 	MACRO_VERBOSE(SYNC_IMPLEMENTATION);
@@ -598,14 +597,6 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 	defines_verbose();
-
-	if (!SDLMAME_HAS_DEBUGGER)
-		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		{
-			osd_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
-			osd_exit();
-			exit(-1);
-		}
 
 	osd_common_t::init_subsystems();
 

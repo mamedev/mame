@@ -1,4 +1,9 @@
+dofile("modules.lua")
+
+
 function maintargetosdoptions(_target)
+	osdmodulestargetconf()
+
 	linkoptions {
 		"-municode",
 	}
@@ -21,15 +26,8 @@ project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
 
-	removeflags {
-		"SingleOutputDir",
-	}
-
-	options {
-		"ForceCPP",
-	}
-
 	dofile("windows_cfg.lua")
+	osdmodulesbuild()
 
 	defines {
 		"DIRECTINPUT_VERSION=0x0800",
@@ -43,9 +41,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/osd/modules/render",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/winpcap/Include",
-		MAME_DIR .. "3rdparty/bgfx/include",
-		MAME_DIR .. "3rdparty/bx/include",
 	}
 
 	includedirs {
@@ -65,10 +60,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows/window.c",
 		MAME_DIR .. "src/osd/windows/winmenu.c",
 		MAME_DIR .. "src/osd/windows/winmain.c",
-		MAME_DIR .. "src/osd/modules/debugger/none.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugint.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugwin.c",
-		MAME_DIR .. "src/osd/modules/debugger/debugqt.c",
 		MAME_DIR .. "src/osd/modules/debugger/win/consolewininfo.c",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugbaseinfo.c",
 		MAME_DIR .. "src/osd/modules/debugger/win/debugviewinfo.c",
@@ -82,30 +73,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/debugger/win/memorywininfo.c",
 		MAME_DIR .. "src/osd/modules/debugger/win/pointswininfo.c",
 		MAME_DIR .. "src/osd/modules/debugger/win/uimetrics.c",
-		MAME_DIR .. "src/osd/modules/render/drawogl.c",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.c",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.c",
-		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
-		MAME_DIR .. "src/osd/modules/font/font_sdl.c",
-		MAME_DIR .. "src/osd/modules/font/font_windows.c",
-		MAME_DIR .. "src/osd/modules/font/font_osx.c",
-		MAME_DIR .. "src/osd/modules/font/font_none.c",
-		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
-		MAME_DIR .. "src/osd/modules/netdev/pcap.c",
-		MAME_DIR .. "src/osd/modules/netdev/none.c",
-		MAME_DIR .. "src/osd/modules/midi/portmidi.c",
-		MAME_DIR .. "src/osd/modules/midi/none.c",
-		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
-		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
-
-	if USE_BGFX == 1 then
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawbgfx.c",
-		}
-	end
 
 
 project ("ocore_" .. _OPTIONS["osd"])

@@ -30,12 +30,6 @@
 	#define SDL13_COMBINE_RESIZE (0)
 #endif
 
-#if defined(NO_DEBUGGER)
-#define SDLMAME_HAS_DEBUGGER            (0)
-#else
-#define SDLMAME_HAS_DEBUGGER            (1)
-#endif
-
 //============================================================
 //  Defines
 //============================================================

@@ -1344,32 +1344,96 @@ MACHINE_CONFIG_END
   * TMS1470NLHL MP1133 (die labeled TMS1400 MP1133)
   * 9digit 7seg VFD display + 8 LEDs(4 green, 4 yellow), no sound
 
-  x
+  This is an astrological calculator, and also supports 4-function
+  calculations. Refer to the official manual on how to use this device.
 
 ***************************************************************************/
 
+void hh_tms1k_state::astro_display()
+{
+	// declare 7segs
+	for (int y = 0; y < 9; y++)
+		m_display_segmask[y] = 0xff;
+
+	display_matrix(8, 10, m_o, m_r);
+}
+
 WRITE16_MEMBER(hh_tms1k_state::astro_write_r)
 {
+	// R0-R7: input mux
+	m_inp_mux = data & 0xff;
+	
+	// R0-R9: select digit/leds
+	m_r = data;
+	astro_display();
 }
 
 WRITE16_MEMBER(hh_tms1k_state::astro_write_o)
 {
+	// O0-O7: digit segments/leds
+	m_o = data;
+	astro_display();
 }
 
 READ8_MEMBER(hh_tms1k_state::astro_read_k)
 {
-	return 0;
+	return read_inputs(8);
 }
 
 
 static INPUT_PORTS_START( astro )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE"/Sun")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY"/Mercury")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-/Venus")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+/Mars")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=/Astro")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_NAME("B1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("B2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x08, "Mode" )
+	PORT_CONFSETTING(    0x00, "Calculator" )
+	PORT_CONFSETTING(    0x08, "Astro" )
 INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( astro, hh_tms1k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1470, 400000) // approximation - RC osc. R=4.7K, C=33pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pf, but unknown RC curve
 	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, astro_read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, astro_write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, astro_write_o))
@@ -1398,7 +1462,6 @@ MACHINE_CONFIG_END
 
   Press the R key to start, followed by a set of unique numbers and E.
   Refer to the official manual for more information.
-
 
 ***************************************************************************/
 
@@ -2593,7 +2656,7 @@ CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ide
 CONS( 1979, starwbc,   0,        0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command", GAME_SUPPORTS_SAVE )
 CONS( 1979, starwbcp,  starwbc,  0, starwbc,   starwbc,   driver_device, 0, "Kenner", "Star Wars - Electronic Battle Command (prototype)", GAME_SUPPORTS_SAVE )
 
-COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kosmos", "Astro", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kosmos", "Astro", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )

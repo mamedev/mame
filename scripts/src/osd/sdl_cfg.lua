@@ -8,23 +8,10 @@ if SDL_NETWORK~="" and not _OPTIONS["DONT_USE_NETWORK"] then
 	}
 end
 
-if _OPTIONS["NO_OPENGL"]=="1" then
-	defines {
-		"USE_OPENGL=0",
+if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then
+	includedirs {
+		path.join(_OPTIONS["MESA_INSTALL_ROOT"],"include"),
 	}
-else
-	defines {
-		"USE_OPENGL=1",
-	}
-	if _OPTIONS["USE_DISPATCH_GL"]=="1" then
-		defines {
-			"USE_DISPATCH_GL=1",
-		}
-	elseif _OPTIONS["MESA_INSTALL_ROOT"] then
-		includedirs {
-			path.join(_OPTIONS["MESA_INSTALL_ROOT"],"include"),
-		}
-	end
 end
 
 
@@ -54,11 +41,7 @@ else
 	}
 end
 
-if _OPTIONS["NO_USE_MIDI"]=="1" then
-	defines {
-		"NO_USE_MIDI",
-	}
-elseif _OPTIONS["targetos"]=="linux" then
+if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 	buildoptions {
 		string.gsub(os.outputof("pkg-config --cflags alsa"), '[\r\n]+', ' '),
 	}
@@ -76,12 +59,6 @@ if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 else
 	defines {
 		"SDLMAME_SDL2=0",
-	}
-end
-
-if USE_BGFX == 1 then
-	defines {
-		"USE_BGFX"
 	}
 end
 
@@ -124,16 +101,9 @@ if _OPTIONS["targetos"]=="windows" then
 	defines {
 		"UNICODE",
 		"_UNICODE",
-		"USE_QTDEBUG=" .. USE_QT,
 		"main=utf8_main",
 	}
-	configuration { "mingw*" }
-		buildoptions {
-			"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtCore",
-			"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtGui",
-			"-I$(shell qmake -query QT_INSTALL_HEADERS)",
-		}
-		
+
 	configuration { "vs*" }
 		includedirs {
 			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")
@@ -141,9 +111,6 @@ if _OPTIONS["targetos"]=="windows" then
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then
-	defines {
-		"USE_QTDEBUG=" .. USE_QT,
-	}
 	buildoptions {
 		'$(shell pkg-config --cflags QtGui)',
 	}
@@ -151,7 +118,6 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",
 		"SDLMAME_DARWIN",
-		"USE_QTDEBUG=0",
 	}
 elseif _OPTIONS["targetos"]=="freebsd" then
 	buildoptions {

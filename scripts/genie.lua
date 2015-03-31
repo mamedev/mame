@@ -182,20 +182,6 @@ newoption {
 	}
 } 
 
-newoption {
-	trigger = "USE_QT",
-	description = "Use of QT.",
-	allowed = {
-		{ "0",   "Disabled" 	},
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
-	trigger = "DONT_USE_NETWORK",
-	description = "Disable network access",
-}
-
 local os_version = str_to_version(_OPTIONS["os_version"])
 
 USE_BGFX = 1
@@ -204,11 +190,6 @@ if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
 end
 if(_OPTIONS["USE_BGFX"]~=nil) then
 	USE_BGFX = tonumber(_OPTIONS["USE_BGFX"])
-end
-
-USE_QT = 1
-if(_OPTIONS["USE_QT"]~=nil) then
-	USE_QT = tonumber(_OPTIONS["USE_QT"])
 end
 
 GEN_DIR = MAME_BUILD_DIR .. "generated/"
