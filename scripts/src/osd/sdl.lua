@@ -59,16 +59,32 @@ function maintargetosdoptions(_target)
 			}
 		end
 	elseif _OPTIONS["targetos"]=="linux" then
-		if (USE_QT == 1) then
+		if USE_QT == 1 then
+			linkoptions {
+				"$(shell pkg-config --libs QtGui)",
+			}
 			links {
 				"QtGui",
 				"QtCore",
 			}
-
+		end
+		if _OPTIONS["NO_USE_MIDI"]~="1" then
 			linkoptions {
-				"$(shell pkg-config --libs QtGui)",
+				string.gsub(os.outputof("pkg-config --libs alsa"), '[\r\n]+', ' '),
 			}
 		end
+	elseif _OPTIONS["targetos"]=="macosx" then
+		if _OPTIONS["NO_USE_MIDI"]~="1" then
+			links {
+				"CoreAudio.framework",
+				"CoreMIDI.framework",
+			}
+		end
+	elseif _OPTIONS["targetos"]=="haiku" then
+		links {
+			"network",
+			"bsd",
+		}
 	end
 	
 	configuration { "mingw*" or "vs*" }
@@ -82,7 +98,7 @@ function sdlconfigcmd()
 	if not _OPTIONS["SDL_INSTALL_ROOT"] then
 		return _OPTIONS["SDL_LIBVER"] .. "-config"
 	else
-		return _OPTIONS["SDL_INSTALL_ROOT"] .. "/bin/" .. _OPTIONS["SDL_LIBVER"] .. "-config"
+		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin",_OPTIONS["SDL_LIBVER"]) .. "-config"
 	end
 end
 
@@ -115,6 +131,23 @@ newoption {
 
 if not _OPTIONS["NO_USE_XINPUT"] then
 	_OPTIONS["NO_USE_XINPUT"] = "1"
+end
+
+newoption {
+	trigger = "NO_USE_MIDI",
+	description = "Disable MIDI I/O",
+	allowed = {
+		{ "0",  "Enable MIDI"  },
+		{ "1",  "Disable MIDI" },
+	},
+}
+
+if not _OPTIONS["NO_USE_MIDI"] then
+	if _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="openbsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "emscripten" or _OPTIONS["targetos"] == "os2" then
+		_OPTIONS["NO_USE_MIDI"] = "1"
+	else
+		_OPTIONS["NO_USE_MIDI"] = "0"
+	end
 end
 
 newoption {
@@ -244,6 +277,13 @@ if BASE_TARGETOS=="unix" then
 			end
 		end
 	end
+elseif BASE_TARGETOS=="os2" then
+	linkoptions {
+		string.gsub(os.outputof(sdlconfigcmd() .. " --libs"), '[\r\n]+', ' '),
+	}
+	links {
+		"pthread"
+	}
 end
 
 configuration { "mingw*" }

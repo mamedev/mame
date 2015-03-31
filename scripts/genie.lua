@@ -696,7 +696,6 @@ configuration { "nacl*" }
 
 configuration { "linux-*" }
 		links {
-			"asound",
 			"dl",
 			"GL",
 		}
@@ -714,8 +713,6 @@ configuration { "linux-*" }
 
 configuration { "osx*" }
 		links {
-			"CoreAudio.framework",
-			"CoreMIDI.framework",
 			"pthread",
 		}
 		flags {

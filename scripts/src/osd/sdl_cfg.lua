@@ -28,6 +28,16 @@ else
 	}
 end
 
+if _OPTIONS["NO_USE_MIDI"]=="1" then
+	defines {
+		"NO_USE_MIDI",
+	}
+elseif _OPTIONS["targetos"]=="linux" then
+	buildoptions {
+		string.gsub(os.outputof("pkg-config --cflags alsa"), '[\r\n]+', ' '),
+	}
+end
+
 if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 	defines {
 		"SDLMAME_SDL2=1",
@@ -108,7 +118,6 @@ elseif _OPTIONS["targetos"]=="linux" then
 		"USE_QTDEBUG=" .. USE_QT,
 		"SDLMAME_NET_TAPTUN",
 	}
-
 	buildoptions {
 		'$(shell pkg-config --cflags QtGui)',
 	}
@@ -120,8 +129,23 @@ elseif _OPTIONS["targetos"]=="macosx" then
 		"USE_QTDEBUG=0",
 		"SDLMAME_NET_PCAP",
 	}
+elseif _OPTIONS["targetos"]=="freebsd" then
+	defines {
+		"NO_AFFINITY_NP",
+	}
+	buildoptions {
+		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
+		"-isystem /usr/local/include",
+	}
+elseif _OPTIONS["targetos"]=="solaris" then
+	defines {
+		"NO_AFFINITY_NP",
+	}
 elseif _OPTIONS["targetos"]=="os2" then
 	defines {
 		"SDLMAME_OS2",
+	}
+	buildoptions {
+		string.gsub(os.outputof(sdlconfigcmd() .. " --cflags"), '[\r\n]+', ' '),
 	}
 end

@@ -336,6 +336,10 @@ ifdef NO_USE_XINPUT
 PARAMS += --NO_USE_XINPUT='$(NO_USE_XINPUT)'
 endif
 
+ifdef NO_USE_MIDI
+PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
+endif
+
 ifdef SDL_LIBVER
 PARAMS += --SDL_LIBVER='$(SDL_LIBVER)'
 endif
