@@ -328,6 +328,14 @@ endif
 endif
 PARAMS += --USE_QT=$(USE_QT)
 
+ifdef NO_OPENGL
+PARAMS += --NO_OPENGL='$(NO_OPENGL)'
+endif
+
+ifdef USE_DISPATCH_GL
+PARAMS += --USE_DISPATCH_GL='$(USE_DISPATCH_GL)'
+endif
+
 ifdef NO_X11
 PARAMS += --NO_X11='$(NO_X11)'
 endif

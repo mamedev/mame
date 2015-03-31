@@ -2,6 +2,22 @@ forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
 
+if _OPTIONS["NO_OPENGL"]=="1" then
+	defines {
+		"USE_OPENGL=0",
+	}
+else
+	defines {
+		"USE_OPENGL=1",
+	}
+	if _OPTIONS["USE_DISPATCH_GL"]=="1" then
+		defines {
+			"USE_DISPATCH_GL=1",
+		}
+	end
+end
+
+
 if _OPTIONS["NO_X11"]=="1" then
 	defines {
 		"SDLMAME_NO_X11",
@@ -94,7 +110,6 @@ if _OPTIONS["targetos"]=="windows" then
 		"SDLMAME_WIN32",
 		"UNICODE",
 		"_UNICODE",
-		"USE_OPENGL=1",
 		"USE_QTDEBUG=" .. USE_QT,
 		"SDLMAME_NET_PCAP",
 		"main=utf8_main",
@@ -114,7 +129,6 @@ if _OPTIONS["targetos"]=="windows" then
 
 elseif _OPTIONS["targetos"]=="linux" then
 	defines {
-		"USE_OPENGL=1",
 		"USE_QTDEBUG=" .. USE_QT,
 		"SDLMAME_NET_TAPTUN",
 	}
@@ -125,7 +139,6 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",
 		"SDLMAME_DARWIN",
-		"USE_OPENGL=1",
 		"USE_QTDEBUG=0",
 		"SDLMAME_NET_PCAP",
 	}

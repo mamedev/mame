@@ -23,12 +23,22 @@ function maintargetosdoptions(_target)
 				"SDL_ttf",
 			}
 		end
+		if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" then
+			links {
+				"GL"
+			}
+		end
 		linkoptions {
 			string.gsub(os.outputof("pkg-config --libs fontconfig"), '[\r\n]+', ' '),
 		}
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" then
+			links {
+				"opengl32"
+			}
+		end
 		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
@@ -44,7 +54,6 @@ function maintargetosdoptions(_target)
 		configuration { "vs*" }	
 			links {
 				"SDL2",
-				"opengl32",
 			}
 		configuration {}
 
@@ -102,6 +111,40 @@ function sdlconfigcmd()
 	end
 end
 
+
+newoption {
+	trigger = "NO_OPENGL",
+	description = "Disable use of OpenGL",
+	allowed = {
+		{ "0",  "Enable OpenGL"  },
+		{ "1",  "Disable OpenGL" },
+	},
+}
+
+if not _OPTIONS["NO_OPENGL"] then
+	if _OPTIONS["targetos"]=="os2" then
+		_OPTIONS["NO_OPENGL"] = "1"
+	else
+		_OPTIONS["NO_OPENGL"] = "0"
+	end
+end
+
+newoption {
+	trigger = "USE_DISPATCH_GL",
+	description = "Use GL-dispatching",
+	allowed = {
+		{ "0",  "Link to OpenGL library"  },
+		{ "1",  "Use GL-dispatching"      },
+	},
+}
+
+if not _OPTIONS["USE_DISPATCH_GL"] then
+	if USE_BGFX == 1 then
+		_OPTIONS["USE_DISPATCH_GL"] = "0"
+	else
+		_OPTIONS["USE_DISPATCH_GL"] = "1"
+	end
+end
 
 newoption {
 	trigger = "NO_X11",
@@ -365,13 +408,10 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl/watchdog.c",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
 		MAME_DIR .. "src/osd/modules/render/drawsdl.c",
-		MAME_DIR .. "src/osd/modules/render/drawogl.c",
 		MAME_DIR .. "src/osd/modules/debugger/none.c",
 		MAME_DIR .. "src/osd/modules/debugger/debugint.c",
 		MAME_DIR .. "src/osd/modules/debugger/debugwin.c",
 		MAME_DIR .. "src/osd/modules/debugger/debugqt.c",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.c",
-		MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.c",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.c",
 		MAME_DIR .. "src/osd/modules/font/font_windows.c",
 		MAME_DIR .. "src/osd/modules/font/font_osx.c",
@@ -386,6 +426,13 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
+	if _OPTIONS["NO_OPENGL"]~="1" then
+		files {
+			MAME_DIR .. "src/osd/modules/render/drawogl.c",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.c",
+			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.c",
+		}
+	end
 	if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 		files {
 			MAME_DIR .. "src/osd/modules/render/draw13.c",

@@ -697,7 +697,6 @@ configuration { "nacl*" }
 configuration { "linux-*" }
 		links {
 			"dl",
-			"GL",
 		}
 		defines 
 		{
@@ -727,7 +726,6 @@ configuration { "mingw*" }
 		}
 if _OPTIONS["osd"]=="sdl" then
 		links {
-			"opengl32",
 			"SDL2",
 			"imm32",
 			"version",
