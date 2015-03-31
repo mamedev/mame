@@ -275,7 +275,7 @@ WRITE16_MEMBER(hng64_state::sound_comms_w)
 			m_audiocpu->set_input_line(5, CLEAR_LINE);
 			if(data)
 				printf("IRQ ACK %02x?\n",data);
-			return; // intentional for log
+			return;
 	}
 	
 	printf("SOUND W %02x %04x\n",offset*2,data);
