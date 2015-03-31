@@ -896,9 +896,11 @@ if (not os.isfile(path.join("src", "osd",  _OPTIONS["osd"] .. ".lua"))) then
 	error("Unsupported value '" .. _OPTIONS["osd"] .. "' for OSD")
 end
 dofile(path.join("src", "osd", _OPTIONS["osd"] .. ".lua"))
-
-dofile(path.join("src", "3rdparty.lua"))
 dofile(path.join("src", "lib.lua"))
+
+group "3rdparty"
+dofile(path.join("src", "3rdparty.lua"))
+
 
 group "core"
 
