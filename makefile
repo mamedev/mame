@@ -705,17 +705,27 @@ GEN_FOLDERS :=  \
 
 LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
-# TODO: this will attempt to build on many platforms lacking Qt, e.g. emscripten and OS/2
-ifneq ($(TARGETOS),macosx)
-MOC_FILES=
-else
 MOC_FILES=$(wildcard $(SRC)/osd/modules/debugger/qt/*.h)
+ifneq ($(USE_QTDEBUG),1)
+ifeq ($(TARGETOS),macosx)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),solaris)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),haiku)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),emscripten)
+MOC_FILES=
+endif
+ifeq ($(TARGETOS),os2)
+MOC_FILES=
+endif
+endif
 
 ifeq ($(OS),windows)
 MOC = moc
-ifneq ($(OSD),sdl)
-MOC_FILES=
-endif
 else
 MOCTST = $(shell which moc-qt4 2>/dev/null)
 ifeq '$(MOCTST)' ''
@@ -730,7 +740,6 @@ MOC = $(MOCTST)
 endif
 endif
 
-endif
 
 ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak
