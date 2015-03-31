@@ -20,36 +20,36 @@
 #
 
 ifeq ($(OS),Windows_NT)
-OS=windows
-GENIEOS=windows
+OS := windows
+GENIEOS := windows
 else
-UNAME = $(shell uname -mps)
-GENIEOS=linux
+UNAME := $(shell uname -mps)
+GENIEOS := linux
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
-OS = linux
+OS := linux
 endif
 ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
-OS = solaris
+OS := solaris
 endif
 ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
-OS = freebsd
+OS := freebsd
 endif
 ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
-OS = freebsd
+OS := freebsd
 endif
 ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
-OS = netbsd
+OS := netbsd
 endif
 ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
-OS = openbsd
+OS := openbsd
 endif
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
-OS=macosx
-GENIEOS=darwin
-DARWIN_VERSION = $(shell sw_vers -productVersion)
+OS := macosx
+GENIEOS := darwin
+DARWIN_VERSION := $(shell sw_vers -productVersion)
 endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
-OS = haiku
+OS := haiku
 endif
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
@@ -64,20 +64,20 @@ endif
 #-------------------------------------------------
 
 ifndef TARGET
-TARGET = mame
+TARGET := mame
 endif
 
 ifndef SUBTARGET
-SUBTARGET = $(TARGET)
+SUBTARGET := $(TARGET)
 endif
 
 CONFIG = release
 ifdef DEBUG
-CONFIG = debug
+CONFIG := debug
 endif
 
-ifndef verbose
-  SILENT = @
+ifndef VERBOSE
+  SILENT := @
 endif
 
 #-------------------------------------------------
@@ -89,52 +89,52 @@ endif
 ifndef TARGETOS
 
 ifeq ($(OS),windows)
-TARGETOS = windows
-WINDRES = windres
+TARGETOS := windows
+WINDRES := windres
 ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-ARCHITECTURE =_x64
+ARCHITECTURE := _x64
 endif
 ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-ARCHITECTURE =_x64
+ARCHITECTURE := _x64
 ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
 else
-ARCHITECTURE =_x86
+ARCHITECTURE := _x86
 endif
 endif
 else
-WINDRES  = x86_64-w64-mingw32-windres
-UNAME    = $(shell uname -mps)
-TARGETOS = $(OS)
+WINDRES  := x86_64-w64-mingw32-windres
+UNAME    := $(shell uname -mps)
+TARGETOS := $(OS)
 
-ARCHITECTURE =_x86
+ARCHITECTURE := _x86
 
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
-ARCHITECTURE =_x64
+ARCHITECTURE := _x64
 endif
 ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
-ARCHITECTURE =_x64
+ARCHITECTURE := _x64
 endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
-ARCHITECTURE =_x64
+ARCHITECTURE := _x64
 endif
 endif
 
 else
-CROSS_BUILD = 1
+CROSS_BUILD := 1
 endif # TARGET_OS
 
 ifdef PTR64
 ifeq ($(PTR64),1)
-ARCHITECTURE =_x64
+ARCHITECTURE := _x64
 else
-ARCHITECTURE =_x86
+ARCHITECTURE := _x86
 endif
 endif
 
 
-PYTHON = @python
-CC = @gcc
-LD = @g++
+PYTHON := $(SILENT)python
+CC := $(SILENT)gcc
+LD := $(SILENT)g++
 
 #-------------------------------------------------
 # specify OSD layer: windows, sdl, etc.
@@ -144,18 +144,18 @@ LD = @g++
 
 ifndef OSD
 
-OSD = osdmini
+OSD := osdmini
 
 ifeq ($(TARGETOS),windows)
-OSD = windows
+OSD := windows
 endif
 
 ifeq ($(TARGETOS),linux)
-OSD = sdl
+OSD := sdl
 endif
 
 ifeq ($(TARGETOS),macosx)
-OSD = sdl
+OSD := sdl
 endif
 endif
 
@@ -165,30 +165,30 @@ endif
 #-------------------------------------------------
 
 ifeq ($(DISTRO),)
-DISTRO = generic
+DISTRO := generic
 else
 ifeq ($(DISTRO),debian-stable)
 else
 ifeq ($(DISTRO),ubuntu-intrepid)
 # Force gcc-4.2 on ubuntu-intrepid
-CC = @gcc -V 4.2
-LD = @g++-4.2
+CC := $(SILENT)gcc -V 4.2
+LD := $(SILENT)g++-4.2
 else
 ifeq ($(DISTRO),gcc44-generic)
-CC = @gcc-4.4
-LD = @g++-4.4
+CC := $(SILENT)gcc-4.4
+LD := $(SILENT)g++-4.4
 else
 ifeq ($(DISTRO),gcc45-generic)
-CC = @gcc-4.5
-LD = @g++-4.5
+CC := $(SILENT)gcc-4.5
+LD := $(SILENT)g++-4.5
 else
 ifeq ($(DISTRO),gcc46-generic)
-CC = @gcc-4.6
-LD = @g++-4.6
+CC := $(SILENT)gcc-4.6
+LD := $(SILENT)g++-4.6
 else
 ifeq ($(DISTRO),gcc47-generic)
-CC = @gcc-4.7
-LD = @g++-4.7
+CC := $(SILENT)gcc-4.7
+LD := $(SILENT)g++-4.7
 else
 $(error DISTRO $(DISTRO) unknown)
 endif
@@ -202,21 +202,21 @@ endif
 PARAMS+= --distro=$(DISTRO)
 
 ifdef OVERRIDE_CC
-PARAMS+= --CC='$(OVERRIDE_CC)'
+PARAMS += --CC='$(OVERRIDE_CC)'
 ifndef CROSS_BUILD
-CC = $(OVERRIDE_CC)
+CC := $(OVERRIDE_CC)
 endif
 endif
 ifdef OVERRIDE_CXX
-PARAMS+= --CXX='$(OVERRIDE_CXX)'
+PARAMS += --CXX='$(OVERRIDE_CXX)'
 ifndef CROSS_BUILD
-CXX = $(OVERRIDE_CXX)
+CXX := $(OVERRIDE_CXX)
 endif
 endif
 ifdef OVERRIDE_LD
-PARAMS+= --LD='$(OVERRIDE_LD)'
+PARAMS += --LD='$(OVERRIDE_LD)'
 ifndef CROSS_BUILD
-LD = $(OVERRIDE_LD)
+LD := $(OVERRIDE_LD)
 endif
 endif
 
@@ -264,72 +264,72 @@ endif
 endif
 
 ifdef TOOLS
-PARAMS+= --with-tools
+PARAMS += --with-tools
 endif
 
 ifdef SYMBOLS
-PARAMS+= --SYMBOLS=$(SYMBOLS)
+PARAMS += --SYMBOLS=$(SYMBOLS)
 endif
 
 ifdef SYMLEVEL
-PARAMS+= --SYMLEVEL=$(SYMLEVEL)
+PARAMS += --SYMLEVEL=$(SYMLEVEL)
 endif
 
 ifdef PROFILER
-PARAMS+= --PROFILER=$(PROFILER)
+PARAMS += --PROFILER=$(PROFILER)
 endif
 
 ifdef PROFILE
-PARAMS+= --PROFILE=$(PROFILE)
+PARAMS += --PROFILE=$(PROFILE)
 endif
 
 ifdef OPTIMIZE
-PARAMS+= --OPTIMIZE=$(OPTIMIZE)
+PARAMS += --OPTIMIZE=$(OPTIMIZE)
 endif
 
 ifdef ARCHOPTS
-PARAMS+= --ARCHOPTS='$(ARCHOPTS)'
+PARAMS += --ARCHOPTS='$(ARCHOPTS)'
 endif
 
 ifdef MAP
-PARAMS+= --MAP=$(MAP)
+PARAMS += --MAP=$(MAP)
 endif
 
 ifdef USE_BGFX
-PARAMS+= --USE_BGFX=$(USE_BGFX)
+PARAMS += --USE_BGFX=$(USE_BGFX)
 endif
 
 ifdef NOWERROR
-PARAMS+= --NOWERROR=$(NOWERROR)
+PARAMS += --NOWERROR=$(NOWERROR)
 endif
 
 ifdef TARGET
-PARAMS+= --target=$(TARGET)
+PARAMS += --target=$(TARGET)
 endif
 
 ifdef SUBTARGET
-PARAMS+= --subtarget=$(SUBTARGET)
+PARAMS += --subtarget=$(SUBTARGET)
 endif
 
 ifdef OSD
-PARAMS+= --osd=$(OSD)
+PARAMS += --osd=$(OSD)
 endif
 
 ifdef TARGETOS
-PARAMS+= --targetos=$(TARGETOS)
+PARAMS += --targetos=$(TARGETOS)
 endif
 
 ifndef USE_QT
 ifneq ($(TARGETOS),macosx)
-USE_QT = 1
+USE_QT := 1
 else
-USE_QT = 0
+USE_QT := 0
 endif
 endif
-PARAMS+= --USE_QT=$(USE_QT)
+PARAMS += --USE_QT=$(USE_QT)
 
 ifdef LDOPTS
-PARAMS+= --LDOPTS='$(LDOPTS)'
+PARAMS += --LDOPTS='$(LDOPTS)'
 endif
 
 #-------------------------------------------------
@@ -363,13 +363,13 @@ endif
 #-------------------------------------------------
 
 # extension for executables
-EXE =
+EXE :=
 
 ifeq ($(OS),windows)
-EXE = .exe
+EXE := .exe
 endif
 ifeq ($(OS),os2)
-EXE = .exe
+EXE := .exe
 endif
 
 SHELLTYPE := msdos
@@ -389,7 +389,6 @@ else
 endif
 
 GENDIR = build/generated
-PROJECTDIR = build/projects/$(SUBDIR)
 
 # all sources are under the src/ directory
 SRC = src
@@ -398,23 +397,23 @@ SRC = src
 3RDPARTY = 3rdparty
 
 ifeq ($(OS),windows)
-GCC_VERSION:=$(shell gcc -dumpversion 2> NUL)
-CLANG_VERSION:=$(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^0-9,.]//g")
-PYTHON_AVAILABLE:=$(shell python --version > NUL 2>&1 && echo python)
-CHECK_CLANG:=
+GCC_VERSION      := $(shell gcc -dumpversion 2> NUL)
+CLANG_VERSION    := $(shell %CLANG%\bin\clang --version 2> NUL| head -n 1 | sed "s/[^0-9,.]//g")
+PYTHON_AVAILABLE := $(shell python --version > NUL 2>&1 && echo python)
+CHECK_CLANG      :=
 else
-GCC_VERSION:=$(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
-CLANG_VERSION:=$(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
-PYTHON_AVAILABLE:=$(shell python --version > /dev/null 2>&1 && echo python)
-CHECK_CLANG:=$(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
+GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
+CLANG_VERSION    := $(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
+PYTHON_AVAILABLE := $(shell python --version > /dev/null 2>&1 && echo python)
+CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
 
 ifeq ($(TARGETOS),macosx)
 ifneq (,$(findstring 3.,$(CLANG_VERSION)))
 ifeq ($(ARCHITECTURE),_x64)
-ARCHITECTURE=_x64_clang
+ARCHITECTURE := _x64_clang
 else
-ARCHITECTURE=_x86_clang
+ARCHITECTURE := _x86_clang
 endif
 endif
 endif
@@ -423,15 +422,14 @@ ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
 endif
 
-GENIE=3rdparty/genie/bin/$(GENIEOS)/genie
-
-SILENT?=@
+GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
 ifeq ($(TARGET),$(SUBTARGET))
-SUBDIR = $(OSD)/$(TARGET)
+SUBDIR := $(OSD)/$(TARGET)
 else
-SUBDIR = $(OSD)/$(TARGET)$(SUBTARGET)
+SUBDIR := $(OSD)/$(TARGET)$(SUBTARGET)
 endif
+PROJECTDIR := build/projects/$(SUBDIR)
 
 .PHONY: all clean regenie generate
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
