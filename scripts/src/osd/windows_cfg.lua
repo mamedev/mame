@@ -7,7 +7,12 @@ defines {
 	"USE_OPENGL=1",
 	"USE_DISPATCH_GL=1",
 	"DIRECTINPUT_VERSION=0x0800",
-	"SDLMAME_NET_PCAP",
 	"main=utf8_main",
 	"_WIN32_WINNT=0x0501",
 }
+
+if not _OPTIONS["DONT_USE_NETWORK"] then
+	defines {
+		"SDLMAME_NET_PCAP",
+	}
+end

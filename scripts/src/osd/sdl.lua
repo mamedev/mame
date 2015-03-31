@@ -265,27 +265,33 @@ if not _OPTIONS["MACOSX_USE_LIBSDL"] then
 end
 
 
-BASE_TARGETOS = "unix"
-SDLOS_TARGETOS = "unix"
+BASE_TARGETOS       = "unix"
+SDLOS_TARGETOS      = "unix"
 SYNC_IMPLEMENTATION = "tc"
-if _OPTIONS["targetos"]=="openbsd" then
+SDL_NETWORK         = ""
+if _OPTIONS["targetos"]=="linux" then
+	SDL_NETWORK         = "taptun"
+elseif _OPTIONS["targetos"]=="openbsd" then
 	SYNC_IMPLEMENTATION = "ntc"
 elseif _OPTIONS["targetos"]=="netbsd" then
 	SYNC_IMPLEMENTATION = "ntc"
+	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 	SYNC_IMPLEMENTATION = "ntc"
 elseif _OPTIONS["targetos"]=="emscripten" then
 	SYNC_IMPLEMENTATION = "mini"
 elseif _OPTIONS["targetos"]=="windows" then
-	BASE_TARGETOS = "win32"
-	SDLOS_TARGETOS = "win32"
+	BASE_TARGETOS       = "win32"
+	SDLOS_TARGETOS      = "win32"
 	SYNC_IMPLEMENTATION = "windows"
+	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="macosx" then
-	SDLOS_TARGETOS = "macosx"
+	SDLOS_TARGETOS      = "macosx"
 	SYNC_IMPLEMENTATION = "ntc"
+	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="os2" then
-	BASE_TARGETOS = "os2"
-	SDLOS_TARGETOS = "os2"
+	BASE_TARGETOS       = "os2"
+	SDLOS_TARGETOS      = "os2"
 	SYNC_IMPLEMENTATION = "os2"
 end
 

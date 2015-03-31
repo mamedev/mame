@@ -189,7 +189,12 @@ newoption {
 		{ "0",   "Disabled" 	},
 		{ "1",   "Enabled"      },
 	}
-} 
+}
+
+newoption {
+	trigger = "DONT_USE_NETWORK",
+	description = "Disable network access",
+}
 
 local os_version = str_to_version(_OPTIONS["os_version"])
 

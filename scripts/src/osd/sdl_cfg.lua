@@ -2,6 +2,12 @@ forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
 
+if SDL_NETWORK~="" and not _OPTIONS["DONT_USE_NETWORK"] then
+	defines {
+		"SDLMAME_NET_" .. string.upper(SDL_NETWORK),
+	}
+end
+
 if _OPTIONS["NO_OPENGL"]=="1" then
 	defines {
 		"USE_OPENGL=0",
@@ -119,7 +125,6 @@ if _OPTIONS["targetos"]=="windows" then
 		"UNICODE",
 		"_UNICODE",
 		"USE_QTDEBUG=" .. USE_QT,
-		"SDLMAME_NET_PCAP",
 		"main=utf8_main",
 	}
 	configuration { "mingw*" }
@@ -138,7 +143,6 @@ if _OPTIONS["targetos"]=="windows" then
 elseif _OPTIONS["targetos"]=="linux" then
 	defines {
 		"USE_QTDEBUG=" .. USE_QT,
-		"SDLMAME_NET_TAPTUN",
 	}
 	buildoptions {
 		'$(shell pkg-config --cflags QtGui)',
@@ -148,7 +152,6 @@ elseif _OPTIONS["targetos"]=="macosx" then
 		"SDLMAME_MACOSX",
 		"SDLMAME_DARWIN",
 		"USE_QTDEBUG=0",
-		"SDLMAME_NET_PCAP",
 	}
 elseif _OPTIONS["targetos"]=="freebsd" then
 	buildoptions {

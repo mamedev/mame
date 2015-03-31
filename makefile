@@ -302,6 +302,10 @@ endif
 endif
 PARAMS += --USE_QT=$(USE_QT)
 
+ifdef DONT_USE_NETWORK
+PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
+endif
+
 ifdef NO_OPENGL
 PARAMS += --NO_OPENGL='$(NO_OPENGL)'
 endif
