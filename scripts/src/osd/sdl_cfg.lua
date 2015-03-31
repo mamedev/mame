@@ -2,6 +2,26 @@ forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
 
+if _OPTIONS["NO_OPENGL"]=="1" then
+	defines {
+		"USE_OPENGL=0",
+	}
+else
+	defines {
+		"USE_OPENGL=1",
+	}
+	if _OPTIONS["USE_DISPATCH_GL"]=="1" then
+		defines {
+			"USE_DISPATCH_GL=1",
+		}
+	elseif _OPTIONS["MESA_INSTALL_ROOT"] then
+		includedirs {
+			path.join(_OPTIONS["MESA_INSTALL_ROOT"],"include"),
+		}
+	end
+end
+
+
 if _OPTIONS["NO_X11"]=="1" then
 	defines {
 		"SDLMAME_NO_X11",
@@ -25,6 +45,16 @@ else
 	defines {
 		"USE_XINPUT=1",
 		"USE_XINPUT_DEBUG=0",
+	}
+end
+
+if _OPTIONS["NO_USE_MIDI"]=="1" then
+	defines {
+		"NO_USE_MIDI",
+	}
+elseif _OPTIONS["targetos"]=="linux" then
+	buildoptions {
+		string.gsub(os.outputof("pkg-config --cflags alsa"), '[\r\n]+', ' '),
 	}
 end
 
@@ -84,7 +114,6 @@ if _OPTIONS["targetos"]=="windows" then
 		"SDLMAME_WIN32",
 		"UNICODE",
 		"_UNICODE",
-		"USE_OPENGL=1",
 		"USE_QTDEBUG=" .. USE_QT,
 		"SDLMAME_NET_PCAP",
 		"main=utf8_main",
@@ -104,11 +133,9 @@ if _OPTIONS["targetos"]=="windows" then
 
 elseif _OPTIONS["targetos"]=="linux" then
 	defines {
-		"USE_OPENGL=1",
 		"USE_QTDEBUG=" .. USE_QT,
 		"SDLMAME_NET_TAPTUN",
 	}
-
 	buildoptions {
 		'$(shell pkg-config --cflags QtGui)',
 	}
@@ -116,12 +143,26 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",
 		"SDLMAME_DARWIN",
-		"USE_OPENGL=1",
 		"USE_QTDEBUG=0",
 		"SDLMAME_NET_PCAP",
+	}
+elseif _OPTIONS["targetos"]=="freebsd" then
+	defines {
+		"NO_AFFINITY_NP",
+	}
+	buildoptions {
+		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
+		"-isystem /usr/local/include",
+	}
+elseif _OPTIONS["targetos"]=="solaris" then
+	defines {
+		"NO_AFFINITY_NP",
 	}
 elseif _OPTIONS["targetos"]=="os2" then
 	defines {
 		"SDLMAME_OS2",
+	}
+	buildoptions {
+		string.gsub(os.outputof(sdlconfigcmd() .. " --cflags"), '[\r\n]+', ' '),
 	}
 end

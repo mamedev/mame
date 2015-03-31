@@ -696,9 +696,7 @@ configuration { "nacl*" }
 
 configuration { "linux-*" }
 		links {
-			"asound",
 			"dl",
-			"GL",
 		}
 		defines 
 		{
@@ -714,8 +712,6 @@ configuration { "linux-*" }
 
 configuration { "osx*" }
 		links {
-			"CoreAudio.framework",
-			"CoreMIDI.framework",
 			"pthread",
 		}
 		flags {
@@ -730,7 +726,6 @@ configuration { "mingw*" }
 		}
 if _OPTIONS["osd"]=="sdl" then
 		links {
-			"opengl32",
 			"SDL2",
 			"imm32",
 			"version",
