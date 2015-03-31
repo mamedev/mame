@@ -21,6 +21,7 @@
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
+#include "sound/wave.h"
 
 #define ABC80_HTOTAL    384
 #define ABC80_HBEND     35
@@ -56,32 +57,34 @@
 #define Z80PIO_TAG          "cd67"
 #define SN76477_TAG         "g8"
 #define RS232_TAG           "ser"
+#define CASSETTE_TAG 		"cassette"
+#define KEYBOARD_TAG 		"keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
 
 class abc80_state : public driver_device
 {
 public:
-	abc80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_pio(*this, Z80PIO_TAG),
-			m_psg(*this, SN76477_TAG),
-			m_cassette(*this, "cassette"),
-			m_bus(*this, ABCBUS_TAG),
-			m_kb(*this, ABC80_KEYBOARD_TAG),
-			m_ram(*this, RAM_TAG),
-			m_rs232(*this, RS232_TAG),
-			m_palette(*this, "palette"),
-			m_rom(*this, Z80_TAG),
-			m_mmu_rom(*this, "mmu"),
-			m_char_rom(*this, "chargen"),
-			m_hsync_prom(*this, "hsync"),
-			m_vsync_prom(*this, "vsync"),
-			m_line_prom(*this, "line"),
-			m_attr_prom(*this, "attr"),
-			m_video_ram(*this, "video_ram"),
-			m_tape_in(1),
-			m_tape_in_latch(1)
+	abc80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_pio(*this, Z80PIO_TAG),
+		m_psg(*this, SN76477_TAG),
+		m_cassette(*this, "cassette"),
+		m_bus(*this, ABCBUS_TAG),
+		m_kb(*this, ABC80_KEYBOARD_TAG),
+		m_ram(*this, RAM_TAG),
+		m_rs232(*this, RS232_TAG),
+		m_palette(*this, "palette"),
+		m_rom(*this, Z80_TAG),
+		m_mmu_rom(*this, "mmu"),
+		m_char_rom(*this, "chargen"),
+		m_hsync_prom(*this, "hsync"),
+		m_vsync_prom(*this, "vsync"),
+		m_line_prom(*this, "line"),
+		m_attr_prom(*this, "attr"),
+		m_video_ram(*this, "video_ram"),
+		m_tape_in(1),
+		m_tape_in_latch(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -132,6 +135,14 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 	DECLARE_WRITE8_MEMBER( kbd_w );
+
+	enum
+	{
+		MMU_XM      = 0x01,
+		MMU_ROM     = 0x02,
+		MMU_VRAMS   = 0x04,
+		MMU_RAM     = 0x08
+	};
 
 	// keyboard state
 	int m_key_data;
