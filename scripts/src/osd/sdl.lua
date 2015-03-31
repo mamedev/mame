@@ -225,6 +225,19 @@ if not _OPTIONS["SDL_LIBVER"] then
 end
 
 newoption {
+	trigger = "SDL2_MULTIAPI",
+	description = "Use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)",
+	allowed = {
+		{ "0",  "Use single-keyboard API"  },
+		{ "1",  "Use multi-keyboard API"   },
+	},
+}
+
+if not _OPTIONS["SDL2_MULTIAPI"] then
+	_OPTIONS["SDL2_MULTIAPI"] = "0"
+end
+
+newoption {
 	trigger = "SDL_INSTALL_ROOT",
 	description = "Equivalent to the ./configure --prefix=<path>",
 }

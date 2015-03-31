@@ -62,6 +62,11 @@ if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 	defines {
 		"SDLMAME_SDL2=1",
 	}
+	if _OPTIONS["SDL2_MULTIAPI"]=="1" then
+		defines {
+			"SDL2_MULTIAPI",
+		}
+	end
 else
 	defines {
 		"SDLMAME_SDL2=0",
