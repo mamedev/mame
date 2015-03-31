@@ -111,7 +111,6 @@ end
 
 if _OPTIONS["targetos"]=="windows" then
 	defines {
-		"SDLMAME_WIN32",
 		"UNICODE",
 		"_UNICODE",
 		"USE_QTDEBUG=" .. USE_QT,
@@ -147,21 +146,11 @@ elseif _OPTIONS["targetos"]=="macosx" then
 		"SDLMAME_NET_PCAP",
 	}
 elseif _OPTIONS["targetos"]=="freebsd" then
-	defines {
-		"NO_AFFINITY_NP",
-	}
 	buildoptions {
 		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
 		"-isystem /usr/local/include",
 	}
-elseif _OPTIONS["targetos"]=="solaris" then
-	defines {
-		"NO_AFFINITY_NP",
-	}
 elseif _OPTIONS["targetos"]=="os2" then
-	defines {
-		"SDLMAME_OS2",
-	}
 	buildoptions {
 		string.gsub(os.outputof(sdlconfigcmd() .. " --cflags"), '[\r\n]+', ' '),
 	}

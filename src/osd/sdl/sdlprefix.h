@@ -14,7 +14,8 @@
 //============================================================
 
 /* Only problems ... */
-#ifdef SDLMAME_WIN32
+#if defined(_WIN32)
+#define SDLMAME_WIN32
 #define _SDL_main_h
 #endif
 
@@ -27,6 +28,7 @@
 
 #if defined(__sun__) && defined(__svr4__)
 #define SDLMAME_SOLARIS 1
+#define NO_AFFINITY_NP 1
 //#undef _XOPEN_SOURCE
 //#undef _XOPEN_VERSION
 //#undef _XOPEN_SOURCE_EXTENDED
@@ -45,6 +47,7 @@
 
 #elif defined(__FreeBSD__)
 #define SDLMAME_FREEBSD 1
+#define NO_AFFINITY_NP 1
 #elif defined(__DragonFly__)
 #define SDLMAME_DRAGONFLY 1
 #elif defined(__OpenBSD__)
@@ -55,6 +58,10 @@
 
 #if defined(__DragonFly__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #define SDLMAME_BSD 1
+#endif
+
+#if defined(__OS2__)
+#define SDLMAME_OS2 1
 #endif
 
 #if defined(__HAIKU__)

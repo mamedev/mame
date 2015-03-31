@@ -400,7 +400,6 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(NO_DEBUGBER);
 	MACRO_VERBOSE(BIGENDIAN);
 	MACRO_VERBOSE(CPP_COMPILE);
-	MACRO_VERBOSE(DISTRO);
 	MACRO_VERBOSE(SYNC_IMPLEMENTATION);
 	osd_printf_verbose("\n");
 	osd_printf_verbose("SDL/OpenGL defines: ");
