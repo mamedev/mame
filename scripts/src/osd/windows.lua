@@ -58,7 +58,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render/d3d/d3dhlsl.c",
 		MAME_DIR .. "src/osd/modules/render/drawdd.c",
 		MAME_DIR .. "src/osd/modules/render/drawgdi.c",
-		MAME_DIR .. "src/osd/modules/render/drawbgfx.c",
 		MAME_DIR .. "src/osd/modules/render/drawnone.c",
 		MAME_DIR .. "src/osd/windows/input.c",
 		MAME_DIR .. "src/osd/windows/output.c",
@@ -101,6 +100,13 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
+
+	if USE_BGFX == 1 then
+		files {
+			MAME_DIR .. "src/osd/modules/render/drawbgfx.c",
+		}
+	end
+
 
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
