@@ -101,6 +101,7 @@ public:
 	DECLARE_WRITE16_MEMBER(starwbc_write_o);
 	DECLARE_READ8_MEMBER(starwbc_read_k);
 
+	void astro_display();
 	DECLARE_WRITE16_MEMBER(astro_write_r);
 	DECLARE_WRITE16_MEMBER(astro_write_o);
 	DECLARE_READ8_MEMBER(astro_read_k);
