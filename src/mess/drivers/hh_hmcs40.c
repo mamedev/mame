@@ -473,11 +473,6 @@ WRITE16_MEMBER(hh_hmcs40_state::packmon_grid_w)
 
 	// D0-D3: plate 9-12 (update display there)
 	packmon_plate_w(space, 4, data & 0xf);
-	
-	//             12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,13,14,15,16,17,18,19
-	// 23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	// 23,22,21,20, 0, 1, 2, 3, 4, 5, 6,19,18,17,16,15,14,13,12,11,10, 9, 8, 7
-	
 }
 
 READ16_MEMBER(hh_hmcs40_state::packmon_input_r)
@@ -546,10 +541,6 @@ WRITE8_MEMBER(hh_hmcs40_state::zackman_plate_w)
 	// R0x-R6x,D0,D1: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
-	//       13,12,nc,14,15,16,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,17,18,19,20,21,22,23,24,25,26,27,28
-	// 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	// 31,30,27, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12
 	
 	// update display
 	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
@@ -945,6 +936,12 @@ MACHINE_CONFIG_END
   * cyan/red VFD display Futaba DM-34Z 2A, with color overlay
 
   NOTE!: MESS external artwork is recommended
+  
+  The game is started by pushing a P1 joystick direction, selecting a game mode:
+  - Right: Pac-Man (default game)
+  - Left:  Head-to-Head Pac-Man (2-player mode)
+  - Up:    Eat & Run
+  - Down:  Demo
 
 ***************************************************************************/
 
@@ -955,11 +952,6 @@ WRITE8_MEMBER(hh_hmcs40_state::cpacman_plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	
-	// 31,30,29,28,27,13,14, 8,12,11,10, 9,15,16,17,18, 7, 6, 5, 4,19,20,21,22, 0, 1, 2, 3,23,24,25,26
-	// 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	// 31,30,29,28,27, 0, 1, 2, 3, 8, 9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12, 4, 5, 6, 7
-	
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
 	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,27,0,1,2,3,8,9,10,11,16,17,18,19,25,26,23,22,21,20,24,15,14,13,12,4,5,6,7);
 
@@ -1254,7 +1246,6 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 // i/o hookup is identical to Galaxian 2, so we can use those handlers
-// note: plate numbers are 0-23, not 1-24(with 24 always-on)
 
 static INPUT_PORTS_START( epacman2 )
 	PORT_START("IN.0") // D1 port R0x
@@ -1331,10 +1322,6 @@ WRITE8_MEMBER(hh_hmcs40_state::pbqbert_plate_w)
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	
-	// 31,30,29,25,26,27,28,29, 0, 1, 2, 3, 4, 5, 6, 7,24,23,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8
-	// 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	// 31,30,24,25,26,27,28,15,14,29,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,16,17,18,19,20,21,22,23
-
 	// update display
 	UINT32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23);
 	
@@ -1529,14 +1516,6 @@ WRITE8_MEMBER(hh_hmcs40_state::tmtron_plate_w)
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	
-	
-	//       20                                                     7
-	//       13,sp,11, 6, 5, 4, 0, 1, 2, 3,14,15,16, 8,17,18,22, 9,10,21,19,12
-	// 23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	// 23, 5, 2,21, 1, 6, 7, 9,10,11,21, 0,19, 3, 4, 8, 3,18,17,16,12,13,14,15
-	
-
-	
 	tmtron_display();
 }
 
@@ -1556,21 +1535,17 @@ WRITE16_MEMBER(hh_hmcs40_state::tmtron_grid_w)
 	// D6-D15: vfd matrix grid
 	m_grid = data >> 6 & 0x3ff;
 	
-	//                   1,2,3,4,5,6,7,8,9,0
-	//                   9,8,7,6,5,4,3,2,1,0
-	// 15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0
-
 	// D0-D3,D5: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x2f0000);
 	tmtron_display();
 }
+
 
 void hh_hmcs40_state::tmtron_update_int1()
 {
 	// INT1 on multiplexed inputs
 	set_interrupt(1, read_inputs(4));
 }
-
 
 INPUT_CHANGED_MEMBER(hh_hmcs40_state::tmtron_input_changed)
 {
@@ -1579,21 +1554,19 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::tmtron_input_changed)
 
 static INPUT_PORTS_START( tmtron )
 	PORT_START("IN.0") // D12 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL) PORT_16WAY // separate directional buttons, hence 16way
 
 	PORT_START("IN.1") // D13 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL) PORT_16WAY // "
 
 	PORT_START("IN.2") // D14 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL) PORT_16WAY // "
 
 	PORT_START("IN.3") // D15 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, tmtron_input_changed, NULL) PORT_16WAY // "
 
 	PORT_START("IN.4") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
-
-
 INPUT_PORTS_END
 
 
@@ -1729,8 +1702,8 @@ ROM_END
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Basketball - Dribble Away", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
@@ -1742,7 +1715,7 @@ CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Colec
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
