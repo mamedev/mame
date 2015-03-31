@@ -89,12 +89,19 @@ if _OPTIONS["targetos"]=="windows" then
 		"SDLMAME_NET_PCAP",
 		"main=utf8_main",
 	}
+	configuration { "mingw*" }
+		buildoptions {
+			"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtCore",
+			"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtGui",
+			"-I$(shell qmake -query QT_INSTALL_HEADERS)",
+		}
+		
+	configuration { "vs*" }
+		includedirs {
+			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")
+		}
+	configuration { }
 
-	buildoptions {
-		"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtCore",
-		"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtGui",
-		"-I$(shell qmake -query QT_INSTALL_HEADERS)",
-	}
 elseif _OPTIONS["targetos"]=="linux" then
 	defines {
 		"USE_OPENGL=1",

@@ -29,9 +29,25 @@ function maintargetosdoptions(_target)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
-		linkoptions{
-			"-municode",
-		}
+		configuration { "mingw*" }
+			linkoptions{
+				"-municode",
+			}
+		configuration { "x32", "vs*" }
+			libdirs {
+				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x86")
+			}
+		configuration { "x64", "vs*" }
+			libdirs {
+				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
+			}
+		configuration { "vs*" }	
+			links {
+				"SDL2",
+				"opengl32",
+			}
+		configuration {}
+
 		if (USE_QT == 1) then
 			linkoptions{
 				"-L$(shell qmake -query QT_INSTALL_LIBS)",
