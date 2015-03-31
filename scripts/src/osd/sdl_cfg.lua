@@ -70,7 +70,6 @@ if _OPTIONS["SDL_LIBVER"]=="sdl2" then
 else
 	defines {
 		"SDLMAME_SDL2=0",
-		"SYNC_IMPLEMENTATION=" .. SYNC_IMPLEMENTATION,
 	}
 end
 
@@ -82,6 +81,7 @@ end
 
 defines {
 	"OSD_SDL",
+	"SYNC_IMPLEMENTATION=" .. SYNC_IMPLEMENTATION,
 }
 
 if BASE_TARGETOS=="unix" then
