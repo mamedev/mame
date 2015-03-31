@@ -1,4 +1,13 @@
 function maintargetosdoptions(_target)
+	if _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then
+		libdirs {
+			path.join(_OPTIONS["MESA_INSTALL_ROOT"],"lib"),
+		}
+		linkoptions {
+			"-Wl,-rpath=" .. path.join(_OPTIONS["MESA_INSTALL_ROOT"],"lib"),
+		}
+	end
+
 	if _OPTIONS["NO_X11"]~="1" then
 		links {
 			"X11",
@@ -131,7 +140,7 @@ end
 
 newoption {
 	trigger = "USE_DISPATCH_GL",
-	description = "Use GL-dispatching",
+	description = "Use GL-dispatching (takes precedence over MESA_INSTALL_ROOT)",
 	allowed = {
 		{ "0",  "Link to OpenGL library"  },
 		{ "1",  "Use GL-dispatching"      },
@@ -145,6 +154,11 @@ if not _OPTIONS["USE_DISPATCH_GL"] then
 		_OPTIONS["USE_DISPATCH_GL"] = "1"
 	end
 end
+
+newoption {
+	trigger = "MESA_INSTALL_ROOT",
+	description = "link against specific GL-Library - also adds rpath to executable",
+}
 
 newoption {
 	trigger = "NO_X11",
@@ -263,10 +277,10 @@ elseif _OPTIONS["targetos"]=="os2" then
 end
 
 if _OPTIONS["NO_X11"]~="1" then
-	linkoptions {
-		"-L/usr/X11/lib",
-		"-L/usr/X11R6/lib",
-		"-L/usr/openwin/lib",
+	libdirs {
+		"/usr/X11/lib",
+		"/usr/X11R6/lib",
+		"/usr/openwin/lib",
 	}
 	if _OPTIONS["SDL_LIBVER"]=="sdl" then
 		links {

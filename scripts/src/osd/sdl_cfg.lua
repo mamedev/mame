@@ -14,6 +14,10 @@ else
 		defines {
 			"USE_DISPATCH_GL=1",
 		}
+	elseif _OPTIONS["MESA_INSTALL_ROOT"] then
+		includedirs {
+			path.join(_OPTIONS["MESA_INSTALL_ROOT"],"include"),
+		}
 	end
 end
 
