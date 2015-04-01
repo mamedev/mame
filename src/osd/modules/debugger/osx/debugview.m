@@ -36,7 +36,9 @@ static NSCharacterSet *NonWhiteCharacters;
 
 static void debugwin_view_update(debug_view &view, void *osdprivate)
 {
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	[(MAMEDebugView *)osdprivate update];
+	[pool release];
 }
 
 
