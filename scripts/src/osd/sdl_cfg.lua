@@ -99,12 +99,6 @@ if BASE_TARGETOS=="unix" then
 end
 
 if _OPTIONS["targetos"]=="windows" then
-	defines {
-		"UNICODE",
-		"_UNICODE",
-		"main=utf8_main",
-	}
-
 	configuration { "vs*" }
 		includedirs {
 			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")

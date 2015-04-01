@@ -333,6 +333,11 @@ if _OPTIONS["targetos"]=="windows" then
 			"X64_WINDOWS_ABI",
 		}
 	configuration { }
+		defines {
+			"UNICODE",
+			"_UNICODE",
+			"main=utf8_main",
+		}	
 end
 
 -- Avoid error when invoking genie --help.
