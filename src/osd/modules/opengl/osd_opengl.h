@@ -22,9 +22,9 @@
 		#else
 			#include "GL/gl.h"
 			#include "GL/glext.h"
-		#endif
-		#ifndef USE_DISPATCH_GL
-		#include "GL/wglext.h"
+			#ifndef USE_DISPATCH_GL
+			#include "GL/wglext.h"
+			#endif
 		#endif
 	#else
 	#if (SDLMAME_SDL2)
