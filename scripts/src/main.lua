@@ -21,7 +21,11 @@ function mainProject(_target, _subtarget)
 				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
 			}
 	end
-
+	
+	configuration { "vs*" }
+	flags {
+		"Unicode",
+	}
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
