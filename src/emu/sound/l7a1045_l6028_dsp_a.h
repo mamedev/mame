@@ -9,8 +9,10 @@ struct l7a1045_voice
 		frac(0)
 	{
 		//memset(regs, 0, sizeof(UINT32)*8);
+		start = 0;
 	}
 
+	UINT32 start;
 	UINT32 pos;
 	UINT32 frac;
 	
