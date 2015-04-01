@@ -139,6 +139,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	files {
+		MAME_DIR .. "src/osd/osdcore.c",
 		MAME_DIR .. "src/osd/strconv.c",
 		MAME_DIR .. "src/osd/windows/main.c",
 		MAME_DIR .. "src/osd/windows/windir.c",
