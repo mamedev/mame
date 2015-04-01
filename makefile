@@ -750,7 +750,9 @@ MOCTST = $(shell which moc-qt4 2>/dev/null)
 ifeq '$(MOCTST)' ''
 MOCTST = $(shell which moc 2>/dev/null)
 ifeq '$(MOCTST)' ''
+ifneq '$(MOC_FILES)' ''
 $(error Qt's Meta Object Compiler (moc) wasn't found!)
+endif
 else
 MOC = $(MOCTST)
 endif
