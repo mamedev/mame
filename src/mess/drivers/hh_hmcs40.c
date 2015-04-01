@@ -823,6 +823,12 @@ MACHINE_CONFIG_END
   * Hitachi HD38800A70 MCU
   * cyan/red VFD display Futaba DM-36Z 2H, with color overlay
 
+  Select game mode on start:
+  - P1 Left:  Galaxian (default game)
+  - P1 Right: Midway's Attackers
+  - P2 Left:  Head-to-Head Galaxian (2-player mode, short)
+  - P2 Right: Head-to-Head Galaxian (2-player mode, long)
+
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
@@ -832,10 +838,7 @@ void hh_hmcs40_state::cgalaxn_display()
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
 	UINT16 plate = BITSWAP16(m_plate,15,14,5,4,3,2,1,0,7,11,12,9,8,10,6,13);
 
-	//display_matrix(14, 12, plate, grid);
-	
-	grid<<=1; //todo -1
-	display_matrix(14, 13, plate, grid);
+	display_matrix(14, 12, plate, grid);
 }
 
 WRITE8_MEMBER(hh_hmcs40_state::cgalaxn_grid_w)
@@ -934,14 +937,18 @@ MACHINE_CONFIG_END
   * board label Coleco 75690
   * Hitachi HD38820A28/29 MCU
   * cyan/red VFD display Futaba DM-34Z 2A, with color overlay
+  
+  known releases:
+  - Japan: Super Pack Monster, by Gakken
+  - USA: Pac-Man, published by Coleco (name-license from Midway)
+
+  Select game mode on start:
+  - P1 Right: Pac-Man (default game)
+  - P1 Left:  Head-to-Head Pac-Man (2-player mode)
+  - P1 Up:    Eat & Run
+  - P1 Down:  Demo
 
   NOTE!: MESS external artwork is recommended
-  
-  The game is started by pushing a P1 joystick direction, selecting a game mode:
-  - Right: Pac-Man (default game)
-  - Left:  Head-to-Head Pac-Man (2-player mode)
-  - Up:    Eat & Run
-  - Down:  Demo
 
 ***************************************************************************/
 
@@ -983,8 +990,8 @@ READ8_MEMBER(hh_hmcs40_state::cpacman_input_r)
 static INPUT_PORTS_START( cpacman )
 	PORT_START("IN.0") // D13 port R0x
 	PORT_CONFNAME( 0x01, 0x01, "Skill Level" )
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // D14 port R0x
@@ -1036,6 +1043,11 @@ MACHINE_CONFIG_END
   * Hitachi HD38820A61 MCU
   * cyan/red VFD display Futaba DM-60Z 3I, with color overlay
 
+  Select game mode on start:
+  - P1 Left:  Ms. Pac-Man (default game)
+  - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
+  - P1 Up:    Demo
+
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
@@ -1047,12 +1059,7 @@ WRITE8_MEMBER(hh_hmcs40_state::cmspacmn_plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	//                   22,17                               18,13
-	//                    6,11,23,21,20,19,15, 2, 1, 0,32,31,30,29,12, 9, 4, 8,25,26,27,28,16,10, 3, 5
-	// 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	// 14,13,12, 4, 5, 6, 7,24,23,25,22,21,20,13,24, 3,19,14,12,11,24, 2,10, 8, 7,25, 0, 9, 1,18,17,16
-	
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,1,0);
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,11,10,9,8,7,6,5,4,3,2,1,0,1);
 	UINT64 plate = BIT(m_plate,15)<<32 | BITSWAP32(m_plate,14,13,12,4,5,6,7,24,23,25,22,21,20,13,24,3,19,14,12,11,24,2,10,8,7,25,0,9,1,18,17,16);
 
 	display_matrix(33, 12, plate, grid);
@@ -1082,9 +1089,9 @@ READ8_MEMBER(hh_hmcs40_state::cmspacmn_input_r)
 
 static INPUT_PORTS_START( cmspacmn )
 	PORT_START("IN.0") // D13 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Skill Level" )
-	PORT_CONFSETTING(    0x01, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x01, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // D14 port R0x
@@ -1405,11 +1412,6 @@ WRITE8_MEMBER(hh_hmcs40_state::kingman_plate_w)
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	
-	//                               14,13
-	//          12,11,10, 9, 8, 2, 3, 1, 0, 6, 7, 5, 4,21,22,20,19,18,17,16,15
-	// 23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	// 23, 6, 7, 5, 4, 3, 2, 1, 0,13,12,20,19,18,17,16,10,11, 9, 8,14,15,13,12
-	
 	kingman_display();
 }
 
@@ -1708,8 +1710,8 @@ CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Banda
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING ) // original version is Super Puck Monster, by Gakken
-CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING ) // "
+CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // original version is Super Puck Monster, by Gakken
+CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // "
 CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
