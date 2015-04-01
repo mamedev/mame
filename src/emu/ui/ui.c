@@ -319,7 +319,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = show_mandatory_fileman = FALSE;
 
-	#ifdef SDLMAME_EMSCRIPTEN
+	#if defined(EMSCRIPTEN)
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
 	show_gameinfo = show_warnings = show_disclaimer = FALSE;
 	#endif
