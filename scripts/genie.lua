@@ -327,24 +327,11 @@ dofile ("toolchain.lua")
 
 
 if _OPTIONS["targetos"]=="windows" then
-	configuration { "mingw*" }
-		linkoptions {
-			"-municode",
-		}
-	configuration { "vs*" }
-		flags {
-			"Unicode",
-		}
 	configuration { "x64" }
 		defines {
 			"X64_WINDOWS_ABI",
 		}
 	configuration { }
-		defines {
-			"UNICODE",
-			"_UNICODE",
-			"main=utf8_main",
-		}	
 end
 
 -- Avoid error when invoking genie --help.

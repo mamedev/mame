@@ -30,6 +30,7 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
+		MAME_DIR .. "src/osd/osdnet.c",
 		MAME_DIR .. "src/osd/osdmini/minimain.c",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.c",
@@ -87,6 +88,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	end
 
 	files {
+		MAME_DIR .. "src/osd/osdcore.c",
 		MAME_DIR .. "src/osd/modules/osdmodule.c",
 		MAME_DIR .. "src/osd/osdmini/minidir.c",
 		MAME_DIR .. "src/osd/osdmini/minifile.c",
