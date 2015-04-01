@@ -449,13 +449,13 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
-		MAME_DIR .. "3rdparty/dxsdk/Include",
 	}
 
 	includeosd()
 
 	configuration { "vs*" }
 		includedirs {
+			MAME_DIR .. "3rdparty/dxsdk/Include",
 			MAME_DIR .. "3rdparty/bx/include/compat/msvc",
 		}
 	configuration { "mingw*" }

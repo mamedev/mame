@@ -19,6 +19,7 @@ function toolchain(_buildDir, _libDir)
 			{ "asmjs",         "Emscripten/asm.js"      },
 			{ "freebsd",       "FreeBSD"                },
 			{ "linux-gcc",     "Linux (GCC compiler)"   },
+			{ "linux-gcc-5",   "Linux (GCC-5 compiler)" },
 			{ "linux-clang",   "Linux (Clang compiler)" },
 			{ "ios-arm",       "iOS - ARM"              },
 			{ "ios-simulator", "iOS - Simulator"        },
@@ -162,6 +163,12 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
 
 		elseif "linux-gcc" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
+
+		elseif "linux-gcc-5" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "gcc-5"
+			premake.gcc.cxx = "g++-5"
+			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
 
 		elseif "linux-clang" == _OPTIONS["gcc"] then
@@ -465,12 +472,25 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions { "-m64" }
 
-	configuration { "linux-gcc and not linux-clang" }
+	configuration { "linux-clang" }
+
+	configuration { "linux-gcc-5" }
+		buildoptions {
+--			"-fno-omit-frame-pointer",
+--			"-fsanitize=address",
+--			"-fsanitize=undefined",
+--			"-fsanitize=float-divide-by-zero",
+--			"-fsanitize=float-cast-overflow",
+		}
+		links {
+--			"asan",
+--			"ubsan",
+		}
+
+	configuration { "linux-g*" }
 		buildoptions {
 			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
 		}
-
-	configuration { "linux-clang" }
 
 	configuration { "linux-*" }
 		buildoptions {
@@ -489,7 +509,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
-	configuration { "linux-gcc", "x32" }
+	configuration { "linux-g*", "x32" }
 		targetdir (path.join(_buildDir, "linux32_gcc/bin"))
 		objdir (path.join(_buildDir, "linux32_gcc/obj"))
 		libdirs { path.join(_libDir, "lib/linux32_gcc") }
@@ -497,7 +517,7 @@ function toolchain(_buildDir, _libDir)
 			"-m32",
 		}
 
-	configuration { "linux-gcc", "x64" }
+	configuration { "linux-g*", "x64" }
 		targetdir (path.join(_buildDir, "linux64_gcc/bin"))
 		objdir (path.join(_buildDir, "linux64_gcc/obj"))
 		libdirs { path.join(_libDir, "lib/linux64_gcc") }

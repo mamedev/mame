@@ -365,7 +365,7 @@ namespace bgfx { namespace d3d9
 				D3DADAPTER_IDENTIFIER9 desc;
 				HRESULT hr = m_d3d9->GetAdapterIdentifier(ii, 0, &desc);
 				if (SUCCEEDED(hr) )
-				{
+				{			
 					BX_TRACE("Adapter #%d", ii);
 					BX_TRACE("\tDriver: %s", desc.Driver);
 					BX_TRACE("\tDescription: %s", desc.Description);
@@ -380,20 +380,22 @@ namespace bgfx { namespace d3d9
 					g_caps.gpu[ii].vendorId = (uint16_t)desc.VendorId;
 					g_caps.gpu[ii].deviceId = (uint16_t)desc.DeviceId;
 
-					if ( (BGFX_PCI_ID_NONE != g_caps.vendorId ||             0 != g_caps.deviceId)
-					&&   (BGFX_PCI_ID_NONE == g_caps.vendorId || desc.VendorId == g_caps.vendorId)
-					&&   (               0 == g_caps.deviceId || desc.DeviceId == g_caps.deviceId) )
+					if (D3DADAPTER_DEFAULT == m_adapter)
 					{
-						m_adapter = ii;
-					}
+						if ( (BGFX_PCI_ID_NONE != g_caps.vendorId ||             0 != g_caps.deviceId)
+						&&   (BGFX_PCI_ID_NONE == g_caps.vendorId || desc.VendorId == g_caps.vendorId)
+						&&   (               0 == g_caps.deviceId || desc.DeviceId == g_caps.deviceId) )
+						{
+							m_adapter = ii;
+						}
 
-#if BGFX_CONFIG_DEBUG_PERFHUD
-					if (0 != strstr(desc.Description, "PerfHUD") )
-					{
-						m_adapter = ii;
-						m_deviceType = D3DDEVTYPE_REF;
+						if (BX_ENABLED(BGFX_CONFIG_DEBUG_PERFHUD)
+						&&  0 != strstr(desc.Description, "PerfHUD"))
+						{
+							m_adapter = ii;
+							m_deviceType = D3DDEVTYPE_REF;
+						}
 					}
-#endif // BGFX_CONFIG_DEBUG_PERFHUD
 				}
 			}
 
