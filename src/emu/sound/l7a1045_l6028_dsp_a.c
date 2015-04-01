@@ -93,9 +93,10 @@ const device_type L7A1045 = &device_creator<l7a1045_sound_device>;
 l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, L7A1045, "L7A1045 L6028 DSP-A", tag, owner, clock, "l7a1045_custom", __FILE__),
 		device_sound_interface(mconfig, *this),
-		m_stream(NULL)
-		/*m_key(0),
-		m_base(NULL)*/
+		m_stream(NULL),
+		m_key(0),
+		m_rom(NULL),
+		m_rom_size(0)
 {
 }
 
@@ -108,6 +109,9 @@ void l7a1045_sound_device::device_start()
 {
 	/* Allocate the stream */
 	m_stream = stream_alloc(0, 2, clock() / 384);
+
+	m_rom = m_region->base();
+	m_rom_size = m_region->bytes();
 }
 
 
@@ -120,6 +124,44 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
+
+	for (int i = 0; i < 32; i++)
+	{
+		if (m_key & (1 << i))
+		{
+			l7a1045_voice *vptr = &m_voice[i];
+
+			UINT32 start = 0x000000;
+			UINT32 end = 0x002000;
+			UINT32 step  = 0x0800;
+
+			UINT32 pos = vptr->pos;
+			UINT32 frac = vptr->frac;
+
+			for (int j = 0; j < samples; j++)
+			{
+				INT32 sample;
+
+				pos += (frac >> 12);
+				frac &= 0xfff;
+
+				if ((start + pos) >= end)
+				{
+					m_key &= ~(1 << i);
+				
+				}
+
+				sample = (INT8)m_rom[start + pos];
+				frac += step;
+
+				outputs[0][j] += ((sample * 0x8000) >> 8);
+				outputs[1][j] += ((sample * 0x8000) >> 8);
+			}
+
+			vptr->pos = pos;
+			vptr->frac = frac;
+		}
+	}
 }
 
 
@@ -196,7 +238,7 @@ WRITE16_MEMBER(l7a1045_sound_device::l7a1045_sound_data_02_w) // upper? word of 
 		printf("%08x: unexpected write port 0x0002 register %02x chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 		break;
 
-	case 0x00:
+//	case 0x00:
 	case 0x01:
 	case 0x04:
 	case 0x06:
@@ -208,6 +250,17 @@ WRITE16_MEMBER(l7a1045_sound_device::l7a1045_sound_data_02_w) // upper? word of 
 	case 0x0a:
 	//	printf("%08x: write port 0x0002 register %02x chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 		break;
+
+	case 0x00:
+		{
+			// hack
+			m_key |= 1 << m_audioregister;
+
+			m_voice[m_audioregister].frac = 0;
+			m_voice[m_audioregister].pos = 0;
+			break;
+		}
+	
 
 	}
 

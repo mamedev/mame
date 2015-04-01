@@ -4,18 +4,16 @@
 
 struct l7a1045_voice
 {
-	/*
 	l7a1045_voice() :
 		pos(0),
 		frac(0)
 	{
-		memset(regs, 0, sizeof(UINT32)*8);
+		//memset(regs, 0, sizeof(UINT32)*8);
 	}
 
-	UINT32 regs[8];
 	UINT32 pos;
 	UINT32 frac;
-	*/
+	
 };
 
 // ======================> l7a1045_sound_device
@@ -41,9 +39,10 @@ protected:
 
 private:
 	sound_stream *m_stream;
-//	l7a1045_voice m_voice[32];
-//	UINT16     m_key;
-//	INT8*      m_base;
+	l7a1045_voice m_voice[32];
+	UINT32    m_key;
+	UINT8 *m_rom;
+	INT32 m_rom_size;
 
 	UINT8 m_audiochannel;
 	UINT8 m_audioregister;
