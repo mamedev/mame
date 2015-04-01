@@ -4,13 +4,6 @@ dofile("modules.lua")
 function maintargetosdoptions(_target)
 	osdmodulestargetconf()
 
-	configuration { "mingw*" }
-		linkoptions {
-			"-municode",
-		}
-
-	configuration { }
-
 	if _OPTIONS["DIRECTINPUT"] == "8" then
 		links {
 			"dinput8",

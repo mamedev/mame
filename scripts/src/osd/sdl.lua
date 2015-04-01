@@ -43,10 +43,6 @@ function maintargetosdoptions(_target)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
-		configuration { "mingw*" }
-			linkoptions{
-				"-municode",
-			}
 		configuration { "x32", "vs*" }
 			libdirs {
 				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x86")
