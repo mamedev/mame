@@ -101,16 +101,16 @@ function osdmodulesbuild()
 		if _OPTIONS["targetos"]=="windows" then
 			configuration { "mingw*" }
 				buildoptions {
-					"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtCore",
-					"-I$(shell qmake -query QT_INSTALL_HEADERS)/QtGui",
 					"-I$(shell qmake -query QT_INSTALL_HEADERS)",
 				}
 			configuration { }
 		elseif _OPTIONS["targetos"]=="macosx" then
-			-- TODO: search path for Qt on OSX platform
+			buildoptions {
+				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+			}
 		else
 			buildoptions {
-				string.gsub(os.outputof("pkg-config --cflags QtGui"), '[\r\n]+', ' '),
+				string.gsub(os.outputof("pkg-config --cflags Qt"), '[\r\n]+', ' '),
 			}
 		end
 	else
@@ -166,7 +166,13 @@ function osdmodulestargetconf()
 				"QtCore4",
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
-			-- TODO: Qt libs for OSX platform
+			linkoptions {
+				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+			}
+			links {
+				"QtCore.framework",
+				"QtGui.framework",
+			}
 		else
 			linkoptions {
 				string.gsub(os.outputof("pkg-config --libs QtGui"), '[\r\n]+', ' '),
