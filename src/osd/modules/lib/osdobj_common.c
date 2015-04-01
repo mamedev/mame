@@ -170,10 +170,12 @@ void osd_common_t::register_options()
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
 #endif
+#ifndef OSD_MINI
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
 	REGISTER_MODULE(m_mod_man, DEBUG_INTERNAL);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
+#endif
 
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);
 	REGISTER_MODULE(m_mod_man, NETDEV_PCAP);

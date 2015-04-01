@@ -385,7 +385,7 @@ int running_machine::run(bool firstrun)
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
-			#ifdef SDLMAME_EMSCRIPTEN
+			#if defined(EMSCRIPTEN)
 			//break out to our async javascript loop and halt
 			js_set_main_loop(this);
 			#endif
@@ -1217,11 +1217,11 @@ astring &running_machine::nvram_filename(astring &result, device_t &device)
 		const char *software = image_parent_basename(&device);
 		if (software!=NULL && strlen(software)>0)
 		{
-			result.cat('\\').cat(software);
+			result.cat(PATH_SEPARATOR).cat(software);
 		}
 		astring tag(device.tag());
 		tag.del(0, 1).replacechr(':', '_');
-		result.cat('\\').cat(tag);
+		result.cat(PATH_SEPARATOR).cat(tag);
 	}
 	return result;
 }
@@ -1344,7 +1344,7 @@ void system_time::full_time::set(struct tm &t)
 //  JAVASCRIPT PORT-SPECIFIC
 //**************************************************************************
 
-#ifdef SDLMAME_EMSCRIPTEN
+#if defined(EMSCRIPTEN)
 
 static running_machine * jsmess_machine;
 
@@ -1377,4 +1377,4 @@ sound_manager * js_get_sound() {
 	return &(jsmess_machine->sound());
 }
 
-#endif /* SDLMAME_EMSCRIPTEN */
+#endif /* defined(EMSCRIPTEN) */

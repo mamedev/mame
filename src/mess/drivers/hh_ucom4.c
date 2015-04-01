@@ -6,7 +6,7 @@
 
 
   known chips:
-  
+
   serial  device   etc.
 ----------------------------------------------------------------
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
@@ -52,7 +52,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_ioport_array<5> m_inp_matrix; // max 5
 	optional_device<speaker_sound_device> m_speaker;
-	
+
 	// misc common
 	UINT8 m_port[9];                    // MCU port A-I write data
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
@@ -65,17 +65,18 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
+
 	UINT32 m_grid;                      // VFD current row data
 	UINT32 m_plate;                     // VFD current column data
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
+	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// game-specific handlers
@@ -95,7 +96,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(edracula_grid_w);
 	DECLARE_WRITE8_MEMBER(edracula_plate_w);
-	
+
 	DECLARE_WRITE8_MEMBER(tmtennis_grid_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_plate_w);
 	DECLARE_WRITE8_MEMBER(tmtennis_port_e_w);
@@ -107,7 +108,7 @@ public:
 	void tmpacman_display();
 	DECLARE_WRITE8_MEMBER(tmpacman_grid_w);
 	DECLARE_WRITE8_MEMBER(tmpacman_plate_w);
-	
+
 	DECLARE_WRITE8_MEMBER(alnchase_output_w);
 	DECLARE_READ8_MEMBER(alnchase_input_r);
 };
@@ -120,7 +121,7 @@ void hh_ucom4_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-	
+
 	memset(m_port, 0, sizeof(m_port));
 	m_inp_mux = 0;
 	m_grid = 0;
@@ -161,7 +162,7 @@ void hh_ucom4_state::display_update()
 	{
 		active_state[y] = 0;
 
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 		{
 			// turn on powered segments
 			if (m_display_state[y] >> x & 1)
@@ -181,15 +182,25 @@ void hh_ucom4_state::display_update()
 				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x < m_display_maxx; x++)
+			for (int x = 0; x <= m_display_maxx; x++)
 			{
 				int state = active_state[y] >> x & 1;
-				output_set_lamp_value(y * mul + x, state);
-
-				// bit coords for svg2lay
-				char buf[10];
-				sprintf(buf, "%d.%d", y, x);
-				output_set_value(buf, state);
+				char buf1[0x10]; // lampyx
+				char buf2[0x10]; // y.x
+				
+				if (x == m_display_maxx)
+				{
+					// always-on if selected
+					sprintf(buf1, "lamp%da", y);
+					sprintf(buf2, "%d.a", y);
+				}
+				else
+				{
+					sprintf(buf1, "lamp%d", y * mul + x);
+					sprintf(buf2, "%d.%d", y, x);
+				}
+				output_set_value(buf1, state);
+				output_set_value(buf2, state);
 			}
 		}
 
@@ -200,23 +211,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_ucom4_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
+}
+
+void hh_ucom4_state::set_display_size(int maxx, int maxy)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
 }
 
 void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 {
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
+	set_display_size(maxx, maxy);
 
 	// update current state
 	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
-	
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
+
 	display_update();
 }
 
@@ -247,7 +263,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   * PCB label Emix Corp. ET-03
   * NEC uCOM-43 MCU, labeled D553C 031
   * green VFD display Emix-102
-  
+
   Press the Kick button to start the game, an automatic sequence follows.
   Then choose a formation(A,B,C) and either pass the ball, and/or start
   running. For more information, refer to the official manual.
@@ -259,6 +275,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 void hh_ucom4_state::ssfball_display()
 {
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
+
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -274,15 +291,15 @@ WRITE8_MEMBER(hh_ucom4_state::ssfball_grid_w)
 WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
 {
 	m_port[offset] = data;
-	
+
 	// E,F,G,H,I(not all!): vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// F3,G3: input mux + speaker
 	m_inp_mux = (m_port[NEC_UCOM4_PORTF] >> 3 & 1) | (m_port[NEC_UCOM4_PORTG] >> 2 & 2);
 	m_speaker->level_w(m_inp_mux);
-	
+
 	// E3: vfd matrix grid 8
 	if (offset == NEC_UCOM4_PORTE)
 		ssfball_grid_w(space, offset, data >> 3 & 1);
@@ -304,21 +321,21 @@ static INPUT_PORTS_START( ssfball )
 
 	PORT_START("IN.1") // G3 port B3
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.2") // port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Kick/Display")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Formation C")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Formation B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Kick/Display")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Formation C")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Formation B")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // multiplexed, handled in ssfball_input_b_r
 
 	PORT_START("IN.3") // port A
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Left/Right")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Up")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Down")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pass")
 INPUT_PORTS_END
 
 
@@ -368,6 +385,7 @@ MACHINE_CONFIG_END
 void hh_ucom4_state::splasfgt_display()
 {
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
+
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -376,10 +394,10 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_grid_w)
 	// G,H,I0: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	
+
 	// G(grid 0-3): input mux
 	m_inp_mux = m_grid & 0xf;
-	
+
 	// I2: vfd matrix plate 6
 	if (offset == NEC_UCOM4_PORTI)
 		m_plate = (m_plate & 0xffff) | (data << 14 & 0x10000);
@@ -392,11 +410,11 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_plate_w)
 	// C,D,E,F23: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// F01: speaker out
 	if (offset == NEC_UCOM4_PORTF)
 		m_speaker->level_w(data & 3);
-	
+
 	ssfball_display();
 }
 
@@ -408,7 +426,7 @@ READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
 
 
 /* physical button layout and labels is like this:
-    
+
     * left = P1 side *                                         * right = P2 side * (note: in 1P mode, switch sides between turns)
 
     [  JUMP  ]  [ HIGH ]        (players sw)                   [ HIGH ]  [  JUMP  ]
@@ -447,7 +465,7 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_CONFNAME( 0x01, 0x00, "Players" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Difficulty ) )
+	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x02, "2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
@@ -505,7 +523,7 @@ MACHINE_CONFIG_END
 
 void hh_ucom4_state::astrocmd_display()
 {
-	UINT32 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
 
 	display_matrix(17, 9, plate, grid);
@@ -530,7 +548,7 @@ WRITE8_MEMBER(hh_ucom4_state::astrocmd_plate_w)
 	{
 		// E2: speaker out
 		m_speaker->level_w(data >> 2 & 1);
-		
+
 		// E3: vfd matrix grid 8
 		astrocmd_grid_w(space, offset, data >> 3 & 1);
 	}
@@ -605,7 +623,7 @@ WRITE8_MEMBER(hh_ucom4_state::edracula_grid_w)
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
-	display_matrix(18, 8, m_plate, m_grid);
+	display_matrix(18+1, 8, m_plate, m_grid);
 }
 
 WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
@@ -719,7 +737,7 @@ READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
 
 
 /* Pro-Tennis physical button layout and labels is like this:
-    
+
     * left = P2/CPU side *    * right = P1 side *
 
     [SERVE] [1] [2] [3]       [3] [2] [1] [SERVE]
@@ -761,7 +779,7 @@ void hh_ucom4_state::tmtennis_set_clock()
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
 	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
 	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock(m_inp_matrix[1]->read() & 0x100 ? 260000 : 360000);
+	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
 }
 
 INPUT_CHANGED_MEMBER(hh_ucom4_state::tmtennis_difficulty_switch)
@@ -818,7 +836,7 @@ MACHINE_CONFIG_END
   - USA: Pac Man
   - UK: Puckman (Tomy), and also published by Grandstand as Munchman
   - Australia: Pac Man-1, published by Futuretronics
-  
+
   The game will start automatically after turning it on. This Pac Man refuses
   to eat dots with his butt, you can only eat them going right-to-left.
 
@@ -828,10 +846,10 @@ MACHINE_CONFIG_END
 
 void hh_ucom4_state::tmpacman_display()
 {
-	UINT32 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	UINT16 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
-	
-	display_matrix(19, 8, plate | 0x100, grid); // plate 8 (maze) is always on
+
+	display_matrix(19, 8, plate, grid);
 }
 
 WRITE8_MEMBER(hh_ucom4_state::tmpacman_grid_w)
@@ -930,7 +948,7 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 		// C0(grid 0): input enable PL1
 		// D0(grid 4): input enable PL2
 		m_inp_mux = (m_grid & 1) | (m_grid >> 3 & 2);
-		
+
 		// E1: speaker out
 		if (offset == NEC_UCOM4_PORTE)
 			m_speaker->level_w(data >> 1 & 1);

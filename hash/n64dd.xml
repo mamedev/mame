@@ -1,28 +1,178 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="n64dd" description="Nintendo 64 DD disks">
+
 	<software name="dezaemon">
-		<description>Dezaemon DD (Jpn, Prototype Rev 199802xx)</description>
+		<description>Dezaemon DD (Prototype Rev 199802xx)</description>
 		<year>1998</year>
 		<publisher>Athena</publisher>
 		<info name="usage" value="Requires Dezaemon 3D cart" />
-
+		<info name="serial" value="NUD-DPGJ-JPN" />
 		<part name="disk" interface="n64dd_disk">
-			<dataarea name="rom" size="64458560">
-				<rom name="dezaemon.bin" size="64458560" crc="ccb84a39" sha1="d5cc4ab1fc79e27e54a9ad08c4dee47256352006" offset="0" />
+			<dataarea name="rom" size="70627520">
+				<rom name="dezaemon.bin" size="70627520" crc="8648a5e0" sha1="195426bc24501edfdfd36e3f75658b641738b8e3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="fzerox">
-		<description>F-Zero X Expansion Kit (Jpn)</description>
+		<description>F-Zero X Expansion Kit</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="usage" value="Requires F-Zero X cart" />
-
+		<info name="serial" value="NUD-EFZJ-JPN" />
+		<info name="release" value="20000421" />
+        <info name="alt_title" value="エフ　ゼロ　エックス　エクスパンションキット" />
 		<part name="disk" interface="n64dd_disk">
-			<dataarea name="rom" size="67108864">
-				<rom name="fzeroxe.bin" size="67108864" crc="a4a24ab0" sha1="c5845f582bc238e081588e172ef8ec50512e969d" offset="0" />
+			<dataarea name="rom" size="70627520">
+				<rom name="f-zero x expansion kit [nud-efzj-jpn].bin" size="70627520" crc="9ab91e71" sha1="7b39677dad61b2fb91eb2ede756fbd3b49f15afe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="progolf">
+		<description>Nihon Pro Golf Tour 64</description>
+		<year>2000</year>
+		<publisher>Seta</publisher>
+		<info name="serial" value="NUD-DPGJ-JPN" />
+		<info name="release" value="20000502" />
+		<info name="alt_title" value="日本プロゴルフツアー" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="japan pro golf tour 64 [nud-dpgj-jpn].bin" size="70627520" crc="9190e021" sha1="08c7488d5fad40f7760316884823d686c5cae81f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdoshin">
+		<description>Kyojin no Doshin 1</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DKDJ-JPN" />
+		<info name="release" value="19991211" />
+		<info name="alt_title" value="巨人のドシン1" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="kyojin no doshin [nud-dkdj-jpn].bin" size="70627520" crc="7df88308" sha1="204f6594a227e025b018594d7428c6a9e7ba39cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdoshind" cloneof="kdoshin">
+		<description>Kyojin no Doshin (Store Demo)</description>
+		<year>1999?</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DKIJ-JPN" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="kyojin no doshin demo [nud-dkij-jpn].bin" size="70627520" crc="bf29f471" sha1="c8a2e6d1e72b02cacccc2ef590258632f4903919" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kdoshin2">
+		<description>Kyojin no Doshin - Kaihou Sensen Chibikko Chikko Daishuugou</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DKKJ-JPN" />
+		<info name="release" value="20000517" />
+		<info name="alt_title" value="巨人のドシン。　解放戦線チビッコチッコ大集合" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="kyojin no doshin - kaihou sensen chibikko chikko daishuugou [nud-dkkj-jpn].bin" size="70627520" crc="809550ea" sha1="9e570783e6119b3790cffb4b7a5d0e31325959d0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariartc">
+		<description>Mario Artist - Communication Kit</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DMBJ-JPN" />
+		<info name="release" value="20000629" />
+		<info name="alt_title" value="マリオアーティスト。　コミュニケーションキット" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="mario artist - communication kit [nud-dmbj-jpn].bin" size="70627520" crc="5e088759" sha1="b00f0cfd523be8830d03f4f471dfa6ebb0900207" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariartp">
+		<description>Mario Artist - Paint Studio</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DMPJ-JPN" />
+		<info name="release" value="19991211" />
+		<info name="alt_title" value="マリオアーティスト。　ペイントスタジオ" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="mario artist - paint studio [nud-dmpj-jpn].bin" size="70627520" crc="3e3f3e21" sha1="6478c4ebe47aaad3da1087de66e2c1a476706855" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariartg">
+		<description>Mario Artist - Polygon Studio</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DMGJ-JPN" />
+		<info name="release" value="20000829" />
+		<info name="alt_title" value="マリオアーティスト。　ポリゴンスタジオ" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="mario artist - polygon studio [nud-dmgj-jpn].bin" size="70627520" crc="71a517c1" sha1="106f05379c56a69e8a20dc8c6eb7e76fc77f6927" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariartt">
+		<description>Mario Artist - Talent Studio</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DMTJ-JPN" />
+		<info name="release" value="20000223" />
+		<info name="alt_title" value="マリオアーティスト。　タレントスタジオ" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="mario artist - talent studio [nud-dmtj-jpn].bin" size="70627520" crc="f8803e76" sha1="e90fd7b98b0275d4c5135fcb22e86b1b46458993" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="randnet">
+		<description>Randnet Browser</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="NUD-DRDJ-JPN" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="randnet browser [nud-drdj-jpn].bin" size="70627520" crc="5e08cf47" sha1="516679e171e100fdbf95a1991ae8280c387bfdaf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity">
+		<description>Sim City 64</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUD-DSCJ-JPN" />
+		<info name="release" value="20000223" />
+		<info name="alt_title" value="シムシティー64" />
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="sim city 64 [nud-dscj-jpn].bin" size="70627520" crc="0b253f8f" sha1="ebac4aaa4737f1fa58453fbb7bfb05b8012c5d3d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sm64">
+		<description>Super Mario 64</description>
+		<year>19??</year>
+		<publisher>Nintendo</publisher>
+		<part name="disk" interface="n64dd_disk">
+			<dataarea name="rom" size="70627520">
+				<rom name="sm64disk.bin" size="70627520" crc="93921e57" sha1="1539ef4055762eab35acc5953911baef160b8c56" offset="0" />
 			</dataarea>
 		</part>
 	</software>

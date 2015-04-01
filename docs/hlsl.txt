@@ -11,7 +11,7 @@ hlslpath                [path]          Path to the .fx files that are in use.  
 hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X.  (0 for auto)
 hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y.  (0 for auto)
 hlsl_preset             -1 through 3    HLSL preset to use.  (default: -1)
-hlsl_write              0/1		Enable HLSL AVI writing.  (huge disk bandwidth suggested)
+hlsl_write              [filename]      Enable HLSL AVI writing.   (huge disk bandwidth suggested)
 hlsl_snap_width         [width]         HLSL upscaled-snapshot width.  (default: 2048)
 hlsl_snap_height    	[height]        HLSL upscaled-snapshot height.  (default: 1536)
 

@@ -56,6 +56,7 @@ static const luaL_Reg os_functions[] = {
 	{ "pathsearch",  os_pathsearch  },
 	{ "rmdir",       os_rmdir       },
 	{ "stat",        os_stat        },
+	{ "ticks",       os_ticks       },
 	{ "uuid",        os_uuid        },
 	{ NULL, NULL }
 };

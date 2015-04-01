@@ -2494,13 +2494,13 @@ float render_manager::ui_aspect(render_container *rc)
 		orient = orientation_add(m_ui_target->orientation(), m_ui_container->orientation());
 		// based on the orientation of the target, compute height/width or width/height
 		if (!(orient & ORIENTATION_SWAP_XY))
-			   aspect = (float)m_ui_target->height() / (float)m_ui_target->width();
+				aspect = (float)m_ui_target->height() / (float)m_ui_target->width();
 		else
-			   aspect = (float)m_ui_target->width() / (float)m_ui_target->height();
+				aspect = (float)m_ui_target->width() / (float)m_ui_target->height();
 
 		// if we have a valid pixel aspect, apply that and return
 		if (m_ui_target->pixel_aspect() != 0.0f)
-			   return (aspect / m_ui_target->pixel_aspect());
+				return (aspect / m_ui_target->pixel_aspect());
 	} else {
 		// single screen container
 

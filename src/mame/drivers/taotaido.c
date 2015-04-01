@@ -76,7 +76,7 @@ zooming might be wrong
 void taotaido_state::machine_start()
 {
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
-	
+
 	save_item(NAME(m_pending_command));
 }
 

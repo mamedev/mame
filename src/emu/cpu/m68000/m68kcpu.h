@@ -32,7 +32,7 @@ class m68000_base_device;
 
 #include <limits.h>
 
-#ifdef SDLMAME_SOLARIS
+#if defined(__sun__) && defined(__svr4__)
 #undef REG_SP
 #undef REG_PC
 #undef REG_FP

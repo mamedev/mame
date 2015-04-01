@@ -194,7 +194,7 @@ enum
 	MIPS3_BADVADDR
 };
 
-#define MIPS3_MAX_FASTRAM       4
+#define MIPS3_MAX_FASTRAM       3
 #define MIPS3_MAX_HOTSPOTS      16
 
 enum
@@ -296,8 +296,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(compare_int_callback);
 
+	void add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
+
 	void mips3drc_set_options(UINT32 options);
-	void mips3drc_add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
 	void mips3drc_add_hotspot(offs_t pc, UINT32 opcode, UINT32 cycles);
 
 protected:
@@ -325,6 +326,7 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
 
 private:
 	struct internal_mips3_state
@@ -394,6 +396,8 @@ private:
 
 	/* memory accesses */
 	bool            m_bigendian;
+	UINT32			m_byte_xor;
+	UINT32			m_word_xor;
 	data_accessors  m_memory;
 
 	/* cache memory */
@@ -403,6 +407,16 @@ private:
 	/* MMU */
 	vtlb_state *    m_vtlb;
 	mips3_tlb_entry m_tlb[MIPS3_MAX_TLB_ENTRIES];
+
+	/* fast RAM */
+	UINT32              m_fastram_select;
+	struct
+	{
+		offs_t              start;                      /* start of the RAM block */
+		offs_t              end;                        /* end of the RAM block */
+		UINT8               readonly;                   /* TRUE if read-only */
+		void *              base;                       /* base in memory where the RAM lives */
+	}       m_fastram[MIPS3_MAX_FASTRAM];
 
 	UINT64 m_debugger_temp;
 
@@ -442,16 +456,6 @@ private:
 	uml::code_handle *   m_exception[18/*EXCEPTION_COUNT*/]; /* array of exception handlers */
 	uml::code_handle *   m_exception_norecover[18/*EXCEPTION_COUNT*/];   /* array of no-recover exception handlers */
 
-	/* fast RAM */
-	UINT32              m_fastram_select;
-	struct
-	{
-		offs_t              start;                      /* start of the RAM block */
-		offs_t              end;                        /* end of the RAM block */
-		UINT8               readonly;                   /* TRUE if read-only */
-		void *              base;                       /* base in memory where the RAM lives */
-	}       m_fastram[MIPS3_MAX_FASTRAM];
-
 	/* hotspots */
 	UINT32              m_hotspot_select;
 	struct
@@ -477,25 +481,29 @@ public:
 private:
 	UINT32 compute_config_register();
 	UINT32 compute_prid_register();
+
 	void tlb_map_entry(int tlbindex);
 	void tlb_write_common(int tlbindex);
-	int RBYTE(offs_t address, UINT32 *result);
-	int RHALF(offs_t address, UINT32 *result);
-	int RWORD(offs_t address, UINT32 *result);
-	int RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask);
-	int RDOUBLE(offs_t address, UINT64 *result);
-	int RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask);
+
+	bool RBYTE(offs_t address, UINT32 *result);
+	bool RHALF(offs_t address, UINT32 *result);
+	bool RWORD(offs_t address, UINT32 *result);
+	bool RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask);
+	bool RDOUBLE(offs_t address, UINT64 *result);
+	bool RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask);
 	void WBYTE(offs_t address, UINT8 data);
 	void WHALF(offs_t address, UINT16 data);
 	void WWORD(offs_t address, UINT32 data);
 	void WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask);
 	void WDOUBLE(offs_t address, UINT64 data);
 	void WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask);
+
 	UINT64 get_cop0_reg(int idx);
 	void set_cop0_reg(int idx, UINT64 val);
 	UINT64 get_cop0_creg(int idx);
 	void set_cop0_creg(int idx, UINT64 val);
 	void handle_cop0(UINT32 op);
+
 	UINT32 get_cop1_reg32(int idx);
 	UINT64 get_cop1_reg64(int idx);
 	void set_cop1_reg32(int idx, UINT32 val);
@@ -506,11 +514,16 @@ private:
 	void handle_cop1_fr1(UINT32 op);
 	void handle_cop1x_fr0(UINT32 op);
 	void handle_cop1x_fr1(UINT32 op);
+
 	UINT64 get_cop2_reg(int idx);
 	void set_cop2_reg(int idx, UINT64 val);
 	UINT64 get_cop2_creg(int idx);
 	void set_cop2_creg(int idx, UINT64 val);
 	void handle_cop2(UINT32 op);
+
+	void handle_special(UINT32 op);
+	void handle_regimm(UINT32 op);
+
 	void lwl_be(UINT32 op);
 	void lwr_be(UINT32 op);
 	void ldl_be(UINT32 op);
@@ -756,6 +769,7 @@ private:
 #define MIPS3DRC_STRICT_COP2        0x0008          /* validate all COP2 instructions */
 #define MIPS3DRC_FLUSH_PC           0x0010          /* flush the PC value before each memory access */
 #define MIPS3DRC_CHECK_OVERFLOWS    0x0020          /* actually check overflows on add/sub instructions */
+#define MIPS3DRC_ACCURATE_DIVZERO   0x0040          /* load correct values into HI/LO on integer divide-by-zero */
 
 #define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)

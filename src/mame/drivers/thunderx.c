@@ -317,7 +317,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 {
 	// bits 0-3 select ROM bank at 6000-7fff
-    m_rombank->set_entry(data & 0x0f);
+	m_rombank->set_entry(data & 0x0f);
 
 	// bit 4 selects work RAM or palette RAM at 5800-5fff
 	m_bank5800->set_bank((data & 0x10) >> 4);

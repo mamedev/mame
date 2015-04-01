@@ -8,7 +8,7 @@
 #if BGFX_CONFIG_RENDERER_DIRECT3D9
 #	include "renderer_d3d9.h"
 
-namespace bgfx
+namespace bgfx { namespace d3d9
 {
 	static wchar_t s_viewNameW[BGFX_CONFIG_MAX_VIEWS][BGFX_CONFIG_MAX_VIEW_NAME];
 
@@ -359,37 +359,51 @@ namespace bgfx
 			m_adapter = D3DADAPTER_DEFAULT;
 			m_deviceType = D3DDEVTYPE_HAL;
 
-			uint32_t adapterCount = m_d3d9->GetAdapterCount();
-			for (uint32_t ii = 0; ii < adapterCount; ++ii)
+			uint8_t numGPUs = bx::uint32_min(BX_COUNTOF(g_caps.gpu), m_d3d9->GetAdapterCount() );
+			for (uint32_t ii = 0; ii < numGPUs; ++ii)
 			{
-				D3DADAPTER_IDENTIFIER9 identifier;
-				HRESULT hr = m_d3d9->GetAdapterIdentifier(ii, 0, &identifier);
+				D3DADAPTER_IDENTIFIER9 desc;
+				HRESULT hr = m_d3d9->GetAdapterIdentifier(ii, 0, &desc);
 				if (SUCCEEDED(hr) )
-				{
+				{			
 					BX_TRACE("Adapter #%d", ii);
-					BX_TRACE("\tDriver: %s", identifier.Driver);
-					BX_TRACE("\tDescription: %s", identifier.Description);
-					BX_TRACE("\tDeviceName: %s", identifier.DeviceName);
+					BX_TRACE("\tDriver: %s", desc.Driver);
+					BX_TRACE("\tDescription: %s", desc.Description);
+					BX_TRACE("\tDeviceName: %s", desc.DeviceName);
 					BX_TRACE("\tVendorId: 0x%08x, DeviceId: 0x%08x, SubSysId: 0x%08x, Revision: 0x%08x"
-						, identifier.VendorId
-						, identifier.DeviceId
-						, identifier.SubSysId
-						, identifier.Revision
+						, desc.VendorId
+						, desc.DeviceId
+						, desc.SubSysId
+						, desc.Revision
 						);
 
-#if BGFX_CONFIG_DEBUG_PERFHUD
-					if (0 != strstr(identifier.Description, "PerfHUD") )
+					g_caps.gpu[ii].vendorId = (uint16_t)desc.VendorId;
+					g_caps.gpu[ii].deviceId = (uint16_t)desc.DeviceId;
+
+					if (D3DADAPTER_DEFAULT == m_adapter)
 					{
-						m_adapter = ii;
-						m_deviceType = D3DDEVTYPE_REF;
+						if ( (BGFX_PCI_ID_NONE != g_caps.vendorId ||             0 != g_caps.deviceId)
+						&&   (BGFX_PCI_ID_NONE == g_caps.vendorId || desc.VendorId == g_caps.vendorId)
+						&&   (               0 == g_caps.deviceId || desc.DeviceId == g_caps.deviceId) )
+						{
+							m_adapter = ii;
+						}
+
+						if (BX_ENABLED(BGFX_CONFIG_DEBUG_PERFHUD)
+						&&  0 != strstr(desc.Description, "PerfHUD"))
+						{
+							m_adapter = ii;
+							m_deviceType = D3DDEVTYPE_REF;
+						}
 					}
-#endif // BGFX_CONFIG_DEBUG_PERFHUD
 				}
 			}
 
 			DX_CHECK(m_d3d9->GetAdapterIdentifier(m_adapter, 0, &m_identifier) );
-			m_amd = m_identifier.VendorId == 0x1002;
-			m_nvidia = m_identifier.VendorId == 0x10de;
+			m_amd    = m_identifier.VendorId == BGFX_PCI_ID_AMD;
+			m_nvidia = m_identifier.VendorId == BGFX_PCI_ID_NVIDIA;
+			g_caps.vendorId = (uint16_t)m_identifier.VendorId;
+			g_caps.deviceId = (uint16_t)m_identifier.DeviceId;
 
 			uint32_t behaviorFlags[] =
 			{
@@ -1731,14 +1745,14 @@ namespace bgfx
 
 	static RendererContextD3D9* s_renderD3D9;
 
-	RendererContextI* rendererCreateD3D9()
+	RendererContextI* rendererCreate()
 	{
 		s_renderD3D9 = BX_NEW(g_allocator, RendererContextD3D9);
 		s_renderD3D9->init();
 		return s_renderD3D9;
 	}
 
-	void rendererDestroyD3D9()
+	void rendererDestroy()
 	{
 		s_renderD3D9->shutdown();
 		BX_DELETE(g_allocator, s_renderD3D9);
@@ -2215,10 +2229,10 @@ namespace bgfx
 				if (NULL != _rect)
 				{
 					RECT rect;
-					rect.left = _rect->m_x;
-					rect.top = _rect->m_y;
-					rect.right = rect.left + _rect->m_width;
-					rect.bottom = rect.top + _rect->m_height;
+					rect.left   = _rect->m_x;
+					rect.top    = _rect->m_y;
+					rect.right  = rect.left + _rect->m_width;
+					rect.bottom = rect.top  + _rect->m_height;
 					DX_CHECK(m_texture2d->LockRect(_lod, &lockedRect, &rect, 0) );
 				}
 				else
@@ -2494,7 +2508,7 @@ namespace bgfx
 
 		if (convert)
 		{
-			uint8_t* temp = (uint8_t*)BX_ALLOC(g_allocator, rectpitch*_rect.m_height);
+			temp = (uint8_t*)BX_ALLOC(g_allocator, rectpitch*_rect.m_height);
 			imageDecodeToBgra8(temp, data, _rect.m_width, _rect.m_height, srcpitch, m_requestedFormat);
 			data = temp;
 		}
@@ -2864,8 +2878,11 @@ namespace bgfx
 		FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
 		uint32_t blendFactor = 0;
 
-		const uint64_t pt = _render->m_debug&BGFX_DEBUG_WIREFRAME ? BGFX_STATE_PT_LINES : 0;
-		uint8_t primIndex = uint8_t(pt>>BGFX_STATE_PT_SHIFT);
+		uint8_t primIndex;
+		{
+			const uint64_t pt = _render->m_debug&BGFX_DEBUG_WIREFRAME ? BGFX_STATE_PT_LINES : 0;
+			primIndex = uint8_t(pt>>BGFX_STATE_PT_SHIFT);
+		}
 		PrimInfo prim = s_primInfo[primIndex];
 
 		bool viewHasScissor = false;
@@ -2876,6 +2893,7 @@ namespace bgfx
 		uint32_t statsNumPrimsRendered[BX_COUNTOF(s_primInfo)] = {};
 		uint32_t statsNumInstances[BX_COUNTOF(s_primInfo)] = {};
 		uint32_t statsNumIndices = 0;
+		uint32_t statsKeyType[2] = {};
 
 		invalidateSamplerState();
 
@@ -2884,6 +2902,7 @@ namespace bgfx
 			for (uint32_t item = 0, numItems = _render->m_num; item < numItems; ++item)
 			{
 				const bool isCompute = key.decode(_render->m_sortKeys[item], _render->m_viewRemap);
+				statsKeyType[isCompute]++;
 
 				if (isCompute)
 				{
@@ -3414,8 +3433,10 @@ namespace bgfx
 					);
 
 				double elapsedCpuMs = double(elapsed)*toMs;
-				tvm.printf(10, pos++, 0x8e, "  Draw calls: %4d / CPU %3.4f [ms]"
+				tvm.printf(10, pos++, 0x8e, "   Submitted: %4d (draw %4d, compute %4d) / CPU %3.4f [ms]"
 					, _render->m_num
+					, statsKeyType[0]
+					, statsKeyType[1]
 					, elapsedCpuMs
 					);
 				for (uint32_t ii = 0; ii < BX_COUNTOF(s_primName); ++ii)
@@ -3460,20 +3481,20 @@ namespace bgfx
 
 		device->EndScene();
 	}
-} // namespace bgfx
+} /* namespace d3d9 */ } // namespace bgfx
 
 #else
 
-namespace bgfx
+namespace bgfx { namespace d3d9
 {
-	RendererContextI* rendererCreateD3D9()
+	RendererContextI* rendererCreate()
 	{
 		return NULL;
 	}
 
-	void rendererDestroyD3D9()
+	void rendererDestroy()
 	{
 	}
-} // namespace bgfx
+} /* namespace d3d9 */ } // namespace bgfx
 
 #endif // BGFX_CONFIG_RENDERER_DIRECT3D9

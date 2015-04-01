@@ -3,7 +3,7 @@
 /*
 
   Hitachi HMCS40 MCU family disassembler
-  
+
   NOTE: start offset(basepc) is $3F, not 0
 
 */
@@ -92,42 +92,42 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x000 */
-	mNOP,  mXSP,  mXSP,  mXSP,  mSEM,  mSEM,  mSEM,  mSEM,  mLAM,  mLAM,  mLAM,  mLAM,  m,     m,     m,     m,  
+	mNOP,  mXSP,  mXSP,  mXSP,  mSEM,  mSEM,  mSEM,  mSEM,  mLAM,  mLAM,  mLAM,  mLAM,  m,     m,     m,     m,
 	mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,mLMIIY,
-	mLBM,  mLBM,  mLBM,  mLBM,  mBLEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	mAMC,  m,     m,     m,     mAM,   m,     m,     m,     m,     m,     m,     m,     mLTA,  m,     m,     m,  
+	mLBM,  mLBM,  mLBM,  mLBM,  mBLEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mAMC,  m,     m,     m,     mAM,   m,     m,     m,     m,     m,     m,     m,     mLTA,  m,     m,     m,
 	/* 0x040 */
 	mLXA,  m,     m,     m,     m,     mDAS,  mDAA,  m,     m,     m,     m,     m,     mREC,  m,     m,     mSEC,
-	mLYA,  m,     m,     m,     mIY,   m,     m,     m,     mAYY,  m,     m,     m,     m,     m,     m,     m,  
-	mLBA,  m,     m,     m,     mIB,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mLYA,  m,     m,     m,     mIY,   m,     m,     m,     mAYY,  m,     m,     m,     m,     m,     m,     m,
+	mLBA,  m,     m,     m,     mIB,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,  mLAI,
 	/* 0x080 */
 	mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,   mAI,
-	mSED,  m,     m,     m,     mTD,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	mSEIF1,mSECF, mSEIF0,m,     mSEIE, mSETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mSED,  m,     m,     m,     mTD,   m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mSEIF1,mSECF, mSEIF0,m,     mSEIE, mSETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	/* 0x0c0 */
-	mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  m,     m,     m,     m,     m,     m,     m,     m,  
+	mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  m,     m,     m,     m,     m,     m,     m,     m,
 	mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD,
-	mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  m,     m,     m,     m,     m,     m,     m,     m,  
+	mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  m,     m,     m,     m,     m,     m,     m,     m,
 	mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR,
 
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x100 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	mLMAIY,mLMAIY,m,     m,     mLMADY,mLMADY,m,     m,     mLAY,  m,     m,     m,     m,     m,     m,     m,  
-	mOR,   m,     m,     m,     mANEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mLMAIY,mLMAIY,m,     m,     mLMADY,mLMADY,m,     m,     mLAY,  m,     m,     m,     m,     m,     m,     m,
+	mOR,   m,     m,     m,     mANEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	/* 0x140 */
 	mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,  mLXI,
 	mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,  mLYI,
 	mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,  mLBI,
 	mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,  mLTI,
 	/* 0x180 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	mTIF1, mTI1,  mTIF0, mTI0,  m,     mTTF,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mTIF1, mTI1,  mTIF0, mTI0,  m,     mTTF,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	/* 0x1c0 */
 	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
 	mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,   mBR,
@@ -136,42 +136,42 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x200 */
-	mTM,   mTM,   mTM,   mTM,   mREM,  mREM,  mREM,  mREM,  mXMA,  mXMA,  mXMA,  mXMA,  m,     m,     m,     m,  
+	mTM,   mTM,   mTM,   mTM,   mREM,  mREM,  mREM,  mREM,  mXMA,  mXMA,  mXMA,  mXMA,  m,     m,     m,     m,
 	mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI, mMNEI,
-	mXMB,  mXMB,  mXMB,  mXMB,  mROTR, mROTL, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	mSMC,  m,     m,     m,     mALEM, m,     m,     m,     m,     m,     m,     m,     mLAT,  m,     m,     m,  
+	mXMB,  mXMB,  mXMB,  mXMB,  mROTR, mROTL, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mSMC,  m,     m,     m,     mALEM, m,     m,     m,     m,     m,     m,     m,     mLAT,  m,     m,     m,
 	/* 0x240 */
 	mLASPX,m,     m,     m,     mNEGA, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     mTC,
-	mLASPY,m,     m,     m,     mDY,   m,     m,     m,     mSYY,  m,     m,     m,     m,     m,     m,     m,  
-	mLAB,  m,     m,     m,     m,     m,     m,     mDB,   m,     m,     m,     m,     m,     m,     m,     m,  
+	mLASPY,m,     m,     m,     mDY,   m,     m,     m,     mSYY,  m,     m,     m,     m,     m,     m,     m,
+	mLAB,  m,     m,     m,     m,     m,     m,     mDB,   m,     m,     m,     m,     m,     m,     m,     m,
 	mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI, mALEI,
 	/* 0x280 */
 	mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI, mYNEI,
-	mRED,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	mREIF1,mRECF, mREIF0,m,     mREIE, mRETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mRED,  m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mREIF1,mRECF, mREIF0,m,     mREIE, mRETF, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	/* 0x2c0 */
-	mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  m,     m,     m,     m,     m,     m,     m,     m,  
+	mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  m,     m,     m,     m,     m,     m,     m,     m,
 	mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD,
-	mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x300 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	mCOMB, m,     m,     m,     mBNEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	mCOMB, m,     m,     m,     mBNEM, m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	/* 0x340 */
 	mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,
 	mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,  mLPU,
 	mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mTBR,  mP,    mP,    mP,    mP,    mP,    mP,    mP,    mP,
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	/* 0x380 */
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     mRTNI, m,     m,     mRTN,  m,     m,     m,     m,     m,     m,     m,     m,  
-	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,  
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     mRTNI, m,     m,     mRTN,  m,     m,     m,     m,     m,     m,     m,     m,
+	m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,     m,
 	/* 0x3c0 */
 	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
 	mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,  mCAL,
@@ -188,7 +188,7 @@ CPU_DISASSEMBLE(hmcs40)
 	char *dst = buffer;
 	UINT8 instr = hmcs40_mnemonic[op];
 	INT8 bits = s_bits[instr];
-	
+
 	// special case for (XY) opcode
 	if (bits == 99)
 	{
@@ -202,12 +202,12 @@ CPU_DISASSEMBLE(hmcs40)
 	else
 	{
 		dst += sprintf(dst, "%-6s ", s_mnemonics[instr]);
-	
+
 		// opcode parameter
 		if (bits != 0)
 		{
 			UINT8 param = op;
-			
+
 			// reverse bits
 			if (bits < 0)
 			{
@@ -215,16 +215,16 @@ CPU_DISASSEMBLE(hmcs40)
 				param >>= (8 + bits);
 				bits = -bits;
 			}
-			
+
 			param &= ((1 << bits) - 1);
-			
+
 			if (bits > 5)
 				dst += sprintf(dst, "$%02X", param);
 			else
 				dst += sprintf(dst, "%d", param);
 		}
 	}
-	
+
 	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
 }

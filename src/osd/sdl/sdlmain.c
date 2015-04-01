@@ -389,18 +389,16 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(SDLMAME_DARWIN);
 	MACRO_VERBOSE(SDLMAME_LINUX);
 	MACRO_VERBOSE(SDLMAME_SOLARIS);
-	MACRO_VERBOSE(SDLMAME_NOASM);
 	MACRO_VERBOSE(SDLMAME_IRIX);
 	MACRO_VERBOSE(SDLMAME_BSD);
 	osd_printf_verbose("\n");
 	osd_printf_verbose("Build defines 1:    ");
 	MACRO_VERBOSE(LSB_FIRST);
 	MACRO_VERBOSE(PTR64);
+	MACRO_VERBOSE(MAME_NOASM);
 	MACRO_VERBOSE(MAME_DEBUG);
-	MACRO_VERBOSE(NO_DEBUGBER);
 	MACRO_VERBOSE(BIGENDIAN);
 	MACRO_VERBOSE(CPP_COMPILE);
-	MACRO_VERBOSE(DISTRO);
 	MACRO_VERBOSE(SYNC_IMPLEMENTATION);
 	osd_printf_verbose("\n");
 	osd_printf_verbose("SDL/OpenGL defines: ");
@@ -600,14 +598,6 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	defines_verbose();
 
-	if (!SDLMAME_HAS_DEBUGGER)
-		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		{
-			osd_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
-			osd_exit();
-			exit(-1);
-		}
-
 	osd_common_t::init_subsystems();
 
 	if (options().oslog())
@@ -633,44 +623,3 @@ void sdl_osd_interface::init(running_machine &machine)
 	SDL_EnableUNICODE(SDL_TRUE);
 #endif
 }
-
-#ifdef SDLMAME_WIN32
-
-//============================================================
-//  wstring_from_utf8
-//============================================================
-
-WCHAR *wstring_from_utf8(const char *utf8string)
-{
-	int char_count;
-	WCHAR *result;
-
-	// convert MAME string (UTF-8) to UTF-16
-	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
-	result = (WCHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
-		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
-
-	return result;
-}
-
-
-//============================================================
-//  utf8_from_wstring
-//============================================================
-
-char *utf8_from_wstring(const WCHAR *wstring)
-{
-	int char_count;
-	char *result;
-
-	// convert UTF-16 to MAME string (UTF-8)
-	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, NULL, 0, NULL, NULL);
-	result = (char *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
-		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, NULL, NULL);
-
-	return result;
-}
-
-#endif

@@ -228,9 +228,9 @@ public:
 
 	DECLARE_DRIVER_INIT(jchan);
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
 };
 
@@ -290,7 +290,7 @@ void jchan_state::video_start()
 
 	m_spritegen1->skns_sprite_kludge(0,0);
 	m_spritegen2->skns_sprite_kludge(0,0);
-	
+
 	save_item(NAME(m_irq_sub_enable));
 	save_pointer(NAME(m_sprite_ram32_1), 0x4000/4);
 	save_pointer(NAME(m_sprite_ram32_2), 0x4000/4);

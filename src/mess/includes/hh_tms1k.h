@@ -30,9 +30,9 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_ioport_array<7> m_inp_matrix; // max 7
+	optional_ioport_array<11> m_inp_matrix; // max 11
 	optional_device<speaker_sound_device> m_speaker;
-	
+
 	// misc common
 	UINT16 m_r;                         // MCU R-pins data
 	UINT16 m_o;                         // MCU O-pins data
@@ -47,14 +47,15 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
+	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// game-specific handlers
@@ -100,6 +101,11 @@ public:
 	DECLARE_WRITE16_MEMBER(starwbc_write_o);
 	DECLARE_READ8_MEMBER(starwbc_read_k);
 
+	void astro_display();
+	DECLARE_WRITE16_MEMBER(astro_write_r);
+	DECLARE_WRITE16_MEMBER(astro_write_o);
+	DECLARE_READ8_MEMBER(astro_read_k);
+
 	DECLARE_WRITE16_MEMBER(comp4_write_r);
 	DECLARE_WRITE16_MEMBER(comp4_write_o);
 	DECLARE_READ8_MEMBER(comp4_read_k);
@@ -111,6 +117,9 @@ public:
 	DECLARE_WRITE16_MEMBER(ssimon_write_r);
 	DECLARE_WRITE16_MEMBER(ssimon_write_o);
 	DECLARE_READ8_MEMBER(ssimon_read_k);
+	void ssimon_set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(ssimon_speed_switch);
+	DECLARE_MACHINE_RESET(ssimon);
 
 	DECLARE_WRITE16_MEMBER(cnsector_write_r);
 	DECLARE_WRITE16_MEMBER(cnsector_write_o);

@@ -23,7 +23,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
-	
+
 	optional_shared_ptr<UINT16> m_eprom_data;
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -53,15 +53,15 @@ public:
 	DECLARE_WRITE16_MEMBER(video_w);
 	DECLARE_WRITE16_MEMBER(pf1_w);
 	DECLARE_WRITE16_MEMBER(pf2_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
-	
+
 	virtual void machine_start();
 	DECLARE_VIDEO_START(bbuster);
 	DECLARE_VIDEO_START(mechatt);
-	
+
 	UINT32 screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bbuster(screen_device &screen, bool state);

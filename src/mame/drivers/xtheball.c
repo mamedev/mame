@@ -30,21 +30,21 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tlc34076_device> m_tlc34076;
-	
+
 	required_shared_ptr<UINT16> m_vram_bg;
 	required_shared_ptr<UINT16> m_vram_fg;
-	
+
 	required_ioport m_analog_x;
 	required_ioport m_analog_y;
-	
+
 	UINT8 m_bitvals[32];
-	
+
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
 	DECLARE_READ16_MEMBER(analogy_watchdog_r);
-	
+
 	virtual void machine_start();
-	
+
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);

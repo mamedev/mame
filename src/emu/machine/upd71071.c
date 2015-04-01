@@ -1,7 +1,7 @@
 
 /*
 
-	am9517a.c is a more complete implementation of this, the uPD71071 appears to be a clone of it
+    am9517a.c is a more complete implementation of this, the uPD71071 appears to be a clone of it
 
     NEC uPD71071 DMA Controller
     Used on the Fujitsu FM-Towns
@@ -31,8 +31,8 @@
             Self-explanatory, I hope. :)
             NOTE: Datasheet clearly shows this as 24-bit, with register 7 unused.
             But the FM-Towns definitely uses reg 7 as bits 24-31.
-			The documentation on the V53A manual doesn't show these bits either, maybe it's
-			an external connection on the FMT? might be worth checking overflow behavior etc.
+            The documentation on the V53A manual doesn't show these bits either, maybe it's
+            an external connection on the FMT? might be worth checking overflow behavior etc.
 
     0x08:
     0x09:   Device Control register (16-bit)
@@ -77,8 +77,8 @@
     0x0f:   Mask register
             bit 0-3: DMARQ mask
             bits 1 and 0 only in MTM transfers
-			
-	Note, the uPD71071 compatible mode of the V53 CPU differs from a real uPD71071 in the following ways
+
+    Note, the uPD71071 compatible mode of the V53 CPU differs from a real uPD71071 in the following ways
 
 
 

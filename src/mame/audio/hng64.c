@@ -191,95 +191,24 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 {
-//	logerror("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
+//  logerror("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
 
-
+	printf("transfer\n");
 	m_audiocpu->dreq3_w(data&1);
-//	m_audiocpu->hack_w(1);
+//  m_audiocpu->hack_w(1);
 
 }
 
-READ16_MEMBER(hng64_state::hng64_sound_port_0004_r)
-{
-	// it writes the channel select before reading this.. so either it works on channels, or the command..
-	// read in irq5
-	printf("%08x: hng64_sound_port_0004_r mask (%04x) chn %04x\n", space.device().safe_pc(), mem_mask, m_audiochannel);
-	return rand();
-}
-
-READ16_MEMBER(hng64_state::hng64_sound_port_0006_r)
-{
-	// it writes the channel select before reading this.. so either it works on channels, or the command..
-	// read in irq5
-	printf("%08x: hng64_sound_port_0006_r mask (%04x)  chn %04x\n", space.device().safe_pc(), mem_mask, m_audiochannel);
-	return rand();
-}
 
 READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 {
 	// read in irq5
 	logerror("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
-	return rand();
+	return 0;
 }
 
-WRITE16_MEMBER(hng64_state::hng64_sound_select_w)
-{
-	// I'm guessing these addresses are the sound chip / DSP?
 
-	// ---- ---- 000c cccc
-	// c = channel
-
-	if (data & 0x00e0) printf("hng64_sound_select_w unknown channel %02x\n", data & 0x00ff);
-
-	UINT8 command = data >> 8;
-
-	switch (command)
-	{
-	case 0x00:
-	case 0x01:
-	case 0x02:
-	case 0x03: // 00003fffffff (startup only?)
-	case 0x04: // doesn't use 6
-	case 0x05: // 00003fffffff (mostly, often)
-	case 0x06: // 00007ff0ffff mostly
-	case 0x07: // 0000000f0708 etc. (low values)
-	case 0x08: // doesn't write to 2/4/6 with this set??
-	case 0x09: // doesn't write to 2/4/6 with this set??
-	case 0x0a: // random looking values
-
-		break;
-
-	default:
-		printf("hng64_sound_select_w unrecognized command %02x\n", command);
-		break;
-	}
-
-	COMBINE_DATA(&m_audiochannel);
-}
-
-WRITE16_MEMBER(hng64_state::hng64_sound_data_02_w)
-{
-	m_audiodat[m_audiochannel].dat[2] = data;
-
-//	if ((m_audiochannel & 0xff00) == 0x0a00)
-//		printf("write port 0x0002 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
-}
-
-WRITE16_MEMBER(hng64_state::hng64_sound_data_04_w)
-{
-	m_audiodat[m_audiochannel].dat[1] = data;
-
-//	if ((m_audiochannel & 0xff00) == 0x0a00)
-//		printf("write port 0x0004 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
-}
-WRITE16_MEMBER(hng64_state::hng64_sound_data_06_w)
-{
-	m_audiodat[m_audiochannel].dat[0] = data;
-
-//	if ((m_audiochannel & 0xff00) == 0x0a00)
-//		printf("write port 0x0006 chansel %04x data %04x (%04x%04x%04x)\n", m_audiochannel, data, m_audiodat[m_audiochannel].dat[0], m_audiodat[m_audiochannel].dat[1], m_audiodat[m_audiochannel].dat[2]);
-}
 
 // but why not just use the V33/V53 XA mode??
 WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
@@ -325,63 +254,57 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_000c_w)
 }
 
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0102_w)
-{
-	logerror("hng64_port 0x0102 %04x\n", data);
-}
-
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0080_w)
 {
 	logerror("hng64_port 0x0080 %04x\n", data);
 }
 
-READ16_MEMBER(hng64_state::hng64_sound_port_0106_r)
+
+WRITE16_MEMBER(hng64_state::sound_comms_w)
 {
-	// read in irq5
-	logerror("%08x: hng64_sound_port_0106_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
-	return rand();
+	switch(offset*2)
+	{
+		case 0x0:
+			COMBINE_DATA(&sound_latch[0]);
+			return;
+		case 0x2:
+			COMBINE_DATA(&sound_latch[1]);
+			return;
+		case 0xa:
+			/* correct? */
+			m_audiocpu->set_input_line(5, CLEAR_LINE);
+			if(data)
+				printf("IRQ ACK %02x?\n",data);
+			return;
+	}
+	
+	printf("SOUND W %02x %04x\n",offset*2,data);
 }
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_010a_w)
+READ16_MEMBER(hng64_state::sound_comms_r)
 {
-	logerror("%08x: hng64_port hng64_sound_port_010a_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
-}
-
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0108_w)
-{
-	logerror("%08x: hng64_port hng64_sound_port_0108_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
-}
-
-
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0100_w)
-{
-	logerror("%08x: hng64_port hng64_sound_port_0100_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
-}
-
-READ16_MEMBER(hng64_state::hng64_sound_port_0104_r)
-{
-	// read in irq5
-	logerror("%08x: hng64_sound_port_0104_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
-	return rand();
+	switch(offset*2)
+	{
+		case 0x04:
+			return main_latch[0];
+		case 0x06:
+			return main_latch[1];
+	}
+	printf("SOUND R %02x\n",offset*2);
+	
+	return 0;
 }
 
 static ADDRESS_MAP_START( hng_sound_io, AS_IO, 16, hng64_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE( hng64_sound_select_w )
-	AM_RANGE(0x0002, 0x0003) AM_WRITE( hng64_sound_data_02_w )
-	AM_RANGE(0x0004, 0x0005) AM_READWRITE( hng64_sound_port_0004_r, hng64_sound_data_04_w )
-	AM_RANGE(0x0006, 0x0007) AM_READWRITE( hng64_sound_port_0006_r, hng64_sound_data_06_w )
+	AM_RANGE(0x0000, 0x0007) AM_DEVREADWRITE("l7a1045", l7a1045_sound_device, l7a1045_sound_r, l7a1045_sound_w )
+
 	AM_RANGE(0x0008, 0x0009) AM_READWRITE( hng64_sound_port_0008_r, hng64_sound_port_0008_w )
 	AM_RANGE(0x000a, 0x000b) AM_WRITE( hng64_sound_port_000a_w )
 	AM_RANGE(0x000c, 0x000d) AM_WRITE( hng64_sound_port_000c_w )
 
 	AM_RANGE(0x0080, 0x0081) AM_WRITE( hng64_sound_port_0080_w )
 
-	AM_RANGE(0x0100, 0x0101) AM_WRITE( hng64_sound_port_0100_w )
-	AM_RANGE(0x0102, 0x0103) AM_WRITE( hng64_sound_port_0102_w ) // gets values of 0x0080 / 0x0081 / 0x0000 / 0x0001 depending on return from 0x0106 in irq5?
-	AM_RANGE(0x0104, 0x0105) AM_READ( hng64_sound_port_0104_r )
-	AM_RANGE(0x0106, 0x0107) AM_READ( hng64_sound_port_0106_r )
-	AM_RANGE(0x0108, 0x0109) AM_WRITE( hng64_sound_port_0108_w )
-	AM_RANGE(0x010a, 0x010b) AM_WRITE( hng64_sound_port_010a_w )
+	AM_RANGE(0x0100, 0x010f) AM_READWRITE( sound_comms_r,sound_comms_w )
 
 	AM_RANGE(0x0200, 0x021f) AM_WRITE( hng64_sound_bank_w ) // ??
 
@@ -414,20 +337,41 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm0_cb)
 WRITE_LINE_MEMBER(hng64_state::tcu_tm1_cb)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
-//	logerror("tcu_tm1_cb %02x\n", state);
-	m_audiocpu->set_input_line(5, state? ASSERT_LINE:CLEAR_LINE); // not accurate, just so we have a trigger
+//  logerror("tcu_tm1_cb %02x\n", state);
+	//m_audiocpu->set_input_line(5, state? ASSERT_LINE:CLEAR_LINE); // not accurate, just so we have a trigger
+	/* Almost likely wrong */
+	m_audiocpu->set_input_line(2, state? ASSERT_LINE :CLEAR_LINE);
+
 }
 
 WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 {
 	// these are very active, maybe they feed back into the v53 via one of the IRQ pins?  TM2 toggles more rapidly than TM1
-//	logerror("tcu_tm2_cb %02x\n", state);
+//  logerror("tcu_tm2_cb %02x\n", state);
 
 	// NOT ACCURATE, just so that all the interrupts get triggered for now.
-	static int i = 0;
-	m_audiocpu->set_input_line(i, state? ASSERT_LINE:CLEAR_LINE); 
-	i++;
-	if (i == 3) i = 0;
+	#if 0
+	static int i;
+	if(machine().input().code_pressed_once(KEYCODE_Z))
+		i++;
+
+	if(machine().input().code_pressed_once(KEYCODE_X))
+		i--;
+		
+	if(i < 0)
+		i = 0;
+	if(i > 7)
+		i = 7;
+
+	printf("trigger %02x %d\n",i,state);
+		
+	//if(machine().input().code_pressed_once(KEYCODE_C))
+	{
+		m_audiocpu->set_input_line(i, state? ASSERT_LINE :CLEAR_LINE);
+	}
+	//i++;
+	//if (i == 3) i = 0;
+	#endif
 }
 
 
@@ -444,6 +388,10 @@ MACHINE_CONFIG_FRAGMENT( hng64_audio )
 	MCFG_V53_TCU_OUT1_HANDLER(WRITELINE(hng64_state, tcu_tm1_cb))
 	MCFG_V53_TCU_OUT2_HANDLER(WRITELINE(hng64_state, tcu_tm2_cb))
 
-MACHINE_CONFIG_END
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	
+	MCFG_SOUND_ADD("l7a1045", L7A1045, 16000000 ) // ??
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+
+MACHINE_CONFIG_END

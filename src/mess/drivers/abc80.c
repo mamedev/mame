@@ -79,17 +79,6 @@ Notes:
 
 #include "includes/abc80.h"
 
-#define KEYBOARD_TAG "keyboard"
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define MMU_XM      0x01
-#define MMU_ROM     0x02
-#define MMU_VRAMS   0x04
-#define MMU_RAM     0x08
-
 
 
 //**************************************************************************
@@ -395,6 +384,14 @@ WRITE8_MEMBER( abc80_state::kbd_w )
 	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
 }
 
+
+DEVICE_INPUT_DEFAULTS_START( abc830_slow )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+
+
+
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -476,11 +473,6 @@ void abc80_state::machine_start()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-DEVICE_INPUT_DEFAULTS_START( abc830_slow )
-	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
-	DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END
-
 //-------------------------------------------------
 //  MACHINE_CONFIG( abc80 )
 //-------------------------------------------------
@@ -509,6 +501,9 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	// devices
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_11_9808MHz/2/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -516,8 +511,9 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(abc80_state, pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc80_state, pio_pb_w))
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("abc80_cass")
 
 	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0)
 	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(abc80_state, keydown_w))
@@ -532,7 +528,8 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_RAM_DEFAULT_SIZE("16K")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "abc80_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80_flop")
 MACHINE_CONFIG_END
 
 

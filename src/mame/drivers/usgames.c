@@ -32,12 +32,12 @@ Sound: AY-3-8912
 
 void usgames_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 WRITE8_MEMBER(usgames_state::usgames_rombank_w)
 {
-    membank("bank1")->set_entry(data);
+	membank("bank1")->set_entry(data);
 }
 
 WRITE8_MEMBER(usgames_state::lamps1_w)

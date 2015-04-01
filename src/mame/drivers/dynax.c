@@ -1564,14 +1564,14 @@ static ADDRESS_MAP_START( cdracula_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(cdracula_blitter_rev2_w)       // Blitter + Destination Layers
 	AM_RANGE( 0x10, 0x10 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE( 0x11, 0x11 ) AM_NOP	// unpopulated oki
+	AM_RANGE( 0x11, 0x11 ) AM_NOP   // unpopulated oki
 //  AM_RANGE( 0x12, 0x12 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x13, 0x13 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x20, 0x20 ) AM_READ_PORT("P1")                 // P1
 	AM_RANGE( 0x21, 0x21 ) AM_READ_PORT("P2")                 // P2
 	AM_RANGE( 0x22, 0x22 ) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(dynax_layer_enable_w)     // Layers Enable
-//	AM_RANGE( 0x31, 0x31 ) AM_WRITE(dynax_rombank_w)          // BANK ROM Select
+//  AM_RANGE( 0x31, 0x31 ) AM_WRITE(dynax_rombank_w)          // BANK ROM Select
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(dynax_blit_pen_w)         // Destination Pen
 	AM_RANGE( 0x33, 0x33 ) AM_WRITE(dynax_blit_flags_w)       // Flags + Do Blit
 	AM_RANGE( 0x34, 0x34 ) AM_WRITE(dynax_blit_palette01_w)   // Layers Palettes (Low Bits)
@@ -2042,7 +2042,7 @@ static INPUT_PORTS_START( cdracula )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START("DSW1")	// port $61 -> c217
+	PORT_START("DSW1")  // port $61 -> c217
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )    PORT_DIPLOCATION( "SW1:1,2" )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy )    ) // 44
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal )  ) // 47
@@ -2062,9 +2062,9 @@ static INPUT_PORTS_START( cdracula )
 	PORT_DIPNAME( 0x40, 0x40, "Unknown 1-7" )            PORT_DIPLOCATION( "SW1:7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                  PORT_DIPLOCATION( "SW1:8" )  
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )                  PORT_DIPLOCATION( "SW1:8" )
 
-	PORT_START("DSW2")	// port $60 -> c216
+	PORT_START("DSW2")  // port $60 -> c216
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )       PORT_DIPLOCATION( "SW2:1,2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -3190,7 +3190,7 @@ static INPUT_PORTS_START( jantouki )
 	PORT_DIPSETTING(    0x00, "12:00" )
 	PORT_DIPNAME( 0x08, 0x00, "Nudity" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( No ) )	// Moles On Gal's Face
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )   // Moles On Gal's Face
 	PORT_DIPNAME( 0x10, 0x10, "Buy Screen Bonus Points" ) /* Sets your points to 100 every time you arrive at the screen for buying special items. */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3363,7 +3363,7 @@ static INPUT_PORTS_START( mjembase )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Nudity" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )	// Moles On Gal's Face
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )   // Moles On Gal's Face
 
 	PORT_START("FAKE")  /* IN10 - Fake DSW */
 	PORT_DIPNAME( 0xff, 0xff, "Allow Bets" )
@@ -3500,7 +3500,7 @@ static INPUT_PORTS_START( mjelct3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Nudity" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )	// Moles On Gal's Face
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )   // Moles On Gal's Face
 
 	PORT_START("FAKE")  /* IN10 - Fake DSW */
 	PORT_DIPNAME( 0xff, 0xff, "Allow Bets" )
@@ -4354,7 +4354,7 @@ static MACHINE_CONFIG_START( cdracula, dynax_state )
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
+//  MCFG_NVRAM_ADD_0FILL("nvram")    // no battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

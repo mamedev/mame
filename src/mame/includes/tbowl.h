@@ -62,18 +62,18 @@ public:
 	DECLARE_WRITE8_MEMBER(bg2xscroll_hi);
 	DECLARE_WRITE8_MEMBER(bg2yscroll_lo);
 	DECLARE_WRITE8_MEMBER(bg2yscroll_hi);
-	
+
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	void adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_2);

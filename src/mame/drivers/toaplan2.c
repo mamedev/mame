@@ -5370,7 +5370,7 @@ GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareggahk, toaplan2_state, bgaregga
 GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga, toaplan2_state,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
 GAME( 1996, bgareggacn, bgaregga, bgaregga, bgareggacn, toaplan2_state, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
 GAME( 1996, bgareggabl, bgaregga, bgareggabl,bgareggacn, toaplan2_state,bgaregga, ROT270, "bootleg", "1945 Part-2 (Chinese hack of Battle Garegga)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgareggabla,bgaregga, bgareggabl,bgareggacn, toaplan2_state,bgaregga, ROT270, "bootleg", "Thunder Deity Biography (Chinese hack of Battle Garegga)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgareggabla,bgaregga, bgareggabl,bgareggacn, toaplan2_state,bgaregga, ROT270, "bootleg", "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", GAME_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,   0,        batrider, batrider, toaplan2_state,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )

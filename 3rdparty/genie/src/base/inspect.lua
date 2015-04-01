@@ -283,7 +283,9 @@ function inspect(rootObject, options)
 end
 
 function printtable(name, table)
-	print("--- " .. name)
-	print(inspect(table))
-	print("---")
+	print("table: ", name, inspect(table), "\n")
+end
+
+function printstack()
+	print(debug.traceback(), "\n")
 end

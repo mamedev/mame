@@ -6,8 +6,8 @@
  *  Created on: 23/03/2014
  */
 
- #include <assert.h>
- 
+	#include <assert.h>
+
 #include "formats/fmtowns_dsk.h"
 
 fmtowns_format::fmtowns_format() : wd177x_format(formats)

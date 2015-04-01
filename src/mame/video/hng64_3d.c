@@ -68,7 +68,7 @@ TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
 /* Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown */
 WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 {
-//	printf("dl_control_w %08x %08x\n", data, mem_mask);
+//  printf("dl_control_w %08x %08x\n", data, mem_mask);
 
 	//if(data & 2) // swap buffers
 	//{
@@ -540,7 +540,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 #if 0
 			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
 			{
-			//	if (chunkOffset[2] == 0xd870)
+			//  if (chunkOffset[2] == 0xd870)
 				{
 					polys[*numPolys].debugColor = 0xffff0000;
 					printf("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
@@ -863,13 +863,12 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 
 void hng64_state::hng64_command3d(const UINT16* packet)
 {
-
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
 	dynamic_array<polygon> polys(1024*5);
 
 	//printf("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
-	
+
 	switch (packet[0])
 	{
 	case 0x0000:    // Appears to be a NOP.
@@ -1239,7 +1238,7 @@ inline void hng64_state::FillSmoothTexPCHorizontalLine(
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
-	const UINT8 *gfx = m_texturerom;   
+	const UINT8 *gfx = m_texturerom;
 	const UINT8 *textureOffset = &gfx[prOptions.texIndex * 1024 * 1024];
 
 	for (; x_start <= x_end; x_start++)
@@ -1702,4 +1701,3 @@ void hng64_state::drawShaded( struct polygon *p)
 										prOptions);
 	}
 }
-

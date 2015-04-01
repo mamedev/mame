@@ -325,7 +325,7 @@ void wc90b_state::machine_start()
 	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
 	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
 	membank("audiobank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
-	
+
 	save_item(NAME(m_msm5205next));
 	save_item(NAME(m_toggle));
 }

@@ -611,6 +611,10 @@ typedef uint64_t GLuint64;
 namespace bgfx
 {
 	class ConstantBuffer;
+} // namespace bgfx
+
+namespace bgfx { namespace gl
+{
 	void dumpExtensions(const char* _extensions);
 
 	const char* glEnumName(GLenum _enum);
@@ -619,9 +623,9 @@ namespace bgfx
 				BX_MACRO_BLOCK_BEGIN \
 					/*BX_TRACE(#_call);*/ \
 					_call; \
-					GLenum err = glGetError(); \
-					_check(0 == err, #_call "; GL error 0x%x: %s", err, glEnumName(err) ); \
-					BX_UNUSED(err); \
+					GLenum gl_err = glGetError(); \
+					_check(0 == gl_err, #_call "; GL error 0x%x: %s", gl_err, glEnumName(gl_err) ); \
+					BX_UNUSED(gl_err); \
 				BX_MACRO_BLOCK_END
 
 #define IGNORE_GL_ERROR_CHECK(...) BX_NOOP()
@@ -1001,6 +1005,6 @@ namespace bgfx
 		GLuint m_queries[64];
 	};
 
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // BGFX_RENDERER_GL_H_HEADER_GUARD

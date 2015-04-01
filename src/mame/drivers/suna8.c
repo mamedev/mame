@@ -735,7 +735,7 @@ static ADDRESS_MAP_START( brickzn11_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0xc060, 0xc060) AM_WRITE(brickzn_rombank_w     )   // ROM Bank
 	AM_RANGE(0xc080, 0xc080) AM_WRITE(brickzn_leds_w        )   // Leds
 	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(brickzn_palbank_w     )   // Palette RAM Bank
-//	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(brickzn_prot2_w       )   // Protection 2
+//  AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(brickzn_prot2_w       )   // Protection 2
 
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("P1")                 // P1 (Buttons)
 	AM_RANGE(0xc101, 0xc101) AM_READ_PORT("P2")                 // P2 (Buttons)
@@ -771,13 +771,13 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 	else if (protselect == 0x90)
 	{
 		/*
-			0d	brick hit		NO!		25?
-			2c	side wall hit	OK
-			3b	paddle hit		OK
-			44	death			OK?
-			53	death			OK?
-			56	coin in			OK?
-			70	monster hit		NO?		58?
+		    0d  brick hit       NO!     25?
+		    2c  side wall hit   OK
+		    3b  paddle hit      OK
+		    44  death           OK?
+		    53  death           OK?
+		    56  coin in         OK?
+		    70  monster hit     NO?     58?
 		*/
 		UINT8 remap = (m_remap_sound ? BITSWAP8(data, 7,6,3,4,5,2,1,0) : data);
 
@@ -1975,7 +1975,7 @@ MACHINE_CONFIG_END
 MACHINE_RESET_MEMBER(suna8_state,brickzn)
 {
 	m_protection_val = m_prot2 = m_prot2_prev = 0xff;
-	m_paletteram_enab = 1;	// for brickzn11
+	m_paletteram_enab = 1;  // for brickzn11
 	m_remap_sound = 0;
 	membank("bank1")->set_entry(0);
 }
@@ -2015,12 +2015,12 @@ static MACHINE_CONFIG_START( brickzn11, suna8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)		// 3MHz (measured)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     // 3MHz (measured)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)	// 1.5MHz (measured)
+	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    // 1.5MHz (measured)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 

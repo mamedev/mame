@@ -14,7 +14,7 @@ Supported project generators:
 Download (stable)
 -----------------
 
-	version 225 (commit 2321131cbf61d5a13df44c255b8d18d73121149d)
+	version 257 (commit 77931cf939ad4ec1bacb1fe92045012fd1e25eba)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -50,7 +50,7 @@ intention to keep it compatible with it.
  - Added search for default script. Default script name is changed to genie.lua
    (solution.lua and premake4.lua are also allowed), and it can be located in
    `scripts` directory.
- - Updated Lua from 5.1.4 to 5.2.3.
+ - Updated Lua from 5.1.4 to 5.3.0.
  - Disabled `SmallerTypeCheck` VS option when `ExtraWarnings` is set (need to
    move it into separate option).
  - New versioning scheme based on revision number from git.
@@ -73,6 +73,11 @@ intention to keep it compatible with it.
  - Added `msgcompile`, `msgresource`, `msglinking` and `msgarchiving` as
    overrides for make messages.
  - Added `messageskip` list to disable some of compiler messages.
+ - Added `buildoptions_c`, `buildoptions_cpp`, `buildoptions_objc` for
+   configuring language specific build options.
+ - Split functionality of `excludes` in `removefiles` and `excludes`. With VS
+   `excludes` will exclude files from build but files will be added to project
+   file. `removefiles` removes files completely from project.
 
 ## Why fork?
 
@@ -112,7 +117,7 @@ state of Premake, it's just acknowledging the problem, and dealing with it.
 
 	GENie
 	Copyright (c) 2014 Branimir Karadžić, Neil Richardson, Mike Popoloski,
-	Drew Solomon, Ted de Munnik, Miodrag Milanović.
+	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers.
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without modification,

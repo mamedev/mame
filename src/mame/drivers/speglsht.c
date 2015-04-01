@@ -134,7 +134,7 @@ public:
 	DECLARE_READ32_MEMBER(irq_ack_clear);
 	DECLARE_DRIVER_INIT(speglsht);
 	DECLARE_MACHINE_RESET(speglsht);
-    virtual void machine_start();
+	virtual void machine_start();
 	DECLARE_VIDEO_START(speglsht);
 	UINT32 screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
@@ -160,13 +160,13 @@ ADDRESS_MAP_END
 
 void speglsht_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
 WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
 {
-    membank("bank1")->set_entry(data);
+	membank("bank1")->set_entry(data);
 }
 
 

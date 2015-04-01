@@ -82,13 +82,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	
+
 	required_shared_ptr<UINT8> m_col_line;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_char_bank;
-	
+
 	UINT8 m_wdog;
-	
+
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(wdog8000_w);
 	DECLARE_WRITE8_MEMBER(debug8004_w);
@@ -97,12 +97,12 @@ public:
 	DECLARE_WRITE8_MEMBER(payout_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(supdrapo);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

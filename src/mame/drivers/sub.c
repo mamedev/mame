@@ -139,15 +139,15 @@ public:
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_spriteram2;
 	required_shared_ptr<UINT8> m_scrolly;
-	
+
 	UINT8 m_nmi_en;
-	
+
 	DECLARE_WRITE8_MEMBER(to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	
+
 	virtual void machine_start();
 	DECLARE_PALETTE_INIT(sub);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 };

@@ -73,19 +73,19 @@ void hmcs40_cpu_device::op_laspy()
 void hmcs40_cpu_device::op_xamr()
 {
 	// XAMR m: Exchange A and MR(m)
-	
+
 	// determine MR(Memory Register) location
 	UINT8 address = m_op & 0xf;
-	
+
 	// HMCS42: MR0 on file 0, MR4-MR15 on file 4 (there is no file 1-3)
 	// HMCS43: MR0-MR3 on file 0-3, MR4-MR15 on file 4
 	if (m_family == FAMILY_HMCS42 || m_family == FAMILY_HMCS43)
 		address |= (address < 4) ? (address << 4) : 0x40;
-	
+
 	// HMCS44/45/46/47: all on last file
 	else
 		address |= 0xf0;
-	
+
 	address &= m_datamask;
 	UINT8 old_a = m_a;
 	m_a = m_data->read_byte(address) & 0xf;
@@ -657,7 +657,7 @@ void hmcs40_cpu_device::op_p()
 	m_icount--;
 	UINT16 address = m_a | m_b << 4 | m_c << 8 | (m_op & 7) << 9 | (m_pc & ~0x3f);
 	UINT16 o = m_program->read_word((address & m_prgmask) << 1);
-	
+
 	// destination is determined by the 2 highest bits
 	if (o & 0x100)
 	{

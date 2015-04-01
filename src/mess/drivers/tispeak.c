@@ -2,6 +2,8 @@
 // copyright-holders:hap, Lord Nightmare
 /***************************************************************************
 
+  ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.c) **
+
   Texas Instruments 1st-gen. handheld speech devices,
 
   These devices, mostly edu-toys, are based around an MCU(TMS0270/TMS1100),
@@ -135,7 +137,7 @@ Speak & Math:
       Apparently QA never found out and it ended up in the final product.
 
     Speak & Math (US), 1986
-    - MCU: CD2708
+    - MCU: CD2708, labeled CD2708N2L (die labeled TMC0270F 2708A)
     - TMS51xx(1/2): 16KB CD2381
     - TMS51xx(2/2): 4KB CD2614
 
@@ -149,7 +151,7 @@ Speak & Math:
 Speak & Read:
 
     Speak & Read (US), 1980
-    - MCU: CD2705**
+    - MCU: CD2705, labeled CD2705B-N2L (die labeled TMC0270E 2705B) - 2nd revision?
     - TMS51xx(1/2): 16KB CD2394 (rev.A)
     - TMS51xx(2/2): 16KB CD2395 (rev.A)
 
@@ -275,13 +277,13 @@ Other devices:
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "cpu/tms0980/tms0980.h"
+#include "includes/hh_tms1k.h"
 #include "sound/tms5110.h"
 #include "machine/tms6100.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+// internal artwork
 #include "lantutor.lh"
 #include "snspell.lh"
 
@@ -294,47 +296,20 @@ Other devices:
 #define MASTER_CLOCK (640000)
 
 
-class tispeak_state : public driver_device
+class tispeak_state : public hh_tms1k_state
 {
 public:
 	tispeak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		: hh_tms1k_state(mconfig, type, tag),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
-		m_cart(*this, "cartslot"),
-		m_button_matrix(*this, "IN"),
-		m_display_wait(33),
-		m_display_maxy(1),
-		m_display_maxx(0)
+		m_cart(*this, "cartslot")
 	{ }
 
 	// devices
-	required_device<tms0270_cpu_device> m_maincpu;
 	required_device<tms5100_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
-	required_ioport_array<9> m_button_matrix;
-
-	// misc common
-	UINT16 m_r;                         // MCU R-pins data
-	UINT16 m_o;                         // MCU O-pins data
-	int m_power_on;
-	int m_filament_on;
-
-	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
-
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
-	void display_update();
-	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 
 	// cartridge
 	UINT32 m_cart_max_size;
@@ -349,10 +324,11 @@ public:
 	DECLARE_WRITE16_MEMBER(snspell_write_r);
 	DECLARE_WRITE16_MEMBER(lantutor_write_r);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_button);
-	void power_off();
+	DECLARE_INPUT_CHANGED_MEMBER(snspell_power_button);
+	void snspell_power_off();
+	void snspell_display();
 
-	virtual void machine_reset();
+protected:
 	virtual void machine_start();
 };
 
@@ -397,119 +373,37 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 /***************************************************************************
 
-  VFD Display
-
-***************************************************************************/
-
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void tispeak_state::display_update()
-{
-	UINT32 active_state[0x20];
-
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		active_state[y] = 0;
-
-		for (int x = 0; x < m_display_maxx; x++)
-		{
-			// turn on powered segments
-			if (m_power_on && m_filament_on && m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
-
-			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state[y] |= (ds << x);
-		}
-	}
-
-	// on difference, send to output
-	for (int y = 0; y < m_display_maxy; y++)
-		if (m_display_cache[y] != active_state[y])
-		{
-			if (m_display_segmask[y] != 0)
-				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
-
-			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x < m_display_maxx; x++)
-			{
-				int state = active_state[y] >> x & 1;
-				output_set_lamp_value(y * mul + x, state);
-
-				// bit coords for svg2lay
-				char buf[10];
-				sprintf(buf, "%d.%d", y, x);
-				output_set_value(buf, state);
-			}
-		}
-
-	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x < m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-	
-	display_update();
-}
-
-void tispeak_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
-{
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-
-	// update current state
-	UINT32 colmask = (1 << maxx) - 1;
-	for (int y = 0; y < maxy; y++)
-	{
-		m_display_segmask[y] &= segmask;
-		m_display_state[y] = (sety >> y & 1) ? (setx & colmask) : 0;
-	}
-	
-	display_update();
-}
-
-
-
-/***************************************************************************
-
   I/O
 
 ***************************************************************************/
 
 // common/snspell
 
+void tispeak_state::snspell_display()
+{
+	for (int y = 0; y < 16; y++)
+		m_display_segmask[y] = 0x3fff;
+
+	display_matrix(16, 16, m_o, (m_r & 0x8000) ? (m_r & 0x21ff) : 0);
+}
+
 READ8_MEMBER(tispeak_state::snspell_read_k)
 {
-	// the Vss row is always on
-	UINT8 k = m_button_matrix[8]->read();
-
-	// read selected button rows
-	for (int i = 0; i < 8; i++)
-		if (m_r >> i & 1)
-			k |= m_button_matrix[i]->read();
-
-	return k;
+	// note: the Vss row is always on
+	return m_inp_matrix[8]->read() | read_inputs(8);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
 {
-	// R15: filament on
-	m_filament_on = data & 0x8000;
-	
 	// R13: power-off request, on falling edge
 	if ((m_r >> 13 & 1) && !(data >> 13 & 1))
-		power_off();
+		snspell_power_off();
 
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
+	// R15: filament on
 	// other bits: MCU internal use
-	m_r = data & 0x21ff;
-	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
+	m_r = m_inp_mux = data;
+	snspell_display();
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
@@ -517,17 +411,17 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
+	snspell_display();
 }
 
 
-void tispeak_state::power_off()
+void tispeak_state::snspell_power_off()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_tms5100->reset();
 	m_tms6100->reset();
 
-	m_power_on = 0;
+	m_power_on = false;
 }
 
 
@@ -538,7 +432,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[AP],E,G,A (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
-	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
+	snspell_display();
 }
 
 
@@ -547,9 +441,8 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 {
 	// same as default, except R13 is used for an extra digit
-	m_filament_on = data & 0x8000;
-	m_r = data & 0x21ff;
-	display_matrix_seg(16, 16, m_o, m_r, 0x3fff);
+	m_r = m_inp_mux = data;
+	snspell_display();
 }
 
 
@@ -560,17 +453,17 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(tispeak_state::power_button)
+INPUT_CHANGED_MEMBER(tispeak_state::snspell_power_button)
 {
 	int on = (int)(FPTR)param;
 
 	if (on && !m_power_on)
 	{
-		m_power_on = 1;
+		m_power_on = true;
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else if (!on && m_power_on)
-		power_off();
+		snspell_power_off();
 }
 
 static INPUT_PORTS_START( snspell )
@@ -631,7 +524,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
 INPUT_PORTS_END
 
 
@@ -683,7 +576,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -693,28 +586,44 @@ static INPUT_PORTS_START( snmath )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( snread )
+	PORT_INCLUDE( snspell )
+	
+	PORT_MODIFY("IN.7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Word Zapper")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Word Maker")
+	
+	PORT_MODIFY("IN.8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Read It")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, snspell_power_button, (void *)true)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( lantutor )
 	PORT_INCLUDE( snspell )
 
-	PORT_MODIFY("IN.5") // R5
+	PORT_MODIFY("IN.5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Diacritical")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Space")
 
-	PORT_MODIFY("IN.6") // R6
+	PORT_MODIFY("IN.6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("5")
 
-	PORT_MODIFY("IN.7") // R7
+	PORT_MODIFY("IN.7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0")
 
-	PORT_MODIFY("IN.8") // Vss!
+	PORT_MODIFY("IN.8")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("Translate")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Learn")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Phrase")
@@ -730,38 +639,9 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void tispeak_state::machine_reset()
-{
-	m_power_on = 1;
-}
-
 void tispeak_state::machine_start()
 {
-	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_cache, ~0, sizeof(m_display_cache));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
-
-	m_r = 0;
-	m_o = 0;
-	m_power_on = 0;
-	m_filament_on = 0;
-
-	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	/* save_item(NAME(m_display_cache)); */ // don't save!
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
-	save_item(NAME(m_r));
-	save_item(NAME(m_o));
-	save_item(NAME(m_power_on));
-	save_item(NAME(m_filament_on));
+	hh_tms1k_state::machine_start();
 
 	// init cartridge
 	if (m_cart != NULL && m_cart->exists())
@@ -786,7 +666,7 @@ static MACHINE_CONFIG_START( snmath, tispeak_state )
 	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms5100", tms5100_device, ctl_w))
 	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5100_device, pdc_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", tispeak_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_snspell) // max 9 digits
 
 	/* no video! */
@@ -816,6 +696,20 @@ static MACHINE_CONFIG_DERIVED( snspell, snmath )
 	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( snread, snmath )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snread")
+	MCFG_GENERIC_EXTENSIONS("vsm")
+	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "snread")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lantutor, snmath )
@@ -851,13 +745,13 @@ ROM_START( snspell )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0271
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
 	ROM_REGION( 0xc000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
-	ROM_LOAD( "tmc0351.vsm", 0x0000, 0x4000, CRC(beea3373) SHA1(8b0f7586d2f12c3d4a885fdb528cf23feffa1a3b) ) // cd2300
-	ROM_LOAD( "tmc0352.vsm", 0x4000, 0x4000, CRC(d51f0587) SHA1(ddaa484be1bba5fef46b481cafae517e4acaa8ed) ) // cd2301
+	ROM_LOAD( "tmc0351nl.vsm", 0x0000, 0x4000, CRC(beea3373) SHA1(8b0f7586d2f12c3d4a885fdb528cf23feffa1a3b) )
+	ROM_LOAD( "tmc0352nl.vsm", 0x4000, 0x4000, CRC(d51f0587) SHA1(ddaa484be1bba5fef46b481cafae517e4acaa8ed) )
 ROM_END
 
 ROM_START( snspella )
@@ -867,7 +761,23 @@ ROM_START( snspella )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // placeholder, use the one we have
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
+
+	ROM_REGION( 0xc000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "tmc0351n2l.vsm", 0x0000, 0x4000, CRC(2d03b292) SHA1(a3e9a365307ae936c7472f720a7a8240741531d6) )
+	ROM_LOAD( "tmc0352n2l.vsm", 0x4000, 0x4000, CRC(a6d56883) SHA1(eebf9c07f2f9001679dec06c2367d4a50596d04b) )
+ROM_END
+
+ROM_START( snspellb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // placeholder, use the one we have
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -882,7 +792,7 @@ ROM_START( snspelluk )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0271
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -898,7 +808,7 @@ ROM_START( snspelluka )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // placeholder, use the one we have
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -913,7 +823,7 @@ ROM_START( snspelljp )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0271
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) )
 
@@ -929,7 +839,7 @@ ROM_START( ladictee )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // placeholder, use the one we have
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // placeholder, use the one we have
 
@@ -945,7 +855,7 @@ ROM_START( snmath )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) )
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) )
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) )
 
@@ -966,13 +876,30 @@ ROM_START( snmathp )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as cd2704
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
-	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // "
+	ROM_LOAD( "tms0270_cd2708_opla.pla", 0, 1246, BAD_DUMP CRC(1abad753) SHA1(53d20b519ed73ce248368047a056836afbe3cd46) ) // taken from cd2708, need to verify if it's same as cd2704
 
 	ROM_REGION( 0x8000, "tms6100", 0 )
 	ROM_LOAD( "cd2392.vsm", 0x0000, 0x4000, CRC(4ed2e920) SHA1(8896f29e25126c1e4d9a47c9a325b35dddecc61f) )
 	ROM_LOAD( "cd2393.vsm", 0x4000, 0x4000, CRC(571d5b5a) SHA1(83284755d9b77267d320b5b87fdc39f352433715) )
+ROM_END
+
+
+ROM_START( snread )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cd2705b-n2l", 0x0000, 0x1000, CRC(c235636e) SHA1(57b24dd8414bf76ec786a51d10cb8a5898b60e18) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) )
+	ROM_REGION( 1246, "maincpu:opla", 0 )
+	ROM_LOAD( "tms0270_cd2705_opla.pla", 0, 1246, CRC(bf859848) SHA1(66b297fbf534968fa6db7413b99ef0e81cc35ddc) )
+
+	ROM_REGION( 0xc000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
+	ROM_LOAD( "cd2394a.vsm", 0x0000, 0x4000, CRC(cbb0e2b1) SHA1(5e322c683baf806523de171310258ae371671327) )
+	ROM_LOAD( "cd2395a.vsm", 0x4000, 0x4000, CRC(3d519504) SHA1(76b19ba5a9a3486005e09c98e8a6abc8b88288dd) )
 ROM_END
 
 
@@ -983,7 +910,7 @@ ROM_START( lantutor )
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms0270_cd2708_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // taken from cd2708, need to verify if it's same as tmc0275
+	ROM_LOAD( "tms0270_default_mpla.pla", 0, 2127, BAD_DUMP CRC(504b96bb) SHA1(67b691e7c0b97239410587e50e5182bf46475b43) ) // not verified
 	ROM_REGION( 1246, "maincpu:opla", 0 )
 	ROM_LOAD( "tms0270_tmc0271_opla.pla", 0, 1246, BAD_DUMP CRC(9ebe12ab) SHA1(acb4e07ba26f2daca5f1c234885ac0371c7ce87f) ) // taken from snspell, mostly looks correct
 
@@ -993,7 +920,8 @@ ROM_END
 
 
 COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-COMP( 1980, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1979, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1980, snspellb,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
 COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
 COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
 COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
@@ -1001,5 +929,7 @@ COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell, 
 
 COMP( 1986, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 COMP( 1980, snmathp,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+
+COMP( 1980, snread,     0,       0, snread,   snread,   tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 
 COMP( 1979, lantutor,   0,       0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

@@ -1070,17 +1070,21 @@ avigo_it     // 1997 Avigo (Italian)
 // TI Speak & Spell
 snspell
 snspella
+snspellb
 snspelluk
 snspelluka
 snspelljp
 ladictee
 snmath
 snmathp
+snread
 lantutor
 
 // Texas Instruments Calculators
 tisr16    // 1974 SR-16
+tisr16ii
 ti1270
+ti1000
 ti30      // 1976 TI-30
 tiprog
 tibusan1
@@ -2204,9 +2208,10 @@ ebball3     // Entex
 elecdet     // Ideal
 starwbc     // Kenner
 starwbcp    // Kenner (prototype)
+astro       // Kosmos
 comp4       // Milton Bradley
 simon       // Milton Bradley
-//ssimon      // Milton Bradley
+ssimon      // Milton Bradley
 cnsector    // Parker Bros
 merlin      // Parker Bros
 stopthie    // Parker Bros

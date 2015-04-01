@@ -199,7 +199,7 @@ private:
 // pnamedlist_t: a simple list
 // ----------------------------------------------------------------------------------------
 
-#if defined(SDLMAME_SOLARIS) || defined(__ANDROID__)
+#if (defined(__sun__) && defined(__svr4__)) || defined(__ANDROID__)
 #undef _C
 #endif
 

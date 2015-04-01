@@ -2754,10 +2754,10 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 1;
 
-//	UINT8 *romx = (UINT8 *)memregion("user1")->base();
+//  UINT8 *romx = (UINT8 *)memregion("user1")->base();
 	// prevent code dying after a trap 33 by patching it out, why?
-//	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
-//	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
+//  romx[BYTE4_XOR_BE(0x8ff0)] = 3;
+//  romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");

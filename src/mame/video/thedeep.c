@@ -134,4 +134,3 @@ UINT32 thedeep_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
-

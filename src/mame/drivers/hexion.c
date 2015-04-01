@@ -115,6 +115,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(hexion_bankedram_r, hexion_bankedram_w)
 	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(hexion_bankctrl_w)
+	AM_RANGE(0xe000, 0xe000) AM_NOP
 	AM_RANGE(0xe800, 0xe87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
 	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
@@ -134,7 +135,32 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
-
+static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(hexion_bankedram_r, hexion_bankedram_w)
+	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(hexion_bankctrl_w)
+	AM_RANGE(0xe000, 0xe000) AM_NOP
+	AM_RANGE(0xe800, 0xe87f) AM_NOP // all the code to use the k051649 is still present
+	AM_RANGE(0xe880, 0xe889) AM_NOP // but the bootleg has an additional M6295 @ 0xf5c0 instead
+	AM_RANGE(0xe88a, 0xe88e) AM_NOP
+	AM_RANGE(0xe88f, 0xe88f) AM_NOP
+	AM_RANGE(0xe8e0, 0xe8ff) AM_NOP
+	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252", k053252_device, read, write)
+	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
+	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")
+	AM_RANGE(0xf403, 0xf403) AM_READ_PORT("P2")
+	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
+	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xf480, 0xf480) AM_WRITE(hexion_bankswitch_w)
+	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(hexion_gfxrom_select_w)
+	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf5c0, 0xf5c0) AM_DEVWRITE("oki2", okim6295_device, write)
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hexion )
 	PORT_START("DSW1")
@@ -240,6 +266,15 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( hexionb, hexion )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hexionb_map)
+
+	MCFG_DEVICE_REMOVE("k051649")
+
+	MCFG_OKIM6295_ADD("oki2", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -266,5 +301,27 @@ ROM_START( hexion )
 	ROM_LOAD( "122a02.13b",   0x0200, 0x0100, CRC(5734305c) SHA1(c72e59acf79a4db1a5a9d827eef899c0675336f2) )
 ROM_END
 
+ROM_START( hexionb )
+	ROM_REGION( 0x34800, "maincpu", 0 ) /* ROMs + space for additional RAM */
+	ROM_LOAD( "hexionb.u2", 0x00000, 0x20000, CRC(93edc5d4) SHA1(d14c5be85a67eebddda9103bdf19de8c3c05d3af) )
+	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 8000-9fff */
 
-GAME( 1992, hexion, 0, hexion, hexion, driver_device, 0, ROT0, "Konami", "Hexion (Japan ver JAB)", 0 )
+	ROM_REGION( 0x80000, "gfx1", 0 )    /* addressable by the main CPU */
+	ROM_LOAD( "hexionb.u30",   0x00000, 0x40000, CRC(22ae55e3) SHA1(41bdc990f69416b639542e2186a3610c16389063) )
+	ROM_LOAD( "hexionb.u29",   0x40000, 0x40000, CRC(438f4388) SHA1(9e23805c9642a237daeaf106187d1e1e0692434d) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "hexionb.u16",   0x0000, 0x40000, CRC(bcc831bf) SHA1(c3382065dd0069a4dc0bde2d9931ec85b0bffc73) )
+
+	ROM_REGION( 0x40000, "oki2", 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "hexionb.u18",   0x0000, 0x40000, CRC(c179d315) SHA1(b39d5ec8a90b7ae06763191b8324f32fe1d0ca9b) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "122a04.10b",   0x0000, 0x0100, CRC(506eb8c6) SHA1(3bff7cf286942d8bdbc3998245c3de20981fbecb) )
+	ROM_LOAD( "122a03.11b",   0x0100, 0x0100, CRC(590c4f64) SHA1(db4b34f8c5fdfea034a94d65873f6fb842f123e9) )
+	ROM_LOAD( "122a02.13b",   0x0200, 0x0100, CRC(5734305c) SHA1(c72e59acf79a4db1a5a9d827eef899c0675336f2) )
+ROM_END
+
+GAME( 1992, hexion, 0,      hexion, hexion, driver_device, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)", 0 )
+GAME( 1992, hexionb,hexion, hexionb,hexion, driver_device, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA
+

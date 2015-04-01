@@ -310,6 +310,54 @@ ROM_START( sukuinuf )
 	DISK_IMAGE_READONLY( "hm-in2", 0, SHA1(4e2d95798a2bcc6f93bc82c364379a3936d68986) )
 ROM_END
 
+ROM_START( taiko7 )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "tk71.ic002",   0x000000, 0x800000, CRC(0560e525) SHA1(3ae378de908ec2f6472867d4d0c3c19eb51cf8bc) )
+	ROM_LOAD( "tk71_spr.ic002", 0x800000, 0x040000, CRC(245233a5) SHA1(a5dd1eb0350d454396984241c1178ec708a7de55) )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tk71dvd0", 0, SHA1(622ffc8f71f50e93069a8e91b56a7e63cf98b5ae) )
+ROM_END
+
+ROM_START( taiko8 )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "tk81001-na-a.ic002", 0x000000, 0x800000, CRC(205410cf) SHA1(8379771d82c9d8b09ad593e28872107ecc0100ad) )
+	ROM_LOAD( "tk81001-na-a_spr.ic002", 0x800000, 0x040000, CRC(590c8d80) SHA1(30622142428e37b8c3b91dee7fdd147d593b4d6f) )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "tk8100-1-na-dvd0-a", 0, SHA1(81a2a9d7164495af825ad038fbf6f696e755ab9c) )
+ROM_END
+
+ROM_START( zoidsinf )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "b3900076a.ic002", 0x000000, 0x800000, CRC(4cdc2e4f) SHA1(7c53e519683903e5ae53823b7d0644323be23680) )
+	ROM_LOAD( "b3900076a_spr.ic002", 0x800000, 0x040000, CRC(7a7bf195) SHA1(0970251ba203720b2b769d6195bff06b41931b17) )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "zoidsinf", 0, SHA1(aca35eb554bf906898b3ebc27e65f652a72d63f8) )
+ROM_END
+
+ROM_START( zoidiexp )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+	ROM_LOAD( "b3900107a.ic002", 0x000000, 0x800000, CRC(1729af4a) SHA1(df5fb0841f4a81aae68382f731b96437572cdffd) )
+	ROM_LOAD( "b3900107a_spr.ic002", 0x800000, 0x040000, CRC(b3d56cd4) SHA1(1e0afeba4881892682d1f91be8e0b880ee7a7fcb) )
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "zoidsinf-ex-plus-ver2-10", 0, SHA1(6671afc45c8b506a15e5b4b09645b956ab4cfe99) )
+ROM_END
+
 ROM_START( taiko9 )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM256_BIOS
@@ -693,9 +741,12 @@ GAME(2003, zgundm,     sys246, system246, system246, driver_device, 0, ROT0, "Ca
 GAME(2004, fghtjam,    sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Namco", "Capcom Fighting Jam (JAM1 Ver. A)", GAME_IS_SKELETON)
 GAME(2004, sukuinuf,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz and Variety Suku Suku Inufuku 2 (IN2 Ver. A)", GAME_IS_SKELETON)
 GAME(2004, zgundmdx,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A)", GAME_IS_SKELETON)
+GAME(2004, zoidsinf,   sys246, system246, system246, driver_device, 0, ROT0, "Tomy / Taito", "Zoids Infinity", GAME_IS_SKELETON)
 GAME(2005, gundzaft,   sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Banpresto", "Gundam Seed: Federation vs. Z.A.F.T. (SED1 Ver. A)", GAME_IS_SKELETON)
 GAME(2005, soulclb3,   sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31001-NA-A)", GAME_IS_SKELETON)
 GAME(2005, soulclb3a,soulclb3, system246, system246, driver_device, 0, ROT0, "Namco", "Soul Calibur III (SC31002-NA-A)", GAME_IS_SKELETON)
+GAME(2005, taiko7,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 7 (TK71-NA-A)", GAME_IS_SKELETON)
+GAME(2006, taiko8,     sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 8 (TK8100-1-NA-A)", GAME_IS_SKELETON)
 GAME(2006, qgundam,    sys246, system246, system246, driver_device, 0, ROT0, "Namco", "Quiz Mobile Suit Gundam: Monsenshi (QG1 Ver. A)", GAME_IS_SKELETON)
 GAME(2008, fateulc,    sys246, system246, system246, driver_device, 0, ROT0, "Capcom / Namco", "Fate: Unlimited Codes (FUD1 ver. A)", GAME_IS_SKELETON)
 GAME(2008, fateulcb,  fateulc, system246, system246, driver_device, 0, ROT0, "bootleg", "Fate: Unlimited Codes (bootleg)", GAME_IS_SKELETON)
@@ -709,6 +760,7 @@ GAME(2005, superdbz,   sys256, system256, system246, driver_device, 0, ROT0, "Ba
 GAME(2006, kinniku,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix (KN1 Ver. A)", GAME_IS_SKELETON)
 GAME(2006, taiko9,     sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 9 (TK91001-NA-A)", GAME_IS_SKELETON)
 GAME(2006, yuyuhaku,   sys256, system256, system246, driver_device, 0, ROT0, "Banpresto", "The Battle of Yu Yu Hakusho: Shitou! Ankoku Bujutsukai!", GAME_IS_SKELETON)
+GAME(2006, zoidiexp,   sys246, system246, system246, driver_device, 0, ROT0, "Tomy / Taito", "Zoids Infinity EX Plus (ver. 2.10)", GAME_IS_SKELETON)
 GAME(2007, kinniku2,   sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Kinnikuman Muscle Grand Prix 2 (KN2 Ver. A)", GAME_IS_SKELETON)
 GAME(2007, taiko10,    sys256, system256, system246, driver_device, 0, ROT0, "Namco", "Taiko No Tatsujin 10 (T101001-NA-A)", GAME_IS_SKELETON)
 GAME(2008, gdvsgd,     sys256, system256, system246, driver_device, 0, ROT0, "Capcom / Bandai", "Gundam vs. Gundam (GVS1 Ver. A)", GAME_IS_SKELETON)

@@ -31,7 +31,7 @@ private:
 	UINT32 m_fpga_regs[0x20];
 	UINT32 m_rtc_regs[0x800];
 	UINT32 m_prev_reg;
-	
+
 	DECLARE_ADDRESS_MAP(rtc_map, 32);
 	DECLARE_ADDRESS_MAP(fpga_map, 32);
 	DECLARE_ADDRESS_MAP(ctrl_map, 32);

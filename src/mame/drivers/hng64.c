@@ -918,9 +918,46 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 
 WRITE32_MEMBER(hng64_state::hng64_vregs_w)
 {
-//	printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+//  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
 }
+
+READ16_MEMBER(hng64_state::main_sound_comms_r)
+{
+	switch(offset *2)
+	{
+		case 0x04:
+			return sound_latch[0];
+		case 0x06:
+			return sound_latch[1];
+		default:
+			printf("%08x R\n",offset*2);
+			break;
+	}
+	return 0;
+}
+
+WRITE16_MEMBER(hng64_state::main_sound_comms_w)
+{
+	switch(offset * 2)
+	{
+		case 0x00:
+			COMBINE_DATA(&main_latch[0]);
+			break;
+		case 0x02:
+			COMBINE_DATA(&main_latch[1]);
+			break;
+		case 0x08:
+			m_audiocpu->set_input_line(5, ASSERT_LINE);
+			if(data != 1)
+				printf("IRQ send %02x?\n",data);
+			break;
+		default:
+			printf("%02x %04x\n",offset*2,data);
+			break;
+	}
+}
+
 
 static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 
@@ -963,9 +1000,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
-//  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP    // ??
-//  AM_RANGE(0x68000004, 0x68000007) AM_READNOP     // ??
-//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITENOP    // ??
+	AM_RANGE(0x68000000, 0x6800000f) AM_READWRITE16(main_sound_comms_r,main_sound_comms_w,0xffffffff)
 	AM_RANGE(0x6f000000, 0x6f000003) AM_WRITE(hng64_soundcpu_enable_w)
 
 	// Communications
@@ -1490,10 +1525,10 @@ void hng64_state::machine_start()
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
-	/* configure fast RAM regions for DRC */
-	m_maincpu->mips3drc_add_fastram(0x00000000, 0x00ffffff, FALSE, m_mainram);
-	m_maincpu->mips3drc_add_fastram(0x04000000, 0x05ffffff, TRUE,  m_cart);
-	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	/* configure fast RAM regions */
+	m_maincpu->add_fastram(0x00000000, 0x00ffffff, FALSE, m_mainram);
+	m_maincpu->add_fastram(0x04000000, 0x05ffffff, TRUE,  m_cart);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	m_comm_rom = memregion("user2")->base();
 	m_comm_ram = auto_alloc_array(machine(),UINT8,0x10000);
@@ -1503,7 +1538,7 @@ void hng64_state::machine_start()
 	{
 		m_videoregs[i] = 0xdeadbeef;
 	}
-		
+
 }
 
 
@@ -1569,8 +1604,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
-
+	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 
 ROM_START( hng64 )
 	/* BIOS */

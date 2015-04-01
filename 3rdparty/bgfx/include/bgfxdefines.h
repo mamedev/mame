@@ -81,16 +81,16 @@
 					| BGFX_STATE_MSAA \
 					)
 
-#define BGFX_STATE_ALPHA_REF(_ref) ( (uint64_t(_ref)<<BGFX_STATE_ALPHA_REF_SHIFT)&BGFX_STATE_ALPHA_REF_MASK)
-#define BGFX_STATE_POINT_SIZE(_size) ( (uint64_t(_size)<<BGFX_STATE_POINT_SIZE_SHIFT)&BGFX_STATE_POINT_SIZE_MASK)
+#define BGFX_STATE_ALPHA_REF(_ref)   ( ( (uint64_t)(_ref )<<BGFX_STATE_ALPHA_REF_SHIFT )&BGFX_STATE_ALPHA_REF_MASK)
+#define BGFX_STATE_POINT_SIZE(_size) ( ( (uint64_t)(_size)<<BGFX_STATE_POINT_SIZE_SHIFT)&BGFX_STATE_POINT_SIZE_MASK)
 
 ///
-#define BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (0 \
-					| ( (uint64_t(_srcRGB)|(uint64_t(_dstRGB)<<4) )   ) \
-					| ( (uint64_t(_srcA  )|(uint64_t(_dstA  )<<4) )<<8) \
+#define BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (UINT64_C(0) \
+					| ( ( (uint64_t)(_srcRGB)|( (uint64_t)(_dstRGB)<<4) )   ) \
+					| ( ( (uint64_t)(_srcA  )|( (uint64_t)(_dstA  )<<4) )<<8) \
 					)
 
-#define BGFX_STATE_BLEND_EQUATION_SEPARATE(_rgb, _a) (uint64_t(_rgb)|(uint64_t(_a)<<3) )
+#define BGFX_STATE_BLEND_EQUATION_SEPARATE(_rgb, _a) ( (uint64_t)(_rgb)|( (uint64_t)(_a)<<3) )
 
 ///
 #define BGFX_STATE_BLEND_FUNC(_src, _dst)    BGFX_STATE_BLEND_FUNC_SEPARATE(_src, _dst, _src, _dst)
@@ -332,5 +332,11 @@
 #define BGFX_SUBMIT_EYE_RIGHT UINT8_C(0x02)
 #define BGFX_SUBMIT_EYE_MASK  UINT8_C(0x03)
 #define BGFX_SUBMIT_EYE_FIRST BGFX_SUBMIT_EYE_LEFT
+
+///
+#define BGFX_PCI_ID_NONE   UINT16_C(0x0000)
+#define BGFX_PCI_ID_AMD    UINT16_C(0x1002)
+#define BGFX_PCI_ID_INTEL  UINT16_C(0x8086)
+#define BGFX_PCI_ID_NVIDIA UINT16_C(0x10de)
 
 #endif // BGFX_DEFINES_H_HEADER_GUARD

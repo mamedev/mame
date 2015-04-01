@@ -12,7 +12,7 @@
 PALETTE_INIT_MEMBER(tryout_state, tryout)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	
+
 	for (int i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;

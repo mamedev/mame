@@ -29,8 +29,9 @@
 #include <tinystl/allocator.h>
 #include <tinystl/unordered_map.h>
 
+struct Foo { int bar; };
+
 TEST(uomap_nonpod_compiles) {
-	struct Foo { int bar; };
 
 	// verify this compiles
 	typedef tinystl::unordered_map<int, Foo> map;

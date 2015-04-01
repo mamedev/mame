@@ -105,9 +105,9 @@ class iteagle_state : public driver_device
 public:
 	iteagle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")		
+			m_maincpu(*this, "maincpu")
 	{}
-	
+
 	required_device<mips3_device> m_maincpu;
 
 	virtual void machine_start();
@@ -129,7 +129,7 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	
+
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
 	MCFG_ITEAGLE_FPGA_ADD(            ":pci:06.0")
@@ -144,7 +144,7 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_SCREEN_SIZE(640, 350)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 349)
 	MCFG_SCREEN_UPDATE_DEVICE(":pci:09.0", voodoo_pci_device, screen_update)
-	
+
 
 MACHINE_CONFIG_END
 
@@ -167,7 +167,7 @@ static INPUT_PORTS_START( iteagle )
 	PORT_DIPNAME( 0x0F00, 0x0000, "GAME" )
 	PORT_DIPNAME( 0x00F0, 0x0000, "MAJOR" )
 	PORT_DIPNAME( 0x000F, 0x0000, "MINOR" )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtfore05 )
@@ -263,7 +263,7 @@ ROM_START( gtfore02 )
 	DISK_REGION( ":pci:06.1:ide:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2002_v2.01.04_umv", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Labeled Golf Fore! V2.01.04 UMV */
 	//DISK_REGION( "ide:1:cdrom" ) // program CD-ROM
-	
+
 ROM_END
 
 ROM_START( gtfore02o )

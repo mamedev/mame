@@ -237,9 +237,8 @@ void v53_base_device::install_peripheral_io()
 
 		if (m_SCTL & 0x02) // uPD71037 mode
 		{
-			if (IOAG) // 8-bit 
+			if (IOAG) // 8-bit
 			{
-
 			}
 			else
 			{
@@ -256,9 +255,8 @@ void v53_base_device::install_peripheral_io()
 		UINT16 base = (m_OPHA << 8) | m_IULA;
 		base &= 0xfffe;
 
-		if (IOAG) // 8-bit 
+		if (IOAG) // 8-bit
 		{
-
 		}
 		else
 		{
@@ -272,9 +270,8 @@ void v53_base_device::install_peripheral_io()
 		//printf("installing TCU to %04x\n", base);
 		base &= 0xfffe;
 
-		if (IOAG) // 8-bit 
+		if (IOAG) // 8-bit
 		{
-
 		}
 		else
 		{
@@ -290,9 +287,8 @@ void v53_base_device::install_peripheral_io()
 		UINT16 base = (m_OPHA << 8) | m_SULA;
 		base &= 0xfffe;
 
-		if (IOAG) // 8-bit 
+		if (IOAG) // 8-bit
 		{
-
 		}
 		else
 		{
@@ -333,9 +329,9 @@ WRITE8_MEMBER(v53_base_device::tmu_tct2_w) { m_v53tcu->write(space, 2, data); }
 WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_v53tcu->write(space, 3, data); }
 
 
-READ8_MEMBER(v53_base_device::tmu_tst0_r) {	return m_v53tcu->read(space, 0); }
-READ8_MEMBER(v53_base_device::tmu_tst1_r) {	return m_v53tcu->read(space, 1); }
-READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_v53tcu->read(space, 2); }
+READ8_MEMBER(v53_base_device::tmu_tst0_r) { return m_v53tcu->read(space, 0); }
+READ8_MEMBER(v53_base_device::tmu_tst1_r) { return m_v53tcu->read(space, 1); }
+READ8_MEMBER(v53_base_device::tmu_tst2_r) { return m_v53tcu->read(space, 2); }
 
 
 
@@ -343,7 +339,7 @@ READ8_MEMBER(v53_base_device::tmu_tst2_r) {	return m_v53tcu->read(space, 2); }
 
 /*** DMA ***/
 
-// could be wrong / nonexistent 
+// could be wrong / nonexistent
 WRITE_LINE_MEMBER(v53_base_device::dreq0_w)
 {
 	if (!(m_SCTL & 0x02))
@@ -409,20 +405,20 @@ WRITE_LINE_MEMBER(v53_base_device::hack_w)
 static ADDRESS_MAP_START( v53_internal_port_map, AS_IO, 16, v53_base_device )
 	AM_RANGE(0xffe0, 0xffe1) AM_WRITE8( BSEL_w,  0x00ff) // 0xffe0 // uPD71037 DMA mode bank selection register
 	AM_RANGE(0xffe0, 0xffe1) AM_WRITE8( BADR_w,  0xff00) // 0xffe1 // uPD71037 DMA mode bank register peripheral mapping (also uses OPHA)
-//	AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0x00ff) // 0xffe2
-//	AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0xff00) // 0xffe3
-//	AM_RANGE(0xffe4, 0xffe5) // (reserved     ,  0x00ff) // 0xffe4
-//	AM_RANGE(0xffe4, 0xffe5) // (reserved     ,  0xff00) // 0xffe5
-//	AM_RANGE(0xffe6, 0xffe7) // (reserved     ,  0x00ff) // 0xffe6
-//	AM_RANGE(0xffe6, 0xffe7) // (reserved     ,  0xff00) // 0xffe7
-//	AM_RANGE(0xffe8, 0xffe9) // (reserved     ,  0x00ff) // 0xffe8
+//  AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0x00ff) // 0xffe2
+//  AM_RANGE(0xffe2, 0xffe3) // (reserved     ,  0xff00) // 0xffe3
+//  AM_RANGE(0xffe4, 0xffe5) // (reserved     ,  0x00ff) // 0xffe4
+//  AM_RANGE(0xffe4, 0xffe5) // (reserved     ,  0xff00) // 0xffe5
+//  AM_RANGE(0xffe6, 0xffe7) // (reserved     ,  0x00ff) // 0xffe6
+//  AM_RANGE(0xffe6, 0xffe7) // (reserved     ,  0xff00) // 0xffe7
+//  AM_RANGE(0xffe8, 0xffe9) // (reserved     ,  0x00ff) // 0xffe8
 	AM_RANGE(0xffe8, 0xffe9) AM_WRITE8( BRC_w ,  0xff00) // 0xffe9 // baud rate counter (used for serial peripheral)
 	AM_RANGE(0xffea, 0xffeb) AM_WRITE8( WMB0_w,  0x00ff) // 0xffea // waitstate control
 	AM_RANGE(0xffea, 0xffeb) AM_WRITE8( WCY1_w,  0xff00) // 0xffeb // waitstate control
 	AM_RANGE(0xffec, 0xffed) AM_WRITE8( WCY0_w,  0x00ff) // 0xffec // waitstate control
 	AM_RANGE(0xffec, 0xffed) AM_WRITE8( WAC_w,   0xff00) // 0xffed // waitstate control
-//	AM_RANGE(0xffee, 0xffef) // (reserved     ,  0x00ff) // 0xffee
-//	AM_RANGE(0xffee, 0xffef) // (reserved     ,  0xff00) // 0xffef
+//  AM_RANGE(0xffee, 0xffef) // (reserved     ,  0x00ff) // 0xffee
+//  AM_RANGE(0xffee, 0xffef) // (reserved     ,  0xff00) // 0xffef
 	AM_RANGE(0xfff0, 0xfff1) AM_WRITE8( TCKS_w,  0x00ff) // 0xfff0 // timer clocks
 	AM_RANGE(0xfff0, 0xfff1) AM_WRITE8( SBCR_w,  0xff00) // 0xfff1 // internal clock divider, halt behavior etc.
 	AM_RANGE(0xfff2, 0xfff3) AM_WRITE8( REFC_w,  0x00ff) // 0xfff2 // ram refresh control
@@ -430,7 +426,7 @@ static ADDRESS_MAP_START( v53_internal_port_map, AS_IO, 16, v53_base_device )
 	AM_RANGE(0xfff4, 0xfff5) AM_WRITE8( WCY2_w,  0x00ff) // 0xfff4 // waitstate control
 	AM_RANGE(0xfff4, 0xfff5) AM_WRITE8( WCY3_w,  0xff00) // 0xfff5 // waitstate control
 	AM_RANGE(0xfff6, 0xfff7) AM_WRITE8( WCY4_w,  0x00ff) // 0xfff6 // waitstate control
-//	AM_RANGE(0xfff6, 0xfff7) // (reserved     ,  0xff00) // 0xfff7
+//  AM_RANGE(0xfff6, 0xfff7) // (reserved     ,  0xff00) // 0xfff7
 	AM_RANGE(0xfff8, 0xfff9) AM_WRITE8( SULA_w,  0x00ff) // 0xfff8 // peripheral mapping
 	AM_RANGE(0xfff8, 0xfff9) AM_WRITE8( TULA_w,  0xff00) // 0xfff9 // peripheral mapping
 	AM_RANGE(0xfffa, 0xfffb) AM_WRITE8( IULA_w,  0x00ff) // 0xfffa // peripheral mapping
@@ -438,7 +434,7 @@ static ADDRESS_MAP_START( v53_internal_port_map, AS_IO, 16, v53_base_device )
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITE8( OPHA_w,  0x00ff) // 0xfffc // peripheral mapping (upper bits, common)
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITE8( OPSEL_w, 0xff00) // 0xfffd // peripheral enabling
 	AM_RANGE(0xfffe, 0xffff) AM_WRITE8( SCTL_w,  0x00ff) // 0xfffe // peripheral configuration (& byte / word mapping)
-//	AM_RANGE(0xfffe, 0xffff) // (reserved     ,  0xff00) // 0xffff
+//  AM_RANGE(0xfffe, 0xffff) // (reserved     ,  0xff00) // 0xffff
 ADDRESS_MAP_END
 
 
@@ -486,7 +482,7 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE( v53_base_device, tcu_out0_trampoline_cb ))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( v53_base_device, tcu_out1_trampoline_cb ))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( v53_base_device, tcu_out2_trampoline_cb ))
-	
+
 
 	MCFG_DEVICE_ADD("upd71071dma", V53_DMAU, 4000000)
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(v53_base_device, hreq_trampoline_cb))
@@ -506,12 +502,12 @@ static MACHINE_CONFIG_FRAGMENT( v53 )
 	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(v53_base_device, dma_dack2_trampoline_w))
 	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(v53_base_device, dma_dack3_trampoline_w))
 
-	
+
 	MCFG_PIC8259_ADD( "upd71059pic", WRITELINE(v53_base_device, internal_irq_w), VCC, READ8(v53_base_device,get_pic_ack))
 
 
 
-	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0) 
+	MCFG_DEVICE_ADD("v53scu", V53_SCU, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(v53_base_device, scu_txd_trampoline_cb))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(v53_base_device, scu_dtr_trampoline_cb))
 	MCFG_I8251_RTS_HANDLER(WRITELINE(v53_base_device, scu_rts_trampoline_cb))
@@ -578,4 +574,3 @@ v53a_device::v53a_device(const machine_config &mconfig, const char *tag, device_
 	: v53_base_device(mconfig, V53A, "V53A", tag, owner, clock, "v53a", BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }
-

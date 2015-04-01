@@ -61,10 +61,10 @@ public:
 	/* misc */
 	UINT8    m_potmask;
 	UINT8    m_potsense;
-	
+
 	emu_timer *m_pot_clear_timer;
 	emu_timer *m_quarter_timer;
-	
+
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_READ8_MEMBER(scanline_r);
 	DECLARE_READ8_MEMBER(potsense_r);
@@ -75,17 +75,17 @@ public:
 	DECLARE_WRITE8_MEMBER(pitcher_vert_w);
 	DECLARE_WRITE8_MEMBER(pitcher_horz_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
-	
+
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(flyball);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_CALLBACK_MEMBER(joystick_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
@@ -428,7 +428,7 @@ void flyball_state::machine_start()
 	for (int i = 0; i < len; i++)
 		buf[i ^ 0x1ff] = ROM[i];
 	memcpy(ROM, buf, len);
-	
+
 	m_pot_clear_timer = timer_alloc(TIMER_POT_CLEAR);
 	m_quarter_timer = timer_alloc(TIMER_QUARTER);
 

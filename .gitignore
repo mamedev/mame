@@ -11,8 +11,10 @@
 /inp
 /nvram
 /obj
+/roms
 /snap
 src/regtests/chdman/temp
 src/regtests/jedutil/output
 /sta
 *.pyc
+/build

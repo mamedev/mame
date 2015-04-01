@@ -71,7 +71,9 @@ namespace bx
 			uint16_t* sparse = &m_handles[MaxHandlesT];
 			uint16_t index = sparse[_handle];
 
-			return (index < m_numHandles && m_handles[index] == _handle);
+			return index < m_numHandles
+				&& m_handles[index] == _handle
+				;
 		}
 
 		void free(uint16_t _handle)

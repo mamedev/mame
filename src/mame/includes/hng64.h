@@ -1,6 +1,7 @@
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"
+#include "sound/l7a1045_l6028_dsp_a.h"
 
 enum
 {
@@ -125,7 +126,7 @@ public:
 		m_generic_paletteram_32(*this, "paletteram")
 
 	{ }
-	
+
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
 	required_device<cpu_device> m_comm;
@@ -362,21 +363,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
 
-	UINT16 m_audiochannel;
-	
-	struct hng64_48bit_data {
-		UINT16 dat[3];
-	};
 
-	hng64_48bit_data m_audiodat[0x10000];
-
-	DECLARE_WRITE16_MEMBER(hng64_sound_select_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_02_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_04_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_06_w);
-
-	DECLARE_READ16_MEMBER(hng64_sound_port_0004_r);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0006_r);
 
 	DECLARE_READ16_MEMBER(hng64_sound_port_0008_r);
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
@@ -394,5 +381,9 @@ public:
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
+	DECLARE_READ16_MEMBER(main_sound_comms_r);
+	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
+	DECLARE_READ16_MEMBER(sound_comms_r);
+	DECLARE_WRITE16_MEMBER(sound_comms_w);
+	UINT16 main_latch[2],sound_latch[2];
 };
-

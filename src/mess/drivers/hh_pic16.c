@@ -57,14 +57,15 @@ public:
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+
+	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
+	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
 	// game-specific handlers
@@ -79,7 +80,7 @@ void hh_pic16_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-	
+
 	m_b = 0;
 	m_c = 0;
 
@@ -116,7 +117,7 @@ void hh_pic16_state::display_update()
 	{
 		active_state[y] = 0;
 
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 		{
 			// turn on powered segments
 			if (m_display_state[y] >> x & 1)
@@ -136,15 +137,25 @@ void hh_pic16_state::display_update()
 				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x < m_display_maxx; x++)
+			for (int x = 0; x <= m_display_maxx; x++)
 			{
 				int state = active_state[y] >> x & 1;
-				output_set_lamp_value(y * mul + x, state);
-
-				// bit coords for svg2lay
-				char buf[10];
-				sprintf(buf, "%d.%d", y, x);
-				output_set_value(buf, state);
+				char buf1[0x10]; // lampyx
+				char buf2[0x10]; // y.x
+				
+				if (x == m_display_maxx)
+				{
+					// always-on if selected
+					sprintf(buf1, "lamp%da", y);
+					sprintf(buf2, "%d.a", y);
+				}
+				else
+				{
+					sprintf(buf1, "lamp%d", y * mul + x);
+					sprintf(buf2, "%d.%d", y, x);
+				}
+				output_set_value(buf1, state);
+				output_set_value(buf2, state);
 			}
 		}
 
@@ -155,23 +166,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_pic16_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
+}
+
+void hh_pic16_state::set_display_size(int maxx, int maxy)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
 }
 
 void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 {
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
+	set_display_size(maxx, maxy);
 
 	// update current state
 	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
-	
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
+
 	display_update();
 }
 
@@ -199,16 +215,15 @@ WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
 		m_c = data;
 	else
 		m_b = data;
-	
+
 	// d7: speaker out
 	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
 
 	// d0-d6: 7seg
-	m_display_maxx = 7;
-	m_display_maxy = 2;
-	
 	m_display_segmask[offset] = 0x7f;
 	m_display_state[offset] = ~data & 0x7f;
+
+	set_display_size(7, 2);
 	display_update();
 }
 

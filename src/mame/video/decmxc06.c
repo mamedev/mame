@@ -110,14 +110,14 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 		else
 			mult = -16;
 
-		
+
 		// thedeep strongly suggests that this check goes here, otherwise the radar breaks
 		if (!(spriteram[offs] & 0x8000))
 		{
 			offs += 4;
 			continue;
 		}
-		
+
 
 		for (x = 0; x < w; x++)
 		{
@@ -173,7 +173,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 			offs += 4;
 			if (offs >= m_ramsize / 2)
 				return;
-	
+
 
 		}
 	}

@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabal)
 
 	/* video hardware */

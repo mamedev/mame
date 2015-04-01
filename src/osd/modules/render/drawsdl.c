@@ -129,7 +129,7 @@ struct sdl_scale_mode
 #if (!SDLMAME_SDL2)
 	int             m_extra_flags;        /* Texture/surface flags */
 #else
-	const char      *sdl_scale_mode;        /* what to use as a hint ? */
+	const char      *sdl_scale_mode_hint;        /* what to use as a hint ? */
 #endif
 	int             pixel_format;       /* Pixel/Overlay format  */
 	void            (*yuv_blit)(const UINT16 *bitmap, UINT8 *ptr, const int pitch, const UINT32 *lookup, const int width, const int height);
@@ -435,7 +435,7 @@ int sdl_info::create()
 	// create renderer
 
 	/* set hints ... */
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode_hint);
 
 
 	if (video_config.waitvsync)

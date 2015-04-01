@@ -120,6 +120,8 @@ public:
 	UINT32 cart_length;
 
 	bool dd_present;
+	bool disk_present;
+	bool cart_present;
 
 	void poll_reset_button(bool button);
 
@@ -186,9 +188,14 @@ private:
 	UINT32 sp_semaphore;
 
 	// Disk Drive (DD) registers and functions
+	void dd_set_zone_and_track_offset();
+	void dd_update_bm();
+	void dd_write_sector();
+	void dd_read_sector();
+	void dd_read_C2();
 	UINT32 dd_buffer[256];
-	UINT32 dd_sector_data[32]; // ?
-	UINT32 dd_ram_seq_data[32]; // ?
+	UINT32 dd_sector_data[64];
+	UINT32 dd_ram_seq_data[16];
 	UINT32 dd_data_reg;
 	UINT32 dd_status_reg;
 	UINT32 dd_track_reg;
@@ -196,7 +203,18 @@ private:
 	UINT32 dd_sector_err_reg;
 	UINT32 dd_seq_status_reg;
 	UINT32 dd_seq_ctrl_reg;
+	UINT32 dd_sector_reg;
+	UINT32 dd_reset_reg;
+	UINT32 dd_current_reg;
+	bool dd_bm_reset_held;
+	bool dd_write;
 	UINT8 dd_int;
+	UINT8 dd_start_block;
+	UINT8 dd_start_sector;
+	UINT8 dd_sectors_per_block;
+	UINT8 dd_sector_size;
+	UINT8 dd_zone;
+	UINT32 dd_track_offset;
 
 	// Peripheral Interface (PI) registers and functions
 	void pi_dma();
@@ -274,6 +292,65 @@ extern const device_type N64PERIPH;
 #define DP_STATUS_XBUS_DMA      0x01
 #define DP_STATUS_FREEZE        0x02
 #define DP_STATUS_FLUSH         0x04
+
+#define DD_ASIC_STATUS_DISK_CHANGE   0x00010000
+#define DD_ASIC_STATUS_MECHA_ERR     0x00020000
+#define DD_ASIC_STATUS_WRPROTECT_ERR 0x00040000
+#define DD_ASIC_STATUS_HEAD_RETRACT  0x00080000
+#define DD_ASIC_STATUS_MOTOR_OFF     0x00100000
+#define DD_ASIC_STATUS_RESET         0x00400000
+#define DD_ASIC_STATUS_BUSY          0x00800000
+#define DD_ASIC_STATUS_DISK          0x01000000
+#define DD_ASIC_STATUS_MECHA_INT     0x02000000
+#define DD_ASIC_STATUS_BM_INT        0x04000000
+#define DD_ASIC_STATUS_BM_ERROR      0x08000000
+#define DD_ASIC_STATUS_C2_XFER       0x10000000
+#define DD_ASIC_STATUS_DREQ          0x40000000
+
+#define DD_TRACK_INDEX_LOCK        0x60000000
+
+#define DD_BM_MECHA_INT_RESET 0x01000000
+#define DD_BM_XFERBLOCKS      0x02000000
+#define DD_BM_DISABLE_C1      0x04000000
+#define DD_BM_DISABLE_OR_CHK  0x08000000
+#define DD_BM_RESET           0x10000000
+#define DD_BM_INT_MASK        0x20000000
+#define DD_BM_MODE            0x40000000
+#define DD_BM_START           0x80000000
+
+#define DD_BMST_RUNNING       0x80000000
+#define DD_BMST_ERROR         0x04000000
+#define DD_BMST_MICRO_STATUS  0x02000000
+#define DD_BMST_BLOCKS        0x01000000
+#define DD_BMST_C1_CORRECT    0x00800000
+#define DD_BMST_C1_DOUBLE     0x00400000
+#define DD_BMST_C1_SINGLE     0x00200000
+#define DD_BMST_C1_ERROR      0x00010000
+
+#define DD_ASIC_ERR_AM_FAIL      0x80000000
+#define DD_ASIC_ERR_MICRO_FAIL   0x40000000
+#define DD_ASIC_ERR_SPINDLE_FAIL 0x20000000
+#define DD_ASIC_ERR_OVER_RUN     0x10000000
+#define DD_ASIC_ERR_OFFTRACK     0x08000000
+#define DD_ASIC_ERR_NO_DISK      0x04000000
+#define DD_ASIC_ERR_CLOCK_UNLOCK 0x02000000
+#define DD_ASIC_ERR_SELF_STOP    0x01000000
+
+#define DD_SEQ_MICRO_INT_MASK    0x80000000
+#define DD_SEQ_MICRO_PC_ENABLE   0x40000000
+
+#define SECTORS_PER_BLOCK	85
+#define BLOCKS_PER_TRACK	2
+
+const unsigned int ddZoneSecSize[16] = {232,216,208,192,176,160,144,128,
+                                        216,208,192,176,160,144,128,112};
+const unsigned int ddZoneTrackSize[16] = {158,158,149,149,149,149,149,114,
+                                          158,158,149,149,149,149,149,114};
+const unsigned int ddStartOffset[16] = 
+	{0x0,0x5F15E0,0xB79D00,0x10801A0,0x1523720,0x1963D80,0x1D414C0,0x20BBCE0,
+	 0x23196E0,0x28A1E00,0x2DF5DC0,0x3299340,0x36D99A0,0x3AB70E0,0x3E31900,0x4149200};
+
+
 
 extern UINT32 *n64_sram;
 extern UINT32 *rdram;

@@ -153,7 +153,7 @@ video_manager::video_manager(running_machine &machine)
 	filename = machine.options().avi_write();
 	if (filename[0] != 0)
 		begin_recording(filename, MF_AVI);
-	
+
 #ifdef MAME_DEBUG
 	m_dummy_recording = machine.options().dummy_write();
 #endif

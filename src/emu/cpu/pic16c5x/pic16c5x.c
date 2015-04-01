@@ -799,7 +799,7 @@ void pic16c5x_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
-	
+
 	m_read_a.resolve_safe(0);
 	m_read_b.resolve_safe(0);
 	m_read_c.resolve_safe(0);

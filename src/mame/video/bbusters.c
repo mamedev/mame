@@ -76,7 +76,7 @@ VIDEO_START_MEMBER(bbusters_state,bbuster)
 
 	m_pf1_tilemap->set_transparent_pen(15);
 	m_fix_tilemap->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_scale_line_count));
 }
 
@@ -88,7 +88,7 @@ VIDEO_START_MEMBER(bbusters_state,mechatt)
 
 	m_pf1_tilemap->set_transparent_pen(15);
 	m_fix_tilemap->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_scale_line_count));
 }
 

@@ -336,7 +336,7 @@ froggers        // bootleg
 frogf           // bootleg
 quaak           // bootleg
 froggeram       // bootleg
-froggerv		// bootleg
+froggerv        // bootleg
 amidars         // GX337 (c) 1982 Konami
 triplep         // (c) 1982 KKI / made by Sanritsu?
 triplepa        // (c) 1982 KKI / made by Sanritsu?
@@ -1122,9 +1122,12 @@ zgundm
 fghtjam
 sukuinuf
 zgundmdx
+zoidsinf
 gundzaft
 soulclb3
 soulclb3a
+taiko7
+taiko8
 qgundam
 fateulc
 fateulcb
@@ -1139,6 +1142,7 @@ kinniku
 kinniku2
 taiko9
 yuyuhaku
+zoidiexp
 taiko10
 gdvsgd
 gdvsgdnx
@@ -3435,7 +3439,8 @@ sfz2b           // 31/05/1996 (c) 1996 (Brazil)
 sfz2br1         // 04/03/1996 (c) 1996 (Brazil)
 sfz2h           // 04/03/1996 (c) 1996 (Hispanic)
 sfz2n           // 29/02/1996 (c) 1996 (Oceania)
-spf2t           // 20/06/1996 (c) 1996 (USA)
+spf2t           // 29/05/1996 (c) 1996 (Europe)
+spf2tu          // 20/06/1996 (c) 1996 (USA)
 spf2xj          // 31/05/1996 (c) 1996 (Japan)
 spf2ta          // 29/05/1996 (c) 1996 (Asia)
 spf2th          // 31/05/1996 (c) 1996 (Hispanic)
@@ -4899,6 +4904,7 @@ titlefu         // 1993.04 Title Fight (US)
 titlefj         // 1993.03 Title Fight (Japan)
 				// 1992.07 Stadium Cross (Japan)
 scross          // 1992.?? Stadium Cross (World)
+scrossa         // 1992.?? Stadium Cross (World, alt)
 scrossu         // 1992.09 Stadium Cross (US)
 
 // Model 1 Games
@@ -6350,7 +6356,7 @@ combatsc        // GX611 (c) 1988
 combatsct       // GX611 (c) 1987
 combatscj       // GX611 (c) 1987 (Japan)
 bootcamp        // GX611 (c) 1987
-bootcampa		// GX611 (c) 1987
+bootcampa       // GX611 (c) 1987
 combatscb       // bootleg
 rockrage        // GX620 (c) 1986 (World?)
 rockragea       // GX620 (c) 1986 (Prototype?)
@@ -6450,6 +6456,7 @@ chqflag         // GX717 (c) 1988
 chqflagj        // GX717 (c) 1988 (Japan)
 ultraman        // GX910 (c) 1991 Banpresto/Bandai
 hexion          // GX122 (c) 1992
+hexionb			// bootleg
 lethalen        // GX191 (c) 1992
 lethalenub      // GX191 (c) 1992
 lethalenua      // GX191 (c) 1992
@@ -7713,7 +7720,7 @@ kof2000         // 0257 (c) 2000 SNK
 kof2000n        // 0257 (c) 2000 SNK
 				// 0258 SNK vs. Capcom?
 bangbead        // 0259 (c) 2000 Visco
-b2b				// 0071 (c) 2000 Visco (released by NCI in 2010)
+b2b             // 0071 (c) 2000 Visco (released by NCI in 2010)
 nitd            // 0260 (c) 2000 Eleven / Gavaking
 nitdbl          // bootleg
 sengoku3        // 0261 (c) 2001 Noise Factory / SNK
@@ -7910,7 +7917,7 @@ tstrike         // East Coast Coin Company (Melbourne)
 tstrikea        // Game Room
 ctribe          // TA-0028 (c) 1990 (US)
 ctribe1         // TA-0028 (c) 1990 (US)
-ctribeo			// TA-0028 (c) 1990 (US)
+ctribeo         // TA-0028 (c) 1990 (US)
 ctribej         // TA-0028 (c) 1990 (Japan)
 ctribeb         // bootleg
 ctribeb2        // bootleg
@@ -8453,7 +8460,7 @@ raiden2ea       // (c) 1993 Seibu Kaihatsu
 raiden2eu       // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2eua      // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2nl       // (c) 1993 Seibu Kaihatsu
-raiden2f		// (c) 1993 Seibu Kaihatsu
+raiden2f        // (c) 1993 Seibu Kaihatsu
 raiden2g        // (c) 1993 Seibu Kaihatsu + Tuning license
 raiden2dx       // (c) 1993 Seibu Kaihatsu
 
@@ -8508,6 +8515,7 @@ rdftu           // (c) 1996 Seibu Kaihatsu (Fabtek license)
 rdftau          // (c) 1996 Seibu Kaihatsu
 rdftauge        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
 rdftj           // (c) 1996 Seibu Kaihatsu
+rdftja          // (c) 1996 Seibu Kaihatsu
 rdftadi         // (c) 1996 Seibu Kaihatsu (Dream Island license)
 rdftam          // (c) 1996 Seibu Kaihatsu (Metrotainment license)
 rdftit          // (c) 1996 Seibu Kaihatsu
@@ -8777,7 +8785,7 @@ gunbird         // (c) 1994
 gunbirdk        // (c) 1994
 gunbirdj        // (c) 1994
 btlkroad        // (c) 1994
-btlkroadk		// (c) 1994
+btlkroadk       // (c) 1994
 s1945           // (c) 1995
 s1945a          // (c) 1995
 s1945j          // (c) 1995
@@ -9071,6 +9079,7 @@ msgundam1       // (c) 1993 Banpresto
 daioh           // (C) 1993 Athena
 daioha          // (C) 1993 Athena
 daiohp          // (C) 1993 Athena (prototype)
+daiohc          // (C) 1993 Athena (93111A PCB conversion)
 oisipuzl        // (c) 1993 SunSoft / Atlus
 triplfun        // bootleg
 utoukond        // (c) 1993 Banpresto + Tsuburaya Prod.
@@ -9530,7 +9539,8 @@ grdnstrmj       // (c) 1998 (Japan)
 redfoxwp2       // (c) 1998 (China)
 redfoxwp2a      // (c) 1998 (China)
 bubl2000        // (c) 1998 Tuning
-hotbubl         // (c) 1998 Pandora
+hotbubl         // (c) 1998 Pandora (Korea, Nudes)
+hotbubla        // (c) 1998 Pandora (Korea)
 popspops        // (c) 1999
 firehawk        // (c) 2001 ESD
 firehawkv       // (c) 2001 ESD

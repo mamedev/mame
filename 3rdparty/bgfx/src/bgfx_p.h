@@ -29,6 +29,26 @@
 #include <string.h>
 #include <alloca.h>
 
+// Check handle, cannot be bgfx::invalidHandle and must be valid.
+#define BGFX_CHECK_HANDLE(_desc, _handleAlloc, _handle) \
+			BX_CHECK(isValid(_handle) \
+				&& _handleAlloc.isValid(_handle.idx) \
+				, "Invalid handle. %s handle: %d (max %d)" \
+				, _desc \
+				, _handle.idx \
+				, _handleAlloc.getMaxHandles() \
+				)
+
+// Check handle, it's ok to be bgfx::invalidHandle or must be valid.
+#define BGFX_CHECK_HANDLE_INVALID_OK(_desc, _handleAlloc, _handle) \
+			BX_CHECK(!isValid(_handle) \
+				|| _handleAlloc.isValid(_handle.idx) \
+				, "Invalid handle. %s handle: %d (max %d)" \
+				, _desc \
+				, _handle.idx \
+				, _handleAlloc.getMaxHandles() \
+				)
+
 namespace bgfx
 {
 #if BX_COMPILER_CLANG_ANALYZER
@@ -204,8 +224,10 @@ namespace bgfx
 #elif BX_PLATFORM_LINUX
 	extern void*    g_bgfxX11Display;
 	extern uint32_t g_bgfxX11Window;
+	extern void*    g_bgfxGLX;
 #elif BX_PLATFORM_OSX
 	extern void* g_bgfxNSWindow;
+	extern void* g_bgfxNSGL;
 #elif BX_PLATFORM_WINDOWS
 	extern ::HWND g_bgfxHwnd;
 #elif BX_PLATFORM_WINRT
@@ -1418,7 +1440,10 @@ namespace bgfx
 		{
 			Binding& sampler = m_draw.m_bind[_stage];
 			sampler.m_idx    = _handle.idx;
-			sampler.m_un.m_draw.m_flags = (_flags&BGFX_SAMPLER_DEFAULT_FLAGS) ? BGFX_SAMPLER_DEFAULT_FLAGS : _flags;
+			sampler.m_un.m_draw.m_flags = (_flags&BGFX_SAMPLER_DEFAULT_FLAGS)
+				? BGFX_SAMPLER_DEFAULT_FLAGS
+				: _flags
+				;
 
 			if (isValid(_sampler)
 			&& (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) || BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES) ) )
@@ -1989,6 +2014,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyIndexBuffer(IndexBufferHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyIndexBuffer", m_indexBufferHandle, _handle);
+
 			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyIndexBuffer);
 			cmdbuf.write(_handle);
 			m_submit->free(_handle);
@@ -2034,6 +2061,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyVertexBuffer(VertexBufferHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyVertexBuffer", m_vertexBufferHandle, _handle);
+
 			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyVertexBuffer);
 			cmdbuf.write(_handle);
 			m_submit->free(_handle);
@@ -2135,6 +2164,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void updateDynamicIndexBuffer(DynamicIndexBufferHandle _handle, const Memory* _mem) )
 		{
+			BGFX_CHECK_HANDLE("updateDynamicIndexBuffer", m_dynamicIndexBufferHandle, _handle);
+
 			DynamicIndexBuffer& dib = m_dynamicIndexBuffers[_handle.idx];
 			BX_CHECK(0 == (dib.m_flags &  BGFX_BUFFER_COMPUTE_READ_WRITE), "Can't update GPU buffer from CPU.");
 
@@ -2166,6 +2197,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyDynamicIndexBuffer(DynamicIndexBufferHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyDynamicIndexBuffer", m_dynamicIndexBufferHandle, _handle);
+
 			m_freeDynamicIndexBufferHandle[m_numFreeDynamicIndexBufferHandles++] = _handle;
 		}
 
@@ -2279,6 +2312,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void updateDynamicVertexBuffer(DynamicVertexBufferHandle _handle, const Memory* _mem) )
 		{
+			BGFX_CHECK_HANDLE("updateDynamicVertexBuffer", m_dynamicVertexBufferHandle, _handle);
+
 			DynamicVertexBuffer& dvb = m_dynamicVertexBuffers[_handle.idx];
 			BX_CHECK(0 == (dvb.m_flags &  BGFX_BUFFER_COMPUTE_READ_WRITE), "Can't update GPU buffer from CPU.");
 
@@ -2311,6 +2346,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyDynamicVertexBuffer(DynamicVertexBufferHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyDynamicVertexBuffer", m_dynamicVertexBufferHandle, _handle);
+
 			m_freeDynamicVertexBufferHandle[m_numFreeDynamicVertexBufferHandles++] = _handle;
 		}
 
@@ -2593,6 +2630,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyShader(ShaderHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyShader", m_shaderHandle, _handle);
+
 			if (!isValid(_handle) )
 			{
 				BX_WARN(false, "Passing invalid shader handle to bgfx::destroyShader.");
@@ -2704,6 +2743,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyProgram(ProgramHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyProgram", m_programHandle, _handle);
+
 			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyProgram);
 			cmdbuf.write(_handle);
 			m_submit->free(_handle);
@@ -2769,6 +2810,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyTexture(TextureHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyTexture", m_textureHandle, _handle);
+
 			if (!isValid(_handle) )
 			{
 				BX_WARN(false, "Passing invalid texture handle to bgfx::destroyTexture");
@@ -2832,6 +2875,7 @@ namespace bgfx
 				for (uint32_t ii = 0; ii < _num; ++ii)
 				{
 					TextureHandle texHandle = _handles[ii];
+					BGFX_CHECK_HANDLE("createFrameBuffer texture handle", m_textureHandle, texHandle);
 
 					cmdbuf.write(texHandle);
 
@@ -2868,6 +2912,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyFrameBuffer(FrameBufferHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyFrameBuffer", m_frameBufferHandle, _handle);
+
 			CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyFrameBuffer);
 			cmdbuf.write(_handle);
 			m_submit->free(_handle);
@@ -2951,6 +2997,8 @@ namespace bgfx
 
 		BGFX_API_FUNC(void destroyUniform(UniformHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("destroyUniform", m_uniformHandle, _handle);
+
 			UniformRef& uniform = m_uniformRef[_handle.idx];
 			BX_CHECK(uniform.m_refCount > 0, "Destroying already destroyed uniform %d.", _handle.idx);
 			int32_t refs = --uniform.m_refCount;
@@ -3054,6 +3102,7 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setViewFrameBuffer(uint8_t _id, FrameBufferHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE_INVALID_OK("setViewFrameBuffer", m_frameBufferHandle, _handle);
 			m_fb[_id] = _handle;
 		}
 
@@ -3091,7 +3140,7 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setViewRemap(uint8_t _id, uint8_t _num, const void* _remap) )
 		{
-			const uint32_t num = bx::uint32_min( (BGFX_CONFIG_MAX_VIEWS - _id) + _num, BGFX_CONFIG_MAX_VIEWS) - _id;
+			const uint32_t num = bx::uint32_min(_id + _num, BGFX_CONFIG_MAX_VIEWS) - _id;
 			if (NULL == _remap)
 			{
 				for (uint32_t ii = 0; ii < num; ++ii)
@@ -3148,6 +3197,7 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setUniform(UniformHandle _handle, const void* _value, uint16_t _num) )
 		{
+			BGFX_CHECK_HANDLE("setUniform", m_uniformHandle, _handle);
 			UniformRef& uniform = m_uniformRef[_handle.idx];
 			BX_CHECK(uniform.m_num >= _num, "Truncated uniform update. %d (max: %d)", _num, uniform.m_num);
 			m_submit->writeUniform(uniform.m_type, _handle, _value, bx::uint16_min(uniform.m_num, _num) );
@@ -3155,11 +3205,13 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setIndexBuffer(IndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices) )
 		{
+			BGFX_CHECK_HANDLE("setIndexBuffer", m_indexBufferHandle, _handle);
 			m_submit->setIndexBuffer(_handle, _firstIndex, _numIndices);
 		}
 
 		BGFX_API_FUNC(void setIndexBuffer(DynamicIndexBufferHandle _handle, uint32_t _firstIndex, uint32_t _numIndices) )
 		{
+			BGFX_CHECK_HANDLE("setIndexBuffer", m_dynamicIndexBufferHandle, _handle);
 			m_submit->setIndexBuffer(m_dynamicIndexBuffers[_handle.idx], _firstIndex, _numIndices);
 		}
 
@@ -3170,11 +3222,13 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setVertexBuffer(VertexBufferHandle _handle, uint32_t _startVertex, uint32_t _numVertices) )
 		{
+			BGFX_CHECK_HANDLE("setVertexBuffer", m_vertexBufferHandle, _handle);
 			m_submit->setVertexBuffer(_handle, _startVertex, _numVertices);
 		}
 
 		BGFX_API_FUNC(void setVertexBuffer(DynamicVertexBufferHandle _handle, uint32_t _numVertices) )
 		{
+			BGFX_CHECK_HANDLE("setVertexBuffer", m_dynamicVertexBufferHandle, _handle);
 			m_submit->setVertexBuffer(m_dynamicVertexBuffers[_handle.idx], _numVertices);
 		}
 
@@ -3192,12 +3246,14 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setInstanceDataBuffer(VertexBufferHandle _handle, uint32_t _startVertex, uint32_t _num) )
 		{
+			BGFX_CHECK_HANDLE("setInstanceDataBuffer", m_vertexBufferHandle, _handle);
 			const VertexBuffer& vb = m_vertexBuffers[_handle.idx];
 			m_submit->setInstanceDataBuffer(_handle, _startVertex, _num, vb.m_stride);
 		}
 
 		BGFX_API_FUNC(void setInstanceDataBuffer(DynamicVertexBufferHandle _handle, uint32_t _startVertex, uint32_t _num) )
 		{
+			BGFX_CHECK_HANDLE("setInstanceDataBuffer", m_dynamicVertexBufferHandle, _handle);
 			const DynamicVertexBuffer& dvb = m_dynamicVertexBuffers[_handle.idx];
 			m_submit->setInstanceDataBuffer(dvb.m_handle
 				, dvb.m_startVertex + _startVertex
@@ -3208,16 +3264,19 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setProgram(ProgramHandle _handle) )
 		{
+			BGFX_CHECK_HANDLE("setProgram", m_programHandle, _handle);
 			m_submit->setProgram(_handle);
 		}
 
 		BGFX_API_FUNC(void setTexture(uint8_t _stage, UniformHandle _sampler, TextureHandle _handle, uint32_t _flags) )
 		{
+			BGFX_CHECK_HANDLE_INVALID_OK("setTexture/TextureHandle", m_textureHandle, _handle);
 			m_submit->setTexture(_stage, _sampler, _handle, _flags);
 		}
 
 		BGFX_API_FUNC(void setTexture(uint8_t _stage, UniformHandle _sampler, FrameBufferHandle _handle, uint8_t _attachment, uint32_t _flags) )
 		{
+			BGFX_CHECK_HANDLE_INVALID_OK("setTexture/FrameBufferHandle", m_frameBufferHandle, _handle);
 			BX_CHECK(_attachment < g_caps.maxFBAttachments, "Frame buffer attachment index %d is invalid.", _attachment);
 			TextureHandle textureHandle = BGFX_INVALID_HANDLE;
 			if (isValid(_handle) )
@@ -3238,22 +3297,26 @@ namespace bgfx
 
 		BGFX_API_FUNC(void setBuffer(uint8_t _stage, IndexBufferHandle _handle, Access::Enum _access) )
 		{
+			BGFX_CHECK_HANDLE("setBuffer", m_indexBufferHandle, _handle);
 			m_submit->setBuffer(_stage, _handle, _access);
 		}
 
 		BGFX_API_FUNC(void setBuffer(uint8_t _stage, VertexBufferHandle _handle, Access::Enum _access) )
 		{
+			BGFX_CHECK_HANDLE("setBuffer", m_vertexBufferHandle, _handle);
 			m_submit->setBuffer(_stage, _handle, _access);
 		}
 
 		BGFX_API_FUNC(void setBuffer(uint8_t _stage, DynamicIndexBufferHandle _handle, Access::Enum _access) )
 		{
+			BGFX_CHECK_HANDLE("setBuffer", m_dynamicIndexBufferHandle, _handle);
 			const DynamicIndexBuffer& dib = m_dynamicIndexBuffers[_handle.idx];
 			m_submit->setBuffer(_stage, dib.m_handle, _access);
 		}
 
 		BGFX_API_FUNC(void setBuffer(uint8_t _stage, DynamicVertexBufferHandle _handle, Access::Enum _access) )
 		{
+			BGFX_CHECK_HANDLE("setBuffer", m_dynamicVertexBufferHandle, _handle);
 			const DynamicVertexBuffer& dvb = m_dynamicVertexBuffers[_handle.idx];
 			m_submit->setBuffer(_stage, dvb.m_handle, _access);
 		}

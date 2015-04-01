@@ -131,9 +131,9 @@ public:
 	osd_monitor_info    *m_next;                   // pointer to next monitor in list
 protected:
 	virtual void refresh() = 0;
-	osd_rect			m_pos_size;
-	osd_rect			m_usuable_pos_size;
-	bool				m_is_primary;
+	osd_rect            m_pos_size;
+	osd_rect            m_usuable_pos_size;
+	bool                m_is_primary;
 	char                m_name[64];
 private:
 
@@ -175,7 +175,7 @@ struct osd_video_config
 	int                 syncrefresh;                // sync only to refresh rate
 	int                 switchres;                  // switch resolutions
 
-	int                 fullstretch;	// FXIME: implement in windows!
+	int                 fullstretch;    // FXIME: implement in windows!
 
 	// ddraw options
 	int                 hwstretch;                  // stretch using the hardware

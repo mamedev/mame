@@ -54,9 +54,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(star_scrollx_w);
 	DECLARE_WRITE8_MEMBER(star_scrolly_w);
-	
+
 	DECLARE_READ8_MEMBER(turtship_ports_r);
-	
+
 	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
 
 	DECLARE_DRIVER_INIT(dyger);
@@ -64,7 +64,7 @@ public:
 	DECLARE_DRIVER_INIT(whizz);
 	DECLARE_DRIVER_INIT(turtship);
 	virtual void machine_start();
-    virtual void video_start();
+	virtual void video_start();
 
 	TILE_GET_INFO_MEMBER(get_sidearms_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_philko_bg_tile_info);

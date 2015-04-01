@@ -72,7 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(subcpu_status_r);
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 
-    virtual void machine_start();
+	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
@@ -101,7 +101,7 @@ public:
 
 void sothello_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
 WRITE8_MEMBER(sothello_state::bank_w)
@@ -114,7 +114,7 @@ WRITE8_MEMBER(sothello_state::bank_w)
 		case 4: bank=2; break;
 		case 8: bank=3; break;
 	}
-    membank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)

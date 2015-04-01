@@ -159,7 +159,7 @@ void sidearms_state::video_start()
 	m_latch_374 = m_vcount_191 = m_hcount_191 = 0;
 
 	m_flipon = m_charon = m_staron = m_objon = m_bgon = 0;
-	
+
 	save_item(NAME(m_bgon));
 	save_item(NAME(m_objon));
 	save_item(NAME(m_staron));

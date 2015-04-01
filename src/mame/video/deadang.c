@@ -77,7 +77,7 @@ void deadang_state::video_start()
 	m_pf2_layer->set_transparent_pen(15);
 	m_pf1_layer->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_oldtilebank));
 }

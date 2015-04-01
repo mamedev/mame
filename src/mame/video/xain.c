@@ -89,7 +89,7 @@ void xain_state::video_start()
 	m_bgram0_tilemap->set_transparent_pen(0);
 	m_bgram1_tilemap->set_transparent_pen(0);
 	m_char_tilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_pri));
 	save_item(NAME(m_scrollxP0));
 	save_item(NAME(m_scrollyP0));

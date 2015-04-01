@@ -172,7 +172,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	int	m_selected_channel;
+	int m_selected_channel;
 	int m_base;
 	UINT8 m_command_high;
 

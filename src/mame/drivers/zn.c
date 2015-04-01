@@ -4841,9 +4841,9 @@ GAME( 1999, sfex2p,    cpzn2,    coh3002c, zn6b, driver_device, 0, ROT0, "Capcom
 GAME( 1999, sfex2pa,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, sfex2ph,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hispanic 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, sfex2pj,   sfex2p,   coh3002c, zn6b, driver_device, 0, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, strider2,  cpzn2,    coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (USA 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, strider2a, strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (Asia 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, shiryu2,   strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider Hiryu 2 (Japan 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, strider2,  cpzn2,    coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (USA 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // random hangs / crashes
+GAME( 1999, strider2a, strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider 2 (Asia 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, shiryu2,   strider2, coh3002c, zn,   driver_device, 0, ROT0, "Capcom", "Strider Hiryu 2 (Japan 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING  )
 
 /* Atari */
 

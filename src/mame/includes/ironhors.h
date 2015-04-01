@@ -48,21 +48,21 @@ public:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(filter_w);
 	DECLARE_READ8_MEMBER(farwest_soundlatch_r);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(farwest_get_bg_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(ironhors);
 	DECLARE_VIDEO_START(farwest);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(farwest_irq);
 };

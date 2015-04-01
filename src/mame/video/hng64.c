@@ -660,7 +660,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// xrally's pink tilemaps make me think this is a tilemap enable bit.
 	// fatfurwa makes me think otherwise.
-//	if (!(tileregs & 0x0040)) return;
+//  if (!(tileregs & 0x0040)) return;
 
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
@@ -1020,16 +1020,33 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	UINT32 animbits;
 	UINT16 tileflags[4];
 
-#if 0
+#if 1
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
 	if ( machine().input().code_pressed_once(KEYCODE_L) )
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
-		space.write_byte(0x2f27c8, 0x2);
+
+		if (!strcmp(machine().system().name, "sams64_2"))
+		{
+			space.write_byte(0x2f27c8, 0x2);
+		} 
+		else if (!strcmp(machine().system().name, "roadedge")) // hack to get test mode (useful for sound test)
+		{
+			space.write_byte(0xcfb53, 0x1);
+		}
+		else if (!strcmp(machine().system().name, "xrally")) // hack to get test mode (useful for sound test)
+		{
+			space.write_byte(0xa2363, 0x1);
+		}
+
 	}
 #endif
+
+
+	
+
 
 	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
 	screen.priority().fill(0x00, cliprect);
@@ -1251,4 +1268,3 @@ void hng64_state::video_start()
 	m_vertsrom = (UINT16*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 }
-

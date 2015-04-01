@@ -11,11 +11,11 @@ Notes:
   The game uses 2 joysticks (with button on top) and 2 buttons per player.
   Left stick
   up: left straight punch to enemy's face
-  left: swey to left
+  left: sway to left
 
   Right stick
   up: right straight punch to enemy's face
-  right: swey to right
+  right: sway to right
 
   Left + Right stick combinations
   L down + R up: right straight punch to enemy's body
@@ -112,16 +112,17 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 #include "sound/ay8910.h"
 #include "includes/mainsnk.h"
 
+
+void mainsnk_state::machine_start()
+{
+	save_item(NAME(m_sound_cpu_busy));
+}
+
 WRITE8_MEMBER(mainsnk_state::sound_command_w)
 {
 	m_sound_cpu_busy = 1;
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-READ8_MEMBER(mainsnk_state::sound_command_r)
-{
-	return soundlatch_byte_r(space, 0);
 }
 
 READ8_MEMBER(mainsnk_state::sound_ack_r)
@@ -130,7 +131,7 @@ READ8_MEMBER(mainsnk_state::sound_ack_r)
 	return 0xff;
 }
 
-CUSTOM_INPUT_MEMBER(mainsnk_state::mainsnk_sound_r)
+CUSTOM_INPUT_MEMBER(mainsnk_state::sound_r)
 {
 	return (m_sound_cpu_busy) ? 0x01 : 0x00;
 }
@@ -145,18 +146,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3")
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(mainsnk_c600_w)
+	AM_RANGE(0xc600, 0xc600) AM_WRITE(c600_w)
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(mainsnk_bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mainsnk_fgram_w) AM_SHARE("fgram")    // + work RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")    // + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(sound_command_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_ack_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITENOP    // ? always FFFF, snkwave leftover?
@@ -177,7 +178,7 @@ static INPUT_PORTS_START( mainsnk )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mainsnk_state,mainsnk_sound_r, NULL)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mainsnk_state, sound_r, NULL)  /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -271,7 +272,7 @@ static INPUT_PORTS_START( canvas )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mainsnk_state,mainsnk_sound_r, NULL)  /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mainsnk_state, sound_r, NULL)  /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
@@ -399,7 +400,7 @@ static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update_mainsnk)
+	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mainsnk)
@@ -483,5 +484,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, driver_device, 0,   ROT0, "SNK", "Main Event (1984)", 0)
-GAME( 1985, canvas,    0,   mainsnk, canvas, driver_device,  0,   ROT0, "SNK", "Canvas Croquis", 0)
+GAME( 1984, mainsnk,   0,   mainsnk, mainsnk, driver_device, 0,   ROT0, "SNK", "Main Event (1984)", GAME_SUPPORTS_SAVE )
+GAME( 1985, canvas,    0,   mainsnk, canvas, driver_device,  0,   ROT0, "SNK", "Canvas Croquis", GAME_SUPPORTS_SAVE )

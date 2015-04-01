@@ -123,14 +123,14 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-		
+
 	DECLARE_DRIVER_INIT(pturn);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(sub_intgen);
 	INTERRUPT_GEN_MEMBER(main_intgen);
 };
@@ -174,7 +174,7 @@ void pturn_state::video_start()
 	m_fgmap->set_transparent_pen(0);
 	m_bgmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(pturn_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8, 8,32,32*8);
 	m_bgmap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_bgbank));
 	save_item(NAME(m_fgbank));
 	save_item(NAME(m_bgpalette));

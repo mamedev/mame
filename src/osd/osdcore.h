@@ -28,7 +28,11 @@
 
 /* Make sure we have a path separator (default to /) */
 #ifndef PATH_SEPARATOR
+#if defined(_WIN32) || defined (__OS2__)
+#define PATH_SEPARATOR          "\\"
+#else
 #define PATH_SEPARATOR          "/"
+#endif
 #endif
 
 /* flags controlling file access */

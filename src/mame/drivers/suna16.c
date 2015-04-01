@@ -215,7 +215,7 @@ ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(suna16_state,bestbest)
 {
-    save_item(NAME(m_prot));
+	save_item(NAME(m_prot));
 }
 
 
@@ -294,8 +294,8 @@ ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
-    membank("bank1")->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
-    membank("bank2")->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
+	membank("bank1")->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
+	membank("bank2")->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
 
 /* Bank Switching */
@@ -304,16 +304,16 @@ WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-    printf("%d %d\n", 1, bank);
-    membank("bank1")->set_entry(bank);
+	printf("%d %d\n", 1, bank);
+	membank("bank1")->set_entry(bank);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
 	const int bank = data & 7;
 	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-    printf("%d %d\n", 2, bank);
-    membank("bank2")->set_entry(bank);
+	printf("%d %d\n", 2, bank);
+	membank("bank2")->set_entry(bank);
 }
 
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
 	const int bank = data & 1;
 	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
-    membank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 /* Memory maps: Yes, *no* RAM */
@@ -398,8 +398,8 @@ ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
-    membank("bank1")->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
-	
+	membank("bank1")->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
+
 	save_item(NAME(m_prot));
 }
 
@@ -828,7 +828,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-    MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
+	MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-    MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
+	MCFG_MACHINE_START_OVERRIDE(suna16_state,uballoon)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
 
 	/* video hardware */
@@ -992,7 +992,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	/* 2nd PCM Z80 missing */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	
+
 	MCFG_MACHINE_START_OVERRIDE(suna16_state, bestbest)
 
 	/* video hardware */

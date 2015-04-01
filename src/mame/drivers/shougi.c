@@ -107,7 +107,7 @@ public:
 	int m_r;
 	//UINT8 *m_cpu_sharedram;
 	//UINT8 m_cpu_sharedram_control_val;
-	
+
 	DECLARE_WRITE8_MEMBER(cpu_sharedram_sub_w);
 	DECLARE_WRITE8_MEMBER(cpu_sharedram_main_w);
 	DECLARE_READ8_MEMBER(cpu_sharedram_r);
@@ -118,12 +118,12 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_disable_and_clear_line_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(dummy_r);
-	
+
 	DECLARE_PALETTE_INIT(shougi);
 	virtual void machine_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 };
 

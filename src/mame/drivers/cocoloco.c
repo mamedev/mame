@@ -192,21 +192,21 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 *m_videoram;
 	UINT8 m_videobank;
-	
+
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(vbank_w);
 	DECLARE_WRITE8_MEMBER(vram_clear_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(cocoloco);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

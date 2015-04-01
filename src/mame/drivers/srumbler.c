@@ -32,25 +32,25 @@ WRITE8_MEMBER(srumbler_state::bankswitch_w)
 
 	for (int i = 0x05;i < 0x10;i++)
 	{
-        /* bit 2 of prom1 selects ROM or RAM - not supported */
+		/* bit 2 of prom1 selects ROM or RAM - not supported */
 		int bank = ((prom1[i] & 0x03) << 4) | (prom2[i] & 0x0f);
 
-        char bankname[10];
+		char bankname[10];
 		sprintf(bankname, "%04x", i*0x1000);
-        membank(bankname)->set_entry(bank);
+		membank(bankname)->set_entry(bank);
 	}
 }
 
 void srumbler_state::machine_start()
 {
-    for (int i = 0x05; i < 0x10; i++)
+	for (int i = 0x05; i < 0x10; i++)
 	{
-        char bankname[10];
+		char bankname[10];
 		sprintf(bankname, "%04x", i*0x1000);
-        membank(bankname)->configure_entries(0, 64, memregion("user1")->base(), 0x1000);
+		membank(bankname)->configure_entries(0, 64, memregion("user1")->base(), 0x1000);
 	}
 
-    /* initialize banked ROM pointers */
+	/* initialize banked ROM pointers */
 	bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 

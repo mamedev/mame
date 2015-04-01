@@ -27,21 +27,21 @@ public:
 	tilemap_t *m_tilemap2;
 	tilemap_t *m_tilemap4;
 	UINT8 *m_buffer_spriteram;
-	
+
 	DECLARE_READ8_MEMBER(wheel_r);
 	DECLARE_WRITE8_MEMBER(vram1_w);
 	DECLARE_WRITE8_MEMBER(vram2_w);
 	DECLARE_WRITE8_MEMBER(vram4_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info4);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(ssrj);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	void draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect );

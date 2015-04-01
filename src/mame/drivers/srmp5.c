@@ -114,7 +114,7 @@ public:
 	DECLARE_READ8_MEMBER(cmd1_r);
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
-    virtual void machine_start();
+	virtual void machine_start();
 	DECLARE_DRIVER_INIT(srmp5);
 	UINT32 screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -240,7 +240,7 @@ UINT32 srmp5_state::screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bit
 
 void srmp5_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, 256, memregion("maincpu")->base(), 0x4000);
 }
 
 WRITE32_MEMBER(srmp5_state::bank_w)
@@ -400,7 +400,7 @@ READ8_MEMBER(srmp5_state::cmd_stat8_r)
 // common rombank? should go in machine/st0016 with larger address space exposed?
 WRITE8_MEMBER(srmp5_state::st0016_rom_bank_w)
 {
-    membank("bank1")->set_entry(data);
+	membank("bank1")->set_entry(data);
 }
 
 

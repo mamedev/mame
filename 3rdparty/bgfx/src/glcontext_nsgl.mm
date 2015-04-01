@@ -10,7 +10,7 @@
 #	include <Cocoa/Cocoa.h>
 #	include <bx/os.h>
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 
 #	define GL_IMPORT(_optional, _proto, _func, _import) _proto _func
@@ -35,7 +35,7 @@ namespace bgfx
 		{
 		}
 	};
-	
+
 	static void* s_opengl = NULL;
 
 	void GlContext::create(uint32_t _width, uint32_t _height)
@@ -46,56 +46,63 @@ namespace bgfx
 		BX_CHECK(NULL != s_opengl, "OpenGL dynamic library is not found!");
 
 		NSWindow* nsWindow = (NSWindow*)g_bgfxNSWindow;
+		m_context = g_bgfxNSGL;
 
-		NSOpenGLPixelFormatAttribute profile =
+		if (NULL == g_bgfxNSGL)
+		{
+			NSOpenGLPixelFormatAttribute profile =
 #if BGFX_CONFIG_RENDERER_OPENGL >= 31
-			NSOpenGLProfileVersion3_2Core
+				NSOpenGLProfileVersion3_2Core
 #else
-			NSOpenGLProfileVersionLegacy
+				NSOpenGLProfileVersionLegacy
 #endif // BGFX_CONFIG_RENDERER_OPENGL >= 31
-			;
+				;
 
-		NSOpenGLPixelFormatAttribute pixelFormatAttributes[] = {
-			NSOpenGLPFAOpenGLProfile, profile,
-			NSOpenGLPFAColorSize,     24,
-			NSOpenGLPFAAlphaSize,     8,
-			NSOpenGLPFADepthSize,     24,
-			NSOpenGLPFAStencilSize,   8,
-			NSOpenGLPFADoubleBuffer,  true,
-			NSOpenGLPFAAccelerated,   true,
-			NSOpenGLPFANoRecovery,    true,
-			0,                        0,
-		};
+			NSOpenGLPixelFormatAttribute pixelFormatAttributes[] = {
+				NSOpenGLPFAOpenGLProfile, profile,
+				NSOpenGLPFAColorSize,     24,
+				NSOpenGLPFAAlphaSize,     8,
+				NSOpenGLPFADepthSize,     24,
+				NSOpenGLPFAStencilSize,   8,
+				NSOpenGLPFADoubleBuffer,  true,
+				NSOpenGLPFAAccelerated,   true,
+				NSOpenGLPFANoRecovery,    true,
+				0,                        0,
+			};
 
-		NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:pixelFormatAttributes];
-		BGFX_FATAL(NULL != pixelFormat, Fatal::UnableToInitialize, "Failed to initialize pixel format.");
+			NSOpenGLPixelFormat* pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:pixelFormatAttributes];
+			BGFX_FATAL(NULL != pixelFormat, Fatal::UnableToInitialize, "Failed to initialize pixel format.");
 
-		NSRect glViewRect = [[nsWindow contentView] bounds];
-		NSOpenGLView* glView = [[NSOpenGLView alloc] initWithFrame:glViewRect pixelFormat:pixelFormat];
-		
-		[pixelFormat release];
-		[nsWindow setContentView:glView];
-		
-		NSOpenGLContext* glContext = [glView openGLContext];
-		BGFX_FATAL(NULL != glContext, Fatal::UnableToInitialize, "Failed to initialize GL context.");
+			NSRect glViewRect = [[nsWindow contentView] bounds];
+			NSOpenGLView* glView = [[NSOpenGLView alloc] initWithFrame:glViewRect pixelFormat:pixelFormat];
 
-		[glContext makeCurrentContext];
-		GLint interval = 0;
-		[glContext setValues:&interval forParameter:NSOpenGLCPSwapInterval];
-		
-		m_view    = glView;
-		m_context = glContext;
+			[pixelFormat release];
+			[nsWindow setContentView:glView];
+
+			NSOpenGLContext* glContext = [glView openGLContext];
+			BGFX_FATAL(NULL != glContext, Fatal::UnableToInitialize, "Failed to initialize GL context.");
+
+			[glContext makeCurrentContext];
+			GLint interval = 0;
+			[glContext setValues:&interval forParameter:NSOpenGLCPSwapInterval];
+
+			m_view    = glView;
+			m_context = glContext;
+		}
 
 		import();
 	}
 
 	void GlContext::destroy()
 	{
-		NSOpenGLView* glView = (NSOpenGLView*)m_view;
-		m_view = 0;
-		m_context = 0;
-		[glView release];
+		if (NULL == g_bgfxNSGL)
+		{
+			NSOpenGLView* glView = (NSOpenGLView*)m_view;
+			[glView release];
+		}
 
+		m_view    = 0;
+		m_context = 0;
 		bx::dlclose(s_opengl);
 	}
 
@@ -165,6 +172,6 @@ namespace bgfx
 #	include "glimports.h"
 	}
 
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // BX_PLATFORM_OSX && (BGFX_CONFIG_RENDERER_OPENGLES2|BGFX_CONFIG_RENDERER_OPENGLES3|BGFX_CONFIG_RENDERER_OPENGL)

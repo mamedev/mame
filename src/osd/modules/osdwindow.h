@@ -78,9 +78,9 @@ public:
 #endif
 
 	render_primitive_list   *m_primlist;
-	osd_window_config		m_win_config;
+	osd_window_config       m_win_config;
 protected:
-	int						m_prescale;
+	int                     m_prescale;
 };
 
 class osd_renderer
@@ -131,7 +131,7 @@ protected:
 private:
 
 	osd_window      *m_window;
-	int			m_flags;
+	int         m_flags;
 };
 
 

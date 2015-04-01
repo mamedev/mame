@@ -218,7 +218,9 @@
 				BX_STRINGIZE(__clang_minor__) "." \
 				BX_STRINGIZE(__clang_patchlevel__)
 #elif BX_COMPILER_MSVC
-#	if BX_COMPILER_MSVC >= 1800
+#	if BX_COMPILER_MSVC >= 1900
+#		define BX_COMPILER_NAME "MSVC 14.0"
+#	elif BX_COMPILER_MSVC >= 1800
 #		define BX_COMPILER_NAME "MSVC 12.0"
 #	elif BX_COMPILER_MSVC >= 1700
 #		define BX_COMPILER_NAME "MSVC 11.0"

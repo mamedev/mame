@@ -13,17 +13,17 @@ ADDRESS_MAP_END
 
 // cpu i/f map
 DEVICE_ADDRESS_MAP_START(cpu_map, 32, vrc4373_device)
-	AM_RANGE(0x00000000, 0x0000007b) AM_READWRITE(    vrc4373_device::cpu_if_r,          vrc4373_device::cpu_if_w)
+	AM_RANGE(0x00000000, 0x0000007b) AM_READWRITE(    cpu_if_r,          cpu_if_w)
 ADDRESS_MAP_END
 
 // Target Window 1 map
 DEVICE_ADDRESS_MAP_START(target1_map, 32, vrc4373_device)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    vrc4373_device::target1_r,          vrc4373_device::target1_w)
+	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target1_r,          target1_w)
 ADDRESS_MAP_END
 
 // Target Window 2 map
 DEVICE_ADDRESS_MAP_START(target2_map, 32, vrc4373_device)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    vrc4373_device::target2_r,          vrc4373_device::target2_w)
+	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target2_r,          target2_w)
 ADDRESS_MAP_END
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -111,7 +111,7 @@ void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 		if (LOG_NILE)
 			logerror("%s: map_extra Master Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci2_laddr);
 	}
-	// PCI IO Window 
+	// PCI IO Window
 	if (m_cpu_regs[NREG_PCIMIOW]&0x1000) {
 		winStart = m_cpu_regs[NREG_PCIMIOW]&0xff000000;
 		winEnd = winStart | (~(0x80000000 | (((m_cpu_regs[NREG_PCIMIOW]>>13)&0x7f)<<24)));
@@ -122,7 +122,7 @@ void vrc4373_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_
 			logerror("%s: map_extra IO Window start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_pci_io_laddr);
 	}
 	// PCI Target Window 1
-	if (m_cpu_regs[NREG_PCITW1]&0x1000) {		
+	if (m_cpu_regs[NREG_PCITW1]&0x1000) {
 		winStart = m_cpu_regs[NREG_PCITW1]&0xffe00000;
 		winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW1]>>13)&0x7f)<<21)));
 		winSize = winEnd - winStart + 1;
@@ -242,7 +242,7 @@ WRITE32_MEMBER (vrc4373_device::target2_w)
 		logerror("%06X:nile target2 write to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 }
 
-// CPU I/F 
+// CPU I/F
 READ32_MEMBER (vrc4373_device::cpu_if_r)
 {
 	UINT32 result = m_cpu_regs[offset];
@@ -290,7 +290,7 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 		case NREG_PCICAR:
 			// Bits in reserved area are used for device selection of type 0 config transactions
 			// Assuming 23:11 get mapped into device number for configuration
-			if ((data&0x3) == 0x0) { 
+			if ((data&0x3) == 0x0) {
 				// Type 0 transaction
 				modData = 0;
 				// Select the device based on one hot bit
@@ -341,4 +341,3 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 	}
 
 }
-

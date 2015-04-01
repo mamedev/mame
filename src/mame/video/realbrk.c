@@ -154,7 +154,7 @@ void realbrk_state::video_start()
 
 	m_tmpbitmap0 = auto_bitmap_ind16_alloc(machine(),32,32);
 	m_tmpbitmap1 = auto_bitmap_ind16_alloc(machine(),32,32);
-	
+
 	save_item(NAME(m_disable_video));
 }
 

@@ -73,7 +73,7 @@ void timelimt_state::video_start()
 			8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
-	
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 }

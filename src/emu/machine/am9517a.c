@@ -3,15 +3,15 @@
 /***************************************************************************
 
     AMD AM9517A
-	Intel 8237A
-	NEC uPD71037
+    Intel 8237A
+    NEC uPD71037
 
-	NEC uPD71071 (extended version of above)
+    NEC uPD71071 (extended version of above)
 
-	a variant is used in the V53 CPU which offers subsets of both the
-	uPD71071 and uPD71037 functionality depending on a mode bit.
-	
-	Multimode DMA Controller emulation
+    a variant is used in the V53 CPU which offers subsets of both the
+    uPD71071 and uPD71037 functionality depending on a mode bit.
+
+    Multimode DMA Controller emulation
 
     Copyright the MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -28,17 +28,17 @@
 
 /*
 
-	When the V53 operates in uPD71071 compatible mode there are the following
-	differences from a real uPD71071
+    When the V53 operates in uPD71071 compatible mode there are the following
+    differences from a real uPD71071
 
-	                           V53     Real uPD71071
-	Software Reqs              No      Yes
-	Memory-to-Memory DMA       No      Yes
-	DMARQ active level         High    programmable
-	DMAAK active level         Low     programmable
-	Bus Cycle                  4       4 or 3
+                               V53     Real uPD71071
+    Software Reqs              No      Yes
+    Memory-to-Memory DMA       No      Yes
+    DMARQ active level         High    programmable
+    DMAAK active level         Low     programmable
+    Bus Cycle                  4       4 or 3
 
-	we don't currently handle the differences
+    we don't currently handle the differences
 
 */
 
@@ -1158,7 +1158,7 @@ READ8_MEMBER(upd71071_v53_device::read)
 			ret = m_command & 0xff;
 			break;
 		case 0x09:  // Device control (high) // UPD71071 only?
-			ret = m_command_high & 0xff; 
+			ret = m_command_high & 0xff;
 			break;
 		case 0x0b:  // Status
 			ret = m_status;
@@ -1187,14 +1187,14 @@ READ8_MEMBER(upd71071_v53_device::read)
 WRITE8_MEMBER(upd71071_v53_device::write)
 {
 	int channel = m_selected_channel;
-	
+
 	switch (offset)
 	{
 		case 0x00:  // Initialise
 			// TODO: reset (bit 0)
 			//m_buswidth = data & 0x02;
 			//if (data & 0x01)
-			//	soft_reset();
+			//  soft_reset();
 			logerror("DMA: Initialise [%02x]\n", data);
 			break;
 		case 0x01:  // Channel

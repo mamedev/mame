@@ -2993,8 +2993,8 @@ static INPUT_PORTS_START( ns8linew )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )	// manual says 1c/8c
-	PORT_DIPSETTING(    0x28, "1 Coin/10 Credits" ) 
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )    // manual says 1c/8c
+	PORT_DIPSETTING(    0x28, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW4:7")              /* not checked */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3375,12 +3375,12 @@ static INPUT_PORTS_START( bingowng )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-/*	On a W-4 PCB these are used as: "Special Odds-Prohibition Of Winning...(Odds B)" - see DSW2-7
-	PORT_DIPNAME( 0x80, 0x00, "Special Odds" )              PORT_DIPLOCATION("DSW1:7,8")
-	PORT_DIPSETTING(    0x00, "None" )
-	PORT_DIPSETTING(    0x40, "x300 (x1000)" )
-	PORT_DIPSETTING(    0x80, "x500 (x5000" )
-	PORT_DIPSETTING(    0xc0, "x1000 (x10000)
+/*  On a W-4 PCB these are used as: "Special Odds-Prohibition Of Winning...(Odds B)" - see DSW2-7
+    PORT_DIPNAME( 0x80, 0x00, "Special Odds" )              PORT_DIPLOCATION("DSW1:7,8")
+    PORT_DIPSETTING(    0x00, "None" )
+    PORT_DIPSETTING(    0x40, "x300 (x1000)" )
+    PORT_DIPSETTING(    0x80, "x500 (x5000" )
+    PORT_DIPSETTING(    0xc0, "x1000 (x10000)
 */
 
 	PORT_START("DSW2")
@@ -3406,13 +3406,13 @@ static INPUT_PORTS_START( bingowng )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-/*	On a W-4 PCB these are used as:
-	PORT_DIPNAME( 0x40, 0x40, "Odds" )                  PORT_DIPLOCATION("DSW2:7")
-	PORT_DIPSETTING(    0x40, "Type A" )
-	PORT_DIPSETTING(    0x00, "Type B" )
-	PORT_DIPNAME( 0x80, 0x80, "Type Of W-Up Game" )     PORT_DIPLOCATION("DSW2:8")
-	PORT_DIPSETTING(    0x80, "Slots" )
-	PORT_DIPSETTING(    0x00, "Big/Small Card" )
+/*  On a W-4 PCB these are used as:
+    PORT_DIPNAME( 0x40, 0x40, "Odds" )                  PORT_DIPLOCATION("DSW2:7")
+    PORT_DIPSETTING(    0x40, "Type A" )
+    PORT_DIPSETTING(    0x00, "Type B" )
+    PORT_DIPNAME( 0x80, 0x80, "Type Of W-Up Game" )     PORT_DIPLOCATION("DSW2:8")
+    PORT_DIPSETTING(    0x80, "Slots" )
+    PORT_DIPSETTING(    0x00, "Big/Small Card" )
 */
 
 	/* On a W-4 PCB DSW3 & DSW4 are reversed and all dips on DSW4 are set to off! */
@@ -3672,7 +3672,7 @@ static INPUT_PORTS_START( schery97 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")	// doesn't work in v352c4
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats") // doesn't work in v352c4
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x03, "Game Level (Difficulty)" )   PORT_DIPLOCATION("DSW1:1,2,3")  /* OK */
@@ -4335,14 +4335,14 @@ static INPUT_PORTS_START( roypok96a )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Unused - leave off" )            PORT_DIPLOCATION("DSW5:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )	
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "Reset Remaining Score To Zero" ) PORT_DIPLOCATION("DSW5:7")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x00, "Count Game To Issue Ticket" )    PORT_DIPLOCATION("DSW5:8")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -4472,7 +4472,7 @@ static INPUT_PORTS_START( pokonl97 )
 	PORT_DIPNAME( 0x10, 0x10, "Auto Ticket Dispense" )      PORT_DIPLOCATION("DSW4:5")  /* not checked */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0xe0, 0xe0, "Ticket Dispense Mode" )		PORT_DIPLOCATION("DSW4:6,7,8")
+	PORT_DIPNAME( 0xe0, 0xe0, "Ticket Dispense Mode" )      PORT_DIPLOCATION("DSW4:6,7,8")
 	PORT_DIPSETTING(    0xe0, "Continuous" )
 	PORT_DIPSETTING(    0xc0, "Max 1 Ticket Per Game" )
 	PORT_DIPSETTING(    0xa0, "Max 2 Ticket Per Game" )
