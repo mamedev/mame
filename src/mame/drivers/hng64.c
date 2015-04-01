@@ -948,8 +948,8 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 			COMBINE_DATA(&main_latch[1]);
 			break;
 		case 0x08:
-			m_audiocpu->set_input_line(5, ASSERT_LINE);
-			if(data != 1)
+			m_audiocpu->set_input_line(5, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+			if(data & 0xfe)
 				printf("IRQ send %02x?\n",data);
 			break;
 		default:
