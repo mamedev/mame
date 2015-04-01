@@ -42,7 +42,7 @@
 
 	6  ----------------   ----------------   ----------------
 
-	7  ----------------   ----------------   ----------------
+	7  ----------------   ----------------   llllllllrrrrrrrr left/right volume
 
 	8  ----------------   ----------------   ---------------- (read only?)                                                        
 
@@ -69,6 +69,7 @@
 
 	Some of the other ports on the HNG64 sound CPU may also be tied
 	to this chip, this isn't yet clear.
+	Port $8 bit 8 is keyon, low byte is sound status related (masked with 0x7f)
 
 	Sample data format TBA
 
@@ -108,7 +109,7 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 void l7a1045_sound_device::device_start()
 {
 	/* Allocate the stream */
-	m_stream = stream_alloc(0, 2, clock() / 384);
+	m_stream = stream_alloc(0, 2, 44100/4); //clock() / 384);
 
 	m_rom = m_region->base();
 	m_rom_size = m_region->bytes();
@@ -142,7 +143,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			{
 				INT32 sample;
 
-				pos += (frac >> 12);
+				pos += 1;//(frac >> 12);
 				frac &= 0xfff;
 
 				if ((start + pos) >= end)
