@@ -252,14 +252,13 @@ WRITE16_MEMBER(l7a1045_sound_device::l7a1045_sound_data_02_w) // upper? word of 
 		break;
 
 	case 0x00:
-		{
-			// hack
-			m_key |= 1 << m_audioregister;
+		// hack
+		l7a1045_voice *vptr = &m_voice[m_audiochannel];	
 
-			m_voice[m_audioregister].frac = 0;
-			m_voice[m_audioregister].pos = 0;
-		}
-		l7a1045_voice *vptr = &m_voice[m_audioregister];
+		m_key |= 1 << m_audiochannel;
+
+		vptr->frac = 0;
+		vptr->pos = 0;
 
 		vptr->start = (m_audiodat[0][m_audiochannel].dat[0] & 0x000f) << (16 + 4);
 		vptr->start |=   (m_audiodat[0][m_audiochannel].dat[1] & 0xffff) << (4);
