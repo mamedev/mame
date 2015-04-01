@@ -44,11 +44,6 @@ Memo:
 #include "includes/niyanpai.h"
 
 
-WRITE16_MEMBER(niyanpai_state::sound_w)
-{
-	soundlatch_byte_w(space, 0, ((data >> 8) & 0xff));
-}
-
 WRITE8_MEMBER(niyanpai_state::soundbank_w)
 {
 	membank("soundbank")->set_entry(data & 0x03);
@@ -68,7 +63,7 @@ DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 	SNDROM[0x0213] = 0x00;          // DI -> NOP
 
 	// initialize sound rom bank
-	membank("soundbank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x8000);
+	membank("soundbank")->configure_entries(0, 3, memregion("audiocpu")->base() + 0x8000, 0x8000);
 	membank("soundbank")->set_entry(0);
 
 	// initialize out coin flag (musobana)
@@ -78,17 +73,11 @@ DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
 
 READ16_MEMBER(niyanpai_state::dipsw_r)
 {
-	UINT8 dipsw_a, dipsw_b;
+	UINT8 dipsw_a = ioport("DSWA")->read();
+	UINT8 dipsw_b = ioport("DSWB")->read();
 
-	dipsw_a = (((ioport("DSWA")->read() & 0x01) << 7) | ((ioport("DSWA")->read() & 0x02) << 5) |
-				((ioport("DSWA")->read() & 0x04) << 3) | ((ioport("DSWA")->read() & 0x08) << 1) |
-				((ioport("DSWA")->read() & 0x10) >> 1) | ((ioport("DSWA")->read() & 0x20) >> 3) |
-				((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
-
-	dipsw_b = (((ioport("DSWB")->read() & 0x01) << 7) | ((ioport("DSWB")->read() & 0x02) << 5) |
-				((ioport("DSWB")->read() & 0x04) << 3) | ((ioport("DSWB")->read() & 0x08) << 1) |
-				((ioport("DSWB")->read() & 0x10) >> 1) | ((ioport("DSWB")->read() & 0x20) >> 3) |
-				((ioport("DSWB")->read() & 0x40) >> 5) | ((ioport("DSWB")->read() & 0x80) >> 7));
+	dipsw_a = BITSWAP8(dipsw_a,0,1,2,3,4,5,6,7);
+	dipsw_b = BITSWAP8(dipsw_b,0,1,2,3,4,5,6,7);
 
 	return ((dipsw_a << 8) | dipsw_b);
 }
@@ -153,7 +142,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITENOP            // unknown
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -189,7 +178,7 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -228,7 +217,7 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown
@@ -267,7 +256,7 @@ static ADDRESS_MAP_START( zokumahj_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE8(soundlatch_byte_w, 0xff00)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w) // inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP            // unknown

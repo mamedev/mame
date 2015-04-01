@@ -58,7 +58,6 @@ public:
 	UINT8 m_motor_on;
 	
 	// common
-	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(soundbank_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_clear_w);
 	DECLARE_READ16_MEMBER(dipsw_r);
