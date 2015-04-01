@@ -81,7 +81,7 @@ public:
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns
+	int m_display_maxx;                 // display matrix number of columns (max 47 for now)
 
 	UINT32 m_grid;                      // VFD current row data
 	UINT64 m_plate;                     // VFD current column data
@@ -223,7 +223,7 @@ void hh_hmcs40_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			UINT64 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -283,9 +283,9 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, UINT64 setx, UINT32 set
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT64 mask = (1 << maxx) - 1;
+	UINT64 mask = (U64(1) << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (U64(1) << maxx)) : 0;
 
 	display_update();
 }

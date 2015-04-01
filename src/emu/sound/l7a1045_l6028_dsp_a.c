@@ -131,9 +131,9 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		{
 			l7a1045_voice *vptr = &m_voice[i];
 
-			UINT32 start = 0x000000;
-			UINT32 end = 0x002000;
-			UINT32 step  = 0x0800;
+			UINT32 start = vptr->start;
+			UINT32 end = vptr->start+0x002000;
+			UINT32 step  = 0x0400;
 
 			UINT32 pos = vptr->pos;
 			UINT32 frac = vptr->frac;
@@ -151,7 +151,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				
 				}
 
-				sample = (INT8)m_rom[start + pos];
+				sample = (INT8)m_rom[(start + pos) & (m_rom_size-1)];
 				frac += step;
 
 				outputs[0][j] += ((sample * 0x8000) >> 8);
@@ -258,10 +258,17 @@ WRITE16_MEMBER(l7a1045_sound_device::l7a1045_sound_data_02_w) // upper? word of 
 
 			m_voice[m_audioregister].frac = 0;
 			m_voice[m_audioregister].pos = 0;
-			break;
 		}
-	
+		l7a1045_voice *vptr = &m_voice[m_audioregister];
 
+		vptr->start = (m_audiodat[0][m_audiochannel].dat[0] & 0x000f) << (16 + 4);
+		vptr->start |=   (m_audiodat[0][m_audiochannel].dat[1] & 0xffff) << (4);
+		vptr->start |=   (m_audiodat[0][m_audiochannel].dat[2] & 0xf000) >> (12);
+
+		vptr->start &= m_rom_size - 1;
+
+		//printf("%08x: REGISTER 00 write port 0x0002 chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
+		break;
 	}
 
 }
@@ -284,7 +291,7 @@ WRITE16_MEMBER(l7a1045_sound_device::l7a1045_sound_data_04_w) // lower? word of 
 		printf("%08x: unexpected write port 0x0004 register %02x chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 		break;
 
-	case 0x00:
+//	case 0x00:
 	case 0x04:
 	case 0x06:
 	case 0x05:
@@ -295,6 +302,10 @@ WRITE16_MEMBER(l7a1045_sound_device::l7a1045_sound_data_04_w) // lower? word of 
 
 	case 0x0a:
 		//printf("%08x: write port 0x0004 register %02x chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
+		break;
+
+	case 0x00:
+		//printf("%08x: REGISTER 00 write port 0x0004 chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 		break;
 	}
 
@@ -321,9 +332,17 @@ WRITE16_MEMBER(l7a1045_sound_device::l7a1045_sound_data_06_w) // other part? of 
 		printf("%08x: unexpected write port 0x0006 register %02x chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 		break;
 
-	case 0x00:
+//	case 0x00:
 	case 0x01:
 		//printf("%08x: unexpected write port 0x0006 register %02x chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
+		break;
+
+	case 0x00:
+
+		// it writes 2 values here for each sample
+		// the 2nd one seems to contain the upper 4 bits of the sample address
+		// so why does it write different data first?
+		//printf("%08x: REGISTER 00 write port 0x0006 chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 		break;
 
 	}
