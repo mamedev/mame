@@ -111,7 +111,7 @@ function osdmodulesbuild()
 			}
 		else
 			buildoptions {
-				string.gsub(os.outputof("pkg-config --cflags Qt"), '[\r\n]+', ' '),
+				string.gsub(os.outputof("pkg-config --cflags QtGui"), '[\r\n]+', ' '),
 			}
 		end
 	else
