@@ -390,12 +390,6 @@ defines {
 	"LSB_FIRST",
 }
 
--- define USE_NETWORK if networking is enabled (not OS/2 and hasn't been disabled)
-if not _OPTIONS["targetos"]=="os2" then
-	defines {
-		"USE_NETWORK",
-	}
-end
 -- need to ensure FLAC functions are statically linked
 defines {
 	"FLAC__NO_DLL",

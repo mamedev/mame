@@ -4,7 +4,8 @@ forcedincludes {
 
 if SDL_NETWORK~="" and not _OPTIONS["DONT_USE_NETWORK"] then
 	defines {
-		"SDLMAME_NET_" .. string.upper(SDL_NETWORK),
+		"USE_NETWORK",
+		"OSD_NET_USE_" .. string.upper(SDL_NETWORK),
 	}
 end
 

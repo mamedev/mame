@@ -1,4 +1,4 @@
-#if defined(SDLMAME_NET_TAPTUN)
+#if defined(OSD_NET_USE_TAPTUN)
 
 #include <unistd.h>
 #include <fcntl.h>

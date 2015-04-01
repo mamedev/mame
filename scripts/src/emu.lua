@@ -123,7 +123,6 @@ files {
 	MAME_DIR .. "src/emu/debug/textbuf.c",
 	MAME_DIR .. "src/emu/profiler.c",
 	MAME_DIR .. "src/emu/webengine.c",
-	MAME_DIR .. "src/osd/osdnet.c",
 	MAME_DIR .. "src/emu/sound/filter.c",
 	MAME_DIR .. "src/emu/sound/flt_vol.c",
 	MAME_DIR .. "src/emu/sound/flt_rc.c",

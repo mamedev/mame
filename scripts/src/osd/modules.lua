@@ -9,6 +9,7 @@ function osdmodulesbuild()
 	}
 
 	files {
+		MAME_DIR .. "src/osd/osdnet.c",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
 		MAME_DIR .. "src/osd/modules/debugger/none.c",
 		MAME_DIR .. "src/osd/modules/debugger/debugint.c",

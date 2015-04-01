@@ -9,6 +9,7 @@ defines {
 
 if not _OPTIONS["DONT_USE_NETWORK"] then
 	defines {
-		"SDLMAME_NET_PCAP",
+		"USE_NETWORK",
+		"OSD_NET_USE_PCAP",
 	}
 end
