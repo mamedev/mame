@@ -64,7 +64,7 @@ public:
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns
+	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
 	UINT32 m_grid;                      // VFD current row data
 	UINT32 m_plate;                     // VFD current column data
