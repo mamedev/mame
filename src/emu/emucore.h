@@ -373,7 +373,7 @@ ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, c
 //**************************************************************************
 
 // population count
-#if defined(__NetBSD__)
+#if !defined(__NetBSD__)
 inline int popcount(UINT32 val)
 {
 	int count;
