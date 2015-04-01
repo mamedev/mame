@@ -13,7 +13,7 @@
 #ifndef __EMINLINE__
 #define __EMINLINE__
 
-#if !defined(SDLMAME_NOASM)
+#if !defined(MAME_NOASM)
 /* we come with implementations for GCC x86 and PPC */
 #if defined(__GNUC__)
 

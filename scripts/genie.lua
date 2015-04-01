@@ -164,6 +164,15 @@ newoption {
 } 
 
 newoption {
+	trigger = "NOASM",
+	description = "Disable implementations based on assembler code",
+	allowed = {
+		{ "0",  "Enable assembler code"   },
+		{ "1",  "Disable assembler code"  },
+	},
+}
+
+newoption {
 	trigger = "FORCE_DRC_C_BACKEND",
 	description = "Force DRC C backend.",
 } 
@@ -180,9 +189,21 @@ newoption {
 		{ "0",   "Disabled" 	},
 		{ "1",   "Enabled"      },
 	}
-} 
+}
 
 local os_version = str_to_version(_OPTIONS["os_version"])
+
+if not _OPTIONS["NOASM"] then
+	if _OPTIONS["targetos"]=="emscripten" then
+		_OPTIONS["NOASM"] = "1"
+	else
+		_OPTIONS["NOASM"] = "0"
+	end
+end
+
+if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	_OPTIONS["FORCE_DRC_C_BACKEND"] = "1"
+end
 
 USE_BGFX = 1
 if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
@@ -201,42 +222,44 @@ if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	solution (_OPTIONS["target"])
 else
 	solution (_OPTIONS["target"] .. _OPTIONS["subtarget"])
-end	
-	configurations {
-		"Debug",
-		"Release",
-	}
+end
 
-	platforms {
-		"x32",
-		"x64",
-		"Native", -- for targets where bitness is not specified
-	}
+configurations {
+	"Debug",
+	"Release",
+}
 
-	language "C++"
+platforms {
+	"x32",
+	"x64",
+	"Native", -- for targets where bitness is not specified
+}
 
-	flags {
-		"StaticRuntime",
-		"Unicode",
-		"NoPCH",
-	}
-	
-	configuration { "vs*" }
+language "C++"
+
+flags {
+	"StaticRuntime",
+	"Unicode",
+	"NoPCH",
+}
+
+configuration { "vs*" }
 	flags {
 		"ExtraWarnings",
 	}
-	if _OPTIONS["NOWERROR"]==nil then
-	flags{
-		"FatalWarnings",
-	}
+	if not _OPTIONS["NOWERROR"] then
+		flags{
+			"FatalWarnings",
+		}
 	end
 	
 	
-	configuration { "Debug", "vs*" }
-		flags {
-			"Symbols",
-		}	
-	configuration {}
+configuration { "Debug", "vs*" }
+	flags {
+		"Symbols",
+	}
+
+configuration {}
 	
 --aftercompilefile ("\t$(SILENT) gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)\n\t$(SILENT) mv $(@:%.o=%.dep) $(@:%.o=%.d)")
 	
@@ -305,11 +328,11 @@ dofile ("toolchain.lua")
 
 
 if _OPTIONS["targetos"]=="windows" then
-configuration { "x64" }
-	defines {
-		"X64_WINDOWS_ABI",
-	}
-configuration { }
+	configuration { "x64" }
+		defines {
+			"X64_WINDOWS_ABI",
+		}
+	configuration { }
 end
 
 -- Avoid error when invoking genie --help.
@@ -349,46 +372,53 @@ configuration { "Release" }
 	}
 
 configuration { }
-	-- CR/LF setup: use both on win32/os2, CR only on everything else
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="os2" then
-		defines {
-			"CRLF=3",
-		}
-	else
-		defines {
-			"CRLF=2",
-		}
-	end
 
-
-	-- define LSB_FIRST if we are a little-endian target
+-- CR/LF setup: use both on win32/os2, CR only on everything else
+if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="os2" then
 	defines {
-		"LSB_FIRST",
+		"CRLF=3",
 	}
-
-	-- define USE_NETWORK if networking is enabled (not OS/2 and hasn't been disabled)
-	if not _OPTIONS["targetos"]=="os2" then
-		defines {
-			"USE_NETWORK",
-		}
-	end
-	-- need to ensure FLAC functions are statically linked
+else
 	defines {
-		"FLAC__NO_DLL",
+		"CRLF=2",
 	}
+end
 
-	-- fixme -- need to make this work for other target architectures (PPC)
-	if _OPTIONS["FORCE_DRC_C_BACKEND"]==nil then
-		configuration { "x64" }
-			defines {
-				"NATIVE_DRC=drcbe_x64",
-			}
-		configuration { "x32" }
-			defines {
-				"NATIVE_DRC=drcbe_x86",
-			}
-		configuration {  }
-	end
+
+-- define LSB_FIRST if we are a little-endian target
+defines {
+	"LSB_FIRST",
+}
+
+-- define USE_NETWORK if networking is enabled (not OS/2 and hasn't been disabled)
+if not _OPTIONS["targetos"]=="os2" then
+	defines {
+		"USE_NETWORK",
+	}
+end
+-- need to ensure FLAC functions are statically linked
+defines {
+	"FLAC__NO_DLL",
+}
+
+if _OPTIONS["NOASM"]=="1" then
+	defines {
+		"MAME_NOASM"
+	}
+end
+
+-- fixme -- need to make this work for other target architectures (PPC)
+if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	configuration { "x64" }
+		defines {
+			"NATIVE_DRC=drcbe_x64",
+		}
+	configuration { "x32" }
+		defines {
+			"NATIVE_DRC=drcbe_x86",
+		}
+	configuration {  }
+end
 	
 -- define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
 --ifneq ($(BUILD_JPEGLIB),1)

@@ -150,9 +150,18 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/windows/winsocket.c",
 		MAME_DIR .. "src/osd/windows/winptty.c",
 		MAME_DIR .. "src/osd/modules/osdmodule.c",
-		MAME_DIR .. "src/osd/modules/sync/work_osd.c",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_win32.c",
 	}
+
+	if _OPTIONS["NOASM"]=="1" then
+		files {
+			MAME_DIR .. "src/osd/modules/sync/work_mini.c",
+		}
+	else
+		files {
+			MAME_DIR .. "src/osd/modules/sync/work_osd.c",
+		}
+	end
 
 
 --------------------------------------------------

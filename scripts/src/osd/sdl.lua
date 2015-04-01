@@ -382,11 +382,17 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/osdmodule.c",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_" .. SDLOS_TARGETOS .. ".c",
 		MAME_DIR .. "src/osd/modules/sync/sync_" .. SYNC_IMPLEMENTATION .. ".c",
-		--ifdef NOASM
-		--MAME_DIR .. "src/osd/modules/sync/work_mini.c",
-		--else
-		MAME_DIR .. "src/osd/modules/sync/work_osd.c",
 	}
+
+	if _OPTIONS["NOASM"]=="1" then
+		files {
+			MAME_DIR .. "src/osd/modules/sync/work_mini.c",
+		}
+	else
+		files {
+			MAME_DIR .. "src/osd/modules/sync/work_osd.c",
+		}
+	end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {

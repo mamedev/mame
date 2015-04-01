@@ -132,6 +132,13 @@ endif
 endif
 
 
+ifeq ($(findstring arm,$(UNAME)),arm)
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
+
 PYTHON := $(SILENT)python
 CC := $(SILENT)gcc
 LD := $(SILENT)g++
@@ -266,11 +273,19 @@ PARAMS += --ARCHOPTS='$(ARCHOPTS)'
 endif
 
 ifdef MAP
-PARAMS += --MAP=$(MAP)
+PARAMS += --MAP='$(MAP)'
 endif
 
 ifdef USE_BGFX
-PARAMS += --USE_BGFX=$(USE_BGFX)
+PARAMS += --USE_BGFX='$(USE_BGFX)'
+endif
+
+ifdef NOASM
+PARAMS += --NOASM='$(NOASM)'
+endif
+
+ifdef FORCE_DRC_C_BACKEND
+PARAMS += --FORCE_DRC_C_BACKEND='$(FORCE_DRC_C_BACKEND)'
 endif
 
 ifdef NOWERROR
