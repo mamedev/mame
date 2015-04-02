@@ -49,6 +49,16 @@ newoption {
 }
 
 newoption {
+	trigger = "xcode",
+	value = "xcode_target",
+	description = "Choose XCode target",
+	allowed = {
+		{ "osx", "OSX" },
+		{ "ios", "iOS" },
+	}
+}
+
+newoption {
 	trigger = "with-android",
 	value   = "#",
 	description = "Set Android platform version (default: android-14).",
@@ -319,6 +329,16 @@ function toolchain(_buildDir, _subDir)
 		if ("vs2013-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
+		end	
+	elseif _ACTION == "xcode4" then
+
+		if "osx" == _OPTIONS["xcode"] then
+			premake.xcode.toolset = "macosx"
+			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
+
+		elseif "ios" == _OPTIONS["xcode"] then
+			premake.xcode.toolset = "iphoneos"
+			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
 		end
 	end
 
