@@ -114,7 +114,7 @@
 			[".h"]         = "sourcecode.cpp.h",
 			[".html"]      = "text.html",
 			[".lua"]       = "sourcecode.lua",
-			[".m"]         = "sourcecode.c.objc",
+			[".m"]         = "sourcecode.cpp.objc",
 			[".mm"]        = "sourcecode.cpp.objc",
 			[".nib"]       = "wrapper.nib",
 			[".pch"]       = "sourcecode.cpp.h",
