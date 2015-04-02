@@ -252,16 +252,16 @@ int main(int argc, char *argv[])
 
 	// FIXME: this should be done differently
 
-	#ifdef SDLMAME_UNIX
+#ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	FcInit();
-	#endif
-	#endif
+#endif
+#endif
 
-	#ifdef SDLMAME_OS2
+#ifdef SDLMAME_OS2
 	MorphToPM();
-	#endif
+#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
 	if (SDL_Linked_Version()->patch < 10)
@@ -297,14 +297,14 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	#ifdef SDLMAME_UNIX
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#ifdef SDLMAME_UNIX
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	if (!sdl_entered_debugger)
 	{
 		FcFini();
 	}
-	#endif
-	#endif
+#endif
+#endif
 
 	exit(res);
 }

@@ -969,7 +969,6 @@ end
 if (SOUNDS["VOTRAX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/sound/votrax.c",
-		MAME_DIR .. "src/emu/sound/samples.c",
 	}
 end
 

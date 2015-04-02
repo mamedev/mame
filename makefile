@@ -138,6 +138,18 @@ ifndef NOASM
 endif
 endif
 
+# Autodetect BIGENDIAN
+# MacOSX
+ifndef BIGENDIAN
+ifneq (,$(findstring Power,$(UNAME)))
+BIGENDIAN := 1
+endif
+# Linux
+ifneq (,$(findstring ppc,$(UNAME)))
+BIGENDIAN := 1
+endif
+endif # BIGENDIAN
+
 
 PYTHON := $(SILENT)python
 CC := $(SILENT)gcc
@@ -249,19 +261,19 @@ PARAMS += --with-tools
 endif
 
 ifdef SYMBOLS
-PARAMS += --SYMBOLS=$(SYMBOLS)
+PARAMS += --SYMBOLS='$(SYMBOLS)'
 endif
 
 ifdef SYMLEVEL
-PARAMS += --SYMLEVEL=$(SYMLEVEL)
+PARAMS += --SYMLEVEL='$(SYMLEVEL)'
 endif
 
 ifdef PROFILER
-PARAMS += --PROFILER=$(PROFILER)
+PARAMS += --PROFILER='$(PROFILER)'
 endif
 
 ifdef PROFILE
-PARAMS += --PROFILE=$(PROFILE)
+PARAMS += --PROFILE='$(PROFILE)'
 endif
 
 ifdef OPTIMIZE
@@ -284,28 +296,32 @@ ifdef NOASM
 PARAMS += --NOASM='$(NOASM)'
 endif
 
+ifdef BIGENDIAN
+PARAMS += --BIGENDIAN='$(BIGENDIAN)'
+endif
+
 ifdef FORCE_DRC_C_BACKEND
 PARAMS += --FORCE_DRC_C_BACKEND='$(FORCE_DRC_C_BACKEND)'
 endif
 
 ifdef NOWERROR
-PARAMS += --NOWERROR=$(NOWERROR)
+PARAMS += --NOWERROR='$(NOWERROR)'
 endif
 
 ifdef TARGET
-PARAMS += --target=$(TARGET)
+PARAMS += --target='$(TARGET)'
 endif
 
 ifdef SUBTARGET
-PARAMS += --subtarget=$(SUBTARGET)
+PARAMS += --subtarget='$(SUBTARGET)'
 endif
 
 ifdef OSD
-PARAMS += --osd=$(OSD)
+PARAMS += --osd='$(OSD)'
 endif
 
 ifdef TARGETOS
-PARAMS += --targetos=$(TARGETOS)
+PARAMS += --targetos='$(TARGETOS)'
 endif
 
 ifdef DONT_USE_NETWORK
