@@ -360,6 +360,11 @@ configuration { "gmake" }
 	buildoptions_objc {
 		"-DINLINE=\"static inline\"",
 	}
+configuration { "xcode4*" }
+	buildoptions {
+		"-DINLINE=\"static inline\"",
+	}
+
 configuration { "vs*" }
 	defines {
 		"INLINE=static inline",
