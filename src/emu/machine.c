@@ -85,7 +85,7 @@
 
 #include <time.h>
 
-#ifdef SDLMAME_EMSCRIPTEN
+#if defined(EMSCRIPTEN)
 #include <emscripten.h>
 
 void js_set_main_loop(running_machine * machine);
@@ -385,10 +385,10 @@ int running_machine::run(bool firstrun)
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
-			#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN)
 			//break out to our async javascript loop and halt
 			js_set_main_loop(this);
-			#endif
+#endif
 
 			manager().web()->serve();
 

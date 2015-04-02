@@ -71,20 +71,6 @@ struct ssg_callbacks
 	#define ym2612_update_req(chip) ym2612_update_request(chip);
 #endif /* (BUILD_YM2612||BUILD_YM3438) */
 
-/* compiler dependence */
-#if 0
-#ifndef OSD_CPU_H
-#define OSD_CPU_H
-typedef unsigned char   UINT8;   /* unsigned  8bit */
-typedef unsigned short  UINT16;  /* unsigned 16bit */
-typedef unsigned int    UINT32;  /* unsigned 32bit */
-typedef signed char     INT8;    /* signed  8bit   */
-typedef signed short    INT16;   /* signed 16bit   */
-typedef signed int      INT32;   /* signed 32bit   */
-#endif /* OSD_CPU_H */
-#endif
-
-
 
 typedef stream_sample_t FMSAMPLE;
 /*
