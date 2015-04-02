@@ -856,6 +856,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	}
 	
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mess",
 		MAME_DIR .. "src/mame",
@@ -867,8 +868,6 @@ function createMESSProjects(_target, _subtarget, _name)
 		GEN_DIR  .. "mame/layout",
 		GEN_DIR .. "emu/cpu/m68000",
 	}
-
-	includeosd()
 end
 	
 function createProjects_mess_mess(_target, _subtarget)

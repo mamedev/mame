@@ -21,10 +21,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/romcmp.c",
@@ -55,11 +54,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/chdman.c",
@@ -89,10 +87,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/jedutil.c",
@@ -125,12 +122,11 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/unidasm.c",
@@ -162,11 +158,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/ldresample.c",
@@ -197,11 +192,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/ldverify.c",
@@ -230,10 +224,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/regrep.c",
@@ -262,10 +255,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/srcclean.c",
@@ -294,10 +286,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/src2html.c",
@@ -328,10 +319,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/split.c",
@@ -360,10 +350,9 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/pngcmp.c",
@@ -394,11 +383,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "src/emu",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/tools/nltool.c",
@@ -432,11 +420,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib",	
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/mess/tools/castool/main.c",
@@ -469,11 +456,10 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib",	
 	MAME_DIR .. "src/lib/util",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/mess/tools/floptool/main.c",
@@ -506,13 +492,12 @@ links {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/lib",	
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty/zlib",
 	MAME_DIR .. "src/mess/tools/imgtool",	
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/mess/tools/imgtool/main.c",

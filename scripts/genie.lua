@@ -38,12 +38,6 @@ function findfunction(x)
   end
 end
 
-function includeosd()
-	includedirs {
-		MAME_DIR .. "src/osd",
-	}
-end
-
 
 CPUS = {}
 SOUNDS  = {}

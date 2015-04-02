@@ -68,6 +68,7 @@ function mainProject(_target, _subtarget)
 	maintargetosdoptions(_target)
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/" .. _target,
 		MAME_DIR .. "src/lib",
@@ -77,8 +78,6 @@ function mainProject(_target, _subtarget)
 		GEN_DIR  .. _target .. "/layout",
 		GEN_DIR  .. "resource",
 	}
-
-	includeosd()
 
 	if _OPTIONS["targetos"]=="macosx" then
 		linkoptions {

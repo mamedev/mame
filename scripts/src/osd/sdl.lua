@@ -426,16 +426,16 @@ if _OPTIONS["with-tools"] then
 		dofile("sdl_cfg.lua")
 
 		includedirs {
+			MAME_DIR .. "src/osd",
 			MAME_DIR .. "src/lib/util",
 		}
+		
 		targetdir(MAME_DIR)
 
 		links {
 			"utils",
 			"ocore_" .. _OPTIONS["osd"],
 		}
-
-		includeosd()
 
 		files {
 			MAME_DIR .. "src/osd/sdl/testkeys.c",

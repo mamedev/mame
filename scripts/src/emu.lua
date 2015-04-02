@@ -6,6 +6,7 @@ options {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
@@ -16,8 +17,6 @@ includedirs {
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/emu/hashfile.c",
@@ -174,6 +173,7 @@ function emuProject(_target, _subtarget)
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame", -- used for sound amiga
 		MAME_DIR .. "src/lib",
@@ -187,7 +187,6 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "src/emu/cpu/m68000",
 		GEN_DIR .. "emu/cpu/m68000",
 	}
-	includeosd()
 	
 	dofile(path.join("src", "cpu.lua"))
 
@@ -210,6 +209,7 @@ function emuProject(_target, _subtarget)
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -223,8 +223,6 @@ function emuProject(_target, _subtarget)
 		GEN_DIR  .. "emu/layout",
 	}
 
-	includeosd()
-	
 	dofile(path.join("src", "bus.lua"))
 	
 	
@@ -237,6 +235,7 @@ function emuProject(_target, _subtarget)
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -246,8 +245,6 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "emu",
 	}
-	
-	includeosd()
 	
 	files {
 		disasm_files

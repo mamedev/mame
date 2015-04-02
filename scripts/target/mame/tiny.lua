@@ -86,6 +86,7 @@ function createProjects_mame_tiny(_target, _subtarget)
 	}
 	
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
@@ -94,8 +95,6 @@ function createProjects_mame_tiny(_target, _subtarget)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mame/layout",
 	}	
-
-	includeosd()
 
 	files{
 		MAME_DIR .. "src/mame/machine/ticket.c",

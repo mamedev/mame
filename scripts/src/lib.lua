@@ -7,13 +7,12 @@ project "utils"
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/expat/lib",
 		MAME_DIR .. "3rdparty/zlib",
 	}
-
-	includeosd()
 
 	files {
 		MAME_DIR .. "src/lib/util/astring.c",
@@ -63,14 +62,13 @@ project "formats"
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/zlib",
 	}
-
-	includeosd()
 
 	files {
 		MAME_DIR .. "src/lib/formats/cassimg.c",
