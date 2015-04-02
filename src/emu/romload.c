@@ -13,7 +13,7 @@
 #include "emuopts.h"
 #include "drivenum.h"
 #include "png.h"
-#include "harddisk.h"
+#include "chd.h"
 #include "config.h"
 #include "ui/ui.h"
 

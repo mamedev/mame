@@ -852,10 +852,10 @@ void myarc_hfdc_device::device_config_complete()
 		m_floppy_unit[i] = NULL;
 
 	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=NULL) m_floppy_unit[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
-	if (subdevice("1")!=NULL) m_floppy_unit[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
-	if (subdevice("2")!=NULL) m_floppy_unit[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
-	if (subdevice("3")!=NULL) m_floppy_unit[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
+	if (subdevice("f0")!=NULL) m_floppy_unit[0] = static_cast<floppy_image_device*>(subdevice("f0")->first_subdevice());
+	if (subdevice("f1")!=NULL) m_floppy_unit[1] = static_cast<floppy_image_device*>(subdevice("f1")->first_subdevice());
+	if (subdevice("f2")!=NULL) m_floppy_unit[2] = static_cast<floppy_image_device*>(subdevice("f2")->first_subdevice());
+	if (subdevice("f3")!=NULL) m_floppy_unit[3] = static_cast<floppy_image_device*>(subdevice("f3")->first_subdevice());
 }
 
 /*
@@ -927,10 +927,10 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_HDC9234_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
 	MCFG_HDC9234_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
 
-	MCFG_FLOPPY_DRIVE_ADD("0", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("2", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("3", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f0", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f2", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f3", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour
