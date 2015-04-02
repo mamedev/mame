@@ -5,7 +5,11 @@ local MAME_BUILD_DIR = (MAME_DIR .. "build/")
 local naclToolchain = ""
 
 
-function str_to_version (str)
+function backtick(cmd)
+	return string.gsub(string.gsub(os.outputof(cmd), "\r?\n$", ""), "\r?\n", " ")
+end
+
+function str_to_version(str)
 	local val = 0
 	if (str == nil or str == '') then
 		return val

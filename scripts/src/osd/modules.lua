@@ -107,11 +107,11 @@ function osdmodulesbuild()
 			configuration { }
 		elseif _OPTIONS["targetos"]=="macosx" then
 			buildoptions {
-				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 		else
 			buildoptions {
-				string.gsub(os.outputof("pkg-config --cflags QtGui"), '[\r\n]+', ' '),
+				backtick("pkg-config --cflags QtGui"),
 			}
 		end
 	else
@@ -146,7 +146,7 @@ function osdmodulestargetconf()
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		if _OPTIONS["targetos"]=="linux" then
 			linkoptions {
-				string.gsub(os.outputof("pkg-config --libs alsa"), '[\r\n]+', ' '),
+				backtick("pkg-config --libs alsa"),
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			links {
@@ -168,7 +168,7 @@ function osdmodulestargetconf()
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			linkoptions {
-				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 			links {
 				"QtCore.framework",
@@ -176,7 +176,7 @@ function osdmodulestargetconf()
 			}
 		else
 			linkoptions {
-				string.gsub(os.outputof("pkg-config --libs QtGui"), '[\r\n]+', ' '),
+				backtick("pkg-config --libs QtGui"),
 			}
 		end
 	end
