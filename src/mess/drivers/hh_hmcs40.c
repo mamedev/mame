@@ -114,11 +114,12 @@ public:
 	void zackman_update_int0();
 	DECLARE_INPUT_CHANGED_MEMBER(zackman_input_changed);
 
+	int m_cdkong_speaker_volume;
+	TIMER_DEVICE_CALLBACK_MEMBER(cdkong_speaker_decay_sim);
 	void cdkong_display();
 	DECLARE_WRITE8_MEMBER(cdkong_plate_w);
 	DECLARE_WRITE16_MEMBER(cdkong_grid_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(cdkong_speaker_decay_sim);
-	int m_cdkong_speaker_volume;
+	DECLARE_MACHINE_START(cdkong);
 
 	void cgalaxn_display();
 	DECLARE_WRITE16_MEMBER(cgalaxn_plate_w);
@@ -192,10 +193,6 @@ void hh_hmcs40_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
 	save_item(NAME(m_plate));
-	
-	// game-specific
-	m_cdkong_speaker_volume = 0;
-	save_item(NAME(m_cdkong_speaker_volume));
 }
 
 void hh_hmcs40_state::machine_reset()
@@ -740,13 +737,17 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+// Sound is controlled by two pins: D3 for pitch, and R13 for on/off. When turned
+// off, it does not mute instantly, but volume slowly decays. Until we emulate it
+// with discrete audio, this crude simulation will do.
+
 #define CDKONG_SPEAKER_MAX 0x10000
 #define CDKONG_SPEAKER_DECAY 50
 
 TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::cdkong_speaker_decay_sim)
 {
-	m_cdkong_speaker_volume /= 2;
 	m_speaker->set_output_gain(0, m_cdkong_speaker_volume / (double)CDKONG_SPEAKER_MAX);
+	m_cdkong_speaker_volume /= 2;
 }
 
 void hh_hmcs40_state::cdkong_display()
@@ -766,12 +767,6 @@ WRITE8_MEMBER(hh_hmcs40_state::cdkong_plate_w)
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	cdkong_display();
-
-	//             12
-	//             16,15,17,28,nc, 8, 5, 1, 3,19,22,26,13, 9, 6, 2,10,18,21,25,sp, 7, 4, 0,14,20,24,27
-	// 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-	//   ,  ,  ,24, 0,16, 8, 1,  ,17, 9, 2,18,10,25,27,26, 3,15,27,  ,11,14,22, 6,13,21, 5,19,12,20, 4
-	
 }
 
 WRITE16_MEMBER(hh_hmcs40_state::cdkong_grid_w)
@@ -798,6 +793,15 @@ static INPUT_PORTS_START( cdkong )
 INPUT_PORTS_END
 
 
+MACHINE_START_MEMBER(hh_hmcs40_state, cdkong)
+{
+	hh_hmcs40_state::machine_start();
+	
+	// zerofill/init
+	m_cdkong_speaker_volume = 0;
+	save_item(NAME(m_cdkong_speaker_volume));
+}
+
 static MACHINE_CONFIG_START( cdkong, hh_hmcs40_state )
 
 	/* basic machine hardware */
@@ -815,6 +819,8 @@ static MACHINE_CONFIG_START( cdkong, hh_hmcs40_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", hh_hmcs40_state, cdkong_speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+	
+	MCFG_MACHINE_START_OVERRIDE(hh_hmcs40_state, cdkong)
 
 	/* no video! */
 
@@ -1723,7 +1729,7 @@ CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Banda
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // original version is Super Puck Monster, by Gakken
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // "
