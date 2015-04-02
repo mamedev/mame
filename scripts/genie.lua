@@ -223,7 +223,7 @@ if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 end
 
 USE_BGFX = 1
-if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
+if (_OPTIONS["targetos"]=="macosx" and  os_version < 100600) then
 	USE_BGFX = 0
 end
 if(_OPTIONS["USE_BGFX"]~=nil) then
