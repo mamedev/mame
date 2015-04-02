@@ -6,7 +6,8 @@ local naclToolchain = ""
 
 
 function backtick(cmd)
-	return string.gsub(string.gsub(os.outputof(cmd), "\r?\n$", ""), "\r?\n", " ")
+	result = string.gsub(string.gsub(os.outputof(cmd), "\r?\n$", ""), " $", "")
+	return result
 end
 
 function str_to_version(str)
@@ -124,42 +125,42 @@ newoption {
 newoption {
 	trigger = "PROFILE",
 	description = "Enable profiling.",
-} 
+}
 
 newoption {
 	trigger = "SYMBOLS",
 	description = "Enable symbols.",
-} 
+}
 
 newoption {
 	trigger = "SYMLEVEL",
 	description = "Symbols level.",
-} 
+}
 
 newoption {
 	trigger = "PROFILER",
 	description = "Include the internal profiler.",
-} 
+}
 
 newoption {
 	trigger = "OPTIMIZE",
 	description = "Optimization level.",
-} 
+}
 
 newoption {
 	trigger = "ARCHOPTS",
 	description = "ARCHOPTS.",
-} 
+}
 
 newoption {
 	trigger = "LDOPTS",
 	description = "Additional linker options",
-} 
+}
 
 newoption {
 	trigger = "MAP",
 	description = "Generate a link map.",
-} 
+}
 
 newoption {
 	trigger = "NOASM",
@@ -182,12 +183,12 @@ newoption {
 newoption {
 	trigger = "FORCE_DRC_C_BACKEND",
 	description = "Force DRC C backend.",
-} 
+}
 
 newoption {
 	trigger = "NOWERROR",
 	description = "NOWERROR",
-} 
+}
 
 newoption {
 	trigger = "USE_BGFX",
@@ -262,18 +263,18 @@ configuration { "vs*" }
 			"FatalWarnings",
 		}
 	end
-	
-	
+
+
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
 	}
 
 configuration {}
-	
+
 --aftercompilefile ("\t$(SILENT) gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)\n\t$(SILENT) mv $(@:%.o=%.dep) $(@:%.o=%.d)")
-	
-	
+
+
 msgcompile ("Compiling $(subst ../,,$<)...")
 
 msgcompile_objc ("Objective-C compiling $(subst ../,,$<)...")
@@ -307,19 +308,19 @@ configuration { "x64", "Debug" }
 	if _OPTIONS["PROFILE"] then
 		targetsuffix "64dp"
 	end
-	
+
 configuration { "x32", "Release" }
 	targetsuffix ""
 	if _OPTIONS["PROFILE"] then
 		targetsuffix "p"
 	end
-	
+
 configuration { "x32", "Debug" }
 	targetsuffix "d"
 	if _OPTIONS["PROFILE"] then
 		targetsuffix "dp"
 	end
-	
+
 configuration { "Native", "Release" }
 	targetsuffix ""
 	if _OPTIONS["PROFILE"] then
@@ -470,7 +471,7 @@ if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 		configuration {  }
 	end
 end
-	
+
 -- define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
 --ifneq ($(BUILD_JPEGLIB),1)
 --DEFS += -DUSE_SYSTEM_JPEGLIB
@@ -553,7 +554,7 @@ end
 if _OPTIONS["SYMBOLS"]~=nil then
 	flags {
 		"Symbols",
-	}	
+	}
 end
 
 --# add the optimization flag
@@ -573,9 +574,9 @@ end
 --ifneq ($(),0)
 if _OPTIONS["OPTIMIZE"] then
 	buildoptions {
-		"-fno-strict-aliasing" 
+		"-fno-strict-aliasing"
 	}
-	if _OPTIONS["ARCHOPTS"] then	
+	if _OPTIONS["ARCHOPTS"] then
 		buildoptions {
 			_OPTIONS["ARCHOPTS"]
 		}
@@ -611,7 +612,7 @@ if _OPTIONS["MAP"] then
 			"-Wl,-Map," .. "../../../../"  .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".map"
 		}
 
-	end	
+	end
 end
 	buildoptions {
 		"-Wno-unknown-pragmas",
@@ -652,7 +653,7 @@ end
 --endif
 
 
-		
+
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
@@ -665,7 +666,7 @@ end
 				buildoptions {
 					"-Wno-unused-value",
 				}
-			end	
+			end
 			if (version >= 30400) then
 				buildoptions {
 					"-Wno-inline-new-delete",
@@ -684,12 +685,12 @@ end
 				buildoptions {
 					"-Wno-cast-align"
 				}
-			end 
+			end
 			if (version >= 40400) then
 				buildoptions {
 					"-Wno-unused-result",
 				}
-			end 
+			end
 
 			if (version >= 40700) then
 				buildoptions {
@@ -714,13 +715,13 @@ local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"]
 else
-	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"] .. _OPTIONS["subtarget"] 
-end	
+	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"] .. _OPTIONS["subtarget"]
+end
 
 if not toolchain(MAME_BUILD_DIR, subdir) then
 	return -- no action specified
 end
-	
+
 configuration { "asmjs" }
 	buildoptions {
 		"-std=gnu89",
@@ -762,7 +763,7 @@ configuration { "linux-*" }
 			"dl",
 		}
 		if _OPTIONS["distro"]=="debian-stable" then
-			defines 
+			defines
 			{
 				"NO_AFFINITY_NP",
 			}
@@ -890,7 +891,7 @@ configuration { "vs*" }
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd9", 
+			"/Qwd9",
 			"/Qwd82",
 			"/Qwd111",
 			"/Qwd128",
@@ -903,13 +904,13 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",
 			"/Qwd2545",
 			"/Qwd2553",
-			"/Qwd2557", 
-			"/Qwd3280", 
+			"/Qwd2557",
+			"/Qwd3280",
 
 			"/Qwd170",
 			"/Qwd188",
 
-			"/Qwd63", 
+			"/Qwd63",
 			"/Qwd177",
 			"/Qwd186",
 			"/Qwd488",
@@ -968,7 +969,7 @@ if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	startproject (_OPTIONS["target"])
 else
 	startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
-end	
+end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
 if _OPTIONS["with-tools"] then
@@ -976,6 +977,6 @@ if _OPTIONS["with-tools"] then
 	dofile(path.join("src", "tools.lua"))
 end
 
-if (_ACTION == "gmake" and _OPTIONS["gcc"]=='asmjs') then 
+if (_ACTION == "gmake" and _OPTIONS["gcc"]=='asmjs') then
 	strip()
 end
