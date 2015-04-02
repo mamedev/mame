@@ -578,7 +578,6 @@ void hmcs40_cpu_device::execute_run()
 		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for immediate param (except for XAMR?)
 		increment_pc();
 
-<<<<<<< HEAD
 		// handle opcode
 		switch (m_op)
 		{
@@ -592,75 +591,30 @@ void hmcs40_cpu_device::execute_run()
 				break;
 
 
-=======
-/*
-
-op_ayy();  - 
-op_syy();  - 
-op_am();   - 34 234 4c
-op_sm()???:- 234
-op_daa();  - 46
-op_das();  - 45
-op_nega(); - 
-op_anem(); - 324 124
-op_bnem(); - 267 024
-op_alem(); - 324 124
-op_blem(); - 267 024
-op_lay();  - 118
-
-*/
-
-		// handle opcode
-		switch (m_op)
-		{
-			case 0x118:
-				op_lay(); // probably lay
-				break;
-			case 0x267:
-				op_blem(); break; // bnem or blem
->>>>>>> parent of 5b170fd... messing around
 			case 0x124:
 				op_illegal();
 				//op_alem(); // alem or anem
 				//op_ayy();
 				break;
 			case 0x324:
-<<<<<<< HEAD
 				op_illegal();
 				//op_anem(); // "
 				break;
 
-=======
-				op_anem(); break; // "
->>>>>>> parent of 5b170fd... messing around
 			case 0x024:
 				op_illegal();
 				//op_nega();
 				break;
-<<<<<<< HEAD
 
 
 
 			case 0x234:
 				op_illegal();
 				//op_nega();
-=======
-			case 0x234:
-				// sm?
-#if 0
-				m_a = ram_r() - m_a;
-				m_s = ~m_a >> 4 & 1;
-				m_a &= 0xf;
-#else
-				op_am();
-#endif
 				break;
-			case 0x04c:
-				op_illegal();
-				//m_c ^= 1;
-				//op_lat();
->>>>>>> parent of 5b170fd... messing around
-				break;
+
+
+
 
 
 
@@ -679,27 +633,18 @@ op_lay();  - 118
 			case 0x020: case 0x021: case 0x022: case 0x023:
 				op_lbm(); break;
 			case 0x030:
-<<<<<<< HEAD
 /* ok */		op_amc(); break;
-=======
-				op_amc(); break;
->>>>>>> parent of 5b170fd... messing around
 			case 0x03c:
 				op_lta(); break;
 			
 			case 0x040:
 /* ok */		op_lxa(); break;
-<<<<<<< HEAD
 			case 0x045:
 /* ok */		op_das(); break;
 			case 0x046:
 /* ok */		op_daa(); break;
 			case 0x04c:
 /* ok */		op_rec(); break;
-=======
-			case 0x04b:
-				op_rec(); break;
->>>>>>> parent of 5b170fd... messing around
 			case 0x04f:
 /* ok */		op_sec(); break;
 			case 0x050:
@@ -806,11 +751,7 @@ op_lay();  - 118
 			case 0x225:
 /* ok */		op_rotl(); break;
 			case 0x230:
-<<<<<<< HEAD
 /* ok */		op_smc(); break;
-=======
-				op_smc(); break;
->>>>>>> parent of 5b170fd... messing around
 			case 0x23c:
 				op_lat(); break;
 			
