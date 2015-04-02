@@ -15,6 +15,62 @@
 #################   BEGIN USER-CONFIGURABLE OPTIONS   #####################
 ###########################################################################
 
+# REGENIE = 1
+# VERBOSE = 1
+# NOWERROR = 1
+
+# TARGET = mame
+# SUBTARGET = tiny
+# TOOLS = 1
+# OSD = sdl
+
+# USE_BGFX = 1
+# NO_OPENGL = 1
+# USE_DISPATCH_GL = 0
+# DIRECTINPUT = 7
+# SDL2_MULTIAPI = 1
+# NO_USE_MIDI = 1
+# DONT_USE_NETWORK = 1
+# USE_QTDEBUG = 1
+# NO_X11 = 1
+# NO_USE_XINPUT = 0
+# FORCE_DRC_C_BACKEND = 1
+
+# DEBUG = 1
+# PROFILER = 1
+# SANITIZE = 1
+
+# PTR64 = 1
+# BIGENDIAN = 1
+# NOASM = 1
+
+# OPTIMIZE = 3
+# SYMBOLS = 1
+# SYMLEVEL = 2
+# MAP = 1
+# PROFILE = 1
+# ARCHOPTS =
+# LDOPTS =
+
+# MESA_INSTALL_ROOT = /opt/mesa
+# SDL_INSTALL_ROOT = /opt/sdl2
+# SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
+# SDL_LIBVER = sdl
+# MACOSX_USE_LIBSDL = 1
+
+# TARGETOS = windows
+# CROSS_BUILD = 1
+# OVERRIDE_CC = cc
+# OVERRIDE_CXX = c++
+# OVERRIDE_LD = ld
+
+
+###########################################################################
+##################   END USER-CONFIGURABLE OPTIONS   ######################
+###########################################################################
+
+MAKEPARAMS := -R
+
 #
 # Determine running OS
 #
@@ -76,8 +132,11 @@ ifdef DEBUG
 CONFIG := debug
 endif
 
-ifndef VERBOSE
-  SILENT := @
+ifdef VERBOSE
+MAKEPARAMS += verbose=1
+else
+SILENT := @
+MAKEPARAMS += --no-print-directory
 endif
 
 #-------------------------------------------------
@@ -499,7 +558,7 @@ endif
 
 .PHONY: windows_x64
 windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw32-gcc
@@ -516,7 +575,7 @@ endif
 
 .PHONY: windows_x86
 windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw-clang
@@ -530,11 +589,11 @@ endif
 
 .PHONY: windows_x64_clang
 windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
 	
 .PHONY: windows_x86_clang
 windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 vs2010: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2010
@@ -570,7 +629,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-arm config=$(CONFIG)
 
 android-mips: generate
 ifndef ANDROID_NDK_MIPS
@@ -582,7 +641,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-mips config=$(CONFIG)
 
 android-x86: generate
 ifndef ANDROID_NDK_X86
@@ -594,7 +653,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-android-x86 config=$(CONFIG)
 
 asmjs: generate
 ifndef EMSCRIPTEN
@@ -603,7 +662,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=asmjs --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-asmjs config=$(CONFIG)
 
 
 nacl: nacl_x86
@@ -615,7 +674,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)64
 
 nacl_x86: generate
 ifndef NACL_SDK_ROOT
@@ -624,7 +683,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl config=$(CONFIG)32
 
 nacl-arm: generate
 ifndef NACL_SDK_ROOT
@@ -633,7 +692,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=nacl-arm --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-nacl-arm config=$(CONFIG)
 
 pnacl: generate
 ifndef NACL_SDK_ROOT
@@ -642,7 +701,7 @@ endif
 ifndef COMPILE
 	$(SILENT) $(GENIE) $(PARAMS) --gcc=pnacl --gcc_version=4.8 gmake
 endif
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-pnacl config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-linux
@@ -653,14 +712,14 @@ $(PROJECTDIR)/gmake-linux/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: linux_x64
 linux_x64: generate $(PROJECTDIR)/gmake-linux/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)64
 
 .PHONY: linux
 linux: linux_x86
 
 .PHONY: linux_x86
 linux_x86: generate $(PROJECTDIR)/gmake-linux/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-linux-clang
@@ -671,11 +730,11 @@ $(PROJECTDIR)/gmake-linux-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: linux_x64_clang
 linux_x64_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)64
 
 .PHONY: linux_x86_clang
 linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-linux-clang config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-osx
@@ -686,14 +745,14 @@ $(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: macosx_x64
 macosx_x64: generate $(PROJECTDIR)/gmake-osx/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)64
 
 .PHONY: macosx
 macosx: macosx_x86
 
 .PHONY: macosx_x86
 macosx_x86: generate $(PROJECTDIR)/gmake-osx/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-osx-clang
@@ -704,23 +763,23 @@ $(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)64
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)64
 
 .PHONY: macosx_x86_clang
 macosx_x86_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
-	$(SILENT) $(MAKE) --no-print-directory -R -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-osx-clang config=$(CONFIG)32
 
 #-------------------------------------------------
 # Clean/bootstrap
 #-------------------------------------------------
 
 $(GENIE):
-	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
 
 clean:
 	@echo Cleaning...
 	-@rm -rf build
-	$(SILENT) $(MAKE) --no-print-directory -R -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
 GEN_FOLDERS :=  \
 	$(GENDIR) \
