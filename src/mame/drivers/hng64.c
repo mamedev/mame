@@ -132,7 +132,7 @@ PCB Layout (Bottom)
 |             CONN10                                           |
 |                                                              |
 |                                                              |
-|   PSRAM4  ASIC9                   SRAM4     CPU1  Y1         |
+|   PSRAM4  ASIC9                   SRAM4     CPU2  Y1         |
 |   PSRAM3         SRAM1            SRAM3                      |
 |                  SRAM2                                       |
 |                                                              |
@@ -167,7 +167,7 @@ No.  PCB Label  IC Markings               IC Package
 16   SRAM2      TC55257DFL-85L            SOP28
 17   SRAM3      TC551001BFL-70L           SOP32
 18   SRAM4      TC551001BFL-70L           SOP32
-19   Y1         D320L7                    XTAL
+19   Y1         D320L7                    XTAL (32MHz)
 
 
 INTERFACE PCB
