@@ -210,6 +210,10 @@ elseif _OPTIONS["targetos"]=="os2" then
 	SYNC_IMPLEMENTATION = "os2"
 end
 
+if _OPTIONS["SDL_LIBVER"]=="sdl" then
+	USE_BGFX = 0
+end
+
 if BASE_TARGETOS=="unix" then
 	if _OPTIONS["targetos"]=="macosx" then
 		links {
