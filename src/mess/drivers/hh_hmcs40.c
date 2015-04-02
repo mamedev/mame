@@ -117,6 +117,8 @@ public:
 	void cdkong_display();
 	DECLARE_WRITE8_MEMBER(cdkong_plate_w);
 	DECLARE_WRITE16_MEMBER(cdkong_grid_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(cdkong_speaker_decay_sim);
+	int m_cdkong_speaker_volume;
 
 	void cgalaxn_display();
 	DECLARE_WRITE16_MEMBER(cgalaxn_plate_w);
@@ -190,6 +192,10 @@ void hh_hmcs40_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
 	save_item(NAME(m_plate));
+	
+	// game-specific
+	m_cdkong_speaker_volume = 0;
+	save_item(NAME(m_cdkong_speaker_volume));
 }
 
 void hh_hmcs40_state::machine_reset()
@@ -734,6 +740,15 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+#define CDKONG_SPEAKER_MAX 0x10000
+#define CDKONG_SPEAKER_DECAY 50
+
+TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::cdkong_speaker_decay_sim)
+{
+	m_cdkong_speaker_volume /= 2;
+	m_speaker->set_output_gain(0, m_cdkong_speaker_volume / (double)CDKONG_SPEAKER_MAX);
+}
+
 void hh_hmcs40_state::cdkong_display()
 {
 	UINT32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4);
@@ -743,13 +758,9 @@ void hh_hmcs40_state::cdkong_display()
 
 WRITE8_MEMBER(hh_hmcs40_state::cdkong_plate_w)
 {
-	// R13: speaker on?
-	if (offset == HMCS40_PORT_R1X)
-	{
-		//strobes at the start of a sound.. on+slow decay?
-		//printf("%d",data>>3&1);
-		data &= 7;
-	}
+	// R13: speaker on
+	if (offset == HMCS40_PORT_R1X && data & 8)
+		m_cdkong_speaker_volume = CDKONG_SPEAKER_MAX;
 	
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
@@ -801,6 +812,7 @@ static MACHINE_CONFIG_START( cdkong, hh_hmcs40_state )
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(hh_hmcs40_state, cdkong_grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.0"))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", hh_hmcs40_state, cdkong_speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
 
@@ -1047,6 +1059,9 @@ MACHINE_CONFIG_END
   - P1 Left:  Ms. Pac-Man (default game)
   - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
   - P1 Up:    Demo
+  
+  BTANB note: in demo-mode, she hardly walks to the upper two rows, never
+  finishing the level.
 
   NOTE!: MESS external artwork is recommended
 
@@ -1708,7 +1723,7 @@ CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Banda
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // original version is Super Puck Monster, by Gakken
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Gakken (Coleco license)", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK ) // "
