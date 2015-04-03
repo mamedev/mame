@@ -327,7 +327,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(snspell_power_button);
 	void snspell_power_off();
-	void snspell_display();
+	void prepare_display();
 
 protected:
 	virtual void machine_start();
@@ -400,7 +400,7 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 // common/snspell
 
-void tispeak_state::snspell_display()
+void tispeak_state::prepare_display()
 {
 	display_matrix_seg(16, 16, m_o, (m_r & 0x8000) ? (m_r & 0x21ff) : 0, 0x3fff);
 }
@@ -415,7 +415,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	// R15: filament on
 	// other bits: MCU internal use
 	m_r = m_inp_mux = data;
-	snspell_display();
+	prepare_display();
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
@@ -423,7 +423,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-	snspell_display();
+	prepare_display();
 }
 
 READ8_MEMBER(tispeak_state::snspell_read_k)
@@ -450,7 +450,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[AP],E,G,A (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
-	snspell_display();
+	prepare_display();
 }
 
 
@@ -460,7 +460,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
-	snspell_display();
+	prepare_display();
 }
 
 

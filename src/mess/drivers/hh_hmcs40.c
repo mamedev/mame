@@ -745,7 +745,7 @@ public:
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void cdkong_display();
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -772,7 +772,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
 }
 
 
-void cdkong_state::cdkong_display()
+void cdkong_state::prepare_display()
 {
 	UINT32 plate = BITSWAP32(m_plate,31,30,29,24,0,16,8,1,23,17,9,2,18,10,25,27,26,3,15,27,11,11,14,22,6,13,21,5,19,12,20,4);
 	display_matrix(29, 11, plate, m_grid);
@@ -787,7 +787,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	cdkong_display();
+	prepare_display();
 }
 
 WRITE16_MEMBER(cdkong_state::grid_w)
@@ -797,7 +797,7 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 
 	// D4-D14: vfd matrix grid
 	m_grid = data >> 4 & 0x7ff;
-	cdkong_display();
+	prepare_display();
 }
 
 
@@ -879,7 +879,7 @@ public:
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void cgalaxn_display();
+	void prepare_display();
 	DECLARE_WRITE16_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -887,7 +887,7 @@ public:
 
 // handlers
 
-void cgalaxn_state::cgalaxn_display()
+void cgalaxn_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
 	UINT16 plate = BITSWAP16(m_plate,15,14,5,4,3,2,1,0,7,11,12,9,8,10,6,13);
@@ -903,7 +903,7 @@ WRITE8_MEMBER(cgalaxn_state::grid_w)
 
 	// D2-D15: vfd matrix plate
 	m_plate = data >> 2 & 0x3fff;
-	cgalaxn_display();
+	prepare_display();
 }
 
 WRITE16_MEMBER(cgalaxn_state::plate_w)
@@ -915,7 +915,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 	// R1x-R3x: vfd matrix grid
 	int shift = (offset - HMCS40_PORT_R1X) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	cgalaxn_display();
+	prepare_display();
 }
 
 READ8_MEMBER(cgalaxn_state::input_r)
@@ -1225,7 +1225,7 @@ public:
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void egalaxn2_display();
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_READ8_MEMBER(input_r);
@@ -1233,7 +1233,7 @@ public:
 
 // handlers
 
-void egalaxn2_state::egalaxn2_display()
+void egalaxn2_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,15,14,13,12,7,6,5,4,3,2,1,0,19,18,17,16,11,10,9,8);
@@ -1250,7 +1250,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 
 	// D1-D15: vfd matrix grid
 	m_grid = data >> 1;
-	egalaxn2_display();
+	prepare_display();
 }
 
 WRITE8_MEMBER(egalaxn2_state::plate_w)
@@ -1258,7 +1258,7 @@ WRITE8_MEMBER(egalaxn2_state::plate_w)
 	// R1x-R6x: vfd matrix plate
 	int shift = (offset - HMCS40_PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	egalaxn2_display();
+	prepare_display();
 }
 
 READ8_MEMBER(egalaxn2_state::input_r)
@@ -1345,7 +1345,6 @@ public:
 	epacman2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
-
 };
 
 // handlers are identical to Galaxian 2, so we can use those
@@ -1515,7 +1514,7 @@ public:
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void kingman_display();
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -1525,7 +1524,7 @@ public:
 
 // handlers
 
-void kingman_state::kingman_display()
+void kingman_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	UINT32 plate = BITSWAP24(m_plate,23,6,7,5,4,3,2,1,0,13,12,20,19,18,17,16,10,11,9,8,14,15,13,12);
@@ -1537,7 +1536,7 @@ WRITE8_MEMBER(kingman_state::plate_w)
 	// R0x-R3x: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	kingman_display();
+	prepare_display();
 }
 
 WRITE16_MEMBER(kingman_state::grid_w)
@@ -1558,7 +1557,7 @@ WRITE16_MEMBER(kingman_state::grid_w)
 	
 	// D0-D4: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
-	kingman_display();
+	prepare_display();
 }
 
 void kingman_state::update_int0()
@@ -1636,7 +1635,7 @@ public:
 		: hh_hmcs40_state(mconfig, type, tag)
 	{ }
 
-	void tmtron_display();
+	void prepare_display();
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE16_MEMBER(grid_w);
 
@@ -1646,7 +1645,7 @@ public:
 
 // handlers
 
-void tmtron_state::tmtron_display()
+void tmtron_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,1,2,3,4,5,6,7,8,9,0);
 	UINT32 plate = BITSWAP24(m_plate,23,5,2,21,1,6,7,9,10,11,21,0,19,3,4,8,3,18,17,16,12,13,14,15);
@@ -1658,7 +1657,7 @@ WRITE8_MEMBER(tmtron_state::plate_w)
 	// R0x-R3x: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	tmtron_display();
+	prepare_display();
 }
 
 WRITE16_MEMBER(tmtron_state::grid_w)
@@ -1679,7 +1678,7 @@ WRITE16_MEMBER(tmtron_state::grid_w)
 	
 	// D0-D3,D5: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x2f0000);
-	tmtron_display();
+	prepare_display();
 }
 
 void tmtron_state::update_int1()
