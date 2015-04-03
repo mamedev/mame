@@ -185,7 +185,6 @@ function emuProject(_target, _subtarget)
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 		MAME_DIR .. "src/emu/cpu/m68000",
-		GEN_DIR .. "emu/cpu/m68000",
 	}
 	
 	dofile(path.join("src", "cpu.lua"))

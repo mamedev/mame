@@ -866,7 +866,7 @@ function createMESSProjects(_target, _subtarget, _name)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
-		GEN_DIR .. "emu/cpu/m68000",
+		MAME_DIR .. "src/emu/cpu/m68000",
 	}
 end
 	

@@ -798,7 +798,6 @@ GEN_FOLDERS :=  \
 	$(GENDIR)/emu/cpu/mcs96/ \
 	$(GENDIR)/emu/cpu/m6502/ \
 	$(GENDIR)/emu/cpu/m6809/ \
-	$(GENDIR)/emu/cpu/m68000/ \
 	$(GENDIR)/emu/cpu/tms57002/ \
 	$(GENDIR)/osd/modules/debugger/qt/ \
 	$(GENDIR)/resource/
@@ -869,8 +868,7 @@ generate: \
 		$(GENDIR)/emu/cpu/mcs96/mcs96.inc $(GENDIR)/emu/cpu/mcs96/i8x9x.inc $(GENDIR)/emu/cpu/mcs96/i8xc196.inc \
 		$(GENDIR)/emu/cpu/m6502/deco16.inc $(GENDIR)/emu/cpu/m6502/m4510.inc $(GENDIR)/emu/cpu/m6502/m6502.inc $(GENDIR)/emu/cpu/m6502/m65c02.inc $(GENDIR)/emu/cpu/m6502/m65ce02.inc $(GENDIR)/emu/cpu/m6502/m6509.inc $(GENDIR)/emu/cpu/m6502/m6510.inc $(GENDIR)/emu/cpu/m6502/n2a03.inc $(GENDIR)/emu/cpu/m6502/r65c02.inc $(GENDIR)/emu/cpu/m6502/m740.inc \
 		$(GENDIR)/emu/cpu/m6809/m6809.inc $(GENDIR)/emu/cpu/m6809/hd6309.inc $(GENDIR)/emu/cpu/m6809/konami.inc \
-		$(GENDIR)/emu/cpu/tms57002/tms57002.inc \
-		$(GENDIR)/m68kmake$(EXE) $(GENDIR)/emu/cpu/m68000/m68kops.c
+		$(GENDIR)/emu/cpu/tms57002/tms57002.inc 
 
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
@@ -981,18 +979,6 @@ $(GENDIR)/emu/cpu/m6809/konami.inc: $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu
 $(GENDIR)/emu/cpu/tms57002/tms57002.inc: $(SRC)/emu/cpu/tms57002/tmsmake.py $(SRC)/emu/cpu/tms57002/tmsinstr.lst
 	@echo Generating TMS57002 source file...
 	$(PYTHON) $(SRC)/emu/cpu/tms57002/tmsmake.py $(SRC)/emu/cpu/tms57002/tmsinstr.lst $@
-
-$(GENDIR)/m68kmake.o: src/emu/cpu/m68000/m68kmake.c
-	@echo $(notdir $<)
-	$(SILENT) $(CC) -x c++ -std=gnu++98 -o "$@" -c "$<"
-
-$(GENDIR)/m68kmake$(EXE) : $(GENDIR)/m68kmake.o
-	@echo Linking $@...
-	$(LD) -lstdc++ $^ -o $@
-
-$(GENDIR)/emu/cpu/m68000/m68kops.c: $(GENDIR)/m68kmake$(EXE) $(SRC)/emu/cpu/m68000/m68k_in.c
-	@echo Generating M68K source files...
-	$(SILENT) $(GENDIR)/m68kmake $(GENDIR)/emu/cpu/m68000 $(SRC)/emu/cpu/m68000/m68k_in.c
 
 $(GENDIR)/mess/drivers/ymmu100.inc: $(SRC)/mess/drivers/ymmu100.ppm $(SRC)/build/file2str.py
 	@echo Converting $<...

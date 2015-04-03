@@ -1034,7 +1034,7 @@ end
 if (CPUS["M680X0"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m68000/m68kcpu.c",
-		GEN_DIR .. "emu/cpu/m68000/m68kops.c",
+		MAME_DIR .. "src/emu/cpu/m68000/m68kops.c",
 	}
 end
 
