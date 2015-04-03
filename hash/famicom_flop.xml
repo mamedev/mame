@@ -1336,6 +1336,20 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
+	<software name="mahjong">
+		<description>Mahjong</description>
+		<year>1986</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="FMC-MJA"/>
+		<info name="release" value="19860221"/>
+		<info name="alt_title" value="麻雀"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="65500">
+				<rom name="mahjong (japan).fds" size="65500" crc="9a8a4dbf" sha1="615659bfea21919e11608031e8fe818a9e02d1e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mjgoraku">
 		<description>Mahjong Goraku - Bishoujo Meijinsen</description>
 		<year>19??</year>
@@ -2033,6 +2047,20 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="ultraman club - chikyuu dakkan sakusen (japan) (v1.1).fds" size="131000" crc="fd150e81" sha1="ea57b4411d5daf23333fe0c8fbb1d2b37e4360ce" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volley">
+		<description>Volleyball</description>
+		<year>1986</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="FMC-VBW"/>
+		<info name="release" value="19860721"/>
+		<info name="alt_title" value="バレーボール"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="65500">
+				<rom name="volleyball (japan).fds" size="65500" crc="f2040d16" sha1="fb2d7fe3866765ec34249a2853a592bd0dc2217d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3459,20 +3487,6 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="mahjong">
-		<description>Mahjong</description>
-		<year>1986</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="FMC-MJA"/>
-		<info name="release" value="19860221"/>
-		<info name="alt_title" value="麻雀"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="65500">
-				<rom name="mahjong (1983)(nintendo)[fmc-mja] [ok].fds" size="65500" crc="84e2c9b0" sha1="5524318bb3923d7cef952d10c1d93fef7851ebc1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mjkazoku">
 		<description>Mahjong Kazoku</description>
 		<year>1987</year>
@@ -4047,20 +4061,6 @@ Re-releases (probably the same as the original release, but listed while waiting
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131000">
 				<rom name="ultraman - kaijuu teikoku no gyakushuu (1986)(bandai)[ban-ulm][a].fds" size="131000" crc="abcc81bf" sha1="0f711efbf57c6c2aa2d33de4b42f36a04a086fbb" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="volley">
-		<description>Volleyball</description>
-		<year>1986</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="FMC-VBW"/>
-		<info name="release" value="19860721"/>
-		<info name="alt_title" value="バレーボール"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="65500">
-				<rom name="volleyball (1986)(nintendo)[fmc-vbw] [ok].fds" size="65500" crc="44f52452" sha1="76a0ae474082e4c500a17cd6ace2be70e47b5ac3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
