@@ -66,6 +66,12 @@
 			scope = "solution",
 		},
 
+		custombuildtask =
+		{
+			kind  = "table",
+			scope = "config",
+		},
+
 		debugargs =
 		{
 			kind = "list",
@@ -97,6 +103,12 @@
 			usagecopy = true,
 		},
 
+		dependency =
+		{
+			kind  = "table",
+			scope = "config",
+		},
+		
 		excludes =
 		{
 			kind  = "filelist",
@@ -427,6 +439,12 @@
 			scope = "config",
 		},
 
+		postcompiletasks =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+		
 		prelinkcommands =
 		{
 			kind  = "list",
@@ -653,6 +671,14 @@
 
 
 --
+-- Adds table value to array of tables
+--
+	function premake.settable(obj, fieldname, value, allowed)
+		obj[fieldname] = obj[fieldname] or {}
+		table.insert(obj[fieldname], value)
+		return obj[fieldname]
+	end
+--
 -- Adds values to an array-of-directories field of a solution/project/configuration.
 -- `ctype` specifies the container type (see premake.getobject) for the field. All
 -- values are converted to absolute paths before being stored.
@@ -789,6 +815,8 @@
 			return premake.setstring(scope, name, value)
 		elseif kind == "list" then
 			return premake.setarray(container, name, value, allowed)
+		elseif kind == "table" then
+			return premake.settable(container, name, value, allowed)
 		elseif kind == "dirlist" then
 			return premake.setdirarray(container, name, value)
 		elseif kind == "filelist" or kind == "absolutefilelist" then
