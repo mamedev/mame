@@ -517,10 +517,17 @@
 	function cpp.dependencyRules(prj)
 		for _, dependency in ipairs(prj.dependency or {}) do
 			for _, dep in ipairs(dependency or {}) do
-				_p('$(OBJDIR)/%s.o: %s'
-					, _MAKE.esc(path.trimdots(path.removeext(path.getrelative(prj.location, dep[1]))))
-					, _MAKE.esc(path.getrelative(prj.location, dep[2]))
-					)
+				if (dep[3]==nil or dep[3]==false) then
+					_p('$(OBJDIR)/%s.o: %s'
+						, _MAKE.esc(path.trimdots(path.removeext(path.getrelative(prj.location, dep[1]))))
+						, _MAKE.esc(path.getrelative(prj.location, dep[2]))
+						)
+				else
+					_p('%s: %s'
+						, _MAKE.esc(dep[1])
+						, _MAKE.esc(path.getrelative(prj.location, dep[2]))
+						)
+				end
 				_p('')
 			end
 		end
