@@ -102,12 +102,6 @@ newoption {
 }
 
 newoption {
-	trigger = "os_version",
-	description = "OS version",
-	value = "",
-}
-
-newoption {
 	trigger = "CC",
 	description = "CC replacement",
 }
@@ -198,8 +192,6 @@ newoption {
 		{ "1",   "Enabled"      },
 	}
 }
-
-local os_version = str_to_version(_OPTIONS["os_version"])
 
 if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"

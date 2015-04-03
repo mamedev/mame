@@ -102,7 +102,6 @@ endif
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 OS := macosx
 GENIEOS := darwin
-DARWIN_VERSION := $(shell sw_vers -productVersion)
 endif
 ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
@@ -741,7 +740,7 @@ linux_x86_clang: generate $(PROJECTDIR)/gmake-linux-clang/Makefile
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-osx/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --os_version=$(DARWIN_VERSION) --gcc_version=$(GCC_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: macosx_x64
 macosx_x64: generate $(PROJECTDIR)/gmake-osx/Makefile
@@ -759,7 +758,7 @@ macosx_x86: generate $(PROJECTDIR)/gmake-osx/Makefile
 #-------------------------------------------------
 
 $(PROJECTDIR)/gmake-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --os_version=$(DARWIN_VERSION) --gcc_version=$(CLANG_VERSION) gmake
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=osx-clang --gcc_version=$(CLANG_VERSION) gmake
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/gmake-osx-clang/Makefile
