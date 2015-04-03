@@ -57,6 +57,7 @@ public:
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
 
 	// game-specific handlers
 	void mathmagi_display();

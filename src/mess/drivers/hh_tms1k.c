@@ -161,7 +161,7 @@ void hh_tms1k_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -226,6 +226,15 @@ void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
 	display_update();
+}
+
+void hh_tms1k_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
+{
+	// expects m_display_segmask to be not-0
+	for (int y = 0; y < maxy; y++)
+		m_display_segmask[y] &= segmask;
+
+	display_matrix(maxx, maxy, setx, sety);
 }
 
 

@@ -31,8 +31,6 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
-
 	// calculator-specific handlers
 	void tisr16_display();
 	DECLARE_WRITE16_MEMBER(tisr16_write_o);
@@ -71,14 +69,6 @@ void ticalc1x_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
-}
-
-void ticalc1x_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
-{
-	for (int y = 0; y < maxy; y++)
-		m_display_segmask[y] &= segmask;
-
-	display_matrix(maxx, maxy, setx, sety);
 }
 
 
