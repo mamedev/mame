@@ -105,6 +105,10 @@ if _OPTIONS["targetos"]=="windows" then
 		"main=utf8_main",
 	}
 
+	configuration { "Debug" }
+		defines {
+			"MALLOC_DEBUG",
+		}
 	configuration { "vs*" }
 		includedirs {
 			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")
