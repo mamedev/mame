@@ -26,6 +26,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/midi/none.c",
 		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
+		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
@@ -181,7 +182,6 @@ function osdmodulestargetconf()
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			links {
-				"CoreAudio.framework",
 				"CoreMIDI.framework",
 			}
 		end
@@ -217,6 +217,12 @@ function osdmodulestargetconf()
 			"gdi32",
 			"dsound",
 			"dxguid",
+		}
+	elseif _OPTIONS["targetos"]=="macosx" then
+		links {
+			"AudioUnit.framework",
+			"CoreAudio.framework",
+			"CoreServices.framework",
 		}
 	end
 

@@ -196,7 +196,7 @@ public:
 	}
 
 };
-#else /* SDLMAME_UNIX */
+#else /* SDLMAME_MACOSX */
 	MODULE_NOT_SUPPORTED(font_osx, OSD_FONT_PROVIDER, "osx")
 #endif
 
