@@ -59,8 +59,8 @@ private:
 	};
 
 	UINT32 clamped_latency() const { return MAX(MIN(m_audio_latency, LATENCY_MAX), LATENCY_MIN); }
-	UINT32 buffer_avail() const { return ((m_writepos <= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
-	UINT32 buffer_used() const { return ((m_playpos < m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
+	UINT32 buffer_avail() const { return ((m_writepos >= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
+	UINT32 buffer_used() const { return ((m_playpos > m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
 
 	void copy_scaled(void *dst, void const *src, UINT32 bytes) const
 	{
