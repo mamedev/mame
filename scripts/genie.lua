@@ -65,14 +65,17 @@ newoption {
 		{ "android-x86",   "Android - x86"          },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
+		{ "netbsd",        "NetBSD"                 },
+		{ "openbsd",       "OpenBSD"                },
 		{ "nacl",          "Native Client"          },
 		{ "nacl-arm",      "Native Client - ARM"    },
 		{ "pnacl",         "Native Client - PNaCl"  },
-		{ "linux",     	   "Linux"   				},
-		{ "ios",           "iOS"              		},
+		{ "linux",     	   "Linux"                  },
+		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
-
+		{ "os2",           "OS/2 eComStation"       },
+		{ "haiku",         "Haiku"                  },
 	},
 }
 

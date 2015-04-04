@@ -90,7 +90,7 @@ if BASE_TARGETOS=="unix" then
 		buildoptions {
 			backtick(sdlconfigcmd() .. " --cflags"),
 		}
-		if _OPTIONS["targetos"]~="emscripten" then
+		if _OPTIONS["targetos"]~="asmjs" then
 			buildoptions {
 				backtick("pkg-config --cflags fontconfig"),
 			}

@@ -102,7 +102,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_X11"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="emscripten" or _OPTIONS["targetos"]=="os2" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" or _OPTIONS["targetos"]=="os2" then
 		_OPTIONS["NO_X11"] = "1"
 	else
 		_OPTIONS["NO_X11"] = "0"
@@ -193,7 +193,7 @@ elseif _OPTIONS["targetos"]=="netbsd" then
 	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 	SYNC_IMPLEMENTATION = "ntc"
-elseif _OPTIONS["targetos"]=="emscripten" then
+elseif _OPTIONS["targetos"]=="asmjs" then
 	SYNC_IMPLEMENTATION = "mini"
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
