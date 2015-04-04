@@ -471,6 +471,7 @@ SCRIPTS = scripts/genie.lua \
 	scripts/src/bus.lua \
 	scripts/src/netlist.lua \
 	scripts/toolchain.lua \
+	scripts/src/osd/modules.lua \
 	scripts/target/$(TARGET)/$(SUBTARGET).lua \
 	$(wildcard src/osd/$(OSD)/$(OSD).mak) \
 	$(wildcard src/$(TARGET)/$(SUBTARGET).mak)
@@ -797,49 +798,9 @@ clean:
 	-@rm -rf build
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
-GEN_FOLDERS :=  \
-	$(GENDIR)/$(TARGET)/layout/ \
-	$(GENDIR)/osd/modules/debugger/qt/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/
 
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
-
-MOC_FILES=$(wildcard $(SRC)/osd/modules/debugger/qt/*.h)
-ifneq ($(USE_QTDEBUG),1)
-ifeq ($(TARGETOS),macosx)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),solaris)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),haiku)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),emscripten)
-MOC_FILES=
-endif
-ifeq ($(TARGETOS),os2)
-MOC_FILES=
-endif
-endif
-
-ifeq ($(OS),windows)
-MOC = moc
-else
-MOCTST = $(shell which moc-qt4 2>/dev/null)
-ifeq '$(MOCTST)' ''
-MOCTST = $(shell which moc 2>/dev/null)
-ifeq '$(MOCTST)' ''
-ifneq '$(MOC_FILES)' ''
-$(error Qt's Meta Object Compiler (moc) wasn't found!)
-endif
-else
-MOC = $(MOCTST)
-endif
-else
-MOC = $(MOCTST)
-endif
-endif
-
 
 ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak
@@ -855,13 +816,9 @@ $(GEN_FOLDERS):
 generate: \
 		$(GENIE) \
 		$(GEN_FOLDERS) \
-		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES))
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
 
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
 	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
-$(GENDIR)/%.moc.c: $(SRC)/%.h
-	$(SILENT) $(MOC) $(MOCINCPATH) $< -o $@
-	
