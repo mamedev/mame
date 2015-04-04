@@ -76,6 +76,14 @@ if (CPUS["ARCOMPACT"]~=null) then
 		MAME_DIR .. "src/emu/cpu/arcompact/arcompact.c",
 		MAME_DIR .. "src/emu/cpu/arcompact/arcompact_execute.c",
 	}
+	dependency {
+		{ MAME_DIR .. "src/emu/cpu/arcompact/arcompact.c",  	   GEN_DIR .. "emu/cpu/arcompact/arcompact.inc" },
+		{ MAME_DIR .. "src/emu/cpu/arcompact/arcompact_execute.c", GEN_DIR .. "emu/cpu/arcompact/arcompact.inc" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/emu/cpu/arcompact/arcompact_make.py" , GEN_DIR .. "emu/cpu/arcompact/arcompact.inc",   { MAME_DIR .. "src/emu/cpu/arcompact/arcompact_make.py" }, {"@echo Generating arcompact source .inc files...", "python $(1)  $(@)" }},
+	}
 end
 
 if (CPUS["ARCOMPACT"]~=null or _OPTIONS["with-tools"]) then
@@ -459,6 +467,20 @@ if (CPUS["H8"]~=null) then
 		MAME_DIR .. "src/emu/cpu/h8/h8_timer16.c",
 		MAME_DIR .. "src/emu/cpu/h8/h8_sci.c",
 	}
+	
+	dependency {
+		{ MAME_DIR .. "src/emu/cpu/h8/h8.c",       GEN_DIR .. "emu/cpu/h8/h8.inc" },
+		{ MAME_DIR .. "src/emu/cpu/h8/h8h.c",      GEN_DIR .. "emu/cpu/h8/h8h.inc" },
+		{ MAME_DIR .. "src/emu/cpu/h8/h8s2000.c",  GEN_DIR .. "emu/cpu/h8/h8s2000.inc" },
+		{ MAME_DIR .. "src/emu/cpu/h8/h8s2600.c",  GEN_DIR .. "emu/cpu/h8/h8s2600.inc" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/emu/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8.inc",       { MAME_DIR .. "src/emu/cpu/h8/h8make.py" }, {"@echo Generating H8-300 source file...",   "python $(1) $(<) o   $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8h.inc",      { MAME_DIR .. "src/emu/cpu/h8/h8make.py" }, {"@echo Generating H8-300H source file...",  "python $(1) $(<) h   $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2000.inc",  { MAME_DIR .. "src/emu/cpu/h8/h8make.py" }, {"@echo Generating H8S/2000 source file...", "python $(1) $(<) s20 $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2600.inc",  { MAME_DIR .. "src/emu/cpu/h8/h8make.py" }, {"@echo Generating H8S/2600 source file...", "python $(1) $(<) s26 $(@)" }},
+	}
 end
 
 --------------------------------------------------
@@ -688,6 +710,17 @@ if (CPUS["MCS96"]~=null) then
 		MAME_DIR .. "src/emu/cpu/mcs96/mcs96.c",
 		MAME_DIR .. "src/emu/cpu/mcs96/i8x9x.c",
 		MAME_DIR .. "src/emu/cpu/mcs96/i8xc196.c",
+	}
+	dependency {
+		{ MAME_DIR .. "src/emu/cpu/mcs96/mcs96.c",   GEN_DIR .. "emu/cpu/mcs96/mcs96.inc" },
+		{ MAME_DIR .. "src/emu/cpu/mcs96/i8x9x.c",   GEN_DIR .. "emu/cpu/mcs96/i8x9x.inc" },
+		{ MAME_DIR .. "src/emu/cpu/mcs96/i8xc196.c", GEN_DIR .. "emu/cpu/mcs96/i8xc196.inc" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/emu/cpu/mcs96/mcs96ops.lst" , GEN_DIR .. "emu/cpu/mcs96/mcs96.inc",   { MAME_DIR .. "src/emu/cpu/mcs96/mcs96make.py" }, {"@echo Generating mcs96 source file...", "python $(1) mcs96 $(<) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/mcs96/mcs96ops.lst" , GEN_DIR .. "emu/cpu/mcs96/i8x9x.inc",   { MAME_DIR .. "src/emu/cpu/mcs96/mcs96make.py" }, {"@echo Generating i8x9x source file...", "python $(1) i8x9x $(<) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/mcs96/mcs96ops.lst" , GEN_DIR .. "emu/cpu/mcs96/i8xc196.inc", { MAME_DIR .. "src/emu/cpu/mcs96/mcs96make.py" }, {"@echo Generating i8xc196 source file...", "python $(1) i8xc196 $(<) $(@)" }},
 	}
 end
 
@@ -958,6 +991,33 @@ if (CPUS["M6502"]~=null) then
 		MAME_DIR .. "src/emu/cpu/m6502/m3745x.c",
 		MAME_DIR .. "src/emu/cpu/m6502/m5074x.c",
 	}
+	
+	dependency {
+		{ MAME_DIR .. "src/emu/cpu/m6502/deco16.c",   GEN_DIR .. "emu/cpu/m6502/deco16.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/m4510.c",    GEN_DIR .. "emu/cpu/m6502/m4510.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/m6502.c",    GEN_DIR .. "emu/cpu/m6502/m6502.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/m65c02.c",   GEN_DIR .. "emu/cpu/m6502/m65c02.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/m65ce02.c",  GEN_DIR .. "emu/cpu/m6502/m65ce02.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/m6509.c",    GEN_DIR .. "emu/cpu/m6502/m6509.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/m6510.c",    GEN_DIR .. "emu/cpu/m6502/m6510.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/n2a03.c",    GEN_DIR .. "emu/cpu/m6502/n2a03.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/r65c02.c",   GEN_DIR .. "emu/cpu/m6502/r65c02.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6502/m740.c",     GEN_DIR .. "emu/cpu/m6502/m740.inc" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/emu/cpu/m6502/odeco16.lst", GEN_DIR .. "emu/cpu/m6502/deco16.inc", { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/ddeco16.lst"  }, {"@echo Generating deco16 source file...", "python $(1) deco16_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/om4510.lst",  GEN_DIR .. "emu/cpu/m6502/m4510.inc",  { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dm4510.lst"   }, {"@echo Generating m4510 source file...", "python $(1) m4510_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/om6502.lst",  GEN_DIR .. "emu/cpu/m6502/m6502.inc",  { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dm6502.lst"   }, {"@echo Generating m6502 source file...", "python $(1) m6502_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/om65c02.lst", GEN_DIR .. "emu/cpu/m6502/m65c02.inc", { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dm65c02.lst"  }, {"@echo Generating m65c02 source file...", "python $(1) m65c02_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/om65ce02.lst",GEN_DIR .. "emu/cpu/m6502/m65ce02.inc",{ MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dm65ce02.lst" }, {"@echo Generating m65ce02 source file...", "python $(1) m65ce02_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/om6509.lst",  GEN_DIR .. "emu/cpu/m6502/m6509.inc",  { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dm6509.lst"   }, {"@echo Generating m6509 source file...", "python $(1) m6509_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/om6510.lst",  GEN_DIR .. "emu/cpu/m6502/m6510.inc",  { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dm6510.lst"   }, {"@echo Generating m6510 source file...", "python $(1) m6510_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/on2a03.lst",  GEN_DIR .. "emu/cpu/m6502/n2a03.inc",  { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dn2a03.lst"   }, {"@echo Generating n2a03 source file...", "python $(1) n2a03_device $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6502/om740.lst" ,  GEN_DIR .. "emu/cpu/m6502/m740.inc",   { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/emu/cpu/m6502/dm740.lst"    }, {"@echo Generating m740 source file...", "python $(1) m740_device $(<) $(2) $(@)" }},
+
+		{ MAME_DIR .. "src/emu/cpu/m6502/dr65c02.lst", GEN_DIR .. "emu/cpu/m6502/r65c02.inc", { MAME_DIR .. "src/emu/cpu/m6502/m6502make.py" }, {"@echo Generating r65c02 source file...", "python $(1) r65c02_device - $(<) $(@)" }},
+	}
 end
 
 --------------------------------------------------
@@ -1002,6 +1062,18 @@ if (CPUS["M6809"]~=null) then
 		MAME_DIR .. "src/emu/cpu/m6809/m6809.c",
 		MAME_DIR .. "src/emu/cpu/m6809/hd6309.c",
 		MAME_DIR .. "src/emu/cpu/m6809/konami.c",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/emu/cpu/m6809/m6809.c",   GEN_DIR .. "emu/cpu/m6809/m6809.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6809/hd6309.c",  GEN_DIR .. "emu/cpu/m6809/hd6309.inc" },
+		{ MAME_DIR .. "src/emu/cpu/m6809/konami.c",  GEN_DIR .. "emu/cpu/m6809/konami.inc" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/emu/cpu/m6809/m6809.ops"  , GEN_DIR .. "emu/cpu/m6809/m6809.inc",   { MAME_DIR .. "src/emu/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/emu/cpu/m6809/base6x09.ops"  }, {"@echo Generating m6809 source file...", "python $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6809/hd6309.ops" , GEN_DIR .. "emu/cpu/m6809/hd6309.inc",  { MAME_DIR .. "src/emu/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/emu/cpu/m6809/base6x09.ops"  }, {"@echo Generating hd6309 source file...", "python $(1) $(<) > $(@)" }},
+		{ MAME_DIR .. "src/emu/cpu/m6809/konami.ops" , GEN_DIR .. "emu/cpu/m6809/konami.inc",  { MAME_DIR .. "src/emu/cpu/m6809/m6809make.py"  , MAME_DIR .. "src/emu/cpu/m6809/base6x09.ops"  }, {"@echo Generating konami source file...", "python $(1) $(<) > $(@)" }},
 	}
 end
 
@@ -1527,10 +1599,16 @@ if (CPUS["TMS57002"]~=null) then
 		MAME_DIR .. "src/emu/cpu/tms57002/tms57002.c",
 		MAME_DIR .. "src/emu/cpu/tms57002/tms57kdec.c",
 	}
+	dependency {
+		{ MAME_DIR .. "src/emu/cpu/tms57002/tms57kdec.c", GEN_DIR .. "emu/cpu/tms57002/tms57002.inc" },
+		{ MAME_DIR .. "src/emu/cpu/tms57002/tms57002.c",  GEN_DIR .. "emu/cpu/tms57002/tms57002.inc" },
+	}
 end
 
 if (CPUS["TMS57002"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/tms57002/57002dsm.c")
+	table.insert(disasm_dependency , { MAME_DIR .. "src/emu/cpu/tms57002/57002dsm.c",  GEN_DIR .. "emu/cpu/tms57002/tms57002.inc" } )
+	table.insert(disasm_custombuildtask , { MAME_DIR .. "src/emu/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.inc",   { MAME_DIR .. "src/emu/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", "python $(1) $(<) $(@)" }})
 end
 
 --------------------------------------------------

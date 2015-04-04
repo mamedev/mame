@@ -39,6 +39,9 @@ function findfunction(x)
   end
 end
 
+function layoutbuildtask(_folder, _name)
+	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",    {  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    "python $(1) $(<) $(@) layout_".._name }};
+end
 
 CPUS = {}
 SOUNDS  = {}
@@ -261,8 +264,10 @@ configuration { "Debug", "vs*" }
 
 configuration {}
 
---aftercompilefile ("\t$(SILENT) gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)\n\t$(SILENT) mv $(@:%.o=%.dep) $(@:%.o=%.d)")
-
+--postcompiletasks { 
+--	"gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)", 
+--	"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
+--}
 
 msgcompile ("Compiling $(subst ../,,$<)...")
 

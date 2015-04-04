@@ -75,6 +75,14 @@ function createProjects_ldplayer_ldplayer(_target, _subtarget)
 	files{
 		MAME_DIR .. "src/emu/drivers/emudummy.c",
 	}
+
+	dependency {
+		{ MAME_DIR .. "src/emu/drivers/emudummy.c", GEN_DIR .. "ldplayer/layout/pr8210.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("ldplayer/layout", "pr8210"),
+	}		
 end
 
 function linkProjects_ldplayer_ldplayer(_target, _subtarget)

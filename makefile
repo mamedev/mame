@@ -790,19 +790,11 @@ clean:
 GEN_FOLDERS :=  \
 	$(GENDIR) \
 	$(GENDIR)/$(TARGET)/$(SUBTARGET) \
-	$(GENDIR)/emu/layout/ \
 	$(GENDIR)/$(TARGET)/layout/ \
-	$(GENDIR)/mess/drivers/ \
-	$(GENDIR)/emu/cpu/arcompact/ \
-	$(GENDIR)/emu/cpu/h8/ \
-	$(GENDIR)/emu/cpu/mcs96/ \
-	$(GENDIR)/emu/cpu/m6502/ \
-	$(GENDIR)/emu/cpu/m6809/ \
-	$(GENDIR)/emu/cpu/tms57002/ \
 	$(GENDIR)/osd/modules/debugger/qt/ \
 	$(GENDIR)/resource/
 
-LAYOUTS=$(wildcard $(SRC)/emu/layout/*.lay) $(wildcard $(SRC)/$(TARGET)/layout/*.lay)
+LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
 MOC_FILES=$(wildcard $(SRC)/osd/modules/debugger/qt/*.h)
 ifneq ($(USE_QTDEBUG),1)
@@ -858,131 +850,15 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES)) \
-		$(GENDIR)/emu/uismall.fh \
-		$(GENDIR)/resource/$(TARGET)vers.rc \
-		$(GENDIR)/resource/$(TARGET)-Info.plist \
-		$(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c \
-		$(GENDIR)/mess/drivers/ymmu100.inc \
-		$(GENDIR)/emu/cpu/arcompact/arcompact.inc \
-		$(GENDIR)/emu/cpu/h8/h8.inc $(GENDIR)/emu/cpu/h8/h8h.inc $(GENDIR)/emu/cpu/h8/h8s2000.inc $(GENDIR)/emu/cpu/h8/h8s2600.inc \
-		$(GENDIR)/emu/cpu/mcs96/mcs96.inc $(GENDIR)/emu/cpu/mcs96/i8x9x.inc $(GENDIR)/emu/cpu/mcs96/i8xc196.inc \
-		$(GENDIR)/emu/cpu/m6502/deco16.inc $(GENDIR)/emu/cpu/m6502/m4510.inc $(GENDIR)/emu/cpu/m6502/m6502.inc $(GENDIR)/emu/cpu/m6502/m65c02.inc $(GENDIR)/emu/cpu/m6502/m65ce02.inc $(GENDIR)/emu/cpu/m6502/m6509.inc $(GENDIR)/emu/cpu/m6502/m6510.inc $(GENDIR)/emu/cpu/m6502/n2a03.inc $(GENDIR)/emu/cpu/m6502/r65c02.inc $(GENDIR)/emu/cpu/m6502/m740.inc \
-		$(GENDIR)/emu/cpu/m6809/m6809.inc $(GENDIR)/emu/cpu/m6809/hd6309.inc $(GENDIR)/emu/cpu/m6809/konami.inc \
-		$(GENDIR)/emu/cpu/tms57002/tms57002.inc 
+		$(GENDIR)/resource/$(TARGET)-Info.plist
 
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
 	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
 
-$(GENDIR)/%.fh: $(SRC)/%.png $(SRC)/build/png2bdc.py $(SRC)/build/file2str.py
-	@echo Converting $<...
-	$(PYTHON) $(SRC)/build/png2bdc.py $< $(GENDIR)/temp.bdc
-	$(PYTHON) $(SRC)/build/file2str.py $(GENDIR)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
-
-$(GENDIR)/resource/$(TARGET)vers.rc: $(SRC)/build/verinfo.py $(SRC)/version.c
-	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -r -b $(TARGET) $(SRC)/version.c > $@
-
 $(GENDIR)/resource/$(TARGET)-Info.plist: $(SRC)/build/verinfo.py $(SRC)/version.c
 	@echo Emitting $@...
 	$(PYTHON) $(SRC)/build/verinfo.py -p -b $(TARGET) $(SRC)/version.c > $@
-
-$(GENDIR)/$(TARGET)/$(SUBTARGET)/drivlist.c: $(SRC)/$(TARGET)/$(SUBTARGET).lst $(SRC)/build/makelist.py
-	@echo Building driver list $<...
-	$(PYTHON) $(SRC)/build/makelist.py $< >$@
-
-# rule to generate the C files
-$(GENDIR)/emu/cpu/arcompact/arcompact.inc: $(SRC)/emu/cpu/arcompact/arcompact_make.py
-	@echo Generating arcompact source .inc files...
-	$(PYTHON) $(SRC)/emu/cpu/arcompact/arcompact_make.py $@
-
-$(GENDIR)/emu/cpu/h8/h8.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8-300 source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst o $@
-
-$(GENDIR)/emu/cpu/h8/h8h.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8-300H source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst h $@
-
-$(GENDIR)/emu/cpu/h8/h8s2000.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8S/2000 source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst s20 $@
-
-$(GENDIR)/emu/cpu/h8/h8s2600.inc: $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst
-	@echo Generating H8S/2600 source file...
-	$(PYTHON) $(SRC)/emu/cpu/h8/h8make.py $(SRC)/emu/cpu/h8/h8.lst s26 $@
-
-$(GENDIR)/emu/cpu/mcs96/mcs96.inc:   $(SRC)/emu/cpu/mcs96/mcs96make.py $(SRC)/emu/cpu/mcs96/mcs96ops.lst
-	@echo Generating mcs96 source file...
-	$(PYTHON) $(SRC)/emu/cpu/mcs96/mcs96make.py mcs96 $(SRC)/emu/cpu/mcs96/mcs96ops.lst $@
-
-$(GENDIR)/emu/cpu/mcs96/i8x9x.inc:   $(SRC)/emu/cpu/mcs96/mcs96make.py $(SRC)/emu/cpu/mcs96/mcs96ops.lst
-	@echo Generating i8x9x source file...
-	$(PYTHON) $(SRC)/emu/cpu/mcs96/mcs96make.py i8x9x $(SRC)/emu/cpu/mcs96/mcs96ops.lst $@
-
-$(GENDIR)/emu/cpu/mcs96/i8xc196.inc: $(SRC)/emu/cpu/mcs96/mcs96make.py $(SRC)/emu/cpu/mcs96/mcs96ops.lst
-	@echo Generating i8xc196 source file...
-	$(PYTHON) $(SRC)/emu/cpu/mcs96/mcs96make.py i8xc196 $(SRC)/emu/cpu/mcs96/mcs96ops.lst $@
-
-$(GENDIR)/emu/cpu/m6502/deco16.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/odeco16.lst $(SRC)/emu/cpu/m6502/ddeco16.lst
-	@echo Generating deco16 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py deco16_device $(SRC)/emu/cpu/m6502/odeco16.lst $(SRC)/emu/cpu/m6502/ddeco16.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m4510.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om4510.lst $(SRC)/emu/cpu/m6502/dm4510.lst
-	@echo Generating m4510 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m4510_device $(SRC)/emu/cpu/m6502/om4510.lst $(SRC)/emu/cpu/m6502/dm4510.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m6502.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om6502.lst $(SRC)/emu/cpu/m6502/dm6502.lst
-	@echo Generating m6502 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m6502_device $(SRC)/emu/cpu/m6502/om6502.lst $(SRC)/emu/cpu/m6502/dm6502.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m65c02.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om65c02.lst $(SRC)/emu/cpu/m6502/dm65c02.lst
-	@echo Generating m65c02 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m65c02_device $(SRC)/emu/cpu/m6502/om65c02.lst $(SRC)/emu/cpu/m6502/dm65c02.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m65ce02.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om65ce02.lst $(SRC)/emu/cpu/m6502/dm65ce02.lst
-	@echo Generating m65ce02 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m65ce02_device $(SRC)/emu/cpu/m6502/om65ce02.lst $(SRC)/emu/cpu/m6502/dm65ce02.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m6509.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om6509.lst $(SRC)/emu/cpu/m6502/dm6509.lst
-	@echo Generating m6509 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m6509_device $(SRC)/emu/cpu/m6502/om6509.lst $(SRC)/emu/cpu/m6502/dm6509.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m6510.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om6510.lst $(SRC)/emu/cpu/m6502/dm6510.lst
-	@echo Generating m6510 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m6510_device $(SRC)/emu/cpu/m6502/om6510.lst $(SRC)/emu/cpu/m6502/dm6510.lst $@
-
-$(GENDIR)/emu/cpu/m6502/n2a03.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/on2a03.lst $(SRC)/emu/cpu/m6502/dn2a03.lst
-	@echo Generating n2a03 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py n2a03_device $(SRC)/emu/cpu/m6502/on2a03.lst $(SRC)/emu/cpu/m6502/dn2a03.lst $@
-
-$(GENDIR)/emu/cpu/m6502/r65c02.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/dr65c02.lst
-	@echo Generating r65c02 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py r65c02_device - $(SRC)/emu/cpu/m6502/dr65c02.lst $@
-
-$(GENDIR)/emu/cpu/m6502/m740.inc: $(SRC)/emu/cpu/m6502/m6502make.py $(SRC)/emu/cpu/m6502/om740.lst $(SRC)/emu/cpu/m6502/dm740.lst
-	@echo Generating m740 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6502/m6502make.py m740_device $(SRC)/emu/cpu/m6502/om740.lst $(SRC)/emu/cpu/m6502/dm740.lst $@
-
-$(GENDIR)/emu/cpu/m6809/m6809.inc:  $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/m6809.ops $(SRC)/emu/cpu/m6809/base6x09.ops
-	@echo Generating m6809 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/m6809.ops > $@
-
-$(GENDIR)/emu/cpu/m6809/hd6309.inc: $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/hd6309.ops $(SRC)/emu/cpu/m6809/base6x09.ops
-	@echo Generating hd6309 source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/hd6309.ops > $@
-
-$(GENDIR)/emu/cpu/m6809/konami.inc: $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/konami.ops $(SRC)/emu/cpu/m6809/base6x09.ops
-	@echo Generating konami source file...
-	$(PYTHON) $(SRC)/emu/cpu/m6809/m6809make.py $(SRC)/emu/cpu/m6809/konami.ops > $@
-
-$(GENDIR)/emu/cpu/tms57002/tms57002.inc: $(SRC)/emu/cpu/tms57002/tmsmake.py $(SRC)/emu/cpu/tms57002/tmsinstr.lst
-	@echo Generating TMS57002 source file...
-	$(PYTHON) $(SRC)/emu/cpu/tms57002/tmsmake.py $(SRC)/emu/cpu/tms57002/tmsinstr.lst $@
-
-$(GENDIR)/mess/drivers/ymmu100.inc: $(SRC)/mess/drivers/ymmu100.ppm $(SRC)/build/file2str.py
-	@echo Converting $<...
-	@$(PYTHON) $(SRC)/build/file2str.py $(SRC)/mess/drivers/ymmu100.ppm $@ ymmu100_bkg UINT8
 
 $(GENDIR)/%.moc.c: $(SRC)/%.h
 	$(SILENT) $(MOC) $(MOCINCPATH) $< -o $@
