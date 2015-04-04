@@ -859,16 +859,11 @@ generate: \
 		$(GENIE) \
 		$(GEN_FOLDERS) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES)) \
-		$(GENDIR)/resource/$(TARGET)-Info.plist
+		$(patsubst $(SRC)/%.h,$(GENDIR)/%.moc.c,$(MOC_FILES))
 
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
 	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
-
-$(GENDIR)/resource/$(TARGET)-Info.plist: $(SRC)/build/verinfo.py $(SRC)/version.c
-	@echo Emitting $@...
-	$(PYTHON) $(SRC)/build/verinfo.py -p -b $(TARGET) $(SRC)/version.c > $@
 
 $(GENDIR)/%.moc.c: $(SRC)/%.h
 	$(SILENT) $(MOC) $(MOCINCPATH) $< -o $@
