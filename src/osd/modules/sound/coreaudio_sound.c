@@ -164,7 +164,7 @@ int sound_coreaudio::init()
 
 	// Allocate buffer
 	m_headroom = (clamped_latency() * sample_rate() / 40) * m_sample_bytes;
-	m_buffer_size = MAX((sample_rate() * m_sample_bytes * (clamped_latency() + 2) / 20480) * 1024, m_sample_bytes * 256);
+	m_buffer_size = MAX(sample_rate() * m_sample_bytes * (clamped_latency() + 2) / 40, m_sample_bytes * 256);
 	m_buffer = global_alloc_array_clear(INT8, m_buffer_size);
 	if (!m_buffer)
 	{
