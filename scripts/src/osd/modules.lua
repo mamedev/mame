@@ -103,7 +103,6 @@ function osdmodulesbuild()
 		
 		local MOC = ""
 		if (os.is("windows")) then
-			print("windows")
 			MOC = "moc"
 		else
 			MOCTST = backtick("which moc-qt4 2>/dev/null")			

@@ -267,10 +267,35 @@ configuration { "Debug", "vs*" }
 
 configuration {}
 
---postcompiletasks { 
---	"gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)", 
---	"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
---}
+local AWK = ""
+if (os.is("windows")) then
+	AWK_TEST = backtick("awk --version 2> NUL")
+	if (AWK_TEST~='') then
+		AWK = "awk"
+	else
+		AWK_TEST = backtick("gawk --version 2> NUL")
+		if (AWK_TEST~='') then
+			AWK = "gawk"
+		end
+	end	
+else
+	AWK_TEST = backtick("awk --version 2> /dev/null")
+	if (AWK_TEST~='') then
+		AWK = "awk"
+	else
+		AWK_TEST = backtick("gawk --version 2> /dev/null")
+		if (AWK_TEST~='') then
+			AWK = "gawk"
+		end
+	end	
+end
+
+if (AWK~='') then
+	postcompiletasks { 
+		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)", 
+		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
+	}
+end
 
 msgcompile ("Compiling $(subst ../,,$<)...")
 
