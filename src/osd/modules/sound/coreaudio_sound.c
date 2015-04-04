@@ -26,7 +26,6 @@ public:
 		osd_module(OSD_SOUND_PROVIDER, "coreaudio"),
 		sound_module(),
 		m_open(false),
-		m_started(false),
 		m_attenuation(0),
 		m_scale(128),
 		m_sample_bytes(0),
@@ -87,10 +86,9 @@ private:
 			AudioBufferList             *data);
 
 	bool        m_open;
-	bool        m_started;
 	AudioUnit   m_output;
 	int         m_attenuation;
-	UINT32      m_scale;
+	INT32       m_scale;
 	UINT32      m_sample_bytes;
 	UINT32      m_headroom;
 	UINT32      m_buffer_size;
@@ -200,7 +198,6 @@ int sound_coreaudio::init()
 		return -1;
 	}
 	m_open = true;
-	m_started = true;
 	osd_printf_verbose("Audio: End initialization\n");
 	return 0;
 }
@@ -215,7 +212,6 @@ void sound_coreaudio::exit()
 		AudioUnitUninitialize(m_output);
 		CloseComponent(m_output);
 		m_open = false;
-		m_started = false;
 	}
 	if (m_buffer)
 	{
@@ -257,27 +253,8 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, INT16 const *buffer
 
 void sound_coreaudio::set_mastervolume(int attenuation)
 {
-	m_attenuation   = MAX(MIN(attenuation, 0), -32);
-	m_scale         = (UINT32)(pow(10.0, m_attenuation / 20.0) * 128);
-	if (m_open)
-	{
-		if (-32 == m_attenuation)
-		{
-			if (m_started)
-			{
-				if (noErr == AudioOutputUnitStop(m_output))
-					m_started = false;
-			}
-		}
-		else
-		{
-			if (!m_started)
-			{
-				if (noErr == AudioOutputUnitStart(m_output))
-					m_started = true;
-			}
-		}
-	}
+	m_attenuation = MAX(MIN(attenuation, 0), -32);
+	m_scale = (-32 == m_attenuation) ? 0 : (INT32)(pow(10.0, m_attenuation / 20.0) * 128);
 }
 
 
