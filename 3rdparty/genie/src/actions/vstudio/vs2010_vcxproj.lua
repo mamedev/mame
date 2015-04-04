@@ -570,11 +570,11 @@
 						cmd = cmd .. cmdline
 						local num = 1
 						for _, depdata in ipairs(buildtask[3] or {}) do
-							cmd = string.gsub(cmd,"__" .. num .."__", string.format("%s ",path.getrelative(prj.location,depdata)))
+							cmd = string.gsub(cmd,"%$%(" .. num .."%)", string.format("%s ",path.getrelative(prj.location,depdata)))
 							num = num + 1
 						end
-						cmd = string.gsub(cmd, "__I__", string.format("%s ",path.getrelative(prj.location,buildtask[1])))
-						cmd = string.gsub(cmd, "__O__", string.format("%s ",path.getrelative(prj.location,buildtask[2])))
+						cmd = string.gsub(cmd, "%$%(<%)", string.format("%s ",path.getrelative(prj.location,buildtask[1])))
+						cmd = string.gsub(cmd, "%$%(@%)", string.format("%s ",path.getrelative(prj.location,buildtask[2])))
 						cmd = cmd .. "\r\n"
 					end	 					
 					_p(3,'<Command>%s</Command>',cmd)
