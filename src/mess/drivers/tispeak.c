@@ -314,6 +314,7 @@ public:
 	// cartridge
 	UINT32 m_cart_max_size;
 	UINT8* m_cart_base;
+	void init_cartridge();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
 	DECLARE_DRIVER_INIT(snspell);
 	DECLARE_DRIVER_INIT(lantutor);
@@ -326,19 +327,39 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(snspell_power_button);
 	void snspell_power_off();
-	void snspell_display();
+	void prepare_display();
 
 protected:
 	virtual void machine_start();
 };
 
 
+void tispeak_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
+	
+	init_cartridge();
+}
+
+
 
 /***************************************************************************
 
-  File Handling
+  Cartridge Handling
 
 ***************************************************************************/
+
+void tispeak_state::init_cartridge()
+{
+	if (m_cart != NULL && m_cart->exists())
+	{
+		astring region_tag;
+		memory_region *src = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+		if (src)
+			memcpy(m_cart_base, src->base(), src->bytes());
+	}
+}
 
 DEVICE_IMAGE_LOAD_MEMBER(tispeak_state, tispeak_cartridge)
 {
@@ -379,18 +400,9 @@ DRIVER_INIT_MEMBER(tispeak_state, lantutor)
 
 // common/snspell
 
-void tispeak_state::snspell_display()
+void tispeak_state::prepare_display()
 {
-	for (int y = 0; y < 16; y++)
-		m_display_segmask[y] = 0x3fff;
-
-	display_matrix(16, 16, m_o, (m_r & 0x8000) ? (m_r & 0x21ff) : 0);
-}
-
-READ8_MEMBER(tispeak_state::snspell_read_k)
-{
-	// note: the Vss row is always on
-	return m_inp_matrix[8]->read() | read_inputs(8);
+	display_matrix_seg(16, 16, m_o, (m_r & 0x8000) ? (m_r & 0x21ff) : 0, 0x3fff);
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_r)
@@ -403,7 +415,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	// R15: filament on
 	// other bits: MCU internal use
 	m_r = m_inp_mux = data;
-	snspell_display();
+	prepare_display();
 }
 
 WRITE16_MEMBER(tispeak_state::snspell_write_o)
@@ -411,7 +423,13 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// E,D,C,G,B,A,I,M,L,K,N,J,[AP],H,F,[DP] (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-	snspell_display();
+	prepare_display();
+}
+
+READ8_MEMBER(tispeak_state::snspell_read_k)
+{
+	// note: the Vss row is always on
+	return m_inp_matrix[8]->read() | read_inputs(8);
 }
 
 
@@ -432,7 +450,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[AP],E,G,A (sidenote: TI KLMN = MAME MLNK)
 	m_o = BITSWAP16(data,12,0,10,7,8,9,11,6,3,14,4,13,1,2,5,15);
-	snspell_display();
+	prepare_display();
 }
 
 
@@ -442,7 +460,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
-	snspell_display();
+	prepare_display();
 }
 
 
@@ -638,21 +656,6 @@ INPUT_PORTS_END
   Machine Config
 
 ***************************************************************************/
-
-void tispeak_state::machine_start()
-{
-	hh_tms1k_state::machine_start();
-
-	// init cartridge
-	if (m_cart != NULL && m_cart->exists())
-	{
-		astring region_tag;
-		memory_region *src = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
-		if (src)
-			memcpy(m_cart_base, src->base(), src->bytes());
-	}
-}
-
 
 static MACHINE_CONFIG_START( snmath, tispeak_state )
 
@@ -919,17 +922,18 @@ ROM_END
 
 
 
-COMP( 1978, snspell,    0,       0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-COMP( 1979, snspella,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1980, snspellb,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1978, snspelluk,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1981, snspelluka, snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1979, snspelljp,  snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
-COMP( 1980, ladictee,   snspell, 0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
+/*    YEAR  NAME        PARENT COMPAT MACHINE  INPUT     INIT                     COMPANY, FULLNAME, FLAGS */
+COMP( 1978, snspell,    0,        0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+COMP( 1979, snspella,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1980, snspellb,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1978, snspelluk,  snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1981, snspelluka, snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1979, snspelljp,  snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // incomplete dump, uses prototype MCU ROM
+COMP( 1980, ladictee,   snspell,  0, snspell,  snspell,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // doesn't work due to missing CD2702 MCU dump, German/Italian version has CD2702 too
 
-COMP( 1986, snmath,     0,       0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-COMP( 1980, snmathp,    snmath,  0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1986, snmath,     0,        0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+COMP( 1980, snmathp,    snmath,   0, snmath,   snmath,   driver_device, 0,        "Texas Instruments", "Speak & Math (US, 1980 version/prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
-COMP( 1980, snread,     0,       0, snread,   snread,   tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+COMP( 1980, snread,     0,        0, snread,   snread,   tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 
-COMP( 1979, lantutor,   0,       0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+COMP( 1979, lantutor,   0,        0, lantutor, lantutor, tispeak_state, lantutor, "Texas Instruments", "Language Tutor (prototype)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

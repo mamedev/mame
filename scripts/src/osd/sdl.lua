@@ -43,6 +43,16 @@ function maintargetosdoptions(_target)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+			links {
+				"SDL2.dll",
+			}
+		else
+			links {
+				"SDL.dll",
+			}
+		end
+
 		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
@@ -58,10 +68,6 @@ function maintargetosdoptions(_target)
 		configuration { "x64", "vs*" }
 			libdirs {
 				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
-			}
-		configuration { "vs*" }	
-			links {
-				"SDL2",
 			}
 		configuration {}
 	elseif _OPTIONS["targetos"]=="haiku" then
@@ -102,7 +108,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_X11"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="emscripten" or _OPTIONS["targetos"]=="os2" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" or _OPTIONS["targetos"]=="os2" then
 		_OPTIONS["NO_X11"] = "1"
 	else
 		_OPTIONS["NO_X11"] = "0"
@@ -193,7 +199,7 @@ elseif _OPTIONS["targetos"]=="netbsd" then
 	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 	SYNC_IMPLEMENTATION = "ntc"
-elseif _OPTIONS["targetos"]=="emscripten" then
+elseif _OPTIONS["targetos"]=="asmjs" then
 	SYNC_IMPLEMENTATION = "mini"
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
@@ -281,13 +287,6 @@ elseif BASE_TARGETOS=="os2" then
 		"pthread"
 	}
 end
-
-configuration { "mingw*" }
-		linkoptions {
-			"-static"
-		}
-
-configuration { }
 
 
 project ("osd_" .. _OPTIONS["osd"])
@@ -442,6 +441,15 @@ if _OPTIONS["with-tools"] then
 		}
 
 		if _OPTIONS["targetos"]=="windows" then
+			if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+				links {
+					"SDL2.dll",
+				}
+			else
+				links {
+					"SDL.dll",
+				}
+			end
 			linkoptions{
 				"-municode",
 			}

@@ -12,6 +12,11 @@
 #ifndef __SDLVIDEO__
 #define __SDLVIDEO__
 
+#if defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 #include "osdsdl.h"
 
 //============================================================

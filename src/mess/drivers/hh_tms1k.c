@@ -161,7 +161,7 @@ void hh_tms1k_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -228,6 +228,15 @@ void hh_tms1k_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 	display_update();
 }
 
+void hh_tms1k_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
+{
+	// expects m_display_segmask to be not-0
+	for (int y = 0; y < maxy; y++)
+		m_display_segmask[y] &= segmask;
+
+	display_matrix(maxx, maxy, setx, sety);
+}
+
 
 UINT8 hh_tms1k_state::read_inputs(int columns)
 {
@@ -263,7 +272,7 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 
 /***************************************************************************
 
-  Minidrivers (I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config)
 
 ***************************************************************************/
 
@@ -290,7 +299,22 @@ INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
 
 ***************************************************************************/
 
-void hh_tms1k_state::mathmagi_display()
+class mathmagi_state : public hh_tms1k_state
+{
+public:
+	mathmagi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void mathmagi_state::prepare_display()
 {
 	// R0-R7: 7seg leds
 	for (int y = 0; y < 8; y++)
@@ -309,17 +333,17 @@ void hh_tms1k_state::mathmagi_display()
 	display_update();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_r)
+WRITE16_MEMBER(mathmagi_state::write_r)
 {
 	// R3,R5-R7,R9,R10: input mux
 	m_inp_mux = (data >> 3 & 1) | (data >> 4 & 0xe) | (data >> 5 & 0x30);
 
 	// +others:
 	m_r = data;
-	mathmagi_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_o)
+WRITE16_MEMBER(mathmagi_state::write_o)
 {
 	// O1-O7: led segments A-G
 	// O0: N/C
@@ -327,11 +351,13 @@ WRITE16_MEMBER(hh_tms1k_state::mathmagi_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(hh_tms1k_state::mathmagi_read_k)
+READ8_MEMBER(mathmagi_state::read_k)
 {
 	return read_inputs(6);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -382,6 +408,7 @@ static INPUT_PORTS_START( mathmagi )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
 // output PLA is not dumped
 static const UINT16 mathmagi_output_pla[0x20] =
 {
@@ -419,14 +446,14 @@ static const UINT16 mathmagi_output_pla[0x20] =
 	lA+lF+lE+lD+lC          // G
 };
 
-static MACHINE_CONFIG_START( mathmagi, hh_tms1k_state )
+static MACHINE_CONFIG_START( mathmagi, mathmagi_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, 175000) // RC osc. R=68K, C=82pf -> ~175kHz
 	MCFG_TMS1XXX_OUTPUT_PLA(mathmagi_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, mathmagi_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, mathmagi_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, mathmagi_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(mathmagi_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mathmagi_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mathmagi_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mathmagi)
@@ -453,7 +480,22 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::amaztron_display()
+class amaztron_state : public hh_tms1k_state
+{
+public:
+	amaztron_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void amaztron_state::prepare_display()
 {
 	// R8,R9: select digit
 	for (int y = 0; y < 2; y++)
@@ -469,7 +511,7 @@ void hh_tms1k_state::amaztron_display()
 	display_update();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::amaztron_write_r)
+WRITE16_MEMBER(amaztron_state::write_r)
 {
 	// R0-R5: input mux
 	m_inp_mux = data & 0x3f;
@@ -479,18 +521,18 @@ WRITE16_MEMBER(hh_tms1k_state::amaztron_write_r)
 
 	// other bits:
 	m_r = data;
-	amaztron_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::amaztron_write_o)
+WRITE16_MEMBER(amaztron_state::write_o)
 {
 	// O0-O6: digit segments
 	// O7: N/C
 	m_o = data & 0x7f;
-	amaztron_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::amaztron_read_k)
+READ8_MEMBER(amaztron_state::read_k)
 {
 	UINT8 k = read_inputs(6);
 
@@ -499,6 +541,8 @@ READ8_MEMBER(hh_tms1k_state::amaztron_read_k)
 	return k & 0xf;
 }
 
+
+// config
 
 static INPUT_PORTS_START( amaztron )
 	PORT_START("IN.0") // R0
@@ -544,14 +588,13 @@ static INPUT_PORTS_START( amaztron )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( amaztron, hh_tms1k_state )
+static MACHINE_CONFIG_START( amaztron, amaztron_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=33K?, C=100pf -> ~350kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, amaztron_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, amaztron_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, amaztron_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(amaztron_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(amaztron_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(amaztron_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_amaztron)
@@ -600,7 +643,22 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::tc4_display()
+class tc4_state : public hh_tms1k_state
+{
+public:
+	tc4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void tc4_state::prepare_display()
 {
 	m_display_wait = 50;
 
@@ -613,7 +671,7 @@ void hh_tms1k_state::tc4_display()
 	display_matrix(9, 10, (m_o | (m_r << 2 & 0x100)), m_r);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::tc4_write_r)
+WRITE16_MEMBER(tc4_state::write_r)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -625,17 +683,17 @@ WRITE16_MEMBER(hh_tms1k_state::tc4_write_r)
 	// R6: led column 8
 	// +other columns
 	m_r = data;
-	tc4_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::tc4_write_o)
+WRITE16_MEMBER(tc4_state::write_o)
 {
 	// O0-O7: led row
 	m_o = data;
-	tc4_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::tc4_read_k)
+READ8_MEMBER(tc4_state::read_k)
 {
 	UINT8 k = read_inputs(6);
 
@@ -646,6 +704,8 @@ READ8_MEMBER(hh_tms1k_state::tc4_read_k)
 	return k;
 }
 
+
+// config
 
 static INPUT_PORTS_START( tc4 )
 	PORT_START("IN.0") // R0
@@ -692,14 +752,13 @@ static INPUT_PORTS_START( tc4 )
 	PORT_CONFSETTING(    0x08, "Football" )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( tc4, hh_tms1k_state )
+static MACHINE_CONFIG_START( tc4, tc4_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=27.3K, C=100pf, but unknown RC curve
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, tc4_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, tc4_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, tc4_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(tc4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tc4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tc4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tc4)
@@ -748,7 +807,22 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::ebball_display()
+class ebball_state : public hh_tms1k_state
+{
+public:
+	ebball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void ebball_state::prepare_display()
 {
 	// R8 is a 7seg
 	m_display_segmask[8] = 0x7f;
@@ -756,7 +830,7 @@ void hh_tms1k_state::ebball_display()
 	display_matrix(7, 9, ~m_o, m_r);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
+WRITE16_MEMBER(ebball_state::write_r)
 {
 	// R1-R5: input mux
 	m_inp_mux = data >> 1 & 0x1f;
@@ -766,23 +840,25 @@ WRITE16_MEMBER(hh_tms1k_state::ebball_write_r)
 
 	// R0-R8: led columns
 	m_r = data;
-	ebball_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::ebball_write_o)
+WRITE16_MEMBER(ebball_state::write_o)
 {
 	// O0-O6: led row
 	// O7: N/C
 	m_o = data;
-	ebball_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::ebball_read_k)
+READ8_MEMBER(ebball_state::read_k)
 {
 	// note: K8(Vss row) is always on
 	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
+
+// config
 
 static INPUT_PORTS_START( ebball )
 	PORT_START("IN.0") // R1
@@ -814,14 +890,13 @@ static INPUT_PORTS_START( ebball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( ebball, hh_tms1k_state )
+static MACHINE_CONFIG_START( ebball, ebball_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // RC osc. R=43K, C=47pf -> ~375kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(ebball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball)
@@ -866,7 +941,22 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::ebball2_display()
+class ebball2_state : public hh_tms1k_state
+{
+public:
+	ebball2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void ebball2_state::prepare_display()
 {
 	// the first 3 are 7segs
 	for (int y = 0; y < 3; y++)
@@ -875,7 +965,7 @@ void hh_tms1k_state::ebball2_display()
 	display_matrix(8, 10, ~m_o, m_r ^ 0x7f);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
+WRITE16_MEMBER(ebball2_state::write_r)
 {
 	// R3-R6: input mux
 	m_inp_mux = data >> 3 & 0xf;
@@ -885,21 +975,23 @@ WRITE16_MEMBER(hh_tms1k_state::ebball2_write_r)
 
 	// R0-R9: led columns
 	m_r = data;
-	ebball2_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::ebball2_write_o)
+WRITE16_MEMBER(ebball2_state::write_o)
 {
 	// O0-O7: led row/segment
 	m_o = data;
-	ebball2_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::ebball2_read_k)
+READ8_MEMBER(ebball2_state::read_k)
 {
 	return read_inputs(4);
 }
 
+
+// config
 
 static INPUT_PORTS_START( ebball2 )
 	PORT_START("IN.0") // R3
@@ -925,14 +1017,13 @@ static INPUT_PORTS_START( ebball2 )
 	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( ebball2, hh_tms1k_state )
+static MACHINE_CONFIG_START( ebball2, ebball2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball2_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball2_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball2_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(ebball2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball2_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball2)
@@ -982,7 +1073,28 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::ebball3_display()
+class ebball3_state : public hh_tms1k_state
+{
+public:
+	ebball3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+
+	void set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+
+protected:
+	virtual void machine_reset();
+};
+
+// handlers
+
+void ebball3_state::prepare_display()
 {
 	// update current state
 	for (int y = 0; y < 10; y++)
@@ -1000,7 +1112,7 @@ void hh_tms1k_state::ebball3_display()
 	display_update();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::ebball3_write_r)
+WRITE16_MEMBER(ebball3_state::write_r)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
@@ -1010,22 +1122,24 @@ WRITE16_MEMBER(hh_tms1k_state::ebball3_write_r)
 
 	// R0-R9: led columns
 	m_r = data;
-	ebball3_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::ebball3_write_o)
+WRITE16_MEMBER(ebball3_state::write_o)
 {
 	// O0-O6: led row
 	// O7: N/C
 	m_o = data & 0x7f;
-	ebball3_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::ebball3_read_k)
+READ8_MEMBER(ebball3_state::read_k)
 {
 	return read_inputs(3);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -1061,13 +1175,18 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // fake
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, ebball3_difficulty_switch, NULL)
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, ebball3_state, difficulty_switch, NULL)
 	PORT_CONFSETTING(    0x00, "Amateur" )
 	PORT_CONFSETTING(    0x01, "Professional" )
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(ebball3_state::difficulty_switch)
+{
+	set_clock();
+}
 
-void hh_tms1k_state::ebball3_set_clock()
+
+void ebball3_state::set_clock()
 {
 	// MCU clock is from an RC circuit(R=47K, C=33pf) oscillating by default at ~340kHz,
 	// but on PRO, the difficulty switch adds an extra 150K resistor to Vdd to speed
@@ -1075,29 +1194,22 @@ void hh_tms1k_state::ebball3_set_clock()
 	m_maincpu->set_unscaled_clock((m_inp_matrix[3]->read() & 1) ? 440000 : 340000);
 }
 
-INPUT_CHANGED_MEMBER(hh_tms1k_state::ebball3_difficulty_switch)
+void ebball3_state::machine_reset()
 {
-	ebball3_set_clock();
+	hh_tms1k_state::machine_reset();
+	set_clock();
 }
 
-MACHINE_RESET_MEMBER(hh_tms1k_state, ebball3)
-{
-	machine_reset();
-	ebball3_set_clock();
-}
-
-static MACHINE_CONFIG_START( ebball3, hh_tms1k_state )
+static MACHINE_CONFIG_START( ebball3, ebball3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 340000) // see ebball3_set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ebball3_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ebball3_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ebball3_write_o))
+	MCFG_CPU_ADD("maincpu", TMS1100, 340000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(ebball3_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ebball3_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ebball3_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball3)
-
-	MCFG_MACHINE_RESET_OVERRIDE(hh_tms1k_state, ebball3)
 
 	/* no video! */
 
@@ -1126,7 +1238,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::elecdet_write_r)
+class elecdet_state : public hh_tms1k_state
+{
+public:
+	elecdet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(elecdet_state::write_r)
 {
 	// R7,R8: speaker on
 	m_speaker->level_w((data & 0x180 && m_o & 0x80) ? 1 : 0);
@@ -1138,7 +1264,7 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_r)
 	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::elecdet_write_o)
+WRITE16_MEMBER(elecdet_state::write_o)
 {
 	// O0,O1,O4,O6: input mux
 	m_inp_mux = (data & 3) | (data >> 2 & 4) | (data >> 3 & 8);
@@ -1148,12 +1274,14 @@ WRITE16_MEMBER(hh_tms1k_state::elecdet_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(hh_tms1k_state::elecdet_read_k)
+READ8_MEMBER(elecdet_state::read_k)
 {
 	// note: the Vss row is always on
 	return m_inp_matrix[4]->read() | read_inputs(4);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -1202,14 +1330,13 @@ static INPUT_PORTS_START( elecdet )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( elecdet, hh_tms1k_state )
+static MACHINE_CONFIG_START( elecdet, elecdet_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 425000) // approximation - unknown freq
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, elecdet_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, elecdet_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, elecdet_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(elecdet_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(elecdet_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(elecdet_state, write_o))
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
@@ -1239,15 +1366,29 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::starwbc_display()
+class starwbc_state : public hh_tms1k_state
+{
+public:
+	starwbc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void starwbc_state::prepare_display()
 {
 	// R6,R8 are 7segs
 	m_display_segmask[6] = m_display_segmask[8] = 0x7f;
-
 	display_matrix(8, 10, m_o, m_r);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::starwbc_write_r)
+WRITE16_MEMBER(starwbc_state::write_r)
 {
 	// R0,R1,R3,R5,R7: input mux
 	m_inp_mux = (data & 3) | (data >> 1 & 4) | (data >> 2 & 8) | (data >> 3 & 0x10);
@@ -1257,21 +1398,23 @@ WRITE16_MEMBER(hh_tms1k_state::starwbc_write_r)
 
 	// R0,R2,R4,R6,R8: led columns
 	m_r = data & 0x155;
-	starwbc_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::starwbc_write_o)
+WRITE16_MEMBER(starwbc_state::write_o)
 {
 	// O0-O7: led row
 	m_o = (data << 4 & 0xf0) | (data >> 4 & 0x0f);
-	starwbc_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::starwbc_read_k)
+READ8_MEMBER(starwbc_state::read_k)
 {
 	return read_inputs(5);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -1315,13 +1458,13 @@ static INPUT_PORTS_START( starwbc )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( starwbc, hh_tms1k_state )
+static MACHINE_CONFIG_START( starwbc, starwbc_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // RC osc. R=51K, C=47pf -> ~325kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, starwbc_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, starwbc_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, starwbc_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(starwbc_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(starwbc_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(starwbc_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_starwbc)
@@ -1349,7 +1492,22 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::astro_display()
+class astro_state : public hh_tms1k_state
+{
+public:
+	astro_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void astro_state::prepare_display()
 {
 	// declare 7segs
 	for (int y = 0; y < 9; y++)
@@ -1358,28 +1516,30 @@ void hh_tms1k_state::astro_display()
 	display_matrix(8, 10, m_o, m_r);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::astro_write_r)
+WRITE16_MEMBER(astro_state::write_r)
 {
 	// R0-R7: input mux
 	m_inp_mux = data & 0xff;
 	
 	// R0-R9: select digit/leds
 	m_r = data;
-	astro_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::astro_write_o)
+WRITE16_MEMBER(astro_state::write_o)
 {
 	// O0-O7: digit segments/leds
 	m_o = data;
-	astro_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::astro_read_k)
+READ8_MEMBER(astro_state::read_k)
 {
 	return read_inputs(8);
 }
 
+
+// config
 
 static INPUT_PORTS_START( astro )
 	PORT_START("IN.0") // R0
@@ -1429,14 +1589,13 @@ static INPUT_PORTS_START( astro )
 	PORT_CONFSETTING(    0x08, "Astro" )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( astro, hh_tms1k_state )
+static MACHINE_CONFIG_START( astro, astro_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pf, but unknown RC curve
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, astro_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, astro_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, astro_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(astro_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(astro_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(astro_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_astro)
@@ -1465,7 +1624,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::comp4_write_r)
+class comp4_state : public hh_tms1k_state
+{
+public:
+	comp4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(comp4_state::write_r)
 {
 	// leds:
 	// R4    R9
@@ -1477,7 +1650,7 @@ WRITE16_MEMBER(hh_tms1k_state::comp4_write_r)
 	display_matrix(11, 1, m_r, m_o);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::comp4_write_o)
+WRITE16_MEMBER(comp4_state::write_o)
 {
 	// O1-O3: input mux
 	m_inp_mux = data >> 1 & 7;
@@ -1488,11 +1661,13 @@ WRITE16_MEMBER(hh_tms1k_state::comp4_write_o)
 	display_matrix(11, 1, m_r, m_o);
 }
 
-READ8_MEMBER(hh_tms1k_state::comp4_read_k)
+READ8_MEMBER(comp4_state::read_k)
 {
 	return read_inputs(3);
 }
 
+
+// config
 
 static INPUT_PORTS_START( comp4 )
 	PORT_START("IN.0") // O1
@@ -1514,13 +1689,13 @@ static INPUT_PORTS_START( comp4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( comp4, hh_tms1k_state )
+static MACHINE_CONFIG_START( comp4, comp4_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation - unknown freq
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, comp4_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, comp4_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, comp4_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(comp4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(comp4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(comp4_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_comp4)
@@ -1549,7 +1724,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
+class simon_state : public hh_tms1k_state
+{
+public:
+	simon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(simon_state::write_r)
 {
 	// R4-R8 go through an 75494 IC first:
 	// R4 -> 75494 IN6 -> green lamp
@@ -1567,16 +1756,18 @@ WRITE16_MEMBER(hh_tms1k_state::simon_write_r)
 	m_inp_mux = (data & 7) | (data >> 6 & 8);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::simon_write_o)
+WRITE16_MEMBER(simon_state::write_o)
 {
 	// N/C
 }
 
-READ8_MEMBER(hh_tms1k_state::simon_read_k)
+READ8_MEMBER(simon_state::read_k)
 {
 	return read_inputs(4);
 }
 
+
+// config
 
 static INPUT_PORTS_START( simon )
 	PORT_START("IN.0") // R0
@@ -1606,14 +1797,13 @@ static INPUT_PORTS_START( simon )
 	PORT_CONFSETTING(    0x01, "4" )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( simon, hh_tms1k_state )
+static MACHINE_CONFIG_START( simon, simon_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=33K, C=100pf -> ~350kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, simon_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, simon_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, simon_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(simon_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(simon_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(simon_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_simon)
@@ -1641,7 +1831,27 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::ssimon_write_r)
+class ssimon_state : public hh_tms1k_state
+{
+public:
+	ssimon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+
+	void set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
+
+protected:
+	virtual void machine_reset();
+};
+
+// handlers
+
+WRITE16_MEMBER(ssimon_state::write_r)
 {
 	// R0-R3,R9,R10: input mux
 	m_inp_mux = (data & 0xf) | (data >> 5 & 0x30);
@@ -1656,16 +1866,18 @@ WRITE16_MEMBER(hh_tms1k_state::ssimon_write_r)
 	m_speaker->level_w(data >> 8 & 1);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::ssimon_write_o)
+WRITE16_MEMBER(ssimon_state::write_o)
 {
 	// N/C
 }
 
-READ8_MEMBER(hh_tms1k_state::ssimon_read_k)
+READ8_MEMBER(ssimon_state::read_k)
 {
 	return read_inputs(6);
 }
 
+
+// config
 
 static INPUT_PORTS_START( ssimon )
 	PORT_START("IN.0") // R0
@@ -1708,14 +1920,19 @@ static INPUT_PORTS_START( ssimon )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // fake
-	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, ssimon_speed_switch, NULL)
+	PORT_CONFNAME( 0x03, 0x01, "Speed" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssimon_state, speed_switch, NULL)
 	PORT_CONFSETTING(    0x00, "Simple" )
 	PORT_CONFSETTING(    0x01, "Normal" )
 	PORT_CONFSETTING(    0x02, "Super" )
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(ssimon_state::speed_switch)
+{
+	set_clock();
+}
 
-void hh_tms1k_state::ssimon_set_clock()
+
+void ssimon_state::set_clock()
 {
 	// MCU clock is from an RC circuit with C=100pf, R=x depending on speed switch:
 	// 0 Simple: R=51K -> ~200kHz
@@ -1725,29 +1942,22 @@ void hh_tms1k_state::ssimon_set_clock()
 	m_maincpu->set_unscaled_clock((inp & 2) ? 400000 : ((inp & 1) ? 275000 : 200000));
 }
 
-INPUT_CHANGED_MEMBER(hh_tms1k_state::ssimon_speed_switch)
+void ssimon_state::machine_reset()
 {
-	ssimon_set_clock();
+	hh_tms1k_state::machine_reset();
+	set_clock();
 }
 
-MACHINE_RESET_MEMBER(hh_tms1k_state, ssimon)
-{
-	machine_reset();
-	ssimon_set_clock();
-}
-
-static MACHINE_CONFIG_START( ssimon, hh_tms1k_state )
+static MACHINE_CONFIG_START( ssimon, ssimon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 275000) // see ssimon_set_clock
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, ssimon_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, ssimon_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, ssimon_write_o))
+	MCFG_CPU_ADD("maincpu", TMS1100, 275000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(ssimon_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ssimon_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ssimon_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ssimon)
-
-	MCFG_MACHINE_RESET_OVERRIDE(hh_tms1k_state, ssimon)
 
 	/* no video! */
 
@@ -1773,7 +1983,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
+class cnsector_state : public hh_tms1k_state
+{
+public:
+	cnsector_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(cnsector_state::write_r)
 {
 	// R0-R5: select digit (right-to-left)
 	for (int y = 0; y < 6; y++)
@@ -1789,7 +2013,7 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_r)
 	display_update();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::cnsector_write_o)
+WRITE16_MEMBER(cnsector_state::write_o)
 {
 	// O0-O4: input mux
 	m_inp_mux = data & 0x1f;
@@ -1798,11 +2022,13 @@ WRITE16_MEMBER(hh_tms1k_state::cnsector_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(hh_tms1k_state::cnsector_read_k)
+READ8_MEMBER(cnsector_state::read_k)
 {
 	return read_inputs(5);
 }
 
+
+// config
 
 static INPUT_PORTS_START( cnsector )
 	PORT_START("IN.0") // O0
@@ -1836,14 +2062,13 @@ static INPUT_PORTS_START( cnsector )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Move Ship")
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( cnsector, hh_tms1k_state )
+static MACHINE_CONFIG_START( cnsector, cnsector_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation - unknown freq
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, cnsector_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, cnsector_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, cnsector_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(cnsector_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cnsector_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cnsector_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cnsector)
@@ -1861,7 +2086,7 @@ MACHINE_CONFIG_END
 
   Parker Bros Merlin handheld game, by Bob Doyle
   * TMS1100NLL MP3404A-N2
-  * 11 LEDs behind buttons, 1bit sound
+  * 11 LEDs behind buttons, 2bit sound
 
   Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
   The one with dark-blue case is the rare sequel Master Merlin. More sequels
@@ -1879,7 +2104,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::merlin_write_r)
+class merlin_state : public hh_tms1k_state
+{
+public:
+	merlin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(merlin_state::write_r)
 {
 	/* leds:
 
@@ -1892,7 +2131,7 @@ WRITE16_MEMBER(hh_tms1k_state::merlin_write_r)
 	display_matrix(11, 1, data, 1);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::merlin_write_o)
+WRITE16_MEMBER(merlin_state::write_o)
 {
 	// O4-O6: speaker out (paralleled for increased current driving capability)
 	static const int count[8] = { 0, 1, 1, 2, 1, 2, 2, 3 };
@@ -1903,11 +2142,13 @@ WRITE16_MEMBER(hh_tms1k_state::merlin_write_o)
 	m_inp_mux = data & 0xf;
 }
 
-READ8_MEMBER(hh_tms1k_state::merlin_read_k)
+READ8_MEMBER(merlin_state::read_k)
 {
 	return read_inputs(4);
 }
 
+
+// config
 
 static INPUT_PORTS_START( merlin )
 	PORT_START("IN.0") // O0
@@ -1938,13 +2179,13 @@ INPUT_PORTS_END
 
 static const INT16 merlin_speaker_levels[] = { 0, 10922, 21845, 32767 };
 
-static MACHINE_CONFIG_START( merlin, hh_tms1k_state )
+static MACHINE_CONFIG_START( merlin, merlin_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // RC osc. R=33K, C=100pf -> ~350kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, merlin_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, merlin_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, merlin_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(merlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(merlin_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(merlin_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_merlin)
@@ -1974,7 +2215,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
+class stopthief_state : public hh_tms1k_state
+{
+public:
+	stopthief_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(stopthief_state::write_r)
 {
 	// R0-R2: select digit
 	UINT8 o = BITSWAP8(m_o,3,5,2,1,4,0,6,7) & 0x7f;
@@ -1991,7 +2246,7 @@ WRITE16_MEMBER(hh_tms1k_state::stopthief_write_r)
 	m_speaker->level_w((data & 0x1f8 && m_o & 8) ? 1 : 0);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::stopthief_write_o)
+WRITE16_MEMBER(stopthief_state::write_o)
 {
 	// O0,O6: input mux
 	m_inp_mux = (data & 1) | (data >> 5 & 2);
@@ -2001,12 +2256,14 @@ WRITE16_MEMBER(hh_tms1k_state::stopthief_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(hh_tms1k_state::stopthief_read_k)
+READ8_MEMBER(stopthief_state::read_k)
 {
 	// note: the Vss row is always on
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -2041,13 +2298,13 @@ static INPUT_PORTS_START( stopthief )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( stopthief, hh_tms1k_state )
+static MACHINE_CONFIG_START( stopthief, stopthief_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 425000) // approximation - unknown freq
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, stopthief_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, stopthief_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, stopthief_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(stopthief_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(stopthief_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(stopthief_state, write_o))
 	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
@@ -2081,7 +2338,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::bankshot_write_r)
+class bankshot_state : public hh_tms1k_state
+{
+public:
+	bankshot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(bankshot_state::write_r)
 {
 	// R0: speaker out
 	m_speaker->level_w(data & 1);
@@ -2094,7 +2365,7 @@ WRITE16_MEMBER(hh_tms1k_state::bankshot_write_r)
 	display_matrix(7, 11, m_o, m_r);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::bankshot_write_o)
+WRITE16_MEMBER(bankshot_state::write_o)
 {
 	// O0-O6: led row
 	// O7: N/C
@@ -2102,11 +2373,13 @@ WRITE16_MEMBER(hh_tms1k_state::bankshot_write_o)
 	display_matrix(7, 11, m_o, m_r);
 }
 
-READ8_MEMBER(hh_tms1k_state::bankshot_read_k)
+READ8_MEMBER(bankshot_state::read_k)
 {
 	return read_inputs(2);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
   (note: remember that you can rotate the display in MESS)
@@ -2134,13 +2407,13 @@ static INPUT_PORTS_START( bankshot )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bankshot, hh_tms1k_state )
+static MACHINE_CONFIG_START( bankshot, bankshot_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf, but unknown RC curve
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, bankshot_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, bankshot_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, bankshot_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(bankshot_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bankshot_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bankshot_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_bankshot)
@@ -2189,7 +2462,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(hh_tms1k_state::splitsec_write_r)
+class splitsec_state : public hh_tms1k_state
+{
+public:
+	splitsec_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(splitsec_state::write_r)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -2202,7 +2489,7 @@ WRITE16_MEMBER(hh_tms1k_state::splitsec_write_r)
 	display_matrix(7, 8, m_o, m_r);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::splitsec_write_o)
+WRITE16_MEMBER(splitsec_state::write_o)
 {
 	// O0-O6: led row
 	// O7: N/C
@@ -2210,11 +2497,13 @@ WRITE16_MEMBER(hh_tms1k_state::splitsec_write_o)
 	display_matrix(7, 8, m_o, m_r);
 }
 
-READ8_MEMBER(hh_tms1k_state::splitsec_read_k)
+READ8_MEMBER(splitsec_state::read_k)
 {
 	return read_inputs(2);
 }
 
+
+// config
 
 static INPUT_PORTS_START( splitsec )
 	PORT_START("IN.0") // R9
@@ -2230,13 +2519,13 @@ static INPUT_PORTS_START( splitsec )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( splitsec, hh_tms1k_state )
+static MACHINE_CONFIG_START( splitsec, splitsec_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pf, but unknown RC curve
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, splitsec_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, splitsec_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, splitsec_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(splitsec_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(splitsec_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(splitsec_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_splitsec)
@@ -2275,13 +2564,28 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_tms1k_state::tandy12_display()
+class tandy12_state : public hh_tms1k_state
+{
+public:
+	tandy12_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void tandy12_state::prepare_display()
 {
 	// O0-O7: button lamps 1-8, R0-R3: button lamps 9-12
 	display_matrix(13, 1, (m_o << 1 & 0x1fe) | (m_r << 9 & 0x1e00), 1);
 }
 
-WRITE16_MEMBER(hh_tms1k_state::tandy12_write_r)
+WRITE16_MEMBER(tandy12_state::write_r)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
@@ -2291,20 +2595,22 @@ WRITE16_MEMBER(hh_tms1k_state::tandy12_write_r)
 
 	// other bits:
 	m_r = data;
-	tandy12_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(hh_tms1k_state::tandy12_write_o)
+WRITE16_MEMBER(tandy12_state::write_o)
 {
 	m_o = data;
-	tandy12_display();
+	prepare_display();
 }
 
-READ8_MEMBER(hh_tms1k_state::tandy12_read_k)
+READ8_MEMBER(tandy12_state::read_k)
 {
 	return read_inputs(5);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -2372,14 +2678,14 @@ static const UINT16 tandy12_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static MACHINE_CONFIG_START( tandy12, hh_tms1k_state )
+static MACHINE_CONFIG_START( tandy12, tandy12_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1100, 400000) // RC osc. R=39K, C=47pf -> ~400kHz
 	MCFG_TMS1XXX_OUTPUT_PLA(tandy12_output_pla)
-	MCFG_TMS1XXX_READ_K_CB(READ8(hh_tms1k_state, tandy12_read_k))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(hh_tms1k_state, tandy12_write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(hh_tms1k_state, tandy12_write_o))
+	MCFG_TMS1XXX_READ_K_CB(READ8(tandy12_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tandy12_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tandy12_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tandy12)

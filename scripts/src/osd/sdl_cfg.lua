@@ -90,7 +90,7 @@ if BASE_TARGETOS=="unix" then
 		buildoptions {
 			backtick(sdlconfigcmd() .. " --cflags"),
 		}
-		if _OPTIONS["targetos"]~="emscripten" then
+		if _OPTIONS["targetos"]~="asmjs" then
 			buildoptions {
 				backtick("pkg-config --cflags fontconfig"),
 			}
@@ -105,6 +105,10 @@ if _OPTIONS["targetos"]=="windows" then
 		"main=utf8_main",
 	}
 
+	configuration { "Debug" }
+		defines {
+			"MALLOC_DEBUG",
+		}
 	configuration { "vs*" }
 		includedirs {
 			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")

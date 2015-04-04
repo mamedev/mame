@@ -56,7 +56,7 @@ newoption {
 
 newoption {
 	trigger = "osd",
-	description = "Choose target OSD",
+	description = "Choose OSD layer implementation",
 }
 
 newoption {
@@ -68,14 +68,17 @@ newoption {
 		{ "android-x86",   "Android - x86"          },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
+		{ "netbsd",        "NetBSD"                 },
+		{ "openbsd",       "OpenBSD"                },
 		{ "nacl",          "Native Client"          },
 		{ "nacl-arm",      "Native Client - ARM"    },
 		{ "pnacl",         "Native Client - PNaCl"  },
-		{ "linux",     	   "Linux"   				},
-		{ "ios",           "iOS"              		},
+		{ "linux",     	   "Linux"                  },
+		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
-
+		{ "os2",           "OS/2 eComStation"       },
+		{ "haiku",         "Haiku"                  },
 	},
 }
 
@@ -783,26 +786,12 @@ configuration { "mingw*" }
 			"-static-libgcc",
 			"-static-libstdc++",
 		}
-if _OPTIONS["osd"]=="sdl" then
-		links {
-			"SDL2",
-			"imm32",
-			"version",
-			"ole32",
-			"oleaut32",
-		}
-end
 		links {
 			"user32",
-			"gdi32",
-			"dsound",
-			"dxguid",
 			"winmm",
 			"advapi32",
-			"comctl32",
 			"shlwapi",
 			"wsock32",
-			"comdlg32",
 		}
 
 configuration { "vs*" }
@@ -815,15 +804,10 @@ configuration { "vs*" }
 		}
 		links {
 			"user32",
-			"gdi32",
-			"dsound",
-			"dxguid",
 			"winmm",
 			"advapi32",
-			"comctl32",
 			"shlwapi",
 			"wsock32",
-			"comdlg32",
 		}
 
 		buildoptions {

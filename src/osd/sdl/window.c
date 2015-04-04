@@ -9,6 +9,11 @@
 //
 //============================================================
 
+#ifdef SDLMAME_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 // standard SDL headers
 #include "sdlinc.h"
 
@@ -60,16 +65,16 @@
 // minimum window dimension
 #define MIN_WINDOW_DIM                  200
 
-//#ifndef SDLMAME_WIN32
-#define WMSZ_TOP        (0)
-#define WMSZ_BOTTOM     (1)
+#ifndef SDLMAME_WIN32
+#define WMSZ_TOP            (0)
+#define WMSZ_BOTTOM         (1)
 #define WMSZ_BOTTOMLEFT     (2)
 #define WMSZ_BOTTOMRIGHT    (3)
-#define WMSZ_LEFT       (4)
+#define WMSZ_LEFT           (4)
 #define WMSZ_TOPLEFT        (5)
 #define WMSZ_TOPRIGHT       (6)
-#define WMSZ_RIGHT      (7)
-//#endif
+#define WMSZ_RIGHT          (7)
+#endif
 
 //============================================================
 //  GLOBAL VARIABLES

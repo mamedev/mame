@@ -31,37 +31,6 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask);
-
-	// calculator-specific handlers
-	void tisr16_display();
-	DECLARE_WRITE16_MEMBER(tisr16_write_o);
-	DECLARE_WRITE16_MEMBER(tisr16_write_r);
-	DECLARE_READ8_MEMBER(tisr16_read_k);
-
-	DECLARE_WRITE16_MEMBER(ti1270_write_o);
-	DECLARE_WRITE16_MEMBER(ti1270_write_r);
-	DECLARE_READ8_MEMBER(ti1270_read_k);
-
-	DECLARE_WRITE16_MEMBER(ti1000_write_o);
-	DECLARE_WRITE16_MEMBER(ti1000_write_r);
-	DECLARE_READ8_MEMBER(ti1000_read_k);
-
-	DECLARE_WRITE16_MEMBER(wizatron_write_o);
-	DECLARE_WRITE16_MEMBER(wizatron_write_r);
-	DECLARE_READ8_MEMBER(wizatron_read_k);
-
-	DECLARE_WRITE16_MEMBER(lilprof_write_o);
-	DECLARE_READ8_MEMBER(lilprof_read_k);
-
-	DECLARE_WRITE16_MEMBER(lilprof78_write_o);
-	DECLARE_WRITE16_MEMBER(lilprof78_write_r);
-	DECLARE_READ8_MEMBER(lilprof78_read_k);
-
-	DECLARE_WRITE16_MEMBER(ti30_write_o);
-	DECLARE_WRITE16_MEMBER(ti30_write_r);
-	DECLARE_READ8_MEMBER(ti30_read_k);
-
 protected:
 	virtual void machine_start();
 };
@@ -73,31 +42,41 @@ void ticalc1x_state::machine_start()
 	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
 }
 
-void ticalc1x_state::display_matrix_seg(int maxx, int maxy, UINT32 setx, UINT32 sety, UINT16 segmask)
-{
-	for (int y = 0; y < maxy; y++)
-		m_display_segmask[y] &= segmask;
-
-	display_matrix(maxx, maxy, setx, sety);
-}
-
 
 
 /***************************************************************************
 
-  Minidrivers (I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config)
 
 ***************************************************************************/
 
 /***************************************************************************
 
-  TI SR-16
-  * TMS1000 MCU labeled TMS1001NL. die labeled 1000, 1001A
+  TI SR-16, SR-16 II
+  * SR-16: TMS1000 MCU labeled TMS1001NL. die labeled 1000, 1001A
+  * SR-16 II: TMS1000 MCU labeled TMS1016NL. die labeled 1000B, 1016A
   * 12-digit 7seg LED display
 
+  SR-16 II is a cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
+
 ***************************************************************************/
 
-void ticalc1x_state::tisr16_display()
+class tisr16_state : public ticalc1x_state
+{
+public:
+	tisr16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void tisr16_state::prepare_display()
 {
 	// update leds state
 	for (int y = 0; y < 11; y++)
@@ -111,26 +90,28 @@ void ticalc1x_state::tisr16_display()
 	display_update();
 }
 
-WRITE16_MEMBER(ticalc1x_state::tisr16_write_r)
+WRITE16_MEMBER(tisr16_state::write_r)
 {
 	// R0-R10: input mux
 	// R0-R10: select digit (right-to-left)
 	m_r = m_inp_mux = data;
-	tisr16_display();
+	prepare_display();
 }
 
-WRITE16_MEMBER(ticalc1x_state::tisr16_write_o)
+WRITE16_MEMBER(tisr16_state::write_o)
 {
 	// O0-O7: digit segments
 	m_o = data;
-	tisr16_display();
+	prepare_display();
 }
 
-READ8_MEMBER(ticalc1x_state::tisr16_read_k)
+READ8_MEMBER(tisr16_state::read_k)
 {
 	return read_inputs(11);
 }
 
+
+// config
 
 static INPUT_PORTS_START( tisr16 )
 	PORT_START("IN.0") // R0
@@ -201,38 +182,6 @@ static INPUT_PORTS_START( tisr16 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tisr16, ticalc1x_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // RC osc. R=43K, C=68pf -> ~300kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, tisr16_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, tisr16_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, tisr16_write_r))
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tisr16)
-
-	/* no video! */
-
-	/* no sound! */
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
-  TI SR-16 II
-  * TMS1000 MCU labeled TMS1016NL. die labeled 1000B, 1016A
-  * 12-digit 7seg LED display
-
-  A cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
-
-***************************************************************************/
-
-// hardware is nearly identical to TI SR-16 above, so we simply use those handlers
-
 static INPUT_PORTS_START( tisr16ii )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -302,10 +251,20 @@ static INPUT_PORTS_START( tisr16ii )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( tisr16ii, tisr16 )
+static MACHINE_CONFIG_START( tisr16, tisr16_state )
 
 	/* basic machine hardware */
-	// the MCU RC osc. is different: R=30K, C=100pf -> ~300kHz(same freq as tisr16, no change needed)
+	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // RC osc. R=43K, C=68pf -> ~300kHz (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf -> also ~300kHz)
+	MCFG_TMS1XXX_READ_K_CB(READ8(tisr16_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tisr16_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tisr16_state, write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tisr16)
+
+	/* no video! */
+
+	/* no sound! */
 MACHINE_CONFIG_END
 
 
@@ -320,13 +279,27 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ticalc1x_state::ti1270_write_r)
+class ti1270_state : public ticalc1x_state
+{
+public:
+	ti1270_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(ti1270_state::write_r)
 {
 	// R0-R7: select digit (right-to-left)
 	display_matrix_seg(8, 8, m_o, data, 0xff);
 }
 
-WRITE16_MEMBER(ticalc1x_state::ti1270_write_o)
+WRITE16_MEMBER(ti1270_state::write_o)
 {
 	// O1-O5,O7: input mux
 	// O0-O7: digit segments
@@ -334,11 +307,13 @@ WRITE16_MEMBER(ticalc1x_state::ti1270_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ticalc1x_state::ti1270_read_k)
+READ8_MEMBER(ti1270_state::read_k)
 {
 	return read_inputs(6);
 }
 
+
+// config
 
 static INPUT_PORTS_START( ti1270 )
 	PORT_START("IN.0") // O1
@@ -378,14 +353,13 @@ static INPUT_PORTS_START( ti1270 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( ti1270, ticalc1x_state )
+static MACHINE_CONFIG_START( ti1270, ti1270_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti1270_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti1270_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti1270_write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(ti1270_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1270_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1270_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
@@ -407,14 +381,28 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ticalc1x_state::ti1000_write_r)
+class ti1000_state : public ticalc1x_state
+{
+public:
+	ti1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(ti1000_state::write_r)
 {
 	// R0-R7: select digit (right-to-left)
 	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5);
 	display_matrix_seg(8, 8, o, data, 0xff);
 }
 
-WRITE16_MEMBER(ticalc1x_state::ti1000_write_o)
+WRITE16_MEMBER(ti1000_state::write_o)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
@@ -422,11 +410,13 @@ WRITE16_MEMBER(ticalc1x_state::ti1000_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ticalc1x_state::ti1000_read_k)
+READ8_MEMBER(ti1000_state::read_k)
 {
 	return read_inputs(5);
 }
 
+
+// config
 
 static INPUT_PORTS_START( ti1000 )
 	PORT_START("IN.0") // O0
@@ -449,26 +439,25 @@ static INPUT_PORTS_START( ti1000 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( ti1000, ticalc1x_state )
+static MACHINE_CONFIG_START( ti1000, ti1000_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti1000_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti1000_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti1000_write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(ti1000_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1000_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1000_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
@@ -490,7 +479,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
+class wizatron_state : public ticalc1x_state
+{
+public:
+	wizatron_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(wizatron_state::write_r)
 {
 	// 6th digit is custom(not 7seg), for math symbols, like this:
 	//   \./    GAB
@@ -505,7 +508,7 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_r)
 	display_matrix_seg(7, 9, m_o, data, 0x7f);
 }
 
-WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
+WRITE16_MEMBER(wizatron_state::write_o)
 {
 	// O1-O4: input mux
 	// O0-O6: digit segments A-G
@@ -514,11 +517,13 @@ WRITE16_MEMBER(ticalc1x_state::wizatron_write_o)
 	m_o = data & 0x7f;
 }
 
-READ8_MEMBER(ticalc1x_state::wizatron_read_k)
+READ8_MEMBER(wizatron_state::read_k)
 {
 	return read_inputs(4);
 }
 
+
+// config
 
 static INPUT_PORTS_START( wizatron )
 	PORT_START("IN.0") // O1
@@ -546,14 +551,13 @@ static INPUT_PORTS_START( wizatron )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( wizatron, ticalc1x_state )
+static MACHINE_CONFIG_START( wizatron, wizatron_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, wizatron_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, wizatron_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, wizatron_write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(wizatron_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(wizatron_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(wizatron_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
@@ -578,7 +582,20 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ticalc1x_state::lilprof_write_o)
+class lilprof_state : public wizatron_state
+{
+public:
+	lilprof_state(const machine_config &mconfig, device_type type, const char *tag)
+		: wizatron_state(mconfig, type, tag)
+	{ }
+
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(lilprof_state::write_o)
 {
 	// O1-O4,O7: input mux
 	// O0-O6: digit segments A-G
@@ -586,11 +603,13 @@ WRITE16_MEMBER(ticalc1x_state::lilprof_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ticalc1x_state::lilprof_read_k)
+READ8_MEMBER(lilprof_state::read_k)
 {
 	return read_inputs(5);
 }
 
+
+// config
 
 static INPUT_PORTS_START( lilprof )
 	PORT_INCLUDE( wizatron )
@@ -607,14 +626,13 @@ static INPUT_PORTS_START( lilprof )
 	PORT_CONFSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( lilprof, ticalc1x_state )
+static MACHINE_CONFIG_START( lilprof, lilprof_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, lilprof_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, wizatron_write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(lilprof_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lilprof_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(wizatron_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
@@ -639,7 +657,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ticalc1x_state::lilprof78_write_r)
+class lilprof78_state : public ticalc1x_state
+{
+public:
+	lilprof78_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(lilprof78_state::write_r)
 {
 	// update leds state
 	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
@@ -651,14 +683,14 @@ WRITE16_MEMBER(ticalc1x_state::lilprof78_write_r)
 	// 3rd digit A/G(equals sign) is from O7
 	m_display_state[3] = (m_o & 0x80) ? 0x41 : 0;
 
-	// 6th digit is a custom 7seg for math symbols (see wizatron_write_r)
+	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
 	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
 
 	set_display_size(7, 9);
 	display_update();
 }
 
-WRITE16_MEMBER(ticalc1x_state::lilprof78_write_o)
+WRITE16_MEMBER(lilprof78_state::write_o)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O6: digit segments A-G
@@ -667,11 +699,13 @@ WRITE16_MEMBER(ticalc1x_state::lilprof78_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ticalc1x_state::lilprof78_read_k)
+READ8_MEMBER(lilprof78_state::read_k)
 {
 	return read_inputs(5);
 }
 
+
+// config
 
 static INPUT_PORTS_START( lilprof78 )
 	PORT_START("IN.0") // O0
@@ -694,26 +728,25 @@ static INPUT_PORTS_START( lilprof78 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( lilprof78, ticalc1x_state )
+static MACHINE_CONFIG_START( lilprof78, lilprof78_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, lilprof78_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, lilprof78_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, lilprof78_write_r))
+	MCFG_TMS1XXX_READ_K_CB(READ8(lilprof78_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lilprof78_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(lilprof78_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
@@ -737,7 +770,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
+class majestic_state : public ticalc1x_state
+{
+public:
+	majestic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(majestic_state::write_r)
 {
 	// note: 1st digit only has segments B,F,G,DP
 	m_display_segmask[0] = 0xe2;
@@ -747,7 +794,7 @@ WRITE16_MEMBER(ticalc1x_state::ti30_write_r)
 	display_matrix_seg(8, 9, o, data, 0xff);
 }
 
-WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
+WRITE16_MEMBER(majestic_state::write_o)
 {
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
@@ -755,12 +802,14 @@ WRITE16_MEMBER(ticalc1x_state::ti30_write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ticalc1x_state::ti30_read_k)
+READ8_MEMBER(majestic_state::read_k)
 {
 	// note: the Vss row is always on
 	return m_inp_matrix[7]->read() | read_inputs(7);
 }
 
+
+// config
 
 static INPUT_PORTS_START( ti30 )
 	PORT_START("IN.0") // O0
@@ -814,11 +863,11 @@ static INPUT_PORTS_START( ti30 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -874,11 +923,11 @@ static INPUT_PORTS_START( tiprog )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
@@ -935,22 +984,22 @@ static INPUT_PORTS_START( tibusan1 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("ON/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2"  " UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e" UTF8_POW_X)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, ticalc1x_state, power_button, (void *)false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("OFF") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)false)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ti30, ticalc1x_state )
+static MACHINE_CONFIG_START( majestic, majestic_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ticalc1x_state, ti30_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ticalc1x_state, ti30_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ticalc1x_state, ti30_write_r))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(ticalc1x_state, auto_power_off))
+	MCFG_TMS1XXX_READ_K_CB(READ8(majestic_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(majestic_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(majestic_state, write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti30)
@@ -1114,7 +1163,7 @@ ROM_END
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1975, tisr16ii,  0,        0, tisr16ii,  tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1975, tisr16ii,  0,        0, tisr16,    tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
 COMP( 1976, ti1270,    0,        0, ti1270,    ti1270,    driver_device, 0, "Texas Instruments", "TI-1270", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1977, ti1000,    0,        0, ti1000,    ti1000,    driver_device, 0, "Texas Instruments", "TI-1000", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
@@ -1122,6 +1171,6 @@ COMP( 1977, wizatron,  0,        0, wizatron,  wizatron,  driver_device, 0, "Tex
 COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Texas Instruments", "Little Professor (1976 version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
-COMP( 1976, ti30,      0,        0, ti30,      ti30,      driver_device, 0, "Texas Instruments", "TI-30", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1977, tiprog,    0,        0, ti30,      tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
-COMP( 1979, tibusan1,  0,        0, ti30,      tibusan1,  driver_device, 0, "Texas Instruments", "TI Business Analyst-I", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1976, ti30,      0,        0, majestic,  ti30,      driver_device, 0, "Texas Instruments", "TI-30", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,        0, majestic,  tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1979, tibusan1,  0,        0, majestic,  tibusan1,  driver_device, 0, "Texas Instruments", "TI Business Analyst-I", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )

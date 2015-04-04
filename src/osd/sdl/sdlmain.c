@@ -290,13 +290,6 @@ int main(int argc, char *argv[])
 		res = frontend.execute(argc, argv);
 	}
 
-#ifdef MALLOC_DEBUG
-	{
-		void check_unfreed_mem(void);
-		check_unfreed_mem();
-	}
-#endif
-
 #ifdef SDLMAME_UNIX
 #if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	if (!sdl_entered_debugger)

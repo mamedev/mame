@@ -8,7 +8,7 @@
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
     (assume same ROM contents between revisions)
   * SN75494N MOS-to-LED digit driver
-  * rotating reel + lightsensor
+  * rotating reel + lightsensor, 1bit-sound
 
   This is a board game, it obviously requires game pieces and the board.
   The emulated part is the centerpiece, a black tower with a rotating card
@@ -32,7 +32,7 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void mbdtower_display();
+	void prepare_display();
 	bool sensor_led_on() { return m_display_decay[0][0] != 0; }
 
 	int m_motor_pos;
@@ -58,7 +58,7 @@ protected:
 
 ***************************************************************************/
 
-void mbdtower_state::mbdtower_display()
+void mbdtower_state::prepare_display()
 {
 	// declare display matrix size and the 2 7segs
 	set_display_size(7, 3);
@@ -148,7 +148,7 @@ WRITE16_MEMBER(mbdtower_state::write_r)
 	// R5-R7: tower lamps
 	// R8: rotation sensor led
 	m_r = data;
-	mbdtower_display();
+	prepare_display();
 
 	// R10: speaker out
 	m_speaker->level_w(~data >> 4 & data >> 10 & 1);
@@ -159,7 +159,7 @@ WRITE16_MEMBER(mbdtower_state::write_o)
 	// O0-O6: led segments A-G
 	// O7: digit select
 	m_o = data;
-	mbdtower_display();
+	prepare_display();
 }
 
 READ8_MEMBER(mbdtower_state::read_k)
@@ -226,13 +226,14 @@ void mbdtower_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// zerofill/register for savestates
+	// zerofill
 	m_motor_pos = 0;
 	m_motor_pos_prev = -1;
 	m_motor_decay = 0;
 	m_motor_on = false;
 	m_sensor_blind = false;
 
+	// register for savestates
 	save_item(NAME(m_motor_pos));
 	/* save_item(NAME(m_motor_pos_prev)); */ // don't save!
 	save_item(NAME(m_motor_decay));
