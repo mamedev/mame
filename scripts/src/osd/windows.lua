@@ -28,6 +28,11 @@ function maintargetosdoptions(_target)
 		}
 	end
 
+	links {
+		"comctl32",
+		"comdlg32",
+	}
+
 	local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
 
 	if os.isfile(rcfile) then

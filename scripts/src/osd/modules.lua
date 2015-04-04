@@ -181,6 +181,14 @@ function osdmodulestargetconf()
 		end
 	end
 
+	if _OPTIONS["targetos"]=="windows" then
+		links {
+			"gdi32",
+			"dsound",
+			"dxguid",
+		}
+	end
+
 end
 
 

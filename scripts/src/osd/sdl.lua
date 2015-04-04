@@ -43,6 +43,16 @@ function maintargetosdoptions(_target)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+			links {
+				"SDL2.dll",
+			}
+		else
+			links {
+				"SDL.dll",
+			}
+		end
+
 		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
@@ -58,10 +68,6 @@ function maintargetosdoptions(_target)
 		configuration { "x64", "vs*" }
 			libdirs {
 				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
-			}
-		configuration { "vs*" }	
-			links {
-				"SDL2",
 			}
 		configuration {}
 	elseif _OPTIONS["targetos"]=="haiku" then
@@ -282,13 +288,6 @@ elseif BASE_TARGETOS=="os2" then
 	}
 end
 
-configuration { "mingw*" }
-		linkoptions {
-			"-static"
-		}
-
-configuration { }
-
 
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
@@ -442,6 +441,15 @@ if _OPTIONS["with-tools"] then
 		}
 
 		if _OPTIONS["targetos"]=="windows" then
+			if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+				links {
+					"SDL2.dll",
+				}
+			else
+				links {
+					"SDL.dll",
+				}
+			end
 			linkoptions{
 				"-municode",
 			}
