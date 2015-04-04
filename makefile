@@ -798,11 +798,8 @@ clean:
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
 GEN_FOLDERS :=  \
-	$(GENDIR) \
-	$(GENDIR)/$(TARGET)/$(SUBTARGET) \
 	$(GENDIR)/$(TARGET)/layout/ \
-	$(GENDIR)/osd/modules/debugger/qt/ \
-	$(GENDIR)/resource/
+	$(GENDIR)/osd/modules/debugger/qt/
 
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
 
