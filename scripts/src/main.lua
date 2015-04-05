@@ -65,6 +65,9 @@ function mainProject(_target, _subtarget)
 	links{
 		"ocore_" .. _OPTIONS["osd"],
 	}
+	
+	local override_resources = false;
+	
 	maintargetosdoptions(_target)
 
 	includedirs {
@@ -79,7 +82,7 @@ function mainProject(_target, _subtarget)
 		GEN_DIR  .. "resource",
 	}
 
-	if _OPTIONS["targetos"]=="macosx" then
+	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {
 			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _target .. "-Info.plist"
 		}
@@ -92,7 +95,7 @@ function mainProject(_target, _subtarget)
 
 	end
 
-	if _OPTIONS["targetos"]=="windows" then
+	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
 		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/" .. _target ..".rc"
 		if not os.isfile(rcfile) then
 			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
