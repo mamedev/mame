@@ -246,9 +246,9 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 
 			vptr->r_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xff);
 			/* TODO: volume tables, linear? */
-			vptr->r_volume = (vptr->l_volume) | (vptr->l_volume << 8);
+			vptr->r_volume = (vptr->r_volume) | (vptr->r_volume << 8);
 			vptr->l_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] >> 8) & 0xff;
-			vptr->l_volume = (vptr->r_volume) | (vptr->r_volume << 8);
+			vptr->l_volume = (vptr->l_volume) | (vptr->l_volume << 8);
 			//printf("%04x %02x %02x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0],vptr->l_volume,vptr->r_volume);
 
 			break;
