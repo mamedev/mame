@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    commodore c65 home computer
+    Commodore C65 home computer
     PeT mess@utanet.at
 
     documention
@@ -256,7 +256,7 @@ static INPUT_PORTS_START( c65 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Mouse 1350 Button 2") PORT_CONDITION("CTRLSEL", 0x0f, EQUALS, 0x03)
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	/* Still to verify how many mices you were able to plug into a c64 */
+	/* Still to verify how many mice you were able to plug into a C64 */
 	/* Only one, for now */
 	PORT_START("JOY2_2B")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
