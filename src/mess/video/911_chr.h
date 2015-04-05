@@ -12,24 +12,24 @@
     I don't know how close to this standard the character sets used by the
     911 VDT are.
 
-    The japanese terminal uses 8-bit character codes.  The 128 first characters
+    The Japanese terminal uses 8-bit character codes.  The 128 first characters
     are identical to the US character set (except that '\' is replaced by the
     Yen symbol), and the next 128 characters include the katakana syllabus.
     Kanji ideograms are not supported in this scheme.
 
-    The arabic terminal uses 8-bit character codes, too.  It requires
+    The Arabic terminal uses 8-bit character codes, too.  It requires
     additional code in the TI990 OS for correct operation, as the keyboard
     returns codes for isolated characters (i.e. without ligatures), which need
     to be substituted with codes with correct context-dependent ligatures.
     And both OS and application programs need to support the fact that the
     writing direction can be either right-to-left or left-to-right, according
-    to whether the characters are latin or arabic.
+    to whether the characters are Latin or Arabic.
 
     As the original ROMs have not been dumped yet, I recreated the matrices
     from various matrix printouts in TI documentation.
 */
 /*
-    The arabic character set is not implemented, because documentation is ambiguous
+    The Arabic character set is not implemented, because documentation is ambiguous
     (it says there are 115 characters, but I can hardly see 80 characters in the
     attached table), and the character matrices are not documented.
 */
@@ -47,26 +47,26 @@ enum
 	/* extra symbols for national character sets */
 	char_defs_pound = char_defs_katakana_base+128,  /* pound sign (UK 0x23, French WP 0x23) */
 	char_defs_yen,      /* yen sign (Japan 0x5C) */
-	char_defs_auml,     /* latin small letter a with diaeresis (Swedish/Finish 0x7B, German 0x7B) */
-	char_defs_Auml,     /* latin capital letter A with diaeresis (Swedish/Finish 0x5B, German 0x5B) */
-	char_defs_Aring,    /* latin capital letter A with ring above (Swedish/Finish 0x5D, Norwegian/Danish 0x5D) */
-	char_defs_uuml,     /* latin small letter u with diaeresis (Swedish/Finish 0x7E, German 0x7D) */
-	char_defs_aring,    /* latin small letter a with ring above (Swedish/Finish 0x7D, Norwegian/Danish 0x7D) */
-	char_defs_Uuml,     /* latin capital letter U with diaeresis (German 0x5D) */
-	char_defs_ouml,     /* latin small letter o with diaeresis (German 0x7C) */
-	char_defs_Ouml,     /* latin capital letter O with diaeresis (German 0x5C) */
-	char_defs_szlig,    /* latin small letter sharp s (German 0x7E) */
-	char_defs_aelig,    /* latin small letter ae (Norwegian/Danish 0x7B) */
-	char_defs_AElig,    /* latin capital letter AE (Norwegian/Danish 0x5B) */
-	char_defs_oslash,   /* latin small letter o with stroke (Norwegian/Danish 0x7C) */
-	char_defs_Oslash,   /* latin capital letter O with stroke (Norwegian/Danish 0x5C) */
-	char_defs_agrave,   /* latin small letter a with grave (French WP 0x40) */
+	char_defs_auml,     /* Latin small letter a with diaeresis (Swedish/Finish 0x7B, German 0x7B) */
+	char_defs_Auml,     /* Latin capital letter A with diaeresis (Swedish/Finish 0x5B, German 0x5B) */
+	char_defs_Aring,    /* Latin capital letter A with ring above (Swedish/Finish 0x5D, Norwegian/Danish 0x5D) */
+	char_defs_uuml,     /* Latin small letter u with diaeresis (Swedish/Finish 0x7E, German 0x7D) */
+	char_defs_aring,    /* Latin small letter a with ring above (Swedish/Finish 0x7D, Norwegian/Danish 0x7D) */
+	char_defs_Uuml,     /* Latin capital letter U with diaeresis (German 0x5D) */
+	char_defs_ouml,     /* Latin small letter o with diaeresis (German 0x7C) */
+	char_defs_Ouml,     /* Latin capital letter O with diaeresis (German 0x5C) */
+	char_defs_szlig,    /* Latin small letter sharp s (German 0x7E) */
+	char_defs_aelig,    /* Latin small letter ae (Norwegian/Danish 0x7B) */
+	char_defs_AElig,    /* Latin capital letter AE (Norwegian/Danish 0x5B) */
+	char_defs_oslash,   /* Latin small letter o with stroke (Norwegian/Danish 0x7C) */
+	char_defs_Oslash,   /* Latin capital letter O with stroke (Norwegian/Danish 0x5C) */
+	char_defs_agrave,   /* Latin small letter a with grave (French WP 0x40) */
 	char_defs_deg,      /* degree sign (French WP 0x5B) */
-	char_defs_ccedil,   /* latin small letter c with cedilla (French WP 0x5C) */
+	char_defs_ccedil,   /* Latin small letter c with cedilla (French WP 0x5C) */
 	char_defs_sect,     /* section sign (French WP 0x5D) */
-	char_defs_egrave,   /* latin small letter e with grave (French WP 0x7B) */
-	char_defs_ugrave,   /* latin small letter u with grave (French WP 0x7C) */
-	char_defs_eacute,   /* latin small letter e with acute (French WP 0x7D) */
+	char_defs_egrave,   /* Latin small letter e with grave (French WP 0x7B) */
+	char_defs_ugrave,   /* Latin small letter u with grave (French WP 0x7C) */
+	char_defs_eacute,   /* Latin small letter e with acute (French WP 0x7D) */
 	char_defs_uml,      /* diaeresis (French WP 0x7E) */
 
 	char_defs_count     /* total character count */
@@ -87,13 +87,13 @@ static const char_override_t UK_overrides[1] =
 	{   0x23,   char_defs_pound }
 };
 
-/* One japan-specific character (see below for the 128 additionnal characters) */
+/* One Japan-specific character (see below for the 128 additionnal characters) */
 static const char_override_t japanese_overrides[1] =
 {
 	{   0x5C,   char_defs_yen   }
 };
 
-/* 5 sweden/finland-specific characters */
+/* 5 Sweden/Finland-specific characters */
 static const char_override_t swedish_overrides[/*5*/7] =
 {
 	{   0x7B,   char_defs_auml  },
@@ -106,7 +106,7 @@ static const char_override_t swedish_overrides[/*5*/7] =
 	{   0x7C,   char_defs_ouml  }
 };
 
-/* 7 german-specific characters */
+/* 7 German-specific characters */
 static const char_override_t german_overrides[7] =
 {
 	{   0x5D,   char_defs_Uuml  },
@@ -118,7 +118,7 @@ static const char_override_t german_overrides[7] =
 	{   0x5B,   char_defs_Auml  }   /* 945423-9701 rev. B p. 1-10 says 0x5D, but it must be a mistake */
 };
 
-/* 6 norway/denmark-specific characters */
+/* 6 Norway/Denmark-specific characters */
 static const char_override_t norwegian_overrides[6] =
 {
 	{   0x5D,   char_defs_Aring },
@@ -129,7 +129,7 @@ static const char_override_t norwegian_overrides[6] =
 	{   0x5C,   char_defs_Oslash}
 };
 
-/* 9 french-specific characters (word-processing model only: the data-processing model uses
+/* 9 French-specific characters (word-processing model only: the data-processing model uses
 the US character set, although the keyboard mapping is different from the US model) */
 /* WARNING: I have created the character matrices from scratch, as I have no printout of
 the original matrices. */
@@ -1690,7 +1690,7 @@ static const UINT8 char_defs[char_defs_count][10] =
 	},
 
 
-/* 128 additional characters for japanese terminals */
+/* 128 additional characters for Japanese terminals */
 	{   /* 0x80 */
 		0x00,
 		0x00,
