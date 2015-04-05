@@ -791,8 +791,12 @@ xcode4-ios: generate
 # Clean/bootstrap
 #-------------------------------------------------
 
-$(GENIE):
+GENIE_SRC=$(wildcard 3rdparty/genie/src/host/*.c)
+
+$(GENIE): $(GENIE_SRC)
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
+
+3rdparty/genie/src/hosts/%.c:
 
 clean:
 	@echo Cleaning...
