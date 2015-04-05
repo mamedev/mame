@@ -159,7 +159,6 @@ private:
 		void start(z80pio_device *device, int index);
 		void reset();
 
-		bool interrupt_signalled();
 		void trigger_interrupt();
 
 		int rdy() const { return m_rdy; }

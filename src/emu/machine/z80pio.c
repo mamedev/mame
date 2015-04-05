@@ -9,6 +9,14 @@
 
 ***************************************************************************/
 
+/*
+
+	TODO:
+
+	- if port A is bidirectional, port B does not issue interrupts in bit mode
+
+*/
+
 #include "emu.h"
 #include "z80pio.h"
 #include "cpu/z80/z80daisy.h"
@@ -150,7 +158,7 @@ int z80pio_device::z80daisy_irq_ack()
 
 		if (port.m_ip)
 		{
-			if (LOG) logerror("Z80PIO '%s' Interrupt Acknowledge\n", tag());
+			if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Acknowledge\n", tag(), 'A' + index);
 
 			// clear interrupt pending flag
 			port.m_ip = false;
@@ -183,7 +191,7 @@ void z80pio_device::z80daisy_irq_reti()
 
 		if (port.m_ius)
 		{
-			if (LOG) logerror("Z80PIO '%s' Return from Interrupt\n", tag());
+			if (LOG) logerror("Z80PIO '%s' Port %c Return from Interrupt\n", tag(), 'A' + index);
 
 			// clear interrupt under service flag
 			port.m_ius = false;
@@ -266,10 +274,19 @@ UINT8 z80pio_device::control_read()
 void z80pio_device::check_interrupts()
 {
 	int state = CLEAR_LINE;
+	bool ius = (m_port[PORT_A].m_ius || m_port[PORT_B].m_ius);
 
 	for (int index = PORT_A; index < PORT_COUNT; index++)
-		if (m_port[index].interrupt_signalled())
+	{
+		if (LOG) logerror("Z80PIO '%s' Port %c IE %s IP %s IUS %s\n", tag(), 'A' + index, m_port[index].m_ie ? "1":"0", m_port[index].m_ip ? "1":"0", m_port[index].m_ius ? "1":"0");
+		
+		if (!ius && m_port[index].m_ie && m_port[index].m_ip)
+		{
 			state = ASSERT_LINE;
+		}
+	}
+
+	if (LOG) logerror("Z80PIO '%s' INT %u\n", tag(), state);
 
 	m_out_int_cb(state);
 }
@@ -284,23 +301,23 @@ void z80pio_device::check_interrupts()
 //  pio_port - constructor
 //-------------------------------------------------
 
-z80pio_device::pio_port::pio_port()
-	: m_device(NULL),
-		m_index(0),
-		m_mode(0),
-		m_next_control_word(0),
-		m_input(0),
-		m_output(0),
-		m_ior(0),
-		m_rdy(false),
-		m_stb(false),
-		m_ie(false),
-		m_ip(false),
-		m_ius(false),
-		m_icw(0),
-		m_vector(0),
-		m_mask(0),
-		m_match(false)
+z80pio_device::pio_port::pio_port() :
+	m_device(NULL),
+	m_index(0),
+	m_mode(0),
+	m_next_control_word(0),
+	m_input(0),
+	m_output(0),
+	m_ior(0),
+	m_rdy(false),
+	m_stb(false),
+	m_ie(false),
+	m_ip(false),
+	m_ius(false),
+	m_icw(0),
+	m_vector(0),
+	m_mask(0),
+	m_match(false)
 {
 }
 
@@ -363,41 +380,6 @@ void z80pio_device::pio_port::reset()
 
 
 //-------------------------------------------------
-//  interrupt_signalled - return true if an
-//  interrupt is signalled
-//-------------------------------------------------
-
-bool z80pio_device::pio_port::interrupt_signalled()
-{
-	if (m_mode == MODE_BIT_CONTROL)
-	{
-		// fetch input data (ignore output lines)
-		UINT8 data = (m_input & m_ior) | (m_output & ~m_ior);
-		UINT8 mask = ~m_mask;
-		bool match = false;
-
-		data &= mask;
-
-		if ((m_icw & 0x60) == 0 && data != mask) match = true;
-		else if ((m_icw & 0x60) == 0x20 && data != 0) match = true;
-		else if ((m_icw & 0x60) == 0x40 && data == 0) match = true;
-		else if ((m_icw & 0x60) == 0x60 && data == mask) match = true;
-
-		if (!m_match && match)
-		{
-			// trigger interrupt
-			m_ip = true;
-			if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Pending\n", m_device->tag(), 'A' + m_index);
-		}
-
-		m_match = match;
-	}
-
-	return (m_ie && m_ip && !m_ius);
-}
-
-
-//-------------------------------------------------
 //  trigger_interrupt - trigger an interrupt from
 //  this port
 //-------------------------------------------------
@@ -405,7 +387,7 @@ bool z80pio_device::pio_port::interrupt_signalled()
 void z80pio_device::pio_port::trigger_interrupt()
 {
 	m_ip = true;
-	if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Pending\n", m_device->tag(), 'A' + m_index);
+	if (LOG) logerror("Z80PIO '%s' Port %c Transfer Mode Interrupt Pending\n", m_device->tag(), 'A' + m_index);
 
 	check_interrupts();
 }
@@ -601,6 +583,28 @@ void z80pio_device::pio_port::write(UINT8 data)
 	{
 		// latch data
 		m_input = data;
+
+		// fetch input data (ignore output lines)
+		UINT8 data = (m_input & m_ior) | (m_output & ~m_ior);
+		UINT8 mask = ~m_mask;
+		bool match = false;
+
+		data &= mask;
+
+		if ((m_icw & 0x60) == 0 && data != mask) match = true;
+		else if ((m_icw & 0x60) == 0x20 && data != 0) match = true;
+		else if ((m_icw & 0x60) == 0x40 && data == 0) match = true;
+		else if ((m_icw & 0x60) == 0x60 && data == mask) match = true;
+
+		if (!m_match && match && !m_ius)
+		{
+			// trigger interrupt
+			m_ip = true;
+			if (LOG) logerror("Z80PIO '%s' Port %c Bit Control Mode Interrupt Pending\n", m_device->tag(), 'A' + m_index);
+		}
+
+		m_match = match;
+
 		check_interrupts();
 	}
 }
