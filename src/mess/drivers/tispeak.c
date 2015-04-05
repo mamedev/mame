@@ -50,7 +50,7 @@ above expectations. TI continued to manufacture many products for this line.
     - notes: only 1 VSM, meaning much smaller internal vocabulary
 
     Speak & Spell (Japan), 1980
-    - MCU: TMC0271* (assume same as US 1978 version)
+    - MCU: TMC0271* (assume same as US 1978 or 1979 version)
     - TMS51xx(1/2): 16KB CD2321
     - TMS51xx(2/2): 16KB CD2322
     - notes: no local name for the product, words are in English but very low difficulty
@@ -161,11 +161,11 @@ Speak & Read modules:
     - Sea Sights: TMS51xx: 16KB CD2396 (rev.A)
     - Who's Who at the Zoo: TMS51xx: 16KB CD2397
     - A Dog on a Log: TMS51xx: 16KB CD3534 (rev.A)
-    - The Seal That Could Fly: TMS51xx: 16KB CD3535*
+    - The Seal That Could Fly: TMS51xx: 16KB CD3535
     - A Ghost in the House: TMS51xx: 16KB CD3536*
     - On the Track: TMS51xx: 16KB CD3538
     - The Third Circle: TMS51xx: 16KB CD3539*
-    - The Millionth Knight: TMS51xx: 16KB CD3540*
+    - The Millionth Knight: TMS51xx: 16KB CD3540
 
 
 Touch & Tell:
@@ -743,7 +743,7 @@ MACHINE_CONFIG_END
 
 ROM_START( snspell )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, BAD_DUMP CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // typed in from patent 4189779, may have errors
+	ROM_LOAD( "us4189779_tmc0271", 0x0000, 0x1000, CRC(d3f5a37d) SHA1(f75ab617a6067d4d3a954a9f86126d2089554df8) ) // typed in from patent 4189779, verified by 2 sources
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_default_ipla.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )

@@ -11,7 +11,8 @@
     2*CD4043 quad r/s input latch
   * 5 7seg LEDs, 15 lamps(10 lamps projected to bowling pins reflection),
     1bit-sound with crude volume control
-  * edge connector to sensor board, inputs, ...?
+  * edge connector to sensors(switches trigger when ball rolls over)
+    and other inputs
 
   lamp translation table: SN74259.u5(mux 1) goes to MESS output lamp5x,
   SN74259.u6(mux 2) goes to MESS output lamp6x. u1-u3 are SN75492 ICs,
@@ -62,11 +63,14 @@ void elecbowl_state::prepare_display()
 	}
 
 	// lamp muxes
-	UINT8 d = m_r >> 1 & 1;
-	m_display_state[5] = (m_r & 1) ? (d << (m_o & 7)) : 0;
-	m_display_state[6] = (m_r >> 2 & 1) ? (d << (m_o & 7)) : 0;
+	UINT8 mask = 1 << (m_o & 7);
+	UINT8 d = (m_r & 2) ? mask : 0;
+	if (~m_r & 1)
+		m_display_state[5] = (m_display_state[5] & ~mask) | d;
+	if (~m_r & 4)
+		m_display_state[6] = (m_display_state[6] & ~mask) | d;
 	
-	// digit 4 is from u6 Q7
+	// digit 4 is from mux2 Q7
 	m_display_segmask[4] = 6;
 	m_display_state[4] = (m_display_state[6] & 0x80) ? 6 : 0;
 
@@ -92,7 +96,7 @@ WRITE16_MEMBER(elecbowl_state::write_r)
 	m_speaker->level_w(data >> 9 & 1);
 
 	// R4-R7: select digit
-	// R0,R2: lamp muxes enable
+	// R0,R2: lamp mux1,2 _enable
 	// R1: lamp muxes state
 	m_r = data;
 	prepare_display();
@@ -100,11 +104,11 @@ WRITE16_MEMBER(elecbowl_state::write_r)
 
 WRITE16_MEMBER(elecbowl_state::write_o)
 {
-	// O0-O2: lamp mux
+	//if (data & 0x80) printf("%X ",data&0x7f);
+
+	// O0-O2: lamp muxes select
 	// O0-O6: digit segments A-G
 	// O7: N/C
-	//if (data & 0x80) printf("%X ",data&0x7f);
-	
 	m_o = data & 0x7f;
 	prepare_display();
 }
@@ -132,8 +136,8 @@ static INPUT_PORTS_START( elecbowl )
 	PORT_START("IN.1") // R6
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) // reset/newgame?
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) // reset/test?
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) // reset/test?
 
 	PORT_START("IN.2") // R7
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)
@@ -145,7 +149,7 @@ static INPUT_PORTS_START( elecbowl )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) // 2 players sw?
 INPUT_PORTS_END
 
 
@@ -171,7 +175,7 @@ static const UINT16 elecbowl_output_pla[0x20] =
 	lA+lB+lG+lF+lC+lD,      // 9
 	
 	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
-	0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
+	0,1,2,3,4,5,6,7,        // lamp muxes select
 	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
 };
 
