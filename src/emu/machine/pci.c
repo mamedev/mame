@@ -81,7 +81,7 @@ void pci_device::device_start()
 	status = 0x0000;
 
 	for(int i=0; i<6; i++) {
-		bank_infos[i].adr = 0;
+		bank_infos[i].adr = -1;
 		bank_infos[i].size = 0;
 		bank_infos[i].flags = 0;
 		bank_reg_infos[i].bank = -1;
@@ -257,7 +257,7 @@ void pci_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end
 {
 	for(int i=0; i<bank_count; i++) {
 		bank_info &bi = bank_infos[i];
-		if(!bi.adr)
+		if(bi.adr==-1)
 			continue;
 		if(UINT32(bi.adr) == UINT32(~(bi.size - 1)))
 			continue;
