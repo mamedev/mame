@@ -66,8 +66,6 @@ function mainProject(_target, _subtarget)
 		"ocore_" .. _OPTIONS["osd"],
 	}
 	
-	local override_resources = false;
-	
 	maintargetosdoptions(_target)
 
 	includedirs {
@@ -82,7 +80,7 @@ function mainProject(_target, _subtarget)
 		GEN_DIR  .. "resource",
 	}
 
-	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
+	if _OPTIONS["targetos"]=="macosx" then
 		linkoptions {
 			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _target .. "-Info.plist"
 		}
@@ -93,29 +91,6 @@ function mainProject(_target, _subtarget)
 			{ "$(TARGET)" ,  GEN_DIR  .. "/resource/" .. _target .. "-Info.plist", true  },
 		}
 
-	end
-
-	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/" .. _target ..".rc"
-		if not os.isfile(rcfile) then
-			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
-		end
-		
-		if os.isfile(rcfile) then
-			files {
-				rcfile,
-			}
-			dependency {
-				{ "$(OBJDIR)/".._target ..".res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
-			}
-		else
-			files {
-				MAME_DIR .. "src/osd/windows/mame.rc",
-			}
-			dependency {
-				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
-			}
-		end	
 	end
 
 	files {
