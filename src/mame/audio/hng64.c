@@ -194,7 +194,9 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 //  logerror("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
 
+	/* TODO: huh? */
 	m_audiocpu->dreq3_w(data&1);
+	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
 //  m_audiocpu->hack_w(1);
 
 }
@@ -276,7 +278,7 @@ WRITE16_MEMBER(hng64_state::sound_comms_w)
 				printf("IRQ ACK %02x?\n",data);
 			return;
 	}
-	
+
 	printf("SOUND W %02x %04x\n",offset*2,data);
 }
 
@@ -290,7 +292,7 @@ READ16_MEMBER(hng64_state::sound_comms_r)
 			return main_latch[1];
 	}
 	printf("SOUND R %02x\n",offset*2);
-	
+
 	return 0;
 }
 
@@ -356,14 +358,14 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 	if(machine().input().code_pressed_once(KEYCODE_X))
 		i--;
-		
+
 	if(i < 0)
 		i = 0;
 	if(i > 7)
 		i = 7;
 
 	printf("trigger %02x %d\n",i,state);
-		
+
 	//if(machine().input().code_pressed_once(KEYCODE_C))
 	{
 		m_audiocpu->set_input_line(i, state? ASSERT_LINE :CLEAR_LINE);

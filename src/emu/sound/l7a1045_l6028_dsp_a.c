@@ -172,6 +172,8 @@ WRITE16_MEMBER( l7a1045_sound_device::l7a1045_sound_w )
 
 	if(offset == 0)
 		sound_select_w(space, offset, data, mem_mask);
+	else if(offset == 8/2)
+		sound_status_w(space, offset, data, mem_mask);
 	else
 		sound_data_w(space,offset - 1,data,mem_mask);
 }
@@ -225,32 +227,33 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
-	if(offset == 0)
-	{
-
 	switch (m_audioregister)
 	{
-	case 0x00:
-		// hack
-		l7a1045_voice *vptr = &m_voice[m_audiochannel];
+		case 0x00:
+			l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
-		m_key |= 1 << m_audiochannel;
+			vptr->start = (m_audiodat[0][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
+			vptr->start |= (m_audiodat[0][m_audiochannel].dat[1] & 0xffff) << (4);
+			vptr->start |= (m_audiodat[0][m_audiochannel].dat[0] & 0xf000) >> (12);
+
+			vptr->start &= m_rom_size - 1;
+
+			//printf("%08x: REGISTER 00 write port 0x0002 chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
+			break;
+	}
+}
+
+WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
+{
+	if(data & 0x100) // keyin
+	{
+		l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
 		vptr->frac = 0;
 		vptr->pos = 0;
-
-		vptr->start = (m_audiodat[0][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
-		vptr->start |= (m_audiodat[0][m_audiochannel].dat[1] & 0xffff) << (4);
-		vptr->start |= (m_audiodat[0][m_audiochannel].dat[0] & 0xf000) >> (12);
-
-		vptr->start &= m_rom_size - 1;
-
-		//printf("%08x: REGISTER 00 write port 0x0002 chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
-		break;
+		m_key |= 1 << m_audiochannel;
 	}
 }
-}
-
 
 READ16_MEMBER(l7a1045_sound_device::l7a1045_sound_port_0004_r)
 {

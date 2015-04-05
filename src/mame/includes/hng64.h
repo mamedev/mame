@@ -104,6 +104,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_dsp(*this, "l7a1045"),
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
@@ -129,8 +130,10 @@ public:
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
+	required_device<l7a1045_sound_device> m_dsp;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
+
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_cart;
 	required_shared_ptr<UINT32> m_sysregs;

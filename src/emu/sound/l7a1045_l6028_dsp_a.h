@@ -57,6 +57,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(sound_select_w);
 	DECLARE_WRITE16_MEMBER(sound_data_w);
+	DECLARE_WRITE16_MEMBER(sound_status_w);
 
 	DECLARE_READ16_MEMBER(l7a1045_sound_port_0004_r);
 	DECLARE_READ16_MEMBER(l7a1045_sound_port_0006_r);
