@@ -26,8 +26,6 @@ public:
 		osd_module(OSD_SOUND_PROVIDER, "coreaudio"),
 		sound_module(),
 		m_open(false),
-		m_attenuation(0),
-		m_scale(128),
 		m_sample_bytes(0),
 		m_headroom(0),
 		m_buffer_size(0),
@@ -35,6 +33,7 @@ public:
 		m_playpos(0),
 		m_writepos(0),
 		m_in_underrun(false),
+		m_scale(128),
 		m_overflows(0),
 		m_underflows(0)
 	{
@@ -87,8 +86,6 @@ private:
 
 	bool        m_open;
 	AudioUnit   m_output;
-	int         m_attenuation;
-	INT32       m_scale;
 	UINT32      m_sample_bytes;
 	UINT32      m_headroom;
 	UINT32      m_buffer_size;
@@ -96,6 +93,7 @@ private:
 	UINT32      m_playpos;
 	UINT32      m_writepos;
 	bool        m_in_underrun;
+	INT32       m_scale;
 	unsigned    m_overflows;
 	unsigned    m_underflows;
 };
@@ -163,8 +161,8 @@ int sound_coreaudio::init()
 	m_sample_bytes = format.mBytesPerFrame;
 
 	// Allocate buffer
-	m_headroom = (clamped_latency() * sample_rate() / 40) * m_sample_bytes;
-	m_buffer_size = MAX(sample_rate() * m_sample_bytes * (clamped_latency() + 2) / 40, m_sample_bytes * 256);
+	m_headroom = m_sample_bytes * (clamped_latency() * sample_rate() / 40);
+	m_buffer_size = m_sample_bytes * MAX(sample_rate() * (clamped_latency() + 3) / 40, 256);
 	m_buffer = global_alloc_array_clear(INT8, m_buffer_size);
 	if (!m_buffer)
 	{
@@ -175,6 +173,7 @@ int sound_coreaudio::init()
 	m_playpos = 0;
 	m_writepos = m_headroom;
 	m_in_underrun = false;
+	m_scale = 128;
 	m_overflows = m_underflows = 0;
 
 	// Initialise and start
@@ -253,8 +252,8 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, INT16 const *buffer
 
 void sound_coreaudio::set_mastervolume(int attenuation)
 {
-	m_attenuation = MAX(MIN(attenuation, 0), -32);
-	m_scale = (-32 == m_attenuation) ? 0 : (INT32)(pow(10.0, m_attenuation / 20.0) * 128);
+	int const clamped_attenuation = MAX(MIN(attenuation, 0), -32);
+	m_scale = (-32 == clamped_attenuation) ? 0 : (INT32)(pow(10.0, clamped_attenuation / 20.0) * 128);
 }
 
 
