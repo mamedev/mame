@@ -155,8 +155,8 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 				sample = (INT8)m_rom[(start + pos) & (m_rom_size-1)];
 				frac += step;
 
-				outputs[0][j] += ((sample * 0x8000) >> 8);
-				outputs[1][j] += ((sample * 0x8000) >> 8);
+				outputs[0][j] += ((sample * vptr->l_volume) >> 8);
+				outputs[1][j] += ((sample * vptr->r_volume) >> 8);
 			}
 
 			vptr->pos = pos;
@@ -222,15 +222,16 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_select_w)
 
 WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 {
+	l7a1045_voice *vptr = &m_voice[m_audiochannel];
+
 	if(m_audioregister != 0)
-		printf("%04x %04x (%04x|%04x %04x)\n",offset,data,offset ^ 2,m_audioregister,m_audiochannel);
+		printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
 	switch (m_audioregister)
 	{
 		case 0x00:
-			l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
 			vptr->start = (m_audiodat[0][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
 			vptr->start |= (m_audiodat[0][m_audiochannel].dat[1] & 0xffff) << (4);
@@ -239,6 +240,17 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 			vptr->start &= m_rom_size - 1;
 
 			//printf("%08x: REGISTER 00 write port 0x0002 chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
+			break;
+
+		case 0x07:
+
+			vptr->r_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xff);
+			/* TODO: volume tables, linear? */
+			vptr->r_volume = (vptr->l_volume) | (vptr->l_volume << 8);
+			vptr->l_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] >> 8) & 0xff;
+			vptr->l_volume = (vptr->r_volume) | (vptr->r_volume << 8);
+			//printf("%04x %02x %02x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0],vptr->l_volume,vptr->r_volume);
+
 			break;
 	}
 }

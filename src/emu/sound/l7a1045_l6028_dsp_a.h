@@ -15,7 +15,8 @@ struct l7a1045_voice
 	UINT32 start;
 	UINT32 pos;
 	UINT32 frac;
-
+	UINT16 l_volume;
+	UINT16 r_volume;
 };
 
 // ======================> l7a1045_sound_device
