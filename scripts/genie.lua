@@ -1,4 +1,5 @@
 premake.check_paths = true
+premake.make.linkoptions_after = true
 premake.make.override = { "TARGET" }
 MAME_DIR = (path.getabsolute("..") .. "/")
 local MAME_BUILD_DIR = (MAME_DIR .. "build/")
@@ -277,7 +278,7 @@ if (os.is("windows")) then
 		if (AWK_TEST~='') then
 			AWK = "gawk"
 		end
-	end	
+	end
 else
 	AWK_TEST = backtick("awk --version 2> /dev/null")
 	if (AWK_TEST~='') then
@@ -287,12 +288,12 @@ else
 		if (AWK_TEST~='') then
 			AWK = "gawk"
 		end
-	end	
+	end
 end
 
 if (AWK~='') then
-	postcompiletasks { 
-		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)", 
+	postcompiletasks {
+		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
 		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
 	}
 end
