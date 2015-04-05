@@ -404,7 +404,7 @@ configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
 	}
-	if _OPTIONS["PROFILER"] then
+	if _OPTIONS["PROFILER"]=="1" then
 		defines{
 			"MAME_PROFILER", -- define MAME_PROFILER if we are a profiling build
 		}
