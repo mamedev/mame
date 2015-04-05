@@ -265,6 +265,11 @@ configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
 	}
+	
+configuration { "Release", "vs*" }
+	flags {
+		"Optimize",
+	}
 
 configuration {}
 
