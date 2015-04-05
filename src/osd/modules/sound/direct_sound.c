@@ -275,7 +275,7 @@ HRESULT sound_direct_sound::dsound_init()
 	}
 
 	// set the cooperative level
-	#ifdef SDLMAME_WIN32
+#ifdef SDLMAME_WIN32
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
 #if (SDLMAME_SDL2)
@@ -287,7 +287,7 @@ HRESULT sound_direct_sound::dsound_init()
 #endif
 	#else
 	result = IDirectSound_SetCooperativeLevel(dsound, win_window_list->m_hwnd, DSSCL_PRIORITY);
-	#endif
+#endif
 	if (result != DS_OK)
 	{
 		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", (UINT32)result);

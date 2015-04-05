@@ -54,17 +54,15 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	UINT8 m_port[9];                    // MCU port A-I write data
+	UINT8 m_port[9];                    // MCU port A-I write data (optional)
 	UINT16 m_inp_mux;                   // multiplexed inputs mask
 
 	UINT8 read_inputs(int columns);
 
-	virtual void machine_start();
-
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns
+	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
 	UINT32 m_grid;                      // VFD current row data
 	UINT32 m_plate;                     // VFD current column data
@@ -79,40 +77,13 @@ public:
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
-	// game-specific handlers
-	void ssfball_display();
-	DECLARE_WRITE8_MEMBER(ssfball_grid_w);
-	DECLARE_WRITE8_MEMBER(ssfball_plate_w);
-	DECLARE_READ8_MEMBER(ssfball_input_b_r);
-
-	void splasfgt_display();
-	DECLARE_WRITE8_MEMBER(splasfgt_grid_w);
-	DECLARE_WRITE8_MEMBER(splasfgt_plate_w);
-	DECLARE_READ8_MEMBER(splasfgt_input_b_r);
-
-	void astrocmd_display();
-	DECLARE_WRITE8_MEMBER(astrocmd_grid_w);
-	DECLARE_WRITE8_MEMBER(astrocmd_plate_w);
-
-	DECLARE_WRITE8_MEMBER(edracula_grid_w);
-	DECLARE_WRITE8_MEMBER(edracula_plate_w);
-
-	DECLARE_WRITE8_MEMBER(tmtennis_grid_w);
-	DECLARE_WRITE8_MEMBER(tmtennis_plate_w);
-	DECLARE_WRITE8_MEMBER(tmtennis_port_e_w);
-	DECLARE_READ8_MEMBER(tmtennis_input_r);
-	void tmtennis_set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(tmtennis_difficulty_switch);
-	DECLARE_MACHINE_RESET(tmtennis);
-
-	void tmpacman_display();
-	DECLARE_WRITE8_MEMBER(tmpacman_grid_w);
-	DECLARE_WRITE8_MEMBER(tmpacman_plate_w);
-
-	DECLARE_WRITE8_MEMBER(alnchase_output_w);
-	DECLARE_READ8_MEMBER(alnchase_input_r);
+protected:
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
+
+// machine start/reset
 
 void hh_ucom4_state::machine_start()
 {
@@ -143,6 +114,10 @@ void hh_ucom4_state::machine_start()
 	save_item(NAME(m_plate));
 }
 
+void hh_ucom4_state::machine_reset()
+{
+}
+
 
 
 /***************************************************************************
@@ -169,7 +144,7 @@ void hh_ucom4_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -253,7 +228,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
 /***************************************************************************
 
-  Minidrivers (I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config)
 
 ***************************************************************************/
 
@@ -272,23 +247,36 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 
 ***************************************************************************/
 
-void hh_ucom4_state::ssfball_display()
+class ssfball_state : public hh_ucom4_state
+{
+public:
+	ssfball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_READ8_MEMBER(input_b_r);
+};
+
+// handlers
+
+void ssfball_state::prepare_display()
 {
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
-
 	display_matrix(16, 9, plate, m_grid);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::ssfball_grid_w)
+WRITE8_MEMBER(ssfball_state::grid_w)
 {
-	// C,D(,E): vfd matrix grid 0-7(,8)
+	// C,D(,E3): vfd matrix grid 0-7(,8)
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-
-	ssfball_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
+WRITE8_MEMBER(ssfball_state::plate_w)
 {
 	m_port[offset] = data;
 
@@ -302,17 +290,19 @@ WRITE8_MEMBER(hh_ucom4_state::ssfball_plate_w)
 
 	// E3: vfd matrix grid 8
 	if (offset == NEC_UCOM4_PORTE)
-		ssfball_grid_w(space, offset, data >> 3 & 1);
+		grid_w(space, offset, data >> 3 & 1);
 	else
-		ssfball_display();
+		prepare_display();
 }
 
-READ8_MEMBER(hh_ucom4_state::ssfball_input_b_r)
+READ8_MEMBER(ssfball_state::input_b_r)
 {
 	// B: input port 2, where B3 is multiplexed
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
+
+// config
 
 static INPUT_PORTS_START( ssfball )
 	PORT_START("IN.0") // F3 port B3
@@ -341,19 +331,19 @@ INPUT_PORTS_END
 
 static const INT16 ssfball_speaker_levels[] = { 0, 32767, -32768, 0 };
 
-static MACHINE_CONFIG_START( ssfball, hh_ucom4_state )
+static MACHINE_CONFIG_START( ssfball, ssfball_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.3"))
-	MCFG_UCOM4_READ_B_CB(READ8(hh_ucom4_state, ssfball_input_b_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, ssfball_grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, ssfball_grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, ssfball_plate_w))
+	MCFG_UCOM4_READ_B_CB(READ8(ssfball_state, input_b_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(ssfball_state, grid_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(ssfball_state, grid_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(ssfball_state, plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(ssfball_state, plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(ssfball_state, plate_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(ssfball_state, plate_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(ssfball_state, plate_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
@@ -382,14 +372,28 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_ucom4_state::splasfgt_display()
+class splasfgt_state : public hh_ucom4_state
+{
+public:
+	splasfgt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_READ8_MEMBER(input_b_r);
+};
+
+// handlers
+
+void splasfgt_state::prepare_display()
 {
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
-
 	display_matrix(16, 9, plate, m_grid);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::splasfgt_grid_w)
+WRITE8_MEMBER(splasfgt_state::grid_w)
 {
 	// G,H,I0: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
@@ -400,30 +404,31 @@ WRITE8_MEMBER(hh_ucom4_state::splasfgt_grid_w)
 
 	// I2: vfd matrix plate 6
 	if (offset == NEC_UCOM4_PORTI)
-		m_plate = (m_plate & 0xffff) | (data << 14 & 0x10000);
-
-	splasfgt_display();
+		plate_w(space, 4 + NEC_UCOM4_PORTC, data >> 2 & 1);
+	else
+		prepare_display();
 }
 
-WRITE8_MEMBER(hh_ucom4_state::splasfgt_plate_w)
+WRITE8_MEMBER(splasfgt_state::plate_w)
 {
-	// C,D,E,F23: vfd matrix plate
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
-	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-
 	// F01: speaker out
 	if (offset == NEC_UCOM4_PORTF)
 		m_speaker->level_w(data & 3);
 
-	ssfball_display();
+	// C,D,E,F23(,I2): vfd matrix plate
+	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
 }
 
-READ8_MEMBER(hh_ucom4_state::splasfgt_input_b_r)
+READ8_MEMBER(splasfgt_state::input_b_r)
 {
 	// B: multiplexed buttons
 	return read_inputs(4);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -475,19 +480,19 @@ INPUT_PORTS_END
 
 static const INT16 splasfgt_speaker_levels[] = { 0, 32767, -32768, 0 };
 
-static MACHINE_CONFIG_START( splasfgt, hh_ucom4_state )
+static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.4"))
-	MCFG_UCOM4_READ_B_CB(READ8(hh_ucom4_state, splasfgt_input_b_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, splasfgt_plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, splasfgt_grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, splasfgt_grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, splasfgt_grid_w))
+	MCFG_UCOM4_READ_B_CB(READ8(splasfgt_state, input_b_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(splasfgt_state, plate_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(splasfgt_state, plate_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(splasfgt_state, plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(splasfgt_state, plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(splasfgt_state, grid_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(splasfgt_state, grid_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(splasfgt_state, grid_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
@@ -521,24 +526,36 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_ucom4_state::astrocmd_display()
+class astrocmd_state : public hh_ucom4_state
+{
+public:
+	astrocmd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+};
+
+// handlers
+
+void astrocmd_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
-
 	display_matrix(17, 9, plate, grid);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::astrocmd_grid_w)
+WRITE8_MEMBER(astrocmd_state::grid_w)
 {
 	// C,D(,E3): vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-
-	astrocmd_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(hh_ucom4_state::astrocmd_plate_w)
+WRITE8_MEMBER(astrocmd_state::plate_w)
 {
 	// E01,F,G,H,I: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
@@ -550,12 +567,14 @@ WRITE8_MEMBER(hh_ucom4_state::astrocmd_plate_w)
 		m_speaker->level_w(data >> 2 & 1);
 
 		// E3: vfd matrix grid 8
-		astrocmd_grid_w(space, offset, data >> 3 & 1);
+		grid_w(space, offset, data >> 3 & 1);
 	}
 	else
-		astrocmd_display();
+		prepare_display();
 }
 
+
+// config
 
 static INPUT_PORTS_START( astrocmd )
 	PORT_START("IN.0") // port A
@@ -571,20 +590,19 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( astrocmd, hh_ucom4_state )
+static MACHINE_CONFIG_START( astrocmd, astrocmd_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, astrocmd_grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, astrocmd_grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, astrocmd_plate_w))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(astrocmd_state, grid_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(astrocmd_state, grid_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(astrocmd_state, plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(astrocmd_state, plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(astrocmd_state, plate_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(astrocmd_state, plate_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(astrocmd_state, plate_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
@@ -617,16 +635,28 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hh_ucom4_state::edracula_grid_w)
+class edracula_state : public hh_ucom4_state
+{
+public:
+	edracula_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+};
+
+// handlers
+
+WRITE8_MEMBER(edracula_state::grid_w)
 {
 	// C,D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-
-	display_matrix(18+1, 8, m_plate, m_grid);
+	display_matrix(18, 8, m_plate, m_grid);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
+WRITE8_MEMBER(edracula_state::plate_w)
 {
 	// I2: speaker out
 	if (offset == NEC_UCOM4_PORTI)
@@ -635,10 +665,11 @@ WRITE8_MEMBER(hh_ucom4_state::edracula_plate_w)
 	// E,F,G,H,I01: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-
 	display_matrix(18, 8, m_plate, m_grid);
 }
 
+
+// config
 
 static INPUT_PORTS_START( edracula )
 	PORT_START("IN.0") // port A
@@ -654,20 +685,19 @@ static INPUT_PORTS_START( edracula )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( edracula, hh_ucom4_state )
+static MACHINE_CONFIG_START( edracula, edracula_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, edracula_grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, edracula_grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, edracula_plate_w))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(edracula_state, grid_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(edracula_state, grid_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(edracula_state, plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(edracula_state, plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(edracula_state, plate_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(edracula_state, plate_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(edracula_state, plate_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
@@ -701,26 +731,45 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hh_ucom4_state::tmtennis_grid_w)
+class tmtennis_state : public hh_ucom4_state
+{
+public:
+	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE8_MEMBER(port_e_w);
+	DECLARE_READ8_MEMBER(input_r);
+
+	void set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+
+protected:
+	virtual void machine_reset();
+};
+
+// handlers
+
+WRITE8_MEMBER(tmtennis_state::grid_w)
 {
 	// G,H,I: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-
 	display_matrix(12, 12, m_plate, m_grid);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::tmtennis_plate_w)
+WRITE8_MEMBER(tmtennis_state::plate_w)
 {
 	// C,D,F: vfd matrix plate
 	if (offset == NEC_UCOM4_PORTF) offset--;
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-
 	display_matrix(12, 12, m_plate, m_grid);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::tmtennis_port_e_w)
+WRITE8_MEMBER(tmtennis_state::port_e_w)
 {
 	// E01: input mux
 	// E2: speaker out
@@ -729,12 +778,14 @@ WRITE8_MEMBER(hh_ucom4_state::tmtennis_port_e_w)
 	m_speaker->level_w(data >> 2 & 1);
 }
 
-READ8_MEMBER(hh_ucom4_state::tmtennis_input_r)
+READ8_MEMBER(tmtennis_state::input_r)
 {
 	// A,B: multiplexed buttons
 	return ~read_inputs(2) >> (offset*4);
 }
 
+
+// config
 
 /* Pro-Tennis physical button layout and labels is like this:
 
@@ -758,9 +809,9 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Button 6")
 
 	PORT_START("IN.1") // E1 port A/B
-	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, tmtennis_difficulty_switch, NULL)
+	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, NULL)
 	PORT_CONFSETTING(     0x001, "Practice" )
-	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> tmtennis_difficulty_switch
+	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> difficulty_switch
 	PORT_CONFSETTING(     0x000, "Pro 2" )
 	PORT_CONFNAME( 0x02, 0x00, "Players" )
 	PORT_CONFSETTING(    0x00, "1" )
@@ -773,8 +824,13 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 6")
 INPUT_PORTS_END
 
+INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
+{
+	set_clock();
+}
 
-void hh_ucom4_state::tmtennis_set_clock()
+
+void tmtennis_state::set_clock()
 {
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
 	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
@@ -782,34 +838,28 @@ void hh_ucom4_state::tmtennis_set_clock()
 	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
 }
 
-INPUT_CHANGED_MEMBER(hh_ucom4_state::tmtennis_difficulty_switch)
+void tmtennis_state::machine_reset()
 {
-	tmtennis_set_clock();
+	hh_ucom4_state::machine_reset();
+	set_clock();
 }
 
-MACHINE_RESET_MEMBER(hh_ucom4_state, tmtennis)
-{
-	tmtennis_set_clock();
-}
-
-static MACHINE_CONFIG_START( tmtennis, hh_ucom4_state )
+static MACHINE_CONFIG_START( tmtennis, tmtennis_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D552, 360000) // see tmtennis_set_clock
-	MCFG_UCOM4_READ_A_CB(READ8(hh_ucom4_state, tmtennis_input_r))
-	MCFG_UCOM4_READ_B_CB(READ8(hh_ucom4_state, tmtennis_input_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, tmtennis_plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, tmtennis_plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, tmtennis_port_e_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, tmtennis_plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, tmtennis_grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, tmtennis_grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, tmtennis_grid_w))
+	MCFG_CPU_ADD("maincpu", NEC_D552, 360000) // see set_clock
+	MCFG_UCOM4_READ_A_CB(READ8(tmtennis_state, input_r))
+	MCFG_UCOM4_READ_B_CB(READ8(tmtennis_state, input_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmtennis_state, plate_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(tmtennis_state, plate_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(tmtennis_state, port_e_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(tmtennis_state, plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(tmtennis_state, grid_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmtennis_state, grid_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmtennis_state, grid_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
-
-	MCFG_MACHINE_RESET_OVERRIDE(hh_ucom4_state, tmtennis)
 
 	/* no video! */
 
@@ -844,24 +894,36 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void hh_ucom4_state::tmpacman_display()
+class tmpacman_state : public hh_ucom4_state
+{
+public:
+	tmpacman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+};
+
+// handlers
+
+void tmpacman_state::prepare_display()
 {
 	UINT16 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15);
-
 	display_matrix(19, 8, plate, grid);
 }
 
-WRITE8_MEMBER(hh_ucom4_state::tmpacman_grid_w)
+WRITE8_MEMBER(tmpacman_state::grid_w)
 {
 	// C,D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-
-	tmpacman_display();
+	prepare_display();
 }
 
-WRITE8_MEMBER(hh_ucom4_state::tmpacman_plate_w)
+WRITE8_MEMBER(tmpacman_state::plate_w)
 {
 	// E1: speaker out
 	if (offset == NEC_UCOM4_PORTE)
@@ -870,10 +932,11 @@ WRITE8_MEMBER(hh_ucom4_state::tmpacman_plate_w)
 	// E023,F,G,H,I: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-
-	tmpacman_display();
+	prepare_display();
 }
 
+
+// config
 
 static INPUT_PORTS_START( tmpacman )
 	PORT_START("IN.0") // port A
@@ -889,20 +952,19 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( tmpacman, hh_ucom4_state )
+static MACHINE_CONFIG_START( tmpacman, tmpacman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_430kHz)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, tmpacman_grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, tmpacman_grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, tmpacman_plate_w))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmpacman_state, grid_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(tmpacman_state, grid_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(tmpacman_state, plate_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(tmpacman_state, plate_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(tmpacman_state, plate_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(tmpacman_state, plate_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(tmpacman_state, plate_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
@@ -937,7 +999,20 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
+class alnchase_state : public hh_ucom4_state
+{
+public:
+	alnchase_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+// handlers
+
+WRITE8_MEMBER(alnchase_state::output_w)
 {
 	if (offset <= NEC_UCOM4_PORTE)
 	{
@@ -964,12 +1039,14 @@ WRITE8_MEMBER(hh_ucom4_state::alnchase_output_w)
 	display_matrix(17, 9, m_plate, m_grid);
 }
 
-READ8_MEMBER(hh_ucom4_state::alnchase_input_r)
+READ8_MEMBER(alnchase_state::input_r)
 {
 	// A: buttons
 	return read_inputs(2);
 }
 
+
+// config
 
 /* physical button layout and labels is like this:
 
@@ -1008,20 +1085,19 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static MACHINE_CONFIG_START( alnchase, hh_ucom4_state )
+static MACHINE_CONFIG_START( alnchase, alnchase_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
-	MCFG_UCOM4_READ_A_CB(READ8(hh_ucom4_state, alnchase_input_r))
+	MCFG_UCOM4_READ_A_CB(READ8(alnchase_state, input_r))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(hh_ucom4_state, alnchase_output_w))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(alnchase_state, output_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(alnchase_state, output_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(alnchase_state, output_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(alnchase_state, output_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(alnchase_state, output_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(alnchase_state, output_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(alnchase_state, output_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)

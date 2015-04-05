@@ -97,6 +97,18 @@ public:
 		: seconds(secs),
 			attoseconds(attos) { }
 
+	attotime(const attotime& that)
+		: seconds(that.seconds),
+			attoseconds(that.attoseconds) { }
+
+	// assignment
+	attotime& operator=(const attotime& that)
+	{
+		this->seconds = that.seconds;
+		this->attoseconds = that.attoseconds;
+		return *this;
+	}
+
 	// queries
 	bool is_zero() const { return (seconds == 0 && attoseconds == 0); }
 	bool is_never() const { return (seconds >= ATTOTIME_MAX_SECONDS); }

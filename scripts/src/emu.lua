@@ -6,6 +6,7 @@ options {
 }
 
 includedirs {
+	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
@@ -16,8 +17,6 @@ includedirs {
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }
-
-includeosd()
 
 files {
 	MAME_DIR .. "src/emu/hashfile.c",
@@ -159,10 +158,50 @@ files {
 	MAME_DIR .. "src/emu/video/vector.c",
 }
 
+dependency {
+	--------------------------------------------------
+	-- additional dependencies
+	--------------------------------------------------
+	{ MAME_DIR .. "src/emu/rendfont.c", GEN_DIR .. "emu/uismall.fh" },
+	-------------------------------------------------
+	-- core layouts
+	--------------------------------------------------
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/dualhovu.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/dualhsxs.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/dualhuov.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/horizont.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/triphsxs.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/quadhsxs.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/vertical.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/lcd.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/lcd_rot.lh" },
+	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/noscreens.lh" },
+
+	{ MAME_DIR .. "src/emu/video.c",   GEN_DIR .. "emu/layout/snap.lh" },
+	
+}
+
+custombuildtask {
+	{ MAME_DIR .. "src/emu/uismall.png"         , GEN_DIR .. "emu/uismall.fh",  {  MAME_DIR.. "src/build/png2bdc.py",  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting uismall.png...", "python $(1) $(<) temp.bdc", "python $(2) temp.bdc $(@) font_uismall UINT8" }},
+                                                
+	layoutbuildtask("emu/layout", "dualhovu"),
+	layoutbuildtask("emu/layout", "dualhsxs"),
+	layoutbuildtask("emu/layout", "dualhuov"),
+	layoutbuildtask("emu/layout", "horizont"),
+	layoutbuildtask("emu/layout", "triphsxs"),
+	layoutbuildtask("emu/layout", "quadhsxs"),
+	layoutbuildtask("emu/layout", "vertical"),
+	layoutbuildtask("emu/layout", "lcd"),
+	layoutbuildtask("emu/layout", "lcd_rot"),
+	layoutbuildtask("emu/layout", "noscreens"),
+	layoutbuildtask("emu/layout", "snap"),
+}
 
 function emuProject(_target, _subtarget)
 
 	disasm_files = { }
+	disasm_dependency = { }
+	disasm_custombuildtask = { }
 
 	project ("optional")
 	uuid (os.uuid("optional-" .. _target .."_" .. _subtarget))
@@ -174,6 +213,7 @@ function emuProject(_target, _subtarget)
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mame", -- used for sound amiga
 		MAME_DIR .. "src/lib",
@@ -185,9 +225,7 @@ function emuProject(_target, _subtarget)
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 		MAME_DIR .. "src/emu/cpu/m68000",
-		GEN_DIR .. "emu/cpu/m68000",
 	}
-	includeosd()
 	
 	dofile(path.join("src", "cpu.lua"))
 
@@ -210,6 +248,7 @@ function emuProject(_target, _subtarget)
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -223,8 +262,6 @@ function emuProject(_target, _subtarget)
 		GEN_DIR  .. "emu/layout",
 	}
 
-	includeosd()
-	
 	dofile(path.join("src", "bus.lua"))
 	
 	
@@ -237,6 +274,7 @@ function emuProject(_target, _subtarget)
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -247,9 +285,19 @@ function emuProject(_target, _subtarget)
 		GEN_DIR  .. "emu",
 	}
 	
-	includeosd()
-	
 	files {
 		disasm_files
-	}
+	}	
+
+	if #disasm_dependency > 0 then
+		dependency {
+			disasm_dependency[1]
+		}
+	end
+
+	if #disasm_custombuildtask > 0 then
+		custombuildtask {
+			disasm_custombuildtask[1]
+		}
+	end
 end

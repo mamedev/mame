@@ -122,8 +122,8 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				v = rom[(addr >> 8) & m_rom.mask()] - 0x80;
 
 				/* apply panning and advance */
-				outputs[0][i] += v * regs[2];
-				outputs[1][i] += v * regs[3];
+				outputs[0][i] += v * (regs[2] & 0x7f);
+				outputs[1][i] += v * (regs[3] & 0x7f);
 				addr = (addr + regs[7]) & 0xffffff;
 			}
 

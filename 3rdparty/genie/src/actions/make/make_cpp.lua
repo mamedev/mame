@@ -3,7 +3,7 @@
 -- Generate a C/C++ project makefile.
 -- Copyright (c) 2002-2013 Jason Perkins and the Premake project
 --
-
+	premake.make.linkoptions_after = false
 	premake.make.cpp = { }
 	premake.make.override = { }
 	local cpp = premake.make.cpp
@@ -28,15 +28,26 @@
 
 		-- list object directories
 		local objdirs = {}
+		local additionalobjdirs = {}
 		for _, file in ipairs(prj.files) do
 			if path.iscppfile(file) then
 				objdirs[_MAKE.esc(path.getdirectory(path.trimdots(file)))] = 1
 			end
 		end
+
+		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+			for _, buildtask in ipairs(custombuildtask or {}) do
+				additionalobjdirs[_MAKE.esc(path.getdirectory(path.getrelative(prj.location,buildtask[2])))] = 1
+			end
+		end
+
 		_p('OBJDIRS := \\')
 		_p('\t$(OBJDIR) \\')
 		for dir, _ in pairs(objdirs) do
 			_p('\t$(OBJDIR)/%s \\', dir)
+		end
+		for dir, _ in pairs(additionalobjdirs) do
+			_p('\t%s \\', dir)
 		end
 		_p('')
 
@@ -151,6 +162,36 @@
 
 		-- per-file build rules
 		cpp.fileRules(prj)
+
+		-- per-dependency build rules
+		cpp.dependencyRules(prj)
+
+		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+			for _, buildtask in ipairs(custombuildtask or {}) do
+				local deps =  string.format("%s ",path.getrelative(prj.location,buildtask[1]))
+				for _, depdata in ipairs(buildtask[3] or {}) do
+					deps = deps .. string.format("%s ",path.getrelative(prj.location,depdata))
+				end
+				_p('%s: %s'
+					,path.getrelative(prj.location,buildtask[2])
+					, deps
+					)
+				for _, cmdline in ipairs(buildtask[4] or {}) do
+					local cmd = cmdline
+					local num = 1
+					for _, depdata in ipairs(buildtask[3] or {}) do
+						cmd = string.gsub(cmd,"%$%(" .. num .."%)", string.format("%s ",path.getrelative(prj.location,depdata)))
+						num = num + 1
+					end
+					cmd = string.gsub(cmd, "%$%(<%)", "$<")
+					cmd = string.gsub(cmd, "%$%(@%)", "$@")
+
+					_p('\t$(SILENT) %s',cmd)
+
+				end
+				_p('')
+			end
+		end
 
 		-- include the dependencies, built by GCC (with the -MMD flag)
 		_p('-include $(OBJECTS:%%.o=%%.d)')
@@ -370,7 +411,11 @@
 			-- $(LIBS) moved to end (http://sourceforge.net/p/premake/bugs/279/)
 
 			local tool = iif(cfg.language == "C", "CC", "CXX")
-			_p('  LINKCMD    = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
+			if (premake.make.linkoptions_after) then
+				_p('  LINKCMD    = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(LIBS) $(ALL_LDFLAGS)', tool)
+			else
+				_p('  LINKCMD    = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
+			end
 
 		end
 	end
@@ -454,6 +499,11 @@
 				else
 					cpp.buildcommand(path.iscfile(file) and not prj.options.ForceCPP, "o")
 				end
+				for _, task in ipairs(prj.postcompiletasks or {}) do
+					_p('\t$(SILENT) %s', task)
+					_p('')
+				end
+
 				_p('')
 			elseif (path.getextension(file) == ".rc") then
 				_p('$(OBJDIR)/%s.res: %s', _MAKE.esc(path.getbasename(file)), _MAKE.esc(file))
@@ -467,6 +517,26 @@
 			end
 		end
 	end
+
+	function cpp.dependencyRules(prj)
+		for _, dependency in ipairs(prj.dependency or {}) do
+			for _, dep in ipairs(dependency or {}) do
+				if (dep[3]==nil or dep[3]==false) then
+					_p('$(OBJDIR)/%s.o: %s'
+						, _MAKE.esc(path.trimdots(path.removeext(path.getrelative(prj.location, dep[1]))))
+						, _MAKE.esc(path.getrelative(prj.location, dep[2]))
+						)
+				else
+					_p('%s: %s'
+						, _MAKE.esc(dep[1])
+						, _MAKE.esc(path.getrelative(prj.location, dep[2]))
+						)
+				end
+				_p('')
+			end
+		end
+	end
+
 
 	function cpp.buildcommand(iscfile, objext)
 		local flags = iif(iscfile, '$(CC) $(ALL_CFLAGS)', '$(CXX) $(ALL_CXXFLAGS)')

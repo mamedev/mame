@@ -1021,6 +1021,17 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/emu/bus/centronics/printer.c",
 		MAME_DIR .. "src/emu/bus/centronics/digiblst.c",
 	}
+	
+	dependency {
+		{ MAME_DIR .. "src/emu/bus/centronics/epson_ex800.c",  GEN_DIR .. "emu/layout/ex800.lh" },
+		{ MAME_DIR .. "src/emu/bus/centronics/epson_lx800.c",  GEN_DIR .. "emu/layout/lx800.lh" },
+		{ MAME_DIR .. "src/emu/bus/centronics/epson_lx810l.c", GEN_DIR .. "emu/layout/lx800.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "ex800"),
+		layoutbuildtask("emu/layout", "lx800"),
+	}		
 end
 
 ---------------------------------------------------

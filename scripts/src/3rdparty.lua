@@ -66,13 +66,13 @@ project "softfloat"
 	}
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/expat/lib/",
 	}
-	includeosd()
 	
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
@@ -389,12 +389,11 @@ project "portmidi"
 	kind "StaticLib"
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "3rdparty/portmidi/pm_common",
 		MAME_DIR .. "3rdparty/portmidi/porttime",
 	}
-	
-	includeosd()
-
+		
 	configuration { "linux*" }
 		defines {
 			"PMALSA=1",
@@ -450,8 +449,6 @@ project "bgfx"
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 	}
-
-	includeosd()
 
 	configuration { "vs*" }
 		includedirs {

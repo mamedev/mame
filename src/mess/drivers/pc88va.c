@@ -162,6 +162,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
 	DECLARE_READ8_MEMBER(fdc_dma_r);
 	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+DECLARE_READ8_MEMBER(dma_memr_cb);
+DECLARE_WRITE8_MEMBER(dma_memw_cb);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
@@ -1761,6 +1763,18 @@ static SLOT_INTERFACE_START( pc88va_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
+READ8_MEMBER(pc88va_state::dma_memr_cb)
+{
+printf("%08x\n",offset);
+	return 0;
+}
+
+WRITE8_MEMBER(pc88va_state::dma_memw_cb)
+{
+printf("%08x %02x\n",offset,data);
+}
+
+
 static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
@@ -1816,6 +1830,8 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(pc88va_state, pc88va_tc_w))
 	MCFG_AM9517A_IN_IOR_2_CB(READ8(pc88va_state, fdc_dma_r))
 	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(pc88va_state, fdc_dma_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(pc88va_state, dma_memr_cb))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(pc88va_state, dma_memw_cb))
 
 	
 	MCFG_UPD765A_ADD("upd765", false, true)

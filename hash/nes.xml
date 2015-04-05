@@ -30736,25 +30736,6 @@
 		</part>
 	</software>
 
-	<software name="rockinktu" cloneof="rockinkt">
-		<description>Rockin' Kats (USA)</description>
-		<year>1991</year>
-		<publisher>Atlus</publisher>
-		<info name="serial" value="NES-7A-USA"/>
-		<info name="release" value="199109xx"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
-			<feature name="mmc3_type" value="MMC3B" />
-			<dataarea name="prg" size="131072">
-				<rom name="nes-7a-0 prg" size="131072" crc="319ccfcc" sha1="06e1c34af917b84a990db895c7b44df1b3393c96" offset="00000" />
-			</dataarea>
-			<dataarea name="chr" size="131072">
-				<rom name="nes-7a-0 chr" size="131072" crc="487aa440" sha1="ee7ebbcf89c81ba59beda1bd27289dae21bb8071" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rockinkt">
 		<description>Rockin' Kats (Euro)</description>
 		<year>1992</year>
@@ -30770,6 +30751,25 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="pal-7a-0 chr" size="131072" crc="18a98868" sha1="4be832329cd0d392496aaf641c0b548d7e53aa30" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockinktu" cloneof="rockinkt">
+		<description>Rockin' Kats (USA)</description>
+		<year>1991</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="NES-7A-USA"/>
+		<info name="release" value="199109xx"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="nes-7a-0 prg" size="131072" crc="319ccfcc" sha1="06e1c34af917b84a990db895c7b44df1b3393c96" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nes-7a-0 chr" size="131072" crc="487aa440" sha1="ee7ebbcf89c81ba59beda1bd27289dae21bb8071" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48515,6 +48515,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockinktup" cloneof="rockinkt">
+		<description>Rockin' Kats (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Atlus</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="rockin' kats prototype.chr" size="131072" crc="a28ef6f8" sha1="307dbc9fc9b101e6eb88df31543a75cd36f185b7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="rockin' kats prototype.prg" size="131072" crc="319ccfcc" sha1="06e1c34af917b84a990db895c7b44df1b3393c96" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -71197,6 +71213,22 @@ resulting in tons of glitches? -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordkinga" cloneof="astyanax">
+		<description>The Lord of King (Asia, Pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="btl_900218" />
+			<feature name="pcb" value="BTL-900218" />
+			<dataarea name="chr" size="131072">
+				<rom name="lord of king, the (j)[p2].chr" size="131072" crc="7a2dcf20" sha1="120e203c4f52e63b0af7824d6b894911a6d7a0a1" offset="00000" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="lord of king, the (j)[p2].prg" size="131072" crc="6862b87f" sha1="ceb6fff70556b2108816ab60f8f9ef2a6ac17aef" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

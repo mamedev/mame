@@ -38,12 +38,23 @@
 #define NREG_DRAMRCR        (0x058/4)
 #define NREG_BOOTWP         (0x05C/4)
 #define NREG_PCIEAR         (0x060/4)
-#define NREG_DMA_WR         (0x064/4)
+#define NREG_DMA_REM        (0x064/4)
 #define NREG_DMA_CMAR       (0x068/4)
 #define NREG_DMA_CPAR       (0x06C/4)
 #define NREG_PCIRC          (0x070/4)
 #define NREG_PCIEN          (0x074/4)
 #define NREG_PMIR           (0x078/4)
+
+#define DMA_BUSY				0x80000000
+#define DMA_INT_EN			0x40000000
+#define DMA_RW					0x20000000
+#define DMA_GO					0x10000000
+#define DMA_SUS					0x08000000
+#define DMA_INC 				0x04000000
+#define DMA_MIO					0x02000000
+#define DMA_RST					0x01000000
+#define DMA_BLK_SIZE		0x000fffff
+
 
 class vrc4373_device : public pci_host_device {
 public:
@@ -86,6 +97,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const;
 	virtual void device_start();
 	virtual void device_reset();
+	void dma_transfer(int which);
 
 private:
 	cpu_device *m_cpu;
@@ -108,6 +120,7 @@ private:
 
 	UINT32 m_pci1_laddr, m_pci2_laddr, m_pci_io_laddr;
 	UINT32 m_target1_laddr, m_target2_laddr;
+	
 };
 
 

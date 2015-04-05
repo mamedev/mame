@@ -856,6 +856,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	}
 	
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mess",
 		MAME_DIR .. "src/mame",
@@ -865,10 +866,8 @@ function createMESSProjects(_target, _subtarget, _name)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
-		GEN_DIR .. "emu/cpu/m68000",
+		MAME_DIR .. "src/emu/cpu/m68000",
 	}
-
-	includeosd()
 end
 	
 function createProjects_mess_mess(_target, _subtarget)
@@ -2506,6 +2505,12 @@ createMESSProjects(_target, _subtarget, "yamaha")
 files {            
 	MAME_DIR .. "src/mess/drivers/ymmu100.c",   
 	MAME_DIR .. "src/mess/drivers/fb01.c",      
+}
+dependency {
+	{ MAME_DIR .. "src/mess/drivers/ymmu100.c",    GEN_DIR .. "mess/drivers/ymmu100.inc" },
+}
+custombuildtask {
+	{ MAME_DIR .. "src/mess/drivers/ymmu100.ppm", GEN_DIR .. "mess/drivers/ymmu100.inc",  {  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/drivers/ymmu100.ppm...", "python $(1) $(<) $(@) ymmu100_bkg UINT8" }},
 }
 
 createMESSProjects(_target, _subtarget, "zenith")

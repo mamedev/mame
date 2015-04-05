@@ -163,6 +163,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
 	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
+	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
@@ -204,11 +205,11 @@ void osd_common_t::register_options()
 
 #if 0
 	// Register midi options and update options
-	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
+	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, &num, names);
 	dnames.reset();
 	for (int i = 0; i < num; i++)
 		dnames.append(names[i]);
-	update_option(OSD_DEBUG_PROVIDER, dnames);
+	update_option(OSD_MIDI_PROVIDER, dnames);
 #endif
 
 	// Register debugger options and update options

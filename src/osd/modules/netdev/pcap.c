@@ -189,7 +189,14 @@ void netdev_pcap::set_mac(const char *mac)
 
 int netdev_pcap::send(UINT8 *buf, int len)
 {
-	if(!m_p) return 0;
+	int ret;
+	if(!m_p) {
+		printf("send invoked, but no pcap context\n");
+		return 0;
+	}
+	ret = pcap_sendpacket_dl(m_p, buf, len);
+	printf("sent packet length %d, returned %d\n", len, ret);
+	return ret ? len : 0;
 	return (!pcap_sendpacket_dl(m_p, buf, len))?len:0;
 }
 
@@ -219,6 +226,7 @@ int netdev_pcap::recv_dev(UINT8 **buf)
 netdev_pcap::~netdev_pcap()
 {
 	if(m_p) pcap_close_dl(m_p);
+	m_p = NULL;
 }
 
 static CREATE_NETDEV(create_pcap)
@@ -279,7 +287,11 @@ int pcap_module::init()
 
 	while(devs)
 	{
-		add_netdev(devs->name, devs->description, create_pcap);
+		if(devs->description) {
+			add_netdev(devs->name, devs->description, create_pcap);
+		} else {
+			add_netdev(devs->name, devs->name, create_pcap);
+		}
 		devs = devs->next;
 	}
 	return 0;

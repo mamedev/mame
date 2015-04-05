@@ -38,11 +38,21 @@ function maintargetosdoptions(_target)
 			}
 		end
 		linkoptions {
-			string.gsub(os.outputof("pkg-config --libs fontconfig"), '[\r\n]+', ' '),
+			backtick("pkg-config --libs fontconfig"),
 		}
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
+		if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+			links {
+				"SDL2.dll",
+			}
+		else
+			links {
+				"SDL.dll",
+			}
+		end
+
 		configuration { "mingw*" }
 			linkoptions{
 				"-municode",
@@ -58,10 +68,6 @@ function maintargetosdoptions(_target)
 		configuration { "x64", "vs*" }
 			libdirs {
 				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
-			}
-		configuration { "vs*" }	
-			links {
-				"SDL2",
 			}
 		configuration {}
 	elseif _OPTIONS["targetos"]=="haiku" then
@@ -102,7 +108,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_X11"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="emscripten" or _OPTIONS["targetos"]=="os2" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" or _OPTIONS["targetos"]=="os2" then
 		_OPTIONS["NO_X11"] = "1"
 	else
 		_OPTIONS["NO_X11"] = "0"
@@ -193,7 +199,7 @@ elseif _OPTIONS["targetos"]=="netbsd" then
 	SDL_NETWORK         = "pcap"
 elseif _OPTIONS["targetos"]=="haiku" then
 	SYNC_IMPLEMENTATION = "ntc"
-elseif _OPTIONS["targetos"]=="emscripten" then
+elseif _OPTIONS["targetos"]=="asmjs" then
 	SYNC_IMPLEMENTATION = "mini"
 elseif _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
@@ -208,6 +214,10 @@ elseif _OPTIONS["targetos"]=="os2" then
 	BASE_TARGETOS       = "os2"
 	SDLOS_TARGETOS      = "os2"
 	SYNC_IMPLEMENTATION = "os2"
+end
+
+if _OPTIONS["SDL_LIBVER"]=="sdl" then
+	USE_BGFX = 0
 end
 
 if BASE_TARGETOS=="unix" then
@@ -230,7 +240,7 @@ if BASE_TARGETOS=="unix" then
 			end
 		else
 			linkoptions {
-				string.gsub(os.outputof(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'"), '[\r\n]+', ' '),
+				backtick(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'"),
 			}
 		end
 	else
@@ -250,7 +260,7 @@ if BASE_TARGETOS=="unix" then
 			end
 		end
 		linkoptions {
-			string.gsub(os.outputof(sdlconfigcmd() .. " --libs"), '[\r\n]+', ' '),
+			backtick(sdlconfigcmd() .. " --libs"),
 		}
 		if _OPTIONS["targetos"]~="haiku" then
 			links {
@@ -271,19 +281,12 @@ if BASE_TARGETOS=="unix" then
 	end
 elseif BASE_TARGETOS=="os2" then
 	linkoptions {
-		string.gsub(os.outputof(sdlconfigcmd() .. " --libs"), '[\r\n]+', ' '),
+		backtick(sdlconfigcmd() .. " --libs"),
 	}
 	links {
 		"pthread"
 	}
 end
-
-configuration { "mingw*" }
-		linkoptions {
-			"-static"
-		}
-
-configuration { }
 
 
 project ("osd_" .. _OPTIONS["osd"])
@@ -422,8 +425,10 @@ if _OPTIONS["with-tools"] then
 		dofile("sdl_cfg.lua")
 
 		includedirs {
+			MAME_DIR .. "src/osd",
 			MAME_DIR .. "src/lib/util",
 		}
+		
 		targetdir(MAME_DIR)
 
 		links {
@@ -431,13 +436,20 @@ if _OPTIONS["with-tools"] then
 			"ocore_" .. _OPTIONS["osd"],
 		}
 
-		includeosd()
-
 		files {
 			MAME_DIR .. "src/osd/sdl/testkeys.c",
 		}
 
 		if _OPTIONS["targetos"]=="windows" then
+			if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+				links {
+					"SDL2.dll",
+				}
+			else
+				links {
+					"SDL.dll",
+				}
+			end
 			linkoptions{
 				"-municode",
 			}

@@ -44,6 +44,32 @@
 			end
 		end
 		
+		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+			for _, buildtask in ipairs(custombuildtask or {}) do
+				local folders = string.explode(path.trimdots(path.getrelative(prj.location,buildtask[1])), "/", true)
+				local path = ""
+				for i = 1, #folders - 1 do
+					-- element is only written if there *are* filters
+					if not filterfound then
+						filterfound = true
+						_p(1,'<ItemGroup>')
+					end
+					
+					path = path .. folders[i]
+
+					-- have I seen this path before?
+					if not filters[path] then
+						filters[path] = true
+						_p(2, '<Filter Include="%s">', path)
+						_p(3, '<UniqueIdentifier>{%s}</UniqueIdentifier>', os.uuid())
+						_p(2, '</Filter>')
+					end
+
+					-- prepare for the next subfolder
+					path = path .. "\\"
+				end	
+			end
+		end
 		if filterfound then
 			_p(1,'</ItemGroup>')
 		end
@@ -57,7 +83,17 @@
 --
 
 	function vc2010.filefiltergroup(prj, section)
-		local files = vc2010.getfilegroup(prj, section)
+		local files = vc2010.getfilegroup(prj, section) or {}
+		if (section == "CustomBuild") then
+			for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+				for _, buildtask in ipairs(custombuildtask or {}) do
+					local fcfg = { }
+					fcfg.name = path.getrelative(prj.location,buildtask[1])
+					fcfg.vpath = path.trimdots(fcfg.name)
+					table.insert(files, fcfg)
+				end
+			end
+		end
 		if #files > 0 then
 			_p(1,'<ItemGroup>')
 			for _, file in ipairs(files) do
@@ -93,5 +129,6 @@
 			vc2010.filefiltergroup(prj, "ClInclude")
 			vc2010.filefiltergroup(prj, "ClCompile")
 			vc2010.filefiltergroup(prj, "ResourceCompile")
+			vc2010.filefiltergroup(prj, "CustomBuild")
 		_p('</Project>')
 	end

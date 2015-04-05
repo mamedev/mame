@@ -17,6 +17,7 @@ function createProjects_mess_tiny(_target, _subtarget)
 	}
 	
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/mess",
 		MAME_DIR .. "src/lib",
@@ -25,8 +26,6 @@ function createProjects_mess_tiny(_target, _subtarget)
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "mess/layout",
 	}	
-
-	includeosd()
 
 	files{
 		MAME_DIR .. "src/mess/drivers/coleco.c",

@@ -2894,6 +2894,7 @@ mmmbanc         // (c) 2007 Cave (AMI license) - 2007/06/05 MASTER VER.
 ddpdfk          // (c) 2008 Cave (AMI license) - 2008/06/23  MASTER VER 1.5
 ddpdfk10        // (c) 2008 Cave (AMI license) - 2008/05/16  MASTER VER
 dsmbl           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
+dfkbl           // (c) 2010 Cave (AMI license) - 2010/1/18 BLACK LABEL
 
 deathsm2
 
@@ -4332,6 +4333,7 @@ nsub            // 268-275 (c) 1980 Sega
 samurai         // 289-302 + upgrades (c) 1980 Sega
 invinco         // 310-318 (c) 1979 Sega
 invds           // 367-382 (c) 1979 Sega
+carhntds		//
 tranqgun        // 413-428 (c) 1980 Sega
 				// 450-465  Tranquilizer Gun (different version?)
 				// ???-??? Car Hunt / Deep Scan
@@ -7942,6 +7944,7 @@ shadfrcejv2     // TA-0032 (c) 1993 (Japan)
 // Stern "Berzerk hardware" games
 berzerk         // (c) 1980
 berzerk1        // (c) 1980
+berzerkf        // (c) 1980
 berzerkg        // (c) 1980
 frenzy          // (c) 1982
 moonwarp        // (c) 1982 - prototype

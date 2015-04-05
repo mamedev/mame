@@ -779,6 +779,18 @@ static INPUT_PORTS_START( berzerk )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
+// this set has French speech roms, so default the language to French
+static INPUT_PORTS_START( berzerkf )
+	PORT_INCLUDE( berzerk )
+
+	PORT_MODIFY("F3")
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Language ) ) PORT_DIPLOCATION("F3:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
+INPUT_PORTS_END
+
 // this set has German speech roms, so default the language to German
 static INPUT_PORTS_START( berzerkg )
 	PORT_INCLUDE( berzerk )
@@ -1177,6 +1189,21 @@ ROM_START( berzerk1 )
 	ROM_LOAD( "berzerk_r_vo_2c.2c", 0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )  /* ditto */
 ROM_END
 
+ROM_START( berzerkf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rc31f.1c", 0x0000, 0x0800, CRC(3ba6e56e) SHA1(f2b02dcdc3fe1de28cace39055a88f6aa0798fd1) )
+	ROM_LOAD( "rc31f.1d", 0x1000, 0x0800, CRC(a1de2a3e) SHA1(86ac3717ec26aeb2632583a65de6a0c2e7ea7419) )
+	ROM_LOAD( "rc31f.3d", 0x1800, 0x0800, CRC(bc31c478) SHA1(906d0acdee208a0bf714bd06be99321722b531c6) )
+	ROM_LOAD( "rc31f.5d", 0x2000, 0x0800, CRC(316192b5) SHA1(50f4ba2b59423a48c1d51fc6e4d9ea098d6f3743) )
+	ROM_LOAD( "rc31f.6d", 0x2800, 0x0800, CRC(cd51238c) SHA1(f0b65bdd1f225c151a93ea62812b4bb64969acac) )
+	ROM_LOAD( "rc31f.5c", 0x3000, 0x0800, CRC(563b13b6) SHA1(f8d137cd26535efe92780560d2f69f12d3f0fa42) )
+	ROM_FILL(             0x3800, 0x0800, 0xff )
+
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
+	ROM_LOAD( "rvof.1c", 0x0000, 0x0800, CRC(d7bfaca2) SHA1(b8c22db0f6e86d90f3c2ac9ff9e9d0ccff314919) )    /* VSU-1000 board */
+	ROM_LOAD( "rvof.2c", 0x0800, 0x0800, CRC(7bdc3573) SHA1(f346f0ac9813812f2e3fe68ebbf79151975babcb) )    /* ditto */
+ROM_END
+
 ROM_START( berzerkg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu rom 00.1c", 0x0000, 0x0800, CRC(77923a9e) SHA1(3760800b7aa1245f2141897b2406f0f5af5a8d71) )
@@ -1250,8 +1277,9 @@ DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
  *
  *************************************/
 
-GAME( 1980, berzerk,  0,       berzerk, berzerk, driver_device, 0, ROT0, "Stern Electronics", "Berzerk (set 1)", 0 )
-GAME( 1980, berzerk1, berzerk, berzerk, berzerk, driver_device, 0, ROT0, "Stern Electronics", "Berzerk (set 2)", 0 )
-GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, driver_device,0, ROT0, "Stern Electronics", "Berzerk (German Speech)", 0 )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy, driver_device,  0, ROT0, "Stern Electronics", "Frenzy", 0 )
-GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state,moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", 0)
+GAME( 1980, berzerk,  0,       berzerk, berzerk,  driver_device,        0, ROT0, "Stern Electronics", "Berzerk (set 1)", 0 )
+GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  driver_device,        0, ROT0, "Stern Electronics", "Berzerk (set 2)", 0 )
+GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, driver_device,        0, ROT0, "Stern Electronics", "Berzerk (French Speech)", 0 )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, driver_device,        0, ROT0, "Stern Electronics", "Berzerk (German Speech)", 0 )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy,   driver_device,        0, ROT0, "Stern Electronics", "Frenzy", 0 )
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", 0)

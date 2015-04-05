@@ -21,7 +21,11 @@ function mainProject(_target, _subtarget)
 				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
 			}
 	end
-
+	
+	configuration { "vs*" }
+	flags {
+		"Unicode",
+	}
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
@@ -61,9 +65,13 @@ function mainProject(_target, _subtarget)
 	links{
 		"ocore_" .. _OPTIONS["osd"],
 	}
+	
+	override_resources = false;
+	
 	maintargetosdoptions(_target)
 
 	includedirs {
+		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/" .. _target,
 		MAME_DIR .. "src/lib",
@@ -74,15 +82,40 @@ function mainProject(_target, _subtarget)
 		GEN_DIR  .. "resource",
 	}
 
-	includeosd()
-
-	if _OPTIONS["targetos"]=="macosx" then
+	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _OPTIONS["target"] .. "-Info.plist"
+			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _target .. "-Info.plist"
 		}
+		custombuildtask {	
+			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _target .. "-Info.plist",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _target .. "-Info.plist" .. "...",    "python $(1)  -p -b " .. _target .. " $(<) > $(@)" }},
+		}
+		dependency {
+			{ "$(TARGET)" ,  GEN_DIR  .. "/resource/" .. _target .. "-Info.plist", true  },
+		}
+
 	end
 
-	if _OPTIONS["targetos"]=="windows" then
+	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
+		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/" .. _target ..".rc"
+		if not os.isfile(rcfile) then
+			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
+		end
+		
+		if os.isfile(rcfile) then
+			files {
+				rcfile,
+			}
+			dependency {
+				{ "$(OBJDIR)/".._target ..".res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
+			}
+		else
+			files {
+				MAME_DIR .. "src/osd/windows/mame.rc",
+			}
+			dependency {
+				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
+			}
+		end	
 	end
 
 	files {
@@ -90,6 +123,26 @@ function mainProject(_target, _subtarget)
 		MAME_DIR .. "src/version.c",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
 	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/".._target .."/" .. _subtarget ..".lst" ,  GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",    {  MAME_DIR .. "src/build/makelist.py" }, {"@echo Building driver list...",    "python $(1) $(<) > $(@)" }},
+	}
+	
+	configuration { "mingw*" }
+		custombuildtask {	
+			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _target .. "vers.rc" .. "...",    "python $(1)  -r -b " .. _target .. " $(<) > $(@)" }},
+		}	
+	
+	configuration { "vs*" }
+		prebuildcommands {	
+			"mkdir " .. path.translate(GEN_DIR  .. "/resource/","\\") .. " 2>NUL",
+			"@echo Emitting ".. _target .. "vers.rc...",
+			"python " .. path.translate(MAME_DIR .. "src/build/verinfo.py","\\") .. " -r -b " .. _target .. " " .. path.translate(MAME_DIR .. "src/version.c","\\") .. " > " .. path.translate(GEN_DIR  .. "/resource/" .. _target .. "vers.rc", "\\") ,
+		}	
+	
+	 
+	configuration { }
+
 	debugdir (MAME_DIR)
 	debugargs ("-window")
 end

@@ -146,10 +146,10 @@ Super PE+
              XMP00002 through XMP00006 & XMP00024 Use the XM000xxP Multi-Poker Data
              XMP00014, XMP00017 & XMP00030 Use the WING Board add-on and use the XnnnnnnP Poker Data (Not all are compatible!)
              XMP00013, XMP00022 & XMP00026 Use the WING Board add-on & CG2346 + CAPX2346 for Spanish paytables
-             XMP00025 Uses the Wing Board add-on and is for the International markets. Auto Hold always enabled.
+             XMP00025 Uses the XM000xxP Multi-Poker Data roms and is for the International markets. Auto Hold always enabled.
    XMnnnnnP Multi-Poker Data. Contains poker games + paytable percentages: Requires specific CG graphics + CAP color prom
   XKnnnnnn  Spot Keno Programs. Different options for each set, but all use the same XnnnnnnK data roms
-   XnnnnnnK Spot Keno Data. Uses CG2120 with CAP1267
+   XnnnnnnK Spot Keno Data. Uses CG2120 with CAPX1267
   XSnnnnnn  Slot Programs. Different options for each set, but all use the same XnnnnnnS data roms
   XnnnnnnT  Tournament Slot Programs? Different options for each set, but all use the same XnnnnnnS data roms
    XnnnnnnS Slot Data. Each set requires specific CG graphics + CAP color prom
@@ -9723,9 +9723,9 @@ GAMEL(1995, pex0053p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex0054p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000054P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0055p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000019) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0055pa, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000022) Deuces Wild Poker (The Orleans)", 0, layout_pe_poker )
-GAMEL(1995, pex0055pb, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000023) Deuces Wild Poker (The Fun Ships)", GAME_WRONG_COLORS, layout_pe_poker ) /* CAP2399 not dumped */
+GAMEL(1995, pex0055pb, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000023) Deuces Wild Poker (The Fun Ships)", GAME_WRONG_COLORS, layout_pe_poker ) /* CAPX2399 not dumped */
 GAMEL(1995, pex0055pc, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000028) Deuces Wild Poker (Horseshoe)", 0, layout_pe_poker )
-GAMEL(1995, pex0055pd, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000035) Deuces Wild Poker (The Wild Wild West Casino)", GAME_WRONG_COLORS, layout_pe_poker ) /* CAP2389 not dumped */
+GAMEL(1995, pex0055pd, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000035) Deuces Wild Poker (The Wild Wild West Casino)", GAME_WRONG_COLORS, layout_pe_poker ) /* CAPX2389 not dumped */
 GAMEL(1995, pex0055pe, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000038) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0055pf, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000040) Deuces Wild Poker",   0, layout_pe_poker )
 GAMEL(1995, pex0055pg, pex0055p,  peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000055P+XP000053) Deuces Wild Poker",   0, layout_pe_poker )
@@ -9821,8 +9821,8 @@ GAMEL(1995, pex2251p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex2272p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002272P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2275p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002275P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2276p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002276P+XP000055) Black Jack Bonus Poker", 0, layout_pe_poker )
-GAMEL(1995, pex2283p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Dealt Deuces Wild Bonus Poker", 0, layout_pe_poker ) /* Undumped color CAP but should have correct colors anyways */
-GAMEL(1995, pex2284p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Bonus Poker", 0, layout_pe_poker ) /* Undumped color CAP but should have correct colors anyways */
+GAMEL(1995, pex2283p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002283P+XP000057) Dealt Deuces Wild Bonus Poker", 0, layout_pe_poker ) /* Undumped color CAPX but should have correct colors anyways */
+GAMEL(1995, pex2284p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002284P+XP000057) Barbaric Decues Wild Bonus Poker", 0, layout_pe_poker ) /* Undumped color CAPX but should have correct colors anyways */
 GAMEL(1995, pex2302p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002302P+XP000038) Bonus Poker Deluxe",  0, layout_pe_poker )
 GAMEL(1995, pex2303p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002303P+XP000112) White Hot Aces Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2306p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002306P+XP000112) Triple Double Bonus Poker", 0, layout_pe_poker )

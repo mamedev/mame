@@ -74,6 +74,8 @@ public:
 	// midi interface
 	virtual osd_midi_device *create_midi_device() = 0;
 
+protected:
+	virtual ~osd_interface() { }
 };
 
 #endif  /* __OSDEPEND_H__ */

@@ -544,11 +544,62 @@
 		vc2010.simplefilesgroup(prj, "ClInclude")
 		vc2010.compilerfilesgroup(prj)
 		vc2010.simplefilesgroup(prj, "None")
+		vc2010.customtaskgroup(prj)
 		vc2010.simplefilesgroup(prj, "ResourceCompile")
 		vc2010.simplefilesgroup(prj, "AppxManifest")
 	end
 
-
+	function vc2010.customtaskgroup(prj)
+		local files = { }
+		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+			for _, buildtask in ipairs(custombuildtask or {}) do
+				local fcfg = { }
+				fcfg.name = path.getrelative(prj.location,buildtask[1])
+				fcfg.vpath = path.trimdots(fcfg.name)
+				table.insert(files, fcfg)
+			end
+		end		
+		if #files > 0  then
+			_p(1,'<ItemGroup>')
+			local groupedBuildTasks = {}
+			for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+				for _, buildtask in ipairs(custombuildtask or {}) do
+					if (groupedBuildTasks[buildtask[1]] == nil) then
+						groupedBuildTasks[buildtask[1]] = {}
+					end
+					table.insert(groupedBuildTasks[buildtask[1]], buildtask)
+				end
+			end
+			
+			for name, custombuildtask in pairs(groupedBuildTasks or {}) do
+				_p(2,'<CustomBuild Include=\"%s\">', path.translate(path.getrelative(prj.location,name), "\\"))
+				_p(3,'<FileType>Text</FileType>')
+				local cmd = ""
+				local outputs = ""
+				for _, buildtask in ipairs(custombuildtask or {}) do
+					for _, cmdline in ipairs(buildtask[4] or {}) do
+						cmd = cmd .. cmdline
+						local num = 1
+						for _, depdata in ipairs(buildtask[3] or {}) do
+							cmd = string.gsub(cmd,"%$%(" .. num .."%)", string.format("%s ",path.getrelative(prj.location,depdata)))
+							num = num + 1
+						end
+						cmd = string.gsub(cmd, "%$%(<%)", string.format("%s ",path.getrelative(prj.location,buildtask[1])))
+						cmd = string.gsub(cmd, "%$%(@%)", string.format("%s ",path.getrelative(prj.location,buildtask[2])))
+						cmd = cmd .. "\r\n"
+					end	 
+					outputs = outputs .. path.getrelative(prj.location,buildtask[2]) .. ";"
+				end
+				_p(3,'<Command>%s</Command>',cmd)
+				_p(3,'<Outputs>%s%%(Outputs)</Outputs>',outputs)
+				_p(3,'<SubType>Designer</SubType>')
+				_p(3,'<Message></Message>')
+				_p(2,'</CustomBuild>')
+			end
+			_p(1,'</ItemGroup>')
+		end
+	end
+	
 	function vc2010.simplefilesgroup(prj, section, subtype)
 		local files = vc2010.getfilegroup(prj, section)
 		if #files > 0  then

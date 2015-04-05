@@ -5,57 +5,116 @@
 
 #include "machine/pci.h"
 
+// No interrupts
 #define MCFG_ES1373_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, ES1373, 0x12741371, 0x04, 0x040100, 0x12741371)
+
+#define MCFG_ES1373_IRQ_ADD(_cpu_tag, _irq_num) \
+	downcast<es1373_device *>(device)->set_irq_info(_cpu_tag, _irq_num);
 
 /* Ensonic ES1373 registers 0x00-0x3f */
 #define ES_INT_CS_CTRL          (0x00/4)
 #define ES_INT_CS_STATUS        (0x04/4)
-#define ES_UART_DATA              (0x08/4)
-#define ES_UART_STATUS            (0x09/4)
-#define ES_UART_CTRL              (0x09/4)
-#define ES_UART_RSVD              (0x0A/4)
-#define ES_MEM_PAGE               (0x0C/4)
+#define ES_UART_DATA            (0x08/4)
+#define ES_UART_STATUS          (0x09/4)
+#define ES_UART_CTRL            (0x09/4)
+#define ES_UART_RSVD            (0x0A/4)
+#define ES_MEM_PAGE             (0x0C/4)
 #define ES_SRC_IF               (0x10/4)
-#define ES_CODEC                  (0x14/4)
-#define ES_LEGACY                 (0x18/4)
-#define ES_CHAN_CTRL              (0x1C/4)
+#define ES_CODEC                (0x14/4)
+#define ES_LEGACY               (0x18/4)
+#define ES_CHAN_CTRL            (0x1C/4)
 #define ES_SERIAL_CTRL          (0x20/4)
 #define ES_DAC1_CNT             (0x24/4)
 #define ES_DAC2_CNT             (0x28/4)
-#define ES_ADC_CNT              (0x2C/4)
 #define ES_ADC_CNT              (0x2C/4)
 #define ES_HOST_IF0             (0x30/4)
 #define ES_HOST_IF1             (0x34/4)
 #define ES_HOST_IF2             (0x38/4)
 #define ES_HOST_IF3             (0x3C/4)
 
-struct frame_reg {
-	UINT32 pci_addr;
-	UINT16 curr_count;
-	UINT16 buff_size;
-	frame_reg() : pci_addr(0), curr_count(0), buff_size(0) {}
+// Interrupt/Chip Select Control Register (ES_INT_CS_CTRL) bits
+#define ICCTRL_ADC_STOP_MASK   0x00002000
+#define ICCTRL_DAC1_EN_MASK    0x00000040
+#define ICCTRL_DAC2_EN_MASK    0x00000020
+#define ICCTRL_ADC_EN_MASK     0x00000010
+#define ICCTRL_UART_EN_MASK    0x00000008
+#define ICCTRL_JYSTK_EN_MASK   0x00000004
+
+// Interrupt/Chip Select Status Register (ES_INT_CS_STATUS) bits
+#define ICSTATUS_INTR_MASK        0x80000000
+#define ICSTATUS_DAC1_INT_MASK    0x00000004
+#define ICSTATUS_DAC2_INT_MASK    0x00000002
+#define ICSTATUS_ADC_INT_MASK     0x00000001
+
+// Serial Interface Control Register (ES_SERIAL_CTRL) bits
+#define SCTRL_P2_END_MASK     0x00380000
+#define SCTRL_P2_START_MASK   0x00070000
+#define SCTRL_R1_LOOP_MASK    0x00008000
+#define SCTRL_P2_LOOP_MASK    0x00004000
+#define SCTRL_P1_LOOP_MASK    0x00002000
+#define SCTRL_P2_PAUSE_MASK   0x00001000
+#define SCTRL_P1_PAUSE_MASK   0x00000800
+#define SCTRL_R1_INT_EN_MASK  0x00000400
+#define SCTRL_P2_INT_EN_MASK  0x00000200
+#define SCTRL_P1_INT_EN_MASK  0x00000100
+#define SCTRL_P1_RELOAD_MASK  0x00000080
+#define SCTRL_P2_STOP_MASK    0x00000040
+#define SCTRL_R1_S_MASK       0x00000030
+#define SCTRL_P2_S_MASK       0x0000000C
+#define SCTRL_P1_S_MASK       0x00000003
+
+#define ES_PCI_READ 0
+#define ES_PCI_WRITE 1
+
+struct chan_info {
+	bool enable;
+	bool int_en;
+	bool loop_en;
+	bool initialized;
+	UINT32 samp_size;    // Size of one sample in log2(bytes)
+	UINT32 buf_wptr;     // Address to sample cache memory
+	UINT32 buf_rptr;     // Address to sample cache memory
+	UINT16 buf_count;    // Number of samples that have been played
+	UINT16 buf_size;     // Number of samples minus one to play
+	UINT32 pci_addr;     // PCI Addresss for system memory accesses
+	UINT16 pci_count;    // Number of 32 bits transfered
+	UINT16 pci_size;     // Total number of words (32 bits) minus one in system memory
 };
 
 class es1373_device : public pci_device {
 public:
 	es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
+							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space);
+
+	void set_irq_info(const char *tag, const int irq_num);
 
 	DECLARE_READ32_MEMBER (reg_r);
 	DECLARE_WRITE32_MEMBER(reg_w);
-
+	TIMER_DEVICE_CALLBACK_MEMBER(es_timer_callback);
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
 	virtual void device_start();
 	virtual void device_reset();
+	address_space *m_memory_space;
+	//virtual const address_space_config *memory_space_config(address_spacenum spacenum) const;
 
 private:
+	const char *m_cpu_tag;
+	cpu_device *m_cpu;
+	int m_irq_num;
 	DECLARE_ADDRESS_MAP(map, 32);
 	UINT16 m_ac97_regs[0x80];
 	UINT32 m_es_regs[0x10];
+	UINT32 m_sound_cache[0x40];
 	UINT16 m_src_ram[0x80];
-	frame_reg m_dac1_fr;
-	frame_reg m_dac2_fr;
-	frame_reg m_adc_fr;
+	chan_info m_dac1;
+	chan_info m_dac2;
+	chan_info m_adc;
+	void transfer_pci_audio(chan_info& chan, int type);
+	
 };
 
 extern const device_type ES1373;

@@ -1,11 +1,17 @@
 premake.check_paths = true
+premake.make.linkoptions_after = true
 premake.make.override = { "TARGET" }
 MAME_DIR = (path.getabsolute("..") .. "/")
 local MAME_BUILD_DIR = (MAME_DIR .. "build/")
 local naclToolchain = ""
 
 
-function str_to_version (str)
+function backtick(cmd)
+	result = string.gsub(string.gsub(os.outputof(cmd), "\r?\n$", ""), " $", "")
+	return result
+end
+
+function str_to_version(str)
 	local val = 0
 	if (str == nil or str == '') then
 		return val
@@ -34,12 +40,9 @@ function findfunction(x)
   end
 end
 
-function includeosd()
-	includedirs {
-		MAME_DIR .. "src/osd",
-	}
+function layoutbuildtask(_folder, _name)
+	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",    {  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    "python $(1) $(<) $(@) layout_".._name }};
 end
-
 
 CPUS = {}
 SOUNDS  = {}
@@ -54,7 +57,7 @@ newoption {
 
 newoption {
 	trigger = "osd",
-	description = "Choose target OSD",
+	description = "Choose OSD layer implementation",
 }
 
 newoption {
@@ -66,14 +69,17 @@ newoption {
 		{ "android-x86",   "Android - x86"          },
 		{ "asmjs",         "Emscripten/asm.js"      },
 		{ "freebsd",       "FreeBSD"                },
+		{ "netbsd",        "NetBSD"                 },
+		{ "openbsd",       "OpenBSD"                },
 		{ "nacl",          "Native Client"          },
 		{ "nacl-arm",      "Native Client - ARM"    },
 		{ "pnacl",         "Native Client - PNaCl"  },
-		{ "linux",     	   "Linux"   				},
-		{ "ios",           "iOS"              		},
+		{ "linux",     	   "Linux"                  },
+		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
-
+		{ "os2",           "OS/2 eComStation"       },
+		{ "haiku",         "Haiku"                  },
 	},
 }
 
@@ -103,12 +109,6 @@ newoption {
 }
 
 newoption {
-	trigger = "os_version",
-	description = "OS version",
-	value = "",
-}
-
-newoption {
 	trigger = "CC",
 	description = "CC replacement",
 }
@@ -126,42 +126,42 @@ newoption {
 newoption {
 	trigger = "PROFILE",
 	description = "Enable profiling.",
-} 
+}
 
 newoption {
 	trigger = "SYMBOLS",
 	description = "Enable symbols.",
-} 
+}
 
 newoption {
 	trigger = "SYMLEVEL",
 	description = "Symbols level.",
-} 
+}
 
 newoption {
 	trigger = "PROFILER",
 	description = "Include the internal profiler.",
-} 
+}
 
 newoption {
 	trigger = "OPTIMIZE",
 	description = "Optimization level.",
-} 
+}
 
 newoption {
 	trigger = "ARCHOPTS",
 	description = "ARCHOPTS.",
-} 
+}
 
 newoption {
 	trigger = "LDOPTS",
 	description = "Additional linker options",
-} 
+}
 
 newoption {
 	trigger = "MAP",
 	description = "Generate a link map.",
-} 
+}
 
 newoption {
 	trigger = "NOASM",
@@ -173,14 +173,23 @@ newoption {
 }
 
 newoption {
+	trigger = "BIGENDIAN",
+	description = "Build for big endian target",
+	allowed = {
+		{ "0",  "Little endian target"   },
+		{ "1",  "Big endian target"  },
+	},
+}
+
+newoption {
 	trigger = "FORCE_DRC_C_BACKEND",
 	description = "Force DRC C backend.",
-} 
+}
 
 newoption {
 	trigger = "NOWERROR",
 	description = "NOWERROR",
-} 
+}
 
 newoption {
 	trigger = "USE_BGFX",
@@ -191,7 +200,9 @@ newoption {
 	}
 }
 
-local os_version = str_to_version(_OPTIONS["os_version"])
+if not _OPTIONS["BIGENDIAN"] then
+	_OPTIONS["BIGENDIAN"] = "0"
+end
 
 if not _OPTIONS["NOASM"] then
 	if _OPTIONS["targetos"]=="emscripten" then
@@ -206,9 +217,6 @@ if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 end
 
 USE_BGFX = 1
-if (_OPTIONS["targetos"]=="macosx" and  os_version < 100700) then
-	USE_BGFX = 0
-end
 if(_OPTIONS["USE_BGFX"]~=nil) then
 	USE_BGFX = tonumber(_OPTIONS["USE_BGFX"])
 end
@@ -251,18 +259,50 @@ configuration { "vs*" }
 			"FatalWarnings",
 		}
 	end
-	
-	
+
+
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
 	}
+	
+configuration { "Release", "vs*" }
+	flags {
+		"Optimize",
+	}
 
 configuration {}
-	
---aftercompilefile ("\t$(SILENT) gawk -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)\n\t$(SILENT) mv $(@:%.o=%.dep) $(@:%.o=%.d)")
-	
-	
+
+local AWK = ""
+if (os.is("windows")) then
+	AWK_TEST = backtick("awk --version 2> NUL")
+	if (AWK_TEST~='') then
+		AWK = "awk"
+	else
+		AWK_TEST = backtick("gawk --version 2> NUL")
+		if (AWK_TEST~='') then
+			AWK = "gawk"
+		end
+	end
+else
+	AWK_TEST = backtick("awk --version 2> /dev/null")
+	if (AWK_TEST~='') then
+		AWK = "awk"
+	else
+		AWK_TEST = backtick("gawk --version 2> /dev/null")
+		if (AWK_TEST~='') then
+			AWK = "gawk"
+		end
+	end
+end
+
+if (AWK~='') then
+	postcompiletasks {
+		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
+		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
+	}
+end
+
 msgcompile ("Compiling $(subst ../,,$<)...")
 
 msgcompile_objc ("Objective-C compiling $(subst ../,,$<)...")
@@ -296,19 +336,19 @@ configuration { "x64", "Debug" }
 	if _OPTIONS["PROFILE"] then
 		targetsuffix "64dp"
 	end
-	
+
 configuration { "x32", "Release" }
 	targetsuffix ""
 	if _OPTIONS["PROFILE"] then
 		targetsuffix "p"
 	end
-	
+
 configuration { "x32", "Debug" }
 	targetsuffix "d"
 	if _OPTIONS["PROFILE"] then
 		targetsuffix "dp"
 	end
-	
+
 configuration { "Native", "Release" }
 	targetsuffix ""
 	if _OPTIONS["PROFILE"] then
@@ -349,6 +389,11 @@ configuration { "gmake" }
 	buildoptions_objc {
 		"-DINLINE=\"static inline\"",
 	}
+configuration { "xcode4*" }
+	buildoptions {
+		"-DINLINE=\"static inline\"",
+	}
+
 configuration { "vs*" }
 	defines {
 		"INLINE=static inline",
@@ -384,10 +429,56 @@ else
 end
 
 
--- define LSB_FIRST if we are a little-endian target
-defines {
-	"LSB_FIRST",
-}
+if _OPTIONS["BIGENDIAN"]=="1" then
+	if _OPTIONS["targetos"]=="macosx" then
+		defines {
+			"OSX_PPC",
+		}
+		buildoptions {
+			"-Wno-unused-label",
+		}
+		if _OPTIONS["SYMBOLS"] then
+			buildoptions {
+				"-mlong-branch",
+			}
+		end
+		configuration { "x64" }
+			buildoptions {
+				"-arch ppc64",
+			}
+			linkoptions {
+				"-arch ppc64",
+			}
+		configuration { "x32" }
+			buildoptions {
+				"-arch ppc",
+			}
+			linkoptions {
+				"-arch ppc",
+			}
+		configuration { }
+	end
+else
+	defines {
+		"LSB_FIRST",
+	}
+	if _OPTIONS["targetos"]=="macosx" then
+		configuration { "x64" }
+			buildoptions {
+				"-arch x86_64",
+			}
+			linkoptions {
+				"-arch x86_64",
+			}
+		configuration { "x32" }
+			buildoptions {
+				"-arch i386",
+			}
+			linkoptions {
+				"-arch i386",
+			}
+	end
+end
 
 -- need to ensure FLAC functions are statically linked
 defines {
@@ -400,19 +491,20 @@ if _OPTIONS["NOASM"]=="1" then
 	}
 end
 
--- fixme -- need to make this work for other target architectures (PPC)
 if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-	configuration { "x64" }
-		defines {
-			"NATIVE_DRC=drcbe_x64",
-		}
-	configuration { "x32" }
-		defines {
-			"NATIVE_DRC=drcbe_x86",
-		}
-	configuration {  }
+	if _OPTIONS["BIGENDIAN"]~="1" then
+		configuration { "x64" }
+			defines {
+				"NATIVE_DRC=drcbe_x64",
+			}
+		configuration { "x32" }
+			defines {
+				"NATIVE_DRC=drcbe_x86",
+			}
+		configuration {  }
+	end
 end
-	
+
 -- define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
 --ifneq ($(BUILD_JPEGLIB),1)
 --DEFS += -DUSE_SYSTEM_JPEGLIB
@@ -495,7 +587,7 @@ end
 if _OPTIONS["SYMBOLS"]~=nil then
 	flags {
 		"Symbols",
-	}	
+	}
 end
 
 --# add the optimization flag
@@ -515,9 +607,9 @@ end
 --ifneq ($(),0)
 if _OPTIONS["OPTIMIZE"] then
 	buildoptions {
-		"-fno-strict-aliasing" 
+		"-fno-strict-aliasing"
 	}
-	if _OPTIONS["ARCHOPTS"] then	
+	if _OPTIONS["ARCHOPTS"] then
 		buildoptions {
 			_OPTIONS["ARCHOPTS"]
 		}
@@ -553,7 +645,7 @@ if _OPTIONS["MAP"] then
 			"-Wl,-Map," .. "../../../../"  .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".map"
 		}
 
-	end	
+	end
 end
 	buildoptions {
 		"-Wno-unknown-pragmas",
@@ -594,7 +686,7 @@ end
 --endif
 
 
-		
+
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") then
 			buildoptions {
@@ -607,7 +699,7 @@ end
 				buildoptions {
 					"-Wno-unused-value",
 				}
-			end	
+			end
 			if (version >= 30400) then
 				buildoptions {
 					"-Wno-inline-new-delete",
@@ -626,12 +718,12 @@ end
 				buildoptions {
 					"-Wno-cast-align"
 				}
-			end 
+			end
 			if (version >= 40400) then
 				buildoptions {
 					"-Wno-unused-result",
 				}
-			end 
+			end
 
 			if (version >= 40700) then
 				buildoptions {
@@ -656,13 +748,13 @@ local subdir
 if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"]
 else
-	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"] .. _OPTIONS["subtarget"] 
-end	
+	subdir = _OPTIONS["osd"] .. "/" .. _OPTIONS["target"] .. _OPTIONS["subtarget"]
+end
 
 if not toolchain(MAME_BUILD_DIR, subdir) then
 	return -- no action specified
 end
-	
+
 configuration { "asmjs" }
 	buildoptions {
 		"-std=gnu89",
@@ -704,7 +796,7 @@ configuration { "linux-*" }
 			"dl",
 		}
 		if _OPTIONS["distro"]=="debian-stable" then
-			defines 
+			defines
 			{
 				"NO_AFFINITY_NP",
 			}
@@ -725,26 +817,12 @@ configuration { "mingw*" }
 			"-static-libgcc",
 			"-static-libstdc++",
 		}
-if _OPTIONS["osd"]=="sdl" then
-		links {
-			"SDL2",
-			"imm32",
-			"version",
-			"ole32",
-			"oleaut32",
-		}
-end
 		links {
 			"user32",
-			"gdi32",
-			"dsound",
-			"dxguid",
 			"winmm",
 			"advapi32",
-			"comctl32",
 			"shlwapi",
 			"wsock32",
-			"comdlg32",
 		}
 
 configuration { "vs*" }
@@ -757,15 +835,10 @@ configuration { "vs*" }
 		}
 		links {
 			"user32",
-			"gdi32",
-			"dsound",
-			"dxguid",
 			"winmm",
 			"advapi32",
-			"comctl32",
 			"shlwapi",
 			"wsock32",
-			"comdlg32",
 		}
 
 		buildoptions {
@@ -832,7 +905,7 @@ configuration { "vs*" }
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd9", 
+			"/Qwd9",
 			"/Qwd82",
 			"/Qwd111",
 			"/Qwd128",
@@ -845,13 +918,13 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",
 			"/Qwd2545",
 			"/Qwd2553",
-			"/Qwd2557", 
-			"/Qwd3280", 
+			"/Qwd2557",
+			"/Qwd3280",
 
 			"/Qwd170",
 			"/Qwd188",
 
-			"/Qwd63", 
+			"/Qwd63",
 			"/Qwd177",
 			"/Qwd186",
 			"/Qwd488",
@@ -910,7 +983,7 @@ if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
 	startproject (_OPTIONS["target"])
 else
 	startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
-end	
+end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
 if _OPTIONS["with-tools"] then
@@ -918,6 +991,6 @@ if _OPTIONS["with-tools"] then
 	dofile(path.join("src", "tools.lua"))
 end
 
-if (_ACTION == "gmake" and _OPTIONS["gcc"]=='asmjs') then 
+if (_ACTION == "gmake" and _OPTIONS["gcc"]=='asmjs') then
 	strip()
 end

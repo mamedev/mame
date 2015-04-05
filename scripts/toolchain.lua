@@ -49,6 +49,16 @@ newoption {
 }
 
 newoption {
+	trigger = "xcode",
+	value = "xcode_target",
+	description = "Choose XCode target",
+	allowed = {
+		{ "osx", "OSX" },
+		{ "ios", "iOS" },
+	}
+}
+
+newoption {
 	trigger = "with-android",
 	value   = "#",
 	description = "Set Android platform version (default: android-14).",
@@ -319,6 +329,16 @@ function toolchain(_buildDir, _subDir)
 		if ("vs2013-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
+		end	
+	elseif _ACTION == "xcode4" then
+
+		if "osx" == _OPTIONS["xcode"] then
+			premake.xcode.toolset = "macosx"
+			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
+
+		elseif "ios" == _OPTIONS["xcode"] then
+			premake.xcode.toolset = "iphoneos"
+			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
 		end
 	end
 
@@ -469,12 +489,13 @@ function toolchain(_buildDir, _subDir)
 		objdir (_buildDir .. "android-arm" .. "/obj")
 			libdirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib",
 			}
 			includedirs {
 				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include",
+				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/include",
 			}
 			buildoptions {
-				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
 				"-mthumb",
 				"-march=armv7-a",
 				"-mfloat-abi=softfp",
@@ -483,7 +504,6 @@ function toolchain(_buildDir, _subDir)
 				"-Wundef",
 			}
 			linkoptions {
-				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
 				"-march=armv7-a",
@@ -495,17 +515,17 @@ function toolchain(_buildDir, _subDir)
 		objdir (_buildDir .. "android-mips" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/",
 		}
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips/include",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/include",
 		}
 		buildoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
 			"-Wunused-value",
 			"-Wundef",
 		}
 		linkoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtend_so.o",
 		}
@@ -515,12 +535,13 @@ function toolchain(_buildDir, _subDir)
 		objdir (_buildDir .. "android-x86" .. "/obj")
 		libdirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib",
 		}
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86/include",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/include",
 		}
 		buildoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86",
 			"-march=i686",
 			"-mtune=atom",
 			"-mstackrealign",
@@ -530,7 +551,6 @@ function toolchain(_buildDir, _subDir)
 			"-Wundef",
 		}
 		linkoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtend_so.o",
 		}

@@ -5373,7 +5373,7 @@ ROM_START( mtwins )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 
 	ROM_REGION( 0x0200, "bboardplds", 0 )
-	ROM_LOAD( "ck24b.1a",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "ck24b.1a",     0x0000, 0x0117, CRC(bd99c448) SHA1(2692c158f76769b0743103cc3a6d1c5d1f4f52ec) )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 ROM_END
 

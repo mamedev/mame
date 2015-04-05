@@ -44,7 +44,7 @@ end
 
 if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 	buildoptions {
-		string.gsub(os.outputof("pkg-config --cflags alsa"), '[\r\n]+', ' '),
+		backtick("pkg-config --cflags alsa"),
 	}
 end
 
@@ -83,16 +83,16 @@ if BASE_TARGETOS=="unix" then
 				"MACOSX_USE_LIBSDL",
 			}
 			buildoptions {
-				string.gsub(os.outputof(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"), '[\r\n]+', ' '),
+				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL::'"),
 			}
 		end
 	else
 		buildoptions {
-			string.gsub(os.outputof(sdlconfigcmd() .. " --cflags"), '[\r\n]+', ' '),
+			backtick(sdlconfigcmd() .. " --cflags"),
 		}
-		if _OPTIONS["targetos"]~="emscripten" then
+		if _OPTIONS["targetos"]~="asmjs" then
 			buildoptions {
-				string.gsub(os.outputof("pkg-config --cflags fontconfig"), '[\r\n]+', ' '),
+				backtick("pkg-config --cflags fontconfig"),
 			}
 		end
 	end
@@ -105,6 +105,10 @@ if _OPTIONS["targetos"]=="windows" then
 		"main=utf8_main",
 	}
 
+	configuration { "Debug" }
+		defines {
+			"MALLOC_DEBUG",
+		}
 	configuration { "vs*" }
 		includedirs {
 			path.join(_OPTIONS["SDL_INSTALL_ROOT"],"include")
@@ -127,6 +131,6 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 	}
 elseif _OPTIONS["targetos"]=="os2" then
 	buildoptions {
-		string.gsub(os.outputof(sdlconfigcmd() .. " --cflags"), '[\r\n]+', ' '),
+		backtick(sdlconfigcmd() .. " --cflags"),
 	}
 end

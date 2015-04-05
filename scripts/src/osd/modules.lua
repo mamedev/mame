@@ -26,6 +26,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/midi/none.c",
 		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.c",
+		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.c",
 		MAME_DIR .. "src/osd/modules/sound/none.c",
 	}
@@ -99,6 +100,36 @@ function osdmodulesbuild()
 		defines {
 			"USE_QTDEBUG=1",
 		}
+		
+		local MOC = ""
+		if (os.is("windows")) then
+			MOC = "moc"
+		else
+			MOCTST = backtick("which moc-qt4 2>/dev/null")			
+			if (MOCTST=='') then
+				MOCTST = backtick("which moc 2>/dev/null")
+			end
+			if (MOCTST=='') then
+				print("Qt's Meta Object Compiler (moc) wasn't found!")
+				os.exit(1)
+			end	
+			MOC = MOCTST
+		end
+		
+		
+		custombuildtask {
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h", 			GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.c", { },			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h", 				GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.c", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.c", { }, 				{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h", 				GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",				GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",		GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.c", { }, 		{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h", 			GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.c", { }, 			{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.c", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			
+		}
+		
 		if _OPTIONS["targetos"]=="windows" then
 			configuration { "mingw*" }
 				buildoptions {
@@ -107,11 +138,11 @@ function osdmodulesbuild()
 			configuration { }
 		elseif _OPTIONS["targetos"]=="macosx" then
 			buildoptions {
-				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 		else
 			buildoptions {
-				string.gsub(os.outputof("pkg-config --cflags Qt"), '[\r\n]+', ' '),
+				backtick("pkg-config --cflags QtGui"),
 			}
 		end
 	else
@@ -146,11 +177,10 @@ function osdmodulestargetconf()
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		if _OPTIONS["targetos"]=="linux" then
 			linkoptions {
-				string.gsub(os.outputof("pkg-config --libs alsa"), '[\r\n]+', ' '),
+				backtick("pkg-config --libs alsa"),
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			links {
-				"CoreAudio.framework",
 				"CoreMIDI.framework",
 			}
 		end
@@ -168,7 +198,7 @@ function osdmodulestargetconf()
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
 			linkoptions {
-				"-F" .. string.gsub(os.outputof("qmake -query QT_INSTALL_LIBS"), '[\r\n]+', ''),
+				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 			links {
 				"QtCore.framework",
@@ -176,9 +206,23 @@ function osdmodulestargetconf()
 			}
 		else
 			linkoptions {
-				string.gsub(os.outputof("pkg-config --libs QtGui"), '[\r\n]+', ' '),
+				backtick("pkg-config --libs QtGui"),
 			}
 		end
+	end
+
+	if _OPTIONS["targetos"]=="windows" then
+		links {
+			"gdi32",
+			"dsound",
+			"dxguid",
+		}
+	elseif _OPTIONS["targetos"]=="macosx" then
+		links {
+			"AudioUnit.framework",
+			"CoreAudio.framework",
+			"CoreServices.framework",
+		}
 	end
 
 end

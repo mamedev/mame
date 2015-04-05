@@ -1,8 +1,8 @@
 #include "vrc4373.h"
 
-#define LOG_NILE            (1)
+#define LOG_NILE            (0)
 #define LOG_NILE_MASTER     (0)
-#define LOG_NILE_TARGET     (1)
+#define LOG_NILE_TARGET     (0)
 
 const device_type VRC4373      = &device_creator<vrc4373_device>;
 
@@ -217,14 +217,14 @@ READ32_MEMBER (vrc4373_device::target1_r)
 {
 	UINT32 result = m_cpu->space(AS_PROGRAM).read_dword(m_target1_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_TARGET)
-		logerror("%06X:nile target1 read from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
+		logerror("%08X:nile target1 read from offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (vrc4373_device::target1_w)
 {
 	m_cpu->space(AS_PROGRAM).write_dword(m_target1_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_TARGET)
-		logerror("%06X:nile target1 write to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+		logerror("%08X:nile target1 write to offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, data, mem_mask);
 }
 
 // PCI Target Window 2
@@ -232,16 +232,38 @@ READ32_MEMBER (vrc4373_device::target2_r)
 {
 	UINT32 result = m_cpu->space(AS_PROGRAM).read_dword(m_target2_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_TARGET)
-		logerror("%06X:nile target2 read from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
+		logerror("%08X:nile target2 read from offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
 WRITE32_MEMBER (vrc4373_device::target2_w)
 {
 	m_cpu->space(AS_PROGRAM).write_dword(m_target2_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_TARGET)
-		logerror("%06X:nile target2 write to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
+		logerror("%08X:nile target2 write to offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, data, mem_mask);
 }
 
+// DMA Transfer
+void vrc4373_device::dma_transfer(int which)
+{
+	if (LOG_NILE)
+		logerror("%08X:nile Start dma PCI: %08X MEM: %08X Words: %X\n", m_cpu->space(AS_PROGRAM).device().safe_pc(), m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+	int pciSel = (m_cpu_regs[NREG_DMACR1+which*0xC] & DMA_MIO) ? AS_DATA : AS_IO;
+	UINT32 mem_mask = 0xffffffff;
+	while (m_cpu_regs[NREG_DMA_REM]>0) {
+		if (0 && LOG_NILE)
+			logerror("dma_transfer PCI: %08X Mem: %08X Words Remaining: %X\n", m_cpu_regs[NREG_DMA_CPAR], m_cpu_regs[NREG_DMA_CMAR], m_cpu_regs[NREG_DMA_REM]);
+		if (m_cpu_regs[NREG_DMACR1+which*0xC]&DMA_RW) {
+			// Read data from PCI and write to local
+			m_cpu->space(AS_PROGRAM).write_dword(m_cpu_regs[NREG_DMA_CMAR], this->space(pciSel).read_dword(m_cpu_regs[NREG_DMA_CPAR], mem_mask), mem_mask);
+		} else {
+			// Read data from local and write to PCI
+			this->space(pciSel).write_dword(m_cpu_regs[NREG_DMA_CPAR], m_cpu->space(AS_PROGRAM).read_dword(m_cpu_regs[NREG_DMA_CMAR], mem_mask), mem_mask);
+		}
+		m_cpu_regs[NREG_DMA_CMAR] += 0x4;
+		m_cpu_regs[NREG_DMA_CPAR] += 0x4;
+		m_cpu_regs[NREG_DMA_REM]--;
+	}
+}	
 // CPU I/F
 READ32_MEMBER (vrc4373_device::cpu_if_r)
 {
@@ -252,6 +274,15 @@ READ32_MEMBER (vrc4373_device::cpu_if_r)
 			break;
 		case NREG_PCICDR:
 			result = config_data_r(space, offset);
+			break;
+		case NREG_DMACR1:
+		case NREG_DMACR2:
+			// Clear busy and go on read
+			if (m_cpu_regs[NREG_DMA_REM]==0) {
+					int which = (offset-NREG_DMACR1)>>3;
+					m_cpu_regs[NREG_DMACR1+which*0xc] &= ~DMA_BUSY;
+					m_cpu_regs[NREG_DMACR1+which*0xc] &= ~DMA_GO;
+			}
 			break;
 		default:
 			break;
@@ -266,7 +297,8 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 	if (LOG_NILE)
 		logerror("%06X:nile write to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 
-	UINT32 modData;
+	UINT32 modData, oldData;
+	oldData = m_cpu_regs[offset];
 	COMBINE_DATA(&m_cpu_regs[offset]);
 	switch (offset) {
 		case NREG_PCIMW1:
@@ -311,6 +343,23 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 			break;
 		case NREG_PCICDR:
 			pci_host_device::config_data_w(space, offset, data);
+			break;
+		case NREG_DMACR1:
+		case NREG_DMACR2:
+			// Start when DMA_GO bit is set
+			if (!(oldData & DMA_GO) && (data & DMA_GO)) {				
+				int which = (offset-NREG_DMACR1)>>3;
+				// Check to see DMA is not already started
+				if (!(data&DMA_BUSY)) {
+					// Set counts and address
+					m_cpu_regs[NREG_DMA_CPAR] = m_cpu_regs[NREG_DMAPCI1+which*0xC];
+					m_cpu_regs[NREG_DMA_CMAR] = m_cpu_regs[NREG_DMAMAR1+which*0xC];					
+					m_cpu_regs[NREG_DMA_REM] = (data & DMA_BLK_SIZE)>>2;
+					m_cpu_regs[NREG_DMACR1+which*0xc] |= DMA_BUSY;
+					// Start the transfer
+					dma_transfer(which);
+				}
+			}
 			break;
 		case NREG_BMCR:
 			if ((data>>3)&0x1) {

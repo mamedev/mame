@@ -1044,6 +1044,14 @@ WRITE8_MEMBER(vicdual_state::invds_io_w)
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
+WRITE8_MEMBER(vicdual_state::carhntds_io_w)
+{
+	if (offset & 0x01) { /* invinco_audio_w(space, 0, data); */ }
+	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
+	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
+}
+
 
 WRITE8_MEMBER(vicdual_state::sspacaho_io_w)
 {
@@ -1115,12 +1123,18 @@ WRITE8_MEMBER(vicdual_state::alphaho_io_w)
 
 
 static ADDRESS_MAP_START( vicdual_dualgame_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
+    AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_SHARE("characterram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( carhntds_dualgame_map, AS_PROGRAM, 8, vicdual_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM // also has part of a rom mapped at 0x4000
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_SHARE("characterram")
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( invho2_io_map, AS_IO, 8, vicdual_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
@@ -1149,6 +1163,18 @@ static ADDRESS_MAP_START( invds_io_map, AS_IO, 8, vicdual_state )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(invds_io_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( carhntds_io_map, AS_IO, 8, vicdual_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	AM_RANGE(0x00, 0x7f) AM_WRITE(carhntds_io_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sspacaho_io_map, AS_IO, 8, vicdual_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7f)
@@ -1336,6 +1362,63 @@ static INPUT_PORTS_START( invho2 )
 //  PORT_DIPSETTING(    0x01, "5" ) // results in 3, see above
 //  PORT_DIPSETTING(    0x00, "6" ) // results in 4, see above
 
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( carhntds )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x001)
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_4WAY PORT_NAME("P1 Up / Fire Left") // it's UP on Car Hunt but Fire Left on Deep Scan, what was it on the control panel??
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_composite_blank_comp, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x101)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_get_timer_value, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_fake_lives_r, (void *)0x102)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_COIN_DEFAULT
+
+	PORT_START("FAKE_LIVES1")
+	PORT_DIPNAME( 0x03, 0x01, "Car Hunt Lives" )   PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+
+	PORT_START("FAKE_LIVES2")
+	PORT_DIPNAME( 0x03, 0x03, "Deep Scan Lives" )     PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
 INPUT_PORTS_END
 
 
@@ -1883,6 +1966,7 @@ static MACHINE_CONFIG_DERIVED( vicdual_dualgame_root, vicdual_root )
 MACHINE_CONFIG_END
 
 
+
 static MACHINE_CONFIG_DERIVED( invho2, vicdual_dualgame_root )
 
 	/* basic machine hardware */
@@ -1896,6 +1980,7 @@ static MACHINE_CONFIG_DERIVED( invho2, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
+
 static MACHINE_CONFIG_DERIVED( invds, vicdual_dualgame_root )
 
 	/* basic machine hardware */
@@ -1905,6 +1990,13 @@ static MACHINE_CONFIG_DERIVED( invds, vicdual_dualgame_root )
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_FRAGMENT_ADD(invinco_audio)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( carhntds, vicdual_dualgame_root )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(carhntds_dualgame_map)
+	MCFG_CPU_IO_MAP(carhntds_io_map)
 MACHINE_CONFIG_END
 
 
@@ -2985,6 +3077,30 @@ ROM_START( invds )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    /* control PROM */
 ROM_END
 
+ROM_START( carhntds )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr617.u33",      0x0000, 0x0400, CRC(0bbfdb4e) SHA1(383599276923264602a0b5efeac9697d9c15a20f) )
+	ROM_CONTINUE(0x4000, 0x400)
+	ROM_LOAD( "epr618.u32",      0x0400, 0x0400, CRC(5a080b1d) SHA1(3c3d6b8b16d9a8976ee63435e949b67f025e38d8) )
+	ROM_LOAD( "epr619.u31",      0x0800, 0x0400, CRC(c6f2f399) SHA1(4bb34816042ec352b0bb71d2d654ebb6fb5083e9) )
+	ROM_LOAD( "epr620.u30",      0x0c00, 0x0400, CRC(d9deb88f) SHA1(a863f29cfed782c8871a2268aa28a67ccced1b45) )
+	ROM_LOAD( "epr621.u29",      0x1000, 0x0400, CRC(43e5de5c) SHA1(3adff5042be73f4693cee7977c88f425e930532d) )
+	ROM_LOAD( "epr622.u28",      0x1400, 0x0400, CRC(c881a3bc) SHA1(fbff24c4075103fd686cfb376b08cf0677522222) )
+	ROM_LOAD( "epr623.u27",      0x1800, 0x0400, CRC(297e7f42) SHA1(9e1042fe96f3bf55228b759b905467eff814ad84) )
+	ROM_LOAD( "epr624.u26",      0x1c00, 0x0400, CRC(dc943125) SHA1(39f18e29cc3d03ee1b98a969f739e22dfd76b6f7) )
+	ROM_LOAD( "epr625.u8",       0x2000, 0x0400, CRC(c86a0842) SHA1(5c59fe64985936b847a4c033a805153f627b1883) )
+	ROM_LOAD( "epr626.u7",       0x2400, 0x0400, CRC(9a48c939) SHA1(2c898810f6fd97d4a6edb97236aaa29d08f5598a) )
+	ROM_LOAD( "epr627.u6",       0x2800, 0x0400, CRC(b4b147e2) SHA1(8880f80708711b253f5da352679820500680ebab) )
+	ROM_LOAD( "epr628.u5",       0x2c00, 0x0400, CRC(aecf3c26) SHA1(2f4419c6ccf03042cf32a415160e41d52fd0ef9c) )
+	ROM_LOAD( "epr629.u4",       0x3000, 0x0400, CRC(c5be665b) SHA1(8bb145c140afa6166f08881b7e820335c3f83c08) )
+	ROM_LOAD( "epr630.u3",       0x3400, 0x0400, CRC(4312388b) SHA1(d0b53d505276754651d2aeda4b17f2d600f65166) )
+	ROM_LOAD( "epr631.u2",       0x3800, 0x0400, CRC(6766c7e5) SHA1(05b0ac31894c3c80d3940206aac2ef21a96ff849) )
+	ROM_LOAD( "epr632.u1",       0x3c00, 0x0400, CRC(ae68b7d5) SHA1(de449b62ba39331a4ecf3dfe81511b21b7c881d5) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "316.0390.u49", 0x0000, 0x0020, CRC(a0811288) SHA1(a6e78c26f7eeb70125eee715eb6a3e3c82ed7fc8) )    /* color PROM */
+ROM_END
+
 ROM_START( tranqgun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u33.bin",      0x0000, 0x0400, CRC(6d50e902) SHA1(1d14c0b28cb3650bb57b9ef61265fe94c453d648) )
@@ -3517,6 +3633,7 @@ GAME( 1980, nsub,       0,        nsub,      nsub,      driver_device, 0, ROT270
 GAME( 1980, samurai,    0,        samurai,   samurai,   driver_device, 0, ROT270, "Sega", "Samurai", GAME_NO_SOUND )
 GAME( 1979, invinco,    0,        invinco,   invinco,   driver_device, 0, ROT270, "Sega", "Invinco", GAME_IMPERFECT_SOUND )
 GAME( 1979, invds,      0,        invds,     invds,     driver_device, 0, ROT270, "Sega", "Invinco / Deep Scan", GAME_IMPERFECT_SOUND )
+GAME( 1979, carhntds,   0,        carhntds,  carhntds,  driver_device, 0, ROT270, "Sega", "Car Hunt / Deep Scan (France)", GAME_NO_SOUND )
 GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  driver_device, 0, ROT270, "Sega", "Tranquilizer Gun", GAME_NO_SOUND )
 GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  driver_device, 0, ROT270, "Sega", "Space Trek (upright)", GAME_NO_SOUND )
 GAME( 1980, spacetrkc,  spacetrk, spacetrk,  spacetrkc, driver_device, 0, ROT270, "Sega", "Space Trek (cocktail)", GAME_NO_SOUND )
