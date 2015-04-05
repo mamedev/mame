@@ -165,7 +165,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	}
 }
 
-
+// TODO: needs proper memory map
 WRITE16_MEMBER( l7a1045_sound_device::l7a1045_sound_w )
 {
 	m_stream->update(); // TODO
@@ -222,8 +222,8 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_select_w)
 
 WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 {
-//	if(m_audioregister == 0)
-//		printf("%04x %04x (%04x|%04x %04x)\n",offset,data,offset ^ 2,m_audioregister,m_audiochannel);
+	if(m_audioregister != 0)
+		printf("%04x %04x (%04x|%04x %04x)\n",offset,data,offset ^ 2,m_audioregister,m_audiochannel);
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
