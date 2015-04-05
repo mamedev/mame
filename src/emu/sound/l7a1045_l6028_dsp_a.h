@@ -15,7 +15,7 @@ struct l7a1045_voice
 	UINT32 start;
 	UINT32 pos;
 	UINT32 frac;
-	
+
 };
 
 // ======================> l7a1045_sound_device
@@ -55,10 +55,8 @@ private:
 
 	l7a1045_48bit_data m_audiodat[0x10][0x20];
 
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_select_w);
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_data_02_w);
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_data_04_w);
-	DECLARE_WRITE16_MEMBER(l7a1045_sound_data_06_w);
+	DECLARE_WRITE16_MEMBER(sound_select_w);
+	DECLARE_WRITE16_MEMBER(sound_data_w);
 
 	DECLARE_READ16_MEMBER(l7a1045_sound_port_0004_r);
 	DECLARE_READ16_MEMBER(l7a1045_sound_port_0006_r);
