@@ -93,6 +93,26 @@ function mainProject(_target, _subtarget)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
+		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/" .. _target ..".rc"
+		if not os.isfile(rcfile) then
+			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
+		end
+		
+		if os.isfile(rcfile) then
+			files {
+				rcfile,
+			}
+			dependency {
+				{ "$(OBJDIR)/".._target ..".res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
+			}
+		else
+			files {
+				MAME_DIR .. "src/osd/windows/mame.rc",
+			}
+			dependency {
+				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
+			}
+		end	
 	end
 
 	files {
