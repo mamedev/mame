@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Scandia Metric DOS floppy controller emulation
+    Luxor ABC Memory Card 55 10762-01 emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef __ABC_DOS__
-#define __ABC_DOS__
+#ifndef __ABC_MEMORY_CARD__
+#define __ABC_MEMORY_CARD__
 
 #include "emu.h"
 #include "abcbus.h"
@@ -23,14 +23,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abc_dos_device
+// ======================> abc_memory_card_t
 
-class abc_dos_device :  public device_t,
-						public device_abcbus_card_interface
+class abc_memory_card_t :  public device_t,
+						   public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	abc_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc_memory_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -44,12 +44,15 @@ protected:
 	virtual UINT8 abcbus_xmemfl(offs_t offset);
 
 private:
-	required_memory_region m_rom;
+	required_memory_region m_dos_rom;
+	required_memory_region m_iec_rom;
+	required_memory_region m_opt_rom;
+	required_memory_region m_prn_rom;
 };
 
 
 // device type definition
-extern const device_type ABC_DOS;
+extern const device_type ABC_MEMORY_CARD;
 
 
 

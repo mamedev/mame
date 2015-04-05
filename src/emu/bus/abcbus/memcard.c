@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor ABC DOS card emulation
+    Luxor ABC Memory Card 55 10762-01 emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -57,7 +57,7 @@ Notes:
 
 */
 
-#include "dos.h"
+#include "memcard.h"
 
 
 
@@ -65,7 +65,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ABC_DOS = &device_creator<abc_dos_device>;
+const device_type ABC_MEMORY_CARD = &device_creator<abc_memory_card_t>;
 
 
 //-------------------------------------------------
@@ -73,7 +73,7 @@ const device_type ABC_DOS = &device_creator<abc_dos_device>;
 //-------------------------------------------------
 
 ROM_START( abc_dos )
-	ROM_REGION( 0x2000, "dos", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000, "dos", 0 )
 	ROM_DEFAULT_BIOS("ufd20")
 	ROM_SYSTEM_BIOS( 0, "abcdos", "ABC-DOS" ) // Scandia Metric FD2
 	ROMX_LOAD( "abcdos.3d",   0x0000, 0x1000, CRC(2cb2192f) SHA1(a6b3a9587714f8db807c05bee6c71c0684363744), ROM_BIOS(1) )
@@ -81,10 +81,15 @@ ROM_START( abc_dos )
 	ROMX_LOAD( "dosdd80.3d",  0x0000, 0x1000, CRC(36db4c15) SHA1(ae462633f3a9c142bb029beb14749a84681377fa), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ufd20", "UFD-DOS v.20" ) // ABC 830
 	ROMX_LOAD( "ufddos20.3d", 0x0000, 0x1000, CRC(69b09c0b) SHA1(403997a06cf6495b8fa13dc74eff6a64ef7aa53e), ROM_BIOS(3) )
-	ROM_LOAD( "printer.4c",   0x1000, 0x400, NO_DUMP )
-	//ROM_LOAD( "spare.4a",   0x1400, 0x400, NO_DUMP )
-	ROM_LOAD( "9704.3c",      0x1800, 0x400, NO_DUMP )
-	//ROM_LOAD( "spare.3a",   0x1c00, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x400, "iec", 0 )
+	ROM_LOAD( "iec.4b", 0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x400, "opt", 0 )
+	ROM_LOAD( "spare.4a", 0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x400, "prn", 0 )
+	ROM_LOAD( "printer.3b", 0x000, 0x400, NO_DUMP )
 ROM_END
 
 
@@ -92,7 +97,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc_dos_device::device_rom_region() const
+const rom_entry *abc_memory_card_t::device_rom_region() const
 {
 	return ROM_NAME( abc_dos );
 }
@@ -104,13 +109,16 @@ const rom_entry *abc_dos_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  abc_dos_device - constructor
+//  abc_memory_card_t - constructor
 //-------------------------------------------------
 
-abc_dos_device::abc_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC_DOS, "ABC DOS", tag, owner, clock, "abc_dos", __FILE__),
-		device_abcbus_card_interface(mconfig, *this),
-		m_rom(*this, "dos")
+abc_memory_card_t::abc_memory_card_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, ABC_MEMORY_CARD, "ABC Memory Card", tag, owner, clock, "abc_mem", __FILE__),
+	device_abcbus_card_interface(mconfig, *this),
+	m_dos_rom(*this, "dos"),
+	m_iec_rom(*this, "iec"),
+	m_opt_rom(*this, "opt"),
+	m_prn_rom(*this, "prn")
 {
 }
 
@@ -119,7 +127,7 @@ abc_dos_device::abc_dos_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void abc_dos_device::device_start()
+void abc_memory_card_t::device_start()
 {
 }
 
@@ -133,13 +141,25 @@ void abc_dos_device::device_start()
 //  abcbus_xmemfl -
 //-------------------------------------------------
 
-UINT8 abc_dos_device::abcbus_xmemfl(offs_t offset)
+UINT8 abc_memory_card_t::abcbus_xmemfl(offs_t offset)
 {
 	UINT8 data = 0xff;
 
-	if (offset >= 0x6000 && offset < 0x8000)
+	if (offset >= 0x6000 && offset < 0x7000)
 	{
-		data = m_rom->base()[offset & 0x1fff];
+		data = m_dos_rom->base()[offset & 0xfff];
+	}
+	if (offset >= 0x7000 && offset < 0x7400)
+	{
+		data = m_iec_rom->base()[offset & 0x3ff];
+	}
+	if (offset >= 0x7400 && offset < 0x7800)
+	{
+		data = m_opt_rom->base()[offset & 0x3ff];
+	}
+	if (offset >= 0x7800 && offset < 0x7c00)
+	{
+		data = m_prn_rom->base()[offset & 0x3ff];
 	}
 
 	return data;

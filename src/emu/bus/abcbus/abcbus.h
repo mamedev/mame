@@ -124,34 +124,34 @@
 
 
 #define MCFG_ABCBUS_SLOT_IRQ_CALLBACK(_irq) \
-	downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB_##_irq);
+	downcast<abcbus_slot_t *>(device)->set_irq_callback(DEVCB_##_irq);
 
 #define MCFG_ABCBUS_SLOT_NMI_CALLBACK(_nmi) \
-	downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
+	downcast<abcbus_slot_t *>(device)->set_nmi_callback(DEVCB_##_nmi);
 
 #define MCFG_ABCBUS_SLOT_RDY_CALLBACK(_rdy) \
-	downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB_##_rdy);
+	downcast<abcbus_slot_t *>(device)->set_rdy_callback(DEVCB_##_rdy);
 
 #define MCFG_ABCBUS_SLOT_RESIN_CALLBACK(_resin) \
-	downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB_##_resin);
+	downcast<abcbus_slot_t *>(device)->set_resin_callback(DEVCB_##_resin);
 
 #define MCFG_ABCBUS_SLOT_PREN_CALLBACK(_pren) \
-	downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB_##_pren);
+	downcast<abcbus_slot_t *>(device)->set_pren_callback(DEVCB_##_pren);
 
 #define MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(_trrq) \
-	downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB_##_trrq);
+	downcast<abcbus_slot_t *>(device)->set_trrq_callback(DEVCB_##_trrq);
 
 #define MCFG_ABCBUS_SLOT_XINT2_CALLBACK(_xint2) \
-	downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB_##_xint2);
+	downcast<abcbus_slot_t *>(device)->set_xint2_callback(DEVCB_##_xint2);
 
 #define MCFG_ABCBUS_SLOT_XINT3_CALLBACK(_xint3) \
-	downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB_##_xint3);
+	downcast<abcbus_slot_t *>(device)->set_xint3_callback(DEVCB_##_xint3);
 
 #define MCFG_ABCBUS_SLOT_XINT4_CALLBACK(_xint4) \
-	downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB_##_xint4);
+	downcast<abcbus_slot_t *>(device)->set_xint4_callback(DEVCB_##_xint4);
 
 #define MCFG_ABCBUS_SLOT_XINT5_CALLBACK(_xint5) \
-	downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB_##_xint5);
+	downcast<abcbus_slot_t *>(device)->set_xint5_callback(DEVCB_##_xint5);
 
 
 
@@ -161,7 +161,7 @@
 
 // ======================> device_abcbus_card_interface
 
-class abcbus_slot_device;
+class abcbus_slot_t;
 
 class device_abcbus_card_interface : public device_slot_card_interface
 {
@@ -197,18 +197,18 @@ public:
 	virtual int abcbus_xcsb5() { return 1; };
 
 public:
-	abcbus_slot_device  *m_slot;
+	abcbus_slot_t  *m_slot;
 };
 
 
-// ======================> abcbus_slot_device
+// ======================> abcbus_slot_t
 
-class abcbus_slot_device : public device_t,
+class abcbus_slot_t : public device_t,
 							public device_slot_interface
 {
 public:
 	// construction/destruction
-	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abcbus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
 	template<class _nmi> void set_nmi_callback(_nmi nmi) { m_write_nmi.set_callback(nmi); }
@@ -309,11 +309,12 @@ protected:
 extern const device_type ABCBUS_SLOT;
 
 
+SLOT_INTERFACE_EXTERN( abc80_cards );
 SLOT_INTERFACE_EXTERN( abcbus_cards );
 SLOT_INTERFACE_EXTERN( abc1600bus_cards );
 
 
-typedef device_type_iterator<&device_creator<abcbus_slot_device>, abcbus_slot_device> abcbus_slot_device_iterator;
+typedef device_type_iterator<&device_creator<abcbus_slot_t>, abcbus_slot_t> abcbus_slot_device_iterator;
 
 
 

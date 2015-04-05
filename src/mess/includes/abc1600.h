@@ -93,10 +93,10 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
-	required_device<abcbus_slot_device> m_bus0i;
-	required_device<abcbus_slot_device> m_bus0x;
-	required_device<abcbus_slot_device> m_bus1;
-	required_device<abcbus_slot_device> m_bus2;
+	required_device<abcbus_slot_t> m_bus0i;
+	required_device<abcbus_slot_t> m_bus0x;
+	required_device<abcbus_slot_t> m_bus1;
+	required_device<abcbus_slot_t> m_bus2;
 
 	virtual void machine_start();
 	virtual void machine_reset();
