@@ -32,24 +32,6 @@ function maintargetosdoptions(_target)
 		"comctl32",
 		"comdlg32",
 	}
-
-	local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
-
-	if os.isfile(rcfile) then
-		files {
-			rcfile,
-		}
-		dependency {
-			{ "$(OBJDIR)/".._target ..".res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
-		}
-	else
-		files {
-			MAME_DIR .. "src/osd/windows/mame.rc",
-		}
-		dependency {
-			{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
-		}
-	end
 end
 
 
