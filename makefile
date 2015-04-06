@@ -66,6 +66,11 @@
 # OVERRIDE_CXX = c++
 # OVERRIDE_LD = ld
 
+# DEPRECATED = 1
+# LTO = 1
+# SSE2 = 1
+# OPENMP = 1
+# CPP11 = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -450,6 +455,26 @@ endif
 
 ifdef LDOPTS
 PARAMS += --LDOPTS='$(LDOPTS)'
+endif
+
+ifdef LTO
+PARAMS += --LTO='$(LTO)'
+endif
+
+ifdef DEPRECATED
+PARAMS += --DEPRECATED='$(DEPRECATED)'
+endif
+
+ifdef SSE2
+PARAMS += --SSE2='$(SSE2)'
+endif
+
+ifdef OPENMP
+PARAMS += --OPENMP='$(OPENMP)'
+endif
+
+ifdef CPP11
+PARAMS += --CPP11='$(CPP11)'
 endif
 
 #-------------------------------------------------

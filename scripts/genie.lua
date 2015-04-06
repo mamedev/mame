@@ -199,6 +199,51 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "DEPRECATED",
+	description = "Generate deprecation warnings during compilation.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
+newoption {
+	trigger = "LTO",
+	description = "Clang link time optimization.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
+newoption {
+	trigger = "SSE2",
+	description = "SSE2 optimized code and SSE2 code generation.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
+newoption {
+	trigger = "OPENMP",
+	description = "OpenMP optimized code.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
+newoption {
+	trigger = "CPP11",
+	description = "Compile c++ code as C++11.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"
 end
@@ -530,18 +575,24 @@ end
 		"-std=gnu89",
 
 	}
+	
+if _OPTIONS["CPP11"]=="1" then
+	buildoptions_cpp {
+		"-x c++",
+		"-std=gnu++11",
+	}
+else
 	--we compile C++ code to C++98 standard with GNU extensions
 	buildoptions_cpp {
 		"-x c++",
 		"-std=gnu++98",
 	}
+end
 
 	buildoptions_objc {
 		"-x objective-c++",
 	}
---ifdef CPP11
---CPPONLYFLAGS += -x c++ -std=gnu++11
---else
+
 
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
 	if not ("pnacl" == _OPTIONS["gcc"]) then
@@ -572,11 +623,11 @@ if _OPTIONS["VERBOSE"] then
 end
 
 -- only show deprecation warnings when enabled
---ifndef DEPRECATED
+if _OPTIONS["DEPRECATED"]=="1" then
 	buildoptions {
 		"-Wno-deprecated-declarations"
 	}
---endif
+end
 
 -- add profiling information for the compiler
 if _OPTIONS["PROFILE"] then
@@ -608,7 +659,6 @@ if _OPTIONS["NOWERROR"]==nil then
 end
 
 -- if we are optimizing, include optimization options
---ifneq ($(),0)
 if _OPTIONS["OPTIMIZE"] then
 	buildoptions {
 		"-fno-strict-aliasing"
@@ -618,20 +668,31 @@ if _OPTIONS["OPTIMIZE"] then
 			_OPTIONS["ARCHOPTS"]
 		}
 	end
---ifdef LTO
---CCOMFLAGS += -flto
---endif
+	if _OPTIONS["LTO"]=="1" then
+		buildoptions {
+			"-flto",
+		}
+		linkoptions {
+			"-flto",
+		}
+	end
 end
 
---ifdef SSE2
---CCOMFLAGS += -msse2
---endif
+if _OPTIONS["SSE2"]=="1" then
+	buildoptions {
+		"-msse2",
+	}
+end
 
---ifdef OPENMP
---CCOMFLAGS += -fopenmp
---else
---CCOMFLAGS += -Wno-unknown-pragmas
---endif
+if _OPTIONS["OPENMP"]=="1" then
+	buildoptions {
+		"-fopenmp",
+	}
+else
+	buildoptions {
+		"-Wno-unknown-pragmas",
+	}
+end
 
 if _OPTIONS["LDOPTS"] then
 		linkoptions {
@@ -651,9 +712,8 @@ if _OPTIONS["MAP"] then
 
 	end
 end
-	buildoptions {
-		"-Wno-unknown-pragmas",
-	}
+
+
 -- add a basic set of warnings
 	buildoptions {
 		"-Wall",
