@@ -376,6 +376,11 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "win64_" .. _ACTION .. "-clang/bin")
 		objdir (_buildDir .. "win64_" .. _ACTION .. "-clang/obj")
 
+	configuration { "vs*-clang" }
+		buildoptions {
+			"-Qunused-arguments",
+		} 
+		
 	configuration { "mingw*" }
 		defines { "WIN32" }
 

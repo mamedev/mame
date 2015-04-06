@@ -657,6 +657,9 @@ vs2013_intel: generate
 vs2013_xp: generate
 	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-xp vs2013
 
+vs2013_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) --vs=vs2013-clang vs2013
+
 vs2015: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2015
 
