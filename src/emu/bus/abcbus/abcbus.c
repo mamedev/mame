@@ -89,10 +89,11 @@ void abcbus_slot_t::device_start()
 #include "lux21056.h"
 #include "lux4105.h"
 #include "memcard.h"
-#include "uni800.h"
+#include "ram.h"
 #include "sio.h"
 #include "slutprov.h"
 #include "turbo.h"
+#include "uni800.h"
 
 
 
@@ -104,6 +105,7 @@ SLOT_INTERFACE_START( abc80_cards )
 	SLOT_INTERFACE("fd2", ABC_FD2)
 	SLOT_INTERFACE("memcard", ABC_MEMORY_CARD)
 	SLOT_INTERFACE("abcexp", ABC_EXPANSION_UNIT)
+	SLOT_INTERFACE("16k", ABC80_16KB_RAM_CARD)
 	SLOT_INTERFACE("slow", LUXOR_55_10828)
 SLOT_INTERFACE_END
 

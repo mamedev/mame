@@ -61,7 +61,7 @@ static MACHINE_CONFIG_FRAGMENT( abc_expansion_unit )
 	MCFG_ABCBUS_SLOT_ADD("io3", abc80_cards, NULL)
 	MCFG_ABCBUS_SLOT_ADD("io4", abc80_cards, NULL)
 	MCFG_ABCBUS_SLOT_ADD("mem1", abc80_cards, "memcard")
-	MCFG_ABCBUS_SLOT_ADD("mem2", abc80_cards, NULL)
+	MCFG_ABCBUS_SLOT_ADD("mem2", abc80_cards, "16k")
 	MCFG_ABCBUS_SLOT_ADD("mem3", abc80_cards, NULL)
 MACHINE_CONFIG_END
 

@@ -69,10 +69,11 @@ if (BUSES["ABCBUS"]~=null) then
 		MAME_DIR .. "src/emu/bus/abcbus/lux21056.c",
 		MAME_DIR .. "src/emu/bus/abcbus/lux4105.c",
 		MAME_DIR .. "src/emu/bus/abcbus/memcard.c",
-		MAME_DIR .. "src/emu/bus/abcbus/uni800.c",
+		MAME_DIR .. "src/emu/bus/abcbus/ram.c",
 		MAME_DIR .. "src/emu/bus/abcbus/sio.c",
 		MAME_DIR .. "src/emu/bus/abcbus/slutprov.c",
 		MAME_DIR .. "src/emu/bus/abcbus/turbo.c",
+		MAME_DIR .. "src/emu/bus/abcbus/uni800.c",
 	}
 end
 
