@@ -633,7 +633,7 @@ if _OPTIONS["VERBOSE"] then
 end
 
 -- only show deprecation warnings when enabled
-if _OPTIONS["DEPRECATED"]=="1" then
+if _OPTIONS["DEPRECATED"]~="1" then
 	buildoptions {
 		"-Wno-deprecated-declarations"
 	}
