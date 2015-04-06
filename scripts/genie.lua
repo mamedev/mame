@@ -402,12 +402,16 @@ configuration { "vs*" }
 configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
+		"MAME_PROFILER",
 	}
-	if _OPTIONS["PROFILER"]=="1" then
-		defines{
-			"MAME_PROFILER", -- define MAME_PROFILER if we are a profiling build
-		}
-	end
+
+configuration { }	
+
+if _OPTIONS["PROFILER"]=="1" then
+	defines{
+		"MAME_PROFILER", -- define MAME_PROFILER if we are a profiling build
+	}
+end
 
 configuration { "Release" }
 	defines {
