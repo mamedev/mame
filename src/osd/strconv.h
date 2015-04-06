@@ -42,10 +42,6 @@ char *utf8_from_wstring(const WCHAR *s);
 #define utf8_from_tstring   utf8_from_astring
 #endif // UNICODE
 
-#if defined(SDLMAME_WIN32)
-#define _tcsncpy wcsncpy
-#endif
-
 #endif //SDLMAME_WIN32
 
 
