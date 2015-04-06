@@ -63,10 +63,10 @@ protected:
 	void attribute_reg_write(UINT8 index, UINT8 data);
 	void gc_reg_write(UINT8 index,UINT8 data);
 	virtual UINT16 offset();
+	inline UINT8 vga_latch_write(int offs, UINT8 data);
 private:
 	inline UINT8 rotate_right(UINT8 val);
 	inline UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask);
-	inline UINT8 vga_latch_write(int offs, UINT8 data);
 
 protected:
 	struct
@@ -645,6 +645,8 @@ protected:
 	UINT8 gc_mode_ext;
 	UINT8 gc_bank_0;
 	UINT8 gc_bank_1;
+	UINT8 gc_blt_status;
+	bool gc_locked;
 private:
 	void cirrus_define_video_mode();
 	UINT8 cirrus_seq_reg_read(UINT8 index);
