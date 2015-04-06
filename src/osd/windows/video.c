@@ -228,7 +228,7 @@ BOOL CALLBACK win_monitor_info::monitor_enum_callback(HMONITOR handle, HDC dc, L
 	float aspect = (float)(info.rcMonitor.right - info.rcMonitor.left) / (float)(info.rcMonitor.bottom - info.rcMonitor.top);
 
 	// allocate a new monitor info
-	char *temp = utf8_from_wstring(info.szDevice);
+	char *temp = utf8_from_tstring(info.szDevice);
 	// copy in the data
 	monitor = global_alloc(win_monitor_info(handle, temp, aspect));
 	osd_free(temp);
