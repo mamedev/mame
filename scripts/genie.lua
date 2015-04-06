@@ -1,5 +1,4 @@
 premake.check_paths = true
-premake.make.linkoptions_after = true
 premake.make.override = { "TARGET" }
 MAME_DIR = (path.getabsolute("..") .. "/")
 local MAME_BUILD_DIR = (MAME_DIR .. "build/")
