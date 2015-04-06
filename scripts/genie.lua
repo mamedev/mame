@@ -244,6 +244,15 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "FASTDEBUG",
+	description = "Fast DEBUG.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"
 end
@@ -449,6 +458,11 @@ configuration { "Debug" }
 		"MAME_DEBUG",
 		"MAME_PROFILER",
 	}
+if _OPTIONS["FASTDEBUG"]=="1" then
+	defines {
+		"MAME_DEBUG_FAST"
+	}
+end
 
 configuration { }	
 
@@ -557,10 +571,6 @@ end
 -- define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
 --ifneq ($(BUILD_JPEGLIB),1)
 --DEFS += -DUSE_SYSTEM_JPEGLIB
---endif
-
---ifdef FASTDEBUG
---DEFS += -DMAME_DEBUG_FAST
 --endif
 
 	--To support casting in Lua 5.3

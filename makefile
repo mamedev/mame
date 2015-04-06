@@ -71,6 +71,7 @@
 # SSE2 = 1
 # OPENMP = 1
 # CPP11 = 1
+# FASTDEBUG = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -475,6 +476,10 @@ endif
 
 ifdef CPP11
 PARAMS += --CPP11='$(CPP11)'
+endif
+
+ifdef FASTDEBUG
+PARAMS += --FASTDEBUG='$(FASTDEBUG)'
 endif
 
 #-------------------------------------------------
