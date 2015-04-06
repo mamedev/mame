@@ -60,6 +60,8 @@ public:
 	DECLARE_READ8_MEMBER(intf_r);
 	DECLARE_READ8_MEMBER(acard_r);
 
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
+	
 private:
 	void adpcm_stop(UINT8 irq_flag);
 	void adpcm_play();
