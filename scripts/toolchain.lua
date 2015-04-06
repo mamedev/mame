@@ -393,6 +393,7 @@ function toolchain(_buildDir, _subDir)
 		linkoptions {
 			"-Qunused-arguments",
 			"-Wno-error=unused-command-line-argument-hard-error-in-future",
+			"-Wl,--allow-multiple-definition",
 		}
 
 	configuration { "x32", "mingw-clang" }
