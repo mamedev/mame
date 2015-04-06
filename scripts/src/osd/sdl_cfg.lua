@@ -99,11 +99,12 @@ if BASE_TARGETOS=="unix" then
 end
 
 if _OPTIONS["targetos"]=="windows" then
-	defines {
-		"UNICODE",
-		"_UNICODE",
-		"main=utf8_main",
-	}
+	configuration { "mingw*-gcc or vs*" }
+		defines {
+			"UNICODE",
+			"_UNICODE",
+			"main=utf8_main",
+		}
 
 	configuration { "Debug" }
 		defines {

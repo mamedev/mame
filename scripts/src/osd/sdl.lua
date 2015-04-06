@@ -53,7 +53,7 @@ function maintargetosdoptions(_target)
 			}
 		end
 
-		configuration { "mingw*" }
+		configuration { "mingw*-gcc" }
 			linkoptions{
 				"-municode",
 			}

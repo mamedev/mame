@@ -4,7 +4,7 @@ dofile("modules.lua")
 function maintargetosdoptions(_target)
 	osdmodulestargetconf()
 
-	configuration { "mingw*" }
+	configuration { "mingw*-gcc" }
 		linkoptions {
 			"-municode",
 		}

@@ -1,10 +1,14 @@
 defines {
-	"UNICODE",
-	"_UNICODE",
 	"OSD_WINDOWS",
-	"main=utf8_main",
 	"_WIN32_WINNT=0x0501",
 }
+
+configuration { "mingw*-gcc or vs*" }
+	defines {
+		"UNICODE",
+		"_UNICODE",
+		"main=utf8_main",
+	}
 
 configuration { "Debug" }
 	defines {
