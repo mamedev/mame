@@ -296,10 +296,10 @@ else
 end
 
 if (AWK~='') then
-	postcompiletasks {
-		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
-		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
-	}
+--	postcompiletasks {
+--		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
+--		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
+--	}
 end
 
 msgcompile ("Compiling $(subst ../,,$<)...")
