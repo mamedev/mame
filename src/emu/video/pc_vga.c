@@ -276,6 +276,7 @@ void cirrus_vga_device::device_start()
 	vga.svga_intf.seq_regcount = 0x1f;
 	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.svga_intf.vram_size = 0x200000;
+	gc_locked = true;
 
 	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
@@ -5671,20 +5672,28 @@ UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
 
 	res = 0xff;
 
-	if(index <= 0x04)
-		res = vga.sequencer.data[index];
-	else
+	switch(index)
 	{
-		switch(index)
-		{
-			case 0x06:
-			case 0x07:
-			case 0x09:
-			case 0x0a:
-				//printf("%02x\n",index);
-				res = vga.sequencer.data[index];
-				break;
-		}
+		case 0x02:
+			if(gc_mode_ext & 0x08)
+				res = vga.sequencer.map_mask & 0xff;
+			else
+				res = vga.sequencer.map_mask & 0x0f;
+			break;
+		case 0x06:
+			if(gc_locked)
+				return 0x0f;
+			else
+				return 0x00;
+			break;
+		case 0x07:
+		case 0x09:
+		case 0x0a:
+			//printf("%02x\n",index);
+			res = vga.sequencer.data[index];
+			break;
+		default:
+			res = vga.sequencer.data[index];
 	}
 
 	return res;
@@ -5692,23 +5701,33 @@ UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
 
 void cirrus_vga_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 {
-	if(index <= 0x04)
+	switch(index)
 	{
-		vga.sequencer.data[vga.sequencer.index] = data;
-		seq_reg_write(vga.sequencer.index,data);
-	}
-	else
-	{
-		switch(index)
-		{
-			case 0x06:
-			case 0x07:
-			case 0x09:
-			case 0x0a:
-				//printf("%02x %02x\n",index,data);
-				vga.sequencer.data[vga.sequencer.index] = data;
-				break;
-		}
+		case 0x02:
+			if(gc_mode_ext & 0x08)
+				vga.sequencer.map_mask = data & 0xff;
+			else
+				vga.sequencer.map_mask = data & 0x0f;
+			break;
+		case 0x06:
+			// Note: extensions are always enabled on the GD5429
+			if((data & 0x17) == 0x12)  // bits 3,5,6,7 ignored
+				gc_locked = false;
+			else
+				gc_locked = true;
+		case 0x09:
+		case 0x0a:
+			//printf("%02x %02x\n",index,data);
+			vga.sequencer.data[vga.sequencer.index] = data;
+			break;
+		case 0x07:
+			if((data & 0xf0) != 0)
+				popmessage("1MB framebuffer window enabled at %iMB",data >> 4);
+			vga.sequencer.data[vga.sequencer.index] = data;
+			break;
+		default:
+			vga.sequencer.data[vga.sequencer.index] = data;
+			seq_reg_write(vga.sequencer.index,data);
 	}
 }
 
@@ -5719,8 +5738,16 @@ UINT8 cirrus_vga_device::cirrus_gc_reg_read(UINT8 index)
 	switch(index)
 	{
 	case 0x00:
+		if(gc_mode_ext & 0x02)
+			res = vga.gc.set_reset & 0xff;
+		else
+			res = vga.gc.set_reset & 0x0f;
 		break;
 	case 0x01:
+		if(gc_mode_ext & 0x02)
+			res = vga.gc.enable_set_reset & 0xff;
+		else
+			res = vga.gc.enable_set_reset & 0x0f;
 		break;
 	case 0x09:  // Offset register 0
 		res = gc_bank_0;
@@ -5742,6 +5769,9 @@ UINT8 cirrus_vga_device::cirrus_gc_reg_read(UINT8 index)
 	case 0x11:  // Background Colour Byte 1
 		break;
 		// later registers are related to the BitBLT hardware
+	case 0x31:  // BitBLT Start / Status
+		res = gc_blt_status;
+		break;
 	default:
 		res = gc_reg_read(index);
 	}
@@ -5754,12 +5784,17 @@ void cirrus_vga_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 	logerror("CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
 	{
-	case 0x00:
-	case 0x01:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
+	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
 		if(gc_mode_ext & 0x02)
-			gc_reg_write(index,data);
+			vga.gc.set_reset = data & 0xff;
 		else
-			gc_reg_write(index,data & 0x0f);
+			vga.gc.set_reset = data & 0x0f;
+		break;
+	case 0x01:
+		if(gc_mode_ext & 0x02)
+			vga.gc.enable_set_reset = data & 0xff;
+		else
+			vga.gc.enable_set_reset = data & 0x0f;
 		break;
 	case 0x09:  // Offset register 0
 		gc_bank_0 = data;
@@ -5783,6 +5818,11 @@ void cirrus_vga_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 	case 0x11:  // Background Colour Byte 1
 		break;
 		// later registers are related to the BitBLT hardware
+	case 0x31:  // BitBLT Start / Status
+		gc_blt_status = data & 0xf2;
+		if(data != 0)
+			popmessage("BitBLT start %02x",data);
+		break;
 	default:
 		gc_reg_write(index,data);
 	}
@@ -5938,28 +5978,181 @@ void cirrus_vga_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
 
 READ8_MEMBER(cirrus_vga_device::mem_r)
 {
+	UINT32 addr;
+	UINT8 bank;
+
+	if(gc_locked)
+		return vga_device::mem_r(space,offset,mem_mask);
+
+	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
+		bank = gc_bank_1;
+	else
+		bank = gc_bank_0;
+
+	if(gc_mode_ext & 0x20)  // 16kB bank granularity
+		addr = bank * 0x4000;
+	else  // 4kB bank granularity
+		addr = bank * 0x1000;
+	// Win 3.1 GD5426/8 drivers use this in 16-colour mode also
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
-		offset &= 0xffff;
-		if(gc_mode_ext & 0x20)
-			return vga.memory[(offset+gc_bank_0*0x4000) % vga.svga_intf.vram_size];
+		if(gc_mode_ext & 0x01)
+			offset &= 0x7fff;
 		else
-			return vga.memory[(offset+gc_bank_0*0x1000) % vga.svga_intf.vram_size];
+			offset &= 0xffff;
+		return vga.memory[(offset+addr) % vga.svga_intf.vram_size];
 	}
 
-	return vga_device::mem_r(space,offset,mem_mask);
+	switch(vga.gc.memory_map_sel & 0x03)
+	{
+		case 0: break;
+		case 1: if(gc_mode_ext & 0x01) offset &= 0x7fff; else offset &= 0x0ffff; break;
+		case 2: offset -= 0x10000; offset &= 0x07fff; break;
+		case 3: offset -= 0x18000; offset &= 0x07fff; break;
+	}
+
+	if(vga.sequencer.data[4] & 4)
+	{
+		int data;
+		if (!space.debugger_access())
+		{
+			vga.gc.latch[0]=vga.memory[(offset+addr)];
+			vga.gc.latch[1]=vga.memory[(offset+addr)+0x10000];
+			vga.gc.latch[2]=vga.memory[(offset+addr)+0x20000];
+			vga.gc.latch[3]=vga.memory[(offset+addr)+0x30000];
+		}
+
+		if (vga.gc.read_mode)
+		{
+			UINT8 byte,layer;
+			UINT8 fill_latch;
+			data=0;
+
+			for(byte=0;byte<8;byte++)
+			{
+				fill_latch = 0;
+				for(layer=0;layer<4;layer++)
+				{
+					if(vga.gc.latch[layer] & 1 << byte)
+						fill_latch |= 1 << layer;
+				}
+				fill_latch &= vga.gc.color_dont_care;
+				if(fill_latch == vga.gc.color_compare)
+					data |= 1 << byte;
+			}
+		}
+		else
+			data=vga.gc.latch[vga.gc.read_map_sel];
+
+		return data;
+	}
+	else
+	{
+		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
+		UINT8 i,data;
+//		UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+
+		data = 0;
+		//printf("%08x\n",offset);
+
+		if(gc_mode_ext & 0x02)
+		{
+			for(i=0;i<8;i++)
+			{
+				if(vga.sequencer.map_mask & 1 << i)
+					data |= vga.memory[((offset+addr))+i*0x10000];
+			}
+		}
+		else
+		{
+			for(i=0;i<4;i++)
+			{
+				if(vga.sequencer.map_mask & 1 << i)
+					data |= vga.memory[((offset+addr))+i*0x10000];
+			}
+		}
+
+		return data;
+	}
 }
 
 WRITE8_MEMBER(cirrus_vga_device::mem_w)
 {
+	UINT32 addr;
+	UINT8 bank;
+
+	if(gc_locked)
+	{
+		vga_device::mem_w(space,offset,data,mem_mask);
+		return;
+	}
+
+	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
+		bank = gc_bank_1;
+	else
+		bank = gc_bank_0;
+
+	if(gc_mode_ext & 0x20)  // 16kB bank granularity
+		addr = bank * 0x4000;
+	else  // 4kB bank granularity
+		addr = bank * 0x1000;
+
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
-		offset &= 0xffff;
-		if(gc_mode_ext & 0x20)
-			vga.memory[(offset+gc_bank_0*0x4000) % vga.svga_intf.vram_size] = data;
+		if(gc_mode_ext & 0x01)
+			offset &= 0x7fff;
 		else
-			vga.memory[(offset+gc_bank_0*0x1000) % vga.svga_intf.vram_size] = data;
+			offset &= 0xffff;
+		vga.memory[(offset+addr) % vga.svga_intf.vram_size] = data;
 	}
 	else
-		vga_device::mem_w(space,offset,data,mem_mask);
+	{
+		//Inside each case must prevent writes to non-mapped VGA memory regions, not only mask the offset.
+		switch(vga.gc.memory_map_sel & 0x03)
+		{
+			case 0: break;
+			case 1:
+				if(offset & 0x10000)
+					return;
+
+				if(gc_mode_ext & 0x01)
+					offset &= 0x7fff;
+				else
+					offset &= 0xffff;
+				break;
+			case 2:
+				if((offset & 0x18000) != 0x10000)
+					return;
+
+				offset &= 0x07fff;
+				break;
+			case 3:
+				if((offset & 0x18000) != 0x18000)
+					return;
+
+				offset &= 0x07fff;
+				break;
+		}
+
+		{
+		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
+			UINT8 i;
+//			UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+
+			for(i=0;i<4;i++)
+			{
+				if(vga.sequencer.map_mask & 1 << i)
+				{
+					if(gc_mode_ext & 0x02)
+					{
+						vga.memory[((offset+addr) << 1)+i*0x10000] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+						vga.memory[((offset+addr) << 1)+i*0x10000+1] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+					}
+					else
+						vga.memory[((offset+addr))+i*0x10000] = (vga.sequencer.data[4] & 4) ? vga_latch_write(i,data) : data;
+				}
+			}
+			return;
+		}
+	}
 }
