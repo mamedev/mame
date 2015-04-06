@@ -31,7 +31,7 @@ extern int utf8_main(int argc, char *argv[]);
 #undef main
 #undef wmain
 #endif
-
+#ifdef UNICODE
 extern "C" int _tmain(int argc, TCHAR **argv)
 {
 	int i, rc;
@@ -58,3 +58,4 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 
 	return rc;
 }
+#endif
