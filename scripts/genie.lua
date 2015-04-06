@@ -477,6 +477,7 @@ else
 			linkoptions {
 				"-arch i386",
 			}
+		configuration { }
 	end
 end
 
