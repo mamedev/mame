@@ -86,7 +86,7 @@ function mainProject(_target, _subtarget)
 		linkoptions {
 			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _target .. "-Info.plist"
 		}
-		custombuildtask {	
+		custombuildtask {
 			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _target .. "-Info.plist",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _target .. "-Info.plist" .. "...",    "python $(1)  -p -b " .. _target .. " $(<) > $(@)" }},
 		}
 		dependency {

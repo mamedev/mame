@@ -76,7 +76,7 @@ function maintargetosdoptions(_target)
 			"bsd",
 		}
 	end
-	
+
 	configuration { "mingw*" or "vs*" }
 		targetprefix "sdl"
 
@@ -366,11 +366,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	removeflags {
-		"SingleOutputDir",	
+		"SingleOutputDir",
 	}
 
 	dofile("sdl_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
@@ -428,7 +428,7 @@ if _OPTIONS["with-tools"] then
 			MAME_DIR .. "src/osd",
 			MAME_DIR .. "src/lib/util",
 		}
-		
+
 		targetdir(MAME_DIR)
 
 		links {
@@ -440,8 +440,8 @@ if _OPTIONS["with-tools"] then
 			MAME_DIR .. "src/osd/sdl/testkeys.c",
 		}
 
-		if _OPTIONS["targetos"]=="windows" then
-			if _OPTIONS["SDL_LIBVER"]=="sdl2" then
+		if _OPTIONS["targetos"] == "windows" then
+			if _OPTIONS["SDL_LIBVER"] == "sdl2" then
 				links {
 					"SDL2.dll",
 				}
@@ -456,10 +456,49 @@ if _OPTIONS["with-tools"] then
 			files {
 				MAME_DIR .. "src/osd/sdl/main.c",
 			}
-		elseif _OPTIONS["targetos"]=="macosx" and _OPTIONS["SDL_LIBVER"]=="sdl" then
+		elseif _OPTIONS["targetos"] == "macosx" and _OPTIONS["SDL_LIBVER"] == "sdl" then
 			-- SDLMain_tmpl isn't necessary for SDL2
 			files {
 				MAME_DIR .. "src/osd/sdl/SDLMain_tmpl.m",
 			}
 		end
+end
+
+
+--------------------------------------------------
+-- aueffectutil
+--------------------------------------------------
+
+if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
+	project("aueffectutil")
+		uuid ("3db8316d-fad7-4f5b-b46a-99373c91550e")
+		kind "ConsoleApp"
+
+		options {
+			"ForceCPP",
+		}
+
+		dofile("sdl_cfg.lua")
+
+		targetdir(MAME_DIR)
+
+		linkoptions {
+			"-sectcreate __TEXT __info_plist " .. MAME_DIR .. "src/osd/sdl/aueffectutil-Info.plist",
+		}
+
+		dependency {
+			{ "aueffectutil",  MAME_DIR .. "src/osd/sdl/aueffectutil-Info.plist", true  },
+		}
+
+		links {
+			"AudioUnit.framework",
+			"AudioToolbox.framework",
+			"CoreAudio.framework",
+			"CoreAudioKit.framework",
+			"CoreServices.framework",
+		}
+
+		files {
+			MAME_DIR .. "src/osd/sdl/aueffectutil.m",
+		}
 end
