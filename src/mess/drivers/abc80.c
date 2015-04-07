@@ -354,9 +354,10 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 
 		m_tape_in_latch = 1;
 
-		m_pio->port_b_write(m_tape_in_latch << 7);
+		m_pio->pb7_w(m_tape_in_latch);
 	}
 };
+
 
 //-------------------------------------------------
 //  Z80 Daisy Chain
