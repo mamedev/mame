@@ -84,8 +84,43 @@ private:
 			*d = (*s * m_scale) >> 7;
 	}
 
-	int create_graph(osd_options const &options);
-	int add_effect(char const *name);
+	bool create_graph(osd_options const &options);
+	bool add_output();
+	bool add_converter();
+	bool add_effect(char const *name);
+
+	OSStatus add_node(OSType type, OSType subtype, OSType manufacturer)
+	{
+		AudioComponentDescription const desc = { type, subtype, manufacturer, 0, 0 };
+		return AUGraphAddNode(m_graph, &desc, &m_node_details[m_node_count].m_node);
+	}
+
+	OSStatus get_next_node_info()
+	{
+		return AUGraphNodeInfo(
+				m_graph,
+				m_node_details[m_node_count].m_node,
+				NULL,
+				&m_node_details[m_node_count].m_unit);
+	}
+
+	OSStatus connect_next_node()
+	{
+		return AUGraphConnectNodeInput(
+				m_graph,
+				m_node_details[m_node_count].m_node,
+				0,
+				m_node_details[m_node_count - 1].m_node,
+				0);
+	}
+
+	bool extract_effect_info(
+			char const          *name,
+			CFPropertyListRef   properties,
+			OSType              &type,
+			OSType              &subtype,
+			OSType              &manufacturer,
+			CFPropertyListRef   &class_info) const;
 	CFPropertyListRef load_property_list(char const *name) const;
 
 	OSStatus render(
@@ -129,7 +164,7 @@ int sound_coreaudio::init(const osd_options &options)
 		return 0;
 
 	// Create the output graph
-	if (0 != create_graph(options))
+	if (!create_graph(options))
 		return -1;
 
 	// Set audio stream format for two-channel native-endian 16-bit packed linear PCM
@@ -211,7 +246,7 @@ void sound_coreaudio::exit()
 		AUGraphStop(m_graph);
 		AUGraphUninitialize(m_graph);
 		DisposeAUGraph(m_graph);
-		m_graph = 0;
+		m_graph = NULL;
 		m_node_count = 0;
 	}
 	if (m_buffer)
@@ -259,99 +294,33 @@ void sound_coreaudio::set_mastervolume(int attenuation)
 }
 
 
-int sound_coreaudio::create_graph(osd_options const &options)
+bool sound_coreaudio::create_graph(osd_options const &options)
 {
 	OSStatus err;
-	AudioComponentDescription node_desc;
 
-	err = NewAUGraph(&m_graph);
-	if (noErr != err)
+	if (noErr != (err = NewAUGraph(&m_graph)))
 	{
 		osd_printf_error("Failed to create AudioUnit graph (%ld)\n", (long)err);
 		goto return_error;
 	}
 
-	err = AUGraphOpen(m_graph);
-	if (noErr != err)
+	if (noErr != (err = AUGraphOpen(m_graph)))
 	{
 		osd_printf_error("Failed to open AudioUnit graph (%ld)\n", (long)err);
 		goto dispose_graph_and_return_error;
 	}
 
-	node_desc.componentType         = kAudioUnitType_Output;
-	node_desc.componentSubType      = kAudioUnitSubType_DefaultOutput;
-	node_desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-	node_desc.componentFlags        = 0;
-	node_desc.componentFlagsMask    = 0;
-	err = AUGraphAddNode(m_graph, &node_desc, &m_node_details[m_node_count].m_node);
-	if (noErr != err)
-	{
-		osd_printf_error(
-				"Failed to add default sound output to AudioUnit graph (%ld)\n",
-				(long)err);
+	if (!add_output())
 		goto close_graph_and_return_error;
-	}
-	err = AUGraphNodeInfo(
-			m_graph,
-			m_node_details[m_node_count].m_node,
-			NULL,
-			&m_node_details[m_node_count].m_unit);
-	if (noErr != err)
-	{
-		osd_printf_error(
-				"Failed to obtain AudioUnit for default sound output (%ld)\n",
-				(long)err);
-	}
-	m_node_count++;
 
 	for (unsigned i = EFFECT_COUNT_MAX; 0U < i; i--)
 	{
-		if (0 != add_effect(options.audio_effect(i - 1)))
+		if (!add_effect(options.audio_effect(i - 1)))
 			goto close_graph_and_return_error;
 	}
 
-	if (1U < m_node_count)
-	{
-		node_desc.componentType         = kAudioUnitType_FormatConverter;
-		node_desc.componentSubType      = kAudioUnitSubType_AUConverter;
-		node_desc.componentManufacturer = kAudioUnitManufacturer_Apple;
-		node_desc.componentFlags        = 0;
-		node_desc.componentFlagsMask    = 0;
-		err = AUGraphAddNode(m_graph, &node_desc, &m_node_details[m_node_count].m_node);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to add sound format converter to AudioUnit graph (%ld)\n",
-					(long)err);
-			goto close_graph_and_return_error;
-		}
-		err = AUGraphNodeInfo(
-				m_graph,
-				m_node_details[m_node_count].m_node,
-				NULL,
-				&m_node_details[m_node_count].m_unit);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to obtain AudioUnit for sound format converter (%ld)\n",
-					(long)err);
-			goto close_graph_and_return_error;
-		}
-		err = AUGraphConnectNodeInput(
-				m_graph,
-				m_node_details[m_node_count].m_node,
-				0,
-				m_node_details[m_node_count - 1].m_node,
-				0);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to connect sound format converter in AudioUnit graph (%ld)\n",
-					(long)err);
-			goto close_graph_and_return_error;
-		}
-		m_node_count++;
-	}
+	if ((1U < m_node_count) && !add_converter())
+		goto close_graph_and_return_error;
 
 	{
 		AURenderCallbackStruct const renderer = { sound_coreaudio::render_callback, this };
@@ -360,13 +329,13 @@ int sound_coreaudio::create_graph(osd_options const &options)
 				m_node_details[m_node_count - 1].m_node,
 				0,
 				&renderer);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to set audio render callback for AudioUnit graph (%ld)\n",
-					(long)err);
-			goto close_graph_and_return_error;
-		}
+	}
+	if (noErr != err)
+	{
+		osd_printf_error(
+				"Failed to set audio render callback for AudioUnit graph (%ld)\n",
+				(long)err);
+		goto close_graph_and_return_error;
 	}
 
 	err = AUGraphUpdate(m_graph, NULL);
@@ -378,7 +347,7 @@ int sound_coreaudio::create_graph(osd_options const &options)
 		goto close_graph_and_return_error;
 	}
 
-	return 0;
+	return true;
 
 close_graph_and_return_error:
 	AUGraphClose(m_graph);
@@ -387,107 +356,105 @@ dispose_graph_and_return_error:
 return_error:
 	m_graph = NULL;
 	m_node_count = 0;
-	return -1;
+	return false;
 }
 
 
-int sound_coreaudio::add_effect(char const *name)
+bool sound_coreaudio::add_output()
+{
+	OSStatus err;
+	err = add_node(
+			kAudioUnitType_Output,
+			kAudioUnitSubType_DefaultOutput,
+			kAudioUnitManufacturer_Apple);
+	if (noErr != err)
+	{
+		osd_printf_error(
+				"Failed to add default sound output to AudioUnit graph (%ld)\n",
+				(long)err);
+		return false;
+	}
+	if (noErr != (err = get_next_node_info()))
+	{
+		osd_printf_error(
+				"Failed to obtain AudioUnit for default sound output (%ld)\n",
+				(long)err);
+		return false;
+	}
+	m_node_count++;
+	return true;
+}
+
+
+bool sound_coreaudio::add_converter()
+{
+	OSStatus err;
+	err = add_node(
+			kAudioUnitType_FormatConverter,
+			kAudioUnitSubType_AUConverter,
+			kAudioUnitManufacturer_Apple);
+	if (noErr != err)
+	{
+		osd_printf_error(
+				"Failed to add sound format converter to AudioUnit graph (%ld)\n",
+				(long)err);
+		return false;
+	}
+	if (noErr != (err = get_next_node_info()))
+	{
+		osd_printf_error(
+				"Failed to obtain AudioUnit for sound format converter (%ld)\n",
+				(long)err);
+		return false;
+	}
+	if (noErr != (err = connect_next_node()))
+	{
+		osd_printf_error(
+				"Failed to connect sound format converter in AudioUnit graph (%ld)\n",
+				(long)err);
+		return false;
+	}
+	m_node_count++;
+	return true;
+}
+
+
+bool sound_coreaudio::add_effect(char const *name)
 {
 	OSStatus err;
 
 	if (!*name || !strcmp(name, OSDOPTVAL_NONE))
-		return 0;
+		return true;
 
 	CFPropertyListRef const properties = load_property_list(name);
 	if (NULL == properties)
-		return 0;
+		return true;
 
-	if (CFDictionaryGetTypeID() != CFGetTypeID(properties))
+	OSType type, subtype, manufacturer;
+	CFPropertyListRef class_info;
+	if (!extract_effect_info(name, properties, type, subtype, manufacturer, class_info))
 	{
-		osd_printf_error(
-				"%s is not a valid AudioUnit effect description: expected dictionary\n",
-				name);
-		return 0;
-	}
-
-	CFTypeRef type = NULL;
-	CFTypeRef subtype = NULL;
-	CFTypeRef manufacturer = NULL;
-	CFTypeRef class_info = NULL;
-	if (CFDictionaryContainsKey((CFDictionaryRef)properties, CFSTR("ComponentType"))
-	 && CFDictionaryContainsKey((CFDictionaryRef)properties, CFSTR("ComponentSubType"))
-	 && CFDictionaryContainsKey((CFDictionaryRef)properties, CFSTR("ComponentManufacturer"))
-	 && CFDictionaryContainsKey((CFDictionaryRef)properties, CFSTR("ClassInfo")))
-	{
-		type = CFDictionaryGetValue((CFDictionaryRef)properties, CFSTR("ComponentType"));
-		subtype = CFDictionaryGetValue((CFDictionaryRef)properties, CFSTR("ComponentSubType"));
-		manufacturer = CFDictionaryGetValue((CFDictionaryRef)properties, CFSTR("ComponentManufacturer"));
-		class_info = CFDictionaryGetValue((CFDictionaryRef)properties, CFSTR("ClassInfo"));
-	}
-	else if (CFDictionaryContainsKey((CFDictionaryRef)properties, CFSTR("type"))
-		  && CFDictionaryContainsKey((CFDictionaryRef)properties, CFSTR("subtype"))
-		  && CFDictionaryContainsKey((CFDictionaryRef)properties, CFSTR("manufacturer")))
-	{
-		type = CFDictionaryGetValue((CFDictionaryRef)properties, CFSTR("type"));
-		subtype = CFDictionaryGetValue((CFDictionaryRef)properties, CFSTR("subtype"));
-		manufacturer = CFDictionaryGetValue((CFDictionaryRef)properties, CFSTR("manufacturer"));
-		class_info = properties;
-	}
-
-	SInt64 type_val, subtype_val, manufacturer_val;
-	if ((NULL == type)
-	 || (NULL == subtype)
-	 || (NULL == manufacturer)
-	 || (NULL == class_info)
-	 || (CFNumberGetTypeID() != CFGetTypeID(type))
-	 || (CFNumberGetTypeID() != CFGetTypeID(subtype))
-	 || (CFNumberGetTypeID() != CFGetTypeID(manufacturer))
-	 || (CFDictionaryGetTypeID() != CFGetTypeID(class_info))
-	 || !CFNumberGetValue((CFNumberRef)type, kCFNumberSInt64Type, &type_val)
-	 || !CFNumberGetValue((CFNumberRef)subtype, kCFNumberSInt64Type, &subtype_val)
-	 || !CFNumberGetValue((CFNumberRef)manufacturer, kCFNumberSInt64Type, &manufacturer_val)
-	 || (kAudioUnitType_Effect != type_val))
-	{
-		osd_printf_error(
-				"%s is not a valid AudioUnit effect description: required properties not found\n",
-				name);
 		CFRelease(properties);
-		return 0;
+		return true;
 	}
 
-	AudioComponentDescription const effect_desc = { type_val, subtype_val, manufacturer_val, 0, 0 };
-	err = AUGraphAddNode(m_graph, &effect_desc, &m_node_details[m_node_count].m_node);
-	if (noErr != err)
+	if (noErr != (err = add_node(type, subtype, manufacturer)))
 	{
 		osd_printf_error(
 				"Failed to add effect %s to AudioUnit graph (%ld)\n",
 				name,
 				(long)err);
 		CFRelease(properties);
-		return 0;
+		return true;
 	}
-	err = AUGraphNodeInfo(
-			m_graph,
-			m_node_details[m_node_count].m_node,
-			NULL,
-			&m_node_details[m_node_count].m_unit);
-	if (noErr != err)
+	if (noErr != (err = get_next_node_info()))
 	{
 		osd_printf_error(
 				"Failed to obtain AudioUnit for effect %s (%ld)\n",
 				name,
 				(long)err);
 		CFRelease(properties);
-		err = AUGraphRemoveNode(m_graph, m_node_details[m_node_count].m_node);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to remove effect %s from AudioUnit graph (%ld)\n",
-					name,
-					(long)err);
-			return -1;
-		}
-		return 0;
+		goto remove_node_and_return_error;
 	}
 	err = AudioUnitSetProperty(
 			m_node_details[m_node_count].m_unit,
@@ -503,67 +470,129 @@ int sound_coreaudio::add_effect(char const *name)
 				"Failed to configure AudioUnit effect %s (%ld)\n",
 				name,
 				(long)err);
-		err = AUGraphRemoveNode(m_graph, m_node_details[m_node_count].m_node);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to remove effect %s from AudioUnit graph (%ld)\n",
-					name,
-					(long)err);
-			return -1;
-		}
-		return 0;
+		goto remove_node_and_return_error;
 	}
-	AudioUnitParameter const change = {
-			m_node_details[m_node_count].m_unit,
-			kAUParameterListener_AnyParameter,
-			0,
-			0 };
-	err = AUParameterListenerNotify(NULL, NULL, &change);
+	{
+		AudioUnitParameter const change = {
+				m_node_details[m_node_count].m_unit,
+				kAUParameterListener_AnyParameter,
+				0,
+				0 };
+		err = AUParameterListenerNotify(NULL, NULL, &change);
+	}
 	if (noErr != err)
 	{
 		osd_printf_error(
 				"Failed to notify AudioUnit effect %s parameter change (%ld)\n",
 				name,
 				(long)err);
-		err = AUGraphRemoveNode(m_graph, m_node_details[m_node_count].m_node);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to remove effect %s from AudioUnit graph (%ld)\n",
-					name,
-					(long)err);
-			return -1;
-		}
-		return 0;
+		goto remove_node_and_return_error;
 	}
-	err = AUGraphConnectNodeInput(
-			m_graph,
-			m_node_details[m_node_count].m_node,
-			0,
-			m_node_details[m_node_count - 1].m_node,
-			0);
-	if (noErr != err)
+	if (noErr != (err = connect_next_node()))
 	{
 		osd_printf_error(
 				"Failed to connect effect %s in AudioUnit graph (%ld)\n",
 				name,
 				(long)err);
-		err = AUGraphRemoveNode(m_graph, m_node_details[m_node_count].m_node);
-		if (noErr != err)
-		{
-			osd_printf_error(
-					"Failed to remove effect %s from AudioUnit graph (%ld)\n",
-					name,
-					(long)err);
-			return -1;
-		}
-		return 0;
+		goto remove_node_and_return_error;
 	}
 	m_node_count++;
+	return true;
 
-	CFRelease(properties);
-	return 0;
+remove_node_and_return_error:
+	err = AUGraphRemoveNode(m_graph, m_node_details[m_node_count].m_node);
+	if (noErr != err)
+	{
+		osd_printf_error(
+				"Failed to remove effect %s from AudioUnit graph (%ld)\n",
+				name,
+				(long)err);
+		return false;
+	}
+	return true;
+}
+
+
+bool sound_coreaudio::extract_effect_info(
+		char const          *name,
+		CFPropertyListRef   properties,
+		OSType              &type,
+		OSType              &subtype,
+		OSType              &manufacturer,
+		CFPropertyListRef   &class_info) const
+{
+	if (CFDictionaryGetTypeID() != CFGetTypeID(properties))
+	{
+		osd_printf_error(
+				"%s is not a valid AudioUnit effect description: expected dictionary\n",
+				name);
+		return false;
+	}
+
+	CFDictionaryRef const desc = (CFDictionaryRef)properties;
+	CFTypeRef type_val = NULL;
+	CFTypeRef subtype_val = NULL;
+	CFTypeRef manufacturer_val = NULL;
+	if (CFDictionaryContainsKey(desc, CFSTR("ComponentType"))
+	 && CFDictionaryContainsKey(desc, CFSTR("ComponentSubType"))
+	 && CFDictionaryContainsKey(desc, CFSTR("ComponentManufacturer"))
+	 && CFDictionaryContainsKey(desc, CFSTR("ClassInfo")))
+	{
+		type_val = CFDictionaryGetValue(desc, CFSTR("ComponentType"));
+		subtype_val = CFDictionaryGetValue(desc, CFSTR("ComponentSubType"));
+		manufacturer_val = CFDictionaryGetValue(desc, CFSTR("ComponentManufacturer"));
+		class_info = CFDictionaryGetValue(desc, CFSTR("ClassInfo"));
+	}
+	else if (CFDictionaryContainsKey(desc, CFSTR("type"))
+		  && CFDictionaryContainsKey(desc, CFSTR("subtype"))
+		  && CFDictionaryContainsKey(desc, CFSTR("manufacturer")))
+	{
+		type_val = CFDictionaryGetValue(desc, CFSTR("type"));
+		subtype_val = CFDictionaryGetValue(desc, CFSTR("subtype"));
+		manufacturer_val = CFDictionaryGetValue(desc, CFSTR("manufacturer"));
+		class_info = properties;
+	}
+	else
+	{
+		osd_printf_error(
+				"%s is not a valid AudioUnit effect description: required properties not found\n",
+				name);
+		return false;
+	}
+
+	SInt64 type_int, subtype_int, manufacturer_int;
+	if ((NULL == type_val)
+	 || (NULL == subtype_val)
+	 || (NULL == manufacturer_val)
+	 || (NULL == class_info)
+	 || (CFNumberGetTypeID() != CFGetTypeID(type_val))
+	 || (CFNumberGetTypeID() != CFGetTypeID(subtype_val))
+	 || (CFNumberGetTypeID() != CFGetTypeID(manufacturer_val))
+	 || (CFDictionaryGetTypeID() != CFGetTypeID(class_info))
+	 || !CFNumberGetValue((CFNumberRef)type_val, kCFNumberSInt64Type, &type_int)
+	 || !CFNumberGetValue((CFNumberRef)subtype_val, kCFNumberSInt64Type, &subtype_int)
+	 || !CFNumberGetValue((CFNumberRef)manufacturer_val, kCFNumberSInt64Type, &manufacturer_int))
+	{
+		osd_printf_error(
+				"%s is not a valid AudioUnit effect description: incorrect property type(s)\n",
+				name);
+		return false;
+	}
+
+	if (kAudioUnitType_Effect != type_int)
+	{
+		osd_printf_error(
+				"%s does not describe an AudioUnit effect (type %lu, expected %lu)\n",
+				name,
+				(unsigned long)type_int,
+				(unsigned long)kAudioUnitType_Effect);
+		return false;
+	}
+
+	type = (OSType)(UInt64)type_int;
+	subtype = (OSType)(UInt64)subtype_int;
+	manufacturer = (OSType)(UInt64)manufacturer_int;
+	return true;
 }
 
 

@@ -46,10 +46,21 @@ static NSString *const ComponentManufacturerKey = @"ComponentManufacturer";
 static NSString *const ClassInfoKey             = @"ClassInfo";
 
 
+static void UpdateChangeCountCallback(void                      *userData,
+									  void                      *object,
+									  AudioUnitEvent const      *inEvent,
+									  UInt64                    inEventHostTime,
+									  AudioUnitParameterValue   inParameterValue)
+{
+	[(NSDocument *)userData updateChangeCount:NSChangeDone];
+}
+
+
 @interface AUEffectDocument : NSDocument <NSWindowDelegate>
 {
 	IBOutlet NSWindow           *window;
-	IBOutlet NSScrollView       *scroller;
+	NSView                      *view;
+	AUParameterListenerRef      listener;
 
 	AudioComponentDescription   description;
 	AUGraph                     graph;
@@ -63,6 +74,8 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)type error:(NSError **)error;
 - (NSData *)dataOfType:(NSString *)type error:(NSError **)error;
 
+- (void)viewFrameDidChange:(NSNotification *)notification;
+
 @end
 
 @implementation AUEffectDocument
@@ -74,7 +87,6 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 	OSStatus status;
 	UInt32 uiDescSize;
 	AudioUnitCocoaViewInfo *viewInfo;
-	NSView *view = nil;
 	status = AudioUnitGetPropertyInfo(effectUnit,
 									  kAudioUnitProperty_CocoaUI,
 									  kAudioUnitScope_Global,
@@ -101,7 +113,7 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 			{
 				id const factory = [[viewClass alloc] init];
 				view = [factory uiViewForAudioUnit:effectUnit
-										  withSize:[[scroller contentView] bounds].size];
+										  withSize:[[window contentView] bounds].size];
 				[factory release];
 			}
 			CFRelease(viewInfo->mCocoaAUViewBundleLocation);
@@ -116,20 +128,29 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 		[(AUGenericView *)view setShowsExpertParameters:YES];
 	}
 
-	NSRect const frame = [view frame];
-	NSSize const desired = [NSScrollView frameSizeForContentSize:frame.size
-										 hasHorizontalScroller:[scroller hasHorizontalScroller]
-										 hasVerticalScroller:[scroller hasVerticalScroller]
-										 borderType:[scroller borderType]];
-	NSSize const min = [window contentMinSize];
-	NSRect const current = [scroller frame];
-	[window setContentSize:NSMakeSize(MAX(min.width, desired.width), MAX(min.height, desired.height))];
-	[view setFrameSize:[scroller contentSize]];
-	[scroller setDocumentView:view];
+	[view setAutoresizingMask:NSViewNotSizable];
+	[view setFrameOrigin:NSMakePoint(0, 0)];
+	NSRect const oldFrame = [window frame];
+	NSRect const desired = [window frameRectForContentRect:[view frame]];
+	NSRect const newFrame = NSMakeRect(oldFrame.origin.x,
+									   oldFrame.origin.y + oldFrame.size.height - desired.size.height,
+									   desired.size.width,
+									   desired.size.height);
+	[window setFrame:newFrame display:YES animate:NO];
+	[[window contentView] addSubview:view];
+	[view setPostsFrameChangedNotifications:YES];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(viewFrameDidChange:)
+												 name:NSViewFrameDidChangeNotification
+											   object:view];
 }
 
 - (id)init {
 	if (!(self = [super init])) return nil;
+
+	window = nil;
+	view = nil;
+	listener = NULL;
 
 	description.componentType = description.componentSubType = description.componentManufacturer = 0;
 	description.componentFlags = description.componentFlagsMask = 0;
@@ -154,6 +175,9 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 }
 
 - (void)dealloc {
+	if (NULL != listener)
+		AUListenerDispose(listener);
+
 	if (NULL != graph)
 	{
 		AUGraphClose(graph);
@@ -167,8 +191,7 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 	window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 400, 300)
 										 styleMask:(NSTitledWindowMask |
 													NSClosableWindowMask |
-													NSMiniaturizableWindowMask |
-													NSResizableWindowMask)
+													NSMiniaturizableWindowMask)
 										   backing:NSBackingStoreBuffered
 											 defer:YES];
 	[window setContentMinSize:NSMakeSize(400, 300)];
@@ -181,15 +204,6 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 	[self addWindowController:controller];
 	[controller release];
 	[window release];
-
-	scroller = [[NSScrollView alloc] initWithFrame:[[window contentView] bounds]];
-	[scroller setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
-	[scroller setHasHorizontalScroller:YES];
-	[scroller setHasVerticalScroller:YES];
-	[scroller setAutohidesScrollers:NO];
-	[scroller setBorderType:NSNoBorder];
-	[[window contentView] addSubview:scroller];
-	[scroller release];
 
 	[self loadEffectUI];
 }
@@ -247,9 +261,22 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 		return NO;
 	}
 
+	if (NULL != listener)
+	{
+		AUListenerDispose(listener);
+		listener = NULL;
+	}
+	if (nil != view)
+	{
+		[[NSNotificationCenter defaultCenter] removeObserver:self
+														name:NSViewFrameDidChangeNotification
+													  object:nil];
+		[view removeFromSuperview];
+		view = nil;
+	}
 	if (0 != effectNode)
 	{
-		[[scroller documentView] removeFromSuperview];
+		view = nil;
 		AUGraphRemoveNode(graph, effectNode);
 		effectNode = 0;
 	}
@@ -304,6 +331,98 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 		}
 	}
 
+	UInt32 paramListSize = 0;
+	status = AudioUnitGetPropertyInfo(
+			effectUnit,
+			kAudioUnitProperty_ParameterList,
+			kAudioUnitScope_Global,
+			0,
+			&paramListSize, NULL);
+	if (noErr != status)
+	{
+		if (NULL != error)
+		{
+			NSString * const message = @"Error getting effect parameters";
+			NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,       NSLocalizedDescriptionKey,
+																				  underlying,    NSUnderlyingErrorKey,
+																				  nil];
+			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
+		}
+		return NO;
+	}
+	UInt32 const paramCount = paramListSize / sizeof(AudioUnitParameterID);
+	if (0U < paramCount)
+	{
+		status = AUEventListenerCreate(UpdateChangeCountCallback,
+									   self,
+									   CFRunLoopGetCurrent(),
+									   kCFRunLoopDefaultMode,
+									   0.05,
+									   0.05,
+									   &listener);
+		if (noErr != status)
+		{
+			if (NULL != error)
+			{
+				NSString * const message = @"Error creating AudioUnit event listener";
+				NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+				NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,       NSLocalizedDescriptionKey,
+																					  underlying,    NSUnderlyingErrorKey,
+																					  nil];
+				*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
+			}
+			return NO;
+		}
+		AudioUnitParameterID *const params = (AudioUnitParameterID *)malloc(paramListSize);
+		AudioUnitGetProperty(
+				effectUnit,
+				kAudioUnitProperty_ParameterList,
+				kAudioUnitScope_Global,
+				0,
+				params,
+				&paramListSize);
+		if (noErr != status)
+		{
+			free(params);
+			if (NULL != error)
+			{
+				NSString * const message = @"Error getting effect parameters";
+				NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+				NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,       NSLocalizedDescriptionKey,
+																					  underlying,    NSUnderlyingErrorKey,
+																					  nil];
+				*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
+			}
+			return NO;
+		}
+		for (UInt32 i = 0; (i < paramCount) && (noErr == status); i++)
+		{
+			AudioUnitEvent event;
+			event.mEventType = kAudioUnitEvent_ParameterValueChange;
+			event.mArgument.mParameter.mAudioUnit = effectUnit;
+			event.mArgument.mParameter.mParameterID = params[i];
+			event.mArgument.mParameter.mScope = kAudioUnitScope_Global;
+			event.mArgument.mParameter.mElement = 0;
+			status = AUEventListenerAddEventType(listener, self, &event);
+		}
+		free(params);
+		if (noErr != status)
+		{
+			free(params);
+			if (NULL != error)
+			{
+				NSString * const message = @"Error getting effect parameters";
+				NSError *const underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+				NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,       NSLocalizedDescriptionKey,
+																					  underlying,    NSUnderlyingErrorKey,
+																					  nil];
+				*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
+			}
+			return NO;
+		}
+	}
+
 	[self loadEffectUI];
 
 	return YES;
@@ -322,8 +441,10 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 	{
 		if (NULL != error)
 		{
-			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:@"Error getting effect settings",                                         NSLocalizedDescriptionKey,
-																				  [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil], NSUnderlyingErrorKey,
+			NSString const *message = @"Error getting effect settings";
+			NSError const *underlying = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,      NSLocalizedDescriptionKey,
+																				  underlying,   NSUnderlyingErrorKey,
 																				  nil];
 			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		}
@@ -332,10 +453,13 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 	NSDictionary *desc = nil;
 	if ([type isEqualToString:AUEffectDocumentType])
 	{
-		desc = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:description.componentType],          ComponentTypeKey,
-														  [NSNumber numberWithUnsignedLong:description.componentSubType],       ComponentSubTypeKey,
-														  [NSNumber numberWithUnsignedLong:description.componentManufacturer],  ComponentManufacturerKey,
-														  classInfo,                                                            ClassInfoKey,
+		NSNumber const *typeVal = [NSNumber numberWithUnsignedLong:description.componentType];
+		NSNumber const *subtypeVal = [NSNumber numberWithUnsignedLong:description.componentSubType];
+		NSNumber const *manufacturerVal = [NSNumber numberWithUnsignedLong:description.componentManufacturer];
+		desc = [NSDictionary dictionaryWithObjectsAndKeys:typeVal,          ComponentTypeKey,
+														  subtypeVal,       ComponentSubTypeKey,
+														  manufacturerVal,  ComponentManufacturerKey,
+														  classInfo,        ClassInfoKey,
 														  nil];
 	}
 	else if ([type isEqualToString:AUPresetDocumentType])
@@ -372,6 +496,16 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 		return nil;
 	}
 	return data;
+}
+
+- (void)viewFrameDidChange:(NSNotification *)notification {
+	NSRect const oldFrame = [window frame];
+	NSRect const desired = [window frameRectForContentRect:[[notification object] frame]];
+	NSRect const newFrame = NSMakeRect(oldFrame.origin.x,
+									   oldFrame.origin.y + oldFrame.size.height - desired.size.height,
+									   desired.size.width,
+									   desired.size.height);
+	[window setFrame:newFrame display:YES animate:NO];
 }
 
 @end
