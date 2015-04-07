@@ -173,7 +173,7 @@ private:
 
 	// Wait for some time to pass or for a line to change level
 	void wait_time(emu_timer *tm, int microsec, int next_substate);
-	void wait_time(emu_timer *tm, attotime delay, int param);
+	void wait_time(emu_timer *tm, const attotime &delay, int param);
 	void wait_line(int line, line_state level, int substate, bool stopwrite);
 
 	// Converts attotime to a string

@@ -570,7 +570,7 @@ void hdc9234_device::wait_time(emu_timer *tm, int microsec, int next_substate)
 	m_substate = next_substate;
 }
 
-void hdc9234_device::wait_time(emu_timer *tm, attotime delay, int param)
+void hdc9234_device::wait_time(emu_timer *tm, const attotime &delay, int param)
 {
 	if (TRACE_DELAY) logerror("%s: [%s] Delaying by %4.2f microsecs\n", tag(), ttsn().cstr(), delay.as_double()*1000000);
 	tm->adjust(delay);

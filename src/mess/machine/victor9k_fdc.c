@@ -1076,7 +1076,7 @@ void victor_9000_fdc_t::live_start()
 	live_run();
 }
 
-void victor_9000_fdc_t::pll_reset(const attotime &when, const attotime clock)
+void victor_9000_fdc_t::pll_reset(const attotime &when, const attotime &clock)
 {
 	cur_pll.reset(when);
 	cur_pll.set_clock(clock);

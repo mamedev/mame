@@ -142,7 +142,7 @@ protected:
 	void live_start();
 	void checkpoint();
 	void rollback();
-	void pll_reset(const attotime &when, const attotime clock);
+	void pll_reset(const attotime &when, const attotime &clock);
 	void pll_start_writing(const attotime &tm);
 	void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);

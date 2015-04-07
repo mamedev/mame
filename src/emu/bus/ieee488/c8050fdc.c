@@ -233,7 +233,7 @@ void c8050_fdc_t::live_start()
 	live_run();
 }
 
-void c8050_fdc_t::pll_reset(const attotime &when, const attotime clock)
+void c8050_fdc_t::pll_reset(const attotime &when, const attotime &clock)
 {
 	cur_pll.reset(when);
 	cur_pll.set_clock(clock);
