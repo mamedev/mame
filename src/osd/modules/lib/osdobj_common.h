@@ -67,6 +67,7 @@
 #define OSDOPTION_GL_NOTEXTURERECT      "gl_notexturerect"
 #define OSDOPTION_GL_FORCEPOW2TEXTURE   "gl_forcepow2texture"
 
+#define OSDOPTION_AUDIO_EFFECT          "audio_effect"
 
 #define OSDOPTVAL_AUTO                  "auto"
 #define OSDOPTVAL_NONE                  "none"
@@ -132,6 +133,9 @@ public:
 	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
 	const char *shader_mame(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_MAME, index)); }
 	const char *shader_screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_SCREEN, index)); }
+
+	// CoreAudio specific options
+	const char *audio_effect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_AUDIO_EFFECT, index)); }
 
 private:
 	static const options_entry s_option_entries[];
