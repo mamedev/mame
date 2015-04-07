@@ -34,7 +34,7 @@
 #include "includes/clshroad.h"
 
 
-WRITE8_MEMBER(clshroad_state::clshroad_flipscreen_w)
+WRITE8_MEMBER(clshroad_state::flipscreen_w)
 {
 	flip_screen_set(data & 1 );
 }
@@ -125,7 +125,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
 			0);
 }
 
-WRITE8_MEMBER(clshroad_state::clshroad_vram_0_w)
+WRITE8_MEMBER(clshroad_state::vram_0_w)
 {
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
@@ -190,7 +190,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
 			0);
 }
 
-WRITE8_MEMBER(clshroad_state::clshroad_vram_1_w)
+WRITE8_MEMBER(clshroad_state::vram_1_w)
 {
 	m_vram_1[offset] = data;
 	m_tilemap_1->mark_tile_dirty(offset % 0x400);
@@ -275,15 +275,12 @@ Offset:     Format:     Value:
 
 void clshroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int i;
-
-	for (i = 0; i < m_spriteram.bytes() ; i += 8)
+	for (int i = 0; i < m_spriteram.bytes() ; i += 8)
 	{
-		int y       =    240 - spriteram[i+1];
-		int code    =   (spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);
-		int x       =    spriteram[i+5]         + (spriteram[i+6] << 8);
-		int attr    =    spriteram[i+7];
+		int y       =    240 - m_spriteram[i+1];
+		int code    =   (m_spriteram[i+3] & 0x3f) + (m_spriteram[i+2] << 6);
+		int x       =    m_spriteram[i+5]         + (m_spriteram[i+6] << 8);
+		int attr    =    m_spriteram[i+7];
 
 		int flipx   =   0;
 		int flipy   =   0;
@@ -313,7 +310,7 @@ void clshroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 ***************************************************************************/
 
-UINT32 clshroad_state::screen_update_clshroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 clshroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int scrollx  = m_vregs[ 0 ] + (m_vregs[ 1 ] << 8);
 //  int priority = m_vregs[ 2 ];

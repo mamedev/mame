@@ -28,7 +28,7 @@ void clshroad_state::machine_reset()
 }
 
 
-READ8_MEMBER(clshroad_state::clshroad_input_r)
+READ8_MEMBER(clshroad_state::input_r)
 {
 	return  ((~ioport("P1")->read() & (1 << offset)) ? 1 : 0) |
 			((~ioport("P2")->read() & (1 << offset)) ? 2 : 0) |
@@ -44,11 +44,11 @@ static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0x9800, 0x9dff) AM_RAM
 	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP    // ? Interrupt related
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(clshroad_flipscreen_w)
-	AM_RANGE(0xa100, 0xa107) AM_READ(clshroad_input_r)
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(clshroad_vram_1_w) AM_SHARE("vram_1") // Layer 1
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xa100, 0xa107) AM_READ(input_r)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
 	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_SHARE("vregs") // Scroll
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(clshroad_vram_0_w) AM_SHARE("vram_0") // Layer 0
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( clshroad_sound_map, AS_PROGRAM, 8, clshroad_state )
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x120, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update_clshroad)
+	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebatl)
@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( clshroad, clshroad_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x120, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update_clshroad)
+	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clshroad)
@@ -479,7 +479,7 @@ die once, it would be nice to avoid the hack however
 	ROM[0x05C8] = 0x23;
 }
 
-GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", 0 )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", 0 )
-GAME( 1986, clshroadd,clshroad, clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc. (Data East license)", "Clash-Road (Data East license)", 0 )
+GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Taito", "Fire Battle", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1986, clshroad, 0,        clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc.", "Clash-Road", GAME_SUPPORTS_SAVE )
+GAME( 1986, clshroads,clshroad, clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)", GAME_SUPPORTS_SAVE )
+GAME( 1986, clshroadd,clshroad, clshroad, clshroad, driver_device, 0,        ROT0,  "Wood Place Inc. (Data East license)", "Clash-Road (Data East license)", GAME_SUPPORTS_SAVE )

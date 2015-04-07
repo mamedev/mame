@@ -32,15 +32,6 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	memset(m_soundregs, 0, sizeof(UINT8)*0x4000);
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void wiping_sound_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -77,6 +68,17 @@ void wiping_sound_device::device_start()
 		voice->volume = 0;
 		voice->wave = &m_sound_prom[0];
 		voice->counter = 0;
+	}
+	
+	save_item(NAME(m_soundregs));
+	
+	for (int i = 0; i < MAX_VOICES; i++)
+	{
+		save_item(NAME(m_channel_list[i].frequency), i);
+		save_item(NAME(m_channel_list[i].counter), i);
+		save_item(NAME(m_channel_list[i].volume), i);
+		save_item(NAME(m_channel_list[i].oneshot), i);
+		save_item(NAME(m_channel_list[i].oneshotplaying), i);
 	}
 }
 

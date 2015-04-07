@@ -38,8 +38,17 @@ TODO:
 #include "cpu/mcs48/mcs48.h"
 #include "includes/spcforce.h"
 
+void spcforce_state::machine_start()
+{
+	save_item(NAME(m_sn76496_latch));
+	save_item(NAME(m_sn76496_select));
+	save_item(NAME(m_sn1_ready));
+	save_item(NAME(m_sn2_ready));
+	save_item(NAME(m_sn3_ready));
+	save_item(NAME(m_irq_mask));
+}
 
-WRITE8_MEMBER(spcforce_state::spcforce_SN76496_latch_w)
+WRITE8_MEMBER(spcforce_state::SN76496_latch_w)
 {
 	m_sn76496_latch = data;
 }
@@ -59,7 +68,7 @@ WRITE_LINE_MEMBER(spcforce_state::write_sn3_ready)
 	m_sn3_ready = state;
 }
 
-READ8_MEMBER(spcforce_state::spcforce_SN76496_select_r)
+READ8_MEMBER(spcforce_state::SN76496_select_r)
 {
 	if (~m_sn76496_select & 0x40) return m_sn1_ready;
 	if (~m_sn76496_select & 0x20) return m_sn2_ready;
@@ -68,7 +77,7 @@ READ8_MEMBER(spcforce_state::spcforce_SN76496_select_r)
 	return 0;
 }
 
-WRITE8_MEMBER(spcforce_state::spcforce_SN76496_select_w)
+WRITE8_MEMBER(spcforce_state::SN76496_select_w)
 {
 	m_sn76496_select = data;
 
@@ -77,14 +86,14 @@ WRITE8_MEMBER(spcforce_state::spcforce_SN76496_select_w)
 	if (~data & 0x10) m_sn3->write(space, 0, m_sn76496_latch);
 }
 
-READ8_MEMBER(spcforce_state::spcforce_t0_r)
+READ8_MEMBER(spcforce_state::t0_r)
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
 	return machine().rand() & 1;
 }
 
 
-WRITE8_MEMBER(spcforce_state::spcforce_soundtrigger_w)
+WRITE8_MEMBER(spcforce_state::soundtrigger_w)
 {
 	m_audiocpu->set_input_line(0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -98,9 +107,9 @@ static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE(spcforce_soundtrigger_w)
+	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE(soundtrigger_w)
 	AM_RANGE(0x7002, 0x7002) AM_READ_PORT("P2")
-	AM_RANGE(0x700b, 0x700b) AM_WRITE(spcforce_flip_screen_w)
+	AM_RANGE(0x700b, 0x700b) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x700e, 0x700e) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITENOP
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("videoram")
@@ -114,9 +123,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spcforce_sound_io_map, AS_IO, 8, spcforce_state )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(soundlatch_byte_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(spcforce_SN76496_latch_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(spcforce_SN76496_select_r, spcforce_SN76496_select_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(spcforce_t0_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(SN76496_latch_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(SN76496_select_r, SN76496_select_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(t0_r)
 ADDRESS_MAP_END
 
 
@@ -276,7 +285,7 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update_spcforce)
+	MCFG_SCREEN_UPDATE_DRIVER(spcforce_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spcforce)
@@ -375,6 +384,6 @@ ROM_START( meteor )
 ROM_END
 
 
-GAME( 1980, spcforce, 0,        spcforce, spcforce, driver_device, 0, ROT270, "Venture Line", "Space Force (set 1)", GAME_IMPERFECT_COLORS )
-GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, driver_device, 0, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", GAME_IMPERFECT_COLORS )
-GAME( 1981, meteor,   spcforce, spcforce, spcforc2, driver_device, 0, ROT270, "Venture Line", "Meteoroids", GAME_IMPERFECT_COLORS )
+GAME( 1980, spcforce, 0,        spcforce, spcforce, driver_device, 0, ROT270, "Venture Line", "Space Force (set 1)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, driver_device, 0, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, meteor,   spcforce, spcforce, spcforc2, driver_device, 0, ROT270, "Venture Line", "Meteoroids", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
