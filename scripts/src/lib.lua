@@ -79,6 +79,7 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/a26_cas.c",
 		MAME_DIR .. "src/lib/formats/a5105_dsk.c",
 		MAME_DIR .. "src/lib/formats/abc800_dsk.c",
+		MAME_DIR .. "src/lib/formats/abcfd2_dsk.c",
 		MAME_DIR .. "src/lib/formats/ace_tap.c",
 		MAME_DIR .. "src/lib/formats/adam_cas.c",
 		MAME_DIR .. "src/lib/formats/adam_dsk.c",
