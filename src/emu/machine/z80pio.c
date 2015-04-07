@@ -28,30 +28,6 @@
 
 #define LOG 0
 
-enum
-{
-	MODE_OUTPUT = 0,
-	MODE_INPUT,
-	MODE_BIDIRECTIONAL,
-	MODE_BIT_CONTROL
-};
-
-enum
-{
-	ANY = 0,
-	IOR,
-	MASK
-};
-
-const int ICW_ENABLE_INT    = 0x80;
-//const int ICW_AND_OR        = 0x40;
-//const int ICW_AND           = 0x40;
-//const int ICW_OR            = 0x00;
-//const int ICW_HIGH_LOW      = 0x20;
-//const int ICW_HIGH          = 0x20;
-//const int ICW_LOW           = 0x00;
-const int ICW_MASK_FOLLOWS  = 0x10;
-
 
 
 //**************************************************************************
@@ -65,16 +41,16 @@ const device_type Z80PIO = &device_creator<z80pio_device>;
 //  z80pio_device - constructor
 //-------------------------------------------------
 
-z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, Z80PIO, "Z80 PIO", tag, owner, clock, "z80pio", __FILE__),
-		device_z80daisy_interface(mconfig, *this),
-		m_out_int_cb(*this),
-		m_in_pa_cb(*this),
-		m_out_pa_cb(*this),
-		m_out_ardy_cb(*this),
-		m_in_pb_cb(*this),
-		m_out_pb_cb(*this),
-		m_out_brdy_cb(*this)
+z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, Z80PIO, "Z80 PIO", tag, owner, clock, "z80pio", __FILE__),
+	device_z80daisy_interface(mconfig, *this),
+	m_out_int_cb(*this),
+	m_in_pa_cb(*this),
+	m_out_pa_cb(*this),
+	m_out_ardy_cb(*this),
+	m_in_pb_cb(*this),
+	m_out_pb_cb(*this),
+	m_out_brdy_cb(*this)
 {
 }
 
