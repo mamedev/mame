@@ -394,6 +394,8 @@ files {
 
 dofile("netlist.lua")
 
+
+if (_OPTIONS["target"]=="mess") then
 --------------------------------------------------
 -- castool
 --------------------------------------------------
@@ -534,3 +536,4 @@ files {
 	MAME_DIR .. "src/mess/tools/imgtool/modules/hp48.c",
 }
 
+end
