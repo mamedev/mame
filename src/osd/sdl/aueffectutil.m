@@ -329,12 +329,28 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 		}
 		return nil;
 	}
-	NSDictionary *const desc = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:description.componentType],          ComponentTypeKey,
-																		  [NSNumber numberWithUnsignedLong:description.componentSubType],       ComponentSubTypeKey,
-																		  [NSNumber numberWithUnsignedLong:description.componentManufacturer],  ComponentManufacturerKey,
-																		  classInfo,                                                            ClassInfoKey,
-																		  nil];
+	NSDictionary *desc = nil;
+	if ([type isEqualToString:AUEffectDocumentType])
+	{
+		desc = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:description.componentType],          ComponentTypeKey,
+														  [NSNumber numberWithUnsignedLong:description.componentSubType],       ComponentSubTypeKey,
+														  [NSNumber numberWithUnsignedLong:description.componentManufacturer],  ComponentManufacturerKey,
+														  classInfo,                                                            ClassInfoKey,
+														  nil];
+	}
+	else if ([type isEqualToString:AUPresetDocumentType])
+	{
+		desc = [NSDictionary dictionaryWithDictionary:(NSDictionary *)classInfo];
+	}
 	CFRelease(classInfo);
+	if (nil == desc)
+	{
+			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:@"Unsupported document type", NSLocalizedDescriptionKey,
+																				  nil];
+			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
+		return nil;
+	}
+
 	NSString *errDesc = nil;
 	NSData *const data = [NSPropertyListSerialization dataFromPropertyList:desc
 																	format:NSPropertyListXMLFormat_v1_0
@@ -343,7 +359,12 @@ static NSString *const ClassInfoKey             = @"ClassInfo";
 	{
 		if (NULL != error)
 		{
-			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:@"Error serialising effect settings", NSLocalizedDescriptionKey,
+			NSString *message;
+			if (nil != errDesc)
+				message = [NSString stringWithFormat:@"Error serialising effect settings: %@", errDesc];
+			else
+				message = @"Error serialising effect settings";
+			NSDictionary *const info = [NSDictionary dictionaryWithObjectsAndKeys:message,  NSLocalizedDescriptionKey,
 																				  nil];
 			*error = [NSError errorWithDomain:AUEffectUtilErrorDomain code:0 userInfo:info];
 		}
