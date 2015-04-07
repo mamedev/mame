@@ -220,6 +220,7 @@ function osdmodulestargetconf()
 	elseif _OPTIONS["targetos"]=="macosx" then
 		links {
 			"AudioUnit.framework",
+			"AudioToolbox.framework",
 			"CoreAudio.framework",
 			"CoreServices.framework",
 		}

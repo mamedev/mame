@@ -1,3 +1,4 @@
+#import <AvailabilityMacros.h>
 #import <AudioUnit/AudioUnit.h>
 #import <AudioUnit/AUCocoaUIView.h>
 #import <AudioToolbox/AudioToolbox.h>
@@ -11,6 +12,18 @@
 #include <vector>
 
 #include <stdlib.h>
+
+
+#ifdef MAC_OS_X_VERSION_MAX_ALLOWED
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+
+@protocol NSWindowDelegate <NSObject>
+@end
+
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED
 
 
 struct EffectInfo
