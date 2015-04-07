@@ -2778,11 +2778,10 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-			for (int x2 = 0; x2 < xprescale/2; x2++)
-			{
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
-			}
 		}
 		if (xborderpix)
 		{
@@ -2813,11 +2812,10 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-			for (int x2 = 0; x2 < xprescale/2; x2++)
-			{
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
-			}
 		}
 		if (xborderpix)
 		{
@@ -2860,7 +2858,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 				(texsource->width * texture->xprescale + 2) * sizeof(UINT32));
 	}
 
-	// when nescesarry copy (and convert) the data
+	// when necessary copy (and convert) the data
 	if (!texture->nocopy)
 	{
 		int y, y2;
