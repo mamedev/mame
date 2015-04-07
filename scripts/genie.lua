@@ -254,6 +254,15 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "FILTER_DEPS",
+	description = "Filter dependency files.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"
 end
@@ -350,11 +359,11 @@ else
 	end
 end
 
-if (AWK~='') then
---	postcompiletasks {
---		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
---		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
---	}
+if (_OPTIONS["FILTER_DEPS"]=="1") and (AWK~='') then
+	postcompiletasks {
+		AWK .. " -f ../../../../../scripts/depfilter.awk $(@:%.o=%.d) > $(@:%.o=%.dep)",
+		"mv $(@:%.o=%.dep) $(@:%.o=%.d)",
+	}
 end
 
 msgcompile ("Compiling $(subst ../,,$<)...")

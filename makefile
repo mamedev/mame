@@ -73,6 +73,8 @@
 # CPP11 = 1
 # FASTDEBUG = 1
 
+# FILTER_DEPS = 1
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -481,6 +483,11 @@ endif
 ifdef FASTDEBUG
 PARAMS += --FASTDEBUG='$(FASTDEBUG)'
 endif
+
+ifdef FILTER_DEPS
+PARAMS += --FILTER_DEPS='$(FILTER_DEPS)'
+endif
+
 
 #-------------------------------------------------
 # All scripts
