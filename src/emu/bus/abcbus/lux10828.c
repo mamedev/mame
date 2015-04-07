@@ -304,6 +304,10 @@ static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
+FLOPPY_FORMATS_MEMBER( luxor_55_10828_device::floppy_formats )
+	FLOPPY_ABC800_FORMAT
+FLOPPY_FORMATS_END
+
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 {
 	m_fdc_irq = state;
@@ -341,8 +345,8 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
