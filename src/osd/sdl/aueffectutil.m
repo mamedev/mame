@@ -585,6 +585,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 	item = [menu addItemWithTitle:NSLocalizedString(@"Close", nil) action:@selector(performClose:) keyEquivalent:@"w"];
 	item = [menu addItemWithTitle:NSLocalizedString(@"Save", nil) action:@selector(saveDocument:) keyEquivalent:@"s"];
 	item = [menu addItemWithTitle:NSLocalizedString(@"Save As…", nil) action:@selector(saveDocumentAs:) keyEquivalent:@"S"];
+	item = [menu addItemWithTitle:NSLocalizedString(@"Save All", nil) action:@selector(saveAllDocuments:) keyEquivalent:@""];
 	item = [menu addItemWithTitle:NSLocalizedString(@"Revert to Saved", nil) action:@selector(revertDocumentToSaved:) keyEquivalent:@""];
 }
 
