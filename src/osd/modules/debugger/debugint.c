@@ -35,7 +35,7 @@ public:
 
 	virtual ~debug_internal() { }
 
-	virtual int init() { return 0;}
+	virtual int init(const osd_options &options) { return 0; }
 	virtual void exit();
 
 	virtual void init_debugger(running_machine &machine);

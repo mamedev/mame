@@ -21,7 +21,7 @@ public:
 	}
 	virtual ~none_module() { }
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	osd_midi_device *create_midi_device();
@@ -50,7 +50,7 @@ osd_midi_device *none_module::create_midi_device()
 }
 
 
-int none_module::init()
+int none_module::init(const osd_options &options)
 {
 	return 0;
 }

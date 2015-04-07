@@ -58,7 +58,7 @@ public:
 	}
 	virtual ~pcap_module() { }
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	virtual bool probe();
@@ -251,7 +251,7 @@ bool pcap_module::probe()
 }
 
 
-int pcap_module::init()
+int pcap_module::init(const osd_options &options)
 {
 	pcap_if_t *devs;
 	char errbuf[PCAP_ERRBUF_SIZE];

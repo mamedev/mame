@@ -11,6 +11,7 @@
 
 #include "sound_module.h"
 #include "modules/osdmodule.h"
+#include "modules/lib/osdobj_common.h"
 
 #ifdef SDLMAME_MACOSX
 
@@ -42,7 +43,7 @@ public:
 	{
 	}
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	// sound_module
@@ -99,7 +100,7 @@ private:
 };
 
 
-int sound_coreaudio::init()
+int sound_coreaudio::init(const osd_options &options)
 {
 	OSStatus err;
 

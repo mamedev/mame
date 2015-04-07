@@ -500,7 +500,7 @@ bool osd_common_t::execute_command(const char *command)
 
 		if (om->probe())
 		{
-			om->init();
+			om->init(options());
 			osd_list_network_adapters();
 			om->exit();
 		}
@@ -514,7 +514,7 @@ bool osd_common_t::execute_command(const char *command)
 
 		if (om->probe())
 		{
-			om->init();
+			om->init(options());
 			pm->list_midi_devices();
 			om->exit();
 		}
@@ -555,7 +555,7 @@ void osd_common_t::init_subsystems()
 
 	m_midi = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
-	m_mod_man.init();
+	m_mod_man.init(options());
 
 }
 

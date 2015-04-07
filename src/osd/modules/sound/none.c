@@ -20,7 +20,7 @@ public:
 	}
 	virtual ~sound_none() { }
 
-	virtual int init() { return 0; }
+	virtual int init(const osd_options &options) { return 0; }
 	virtual void exit() { }
 
 	// sound_module

@@ -58,7 +58,7 @@ public:
 	}
 	virtual ~sound_sdl() { }
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	// sound_module
@@ -403,7 +403,7 @@ static void sdl_callback(void *userdata, Uint8 *stream, int len)
 //  sound_sdl::init
 //============================================================
 
-int sound_sdl::init()
+int sound_sdl::init(const osd_options &options)
 {
 	int         n_channels = 2;
 	int         audio_latency;

@@ -53,7 +53,7 @@ public:
 			[m_console release];
 	}
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	virtual void init_debugger(running_machine &machine);
@@ -71,7 +71,7 @@ MODULE_DEFINITION(DEBUG_OSX, debugger_osx)
 //  debugger_osx::init
 //============================================================
 
-int debugger_osx::init()
+int debugger_osx::init(const osd_options &options)
 {
 	return 0;
 }

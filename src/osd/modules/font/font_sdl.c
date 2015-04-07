@@ -32,7 +32,7 @@
 class osd_font_sdl : public osd_font
 {
 public:
-	virtual ~osd_font_sdl() {};
+	virtual ~osd_font_sdl() { }
 
 	virtual bool open(const char *font_path, const char *name, int &height);
 	virtual void close();
@@ -328,8 +328,7 @@ TTF_Font *osd_font_sdl::search_font_config(astring name, bool bold, bool italic,
 class font_sdl : public osd_module, public font_module
 {
 public:
-	font_sdl()
-	: osd_module(OSD_FONT_PROVIDER, "sdl"), font_module()
+	font_sdl() : osd_module(OSD_FONT_PROVIDER, "sdl"), font_module()
 	{
 	}
 
@@ -338,7 +337,7 @@ public:
 		return global_alloc(osd_font_sdl);
 	}
 
-	int init()
+	virtual int init(const osd_options &options)
 	{
 		if (TTF_Init() == -1)
 		{

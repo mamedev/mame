@@ -57,7 +57,7 @@ public:
 	}
 	virtual ~sound_direct_sound() { }
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	// sound_module
@@ -108,7 +108,7 @@ static int                  buffer_overflows;
 //  sound_direct_sound - constructor
 //-------------------------------------------------
 
-int sound_direct_sound::init()
+int sound_direct_sound::init(const osd_options &options)
 {
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound

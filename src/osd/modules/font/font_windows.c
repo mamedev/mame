@@ -34,7 +34,7 @@
 class osd_font_windows : public osd_font
 {
 public:
-	virtual ~osd_font_windows() {};
+	virtual ~osd_font_windows() { }
 
 	virtual bool open(const char *font_path, const char *name, int &height);
 	virtual void close();
@@ -266,10 +266,11 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
 class font_win : public osd_module, public font_module
 {
 public:
-	font_win()
-	: osd_module(OSD_FONT_PROVIDER, "win"), font_module()
+	font_win() : osd_module(OSD_FONT_PROVIDER, "win"), font_module()
 	{
 	}
+
+	virtual int init(const osd_options &options) { return 0; }
 
 	osd_font *font_alloc()
 	{
