@@ -223,9 +223,9 @@ endif
 endif # BIGENDIAN
 
 ifndef PYTHON_EXECUTABLE
-PYTHON := $(SILENT)python
+PYTHON := python
 else
-PYTHON := $(SILENT)$(PYTHON_EXECUTABLE)
+PYTHON := $(PYTHON_EXECUTABLE)
 endif
 CC := $(SILENT)gcc
 LD := $(SILENT)g++
@@ -591,9 +591,9 @@ endif
 endif
 endif
 
-#ifneq ($(PYTHON_AVAILABLE),python)
-#$(error Python is not available in path)
-#endif
+ifneq ($(PYTHON_AVAILABLE),python)
+$(error Python is not available in path)
+endif
 
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
@@ -616,7 +616,7 @@ $(PROJECTDIR)/gmake-mingw64-gcc/Makefile: makefile $(SCRIPTS) $(GENIE)
 ifndef MINGW64
 	$(error MINGW64 is not set)
 endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake 
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=mingw64-gcc --gcc_version=$(GCC_VERSION) gmake
 
 .PHONY: windows_x64
 windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
@@ -652,7 +652,7 @@ endif
 .PHONY: windows_x64_clang
 windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
-	
+
 .PHONY: windows_x86_clang
 windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
@@ -879,5 +879,4 @@ generate: \
 
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
-	$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
-
+	$(SILENT)$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
