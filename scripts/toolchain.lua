@@ -356,24 +356,24 @@ function toolchain(_buildDir, _subDir)
 
 
 	configuration { "x32", "vs*" }
-		targetdir (_buildDir .. "win32_" .. _ACTION .. "/bin")
+		targetdir (_buildDir .. "win32_" .. _ACTION .. "/bin/x32")
 		objdir (_buildDir .. "win32_" .. _ACTION .. "/obj")
 
 	configuration { "x64", "vs*" }
 		defines { "_WIN64" }
-		targetdir (_buildDir .. "win64_" .. _ACTION .. "/bin")
+		targetdir (_buildDir .. "win64_" .. _ACTION .. "/bin/x64")
 		objdir (_buildDir .. "win64_" .. _ACTION .. "/obj")
 
 	configuration { "ARM", "vs*" }
-		targetdir (_buildDir .. "arm_" .. _ACTION .. "/bin")
+		targetdir (_buildDir .. "arm_" .. _ACTION .. "/bin/ARM")
 		objdir (_buildDir .. "arm_" .. _ACTION .. "/obj")
 
 	configuration { "x32", "vs*-clang" }
-		targetdir (_buildDir .. "win32_" .. _ACTION .. "-clang/bin")
+		targetdir (_buildDir .. "win32_" .. _ACTION .. "-clang/bin/x32")
 		objdir (_buildDir .. "win32_" .. _ACTION .. "-clang/obj")
 
 	configuration { "x64", "vs*-clang" }
-		targetdir (_buildDir .. "win64_" .. _ACTION .. "-clang/bin")
+		targetdir (_buildDir .. "win64_" .. _ACTION .. "-clang/bin/x64")
 		objdir (_buildDir .. "win64_" .. _ACTION .. "-clang/obj")
 
 	configuration { "vs*-clang" }
@@ -385,12 +385,12 @@ function toolchain(_buildDir, _subDir)
 		defines { "WIN32" }
 
 	configuration { "x32", "mingw32-gcc" }
-		targetdir (_buildDir .. "win32_mingw-gcc" .. "/bin")
+		targetdir (_buildDir .. "win32_mingw-gcc" .. "/bin/x32")
 		objdir (_buildDir .. "win32_mingw-gcc" .. "/obj")
 		buildoptions { "-m32" }
 
 	configuration { "x64", "mingw64-gcc" }
-		targetdir (_buildDir .. "win64_mingw-gcc" .. "/bin")
+		targetdir (_buildDir .. "win64_mingw-gcc" .. "/bin/x64")
 		objdir (_buildDir .. "win64_mingw-gcc" .. "/obj")
 		buildoptions { "-m64" }
 		
@@ -402,7 +402,7 @@ function toolchain(_buildDir, _subDir)
 		}
 
 	configuration { "x32", "mingw-clang" }
-		targetdir (_buildDir .. "win32_mingw-clang/bin")
+		targetdir (_buildDir .. "win32_mingw-clang/bin/x32")
 		objdir ( _buildDir .. "win32_mingw-clang/obj")
 		buildoptions { "-m32" }
 		buildoptions {
@@ -412,7 +412,7 @@ function toolchain(_buildDir, _subDir)
 		}
 		
 	configuration { "x64", "mingw-clang" }
-		targetdir (_buildDir .. "win64_mingw-clang/bin")
+		targetdir (_buildDir .. "win64_mingw-clang/bin/x64")
 		objdir (_buildDir .. "win64_mingw-clang/obj")
 		buildoptions { "-m64" }
 		buildoptions {
@@ -422,28 +422,28 @@ function toolchain(_buildDir, _subDir)
 		}		
 
 	configuration { "linux-gcc", "x32" }
-		targetdir (_buildDir .. "linux32_gcc" .. "/bin")
+		targetdir (_buildDir .. "linux32_gcc" .. "/bin/x32")
 		objdir (_buildDir .. "linux32_gcc" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "linux-gcc", "x64" }
-		targetdir (_buildDir .. "linux64_gcc" .. "/bin")
+		targetdir (_buildDir .. "linux64_gcc" .. "/bin/x64")
 		objdir (_buildDir .. "linux64_gcc" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
 
 	configuration { "linux-clang", "x32" }
-		targetdir (_buildDir .. "linux32_clang" .. "/bin")
+		targetdir (_buildDir .. "linux32_clang" .. "/bin/x32")
 		objdir (_buildDir .. "linux32_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "linux-clang", "x64" }
-		targetdir (_buildDir .. "linux64_clang" .. "/bin")
+		targetdir (_buildDir .. "linux64_clang" .. "/bin/x64")
 		objdir (_buildDir .. "linux64_clang" .. "/obj")
 		buildoptions {
 			"-m64",
@@ -610,7 +610,7 @@ function toolchain(_buildDir, _subDir)
 		}
 
 	configuration { "x32", "nacl" }
-		targetdir (_buildDir .. "nacl-x86" .. "/bin")
+		targetdir (_buildDir .. "nacl-x86" .. "/bin/x32")
 		objdir (_buildDir .. "nacl-x86" .. "/obj")
 
 	configuration { "x32", "nacl", "Debug" }
@@ -620,7 +620,7 @@ function toolchain(_buildDir, _subDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release" }
 
 	configuration { "x64", "nacl" }
-		targetdir (_buildDir .. "nacl-x64" .. "/bin")
+		targetdir (_buildDir .. "nacl-x64" .. "/bin/x64")
 		objdir (_buildDir .. "nacl-x64" .. "/obj")
 
 	configuration { "x64", "nacl", "Debug" }
