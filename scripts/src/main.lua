@@ -26,6 +26,11 @@ function mainProject(_target, _subtarget)
 	flags {
 		"Unicode",
 	}
+
+	if _OPTIONS["SEPARATE_BIN"]~="1" then 
+		targetdir(MAME_DIR)
+	end
+	
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
@@ -33,7 +38,6 @@ function mainProject(_target, _subtarget)
 		targetextension ".bc"  
 
 	configuration { }
-		targetdir(MAME_DIR)
 
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 	links {

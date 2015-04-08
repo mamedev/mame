@@ -74,6 +74,7 @@
 # FASTDEBUG = 1
 
 # FILTER_DEPS = 1
+# SEPARATE_BIN = 1
 
 -include useroptions.mak
 
@@ -490,6 +491,9 @@ ifdef FILTER_DEPS
 PARAMS += --FILTER_DEPS='$(FILTER_DEPS)'
 endif
 
+ifdef SEPARATE_BIN
+PARAMS += --SEPARATE_BIN='$(SEPARATE_BIN)'
+endif
 
 #-------------------------------------------------
 # All scripts

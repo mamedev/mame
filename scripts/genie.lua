@@ -263,6 +263,15 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "SEPARATE_BIN",
+	description = "Use separate bin folders.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 if not _OPTIONS["BIGENDIAN"] then
 	_OPTIONS["BIGENDIAN"] = "0"
 end

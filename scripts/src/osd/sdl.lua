@@ -429,7 +429,9 @@ if _OPTIONS["with-tools"] then
 			MAME_DIR .. "src/lib/util",
 		}
 
-		targetdir(MAME_DIR)
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			targetdir(MAME_DIR)
+		end
 
 		links {
 			"utils",
@@ -480,7 +482,9 @@ if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
 
 		dofile("sdl_cfg.lua")
 
-		targetdir(MAME_DIR)
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			targetdir(MAME_DIR)
+		end
 
 		linkoptions {
 			"-sectcreate __TEXT __info_plist " .. MAME_DIR .. "src/osd/sdl/aueffectutil-Info.plist",

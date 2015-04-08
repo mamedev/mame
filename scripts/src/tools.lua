@@ -10,8 +10,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -41,8 +42,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -76,8 +78,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -107,8 +110,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"dasm",
@@ -145,8 +149,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -179,8 +184,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -213,8 +219,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -244,8 +251,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -275,8 +283,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -306,8 +315,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -339,8 +349,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -370,8 +381,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"utils",
@@ -408,8 +420,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"formats",
@@ -443,8 +456,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"formats",
@@ -479,8 +493,9 @@ options {
 	"ForceCPP",
 }
 
-configuration { }
+if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
+end
 
 links {
 	"formats",

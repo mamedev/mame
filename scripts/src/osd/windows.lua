@@ -217,7 +217,9 @@ if _OPTIONS["with-tools"] then
 			"ForceCPP",
 		}
 
-		targetdir(MAME_DIR)
+		if _OPTIONS["SEPARATE_BIN"]~="1" then 
+			targetdir(MAME_DIR)
+		end
 
 		links {
 			"ocore_" .. _OPTIONS["osd"],
