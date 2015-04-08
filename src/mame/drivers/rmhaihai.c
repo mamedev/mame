@@ -71,7 +71,7 @@ public:
 	DECLARE_MACHINE_RESET(themj);
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
@@ -102,7 +102,7 @@ void rmhaihai_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rmhaihai_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		8, 8, 64, 32);
-		
+
 	save_item(NAME(m_keyboard_cmd));
 	save_item(NAME(m_gfxbank));
 }
