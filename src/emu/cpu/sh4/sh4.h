@@ -11,6 +11,9 @@
 #ifndef __SH4_H__
 #define __SH4_H__
 
+// doesn't actually seem to improve performance at all
+#define SH4_USE_FASTRAM_OPTIMIZATION 0
+#define SH4_MAX_FASTRAM       3
 
 #define SH4_INT_NONE    -1
 enum
@@ -170,6 +173,10 @@ class sh34_base_device : public cpu_device
 public:
 	// construction/destruction
 	sh34_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, endianness_t endianness, address_map_constructor internal);
+
+//#if SH4_USE_FASTRAM_OPTIMIZATION
+	void add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base);
+//#endif
 
 	static void set_md0(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md0 = md0; }
 	static void set_md1(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md1 = md0; }
@@ -683,6 +690,21 @@ protected:
 	UINT32 sh4_handle_chcr3_addr_r(UINT32 mem_mask) { return m_SH4_CHCR3; }
 	UINT32 sh4_handle_dmaor_addr_r(UINT32 mem_mask) { return m_SH4_DMAOR; }
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	/* fast RAM */
+	bool            m_bigendian;
+	UINT32			m_byte_xor;
+	UINT32			m_word_xor;
+	UINT32			m_dword_xor;
+	UINT32              m_fastram_select;
+	struct
+	{
+		offs_t              start;                      /* start of the RAM block */
+		offs_t              end;                        /* end of the RAM block */
+		UINT8               readonly;                   /* TRUE if read-only */
+		void *              base;                       /* base in memory where the RAM lives */
+	}       m_fastram[SH4_MAX_FASTRAM];
+#endif
 };
 
 

@@ -30,6 +30,24 @@
 #include "sh3comn.h"
 #include "sh4tmu.h"
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+void sh34_base_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+	if (m_fastram_select < ARRAY_LENGTH(m_fastram))
+	{
+		m_fastram[m_fastram_select].start = start;
+		m_fastram[m_fastram_select].end = end;
+		m_fastram[m_fastram_select].readonly = readonly;
+		m_fastram[m_fastram_select].base = base;
+		m_fastram_select++;
+	}
+}
+#else
+void sh34_base_device::add_fastram(offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+}
+#endif
+
 
 CPU_DISASSEMBLE( sh4 );
 CPU_DISASSEMBLE( sh4be );
@@ -79,7 +97,17 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 	, c_md7(0)
 	, c_md8(0)
 	, c_clock(0)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	, m_bigendian(endianness == ENDIANNESS_BIG)
+	, m_byte_xor(m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0))
+    , m_word_xor(m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0))
+    , m_dword_xor(m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0))
+	, m_fastram_select(0)
+#endif
 {
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	memset(m_fastram, 0, sizeof(m_fastram));
+#endif
 }
 
 
@@ -233,7 +261,22 @@ inline UINT8 sh34_base_device::RB(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_byte(A);
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		return fastbase[_A ^ m_byte_xor];
+	}
+	return m_program->read_byte(_A);
+#else
 	return m_program->read_byte(A & AM);
+#endif
+
 }
 
 inline UINT16 sh34_base_device::RW(offs_t A)
@@ -241,7 +284,22 @@ inline UINT16 sh34_base_device::RW(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_word(A);
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		return ((UINT16*)fastbase)[(_A ^ m_word_xor) >> 1];
+	}
+	return m_program->read_word(_A);
+#else
 	return m_program->read_word(A & AM);
+#endif
+
 }
 
 inline UINT32 sh34_base_device::RL(offs_t A)
@@ -249,7 +307,22 @@ inline UINT32 sh34_base_device::RL(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_dword(A);
 
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		return ((UINT32*)fastbase)[(_A^m_dword_xor) >> 2];
+	}
+	return m_program->read_dword(_A);
+#else
 	return m_program->read_dword(A & AM);
+#endif
+
 }
 
 inline void sh34_base_device::WB(offs_t A, UINT8 V)
@@ -259,8 +332,23 @@ inline void sh34_base_device::WB(offs_t A, UINT8 V)
 		m_program->write_byte(A,V);
 		return;
 	}
-
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		UINT8 *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		fastbase[_A ^ m_byte_xor] = V;
+		return;
+	}
+	m_program->write_byte(_A,V);
+#else
 	m_program->write_byte(A & AM,V);
+#endif
+
 }
 
 inline void sh34_base_device::WW(offs_t A, UINT16 V)
@@ -270,8 +358,23 @@ inline void sh34_base_device::WW(offs_t A, UINT16 V)
 		m_program->write_word(A,V);
 		return;
 	}
-
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		((UINT16*)fastbase)[(_A ^ m_word_xor) >> 1] = V;
+		return;
+	}
+	m_program->write_word(_A,V);
+#else
 	m_program->write_word(A & AM,V);
+#endif
+
 }
 
 inline void sh34_base_device::WL(offs_t A, UINT32 V)
@@ -281,8 +384,22 @@ inline void sh34_base_device::WL(offs_t A, UINT32 V)
 		m_program->write_dword(A,V);
 		return;
 	}
-
+#if SH4_USE_FASTRAM_OPTIMIZATION
+	const offs_t _A = A & AM;
+	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	{
+		if (m_fastram[ramnum].readonly == TRUE || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+		{
+			continue;
+		}
+		void *fastbase = (UINT8*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+		((UINT32*)fastbase)[(_A ^ m_dword_xor) >> 2] = V;
+		return;
+	}
+	m_program->write_dword(_A,V);
+#else
 	m_program->write_dword(A & AM,V);
+#endif
 }
 
 /*  code                 cycles  t-bit
