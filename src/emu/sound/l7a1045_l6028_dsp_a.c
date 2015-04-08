@@ -77,6 +77,7 @@
 
 #include "emu.h"
 #include "l7a1045_l6028_dsp_a.h"
+#include "debugger.h"
 
 
 // device type definition
@@ -133,7 +134,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			l7a1045_voice *vptr = &m_voice[i];
 
 			UINT32 start = vptr->start;
-			UINT32 end = vptr->start+0x002000;
+			UINT32 end = vptr->end;
 			UINT32 step  = 0x0400;
 
 			UINT32 pos = vptr->pos;
@@ -183,17 +184,12 @@ READ16_MEMBER( l7a1045_sound_device::l7a1045_sound_r )
 {
 	m_stream->update();
 
-	switch (offset)
-	{
-	case 0x00:
-	case 0x01:
-		printf("%08x: l7a1045_sound_r unknown offset %02x\n", space.device().safe_pc(), offset * 2);
-		return 0x0000;
-
-	case 0x02: return l7a1045_sound_port_0004_r(space, offset, mem_mask);
-	case 0x03: return l7a1045_sound_port_0006_r(space, offset, mem_mask);
-	}
-	return 0x000;
+	if(offset == 0)
+		printf("sound_select_r?\n");
+	else
+		return sound_data_r(space,offset -1,mem_mask);
+		
+	return 0xffff;
 }
 
 
@@ -224,8 +220,9 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 {
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
-	if(m_audioregister != 0)
-		printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
+	//if(m_audioregister != 0 && m_audioregister != 7)
+	//if(m_audioregister == 6)
+	//	printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
@@ -233,15 +230,38 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 	{
 		case 0x00:
 
-			vptr->start = (m_audiodat[0][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
-			vptr->start |= (m_audiodat[0][m_audiochannel].dat[1] & 0xffff) << (4);
-			vptr->start |= (m_audiodat[0][m_audiochannel].dat[0] & 0xf000) >> (12);
+			vptr->start = (m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
+			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xffff) << (4);
+			vptr->start |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
 
 			vptr->start &= m_rom_size - 1;
 
-			//printf("%08x: REGISTER 00 write port 0x0002 chansel %02x data %04x (%04x%04x%04x)\n", space.device().safe_pc(), m_audiochannel, data, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 			break;
+		case 0x01:
+			// relative to start
+				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0]);
+				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[1]);
+				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 
+			if(m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x100)
+			{
+				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xffff) << 2;
+				vptr->end += vptr->start;
+				// hopefully it'll never happen? Maybe assert here?
+				vptr->end &= m_rom_size - 1;
+
+			}
+			else // absolute
+			{
+				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
+				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xffff) << (4);
+				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
+
+				vptr->end &= m_rom_size - 1;
+			}
+			
+			break;
+		
 		case 0x07:
 
 			vptr->r_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xff);
@@ -255,77 +275,56 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 	}
 }
 
+
+READ16_MEMBER(l7a1045_sound_device::sound_data_r)
+{
+	//printf("%04x (%04x %04x)\n",offset,m_audioregister,m_audiochannel);
+	//debugger_break(machine());
+	l7a1045_voice *vptr = &m_voice[m_audiochannel];
+
+	switch(m_audioregister)
+	{
+		case 0x00: 
+		{
+			UINT32 current_addr;
+			UINT16 res;
+			
+			current_addr = vptr->start + vptr->pos;
+			if(offset == 0)
+				res = (current_addr & 0xf) << 12; // TODO: frac
+			else if(offset == 1)
+				res = (current_addr & 0xffff0) >> 4;
+			else
+				res = (current_addr & 0xf00000) >> 20;
+		
+			return res;
+		}
+	}
+	
+	return 0;
+}
+
 WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
 {
 	if(data & 0x100) // keyin
 	{
 		l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
+		#if 0
+		if(vptr->start != 0)
+		{
+		printf("%08x START\n",vptr->start);
+		printf("%08x END\n",vptr->end);
+		
+		for(int i=0;i<0x10;i++)
+			printf("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
+		}
+		#endif
+		
 		vptr->frac = 0;
 		vptr->pos = 0;
 		m_key |= 1 << m_audiochannel;
 	}
 }
 
-READ16_MEMBER(l7a1045_sound_device::l7a1045_sound_port_0004_r)
-{
-	// it writes the channel select before reading this.. so either it works on channels, or the command..
 
-	// buriki reads registers 03/05/00 these at the moment, others don't
-	// also reads 06
-
-	switch (m_audioregister)
-	{
-	default:
-
-	case 0x01:
-	case 0x02:
-	case 0x04:
-	case 0x07:
-	case 0x08:
-	case 0x09:
-	case 0x0a:
-		printf("%08x: unexpected read port 0x0004 register %02x chansel %02x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
-		break;
-
-	case 0x03:
-	case 0x05:
-	case 0x00:
-	case 0x06:
-		//printf("%08x: read port 0x0004 register %02x chansel %02x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
-		break;
-
-
-	}
-	return 0;
-}
-
-READ16_MEMBER(l7a1045_sound_device::l7a1045_sound_port_0006_r)
-{
-	// it writes the channel select before reading this.. so either it works on channels, or the command..
-
-	// buriki reads register 00
-
-	switch (m_audioregister)
-	{
-	default:
-
-	case 0x01:
-	case 0x02:
-	case 0x03:
-	case 0x04:
-	case 0x05:
-	case 0x06:
-	case 0x07:
-	case 0x08:
-	case 0x09:
-	case 0x0a:
-		printf("%08x: unexpected read port 0x0006 register %02x chansel %02x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
-		break;
-
-	case 0x00:
-		//printf("%08x: read port 0x0006 register %02x chansel %02x (%04x%04x%04x)\n", space.device().safe_pc(), m_audioregister, m_audiochannel, m_audiodat[m_audioregister][m_audiochannel].dat[0], m_audiodat[m_audioregister][m_audiochannel].dat[1], m_audiodat[m_audioregister][m_audiochannel].dat[2]);
-		break;
-	}
-	return rand();
-}

@@ -13,6 +13,7 @@ struct l7a1045_voice
 	}
 
 	UINT32 start;
+	UINT32 end;
 	UINT32 pos;
 	UINT32 frac;
 	UINT16 l_volume;
@@ -58,12 +59,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(sound_select_w);
 	DECLARE_WRITE16_MEMBER(sound_data_w);
+	DECLARE_READ16_MEMBER(sound_data_r);
 	DECLARE_WRITE16_MEMBER(sound_status_w);
-
-	DECLARE_READ16_MEMBER(l7a1045_sound_port_0004_r);
-	DECLARE_READ16_MEMBER(l7a1045_sound_port_0006_r);
-
-
 };
 
 extern const device_type L7A1045;

@@ -66,7 +66,7 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 	UINT32 mem_mask32 = mem_mask;
 	UINT32 data32 = data;
 
-	/* swap data around.. keep the v55 happy */
+	/* swap data around.. keep the v53 happy */
 	data = data32 >> 16;
 	data = FLIPENDIAN_INT16(data);
 	mem_mask = mem_mask32 >> 16;
@@ -195,7 +195,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
 
 	/* TODO: huh? */
-	m_audiocpu->dreq3_w(data&1);
+	m_audiocpu->dreq3_w(data&0x1);
 	m_dsp->l7a1045_sound_w(space,8/2,data,mem_mask);
 //  m_audiocpu->hack_w(1);
 
@@ -205,7 +205,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 {
 	// read in irq5
-	logerror("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
+	printf("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
 	return 0;
 }
 
@@ -326,6 +326,7 @@ WRITE8_MEMBER(hng64_state::dma_iow3_cb)
 	// currently it reads a block of 0x20 '0x00' values from a very specific block of RAM where there is a 0x20 space in the data and transfers them repeatedly, I assume
 	// this is some kind of buffer for the audio or DSP and eventually will be populated with other values...
 	// if this comes to life maybe something interesting is happening!
+
 	if (data!=0x00) logerror("dma_iow3_cb %02x\n", data);
 }
 
@@ -378,7 +379,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 MACHINE_CONFIG_FRAGMENT( hng64_audio )
-	MCFG_CPU_ADD("audiocpu", V53A, 16000000)              // V53A, 16? mhz!
+	MCFG_CPU_ADD("audiocpu", V53A, 32000000*2)              // V53A, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
 	MCFG_CPU_IO_MAP(hng_sound_io)
 	MCFG_V53_DMAU_OUT_HREQ_CB(WRITELINE(hng64_state, dma_hreq_cb))
@@ -391,7 +392,7 @@ MACHINE_CONFIG_FRAGMENT( hng64_audio )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("l7a1045", L7A1045, 16000000 ) // ??
+	MCFG_SOUND_ADD("l7a1045", L7A1045, 32000000/2 ) // ??
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

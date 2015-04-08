@@ -429,6 +429,7 @@ Keyboard TX commands:
 #include "machine/idectrl.h"
 #include "machine/idehd.h"
 
+#include "debugger.h"
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
@@ -1666,7 +1667,6 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_req )
 	m_dmac->dreq0_w(!(state && !(m_sasi_ctrl_in->read() & 8) && (m_sasi_ctrl & 2)));
 }
 
-#include "debugger.h"
 
 READ8_MEMBER( pc9801_state::sasi_status_r )
 {
