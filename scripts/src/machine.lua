@@ -1385,6 +1385,7 @@ end
 if (MACHINES["MIOT6530"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/machine/mos6530.c",
+		MAME_DIR .. "src/emu/machine/mos6530n.c",
 	}
 end
 
