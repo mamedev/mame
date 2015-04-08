@@ -40,17 +40,19 @@ namespace bgfx { namespace gl
 	class AutoreleasePoolHolder
 	{
 	public:
-		AutoreleasePoolHolder() : pool([[NSAutoreleasePool alloc] init])
+		AutoreleasePoolHolder() : m_pool([[NSAutoreleasePool alloc] init])
 		{
 		}
 
 		~AutoreleasePoolHolder()
 		{
-			[pool release];
+			[m_pool release];
 		}
 
 	private:
-		NSAutoreleasePool* pool;
+		AutoreleasePoolHolder(AutoreleasePoolHolder const&);
+
+		NSAutoreleasePool* const m_pool;
 	};
 
 	static void* s_opengl = NULL;
@@ -99,6 +101,7 @@ namespace bgfx { namespace gl
 			NSOpenGLView* glView = [[NSOpenGLView alloc] initWithFrame:glViewRect pixelFormat:pixelFormat];
 
 			[pixelFormat release];
+//			[glView setWantsBestResolutionOpenGLSurface:YES];
 			[nsWindow setContentView:glView];
 
 			NSOpenGLContext* glContext = [glView openGLContext];
@@ -128,11 +131,12 @@ namespace bgfx { namespace gl
 		bx::dlclose(s_opengl);
 	}
 
-	void GlContext::resize(uint32_t _width, uint32_t _height, bool _vsync)
+	void GlContext::resize(uint32_t _width, uint32_t _height, uint32_t _flags)
 	{
 		BX_UNUSED(_width, _height);
 
-		GLint interval = _vsync ? 1 : 0;
+		bool vsync = !!(_flags&BGFX_RESET_VSYNC);
+		GLint interval = vsync ? 1 : 0;
 		NSOpenGLContext* glContext = (NSOpenGLContext*)m_context;
 		[glContext setValues:&interval forParameter:NSOpenGLCPSwapInterval];
 		[glContext update];

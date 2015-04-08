@@ -361,7 +361,7 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "vs2008" }
-		includedirs { path.join(bxDir .. "include/compat/msvc/pre1600") }
+		includedirs { path.join(bxDir, "include/compat/msvc/pre1600") }
 
 	configuration { "x32", "vs*" }
 		targetdir (path.join(_buildDir, "win32_" .. _ACTION, "bin"))
@@ -401,6 +401,11 @@ function toolchain(_buildDir, _libDir)
 		removeflags {
 			"StaticRuntime",
 			"NoExceptions",
+		}
+
+	configuration { "*-gcc* or osx" }
+		buildoptions {
+			"-Wshadow",
 		}
 
 	configuration { "mingw-*" }

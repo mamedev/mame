@@ -14,6 +14,12 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wundef");
 #include <d3dx9.h>
 BX_PRAGMA_DIAGNOSTIC_POP();
 
+#if defined(__MINGW32__)
+#	ifndef D3DXDisassembleShader
+extern "C" HRESULT WINAPI D3DXDisassembleShader(CONST DWORD* pShader, BOOL EnableColorCode, LPCSTR pComments, LPD3DXBUFFER* ppDisassembly);
+#	endif // D3DXDisassembleShader
+#endif // !defined(__MINGW32__)
+
 struct UniformRemapDx9
 {
 	UniformType::Enum id;

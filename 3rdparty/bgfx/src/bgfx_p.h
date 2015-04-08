@@ -379,7 +379,7 @@ namespace bgfx
 			BX_FREE(g_allocator, m_mem);
 		}
 
-		void resize(bool _small = false, uint16_t _width = BGFX_DEFAULT_WIDTH, uint16_t _height = BGFX_DEFAULT_HEIGHT)
+		void resize(bool _small = false, uint32_t _width = BGFX_DEFAULT_WIDTH, uint32_t _height = BGFX_DEFAULT_HEIGHT)
 		{
 			uint32_t width = bx::uint32_max(1, _width/8);
 			uint32_t height = bx::uint32_max(1, _height/(_small ? 8 : 16) );
@@ -389,8 +389,8 @@ namespace bgfx
 			||  m_height != height
 			||  m_small != _small)
 			{
-				m_small = _small;
-				m_width = (uint16_t)width;
+				m_small  = _small;
+				m_width  = (uint16_t)width;
 				m_height = (uint16_t)height;
 
 				uint32_t size = m_size;
@@ -701,7 +701,7 @@ namespace bgfx
 		void operator=(const CommandBuffer&);
 	};
 
-#define SORT_KEY_RENDER_DRAW (UINT64_C(1)<<0x2b)
+#define SORT_KEY_RENDER_DRAW (UINT64_C(1)<<0x36)
 #define SORT_KEY_VIEW_SHIFT  UINT8_C(0x37)
 #define SORT_KEY_VIEW_MASK   ( (uint64_t(BGFX_CONFIG_MAX_VIEWS-1) )<<SORT_KEY_VIEW_SHIFT)
 
@@ -714,16 +714,16 @@ namespace bgfx
 		{
 			// |               3               2               1               0|
 			// |fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210|
-			// | vvvvvvvvsssssssssssdttpppppppppdddddddddddddddddddddddddddddddd|
-			// |        ^          ^^ ^        ^                               ^|
-			// |        |          || |        |                               ||
-			// |   view-+      seq-+| +-trans  +-program                 depth-+|
-			// |                    +-draw                                      |
+			// | vvvvvvvvdsssssssssssttpppppppppdddddddddddddddddddddddddddddddd|
+			// |        ^^          ^ ^        ^                               ^|
+			// |        ||          | |        |                               ||
+			// |   view-+|      seq-+ +-trans  +-program                 depth-+|
+			// |         +-draw                                                 |
 
 			const uint64_t depth   = m_depth;
 			const uint64_t program = uint64_t(m_program)<<0x20;
 			const uint64_t trans   = uint64_t(m_trans  )<<0x29;
-			const uint64_t seq     = uint64_t(m_seq    )<<0x2c;
+			const uint64_t seq     = uint64_t(m_seq    )<<0x2b;
 			const uint64_t view    = uint64_t(m_view   )<<SORT_KEY_VIEW_SHIFT;
 			const uint64_t key     = depth|program|trans|SORT_KEY_RENDER_DRAW|seq|view;
 			return key;
@@ -733,14 +733,14 @@ namespace bgfx
 		{
 			// |               3               2               1               0|
 			// |fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210|
-			// | vvvvvvvvsssssssssssdppppppppp                                  |
-			// |        ^          ^^        ^                                  |
-			// |        |          ||        |                                  |
-			// |   view-+      seq-+|        +-program                          |
-			// |                    +-draw                                      |
+			// | vvvvvvvvdsssssssssssppppppppp                                  |
+			// |        ^^          ^        ^                                  |
+			// |        ||          |        |                                  |
+			// |   view-+|      seq-+        +-program                          |
+			// |         +-draw                                                 |
 
 			const uint64_t program = uint64_t(m_program)<<0x22;
-			const uint64_t seq     = uint64_t(m_seq    )<<0x2c;
+			const uint64_t seq     = uint64_t(m_seq    )<<0x2b;
 			const uint64_t view    = uint64_t(m_view   )<<SORT_KEY_VIEW_SHIFT;
 			const uint64_t key     = program|seq|view;
 			return key;
@@ -1418,7 +1418,7 @@ namespace bgfx
 		{
  			m_draw.m_instanceDataOffset = _idb->offset;
 			m_draw.m_instanceDataStride = _idb->stride;
-			m_draw.m_numInstances       = bx::uint32_min(_idb->num, _num);
+			m_draw.m_numInstances       = uint16_t(bx::uint32_min(_idb->num, _num) );
 			m_draw.m_instanceDataBuffer = _idb->handle;
 			BX_FREE(g_allocator, const_cast<InstanceDataBuffer*>(_idb) );
 		}
@@ -1427,7 +1427,7 @@ namespace bgfx
 		{
 			m_draw.m_instanceDataOffset = _startVertex * _stride;
 			m_draw.m_instanceDataStride = _stride;
-			m_draw.m_numInstances       = _num;
+			m_draw.m_numInstances       = uint16_t(_num);
 			m_draw.m_instanceDataBuffer = _handle;
 		}
 
@@ -1768,9 +1768,9 @@ namespace bgfx
 
 			if (0 < m_free.size() )
 			{
-				Free free = m_free.front();
+				Free freeBlock = m_free.front();
 				m_free.pop_front();
-				return free.m_ptr;
+				return freeBlock.m_ptr;
 			}
 
 			return 0;
@@ -1934,11 +1934,10 @@ namespace bgfx
 		{
 		}
 
-		static int32_t renderThread(void* _userData)
+		static int32_t renderThread(void* /*_userData*/)
 		{
 			BX_TRACE("render thread start");
-			Context* ctx = (Context*)_userData;
-			while (!ctx->renderFrame() ) {};
+			while (RenderFrame::Exiting != bgfx::renderFrame() ) {};
 			BX_TRACE("render thread exit");
 			return EXIT_SUCCESS;
 		}
@@ -3069,10 +3068,10 @@ namespace bgfx
 		{
 			Clear& clear = m_clear[_id];
 			clear.m_flags = _flags;
-			clear.m_index[0] = _rgba>>24;
-			clear.m_index[1] = _rgba>>16;
-			clear.m_index[2] = _rgba>> 8;
-			clear.m_index[3] = _rgba>> 0;
+			clear.m_index[0] = uint8_t(_rgba>>24);
+			clear.m_index[1] = uint8_t(_rgba>>16);
+			clear.m_index[2] = uint8_t(_rgba>> 8);
+			clear.m_index[3] = uint8_t(_rgba>> 0);
 			clear.m_depth    = _depth;
 			clear.m_stencil  = _stencil;
 		}

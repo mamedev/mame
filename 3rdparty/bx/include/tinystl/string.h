@@ -47,8 +47,8 @@ namespace tinystl {
 		size_t size() const;
 		bool empty() const;
 
-		void reserve(size_t size);
-		void resize(size_t size);
+		void reserve(size_t _size);
+		void resize(size_t _size);
 
 		void append(const char* first, const char* last);
 		void append(const char* str);
@@ -145,7 +145,7 @@ namespace tinystl {
 			return;
 		}
 
-		const size_t size = (size_t)(m_last - m_first);
+		const size_t _size = (size_t)(m_last - m_first);
 
 		pointer newfirst = (pointer)Alloc::static_allocate(capacity + 1);
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit) {
@@ -157,17 +157,17 @@ namespace tinystl {
 		}
 
 		m_first = newfirst;
-		m_last = newfirst + size;
+		m_last = newfirst + _size;
 		m_capacity = m_first + capacity;
 	}
 
 	template<typename Alloc>
-	inline void stringT<Alloc>::resize(size_t size) {
-		reserve(size);
-		for (pointer it = m_last, end = m_first + size + 1; it < end; ++it)
+	inline void stringT<Alloc>::resize(size_t _size) {
+		reserve(_size);
+		for (pointer it = m_last, end = m_first + _size + 1; it < end; ++it)
 			*it = 0;
 
-		m_last += size;
+		m_last += _size;
 	}
 
 	template<typename Alloc>
