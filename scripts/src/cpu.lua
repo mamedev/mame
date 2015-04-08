@@ -1603,6 +1603,9 @@ if (CPUS["TMS57002"]~=null) then
 		{ MAME_DIR .. "src/emu/cpu/tms57002/tms57kdec.c", GEN_DIR .. "emu/cpu/tms57002/tms57002.inc" },
 		{ MAME_DIR .. "src/emu/cpu/tms57002/tms57002.c",  GEN_DIR .. "emu/cpu/tms57002/tms57002.inc" },
 	}
+	custombuildtask { 	
+		{ MAME_DIR .. "src/emu/cpu/tms57002/tmsinstr.lst" , GEN_DIR .. "emu/cpu/tms57002/tms57002.inc",   { MAME_DIR .. "src/emu/cpu/tms57002/tmsmake.py" }, {"@echo Generating TMS57002 source file...", PYTHON .. " $(1) $(<) $(@)" } }
+	}
 end
 
 if (CPUS["TMS57002"]~=null or _OPTIONS["with-tools"]) then
