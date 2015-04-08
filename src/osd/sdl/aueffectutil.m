@@ -44,6 +44,8 @@ static NSString *const ComponentTypeKey         = @"ComponentType";
 static NSString *const ComponentSubTypeKey      = @"ComponentSubType";
 static NSString *const ComponentManufacturerKey = @"ComponentManufacturer";
 static NSString *const ClassInfoKey             = @"ClassInfo";
+static NSString *const ForceGenericViewKey      = @"ForceGenericView";
+static NSString *const WindowFrameKey           = @"WindowFrame";
 
 
 static void UpdateChangeCountCallback(void                      *userData,
@@ -59,8 +61,14 @@ static void UpdateChangeCountCallback(void                      *userData,
 @interface AUEffectDocument : NSDocument <NSWindowDelegate>
 {
 	IBOutlet NSWindow           *window;
+	IBOutlet NSButton           *genericViewButton;
+	IBOutlet NSPopUpButton      *presetButton;
 	NSView                      *view;
+	NSSize                      headerSize;
+	CFArrayRef                  presets;
 	AUParameterListenerRef      listener;
+	BOOL                        forceGenericView;
+	NSString                    *restoreFrame;
 
 	AudioComponentDescription   description;
 	AUGraph                     graph;
@@ -74,6 +82,9 @@ static void UpdateChangeCountCallback(void                      *userData,
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)type error:(NSError **)error;
 - (NSData *)dataOfType:(NSString *)type error:(NSError **)error;
 
+- (IBAction)toggleGenericView:(id)sender;
+- (IBAction)loadPreset:(id)sender;
+
 - (void)viewFrameDidChange:(NSNotification *)notification;
 
 @end
@@ -84,6 +95,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 	if ((0 == effectNode) || (nil == window))
 		return;
 
+	BOOL customViewValid = NO;
 	OSStatus status;
 	UInt32 uiDescSize;
 	AudioUnitCocoaViewInfo *viewInfo;
@@ -111,10 +123,14 @@ static void UpdateChangeCountCallback(void                      *userData,
 			 && [viewClass conformsToProtocol:@protocol(AUCocoaUIBase)]
 			 && [viewClass instancesRespondToSelector:@selector(uiViewForAudioUnit:withSize:)])
 			{
-				id const factory = [[viewClass alloc] init];
-				view = [factory uiViewForAudioUnit:effectUnit
-										  withSize:[[window contentView] bounds].size];
-				[factory release];
+				customViewValid = YES;
+				if (!forceGenericView)
+				{
+					id const factory = [[viewClass alloc] init];
+					view = [factory uiViewForAudioUnit:effectUnit
+											  withSize:[[window contentView] bounds].size];
+					[factory release];
+				}
 			}
 			CFRelease(viewInfo->mCocoaAUViewBundleLocation);
 			for (UInt32 i = 0; i < uiClassCount; i++)
@@ -133,9 +149,9 @@ static void UpdateChangeCountCallback(void                      *userData,
 	NSRect const oldFrame = [window frame];
 	NSRect const desired = [window frameRectForContentRect:[view frame]];
 	NSRect const newFrame = NSMakeRect(oldFrame.origin.x,
-									   oldFrame.origin.y + oldFrame.size.height - desired.size.height,
+									   oldFrame.origin.y + oldFrame.size.height - headerSize.height - desired.size.height,
 									   desired.size.width,
-									   desired.size.height);
+									   headerSize.height + desired.size.height);
 	[window setFrame:newFrame display:YES animate:NO];
 	[[window contentView] addSubview:view];
 	[view setPostsFrameChangedNotifications:YES];
@@ -143,22 +159,56 @@ static void UpdateChangeCountCallback(void                      *userData,
 											 selector:@selector(viewFrameDidChange:)
 												 name:NSViewFrameDidChangeNotification
 											   object:view];
+
+	[genericViewButton setEnabled:customViewValid];
+	if (!customViewValid)
+	{
+		forceGenericView = YES;
+		[genericViewButton setState:NSOnState];
+	}
+
+	CFIndex const presetCount = (NULL != presets) ? CFArrayGetCount(presets) : 0;
+	[presetButton setEnabled:(0 < presetCount)];
+	while (1 < [presetButton numberOfItems])
+		[presetButton removeItemAtIndex:1];
+	for (CFIndex i = 0; i < presetCount; i++)
+	{
+		AUPreset const *preset = (AUPreset const*)CFArrayGetValueAtIndex(presets, i);
+		NSMenuItem const *item = [[presetButton menu] addItemWithTitle:(NSString *)preset->presetName
+																action:@selector(loadPreset:)
+														 keyEquivalent:@""];
+		[item setTarget:self];
+		[item setTag:i];
+	}
 }
 
 - (id)init {
 	if (!(self = [super init])) return nil;
 
 	window = nil;
+	genericViewButton = nil;
+	presetButton = nil;
 	view = nil;
+	presets = NULL;
 	listener = NULL;
+	forceGenericView = NO;
+	restoreFrame = nil;
 
 	description.componentType = description.componentSubType = description.componentManufacturer = 0;
 	description.componentFlags = description.componentFlagsMask = 0;
 	graph = NULL;
 	outputNode = sourceNode = effectNode = 0;
 
-	AudioComponentDescription const outputDesc = { kAudioUnitType_Output, kAudioUnitSubType_DefaultOutput, kAudioUnitManufacturer_Apple, 0, 0, };
-	AudioComponentDescription const sourceDesc = { kAudioUnitType_Generator, kAudioUnitSubType_AudioFilePlayer, kAudioUnitManufacturer_Apple, 0, 0, };
+	AudioComponentDescription const outputDesc = { kAudioUnitType_Output,
+												   kAudioUnitSubType_DefaultOutput,
+												   kAudioUnitManufacturer_Apple,
+												   0,
+												   0, };
+	AudioComponentDescription const sourceDesc = { kAudioUnitType_Generator,
+												   kAudioUnitSubType_AudioFilePlayer,
+												   kAudioUnitManufacturer_Apple,
+												   0,
+												   0, };
 	if ((noErr != NewAUGraph(&graph))
 	 || (noErr != AUGraphAddNode(graph, &outputDesc, &outputNode))
 	 || (noErr != AUGraphAddNode(graph, &sourceDesc, &sourceNode))
@@ -175,8 +225,14 @@ static void UpdateChangeCountCallback(void                      *userData,
 }
 
 - (void)dealloc {
+	if (NULL != presets)
+		CFRelease(presets);
+
 	if (NULL != listener)
 		AUListenerDispose(listener);
+
+	if (nil != restoreFrame)
+		[restoreFrame release];
 
 	if (NULL != graph)
 	{
@@ -188,16 +244,57 @@ static void UpdateChangeCountCallback(void                      *userData,
 }
 
 - (void)makeWindowControllers {
-	window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, 400, 300)
+	genericViewButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 18)];
+	[genericViewButton setAutoresizingMask:NSViewNotSizable];
+	[[genericViewButton cell] setControlSize:NSSmallControlSize];
+	[genericViewButton setButtonType:NSSwitchButton];
+	[genericViewButton setBordered:NO];
+	[genericViewButton setAllowsMixedState:NO];
+	[genericViewButton setState:(forceGenericView ? NSOnState : NSOffState)];
+	[genericViewButton setTitle:@"Use generic editor view"];
+	[genericViewButton setAction:@selector(toggleGenericView:)];
+	[genericViewButton setTarget:self];
+	[genericViewButton sizeToFit];
+
+	presetButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 22) pullsDown:YES];
+	[presetButton setAutoresizingMask:NSViewNotSizable];
+	[[presetButton cell] setControlSize:NSSmallControlSize];
+	[[presetButton cell] setFont:[NSFont systemFontOfSize:[NSFont systemFontSizeForControlSize:NSSmallControlSize]]];
+	[presetButton setTitle:@"Load preset"];
+	[[[presetButton menu] addItemWithTitle:@"Load preset" action:NULL keyEquivalent:@""] setHidden:YES];
+	[presetButton sizeToFit];
+
+	CGFloat const controlWidth = MAX(NSWidth([genericViewButton frame]), NSWidth([presetButton frame]));
+	NSRect const presetFrame = NSMakeRect(17,
+										  8,
+										  controlWidth,
+										  NSHeight([presetButton frame]));
+	NSRect const genericViewFrame = NSMakeRect(17,
+											   NSMaxY(presetFrame) + 9,
+											   controlWidth,
+											   NSHeight([genericViewButton frame]));
+	[genericViewButton setFrame:genericViewFrame];
+	[presetButton setFrame:presetFrame];
+
+	headerSize = NSMakeSize((2 * 17) + controlWidth, 18 + NSMaxY(genericViewFrame));
+	NSView *const container = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, headerSize.width, headerSize.height)];
+	[container setAutoresizingMask:(NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin)];
+	[container addSubview:genericViewButton];
+	[genericViewButton release];
+	[container addSubview:presetButton];
+	[presetButton release];
+
+	window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0, 0, headerSize.width, headerSize.height)
 										 styleMask:(NSTitledWindowMask |
 													NSClosableWindowMask |
 													NSMiniaturizableWindowMask)
 										   backing:NSBackingStoreBuffered
 											 defer:YES];
-	[window setContentMinSize:NSMakeSize(400, 300)];
 	[window setReleasedWhenClosed:NO];
 	[window setDelegate:self];
 	[window setTitle:@"Effect"];
+	[[window contentView] addSubview:container];
+	[container release];
 	[self setWindow:window];
 
 	NSWindowController *const controller = [[NSWindowController alloc] initWithWindow:window];
@@ -206,10 +303,13 @@ static void UpdateChangeCountCallback(void                      *userData,
 	[window release];
 
 	[self loadEffectUI];
+	if (nil != restoreFrame)
+		[window setFrameFromString:restoreFrame];
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)type error:(NSError **)error {
 	OSStatus status;
+	UInt32 propertySize;
 
 	BOOL const hasWrapper = [type isEqualToString:AUEffectDocumentType];
 	if (!hasWrapper && ![type isEqualToString:AUPresetDocumentType])
@@ -243,9 +343,9 @@ static void UpdateChangeCountCallback(void                      *userData,
 		return NO;
 	}
 
-	id const typeValue = [desc objectForKey:(hasWrapper ? ComponentTypeKey : @"type")];
-	id const subtypeValue = [desc objectForKey:(hasWrapper ? ComponentSubTypeKey : @"subtype")];
-	id const manufacturerValue = [desc objectForKey:(hasWrapper ? ComponentManufacturerKey : @"manufacturer")];
+	id const typeValue = [desc objectForKey:(hasWrapper ? ComponentTypeKey : (NSString *)CFSTR(kAUPresetTypeKey))];
+	id const subtypeValue = [desc objectForKey:(hasWrapper ? ComponentSubTypeKey : (NSString *)CFSTR(kAUPresetSubtypeKey))];
+	id const manufacturerValue = [desc objectForKey:(hasWrapper ? ComponentManufacturerKey : (NSString *)CFSTR(kAUPresetManufacturerKey))];
 	if ((nil == typeValue)          || ![typeValue isKindOfClass:[NSNumber class]]
 	 || (nil == subtypeValue)       || ![subtypeValue isKindOfClass:[NSNumber class]]
 	 || (nil == manufacturerValue)  || ![manufacturerValue isKindOfClass:[NSNumber class]]
@@ -261,6 +361,11 @@ static void UpdateChangeCountCallback(void                      *userData,
 		return NO;
 	}
 
+	if (NULL != presets)
+	{
+		CFRelease(presets);
+		presets = NULL;
+	}
 	if (NULL != listener)
 	{
 		AUListenerDispose(listener);
@@ -331,13 +436,14 @@ static void UpdateChangeCountCallback(void                      *userData,
 		}
 	}
 
-	UInt32 paramListSize = 0;
+	propertySize = 0;
 	status = AudioUnitGetPropertyInfo(
 			effectUnit,
 			kAudioUnitProperty_ParameterList,
 			kAudioUnitScope_Global,
 			0,
-			&paramListSize, NULL);
+			&propertySize,
+			NULL);
 	if (noErr != status)
 	{
 		if (NULL != error)
@@ -351,7 +457,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 		}
 		return NO;
 	}
-	UInt32 const paramCount = paramListSize / sizeof(AudioUnitParameterID);
+	UInt32 const paramCount = propertySize / sizeof(AudioUnitParameterID);
 	if (0U < paramCount)
 	{
 		status = AUEventListenerCreate(UpdateChangeCountCallback,
@@ -374,14 +480,14 @@ static void UpdateChangeCountCallback(void                      *userData,
 			}
 			return NO;
 		}
-		AudioUnitParameterID *const params = (AudioUnitParameterID *)malloc(paramListSize);
+		AudioUnitParameterID *const params = (AudioUnitParameterID *)malloc(propertySize);
 		AudioUnitGetProperty(
 				effectUnit,
 				kAudioUnitProperty_ParameterList,
 				kAudioUnitScope_Global,
 				0,
 				params,
-				&paramListSize);
+				&propertySize);
 		if (noErr != status)
 		{
 			free(params);
@@ -423,6 +529,35 @@ static void UpdateChangeCountCallback(void                      *userData,
 		}
 	}
 
+	propertySize = sizeof(presets);
+	status = AudioUnitGetProperty(effectUnit,
+								  kAudioUnitProperty_FactoryPresets,
+								  kAudioUnitScope_Global,
+								  0,
+								  &presets,
+								  &propertySize);
+	if ((noErr != status) && (NULL != presets))
+	{
+		CFRelease(presets);
+		presets = NULL;
+	}
+
+	if (hasWrapper)
+	{
+		if ((nil != [desc objectForKey:ForceGenericViewKey])
+		 && [[desc objectForKey:ForceGenericViewKey] respondsToSelector:@selector(boolValue)])
+		{
+			forceGenericView = [[desc objectForKey:ForceGenericViewKey] boolValue];
+			[genericViewButton setState:(forceGenericView ? NSOnState : NSOffState)];
+		}
+		if ((nil != [desc objectForKey:WindowFrameKey])
+		 && [[desc objectForKey:WindowFrameKey] isKindOfClass:[NSString class]])
+		{
+			if (nil != restoreFrame) [restoreFrame release];
+			restoreFrame = [[NSString alloc] initWithString:[desc objectForKey:WindowFrameKey]];
+		}
+	}
+
 	[self loadEffectUI];
 
 	return YES;
@@ -456,10 +591,14 @@ static void UpdateChangeCountCallback(void                      *userData,
 		NSNumber const *typeVal = [NSNumber numberWithUnsignedLong:description.componentType];
 		NSNumber const *subtypeVal = [NSNumber numberWithUnsignedLong:description.componentSubType];
 		NSNumber const *manufacturerVal = [NSNumber numberWithUnsignedLong:description.componentManufacturer];
-		desc = [NSDictionary dictionaryWithObjectsAndKeys:typeVal,          ComponentTypeKey,
-														  subtypeVal,       ComponentSubTypeKey,
-														  manufacturerVal,  ComponentManufacturerKey,
-														  classInfo,        ClassInfoKey,
+		NSNumber const *forceGenericViewVal = [NSNumber numberWithBool:forceGenericView];
+		NSString const *windowFrameVal = [window stringWithSavedFrame];
+		desc = [NSDictionary dictionaryWithObjectsAndKeys:typeVal,              ComponentTypeKey,
+														  subtypeVal,           ComponentSubTypeKey,
+														  manufacturerVal,      ComponentManufacturerKey,
+														  classInfo,            ClassInfoKey,
+														  forceGenericViewVal,  ForceGenericViewKey,
+														  windowFrameVal,       WindowFrameKey,
 														  nil];
 	}
 	else if ([type isEqualToString:AUPresetDocumentType])
@@ -498,13 +637,74 @@ static void UpdateChangeCountCallback(void                      *userData,
 	return data;
 }
 
+- (IBAction)toggleGenericView:(id)sender {
+	forceGenericView = (NSOnState == [sender state]);
+	if (nil != view)
+	{
+		[[NSNotificationCenter defaultCenter] removeObserver:self
+														name:NSViewFrameDidChangeNotification
+													  object:nil];
+		[view removeFromSuperview];
+		view = nil;
+	}
+	if (0 != effectNode)
+		[self loadEffectUI];
+}
+
+- (IBAction)loadPreset:(id)sender {
+	OSStatus status;
+
+	CFIndex const idx = [sender tag];
+	CFIndex const total = (NULL == presets) ? 0 : CFArrayGetCount(presets);
+	if ((0 > idx) || (total <= idx))
+	{
+		NSAlert const *alert = [[NSAlert alloc] init];
+		[alert setMessageText:@"Invalid preset selected"];
+		[alert setInformativeText:[NSString stringWithFormat:@"Tried to select preset %ld of %ld",
+															 (long)idx + 1,
+															 (long)total]];
+		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		return;
+	}
+
+	AUPreset const *preset = (AUPreset const *)CFArrayGetValueAtIndex(presets, idx);
+	status = AudioUnitSetProperty(effectUnit,
+								  kAudioUnitProperty_PresentPreset,
+								  kAudioUnitScope_Global,
+								  0,
+								  preset,
+								  sizeof(AUPreset));
+	if (noErr != status)
+	{
+		NSAlert const *alert = [[NSAlert alloc] init];
+		[alert setMessageText:[NSString stringWithFormat:@"Error loading preset %@", preset->presetName]];
+		[alert setInformativeText:[NSString stringWithFormat:@"Error %ld encountered while setting AudioUnit property",
+															 (long)status]];
+		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		return;
+	}
+
+	AudioUnitParameter change = { effectUnit, kAUParameterListener_AnyParameter, 0, 0 };
+	status = AUParameterListenerNotify(NULL, NULL, &change);
+	if (noErr != status)
+	{
+		NSAlert const *alert = [[NSAlert alloc] init];
+		[alert setMessageText:[NSString stringWithFormat:@"Error notifying of parameter changes for preset %@",
+														 preset->presetName]];
+		[alert setInformativeText:[NSString stringWithFormat:@"Error %ld encountered while sending notification",
+															 (long)status]];
+		[alert beginSheetModalForWindow:window modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+		return;
+	}
+}
+
 - (void)viewFrameDidChange:(NSNotification *)notification {
 	NSRect const oldFrame = [window frame];
 	NSRect const desired = [window frameRectForContentRect:[[notification object] frame]];
 	NSRect const newFrame = NSMakeRect(oldFrame.origin.x,
-									   oldFrame.origin.y + oldFrame.size.height - desired.size.height,
+									   oldFrame.origin.y + oldFrame.size.height - headerSize.height- desired.size.height,
 									   desired.size.width,
-									   desired.size.height);
+									   headerSize.height + desired.size.height);
 	[window setFrame:newFrame display:YES animate:NO];
 }
 
@@ -582,11 +782,11 @@ static void UpdateChangeCountCallback(void                      *userData,
 	
 	[menu addItem:[NSMenuItem separatorItem]];
 	
-	item = [menu addItemWithTitle:NSLocalizedString(@"Close", nil) action:@selector(performClose:) keyEquivalent:@"w"];
-	item = [menu addItemWithTitle:NSLocalizedString(@"Save", nil) action:@selector(saveDocument:) keyEquivalent:@"s"];
-	item = [menu addItemWithTitle:NSLocalizedString(@"Save As…", nil) action:@selector(saveDocumentAs:) keyEquivalent:@"S"];
-	item = [menu addItemWithTitle:NSLocalizedString(@"Save All", nil) action:@selector(saveAllDocuments:) keyEquivalent:@""];
-	item = [menu addItemWithTitle:NSLocalizedString(@"Revert to Saved", nil) action:@selector(revertDocumentToSaved:) keyEquivalent:@""];
+	item = [menu addItemWithTitle:@"Close" action:@selector(performClose:) keyEquivalent:@"w"];
+	item = [menu addItemWithTitle:@"Save" action:@selector(saveDocument:) keyEquivalent:@"s"];
+	item = [menu addItemWithTitle:@"Save As…" action:@selector(saveDocumentAs:) keyEquivalent:@"S"];
+	item = [menu addItemWithTitle:@"Save All" action:@selector(saveAllDocuments:) keyEquivalent:@""];
+	item = [menu addItemWithTitle:@"Revert to Saved" action:@selector(revertDocumentToSaved:) keyEquivalent:@"u"];
 }
 
 - (void)appendEditMenu:(NSMenu *)parent {
