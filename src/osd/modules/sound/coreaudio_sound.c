@@ -85,7 +85,8 @@ private:
 	}
 
 	bool create_graph(osd_options const &options);
-	bool add_output();
+	bool add_output(char const *name);
+	bool add_device_output(char const *name);
 	bool add_converter();
 	bool add_effect(char const *name);
 
@@ -114,6 +115,14 @@ private:
 				0);
 	}
 
+	bool get_output_device_id(char const *name, AudioDeviceID &id) const;
+	char *get_device_uid(AudioDeviceID id) const;
+	char *get_device_name(AudioDeviceID id) const;
+	UInt32 get_output_stream_count(
+			AudioDeviceID id,
+			char const *uid,
+			char const *name) const;
+
 	bool extract_effect_info(
 			char const          *name,
 			CFPropertyListRef   properties,
@@ -122,6 +131,20 @@ private:
 			OSType              &manufacturer,
 			CFPropertyListRef   &class_info) const;
 	CFPropertyListRef load_property_list(char const *name) const;
+
+	char *convert_cfstring_to_utf8(CFStringRef str) const
+	{
+		CFIndex const len = CFStringGetMaximumSizeForEncoding(
+				CFStringGetLength(str),
+				kCFStringEncodingUTF8);
+		char *const result = global_alloc_array_clear(char, len + 1);
+		if (!CFStringGetCString(str, result, len + 1, kCFStringEncodingUTF8))
+		{
+			global_free_array(result);
+			return NULL;
+		}
+		return result;
+	}
 
 	OSStatus render(
 			AudioUnitRenderActionFlags  *action_flags,
@@ -164,6 +187,7 @@ int sound_coreaudio::init(const osd_options &options)
 		return 0;
 
 	// Create the output graph
+	osd_printf_verbose("Audio: Start initialization\n");
 	if (!create_graph(options))
 		return -1;
 
@@ -240,6 +264,7 @@ close_graph_and_return_error:
 
 void sound_coreaudio::exit()
 {
+	osd_printf_verbose("Audio: Start deinitialization\n");
 	if (m_graph)
 	{
 		osd_printf_verbose("Stopping CoreAudio output\n");
@@ -256,6 +281,7 @@ void sound_coreaudio::exit()
 	}
 	if (m_overflows || m_underflows)
 		osd_printf_verbose("Sound buffer: overflows=%u underflows=%u\n", m_overflows, m_underflows);
+	osd_printf_verbose("Audio: End deinitialization\n");
 }
 
 
@@ -298,19 +324,19 @@ bool sound_coreaudio::create_graph(osd_options const &options)
 {
 	OSStatus err;
 
+	osd_printf_verbose("Creating AudioUnit graph\n");
 	if (noErr != (err = NewAUGraph(&m_graph)))
 	{
 		osd_printf_error("Failed to create AudioUnit graph (%ld)\n", (long)err);
 		goto return_error;
 	}
-
 	if (noErr != (err = AUGraphOpen(m_graph)))
 	{
 		osd_printf_error("Failed to open AudioUnit graph (%ld)\n", (long)err);
 		goto dispose_graph_and_return_error;
 	}
 
-	if (!add_output())
+	if (!add_output(options.audio_output()))
 		goto close_graph_and_return_error;
 
 	for (unsigned i = EFFECT_COUNT_MAX; 0U < i; i--)
@@ -360,28 +386,102 @@ return_error:
 }
 
 
-bool sound_coreaudio::add_output()
+bool sound_coreaudio::add_output(char const *name)
 {
 	OSStatus err;
+
+	if (*name && strcmp(name, OSDOPTVAL_AUTO) && !add_device_output(name))
+		return false;
+
+	if (0U == m_node_count)
+	{
+		osd_printf_verbose("Adding default output to AudioUnit graph\n");
+		err = add_node(
+				kAudioUnitType_Output,
+				kAudioUnitSubType_DefaultOutput,
+				kAudioUnitManufacturer_Apple);
+		if (noErr != err)
+		{
+			osd_printf_error(
+					"Failed to add default sound output to AudioUnit graph (%ld)\n",
+					(long)err);
+			return false;
+		}
+		if (noErr != (err = get_next_node_info()))
+		{
+			osd_printf_error(
+					"Failed to obtain AudioUnit for default sound output (%ld)\n",
+					(long)err);
+			return false;
+		}
+		m_node_count++;
+	}
+
+	return true;
+}
+
+
+bool sound_coreaudio::add_device_output(char const *name)
+{
+	OSStatus err;
+
+	AudioDeviceID id;
+	if (!get_output_device_id(name, id))
+	{
+		osd_printf_warning(
+				"No audio output device matched %s - falling back to default output\n",
+				name);
+		return true;
+	}
+
+	osd_printf_verbose("Adding HAL output to AudioUnit graph\n");
 	err = add_node(
 			kAudioUnitType_Output,
-			kAudioUnitSubType_DefaultOutput,
+			kAudioUnitSubType_HALOutput,
 			kAudioUnitManufacturer_Apple);
 	if (noErr != err)
 	{
 		osd_printf_error(
-				"Failed to add default sound output to AudioUnit graph (%ld)\n",
+				"Failed to add HAL output to AudioUnit graph (%ld) - falling back to default output\n",
 				(long)err);
-		return false;
+		return true;
 	}
 	if (noErr != (err = get_next_node_info()))
 	{
 		osd_printf_error(
-				"Failed to obtain AudioUnit for default sound output (%ld)\n",
+				"Failed to obtain AudioUnit for HAL output (%ld)\n",
+				(long)err);
+		goto remove_node_and_return_error;
+	}
+	err = AudioUnitSetProperty(
+			m_node_details[m_node_count].m_unit,
+			kAudioOutputUnitProperty_CurrentDevice,
+			kAudioUnitScope_Global,
+			0,
+			&id,
+			sizeof(id));
+	if (noErr != (err = get_next_node_info()))
+	{
+		osd_printf_error(
+				"Failed to set HAL output device to %s (%ld)\n",
+				name,
+				(long)err);
+		goto remove_node_and_return_error;
+	}
+	m_node_count++;
+	return true;
+
+remove_node_and_return_error:
+	osd_printf_verbose("Removing failed HAL output from AudioUnit graph\n");
+	err = AUGraphRemoveNode(m_graph, m_node_details[m_node_count].m_node);
+	if (noErr != err)
+	{
+		osd_printf_error(
+				"Failed to remove HAL output from AudioUnit graph (%ld)\n",
 				(long)err);
 		return false;
 	}
-	m_node_count++;
+	osd_printf_warning("Falling back to default output");
 	return true;
 }
 
@@ -389,6 +489,7 @@ bool sound_coreaudio::add_output()
 bool sound_coreaudio::add_converter()
 {
 	OSStatus err;
+	osd_printf_verbose("Adding format converter to AudioUnit graph\n");
 	err = add_node(
 			kAudioUnitType_FormatConverter,
 			kAudioUnitSubType_AUConverter,
@@ -438,6 +539,7 @@ bool sound_coreaudio::add_effect(char const *name)
 		return true;
 	}
 
+	osd_printf_verbose("Adding effect %s to AudioUnit graph\n", name);
 	if (noErr != (err = add_node(type, subtype, manufacturer)))
 	{
 		osd_printf_error(
@@ -500,6 +602,7 @@ bool sound_coreaudio::add_effect(char const *name)
 	return true;
 
 remove_node_and_return_error:
+	osd_printf_verbose("Removing failed effect %s from AudioUnit graph\n", name);
 	err = AUGraphRemoveNode(m_graph, m_node_details[m_node_count].m_node);
 	if (noErr != err)
 	{
@@ -510,6 +613,204 @@ remove_node_and_return_error:
 		return false;
 	}
 	return true;
+}
+
+
+bool sound_coreaudio::get_output_device_id(
+		char const *name,
+		AudioDeviceID &id) const
+{
+	OSStatus err;
+	UInt32 property_size;
+
+	AudioObjectPropertyAddress const devices_addr = {
+			kAudioHardwarePropertyDevices,
+			kAudioObjectPropertyScopeGlobal,
+			kAudioObjectPropertyElementMaster };
+	err = AudioObjectGetPropertyDataSize(
+			kAudioObjectSystemObject,
+			&devices_addr,
+			0,
+			NULL,
+			&property_size);
+	if (noErr != err)
+	{
+		osd_printf_error("Error getting size of audio device list (%ld)\n", (long)err);
+		return false;
+	}
+	property_size /= sizeof(AudioDeviceID);
+	AudioDeviceID *const devices = global_alloc_array_clear(AudioDeviceID, property_size);
+	property_size *= sizeof(AudioDeviceID);
+	err = AudioObjectGetPropertyData(
+			kAudioObjectSystemObject,
+			&devices_addr,
+			0,
+			NULL,
+			&property_size,
+			devices);
+	UInt32 const device_count = property_size / sizeof(AudioDeviceID);
+	if (noErr != err)
+	{
+		osd_printf_error("Error getting audio device list (%ld)\n", (long)err);
+		global_free_array(devices);
+		return false;
+	}
+
+	for (UInt32 i = 0; device_count > i; i++)
+	{
+		char *const device_uid = get_device_uid(devices[i]);
+		char *const device_name = get_device_name(devices[i]);
+		if ((NULL == device_uid) && (NULL == device_name))
+		{
+			osd_printf_warning(
+					"Could not get UID or name for device %lu - skipping\n",
+					(unsigned long)devices[i]);
+			continue;
+		}
+
+		UInt32 const streams = get_output_stream_count(
+				devices[i],
+				device_uid,
+				device_name);
+		if (1U > streams)
+		{
+			osd_printf_verbose(
+					"No output streams found for device %s (%s) - skipping\n",
+					(NULL != device_name) ? device_name : "<anonymous>",
+					(NULL != device_uid) ? device_uid : "<unknown>");
+			if (NULL != device_uid) global_free_array(device_uid);
+			if (NULL != device_name) global_free_array(device_name);
+			continue;
+		}
+
+		for (std::size_t j = strlen(device_uid); (0 < j) && (' ' == device_uid[j - 1]); j--)
+			device_uid[j - 1] = '\0';
+		for (std::size_t j = strlen(device_name); (0 < j) && (' ' == device_name[j - 1]); j--)
+			device_name[j - 1] = '\0';
+
+		bool const matched_uid = (NULL != device_uid) && !strcmp(name, device_uid);
+		bool const matched_name = (NULL != device_name) && !strcmp(name, device_name);
+		if (matched_uid || matched_name)
+		{
+			osd_printf_verbose(
+					"Matched device %s (%s) with %lu output stream(s)\n",
+					(NULL != device_name) ? device_name : "<anonymous>",
+					(NULL != device_uid) ? device_uid : "<unknown>",
+					(unsigned long)streams);
+		}
+		global_free_array(device_uid);
+		global_free_array(device_name);
+
+		if (matched_uid || matched_name)
+		{
+			id = devices[i];
+			global_free_array(devices);
+			return true;
+		}
+	}
+
+	osd_printf_verbose("No audio output devices match %s\n", name);
+	global_free_array(devices);
+	return false;
+}
+
+
+char *sound_coreaudio::get_device_uid(AudioDeviceID id) const
+{
+	AudioObjectPropertyAddress const uid_addr = {
+			kAudioDevicePropertyDeviceUID,
+			kAudioObjectPropertyScopeGlobal,
+			kAudioObjectPropertyElementMaster };
+	CFStringRef device_uid = NULL;
+	UInt32 property_size = sizeof(device_uid);
+	OSStatus const err = AudioObjectGetPropertyData(
+			id,
+			&uid_addr,
+			0,
+			NULL,
+			&property_size,
+			&device_uid);
+	if ((noErr != err) || (NULL == device_uid))
+	{
+		osd_printf_warning(
+				"Error getting UID for audio device %lu (%ld)\n",
+				(unsigned long)id,
+				(long)err);
+		return NULL;
+	}
+	char *const result = convert_cfstring_to_utf8(device_uid);
+	CFRelease(device_uid);
+	if (NULL == result)
+	{
+		osd_printf_warning(
+				"Error converting UID for audio device %lu to UTF-8\n",
+				(unsigned long)id);
+	}
+	return result;
+}
+
+
+char *sound_coreaudio::get_device_name(AudioDeviceID id) const
+{
+	AudioObjectPropertyAddress const name_addr = {
+			kAudioDevicePropertyDeviceNameCFString,
+			kAudioObjectPropertyScopeGlobal,
+			kAudioObjectPropertyElementMaster };
+	CFStringRef device_name = NULL;
+	UInt32 property_size = sizeof(device_name);
+	OSStatus const err = AudioObjectGetPropertyData(
+			id,
+			&name_addr,
+			0,
+			NULL,
+			&property_size,
+			&device_name);
+	if ((noErr != err) || (NULL == device_name))
+	{
+		osd_printf_warning(
+				"Error getting name for audio device %lu (%ld)\n",
+				(unsigned long)id,
+				(long)err);
+		return NULL;
+	}
+	char *const result = convert_cfstring_to_utf8(device_name);
+	CFRelease(device_name);
+	if (NULL == result)
+	{
+		osd_printf_warning(
+				"Error converting name for audio device %lu to UTF-8\n",
+				(unsigned long)id);
+	}
+	return result;
+}
+
+
+UInt32 sound_coreaudio::get_output_stream_count(
+		AudioDeviceID id,
+		char const *uid,
+		char const *name) const
+{
+	AudioObjectPropertyAddress const streams_addr = {
+			kAudioDevicePropertyStreams,
+			kAudioDevicePropertyScopeOutput,
+			kAudioObjectPropertyElementMaster };
+	UInt32 property_size = 0;
+	OSStatus const err = AudioObjectGetPropertyDataSize(
+			id,
+			&streams_addr,
+			0,
+			NULL,
+			&property_size);
+	if (noErr != err)
+	{
+		osd_printf_warning(
+				"Error getting output stream count for audio device %s (%s) (%ld)\n",
+				(NULL != name) ? name : "<anonymous>",
+				(NULL != uid) ? uid : "<unknown>",
+				(long)err);
+		return 0;
+	}
+	return property_size / sizeof(AudioStreamID);
 }
 
 
@@ -637,20 +938,10 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 	CFRelease(data);
 	if ((NULL == result) || (NULL != msg))
 	{
-		char *buf = NULL;
+		char *buf = (NULL != msg) ? convert_cfstring_to_utf8(msg) : NULL;
 		if (NULL != msg)
-		{
-			CFIndex const len = CFStringGetMaximumSizeForEncoding(
-					CFStringGetLength(msg),
-					kCFStringEncodingUTF8);
-			buf = global_alloc_array_clear(char, len + 1);
-			if (!CFStringGetCString(msg, buf, len + 1, kCFStringEncodingUTF8))
-			{
-				global_free_array(buf);
-				buf = NULL;
-			}
 			CFRelease(msg);
-		}
+
 		if (NULL != buf)
 		{
 			osd_printf_error(

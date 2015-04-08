@@ -17,16 +17,16 @@ extern bool g_print_verbose;
 
 const options_entry osd_options::s_option_entries[] =
 {
-	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD FONT OPTIONS" },
-	{ OSD_FONT_PROVIDER,                      "auto",     OPTION_STRING,     "provider for ui font: " },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD FONT OPTIONS" },
+	{ OSD_FONT_PROVIDER,                      OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for ui font: " },
 
-	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD CLI OPTIONS" },
-	{ OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",        OPTION_COMMAND,    "list available MIDI I/O devices" },
-	{ OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",     OPTION_COMMAND,    "list available network adapters" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD CLI OPTIONS" },
+	{ OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",              OPTION_COMMAND,   "list available MIDI I/O devices" },
+	{ OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",           OPTION_COMMAND,   "list available network adapters" },
 
 	// debugging options
 	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD DEBUGGING OPTIONS" },
-	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,   OPTION_STRING,    "debugger used : " },
+	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,   OPTION_STRING,    "debugger used: " },
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",              OPTION_INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
 
 	// performance options
@@ -119,6 +119,7 @@ const options_entry osd_options::s_option_entries[] =
 
 #ifdef SDLMAME_MACOSX
 	{ NULL,                                   NULL,             OPTION_HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
+	{ OSDOPTION_AUDIO_OUTPUT,                 OSDOPTVAL_AUTO,   OPTION_STRING,    "Audio output device" },
 	{ OSDOPTION_AUDIO_EFFECT "0",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 0" },
 	{ OSDOPTION_AUDIO_EFFECT "1",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 1" },
 	{ OSDOPTION_AUDIO_EFFECT "2",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 2" },
