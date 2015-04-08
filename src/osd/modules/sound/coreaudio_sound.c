@@ -543,13 +543,13 @@ bool sound_coreaudio::extract_effect_info(
 		manufacturer_val = CFDictionaryGetValue(desc, CFSTR("ComponentManufacturer"));
 		class_info = CFDictionaryGetValue(desc, CFSTR("ClassInfo"));
 	}
-	else if (CFDictionaryContainsKey(desc, CFSTR("type"))
-		  && CFDictionaryContainsKey(desc, CFSTR("subtype"))
-		  && CFDictionaryContainsKey(desc, CFSTR("manufacturer")))
+	else if (CFDictionaryContainsKey(desc, CFSTR(kAUPresetTypeKey))
+		  && CFDictionaryContainsKey(desc, CFSTR(kAUPresetSubtypeKey))
+		  && CFDictionaryContainsKey(desc, CFSTR(kAUPresetManufacturerKey)))
 	{
-		type_val = CFDictionaryGetValue(desc, CFSTR("type"));
-		subtype_val = CFDictionaryGetValue(desc, CFSTR("subtype"));
-		manufacturer_val = CFDictionaryGetValue(desc, CFSTR("manufacturer"));
+		type_val = CFDictionaryGetValue(desc, CFSTR(kAUPresetTypeKey));
+		subtype_val = CFDictionaryGetValue(desc, CFSTR(kAUPresetSubtypeKey));
+		manufacturer_val = CFDictionaryGetValue(desc, CFSTR(kAUPresetManufacturerKey));
 		class_info = properties;
 	}
 	else
