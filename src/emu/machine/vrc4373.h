@@ -115,12 +115,10 @@ private:
 	UINT32 m_simm_base;
 	dynamic_array<UINT32> m_simm;
 
-
 	UINT32 m_cpu_regs[0x7c];
 
 	UINT32 m_pci1_laddr, m_pci2_laddr, m_pci_io_laddr;
 	UINT32 m_target1_laddr, m_target2_laddr;
-	
 };
 
 

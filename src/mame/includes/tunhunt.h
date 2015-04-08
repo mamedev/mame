@@ -25,7 +25,7 @@ public:
 	UINT8 m_control;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_tmpbitmap;
-	
+
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(button_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -34,7 +34,7 @@ public:
 	DECLARE_READ8_MEMBER(dsw2_2r);
 	DECLARE_READ8_MEMBER(dsw2_3r);
 	DECLARE_READ8_MEMBER(dsw2_4r);
-	
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	virtual void video_start();
