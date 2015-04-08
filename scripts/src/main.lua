@@ -27,10 +27,6 @@ function mainProject(_target, _subtarget)
 		"Unicode",
 	}
 
-	if _OPTIONS["SEPARATE_BIN"]~="1" then 
-		targetdir(MAME_DIR)
-	end
-	
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"
 
@@ -39,6 +35,10 @@ function mainProject(_target, _subtarget)
 
 	configuration { }
 
+	if _OPTIONS["SEPARATE_BIN"]~="1" then 
+		targetdir(MAME_DIR)
+	end
+	
 	findfunction("linkProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
 	links {
 		"osd_" .. _OPTIONS["osd"],
