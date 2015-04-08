@@ -186,7 +186,7 @@ void hh_hmcs40_state::display_update()
 				int state = active_state[y] >> x & 1;
 				char buf1[0x10]; // lampyx
 				char buf2[0x10]; // y.x
-				
+
 				if (x == m_display_maxx)
 				{
 					// always-on if selected
@@ -261,7 +261,7 @@ void hh_hmcs40_state::set_interrupt(int line, int state)
 {
 	line = line ? 1 : 0;
 	state = state ? 1 : 0;
-	
+
 	if (state != m_int[line])
 	{
 		if (machine().phase() >= MACHINE_PHASE_RESET)
@@ -530,7 +530,7 @@ WRITE8_MEMBER(zackman_state::plate_w)
 	// R0x-R6x,D0,D1: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// update display
 	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
 	UINT32 plate = BITSWAP32(m_plate,31,30,27,0,1,2,3,4,5,6,7,8,9,10,11,24,25,26,29,28,23,22,21,20,19,18,17,16,15,14,13,12);
@@ -549,10 +549,10 @@ WRITE16_MEMBER(zackman_state::grid_w)
 		m_inp_mux = inp_mux;
 		update_int0();
 	}
-	
+
 	// D8-D15: vfd matrix grid
 	m_grid = data >> 8 & 0xff;
-	
+
 	// D0,D1: plate 12,13 (update display there)
 	plate_w(space, 7, data & 3);
 }
@@ -783,7 +783,7 @@ WRITE8_MEMBER(cdkong_state::plate_w)
 	// R13: speaker on
 	if (offset == HMCS40_PORT_R1X && data & 8)
 		m_speaker_volume = CDKONG_SPEAKER_MAX;
-	
+
 	// R0x-R6x: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
@@ -842,7 +842,7 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
-	
+
 	/* no video! */
 
 	/* sound hardware */
@@ -898,7 +898,7 @@ WRITE8_MEMBER(cgalaxn_state::grid_w)
 {
 	// D0: speaker out
 	m_speaker->level_w(data & 1);
-	
+
 	// D1: speaker on?
 
 	// D2-D15: vfd matrix plate
@@ -911,7 +911,7 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 	// R10,R11: input mux
 	if (offset == HMCS40_PORT_R1X)
 		m_inp_mux = data & 3;
-	
+
 	// R1x-R3x: vfd matrix grid
 	int shift = (offset - HMCS40_PORT_R1X) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
@@ -978,7 +978,7 @@ MACHINE_CONFIG_END
   * board label Coleco 75690
   * Hitachi HD38820A28/29 MCU
   * cyan/red VFD display Futaba DM-34Z 2A, with color overlay
-  
+
   known releases:
   - Japan: Super Pack Monster, by Gakken
   - USA: Pac-Man, published by Coleco (name-license from Midway)
@@ -1102,7 +1102,7 @@ MACHINE_CONFIG_END
   - P1 Left:  Ms. Pac-Man (default game)
   - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
   - P1 Up:    Demo
-  
+
   BTANB note: in demo-mode, she hardly walks to the upper two rows, never
   finishing the level.
 
@@ -1437,7 +1437,7 @@ WRITE8_MEMBER(pbqbert_state::plate_w)
 	// R0x-R6x,D8: vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// update display
 	UINT32 plate = BITSWAP32(m_plate,31,30,24,25,26,27,28,15,14,29,13,12,11,10,9,8,7,6,5,4,3,2,1,0,16,17,18,19,20,21,22,23);
 	display_matrix(30, 8, plate, m_grid);
@@ -1551,10 +1551,10 @@ WRITE16_MEMBER(kingman_state::grid_w)
 		m_inp_mux = inp_mux;
 		update_int0();
 	}
-	
+
 	// D7-D15: vfd matrix grid
 	m_grid = data >> 7 & 0x1ff;
-	
+
 	// D0-D4: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x1f0000);
 	prepare_display();
@@ -1672,10 +1672,10 @@ WRITE16_MEMBER(tmtron_state::grid_w)
 		m_inp_mux = inp_mux;
 		update_int1();
 	}
-	
+
 	// D6-D15: vfd matrix grid
 	m_grid = data >> 6 & 0x3ff;
-	
+
 	// D0-D3,D5: more plates
 	m_plate = (m_plate & 0x00ffff) | (data << 16 & 0x2f0000);
 	prepare_display();

@@ -65,7 +65,7 @@ void elecbowl_state::prepare_display()
 	UINT8 d = m_r >> 1 & 1;
 	m_display_state[5] = (m_r & 1) ? (d << (m_o & 7)) : 0;
 	m_display_state[6] = (m_r >> 2 & 1) ? (d << (m_o & 7)) : 0;
-	
+
 	// digit 4 is from u6 Q7
 	m_display_segmask[4] = 6;
 	m_display_state[4] = (m_display_state[6] & 0x80) ? 6 : 0;
@@ -104,7 +104,7 @@ WRITE16_MEMBER(elecbowl_state::write_o)
 	// O0-O6: digit segments A-G
 	// O7: N/C
 	//if (data & 0x80) printf("%X ",data&0x7f);
-	
+
 	m_o = data & 0x7f;
 	prepare_display();
 }
@@ -169,7 +169,7 @@ static const UINT16 elecbowl_output_pla[0x20] =
 	lA+lB+lC,               // 7
 	lA+lB+lC+lD+lE+lF+lG,   // 8
 	lA+lB+lG+lF+lC+lD,      // 9
-	
+
 	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
 	0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
 	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
