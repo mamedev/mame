@@ -18,6 +18,8 @@
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
 
+typedef ComponentDescription AudioComponentDescription;
+
 @protocol NSWindowDelegate <NSObject>
 @end
 
