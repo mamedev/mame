@@ -2510,7 +2510,7 @@ dependency {
 	{ MAME_DIR .. "src/mess/drivers/ymmu100.c",    GEN_DIR .. "mess/drivers/ymmu100.inc" },
 }
 custombuildtask {
-	{ MAME_DIR .. "src/mess/drivers/ymmu100.ppm", GEN_DIR .. "mess/drivers/ymmu100.inc",  {  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/drivers/ymmu100.ppm...", "python $(1) $(<) $(@) ymmu100_bkg UINT8" }},
+	{ MAME_DIR .. "src/mess/drivers/ymmu100.ppm", GEN_DIR .. "mess/drivers/ymmu100.inc",  {  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/drivers/ymmu100.ppm...", PYTHON .. " $(1) $(<) $(@) ymmu100_bkg UINT8" }},
 }
 
 createMESSProjects(_target, _subtarget, "zenith")
