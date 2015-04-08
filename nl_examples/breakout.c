@@ -64,7 +64,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("S2", DIPSWITCH, &dipswitch2_desc)
 	CHIP("S3", DIPSWITCH, &dipswitch3_desc)
 	CHIP("S4", DIPSWITCH, &dipswitch4_desc)
-	    
+
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-7) // works and is sufficient
     //CHIP("CLOCK", CLOCK_14_318_MHZ)
@@ -80,7 +80,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("C36", CAPACITOR, &c36_desc)
  	CHIP("C37", CAPACITOR, &c37_desc)
  	CHIP("PAD_EN_BUF", BUFFER, &pad_en_buf_desc)
- 
+
 	CHIP("A3", 7474)
 	CHIP("A4", 7408)
 	CHIP("A5", 7400)
@@ -105,7 +105,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("C7", 9316)
 	CHIP("C8", 9316)
     CHIP("C9", 555_Mono, &c9_555_desc)
-   
+
 	CHIP("D2", 7432)
 	CHIP("D3", 7474)
 	CHIP("D4", 9316)
@@ -208,11 +208,11 @@ CIRCUIT_LAYOUT( breakout )
     CHIP("COIN1", COIN_INPUT)
 
     //CHIP("COIN2", COIN_INPUT)
-    
+
     CHIP("START", START_INPUT)
 
     CHIP("SERVE", BUTTONS1_INPUT)
-	
+
     //TODO: coin2 and start 2
 
     VIDEO(breakout)
@@ -256,7 +256,7 @@ CIRCUIT_LAYOUT( breakout )
    #define H64		"K2", 3
    #define H128		"K2", 6
 
-   //#define V1		
+   //#define V1
    #define V2		"M3", 3
    #define V4		"M3", 6
    #define V8		"M3", 11
@@ -274,10 +274,10 @@ CIRCUIT_LAYOUT( breakout )
    #define BSYNC  	"J1", 15
    #define BSYNC_n  	"J1", 14
 
-   #define BALL 	"D7", 6 
+   #define BALL 	"D7", 6
    #define BALL_DISPLAY "A4", 6
-   #define PLAYFIELD 	"H4", 3 
-   #define SCORE 	"D3", 5  
+   #define PLAYFIELD 	"H4", 3
+   #define SCORE 	"D3", 5
    #define VERT_TRIG_n 	"H1", 8
 
    #define CLOCK 	"H1", 11
@@ -292,7 +292,7 @@ CIRCUIT_LAYOUT( breakout )
 
    #define COIN 		"L9", 6
    #define COIN1_n 		"F8", 5
-   #define COIN2_n 		"H9", 5   
+   #define COIN2_n 		"H9", 5
    #define CREDIT_1_OR_2 	"L9", 3
    #define CREDIT_1_OR_2_n 	"F9", 8
    #define CREDIT2 		"F9", 6
@@ -306,7 +306,7 @@ CIRCUIT_LAYOUT( breakout )
 
    #define P2_CONDITIONAL	"H1", 3
    #define P2_CONDITIONAL_dash 	"H7", 8
-   #define PLAYER_2 		"B4", 14 
+   #define PLAYER_2 		"B4", 14
    #define PLAYER_2_n 		"M9", 8
 
    #define START_GAME 		"D8", 6
@@ -317,24 +317,24 @@ CIRCUIT_LAYOUT( breakout )
    #define BG1 		"K8", 8
    #define BG2_n	"K8", 5
    #define BG2		"K8", 6
- 
+
    #define FREE_GAME_TONE	"N7", 3
    #define BONUS_COIN		"L9", 11
- 
+
    //#define Q        "E9", 6
    #define LAT_Q	"E9", 6
    #define Q_n 		"LATCH", 3
    #define SBD_n 	"D2", 11
 
    #define PLAY_CP 	"D2", 8
-   #define PLGM2_n 	"F7", 7	
+   #define PLGM2_n 	"F7", 7
    #define VB_HIT_n 	"A5", 6
 
    #define SERVE_n 	"SERVE", 1
    #define SERVE_WAIT 	"A3", 9
-   #define SERVE_WAIT_n "A3", 8   
+   #define SERVE_WAIT_n "A3", 8
 
-   #define BRICK_DISPLAY 	"E3", 1   
+   #define BRICK_DISPLAY 	"E3", 1
    #define BRICK_HIT 		"E6", 5
    #define BRICK_HIT_n 		"E6", 6
 
@@ -401,14 +401,14 @@ CIRCUIT_LAYOUT( breakout )
    #define FPD1_n 	"F3", 9
    #define FPD2 	"F3", 6
    #define FPD2_n 	"F3", 7
- 
+
    #define COUNT 	"N7", 11
    #define COUNT_1 	"N7", 8
    #define COUNT_2 	"N7", 6
 
    #define ATTRACT 	"E6", 8
    #define ATTRACT_n 	"E6", 9
-   
+
    #define BRICK_SOUND 	"B8", 14
    #define P_HIT_SOUND 	"B7", 12
    #define VB_HIT_SOUND "B7", 11
@@ -416,7 +416,7 @@ CIRCUIT_LAYOUT( breakout )
    #define LH_SIDE 	"J3", 13
    #define RH_SIDE 	"H2", 3
    #define TOP_BOUND 	"K4", 6
-   
+
 //   CONNECTION(CREDIT_1_OR_2, "CREDIT_LIGHT1", 1)
 //   CONNECTION(CREDIT2, "CREDIT_LIGHT2", 1)
 //   CONNECTION(SERVE_WAIT_n, "SERVE_LIGHT", 1)
@@ -540,7 +540,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P2_CONDITIONAL, "M2", 7)
    CONNECTION(GND, "M2", 4)
    CONNECTION(GND, "M2", 16)
-   
+
    CONNECTION("M2", 14, "N2", 13)
    CONNECTION(V16_d, "N2", 10)
    CONNECTION(V32_d, "N2", 8)
@@ -608,7 +608,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "K1", 10)
    CONNECTION(CLOCK, "K1", 2)
    CONNECTION("L1", 15, "K1", 7)
- 
+
    CONNECTION(P, "L1", 1)
    CONNECTION(P, "L1", 3)
    CONNECTION(GND, "L1", 4)
@@ -631,7 +631,7 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION("M1", 15, "H2", 5)
    CONNECTION("L1", 15, "H2", 4)
-   
+
    CONNECTION(V128_d, "N4", 5)
    CONNECTION(V64_d, "N4", 3)
    CONNECTION(V32_d, "N4", 4)
@@ -648,7 +648,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("L1", 15, "M1", 7)
    CONNECTION("K1", 15, "M1", 10)
 
- 
+
    //9312 circuit
    CONNECTION(PLAYER_2, "M9", 9)
    CONNECTION(BALL_A, "C5", 5)
@@ -758,7 +758,7 @@ CIRCUIT_LAYOUT( breakout )
 
    //PADDLES
    CONNECTION(ATTRACT_n, "B2", 4)
-   
+
    CONNECTION("B2", 3, "E9", 13)
    CONNECTION(PLAYER_2_n, "M3", 9)
    CONNECTION(V128, "M3", 10)
@@ -810,7 +810,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "D4", 10)
    CONNECTION("C3", 11, "D4", 7)
    CONNECTION(VSYNC_n, "D4", 1)
-   
+
    CONNECTION("D4", 15, "E4", 10)
    CONNECTION("H7", 6, "E4", 9)
    CONNECTION("C9", 3, "H7", 5)
@@ -839,14 +839,14 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(V32_d, "J2", 9)
    CONNECTION("J2", 8, "C2", 10)
    CONNECTION("C2", 6, "C2", 9)
-   
+
 
    //SCORE
    CONNECTION(SCI_n, "D3", 4)
    CONNECTION(GND, "D3", 2)
    CONNECTION(GND, "D3", 3)
    CONNECTION(GND, "D3", 1)
- 
+
    //PLAYER2_CONDITIONAL
    CONNECTION(PLAYER_2, "H7", 10)
    CONNECTION(GND, "S2", 1)
@@ -874,7 +874,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(PLAYER_2, "M6", 7)
    CONNECTION(COUNT_2, "M6", 2)
    CONNECTION(START_GAME_n, "M6", 1)
-   
+
    CONNECTION("M6", 15, "L6", 10)
    CONNECTION(PLAYER_2, "L6", 7)
    CONNECTION(COUNT_2, "L6", 2)
@@ -884,7 +884,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(RAM_PLAYER1, "H6", 7)
    CONNECTION(COUNT_1, "H6", 2)
    CONNECTION(START_GAME_n, "H6", 1)
-   
+
    CONNECTION("H6", 15, "J6", 10)
    CONNECTION(RAM_PLAYER1, "J6", 7)
    CONNECTION(COUNT_1, "J6", 2)
@@ -917,7 +917,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("N8", 9, "N9", 11)
    CONNECTION(P, "N9", 15)
    CONNECTION(P, "N9", 5)
-   
+
    CONNECTION(COUNT, "N9", 4)
    CONNECTION(START_GAME, "N9", 14)
    CONNECTION(H8_n, "N9", 1)
@@ -991,7 +991,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(CKBH, "H1", 12)
    CONNECTION("F1", 14, "H1", 13)
    CONNECTION("F1", 15, "E1", 5)
-   
+
    CONNECTION(P, "F1", 1)
    CONNECTION(P, "F1", 7)
    CONNECTION(P, "F1", 10)
@@ -1029,7 +1029,7 @@ CIRCUIT_LAYOUT( breakout )
 
    // Coin Circuit
    CONNECTION("COIN1", 1, "F9", 13)
-   
+
    CONNECTION(CSW1, "F9", 11)
    //CONNECTION("F9", 10, "F9", 13) //TODO: causes lots of bouncing, commented out since this trace is not implemented in gotcha
 
@@ -1044,7 +1044,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(V64I, "F8", 3)
    CONNECTION("F8", 9, "F8", 2)
    CONNECTION(CSW1, "F8", 4)
-  
+
    CONNECTION("F8", 6, "H8", 12)
    CONNECTION(P, "H8", 10)
    CONNECTION(V16_d, "H8", 11)
@@ -1063,7 +1063,7 @@ CIRCUIT_LAYOUT( breakout )
    //COIN2 circuit
    //CONNECTION("COIN2", 1, "F9", 1)
    CONNECTION(GND, "F9", 1)		//TODO: coin2 not implemented
- 
+
    CONNECTION(CSW2, "F9", 3)
    CONNECTION(CSW2, "H9", 10)
    CONNECTION("F9", 4, "H9", 12)
@@ -1073,7 +1073,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("H9", 9, "H9", 2)
    CONNECTION(CSW2, "H9", 4)
    CONNECTION(P, "H9", 1)
-   
+
    CONNECTION(P, "H8", 4)
    CONNECTION("H9", 6, "H8", 2)
    CONNECTION(V16_d, "H8", 3)
@@ -1179,7 +1179,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "D3", 12)
    CONNECTION(START_GAME, "D3", 11)
    CONNECTION(SERVE_n, "D3", 13)
-     
+
    //Playfield
    CONNECTION(LH_SIDE, "H3", 1)
    CONNECTION(TOP_BOUND, "H3", 13)
@@ -1187,7 +1187,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("H3", 12, "H4", 2)
    CONNECTION("E1", 2, "C36", 1)
    CONNECTION("C36", 2, "H4", 1)
-   
+
    CONNECTION(BALL_DISPLAY, "A5", 10)
    CONNECTION(PSYNC, "A5", 9)
    CONNECTION(BSYNC, "C3", 2)
@@ -1200,7 +1200,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("C5", 12, "A5", 2)
    CONNECTION(BSYNC, "A5", 5)
    CONNECTION(VSYNC, "A5", 4)
-  
+
    CONNECTION("C5", 12, "A5", 13)
    CONNECTION("A5", 3, "A5", 12)
 
@@ -1213,7 +1213,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("C4", 6, "A6", 12)
    CONNECTION(BP_HIT_n, "A6", 11)
    CONNECTION(P, "A6", 13)
-   
+
    CONNECTION("A5", 3, "A6", 4)
    CONNECTION(V16_d, "A6", 2)
    CONNECTION(VB_HIT_n, "A6", 3)
@@ -1241,7 +1241,7 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION("B5", 6, "C5", 11)
    CONNECTION("B5", 7, "C5", 9)
- 
+
    CONNECTION(SU_n, "B5", 11)
    CONNECTION(P, "B5", 15)
    CONNECTION(P, "B5", 1)
@@ -1326,7 +1326,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "F4", 2)
    CONNECTION("E4", 3, "F4", 3)
    CONNECTION(START_GAME1_n, "F4", 1)
- 
+
    CONNECTION(P, "F4", 10)
    CONNECTION(P, "F4", 12)
    CONNECTION("E4", 6, "F4", 11)
@@ -1339,8 +1339,8 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION(P, "F3", 3)
    CONNECTION(P, "F3", 13)
- 
- 
+
+
    //CREDIT_COUNTER
    CONNECTION(BONUS_COIN, "E7", 8)
    CONNECTION(COIN, "E7", 9)
@@ -1364,7 +1364,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("L8", 6, "M8", 10)
    CONNECTION("L8", 2, "M8", 11)
    CONNECTION("L8", 3, "M9", 13)
-  
+
    CONNECTION(CREDIT2_n, "F9", 5)
    CONNECTION(CREDIT2_n, "L9", 2)
    CONNECTION("M9", 12, "L9", 1)
@@ -1402,11 +1402,11 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(BALL_C, "S4", 2)
    CONNECTION("S4", 3, "A4", 1)
    CONNECTION("A4", 3, "C37", 1)
-   
+
    CONNECTION(SERVE_WAIT_n, "A4", 5)
    CONNECTION(BALL, "A4", 4)
 
-   // Ball Circuit   
+   // Ball Circuit
 
 
    // Video Summing
@@ -1428,7 +1428,7 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION("VIDEO", Video::HBLANK_PIN, HSYNC)
    CONNECTION("VIDEO", Video::VBLANK_PIN, "E3", 10)
-   
+
 
    // Audio Summing
    CONNECTION("AUDIO", 1, "B9", 11)

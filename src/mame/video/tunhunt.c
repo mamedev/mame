@@ -78,7 +78,7 @@ void tunhunt_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrollx(0, 64);
-	
+
 	save_item(NAME(m_control));
 }
 
