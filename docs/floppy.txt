@@ -369,7 +369,7 @@ The track is finished with a stream of MFM-encoded 0x4e.
 
 The 250KHz pulse trains are used to lock the PLL to the signal
 correctly.  The cell pattern 4489 does not appear in normal
-MFM-encoded data and is used for clock/data separation.  
+MFM-encoded data and is used for clock/data separation.
 
 As for FM, the Western Digital-based controllers usually get rid of
 everything but some 0x4e before the first sector and allow a better
@@ -392,7 +392,7 @@ Similarly two write splices are created when a sector is written at
 the start and end of the data block part.  They're not supposed to
 happen on a mastered disk though, even if there are some rare
 exceptions.
-  
+
 
   3 The new implementation
   3.1 Floppy disk representation

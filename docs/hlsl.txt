@@ -42,7 +42,7 @@ converge_y              [r,g,b]         Convergence in screen-relative Y directi
 radial_converge_x   	[r,g,b]         Radial convergence in screen-relative X direction.
 radial_converge_y   	[r,g,b]         Radial convergence in screen-relative Y direction.
                                         Allowed values for convergence: -150 to 150 for each color.
-red_ratio               [r,g,b]         These parameters define a 3x3 matrix which is multiplied 
+red_ratio               [r,g,b]         These parameters define a 3x3 matrix which is multiplied
 grn_ratio               [r,g,b]         by the incoming RGB signal. This can be used for any
 blu_ratio               [r,g,b]         standard matrix convolution, including H/S/V or simply
                                         affecting the TV-style tint.
