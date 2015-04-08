@@ -779,7 +779,7 @@ static MACHINE_CONFIG_DERIVED( musobana, niyanpai )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(musobana_map)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
 MACHINE_CONFIG_END
 
