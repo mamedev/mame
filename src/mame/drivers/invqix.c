@@ -160,6 +160,7 @@ private:
 
 void invqix_state::video_start()
 {
+	save_item(NAME(m_vctl));
 }
 
 UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -359,4 +360,4 @@ ROM_START( invqix )
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
 ROM_END
 
-GAME(2003, invqix, 0, invqix, invqix, driver_device, 0, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", 0)
+GAME( 2003, invqix, 0, invqix, invqix, driver_device, 0, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", GAME_SUPPORTS_SAVE )
