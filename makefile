@@ -591,9 +591,9 @@ endif
 endif
 endif
 
-ifneq ($(PYTHON_AVAILABLE),python)
-$(error Python is not available in path)
-endif
+#ifneq ($(PYTHON_AVAILABLE),python)
+#$(error Python is not available in path)
+#endif
 
 GENIE := 3rdparty/genie/bin/$(GENIEOS)/genie$(EXE)
 
