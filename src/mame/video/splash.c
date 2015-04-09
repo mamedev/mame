@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  splash.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -38,7 +38,7 @@
       0  | xxxx---- -------- | color
 */
 
-TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap0)
+TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap0)
 {
 	int data = m_videoram[tile_index];
 	int attr = data >> 8;
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap1)
+TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap1)
 {
 	int data = m_videoram[(0x1000/2) + tile_index];
 	int attr = data >> 8;
@@ -68,7 +68,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap1)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(splash_state::splash_vram_w)
+WRITE16_MEMBER(splash_state::vram_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 1);
@@ -163,8 +163,8 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 void splash_state::video_start()
 {
-	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap0),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_tilemap0),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_tilemap1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
@@ -201,7 +201,7 @@ void splash_state::video_start()
       400| xxxxxxxx -------- | unused
 */
 
-void splash_state::splash_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void splash_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
@@ -247,7 +247,7 @@ void splash_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &c
 
 ***************************************************************************/
 
-UINT32 splash_state::screen_update_splash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 splash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* set scroll registers */
 	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
@@ -256,7 +256,7 @@ UINT32 splash_state::screen_update_splash(screen_device &screen, bitmap_ind16 &b
 	draw_bitmap(bitmap, cliprect);
 
 	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	splash_draw_sprites(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

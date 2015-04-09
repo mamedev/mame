@@ -31,13 +31,13 @@ Sound not working on Return of Lady Frog
 
 TS 2006.12.22:
 - Funny Strip is runing on pSOS RTOS ( http://en.wikipedia.org/wiki/PSOS and http://dr-linux.net/newbase/reference/psosCD/ ) .
-  There's copyrigth text at $480
+  There's copyright text at $480
   Also Rebus and TRoLF are running on it (the same internal code structure - traps, interrupt vectors),
   but copyright messages are removed.
 - Rebus protection patch sits at the end of trap $b (rtos call) and in some cases returns 0 in D0.
   It's not a real protection check i think.
 
-More notes about Funny Strip protection issus at the boottom of source file (DRIVER INIT)
+More notes about Funny Strip protection issues at the bottom of source file (DRIVER INIT)
 
 ***************************************************************************/
 
@@ -46,7 +46,6 @@ More notes about Funny Strip protection issus at the boottom of source file (DRI
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "sound/msm5205.h"
 #include "includes/splash.h"
 
 WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
@@ -70,7 +69,7 @@ WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
 	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
-WRITE16_MEMBER(splash_state::splash_coin_w)
+WRITE16_MEMBER(splash_state::coin_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -96,8 +95,8 @@ static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)                       /* Sound command */
-	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)                                /* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_SHARE("videoram")   /* Video RAM */
+	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
@@ -169,8 +168,8 @@ static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(roldf_sh_irqtrigger_w)                        /* Sound command */
-	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)                                /* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_SHARE("videoram")   /* Video RAM */
+	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM                                                 /* Work RAM */
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
@@ -224,14 +223,14 @@ static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM                                                 /* ROM */
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM                                                 /* protection? RAM */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("pixelram")                        /* Pixel Layer */
-	AM_RANGE(0x84000a, 0x84000b) AM_WRITE(splash_coin_w)                                /* Coin Counters + Coin Lockout */
+	AM_RANGE(0x84000a, 0x84000b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(funystrp_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x840008, 0x840009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_SHARE("videoram")   /* Video RAM */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")   /* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_SHARE("vregs")                           /* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_WRITENOP
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
@@ -472,6 +471,11 @@ static GFXDECODE_START( splash )
 GFXDECODE_END
 
 
+MACHINE_START_MEMBER(splash_state,splash)
+{
+	save_item(NAME(m_adpcm_data));
+}
+
 MACHINE_RESET_MEMBER(splash_state,splash)
 {
 	m_adpcm_data = 0;
@@ -495,13 +499,14 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_splash)
+	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_MACHINE_START_OVERRIDE(splash_state, splash )
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
@@ -516,6 +521,13 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
+
+MACHINE_START_MEMBER(splash_state, roldfrog)
+{
+	save_item(NAME(m_ret));
+	save_item(NAME(m_vblank_irq));
+	save_item(NAME(m_sound_irq));
+}
 
 INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
 {
@@ -541,14 +553,14 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update_splash)
+	MCFG_SCREEN_UPDATE_DRIVER(splash_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", splash)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-
+	MCFG_MACHINE_START_OVERRIDE(splash_state, roldfrog )
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, splash )
 
 	/* sound hardware */
@@ -592,6 +604,21 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int2)
 	}
 }
 
+
+MACHINE_START_MEMBER(splash_state, funystrp)
+{
+	save_item(NAME(m_funystrp_val));
+	save_item(NAME(m_funystrp_ff3cc7_val));
+	save_item(NAME(m_funystrp_ff3cc8_val));
+	save_item(NAME(m_msm_data1));
+	save_item(NAME(m_msm_data2));
+	save_item(NAME(m_msm_toggle1));
+	save_item(NAME(m_msm_toggle2));
+	save_item(NAME(m_msm_source));
+	save_item(NAME(m_snd_interrupt_enable1));
+	save_item(NAME(m_snd_interrupt_enable2));
+}
+
 static MACHINE_CONFIG_START( funystrp, splash_state )
 
 	/* basic machine hardware */
@@ -616,6 +643,7 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
+	MCFG_MACHINE_START_OVERRIDE(splash_state, funystrp )
 	MCFG_MACHINE_RESET_OVERRIDE(splash_state, funystrp )
 
 	/* sound hardware */
@@ -1035,222 +1063,222 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 		// sub $7ACC, $C7EE, subtractions, original value from 68k
 
 		case ((0x107001 / 2) + 0x0030): // $7ACE
-			funystrp_val = funystrp_ff3cc7_val & 0x7f;
+			m_funystrp_val = m_funystrp_ff3cc7_val & 0x7f;
 			return 0;
 
 		case ((0x107001 / 2) + 0x013e): // $7AFC
-			return (funystrp_val + 0x13) & 0xff;
+			return (m_funystrp_val + 0x13) & 0xff;
 
 		case ((0x107001 / 2) + 0x0279): // $7B38
-			return (funystrp_val + 0x22) & 0xff;
+			return (m_funystrp_val + 0x22) & 0xff;
 
 		case ((0x107001 / 2) + 0x0357): // $7B6E
-			return (funystrp_val + 0x44) & 0xff;
+			return (m_funystrp_val + 0x44) & 0xff;
 
 		case ((0x107001 / 2) + 0x03b1): // $7BA4
-			return (funystrp_val + 0x6a) & 0xff;
+			return (m_funystrp_val + 0x6a) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $7E76, subtractions, original value from protection device
 
 		case ((0x110001 / 2) + 0x0013): // $7E80
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x110001 / 2) + 0x0125): // $7E96
-			return (funystrp_val + 0x03) & 0xff;
+			return (m_funystrp_val + 0x03) & 0xff;
 
 		case ((0x110001 / 2) + 0x0261): // $7ECE
-			return (funystrp_val + 0x08) & 0xff;
+			return (m_funystrp_val + 0x08) & 0xff;
 
 		case ((0x110001 / 2) + 0x0322): // $7F00
-			return (funystrp_val + 0x12) & 0xff;
+			return (m_funystrp_val + 0x12) & 0xff;
 
 		case ((0x110001 / 2) + 0x039b): // $7F36
-			return (funystrp_val + 0x70) & 0xff;
+			return (m_funystrp_val + 0x70) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $7F70, $8038, $116E2, no subtractions, straight compare!, original value from 68k
 		// increase ff3cc8 value in sub $116e2
 
 		case ((0x100001 / 2) + 0x0010): // $7F72
-			funystrp_val = funystrp_ff3cc8_val;
+			m_funystrp_val = m_funystrp_ff3cc8_val;
 			return 0;
 
 		case ((0x100001 / 2) + 0x0123): // $7F9A
-			return (funystrp_val + 0x00) & 0xff;
+			return (m_funystrp_val + 0x00) & 0xff;
 
 		case ((0x100001 / 2) + 0x0257): // $7FC4
-			return (funystrp_val + 0x00) & 0xff;
+			return (m_funystrp_val + 0x00) & 0xff;
 
 		case ((0x100001 / 2) + 0x0312): // $7FEA
-			return (funystrp_val + 0x00) & 0xff;
+			return (m_funystrp_val + 0x00) & 0xff;
 
 		case ((0x100001 / 2) + 0x0395): // $8010
 			// increment $ff3cc8 in $117A8
-			return (funystrp_val + 0x00) & 0xff;
+			return (m_funystrp_val + 0x00) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $8522, subtractions, original value from protection device, weird cases
 
 		case ((0x104801 / 2) + 0x013A): // $8524
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		// this and above usually swapped... fooling the lazy bootlegger?
 		case ((0x104801 / 2) + 0x0017): // $8542
-			return (funystrp_val + 0x12) & 0xff;
+			return (m_funystrp_val + 0x12) & 0xff;
 
 		// first case... weird?
 	//  case ((0x104801 / 2) + 0x013A): // $857E
-	//      return (funystrp_val + 0x00) & 0xff;
+	//      return (m_funystrp_val + 0x00) & 0xff;
 
 		case ((0x104801 / 2) + 0x0277): // $85A4
-			return (funystrp_val + 0x04) & 0xff;
+			return (m_funystrp_val + 0x04) & 0xff;
 
 		case ((0x104801 / 2) + 0x034b): // $85D6
-			return (funystrp_val + 0x37) & 0xff;
+			return (m_funystrp_val + 0x37) & 0xff;
 
 		case ((0x104801 / 2) + 0x03ac): // $860E
-			return (funystrp_val + 0x77) & 0xff;
+			return (m_funystrp_val + 0x77) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $88F8, subtractions, original value from protection device
 		// verified as working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		case ((0x127001 / 2) + 0x0045): // $88FA
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x127001 / 2) + 0x0145): // $8918
-			return (funystrp_val + 0x01) & 0xff;
+			return (m_funystrp_val + 0x01) & 0xff;
 
 		case ((0x127001 / 2) + 0x028B): // $894A
-			return (funystrp_val + 0x02) & 0xff;
+			return (m_funystrp_val + 0x02) & 0xff;
 
 		case ((0x127001 / 2) + 0x0363): // $8982
-			return (funystrp_val + 0x03) & 0xff;
+			return (m_funystrp_val + 0x03) & 0xff;
 
 		case ((0x127001 / 2) + 0x03BA): // $89B4
-			return (funystrp_val + 0x00) & 0xff;
+			return (m_funystrp_val + 0x00) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $9DD2, subtractions, original value from protection device
 
 		case ((0x170001 / 2) + 0x006B): // $9DD4
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x170001 / 2) + 0x0162): // $9DF2
-			return (funystrp_val + 0x00) & 0xff;
+			return (m_funystrp_val + 0x00) & 0xff;
 
 		case ((0x170001 / 2) + 0x02A7): // $9E1E
-			return (funystrp_val + 0x7c) & 0xff;
+			return (m_funystrp_val + 0x7c) & 0xff;
 
 		case ((0x170001 / 2) + 0x0381): // $9E54
-			return (funystrp_val + 0x30) & 0xff;
+			return (m_funystrp_val + 0x30) & 0xff;
 
 		case ((0x170001 / 2) + 0x03C7): // $9E8A
-			return (funystrp_val + 0x28) & 0xff;
+			return (m_funystrp_val + 0x28) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $A944, subtractions, original value from protection device
 		// verified as working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		case ((0x177001 / 2) + 0x0079): // $A946
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x177001 / 2) + 0x01A0): // $A964
-			return (funystrp_val + 0x02) & 0xff;
+			return (m_funystrp_val + 0x02) & 0xff;
 
 		case ((0x177001 / 2) + 0x02B2): // $A99C
-			return (funystrp_val + 0x04) & 0xff;
+			return (m_funystrp_val + 0x04) & 0xff;
 
 		case ((0x177001 / 2) + 0x039A): // $A9CE
-			return (funystrp_val + 0x25) & 0xff;
+			return (m_funystrp_val + 0x25) & 0xff;
 
 		case ((0x177001 / 2) + 0x03D3): // $AA04
-			return (funystrp_val + 0x16) & 0xff;
+			return (m_funystrp_val + 0x16) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $C5E4, subtractions, original value from 68k
 
 	//  these cases are already in sub $7ACC, last one is new!!
 	//  case ((0x107001 / 2) + 0x0030): // $7ACE
-	//      funystrp_val = funystrp_ff3cc7_val & 0x7f;
+	//      m_funystrp_val = m_funystrp_ff3cc7_val & 0x7f;
 	//      return 0;
 
 	//  case ((0x107001 / 2) + 0x013e): // $7AFC
-	//      return (funystrp_val + 0x13) & 0xff;
+	//      return (m_funystrp_val + 0x13) & 0xff;
 
 	//  case ((0x107001 / 2) + 0x0279): // $7B38
-	//      return (funystrp_val + 0x22) & 0xff;
+	//      return (m_funystrp_val + 0x22) & 0xff;
 
 	//  case ((0x107001 / 2) + 0x0357): // $7B6E
-	//      return (funystrp_val + 0x44) & 0xff;
+	//      return (m_funystrp_val + 0x44) & 0xff;
 
 		case ((0x107001 / 2) + 0x0381): // $7BA4
-			return (funystrp_val + 0x6a) & 0xff;
+			return (m_funystrp_val + 0x6a) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $DBCE, subtractions, original value from protection device
 
 		case ((0x140001 / 2) + 0x0052): // $DBD0
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x140001 / 2) + 0x015C): // $DBEE
-			return (funystrp_val + 0x15) & 0xff;
+			return (m_funystrp_val + 0x15) & 0xff;
 
 		case ((0x140001 / 2) + 0x0293): // $DC2A
-			return (funystrp_val + 0x03) & 0xff;
+			return (m_funystrp_val + 0x03) & 0xff;
 
 		case ((0x140001 / 2) + 0x0374): // $DC5C
-			return (funystrp_val + 0x55) & 0xff;
+			return (m_funystrp_val + 0x55) & 0xff;
 
 		case ((0x140001 / 2) + 0x03C0): // $DC92
-			return (funystrp_val + 0x44) & 0xff;
+			return (m_funystrp_val + 0x44) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $F72C, subtractions, original value from protection device,
 		// routine verified working!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 		case ((0x100001 / 2) + 0x0017): // $F72E
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x100001 / 2) + 0x0127): // $F74C
-			return (funystrp_val + 0x17) & 0xff;
+			return (m_funystrp_val + 0x17) & 0xff;
 
 		case ((0x110001 / 2) + 0x0263): // $F788
-			return (funystrp_val + 0x0f) & 0xff;
+			return (m_funystrp_val + 0x0f) & 0xff;
 
 		case ((0x110001 / 2) + 0x0324): // $F7BE
-			return (funystrp_val + 0x12) & 0xff;
+			return (m_funystrp_val + 0x12) & 0xff;
 
 		case ((0x110001 / 2) + 0x0399): // $F7F4
-			return (funystrp_val + 0x70) & 0xff;
+			return (m_funystrp_val + 0x70) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $F82E, subtractions, original value from protection device,
 
 		case ((0x100001 / 2) + 0x0013): // $F830
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x100001 / 2) + 0x0125): // $F84E
-			return (funystrp_val + 0x17) & 0xff;
+			return (m_funystrp_val + 0x17) & 0xff;
 
 	//  used in sub $7E76
 	//  case ((0x110001 / 2) + 0x0261): // $F88A
-	//      return (funystrp_val + 0x0f) & 0xff;
+	//      return (m_funystrp_val + 0x0f) & 0xff;
 
 	//  case ((0x110001 / 2) + 0x0322): // $F8C0
-	//      return (funystrp_val + 0x12) & 0xff;
+	//      return (m_funystrp_val + 0x12) & 0xff;
 
 	//  case ((0x110001 / 2) + 0x039B): // $F8F6
-	//      return (funystrp_val + 0x70) & 0xff;
+	//      return (m_funystrp_val + 0x70) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $10FE2, subtractions, original value from protection device
@@ -1258,20 +1286,20 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 		// examine later to verify this is right
 
 		case ((0x105001 / 2) + 0x0021): // $10FF6
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x105001 / 2) + 0x0131): // $1100C
-			return (funystrp_val + 0x51) & 0xff;
+			return (m_funystrp_val + 0x51) & 0xff;
 
 		case ((0x105001 / 2) + 0x026a): // $11038
-			return (funystrp_val + 0x22) & 0xff;
+			return (m_funystrp_val + 0x22) & 0xff;
 
 		case ((0x105001 / 2) + 0x0331): // $11060
-			return (funystrp_val + 0x00) & 0xff;
+			return (m_funystrp_val + 0x00) & 0xff;
 
 		case ((0x105001 / 2) + 0x03ab): // $11078
-			return (funystrp_val + 0x03) & 0xff;
+			return (m_funystrp_val + 0x03) & 0xff;
 
 		//-----------------------------------------------------------------
 		// sub $11F2C, subtractions, original value from protection device,
@@ -1279,20 +1307,20 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 		// examine later to verify this is right
 
 		case ((0x183001 / 2) + 0x0088): // $11F3C
-			funystrp_val = 0;
+			m_funystrp_val = 0;
 			return 0;
 
 		case ((0x183001 / 2) + 0x01A7): // $11F5A
-			return (funystrp_val + 0x09) & 0xff;
+			return (m_funystrp_val + 0x09) & 0xff;
 
 		case ((0x183001 / 2) + 0x02C4): // $11F86
-			return (funystrp_val + 0x01) & 0xff;
+			return (m_funystrp_val + 0x01) & 0xff;
 
 		case ((0x183001 / 2) + 0x03B3): // $11FAA
-			return (funystrp_val + 0x63) & 0xff;
+			return (m_funystrp_val + 0x63) & 0xff;
 
 		case ((0x183001 / 2) + 0x03E9): // $11FD2
-			return (funystrp_val + 0x65) & 0xff;
+			return (m_funystrp_val + 0x65) & 0xff;
 	}
 
 	return 0;
@@ -1318,11 +1346,11 @@ WRITE16_MEMBER(splash_state::funystrp_protection_w)
 			return;
 
 			case (0x1007e5/2):
-				funystrp_ff3cc8_val = data;
+				m_funystrp_ff3cc8_val = data;
 			return;
 
 			case (0x1007e7/2):
-				funystrp_ff3cc7_val = data;
+				m_funystrp_ff3cc7_val = data;
 			return;
 		}
 	}
@@ -1341,12 +1369,12 @@ DRIVER_INIT_MEMBER(splash_state,funystrp)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16_delegate(FUNC(splash_state::funystrp_protection_r),this));
 }
 
-GAME( 1992, splash,   0,        splash,   splash, splash_state,   splash,   ROT0, "Gaelco / OMK Software", "Splash! (Ver. 1.2 World)", 0 )
-GAME( 1992, splash10, splash,   splash,   splash, splash_state,   splash10, ROT0, "Gaelco / OMK Software", "Splash! (Ver. 1.0 World)", 0 )
-GAME( 1992, paintlad, splash,   splash,   splash, splash_state,   splash,   ROT0, "Gaelco / OMK Software", "Painted Lady (Splash) (Ver. 1.3 US)", 0 )
+GAME( 1992, splash,   0,        splash,   splash, splash_state,   splash,   ROT0, "Gaelco / OMK Software", "Splash! (Ver. 1.2 World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, splash10, splash,   splash,   splash, splash_state,   splash10, ROT0, "Gaelco / OMK Software", "Splash! (Ver. 1.0 World)", GAME_SUPPORTS_SAVE )
+GAME( 1992, paintlad, splash,   splash,   splash, splash_state,   splash,   ROT0, "Gaelco / OMK Software", "Painted Lady (Splash) (Ver. 1.3 US)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, roldfrog, 0,        roldfrog, splash, splash_state,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 1)", 0)
-GAME( 1993, roldfroga,roldfrog, roldfrog, splash, splash_state,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 2)", 0 )
-GAME( 1995, rebus,    0,        roldfrog, splash, splash_state,   rebus,    ROT0, "Microhard", "Rebus", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
-GAME( 199?, funystrp, 0,        funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 199?, puckpepl, funystrp, funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard", "Puck People", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1993, roldfrog, 0,        roldfrog, splash, splash_state,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1993, roldfroga,roldfrog, roldfrog, splash, splash_state,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1995, rebus,    0,        roldfrog, splash, splash_state,   rebus,    ROT0, "Microhard", "Rebus", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 199?, funystrp, 0,        funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 199?, puckpepl, funystrp, funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard", "Puck People", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )

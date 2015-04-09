@@ -27,14 +27,19 @@ class spoker_state : public driver_device
 public:
 	spoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_bg_tile_ram(*this, "bg_tile_ram"),
-		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_bg_tile_ram(*this, "bg_tile_ram"),
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	
 	required_shared_ptr<UINT8> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
 
@@ -42,32 +47,39 @@ public:
 	required_shared_ptr<UINT8> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
 
-	int m_video_enable;
+	// common
 	int m_nmi_ack;
+	UINT8 m_out[3];
+
+	// spk116it and spk115it specific
+	int m_video_enable;
 	int m_hopper;
 	UINT8 m_igs_magic[2];
-	UINT8 m_out[3];
+
+	// common
 	DECLARE_WRITE8_MEMBER(bg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(spoker_nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(spoker_video_and_leds_w);
-	DECLARE_WRITE8_MEMBER(spoker_leds_w);
-	DECLARE_WRITE8_MEMBER(spoker_magic_w);
-	DECLARE_READ8_MEMBER(spoker_magic_r);
+	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
+	DECLARE_WRITE8_MEMBER(leds_w);
+
+	// spk116it and spk115it specific
+	DECLARE_WRITE8_MEMBER(video_and_leds_w);
+	DECLARE_WRITE8_MEMBER(magic_w);
+	DECLARE_READ8_MEMBER(magic_r);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
 	DECLARE_DRIVER_INIT(spk116it);
 	DECLARE_DRIVER_INIT(3super8);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(spoker_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 WRITE8_MEMBER(spoker_state::bg_tile_w)
@@ -107,7 +119,7 @@ void spoker_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-UINT32 spoker_state::screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -132,7 +144,7 @@ static void show_out(UINT8 *out)
 #endif
 }
 
-WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
+WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 {
 	if ((data) & (0x22))
 	{
@@ -156,7 +168,7 @@ WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
 	show_out(m_out);
 }
 
-WRITE8_MEMBER(spoker_state::spoker_video_and_leds_w)
+WRITE8_MEMBER(spoker_state::video_and_leds_w)
 {
 	set_led_status(machine(), 4,      data & 0x01); // start?
 	set_led_status(machine(), 5,      data & 0x04); // l_bet?
@@ -168,7 +180,7 @@ WRITE8_MEMBER(spoker_state::spoker_video_and_leds_w)
 	show_out(m_out);
 }
 
-WRITE8_MEMBER(spoker_state::spoker_leds_w)
+WRITE8_MEMBER(spoker_state::leds_w)
 {
 	set_led_status(machine(), 0, data & 0x01);  // stop_1
 	set_led_status(machine(), 1, data & 0x02);  // stop_2
@@ -180,7 +192,7 @@ WRITE8_MEMBER(spoker_state::spoker_leds_w)
 	show_out(m_out);
 }
 
-WRITE8_MEMBER(spoker_state::spoker_magic_w)
+WRITE8_MEMBER(spoker_state::magic_w)
 {
 	m_igs_magic[offset] = data;
 
@@ -198,7 +210,7 @@ WRITE8_MEMBER(spoker_state::spoker_magic_w)
 	}
 }
 
-READ8_MEMBER(spoker_state::spoker_magic_r)
+READ8_MEMBER(spoker_state::magic_r)
 {
 	switch(m_igs_magic[0])
 	{
@@ -237,14 +249,14 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
 	/* TODO: ppi #1 */
-	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(spoker_nmi_and_coins_w )
+	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(nmi_and_coins_w )
 	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
 
 	/* TODO: ppi #2 */
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "BUTTONS1" )
-	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE(spoker_video_and_leds_w )
-	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE(spoker_leds_w )
+	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE(video_and_leds_w )
+	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE(leds_w )
 
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
 
@@ -252,7 +264,7 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 
 	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(spoker_magic_r, spoker_magic_w )    // DSW1-5
+	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(magic_r, magic_w )    // DSW1-5
 
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
@@ -279,10 +291,10 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "IN1" )
 	AM_RANGE( 0x6491, 0x6491 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "IN2" )
-	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE(spoker_leds_w )
+	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE(leds_w )
 	AM_RANGE( 0x64c0, 0x64c0 ) AM_READNOP //irq ack?
 
-	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE(spoker_nmi_and_coins_w )
+	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE(nmi_and_coins_w )
 
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
@@ -510,16 +522,20 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
+void spoker_state::machine_start()
+{
+	save_item(NAME(m_nmi_ack));
+	save_item(NAME(m_out));
+	save_item(NAME(m_video_enable));
+	save_item(NAME(m_hopper));
+	save_item(NAME(m_igs_magic));
+}
+
 void spoker_state::machine_reset()
 {
 	m_nmi_ack       =   0;
 	m_hopper            =   0;
 	m_video_enable  =   1;
-}
-
-INTERRUPT_GEN_MEMBER(spoker_state::spoker_interrupt)
-{
-	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( spoker, spoker_state )
@@ -528,7 +544,7 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(spoker_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, spoker_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -539,7 +555,7 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update_spoker)
+	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spoker)
@@ -561,7 +577,7 @@ static MACHINE_CONFIG_DERIVED( 3super8, spoker )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(3super8_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, spoker_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spoker_state, irq0_line_hold, 120) // this signal comes from the PIC
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 3super8)
@@ -714,6 +730,6 @@ DRIVER_INIT_MEMBER(spoker_state,3super8)
 	}
 }
 
-GAME( 1993?, spk116it, 0,        spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v116IT)", 0 )
-GAME( 1993?, spk115it, spk116it, spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v115IT)", 0 )
-GAME( 1993?, 3super8,  spk116it, 3super8,3super8, spoker_state, 3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) //roms are badly dumped
+GAME( 1993?, spk116it, 0,        spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v116IT)", GAME_SUPPORTS_SAVE )
+GAME( 1993?, spk115it, spk116it, spoker, spoker, spoker_state,  spk116it, ROT0, "IGS",       "Super Poker (v115IT)", GAME_SUPPORTS_SAVE )
+GAME( 1993?, 3super8,  spk116it, 3super8,3super8, spoker_state, 3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) //roms are badly dumped
