@@ -19,6 +19,7 @@
  @MP1030   TMS1100  1980, APF Mathemagician
  @MP1133   TMS1470  1979, Kosmos Astro
  @MP1204   TMS1100  1980, Entex Baseball 3
+ @MP1211   TMS1100  1980, Entex Space Invader
  *MP1221   TMS1100  1980, Entex Raise The Devil
  *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  *MP2105   TMS1370  1979, Gakken Poker, Entex Electronic Poker
@@ -69,8 +70,8 @@
     electronically (mpla is usually the default, opla is often custom)
   - unknown MCU clocks for some: TMS1000 and TMS1100 RC curve is documented in
     the data manual, but for TMS1400 it's unknown. TMS0970/0980 osc. is on-die.
-  - some of the games rely on the fact that faster(longer) strobed leds appear
-    brighter: tc4(offensive players), bankshot(cue ball)
+  - some of the games rely on the fact that faster/longer strobed leds appear
+    brighter: tc4(offensive players), bankshot(cue ball), ...
   - add softwarelist for tc4 cartridges?
   - stopthiep: unable to start a game (may be intentional?)
 
@@ -86,6 +87,7 @@
 #include "ebball.lh"
 #include "ebball2.lh"
 #include "ebball3.lh"
+#include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
 #include "comp4.lh"
 #include "mathmagi.lh"
@@ -526,7 +528,7 @@ WRITE16_MEMBER(amaztron_state::write_r)
 
 WRITE16_MEMBER(amaztron_state::write_o)
 {
-	// O0-O6: digit segments
+	// O0-O6: led segments A-G
 	// O7: N/C
 	m_o = data & 0x7f;
 	prepare_display();
@@ -688,7 +690,7 @@ WRITE16_MEMBER(tc4_state::write_r)
 
 WRITE16_MEMBER(tc4_state::write_o)
 {
-	// O0-O7: led row
+	// O0-O7: led state
 	m_o = data;
 	prepare_display();
 }
@@ -838,14 +840,14 @@ WRITE16_MEMBER(ebball_state::write_r)
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
 
-	// R0-R8: led columns
+	// R0-R8: led select
 	m_r = data;
 	prepare_display();
 }
 
 WRITE16_MEMBER(ebball_state::write_o)
 {
-	// O0-O6: led row
+	// O0-O6: led state
 	// O7: N/C
 	m_o = data;
 	prepare_display();
@@ -973,14 +975,14 @@ WRITE16_MEMBER(ebball2_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led columns
+	// R0-R9: led select
 	m_r = data;
 	prepare_display();
 }
 
 WRITE16_MEMBER(ebball2_state::write_o)
 {
-	// O0-O7: led row/segment
+	// O0-O7: led state
 	m_o = data;
 	prepare_display();
 }
@@ -1120,14 +1122,14 @@ WRITE16_MEMBER(ebball3_state::write_r)
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
 
-	// R0-R9: led columns
+	// R0-R9: led select
 	m_r = data;
 	prepare_display();
 }
 
 WRITE16_MEMBER(ebball3_state::write_o)
 {
-	// O0-O6: led row
+	// O0-O6: led state
 	// O7: N/C
 	m_o = data & 0x7f;
 	prepare_display();
@@ -1210,6 +1212,122 @@ static MACHINE_CONFIG_START( ebball3, ebball3_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball3)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex Space Invader
+  * TMS1100 MP1211 (die labeled MP1211)
+  * 3 7seg LEDs, LED matrix and overlay mask, 1bit sound
+
+  There are two versions of this game: the first release(this one) is on
+  TMS1100, the second more widespread release runs on a COP400. There are
+  also differences with the overlay mask.
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class einvader_state : public hh_tms1k_state
+{
+public:
+	einvader_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+
+	void set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+
+protected:
+	virtual void machine_reset();
+};
+
+// handlers
+
+void einvader_state::prepare_display()
+{
+	// R7-R9 are 7segs
+	for (int y = 7; y < 10; y++)
+		m_display_segmask[y] = 0x7f;
+	
+	display_matrix(8, 10, m_o, m_r);
+}
+
+WRITE16_MEMBER(einvader_state::write_r)
+{
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R9: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(einvader_state::write_o)
+{
+	// O0-O7: led state
+	m_o = data;
+	prepare_display();
+}
+
+
+// config
+
+static INPUT_PORTS_START( einvader )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, einvader_state, difficulty_switch, NULL)
+	PORT_CONFSETTING(    0x00, "Amateur" )
+	PORT_CONFSETTING(    0x08, "Professional" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(einvader_state::difficulty_switch)
+{
+	set_clock();
+}
+
+
+void einvader_state::set_clock()
+{
+	// MCU clock is from an RC circuit(R=47K, C=56pf) oscillating by default at ~320kHz,
+	// but on PRO, the difficulty switch adds an extra 180K resistor to Vdd to speed
+	// it up to around ~400kHz.
+	m_maincpu->set_unscaled_clock((m_inp_matrix[0]->read() & 8) ? 400000 : 320000);
+}
+
+void einvader_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
+
+static MACHINE_CONFIG_START( einvader, einvader_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 320000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(einvader_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(einvader_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_einvader)
 
 	/* no video! */
 
@@ -1396,14 +1514,14 @@ WRITE16_MEMBER(starwbc_state::write_r)
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
 
-	// R0,R2,R4,R6,R8: led columns
+	// R0,R2,R4,R6,R8: led select
 	m_r = data & 0x155;
 	prepare_display();
 }
 
 WRITE16_MEMBER(starwbc_state::write_o)
 {
-	// O0-O7: led row
+	// O0-O7: led state
 	m_o = (data << 4 & 0xf0) | (data >> 4 & 0x0f);
 	prepare_display();
 }
@@ -1521,14 +1639,14 @@ WRITE16_MEMBER(astro_state::write_r)
 	// R0-R7: input mux
 	m_inp_mux = data & 0xff;
 	
-	// R0-R9: select digit/leds
+	// R0-R9: led select
 	m_r = data;
 	prepare_display();
 }
 
 WRITE16_MEMBER(astro_state::write_o)
 {
-	// O0-O7: digit segments/leds
+	// O0-O7: led state
 	m_o = data;
 	prepare_display();
 }
@@ -1732,7 +1850,6 @@ public:
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
 };
 
@@ -1754,11 +1871,6 @@ WRITE16_MEMBER(simon_state::write_r)
 	// R3: GND
 	// other bits: N/C
 	m_inp_mux = (data & 7) | (data >> 6 & 8);
-}
-
-WRITE16_MEMBER(simon_state::write_o)
-{
-	// N/C
 }
 
 READ8_MEMBER(simon_state::read_k)
@@ -1803,7 +1915,6 @@ static MACHINE_CONFIG_START( simon, simon_state )
 	MCFG_CPU_ADD("maincpu", TMS1000, 350000) // RC osc. R=33K, C=100pf -> ~350kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(simon_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(simon_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(simon_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_simon)
@@ -1839,7 +1950,6 @@ public:
 	{ }
 
 	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
 
 	void set_clock();
@@ -1864,11 +1974,6 @@ WRITE16_MEMBER(ssimon_state::write_r)
 	
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
-}
-
-WRITE16_MEMBER(ssimon_state::write_o)
-{
-	// N/C
 }
 
 READ8_MEMBER(ssimon_state::read_k)
@@ -1954,7 +2059,6 @@ static MACHINE_CONFIG_START( ssimon, ssimon_state )
 	MCFG_CPU_ADD("maincpu", TMS1100, 275000) // see set_clock
 	MCFG_TMS1XXX_READ_K_CB(READ8(ssimon_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ssimon_state, write_r))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ssimon_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ssimon)
@@ -2360,14 +2464,14 @@ WRITE16_MEMBER(bankshot_state::write_r)
 	// R2,R3: input mux
 	m_inp_mux = data >> 2 & 3;
 
-	// R2-R10: led columns
+	// R2-R10: led select
 	m_r = data & ~3;
 	display_matrix(7, 11, m_o, m_r);
 }
 
 WRITE16_MEMBER(bankshot_state::write_o)
 {
-	// O0-O6: led row
+	// O0-O6: led state
 	// O7: N/C
 	m_o = data;
 	display_matrix(7, 11, m_o, m_r);
@@ -2484,14 +2588,14 @@ WRITE16_MEMBER(splitsec_state::write_r)
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
 
-	// R0-R7: led columns
+	// R0-R7: led select
 	m_r = data;
 	display_matrix(7, 8, m_o, m_r);
 }
 
 WRITE16_MEMBER(splitsec_state::write_o)
 {
-	// O0-O6: led row
+	// O0-O6: led state
 	// O7: N/C
 	m_o = data;
 	display_matrix(7, 8, m_o, m_r);
@@ -2774,6 +2878,17 @@ ROM_START( ebball3 )
 ROM_END
 
 
+ROM_START( einvader )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1211", 0x0000, 0x0800, CRC(b6efbe8e) SHA1(d7d54921dab22bb0c2956c896a5d5b56b6f64969) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_einvader_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_einvader_opla.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
+ROM_END
+
+
 ROM_START( elecdet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp6100a", 0x0000, 0x1000, CRC(6f396bb8) SHA1(1f104d4ca9bee0d4572be4779b7551dfe20c4f04) )
@@ -2956,6 +3071,7 @@ CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Col
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
+CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
 
