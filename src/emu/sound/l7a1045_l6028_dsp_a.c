@@ -73,6 +73,12 @@
 
 	Sample data format TBA
 
+	TODO:
+	- Sample format needs to be double checked;
+	- Octave Control/BPM/Pitch, right now XRally Network BGM wants 66150 Hz which is definitely too fast for Terry Bogard speech;
+	- Key Off;
+	- ADSR (registers 2 & 4?);
+	
 ***************************************************************************/
 
 #include "emu.h"
@@ -110,7 +116,7 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 void l7a1045_sound_device::device_start()
 {
 	/* Allocate the stream */
-	m_stream = stream_alloc(0, 2, 44100); //clock() / 384);
+	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
 
 	m_rom = m_region->base();
 	m_rom_size = m_region->bytes();
@@ -164,11 +170,11 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 				data = m_rom[(start + pos) & (m_rom_size-1)];
-				sample = (INT8)data;
+				sample = ((INT8)(data & 0xfc)) << (3 - (data & 3));
 				frac += step;
 
-				outputs[0][j] += ((sample * vptr->l_volume) >> 8);
-				outputs[1][j] += ((sample * vptr->r_volume) >> 8);
+				outputs[0][j] += ((sample * vptr->l_volume) >> 9);
+				outputs[1][j] += ((sample * vptr->r_volume) >> 9);
 			}
 
 			vptr->pos = pos;
@@ -322,7 +328,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
 	{
 		l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
-		#if 1
+		#if 0
 		if(vptr->start != 0)
 		{
 		printf("%08x START\n",vptr->start);
