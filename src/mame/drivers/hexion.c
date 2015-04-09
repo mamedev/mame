@@ -236,11 +236,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::hexion_scanline)
 static MACHINE_CONFIG_START( hexion, hexion_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,24000000/4) /* Z80B 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, hexion_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("k053252", K053252, 24000000/2)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, hexion_irq_ack_w))
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, hexion_nmi_ack_w))
 
@@ -259,10 +259,10 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_K051649_ADD("k051649", 24000000/16)
+	MCFG_K051649_ADD("k051649", XTAL_24MHz/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -285,20 +285,24 @@ MACHINE_CONFIG_END
 
 ROM_START( hexion )
 	ROM_REGION( 0x34800, "maincpu", 0 ) /* ROMs + space for additional RAM */
-	ROM_LOAD( "122jab01.bin", 0x00000, 0x20000, CRC(eabc6dd1) SHA1(e74c1f1f2fcf8973f0741a2d544f25c8639448bf) )
+	ROM_LOAD( "122__j_a__b01.16f", 0x00000, 0x20000, CRC(eabc6dd1) SHA1(e74c1f1f2fcf8973f0741a2d544f25c8639448bf) ) /* "122 // J A // B01" @16F (27c010?) */
 	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 8000-9fff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* addressable by the main CPU */
-	ROM_LOAD( "122a07.bin",   0x00000, 0x40000, CRC(22ae55e3) SHA1(41bdc990f69416b639542e2186a3610c16389063) )
-	ROM_LOAD( "122a06.bin",   0x40000, 0x40000, CRC(438f4388) SHA1(9e23805c9642a237daeaf106187d1e1e0692434d) )
+	ROM_LOAD( "122a07.1h",   0x00000, 0x40000, CRC(22ae55e3) SHA1(41bdc990f69416b639542e2186a3610c16389063) ) /* Later pcbs have mask roms labeled: "KONAMI // 055066 // 122A07 // 233505" @1H (maybe mismarked 2H on pcb?) */
+	ROM_LOAD( "122a06.1g",   0x40000, 0x40000, CRC(438f4388) SHA1(9e23805c9642a237daeaf106187d1e1e0692434d) ) /* Later pcbs have mask roms labeled: "KONAMI // 055065 // 122A06 // 233506" @1G */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "122a05.bin",   0x0000, 0x40000, CRC(bcc831bf) SHA1(c3382065dd0069a4dc0bde2d9931ec85b0bffc73) )
+	ROM_LOAD( "122a05.2f",   0x0000, 0x40000, CRC(bcc831bf) SHA1(c3382065dd0069a4dc0bde2d9931ec85b0bffc73) ) /* Later pcbs have mask roms labeled: "KONAMI // 055064 // 122A05 // 233507" @2F (maybe 2G? marking isn't visible in the picture I have) */
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "122a04.10b",   0x0000, 0x0100, CRC(506eb8c6) SHA1(3bff7cf286942d8bdbc3998245c3de20981fbecb) )
-	ROM_LOAD( "122a03.11b",   0x0100, 0x0100, CRC(590c4f64) SHA1(db4b34f8c5fdfea034a94d65873f6fb842f123e9) )
-	ROM_LOAD( "122a02.13b",   0x0200, 0x0100, CRC(5734305c) SHA1(c72e59acf79a4db1a5a9d827eef899c0675336f2) )
+	ROM_LOAD( "122a04.10b",   0x0000, 0x0100, CRC(506eb8c6) SHA1(3bff7cf286942d8bdbc3998245c3de20981fbecb) ) // AMD27S21 == 82S129
+	ROM_LOAD( "122a03.11b",   0x0100, 0x0100, CRC(590c4f64) SHA1(db4b34f8c5fdfea034a94d65873f6fb842f123e9) ) // AMD27S21 == 82S129
+	ROM_LOAD( "122a02.13b",   0x0200, 0x0100, CRC(5734305c) SHA1(c72e59acf79a4db1a5a9d827eef899c0675336f2) ) // AMD27S21 == 82S129
+
+	// there are also two PALs of unknown type on the pcb:
+	//054843 @12F
+	//054844 @12H(12I?)
 ROM_END
 
 ROM_START( hexionb )
@@ -307,19 +311,23 @@ ROM_START( hexionb )
 	ROM_RELOAD(               0x10000, 0x20000 )    /* banked at 8000-9fff */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )    /* addressable by the main CPU */
-	ROM_LOAD( "hexionb.u30",   0x00000, 0x40000, CRC(22ae55e3) SHA1(41bdc990f69416b639542e2186a3610c16389063) )
-	ROM_LOAD( "hexionb.u29",   0x40000, 0x40000, CRC(438f4388) SHA1(9e23805c9642a237daeaf106187d1e1e0692434d) )
+	ROM_LOAD( "hexionb.u30",   0x00000, 0x40000, CRC(22ae55e3) SHA1(41bdc990f69416b639542e2186a3610c16389063) ) // == 122a07.1h
+	ROM_LOAD( "hexionb.u29",   0x40000, 0x40000, CRC(438f4388) SHA1(9e23805c9642a237daeaf106187d1e1e0692434d) ) // == 122a06.1g
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* OKIM6295 samples */
-	ROM_LOAD( "hexionb.u16",   0x0000, 0x40000, CRC(bcc831bf) SHA1(c3382065dd0069a4dc0bde2d9931ec85b0bffc73) )
+	ROM_LOAD( "hexionb.u16",   0x0000, 0x40000, CRC(bcc831bf) SHA1(c3382065dd0069a4dc0bde2d9931ec85b0bffc73) ) // == 122a05.2f
 
 	ROM_REGION( 0x40000, "oki2", 0 ) /* OKIM6295 samples */
 	ROM_LOAD( "hexionb.u18",   0x0000, 0x40000, CRC(c179d315) SHA1(b39d5ec8a90b7ae06763191b8324f32fe1d0ca9b) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "122a04.10b",   0x0000, 0x0100, CRC(506eb8c6) SHA1(3bff7cf286942d8bdbc3998245c3de20981fbecb) )
-	ROM_LOAD( "122a03.11b",   0x0100, 0x0100, CRC(590c4f64) SHA1(db4b34f8c5fdfea034a94d65873f6fb842f123e9) )
-	ROM_LOAD( "122a02.13b",   0x0200, 0x0100, CRC(5734305c) SHA1(c72e59acf79a4db1a5a9d827eef899c0675336f2) )
+	ROM_LOAD( "82s129.u36",   0x0000, 0x0100, CRC(506eb8c6) SHA1(3bff7cf286942d8bdbc3998245c3de20981fbecb) )
+	ROM_LOAD( "82s129.u37",   0x0100, 0x0100, CRC(590c4f64) SHA1(db4b34f8c5fdfea034a94d65873f6fb842f123e9) )
+	ROM_LOAD( "82s129.u38",   0x0200, 0x0100, CRC(5734305c) SHA1(c72e59acf79a4db1a5a9d827eef899c0675336f2) )
+
+	// there are also two PALs on the bootleg:
+	//PAL20L10 @U12
+	//PAL20L10 @U31
 ROM_END
 
 GAME( 1992, hexion, 0,      hexion, hexion, driver_device, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)", 0 )
