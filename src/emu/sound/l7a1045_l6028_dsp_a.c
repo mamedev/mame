@@ -127,7 +127,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
 	
-	for (int i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i+=2)
 	{
 		if (m_key & (1 << i))
 		{
@@ -136,7 +136,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			UINT32 start = vptr->start;
 			UINT32 end = vptr->end;
 			UINT32 step  = 0x400;
-
+			
 			UINT32 pos = vptr->pos;
 			UINT32 frac = vptr->frac;
 
@@ -150,8 +150,16 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 				if ((start + pos) >= end)
 				{
-					m_key &= ~(1 << i);
-
+					if(vptr->mode == true) // loop
+					{
+						pos = vptr->pos = 0;
+						frac = vptr->frac = 0;
+					}
+					else // no loop, keyoff
+					{
+						m_key &= ~(1 << i);
+						break;
+					}
 				}
 
 
@@ -249,6 +257,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 			{
 				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xffff) << 2;
 				vptr->end += vptr->start;
+				vptr->mode = false;
 				// hopefully it'll never happen? Maybe assert here?
 				vptr->end &= m_rom_size - 1;
 
@@ -258,6 +267,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x000f) << (16 + 4);
 				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[1] & 0xffff) << (4);
 				vptr->end |= (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xf000) >> (12);
+				vptr->mode = true;
 
 				vptr->end &= m_rom_size - 1;
 			}

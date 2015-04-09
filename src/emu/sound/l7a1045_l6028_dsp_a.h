@@ -14,6 +14,7 @@ struct l7a1045_voice
 
 	UINT32 start;
 	UINT32 end;
+	bool mode;
 	UINT32 pos;
 	UINT32 frac;
 	UINT16 l_volume;
