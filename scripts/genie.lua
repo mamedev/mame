@@ -946,95 +946,95 @@ configuration { "vs*" }
 		}
 
 		buildoptions {
-			"/wd4025",
-			"/wd4003",
-			"/wd4018",
-			"/wd4061",
-			"/wd4100",
-			"/wd4127",
-			"/wd4131",
-			"/wd4141",
-			"/wd4146",
-			"/wd4150",
-			"/wd4189",
-			"/wd4191",
-			"/wd4201",
-			"/wd4232",
-			"/wd4242",
-			"/wd4244",
-			"/wd4250",
-			"/wd4255",
-			"/wd4296",
-			"/wd4306",
-			"/wd4310",
-			"/wd4312",
-			"/wd4324",
-			"/wd4347",
-			"/wd4435",
-			"/wd4510",
-			"/wd4512",
-			"/wd4514",
-			"/wd4571",
-			"/wd4610",
-			"/wd4611",
-			"/wd4619",
-			"/wd4625",
-			"/wd4626",
-			"/wd4640",
-			"/wd4668",
-			"/wd4702",
-			"/wd4706",
-			"/wd4710",
-			"/wd4711",
-			"/wd4805",
-			"/wd4820",
-			"/wd4826",
-			"/wd4365",
-			"/wd4389",
-			"/wd4245",
-			"/wd4388",
-			"/wd4267",
-			"/wd4005",
-			"/wd4350",
-			"/wd4996",
-			"/wd4191",
-			"/wd4060",
-			"/wd4065",
-			"/wd4640",
-			"/wd4290",
-			"/wd4355",
-			"/wd4800",
-			"/wd4371",
-			"/wd4548",
+			"/wd4025", -- warning C4025: 'number' : based pointer passed to function with variable arguments: parameter number
+			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
+			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch 
+			"/wd4061", -- warning C4061: enumerator 'xxx' in switch of enum 'xxx' is not explicitly handled by a case label
+			"/wd4100", -- warning C4100: 'xxx' : unreferenced formal parameter
+			"/wd4127", -- warning C4127: conditional expression is constant
+			"/wd4131", -- warning C4131: 'xxx' : uses old-style declarator
+			"/wd4141", -- warning C4141: 'xxx' : used more than once
+			"/wd4146", -- warning C4146: unary minus operator applied to unsigned type, result still unsigned
+			"/wd4150", -- warning C4150: deletion of pointer to incomplete type 'xxx'; no destructor called
+			"/wd4189", -- warning C4189: 'xxx' : local variable is initialized but not referenced
+			"/wd4191", -- warning C4191: 'type cast' : unsafe conversion from 'xxx' to 'xxx' // 64-bit only
+			"/wd4201", -- warning C4201: nonstandard extension used : nameless struct/union
+			"/wd4232", -- warning C4232: nonstandard extension used : 'xxx' : address of dllimport 'xxx' is not static, identity not guaranteed
+			"/wd4242", -- warning C4242: 'x' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
+			"/wd4250", -- warning C4250: 'xxx' : inherits 'xxx' via dominance
+			"/wd4255", -- warning C4255: 'xxx' : no function prototype given: converting '()' to '(void)'
+			"/wd4296", -- warning C4296: 'x' : expression is always false
+			"/wd4306", -- warning C4306: 'xxx': conversion from 'type1' to 'type2' of greater size // 64-bit only
+			"/wd4310", -- warning C4310: cast truncates constant value
+			"/wd4312", -- warning C4312: 'type cast' : conversion from 'xxx' to 'xxx' of greater size
+			"/wd4324", -- warning C4324: 'xxx' : structure was padded due to __declspec(align())
+			"/wd4347", -- warning C4347: behavior change: 'xxx' is called instead of 'xxx' // obsolete VS2005 - VS2010 only
+			"/wd4435", -- warning C4435: 'xxx' : Object layout under /vd2 will change due to virtual base 'xxx'
+			"/wd4510", -- warning C4510: 'xxx' : default constructor could not be generated
+			"/wd4512", -- warning C4512: 'xxx' : assignment operator could not be generated
+			"/wd4514", -- warning C4514: 'xxx' : unreferenced inline function has been removed
+			"/wd4571", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
+			"/wd4610", -- warning C4619: #pragma warning : there is no warning number 'xxx'
+			"/wd4611", -- warning C4571: Informational: catch(...) semantics changed since Visual C++ 7.1; structured exceptions (SEH) are no longer caught
+			"/wd4619", -- warning C4610: struct 'xxx' can never be instantiated - user defined constructor required
+			"/wd4625", -- warning C4625: 'xxx' : copy constructor could not be generated because a base class copy constructor is inaccessible or deleted
+			"/wd4626", -- warning C4626: 'xxx' : assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
+			"/wd4640", -- warning C4640: 'xxx' : construction of local static object is not thread-safe
+			"/wd4668", -- warning C4668: 'xxx' is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
+			"/wd4702", -- warning C4702: unreachable code
+			"/wd4706", -- warning C4706: assignment within conditional expression
+			"/wd4710", -- warning C4710: 'xxx' : function not inlined
+			"/wd4711", -- warning C4711: function 'xxx' selected for automatic inline expansion // optimized only
+			"/wd4805", -- warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
+			"/wd4820", -- warning C4820: 'xxx' : 'x' bytes padding added after data member 'xxx'
+			"/wd4826", -- warning C4826: Conversion from 'type1 ' to 'type_2' is sign-extended. This may cause unexpected runtime behavior. // 32-bit only
+			"/wd4365", -- warning C4365: 'action' : conversion from 'type_1' to 'type_2', signed/unsigned mismatch
+			"/wd4389", -- warning C4389: 'operator' : signed/unsigned mismatch
+			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
+			"/wd4388", -- warning C4388: 
+			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
+			"/wd4350", -- warning C4350: behavior change: 'member1' called instead of 'member2'
+			"/wd4996", -- warning C4996: 'function': was declared deprecated
+			"/wd4191", -- warning C4191: 'operator/operation' : unsafe conversion from 'type of expression' to 'type required'
+			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
+			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
+			"/wd4640", -- warning C4640: 'instance' : construction of local static object is not thread-safe
+			"/wd4290", -- warning C4290: 
+			"/wd4355", -- warning C4355: 'this' : used in base member initializer list
+			"/wd4800", -- warning C4800: 'type' : forcing value to bool 'true' or 'false' (performance warning)
+			"/wd4371", -- warning C4371: 
+			"/wd4548", -- warning C4548: expression before comma has no effect; expected expression with side-effect
 		}
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
-			"/Qwd9",
-			"/Qwd82",
-			"/Qwd111",
-			"/Qwd128",
-			"/Qwd177",
-			"/Qwd181",
-			"/Qwd185",
-			"/Qwd280",
-			"/Qwd344",
-			"/Qwd411",
-			"/Qwd869",
-			"/Qwd2545",
-			"/Qwd2553",
-			"/Qwd2557",
-			"/Qwd3280",
+			"/Qwd9",    			-- remark #9: nested comment is not allowed
+			"/Qwd82",   			-- remark #82: storage class is not first
+			"/Qwd111",  			-- remark #111: statement is unreachable
+			"/Qwd128",  			-- remark #128: loop is not reachable
+			"/Qwd177",  			-- remark #177: function "xxx" was declared but never referenced
+			"/Qwd181",  			-- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
+			"/Qwd185",  			-- remark #185: dynamic initialization in unreachable code
+			"/Qwd280",  			-- remark #280: selector expression is constant
+			"/Qwd344",  			-- remark #344: typedef name has already been declared (with same type)
+			"/Qwd411",  			-- remark #411: class "xxx" defines no constructor to initialize the following
+			"/Qwd869",  			-- remark #869: parameter "xxx" was never referenced
+			"/Qwd2545", 			-- remark #2545: empty dependent statement in "else" clause of if - statement
+			"/Qwd2553", 			-- remark #2553: nonstandard second parameter "TCHAR={WCHAR = { __wchar_t } } **" of "main", expected "char *[]" or "char **" extern "C" int _tmain(int argc, TCHAR **argv)
+			"/Qwd2557", 			-- remark #2557: comparison between signed and unsigned operands
+			"/Qwd3280", 			-- remark #3280: declaration hides member "attotime::seconds" (declared at line 126) static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
 
-			"/Qwd170",
-			"/Qwd188",
+			"/Qwd170",  			-- error #170: pointer points outside of underlying object
+			"/Qwd188",  			-- error #188: enumerated type mixed with another type
 
-			"/Qwd63",
-			"/Qwd177",
-			"/Qwd186",
-			"/Qwd488",
-			"/Qwd1478",
-			"/Qwd1879",
-			"/Qwd3291",
+			"/Qwd63",   			-- warning #63: shift count is too large
+			"/Qwd177",  			-- warning #177: label "xxx" was declared but never referenced
+			"/Qwd186",  			-- warning #186: pointless comparison of unsigned integer with zero
+			"/Qwd488",  			-- warning #488: template parameter "_FunctionClass" is not used in declaring the parameter types of function template "device_delegate<_Signature>::device_delegate<_FunctionClass>(delegate<_Signature>:
+			"/Qwd1478", 			-- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
+			"/Qwd1879", 			-- warning #1879: unimplemented pragma ignored
+			"/Qwd3291", 			-- warning #3291: invalid narrowing conversion from "double" to "int"
 			"/Qwd1195",
 			"/Qwd1786",
 			"/Qwd592", -- For lua, false positive?
