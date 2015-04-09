@@ -15,15 +15,16 @@
  *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
 
  *04      HD38800A  1980, Gakken Heiankyo Alien
- @23      HD38800B  1982, Tomy Kingman (THF-01II)
- *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster (DM-21Z)
+ *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
+ @70      HD38800A  1982, Coleco Galaxian
+ 
+ @23      HD38800B  1982, Tomy Kingman (THF-01II)
+ *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
  *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
  *43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon
- *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
- @70      HD38800A  1982, Coleco Galaxian
 
  @13      HD38820A  1981, Entex Galaxian 2
  @23      HD38820A  1981, Entex Pac Man 2
