@@ -30,6 +30,8 @@
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 #define OSDOPTION_DEBUGGER              "debugger"
+#define OSDOPTION_DEBUGGER_FONT         "debugger_font"
+#define OSDOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
 #define OSDOPTION_WATCHDOG              "watchdog"
 
 #define OSDOPTION_MULTITHREADING        "multithreading"
@@ -87,6 +89,8 @@ public:
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
+	const char *debugger_font() const { return value(OSDOPTION_DEBUGGER_FONT); }
+	float debugger_font_size() const { return float_value(OSDOPTION_DEBUGGER_FONT_SIZE); }
 	int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
 
 	// performance options
