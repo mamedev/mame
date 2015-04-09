@@ -404,19 +404,22 @@ HRESULT sound_direct_sound::dsound_init()
 	}
 
 	// set the cooperative level
+	{
 #ifdef SDLMAME_WIN32
-	SDL_SysWMinfo wminfo;
-	SDL_VERSION(&wminfo.version);
-#if (SDLMAME_SDL2)
-	SDL_GetWindowWMInfo(sdl_window_list->sdl_window(), &wminfo);
-	result = m_dsound->SetCooperativeLevel(wminfo.info.win.window, DSSCL_PRIORITY);
-#else
-	SDL_GetWMInfo(&wminfo);
-	result = m_dsound->SetCooperativeLevel(wminfo.window, DSSCL_PRIORITY);
-#endif
-	#else
-	result = m_dsound->SetCooperativeLevel(win_window_list->m_hwnd, DSSCL_PRIORITY);
-#endif
+		SDL_SysWMinfo wminfo;
+		SDL_VERSION(&wminfo.version);
+#if SDLMAME_SDL2
+		SDL_GetWindowWMInfo(sdl_window_list->sdl_window(), &wminfo);
+		HWND const window = wminfo.info.win.window;
+#else // SDLMAME_SDL2
+		SDL_GetWMInfo(&wminfo);
+		HWND const window = wminfo.window;
+#endif // SDLMAME_SDL2
+#else // SDLMAME_WIN32
+		HWND const window = win_window_list->m_hwnd;
+#endif // SDLMAME_WIN32
+		result = m_dsound->SetCooperativeLevel(window, DSSCL_PRIORITY);
+	}
 	if (result != DS_OK)
 	{
 		osd_printf_error("Error setting DirectSound cooperative level: %08x\n", (unsigned)result);
@@ -560,8 +563,8 @@ void sound_direct_sound::destroy_buffers(void)
 	m_primary_buffer.release();
 }
 
-#else /* SDLMAME_UNIX */
+#else // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 	MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound")
-#endif
+#endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 MODULE_DEFINITION(SOUND_DSOUND, sound_direct_sound)
