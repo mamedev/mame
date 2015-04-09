@@ -476,9 +476,9 @@ WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
 static MACHINE_CONFIG_FRAGMENT( v53 )
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0) // functionality identical to uPD71054
-	MCFG_PIT8253_CLK0(1000000) // todo
-	MCFG_PIT8253_CLK1(1000000) // todo
-	MCFG_PIT8253_CLK2(1000000) // todo
+	MCFG_PIT8253_CLK0(16000000) // manual implicitly claims that these runs at same speed as the CPU
+	MCFG_PIT8253_CLK1(16000000) 
+	MCFG_PIT8253_CLK2(16000000) 
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE( v53_base_device, tcu_out0_trampoline_cb ))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE( v53_base_device, tcu_out1_trampoline_cb ))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE( v53_base_device, tcu_out2_trampoline_cb ))
