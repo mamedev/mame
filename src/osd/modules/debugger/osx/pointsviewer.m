@@ -36,7 +36,7 @@
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
 	[subviewButton setBezelStyle:NSShadowlessSquareBezelStyle];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
-	[subviewButton setFont:[[MAMEDebugView class] defaultFont]];
+	[subviewButton setFont:[[MAMEDebugView class] defaultFontForMachine:m]];
 	[subviewButton setTarget:self];
 	[subviewButton setAction:@selector(changeSubview:)];
 	[[subviewButton cell] setArrowPosition:NSPopUpArrowAtBottom];
