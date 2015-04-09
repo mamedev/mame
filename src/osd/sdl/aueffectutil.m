@@ -306,7 +306,17 @@ static void UpdateChangeCountCallback(void                      *userData,
 
 	[self loadEffectUI];
 	if (nil != restoreFrame)
+	{
 		[window setFrameFromString:restoreFrame];
+	}
+	else
+	{
+		NSRect const available = [[NSScreen mainScreen] visibleFrame];
+		NSRect frame = [window frame];
+		frame.origin.x = (NSWidth(available) - NSWidth(frame)) / 4;
+		frame.origin.y = (NSHeight(available) - NSHeight(frame)) * 3 / 4;
+		[window setFrame:frame display:YES animate:NO];
+	}
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)type error:(NSError **)error {
@@ -836,7 +846,9 @@ static void UpdateChangeCountCallback(void                      *userData,
 	item = [parent addItemWithTitle:@"Help" action:NULL keyEquivalent:@""];
 	[parent setSubmenu:menu forItem:item];
 	[menu release];
-	[NSApp setHelpMenu:menu];
+	[menu setValue:@"NSHelpMenu" forKey:@"name"];
+	if ([NSApp respondsToSelector:@selector(setHelpMenu:)])
+		[NSApp performSelector:@selector(setHelpMenu:) withObject:menu];
 
 	item = [menu addItemWithTitle:[NSString stringWithFormat:@"%@ Help", appName] action:@selector(showHelp:) keyEquivalent:@"?"];
 }
