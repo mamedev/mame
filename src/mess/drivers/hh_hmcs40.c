@@ -989,6 +989,8 @@ MACHINE_CONFIG_END
   - P1 Up:    Eat & Run
   - P1 Down:  Demo
 
+  BTANB note: 1st version doesn't show the whole maze on power-on
+
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
@@ -1103,8 +1105,7 @@ MACHINE_CONFIG_END
   - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
   - P1 Up:    Demo
   
-  BTANB note: in demo-mode, she hardly walks to the upper two rows, never
-  finishing the level.
+  BTANB note: in demo-mode, she hardly ever walks to the upper two rows
 
   NOTE!: MESS external artwork is recommended
 
