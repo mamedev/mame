@@ -63,7 +63,6 @@
 // ICs that are not emulated yet are marked with "*"
 //
 // TODO:
-// - Improve keyboard mapping
 // - Emulate PIO. No known dumps of its ROM are available, though.
 // - Emulate line printer output on PIO
 // - Emulate serial channels on IPC
@@ -101,6 +100,9 @@
 // FDC oscillator of IOC board: 8 MHz
 #define IOC_XTAL_Y1     XTAL_8MHz
 
+// PIO oscillator: 6 MHz
+#define IOC_XTAL_Y3     XTAL_6MHz
+
 // Frequency of beeper
 #define IOC_BEEP_FREQ   3300
 
@@ -112,12 +114,13 @@ static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0xc0 , 0xc0) AM_READWRITE(imds2_ipc_dbbout_r , imds2_ipc_dbbin_data_w)
 	AM_RANGE(0xc1 , 0xc1) AM_READWRITE(imds2_ipc_status_r , imds2_ipc_dbbin_cmd_w)
+        AM_RANGE(0xf8 , 0xf9) AM_DEVREADWRITE("iocpio" , i8041_device , upi41_master_r , upi41_master_w)
 	AM_RANGE(0xfa , 0xfb) AM_READWRITE(imds2_ipclocpic_r , imds2_ipclocpic_w)
 	AM_RANGE(0xfc , 0xfd) AM_READWRITE(imds2_ipcsyspic_r , imds2_ipcsyspic_w)
 	AM_RANGE(0xff , 0xff) AM_WRITE(imds2_ipc_control_w)
 ADDRESS_MAP_END
 
-	static ADDRESS_MAP_START(ioc_mem_map , AS_PROGRAM , 8 , imds2_state)
+static ADDRESS_MAP_START(ioc_mem_map , AS_PROGRAM , 8 , imds2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000 , 0x1fff) AM_ROM
 	AM_RANGE(0x4000 , 0x5fff) AM_RAM
@@ -143,6 +146,11 @@ static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(0xf0 , 0xf8) AM_DEVREADWRITE("iocdma" , i8257_device , read , write)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(pio_io_map , AS_IO , 8 , imds2_state)
+	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_READWRITE(imds2_pio_port_p1_r , imds2_pio_port_p1_w)
+	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READWRITE(imds2_pio_port_p2_r , imds2_pio_port_p2_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(kb_io_map , AS_IO , 8 , imds2_state)
 	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_WRITE(imds2_kb_port_p1_w)
 	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READ(imds2_kb_port_p2_r)
@@ -161,6 +169,7 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_iocbeep(*this , "iocbeep"),
 	m_ioctimer(*this , "ioctimer"),
 	m_iocfdc(*this , "iocfdc"),
+        m_iocpio(*this , "iocpio"),
 	m_kbcpu(*this , "kbcpu"),
 	m_palette(*this , "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
@@ -370,7 +379,7 @@ WRITE8_MEMBER(imds2_state::imds2_ioc_reset_f1_w)
 
 READ8_MEMBER(imds2_state::imds2_ioc_status_r)
 {
-	return (~m_ipc_ioc_status & 0x0f) | 0xf0;
+	return ~m_ipc_ioc_status;
 }
 
 READ8_MEMBER(imds2_state::imds2_ioc_dbbin_r)
@@ -426,6 +435,31 @@ WRITE8_MEMBER(imds2_state::imds2_ioc_mem_w)
 {
 	address_space& prog_space = m_ioccpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset , data);
+}
+
+READ8_MEMBER(imds2_state::imds2_pio_port_p1_r)
+{
+        // TODO
+        return 0;
+}
+
+WRITE8_MEMBER(imds2_state::imds2_pio_port_p1_w)
+{
+        m_pio_port1 = data;
+        imds2_update_printer();
+}
+
+READ8_MEMBER(imds2_state::imds2_pio_port_p2_r)
+{
+        return m_pio_port2;
+}
+
+WRITE8_MEMBER(imds2_state::imds2_pio_port_p2_w)
+{
+        m_pio_port2 = data;
+        imds2_update_printer();
+	// Send INTR to IPC
+	m_ipclocpic->ir5_w(BIT(data , 7));
 }
 
 I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
@@ -536,6 +570,11 @@ bool imds2_state::imds2_in_ipc_rom(offs_t offset) const
 void imds2_state::imds2_update_beeper(void)
 {
 	m_iocbeep->set_state(m_beeper_timer == 0 && BIT(m_miscout , 0) == 0);
+}
+
+void imds2_state::imds2_update_printer(void)
+{
+        // TODO
 }
 
 static INPUT_PORTS_START(imds2)
@@ -727,6 +766,10 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 
 		MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, imds2_floppy_interface)
 
+                MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
+                MCFG_CPU_IO_MAP(pio_io_map)
+		MCFG_QUANTUM_TIME(attotime::from_hz(100))
+                
 		MCFG_CPU_ADD("kbcpu", I8741, XTAL_3_579545MHz)         /* 3.579545 MHz */
 		MCFG_CPU_IO_MAP(kb_io_map)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
@@ -743,6 +786,11 @@ ROM_START(imds2)
 		ROM_LOAD("ioc_a51.bin" , 0x0800 , 0x0800 , CRC(6aa2f86c) SHA1(d3a5314d86e3366545b4c97b29e323dfab383d5f))
 		ROM_LOAD("ioc_a52.bin" , 0x1000 , 0x0800 , CRC(b88a38d5) SHA1(934716a1daec852f4d1f846510f42408df0c9584))
 		ROM_LOAD("ioc_a53.bin" , 0x1800 , 0x0800 , CRC(c8df4bb9) SHA1(2dfb921e94ae7033a7182457b2f00657674d1b77))
+
+                // ROM definition of PIO controller (8041A)
+                ROM_REGION(0x400 , "iocpio" , 0)
+                ROM_LOAD("pio_a72.bin" , 0 , 0x400 , CRC(c1eabf25))
+                
 		// ROM definition of keyboard controller (8741)
 		ROM_REGION(0x400 , "kbcpu" , 0)
 		ROM_LOAD("kbd511.bin" , 0 , 0x400 , CRC(ba7c4303) SHA1(19899af732d0ae1247bfc79979b1ee5f339ee5cf))

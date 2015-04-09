@@ -53,6 +53,10 @@ class imds2_state : public driver_device
 
 	DECLARE_READ8_MEMBER(imds2_ioc_mem_r);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_mem_w);
+	DECLARE_READ8_MEMBER(imds2_pio_port_p1_r);
+	DECLARE_WRITE8_MEMBER(imds2_pio_port_p1_w);
+	DECLARE_READ8_MEMBER(imds2_pio_port_p2_r);
+	DECLARE_WRITE8_MEMBER(imds2_pio_port_p2_w);
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
@@ -71,6 +75,7 @@ class imds2_state : public driver_device
 	required_device<beep_device> m_iocbeep;
 	required_device<pit8253_device> m_ioctimer;
 	required_device<i8271_device> m_iocfdc;
+        required_device<i8041_device> m_iocpio;
 	required_device<i8741_device> m_kbcpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -90,6 +95,7 @@ class imds2_state : public driver_device
 	bool imds2_in_ipc_rom(offs_t offset) const;
 
 	void imds2_update_beeper(void);
+        void imds2_update_printer(void);
 
 	// IPC control port
 	UINT8 m_ipc_control;
@@ -117,6 +123,12 @@ class imds2_state : public driver_device
 
 	// IPC/IOC status
 	UINT8 m_ipc_ioc_status;
+
+        // PIO port 1
+        UINT8 m_pio_port1;
+
+        // PIO port 2
+        UINT8 m_pio_port2;
 };
 
 #endif /* _IMDS2_H_ */
