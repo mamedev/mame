@@ -110,7 +110,7 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 void l7a1045_sound_device::device_start()
 {
 	/* Allocate the stream */
-	m_stream = stream_alloc(0, 2, 44100/4); //clock() / 384);
+	m_stream = stream_alloc(0, 2, 44100); //clock() / 384);
 
 	m_rom = m_region->base();
 	m_rom_size = m_region->bytes();
@@ -126,7 +126,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
-
+	
 	for (int i = 0; i < 32; i++)
 	{
 		if (m_key & (1 << i))
@@ -135,7 +135,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 			UINT32 start = vptr->start;
 			UINT32 end = vptr->end;
-			UINT32 step  = 0x0400;
+			UINT32 step  = 0x400;
 
 			UINT32 pos = vptr->pos;
 			UINT32 frac = vptr->frac;
@@ -143,8 +143,9 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			for (int j = 0; j < samples; j++)
 			{
 				INT32 sample;
-
-				pos += 1;//(frac >> 12);
+				UINT8 data;
+				
+				pos += (frac >> 12);
 				frac &= 0xfff;
 
 				if ((start + pos) >= end)
@@ -153,7 +154,9 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 				}
 
-				sample = (INT8)m_rom[(start + pos) & (m_rom_size-1)];
+
+				data = m_rom[(start + pos) & (m_rom_size-1)];
+				sample = (INT8)data;
 				frac += step;
 
 				outputs[0][j] += ((sample * vptr->l_volume) >> 8);
@@ -220,8 +223,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 {
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
-	//if(m_audioregister != 0 && m_audioregister != 7)
-	//if(m_audioregister == 6)
+	//if(m_audioregister != 0 && m_audioregister != 1 && m_audioregister != 7)
 	//	printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
@@ -310,7 +312,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
 	{
 		l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
-		#if 0
+		#if 1
 		if(vptr->start != 0)
 		{
 		printf("%08x START\n",vptr->start);
