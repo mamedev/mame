@@ -13,13 +13,13 @@
 
 #include "emu.h"
 
-#include "winmain.h"
+#include "modules/lib/osdobj_common.h"
 
 
 class ui_metrics
 {
 public:
-	ui_metrics(windows_options const &options);
+	ui_metrics(osd_options const &options);
 	ui_metrics(ui_metrics const &that);
 	~ui_metrics();
 

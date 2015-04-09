@@ -34,7 +34,7 @@
 	NSLayoutManager *layoutManager;
 }
 
-+ (NSFont *)defaultFont;
++ (NSFont *)defaultFontForMachine:(running_machine &)m;
 
 - (id)initWithFrame:(NSRect)f type:(debug_view_type)t machine:(running_machine &)m wholeLineScroll:(BOOL)w;
 

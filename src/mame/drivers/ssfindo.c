@@ -217,51 +217,72 @@ class ssfindo_state : public driver_device
 public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram"),
 		m_flashrom(*this, "flash"),
-		m_io_ps7500(*this, "PS7500"),
-		m_palette(*this, "palette") { }
+		m_io_ps7500(*this, "PS7500") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<UINT32> m_vram;
+
+	required_region_ptr<UINT16> m_flashrom;
+
+	required_ioport m_io_ps7500;
+
+	// driver init configuration
+	UINT32 m_flashType;
+	int m_iocr_hack;
+	
+	// common
 	UINT32 m_PS7500_IO[MAXIO];
 	UINT32 m_PS7500_FIFO[256];
-	required_shared_ptr<UINT32> m_vram;
+	emu_timer *m_PS7500timer0;
+	emu_timer *m_PS7500timer1;
+
+	// ssfindo and ppcar
 	UINT32 m_flashAdr;
 	UINT32 m_flashOffset;
 	UINT32 m_adrLatch;
-	UINT32 m_flashType;
 	UINT32 m_flashN;
-	emu_timer *m_PS7500timer0;
-	emu_timer *m_PS7500timer1;
-	int m_iocr_hack;
+
+	// common
 	DECLARE_WRITE32_MEMBER(FIFO_w);
 	DECLARE_READ32_MEMBER(PS7500_IO_r);
 	DECLARE_WRITE32_MEMBER(PS7500_IO_w);
+
+	// ssfindo and ppcar
 	DECLARE_READ32_MEMBER(io_r);
 	DECLARE_WRITE32_MEMBER(io_w);
+
+	// ssfindo
 	DECLARE_WRITE32_MEMBER(debug_w);
 	DECLARE_READ32_MEMBER(ff4_r);
 	DECLARE_READ32_MEMBER(SIMPLEIO_r);
+
+	// ppcar
 	DECLARE_READ32_MEMBER(randomized_r);
+
+	// tetfight
 	DECLARE_READ32_MEMBER(tetfight_unk_r);
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
+
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(ssfindo);
 	DECLARE_DRIVER_INIT(ppcar);
 	DECLARE_DRIVER_INIT(tetfight);
 	virtual void machine_reset();
-	UINT32 screen_update_ssfindo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ssfindo_interrupt);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer1_callback);
 
-	required_device<cpu_device> m_maincpu;
-	required_region_ptr<UINT16> m_flashrom;
-	required_ioport m_io_ps7500;
-	required_device<palette_device> m_palette;
-
-	typedef void (ssfindo_state::*ssfindo_speedup_func)(address_space &space);
-	ssfindo_speedup_func ssfindo_speedup;
+	typedef void (ssfindo_state::*speedup_func)(address_space &space);
+	speedup_func m_speedup;
 
 	void PS7500_startTimer0();
 	void PS7500_startTimer1();
@@ -271,7 +292,7 @@ public:
 };
 
 
-UINT32 ssfindo_state::screen_update_ssfindo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 ssfindo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int s,x,y;
 
@@ -343,7 +364,7 @@ void ssfindo_state::PS7500_startTimer1()
 		m_PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-INTERRUPT_GEN_MEMBER(ssfindo_state::ssfindo_interrupt)
+INTERRUPT_GEN_MEMBER(ssfindo_state::interrupt)
 {
 	m_PS7500_IO[IRQSTA]|=0x08;
 		if(m_PS7500_IO[IRQMSKA]&0x08)
@@ -403,7 +424,7 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 			return (m_PS7500_IO[IRQSTA] & m_PS7500_IO[IRQMSKA]) | 0x80;
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
-			if (ssfindo_speedup) (this->*ssfindo_speedup)(space);
+			if (m_speedup) (this->*m_speedup)(space);
 
 			if( m_iocr_hack)
 			{
@@ -764,7 +785,7 @@ static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
 	MCFG_CPU_PROGRAM_MAP(ssfindo_map)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssfindo_state,  ssfindo_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssfindo_state,  interrupt)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -772,7 +793,7 @@ static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(ssfindo_state, screen_update_ssfindo)
+	MCFG_SCREEN_UPDATE_DRIVER(ssfindo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -864,26 +885,32 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ssfindo_state,common)
 {
-	ssfindo_speedup = 0;
+	m_speedup = 0;
 	m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
 	m_PS7500timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer1_callback),this));
-
+	
+	save_item(NAME(m_PS7500_IO));
+	save_item(NAME(m_PS7500_FIFO));
 }
 
 DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
 {
 	DRIVER_INIT_CALL(common);
 	m_flashType=0;
-	ssfindo_speedup = &ssfindo_state::ssfindo_speedups;
+	m_speedup = &ssfindo_state::ssfindo_speedups;
 	m_iocr_hack=0;
+
+	save_item(NAME(m_flashAdr));
+	save_item(NAME(m_flashOffset));
+	save_item(NAME(m_adrLatch));
+	save_item(NAME(m_flashN));
 }
 
 DRIVER_INIT_MEMBER(ssfindo_state,ppcar)
 {
-	DRIVER_INIT_CALL(common);
+	DRIVER_INIT_CALL(ssfindo);
 	m_flashType=1;
-	ssfindo_speedup = &ssfindo_state::ppcar_speedups;
-	m_iocr_hack=0;
+	m_speedup = &ssfindo_state::ppcar_speedups;
 }
 
 DRIVER_INIT_MEMBER(ssfindo_state,tetfight)
@@ -893,6 +920,6 @@ DRIVER_INIT_MEMBER(ssfindo_state,tetfight)
 	m_iocr_hack=1;
 }
 
-GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo, ssfindo_state,  ssfindo,  ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )
-GAME( 1999, ppcar,   0,        ppcar,    ppcar, ssfindo_state,    ppcar,    ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND )
-GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo, ssfindo_state,  ssfindo,  ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, ppcar,   0,        ppcar,    ppcar, ssfindo_state,    ppcar,    ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

@@ -25,16 +25,17 @@
 	NSScrollView	*memoryScroll;
 	NSView			*expressionContainer;
 	NSPopUpButton	*actionButton;
-	NSRect			contentBounds, expressionFrame;
+	NSRect			expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Memory" console:c]))
 		return nil;
-	contentBounds = [[window contentView] bounds];
+	NSRect const contentBounds = [[window contentView] bounds];
+	NSFont *const defaultFont = [[MAMEDebugView class] defaultFontForMachine:m];
 
 	// create the expression field
 	expressionField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[expressionField setAutoresizingMask:(NSViewWidthSizable | NSViewMaxXMargin | NSViewMinYMargin)];
-	[expressionField setFont:[[MAMEDebugView class] defaultFont]];
+	[expressionField setFont:defaultFont];
 	[expressionField setFocusRingType:NSFocusRingTypeNone];
 	[expressionField setTarget:self];
 	[expressionField setAction:@selector(doExpression:)];
@@ -50,7 +51,7 @@
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinXMargin | NSViewMinYMargin)];
 	[subviewButton setBezelStyle:NSShadowlessSquareBezelStyle];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
-	[subviewButton setFont:[[MAMEDebugView class] defaultFont]];
+	[subviewButton setFont:defaultFont];
 	[subviewButton setTarget:self];
 	[subviewButton setAction:@selector(changeSubview:)];
 	[[subviewButton cell] setArrowPosition:NSPopUpArrowAtBottom];
@@ -144,7 +145,7 @@
 }
 
 
-- (BOOL)selectSubviewForDevice:(device_t *)device {	
+- (BOOL)selectSubviewForDevice:(device_t *)device {
 	BOOL const result = [memoryView selectSubviewForDevice:device];
 	[subviewButton selectItemAtIndex:[subviewButton indexOfItemWithTag:[memoryView selectedSubviewIndex]]];
 	[window setTitle:[NSString stringWithFormat:@"Memory: %@", [memoryView selectedSubviewName]]];

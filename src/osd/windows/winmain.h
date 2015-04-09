@@ -18,10 +18,6 @@
 //  CONSTANTS
 //============================================================
 
-// debugging options
-#define WINOPTION_DEBUGGER_FONT         "debugger_font"
-#define WINOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
-
 // performance options
 #define WINOPTION_PRIORITY              "priority"
 #define WINOPTION_PROFILE               "profile"
@@ -118,10 +114,6 @@ class windows_options : public osd_options
 public:
 	// construction/destruction
 	windows_options();
-
-	// debugging options
-	const char *debugger_font() const { return value(WINOPTION_DEBUGGER_FONT); }
-	float debugger_font_size() const { return float_value(WINOPTION_DEBUGGER_FONT_SIZE); }
 
 	// performance options
 	int priority() const { return int_value(WINOPTION_PRIORITY); }

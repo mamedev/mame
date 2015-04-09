@@ -2,6 +2,9 @@
 
 #include "debuggerview.h"
 
+#include "modules/lib/osdobj_common.h"
+
+
 DebuggerView::DebuggerView(const debug_view_type& type,
 							running_machine* machine,
 							QWidget* parent) :
@@ -11,9 +14,12 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 	m_machine(machine)
 {
 	// I like setting the font per-view since it doesn't override the menuing fonts.
-	QFont viewFontRequest("Courier New");
+	const char *const selectedFont(downcast<osd_options &>(m_machine->options()).debugger_font());
+	const float selectedFontSize(downcast<osd_options &>(m_machine->options()).debugger_font_size());
+	QFont viewFontRequest((!*selectedFont || !strcmp(selectedFont, OSDOPTVAL_AUTO)) ? "Courier New" : selectedFont);
 	viewFontRequest.setFixedPitch(true);
-	viewFontRequest.setPointSize(11);
+	viewFontRequest.setStyleHint(QFont::TypeWriter);
+	viewFontRequest.setPointSize((selectedFontSize <= 0) ? 11 : selectedFontSize);
 	setFont(viewFontRequest);
 
 	m_view = m_machine->debug_view().alloc_view(type,

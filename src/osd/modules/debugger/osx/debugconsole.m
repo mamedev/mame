@@ -77,7 +77,7 @@
 	// create the command field
 	commandField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[commandField setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
-	[commandField setFont:[[MAMEDebugView class] defaultFont]];
+	[commandField setFont:[[MAMEDebugView class] defaultFontForMachine:m]];
 	[commandField setFocusRingType:NSFocusRingTypeNone];
 	[commandField setTarget:self];
 	[commandField setAction:@selector(doCommand:)];

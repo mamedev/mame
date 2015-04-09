@@ -3,17 +3,24 @@ class pitnrun_state : public driver_device
 public:
 	pitnrun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_videoram2(*this, "videoram2"),
-		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_spriteram(*this, "spriteram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 	required_shared_ptr<UINT8> m_videoram;
-	int m_nmi;
 	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_spriteram;
+
+	int m_nmi;
 	UINT8 m_fromz80;
 	UINT8 m_toz80;
 	int m_zaccept;
@@ -30,41 +37,42 @@ public:
 	bitmap_ind16 *m_tmp_bitmap[4];
 	tilemap_t *m_bg;
 	tilemap_t *m_fg;
-	required_shared_ptr<UINT8> m_spriteram;
+
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_hflip_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_vflip_w);
-	DECLARE_READ8_MEMBER(pitnrun_mcu_data_r);
-	DECLARE_WRITE8_MEMBER(pitnrun_mcu_data_w);
-	DECLARE_READ8_MEMBER(pitnrun_mcu_status_r);
-	DECLARE_READ8_MEMBER(pitnrun_68705_portA_r);
-	DECLARE_WRITE8_MEMBER(pitnrun_68705_portA_w);
-	DECLARE_READ8_MEMBER(pitnrun_68705_portB_r);
-	DECLARE_WRITE8_MEMBER(pitnrun_68705_portB_w);
-	DECLARE_READ8_MEMBER(pitnrun_68705_portC_r);
-	DECLARE_WRITE8_MEMBER(pitnrun_videoram_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_videoram2_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_char_bank_select);
-	DECLARE_WRITE8_MEMBER(pitnrun_scroll_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_ha_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_h_heed_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_v_heed_w);
-	DECLARE_WRITE8_MEMBER(pitnrun_color_select_w);
+	DECLARE_WRITE8_MEMBER(hflip_w);
+	DECLARE_WRITE8_MEMBER(vflip_w);
+	DECLARE_READ8_MEMBER(mcu_data_r);
+	DECLARE_WRITE8_MEMBER(mcu_data_w);
+	DECLARE_READ8_MEMBER(mcu_status_r);
+	DECLARE_READ8_MEMBER(m68705_portA_r);
+	DECLARE_WRITE8_MEMBER(m68705_portA_w);
+	DECLARE_READ8_MEMBER(m68705_portB_r);
+	DECLARE_WRITE8_MEMBER(m68705_portB_w);
+	DECLARE_READ8_MEMBER(m68705_portC_r);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(videoram2_w);
+	DECLARE_WRITE8_MEMBER(char_bank_select);
+	DECLARE_WRITE8_MEMBER(scroll_w);
+	DECLARE_WRITE8_MEMBER(ha_w);
+	DECLARE_WRITE8_MEMBER(h_heed_w);
+	DECLARE_WRITE8_MEMBER(v_heed_w);
+	DECLARE_WRITE8_MEMBER(color_select_w);
+
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
+	
+	INTERRUPT_GEN_MEMBER(nmi_source);
+	TIMER_CALLBACK_MEMBER(mcu_real_data_r);
+	TIMER_CALLBACK_MEMBER(mcu_real_data_w);
+	TIMER_CALLBACK_MEMBER(mcu_data_real_r);
+	TIMER_CALLBACK_MEMBER(mcu_status_real_w);
+
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(pitnrun);
-	UINT32 screen_update_pitnrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pitnrun_nmi_source);
-	TIMER_CALLBACK_MEMBER(pitnrun_mcu_real_data_r);
-	TIMER_CALLBACK_MEMBER(pitnrun_mcu_real_data_w);
-	TIMER_CALLBACK_MEMBER(pitnrun_mcu_data_real_r);
-	TIMER_CALLBACK_MEMBER(pitnrun_mcu_status_real_w);
-	void pitnrun_spotlights();
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void spotlights();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };

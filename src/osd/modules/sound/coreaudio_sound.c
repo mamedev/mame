@@ -15,6 +15,7 @@
 
 #ifdef SDLMAME_MACOSX
 
+#include <AvailabilityMacros.h>
 #include <AudioToolbox/AudioToolbox.h>
 #include <AudioUnit/AudioUnit.h>
 #include <CoreAudio/CoreAudio.h>
@@ -22,6 +23,17 @@
 #include <CoreServices/CoreServices.h>
 
 #include <string.h>
+
+
+#ifdef MAC_OS_X_VERSION_MAX_ALLOWED
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+
+typedef ComponentDescription AudioComponentDescription;
+
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+
+#endif // MAC_OS_X_VERSION_MAX_ALLOWED
 
 
 class sound_coreaudio : public osd_module, public sound_module
