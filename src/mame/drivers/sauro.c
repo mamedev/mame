@@ -123,7 +123,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-#include "sound/sp0256.h"
 #include "includes/sauro.h"
 #include "machine/nvram.h"
 
@@ -141,13 +140,13 @@ READ8_MEMBER(sauro_state::sauro_sound_command_r)
 	return ret;
 }
 
-WRITE8_MEMBER(sauro_state::sauro_coin1_w)
+WRITE8_MEMBER(sauro_state::coin1_w)
 {
 	coin_counter_w(machine(), 0, data);
 	coin_counter_w(machine(), 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-WRITE8_MEMBER(sauro_state::sauro_coin2_w)
+WRITE8_MEMBER(sauro_state::coin2_w)
 {
 	coin_counter_w(machine(), 1, data);
 	coin_counter_w(machine(), 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
@@ -167,10 +166,10 @@ static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(tecfri_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sauro_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(sauro_colorram2_w) AM_SHARE("colorram2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
@@ -180,13 +179,13 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("P2")
 	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(tecfri_scroll_bg_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(scroll_bg_w)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP        /* coin reset */
-	AM_RANGE(0xc3, 0xc3) AM_WRITE(sauro_coin1_w)
+	AM_RANGE(0xc3, 0xc3) AM_WRITE(coin1_w)
 	AM_RANGE(0xc4, 0xc4) AM_WRITENOP        /* coin reset */
-	AM_RANGE(0xc5, 0xc5) AM_WRITE(sauro_coin2_w)
+	AM_RANGE(0xc5, 0xc5) AM_WRITE(coin2_w)
 	AM_RANGE(0xc6, 0xc7) AM_WRITENOP        /* same as 0x80 - verified with debugger */
 	AM_RANGE(0xc8, 0xc8) AM_WRITENOP        /* written every int: 0 written at end   of isr */
 	AM_RANGE(0xc9, 0xc9) AM_WRITENOP        /* written every int: 1 written at start of isr */
@@ -213,19 +212,19 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
+	AM_RANGE(0xf830, 0xf830) AM_WRITE(scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP                /* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(sauro_coin1_w)
-	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(sauro_coin2_w)
+	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(coin1_w)
+	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(coin2_w)
 	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP                /* only written at startup */
 ADDRESS_MAP_END
@@ -583,9 +582,9 @@ DRIVER_INIT_MEMBER(sauro_state,tecfri)
 	RAM[0xe000] = 1;
 }
 
-GAME( 1987, sauro,    0,        sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri",                                "Sauro", 0 )
-GAME( 1987, saurop,   sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", 0 )
-GAME( 1987, saurorr,  sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", 0 )
+GAME( 1987, sauro,    0,        sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri",                                "Sauro", GAME_SUPPORTS_SAVE )
+GAME( 1987, saurop,   sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", GAME_SUPPORTS_SAVE )
+GAME( 1987, saurorr,  sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", GAME_SUPPORTS_SAVE )
 
-GAME( 1987, trckydoc, 0,        trckydoc, tecfri, sauro_state,    tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", 0 )
-GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", 0 )
+GAME( 1987, trckydoc, 0,        trckydoc, tecfri, sauro_state,    tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", GAME_SUPPORTS_SAVE )

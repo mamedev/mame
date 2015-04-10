@@ -23,21 +23,28 @@ public:
 	rotaryf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_videoram(*this, "videoram"),
 		m_samples(*this, "samples"),
-		m_sn(*this, "snsnd")
+		m_sn(*this, "snsnd"),
+		m_videoram(*this, "videoram")
 	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
+	required_device<sn76477_device> m_sn;
+
+	required_shared_ptr<UINT8> m_videoram;
 
 	DECLARE_READ8_MEMBER(port29_r);
 	DECLARE_WRITE8_MEMBER(port28_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
+
 	bool m_flipscreen;
 	UINT8 m_last;
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_device<samples_device> m_samples;
-	required_device<sn76477_device> m_sn;
-	UINT32 screen_update_rotaryf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	virtual void machine_start();
+
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 };
 
@@ -57,6 +64,12 @@ static const char *const rotaryf_sample_names[] =
 	0
 };
 
+
+void rotaryf_state::machine_start()
+{
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_last));
+}
 
 READ8_MEMBER( rotaryf_state::port29_r )
 {
@@ -126,7 +139,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_state::rotaryf_interrupt)
  *
  *************************************/
 
-UINT32 rotaryf_state::screen_update_rotaryf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 	pen_t pens[2];
@@ -238,7 +251,7 @@ static MACHINE_CONFIG_START( rotaryf, rotaryf_state )
 	MCFG_SCREEN_SIZE(32*8, 262)     /* vert size is a guess, taken from mw8080bw */
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(rotaryf_state, screen_update_rotaryf)
+	MCFG_SCREEN_UPDATE_DRIVER(rotaryf_state, screen_update)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -276,4 +289,4 @@ ROM_START( rotaryf )
 ROM_END
 
 
-GAME( 1979, rotaryf, 0, rotaryf, rotaryf, driver_device, 0, ROT270, "Kasco", "Rotary Fighter", GAME_IMPERFECT_SOUND )
+GAME( 1979, rotaryf, 0, rotaryf, rotaryf, driver_device, 0, ROT270, "Kasco", "Rotary Fighter", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
