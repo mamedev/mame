@@ -1061,7 +1061,18 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}
-
+configuration { "vs2015" }
+		buildoptions {
+			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
+			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
+			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
+			"/wd4838", -- warning C4838: conversion from 'xxx' to 'yyy' requires a narrowing conversion
+			"/wd4091", -- warning C4091: 'typedef ': ignored on left of '' when no variable is declared
+			"/wd4463", -- warning C4463: overflow; assigning 1 to bit-field that can only hold values from -1 to 0
+			"/wd4297", -- warning C4297: 'xxx::~xxx': function assumed not to throw an exception but does
+		}
+		
 configuration { "x32", "vs*" }
 		libdirs {
 			MAME_DIR .. "3rdparty/dxsdk/lib/x86",
