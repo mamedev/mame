@@ -1250,7 +1250,7 @@ DRIVER_INIT_MEMBER(thepit_state,rtriv)
 {
 	// Set-up the weirdest questions read ever done
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));
-	
+
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));

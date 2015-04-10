@@ -338,7 +338,7 @@ void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
-	
+
 	init_cartridge();
 }
 
@@ -606,11 +606,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( snread )
 	PORT_INCLUDE( snspell )
-	
+
 	PORT_MODIFY("IN.7")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Word Zapper")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Word Maker")
-	
+
 	PORT_MODIFY("IN.8")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Read It")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")

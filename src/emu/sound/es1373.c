@@ -94,9 +94,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(es1373_device::es_timer_callback)
 		// The initalized is to signal that inital buffer has been written
 		if (m_dac2.buf_count<=m_dac2.buf_size && m_dac2.initialized) {
 			// Send data to sound???
-			// sound = m_sound_cache[chan.buf_rptr] 
-			if (0 && LOG_ES) 
-				logerror("%X: DAC2 buf_count: %i buf_size: %X buf_rptr: %X buf_wptr: %X\n", machine().device("maincpu")->safe_pc(), 
+			// sound = m_sound_cache[chan.buf_rptr]
+			if (0 && LOG_ES)
+				logerror("%X: DAC2 buf_count: %i buf_size: %X buf_rptr: %X buf_wptr: %X\n", machine().device("maincpu")->safe_pc(),
 					m_dac2.buf_count, m_dac2.buf_size, m_dac2.buf_rptr, m_dac2.buf_wptr);
 			if (m_dac2.buf_count==m_dac2.buf_size) {
 				if (m_dac2.int_en) {
@@ -122,8 +122,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(es1373_device::es_timer_callback)
 	}
 	if (m_adc.enable) {
 		if (m_adc.buf_count<=m_adc.buf_size) {
-			if (LOG_ES) 
-				logerror("%s: ADC buf_count: %i buf_size: %i buf_rptr: %i buf_wptr: %i\n", machine().describe_context(), 
+			if (LOG_ES)
+				logerror("%s: ADC buf_count: %i buf_size: %i buf_rptr: %i buf_wptr: %i\n", machine().describe_context(),
 					m_adc.buf_count, m_adc.buf_size, m_adc.buf_rptr, m_adc.buf_wptr);
 			if (m_adc.int_en && m_adc.buf_count==m_adc.buf_size) {
 				m_es_regs[ES_INT_CS_STATUS] |= ICSTATUS_ADC_INT_MASK;

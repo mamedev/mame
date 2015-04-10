@@ -13,7 +13,7 @@ Debugging options
 
 -[no]oslog
 
-	Outputs the error.log data to the stderr TTY channel (usually the 
+	Outputs the error.log data to the stderr TTY channel (usually the
 	command line window MAME was started in). This can be used at
 	the same time as -log to output the log data to both targets as well.
 	Default is OFF (-nooslog).
@@ -34,20 +34,19 @@ Performance options
 
 -[no]multithreading / -[no]mt
 
-	Enables multithreading for the final drawing operation.  This can help 
+	Enables multithreading for the final drawing operation.  This can help
 	performance on multicore/hyperthreaded systems with slow video cards,
 	but may cause undesired behavior in some games.
 	Note that some drivers in MAME and MESS will use multiple threads even
 	when this is set to OFF, assuming -numprocessors allows it.
 	The default is OFF (-nomultithreading).
-	
 
 -numprocessors <auto|value> / -np <auto|value>
 
 	Specify the number of processors to use for work queues. Specifying
-	"auto" will use the value reported by the system or environment 
+	"auto" will use the value reported by the system or environment
 	variable OSDPROCESSORS. To avoid abuse, this value is internally limited
-	to 4 times the number of processors reported by the system. 
+	to 4 times the number of processors reported by the system.
 	The default is "auto".
 
 -sdlvideofps
@@ -68,8 +67,8 @@ Video options
 
 -video <soft|opengl|none>
 
-	Specifies which video subsystem to use for drawing.  The default for 
-	Mac OS X is 'opengl' because OS X is guaranteed to have a compliant 
+	Specifies which video subsystem to use for drawing.  The default for
+	Mac OS X is 'opengl' because OS X is guaranteed to have a compliant
 	OpenGL stack.  The default on all other systems is 'soft'.
 
 -numscreens <count>
@@ -188,7 +187,7 @@ Video OpenGL-specific options
 -[no]gl_pbo              Enable OpenGL PBO,  if available (default on)
 
 	These 4 options are for compatibility in -video opengl.  If you report
-	rendering artifacts you may be asked to try messing with them by the 
+	rendering artifacts you may be asked to try messing with them by the
 	devs, but normally they should be left at their defaults which results
 	in the best possible video performance.
 
@@ -363,7 +362,7 @@ SDL Joystick Mapping
 -joy_idx6            Name of joystick mapped to joystick #6, default is auto.
 -joy_idx7            Name of joystick mapped to joystick #7, default is auto.
 -joy_idx8            Name of joystick mapped to joystick #8, default is auto.
--sixaxis             Use special handling for PS3 Sixaxis controllers. 
+-sixaxis             Use special handling for PS3 Sixaxis controllers.
                      Default is OFF (-nosixaxis)
 
 

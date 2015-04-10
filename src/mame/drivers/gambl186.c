@@ -21,7 +21,7 @@ U3 Max691cpe
 U300 Nec D7759GC (10Mhz xtal near it)
 
 TODO:
-- No idea about how to surpass the "No Funzione" (sic) screen. According to the bad settings almost 
+- No idea about how to surpass the "No Funzione" (sic) screen. According to the bad settings almost
   surely it wants EEPROM hooked up (i/o at 0x680/0x682?)
 
 */
@@ -41,7 +41,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	DECLARE_READ16_MEMBER(unk_r);
 };
 
@@ -109,7 +109,7 @@ static INPUT_PORTS_START( gambl186 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 ) 
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( gambl186 )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "1-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

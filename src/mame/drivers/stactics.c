@@ -282,7 +282,7 @@ void stactics_state::machine_start()
 	m_vert_pos = 0;
 	m_horiz_pos = 0;
 	*m_motor_on = 0;
-	
+
 	save_item(NAME(m_vert_pos));
 	save_item(NAME(m_horiz_pos));
 }

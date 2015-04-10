@@ -69,7 +69,7 @@ void elecbowl_state::prepare_display()
 		m_display_state[5] = (m_display_state[5] & ~mask) | d;
 	if (~m_r & 4)
 		m_display_state[6] = (m_display_state[6] & ~mask) | d;
-	
+
 	// digit 4 is from mux2 Q7
 	m_display_segmask[4] = 6;
 	m_display_state[4] = (m_display_state[6] & 0x80) ? 6 : 0;
@@ -173,7 +173,7 @@ static const UINT16 elecbowl_output_pla[0x20] =
 	lA+lB+lC,               // 7
 	lA+lB+lC+lD+lE+lF+lG,   // 8
 	lA+lB+lG+lF+lC+lD,      // 9
-	
+
 	0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
 	0,1,2,3,4,5,6,7,        // lamp muxes select
 	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f

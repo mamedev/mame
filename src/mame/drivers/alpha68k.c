@@ -110,7 +110,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
   - There is no Dip Switch to determine if you are allowed to continue a game
     or not, so you ALWAYS have the possibility to continue a game.
 
- 
+
 Stephh's log (2002.06.19) :
 
   - Create macros for players inputs and "Coinage" Dip Switch

@@ -87,7 +87,7 @@ static const unsigned short vdt911_palette[] =
 /*
     Macros for model features
 */
-/* TRUE for japanese and arabic terminals, which use 8-bit charcodes and keyboard shift modes */
+/* TRUE for Japanese and Arabic terminals, which use 8-bit charcodes and keyboard shift modes */
 #define USES_8BIT_CHARCODES() ((m_model == vdt911_model_Japanese) /*|| (m_model == vdt911_model_Arabic)*/)
 /* TRUE for keyboards which have this extra key (on the left of TAB/SKIP)
     (Most localized keyboards have it) */
@@ -541,9 +541,9 @@ void vdt911_device::check_keyboard()
 {
 	enum modifier_state_t
 	{
-		/* states for western keyboards and katakana/arabic keyboards in romaji/latin mode */
+		/* states for Western keyboards and katakana/Arabic keyboards in romaji/Latin mode */
 		lower_case = 0, upper_case, shift, control,
-		/* states for katakana/arabic keyboards in katakana/arabic mode */
+		/* states for katakana/Arabic keyboards in katakana/Arabic mode */
 		foreign, foreign_shift,
 		/* special value to stop repeat if the modifier state changes */
 		special_debounce = -1
@@ -568,7 +568,7 @@ void vdt911_device::check_keyboard()
 	/* parse modifier keys */
 	if ((USES_8BIT_CHARCODES())
 		&& ((key_buf[5] & 0x0400) || ((!(key_buf[5] & 0x0100)) && m_foreign_mode)))
-	{   /* we are in katakana/arabic mode */
+	{   /* we are in katakana/Arabic mode */
 		m_foreign_mode = true;
 
 		if ((key_buf[4] & 0x0400) || (key_buf[5] & 0x0020))
@@ -577,8 +577,8 @@ void vdt911_device::check_keyboard()
 			modifier_state = foreign;
 	}
 	else
-	{   /* we are using a western keyboard, or a katakana/arabic keyboard in
-        romaji/latin mode */
+	{   /* we are using a Western keyboard, or a katakana/Arabic keyboard in
+        romaji/Latin mode */
 		m_foreign_mode = false;
 
 		if (key_buf[3] & 0x0040)

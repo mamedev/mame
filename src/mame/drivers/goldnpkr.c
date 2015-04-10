@@ -20,7 +20,7 @@
   * Jack Potten's Poker (set 6),                      198?, Bootleg.
   * Jack Potten's Poker (set 7, Royale GFX),          198?, Bootleg.
   * Good Luck,                                        198?, Unknown.
-  * Super Double (french),                            198?, Karateco.
+  * Super Double (French),                            198?, Karateco.
   * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
   * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
@@ -104,7 +104,7 @@
   * Falcons Wild - World Wide Poker (VK set 1),       1990, Video Klein.
   * Falcons Wild - World Wide Poker (VK set 2),       1990, Video Klein.
   * Falcons Wild - Wild Card 1991,                    1991, TVG.
-  * PlayMan Poker (german),                           1981, PM / Beck Elektronik.
+  * PlayMan Poker (German),                           1981, PM / Beck Elektronik.
   * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
   * Super Loco 93 (Spanish, set 2),                   1993, Unknown.
   * Royale (set 1),                                   198?, Unknown.
@@ -119,7 +119,7 @@
   * Genie,                                            198?, Video Fun Games Ltd.
   * Silver Game,                                      1983, Unknown.
   * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
-  * "Unknown french poker game",                      198?, Unknown.
+  * "Unknown French poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
   * Bonne Chance! (Golden Poker prequel hardware),    198?, Unknown.
   * Mundial/Mondial (Italian/French),                 1987, Unknown.
@@ -215,7 +215,7 @@
   Maybe some settings can enable the use of them...
 
 
-  * Witch Card (spanish sets)
+  * Witch Card (Spanish sets)
 
   This game is derivated from Golden Poker.
 
@@ -336,7 +336,7 @@
   The game has 2 service switches/buttons:
   One for settings, and other just for bookkeeping.
 
-  Here the original Service Card (in german), and the english translation:
+  Here the original Service Card (in German), and the English translation:
    _____________________________________     _____________________________________
   |                                     |   |                                     |
   |          SERVICE ANLEITUNG          |   |           SERVICE MANUAL            |
@@ -772,10 +772,10 @@
   - Fixed the visible area based on M6845 registers.
   - Improved the lamps layouts to be more realistic.
   - Added Good Luck (potten's poker hybrid running in goldnpkr hardware).
-  - Added Buena Suerte (spanish) x 2 sets.
+  - Added Buena Suerte (Spanish) x 2 sets.
   - Added set Royale.
-  - Added Witch Card and spanish variants.
-  - Added Super Loco 93 (spanish) x 2 sets.
+  - Added Witch Card and Spanish variants.
+  - Added Super Loco 93 (Spanish) x 2 sets.
   - Renamed set goldnpkc to pottnpkr (parent Jack Potten's Poker set).
   - Renamed set jokerpkr to potnpkra, since is another Jack Potten's Poker set.
   - Added other 2 clones of Jack Potten's Poker.
@@ -817,11 +817,11 @@
   [2009-09-05]
 
   - Added 2 new Witch Card sets.
-  - Reworked inputs for Witch Card (german set 1).
-  - Created new inputs for Witch Card (english, witch game, lamps).
+  - Reworked inputs for Witch Card (German set 1).
+  - Created new inputs for Witch Card (English, witch game, lamps).
   - Added and connected lamps for both sets.
   - Added minimal bet and 50/60 Hz. switches to both sets.
-  - Added DIP switches info for Witch Card (german, set 2).
+  - Added DIP switches info for Witch Card (German, set 2).
 
   - Added Genius, running in a modified Golden Poker board.
 
@@ -844,7 +844,7 @@
 
   [2010-11-18]
 
-  - Added Karateco Super Double (french)
+  - Added Karateco Super Double (French)
   - Extended ROM space for goldnpkr game to include the 0x2000..0x3fff range
 
 
@@ -4362,7 +4362,7 @@ ROM_END
 	ROM_LOAD( "epoxy_82s129.bin",   0x0100, 0x0100, CRC(f0c012b1) SHA1(5502977404172e8c5b9fbf305581a406668ad1d9) ) /* original epoxy block PROM */
 ROM_END
 
-/*  Witch Card (spanish, set 1)
+/*  Witch Card (Spanish, set 1)
     Unknown argentine manufacturer.
 */
 ROM_START( witchcda )
@@ -4382,7 +4382,7 @@ ROM_START( witchcda )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
-/*  Witch Card (spanish, set 2)
+/*  Witch Card (Spanish, set 2)
     Unknown argentine manufacturer.
 */
 ROM_START( witchcdb )
@@ -4402,7 +4402,7 @@ ROM_START( witchcdb )
 	ROM_LOAD( "82s129.9c",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
-/*  Witch Card (english, no witch game)
+/*  Witch Card (English, no witch game)
     Hack?
 */
 ROM_START( witchcdc )
@@ -4424,7 +4424,7 @@ ROM_END
 
 /***************************************
 
-  Witch Card (german, WC3050, set 1 )
+  Witch Card (German, WC3050, set 1 )
 
   TV GAME ELEKTRONIK 1994
          PROMA
@@ -4477,7 +4477,7 @@ ROM_END
 	ROM_LOAD( "24s10_epoxy.bin",    0x0100, 0x0100, CRC(ddfd7034) SHA1(78dee69ab4ba759485ee7f00446c2d86f08cc50f) ) /* original epoxy block PROM */
 ROM_END
 
-/*  Witch Card (english, witch game, lights)
+/*  Witch Card (English, witch game, lights)
     PCB by PM. Hybrid hardware.
 
     Copyright 1983/84/85
@@ -4539,7 +4539,7 @@ ROM_END
 
 /***************************************
 
-  Witch Card (german, WC3050, set 2 )
+  Witch Card (German, WC3050, set 2 )
 
   TV GAME ELEKTRONIK 1994
          PROMA
@@ -4882,7 +4882,7 @@ ROM_START( bsuertek )
 ROM_END
 
 ROM_START( bsuertel )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* bslacer128: Buena Suerte! (portugues), english settings */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* bslacer128: Buena Suerte! (portugues), English settings */
 	ROM_LOAD( "bslacer.128",    0x4000, 0x4000, CRC(edc254f4) SHA1(20e5543e59bfd67a0afec7cbeeb7000f6bba6c69) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
@@ -4899,7 +4899,7 @@ ROM_START( bsuertel )
 ROM_END
 
 ROM_START( bsuertem )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* bslacer128: Buena Suerte! (portugues), english settings, set 2*/
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* bslacer128: Buena Suerte! (portugues), English settings, set 2*/
 	ROM_LOAD( "bslacer.256",    0x0000, 0x8000, CRC(9f8a899a) SHA1(a1f3d0635b309d4734289b7ff48eceda69dfd3d0) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
@@ -5464,7 +5464,7 @@ ROM_END
   mc6845 video chip
   10mhz (?) xtal
 
-  There are french strings related to the game, so maybe is
+  There are French strings related to the game, so maybe is
   a leftover, or maybe there is a unknown way to switch the
   language.
 
@@ -5544,7 +5544,7 @@ ROM_END
   Unknown poker game, set 1.
   198?.
 
-  There are french strings related to the game into
+  There are French strings related to the game into
   the program ROM.
 
   The dump lacks of 1 program ROM located at 17a.
@@ -5606,7 +5606,7 @@ ROM_END
 
 /************************************
 
-  Jolli Witch (german)
+  Jolli Witch (German)
   Epoxy CPU box.
 
   Using the whole addressing

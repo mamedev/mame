@@ -1,4 +1,4 @@
-/* CD controller code from megacd.c, used by Sega Cd / Mega CD */
+/* CD controller code from megacd.c, used by Sega CD / Mega CD */
 
 /* todo: cleanup(!!), make more generic, unifiy implementation with NeoCD, turn into a device and move to the proper lc89510.c file
   currently this is a bit of a mix of system specific bits, incomplete implementations etc. as well as a rather kludgy combination
@@ -217,7 +217,7 @@ void lc89510_temp_device::CDD_GetPos(void)
 	CLEAR_CDD_RESULT
 	UINT32 msf;
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	msf = lba_to_msf_alt(SCD_CURLBA+150);
@@ -233,7 +233,7 @@ void lc89510_temp_device::CDD_GetTrackPos(void)
 	UINT32 msf;
 	CDD_STATUS &= 0xFF;
 	//  UINT32 end_msf = ;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	elapsedlba = SCD_CURLBA - segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) ].logframeofs;
@@ -248,7 +248,7 @@ void lc89510_temp_device::CDD_GetTrack(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
@@ -259,7 +259,7 @@ void lc89510_temp_device::CDD_Length(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 
@@ -276,7 +276,7 @@ void lc89510_temp_device::CDD_FirstLast(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 	CDD_MIN = 1; // first
@@ -291,7 +291,7 @@ void lc89510_temp_device::CDD_GetTrackAdr(void)
 	int last_track = cdrom_get_last_track(segacd.cd);
 
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 
@@ -323,7 +323,7 @@ void lc89510_temp_device::CDD_GetTrackType(void)
 	int last_track = cdrom_get_last_track(segacd.cd);
 
 	CDD_STATUS &= 0xFF;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
 
@@ -359,7 +359,7 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
 	SCD_CURLBA = msf_to_lba(msf)-150;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	UINT32 end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].logframeofs;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
@@ -384,7 +384,7 @@ void lc89510_temp_device::CDD_Seek(void)
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
 	SCD_CURLBA = msf_to_lba(msf)-150;
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
 	LC8951UpdateHeader();
@@ -417,7 +417,7 @@ void lc89510_temp_device::CDD_Resume(running_machine &machine)
 {
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
-	if(segacd.cd == NULL) // no cd is there, bail out
+	if(segacd.cd == NULL) // no CD is there, bail out
 		return;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
 	SCD_STATUS = CDD_PLAYINGCDDA;

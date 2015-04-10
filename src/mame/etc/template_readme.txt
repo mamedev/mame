@@ -1,5 +1,5 @@
-The template family tree is an attempt to ease the pain to write CPUs/drivers/devices 
-from scratch (especially for smaller projects). 
+The template family tree is an attempt to ease the pain to write CPUs/drivers/devices
+from scratch (especially for smaller projects).
 
 ===
 Usage:

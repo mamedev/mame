@@ -68,7 +68,7 @@ void portrait_state::video_start()
 	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(portrait_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
 
 	m_foreground->set_transparent_pen(7);
-	
+
 	save_item(NAME(m_scroll));
 }
 

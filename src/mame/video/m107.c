@@ -141,12 +141,12 @@ void m107_state::video_start()
 	}
 
 	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
-	
+
 	save_item(NAME(m_sprite_display));
 	save_item(NAME(m_raster_irq_position));
 	save_item(NAME(m_control));
 	save_pointer(NAME(m_buffered_spriteram), 0x1000/2);
-	
+
 	for (int i = 0; i < 4; i++)
 	{
 		save_item(NAME(m_pf_layer[i].vram_base), i);

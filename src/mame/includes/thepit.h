@@ -39,10 +39,10 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
 	DECLARE_READ8_MEMBER(input_port_0_r);
-	
+
 	DECLARE_READ8_MEMBER(intrepid_colorram_mirror_r);
 	DECLARE_WRITE8_MEMBER(intrepid_graphics_bank_w);
-	
+
 	DECLARE_READ8_MEMBER(rtriv_question_r);
 
 	TILE_GET_INFO_MEMBER(solid_get_tile_info);
@@ -57,6 +57,6 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
-	
+
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
