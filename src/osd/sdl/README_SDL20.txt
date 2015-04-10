@@ -21,7 +21,7 @@ Known bugs:
 Build SDL 2.0 from HG
 ======================
 
-Pull 2.0 from hg. Than
+Pull 2.0 from hg.  Then
 
 sh autogen.sh
 ./configure --prefix=/usr/local/sdl13/ --disable-video-svga --enable-video-directfb --enable-fusionsound
@@ -66,7 +66,7 @@ The following modes are working:
 SDL13
 =====
 
-This is driver using SDL texture and line drawing support. It supports
+This is driver using SDL texture and line drawing support.  It supports
 -prescale, -filter and -waitvsync.  The driver determines which pixel
 formats perform best and converts textures to these pixel formats and at
 the same time performs any necessary rotation.
@@ -93,7 +93,7 @@ Soft:
 OpenGL:
 =======
 
-Plain opengl does work. Anything more advanced like pbo, fbo or glsl will
+Plain opengl does work.  Anything more advanced like pbo, fbo or glsl will
 most probably not work with more than one screen.
 
 	./mamed -mt -video opengl mario -nogl_pbo -nogl_vbo -nogl_glsl -numscreens 2
@@ -125,6 +125,6 @@ yv12, yv12x2, yuy2, yuy2x2:
 Rendering in software / scaling with hardware (if supported)
 
 Whether these are actually hardware accelerated depends on the SDL driver
-and the hardware. The SDL directfb driver supports all above if the hardware
-supports it. However, only one YUV-texture per display is supported.
+and the hardware.  The SDL directfb driver supports all above if the hardware
+supports it.  However, only one YUV-texture per display is supported.
 The second window consequently will get "software" YUV blitting.
