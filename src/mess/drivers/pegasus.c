@@ -51,27 +51,20 @@ class pegasus_state : public driver_device
 {
 public:
 	pegasus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette"),
-	m_pia_s(*this, "pia_s"),
-	m_pia_u(*this, "pia_u"),
-	m_exp_00(*this, "exp00"),
-	m_exp_01(*this, "exp01"),
-	m_exp_02(*this, "exp02"),
-	m_exp_0c(*this, "exp0c"),
-	m_exp_0d(*this, "exp0d"),
-	m_p_videoram(*this, "p_videoram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_pia_s(*this, "pia_s")
+		, m_pia_u(*this, "pia_u")
+		, m_exp_00(*this, "exp00")
+		, m_exp_01(*this, "exp01")
+		, m_exp_02(*this, "exp02")
+		, m_exp_0c(*this, "exp0c")
+		, m_exp_0d(*this, "exp0d")
+		, m_p_videoram(*this, "videoram")
+		, m_io_keyboard(*this, "KEY")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
-	required_device<pia6821_device> m_pia_s;
-	required_device<pia6821_device> m_pia_u;
-	required_device<generic_slot_device> m_exp_00;
-	required_device<generic_slot_device> m_exp_01;
-	required_device<generic_slot_device> m_exp_02;
-	required_device<generic_slot_device> m_exp_0c;
-	required_device<generic_slot_device> m_exp_0d;
 	DECLARE_READ8_MEMBER( pegasus_keyboard_r );
 	DECLARE_READ8_MEMBER( pegasus_protection_r );
 	DECLARE_READ8_MEMBER( pegasus_pcg_r );
@@ -82,26 +75,36 @@ public:
 	DECLARE_READ_LINE_MEMBER( pegasus_cassette_r );
 	DECLARE_WRITE_LINE_MEMBER( pegasus_cassette_w );
 	DECLARE_WRITE_LINE_MEMBER( pegasus_firq_clr );
-	UINT8 m_kbd_row;
-	bool m_kbd_irq;
-	UINT8 *m_p_pcgram;
-	required_shared_ptr<UINT8> m_p_videoram;
-	const UINT8 *m_p_chargen;
-	UINT8 m_control_bits;
-	virtual void machine_reset();
-	virtual void machine_start();
-	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(pegasus);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
-	void pegasus_decrypt_rom(UINT8 *ROM, bool force_decrypt);
-
 	int load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
+private:
+	UINT8 m_kbd_row;
+	bool m_kbd_irq;
+	UINT8 *m_p_pcgram;
+	const UINT8 *m_p_chargen;
+	UINT8 m_control_bits;
+	virtual void machine_reset();
+	virtual void machine_start();
+	virtual void video_start();
+	void pegasus_decrypt_rom(UINT8 *ROM, bool force_decrypt);
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
+	required_device<pia6821_device> m_pia_s;
+	required_device<pia6821_device> m_pia_u;
+	required_device<generic_slot_device> m_exp_00;
+	required_device<generic_slot_device> m_exp_01;
+	required_device<generic_slot_device> m_exp_02;
+	required_device<generic_slot_device> m_exp_0c;
+	required_device<generic_slot_device> m_exp_0d;
+	required_shared_ptr<UINT8> m_p_videoram;
+	required_ioport_array<8> m_io_keyboard;
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
@@ -116,13 +119,13 @@ WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 
 READ8_MEMBER( pegasus_state::pegasus_keyboard_r )
 {
-	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
-	UINT8 bit,data = 0xff;
-	for (bit = 0; bit < 8; bit++)
-		if (!BIT(m_kbd_row, bit)) data &= ioport(keynames[bit])->read();
+	UINT8 i,data = 0xff;
+	for (i = 0; i < 8; i++)
+		if (!BIT(m_kbd_row, i)) data &= m_io_keyboard[i]->read();
 
 	m_kbd_irq = (data == 0xff) ? 1 : 0;
-	if (m_control_bits & 8) data<<=4;
+	if BIT(m_control_bits, 3)
+		data<<=4;
 	return data;
 }
 
@@ -166,7 +169,7 @@ READ8_MEMBER( pegasus_state::pegasus_pcg_r )
 
 WRITE8_MEMBER( pegasus_state::pegasus_pcg_w )
 {
-//  if (m_control_bits & 2)
+//  if BIT(m_control_bits, 1)
 	{
 		UINT8 code = m_p_videoram[offset] & 0x7f;
 		m_p_pcgram[(code << 4) | (~m_kbd_row & 15)] = data;
@@ -185,7 +188,7 @@ static ADDRESS_MAP_START(pegasus_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x0000, 0x2fff)      // mapped by the cartslots 1-3
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_SHARE("videoram")
 	//AM_RANGE(0xc000, 0xdfff)      // mapped by the cartslots 4-5
 	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
@@ -196,20 +199,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pegasusm_mem, AS_PROGRAM, 8, pegasus_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x5000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_SHARE("p_videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
-	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
-	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
-	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
-	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
+	AM_IMPORT_FROM(pegasus_mem)
+	AM_RANGE(0x5000, 0xafff) AM_RAM
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( pegasus )
-	PORT_START("X0")
+	PORT_START("KEY.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BackSpace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(8)
@@ -219,7 +215,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l') PORT_CHAR(13)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p') PORT_CHAR(16)
 
-	PORT_START("X1")
+	PORT_START("KEY.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Tab") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("[ ]") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR(']')
@@ -229,7 +225,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k') PORT_CHAR(11)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o') PORT_CHAR(15)
 
-	PORT_START("X2")
+	PORT_START("KEY.2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
@@ -239,7 +235,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u') PORT_CHAR(21)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g') PORT_CHAR(7)
 
-	PORT_START("X3")
+	PORT_START("KEY.3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t') PORT_CHAR(20)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
@@ -249,7 +245,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h') PORT_CHAR(8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y') PORT_CHAR(25)
 
-	PORT_START("X4")
+	PORT_START("KEY.4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r') PORT_CHAR(18)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w') PORT_CHAR(23)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
@@ -259,7 +255,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c') PORT_CHAR(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f') PORT_CHAR(6)
 
-	PORT_START("X5")
+	PORT_START("KEY.5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e') PORT_CHAR(5)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q') PORT_CHAR(17)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // REPEAT key which is disconnected - outputs a space
@@ -269,7 +265,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d') PORT_CHAR(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n') PORT_CHAR(14)
 
-	PORT_START("X6")
+	PORT_START("KEY.6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v') PORT_CHAR(22)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a') PORT_CHAR(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
@@ -279,7 +275,7 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x') PORT_CHAR(24)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BlankL") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(16)
 
-	PORT_START("X7")
+	PORT_START("KEY.7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b') PORT_CHAR(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s') PORT_CHAR(19)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CapsLock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(19)
@@ -312,7 +308,7 @@ UINT32 pegasus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	UINT8 y,ra,chr,gfx,inv;
 	UINT16 sy=0,ma=0,x;
-	UINT8 pcg_mode = m_control_bits & 2;
+	bool pcg_mode = BIT(m_control_bits, 1);
 
 	for(y = 0; y < 16; y++ )
 	{
@@ -573,5 +569,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, pegasus,  0,     0,      pegasus,   pegasus, pegasus_state, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
+COMP( 1981, pegasus,  0,       0,    pegasus,   pegasus, pegasus_state, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
 COMP( 1981, pegasusm, pegasus, 0,    pegasusm,  pegasus, pegasus_state, pegasus, "Technosys",   "Aamber Pegasus with RAM expansion unit", GAME_NO_SOUND_HW )
