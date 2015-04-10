@@ -41,7 +41,8 @@ function findfunction(x)
 end
 
 function layoutbuildtask(_folder, _name)
-	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",    {  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
+	return { MAME_DIR .. "src/".._folder.."/".. _name ..".lay" ,    GEN_DIR .. _folder .. "/".._name..".lh",   
+		{  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting src/".._folder.."/".._name..".lay...",    PYTHON .. " $(1) $(<) $(@) layout_".._name }};
 end
 
 CPUS = {}
@@ -612,10 +613,17 @@ end
 	if _ACTION == "gmake" then
 
 	--we compile C-only to C89 standard with GNU extensions
+if (_OPTIONS["targetos"]=="solaris") then
+	buildoptions_c {
+		"-std=gnu99",
+	}
+else
 	buildoptions_c {
 		"-std=gnu89",
 
 	}
+end	
+
 	
 if _OPTIONS["CPP11"]=="1" then
 	buildoptions_cpp {

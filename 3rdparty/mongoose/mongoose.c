@@ -2811,7 +2811,7 @@ static int is_big_endian(void) {
 // Copyright(c) By Steve Reid <steve@edmweb.com>
 #define SHA1HANDSOFF
 #if defined(__sun)
-#include "solarisfixes.h"
+//#include "solarisfixes.h"
 #endif
 
 union char64long16 { unsigned char c[64]; uint32_t l[16]; };
