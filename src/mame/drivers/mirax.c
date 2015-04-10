@@ -148,7 +148,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
@@ -247,7 +247,7 @@ UINT32 mirax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 void mirax_state::machine_start()
 {
 	m_nAyCtrl = 0x00;
-	
+
 	save_item(NAME(m_nAyCtrl));
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_flipscreen_x));

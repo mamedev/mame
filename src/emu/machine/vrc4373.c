@@ -263,7 +263,7 @@ void vrc4373_device::dma_transfer(int which)
 		m_cpu_regs[NREG_DMA_CPAR] += 0x4;
 		m_cpu_regs[NREG_DMA_REM]--;
 	}
-}	
+}
 // CPU I/F
 READ32_MEMBER (vrc4373_device::cpu_if_r)
 {
@@ -347,13 +347,13 @@ WRITE32_MEMBER(vrc4373_device::cpu_if_w)
 		case NREG_DMACR1:
 		case NREG_DMACR2:
 			// Start when DMA_GO bit is set
-			if (!(oldData & DMA_GO) && (data & DMA_GO)) {				
+			if (!(oldData & DMA_GO) && (data & DMA_GO)) {
 				int which = (offset-NREG_DMACR1)>>3;
 				// Check to see DMA is not already started
 				if (!(data&DMA_BUSY)) {
 					// Set counts and address
 					m_cpu_regs[NREG_DMA_CPAR] = m_cpu_regs[NREG_DMAPCI1+which*0xC];
-					m_cpu_regs[NREG_DMA_CMAR] = m_cpu_regs[NREG_DMAMAR1+which*0xC];					
+					m_cpu_regs[NREG_DMA_CMAR] = m_cpu_regs[NREG_DMAMAR1+which*0xC];
 					m_cpu_regs[NREG_DMA_REM] = (data & DMA_BLK_SIZE)>>2;
 					m_cpu_regs[NREG_DMACR1+which*0xc] |= DMA_BUSY;
 					// Start the transfer

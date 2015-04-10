@@ -51,12 +51,12 @@ public:
 	UINT8 *m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
 	emu_timer *m_blitter_timer;
-	
+
 	// musobana and derived machine configs
 	int m_musobana_inputport;
 	int m_musobana_outcoin_flag;
 	UINT8 m_motor_on;
-	
+
 	// common
 	DECLARE_WRITE8_MEMBER(soundbank_w);
 	DECLARE_WRITE8_MEMBER(soundlatch_clear_w);
@@ -76,7 +76,7 @@ public:
 	DECLARE_WRITE8_MEMBER(clutsel_1_w);
 	DECLARE_WRITE8_MEMBER(clutsel_2_w);
 	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
-	
+
 	// musobana and derived machine configs
 	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
 	DECLARE_WRITE16_MEMBER(musobana_inputport_w);

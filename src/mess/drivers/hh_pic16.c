@@ -147,7 +147,7 @@ void hh_pic16_state::display_update()
 				int state = active_state[y] >> x & 1;
 				char buf1[0x10]; // lampyx
 				char buf2[0x10]; // y.x
-				
+
 				if (x == m_display_maxx)
 				{
 					// always-on if selected

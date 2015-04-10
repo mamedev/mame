@@ -67,12 +67,12 @@ public:
 
 	// majtitle specific
 	int m_majtitle_rowscroll;
-	
+
 	// m72_i8751 specific
 	UINT8 m_mcu_snd_cmd_latch;
 	UINT8 m_mcu_sample_latch;
 	UINT32 m_mcu_sample_addr;
-	
+
 	// common
 	DECLARE_READ16_MEMBER(palette1_r);
 	DECLARE_READ16_MEMBER(palette2_r);
@@ -82,7 +82,7 @@ public:
 	DECLARE_WRITE16_MEMBER(videoram2_w);
 	DECLARE_READ16_MEMBER(soundram_r);
 	DECLARE_WRITE16_MEMBER(soundram_w);
-	
+
 	// m72_i8751 specific
 	DECLARE_WRITE16_MEMBER(main_mcu_sound_w);
 	DECLARE_WRITE16_MEMBER(main_mcu_w);
@@ -118,14 +118,14 @@ public:
 	DECLARE_READ16_MEMBER(poundfor_trackball_r);
 	DECLARE_WRITE16_MEMBER(rtype2_port02_w);
 	DECLARE_WRITE16_MEMBER(majtitle_gfx_ctrl_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(hharry_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(majtitle_scan_rows);
-	
+
 	void machine_start();
 	void machine_reset();
 	DECLARE_VIDEO_START(m72);
@@ -147,15 +147,15 @@ public:
 	DECLARE_DRIVER_INIT(nspirit);
 	DECLARE_DRIVER_INIT(loht);
 	DECLARE_DRIVER_INIT(imgfight);
-	
+
 	INTERRUPT_GEN_MEMBER(mcu_int);
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	TIMER_CALLBACK_MEMBER(synch_callback);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
-	
-	
+
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_majtitle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);

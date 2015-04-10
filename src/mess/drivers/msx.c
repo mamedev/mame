@@ -8148,10 +8148,10 @@ COMP(1986, ax170,      0,        0, ax170,      msx,      driver_device, 0, "Al 
 COMP(1983, canonv8,    0,        0, canonv8,    msx,      driver_device, 0, "Canon", "V-8 (MSX1)", 0)
 COMP(1983, canonv10,   canonv20, 0, canonv10,   msx,      driver_device, 0, "Canon", "V-10 (MSX1)", 0)
 COMP(1983, canonv20,   0,        0, canonv20,   msx,      driver_device, 0, "Canon", "V-20 (MSX1)", 0)
-COMP(1983, canonv20e,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20E (MSX1)", 0) // Different euro keyboard layout?
-COMP(1983, canonv20f,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20F (MSX1)", 0) // Different french keyboard layout?
-COMP(1983, canonv20g,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20G (MSX1)", 0) // Different german keyboard layout?
-COMP(1983, canonv20s,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20S (MSX1)", 0) // Different spanish keyboard layout?
+COMP(1983, canonv20e,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20E (MSX1)", 0) // Different Euro keyboard layout?
+COMP(1983, canonv20f,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20F (MSX1)", 0) // Different French keyboard layout?
+COMP(1983, canonv20g,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20G (MSX1)", 0) // Different German keyboard layout?
+COMP(1983, canonv20s,  canonv20, 0, canonv20,   msx,      driver_device, 0, "Canon", "V-20S (MSX1)", 0) // Different Spanish keyboard layout?
 COMP(1984, mx10,       0,        0, mx10,       msx,      driver_device, 0, "Casio", "MX-10 (MSX1)", 0)
 COMP(1984, mx101,      mx10,     0, mx101,      msx,      driver_device, 0, "Casio", "MX-101 (MSX1)", 0)
 COMP(1984, mx15,       mx10,     0, mx15,       msx,      driver_device, 0, "Casio", "MX-15 (MSX1)", 0)

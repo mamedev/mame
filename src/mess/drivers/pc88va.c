@@ -1833,7 +1833,6 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_AM9517A_IN_MEMR_CB(READ8(pc88va_state, dma_memr_cb))
 	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(pc88va_state, dma_memw_cb))
 
-	
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_irq))
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_drq))

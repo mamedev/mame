@@ -371,7 +371,7 @@ void niyanpai_state::video_start()
 	m_clut[2] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_nb19010_busyflag = 1;
 	m_blitter_timer = timer_alloc(TIMER_BLITTER);
-	
+
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_blitter_destx));

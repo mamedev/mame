@@ -117,9 +117,9 @@ public:
 	required_shared_ptr<UINT8> m_main;
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
-	
+
 	tilemap_t *m_sc0_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(cram_w);
 	DECLARE_READ8_MEMBER(spool99_io_r);
@@ -127,10 +127,10 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_resetline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
-	
+
 	DECLARE_DRIVER_INIT(spool99);
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };

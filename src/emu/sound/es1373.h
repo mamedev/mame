@@ -114,7 +114,6 @@ private:
 	chan_info m_dac2;
 	chan_info m_adc;
 	void transfer_pci_audio(chan_info& chan, int type);
-	
 };
 
 extern const device_type ES1373;

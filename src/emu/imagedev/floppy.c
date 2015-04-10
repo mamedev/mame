@@ -48,7 +48,7 @@ const device_type FLOPPY_8_DSSD = &device_creator<floppy_8_dssd>;
 const device_type FLOPPY_8_SSDD = &device_creator<floppy_8_ssdd>;
 const device_type FLOPPY_8_DSDD = &device_creator<floppy_8_dsdd>;
 
-// epson 3.5" drives
+// Epson 3.5" drives
 #if 0
 const device_type EPSON_SMD_110 = &device_creator<epson_smd_110>;
 const device_type EPSON_SMD_120 = &device_creator<epson_smd_120>;
@@ -70,7 +70,7 @@ const device_type EPSON_SMD_480LM = &device_creator<epson_smd_480lm>;
 const device_type EPSON_SMD_489M = &device_creator<epson_smd_489m>;
 #endif
 
-// epson 5.25" drives
+// Epson 5.25" drives
 #if 0
 const device_type EPSON_SD_311 = &device_creator<epson_sd_311>;
 #endif
@@ -88,12 +88,12 @@ const device_type EPSON_SD_621L = &device_creator<epson_sd_621l>;
 const device_type EPSON_SD_680L = &device_creator<epson_sd_680l>;
 #endif
 
-// sony 3.5" drives
+// Sony 3.5" drives
 const device_type SONY_OA_D31V = &device_creator<sony_oa_d31v>;
 const device_type SONY_OA_D32W = &device_creator<sony_oa_d32w>;
 const device_type SONY_OA_D32V = &device_creator<sony_oa_d32v>;
 
-// teac 5.25" drives
+// TEAC 5.25" drives
 #if 0
 const device_type TEAC_FD_55A = &device_creator<teac_fd_55a>;
 const device_type TEAC_FD_55B = &device_creator<teac_fd_55b>;
@@ -1672,7 +1672,7 @@ void epson_sd_321::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 //-------------------------------------------------
-//  sony oa-d31v
+//  Sony OA-D31V
 //
 //  track to track: 15 ms
 //  average: 365 ms
@@ -1706,7 +1706,7 @@ void sony_oa_d31v::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 //-------------------------------------------------
-//  sony oa-d32w
+//  Sony OA-D32W
 //
 //  track to track: 12 ms
 //  average: 350 ms
@@ -1742,7 +1742,7 @@ void sony_oa_d32w::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 //-------------------------------------------------
-//  sony oa-d32v
+//  Sony OA-D32V
 //
 //  track to track: 12 ms
 //  average: 350 ms
@@ -1777,7 +1777,7 @@ void sony_oa_d32v::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 //-------------------------------------------------
-//  teac fd-55f
+//  TEAC FD-55F
 //
 //  track to track: 3 ms
 //  average: 94 ms
@@ -1815,7 +1815,7 @@ void teac_fd_55f::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 //-------------------------------------------------
-//  teac fd-55g
+//  TEAC FD-55G
 //
 //  track to track: 3 ms
 //  average: 91 ms

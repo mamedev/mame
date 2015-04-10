@@ -181,7 +181,7 @@ void hh_tms1k_state::display_update()
 				int state = active_state[y] >> x & 1;
 				char buf1[0x10]; // lampyx
 				char buf2[0x10]; // y.x
-				
+
 				if (x == m_display_maxx)
 				{
 					// always-on if selected
@@ -1346,7 +1346,7 @@ MACHINE_CONFIG_END
   Ideal Electronic Detective
   * TMS0980NLL MP6100A (die labeled 0980B-00)
   * 10-digit 7seg LED display, 1bit sound
-  
+
   hardware (and concept) is very similar to Parker Bros Stop Thief
 
   This is an electronic board game. It requires game cards with suspect info,
@@ -1638,7 +1638,7 @@ WRITE16_MEMBER(astro_state::write_r)
 {
 	// R0-R7: input mux
 	m_inp_mux = data & 0xff;
-	
+
 	// R0-R9: led select
 	m_r = data;
 	prepare_display();
@@ -1965,13 +1965,13 @@ WRITE16_MEMBER(ssimon_state::write_r)
 {
 	// R0-R3,R9,R10: input mux
 	m_inp_mux = (data & 0xf) | (data >> 5 & 0x30);
-	
+
 	// R4: yellow lamps
 	// R5: green lamps
 	// R6: blue lamps
 	// R7: red lamps
 	display_matrix(4, 1, data >> 4, 1);
-	
+
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
 }

@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE16_MEMBER(spritebuffer_w);
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 
 	DECLARE_DRIVER_INIT(firebarr);

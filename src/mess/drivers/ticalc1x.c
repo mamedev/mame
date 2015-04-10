@@ -85,7 +85,7 @@ void tisr16_state::prepare_display()
 	// exponent sign is from R10 O1, and R10 itself only uses segment G
 	m_display_state[11] = m_display_state[10] << 5 & 0x40;
 	m_display_state[10] &= 0x40;
-	
+
 	set_display_size(8, 12);
 	display_update();
 }
@@ -651,7 +651,7 @@ MACHINE_CONFIG_END
   TI Little Professor (1978 version)
   * TMS1990 MCU labeled TMC1993NL. die labeled 1990C-c3C
   * 9-digit 7seg LED display(one custom digit)
-  
+
   1978 re-release, with on/off and level select on buttons instead of
   switches. The casing was slightly revised in 1980 again, but same rom.
 

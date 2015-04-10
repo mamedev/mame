@@ -437,8 +437,8 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 			{
 				if (m_port10 & 0x30) // this is set when moving objects are cleared, although not screen clears?
 				{
-					/* guess: assume that bit 4 is for layer 0 and bit 5 for layer 1 
-					   (according to 0x21 setted at the "Clubs League" color fade-out) 
+					/* guess: assume that bit 4 is for layer 0 and bit 5 for layer 1
+					   (according to 0x21 setted at the "Clubs League" color fade-out)
 					*/
 					if(m_port10 & 0x10)
 						m_videoram0[offset] = 0x0000;
@@ -450,7 +450,7 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 				else
 				{
 					UINT8 data;
-										
+
 					data = (src[(m_spritesaddr * 2) + 1]);
 					//data |= vram[offset] >> 8;
 
@@ -636,7 +636,7 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
-	
+
 	MCFG_NVRAM_ADD_0FILL("backram")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

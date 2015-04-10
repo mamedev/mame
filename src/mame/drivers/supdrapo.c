@@ -40,7 +40,7 @@
      Minimal Winner Hand (Jacks or Better, Two Pair).
      Deal Speed (Slow, Fast).
      Aces Type (Normal Aces, Number 1).
-     Cards Deck Type (english cards, french cards).
+     Cards Deck Type (English cards, French cards).
      Max Bet (5, 10, 15, 20).
   - Added NVRAM support.
   - Reorganized and cleaned-up the driver.

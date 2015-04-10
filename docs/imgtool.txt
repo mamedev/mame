@@ -81,7 +81,7 @@ only for early revisions of lynx archivs
 only extraction supported
 not heavily tested
 
-Lynx archivs could and should be handled in a c64 emulation 
+Lynx archivs could and should be handled in a c64 emulation
 with the native lynx tool
 
 
@@ -128,7 +128,7 @@ special disk controller necessary for enhanced density
 type 7: 3 1/2 inch, enhanced density, DS, 2.88mb: sectors 36, heads 2, tracks 80
 
 unix with bash: use
-dd if=/dev/zero of=<name.dsk> bs=512 count=$((9*2*40)) 
+dd if=/dev/zero of=<name.dsk> bs=512 count=$((9*2*40))
 to generate standard blank 360kb image
 
 
@@ -145,14 +145,14 @@ standard parameter for common disk formats:
 type 0: 20mb standard pc/xt harddisk: 17 sectors, 4 heads, 615 cylinders
 
 unix with bash: use
-dd if=/dev/zero of=<name.dsk> bs=512 count=$((17*4*615)) 
+dd if=/dev/zero of=<name.dsk> bs=512 count=$((17*4*615))
 to generate standard blank 20mb pc xt harddisk image
 
 
 Virtual MSX tape archive
 ------------------------
 Converts .tap files from Virtual MSX 1.x to .cas files. It is not
-fault-tolerant. 
+fault-tolerant.
 
 
 Virtual MSX Game Master 2 SRAM file
@@ -161,7 +161,7 @@ Very simple, not overly useful but some might want it. Virtual MSX stored the
 SRAM of Konami's Game Master 2 in "gmaster2.ram". To convert this to something
 useful with MESS and other MSX emulators, go:
 
-imgtool getall vmsx_gm2 gmaster2.ram 
+imgtool getall vmsx_gm2 gmaster2.ram
 
 You'll get a file called gmaster2.mem, which must place in the correct directory
 of mess to use  (MESS\MEMCARD\GameMaster2 if your Game Master 2 .rom file is
@@ -174,7 +174,7 @@ Converts .cas files to .wav files. The MSX driver can use .cas files directly
 so you don't have to convert them. You can use it to export files to a real
 MSX. Connect the MSX to the line out of your computer. Give the apropriate
 command on the MSX (BLOAD "CAS:",R for example) and then play the .wav file
-on your computer. 
+on your computer.
 
 imgtool dir fmsx_cas file.cas
 imgtool getall fmsx_cas file.cas
@@ -185,7 +185,7 @@ XelaSoft Archive (.xsa)
 -----------------------
 
 The XelaSoft Archive is a compressed file. It can only contain one
-file. Although it can contain any file, it's always used for MSX disk 
+file. Although it can contain any file, it's always used for MSX disk
 images. The were programs written by XelaSoft which made a dump
 of a disk, and compressing them at the same time. Very useful to store
 a disk dump on another disk. zip/gzip offer much better compression and
@@ -205,7 +205,7 @@ emulators, is .dsk (a plain dump without any header information). This
 filetype converts them all to .dsk format.
 
 msx_img are disk images with an extra byte at the beginning. It' 1 (0x01)
-for single-sided images and 2 (0x02) for double-side images. These 
+for single-sided images and 2 (0x02) for double-side images. These
 files are at: ftp://ftp.funet.fi/pub/msx/. The extension is .img
 
 msx_ddi are DiskDupe 5.12 disk images. There is a 0x1800 bytes header
@@ -215,9 +215,9 @@ often contain garbage so it's simply stripped. The extension is .ddi
 msx_msx are disk images with a weird sector order. You can find them
 at: ftp://jazz.snu.ac.kr/pub/msx/. The extension is .msx
 
-msx_mul are "multi disk" images, used by fmsx-dos 1.6. It is simply 
+msx_mul are "multi disk" images, used by fmsx-dos 1.6. It is simply
 more than one .dsk image appended to one another. The extension is
-still .dsk, but the file is larger than 720kB (actually always a 
+still .dsk, but the file is larger than 720kB (actually always a
 multiple of 720kB.
 
 
@@ -235,7 +235,7 @@ The card filesystem is similar to FAT, but not identical.
 The maximum card size is 1mb, and maximum file size is 64k.
 (Files will be cut at 64k if they are larger - e.g. when putting a large file)
 
-As far as I know there is no directory system, however there is always a 
+As far as I know there is no directory system, however there is always a
 system "NC100" directory which points to the root directory. (Like the DOS "."
 directory).
 

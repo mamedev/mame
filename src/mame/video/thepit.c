@@ -136,7 +136,7 @@ void thepit_state::video_start()
 	m_dummy_tile = auto_alloc_array_clear(machine(), UINT8, 8*8);
 
 	m_graphics_bank = 0;    /* only used in intrepid */
-	
+
 	save_item(NAME(m_graphics_bank));
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));

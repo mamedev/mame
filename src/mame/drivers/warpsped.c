@@ -152,7 +152,7 @@ void warpspeed_state::video_start()
 	m_text_tilemap->set_transparent_pen(0);
 	m_starfield_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(warpspeed_state::get_starfield_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_starfield_tilemap->mark_all_dirty();
-	
+
 	save_item(NAME(m_regs));
 }
 

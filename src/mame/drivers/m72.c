@@ -337,7 +337,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	program.install_read_bank(0xb0000, 0xbffff, "bank1");
 	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::main_mcu_w),this));
 	membank("bank1")->configure_entry(0, m_protection_ram);
-	
+
 	save_pointer(NAME(m_protection_ram), 0x10000/2);
 	save_item(NAME(m_mcu_sample_latch));
 	save_item(NAME(m_mcu_sample_addr));
@@ -685,7 +685,7 @@ void m72_state::install_protection_handler(const UINT8 *code,const UINT8 *crc)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),this));
 	membank("bank1")->configure_entry(0, m_protection_ram);
-	
+
 	save_pointer(NAME(m_protection_ram), 0x1000/2);
 }
 
