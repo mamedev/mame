@@ -9,6 +9,15 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+    - write protect
+    - separate read/write methods
+
+*/
+
 #include "c2040fdc.h"
 
 
@@ -310,7 +319,7 @@ void c2040_fdc_t::live_run(const attotime &limit)
 					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.rw_sel, cur_live.mode_sel);
 
 				// write bit
-				if (!cur_live.rw_sel) {
+				if (!cur_live.rw_sel) { // TODO WPS
 					write_next_bit(BIT(cur_live.shift_reg_write, 9), limit);
 				}
 

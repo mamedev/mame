@@ -37,7 +37,7 @@ const char *d80_format::extensions() const
 
 const d80_format::format d80_format::file_formats[] = {
 	{ // d80, dos 2.5, 77 tracks, head/stepper 100 tpi
-		floppy_image::FF_525, floppy_image::SSQD, 2083, 77, 1, 256, 9, 8
+		floppy_image::FF_525, floppy_image::SSQD, 2083, 77, 1, 256, 19, 19 // TODO verify gaps
 	},
 	{}
 };
