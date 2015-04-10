@@ -32,6 +32,8 @@
 
     TODO:
 
+    - write protect
+    - separate read/write methods
     - communication error with SCP after loading boot sector
         - bp ff1a8
         - patch ff1ab=c3

@@ -391,6 +391,9 @@ READ8_MEMBER( mos6530_t::timer_r )
 {
 	UINT8 data = 0;
 
+	if (space.debugger_access())
+		return 0;
+
 	if (offset & 0x01)
 	{
 		data = m_irq ? 0x80 : 0x00;
@@ -565,7 +568,7 @@ void mos6530_t::live_run(const attotime &limit)
 		}
 
 		case RUNNING_SYNCPOINT: {
-			logerror("%s MOS6530 '%s' IRQ\n", machine().time().as_string(), tag());
+			if (LOG) logerror("%s MOS6530 '%s' IRQ\n", machine().time().as_string(), tag());
 
 			m_irq = true;
 			update_pb();

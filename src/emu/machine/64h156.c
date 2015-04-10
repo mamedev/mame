@@ -15,9 +15,9 @@
 
     http://personalpages.tds.net/~rcarlsen/cbm/1541/1541%20EARLY/1540-2.GIF
 
-    - write
+    - write protect
+    - separate read/write methods
     - cycle exact VIA
-
     - get these running and we're golden
         - Bounty Bob Strikes Back (aligned halftracks)
         - Quiwi (speed change within track)
@@ -306,7 +306,7 @@ void c64h156_device::live_run(const attotime &limit)
 				syncpoint = true;
 			}
 
-			if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) {
+			if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) { // TODO WPS
 				write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
 			}
 

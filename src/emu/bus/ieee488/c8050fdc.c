@@ -9,6 +9,16 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- write mode
+    - write protect
+    - separate read/write methods
+
+*/
+
 #include "c8050fdc.h"
 
 
@@ -17,7 +27,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 #define GCR_DECODE(_e, _i) \
 	((BIT(_e, 6) << 7) | (BIT(_i, 7) << 6) | (_e & 0x33) | (BIT(_e, 2) << 3) | (_i & 0x04))
@@ -67,7 +77,9 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 	device_t(mconfig, C8050_FDC, "C8050 FDC", tag, owner, clock, "c8050fdc", __FILE__),
 	m_write_sync(*this),
 	m_write_ready(*this),
+	m_write_brdy(*this),
 	m_write_error(*this),
+	m_write_wps(*this),
 	m_gcr_rom(*this, "gcr"),
 	m_floppy0(NULL),
 	m_floppy1(NULL),
@@ -78,14 +90,16 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_ds(0),
 	m_drv_sel(0),
 	m_mode_sel(0),
-	m_rw_sel(0)
+	m_rw_sel(0),
+	m_wps(0),
+	m_wps0(0),
+	m_wps1(0)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
 	cur_live.drv_sel = m_drv_sel;
 }
-
 
 
 //-------------------------------------------------
@@ -97,7 +111,9 @@ void c8050_fdc_t::device_start()
 	// resolve callbacks
 	m_write_sync.resolve_safe();
 	m_write_ready.resolve_safe();
+	m_write_brdy.resolve_safe();
 	m_write_error.resolve_safe();
+	m_write_wps.resolve_safe();
 
 	// allocate timer
 	t_gen = timer_alloc(0);
@@ -206,7 +222,47 @@ void c8050_fdc_t::ds_w(int ds)
 void c8050_fdc_t::set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1)
 {
 	m_floppy0 = floppy0;
-	m_floppy1 = floppy1;
+	m_floppy0->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(c8050_fdc_t::wps0_w), this));
+
+	if (floppy1) {
+		m_floppy1 = floppy1;
+		m_floppy1->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(c8050_fdc_t::wps1_w), this));
+	}
+}
+
+void c8050_fdc_t::update_wps()
+{
+	int state = m_drv_sel ? m_wps1 : m_wps0;
+
+	if (m_wps != state)
+	{
+		m_wps = state;
+		m_write_wps(m_wps);
+	}
+}
+
+void c8050_fdc_t::wps0_w(floppy_image_device *floppy, int state)
+{
+	if (m_wps0 != state)
+	{
+		live_sync();
+		m_wps0 = state;
+		update_wps();
+		checkpoint();
+		live_run();
+	}
+}
+
+void c8050_fdc_t::wps1_w(floppy_image_device *floppy, int state)
+{
+	if (m_wps1 != state)
+	{
+		live_sync();
+		m_wps0 = state;
+		update_wps();
+		checkpoint();
+		live_run();
+	}
 }
 
 void c8050_fdc_t::live_start()
@@ -225,6 +281,7 @@ void c8050_fdc_t::live_start()
 	cur_live.mode_sel = m_mode_sel;
 	cur_live.rw_sel = m_rw_sel;
 	cur_live.pi = m_pi;
+	cur_live.wps = m_wps;
 
 	pll_reset(cur_live.tm, attotime::from_hz(clock() / (16 - m_ds)));
 	checkpoint_live = cur_live;
@@ -333,6 +390,7 @@ void c8050_fdc_t::live_abort()
 	cur_live.next_state = -1;
 
 	cur_live.ready = 1;
+	cur_live.brdy = 1;
 	cur_live.sync = 1;
 	cur_live.error = 1;
 }
@@ -390,7 +448,8 @@ void c8050_fdc_t::live_run(const attotime &limit)
 			if (LOG) logerror("%s cyl %u bit %u sync %u bc %u sr %03x i %03x e %02x\n",cur_live.tm.as_string(),get_floppy()->get_cyl(),bit,sync,cur_live.bit_counter,cur_live.shift_reg,cur_live.i,cur_live.e);
 
 			// byte ready
-			int ready = !(cur_live.bit_counter == 9);
+			int ready = !(cur_live.bit_counter == 9); // 74190 _RC, should be triggered on the falling edge of the clock
+			int brdy = ready; // 74190 TC
 
 			// GCR error
 			int error = !(ready || BIT(cur_live.e, 3));
@@ -419,14 +478,20 @@ void c8050_fdc_t::live_run(const attotime &limit)
 				syncpoint = true;
 			}
 
+			if (brdy != cur_live.brdy) {
+				if (LOG) logerror("%s BRDY %u\n", cur_live.tm.as_string(), brdy);
+				cur_live.brdy = brdy;
+				syncpoint = true;
+			}
+
 			if (sync != cur_live.sync) {
-				if (LOG) logerror("%s SYNC %u\n", cur_live.tm.as_string(),sync);
+				if (LOG) logerror("%s SYNC %u\n", cur_live.tm.as_string(), sync);
 				cur_live.sync = sync;
 				syncpoint = true;
 			}
 
 			if (error != cur_live.error) {
-				if (LOG) logerror("%s ERROR %u\n", cur_live.tm.as_string(),error);
+				if (LOG) logerror("%s ERROR %u\n", cur_live.tm.as_string(), error);
 				cur_live.error = error;
 				syncpoint = true;
 			}
@@ -439,7 +504,12 @@ void c8050_fdc_t::live_run(const attotime &limit)
 		}
 
 		case RUNNING_SYNCPOINT: {
+			if (LOG) {
+				if (!cur_live.sync) logerror("%s SYNC\n",cur_live.tm.as_string());
+				if (!cur_live.ready && cur_live.bit_counter == 9) logerror("%s DATA %02x\n",cur_live.tm.as_string(),GCR_DECODE(cur_live.e,cur_live.i));
+			}
 			m_write_ready(cur_live.ready);
+			m_write_brdy(cur_live.brdy);
 			m_write_sync(cur_live.sync);
 			m_write_error(cur_live.error);
 
@@ -456,9 +526,9 @@ READ8_MEMBER( c8050_fdc_t::read )
 	UINT8 e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
 
-	UINT8 data = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
+	UINT8 data = GCR_DECODE(e, i);
 
-	if (LOG) logerror("%s %s VIA reads data %02x (%03x)\n", machine().time().as_string(), machine().describe_context(), data, checkpoint_live.shift_reg);
+	if (LOG)logerror("%s %s VIA reads data %02x (%03x)\n", machine().time().as_string(), machine().describe_context(), data, checkpoint_live.shift_reg);
 
 	return data;
 }
@@ -475,12 +545,25 @@ WRITE8_MEMBER( c8050_fdc_t::write )
 	}
 }
 
+WRITE_LINE_MEMBER( c8050_fdc_t::ds0_w )
+{
+	m_ds0 = state;
+}
+
+WRITE_LINE_MEMBER( c8050_fdc_t::ds1_w )
+{
+	m_ds1 = state;
+
+	ds_w(m_ds1 << 1 | m_ds0);
+}
+
 WRITE_LINE_MEMBER( c8050_fdc_t::drv_sel_w )
 {
 	if (m_drv_sel != state)
 	{
 		live_sync();
 		m_drv_sel = cur_live.drv_sel = state;
+		update_wps();
 		checkpoint();
 		if (LOG) logerror("%s %s DRV SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();
@@ -576,6 +659,5 @@ WRITE_LINE_MEMBER( c8050_fdc_t::odd_hd_w )
 
 WRITE_LINE_MEMBER( c8050_fdc_t::pull_sync_w )
 {
-	// TODO
 	if (LOG) logerror("%s %s PULL SYNC %u\n", machine().time().as_string(), machine().describe_context(), state);
 }
