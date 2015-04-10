@@ -35,7 +35,7 @@
 //
 // This board acts as a controller for all I/O of the system.
 // It is structured as if it were 2 boards in one:
-// One part (around 8080) controls Keyboard, CRT & floppy, the other part (around PIO 8741) controls all parallel I/Os
+// One part (around 8080) controls Keyboard, CRT & floppy, the other part (around PIO 8041A) controls all parallel I/Os
 // (Line printer, Paper tape puncher, Paper tape reader, I/O to PROM programmer).
 // Both parts are interfaced to IPC through a bidirectional 8-bit bus.
 // IOC is composed of these parts:
@@ -51,7 +51,7 @@
 // A20 8275     CRT controller
 // A19 2708     Character generator ROM
 // LS1          3.3 kHz beeper
-//*A72 8741-4   CPU @ 6 MHz (PIO: parallel I/O)
+// A72 8041A    CPU @ 6 MHz (PIO: parallel I/O)
 //
 // **********
 // Keyboard controller
@@ -63,8 +63,6 @@
 // ICs that are not emulated yet are marked with "*"
 //
 // TODO:
-// - Emulate PIO. No known dumps of its ROM are available, though.
-// - Emulate line printer output on PIO
 // - Emulate serial channels on IPC
 // - Emulate PIT on IPC
 // - Adjust speed of processors. Wait states are not accounted for yet.
@@ -86,8 +84,6 @@
 // should be mounted and the system reset. After a few seconds the ISIS-II
 // prompt should appear. A command that could be tried is "DIR" that lists
 // the content of floppy disk.
-// Please note that the message "FAILURE -- PIO NOT RESPONDING" is normal
-// as the support for PIO isn't implemented yet
 
 #include "includes/imds2.h"
 
@@ -114,7 +110,7 @@ static ADDRESS_MAP_START(ipc_io_map , AS_IO , 8 , imds2_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0xc0 , 0xc0) AM_READWRITE(imds2_ipc_dbbout_r , imds2_ipc_dbbin_data_w)
 	AM_RANGE(0xc1 , 0xc1) AM_READWRITE(imds2_ipc_status_r , imds2_ipc_dbbin_cmd_w)
-        AM_RANGE(0xf8 , 0xf9) AM_DEVREADWRITE("iocpio" , i8041_device , upi41_master_r , upi41_master_w)
+	AM_RANGE(0xf8 , 0xf9) AM_DEVREADWRITE("iocpio" , i8041_device , upi41_master_r , upi41_master_w)
 	AM_RANGE(0xfa , 0xfb) AM_READWRITE(imds2_ipclocpic_r , imds2_ipclocpic_w)
 	AM_RANGE(0xfc , 0xfd) AM_READWRITE(imds2_ipcsyspic_r , imds2_ipcsyspic_w)
 	AM_RANGE(0xff , 0xff) AM_WRITE(imds2_ipc_control_w)
@@ -169,11 +165,12 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_iocbeep(*this , "iocbeep"),
 	m_ioctimer(*this , "ioctimer"),
 	m_iocfdc(*this , "iocfdc"),
-        m_iocpio(*this , "iocpio"),
+	m_iocpio(*this , "iocpio"),
 	m_kbcpu(*this , "kbcpu"),
 	m_palette(*this , "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_floppy0(*this , FLOPPY_0),
+	m_centronics(*this , "centronics"),
 	m_io_key0(*this , "KEY0"),
 	m_io_key1(*this , "KEY1"),
 	m_io_key2(*this , "KEY2"),
@@ -182,7 +179,8 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_io_key5(*this , "KEY5"),
 	m_io_key6(*this , "KEY6"),
 	m_io_key7(*this , "KEY7"),
-	m_ioc_options(*this , "IOC_OPTS")
+	m_ioc_options(*this , "IOC_OPTS"),
+	m_device_status_byte(0xff)
 {
 }
 
@@ -439,27 +437,60 @@ WRITE8_MEMBER(imds2_state::imds2_ioc_mem_w)
 
 READ8_MEMBER(imds2_state::imds2_pio_port_p1_r)
 {
-        // TODO
-        return 0;
+	// If STATUS ENABLE/ == 0 return inverted device status byte, else return 0xff
+	// STATUS ENABLE/ == 0 when P23-P20 == 12 & P24 == 0 & P25 = 1 & P26 = 1
+	if ((m_pio_port2 & 0x7f) == 0x6c) {
+		return ~m_device_status_byte;
+	} else {
+	return 0xff;
+}
 }
 
 WRITE8_MEMBER(imds2_state::imds2_pio_port_p1_w)
 {
-        m_pio_port1 = data;
-        imds2_update_printer();
+	m_pio_port1 = data;
+	imds2_update_printer();
 }
 
 READ8_MEMBER(imds2_state::imds2_pio_port_p2_r)
 {
-        return m_pio_port2;
+	return m_pio_port2;
 }
 
 WRITE8_MEMBER(imds2_state::imds2_pio_port_p2_w)
 {
-        m_pio_port2 = data;
-        imds2_update_printer();
+	m_pio_port2 = data;
+	imds2_update_printer();
 	// Send INTR to IPC
 	m_ipclocpic->ir5_w(BIT(data , 7));
+}
+
+WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_ack_w)
+{
+	if (state) {
+		m_device_status_byte |= 0x20;
+	} else {
+		m_device_status_byte &= ~0x20;
+	}
+}
+
+WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_busy_w)
+{
+	// Busy is active high in centronics_device whereas it's active low in MDS
+	if (!state) {
+		m_device_status_byte |= 0x10;
+	} else {
+		m_device_status_byte &= ~0x10;
+	}
+}
+
+WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_select_w)
+{
+	if (state) {
+		m_device_status_byte |= 0x40;
+	} else {
+		m_device_status_byte &= ~0x40;
+	}
 }
 
 I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
@@ -574,7 +605,24 @@ void imds2_state::imds2_update_beeper(void)
 
 void imds2_state::imds2_update_printer(void)
 {
-        // TODO
+	// Data to printer is ~P1 when STATUS ENABLE/==1, else 0xff (assuming pull-ups on printer)
+	UINT8 printer_data;
+	if ((m_pio_port2 & 0x7f) == 0x6c) {
+		printer_data = 0xff;
+	} else {
+		printer_data = ~m_pio_port1;
+	}
+	m_centronics->write_data0(BIT(printer_data , 0));
+	m_centronics->write_data1(BIT(printer_data , 1));
+	m_centronics->write_data2(BIT(printer_data , 2));
+	m_centronics->write_data3(BIT(printer_data , 3));
+	m_centronics->write_data4(BIT(printer_data , 4));
+	m_centronics->write_data5(BIT(printer_data , 5));
+	m_centronics->write_data6(BIT(printer_data , 6));
+	m_centronics->write_data7(BIT(printer_data , 7));
+
+	// LPT DATA STROBE/ == 0 when P23-P20 == 9 & P24 == 0
+	m_centronics->write_strobe((m_pio_port2 & 0x1f) != 0x09);
 }
 
 static INPUT_PORTS_START(imds2)
@@ -766,13 +814,18 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 
 		MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, imds2_floppy_interface)
 
-                MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
-                MCFG_CPU_IO_MAP(pio_io_map)
+		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
+		MCFG_CPU_IO_MAP(pio_io_map)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
-                
+
 		MCFG_CPU_ADD("kbcpu", I8741, XTAL_3_579545MHz)         /* 3.579545 MHz */
 		MCFG_CPU_IO_MAP(kb_io_map)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
+
+		MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+		MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(imds2_state , imds2_pio_lpt_ack_w))
+		MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(imds2_state , imds2_pio_lpt_busy_w))
+		MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(imds2_state , imds2_pio_lpt_select_w))
 MACHINE_CONFIG_END
 
 ROM_START(imds2)
@@ -787,10 +840,10 @@ ROM_START(imds2)
 		ROM_LOAD("ioc_a52.bin" , 0x1000 , 0x0800 , CRC(b88a38d5) SHA1(934716a1daec852f4d1f846510f42408df0c9584))
 		ROM_LOAD("ioc_a53.bin" , 0x1800 , 0x0800 , CRC(c8df4bb9) SHA1(2dfb921e94ae7033a7182457b2f00657674d1b77))
 
-                // ROM definition of PIO controller (8041A)
-                ROM_REGION(0x400 , "iocpio" , 0)
-                ROM_LOAD("pio_a72.bin" , 0 , 0x400 , CRC(c1eabf25))
-                
+		// ROM definition of PIO controller (8041A)
+		ROM_REGION(0x400 , "iocpio" , 0)
+		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(9a446534))
+
 		// ROM definition of keyboard controller (8741)
 		ROM_REGION(0x400 , "kbcpu" , 0)
 		ROM_LOAD("kbd511.bin" , 0 , 0x400 , CRC(ba7c4303) SHA1(19899af732d0ae1247bfc79979b1ee5f339ee5cf))
