@@ -29,6 +29,7 @@ newoption {
 		{ "pnacl",         "Native Client - PNaCl"  },
 		{ "qnx-arm",       "QNX/Blackberry - ARM"   },
 		{ "rpi",           "RaspberryPi"            },
+		{ "solaris", 	   "Solaris"                },
 	},
 }
 
@@ -167,6 +168,11 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
 		end
+
+		if "solaris" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-solaris")
+		end
+
 
 		if "linux-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "clang"
@@ -449,6 +455,34 @@ function toolchain(_buildDir, _subDir)
 			"-m64",
 		}
 		
+	configuration { "solaris", "x32" }
+		targetdir (_buildDir .. "solaris" .. "/bin/x32")
+		objdir (_buildDir .. "solaris" .. "/obj")
+		buildoptions {
+			"-m32",
+		}
+
+	configuration { "solaris", "x64" }
+		targetdir (_buildDir .. "solaris" .. "/bin/x64")
+		objdir (_buildDir .. "solaris" .. "/obj")
+		buildoptions {
+			"-m64",
+		}
+
+	configuration { "freebsd", "x32" }
+		targetdir (_buildDir .. "freebsd" .. "/bin/x32")
+		objdir (_buildDir .. "freebsd" .. "/obj")
+		buildoptions {
+			"-m32",
+		}
+
+	configuration { "freebsd", "x64" }
+		targetdir (_buildDir .. "freebsd" .. "/bin/x64")
+		objdir (_buildDir .. "freebsd" .. "/obj")
+		buildoptions {
+			"-m64",
+		}
+		
 	configuration { "android-*" }
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/include",
@@ -579,10 +613,6 @@ function toolchain(_buildDir, _subDir)
 			"-Wno-unknown-warning-option",
 			"-Wno-extern-c-compat",
 		}
-
-	configuration { "freebsd" }
-		targetdir (_buildDir .. "freebsd" .. "/bin")
-		objdir (_buildDir .. "freebsd" .. "/obj")
 
 	configuration { "nacl or nacl-arm or pnacl" }
 		buildoptions {

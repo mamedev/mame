@@ -59,8 +59,12 @@ function mainProject(_target, _subtarget)
 		"zlib",
 		"jsoncpp",
 		"mongoose",
-		"portmidi",
 	}
+	if _OPTIONS["NO_USE_MIDI"]=="0" then
+		links {
+			"portmidi",
+		}
+	end
 	if (USE_BGFX == 1) then
 		links {
 			"bgfx"

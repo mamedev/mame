@@ -54,6 +54,7 @@
 			{ "bsd",      "OpenBSD, NetBSD, or FreeBSD" },
 			{ "linux",    "Linux" },
 			{ "macosx",   "Apple Mac OS X" },
+			{ "solaris",  "Solaris" },
 			{ "windows",  "Microsoft Windows" },
 		}
 	}

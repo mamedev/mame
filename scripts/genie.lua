@@ -80,6 +80,7 @@ newoption {
 		{ "windows",       "Windows"                },
 		{ "os2",           "OS/2 eComStation"       },
 		{ "haiku",         "Haiku"                  },
+		{ "solaris",       "Solaris SunOS"          },
 	},
 }
 
@@ -767,9 +768,14 @@ end
 -- warnings only applicable to C compiles
 	buildoptions_c {
 		"-Wpointer-arith",
-		"-Wbad-function-cast",
 		"-Wstrict-prototypes",
 	}
+	
+if _OPTIONS["targetos"]~="freebsd" then
+	buildoptions_c {
+		"-Wbad-function-cast",
+	}
+end
 
 -- warnings only applicable to OBJ-C compiles
 	buildoptions_objc {

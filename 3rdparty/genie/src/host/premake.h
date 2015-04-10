@@ -18,6 +18,9 @@
 #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 #define PLATFORM_BSD      (1)
 #define PLATFORM_STRING   "bsd"
+#elif defined(__sun__) || defined(__svr4__)
+#define PLATFORM_SOLARIS  (1)
+#define PLATFORM_STRING   "solaris"
 #elif defined(__APPLE__) && defined(__MACH__)
 #define PLATFORM_MACOSX   (1)
 #define PLATFORM_STRING   "macosx"

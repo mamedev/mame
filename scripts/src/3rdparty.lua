@@ -383,7 +383,7 @@ project "sqllite3"
 --------------------------------------------------
 -- portmidi library objects
 --------------------------------------------------
-
+if _OPTIONS["NO_USE_MIDI"]=="0" then
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
 	kind "StaticLib"
@@ -433,7 +433,7 @@ project "portmidi"
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end
-	
+end	
 --------------------------------------------------
 -- BGFX library objects
 --------------------------------------------------
@@ -464,7 +464,12 @@ project "bgfx"
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/osx",
 		}
-	
+		
+	configuration { "freebsd" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
 	configuration { "gmake" }
 		buildoptions {		
 			"-Wno-uninitialized",
