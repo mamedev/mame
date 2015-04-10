@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	}
 	catch(...)
 	{
-		printf("Exception occured");
+		printf("Exception occurred");
 		return 1000;
 	}
 }

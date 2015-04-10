@@ -63,7 +63,7 @@ public:
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_drq_cb.set_callback(object); }
 
-	// any publically accessible interfaces needed for runtime
+	// any publicly accessible interfaces needed for runtime
 	DECLARE_READ8_MEMBER( mb89352_r );
 	DECLARE_WRITE8_MEMBER( mb89352_w );
 

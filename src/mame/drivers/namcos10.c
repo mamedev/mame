@@ -28,7 +28,7 @@ Kotoba no Puzzle Mojipittan (KPM1 Ver.A)         (C) Namco, 2001
 Mr Driller 2 (DR21 Ver.A)                        (C) Namco, 2000
 Mr Driller 2 (DR22 Ver.A)                        (C) Namco, 2000
 Mr Driller G (DRG1 Ver.A)                        (C) Namco, 2001
-NFL Classic Football (NCF3 Ver.A)                (C) Namco, 2003 - Has a noticable red dot the right right of the version printed on PCB.  Something to determine region?
+NFL Classic Football (NCF3 Ver.A)                (C) Namco, 2003 - Has a noticeable red dot on the right of the version printed on PCB.  Something to determine region?
 Panicuru Panekuru (PPA1 Ver.A)                   (C) Namco, 2001
 *Photo Battole                                   (C) Namco, 2001
 Point Blank 3 / Gunbalina (GNN2 Ver. A)          (C) Namco, 2000

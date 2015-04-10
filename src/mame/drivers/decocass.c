@@ -1108,7 +1108,7 @@ ROM_START( clocknch )
 ROM_END
 
 /* 13 */
-/* Photo of Dongle shows DP-1130B (the "B" is in a seperate white box then the DP-1130 label) */
+/* Photo of Dongle shows DP-1130B (the "B" is in a separate white box then the DP-1130 label) */
 ROM_START( cprogolf ) // version 9-B-0
 	DECOCASS_BIOS_B_ROMS
 
@@ -1152,7 +1152,7 @@ ROM_START( cdsteljn ) // version 4-A-3
 ROM_END
 
 /* 15 Lucky Poker */
-/* Photo of Dongle shows DP-1150B (the "B" is in a seperate white box then the DP-1150 label) */
+/* Photo of Dongle shows DP-1150B (the "B" is in a separate white box then the DP-1150 label) */
 ROM_START( cluckypo )
 	DECOCASS_BIOS_B_ROMS
 
@@ -1213,7 +1213,7 @@ ROM_START( ctisland3 )
 ROM_END
 
 /* 18 Explorer */
-/* Photo of Dongle shows DP-1180B (the "B" is in a seperate white box then the DP-1180 label) */
+/* Photo of Dongle shows DP-1180B (the "B" is in a separate white box then the DP-1180 label) */
 ROM_START( cexplore )
 	DECOCASS_BIOS_B_ROMS
 
@@ -1233,7 +1233,7 @@ ROM_END
 
 /* 19 Disco No.1 / Sweet Heart */
 ROM_START( cdiscon1 )
-/* Photo of Dongle shows DP-1190B (the "B" is in a seperate white box then the DP-1190 label) */
+/* Photo of Dongle shows DP-1190B (the "B" is in a separate white box then the DP-1190 label) */
 	DECOCASS_BIOS_B_ROMS
 
 	ROM_REGION( 0x00800, "dongle", 0 )    /* dongle data */
@@ -1265,7 +1265,7 @@ ROM_START( ctornado )
 ROM_END
 
 /* 21 Mission-X */
-/* Photo of Dongle shows DP-121B with Cassette DT-1213B (the "3B" is in a seperate white box then the DP-121 label) */
+/* Photo of Dongle shows DP-121B with Cassette DT-1213B (the "3B" is in a separate white box then the DP-121 label) */
 ROM_START( cmissnx )
 	DECOCASS_BIOS_B_ROMS
 
@@ -1314,7 +1314,7 @@ ROM_END
 
 
 /* 26 Hamburger / Burger Time */
-/* Photo of Dongle shows DP-126B with Cassette DT-1267B (the "7B" is in a seperate white box then the DP-126 label) */
+/* Photo of Dongle shows DP-126B with Cassette DT-1267B (the "7B" is in a separate white box then the DP-126 label) */
 ROM_START( cbtime ) // version 7-B-0
 	DECOCASS_BIOS_B_ROMS
 
@@ -1336,7 +1336,7 @@ ROM_START( chamburger ) // version 0-A-0
 ROM_END
 
 /* 27 Burnin' Rubber / Bump 'n' Jump */
-/* Photo of Dongle shows DP-127B with Cassette DP-1275B (the "5B" is in a seperate white box then the DP-127 label) */
+/* Photo of Dongle shows DP-127B with Cassette DP-1275B (the "5B" is in a separate white box then the DP-127 label) */
 ROM_START( cburnrub )
 	DECOCASS_BIOS_B_ROMS
 

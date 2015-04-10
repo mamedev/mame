@@ -33,7 +33,7 @@ One GFX ROM is bad though.
 See A30-26.u23\A30-26.txt for details about the bad ROM.
 To summarise:
   Dumps from GFX ROM A30-26.u23 were inconsistent. Reads with checksums
-  41A3 and 415F occured a couple of times, and the difference is one byte
+  41A3 and 415F occurred a couple of times, and the difference is one byte
   at offset $0004 (data $CC or $88). Maybe one of these reads is correct
   or closest to the real ROM. We are using the one with checksum 415F,
   the other one makes one sprite looks worse.

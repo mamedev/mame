@@ -124,7 +124,7 @@
  * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
  * - Handle internal ram better (debugger visible)
  *  - Fixed port reading
- *  - Rewrote Macros for better readibility
+ *  - Rewrote Macros for better readability
  *  - Fixed and rewrote Interrupt handling
  *  - Now returns INTERNAL_DIVIDER, adjusted cycle counts
  *  - Remove unnecessary and duplicated code

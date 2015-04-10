@@ -627,7 +627,7 @@ void hdc9234_device::read_id(int& cont, bool implied_seek, bool wait_seek_comple
 			break;
 
 		case READ_ID1:
-			// If an error occured (no IDAM found), terminate the command
+			// If an error occurred (no IDAM found), terminate the command
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
 				if (TRACE_FAIL) logerror("%s: READ_ID failed to find any IDAM\n", tag());
@@ -735,7 +735,7 @@ void hdc9234_device::verify(int& cont, bool verify_all)
 
 			if (TRACE_VERIFY && TRACE_SUBSTATES) logerror("%s: substate VERIFY\n", tag());
 
-			// If an error occured (no IDAM found), terminate the command
+			// If an error occurred (no IDAM found), terminate the command
 			// (This test is only relevant when we did not have a seek phase before)
 			if ((m_register_r[CHIP_STATUS] & CS_SYNCERR) != 0)
 			{
@@ -1757,7 +1757,7 @@ void hdc9234_device::write_sectors()
     state machine attempts to find marks on the track, starting from the current
     position. When found, it waits for the machine to catch up. When an event
     happens in the meantime, the state machine is rolled back, and the actions
-    are replayed until the position where the event occured.
+    are replayed until the position where the event occurred.
 
     Lots of code is taken from wd_fdc, with some minor restructuring and renaming.
     Same ideas, though. More comments.

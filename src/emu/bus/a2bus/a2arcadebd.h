@@ -2,7 +2,7 @@
 
     a2arcadebd.h
 
-    Third Millenium Engineering Arcade Board
+    Third Millennium Engineering Arcade Board
 
 *********************************************************************/
 

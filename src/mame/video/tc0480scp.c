@@ -690,7 +690,7 @@ Historical Issues
    TC0480SCP_ctrl_word_write.
 
 4) Zoom movement was jagged: improved by bringing in scroll delta
-   values... but the results are noticably imperfect.
+   values... but the results are noticeably imperfect.
 
 **********************************************************************/
 

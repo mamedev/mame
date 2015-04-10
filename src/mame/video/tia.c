@@ -481,7 +481,7 @@ void tia_video_device::draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gf
 
 
 void tia_video_device::draw_missile_helper(UINT8* p, UINT8* col, int horz, int skipdelay, int latch, int start,
-	UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM)
+	UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUMN)
 {
 	int num = nusiz[NUSIZ & 7][0];
 	int skp = nusiz[NUSIZ & 7][2];
@@ -508,27 +508,27 @@ void tia_video_device::draw_missile_helper(UINT8* p, UINT8* col, int horz, int s
 							if ( horz >= 0 )
 							{
 								if ( horz < 156 ) {
-									p[(horz + 1) % 160] = COLUM >> 1;
-									col[(horz + 1) % 160] = COLUM >> 1;
+									p[(horz + 1) % 160] = COLUMN >> 1;
+									col[(horz + 1) % 160] = COLUMN >> 1;
 								}
-								p[horz % 160] = COLUM >> 1;
-								col[horz % 160] = COLUM >> 1;
+								p[horz % 160] = COLUMN >> 1;
+								col[horz % 160] = COLUMN >> 1;
 							}
 							break;
 						case 2:
 						case 3:
 							if ( horz >= 0 )
 							{
-								p[horz % 160] = COLUM >> 1;
-								col[horz % 160] = COLUM >> 1;
+								p[horz % 160] = COLUMN >> 1;
+								col[horz % 160] = COLUMN >> 1;
 							}
 							break;
 						}
 					} else {
 						if ( horz >= 0 )
 						{
-							p[horz % 160] = COLUM >> 1;
-							col[horz % 160] = COLUM >> 1;
+							p[horz % 160] = COLUMN >> 1;
+							col[horz % 160] = COLUMN >> 1;
 						}
 					}
 				}

@@ -64,7 +64,7 @@ U.S.A. Trivia              New Sports                 General Facts
  or alt: Adult Sex 2        or alt: Adult Sex 3        or alt: Gay Times
 
 NOTE: Trivia Question rom names are the internal names used. IE: read from the file with
-      a Hex Editor. Any "_alt" extention is used to seperate different roms with the same
+      a Hex Editor. Any "_alt" extention is used to separate different roms with the same
       label or internal name.
 
 */

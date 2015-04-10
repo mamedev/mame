@@ -487,7 +487,7 @@ UINT32 alto2_cpu_device::hamming_code(int write, UINT32 dw_addr, UINT32 dw_data)
  *
  * This register is a 'shadow MAR'; it holds the address of the
  * first error since the error status was last reset. If no error
- * has occured, MEAR reports the address of the most recent
+ * has occurred, MEAR reports the address of the most recent
  * memory access. Note that MEAR is set whenever an error of
  * _any kind_ (single-bit or double-bit) is detected.
  */
@@ -504,7 +504,7 @@ READ16_MEMBER( alto2_cpu_device::mear_r )
  * @brief memory error status register read
  *
  * This register reports specifics of the first error that
- * occured since MESR was last reset. Storing anything into
+ * occurred since MESR was last reset. Storing anything into
  * this register resets the error logic and enables it to
  * detect a new error. Bits are "low true", i.e. if the bit
  * is 0, the conidition is true.
@@ -513,7 +513,7 @@ READ16_MEMBER( alto2_cpu_device::mear_r )
  * MESR[6]  Parity error
  * MESR[7]  Memory parity bit
  * MESR[8-13]   Syndrome bits
- * MESR[14-15]  Bank number in which error occured
+ * MESR[14-15]  Bank number in which error occurred
  * </PRE>
  */
 READ16_MEMBER( alto2_cpu_device::mesr_r )
@@ -551,7 +551,7 @@ WRITE16_MEMBER( alto2_cpu_device::mesr_w )
  * the memory error logic. This register is set to all ones
  * (disable all interrupts) when the alto is bootstrapped
  * and when the parity error task first detects an error.
- * When an error has occured, MEAR and MESR should be read
+ * When an error has occurred, MEAR and MESR should be read
  * before setting MECR. Bits are "low true", i.e. a 0 bit
  * enables the condition.
  *

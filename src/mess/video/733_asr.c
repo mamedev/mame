@@ -8,7 +8,7 @@
     emulated).  The ASR is attached to the computer with a serial interface.
 
     References:
-    945401-9701 Model 990/4 Computer System Field Maintainance Manual p. C-1,
+    945401-9701 Model 990/4 Computer System Field Maintenance Manual p. C-1,
     945250-9701 990 Computer Family Systems Handbook pp. 5-9 through 5-16,
     0943442-9701 Model 990 Computer Reference Manual Preliminary pp. 3-13
     through 3-21 and 3-39 through 3-44.

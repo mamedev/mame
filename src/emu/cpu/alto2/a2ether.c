@@ -435,9 +435,9 @@ void alto2_cpu_device::eth_wakeup()
  * 'F401 is not in the data path, but only monitors the message. The
  * Error output becomes valid after the last check bit has been entered
  * into the 'F401 by a HIGH-to-LOW transition of CP'. If no detectable
- * errors have occured during the transmission, the resultant internal
+ * errors have occurred during the transmission, the resultant internal
  * register bits are all LOW and the Error Output (ER) is LOW.
- * If a detectable error has occured, ER is HIGH.
+ * If a detectable error has occurred, ER is HIGH.
  *
  * A HIGH on the Master Reset input (MR) asynchronously clears the
  * register. A LOW on the Preset input (P') asynchronously sets the

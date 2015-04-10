@@ -32,7 +32,7 @@ ROM_START( gfxultrp )
 	ROM_SYSTEM_BIOS( 0, "isa", "ISA BIOS 112-18900-100" )
 	ROMX_LOAD("gfxultrapro.bin", 0x00000, 0x8000, CRC(4e5effd7) SHA1(84ad3abf7653e4734bf39f5d5c8b88e74527e8ce), ROM_BIOS(1) )
 
-	// We can seperate out this BIOS once a proper VLB bus emulation is available
+	// We can separate out this BIOS once a proper VLB bus emulation is available
 	ROM_SYSTEM_BIOS( 1, "vlb", "VLB BIOS 113-19500-100" )
 	ROMX_LOAD("gfxultrapro_vlb.bin", 0x00000, 0x8000, CRC(5018f71e) SHA1(61321dfecf1bcdd8043836fabbe41786dbf3001b), ROM_BIOS(2) )
 ROM_END
@@ -43,7 +43,7 @@ ROM_START( mach64 )
 	ROM_SYSTEM_BIOS( 0, "isa", "ISA BIOS 112-28122-101" )
 	ROMX_LOAD("mach64.bin", 0x00000, 0x8000, CRC(1300aa8f) SHA1(dfc7f817900f125b89b0bda16fcb205f066a47fc), ROM_BIOS(1) )
 
-	// We can seperate out these BIOSes once a proper PCI and VLB bus emulation is available
+	// We can separate out these BIOSes once a proper PCI and VLB bus emulation is available
 	ROM_SYSTEM_BIOS( 1, "vlb_d", "VLB DRAM BIOS 113-27803-102" )
 	ROMX_LOAD("mach64_vlb_dram.bin", 0x00000, 0x8000, CRC(f2a24699) SHA1(580401a8bdfc379180a8d7d77305fc529b2a8374), ROM_BIOS(2) )
 

@@ -500,7 +500,7 @@ WRITE8_MEMBER(socrates_state::speech_command) // write 0x4x
    does not have the rom read mode, which the socrates definitely uses! */
 /* Commands (tc8802):
 SEL 5 4 3 2 1 0
-    0 0 n n n n -  ADLD - ADress LoaD - writes one nybble to the address
+    0 0 n n n n -  ADLD - ADdress LoaD - writes one nybble to the address
                           of vsm rom selected (internal or external) starting
                           from the low 4 bits; each subsequent write writes to
                           the next higher 4 bits; resetting the chip resets

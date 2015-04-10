@@ -108,7 +108,7 @@ struct hp48_card
 
 struct hp48_partition
 {
-		/* pointer to the begining of the partition inside the hp48_card */
+		/* pointer to the beginning of the partition inside the hp48_card */
 		UINT8* data;
 
 		/* size, in bytes (128 KB or less) */

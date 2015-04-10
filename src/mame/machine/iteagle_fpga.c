@@ -56,8 +56,8 @@ void iteagle_fpga_device::device_reset()
 	m_ctrl_regs[0x10/4] =  0x00000000; // 0xFFFFFFFF causes a write of 0xFFFEFFFF then 0xFFFFFFFF  // Not sure
 	// 0x00&0x2 == 1 for boot
 	m_fpga_regs[0x00/4] =  0xC0000002; // 0xCF000002;// byte 3 is voltage sensor? high = 0x40 good = 0xC0 0xF0 0xFF; //0x80 0x30 0x00FF = voltage low
-	//m_fpga_regs[0x308/4]=0x0000ffff; // Low 16 bits gets read alot?
-	m_fpga_regs[0x08/4]=0x00000000; // Low 16 bits gets read alot?
+	//m_fpga_regs[0x308/4]=0x0000ffff; // Low 16 bits get read a lot?
+	m_fpga_regs[0x08/4]=0x00000000; // Low 16 bits get read a lot?
 	m_prev_reg = 0;
 }
 

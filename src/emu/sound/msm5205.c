@@ -28,7 +28,7 @@
 
     Data is streamed from a CPU by means of a clock generated on the chip.
 
-    A reset signal is set high or low to determine whether playback (and interrupts) are occuring.
+    A reset signal is set high or low to determine whether playback (and interrupts) are occurring.
 
   MSM6585: is an upgraded MSM5205 voice synth IC.
    Improvements:

@@ -127,8 +127,8 @@
 #define OUTPUT_COMBINATORIAL          0x00000004
 #define OUTPUT_REGISTERED             0x00000008
 #define OUTPUT_FEEDBACK_OUTPUT        0x00000010 /* Feedback state depends on output enable */
-#define OUTPUT_FEEDBACK_COMBINATORIAL 0x00000020 /* Feedback state independant of output enable */
-#define OUTPUT_FEEDBACK_REGISTERED    0x00000040 /* Feedback state independant of output enable */
+#define OUTPUT_FEEDBACK_COMBINATORIAL 0x00000020 /* Feedback state independent of output enable */
+#define OUTPUT_FEEDBACK_REGISTERED    0x00000040 /* Feedback state independent of output enable */
 #define OUTPUT_FEEDBACK_NONE          0x00000080 /* Feedback not available */
 
 /*

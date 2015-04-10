@@ -2,7 +2,7 @@
 
     a2arcadeboard.c
 
-    Implementation of the Third Millenium Engineering Arcade Board
+    Implementation of the Third Millennium Engineering Arcade Board
 
     TODO:
         - VDPTEST program seems to want more than 16K of RAM, but docs/ads/press releases say 16k, period
@@ -56,7 +56,7 @@ machine_config_constructor a2bus_arcboard_device::device_mconfig_additions() con
 //**************************************************************************
 
 a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, A2BUS_ARCADEBOARD, "Third Millenium Engineering Arcade Board", tag, owner, clock, "a2arcbd", __FILE__),
+	device_t(mconfig, A2BUS_ARCADEBOARD, "Third Millennium Engineering Arcade Board", tag, owner, clock, "a2arcbd", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG),
 	m_ay(*this, AY_TAG)

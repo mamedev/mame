@@ -787,7 +787,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 #elif (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9940_ID)
 	/*16-bit data bus, 16-bit address bus (internal bus in the case of TMS9940)*/
 	/*Note that tms9900 actually never accesses a single byte : when performing byte operations,
-	it reads a 16-bit word, changes the revelant byte, then write a complete word.  You should
+	it reads a 16-bit word, changes the relevant byte, then write a complete word.  You should
 	remember this when writing memory handlers.*/
 	/*This does not apply to tms9995 and tms99xxx, but does apply to tms9980 (see below).*/
 
@@ -2342,7 +2342,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 /*
  * field_interrupt
  *
- * Determines whether if an interrupt is pending, and sets the revelant flag.
+ * Determines whether if an interrupt is pending, and sets the relevant flag.
  *
  * Called when an interrupt pin (LOAD*, INTREQ*, IC0-IC3) is changed, and when the interrupt mask
  * is modified.
@@ -2959,9 +2959,9 @@ static void contextswitch(tms99xx_state *cpustate, UINT16 addr)
 
 #if HAS_MAPPING || HAS_PRIVILEGE
 
-/* priviledged context switch, that occurs after a reset, interrupt or XOP:
-we enter priviledged mode and select map file 0 before doing the context switch */
-/* For CPU that have no priviledge support, contextswitchX would behave
+/* privileged context switch, that occurs after a reset, interrupt or XOP:
+we enter privileged mode and select map file 0 before doing the context switch */
+/* For CPU that have no privilege support, contextswitchX would behave
 identically to contextswitch, so we can call contextswitch in all cases. */
 static void contextswitchX(tms99xx_state *cpustate, UINT16 addr)
 {
@@ -2973,7 +2973,7 @@ static void contextswitchX(tms99xx_state *cpustate, UINT16 addr)
 	setstat(cpustate);
 	oldST = cpustate->STATUS;
 
-	/* enter priviledged mode and select map file 0 */
+	/* enter privileged mode and select map file 0 */
 	#if HAS_PRIVILEGE
 		cpustate->STATUS &= ~ ST_PR;
 	#endif
@@ -4951,7 +4951,7 @@ static void h4000b(tms99xx_state *cpustate, UINT16 opcode)
 		setst_byte_laep(cpustate, value);
 		#if (TMS99XX_MODEL <= TMS9985_ID)
 			/* On ti990/10 and tms9900, MOVB needs to read destination, because it cannot actually
-			  read one single byte.  It reads a word, replaces the revelant byte, then write
+			  read one single byte.  It reads a word, replaces the relevant byte, then write
 			  the result.  A tms9980 should not need to do so, but still does, because it is just
 			  a tms9900 with a 16 to 8 bit multiplexer (instead of a new chip design, like tms9995). */
 			(void)readbyteX(cpustate, dest, dst_map);

@@ -29,7 +29,7 @@
 #define MAC_539X_2_TAG "539x_2"
 #define MACKBD_TAG "mackbd"
 
-// uncomment to run i8021 keyboard in orignal Mac/512(e)/Plus
+// uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
 
 // model helpers

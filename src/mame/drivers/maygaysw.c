@@ -271,7 +271,7 @@ MAYGAY M2 - London Underground SWP game
 Dumped by Andy Welburn on a sunny morning 10/03/07
 
 *************************************************
-**Do not seperate this text file from the roms.**
+**Do not separate this text file from the roms.**
 *************************************************
 
 filename:   label:          location    type

@@ -68,7 +68,7 @@ public:
 						/*                               end is ready to accept it */
 		DSR = 0x0004, /* Data Set ready.      (INPUT)  Other end of connection has data */
 		DTR = 0x0008, /* Data terminal Ready. (OUTPUT) TX contains new data. */
-		RX  = 0x0010, /* Recieve data.        (INPUT)  */
+		RX  = 0x0010, /* Receive data.        (INPUT)  */
 		TX  = 0x0020  /* TX = Transmit data.  (OUTPUT) */
 	};
 

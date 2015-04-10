@@ -86,7 +86,7 @@ CPU_DISASSEMBLE( apexc )
 	UINT32 instruction;         /* 32-bit machine instruction */
 	int x, y, function, c6, vector; /* instruction fields */
 	int n;                      /* 'friendly', instruction-dependant interpretation of C6 */
-	const instr_desc *the_desc; /* pointer to the revelant entry in the instructions array */
+	const instr_desc *the_desc; /* pointer to the relevant entry in the instructions array */
 	char mnemonic[9];           /* storage for generated mnemonic */
 
 	/* read the instruction to disassemble */
@@ -99,7 +99,7 @@ CPU_DISASSEMBLE( apexc )
 	c6 = (instruction >> 1) & 0x3F;
 	vector = instruction & 1;
 
-	/* get the revelant entry in instructions */
+	/* get the relevant entry in instructions */
 	the_desc = & instructions[function >> 1];
 
 	/* generate mnemonic : append a 'v' to the basic mnemonic if it is a vector instruction */
