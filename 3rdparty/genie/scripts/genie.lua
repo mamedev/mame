@@ -66,7 +66,13 @@
 		configuration "bsd"
 			targetdir   "../bin/bsd"
 
-		configuration "linux or bsd"
+		configuration "solaris"
+			targetdir   "../bin/solaris"
+			defines     { "_REENTRANT" }
+			buildoptions { "-std=gnu99" }
+			links       { "dl" }
+
+		configuration "linux or bsd or solaris"
 			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
 			links       { "m" }
 			linkoptions { "-rdynamic" }

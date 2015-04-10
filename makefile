@@ -100,18 +100,27 @@ OS := linux
 endif
 ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
 OS := solaris
+GENIEOS := solaris
+endif
+ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
+OS := solaris
+GENIEOS := solaris
 endif
 ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 OS := freebsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
 OS := freebsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
 OS := netbsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
 OS := openbsd
+GENIEOS := bsd
 endif
 ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 OS := macosx
@@ -245,6 +254,14 @@ OSD := windows
 endif
 
 ifeq ($(TARGETOS),linux)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),freebsd)
+OSD := sdl
+endif
+
+ifeq ($(TARGETOS),solaris)
 OSD := sdl
 endif
 
@@ -576,7 +593,9 @@ PYTHON_AVAILABLE := $(shell $(PYTHON) --version > NUL 2>&1 && echo python)
 CHECK_CLANG      :=
 else
 GCC_VERSION      := $(shell $(subst @,,$(CC)) -dumpversion 2> /dev/null)
+ifneq ($(OS),solaris)
 CLANG_VERSION    := $(shell clang --version  2> /dev/null | grep 'LLVM [0-9]\.[0-9]' -o | grep '[0-9]\.[0-9]' -o | head -n 1)
+endif
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 CHECK_CLANG      := $(shell gcc --version  2> /dev/null | grep 'clang' | head -n 1)
 endif
@@ -839,6 +858,45 @@ xcode4: generate
 
 xcode4-ios: generate
 	$(SILENT) $(GENIE) $(PARAMS) --targetos=macosx --xcode=ios xcode4
+
+#-------------------------------------------------
+# gmake-solaris
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: solaris_x64
+solaris_x64: generate $(PROJECTDIR)/gmake-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-solaris config=$(CONFIG)64
+
+.PHONY: solaris
+solaris: solaris_x86
+
+.PHONY: solaris_x86
+solaris_x86: generate $(PROJECTDIR)/gmake-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-solaris config=$(CONFIG)32
+
+
+#-------------------------------------------------
+# gmake-freebsd
+#-------------------------------------------------
+
+
+$(PROJECTDIR)/gmake-freebsd/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=freebsd --gcc_version=$(GCC_VERSION) gmake
+
+.PHONY: freebsd_x64
+freebsd_x64: generate $(PROJECTDIR)/gmake-freebsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)64
+
+.PHONY: freebsd
+freebsd: freebsd_x86
+
+.PHONY: freebsd_x86
+freebsd_x86: generate $(PROJECTDIR)/gmake-freebsd/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/gmake-freebsd config=$(CONFIG)32
 
 
 #-------------------------------------------------
