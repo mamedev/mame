@@ -110,8 +110,6 @@ protected:
 
 		attotime edge;
 		UINT16 shift_reg;
-		int cycle_counter;
-		int cell_counter;
 		int bit_counter;
 		UINT8 e;
 		offs_t i;

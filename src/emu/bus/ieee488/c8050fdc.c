@@ -230,8 +230,6 @@ void c8050_fdc_t::live_start()
 
 	cur_live.shift_reg = 0;
 	cur_live.shift_reg_write = 0;
-	cur_live.cycle_counter = 0;
-	cur_live.cell_counter = 0;
 	cur_live.bit_counter = 0;
 	cur_live.ds = m_ds;
 	cur_live.drv_sel = m_drv_sel;
@@ -395,12 +393,12 @@ void c8050_fdc_t::live_run(const attotime &limit)
 
 			// GCR decoder
 			if (cur_live.rw_sel) {
-				cur_live.i = cur_live.shift_reg;
+				cur_live.i = (cur_live.rw_sel << 10) | cur_live.shift_reg;
 			} else {
-				cur_live.i = ((cur_live.pi & 0xf0) << 1) | (cur_live.mode_sel << 4) | (cur_live.pi & 0x0f);
+				cur_live.i = (cur_live.rw_sel << 10) | ((cur_live.pi & 0xf0) << 1) | (cur_live.mode_sel << 4) | (cur_live.pi & 0x0f);
 			}
 
-			cur_live.e = m_gcr_rom->base()[cur_live.rw_sel << 10 | cur_live.i];
+			cur_live.e = m_gcr_rom->base()[cur_live.i];
 
 			if (LOG) logerror("%s cyl %u bit %u sync %u bc %u sr %03x i %03x e %02x\n",cur_live.tm.as_string(),get_floppy()->get_cyl(),bit,sync,cur_live.bit_counter,cur_live.shift_reg,cur_live.i,cur_live.e);
 

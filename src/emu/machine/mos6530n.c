@@ -367,7 +367,7 @@ READ8_MEMBER( mos6530_t::pb_data_r )
 	UINT8 data = (out & ddr_out) | (in & ddr_in);
 
 	if (LOG) logerror("%s %s MOS6530 '%s' Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
-logerror("PB data read %02x\n",data);
+
 	return data;
 }
 
