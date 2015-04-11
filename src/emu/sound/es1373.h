@@ -1,5 +1,7 @@
 // Creative Labs Ensonic AudioPCI97 ES1373
 
+#pragma once
+
 #ifndef ES1373_H
 #define ES1373_H
 
@@ -64,15 +66,21 @@
 #define SCTRL_P2_S_MASK       0x0000000C
 #define SCTRL_P1_S_MASK       0x00000003
 
+#define SCTRL_8BIT_MONO				0x0
+#define SCTRL_8BIT_STEREO			0x1
+#define SCTRL_16BIT_MONO			0x2
+#define SCTRL_16BIT_STEREO		0x3
+
 #define ES_PCI_READ 0
 #define ES_PCI_WRITE 1
 
 struct chan_info {
+	int number;
 	bool enable;
 	bool int_en;
 	bool loop_en;
 	bool initialized;
-	UINT32 samp_size;    // Size of one sample in log2(bytes)
+	UINT8  format;       // Format of channel
 	UINT32 buf_wptr;     // Address to sample cache memory
 	UINT32 buf_rptr;     // Address to sample cache memory
 	UINT16 buf_count;    // Number of samples that have been played
@@ -82,7 +90,8 @@ struct chan_info {
 	UINT16 pci_size;     // Total number of words (32 bits) minus one in system memory
 };
 
-class es1373_device : public pci_device {
+class es1373_device : public pci_device, public device_sound_interface
+{
 public:
 	es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual void map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
@@ -92,16 +101,26 @@ public:
 
 	DECLARE_READ32_MEMBER (reg_r);
 	DECLARE_WRITE32_MEMBER(reg_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(es_timer_callback);
+
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
+
+	// Sound stream
+	sound_stream *m_stream;
+
 protected:
 	virtual void device_start();
+	virtual void device_stop();
 	virtual void device_reset();
-	address_space *m_memory_space;
-	//virtual const address_space_config *memory_space_config(address_spacenum spacenum) const;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	FILE *m_eslog;
 
 private:
+	UINT32 m_tempCount;
+	emu_timer *m_timer;
+	address_space *m_memory_space;
 	const char *m_cpu_tag;
 	cpu_device *m_cpu;
 	int m_irq_num;
@@ -114,6 +133,9 @@ private:
 	chan_info m_dac2;
 	chan_info m_adc;
 	void transfer_pci_audio(chan_info& chan, int type);
+	UINT32 calc_size(const UINT8 &format);
+	void send_audio_out(chan_info& chan, UINT32 intr_mask, stream_sample_t *outL, stream_sample_t *outR, int samples);
+
 };
 
 extern const device_type ES1373;

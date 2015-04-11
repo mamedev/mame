@@ -1,10 +1,9 @@
 #include "voodoo_pci.h"
 
 static MACHINE_CONFIG_FRAGMENT( voodoo_pci )
-	MCFG_DEVICE_ADD("voodoo", VOODOO_BANSHEE, STD_VOODOO_BANSHEE_CLOCK)
+	MCFG_DEVICE_ADD("voodoo", VOODOO_3, STD_VOODOO_3_CLOCK)
 	MCFG_VOODOO_FBMEM(16)
 	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG(":maincpu")
 MACHINE_CONFIG_END
 
 machine_config_constructor voodoo_pci_device::device_mconfig_additions() const
@@ -18,7 +17,7 @@ DEVICE_ADDRESS_MAP_START(reg_map, 32, voodoo_pci_device)
 	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_r, banshee_w)
 ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(lfb_map, 32, voodoo_pci_device)
-	AM_RANGE(0x0, 0x00ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_fb_r, banshee_fb_w)
+	AM_RANGE(0x0, 0x01ffffff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_fb_r, banshee_fb_w)
 ADDRESS_MAP_END
 DEVICE_ADDRESS_MAP_START(io_map, 32, voodoo_pci_device)
 	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("voodoo", voodoo_banshee_device, banshee_io_r, banshee_io_w)
@@ -30,11 +29,17 @@ voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *
 {
 }
 
+void voodoo_pci_device::set_cpu_tag(const char *_cpu_tag)
+{
+	cpu_tag = _cpu_tag;
+}
+
 void voodoo_pci_device::device_start()
 {
+	voodoo_device::static_set_cpu_tag(m_voodoo, cpu_tag);
 	pci_device::device_start();
 	add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::reg_map));
-	add_map(16*1024*1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
+	add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
 	add_map(256, M_IO, FUNC(voodoo_pci_device::io_map));
 }
 

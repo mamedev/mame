@@ -60,6 +60,7 @@ void vrc4373_device::device_start()
 	m_simm_size = 1<<21;
 	m_simm_base = 0;
 	regenerate_config_mapping();
+
 }
 
 void vrc4373_device::device_reset()
