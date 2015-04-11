@@ -1149,7 +1149,7 @@ UINT32 cirrus_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	UINT32 ptr = (vga.svga_intf.vram_size - 0x4000);  // cursor patterns are stored in the last 16kB of VRAM
 	svga_device::screen_update(screen, bitmap, cliprect);
 
-	UINT8 cur_mode = pc_vga_choosevideomode();
+	//UINT8 cur_mode = pc_vga_choosevideomode();
 
 	if(m_cursor_attr & 0x01)  // hardware cursor enabled
 	{
