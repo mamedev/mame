@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "%s", "WARNING: This is Work In Progress! - It may fail anytime\n");
 	if (!opts.parse_command_line(argc, argv, OPTION_PRIORITY_DEFAULT, aerror))
 	{
-		fprintf(stderr, "%s\n", aerror.cstr());
+		fprintf(stderr, "%s\n", aerror.c_str());
 		usage(opts);
 		return 1;
 	}

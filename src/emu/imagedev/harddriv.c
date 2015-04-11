@@ -179,7 +179,7 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 	astring fname(name, ".dif");
 
 	/* try to open the diff */
-	//printf("Opening differencing image file: %s\n", fname.cstr());
+	//printf("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
 	file_error filerr = diff_file.open(fname);
 	if (filerr == FILERR_NONE)
@@ -187,12 +187,12 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 		astring fullpath(diff_file.fullpath());
 		diff_file.close();
 
-		//printf("Opening differencing image file: %s\n", fullpath.cstr());
+		//printf("Opening differencing image file: %s\n", fullpath.c_str());
 		return diff_chd.open(fullpath, true, &source);
 	}
 
 	/* didn't work; try creating it instead */
-	//printf("Creating differencing image: %s\n", fname.cstr());
+	//printf("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	filerr = diff_file.open(fname);
 	if (filerr == FILERR_NONE)
@@ -201,7 +201,7 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 		diff_file.close();
 
 		/* create the CHD */
-		//printf("Creating differencing image file: %s\n", fullpath.cstr());
+		//printf("Creating differencing image file: %s\n", fullpath.c_str());
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
 		chd_error err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
 		if (err != CHDERR_NONE)

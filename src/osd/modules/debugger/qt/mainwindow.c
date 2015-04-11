@@ -138,7 +138,7 @@ void MainWindow::setProcessor(device_t* processor)
 	// Window title
 	astring title;
 	title.printf("Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
-	setWindowTitle(title.cstr());
+	setWindowTitle(title.c_str());
 }
 
 
@@ -466,7 +466,7 @@ void MainWindow::createImagesMenu()
 		astring menuName;
 		menuName.format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 
-		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.cstr());
+		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.c_str());
 		interfaceMenu->setObjectName(img->device().name());
 
 		QAction* mountAct = new QAction("Mount...", interfaceMenu);

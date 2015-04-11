@@ -134,7 +134,7 @@ void debug_view_breakpoints::enumerate_sources()
 	{
 		astring name;
 		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*global_alloc(debug_view_source(name.cstr(), &dasm->device())));
+		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
 	// reset the source to a known good entry
@@ -196,7 +196,7 @@ void debug_view_breakpoints::pad_astring_to_length(astring& str, int len)
 		buffer.expand(diff);
 		for (int i = 0; i < diff; i++)
 			buffer.catprintf(" ");
-		str.catprintf("%s", buffer.cstr());
+		str.catprintf("%s", buffer.c_str());
 	}
 }
 

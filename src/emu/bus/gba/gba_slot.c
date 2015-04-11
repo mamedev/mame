@@ -307,7 +307,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
 			chip |= GBA_CHIP_RTC;
 	}
-	osd_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).cstr());
+	osd_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).c_str());
 
 	// fix for games which return more than one kind of chip: either it is one of the known titles, or we default to no battery
 	if (gba_chip_has_conflict(chip))
@@ -364,7 +364,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		chip &= ~GBA_CHIP_RTC;
 	}
 
-	osd_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).cstr());
+	osd_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).c_str());
 
 	switch (chip)
 	{

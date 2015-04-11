@@ -153,7 +153,7 @@ int cli_frontend::execute(int argc, char **argv)
 												val.printf("%s:%s:%s", swlistdev->list_name(), m_options.software_name(), swpart->name());
 
 												// call this in order to set slot devices according to mounting
-												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.cstr());
+												m_options.parse_slot_devices(argc, argv, option_errors, image->instance_name(), val.c_str());
 												break;
 											}
 										}
@@ -184,10 +184,10 @@ int cli_frontend::execute(int argc, char **argv)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
 			// otherwise, error on the options
-			throw emu_fatalerror(MAMERR_INVALID_CONFIG, "%s", option_errors.trimspace().cstr());
+			throw emu_fatalerror(MAMERR_INVALID_CONFIG, "%s", option_errors.trimspace().c_str());
 		}
 		if (option_errors)
-			osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().cstr());
+			osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().c_str());
 
 		// determine the base name of the EXE
 		astring exename;
@@ -208,7 +208,7 @@ int cli_frontend::execute(int argc, char **argv)
 				m_options.parse_standard_inis(option_errors);
 			}
 			if (option_errors)
-				osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().cstr());
+				osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().c_str());
 
 			// if we can't find it, give an appropriate error
 			const game_driver *system = m_options.system();
@@ -226,7 +226,7 @@ int cli_frontend::execute(int argc, char **argv)
 	catch (emu_fatalerror &fatal)
 	{
 		astring string(fatal.string());
-		osd_printf_error("%s\n", string.trimspace().cstr());
+		osd_printf_error("%s\n", string.trimspace().c_str());
 		m_result = (fatal.exitcode() != 0) ? fatal.exitcode() : MAMERR_FATALERROR;
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
@@ -328,7 +328,7 @@ void cli_frontend::listsource(const char *gamename)
 	// iterate through drivers and output the info
 	astring filename;
 	while (drivlist.next())
-		osd_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(filename, drivlist.driver().source_file).cstr());
+		osd_printf_info("%-16s %s\n", drivlist.driver().name, core_filename_extract_base(filename, drivlist.driver().source_file).c_str());
 }
 
 
@@ -418,7 +418,7 @@ void cli_frontend::listbrothers(const char *gamename)
 	while (drivlist.next())
 	{
 		int clone_of = drivlist.clone();
-		osd_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(filename, drivlist.driver().source_file).cstr(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
+		osd_printf_info("%-16s %-16s %-16s\n", core_filename_extract_base(filename, drivlist.driver().source_file).c_str(), drivlist.driver().name, (clone_of == -1 ? "" : drivlist.driver(clone_of).name));
 	}
 }
 
@@ -726,14 +726,14 @@ void cli_frontend::listmedia(const char *gamename)
 			paren_shortname.format("(%s)", imagedev->brief_instance_name());
 
 			// output the line, up to the list of extensions
-			printf("%-13s%-12s%-8s   ", first ? drivlist.driver().name : "", imagedev->instance_name(), paren_shortname.cstr());
+			printf("%-13s%-12s%-8s   ", first ? drivlist.driver().name : "", imagedev->instance_name(), paren_shortname.c_str());
 
 			// get the extensions and print them
 			astring extensions(imagedev->file_extensions());
 			for (int start = 0, end = extensions.chr(0, ','); ; start = end + 1, end = extensions.chr(start, ','))
 			{
 				astring curext(extensions, start, (end == -1) ? extensions.len() - start : end - start);
-				printf(".%-5s", curext.cstr());
+				printf(".%-5s", curext.c_str());
 				if (end == -1)
 					break;
 			}
@@ -782,7 +782,7 @@ void cli_frontend::verifyroms(const char *gamename)
 			// output the summary of the audit
 			astring summary_string;
 			auditor.summarize(drivlist.driver().name,&summary_string);
-			osd_printf_info("%s", summary_string.cstr());
+			osd_printf_info("%s", summary_string.c_str());
 
 			// output the name of the driver and its clone
 			osd_printf_info("romset %s ", drivlist.driver().name);
@@ -842,7 +842,7 @@ void cli_frontend::verifyroms(const char *gamename)
 							// output the summary of the audit
 							astring summary_string;
 							auditor.summarize(dev->shortname(),&summary_string);
-							osd_printf_info("%s", summary_string.cstr());
+							osd_printf_info("%s", summary_string.c_str());
 
 							// display information about what we discovered
 							osd_printf_info("romset %s ", dev->shortname());
@@ -880,7 +880,7 @@ void cli_frontend::verifyroms(const char *gamename)
 				{
 					astring temptag("_");
 					temptag.cat(option->name());
-					device_t *dev = const_cast<machine_config &>(config).device_add(&config.root_device(), temptag.cstr(), option->devtype(), 0);
+					device_t *dev = const_cast<machine_config &>(config).device_add(&config.root_device(), temptag.c_str(), option->devtype(), 0);
 
 					// notify this device and all its subdevices that they are now configured
 					device_iterator subiter(*dev);
@@ -907,7 +907,7 @@ void cli_frontend::verifyroms(const char *gamename)
 									// output the summary of the audit
 									astring summary_string;
 									auditor.summarize(dev->shortname(),&summary_string);
-									osd_printf_info("%s", summary_string.cstr());
+									osd_printf_info("%s", summary_string.c_str());
 
 									// display information about what we discovered
 									osd_printf_info("romset %s ", dev->shortname());
@@ -938,7 +938,7 @@ void cli_frontend::verifyroms(const char *gamename)
 						}
 					}
 
-					const_cast<machine_config &>(config).device_remove(&config.root_device(), temptag.cstr());
+					const_cast<machine_config &>(config).device_remove(&config.root_device(), temptag.c_str());
 				}
 			}
 		}
@@ -1004,7 +1004,7 @@ void cli_frontend::verifysamples(const char *gamename)
 			// output the summary of the audit
 			astring summary_string;
 			auditor.summarize(drivlist.driver().name,&summary_string);
-			osd_printf_info("%s", summary_string.cstr());
+			osd_printf_info("%s", summary_string.c_str());
 
 			// output the name of the driver and its clone
 			osd_printf_info("sampleset %s ", drivlist.driver().name);
@@ -1322,7 +1322,7 @@ void cli_frontend::verifysoftware(const char *gamename)
 								// output the summary of the audit
 								astring summary_string;
 								auditor.summarize(swinfo->shortname(), &summary_string);
-								osd_printf_info("%s", summary_string.cstr());
+								osd_printf_info("%s", summary_string.c_str());
 
 								// display information about what we discovered
 								osd_printf_info("romset %s:%s ", swlistdev->list_name(), swinfo->shortname());
@@ -1444,7 +1444,7 @@ void cli_frontend::verifysoftlist(const char *gamename)
 							// output the summary of the audit
 							astring summary_string;
 							auditor.summarize(swinfo->shortname(), &summary_string);
-							osd_printf_info("%s", summary_string.cstr());
+							osd_printf_info("%s", summary_string.c_str());
 
 							// display information about what we discovered
 							osd_printf_info("romset %s:%s ", swlistdev->list_name(), swinfo->shortname());
@@ -1556,7 +1556,7 @@ void cli_frontend::execute_commands(const char *exename)
 	astring option_errors;
 	m_options.parse_standard_inis(option_errors);
 	if (option_errors)
-		osd_printf_error("%s\n", option_errors.cstr());
+		osd_printf_error("%s\n", option_errors.c_str());
 
 	// createconfig?
 	if (strcmp(m_options.command(), CLICOMMAND_CREATECONFIG) == 0)
@@ -1779,7 +1779,7 @@ void media_identifier::identify_file(const char *name)
 	{
 		// output the name
 		astring basename;
-		osd_printf_info("%-20s", core_filename_extract_base(basename, name).cstr());
+		osd_printf_info("%-20s", core_filename_extract_base(basename, name).c_str());
 		m_total++;
 
 		// attempt to open as a CHD; fail if not
@@ -1855,7 +1855,7 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 	// output the name
 	m_total++;
 	astring basename;
-	osd_printf_info("%-20s", core_filename_extract_base(basename, name).cstr());
+	osd_printf_info("%-20s", core_filename_extract_base(basename, name).c_str());
 
 	// see if we can find a match in the ROMs
 	int found = find_by_hash(hashes, length);

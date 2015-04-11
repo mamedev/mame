@@ -74,7 +74,7 @@ public:
 
 	// C string conversion operators and helpers
 	operator const char *() const { return m_text; }
-	const char *cstr() const { return m_text; }
+	const char *c_str() const { return m_text; }
 
 	// buffer management
 	astring &reset() { return cpy(""); }
@@ -86,19 +86,19 @@ public:
 	// copy helpers
 	astring &cpy(const char *src, int count);
 	astring &cpysubstr(const astring &src, int start, int count = -1);
-	astring &cpy(const astring &src) { return cpy(src.cstr(), src.len()); }
+	astring &cpy(const astring &src) { return cpy(src.c_str(), src.len()); }
 	astring &cpy(const char *src) { return cpy(src, strlen(src)); }
 
 	// insertion helpers
 	astring &ins(int insbefore, const char *src, int count);
 	astring &inssubstr(int insbefore, const astring &src, int start, int count = -1);
-	astring &ins(int insbefore, const astring &src) { return ins(insbefore, src.cstr(), src.len()); }
+	astring &ins(int insbefore, const astring &src) { return ins(insbefore, src.c_str(), src.len()); }
 	astring &ins(int insbefore, const char *src) { return ins(insbefore, src, strlen(src)); }
 
 	// concatenation helpers (== insert at end)
 	astring &cat(const char *src, int count) { return ins(-1, src, count); }
 	astring &catsubstr(const astring &src, int start, int count = -1) { return inssubstr(-1, src, start, count); }
-	astring &cat(const astring &src) { return ins(-1, src.cstr(), src.len()); }
+	astring &cat(const astring &src) { return ins(-1, src.c_str(), src.len()); }
 	astring &cat(const char *src) { return ins(-1, src, strlen(src)); }
 	astring &cat(char ch) { return ins(-1, &ch, 1); }
 
@@ -117,13 +117,13 @@ public:
 	// comparison helpers
 	int cmp(const char *str2, int count) const;
 	int cmpsubstr(const astring &str2, int start, int count = -1) const;
-	int cmp(const astring &str2) const { return cmp(str2.cstr(), str2.len()); }
+	int cmp(const astring &str2) const { return cmp(str2.c_str(), str2.len()); }
 	int cmp(const char *str2) const { return cmp(str2, strlen(str2)); }
 
 	// case-insensitive comparison helpers
 	int icmp(const char *str2, int count) const;
 	int icmpsubstr(const astring &str2, int start, int count = -1) const;
-	int icmp(const astring &str2) const { return icmp(str2.cstr(), str2.len()); }
+	int icmp(const astring &str2) const { return icmp(str2.c_str(), str2.len()); }
 	int icmp(const char *str2) const { return icmp(str2, strlen(str2)); }
 
 	// character searching helpers

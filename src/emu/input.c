@@ -531,7 +531,7 @@ bool joystick_map::parse(const char *mapstring)
 
 const char *joystick_map::to_string(astring &string) const
 {
-	string.printf("%s\n", m_origstring.cstr());
+	string.printf("%s\n", m_origstring.c_str());
 	for (int rownum = 0; rownum < 9; rownum++)
 	{
 		string.catprintf("  ");
@@ -1579,7 +1579,7 @@ input_code input_manager::code_from_token(const char *_token)
 
 	// first token should be the devclass
 	int curtok = 0;
-	input_device_class devclass = input_device_class((*devclass_token_table)[token[curtok++].cstr()]);
+	input_device_class devclass = input_device_class((*devclass_token_table)[token[curtok++].c_str()]);
 	if (devclass == ~0)
 		return INPUT_CODE_INVALID;
 
@@ -1594,7 +1594,7 @@ input_code input_manager::code_from_token(const char *_token)
 		return INPUT_CODE_INVALID;
 
 	// next token is the item ID
-	input_item_id itemid = input_item_id((*itemid_token_table)[token[curtok].cstr()]);
+	input_item_id itemid = input_item_id((*itemid_token_table)[token[curtok].c_str()]);
 	bool standard = (itemid != ~0);
 
 	// if we're a standard code, default the itemclass based on it
@@ -1632,7 +1632,7 @@ input_code input_manager::code_from_token(const char *_token)
 	input_item_modifier modifier = ITEM_MODIFIER_NONE;
 	if (curtok < numtokens)
 	{
-		modifier = input_item_modifier((*modifier_token_table)[token[curtok].cstr()]);
+		modifier = input_item_modifier((*modifier_token_table)[token[curtok].c_str()]);
 		if (modifier != ~0)
 			curtok++;
 		else
@@ -1642,7 +1642,7 @@ input_code input_manager::code_from_token(const char *_token)
 	// if we have another token, it is the item class
 	if (curtok < numtokens)
 	{
-		UINT32 temp = (*itemclass_token_table)[token[curtok].cstr()];
+		UINT32 temp = (*itemclass_token_table)[token[curtok].c_str()];
 		if (temp != ~0)
 		{
 			curtok++;
@@ -2020,7 +2020,7 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 
 	// loop until we're done
 	astring strcopy = string;
-	char *str = const_cast<char *>(strcopy.cstr());
+	char *str = const_cast<char *>(strcopy.c_str());
 	while (1)
 	{
 		// trim any leading spaces

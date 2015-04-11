@@ -130,7 +130,7 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 	if (device.machine().options().drc_log_uml())
 	{
 		astring filename("drcuml_", m_device.shortname(), ".asm");
-		m_umllog = fopen(filename.cstr(), "w");
+		m_umllog = fopen(filename.c_str(), "w");
 	}
 }
 
@@ -490,12 +490,12 @@ void drcuml_block::disassemble()
 			// include the first accumulated comment with this line
 			if (firstcomment != -1)
 			{
-				m_drcuml.log_printf("\t%-50.50s; %s\n", dasm.cstr(), get_comment_text(m_inst[firstcomment], comment));
+				m_drcuml.log_printf("\t%-50.50s; %s\n", dasm.c_str(), get_comment_text(m_inst[firstcomment], comment));
 				firstcomment++;
 				flushcomments = TRUE;
 			}
 			else
-				m_drcuml.log_printf("\t%s\n", dasm.cstr());
+				m_drcuml.log_printf("\t%s\n", dasm.c_str());
 		}
 
 		// flush any comments pending

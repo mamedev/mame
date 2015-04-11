@@ -328,7 +328,7 @@ int intv_cart_slot_device::load_fullpath()
 		}
 		else
 		{
-			sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+			sscanf(extrainfo.c_str() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 					&rom[3], &ram, &extra);
 			//printf("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2], rom[3], ram, extra);
 
@@ -483,7 +483,7 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 
 			if (hashfile_extrainfo(*this, extrainfo))
 			{
-				sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+				sscanf(extrainfo.c_str() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 						&rom[3], &ram, &extra);
 
 				if (ram)

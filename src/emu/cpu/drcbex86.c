@@ -569,7 +569,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 	if (device.machine().options().drc_log_native())
 	{
 		astring filename("drcbex86_", device.shortname(), ".asm");
-		m_log = x86log_create_context(filename.cstr());
+		m_log = x86log_create_context(filename.c_str());
 	}
 }
 
@@ -782,7 +782,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 		{
 			astring dasm;
 			inst.disasm(dasm, &m_drcuml);
-			x86log_add_comment(m_log, dst, "%s", dasm.cstr());
+			x86log_add_comment(m_log, dst, "%s", dasm.c_str());
 		}
 
 		// extract a blockname

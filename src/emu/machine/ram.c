@@ -162,7 +162,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		else
 			output.catprintf(").\n");
 
-		osd_printf_error("%s", output.cstr());
+		osd_printf_error("%s", output.c_str());
 
 		osd_printf_warning("Setting value to default %s\n",m_default_size);
 		astring error;

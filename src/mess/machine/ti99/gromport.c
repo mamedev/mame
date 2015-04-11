@@ -1227,7 +1227,7 @@ bool ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
 	// return true = error
-	if (VERBOSE>8) LOG("cartridge_device: loading %s in slot %s\n", m_basename.cstr(), tag());
+	if (VERBOSE>8) LOG("cartridge_device: loading %s in slot %s\n", m_basename.c_str(), tag());
 
 	if (m_softlist)
 	{
@@ -2286,7 +2286,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 				throw rpk_exception(RPK_INVALID_RAM_SPEC, "<ram type='persistent'> must have a 'file' attribute");
 			}
 			astring ram_pathname(system_name, PATH_SEPARATOR, ram_filename);
-			ram_pname = core_strdup(ram_pathname.cstr());
+			ram_pname = core_strdup(ram_pathname.c_str());
 			// load, and fill rest with 00
 			if (VERBOSE>6) LOG("gromport/RPK: Loading NVRAM contents from '%s'\n", ram_pname);
 			image_battery_load_by_name(options, ram_pname, contents, length, 0x00);

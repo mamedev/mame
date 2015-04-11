@@ -19,6 +19,7 @@
  @27      HD38800A  1981, Bandai Packri Monster (DM-21Z)
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
  @70      HD38800A  1982, Coleco Galaxian
+ @73      HD38800A  1982, Mattel Star Hawk
  
  @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
@@ -42,6 +43,26 @@
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
 ***************************************************************************/
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Star Hawk (manufactured in Japan)
+  * PCBs are labeled Kaken, PT-317B
+  * Hitachi HD38800A73 MCU
+  * cyan/red VFD display Futaba DM-41ZK, with partial color overlay
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+
+
+
+
 
 #include "emu.h"
 #include "cpu/hmcs40/hmcs40.h"
@@ -287,7 +308,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 /***************************************************************************
 
   Bambino Basketball - Dribble Away (manufactured in Japan)
-  * boards are labeled Emix Corp. ET-05
+  * PCBs are labeled Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
   * green VFD display Emix-106, with bezel overlay
 
@@ -399,7 +420,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bandai Packri Monster (manufactured in Japan)
-  * board label DM-21ZA2
+  * PCB label DM-21ZA2
   * Hitachi HD38800A27 MCU
   * cyan/red/green VFD display Futaba DM-21ZK 2B, with bezel overlay
 
@@ -731,7 +752,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Donkey Kong (manufactured in Taiwan)
-  * board label Coleco Rev C 75790 DK
+  * PCB label Coleco Rev C 75790 DK
   * Hitachi HD38820A45 MCU
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
@@ -859,7 +880,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Galaxian (manufactured in Taiwan)
-  * board label Coleco Rev A 75718
+  * PCB label Coleco Rev A 75718
   * Hitachi HD38800A70 MCU
   * cyan/red VFD display Futaba DM-36Z 2H, with color overlay
 
@@ -976,7 +997,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Pac-Man (manufactured in Taiwan)
-  * board label Coleco 75690
+  * PCB label Coleco 75690
   * Hitachi HD38820A28/29 MCU
   * cyan/red VFD display Futaba DM-34Z 2A, with color overlay
 
@@ -1097,7 +1118,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Ms. Pac-Man (manufactured in Taiwan)
-  * board label Coleco 911171
+  * PCB label Coleco 911171
   * Hitachi HD38820A61 MCU
   * cyan/red VFD display Futaba DM-60Z 3I, with color overlay
 
@@ -1501,7 +1522,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy Kingman (manufactured in Japan)
-  * boards are labeled THF-01II 2E138E01/2E128E02
+  * PCBs are labeled THF-01II 2E138E01/2E128E02
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
@@ -1622,9 +1643,9 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Tron (manufactured in Japan)
-  * boards are labeled THN-02 2E114E07
+  * PCBs are labeled THN-02 2E114E07
   * Hitachi HD38800A88 MCU
-  * cyan/red/green VFD display NEC FIP10AM24T
+  * cyan/red/green VFD display NEC FIP10AM24T no. 2-8 1
 
   NOTE!: MESS external artwork is recommended
 

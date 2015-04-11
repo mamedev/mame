@@ -245,7 +245,7 @@ private:
 			opt_val = "";
 		else if (!m_mod_man.type_has_name(opt_name, opt_val))
 		{
-			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val.cstr(), opt_name.cstr());
+			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val.c_str(), opt_name.c_str());
 			opt_val = "";
 		}
 		return m_mod_man.select_module(opt_name, opt_val);

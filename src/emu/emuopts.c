@@ -532,7 +532,7 @@ bool emu_options::parse_one_ini(const char *basename, int priority, astring *err
 
 	// append errors if requested
 	if (error && error_string != NULL)
-		error_string->catprintf("While parsing %s:\n%s\n", file.fullpath(), error.cstr());
+		error_string->catprintf("While parsing %s:\n%s\n", file.fullpath(), error.c_str());
 
 	return result;
 }
@@ -544,7 +544,7 @@ const char *emu_options::main_value(astring &buffer, const char *name) const
 	int pos = buffer.chr(0, ',');
 	if (pos != -1)
 		buffer = buffer.substr(0, pos);
-	return buffer.cstr();
+	return buffer.c_str();
 }
 
 const char *emu_options::sub_value(astring &buffer, const char *name, const char *subname) const
@@ -561,5 +561,5 @@ const char *emu_options::sub_value(astring &buffer, const char *name, const char
 	}
 	else
 		buffer.reset();
-	return buffer.cstr();
+	return buffer.c_str();
 }

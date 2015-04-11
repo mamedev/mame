@@ -158,9 +158,9 @@ public:
 		if (r == iR3) return false;
 
 		char temp[32];
-		sprintf(temp,  "X:%s,%s", ea1.cstr(), regIdAsString(D1).cstr());
+		sprintf(temp,  "X:%s,%s", ea1.c_str(), regIdAsString(D1).c_str());
 		parallelMove = temp;
-		sprintf(temp, "X:%s,%s", ea2.cstr(), regIdAsString(D2).cstr());
+		sprintf(temp, "X:%s,%s", ea2.c_str(), regIdAsString(D2).c_str());
 		parallelMove2 = temp;
 
 		return true;
@@ -253,8 +253,8 @@ public:
 		decode_RR_table(BITSn(word0,0x00c0), r);
 		decode_DD_table(BITSn(word0,0x0030), S);
 
-		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", regIdAsString(Dnot).cstr(), regIDAsNum(r), regIDAsNum(r));
-		sprintf(parallel_move_str2, "%s,%s", regIdAsString(S).cstr(), regIdAsString(Dnot).cstr());
+		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", regIdAsString(Dnot).c_str(), regIDAsNum(r), regIDAsNum(r));
+		sprintf(parallel_move_str2, "%s,%s", regIdAsString(S).c_str(), regIdAsString(Dnot).c_str());
 		pms = parallel_move_str;
 		pms2 = parallel_move_str2;
 		return true;

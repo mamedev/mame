@@ -695,7 +695,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 	#if 0
 	for(i=0; i < numtracks; i++)
 	{
-		printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.cstr(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
+		printf("%s %d %d %d (true %d)\n", outinfo.track[i].fname.c_str(), outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
 	}
 	#endif
 
@@ -771,7 +771,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					wavlen = parse_wav_sample(lastfname, &wavoffs);
 					if (!wavlen)
 					{
-						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.cstr());
+						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
 						return CHDERR_INVALID_DATA;
 					}
 				}
@@ -812,7 +812,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 
 				outinfo.track[trknum].fname.cpy(lastfname); // default filename to the last one
 
-//              printf("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname.cstr(), outinfo.track[trknum].offset);
+//              printf("trk %d: fname %s offset %d\n", trknum, outinfo.track[trknum].fname.c_str(), outinfo.track[trknum].offset);
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc.tracks[trknum]);
 				if (outtoc.tracks[trknum].datasize == 0)
@@ -927,10 +927,10 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				/* if we have the same filename as the last track, do it that way */
 				if (trknum != 0 && outinfo.track[trknum].fname == outinfo.track[trknum-1].fname)
 				{
-					tlen = get_file_size(outinfo.track[trknum].fname.cstr());
+					tlen = get_file_size(outinfo.track[trknum].fname.c_str());
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.cstr());
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
 						return CHDERR_FILE_NOT_FOUND;
 					}
 					outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
@@ -941,7 +941,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.cstr());
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
 						return CHDERR_FILE_NOT_FOUND;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
@@ -976,7 +976,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					tlen = get_file_size(outinfo.track[trknum].fname);
 					if (tlen == 0)
 					{
-						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.cstr());
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.c_str());
 						return CHDERR_FILE_NOT_FOUND;
 					}
 					tlen /= (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);

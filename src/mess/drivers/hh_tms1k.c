@@ -26,7 +26,7 @@
  *MP2139   TMS1370? 1982, Gakken Galaxy Invader 1000
  *MP2788   ?        1980, Bandai Flight Time (? note: VFD-capable)
  @MP3226   TMS1000  1978, Milton Bradley Simon
- *MP3301   TMS1000  1979, Milton Bradley Bigtrak
+ *MP3301   TMS1000  1979, Milton Bradley Big Trak
  *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
   MP3403   TMS1100  1978, Marx Electronic Bowling -> elecbowl.c
  @MP3404   TMS1100  1978, Parker Brothers Merlin
@@ -918,7 +918,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Electronic Baseball 2
-  * boards are labeled: ZENY
+  * PCBs are labeled: ZENY
   * TMS1000 MCU, MP0923 (die labeled MP0923)
   * 3 7seg LEDs, and other LEDs behind bezel, 1bit sound
 
@@ -1045,7 +1045,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Electronic Baseball 3
-  * boards are labeled: ZENY
+  * PCBs are labeled: ZENY
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound

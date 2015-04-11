@@ -29,7 +29,7 @@ ui_menu_device_config::ui_menu_device_config(running_machine &machine, render_co
 	device_iterator deviter(machine.config().root_device());
 	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 	{
-		if (strcmp(device->tag(), tmp_tag.cstr()) == 0)
+		if (strcmp(device->tag(), tmp_tag.c_str()) == 0)
 		{
 			m_mounted = true;
 			break;
@@ -176,7 +176,7 @@ void ui_menu_device_config::populate()
 		}
 
 		if (bios)
-			string.catprintf("* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_str.cstr());
+			string.catprintf("* BIOS settings:\n  %d options    [default: %s]\n", bios, bios_str.c_str());
 	}
 
 	int input = 0, input_mj = 0, input_hana = 0, input_gamble = 0, input_analog = 0, input_adjust = 0;

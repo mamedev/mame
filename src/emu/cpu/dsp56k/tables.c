@@ -574,8 +574,8 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, astring& D)
 			break;
 		case 0x1:
 			assemble_address_from_IO_short_address(ppppp, fullAddy);
-			sprintf(temp, "X:<<$%s", fullAddy.cstr());
-			// NEW // sprintf(temp, "X:$%s", fullAddy.cstr());
+			sprintf(temp, "X:<<$%s", fullAddy.c_str());
+			// NEW // sprintf(temp, "X:$%s", fullAddy.c_str());
 			break;
 	}
 	D = temp;
@@ -585,7 +585,7 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const 
 										astring& source, astring& destination)
 {
 	char temp[32];
-	sprintf(temp, "%c:%s", ma, ea.cstr());
+	sprintf(temp, "%c:%s", ma, ea.c_str());
 	switch(W)
 	{
 		case 0x0: source = regIdAsString(SD); destination = temp; break;
@@ -597,7 +597,7 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const astring& SD, const
 										astring& source, astring& destination)
 {
 	char temp[32];
-	sprintf(temp, "%c:%s", ma, ea.cstr());
+	sprintf(temp, "%c:%s", ma, ea.c_str());
 	switch(W)
 	{
 		case 0x0: source = SD;   destination = temp; break;

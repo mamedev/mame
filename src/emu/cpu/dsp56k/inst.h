@@ -204,7 +204,7 @@ public:
 	void disassemble(astring& retString) const
 	{
 		char temp[32];
-		sprintf(temp, "#$%x,%s", m_immediate, regIdAsString(m_destination).cstr());
+		sprintf(temp, "#$%x,%s", m_immediate, regIdAsString(m_destination).c_str());
 		retString = "andi " + astring(temp);
 		// NEW // sprintf(opcode_str, "and(i)");
 	}
@@ -438,7 +438,7 @@ public:
 		sprintf(temp, "#$%x", m_iVal);
 		astring source = temp;
 
-		sprintf(temp, "X:(%s)", regIdAsString(m_r).cstr());
+		sprintf(temp, "X:(%s)", regIdAsString(m_r).c_str());
 		astring destination = temp;
 
 		retString = m_opcode + " " + source + "," + destination;
@@ -1138,7 +1138,7 @@ public:
 		astring destination = temp;
 		// NEW // sprintf(temp, "X:(R%d),$%02x", Rnum, pc + 2 + word1);
 
-		sprintf(temp, "X:(%s)", regIdAsString(m_source).cstr());
+		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
 		astring source = temp;
 
 		retString = "do " + source + "," + destination;
@@ -3042,7 +3042,7 @@ public:
 	void disassemble(astring& retString) const
 	{
 		char temp[32];
-		sprintf(temp, "X:(%s)", regIdAsString(m_source).cstr());
+		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
 		retString = "rep " + astring(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}

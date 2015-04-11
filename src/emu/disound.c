@@ -238,14 +238,14 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 	for (const sound_route *route = first_route(); route != NULL; route = route->next())
 	{
 		// find a device with the requested tag
-		const device_t *target = device().siblingdevice(route->m_target.cstr());
+		const device_t *target = device().siblingdevice(route->m_target.c_str());
 		if (target == NULL)
-			osd_printf_error("Attempting to route sound to non-existant device '%s'\n", route->m_target.cstr());
+			osd_printf_error("Attempting to route sound to non-existant device '%s'\n", route->m_target.c_str());
 
 		// if it's not a speaker or a sound device, error
 		const device_sound_interface *sound;
 		if (target != NULL && target->type() != SPEAKER && !target->interface(sound))
-			osd_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", route->m_target.cstr(), target->name());
+			osd_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", route->m_target.c_str(), target->name());
 	}
 }
 
@@ -318,13 +318,13 @@ void device_sound_interface::interface_post_start()
 						int streamoutputnum;
 						sound_stream *outputstream = sound->output_to_stream_output(outputnum, streamoutputnum);
 						if (outputstream == NULL)
-							fatalerror("Sound device '%s' specifies route for non-existant output #%d\n", route->m_target.cstr(), outputnum);
+							fatalerror("Sound device '%s' specifies route for non-existant output #%d\n", route->m_target.c_str(), outputnum);
 
 						// find the input stream to connect to
 						int streaminputnum;
 						sound_stream *inputstream = input_to_stream_input(inputnum++, streaminputnum);
 						if (inputstream == NULL)
-							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d\n", route->m_target.cstr(), outputnum, m_device.tag(), inputnum - 1);
+							fatalerror("Sound device '%s' targeted output #%d to non-existant device '%s' input %d\n", route->m_target.c_str(), outputnum, m_device.tag(), inputnum - 1);
 
 						// set the input
 						inputstream->set_input(streaminputnum, outputstream, streamoutputnum, route->m_gain);

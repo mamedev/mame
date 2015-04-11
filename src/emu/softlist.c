@@ -500,7 +500,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 {
 	// add to the global map whenever we check a list so we don't re-check
 	// it in the future
-	if (valid.already_checked(astring("softlist/", m_list_name.cstr())))
+	if (valid.already_checked(astring("softlist/", m_list_name.c_str())))
 		return;
 
 	// do device validation only in case of validate command
@@ -565,7 +565,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		}
 
 		// check for duplicate descriptions
-		if (descriptions.add(astring(swinfo->longname()).makelower().cstr(), swinfo, false) == TMERR_DUPLICATE)
+		if (descriptions.add(astring(swinfo->longname()).makelower().c_str(), swinfo, false) == TMERR_DUPLICATE)
 			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo->longname(), swinfo->shortname());
 
 		bool is_clone = false;
