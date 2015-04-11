@@ -24,15 +24,27 @@ files {
 if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/drcbec.c",
+		MAME_DIR .. "src/emu/cpu/drcbec.h",
 		MAME_DIR .. "src/emu/cpu/drcbeut.c",
+		MAME_DIR .. "src/emu/cpu/drcbeut.h",
 		MAME_DIR .. "src/emu/cpu/drccache.c",
+		MAME_DIR .. "src/emu/cpu/drccache.h",
 		MAME_DIR .. "src/emu/cpu/drcfe.c",
+		MAME_DIR .. "src/emu/cpu/drcfe.h",
 		MAME_DIR .. "src/emu/cpu/drcuml.c",
+		MAME_DIR .. "src/emu/cpu/drcuml.h",
 		MAME_DIR .. "src/emu/cpu/uml.c",
+		MAME_DIR .. "src/emu/cpu/uml.h",
 		MAME_DIR .. "src/emu/cpu/i386/i386dasm.c",
 		MAME_DIR .. "src/emu/cpu/x86log.c",
+		MAME_DIR .. "src/emu/cpu/x86log.h",
 		MAME_DIR .. "src/emu/cpu/drcbex86.c",
+		MAME_DIR .. "src/emu/cpu/drcbex86.h",
 		MAME_DIR .. "src/emu/cpu/drcbex64.c",
+		MAME_DIR .. "src/emu/cpu/drcbex64.h",
+		MAME_DIR .. "src/emu/cpu/drcumlsh.h",
+		MAME_DIR .. "src/emu/cpu/vtlb.h",
+		MAME_DIR .. "src/emu/cpu/x86emit.h",		
 	}
 end
 
@@ -44,6 +56,7 @@ end
 if (CPUS["8X300"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/8x300/8x300.c",
+		MAME_DIR .. "src/emu/cpu/8x300/8x300.h",
 	}
 end
 
@@ -59,6 +72,7 @@ end
 if (CPUS["ARC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/arc/arc.c",
+		MAME_DIR .. "src/emu/cpu/arc/arc.h",
 	}
 end
 
@@ -74,6 +88,7 @@ end
 if (CPUS["ARCOMPACT"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/arcompact/arcompact.c",
+		MAME_DIR .. "src/emu/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/emu/cpu/arcompact/arcompact_execute.c",
 	}
 	dependency {
@@ -103,6 +118,7 @@ end
 if (CPUS["ARM"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/arm/arm.c",
+		MAME_DIR .. "src/emu/cpu/arm/arm.h",
 	}
 end
 
@@ -113,6 +129,7 @@ end
 if (CPUS["ARM7"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/arm7/arm7.c",
+		MAME_DIR .. "src/emu/cpu/arm7/arm7.h",
 		MAME_DIR .. "src/emu/cpu/arm7/arm7thmb.c",
 		MAME_DIR .. "src/emu/cpu/arm7/arm7ops.c",
 	}
@@ -130,6 +147,7 @@ end
 if (CPUS["SE3208"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/se3208/se3208.c",
+		MAME_DIR .. "src/emu/cpu/se3208/se3208.h",
 	}
 end
 
@@ -145,6 +163,7 @@ end
 if (CPUS["AMIS2000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/amis2000/amis2000.c",
+		MAME_DIR .. "src/emu/cpu/amis2000/amis2000.h",
 	}
 end
 
@@ -160,6 +179,7 @@ end
 if (CPUS["ALPHA8201"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/alph8201/alph8201.c",
+		MAME_DIR .. "src/emu/cpu/alph8201/alph8201.h",
 	}
 end
 
@@ -175,6 +195,7 @@ end
 if (CPUS["ADSP21XX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/adsp2100/adsp2100.c",
+		MAME_DIR .. "src/emu/cpu/adsp2100/adsp2100.h",
 	}
 end
 
@@ -190,6 +211,7 @@ end
 if (CPUS["ADSP21062"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sharc/sharc.c",
+		MAME_DIR .. "src/emu/cpu/sharc/sharc.h",
 	}
 end
 
@@ -205,6 +227,7 @@ end
 if (CPUS["APEXC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/apexc/apexc.c",
+		MAME_DIR .. "src/emu/cpu/apexc/apexc.h",
 	}
 end
 
@@ -220,6 +243,7 @@ end
 if (CPUS["DSP16A"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/dsp16/dsp16.c",
+		MAME_DIR .. "src/emu/cpu/dsp16/dsp16.h",
 	}
 end
 
@@ -235,6 +259,7 @@ end
 if (CPUS["DSP32C"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/dsp32/dsp32.c",
+		MAME_DIR .. "src/emu/cpu/dsp32/dsp32.h",
 	}
 end
 
@@ -250,6 +275,7 @@ end
 if (CPUS["ASAP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/asap/asap.c",
+		MAME_DIR .. "src/emu/cpu/asap/asap.h",
 	}
 end
 
@@ -265,6 +291,7 @@ end
 if (CPUS["AM29000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/am29000/am29000.c",
+		MAME_DIR .. "src/emu/cpu/am29000/am29000.h",
 	}
 end
 
@@ -280,6 +307,7 @@ end
 if (CPUS["JAGUAR"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/jaguar/jaguar.c",
+		MAME_DIR .. "src/emu/cpu/jaguar/jaguar.h",
 	}
 end
 
@@ -295,6 +323,7 @@ end
 if (CPUS["CUBEQCPU"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cubeqcpu/cubeqcpu.c",
+		MAME_DIR .. "src/emu/cpu/cubeqcpu/cubeqcpu.h",
 	}
 end
 
@@ -310,6 +339,7 @@ end
 if (CPUS["ES5510"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/es5510/es5510.c",
+		MAME_DIR .. "src/emu/cpu/es5510/es5510.h",
 	}
 end
 
@@ -321,6 +351,7 @@ end
 if (CPUS["ESRIP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/esrip/esrip.c",
+		MAME_DIR .. "src/emu/cpu/esrip/esrip.h",
 	}
 end
 
@@ -336,6 +367,7 @@ end
 if (CPUS["COSMAC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cosmac/cosmac.c",
+		MAME_DIR .. "src/emu/cpu/cosmac/cosmac.h",
 	}
 end
 
@@ -351,6 +383,7 @@ end
 if (CPUS["COP400"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cop400/cop400.c",
+		MAME_DIR .. "src/emu/cpu/cop400/cop400.h",
 	}
 end
 
@@ -368,6 +401,7 @@ end
 if (CPUS["CP1610"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/cp1610/cp1610.c",
+		MAME_DIR .. "src/emu/cpu/cp1610/cp1610.h",
 	}
 end
 
@@ -383,6 +417,7 @@ end
 if (CPUS["CCPU"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ccpu/ccpu.c",
+		MAME_DIR .. "src/emu/cpu/ccpu/ccpu.h",
 	}
 end
 
@@ -398,6 +433,7 @@ end
 if (CPUS["T11"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/t11/t11.c",
+		MAME_DIR .. "src/emu/cpu/t11/t11.h",
 	}
 end
 
@@ -413,6 +449,7 @@ end
 if (CPUS["F8"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/f8/f8.c",
+		MAME_DIR .. "src/emu/cpu/f8/f8.h",
 	}
 end
 
@@ -428,6 +465,7 @@ end
 if (CPUS["G65816"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/g65816/g65816.c",
+		MAME_DIR .. "src/emu/cpu/g65816/g65816.h",
 		MAME_DIR .. "src/emu/cpu/g65816/g65816o0.c",
 		MAME_DIR .. "src/emu/cpu/g65816/g65816o1.c",
 		MAME_DIR .. "src/emu/cpu/g65816/g65816o2.c",
@@ -448,24 +486,43 @@ end
 if (CPUS["H8"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/h8/h8.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8h.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8h.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8s2000.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8s2000.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8s2600.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8s2600.h",
 		MAME_DIR .. "src/emu/cpu/h8/h83337.c",
+		MAME_DIR .. "src/emu/cpu/h8/h83337.h",
 		MAME_DIR .. "src/emu/cpu/h8/h83002.c",
+		MAME_DIR .. "src/emu/cpu/h8/h83002.h",
 		MAME_DIR .. "src/emu/cpu/h8/h83006.c",
+		MAME_DIR .. "src/emu/cpu/h8/h83006.h",
 		MAME_DIR .. "src/emu/cpu/h8/h83008.c",
+		MAME_DIR .. "src/emu/cpu/h8/h83008.h",
 		MAME_DIR .. "src/emu/cpu/h8/h83048.c",
+		MAME_DIR .. "src/emu/cpu/h8/h83048.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8s2245.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8s2245.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8s2320.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8s2320.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8s2357.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8s2357.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8s2655.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8s2655.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8_adc.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8_adc.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8_port.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8_port.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8_intc.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8_intc.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8_timer8.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8_timer8.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8_timer16.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8_timer16.h",
 		MAME_DIR .. "src/emu/cpu/h8/h8_sci.c",
+		MAME_DIR .. "src/emu/cpu/h8/h8_sci.h",
 	}
 	
 	dependency {
@@ -491,6 +548,7 @@ end
 if (CPUS["HCD62121"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hcd62121/hcd62121.c",
+		MAME_DIR .. "src/emu/cpu/hcd62121/hcd62121.h",
 	}
 end
 
@@ -506,6 +564,7 @@ end
 if (CPUS["HMCS40"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40.c",
+		MAME_DIR .. "src/emu/cpu/hmcs40/hmcs40.h",
 	}
 end
 
@@ -521,6 +580,7 @@ end
 if (CPUS["SH2"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sh2/sh2.c",
+		MAME_DIR .. "src/emu/cpu/sh2/sh2.h",
 		MAME_DIR .. "src/emu/cpu/sh2/sh2fe.c",
 	}
 end
@@ -537,10 +597,15 @@ end
 if (CPUS["SH4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sh4/sh4.c",
+		MAME_DIR .. "src/emu/cpu/sh4/sh4.h",
 		MAME_DIR .. "src/emu/cpu/sh4/sh4comn.c",
+		MAME_DIR .. "src/emu/cpu/sh4/sh4comn.h",
 		MAME_DIR .. "src/emu/cpu/sh4/sh3comn.c",
+		MAME_DIR .. "src/emu/cpu/sh4/sh3comn.h",
 		MAME_DIR .. "src/emu/cpu/sh4/sh4tmu.c",
+		MAME_DIR .. "src/emu/cpu/sh4/sh4tmu.h",
 		MAME_DIR .. "src/emu/cpu/sh4/sh4dmac.c",
+		MAME_DIR .. "src/emu/cpu/sh4/sh4dmac.h",
 	}
 end
 
@@ -556,6 +621,7 @@ end
 if (CPUS["H6280"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/h6280/h6280.c",
+		MAME_DIR .. "src/emu/cpu/h6280/h6280.h",
 	}
 end
 
@@ -571,6 +637,7 @@ end
 if (CPUS["E1"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/e132xs/e132xs.c",
+		MAME_DIR .. "src/emu/cpu/e132xs/e132xs.h",
 	}
 end
 
@@ -586,6 +653,7 @@ end
 if (CPUS["IE15"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ie15/ie15.c",
+		MAME_DIR .. "src/emu/cpu/ie15/ie15.h",
 	}
 end
 
@@ -601,6 +669,7 @@ end
 if (CPUS["I4004"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i4004/i4004.c",
+		MAME_DIR .. "src/emu/cpu/i4004/i4004.h",
 	}
 end
 
@@ -616,6 +685,7 @@ end
 if (CPUS["I8008"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i8008/i8008.c",
+		MAME_DIR .. "src/emu/cpu/i8008/i8008.h",
 	}
 end
 
@@ -631,6 +701,7 @@ end
 if (CPUS["SCMP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/scmp/scmp.c",
+		MAME_DIR .. "src/emu/cpu/scmp/scmp.h",
 	}
 end
 
@@ -646,6 +717,7 @@ end
 if (CPUS["I8085"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i8085/i8085.c",
+		MAME_DIR .. "src/emu/cpu/i8085/i8085.h",
 	}
 end
 
@@ -661,7 +733,9 @@ end
 if (CPUS["I8089"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i8089/i8089.c",
+		MAME_DIR .. "src/emu/cpu/i8089/i8089.h",
 		MAME_DIR .. "src/emu/cpu/i8089/i8089_channel.c",
+		MAME_DIR .. "src/emu/cpu/i8089/i8089_channel.h",
 		MAME_DIR .. "src/emu/cpu/i8089/i8089_ops.c",
 	}
 end
@@ -678,6 +752,7 @@ end
 if (CPUS["MCS48"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mcs48/mcs48.c",
+		MAME_DIR .. "src/emu/cpu/mcs48/mcs48.h",
 	}
 end
 
@@ -693,6 +768,7 @@ end
 if (CPUS["MCS51"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mcs51/mcs51.c",
+		MAME_DIR .. "src/emu/cpu/mcs51/mcs51.h",
 	}
 end
 
@@ -708,8 +784,11 @@ end
 if (CPUS["MCS96"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mcs96/mcs96.c",
+		MAME_DIR .. "src/emu/cpu/mcs96/mcs96.h",
 		MAME_DIR .. "src/emu/cpu/mcs96/i8x9x.c",
+		MAME_DIR .. "src/emu/cpu/mcs96/i8x9x.h",
 		MAME_DIR .. "src/emu/cpu/mcs96/i8xc196.c",
+		MAME_DIR .. "src/emu/cpu/mcs96/i8xc196.h",
 	}
 	dependency {
 		{ MAME_DIR .. "src/emu/cpu/mcs96/mcs96.c",   GEN_DIR .. "emu/cpu/mcs96/mcs96.inc" },
@@ -734,8 +813,11 @@ end
 if (CPUS["I86"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i86/i86.c",
+		MAME_DIR .. "src/emu/cpu/i86/i86.h",
 		MAME_DIR .. "src/emu/cpu/i86/i186.c",
+		MAME_DIR .. "src/emu/cpu/i86/i186.h",
 		MAME_DIR .. "src/emu/cpu/i86/i286.c",
+		MAME_DIR .. "src/emu/cpu/i86/i286.h",
 	}
 end
 
@@ -746,6 +828,7 @@ end
 if (CPUS["I386"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i386/i386.c",
+		MAME_DIR .. "src/emu/cpu/i386/i386.h",
 	}
 end
 
@@ -761,6 +844,7 @@ end
 if (CPUS["I860"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i860/i860.c",
+		MAME_DIR .. "src/emu/cpu/i860/i860.h",
 	}
 end
 
@@ -776,6 +860,7 @@ end
 if (CPUS["I960"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/i960/i960.c",
+		MAME_DIR .. "src/emu/cpu/i960/i960.h",
 	}
 end
 
@@ -791,6 +876,7 @@ end
 if (CPUS["LH5801"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/lh5801/lh5801.c",
+		MAME_DIR .. "src/emu/cpu/lh5801/lh5801.h",
 	}
 end
 
@@ -806,6 +892,7 @@ end
 if (CPUS["SSEM"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ssem/ssem.c",
+		MAME_DIR .. "src/emu/cpu/ssem/ssem.h",
 	}
 end
 
@@ -821,6 +908,7 @@ end
 if (CPUS["MB88XX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mb88xx/mb88xx.c",
+		MAME_DIR .. "src/emu/cpu/mb88xx/mb88xx.h",
 	}
 end
 
@@ -836,6 +924,7 @@ end
 if (CPUS["MB86233"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mb86233/mb86233.c",
+		MAME_DIR .. "src/emu/cpu/mb86233/mb86233.h",
 	}
 end
 
@@ -851,6 +940,7 @@ end
 if (CPUS["MB86235"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mb86235/mb86235.c",
+		MAME_DIR .. "src/emu/cpu/mb86235/mb86235.h",
 	}
 end
 
@@ -866,6 +956,7 @@ end
 if (CPUS["PIC16C5X"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/pic16c5x/pic16c5x.c",
+		MAME_DIR .. "src/emu/cpu/pic16c5x/pic16c5x.h",
 	}
 end
 
@@ -881,6 +972,7 @@ end
 if (CPUS["PIC16C62X"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/pic16c62x/pic16c62x.c",
+		MAME_DIR .. "src/emu/cpu/pic16c62x/pic16c62x.h",
 	}
 end
 
@@ -897,9 +989,13 @@ end
 if (CPUS["MIPS"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mips/r3000.c",
+		MAME_DIR .. "src/emu/cpu/mips/r3000.h",
 		MAME_DIR .. "src/emu/cpu/mips/mips3com.c",
+		MAME_DIR .. "src/emu/cpu/mips/mips3com.h",
 		MAME_DIR .. "src/emu/cpu/mips/mips3.c",
+		MAME_DIR .. "src/emu/cpu/mips/mips3.h",
 		MAME_DIR .. "src/emu/cpu/mips/mips3fe.c",
+		MAME_DIR .. "src/emu/cpu/mips/mips3fe.h",
 		MAME_DIR .. "src/emu/cpu/mips/mips3drc.c",
 	}
 end
@@ -917,12 +1013,19 @@ end
 if (CPUS["PSX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/psx/psx.c",
+		MAME_DIR .. "src/emu/cpu/psx/psx.h",
 		MAME_DIR .. "src/emu/cpu/psx/gte.c",
+		MAME_DIR .. "src/emu/cpu/psx/gte.h",
 		MAME_DIR .. "src/emu/cpu/psx/dma.c",
+		MAME_DIR .. "src/emu/cpu/psx/dma.h",
 		MAME_DIR .. "src/emu/cpu/psx/irq.c",
+		MAME_DIR .. "src/emu/cpu/psx/irq.h",
 		MAME_DIR .. "src/emu/cpu/psx/mdec.c",
+		MAME_DIR .. "src/emu/cpu/psx/mdec.h",
 		MAME_DIR .. "src/emu/cpu/psx/rcnt.c",
+		MAME_DIR .. "src/emu/cpu/psx/rcnt.h",
 		MAME_DIR .. "src/emu/cpu/psx/sio.c",
+		MAME_DIR .. "src/emu/cpu/psx/sio.h",
 	}
 end
 
@@ -938,6 +1041,7 @@ end
 if (CPUS["M37710"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m37710/m37710.c",
+		MAME_DIR .. "src/emu/cpu/m37710/m37710.h",
 		MAME_DIR .. "src/emu/cpu/m37710/m37710o0.c",
 		MAME_DIR .. "src/emu/cpu/m37710/m37710o1.c",
 		MAME_DIR .. "src/emu/cpu/m37710/m37710o2.c",
@@ -974,22 +1078,39 @@ end
 if (CPUS["M6502"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m6502/deco16.c",
+		MAME_DIR .. "src/emu/cpu/m6502/deco16.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m4510.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m4510.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m6502.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m6502.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m65c02.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m65c02.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m65ce02.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m65ce02.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m65sc02.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m65sc02.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m6504.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m6504.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m6509.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m6509.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m6510.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m6510.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m6510t.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m6510t.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m7501.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m7501.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m8502.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m8502.h",
 		MAME_DIR .. "src/emu/cpu/m6502/n2a03.c",
+		MAME_DIR .. "src/emu/cpu/m6502/n2a03.h",
 		MAME_DIR .. "src/emu/cpu/m6502/r65c02.c",
+		MAME_DIR .. "src/emu/cpu/m6502/r65c02.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m740.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m740.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m3745x.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m3745x.h",
 		MAME_DIR .. "src/emu/cpu/m6502/m5074x.c",
+		MAME_DIR .. "src/emu/cpu/m6502/m5074x.h",
 	}
 	
 	dependency {
@@ -1028,6 +1149,7 @@ end
 if (CPUS["M6800"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m6800/m6800.c",
+		MAME_DIR .. "src/emu/cpu/m6800/m6800.h",
 	}
 end
 
@@ -1043,6 +1165,7 @@ end
 if (CPUS["M6805"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m6805/m6805.c",
+		MAME_DIR .. "src/emu/cpu/m6805/m6805.h",
 	}
 end
 
@@ -1060,8 +1183,11 @@ end
 if (CPUS["M6809"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m6809/m6809.c",
+		MAME_DIR .. "src/emu/cpu/m6809/m6809.h",
 		MAME_DIR .. "src/emu/cpu/m6809/hd6309.c",
+		MAME_DIR .. "src/emu/cpu/m6809/hd6309.h",
 		MAME_DIR .. "src/emu/cpu/m6809/konami.c",
+		MAME_DIR .. "src/emu/cpu/m6809/konami.h",
 	}
 
 	dependency {
@@ -1091,6 +1217,7 @@ end
 if (CPUS["MC68HC11"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mc68hc11/mc68hc11.c",
+		MAME_DIR .. "src/emu/cpu/mc68hc11/mc68hc11.h",
 	}
 end
 
@@ -1106,7 +1233,9 @@ end
 if (CPUS["M680X0"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/m68000/m68kcpu.c",
+		MAME_DIR .. "src/emu/cpu/m68000/m68kcpu.h",
 		MAME_DIR .. "src/emu/cpu/m68000/m68kops.c",
+		MAME_DIR .. "src/emu/cpu/m68000/m68kops.h",
 	}
 end
 
@@ -1122,8 +1251,11 @@ end
 if (CPUS["DSP56156"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56k.c",
+		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56k.h",
 		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56mem.c",
+		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56mem.h",
 		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56pcu.c",
+		MAME_DIR .. "src/emu/cpu/dsp56k/dsp56pcu.h",
 	}
 end
 
@@ -1145,7 +1277,9 @@ end
 if (CPUS["PDP1"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/pdp1/pdp1.c",
+		MAME_DIR .. "src/emu/cpu/pdp1/pdp1.h",
 		MAME_DIR .. "src/emu/cpu/pdp1/tx0.c",
+		MAME_DIR .. "src/emu/cpu/pdp1/tx0.h",
 	}
 end
 
@@ -1162,7 +1296,9 @@ end
 if (CPUS["POWERPC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/powerpc/ppccom.c",
+		MAME_DIR .. "src/emu/cpu/powerpc/ppccom.h",
 		MAME_DIR .. "src/emu/cpu/powerpc/ppcfe.c",
+		MAME_DIR .. "src/emu/cpu/powerpc/ppcfe.h",
 		MAME_DIR .. "src/emu/cpu/powerpc/ppcdrc.c",
 	}
 end
@@ -1180,9 +1316,12 @@ end
 if (CPUS["NEC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/nec/nec.c",
+		MAME_DIR .. "src/emu/cpu/nec/nec.h",
 		MAME_DIR .. "src/emu/cpu/nec/v25.c",
+		MAME_DIR .. "src/emu/cpu/nec/v25.h",
 		MAME_DIR .. "src/emu/cpu/nec/v25sfr.c",
 		MAME_DIR .. "src/emu/cpu/nec/v53.c",
+		MAME_DIR .. "src/emu/cpu/nec/v53.h",
 	}
 end
 
@@ -1193,6 +1332,7 @@ end
 if (CPUS["V30MZ"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/v30mz/v30mz.c",
+		MAME_DIR .. "src/emu/cpu/v30mz/v30mz.h",
 	}
 end
 
@@ -1208,6 +1348,7 @@ end
 if (CPUS["V60"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/v60/v60.c",
+		MAME_DIR .. "src/emu/cpu/v60/v60.h",
 	}
 end
 
@@ -1223,6 +1364,7 @@ end
 if (CPUS["V810"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/v810/v810.c",
+		MAME_DIR .. "src/emu/cpu/v810/v810.h",
 	}
 end
 
@@ -1238,6 +1380,7 @@ end
 if (CPUS["UPD7725"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/upd7725/upd7725.c",
+		MAME_DIR .. "src/emu/cpu/upd7725/upd7725.h",
 	}
 end
 
@@ -1253,6 +1396,7 @@ end
 if (CPUS["UPD7810"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/upd7810/upd7810.c",
+		MAME_DIR .. "src/emu/cpu/upd7810/upd7810.h",
 		MAME_DIR .. "src/emu/cpu/upd7810/upd7810_opcodes.c",
 		MAME_DIR .. "src/emu/cpu/upd7810/upd7810_table.c",
 	}
@@ -1270,6 +1414,7 @@ end
 if (CPUS["UCOM4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ucom4/ucom4.c",
+		MAME_DIR .. "src/emu/cpu/ucom4/ucom4.h",
 	}
 end
 
@@ -1285,6 +1430,7 @@ end
 if (CPUS["MINX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/minx/minx.c",
+		MAME_DIR .. "src/emu/cpu/minx/minx.h",
 	}
 end
 
@@ -1300,10 +1446,14 @@ end
 if (CPUS["RSP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/rsp/rsp.c",
+		MAME_DIR .. "src/emu/cpu/rsp/rsp.h",
 		MAME_DIR .. "src/emu/cpu/rsp/rspdrc.c",
 		MAME_DIR .. "src/emu/cpu/rsp/rspfe.c",
+		MAME_DIR .. "src/emu/cpu/rsp/rspfe.h",
 		MAME_DIR .. "src/emu/cpu/rsp/rspcp2.c",
+		MAME_DIR .. "src/emu/cpu/rsp/rspcp2.h",
 		MAME_DIR .. "src/emu/cpu/rsp/rspcp2d.c",
+		MAME_DIR .. "src/emu/cpu/rsp/rspcp2d.h",
 	}
 end
 
@@ -1319,6 +1469,7 @@ end
 if (CPUS["MN10200"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/mn10200/mn10200.c",
+		MAME_DIR .. "src/emu/cpu/mn10200/mn10200.h",
 	}
 end
 
@@ -1334,6 +1485,7 @@ end
 if (CPUS["SATURN"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/saturn/saturn.c",
+		MAME_DIR .. "src/emu/cpu/saturn/saturn.h",
 	}
 end
 
@@ -1349,6 +1501,7 @@ end
 if (CPUS["S2650"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/s2650/s2650.c",
+		MAME_DIR .. "src/emu/cpu/s2650/s2650.h",
 	}
 end
 
@@ -1364,6 +1517,7 @@ end
 if (CPUS["SC61860"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sc61860/sc61860.c",
+		MAME_DIR .. "src/emu/cpu/sc61860/sc61860.h",
 	}
 end
 
@@ -1379,6 +1533,7 @@ end
 if (CPUS["SM8500"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/sm8500/sm8500.c",
+		MAME_DIR .. "src/emu/cpu/sm8500/sm8500.h",
 	}
 end
 
@@ -1394,6 +1549,7 @@ end
 if (CPUS["SPC700"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/spc700/spc700.c",
+		MAME_DIR .. "src/emu/cpu/spc700/spc700.h",
 	}
 end
 
@@ -1409,6 +1565,7 @@ end
 if (CPUS["SSP1601"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/ssp1601/ssp1601.c",
+		MAME_DIR .. "src/emu/cpu/ssp1601/ssp1601.h",
 	}
 end
 
@@ -1424,6 +1581,7 @@ end
 if (CPUS["UNSP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/unsp/unsp.c",
+		MAME_DIR .. "src/emu/cpu/unsp/unsp.h",
 	}
 end
 
@@ -1439,6 +1597,7 @@ end
 if (CPUS["AVR8"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/avr8/avr8.c",
+		MAME_DIR .. "src/emu/cpu/avr8/avr8.h",
 	}
 end
 
@@ -1454,6 +1613,7 @@ end
 if (CPUS["TMS0980"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms0980/tms0980.c",
+		MAME_DIR .. "src/emu/cpu/tms0980/tms0980.h",
 	}
 end
 
@@ -1469,6 +1629,7 @@ end
 if (CPUS["TMS7000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms7000/tms7000.c",
+		MAME_DIR .. "src/emu/cpu/tms7000/tms7000.h",
 	}
 end
 
@@ -1487,9 +1648,13 @@ end
 if (CPUS["TMS9900"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms9900/tms9900.c",
+		MAME_DIR .. "src/emu/cpu/tms9900/tms9900.h",
 		MAME_DIR .. "src/emu/cpu/tms9900/tms9980a.c",
+		MAME_DIR .. "src/emu/cpu/tms9900/tms9980a.h",
 		MAME_DIR .. "src/emu/cpu/tms9900/tms9995.c",
+		MAME_DIR .. "src/emu/cpu/tms9900/tms9995.h",
 		MAME_DIR .. "src/emu/cpu/tms9900/ti990_10.c",
+		MAME_DIR .. "src/emu/cpu/tms9900/ti990_10.h",
 	}
 end
 
@@ -1505,6 +1670,7 @@ end
 if (CPUS["TMS340X0"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms34010/tms34010.c",
+		MAME_DIR .. "src/emu/cpu/tms34010/tms34010.h",
 	}
 end
 
@@ -1520,6 +1686,7 @@ end
 if (CPUS["TMS32010"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32010/tms32010.c",
+		MAME_DIR .. "src/emu/cpu/tms32010/tms32010.h",
 	}
 end
 
@@ -1535,6 +1702,7 @@ end
 if (CPUS["TMS32025"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32025/tms32025.c",
+		MAME_DIR .. "src/emu/cpu/tms32025/tms32025.h",
 	}
 end
 
@@ -1550,6 +1718,7 @@ end
 if (CPUS["TMS32031"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32031/tms32031.c",
+		MAME_DIR .. "src/emu/cpu/tms32031/tms32031.h",
 	}
 end
 
@@ -1565,6 +1734,7 @@ end
 if (CPUS["TMS32051"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32051/tms32051.c",
+		MAME_DIR .. "src/emu/cpu/tms32051/tms32051.h",
 	}
 end
 
@@ -1580,6 +1750,7 @@ end
 if (CPUS["TMS32082"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms32082/tms32082.c",
+		MAME_DIR .. "src/emu/cpu/tms32082/tms32082.h",
 		MAME_DIR .. "src/emu/cpu/tms32082/mp_ops.c",
 	}
 end
@@ -1597,6 +1768,7 @@ end
 if (CPUS["TMS57002"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tms57002/tms57002.c",
+		MAME_DIR .. "src/emu/cpu/tms57002/tms57002.h",
 		MAME_DIR .. "src/emu/cpu/tms57002/tms57kdec.c",
 	}
 	dependency {
@@ -1622,6 +1794,7 @@ end
 if (CPUS["TLCS90"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tlcs90/tlcs90.c",
+		MAME_DIR .. "src/emu/cpu/tlcs90/tlcs90.h",
 	}
 end
 
@@ -1633,6 +1806,7 @@ end
 if (CPUS["TLCS900"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/tlcs900/tlcs900.c",
+		MAME_DIR .. "src/emu/cpu/tlcs900/tlcs900.h",
 	}
 end
 
@@ -1648,10 +1822,15 @@ end
 if (CPUS["Z80"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/z80/z80.c",
+		MAME_DIR .. "src/emu/cpu/z80/z80.h",
 		MAME_DIR .. "src/emu/cpu/z80/z80daisy.c",
+		MAME_DIR .. "src/emu/cpu/z80/z80daisy.h",
 		MAME_DIR .. "src/emu/cpu/z80/tmpz84c011.c",
+		MAME_DIR .. "src/emu/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/emu/cpu/z80/tmpz84c015.c",
+		MAME_DIR .. "src/emu/cpu/z80/tmpz84c015.h",
 		MAME_DIR .. "src/emu/cpu/z80/kl5c80a12.c",
+		MAME_DIR .. "src/emu/cpu/z80/kl5c80a12.h",
 	}
 end
 
@@ -1667,6 +1846,7 @@ end
 if (CPUS["LR35902"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/lr35902/lr35902.c",
+		MAME_DIR .. "src/emu/cpu/lr35902/lr35902.h",
 	}
 end
 
@@ -1682,7 +1862,9 @@ end
 if (CPUS["Z180"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/z180/z180.c",
+		MAME_DIR .. "src/emu/cpu/z180/z180.h",
 		MAME_DIR .. "src/emu/cpu/z80/z80daisy.c",
+		MAME_DIR .. "src/emu/cpu/z80/z80daisy.h",
 	}
 end
 
@@ -1698,6 +1880,7 @@ end
 if (CPUS["Z8000"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/z8000/z8000.c",
+		MAME_DIR .. "src/emu/cpu/z8000/z8000.h",
 	}
 end
 
@@ -1713,6 +1896,7 @@ end
 if (CPUS["Z8"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/z8/z8.c",
+		MAME_DIR .. "src/emu/cpu/z8/z8.h",
 	}
 end
 
@@ -1728,6 +1912,7 @@ end
 if (CPUS["SUPERFX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/superfx/superfx.c",
+		MAME_DIR .. "src/emu/cpu/superfx/superfx.h",
 	}
 end
 
@@ -1743,6 +1928,7 @@ end
 if (CPUS["PPS4"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/pps4/pps4.c",
+		MAME_DIR .. "src/emu/cpu/pps4/pps4.h",
 	}
 end
 
@@ -1758,6 +1944,7 @@ end
 if (CPUS["HD61700"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/hd61700/hd61700.c",
+		MAME_DIR .. "src/emu/cpu/hd61700/hd61700.h",
 	}
 end
 
@@ -1773,6 +1960,7 @@ end
 if (CPUS["LC8670"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/lc8670/lc8670.c",
+		MAME_DIR .. "src/emu/cpu/lc8670/lc8670.h",
 	}
 end
 
@@ -1788,6 +1976,7 @@ end
 if (CPUS["SCUDSP"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/scudsp/scudsp.c",
+		MAME_DIR .. "src/emu/cpu/scudsp/scudsp.h",
 	}
 end
 
@@ -1803,6 +1992,7 @@ end
 if (CPUS["SCORE"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/score/score.c",
+		MAME_DIR .. "src/emu/cpu/score/score.h",
 	}
 end
 
@@ -1818,24 +2008,43 @@ end
 if (CPUS["ALTO2"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/alto2/alto2cpu.c",
+		MAME_DIR .. "src/emu/cpu/alto2/alto2cpu.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2disk.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2disk.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2disp.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2disp.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2curt.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2curt.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2dht.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2dht.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2dvt.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2dvt.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2dwt.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2dwt.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2emu.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2emu.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2ether.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2ether.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2hw.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2hw.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2kbd.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2kbd.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2ksec.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2ksec.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2kwd.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2kwd.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2mem.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2mem.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2mouse.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2mouse.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2mrt.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2mrt.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2part.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2part.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2ram.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2ram.h",
 		MAME_DIR .. "src/emu/cpu/alto2/a2roms.c",
+		MAME_DIR .. "src/emu/cpu/alto2/a2roms.h",
 	}
 end
 

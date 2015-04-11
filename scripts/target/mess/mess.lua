@@ -2585,6 +2585,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/ht68k.c",     
 	MAME_DIR .. "src/mess/drivers/hunter2.c", 
 	MAME_DIR .. "src/emu/machine/nsc810.c", 
+	MAME_DIR .. "src/emu/machine/nsc810.h", 
 	MAME_DIR .. "src/mess/drivers/ibm6580.c",   
 	MAME_DIR .. "src/mess/drivers/ie15.c",
 	MAME_DIR .. "src/mess/machine/ie15_kbd.c", 
