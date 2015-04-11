@@ -3192,6 +3192,18 @@
 		</part>
 	</software>
 
+	<software name="hongkd">
+		<description>Hong Kil Dong (Kor)</description>
+		<year>1991</year>
+		<publisher>Clover</publisher>
+		<part name="cart" interface="sms_cart">
+			<feature name="slot" value="korean" />
+			<dataarea name="rom" size="49152">
+				<rom name="hong_kil_dong.bin" size="49152" crc="8040b2fa" sha1="f44299070c8f4d3c0a4b2f671d105c811ae7db99" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hook">
 		<description>Hook (Euro, Prototype)</description>
 		<year>19??</year>

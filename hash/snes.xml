@@ -53726,6 +53726,20 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="shinodyss" cloneof="shinodys">
+		<description>Shinseiki Odysselya (Jpn, Sample)</description>
+		<year>1993</year>
+		<publisher>Vic Tokai</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shinseiki odysselya (japan) (sample).sfc" size="1048576" crc="de7f3a8d" sha1="a2097dbace24813ba4dd16cfd28db80994acb459" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shinody2">
 		<description>Shinseiki Odysselya II (Jpn)</description>
 		<year>1995</year>
@@ -54590,6 +54604,20 @@ List of unclassified roms
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="soul blazer (france).sfc" size="1048576" crc="20157693" sha1="7498fb48bc977a85a73610c3185af3e5998c09b5" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soundfct">
+		<description>Sound Factory (Jpn)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sound.sfc" size="1048576" crc="fb0a855a" sha1="060bf62f0d2cd30d9cd4b843d8b316ebecbb96b6" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
