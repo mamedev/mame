@@ -12,6 +12,7 @@
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
  *042     uPD552C  1979, Tomy Space Attack
  @048     uPD552C  1980, Tomy Tennis (TN-04)
+ @049     uPD553C  1979, Mego Mini-Vid Break Free
  @055     uPD553C  1980, Bambino Laser Fight (ET-12)
  *085     uPD650C  1980, Roland TR-808
  *102     uPD553C  1981, Bandai Block Out
@@ -19,14 +20,54 @@
  *128     uPD650C  1982, Roland TR-606
   133     uPD650C  1982, Roland TB-303 -> tb303.c
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
+ @192     uPD553C  1982, Tomy Scramble (TN-10)
  @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
- *209     uPD553C  1982, Tomy Caveman (TN-12)
+ @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
 ***************************************************************************/
+
+
+
+
+/***************************************************************************
+
+  Mego Mini-Vid Break Free (manufactured in Japan)
+  * PCB label Mego 79 rev F
+  * NEC uCOM-43 MCU, labeled D553C 031
+  * cyan VFD display Futaba DM-4.5 91
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+
+/***************************************************************************
+
+  Tomy(tronic) Caveman (manufactured in Japan)
+  * PCBs are labeled TN-12 2E114E03
+  * NEC uCOM-43 MCU, labeled D553C 209
+  * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+
+/***************************************************************************
+
+  Tomy(tronic) Scramble (manufactured in Japan)
+  * PCBs are labeled TN-10 2E114E01
+  * NEC uCOM-43 MCU, labeled D553C 192
+  * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
 
 #include "emu.h"
 #include "cpu/ucom4/ucom4.h"
@@ -515,7 +556,7 @@ MACHINE_CONFIG_END
   Epoch Astro Command (manufactured in Japan)
   * PCB label 96111
   * NEC uCOM-43 MCU, labeled D553C 202
-  * cyan/red VFD display NEC FIP9AM20T NO.42, with color overlay
+  * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay (FIP=fluorescent indicator panel)
 
   known releases:
   - Japan: Astro Command
@@ -624,7 +665,7 @@ MACHINE_CONFIG_END
   Epoch Dracula (manufactured in Japan)
   * PCB label 96121
   * NEC uCOM-43 MCU, labeled D553C 206
-  * cyan/red/green VFD display NEC FIP8BM20T (FIP=fluorescent indicator panel)
+  * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
 
   known releases:
   - Japan: Dracula House, yellow case
@@ -717,9 +758,9 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Tennis (manufactured in Japan)
-  * board labeled TOMY TN-04 TENNIS
+  * PCB labeled TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, labeled D552C 048
-  * VFD display NEC FIP11AM15T
+  * VFD display NEC FIP11AM15T tube no. 0F
 
   The initial release of this game was in 1979, known as Pro-Tennis,
   it has a D553 instead of D552, with just a little over 50% ROM used.
@@ -876,9 +917,9 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy(tronic) Pac-Man (manufactured in Japan)
-  * boards are labeled TN-08 2E108E01
+  * PCBs are labeled TN-08 2E108E01
   * NEC uCOM-43 MCU, labeled D553C 160
-  * cyan/red/green VFD display NEC FIP8AM18T
+  * cyan/red/green VFD display NEC FIP8AM18T no. 2-21
   * bright yellow round casing
 
   known releases:
@@ -984,7 +1025,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Tomy Alien Chase (manufactured in Japan)
-  * boards are labeled TN-16 2E121B01
+  * PCBs are labeled TN-16 2E121B01
   * NEC uCOM-43 MCU, labeled D553C 258
   * red/green VFD display NEC FIP9AM24T, with color overlay, 2-sided*
 
