@@ -16,8 +16,8 @@
 //  gb_rom_mbc*_device - constructor
 //-------------------------------------------------
 
-const device_type GB_ROM_MBC1 = &device_creator<gb_rom_mbc1_device>;
-const device_type GB_ROM_MBC1_COL = &device_creator<gb_rom_mbc1col_device>;
+const device_type GB_ROM_MBC1 = &device_creator<gb_rom_mbc1_device<0x1Fu, 0x00u> >;
+const device_type GB_ROM_MBC1_COL = &device_creator<gb_rom_mbc1_device<0x0Fu, -0x01> >;
 const device_type GB_ROM_MBC2 = &device_creator<gb_rom_mbc2_device>;
 const device_type GB_ROM_MBC3 = &device_creator<gb_rom_mbc3_device>;
 const device_type GB_ROM_MBC5 = &device_creator<gb_rom_mbc5_device>;
@@ -35,22 +35,22 @@ const device_type GB_ROM_SM3SP = &device_creator<gb_rom_sm3sp_device>;
 
 gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-						device_gb_cart_interface( mconfig, *this )
+					  device_gb_cart_interface( mconfig, *this ),
+					  m_ram_enable(0x00u)
 {
 }
 
-gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source)
+template <UINT8 ra_mask, INT8 aa_shift>
+gb_rom_mbc1_device<ra_mask, aa_shift>::gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock, shortname, source),
+					  m_mode(MODE_16M_8k)
 {
 }
 
-gb_rom_mbc1_device::gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1, "GB MBC1 Carts", tag, owner, clock, "gb_rom_mbc1", __FILE__)
-{
-}
-
-gb_rom_mbc1col_device::gb_rom_mbc1col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1_COL, "GB MBC1 Collection Carts", tag, owner, clock, "gb_rom_mbc1col", __FILE__)
+template <UINT8 ra_mask, INT8 aa_shift>
+gb_rom_mbc1_device<ra_mask, aa_shift>::gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: gb_rom_mbc_device(mconfig, GB_ROM_MBC1, "GB MBC1 Carts", tag, owner, clock, "gb_rom_mbc1", __FILE__),
+					  m_mode(MODE_16M_8k)
 {
 }
 
@@ -135,7 +135,6 @@ void gb_rom_mbc_device::shared_start()
 	save_item(NAME(m_latch_bank2));
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
 }
 
 //-------------------------------------------------
@@ -144,11 +143,10 @@ void gb_rom_mbc_device::shared_start()
 
 void gb_rom_mbc_device::shared_reset()
 {
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
+	m_latch_bank = 0x00u;
+	m_latch_bank2 = 0x01u;
+	m_ram_bank = 0x00u;
+	m_ram_enable = 0x00u;
 }
 
 //-------------------------------------------------
@@ -177,7 +175,6 @@ void gb_rom_mbc6_device::device_start()
 	save_item(NAME(m_latch_bank2));
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
 }
 
 void gb_rom_mbc6_device::device_reset()
@@ -191,7 +188,6 @@ void gb_rom_mbc6_device::device_reset()
 	m_latch_bank2 = 3;  // correct default?
 	m_ram_bank = 0;
 	m_ram_enable = 0;
-	m_mode = 0;
 }
 
 void gb_rom_mmm01_device::device_start()
@@ -272,115 +268,102 @@ WRITE8_MEMBER(gb_rom_mbc_device::write_ram)
 
 
 // MBC1
-
-READ8_MEMBER(gb_rom_mbc1_device::read_rom)
+#define COMMA ,
+template <UINT8 ra_mask, INT8 aa_shift>
+READ8_MEMBER(gb_rom_mbc1_device<ra_mask COMMA aa_shift>::read_rom)
 {
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
-	else
-		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+
+	if (offset < 0x4000u) {
+		switch (m_mode) {
+		case MODE_4M_256k:
+			return m_rom[rom_bank_map[(m_ram_bank << (5 + aa_shift))] * 0x4000 + (offset & 0x3fff)];
+		case MODE_16M_8k:
+			// $$FALL-THROUGH$$
+		default:
+			return m_rom[rom_bank_map[0x00u] * 0x4000 + (offset & 0x3fff)];
+		}
+	} else {
+		return m_rom[rom_bank_map[(m_ram_bank << (5 + aa_shift)) | (m_latch_bank2 & ra_mask)] * 0x4000 + (offset & 0x3fff)];
+	}
+
 }
 
-WRITE8_MEMBER(gb_rom_mbc1_device::write_bank)
+template <UINT8 ra_mask, INT8 aa_shift>
+WRITE8_MEMBER(gb_rom_mbc1_device<ra_mask COMMA aa_shift>::write_bank)
 {
-	if (offset < 0x2000)
-		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
-	else if (offset < 0x4000)
-	{
-		// 5bits only
-		data &= 0x1f;
-		// bank = 0 => bank = 1
-		if (data == 0)
-			data = 1;
 
-		m_latch_bank2 = (m_latch_bank2 & 0x01e0) | data;
+	// only 5 bit data port
+	data &= 0x1Fu;
+
+	switch (offset & 0xE000u) {
+
+	case 0x0000u:
+		// RAM Enable Register
+		m_ram_enable = ((data & 0x0Fu) == 0x0Au) ? 0x01u : 0x00u;
+		break;
+
+	case 0x2000u:
+		// ROM Bank Register
+		m_latch_bank2 = data ? data : 0x01u;
+		break;
+
+	case 0x4000u:
+		// RAM Bank Register
+		m_ram_bank = data & 0x03u;
+		break;
+
+	case 0x6000u:
+		// MBC1 Mode Register
+		m_mode = (data & 0x01u) ? MODE_4M_256k : MODE_16M_8k;
+		break;
+
+	default:
+		break;
 	}
-	else if (offset < 0x6000)
-	{
-		// 2bits only
-		data &= 0x3;
-		m_latch_bank2 = (m_latch_bank2 & 0x001f) | (data << 5);
-	}
-	else
-		m_mode = data & 0x1;
+
 }
 
-READ8_MEMBER(gb_rom_mbc1_device::read_ram)
+template <UINT8 ra_mask, INT8 aa_shift>
+READ8_MEMBER(gb_rom_mbc1_device<ra_mask COMMA aa_shift>::read_ram)
 {
 	if (m_ram && m_ram_enable)
 	{
-		m_ram_bank = m_mode ? (m_latch_bank2 >> 5) : 0;
-		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset];
+		switch (m_mode) {
+		case MODE_4M_256k:
+			return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset];
+			break;
+		case MODE_16M_8k:
+			// $$FALL-THROUGH$$
+		default:
+			return m_ram[ram_bank_map[0x00u] * 0x2000 + offset];
+			break;
+		}
+
 	}
 	else
 		return 0xff;
 }
 
-WRITE8_MEMBER(gb_rom_mbc1_device::write_ram)
+template <UINT8 ra_mask, INT8 aa_shift>
+WRITE8_MEMBER(gb_rom_mbc1_device<ra_mask COMMA aa_shift>::write_ram)
 {
 	if (m_ram && m_ram_enable)
 	{
-		m_ram_bank = m_mode ? (m_latch_bank2 >> 5) : 0;
-		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset] = data;
+
+		switch (m_mode) {
+		case MODE_4M_256k:
+			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset] = data;
+			break;
+		case MODE_16M_8k:
+			// $$FALL-THROUGH$$
+		default:
+			m_ram[ram_bank_map[0x00u] * 0x2000 + offset] = data;
+			break;
+		}
+
 	}
 }
-
-
-// MBC1 Korean variant (used by Bomberman Selection)
-
-READ8_MEMBER(gb_rom_mbc1col_device::read_rom)
-{
-	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
-	else
-		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
-}
-
-WRITE8_MEMBER(gb_rom_mbc1col_device::write_bank)
-{
-	if (offset < 0x2000)
-		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
-	else if (offset < 0x4000)
-	{
-		// 4bits only?
-		data &= 0x0f;
-		// bank = 0 => bank = 1
-		if (data == 0)
-			data = 1;
-
-		m_latch_bank2 = (m_latch_bank2 & 0x01f0) | data;
-	}
-	else if (offset < 0x6000)
-	{
-		// 2bits only
-		data &= 0x3;
-		m_latch_bank2 = (m_latch_bank2 & 0x000f) | (data << 4);
-		m_latch_bank = m_latch_bank2 & 0x30;
-	}
-	else
-		m_mode = data & 0x1;
-}
-
-// RAM access is the same as usual MBC1
-READ8_MEMBER(gb_rom_mbc1col_device::read_ram)
-{
-	if (m_ram && m_ram_enable)
-	{
-		m_ram_bank = m_mode ? (m_latch_bank2 >> 5) : 0;
-		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset];
-	}
-	else
-		return 0xff;
-}
-
-WRITE8_MEMBER(gb_rom_mbc1col_device::write_ram)
-{
-	if (m_ram && m_ram_enable)
-	{
-		m_ram_bank = m_mode ? (m_latch_bank2 >> 5) : 0;
-		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset] = data;
-	}
-}
+#undef COMMA
 
 // MBC2
 
