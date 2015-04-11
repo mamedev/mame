@@ -9,7 +9,7 @@
     video system.
 
     On the real machine, the Video chip has a block of 64K of memory which is
-    completely seperate from the main 80186 memory.
+    completely separate from the main 80186 memory.
 
     The main CPU write to the video chip via a series of registers in the
     0x0000 to 0x002F reigon, the video chip then manages all video memory

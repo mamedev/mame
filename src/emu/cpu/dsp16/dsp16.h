@@ -91,12 +91,12 @@ protected:
 	UINT16 m_sdx;
 	UINT16 m_pioc;
 	UINT16 m_pdx0;  // pdx0 & pdx1 refer to the same physical register (page 6-1)
-	UINT16 m_pdx1;  // but we keep them seperate for logic's sake.
+	UINT16 m_pdx1;  // but we keep them separate for logic's sake.
 
 	// internal stuff
 	UINT16 m_ppc;
 
-	// This CPU core handles the cache as more of a loop than 15 seperate memory elements.
+	// This CPU core handles the cache as more of a loop than 15 separate memory elements.
 	// It's a bit of a hack, but it's easier this way (for now).
 	UINT16 m_cacheStart;
 	UINT16 m_cacheEnd;

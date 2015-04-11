@@ -734,7 +734,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
  * bit 2 - DMA channel width (0=8-bit, 1=16-bit)
  * bits 3,4 - DMA rate divider
  * bit 5 - DMA terminal count IRQ enable
- * bit 6 - DMA terminal count IRQ pending (read), Data size (write, 0=8bit, 1=16-bit, independant of channel size)
+ * bit 6 - DMA terminal count IRQ pending (read), Data size (write, 0=8bit, 1=16-bit, independent of channel size)
  * bit 7 - Invert MSB of data
  */
 		if(offset == 1)

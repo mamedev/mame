@@ -51,7 +51,7 @@ TODO - Write documentation
           | | +------------ input from FEAT0 on the feature connector
           | +-------------- input from FEAT1 on the feature connector
           +---------------- CRT Interrupt
-                            0 = vertical retrace if occuring
+                            0 = vertical retrace if occurring
                             1 = video is being displayed
 
 

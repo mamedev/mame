@@ -179,7 +179,7 @@ void nes_miracle_device::write(UINT8 data)
 
 			if (m_strobe_clock < 66 && data == 0)
 			{
-				// short delay is recieve mode
+				// short delay is receive mode
 				m_midi_mode = MIRACLE_MIDI_RECEIVE;
 				strobe_timer->reset();
 				m_strobe_on = 0;

@@ -312,7 +312,7 @@ WRITE8_MEMBER( sns_rom_pokemon_device::chip_write )
 // Tekken 2: It accesses the protection in a very strange way, always reading/writing the same data $f0 times,
 // because each access must be repeated a couple of times to be registered (typically around 7-30 times)
 // They probably used a microcontroller here.
-// The protection itself is accessed in banks $80-$bf. Accessing (read/write, doesn't matter) adress lines
+// The protection itself is accessed in banks $80-$bf. Accessing (read/write, doesn't matter) address lines
 // A8,A9,A10 in these banks in a certain sequence makes the mc return a 4bit value. [d4s]
 // Details on a possible algorythm behind the sequence of accesses were provided by nocash. Thanks!
 void sns_rom_tekken2_device::update_prot(UINT32 offset)

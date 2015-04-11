@@ -2930,12 +2930,12 @@ int CLIB_DECL main(int argc, char *argv[])
 			}
 			catch (chd_error &err)
 			{
-				fprintf(stderr, "CHD error occured (main): %s\n", chd_file::error_string(err));
+				fprintf(stderr, "CHD error occurred (main): %s\n", chd_file::error_string(err));
 				return 1;
 			}
 			catch (fatal_error &err)
 			{
-				fprintf(stderr, "Fatal error occured: %d\n", err.error());
+				fprintf(stderr, "Fatal error occurred: %d\n", err.error());
 				return err.error();
 			}
 			catch (std::exception& ex)

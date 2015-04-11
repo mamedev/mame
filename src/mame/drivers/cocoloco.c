@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( cocoloco_map, AS_PROGRAM, 8, cocoloco_state )
 ADDRESS_MAP_END
 
 /*
-  1800-3fff: RW  --> code inits reading and writting the whole range.
+  1800-3fff: RW  --> code inits reading and writing the whole range.
 
   All 3 instances of A005 reads (d07e, d355 and dca8),
   discard the read in a non-sense way....

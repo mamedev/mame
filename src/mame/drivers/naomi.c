@@ -67,7 +67,7 @@ TODO (general):
     * Shootout Pool Medal
     * Shootout Pool Prize
 
-    - "com error occured between Naomi BD and I/O BD"
+    - "com error occurred between Naomi BD and I/O BD"
     * Samba de Amigo
     * Samba de Amigo (prototype)
     * Samba de Amigo Ver. 2000
@@ -595,7 +595,7 @@ Mushiking - The King Of Beetles II ENG (Ver. 1.001) 840-0164C  not present  2 (5
 Mushiking - The King Of Beetles II ENG (Ver. 2.001) 840-0164C  24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
 Poka Suka Ghost                                     840-0170C  not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
 Radirgy Noa                                         841-0062C  not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
-Rythm Tengoku                                       841-0177C  not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Rhythm Tengoku                                      841-0177C  not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
 Star Horse Progress Returns (satellite)             840-0186C  not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Shooting Love 2007                                  841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)                              840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18", requires 837-14672 sensor board (SH4 based)

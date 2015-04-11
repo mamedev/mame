@@ -2669,12 +2669,12 @@ void chd_file_compressor::async_read()
 	}
 	catch (chd_error& err)
 	{
-		fprintf(stderr, "CHD error occured: %s\n", chd_file::error_string(err));
+		fprintf(stderr, "CHD error occurred: %s\n", chd_file::error_string(err));
 		m_read_error = true;
 	}
 	catch (std::exception& ex)
 	{
-		fprintf(stderr, "exception occured: %s\n", ex.what());
+		fprintf(stderr, "exception occurred: %s\n", ex.what());
 		m_read_error = true;
 	}
 }

@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chance32_portmap, AS_IO, 8, chance32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP        // writting bit3 constantly... watchdog?
+	AM_RANGE(0x10, 0x10) AM_WRITENOP        // writing bit3 constantly... watchdog?
 	AM_RANGE(0x13, 0x13) AM_WRITE(mux_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW1")

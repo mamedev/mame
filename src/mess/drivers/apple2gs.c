@@ -288,7 +288,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
 	SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
 	SLOT_INTERFACE("echoii", A2BUS_ECHOII)    /* Street Electronics Echo II */
-	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millenium Engineering Arcade Board */
+	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millennium Engineering Arcade Board */
 	SLOT_INTERFACE("midi", A2BUS_MIDI)  /* Generic 6840+6850 MIDI board */
 	SLOT_INTERFACE("vulcan", A2BUS_VULCAN)  /* AE Vulcan IDE card */
 	SLOT_INTERFACE("vulcangold", A2BUS_VULCANGOLD)  /* AE Vulcan Gold IDE card */

@@ -53,7 +53,7 @@ Cookie & Bibi 3
 This game is quite buggy.  The test mode is incomplete and displays garbage
 on the 'Dipswitch settings' screens, and during some of the attract mode
 scenes the credit counter is not updated when you insert coins until the next
-scene.  Both these bugs are verified as occuring on the original hardware.
+scene.  Both these bugs are verified as occurring on the original hardware.
 
 Honey Doll / Twin Adventure
 

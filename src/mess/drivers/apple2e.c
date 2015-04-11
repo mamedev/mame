@@ -3019,7 +3019,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("ap16alt", A2BUS_IBSAP16ALT)    /* IBS AP16 (German VideoTerm clone), alternate revision */
 	SLOT_INTERFACE("vtc1", A2BUS_VTC1)    /* Unknown VideoTerm clone #1 */
 	SLOT_INTERFACE("vtc2", A2BUS_VTC2)    /* Unknown VideoTerm clone #2 */
-	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millenium Engineering Arcade Board */
+	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millennium Engineering Arcade Board */
 	SLOT_INTERFACE("midi", A2BUS_MIDI)  /* Generic 6840+6850 MIDI board */
 	SLOT_INTERFACE("zipdrive", A2BUS_ZIPDRIVE)  /* ZIP Technologies IDE card */
 	SLOT_INTERFACE("echoiiplus", A2BUS_ECHOPLUS)    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */

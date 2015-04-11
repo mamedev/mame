@@ -616,9 +616,9 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
  * when in loopback/test mode, SYSTAT_B is read and expected the following, around 0x606:
  * reset 8751, modewrite of 0x5E
- * write command -> 0x20 (normal, normal, /RTS is 0, normal, normal, recieve off, /DTR is 1, transmit off)
+ * write command -> 0x20 (normal, normal, /RTS is 0, normal, normal, receive off, /DTR is 1, transmit off)
  * read SYSTAT B (and xor with 0xe), expect d7 to be CLEAR or jump to error
- * write command -> 0x05 (normal, normal, /RTS is 1, normal, normal, recieve ON, /DTR is 0, transmit off)
+ * write command -> 0x05 (normal, normal, /RTS is 1, normal, normal, receive ON, /DTR is 0, transmit off)
  * read SYSTAT B (and xor with 0xe), expect d7 to be SET or jump to error
  * after this it does something and waits for an rxrdy interrupt
 

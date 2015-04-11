@@ -11,7 +11,7 @@
     Interfacing it with the tms5110 would make sense, too.
 
     TODO:
-        Create seperate devices for TMS6100 & TMS6125
+        Create separate devices for TMS6100 & TMS6125
         Implement the serial protocol
 */
 

@@ -29,7 +29,7 @@ PRINTER communication (Star Printer )
 ******************************************************
 SECURITY SYSTEM
 
-ADRESS A40000..A40001
+ADDRESS A40000..A40001
 U35 PAL16R8  SECURITY
 PAL is connect on the BUS D15..D8
 Write Clock 8 bits in D15..D8
@@ -204,7 +204,7 @@ need further test on PAL16R8 (FlipFlop Trick with other bits ?)
 this DUMP is done writing 0 to 255 and reading output (probably not the good way.)
 
 PAL is connected on the UPPER byte D15..D8
-Adress A40000..A40001
+Address A40000..A40001
 2 Type of PAL (one for game, the other is to set game to fabric default)
 
 there is a 74LS173 on the LOWER byte that used bit D3..D0
@@ -469,7 +469,7 @@ U40 MC68681 PIN38 IP5  from U51 DS1260 smart Battery POWER FAIL FLAG
 U40 MC68681 Pin12 OP1  JCM Bill Acceptor  (Enable Comm. U34)
 U40 MC68681 Pin27 OP4  JCM Bill Acceptor  (J4-6, J4-7 Control)
 
-// missing adress for :
+// missing address for :
 // external I/O board communication via PAL23
 
     A23 A22 A21 A20  | A19 A18 A17 A16 | A15 A14 A13 A12 | A11 A10 A9 A8 | A7 A6 A5 A4 | A3 A2 A1 xx
@@ -487,11 +487,11 @@ U40 MC68681 Pin27 OP4  JCM Bill Acceptor  (J4-6, J4-7 Control)
     00014001
     00020001
     00024001
-    00900001 6845  CS  CRTC U8  RS=LOW   ADRESS REGISTER    (A15 ON RS)  Data bus on D7..D0
+    00900001 6845  CS  CRTC U8  RS=LOW   ADDRESS REGISTER   (A15 ON RS)  Data bus on D7..D0
     00980001 6845  CS  CRTC U8  RS=HIGH  DATA   REGISTER    (A15 ON RS)
     00A00001           I/O Board Communication
     00A08001           I/O Board Communication
-    00A10000 WDT    STROBE DS1232 WatchDog Controller (this adress reset Strobe of Ds1232)
+    00A10000 WDT    STROBE DS1232 WatchDog Controller (this address reset Strobe of Ds1232)
     00A20001 AY8912 BDIR  AUDIO  Data bus on D7..D0
     00A28001 AY8912 BC1   AUDIO
     00A300x1 6242  CS  RTC  U41 A0..A3   (A4..A7 ON A0..A3)  Data bus on D3..D0

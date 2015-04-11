@@ -321,7 +321,7 @@ machine_config_constructor single_conn_device::device_mconfig_additions() const
     The multi-cartridge extender
 
     This is a somewhat mythical device which was never available for the normal
-    customer, but there are reports of the existance of such a device
+    customer, but there are reports of the existence of such a device
     in development labs or demonstrations.
 
     The interesting thing about this is that the OS of the console

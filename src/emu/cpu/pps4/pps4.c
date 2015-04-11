@@ -571,7 +571,7 @@ void pps4_device::iEXD()
  * The 4-bit contents, immediate field I(4:1),
  * of the instruction are placed in the accumulator.
  *
- * Note: Only the first occurence of an LDI in a consecutive
+ * Note: Only the first occurrence of an LDI in a consecutive
  * string of LDIs will be executed. The program will ignore
  * remaining LDIs and execute next valid instruction.
  *
@@ -815,7 +815,7 @@ void pps4_device::iCYS()
  * This instruction takes two cycles to execute but occupies
  * only one ROM word. (Automatic return)
  *
- * Only the first occurence of an LB or LBL instruction in a
+ * Only the first occurrence of an LB or LBL instruction in a
  * consecutive string of LB or LBL will be executed. The
  * program will ignore the remaining LB or LBL and execute
  * the next valid instruction. Within subroutines the LB
@@ -858,7 +858,7 @@ void pps4_device::iLB()
  * bits of the B register. The four most significant bits
  * of B (BU) will be loaded with zeroes.
  *
- * Only the first occurence of an LB or LBL instruction in a
+ * Only the first occurrence of an LB or LBL instruction in a
  * consecutive string of LB or LBL will be executed. The
  * program will ignore the remaining LB or LBL and execute
  * the next valid instruction.

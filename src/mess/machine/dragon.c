@@ -25,9 +25,9 @@ this is set to toggle at 1Hz, this seems to be good enough to trigger the
 cartline, but is so slow in real terms that it should have very little
 impact on the emulation speed.
 
-Re-factored the code common to all machines, and seperated the code different,
+Re-factored the code common to all machines, and separated the code different,
 into callbacks/functions unique to the machines, in preperation for splitting
-the code for individual machine types into seperate files, I have preposed, that
+the code for individual machine types into separate files, I have preposed, that
 the CoCo 1/2 should stay in coco.c, and that the coco3 and dragon specifc code
 should go into coco3.c and dragon.c which should (hopefully) make the code
 easier to manage.

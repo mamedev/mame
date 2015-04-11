@@ -394,7 +394,7 @@ TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 
 	// handle our expiring and also tick our cascaded children
 	if (timer_tick_simple(tmr) == 2)
-		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occured
+		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occurred
 	else
 		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
 

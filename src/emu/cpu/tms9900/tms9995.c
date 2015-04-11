@@ -1467,7 +1467,7 @@ void tms9995_device::int_prefetch_and_decode()
 				if (m_idle_state)
 				{
 					m_idle_state = false;
-					if (TRACE_INT) logerror("tms9995: Interrupt occured, terminate IDLE state\n");
+					if (TRACE_INT) logerror("tms9995: Interrupt occurred, terminate IDLE state\n");
 				}
 				PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
 				if (TRACE_INT) logerror("tms9995: Interrupts pending; no prefetch; advance PC to %04x\n", PC);

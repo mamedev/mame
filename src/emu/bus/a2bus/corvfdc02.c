@@ -257,7 +257,7 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::intrq_w)
 {
 	if (state)
 	{
-		m_fdc_local_status &= ~2;   // indicate IRQ occured
+		m_fdc_local_status &= ~2;   // indicate IRQ occurred
 		if (m_fdc_local_command & 0x20)
 		{
 			raise_slot_irq();

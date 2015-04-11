@@ -1102,7 +1102,7 @@ void tms32025_device::macd()          /** RAM blocks B0,B1,B2 may be important !
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
-	if ( (m_opcode.b.l & 0x80) || m_init_load_addr ) {  /* No writing during repitition, or DMA mode */
+	if ( (m_opcode.b.l & 0x80) || m_init_load_addr ) {  /* No writing during repetition, or DMA mode */
 		M_WRTRAM((m_memaccess+1), m_ALU.w.l);
 	}
 	m_Treg = m_ALU.w.l;

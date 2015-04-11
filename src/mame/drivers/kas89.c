@@ -282,7 +282,7 @@ WRITE8_MEMBER(kas89_state::mux_w)
     7654 3210
     xxxx xxxx   Input selector.
 
-    Writes: 1-2-4-8-10-20-40-3f. Only 80 (for DSW) at very begining...
+    Writes: 1-2-4-8-10-20-40-3f. Only 80 (for DSW) at very beginning...
 */
 
 	m_mux_data = data;

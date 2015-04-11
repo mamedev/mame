@@ -40,7 +40,7 @@
  *  cchsV - Read a sector from disk (cc = cylinder, h = head [bit 0=drive, bit 2=side], s = sector)
  *  cchsW - Write a sector from disk
  *  nnnnmmmmX - I/O port transmit (nnnn = number of bytes to transmit, mmmm = start of data to transmit)
- *  nnnnY - I/O port recieve (nnnn = address of data loaded)
+ *  nnnnY - I/O port receive (nnnn = address of data loaded)
  *  Z - Auto Disk Test (1Z for drive B)
  *
  *
