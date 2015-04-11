@@ -48,7 +48,7 @@ public:
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<fmscsi_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<fmscsi_device &>(device).m_drq_handler.set_callback(object); }
 
-	// any publicly accessible interfaces needed for runtime
+	// any publically accessible interfaces needed for runtime
 	UINT8 fmscsi_data_r(void);
 	void fmscsi_data_w(UINT8 data);
 	UINT8 fmscsi_status_r(void);
