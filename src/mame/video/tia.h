@@ -66,7 +66,7 @@ protected:
 	virtual void device_reset();
 
 	void draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gfx *gfx, UINT8 GRP, UINT8 COLUP, UINT8 REFP);
-	void draw_missile_helper(UINT8* p, UINT8* col, int horz, int skipdelay, int latch, int start, UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUMN);
+	void draw_missile_helper(UINT8* p, UINT8* col, int horz, int skipdelay, int latch, int start, UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM);
 	void draw_playfield_helper(UINT8* p, UINT8* col, int horz, UINT8 COLU, UINT8 REFPF);
 	void draw_ball_helper(UINT8* p, UINT8* col, int horz, UINT8 ENAB);
 	void drawS0(UINT8* p, UINT8* col);
