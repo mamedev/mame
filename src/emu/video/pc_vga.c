@@ -276,7 +276,6 @@ void cirrus_vga_device::device_start()
 	vga.svga_intf.seq_regcount = 0x1f;
 	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.svga_intf.vram_size = 0x200000;
-	gc_locked = true;
 
 	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
@@ -1142,6 +1141,83 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 	}
 	return 0;
+}
+
+UINT32 cirrus_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	UINT8 cur_mode = 0;
+	int x,y,bit;
+	UINT32 ptr = (vga.svga_intf.vram_size - 0x4000);  // cursor patterns are stored in the last 16kB of VRAM
+	svga_device::screen_update(screen, bitmap, cliprect);
+
+	cur_mode = pc_vga_choosevideomode();
+
+	if(m_cursor_attr & 0x01)  // hardware cursor enabled
+	{
+		// draw hardware graphics cursor
+		if(m_cursor_attr & 0x04)  // 64x64
+		{
+			ptr += ((m_cursor_addr & 0x3c) * 256);
+			for(y=0;y<64;y++)
+			{
+				for(x=0;x<64;x+=8)
+				{
+					for(bit=0;bit<8;bit++)
+					{
+						UINT8 pixel1 = vga.memory[ptr] >> (7-bit);
+						UINT8 pixel2 = vga.memory[ptr+256] >> (7-bit);
+						UINT8 output = ((pixel1 & 0x01) << 1) | (pixel2 & 0x01);
+						switch(output)
+						{
+						case 0:  // transparent - do nothing
+							break;
+						case 1:  // background
+							bitmap.pix32(y,x+bit) = (m_ext_palette[0].red << 16) | (m_ext_palette[0].green << 8) | (m_ext_palette[0].blue);
+							break;
+						case 2:  // XOR
+							bitmap.pix32(y,x+bit) = ~bitmap.pix32(y,x+bit);
+							break;
+						case 3:  // foreground
+							bitmap.pix32(y,x+bit) = (m_ext_palette[15].red << 16) | (m_ext_palette[15].green << 8) | (m_ext_palette[15].blue);
+							break;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			ptr += ((m_cursor_addr & 0x3f) * 256);
+			for(y=0;y<32;y++)
+			{
+				for(x=0;x<32;x+=8)
+				{
+					for(bit=0;bit<8;bit++)
+					{
+						UINT8 pixel1 = vga.memory[ptr] >> (7-bit);
+						UINT8 pixel2 = vga.memory[ptr+128] >> (7-bit);
+						UINT8 output = ((pixel1 & 0x01) << 1) | (pixel2 & 0x01);
+						switch(output)
+						{
+						case 0:  // transparent - do nothing
+							break;
+						case 1:  // background
+							bitmap.pix32(y,x+bit) = (m_ext_palette[0].red << 16) | (m_ext_palette[0].green << 8) | (m_ext_palette[0].blue);
+							break;
+						case 2:  // XOR
+							bitmap.pix32(y,x+bit) = ~bitmap.pix32(y,x+bit);
+							break;
+						case 3:  // foreground
+							bitmap.pix32(y,x+bit) = (m_ext_palette[15].red << 16) | (m_ext_palette[15].green << 8) | (m_ext_palette[15].blue);
+							break;
+						}
+					}
+					ptr++;
+				}
+			}
+		}
+	}
+	return 0;	
 }
 
 /***************************************************************************/
@@ -2023,6 +2099,21 @@ void s3_vga_device::device_reset()
 	s3.strapping = 0x000f0b1e;
 	s3.sr10 = 0x42;
 	s3.sr11 = 0x41;
+}
+
+void cirrus_vga_device::device_reset()
+{
+	vga_device::device_reset();
+	gc_locked = true;
+	gc_mode_ext = 0;
+	gc_bank_0 = gc_bank_1 = 0;
+	gc_blt_status = 0;
+	m_cursor_attr = 0x00;  // disable hardware cursor and extra palette
+	m_cursor_x = m_cursor_y = 0;
+	m_cursor_addr = 0;
+	m_scratchpad1 = m_scratchpad2 = m_scratchpad3 = 0;
+	m_cr19 = m_cr1a = m_cr1b = 0;
+	memset(m_ext_palette, 0, sizeof(m_ext_palette));
 }
 
 READ8_MEMBER(vga_device::mem_r)
@@ -5684,13 +5775,20 @@ UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
 			if(gc_locked)
 				return 0x0f;
 			else
-				return 0x00;
+				return m_lock_reg;
 			break;
-		case 0x07:
 		case 0x09:
-		case 0x0a:
 			//printf("%02x\n",index);
 			res = vga.sequencer.data[index];
+			break;
+		case 0x0a:
+			res = m_scratchpad1;
+			break;
+		case 0x14:
+			res = m_scratchpad2;
+			break;
+		case 0x15:
+			res = m_scratchpad3;
 			break;
 		default:
 			res = vga.sequencer.data[index];
@@ -5712,18 +5810,64 @@ void cirrus_vga_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 		case 0x06:
 			// Note: extensions are always enabled on the GD5429
 			if((data & 0x17) == 0x12)  // bits 3,5,6,7 ignored
+			{
 				gc_locked = false;
+				logerror("Cirrus register extensions unlocked\n");
+			}
 			else
+			{
 				gc_locked = true;
-		case 0x09:
-		case 0x0a:
-			//printf("%02x %02x\n",index,data);
-			vga.sequencer.data[vga.sequencer.index] = data;
+				logerror("Cirrus register extensions locked\n");
+			}
+			m_lock_reg = data & 0x17;
 			break;
 		case 0x07:
 			if((data & 0xf0) != 0)
-				popmessage("1MB framebuffer window enabled at %iMB",data >> 4);
+				popmessage("1MB framebuffer window enabled at %iMB (%02x)",data >> 4,data);
 			vga.sequencer.data[vga.sequencer.index] = data;
+			break;
+		case 0x09:
+			//printf("%02x %02x\n",index,data);
+			vga.sequencer.data[vga.sequencer.index] = data;
+			break;
+		case 0x0a:
+			m_scratchpad1 = data;  // GD5402/GD542x BIOS writes VRAM size here.
+			break;
+		case 0x10:
+		case 0x30:
+		case 0x50:
+		case 0x70:
+		case 0x90:
+		case 0xb0:
+		case 0xd0:
+		case 0xf0:  // bits 5-7 of the register index are the low bits of the X co-ordinate
+			m_cursor_x = (data << 3) | ((index & 0xe0) >> 5);
+			break;
+		case 0x11:
+		case 0x31:
+		case 0x51:
+		case 0x71:
+		case 0x91:
+		case 0xb1:
+		case 0xd1:
+		case 0xf1:  // bits 5-7 of the register index are the low bits of the Y co-ordinate
+			m_cursor_y = (data << 3) | ((index & 0xe0) >> 5);
+			break;
+		case 0x12:
+			// bit 0 - enable cursor
+			// bit 1 - enable extra palette (cursor colours are there)
+			// bit 2 - 64x64 cursor (32x32 if clear, GD5422+)
+			// bit 7 - overscan colour protect - if set, use colour 2 in the extra palette for the border (GD5424+)
+			m_cursor_attr = data;
+			break;
+		case 0x13:
+			m_cursor_addr = data;  // bits 0 and 1 are ignored if using 64x64 cursor
+			break;
+		case 0x14:
+			m_scratchpad2 = data;
+			break;
+		case 0x15:
+			m_scratchpad3 = data;  // GD543x BIOS writes VRAM size here
 			break;
 		default:
 			vga.sequencer.data[vga.sequencer.index] = data;
@@ -5830,12 +5974,40 @@ void cirrus_vga_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 
 READ8_MEMBER(cirrus_vga_device::port_03c0_r)
 {
-	UINT8 res;
+	UINT8 res = 0xff;
 
 	switch(offset)
 	{
 		case 0x05:
 			res = cirrus_seq_reg_read(vga.sequencer.index);
+			break;
+		case 0x09:
+			if(!(m_cursor_attr & 0x02))
+				res = vga_device::port_03c0_r(space,offset,mem_mask);
+			else
+			{
+				if (vga.dac.read)
+				{
+					switch (vga.dac.state++)
+					{
+						case 0:
+							res = m_ext_palette[vga.dac.read_index & 0x0f].red;
+							break;
+						case 1:
+							res = m_ext_palette[vga.dac.read_index & 0x0f].green;
+							break;
+						case 2:
+							res = m_ext_palette[vga.dac.read_index & 0x0f].blue;
+							break;
+					}
+
+					if (vga.dac.state==3)
+					{
+						vga.dac.state = 0;
+						vga.dac.read_index++;
+					}
+				}
+			}				
 			break;
 		case 0x0f:
 			res = cirrus_gc_reg_read(vga.gc.index);
@@ -5854,6 +6026,31 @@ WRITE8_MEMBER(cirrus_vga_device::port_03c0_w)
 	{
 		case 0x05:
 			cirrus_seq_reg_write(vga.sequencer.index,data);
+			break;
+		case 0x09:
+			if(!(m_cursor_attr & 0x02))
+				vga_device::port_03c0_w(space,offset,data,mem_mask);
+			else
+			{
+				if (!vga.dac.read)
+				{
+					switch (vga.dac.state++) {
+					case 0:
+						m_ext_palette[vga.dac.write_index & 0x0f].red=data;
+						break;
+					case 1:
+						m_ext_palette[vga.dac.write_index & 0x0f].green=data;
+						break;
+					case 2:
+						m_ext_palette[vga.dac.write_index & 0x0f].blue=data;
+						break;
+					}
+					vga.dac.dirty=1;
+					if (vga.dac.state==3) {
+						vga.dac.state=0; vga.dac.write_index++;
+					}
+				}
+			}
 			break;
 		case 0x0f:
 			cirrus_gc_reg_write(vga.gc.index,data);
@@ -5948,8 +6145,17 @@ UINT8 cirrus_vga_device::cirrus_crtc_reg_read(UINT8 index)
 
 	switch(index)
 	{
+	case 0x19:
+		res = m_cr19;
+		break;
+	case 0x1a:
+		res = m_cr1a;
+		break;
+	case 0x1b:
+		res = m_cr1b;
+		break;
 	case 0x27:
-		res = 0xa0;
+		res = 0xa0;  // Chip ID - GD5430 rev 0
 		break;
 	default:
 		logerror("CL: Unhandled extended CRTC register CR%02x read\n",index);
@@ -5967,6 +6173,15 @@ void cirrus_vga_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
 	}
 	switch(index)
 	{
+	case 0x19:
+		m_cr19 = data;
+		break;
+	case 0x1a:
+		m_cr1a = data;
+		break;
+	case 0x1b:
+		m_cr1b = data;
+		break;
 	case 0x27:
 		// Do nothing, read only
 		break;
@@ -5980,8 +6195,9 @@ READ8_MEMBER(cirrus_vga_device::mem_r)
 {
 	UINT32 addr;
 	UINT8 bank;
+	UINT8 cur_mode = pc_vga_choosevideomode();
 
-	if(gc_locked)
+	if(gc_locked || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 		return vga_device::mem_r(space,offset,mem_mask);
 
 	if(offset >= 0x8000 && offset < 0x10000 && (gc_mode_ext & 0x01)) // if accessing bank 1 (if enabled)
@@ -5993,7 +6209,7 @@ READ8_MEMBER(cirrus_vga_device::mem_r)
 		addr = bank * 0x4000;
 	else  // 4kB bank granularity
 		addr = bank * 0x1000;
-	// Win 3.1 GD5426/8 drivers use this in 16-colour mode also
+
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		if(gc_mode_ext & 0x01)
@@ -6080,8 +6296,9 @@ WRITE8_MEMBER(cirrus_vga_device::mem_w)
 {
 	UINT32 addr;
 	UINT8 bank;
+	UINT8 cur_mode = pc_vga_choosevideomode();
 
-	if(gc_locked)
+	if(gc_locked || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 	{
 		vga_device::mem_w(space,offset,data,mem_mask);
 		return;

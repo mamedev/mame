@@ -637,9 +637,12 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w);
 	virtual READ8_MEMBER(mem_r);
 	virtual WRITE8_MEMBER(mem_w);
+
+	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual UINT16 offset();
 
 	UINT8 gc_mode_ext;
@@ -647,6 +650,22 @@ protected:
 	UINT8 gc_bank_1;
 	UINT8 gc_blt_status;
 	bool gc_locked;
+	UINT8 m_lock_reg;
+	
+	UINT8 m_cr19;
+	UINT8 m_cr1a;
+	UINT8 m_cr1b;
+	
+	// hardware cursor
+	UINT16 m_cursor_x;
+	UINT16 m_cursor_y;
+	UINT16 m_cursor_addr;
+	UINT8 m_cursor_attr;
+	struct { UINT8 red, green, blue; } m_ext_palette[16];  // extra palette, colour 0 is cursor background, colour 15 is cursor foreground, colour 2 is overscan border colour
+	
+	UINT8 m_scratchpad1;
+	UINT8 m_scratchpad2;
+	UINT8 m_scratchpad3;
 private:
 	void cirrus_define_video_mode();
 	UINT8 cirrus_seq_reg_read(UINT8 index);
