@@ -79,7 +79,6 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_write_ready(*this),
 	m_write_brdy(*this),
 	m_write_error(*this),
-	m_write_wps(*this),
 	m_gcr_rom(*this, "gcr"),
 	m_floppy0(NULL),
 	m_floppy1(NULL),
@@ -90,10 +89,7 @@ c8050_fdc_t::c8050_fdc_t(const machine_config &mconfig, const char *tag, device_
 	m_ds(0),
 	m_drv_sel(0),
 	m_mode_sel(0),
-	m_rw_sel(0),
-	m_wps(0),
-	m_wps0(0),
-	m_wps1(0)
+	m_rw_sel(0)
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
@@ -113,7 +109,6 @@ void c8050_fdc_t::device_start()
 	m_write_ready.resolve_safe();
 	m_write_brdy.resolve_safe();
 	m_write_error.resolve_safe();
-	m_write_wps.resolve_safe();
 
 	// allocate timer
 	t_gen = timer_alloc(0);
@@ -127,6 +122,8 @@ void c8050_fdc_t::device_start()
 	save_item(NAME(m_drv_sel));
 	save_item(NAME(m_mode_sel));
 	save_item(NAME(m_rw_sel));
+	save_item(NAME(m_odd_hd));
+	save_item(NAME(m_pi));
 }
 
 
@@ -222,47 +219,7 @@ void c8050_fdc_t::ds_w(int ds)
 void c8050_fdc_t::set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1)
 {
 	m_floppy0 = floppy0;
-	m_floppy0->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(c8050_fdc_t::wps0_w), this));
-
-	if (floppy1) {
-		m_floppy1 = floppy1;
-		m_floppy1->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(c8050_fdc_t::wps1_w), this));
-	}
-}
-
-void c8050_fdc_t::update_wps()
-{
-	int state = m_drv_sel ? m_wps1 : m_wps0;
-
-	if (m_wps != state)
-	{
-		m_wps = state;
-		m_write_wps(m_wps);
-	}
-}
-
-void c8050_fdc_t::wps0_w(floppy_image_device *floppy, int state)
-{
-	if (m_wps0 != state)
-	{
-		live_sync();
-		m_wps0 = state;
-		update_wps();
-		checkpoint();
-		live_run();
-	}
-}
-
-void c8050_fdc_t::wps1_w(floppy_image_device *floppy, int state)
-{
-	if (m_wps1 != state)
-	{
-		live_sync();
-		m_wps0 = state;
-		update_wps();
-		checkpoint();
-		live_run();
-	}
+	m_floppy1 = floppy1;
 }
 
 void c8050_fdc_t::live_start()
@@ -281,7 +238,6 @@ void c8050_fdc_t::live_start()
 	cur_live.mode_sel = m_mode_sel;
 	cur_live.rw_sel = m_rw_sel;
 	cur_live.pi = m_pi;
-	cur_live.wps = m_wps;
 
 	pll_reset(cur_live.tm, attotime::from_hz(clock() / (16 - m_ds)));
 	checkpoint_live = cur_live;
@@ -408,6 +364,7 @@ void c8050_fdc_t::live_run(const attotime &limit)
 			if (cur_live.tm > limit)
 				return;
 
+			// read bit
 			int bit = pll_get_next_bit(cur_live.tm, get_floppy(), limit);
 			if(bit < 0)
 				return;
@@ -563,7 +520,6 @@ WRITE_LINE_MEMBER( c8050_fdc_t::drv_sel_w )
 	{
 		live_sync();
 		m_drv_sel = cur_live.drv_sel = state;
-		update_wps();
 		checkpoint();
 		if (LOG) logerror("%s %s DRV SEL %u\n", machine().time().as_string(), machine().describe_context(), state);
 		live_run();

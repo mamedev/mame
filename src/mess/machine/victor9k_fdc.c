@@ -260,8 +260,6 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 }
 
 
@@ -271,6 +269,11 @@ victor_9000_fdc_t::victor_9000_fdc_t(const machine_config &mconfig, const char *
 
 void victor_9000_fdc_t::device_start()
 {
+	// resolve callbacks
+	m_irq_cb.resolve_safe();
+	m_syn_cb.resolve_safe();
+	m_lbrdy_cb.resolve_safe();
+
 	// allocate timer
 	t_gen = timer_alloc(TM_GEN);
 	t_tach0 = timer_alloc(TM_TACH0);
@@ -313,11 +316,6 @@ void victor_9000_fdc_t::device_start()
 void victor_9000_fdc_t::device_reset()
 {
 	live_abort();
-
-	// resolve callbacks
-	m_irq_cb.resolve_safe();
-	m_syn_cb.resolve_safe();
-	m_lbrdy_cb.resolve_safe();
 
 	// reset devices
 	m_via4->reset();
@@ -1176,8 +1174,6 @@ void victor_9000_fdc_t::live_abort()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 
 	cur_live.brdy = 1;
 	cur_live.lbrdy_changed = true;

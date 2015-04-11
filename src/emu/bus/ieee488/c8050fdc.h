@@ -38,9 +38,6 @@
 #define MCFG_C8050_ERROR_CALLBACK(_write) \
 	devcb = &c8050_fdc_t::set_error_wr_callback(*device, DEVCB_##_write);
 
-#define MCFG_C8050_WPS_CALLBACK(_write) \
-	devcb = &c8050_fdc_t::set_wps_wr_callback(*device, DEVCB_##_write);
-
 
 
 //**************************************************************************
@@ -59,7 +56,6 @@ public:
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_ready.set_callback(object); }
 	template<class _Object> static devcb_base &set_brdy_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_brdy.set_callback(object); }
 	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_error.set_callback(object); }
-	template<class _Object> static devcb_base &set_wps_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_wps.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -74,13 +70,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( odd_hd_w );
 	DECLARE_WRITE_LINE_MEMBER( pull_sync_w );
 
+	DECLARE_READ_LINE_MEMBER( wps_r ) { return checkpoint_live.drv_sel ? m_floppy1->wpt_r() : m_floppy0->wpt_r(); }
+
 	void stp0_w(int stp);
 	void stp1_w(int stp);
 	void ds_w(int ds);
 
 	void set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1);
-	void wps0_w(floppy_image_device *floppy, int state);
-	void wps1_w(floppy_image_device *floppy, int state);
 
 protected:
 	// device-level overrides
@@ -92,7 +88,6 @@ protected:
 	virtual const rom_entry *device_rom_region() const;
 
 	void stp_w(floppy_image_device *floppy, int mtr, int &old_stp, int stp);
-	void update_wps();
 
 	enum {
 		IDLE,
@@ -123,14 +118,12 @@ protected:
 
 		UINT8 pi;
 		UINT16 shift_reg_write;
-		int wps;
 	};
 
 	devcb_write_line m_write_sync;
 	devcb_write_line m_write_ready;
 	devcb_write_line m_write_brdy;
 	devcb_write_line m_write_error;
-	devcb_write_line m_write_wps;
 
 	required_memory_region m_gcr_rom;
 
@@ -149,9 +142,6 @@ protected:
 	int m_rw_sel;
 	int m_odd_hd;
 	UINT8 m_pi;
-	int m_wps;
-	int m_wps0;
-	int m_wps1;
 
 	live_info cur_live, checkpoint_live;
 	fdc_pll_t cur_pll, checkpoint_pll;

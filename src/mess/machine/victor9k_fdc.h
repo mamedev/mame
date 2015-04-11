@@ -148,9 +148,6 @@ private:
 
 		// write
 		UINT16 shift_reg_write;
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
 		UINT8 wd;
 		int wrsync;
 		int gcr_data;

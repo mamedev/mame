@@ -18,6 +18,7 @@
 //**************************************************************************
 
 #define LOG 0
+#define LOG_TIMER 0
 
 
 
@@ -111,10 +112,10 @@ void mos6530_t::device_start()
 {
 	// resolve callbacks
 	m_irq_cb.resolve_safe();
-	m_in_pa_cb.resolve_safe(0xff);
-	m_out_pa_cb.resolve_safe();
-	m_in_pb_cb.resolve_safe(0xff);
-	m_out_pb_cb.resolve_safe();
+	m_in_pa_cb.resolve();
+	m_out_pa_cb.resolve();
+	m_in_pb_cb.resolve();
+	m_out_pb_cb.resolve();
 	m_in_pa0_cb.resolve_safe(1);
 	m_in_pa1_cb.resolve_safe(1);
 	m_in_pa2_cb.resolve_safe(1);
@@ -198,16 +199,21 @@ void mos6530_t::update_pa()
 	UINT8 ddr = m_pa_ddr;
 	UINT8 data = (out & ddr) | (ddr ^ 0xff);
 
-	m_out_pa_cb(data);
-
-	m_out_pa0_cb(BIT(data, 0));
-	m_out_pa1_cb(BIT(data, 1));
-	m_out_pa2_cb(BIT(data, 2));
-	m_out_pa3_cb(BIT(data, 3));
-	m_out_pa4_cb(BIT(data, 4));
-	m_out_pa5_cb(BIT(data, 5));
-	m_out_pa6_cb(BIT(data, 6));
-	m_out_pa7_cb(BIT(data, 7));
+	if (m_out_pa_cb.isnull())
+	{
+		m_out_pa0_cb(BIT(data, 0));
+		m_out_pa1_cb(BIT(data, 1));
+		m_out_pa2_cb(BIT(data, 2));
+		m_out_pa3_cb(BIT(data, 3));
+		m_out_pa4_cb(BIT(data, 4));
+		m_out_pa5_cb(BIT(data, 5));
+		m_out_pa6_cb(BIT(data, 6));
+		m_out_pa7_cb(BIT(data, 7));
+	}
+	else
+	{
+		m_out_pa_cb(data);
+	}
 }
 
 
@@ -228,16 +234,21 @@ void mos6530_t::update_pb()
 		m_irq_cb(m_irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	m_out_pb_cb(data);
-
-	m_out_pb0_cb(BIT(data, 0));
-	m_out_pb1_cb(BIT(data, 1));
-	m_out_pb2_cb(BIT(data, 2));
-	m_out_pb3_cb(BIT(data, 3));
-	m_out_pb4_cb(BIT(data, 4));
-	m_out_pb5_cb(BIT(data, 5));
-	m_out_pb6_cb(BIT(data, 6));
-	m_out_pb7_cb(BIT(data, 7));
+	if (m_out_pb_cb.isnull())
+	{
+		m_out_pb0_cb(BIT(data, 0));
+		m_out_pb1_cb(BIT(data, 1));
+		m_out_pb2_cb(BIT(data, 2));
+		m_out_pb3_cb(BIT(data, 3));
+		m_out_pb4_cb(BIT(data, 4));
+		m_out_pb5_cb(BIT(data, 5));
+		m_out_pb6_cb(BIT(data, 6));
+		m_out_pb7_cb(BIT(data, 7));
+	}
+	else
+	{
+		m_out_pb_cb(data);	
+	}
 }
 
 
@@ -247,9 +258,8 @@ void mos6530_t::update_pb()
 
 void mos6530_t::pa_w(int bit, int state)
 {
-	m_pa_in &= ~(2 << bit);
-
-	if (state) m_pa_in |= (2 << bit);
+	m_pa_in &= ~(1 << bit);
+	m_pa_in |= (state << bit);
 }
 
 
@@ -259,9 +269,8 @@ void mos6530_t::pa_w(int bit, int state)
 
 void mos6530_t::pb_w(int bit, int state)
 {
-	m_pb_in &= ~(2 << bit);
-
-	if (state) m_pb_in |= (2 << bit);
+	m_pb_in &= ~(1 << bit);
+	m_pb_in |= (state << bit);
 }
 
 
@@ -275,14 +284,14 @@ READ8_MEMBER( mos6530_t::pa_data_r )
 
 	if (m_in_pa_cb.isnull())
 	{
-		in |= m_in_pa0_cb.isnull() ? BIT(m_pa_in, 0) : m_in_pa0_cb() << 0;
-		in |= m_in_pa1_cb.isnull() ? BIT(m_pa_in, 1) : m_in_pa1_cb() << 1;
-		in |= m_in_pa2_cb.isnull() ? BIT(m_pa_in, 2) : m_in_pa2_cb() << 2;
-		in |= m_in_pa3_cb.isnull() ? BIT(m_pa_in, 3) : m_in_pa3_cb() << 3;
-		in |= m_in_pa4_cb.isnull() ? BIT(m_pa_in, 4) : m_in_pa4_cb() << 4;
-		in |= m_in_pa5_cb.isnull() ? BIT(m_pa_in, 5) : m_in_pa5_cb() << 5;
-		in |= m_in_pa6_cb.isnull() ? BIT(m_pa_in, 6) : m_in_pa6_cb() << 6;
-		in |= m_in_pa7_cb.isnull() ? BIT(m_pa_in, 7) : m_in_pa7_cb() << 7;
+		in |= (m_in_pa0_cb.isnull() ? BIT(m_pa_in, 0) : m_in_pa0_cb());
+		in |= (m_in_pa1_cb.isnull() ? BIT(m_pa_in, 1) : m_in_pa1_cb()) << 1;
+		in |= (m_in_pa2_cb.isnull() ? BIT(m_pa_in, 2) : m_in_pa2_cb()) << 2;
+		in |= (m_in_pa3_cb.isnull() ? BIT(m_pa_in, 3) : m_in_pa3_cb()) << 3;
+		in |= (m_in_pa4_cb.isnull() ? BIT(m_pa_in, 4) : m_in_pa4_cb()) << 4;
+		in |= (m_in_pa5_cb.isnull() ? BIT(m_pa_in, 5) : m_in_pa5_cb()) << 5;
+		in |= (m_in_pa6_cb.isnull() ? BIT(m_pa_in, 6) : m_in_pa6_cb()) << 6;
+		in |= (m_in_pa7_cb.isnull() ? BIT(m_pa_in, 7) : m_in_pa7_cb()) << 7;
 	}
 	else
 	{
@@ -290,9 +299,13 @@ READ8_MEMBER( mos6530_t::pa_data_r )
 	}
 
 	UINT8 out = m_pa_out;
-	UINT8 ddr = m_pa_ddr;
+	UINT8 ddr_out = m_pa_ddr;
+	UINT8 ddr_in = m_pa_ddr ^ 0xff;
+	UINT8 data = (out & ddr_out) | (in & ddr_in);
 
-	return (out & ddr) | (in & (ddr ^ 0xff));
+	if (LOG) logerror("%s %s MOS6530 '%s' Port A Data In %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+
+	return data;
 }
 
 
@@ -304,7 +317,7 @@ WRITE8_MEMBER( mos6530_t::pa_data_w )
 {
 	m_pa_out = data;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port A data %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s MOS6530 '%s' Port A Data Out %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
 
 	update_pa();
 }
@@ -334,14 +347,14 @@ READ8_MEMBER( mos6530_t::pb_data_r )
 
 	if (m_in_pb_cb.isnull())
 	{
-		in |= m_in_pb0_cb.isnull() ? BIT(m_pb_in, 0) : m_in_pb0_cb() << 0;
-		in |= m_in_pb1_cb.isnull() ? BIT(m_pb_in, 1) : m_in_pb1_cb() << 1;
-		in |= m_in_pb2_cb.isnull() ? BIT(m_pb_in, 2) : m_in_pb2_cb() << 2;
-		in |= m_in_pb3_cb.isnull() ? BIT(m_pb_in, 3) : m_in_pb3_cb() << 3;
-		in |= m_in_pb4_cb.isnull() ? BIT(m_pb_in, 4) : m_in_pb4_cb() << 4;
-		in |= m_in_pb5_cb.isnull() ? BIT(m_pb_in, 5) : m_in_pb5_cb() << 5;
-		in |= m_in_pb6_cb.isnull() ? BIT(m_pb_in, 6) : m_in_pb6_cb() << 6;
-		in |= m_in_pb7_cb.isnull() ? BIT(m_pb_in, 7) : m_in_pb7_cb() << 7;
+		in |= (m_in_pb0_cb.isnull() ? BIT(m_pb_in, 0) : m_in_pb0_cb());
+		in |= (m_in_pb1_cb.isnull() ? BIT(m_pb_in, 1) : m_in_pb1_cb()) << 1;
+		in |= (m_in_pb2_cb.isnull() ? BIT(m_pb_in, 2) : m_in_pb2_cb()) << 2;
+		in |= (m_in_pb3_cb.isnull() ? BIT(m_pb_in, 3) : m_in_pb3_cb()) << 3;
+		in |= (m_in_pb4_cb.isnull() ? BIT(m_pb_in, 4) : m_in_pb4_cb()) << 4;
+		in |= (m_in_pb5_cb.isnull() ? BIT(m_pb_in, 5) : m_in_pb5_cb()) << 5;
+		in |= (m_in_pb6_cb.isnull() ? BIT(m_pb_in, 6) : m_in_pb6_cb()) << 6;
+		in |= (m_in_pb7_cb.isnull() ? BIT(m_pb_in, 7) : m_in_pb7_cb()) << 7;
 	}
 	else
 	{
@@ -349,9 +362,13 @@ READ8_MEMBER( mos6530_t::pb_data_r )
 	}
 
 	UINT8 out = m_pb_out;
-	UINT8 ddr = m_pb_ddr;
+	UINT8 ddr_out = m_pb_ddr;
+	UINT8 ddr_in = m_pb_ddr ^ 0xff;
+	UINT8 data = (out & ddr_out) | (in & ddr_in);
 
-	return (out & ddr) | (in & (ddr ^ 0xff));
+	if (LOG) logerror("%s %s MOS6530 '%s' Port B Data In %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+logerror("PB data read %02x\n",data);
+	return data;
 }
 
 
@@ -363,7 +380,7 @@ WRITE8_MEMBER( mos6530_t::pb_data_w )
 {
 	m_pb_out = data;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Port B data %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
+	if (LOG) logerror("%s %s MOS6530 '%s' Port B Data Out %02x\n", machine().time().as_string(), machine().describe_context(), tag(), data);
 
 	update_pb();
 }
@@ -438,7 +455,7 @@ WRITE8_MEMBER( mos6530_t::timer_w )
 
 	m_ie = BIT(offset, 3) ? true : false;
 
-	if (LOG) logerror("%s %s MOS6530 '%s' Timer value %02x shift %u IE %u\n", machine().time().as_string(), machine().describe_context(), tag(), data, m_shift, m_ie ? 1 : 0);
+	if (LOG_TIMER) logerror("%s %s MOS6530 '%s' Timer value %02x shift %u IE %u\n", machine().time().as_string(), machine().describe_context(), tag(), data, m_shift, m_ie ? 1 : 0);
 
 	if (m_irq) {
 		m_irq = false;
@@ -541,7 +558,7 @@ void mos6530_t::live_run(const attotime &limit)
 
 			cur_live.value--;
 
-			if (LOG) logerror("%s MOS6530 '%s' timer %02x IRQ 1\n", cur_live.tm.as_string(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s MOS6530 '%s' timer %02x IRQ 1\n", cur_live.tm.as_string(), tag(), cur_live.value);
 
 			if (!cur_live.value) {
 				cur_live.period = attotime::from_hz(clock());
@@ -559,7 +576,7 @@ void mos6530_t::live_run(const attotime &limit)
 			cur_live.value--;
 			cur_live.irq = true;
 
-			if (LOG) logerror("%s MOS6530 '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s MOS6530 '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), tag(), cur_live.value);
 
 			live_delay(RUNNING_SYNCPOINT);
 
@@ -568,7 +585,7 @@ void mos6530_t::live_run(const attotime &limit)
 		}
 
 		case RUNNING_SYNCPOINT: {
-			if (LOG) logerror("%s MOS6530 '%s' IRQ\n", machine().time().as_string(), tag());
+			if (LOG_TIMER) logerror("%s MOS6530 '%s' IRQ\n", machine().time().as_string(), tag());
 
 			m_irq = true;
 			update_pb();
@@ -584,7 +601,7 @@ void mos6530_t::live_run(const attotime &limit)
 
 			cur_live.value--;
 
-			if (LOG) logerror("%s MOS6530 '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), tag(), cur_live.value);
+			if (LOG_TIMER) logerror("%s MOS6530 '%s' timer %02x IRQ 0\n", cur_live.tm.as_string(), tag(), cur_live.value);
 
 			if (!cur_live.value) {
 				live_abort();

@@ -93,7 +93,6 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 }
 
 
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
