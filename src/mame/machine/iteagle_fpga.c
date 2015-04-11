@@ -424,7 +424,7 @@ void iteagle_ide_device::device_start()
 {
 	m_cpu = machine().device<cpu_device>(m_cpu_tag);
 	pci_device::device_start();
-	add_map(sizeof(m_ctrl_regs), M_IO, FUNC(ctrl_map));
+	add_map(sizeof(m_ctrl_regs), M_IO, FUNC(iteagle_ide_device::ctrl_map));
 	// ctrl defaults to base address 0x00000000
 	bank_infos[0].adr = 0x000;
 
