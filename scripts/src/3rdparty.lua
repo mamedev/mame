@@ -15,6 +15,11 @@ project "expat"
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- zlib library objects
@@ -52,6 +57,11 @@ project "zlib"
 		MAME_DIR .. "3rdparty/zlib/uncompr.c",
 		MAME_DIR .. "3rdparty/zlib/zutil.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- SoftFloat library objects
@@ -79,6 +89,11 @@ project "softfloat"
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- libJPEG library objects
@@ -136,6 +151,11 @@ project "jpeg"
 		MAME_DIR .. "3rdparty/libjpeg/jmemmgr.c",
 		MAME_DIR .. "3rdparty/libjpeg/jmemansi.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- libflac library objects
@@ -190,6 +210,11 @@ project "flac"
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/stream_encoder_framing.c",
 		MAME_DIR .. "3rdparty/libflac/src/libFLAC/window.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- lib7z library objects
@@ -225,6 +250,11 @@ project "7z"
 			MAME_DIR .. "3rdparty/lzma/C/Ppmd7Dec.c",
 			MAME_DIR .. "3rdparty/lzma/C/7zStream.c",
 		}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- LUA library objects
@@ -290,6 +320,11 @@ project "lua"
 		MAME_DIR .. "3rdparty/lua/src/linit.c",
 		MAME_DIR .. "3rdparty/lua/src/lutf8lib.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- sqlite3 lua library objects
@@ -312,6 +347,11 @@ project "lsqlite3"
 	files {
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- mongoose library objects
@@ -336,6 +376,11 @@ project "mongoose"
 	files {
 		MAME_DIR .. "3rdparty/mongoose/mongoose.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- jsoncpp library objects
@@ -359,6 +404,11 @@ project "jsoncpp"
 		MAME_DIR .. "3rdparty/jsoncpp/src/lib_json/json_writer.cpp",
 		
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- SQLite3 library objects
@@ -379,6 +429,11 @@ project "sqllite3"
 	files {
 		MAME_DIR .. "3rdparty/sqlite3/sqlite3.c",
 	}
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
+		}
+	end
 
 --------------------------------------------------
 -- portmidi library objects
@@ -431,6 +486,11 @@ project "portmidi"
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/readbinaryplist.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/osxsupport.m",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
+		}
+	end
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
 		}
 	end
 end	
@@ -515,6 +575,11 @@ project "bgfx"
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
 			
+		}
+	end
+	if (_OPTIONS["SHADOW_CHECK"]=="1") then
+		removebuildoptions {
+			"-Wshadow"
 		}
 	end
 end

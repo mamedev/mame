@@ -76,6 +76,7 @@
 # FILTER_DEPS = 1
 # SEPARATE_BIN = 1
 # PYTHON_EXECUTABLE = python3
+# SHADOW_CHECK = 1
 
 -include useroptions.mak
 
@@ -518,6 +519,10 @@ endif
 
 ifdef PYTHON_EXECUTABLE
 PARAMS += --PYTHON_EXECUTABLE='$(PYTHON_EXECUTABLE)'
+endif
+
+ifdef SHADOW_CHECK
+PARAMS += --SHADOW_CHECK='$(SHADOW_CHECK)'
 endif
 
 #-------------------------------------------------

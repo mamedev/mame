@@ -279,6 +279,16 @@ newoption {
 	description = "Python executable.",
 }
 
+newoption {
+	trigger = "SHADOW_CHECK",
+	description = "Shadow checks.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
+
 PYTHON = "python"
 
 if _OPTIONS["PYTHON_EXECUTABLE"]~=nil then
@@ -832,6 +842,11 @@ end
 				}
 			end
 		else
+			if (_OPTIONS["SHADOW_CHECK"]=="1") then
+				buildoptions {
+					"-Wshadow"
+				}			
+			end
 			if (version == 40201) then
 				buildoptions {
 					"-Wno-cast-align"
