@@ -1238,21 +1238,34 @@ WRITE_LINE_MEMBER(msx_state::turbo_w)
 
 
 static MACHINE_CONFIG_FRAGMENT( msx1_cartlist )
-	MCFG_SOFTWARE_LIST_ADD("cart_list","msx1_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx1_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx1_floplist )
-	MCFG_SOFTWARE_LIST_ADD("flop_list","msx1_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx1_flop")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx2_cartlist )
-	MCFG_SOFTWARE_LIST_ADD("cart_list","msx2_cart")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_cart_list","msx1_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "msx2_cart")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_crt_l", "msx1_cart")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msx2_floplist )
-	MCFG_SOFTWARE_LIST_ADD("flop_list","msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT( msx2p_floplist )
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2p_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")	// maybe not?
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT( msxr_floplist )
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "msxr_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2p_flp_l", "msx2p_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")	// maybe not?
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")	// maybe not?
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
@@ -1457,7 +1470,8 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_cas_l", "msx1_cass")
 MACHINE_CONFIG_END
 
 
@@ -1521,7 +1535,8 @@ static MACHINE_CONFIG_START( msx2p, msx_state )
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "msx2_cass")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_cas_l", "msx1_cass")
 MACHINE_CONFIG_END
 
 
@@ -7535,7 +7550,7 @@ static MACHINE_CONFIG_DERIVED( expert3i, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7571,7 +7586,7 @@ static MACHINE_CONFIG_DERIVED( expert3t, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7603,7 +7618,7 @@ static MACHINE_CONFIG_DERIVED( expertac, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_wd2793_force_ready )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7635,7 +7650,7 @@ static MACHINE_CONFIG_DERIVED( expertdx, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7676,7 +7691,7 @@ static MACHINE_CONFIG_DERIVED( fsa1fx, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7723,7 +7738,7 @@ static MACHINE_CONFIG_DERIVED( fsa1wsx, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7770,7 +7785,7 @@ static MACHINE_CONFIG_DERIVED( fsa1wx, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7815,7 +7830,7 @@ static MACHINE_CONFIG_DERIVED( fsa1wxa, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7888,7 +7903,7 @@ static MACHINE_CONFIG_DERIVED( phc70fd, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7930,7 +7945,7 @@ static MACHINE_CONFIG_DERIVED( phc70fd2, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_2_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -7976,7 +7991,7 @@ static MACHINE_CONFIG_DERIVED( hbf1xdj, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -8022,7 +8037,7 @@ static MACHINE_CONFIG_DERIVED( hbf1xv, msx2p )
 
 	MCFG_FRAGMENT_ADD( msx_wd2793 )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msx2p_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -8093,7 +8108,7 @@ static MACHINE_CONFIG_DERIVED( fsa1gt, msx2 )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msxr_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
@@ -8135,7 +8150,7 @@ static MACHINE_CONFIG_DERIVED( fsa1st, msx2 )
 
 	MCFG_FRAGMENT_ADD( msx_tc8566af )
 	MCFG_FRAGMENT_ADD( msx_1_35_dd_drive )
-	MCFG_FRAGMENT_ADD( msx2_floplist )
+	MCFG_FRAGMENT_ADD( msxr_floplist )
 
 	MCFG_FRAGMENT_ADD( msx2_cartlist )
 MACHINE_CONFIG_END
