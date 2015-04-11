@@ -72,6 +72,16 @@ enum
 	MCS51_PORT_TX   = 0x20004,  /* P3.1 */
 };
 
+/* At least CMOS devices may be forced to read from ports configured as output.
+ * All you need is a low impedance output connect to the port.
+ */
+
+#define MCFG_MCS51_PORT1_CONFIG(_forced_inputs) \
+	mcs51_cpu_device::set_port_forced_input(*device, 1, _forced_inputs);
+#define MCFG_MCS51_PORT2_CONFIG(_forced_inputs) \
+	mcs51_cpu_device::set_port_forced_input(*device, 2, _forced_inputs);
+#define MCFG_MCS51_PORT3_CONFIG(_forced_inputs) \
+	mcs51_cpu_device::set_port_forced_input(*device, 3, _forced_inputs);
 
 class mcs51_cpu_device : public cpu_device
 {
@@ -81,6 +91,9 @@ public:
 
 	void i8051_set_serial_tx_callback(write8_delegate tx_func);
 	void i8051_set_serial_rx_callback(read8_delegate rx_func);
+
+	// configuration helpers
+	static void set_port_forced_input(device_t &device, UINT8 port, UINT8 forced_input) { downcast<mcs51_cpu_device &>(device).m_forced_inputs[port] = forced_input; }
 
 protected:
 	// device-level overrides
@@ -136,6 +149,8 @@ protected:
 	int     m_cur_irq_prio;       /* Holds value of the current IRQ Priority Level; -1 if no irq */
 	UINT8   m_irq_active;         /* mask which irq levels are serviced */
 	UINT8   m_irq_prio[8];        /* interrupt priority */
+
+	UINT8	m_forced_inputs[4];	  /* allow read even if configured as output */
 
 	int     m_icount;
 
