@@ -327,7 +327,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 
 			UINT32 region_length = valid.region_length(gfxregion);
 			if (region_length == 0)
-				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.cstr());
+				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.c_str());
 
 			// if we have a valid region, and we're not using auto-sizing, check the decode against the region length
 			else if (!IS_FRAC(layout.total))

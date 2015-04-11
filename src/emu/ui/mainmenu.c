@@ -56,7 +56,7 @@ void ui_menu_main::populate()
 	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);
 
 	menu_text.printf("Input (this %s)",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)INPUT_SPECIFIC);
+	item_append(menu_text.c_str(), NULL, 0, (void *)INPUT_SPECIFIC);
 
 	/* add optional input-related menus */
 	if (machine().ioport().has_analog())
@@ -66,7 +66,7 @@ void ui_menu_main::populate()
 	if (machine().ioport().has_configs())
 	{
 		menu_text.printf("%s Configuration",emulator_info::get_capstartgamenoun());
-		item_append(menu_text.cstr(), NULL, 0, (void *)SETTINGS_DRIVER_CONFIG);
+		item_append(menu_text.c_str(), NULL, 0, (void *)SETTINGS_DRIVER_CONFIG);
 	}
 
 	/* add bookkeeping menu */
@@ -74,7 +74,7 @@ void ui_menu_main::populate()
 
 	/* add game info menu */
 	menu_text.printf("%s Information",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)GAME_INFO);
+	item_append(menu_text.c_str(), NULL, 0, (void *)GAME_INFO);
 
 	image_interface_iterator imgiter(machine().root_device());
 	if (imgiter.first() != NULL)
@@ -135,7 +135,7 @@ void ui_menu_main::populate()
 
 	/* add reset and exit menus */
 	menu_text.printf("Select New %s",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)SELECT_GAME);
+	item_append(menu_text.c_str(), NULL, 0, (void *)SELECT_GAME);
 }
 
 ui_menu_main::~ui_menu_main()

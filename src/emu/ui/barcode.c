@@ -118,7 +118,7 @@ void ui_menu_barcode_reader::handle()
 						machine().ui().popup_time(5, "Barcode length invalid!");
 					else
 					{
-						current_device()->write_code(tmp_file.cstr(), tmp_file.len());
+						current_device()->write_code(tmp_file.c_str(), tmp_file.len());
 						// if sending was successful, reset char buffer
 						if (m_barcode_buffer[0] != '\0')
 							memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));

@@ -236,7 +236,7 @@ static const char *const messages[] =
 
 const char *device_image_interface::error()
 {
-	return (m_err_message) ? m_err_message.cstr() : messages[m_err];
+	return (m_err_message) ? m_err_message.c_str() : messages[m_err];
 }
 
 
@@ -295,7 +295,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 	bool success = FALSE;
 	bool done = FALSE;
 
-	directory = osd_opendir(m_working_directory.cstr());
+	directory = osd_opendir(m_working_directory.c_str());
 	if (directory != NULL)
 	{
 		while(!done && (entry = osd_readdir(directory)) != NULL)
@@ -536,7 +536,7 @@ bool device_image_interface::uses_file_extension(const char *file_extension) con
 
 	/* find the extensions */
 	astring extensions(file_extensions());
-	char *ext = strtok((char*)extensions.cstr(),",");
+	char *ext = strtok((char*)extensions.c_str(),",");
 	while (ext != NULL)
 	{
 		if (!core_stricmp(ext, file_extension))
@@ -823,17 +823,17 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				// - if we are not using lists, we have regiontag only;
 				// - if we are using lists, we have: list/clonename, list/parentname, clonename, parentname
 				// try to load from list/setname
-				if ((m_mame_file == NULL) && (tag2.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag2.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag2.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag2.c_str(), has_crc, crc, romp, &m_mame_file);
 				// try to load from list/parentname
-				if ((m_mame_file == NULL) && (tag3.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag3.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag3.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag3.c_str(), has_crc, crc, romp, &m_mame_file);
 				// try to load from setname
-				if ((m_mame_file == NULL) && (tag4.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag4.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag4.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag4.c_str(), has_crc, crc, romp, &m_mame_file);
 				// try to load from parentname
-				if ((m_mame_file == NULL) && (tag5.cstr() != NULL))
-					filerr = common_process_file(device().machine().options(), tag5.cstr(), has_crc, crc, romp, &m_mame_file);
+				if ((m_mame_file == NULL) && (tag5.c_str() != NULL))
+					filerr = common_process_file(device().machine().options(), tag5.c_str(), has_crc, crc, romp, &m_mame_file);
 
 				warningcount += verify_length_and_hash(m_mame_file,ROM_GETNAME(romp),ROM_GETLENGTH(romp),hash_collection(ROM_GETHASHDATA(romp)));
 

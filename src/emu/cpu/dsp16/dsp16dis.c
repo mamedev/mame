@@ -270,7 +270,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 F1 = (op & 0x01e0) >> 5;
 			astring yString = disasmYField(Y);
 			astring fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s", fString.cstr(), yString.cstr());
+			sprintf(buffer, "%s, %s", fString.c_str(), yString.c_str());
 			break;
 		}
 		case 0x04: case 0x1c:
@@ -285,7 +285,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring fString = disasmF1Field(F1, D, S);
 			astring aString = (opcode == 0x1c) ? "a0" : "a1";
 			astring xString = (X) ? "" : "l";
-			sprintf(buffer, "%s = %s%s, %s", yString.cstr(), aString.cstr(), xString.cstr(), fString.cstr());
+			sprintf(buffer, "%s = %s%s, %s", yString.c_str(), aString.c_str(), xString.c_str(), fString.c_str());
 			break;
 		}
 		case 0x16:
@@ -297,7 +297,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 F1 = (op & 0x01e0) >> 5;
 			astring yString = disasmYField(Y);
 			astring fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, x = %s", fString.cstr(), yString.cstr());
+			sprintf(buffer, "%s, x = %s", fString.c_str(), yString.c_str());
 			break;
 		}
 		case 0x17:
@@ -311,7 +311,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring yString = disasmYField(Y);
 			astring fString = disasmF1Field(F1, D, S);
 			astring xString = (X ? "y" : "y1");
-			sprintf(buffer, "%s, %s = %s", fString.cstr(), xString.cstr(), yString.cstr());
+			sprintf(buffer, "%s, %s = %s", fString.c_str(), xString.c_str(), yString.c_str());
 			break;
 		}
 		case 0x1f:
@@ -325,7 +325,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring yString = disasmYField(Y);
 			astring fString = disasmF1Field(F1, D, S);
 			astring xString = (X ? "*pt++i" : "*pt++");
-			sprintf(buffer, "%s, y = %s, x = %s", fString.cstr(), yString.cstr(), xString.cstr());
+			sprintf(buffer, "%s, y = %s, x = %s", fString.c_str(), yString.c_str(), xString.c_str());
 			break;
 		}
 		case 0x19: case 0x1b:
@@ -339,7 +339,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring fString = disasmF1Field(F1, D, S);
 			astring xString = (X ? "*pt++i" : "*pt++");
 			astring aString = (opcode == 0x19) ? "a0" : "a1";
-			sprintf(buffer, "%s, y = %s, x = %s", fString.cstr(), aString.cstr(), xString.cstr());
+			sprintf(buffer, "%s, y = %s, x = %s", fString.c_str(), aString.c_str(), xString.c_str());
 			if (Y != 0x00) sprintf(buffer, "UNKNOWN");
 			break;
 		}
@@ -354,7 +354,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring yString = disasmYField(Y);
 			astring xString = (X ? "y" : "y1");
 			astring fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s = %s", fString.cstr(), yString.cstr(), xString.cstr());
+			sprintf(buffer, "%s, %s = %s", fString.c_str(), yString.c_str(), xString.c_str());
 			break;
 		}
 
@@ -369,7 +369,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring yString = disasmYField(Y);
 			astring atString = (aT ? "a0" : "a1");
 			astring fString = disasmF1Field(F1, aT, S);
-			sprintf(buffer, "%s, %s = %s", fString.cstr(), atString.cstr(), yString.cstr());
+			sprintf(buffer, "%s, %s = %s", fString.c_str(), atString.c_str(), yString.c_str());
 			break;
 		}
 
@@ -385,7 +385,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring zString = disasmZField(Z);
 			astring xString = (X ? "y" : "y1");
 			astring fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s <=> %s", fString.cstr(), xString.cstr(), zString.cstr());
+			sprintf(buffer, "%s, %s <=> %s", fString.c_str(), xString.c_str(), zString.c_str());
 			break;
 		}
 		case 0x1d:
@@ -399,7 +399,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring zString = disasmZField(Z);
 			astring xString = (X ? "*pt++i" : "*pt++");
 			astring fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s <=> y, x = %s", fString.cstr(), zString.cstr(), xString.cstr());
+			sprintf(buffer, "%s, %s <=> y, x = %s", fString.c_str(), zString.c_str(), xString.c_str());
 			break;
 		}
 
@@ -416,7 +416,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring atString = (aT ? "a0" : "a1");
 			atString += X ? "" : "1";   // TODO: Figure out unclear wording.
 			astring fString = disasmF1Field(F1, aT, S);
-			sprintf(buffer, "%s, %s <=> %s", fString.cstr(), zString.cstr(), atString.cstr());
+			sprintf(buffer, "%s, %s <=> %s", fString.c_str(), zString.c_str(), atString.c_str());
 			break;
 		}
 
@@ -431,8 +431,8 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 F2 = (op & 0x01e0) >> 5;
 			astring fString = disasmF2Field(F2, D, S);
 			astring conString = disasmCONField(CON);
-			if (op & 0x0800) sprintf(buffer,  "if %s : %s", conString.cstr(), fString.cstr());
-			else             sprintf(buffer, "ifc %s : %s", conString.cstr(), fString.cstr());
+			if (op & 0x0800) sprintf(buffer,  "if %s : %s", conString.c_str(), fString.c_str());
+			else             sprintf(buffer, "ifc %s : %s", conString.c_str(), fString.c_str());
 			break;
 		}
 
@@ -458,7 +458,7 @@ CPU_DISASSEMBLE( dsp16a )
 			// goto B
 			const UINT8 B = (op & 0x0700) >> 8;
 			astring bString = disasmBField(B);
-			sprintf(buffer, "%s", bString.cstr());
+			sprintf(buffer, "%s", bString.c_str());
 			break;
 		}
 
@@ -468,7 +468,7 @@ CPU_DISASSEMBLE( dsp16a )
 			// if CON [goto/call/return]
 			const UINT8 CON = (op & 0x001f);
 			astring conString = disasmCONField(CON);
-			sprintf(buffer, "if %s:", conString.cstr());
+			sprintf(buffer, "if %s:", conString.c_str());
 			// TODO: Test for invalid ops
 			// icall
 			if (op == 0xd40e) sprintf(buffer, "icall");
@@ -482,7 +482,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 R = (op & 0x03f0) >> 4;
 			const UINT8 S = (op & 0x1000) >> 12;
 			astring rString = disasmRField(R);
-			sprintf(buffer, "%s = %s", rString.cstr(), (S ? "a1" : "a0"));
+			sprintf(buffer, "%s = %s", rString.c_str(), (S ? "a1" : "a0"));
 			break;
 		}
 		case 0x08:
@@ -491,7 +491,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 R  = (op & 0x03f0) >> 4;
 			const UINT8 aT = (op & 0x0400) >> 10;
 			astring rString = disasmRField(R);
-			sprintf(buffer, "%s = %s", (aT ? "a0" : "a1"), rString.cstr());
+			sprintf(buffer, "%s = %s", (aT ? "a0" : "a1"), rString.c_str());
 			break;
 		}
 		case 0x0f:
@@ -501,7 +501,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 R = (op & 0x03f0) >> 4;
 			astring yString = disasmYField(Y);
 			astring rString = disasmRField(R);
-			sprintf(buffer, "%s = %s", rString.cstr(), yString.cstr());
+			sprintf(buffer, "%s = %s", rString.c_str(), yString.c_str());
 			// TODO: Special case the R == [y, y1, or x] case
 			break;
 		}
@@ -513,7 +513,7 @@ CPU_DISASSEMBLE( dsp16a )
 			astring yString = disasmYField(Y);
 			astring rString = disasmRField(R);
 			// TODO: page 3-31 "special function encoding"
-			sprintf(buffer, "%s = %s", yString.cstr(), rString.cstr());
+			sprintf(buffer, "%s = %s", yString.c_str(), rString.c_str());
 			break;
 		}
 		case 0x0d:
@@ -523,7 +523,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 R = (op & 0x03f0) >> 4;
 			astring zString = disasmZField(Z);
 			astring rString = disasmRField(R);
-			sprintf(buffer, "%s <=> %s", zString.cstr(), rString.cstr());
+			sprintf(buffer, "%s <=> %s", zString.c_str(), rString.c_str());
 			break;
 		}
 
@@ -533,7 +533,7 @@ CPU_DISASSEMBLE( dsp16a )
 			// R = N
 			const UINT8 R = (op & 0x03f0) >> 4;
 			astring rString = disasmRField(R);
-			sprintf(buffer, "%s = 0x%04x", rString.cstr(), op2);
+			sprintf(buffer, "%s = 0x%04x", rString.c_str(), op2);
 			opSize = 2;
 			break;
 		}
@@ -545,7 +545,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT16 M = (op & 0x01ff);
 			const UINT8  R = (op & 0x0e00) >> 9;
 			astring rString = disasmRImmediateField(R);
-			sprintf(buffer, "%s = 0x%04x", rString.cstr(), M);
+			sprintf(buffer, "%s = 0x%04x", rString.c_str(), M);
 			break;
 		}
 

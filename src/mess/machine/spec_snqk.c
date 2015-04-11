@@ -64,7 +64,7 @@ static void log_quickload(running_machine &machine, const char *type, UINT32 sta
 		tempstring.catprintf(exec_format, exec);
 	}
 
-	machine.ui().popup_time(10, "%s", tempstring.cstr());
+	machine.ui().popup_time(10, "%s", tempstring.c_str());
 }
 
 /*******************************************************************

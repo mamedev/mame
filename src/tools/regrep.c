@@ -571,7 +571,7 @@ static core_file *create_file_and_output_header(astring &filename, astring &temp
 	/* print a header */
 	astring modified(templatefile);
 	modified.replace("<!--TITLE-->", title);
-	core_fwrite(file, modified.cstr(), modified.len());
+	core_fwrite(file, modified.c_str(), modified.len());
 
 	/* return the file */
 	return file;
@@ -587,7 +587,7 @@ static void output_footer_and_close_file(core_file *file, astring &templatefile,
 {
 	astring modified(templatefile);
 	modified.replace(0, "<!--TITLE-->", title);
-	core_fwrite(file, modified.cstr(), modified.len());
+	core_fwrite(file, modified.c_str(), modified.len());
 	core_fclose(file);
 }
 
@@ -686,11 +686,11 @@ static void output_report(astring &dirname, astring &tempheader, astring &tempfo
 		*buckettailptr[bucknum] = NULL;
 
 	/* output header */
-	tempname.printf("%s" PATH_SEPARATOR "%s", dirname.cstr(), "index.html");
+	tempname.printf("%s" PATH_SEPARATOR "%s", dirname.c_str(), "index.html");
 	indexfile = create_file_and_output_header(tempname, tempheader, title);
 	if (indexfile == NULL)
 	{
-		fprintf(stderr, "Error creating file '%s'\n", tempname.cstr());
+		fprintf(stderr, "Error creating file '%s'\n", tempname.c_str());
 		return;
 	}
 
@@ -843,14 +843,14 @@ static int generate_png_diff(const summary_file *curfile, astring &destdir, cons
 	int starty;
 
 	/* generate the common source filename */
-	dstfilename.printf("%s" PATH_SEPARATOR "%s", destdir.cstr(), destname);
+	dstfilename.printf("%s" PATH_SEPARATOR "%s", destdir.c_str(), destname);
 	srcimgname.printf("snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
 
 	/* open and load all unique bitmaps */
 	for (listnum = 0; listnum < list_count; listnum++)
 		if (curfile->matchbitmap[listnum] == listnum)
 		{
-			tempname.printf("%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.cstr());
+			tempname.printf("%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.c_str());
 
 			/* open the source image */
 			filerr = core_fopen(tempname, OPEN_FLAG_READ, &file);
@@ -961,11 +961,11 @@ static void create_linked_file(astring &dirname, const summary_file *curfile, co
 
 	/* output header */
 	title.printf("%s Regressions (%s)", curfile->name, curfile->source);
-	linkname.printf("%s" PATH_SEPARATOR "%s", dirname.cstr(), filename.cstr());
+	linkname.printf("%s" PATH_SEPARATOR "%s", dirname.c_str(), filename.c_str());
 	linkfile = create_file_and_output_header(linkname, tempheader, title);
 	if (linkfile == NULL)
 	{
-		fprintf(stderr, "Error creating file '%s'\n", filename.cstr());
+		fprintf(stderr, "Error creating file '%s'\n", filename.c_str());
 		return;
 	}
 
@@ -1002,7 +1002,7 @@ static void create_linked_file(astring &dirname, const summary_file *curfile, co
 		{
 			core_fprintf(linkfile, "\t<p>\n");
 			core_fprintf(linkfile, "\t<b>Errors:</b>\n");
-			core_fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum].cstr());
+			core_fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum].c_str());
 			core_fprintf(linkfile, "\t</p>\n");
 		}
 	}

@@ -592,7 +592,7 @@ astring running_machine::get_statename(const char *option)
 			// copy the device name to an astring
 			astring devname_str;
 			devname_str.cpysubstr(statename_str, pos + 3, end - pos - 3);
-			//printf("check template: %s\n", devname_str.cstr());
+			//printf("check template: %s\n", devname_str.c_str());
 
 			// verify that there is such a device for this system
 			image_interface_iterator iter(root_device());
@@ -600,7 +600,7 @@ astring running_machine::get_statename(const char *option)
 			{
 				// get the device name
 				astring tempdevname(image->brief_instance_name());
-				//printf("check device: %s\n", tempdevname.cstr());
+				//printf("check device: %s\n", tempdevname.c_str());
 
 				if (devname_str.cmp(tempdevname) == 0)
 				{
@@ -612,7 +612,7 @@ astring running_machine::get_statename(const char *option)
 						// setup snapname and remove the %d_
 						statename_str.replace(0, devname_str, filename);
 						statename_str.del(pos, 3);
-						//printf("check image: %s\n", filename.cstr());
+						//printf("check image: %s\n", filename.c_str());
 
 						name_found = 1;
 					}
@@ -651,7 +651,7 @@ void running_machine::set_saveload_filename(const char *filename)
 		// take into account the statename option
 		const char *stateopt = options().state_name();
 		astring statename = get_statename(stateopt);
-		m_saveload_pending_file.cpy(statename.cstr()).cat(PATH_SEPARATOR).cat(filename).cat(".sta");
+		m_saveload_pending_file.cpy(statename.c_str()).cat(PATH_SEPARATOR).cat(filename).cat(".sta");
 	}
 }
 

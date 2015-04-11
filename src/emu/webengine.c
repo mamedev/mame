@@ -455,7 +455,7 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
 		mg_send_header(conn, "Pragma", "no-cache");
 		mg_send_header(conn, "Expires", "0");
-		mg_send_file(conn, fullpath.cstr(), NULL);
+		mg_send_file(conn, fullpath.c_str(), NULL);
 		return MG_MORE; // It is important to return MG_MORE after mg_send_file!
 	}
 	return 0;

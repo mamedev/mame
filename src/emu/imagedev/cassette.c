@@ -280,7 +280,7 @@ bool cassette_image_device::call_load()
 				fname = m_mame_file->filename();
 				int loc = fname.rchr(0,'.');
 				if (loc!=-1) {
-					extension = fname.substr(loc + 1,fname.len()-loc).cstr();
+					extension = fname.substr(loc + 1,fname.len()-loc).c_str();
 				} else {
 					extension = "";
 				}

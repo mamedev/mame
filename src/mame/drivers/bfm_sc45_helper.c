@@ -237,7 +237,7 @@ int find_input_strings(running_machine &machine)
 
 
 
-					sc45helperlog("%s", tempstring.cstr());
+					sc45helperlog("%s", tempstring.c_str());
 
 					sc45helperlog("\n");
 
@@ -316,48 +316,48 @@ int find_input_strings(running_machine &machine)
 
 				if (ignoreports[i][j] > 0)
 				{
-					printf("    PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_%d_%d ) PORT_NAME(\"%s\")\n", 1 << j, i,j/*ignoreports[i][j]*/, sc4inputs[i][j].name.cstr());
+					printf("    PORT_BIT( 0x%04x, IP_ACTIVE_HIGH, SC45_BUTTON_MATRIX_%d_%d ) PORT_NAME(\"%s\")\n", 1 << j, i,j/*ignoreports[i][j]*/, sc4inputs[i][j].name.c_str());
 					buttons_used++;
 				}
 				else if (ignoreports[i][j] == -3)
 				{
-					printf("    // 0x%04x - \"%s\" // standard input (motherboard)\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // standard input (motherboard)\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -2)
 				{
-					printf("    // 0x%04x - \"%s\" // standard input (expected here)\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // standard input (expected here)\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -1)
 				{
-					printf("    // 0x%04x - \"%s\" // unexpected here\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // unexpected here\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -4)
 				{
-					printf("    // 0x%04x - \"%s\" // known extended input, mapping not understood\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, mapping not understood\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -5)
 				{
-					printf("    // 0x%04x - \"%s\" // known extended input, usually 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, usually 'top up'\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -6)
 				{
-					printf("    // 0x%04x - \"%s\" // known extended input, usually 'hopper low'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, usually 'hopper low'\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -7)
 				{
-					printf("    // 0x%04x - \"%s\" // known extended input, usually 'hopper fit'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended input, usually 'hopper fit'\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -8)
 				{
-					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'top up'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'top up'\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -9)
 				{
-					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop hi'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop hi'\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				else if (ignoreports[i][j] == -10)
 				{
-					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop top'\n", 1 << j, sc4inputs[i][j].name.cstr());
+					printf("    // 0x%04x - \"%s\" // known extended(?) input, sometimes 'hop top'\n", 1 << j, sc4inputs[i][j].name.c_str());
 				}
 				buttons_used++;
 			}
@@ -390,7 +390,7 @@ void set_clickable_temp(running_machine &machine, const astring &teststring, int
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			if (!strcmp(teststring.cstr(), lamps[y][x].lampname_alt.cstr()))
+			if (!strcmp(teststring.c_str(), lamps[y][x].lampname_alt.c_str()))
 			{
 				lamps[y][x].clickport = clickport;
 				lamps[y][x].clickmask = clickmask;
@@ -507,7 +507,7 @@ int find_lamp_strings(running_machine &machine)
 				fatalerror("duplicate lamp?\n");
 			}
 
-			//sc45helperlog("%s", tempstring.cstr());
+			//sc45helperlog("%s", tempstring.c_str());
 
 			//sc45helperlog("\n");
 
@@ -521,7 +521,7 @@ int find_lamp_strings(running_machine &machine)
 		//sc45helperlog("---ROW %02d---\n", y);
 		for (int x = 0; x < 16; x++)
 		{
-			sc45helperlog("<element name=\"lamplabelel%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", d, lamps[y][x].lampname.cstr());
+			sc45helperlog("<element name=\"lamplabelel%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", d, lamps[y][x].lampname.c_str());
 			d++;
 		}
 	}
@@ -536,7 +536,7 @@ int find_lamp_strings(running_machine &machine)
 
 		for (int x = 0; x < 6; x++)
 		{
-			sc45helperlog("<element name=\"inputlabel%d-%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", realy,x,sc4inputs[realy][x].name.cstr());
+			sc45helperlog("<element name=\"inputlabel%d-%d\"><text string=\"%s\"><color red=\"1.0\" green=\"1.0\" blue=\"1.0\" /></text></element>\n", realy,x,sc4inputs[realy][x].name.c_str());
 
 		}
 	}
@@ -593,11 +593,11 @@ int find_lamp_strings(running_machine &machine)
 		{
 			lamps[y][x].lampname_alt = lamps[y][x].lampname;
 
-			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "hold2/hi")) lamps[y][x].lampname_alt = "hold2";
-			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "hold3/lo")) lamps[y][x].lampname_alt = "hold3";
-			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "chg stake")) lamps[y][x].lampname_alt = "chnge stk";
-			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "canc/coll")) lamps[y][x].lampname_alt = "cancel";
-			if (!strcmp(lamps[y][x].lampname_alt.cstr(), "start")) lamps[y][x].lampname_alt = "strt exch";
+			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "hold2/hi")) lamps[y][x].lampname_alt = "hold2";
+			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "hold3/lo")) lamps[y][x].lampname_alt = "hold3";
+			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "chg stake")) lamps[y][x].lampname_alt = "chnge stk";
+			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "canc/coll")) lamps[y][x].lampname_alt = "cancel";
+			if (!strcmp(lamps[y][x].lampname_alt.c_str(), "start")) lamps[y][x].lampname_alt = "strt exch";
 
 		}
 	}
@@ -625,7 +625,7 @@ int find_lamp_strings(running_machine &machine)
 			{
 				for (int x = 0; x < 16; x++)
 				{
-					if (!strcmp(tempname2, lamps[y][x].lampname_alt.cstr()))
+					if (!strcmp(tempname2, lamps[y][x].lampname_alt.c_str()))
 					{
 						//sc45helperlog("%s found\n", tempname2);
 						lamps[y][x].draw_label = false;
@@ -640,7 +640,7 @@ int find_lamp_strings(running_machine &machine)
 					}
 					else
 					{
-						//printf("%s:%s:\n", tempname2, lamps[y][x].lampname_alt.cstr());
+						//printf("%s:%s:\n", tempname2, lamps[y][x].lampname_alt.c_str());
 					}
 
 				}
@@ -679,8 +679,8 @@ int find_lamp_strings(running_machine &machine)
 		//sc45helperlog("---ROW %02d---\n", y);
 		for (int x = 0; x < 16; x++)
 		{
-			if (lamps[y][x].clickport== -1) sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"/></bezel>\n", d, lamps[y][x].lamptypename.cstr(), lamps[y][x].x, lamps[y][x].y, lamps[y][x].width, lamps[y][x].height);
-			else sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\" inputtag=\"IN-%d\" inputmask=\"0x%02x\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" /></bezel>\n", d, lamps[y][x].lamptypename.cstr(), lamps[y][x].clickport, lamps[y][x].clickmask, lamps[y][x].x, lamps[y][x].y, lamps[y][x].width, lamps[y][x].height);
+			if (lamps[y][x].clickport== -1) sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"/></bezel>\n", d, lamps[y][x].lamptypename.c_str(), lamps[y][x].x, lamps[y][x].y, lamps[y][x].width, lamps[y][x].height);
+			else sc45helperlog("<bezel name=\"lamp%d\" element=\"%s\" state=\"0\" inputtag=\"IN-%d\" inputmask=\"0x%02x\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" /></bezel>\n", d, lamps[y][x].lamptypename.c_str(), lamps[y][x].clickport, lamps[y][x].clickmask, lamps[y][x].x, lamps[y][x].y, lamps[y][x].width, lamps[y][x].height);
 
 			if (lamps[y][x].draw_label == false) sc45helperlog("<!-- Label not drawn\n");
 			sc45helperlog("<bezel name=\"lamplabel%d\" element=\"lamplabelel%d\"><bounds x=\"%d\" y=\"%d\" width=\"%d\" height=\"10\" /></bezel>\n", d,d, lamps[y][x].x, lamps[y][x].y-10, lamps[y][x].width);
@@ -905,7 +905,7 @@ int find_reel_strings(running_machine &machine)
 				tempstring.cat("PND");
 			}
 
-			sc45helperlog("%s", tempstring.cstr());
+			sc45helperlog("%s", tempstring.c_str());
 
 
 

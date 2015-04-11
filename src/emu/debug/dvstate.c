@@ -291,13 +291,13 @@ void debug_view_state::view_update()
 				len += m_divider - 1 - curitem->m_symbol.len();
 			}
 
-			memcpy(&temp[len], curitem->m_symbol.cstr(), curitem->m_symbol.len());
+			memcpy(&temp[len], curitem->m_symbol.c_str(), curitem->m_symbol.len());
 			len += curitem->m_symbol.len();
 
 			temp[len++] = ' ';
 			temp[len++] = ' ';
 
-			memcpy(&temp[len], valstr.cstr(), curitem->m_vallen);
+			memcpy(&temp[len], valstr.c_str(), curitem->m_vallen);
 			len += curitem->m_vallen;
 
 			temp[len++] = ' ';

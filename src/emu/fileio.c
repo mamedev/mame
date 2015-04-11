@@ -845,16 +845,16 @@ file_error emu_file::attempt__7zped()
 		int fileno = -1;
 
 		// see if we can find a file with the right name and (if available) crc
-		if (m_openflags & OPEN_FLAG_HAS_CRC) fileno = _7z_search_crc_match(_7z, m_crc, filename.cstr(), filename.len(), true, true);
+		if (m_openflags & OPEN_FLAG_HAS_CRC) fileno = _7z_search_crc_match(_7z, m_crc, filename.c_str(), filename.len(), true, true);
 
 		// if that failed, look for a file with the right crc, but the wrong filename
 		if (fileno==-1)
-			if (m_openflags & OPEN_FLAG_HAS_CRC) fileno = _7z_search_crc_match(_7z, m_crc, filename.cstr(), filename.len(), true, false);
+			if (m_openflags & OPEN_FLAG_HAS_CRC) fileno = _7z_search_crc_match(_7z, m_crc, filename.c_str(), filename.len(), true, false);
 
 		// if that failed, look for a file with the right name; reporting a bad checksum
 		// is more helpful and less confusing than reporting "rom not found"
 		if (fileno==-1)
-			fileno = _7z_search_crc_match(_7z, m_crc, filename.cstr(), filename.len(), false, true);
+			fileno = _7z_search_crc_match(_7z, m_crc, filename.c_str(), filename.len(), false, true);
 
 		if (fileno != -1)
 		{

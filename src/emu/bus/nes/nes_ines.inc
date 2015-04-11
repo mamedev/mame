@@ -392,7 +392,7 @@ void nes_cart_slot_device::call_load_ines()
 		}
 		else
 		{
-			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo.cstr());
+			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo.c_str());
 		}
 	}
 	else

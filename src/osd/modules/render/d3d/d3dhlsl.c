@@ -3489,7 +3489,7 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 		for (int seq = 0; ; seq++)
 		{
 			// build up the filename
-			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d_%d", seq, idx).cstr());
+			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d_%d", seq, idx).c_str());
 
 			// try to open the file; stop when we fail
 			file_error filerr = file.open(fname);

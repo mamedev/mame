@@ -3061,7 +3061,7 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 				}
 				else
 					buffer.printf("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
-				debug_console_printf(space.machine(), "%s\n", buffer.cstr());
+				debug_console_printf(space.machine(), "%s\n", buffer.c_str());
 				space.device().debug()->compute_debug_flags();
 			}
 			break;
@@ -3495,7 +3495,7 @@ void device_debug::tracer::update(offs_t pc)
 	buffer.cat(dasm);
 
 	// output the result
-	fprintf(&m_file, "%s\n", buffer.cstr());
+	fprintf(&m_file, "%s\n", buffer.c_str());
 
 	// do we need to step the trace over this instruction?
 	if (m_trace_over && (dasmresult & DASMFLAG_SUPPORTED) != 0 && (dasmresult & DASMFLAG_STEP_OVER) != 0)

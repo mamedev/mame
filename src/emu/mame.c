@@ -285,15 +285,15 @@ void CLIB_DECL popmessage(const char *format, ...)
 		va_end(arg);
 
 		// pop it in the UI
-		machine_manager::instance()->machine()->ui().popup_time(temp.len() / 40 + 2, "%s", temp.cstr());
+		machine_manager::instance()->machine()->ui().popup_time(temp.len() / 40 + 2, "%s", temp.c_str());
 
 		/*
 		// also write to error.log
-		logerror("popmessage: %s\n", temp.cstr());
+		logerror("popmessage: %s\n", temp.c_str());
 
 #ifdef MAME_DEBUG
 		// and to command-line in a DEBUG build
-		osd_printf_info("popmessage: %s\n", temp.cstr());
+		osd_printf_info("popmessage: %s\n", temp.c_str());
 #endif
 		*/
 	}

@@ -409,7 +409,7 @@ void palette_device::device_start()
 	{
 		// find the extended (split) memory, if present
 		astring tag_ext(tag(), "_ext");
-		const memory_share *share_ext = memshare(tag_ext.cstr());
+		const memory_share *share_ext = memshare(tag_ext.c_str());
 
 		// make sure we have specified a format
 		assert_always(m_raw_to_rgb.bytes_per_entry() > 0, "Palette has memory share but no format specified");

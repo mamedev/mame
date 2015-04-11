@@ -129,7 +129,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 				break;
 		if (!curdevice)
 			throw emu_fatalerror("Could not find %s when looking up path for device %s\n",
-									part.cstr(), orig_tag);
+									part.c_str(), orig_tag);
 		owner = curdevice;
 		tag = next+1;
 	}

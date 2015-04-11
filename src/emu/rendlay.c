@@ -1328,9 +1328,9 @@ void layout_element::component::load_bitmap()
 
 		// log an error
 		if (!m_alphafile[0])
-			osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].cstr());
+			osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].c_str());
 		else
-			osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].cstr(), m_alphafile[0].cstr());
+			osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].c_str(), m_alphafile[0].c_str());
 	}
 }
 

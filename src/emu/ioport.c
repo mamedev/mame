@@ -2482,7 +2482,7 @@ time_t ioport_manager::initialize()
 		astring errors;
 		m_portlist.append(*device, errors);
 		if (errors)
-			osd_printf_error("Input port errors:\n%s", errors.cstr());
+			osd_printf_error("Input port errors:\n%s", errors.c_str());
 	}
 
 	// renumber player numbers for controller ports
@@ -3703,9 +3703,9 @@ void ioport_configurer::port_modify(const char *tag)
 	m_owner.subtag(fulltag, tag);
 
 	// find the existing port
-	m_curport = m_portlist.find(fulltag.cstr());
+	m_curport = m_portlist.find(fulltag.c_str());
 	if (m_curport == NULL)
-		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.cstr());
+		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.c_str());
 
 	// bump the modification count, and reset current field/setting
 	m_curport->m_modcount++;

@@ -1836,9 +1836,9 @@ void address_space::prepare_map()
 		{
 			// if we can't find it, add it to our map
 			astring fulltag;
-			if (manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr()) == NULL)
+			if (manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str()) == NULL)
 			{
-				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.cstr(), entry->m_byteend + 1 - entry->m_bytestart));
+				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry->m_byteend + 1 - entry->m_bytestart));
 				memory_share *share = global_alloc(memory_share(m_map->m_databits, entry->m_byteend + 1 - entry->m_bytestart, endianness()));
 				manager().m_sharelist.append(fulltag, *share);
 			}
@@ -1880,7 +1880,7 @@ void address_space::prepare_map()
 			entry->m_devbase.subtag(fulltag, entry->m_region);
 
 			// set the memory address
-			entry->m_memory = machine().root_device().memregion(fulltag.cstr())->base() + entry->m_rgnoffs;
+			entry->m_memory = machine().root_device().memregion(fulltag.c_str())->base() + entry->m_rgnoffs;
 		}
 	}
 
@@ -2154,7 +2154,7 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		if (entry->m_memory == NULL && entry->m_share != NULL)
 		{
 			astring fulltag;
-			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr());
+			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str());
 			if (share != NULL && share->ptr() != NULL)
 			{
 				entry->m_memory = share->ptr();
@@ -2177,7 +2177,7 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		if (entry->m_memory != NULL && entry->m_share != NULL)
 		{
 			astring fulltag;
-			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr());
+			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str());
 			if (share != NULL && share->ptr() == NULL)
 			{
 				share->set_ptr(entry->m_memory);
@@ -2613,7 +2613,7 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 	if (entry->m_share != NULL)
 	{
 		astring fulltag;
-		memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).cstr());
+		memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str());
 		if (share != NULL && share->ptr() == NULL)
 			return true;
 	}
@@ -4022,7 +4022,7 @@ void memory_bank::set_entry(int entrynum)
 	if (entrynum < 0 || entrynum >= m_entry.count())
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);
 	if (m_entry[entrynum].m_raw == NULL)
-		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.cstr(), entrynum);
+		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
 
 	// set both raw and decrypted values
 	m_curentry = entrynum;

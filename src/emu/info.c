@@ -197,7 +197,7 @@ void info_xml_creator::output(FILE *out)
 	dtd.replace(0,"__XML_ROOT__", emulator_info::get_xml_root());
 	dtd.replace(0,"__XML_TOP__", emulator_info::get_xml_top());
 
-	fprintf(m_output, "%s\n\n", dtd.cstr());
+	fprintf(m_output, "%s\n\n", dtd.c_str());
 
 	// top-level tag
 	fprintf(m_output, "<%s build=\"%s\" debug=\""
@@ -343,7 +343,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
 	astring src(device.source());
 	src.replace("../","");
-	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(src.cstr()));
+	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(src.c_str()));
 	fprintf(m_output, " isdevice=\"yes\"");
 	fprintf(m_output, " runnable=\"no\"");
 	output_sampleof();
@@ -404,7 +404,7 @@ void info_xml_creator::output_devices()
 			{
 				astring temptag("_");
 				temptag.cat(option->name());
-				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.cstr(), option->devtype(), 0);
+				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.c_str(), option->devtype(), 0);
 
 				// notify this device and all its subdevices that they are now configured
 				device_iterator subiter(*dev);
@@ -413,9 +413,9 @@ void info_xml_creator::output_devices()
 						device->config_complete();
 
 				if (shortnames.add(dev->shortname(), 0, FALSE) != TMERR_DUPLICATE)
-					output_one_device(*dev, temptag.cstr());
+					output_one_device(*dev, temptag.c_str());
 
-				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.cstr());
+				const_cast<machine_config &>(m_drivlist.config()).device_remove(&m_drivlist.config().root_device(), temptag.c_str());
 			}
 		}
 	}
@@ -582,7 +582,7 @@ void info_xml_creator::output_rom(device_t &device)
 
 				output.cat("/>\n");
 
-				fprintf(m_output, "%s", output.cstr());
+				fprintf(m_output, "%s", output.c_str());
 			}
 		}
 }
@@ -1085,7 +1085,7 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				// output the switch name information
 				astring normalized_field_name(xml_normalize_string(field->name()));
 				astring normalized_newtag(xml_normalize_string(newtag));
-				output.catprintf("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.cstr(), normalized_newtag.cstr(), field->mask());
+				output.catprintf("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
 
 				// loop over settings
 				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
@@ -1096,7 +1096,7 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				// terminate the switch entry
 				output.catprintf("\t\t</%s>\n", outertag);
 
-				fprintf(m_output, "%s", output.cstr());
+				fprintf(m_output, "%s", output.c_str());
 			}
 }
 
@@ -1240,7 +1240,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 
 			astring extensions(imagedev->file_extensions());
 
-			char *ext = strtok((char *)extensions.cstr(), ",");
+			char *ext = strtok((char *)extensions.c_str(), ",");
 			while (ext != NULL)
 			{
 				fprintf(m_output, "\t\t\t<extension");

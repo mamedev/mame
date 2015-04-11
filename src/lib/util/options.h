@@ -75,7 +75,7 @@ public:
 	public:
 		// getters
 		entry *next() const { return m_next; }
-		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && m_name[index]) ? m_name[index].cstr() : NULL; }
+		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && m_name[index]) ? m_name[index].c_str() : NULL; }
 		const char *description() const { return m_description; }
 		const char *value() const { return m_data; }
 		const char *default_value() const { return m_defdata; }

@@ -260,7 +260,7 @@ void osd_common_t::update_option(const char * key, dynamic_array<const char *> &
 		new_option_value.cat(t);
 	}
 	// TODO: core_strdup() is leaked
-	m_options.set_description(key, core_strdup(current_value.cat(new_option_value).cstr()));
+	m_options.set_description(key, core_strdup(current_value.cat(new_option_value).c_str()));
 }
 
 

@@ -60,7 +60,7 @@ int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const att
 
 #if 0
 	if(!edge.is_never())
-		fprintf(stderr, "ctime=%s, transition_time=%s, next=%s, pha=%s\n", tts(ctime).cstr(), tts(edge).cstr(), tts(next).cstr(), tts(phase_adjust).cstr());
+		fprintf(stderr, "ctime=%s, transition_time=%s, next=%s, pha=%s\n", tts(ctime).c_str(), tts(edge).c_str(), tts(next).c_str(), tts(phase_adjust).c_str());
 #endif
 
 	if(next > limit)

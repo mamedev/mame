@@ -540,7 +540,7 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 	// output an output
 	else
 	{
-		cheatfile.printf("\t\t\t<output format=\"%s\"", m_format.cstr());
+		cheatfile.printf("\t\t\t<output format=\"%s\"", m_format.c_str());
 		if (!m_condition.is_empty())
 			cheatfile.printf(" condition=\"%s\"", cheat_manager::quote_expression(tempstring, m_condition));
 		if (m_line != 0)
@@ -588,7 +588,7 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 
 		// look for a valid type
 		if (strchr("cdiouxX", *p) == NULL)
-			throw emu_fatalerror("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, m_format.cstr());
+			throw emu_fatalerror("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, m_format.c_str());
 		argscounted++;
 
 		// look for the next one
@@ -597,9 +597,9 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 
 	// did we match?
 	if (argscounted < argsprovided)
-		throw emu_fatalerror("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.cstr());
+		throw emu_fatalerror("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.c_str());
 	if (argscounted > argsprovided)
-		throw emu_fatalerror("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.cstr());
+		throw emu_fatalerror("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.c_str());
 }
 
 
@@ -782,7 +782,7 @@ void cheat_entry::save(emu_file &cheatfile) const
 	bool has_scripts = (m_off_script != NULL || m_on_script != NULL || m_run_script != NULL || m_change_script != NULL);
 
 	// output the cheat tag
-	cheatfile.printf("\t<cheat desc=\"%s\"", m_description.cstr());
+	cheatfile.printf("\t<cheat desc=\"%s\"", m_description.c_str());
 	if (m_numtemp != DEFAULT_TEMP_VARIABLES)
 		cheatfile.printf(" tempvariables=\"%d\"", m_numtemp);
 	if (!m_comment && m_parameter == NULL && !has_scripts)
@@ -793,7 +793,7 @@ void cheat_entry::save(emu_file &cheatfile) const
 
 		// save the comment
 		if (m_comment)
-			cheatfile.printf("\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment.cstr());
+			cheatfile.printf("\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment.c_str());
 
 		// output the parameter, if present
 		if (m_parameter != NULL)
@@ -832,7 +832,7 @@ bool cheat_entry::activate()
 	{
 		execute_on_script();
 		changed = true;
-		popmessage("Activated %s", m_description.cstr());
+		popmessage("Activated %s", m_description.c_str());
 	}
 
 	// if we're a oneshot parameter cheat and we're active, execute the "state change" script and indicate change
@@ -840,7 +840,7 @@ bool cheat_entry::activate()
 	{
 		execute_change_script();
 		changed = true;
-		popmessage("Activated\n %s = %s", m_description.cstr(), m_parameter->text());
+		popmessage("Activated\n %s = %s", m_description.c_str(), m_parameter->text());
 	}
 
 	return changed;

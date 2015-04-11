@@ -237,7 +237,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 							m_auc & 0x10 ? '0':'.',
 							m_auc & 0x08 ? '1':'.',
 							m_auc & 0x04 ? '0':'.',
-							alignString.cstr());
+							alignString.c_str());
 			break;
 		}
 
@@ -274,7 +274,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 			}
 			string.printf("%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
 							m_pioc & 0x8000 ? 'I':'.',
-							strobeString.cstr(),
+							strobeString.c_str(),
 							m_pioc & 0x1000 ? 'O':'I',
 							m_pioc & 0x0800 ? 'O':'I',
 							m_pioc & 0x0400 ? 'S':'.',
@@ -305,7 +305,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 			}
 			string.printf("%c%s%c%c%c%c%c%c%c",
 							m_sioc & 0x0200 ? 'I':'O',
-							clkString.cstr(),
+							clkString.c_str(),
 							m_sioc & 0x0040 ? 'L':'M',
 							m_sioc & 0x0020 ? 'I':'O',
 							m_sioc & 0x0010 ? 'I':'O',

@@ -1158,7 +1158,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 			// copy the device name to an astring
 			astring snapdevname;
 			snapdevname.cpysubstr(snapstr, pos + 3, end - pos - 3);
-			//printf("check template: %s\n", snapdevname.cstr());
+			//printf("check template: %s\n", snapdevname.c_str());
 
 			// verify that there is such a device for this system
 			image_interface_iterator iter(machine().root_device());
@@ -1166,7 +1166,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 			{
 				// get the device name
 				astring tempdevname(image->brief_instance_name());
-				//printf("check device: %s\n", tempdevname.cstr());
+				//printf("check device: %s\n", tempdevname.c_str());
 
 				if (snapdevname.cmp(tempdevname) == 0)
 				{
@@ -1181,7 +1181,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 						// setup snapname and remove the %d_
 						snapstr.replace(0, snapdevname, filename);
 						snapstr.del(pos, 3);
-						//printf("check image: %s\n", filename.cstr());
+						//printf("check image: %s\n", filename.c_str());
 
 						name_found = 1;
 					}
@@ -1215,7 +1215,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 		for (int seq = 0; ; seq++)
 		{
 			// build up the filename
-			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d", seq).cstr());
+			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d", seq).c_str());
 
 			// try to open the file; stop when we fail
 			file_error filerr = file.open(fname);

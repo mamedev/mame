@@ -360,7 +360,7 @@ void ui_manager::display_startup_screens(bool first_time, bool show_disclaimer)
 				{
 					astring warning;
 					warning.cpy("This driver requires images to be loaded in the following device(s): ").cat(messagebox_text.substr(0, messagebox_text.len() - 2));
-					ui_menu_file_manager::force_file_manager(machine(), &machine().render().ui_container(), warning.cstr());
+					ui_menu_file_manager::force_file_manager(machine(), &machine().render().ui_container(), warning.c_str());
 				}
 				break;
 		}
@@ -1134,7 +1134,7 @@ astring &ui_manager::game_info_astring(astring &string)
 {
 	// print description, manufacturer, and CPU:
 	astring tempstr;
-	string.printf("%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(tempstr, machine().system().source_file).cstr());
+	string.printf("%s\n%s %s\nDriver: %s\n\nCPU:\n", machine().system().description, machine().system().year, machine().system().manufacturer, core_filename_extract_base(tempstr, machine().system().source_file).c_str());
 
 	// loop over all CPUs
 	execute_interface_iterator execiter(machine().root_device());
@@ -1761,8 +1761,8 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 		"Are you sure you want to quit?\n\n"
 		"Press ''%s'' to quit,\n"
 		"Press ''%s'' to return to emulation.",
-		ui_select_text.cstr(),
-		ui_cancel_text.cstr());
+		ui_select_text.c_str(),
+		ui_cancel_text.c_str());
 
 	machine.ui().draw_text_box(container, quit_message, JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine.pause();

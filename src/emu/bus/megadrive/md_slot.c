@@ -1082,10 +1082,10 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	}
 	logerror("Checksum: %X\n", checksum);
 	logerror(" - Calculated Checksum: %X\n", csum);
-	logerror("Supported I/O Devices: %.16s\n%s", io, ctrl.cstr());
+	logerror("Supported I/O Devices: %.16s\n%s", io, ctrl.c_str());
 	logerror("Modem: %.12s\n", modem);
 	logerror("Memo: %.40s\n", memo);
-	logerror("Country: %.16s\n%s", country, reg.cstr());
+	logerror("Country: %.16s\n%s", country, reg.c_str());
 	logerror("ROM Start:  0x%.8X\n", rom_start);
 	logerror("ROM End:    0x%.8X\n", rom_end);
 	logerror("RAM Start:  0x%.8X\n", ram_start);

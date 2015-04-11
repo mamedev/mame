@@ -377,7 +377,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 	{
 		astring errmsg;
 		errmsg.printf("Invalid cartridge size %u", size);
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.cstr());
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.c_str());
 		return IMAGE_INIT_FAIL;
 	}
 
@@ -1518,7 +1518,7 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 	{
 		astring errmsg;
 		errmsg.printf("Invalid cartridge size %" I64FMT "d", size);
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.cstr());
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.c_str());
 		return IMAGE_INIT_FAIL;
 	}
 

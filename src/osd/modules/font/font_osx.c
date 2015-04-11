@@ -54,7 +54,7 @@ bool osd_font_osx::open(const char *font_path, const char *_name, int &height)
 	}
 
 	CTFontRef ct_font = NULL;
-	CFStringRef const font_name = CFStringCreateWithCString(NULL, name.cstr(), kCFStringEncodingUTF8);
+	CFStringRef const font_name = CFStringCreateWithCString(NULL, name.c_str(), kCFStringEncodingUTF8);
 	if (font_name != NULL)
 	{
 		CTFontDescriptorRef const font_descriptor = CTFontDescriptorCreateWithNameAndSize(font_name, 0.0);
@@ -68,7 +68,7 @@ bool osd_font_osx::open(const char *font_path, const char *_name, int &height)
 
 	if (!ct_font)
 	{
-		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.cstr());
+		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.c_str());
 		return false;
 	}
 
