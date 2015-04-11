@@ -17,6 +17,7 @@
 if (VIDEOS["SEGA315_5124"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/315_5124.c",
+		MAME_DIR .. "src/emu/video/315_5124.h",
 	}
 end
 
@@ -28,6 +29,7 @@ end
 if (VIDEOS["SEGA315_5313"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/315_5313.c",
+		MAME_DIR .. "src/emu/video/315_5313.h",
 	}
 end
 
@@ -39,6 +41,7 @@ end
 if (VIDEOS["BUFSPRITE"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/bufsprite.c",
+		MAME_DIR .. "src/emu/video/bufsprite.h",
 	}
 end
 
@@ -50,6 +53,7 @@ end
 if (VIDEOS["CDP1861"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/cdp1861.c",
+		MAME_DIR .. "src/emu/video/cdp1861.h",
 	}
 end
 
@@ -61,6 +65,7 @@ end
 if (VIDEOS["CDP1862"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/cdp1862.c",
+		MAME_DIR .. "src/emu/video/cdp1862.h",
 	}
 end
 
@@ -72,6 +77,7 @@ end
 if (VIDEOS["CRT9007"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/crt9007.c",
+		MAME_DIR .. "src/emu/video/crt9007.h",
 	}
 end
 
@@ -83,6 +89,7 @@ end
 if (VIDEOS["CRT9021"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/crt9021.c",
+		MAME_DIR .. "src/emu/video/crt9021.h",
 	}
 end
 
@@ -94,6 +101,7 @@ end
 if (VIDEOS["CRT9212"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/crt9212.c",
+		MAME_DIR .. "src/emu/video/crt9212.h",
 	}
 end
 
@@ -105,6 +113,7 @@ end
 if (VIDEOS["DL1416"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/dl1416.c",
+		MAME_DIR .. "src/emu/video/dl1416.h",
 	}
 end
 
@@ -116,6 +125,7 @@ end
 if (VIDEOS["DM9368"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/dm9368.c",
+		MAME_DIR .. "src/emu/video/dm9368.h",
 	}
 end
 
@@ -127,6 +137,8 @@ end
 if (VIDEOS["EF9340_1"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/ef9340_1.c",
+		MAME_DIR .. "src/emu/video/ef9340_1.h",
+		MAME_DIR .. "src/emu/video/ef9341_chargen.h",
 	}
 end
 
@@ -138,6 +150,7 @@ end
 if (VIDEOS["EF9345"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/ef9345.c",
+		MAME_DIR .. "src/emu/video/ef9345.h",
 	}
 end
 
@@ -148,6 +161,7 @@ end
 if (VIDEOS["EPIC12"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/epic12.c",
+		MAME_DIR .. "src/emu/video/epic12.h",
 		MAME_DIR .. "src/emu/video/epic12_blit0.c",
 		MAME_DIR .. "src/emu/video/epic12_blit1.c",
 		MAME_DIR .. "src/emu/video/epic12_blit2.c",
@@ -157,6 +171,8 @@ if (VIDEOS["EPIC12"]~=null) then
 		MAME_DIR .. "src/emu/video/epic12_blit6.c",
 		MAME_DIR .. "src/emu/video/epic12_blit7.c",
 		MAME_DIR .. "src/emu/video/epic12_blit8.c",
+		MAME_DIR .. "src/emu/video/epic12in.inc",
+		MAME_DIR .. "src/emu/video/epic12pixel.inc",
 	}
 end
 
@@ -168,6 +184,7 @@ end
 if (VIDEOS["FIXFREQ"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/fixfreq.c",
+		MAME_DIR .. "src/emu/video/fixfreq.h",
 	}
 end
 
@@ -179,6 +196,7 @@ end
 if (VIDEOS["GF4500"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/gf4500.c",
+		MAME_DIR .. "src/emu/video/gf4500.h",
 	}
 end
 
@@ -190,6 +208,7 @@ end
 if (VIDEOS["GF7600GS"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/gf7600gs.c",
+		MAME_DIR .. "src/emu/video/gf7600gs.h",
 	}
 end
 
@@ -201,6 +220,7 @@ end
 if (VIDEOS["H63484"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/h63484.c",
+		MAME_DIR .. "src/emu/video/h63484.h",
 	}
 end
 
@@ -212,6 +232,7 @@ end
 if (VIDEOS["HD44102"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/hd44102.c",
+		MAME_DIR .. "src/emu/video/hd44102.h",
 	}
 end
 
@@ -223,6 +244,7 @@ end
 if (VIDEOS["HD44352"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/hd44352.c",
+		MAME_DIR .. "src/emu/video/hd44352.h",
 	}
 end
 
@@ -234,6 +256,7 @@ end
 if (VIDEOS["HD44780"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/hd44780.c",
+		MAME_DIR .. "src/emu/video/hd44780.h",
 	}
 end
 
@@ -245,6 +268,7 @@ end
 if (VIDEOS["HD61830"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/hd61830.c",
+		MAME_DIR .. "src/emu/video/hd61830.h",
 	}
 end
 
@@ -256,6 +280,7 @@ end
 if (VIDEOS["HD63484"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/hd63484.c",
+		MAME_DIR .. "src/emu/video/hd63484.h",
 	}
 end
 
@@ -267,6 +292,7 @@ end
 if (VIDEOS["HD66421"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/hd66421.c",
+		MAME_DIR .. "src/emu/video/hd66421.h",
 	}
 end
 
@@ -278,6 +304,7 @@ end
 if (VIDEOS["HUC6202"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/huc6202.c",
+		MAME_DIR .. "src/emu/video/huc6202.h",
 	}
 end
 
@@ -289,6 +316,7 @@ end
 if (VIDEOS["HUC6260"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/huc6260.c",
+		MAME_DIR .. "src/emu/video/huc6260.h",
 	}
 end
 
@@ -300,6 +328,7 @@ end
 if (VIDEOS["HUC6261"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/huc6261.c",
+		MAME_DIR .. "src/emu/video/huc6261.h",
 	}
 end
 
@@ -311,6 +340,7 @@ end
 if (VIDEOS["HUC6270"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/huc6270.c",
+		MAME_DIR .. "src/emu/video/huc6270.h",
 	}
 end
 
@@ -322,6 +352,7 @@ end
 if (VIDEOS["HUC6272"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/huc6272.c",
+		MAME_DIR .. "src/emu/video/huc6272.h",
 	}
 end
 
@@ -333,6 +364,7 @@ end
 if (VIDEOS["I8244"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/i8244.c",
+		MAME_DIR .. "src/emu/video/i8244.h",
 	}
 end
 
@@ -344,6 +376,7 @@ end
 if (VIDEOS["I8275"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/i8275.c",
+		MAME_DIR .. "src/emu/video/i8275.h",
 	}
 end
 
@@ -355,6 +388,7 @@ end
 if (VIDEOS["M50458"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/m50458.c",
+		MAME_DIR .. "src/emu/video/m50458.h",
 	}
 end
 
@@ -366,6 +400,7 @@ end
 if (VIDEOS["MB90082"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/mb90082.c",
+		MAME_DIR .. "src/emu/video/mb90082.h",
 	}
 end
 
@@ -377,6 +412,7 @@ end
 if (VIDEOS["MB_VCU"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/mb_vcu.c",
+		MAME_DIR .. "src/emu/video/mb_vcu.h",
 	}
 end
 
@@ -388,6 +424,7 @@ end
 if (VIDEOS["MC6845"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/mc6845.c",
+		MAME_DIR .. "src/emu/video/mc6845.h",
 	}
 end
 
@@ -399,6 +436,7 @@ end
 if (VIDEOS["MC6847"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/mc6847.c",
+		MAME_DIR .. "src/emu/video/mc6847.h",
 	}
 end
 
@@ -410,6 +448,7 @@ end
 if (VIDEOS["MSM6222B"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/msm6222b.c",
+		MAME_DIR .. "src/emu/video/msm6222b.h",
 	}
 end
 
@@ -421,6 +460,7 @@ end
 if (VIDEOS["MSM6255"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/msm6255.c",
+		MAME_DIR .. "src/emu/video/msm6255.h",
 	}
 end
 
@@ -432,12 +472,14 @@ end
 if (VIDEOS["MOS6566"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/mos6566.c",
+		MAME_DIR .. "src/emu/video/mos6566.h",
 	}
 end
 
 
 files {	
 	MAME_DIR .. "src/emu/video/cgapal.c",
+	MAME_DIR .. "src/emu/video/cgapal.h",	
 }
 
 --------------------------------------------------
@@ -448,7 +490,9 @@ files {
 if (VIDEOS["PC_VGA"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/pc_vga.c",
+		MAME_DIR .. "src/emu/video/pc_vga.h",
 		MAME_DIR .. "src/emu/bus/isa/trident.c",
+		MAME_DIR .. "src/emu/bus/isa/trident.h",
 	}
 end
 
@@ -460,6 +504,7 @@ end
 if (VIDEOS["POLY"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/polylgcy.c",
+		MAME_DIR .. "src/emu/video/polylgcy.h",
 	}
 end
 
@@ -471,6 +516,7 @@ end
 if (VIDEOS["PSX"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/psx.c",
+		MAME_DIR .. "src/emu/video/psx.h",
 	}
 end
 
@@ -482,6 +528,7 @@ end
 if (VIDEOS["RAMDAC"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/ramdac.c",
+		MAME_DIR .. "src/emu/video/ramdac.h",
 	}
 end
 
@@ -493,6 +540,7 @@ end
 if (VIDEOS["SAA5050"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/saa5050.c",
+		MAME_DIR .. "src/emu/video/saa5050.h",
 	}
 end
 
@@ -503,6 +551,7 @@ end
 if (VIDEOS["SED1200"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/sed1200.c",
+		MAME_DIR .. "src/emu/video/sed1200.h",
 	}
 end
 
@@ -513,6 +562,7 @@ end
 if (VIDEOS["SED1330"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/sed1330.c",
+		MAME_DIR .. "src/emu/video/sed1330.h",
 	}
 end
 
@@ -523,6 +573,7 @@ end
 if (VIDEOS["SED1520"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/sed1520.c",
+		MAME_DIR .. "src/emu/video/sed1520.h",
 	}
 end
 
@@ -533,6 +584,7 @@ end
 if (VIDEOS["SCN2674"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/scn2674.c",
+		MAME_DIR .. "src/emu/video/scn2674.h",
 	}
 end
 
@@ -543,6 +595,7 @@ end
 if (VIDEOS["SNES_PPU"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/snes_ppu.c",
+		MAME_DIR .. "src/emu/video/snes_ppu.h",
 	}
 end
 
@@ -567,6 +620,7 @@ end
 if (VIDEOS["T6A04"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/t6a04.c",
+		MAME_DIR .. "src/emu/video/t6a04.h",
 	}
 end
 
@@ -578,6 +632,7 @@ end
 if (VIDEOS["TEA1002"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/tea1002.c",
+		MAME_DIR .. "src/emu/video/tea1002.h",
 	}
 end
 
@@ -589,6 +644,7 @@ end
 if (VIDEOS["TLC34076"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/tlc34076.c",
+		MAME_DIR .. "src/emu/video/tlc34076.h",
 	}
 end
 
@@ -600,6 +656,7 @@ end
 if (VIDEOS["TMS34061"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/tms34061.c",
+		MAME_DIR .. "src/emu/video/tms34061.h",
 	}
 end
 
@@ -611,6 +668,7 @@ end
 if (VIDEOS["TMS3556"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/tms3556.c",
+		MAME_DIR .. "src/emu/video/tms3556.h",
 	}
 end
 
@@ -622,6 +680,7 @@ end
 if (VIDEOS["TMS9927"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/tms9927.c",
+		MAME_DIR .. "src/emu/video/tms9927.h",
 	}
 end
 
@@ -633,6 +692,7 @@ end
 if (VIDEOS["TMS9928A"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/tms9928a.c",
+		MAME_DIR .. "src/emu/video/tms9928a.h",
 	}
 end
 
@@ -644,6 +704,7 @@ end
 if (VIDEOS["UPD3301"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/upd3301.c",
+		MAME_DIR .. "src/emu/video/upd3301.h",
 	}
 end
 
@@ -655,6 +716,7 @@ end
 if (VIDEOS["UPD7220"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/upd7220.c",
+		MAME_DIR .. "src/emu/video/upd7220.h",
 	}
 end
 
@@ -666,6 +728,7 @@ end
 if (VIDEOS["UPD7227"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/upd7227.c",
+		MAME_DIR .. "src/emu/video/upd7227.h",
 	}
 end
 
@@ -677,6 +740,7 @@ end
 if (VIDEOS["VIC4567"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/vic4567.c",
+		MAME_DIR .. "src/emu/video/vic4567.h",
 	}
 end
 
@@ -688,6 +752,7 @@ end
 if (VIDEOS["V9938"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/v9938.c",
+		MAME_DIR .. "src/emu/video/v9938.h",
 	}
 end
 
@@ -699,6 +764,8 @@ end
 if (VIDEOS["VOODOO"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/voodoo.c",
+		MAME_DIR .. "src/emu/video/voodoo.h",
+		MAME_DIR .. "src/emu/video/vooddefs.h",
 	}
 end
 
@@ -710,6 +777,7 @@ end
 if (VIDEOS["VOODOO_PCI"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/voodoo_pci.c",
+		MAME_DIR .. "src/emu/video/voodoo_pci.h",
 	}
 end
 
@@ -721,5 +789,6 @@ end
 if (VIDEOS["CRTC_EGA"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/video/crtc_ega.c",
+		MAME_DIR .. "src/emu/video/crtc_ega.h",
 	}
 end
