@@ -13,6 +13,9 @@
  XTAL 12 MHz
  XTAL  4 MHz
 
+ TODO:
+ 	 Hook up MC6845P
+
 ***********************************/
 
 
@@ -99,12 +102,16 @@ WRITE8_MEMBER(cardline_state::attr_w)
 WRITE8_MEMBER(cardline_state::video_w)
 {
 	m_video=data;
+	//printf("m_video %x\n", m_video);
 }
 
 READ8_MEMBER(cardline_state::unk_r)
 {
+	/* TODO: Certainly a hack. Most likely video related.
+	 * 		 Using VBLANK makes screen updates to slow. May be hblank.
+	 */
 	m_var^=0x10;
-	//printf("var %d\n",m_var);
+	//printf("var %x\n",m_var);
 	return m_var;
 }
 
@@ -174,6 +181,11 @@ static INPUT_PORTS_START( cardline )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_SPECIAL ) // h/w status bits
+
+	PORT_START("VBLANK")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // VBLANK_Q
+	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -222,6 +234,7 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32,12000000)
+	MCFG_MCS51_PORT1_CONFIG(0x10)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
