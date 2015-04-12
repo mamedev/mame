@@ -5584,7 +5584,7 @@ List of unconfirmed retail cartridge roms
 	<software name="bombmsel">
 		<!-- Notes: GBC only -->
 		<description>Bomberman Selection (Kor)</description>
-		<year>1996?</year>
+		<year>2003</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="CGB-B2CK-KOR"/>
 		<part name="cart" interface="gameboy_cart">
