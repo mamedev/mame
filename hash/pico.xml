@@ -4194,7 +4194,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher> <!-- Reprint was published by Sega Toys -->
 		<info name="serial" value="HPC-6017, HPC-6128 (10th Anniversary Reprint)"/>
 		<info name="release" value="1995xxxx, 20030714 (10th Anniversary Reprint)"/>
-		<info name="alt_title" value="それいけ! アンパンマン えいごとなかよし2 たのしいカーニバル, それいけ! アンパンマン えいごとなかよし2 たのしいカーニバル<10th>"/>
+		<info name="alt_title" value="それいけ! アンパンマン えいごとなかよし2 たのしいカーニバル"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6586A, 170-7090A (Reprint)" />
 			<feature name="ic1" value="MPR-17522 J13, Epoxy Block (Reprint)" />
