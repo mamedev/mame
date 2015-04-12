@@ -93,7 +93,7 @@ enum
 
 typedef UINT32 (*ui_callback)(running_machine &, render_container *, UINT32);
 
-typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *string, INT32 newval);
+typedef INT32 (*slider_update)(running_machine &machine, void *arg, astring *str, INT32 newval);
 
 struct slider_state
 {

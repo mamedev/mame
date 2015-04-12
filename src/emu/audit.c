@@ -320,7 +320,7 @@ media_auditor::summary media_auditor::audit_samples()
 //  string format
 //-------------------------------------------------
 
-media_auditor::summary media_auditor::summarize(const char *name, astring *string)
+media_auditor::summary media_auditor::summarize(const char *name, astring *output)
 {
 	if (m_record_list.count() == 0)
 	{
@@ -338,60 +338,60 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *strin
 			continue;
 
 		// output the game name, file name, and length (if applicable)
-		if (string != NULL)
+		if (output != NULL)
 		{
-			string->catprintf("%-12s: %s", name, record->name());
+			output->catprintf("%-12s: %s", name, record->name());
 			if (record->expected_length() > 0)
-				string->catprintf(" (%" I64FMT "d bytes)", record->expected_length());
-			string->catprintf(" - ");
+				output->catprintf(" (%" I64FMT "d bytes)", record->expected_length());
+			output->catprintf(" - ");
 		}
 
 		// use the substatus for finer details
 		switch (record->substatus())
 		{
 			case audit_record::SUBSTATUS_GOOD_NEEDS_REDUMP:
-				if (string != NULL) string->catprintf("NEEDS REDUMP\n");
+				if (output != NULL) output->catprintf("NEEDS REDUMP\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_NODUMP:
-				if (string != NULL) string->catprintf("NO GOOD DUMP KNOWN\n");
+				if (output != NULL) output->catprintf("NO GOOD DUMP KNOWN\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_BAD_CHECKSUM:
-				if (string != NULL)
+				if (output != NULL)
 				{
 					astring tempstr;
-					string->catprintf("INCORRECT CHECKSUM:\n");
-					string->catprintf("EXPECTED: %s\n", record->expected_hashes().macro_string(tempstr));
-					string->catprintf("   FOUND: %s\n", record->actual_hashes().macro_string(tempstr));
+					output->catprintf("INCORRECT CHECKSUM:\n");
+					output->catprintf("EXPECTED: %s\n", record->expected_hashes().macro_string(tempstr));
+					output->catprintf("   FOUND: %s\n", record->actual_hashes().macro_string(tempstr));
 				}
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_WRONG_LENGTH:
-				if (string != NULL) string->catprintf("INCORRECT LENGTH: %" I64FMT "d bytes\n", record->actual_length());
+				if (output != NULL) output->catprintf("INCORRECT LENGTH: %" I64FMT "d bytes\n", record->actual_length());
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND:
-				if (string != NULL)
+				if (output != NULL)
 				{
 					device_t *shared_device = record->shared_device();
 					if (shared_device == NULL)
-						string->catprintf("NOT FOUND\n");
+						output->catprintf("NOT FOUND\n");
 					else
-						string->catprintf("NOT FOUND (%s)\n", shared_device->shortname());
+						output->catprintf("NOT FOUND (%s)\n", shared_device->shortname());
 				}
 				best_new_status = NOTFOUND;
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND_NODUMP:
-				if (string != NULL) string->catprintf("NOT FOUND - NO GOOD DUMP KNOWN\n");
+				if (output != NULL) output->catprintf("NOT FOUND - NO GOOD DUMP KNOWN\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND_OPTIONAL:
-				if (string != NULL) string->catprintf("NOT FOUND BUT OPTIONAL\n");
+				if (output != NULL) output->catprintf("NOT FOUND BUT OPTIONAL\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
