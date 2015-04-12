@@ -47,21 +47,21 @@ void iteagle_fpga_device::device_reset()
 	//m_rtc_regs[0] = 0x11223344;
 	switch ((machine().root_device().ioport("VERSION")->read()>>4)&0xF) {
 		case 3:
-  		m_seq = 0x0a0b0a; // gt02o
-  		break;
+			m_seq = 0x0a0b0a; // gt02
+			break;
 		case 4:
-  		m_seq = 0x0a020b; // gt04
-  		break;
+			m_seq = 0x0a020b; // gt04
+			break;
 		case 5:
-  		m_seq = 0x0b0a0c; // gt05
-  		break;
+			m_seq = 0x0b0a0c; // gt05
+			break;
 		default:
-  		m_seq = 0x0c0b0d; // gt02
-  		break;
-  }
+			m_seq = 0x0c0b0d; // gt06
+			break;
+	}
 
-  m_seq_rem1 = 0;
-  m_seq_rem2 = 0;
+	m_seq_rem1 = 0;
+	m_seq_rem2 = 0;
 
 	// 0x00&0x2 == 1 for boot
 	//m_fpga_regs[0x00/4] =  0xC1110002; // 0xCF000002;// byte 3 is voltage sensor? high = 0x40 good = 0xC0 0xF0 0xFF; //0x80 0x30 0x00FF = voltage low
@@ -97,21 +97,21 @@ void iteagle_fpga_device::update_sequence(UINT32 data)
 		UINT32 val1, feed;
 		feed = ((m_seq<<4) ^ m_seq)>>7;
 		if (data & 0x1) {
-    	val1 = ((m_seq & 0x2)<<1) | ((m_seq & 0x4)>>1) | ((m_seq & 0x8)>>3);
-    	m_seq_rem1 = ((m_seq & 0x10)) | ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4);
-    	m_seq_rem2 = ((m_seq & 0x80)>>1) | ((m_seq & 0x100)>>3) | ((m_seq & 0x200)>>5);
-    	m_seq = (m_seq>>9) | ((feed&0x1ff)<<15);
-	    m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2)&0xFF);
+			val1 = ((m_seq & 0x2)<<1) | ((m_seq & 0x4)>>1) | ((m_seq & 0x8)>>3);
+			m_seq_rem1 = ((m_seq & 0x10)) | ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4);
+			m_seq_rem2 = ((m_seq & 0x80)>>1) | ((m_seq & 0x100)>>3) | ((m_seq & 0x200)>>5);
+			m_seq = (m_seq>>9) | ((feed&0x1ff)<<15);
+			m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2)&0xFF);
 		} else if (data & 0x2) {
-    	val1 = ((m_seq & 0x2)<<1) | ((m_seq & 0x4)>>1) | ((m_seq & 0x8)>>3);
-    	m_seq_rem1 = ((m_seq & 0x10)) | ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4);
-    	m_seq = (m_seq>>6) | ((feed&0x3f)<<18);
-	    m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2)&0xFF);
+			val1 = ((m_seq & 0x2)<<1) | ((m_seq & 0x4)>>1) | ((m_seq & 0x8)>>3);
+			m_seq_rem1 = ((m_seq & 0x10)) | ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4);
+			m_seq = (m_seq>>6) | ((feed&0x3f)<<18);
+			m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2)&0xFF);
 		} else {
 			val1 = ((m_seq & 0x2)<<6) | ((m_seq & 0x4)<<4) | ((m_seq & 0x8)<<2) | ((m_seq & 0x10)<<0)
 				 | ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4) | ((m_seq & 0x80)>>6) | ((m_seq & 0x100)>>8);
-    	m_seq = (m_seq>>8) | ((feed&0xff)<<16);
-	    m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2) & 0xff);
+			m_seq = (m_seq>>8) | ((feed&0xff)<<16);
+			m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2) & 0xff);
 		}
 		if (0 && LOG_FPGA)
 			logerror("%s:fpga update_sequence In: %02X Seq: %06X Out: %02X\n", machine().describe_context(), data, m_seq, m_fpga_regs[offset]&0xff);

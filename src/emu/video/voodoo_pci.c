@@ -31,12 +31,12 @@ voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, const char *
 
 void voodoo_pci_device::set_cpu_tag(const char *_cpu_tag)
 {
-	cpu_tag = _cpu_tag;
+	m_cpu_tag = _cpu_tag;
 }
 
 void voodoo_pci_device::device_start()
 {
-	voodoo_device::static_set_cpu_tag(m_voodoo, cpu_tag);
+	voodoo_device::static_set_cpu_tag(m_voodoo, m_cpu_tag);
 	pci_device::device_start();
 	add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::reg_map));
 	add_map(32*1024*1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
@@ -51,7 +51,7 @@ void voodoo_pci_device::device_reset()
 void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
-	logerror("%s: map_extra\n", tag());
+	logerror("%s: map_extra\n", this->tag());
 	// Really awkward way of getting vga address space mapped
 	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
 	if (1) {
@@ -75,7 +75,7 @@ void voodoo_pci_device::map_extra(UINT64 memory_window_start, UINT64 memory_wind
 		start = (start & 0xFFFF0000) + 0x300;
 		UINT64 end = (start & 0xFFFF0000) + 0x3ef;
 		space->install_device_delegate(start, end, *this, bi.map);
-		logerror("%s: map %s at %0*x-%0*x\n", tag(), bi.map.name(), bi.flags & M_IO ? 4 : 8, UINT32(start), bi.flags & M_IO ? 4 : 8, UINT32(end));
+		logerror("%s: map %s at %0*x-%0*x\n", this->tag(), bi.map.name(), bi.flags & M_IO ? 4 : 8, UINT32(start), bi.flags & M_IO ? 4 : 8, UINT32(end));
 	}
 
 }

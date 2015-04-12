@@ -27,7 +27,7 @@ protected:
 
 private:
 	required_device<voodoo_banshee_device> m_voodoo;
-	const char *cpu_tag;
+	const char *m_cpu_tag;
 
 	DECLARE_ADDRESS_MAP(reg_map, 32);
 	DECLARE_ADDRESS_MAP(lfb_map, 32);
