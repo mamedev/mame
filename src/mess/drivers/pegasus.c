@@ -65,16 +65,16 @@ public:
 		, m_io_keyboard(*this, "KEY")
 	{ }
 
-	DECLARE_READ8_MEMBER( pegasus_keyboard_r );
-	DECLARE_READ8_MEMBER( pegasus_protection_r );
-	DECLARE_READ8_MEMBER( pegasus_pcg_r );
-	DECLARE_WRITE8_MEMBER( pegasus_controls_w );
-	DECLARE_WRITE8_MEMBER( pegasus_keyboard_w );
-	DECLARE_WRITE8_MEMBER( pegasus_pcg_w );
-	DECLARE_READ_LINE_MEMBER( pegasus_keyboard_irq );
-	DECLARE_READ_LINE_MEMBER( pegasus_cassette_r );
-	DECLARE_WRITE_LINE_MEMBER( pegasus_cassette_w );
-	DECLARE_WRITE_LINE_MEMBER( pegasus_firq_clr );
+	DECLARE_READ8_MEMBER(pegasus_keyboard_r);
+	DECLARE_READ8_MEMBER(pegasus_protection_r);
+	DECLARE_READ8_MEMBER(pegasus_pcg_r);
+	DECLARE_WRITE8_MEMBER(pegasus_controls_w);
+	DECLARE_WRITE8_MEMBER(pegasus_keyboard_w);
+	DECLARE_WRITE8_MEMBER(pegasus_pcg_w);
+	DECLARE_READ_LINE_MEMBER(pegasus_keyboard_irq);
+	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
+	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
+	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(pegasus);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
@@ -93,7 +93,7 @@ private:
 	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void video_start();
-	void pegasus_decrypt_rom(UINT8 *ROM, bool force_decrypt);
+	void pegasus_decrypt_rom(UINT8 *ROM);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia_s;
@@ -383,16 +383,24 @@ static GFXDECODE_START( pegasus )
 GFXDECODE_END
 
 
-/* An encrypted single rom starts with 02, decrypted with 20. Not sure what
-    multipart roms will have. */
-void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM, bool force_decrypt)
+// An encrypted single rom starts with 02, decrypted with 20. 
+// The 2nd and 3rd part of a multi-rom set will have no obvious byte,
+// so we check the first 4 bytes for a signature, and decrypt if found.
+void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)
 {
+	bool doit = FALSE;
 	UINT8 b;
 	UINT16 j;
 	dynamic_buffer temp_copy;
 	temp_copy.resize(0x1000);
 
-	if (ROM[0] == 0x02 || force_decrypt)
+	if (ROM[0] == 0x02) doit = TRUE;
+	if (ROM[0] == 0x1e && ROM[1] == 0xfa && ROM[2] == 0x60 && ROM[3] == 0x71) doit = TRUE; // xbasic 2nd rom
+	if (ROM[0] == 0x72 && ROM[1] == 0x62 && ROM[2] == 0xc6 && ROM[3] == 0x36) doit = TRUE; // xbasic 3rd rom
+	if (ROM[0] == 0xf0 && ROM[1] == 0x40 && ROM[2] == 0xce && ROM[3] == 0x80) doit = TRUE; // forth 2nd rom (both sets)
+	if (ROM[0] == 0x80 && ROM[1] == 0x06 && ROM[2] == 0x68 && ROM[3] == 0x14) doit = TRUE; // pascal 2nd rom
+
+	if (doit)
 	{
 		for (int i = 0; i < 0x1000; i++)
 		{
@@ -436,7 +444,7 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 	slot->common_load_rom(slot->get_rom_base(), size, any_socket ? "rom" : reg_tag);
 
 	// raw images have to be decrypted (in particular the ones from softlist)
-	pegasus_decrypt_rom(slot->get_rom_base(), image.software_entry() != NULL);
+	pegasus_decrypt_rom(slot->get_rom_base());
 
 	return IMAGE_INIT_PASS;
 }
@@ -468,7 +476,7 @@ DRIVER_INIT_MEMBER(pegasus_state, pegasus)
 {
 	// decrypt monitor
 	UINT8 *base = memregion("maincpu")->base() + 0xf000;
-	pegasus_decrypt_rom(base, FALSE);
+	pegasus_decrypt_rom(base);
 }
 
 static MACHINE_CONFIG_START( pegasus, pegasus_state )
