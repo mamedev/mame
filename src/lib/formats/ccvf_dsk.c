@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h" // BIT
-#include "astring.h"
 #include "formats/ccvf_dsk.h"
 
 ccvf_format::ccvf_format()

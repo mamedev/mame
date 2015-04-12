@@ -40,7 +40,6 @@
 *********************************************************************/
 
 #include "emu.h" // fatalerror
-#include "astring.h"
 #include "corefile.h"
 #include "cbm_crt.h"
 

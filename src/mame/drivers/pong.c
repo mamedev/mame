@@ -16,7 +16,6 @@ TODO: please see netlist include files
 #include "netlist/devices/net_lib.h"
 #include "sound/dac.h"
 #include "video/fixfreq.h"
-#include "astring.h"
 
 /*
  * H count width to 512
