@@ -31,6 +31,7 @@
 // standard C++ includes
 #include <exception>
 #include <typeinfo>
+#include <string>
 
 // core system includes
 #include "osdcomm.h"

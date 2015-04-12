@@ -5891,7 +5891,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(model2_state,genprot)
 {
-	//astring key = parameter(":315_5881:key");
+	//std::string key = parameter(":315_5881:key");
 	m_maincpu->space(AS_PROGRAM).install_ram(0x01d80000, 0x01d8ffff);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x01d90000, 0x01d9ffff, read32_delegate(FUNC(model2_state::model2_5881prot_r), this), write32_delegate(FUNC(model2_state::model2_5881prot_w), this));
 }

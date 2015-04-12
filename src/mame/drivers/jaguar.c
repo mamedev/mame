@@ -484,7 +484,7 @@ emu_file jaguar_state::*jaguar_nvram_fopen( UINT32 openflags)
     emu_file *file;
     if (image->exists())
     {
-        astring fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
+        std::string fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
         filerr = mame_fopen( SEARCHPATH_NVRAM, fname, openflags, &file);
         return (filerr == FILERR_NONE) ? file : NULL;
     }
