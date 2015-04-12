@@ -300,6 +300,14 @@ bool base_gb_cart_slot_device::call_load()
 		else
 			m_type = get_cart_type(ROM + offset, len - offset);
 
+		// setup additional mask/shift for MBC1 variants:
+		// a few game collections use the same mapper with slightly
+		// different lines connection with the ROM / RAM
+		if (m_type == GB_MBC_MBC1 || m_type == GB_MBC_188IN1)
+			m_cart->set_additional_wirings(0x1f, 0);
+		if (m_type == GB_MBC_MBC1_COL)
+			m_cart->set_additional_wirings(0x0f, -1);
+
 		// setup RAM/NVRAM/RTC/RUMBLE
 		if (software_entry() != NULL)
 		{

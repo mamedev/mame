@@ -26,7 +26,6 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 	UINT8 m_ram_enable;
-	UINT8 m_mode;
 };
 
 // ======================> gb_rom_mbc1_device
@@ -34,36 +33,28 @@ public:
 class gb_rom_mbc1_device : public gb_rom_mbc_device
 {
 public:
+	
+	enum {
+		MODE_16M_8k  = 0, /// 16Mbit ROM, 8kBit RAM
+		MODE_4M_256k = 1, /// 4Mbit ROM, 256kBit RAM
+	};
+	
 	// construction/destruction
 	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start() { shared_start(); };
-	virtual void device_reset() { shared_reset(); };
+	virtual void device_start() { shared_start(); save_item(NAME(m_mode)); };
+	virtual void device_reset() { shared_reset(); m_mode = MODE_16M_8k; };
+	virtual void set_additional_wirings(UINT8 mask, int shift) { m_mask = mask; m_shift = shift; }	// these get set at cart loading
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
-};
 
-// ======================> gb_rom_mbc1col_device
-
-class gb_rom_mbc1col_device : public gb_rom_mbc_device
-{
-public:
-	// construction/destruction
-	gb_rom_mbc1col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_start() { shared_start(); };
-	virtual void device_reset() { shared_reset(); };
-
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	UINT8 m_mode, m_mask;
+	int m_shift;
 };
 
 // ======================> gb_rom_mbc2_device
@@ -298,7 +289,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	UINT8 m_bank_mask, m_bank, m_reg;
+	UINT8 m_bank_mask, m_bank, m_reg, m_mode;
 };
 
 
