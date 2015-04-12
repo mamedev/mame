@@ -1537,7 +1537,7 @@ READ8_MEMBER(nes_mmalee_device::read_m)
 
 	if (offset < 0x0800)
 		return m_prg[0x8000 + offset];
-	else if (m_prgram && offset >= 0x1000 && offset < 0x1800)   // WRAM only in these 2K
+	else if (!m_prgram.empty() && offset >= 0x1000 && offset < 0x1800)   // WRAM only in these 2K
 		return m_prgram[offset & 0x7ff];
 
 	return ((offset + 0x6000) & 0xff00) >> 8;
@@ -1547,7 +1547,7 @@ WRITE8_MEMBER(nes_mmalee_device::write_m)
 {
 	LOG_MMC(("mmalee write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (m_prgram && offset >= 0x1000 && offset < 0x1800)    // WRAM only in these 2K
+	if (!m_prgram.empty() && offset >= 0x1000 && offset < 0x1800)    // WRAM only in these 2K
 		m_prgram[offset & 0x7ff] = data;
 }
 

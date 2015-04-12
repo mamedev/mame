@@ -3019,11 +3019,11 @@ DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 
 	for (int i=0;i<88;i++)
 	{
-		memcpy(buffer+i*0x100, rom+ckonggx_remap[i], 0x100);
+		memcpy(&buffer[i*0x100], rom+ckonggx_remap[i], 0x100);
 
 	}
 
-	memcpy(rom, buffer, 0x5800);
+	memcpy(rom, &buffer[0], 0x5800);
 }
 
 

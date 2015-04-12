@@ -494,7 +494,8 @@ public:
 			marker_tail(NULL)
 	{
 		buffer_size=sector_size*num_sectors;
-		buffer.resize_and_clear(buffer_size);
+		buffer.resize(buffer_size);
+		memset(&buffer[0], 0, buffer_size);
 	}
 
 	~stream_buffer()
@@ -518,7 +519,7 @@ public:
 		}
 		marker_tail=xam;
 
-		unsigned char *ret=buffer+head;
+		unsigned char *ret=&buffer[head];
 		head=(head+sector_size)%buffer_size;
 		in+=sector_size;
 		return ret;

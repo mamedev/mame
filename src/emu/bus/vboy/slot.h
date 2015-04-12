@@ -33,9 +33,9 @@ public:
 	void rom_alloc(UINT32 size, const char *tag);
 	void eeprom_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
-	UINT32* get_eeprom_base() { return m_eeprom; }
+	UINT32* get_eeprom_base() { return &m_eeprom[0]; }
 	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_eeprom_size() { return m_eeprom.count(); }
+	UINT32 get_eeprom_size() { return m_eeprom.size(); }
 
 	void save_eeprom()  { device().save_item(NAME(m_eeprom)); }
 
@@ -44,7 +44,7 @@ protected:
 	UINT32 *m_rom;
 	UINT32 m_rom_size;
 	UINT32 m_rom_mask;
-	dynamic_array<UINT32> m_eeprom;
+	std::vector<UINT32> m_eeprom;
 };
 
 

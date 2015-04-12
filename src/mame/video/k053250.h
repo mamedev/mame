@@ -41,7 +41,7 @@ private:
 
 	// internal state
 	dynamic_buffer m_unpacked_rom;
-	dynamic_array<UINT16> m_ram;
+	std::vector<UINT16> m_ram;
 	UINT16 *m_buffer[2];
 	UINT8 m_regs[8];
 	UINT8 m_page;

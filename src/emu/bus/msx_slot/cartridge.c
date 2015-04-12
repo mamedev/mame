@@ -326,7 +326,7 @@ void msx_slot_cartridge_device::get_default_card_software(astring &result)
 		if (type == NOMAPPER)
 		{
 			// Not identified through hashfile, try automatic detection
-			type = get_cart_type(rom, length);
+			type = get_cart_type(&rom[0], length);
 		}
 
 		if (type > NOMAPPER)

@@ -38,11 +38,11 @@ void pcm2_prot_device::neo_pcm2_snk_1999(UINT8* ymrom, UINT32 ymsize, int value)
 
 	if( rom != NULL )
 	{   /* swap address lines on the whole ROMs */
-		dynamic_array<UINT16> buffer(value / 2);
+		std::vector<UINT16> buffer(value / 2);
 
 		for( i = 0; i < size / 2; i += ( value / 2 ) )
 		{
-			memcpy( buffer, &rom[ i ], value );
+			memcpy( &buffer[0], &rom[ i ], value );
 			for( j = 0; j < (value / 2); j++ )
 			{
 				rom[ i + j ] = buffer[ j ^ (value/4) ];
@@ -75,7 +75,7 @@ void pcm2_prot_device::neo_pcm2_swap(UINT8* ymrom, UINT32 ymsize, int value)
 	dynamic_buffer buf(0x1000000);
 	int i, j, d;
 	UINT8* src = ymrom;
-	memcpy(buf,src,0x1000000);
+	memcpy(&buf[0],src,0x1000000);
 	for (i=0;i<0x1000000;i++)
 	{
 		j=BITSWAP24(i,23,22,21,20,19,18,17,0,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,16);

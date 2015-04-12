@@ -328,7 +328,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 		return;
 
 	// initialize everyone's states
-	dynamic_array<int> penalty(matches);
+	std::vector<int> penalty(matches);
 	for (int matchnum = 0; matchnum < matches; matchnum++)
 	{
 		penalty[matchnum] = 9999;
@@ -781,17 +781,19 @@ void softlist_parser::add_rom_entry(const char *name, const char *hashdata, UINT
 
 	// make sure we don't add duplicate regions
 	if (name != NULL && (flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_REGION)
-		for (int romentry = 0; romentry < m_current_part->m_romdata.count(); romentry++)
+		for (unsigned int romentry = 0; romentry < m_current_part->m_romdata.size(); romentry++)
 			if (m_current_part->m_romdata[romentry]._name != NULL && strcmp(m_current_part->m_romdata[romentry]._name, name) == 0)
 				parse_error("Duplicated dataarea %s in software %s", name, infoname());
 
 	// create the new entry and append it
-	rom_entry &entry = m_current_part->m_romdata.append();
+	rom_entry entry;
 	entry._name = m_list.add_string(name);
 	entry._hashdata = m_list.add_string(hashdata);
 	entry._offset = offset;
 	entry._length = length;
 	entry._flags = flags;
+
+	m_current_part->m_romdata.push_back(entry);
 }
 
 

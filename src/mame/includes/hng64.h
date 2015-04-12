@@ -323,7 +323,7 @@ public:
 	void setLighting(const UINT16* packet);
 	void set3dFlags(const UINT16* packet);
 	void setCameraProjectionMatrix(const UINT16* packet);
-	void recoverPolygonBlock(const UINT16* packet, struct polygon* polys, int* numPolys);
+	void recoverPolygonBlock(const UINT16* packet, std::vector<struct polygon> &polys, int* numPolys);
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
 

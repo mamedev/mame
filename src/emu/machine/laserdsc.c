@@ -436,8 +436,8 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, stream_sample_t
 	// otherwise, stream from our buffer
 	else
 	{
-		INT16 *buffer0 = m_audiobuffer[0];
-		INT16 *buffer1 = m_audiobuffer[1];
+		INT16 *buffer0 = &m_audiobuffer[0][0];
+		INT16 *buffer1 = &m_audiobuffer[1][0];
 		int sampout = m_audiobufout;
 
 		// copy samples, clearing behind us as we go
@@ -777,7 +777,7 @@ void laserdisc_device::init_disc()
 
 		// allocate memory for the precomputed per-frame metadata
 		err = m_disc->read_metadata(AV_LD_METADATA_TAG, 0, m_vbidata);
-		if (err != CHDERR_NONE || m_vbidata.count() != totalhunks * VBI_PACKED_BYTES)
+		if (err != CHDERR_NONE || m_vbidata.size() != totalhunks * VBI_PACKED_BYTES)
 			throw emu_fatalerror("Precomputed VBI metadata missing or incorrect size");
 	}
 	m_maxtrack = MAX(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
@@ -993,7 +993,7 @@ void laserdisc_device::read_track_data()
 
 	// cheat and look up the metadata we are about to retrieve
 	vbi_metadata vbidata = { 0 };
-	if (m_vbidata.count() != 0)
+	if (!m_vbidata.empty())
 		vbi_metadata_unpack(&vbidata, NULL, &m_vbidata[readhunk * VBI_PACKED_BYTES]);
 
 	// if we're in the lead-in area, force the VBI data to be standard lead-in
@@ -1044,7 +1044,7 @@ void laserdisc_device::read_track_data()
 	m_audiocursamples = 0;
 
 	// set the VBI data for the new field from our precomputed data
-	if (m_vbidata.count() != 0)
+	if (!m_vbidata.empty())
 	{
 		UINT32 vbiframe;
 		vbi_metadata_unpack(&m_metadata[m_fieldnum], &vbiframe, &m_vbidata[readhunk * VBI_PACKED_BYTES]);

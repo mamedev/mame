@@ -782,7 +782,7 @@ int find_reel_strings(running_machine &machine)
 	int startblock = -1;
 	int endblock = -1;
 
-	dynamic_array<int> reelsizes;
+	std::vector<int> reelsizes;
 
 	// these are for sc4dnd ONLY, need to work out how the code calculates them
 
@@ -790,37 +790,37 @@ int find_reel_strings(running_machine &machine)
 	// code that points at these is likely to be complex because it's conditional on the game code / mode..
 	if (!strcmp(machine.system().name, "sc4dnd"))
 	{
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(12);
-		reelsizes.append(16);
-		reelsizes.append(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(12);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
 
 		startblock = 0x8d74c;
 	}
 	else if (!strcmp(machine.system().name, "sc4dndtp"))
 	{
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(12);
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(12);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
 
 		startblock = 0x9d252;
 	}
 	else if (!strcmp(machine.system().name, "sc4dnddw"))
 	{
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(16);
-		reelsizes.append(12);
-		reelsizes.append(20);
-		reelsizes.append(20);
-		reelsizes.append(20);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(16);
+		reelsizes.push_back(12);
+		reelsizes.push_back(20);
+		reelsizes.push_back(20);
+		reelsizes.push_back(20);
 
 		startblock = 0x9b8c8;
 	}
@@ -828,7 +828,7 @@ int find_reel_strings(running_machine &machine)
 
 	int total_reel_symbols = 0;
 
-	for (int i = 0; i < reelsizes.count(); i++)
+	for (unsigned int i = 0; i < reelsizes.size(); i++)
 	{
 		total_reel_symbols += reelsizes[i];
 	}

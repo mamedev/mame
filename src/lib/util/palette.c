@@ -79,7 +79,8 @@ void palette_client::dirty_state::resize(UINT32 colors)
 {
 	// resize to the correct number of dwords and mark all entries dirty
 	UINT32 dirty_dwords = (colors + 31) / 32;
-	m_dirty.resize_and_clear(dirty_dwords, 0xff);
+	m_dirty.resize(dirty_dwords);
+	memset(&m_dirty[0], 0xff, dirty_dwords*4);
 
 	// mark all entries dirty
 	m_dirty[dirty_dwords - 1] &= (1 << (colors % 32)) - 1;
@@ -111,7 +112,7 @@ void palette_client::dirty_state::reset()
 {
 	// erase relevant entries in the new live one
 	memset(&m_dirty[m_mindirty / 32], 0, ((m_maxdirty / 32) + 1 - (m_mindirty / 32)) * sizeof(UINT32));
-	m_mindirty = m_dirty.count() * 32 - 1;
+	m_mindirty = m_dirty.size() * 32 - 1;
 	m_maxdirty = 0;
 }
 

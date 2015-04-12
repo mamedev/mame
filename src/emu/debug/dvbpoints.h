@@ -52,7 +52,7 @@ private:
 
 	// internal state
 	int (*m_sortType)(void const *, void const *);
-	dynamic_array<device_debug::breakpoint *> m_buffer;
+	std::vector<device_debug::breakpoint *> m_buffer;
 };
 
 

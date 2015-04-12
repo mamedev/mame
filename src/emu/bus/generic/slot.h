@@ -31,8 +31,8 @@ public:
 	UINT8* get_rom_base()  { return m_rom; }
 	UINT32 get_rom_size() { return m_rom_size; }
 
-	UINT8* get_ram_base() { return m_ram; }
-	UINT32 get_ram_size() { return m_ram.count(); }
+	UINT8* get_ram_base() { return &m_ram[0]; }
+	UINT32 get_ram_size() { return m_ram.size(); }
 
 	void save_ram()   { device().save_item(NAME(m_ram)); }
 

@@ -48,11 +48,11 @@ private:
 	UINT16 byte_to_mfm(UINT8 data, bool context);
 	UINT16 calc_crc(const UINT8 *data, int size, UINT16 crc);
 
-	void wd_generate_unsynced_gap(UINT32 *track, int &pos, const wd_obs &obs, int tstart, int tend, UINT32 cell_size);
-	void wd_generate_synced_gap(UINT32 *track, int &pos, const wd_obs &obs, int tstart, int tend, UINT32 cell_size);
-	void wd_generate_gap(UINT32 *track, int &pos, const wd_obs &obs, int tstart, int tend, bool synced, UINT32 cell_size_start, UINT32 cell_size_end);
-	void wd_generate_sector_header(UINT32 *track, int &pos, const wd_obs &obs, int sector, int tstart, UINT32 cell_size);
-	void wd_generate_sector_data(UINT32 *track, int &pos, const wd_obs &obs, int sector, int tstart, UINT32 cell_size);
+	void wd_generate_unsynced_gap(std::vector<UINT32> &track, const wd_obs &obs, int tstart, int tend, UINT32 cell_size);
+	void wd_generate_synced_gap(std::vector<UINT32> &track, const wd_obs &obs, int tstart, int tend, UINT32 cell_size);
+	void wd_generate_gap(std::vector<UINT32> &track, const wd_obs &obs, int tstart, int tend, bool synced, UINT32 cell_size_start, UINT32 cell_size_end);
+	void wd_generate_sector_header(std::vector<UINT32> &track, const wd_obs &obs, int sector, int tstart, UINT32 cell_size);
+	void wd_generate_sector_data(std::vector<UINT32> &track, const wd_obs &obs, int sector, int tstart, UINT32 cell_size);
 	void wd_generate_track_from_sectors_and_track(int track, int head, floppy_image *image, wd_obs &obs);
 	void wd_generate_track_from_sectors_only(int track, int head, floppy_image *image, wd_obs &obs);
 };

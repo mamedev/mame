@@ -720,7 +720,7 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	UINT8 *track_data;
 	void *track_data_v;
 	UINT32 max_track_size;
-	dynamic_array<int> sector_map;
+	std::vector<int> sector_map;
 
 	sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
 	sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
@@ -747,7 +747,7 @@ static floperr_t coco_dmk_format_track(floppy_image_legacy *floppy, int head, in
 	track_data = (UINT8 *) track_data_v;
 
 	/* set up sector map */
-	sector_map.resize_and_clear(sectors, 0xFF);
+	memset(&sector_map[0], 0xff, sectors*sizeof(int));
 
 	physical_sector = 0;
 	for (logical_sector = 0; logical_sector < sectors; logical_sector++)

@@ -3699,14 +3699,14 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	RAM = memregion("gfx2")->base();
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
@@ -3718,14 +3718,14 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	RAM = memregion("gfx2")->base();
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco74_decrypt_gfx(machine(), "gfx2");

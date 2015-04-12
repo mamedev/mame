@@ -340,7 +340,7 @@ void drcuml_block::end()
 		disassemble();
 
 	// generate the code via the back-end
-	m_drcuml.generate(*this, m_inst, m_nextinst);
+	m_drcuml.generate(*this, &m_inst[0], m_nextinst);
 
 	// block is no longer in use
 	m_inuse = false;

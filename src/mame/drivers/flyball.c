@@ -427,7 +427,7 @@ void flyball_state::machine_start()
 	dynamic_buffer buf(len);
 	for (int i = 0; i < len; i++)
 		buf[i ^ 0x1ff] = ROM[i];
-	memcpy(ROM, buf, len);
+	memcpy(ROM, &buf[0], len);
 
 	m_pot_clear_timer = timer_alloc(TIMER_POT_CLEAR);
 	m_quarter_timer = timer_alloc(TIMER_QUARTER);

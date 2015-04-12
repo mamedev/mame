@@ -16,7 +16,8 @@ void speedspn_state::video_start()
 {
 	m_display_disable = false;
 	m_bank_vidram = 0;
-	m_vidram.resize_and_clear(0x1000 * 2);
+	m_vidram.resize(0x1000 * 2);
+	memset(&m_vidram[0], 0, 0x1000*2);
 	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(speedspn_state::get_tile_info),this),TILEMAP_SCAN_COLS, 8, 8,64,32);
 
 	save_item(NAME(m_display_disable));
@@ -61,7 +62,7 @@ WRITE8_MEMBER(speedspn_state::display_disable_w)
 void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	UINT8 *source = m_vidram+ 0x1000;
+	UINT8 *source = &m_vidram[0x1000];
 	UINT8 *finish = source + 0x1000;
 
 	while( source<finish )

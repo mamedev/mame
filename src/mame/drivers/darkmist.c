@@ -436,7 +436,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	/* adr line swaps */
 	ROM = memregion("user1")->base();
 	len = memregion("user1")->bytes();
-	memcpy( buffer, ROM, len );
+	memcpy( &buffer[0], ROM, len );
 
 	for(i=0;i<len;i++)
 	{
@@ -445,7 +445,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 	ROM = memregion("user2")->base();
 	len = memregion("user2")->bytes();
-	memcpy( buffer, ROM, len );
+	memcpy( &buffer[0], ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
@@ -453,7 +453,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 	ROM = memregion("user3")->base();
 	len = memregion("user3")->bytes();
-	memcpy( buffer, ROM, len );
+	memcpy( &buffer[0], ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
@@ -461,7 +461,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 	ROM = memregion("user4")->base();
 	len = memregion("user4")->bytes();
-	memcpy( buffer, ROM, len );
+	memcpy( &buffer[0], ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];

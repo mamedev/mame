@@ -57,7 +57,7 @@ public:
 	// accessors
 	UINT32 size(void) const { return m_size; }
 	UINT32 mask(void) const { return m_size - 1; }
-	UINT8 *pointer(void) { return m_pointer; }
+	UINT8 *pointer(void) { return &m_pointer[0]; }
 	static UINT32 parse_string(const char *s);
 	UINT32 default_size(void) const;
 	const char *extra_options(void) const { return m_extra_options; }

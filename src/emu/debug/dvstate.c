@@ -212,7 +212,7 @@ void debug_view_state::view_update()
 
 	// loop over visible rows
 	screen_device *screen = machine().first_screen();
-	debug_view_char *dest = m_viewdata;
+	debug_view_char *dest = &m_viewdata[0];
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
 		UINT32 col = 0;

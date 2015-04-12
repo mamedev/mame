@@ -118,7 +118,7 @@ public:
 	required_shared_ptr<UINT16> m_p_palette;
 	required_shared_ptr<UINT16> m_p_spriteram;
 
-	dynamic_array<UINT16> m_p_cart;
+	std::vector<UINT16> m_p_cart;
 
 	UINT32 m_current_bank;
 
@@ -585,9 +585,9 @@ void vii_state::switch_bank(UINT32 bank)
 	{
 		m_current_bank = bank;
 		if (m_cart_rom)
-			memcpy(m_p_cart, m_cart_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
+			memcpy(&m_p_cart[0], m_cart_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
 		else
-			memcpy(m_p_cart, m_bios_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
+			memcpy(&m_p_cart[0], m_bios_rom->base() + 0x400000 * bank * 2, 0x400000 * 2);
 	}
 }
 
@@ -1025,12 +1025,12 @@ void vii_state::machine_start()
 	{
 		astring region_tag;
 		m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
-		memcpy(m_p_cart, m_cart_rom->base(), 0x400000 * 2);
+		memcpy(&m_p_cart[0], m_cart_rom->base(), 0x400000 * 2);
 	}
 	else if (m_spg243_mode == SPG243_VII)   // Vii bios is banked
-		memcpy(m_p_cart, m_bios_rom->base(), 0x400000 * 2);
+		memcpy(&m_p_cart[0], m_bios_rom->base(), 0x400000 * 2);
 	else
-		memcpy(m_p_cart, memregion("maincpu")->base(), 0x400000 * 2);
+		memcpy(&m_p_cart[0], memregion("maincpu")->base(), 0x400000 * 2);
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;

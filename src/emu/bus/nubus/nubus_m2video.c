@@ -119,7 +119,7 @@ void nubus_m2video_device::device_reset()
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
 	m_mode = 0;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -149,7 +149,7 @@ UINT32 nubus_m2video_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	int x, y;
 	UINT8 pixels, *vram;
 
-	vram = m_vram + 0x20;
+	vram = &m_vram[0x20];
 
 	switch (m_mode)
 	{

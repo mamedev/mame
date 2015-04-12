@@ -690,7 +690,7 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
-	memcpy(original, rom, length);
+	memcpy(&original[0], rom, length);
 	for (srcaddr = 0; srcaddr < length; srcaddr++)
 	{
 		UINT32 dstaddr = srcaddr;
@@ -709,7 +709,7 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
-	memcpy(original, rom, length);
+	memcpy(&original[0], rom, length);
 	for (srcaddr = 0; srcaddr < length; srcaddr++)
 	{
 		UINT32 dstaddr = srcaddr;
@@ -727,7 +727,7 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 	dynamic_buffer original(length);
 	UINT32 srcaddr;
 
-	memcpy(original, rom, length);
+	memcpy(&original[0], rom, length);
 	for (srcaddr = 0; srcaddr < length; srcaddr++)
 	{
 		UINT32 dstaddr = srcaddr;

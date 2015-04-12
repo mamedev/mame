@@ -626,7 +626,7 @@ private:
 	offs_t                  m_bytestart;            // byte-adjusted start offset
 	offs_t                  m_byteend;              // byte-adjusted end offset
 	int                     m_curentry;             // current entry
-	dynamic_array<bank_entry> m_entry;              // array of entries (dynamically allocated)
+	std::vector<bank_entry>      m_entry;                // array of entries (dynamically allocated)
 	astring                 m_name;                 // friendly name for this bank
 	astring                 m_tag;                  // tag for this bank
 	simple_list<bank_reference> m_reflist;          // linked list of address spaces referencing this bank
@@ -693,8 +693,8 @@ public:
 	running_machine &machine() const { return m_machine; }
 	memory_region *next() const { return m_next; }
 	UINT8 *base() { return (this != NULL) ? &m_buffer[0] : NULL; }
-	UINT8 *end() { return (this != NULL) ? base() + m_buffer.count() : NULL; }
-	UINT32 bytes() const { return (this != NULL) ? m_buffer.count() : 0; }
+	UINT8 *end() { return (this != NULL) ? base() + m_buffer.size() : NULL; }
+	UINT32 bytes() const { return (this != NULL) ? m_buffer.size() : 0; }
 	const char *name() const { return m_name.c_str(); }
 
 	// flag expansion

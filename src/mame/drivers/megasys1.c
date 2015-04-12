@@ -3692,7 +3692,7 @@ void megasys1_state::rodlandj_gfx_unmangle(const char *region)
 
 	dynamic_buffer buffer(size);
 
-	memcpy(buffer,rom,size);
+	memcpy(&buffer[0],rom,size);
 
 	/* address lines swap: ..dcba9876543210 -> ..acb8937654d210 */
 	for (i = 0;i < size;i++)
@@ -3718,7 +3718,7 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 
 	dynamic_buffer buffer(size);
 
-	memcpy(buffer,rom,size);
+	memcpy(&buffer[0],rom,size);
 
 	/* address lines swap: fedcba9876543210 -> fe8cb39d7654a210 */
 	for (i = 0;i < size;i++)
@@ -3742,7 +3742,7 @@ void megasys1_state::stdragona_gfx_unmangle(const char *region)
 
 	dynamic_buffer buffer(size);
 
-	memcpy(buffer,rom,size);
+	memcpy(&buffer[0],rom,size);
 
 	/* address lines swap: fedcba9876543210 -> fe3cbd9a76548210 */
 	for (i = 0;i < size;i++)

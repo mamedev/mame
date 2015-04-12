@@ -32,7 +32,7 @@ void msx_slot_ram_mm_device::device_start()
 	for ( int i = 0; i < 4; i++ )
 	{
 		m_bank_selected[i] = 3 -i;
-		m_bank_base[i] = m_ram + 0x4000 * m_bank_selected[i];
+		m_bank_base[i] = &m_ram[0x4000 * m_bank_selected[i]];
 	}
 
 	save_item(NAME(m_ram));
@@ -50,7 +50,7 @@ void msx_slot_ram_mm_device::restore_banks()
 {
 	for ( int i = 0; i < 3; i++ )
 	{
-		m_bank_base[i] = m_ram + 0x4000 * ( m_bank_selected[i] & m_bank_mask );
+		m_bank_base[i] = &m_ram[0x4000 * ( m_bank_selected[i] & m_bank_mask )];
 	}
 }
 
@@ -74,5 +74,5 @@ WRITE8_MEMBER(msx_slot_ram_mm_device::write_mapper_bank)
 	offset &= 3;
 
 	m_bank_selected[offset] = data;
-	m_bank_base[offset] = m_ram + 0x4000 * ( m_bank_selected[offset] & m_bank_mask );
+	m_bank_base[offset] = &m_ram[0x4000 * ( m_bank_selected[offset] & m_bank_mask )];
 }

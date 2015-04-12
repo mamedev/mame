@@ -198,7 +198,7 @@ void debug_view_watchpoints::view_click(const int button, const debug_view_xy& p
 		gather_watchpoints();
 
 		int const wpIndex = pos.y - 1;
-		if ((wpIndex >= m_buffer.count()) || (wpIndex < 0))
+		if ((wpIndex >= m_buffer.size()) || (wpIndex < 0))
 			return;
 
 		// Enable / disable
@@ -235,13 +235,13 @@ void debug_view_watchpoints::gather_watchpoints()
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != NULL; wp = wp->next())
-				m_buffer.append() = wp;
+				m_buffer.push_back(wp);
 		}
 	}
 
 	// And now for the sort
-	if (m_buffer.count() > 0)
-		qsort(&m_buffer[0], m_buffer.count(), sizeof(device_debug::watchpoint *), m_sortType);
+	if (!m_buffer.empty())
+		qsort(&m_buffer[0], m_buffer.size(), sizeof(device_debug::watchpoint *), m_sortType);
 }
 
 
@@ -257,12 +257,12 @@ void debug_view_watchpoints::view_update()
 
 	// Set the view region so the scroll bars update
 	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
-	m_total.y = m_buffer.count() + 1;
+	m_total.y = m_buffer.size() + 1;
 	if (m_total.y < 10)
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char *dest = m_viewdata;
+	debug_view_char *dest = &m_viewdata[0];
 	astring         linebuf;
 
 	// Header
@@ -313,7 +313,7 @@ void debug_view_watchpoints::view_update()
 	{
 		// watchpoints
 		int const wpi = row + m_topleft.y - 1;
-		if ((wpi < m_buffer.count()) && wpi >= 0)
+		if ((wpi < m_buffer.size()) && wpi >= 0)
 		{
 			static char const *const types[] = { "unkn ", "read ", "write", "r/w  " };
 			device_debug::watchpoint *const wp = m_buffer[wpi];

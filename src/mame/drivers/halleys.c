@@ -246,7 +246,7 @@ public:
 	emu_timer *m_blitter_reset_timer;
 	offs_t m_collision_detection;
 	int m_latch_delay;
-	dynamic_array<UINT8> m_paletteram;
+	std::vector<UINT8> m_paletteram;
 
 	DECLARE_WRITE8_MEMBER(bgtile_w);
 	DECLARE_READ8_MEMBER(blitter_status_r);
@@ -1191,7 +1191,7 @@ void halleys_state::halleys_decode_rgb(UINT32 *r, UINT32 *g, UINT32 *b, int addr
 	int bit0, bit1, bit2, bit3, bit4;
 
 	// the four 16x4-bit SN74S189 SRAM chips are assumed be the game's 32-byte palette RAM
-	sram_189 = m_paletteram;
+	sram_189 = &m_paletteram[0];
 
 	// each of the three 32-byte 6330 PROM is wired to an RGB component output
 	prom_6330 = memregion("proms")->base();

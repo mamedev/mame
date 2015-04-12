@@ -863,7 +863,7 @@ WRITE16_MEMBER(x68k_state::x68k_sram_w)
 {
 	if(m_sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(m_nvram + offset);
+		COMBINE_DATA(&m_nvram[offset]);
 	}
 }
 
@@ -1571,7 +1571,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	unsigned char* rom = memregion("maincpu")->base();
 	unsigned char* user2 = memregion("user2")->base();
 
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, m_nvram.bytes());
+	machine().device<nvram_device>("nvram")->set_base(&m_nvram[0], m_nvram.size()*sizeof(m_nvram[0]));
 
 #ifdef USE_PREDEFINED_SRAM
 	{

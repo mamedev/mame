@@ -744,33 +744,33 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	allocation_bitmap_lsns = (allocation_bitmap_bits / 8 + sector_bytes - 1) / sector_bytes;
 	format_flags = ((heads > 1) ? 0x01 : 0x00) | ((tracks > 40) ? 0x02 : 0x00);
 
-	memset(header, 0, sector_bytes);
-	place_integer_be(header,   0,  3, heads * tracks * sectors);
-	place_integer_be(header,   3,  1, sectors);
-	place_integer_be(header,   4,  2, (allocation_bitmap_bits + 7) / 8);
-	place_integer_be(header,   6,  2, cluster_size);
-	place_integer_be(header,   8,  3, 1 + allocation_bitmap_lsns);
-	place_integer_be(header,  11,  2, owner_id);
-	place_integer_be(header,  13,  1, attributes);
-	place_integer_be(header,  14,  2, disk_id);
-	place_integer_be(header,  16,  1, format_flags);
-	place_integer_be(header,  17,  2, sectors);
-	place_string(header,   31, 32, title);
-	place_integer_be(header, 103, 2, sector_bytes / 256);
+	memset(&header[0], 0, sector_bytes);
+	place_integer_be(&header[0],   0,  3, heads * tracks * sectors);
+	place_integer_be(&header[0],   3,  1, sectors);
+	place_integer_be(&header[0],   4,  2, (allocation_bitmap_bits + 7) / 8);
+	place_integer_be(&header[0],   6,  2, cluster_size);
+	place_integer_be(&header[0],   8,  3, 1 + allocation_bitmap_lsns);
+	place_integer_be(&header[0],  11,  2, owner_id);
+	place_integer_be(&header[0],  13,  1, attributes);
+	place_integer_be(&header[0],  14,  2, disk_id);
+	place_integer_be(&header[0],  16,  1, format_flags);
+	place_integer_be(&header[0],  17,  2, sectors);
+	place_string(&header[0],   31, 32, title);
+	place_integer_be(&header[0], 103, 2, sector_bytes / 256);
 
 	/* path descriptor options */
-	place_integer_be(header, 0x3f+0x00, 1, 1); /* device class */
-	place_integer_be(header, 0x3f+0x01, 1, 1); /* drive number */
-	place_integer_be(header, 0x3f+0x03, 1, 0x20); /* device type */
-	place_integer_be(header, 0x3f+0x04, 1, 1); /* density capability */
-	place_integer_be(header, 0x3f+0x05, 2, tracks); /* number of tracks */
-	place_integer_be(header, 0x3f+0x07, 1, heads); /* number of sides */
-	place_integer_be(header, 0x3f+0x09, 2, sectors); /* sectors per track */
-	place_integer_be(header, 0x3f+0x0b, 2, sectors); /* sectors on track zero */
-	place_integer_be(header, 0x3f+0x0d, 1, 3); /* sector interleave factor */
-	place_integer_be(header, 0x3f+0x0e, 1, 8); /* default sectors per allocation */
+	place_integer_be(&header[0], 0x3f+0x00, 1, 1); /* device class */
+	place_integer_be(&header[0], 0x3f+0x01, 1, 1); /* drive number */
+	place_integer_be(&header[0], 0x3f+0x03, 1, 0x20); /* device type */
+	place_integer_be(&header[0], 0x3f+0x04, 1, 1); /* density capability */
+	place_integer_be(&header[0], 0x3f+0x05, 2, tracks); /* number of tracks */
+	place_integer_be(&header[0], 0x3f+0x07, 1, heads); /* number of sides */
+	place_integer_be(&header[0], 0x3f+0x09, 2, sectors); /* sectors per track */
+	place_integer_be(&header[0], 0x3f+0x0b, 2, sectors); /* sectors on track zero */
+	place_integer_be(&header[0], 0x3f+0x0d, 1, 3); /* sector interleave factor */
+	place_integer_be(&header[0], 0x3f+0x0e, 1, 8); /* default sectors per allocation */
 
-	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id, 0, header, sector_bytes, 0);    /* TODO: pass ddam argument from imgtool */
+	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id, 0, &header[0], sector_bytes, 0);    /* TODO: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
@@ -778,11 +778,11 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 
 	for (i = 0; i < allocation_bitmap_lsns; i++)
 	{
-		memset(header, 0x00, sector_bytes);
+		memset(&header[0], 0x00, sector_bytes);
 
 		if (total_allocated_sectors > (8 * 256))
 		{
-			memset(header, 0xff, sector_bytes);
+			memset(&header[0], 0xff, sector_bytes);
 			total_allocated_sectors -= (8 * 256);
 		}
 		else if (total_allocated_sectors > 1 )
@@ -800,12 +800,12 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 			}
 		}
 
-		err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + i, 0, header, sector_bytes, 0);    /* TODO: pass ddam argument from imgtool */
+		err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + i, 0, &header[0], sector_bytes, 0);    /* TODO: pass ddam argument from imgtool */
 		if (err)
 			goto done;
 	}
 
-	memset(header, 0, sector_bytes);
+	memset(&header[0], 0, sector_bytes);
 	header[0x00] = 0xBF;
 	header[0x01] = 0x00;
 	header[0x02] = 0x00;
@@ -822,20 +822,20 @@ static imgtoolerr_t os9_diskimage_create(imgtool_image *img, imgtool_stream *str
 	header[0x0D] = (UINT8) (ltime->tm_year % 100);
 	header[0x0E] = (UINT8) ltime->tm_mon;
 	header[0x0F] = (UINT8) ltime->tm_mday;
-	place_integer_be(header, 0x10, 3, 1 + allocation_bitmap_lsns + 1);
-	place_integer_be(header, 0x13, 2, 8);
+	place_integer_be(&header[0], 0x10, 3, 1 + allocation_bitmap_lsns + 1);
+	place_integer_be(&header[0], 0x13, 2, 8);
 
-	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);   /* TODO: pass ddam argument from imgtool */
+	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 1 + allocation_bitmap_lsns, 0, &header[0], sector_bytes, 0);   /* TODO: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
-	memset(header, 0, sector_bytes);
+	memset(&header[0], 0, sector_bytes);
 	header[0x00] = 0x2E;
 	header[0x01] = 0xAE;
 	header[0x1F] = 1 + allocation_bitmap_lsns;
 	header[0x20] = 0xAE;
 	header[0x3F] = 1 + allocation_bitmap_lsns;
-	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, header, sector_bytes, 0);   /* TOOD: pass ddam argument from imgtool */
+	err = (imgtoolerr_t)floppy_write_sector(imgtool_floppy(img), 0, 0, first_sector_id + 2 + allocation_bitmap_lsns, 0, &header[0], sector_bytes, 0);   /* TOOD: pass ddam argument from imgtool */
 	if (err)
 		goto done;
 
@@ -1055,7 +1055,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const 
 	{
 		write_size = (size_t) MIN(sz, (UINT64) disk_info->sector_size);
 
-		stream_read(sourcef, buf, write_size);
+		stream_read(sourcef, &buf[0], write_size);
 
 		while(count == 0)
 		{
@@ -1064,7 +1064,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const 
 			count = file_info.sector_map[i].count;
 		}
 
-		err = os9_write_lsn(image, lsn, 0, buf, write_size);
+		err = os9_write_lsn(image, lsn, 0, &buf[0], write_size);
 		if (err)
 			goto done;
 

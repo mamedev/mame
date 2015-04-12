@@ -121,8 +121,8 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 
 	// local variables to hold mutable copies of gfx layout data
 	gfx_layout glcopy;
-	dynamic_array<UINT32> extxoffs(0);
-	dynamic_array<UINT32> extyoffs(0);
+	std::vector<UINT32> extxoffs(0);
+	std::vector<UINT32> extyoffs(0);
 
 	// loop over all elements
 	for (int curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
@@ -206,8 +206,8 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 			memcpy(&extyoffs[0], (glcopy.extyoffs != NULL) ? glcopy.extyoffs : glcopy.yoffset, glcopy.height * sizeof(UINT32));
 
 			// always use the extended offsets here
-			glcopy.extxoffs = extxoffs;
-			glcopy.extyoffs = extyoffs;
+			glcopy.extxoffs = &extxoffs[0];
+			glcopy.extyoffs = &extyoffs[0];
 
 			// expand X and Y by the scale factors
 			if (xscale > 1)

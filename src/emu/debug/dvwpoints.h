@@ -48,7 +48,7 @@ private:
 
 	// internal state
 	int (*m_sortType)(void const *, void const *);
-	dynamic_array<device_debug::watchpoint *> m_buffer;
+	std::vector<device_debug::watchpoint *> m_buffer;
 };
 
 

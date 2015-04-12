@@ -376,7 +376,7 @@ DRIVER_INIT_MEMBER(scramble_state,rescue)
 
 	dynamic_buffer scratch(len);
 
-	memcpy(scratch, RAM, len);
+	memcpy(&scratch[0], RAM, len);
 
 	for (i = 0; i < len; i++)
 	{
@@ -409,7 +409,7 @@ DRIVER_INIT_MEMBER(scramble_state,minefld)
 
 	dynamic_buffer scratch(len);
 
-	memcpy(scratch, RAM, len);
+	memcpy(&scratch[0], RAM, len);
 
 	for (i = 0; i < len; i++)
 	{

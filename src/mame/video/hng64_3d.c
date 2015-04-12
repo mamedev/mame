@@ -284,7 +284,7 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 
 // Operation 0100
 // Polygon rasterization.
-void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* polys, int* numPolys)
+void hng64_state::recoverPolygonBlock(const UINT16* packet, std::vector<struct polygon> &polys, int* numPolys)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -865,7 +865,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 {
 	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	dynamic_array<polygon> polys(1024*5);
+	std::vector<polygon> polys(1024*5);
 
 	//printf("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
 

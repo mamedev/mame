@@ -190,10 +190,10 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 	if (m_layout_is_raw)
 	{
 		// RAW layouts don't need these arrays
-		m_layout_planeoffset.reset();
-		m_layout_xoffset.reset();
-		m_layout_yoffset.reset();
-		m_gfxdata_allocated.reset();
+		m_layout_planeoffset.clear();
+		m_layout_xoffset.clear();
+		m_layout_yoffset.clear();
+		m_gfxdata_allocated.clear();
 
 		// modulos are determined for us by the layout
 		m_line_modulo = gl.yoffs(0) / 8;
@@ -229,13 +229,14 @@ void gfx_element::set_layout(const gfx_layout &gl, const UINT8 *srcdata)
 	}
 
 	// mark everything dirty
-	m_dirty.resize_and_clear(m_total_elements, 1);
+	m_dirty.resize(m_total_elements);
+	memset(&m_dirty[0], 1, m_total_elements);
 
 	// allocate a pen usage array for entries with 32 pens or less
 	if (m_color_depth <= 32)
 		m_pen_usage.resize(m_total_elements);
 	else
-		m_pen_usage.reset();
+		m_pen_usage.clear();
 }
 
 
@@ -264,7 +265,7 @@ void gfx_element::set_raw_layout(const UINT8 *srcdata, UINT32 width, UINT32 heig
 void gfx_element::set_source(const UINT8 *source)
 {
 	m_srcdata = source;
-	memset(m_dirty, 1, elements());
+	memset(&m_dirty[0], 1, elements());
 	if (m_layout_is_raw) m_gfxdata = const_cast<UINT8 *>(source);
 }
 
@@ -280,7 +281,8 @@ void gfx_element::set_source_and_total(const UINT8 *source, UINT32 total)
 	m_total_elements = total;
 
 	// mark everything dirty
-	m_dirty.resize_and_clear(m_total_elements, 1);
+	m_dirty.resize(m_total_elements);
+	memset(&m_dirty[0], 1, m_total_elements);
 
 	// allocate a pen usage array for entries with 32 pens or less
 	if (m_color_depth <= 32)
@@ -353,7 +355,7 @@ void gfx_element::decode(UINT32 code)
 	}
 
 	// (re)compute pen usage
-	if (code < m_pen_usage.count())
+	if (code < m_pen_usage.size())
 	{
 		// iterate over data, creating a bitmask of live pens
 		const UINT8 *dp = m_gfxdata + code * m_char_modulo;

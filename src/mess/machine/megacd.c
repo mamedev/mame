@@ -1691,7 +1691,7 @@ void sega_segacd_device::device_start()
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	m_backupram.resize(0x2000);
-	subdevice<nvram_device>("backupram")->set_base(m_backupram, 0x2000);
+	subdevice<nvram_device>("backupram")->set_base(&m_backupram[0], 0x2000);
 
 	segacd_4meg_prgbank = 0;
 

@@ -185,7 +185,7 @@ void neogeo_noslot_state::kf2k3pcb_sp1_decrypt()
 	};
 
 	UINT16 *rom = (UINT16 *)memregion("mainbios")->base();
-	dynamic_array<UINT16> buf(0x80000/2);
+	std::vector<UINT16> buf(0x80000/2);
 	int i, addr;
 
 	for (i = 0; i < 0x80000/2; i++)
@@ -208,5 +208,5 @@ void neogeo_noslot_state::kf2k3pcb_sp1_decrypt()
 		if (buf[i] & 0x0020) buf[i] ^= 0x0008;
 	}
 
-	memcpy(rom, buf, 0x80000);
+	memcpy(rom, &buf[0], 0x80000);
 }

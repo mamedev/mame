@@ -128,7 +128,7 @@ private:
 	drcuml_block *          m_next;             // pointer to next block
 	UINT32                  m_nextinst;         // next instruction to fill in the cache
 	UINT32                  m_maxinst;          // maximum number of instructions
-	dynamic_array<uml::instruction> m_inst;     // pointer to the instruction list
+	std::vector<uml::instruction> m_inst;     // pointer to the instruction list
 	bool                    m_inuse;            // this block is in use
 };
 

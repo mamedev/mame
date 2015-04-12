@@ -5235,7 +5235,7 @@ static void decryptcode( running_machine &machine, int a23, int a22, int a21, in
 	size_t  size = machine.root_device().memregion( "maincpu" )->bytes();
 	dynamic_buffer buffer( size );
 
-	memcpy( buffer, RAM, size );
+	memcpy( &buffer[0], RAM, size );
 	for( i = 0; i < size; i++ )
 	{
 		RAM[ i ] = buffer[ BITSWAP24( i, a23, a22, a21, a20, a19, a18, a17, a16, a15, a14, a13, a12,

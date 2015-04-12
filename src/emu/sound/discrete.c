@@ -117,7 +117,7 @@ public:
 	node_step_list_t        step_list;
 
 	/* list of source nodes */
-	dynamic_array_t<input_buffer> source_list;      /* discrete_source_node */
+	vector_t<input_buffer> source_list;      /* discrete_source_node */
 
 	int                     task_group;
 
@@ -137,7 +137,7 @@ protected:
 	void check(discrete_task *dest_task);
 	void prepare_for_queue(int samples);
 
-	dynamic_array_t<output_buffer>      m_buffers;
+	vector_t<output_buffer>      m_buffers;
 	discrete_device &                   m_device;
 
 private:
@@ -525,7 +525,7 @@ void discrete_device::discrete_build_list(const discrete_block *intf, sound_bloc
 		}
 		else if (intf[node_count].type == DSO_DELETE)
 		{
-			dynamic_array_t<int> deletethem;
+			vector_t<int> deletethem;
 
 			for (int i=0; i<block_list.count(); i++)
 			{

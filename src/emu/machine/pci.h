@@ -190,8 +190,8 @@ public:
 
 protected:
 	pci_device *sub_devices[32*8];
-	dynamic_array<pci_device *> all_devices;
-	dynamic_array<pci_bridge_device *> all_bridges;
+	std::vector<pci_device *> all_devices;
+	std::vector<pci_bridge_device *> all_bridges;
 
 	UINT32 prefetch_baseu, prefetch_limitu;
 	UINT16 bridge_control, memory_base, memory_limit, prefetch_base, prefetch_limit, iobaseu, iolimitu;

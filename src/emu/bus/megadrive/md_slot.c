@@ -471,7 +471,7 @@ int base_md_cart_slot_device::load_nonlist()
 	dynamic_buffer tmpROM(tmplen);
 
 	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
-	fread(tmpROM, tmplen);
+	fread(&tmpROM[0], tmplen);
 	is_smd = genesis_is_SMD(&tmpROM[0x200], tmplen - 0x200);
 	is_md = (tmpROM[0x80] == 'E') && (tmpROM[0x81] == 'A') && (tmpROM[0x82] == 'M' || tmpROM[0x82] == 'G');
 
@@ -909,12 +909,12 @@ void base_md_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		if (genesis_is_SMD(&rom[0x200], len - 0x200))
 				offset = 0x200;
 
-		type = get_cart_type(rom + offset, len - offset);
+		type = get_cart_type(&rom[offset], len - offset);
 		slot_string = md_get_slot(type);
 
 		clear();

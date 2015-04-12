@@ -23,8 +23,8 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 *    m_spriteram;
 	required_shared_ptr<UINT8> m_scrlram;
-	dynamic_array<UINT8> m_paletteram;
-	dynamic_array<UINT8> m_paletteram_ext;
+	std::vector<UINT8> m_paletteram;
+	std::vector<UINT8> m_paletteram_ext;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;

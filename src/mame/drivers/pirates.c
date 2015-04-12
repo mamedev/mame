@@ -327,9 +327,9 @@ void pirates_state::decrypt_68k()
 {
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	size_t rom_size = memregion("maincpu")->bytes();
-	dynamic_array<UINT16> buf(rom_size/2);
+	std::vector<UINT16> buf(rom_size/2);
 
-	memcpy (buf, rom, rom_size);
+	memcpy (&buf[0], rom, rom_size);
 
 	for (int i=0; i<rom_size/2; i++)
 	{
@@ -357,7 +357,7 @@ void pirates_state::decrypt_p()
 	dynamic_buffer buf(rom_size);
 
 	rom = memregion("gfx1")->base();
-	memcpy (buf, rom, rom_size);
+	memcpy (&buf[0], rom, rom_size);
 
 	for (i=0; i<rom_size/4; i++)
 	{
@@ -380,7 +380,7 @@ void pirates_state::decrypt_s()
 	dynamic_buffer buf(rom_size);
 
 	rom = memregion("gfx2")->base();
-	memcpy (buf, rom, rom_size);
+	memcpy (&buf[0], rom, rom_size);
 
 	for (i=0; i<rom_size/4; i++)
 	{
@@ -404,7 +404,7 @@ void pirates_state::decrypt_oki()
 	dynamic_buffer buf(rom_size);
 
 	rom = memregion("oki")->base();
-	memcpy (buf, rom, rom_size);
+	memcpy (&buf[0], rom, rom_size);
 
 	for (i=0; i<rom_size; i++)
 	{

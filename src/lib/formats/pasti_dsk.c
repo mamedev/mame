@@ -86,10 +86,10 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			raw_track.resize(entry_len-16);
 
-			io_generic_read(io, raw_track, pos+16, entry_len-16);
+			io_generic_read(io, &raw_track[0], pos+16, entry_len-16);
 
-			UINT8 *fuzz = fuzz_len ? raw_track+16*sect : 0;
-			UINT8 *bdata = fuzz ? fuzz+fuzz_len : raw_track+16*sect;
+			UINT8 *fuzz = fuzz_len ? &raw_track[16*sect] : 0;
+			UINT8 *bdata = fuzz ? fuzz+fuzz_len : &raw_track[16*sect];
 			UINT8 *tdata = bdata;
 
 			int syncpos = -1;
@@ -109,7 +109,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				printf("Track %2d.%d: el=%d fl=%d sect=%d flags=%04x tlen=%d/%d tnum=%d flags2=%02x sync=%x\n",
 						track, head,
 						entry_len, fuzz_len, sect, flags, track_len, tsize, track_num, flags2, syncpos);
-				hexdump(raw_track+16*sect, entry_len-16-16*sect);
+				hexdump(&raw_track[16*sect], entry_len-16-16*sect);
 			}
 
 			if(0 && tdata) {
@@ -124,7 +124,7 @@ bool pasti_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			}
 
 			for(int s=0; s<sect; s++) {
-				UINT8 *sh = raw_track+16*s;
+				UINT8 *sh = &raw_track[16*s];
 				int s_off   = sh[0] | (sh[1] << 8) | (sh[2] << 16) | (sh[3] << 24);
 				int s_pos   = sh[4] | (sh[5] << 8);
 				int s_time  = sh[6] | (sh[7] << 8);
@@ -168,7 +168,7 @@ void pasti_format::wd_generate_track_from_observations(int track, int head, flop
 		wd_generate_track_from_sectors_and_track(track, head, image, obs);
 }
 
-void pasti_format::wd_generate_unsynced_gap(UINT32 *track, int &pos, const wd_obs &obs, int tstart, int tend, UINT32 cell_size)
+void pasti_format::wd_generate_unsynced_gap(std::vector<UINT32> &track, const wd_obs &obs, int tstart, int tend, UINT32 cell_size)
 {
 	for(int i=tstart; i != tend;) {
 		unsigned char v = obs.track_data[i];
@@ -176,7 +176,7 @@ void pasti_format::wd_generate_unsynced_gap(UINT32 *track, int &pos, const wd_ob
 		for(j=i+1; j != tend && obs.track_data[j] == v; j++);
 		int size = j-i;
 		if(size < 4) {
-			mfm_w(track, pos, 8, v, cell_size);
+			mfm_w(track, 8, v, cell_size);
 			i++;
 			continue;
 		}
@@ -189,32 +189,32 @@ void pasti_format::wd_generate_unsynced_gap(UINT32 *track, int &pos, const wd_ob
 		if((v == 0 || v == 0x4e) && j != tend)
 			size++;
 		for(j=0; j != size; j++)
-			mfm_w(track, pos, 8, v, cell_size);
+			mfm_w(track, 8, v, cell_size);
 		i += size;
 	}
 }
 
-void pasti_format::wd_generate_synced_gap(UINT32 *track, int &pos, const wd_obs &obs, int tstart, int tend, UINT32 cell_size)
+void pasti_format::wd_generate_synced_gap(std::vector<UINT32> &track, const wd_obs &obs, int tstart, int tend, UINT32 cell_size)
 {
 	for(int i = tstart; i != tend; i++) {
 		unsigned char v = obs.track_data[i];
 		if((v == 0x14 || v == 0xa1 || v == 0xc2) && i+2 < tend && obs.track_data[i+1] == 0xa1 && obs.track_data[i+2] == 0xa1) {
-			raw_w(track, pos, 16, 0x4489, cell_size);
-			raw_w(track, pos, 16, 0x4489, cell_size);
-			raw_w(track, pos, 16, 0x4489, cell_size);
+			raw_w(track, 16, 0x4489, cell_size);
+			raw_w(track, 16, 0x4489, cell_size);
+			raw_w(track, 16, 0x4489, cell_size);
 			i += 2;
-		} else if(pos && i != tend-1 && (((v == 0x14 || v == 0xc2) && (track[pos-1] & 0x1f) == 10) || (v == 0xa1 && (track[pos-1] & 0x1f) != 10)))
-			raw_w(track, pos, 16, 0x4489, cell_size);
+		} else if(!track.empty() && i != tend-1 && (((v == 0x14 || v == 0xc2) && (track.back() & 0x1f) == 10) || (v == 0xa1 && (track.back() & 0x1f) != 10)))
+			raw_w(track, 16, 0x4489, cell_size);
 		else if(i != tend-1 && (v == 0x14 || v == 0xc2))
-			raw_w(track, pos, 16, 0x5224, cell_size);
+			raw_w(track, 16, 0x5224, cell_size);
 		else
-			mfm_w(track, pos, 8, v, cell_size);
+			mfm_w(track, 8, v, cell_size);
 	}
 }
 
-void pasti_format::wd_generate_gap(UINT32 *track, int &pos, const wd_obs &obs, int tstart, int tend, bool synced, UINT32 cell_size_start, UINT32 cell_size_end)
+void pasti_format::wd_generate_gap(std::vector<UINT32> &track, const wd_obs &obs, int tstart, int tend, bool synced, UINT32 cell_size_start, UINT32 cell_size_end)
 {
-	int spos = pos;
+	unsigned int spos = track.size();
 	if(!synced) {
 		int sync = -1;
 		for(int i = tstart; sync == -1 && i != tend; i++)
@@ -222,18 +222,18 @@ void pasti_format::wd_generate_gap(UINT32 *track, int &pos, const wd_obs &obs, i
 				sync = i;
 		if(sync == -1)
 			sync = tend;
-		wd_generate_unsynced_gap(track, pos, obs, tstart, sync, cell_size_start);
+		wd_generate_unsynced_gap(track, obs, tstart, sync, cell_size_start);
 		tstart = sync;
 	}
 	if(tstart != tend)
-		wd_generate_synced_gap(track, pos, obs, tstart, tend, cell_size_start);
+		wd_generate_synced_gap(track, obs, tstart, tend, cell_size_start);
 
 	if(cell_size_end != cell_size_start) {
 		INT32 total_size = 0;
-		for(int i=spos; i != pos; i++)
+		for(unsigned int i=spos; i != track.size(); i++)
 			total_size += track[i] & floppy_image::TIME_MASK;
 		INT64 cur_size = 0;
-		for(int i=spos; i != pos; i++) {
+		for(unsigned int i=spos; i != track.size(); i++) {
 			cur_size += track[i] & floppy_image::TIME_MASK;
 			track[i] = (track[i] & floppy_image::MG_MASK) |
 				(cur_size*int(cell_size_end-cell_size_start)/total_size + cell_size_start);
@@ -241,36 +241,35 @@ void pasti_format::wd_generate_gap(UINT32 *track, int &pos, const wd_obs &obs, i
 	}
 }
 
-void pasti_format::wd_generate_sector_header(UINT32 *track, int &pos, const wd_obs &obs, int sector, int tstart, UINT32 cell_size)
+void pasti_format::wd_generate_sector_header(std::vector<UINT32> &track, const wd_obs &obs, int sector, int tstart, UINT32 cell_size)
 {
-	raw_w(track, pos, 16, 0x4489, cell_size);
-	raw_w(track, pos, 16, 0x4489, cell_size);
-	raw_w(track, pos, 16, 0x4489, cell_size);
-	mfm_w(track, pos, 8, obs.track_data[tstart+3], cell_size);
+	raw_w(track, 16, 0x4489, cell_size);
+	raw_w(track, 16, 0x4489, cell_size);
+	raw_w(track, 16, 0x4489, cell_size);
+	mfm_w(track, 8, obs.track_data[tstart+3], cell_size);
 	for(int i=0; i != 6; i++)
-		mfm_w(track, pos, 8, obs.sectors[sector].id[i], cell_size);
+		mfm_w(track, 8, obs.sectors[sector].id[i], cell_size);
 }
 
-void pasti_format::wd_generate_sector_data(UINT32 *track, int &pos, const wd_obs &obs, int sector, int tstart, UINT32 cell_size)
+void pasti_format::wd_generate_sector_data(std::vector<UINT32> &track, const wd_obs &obs, int sector, int tstart, UINT32 cell_size)
 {
 	const wd_sect &s = obs.sectors[sector];
-	raw_w(track, pos, 16, 0x4489, cell_size);
-	raw_w(track, pos, 16, 0x4489, cell_size);
-	raw_w(track, pos, 16, 0x4489, cell_size);
-	mfm_w(track, pos, 8, obs.track_data[tstart+3], cell_size);
+	raw_w(track, 16, 0x4489, cell_size);
+	raw_w(track, 16, 0x4489, cell_size);
+	raw_w(track, 16, 0x4489, cell_size);
+	mfm_w(track, 8, obs.track_data[tstart+3], cell_size);
 	for(int i=0; i<128 << (s.id[3] & 3); i++)
-		mfm_w(track, pos, 8, s.data[i], cell_size);
-	UINT16 crc = calc_crc_ccitt(track, pos - (2048 << (s.id[3] & 3)) - 16*4, pos);
-	mfm_w(track, pos, 8, crc >> 8, cell_size);
-	mfm_w(track, pos, 8, crc, cell_size);
+		mfm_w(track, 8, s.data[i], cell_size);
+	UINT16 crc = calc_crc_ccitt(track, track.size() - (2048 << (s.id[3] & 3)) - 16*4, track.size());
+	mfm_w(track, 8, crc >> 8, cell_size);
+	mfm_w(track, 8, crc, cell_size);
 }
 
 void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head, floppy_image *image, wd_obs &obs)
 {
 	if(0)
 		printf("Track %d head %d sectors %d\n", track, head, obs.sector_count);
-	dynamic_array<UINT32> trackbuf(200000);
-	int pos = 0;
+	std::vector<UINT32> trackbuf;
 
 	wd_sect_info sect_infos[256];
 
@@ -306,7 +305,7 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 		}
 
 		UINT32 cell_size = UINT32(obs.sectors[0].time_ratio * 1000+0.5);
-		wd_generate_gap(trackbuf, pos, obs, 0, sect_infos[0].hstart, false, cell_size, cell_size);
+		wd_generate_gap(trackbuf, obs, 0, sect_infos[0].hstart, false, cell_size, cell_size);
 
 		for(int i=0; i != obs.sector_count; i++) {
 			wd_sect_info *s = sect_infos + i;
@@ -319,28 +318,28 @@ void pasti_format::wd_generate_track_from_sectors_and_track(int track, int head,
 
 			UINT32 ncell_size =  UINT32(obs.sectors[i+1 != obs.sector_count ? i+1 : 0].time_ratio * 1000+0.5);
 
-			wd_generate_sector_header(trackbuf, pos, obs, i, s->hstart, cell_size);
+			wd_generate_sector_header(trackbuf, obs, i, s->hstart, cell_size);
 
 			if(s->dstart == -1) {
 				if(i == obs.sector_count-1)
-					wd_generate_gap(trackbuf, pos, obs, s->hend, obs.track_size, s->hsynced, cell_size, ncell_size);
+					wd_generate_gap(trackbuf, obs, s->hend, obs.track_size, s->hsynced, cell_size, ncell_size);
 				else
-					wd_generate_gap(trackbuf, pos, obs, s->hend, s[1].hstart, s->hsynced, cell_size, ncell_size);
+					wd_generate_gap(trackbuf, obs, s->hend, s[1].hstart, s->hsynced, cell_size, ncell_size);
 			} else {
-				wd_generate_gap(trackbuf, pos, obs, s->hend, s->dstart, s->hsynced, cell_size, cell_size);
-				wd_generate_sector_data(trackbuf, pos, obs, i, s->dstart, cell_size);
+				wd_generate_gap(trackbuf, obs, s->hend, s->dstart, s->hsynced, cell_size, cell_size);
+				wd_generate_sector_data(trackbuf, obs, i, s->dstart, cell_size);
 				if(i == obs.sector_count-1)
-					wd_generate_gap(trackbuf, pos, obs, s->dend, obs.track_size, s->dsynced, cell_size, ncell_size);
+					wd_generate_gap(trackbuf, obs, s->dend, obs.track_size, s->dsynced, cell_size, ncell_size);
 				else
-					wd_generate_gap(trackbuf, pos, obs, s->dend, s[1].hstart, s->dsynced, cell_size, ncell_size);
+					wd_generate_gap(trackbuf, obs, s->dend, s[1].hstart, s->dsynced, cell_size, ncell_size);
 			}
 			cell_size = ncell_size;
 		}
 
 	} else
-		wd_generate_gap(trackbuf, pos, obs, 0, obs.track_size, false, 1000, 1000);
+		wd_generate_gap(trackbuf, obs, 0, obs.track_size, false, 1000, 1000);
 
-	generate_track_from_levels(track, head, trackbuf, pos, 0, image);
+	generate_track_from_levels(track, head, trackbuf, 0, image);
 }
 
 void pasti_format::wd_generate_track_from_sectors_only(int track, int head, floppy_image *image, wd_obs &obs)
@@ -360,63 +359,62 @@ void pasti_format::wd_generate_track_from_sectors_only(int track, int head, flop
 		}
 	}
 
-	UINT32 *tdata = global_alloc_array(UINT32, 200000);
-	int pos = 0;
+	std::vector<UINT32> tdata;
 	for(int i=0; i != obs.sector_count; i++) {
 		const wd_sect &s = obs.sectors[i];
 		if(i+1 != obs.sector_count && obs.sectors[i+1].position < s.position+10+44+4+(128 << (s.id[3] & 3))) {
 			logerror("pasti: Unsupported sector data sharing, track %d head %d\n", track, head);
 			return;
 		}
-		if(pos >> 4 < s.position - 12) {
-			int count = s.position - 12 - (pos >> 4);
+		if(tdata.size() >> 4 < s.position - 12) {
+			int count = s.position - 12 - (tdata.size() >> 4);
 			if(count & 1) {
-				mfm_w(tdata, pos, 8, 0x4e);
+				mfm_w(tdata, 8, 0x4e);
 				count--;
 			}
 			for(int j=0; j<count; j+=2)
-				mfm_w(tdata, pos, 8, 0x4e);
+				mfm_w(tdata, 8, 0x4e);
 		}
-		if(pos < s.position*16) {
-			int count = s.position - (pos >> 4);
+		if(tdata.size() < s.position*16) {
+			int count = s.position - (tdata.size() >> 4);
 			if(count & 1) {
-				mfm_w(tdata, pos, 8, 0x00);
+				mfm_w(tdata, 8, 0x00);
 				count--;
 			}
 			for(int j=0; j<count; j+=2)
-				mfm_w(tdata, pos, 8, 0x00);
+				mfm_w(tdata, 8, 0x00);
 		}
-		raw_w(tdata, pos, 16, 0x4489);
-		raw_w(tdata, pos, 16, 0x4489);
-		raw_w(tdata, pos, 16, 0x4489);
-		mfm_w(tdata, pos, 8, 0xfe);
+		raw_w(tdata, 16, 0x4489);
+		raw_w(tdata, 16, 0x4489);
+		raw_w(tdata, 16, 0x4489);
+		mfm_w(tdata, 8, 0xfe);
 		for(int j=0; j<6; j++)
-			mfm_w(tdata, pos, 8, s.id[j]);
+			mfm_w(tdata, 8, s.id[j]);
 
 		if(!s.data)
 			continue;
 
 		for(int j=0; j<22; j++)
-			mfm_w(tdata, pos, 8, 0x4e);
+			mfm_w(tdata, 8, 0x4e);
 		for(int j=0; j<12; j++)
-			mfm_w(tdata, pos, 8, 0x00);
+			mfm_w(tdata, 8, 0x00);
 
-		raw_w(tdata, pos, 16, 0x4489);
-		raw_w(tdata, pos, 16, 0x4489);
-		raw_w(tdata, pos, 16, 0x4489);
-		mfm_w(tdata, pos, 8, 0xfb);
+		raw_w(tdata, 16, 0x4489);
+		raw_w(tdata, 16, 0x4489);
+		raw_w(tdata, 16, 0x4489);
+		mfm_w(tdata, 8, 0xfb);
 		for(int j=0; j<128 << (s.id[3] & 3); j++)
-			mfm_w(tdata, pos, 8, s.data[j]);
-		UINT16 crc = calc_crc_ccitt(tdata, pos - (2048 << (s.id[3] & 3)) - 16*4, pos);
-		mfm_w(tdata, pos, 8, crc >> 8);
-		mfm_w(tdata, pos, 8, crc);
+			mfm_w(tdata, 8, s.data[j]);
+		UINT16 crc = calc_crc_ccitt(tdata, tdata.size() - (2048 << (s.id[3] & 3)) - 16*4, tdata.size());
+		mfm_w(tdata, 8, crc >> 8);
+		mfm_w(tdata, 8, crc);
 	}
 
-	int count = (100015 - pos) >> 16;
+	int count = (100015 - tdata.size()) >> 16;
 	for(int i=0; i<count; i++)
-		mfm_w(tdata, pos, 8, 0x4e);
+		mfm_w(tdata, 8, 0x4e);
 
-	generate_track_from_levels(track, head, tdata, pos, 0, image);
+	generate_track_from_levels(track, head, tdata, 0, image);
 }
 
 UINT16 pasti_format::byte_to_mfm(UINT8 data, bool context)

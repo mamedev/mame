@@ -134,7 +134,7 @@ public:
 	required_shared_ptr<UINT8> m_nvram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
-	dynamic_array<UINT8> m_paletteram;
+	std::vector<UINT8> m_paletteram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -1509,8 +1509,8 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 			m_rambank = data;
 			switch (data)
 			{
-				case 0x52:  membank("palbank")->set_base(m_nvram);        break;
-				case 0x64:  membank("palbank")->set_base(m_paletteram);   break;
+				case 0x52:  membank("palbank")->set_base(m_nvram);          break;
+				case 0x64:  membank("palbank")->set_base(&m_paletteram[0]); break;
 				default:
 					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
 					return;
@@ -2656,9 +2656,10 @@ DRIVER_INIT_MEMBER(sigmab98_state,itazuram)
 	m_rombank = 0x0f;
 
 	// RAM banks
-	m_paletteram.resize_and_clear(0x3000);
+	m_paletteram.resize(0x3000);
+	memset(&m_paletteram[0], 0, 0x3000);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
-	membank("palbank")->set_base(m_paletteram);
+	membank("palbank")->set_base(&m_paletteram[0]);
 	m_rambank = 0x64;
 
 	m_spriteram.allocate(0x1000 * 5);
@@ -2768,7 +2769,8 @@ ROM_END
 DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 {
 	// RAM banks
-	m_paletteram.resize_and_clear(0x200);
+	m_paletteram.resize(0x200);
+	memset(&m_paletteram[0], 0, 0x200);
 	m_palette->basemem().set(m_paletteram, ENDIANNESS_BIG, 2);
 
 	m_spriteram.allocate(0x1000);

@@ -239,15 +239,15 @@ hash_collection &emu_file::hashes(const char *types)
 		return m_hashes;
 
 	// if we have ZIP data, just hash that directly
-	if (m__7zdata.count() != 0)
+	if (!m__7zdata.empty())
 	{
-		m_hashes.compute(m__7zdata, m__7zdata.count(), needed.c_str());
+		m_hashes.compute(&m__7zdata[0], m__7zdata.size(), needed.c_str());
 		return m_hashes;
 	}
 
-	if (m_zipdata.count() != 0)
+	if (!m_zipdata.empty())
 	{
-		m_hashes.compute(m_zipdata, m_zipdata.count(), needed.c_str());
+		m_hashes.compute(&m_zipdata[0], m_zipdata.size(), needed.c_str());
 		return m_hashes;
 	}
 
@@ -409,8 +409,8 @@ void emu_file::close()
 		core_fclose(m_file);
 	m_file = NULL;
 
-	m__7zdata.reset();
-	m_zipdata.reset();
+	m__7zdata.clear();
+	m_zipdata.clear();
 
 	if (m_remove_on_close)
 		osd_rmfile(m_fullpath.c_str());
@@ -751,25 +751,25 @@ file_error emu_file::attempt_zipped()
 file_error emu_file::load_zipped_file()
 {
 	assert(m_file == NULL);
-	assert(m_zipdata.count() == 0);
+	assert(m_zipdata.empty());
 	assert(m_zipfile != NULL);
 
 	// allocate some memory
 	m_zipdata.resize(m_ziplength);
 
 	// read the data into our buffer and return
-	zip_error ziperr = zip_file_decompress(m_zipfile, m_zipdata, m_zipdata.count());
+	zip_error ziperr = zip_file_decompress(m_zipfile, &m_zipdata[0], m_zipdata.size());
 	if (ziperr != ZIPERR_NONE)
 	{
-		m_zipdata.reset();
+		m_zipdata.clear();
 		return FILERR_FAILURE;
 	}
 
 	// convert to RAM file
-	file_error filerr = core_fopen_ram(m_zipdata, m_zipdata.count(), m_openflags, &m_file);
+	file_error filerr = core_fopen_ram(&m_zipdata[0], m_zipdata.size(), m_openflags, &m_file);
 	if (filerr != FILERR_NONE)
 	{
-		m_zipdata.reset();
+		m_zipdata.clear();
 		return FILERR_FAILURE;
 	}
 
@@ -880,25 +880,25 @@ file_error emu_file::attempt__7zped()
 file_error emu_file::load__7zped_file()
 {
 	assert(m_file == NULL);
-	assert(m__7zdata.count() == 0);
+	assert(m__7zdata.empty());
 	assert(m__7zfile != NULL);
 
 	// allocate some memory
 	m__7zdata.resize(m__7zlength);
 
 	// read the data into our buffer and return
-	_7z_error _7zerr = _7z_file_decompress(m__7zfile, m__7zdata, m__7zdata.count());
+	_7z_error _7zerr = _7z_file_decompress(m__7zfile, &m__7zdata[0], m__7zdata.size());
 	if (_7zerr != _7ZERR_NONE)
 	{
-		m__7zdata.reset();
+		m__7zdata.clear();
 		return FILERR_FAILURE;
 	}
 
 	// convert to RAM file
-	file_error filerr = core_fopen_ram(m__7zdata, m__7zdata.count(), m_openflags, &m_file);
+	file_error filerr = core_fopen_ram(&m__7zdata[0], m__7zdata.size(), m_openflags, &m_file);
 	if (filerr != FILERR_NONE)
 	{
-		m__7zdata.reset();
+		m__7zdata.clear();
 		return FILERR_FAILURE;
 	}
 

@@ -854,7 +854,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 
 	/* Unscrambling address lines */
 	dynamic_buffer buf(memsize);
-	memcpy(buf, mem, memsize);
+	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[BITSWAP16(i,15,14,5,6,3,0,12,1,9,13,4,7,10,8,2,11)] = buf[i];

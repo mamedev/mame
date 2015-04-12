@@ -575,7 +575,7 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 	UINT8 *rom = memregion("maincpu")->base();
 	dynamic_buffer buffer(0x2000);
 
-	memcpy(buffer, rom, 0x2000);
+	memcpy(&buffer[0], rom, 0x2000);
 
 	/* The first CPU ROM has the address and data lines scrambled */
 	for (A = 0; A < 0x2000; A++)

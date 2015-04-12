@@ -291,7 +291,7 @@ READ8_MEMBER(gb_rom_mbc_device::read_rom)
 
 READ8_MEMBER(gb_rom_mbc_device::read_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset];
 	else
 		return 0xff;
@@ -299,7 +299,7 @@ READ8_MEMBER(gb_rom_mbc_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_mbc_device::write_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset] = data;
 }
 
@@ -342,7 +342,7 @@ WRITE8_MEMBER(gb_rom_mbc1_device::write_bank)
 
 READ8_MEMBER(gb_rom_mbc1_device::read_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 	{
 		int bank = (m_mode == MODE_4M_256k) ? m_ram_bank : 0;
 		return m_ram[ram_bank_map[bank] * 0x2000 + offset];
@@ -353,7 +353,7 @@ READ8_MEMBER(gb_rom_mbc1_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_mbc1_device::write_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 	{
 		int bank = (m_mode == MODE_4M_256k) ? m_ram_bank : 0;
 		m_ram[ram_bank_map[bank] * 0x2000 + offset] = data;
@@ -392,7 +392,7 @@ WRITE8_MEMBER(gb_rom_mbc2_device::write_bank)
 // 1 bank only??
 READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	else
 		return 0xff;
@@ -400,7 +400,7 @@ READ8_MEMBER(gb_rom_mbc2_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_mbc2_device::write_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
 
@@ -451,7 +451,7 @@ READ8_MEMBER(gb_rom_mbc3_device::read_ram)
 {
 	if (m_ram_bank < 4 && m_ram_enable)
 	{   // RAM
-		if (m_ram)
+		if (!m_ram.empty())
 			return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	}
 	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc)
@@ -466,7 +466,7 @@ WRITE8_MEMBER(gb_rom_mbc3_device::write_ram)
 {
 	if (m_ram_bank < 4 && m_ram_enable)
 	{   // RAM
-		if (m_ram)
+		if (!m_ram.empty())
 			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 	}
 	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc)
@@ -515,7 +515,7 @@ WRITE8_MEMBER(gb_rom_mbc5_device::write_bank)
 
 READ8_MEMBER(gb_rom_mbc5_device::read_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	else
 		return 0xff;
@@ -523,7 +523,7 @@ READ8_MEMBER(gb_rom_mbc5_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_mbc5_device::write_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
 
@@ -563,7 +563,7 @@ WRITE8_MEMBER(gb_rom_mbc6_device::write_bank)
 
 READ8_MEMBER(gb_rom_mbc6_device::read_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	else
 		return 0xff;
@@ -571,7 +571,7 @@ READ8_MEMBER(gb_rom_mbc6_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_mbc6_device::write_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
 
@@ -620,7 +620,7 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_bank)
 
 READ8_MEMBER(gb_rom_mbc7_device::read_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	else
 		return 0xff;
@@ -628,7 +628,7 @@ READ8_MEMBER(gb_rom_mbc7_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_mbc7_device::write_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
 
@@ -910,7 +910,7 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 
 READ8_MEMBER(gb_rom_sintax_device::read_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	else
 		return 0xff;
@@ -918,7 +918,7 @@ READ8_MEMBER(gb_rom_sintax_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_sintax_device::write_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
 
@@ -977,7 +977,7 @@ WRITE8_MEMBER(gb_rom_digimon_device::write_bank)
 
 READ8_MEMBER(gb_rom_digimon_device::read_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	else
 		return 0xff;
@@ -985,7 +985,7 @@ READ8_MEMBER(gb_rom_digimon_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_digimon_device::write_ram)
 {
-	if (m_ram && m_ram_enable)
+	if (!m_ram.empty() && m_ram_enable)
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
 
@@ -1019,7 +1019,7 @@ WRITE8_MEMBER(gb_rom_rockman8_device::write_bank)
 
 READ8_MEMBER(gb_rom_rockman8_device::read_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		return m_ram[offset];
 	else
 		return 0xff;
@@ -1027,7 +1027,7 @@ READ8_MEMBER(gb_rom_rockman8_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_rockman8_device::write_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		m_ram[offset] = data;
 }
 
@@ -1127,7 +1127,7 @@ WRITE8_MEMBER(gb_rom_sm3sp_device::write_bank)
 
 READ8_MEMBER(gb_rom_sm3sp_device::read_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		return m_ram[offset];
 	else
 		return 0xff;
@@ -1135,6 +1135,6 @@ READ8_MEMBER(gb_rom_sm3sp_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_sm3sp_device::write_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		m_ram[offset] = data;
 }

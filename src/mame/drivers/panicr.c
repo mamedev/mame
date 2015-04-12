@@ -797,7 +797,7 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	//rearrange  bg tilemaps a bit....
 	rom = memregion("user1")->base();
 	size = memregion("user1")->bytes();
-	memcpy(buf,rom, size);
+	memcpy(&buf[0],rom, size);
 
 	for(j=0;j<16;j++)
 	{
@@ -809,7 +809,7 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 
 	rom = memregion("user2")->base();
 	size = memregion("user2")->bytes();
-	memcpy(buf,rom, size);
+	memcpy(&buf[0],rom, size);
 
 	for(j=0;j<16;j++)
 	{

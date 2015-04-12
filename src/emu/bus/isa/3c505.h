@@ -168,10 +168,10 @@ private:
 		UINT8 get(int i) { return m_data[i]; };
 		UINT16 get_word(int i) { return (m_data[i*2+1] << 8) + m_data[i*2]; };
 		int is_empty() {return  m_length == 0; };
-		int is_full() {return  m_length >= m_data.count(); };
+		int is_full() {return  m_length >= m_data.size(); };
 		UINT16 get_length() { return m_length; };
-		UINT16 get_size() { return m_data.count(); };
-		UINT8 *get_data() { return m_data; };
+		UINT16 get_size() { return m_data.size(); };
+		UINT8 *get_data() { return &m_data[0]; };
 		void copy(data_buffer *db) const;
 		void log(const char *title) const;
 

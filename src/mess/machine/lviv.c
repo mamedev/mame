@@ -303,14 +303,14 @@ SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 {
 	dynamic_buffer lviv_snapshot_data(LVIV_SNAPSHOT_SIZE);
 
-	image.fread( lviv_snapshot_data, LVIV_SNAPSHOT_SIZE);
+	image.fread( &lviv_snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 
-	if(lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
+	if(lviv_verify_snapshot(&lviv_snapshot_data[0], snapshot_size) == IMAGE_VERIFY_FAIL)
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	lviv_setup_snapshot (lviv_snapshot_data);
+	lviv_setup_snapshot (&lviv_snapshot_data[0]);
 
 	dump_registers();
 

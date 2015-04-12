@@ -190,7 +190,7 @@ void mc146818_device::nvram_default()
 		if (bytes > data_size())
 			bytes = data_size();
 
-		memcpy(m_data, m_region->base(), bytes);
+		memcpy(&m_data[0], m_region->base(), bytes);
 	}
 	else
 	{
@@ -210,7 +210,7 @@ void mc146818_device::nvram_default()
 
 void mc146818_device::nvram_read(emu_file &file)
 {
-	file.read(m_data, data_size());
+	file.read(&m_data[0], data_size());
 
 	set_base_datetime();
 	update_timer();
@@ -225,7 +225,7 @@ void mc146818_device::nvram_read(emu_file &file)
 
 void mc146818_device::nvram_write(emu_file &file)
 {
-	file.write(m_data, data_size());
+	file.write(&m_data[0], data_size());
 }
 
 

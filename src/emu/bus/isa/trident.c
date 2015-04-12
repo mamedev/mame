@@ -169,7 +169,8 @@ void trident_vga_device::device_start()
 	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
 	vga.svga_intf.vram_size = 0x200000;
 
-	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
+	vga.memory.resize(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);

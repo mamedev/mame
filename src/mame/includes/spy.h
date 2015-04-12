@@ -25,7 +25,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_ram;
 	UINT8      m_pmcram[0x800];
-	dynamic_array<UINT8> m_paletteram;
+	std::vector<UINT8> m_paletteram;
 
 	/* video-related */
 	int        m_layer_colorbase[3];

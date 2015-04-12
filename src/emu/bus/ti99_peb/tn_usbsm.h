@@ -51,7 +51,7 @@ private:
 
 	UINT16      m_input_latch;
 	UINT16      m_output_latch;
-	dynamic_array<UINT16> m_ram;
+	std::vector<UINT16> m_ram;
 
 	required_device<smartmedia_image_device> m_smartmedia;
 	required_device<strataflash_device> m_flash;

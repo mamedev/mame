@@ -1673,7 +1673,7 @@ DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 	/* highly strange -- the address bits on the chip at 2J (and only that
 	   chip) are scrambled -- this is verified on the schematics! */
 
-	memcpy(data, &gfx2_base[0x88000], 0x8000);
+	memcpy(&data[0], &gfx2_base[0x88000], 0x8000);
 	for (i = 0; i < 0x8000; i++)
 	{
 		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);

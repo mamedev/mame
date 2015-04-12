@@ -833,10 +833,10 @@ bool td0_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		disk_decode.floppy_file = io;
 		disk_decode.init_Decode();
 		disk_decode.floppy_file_offset = 12;
-		disk_decode.Decode(imagebuf, max_size);
+		disk_decode.Decode(&imagebuf[0], max_size);
 	}
 	else
-		io_generic_read(io, imagebuf, 12, io_generic_size(io));
+		io_generic_read(io, &imagebuf[0], 12, io_generic_size(io));
 
 	if(header[7] & 0x80)
 		offset = 10 + imagebuf[2] + (imagebuf[3] << 8);

@@ -113,7 +113,7 @@ private:
 		// internal state
 		int                         m_rlecount;
 		huffman_encoder<256 + 16>   m_encoder;
-		dynamic_array<UINT16>       m_rlebuffer;
+		std::vector<UINT16>       m_rlebuffer;
 	};
 
 	// internal helpers

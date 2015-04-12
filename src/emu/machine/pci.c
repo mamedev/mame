@@ -401,7 +401,7 @@ device_t *pci_bridge_device::bus_root()
 void pci_bridge_device::set_remap_cb(mapper_cb _remap_cb)
 {
 	remap_cb = _remap_cb;
-	for(int i=0; i != all_devices.count(); i++)
+	for(unsigned int i=0; i != all_devices.size(); i++)
 		if(all_devices[i] != this)
 			all_devices[i]->set_remap_cb(_remap_cb);
 }
@@ -430,13 +430,13 @@ void pci_bridge_device::device_start()
 			if((i & 7) && sub_devices[i & ~7])
 				sub_devices[i & ~7]->set_multifunction_device(true);
 
-			all_devices.append(sub_devices[i]);
+			all_devices.push_back(sub_devices[i]);
 			if(sub_devices[i] != this) {
 				sub_devices[i]->remap_config_cb = cf_cb;
 				sub_devices[i]->set_remap_cb(remap_cb);
 				pci_bridge_device *bridge = dynamic_cast<pci_bridge_device *>(sub_devices[i]);
 				if(bridge)
-					all_bridges.append(bridge);
+					all_bridges.push_back(bridge);
 			}
 		}
 }
@@ -456,7 +456,7 @@ void pci_bridge_device::reset_all_mappings()
 {
 	pci_device::reset_all_mappings();
 
-	for(int i=0; i != all_devices.count(); i++)
+	for(unsigned int i=0; i != all_devices.size(); i++)
 		if(all_devices[i] != this)
 			all_devices[i]->reset_all_mappings();
 
@@ -475,7 +475,7 @@ void pci_bridge_device::reset_all_mappings()
 void pci_bridge_device::map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
 									UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space)
 {
-	for(int i = all_devices.count()-1; i>=0; i--)
+	for(int i = int(all_devices.size())-1; i>=0; i--)
 		if(all_devices[i] != this)
 			all_devices[i]->map_device(memory_window_start, memory_window_end, memory_offset, memory_space,
 										io_window_start, io_window_end, io_offset, io_space);
@@ -507,7 +507,7 @@ UINT32 pci_bridge_device::do_config_read(UINT8 bus, UINT8 device, UINT16 reg, UI
 UINT32 pci_bridge_device::propagate_config_read(UINT8 bus, UINT8 device, UINT16 reg, UINT32 mem_mask)
 {
 	UINT32 data = 0xffffffff;
-	for(int i=0; i != all_bridges.count(); i++)
+	for(unsigned int i=0; i != all_bridges.size(); i++)
 		data &= all_bridges[i]->config_read(bus, device, reg, mem_mask);
 	return data;
 }
@@ -533,7 +533,7 @@ void pci_bridge_device::do_config_write(UINT8 bus, UINT8 device, UINT16 reg, UIN
 
 void pci_bridge_device::propagate_config_write(UINT8 bus, UINT8 device, UINT16 reg, UINT32 data, UINT32 mem_mask)
 {
-	for(int i=0; i != all_bridges.count(); i++)
+	for(unsigned int i=0; i != all_bridges.size(); i++)
 		all_bridges[i]->config_write(bus, device, reg, data, mem_mask);
 }
 

@@ -54,9 +54,9 @@ void deco102_decrypt_cpu(running_machine &machine, const char *cputag, int addre
 	UINT16 *rom = (UINT16 *)machine.root_device().memregion(cputag)->base();
 	int size = machine.root_device().memregion(cputag)->bytes();
 	UINT16 *opcodes = auto_alloc_array(machine, UINT16, size / 2);
-	dynamic_array<UINT16> buf(size / 2);
+	std::vector<UINT16> buf(size / 2);
 
-	memcpy(buf, rom, size);
+	memcpy(&buf[0], rom, size);
 
 	space.set_decrypted_region(0, size - 1, opcodes);
 	((m68000_base_device*)machine.device(cputag))->set_encrypted_opcode_range(0, size);

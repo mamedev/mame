@@ -2077,7 +2077,7 @@ WRITE8_MEMBER(nes_bmc_hik8_device::write_m)
 
 	/* This bit is the "register lock". Once register are locked, writes go to WRAM
 	 and there is no way to unlock them (except by resetting the machine) */
-	if ((m_reg[3] & 0x40) && m_prgram)
+	if ((m_reg[3] & 0x40) && !m_prgram.empty())
 		m_prgram[offset] = data;
 	else
 	{

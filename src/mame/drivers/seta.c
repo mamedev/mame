@@ -11427,7 +11427,7 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 		buf[rpos] = rom[rpos*2+1];
 	}
 
-	memcpy( rom, buf, rom_size );
+	memcpy( rom, &buf[0], rom_size );
 
 	rom = memregion("gfx3")->base() + 0x40000;
 
@@ -11436,7 +11436,7 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 		buf[rpos] = rom[rpos*2+1];
 	}
 
-	memcpy( rom, buf, rom_size );
+	memcpy( rom, &buf[0], rom_size );
 }
 
 

@@ -198,9 +198,9 @@ protected:
 	UINT32 m_x_mask;
 
 	// lookup tables
-	dynamic_array<UINT32> m_fixed_decode;
-	dynamic_array<UINT32> m_micro_decode;
-	dynamic_array<UINT32> m_micro_direct;
+	std::vector<UINT32> m_fixed_decode;
+	std::vector<UINT32> m_micro_decode;
+	std::vector<UINT32> m_micro_direct;
 };
 
 

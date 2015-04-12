@@ -72,7 +72,7 @@ void debug_view_textbuf::view_update()
 	m_topleft.y = curseq - text_buffer_line_index_to_seqnum(&m_textbuf, 0);
 
 	// loop over visible rows
-	debug_view_char *dest = m_viewdata;
+	debug_view_char *dest = &m_viewdata[0];
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
 		const char *line = text_buffer_get_seqnum_line(&m_textbuf, curseq++);

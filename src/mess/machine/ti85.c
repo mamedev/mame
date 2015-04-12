@@ -1179,12 +1179,12 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 
 	ti8x_snapshot_data.resize(snapshot_size);
 
-	image.fread( ti8x_snapshot_data, snapshot_size);
+	image.fread( &ti8x_snapshot_data[0], snapshot_size);
 
 	if (!strncmp(machine().system().name, "ti85", 4))
-		ti85_setup_snapshot(ti8x_snapshot_data);
+		ti85_setup_snapshot(&ti8x_snapshot_data[0]);
 	else if (!strncmp(machine().system().name, "ti86", 4))
-		ti86_setup_snapshot(ti8x_snapshot_data);
+		ti86_setup_snapshot(&ti8x_snapshot_data[0]);
 
 	return IMAGE_INIT_PASS;
 }

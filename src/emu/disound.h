@@ -146,7 +146,7 @@ protected:
 
 	// internal state
 	UINT8               m_outputs;              // number of outputs
-	dynamic_array<UINT8> m_outputmap;           // map of inputs to outputs
+	std::vector<UINT8>       m_outputmap;            // map of inputs to outputs
 	sound_stream *      m_mixer_stream;         // mixing stream
 };
 

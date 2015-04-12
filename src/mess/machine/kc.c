@@ -41,7 +41,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 		return IMAGE_INIT_FAIL;
 
 	dynamic_buffer data(size);
-	image.fread( data, size);
+	image.fread( &data[0], size);
 
 	header = (struct kcc_header *) &data[0];
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);

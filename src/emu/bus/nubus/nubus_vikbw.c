@@ -92,8 +92,8 @@ void nubus_vikbw_device::device_start()
 //  printf("[vikbw %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", m_vram);
-	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, 0, 0, "bank_vikbw2", m_vram);
+	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", &m_vram[0]);
+	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, 0, 0, "bank_vikbw2", &m_vram[0]);
 
 	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_vikbw_device::viking_enable_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_disable_w), this));
 	m_nubus->install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
@@ -106,7 +106,7 @@ void nubus_vikbw_device::device_start()
 void nubus_vikbw_device::device_reset()
 {
 	m_vbl_disable = 1;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 
 	m_palette[0] = rgb_t(255, 255, 255);
 	m_palette[1] = rgb_t(0, 0, 0);

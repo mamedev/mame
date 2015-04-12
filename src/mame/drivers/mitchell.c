@@ -2249,7 +2249,7 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 		/* bank f     */12, 12,
 	};
 
-	memcpy(source, dst, len);
+	memcpy(&source[0], dst, len);
 	for (x = 0; x < 40; x += 2)
 	{
 		if (tablebank[x] != -1)

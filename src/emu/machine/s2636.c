@@ -112,7 +112,8 @@ void s2636_device::device_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_work_ram.resize_and_clear(m_work_ram_size);
+	m_work_ram.resize(m_work_ram_size);
+	memset(&m_work_ram[0], 0, m_work_ram_size);
 	m_bitmap.resize(width, height);
 	m_collision_bitmap.resize(width, height);
 

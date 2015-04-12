@@ -384,9 +384,9 @@ public:
 	// dynamic allocation of a shared pointer
 	void allocate(UINT32 entries)
 	{
-		assert(m_allocated.count() == 0);
+		assert(m_allocated.empty());
 		m_allocated.resize(entries);
-		this->m_target = m_allocated;
+		this->m_target = &m_allocated[0];
 		m_bytes = entries * sizeof(_PointerType);
 		this->m_base.save_item(this->m_allocated, this->m_tag);
 	}
@@ -403,7 +403,7 @@ protected:
 	// internal state
 	size_t m_bytes;
 	UINT8 m_width;
-	dynamic_array<_PointerType> m_allocated;
+	std::vector<_PointerType> m_allocated;
 };
 
 // optional shared pointer finder

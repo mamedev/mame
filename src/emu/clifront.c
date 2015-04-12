@@ -584,15 +584,15 @@ void cli_frontend::listdevices(const char *gamename)
 
 		// build a list of devices
 		device_iterator iter(drivlist.config().root_device());
-		dynamic_array<device_t *> device_list;
+		std::vector<device_t *> device_list;
 		for (device_t *device = iter.first(); device != NULL; device = iter.next())
-			device_list.append(device);
+			device_list.push_back(device);
 
 		// sort them by tag
-		qsort(&device_list[0], device_list.count(), sizeof(device_list[0]), compare_devices);
+		qsort(&device_list[0], device_list.size(), sizeof(device_list[0]), compare_devices);
 
 		// dump the results
-		for (int index = 0; index < device_list.count(); index++)
+		for (unsigned int index = 0; index < device_list.size(); index++)
 		{
 			device_t *device = device_list[index];
 
@@ -1708,11 +1708,11 @@ void media_identifier::identify(const char *filename)
 				const CSzFileItem *f = _7z->db.db.Files + i;
 				_7z->curr_file_idx = i;
 				int namelen = SzArEx_GetFileNameUtf16(&_7z->db, i, NULL);
-				dynamic_array<UINT16> temp(namelen);
+				std::vector<UINT16> temp(namelen);
 				dynamic_buffer temp2(namelen+1);
-				UINT8* temp3 = (UINT8*)temp2;
+				UINT8* temp3 = &temp2[0];
 				memset(temp3, 0x00, namelen);
-				SzArEx_GetFileNameUtf16(&_7z->db, i, temp);
+				SzArEx_GetFileNameUtf16(&_7z->db, i, &temp[0]);
 				// crude, need real UTF16->UTF8 conversion ideally
 				for (int j=0;j<namelen;j++)
 				{
@@ -1723,9 +1723,9 @@ void media_identifier::identify(const char *filename)
 				{
 					// decompress data into RAM and identify it
 					dynamic_buffer data(f->Size);
-					_7zerr = _7z_file_decompress(_7z, data, f->Size);
+					_7zerr = _7z_file_decompress(_7z, &data[0], f->Size);
 					if (_7zerr == _7ZERR_NONE)
-						identify_data((const char*)&temp2[0], data, f->Size);
+						identify_data((const char*)&temp2[0], &data[0], f->Size);
 				}
 			}
 
@@ -1749,9 +1749,9 @@ void media_identifier::identify(const char *filename)
 				{
 					// decompress data into RAM and identify it
 					dynamic_buffer data(entry->uncompressed_length);
-					ziperr = zip_file_decompress(zip, data, entry->uncompressed_length);
+					ziperr = zip_file_decompress(zip, &data[0], entry->uncompressed_length);
 					if (ziperr == ZIPERR_NONE)
-						identify_data(entry->filename, data, entry->uncompressed_length);
+						identify_data(entry->filename, &data[0], entry->uncompressed_length);
 				}
 
 			// close up
@@ -1844,8 +1844,8 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 		// now determine the new data length and allocate temporary memory for it
 		length = jedbin_output(&jed, NULL, 0);
 		tempjed.resize(length);
-		jedbin_output(&jed, tempjed, length);
-		data = tempjed;
+		jedbin_output(&jed, &tempjed[0], length);
+		data = &tempjed[0];
 	}
 
 	// compute the hash of the data

@@ -93,9 +93,9 @@ public:
 	int bank() const { return m_bank; }
 	int xscroll() const { return m_xscroll; }
 	int yscroll() const { return m_yscroll; }
-	dynamic_array<UINT16> &code_lookup() { return m_codelookup; }
-	dynamic_array<UINT8> &color_lookup() { return m_colorlookup; }
-	dynamic_array<UINT8> &gfx_lookup() { return m_gfxlookup; }
+	std::vector<UINT16> &code_lookup() { return m_codelookup; }
+	std::vector<UINT8> &color_lookup() { return m_colorlookup; }
+	std::vector<UINT8> &gfx_lookup() { return m_gfxlookup; }
 
 	// setters
 	void set_bank(int bank) { m_bank = bank; }
@@ -212,9 +212,9 @@ private:
 
 	// arrays
 	optional_shared_ptr<UINT16> m_slipram;    // pointer to the SLIP RAM
-	dynamic_array<UINT16>   m_codelookup;       // lookup table for codes
-	dynamic_array<UINT8>    m_colorlookup;       // lookup table for colors
-	dynamic_array<UINT8>    m_gfxlookup;         // lookup table for graphics
+	std::vector<UINT16>   m_codelookup;       // lookup table for codes
+	std::vector<UINT8>    m_colorlookup;       // lookup table for colors
+	std::vector<UINT8>    m_gfxlookup;         // lookup table for graphics
 
 	UINT16                  m_activelist[MAX_PER_BANK*4]; // active list
 	UINT16 *                m_activelast;           // last entry in the active list

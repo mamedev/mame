@@ -236,7 +236,7 @@ private:
 	osd_module_manager m_mod_man;
 	font_module *m_font_module;
 
-	void update_option(const char * key, dynamic_array<const char *> &values);
+	void update_option(const char * key, std::vector<const char *> &values);
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const astring &opt_name)
 	{
@@ -263,7 +263,7 @@ protected:
 	midi_module* m_midi;
 private:
 	//tagmap_t<osd_video_type>  m_video_options;
-	dynamic_array<const char *> m_video_names;
+	std::vector<const char *> m_video_names;
 };
 
 

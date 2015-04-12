@@ -797,15 +797,15 @@ void nes_cart_slot_device::call_load_ines()
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
 		dynamic_buffer temp_nvram(tot_size);
-		battery_load(temp_nvram, tot_size, 0x00);
+		battery_load(&temp_nvram[0], tot_size, 0x00);
 		if (battery_size)
 		{
 			//printf("here %d\n", battery_size);
 			m_cart->battery_alloc(battery_size);
-			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
+			memcpy(m_cart->get_battery_base(), &temp_nvram[0], battery_size);
 		}
 		if (mapper_sram_size)
-			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, m_cart->get_mapper_sram_size());
+			memcpy(m_cart->get_mapper_sram_base(), &temp_nvram[battery_size], m_cart->get_mapper_sram_size());
 	}
 }
 

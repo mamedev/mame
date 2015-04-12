@@ -279,7 +279,7 @@ void dmac_hdc_device::resize_ram(int config)
 		break;
 	}
 
-	m_dmac->set_ram(m_ram);
+	m_dmac->set_ram(&m_ram[0]);
 }
 
 void a590_device::device_reset()

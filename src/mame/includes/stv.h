@@ -656,7 +656,7 @@ public:
 	int get_timing_command( void );
 
 	direntryT curroot;       // root entry of current filesystem
-	dynamic_array<direntryT> curdir;       // current directory
+	std::vector<direntryT> curdir;       // current directory
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
 

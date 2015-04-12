@@ -4818,7 +4818,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 		int i;
 		for (i = 0; i < len; i++)
 			buffer[i ^ 0xdf88] = src[BITSWAP24(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
-		memcpy(src, buffer, len);
+		memcpy(src, &buffer[0], len);
 	}
 
 	unpack_sprites("sprites0");
@@ -4885,7 +4885,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 			buffer[j ^ 7] = (src[i] >> 4) | (src[i] << 4);
 		}
 
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 
 	unpack_sprites("sprites0");
@@ -4933,7 +4933,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 		int i;
 		for (i = 0; i < len; i++)
 			buffer[i ^ 0x950c4] = src[BITSWAP24(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
-		memcpy(src, buffer, len);
+		memcpy(src, &buffer[0], len);
 	}
 
 	sailormn_unpack_tiles("layer2");

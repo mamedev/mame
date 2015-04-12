@@ -308,7 +308,7 @@ avhuff_error avhuff_encoder::assemble_data(dynamic_buffer &buffer, bitmap_yuy16 
 
 	// fill in the header
 	buffer.resize(12 + metadatasize + numsamples * channels * 2 + bitmap.width() * bitmap.height() * 2);
-	UINT8 *dest = buffer;
+	UINT8 *dest = &buffer[0];
 	*dest++ = 'c';
 	*dest++ = 'h';
 	*dest++ = 'a';
@@ -549,7 +549,7 @@ UINT16 *avhuff_encoder::deltarle_encoder::rle_and_histo_bitmap(const UINT8 *sour
 {
 	// resize our RLE buffer
 	m_rlebuffer.resize(items_per_row * row_count);
-	UINT16 *dest = m_rlebuffer;
+	UINT16 *dest = &m_rlebuffer[0];
 
 	// iterate over rows
 	m_encoder.histo_reset();
@@ -599,7 +599,7 @@ UINT16 *avhuff_encoder::deltarle_encoder::rle_and_histo_bitmap(const UINT8 *sour
 
 	// compute the tree for our histogram
 	m_encoder.compute_tree_from_histo();
-	return m_rlebuffer;
+	return &m_rlebuffer[0];
 }
 
 

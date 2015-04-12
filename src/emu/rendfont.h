@@ -90,10 +90,10 @@ private:
 	int                 m_height;           // height of the font, from ascent to descent
 	int                 m_yoffs;            // y offset from baseline to descent
 	float               m_scale;            // 1 / height precomputed
-	dynamic_array<glyph> m_glyphs[256];     // array of glyph subtables
-	dynamic_array<char> m_rawdata;          // pointer to the raw data for the font
+	glyph               *m_glyphs[256];      // array of glyph subtables
+	std::vector<char>   m_rawdata;          // pointer to the raw data for the font
 	UINT64              m_rawsize;          // size of the raw font data
-	osd_font            *m_osdfont;          // handle to the OSD font
+	osd_font            *m_osdfont;         // handle to the OSD font
 
 	// constants
 	static const int CACHED_CHAR_SIZE       = 12;

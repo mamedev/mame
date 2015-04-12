@@ -90,13 +90,15 @@ void wswan_video_device::device_start()
 
 	if (m_vdp_type == VDP_TYPE_WSC)
 	{
-		m_vram.resize_and_clear(0x10000);
-		m_palette_vram = m_vram + 0xfe00;
+		m_vram.resize(0x10000);
+		memset(&m_vram[0], 0, 0x10000);
+		m_palette_vram = &m_vram[0xfe00];
 	}
 	else
 	{
-		m_vram.resize_and_clear(0x4000);
-		m_palette_vram = m_vram;
+		m_vram.resize(0x4000);
+		memset(&m_vram[0], 0, 0x4000);
+		m_palette_vram = &m_vram[0];
 	}
 
 	common_save();

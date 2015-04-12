@@ -171,8 +171,8 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 		// Gather a sorted list of all the breakpoints for all the CPUs
 		gather_breakpoints();
 
-		int const bpIndex = pos.y - 1;
-		if ((bpIndex >= m_buffer.count()) || (bpIndex < 0))
+		int bpIndex = pos.y - 1;
+		if ((bpIndex >= m_buffer.size()) || (bpIndex < 0))
 			return;
 
 		// Enable / disable
@@ -209,12 +209,12 @@ void debug_view_breakpoints::gather_breakpoints()
 		// Collect
 		device_debug &debugInterface = *source->device()->debug();
 		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
-			m_buffer.append() = bp;
+			m_buffer.push_back(bp);
 	}
 
 	// And now for the sort
-	if (m_buffer.count() > 0)
-		qsort(&m_buffer[0], m_buffer.count(), sizeof(device_debug::breakpoint *), m_sortType);
+	if (!m_buffer.empty())
+		qsort(&m_buffer[0], m_buffer.size(), sizeof(device_debug::breakpoint *), m_sortType);
 }
 
 
@@ -230,12 +230,12 @@ void debug_view_breakpoints::view_update()
 
 	// Set the view region so the scroll bars update
 	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
-	m_total.y = m_buffer.count() + 1;
+	m_total.y = m_buffer.size() + 1;
 	if (m_total.y < 10)
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char *dest = m_viewdata;
+	debug_view_char *dest = &m_viewdata[0];
 	astring         linebuf;
 
 	// Header
@@ -278,7 +278,7 @@ void debug_view_breakpoints::view_update()
 	{
 		// Breakpoints
 		int bpi = row + m_topleft.y - 1;
-		if ((bpi < m_buffer.count()) && (bpi >= 0))
+		if ((bpi < m_buffer.size()) && (bpi >= 0))
 		{
 			device_debug::breakpoint *const bp = m_buffer[bpi];
 

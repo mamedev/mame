@@ -481,9 +481,9 @@ DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 
-	SRC = temp;
+	SRC = &temp[0];
 	DST = m_cart->get_rom_base();
-	m_cart->common_load_rom(temp, size, "rom");
+	m_cart->common_load_rom(&temp[0], size, "rom");
 
 	// fix endianness
 	for (int i = 0; i < 0x200000; i += 4)

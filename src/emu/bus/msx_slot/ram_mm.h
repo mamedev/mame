@@ -30,7 +30,7 @@ public:
 	void restore_banks();
 
 private:
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 	UINT32 m_total_size;
 	UINT8 m_bank_mask;
 	UINT8 m_bank_selected[4];

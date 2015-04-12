@@ -8646,9 +8646,9 @@ void cps_state::gigaman2_gfx_reorder()
 	int i;
 	int length = memregion( "gfx" )->bytes();
 	UINT16 *rom = (UINT16 *)memregion("gfx")->base();
-	dynamic_array<UINT16> buf( length );
+	std::vector<UINT16> buf( length );
 
-	memcpy (buf, rom, length);
+	memcpy (&buf[0], rom, length);
 
 	for (i = 0; i < length/2; i++) {
 		rom[i] = buf[((i & ~7) >> 2) | ((i & 4) << 18) | ((i & 2) >> 1) | ((i & 1) << 21)];

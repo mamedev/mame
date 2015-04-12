@@ -1746,7 +1746,7 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 	dynamic_buffer buf(length);
 	int i;
 
-	memcpy(buf,rom,length);
+	memcpy(&buf[0],rom,length);
 
 	for(i = 0; i < length; i++)
 	{

@@ -270,9 +270,9 @@ void scv_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
-		type = get_cart_type(rom, len);
+		type = get_cart_type(&rom[0], len);
 		slot_string = scv_get_slot(type);
 
 		//printf("type: %s\n", slot_string);

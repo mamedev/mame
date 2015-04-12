@@ -2594,7 +2594,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 			if (i&1) buffer[i] = BITSWAP8(src[i],6,7,5,4,3,2,1,0);
 			else buffer[i] = src[i];
 
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 
 	src = memregion("soundcpu")->base();
@@ -2606,7 +2606,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
@@ -2622,7 +2622,7 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 
 	save_item(NAME(m_sb3_music_is_playing));

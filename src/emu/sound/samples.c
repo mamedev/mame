@@ -73,10 +73,10 @@ samples_device::samples_device(const machine_config &mconfig, device_type type, 
 void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 {
 	// if samples are disabled, just return quietly
-	if (m_sample.count() == 0)
+	if (m_sample.empty())
 		return;
 
-	assert(samplenum < m_sample.count());
+	assert(samplenum < m_sample.size());
 	assert(channel < m_channels);
 
 	// force an update before we start
@@ -85,8 +85,8 @@ void samples_device::start(UINT8 channel, UINT32 samplenum, bool loop)
 
 	// update the parameters
 	sample_t &sample = m_sample[samplenum];
-	chan.source = sample.data;
-	chan.source_length = sample.data.count();
+	chan.source = &sample.data[0];
+	chan.source_length = sample.data.size();
 	chan.source_num = (chan.source_length > 0) ? samplenum : -1;
 	chan.pos = 0;
 	chan.frac = 0;
@@ -292,12 +292,12 @@ void samples_device::device_post_load()
 	{
 		// attach any samples that were loaded and playing
 		channel_t &chan = m_channel[channel];
-		if (chan.source_num >= 0 && chan.source_num < m_sample.count())
+		if (chan.source_num >= 0 && chan.source_num < m_sample.size())
 		{
 			sample_t &sample = m_sample[chan.source_num];
-			chan.source = sample.data;
-			chan.source_length = sample.data.count();
-			if (sample.data == NULL)
+			chan.source = &sample.data[0];
+			chan.source_length = sample.data.size();
+			if (sample.data.empty())
 				chan.source_num = -1;
 		}
 
@@ -540,7 +540,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	if (bits == 8)
 	{
 		sample.data.resize(length);
-		file.read(sample.data, length);
+		file.read(&sample.data[0], length);
 
 		// convert 8-bit data to signed samples
 		UINT8 *tempptr = reinterpret_cast<UINT8 *>(&sample.data[0]);
@@ -551,7 +551,7 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	{
 		// 16-bit data is fine as-is
 		sample.data.resize(length / 2);
-		file.read(sample.data, length);
+		file.read(&sample.data[0], length);
 
 		// swap high/low on big-endian systems
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
@@ -583,7 +583,7 @@ bool samples_device::read_flac_sample(emu_file &file, sample_t &sample)
 
 	// resize the array and read
 	sample.data.resize(decoder.total_samples());
-	if (!decoder.decode_interleaved(sample.data, sample.data.count()))
+	if (!decoder.decode_interleaved(&sample.data[0], sample.data.size()))
 		return false;
 
 	// finish up and clean up

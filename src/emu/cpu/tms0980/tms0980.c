@@ -593,8 +593,10 @@ void tms1000_cpu_device::device_reset()
 	tms1xxx_cpu_device::device_reset();
 
 	// pre-decode instructionset
-	m_fixed_decode.resize_and_clear(0x100);
-	m_micro_decode.resize_and_clear(0x100);
+	m_fixed_decode.resize(0x100);
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(UINT32));
+	m_micro_decode.resize(0x100);
+	memset(&m_micro_decode[0], 0, 0x100*sizeof(UINT32));
 
 	for (int op = 0; op < 0x100; op++)
 	{
@@ -653,8 +655,10 @@ void tms0970_cpu_device::device_reset()
 	tms1xxx_cpu_device::device_reset();
 
 	// pre-decode instructionset
-	m_fixed_decode.resize_and_clear(0x100);
-	m_micro_decode.resize_and_clear(0x100);
+	m_fixed_decode.resize(0x100);
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(UINT32));
+	m_micro_decode.resize(0x100);
+	memset(&m_micro_decode[0], 0, 0x100*sizeof(UINT32));
 
 	for (int op = 0; op < 0x100; op++)
 	{
@@ -717,8 +721,10 @@ void tms0980_cpu_device::device_reset()
 	tms1xxx_cpu_device::device_reset();
 
 	// pre-decode instructionset
-	m_fixed_decode.resize_and_clear(0x200);
-	m_micro_decode.resize_and_clear(0x200);
+	m_fixed_decode.resize(0x200);
+	memset(&m_fixed_decode[0], 0, 0x200*sizeof(UINT32));
+	m_micro_decode.resize(0x200);
+	memset(&m_micro_decode[0], 0, 0x200*sizeof(UINT32));
 
 	for (int op = 0; op < 0x200; op++)
 	{
@@ -741,7 +747,8 @@ void tms0980_cpu_device::device_reset()
 
 	// like on TMS0970, one of the terms directly select a microinstruction index (via R4-R8),
 	// but it can't be pre-determined when it's active
-	m_micro_direct.resize_and_clear(0x40);
+	m_micro_direct.resize(0x40);
+	memset(&m_micro_decode[0], 0, 0x40*sizeof(UINT32));
 
 	for (int op = 0; op < 0x40; op++)
 		m_micro_direct[op] = decode_micro(op);

@@ -121,7 +121,7 @@ private:
 	UINT64 m_xor;
 
 	int m_cache_size;
-	dynamic_array<UINT32> m_cache;
+	std::vector<UINT32> m_cache;
 	UINT64 m_cache2[CACHE2_SIZE];
 	UINT8 m_cache2_ptr;
 

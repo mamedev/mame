@@ -42,7 +42,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
 	dynamic_buffer img(size);
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
 	if (img[VERSION]) {
 		throw emu_fatalerror("g64_format: Unsupported version %u", img[VERSION]);
@@ -53,7 +53,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	for (int track = 0; track < track_count; track++)
 	{
-		UINT32 track_offset = pick_integer_le(img, TRACK_OFFSET + (track * 4), 4);
+		UINT32 track_offset = pick_integer_le(&img[0], TRACK_OFFSET + (track * 4), 4);
 
 		if (!track_offset)
 			continue;
@@ -61,12 +61,12 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if (track_offset > size)
 			throw emu_fatalerror("g64_format: Track %u offset %06x out of bounds", track, track_offset);
 
-		UINT32 speed_zone = pick_integer_le(img, SPEED_ZONE + (track * 4), 4);
+		UINT32 speed_zone = pick_integer_le(&img[0], SPEED_ZONE + (track * 4), 4);
 
 		if (speed_zone > 3)
 			throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
 
-		UINT16 track_bytes = pick_integer_le(img, track_offset, 2);
+		UINT16 track_bytes = pick_integer_le(&img[0], track_offset, 2);
 		int track_size = track_bytes * 8;
 
 		LOG_FORMATS("track %u size %u cell %ld\n", track, track_size, 200000000L/track_size);
@@ -109,17 +109,17 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 		io_generic_write_filler(io, 0x00, tpos, 4);
 		io_generic_write_filler(io, 0x00, spos, 4);
 
-		if (image->get_track_size(track, head) <= 1)
+		if (image->get_buffer(track, head).size() <= 1)
 			continue;
 
 		int track_size;
 		int speed_zone;
 
 		// figure out the cell size and speed zone from the track data
-		if ((speed_zone = generate_bitstream(track, head, 3, trackbuf, track_size, image)) == -1)
-			if ((speed_zone = generate_bitstream(track, head, 2, trackbuf, track_size, image)) == -1)
-				if ((speed_zone = generate_bitstream(track, head, 1, trackbuf, track_size, image)) == -1)
-					if ((speed_zone = generate_bitstream(track, head, 0, trackbuf, track_size, image)) == -1)
+		if ((speed_zone = generate_bitstream(track, head, 3, &trackbuf[0], track_size, image)) == -1)
+			if ((speed_zone = generate_bitstream(track, head, 2, &trackbuf[0], track_size, image)) == -1)
+				if ((speed_zone = generate_bitstream(track, head, 1, &trackbuf[0], track_size, image)) == -1)
+					if ((speed_zone = generate_bitstream(track, head, 0, &trackbuf[0], track_size, image)) == -1)
 						throw emu_fatalerror("g64_format: Cannot determine speed zone for track %u", track);
 
 		LOG_FORMATS("track %u size %u cell %u\n", track, track_size, c1541_cell_size[speed_zone]);
@@ -136,7 +136,7 @@ bool g64_format::save(io_generic *io, floppy_image *image)
 		io_generic_write(io, speed_offset, spos, 4);
 		io_generic_write_filler(io, 0xff, dpos, TRACK_LENGTH);
 		io_generic_write(io, track_length, dpos, 2);
-		io_generic_write(io, trackbuf, dpos + 2, track_size);
+		io_generic_write(io, &trackbuf[0], dpos + 2, track_size);
 
 		tracks_written++;
 	}

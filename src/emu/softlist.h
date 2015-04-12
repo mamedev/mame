@@ -111,7 +111,7 @@ public:
 	const char *name() const { return m_name; }
 	const char *interface() const { return m_interface; }
 	feature_list_item *featurelist() const { return m_featurelist.first(); }
-	rom_entry *romdata(int index = 0) { return (index < m_romdata.count()) ? &m_romdata[index] : NULL; }
+	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : NULL; }
 
 	// helpers
 	bool is_compatible(const software_list_device &swlist) const;
@@ -125,7 +125,7 @@ private:
 	const char *        m_name;
 	const char *        m_interface;
 	simple_list<feature_list_item> m_featurelist;
-	dynamic_array<rom_entry> m_romdata;
+	std::vector<rom_entry>   m_romdata;
 };
 
 

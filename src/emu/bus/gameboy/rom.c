@@ -153,7 +153,7 @@ READ8_MEMBER(gb_rom_device::read_rom)
 
 READ8_MEMBER(gb_rom_device::read_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset];
 	else
 		return 0xff;
@@ -161,7 +161,7 @@ READ8_MEMBER(gb_rom_device::read_ram)
 
 WRITE8_MEMBER(gb_rom_device::write_ram)
 {
-	if (m_ram)
+	if (!m_ram.empty())
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + offset] = data;
 }
 

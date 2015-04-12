@@ -316,10 +316,10 @@ void ws_cart_slot_device::get_default_card_software(astring &result)
 		int type;
 		UINT32 nvram;
 
-		core_fread(m_file, rom, size);
+		core_fread(m_file, &rom[0], size);
 
 		// nvram size is not really used here, but we set it up nevertheless
-		type = get_cart_type(rom, size, nvram);
+		type = get_cart_type(&rom[0], size, nvram);
 		slot_string = ws_get_slot(type);
 
 		//printf("type: %s\n", slot_string);

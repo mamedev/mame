@@ -551,13 +551,13 @@ READ8_MEMBER(nes_fukutake_device::read_l)
 WRITE8_MEMBER(nes_fukutake_device::write_m)
 {
 	LOG_MMC(("fukutake write_m, offset: %04x, data: %02x\n", offset, data));
-	m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.count() - 1)] = data;
+	m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.size() - 1)] = data;
 }
 
 READ8_MEMBER(nes_fukutake_device::read_m)
 {
 	LOG_MMC(("fukutake read_m, offset: %04x\n", offset));
-	return m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.count() - 1)];
+	return m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.size() - 1)];
 }
 
 /*-------------------------------------------------
@@ -871,13 +871,13 @@ WRITE8_MEMBER(nes_edu2k_device::write_h)
 WRITE8_MEMBER(nes_edu2k_device::write_m)
 {
 	LOG_MMC(("edu2k write_m, offset: %04x, data: %02x\n", offset, data));
-	m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.count() - 1)] = data;
+	m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.size() - 1)] = data;
 }
 
 READ8_MEMBER(nes_edu2k_device::read_m)
 {
 	LOG_MMC(("edu2k read_m, offset: %04x\n", offset));
-	return m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.count() - 1)];
+	return m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.size() - 1)];
 }
 
 /*-------------------------------------------------

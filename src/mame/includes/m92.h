@@ -56,7 +56,7 @@ public:
 	UINT16 m_pf_master_control[4];
 	INT32 m_sprite_list;
 	UINT8 m_palette_bank;
-	dynamic_array<UINT16> m_paletteram;
+	std::vector<UINT16> m_paletteram;
 
 	DECLARE_READ16_MEMBER(m92_eeprom_r);
 	DECLARE_WRITE16_MEMBER(m92_eeprom_w);

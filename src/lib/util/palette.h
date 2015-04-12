@@ -118,7 +118,7 @@ private:
 
 	private:
 		// internal state
-		dynamic_array<UINT32> m_dirty;          // bitmap of dirty entries
+		std::vector<UINT32> m_dirty;          // bitmap of dirty entries
 		UINT32          m_mindirty;             // minimum dirty entry
 		UINT32          m_maxdirty;             // minimum dirty entry
 	};
@@ -169,9 +169,9 @@ public:
 	void entry_set_contrast(UINT32 index, float contrast);
 
 	// entry list getters
-	const rgb_t *entry_list_raw() const { return m_entry_color; }
-	const rgb_t *entry_list_adjusted() const { return m_adjusted_color; }
-	const rgb_t *entry_list_adjusted_rgb15() const { return m_adjusted_rgb15; }
+	const rgb_t *entry_list_raw() const { return &m_entry_color[0]; }
+	const rgb_t *entry_list_adjusted() const { return &m_adjusted_color[0]; }
+	const rgb_t *entry_list_adjusted_rgb15() const { return &m_adjusted_rgb15[0]; }
 
 	// group adjustments
 	void group_set_brightness(UINT32 group, float brightness);
@@ -199,13 +199,13 @@ private:
 	float           m_gamma;                      // overall gamma value
 	UINT8           m_gamma_map[256];             // gamma map
 
-	dynamic_array<rgb_t> m_entry_color;           // array of raw colors
-	dynamic_array<float> m_entry_contrast;        // contrast value for each entry
-	dynamic_array<rgb_t> m_adjusted_color;        // array of adjusted colors
-	dynamic_array<rgb_t> m_adjusted_rgb15;        // array of adjusted colors as RGB15
+	std::vector<rgb_t> m_entry_color;           // array of raw colors
+	std::vector<float> m_entry_contrast;        // contrast value for each entry
+	std::vector<rgb_t> m_adjusted_color;        // array of adjusted colors
+	std::vector<rgb_t> m_adjusted_rgb15;        // array of adjusted colors as RGB15
 
-	dynamic_array<float> m_group_bright;          // brightness value for each group
-	dynamic_array<float> m_group_contrast;        // contrast value for each group
+	std::vector<float> m_group_bright;          // brightness value for each group
+	std::vector<float> m_group_contrast;        // contrast value for each group
 
 	palette_client *m_client_list;                // list of clients for this palette
 };

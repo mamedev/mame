@@ -1301,7 +1301,7 @@ void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _
 	dynamic_buffer buffer(len);
 	int i;
 
-	memcpy(buffer,src,len);
+	memcpy(&buffer[0],src,len);
 	for (i = 0;i < len;i++)
 	{
 		src[i] =
@@ -1419,12 +1419,12 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 		UINT8 *finish   = base + 2*bank_size*i;
 		UINT8 *dest     = finish - 2*bank_size;
 
-		UINT8 *p1 = temp;
-		UINT8 *p2 = temp+bank_size/2;
+		UINT8 *p1 = &temp[0];
+		UINT8 *p2 = &temp[bank_size/2];
 
 		UINT8 data;
 
-		memcpy (temp, base+bank_size*(i-1), bank_size);
+		memcpy (&temp[0], base+bank_size*(i-1), bank_size);
 
 		do {
 			data = *p1++;

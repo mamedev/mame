@@ -355,9 +355,9 @@ WRITE8_MEMBER(nes_fcg_device::write_m)
 {
 	LOG_MMC(("lz93d50 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (!m_battery && !m_prgram)
+	if (m_battery.empty() && m_prgram.empty())
 		fcg_write(space, offset & 0x0f, data, mem_mask);
-	else if (m_battery)
+	else if (!m_battery.empty())
 		m_battery[offset] = data;
 	else
 		m_prgram[offset] = data;
@@ -447,13 +447,13 @@ void nes_fjump2_device::set_prg()
 READ8_MEMBER(nes_fjump2_device::read_m)
 {
 	LOG_MMC(("fjump2 read_m, offset: %04x\n", offset));
-	return m_battery[offset & (m_battery.count() - 1)];
+	return m_battery[offset & (m_battery.size() - 1)];
 }
 
 WRITE8_MEMBER(nes_fjump2_device::write_m)
 {
 	LOG_MMC(("fjump2 write_m, offset: %04x, data: %02x\n", offset, data));
-	m_battery[offset & (m_battery.count() - 1)] = data;
+	m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
 WRITE8_MEMBER(nes_fjump2_device::write_h)

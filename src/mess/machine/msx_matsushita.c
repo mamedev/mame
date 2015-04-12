@@ -58,7 +58,7 @@ void msx_matsushita_device::device_start()
 
 	m_sram.resize(0x800);
 
-	m_nvram->set_base((UINT8*)m_sram, 0x000);
+	m_nvram->set_base(&m_sram[0], 0x000);
 }
 
 
@@ -80,7 +80,7 @@ READ8_MEMBER(msx_matsushita_device::io_read)
 			}
 
 		case 0x09:   // Data
-			if (m_address < m_sram.count())
+			if (m_address < m_sram.size())
 			{
 				return m_sram[m_address];
 			}
@@ -153,7 +153,7 @@ WRITE8_MEMBER(msx_matsushita_device::io_write)
 			break;
 
 		case 0x09:   // Data
-			if (m_address < m_sram.count())
+			if (m_address < m_sram.size())
 			{
 				m_sram[m_address] = data;
 			}

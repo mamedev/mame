@@ -241,12 +241,12 @@ READ8_MEMBER(vc4000_rom_device::read_rom)
 
 READ8_MEMBER(vc4000_ram1k_device::read_ram)
 {
-	return m_ram[offset & (m_ram.count() - 1)];
+	return m_ram[offset & (m_ram.size() - 1)];
 }
 
 WRITE8_MEMBER(vc4000_ram1k_device::write_ram)
 {
-	m_ram[offset & (m_ram.count() - 1)] = data;
+	m_ram[offset & (m_ram.size() - 1)] = data;
 }
 
 
@@ -260,10 +260,10 @@ READ8_MEMBER(vc4000_chess2_device::extra_rom)
 
 READ8_MEMBER(vc4000_chess2_device::read_ram)
 {
-	return m_ram[offset & (m_ram.count() - 1)];
+	return m_ram[offset & (m_ram.size() - 1)];
 }
 
 WRITE8_MEMBER(vc4000_chess2_device::write_ram)
 {
-	m_ram[offset & (m_ram.count() - 1)] = data;
+	m_ram[offset & (m_ram.size() - 1)] = data;
 }

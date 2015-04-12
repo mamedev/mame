@@ -750,10 +750,10 @@ file_error core_fload(const char *filename, dynamic_buffer &data)
 	data.resize(size);
 
 	/* read the data */
-	if (core_fread(file, data, size) != size)
+	if (core_fread(file, &data[0], size) != size)
 	{
 		core_fclose(file);
-		data.reset();
+		data.clear();
 		return FILERR_FAILURE;
 	}
 

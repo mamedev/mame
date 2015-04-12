@@ -336,7 +336,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT64 size = io_generic_size(io);
 	dynamic_buffer img(size);
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
 	UINT64 pos;
 	for(pos=0; pos < size && img[pos] != 0x1a; pos++);
@@ -363,12 +363,12 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300000) ? 360 : 300;
 		int cell_count = (fm ? 1 : 2)*rate*60/rpm;
 
-		const UINT8 *snum = img+pos;
+		const UINT8 *snum = &img[pos];
 		pos += sector_count;
-		const UINT8 *tnum = head & 0x80 ? img+pos : NULL;
+		const UINT8 *tnum = head & 0x80 ? &img[pos] : NULL;
 		if(tnum)
 			pos += sector_count;
-		const UINT8 *hnum = head & 0x40 ? img+pos : NULL;
+		const UINT8 *hnum = head & 0x40 ? &img[pos] : NULL;
 		if(hnum)
 			pos += sector_count;
 
@@ -398,7 +398,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					memset(sects[i].data, img[pos++], actual_size);
 
 				} else {
-					sects[i].data = img + pos;
+					sects[i].data = &img[pos];
 					pos += actual_size;
 				}
 			}
@@ -410,7 +410,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, gap_3);
 
 		for(int i=0; i<sector_count; i++)
-			if(sects[i].data && (sects[i].data < img || sects[i].data >= img+size))
+			if(sects[i].data && (sects[i].data < &img[0] || sects[i].data >= &img[size]))
 				global_free_array(sects[i].data);
 	}
 

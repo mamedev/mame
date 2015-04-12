@@ -326,7 +326,7 @@ void eeprom_base_device::nvram_read(emu_file &file)
 	UINT32 eeprom_bytes = eeprom_length * m_data_bits / 8;
 
 	dynamic_buffer buffer(eeprom_bytes);
-	file.read(buffer, eeprom_bytes);
+	file.read(&buffer[0], eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
 		m_addrspace[0]->write_byte(offs, buffer[offs]);
 }
@@ -345,7 +345,7 @@ void eeprom_base_device::nvram_write(emu_file &file)
 	dynamic_buffer buffer(eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
 		buffer[offs] = m_addrspace[0]->read_byte(offs);
-	file.write(buffer, eeprom_bytes);
+	file.write(&buffer[0], eeprom_bytes);
 }
 
 

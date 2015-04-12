@@ -256,7 +256,8 @@ void vga_device::device_start()
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.svga_intf.vram_size = 0x100000;
 
-	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
+	vga.memory.resize(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
@@ -288,7 +289,8 @@ void cirrus_gd5428_device::device_start()
 	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.svga_intf.vram_size = 0x200000;
 
-	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
+	vga.memory.resize(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);

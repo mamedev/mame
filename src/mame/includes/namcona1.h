@@ -65,7 +65,7 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 
 	// this has to be UINT8 to be in the right byte order for the tilemap system
-	dynamic_array<UINT8> m_shaperam;
+	std::vector<UINT8> m_shaperam;
 
 	UINT16 *m_prgrom;
 	UINT16 *m_maskrom;

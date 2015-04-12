@@ -1396,11 +1396,11 @@ static void hng64_reorder( UINT8* gfxregion, size_t gfxregionsize)
 
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
-		memcpy((buffer+i*2)+tilesize, gfxregion+i,                   tilesize);
-		memcpy((buffer+i*2),          gfxregion+i+(gfxregionsize/2), tilesize);
+		memcpy(&buffer[i*2+tilesize], gfxregion+i,                   tilesize);
+		memcpy(&buffer[i*2],          gfxregion+i+(gfxregionsize/2), tilesize);
 	}
 
-	memcpy(gfxregion, buffer, gfxregionsize);
+	memcpy(gfxregion, &buffer[0], gfxregionsize);
 }
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)

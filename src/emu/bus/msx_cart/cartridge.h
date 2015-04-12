@@ -29,14 +29,14 @@ public:
 	void rom_vlm5030_alloc(UINT32 size);
 	void sram_alloc(UINT32 size);
 
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_rom_vlm5030_base() { return m_rom_vlm5030; }
-	UINT8* get_ram_base() { return m_ram; }
-	UINT8* get_sram_base() { return m_sram; }
-	UINT32 get_rom_size() { return m_rom.count(); }
-	UINT32 get_rom_vlm5030_size() { return m_rom_vlm5030.count(); }
-	UINT32 get_ram_size() { return m_ram.count(); }
-	UINT32 get_sram_size() { return m_sram.count(); }
+	UINT8* get_rom_base() { return &m_rom[0]; }
+	UINT8* get_rom_vlm5030_base() { return &m_rom_vlm5030[0]; }
+	UINT8* get_ram_base() { return &m_ram[0]; }
+	UINT8* get_sram_base() { return &m_sram[0]; }
+	UINT32 get_rom_size() { return m_rom.size(); }
+	UINT32 get_rom_vlm5030_size() { return m_rom_vlm5030.size(); }
+	UINT32 get_ram_size() { return m_ram.size(); }
+	UINT32 get_sram_size() { return m_sram.size(); }
 
 protected:
 	dynamic_buffer m_rom;

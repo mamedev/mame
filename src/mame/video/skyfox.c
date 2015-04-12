@@ -77,10 +77,10 @@ static const res_net_info skyfox_net_info =
 PALETTE_INIT_MEMBER(skyfox_state, skyfox)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, skyfox_decode_info, skyfox_net_info);
-	palette.set_pen_colors(0, rgb, 256);
+	palette.set_pen_colors(0, rgb);
 
 	/* Grey scale for the background??? is wrong */
 	for (int i = 0; i < 256; i++)

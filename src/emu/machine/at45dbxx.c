@@ -140,7 +140,7 @@ void at45db041_device::device_reset()
 
 void at45db041_device::nvram_default()
 {
-	m_data.clear(0xff);
+	memset(&m_data[0], 0xff, m_data.size());
 
 	if (region() != NULL)
 	{
@@ -148,7 +148,7 @@ void at45db041_device::nvram_default()
 		if (bytes > m_size)
 			bytes = m_size;
 
-		memcpy(m_data, region()->base(), bytes);
+		memcpy(&m_data[0], region()->base(), bytes);
 	}
 }
 
@@ -159,7 +159,7 @@ void at45db041_device::nvram_default()
 
 void at45db041_device::nvram_read(emu_file &file)
 {
-	file.read(m_data, m_size);
+	file.read(&m_data[0], m_size);
 }
 
 //-------------------------------------------------
@@ -169,7 +169,7 @@ void at45db041_device::nvram_read(emu_file &file)
 
 void at45db041_device::nvram_write(emu_file &file)
 {
-	file.write(m_data, m_size);
+	file.write(&m_data[0], m_size);
 }
 
 UINT8 at45db041_device::read_byte()
@@ -255,7 +255,7 @@ void at45db041_device::write_byte(UINT8 data)
 					UINT8 comp;
 					page = flash_get_page_addr();
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page to buffer 1 compare [%04X]\n", opcode, page));
-					comp = memcmp( m_data + page * page_size(), m_buffer1, page_size()) == 0 ? 0 : 1;
+					comp = memcmp( &m_data[page * page_size()], &m_buffer1[0], page_size()) == 0 ? 0 : 1;
 					if (comp) m_status |= 0x40; else m_status &= ~0x40;
 					_logerror( 1, ("at45dbxx page compare %s\n", comp ? "failure" : "success"));
 					m_mode = FLASH_MODE_SI;
@@ -273,7 +273,7 @@ void at45db041_device::write_byte(UINT8 data)
 					page = flash_get_page_addr();
 					byte = flash_get_byte_addr();
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page read [%04X/%04X]\n", opcode, page, byte));
-					flash_set_io(m_data + page * page_size(), page_size(), byte);
+					flash_set_io(&m_data[page * page_size()], page_size(), byte);
 					m_mode = FLASH_MODE_SO;
 					m_cmd.size = 8;
 				}
@@ -289,8 +289,8 @@ void at45db041_device::write_byte(UINT8 data)
 					page = flash_get_page_addr();
 					byte = flash_get_byte_addr();
 					_logerror( 1, ("at45dbxx opcode %02X - main memory page program through buffer 1 [%04X/%04X]\n",opcode, page, byte));
-					flash_set_io(m_buffer1, page_size(), byte);
-					m_buffer1.clear(0xFF);
+					flash_set_io(&m_buffer1[0], page_size(), byte);
+					memset(&m_buffer1[0], 0xff, m_buffer1.size());
 					m_mode = FLASH_MODE_SI;
 					m_cmd.size = 8;
 				}
@@ -342,7 +342,7 @@ WRITE_LINE_MEMBER(at45db041_device::cs_w)
 			page = flash_get_page_addr();
 			byte = flash_get_byte_addr();
 			_logerror( 1, ("at45dbxx - program data stored in buffer 1 into selected page in main memory [%04X/%04X]\n", page, byte));
-			memcpy( m_data + page * page_size(), m_buffer1, page_size());
+			memcpy( &m_data[page * page_size()], &m_buffer1[0], page_size());
 		}
 		// reset
 		at45db041_device::device_reset();

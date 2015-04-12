@@ -420,8 +420,8 @@ void a800_cart_slot_device::get_default_card_software(astring &result)
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);
-			type = identify_cart_type(head);
+			core_fread(m_file, &head[0], 0x10);
+			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
 		{
@@ -457,8 +457,8 @@ void a5200_cart_slot_device::get_default_card_software(astring &result)
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);
-			type = identify_cart_type(head);
+			core_fread(m_file, &head[0], 0x10);
+			type = identify_cart_type(&head[0]);
 
 			astring info;
 			if (hashfile_extrainfo(*this, info) && info == "A13MIRRORING")
@@ -490,8 +490,8 @@ void xegs_cart_slot_device::get_default_card_software(astring &result)
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			core_fread(m_file, head, 0x10);
-			type = identify_cart_type(head);
+			core_fread(m_file, &head[0], 0x10);
+			type = identify_cart_type(&head[0]);
 		}
 		if (type != A800_XEGS)
 		{

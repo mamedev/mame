@@ -98,13 +98,13 @@ void x68k_state::x68k_crtc_text_copy(int src, int dest, UINT8 planes)
 
 	// update RAM in each plane
 	if(planes & 1)
-		memcpy(m_tvram+dest_ram,m_tvram+src_ram,512);
+		memcpy(&m_tvram[dest_ram],&m_tvram[src_ram],512);
 	if(planes & 2)
-		memcpy(m_tvram+dest_ram+0x10000,m_tvram+src_ram+0x10000,512);
+		memcpy(&m_tvram[dest_ram+0x10000],&m_tvram[src_ram+0x10000],512);
 	if(planes & 4)
-		memcpy(m_tvram+dest_ram+0x20000,m_tvram+src_ram+0x20000,512);
+		memcpy(&m_tvram[dest_ram+0x20000],&m_tvram[src_ram+0x20000],512);
 	if(planes & 8)
-		memcpy(m_tvram+dest_ram+0x30000,m_tvram+src_ram+0x30000,512);
+		memcpy(&m_tvram[dest_ram+0x30000],&m_tvram[src_ram+0x30000],512);
 }
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_operation_end)
@@ -440,7 +440,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 		m_crtc.operation = data;
 		if(data & 0x02)  // high-speed graphic screen clear
 		{
-			memset(m_gvram,0,0x40000);
+			memset(&m_gvram[0],0,0x40000);
 			timer_set(attotime::from_msec(10), TIMER_X68K_CRTC_OPERATION_END, 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;
@@ -501,7 +501,7 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 	if(m_crtc.reg[20] & 0x0800)  // G-VRAM set to buffer
 	{
 		if(offset < 0x40000)
-			COMBINE_DATA(m_gvram+offset);
+			COMBINE_DATA(&m_gvram[offset]);
 	}
 	else
 	{
@@ -509,7 +509,7 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 		{
 			case 0x0300:
 				if(offset < 0x40000)
-					COMBINE_DATA(m_gvram+offset);
+					COMBINE_DATA(&m_gvram[offset]);
 				break;
 			case 0x0100:
 				if(offset < 0x40000)
@@ -565,13 +565,13 @@ WRITE16_MEMBER(x68k_state::x68k_tvram_w )
 		{
 			if(wr & (1 << plane))
 			{
-				COMBINE_DATA(m_tvram+offset+(0x10000*plane));
+				COMBINE_DATA(&m_tvram[offset+0x10000*plane]);
 			}
 		}
 	}
 	else
 	{
-		COMBINE_DATA(m_tvram+offset);
+		COMBINE_DATA(&m_tvram[offset]);
 	}
 }
 
@@ -623,7 +623,7 @@ READ16_MEMBER(x68k_state::x68k_tvram_r )
 
 WRITE16_MEMBER(x68k_state::x68k_spritereg_w )
 {
-	COMBINE_DATA(m_spritereg+offset);
+	COMBINE_DATA(&m_spritereg[offset]);
 	switch(offset)
 	{
 	case 0x400:

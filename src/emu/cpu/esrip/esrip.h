@@ -200,7 +200,7 @@ protected:
 
 	UINT8   m_optable[65536];
 
-	dynamic_array<UINT16> m_ipt_ram;
+	std::vector<UINT16> m_ipt_ram;
 	UINT8   *m_lbrm;
 
 	address_space *m_program;

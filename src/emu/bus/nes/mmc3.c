@@ -320,10 +320,10 @@ WRITE8_MEMBER(nes_txrom_device::write_m)
 
 	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
 	{
-		if (m_battery)
-			m_battery[offset & (m_battery.count() - 1)] = data;
-		if (m_prgram)
-			m_prgram[offset & (m_prgram.count() - 1)] = data;
+		if (!m_battery.empty())
+			m_battery[offset & (m_battery.size() - 1)] = data;
+		if (!m_prgram.empty())
+			m_prgram[offset & (m_prgram.size() - 1)] = data;
 	}
 }
 
@@ -333,10 +333,10 @@ READ8_MEMBER(nes_txrom_device::read_m)
 
 	if (BIT(m_wram_protect, 7))
 	{
-		if (m_battery)
-			return m_battery[offset & (m_battery.count() - 1)];
-		if (m_prgram)
-			return m_prgram[offset & (m_prgram.count() - 1)];
+		if (!m_battery.empty())
+			return m_battery[offset & (m_battery.size() - 1)];
+		if (!m_prgram.empty())
+			return m_prgram[offset & (m_prgram.size() - 1)];
 	}
 
 	return m_open_bus;   // open bus

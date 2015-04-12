@@ -124,10 +124,10 @@ public:
 	UINT16  *m_rom6b;
 
 	// AMS RAM (1 Mib)
-	dynamic_array<UINT16> m_ram;
+	std::vector<UINT16> m_ram;
 
 	// Scratch pad ram (1 KiB)
-	dynamic_array<UINT16> m_scratchpad;
+	std::vector<UINT16> m_scratchpad;
 
 	// First joystick. 6 for TI-99/4A
 	int     m_firstjoy;

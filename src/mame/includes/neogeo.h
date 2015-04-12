@@ -194,7 +194,7 @@ protected:
 	UINT16 get_video_control(  );
 
 	// color/palette related
-	dynamic_array<UINT16> m_paletteram;
+	std::vector<UINT16> m_paletteram;
 	UINT8        m_palette_lookup[32][4];
 	const pen_t *m_bg_pen;
 	int          m_screen_shadow;

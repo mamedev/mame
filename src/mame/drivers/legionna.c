@@ -1073,7 +1073,7 @@ void legionna_state::descramble_legionnaire_gfx(UINT8* src)
 			7,4,
 			3,2,1,0)];
 		}
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 
 }
