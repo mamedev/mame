@@ -75,7 +75,7 @@ bool osd_font_sdl::open(const char *font_path, const char *_name, int &height)
 		osd_printf_verbose("Searching font %s in -%s\n", name.c_str(), OPTION_FONTPATH);
 		//emu_file file(options().font_path(), OPEN_FLAG_READ);
 		emu_file file(font_path, OPEN_FLAG_READ);
-		if (file.open(name) == FILERR_NONE)
+		if (file.open(name.c_str()) == FILERR_NONE)
 		{
 			astring full_name = file.fullpath();
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE);
@@ -187,7 +187,7 @@ bool osd_font_sdl::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &
 TTF_Font * osd_font_sdl::TTF_OpenFont_Magic(astring name, int fsize)
 {
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open(name) == FILERR_NONE)
+	if (file.open(name.c_str()) == FILERR_NONE)
 	{
 		unsigned char buffer[5] = { 0xff, 0xff, 0xff, 0xff, 0xff };
 		unsigned char magic[5] = { 0x00, 0x01, 0x00, 0x00, 0x00 };
@@ -201,7 +201,7 @@ TTF_Font * osd_font_sdl::TTF_OpenFont_Magic(astring name, int fsize)
 bool osd_font_sdl::BDF_Check_Magic(astring name)
 {
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open(name) == FILERR_NONE)
+	if (file.open(name.c_str()) == FILERR_NONE)
 	{
 		unsigned char buffer[9];
 		unsigned char magic[9] = { 'S', 'T', 'A', 'R', 'T', 'F', 'O', 'N', 'T' };
