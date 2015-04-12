@@ -22,9 +22,11 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+#include "video/mc6845.h"
 
 #include "cardline.lh"
 
+#define MASTER_CLOCK XTAL_12MHz
 
 class cardline_state : public driver_device
 {
@@ -141,7 +143,8 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x2008, 0x2008) AM_NOP
 	AM_RANGE(0x2080, 0x213f) AM_NOP
 	AM_RANGE(0x2400, 0x2400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x2800, 0x2801) AM_NOP
+	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x2801, 0x2801) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x2840, 0x2840) AM_NOP
 	AM_RANGE(0x2880, 0x2880) AM_NOP
 	AM_RANGE(0x3003, 0x3003) AM_NOP
@@ -233,7 +236,7 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 static MACHINE_CONFIG_START( cardline, cardline_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32,12000000)
+	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
 	MCFG_MCS51_PORT1_CONFIG(0x10)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
@@ -251,6 +254,10 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cardline)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)   /* divisor guessed - result is 56 Hz */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 
