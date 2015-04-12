@@ -162,8 +162,8 @@ protected:
 	// derived class overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_import(const device_state_entry &entry, astring &string);
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_import(const device_state_entry &entry, astring &str);
+	virtual void state_string_export(const device_state_entry &entry, astring &str);
 
 	// internal operation overrides
 	virtual void interface_post_start();

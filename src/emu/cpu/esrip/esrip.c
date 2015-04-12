@@ -349,12 +349,12 @@ const address_space_config *esrip_device::memory_space_config(address_spacenum s
 //  for the debugger
 //-------------------------------------------------
 
-void esrip_device::state_string_export(const device_state_entry &entry, astring &string)
+void esrip_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c%c%c%c",
 				(m_status & 0x80) ? '3' : '.',
 				(m_status & 0x40) ? '2' : '.',
 				(m_status & 0x20) ? '1' : '.',

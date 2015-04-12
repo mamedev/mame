@@ -225,8 +225,8 @@ int cli_frontend::execute(int argc, char **argv)
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
 	{
-		astring string(fatal.string());
-		osd_printf_error("%s\n", string.trimspace().c_str());
+		astring str(fatal.string());
+		osd_printf_error("%s\n", str.trimspace().c_str());
 		m_result = (fatal.exitcode() != 0) ? fatal.exitcode() : MAMERR_FATALERROR;
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the

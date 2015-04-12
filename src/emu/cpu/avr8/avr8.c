@@ -902,12 +902,12 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void avr8_device::state_string_export(const device_state_entry &entry, astring &string)
+void avr8_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c%c%c",
 				(m_r[AVR8_REGIDX_SREG] & 0x80) ? 'I' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x40) ? 'T' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x20) ? 'H' : '-',

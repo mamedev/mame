@@ -735,12 +735,12 @@ void pdp1_device::state_export(const device_state_entry &entry)
 }
 
 
-void pdp1_device::state_string_export(const device_state_entry &entry, astring &string)
+void pdp1_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c-%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c-%c%c%c%c%c%c",
 					(FLAGS & 040) ? '1' : '.',
 					(FLAGS & 020) ? '2' : '.',
 					(FLAGS & 010) ? '3' : '.',

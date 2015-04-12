@@ -174,12 +174,12 @@ void mn10200_device::device_start()
 }
 
 
-void mn10200_device::state_string_export(const device_state_entry &entry, astring &string)
+void mn10200_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf( "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
+			str.printf("S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
 				(m_psw >> 12) & 3,
 				m_psw & FLAG_IE ? "on " : "off",
 				(m_psw >> 8) & 7,

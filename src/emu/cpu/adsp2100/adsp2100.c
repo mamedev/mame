@@ -720,12 +720,12 @@ void adsp21xx_device::state_import(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void adsp21xx_device::state_string_export(const device_state_entry &entry, astring &string)
+void adsp21xx_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c%c%c",
 				m_astat & 0x80 ? 'X':'.',
 				m_astat & 0x40 ? 'M':'.',
 				m_astat & 0x20 ? 'Q':'.',

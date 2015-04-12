@@ -529,31 +529,31 @@ bool joystick_map::parse(const char *mapstring)
 //  friendly display
 //-------------------------------------------------
 
-const char *joystick_map::to_string(astring &string) const
+const char *joystick_map::to_string(astring &str) const
 {
-	string.printf("%s\n", m_origstring.c_str());
+	str.printf("%s\n", m_origstring.c_str());
 	for (int rownum = 0; rownum < 9; rownum++)
 	{
-		string.catprintf("  ");
+		str.catprintf("  ");
 		for (int colnum = 0; colnum < 9; colnum++)
 			switch (m_map[rownum][colnum])
 			{
-				case JOYSTICK_MAP_UP | JOYSTICK_MAP_LEFT:   string.catprintf("7");  break;
-				case JOYSTICK_MAP_UP:                       string.catprintf("8");  break;
-				case JOYSTICK_MAP_UP | JOYSTICK_MAP_RIGHT:  string.catprintf("9");  break;
-				case JOYSTICK_MAP_LEFT:                     string.catprintf("4");  break;
-				case JOYSTICK_MAP_NEUTRAL:                  string.catprintf("5");  break;
-				case JOYSTICK_MAP_RIGHT:                    string.catprintf("6");  break;
-				case JOYSTICK_MAP_DOWN | JOYSTICK_MAP_LEFT: string.catprintf("1");  break;
-				case JOYSTICK_MAP_DOWN:                     string.catprintf("2");  break;
-				case JOYSTICK_MAP_DOWN | JOYSTICK_MAP_RIGHT:string.catprintf("3");  break;
-				case JOYSTICK_MAP_STICKY:                   string.catprintf("s");  break;
-				default:                                    string.catprintf("?");  break;
+				case JOYSTICK_MAP_UP | JOYSTICK_MAP_LEFT:   str.catprintf("7");  break;
+				case JOYSTICK_MAP_UP:                       str.catprintf("8");  break;
+				case JOYSTICK_MAP_UP | JOYSTICK_MAP_RIGHT:  str.catprintf("9");  break;
+				case JOYSTICK_MAP_LEFT:                     str.catprintf("4");  break;
+				case JOYSTICK_MAP_NEUTRAL:                  str.catprintf("5");  break;
+				case JOYSTICK_MAP_RIGHT:                    str.catprintf("6");  break;
+				case JOYSTICK_MAP_DOWN | JOYSTICK_MAP_LEFT: str.catprintf("1");  break;
+				case JOYSTICK_MAP_DOWN:                     str.catprintf("2");  break;
+				case JOYSTICK_MAP_DOWN | JOYSTICK_MAP_RIGHT:str.catprintf("3");  break;
+				case JOYSTICK_MAP_STICKY:                   str.catprintf("s");  break;
+				default:                                    str.catprintf("?");  break;
 			}
 
-		string.catprintf("\n");
+		str.catprintf("\n");
 	}
-	return string.c_str();
+	return str.c_str();
 }
 
 
@@ -1461,14 +1461,14 @@ input_code input_manager::code_from_itemid(input_item_id itemid) const
 //  friendly name
 //-------------------------------------------------
 
-const char *input_manager::code_name(astring &string, input_code code) const
+const char *input_manager::code_name(astring &str, input_code code) const
 {
-	string.reset();
+	str.reset();
 
 	// if nothing there, return an empty string
 	input_device_item *item = item_from_code(code);
 	if (item == NULL)
-		return string.c_str();
+		return str.c_str();
 
 	// determine the devclass part
 	const char *devclass = (*devclass_string_table)[code.device_class()];
@@ -1501,16 +1501,16 @@ const char *input_manager::code_name(astring &string, input_code code) const
 			devcode = "";
 
 	// concatenate the strings
-	string.cpy(devclass);
+	str.cpy(devclass);
 	if (devindex)
-		string.cat(" ").cat(devindex);
+		str.cat(" ").cat(devindex);
 	if (devcode[0] != 0)
-		string.cat(" ").cat(devcode);
+		str.cat(" ").cat(devcode);
 	if (modifier != NULL)
-		string.cat(" ").cat(modifier);
+		str.cat(" ").cat(modifier);
 
 	// delete any leading spaces
-	return string.trimspace().c_str();
+	return str.trimspace().c_str();
 }
 
 
@@ -1518,7 +1518,7 @@ const char *input_manager::code_name(astring &string, input_code code) const
 //  code_to_token - create a token for a given code
 //-------------------------------------------------
 
-const char *input_manager::code_to_token(astring &string, input_code code) const
+const char *input_manager::code_to_token(astring &str, input_code code) const
 {
 	// determine the devclass part
 	const char *devclass = (*devclass_token_table)[code.device_class()];
@@ -1542,16 +1542,16 @@ const char *input_manager::code_to_token(astring &string, input_code code) const
 		itemclass = (*itemclass_token_table)[code.item_class()];
 
 	// concatenate the strings
-	string.cpy(devclass);
+	str.cpy(devclass);
 	if (devindex)
-		string.cat("_").cat(devindex);
+		str.cat("_").cat(devindex);
 	if (devcode[0] != 0)
-		string.cat("_").cat(devcode);
+		str.cat("_").cat(devcode);
 	if (modifier != NULL)
-		string.cat("_").cat(modifier);
+		str.cat("_").cat(modifier);
 	if (itemclass[0] != 0)
-		string.cat("_").cat(itemclass);
-	return string.c_str();
+		str.cat("_").cat(itemclass);
+	return str.c_str();
 }
 
 
@@ -1925,7 +1925,7 @@ bool input_manager::seq_poll()
 //  sequence
 //-------------------------------------------------
 
-const char *input_manager::seq_name(astring &string, const input_seq &seq) const
+const char *input_manager::seq_name(astring &str, const input_seq &seq) const
 {
 	// make a copy of our sequence, removing any invalid bits
 	input_code clean_codes[sizeof(seq) / sizeof(input_code)];
@@ -1946,30 +1946,30 @@ const char *input_manager::seq_name(astring &string, const input_seq &seq) const
 
 	// special case: empty
 	if (clean_index == 0)
-		return string.cpy((seq.length() == 0) ? "None" : "n/a").c_str();
+		return str.cpy((seq.length() == 0) ? "None" : "n/a").c_str();
 
 	// start with an empty buffer
-	string.reset();
+	str.reset();
 
 	// loop until we hit the end
 	for (int codenum = 0; codenum < clean_index; codenum++)
 	{
 		// append a space if not the first code
 		if (codenum != 0)
-			string.cat(" ");
+			str.cat(" ");
 
 		// handle OR/NOT codes here
 		input_code code = clean_codes[codenum];
 		if (code == input_seq::or_code)
-			string.cat("or");
+			str.cat("or");
 		else if (code == input_seq::not_code)
-			string.cat("not");
+			str.cat("not");
 
 		// otherwise, assume it is an input code and ask the input system to generate it
 		else
-			string.cat(code_name(codestr, code));
+			str.cat(code_name(codestr, code));
 	}
-	return string.c_str();
+	return str.c_str();
 }
 
 
@@ -1978,10 +1978,10 @@ const char *input_manager::seq_name(astring &string, const input_seq &seq) const
 //  a sequence
 //-------------------------------------------------
 
-const char *input_manager::seq_to_tokens(astring &string, const input_seq &seq) const
+const char *input_manager::seq_to_tokens(astring &str, const input_seq &seq) const
 {
 	// start with an empty buffer
-	string.reset();
+	str.reset();
 
 	// loop until we hit the end
 	astring codestr;
@@ -1989,22 +1989,22 @@ const char *input_manager::seq_to_tokens(astring &string, const input_seq &seq) 
 	{
 		// append a space if not the first code
 		if (codenum != 0)
-			string.cat(" ");
+			str.cat(" ");
 
 		// handle OR/NOT codes here
 		input_code code = seq[codenum];
 		if (code == input_seq::or_code)
-			string.cat("OR");
+			str.cat("OR");
 		else if (code == input_seq::not_code)
-			string.cat("NOT");
+			str.cat("NOT");
 		else if (code == input_seq::default_code)
-			string.cat("DEFAULT");
+			str.cat("DEFAULT");
 
 		// otherwise, assume it is an input code and ask the input system to generate it
 		else
-			string.cat(code_to_token(codestr, code));
+			str.cat(code_to_token(codestr, code));
 	}
-	return string.c_str();
+	return str.c_str();
 }
 
 

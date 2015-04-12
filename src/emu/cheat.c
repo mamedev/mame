@@ -101,28 +101,28 @@
 //  the format
 //-------------------------------------------------
 
-inline const char *number_and_format::format(astring &string) const
+inline const char *number_and_format::format(astring &str) const
 {
 	switch (m_format)
 	{
 		default:
 		case XML_INT_FORMAT_DECIMAL:
-			string.printf("%d", (UINT32)m_value);
+			str.printf("%d", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_DECIMAL_POUND:
-			string.printf("#%d", (UINT32)m_value);
+			str.printf("#%d", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_HEX_DOLLAR:
-			string.printf("$%X", (UINT32)m_value);
+			str.printf("$%X", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_HEX_C:
-			string.printf("0x%X", (UINT32)m_value);
+			str.printf("0x%X", (UINT32)m_value);
 			break;
 	}
-	return string.c_str();
+	return str.c_str();
 }
 
 
@@ -205,15 +205,15 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	cheatfile.printf("\t\t<parameter");
 
 	// if no items, just output min/max/step
-	astring string;
+	astring str;
 	if (!has_itemlist())
 	{
 		if (m_minval != 0)
-			cheatfile.printf(" min=\"%s\"", m_minval.format(string));
+			cheatfile.printf(" min=\"%s\"", m_minval.format(str));
 		if (m_maxval != 0)
-			cheatfile.printf(" max=\"%s\"", m_maxval.format(string));
+			cheatfile.printf(" max=\"%s\"", m_maxval.format(str));
 		if (m_stepval != 1)
-			cheatfile.printf(" step=\"%s\"", m_stepval.format(string));
+			cheatfile.printf(" step=\"%s\"", m_stepval.format(str));
 		cheatfile.printf("/>\n");
 	}
 
@@ -221,7 +221,7 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	else
 	{
 		for (const item *curitem = m_itemlist.first(); curitem != NULL; curitem = curitem->next())
-			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem->value().format(string), curitem->text());
+			cheatfile.printf("\t\t\t<item value=\"%s\">%s</item>\n", curitem->value().format(str), curitem->text());
 		cheatfile.printf("\t\t</parameter>\n");
 	}
 }
@@ -1263,36 +1263,36 @@ astring &cheat_manager::get_output_astring(int row, int justify)
 //  document
 //-------------------------------------------------
 
-const char *cheat_manager::quote_expression(astring &string, const parsed_expression &expression)
+const char *cheat_manager::quote_expression(astring &str, const parsed_expression &expression)
 {
-	string.cpy(expression.original_string());
+	str.cpy(expression.original_string());
 
-	string.replace(0, " && ", " and ");
-	string.replace(0, " &&", " and ");
-	string.replace(0, "&& ", " and ");
-	string.replace(0, "&&", " and ");
+	str.replace(0, " && ", " and ");
+	str.replace(0, " &&", " and ");
+	str.replace(0, "&& ", " and ");
+	str.replace(0, "&&", " and ");
 
-	string.replace(0, " & ", " band ");
-	string.replace(0, " &", " band ");
-	string.replace(0, "& ", " band ");
-	string.replace(0, "&", " band ");
+	str.replace(0, " & ", " band ");
+	str.replace(0, " &", " band ");
+	str.replace(0, "& ", " band ");
+	str.replace(0, "&", " band ");
 
-	string.replace(0, " <= ", " le ");
-	string.replace(0, " <=", " le ");
-	string.replace(0, "<= ", " le ");
-	string.replace(0, "<=", " le ");
+	str.replace(0, " <= ", " le ");
+	str.replace(0, " <=", " le ");
+	str.replace(0, "<= ", " le ");
+	str.replace(0, "<=", " le ");
 
-	string.replace(0, " < ", " lt ");
-	string.replace(0, " <", " lt ");
-	string.replace(0, "< ", " lt ");
-	string.replace(0, "<", " lt ");
+	str.replace(0, " < ", " lt ");
+	str.replace(0, " <", " lt ");
+	str.replace(0, "< ", " lt ");
+	str.replace(0, "<", " lt ");
 
-	string.replace(0, " << ", " lshift ");
-	string.replace(0, " <<", " lshift ");
-	string.replace(0, "<< ", " lshift ");
-	string.replace(0, "<<", " lshift ");
+	str.replace(0, " << ", " lshift ");
+	str.replace(0, " <<", " lshift ");
+	str.replace(0, "<< ", " lshift ");
+	str.replace(0, "<<", " lshift ");
 
-	return string.c_str();
+	return str.c_str();
 }
 
 

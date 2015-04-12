@@ -148,12 +148,12 @@ const address_space_config *ssem_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void ssem_device::state_string_export(const device_state_entry &entry, astring &string)
+void ssem_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c", m_halt ? 'H' : '.');
+			str.printf("%c", m_halt ? 'H' : '.');
 			break;
 	}
 }

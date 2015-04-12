@@ -1596,12 +1596,12 @@ READ16_MEMBER( tms340x0_device::host_r )
 }
 
 
-void tms340x0_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms340x0_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_st & 0x80000000 ? 'N':'.',
 				m_st & 0x40000000 ? 'C':'.',
 				m_st & 0x20000000 ? 'Z':'.',

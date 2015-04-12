@@ -132,12 +132,12 @@ void score7_cpu_device::device_reset()
 //  for the debugger
 //-------------------------------------------------
 
-void score7_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void score7_cpu_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%s%s%s%s%s",
+			str.printf("%s%s%s%s%s",
 				REG_CR & FLAG_V ? "V" : ".",
 				REG_CR & FLAG_C ? "C" : ".",
 				REG_CR & FLAG_Z ? "Z" : ".",

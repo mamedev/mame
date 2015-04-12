@@ -1036,18 +1036,18 @@ void validity_checker::validate_devices()
 //  and device
 //-------------------------------------------------
 
-void validity_checker::build_output_prefix(astring &string)
+void validity_checker::build_output_prefix(astring &str)
 {
 	// start empty
-	string.reset();
+	str.reset();
 
 	// if we have a current device, indicate that
 	if (m_current_device != NULL)
-		string.cat(m_current_device->name()).cat(" device '").cat(m_current_device->tag()).cat("': ");
+		str.cat(m_current_device->name()).cat(" device '").cat(m_current_device->tag()).cat("': ");
 
 	// if we have a current port, indicate that as well
 	if (m_current_ioport != NULL)
-		string.cat("ioport '").cat(m_current_ioport).cat("': ");
+		str.cat("ioport '").cat(m_current_ioport).cat("': ");
 }
 
 

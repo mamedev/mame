@@ -160,7 +160,7 @@ public:
 	void request_quit();
 
 	// print the game info string into a buffer
-	astring &game_info_astring(astring &string);
+	astring &game_info_astring(astring &str);
 
 	// slider controls
 	const slider_state *get_slider_list(void);

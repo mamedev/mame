@@ -212,12 +212,12 @@ const address_space_config *dsp16_device::memory_space_config(address_spacenum s
 //  for the debugger
 //-------------------------------------------------
 
-void dsp16_device::state_string_export(const device_state_entry &entry, astring &string)
+void dsp16_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-		string.printf("(below)");
+			str.printf("(below)");
 			break;
 
 		case DSP16_AUC:
@@ -231,7 +231,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 				case 0x02: alignString.printf("x4"); break;
 				case 0x03: alignString.printf(",,"); break;
 			}
-			string.printf("%c%c%c%c%c%s",
+			str.printf("%c%c%c%c%c%s",
 							m_auc & 0x40 ? 'Y':'.',
 							m_auc & 0x20 ? '1':'.',
 							m_auc & 0x10 ? '0':'.',
@@ -242,7 +242,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 		}
 
 		case DSP16_PSW:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 							m_psw & 0x8000 ? 'M':'.',
 							m_psw & 0x4000 ? 'E':'.',
 							m_psw & 0x2000 ? 'L':'.',
@@ -272,7 +272,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 				case 0x02: strobeString.printf("3T"); break;
 				case 0x03: strobeString.printf("4T"); break;
 			}
-			string.printf("%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str.printf("%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
 							m_pioc & 0x8000 ? 'I':'.',
 							strobeString.c_str(),
 							m_pioc & 0x1000 ? 'O':'I',
@@ -303,7 +303,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 				case 0x02: clkString.printf("16"); break;
 				case 0x03: clkString.printf("20"); break;
 			}
-			string.printf("%c%s%c%c%c%c%c%c%c",
+			str.printf("%c%s%c%c%c%c%c%c%c",
 							m_sioc & 0x0200 ? 'I':'O',
 							clkString.c_str(),
 							m_sioc & 0x0040 ? 'L':'M',

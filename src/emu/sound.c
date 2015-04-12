@@ -163,17 +163,17 @@ float sound_stream::output_gain(int outputnum) const
 //  on a given stream's input
 //-------------------------------------------------
 
-const char *sound_stream::input_name(int inputnum, astring &string) const
+const char *sound_stream::input_name(int inputnum, astring &str) const
 {
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_input.count());
-	string.printf("%s '%s': ", m_device.name(), m_device.tag());
+	str.printf("%s '%s': ", m_device.name(), m_device.tag());
 
 	// if we have a source, indicate where the sound comes from by device name and tag
 	if (m_input[inputnum].m_source != NULL && m_input[inputnum].m_source->m_stream != NULL)
 	{
 		device_t &source = m_input[inputnum].m_source->m_stream->device();
-		string.catprintf("%s '%s'", source.name(), source.tag());
+		str.catprintf("%s '%s'", source.name(), source.tag());
 
 		// get the sound interface; if there is more than 1 output we need to figure out which one
 		device_sound_interface *sound;
@@ -186,12 +186,12 @@ const char *sound_stream::input_name(int inputnum, astring &string) const
 			for (int outputnum = 0; (outstream = sound->output_to_stream_output(outputnum, streamoutputnum)) != NULL; outputnum++)
 				if (outstream == m_input[inputnum].m_source->m_stream && m_input[inputnum].m_source == &outstream->m_output[streamoutputnum])
 				{
-					string.catprintf(" Ch.%d", outputnum);
+					str.catprintf(" Ch.%d", outputnum);
 					break;
 				}
 		}
 	}
-	return string.c_str();
+	return str.c_str();
 }
 
 

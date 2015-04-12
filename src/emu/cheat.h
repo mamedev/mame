@@ -56,7 +56,7 @@ public:
 	operator const UINT64 &() const { return m_value; }
 
 	// format the number according to its format
-	const char *format(astring &string) const;
+	const char *format(astring &str) const;
 
 private:
 	// internal state
@@ -308,7 +308,7 @@ public:
 	astring &get_output_astring(int row, int justify);
 
 	// global helpers
-	static const char *quote_expression(astring &string, const parsed_expression &expression);
+	static const char *quote_expression(astring &str, const parsed_expression &expression);
 	static UINT64 execute_frombcd(symbol_table &table, void *ref, int params, const UINT64 *param);
 	static UINT64 execute_tobcd(symbol_table &table, void *ref, int params, const UINT64 *param);
 

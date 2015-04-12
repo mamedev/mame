@@ -472,12 +472,12 @@ void cosmac_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void cosmac_device::state_string_export(const device_state_entry &entry, astring &string)
+void cosmac_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c",
+			str.printf("%c%c%c",
 							m_df ? 'D' : '.',
 							m_ie ? 'I' : '.',
 							m_q  ? 'Q' : '.');

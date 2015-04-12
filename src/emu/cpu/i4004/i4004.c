@@ -507,12 +507,12 @@ void i4004_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i4004_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void i4004_cpu_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf(".%c%c%c",
+			str.printf(".%c%c%c",
 				(m_A==0) ? 'Z':'.',
 				m_C      ? 'C':'.',
 				m_TEST   ? 'T':'.');

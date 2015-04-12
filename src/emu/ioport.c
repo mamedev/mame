@@ -1307,13 +1307,13 @@ void natural_keyboard::frame_update(ioport_port &port, ioport_value &digital)
 //  key_name - returns the name of a specific key
 //-------------------------------------------------
 
-const char *natural_keyboard::key_name(astring &string, unicode_char ch)
+const char *natural_keyboard::key_name(astring &str, unicode_char ch)
 {
 	// attempt to get the string from the character info table
 	const char_info *ci = char_info::find(ch);
 	const char *result = (ci != NULL) ? ci->name : NULL;
 	if (result != NULL)
-		string.cpy(result);
+		str.cpy(result);
 
 	// if that doesn't work, convert to UTF-8
 	else if (ch > 0x7F || isprint(ch))
@@ -1321,13 +1321,13 @@ const char *natural_keyboard::key_name(astring &string, unicode_char ch)
 		char buf[10];
 		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
 		buf[count] = 0;
-		string.cpy(buf);
+		str.cpy(buf);
 	}
 
 	// otherwise, opt for question marks
 	else
-		string.cpy("???");
-	return string.c_str();
+		str.cpy("???");
+	return str.c_str();
 }
 
 
@@ -4397,15 +4397,15 @@ ioport_type ioport_manager::token_to_input_type(const char *string, int &player)
 //  type and player to a string token
 //-------------------------------------------------
 
-const char *ioport_manager::input_type_to_token(astring &string, ioport_type type, int player)
+const char *ioport_manager::input_type_to_token(astring &str, ioport_type type, int player)
 {
 	// look up the port and return the token
 	input_type_entry *entry = m_type_to_entry[type][player];
 	if (entry != NULL)
-		return string.cpy(entry->token()).c_str();
+		return str.cpy(entry->token()).c_str();
 
 	// if that fails, carry on
-	return string.format("TYPE_OTHER(%d,%d)", type, player).c_str();
+	return str.format("TYPE_OTHER(%d,%d)", type, player).c_str();
 }
 
 

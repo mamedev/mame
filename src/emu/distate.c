@@ -580,7 +580,7 @@ void device_state_interface::state_export(const device_state_entry &entry)
 //  written to perform any post-processing
 //-------------------------------------------------
 
-void device_state_interface::state_string_import(const device_state_entry &entry, astring &string)
+void device_state_interface::state_string_import(const device_state_entry &entry, astring &str)
 {
 	// do nothing by default
 }
@@ -591,7 +591,7 @@ void device_state_interface::state_string_import(const device_state_entry &entry
 //  written to perform any post-processing
 //-------------------------------------------------
 
-void device_state_interface::state_string_export(const device_state_entry &entry, astring &string)
+void device_state_interface::state_string_export(const device_state_entry &entry, astring &str)
 {
 	// do nothing by default
 }

@@ -257,30 +257,30 @@ void video_manager::frame_update(bool debug)
 //  into a string buffer
 //-------------------------------------------------
 
-astring &video_manager::speed_text(astring &string)
+astring &video_manager::speed_text(astring &str)
 {
-	string.reset();
+	str.reset();
 
 	// if we're paused, just display Paused
 	bool paused = machine().paused();
 	if (paused)
-		string.cat("paused");
+		str.cat("paused");
 
 	// if we're fast forwarding, just display Fast-forward
 	else if (m_fastforward)
-		string.cat("fast ");
+		str.cat("fast ");
 
 	// if we're auto frameskipping, display that plus the level
 	else if (effective_autoframeskip())
-		string.catprintf("auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		str.catprintf("auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// otherwise, just display the frameskip plus the level
 	else
-		string.catprintf("skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		str.catprintf("skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// append the speed for all cases except paused
 	if (!paused)
-		string.catprintf("%4d%%", (int)(100 * m_speed_percent + 0.5));
+		str.catprintf("%4d%%", (int)(100 * m_speed_percent + 0.5));
 
 	// display the number of partial updates as well
 	int partials = 0;
@@ -288,9 +288,9 @@ astring &video_manager::speed_text(astring &string)
 	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
 		partials += screen->partial_updates();
 	if (partials > 1)
-		string.catprintf("\n%d partial updates", partials);
+		str.catprintf("\n%d partial updates", partials);
 
-	return string;
+	return str;
 }
 
 

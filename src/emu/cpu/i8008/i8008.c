@@ -187,12 +187,12 @@ void i8008_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void i8008_device::state_string_export(const device_state_entry &entry, astring &string)
+void i8008_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c",
+			str.printf("%c%c%c%c",
 				m_CF ? 'C':'.',
 				m_ZF ? 'Z':'.',
 				m_SF ? 'S':'.',

@@ -369,12 +369,12 @@ void dsp32c_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void dsp32c_device::state_string_export(const device_state_entry &entry, astring &string)
+void dsp32c_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c%c%c",
 				NFLAG ? 'N':'.',
 				ZFLAG ? 'Z':'.',
 				UFLAG ? 'U':'.',
@@ -389,7 +389,7 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, astring
 		case DSP32_A1:
 		case DSP32_A2:
 		case DSP32_A3:
-			string.printf("%8g", *(double *)entry.dataptr());
+			str.printf("%8g", *(double *)entry.dataptr());
 			break;
 	}
 }

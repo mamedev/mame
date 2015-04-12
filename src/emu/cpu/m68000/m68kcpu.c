@@ -1173,47 +1173,47 @@ void m68000_base_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void m68000_base_device::state_string_export(const device_state_entry &entry, astring &string)
+void m68000_base_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	UINT16 sr;
 
 	switch (entry.index())
 	{
 		case M68K_FP0:
-			string.printf("%f", fx80_to_double(REG_FP(this)[0]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[0]));
 			break;
 
 		case M68K_FP1:
-			string.printf("%f", fx80_to_double(REG_FP(this)[1]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[1]));
 			break;
 
 		case M68K_FP2:
-			string.printf("%f", fx80_to_double(REG_FP(this)[2]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[2]));
 			break;
 
 		case M68K_FP3:
-			string.printf("%f", fx80_to_double(REG_FP(this)[3]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[3]));
 			break;
 
 		case M68K_FP4:
-			string.printf("%f", fx80_to_double(REG_FP(this)[4]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[4]));
 			break;
 
 		case M68K_FP5:
-			string.printf("%f", fx80_to_double(REG_FP(this)[5]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[5]));
 			break;
 
 		case M68K_FP6:
-			string.printf("%f", fx80_to_double(REG_FP(this)[6]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[6]));
 			break;
 
 		case M68K_FP7:
-			string.printf("%f", fx80_to_double(REG_FP(this)[7]));
+			str.printf("%f", fx80_to_double(REG_FP(this)[7]));
 			break;
 
 		case STATE_GENFLAGS:
 			sr = m68ki_get_sr(this);
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				sr & 0x8000 ? 'T':'.',
 				sr & 0x4000 ? 't':'.',
 				sr & 0x2000 ? 'S':'.',

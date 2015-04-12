@@ -1847,12 +1847,12 @@ const address_space_config *hyperstone_device::memory_space_config(address_space
 //  for the debugger
 //-------------------------------------------------
 
-void hyperstone_device::state_string_export(const device_state_entry &entry, astring &string)
+void hyperstone_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c FTE:%X FRM:%X ILC:%d FL:%d FP:%d",
+			str.printf("%c%c%c%c%c%c%c%c%c%c%c%c FTE:%X FRM:%X ILC:%d FL:%d FP:%d",
 				GET_S ? 'S':'.',
 				GET_P ? 'P':'.',
 				GET_T ? 'T':'.',

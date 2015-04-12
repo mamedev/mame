@@ -443,7 +443,7 @@ void r3000_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void r3000_device::state_string_export(const device_state_entry &entry, astring &string)
+void r3000_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{

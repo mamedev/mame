@@ -812,12 +812,12 @@ void apexc_cpu_device::state_export(const device_state_entry &entry)
 }
 
 
-void apexc_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void apexc_cpu_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c", m_running ? 'R' : 'S' );
+			str.printf("%c", m_running ? 'R' : 'S');
 			break;
 	}
 }

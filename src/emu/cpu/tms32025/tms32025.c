@@ -1799,12 +1799,12 @@ void tms32025_device::state_export(const device_state_entry &entry)
 }
 
 
-void tms32025_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms32025_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
+			str.printf("arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
 				(m_STR0 & 0xe000) >> 13,
 				m_STR0 & 0x1000 ? 'O':'.',
 				m_STR0 & 0x0800 ? 'M':'.',

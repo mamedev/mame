@@ -271,12 +271,12 @@ void hd61700_cpu_device::state_import(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void hd61700_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void hd61700_cpu_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c",
 				m_flags & FLAG_Z   ? '.' : 'Z',
 				m_flags & FLAG_C   ? 'C' : '.',
 				m_flags & FLAG_LZ  ? '.' : 'L',

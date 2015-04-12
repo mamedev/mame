@@ -79,7 +79,7 @@ private:
 	void validate_devices();
 
 	// output helpers
-	void build_output_prefix(astring &string);
+	void build_output_prefix(astring &str);
 	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
 
 	// internal driver list

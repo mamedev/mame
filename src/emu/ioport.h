@@ -830,7 +830,7 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	void frame_update(ioport_port &port, ioport_value &digital);
-	const char *key_name(astring &string, unicode_char ch);
+	const char *key_name(astring &str, unicode_char ch);
 
 	// debugging
 	astring dump();
@@ -1397,7 +1397,7 @@ public:
 	void setup_natural_keyboard(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
-	const char *input_type_to_token(astring &string, ioport_type type, int player);
+	const char *input_type_to_token(astring &str, ioport_type type, int player);
 
 private:
 	// internal helpers

@@ -807,11 +807,11 @@ void z8_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void z8_device::state_string_export(const device_state_entry &entry, astring &string)
+void z8_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
-		case STATE_GENFLAGS: string.printf("%c%c%c%c%c%c",
+		case STATE_GENFLAGS: str.printf("%c%c%c%c%c%c",
 										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_C ? 'C' : '.',
 										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_Z ? 'Z' : '.',
 										m_r[Z8_REGISTER_FLAGS] & Z8_FLAGS_S ? 'S' : '.',

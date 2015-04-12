@@ -281,12 +281,12 @@ void asap_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void asap_device::state_string_export(const device_state_entry &entry, astring &string)
+void asap_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c",
+			str.printf("%c%c%c%c%c%c",
 							m_pflag ? 'P' : '.',
 							m_iflag ? 'I' : '.',
 							((INT32)m_znflag < 0) ? 'N' : '.',

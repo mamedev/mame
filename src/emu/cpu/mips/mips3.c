@@ -661,268 +661,268 @@ void mips3_device::state_export(const device_state_entry &entry)
 }
 
 
-void mips3_device::state_string_export(const device_state_entry &entry, astring &string)
+void mips3_device::state_string_export(const device_state_entry &entry, astring &str)
 {
 	switch (entry.index())
 	{
 		case MIPS3_FPS0:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][0]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][0]);
 			break;
 
 		case MIPS3_FPD0:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][0]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][0]);
 			break;
 
 		case MIPS3_FPS1:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][1]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][1]);
 			break;
 
 		case MIPS3_FPD1:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][1]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][1]);
 			break;
 
 		case MIPS3_FPS2:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][2]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][2]);
 			break;
 
 		case MIPS3_FPD2:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][2]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][2]);
 			break;
 
 		case MIPS3_FPS3:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][3]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][3]);
 			break;
 
 		case MIPS3_FPD3:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][3]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][3]);
 			break;
 
 		case MIPS3_FPS4:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][4]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][4]);
 			break;
 
 		case MIPS3_FPD4:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][4]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][4]);
 			break;
 
 		case MIPS3_FPS5:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][5]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][5]);
 			break;
 
 		case MIPS3_FPD5:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][5]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][5]);
 			break;
 
 		case MIPS3_FPS6:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][6]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][6]);
 			break;
 
 		case MIPS3_FPD6:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][6]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][6]);
 			break;
 
 		case MIPS3_FPS7:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][7]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][7]);
 			break;
 
 		case MIPS3_FPD7:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][7]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][7]);
 			break;
 
 		case MIPS3_FPS8:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][8]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][8]);
 			break;
 
 		case MIPS3_FPD8:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][8]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][8]);
 			break;
 
 		case MIPS3_FPS9:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][9]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][9]);
 			break;
 
 		case MIPS3_FPD9:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][9]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][9]);
 			break;
 
 		case MIPS3_FPS10:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][10]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][10]);
 			break;
 
 		case MIPS3_FPD10:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][10]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][10]);
 			break;
 
 		case MIPS3_FPS11:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][11]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][11]);
 			break;
 
 		case MIPS3_FPD11:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][11]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][11]);
 			break;
 
 		case MIPS3_FPS12:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][12]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][12]);
 			break;
 
 		case MIPS3_FPD12:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][12]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][12]);
 			break;
 
 		case MIPS3_FPS13:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][13]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][13]);
 			break;
 
 		case MIPS3_FPD13:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][13]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][13]);
 			break;
 
 		case MIPS3_FPS14:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][14]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][14]);
 			break;
 
 		case MIPS3_FPD14:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][14]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][14]);
 			break;
 
 		case MIPS3_FPS15:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][15]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][15]);
 			break;
 
 		case MIPS3_FPD15:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][15]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][15]);
 			break;
 
 		case MIPS3_FPS16:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][16]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][16]);
 			break;
 
 		case MIPS3_FPD16:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][16]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][16]);
 			break;
 
 		case MIPS3_FPS17:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][17]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][17]);
 			break;
 
 		case MIPS3_FPD17:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][17]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][17]);
 			break;
 
 		case MIPS3_FPS18:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][18]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][18]);
 			break;
 
 		case MIPS3_FPD18:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][18]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][18]);
 			break;
 
 		case MIPS3_FPS19:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][19]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][19]);
 			break;
 
 		case MIPS3_FPD19:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][19]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][19]);
 			break;
 
 		case MIPS3_FPS20:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][20]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][20]);
 			break;
 
 		case MIPS3_FPD20:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][20]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][20]);
 			break;
 
 		case MIPS3_FPS21:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][21]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][21]);
 			break;
 
 		case MIPS3_FPD21:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][21]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][21]);
 			break;
 
 		case MIPS3_FPS22:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][22]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][22]);
 			break;
 
 		case MIPS3_FPD22:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][22]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][22]);
 			break;
 
 		case MIPS3_FPS23:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][23]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][23]);
 			break;
 
 		case MIPS3_FPD23:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][23]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][23]);
 			break;
 
 		case MIPS3_FPS24:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][24]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][24]);
 			break;
 
 		case MIPS3_FPD24:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][24]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][24]);
 			break;
 
 		case MIPS3_FPS25:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][25]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][25]);
 			break;
 
 		case MIPS3_FPD25:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][25]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][25]);
 			break;
 
 		case MIPS3_FPS26:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][26]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][26]);
 			break;
 
 		case MIPS3_FPD26:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][26]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][26]);
 			break;
 
 		case MIPS3_FPS27:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][27]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][27]);
 			break;
 
 		case MIPS3_FPD27:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][27]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][27]);
 			break;
 
 		case MIPS3_FPS28:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][28]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][28]);
 			break;
 
 		case MIPS3_FPD28:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][28]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][28]);
 			break;
 
 		case MIPS3_FPS29:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][29]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][29]);
 			break;
 
 		case MIPS3_FPD29:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][29]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][29]);
 			break;
 
 		case MIPS3_FPS30:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][30]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][30]);
 			break;
 
 		case MIPS3_FPD30:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][30]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][30]);
 			break;
 
 		case MIPS3_FPS31:
-			string.printf("!%16g", *(float *)&m_core->cpr[1][31]);
+			str.printf("!%16g", *(float *)&m_core->cpr[1][31]);
 			break;
 
 		case MIPS3_FPD31:
-			string.printf("!%16g", *(double *)&m_core->cpr[1][31]);
+			str.printf("!%16g", *(double *)&m_core->cpr[1][31]);
 			break;
 
 		case STATE_GENFLAGS:
-			string.printf(" ");
+			str.printf(" ");
 			break;
 	}
 }

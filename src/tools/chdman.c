@@ -822,14 +822,14 @@ static int print_help(const char *argv0, const command_description &desc, const 
 //  big_int_string - create a 64-bit string
 //-------------------------------------------------
 
-const char *big_int_string(astring &string, UINT64 intvalue)
+const char *big_int_string(astring &str, UINT64 intvalue)
 {
 	// 0 is a special case
 	if (intvalue == 0)
-		return string.cpy("0").c_str();
+		return str.cpy("0").c_str();
 
 	// loop until all chunks are done
-	string.reset();
+	str.reset();
 	bool first = true;
 	while (intvalue != 0)
 	{
@@ -840,11 +840,11 @@ const char *big_int_string(astring &string, UINT64 intvalue)
 		insert.format((intvalue != 0) ? "%03d" : "%d", chunk);
 
 		if (!first)
-			string.ins(0, ",").c_str();
+			str.ins(0, ",").c_str();
 		first = false;
-		string.ins(0, insert);
+		str.ins(0, insert);
 	}
-	return string.c_str();
+	return str.c_str();
 }
 
 
@@ -853,9 +853,9 @@ const char *big_int_string(astring &string, UINT64 intvalue)
 //  number of frames in M:S:F format
 //-------------------------------------------------
 
-const char *msf_string_from_frames(astring &string, UINT32 frames)
+const char *msf_string_from_frames(astring &str, UINT32 frames)
 {
-	return string.format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75).c_str();
+	return str.format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75).c_str();
 }
 
 
@@ -1124,12 +1124,12 @@ static void parse_numprocessors(const parameters_t &params)
 //  describing a set of compressors
 //-------------------------------------------------
 
-static const char *compression_string(astring &string, chd_codec_type compression[4])
+static const char *compression_string(astring &str, chd_codec_type compression[4])
 {
 	// output compression types
-	string.reset();
+	str.reset();
 	if (compression[0] == CHD_CODEC_NONE)
-		return string.cpy("none").c_str();
+		return str.cpy("none").c_str();
 
 	// iterate over types
 	for (int index = 0; index < 4; index++)
@@ -1138,11 +1138,11 @@ static const char *compression_string(astring &string, chd_codec_type compressio
 		if (type == CHD_CODEC_NONE)
 			break;
 		if (index != 0)
-			string.cat(", ");
-		string.cat((type >> 24) & 0xff).cat((type >> 16) & 0xff).cat((type >> 8) & 0xff).cat(type & 0xff);
-		string.cat(" (").cat(chd_codec_list::codec_name(type)).cat(")");
+			str.cat(", ");
+		str.cat((type >> 24) & 0xff).cat((type >> 16) & 0xff).cat((type >> 8) & 0xff).cat(type & 0xff);
+		str.cat(" (").cat(chd_codec_list::codec_name(type)).cat(")");
 	}
-	return string.c_str();
+	return str.c_str();
 }
 
 
