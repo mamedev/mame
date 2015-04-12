@@ -168,6 +168,7 @@ const device_type C1541 = &device_creator<c1541_device>;
 const device_type C1541C = &device_creator<c1541c_device>;
 const device_type C1541II = &device_creator<c1541ii_device>;
 const device_type SX1541 = &device_creator<sx1541_device>;
+const device_type FSD1 = &device_creator<fsd1_device>;
 const device_type FSD2 = &device_creator<fsd2_device>;
 const device_type CSD1 = &device_creator<csd1_device>;
 const device_type C1541_DOLPHIN_DOS = &device_creator<c1541_dolphin_dos_device>;
@@ -315,6 +316,26 @@ ROM_END
 const rom_entry *sx1541_device::device_rom_region() const
 {
 	return ROM_NAME( sx1541 );
+}
+
+
+//-------------------------------------------------
+//  ROM( fsd1 )
+//-------------------------------------------------
+
+ROM_START( fsd1 )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_LOAD( "fsd1.bin", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *fsd1_device::device_rom_region() const
+{
+    return ROM_NAME( fsd1 );
 }
 
 
@@ -1009,6 +1030,14 @@ c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, d
 
 sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: base_c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock, "sx1541", __FILE__) { }
+
+
+//-------------------------------------------------
+//  fsd1_device - constructor
+//-------------------------------------------------
+
+fsd1_device::fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : base_c1541_device(mconfig, FSD1, "FSD-1", tag, owner, clock, "fsd1", __FILE__) { }
 
 
 //-------------------------------------------------
