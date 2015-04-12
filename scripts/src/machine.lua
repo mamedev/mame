@@ -2637,3 +2637,16 @@ if (MACHINES["FDC37C665GT"]~=null) then
 		MAME_DIR .. "src/emu/machine/fdc37c665gt.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/emu/machine/pci9050.h,MACHINES += PCI9050
+---------------------------------------------------
+
+if (MACHINES["PCI9050"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/machine/pci9050.c",
+		MAME_DIR .. "src/emu/machine/pci9050.h",
+	}
+end
+

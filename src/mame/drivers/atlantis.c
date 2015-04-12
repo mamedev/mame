@@ -38,7 +38,7 @@
 #include "audio/dcs.h"
 #include "machine/pci.h"
 #include "machine/vrc4373.h"
-
+#include "machine/pci9050.h"
 
 class atlantis_state : public driver_device
 {
@@ -128,6 +128,7 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
+	MCFG_PCI9050_ADD(                 ":pci:0b.0")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
 
