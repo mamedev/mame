@@ -121,7 +121,7 @@ public:
 	virtual ~debug_view_source();
 
 	// getters
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 	debug_view_source *next() const { return m_next; }
 	device_t *device() const { return m_device; }
 	bool is_octal() const { return m_is_octal; }
@@ -266,7 +266,7 @@ public:
 	bool dirty() const { return m_dirty; }
 	UINT64 last_value() const { return m_result; }
 	UINT64 value() { recompute(); return m_result; }
-	const char *string() const { return m_string; }
+	const char *string() const { return m_string.c_str(); }
 	symbol_table *context() const { return m_parsed.symbols(); }
 
 	// setters

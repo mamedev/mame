@@ -234,7 +234,7 @@ chd_file *ldplayer_state::get_disc()
 
 				// try to open the CHD
 
-				if (set_disk_handle(machine(), "laserdisc", fullpath) == CHDERR_NONE)
+				if (set_disk_handle(machine(), "laserdisc", fullpath.c_str()) == CHDERR_NONE)
 				{
 					m_filename.cpy(dir->name);
 					found = TRUE;

@@ -166,7 +166,7 @@ void ui_menu_slot_devices::populate()
 				opt_name.cat(" [internal]");
 		}
 
-		item_append(slot->device().tag() + 1, opt_name, (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
+		item_append(slot->device().tag() + 1, opt_name.c_str(), (slot->fixed() || slot_get_length(slot) == 0) ? 0 : (MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW), (void *)slot);
 	}
 	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 	item_append("Reset",  NULL, 0, (void *)1);

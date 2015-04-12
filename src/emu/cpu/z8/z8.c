@@ -680,7 +680,7 @@ void z8_device::device_start()
 
 		astring tempstr;
 		for (int regnum = 0; regnum < 16; regnum++)
-			state_add(Z8_R0 + regnum, tempstr.format("R%d", regnum), m_fake_r[regnum]).callimport().callexport();
+			state_add(Z8_R0 + regnum, tempstr.format("R%d", regnum).c_str(), m_fake_r[regnum]).callimport().callexport();
 	}
 
 	/* find address spaces */

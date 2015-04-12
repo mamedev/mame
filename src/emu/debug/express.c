@@ -703,7 +703,7 @@ void parsed_expression::print_tokens(FILE *out)
 void parsed_expression::parse_string_into_tokens()
 {
 	// loop until done
-	const char *stringstart = m_original_string;
+	const char *stringstart = m_original_string.c_str();
 	const char *string = stringstart;
 	while (string[0] != 0)
 	{
@@ -876,7 +876,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	if (string[0] == '@')
 	{
 		string += 1;
-		return parse_memory_operator(token, buffer);
+		return parse_memory_operator(token, buffer.c_str());
 	}
 
 	// empty string is automatically invalid
@@ -938,7 +938,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		return parse_number(token, buffer.c_str() + 1, 16, expression_error::INVALID_NUMBER);
 
 	// check for a symbol match
-	symbol_entry *symbol = m_symtable->find_deep(buffer);
+	symbol_entry *symbol = m_symtable->find_deep(buffer.c_str());
 	if (symbol != NULL)
 	{
 		token.configure_symbol(*symbol);
@@ -953,7 +953,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	}
 
 	// attempt to parse as a number in the default base
-	parse_number(token, buffer, DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
+	parse_number(token, buffer.c_str(), DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
 }
 
 
@@ -1052,7 +1052,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 	string++;
 
 	// make the token
-	token.configure_string(m_stringlist.append(*global_alloc(expression_string(buffer))));
+	token.configure_string(m_stringlist.append(*global_alloc(expression_string(buffer.c_str()))));
 }
 
 

@@ -337,7 +337,7 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	} else {
 		m_prgspace->install_read_bank(start, end, mask, mirror, tag);
 		m_prgspace->unmap_write(start, end, mask, mirror);
-		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(tempstring, region))->base());
+		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(tempstring, region).c_str())->base());
 	}
 }
 

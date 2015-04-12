@@ -193,7 +193,7 @@ public:
 	static void static_set_filter(device_t &device, const char *filter);
 
 	// getters
-	const char *list_name() const { return m_list_name; }
+	const char *list_name() const { return m_list_name.c_str(); }
 	softlist_type list_type() const { return m_list_type; }
 	const char *filter() const { return m_filter; }
 	const char *filename() { return m_file.filename(); }
@@ -201,7 +201,7 @@ public:
 	// getters that may trigger a parse
 	const char *description() { if (!m_parsed) parse(); return m_description; }
 	bool valid() { if (!m_parsed) parse(); return m_infolist.count() > 0; }
-	const char *errors_string() { if (!m_parsed) parse(); return m_errors; }
+	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
 
 	// operations
 	software_info *find(const char *look_for, software_info *prev = NULL);

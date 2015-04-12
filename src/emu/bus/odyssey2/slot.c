@@ -51,7 +51,7 @@ void device_o2_cart_interface::rom_alloc(UINT32 size, const char *tag)
 	{
 		astring tempstring(tag);
 		tempstring.cat(O2SLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }

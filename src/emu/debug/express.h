@@ -120,7 +120,7 @@ protected:
 public:
 	// getters
 	symbol_entry *next() const { return m_next; }
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 
 	// type checking
 	bool is_function() const { return (m_type == SMT_FUNCTION); }
@@ -221,7 +221,7 @@ public:
 
 	// getters
 	bool is_empty() const { return (m_tokenlist.count() == 0); }
-	const char *original_string() const { return m_original_string; }
+	const char *original_string() const { return m_original_string.c_str(); }
 	symbol_table *symbols() const { return m_symtable; }
 
 	// setters
@@ -335,8 +335,8 @@ private:
 				m_string(string, (length == 0) ? strlen(string) : length) { }
 
 		// operators
-		operator const char *() { return m_string; }
-		operator const char *() const { return m_string; }
+		operator const char *() { return m_string.c_str(); }
+		operator const char *() const { return m_string.c_str(); }
 
 	private:
 		// internal state

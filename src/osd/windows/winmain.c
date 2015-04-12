@@ -591,7 +591,7 @@ void windows_osd_interface::init(running_machine &machine)
 	for (win_window_info *info = win_window_list; info != NULL; info = info->m_next)
 	{
 		tempstring.printf("Orientation(%s)", info->m_monitor->devicename());
-		output_set_value(tempstring, info->m_targetorient);
+		output_set_value(tempstring.c_str(), info->m_targetorient);
 	}
 
 	// hook up the debugger log
@@ -1062,7 +1062,7 @@ const char *symbol_manager::symbol_for_address(FPTR address)
 		else
 			scan_file_for_address(address, false);
 	}
-	return m_buffer;
+	return m_buffer.c_str();
 }
 
 
@@ -1116,13 +1116,13 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 
 #ifdef __GNUC__
 	// see if we have a symbol file (gcc only)
-	srcfile = fopen(m_symfile, "r");
+	srcfile = fopen(m_symfile.c_str(), "r");
 	is_symfile = (srcfile != NULL);
 #endif
 
 	// if not, see if we have a map file
 	if (srcfile == NULL)
-		srcfile = fopen(m_mapfile, "r");
+		srcfile = fopen(m_mapfile.c_str(), "r");
 
 	// if not, fail
 	if (srcfile == NULL)
@@ -1153,7 +1153,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 
 			// also create a cache entry if we can
 			if (create_cache)
-				m_cache.append(*global_alloc(cache_entry(addr, symbol)));
+				m_cache.append(*global_alloc(cache_entry(addr, symbol.c_str())));
 		}
 	}
 
@@ -1161,7 +1161,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 	fclose(srcfile);
 
 	// format the symbol and remember the last base
-	format_symbol(best_symbol, address - best_addr);
+	format_symbol(best_symbol.c_str(), address - best_addr);
 	m_last_base = best_addr;
 }
 
@@ -1188,7 +1188,7 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 		}
 
 	// format the symbol and remember the last base
-	format_symbol(best_symbol, address - best_addr);
+	format_symbol(best_symbol.c_str(), address - best_addr);
 	m_last_base = best_addr;
 }
 

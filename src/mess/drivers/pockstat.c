@@ -886,7 +886,7 @@ void pockstat_state::machine_start()
 	m_rtc_regs.timer->adjust(attotime::from_hz(1), index);
 
 	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	save_item(NAME(m_ftlb_regs.control));
 	save_item(NAME(m_ftlb_regs.stat));

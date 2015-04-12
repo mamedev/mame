@@ -103,21 +103,21 @@ bool cdrom_image_device::call_load()
 
 	if (software_entry() == NULL)
 	{
-		if (strstr(m_image_name,".chd") && is_loaded()) {
+		if (strstr(m_image_name.c_str(), ".chd") && is_loaded()) {
 			err = m_self_chd.open( *image_core_file() );    /* CDs are never writeable */
 			if ( err )
 				goto error;
 			chd = &m_self_chd;
 		}
 	} else {
-		chd  = get_disk_handle(device().machine(), device().subtag(tempstring,"cdrom"));
+		chd = get_disk_handle(device().machine(), device().subtag(tempstring, "cdrom").c_str());
 	}
 
 	/* open the CHD file */
 	if (chd) {
 		m_cdrom_handle = cdrom_open( chd );
 	} else {
-		m_cdrom_handle = cdrom_open( m_image_name );
+		m_cdrom_handle = cdrom_open(m_image_name.c_str());
 	}
 	if ( ! m_cdrom_handle )
 		goto error;

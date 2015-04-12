@@ -317,7 +317,7 @@ void beta_state::machine_start()
 	else
 	{
 		astring region_tag;
-		memcpy(m_eprom_rom, memregion(region_tag.cpy(m_eprom->tag()).cat(GENERIC_ROM_REGION_TAG))->base(), 0x800);
+		memcpy(m_eprom_rom, memregion(region_tag.cpy(m_eprom->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base(), 0x800);
 	}
 
 	// state saving

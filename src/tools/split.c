@@ -120,7 +120,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 	splitfilename.cpy(basename).cat(".split");
 
 	// create the split file
-	filerr = core_fopen(splitfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &splitfile);
+	filerr = core_fopen(splitfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &splitfile);
 	if (filerr != FILERR_NONE)
 	{
 		fprintf(stderr, "Fatal error: unable to create split file '%s'\n", splitfilename.c_str());
@@ -156,7 +156,7 @@ static int split_file(const char *filename, const char *basename, UINT32 splitsi
 		outfilename.printf("%s.%03d", basename, partnum);
 
 		// create it
-		filerr = core_fopen(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &outfile);
+		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &outfile);
 		if (filerr != FILERR_NONE)
 		{
 			printf("\n");
@@ -193,7 +193,7 @@ cleanup:
 	{
 		core_fclose(splitfile);
 		if (error != 0)
-			remove(splitfilename);
+			remove(splitfilename.c_str());
 	}
 	if (infile != NULL)
 		core_fclose(infile);
@@ -201,7 +201,7 @@ cleanup:
 	{
 		core_fclose(outfile);
 		if (error != 0)
-			remove(outfilename);
+			remove(outfilename.c_str());
 	}
 	if (splitbuffer != NULL)
 		free(splitbuffer);
@@ -268,7 +268,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 	if (write_output)
 	{
 		// don't overwrite the original!
-		filerr = core_fopen(outfilename, OPEN_FLAG_READ, &outfile);
+		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_READ, &outfile);
 		if (filerr == FILERR_NONE)
 		{
 			core_fclose(outfile);
@@ -278,7 +278,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		}
 
 		// open the output for write
-		filerr = core_fopen(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &outfile);
+		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &outfile);
 		if (filerr != FILERR_NONE)
 		{
 			fprintf(stderr, "Fatal error: unable to create file '%s'\n", outfilename.c_str());
@@ -306,7 +306,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 
 		// read the file's contents
 		infilename.ins(0, basepath);
-		filerr = core_fload(infilename, &splitbuffer, &length);
+		filerr = core_fload(infilename.c_str(), &splitbuffer, &length);
 		if (filerr != FILERR_NONE)
 		{
 			printf("\n");
@@ -364,7 +364,7 @@ cleanup:
 	{
 		core_fclose(outfile);
 		if (error != 0)
-			remove(outfilename);
+			remove(outfilename.c_str());
 	}
 	if (splitbuffer != NULL)
 		osd_free(splitbuffer);

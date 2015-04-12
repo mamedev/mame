@@ -195,7 +195,7 @@ const char *running_machine::describe_context()
 	else
 		m_context.cpy("(no context)");
 
-	return m_context;
+	return m_context.c_str();
 }
 
 TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
@@ -206,8 +206,8 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 	else if (strlen(options().autoboot_command())!=0) {
 		astring cmd = astring(options().autoboot_command());
 		cmd.replace("'","\\'");
-		astring val = astring("emu.keypost('",cmd,"')");
-		manager().lua()->load_string(val);
+		astring val = astring("emu.keypost('", cmd.c_str(), "')").c_str();
+		manager().lua()->load_string(val.c_str());
 	}
 }
 
@@ -560,12 +560,12 @@ astring running_machine::get_statename(const char *option)
 
 	// handle %d in the template (for image devices)
 	astring statename_dev("%d_");
-	int pos = statename_str.find(0, statename_dev);
+	int pos = statename_str.find(0, statename_dev.c_str());
 
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (statename_str.find(pos + 3, statename_dev) != -1)
+		if (statename_str.find(pos + 3, statename_dev.c_str()) != -1)
 			statename_str.cpy("%g");
 		// else if there is a single %d, try to create the correct snapname
 		else
@@ -610,7 +610,7 @@ astring running_machine::get_statename(const char *option)
 						astring filename(image->basename_noext());
 
 						// setup snapname and remove the %d_
-						statename_str.replace(0, devname_str, filename);
+						statename_str.replace(0, devname_str.c_str(), filename.c_str());
 						statename_str.del(pos, 3);
 						//printf("check image: %s\n", filename.c_str());
 
@@ -909,7 +909,7 @@ void running_machine::handle_saveload()
 	}
 
 	// open the file
-	filerr = file.open(m_saveload_pending_file);
+	filerr = file.open(m_saveload_pending_file.c_str());
 	if (filerr == FILERR_NONE)
 	{
 		// read/write the save state
@@ -1237,7 +1237,7 @@ void running_machine::nvram_load()
 	{
 		astring filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(filename, nvram->device())) == FILERR_NONE)
+		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
 		{
 			nvram->nvram_load(file);
 			file.close();
@@ -1259,7 +1259,7 @@ void running_machine::nvram_save()
 	{
 		astring filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(nvram_filename(filename, nvram->device())) == FILERR_NONE)
+		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
 		{
 			nvram->nvram_save(file);
 			file.close();

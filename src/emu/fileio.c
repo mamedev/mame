@@ -114,7 +114,7 @@ const osd_directory_entry *file_enumerator::next()
 				return NULL;
 
 			// open the path
-			m_curdir = osd_opendir(m_pathbuffer);
+			m_curdir = osd_opendir(m_pathbuffer.c_str());
 		}
 
 		// get the next entry from the current directory
@@ -241,13 +241,13 @@ hash_collection &emu_file::hashes(const char *types)
 	// if we have ZIP data, just hash that directly
 	if (m__7zdata.count() != 0)
 	{
-		m_hashes.compute(m__7zdata, m__7zdata.count(), needed);
+		m_hashes.compute(m__7zdata, m__7zdata.count(), needed.c_str());
 		return m_hashes;
 	}
 
 	if (m_zipdata.count() != 0)
 	{
-		m_hashes.compute(m_zipdata, m_zipdata.count(), needed);
+		m_hashes.compute(m_zipdata, m_zipdata.count(), needed.c_str());
 		return m_hashes;
 	}
 
@@ -257,7 +257,7 @@ hash_collection &emu_file::hashes(const char *types)
 		return m_hashes;
 
 	// compute the hash
-	m_hashes.compute(filedata, core_fsize(m_file), needed);
+	m_hashes.compute(filedata, core_fsize(m_file), needed.c_str());
 	return m_hashes;
 }
 
@@ -282,21 +282,21 @@ file_error emu_file::open(const char *name1, const char *name2)
 {
 	// concatenate the strings and do a standard open
 	astring name(name1, name2);
-	return open(name);
+	return open(name.c_str());
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3)
 {
 	// concatenate the strings and do a standard open
 	astring name(name1, name2, name3);
-	return open(name);
+	return open(name.c_str());
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3, const char *name4)
 {
 	// concatenate the strings and do a standard open
 	astring name(name1, name2, name3, name4);
-	return open(name);
+	return open(name.c_str());
 }
 
 file_error emu_file::open(const char *name, UINT32 crc)
@@ -315,21 +315,21 @@ file_error emu_file::open(const char *name1, const char *name2, UINT32 crc)
 {
 	// concatenate the strings and do a standard open
 	astring name(name1, name2);
-	return open(name, crc);
+	return open(name.c_str(), crc);
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3, UINT32 crc)
 {
 	// concatenate the strings and do a standard open
 	astring name(name1, name2, name3);
-	return open(name, crc);
+	return open(name.c_str(), crc);
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3, const char *name4, UINT32 crc)
 {
 	// concatenate the strings and do a standard open
 	astring name(name1, name2, name3, name4);
-	return open(name, crc);
+	return open(name.c_str(), crc);
 }
 
 
@@ -346,10 +346,10 @@ file_error emu_file::open_next()
 
 	// loop over paths
 	file_error filerr = FILERR_NOT_FOUND;
-	while (m_iterator.next(m_fullpath, m_filename))
+	while (m_iterator.next(m_fullpath, m_filename.c_str()))
 	{
 		// attempt to open the file directly
-		filerr = core_fopen(m_fullpath, m_openflags, &m_file);
+		filerr = core_fopen(m_fullpath.c_str(), m_openflags, &m_file);
 		if (filerr == FILERR_NONE)
 			break;
 
@@ -413,7 +413,7 @@ void emu_file::close()
 	m_zipdata.reset();
 
 	if (m_remove_on_close)
-		osd_rmfile(m_fullpath);
+		osd_rmfile(m_fullpath.c_str());
 	m_remove_on_close = false;
 
 	// reset our hashes and path as well
@@ -698,7 +698,7 @@ file_error emu_file::attempt_zipped()
 
 		// attempt to open the ZIP file
 		zip_file *zip;
-		zip_error ziperr = zip_file_open(m_fullpath, &zip);
+		zip_error ziperr = zip_file_open(m_fullpath.c_str(), &zip);
 
 		// chop the .zip back off the filename before continuing
 		m_fullpath.substr(0, dirsep);
@@ -833,7 +833,7 @@ file_error emu_file::attempt__7zped()
 
 		// attempt to open the _7Z file
 		_7z_file *_7z;
-		_7z_error _7zerr = _7z_file_open(m_fullpath, &_7z);
+		_7z_error _7zerr = _7z_file_open(m_fullpath.c_str(), &_7z);
 
 		// chop the ._7z back off the filename before continuing
 		m_fullpath.substr(0, dirsep);

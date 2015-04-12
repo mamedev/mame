@@ -106,7 +106,7 @@ void ui_menu_file_manager::populate()
 
 	if (m_warnings)
 	{
-		item_append(m_warnings, NULL, MENU_FLAG_DISABLE, NULL);
+		item_append(m_warnings.c_str(), NULL, MENU_FLAG_DISABLE, NULL);
 		item_append("", NULL, MENU_FLAG_DISABLE, NULL);
 	}
 
@@ -139,12 +139,12 @@ void ui_menu_file_manager::populate()
 							else
 								item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 							buffer.printf("[root%s]", dev->tag());
-							item_append(buffer, NULL, 0, NULL);
+							item_append(buffer.c_str(), NULL, 0, NULL);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
 						fill_image_line(scan, tmp_inst, tmp_name);
-						item_append(tmp_inst, tmp_name, 0, (void *) scan);
+						item_append(tmp_inst.c_str(), tmp_name.c_str(), 0, (void *)scan);
 					}
 			}
 		}

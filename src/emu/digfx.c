@@ -325,7 +325,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 			else
 				device().owner()->subtag(gfxregion, region);
 
-			UINT32 region_length = valid.region_length(gfxregion);
+			UINT32 region_length = valid.region_length(gfxregion.c_str());
 			if (region_length == 0)
 				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.c_str());
 

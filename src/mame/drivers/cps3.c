@@ -780,7 +780,7 @@ void cps3_state::init_common(void)
 	astring tempstr;
 	for (int simmnum = 0; simmnum < 7; simmnum++)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
-			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum));
+			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum).c_str());
 
 	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
 	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);

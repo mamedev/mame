@@ -32,8 +32,8 @@ public:
 	{}
 	virtual ~osd_module() { }
 
-	const char * name() const { return m_name; }
-	const char * type() const { return m_type; }
+	const char * name() const { return m_name.c_str(); }
+	const char * type() const { return m_type.c_str(); }
 
 	virtual bool probe() { return true; }
 

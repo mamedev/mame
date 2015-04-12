@@ -312,7 +312,7 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 	/* did we successfully identify the directory? */
 	if (success)
-		zippath_combine(m_working_directory, m_working_directory, subdir);
+		zippath_combine(m_working_directory, m_working_directory.c_str(), subdir);
 
 	return success;
 }
@@ -354,7 +354,7 @@ const char * device_image_interface::working_directory()
 	if (!m_working_directory)
 		setup_working_directory();
 
-	return m_working_directory;
+	return m_working_directory.c_str();
 }
 
 
@@ -499,14 +499,14 @@ UINT32 device_image_interface::crc()
 -------------------------------------------------*/
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
-	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
-	image_battery_load_by_name(device().machine().options(), fname, buffer, length, fill);
+	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext.c_str(), ".nv");
+	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, fill);
 }
 
 void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
 {
-	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
-	image_battery_load_by_name(device().machine().options(), fname, buffer, length, def_buffer);
+	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext.c_str(), ".nv");
+	image_battery_load_by_name(device().machine().options(), fname.c_str(), buffer, length, def_buffer);
 }
 
 /*-------------------------------------------------
@@ -517,9 +517,9 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 -------------------------------------------------*/
 void device_image_interface::battery_save(const void *buffer, int length)
 {
-	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext, ".nv");
+	astring fname(device().machine().system().name, PATH_SEPARATOR, m_basename_noext.c_str(), ".nv");
 
-	image_battery_save_by_name(device().machine().options(), fname, buffer, length);
+	image_battery_save_by_name(device().machine().options(), fname.c_str(), buffer, length);
 }
 
 //-------------------------------------------------
@@ -614,7 +614,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 
 	/* if successful, set the file name */
 	if (filerr == FILERR_NONE)
-		set_image_filename(revised_path);
+		set_image_filename(revised_path.c_str());
 
 	return err;
 }
@@ -668,7 +668,7 @@ int device_image_interface::reopen_for_write(const char *path)
 
 	/* if successful, set the file name */
 	if (filerr == FILERR_NONE)
-		set_image_filename(revised_path);
+		set_image_filename(revised_path.c_str());
 
 	return err;
 }
@@ -900,7 +900,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 				// if we had launched from softlist with a specified part, e.g. "shortname:part"
 				// we would have recorded the wrong name, so record it again based on software_info
 				if (m_software_info_ptr && m_full_software_name)
-					m_err = set_image_filename(m_full_software_name);
+					m_err = set_image_filename(m_full_software_name.c_str());
 
 				// check if image should be read-only
 				const char *read_only = get_feature("read_only");
@@ -1218,10 +1218,10 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	{
 		if (swlist_name == swlistdev->list_name() || !(swlist_name.len() > 0))
 		{
-			software_info *info = swlistdev->find(swinfo_name);
+			software_info *info = swlistdev->find(swinfo_name.c_str());
 			if (info != NULL)
 			{
-				software_part *part = info->find_part(swpart_name, interface);
+				software_part *part = info->find_part(swpart_name.c_str(), interface);
 				if (part != NULL)
 					return part;
 			}
@@ -1233,7 +1233,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 			// gameboy:sml) which is not handled properly by software_name_split
 			// since the function cannot distinguish between this and the case
 			// path = swinfo_name:swpart_name
-			software_info *info = swlistdev->find(swpart_name);
+			software_info *info = swlistdev->find(swpart_name.c_str());
 			if (info != NULL)
 			{
 				software_part *part = info->find_part(NULL, interface);

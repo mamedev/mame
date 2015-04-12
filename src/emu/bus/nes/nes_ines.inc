@@ -379,7 +379,7 @@ void nes_cart_slot_device::call_load_ines()
 	// use info from nes.hsi if available!
 	if (hashfile_extrainfo(*this, mapinfo))
 	{
-		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
+		if (4 == sscanf(mapinfo.c_str(),"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
 			/* image is present in nes.hsi: overwrite the header settings with these */
 			mapper = mapint1;
@@ -837,7 +837,7 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	// use info from nes.hsi if available!
 	if (hashfile_extrainfo(*this, mapinfo))
 	{
-		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
+		if (4 == sscanf(mapinfo.c_str(),"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
 			/* image is present in nes.hsi: overwrite the header settings with these */
 			mapper = mapint1;

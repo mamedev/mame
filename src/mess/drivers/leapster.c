@@ -270,7 +270,7 @@ DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
 void leapster_state::machine_start()
 {
 	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	if (m_cart_rom)
 	{

@@ -175,7 +175,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 	bool hitnonzero = false;
 	bool reset = true;
 	int width = 0;
-	for (const char *fptr = m_format; *fptr != 0; fptr++)
+	for (const char *fptr = m_format.c_str(); *fptr != 0; fptr++)
 	{
 		// reset any accumulated state
 		if (reset)
@@ -449,7 +449,7 @@ astring &device_state_interface::state_string(int index, astring &dest)
 		state_string_export(*entry, custom);
 
 	// ask the entry to format itself
-	return entry->format(dest, custom);
+	return entry->format(dest, custom.c_str());
 }
 
 

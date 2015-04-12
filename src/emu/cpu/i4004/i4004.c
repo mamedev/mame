@@ -422,12 +422,12 @@ void i4004_cpu_device::device_start()
 		astring tempstr;
 		for (int regnum = 0; regnum < 8; regnum++)
 		{
-			state_add(I4004_R01 + regnum, tempstr.format("R%X%X", regnum*2, regnum*2+1), m_R[regnum]);
+			state_add(I4004_R01 + regnum, tempstr.format("R%X%X", regnum * 2, regnum * 2 + 1).c_str(), m_R[regnum]);
 		}
 
 		for (int addrnum = 0; addrnum < 4; addrnum++)
 		{
-			state_add(I4004_ADDR1 + addrnum, tempstr.format("ADDR%d", addrnum + 1), m_ADDR[addrnum].w.l).mask(0xfff);
+			state_add(I4004_ADDR1 + addrnum, tempstr.format("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
 		}
 
 		state_add(I4004_RAM,   "RAM",   m_RAM.w.l).mask(0x0fff);

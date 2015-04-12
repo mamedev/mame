@@ -267,7 +267,7 @@ void ui_menu_bookkeeping::populate()
 	}
 
 	/* append the single item */
-	item_append(tempstring, NULL, MENU_FLAG_MULTILINE, NULL);
+	item_append(tempstring.c_str(), NULL, MENU_FLAG_MULTILINE, NULL);
 }
 
 /*-------------------------------------------------

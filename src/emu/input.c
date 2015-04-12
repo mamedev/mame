@@ -553,7 +553,7 @@ const char *joystick_map::to_string(astring &string) const
 
 		string.catprintf("\n");
 	}
-	return string;
+	return string.c_str();
 }
 
 
@@ -1468,7 +1468,7 @@ const char *input_manager::code_name(astring &string, input_code code) const
 	// if nothing there, return an empty string
 	input_device_item *item = item_from_code(code);
 	if (item == NULL)
-		return string;
+		return string.c_str();
 
 	// determine the devclass part
 	const char *devclass = (*devclass_string_table)[code.device_class()];
@@ -1510,7 +1510,7 @@ const char *input_manager::code_name(astring &string, input_code code) const
 		string.cat(" ").cat(modifier);
 
 	// delete any leading spaces
-	return string.trimspace();
+	return string.trimspace().c_str();
 }
 
 
@@ -1551,7 +1551,7 @@ const char *input_manager::code_to_token(astring &string, input_code code) const
 		string.cat("_").cat(modifier);
 	if (itemclass[0] != 0)
 		string.cat("_").cat(itemclass);
-	return string;
+	return string.c_str();
 }
 
 
@@ -1585,7 +1585,7 @@ input_code input_manager::code_from_token(const char *_token)
 
 	// second token might be index; look for number
 	int devindex = 0;
-	if (numtokens > 2 && sscanf(token[curtok], "%d", &devindex) == 1)
+	if (numtokens > 2 && sscanf(token[curtok].c_str(), "%d", &devindex) == 1)
 	{
 		curtok++;
 		devindex--;
@@ -1946,7 +1946,7 @@ const char *input_manager::seq_name(astring &string, const input_seq &seq) const
 
 	// special case: empty
 	if (clean_index == 0)
-		return string.cpy((seq.length() == 0) ? "None" : "n/a");
+		return string.cpy((seq.length() == 0) ? "None" : "n/a").c_str();
 
 	// start with an empty buffer
 	string.reset();
@@ -1969,7 +1969,7 @@ const char *input_manager::seq_name(astring &string, const input_seq &seq) const
 		else
 			string.cat(code_name(codestr, code));
 	}
-	return string;
+	return string.c_str();
 }
 
 
@@ -2004,7 +2004,7 @@ const char *input_manager::seq_to_tokens(astring &string, const input_seq &seq) 
 		else
 			string.cat(code_to_token(codestr, code));
 	}
-	return string;
+	return string.c_str();
 }
 
 

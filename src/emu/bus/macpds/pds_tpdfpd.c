@@ -89,7 +89,7 @@ macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, 
 		device_macpds_card_interface(mconfig, *this),
 		m_assembled_tag(tag, ":", SEDISPLAY_SCREEN_NAME)
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
@@ -98,7 +98,7 @@ macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, 
 		device_macpds_card_interface(mconfig, *this),
 		m_assembled_tag(tag, ":", SEDISPLAY_SCREEN_NAME)
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 //-------------------------------------------------

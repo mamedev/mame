@@ -318,7 +318,7 @@ void socrates_state::socrates_check_kb_latch(  ) // if kb[1] is full and kb[0] i
 void socrates_state::machine_reset()
 {
 	astring region_tag;
-	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
 	socrates_set_rom_bank();
@@ -897,7 +897,7 @@ WRITE8_MEMBER( iqunlim_state::video_regs_w )
 void iqunlim_state::machine_start()
 {
 	astring region_tag;
-	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_reg = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	UINT8 *bios = m_bios_reg->base();
 	UINT8 *cart = m_cart_reg ? m_cart_reg->base() : m_bios_reg->base();

@@ -239,7 +239,7 @@ namespace uml
 		code_handle *next() const { return m_next; }
 		drccodeptr codeptr() const { return *m_code; }
 		drccodeptr *codeptr_addr() { return m_code; }
-		const char *string() const { return m_string; }
+		const char *string() const { return m_string.c_str(); }
 
 		// setters
 		void set_codeptr(drccodeptr code);

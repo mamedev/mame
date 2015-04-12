@@ -68,7 +68,7 @@ nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, co
 		device_nubus_card_interface(mconfig, *this),
 		m_assembled_tag(tag, ":", XCEEDMC30_SCREEN_NAME)
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
@@ -77,7 +77,7 @@ nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, de
 		device_nubus_card_interface(mconfig, *this),
 		m_assembled_tag(tag, ":", XCEEDMC30_SCREEN_NAME)
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 //-------------------------------------------------

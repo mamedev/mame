@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
 
 	/* read the template file into an astring */
 	astring tempheader;
-	if (core_fload(tempfilename, &buffer, &bufsize) == FILERR_NONE)
+	if (core_fload(tempfilename.c_str(), &buffer, &bufsize) == FILERR_NONE)
 	{
 		tempheader.cpy((const char *)buffer, bufsize);
 		osd_free(buffer);
@@ -565,12 +565,12 @@ static core_file *create_file_and_output_header(astring &filename, astring &temp
 	core_file *file;
 
 	/* create the indexfile */
-	if (core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
+	if (core_fopen(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
 		return NULL;
 
 	/* print a header */
 	astring modified(templatefile);
-	modified.replace("<!--TITLE-->", title);
+	modified.replace("<!--TITLE-->", title.c_str());
 	core_fwrite(file, modified.c_str(), modified.len());
 
 	/* return the file */
@@ -586,7 +586,7 @@ static core_file *create_file_and_output_header(astring &filename, astring &temp
 static void output_footer_and_close_file(core_file *file, astring &templatefile, astring &title)
 {
 	astring modified(templatefile);
-	modified.replace(0, "<!--TITLE-->", title);
+	modified.replace(0, "<!--TITLE-->", title.c_str());
 	core_fwrite(file, modified.c_str(), modified.len());
 	core_fclose(file);
 }
@@ -735,7 +735,7 @@ static int compare_screenshots(summary_file *curfile)
 			fullname.printf("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", lists[listnum].dir, curfile->name);
 
 			/* open the file */
-			filerr = core_fopen(fullname, OPEN_FLAG_READ, &file);
+			filerr = core_fopen(fullname.c_str(), OPEN_FLAG_READ, &file);
 
 			/* if that failed, look in the old location */
 			if (filerr != FILERR_NONE)
@@ -744,7 +744,7 @@ static int compare_screenshots(summary_file *curfile)
 				fullname.printf("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
 
 				/* open the file */
-				filerr = core_fopen(fullname, OPEN_FLAG_READ, &file);
+				filerr = core_fopen(fullname.c_str(), OPEN_FLAG_READ, &file);
 			}
 
 			/* if that worked, load the file */
@@ -853,7 +853,7 @@ static int generate_png_diff(const summary_file *curfile, astring &destdir, cons
 			tempname.printf("%s" PATH_SEPARATOR "%s", lists[listnum].dir, srcimgname.c_str());
 
 			/* open the source image */
-			filerr = core_fopen(tempname, OPEN_FLAG_READ, &file);
+			filerr = core_fopen(tempname.c_str(), OPEN_FLAG_READ, &file);
 			if (filerr != FILERR_NONE)
 				goto error;
 
@@ -925,7 +925,7 @@ static int generate_png_diff(const summary_file *curfile, astring &destdir, cons
 	}
 
 	/* write the final PNG */
-	filerr = core_fopen(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	filerr = core_fopen(dstfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 		goto error;
 	pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
@@ -938,7 +938,7 @@ static int generate_png_diff(const summary_file *curfile, astring &destdir, cons
 
 error:
 	if (error)
-		osd_rmfile(dstfilename);
+		osd_rmfile(dstfilename.c_str());
 	return error;
 }
 

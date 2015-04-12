@@ -275,8 +275,8 @@ void emu_options::update_slot_options()
 			slot->get_default_card_software(defvalue);
 			if (defvalue.len() > 0)
 			{
-				set_default_value(name, defvalue);
-				const device_slot_option *option = slot->option(defvalue);
+				set_default_value(name, defvalue.c_str());
+				const device_slot_option *option = slot->option(defvalue.c_str());
 				set_flag(name, ~OPTION_FLAG_INTERNAL, (option != NULL && !option->selectable()) ? OPTION_FLAG_INTERNAL : 0);
 			}
 		}
@@ -317,7 +317,7 @@ void emu_options::add_device_options(bool isfirstpass)
 
 		// add the option
 		if (!exists(image->instance_name()))
-			add_entry(option_name, NULL, OPTION_STRING | OPTION_FLAG_DEVICE, NULL, true);
+			add_entry(option_name.c_str(), NULL, OPTION_STRING | OPTION_FLAG_DEVICE, NULL, true);
 	}
 }
 
@@ -444,10 +444,10 @@ void emu_options::parse_standard_inis(astring &error_string)
 	// next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini
 	astring sourcename;
 	core_filename_extract_base(sourcename, cursystem->source_file, true).ins(0, "source" PATH_SEPARATOR);
-	if (!parse_one_ini(sourcename, OPTION_PRIORITY_SOURCE_INI, &error_string))
+	if (!parse_one_ini(sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string))
 	{
 		core_filename_extract_base(sourcename, cursystem->source_file, true);
-		parse_one_ini(sourcename, OPTION_PRIORITY_SOURCE_INI, &error_string);
+		parse_one_ini(sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_string);
 	}
 
 	// then parse the grandparent, parent, and system-specific INIs
@@ -472,7 +472,7 @@ void emu_options::parse_standard_inis(astring &error_string)
 const game_driver *emu_options::system() const
 {
 	astring tempstr;
-	int index = driver_list::find(core_filename_extract_base(tempstr, system_name(), true));
+	int index = driver_list::find(core_filename_extract_base(tempstr, system_name(), true).c_str());
 	return (index != -1) ? &driver_list::driver(index) : NULL;
 }
 
@@ -551,7 +551,7 @@ const char *emu_options::sub_value(astring &buffer, const char *name, const char
 {
 	astring tmp(",", subname, "=");
 	buffer = value(name);
-	int pos = buffer.find(0, tmp);
+	int pos = buffer.find(0, tmp.c_str());
 	if (pos != -1)
 	{
 		int endpos = buffer.chr(pos + 1, ',');

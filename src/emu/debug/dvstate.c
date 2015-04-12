@@ -79,7 +79,7 @@ void debug_view_state::enumerate_sources()
 	for (device_state_interface *state = iter.first(); state != NULL; state = iter.next())
 	{
 		name.printf("%s '%s'", state->device().name(), state->device().tag());
-		m_source_list.append(*global_alloc(debug_view_state_source(name, state->device())));
+		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state->device())));
 	}
 
 	// reset the source to a known good entry

@@ -93,8 +93,8 @@ public:
 	operator core_file *();
 	operator core_file &();
 	bool is_open() const { return (m_file != NULL); }
-	const char *filename() const { return m_filename; }
-	const char *fullpath() const { return m_fullpath; }
+	const char *filename() const { return m_filename.c_str(); }
+	const char *fullpath() const { return m_fullpath.c_str(); }
 	UINT32 openflags() const { return m_openflags; }
 	hash_collection &hashes(const char *types);
 	bool restrict_to_mediapath() { return m_restrict_to_mediapath; }

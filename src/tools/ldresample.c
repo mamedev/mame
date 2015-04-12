@@ -177,7 +177,7 @@ static chd_error open_chd(chd_file &file, const char *filename, movie_info &info
 
 	// extract the info
 	int fps, fpsfrac, width, height, interlaced, channels, rate;
-	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
+	if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 	{
 		fprintf(stderr, "Improperly formatted metadata\n");
 		return CHDERR_INVALID_DATA;

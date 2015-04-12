@@ -2118,7 +2118,7 @@ void gba_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
 
 		astring region_tag;
-		memory_region *cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GBASLOT_ROM_REGION_TAG));
+		memory_region *cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GBASLOT_ROM_REGION_TAG).c_str());
 
 		// install ROM accesses
 		membank("rom1")->set_base(cart_rom->base());

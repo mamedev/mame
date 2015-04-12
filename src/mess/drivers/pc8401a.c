@@ -489,7 +489,7 @@ INPUT_PORTS_END
 void pc8401a_state::machine_start()
 {
 	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);

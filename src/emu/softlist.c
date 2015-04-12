@@ -156,7 +156,7 @@ bool software_part::is_compatible(const software_list_device &swlistdev) const
 	for (int start = 0, end = filt.chr(start, ','); end != -1; start = end + 1, end = filt.chr(start, ','))
 	{
 		astring token(filt, start, end - start + 1);
-		if (comp.find(0, token) != -1)
+		if (comp.find(0, token.c_str()) != -1)
 			return true;
 	}
 	return false;
@@ -179,7 +179,7 @@ bool software_part::matches_interface(const char *interface_list) const
 
 	// then add a comma to the end of our interface and return true if we find it in the list string
 	astring our_interface(m_interface, ",");
-	return (interfaces.find(0, our_interface) != -1);
+	return (interfaces.find(0, our_interface.c_str()) != -1);
 }
 
 
@@ -476,7 +476,7 @@ void software_list_device::parse()
 	m_errors.reset();
 
 	// attempt to open the file
-	file_error filerr = m_file.open(m_list_name, ".xml");
+	file_error filerr = m_file.open(m_list_name.c_str(), ".xml");
 	if (filerr == FILERR_NONE)
 	{
 		// parse if no error
@@ -500,7 +500,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 {
 	// add to the global map whenever we check a list so we don't re-check
 	// it in the future
-	if (valid.already_checked(astring("softlist/", m_list_name.c_str())))
+	if (valid.already_checked(astring("softlist/", m_list_name.c_str()).c_str()))
 		return;
 
 	// do device validation only in case of validate command
@@ -1172,7 +1172,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				else if (loadflag != NULL && strcmp(loadflag, "load32_byte") == 0)
 					romflags = ROM_SKIP(3);
 
-				add_rom_entry(name, hashdata, offset, length, ROMENTRYTYPE_ROM | romflags);
+				add_rom_entry(name, hashdata.c_str(), offset, length, ROMENTRYTYPE_ROM | romflags);
 			}
 			else
 				parse_error("Rom name missing");
@@ -1200,7 +1200,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			astring hashdata;
 			hashdata.printf( "%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
 
-			add_rom_entry(name, hashdata, 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
+			add_rom_entry(name, hashdata.c_str(), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}
 		else if (status == NULL || !strcmp(status, "nodump")) // a no_dump chd is not an incomplete entry
 			parse_error("Incomplete disk definition");
@@ -1225,15 +1225,15 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 	// <description>
 	if (strcmp(tagname, "description") == 0)
-		m_current_info->m_longname = m_list.add_string(m_data_accum);
+		m_current_info->m_longname = m_list.add_string(m_data_accum.c_str());
 
 	// <year>
 	else if (strcmp(tagname, "year") == 0)
-		m_current_info->m_year = m_list.add_string(m_data_accum);
+		m_current_info->m_year = m_list.add_string(m_data_accum.c_str());
 
 	// <publisher>
 	else if (strcmp(tagname, "publisher") == 0)
-		m_current_info->m_publisher = m_list.add_string(m_data_accum);
+		m_current_info->m_publisher = m_list.add_string(m_data_accum.c_str());
 
 	// </part>
 	else if (strcmp(tagname, "part") == 0)

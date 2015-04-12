@@ -80,10 +80,10 @@ public:
 			m_optspec(optspec)  { }
 
 	image_device_format *next() const { return m_next; }
-	const char *name() const { return m_name; }
-	const char *description() const { return m_description; }
-	const char *extensions() const { return m_extensions; }
-	const char *optspec() const { return m_optspec; }
+	const char *name() const { return m_name.c_str(); }
+	const char *description() const { return m_description.c_str(); }
+	const char *extensions() const { return m_extensions.c_str(); }
+	const char *optspec() const { return m_optspec.c_str(); }
 
 private:
 	image_device_format *m_next;
@@ -171,10 +171,10 @@ public:
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
 	bool exists() { return m_image_name; }
-	const char *filename() { if (!m_image_name) return NULL; else return m_image_name; }
-	const char *basename() { if (!m_basename) return NULL; else return m_basename; }
-	const char *basename_noext()  { if (!m_basename_noext) return NULL; else return m_basename_noext; }
-	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype; }
+	const char *filename() { if (!m_image_name) return NULL; else return m_image_name.c_str(); }
+	const char *basename() { if (!m_basename) return NULL; else return m_basename.c_str(); }
+	const char *basename_noext()  { if (!m_basename_noext) return NULL; else return m_basename_noext.c_str(); }
+	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype.c_str(); }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
 	bool is_readonly() { return m_readonly; }
@@ -193,14 +193,14 @@ public:
 	// configuration access
 	void set_init_phase() { m_init_phase = TRUE; }
 
-	const char* longname() { return m_longname; }
-	const char* manufacturer() { return m_manufacturer; }
-	const char* year() { return m_year; }
+	const char* longname() { return m_longname.c_str(); }
+	const char* manufacturer() { return m_manufacturer.c_str(); }
+	const char* year() { return m_year.c_str(); }
 	UINT32 supported() { return m_supported; }
 
 	const software_info *software_entry() { return m_software_info_ptr; }
 	const software_part *part_entry() { return m_software_part_ptr; }
-	const char *software_list_name() { return m_software_list_name; }
+	const char *software_list_name() { return m_software_list_name.c_str(); }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const char * working_directory();
@@ -221,8 +221,8 @@ public:
 
 
 
-	const char *instance_name() const { return m_instance_name; }
-	const char *brief_instance_name() const { return m_brief_instance_name; }
+	const char *instance_name() const { return m_instance_name.c_str(); }
+	const char *brief_instance_name() const { return m_brief_instance_name.c_str(); }
 	bool uses_file_extension(const char *file_extension) const;
 	image_device_format *formatlist() const { return m_formatlist.first(); }
 

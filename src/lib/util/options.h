@@ -77,10 +77,10 @@ public:
 		entry *next() const { return m_next; }
 		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && m_name[index]) ? m_name[index].c_str() : NULL; }
 		const char *description() const { return m_description; }
-		const char *value() const { return m_data; }
-		const char *default_value() const { return m_defdata; }
-		const char *minimum() const { return m_minimum; }
-		const char *maximum() const { return m_maximum; }
+		const char *value() const { return m_data.c_str(); }
+		const char *default_value() const { return m_defdata.c_str(); }
+		const char *minimum() const { return m_minimum.c_str(); }
+		const char *maximum() const { return m_maximum.c_str(); }
 		UINT32 seqid() const { return m_seqid; }
 		int type() const { return (m_flags & OPTION_TYPE_MASK); }
 		UINT32 flags() const { return m_flags; }
@@ -127,7 +127,7 @@ public:
 
 	// getters
 	entry *first() const { return m_entrylist.first(); }
-	const char *command() const { return m_command; }
+	const char *command() const { return m_command.c_str(); }
 
 	// configuration
 	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = NULL, bool override_existing = false);

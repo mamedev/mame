@@ -84,7 +84,7 @@ const char *sha1_t::as_string(astring &buffer) const
 	buffer.reset();
 	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
 		buffer.catformat("%02x", m_raw[i]);
-	return buffer;
+	return buffer.c_str();
 }
 
 
@@ -127,7 +127,7 @@ const char *md5_t::as_string(astring &buffer) const
 	buffer.reset();
 	for (int i = 0; i < ARRAY_LENGTH(m_raw); i++)
 		buffer.catformat("%02x", m_raw[i]);
-	return buffer;
+	return buffer.c_str();
 }
 
 
@@ -168,7 +168,7 @@ bool crc32_t::from_string(const char *string, int length)
 
 const char *crc32_t::as_string(astring &buffer) const
 {
-	return buffer.format("%08x", m_raw);
+	return buffer.format("%08x", m_raw).c_str();
 }
 
 
@@ -220,7 +220,7 @@ bool crc16_t::from_string(const char *string, int length)
 
 const char *crc16_t::as_string(astring &buffer) const
 {
-	return buffer.format("%04x", m_raw);
+	return buffer.format("%04x", m_raw).c_str();
 }
 
 

@@ -484,7 +484,7 @@ static void dview_draw_title(DView *dv)
 	if (!dv->title)
 		return;
 
-	for (i=0; i<strlen(dv->title); i++)
+	for (i = 0; i<strlen(dv->title.c_str()); i++)
 	{
 		dview_draw_char(dv, RECT_DVIEW_TITLE, i * debug_font_width + BORDER_XTHICKNESS,
 				BORDER_YTHICKNESS, debug_font_height, //r.max_y - 2 * BORDER_YTHICKNESS,
@@ -1113,7 +1113,7 @@ static void render_editor(DView_edit *editor)
 
 	editor->container->empty();
 	/* get the size of the text */
-	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, 0.5);
@@ -1134,7 +1134,7 @@ static void render_editor(DView_edit *editor)
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 }
@@ -1180,7 +1180,7 @@ static void CreateMainMenu(running_machine &machine)
 		break;
 	}
 
-	menu->item_append(title.cat(focus_view->title), NULL, MENU_FLAG_DISABLE, NULL);
+	menu->item_append(title.cat(focus_view->title).c_str(), NULL, MENU_FLAG_DISABLE, NULL);
 	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	switch (focus_view->type)
@@ -1322,7 +1322,7 @@ static void handle_editor(running_machine &machine)
 			render_editor(cur_editor);
 			if (ui_input_pressed(machine, IPT_UI_SELECT))
 			{
-				process_string(focus_view, focus_view->editor.str);
+				process_string(focus_view, focus_view->editor.str.c_str());
 				focus_view->editor.str = "";
 				cur_editor = NULL;
 			}

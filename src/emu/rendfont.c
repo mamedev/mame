@@ -392,7 +392,7 @@ bool render_font::load_cached_bdf(const char *filename)
 	// attempt to open the cached version of the font
 	{
 		emu_file cachefile(manager().machine().options().font_path(), OPEN_FLAG_READ);
-		filerr = cachefile.open(cachedname);
+		filerr = cachefile.open(cachedname.c_str());
 		if (filerr == FILERR_NONE)
 		{
 			// if we have a cached version, load it
@@ -427,7 +427,7 @@ bool render_font::load_cached_bdf(const char *filename)
 
 	// if we loaded okay, create a cached one
 	if (result)
-		save_cached(cachedname, hash);
+		save_cached(cachedname.c_str(), hash);
 
 	// close the file
 	return result;

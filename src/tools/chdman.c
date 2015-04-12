@@ -325,7 +325,7 @@ public:
 					if (m_file != NULL)
 						core_fclose(m_file);
 					m_lastfile = m_info.track[tracknum].fname;
-					file_error filerr = core_fopen(m_lastfile, OPEN_FLAG_READ, &m_file);
+					file_error filerr = core_fopen(m_lastfile.c_str(), OPEN_FLAG_READ, &m_file);
 					if (filerr != FILERR_NONE)
 						report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
 				}
@@ -826,7 +826,7 @@ const char *big_int_string(astring &string, UINT64 intvalue)
 {
 	// 0 is a special case
 	if (intvalue == 0)
-		return string.cpy("0");
+		return string.cpy("0").c_str();
 
 	// loop until all chunks are done
 	string.reset();
@@ -840,11 +840,11 @@ const char *big_int_string(astring &string, UINT64 intvalue)
 		insert.format((intvalue != 0) ? "%03d" : "%d", chunk);
 
 		if (!first)
-			string.ins(0, ",");
+			string.ins(0, ",").c_str();
 		first = false;
 		string.ins(0, insert);
 	}
-	return string;
+	return string.c_str();
 }
 
 
@@ -855,7 +855,7 @@ const char *big_int_string(astring &string, UINT64 intvalue)
 
 const char *msf_string_from_frames(astring &string, UINT32 frames)
 {
-	return string.format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
+	return string.format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75).c_str();
 }
 
 
@@ -899,7 +899,7 @@ UINT64 parse_number(const char *string)
 static void guess_chs(astring *filename, UINT64 filesize, int sectorsize, UINT32 &cylinders, UINT32 &heads, UINT32 &sectors, UINT32 &bps)
 {
 	// if this is a direct physical drive read, handle it specially
-	if (filename != NULL && osd_get_physical_drive_geometry(*filename, &cylinders, &heads, &sectors, &bps))
+	if (filename != NULL && osd_get_physical_drive_geometry(filename->c_str(), &cylinders, &heads, &sectors, &bps))
 		return;
 
 	// if we have no length to work with, we can't guess
@@ -938,7 +938,7 @@ static void parse_input_chd_parameters(const parameters_t &params, chd_file &inp
 	astring *input_chd_parent_str = params.find(OPTION_INPUT_PARENT);
 	if (input_chd_parent_str != NULL)
 	{
-		chd_error err = input_parent_chd.open(*input_chd_parent_str);
+		chd_error err = input_parent_chd.open(input_chd_parent_str->c_str());
 		if (err != CHDERR_NONE)
 			report_error(1, "Error opening parent CHD file (%s): %s", input_chd_parent_str->c_str(), chd_file::error_string(err));
 	}
@@ -947,7 +947,7 @@ static void parse_input_chd_parameters(const parameters_t &params, chd_file &inp
 	astring *input_chd_str = params.find(OPTION_INPUT);
 	if (input_chd_str != NULL)
 	{
-		chd_error err = input_chd.open(*input_chd_str, writeable, input_parent_chd.opened() ? &input_parent_chd : NULL);
+		chd_error err = input_chd.open(input_chd_str->c_str(), writeable, input_parent_chd.opened() ? &input_parent_chd : NULL);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error opening CHD file (%s): %s", input_chd_str->c_str(), chd_file::error_string(err));
 	}
@@ -970,11 +970,11 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 	astring *input_start_hunk_str = params.find(OPTION_INPUT_START_HUNK);
 	astring *input_start_frame_str = params.find(OPTION_INPUT_START_FRAME);
 	if (input_start_byte_str != NULL)
-		input_start = parse_number(*input_start_byte_str);
+		input_start = parse_number(input_start_byte_str->c_str());
 	if (input_start_hunk_str != NULL)
-		input_start = parse_number(*input_start_hunk_str) * hunkbytes;
+		input_start = parse_number(input_start_hunk_str->c_str()) * hunkbytes;
 	if (input_start_frame_str != NULL)
-		input_start = parse_number(*input_start_frame_str) * framebytes;
+		input_start = parse_number(input_start_frame_str->c_str()) * framebytes;
 	if (input_start >= input_end)
 		report_error(1, "Input start offset greater than input file size");
 
@@ -984,11 +984,11 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 	astring *input_length_frames_str = params.find(OPTION_INPUT_LENGTH_FRAMES);
 	UINT64 input_length = input_end;
 	if (input_length_bytes_str != NULL)
-		input_length = parse_number(*input_length_bytes_str);
+		input_length = parse_number(input_length_bytes_str->c_str());
 	if (input_length_hunks_str != NULL)
-		input_length = parse_number(*input_length_hunks_str) * hunkbytes;
+		input_length = parse_number(input_length_hunks_str->c_str()) * hunkbytes;
 	if (input_length_frames_str != NULL)
-		input_length = parse_number(*input_length_frames_str) * framebytes;
+		input_length = parse_number(input_length_frames_str->c_str()) * framebytes;
 	if (input_start + input_length < input_end)
 		input_end = input_start + input_length;
 }
@@ -1026,7 +1026,7 @@ static astring *parse_output_chd_parameters(const parameters_t &params, chd_file
 	astring *output_chd_parent_str = params.find(OPTION_OUTPUT_PARENT);
 	if (output_chd_parent_str != NULL)
 	{
-		chd_error err = output_parent_chd.open(*output_chd_parent_str);
+		chd_error err = output_parent_chd.open(output_chd_parent_str->c_str());
 		if (err != CHDERR_NONE)
 			report_error(1, "Error opening parent CHD file (%s): %s", output_chd_parent_str->c_str(), chd_file::error_string(err));
 	}
@@ -1034,7 +1034,7 @@ static astring *parse_output_chd_parameters(const parameters_t &params, chd_file
 	// process output file
 	astring *output_chd_str = params.find(OPTION_OUTPUT);
 	if (output_chd_str != NULL)
-		check_existing_output_file(params, *output_chd_str);
+		check_existing_output_file(params, output_chd_str->c_str());
 	return output_chd_str;
 }
 
@@ -1049,7 +1049,7 @@ static void parse_hunk_size(const parameters_t &params, UINT32 required_granular
 	astring *hunk_size_str = params.find(OPTION_HUNK_SIZE);
 	if (hunk_size_str != NULL)
 	{
-		hunk_size = parse_number(*hunk_size_str);
+		hunk_size = parse_number(hunk_size_str->c_str());
 		if (hunk_size < 16 || hunk_size > 1024 * 1024)
 			report_error(1, "Invalid hunk size");
 		if (hunk_size % required_granularity != 0)
@@ -1110,7 +1110,7 @@ static void parse_numprocessors(const parameters_t &params)
 	if (numprocessors_str == NULL)
 		return;
 
-	int count = atoi(*numprocessors_str);
+	int count = atoi(numprocessors_str->c_str());
 	if (count > 0)
 	{
 		extern int osd_num_processors;
@@ -1129,7 +1129,7 @@ static const char *compression_string(astring &string, chd_codec_type compressio
 	// output compression types
 	string.reset();
 	if (compression[0] == CHD_CODEC_NONE)
-		return string.cpy("none");
+		return string.cpy("none").c_str();
 
 	// iterate over types
 	for (int index = 0; index < 4; index++)
@@ -1142,7 +1142,7 @@ static const char *compression_string(astring &string, chd_codec_type compressio
 		string.cat((type >> 24) & 0xff).cat((type >> 16) & 0xff).cat((type >> 8) & 0xff).cat(type & 0xff);
 		string.cat(" (").cat(chd_codec_list::codec_name(type)).cat(")");
 	}
-	return string;
+	return string.c_str();
 }
 
 
@@ -1566,7 +1566,7 @@ static void do_create_raw(parameters_t &params)
 	astring *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
-		file_error filerr = core_fopen(*input_file_str, OPEN_FLAG_READ, &input_file);
+		file_error filerr = core_fopen(input_file_str->c_str(), OPEN_FLAG_READ, &input_file);
 		if (filerr != FILERR_NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->c_str());
 	}
@@ -1584,7 +1584,7 @@ static void do_create_raw(parameters_t &params)
 	astring *unit_size_str = params.find(OPTION_UNIT_SIZE);
 	if (unit_size_str != NULL)
 	{
-		unit_size = parse_number(*unit_size_str);
+		unit_size = parse_number(unit_size_str->c_str());
 		if (hunk_size % unit_size != 0)
 			report_error(1, "Unit size is not an even divisor of the hunk size");
 	}
@@ -1625,9 +1625,9 @@ static void do_create_raw(parameters_t &params)
 		chd = new chd_rawfile_compressor(input_file, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, compression, output_parent);
 		else
-			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, unit_size, compression);
+			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, unit_size, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
@@ -1645,7 +1645,7 @@ static void do_create_raw(parameters_t &params)
 		// delete the output file
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
-			osd_rmfile(*output_chd_str);
+			osd_rmfile(output_chd_str->c_str());
 		throw;
 	}
 }
@@ -1663,7 +1663,7 @@ static void do_create_hd(parameters_t &params)
 	astring *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
-		file_error filerr = core_fopen(*input_file_str, OPEN_FLAG_READ, &input_file);
+		file_error filerr = core_fopen(input_file_str->c_str(), OPEN_FLAG_READ, &input_file);
 		if (filerr != FILERR_NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->c_str());
 	}
@@ -1679,7 +1679,7 @@ static void do_create_hd(parameters_t &params)
 	{
 		if (output_parent.opened())
 			report_error(1, "Sector size does not apply when creating a diff from the parent");
-		sector_size = parse_number(*sectorsize_str);
+		sector_size = parse_number(sectorsize_str->c_str());
 	}
 
 	// process hunk size (needs to know sector_size)
@@ -1700,7 +1700,7 @@ static void do_create_hd(parameters_t &params)
 		astring *size_str = params.find(OPTION_SIZE);
 		if (size_str != NULL)
 		{
-			if (sscanf(*size_str, "%" I64FMT"d", &filesize) != 1)
+			if (sscanf(size_str->c_str(), "%" I64FMT"d", &filesize) != 1)
 				report_error(1, "Invalid size string");
 		}
 	}
@@ -1726,7 +1726,7 @@ static void do_create_hd(parameters_t &params)
 	{
 		if (output_parent.opened())
 			report_error(1, "CHS does not apply when creating a diff from the parent");
-		if (sscanf(*chs_str, "%d,%d,%d", &cylinders, &heads, &sectors) != 3)
+		if (sscanf(chs_str->c_str(), "%d,%d,%d", &cylinders, &heads, &sectors) != 3)
 			report_error(1, "Invalid CHS string; must be of the form <cylinders>,<heads>,<sectors>");
 	}
 
@@ -1738,7 +1738,7 @@ static void do_create_hd(parameters_t &params)
 	if (ident_str != NULL)
 	{
 		// load the file
-		file_error filerr = core_fload(*ident_str, identdata);
+		file_error filerr = core_fload(ident_str->c_str(), identdata);
 		if (filerr != FILERR_NONE)
 			report_error(1, "Error reading ident file (%s)", ident_str->c_str());
 
@@ -1756,7 +1756,7 @@ static void do_create_hd(parameters_t &params)
 		astring metadata;
 		if (output_parent.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) != CHDERR_NONE)
 			report_error(1, "Unable to find hard disk metadata in parent CHD");
-		if (sscanf(metadata, HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
+		if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
 			report_error(1, "Error parsing hard disk metadata in parent CHD");
 	}
 
@@ -1803,9 +1803,9 @@ static void do_create_hd(parameters_t &params)
 		chd = new chd_rawfile_compressor(input_file, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(*output_chd_str, UINT64(totalsectors) * UINT64(sector_size), hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(sector_size), hunk_size, compression, output_parent);
 		else
-			err = chd->create(*output_chd_str, UINT64(totalsectors) * UINT64(sector_size), hunk_size, sector_size, compression);
+			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(sector_size), hunk_size, sector_size, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
@@ -1835,7 +1835,7 @@ static void do_create_hd(parameters_t &params)
 		// delete the output file
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
-			osd_rmfile(*output_chd_str);
+			osd_rmfile(output_chd_str->c_str());
 		throw;
 	}
 }
@@ -1854,7 +1854,7 @@ static void do_create_cd(parameters_t &params)
 	astring *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
-		chd_error err = chdcd_parse_toc(*input_file_str, toc, track_info);
+		chd_error err = chdcd_parse_toc(input_file_str->c_str(), toc, track_info);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error parsing input file (%s: %s)\n", input_file_str->c_str(), chd_file::error_string(err));
 	}
@@ -1906,9 +1906,9 @@ static void do_create_cd(parameters_t &params)
 		chd = new chd_cd_compressor(toc, track_info);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(*output_chd_str, UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, compression, output_parent);
 		else
-			err = chd->create(*output_chd_str, UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, CD_FRAME_SIZE, compression);
+			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, CD_FRAME_SIZE, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
@@ -1927,7 +1927,7 @@ static void do_create_cd(parameters_t &params)
 		// delete the output file
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
-			osd_rmfile(*output_chd_str);
+			osd_rmfile(output_chd_str->c_str());
 		throw;
 	}
 }
@@ -1945,7 +1945,7 @@ static void do_create_ld(parameters_t &params)
 	astring *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
-		avi_error avierr = avi_open(*input_file_str, &input_file);
+		avi_error avierr = avi_open(input_file_str->c_str(), &input_file);
 		if (avierr != AVIERR_NONE)
 			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->c_str(), avi_error_string(avierr));
 	}
@@ -2024,9 +2024,9 @@ static void do_create_ld(parameters_t &params)
 		chd = new chd_avi_compressor(*input_file, info, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(*output_chd_str, UINT64(input_end - input_start) * hunk_size, hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), UINT64(input_end - input_start) * hunk_size, hunk_size, compression, output_parent);
 		else
-			err = chd->create(*output_chd_str, UINT64(input_end - input_start) * hunk_size, hunk_size, info.bytes_per_frame, compression);
+			err = chd->create(output_chd_str->c_str(), UINT64(input_end - input_start) * hunk_size, hunk_size, info.bytes_per_frame, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
@@ -2055,7 +2055,7 @@ static void do_create_ld(parameters_t &params)
 		// delete the output file
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
-			osd_rmfile(*output_chd_str);
+			osd_rmfile(output_chd_str->c_str());
 		throw;
 	}
 }
@@ -2133,9 +2133,9 @@ static void do_copy(parameters_t &params)
 		chd = new chd_chdfile_compressor(input_chd, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, compression, output_parent);
 		else
-			err = chd->create(*output_chd_str, input_end - input_start, hunk_size, input_chd.unit_bytes(), compression);
+			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, input_chd.unit_bytes(), compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
@@ -2191,7 +2191,7 @@ static void do_copy(parameters_t &params)
 		// delete the output file
 		astring *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
-			osd_rmfile(*output_chd_str);
+			osd_rmfile(output_chd_str->c_str());
 		throw;
 	}
 }
@@ -2217,7 +2217,7 @@ static void do_extract_raw(parameters_t &params)
 	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
-		check_existing_output_file(params, *output_file_str);
+		check_existing_output_file(params, output_file_str->c_str());
 
 	// print some info
 	astring tempstr;
@@ -2234,7 +2234,7 @@ static void do_extract_raw(parameters_t &params)
 	try
 	{
 		// process output file
-		file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
+		file_error filerr = core_fopen(output_file_str->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
 		if (filerr != FILERR_NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->c_str());
 
@@ -2269,7 +2269,7 @@ static void do_extract_raw(parameters_t &params)
 		if (output_file != NULL)
 		{
 			core_fclose(output_file);
-			osd_rmfile(*output_file_str);
+			osd_rmfile(output_file_str->c_str());
 		}
 		throw;
 	}
@@ -2297,7 +2297,7 @@ static void do_extract_cd(parameters_t &params)
 	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
-		check_existing_output_file(params, *output_file_str);
+		check_existing_output_file(params, output_file_str->c_str());
 
 	// verify output BIN file doesn't exist
 	astring *output_bin_file_str = params.find(OPTION_OUTPUT_BIN);
@@ -2310,7 +2310,7 @@ static void do_extract_cd(parameters_t &params)
 	default_name.cat(".bin");
 	if (output_bin_file_str == NULL)
 		output_bin_file_str = &default_name;
-	check_existing_output_file(params, *output_bin_file_str);
+	check_existing_output_file(params, output_bin_file_str->c_str());
 
 	// print some info
 	astring tempstr;
@@ -2335,14 +2335,14 @@ static void do_extract_cd(parameters_t &params)
 		}
 
 		// process output file
-		file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
+		file_error filerr = core_fopen(output_file_str->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
 		if (filerr != FILERR_NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->c_str());
 
 		// process output BIN file
 		if (mode != MODE_GDI)
 		{
-			filerr = core_fopen(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
+			filerr = core_fopen(output_bin_file_str->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
 			if (filerr != FILERR_NONE)
 				report_error(1, "Unable to open file (%s)", output_bin_file_str->c_str());
 		}
@@ -2382,7 +2382,7 @@ static void do_extract_cd(parameters_t &params)
 					output_bin_file = NULL;
 				}
 
-				filerr = core_fopen(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
+				filerr = core_fopen(trackbin_name.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
 				if (filerr != FILERR_NONE)
 					report_error(1, "Unable to open file (%s)", trackbin_name.c_str());
 
@@ -2394,11 +2394,11 @@ static void do_extract_cd(parameters_t &params)
 			astring temp;
 			if (mode == MODE_GDI)
 			{
-				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,trackbin_name), discoffs, outputoffs);
+				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp, trackbin_name.c_str()).c_str(), discoffs, outputoffs);
 			}
 			else
 			{
-				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp,*output_bin_file_str), discoffs, outputoffs);
+				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp, output_bin_file_str->c_str()).c_str(), discoffs, outputoffs);
 			}
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
@@ -2470,8 +2470,8 @@ static void do_extract_cd(parameters_t &params)
 			core_fclose(output_bin_file);
 		if (output_toc_file != NULL)
 			core_fclose(output_toc_file);
-		osd_rmfile(*output_bin_file_str);
-		osd_rmfile(*output_file_str);
+		osd_rmfile(output_bin_file_str->c_str());
+		osd_rmfile(output_file_str->c_str());
 		throw;
 	}
 }
@@ -2507,7 +2507,7 @@ static void do_extract_ld(parameters_t &params)
 	{
 		int fps;
 		int fpsfrac;
-		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
+		if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 			report_error(1, "Improperly formatted A/V metadata found");
 		fps_times_1million = fps * 1000000 + fpsfrac;
 	}
@@ -2544,7 +2544,7 @@ static void do_extract_ld(parameters_t &params)
 	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
-		check_existing_output_file(params, *output_file_str);
+		check_existing_output_file(params, output_file_str->c_str());
 
 	// print some info
 	astring tempstr;
@@ -2561,7 +2561,7 @@ static void do_extract_ld(parameters_t &params)
 	try
 	{
 		// process output file
-		avi_error avierr = avi_create(*output_file_str, &info, &output_file);
+		avi_error avierr = avi_create(output_file_str->c_str(), &info, &output_file);
 		if (avierr != AVIERR_NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->c_str());
 
@@ -2621,7 +2621,7 @@ static void do_extract_ld(parameters_t &params)
 		// delete the output file
 		if (output_file != NULL)
 			avi_close(output_file);
-		osd_rmfile(*output_file_str);
+		osd_rmfile(output_file_str->c_str());
 		throw;
 	}
 }
@@ -2652,7 +2652,7 @@ static void do_add_metadata(parameters_t &params)
 	UINT32 index = 0;
 	astring *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
-		index = atoi(*index_str);
+		index = atoi(index_str->c_str());
 
 	// process text input
 	astring *text_str = params.find(OPTION_VALUE_TEXT);
@@ -2669,7 +2669,7 @@ static void do_add_metadata(parameters_t &params)
 	dynamic_buffer file;
 	if (file_str != NULL)
 	{
-		file_error filerr = core_fload(*file_str, file);
+		file_error filerr = core_fload(file_str->c_str(), file);
 		if (filerr != FILERR_NONE)
 			report_error(1, "Error reading metadata file (%s)", file_str->c_str());
 	}
@@ -2732,7 +2732,7 @@ static void do_del_metadata(parameters_t &params)
 	UINT32 index = 0;
 	astring *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
-		index = atoi(*index_str);
+		index = atoi(index_str->c_str());
 
 	// print some info
 	astring tempstr;
@@ -2763,7 +2763,7 @@ static void do_dump_metadata(parameters_t &params)
 	// verify output file doesn't exist
 	astring *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
-		check_existing_output_file(params, *output_file_str);
+		check_existing_output_file(params, output_file_str->c_str());
 
 	// process tag
 	chd_metadata_tag tag = CHD_MAKE_TAG('?','?','?','?');
@@ -2778,7 +2778,7 @@ static void do_dump_metadata(parameters_t &params)
 	UINT32 index = 0;
 	astring *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
-		index = atoi(*index_str);
+		index = atoi(index_str->c_str());
 
 	// write the metadata
 	dynamic_buffer buffer;
@@ -2793,7 +2793,7 @@ static void do_dump_metadata(parameters_t &params)
 		// create the file
 		if (output_file_str != NULL)
 		{
-			file_error filerr = core_fopen(*output_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
+			file_error filerr = core_fopen(output_file_str->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
 			if (filerr != FILERR_NONE)
 				report_error(1, "Unable to open file (%s)", output_file_str->c_str());
 
@@ -2820,7 +2820,7 @@ static void do_dump_metadata(parameters_t &params)
 		// delete the output file
 		if (output_file != NULL)
 			core_fclose(output_file);
-		osd_rmfile(*output_file_str);
+		osd_rmfile(output_file_str->c_str());
 		throw;
 	}
 }

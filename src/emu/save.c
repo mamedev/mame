@@ -96,7 +96,7 @@ const char *save_manager::indexed_item(int index, void *&base, UINT32 &valsize, 
 	valsize = entry->m_typesize;
 	valcount = entry->m_typecount;
 
-	return entry->m_name;
+	return entry->m_name.c_str();
 }
 
 
@@ -183,7 +183,7 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname, device, module, tag ? tag : "", index, valsize, valcount)), insert_after);
+	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount)), insert_after);
 }
 
 

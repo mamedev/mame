@@ -358,7 +358,7 @@ void cosmac_device::device_start()
 
 	astring tempstr;
 	for (int regnum = 0; regnum < 16; regnum++)
-		state_add(COSMAC_R0 + regnum, tempstr.format("R%x", regnum), m_r[regnum]);
+		state_add(COSMAC_R0 + regnum, tempstr.format("R%x", regnum).c_str(), m_r[regnum]);
 
 	state_add(COSMAC_DF,    "DF",   m_df).mask(0x1).noshow();
 	state_add(COSMAC_IE,    "IE",   m_ie).mask(0x1).noshow();

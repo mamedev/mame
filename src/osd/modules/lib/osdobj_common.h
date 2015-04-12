@@ -113,10 +113,10 @@ public:
 	const char *aspect() const { return value(OSDOPTION_ASPECT); }
 	const char *resolution() const { return value(OSDOPTION_RESOLUTION); }
 	const char *view() const { return value(OSDOPTION_VIEW); }
-	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SCREEN, index)); }
-	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_ASPECT, index)); }
-	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_RESOLUTION, index)); }
-	const char *view(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_VIEW, index)); }
+	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SCREEN, index).c_str()); }
+	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_ASPECT, index).c_str()); }
+	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_RESOLUTION, index).c_str()); }
+	const char *view(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_VIEW, index).c_str()); }
 
 	// full screen options
 	bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
@@ -136,12 +136,12 @@ public:
 	bool gl_pbo() const { return bool_value(OSDOPTION_GL_PBO); }
 	bool gl_glsl() const { return bool_value(OSDOPTION_GL_GLSL); }
 	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
-	const char *shader_mame(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_MAME, index)); }
-	const char *shader_screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_SCREEN, index)); }
+	const char *shader_mame(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_MAME, index).c_str()); }
+	const char *shader_screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_SCREEN, index).c_str()); }
 
 	// CoreAudio specific options
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
-	const char *audio_effect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_AUDIO_EFFECT, index)); }
+	const char *audio_effect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_AUDIO_EFFECT, index).c_str()); }
 
 private:
 	static const options_entry s_option_entries[];
@@ -240,15 +240,15 @@ private:
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const astring &opt_name)
 	{
-		astring opt_val = opts.value(opt_name);
+		astring opt_val = opts.value(opt_name.c_str());
 		if (opt_val == "auto")
 			opt_val = "";
-		else if (!m_mod_man.type_has_name(opt_name, opt_val))
+		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
 		{
 			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val.c_str(), opt_name.c_str());
 			opt_val = "";
 		}
-		return m_mod_man.select_module(opt_name, opt_val);
+		return m_mod_man.select_module(opt_name.c_str(), opt_val.c_str());
 	}
 
 	template<class C>

@@ -71,7 +71,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, const 
 		device_nubus_card_interface(mconfig, *this),
 		m_assembled_tag(tag, ":", SPEC8S3_SCREEN_NAME)
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
@@ -80,7 +80,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 		device_nubus_card_interface(mconfig, *this),
 		m_assembled_tag(tag, ":", SPEC8S3_SCREEN_NAME)
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 //-------------------------------------------------

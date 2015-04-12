@@ -51,7 +51,7 @@ void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 		astring tempstring(tag);
 		tempstring.cat(GBASLOT_ROM_REGION_TAG);
 		// we always alloc 32MB of rom region!
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring, 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring.c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }

@@ -60,7 +60,7 @@ void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
 	{
 		astring tempstring(tag);
 		tempstring.cat(SATSLOT_ROM_REGION_TAG);
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring, size, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring.c_str(), size, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }

@@ -1739,9 +1739,9 @@ void m68000_base_device::define_state(void)
 
 	astring tempstr;
 	for (int regnum = 0; regnum < 8; regnum++)
-		state_add(M68K_D0 + regnum, tempstr.format("D%d", regnum), dar[regnum]);
+		state_add(M68K_D0 + regnum, tempstr.format("D%d", regnum).c_str(), dar[regnum]);
 	for (int regnum = 0; regnum < 8; regnum++)
-		state_add(M68K_A0 + regnum, tempstr.format("A%d", regnum), dar[8 + regnum]);
+		state_add(M68K_A0 + regnum, tempstr.format("A%d", regnum).c_str(), dar[8 + regnum]);
 
 	state_add(M68K_PREF_ADDR,  "PREF_ADDR", pref_addr).mask(addrmask);
 	state_add(M68K_PREF_DATA,  "PREF_DATA", pref_data);
@@ -1762,7 +1762,7 @@ void m68000_base_device::define_state(void)
 	if (cpu_type & MASK_030_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++)
-			state_add(M68K_FP0 + regnum, tempstr.format("FP%d", regnum), iotemp).callimport().callexport().formatstr("%10s");
+			state_add(M68K_FP0 + regnum, tempstr.format("FP%d", regnum).c_str(), iotemp).callimport().callexport().formatstr("%10s");
 		state_add(M68K_FPSR, "FPSR", fpsr);
 		state_add(M68K_FPCR, "FPCR", fpcr);
 	}

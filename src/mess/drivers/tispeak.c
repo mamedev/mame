@@ -355,7 +355,7 @@ void tispeak_state::init_cartridge()
 	if (m_cart != NULL && m_cart->exists())
 	{
 		astring region_tag;
-		memory_region *src = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+		memory_region *src = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 		if (src)
 			memcpy(m_cart_base, src->base(), src->bytes());
 	}

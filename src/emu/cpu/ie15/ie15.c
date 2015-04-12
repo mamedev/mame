@@ -64,7 +64,7 @@ void ie15_device::device_start()
 
 	astring tempstring;
 	for (int ireg = 0; ireg < 32; ireg++)
-		state_add(IE15_R0 + ireg, tempstring.format("R%d", ireg), m_REGS[ireg]);
+		state_add(IE15_R0 + ireg, tempstring.format("R%d", ireg).c_str(), m_REGS[ireg]);
 }
 
 //-------------------------------------------------

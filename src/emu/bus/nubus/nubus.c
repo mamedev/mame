@@ -326,8 +326,8 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 	bool inverted = false;
 
 	astring tempstring;
-	UINT8 *rom = device().machine().root_device().memregion(dev->subtag(tempstring, romregion))->base();
-	UINT32 romlen = device().machine().root_device().memregion(dev->subtag(tempstring, romregion))->bytes();
+	UINT8 *rom = device().machine().root_device().memregion(dev->subtag(tempstring, romregion).c_str())->base();
+	UINT32 romlen = device().machine().root_device().memregion(dev->subtag(tempstring, romregion).c_str())->bytes();
 
 //  printf("ROM length is %x, last bytes are %02x %02x\n", romlen, rom[romlen-2], rom[romlen-1]);
 

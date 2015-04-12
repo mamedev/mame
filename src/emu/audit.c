@@ -67,7 +67,7 @@ const char *driverpath = m_enumerator.config().root_device().searchpath();
 astring combinedpath(device->searchpath(), ";", driverpath);
 if (device->shortname())
 	combinedpath.cat(";").cat(device->shortname());
-m_searchpath = combinedpath;
+m_searchpath = combinedpath.c_str();
 
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
@@ -195,7 +195,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 		locationtag.cat(swinfo->parentname());
 		combinedpath.cat(";").cat(swinfo->parentname()).cat(";").cat(list_name).cat(PATH_SEPARATOR).cat(swinfo->parentname());
 	}
-	m_searchpath = combinedpath;
+	m_searchpath = combinedpath.c_str();
 
 	int found = 0;
 	int required = 0;
@@ -226,7 +226,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 				// audit a disk
 				else if (ROMREGION_ISDISKDATA(region))
 				{
-					record = audit_one_disk(rom, (const char *)locationtag);
+					record = audit_one_disk(rom, locationtag.c_str());
 				}
 
 				// count the number of files that are found.
@@ -284,14 +284,14 @@ media_auditor::summary media_auditor::audit_samples()
 
 			// look for the files
 			emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
-			path_iterator path(searchpath);
+			path_iterator path(searchpath.c_str());
 			astring curpath;
 			while (path.next(curpath, samplename))
 			{
 				// attempt to access the file (.flac) or (.wav)
-				file_error filerr = file.open(curpath, ".flac");
+				file_error filerr = file.open(curpath.c_str(), ".flac");
 				if (filerr != FILERR_NONE)
-					filerr = file.open(curpath, ".wav");
+					filerr = file.open(curpath.c_str(), ".wav");
 
 				if (filerr == FILERR_NONE)
 				{
@@ -429,9 +429,9 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 		// open the file if we can
 		file_error filerr;
 		if (has_crc)
-			filerr = file.open(curpath, crc);
+			filerr = file.open(curpath.c_str(), crc);
 		else
-			filerr = file.open(curpath);
+			filerr = file.open(curpath.c_str());
 
 		// if it worked, get the actual length and hashes, then stop
 		if (filerr == FILERR_NONE)

@@ -73,7 +73,6 @@ public:
 	operator bool() const { return m_text[0] != 0; }
 
 	// C string conversion operators and helpers
-	operator const char *() const { return m_text; }
 	const char *c_str() const { return m_text; }
 
 	// buffer management

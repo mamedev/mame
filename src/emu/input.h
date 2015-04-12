@@ -500,11 +500,11 @@ public:
 	input_device &device() const { return m_device; }
 	input_manager &manager() const;
 	running_machine &machine() const;
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 	void *internal() const { return m_internal; }
 	input_item_id itemid() const { return m_itemid; }
 	input_item_class itemclass() const { return m_itemclass; }
-	const char *token() const { return m_token; }
+	const char *token() const { return m_token.c_str(); }
 	INT32 current() const { return m_current; }
 	INT32 memory() const { return m_memory; }
 
@@ -549,7 +549,7 @@ public:
 	input_manager &manager() const;
 	running_machine &machine() const;
 	input_device_class devclass() const;
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 	int devindex() const { return m_devindex; }
 	input_device_item *item(input_item_id index) const { return m_item[index]; }
 	input_item_id maxitem() const { return m_maxitem; }

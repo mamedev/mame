@@ -687,14 +687,14 @@ static device_info *devmap_class_register(running_machine &machine, device_map_t
 		{
 			sprintf(tempname, "NC%d", index);
 			devinfo = generic_device_alloc(devlist, tempname);
-			devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name, devinfo);
+			devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name.c_str(), devinfo);
 		}
 		return NULL;
 	}
 	else
 	{
 		devinfo = generic_device_alloc(devlist, devmap->map[index].name);
-		devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name, devinfo);
+		devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name.c_str(), devinfo);
 	}
 	return devinfo;
 }

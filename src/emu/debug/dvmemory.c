@@ -138,14 +138,14 @@ void debug_view_memory::enumerate_sources()
 				{
 					address_space &space = memintf->space(spacenum);
 					name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space.name());
-					m_source_list.append(*global_alloc(debug_view_memory_source(name, space)));
+					m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), space)));
 				}
 
 	// then add all the memory regions
 	for (memory_region *region = machine().memory().first_region(); region != NULL; region = region->next())
 	{
 		name.printf("Region '%s'", region->name());
-		m_source_list.append(*global_alloc(debug_view_memory_source(name, *region)));
+		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region)));
 	}
 
 	// finally add all global array symbols
@@ -163,7 +163,7 @@ void debug_view_memory::enumerate_sources()
 		if (strncmp(itemname, "timer/", 6))
 		{
 			name.cpy(itemname);
-			m_source_list.append(*global_alloc(debug_view_memory_source(name, base, valsize, valcount)));
+			m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), base, valsize, valcount)));
 		}
 	}
 
@@ -245,7 +245,7 @@ void debug_view_memory::view_update()
 			char addrtext[20];
 
 			// generate the address
-			sprintf(addrtext, m_addrformat, address);
+			sprintf(addrtext, m_addrformat.c_str(), address);
 			dest = destrow + m_section[0].m_pos + 1;
 			for (int ch = 0; addrtext[ch] != 0 && ch < m_section[0].m_width - 1; ch++, dest++)
 				if (dest >= destmin && dest < destmax)

@@ -99,7 +99,7 @@ INLINE output_item *find_item(const char *string)
 
 	/* use the hash as a starting point and find an entry */
 	for (item = itemtable[hash % HASH_SIZE]; item != NULL; item = item->next)
-		if (item->hash == hash && strcmp(string, item->name) == 0)
+		if (item->hash == hash && strcmp(string, item->name.c_str()) == 0)
 			return item;
 
 	return NULL;
@@ -333,7 +333,7 @@ void output_notify_all(output_notifier_func callback, void *param)
 	/* remove all items */
 	for (hash = 0; hash < HASH_SIZE; hash++)
 		for (item = itemtable[hash]; item != NULL; item = item->next)
-			(*callback)(item->name, item->value, param);
+			(*callback)(item->name.c_str(), item->value, param);
 }
 
 
@@ -367,7 +367,7 @@ const char *output_id_to_name(UINT32 id)
 	for (hash = 0; hash < HASH_SIZE; hash++)
 		for (item = itemtable[hash]; item != NULL; item = item->next)
 			if (item->id == id)
-				return item->name;
+				return item->name.c_str();
 
 	/* nothing found, return NULL */
 	return NULL;

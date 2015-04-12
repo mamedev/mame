@@ -122,7 +122,7 @@ inline const char *number_and_format::format(astring &string) const
 			string.printf("0x%X", (UINT32)m_value);
 			break;
 	}
-	return string;
+	return string.c_str();
 }
 
 
@@ -191,7 +191,7 @@ const char *cheat_parameter::text()
 				break;
 			}
 	}
-	return m_curtext;
+	return m_curtext.c_str();
 }
 
 
@@ -507,7 +507,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 			curarg += arg->values(argindex, &params[curarg]);
 
 		// generate the astring
-		manager.get_output_astring(m_line, m_justify).printf(m_format,
+		manager.get_output_astring(m_line, m_justify).printf(m_format.c_str(),
 			(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
 			(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
 			(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
@@ -577,7 +577,7 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 		argsprovided += curarg->count();
 
 	// now scan the string for valid argument usage
-	const char *p = strchr(m_format, '%');
+	const char *p = strchr(m_format.c_str(), '%');
 	int argscounted = 0;
 	while (p != NULL)
 	{
@@ -711,7 +711,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		m_symbols.add("argindex", symbol_table::READ_ONLY, &m_argindex);
 		astring tempname;
 		for (int curtemp = 0; curtemp < tempcount; curtemp++)
-			m_symbols.add(tempname.format("temp%d", curtemp), symbol_table::READ_WRITE);
+			m_symbols.add(tempname.format("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
 
 		// read the first comment node
 		xml_data_node *commentnode = xml_get_sibling(cheatnode.child, "comment");
@@ -1151,7 +1151,7 @@ void cheat_manager::reload()
 				{
 					astring filename;
 					filename.printf("%08X", crc);
-					load_cheats(filename);
+					load_cheats(filename.c_str());
 					break;
 				}
 			}
@@ -1221,7 +1221,7 @@ void cheat_manager::render_text(render_container &container)
 		if (m_output[linenum])
 		{
 			// output the text
-			machine().ui().draw_text_full(&container, m_output[linenum],
+			machine().ui().draw_text_full(&container, m_output[linenum].c_str(),
 					0.0f, (float)linenum * machine().ui().get_line_height(), 1.0f,
 					m_justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
 					ARGB_WHITE, ARGB_BLACK, NULL, NULL);
@@ -1292,7 +1292,7 @@ const char *cheat_manager::quote_expression(astring &string, const parsed_expres
 	string.replace(0, "<< ", " lshift ");
 	string.replace(0, "<<", " lshift ");
 
-	return string;
+	return string.c_str();
 }
 
 

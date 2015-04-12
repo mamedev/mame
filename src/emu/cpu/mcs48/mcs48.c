@@ -978,7 +978,7 @@ void mcs48_cpu_device::device_start()
 
 		astring tempstr;
 		for (int regnum = 0; regnum < 8; regnum++)
-			state_add(MCS48_R0 + regnum, tempstr.format("R%d", regnum), m_rtemp).callimport().callexport();
+			state_add(MCS48_R0 + regnum, tempstr.format("R%d", regnum).c_str(), m_rtemp).callimport().callexport();
 
 		state_add(MCS48_EA,        "EA",        m_ea).mask(0x1);
 

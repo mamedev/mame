@@ -111,13 +111,13 @@ public:
 
 	// getters
 	running_machine &machine() const { /*assert(m_machine != NULL);*/ return *m_machine; }
-	const char *tag() const { return m_tag; }
-	const char *basetag() const { return m_basetag; }
+	const char *tag() const { return m_tag.c_str(); }
+	const char *basetag() const { return m_basetag.c_str(); }
 	device_type type() const { return m_type; }
-	const char *name() const { return m_name; }
-	const char *shortname() const { return m_shortname; }
-	const char *searchpath() const { return m_searchpath; }
-	const char *source() const { return m_source; }
+	const char *name() const { return m_name.c_str(); }
+	const char *shortname() const { return m_shortname.c_str(); }
+	const char *searchpath() const { return m_searchpath.c_str(); }
+	const char *source() const { return m_source.c_str(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
 	UINT32 configured_clock() const { return m_configured_clock; }

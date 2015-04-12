@@ -1626,7 +1626,7 @@ void chd_avhuff_compressor::postinit()
 
 	// extract the info
 	int fps, fpsfrac, width, height, interlaced, channels, rate;
-	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
+	if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 		throw CHDERR_INVALID_METADATA;
 
 	// compute the bytes per frame

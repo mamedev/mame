@@ -80,7 +80,7 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 	int x, y;
 
 	/* open the source image */
-	filerr = core_fopen(imgfile1, OPEN_FLAG_READ, &file);
+	filerr = core_fopen(imgfile1.c_str(), OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 	{
 		printf("Could not open %s (%d)\n", imgfile1.c_str(), filerr);
@@ -97,7 +97,7 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 	}
 
 	/* open the source image */
-	filerr = core_fopen(imgfile2, OPEN_FLAG_READ, &file);
+	filerr = core_fopen(imgfile2.c_str(), OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 	{
 		printf("Could not open %s (%d)\n", imgfile2.c_str(), filerr);
@@ -170,7 +170,7 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 		}
 
 		/* write the final PNG */
-		filerr = core_fopen(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 		if (filerr != FILERR_NONE)
 		{
 			printf("Could not open %s (%d)\n", outfilename.c_str(), filerr);
@@ -193,6 +193,6 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 
 error:
 	if (error == -1)
-		osd_rmfile(outfilename);
+		osd_rmfile(outfilename.c_str());
 	return error;
 }

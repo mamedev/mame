@@ -532,7 +532,7 @@ const char *core_options::output_ini(astring &buffer, const core_options *diff)
 			}
 		}
 	}
-	return buffer;
+	return buffer.c_str();
 }
 
 
@@ -556,7 +556,7 @@ const char *core_options::output_help(astring &buffer)
 		else if (curentry->description() != NULL)
 			buffer.catprintf("-%-20s%s\n", curentry->name(), curentry->description());
 	}
-	return buffer;
+	return buffer.c_str();
 }
 
 
@@ -687,7 +687,7 @@ void core_options::append_entry(core_options::entry &newentry)
 
 			// for boolean options add a "no" variant as well
 			if (newentry.type() == OPTION_BOOLEAN)
-				m_entrymap.add(astring("no", newentry.name(name)), &newentry);
+				m_entrymap.add(astring("no", newentry.name(name)).c_str(), &newentry);
 		}
 }
 
@@ -702,7 +702,7 @@ void core_options::remove_entry(core_options::entry &delentry)
 	// remove all names from the map
 	for (int name = 0; name < ARRAY_LENGTH(delentry.m_name); name++)
 		if (delentry.m_name[name])
-			m_entrymap.remove(delentry.m_name[name]);
+			m_entrymap.remove(delentry.m_name[name].c_str());
 
 	// remove the entry from the list
 	m_entrylist.remove(delentry);
@@ -750,7 +750,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 	{
 		// booleans must be 0 or 1
 		case OPTION_BOOLEAN:
-			if (sscanf(data, "%d", &ival) != 1 || ival < 0 || ival > 1)
+			if (sscanf(data.c_str(), "%d", &ival) != 1 || ival < 0 || ival > 1)
 			{
 				error_string.catprintf("Illegal boolean value for %s: \"%s\"; reverting to %s\n", curentry.name(), data.c_str(), curentry.value());
 				return false;
@@ -759,7 +759,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 
 		// integers must be integral
 		case OPTION_INTEGER:
-			if (sscanf(data, "%d", &ival) != 1)
+			if (sscanf(data.c_str(), "%d", &ival) != 1)
 			{
 				error_string.catprintf("Illegal integer value for %s: \"%s\"; reverting to %s\n", curentry.name(), data.c_str(), curentry.value());
 				return false;
@@ -773,7 +773,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 
 		// floating-point values must be numeric
 		case OPTION_FLOAT:
-			if (sscanf(data, "%f", &fval) != 1)
+			if (sscanf(data.c_str(), "%f", &fval) != 1)
 			{
 				error_string.catprintf("Illegal float value for %s: \"%s\"; reverting to %s\n", curentry.name(), data.c_str(), curentry.value());
 				return false;
@@ -798,6 +798,6 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 	}
 
 	// set the data
-	curentry.set_value(data, priority);
+	curentry.set_value(data.c_str(), priority);
 	return true;
 }

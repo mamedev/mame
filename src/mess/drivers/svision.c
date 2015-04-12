@@ -469,7 +469,7 @@ void svision_state::machine_start()
 {
 	int num_banks;
 	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 	num_banks = m_cart_rom->bytes() / 0x4000;
 
 	m_bank1 = membank("bank1");

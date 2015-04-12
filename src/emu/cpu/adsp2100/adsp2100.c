@@ -546,13 +546,13 @@ void adsp21xx_device::device_start()
 
 	astring tempstring;
 	for (int ireg = 0; ireg < 8; ireg++)
-		state_add(ADSP2100_I0 + ireg, tempstring.format("I%d", ireg), m_i[ireg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_I0 + ireg, tempstring.format("I%d", ireg).c_str(), m_i[ireg]).mask(0x3fff).callimport();
 
 	for (int lreg = 0; lreg < 8; lreg++)
-		state_add(ADSP2100_L0 + lreg, tempstring.format("L%d", lreg), m_l[lreg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_L0 + lreg, tempstring.format("L%d", lreg).c_str(), m_l[lreg]).mask(0x3fff).callimport();
 
 	for (int mreg = 0; mreg < 8; mreg++)
-		state_add(ADSP2100_M0 + mreg, tempstring.format("M%d", mreg), m_m[mreg]).signed_mask(0x3fff);
+		state_add(ADSP2100_M0 + mreg, tempstring.format("M%d", mreg).c_str(), m_m[mreg]).signed_mask(0x3fff);
 
 	state_add(ADSP2100_PX,      "PX",        m_px);
 	state_add(ADSP2100_CNTR,    "CNTR",      m_cntr).mask(0x3fff);
@@ -571,7 +571,7 @@ void adsp21xx_device::device_start()
 
 	for (int irqnum = 0; irqnum < 4; irqnum++)
 		if (irqnum < 4 || m_chip_type == CHIP_TYPE_ADSP2100)
-			state_add(ADSP2100_IRQSTATE0 + irqnum, tempstring.format("IRQ%d", irqnum), m_irq_state[irqnum]).mask(1).callimport();
+			state_add(ADSP2100_IRQSTATE0 + irqnum, tempstring.format("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
 
 	state_add(ADSP2100_FLAGIN,  "FLAGIN",    m_flagin).mask(1);
 	state_add(ADSP2100_FLAGOUT, "FLAGOUT",   m_flagout).mask(1);

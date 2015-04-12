@@ -279,7 +279,7 @@ void ui_menu_device_config::populate()
 		string.cat("[None]\n");
 
 	const_cast<machine_config &>(machine().config()).device_remove(&machine().config().root_device(), m_option->name());
-	item_append(string, NULL, MENU_FLAG_MULTILINE, NULL);
+	item_append(string.c_str(), NULL, MENU_FLAG_MULTILINE, NULL);
 }
 
 void ui_menu_device_config::handle()

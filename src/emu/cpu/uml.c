@@ -1026,5 +1026,5 @@ const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) cons
 		if (m_flags & FLAG_C)
 			buffer.cat('C');
 	}
-	return buffer;
+	return buffer.c_str();
 }

@@ -1264,7 +1264,7 @@ const char *natural_keyboard::unicode_to_string(astring &buffer, unicode_char ch
 				buffer.format("U+%04X", unsigned(ch));
 			break;
 	}
-	return buffer;
+	return buffer.c_str();
 }
 
 
@@ -1327,7 +1327,7 @@ const char *natural_keyboard::key_name(astring &string, unicode_char ch)
 	// otherwise, opt for question marks
 	else
 		string.cpy("???");
-	return string;
+	return string.c_str();
 }
 
 
@@ -1520,7 +1520,7 @@ const char *ioport_field::name() const
 {
 	// if we have a non-default name, use that
 	if (m_live != NULL && m_live->name)
-		return m_live->name;
+		return m_live->name.c_str();
 	if (m_name != NULL)
 		return m_name;
 
@@ -2066,13 +2066,13 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 		tempstr.cpy(curentry, comma - curentry);
 
 		// first extract the switch name if present
-		const char *number = tempstr;
-		const char *colon = strchr(tempstr, ':');
+		const char *number = tempstr.c_str();
+		const char *colon = strchr(tempstr.c_str(), ':');
 
 		// allocate and copy the name if it is present
 		if (colon != NULL)
 		{
-			lastname = name.cpy(number, colon - number);
+			lastname = name.cpy(number, colon - number).c_str();
 			number = colon + 1;
 		}
 
@@ -2101,7 +2101,7 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 			errorbuf.catprintf("Switch location '%s' has invalid format!\n", location);
 
 		// allocate a new entry
-		m_diploclist.append(*global_alloc(ioport_diplocation(name, swnum, invert)));
+		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
 		entries++;
 
 		// advance to the next item
@@ -3176,7 +3176,7 @@ void ioport_manager::save_sequence(xml_data_node *parentnode, input_seq_type typ
 		machine().input().seq_to_tokens(seqstring, seq);
 
 	// add the new node
-	xml_data_node *seqnode = xml_add_child(parentnode, "newseq", seqstring);
+	xml_data_node *seqnode = xml_add_child(parentnode, "newseq", seqstring.c_str());
 	if (seqnode != NULL)
 		xml_set_attribute(seqnode, "type", seqtypestrings[type]);
 }
@@ -3685,7 +3685,7 @@ void ioport_configurer::port_alloc(const char *tag)
 	m_owner.subtag(fulltag, tag);
 
 	// add it to the list, and reset current field/setting
-	m_curport = &m_portlist.append(fulltag, *global_alloc(ioport_port(m_owner, fulltag)));
+	m_curport = &m_portlist.append(fulltag.c_str(), *global_alloc(ioport_port(m_owner, fulltag.c_str())));
 	m_curfield = NULL;
 	m_cursetting = NULL;
 }
@@ -4402,10 +4402,10 @@ const char *ioport_manager::input_type_to_token(astring &string, ioport_type typ
 	// look up the port and return the token
 	input_type_entry *entry = m_type_to_entry[type][player];
 	if (entry != NULL)
-		return string.cpy(entry->token());
+		return string.cpy(entry->token()).c_str();
 
 	// if that fails, carry on
-	return string.format("TYPE_OTHER(%d,%d)", type, player);
+	return string.format("TYPE_OTHER(%d,%d)", type, player).c_str();
 }
 
 

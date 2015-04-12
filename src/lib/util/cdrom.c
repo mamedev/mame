@@ -161,7 +161,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 	for (i = 0; i < file->cdtoc.numtrks; i++)
 	{
-		file_error filerr = core_fopen(file->track_info.track[i].fname, OPEN_FLAG_READ, &file->fhandle[i]);
+		file_error filerr = core_fopen(file->track_info.track[i].fname.c_str(), OPEN_FLAG_READ, &file->fhandle[i]);
 		if (filerr != FILERR_NONE)
 		{
 			fprintf(stderr, "Unable to open file: %s\n", file->track_info.track[i].fname.c_str());
@@ -833,7 +833,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 			/* parse the metadata */
 			type[0] = subtype[0] = 0;
 			pgtype[0] = pgsub[0] = 0;
-			if (sscanf(metadata, CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
+			if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
 				return CHDERR_INVALID_DATA;
 			if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 				return CHDERR_INVALID_DATA;
@@ -847,7 +847,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 				/* parse the metadata */
 				type[0] = subtype[0] = 0;
 				pregap = postgap = 0;
-				if (sscanf(metadata, CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
+				if (sscanf(metadata.c_str(), CDROM_TRACK_METADATA2_FORMAT, &tracknum, type, subtype, &frames, &pregap, pgtype, pgsub, &postgap) != 8)
 					return CHDERR_INVALID_DATA;
 				if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 					return CHDERR_INVALID_DATA;
@@ -867,7 +867,7 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 					/* parse the metadata */
 					type[0] = subtype[0] = 0;
 					pregap = postgap = 0;
-					if (sscanf(metadata, GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
+					if (sscanf(metadata.c_str(), GDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames, &padframes, &pregap, pgtype, pgsub, &postgap) != 9)
 						return CHDERR_INVALID_DATA;
 					if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 						return CHDERR_INVALID_DATA;

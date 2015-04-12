@@ -44,7 +44,7 @@ public:
 			m_region(region) { }
 
 	open_chd *next() const { return m_next; }
-	const char *region() const { return m_region; }
+	const char *region() const { return m_region.c_str(); }
 	chd_file &chd() { return m_diffchd.opened() ? m_diffchd : m_origchd; }
 	chd_file &orig_chd() { return m_origchd; }
 	chd_file &diff_chd() { return m_diffchd; }
@@ -1125,7 +1125,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		image_file.close();
 
 		/* try to open the CHD */
-		err = image_chd.open(fullpath);
+		err = image_chd.open(fullpath.c_str());
 		if (err == CHDERR_NONE)
 			return err;
 	}
@@ -1163,7 +1163,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 								image_file.close();
 
 								/* try to open the CHD */
-								err = image_chd.open(fullpath);
+								err = image_chd.open(fullpath.c_str());
 								if (err == CHDERR_NONE)
 									return err;
 							}
@@ -1184,20 +1184,20 @@ static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.c_str()));
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	file_error filerr = diff_file.open(fname);
+	file_error filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
 		astring fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		LOG(("Opening differencing image file: %s\n", fullpath.c_str()));
-		return diff_chd.open(fullpath, true, &source);
+		return diff_chd.open(fullpath.c_str(), true, &source);
 	}
 
 	/* didn't work; try creating it instead */
 	LOG(("Creating differencing image: %s\n", fname.c_str()));
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	filerr = diff_file.open(fname);
+	filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
 		astring fullpath(diff_file.fullpath());
@@ -1206,7 +1206,7 @@ static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd
 		/* create the CHD */
 		LOG(("Creating differencing image file: %s\n", fullpath.c_str()));
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
-		chd_error err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
+		chd_error err = diff_chd.create(fullpath.c_str(), source.logical_bytes(), source.hunk_bytes(), compression, source);
 		if (err != CHDERR_NONE)
 			return err;
 
@@ -1393,18 +1393,18 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 		/* if this is a device region, override with the device width and endianness */
 		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 		UINT8 width = ROMREGION_GETWIDTH(region) / 8;
-		memory_region *memregion = romdata->machine().root_device().memregion(regiontag);
+		memory_region *memregion = romdata->machine().root_device().memregion(regiontag.c_str());
 		if (memregion != NULL)
 		{
-			if (romdata->machine().device(regiontag) != NULL)
-				normalize_flags_for_device(romdata->machine(), regiontag, width, endianness);
+			if (romdata->machine().device(regiontag.c_str()) != NULL)
+				normalize_flags_for_device(romdata->machine(), regiontag.c_str(), width, endianness);
 
 			/* clear old region (todo: should be moved to an image unload function) */
 			romdata->machine().memory().region_free(memregion->name());
 		}
 
 		/* remember the base and length */
-		romdata->region = romdata->machine().memory().region_alloc(regiontag, regionlength, width, endianness);
+		romdata->region = romdata->machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);
 		LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 		/* clear the region if it's requested */
@@ -1430,9 +1430,9 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
-			process_rom_entries(romdata, locationtag, region, region + 1, &device, TRUE);
+			process_rom_entries(romdata, locationtag.c_str(), region, region + 1, &device, TRUE);
 		else if (ROMREGION_ISDISKDATA(region))
-			process_disk_entries(romdata, regiontag, region, region + 1, locationtag);
+			process_disk_entries(romdata, regiontag.c_str(), region, region + 1, locationtag.c_str());
 	}
 
 	/* now go back and post-process all the regions */
@@ -1473,11 +1473,11 @@ static void process_region_list(romload_private *romdata)
 				/* if this is a device region, override with the device width and endianness */
 				UINT8 width = ROMREGION_GETWIDTH(region) / 8;
 				endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
-				if (romdata->machine().device(regiontag) != NULL)
-					normalize_flags_for_device(romdata->machine(), regiontag, width, endianness);
+				if (romdata->machine().device(regiontag.c_str()) != NULL)
+					normalize_flags_for_device(romdata->machine(), regiontag.c_str(), width, endianness);
 
 				/* remember the base and length */
-				romdata->region = romdata->machine().memory().region_alloc(regiontag, regionlength, width, endianness);
+				romdata->region = romdata->machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);
 				LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 				/* clear the region if it's requested */
@@ -1498,7 +1498,7 @@ static void process_region_list(romload_private *romdata)
 				process_rom_entries(romdata, device->shortname(), region, region + 1, device, FALSE);
 			}
 			else if (ROMREGION_ISDISKDATA(region))
-				process_disk_entries(romdata, regiontag, region, region + 1, NULL);
+				process_disk_entries(romdata, regiontag.c_str(), region, region + 1, NULL);
 		}
 
 	/* now go back and post-process all the regions */
@@ -1506,7 +1506,7 @@ static void process_region_list(romload_private *romdata)
 		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 		{
 			rom_region_name(regiontag, *device, region);
-			region_post_process(romdata, regiontag, ROMREGION_ISINVERTED(region));
+			region_post_process(romdata, regiontag.c_str(), ROMREGION_ISINVERTED(region));
 		}
 
 	/* and finally register all per-game parameters */

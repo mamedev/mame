@@ -239,7 +239,7 @@ void ui_menu_select_game::populate()
 					emulator_info::get_gamesnoun(),
 					emulator_info::get_configname(),
 					emulator_info::get_appname(),emulator_info::get_appname() );
-		item_append(txt, NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+		item_append(txt.c_str(), NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
 		return;
 	}
 
@@ -293,7 +293,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		tempbuf[0].printf("Type name or select: (random)");
 
 	// get the size of the text
-	machine().ui().draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
@@ -314,7 +314,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 -= UI_BOX_TB_BORDER;
 
 	// draw the text within it
-	machine().ui().draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	machine().ui().draw_text_full(container, tempbuf[0].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	// determine the text to render below
@@ -384,7 +384,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		machine().ui().draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		machine().ui().draw_text_full(container, tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 							DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -415,7 +415,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	// draw all lines
 	for (line = 0; line < 4; line++)
 	{
-		machine().ui().draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		machine().ui().draw_text_full(container, tempbuf[line].c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 							DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 		y1 += machine().ui().get_line_height();
 	}

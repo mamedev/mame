@@ -492,7 +492,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 		{
 			astring tag;
 			owner.subtag(tag, entry->m_read.m_tag);
-			device_t *mapdevice = machine.device(tag);
+			device_t *mapdevice = machine.device(tag.c_str());
 			if (mapdevice == NULL) {
 				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, device.basetag());
 			}

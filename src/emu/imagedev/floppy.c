@@ -325,7 +325,7 @@ floppy_image_format_t *floppy_image_device::identify(astring filename)
 	core_file *fd;
 	astring revised_path;
 
-	file_error err = zippath_fopen(filename, OPEN_FLAG_READ, fd, revised_path);
+	file_error err = zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
 	if(err) {
 		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
 		return 0;
@@ -867,16 +867,16 @@ void ui_menu_control_floppy_image::do_load_create()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
 	if(input_filename == "") {
-		int err = fd->create(output_filename, 0, NULL);
+		int err = fd->create(output_filename.c_str(), 0, NULL);
 		if (err != 0) {
 			popmessage("Error: %s", fd->error());
 			return;
 		}
 		fd->setup_write(output_format);
 	} else {
-		int err = fd->load(input_filename);
+		int err = fd->load(input_filename.c_str());
 		if(!err && output_filename != "")
-			err = fd->reopen_for_write(output_filename);
+			err = fd->reopen_for_write(output_filename.c_str());
 		if(err != 0) {
 			popmessage("Error: %s", fd->error());
 			return;
@@ -891,7 +891,7 @@ void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 	if (softlist)
 	{
 		popmessage("When loaded from software list, the disk is Read-only.\n");
-		image->load(filename);
+		image->load(filename.c_str());
 		ui_menu::stack_pop(machine());
 		return;
 	}
@@ -912,7 +912,7 @@ void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 		astring tmp_path;
 		core_file *tmp_file;
 		/* attempt to open the file for writing but *without* create */
-		filerr = zippath_fopen(filename, OPEN_FLAG_READ|OPEN_FLAG_WRITE, tmp_file, tmp_path);
+		filerr = zippath_fopen(filename.c_str(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);
 		if(!filerr)
 			core_fclose(tmp_file);
 		else
@@ -933,14 +933,14 @@ void ui_menu_control_floppy_image::handle()
 		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
 			if(!i->supports_save())
 				continue;
-			if(i->extension_matches(current_file))
+			if (i->extension_matches(current_file.c_str()))
 				format_array[total_usable++] = i;
 		}
 		ext_match = total_usable;
 		for(floppy_image_format_t *i = fif_list; i; i = i->next) {
 			if(!i->supports_save())
 				continue;
-			if(!i->extension_matches(current_file))
+			if (!i->extension_matches(current_file.c_str()))
 				format_array[total_usable++] = i;
 		}
 		submenu_result = -1;
@@ -955,7 +955,7 @@ void ui_menu_control_floppy_image::handle()
 			state = START_FILE;
 			handle();
 		} else {
-			zippath_combine(output_filename, current_directory, current_file);
+			zippath_combine(output_filename, current_directory.c_str(), current_file.c_str());
 			output_format = format_array[submenu_result];
 			do_load_create();
 			ui_menu::stack_pop(machine());

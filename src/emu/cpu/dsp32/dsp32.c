@@ -201,7 +201,7 @@ void dsp32c_device::device_start()
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_iotemp).callimport().callexport().formatstr("%6s").noshow();
 	state_add(DSP32_PC,        "PC",        m_r[15]).mask(0xffffff);
 	for (int regnum = 0; regnum <= 14; regnum++)
-		state_add(DSP32_R0 + regnum, tempstr.format("R%d", regnum), m_r[regnum]).mask(0xffffff);
+		state_add(DSP32_R0 + regnum, tempstr.format("R%d", regnum).c_str(), m_r[regnum]).mask(0xffffff);
 	state_add(DSP32_R15,       "R15",       m_r[17]).mask(0xffffff);
 	state_add(DSP32_R16,       "R16",       m_r[18]).mask(0xffffff);
 	state_add(DSP32_R17,       "R17",       m_r[19]).mask(0xffffff);

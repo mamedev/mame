@@ -327,13 +327,13 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag != NULL)
 				{
 					astring temp(entry->m_read.m_tag);
-					if (device().siblingdevice(temp) == NULL)
+					if (device().siblingdevice(temp.c_str()) == NULL)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
 				}
 				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag != NULL)
 				{
 					astring temp(entry->m_write.m_tag);
-					if (device().siblingdevice(temp) == NULL)
+					if (device().siblingdevice(temp.c_str()) == NULL)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag);
 				}
 

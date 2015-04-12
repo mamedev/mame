@@ -58,7 +58,7 @@ void ui_menu_tape_control::populate()
 	if (current_device())
 	{
 		// name of tape
-		item_append(current_display_name(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
+		item_append(current_display_name().c_str(), current_device()->exists() ? current_device()->filename() : "No Tape Image loaded", current_display_flags(), TAPECMD_SELECT);
 
 		if (current_device()->exists())
 		{
@@ -86,7 +86,7 @@ void ui_menu_tape_control::populate()
 								? ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "playing" : "(playing)")
 								: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "recording" : "(recording)")
 								),
-						timepos,
+								timepos.c_str(),
 						tapeflags,
 						TAPECMD_SLIDER);
 

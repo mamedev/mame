@@ -461,9 +461,9 @@ void pb1000_state::machine_start()
 	astring region_tag;
 	m_rom_reg = memregion("rom");
 	if (m_card1)
-		m_card1_reg = memregion(region_tag.cpy(m_card1->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_card1_reg = memregion(region_tag.cpy(m_card1->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_card2)
-		m_card2_reg = memregion(region_tag.cpy(m_card2->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_card2_reg = memregion(region_tag.cpy(m_card2->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	membank("bank1")->set_base(m_rom_reg->base());
 

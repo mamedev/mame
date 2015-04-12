@@ -261,10 +261,10 @@ static int filename_endswith(const char *str, const char *suffix)
 int web_engine::begin_request_handler(struct mg_connection *conn)
 {
 	astring file_path(mg_get_option(m_server, "document_root"), PATH_SEPARATOR, conn->uri);
-	if (filename_endswith(file_path,".lp"))
+	if (filename_endswith(file_path.c_str(), ".lp"))
 	{
 		FILE *fp = NULL;
-		if ((fp = fopen(file_path, "rb")) != NULL) {
+		if ((fp = fopen(file_path.c_str(), "rb")) != NULL) {
 		fseek (fp, 0, SEEK_END);
 		size_t size = ftell(fp);
 		fseek (fp, 0, SEEK_SET);
@@ -442,7 +442,7 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 
 		astring fname("screenshot.png");
 		emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = file.open(fname);
+		file_error filerr = file.open(fname.c_str());
 
 		if (filerr != FILERR_NONE)
 		{

@@ -644,7 +644,7 @@ void validity_checker::validate_roms()
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
-				if (m_region_map.add(fulltag, current_length, false) == TMERR_DUPLICATE)
+				if (m_region_map.add(fulltag.c_str(), current_length, false) == TMERR_DUPLICATE)
 					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.c_str());
 			}
 
@@ -852,7 +852,7 @@ void validity_checker::validate_condition(ioport_condition &condition, device_t 
 	device.subtag(porttag, condition.tag());
 
 	// then find a matching port
-	if (port_map.find(porttag) == 0)
+	if (port_map.find(porttag.c_str()) == 0)
 		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 

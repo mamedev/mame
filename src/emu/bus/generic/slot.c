@@ -61,7 +61,7 @@ void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness
 	{
 		astring tempstring(tag);
 		tempstring.cat(GENERIC_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, width, endian)->base();
+		m_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, width, endian)->base();
 		m_rom_size = size;
 	}
 }

@@ -130,7 +130,7 @@ const char *real_profiler_state::text(running_machine &machine)
 	}
 
 	stop();
-	return m_text;
+	return m_text.c_str();
 }
 
 

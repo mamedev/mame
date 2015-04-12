@@ -268,9 +268,9 @@ template<>
 inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, attotime &value, const char *name)
 {
 	astring tempstr(name, ".attoseconds");
-	save_memory(device, module, tag, index, tempstr, &value.attoseconds, sizeof(value.attoseconds));
+	save_memory(device, module, tag, index, tempstr.c_str(), &value.attoseconds, sizeof(value.attoseconds));
 	tempstr.cpy(name).cat(".seconds");
-	save_memory(device, module, tag, index, tempstr, &value.seconds, sizeof(value.seconds));
+	save_memory(device, module, tag, index, tempstr.c_str(), &value.seconds, sizeof(value.seconds));
 }
 
 

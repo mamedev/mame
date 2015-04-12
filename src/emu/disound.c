@@ -265,7 +265,7 @@ void device_sound_interface::interface_pre_start()
 		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
 		{
 			// see if we are the target of this route; if we are, make sure the source device is started
-			device_t *target_device = sound->device().siblingdevice(route->m_target);
+			device_t *target_device = sound->device().siblingdevice(route->m_target.c_str());
 			if (target_device == &m_device && !sound->device().started())
 				throw device_missing_dependencies();
 		}
@@ -279,7 +279,7 @@ void device_sound_interface::interface_pre_start()
 		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
 		{
 			// see if we are the target of this route
-			device_t *target_device = sound->device().siblingdevice(route->m_target);
+			device_t *target_device = sound->device().siblingdevice(route->m_target.c_str());
 			if (target_device == &m_device && route->m_input == AUTO_ALLOC_INPUT)
 			{
 				const_cast<sound_route *>(route)->m_input = m_auto_allocated_inputs;
@@ -305,7 +305,7 @@ void device_sound_interface::interface_post_start()
 		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
 		{
 			// if we are the target of this route, hook it up
-			device_t *target_device = sound->device().siblingdevice(route->m_target);
+			device_t *target_device = sound->device().siblingdevice(route->m_target.c_str());
 			if (target_device == &m_device)
 			{
 				// iterate over all outputs, matching any that apply
@@ -421,7 +421,7 @@ void device_mixer_interface::interface_pre_start()
 		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
 		{
 			// see if we are the target of this route
-			device_t *target_device = sound->device().siblingdevice(route->m_target);
+			device_t *target_device = sound->device().siblingdevice(route->m_target.c_str());
 			if (target_device == &device() && route->m_input < m_auto_allocated_inputs)
 			{
 				int count = (route->m_output == ALL_OUTPUTS) ? sound->outputs() : 1;

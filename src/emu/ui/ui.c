@@ -442,7 +442,7 @@ void ui_manager::update_and_render(render_container *container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_text, JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
+		draw_text_box(container, messagebox_text.c_str(), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
 	else
 		m_popup_text_end = 0;
 
@@ -1253,7 +1253,7 @@ astring &ui_manager::game_info_astring(astring &string)
 
 UINT32 ui_manager::handler_messagebox(running_machine &machine, render_container *container, UINT32 state)
 {
-	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 	return 0;
 }
 
@@ -1266,7 +1266,7 @@ UINT32 ui_manager::handler_messagebox(running_machine &machine, render_container
 UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_container *container, UINT32 state)
 {
 	// draw a standard message window
-	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// an 'O' or left joystick kicks us to the next state
 	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
@@ -1296,7 +1296,7 @@ UINT32 ui_manager::handler_messagebox_ok(running_machine &machine, render_contai
 UINT32 ui_manager::handler_messagebox_anykey(running_machine &machine, render_container *container, UINT32 state)
 {
 	// draw a standard message window
-	machine.ui().draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
+	machine.ui().draw_text_box(container, messagebox_text.c_str(), JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// if the user cancels, exit out completely
 	if (ui_input_pressed(machine, IPT_UI_CANCEL))
@@ -1469,7 +1469,7 @@ UINT32 ui_manager::handler_ingame(running_machine &machine, render_container *co
 	if (machine.ui().show_fps_counter())
 	{
 		astring tempstring;
-		machine.ui().draw_text_full(container, machine.video().speed_text(tempstring), 0.0f, 0.0f, 1.0f,
+		machine.ui().draw_text_full(container, machine.video().speed_text(tempstring).c_str(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
@@ -1764,7 +1764,7 @@ UINT32 ui_manager::handler_confirm_quit(running_machine &machine, render_contain
 		ui_select_text.c_str(),
 		ui_cancel_text.c_str());
 
-	machine.ui().draw_text_box(container, quit_message, JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	machine.ui().draw_text_box(container, quit_message.c_str(), JUSTIFY_CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine.pause();
 
 	// if the user press ENTER, quit the game
@@ -1844,7 +1844,7 @@ static slider_state *slider_init(running_machine &machine)
 
 		info.stream->input_name(info.inputnum, string);
 		string.cat(" Volume");
-		*tailptr = slider_alloc(machine, string, 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
+		*tailptr = slider_alloc(machine, string.c_str(), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 		tailptr = &(*tailptr)->next;
 	}
 
@@ -1866,7 +1866,7 @@ static slider_state *slider_init(running_machine &machine)
 		{
 			void *param = (void *)&exec->device();
 			string.printf("Overclock CPU %s", exec->device().tag());
-			*tailptr = slider_alloc(machine, string, 10, 1000, 2000, 1, slider_overclock, param);
+			*tailptr = slider_alloc(machine, string.c_str(), 10, 1000, 2000, 1, slider_overclock, param);
 			tailptr = &(*tailptr)->next;
 		}
 	}
@@ -1885,33 +1885,33 @@ static slider_state *slider_init(running_machine &machine)
 		if (machine.options().cheat())
 		{
 			string.printf("%s Refresh Rate", slider_get_screen_desc(*screen));
-			*tailptr = slider_alloc(machine, string, -10000, 0, 10000, 1000, slider_refresh, param);
+			*tailptr = slider_alloc(machine, string.c_str(), -10000, 0, 10000, 1000, slider_refresh, param);
 			tailptr = &(*tailptr)->next;
 		}
 
 		// add standard brightness/contrast/gamma controls per-screen
 		string.printf("%s Brightness", slider_get_screen_desc(*screen));
-		*tailptr = slider_alloc(machine, string, 100, 1000, 2000, 10, slider_brightness, param);
+		*tailptr = slider_alloc(machine, string.c_str(), 100, 1000, 2000, 10, slider_brightness, param);
 		tailptr = &(*tailptr)->next;
 		string.printf("%s Contrast", slider_get_screen_desc(*screen));
-		*tailptr = slider_alloc(machine, string, 100, 1000, 2000, 50, slider_contrast, param);
+		*tailptr = slider_alloc(machine, string.c_str(), 100, 1000, 2000, 50, slider_contrast, param);
 		tailptr = &(*tailptr)->next;
 		string.printf("%s Gamma", slider_get_screen_desc(*screen));
-		*tailptr = slider_alloc(machine, string, 100, 1000, 3000, 50, slider_gamma, param);
+		*tailptr = slider_alloc(machine, string.c_str(), 100, 1000, 3000, 50, slider_gamma, param);
 		tailptr = &(*tailptr)->next;
 
 		// add scale and offset controls per-screen
 		string.printf("%s Horiz Stretch", slider_get_screen_desc(*screen));
-		*tailptr = slider_alloc(machine, string, 500, defxscale, 1500, 2, slider_xscale, param);
+		*tailptr = slider_alloc(machine, string.c_str(), 500, defxscale, 1500, 2, slider_xscale, param);
 		tailptr = &(*tailptr)->next;
 		string.printf("%s Horiz Position", slider_get_screen_desc(*screen));
-		*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_xoffset, param);
+		*tailptr = slider_alloc(machine, string.c_str(), -500, defxoffset, 500, 2, slider_xoffset, param);
 		tailptr = &(*tailptr)->next;
 		string.printf("%s Vert Stretch", slider_get_screen_desc(*screen));
-		*tailptr = slider_alloc(machine, string, 500, defyscale, 1500, 2, slider_yscale, param);
+		*tailptr = slider_alloc(machine, string.c_str(), 500, defyscale, 1500, 2, slider_yscale, param);
 		tailptr = &(*tailptr)->next;
 		string.printf("%s Vert Position", slider_get_screen_desc(*screen));
-		*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_yoffset, param);
+		*tailptr = slider_alloc(machine, string.c_str(), -500, defyoffset, 500, 2, slider_yoffset, param);
 		tailptr = &(*tailptr)->next;
 	}
 
@@ -1929,16 +1929,16 @@ static slider_state *slider_init(running_machine &machine)
 
 			// add scale and offset controls per-overlay
 			string.printf("Laserdisc '%s' Horiz Stretch", laserdisc->tag());
-			*tailptr = slider_alloc(machine, string, 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
+			*tailptr = slider_alloc(machine, string.c_str(), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
 			tailptr = &(*tailptr)->next;
 			string.printf("Laserdisc '%s' Horiz Position", laserdisc->tag());
-			*tailptr = slider_alloc(machine, string, -500, defxoffset, 500, 2, slider_overxoffset, param);
+			*tailptr = slider_alloc(machine, string.c_str(), -500, defxoffset, 500, 2, slider_overxoffset, param);
 			tailptr = &(*tailptr)->next;
 			string.printf("Laserdisc '%s' Vert Stretch", laserdisc->tag());
-			*tailptr = slider_alloc(machine, string, 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
+			*tailptr = slider_alloc(machine, string.c_str(), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
 			tailptr = &(*tailptr)->next;
 			string.printf("Laserdisc '%s' Vert Position", laserdisc->tag());
-			*tailptr = slider_alloc(machine, string, -500, defyoffset, 500, 2, slider_overyoffset, param);
+			*tailptr = slider_alloc(machine, string.c_str(), -500, defyoffset, 500, 2, slider_overyoffset, param);
 			tailptr = &(*tailptr)->next;
 		}
 
@@ -1961,10 +1961,10 @@ static slider_state *slider_init(running_machine &machine)
 			{
 				void *param = (void *)field;
 				string.printf("Crosshair Scale %s", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y");
-				*tailptr = slider_alloc(machine, string, -3000, 1000, 3000, 100, slider_crossscale, param);
+				*tailptr = slider_alloc(machine, string.c_str(), -3000, 1000, 3000, 100, slider_crossscale, param);
 				tailptr = &(*tailptr)->next;
 				string.printf("Crosshair Offset %s", (field->crosshair_axis() == CROSSHAIR_AXIS_X) ? "X" : "Y");
-				*tailptr = slider_alloc(machine, string, -3000, 0, 3000, 100, slider_crossoffset, param);
+				*tailptr = slider_alloc(machine, string.c_str(), -3000, 0, 3000, 100, slider_crossoffset, param);
 				tailptr = &(*tailptr)->next;
 			}
 #endif

@@ -504,11 +504,11 @@ bool debug_view_expression::recompute()
 		astring oldstring(m_parsed.original_string());
 		try
 		{
-			m_parsed.parse(m_string);
+			m_parsed.parse(m_string.c_str());
 		}
 		catch (expression_error &)
 		{
-			m_parsed.parse(oldstring);
+			m_parsed.parse(oldstring.c_str());
 		}
 	}
 

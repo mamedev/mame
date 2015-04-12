@@ -1111,7 +1111,7 @@ static device_t *expression_get_device(running_machine &machine, const char *tag
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
 	astring fullname(tag);
 	fullname.makelower();
-	return machine.device(fullname);
+	return machine.device(fullname.c_str());
 }
 
 
@@ -1668,7 +1668,7 @@ device_debug::device_debug(device_t &device)
 		// add all registers into it
 		astring tempstr;
 		for (const device_state_entry *entry = m_state->state_first(); entry != NULL; entry = entry->next())
-			m_symtable.add(tempstr.cpy(entry->symbol()).makelower(), (void *)(FPTR)entry->index(), get_state, set_state);
+			m_symtable.add(tempstr.cpy(entry->symbol()).makelower().c_str(), (void *)(FPTR)entry->index(), get_state, set_state);
 	}
 
 	// set up execution-related stuff
@@ -2668,7 +2668,7 @@ const char *device_debug::comment_text(offs_t addr) const
 	const UINT32 crc = compute_opcode_crc32(addr);
 	std::set<dasm_comment>::iterator comment = m_comment_set.find(dasm_comment(addr, crc, "", 0));
 	if (comment == m_comment_set.end()) return NULL;
-	return comment->m_text;
+	return comment->m_text.c_str();
 }
 
 
@@ -2683,13 +2683,13 @@ bool device_debug::comment_export(xml_data_node &curnode)
 	astring crc_buf;
 	for (std::set<dasm_comment>::iterator item = m_comment_set.begin(); item != m_comment_set.end(); ++item)
 	{
-		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(item->m_text));
+		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(item->m_text.c_str()));
 		if (datanode == NULL)
 			return false;
 		xml_set_attribute_int(datanode, "address", item->m_address);
 		xml_set_attribute_int(datanode, "color", item->m_color);
 		crc_buf.printf("%08X", item->m_crc);
-		xml_set_attribute(datanode, "crc", crc_buf);
+		xml_set_attribute(datanode, "crc", crc_buf.c_str());
 	}
 	return true;
 }
@@ -2908,7 +2908,7 @@ void device_debug::breakpoint_check(offs_t pc)
 
 			// if we hit, evaluate the action
 			if (bp->m_action)
-				debug_console_execute_command(m_device.machine(), bp->m_action, 0);
+				debug_console_execute_command(m_device.machine(), bp->m_action.c_str(), 0);
 
 			// print a notification, unless the action made us go again
 			if (global->execution_state == EXECUTION_STATE_STOPPED)
@@ -2928,7 +2928,7 @@ void device_debug::breakpoint_check(offs_t pc)
 			// if we hit, evaluate the action
 			if (rp->m_action)
 			{
-				debug_console_execute_command(m_device.machine(), rp->m_action, 0);
+				debug_console_execute_command(m_device.machine(), rp->m_action.c_str(), 0);
 			}
 
 			// print a notification, unless the action made us go again
@@ -3037,7 +3037,7 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 
 			// if we hit, evaluate the action
 			if (wp->m_action)
-				debug_console_execute_command(space.machine(), wp->m_action, 0);
+				debug_console_execute_command(space.machine(), wp->m_action.c_str(), 0);
 
 			// print a notification, unless the action made us go again
 			if (global->execution_state == EXECUTION_STATE_STOPPED)
@@ -3480,7 +3480,7 @@ void device_debug::tracer::update(offs_t pc)
 
 	// execute any trace actions first
 	if (m_action)
-		debug_console_execute_command(m_debug.m_device.machine(), m_action, 0);
+		debug_console_execute_command(m_debug.m_device.machine(), m_action.c_str(), 0);
 
 	// print the address
 	astring buffer;

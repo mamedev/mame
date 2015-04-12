@@ -263,10 +263,10 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 		&& ((openflags == OPEN_FLAG_READ) || (subpath.len() == 0)))
 	{
 		/* is the mainpath a ZIP path? */
-		if (is_zip_file(mainpath))
+		if (is_zip_file(mainpath.c_str()))
 		{
 			/* this file might be a zip file - lets take a look */
-			ziperr = zip_file_open(mainpath, &zip);
+			ziperr = zip_file_open(mainpath.c_str(), &zip);
 			if (ziperr == ZIPERR_NONE)
 			{
 				/* it is a zip file - error if we're not opening for reading */
@@ -277,7 +277,7 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 				}
 
 				if (subpath.len() > 0)
-					header = zippath_find_sub_path(zip, subpath, &entry_type);
+					header = zippath_find_sub_path(zip, subpath.c_str(), &entry_type);
 				else
 					header = zip_file_first_file(zip);
 
@@ -300,7 +300,7 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 				goto done;
 			}
 		}
-		else if (is_7z_file(mainpath))
+		else if (is_7z_file(mainpath.c_str()))
 		{
 			filerr = FILERR_INVALID_DATA;
 			goto done;
@@ -316,7 +316,7 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 		{
 			/* go up a directory */
 			astring temp;
-			zippath_parent(temp, mainpath);
+			zippath_parent(temp, mainpath.c_str());
 
 			/* append to the sub path */
 			if (subpath.len() > 0)
@@ -342,7 +342,7 @@ done:
 	if (filerr == FILERR_NONE)
 	{
 		/* cannonicalize mainpath */
-		filerr = osd_get_full_path(&alloc_fullpath, mainpath);
+		filerr = osd_get_full_path(&alloc_fullpath, mainpath.c_str());
 		if (filerr == FILERR_NONE)
 		{
 			if (subpath.len() > 0)
@@ -559,7 +559,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 		apath_trimmed.cpysubstr(apath, 0, i);
 
 		/* stat the path */
-		current_entry = osd_stat(apath_trimmed);
+		current_entry = osd_stat(apath_trimmed.c_str());
 
 		/* did we find anything? */
 		if (current_entry != NULL)
@@ -575,10 +575,10 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 			current_entry_type = ENTTYPE_NONE;
 			went_up = TRUE;
 			astring parent;
-			apath.cpy(zippath_parent(parent, apath));
+			apath.cpy(zippath_parent(parent, apath.c_str()));
 		}
 	}
-	while (current_entry_type == ENTTYPE_NONE && !is_root(apath));
+	while (current_entry_type == ENTTYPE_NONE && !is_root(apath.c_str()));
 
 	/* if we did not find anything, then error out */
 	if (current_entry_type == ENTTYPE_NONE)
@@ -588,8 +588,8 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 	}
 
 	/* is this file a ZIP file? */
-	if ((current_entry_type == ENTTYPE_FILE) && is_zip_file(apath_trimmed)
-		&& (zip_file_open(apath_trimmed, &zipfile) == ZIPERR_NONE))
+	if ((current_entry_type == ENTTYPE_FILE) && is_zip_file(apath_trimmed.c_str())
+		&& (zip_file_open(apath_trimmed.c_str(), &zipfile) == ZIPERR_NONE))
 	{
 		i = strlen(path + apath.len());
 		while (i > 0 && is_zip_path_separator(path[apath.len() + i - 1]))
@@ -597,7 +597,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 		newpath.cpy(path + apath.len(), i);
 
 		/* this was a true ZIP path - attempt to identify the type of path */
-		zippath_find_sub_path(zipfile, newpath, &current_entry_type);
+		zippath_find_sub_path(zipfile, newpath.c_str(), &current_entry_type);
 		if (current_entry_type == ENTTYPE_NONE)
 		{
 			err = FILERR_NOT_FOUND;
@@ -719,7 +719,7 @@ static const char *get_relative_path(zippath_directory *directory, const zip_fil
 	int len = directory->zipprefix.len();
 
 	if ((len <= strlen(header->filename))
-		&& !strncmp(directory->zipprefix, header->filename, len))
+		&& !strncmp(directory->zipprefix.c_str(), header->filename, len))
 	{
 		result = &header->filename[len];
 		while(is_zip_file_separator(*result))
@@ -798,7 +798,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 					/* a nested entry; loop through returned_dirlist to see if we've returned the parent directory */
 					for (rdent = directory->returned_dirlist; rdent != NULL; rdent = rdent->next)
 					{
-						if (!core_strnicmp(rdent->name, relpath, separator - relpath))
+						if (!core_strnicmp(rdent->name.c_str(), relpath, separator - relpath))
 							break;
 					}
 
@@ -812,7 +812,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 
 						/* ...and return it */
 						memset(&directory->returned_entry, 0, sizeof(directory->returned_entry));
-						directory->returned_entry.name = rdent->name;
+						directory->returned_entry.name = rdent->name.c_str();
 						directory->returned_entry.type = ENTTYPE_DIR;
 						result = &directory->returned_entry;
 					}

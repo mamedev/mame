@@ -143,7 +143,7 @@ static int write_config(emu_options &options, const char *filename, const game_d
 	{
 		astring inistring;
 		options.output_ini(inistring);
-		file.puts(inistring);
+		file.puts(inistring.c_str());
 		retval = 0;
 	}
 	return retval;

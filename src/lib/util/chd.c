@@ -1411,7 +1411,7 @@ UINT32 chd_file::guess_unitbytes()
 	// look for hard disk metadata; if found, then the unit size == sector size
 	astring metadata;
 	int i0, i1, i2, i3;
-	if (read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE && sscanf(metadata, HARD_DISK_METADATA_FORMAT, &i0, &i1, &i2, &i3) == 4)
+	if (read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE && sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &i0, &i1, &i2, &i3) == 4)
 		return i3;
 
 	// look for CD-ROM metadata; if found, then the unit size == CD frame size

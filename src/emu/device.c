@@ -130,7 +130,7 @@ memory_region *device_t::memregion(const char *_tag) const
 
 	// build a fully-qualified name and look it up
 	astring fullpath;
-	return machine().memory().region(subtag(fullpath, _tag));
+	return machine().memory().region(subtag(fullpath, _tag).c_str());
 }
 
 
@@ -147,7 +147,7 @@ memory_share *device_t::memshare(const char *_tag) const
 
 	// build a fully-qualified name and look it up
 	astring fullpath;
-	return machine().memory().shared(subtag(fullpath, _tag));
+	return machine().memory().shared(subtag(fullpath, _tag).c_str());
 }
 
 
@@ -164,7 +164,7 @@ memory_bank *device_t::membank(const char *_tag) const
 
 	// build a fully-qualified name and look it up
 	astring fullpath;
-	return machine().memory().bank(subtag(fullpath, _tag));
+	return machine().memory().bank(subtag(fullpath, _tag).c_str());
 }
 
 
@@ -181,7 +181,7 @@ ioport_port *device_t::ioport(const char *tag) const
 
 	// build a fully-qualified name and look it up
 	astring fullpath;
-	return machine().ioport().port(subtag(fullpath, tag));
+	return machine().ioport().port(subtag(fullpath, tag).c_str());
 }
 
 

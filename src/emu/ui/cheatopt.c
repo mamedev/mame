@@ -115,7 +115,7 @@ void ui_menu_cheat::populate()
 	{
 		UINT32 flags;
 		curcheat->menu_text(text, subtext, flags);
-		item_append(text, subtext, flags, curcheat);
+		item_append(text.c_str(), subtext.c_str(), flags, curcheat);
 	}
 
 	/* add a separator */

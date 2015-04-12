@@ -269,7 +269,7 @@ void x86log_printf(x86log_context *log, const char *format, ...)
 
 	/* open the file, creating it if necessary */
 	if (log->file == NULL)
-		log->file = fopen(log->filename, "w");
+		log->file = fopen(log->filename.c_str(), "w");
 	if (log->file == NULL)
 		return;
 

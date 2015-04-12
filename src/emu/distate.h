@@ -66,7 +66,7 @@ public:
 	// query information
 	int index() const { return m_index; }
 	void *dataptr() const { return m_dataptr.v; }
-	const char *symbol() const { return m_symbol; }
+	const char *symbol() const { return m_symbol.c_str(); }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool divider() const { return m_flags & DSF_DIVIDER; }
 	device_state_interface *parent_state() const {return m_device_state;}

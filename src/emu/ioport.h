@@ -969,7 +969,7 @@ public:
 
 	// getters
 	ioport_diplocation *next() const { return m_next; }
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 	UINT8 number() const { return m_number; }
 	bool inverted() const { return m_invert; }
 
@@ -1197,7 +1197,7 @@ public:
 	device_t &device() const { return m_device; }
 	running_machine &machine() const;
 	ioport_field *first_field() const { return m_fieldlist.first(); }
-	const char *tag() const { return m_tag; }
+	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
 	ioport_value active_safe(ioport_value defval) const { return (this == NULL) ? defval : active(); }

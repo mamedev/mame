@@ -679,7 +679,7 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc &outtoc, chdcd_
 		}
 		outinfo.track[trknum].fname.cpy(path).cat(name);
 
-		sz = get_file_size(outinfo.track[trknum].fname);
+		sz = get_file_size(outinfo.track[trknum].fname.c_str());
 
 		outtoc.tracks[trknum].frames = sz/trksize;
 		outtoc.tracks[trknum].padframes = 0;
@@ -768,7 +768,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				}
 				else if (!strcmp(token, "WAVE"))
 				{
-					wavlen = parse_wav_sample(lastfname, &wavoffs);
+					wavlen = parse_wav_sample(lastfname.c_str(), &wavoffs);
 					if (!wavlen)
 					{
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.c_str());
@@ -938,7 +938,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				}
 				else    /* data files are different */
 				{
-					tlen = get_file_size(outinfo.track[trknum].fname);
+					tlen = get_file_size(outinfo.track[trknum].fname.c_str());
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname.c_str());
@@ -973,7 +973,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				}
 				else    /* data files are different */
 				{
-					tlen = get_file_size(outinfo.track[trknum].fname);
+					tlen = get_file_size(outinfo.track[trknum].fname.c_str());
 					if (tlen == 0)
 					{
 						printf("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname.c_str());

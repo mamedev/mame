@@ -180,7 +180,7 @@ public:
 	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
 	bool ui_active() const { return m_ui_active; }
-	const char *basename() const { return m_basename; }
+	const char *basename() const { return m_basename.c_str(); }
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return m_saveload_pending_file; }
 	screen_device *first_screen() const { return primary_screen; }

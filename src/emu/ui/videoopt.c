@@ -187,7 +187,7 @@ void ui_menu_video_options::populate()
 
 		/* create a string for the item, replacing underscores with spaces */
 		tempstring.cpy(name).replace(0, "_", " ");
-		item_append(tempstring, NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
+		item_append(tempstring.c_str(), NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 
 	/* add a separator */

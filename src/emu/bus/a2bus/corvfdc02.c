@@ -109,7 +109,7 @@ void a2bus_corvfdc02_device::device_start()
 	set_a2bus_device();
 
 	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, FDC02_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, FDC02_ROM_REGION).c_str())->base();
 
 	m_timer = timer_alloc(0);
 

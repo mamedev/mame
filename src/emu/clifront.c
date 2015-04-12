@@ -195,7 +195,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		// if we have a command, execute that
 		if (*(m_options.command()) != 0)
-			execute_commands(exename);
+			execute_commands(exename.c_str());
 
 		// otherwise, check for a valid system
 		else
@@ -1687,7 +1687,7 @@ void media_identifier::identify(const char *filename)
 			if (entry->type == ENTTYPE_FILE)
 			{
 				astring curfile(filename, PATH_SEPARATOR, entry->name);
-				identify(curfile);
+				identify(curfile.c_str());
 			}
 
 		// close the directory and be done

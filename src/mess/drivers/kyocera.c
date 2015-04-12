@@ -1169,7 +1169,7 @@ void kc85_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	astring region_tag;
-	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -1212,7 +1212,7 @@ void pc8201_state::machine_start()
 	UINT8 *ram = m_ram->pointer();
 
 	astring region_tag;
-	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -1246,7 +1246,7 @@ void trsm100_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	astring region_tag;
-	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	/* initialize RTC */
 	m_rtc->cs_w(1);
@@ -1297,7 +1297,7 @@ void trsm100_state::machine_start()
 void tandy200_state::machine_start()
 {
 	astring region_tag;
-	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_opt_region = memregion(region_tag.cpy(m_opt_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 
 	/* configure ROM banking */
 	membank("bank1")->configure_entry(0, m_rom->base());

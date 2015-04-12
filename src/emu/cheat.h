@@ -104,7 +104,7 @@ private:
 		// getters
 		item *next() const { return m_next; }
 		const number_and_format &value() const { return m_value; }
-		const char *text() const { return m_text; }
+		const char *text() const { return m_text.c_str(); }
 
 	private:
 		// internal state
@@ -221,8 +221,8 @@ public:
 	cheat_manager &manager() const { return m_manager; }
 	cheat_entry *next() const { return m_next; }
 	script_state state() const { return m_state; }
-	const char *description() const { return m_description; }
-	const char *comment() const { return m_comment; }
+	const char *description() const { return m_description.c_str(); }
+	const char *comment() const { return m_comment.c_str(); }
 
 	// script detection
 	bool has_run_script() const { return (m_run_script != NULL); }

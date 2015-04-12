@@ -628,11 +628,11 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 		if (strcmp(exec->device().tag(), device.tag()))
 		{
 			astring newtag(exec->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"cpu\"");
-			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 			fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
 			fprintf(m_output, " clock=\"%d\"", exec->device().clock());
 			fprintf(m_output, "/>\n");
@@ -646,11 +646,11 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 		if (strcmp(sound->device().tag(), device.tag()))
 		{
 			astring newtag(sound->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"audio\"");
-			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 			fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
 			if (sound->device().clock() != 0)
 				fprintf(m_output, " clock=\"%d\"", sound->device().clock());
@@ -674,10 +674,10 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 		if (strcmp(screendev->tag(), device.tag()))
 		{
 			astring newtag(screendev->tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
 
 			fprintf(m_output, "\t\t<display");
-			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 
 			switch (screendev->screen_type())
 			{
@@ -1080,11 +1080,11 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				astring output;
 
 				astring newtag(port->tag()), oldtag(":");
-				newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+				newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
 
 				// output the switch name information
 				astring normalized_field_name(xml_normalize_string(field->name()));
-				astring normalized_newtag(xml_normalize_string(newtag));
+				astring normalized_newtag(xml_normalize_string(newtag.c_str()));
 				output.catprintf("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
 
 				// loop over settings
@@ -1211,14 +1211,14 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 		if (strcmp(imagedev->device().tag(), device.tag()))
 		{
 			astring newtag(imagedev->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
 
 			// print m_output device type
 			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev->image_type_name()));
 
 			// does this device have a tag?
 			if (imagedev->device().tag())
-				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
+				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
 
 			// is this device mandatory?
 			if (imagedev->must_be_loaded())
@@ -1269,10 +1269,10 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 		if (strcmp(slot->device().tag(), device.tag()))
 		{
 			astring newtag(slot->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
+			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
 
 			// print m_output device type
-			fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(newtag));
+			fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(newtag.c_str()));
 
 			/*
 			 if (slot->slot_interface()[0])
@@ -1346,7 +1346,7 @@ void info_xml_creator::output_ramoptions()
 			{
 				astring option;
 				option.cpysubstr(options, start, (end == -1) ? -1 : end - start);
-				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_device::parse_string(option));
+				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_device::parse_string(option.c_str()));
 				if (end == -1)
 					break;
 			}

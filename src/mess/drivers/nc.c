@@ -796,7 +796,7 @@ void nc_state::machine_start()
 	m_type = NC_TYPE_1xx;
 
 	astring region_tag;
-	m_card_ram = memregion(region_tag.cpy(m_card->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_card_ram = memregion(region_tag.cpy(m_card->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_card_ram)
 		m_card_size = m_card_ram->bytes();
 	else
@@ -1140,7 +1140,7 @@ MACHINE_START_MEMBER(nc_state, nc200)
 	m_type = NC_TYPE_200;
 
 	astring region_tag;
-	m_card_ram = memregion(region_tag.cpy(m_card->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_card_ram = memregion(region_tag.cpy(m_card->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_card_ram)
 		m_card_size = m_card_ram->bytes();
 	else

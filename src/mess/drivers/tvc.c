@@ -608,7 +608,7 @@ void tvc_state::machine_start()
 	m_vram = memregion("vram");
 
 	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 }
 
 void tvc_state::machine_reset()

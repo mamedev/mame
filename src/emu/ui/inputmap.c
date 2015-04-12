@@ -421,7 +421,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 			else
 				item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 			text.printf("[root%s]", item->owner_name);
-			item_append(text, NULL, 0, NULL);
+			item_append(text.c_str(), NULL, 0, NULL);
 			prev_owner.cpy(item->owner_name);
 		}
 
@@ -442,7 +442,7 @@ void ui_menu_input::populate_and_sort(input_item_data *itemlist)
 		}
 
 		/* add the item */
-		item_append(text, subtext, flags, item);
+		item_append(text.c_str(), subtext.c_str(), flags, item);
 	}
 }
 
@@ -575,13 +575,13 @@ void ui_menu_settings::populate()
 					else
 						item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 					name.printf("[root%s]", field->device().tag());
-					item_append(name, NULL, 0, NULL);
+					item_append(name.c_str(), NULL, 0, NULL);
 					prev_owner.cpy(field->device().tag());
 				}
 
 				name.cpy(field->name());
 
-				item_append(name, field->setting_name(), flags, (void *)field);
+				item_append(name.c_str(), field->setting_name(), flags, (void *)field);
 
 				/* for DIP switches, build up the model */
 				if (type == IPT_DIPSWITCH && field->first_diplocation() != NULL)
@@ -879,7 +879,7 @@ void ui_menu_analog::populate()
 							else
 								item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 							name.printf("[root%s]", field->device().tag());
-							item_append(name, NULL, 0, NULL);
+							item_append(name.c_str(), NULL, 0, NULL);
 							prev_owner.cpy(field->device().tag());
 						}
 
@@ -938,7 +938,7 @@ void ui_menu_analog::populate()
 							flags |= MENU_FLAG_RIGHT_ARROW;
 
 						/* append a menu item */
-						item_append(text, subtext, flags, data);
+						item_append(text.c_str(), subtext.c_str(), flags, data);
 					}
 			}
 }

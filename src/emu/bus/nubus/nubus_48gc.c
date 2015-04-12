@@ -80,7 +80,7 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 		device_nubus_card_interface(mconfig, *this),
 		m_assembled_tag(tag, ":", GC48_SCREEN_NAME)
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

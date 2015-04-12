@@ -742,7 +742,7 @@ void pc2000_state::machine_start()
 {
 	astring region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base();
+	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base();
 	if (!cart)
 		cart = memregion("bios")->base();
 
@@ -756,7 +756,7 @@ void gl4004_state::machine_start()
 {
 	astring region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base();
+	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base();
 	if (!cart)
 		cart = memregion("bios")->base();
 

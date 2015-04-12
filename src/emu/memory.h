@@ -587,8 +587,8 @@ public:
 	offs_t bytestart() const { return m_bytestart; }
 	void *base() const { return *m_baseptr; }
 	void *base_decrypted() const { return *m_basedptr; }
-	const char *tag() const { return m_tag; }
-	const char *name() const { return m_name; }
+	const char *tag() const { return m_tag.c_str(); }
+	const char *name() const { return m_name.c_str(); }
 
 	// compare a range against our range
 	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
@@ -695,7 +695,7 @@ public:
 	UINT8 *base() { return (this != NULL) ? &m_buffer[0] : NULL; }
 	UINT8 *end() { return (this != NULL) ? base() + m_buffer.count() : NULL; }
 	UINT32 bytes() const { return (this != NULL) ? m_buffer.count() : 0; }
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 
 	// flag expansion
 	endianness_t endianness() const { return m_endianness; }

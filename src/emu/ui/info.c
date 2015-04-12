@@ -30,7 +30,7 @@ ui_menu_game_info::~ui_menu_game_info()
 void ui_menu_game_info::populate()
 {
 	astring tempstring;
-	item_append(machine().ui().game_info_astring(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
+	item_append(machine().ui().game_info_astring(tempstring).c_str(), NULL, MENU_FLAG_MULTILINE, NULL);
 }
 
 void ui_menu_game_info::handle()
@@ -92,7 +92,7 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 
 			// display manufacturer and year
 			string.catprintf("%s, %s", image->manufacturer(), image->year());
-			item_append(string, "", MENU_FLAG_DISABLE, NULL);
+			item_append(string.c_str(), "", MENU_FLAG_DISABLE, NULL);
 
 			// display supported information, if available
 			switch (image->supported())

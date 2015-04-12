@@ -518,7 +518,7 @@ void pasogo_state::machine_reset()
 {
 	astring region_tag;
 	ioport_port *color = ioport("COLOR");
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
 	if (!m_cart_rom)    // this should never happen, since we make carts mandatory!
 		m_cart_rom = memregion("maincpu");
 

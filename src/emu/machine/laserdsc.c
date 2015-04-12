@@ -762,7 +762,7 @@ void laserdisc_device::init_disc()
 
 		// extract the metadata
 		int fps, fpsfrac, interlaced, channels;
-		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &m_width, &m_height, &interlaced, &channels, &m_samplerate) != 7)
+		if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &m_width, &m_height, &interlaced, &channels, &m_samplerate) != 7)
 			throw emu_fatalerror("Invalid metadata in CHD file");
 		else
 			m_fps_times_1million = fps * 1000000 + fpsfrac;

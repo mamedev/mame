@@ -268,7 +268,7 @@ public:
 	ioport_array_finder(device_t &base, const char *basetag)
 	{
 		for (int index = 0; index < _Count; index++)
-			m_array[index].reset(global_alloc(ioport_finder_type(base, m_tag[index].format("%s.%d", basetag, index))));
+			m_array[index].reset(global_alloc(ioport_finder_type(base, m_tag[index].format("%s.%d", basetag, index).c_str())));
 	}
 
 	ioport_array_finder(device_t &base, const char * const *tags)
@@ -436,7 +436,7 @@ public:
 	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = sizeof(_PointerType) * 8)
 	{
 		for (int index = 0; index < _Count; index++)
-			m_array[index].reset(global_alloc(shared_ptr_type(base, m_tag[index].format("%s.%d", basetag, index), width)));
+			m_array[index].reset(global_alloc(shared_ptr_type(base, m_tag[index].format("%s.%d", basetag, index).c_str(), width)));
 	}
 
 	// array accessors

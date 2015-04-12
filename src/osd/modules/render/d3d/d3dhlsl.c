@@ -373,8 +373,8 @@ void shaders::render_snapshot(surface *surface)
 			astring text1(emulator_info::get_appname(), " ", build_version);
 			astring text2(machine->system().manufacturer, " ", machine->system().description);
 			png_info pnginfo = { 0 };
-			png_add_text(&pnginfo, "Software", text1);
-			png_add_text(&pnginfo, "System", text2);
+			png_add_text(&pnginfo, "Software", text1.c_str());
+			png_add_text(&pnginfo, "System", text2.c_str());
 
 			// now do the actual work
 			png_error error = png_write_bitmap(file, &pnginfo, avi_snap, 1 << 24, NULL);
@@ -567,7 +567,7 @@ void shaders::begin_avi_recording(const char *name)
 	if (filerr == FILERR_NONE)
 	{
 		// create the file and free the string
-		avi_error avierr = avi_create(fullpath, &info, &avi_output_file);
+		avi_error avierr = avi_create(fullpath.c_str(), &info, &avi_output_file);
 		if (avierr != AVIERR_NONE)
 		{
 			osd_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
@@ -3402,12 +3402,12 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 
 	// handle %d in the template (for image devices)
 	astring snapdev("%d_");
-	int pos = snapstr.find(0, snapdev);
+	int pos = snapstr.find(0, snapdev.c_str());
 
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (snapstr.find(pos + 3, snapdev) != -1)
+		if (snapstr.find(pos + 3, snapdev.c_str()) != -1)
 			snapstr.cpy("%g/%i");
 		// else if there is a single %d, try to create the correct snapname
 		else
@@ -3453,7 +3453,7 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 						filename.substr(0, filename.rchr(0, '.'));
 
 						// setup snapname and remove the %d_
-						snapstr.replace(0, snapdevname, filename);
+						snapstr.replace(0, snapdevname.c_str(), filename.c_str());
 						snapstr.del(pos, 3);
 
 						name_found = 1;
@@ -3492,7 +3492,7 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d_%d", seq, idx).c_str());
 
 			// try to open the file; stop when we fail
-			file_error filerr = file.open(fname);
+			file_error filerr = file.open(fname.c_str());
 			if (filerr != FILERR_NONE)
 				break;
 		}
@@ -3500,5 +3500,5 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 
 	// create the final file
 	file.set_openflags(origflags);
-	return file.open(fname);
+	return file.open(fname.c_str());
 }

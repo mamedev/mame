@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
 	// read the template file into an astring
 	UINT32 bufsize;
 	void *buffer;
-	if (core_fload(tempfilename, &buffer, &bufsize) == FILERR_NONE)
+	if (core_fload(tempfilename.c_str(), &buffer, &bufsize) == FILERR_NONE)
 	{
 		tempheader.cpy((const char *)buffer, bufsize);
 		osd_free(buffer);
@@ -347,7 +347,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, astring &srcdir, astring 
 		osd_dir_entry_type entry_type = typelist[entindex];
 
 		// open the directory and iterate through it
-		osd_directory *dir = osd_opendir(srcdir);
+		osd_directory *dir = osd_opendir(srcdir.c_str());
 		if (dir == NULL)
 		{
 			result = 1;
@@ -411,7 +411,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, astring &srcdir, astring 
 				// make sure we care, first
 				file_type type = FILE_TYPE_INVALID;
 				for (int extnum = 0; extnum < ARRAY_LENGTH(extension_lookup); extnum++)
-					if (core_filename_ends_with(curlist->name, extension_lookup[extnum].extension))
+					if (core_filename_ends_with(curlist->name.c_str(), extension_lookup[extnum].extension))
 					{
 						type = extension_lookup[extnum].type;
 						break;
@@ -517,7 +517,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 
 	// open the source file
 	core_file *src;
-	if (core_fopen(srcfile, OPEN_FLAG_READ, &src) != FILERR_NONE)
+	if (core_fopen(srcfile.c_str(), OPEN_FLAG_READ, &src) != FILERR_NONE)
 	{
 		fprintf(stderr, "Unable to read file '%s'\n", srcfile.c_str());
 		return 1;
@@ -706,7 +706,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, astring &
 
 		// append a break and move on
 		dstline.catprintf("\n");
-		core_fputs(dst, dstline);
+		core_fputs(dst, dstline.c_str());
 	}
 
 	// close tags
@@ -733,7 +733,7 @@ static core_file *create_file_and_output_header(astring &filename, astring &temp
 {
 	// create the indexfile
 	core_file *file;
-	if (core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
+	if (core_fopen(filename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
 		return NULL;
 
 	// print a header
@@ -865,7 +865,7 @@ static bool find_include_file(astring &srcincpath, int srcrootlen, int dstrootle
 
 		// see if we can open it
 		core_file *testfile;
-		if (core_fopen(srcincpath, OPEN_FLAG_READ, &testfile) == FILERR_NONE)
+		if (core_fopen(srcincpath.c_str(), OPEN_FLAG_READ, &testfile) == FILERR_NONE)
 		{
 			// close the file
 			core_fclose(testfile);

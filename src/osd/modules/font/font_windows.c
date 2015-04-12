@@ -68,7 +68,7 @@ bool osd_font_windows::open(const char *font_path, const char *_name, int &heigh
 	logfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
 	// copy in the face name
-	TCHAR *face = tstring_from_utf8(name);
+	TCHAR *face = tstring_from_utf8(name.c_str());
 	_tcsncpy(logfont.lfFaceName, face, sizeof(logfont.lfFaceName) / sizeof(TCHAR));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR)-1] = 0;
 	osd_free(face);
@@ -89,7 +89,7 @@ bool osd_font_windows::open(const char *font_path, const char *_name, int &heigh
 
 	// if it doesn't match our request, fail
 	char *utf = utf8_from_tstring(realname);
-	int result = core_stricmp(utf, name);
+	int result = core_stricmp(utf, name.c_str());
 	osd_free(utf);
 
 	// if we didn't match, nuke our font and fall back

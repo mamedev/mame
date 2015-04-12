@@ -77,19 +77,19 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	// create a unique tag for saving
 	astring state_tag;
 	state_tag.printf("%d", m_device.machine().sound().m_stream_list.count());
-	m_device.machine().save().save_item(&m_device, "stream", state_tag, 0, NAME(m_sample_rate));
+	m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), 0, NAME(m_sample_rate));
 	m_device.machine().save().register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
 	// save the gain of each input and output
 	for (int inputnum = 0; inputnum < m_input.count(); inputnum++)
 	{
-		m_device.machine().save().save_item(&m_device, "stream", state_tag, inputnum, NAME(m_input[inputnum].m_gain));
-		m_device.machine().save().save_item(&m_device, "stream", state_tag, inputnum, NAME(m_input[inputnum].m_user_gain));
+		m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), inputnum, NAME(m_input[inputnum].m_gain));
+		m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), inputnum, NAME(m_input[inputnum].m_user_gain));
 	}
 	for (int outputnum = 0; outputnum < m_output.count(); outputnum++)
 	{
 		m_output[outputnum].m_stream = this;
-		m_device.machine().save().save_item(&m_device, "stream", state_tag, outputnum, NAME(m_output[outputnum].m_gain));
+		m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), outputnum, NAME(m_output[outputnum].m_gain));
 	}
 
 	// Mark synchronous streams as such
@@ -191,7 +191,7 @@ const char *sound_stream::input_name(int inputnum, astring &string) const
 				}
 		}
 	}
-	return string;
+	return string.c_str();
 }
 
 

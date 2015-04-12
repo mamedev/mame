@@ -157,8 +157,8 @@ void ym2610_device::device_start()
 	pcmbufa  = region()->base();
 	pcmsizea = region()->bytes();
 	name.printf("%s.deltat", tag());
-	pcmbufb  = (void *)(machine().root_device().memregion(name)->base());
-	pcmsizeb = machine().root_device().memregion(name)->bytes();
+	pcmbufb = (void *)(machine().root_device().memregion(name.c_str())->base());
+	pcmsizeb = machine().root_device().memregion(name.c_str())->bytes();
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;

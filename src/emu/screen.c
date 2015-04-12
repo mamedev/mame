@@ -1054,7 +1054,7 @@ void screen_device::load_effect_overlay(const char *filename)
 
 	// load the file
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);
-	render_load_png(m_screen_overlay_bitmap, file, NULL, fullname);
+	render_load_png(m_screen_overlay_bitmap, file, NULL, fullname.c_str());
 	if (m_screen_overlay_bitmap.valid())
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else

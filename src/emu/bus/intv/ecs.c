@@ -55,7 +55,7 @@ void intv_ecs_device::device_start()
 	if (m_rom == NULL)
 	{
 		astring region_tag;
-		m_rom = memregion(region_tag.cpy(tag()).cat(":ecs"))->base();
+		m_rom = memregion(region_tag.cpy(tag()).cat(":ecs").c_str())->base();
 	}
 	if (!m_ram.count())
 	{

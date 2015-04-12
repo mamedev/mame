@@ -122,7 +122,7 @@ const char *hash_collection::hash_types(astring &buffer) const
 		buffer.cat(HASH_CRC);
 	if (m_has_sha1)
 		buffer.cat(HASH_SHA1);
-	return buffer;
+	return buffer.c_str();
 }
 
 
@@ -204,7 +204,7 @@ const char *hash_collection::internal_string(astring &buffer) const
 		buffer.cat(HASH_SHA1).cat(m_sha1.as_string(temp));
 
 	// append flags
-	return buffer.cat(m_flags);
+	return buffer.cat(m_flags).c_str();
 }
 
 
@@ -231,7 +231,7 @@ const char *hash_collection::macro_string(astring &buffer) const
 		buffer.cat("NO_DUMP ");
 	if (flag(FLAG_BAD_DUMP))
 		buffer.cat("BAD_DUMP ");
-	return buffer.trimspace();
+	return buffer.trimspace().c_str();
 }
 
 
@@ -258,7 +258,7 @@ const char *hash_collection::attribute_string(astring &buffer) const
 		buffer.cat("status=\"nodump\"" );
 	if (flag(FLAG_BAD_DUMP))
 		buffer.cat("status=\"baddump\"" );
-	return buffer.trimspace();
+	return buffer.trimspace().c_str();
 }
 
 

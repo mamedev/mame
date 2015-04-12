@@ -261,10 +261,10 @@ hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring,"primary")));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring, "primary").c_str()));
 		break;
 	case 1:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring,"slave")));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring, "slave").c_str()));
 		break;
 	}
 	if ( img == NULL )

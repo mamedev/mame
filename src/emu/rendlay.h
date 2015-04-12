@@ -52,7 +52,7 @@ public:
 
 	// getters
 	layout_element *next() const { return m_next; }
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 	running_machine &machine() const { return m_machine; }
 	int default_state() const { return m_defstate; }
 	int maxstate() const { return m_maxstate; }
@@ -208,7 +208,7 @@ public:
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const;
 		bool has_input() const { return bool(m_input_tag); }
-		const char *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_tag; }
+		const char *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_tag.c_str(); }
 
 		// fetch state based on configured source
 		int state() const;
@@ -234,7 +234,7 @@ public:
 	// getters
 	layout_view *next() const { return m_next; }
 	item *first_item(item_layer layer) const;
-	const char *name() const { return m_name; }
+	const char *name() const { return m_name.c_str(); }
 	const render_screen_list &screens() const { return m_screens; }
 	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
 

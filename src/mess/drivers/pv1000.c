@@ -406,7 +406,7 @@ void pv1000_state::machine_start()
 
 		// FIXME: this is needed for gfx decoding, but there is probably a cleaner solution!
 		astring region_tag;
-		memcpy(memregion("gfxrom")->base(), memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base(), m_cart->get_rom_size());
+		memcpy(memregion("gfxrom")->base(), memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base(), m_cart->get_rom_size());
 	}
 
 	save_item(NAME(m_io_regs));

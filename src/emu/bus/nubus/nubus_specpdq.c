@@ -87,7 +87,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const 
 		m_assembled_tag(tag, ":", SPECPDQ_SCREEN_NAME),
 		m_palette(*this, "palette")
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
@@ -97,7 +97,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 		m_assembled_tag(tag, ":", SPECPDQ_SCREEN_NAME),
 		m_palette(*this, "palette")
 {
-	m_screen_tag = m_assembled_tag;
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 //-------------------------------------------------

@@ -17,10 +17,10 @@ parameters_manager::parameters_manager(running_machine &machine)
 
 astring parameters_manager::lookup(astring tag) const
 {
-	return m_parameters.find(tag);
+	return m_parameters.find(tag.c_str());
 }
 
 void parameters_manager::add(astring tag, astring value)
 {
-	m_parameters.add(tag, value);
+	m_parameters.add(tag.c_str(), value);
 }

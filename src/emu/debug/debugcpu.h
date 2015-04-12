@@ -68,7 +68,7 @@ public:
 		bool enabled() const { return m_enabled; }
 		offs_t address() const { return m_address; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action; }
+		const char *action() const { return m_action.c_str(); }
 
 		// setters
 		void setEnabled(bool value) { m_enabled = value; }
@@ -113,7 +113,7 @@ public:
 		offs_t address() const { return m_address; }
 		offs_t length() const { return m_length; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action; }
+		const char *action() const { return m_action.c_str(); }
 
 		// setters
 		void setEnabled(bool value) { m_enabled = value; }
@@ -148,7 +148,7 @@ public:
 		int index() const { return m_index; }
 		bool enabled() const { return m_enabled; }
 		const char *condition() const { return m_condition.original_string(); }
-		const char *action() const { return m_action; }
+		const char *action() const { return m_action.c_str(); }
 
 	private:
 		// internals

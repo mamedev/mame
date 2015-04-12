@@ -99,7 +99,7 @@ void isa8_pc1640_iga_device::device_start()
 	}
 
 	/* Install 256KB Video ram on our EGA card */
-	m_vram = machine().memory().region_alloc(subtag(tempstring,"vram"), 256*1024, 1, ENDIANNESS_LITTLE);
+	m_vram = machine().memory().region_alloc(subtag(tempstring, "vram").c_str(), 256 * 1024, 1, ENDIANNESS_LITTLE);
 
 	m_videoram = m_vram->base();
 	m_plane[0] = m_videoram + 0x00000;
