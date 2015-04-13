@@ -170,7 +170,7 @@ void diablo_image_device::call_unload()
 
 static chd_error open_disk_diff(emu_options &options, const char *name, chd_file &source, chd_file &diff_chd)
 {
-	astring fname(name, ".dif");
+	astring fname = astring(name).cat(".dif");
 
 	/* try to open the diff */
 	//printf("Opening differencing image file: %s\n", fname.c_str());

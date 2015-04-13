@@ -568,7 +568,7 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		astring filename("drcbex86_", device.shortname(), ".asm");
+		astring filename = astring("drcbex86_").cat(device.shortname()).cat(".asm");
 		m_log = x86log_create_context(filename.c_str());
 	}
 }

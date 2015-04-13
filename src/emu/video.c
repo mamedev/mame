@@ -308,8 +308,8 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	create_snapshot_bitmap(screen);
 
 	// add two text entries describing the image
-	astring text1(emulator_info::get_appname(), " ", build_version);
-	astring text2(machine().system().manufacturer, " ", machine().system().description);
+	astring text1 = astring(emulator_info::get_appname()).cat(" ").cat(build_version);
+	astring text2 = astring(machine().system().manufacturer).cat(" ").cat(machine().system().description);
 	png_info pnginfo = { 0 };
 	png_add_text(&pnginfo, "Software", text1.c_str());
 	png_add_text(&pnginfo, "System", text2.c_str());
@@ -1278,8 +1278,8 @@ void video_manager::record_frame()
 			png_info pnginfo = { 0 };
 			if (m_mng_frame == 0)
 			{
-				astring text1(emulator_info::get_appname(), " ", build_version);
-				astring text2(machine().system().manufacturer, " ", machine().system().description);
+				astring text1 = astring(emulator_info::get_appname()).cat(" ").cat(build_version);
+				astring text2 = astring(machine().system().manufacturer).cat(" ").cat(machine().system().description);
 				png_add_text(&pnginfo, "Software", text1.c_str());
 				png_add_text(&pnginfo, "System", text2.c_str());
 			}

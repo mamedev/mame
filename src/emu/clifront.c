@@ -1686,7 +1686,7 @@ void media_identifier::identify(const char *filename)
 		for (const osd_directory_entry *entry = osd_readdir(directory); entry != NULL; entry = osd_readdir(directory))
 			if (entry->type == ENTTYPE_FILE)
 			{
-				astring curfile(filename, PATH_SEPARATOR, entry->name);
+				astring curfile = astring(filename).cat(PATH_SEPARATOR).cat(entry->name);
 				identify(curfile.c_str());
 			}
 

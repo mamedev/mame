@@ -132,7 +132,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 void ui_menu_control_device_image::load_software_part()
 {
-	astring temp_name(sld->list_name(), ":", swi->shortname(), ":", swp->name());
+	astring temp_name = astring(sld->list_name()).cat(":").cat(swi->shortname()).cat(":").cat(swp->name());
 
 	driver_enumerator drivlist(machine().options(), machine().options().system_name());
 	media_auditor auditor(drivlist);

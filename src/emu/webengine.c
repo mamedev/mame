@@ -260,7 +260,7 @@ static int filename_endswith(const char *str, const char *suffix)
 // This function will be called by mongoose on every new request.
 int web_engine::begin_request_handler(struct mg_connection *conn)
 {
-	astring file_path(mg_get_option(m_server, "document_root"), PATH_SEPARATOR, conn->uri);
+	astring file_path = astring(mg_get_option(m_server, "document_root")).cat(PATH_SEPARATOR).cat(conn->uri);
 	if (filename_endswith(file_path.c_str(), ".lp"))
 	{
 		FILE *fp = NULL;

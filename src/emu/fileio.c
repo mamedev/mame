@@ -281,21 +281,21 @@ file_error emu_file::open(const char *name)
 file_error emu_file::open(const char *name1, const char *name2)
 {
 	// concatenate the strings and do a standard open
-	astring name(name1, name2);
+	astring name = astring(name1).cat(name2);
 	return open(name.c_str());
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3)
 {
 	// concatenate the strings and do a standard open
-	astring name(name1, name2, name3);
+	astring name = astring(name1).cat(name2).cat(name3);
 	return open(name.c_str());
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3, const char *name4)
 {
 	// concatenate the strings and do a standard open
-	astring name(name1, name2, name3, name4);
+	astring name = astring(name1).cat(name2).cat(name3).cat(name4);
 	return open(name.c_str());
 }
 
@@ -314,21 +314,21 @@ file_error emu_file::open(const char *name, UINT32 crc)
 file_error emu_file::open(const char *name1, const char *name2, UINT32 crc)
 {
 	// concatenate the strings and do a standard open
-	astring name(name1, name2);
+	astring name = astring(name1).cat(name2);
 	return open(name.c_str(), crc);
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3, UINT32 crc)
 {
 	// concatenate the strings and do a standard open
-	astring name(name1, name2, name3);
+	astring name = astring(name1).cat(name2).cat(name3);
 	return open(name.c_str(), crc);
 }
 
 file_error emu_file::open(const char *name1, const char *name2, const char *name3, const char *name4, UINT32 crc)
 {
 	// concatenate the strings and do a standard open
-	astring name(name1, name2, name3, name4);
+	astring name = astring(name1).cat(name2).cat(name3).cat(name4);
 	return open(name.c_str(), crc);
 }
 

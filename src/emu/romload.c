@@ -1179,7 +1179,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 
 static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd)
 {
-	astring fname(ROM_GETNAME(romp), ".dif");
+	astring fname = astring(ROM_GETNAME(romp)).cat(".dif");
 
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.c_str()));
@@ -1236,7 +1236,7 @@ static void process_disk_entries(romload_private *romdata, const char *regiontag
 			chd_error err;
 
 			/* make the filename of the source */
-			astring filename(ROM_GETNAME(romp), ".chd");
+			astring filename = astring(ROM_GETNAME(romp)).cat(".chd");
 
 			/* first open the source drive */
 			LOG(("Opening disk image: %s\n", filename.c_str()));

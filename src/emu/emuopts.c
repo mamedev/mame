@@ -549,7 +549,7 @@ const char *emu_options::main_value(astring &buffer, const char *name) const
 
 const char *emu_options::sub_value(astring &buffer, const char *name, const char *subname) const
 {
-	astring tmp(",", subname, "=");
+	astring tmp = astring(",").cat(subname).cat("=");
 	buffer = value(name);
 	int pos = buffer.find(0, tmp.c_str());
 	if (pos != -1)

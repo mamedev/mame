@@ -149,8 +149,8 @@ bool software_part::is_compatible(const software_list_device &swlistdev) const
 		return true;
 
 	// copy the comma-delimited strings and ensure they end with a final comma
-	astring comp(compatibility, ",");
-	astring filt(filter, ",");
+	astring comp = astring(compatibility).cat(",");
+	astring filt = astring(filter).cat(",");
 
 	// iterate over filter items and see if they exist in the compatibility list; if so, return true
 	for (int start = 0, end = filt.chr(start, ','); end != -1; start = end + 1, end = filt.chr(start, ','))
@@ -175,10 +175,10 @@ bool software_part::matches_interface(const char *interface_list) const
 		return true;
 
 	// copy the comma-delimited interface list and ensure it ends with a final comma
-	astring interfaces(interface_list, ",");
+	astring interfaces = astring(interface_list).cat(",");
 
 	// then add a comma to the end of our interface and return true if we find it in the list string
-	astring our_interface(m_interface, ",");
+	astring our_interface = astring(m_interface).cat(",");
 	return (interfaces.find(0, our_interface.c_str()) != -1);
 }
 
@@ -500,7 +500,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 {
 	// add to the global map whenever we check a list so we don't re-check
 	// it in the future
-	if (valid.already_checked(astring("softlist/", m_list_name.c_str()).c_str()))
+	if (valid.already_checked(astring("softlist/").cat(m_list_name.c_str()).c_str()))
 		return;
 
 	// do device validation only in case of validate command

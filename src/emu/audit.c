@@ -64,7 +64,7 @@ const char *driverpath = m_enumerator.config().root_device().searchpath();
 		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 		{
 // temporary hack: add the driver path & region name
-astring combinedpath(device->searchpath(), ";", driverpath);
+astring combinedpath = astring(device->searchpath()).cat(";").cat(driverpath);
 if (device->shortname())
 	combinedpath.cat(";").cat(device->shortname());
 m_searchpath = combinedpath.c_str();
@@ -188,8 +188,15 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 	// store validation for later
 	m_validation = validation;
 
-	astring combinedpath(swinfo->shortname(), ";", list_name, PATH_SEPARATOR, swinfo->shortname());
-	astring locationtag(list_name, "%", swinfo->shortname(), "%");
+	astring combinedpath(swinfo->shortname());
+	combinedpath.cat(";");
+	combinedpath.cat(list_name);
+	combinedpath.cat(PATH_SEPARATOR);
+	combinedpath.cat(swinfo->shortname());
+	astring locationtag(list_name);
+	locationtag.cat("%");
+	locationtag.cat(swinfo->shortname());
+	locationtag.cat("%");
 	if (swinfo->parentname() != NULL)
 	{
 		locationtag.cat(swinfo->parentname());

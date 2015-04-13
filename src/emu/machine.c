@@ -206,7 +206,7 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 	else if (strlen(options().autoboot_command())!=0) {
 		astring cmd = astring(options().autoboot_command());
 		cmd.replace("'","\\'");
-		astring val = astring("emu.keypost('", cmd.c_str(), "')").c_str();
+		astring val = astring("emu.keypost('").cat(cmd.c_str()).cat("')").c_str();
 		manager().lua()->load_string(val.c_str());
 	}
 }

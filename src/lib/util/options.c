@@ -687,7 +687,7 @@ void core_options::append_entry(core_options::entry &newentry)
 
 			// for boolean options add a "no" variant as well
 			if (newentry.type() == OPTION_BOOLEAN)
-				m_entrymap.add(astring("no", newentry.name(name)).c_str(), &newentry);
+				m_entrymap.add(astring("no").cat(newentry.name(name)).c_str(), &newentry);
 		}
 }
 
