@@ -221,8 +221,10 @@ function osdmodulestargetconf()
 			}
 		else
 			if _OPTIONS["QT_HOME"]~=nil then
-				buildoptions {
-					"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
+				linkoptions {
+					"-L" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
+					"-lQtGui",
+					"-lQtCore",
 				}
 			else
 				linkoptions {
