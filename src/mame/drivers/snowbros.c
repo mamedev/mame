@@ -2290,6 +2290,7 @@ ROM_START( mcheonru ) /* SemiCom Ser-4331-4 PCB */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52",  0x00001, 0x40000, CRC(63fd8a9b) SHA1(53054d8072322842c32625ab38e7d62dc0e75627) )
 	ROM_LOAD16_BYTE( "u74",  0x00000, 0x40000, CRC(3edb17ce) SHA1(0c6ea239f57eca114d75c173b77b2c8ef43d63a2) )
+	ROM_LOAD( "hackprot", 0x7fe00, 0x200 , CRC(2c685396) SHA1(c3bc7940bb2b4394a6b6663b92a656995f6011fe) ) // hack, decrypted data from 3in1semi
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(79e965b4) SHA1(268df67ec6ea828ae01a6e4d2da9ad2a08a837f1) )
@@ -2913,6 +2914,21 @@ DRIVER_INIT_MEMBER(snowbros_state,3in1semi)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
 }
 
+DRIVER_INIT_MEMBER(snowbros_state,mcheonru_hack)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
+	
+	UINT16 *HCROM = (UINT16*)memregion("maincpu")->base();
+
+	HCROM[0x68/ 2] = 0x0007;
+	HCROM[0x6a/ 2] = 0xfe00;
+	HCROM[0x6c/ 2] = 0x0007;
+	HCROM[0x6e/ 2] = 0xff1a;
+	HCROM[0x70/ 2] = 0x0007;
+	HCROM[0x72/ 2] = 0xff4c;
+
+}
+
 READ16_MEMBER(snowbros_state::cookbib3_read)
 {
 	return 0x2a2a;
@@ -2991,7 +3007,7 @@ GAME( 1997, pzlbreak, 0,        semiprot,     pzlbreak, snowbros_state, pzlbreak
 GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", GAME_SUPPORTS_SAVE )
 GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", GAME_SUPPORTS_SAVE )
 GAME( 1998, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", GAME_SUPPORTS_SAVE )
-GAME( 1999, mcheonru, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "Ma Cheon Ru", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, mcheonru, 0,        semiprot,     moremore, snowbros_state, mcheonru_hack, ROT0, "SemiCom",              "Ma Cheon Ru", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More", GAME_SUPPORTS_SAVE )
 GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More Plus", GAME_SUPPORTS_SAVE )
 // This is very similar to the SemiCom titles, but unprotected.
