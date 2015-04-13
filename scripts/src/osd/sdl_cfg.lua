@@ -117,9 +117,15 @@ if _OPTIONS["targetos"]=="windows" then
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then
-	buildoptions {
-		'$(shell pkg-config --cflags QtGui)',
-	}
+	if _OPTIONS["QT_HOME"]~=nil then
+		buildoptions {
+			"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
+		}
+	else
+		buildoptions {
+			backtick("pkg-config --cflags QtGui"),
+		}
+	end
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",

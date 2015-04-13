@@ -78,6 +78,8 @@
 # PYTHON_EXECUTABLE = python3
 # SHADOW_CHECK = 1
 
+# QT_HOME = /usr/lib64/qt48/
+
 -include useroptions.mak
 
 ###########################################################################
@@ -523,6 +525,10 @@ endif
 
 ifdef SHADOW_CHECK
 PARAMS += --SHADOW_CHECK='$(SHADOW_CHECK)'
+endif
+
+ifdef QT_HOME
+PARAMS += --QT_HOME='$(QT_HOME)'
 endif
 
 #-------------------------------------------------

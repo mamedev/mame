@@ -105,15 +105,24 @@ function osdmodulesbuild()
 		if (os.is("windows")) then
 			MOC = "moc"
 		else
-			MOCTST = backtick("which moc-qt4 2>/dev/null")			
-			if (MOCTST=='') then
-				MOCTST = backtick("which moc 2>/dev/null")
+			if _OPTIONS["QT_HOME"]~=nil then
+				QMAKETST = backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake --version 2>/dev/null")
+				if (QMAKETST=='') then
+					print("Qt's Meta Object Compiler (moc) wasn't found!")
+					os.exit(1)
+				end	
+				MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
+			else 
+				MOCTST = backtick("which moc-qt4 2>/dev/null")			
+				if (MOCTST=='') then
+					MOCTST = backtick("which moc 2>/dev/null")
+				end
+				if (MOCTST=='') then
+					print("Qt's Meta Object Compiler (moc) wasn't found!")
+					os.exit(1)
+				end	
+				MOC = MOCTST
 			end
-			if (MOCTST=='') then
-				print("Qt's Meta Object Compiler (moc) wasn't found!")
-				os.exit(1)
-			end	
-			MOC = MOCTST
 		end
 		
 		
@@ -141,9 +150,15 @@ function osdmodulesbuild()
 				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
 		else
-			buildoptions {
-				backtick("pkg-config --cflags QtGui"),
-			}
+			if _OPTIONS["QT_HOME"]~=nil then
+				buildoptions {
+					"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
+				}
+			else
+				buildoptions {
+					backtick("pkg-config --cflags QtGui"),
+				}
+			end
 		end
 	else
 		defines {
@@ -205,9 +220,15 @@ function osdmodulestargetconf()
 				"QtGui.framework",
 			}
 		else
-			linkoptions {
-				backtick("pkg-config --libs QtGui"),
-			}
+			if _OPTIONS["QT_HOME"]~=nil then
+				buildoptions {
+					"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
+				}
+			else
+				linkoptions {
+					backtick("pkg-config --libs QtGui"),
+				}
+			end
 		end
 	end
 
@@ -293,6 +314,12 @@ newoption {
 		{ "1",  "Use Qt debugger" },
 	},
 }
+
+newoption {
+	trigger = "QT_HOME",
+	description = "QT lib location",
+}
+
 
 if not _OPTIONS["USE_QTDEBUG"] then
 	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="solaris" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"] == "emscripten" or _OPTIONS["targetos"] == "os2" then
