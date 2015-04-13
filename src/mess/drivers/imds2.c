@@ -62,7 +62,13 @@
 //
 // ICs that are not emulated yet are marked with "*"
 //
+// NOTE:
+// Firmware running on PIO is NOT original because a dump is not available at the moment.
+// Emulator runs a version of PIO firmware that was specifically developped by me to implement
+// line printer output.
+//
 // TODO:
+// - Find a dump of the original PIO firmware
 // - Emulate serial channels on IPC
 // - Emulate PIT on IPC
 // - Adjust speed of processors. Wait states are not accounted for yet.
@@ -841,8 +847,10 @@ ROM_START(imds2)
 		ROM_LOAD("ioc_a53.bin" , 0x1800 , 0x0800 , CRC(c8df4bb9) SHA1(2dfb921e94ae7033a7182457b2f00657674d1b77))
 
 		// ROM definition of PIO controller (8041A)
+		// For the time being a specially developped PIO firmware is used until a dump of the original PIO is
+		// available.
 		ROM_REGION(0x400 , "iocpio" , 0)
-		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(9a446534))
+		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b))
 
 		// ROM definition of keyboard controller (8741)
 		ROM_REGION(0x400 , "kbcpu" , 0)
