@@ -509,7 +509,7 @@ public:
 	const char* to_string()
 	{
 		if (m_detail==NULL) return error_text[(int)m_err];
-		astring errormsg(error_text[(int)m_err], ": ", m_detail);
+		astring errormsg = astring(error_text[(int)m_err]).cat(": ").cat(m_detail);
 		return core_strdup(errormsg.c_str());
 	}
 

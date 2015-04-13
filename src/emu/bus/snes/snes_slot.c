@@ -796,7 +796,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 	// otherwise, we need to use the legacy versions including DSP dump in device romset
 	if (!m_cart->get_addon_bios_size())
 	{
-		astring region(m_cart->device().tag(), ":addon");
+		astring region = astring(m_cart->device().tag()).cat(":addon");
 		UINT8 *ROM = NULL;
 
 		switch (m_addon)
