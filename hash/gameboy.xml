@@ -10996,7 +10996,20 @@
 		</part>
 	</software>
 
-	<software name="4in1ta" cloneof="varpack">
+	<software name="4in1_601" supported="no">
+		<description>Mani 4 in 1 (Chi, DMG-601 CHN)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-601-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_m161_m12" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-601-chn.bin" size="262144" crc="0c38a775" sha1="dfe46e066c599c17e684ddda3fd74c5357910630" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_602" cloneof="varpack">
 		<description>Mani 4 in 1 (Chi, DMG-602 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
@@ -11004,12 +11017,12 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mmm01" />
 			<dataarea name="rom" size="524288">
-				<rom name="mani 4 in 1 (china).bin" size="524288" crc="5bfc3ef5" sha1="c0639d6c993690022200f2fa4b3094249b9335c0" offset="000000" />
+				<rom name="dmg-602-chn.bin" size="524288" crc="5bfc3ef5" sha1="c0639d6c993690022200f2fa4b3094249b9335c0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="4in1to">
+	<software name="4in1_603">
 		<description>Mani 4 in 1 (Chi, DMG-603 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
@@ -11017,7 +11030,33 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mmm01" />
 			<dataarea name="rom" size="524288">
-				<rom name="4 in 1 (dmg-603 chn) [raw dump].bin" size="524288" crc="c373ac09" sha1="0030295574e4c518ff5cdf20febf6b6737426468" offset="000000" />
+				<rom name="dmg-603-chn.bin" size="524288" crc="c373ac09" sha1="0030295574e4c518ff5cdf20febf6b6737426468" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_604">
+		<description>Mani 4 in 1 (Chi, DMG-604 CHN)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-604-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mmm01" />
+			<dataarea name="rom" size="524288">
+				<rom name="dmg-604-chn.bin" size="524288" crc="cb48b6d0" sha1="1c79eb31a6754b4e96d33a182d36833208dc7177" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_605">
+		<description>Mani 4 in 1 (Chi, DMG-605 CHN)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-605-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mmm01" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-605-chn.bin" size="1048576" crc="950773ee" sha1="af4706da224d794668f3b2c68aea7b3c16452d83" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23435,7 +23474,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-001.bin" size="262144" crc="82f06e93" sha1="7506c75fdfa29935afb1e85f5b6013516b2e9f92" offset="0" />
+				<rom name="4b-001.bin" size="262144" crc="82f06e93" sha1="7506c75fdfa29935afb1e85f5b6013516b2e9f92" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23461,7 +23500,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-004.bin" size="262144" crc="c69a19f6" sha1="ca7990dc03a3b3ada1dce37afc4490deaf872402" offset="0" />
+				<rom name="4b-004.bin" size="262144" crc="c69a19f6" sha1="ca7990dc03a3b3ada1dce37afc4490deaf872402" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23474,7 +23513,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-005.bin" size="262144" crc="f4310eb3" sha1="2107979104cff88bcd635215a936bbc44354ea7c" offset="0" />
+				<rom name="4b-005.bin" size="262144" crc="f4310eb3" sha1="2107979104cff88bcd635215a936bbc44354ea7c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23487,7 +23526,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-006.bin" size="262144" crc="95398da5" sha1="2e856de768c7cb442a206de8c94a23548027bb60" offset="0" />
+				<rom name="4b-006.bin" size="262144" crc="95398da5" sha1="2e856de768c7cb442a206de8c94a23548027bb60" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23500,7 +23539,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-007.bin" size="262144" crc="62d9350e" sha1="0eef7f3934508ab79e1cad4ddf3bfdb3216b6b4f" offset="0" />
+				<rom name="4b-007.bin" size="262144" crc="62d9350e" sha1="0eef7f3934508ab79e1cad4ddf3bfdb3216b6b4f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23513,7 +23552,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-008.bin" size="262144" crc="740e9bc8" sha1="d7c11d56a42ed7c4ef2fe3c752931a63160d7429" offset="0" />
+				<rom name="4b-008.bin" size="262144" crc="740e9bc8" sha1="d7c11d56a42ed7c4ef2fe3c752931a63160d7429" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23526,7 +23565,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="262144">
-				<rom name="4b-009.bin" size="262144" crc="114e1f1e" sha1="39743e21935a9115fcb4ee86d67d51bdb4b5f6d6" offset="0" />
+				<rom name="4b-009.bin" size="262144" crc="114e1f1e" sha1="39743e21935a9115fcb4ee86d67d51bdb4b5f6d6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

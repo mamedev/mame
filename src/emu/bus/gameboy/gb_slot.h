@@ -12,7 +12,6 @@ enum
 	GB_MBC_NONE = 0,     /*  32KB ROM - No memory bank controller         */
 	GB_MBC_MBC1,         /*  ~2MB ROM,   8KB RAM -or- 512KB ROM, 32KB RAM */
 	GB_MBC_MBC2,         /* 256KB ROM,  32KB RAM                          */
-	GB_MBC_MMM01,        /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_MBC3,         /*   2MB ROM,  32KB RAM, RTC                     */
 	GB_MBC_MBC4,         /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_MBC5,         /*   8MB ROM, 128KB RAM (32KB w/ Rumble)         */
@@ -21,6 +20,8 @@ enum
 	GB_MBC_HUC3,         /*    ?? ROM,    ?? RAM - Hudson Soft Controller */
 	GB_MBC_MBC6,         /*    ?? ROM,  32KB SRAM                         */
 	GB_MBC_MBC7,         /*    ?? ROM,    ?? RAM                          */
+	GB_MBC_M161,         /*    ?? ROM,    ?? RAM                          */
+	GB_MBC_MMM01,        /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_WISDOM,       /*    ?? ROM,    ?? RAM - Wisdom tree controller */
 	GB_MBC_MBC1_COL,     /*   1MB ROM,  32KB RAM - workaround for MBC1 on PCB that maps rom address lines differently */
 	GB_MBC_SACHEN1,      /*    ?? ROM,    ?? RAM - Sachen MMC-1 variant */

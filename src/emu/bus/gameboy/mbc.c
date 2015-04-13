@@ -22,6 +22,7 @@ const device_type GB_ROM_MBC3 = &device_creator<gb_rom_mbc3_device>;
 const device_type GB_ROM_MBC5 = &device_creator<gb_rom_mbc5_device>;
 const device_type GB_ROM_MBC6 = &device_creator<gb_rom_mbc6_device>;
 const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
+const device_type GB_ROM_M161_M12 = &device_creator<gb_rom_m161_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
 const device_type GB_ROM_SACHEN1 = &device_creator<gb_rom_sachen1_device>;
 const device_type GB_ROM_SACHEN2 = &device_creator<gb_rom_sachen1_device>;	// Just a placeholder for the moment...
@@ -81,6 +82,11 @@ gb_rom_mbc6_device::gb_rom_mbc6_device(const machine_config &mconfig, const char
 
 gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gb_rom_mbc_device(mconfig, GB_ROM_MBC7, "GB MBC7 Carts", tag, owner, clock, "gb_rom_mbc7", __FILE__)
+{
+}
+
+gb_rom_m161_device::gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: gb_rom_mbc_device(mconfig, GB_ROM_M161_M12, "GB M161-M12 Carts", tag, owner, clock, "gb_rom_m161m12", __FILE__)
 {
 }
 
@@ -193,6 +199,18 @@ void gb_rom_mbc6_device::device_reset()
 	m_latch_bank2 = 3;  // correct default?
 	m_ram_bank = 0;
 	m_ram_enable = 0;
+}
+
+void gb_rom_m161_device::device_start()
+{
+	shared_start();
+	save_item(NAME(m_base_bank));
+}
+
+void gb_rom_m161_device::device_reset()
+{
+	shared_reset();
+	m_base_bank = 0;
 }
 
 void gb_rom_mmm01_device::device_start()
@@ -612,6 +630,33 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_ram)
 {
 	if (m_ram)
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
+}
+
+
+// M161-M12
+
+READ8_MEMBER(gb_rom_m161_device::read_rom)
+{
+	if (offset < 0x4000)
+		return m_rom[rom_bank_map[m_base_bank | m_latch_bank] * 0x4000 + offset];
+	else
+		return m_rom[rom_bank_map[m_base_bank | m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(gb_rom_m161_device::write_bank)
+{
+	switch (offset & 0xe000)
+	{
+		case 0x2000:	// ROM Bank Register? Tetris writes 1 here when selected...
+			data &= 0x1f;
+			m_latch_bank2 = data ? data : 1;
+			break;
+		case 0x4000:	// Base Bank Register
+			m_base_bank = data << 1;
+			break;
+		default:
+			break;
+	}
 }
 
 
