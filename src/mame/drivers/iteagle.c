@@ -147,7 +147,6 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_VOODOO_ADD(                  ":pci:09.0", ":maincpu")
 	MCFG_ITEAGLE_EEPROM_ADD(          ":pci:0a.0")
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(59)
@@ -201,10 +200,10 @@ static INPUT_PORTS_START( iteagle )
 	PORT_DIPSETTING(0x0000, "Not Detected" )
 
 	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 
 	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0000, "GAME" )
@@ -253,6 +252,16 @@ static INPUT_PORTS_START( gtfore06 )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( carnking )
+	PORT_INCLUDE(iteagle)
+
+	PORT_MODIFY("VERSION")
+	PORT_DIPNAME( 0x0F00, 0x0600, "GAME" )
+	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
+	PORT_DIPNAME( 0x000F, 0x0002, "MINOR" )
+
+INPUT_PORTS_END
+
 /*************************************
  *
  *  ROM definition(s)
@@ -295,17 +304,7 @@ ROM_START( iteagle )
 	EAGLE_BIOS
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-ROM_END
-ROM_START( gtfore06 )
-	EAGLE_BIOS
-
-	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
-	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
-
-	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "golf_fore_2002_v2.01.04_umv", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Labeled Golf Fore! V2.01.04 UMV */
-	//DISK_REGION( "ide:1:cdrom" ) // program CD-ROM
-
+	//DISK_REGION( ":pci:06.1:ide:1:cdrom" ) // program CD-ROM
 ROM_END
 
 ROM_START( gtfore02 )
@@ -348,6 +347,16 @@ ROM_START( gtfore05 )
 	DISK_IMAGE( "gt2005", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) )
 ROM_END
 
+ROM_START( gtfore06 )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g4c-us-u.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2002_v2.01.04_umv", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Labeled Golf Fore! V6.00.01 */
+ROM_END
+
 /*************************************
  *
  *  Game driver(s)
@@ -356,7 +365,7 @@ ROM_END
 
 GAME( 2000, iteagle,          0, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
 GAME( 2001, gtfore02,   iteagle, gtfore, gtfore02,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.00.00)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2002, carnking,   iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, carnking,   iteagle, gtfore, carnking,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gtfore04,   iteagle, gtfore, gtfore04,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2004, gtfore05,   iteagle, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, gtfore06,   iteagle, gtfore, gtfore06,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete", GAME_NOT_WORKING | GAME_NO_SOUND )
