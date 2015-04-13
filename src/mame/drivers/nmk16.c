@@ -6932,6 +6932,26 @@ ROM_START( redhawkb )
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+ROM_START( redhawkk )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
+	ROM_LOAD16_BYTE( "2", 0x000000, 0x020000, CRC(8c02e81d) SHA1(e79b0369adfe4111d7596df5270c1db8e3618ce5) )
+	ROM_LOAD16_BYTE( "3", 0x000001, 0x020000, CRC(ab3597ee) SHA1(e9a2e085fa24cb2f500600b84ce2fe3924cf0827) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "1", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )   /* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "6", 0x000001, 0x080000, CRC(6a0b8224) SHA1(07e68a6d13534ff51964d5abeb991508e8c8ea1a) )
+	ROM_LOAD16_BYTE( "7", 0x000000, 0x080000, CRC(f4fa8211) SHA1(c3fed284127c9f837ab6cbd41d89ad827b423c9e) )
+
+	ROM_REGION( 0x080000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
+	ROM_LOAD( "4", 0x000000, 0x080000, CRC(6255d6a1) SHA1(dcde3149c15717d624ca184454703a15db54bcde) )
+
+	ROM_REGION( 0x080000, "fgtile", ROMREGION_ERASEFF )   /* Layer 1, 8x8x4 */
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
 
 
 
@@ -7827,6 +7847,7 @@ GAME( 1997, redhawk,  stagger1, stagger1, stagger1, nmk16_state,   redhawk,  ROT
 GAME( 1997, redhawki, stagger1, redhawki, stagger1, driver_device, 0,        ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, driver_device, 0,        ROT270, "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, driver_device, 0,        ROT0,   "bootleg",                           "Red Hawk (bootleg)", 0 )
+GAME( 1997, redhawkk, 0,        stagger1, stagger1, driver_device, 0,        ROT270, "Afega",                             "Red Hawk (Korea)", 0 )
 
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, driver_device, 0,        ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
 GAME( 1998, grdnstrmv,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )
