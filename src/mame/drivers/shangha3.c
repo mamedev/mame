@@ -25,8 +25,8 @@ blocken:
 - how to play screen is bogus, it basically loses sync pretty soon.
 
 Notes:
-- a Blocken PCB shot barely shows a 48 MHz xtal, game is definitely too slow
-  at 8 MHz (noticeable thru colour cycling effects)
+- a Blocken PCB shot shows a 48 MHz xtal, game is definitely too slow at
+  8 MHz (noticeable thru colour cycling effects)
 - Confirmed OSC is 48MHz and OKI resonator is 1.056MHz.
 
 ***************************************************************************/
@@ -571,7 +571,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -687,7 +687,7 @@ ROM_START( heberpop )
 	ROM_LOAD( "hbpic53.bin",  0x0000, 0x80000, CRC(a4483aa0) SHA1(be301d8ac6d69f5c3fdbcb85bd557090e46da1ff) )
 ROM_END
 
-ROM_START( blocken )
+ROM_START( blocken ) /* PCB labeled KID-07 */
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "ic31j.bin",    0x0000, 0x20000, CRC(ec8de2a3) SHA1(09a6b8c1b656b17ab3d1fc057902487e4f94cf02) )
 	ROM_LOAD16_BYTE( "ic32j.bin",    0x0001, 0x20000, CRC(79b96240) SHA1(c1246bd4b91fa45c581a8fdf90cc6beb85adf8ec) )
