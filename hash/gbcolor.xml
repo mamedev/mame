@@ -12,10 +12,6 @@ Undumped:
 Undumped GBC protos:
   - Jet Force Gemini
 
-
-Undumped Pirates:
-  -  Sachen EB-004 Street Hero
-
 Unreleased (music source code exists, possibly no prototypes exist)
 - Crimson
 - Hard Truck
@@ -23540,6 +23536,86 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 			</dataarea>
 		</part>
 	</software>
+
+
+	<!-- also data from ThunderBlast Man -->
+	<software name="jboy2a" cloneof="jboy2">
+		<description>Jurassic Boy II</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="524288">
+				<rom name="jurassicboyii.bin" size="524288" crc="497be52b" sha1="4d7f15ed30dcc6ddeea1863ee8d786e3933ca92f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocmanx" supported="no">
+		<description>Rocman-X (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="524288">
+				<rom name="rocmanx.bin" size="524288" crc="7e1351cf" sha1="7e62472c13b5a6a933aa93dc5b239f11a664f337" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shero" supported="no">
+		<description>Street Hero (Tw)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="1B-004" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="393216">
+				<rom name="1b-004.bin" size="393216" crc="b580cb1f" sha1="f80ffcaf0757f16ce0e6940a2ec786ebd7549458" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thundbmna" cloneof="thundbmn" supported="no">
+		<description>Thunder Blast Man (Euro)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="SA-114" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="262144">
+				<rom name="thunderblastman_sa-114.bin" size="262144" crc="1a719ead" sha1="676b5f0a304fb83bc04921bc617b7485af529b38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+	<software name="mc31t" supported="no">
+		<description>31 in 1 Mighty Mix (Tw)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="31b-001_row.bin" size="2097152" crc="0eb8ddfb" sha1="8fa0d40dc4c239108304e8799413a69a5668404c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc31" supported="no">
+		<description>31-in-1 Mighty Mix (Aus)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="31b-001_tw.bin" size="2097152" crc="21524051" sha1="c0c2a65b1485a2768962cb97ba2f9b668528453a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 
 <!-- GOWIN games -->
 <!--

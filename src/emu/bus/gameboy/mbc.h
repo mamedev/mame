@@ -168,6 +168,27 @@ public:
 	UINT8 m_bank_mask, m_bank, m_reg;
 };
 
+// ======================> gb_rom_mbc1_device
+
+class gb_rom_sachen1_device : public gb_rom_mbc1_device
+{
+public:
+	
+	// construction/destruction
+	gb_rom_sachen1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
+	
+	UINT8 m_base_bank, m_mask;
+};
+
 // ======================> gb_rom_188in1_device
 class gb_rom_188in1_device : public gb_rom_mbc1_device
 {
@@ -304,6 +325,8 @@ extern const device_type GB_ROM_MBC5;
 extern const device_type GB_ROM_MBC6;
 extern const device_type GB_ROM_MBC7;
 extern const device_type GB_ROM_MMM01;
+extern const device_type GB_ROM_SACHEN1;
+extern const device_type GB_ROM_SACHEN2;
 extern const device_type GB_ROM_188IN1;
 extern const device_type GB_ROM_SINTAX;
 extern const device_type GB_ROM_CHONGWU;

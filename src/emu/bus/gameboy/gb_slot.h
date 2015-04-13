@@ -23,6 +23,8 @@ enum
 	GB_MBC_MBC7,         /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_WISDOM,       /*    ?? ROM,    ?? RAM - Wisdom tree controller */
 	GB_MBC_MBC1_COL,     /*   1MB ROM,  32KB RAM - workaround for MBC1 on PCB that maps rom address lines differently */
+	GB_MBC_SACHEN1,      /*    ?? ROM,    ?? RAM - Sachen MMC-1 variant */
+	GB_MBC_SACHEN2,      /*    ?? ROM,    ?? RAM - Sachen MMC-2 variant */
 	GB_MBC_YONGYONG,     /*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
 	GB_MBC_LASAMA,       /*    ?? ROM,    ?? RAM - Appears in La Sa Ma */
 	GB_MBC_ATVRACIN,

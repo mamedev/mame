@@ -211,6 +211,8 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_MMM01, "rom_mmm01" },
 	{ GB_MBC_MBC3, "rom_huc1" },    // for now treat this as alias for MBC3
 	{ GB_MBC_MBC3, "rom_huc3" },    // for now treat this as alias for MBC3
+	{ GB_MBC_SACHEN1, "rom_sachen1" },
+	{ GB_MBC_SACHEN2, "rom_sachen2" },
 	{ GB_MBC_WISDOM, "rom_wisdom" },
 	{ GB_MBC_YONGYONG, "rom_yong" },
 	{ GB_MBC_LASAMA, "rom_lasama" },

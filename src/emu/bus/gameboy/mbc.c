@@ -23,6 +23,8 @@ const device_type GB_ROM_MBC5 = &device_creator<gb_rom_mbc5_device>;
 const device_type GB_ROM_MBC6 = &device_creator<gb_rom_mbc6_device>;
 const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
+const device_type GB_ROM_SACHEN1 = &device_creator<gb_rom_sachen1_device>;
+const device_type GB_ROM_SACHEN2 = &device_creator<gb_rom_sachen1_device>;	// Just a placeholder for the moment...
 const device_type GB_ROM_188IN1 = &device_creator<gb_rom_188in1_device>;
 const device_type GB_ROM_SINTAX = &device_creator<gb_rom_sintax_device>;
 const device_type GB_ROM_CHONGWU = &device_creator<gb_rom_chongwu_device>;
@@ -84,6 +86,11 @@ gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char
 
 gb_rom_mmm01_device::gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, "GB MMM01 Carts", tag, owner, clock, "gb_rom_mmm01", __FILE__)
+{
+}
+
+gb_rom_sachen1_device::gb_rom_sachen1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: gb_rom_mbc1_device(mconfig, GB_ROM_SACHEN1, "GB Sachen MMC1 Carts", tag, owner, clock, "gb_rom_sachen1", __FILE__)
 {
 }
 
@@ -206,6 +213,20 @@ void gb_rom_mmm01_device::device_reset()
 	m_reg = 0;
 }
 
+void gb_rom_sachen1_device::device_start()
+{
+	shared_start();
+	save_item(NAME(m_base_bank));
+	save_item(NAME(m_mask));
+}
+
+void gb_rom_sachen1_device::device_reset()
+{
+	shared_reset();
+	m_base_bank = 0;
+	m_mask = 0;
+}
+
 void gb_rom_sintax_device::device_start()
 {
 	shared_start();
@@ -280,18 +301,25 @@ READ8_MEMBER(gb_rom_mbc1_device::read_rom)
 
 WRITE8_MEMBER(gb_rom_mbc1_device::write_bank)
 {
-	if (offset < 0x2000)	// RAM Enable Register
-		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
-	else if (offset < 0x4000)	// ROM Bank Register
+	// the mapper only uses inputs A13-A15
+	switch (offset & 0xe000)
 	{
-		data &= 0x1f;
-		m_latch_bank2 = data ? data : 0x01u;
-		m_latch_bank2 &= m_mask;
+		case 0x0000:	// RAM Enable Register
+			m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
+			break;
+		case 0x2000:	// ROM Bank Register
+			data &= 0x1f;
+			m_latch_bank2 = data ? data : 1;
+			m_latch_bank2 &= m_mask;
+			break;
+		case 0x4000:	// RAM Bank Register
+			m_ram_bank = data & 0x3;
+			break;
+		case 0x6000:	// MBC1 Mode Register
+		default:
+			m_mode = (data & 0x1) ? MODE_4M_256k : MODE_16M_8k;
+			break;
 	}
-	else if (offset < 0x6000)	// RAM Bank Register
-		m_ram_bank = data & 0x3;
-	else	// MBC1 Mode Register
-		m_mode = (data & 0x1) ? MODE_4M_256k : MODE_16M_8k;
 }
 
 READ8_MEMBER(gb_rom_mbc1_device::read_ram)
@@ -631,6 +659,40 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 		}
 	}
 }
+
+
+// Sachen MMC1
+
+READ8_MEMBER(gb_rom_sachen1_device::read_rom)
+{
+	if (offset < 0x4000)
+		return m_rom[rom_bank_map[(m_base_bank & m_mask) | (m_latch_bank & ~m_mask)] * 0x4000 + (offset & 0x3fff)];
+	else
+		return m_rom[rom_bank_map[(m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask)] * 0x4000 + (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(gb_rom_sachen1_device::write_bank)
+{
+	if (offset < 0x2000)	// Base ROM Bank register
+	{
+		if ((m_latch_bank2 & 0x30) == 0x30 && data)
+			m_base_bank = data & 0x0f;
+		//logerror("write to base bank %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
+	}
+	else if (offset < 0x4000)	// ROM Bank Register
+	{
+		m_latch_bank2 = data ? data : 1;
+		//logerror("write to latch %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
+	}
+	else if (offset < 0x6000)	// ROM bank mask register
+	{
+		if ((m_latch_bank2 & 0x30) == 0x30)
+			m_mask = data;
+		//logerror("write to mask %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
+	}
+	// nothing happens when writing to 0x6000-0x7fff, as verified by Tauwasser
+}
+
 
 // 188 in 1 pirate (only preliminary)
 
