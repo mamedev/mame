@@ -14,7 +14,7 @@
  XTAL  4 MHz
 
  TODO:
- 	 Hook up MC6845P
+ 	 Really understand ASIC chip
 
 ***********************************/
 
@@ -37,56 +37,109 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
+	{ }
 
-	int m_video;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-	int m_var;
+
+	UINT8 m_video;
+	UINT8 m_hsync_q;
+
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
 	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(hsync_r);
 	DECLARE_WRITE8_MEMBER(lamps_w);
+
+	DECLARE_READ8_MEMBER(asic_r);
+	DECLARE_WRITE8_MEMBER(asic_w);
+	DECLARE_WRITE8_MEMBER(a3003_w);
+
 	DECLARE_PALETTE_INIT(cardline);
-	UINT32 screen_update_cardline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	virtual void machine_start();
+
+	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	MC6845_BEGIN_UPDATE(crtc_begin_update);
+	MC6845_UPDATE_ROW(crtc_update_row);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
-
-
-#define DRAW_TILE(machine, offset, transparency)  m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,\
-					(m_videoram[index+offset] | (m_colorram[index+offset]<<8))&0x3fff,\
-					(m_colorram[index+offset]&0x80)>>7,\
-					0,0,\
-					x<<3, y<<3,\
-					transparency?transparency:(UINT32)-1);
-
-UINT32 cardline_state::screen_update_cardline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cardline_state::machine_start()
 {
-	int x,y;
-	bitmap.fill(0, cliprect);
-	for(y=0;y<32;y++)
-	{
-		for(x=0;x<64;x++)
-		{
-			int index=y*64+x;
-			if(m_video&1)
-			{
-				DRAW_TILE(machine(),0,0);
-				DRAW_TILE(machine(),0x800,1);
-			}
+	m_video = 0;
+	m_hsync_q = 1;
+	for (int i=0; i < 0x2000; i++)
+		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
+	save_item(NAME(m_video));
+	save_item(NAME(m_hsync_q));
+}
 
-			if(m_video&2)
-			{
-				DRAW_TILE(machine(),0x1000,0);
-				DRAW_TILE(machine(),0x1800,1);
-			}
+
+MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
+{
+}
+
+
+MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
+{
+	UINT8 *gfx;
+	UINT16 x = 0;
+	int gfx_ofs;
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+
+	if(m_video&1)
+		gfx_ofs = 0;
+	if(m_video&2)
+		gfx_ofs = 0x1000;
+
+	gfx = memregion("gfx1")->base();
+
+	for (UINT8 cx = 0; cx < x_count; cx++)
+	{
+		int bg_tile = (m_videoram[ma + gfx_ofs] | (m_colorram[ma + gfx_ofs]<<8)) & 0x3fff;
+		int bg_pal_ofs = ((m_colorram[ma + gfx_ofs] & 0x80) ? 256 : 0);
+		int fg_tile = (m_videoram[ma + gfx_ofs + 0x800] | (m_colorram[ma + gfx_ofs + 0x800]<<8)) & 0x3fff;
+		int fg_pal_ofs = ((m_colorram[ma + gfx_ofs + 0x800] & 0x80) ? 256 : 0);
+		for (int i = 0; i < 8; i++)
+		{
+			int bg_col = gfx[bg_tile * 64 + ra * 8 + i];
+			int fg_col = gfx[fg_tile * 64 + ra * 8 + i];
+
+			if (fg_col == 1)
+				bitmap.pix32(y, x) = palette[bg_pal_ofs + bg_col];
+			else
+				bitmap.pix32(y, x) = palette[fg_pal_ofs + fg_col];
+
+			x++;
 		}
+		ma++;
 	}
-	return 0;
+}
+
+
+WRITE_LINE_MEMBER(cardline_state::hsync_changed)
+{
+	/* update any video up to the current scanline */
+	m_hsync_q = (state ? 0x00 : 0x10);
+	m_screen->update_now();
+}
+
+WRITE_LINE_MEMBER(cardline_state::vsync_changed)
+{
+	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE8_MEMBER(cardline_state::a3003_w)
+{
+	/* seems a generate a signal when address is written to */
 }
 
 WRITE8_MEMBER(cardline_state::vram_w)
@@ -94,6 +147,23 @@ WRITE8_MEMBER(cardline_state::vram_w)
 	offset+=0x1000*((m_video&2)>>1);
 	m_videoram[offset]=data;
 }
+
+READ8_MEMBER(cardline_state::asic_r)
+{
+	static int t=0;
+	//printf("asic read %02x\n", offset);
+	// change "if (0)" to "if (1)" to get "ASIC is ERROR!" message
+	if (0)
+		return t++;
+	else
+		return 0xaa;
+}
+
+WRITE8_MEMBER(cardline_state::asic_w)
+{
+	//printf("asic write %02x %02x\n", offset, data);
+}
+
 
 WRITE8_MEMBER(cardline_state::attr_w)
 {
@@ -107,14 +177,9 @@ WRITE8_MEMBER(cardline_state::video_w)
 	//printf("m_video %x\n", m_video);
 }
 
-READ8_MEMBER(cardline_state::unk_r)
+READ8_MEMBER(cardline_state::hsync_r)
 {
-	/* TODO: Certainly a hack. Most likely video related.
-	 * 		 Using VBLANK makes screen updates to slow. May be hblank.
-	 */
-	m_var^=0x10;
-	//printf("var %x\n",m_var);
-	return m_var;
+	return m_hsync_q;
 }
 
 WRITE8_MEMBER(cardline_state::lamps_w)
@@ -140,18 +205,19 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")
 	AM_RANGE(0x2006, 0x2006) AM_READ_PORT("DSW")
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(lamps_w)
-	AM_RANGE(0x2008, 0x2008) AM_NOP
-	AM_RANGE(0x2080, 0x213f) AM_NOP
+	AM_RANGE(0x2008, 0x2008) AM_NOP // set to 1 during coin input
+	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
+	AM_RANGE(0x2100, 0x213f) AM_READWRITE(asic_r, asic_w)
 	AM_RANGE(0x2400, 0x2400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2840, 0x2840) AM_NOP
-	AM_RANGE(0x2880, 0x2880) AM_NOP
-	AM_RANGE(0x3003, 0x3003) AM_NOP
+	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
+	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
+	AM_RANGE(0x3003, 0x3003) AM_WRITE(a3003_w)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_SHARE("colorram")
 	/* Ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(unk_r, video_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(hsync_r, video_w)
 ADDRESS_MAP_END
 
 
@@ -248,8 +314,9 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 35*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
-	MCFG_SCREEN_PALETTE("palette")
+	//MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
+	//MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cardline)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -258,6 +325,10 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)   /* divisor guessed - result is 56 Hz */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(cardline_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(cardline_state, crtc_update_row)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(cardline_state, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(cardline_state, vsync_changed))
 
 	MCFG_DEFAULT_LAYOUT(layout_cardline)
 
@@ -292,4 +363,4 @@ ROM_START( cardline )
 
 ROM_END
 
-GAME( 199?, cardline,  0,       cardline,  cardline, driver_device,  0, ROT0, "Veltmeijer", "Card Line" , 0)
+GAME( 199?, cardline,  0,       cardline,  cardline, driver_device,  0, ROT0, "Veltmeijer", "Card Line" , GAME_SUPPORTS_SAVE)
