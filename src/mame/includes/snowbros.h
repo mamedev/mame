@@ -50,6 +50,8 @@ public:
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 	DECLARE_READ16_MEMBER(toto_read);
 
+	DECLARE_DRIVER_INIT(mcheonru_hack);
+
 	DECLARE_DRIVER_INIT(pzlbreak);
 	DECLARE_DRIVER_INIT(moremorp);
 	DECLARE_DRIVER_INIT(snowbro3);
