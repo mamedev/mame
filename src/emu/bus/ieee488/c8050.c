@@ -484,6 +484,15 @@ SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
+//  SLOT_INTERFACE( sfd1001_floppies )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( sfd1001_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Matsushita JU-570 / JU-570-2
+SLOT_INTERFACE_END
+
+
+//-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
@@ -727,7 +736,6 @@ static MACHINE_CONFIG_FRAGMENT( sfd1001 )
 	MCFG_DEVICE_ADD(M6530_TAG, MOS6530n, XTAL_12MHz/12)
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE(M6504_TAG, M6502_IRQ_LINE))
 	MCFG_MOS6530n_OUT_PA_CB(DEVWRITE8(FDC_TAG, c8050_fdc_t, write))
-	MCFG_MOS6530n_OUT_PB0_CB(DEVWRITELINE(FDC_TAG, c8050_fdc_t, drv_sel_w))
 	MCFG_MOS6530n_OUT_PB1_CB(DEVWRITELINE(FDC_TAG, c8050_fdc_t, ds0_w))
 	MCFG_MOS6530n_OUT_PB2_CB(DEVWRITELINE(FDC_TAG, c8050_fdc_t, ds1_w))
 	MCFG_MOS6530n_IN_PB3_CB(DEVREADLINE(FDC_TAG, c8050_fdc_t, wps_r))
@@ -739,8 +747,7 @@ static MACHINE_CONFIG_FRAGMENT( sfd1001 )
 	MCFG_C8050_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C8050_BRDY_CALLBACK(INPUTLINE(M6504_TAG, M6502_SET_OVERFLOW)) MCFG_DEVCB_XOR(1)
 	MCFG_C8050_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", c8250_floppies, "525qd", sfd1001_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", c8250_floppies, NULL,    sfd1001_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", sfd1001_floppies, "525qd", sfd1001_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -882,7 +889,7 @@ sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, d
 void c8050_device::device_start()
 {
 	// install image callbacks
-	m_fdc->set_floppy(m_floppy0->get_device(), m_floppy1->get_device());
+	m_fdc->set_floppy(m_floppy0, m_floppy1);
 
 	// register for state saving
 	save_item(NAME(m_rfdo));

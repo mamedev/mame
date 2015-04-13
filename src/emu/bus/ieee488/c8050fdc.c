@@ -216,10 +216,13 @@ void c8050_fdc_t::ds_w(int ds)
 	}
 }
 
-void c8050_fdc_t::set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1)
+void c8050_fdc_t::set_floppy(floppy_connector *floppy0, floppy_connector *floppy1)
 {
-	m_floppy0 = floppy0;
-	m_floppy1 = floppy1;
+	m_floppy0 = floppy0->get_device();
+	
+	if (floppy1) {
+		m_floppy1 = floppy1->get_device();
+	}
 }
 
 void c8050_fdc_t::live_start()

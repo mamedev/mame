@@ -76,7 +76,7 @@ public:
 	void stp1_w(int stp);
 	void ds_w(int ds);
 
-	void set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1);
+	void set_floppy(floppy_connector *floppy0, floppy_connector *floppy1);
 
 protected:
 	// device-level overrides
