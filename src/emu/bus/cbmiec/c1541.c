@@ -174,6 +174,7 @@ const device_type CSD1 = &device_creator<csd1_device>;
 const device_type C1541_DOLPHIN_DOS = &device_creator<c1541_dolphin_dos_device>;
 const device_type C1541_PROFESSIONAL_DOS_V1 = &device_creator<c1541_professional_dos_v1_device>;
 const device_type C1541_PROLOGIC_DOS_CLASSIC = &device_creator<c1541_prologic_dos_classic_device>;
+const device_type INDUS_GT = &device_creator<indus_gt_t>;
 
 
 //-------------------------------------------------
@@ -324,8 +325,8 @@ const rom_entry *sx1541_device::device_rom_region() const
 //-------------------------------------------------
 
 ROM_START( fsd1 )
-    ROM_REGION( 0x4000, M6502_TAG, 0 )
-    ROM_LOAD( "fsd1.bin", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "fsd1.bin", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0) )
 ROM_END
 
 
@@ -449,6 +450,30 @@ ROM_END
 const rom_entry *c1541_prologic_dos_classic_device::device_rom_region() const
 {
 	return ROM_NAME( c1541pdc );
+}
+
+
+//-------------------------------------------------
+//  ROM( indusgt )
+//-------------------------------------------------
+
+ROM_START( indusgt )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "u18 v1.1.u18", 0x0000, 0x2000, CRC(e401ce56) SHA1(9878053bdff7a036f57285c2c4974459df2602d8) )
+	ROM_LOAD( "u17 v1.1.u17", 0x2000, 0x2000, CRC(575ad906) SHA1(f48837b024add84f888acd83a9cf9eb7d2379172) )
+
+	ROM_REGION( 0x2000, "romdisk", 0 )
+	ROM_LOAD( "u19 v1.1.u19", 0x0000, 0x2000, CRC(8f83e7a5) SHA1(5bceaad520dac9d0527723b3b454e8ec99748e5b) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *indus_gt_t::device_rom_region() const
+{
+    return ROM_NAME( indusgt );
 }
 
 
@@ -975,19 +1000,19 @@ inline void base_c1541_device::set_iec_data()
 //  base_c1541_device - constructor
 //-------------------------------------------------
 
-base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_cbm_iec_interface(mconfig, *this),
-		device_c64_floppy_parallel_interface(mconfig, *this),
-		m_maincpu(*this, M6502_TAG),
-		m_via0(*this, M6522_0_TAG),
-		m_via1(*this, M6522_1_TAG),
-		m_ga(*this, C64H156_TAG),
-		m_floppy(*this, C64H156_TAG":0:525ssqd"),
-		m_address(*this, "ADDRESS"),
-		m_data_out(1),
-		m_via0_irq(CLEAR_LINE),
-		m_via1_irq(CLEAR_LINE)
+base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	device_cbm_iec_interface(mconfig, *this),
+	device_c64_floppy_parallel_interface(mconfig, *this),
+	m_maincpu(*this, M6502_TAG),
+	m_via0(*this, M6522_0_TAG),
+	m_via1(*this, M6522_1_TAG),
+	m_ga(*this, C64H156_TAG),
+	m_floppy(*this, C64H156_TAG":0:525ssqd"),
+	m_address(*this, "ADDRESS"),
+	m_data_out(1),
+	m_via0_irq(CLEAR_LINE),
+	m_via1_irq(CLEAR_LINE)
 {
 }
 
@@ -1083,6 +1108,14 @@ c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machi
 		m_mmu_rom(*this, "mmu")
 {
 }
+
+
+//-------------------------------------------------
+//  indus_gt_t - constructor
+//-------------------------------------------------
+
+indus_gt_t::indus_gt_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: base_c1541_device(mconfig, INDUS_GT, "Indus GT", tag, owner, clock, "indusgt", __FILE__) { }
 
 
 //-------------------------------------------------
