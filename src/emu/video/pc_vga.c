@@ -122,7 +122,8 @@ const device_type TSENG_VGA = &device_creator<tseng_vga_device>;
 const device_type S3_VGA = &device_creator<s3_vga_device>;
 const device_type GAMTOR_VGA = &device_creator<gamtor_vga_device>;
 const device_type ATI_VGA = &device_creator<ati_vga_device>;
-const device_type CIRRUS_VGA = &device_creator<cirrus_vga_device>;
+const device_type CIRRUS_GD5428 = &device_creator<cirrus_gd5428_device>;
+const device_type CIRRUS_GD5430 = &device_creator<cirrus_gd5430_device>;
 const device_type IBM8514A = &device_creator<ibm8514a_device>;
 const device_type MACH8 = &device_creator<mach8_device>;
 
@@ -173,8 +174,18 @@ ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-cirrus_vga_device::cirrus_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: svga_device(mconfig, CIRRUS_VGA, "Cirrus Logic VGA", tag, owner, clock, "cirrus_vga", __FILE__)
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: svga_device(mconfig, CIRRUS_GD5428, "Cirrus Logic GD5428", tag, owner, clock, "clgd5428", __FILE__)
+{
+}
+
+cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, "Cirrus Logic GD5430", tag, owner, clock, "clgd5430", __FILE__)
 {
 }
 
@@ -260,7 +271,7 @@ void svga_device::device_start()
 	memset(&svga, 0, sizeof(svga));
 }
 
-void cirrus_vga_device::device_start()
+void cirrus_gd5428_device::device_start()
 {
 	zero();
 
@@ -282,8 +293,17 @@ void cirrus_vga_device::device_start()
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);
 	save_pointer(vga.attribute.data,"Attribute Registers", 0x15);
+	save_item(NAME(m_chip_id));
 
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
+	
+	m_chip_id = 0x98;  // GD5428 - Rev 0
+}
+
+void cirrus_gd5430_device::device_start()
+{
+	cirrus_gd5428_device::device_start();
+	m_chip_id = 0xa0;  // GD5430 - Rev 0
 }
 
 void ati_vga_device::device_start()
@@ -1143,7 +1163,7 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-UINT32 cirrus_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,bit;
 	UINT32 ptr = (vga.svga_intf.vram_size - 0x4000);  // cursor patterns are stored in the last 16kB of VRAM
@@ -2100,7 +2120,7 @@ void s3_vga_device::device_reset()
 	s3.sr11 = 0x41;
 }
 
-void cirrus_vga_device::device_reset()
+void cirrus_gd5428_device::device_reset()
 {
 	vga_device::device_reset();
 	gc_locked = true;
@@ -2248,13 +2268,22 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_trident_vga )
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_vga )
+MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_gd5428 )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_vga_device, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", CIRRUS_VGA, 0)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_gd5430 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( pcvideo_gamtor_vga )
@@ -5726,14 +5755,14 @@ Cirrus SVGA card implementation
 
 ******************************************/
 
-void cirrus_vga_device::cirrus_define_video_mode()
+void cirrus_gd5428_device::cirrus_define_video_mode()
 {
 	svga.rgb8_en = 0;
 	svga.rgb15_en = 0;
 	svga.rgb16_en = 0;
 	svga.rgb24_en = 0;
 	svga.rgb32_en = 0;
-	if ((vga.sequencer.data[0x06] == 0x12) && (vga.sequencer.data[0x07] & 0x01))
+	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))
 	{
 		switch(vga.sequencer.data[0x07] & 0x0E)
 		{
@@ -5744,9 +5773,10 @@ void cirrus_vga_device::cirrus_define_video_mode()
 			case 0x08:  svga.rgb32_en = 1; break;
 		}
 	}
+	recompute_params_clock(1, (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz);
 }
 
-UINT16 cirrus_vga_device::offset()
+UINT16 cirrus_gd5428_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
 	if(gc_mode_ext & 0x10)
@@ -5756,7 +5786,7 @@ UINT16 cirrus_vga_device::offset()
 	return vga_device::offset();
 }
 
-UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
+UINT8 cirrus_gd5428_device::cirrus_seq_reg_read(UINT8 index)
 {
 	UINT8 res;
 
@@ -5796,7 +5826,7 @@ UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
 	return res;
 }
 
-void cirrus_vga_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
+void cirrus_gd5428_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 {
 	switch(index)
 	{
@@ -5874,7 +5904,7 @@ void cirrus_vga_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 	}
 }
 
-UINT8 cirrus_vga_device::cirrus_gc_reg_read(UINT8 index)
+UINT8 cirrus_gd5428_device::cirrus_gc_reg_read(UINT8 index)
 {
 	UINT8 res = 0xff;
 
@@ -5922,7 +5952,7 @@ UINT8 cirrus_vga_device::cirrus_gc_reg_read(UINT8 index)
 	return res;
 }
 
-void cirrus_vga_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
+void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 {
 	logerror("CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
@@ -5971,7 +6001,7 @@ void cirrus_vga_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 	}
 }
 
-READ8_MEMBER(cirrus_vga_device::port_03c0_r)
+READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
 {
 	UINT8 res = 0xff;
 
@@ -6019,7 +6049,7 @@ READ8_MEMBER(cirrus_vga_device::port_03c0_r)
 	return res;
 }
 
-WRITE8_MEMBER(cirrus_vga_device::port_03c0_w)
+WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 {
 	switch(offset)
 	{
@@ -6061,7 +6091,7 @@ WRITE8_MEMBER(cirrus_vga_device::port_03c0_w)
 	cirrus_define_video_mode();
 }
 
-READ8_MEMBER(cirrus_vga_device::port_03b0_r)
+READ8_MEMBER(cirrus_gd5428_device::port_03b0_r)
 {
 	UINT8 res = 0xff;
 
@@ -6081,7 +6111,7 @@ READ8_MEMBER(cirrus_vga_device::port_03b0_r)
 	return res;
 }
 
-READ8_MEMBER(cirrus_vga_device::port_03d0_r)
+READ8_MEMBER(cirrus_gd5428_device::port_03d0_r)
 {
 	UINT8 res = 0xff;
 
@@ -6101,7 +6131,7 @@ READ8_MEMBER(cirrus_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(cirrus_vga_device::port_03b0_w)
+WRITE8_MEMBER(cirrus_gd5428_device::port_03b0_w)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -6116,9 +6146,10 @@ WRITE8_MEMBER(cirrus_vga_device::port_03b0_w)
 				break;
 		}
 	}
+	cirrus_define_video_mode();
 }
 
-WRITE8_MEMBER(cirrus_vga_device::port_03d0_w)
+WRITE8_MEMBER(cirrus_gd5428_device::port_03d0_w)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -6133,9 +6164,10 @@ WRITE8_MEMBER(cirrus_vga_device::port_03d0_w)
 				break;
 		}
 	}
+	cirrus_define_video_mode();
 }
 
-UINT8 cirrus_vga_device::cirrus_crtc_reg_read(UINT8 index)
+UINT8 cirrus_gd5428_device::cirrus_crtc_reg_read(UINT8 index)
 {
 	UINT8 res = 0xff;
 
@@ -6154,7 +6186,7 @@ UINT8 cirrus_vga_device::cirrus_crtc_reg_read(UINT8 index)
 		res = m_cr1b;
 		break;
 	case 0x27:
-		res = 0xa0;  // Chip ID - GD5430 rev 0
+		res = m_chip_id;
 		break;
 	default:
 		logerror("CL: Unhandled extended CRTC register CR%02x read\n",index);
@@ -6163,7 +6195,7 @@ UINT8 cirrus_vga_device::cirrus_crtc_reg_read(UINT8 index)
 	return res;
 }
 
-void cirrus_vga_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
+void cirrus_gd5428_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
 {
 	if(index <= 0x18)
 	{
@@ -6190,7 +6222,7 @@ void cirrus_vga_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
 
 }
 
-READ8_MEMBER(cirrus_vga_device::mem_r)
+READ8_MEMBER(cirrus_gd5428_device::mem_r)
 {
 	UINT32 addr;
 	UINT8 bank;
@@ -6291,7 +6323,7 @@ READ8_MEMBER(cirrus_vga_device::mem_r)
 	}
 }
 
-WRITE8_MEMBER(cirrus_vga_device::mem_w)
+WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 {
 	UINT32 addr;
 	UINT8 bank;

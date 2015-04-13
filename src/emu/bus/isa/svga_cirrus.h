@@ -31,7 +31,7 @@ protected:
 		virtual void device_start();
 		virtual void device_reset();
 private:
-		cirrus_vga_device *m_vga;
+		cirrus_gd5430_device *m_vga;
 };
 
 

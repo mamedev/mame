@@ -12,7 +12,8 @@
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_trident_vga );
 MACHINE_CONFIG_EXTERN( pcvideo_gamtor_vga );
-MACHINE_CONFIG_EXTERN( pcvideo_cirrus_vga );
+MACHINE_CONFIG_EXTERN( pcvideo_cirrus_gd5428 );
+MACHINE_CONFIG_EXTERN( pcvideo_cirrus_gd5430 );
 MACHINE_CONFIG_EXTERN( pcvideo_s3_vga );
 
 // ======================> vga_device
@@ -623,12 +624,12 @@ extern const device_type GAMTOR_VGA;
 
 // ======================> cirrus_vga_device
 
-class cirrus_vga_device :  public svga_device
+class cirrus_gd5428_device :  public svga_device
 {
 public:
 	// construction/destruction
-	cirrus_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
+	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual READ8_MEMBER(port_03c0_r);
 	virtual WRITE8_MEMBER(port_03c0_w);
 	virtual READ8_MEMBER(port_03b0_r);
@@ -644,6 +645,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual UINT16 offset();
+
+	UINT8 m_chip_id;
 
 	UINT8 gc_mode_ext;
 	UINT8 gc_bank_0;
@@ -676,8 +679,18 @@ private:
 	void cirrus_crtc_reg_write(UINT8 index, UINT8 data);
 };
 
+class cirrus_gd5430_device :  public cirrus_gd5428_device
+{
+public:
+	cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	virtual void device_start();
+};
+
 // device type definition
-extern const device_type CIRRUS_VGA;
+extern const device_type CIRRUS_GD5428;
+extern const device_type CIRRUS_GD5430;
+
 /*
   pega notes (paradise)
   build in amstrad pc1640

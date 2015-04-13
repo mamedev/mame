@@ -56,9 +56,9 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000380, 0x80000387) AM_DEVREADWRITE8( "ns16550_2", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000388, 0x8000038F) AM_DEVREADWRITE8( "ns16550_3", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800003b0, 0x800003bf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03b0_r, port_03b0_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03c0_r, port_03c0_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03d0_r, port_03d0_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x800003b0, 0x800003bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x800003c0, 0x800003cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x800003d0, 0x800003df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003F0, 0x800003F7) AM_DEVICE8( "smc37c78", smc37c78_device, map, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800003F8, 0x800003FF) AM_DEVREADWRITE8( "ns16550_0",ns16550_device,  ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
@@ -67,8 +67,8 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8("cirrus", cirrus_device, cirrus_42E8_w, U64(0xffffffffffffffff) )
 
 	AM_RANGE(0xBFFFFFF0, 0xBFFFFFFF) AM_READ(bebox_interrupt_ack_r )
-	AM_RANGE(0xC00A0000, 0XC00BFFFF) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_r, mem_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0xC1000000, 0XC11FFFFF) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_linear_r, mem_linear_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xC00A0000, 0XC00BFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xC1000000, 0XC11FFFFF) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_linear_r, mem_linear_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0xFFF00000, 0xFFF03FFF) AM_ROMBANK("bank2")
 	AM_RANGE(0xFFF04000, 0xFFFFFFFF) AM_READWRITE8(bebox_flash_r, bebox_flash_w, U64(0xffffffffffffffff) )
 ADDRESS_MAP_END
@@ -189,7 +189,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	MCFG_DEVICE_ADD( "ns16550_3", NS16550, 0 )   /* TODO: Verify model */
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

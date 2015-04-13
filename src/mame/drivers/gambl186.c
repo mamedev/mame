@@ -50,7 +50,7 @@ public:
 static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("data",0) // TODO: way bigger than this, banked?
-	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_r, mem_w, 0xffff)
+	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
@@ -60,9 +60,9 @@ READ16_MEMBER(gambl186_state::unk_r)
 }
 
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03b0_r, port_03b0_w, 0xffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03c0_r, port_03c0_w, 0xffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03d0_r, port_03d0_w, 0xffff)
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffff)
 	AM_RANGE(0x0400, 0x0401) AM_WRITENOP // sound
 	AM_RANGE(0x0500, 0x0501) AM_READ_PORT("IN0")
 	AM_RANGE(0x0502, 0x0503) AM_READ_PORT("IN1")
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( gambl186, gambl186_state )
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
 
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
 MACHINE_CONFIG_END
 
 
