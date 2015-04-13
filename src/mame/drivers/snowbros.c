@@ -1619,23 +1619,23 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
+	MCFG_CPU_CLOCK(XTAL_12MHz) /* 12MHz - Confirmed */
 	MCFG_CPU_PROGRAM_MAP(hyperpac_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
+	MCFG_CPU_CLOCK(XTAL_16MHz/4) /* 4MHz - Confirmed */
 	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
 	MCFG_CPU_IO_MAP(hyperpac_sound_io_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", hyperpac)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, XTAL_16MHz/4) /* 4MHz - Confirmed */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2241,7 +2241,7 @@ ROM_START( moremorp )
 	ROM_LOAD( "mmp_u78.bin", 0x180000, 0x80000, CRC(5508d80b) SHA1(1b9a70a502b237fa11d1d55dce761e2def18873a) )
 ROM_END
 
-ROM_START( 3in1semi )
+ROM_START( 3in1semi ) /* SemiCom Ser-4331-4 PCB */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52",  0x00001, 0x40000, CRC(b0e4a0f7) SHA1(e1f8b8ef020a85fcd7817814cf6c5d560e9e608d) )
 	ROM_LOAD16_BYTE( "u74",  0x00000, 0x40000, CRC(266862c4) SHA1(2c5c513fee99bdb6e0ae3e0e644e516bdaddd629) )
@@ -2265,6 +2265,51 @@ ROM_START( 3in1semi )
 	ROM_LOAD( "u76", 0x080000, 0x80000, CRC(5f4b48ea) SHA1(e9dd1100d55b021b060990988c1e5271ce1ae35b) )
 	ROM_LOAD( "u77", 0x100000, 0x80000, CRC(d44211e3) SHA1(53af19dec03e76912632450414cdbcbb31cc094c) )
 	ROM_LOAD( "u78", 0x180000, 0x80000, CRC(af596afc) SHA1(875d7a51ff5c741cae4483d8da33df9cae8de52a) )
+ROM_END
+
+/*
+
+Ma Cheon Ru
+SemiCom (c) 1999
+
+PCB:  Ser-4331-4
+
+  CPU: 68000, Z80
+Sound: OKIM6295, YM2151+YM3012 (rebadged as KA51+BS902)
+Video: QuickLogic QL2003-XPL84C
+  OSC: 16MHz, 12MHz
+
+Measurements:
+   68000 12MHz
+     Z80 4MHz (16MHz/4)
+  YM2151 4MHz (16MHz/4)
+OKI 6295 1MHz (16MHz/16, pin 7 High)
+*/
+
+ROM_START( mcheonru ) /* SemiCom Ser-4331-4 PCB */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "u52",  0x00001, 0x40000, CRC(63fd8a9b) SHA1(53054d8072322842c32625ab38e7d62dc0e75627) )
+	ROM_LOAD16_BYTE( "u74",  0x00000, 0x40000, CRC(3edb17ce) SHA1(0c6ea239f57eca114d75c173b77b2c8ef43d63a2) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(79e965b4) SHA1(268df67ec6ea828ae01a6e4d2da9ad2a08a837f1) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from
+	   shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , NO_DUMP )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "u14", 0x00000, 0x40000, CRC(28a62d23) SHA1(24dbe6229647032599e02225de57650205dce5c3) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "u75", 0x000000, 0x80000, CRC(0142c085) SHA1(9d948a63e4edcdb7f5cef0d2d7f118e6cbf4779e) )
+	ROM_LOAD( "u76", 0x080000, 0x80000, CRC(27fda507) SHA1(87820348470979da730956066d3c820faedbec13) )
+	ROM_LOAD( "u77", 0x100000, 0x80000, CRC(4dfe0550) SHA1(9a227114765ea5327b64061e4b4e4d4f19bd3293) )
+	ROM_LOAD( "u78", 0x180000, 0x80000, CRC(f1b74978) SHA1(d1ac1bc212050d4f1a861045ab612115c73d3fd0) )
 ROM_END
 
 ROM_START( cookbib2 )
@@ -2942,12 +2987,13 @@ GAME( 1995, hyperpacb,hyperpac, semicom,      hyperpac, driver_device,  0,      
 GAME( 1996, cookbib2, 0,        semiprot,     cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2", GAME_SUPPORTS_SAVE )
 GAME( 1996, toppyrap, 0,        semiprot,     toppyrap, driver_device,  0,        ROT0, "SemiCom",              "Toppy & Rappy", GAME_SUPPORTS_SAVE )
 GAME( 1997, cookbib3, 0,        semiprot,     cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", GAME_SUPPORTS_SAVE )
-GAME( 1997, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", GAME_SUPPORTS_SAVE )
-GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", GAME_SUPPORTS_SAVE )
 GAME( 1997, pzlbreak, 0,        semiprot,     pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom",              "Puzzle Break", GAME_SUPPORTS_SAVE )
+GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", GAME_SUPPORTS_SAVE )
+GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", GAME_SUPPORTS_SAVE )
+GAME( 1998, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", GAME_SUPPORTS_SAVE )
+GAME( 1999, mcheonru, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "Ma Cheon Ru", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More", GAME_SUPPORTS_SAVE )
 GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More Plus", GAME_SUPPORTS_SAVE )
-GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", GAME_SUPPORTS_SAVE )
 // This is very similar to the SemiCom titles, but unprotected.
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , GAME_SUPPORTS_SAVE )
 
