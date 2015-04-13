@@ -7846,8 +7846,8 @@ GAME( 1998, stagger1, 0,        stagger1, stagger1, driver_device, 0,        ROT
 GAME( 1997, redhawk,  stagger1, stagger1, stagger1, nmk16_state,   redhawk,  ROT270, "Afega (New Vision Ent. license)",   "Red Hawk (US)", 0 )
 GAME( 1997, redhawki, stagger1, redhawki, stagger1, driver_device, 0,        ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, driver_device, 0,        ROT270, "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 )
+GAME( 1997, redhawkk, stagger1, stagger1, stagger1, driver_device, 0,        ROT270, "Afega",                             "Red Hawk (Korea)", 0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, driver_device, 0,        ROT0,   "bootleg",                           "Red Hawk (bootleg)", 0 )
-GAME( 1997, redhawkk, 0,        stagger1, stagger1, driver_device, 0,        ROT270, "Afega",                             "Red Hawk (Korea)", 0 )
 
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, driver_device, 0,        ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
 GAME( 1998, grdnstrmv,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrm, ROT270,             "Afega (Apples Industries license)", "Guardian Storm (vertical)", 0 )
