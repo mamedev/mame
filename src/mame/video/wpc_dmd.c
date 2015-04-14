@@ -56,14 +56,14 @@ void wpc_dmd_device::device_start()
 	screen_buffer.resize(128*32);
 	bitcounts.resize(256);
 
-	dmd0->configure_entries(0, 0x10, ram, 0x200);
-	dmd2->configure_entries(0, 0x10, ram, 0x200);
-	dmd4->configure_entries(0, 0x10, ram, 0x200);
-	dmd6->configure_entries(0, 0x10, ram, 0x200);
-	dmd8->configure_entries(0, 0x10, ram, 0x200);
-	dmda->configure_entries(0, 0x10, ram, 0x200);
+	dmd0->configure_entries(0, 0x10, &ram[0], 0x200);
+	dmd2->configure_entries(0, 0x10, &ram[0], 0x200);
+	dmd4->configure_entries(0, 0x10, &ram[0], 0x200);
+	dmd6->configure_entries(0, 0x10, &ram[0], 0x200);
+	dmd8->configure_entries(0, 0x10, &ram[0], 0x200);
+	dmda->configure_entries(0, 0x10, &ram[0], 0x200);
 
-	memset(ram, 0x00, 0x2000);
+	memset(&ram[0], 0x00, 0x2000);
 
 	for(int i=0; i<256; i++) {
 		int bc = i;
@@ -90,7 +90,7 @@ void wpc_dmd_device::device_reset()
 	dmd8->set_entry(4);
 	dmda->set_entry(5);
 
-	memset(screen_buffer, 0x00, 128*32);
+	memset(&screen_buffer[0], 0x00, 128*32);
 	visible_page = 0;
 	firq_scanline = 0;
 	cur_scanline = 0;
@@ -98,7 +98,7 @@ void wpc_dmd_device::device_reset()
 
 UINT32 wpc_dmd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *src = screen_buffer;
+	const UINT8 *src = &screen_buffer[0];
 	for(int y=0; y<32; y++) {
 		UINT32 *pix0 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y*4));
 		UINT32 *pix1 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y*4+1));
@@ -143,7 +143,7 @@ UINT32 wpc_dmd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 TIMER_DEVICE_CALLBACK_MEMBER(wpc_dmd_device::scanline_timer)
 {
-	const UINT8 *src = ram + 0x200*(visible_page & 0xf) + 16*cur_scanline;
+	const UINT8 *src = &ram[0x200*(visible_page & 0xf) + 16*cur_scanline];
 	UINT8 *base = &screen_buffer[128*cur_scanline];
 
 	for(int x1=0; x1<16; x1++) {

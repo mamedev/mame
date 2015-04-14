@@ -614,7 +614,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 		DOCK = m_dock->get_rom_base();
 
 		// check header
-		image.fread(header, 9);
+		image.fread(&header[0], 9);
 
 		for (int i = 0; i < 8; i++)
 			if (header[i + 1] & 0x02) chunks_in_file++;

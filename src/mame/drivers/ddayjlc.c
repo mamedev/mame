@@ -662,7 +662,7 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 		UINT32 oldaddr, newadr, length,j;
 		UINT8 *src, *dst;
 		dynamic_buffer temp(0x10000);
-		src = temp;
+		src = &temp[0];
 		dst = memregion("gfx1")->base();
 		length = memregion("gfx1")->bytes();
 		memcpy(src, dst, length);

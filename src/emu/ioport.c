@@ -1097,7 +1097,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 								newcode.field[1] = field;
 							}
 							newcode.ch = code;
-							m_keycode_map.append(newcode);
+							m_keycode_map.push_back(newcode);
 
 							if (LOG_NATURAL_KEYBOARD)
 							{
@@ -1190,9 +1190,9 @@ void natural_keyboard::internal_post(unicode_char ch)
 
 	// add to the buffer, resizing if necessary
 	m_buffer[m_bufend++] = ch;
-	if ((m_bufend + 1) % m_buffer.count() == m_bufbegin)
-		m_buffer.resize_keep(m_buffer.count() + KEY_BUFFER_SIZE);
-	m_bufend %= m_buffer.count();
+	if ((m_bufend + 1) % m_buffer.size() == m_bufbegin)
+		m_buffer.resize(m_buffer.size() + KEY_BUFFER_SIZE);
+	m_bufend %= m_buffer.size();
 }
 
 
@@ -1208,7 +1208,7 @@ void natural_keyboard::timer(void *ptr, int param)
 	{
 		while (!empty() && m_queue_chars(&m_buffer[m_bufbegin], 1))
 		{
-			m_bufbegin = (m_bufbegin + 1) % m_buffer.count();
+			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
 			if (m_current_rate != attotime::zero)
 				break;
 		}
@@ -1218,7 +1218,7 @@ void natural_keyboard::timer(void *ptr, int param)
 	else
 	{
 		if (m_status_keydown)
-			m_bufbegin = (m_bufbegin + 1) % m_buffer.count();
+			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
 		m_status_keydown = !m_status_keydown;
 	}
 
@@ -1274,7 +1274,7 @@ const char *natural_keyboard::unicode_to_string(astring &buffer, unicode_char ch
 
 const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(unicode_char ch) const
 {
-	for (int index = 0; index < m_keycode_map.count(); index++)
+	for (unsigned int index = 0; index < m_keycode_map.size(); index++)
 	{
 		if (m_keycode_map[index].ch == ch)
 			return &m_keycode_map[index];
@@ -1341,7 +1341,7 @@ astring natural_keyboard::dump()
 	const size_t left_column_width = 24;
 
 	// loop through all codes
-	for (int index = 0; index < m_keycode_map.count(); index++)
+	for (unsigned int index = 0; index < m_keycode_map.size(); index++)
 	{
 		// describe the character code
 		const natural_keyboard::keycode_map_entry &code = m_keycode_map[index];
@@ -3031,8 +3031,8 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 	if (count > 0)
 	{
 		// allocate tables
-		dynamic_array<input_code> oldtable(count);
-		dynamic_array<input_code> newtable(count);
+		std::vector<input_code> oldtable(count);
+		std::vector<input_code> newtable(count);
 
 		// build up the remap table
 		count = 0;

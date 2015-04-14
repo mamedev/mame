@@ -431,8 +431,8 @@ public:
 				{
 					// read the sound samples
 					m_audio[chnum].resize(samples);
-					samplesptr[chnum] = m_audio[chnum];
-					avi_error avierr = avi_read_sound_samples(&m_file, chnum, first_sample, samples, m_audio[chnum]);
+					samplesptr[chnum] = &m_audio[chnum][0];
+					avi_error avierr = avi_read_sound_samples(&m_file, chnum, first_sample, samples, &m_audio[chnum][0]);
 					if (avierr != AVIERR_NONE)
 						report_error(1, "Error reading audio samples %d-%d from channel %d: %s", first_sample, samples, chnum, avi_error_string(avierr));
 				}
@@ -455,8 +455,12 @@ public:
 				avhuff_error averr = avhuff_encoder::assemble_data(m_rawdata, subbitmap, channels, samples, samplesptr);
 				if (averr != AVHERR_NONE)
 					report_error(1, "Error assembling data for frame %d", framenum);
-				if (m_rawdata.count() < m_info.bytes_per_frame)
-					m_rawdata.resize_keep_and_clear_new(m_info.bytes_per_frame);
+				if (m_rawdata.size() < m_info.bytes_per_frame)
+				{
+					int old_size = m_rawdata.size();
+					m_rawdata.resize(m_info.bytes_per_frame);
+					memset(&m_rawdata[old_size], 0, m_info.bytes_per_frame - old_size);
+				}
 
 				// copy to the destination
 				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);
@@ -480,7 +484,7 @@ private:
 	bitmap_yuy16                m_bitmap;
 	UINT32                      m_start_frame;
 	UINT32                      m_frame_count;
-	dynamic_array<INT16>        m_audio[8];
+	std::vector<INT16>        m_audio[8];
 	dynamic_buffer              m_ldframedata;
 	dynamic_buffer              m_rawdata;
 };
@@ -1371,7 +1375,7 @@ static void do_info(parameters_t &params)
 
 	// print out metadata
 	dynamic_buffer buffer;
-	dynamic_array<metadata_index_info> info;
+	std::vector<metadata_index_info> info;
 	for (int index = 0; ; index++)
 	{
 		// get the indexed metadata item; stop when we hit an error
@@ -1383,7 +1387,7 @@ static void do_info(parameters_t &params)
 
 		// determine our index
 		UINT32 metaindex = ~0;
-		for (int cur = 0; cur < info.count(); cur++)
+		for (unsigned int cur = 0; cur < info.size(); cur++)
 			if (info[cur].tag == metatag)
 			{
 				metaindex = ++info[cur].index;
@@ -1394,19 +1398,19 @@ static void do_info(parameters_t &params)
 		if (metaindex == ~0)
 		{
 			metadata_index_info curinfo = { metatag, 0 };
-			info.append(curinfo);
+			info.push_back(curinfo);
 			metaindex = 0;
 		}
 
 		// print either a string representation or a hex representation of the tag
 		if (isprint((metatag >> 24) & 0xff) && isprint((metatag >> 16) & 0xff) && isprint((metatag >> 8) & 0xff) && isprint(metatag & 0xff))
-			printf("Metadata:     Tag='%c%c%c%c'  Index=%d  Length=%d bytes\n", (metatag >> 24) & 0xff, (metatag >> 16) & 0xff, (metatag >> 8) & 0xff, metatag & 0xff, metaindex, buffer.count());
+			printf("Metadata:     Tag='%c%c%c%c'  Index=%d  Length=%d bytes\n", (metatag >> 24) & 0xff, (metatag >> 16) & 0xff, (metatag >> 8) & 0xff, metatag & 0xff, metaindex, int(buffer.size()));
 		else
-			printf("Metadata:     Tag=%08x  Index=%d  Length=%d bytes\n", metatag, metaindex, buffer.count());
+			printf("Metadata:     Tag=%08x  Index=%d  Length=%d bytes\n", metatag, metaindex, int(buffer.size()));
 		printf("              ");
 
 		// print up to 60 characters of metadata
-		UINT32 count = MIN(60, buffer.count());
+		UINT32 count = MIN(60, buffer.size());
 		for (int chnum = 0; chnum < count; chnum++)
 			printf("%c", isprint(UINT8(buffer[chnum])) ? buffer[chnum] : '.');
 		printf("\n");
@@ -1501,13 +1505,13 @@ static void do_verify(parameters_t &params)
 		progress(false, "Verifying, %.1f%% complete... \r", 100.0 * double(offset) / double(input_chd.logical_bytes()));
 
 		// determine how much to read
-		UINT32 bytes_to_read = MIN((UINT32)buffer.count(), input_chd.logical_bytes() - offset);
-		chd_error err = input_chd.read_bytes(offset, buffer, bytes_to_read);
+		UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_chd.logical_bytes() - offset);
+		chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->c_str(), chd_file::error_string(err));
 
 		// add to the checksum
-		rawsha1.append(buffer, bytes_to_read);
+		rawsha1.append(&buffer[0], bytes_to_read);
 		offset += bytes_to_read;
 	}
 	sha1_t computed_sha1 = rawsha1.finish();
@@ -1743,7 +1747,7 @@ static void do_create_hd(parameters_t &params)
 			report_error(1, "Error reading ident file (%s)", ident_str->c_str());
 
 		// must be at least 14 bytes; extract CHS data from there
-		if (identdata.count() < 14)
+		if (identdata.size() < 14)
 			report_error(1, "Ident file '%s' is invalid (too short)", ident_str->c_str());
 		cylinders = (identdata[3] << 8) | identdata[2];
 		heads = (identdata[7] << 8) | identdata[6];
@@ -1817,7 +1821,7 @@ static void do_create_hd(parameters_t &params)
 			report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
 
 		// write the ident if present
-		if (identdata.count() > 0)
+		if (!identdata.empty())
 		{
 			err = chd->write_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
 			if (err != CHDERR_NONE)
@@ -2245,13 +2249,13 @@ static void do_extract_raw(parameters_t &params)
 			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
 
 			// determine how much to read
-			UINT32 bytes_to_read = MIN((UINT32)buffer.count(), input_end - offset);
-			chd_error err = input_chd.read_bytes(offset, buffer, bytes_to_read);
+			UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_end - offset);
+			chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->c_str(), chd_file::error_string(err));
 
 			// write to the output
-			UINT32 count = core_fwrite(output_file, buffer, bytes_to_read);
+			UINT32 count = core_fwrite(output_file, &buffer[0], bytes_to_read);
 			if (count != bytes_to_read)
 				report_error(1, "Error writing to file; check disk space (%s)", output_file_str->c_str());
 
@@ -2444,10 +2448,10 @@ static void do_extract_cd(parameters_t &params)
 				}
 
 				// write it out if we need to
-				if (bufferoffs == buffer.count() || frame == actualframes - 1)
+				if (bufferoffs == buffer.size() || frame == actualframes - 1)
 				{
 					core_fseek(output_bin_file, outputoffs, SEEK_SET);
-					UINT32 byteswritten = core_fwrite(output_bin_file, buffer, bufferoffs);
+					UINT32 byteswritten = core_fwrite(output_bin_file, &buffer[0], bufferoffs);
 					if (byteswritten != bufferoffs)
 						report_error(1, "Error writing frame %d to file (%s): %s\n", frame, output_file_str->c_str(), chd_file::error_string(CHDERR_WRITE_ERROR));
 					outputoffs += bufferoffs;
@@ -2567,14 +2571,14 @@ static void do_extract_ld(parameters_t &params)
 
 		// create the codec configuration
 		avhuff_decompress_config avconfig;
-		dynamic_array<INT16> audio_data[16];
+		std::vector<INT16> audio_data[16];
 		UINT32 actsamples;
 		avconfig.maxsamples = max_samples_per_frame;
 		avconfig.actsamples = &actsamples;
 		for (int chnum = 0; chnum < ARRAY_LENGTH(audio_data); chnum++)
 		{
 			audio_data[chnum].resize(max_samples_per_frame);
-			avconfig.audio[chnum] = audio_data[chnum];
+			avconfig.audio[chnum] = &audio_data[chnum][0];
 		}
 
 		// iterate over frames
@@ -2693,14 +2697,14 @@ static void do_add_metadata(parameters_t &params)
 	if (text_str != NULL)
 		printf("Text:         %s\n", text.c_str());
 	else
-		printf("Data:         %s (%d bytes)\n", file_str->c_str(), file.count());
+		printf("Data:         %s (%d bytes)\n", file_str->c_str(), int(file.size()));
 
 	// write the metadata
 	chd_error err;
 	if (text_str != NULL)
 		err = input_chd.write_metadata(tag, index, text, flags);
 	else
-		err = input_chd.write_metadata(tag, index, file, flags);
+		err = input_chd.write_metadata(tag, index, &file[0], flags);
 	if (err != CHDERR_NONE)
 		report_error(1, "Error adding metadata: %s", chd_file::error_string(err));
 	else
@@ -2798,20 +2802,20 @@ static void do_dump_metadata(parameters_t &params)
 				report_error(1, "Unable to open file (%s)", output_file_str->c_str());
 
 			// output the metadata
-			UINT32 count = core_fwrite(output_file, buffer, buffer.count());
-			if (count != buffer.count())
+			UINT32 count = core_fwrite(output_file, &buffer[0], buffer.size());
+			if (count != buffer.size())
 				report_error(1, "Error writing file (%s)", output_file_str->c_str());
 			core_fclose(output_file);
 
 			// provide some feedback
 			astring tempstr;
-			printf("File (%s) written, %s bytes\n", output_file_str->c_str(), big_int_string(tempstr, buffer.count()));
+			printf("File (%s) written, %s bytes\n", output_file_str->c_str(), big_int_string(tempstr, buffer.size()));
 		}
 
 		// flush to stdout
 		else
 		{
-			fwrite(buffer, 1, buffer.count(), stdout);
+			fwrite(&buffer[0], 1, buffer.size(), stdout);
 			fflush(stdout);
 		}
 	}

@@ -78,7 +78,7 @@ void dp8390_device::do_tx() {
 	buf.resize(m_regs.tbcr);
 	for(i = 0; i < m_regs.tbcr; i++) buf[i] = m_mem_read_cb(high16 + (m_regs.tpsr << 8) + i);
 
-	if(send(buf, m_regs.tbcr)) {
+	if(send(&buf[0], m_regs.tbcr)) {
 		m_regs.tsr = 1;
 		m_regs.isr |= 2;
 	} else {

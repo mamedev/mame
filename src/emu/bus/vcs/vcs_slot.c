@@ -788,9 +788,9 @@ void vcs_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
-		type = identify_cart_type(rom, len);
+		type = identify_cart_type(&rom[0], len);
 		slot_string = vcs_get_slot(type);
 
 		clear();

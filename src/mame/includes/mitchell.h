@@ -41,11 +41,11 @@ public:
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
-	dynamic_array<UINT8> m_objram;           /* Sprite RAM */
+	std::vector<UINT8> m_objram;           /* Sprite RAM */
 	int        m_flipscreen;
 	int        m_video_bank;
 	int        m_paletteram_bank;
-	dynamic_array<UINT8> m_paletteram;
+	std::vector<UINT8> m_paletteram;
 
 	/* sound-related */
 	int        m_sample_buffer;

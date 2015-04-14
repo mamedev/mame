@@ -431,16 +431,17 @@ void device_image_interface::run_hash(void (*partialhash)(hash_collection &, con
 	hashes.reset();
 	size = (UINT32) length();
 
-	buf.resize_and_clear(size);
+	buf.resize(size);
+	memset(&buf[0], 0, size);
 
 	/* read the file */
 	fseek(0, SEEK_SET);
-	fread(buf, size);
+	fread(&buf[0], size);
 
 	if (partialhash)
-		partialhash(hashes, buf, size, types);
+		partialhash(hashes, &buf[0], size, types);
 	else
-		hashes.compute(buf, size, types);
+		hashes.compute(&buf[0], size, types);
 
 	/* cleanup */
 	fseek(0, SEEK_SET);

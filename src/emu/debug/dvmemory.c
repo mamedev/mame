@@ -217,7 +217,7 @@ void debug_view_memory::view_update()
 	// loop over visible rows
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
-		debug_view_char *destmin = m_viewdata + row * m_visible.x;
+		debug_view_char *destmin = &m_viewdata[row * m_visible.x];
 		debug_view_char *destmax = destmin + m_visible.x;
 		debug_view_char *destrow = destmin - m_topleft.x;
 		UINT32 effrow = m_topleft.y + row;

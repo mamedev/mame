@@ -43,7 +43,7 @@ protected:
 
 private:
 	required_ioport m_config;
-	dynamic_array<UINT16> m_ram;
+	std::vector<UINT16> m_ram;
 };
 
 // device type definition

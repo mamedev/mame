@@ -14,7 +14,7 @@ enum { MOIRE = 0x01000000 };
 
 
 
-struct vector {
+struct vector_t {
 	float x, y, z;
 };
 
@@ -31,7 +31,7 @@ struct view {
 	float a_bottom, a_top, a_left, a_right;
 	float vxx, vyy, vzz, ayy, ayyc, ayys;
 	float trans_mat[12];
-	struct vector light;
+	struct vector_t light;
 	struct lightparam lightparams[32];
 };
 
@@ -81,16 +81,16 @@ static void _transform_point(struct view *view, struct point *p)
 	p->z = view->ayys*xx+view->ayyc*zz;
 }
 
-static void transform_vector(struct view *view, struct vector *p)
+static void transform_vector(struct view *view, struct vector_t *p)
 {
-	struct vector q = *p;
+	struct vector_t q = *p;
 	float *trans = view->trans_mat;
 	p->x = trans[0]*q.x+trans[3]*q.y+trans[6]*q.z;
 	p->y = trans[1]*q.x+trans[4]*q.y+trans[7]*q.z;
 	p->z = trans[2]*q.x+trans[5]*q.y+trans[8]*q.z;
 }
 
-static void normalize_vector(struct vector *p)
+static void normalize_vector(struct vector_t *p)
 {
 	float norm = sqrt(p->x*p->x+p->y*p->y+p->z*p->z);
 	if(norm) {
@@ -100,7 +100,7 @@ static void normalize_vector(struct vector *p)
 	}
 }
 
-static float mult_vector(const struct vector *p, const struct vector *q)
+static float mult_vector(const struct vector_t *p, const struct vector_t *q)
 {
 	return p->x*q->x+p->y*q->y+p->z*q->z;
 }
@@ -696,7 +696,7 @@ static float max4f(float a, float b, float c, float d)
 #ifdef UNUSED_DEFINITION
 static const UINT8 num_of_times[]={1,1,1,1,2,2,2,3};
 #endif
-static float compute_specular(struct vector *normal, struct vector *light,float diffuse,int lmode)
+static float compute_specular(struct vector_t *normal, struct vector_t *light,float diffuse,int lmode)
 {
 #if 0
 	float s;
@@ -728,7 +728,7 @@ void model1_state::push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 	int i;
 	UINT32 flags;
 	struct point *old_p0, *old_p1, *p0, *p1;
-	struct vector vn;
+	struct vector_t vn;
 	int link, type;
 #if 0
 	int dump;

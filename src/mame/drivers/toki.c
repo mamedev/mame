@@ -750,7 +750,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 	dynamic_buffer buffer(0x20000);
 	int i;
 
-	memcpy(buffer,ROM,0x20000);
+	memcpy(&buffer[0],ROM,0x20000);
 	for( i = 0; i < 0x20000; i++ )
 	{
 		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
@@ -772,7 +772,7 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
-		memcpy (temp, base, 65536 * 2);
+		memcpy (&temp[0], base, 65536 * 2);
 		for (i = 0; i < 16; i++)
 		{
 			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
@@ -786,7 +786,7 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
-		memcpy (temp, base, 65536 * 2);
+		memcpy (&temp[0], base, 65536 * 2);
 		for (i = 0; i < 16; i++)
 		{
 			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
@@ -840,7 +840,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 		dynamic_buffer buffer(0x20000);
 		int i;
 
-		memcpy(buffer,ROM,0x20000);
+		memcpy(&buffer[0],ROM,0x20000);
 		for( i = 0; i < 0x20000; i++ )
 		{
 			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];

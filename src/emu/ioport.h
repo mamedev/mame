@@ -816,8 +816,8 @@ public:
 	// getters and queries
 	running_machine &machine() const { return m_machine; }
 	bool empty() const { return (m_bufbegin == m_bufend); }
-	bool full() const { return ((m_bufend + 1) % m_buffer.count()) == m_bufbegin; }
-	bool can_post() const { return (!m_queue_chars.isnull() || m_keycode_map.count() != 0); }
+	bool full() const { return ((m_bufend + 1) % m_buffer.size()) == m_bufbegin; }
+	bool can_post() const { return (!m_queue_chars.isnull() || !m_keycode_map.empty()); }
 	bool is_posting() const { return (!empty() || (!m_charqueue_empty.isnull() && !m_charqueue_empty())); }
 
 	// configuration
@@ -857,7 +857,7 @@ private:
 	running_machine &       m_machine;              // reference to our machine
 	UINT32                  m_bufbegin;             // index of starting character
 	UINT32                  m_bufend;               // index of ending character
-	dynamic_array<unicode_char> m_buffer;           // actual buffer
+	std::vector<unicode_char> m_buffer;           // actual buffer
 	bool                    m_status_keydown;       // current keydown status
 	bool                    m_last_cr;              // was the last char a CR?
 	emu_timer *             m_timer;                // timer for posting characters
@@ -865,7 +865,7 @@ private:
 	ioport_queue_chars_delegate m_queue_chars;      // queue characters callback
 	ioport_accept_char_delegate m_accept_char;      // accept character callback
 	ioport_charqueue_empty_delegate m_charqueue_empty; // character queue empty callback
-	dynamic_array<keycode_map_entry> m_keycode_map; // keycode map
+	std::vector<keycode_map_entry> m_keycode_map; // keycode map
 };
 
 

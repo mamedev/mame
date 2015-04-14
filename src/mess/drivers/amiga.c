@@ -51,7 +51,7 @@ protected:
 private:
 	required_device<address_map_bank_device> m_bootrom;
 	required_memory_bank m_wom;
-	dynamic_array<UINT16> m_wom_ram;
+	std::vector<UINT16> m_wom_ram;
 };
 
 class a2000_state : public amiga_state
@@ -557,7 +557,7 @@ void a1000_state::machine_start()
 
 	// allocate 256kb for wom
 	m_wom_ram.resize(256 * 1024 / 2);
-	m_wom->set_base(m_wom_ram);
+	m_wom->set_base(&m_wom_ram[0]);
 }
 
 void a1000_state::machine_reset()

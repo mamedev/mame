@@ -370,7 +370,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 
 		// calculate physical pixel location
 		// each offset unit represents 256 pixels and should wrap at ROM boundary for safety
-		pix_ptr = &m_unpacked_rom[((offset << 8) % m_unpacked_rom.count())];
+		pix_ptr = &m_unpacked_rom[((offset << 8) % m_unpacked_rom.size())];
 
 		// get scanline zoom factor
 		// For example, 0x20 doubles the length, 0x40 maintains a one-to-one length,
@@ -426,7 +426,7 @@ void k053250_device::dma(int limiter)
 		return; // make sure we only do DMA transfer once per frame
 
 	m_frame = current_frame;
-	memcpy(m_buffer[m_page], m_ram, 0x1000);
+	memcpy(m_buffer[m_page], &m_ram[0], 0x1000);
 	m_page ^= 1;
 }
 

@@ -548,7 +548,7 @@ void intelfsh_device::nvram_default()
 void intelfsh_device::nvram_read(emu_file &file)
 {
 	dynamic_buffer buffer(m_size);
-	file.read(buffer, m_size);
+	file.read(&buffer[0], m_size);
 	for (int byte = 0; byte < m_size; byte++)
 		m_addrspace[0]->write_byte(byte, buffer[byte]);
 }
@@ -564,7 +564,7 @@ void intelfsh_device::nvram_write(emu_file &file)
 	dynamic_buffer buffer(m_size);
 	for (int byte = 0; byte < m_size; byte++)
 		buffer[byte] = m_addrspace[0]->read_byte(byte);
-	file.write(buffer, m_size);
+	file.write(&buffer[0], m_size);
 }
 
 

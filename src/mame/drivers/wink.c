@@ -427,7 +427,7 @@ DRIVER_INIT_MEMBER(wink_state,wink)
 
 	// protection module reverse engineered by HIGHWAYMAN
 
-	memcpy(buffer,ROM,0x8000);
+	memcpy(&buffer[0],ROM,0x8000);
 
 	for (i = 0x0000; i <= 0x1fff; i++)
 		ROM[i] = buffer[BITSWAP16(i,15,14,13, 11,12, 7, 9, 8,10, 6, 4, 5, 1, 2, 3, 0)];

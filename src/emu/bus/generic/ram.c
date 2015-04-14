@@ -99,7 +99,7 @@ void generic_ram_linear_device::device_start()
 
 READ8_MEMBER(generic_ram_plain_device::read_ram)
 {
-	if (offset < m_ram.bytes())
+	if (offset < m_ram.size())
 		return m_ram[offset];
 	else
 		return 0xff;
@@ -107,17 +107,17 @@ READ8_MEMBER(generic_ram_plain_device::read_ram)
 
 WRITE8_MEMBER(generic_ram_plain_device::write_ram)
 {
-	if (offset < m_ram.bytes())
+	if (offset < m_ram.size())
 		m_ram[offset] = data;
 }
 
 
 READ8_MEMBER(generic_ram_linear_device::read_ram)
 {
-	return m_ram[offset % m_ram.bytes()];
+	return m_ram[offset % m_ram.size()];
 }
 
 WRITE8_MEMBER(generic_ram_linear_device::write_ram)
 {
-	m_ram[offset % m_ram.bytes()] = data;
+	m_ram[offset % m_ram.size()] = data;
 }

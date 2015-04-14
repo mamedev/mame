@@ -109,11 +109,11 @@ private:
 
 	UINT32 m_ram_size;
 	UINT32 m_ram_base;
-	dynamic_array<UINT32> m_ram;
+	std::vector<UINT32> m_ram;
 
 	UINT32 m_simm_size;
 	UINT32 m_simm_base;
-	dynamic_array<UINT32> m_simm;
+	std::vector<UINT32> m_simm;
 
 
 	UINT32 m_cpu_regs[0x7c];

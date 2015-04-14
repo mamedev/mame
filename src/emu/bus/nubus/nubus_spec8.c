@@ -121,7 +121,7 @@ void nubus_spec8s3_device::device_reset()
 	m_mode = 0;
 	m_vbl_pending = false;
 	m_parameter = 0;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -152,7 +152,7 @@ UINT32 nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	int x, y;
 	UINT8 pixels, *vram;
 
-	vram = m_vram + 0x400;
+	vram = &m_vram[0x400];
 
 	switch (m_mode)
 	{

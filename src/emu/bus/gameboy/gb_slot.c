@@ -609,15 +609,15 @@ void base_gb_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
 
-		if (get_mmm01_candidate(rom + offset, len - offset))
+		if (get_mmm01_candidate(&rom[offset], len - offset))
 			offset += (len - 0x8000);
 
-		type = get_cart_type(rom + offset, len - offset);
+		type = get_cart_type(&rom[offset], len - offset);
 		slot_string = gb_get_slot(type);
 
 		//printf("type: %s\n", slot_string);

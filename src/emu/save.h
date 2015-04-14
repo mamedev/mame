@@ -48,10 +48,10 @@ typedef delegate<void ()> save_prepost_delegate;
 #define ALLOW_SAVE_TYPE(TYPE) \
 	template<> struct save_manager::type_checker<TYPE> { static const bool is_atom = true; static const bool is_pointer = false; }
 
-// use this as above, but also to declare that dynamic_array<TYPE> is safe as well
+// use this as above, but also to declare that std::vector<TYPE> is safe as well
 #define ALLOW_SAVE_TYPE_AND_ARRAY(TYPE) \
 	ALLOW_SAVE_TYPE(TYPE); \
-	template<> inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, dynamic_array<TYPE> &value, const char *name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.count()); }
+	template<> inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, std::vector<TYPE> &value, const char *name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.size()); }
 
 
 // register items with explicit tags
@@ -209,7 +209,7 @@ private:
 
 // template specializations to enumerate the fundamental atomic types you are allowed to save
 ALLOW_SAVE_TYPE_AND_ARRAY(char);
-ALLOW_SAVE_TYPE_AND_ARRAY(bool);
+ALLOW_SAVE_TYPE          (bool); // std::vector<bool> may be packed internally
 ALLOW_SAVE_TYPE_AND_ARRAY(INT8);
 ALLOW_SAVE_TYPE_AND_ARRAY(UINT8);
 ALLOW_SAVE_TYPE_AND_ARRAY(INT16);

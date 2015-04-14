@@ -69,7 +69,7 @@ void msx_slot_panasonic08_device::device_start()
 
 	m_sram.resize(0x4000);
 
-	m_nvram->set_base((UINT8*)m_sram, 0x4000);
+	m_nvram->set_base(&m_sram[0], 0x4000);
 
 	m_rom = m_rom_region->base() + m_region_offset;
 
@@ -87,7 +87,7 @@ void msx_slot_panasonic08_device::map_bank(int bank)
 	if (m_selected_bank[bank] >= 0x80 && m_selected_bank[bank] < 0x84)   // Are these banks were sram is present? Mirroring?
 	{
 		logerror("panasonic08: mapping bank %d to sram\n", bank);
-		m_bank_base[bank] = m_sram + (((m_selected_bank[bank] & 0x7f) * 0x2000) & 0x3fff);
+		m_bank_base[bank] = &m_sram[((m_selected_bank[bank] & 0x7f) * 0x2000) & 0x3fff];
 	}
 	else
 	{

@@ -42,7 +42,6 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_io_w);
 	DECLARE_WRITE16_MEMBER(twinadv_68000_sound_w);
 	DECLARE_READ16_MEMBER(sb3_sound_r);
-	DECLARE_READ16_MEMBER(moremorp_0a_read);
 	DECLARE_READ16_MEMBER(_4in1_02_read);
 	DECLARE_READ16_MEMBER(_3in1_read);
 	DECLARE_READ16_MEMBER(cookbib3_read);
@@ -50,10 +49,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sb3_sound_w);
 	DECLARE_READ16_MEMBER(toto_read);
 
-	DECLARE_DRIVER_INIT(mcheonru_hack);
-
 	DECLARE_DRIVER_INIT(pzlbreak);
-	DECLARE_DRIVER_INIT(moremorp);
 	DECLARE_DRIVER_INIT(snowbro3);
 	DECLARE_DRIVER_INIT(cookbib3);
 	DECLARE_DRIVER_INIT(4in1boot);

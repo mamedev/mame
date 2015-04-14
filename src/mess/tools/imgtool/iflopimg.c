@@ -318,15 +318,15 @@ static imgtoolerr_t imgtool_floppy_transfer_sector_tofrom_stream(imgtool_image *
 
 	if (direction)
 	{
-		err = floppy_read_sector(floppy, head, track, sector, offset, buffer, length);
+		err = floppy_read_sector(floppy, head, track, sector, offset, &buffer[0], length);
 		if (err)
 			goto done;
-		stream_write(f, buffer, length);
+		stream_write(f, &buffer[0], length);
 	}
 	else
 	{
-		stream_read(f, buffer, length);
-		err = floppy_write_sector(floppy, head, track, sector, offset, buffer, length, 0);  /* TODO: pass ddam argument from imgtool */
+		stream_read(f, &buffer[0], length);
+		err = floppy_write_sector(floppy, head, track, sector, offset, &buffer[0], length, 0);  /* TODO: pass ddam argument from imgtool */
 		if (err)
 			goto done;
 	}

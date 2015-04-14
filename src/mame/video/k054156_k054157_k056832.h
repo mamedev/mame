@@ -125,7 +125,7 @@ private:
 	tilemap_t   *m_tilemap[K056832_PAGE_COUNT];
 	bitmap_ind16  *m_pixmap[K056832_PAGE_COUNT];
 
-	dynamic_array<UINT16> m_videoram;
+	std::vector<UINT16> m_videoram;
 
 	UINT16    m_regs[0x20];   // 157/832 regs group 1
 	UINT16    m_regsb[4]; // 157/832 regs group 2, board dependent

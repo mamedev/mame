@@ -394,11 +394,11 @@ int psx1_state::load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 		n_uncompressed = 0x200000;
 		p_n_uncompressed.resize( n_uncompressed );
 
-		if( uncompress( p_n_uncompressed, &n_uncompressed, p_n_compressed, n_compressed ) != Z_OK )
+		if( uncompress( &p_n_uncompressed[0], &n_uncompressed, p_n_compressed, n_compressed ) != Z_OK )
 		{
 			logerror( "psx_exe_load: psf uncompress failed\n" );
 		}
-		else if( !load_psxexe( cpu, p_n_uncompressed, n_uncompressed ) )
+		else if( !load_psxexe( cpu, &p_n_uncompressed[0], n_uncompressed ) )
 		{
 			logerror( "psx_exe_load: psf load failed\n" );
 		}

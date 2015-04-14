@@ -612,12 +612,12 @@ void sega8_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
 
-		type = get_cart_type(rom + offset, len - offset);
+		type = get_cart_type(&rom[offset], len - offset);
 		slot_string = sega8_get_slot(type);
 
 		//printf("type: %s\n", slot_string);

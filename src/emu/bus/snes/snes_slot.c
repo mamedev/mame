@@ -613,8 +613,8 @@ bool base_sns_cart_slot_device::call_load()
 		{
 			UINT32 tmplen = length();
 			dynamic_buffer tmpROM(tmplen);
-			fread(tmpROM, tmplen);
-			offset = snes_skip_header(tmpROM, tmplen);
+			fread(&tmpROM[0], tmplen);
+			offset = snes_skip_header(&tmpROM[0], tmplen);
 			fseek(offset, SEEK_SET);
 		}
 
@@ -666,11 +666,11 @@ bool base_sns_cart_slot_device::call_load()
 		{
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
 			dynamic_buffer temp_nvram(tot_size);
-			battery_load(temp_nvram, tot_size, 0xff);
+			battery_load(&temp_nvram[0], tot_size, 0xff);
 			if (m_cart->get_nvram_size())
-				memcpy(m_cart->get_nvram_base(), temp_nvram, m_cart->get_nvram_size());
+				memcpy(m_cart->get_nvram_base(), &temp_nvram[0], m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
-				memcpy(m_cart->get_rtc_ram_base(), temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_size());
+				memcpy(m_cart->get_rtc_ram_base(), &temp_nvram[m_cart->get_nvram_size()], m_cart->get_rtc_ram_size());
 		}
 
 		//printf("Type %d\n", m_type);
@@ -697,11 +697,11 @@ void base_sns_cart_slot_device::call_unload()
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
 			dynamic_buffer temp_nvram(tot_size);
 			if (m_cart->get_nvram_size())
-				memcpy(temp_nvram, m_cart->get_nvram_base(), m_cart->get_nvram_size());
+				memcpy(&temp_nvram[0], m_cart->get_nvram_base(), m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
-				memcpy(temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_base(), m_cart->get_rtc_ram_size());
+				memcpy(&temp_nvram[m_cart->get_nvram_size()], m_cart->get_rtc_ram_base(), m_cart->get_rtc_ram_size());
 
-			battery_save(temp_nvram, tot_size);
+			battery_save(&temp_nvram[0], tot_size);
 		}
 	}
 }
@@ -1011,11 +1011,11 @@ void base_sns_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type = 0, addon = 0;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
-		offset = snes_skip_header(rom, len);
+		offset = snes_skip_header(&rom[0], len);
 
-		get_cart_type_addon(rom + offset, len - offset, type, addon);
+		get_cart_type_addon(&rom[offset], len - offset, type, addon);
 		// here we're from fullpath, so check if it's a DSP game which needs legacy device (i.e. it has no appended DSP dump)
 		switch (addon)
 		{

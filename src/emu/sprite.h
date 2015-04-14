@@ -194,7 +194,7 @@ private:
 	// memory pointers and buffers
 	_SpriteRAMType *                m_spriteram;            // pointer to spriteram pointer
 	INT32                           m_spriteram_bytes;      // size of sprite RAM in bytes
-	dynamic_array<_SpriteRAMType>   m_buffer;               // buffered spriteram for those that use it
+	std::vector<_SpriteRAMType>          m_buffer;               // buffered spriteram for those that use it
 
 	// bitmaps
 	_BitmapType                     m_bitmap;               // live bitmap

@@ -157,7 +157,7 @@ int compute_res_net(int inputs, int channel, const res_net_info &di);
 
 /* compute all values */
 
-void compute_res_net_all(dynamic_array<rgb_t> &rgb, const UINT8 *prom, const res_net_decode_info &rdi, const res_net_info &di);
+void compute_res_net_all(std::vector<rgb_t> &rgb, const UINT8 *prom, const res_net_decode_info &rdi, const res_net_info &di);
 
 
 /* legacy interface */

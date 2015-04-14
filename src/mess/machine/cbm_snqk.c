@@ -71,7 +71,7 @@ int general_cbm_loadsnap( device_image_interface &image, const char *file_type, 
 
 	data.resize(snapshot_size);
 
-	bytesread = image.fread( data, snapshot_size);
+	bytesread = image.fread( &data[0], snapshot_size);
 	if (bytesread != snapshot_size)
 		goto error;
 

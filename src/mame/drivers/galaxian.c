@@ -5767,7 +5767,7 @@ void galaxian_state::decode_anteater_gfx()
 	dynamic_buffer scratch(romlength);
 	UINT32 offs;
 
-	memcpy(scratch, rombase, romlength);
+	memcpy(&scratch[0], rombase, romlength);
 	for (offs = 0; offs < romlength; offs++)
 	{
 		UINT32 srcoffs = offs & 0x9bf;
@@ -5786,7 +5786,7 @@ void galaxian_state::decode_losttomb_gfx()
 	dynamic_buffer scratch(romlength);
 	UINT32 offs;
 
-	memcpy(scratch, rombase, romlength);
+	memcpy(&scratch[0], rombase, romlength);
 	for (offs = 0; offs < romlength; offs++)
 	{
 		UINT32 srcoffs = offs & 0xa7f;

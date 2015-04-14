@@ -199,13 +199,14 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	dynamic_buffer img;
 
 	if(size == (UINT32)f.sector_count*f.sector_base_size) {
-		img.resize_and_clear(size + f.sector_count, ERROR_00);
+		img.resize(size + f.sector_count);
+		memset(&img[0], ERROR_00, size + f.sector_count);
 	}
 	else {
 		img.resize(size);
 	}
 
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
 	int track_offset = 0, error_offset = f.sector_count*f.sector_base_size;
 
@@ -230,7 +231,7 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			desc_s sectors[40];
 
-			build_sector_description(f, img, track_offset, error_offset, sectors, sector_count);
+			build_sector_description(f, &img[0], track_offset, error_offset, sectors, sector_count);
 			generate_track(desc, physical_track, head, sectors, sector_count, total_size, image);
 
 			track_offset += track_size;

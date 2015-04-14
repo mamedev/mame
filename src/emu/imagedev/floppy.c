@@ -596,18 +596,18 @@ void floppy_image_device::seek_phase_w(int phases)
 			dskchg = 1;
 }
 
-int floppy_image_device::find_index(UINT32 position, const UINT32 *buf, int buf_size)
+int floppy_image_device::find_index(UINT32 position, const std::vector<UINT32> &buf)
 {
-	int spos = (buf_size >> 1)-1;
+	int spos = (buf.size() >> 1)-1;
 	int step;
-	for(step=1; step<buf_size+1; step<<=1);
+	for(step=1; step<buf.size()+1; step<<=1);
 	step >>= 1;
 
 	for(;;) {
-		if(spos >= buf_size || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
+		if(spos >= buf.size() || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
 			spos -= step;
 			step >>= 1;
-		} else if(spos < 0 || (spos < buf_size-1 && (buf[spos+1] & floppy_image::TIME_MASK) <= position)) {
+		} else if(spos < 0 || (spos < buf.size()-1 && (buf[spos+1] & floppy_image::TIME_MASK) <= position)) {
 			spos += step;
 			step >>= 1;
 		} else
@@ -637,15 +637,15 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	int cells = image->get_track_size(cyl, ss, subcyl);
+	std::vector<UINT32> &buf = image->get_buffer(cyl, ss, subcyl);
+	UINT32 cells = buf.size();
 	if(cells <= 1)
 		return attotime::never;
 
 	attotime base;
 	UINT32 position = find_position(base, from_when);
 
-	const UINT32 *buf = image->get_buffer(cyl, ss, subcyl);
-	int index = find_index(position, buf, cells);
+	int index = find_index(position, buf);
 
 	if(index == -1)
 		return attotime::never;
@@ -671,21 +671,18 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	int start_pos = find_position(base, start);
 	int end_pos   = find_position(base, end);
 
-	dynamic_array<int> trans_pos(transition_count);
+	std::vector<int> trans_pos(transition_count);
 	for(int i=0; i != transition_count; i++)
 		trans_pos[i] = find_position(base, transitions[i]);
 
-	int cells = image->get_track_size(cyl, ss, subcyl);
-	UINT32 *buf = image->get_buffer(cyl, ss, subcyl);
+	std::vector<UINT32> &buf = image->get_buffer(cyl, ss, subcyl);
 
 	int index;
-	if(cells)
-		index = find_index(start_pos, buf, cells);
+	if(!buf.empty())
+		index = find_index(start_pos, buf);
 	else {
 		index = 0;
-		image->set_track_size(cyl, ss, 1, subcyl);
-		buf = image->get_buffer(cyl, ss, subcyl);
-		buf[cells++] = floppy_image::MG_N;
+		buf.push_back(floppy_image::MG_N);
 	}
 
 	if(index && (buf[index] & floppy_image::TIME_MASK) == start_pos)
@@ -697,28 +694,27 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 
 	UINT32 pos = start_pos;
 	int ti = 0;
+	int cells = buf.size();
 	while(pos != end_pos) {
-		if(image->get_track_size(cyl, ss, subcyl) < cells+10) {
-			image->set_track_size(cyl, ss, cells+200, subcyl);
-			buf = image->get_buffer(cyl, ss, subcyl);
-		}
+		if(buf.size() < cells+10)
+			buf.resize(cells+200);
 		UINT32 next_pos;
 		if(ti != transition_count)
 			next_pos = trans_pos[ti++];
 		else
 			next_pos = end_pos;
 		if(next_pos > pos)
-			write_zone(buf, cells, index, pos, next_pos, cur_mg);
+			write_zone(&buf[0], cells, index, pos, next_pos, cur_mg);
 		else {
-			write_zone(buf, cells, index, pos, 200000000, cur_mg);
+			write_zone(&buf[0], cells, index, pos, 200000000, cur_mg);
 			index = 0;
-			write_zone(buf, cells, index, 0, next_pos, cur_mg);
+			write_zone(&buf[0], cells, index, 0, next_pos, cur_mg);
 		}
 		pos = next_pos;
 		cur_mg = cur_mg == floppy_image::MG_A ? floppy_image::MG_B : floppy_image::MG_A;
 	}
 
-	image->set_track_size(cyl, ss, cells, subcyl);
+	buf.resize(cells);
 }
 
 void floppy_image_device::write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg)

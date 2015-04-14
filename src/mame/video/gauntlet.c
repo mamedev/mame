@@ -82,8 +82,8 @@ const atari_motion_objects_config gauntlet_state::s_mob_config =
 VIDEO_START_MEMBER(gauntlet_state,gauntlet)
 {
 	/* modify the motion object code lookup table to account for the code XOR */
-	dynamic_array<UINT16> &codelookup = m_mob->code_lookup();
-	for (int i = 0; i < codelookup.count(); i++)
+	std::vector<UINT16> &codelookup = m_mob->code_lookup();
+	for (unsigned int i = 0; i < codelookup.size(); i++)
 		codelookup[i] ^= 0x800;
 
 	/* set up the base color for the playfield */

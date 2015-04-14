@@ -284,7 +284,7 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image)
 {
 	int track_size_cells = 200000000/cell_size;
-	UINT32 *buffer = global_alloc_array_clear(UINT32, 200000000/cell_size);
+	std::vector<UINT32> buffer;
 
 	// The TDF has a long track lead-out that makes the track length sum up
 	// to 3253; this is too long for the number of cells in the real track.
@@ -299,14 +299,12 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 
 	int track_size = track_size_cells / 16;
 
-	int offset = 0;
 	short crc1, crc2, found_crc;
 	int start = 16;
 
 	if (check_for_address_marks(trackdata, floppy_image::FM)==false)
 	{
 		if (head==0 && track==0) logerror("ti99_dsk: Cannot find FM address marks on track %d, head %d; likely broken or unformatted.\n", track, head);
-		global_free_array(buffer);
 		return;
 	}
 
@@ -323,14 +321,14 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 		if (((i-start-6)%334==0) && (i < start + 9*334))
 		{
 			// IDAM
-			raw_w(buffer, offset, 16, 0xf57e);
+			raw_w(buffer, 16, 0xf57e);
 		}
 		else
 		{
 			if (((i-start-30)%334==0) && (i < start + 9*334))
 			{
 				// DAM
-				raw_w(buffer, offset, 16, 0xf56f);
+				raw_w(buffer, 16, 0xf56f);
 			}
 			else
 			{
@@ -374,20 +372,18 @@ void ti99_floppy_format::generate_track_fm(int track, int head, int cell_size, U
 						}
 					}
 				}
-				fm_w(buffer, offset, 8, trackdata[i]);
+				fm_w(buffer, 8, trackdata[i]);
 			}
 		}
 	}
 
-	generate_track_from_levels(track, head, buffer, track_size_cells, 0, image);
-
-	global_free_array(buffer);
+	generate_track_from_levels(track, head, buffer, 0, image);
 }
 
 void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, UINT8* trackdata, floppy_image *image)
 {
 	int track_size_cells = 200000000/cell_size;
-	UINT32 *buffer = global_alloc_array_clear(UINT32, 200000000/cell_size);
+	std::vector<UINT32> buffer;
 
 	// See above
 	// We limit the track size to cell_number / 16, which means 6250 for MFM
@@ -395,14 +391,12 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 	// (not 712 as specified in the TDF format)
 	int track_size = track_size_cells / 16;
 
-	int offset = 0;
 	short crc1, crc2, found_crc;
 	int start = 40;
 
 	if (check_for_address_marks(trackdata, floppy_image::MFM)==false)
 	{
 		if (track==0 && head==0) logerror("ti99_dsk: Cannot find MFM address marks on track %d, head %d; likely broken or unformatted.\n", track, head);
-		global_free_array(buffer);
 		return;
 	}
 
@@ -420,8 +414,8 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 		{
 			// IDAM
 			for (int j=0; j < 3; j++)
-				raw_w(buffer, offset, 16, 0x4489);  // 3 times A1
-			mfm_w(buffer, offset, 8, 0xfe);
+				raw_w(buffer, 16, 0x4489);  // 3 times A1
+			mfm_w(buffer, 8, 0xfe);
 			i += 3;
 		}
 		else
@@ -430,8 +424,8 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 			{
 				// DAM
 				for (int j=0; j < 3; j++)
-					raw_w(buffer, offset, 16, 0x4489);  // 3 times A1
-				mfm_w(buffer, offset, 8, 0xfb);
+					raw_w(buffer, 16, 0x4489);  // 3 times A1
+				mfm_w(buffer, 8, 0xfb);
 				i += 3;
 			}
 			else
@@ -476,14 +470,12 @@ void ti99_floppy_format::generate_track_mfm(int track, int head, int cell_size, 
 						}
 					}
 				}
-				mfm_w(buffer, offset, 8, trackdata[i]);
+				mfm_w(buffer, 8, trackdata[i]);
 			}
 		}
 	}
 
-	generate_track_from_levels(track, head, buffer, track_size_cells, 0, image);
-
-	global_free_array(buffer);
+	generate_track_from_levels(track, head, buffer, 0, image);
 }
 
 // States for decoding the bitstream
@@ -2551,11 +2543,11 @@ static floperr_t ti99_tdf_read_sector(floppy_image_legacy *floppy, int head, int
 		imgtrack = track / 2;
 	}
 
-	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, track_data, tag->track_size);
+	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, &track_data[0], tag->track_size);
 	if (err)
 		return err;
 
-	err = ti99_tdf_seek_sector_in_track(floppy, head, imgtrack, sector, track_data, &sector_data);
+	err = ti99_tdf_seek_sector_in_track(floppy, head, imgtrack, sector, &track_data[0], &sector_data);
 	if (err)
 		return err;
 	/* verify CRC? */
@@ -2635,7 +2627,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 		imgtrack = track / 2;
 	}
 
-	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, track_data, tag->track_size);
+	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, &track_data[0], tag->track_size);
 	if (err)
 	{
 		return err;
@@ -2644,7 +2636,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	/* Search for the sector_index-th sector. */
 	if (tag->first_idam==0) /* should we check for every track? */
 	{
-		if (determine_offset(tag->format, track_data, &tag->first_idam)==FLOPPY_ERROR_SEEKERROR)
+		if (determine_offset(tag->format, &track_data[0], &tag->first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
 			return FLOPPY_ERROR_SEEKERROR;
 		}
@@ -2654,7 +2646,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	i=0;
 	while (i < tag->track_size && sector_index>=0)
 	{
-		byte = read_byte(tag->format, tag->first_idam, track_data, i);
+		byte = read_byte(tag->format, tag->first_idam, &track_data[0], i);
 		if (byte == TI99_IDAM)
 		{
 			sector_index--;
@@ -2672,7 +2664,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	/* Find the DAM. */
 	while (i < tag->track_size)
 	{
-		byte = read_byte(tag->format, tag->first_idam, track_data, i);
+		byte = read_byte(tag->format, tag->first_idam, &track_data[0], i);
 		if (byte == TI99_DAM)
 			break;
 		else
@@ -2693,7 +2685,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image_legacy *floppy, int 
 	if (err)
 		return err;
 
-	offset = track_offset + (sector_data - track_data);
+	offset = track_offset + (sector_data - &track_data[0]);
 
 	/* Write the sector data at that position. */
 	floppy_image_write(floppy, buffer, offset, SECTOR_SIZE);
@@ -2725,7 +2717,7 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 		imgtrack = track / 2;
 	}
 
-	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, track_data, tag->track_size);
+	err = ti99_tdf_read_track_internal(floppy, head, imgtrack, 0, &track_data[0], tag->track_size);
 	if (err)
 	{
 		return err;
@@ -2735,7 +2727,7 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 
 	if (tag->first_idam==0) /* should we check for every track? */
 	{
-		if (determine_offset(tag->format, track_data, &tag->first_idam)==FLOPPY_ERROR_SEEKERROR)
+		if (determine_offset(tag->format, &track_data[0], &tag->first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
 			return FLOPPY_ERROR_SEEKERROR;
 		}
@@ -2745,7 +2737,7 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 	sector_index = sector_index+1;
 	while (i++ < tag->track_size && sector_index>0)
 	{
-		byte = read_byte(tag->format, tag->first_idam, track_data, i);
+		byte = read_byte(tag->format, tag->first_idam, &track_data[0], i);
 		if (byte == TI99_IDAM)
 		{
 			sector_index--;
@@ -2788,7 +2780,7 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image_legacy *floppy, int h
 		{
 			while (i++ < tag->track_size)
 			{
-				byte = read_byte(tag->format, tag->first_idam, track_data, i);
+				byte = read_byte(tag->format, tag->first_idam, &track_data[0], i);
 				if (byte == TI99_DAM)
 					break;
 			}
@@ -2866,12 +2858,12 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	else
 		geometry = &dummy_geometry;
 
-	floppy_image_read(floppy, track_data, 0, 13000);
+	floppy_image_read(floppy, &track_data[0], 0, 13000);
 
-	if (determine_offset(TI99_MFM, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
+	if (determine_offset(TI99_MFM, &track_data[0], &first_idam)==FLOPPY_ERROR_SEEKERROR)
 	{
 		/* MFM failed. */
-		if (determine_offset(TI99_FM, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
+		if (determine_offset(TI99_FM, &track_data[0], &first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
 			LOG_FORMATS("IDAM not found. Unformatted disk.\n");
 
@@ -2976,7 +2968,7 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 
 	while (i++ < 13000 && head == 0 && track == 0)
 	{
-		byte = read_byte(format, first_idam, track_data, i);
+		byte = read_byte(format, first_idam, &track_data[0], i);
 		switch (state)
 		{
 		case 0:
@@ -3016,8 +3008,8 @@ static int ti99_tdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	// head 0 or for head 1.
 
 	geometry->sides = 1;
-	floppy_image_read(floppy, track_data, size-tracklength, tracklength);
-	if (determine_offset(format, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
+	floppy_image_read(floppy, &track_data[0], size-tracklength, tracklength);
+	if (determine_offset(format, &track_data[0], &first_idam)==FLOPPY_ERROR_SEEKERROR)
 	{
 		/* error ... what now? */
 		LOG_FORMATS("Error when reading last track. Image broken.\n");

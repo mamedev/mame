@@ -276,7 +276,7 @@ void cassette_close(cassette_image *cassette)
 	{
 		if ((cassette->flags & CASSETTE_FLAG_DIRTY) && (cassette->flags & CASSETTE_FLAG_SAVEONEXIT))
 			cassette_save(cassette);
-		for (int i = 0; i < cassette->blocks.count(); i++)
+		for (unsigned int i = 0; i < cassette->blocks.size(); i++)
 			global_free(cassette->blocks[i]);
 		global_free(cassette);
 	}
@@ -377,8 +377,11 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 	size_t sample_index = sample % SAMPLES_PER_BLOCK;
 
 	/* is this block beyond the edge of our waveform? */
-	if (sample_blocknum >= cassette->blocks.count())
-		cassette->blocks.resize_keep_and_clear_new(sample_blocknum + 1);
+	if (sample_blocknum >= cassette->blocks.size()) {
+		size_t osize = cassette->blocks.size();
+		cassette->blocks.resize(sample_blocknum + 1);
+		memset(&cassette->blocks[osize], 0, (cassette->blocks.size()-osize)*sizeof(cassette->blocks[0]));
+	}
 
 	if (cassette->blocks[sample_blocknum] == NULL)
 		cassette->blocks[sample_blocknum] = global_alloc(sample_block);
@@ -386,8 +389,11 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 	sample_block &block = *cassette->blocks[sample_blocknum];
 
 	/* is this sample access off the current block? */
-	if (sample_index >= block.count())
-		block.resize_keep_and_clear_new(SAMPLES_PER_BLOCK);
+	if (sample_index >= block.size()) {
+		size_t osize = block.size();
+		block.resize(SAMPLES_PER_BLOCK);
+		memset(&block[osize], 0, (SAMPLES_PER_BLOCK-osize)*sizeof(block[0]));
+	}
 
 	*ptr = &block[sample_index];
 	return CASSETTE_ERROR_SUCCESS;
@@ -857,7 +863,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	int sample_count;
 	dynamic_buffer bytes;
 	dynamic_buffer chunk;
-	dynamic_array<INT16> samples;
+	std::vector<INT16> samples;
 	int pos = 0;
 	UINT64 offset = 0;
 	UINT64 size;
@@ -892,8 +898,8 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 		}
 
 		bytes.resize(size);
-		cassette_image_read(cassette, bytes, 0, size);
-		sample_count = args.chunk_sample_calc(bytes, (int)size);
+		cassette_image_read(cassette, &bytes[0], 0, size);
+		sample_count = args.chunk_sample_calc(&bytes[0], (int)size);
 
 		if (args.header_samples < 0)
 			args.header_samples = sample_count;
@@ -911,7 +917,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	/* if there has to be a header */
 	if (args.header_samples > 0)
 	{
-		length = args.fill_wave(samples + pos, sample_count - pos, CODE_HEADER);
+		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_HEADER);
 		if (length < 0)
 		{
 			err = CASSETTE_ERROR_INVALIDIMAGE;
@@ -923,10 +929,10 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	/* convert the file data to samples */
 	while((pos < sample_count) && (offset < size))
 	{
-		cassette_image_read(cassette, chunk, offset, args.chunk_size);
+		cassette_image_read(cassette, &chunk[0], offset, args.chunk_size);
 		offset += args.chunk_size;
 
-		length = args.fill_wave(samples + pos, sample_count - pos, chunk);
+		length = args.fill_wave(&samples[pos], sample_count - pos, &chunk[0]);
 		if (length < 0)
 		{
 			err = CASSETTE_ERROR_INVALIDIMAGE;
@@ -940,7 +946,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	/* if there has to be a trailer */
 	if (args.trailer_samples > 0)
 	{
-		length = args.fill_wave(samples + pos, sample_count - pos, CODE_TRAILER);
+		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_TRAILER);
 		if (length < 0)
 		{
 			err = CASSETTE_ERROR_INVALIDIMAGE;
@@ -951,7 +957,7 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 
 	/* specify the wave */
 	err = cassette_put_samples(cassette, 0, 0.0, ((double) pos) / args.sample_frequency,
-		pos, 2, samples, CASSETTE_WAVEFORM_16BIT);
+		pos, 2, &samples[0], CASSETTE_WAVEFORM_16BIT);
 	if (err)
 		goto done;
 

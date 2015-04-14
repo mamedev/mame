@@ -1456,7 +1456,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 
 	rom = memregion("maincpu")->base();
 	size = 0x8000;
-	memcpy(buf, rom, size);
+	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
 		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
@@ -1465,7 +1465,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 
 	rom = memregion("user1")->base();
 	size = 0x80000;
-	memcpy(buf, rom, size);
+	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
 		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
@@ -1473,7 +1473,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	}
 	rom = memregion("gfx1")->base();
 	size = 0x80000;
-	memcpy(buf, rom, size);
+	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
 		addr = BITSWAP24(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);

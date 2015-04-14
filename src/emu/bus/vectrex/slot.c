@@ -228,9 +228,9 @@ void vectrex_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(size);
 		int type = VECTREX_STD;
 
-		core_fread(m_file, rom, size);
+		core_fread(m_file, &rom[0], size);
 
-		if (!memcmp(rom + 0x06, "SRAM", 4))
+		if (!memcmp(&rom[0x06], "SRAM", 4))
 			type = VECTREX_SRAM;
 		if (size > 0x8000)
 			type = VECTREX_64K;

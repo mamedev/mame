@@ -85,7 +85,7 @@ class imds2_state : public driver_device
 	required_ioport m_io_key7;
 	required_ioport m_ioc_options;
 
-	dynamic_array<UINT8> m_ipc_ram;
+	std::vector<UINT8> m_ipc_ram;
 
 	bool imds2_in_ipc_rom(offs_t offset) const;
 

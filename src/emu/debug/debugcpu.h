@@ -236,7 +236,7 @@ public:
 	void registerpoint_enable_all(bool enable = true );
 
 	// hotspots
-	bool hotspot_tracking_enabled() const { return (m_hotspots != NULL); }
+  bool hotspot_tracking_enabled() const { return !m_hotspots.empty(); }
 	void hotspot_track(int numspots, int threshhold);
 
 	// comments
@@ -370,7 +370,7 @@ private:
 		address_space *     m_space;                    // space where the access occurred
 		UINT32              m_count;                    // number of hits
 	};
-	dynamic_array<hotspot_entry> m_hotspots;            // hotspot list
+	std::vector<hotspot_entry> m_hotspots;            // hotspot list
 	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
 
 	// pc tracking

@@ -260,9 +260,9 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 	dynamic_buffer img;
 	img.resize(size);
 
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
-	log_boot_sector(img);
+	log_boot_sector(&img[0]);
 
 	int track_offset = 0;
 
@@ -286,7 +286,7 @@ bool victor9k_format::load(io_generic *io, UINT32 form_factor, floppy_image *ima
 
 			desc_s sectors[40];
 
-			build_sector_description(f, img, track_offset, sectors, sector_count);
+			build_sector_description(f, &img[0], track_offset, sectors, sector_count);
 			generate_track(desc, track, head, sectors, sector_count, total_size, image);
 
 			track_offset += track_size;

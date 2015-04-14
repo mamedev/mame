@@ -762,16 +762,16 @@ int main(int argc, char *argv[])
 		bitmap_yuy16 bitmap(info.width, info.height);
 
 		// allocate sound buffers
-		dynamic_array<INT16> lsound(info.samplerate);
-		dynamic_array<INT16> rsound(info.samplerate);
+		std::vector<INT16> lsound(info.samplerate);
+		std::vector<INT16> rsound(info.samplerate);
 
 		// loop over frames
 		int frame = 0;
 		int samples = 0;
-		while (isavi ? read_avi(file, frame, bitmap, lsound, rsound, samples) : read_chd(file, frame, bitmap, lsound, rsound, samples))
+		while (isavi ? read_avi(file, frame, bitmap, &lsound[0], &rsound[0], samples) : read_chd(file, frame, bitmap, &lsound[0], &rsound[0], samples))
 		{
 			verify_video(video, frame, bitmap);
-			verify_audio(audio, lsound, rsound, samples);
+			verify_audio(audio, &lsound[0], &rsound[0], samples);
 			frame++;
 		}
 

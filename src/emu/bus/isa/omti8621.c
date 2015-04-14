@@ -339,8 +339,8 @@ void omti8621_device::device_reset()
 	// default the sector data buffer with model and status information
 	// (i.e. set sector data buffer for cmd=0x0e READ SECTOR BUFFER)
 
-	memset(sector_buffer, 0, OMTI_DISK_SECTOR_SIZE);
-	memcpy(sector_buffer, "8621VB.4060487xx", 0x10);
+	memset(&sector_buffer[0], 0, OMTI_DISK_SECTOR_SIZE);
+	memcpy(&sector_buffer[0], "8621VB.4060487xx", 0x10);
 	sector_buffer[0x10] = 0; // ROM Checksum error
 	sector_buffer[0x11] = 0; // Processor Register error
 	sector_buffer[0x12] = 0; // Buffer RAM error
@@ -543,7 +543,7 @@ void omti8621_device::set_data_transfer(UINT8 *data, UINT16 length)
 
 void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 lun)
 {
-	UINT8 *data_buffer = sector_buffer;
+	UINT8 *data_buffer = &sector_buffer[0];
 	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
@@ -563,7 +563,7 @@ void omti8621_device::read_sectors_from_disk(INT32 diskaddr, UINT8 count, UINT8 
 
 void omti8621_device::write_sectors_to_disk(INT32 diskaddr, UINT8 count, UINT8 lun)
 {
-	UINT8 *data_buffer = sector_buffer;
+	UINT8 *data_buffer = &sector_buffer[0];
 	device_image_interface *image = our_disks[lun]->m_image;
 
 	while (count-- > 0) {
@@ -594,10 +594,10 @@ void omti8621_device::copy_sectors(INT32 dst_addr, INT32 src_addr, UINT8 count, 
 
 	while (count-- > 0) {
 		image->fseek( src_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fread( sector_buffer, OMTI_DISK_SECTOR_SIZE);
+		image->fread( &sector_buffer[0], OMTI_DISK_SECTOR_SIZE);
 
 		image->fseek( dst_addr * OMTI_DISK_SECTOR_SIZE, SEEK_SET);
-		image->fwrite( sector_buffer, OMTI_DISK_SECTOR_SIZE);
+		image->fwrite( &sector_buffer[0], OMTI_DISK_SECTOR_SIZE);
 
 		if (dst_addr == diskaddr_ecc_error) {
 			// reset previous ECC error
@@ -641,7 +641,7 @@ void omti8621_device::format_track(const UINT8 * cdb)
 
 	if (check_disk_address(cdb) ) {
 		if ((cdb[5] & 0x40) == 0) {
-			memset(sector_buffer, 0x6C, OMTI_DISK_SECTOR_SIZE * our_disks[lun]->m_sectors);
+			memset(&sector_buffer[0], 0x6C, OMTI_DISK_SECTOR_SIZE * our_disks[lun]->m_sectors);
 		}
 		write_sectors_to_disk(disk_addr, our_disks[lun]->m_sectors, lun);
 	}
@@ -840,7 +840,7 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 		if (check_disk_address(cdb)) {
 			// read data from controller
 			read_sectors_from_disk(get_disk_address(cdb), cdb[4], lun);
-			set_data_transfer(sector_buffer,  OMTI_DISK_SECTOR_SIZE*cdb[4]);
+			set_data_transfer(&sector_buffer[0],  OMTI_DISK_SECTOR_SIZE*cdb[4]);
 		}
 		break;
 
@@ -856,7 +856,7 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 		break;
 
 	case OMTI_CMD_READ_SECTOR_BUFFER: // 0x0E
-		set_data_transfer(sector_buffer, OMTI_DISK_SECTOR_SIZE*cdb[4]);
+		set_data_transfer(&sector_buffer[0], OMTI_DISK_SECTOR_SIZE*cdb[4]);
 		break;
 
 	case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
@@ -909,7 +909,7 @@ void omti8621_device::do_command(const UINT8 cdb[], const UINT16 cdb_length)
 		if (check_disk_address(cdb)) {
 			// read data from controller
 			read_sectors_from_disk(get_disk_address(cdb), cdb[4], lun);
-			set_data_transfer(sector_buffer, OMTI_DISK_SECTOR_SIZE+6);
+			set_data_transfer(&sector_buffer[0], OMTI_DISK_SECTOR_SIZE+6);
 		}
 		break;
 
@@ -1050,7 +1050,7 @@ WRITE8_MEMBER(omti8621_device::write8)
 					// TODO: check diskaddr
 					// Fall through
 				case OMTI_CMD_WRITE_SECTOR_BUFFER: // 0x0F
-					set_data_transfer(sector_buffer,
+					set_data_transfer(&sector_buffer[0],
 							OMTI_DISK_SECTOR_SIZE * command_buffer[4]);
 					status_port &= ~OMTI_STATUS_IO;
 					break;
@@ -1062,7 +1062,7 @@ WRITE8_MEMBER(omti8621_device::write8)
 
 				case OMTI_CMD_WRITE_LONG: // 0xE6
 					// TODO: check diskaddr
-					set_data_transfer(sector_buffer,
+					set_data_transfer(&sector_buffer[0],
 							(OMTI_DISK_SECTOR_SIZE +6) * command_buffer[4]);
 					status_port &= ~OMTI_STATUS_IO;
 					break;

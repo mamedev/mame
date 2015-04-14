@@ -153,7 +153,7 @@ ioport_constructor astrocade_rl64ram_device::device_input_ports() const
 // Blue RAM expansions have RAM starting at 0x6000, up to the RAM size
 READ8_MEMBER(astrocade_blueram_4k_device::read)
 {
-	if (offset >= 0x1000 && offset < 0x1000 + m_ram.bytes())
+	if (offset >= 0x1000 && offset < 0x1000 + m_ram.size())
 		return m_ram[offset - 0x1000];
 	else
 		return 0;
@@ -161,7 +161,7 @@ READ8_MEMBER(astrocade_blueram_4k_device::read)
 
 WRITE8_MEMBER(astrocade_blueram_4k_device::write)
 {
-	if (offset >= 0x1000 && offset < 0x1000 + m_ram.bytes() && !m_write_prot->read())
+	if (offset >= 0x1000 && offset < 0x1000 + m_ram.size() && !m_write_prot->read())
 		m_ram[offset - 0x1000] = data;
 }
 

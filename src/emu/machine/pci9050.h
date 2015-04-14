@@ -32,8 +32,8 @@ protected:
 private:
 	DECLARE_ADDRESS_MAP(map, 32);
 
-	address_space_config m_as0_config, m_as1_config, m_as2_config, m_as3_config;
-	address_space *m_as0, *m_as1, *m_as2, *m_as3;
+//	address_space_config m_as0_config, m_as1_config, m_as2_config, m_as3_config;
+//	address_space *m_as0, *m_as1, *m_as2, *m_as3;
 
 	UINT32 m_regs[0x54/4];
 };

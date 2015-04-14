@@ -602,7 +602,7 @@ static void deco_decrypt(running_machine &machine,const char *rgntag,const UINT8
 {
 	UINT16 *rom = (UINT16 *)machine.root_device().memregion(rgntag)->base();
 	int len = machine.root_device().memregion(rgntag)->bytes()/2;
-	dynamic_array<UINT16> buffer(len);
+	std::vector<UINT16> buffer(len);
 	int i;
 
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */
@@ -610,7 +610,7 @@ static void deco_decrypt(running_machine &machine,const char *rgntag,const UINT8
 		for (i = 0;i < len;i++)
 			rom[i] = BIG_ENDIANIZE_INT16(rom[i]);
 
-	memcpy(buffer,rom,len*2);
+	memcpy(&buffer[0],rom,len*2);
 
 	for (i = 0;i < len;i++)
 	{

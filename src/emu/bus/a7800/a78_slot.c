@@ -539,7 +539,7 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 		int type = A78_TYPE0, mapper;
 
 		// Load and check the header
-		core_fread(m_file, head, 128);
+		core_fread(m_file, &head[0], 128);
 
 		// let's try to auto-fix some common errors in the header
 		mapper = validate_header((head[53] << 8) | head[54], FALSE);

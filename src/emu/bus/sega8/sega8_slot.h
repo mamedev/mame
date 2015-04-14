@@ -65,9 +65,9 @@ public:
 
 //protected:
 	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return m_ram; }
+	UINT8* get_ram_base() { return &m_ram[0]; }
 	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.count(); }
+	UINT32 get_ram_size() { return m_ram.size(); }
 
 	void rom_map_setup(UINT32 size);
 	void ram_map_setup(UINT8 banks);

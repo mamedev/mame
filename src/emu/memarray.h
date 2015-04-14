@@ -45,14 +45,14 @@ public:
 	// construction/destruction
 	memory_array();
 	memory_array(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe) { set(base, bytes, membits, endianness, bpe); }
-	template <typename _Type> memory_array(dynamic_array<_Type> &array, endianness_t endianness, int bpe) { set(array, endianness, bpe); }
+	template <typename _Type> memory_array(std::vector<_Type> &array, endianness_t endianness, int bpe) { set(array, endianness, bpe); }
 	memory_array(const address_space &space, void *base, UINT32 bytes, int bpe) { set(space, base, bytes, bpe); }
 	memory_array(const memory_share &share, int bpe) { set(share, bpe); }
 	memory_array(const memory_array &array) { set(array); }
 
 	// configuration
 	void set(void *base, UINT32 bytes, int membits, endianness_t endianness, int bpe);
-	template <typename _Type> void set(dynamic_array<_Type> &array, endianness_t endianness, int bpe) { set(&array[0], array.count(), 8*sizeof(_Type), endianness, bpe); }
+	template <typename _Type> void set(std::vector<_Type> &array, endianness_t endianness, int bpe) { set(&array[0], array.size(), 8*sizeof(_Type), endianness, bpe); }
 	void set(const address_space &space, void *base, UINT32 bytes, int bpe);
 	void set(const memory_share &share, int bpe);
 	void set(const memory_array &array);

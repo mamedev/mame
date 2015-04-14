@@ -729,7 +729,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
-			return m_bcglookup;
+			return &m_bcglookup[0];
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:

@@ -132,7 +132,7 @@ void pcd_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 void pcd_state::machine_start()
 {
-	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), pcd_charlayout, m_charram, 0, 1, 0)));
+	m_gfxdecode->set_gfx(0, global_alloc(gfx_element(machine().device<palette_device>("palette"), pcd_charlayout, &m_charram[0], 0, 1, 0)));
 	m_req_hack = timer_alloc();
 }
 

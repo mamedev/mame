@@ -150,7 +150,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	debug_view *next() const { return m_next; }
 	debug_view_type type() const { return m_type; }
-	const debug_view_char *viewdata() const { return m_viewdata; }
+	const debug_view_char *viewdata() const { return &m_viewdata[0]; }
 	debug_view_xy total_size() { flush_updates(); return m_total; }
 	debug_view_xy visible_size() { flush_updates(); return m_visible; }
 	debug_view_xy visible_position() { flush_updates(); return m_topleft; }
@@ -216,7 +216,7 @@ protected:
 	UINT8                   m_update_level;     // update level; updates when this hits 0
 	bool                    m_update_pending;   // true if there is a pending update
 	bool                    m_osd_update_pending; // true if there is a pending update
-	dynamic_array<debug_view_char> m_viewdata;  // current array of view data
+	std::vector<debug_view_char> m_viewdata;  // current array of view data
 
 private:
 	running_machine &       m_machine;          // machine associated with this view

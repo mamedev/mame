@@ -39,7 +39,7 @@ protected:
 	required_memory_bank dmd0, dmd2, dmd4, dmd6, dmd8, dmda;
 
 	UINT8 cur_scanline, visible_page, firq_scanline;
-	dynamic_array<UINT8> ram, screen_buffer, bitcounts;
+	std::vector<UINT8> ram, screen_buffer, bitcounts;
 
 	virtual void device_start();
 	virtual void device_reset();

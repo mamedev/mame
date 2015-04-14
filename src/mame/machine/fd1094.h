@@ -54,7 +54,7 @@ protected:
 	UINT32                  m_baseaddress;
 	UINT32                  m_size;
 	UINT32                  m_rgnoffset;
-	dynamic_array<UINT16>   m_decrypted_opcodes[256];
+	std::vector<UINT16>          m_decrypted_opcodes[256];
 };
 
 

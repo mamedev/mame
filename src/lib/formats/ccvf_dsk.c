@@ -91,7 +91,7 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	UINT64 size = io_generic_size(io);
 	dynamic_buffer img(size);
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
 	astring ccvf = astring((const char *)&img[0], size);
 	dynamic_buffer bytes(78720);
@@ -119,24 +119,24 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int total_size = 200000000/f.cell_size;
 
 	for(int track=0; track < f.track_count; track++) {
-		dynamic_array<UINT32> buffer(total_size);
+		std::vector<UINT32> buffer;
 		int offset = 0;
 
 		for (int i=0; i<1920 && pos<size; i++, pos++) {
 			for (int bit=0; bit<8; bit++) {
-				bit_w(buffer, offset++, BIT(bytes[pos], bit), f.cell_size);
+				bit_w(buffer, BIT(bytes[pos], bit), f.cell_size);
 			}
 		}
 
 		if (offset < total_size) {
 			// pad the remainder of the track with sync
-			int count = (total_size-offset);
+			int count = total_size-buffer.size();
 			for (int i=0; i<count;i++) {
-				bit_w(buffer, offset++, (track > 0) ? 1 : 0, f.cell_size);
+				bit_w(buffer, (track > 0) ? 1 : 0, f.cell_size);
 			}
 		}
 
-		generate_track_from_levels(track, 0, buffer, total_size, 0, image);
+		generate_track_from_levels(track, 0, buffer, 0, image);
 	}
 
 	image->set_variant(f.variant);

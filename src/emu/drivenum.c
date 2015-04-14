@@ -132,7 +132,7 @@ driver_enumerator::driver_enumerator(emu_options &options)
 		m_filtered_count(0),
 		m_options(options),
 		m_included(s_driver_count, 0),
-		m_config(s_driver_count, 0)
+		m_config(s_driver_count, NULL)
 {
 	include_all();
 }
@@ -143,7 +143,7 @@ driver_enumerator::driver_enumerator(emu_options &options, const char *string)
 		m_filtered_count(0),
 		m_options(options),
 		m_included(s_driver_count, 0),
-		m_config(s_driver_count, 0)
+		m_config(s_driver_count, NULL)
 {
 	filter(string);
 }
@@ -154,7 +154,7 @@ driver_enumerator::driver_enumerator(emu_options &options, const game_driver &dr
 		m_filtered_count(0),
 		m_options(options),
 		m_included(s_driver_count, 0),
-		m_config(s_driver_count, 0)
+		m_config(s_driver_count, NULL)
 {
 	filter(driver);
 }
@@ -242,7 +242,7 @@ int driver_enumerator::filter(const game_driver &driver)
 
 void driver_enumerator::include_all()
 {
-	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count);
+	memset(&m_included[0], 1, sizeof(m_included[0]) * s_driver_count);
 	m_filtered_count = s_driver_count;
 
 	// always exclude the empty driver
@@ -316,7 +316,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 		srand(osd_ticks());
 
 		// allocate a temporary list
-		dynamic_array<int> templist(m_filtered_count);
+		std::vector<int> templist(m_filtered_count);
 		int arrayindex = 0;
 		for (int index = 0; index < s_driver_count; index++)
 			if (m_included[index])
@@ -340,7 +340,7 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 	}
 
 	// allocate memory to track the penalty value
-	dynamic_array<int> penalty(count);
+	std::vector<int> penalty(count);
 
 	// initialize everyone's states
 	for (int matchnum = 0; matchnum < count; matchnum++)

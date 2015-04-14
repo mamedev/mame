@@ -47,7 +47,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(si_w);
 	DECLARE_READ_LINE_MEMBER(so_r);
 
-	UINT8 *get_ptr() {  return m_data;  }
+	UINT8 *get_ptr() {  return &m_data[0];  }
 
 	template<class _Object> static devcb_base &set_so_cb(device_t &device, _Object object) { return downcast<at45db041_device &>(device).write_so.set_callback(object); }
 	devcb_write_line write_so;

@@ -800,7 +800,7 @@ static int read_rom_data(romload_private *romdata, const rom_entry *parent_regio
 	{
 		int evengroupcount = (tempbufsize / groupsize) * groupsize;
 		int bytesleft = (numbytes > evengroupcount) ? evengroupcount : numbytes;
-		UINT8 *bufptr = tempbuf;
+		UINT8 *bufptr = &tempbuf[0];
 
 		/* read as much as we can */
 		LOG(("  Reading %X bytes into buffer\n", bytesleft));

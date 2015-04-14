@@ -116,7 +116,7 @@ void gba_rom_eeprom64_device::device_start()
 
 READ32_MEMBER(gba_rom_sram_device::read_ram)
 {
-	if (m_nvram && offset < m_nvram.count())
+	if (!m_nvram.empty() && offset < m_nvram.size())
 		return m_nvram[offset];
 	else    // this cannot actually happen...
 		return 0xffffffff;
@@ -124,7 +124,7 @@ READ32_MEMBER(gba_rom_sram_device::read_ram)
 
 WRITE32_MEMBER(gba_rom_sram_device::write_ram)
 {
-	if (m_nvram && offset < m_nvram.count())
+	if (!m_nvram.empty() && offset < m_nvram.size())
 		COMBINE_DATA(&m_nvram[offset]);
 }
 

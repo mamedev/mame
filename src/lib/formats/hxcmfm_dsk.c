@@ -85,9 +85,9 @@ bool mfm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			trackbuf.resize(trackdesc.mfmtracksize);
 
 			// actual data read
-			io_generic_read(io, trackbuf, trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
+			io_generic_read(io, &trackbuf[0], trackdesc.mfmtrackoffset, trackdesc.mfmtracksize);
 
-			generate_track_from_bitstream(track, side, trackbuf, trackdesc.mfmtracksize*8, image);
+			generate_track_from_bitstream(track, side, &trackbuf[0], trackdesc.mfmtracksize*8, image);
 
 			counter++;
 		}

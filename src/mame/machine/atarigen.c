@@ -1183,7 +1183,7 @@ inline void atarigen_state::slapstic_update_bank(int bank)
 	{
 		// bank 0 comes from the copy we made earlier
 		if (bank == 0)
-			memcpy(m_slapstic, m_slapstic_bank0, 0x2000);
+			memcpy(m_slapstic, &m_slapstic_bank0[0], 0x2000);
 		else
 			memcpy(m_slapstic, &m_slapstic[bank * 0x1000], 0x2000);
 
@@ -1254,7 +1254,7 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 		// allocate memory for a copy of bank 0
 		m_slapstic_bank0.resize(0x2000);
-		memcpy(m_slapstic_bank0, m_slapstic, 0x2000);
+		memcpy(&m_slapstic_bank0[0], m_slapstic, 0x2000);
 
 		// ensure we recopy memory for the bank
 		m_slapstic_bank = 0xff;

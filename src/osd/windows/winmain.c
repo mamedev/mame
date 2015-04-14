@@ -192,7 +192,7 @@ private:
 
 	UINT8           m_stack_depth;
 	UINT8           m_entry_stride;
-	dynamic_array<FPTR> m_buffer;
+	std::vector<FPTR>    m_buffer;
 	FPTR *          m_buffer_ptr;
 	FPTR *          m_buffer_end;
 };

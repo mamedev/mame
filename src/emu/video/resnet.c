@@ -256,8 +256,8 @@ double compute_resistor_net_outputs(
 
 	/* parse input parameters */
 
-	dynamic_array<double> o((1<<MAX_RES_PER_NET) *  MAX_NETS);
-	dynamic_array<double> os((1<<MAX_RES_PER_NET) *  MAX_NETS);
+	std::vector<double> o((1<<MAX_RES_PER_NET) *  MAX_NETS);
+	std::vector<double> os((1<<MAX_RES_PER_NET) *  MAX_NETS);
 
 	networks_no = 0;
 	for (n = 0; n < MAX_NETS; n++)
@@ -693,7 +693,7 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 	return (int) (v * 255 / vcc + 0.4);
 }
 
-void compute_res_net_all(dynamic_array<rgb_t> &rgb, const UINT8 *prom, const res_net_decode_info &rdi, const res_net_info &di)
+void compute_res_net_all(std::vector<rgb_t> &rgb, const UINT8 *prom, const res_net_decode_info &rdi, const res_net_info &di)
 {
 	UINT8 r,g,b;
 	int i,j,k;

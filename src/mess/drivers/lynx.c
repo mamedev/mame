@@ -168,7 +168,7 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 
 	data.resize(length);
 
-	if (image.fread( data, length) != length)
+	if (image.fread( &data[0], length) != length)
 	{
 		return IMAGE_INIT_FAIL;
 	}

@@ -101,13 +101,14 @@ imgtoolerr_t imghd_create(imgtool_stream *stream, UINT32 hunksize, UINT32 cylind
 	}
 
 	/* alloc and zero buffer */
-	cache.resize_and_clear(hunksize);
+	cache.resize(hunksize);
+	memset(&cache[0], 0, hunksize);
 
 	/* zero out every hunk */
 	totalhunks = (logicalbytes + hunksize - 1) / hunksize;
 	for (hunknum = 0; hunknum < totalhunks; hunknum++)
 	{
-		rc = chd.write_units(hunknum, cache);
+		rc = chd.write_units(hunknum, &cache[0]);
 		if (rc)
 		{
 			err = IMGTOOLERR_WRITEERROR;

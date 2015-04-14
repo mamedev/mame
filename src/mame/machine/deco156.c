@@ -126,8 +126,8 @@ void deco156_decrypt(running_machine &machine)
 {
 	UINT32 *rom = (UINT32 *)machine.root_device().memregion("maincpu")->base();
 	int length = machine.root_device().memregion("maincpu")->bytes();
-	dynamic_array<UINT32> buf(length/4);
+	std::vector<UINT32> buf(length/4);
 
-	memcpy(buf, rom, length);
-	decrypt(buf, rom, length);
+	memcpy(&buf[0], rom, length);
+	decrypt(&buf[0], rom, length);
 }

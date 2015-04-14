@@ -150,14 +150,14 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 	decode_gfx(m_playfield_lookup, motable);
 
 	/* modify the motion object code lookup */
-	dynamic_array<UINT16> &codelookup = m_mob->code_lookup();
-	for (int i = 0; i < codelookup.count(); i++)
+	std::vector<UINT16> &codelookup = m_mob->code_lookup();
+	for (unsigned int i = 0; i < codelookup.size(); i++)
 		codelookup[i] = (i & 0xff) | ((motable[i >> 8] & 0xff) << 8);
 
 	/* modify the motion object color and gfx lookups */
-	dynamic_array<UINT8> &colorlookup = m_mob->color_lookup();
-	dynamic_array<UINT8> &gfxlookup = m_mob->gfx_lookup();
-	for (int i = 0; i < colorlookup.count(); i++)
+	std::vector<UINT8> &colorlookup = m_mob->color_lookup();
+	std::vector<UINT8> &gfxlookup = m_mob->gfx_lookup();
+	for (unsigned int i = 0; i < colorlookup.size(); i++)
 	{
 		colorlookup[i] = ((motable[i] >> 12) & 15) << 1;
 		gfxlookup[i] = (motable[i] >> 8) & 15;

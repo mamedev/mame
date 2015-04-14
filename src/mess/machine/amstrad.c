@@ -3169,14 +3169,14 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 	snapshot.resize(snapshot_size);
 
 	/* read whole file */
-	image.fread(snapshot, snapshot_size);
+	image.fread(&snapshot[0], snapshot_size);
 
-	if (memcmp(snapshot, "MV - SNA", 8))
+	if (memcmp(&snapshot[0], "MV - SNA", 8))
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	amstrad_handle_snapshot(snapshot);
+	amstrad_handle_snapshot(&snapshot[0]);
 	return IMAGE_INIT_PASS;
 }
 
@@ -3238,7 +3238,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		UINT8 *crt = m_cart->get_rom_base();
 		dynamic_buffer temp_copy;
 		temp_copy.resize(size);
-		image.fread(temp_copy, size);
+		image.fread(&temp_copy[0], size);
 
 		// RIFF chunk bits
 		char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
@@ -3260,11 +3260,11 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		// read some chunks
 		while (bytes_to_read > 0)
 		{
-			memcpy(chunkid, temp_copy + offset, 4);
+			memcpy(chunkid, &temp_copy[offset], 4);
 			bytes_to_read -= 4;
 			offset += 4;
 
-			memcpy(chunklen, temp_copy + offset, 4);
+			memcpy(chunklen, &temp_copy[offset], 4);
 			bytes_to_read -= 4;
 			offset += 4;
 
@@ -3285,7 +3285,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 					if (chunksize > 0x4000)
 						chunksize = 0x4000;
 
-					memcpy(crt + 0x4000 * ramblock, temp_copy + offset, chunksize);
+					memcpy(crt + 0x4000 * ramblock, &temp_copy[offset], chunksize);
 					bytes_to_read -= chunksize;
 					offset += chunksize;
 					logerror("CPR: Loaded %i-byte chunk into RAM block %i\n", chunksize, ramblock);

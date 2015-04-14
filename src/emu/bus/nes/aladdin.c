@@ -150,7 +150,7 @@ void nes_aladdin_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		UINT8 mapper;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		mapper = (rom[6] & 0xf0) >> 4;
 		mapper |= rom[7] & 0xf0;

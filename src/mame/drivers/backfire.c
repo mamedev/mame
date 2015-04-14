@@ -700,7 +700,7 @@ void backfire_state::descramble_sound()
 		buf1[addr] = rom[x];
 	}
 
-	memcpy(rom, buf1, length);
+	memcpy(rom, &buf1[0], length);
 }
 
 READ32_MEMBER(backfire_state::backfire_speedup_r)

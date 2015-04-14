@@ -165,7 +165,7 @@ osd_common_t::osd_common_t(osd_options &options)
 
 osd_common_t::~osd_common_t()
 {
-	for(int i= 0; i < m_video_names.count(); ++i)
+	for(unsigned int i= 0; i < m_video_names.size(); ++i)
 		osd_free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
 	osd_output::pop(this);
@@ -210,31 +210,31 @@ void osd_common_t::register_options()
 	const char *names[20];
 	int num;
 	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
-	dynamic_array<const char *> dnames;
+	std::vector<const char *> dnames;
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
+		dnames.push_back(names[i]);
 	update_option(OSD_FONT_PROVIDER, dnames);
 
 	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, &num, names);
-	dnames.reset();
+	dnames.clear();
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
+		dnames.push_back(names[i]);
 	update_option(OSD_SOUND_PROVIDER, dnames);
 
 #if 0
 	// Register midi options and update options
 	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, &num, names);
-	dnames.reset();
+	dnames.clear();
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
+		dnames.push_back(names[i]);
 	update_option(OSD_MIDI_PROVIDER, dnames);
 #endif
 
 	// Register debugger options and update options
 	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
-	dnames.reset();
+	dnames.clear();
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
+		dnames.push_back(names[i]);
 	update_option(OSD_DEBUG_PROVIDER, dnames);
 
 	// Register video options and update options
@@ -243,16 +243,16 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const char * key, dynamic_array<const char *> &values)
+void osd_common_t::update_option(const char * key, std::vector<const char *> &values)
 {
 	astring current_value(m_options.description(key));
 	astring new_option_value("");
-	for (int index = 0; index < values.count(); index++)
+	for (unsigned int index = 0; index < values.size(); index++)
 	{
 		astring t(values[index]);
 		if (new_option_value.len() > 0)
 		{
-			if( index != (values.count()-1))
+			if( index != (values.size()-1))
 				new_option_value.cat(", ");
 			else
 				new_option_value.cat(" or ");
@@ -633,5 +633,5 @@ void osd_common_t::osd_exit()
 void osd_common_t::video_options_add(const char *name, void *type)
 {
 	//m_video_options.add(name, type, false);
-	m_video_names.append(core_strdup(name));
+	m_video_names.push_back(core_strdup(name));
 }

@@ -689,7 +689,7 @@ void igs017_state::mgcs_decrypt_tiles()
 	dynamic_buffer tmp(length);
 	int i;
 
-	memcpy(tmp,rom,length);
+	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
 		int addr = (i & ~0xffff) | BITSWAP16(i,15,14,13,12,11,10,6,7,8,9,5,4,3,2,1,0);
@@ -983,7 +983,7 @@ void igs017_state::lhzb2_decrypt_tiles()
 	int i;
 
 	int addr;
-	memcpy(tmp, rom, length);
+	memcpy(&tmp[0], rom, length);
 	for (i = 0; i < length; i++)
 	{
 		addr = (i & ~0xffffff) | BITSWAP24(i,23,22,21,20,19,18,17,1,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
@@ -1207,7 +1207,7 @@ void igs017_state::slqz2_decrypt_tiles()
 	dynamic_buffer tmp(length);
 	int i;
 
-	memcpy(tmp,rom,length);
+	memcpy(&tmp[0],rom,length);
 	for (i = 0;i < length;i++)
 	{
 		int addr = (i & ~0xff) | BITSWAP8(i,7,4,5,6,3,2,1,0);

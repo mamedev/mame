@@ -56,7 +56,7 @@ void aeroboto_state::video_start()
 		int i;
 
 		dynamic_buffer temp(m_stars_length);
-		memcpy(temp, m_stars_rom, m_stars_length);
+		memcpy(&temp[0], m_stars_rom, m_stars_length);
 
 		for (i = 0; i < m_stars_length; i++)
 			m_stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];

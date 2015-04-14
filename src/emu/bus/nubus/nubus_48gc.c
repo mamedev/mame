@@ -112,7 +112,7 @@ void jmfb_device::device_start()
 //  printf("[JMFB %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_48gc", m_vram);
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, 0, 0, "bank_48gc", &m_vram[0]);
 
 	m_nubus->install_device(slotspace+0x200000, slotspace+0x2003ff, read32_delegate(FUNC(jmfb_device::mac_48gc_r), this), write32_delegate(FUNC(jmfb_device::mac_48gc_w), this));
 
@@ -135,7 +135,7 @@ void jmfb_device::device_reset()
 	m_xres = 640;
 	m_yres = 480;
 	m_mode = 0;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 }
 
@@ -159,7 +159,7 @@ UINT32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 {
 	UINT32 *scanline, *base;
 	int x, y;
-	UINT8 *vram8 = (UINT8 *)m_vram;
+	UINT8 *vram8 = &m_vram[0];
 	UINT8 pixels;
 
 	// first time?  kick off the VBL timer

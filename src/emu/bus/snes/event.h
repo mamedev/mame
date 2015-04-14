@@ -41,8 +41,8 @@ private:
 	UINT8 m_status;
 	UINT32 m_count;
 
-	dynamic_array<UINT32> m_dsp_prg;
-	dynamic_array<UINT16> m_dsp_data;
+	std::vector<UINT32> m_dsp_prg;
+	std::vector<UINT16> m_dsp_data;
 
 	static const device_timer_id TIMER_EVENT = 0;
 	emu_timer *pfest94_timer;

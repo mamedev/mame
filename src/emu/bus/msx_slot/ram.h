@@ -24,7 +24,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write);
 
 private:
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 };
 
 

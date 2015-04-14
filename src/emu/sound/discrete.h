@@ -3751,21 +3751,21 @@ enum
  * add and delete may be slow - the focus is on access!
  */
 
-	// TODO: replace with dynamic_array from utils
-template<class _ElementType> struct dynamic_array_t
+	// TODO: replace with vector from utils
+template<class _ElementType> struct vector_t
 {
 public:
-	dynamic_array_t(int initial) {
+	vector_t(int initial) {
 		m_count = 0;
 		m_allocated = initial;
 		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 	}
-	dynamic_array_t()  {
+	vector_t()  {
 		m_count = 0;
 		m_allocated = 16;
 		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 	}
-	~dynamic_array_t() {
+	~vector_t() {
 		global_free_array(m_arr);
 	}
 	_ElementType& operator [] (unsigned int index) const // get array item
@@ -3773,7 +3773,7 @@ public:
 		return m_arr[index];
 	}
 
-	dynamic_array_t(const dynamic_array_t &a)  // copy constructor
+	vector_t(const vector_t &a)  // copy constructor
 	{
 		m_allocated = a.count();
 		if (m_allocated < 16)
@@ -3783,7 +3783,7 @@ public:
 		for (int i=0; i < m_count; i++)
 			m_arr[i] = a[i];
 	}
-	dynamic_array_t& operator = (const dynamic_array_t &a) // assignment operator
+	vector_t& operator = (const vector_t &a) // assignment operator
 	{
 		if (this == &a) return *this;
 		m_allocated = a.count();
@@ -4185,9 +4185,9 @@ class discrete_task;
 class discrete_base_node;
 class discrete_dss_input_stream_node;
 class discrete_device;
-typedef dynamic_array_t<discrete_base_node *> node_list_t;
-typedef dynamic_array_t<discrete_dss_input_stream_node *> istream_node_list_t;
-typedef dynamic_array_t<discrete_task *> task_list_t;
+typedef vector_t<discrete_base_node *> node_list_t;
+typedef vector_t<discrete_dss_input_stream_node *> istream_node_list_t;
+typedef vector_t<discrete_task *> task_list_t;
 
 
 /*************************************
@@ -4216,7 +4216,7 @@ struct discrete_block
 	const char *    name;                           /* Node Name */
 	const char *    mod_name;                       /* Module / class name */
 };
-typedef dynamic_array_t<const discrete_block *> sound_block_list_t;
+typedef vector_t<const discrete_block *> sound_block_list_t;
 
 /*************************************
  *
@@ -4233,7 +4233,7 @@ public:
 	osd_ticks_t         run_time;
 	discrete_base_node *    self;
 };
-typedef dynamic_array_t<discrete_step_interface *> node_step_list_t;
+typedef vector_t<discrete_step_interface *> node_step_list_t;
 
 class discrete_input_interface
 {
@@ -4271,7 +4271,7 @@ public:
 //**************************************************************************
 
 class discrete_sound_output_interface;
-typedef dynamic_array_t<discrete_sound_output_interface *> node_output_list_t;
+typedef vector_t<discrete_sound_output_interface *> node_output_list_t;
 
 
 // ======================> discrete_device

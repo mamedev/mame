@@ -638,7 +638,7 @@ void sega_315_5195_mapper_device::decrypt_bank::set_decrypt(fd1094_device *fd109
 
 	// clear out all fd1089 stuff
 	m_fd1089 = NULL;
-	m_fd1089_decrypted.reset();
+	m_fd1089_decrypted.clear();
 }
 
 
@@ -691,8 +691,8 @@ void sega_315_5195_mapper_device::decrypt_bank::update()
 	if (m_fd1089 != NULL)
 	{
 		m_fd1089_decrypted.resize((m_end + 1 - m_start) / 2);
-		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, m_fd1089_decrypted, reinterpret_cast<UINT16 *>(m_srcptr));
-		m_bank->set_base_decrypted(m_fd1089_decrypted);
+		m_fd1089->decrypt(m_start, m_end + 1 - m_start, m_rgnoffs, &m_fd1089_decrypted[0], reinterpret_cast<UINT16 *>(m_srcptr));
+		m_bank->set_base_decrypted(&m_fd1089_decrypted[0]);
 	}
 
 	// fd1094 case

@@ -486,7 +486,7 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 
 	dynamic_buffer data;
 	data.resize(quickload_size);
-	image.fread(data, quickload_size);
+	image.fread(&data[0], quickload_size);
 	for (int i = 1; i < quickload_size; i++)
 		space.write_byte(address++, data[i]);
 

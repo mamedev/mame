@@ -112,7 +112,7 @@ void nubus_lview_device::device_reset()
 {
 	m_vbl_disable = 1;
 	m_protstate = 0;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -142,7 +142,7 @@ UINT32 nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	int x, y;
 	UINT8 pixels, *vram;
 
-	vram = m_vram + 0x20;
+	vram = &m_vram[0x20];
 
 	for (y = 0; y < 600; y++)
 	{

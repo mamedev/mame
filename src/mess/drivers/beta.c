@@ -301,7 +301,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
 	if (image.software_entry() == NULL)
-		image.fwrite(m_eprom_rom, 0x800);
+		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 
 /* Machine Initialization */
@@ -313,11 +313,11 @@ void beta_state::machine_start()
 	m_eprom_rom.resize(0x800);
 
 	if (!m_eprom->exists())
-		memset(m_eprom_rom, 0xff, 0x800);
+		memset(&m_eprom_rom[0], 0xff, 0x800);
 	else
 	{
 		astring region_tag;
-		memcpy(m_eprom_rom, memregion(region_tag.cpy(m_eprom->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base(), 0x800);
+		memcpy(&m_eprom_rom[0], memregion(region_tag.cpy(m_eprom->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base(), 0x800);
 	}
 
 	// state saving

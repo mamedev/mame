@@ -12424,12 +12424,12 @@ void cb3_state::do_blockswaps(UINT8* ROM)
 	};
 
 	dynamic_buffer buffer(0x10000);
-	memcpy(buffer,ROM,0x10000);
+	memcpy(&buffer[0],ROM,0x10000);
 
 	// swap some 0x800 blocks around..
 	for (A =0;A<32; A++)
 	{
-		memcpy(ROM+A*0x800,buffer+cherry_swaptables[A],0x800);
+		memcpy(ROM+A*0x800,&buffer[cherry_swaptables[A]],0x800);
 	}
 }
 

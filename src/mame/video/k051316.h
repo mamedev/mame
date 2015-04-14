@@ -78,7 +78,7 @@ protected:
 
 private:
 	// internal state
-	dynamic_array<UINT8> m_ram;
+	std::vector<UINT8> m_ram;
 	UINT8 m_ctrlram[16];
 	tilemap_t *m_tmap;
 

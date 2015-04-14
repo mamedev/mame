@@ -213,7 +213,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	else
 	{
 		dynamic_buffer quick_data(quick_length);
-		int read_ = image.fread( quick_data, quick_length);
+		int read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");

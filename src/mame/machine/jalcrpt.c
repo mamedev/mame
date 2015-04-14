@@ -135,7 +135,7 @@ void ms32_rearrange_sprites(running_machine &machine, const char *region)
 		result_data[i] = source_data[j];
 	}
 
-	memcpy (source_data, result_data, source_size);
+	memcpy (source_data, &result_data[0], source_size);
 }
 
 
@@ -187,7 +187,7 @@ void decrypt_ms32_tx(running_machine &machine, int addr_xor,int data_xor, const 
 		result_data[i] = source_data[j] ^ (i & 0xff) ^ data_xor;
 	}
 
-	memcpy (source_data, result_data, source_size);
+	memcpy (source_data, &result_data[0], source_size);
 }
 
 void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const char *region)
@@ -239,5 +239,5 @@ void decrypt_ms32_bg(running_machine &machine, int addr_xor,int data_xor, const 
 		result_data[i] = source_data[j] ^ (i & 0xff) ^ data_xor;
 	}
 
-	memcpy (source_data, result_data, source_size);
+	memcpy (source_data, &result_data[0], source_size);
 }

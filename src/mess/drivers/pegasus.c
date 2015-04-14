@@ -409,7 +409,7 @@ void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)
 			b = BITSWAP8(b, 3, 2, 1, 0, 7, 6, 5, 4);
 			temp_copy[j & 0xfff] = b;
 		}
-		memcpy(ROM, temp_copy, 0x1000);
+		memcpy(ROM, &temp_copy[0], 0x1000);
 	}
 }
 

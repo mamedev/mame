@@ -33,9 +33,9 @@ protected:
 
 private:
 	// internal state
-	dynamic_array<UINT8> m_ram_r;
-	dynamic_array<UINT8> m_ram_g;
-	dynamic_array<UINT8> m_ram_b;
+	std::vector<UINT8> m_ram_r;
+	std::vector<UINT8> m_ram_g;
+	std::vector<UINT8> m_ram_b;
 	UINT16 m_regs[8];
 };
 

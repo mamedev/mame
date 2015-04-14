@@ -200,7 +200,7 @@ void chanf_rom_device::common_write_2102(UINT32 offset, UINT8 data)
 // These are shared among Schach & Multigame cart types (not directly used by base chanf_rom_device)
 UINT8 chanf_rom_device::common_read_3853(UINT32 offset)
 {
-	if (offset < m_ram.count())
+	if (offset < m_ram.size())
 		return m_ram[offset];
 	else
 		return 0xff;
@@ -208,7 +208,7 @@ UINT8 chanf_rom_device::common_read_3853(UINT32 offset)
 
 void chanf_rom_device::common_write_3853(UINT32 offset, UINT8 data)
 {
-	if (offset < m_ram.count())
+	if (offset < m_ram.size())
 		m_ram[offset] = data;
 }
 

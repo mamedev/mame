@@ -586,7 +586,7 @@ protected:
 	UINT16 *subtable_ptr(UINT16 entry) { return &m_table[level2_index(entry, 0)]; }
 
 	// internal state
-	dynamic_array<UINT16>   m_table;                    // pointer to base of table
+	std::vector<UINT16>   m_table;                    // pointer to base of table
 	UINT16 *                m_live_lookup;              // current lookup
 	address_space &         m_space;                    // pointer back to the space
 	bool                    m_large;                    // large memory model?
@@ -604,7 +604,7 @@ protected:
 		UINT32              m_checksum;                 // checksum over all the bytes
 		UINT32              m_usecount;                 // number of times this has been used
 	};
-	dynamic_array<subtable_data> m_subtable;            // info about each subtable
+	std::vector<subtable_data>   m_subtable;            // info about each subtable
 	UINT16                  m_subtable_alloc;           // number of subtables allocated
 
 	// static global read-only watchpoint table
@@ -698,7 +698,7 @@ private:
 		m_space.device().debug()->memory_read_hook(m_space, offset * sizeof(_UintType), mask);
 
 		UINT16 *oldtable = m_live_lookup;
-		m_live_lookup = m_table;
+		m_live_lookup = &m_table[0];
 		_UintType result;
 		if (sizeof(_UintType) == 1) result = m_space.read_byte(offset);
 		if (sizeof(_UintType) == 2) result = m_space.read_word(offset << 1, mask);
@@ -768,7 +768,7 @@ private:
 		m_space.device().debug()->memory_write_hook(m_space, offset * sizeof(_UintType), data, mask);
 
 		UINT16 *oldtable = m_live_lookup;
-		m_live_lookup = m_table;
+		m_live_lookup = &m_table[0];
 		if (sizeof(_UintType) == 1) m_space.write_byte(offset, data);
 		if (sizeof(_UintType) == 2) m_space.write_word(offset << 1, data, mask);
 		if (sizeof(_UintType) == 4) m_space.write_dword(offset << 2, data, mask);
@@ -2702,12 +2702,13 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 
 address_table::address_table(address_space &space, bool large)
 	: m_table(1 << LEVEL1_BITS),
-		m_live_lookup(m_table),
 		m_space(space),
 		m_large(large),
 		m_subtable(SUBTABLE_COUNT),
 		m_subtable_alloc(0)
 {
+	m_live_lookup = &m_table[0];
+
 	// make our static table all watchpoints
 	if (s_watchpoint_table[0] != STATIC_WATCHPOINT)
 		for (unsigned int i=0; i != ARRAY_LENGTH(s_watchpoint_table); i++)
@@ -3297,10 +3298,12 @@ UINT16 address_table::subtable_alloc()
 					m_subtable_alloc += SUBTABLE_ALLOC;
 					UINT32 newsize = (1 << LEVEL1_BITS) + (m_subtable_alloc << level2_bits());
 
-					bool was_live = (m_live_lookup == m_table);
-					m_table.resize_keep_and_clear_new(newsize);
+					bool was_live = (m_live_lookup == &m_table[0]);
+					int oldsize = m_table.size();
+					m_table.resize(newsize);
+					memset(&m_table[oldsize], 0, (newsize-oldsize)*sizeof(m_table[0]));
 					if (was_live)
-						m_live_lookup = m_table;
+						m_live_lookup = &m_table[0];
 				}
 				// bump the usecount and return
 				m_subtable[subindex].m_usecount++;
@@ -3849,12 +3852,14 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		offs_t length = byteend + 1 - bytestart;
 		if (length < 4096)
 		{
-			m_allocated.resize_and_clear(length);
-			m_data = m_allocated;
+			m_allocated.resize(length);
+			memset(&m_allocated[0], 0, length);
+			m_data = &m_allocated[0];
 		}
 		else
 		{
-			m_allocated.resize_and_clear(length + 0xfff);
+			m_allocated.resize(length + 0xfff);
+			memset(&m_allocated[0], 0, length + 0xfff);
 			m_data = reinterpret_cast<UINT8 *>((reinterpret_cast<FPTR>(&m_allocated[0]) + 0xfff) & ~0xfff);
 		}
 	}
@@ -4019,7 +4024,7 @@ void memory_bank::set_entry(int entrynum)
 	// validate
 	if (m_anonymous)
 		throw emu_fatalerror("memory_bank::set_entry called for anonymous bank");
-	if (entrynum < 0 || entrynum >= m_entry.count())
+	if (entrynum < 0 || entrynum >= int(m_entry.size()))
 		throw emu_fatalerror("memory_bank::set_entry called with out-of-range entry %d", entrynum);
 	if (m_entry[entrynum].m_raw == NULL)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
@@ -4042,7 +4047,9 @@ void memory_bank::set_entry(int entrynum)
 void memory_bank::expand_entries(int entrynum)
 {
 	// allocate a new array and copy from the old one; zero out the new entries
-	m_entry.resize_keep_and_clear_new(entrynum + 1);
+	int old_size = m_entry.size();
+	m_entry.resize(entrynum + 1);
+	memset(&m_entry[old_size], 0, (entrynum+1-old_size)*sizeof(m_entry[0]));
 }
 
 
@@ -4057,7 +4064,7 @@ void memory_bank::configure_entry(int entrynum, void *base)
 		throw emu_fatalerror("memory_bank::configure_entry called with out-of-range entry %d", entrynum);
 
 	// if we haven't allocated this many entries yet, expand our array
-	if (entrynum >= m_entry.count())
+	if (entrynum >= int(m_entry.size()))
 		expand_entries(entrynum);
 
 	// set the entry
@@ -4093,7 +4100,7 @@ void memory_bank::configure_decrypted_entry(int entrynum, void *base)
 		throw emu_fatalerror("memory_bank::configure_decrypted_entry called with out-of-range entry %d", entrynum);
 
 	// if we haven't allocated this many entries yet, expand our array
-	if (entrynum >= m_entry.count())
+	if (entrynum >= int(m_entry.size()))
 		expand_entries(entrynum);
 
 	// set the entry

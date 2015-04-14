@@ -84,7 +84,7 @@ void a2052_device::autoconfig_base_address(offs_t address)
 	m_slot->m_space->unmap_readwrite(0xe80000, 0xe8007f);
 
 	// install access to the rom space
-	m_slot->m_space->install_ram(address, address + m_ram.bytes() - 1, m_ram);
+	m_slot->m_space->install_ram(address, address + m_ram.size()*2 - 1, &m_ram[0]);
 
 	// we're done
 	m_slot->cfgout_w(0);

@@ -102,7 +102,7 @@ void cpc_symbiface2_device::device_start()
 	// 32 banks of 16kB (512kB)
 	m_rom_space.resize(32*16384);
 
-	m_nvram->set_base(m_rom_space,m_rom_space.bytes());
+	m_nvram->set_base(&m_rom_space[0],m_rom_space.size());
 	save_item(NAME(m_rom_space));
 
 }
@@ -275,10 +275,10 @@ READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
 	m_4xxx_ptr_w = (UINT8*)machine().root_device().membank("bank11")->base();
 	m_6xxx_ptr_r = (UINT8*)machine().root_device().membank("bank4")->base();
 	m_6xxx_ptr_w = (UINT8*)machine().root_device().membank("bank12")->base();
-	machine().root_device().membank("bank3")->set_base((UINT8*)m_rom_space+(bank*16384));
-	machine().root_device().membank("bank4")->set_base((UINT8*)m_rom_space+(bank*16384+8192));
-	machine().root_device().membank("bank11")->set_base((UINT8*)m_rom_space+(bank*16384));
-	machine().root_device().membank("bank12")->set_base((UINT8*)m_rom_space+(bank*16384+8192));
+	machine().root_device().membank("bank3")->set_base(&m_rom_space[bank*16384]);
+	machine().root_device().membank("bank4")->set_base(&m_rom_space[bank*16384+8192]);
+	machine().root_device().membank("bank11")->set_base(&m_rom_space[bank*16384]);
+	machine().root_device().membank("bank12")->set_base(&m_rom_space[bank*16384+8192]);
 
 	return 0xff;
 }

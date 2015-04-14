@@ -244,12 +244,12 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 	if (image.software_entry() == NULL)
 	{
 		dynamic_buffer data(size);
-		image.fread(data, size);
+		image.fread(&data[0], size);
 
 		if (!strncmp((const char*)&data[0], "UZEBOX", 6))
-			memcpy(m_cart->get_rom_base(), data + 0x200, size - 0x200);
+			memcpy(m_cart->get_rom_base(), &data[0x200], size - 0x200);
 		else
-			memcpy(m_cart->get_rom_base(), data, size);
+			memcpy(m_cart->get_rom_base(), &data[0], size);
 	}
 	else
 		memcpy(m_cart->get_rom_base(), image.get_software_region("rom"), size);

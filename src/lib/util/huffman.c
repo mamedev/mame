@@ -317,9 +317,9 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 {
 	// first RLE compress the lengths of all the nodes
 	dynamic_buffer rle_data(m_numcodes);
-	UINT8 *dest = rle_data;
-	dynamic_array<UINT16> rle_lengths(m_numcodes/3);
-	UINT16 *lengths = rle_lengths;
+	UINT8 *dest = &rle_data[0];
+	std::vector<UINT16> rle_lengths(m_numcodes/3);
+	UINT16 *lengths = &rle_lengths[0];
 	int last = ~0;
 	int repcount = 0;
 
@@ -393,8 +393,8 @@ huffman_error huffman_context_base::export_tree_huffman(bitstream_out &bitbuf)
 		temp >>= 1, rlefullbits++;
 
 	// now encode the RLE data
-	lengths = rle_lengths;
-	for (UINT8 *src = rle_data; src < dest; src++)
+	lengths = &rle_lengths[0];
+	for (UINT8 *src = &rle_data[0]; src < dest; src++)
 	{
 		// encode the data
 		UINT8 data = *src;
@@ -523,7 +523,7 @@ int CLIB_DECL huffman_context_base::tree_node_compare(const void *item1, const v
 int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
 {
 	// make a list of all non-zero nodes
-	dynamic_array<node_t *> list(m_numcodes * 2);
+	std::vector<node_t *> list(m_numcodes * 2);
 	int listitems = 0;
 	memset(m_huffnode, 0, m_numcodes * sizeof(m_huffnode[0]));
 	for (int curcode = 0; curcode < m_numcodes; curcode++)
@@ -545,7 +545,7 @@ int huffman_context_base::build_tree(UINT32 totaldata, UINT32 totalweight)
         }
 */
 	// sort the list by weight, largest weight first
-	qsort(list, listitems, sizeof(list[0]), tree_node_compare);
+	qsort(&list[0], listitems, sizeof(list[0]), tree_node_compare);
 /*
         fprintf(stderr, "Post-sort:\n");
         for (int i = 0; i < listitems; i++) {

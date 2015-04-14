@@ -1016,7 +1016,7 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 		buf1[addr] = rom[x];
 	}
 
-	memcpy(rom, buf1, length);
+	memcpy(rom, &buf1[0], length);
 
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco156_decrypt(machine());

@@ -792,7 +792,7 @@ void igs011_state::lhb2_decrypt()
 	int i,j;
 	int rom_size = 0x80000;
 	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
-	dynamic_array<UINT16> result_data(rom_size/2);
+	std::vector<UINT16> result_data(rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
 	{
@@ -812,7 +812,7 @@ void igs011_state::lhb2_decrypt()
 		result_data[j] = x;
 	}
 
-	memcpy(src,result_data,rom_size);
+	memcpy(src,&result_data[0],rom_size);
 }
 
 
@@ -822,7 +822,7 @@ void igs011_state::nkishusp_decrypt()
 	int i,j;
 	int rom_size = 0x80000;
 	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
-	dynamic_array<UINT16> result_data(rom_size/2);
+	std::vector<UINT16> result_data(rom_size/2);
 
 	for (i=0; i<rom_size/2; i++)
 	{
@@ -850,7 +850,7 @@ void igs011_state::nkishusp_decrypt()
 		result_data[j] = x;
 	}
 
-	memcpy(src,result_data,rom_size);
+	memcpy(src,&result_data[0],rom_size);
 }
 
 
@@ -979,7 +979,7 @@ void igs011_state::lhb2_decrypt_gfx()
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
 
-	memcpy(src,result_data,rom_size);
+	memcpy(src,&result_data[0],rom_size);
 }
 
 void igs011_state::drgnwrld_gfx_decrypt()
@@ -992,7 +992,7 @@ void igs011_state::drgnwrld_gfx_decrypt()
 	for (i=0; i<rom_size; i++)
 		result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
 
-	memcpy(src,result_data,rom_size);
+	memcpy(src,&result_data[0],rom_size);
 }
 
 

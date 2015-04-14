@@ -113,7 +113,7 @@ private:
 	void fifo_write(UINT16 data);
 	UINT16 fifo_read();
 
-	dynamic_array<UINT16> m_buffer;
+	std::vector<UINT16> m_buffer;
 	int m_ram_size;
 
 	int m_read_ptr;

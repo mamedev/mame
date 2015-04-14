@@ -1936,7 +1936,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 		memcpy(&buffer[tile * 8], &srcgfx[srctile * 8], 8);
 	}
 
-	memcpy(srcgfx, buffer, 0x18000);
+	memcpy(srcgfx, &buffer[0], 0x18000);
 
 	m_bootleg_id = BLOCK2;
 	arkanoid_bootleg_init();

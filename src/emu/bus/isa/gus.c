@@ -389,7 +389,8 @@ void gf1_device::device_start()
 	m_nmi_handler.resolve_safe();
 
 	// TODO: make DRAM size configurable.  Can be 256k, 512k, 768k, or 1024k
-	m_wave_ram.resize_and_clear(1024*1024);
+	m_wave_ram.resize(1024*1024);
+	memset(&m_wave_ram[0], 0, 1024*1024);
 
 	m_stream = stream_alloc(0,2,44100);
 
