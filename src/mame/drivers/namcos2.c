@@ -4055,8 +4055,8 @@ ROM_END
 /* PHELIOS (Japan) */
 ROM_START( pheliosj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "ps2_mpr0.mpr0",  0x000000, 0x020000, CRC(bfbe96c6) SHA1(e597fc66b058aca4f55c38fbaec0abcad4ed6547) )
-	ROM_LOAD16_BYTE( "ps2_mpr1.mpr1",  0x000001, 0x020000, CRC(f5c0f883) SHA1(9fd8b05a568a024e049bedc3c1c1893cb5bd249f) )
+	ROM_LOAD16_BYTE( "ps1_mpr0.mpr0",  0x000000, 0x020000, CRC(bfbe96c6) SHA1(e597fc66b058aca4f55c38fbaec0abcad4ed6547) )
+	ROM_LOAD16_BYTE( "ps1_mpr1.mpr1",  0x000001, 0x020000, CRC(f5c0f883) SHA1(9fd8b05a568a024e049bedc3c1c1893cb5bd249f) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
 	ROM_LOAD16_BYTE( "ps1_spr0.spr0",  0x000000, 0x010000, CRC(e9c6987e) SHA1(325532b065999276e4629b10c27d7df083e81c33) ) /* Same DATA as World set, but labeled PS1 */
