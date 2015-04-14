@@ -1,14 +1,12 @@
 /* video/shangkid */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/shangkid.h"
 
 
 TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
-	UINT8 *videoram = m_videoram;
-	int attributes = videoram[tile_index+0x800];
-	int tile_number = videoram[tile_index]+0x100*(attributes&0x3);
+	int attributes = m_videoram[tile_index+0x800];
+	int tile_number = m_videoram[tile_index]+0x100*(attributes&0x3);
 	int color;
 
 	if( m_gfx_type==1 )
@@ -48,10 +46,9 @@ VIDEO_START_MEMBER(shangkid_state,shangkid)
 	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(shangkid_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
-WRITE8_MEMBER(shangkid_state::shangkid_videoram_w)
+WRITE8_MEMBER(shangkid_state::videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset&0x7ff );
 }
 
@@ -226,7 +223,6 @@ PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 
 void shangkid_state::dynamski_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	UINT8 *videoram = m_videoram;
 	int i;
 	int sx,sy;
 	int tile;
@@ -255,8 +251,8 @@ void shangkid_state::dynamski_draw_background(bitmap_ind16 &bitmap, const rectan
 			sx+=16;
 		}
 
-		tile = videoram[i];
-		attr = videoram[i+0x400];
+		tile = m_videoram[i];
+		attr = m_videoram[i+0x400];
 		/*
 		    x---.----   priority?
 		    -xx-.----   bank
@@ -279,7 +275,6 @@ void shangkid_state::dynamski_draw_background(bitmap_ind16 &bitmap, const rectan
 
 void shangkid_state::dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *videoram = m_videoram;
 	int i;
 	int sx,sy;
 	int tile;
@@ -288,13 +283,13 @@ void shangkid_state::dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 	int color;
 	for( i=0x7e; i>=0x00; i-=2 )
 	{
-		bank = videoram[0x1b80+i];
-		attr = videoram[0x1b81+i];
-		tile = videoram[0xb80+i];
-		color = videoram[0xb81+i];
-		sy = 240-videoram[0x1380+i];
+		bank = m_videoram[0x1b80+i];
+		attr = m_videoram[0x1b81+i];
+		tile = m_videoram[0xb80+i];
+		color = m_videoram[0xb81+i];
+		sy = 240-m_videoram[0x1380+i];
 
-		sx = videoram[0x1381+i]-64+8+16;
+		sx = m_videoram[0x1381+i]-64+8+16;
 		if( attr&1 ) sx += 0x100;
 
 

@@ -13,7 +13,7 @@ driver by Allard Van Der Bas
 
 #define MASTER_CLOCK XTAL_18_432MHz
 
-TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::shaolins_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
 {
 	int scanline = param;
 
@@ -26,7 +26,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::shaolins_interrupt)
 
 
 static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(shaolins_nmi_w)   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(nmi_w)   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE("sn1", sn76489a_device, write) /* trigger chip to read from latch. The program always */
@@ -40,13 +40,13 @@ static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
 	AM_RANGE(0x0703, 0x0703) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP                    /* latch for 76496 #0 */
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP                    /* latch for 76496 #1 */
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(shaolins_palettebank_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(shaolins_scroll_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(palettebank_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(scroll_w)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM                         /* RAM BANK 2 */
 	AM_RANGE(0x3000, 0x30ff) AM_RAM                         /* RAM BANK 1 */
 	AM_RANGE(0x3100, 0x33ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(shaolins_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(shaolins_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM                         /* Machine checks for extra rom */
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -155,7 +155,7 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout shaolins_charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 chars */
 	512,    /* 512 characters */
@@ -166,7 +166,7 @@ static const gfx_layout shaolins_charlayout =
 	16*8    /* every char takes 16 consecutive bytes */
 };
 
-static const gfx_layout shaolins_spritelayout =
+static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	256,    /* 256 sprites */
@@ -180,8 +180,8 @@ static const gfx_layout shaolins_spritelayout =
 };
 
 static GFXDECODE_START( shaolins )
-	GFXDECODE_ENTRY( "gfx1", 0, shaolins_charlayout,         0, 16*8 )
-	GFXDECODE_ENTRY( "gfx2", 0, shaolins_spritelayout, 16*8*16, 16*8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 16*8 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*8*16, 16*8 )
 GFXDECODE_END
 
 
@@ -190,7 +190,7 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shaolins_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shaolins_state, shaolins_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shaolins_state, interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( shaolins, shaolins_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update_shaolins)
+	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shaolins)
@@ -335,6 +335,6 @@ ROM_END
 
 
 /*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    INIT, MONITOR, COMPANY,  FULLNAME,                  FLAGS */
-GAME( 1985, kicker,   0,      shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Kicker",                  0 )
-GAME( 1985, shaolins, kicker, shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 1)", 0 )
-GAME( 1985, shaolinb, kicker, shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 2)", 0 )
+GAME( 1985, kicker,   0,      shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Kicker",                  GAME_SUPPORTS_SAVE )
+GAME( 1985, shaolins, kicker, shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, shaolinb, kicker, shaolins, shaolins, driver_device, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 2)", GAME_SUPPORTS_SAVE )

@@ -56,17 +56,17 @@ Games by Nihon Game/Culture Brain:
 
 /***************************************************************************************/
 
-WRITE8_MEMBER(shangkid_state::shangkid_maincpu_bank_w)
+WRITE8_MEMBER(shangkid_state::maincpu_bank_w)
 {
 	membank("bank1")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(shangkid_state::shangkid_bbx_enable_w)
+WRITE8_MEMBER(shangkid_state::bbx_enable_w)
 {
 	m_bbx->set_input_line(INPUT_LINE_HALT, data?0:1 );
 }
 
-WRITE8_MEMBER(shangkid_state::shangkid_cpu_reset_w)
+WRITE8_MEMBER(shangkid_state::cpu_reset_w)
 {
 	if( data == 0 )
 	{
@@ -78,7 +78,7 @@ WRITE8_MEMBER(shangkid_state::shangkid_cpu_reset_w)
 	}
 }
 
-WRITE8_MEMBER(shangkid_state::shangkid_sound_enable_w)
+WRITE8_MEMBER(shangkid_state::sound_enable_w)
 {
 	m_bbx_sound_enable = data;
 }
@@ -112,7 +112,7 @@ WRITE8_MEMBER(shangkid_state::ay8910_portb_w)
 
 /***************************************************************************************/
 
-READ8_MEMBER(shangkid_state::shangkid_soundlatch_r)
+READ8_MEMBER(shangkid_state::soundlatch_r)
 {
 	return m_sound_latch;
 }
@@ -122,6 +122,9 @@ READ8_MEMBER(shangkid_state::shangkid_soundlatch_r)
 DRIVER_INIT_MEMBER(shangkid_state,chinhero)
 {
 	m_gfx_type = 0;
+	
+	save_item(NAME(m_bbx_sound_enable));
+	save_item(NAME(m_sound_latch));
 }
 
 DRIVER_INIT_MEMBER(shangkid_state,shangkid)
@@ -131,6 +134,9 @@ DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 	/* set up banking */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x0000, 0x10000);
+	
+	save_item(NAME(m_bbx_sound_enable));
+	save_item(NAME(m_sound_latch));
 }
 
 /***************************************************************************************/
@@ -231,18 +237,18 @@ GFXDECODE_END
 static ADDRESS_MAP_START( chinhero_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -251,19 +257,19 @@ static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_SHARE("videoreg")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -273,17 +279,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( chinhero_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -291,18 +297,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shangkid_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP        /* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP        /* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP        /* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -331,7 +337,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, shangkid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -847,7 +853,7 @@ ROM_START( shangkid )
 	ROM_LOAD( "cr02ic04.bin", 0x08000, 0x2000, CRC(85b6e455) SHA1(3b2cd1e55355d24c014c5afe0212c6c9f0899a28) )   /* banked at 0x8000 */
 	ROM_LOAD( "cr03ic05.bin", 0x10000, 0x2000, CRC(3b383863) SHA1(3fb10a7f89cf2387d70b0337916063fd4ec5f754) )   /* banked at 0x8000 */
 
-	/* The BBX coprocessor is burried in an epoxy block.  It contains:
+	/* The BBX coprocessor is buried in an epoxy block.  It contains:
 	**  -   a surface-mounted Z80 (TMPZ84C00P)
 	**  -   LS245 logic IC
 	**  -   battery backed ram chip Fujitsu MB8464
@@ -911,7 +917,7 @@ ROM_START( hiryuken )
 	ROM_LOAD( "3.4", 0x08000, 0x2000, CRC(ad210482) SHA1(9a32bbaf601d3b00f0a79ce90bb9a32e8e608977) ) /* banked at 0x8000 */
 	ROM_LOAD( "4.5", 0x10000, 0x2000, CRC(6518943a) SHA1(b5e78267d5a58c466c9ae20ba4f9c5e14e252287) ) /* banked at 0x8000 */
 
-	/* The BBX coprocessor is burried in an epoxy block.  It contains:
+	/* The BBX coprocessor is buried in an epoxy block.  It contains:
 	** - a surface-mounted Z80 (TMPZ84C00P)
 	** - LS245 logic IC
 	** - battery backed ram chip Fujitsu MB8464
@@ -995,10 +1001,10 @@ ROM_START( dynamski )
 ROM_END
 
 
-GAME( 1984, dynamski, 0,        dynamski, dynamski, driver_device, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
-GAME( 1984, chinhero, 0,        chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 ) // by Nihon Game?
-GAME( 1984, chinhero2,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 1)", 0 )
-GAME( 1984, chinhero3,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 2)", 0 )
-GAME( 1984, chinherot,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo (Taito license)", "Chinese Heroe (Taito)", 0 )
-GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL )
-GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL )
+GAME( 1984, dynamski, 0,        dynamski, dynamski, driver_device, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, chinhero, 0,        chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero", GAME_SUPPORTS_SAVE ) // by Nihon Game?
+GAME( 1984, chinhero2,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, chinhero3,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, chinherot,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo (Taito license)", "Chinese Heroe (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
