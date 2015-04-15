@@ -174,7 +174,6 @@ ifndef TARGETOS
 
 ifeq ($(OS),windows)
 TARGETOS := windows
-WINDRES := windres
 ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 ARCHITECTURE := _x64
 endif
@@ -186,7 +185,6 @@ ARCHITECTURE := _x86
 endif
 endif
 else
-WINDRES  := x86_64-w64-mingw32-windres
 UNAME    := $(shell uname -mps)
 TARGETOS := $(OS)
 
@@ -215,6 +213,19 @@ ARCHITECTURE := _x86
 endif
 endif
 
+ifeq ($(OS),windows)
+ifeq ($(ARCHITECTURE),_x64)
+WINDRES  := $(MINGW64)/bin/windres
+else
+WINDRES  := $(MINGW32)/bin/windres
+endif
+else
+ifeq ($(ARCHITECTURE),_x64)
+WINDRES  := x86_64-w64-mingw32-windres
+else
+WINDRES  := i686-w64-mingw32-windres
+endif
+endif
 
 ifeq ($(findstring arm,$(UNAME)),arm)
 ifndef NOASM
@@ -650,7 +661,7 @@ endif
 
 .PHONY: windows_x64
 windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(MINGW64)/bin/$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw32-gcc
@@ -667,7 +678,7 @@ endif
 
 .PHONY: windows_x86
 windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(MINGW32)/bin/$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw-clang
@@ -681,11 +692,11 @@ endif
 
 .PHONY: windows_x64_clang
 windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(MINGW64)/bin/$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
 
 .PHONY: windows_x86_clang
 windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(MINGW32)/bin/$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 vs2010: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2010
