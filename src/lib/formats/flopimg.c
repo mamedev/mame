@@ -1224,7 +1224,7 @@ void floppy_image_format_t::mfm_half_w(std::vector<UINT32> &buffer, int start_bi
 	}
 }
 
-void floppy_image_format_t::gcr5_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size)
+void floppy_image_format_t::gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size)
 {
 	UINT32 e0 = gcr5fw_tb[val >> 4];
 	UINT32 e1 = gcr5fw_tb[val & 0x0f];
@@ -1232,12 +1232,12 @@ void floppy_image_format_t::gcr5_w(std::vector<UINT32> &buffer, int n, UINT32 va
 	raw_w(buffer, 5, e1, size);
 }
 
-void floppy_image_format_t::gcr5_w(std::vector<UINT32> &buffer, int start_bit, int n, UINT32 val, UINT32 size)
+void floppy_image_format_t::gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size, int offset)
 {
 	UINT32 e0 = gcr5fw_tb[val >> 4];
 	UINT32 e1 = gcr5fw_tb[val & 0x0f];
-	raw_w(buffer, 5, e0, size, start_bit);
-	raw_w(buffer, 5, e1, size, start_bit+5);
+	raw_w(buffer, 5, e0, size, offset);
+	raw_w(buffer, 5, e1, size, offset+5);
 }
 
 void floppy_image_format_t::_8n1_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size)
@@ -1268,7 +1268,7 @@ void floppy_image_format_t::fixup_crc_cbm(std::vector<UINT32> &buffer, const gen
 		v = v ^ (gcr5bw_tb[bitn_r(buffer, o, 5)] << 4);
 		v = v ^ gcr5bw_tb[bitn_r(buffer, o+5, 5)];
 	}
-	gcr5_w(buffer, 10, v, 1000, crc->write);
+	gcr5_w(buffer, v, 1000, crc->write);
 }
 
 UINT16 floppy_image_format_t::calc_crc_ccitt(const std::vector<UINT32> &buffer, int start, int end)
@@ -1313,7 +1313,7 @@ void floppy_image_format_t::fixup_crc_victor_header(std::vector<UINT32> &buffer,
 	UINT8 v = 0;
 	for(int o = crc->start; o < crc->end; o+=10)
 		v += ((gcr5bw_tb[bitn_r(buffer, o, 5)] << 4) | gcr5bw_tb[bitn_r(buffer, o+5, 5)]);
-	gcr5_w(buffer, 10, v, 1000, crc->write);
+	gcr5_w(buffer, v, 1000, crc->write);
 }
 
 void floppy_image_format_t::fixup_crc_victor_data(std::vector<UINT32> &buffer, const gen_crc_info *crc)
@@ -1321,8 +1321,8 @@ void floppy_image_format_t::fixup_crc_victor_data(std::vector<UINT32> &buffer, c
 	UINT16 v = 0;
 	for(int o = crc->start; o < crc->end; o+=10)
 		v += ((gcr5bw_tb[bitn_r(buffer, o, 5)] << 4) | gcr5bw_tb[bitn_r(buffer, o+5, 5)]);
-	gcr5_w(buffer, 10, v & 0xff, 1000, crc->write);
-	gcr5_w(buffer, 10, v >> 8, 1000, crc->write+10);
+	gcr5_w(buffer, v & 0xff, 1000, crc->write);
+	gcr5_w(buffer, v >> 8, 1000, crc->write+10);
 }
 
 void floppy_image_format_t::fixup_crcs(std::vector<UINT32> &buffer, gen_crc_info *crcs)
@@ -1435,7 +1435,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case GCR5:
 			for(int i=0; i<desc[index].p2; i++)
-				gcr5_w(buffer, 10, desc[index].p1);
+				gcr5_w(buffer, desc[index].p1);
 			break;
 
 		case _8N1:
@@ -1471,11 +1471,11 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			break;
 
 		case TRACK_ID_DOS2_GCR5:
-			gcr5_w(buffer, 10, 1 + (track >> 1) + (head * 35));
+			gcr5_w(buffer, 1 + (track >> 1) + (head * 35));
 			break;
 
 		case TRACK_ID_DOS25_GCR5:
-			gcr5_w(buffer, 10, 1 + track + (head * 77));
+			gcr5_w(buffer, 1 + track + (head * 77));
 			break;
 
 		case TRACK_ID_GCR6:
@@ -1487,7 +1487,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			break;
 
 		case TRACK_ID_VICTOR_GCR5:
-			gcr5_w(buffer, 10, track + (head * 0x80));
+			gcr5_w(buffer, track + (head * 0x80));
 			break;
 
 		case HEAD_ID:
@@ -1515,7 +1515,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			break;
 
 		case SECTOR_ID_GCR5:
-			gcr5_w(buffer, 10, sect[sector_idx].sector_id);
+			gcr5_w(buffer, sect[sector_idx].sector_id);
 			break;
 
 		case SECTOR_ID_GCR6:
@@ -1644,7 +1644,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 		case SECTOR_DATA_GCR5: {
 			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
 			for(int i=0; i != csect->size; i++)
-				gcr5_w(buffer, 10, csect->data[i]);
+				gcr5_w(buffer, csect->data[i]);
 			break;
 		}
 

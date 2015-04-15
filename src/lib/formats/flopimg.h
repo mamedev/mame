@@ -558,8 +558,8 @@ protected:
 	//! MFM-encode every two bits and write
 	void mfm_half_w(std::vector<UINT32> &buffer, int start_bit, UINT32 val, UINT32 size = 1000);
 	//! GCR5-encode and write a series of bits
-	void gcr5_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
-	void gcr5_w(std::vector<UINT32> &buffer, int offset, int n, UINT32 val, UINT32 size = 1000);
+	void gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size = 1000);
+	void gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size, int offset);
 	//! 8N1-encode and write a series of bits
 	void _8n1_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
 	//! GCR4 encode (Apple II sector header)
