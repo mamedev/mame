@@ -92,7 +92,7 @@ bool dmk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	const int track_size = ( header[3] << 8 ) | header[2];
 	const int heads = (header[4] & 0x10) ? 1 : 2;
 	const bool is_sd = (header[4] & 0x40) ? true : false;
-	const int raw_track_size = 2 * 8 * ( track_size - 0x80 );
+	//const int raw_track_size = 2 * 8 * ( track_size - 0x80 );
 
 	if (is_sd)
 	{
