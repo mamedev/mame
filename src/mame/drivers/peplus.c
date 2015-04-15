@@ -6618,7 +6618,7 @@ ROM_START( pex0455p ) /* Superboard : Joker Poker (X000455P+XP000038) */
 PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 ----------------------------------------------------------------
   P245D     1    1   2   3    5   7  18  50 100 200 400    940
-  % Range: 85.3-97.3%  Optimum: 99.3%  Hit Frequency: 44.2%
+  % Range: 95.3-97.3%  Optimum: 99.3%  Hit Frequency: 44.2%
      Programs Available: PP0455, X000455P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7272,8 +7272,8 @@ ROM_START( pex2028p ) /* Superboard : Deuces Wild Bonus Poker (X002028P+XP000019
                                    w/D 6-K 3-5         w/A w/oD
 PayTable   3K  STR  FL  FH  4K  SF  RF  5K  5K  5A  4D  4D  RF  (Bonus)
 -----------------------------------------------------------------------
-  P554A     1   1    2   3   4  12  25  20  40  80 200 400 250    800
-  % Range: 932.2-94.2%  Optimum: 96.2%  Hit Frequency: 44.9%
+  P555A     1   1    2   3   4  12  25  20  40  80 200 400 250    800
+  % Range: 92.2-94.2%  Optimum: 96.2%  Hit Frequency: 44.9%
      Programs Available: X002028P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
