@@ -1184,7 +1184,7 @@ void floppy_image_format_t::raw_w(std::vector<UINT32> &buffer, int n, UINT32 val
 void floppy_image_format_t::raw_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size, int offset)
 {
 	for(int i=n-1; i>=0; i--)
-		bit_w(buffer, (val >> i) & 1, size, offset);
+		bit_w(buffer, (val >> i) & 1, size, offset++);
 }
 
 void floppy_image_format_t::mfm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size)
@@ -1203,8 +1203,8 @@ void floppy_image_format_t::mfm_w(std::vector<UINT32> &buffer, int n, UINT32 val
 	int prec = offset ? bit_r(buffer, offset-1) : 0;
 	for(int i=n-1; i>=0; i--) {
 		int bit = (val >> i) & 1;
-		bit_w(buffer, offset++, !(prec || bit), size);
-		bit_w(buffer, offset++, bit, size);
+		bit_w(buffer, !(prec || bit), size, offset++);
+		bit_w(buffer, bit,            size, offset++);
 		prec = bit;
 	}
 }
@@ -1214,7 +1214,7 @@ void floppy_image_format_t::fm_w(std::vector<UINT32> &buffer, int n, UINT32 val,
 	for(int i=n-1; i>=0; i--) {
 		int bit = (val >> i) & 1;
 		bit_w(buffer, true, size);
-		bit_w(buffer, bit, size);
+		bit_w(buffer, bit,  size);
 	}
 }
 
@@ -1223,7 +1223,7 @@ void floppy_image_format_t::fm_w(std::vector<UINT32> &buffer, int n, UINT32 val,
 	for(int i=n-1; i>=0; i--) {
 		int bit = (val >> i) & 1;
 		bit_w(buffer, true, size, offset++);
-		bit_w(buffer, bit, size, offset++);
+		bit_w(buffer, bit,  size, offset++);
 	}
 }
 
@@ -1233,7 +1233,7 @@ void floppy_image_format_t::mfm_half_w(std::vector<UINT32> &buffer, int start_bi
 	for(int i=start_bit; i>=0; i-=2) {
 		int bit = (val >> i) & 1;
 		bit_w(buffer, !(prec || bit), size);
-		bit_w(buffer, bit, size);
+		bit_w(buffer, bit,            size);
 		prec = bit;
 	}
 }
