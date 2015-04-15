@@ -1058,7 +1058,8 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 
 bool floppy_image_format_t::type_no_data(int type) const
 {
-	return type == CRC_CCITT_START ||
+	return
+		type == CRC_CCITT_START ||
 		type == CRC_CCITT_FM_START ||
 		type == CRC_AMIGA_START ||
 		type == CRC_CBM_START ||
@@ -1074,11 +1075,24 @@ bool floppy_image_format_t::type_no_data(int type) const
 
 bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs) const
 {
-	return !type_no_data(type) &&
-		type != RAW &&
-		type != RAWBITS &&
-		type != FM &&
-		(type != CRC || (crcs[p1].type != CRC_CCITT && crcs[p1].type != CRC_CCITT_FM && crcs[p1].type != CRC_AMIGA));
+	return
+		type == MFM ||
+		type == MFMBITS ||
+		type == TRACK_ID ||
+		type == HEAD_ID ||
+		type == HEAD_ID_SWAP ||
+		type == SECTOR_ID ||
+		type == SIZE_ID ||
+		type == OFFSET_ID_O ||
+		type == OFFSET_ID_E ||
+		type == SECTOR_ID_O ||
+		type == SECTOR_ID_E ||
+		type == REMAIN_O ||
+		type == REMAIN_E ||
+		type == SECTOR_DATA ||
+		type == SECTOR_DATA_O ||
+		type == SECTOR_DATA_E ||
+		(type == CRC && (crcs[p1].type == CRC_CCITT || crcs[p1].type == CRC_AMIGA));
 }
 
 void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
@@ -1341,7 +1355,7 @@ void floppy_image_format_t::fixup_crcs(std::vector<UINT32> &buffer, gen_crc_info
 			}
 			if(crcs[i].fixup_mfm_clock) {
 				int offset = crcs[i].write + crc_cells_size(crcs[i].type);
-				bit_w(buffer, offset, !((offset ? bit_r(buffer, offset-1) : false) || bit_r(buffer, offset+1)));
+				bit_w(buffer, !((offset ? bit_r(buffer, offset-1) : false) || bit_r(buffer, offset+1)), 1000, offset);
 			}
 			crcs[i].write = -1;
 		}
