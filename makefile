@@ -650,7 +650,7 @@ endif
 
 .PHONY: windows_x64
 windows_x64: generate $(PROJECTDIR)/gmake-mingw64-gcc/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw64-gcc config=$(CONFIG)64 WINDRES=$(MINGW64)/bin/$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw32-gcc
@@ -667,7 +667,7 @@ endif
 
 .PHONY: windows_x86
 windows_x86: generate $(PROJECTDIR)/gmake-mingw32-gcc/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw32-gcc config=$(CONFIG)32 WINDRES=$(MINGW32)/bin/$(WINDRES)
 
 #-------------------------------------------------
 # gmake-mingw-clang
@@ -681,11 +681,11 @@ endif
 
 .PHONY: windows_x64_clang
 windows_x64_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)64 WINDRES=$(MINGW64)/bin/$(WINDRES)
 
 .PHONY: windows_x86_clang
 windows_x86_clang: generate $(PROJECTDIR)/gmake-mingw-clang/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/gmake-mingw-clang config=$(CONFIG)32 WINDRES=$(MINGW32)/bin/$(WINDRES)
 
 vs2010: generate
 	$(SILENT) $(GENIE) $(PARAMS) vs2010
