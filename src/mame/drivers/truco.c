@@ -208,7 +208,6 @@
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
-#include "sound/dac.h"
 #include "includes/truco.h"
 
 
@@ -355,6 +354,11 @@ static INPUT_PORTS_START( truco )
 INPUT_PORTS_END
 
 
+void truco_state::machine_start()
+{
+	save_item(NAME(m_trigger));
+}
+
 /*******************************************
 *       Machine Reset & Interrupts         *
 *******************************************/
@@ -389,7 +393,7 @@ void truco_state::machine_reset()
 	m_battery_ram[0x020] = m_battery_ram[0x011];
 }
 
-INTERRUPT_GEN_MEMBER(truco_state::truco_interrupt)
+INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 {
 	/* coinup */
 
@@ -414,7 +418,7 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  truco_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
@@ -432,7 +436,7 @@ static MACHINE_CONFIG_START( truco, truco_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 192)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(truco_state, screen_update_truco)
+	MCFG_SCREEN_UPDATE_DRIVER(truco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
@@ -463,4 +467,4 @@ ROM_START( truco )
 ROM_END
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE            INIT  ROT    COMPANY           FULLNAME     FLAGS  */
-GAME( 198?, truco,   0,      truco,   truco,   driver_device,   0,    ROT0, "Playtronic SRL", "Truco-Tron", 0 )
+GAME( 198?, truco,   0,      truco,   truco,   driver_device,   0,    ROT0, "Playtronic SRL", "Truco-Tron", GAME_SUPPORTS_SAVE )
