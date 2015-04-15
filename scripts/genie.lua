@@ -940,10 +940,6 @@ configuration { "osx*" }
 		links {
 			"pthread",
 		}
-		flags {
-			"Symbols",
-		}
-
 
 configuration { "mingw*" }
 		linkoptions {
