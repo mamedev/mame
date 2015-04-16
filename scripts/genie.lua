@@ -746,6 +746,9 @@ if _OPTIONS["OPENMP"]=="1" then
 	buildoptions {
 		"-fopenmp",
 	}
+	linkoptions {
+		"-fopenmp"
+	}
 else
 	buildoptions {
 		"-Wno-unknown-pragmas",
@@ -753,9 +756,9 @@ else
 end
 
 if _OPTIONS["LDOPTS"] then
-		linkoptions {
-			_OPTIONS["LDOPTS"]
-		}
+	linkoptions {
+		_OPTIONS["LDOPTS"]
+	}
 end
 
 if _OPTIONS["MAP"] then
