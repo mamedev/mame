@@ -422,6 +422,10 @@ if _OPTIONS["with-tools"] then
 			"ForceCPP",
 		}
 
+		flags {
+			"Symbols", -- always include minimum symbols for executables 	
+		}
+
 		dofile("sdl_cfg.lua")
 
 		includedirs {
@@ -478,6 +482,10 @@ if _OPTIONS["targetos"] == "macosx" and _OPTIONS["with-tools"] then
 
 		options {
 			"ForceCPP",
+		}
+
+		flags {
+			"Symbols", -- always include minimum symbols for executables 	
 		}
 
 		dofile("sdl_cfg.lua")
