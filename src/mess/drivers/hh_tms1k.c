@@ -918,7 +918,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Electronic Baseball 2
-  * boards are labeled: ZENY
+  * PCBs are labeled: ZENY
   * TMS1000 MCU, MP0923 (die labeled MP0923)
   * 3 7seg LEDs, and other LEDs behind bezel, 1bit sound
 
@@ -1045,7 +1045,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Electronic Baseball 3
-  * boards are labeled: ZENY
+  * PCBs are labeled: ZENY
   * TMS1100NLL 6007 MP1204 (die labeled MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound
