@@ -10,7 +10,7 @@
 ----------------------------------------------------------------
  *07      HD38750A  1979, Bambino Knock-Em Out Boxing (ET-06B)
  @08      HD38750A  1979, Bambino Basketball (ET-05)
- *45      HD38750A  1981, Vtech Invaders
+ @45      HD38750A  1981, VTech Invaders
  *58      HD38750A  1982, Ludotronic(Hanzawa) Grand Prix Turbo
  *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
 
@@ -315,7 +315,7 @@ public:
 
 WRITE8_MEMBER(bambball_state::plate_w)
 {
-	// R1x-R3x, D0-D3: vfd matrix plate
+	// R1x-R3x(,D0-D3): vfd matrix plate
 	int shift = (offset - HMCS40_PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -335,7 +335,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 	// D7-D15: vfd matrix grid
 	m_grid = data >> 7 & 0x1ff;
 
-	// D0-D3: plates (update display there)
+	// D0-D3: more plates (update display there)
 	plate_w(space, 3 + HMCS40_PORT_R1X, data & 0xf);
 }
 
@@ -357,7 +357,7 @@ static INPUT_PORTS_START( bambball )
 
 	PORT_START("IN.1") // D8 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // "
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // D9 port R0x
@@ -557,7 +557,7 @@ public:
 
 WRITE8_MEMBER(packmon_state::plate_w)
 {
-	// R0x-R3x, D0-D3: vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -796,7 +796,7 @@ public:
 
 WRITE8_MEMBER(zackman_state::plate_w)
 {
-	// R0x-R6x,D0,D1: vfd matrix plate
+	// R0x-R6x(,D0,D1): vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -915,7 +915,7 @@ public:
 
 WRITE8_MEMBER(alnattck_state::plate_w)
 {
-	// R0x-R3x, D0-D3: vfd matrix plate
+	// R0x-R3x(,D0-D3): vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -1283,7 +1283,7 @@ public:
 
 WRITE8_MEMBER(cpacman_state::plate_w)
 {
-	// R1x-R6x, D1,D2: vfd matrix plate
+	// R1x-R6x(,D1,D2): vfd matrix plate
 	int shift = (offset - HMCS40_PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -1399,7 +1399,7 @@ public:
 
 WRITE8_MEMBER(cmspacmn_state::plate_w)
 {
-	// R1x-R6x, D0,D1: vfd matrix plate
+	// R1x-R6x(,D0,D1): vfd matrix plate
 	int shift = (offset - HMCS40_PORT_R1X) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -1548,12 +1548,12 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // separate directional buttons, hence 16way
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
 
 	PORT_START("IN.1") // D2 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_COCKTAIL PORT_16WAY // separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_COCKTAIL PORT_16WAY // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_COCKTAIL PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY // "
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY // "
 
 	PORT_START("IN.2") // D3 port R0x
@@ -1607,6 +1607,8 @@ MACHINE_CONFIG_END
   Entex Pac Man 2 (manufactured in Japan)
   * Hitachi HD38820A23 MCU
   * cyan/red VFD display Futaba DM-28Z 1G
+  
+  2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
   NOTE!: MESS external artwork is recommended
 
@@ -1626,15 +1628,15 @@ public:
 
 static INPUT_PORTS_START( epacman2 )
 	PORT_START("IN.0") // D1 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY // separate directional buttons, hence 16way
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_16WAY // "
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
 
 	PORT_START("IN.1") // D2 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_COCKTAIL PORT_16WAY // separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_COCKTAIL PORT_16WAY // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_COCKTAIL PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY // "
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY // "
 
 	PORT_START("IN.2") // D3 port R0x
@@ -1707,7 +1709,7 @@ public:
 
 WRITE8_MEMBER(pbqbert_state::plate_w)
 {
-	// R0x-R6x,D8: vfd matrix plate
+	// R0x-R6x(,D8): vfd matrix plate
 	int shift = offset * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
@@ -2013,6 +2015,100 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  VTech Invaders (manufactured in Taiwan)
+  * Hitachi HD38750A45 MCU
+  * cyan/red VFD display Futaba DM-26Z 1G, with bezel
+
+  known releases:
+  - USA: Invaders/Sonic Invader
+  - UK: Cosmic Invader, published by Grandstand
+  - UK: Galactic Invaders, published by Prinztronic
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class vinvader_state : public hh_hmcs40_state
+{
+public:
+	vinvader_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+};
+
+// handlers
+
+WRITE8_MEMBER(vinvader_state::plate_w)
+{
+	// R1x-R3x(,D4-D6): vfd matrix plate
+	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT16 plate = BITSWAP16(m_plate,15,11,7,3,10,6,14,2,9,5,13,1,8,4,12,0);
+	display_matrix(12, 9, plate, m_grid);
+}
+
+WRITE16_MEMBER(vinvader_state::grid_w)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D7-D15: vfd matrix grid
+	m_grid = data >> 7 & 0x1ff;
+
+	// D4-D6: more plates (update display there)
+	plate_w(space, 3 + HMCS40_PORT_R1X, data >> 4 & 7);
+}
+
+
+// config
+
+static INPUT_PORTS_START( vinvader )
+	PORT_START("IN.0") // port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // port D
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level")
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x08, "2" )
+	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( vinvader, vinvader_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation - RC osc.
+	MCFG_HMCS40_READ_R_CB(0, IOPORT("IN.0"))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(vinvader_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -2128,6 +2224,13 @@ ROM_START( tmtron )
 ROM_END
 
 
+ROM_START( vinvader )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38750a45", 0x0000, 0x0800, CRC(e02d94d9) SHA1(d4679abbb9c6778e5e853aa6c2b90dee1d21c9dd) )
+	ROM_CONTINUE(           0x0f00, 0x0080 )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Basketball - Dribble Away", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
@@ -2147,8 +2250,9 @@ CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Colec
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1982, kingman,   0,        0, kingman,  kingman,  driver_device, 0, "Tomy", "Kingman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1984, tmtron,    0,        0, tmtron,   tmtron,   driver_device, 0, "Tomy", "Tron (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+
+CONS( 1981, vinvader,  0,        0, vinvader, vinvader, driver_device, 0, "VTech", "Invaders (VTech)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )

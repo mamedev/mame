@@ -906,7 +906,7 @@
 --    the group object
 --
 
-	local function creategroup(name, sln, parent, inpath)
+	local function creategroup(name, sln, curpath, parent, inpath)
 
 		local group = {}
 
@@ -921,7 +921,7 @@
 
 		group.solution = sln
 		group.name = name
-		group.uuid = os.uuid(group.name)
+		group.uuid = os.uuid(curpath)
 		group.parent = parent
 		return group
 	end
@@ -951,7 +951,7 @@
 
 			local group = sln.groups[curpath]
 			if group == nil then
-				group = creategroup(v, sln, lastgroup, curpath)
+				group = creategroup(v, sln, curpath, lastgroup, curpath)
 			end
 			lastgroup = group
 		end

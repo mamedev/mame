@@ -1,3 +1,29 @@
+function string.starts(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
+function addlibfromstring(str)
+	if (str==nil) then return  end
+	for w in str:gmatch("%S+") do 
+		if string.starts(w,"-l")==true then 
+			links {
+				string.sub(w,3)
+			}
+		end
+	end
+end
+
+function addoptionsfromstring(str)
+	if (str==nil) then return  end
+	for w in str:gmatch("%S+") do 
+		if string.starts(w,"-l")==false then 
+			linkoptions {
+				w
+			}
+		end
+	end
+end
+
 function osdmodulesbuild()
 
 	removeflags {
@@ -191,9 +217,9 @@ function osdmodulestargetconf()
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		if _OPTIONS["targetos"]=="linux" then
-			linkoptions {
-				backtick("pkg-config --libs alsa"),
-			}
+			local str = backtick("pkg-config --libs alsa")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
 		elseif _OPTIONS["targetos"]=="macosx" then
 			links {
 				"CoreMIDI.framework",
@@ -223,13 +249,15 @@ function osdmodulestargetconf()
 			if _OPTIONS["QT_HOME"]~=nil then
 				linkoptions {
 					"-L" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_LIBS"),
-					"-lQtGui",
-					"-lQtCore",
+				}
+				links {
+					"QtGui",
+					"QtCore",
 				}
 			else
-				linkoptions {
-					backtick("pkg-config --libs QtGui"),
-				}
+				local str = backtick("pkg-config --libs QtGui")
+				addlibfromstring(str)
+				addoptionsfromstring(str)
 			end
 		end
 	end

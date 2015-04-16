@@ -2191,13 +2191,15 @@ alnattck    // Coleco
 cdkong      // Coleco
 cgalaxn     // Coleco
 cpacman     // Coleco
-cpacmanr1   //
+cpacmanr1   // Coleco (rev 1)
 cmspacmn    // Coleco
 egalaxn2    // Entex
 epacman2    // Entex
 pbqbert     // Parker Brothers
+mvbfree     // Mego
 kingman     // Tomy
 tmtron      // Tomy
+vinvader    // VTech
 
 maniac      // Ideal
 
@@ -2226,12 +2228,16 @@ tandy12     // Tandy Radio Shack
 elecbowl    // Marx
 mbdtower    // Milton Bradley
 
+ufombs      // Bambino
 ssfball     // Bambino
 splasfgt    // Bambino
+bcclimbr    // Bandai
 astrocmd    // Epoch
 edracula    // Epoch
 tmpacman    // Tomy
 tmtennis    // Tomy
+tmscramb    // Tomy
+tcaveman    // Tomy
 alnchase    // Tomy
 
 wildfire    // Parker Bros

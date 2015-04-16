@@ -67,8 +67,6 @@ WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
 	logerror("PC %04x: write %02x to 20004e\n",space.device().safe_pc(),data);
 }
 
-
-
 WRITE16_MEMBER(shangha3_state::shangha3_coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
@@ -118,7 +116,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 	}
 }
 
-WRITE16_MEMBER(shangha3_state::shangha3_irq_ack_w)
+WRITE16_MEMBER(shangha3_state::irq_ack_w)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
@@ -128,8 +126,8 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
-	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(shangha3_irq_ack_w)
+	AM_RANGE(0x200008, 0x200009) AM_WRITE(blitter_go_w)
+	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
 	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8("aysnd", ay8910_device, data_w, 0x00ff)
@@ -137,8 +135,8 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
@@ -147,13 +145,13 @@ static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSW")
-	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
-	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(shangha3_irq_ack_w)
+	AM_RANGE(0x200008, 0x200009) AM_WRITE(blitter_go_w)
+	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
@@ -162,14 +160,14 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM") AM_WRITENOP // w -> unknown purpose
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(shangha3_blitter_go_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_READNOP AM_WRITE(shangha3_irq_ack_w) // r -> unknown purpose (value doesn't matter, left-over?)
+	AM_RANGE(0x100008, 0x100009) AM_WRITE(blitter_go_w)
+	AM_RANGE(0x10000a, 0x10000b) AM_READNOP AM_WRITE(irq_ack_w) // r -> unknown purpose (value doesn't matter, left-over?)
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
+	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
@@ -451,12 +449,6 @@ static GFXDECODE_START( shangha3 )
 GFXDECODE_END
 
 
-WRITE_LINE_MEMBER(shangha3_state::irqhandler)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
-}
-
-
 static MACHINE_CONFIG_START( shangha3, shangha3_state )
 
 	/* basic machine hardware */
@@ -472,7 +464,7 @@ static MACHINE_CONFIG_START( shangha3, shangha3_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
@@ -513,7 +505,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
@@ -526,7 +518,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(shangha3_state,irqhandler))
+	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
@@ -554,7 +546,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
-	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update_shangha3)
+	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shangha3)
@@ -567,7 +559,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(shangha3_state,irqhandler))
+	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
@@ -723,6 +715,8 @@ ROM_END
 DRIVER_INIT_MEMBER(shangha3_state,shangha3)
 {
 	m_do_shadows = 1;
+	
+	save_item(NAME(m_prot_count));
 }
 
 DRIVER_INIT_MEMBER(shangha3_state,heberpop)
@@ -730,8 +724,8 @@ DRIVER_INIT_MEMBER(shangha3_state,heberpop)
 	m_do_shadows = 0;
 }
 
-GAME( 1993, shangha3,  0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", 0 )
-GAME( 1993, shangha3u, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", 0 )
-GAME( 1993, shangha3j, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", 0 )
-GAME( 1994, heberpop,  0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", 0 )
-GAME( 1994, blocken,   0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, shangha3,  0,        shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (World)", GAME_SUPPORTS_SAVE )
+GAME( 1993, shangha3u, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (US)", GAME_SUPPORTS_SAVE )
+GAME( 1993, shangha3j, shangha3, shangha3, shangha3, shangha3_state, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, heberpop,  0,        heberpop, heberpop, shangha3_state, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, blocken,   0,        blocken,  blocken,  shangha3_state, heberpop, ROT0, "Visco / KID", "Blocken (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

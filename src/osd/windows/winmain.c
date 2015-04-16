@@ -1354,8 +1354,8 @@ sampling_profiler::sampling_profiler(UINT32 max_seconds, UINT8 stack_depth = 0)
 		m_stack_depth(stack_depth),
 		m_entry_stride(stack_depth + 2),
 		m_buffer(max_seconds * 1000 * m_entry_stride),
-		m_buffer_ptr(m_buffer),
-		m_buffer_end(m_buffer + max_seconds * 1000 * m_entry_stride)
+		m_buffer_ptr(&m_buffer[0]),
+		m_buffer_end(&m_buffer[0] + max_seconds * 1000 * m_entry_stride)
 {
 }
 
@@ -1455,7 +1455,7 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	symbols.cache_symbols();
 
 	// step 1: find the base of each entry
-	for (FPTR *current = m_buffer; current < m_buffer_ptr; current += m_entry_stride)
+	for (FPTR *current = &m_buffer[0]; current < m_buffer_ptr; current += m_entry_stride)
 	{
 		assert(current[0] >= 1 && current[0] < m_entry_stride);
 
@@ -1465,11 +1465,11 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	}
 
 	// step 2: sort the results
-	qsort(m_buffer, (m_buffer_ptr - m_buffer) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_address);
+	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_address);
 
 	// step 3: count and collapse unique entries
 	UINT32 total_count = 0;
-	for (FPTR *current = m_buffer; current < m_buffer_ptr; )
+	for (FPTR *current = &m_buffer[0]; current < m_buffer_ptr; )
 	{
 		int count = 1;
 		FPTR *scan;
@@ -1486,11 +1486,11 @@ void sampling_profiler::print_results(symbol_manager &symbols)
 	}
 
 	// step 4: sort the results again, this time by frequency
-	qsort(m_buffer, (m_buffer_ptr - m_buffer) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_frequency);
+	qsort(&m_buffer[0], (m_buffer_ptr - &m_buffer[0]) / m_entry_stride, m_entry_stride * sizeof(FPTR), compare_frequency);
 
 	// step 5: print the results
 	UINT32 num_printed = 0;
-	for (FPTR *current = m_buffer; current < m_buffer_ptr && num_printed < 30; current += m_entry_stride)
+	for (FPTR *current = &m_buffer[0]; current < m_buffer_ptr && num_printed < 30; current += m_entry_stride)
 	{
 		// once we hit 0 frequency, we're done
 		if (current[0] == 0)

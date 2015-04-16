@@ -7950,8 +7950,9 @@ shadfrcejv2     // TA-0032 (c) 1993 (Japan)
 // Stern "Berzerk hardware" games
 berzerk         // (c) 1980
 berzerk1        // (c) 1980
-berzerkf        // (c) 1980
-berzerkg        // (c) 1980
+berzerkf        // (c) 1980 (French speech)
+berzerkg        // (c) 1980 (German speech)
+berzerks        // (c) 1980 Sonic license(Spanish speech)
 frenzy          // (c) 1982
 moonwarp        // (c) 1982 - prototype
 
@@ -10041,7 +10042,8 @@ gigasb          // (c) 1986 bootleg
 gigasm2b        // (c) 1986 bootleg
 oigas           // (c) 1986 bootleg
 pbillrd         // (c) 1987 Nihon System
-pbillrds        // (c) 1988 Nihon System (+ optional Sega)
+pbillrds        // (c) 1987 Nihon System (Sega license?)
+pbillrdsa       // (c) 1987 Nihon System (Sega license?)
 freekick        // (c) 1988 Nihon System licensed to Merit (+ optional Sega) NS6201-A 1987.10
 freekicka       // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1987.9
 freekickb1      // (c) 1987 bootleg
@@ -11351,6 +11353,7 @@ pex0449p        // (c) 1995 IGT - International Game Technology
 pex0451p        // (c) 1995 IGT - International Game Technology
 pex0452p        // (c) 1995 IGT - International Game Technology
 pex0454p        // (c) 1995 IGT - International Game Technology
+pex0455p        // (c) 1995 IGT - International Game Technology
 pex0458p        // (c) 1995 IGT - International Game Technology
 pex0459p        // (c) 1995 IGT - International Game Technology
 pex0459pa       // (c) 1995 IGT - International Game Technology
@@ -11376,6 +11379,7 @@ pex2018p        // (c) 1995 IGT - International Game Technology
 pex2025p        // (c) 1995 IGT - International Game Technology
 pex2026p        // (c) 1995 IGT - International Game Technology
 pex2027p        // (c) 1995 IGT - International Game Technology
+pex2028p        // (c) 1995 IGT - International Game Technology
 pex2029p        // (c) 1995 IGT - International Game Technology
 pex2031p        // (c) 1995 IGT - International Game Technology
 pex2035p        // (c) 1995 IGT - International Game Technology

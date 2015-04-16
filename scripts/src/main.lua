@@ -12,6 +12,7 @@ function mainProject(_target, _subtarget)
 	}
 	flags {
 		"NoManifest",
+		"Symbols", -- always include minimum symbols for executables 
 	}
 
 	if _OPTIONS["SYMBOLS"] then

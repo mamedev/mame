@@ -604,10 +604,10 @@ int floppy_image_device::find_index(UINT32 position, const std::vector<UINT32> &
 	step >>= 1;
 
 	for(;;) {
-		if(spos >= buf.size() || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
+		if(spos >= int(buf.size()) || (spos > 0 && (buf[spos] & floppy_image::TIME_MASK) > position)) {
 			spos -= step;
 			step >>= 1;
-		} else if(spos < 0 || (spos < buf.size()-1 && (buf[spos+1] & floppy_image::TIME_MASK) <= position)) {
+		} else if(spos < 0 || (spos < int(buf.size())-1 && (buf[spos+1] & floppy_image::TIME_MASK) <= position)) {
 			spos += step;
 			step >>= 1;
 		} else

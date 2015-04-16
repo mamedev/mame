@@ -131,9 +131,11 @@ driver_enumerator::driver_enumerator(emu_options &options)
 	: m_current(-1),
 		m_filtered_count(0),
 		m_options(options),
-		m_included(s_driver_count, 0),
-		m_config(s_driver_count, NULL)
+		m_included(s_driver_count),
+		m_config(s_driver_count)
 {
+	memset(&m_included[0], 0, s_driver_count); 
+	memset(&m_config[0], 0, s_driver_count*sizeof(m_config[0]));
 	include_all();
 }
 
@@ -142,9 +144,11 @@ driver_enumerator::driver_enumerator(emu_options &options, const char *string)
 	: m_current(-1),
 		m_filtered_count(0),
 		m_options(options),
-		m_included(s_driver_count, 0),
-		m_config(s_driver_count, NULL)
+		m_included(s_driver_count),
+		m_config(s_driver_count)
 {
+	memset(&m_included[0], 0, s_driver_count); 
+	memset(&m_config[0], 0, s_driver_count*sizeof(m_config[0]));
 	filter(string);
 }
 
@@ -153,9 +157,11 @@ driver_enumerator::driver_enumerator(emu_options &options, const game_driver &dr
 	: m_current(-1),
 		m_filtered_count(0),
 		m_options(options),
-		m_included(s_driver_count, 0),
-		m_config(s_driver_count, NULL)
+		m_included(s_driver_count),
+		m_config(s_driver_count)
 {
+	memset(&m_included[0], 0, s_driver_count); 
+	memset(&m_config[0], 0, s_driver_count*sizeof(m_config[0]));
 	filter(driver);
 }
 
