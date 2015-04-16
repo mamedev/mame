@@ -2366,6 +2366,16 @@ UINT8 floppy_image_format_t::sbyte_mfm_r(const UINT8 *bitstream, int &pos, int t
 	return res;
 }
 
+UINT8 floppy_image_format_t::sbyte_gcr5_r(const UINT8 *bitstream, int &pos, int track_size)
+{
+	UINT16 gcr = 0;
+	for(int i=0; i<10; i++) {
+		if(sbit_rp(bitstream, pos, track_size))
+			gcr |= 0x200 >> i;
+	}
+
+	return (gcr5bw_tb[gcr >> 5] << 4) | gcr5bw_tb[gcr & 0x1f];
+}
 
 void floppy_image_format_t::extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size)
 {
@@ -2800,4 +2810,83 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 	raw_w(track_data, cell_count-int(track_data.size()), 0x9254 >> (16+int(track_data.size())-cell_count));
 
 	generate_track_from_levels(track, head, track_data, 0, image);
+}
+
+void floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size, int head, int tracks)
+{
+	memset(sectors, 0, 256*sizeof(desc_xs));
+
+	// Don't bother if it's just too small
+	if(track_size < 100)
+		return;
+
+	// Start by detecting all id and data blocks
+	int hblk[100], dblk[100];
+	int hblk_count = 0, dblk_count = 0;
+
+	// Precharge the shift register to detect over-the-index stuff
+	UINT16 shift_reg = 0;
+	for(int i=0; i<16; i++)
+		if(sbit_r(bitstream, track_size-16+i))
+			shift_reg |= 0x8000 >> i;
+
+	// Scan the bitstream for sync marks and follow them to check for blocks
+	bool sync = false;
+	for(int i=0; i<track_size; i++) {
+		int bit = sbit_r(bitstream, i);
+		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
+		
+		if (sync && !bit) {
+			UINT8 id = sbyte_gcr5_r(bitstream, i, track_size);
+
+			switch (id) {
+			case 0x08:
+				if(hblk_count < 100)
+					hblk[hblk_count++] = i-10;
+				break;
+			
+			case 0x07:
+				if(dblk_count < 100)
+					dblk[dblk_count++] = i-10;
+				break;
+			}
+		}
+
+		sync = (shift_reg == 0x3ff);
+	}
+
+	// Then extract the sectors
+	int sectdata_pos = 0;
+	for(int i=0; i<hblk_count; i++) {
+		int pos = hblk[i];
+		UINT8 block_id = sbyte_gcr5_r(bitstream, pos, track_size);
+		UINT8 crc = sbyte_gcr5_r(bitstream, pos, track_size);
+		UINT8 sector = sbyte_gcr5_r(bitstream, pos, track_size);
+		UINT8 track = sbyte_gcr5_r(bitstream, pos, track_size);
+		UINT8 id2 = sbyte_gcr5_r(bitstream, pos, track_size);
+		UINT8 id1 = sbyte_gcr5_r(bitstream, pos, track_size);
+
+		if (crc ^ sector ^ track ^ id2 ^ id1) {
+			// header crc mismatch
+		}
+
+		pos = dblk[i];
+		block_id = sbyte_gcr5_r(bitstream, pos, track_size);
+
+		if (track > tracks) track -= tracks;
+		sectors[sector].track = track;
+		sectors[sector].head = head;
+		sectors[sector].size = 256;
+		sectors[sector].data = sectdata + sectdata_pos;
+		UINT8 data_crc = 0;
+		for(int j=0; j<sectors[sector].size; j++) {
+			UINT8 data = sbyte_gcr5_r(bitstream, pos, track_size);
+			data_crc ^= data;
+			sectdata[sectdata_pos++] = data;
+		}
+		data_crc ^= sbyte_gcr5_r(bitstream, pos, track_size);
+		if (data_crc) {
+			// data crc mismatch
+		}
+	}
 }

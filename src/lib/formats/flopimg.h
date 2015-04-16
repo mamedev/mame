@@ -519,6 +519,8 @@ protected:
 	void extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
 	//! PC-type sectors with FM encoding
 	void extract_sectors_from_bitstream_fm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
+	//! Commodore type sectors with GCR5 encoding
+	void extract_sectors_from_bitstream_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size, int head, int tracks);
 
 
 	//! @brief Get a geometry (including sectors) from an image.
@@ -572,6 +574,7 @@ protected:
 	void gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc);
 
 	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
+	UINT8 sbyte_gcr5_r(const UINT8 *bitstream, int &pos, int track_size);
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
