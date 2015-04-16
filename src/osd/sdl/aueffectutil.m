@@ -20,6 +20,9 @@
 
 typedef ComponentDescription AudioComponentDescription;
 
+@protocol NSApplicationDelegate <NSObject>
+@end
+
 @protocol NSWindowDelegate <NSObject>
 @end
 
@@ -723,7 +726,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 @end
 
 
-@interface AUEffectUtilAppDelegate : NSObject<NSApplicationDelegate>
+@interface AUEffectUtilAppDelegate : NSObject <NSApplicationDelegate>
 {
 	EffectInfo      *effects;
 
