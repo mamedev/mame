@@ -84,8 +84,8 @@ f205v
 - Added "Las Vegas, Nevada" (hack).
 - Added the missing 74s288 dump (32x8 PROM located at 1B) from the new set.
 - Confirmed the MC6845 at $4000/$4001.
-- Corrected screen size acording to MC6845 registers.
-- Corrected visible area acording to MC6845 registers. The last characters line looks odd, but should be visible.
+- Corrected screen size according to MC6845 registers.
+- Corrected visible area according to MC6845 registers. The last characters line looks odd, but should be visible.
 - There are not illegal opcodes. The above mentioned are in fact strings (plain ASCII text).
 
 MC6845 registers:
@@ -115,20 +115,23 @@ class murogem_state : public driver_device
 public:
 	murogem_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	DECLARE_WRITE8_MEMBER(outport_w);
-	DECLARE_PALETTE_INIT(murogem);
-	UINT32 screen_update_murogem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	required_shared_ptr<UINT8> m_videoram;
+
+	DECLARE_WRITE8_MEMBER(outport_w);
+	DECLARE_PALETTE_INIT(murogem);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -211,7 +214,7 @@ GFXDECODE_END
 PALETTE_INIT_MEMBER(murogem_state, murogem)
 {}
 
-UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int xx,yy,count;
 	count = 0x000;
@@ -249,7 +252,7 @@ static MACHINE_CONFIG_START( murogem, murogem_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update_murogem)
+	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", murogem)
@@ -323,7 +326,7 @@ ROM_START( lasvegas )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B */
 ROM_END
 
-GAME( 198?, murogem,  0,       murogem, murogem, driver_device, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", GAME_WRONG_COLORS )
-GAME( 198?, murogema, murogem, murogem, murogem, driver_device, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", GAME_WRONG_COLORS )
-GAME( 198?, murogemb, murogem, murogem, murogem, driver_device, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", GAME_WRONG_COLORS )
-GAME( 198?, lasvegas, murogem, murogem, murogem, driver_device, 0, ROT0, "hack",      "Las Vegas, Nevada",     GAME_WRONG_COLORS )
+GAME( 198?, murogem,  0,       murogem, murogem, driver_device, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 198?, murogema, murogem, murogem, murogem, driver_device, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 198?, murogemb, murogem, murogem, murogem, driver_device, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 198?, lasvegas, murogem, murogem, murogem, driver_device, 0, ROT0, "hack",      "Las Vegas, Nevada",     GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
