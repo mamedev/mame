@@ -37,9 +37,9 @@ function maintargetosdoptions(_target)
 				"SDL_ttf",
 			}
 		end
-		linkoptions {
-			backtick("pkg-config --libs fontconfig"),
-		}
+		local str = backtick("pkg-config --libs fontconfig")
+		addlibfromstring(str)
+		addoptionsfromstring(str)
 	end
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -239,9 +239,9 @@ if BASE_TARGETOS=="unix" then
 				}
 			end
 		else
-			linkoptions {
-				backtick(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'"),
-			}
+			local str = backtick(sdlconfigcmd() .. " --libs | sed 's/-lSDLmain//'")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
 		end
 	else
 		if _OPTIONS["NO_X11"]=="1" then
@@ -259,9 +259,9 @@ if BASE_TARGETOS=="unix" then
 				}
 			end
 		end
-		linkoptions {
-			backtick(sdlconfigcmd() .. " --libs"),
-		}
+		local str = backtick(sdlconfigcmd() .. " --libs")
+		addlibfromstring(str)
+		addoptionsfromstring(str)
 		if _OPTIONS["targetos"]~="haiku" then
 			links {
 				"m",
@@ -280,9 +280,9 @@ if BASE_TARGETOS=="unix" then
 		end
 	end
 elseif BASE_TARGETOS=="os2" then
-	linkoptions {
-		backtick(sdlconfigcmd() .. " --libs"),
-	}
+	local str = backtick(sdlconfigcmd() .. " --libs")
+	addlibfromstring(str)
+	addoptionsfromstring(str)
 	links {
 		"pthread"
 	}
