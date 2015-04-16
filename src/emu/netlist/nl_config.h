@@ -39,7 +39,7 @@
 
 // The following adds about 10% performance ...
 
-#define USE_OPENMP              (0)
+#define USE_OPENMP              (1)
 
 // Use nano-second resolution - Sufficient for now
 #define NETLIST_INTERNAL_RES        (U64(1000000000))
