@@ -2859,7 +2859,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const UINT8 *bit
 	int sectdata_pos = 0;
 	for(int i=0; i<hblk_count; i++) {
 		int pos = hblk[i];
-		UINT8 block_id = sbyte_gcr5_r(bitstream, pos, track_size);
+		ATTR_UNUSED UINT8 block_id = sbyte_gcr5_r(bitstream, pos, track_size);
 		UINT8 crc = sbyte_gcr5_r(bitstream, pos, track_size);
 		UINT8 sector = sbyte_gcr5_r(bitstream, pos, track_size);
 		UINT8 track = sbyte_gcr5_r(bitstream, pos, track_size);
