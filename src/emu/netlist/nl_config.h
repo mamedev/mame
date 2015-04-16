@@ -8,7 +8,7 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
-/* FIXME: at some time, make it compile on it's own */
+/* FIXME: at some time, make it compile on its own */
 
 #include "osdcore.h"
 #include "corealloc.h"
@@ -39,7 +39,13 @@
 
 // The following adds about 10% performance ...
 
+#if !defined(USE_OPENMP)
+#if defined(_OPENMP)
 #define USE_OPENMP              (1)
+#else // defined(_OPENMP)
+#define USE_OPENMP              (0)
+#endif // defined(_OPENMP)
+#endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
 #define NETLIST_INTERNAL_RES        (U64(1000000000))
