@@ -32,27 +32,6 @@
 
 ***************************************************************************/
 
-
-
-
-
-
-
-
-/***************************************************************************
-
-  Mego Mini-Vid Break Free (manufactured in Japan)
-  * PCB label Mego 79 rev F
-  * NEC uCOM-43 MCU, labeled D553C 031
-  * cyan VFD display Futaba DM-4.5 91
-
-  NOTE!: MESS external artwork is recommended
-
-***************************************************************************/
-
-
-
-
 #include "emu.h"
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"
@@ -959,6 +938,113 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Mego Mini-Vid Break Free (manufactured in Japan)
+  * PCB label Mego 79 rev F
+  * NEC uCOM-43 MCU, labeled D553C 049
+  * cyan VFD display Futaba DM-4.5 91
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class mvbfree_state : public hh_ucom4_state
+{
+public:
+	mvbfree_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+};
+
+// handlers
+
+void mvbfree_state::prepare_display()
+{
+	UINT16 grid = BITSWAP16(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+	UINT16 plate = BITSWAP16(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	display_matrix(10, 14, plate, grid);
+}
+
+WRITE8_MEMBER(mvbfree_state::grid_w)
+{
+	// E23,F,G,H: vfd matrix grid
+	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+	
+	// E01: plate 0,1
+	if (offset == NEC_UCOM4_PORTE)
+		plate_w(space, 2 + NEC_UCOM4_PORTC, data & 3);
+	else
+		prepare_display();
+}
+
+WRITE8_MEMBER(mvbfree_state::plate_w)
+{
+	// C,D(,E01): vfd matrix plate
+	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE8_MEMBER(mvbfree_state::speaker_w)
+{
+	// I0: speaker out
+	m_speaker->level_w(data & 1);
+}
+
+
+// config
+
+static INPUT_PORTS_START( mvbfree )
+	PORT_START("IN.0") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY // "
+
+	PORT_START("IN.1") // port B
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) // unimplemented p1/p2 buttons
+	PORT_CONFNAME( 0x0c, 0x04, "Game Select")
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFSETTING(    0x08, "3" )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mvbfree, mvbfree_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
+	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
+	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(mvbfree_state, plate_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(mvbfree_state, plate_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(mvbfree_state, grid_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(mvbfree_state, grid_w))
+	MCFG_UCOM4_WRITE_G_CB(WRITE8(mvbfree_state, grid_w))
+	MCFG_UCOM4_WRITE_H_CB(WRITE8(mvbfree_state, grid_w))
+	MCFG_UCOM4_WRITE_I_CB(WRITE8(mvbfree_state, speaker_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tomy(tronic) Tennis (manufactured in Japan)
   * PCB labeled TOMY TN-04 TENNIS
   * NEC uCOM-44 MCU, labeled D552C 048
@@ -1182,10 +1268,10 @@ WRITE8_MEMBER(tmpacman_state::plate_w)
 
 static INPUT_PORTS_START( tmpacman )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_16WAY // separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY // "
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY // "
 
 	PORT_START("IN.1") // port B
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
@@ -1597,6 +1683,12 @@ ROM_START( edracula )
 ROM_END
 
 
+ROM_START( mvbfree )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-049", 0x0000, 0x0800, CRC(d64a8399) SHA1(97887e486fa29b1fc4a5a40cacf3c960f67aacbf) )
+ROM_END
+
+
 ROM_START( tmtennis )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
@@ -1637,6 +1729,8 @@ CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, driver_device, 0, "Bandai
 
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
