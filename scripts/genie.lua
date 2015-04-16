@@ -1,6 +1,5 @@
 premake.check_paths = true
 premake.make.override = { "TARGET" }
-premake.make.linkoptions_after = true
 MAME_DIR = (path.getabsolute("..") .. "/")
 local MAME_BUILD_DIR = (MAME_DIR .. "build/")
 local naclToolchain = ""
