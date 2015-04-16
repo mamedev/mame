@@ -206,7 +206,12 @@ READ8_MEMBER(spc1000_state::iplk_r)
 
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
+	static char motor = 0;
+	char m = BIT(data, 1);
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
+	if (m != motor && m == 1)
+		m_cass->change_state(m_cass->get_state() & CASSETTE_MASK_MOTOR ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	motor = m;	
 }
 
 WRITE8_MEMBER(spc1000_state::gmode_w)
@@ -414,7 +419,7 @@ READ8_MEMBER( spc1000_state::porta_r )
 {
 	UINT8 data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
-	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x40;
+	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x40;
 	data &= ~(m_io_joy->read() & 0x3f);
 
 	return data;
