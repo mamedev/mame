@@ -338,6 +338,7 @@
 #include <new>          // new (ptr)
 
 #ifdef _MSC_VER
+#pragma warning (disable: 4100) // unreferenced formal parameter
 #pragma warning (disable: 4505) // unreferenced local function has been removed (stb stuff)
 #pragma warning (disable: 4996) // 'This function or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
 #endif
@@ -392,6 +393,8 @@ namespace IMGUI_STB_NAMESPACE
 #ifndef IMGUI_DISABLE_STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
+#else
+#define STBTT_DEF extern
 #endif
 #include "stb_truetype.h"
 
@@ -5563,7 +5566,7 @@ static bool InputTextFilterCharacter(unsigned int* p_char, ImGuiInputTextFlags f
         ImGuiTextEditCallbackData callback_data;
         memset(&callback_data, 0, sizeof(ImGuiTextEditCallbackData));
         callback_data.EventFlag = ImGuiInputTextFlags_CallbackCharFilter;
-        callback_data.EventChar = c;
+        callback_data.EventChar = ImWchar(c);
         callback_data.Flags = flags;
         callback_data.UserData = user_data;
         if (callback(&callback_data) != 0)

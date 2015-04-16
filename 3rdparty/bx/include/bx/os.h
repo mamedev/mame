@@ -164,6 +164,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINRT
 		BX_UNUSED(_path);
+		return -1;
 #elif BX_COMPILER_MSVC_COMPATIBLE
 		return ::_chdir(_path);
 #else
@@ -175,6 +176,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINRT
 		BX_UNUSED(_buffer, _size);
+		return NULL;
 #elif BX_COMPILER_MSVC_COMPATIBLE
 		return ::_getcwd(_buffer, (int)_size);
 #else

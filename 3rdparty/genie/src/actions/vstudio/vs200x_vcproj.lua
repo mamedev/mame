@@ -119,6 +119,8 @@
 				_p(depth, '\t>')
 				depth = depth + 1
 
+				local excluded = table.icontains(prj.excludes, fname)
+
 				-- handle file configuration stuff. This needs to be cleaned up and simplified.
 				-- configurations are cached, so this isn't as bad as it looks
 				for _, cfginfo in ipairs(prj.solution.vstudio_configs) do
@@ -132,6 +134,9 @@
 						if usePCH or isSourceCode then
 							_p(depth, '<FileConfiguration')
 							_p(depth, '\tName="%s"', cfginfo.name)
+							if excluded or table.icontains(cfg.excludes, fname) then
+								_p(depth, '\tExcludedFromBuild="true"')
+							end
 							_p(depth, '\t>')
 							_p(depth, '\t<Tool')
 							_p(depth, '\t\tName="%s"'
