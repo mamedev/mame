@@ -749,6 +749,10 @@ if _OPTIONS["OPENMP"]=="1" then
 	linkoptions {
 		"-fopenmp"
 	}
+	defines {
+		"USE_OPENMP=1",
+	}
+	
 else
 	buildoptions {
 		"-Wno-unknown-pragmas",

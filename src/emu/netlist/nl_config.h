@@ -40,11 +40,7 @@
 // The following adds about 10% performance ...
 
 #if !defined(USE_OPENMP)
-#if defined(_OPENMP)
-#define USE_OPENMP              (1)
-#else // defined(_OPENMP)
 #define USE_OPENMP              (0)
-#endif // defined(_OPENMP)
 #endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
@@ -248,7 +244,7 @@ __extension__ typedef signed long long      INT64;
 
 #if (USE_OPENMP)
 #if (!(HAS_OPENMP))
-#warning To use openmp compile and link with "-fopenmp"
+#error To use openmp compile and link with "-fopenmp"
 #endif
 #endif
 
