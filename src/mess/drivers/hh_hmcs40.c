@@ -2,13 +2,14 @@
 // copyright-holders:hap, Kevin Horton
 /***************************************************************************
 
-  Hitachi HMCS40 MCU tabletops/handhelds or other simple devices.
+  Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
+  most of them are VFD electronic games/toys.
 
   known chips:
 
   serial  device    etc.
 ----------------------------------------------------------------
- *07      HD38750A  1979, Bambino Knock-Em Out Boxing (ET-06B)
+ @07      HD38750A  1979, Bambino Knock-Em Out Boxing (ET-06B)
  @08      HD38750A  1979, Bambino Basketball (ET-05)
  @45      HD38750A  1981, VTech Invaders
  *58      HD38750A  1982, Ludotronic(Hanzawa) Grand Prix Turbo
@@ -341,7 +342,7 @@ WRITE16_MEMBER(bambball_state::grid_w)
 
 READ8_MEMBER(bambball_state::input_r)
 {
-	// R0x: inputs
+	// R0x: multiplexed inputs
 	return read_inputs(4);
 }
 
@@ -378,12 +379,148 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( bambball, bambball_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, READ8(bambball_state, input_r))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bambball_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bambball_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bambball_state, plate_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(bambball_state, grid_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bambino Knock-Em Out Boxing
+  * PCBs are labeled Emix Corp. ET-06B
+  * Hitachi HD38750A07 MCU
+  * cyan VFD display Emix-103, with blue or green color overlay
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class bmboxing_state : public hh_hmcs40_state
+{
+public:
+	bmboxing_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+// handlers
+
+void bmboxing_state::prepare_display()
+{
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	UINT32 plate = BITSWAP16(m_plate,15,14,13,12,1,2,0,3,11,4,10,7,5,6,9,8);
+	display_matrix(12, 9, plate, grid);
+}
+
+WRITE8_MEMBER(bmboxing_state::plate_w)
+{
+	// R1x-R3x: vfd matrix plate
+	int shift = (offset - HMCS40_PORT_R1X) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(bmboxing_state::grid_w)
+{
+	// D13: speaker out
+	m_speaker->level_w(data >> 13 & 1);
+
+	// D9-D12: input mux
+	m_inp_mux = data >> 9 & 0xf;
+
+	// D4-D12: vfd matrix grid
+	m_grid = data >> 4 & 0x1ff;
+	prepare_display();
+}
+
+READ8_MEMBER(bmboxing_state::input_r)
+{
+	// R0x: multiplexed inputs
+	return read_inputs(4);
+}
+
+
+// config
+
+/* physical button layout and labels is like this:
+
+    * left = P2 side *                                       * right = P1 side *
+
+    [ BACK ]  [ HIGH ]        (players sw)                   [ HIGH ]  [ BACK ]
+                              1<--->2         [START/
+    [NORMAL]  [MEDIUM]                         RESET]        [MEDIUM]  [NORMAL]
+                              1<---OFF--->2
+    [ DUCK ]  [ LOW  ]        (skill lvl sw)                 [ LOW  ]  [ DUCK ]
+*/
+
+static INPUT_PORTS_START( bmboxing )
+	PORT_START("IN.0") // D9 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("P1 Punch High")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Punch Medium")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("P1 Punch Low")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // D10 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("P1 Position Normal")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P1 Position Back")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("P1 Position Ducking")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // D11 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("P2 Punch High")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("P2 Punch Medium")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("P2 Punch Low")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // D12 port R0x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P2 Position Normal")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("P2 Position Back")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("P2 Position Ducking")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // port D
+	PORT_CONFNAME( 0x01, 0x00, "Players" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bmboxing, bmboxing_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(bmboxing_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(bmboxing_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.4"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
@@ -502,7 +639,7 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 static MACHINE_CONFIG_START( bfriskyt, bfriskyt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bfriskyt_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bfriskyt_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bfriskyt_state, plate_w))
@@ -611,7 +748,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( packmon, packmon_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(packmon_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(packmon_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(packmon_state, plate_w))
@@ -746,7 +883,7 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 static MACHINE_CONFIG_START( msthawk, msthawk_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(msthawk_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(msthawk_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(msthawk_state, plate_w))
@@ -861,7 +998,7 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 static MACHINE_CONFIG_START( zackman, zackman_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(zackman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(zackman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(zackman_state, plate_w))
@@ -976,7 +1113,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( alnattck, alnattck_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(alnattck_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(alnattck_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(alnattck_state, plate_w))
@@ -1100,7 +1237,7 @@ void cdkong_state::machine_start()
 static MACHINE_CONFIG_START( cdkong, cdkong_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(cdkong_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cdkong_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cdkong_state, plate_w))
@@ -1222,7 +1359,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( cgalaxn, cgalaxn_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, READ8(cgalaxn_state, input_r))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cgalaxn_state, grid_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cgalaxn_state, grid_w))
@@ -1340,7 +1477,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( cpacman, cpacman_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, READ8(cpacman_state, input_r))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cpacman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cpacman_state, plate_w))
@@ -1456,7 +1593,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( cmspacmn, cmspacmn_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, READ8(cmspacmn_state, input_r))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cmspacmn_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cmspacmn_state, plate_w))
@@ -1577,7 +1714,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( egalaxn2, egalaxn2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, READ8(egalaxn2_state, input_r))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(egalaxn2_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(egalaxn2_state, plate_w))
@@ -1659,7 +1796,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( epacman2, epacman2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, READ8(egalaxn2_state, input_r))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(egalaxn2_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(egalaxn2_state, plate_w))
@@ -1745,7 +1882,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( pbqbert, pbqbert_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(pbqbert_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(pbqbert_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pbqbert_state, plate_w))
@@ -1870,7 +2007,7 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 static MACHINE_CONFIG_START( kingman, kingman_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(kingman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(kingman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(kingman_state, plate_w))
@@ -1991,7 +2128,7 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 static MACHINE_CONFIG_START( tmtron, tmtron_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(tmtron_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(tmtron_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(tmtron_state, plate_w))
@@ -2078,13 +2215,13 @@ static INPUT_PORTS_START( vinvader )
 	PORT_CONFNAME( 0x08, 0x00, "Skill Level")
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x08, "2" )
-	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( vinvader, vinvader_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation - RC osc.
+	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, IOPORT("IN.0"))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(vinvader_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(vinvader_state, plate_w))
@@ -2116,6 +2253,13 @@ MACHINE_CONFIG_END
 ROM_START( bambball )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38750a08", 0x0000, 0x0800, CRC(907fef18) SHA1(73fe7ca7c6332268a3a9abc5ac88ada2991012fb) )
+	ROM_CONTINUE(           0x0f00, 0x0080 )
+ROM_END
+
+
+ROM_START( bmboxing )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38750a07", 0x0000, 0x0800, CRC(7f33e259) SHA1(c5fcdd6bf060c96666354f09f0570c754f6ed4e0) )
 	ROM_CONTINUE(           0x0f00, 0x0080 )
 ROM_END
 
@@ -2234,6 +2378,7 @@ ROM_END
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Basketball - Dribble Away", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, driver_device, 0, "Bambino", "Knock-Em Out Boxing", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Bandai", "Frisky Tom (Bandai)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
