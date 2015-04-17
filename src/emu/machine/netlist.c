@@ -534,10 +534,7 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 {
 	//char tmp[16];
 	unsigned startpc = pc;
-#if 0
 	int relpc = pc - m_genPC;
-	UINT16 opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
-	UINT8 inst = opcode >> 13;
 	if (relpc >= 0 && relpc < netlist().queue().count())
 	{
 		//            sprintf(buffer, "%04x %02d %s", pc, relpc, netlist().queue()[netlist().queue().count() - relpc - 1].object().name().cstr());
@@ -547,7 +544,7 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 	}
 	else
 		sprintf(buffer, "%s", "");
-#endif
+
 	pc+=1;
 	return (pc - startpc);
 }
