@@ -172,15 +172,10 @@ project "flac"
 			"_LARGEFILE_SOURCE",
 			"_FILE_OFFSET_BITS=64",
 			"FLAC__HAS_OGG=0",
+			"HAVE_CONFIG_H=1",
 		}
-	configuration { "vs*" }
-		defines {
-			"VERSION=\"1.2.1\""
-		}
-	configuration { "gmake" }
-		defines {
-			"VERSION=\\\"1.2.1\\\""
-		}
+
+	configuration { "gmake"}
 		buildoptions_c {
 			"-Wno-unused-function",
 			"-O0",
