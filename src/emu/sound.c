@@ -618,7 +618,7 @@ void sound_stream::generate_samples(int samples)
 		m_input_array[inputnum] = generate_resampled_data(input, samples);
 	}
 
-	if (m_input.size()>0)
+	if (!m_input.empty())
 	{
 		inputs = &m_input_array[0];
 	}
@@ -630,7 +630,7 @@ void sound_stream::generate_samples(int samples)
 		m_output_array[outputnum] = &output.m_buffer[m_output_sampindex - m_output_base_sampindex];
 	}
 
-	if (m_output.size()>0)
+	if (!m_output.empty())
 	{
 		outputs = &m_output_array[0];
 	}
