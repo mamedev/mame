@@ -906,6 +906,9 @@ configuration { "asmjs" }
 	archivesplit_size "20"
 
 configuration { "android*" }
+	buildoptions {
+		"-Wno-undef",
+	}
 	buildoptions_cpp {
 		"-x c++",
 		"-std=gnu++98",
