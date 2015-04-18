@@ -329,7 +329,7 @@ void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirro
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
-	astring tempstring;
+	std::string tempstring;
 	if (machine().root_device().memregion("isa")) {
 		UINT8 *src = dev->memregion(region)->base();
 		UINT8 *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;

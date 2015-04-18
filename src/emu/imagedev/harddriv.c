@@ -215,7 +215,7 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 
 int harddisk_image_device::internal_load_hd()
 {
-	astring tempstring;
+	std::string tempstring;
 	chd_error err = CHDERR_NONE;
 
 	m_chd = NULL;

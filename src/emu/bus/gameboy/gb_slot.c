@@ -600,7 +600,7 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void base_gb_cart_slot_device::get_default_card_software(astring &result)
+void base_gb_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -623,7 +623,7 @@ void base_gb_cart_slot_device::get_default_card_software(astring &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 
@@ -631,11 +631,11 @@ void base_gb_cart_slot_device::get_default_card_software(astring &result)
 }
 
 
-void megaduck_cart_slot_device::get_default_card_software(astring &result)
+void megaduck_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		result.cpy("rom");
+		result.assign("rom");
 		return;
 	}
 

@@ -271,9 +271,9 @@ void emu_options::update_slot_options()
 		const char *name = slot->device().tag() + 1;
 		if (exists(name) && slot->first_option() != NULL)
 		{
-			astring defvalue;
+			std::string defvalue;
 			slot->get_default_card_software(defvalue);
-			if (defvalue.len() > 0)
+			if (defvalue.length() > 0)
 			{
 				set_default_value(name, defvalue.c_str());
 				const device_slot_option *option = slot->option(defvalue.c_str());

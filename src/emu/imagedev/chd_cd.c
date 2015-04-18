@@ -96,7 +96,7 @@ bool cdrom_image_device::call_load()
 {
 	chd_error   err = (chd_error)0;
 	chd_file    *chd = NULL;
-	astring tempstring;
+	std::string tempstring;
 
 	if (m_cdrom_handle)
 		cdrom_close(m_cdrom_handle);

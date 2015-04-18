@@ -78,7 +78,7 @@ void a1bus_cassette_device::device_start()
 {
 	set_a1bus_device();
 
-	astring tempstring;
+	std::string tempstring;
 	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, CASSETTE_ROM_REGION).c_str())->base();
 
 	install_device(0xc000, 0xc0ff, read8_delegate(FUNC(a1bus_cassette_device::cassette_r), this), write8_delegate(FUNC(a1bus_cassette_device::cassette_w), this));

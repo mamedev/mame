@@ -59,7 +59,7 @@ public:
 
 	// public state
 	attotime                m_minimum_quantum;          // minimum scheduling quantum
-	astring                 m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
+	std::string             m_perfect_cpu_quantum;      // tag of CPU to use for "perfect" scheduling
 	INT32                   m_watchdog_vblank_count;    // number of VBLANKs until the watchdog kills us
 	attotime                m_watchdog_time;            // length of time until the watchdog kills us
 

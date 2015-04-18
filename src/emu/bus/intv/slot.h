@@ -118,7 +118,7 @@ public:
 	virtual const char *file_extensions() const { return "bin,int,rom,itv"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_rom04) { if (m_cart) return m_cart->read_rom04(space, offset, mem_mask); else return 0xffff; }

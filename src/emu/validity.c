@@ -639,7 +639,7 @@ void validity_checker::validate_roms()
 				validate_tag(basetag);
 
 				// generate the full tag
-				astring fulltag;
+				std::string fulltag;
 				rom_region_name(fulltag, *device, romp);
 
 				// attempt to add it to the map, reporting duplicates as errors
@@ -848,7 +848,7 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 void validity_checker::validate_condition(ioport_condition &condition, device_t &device, int_map &port_map)
 {
 	// resolve the tag
-	astring porttag;
+	std::string porttag;
 	device.subtag(porttag, condition.tag());
 
 	// then find a matching port

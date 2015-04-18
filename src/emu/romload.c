@@ -254,7 +254,7 @@ const rom_entry *rom_next_parameter(const rom_entry *romp)
     for a rom region
 -------------------------------------------------*/
 
-astring &rom_region_name(astring &result, const device_t &device, const rom_entry *romp)
+std::string &rom_region_name(std::string &result, const device_t &device, const rom_entry *romp)
 {
 	return device.subtag(result, ROM_GETNAME(romp));
 }
@@ -265,7 +265,7 @@ astring &rom_region_name(astring &result, const device_t &device, const rom_entr
     for a per-game parameter
 -------------------------------------------------*/
 
-astring &rom_parameter_name(astring &result, const device_t &device, const rom_entry *romp)
+std::string &rom_parameter_name(std::string &result, const device_t &device, const rom_entry *romp)
 {
 	return device.subtag(result, romp->_name);
 }
@@ -276,9 +276,9 @@ astring &rom_parameter_name(astring &result, const device_t &device, const rom_e
     per-game parameter
 -------------------------------------------------*/
 
-astring rom_parameter_value(const rom_entry *romp)
+std::string rom_parameter_value(const rom_entry *romp)
 {
-	return romp->_hashdata;
+	return std::string(romp->_hashdata);
 }
 
 
@@ -1338,7 +1338,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 	astring locationtag(swlist.list_name()), breakstr("%");
 	romload_private *romdata = device.machine().romload_data;
 	const rom_entry *region;
-	astring regiontag;
+	std::string regiontag;
 
 	romdata->errorstring.reset();
 	romdata->softwarningstring.reset();
@@ -1453,7 +1453,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 
 static void process_region_list(romload_private *romdata)
 {
-	astring regiontag;
+	std::string regiontag;
 
 	/* loop until we hit the end */
 	device_iterator deviter(romdata->machine().root_device());

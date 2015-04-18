@@ -211,7 +211,7 @@ bool o2_cart_slot_device::call_softlist_load(software_list_device &swlist, const
  get default card software
  -------------------------------------------------*/
 
-void o2_cart_slot_device::get_default_card_software(astring &result)
+void o2_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -229,7 +229,7 @@ void o2_cart_slot_device::get_default_card_software(astring &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 

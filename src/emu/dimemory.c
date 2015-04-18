@@ -297,7 +297,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				{
 					// make sure we can resolve the full path to the region
 					bool found = false;
-					astring entry_region;
+					std::string entry_region;
 					entry->m_devbase.subtag(entry_region, entry->m_region);
 
 					// look for the region
@@ -305,7 +305,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 					for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 						for (const rom_entry *romp = rom_first_region(*device); romp != NULL && !found; romp = rom_next_region(romp))
 						{
-							astring fulltag;
+							std::string fulltag;
 							rom_region_name(fulltag, *device, romp);
 							if (fulltag == entry_region)
 							{

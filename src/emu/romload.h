@@ -297,7 +297,7 @@ const rom_entry *rom_next_file(const rom_entry *romp);
 UINT32 rom_file_size(const rom_entry *romp);
 
 /* return the appropriate name for a rom region */
-astring &rom_region_name(astring &result, const device_t &device, const rom_entry *romp);
+std::string &rom_region_name(std::string &result, const device_t &device, const rom_entry *romp);
 
 /* return pointer to the first per-game parameter */
 const rom_entry *rom_first_parameter(const device_t &device);
@@ -306,10 +306,10 @@ const rom_entry *rom_first_parameter(const device_t &device);
 const rom_entry *rom_next_parameter(const rom_entry *romp);
 
 /* return the appropriate name for a per-game parameter */
-astring &rom_parameter_name(astring &result, const device_t &device, const rom_entry *romp);
+std::string &rom_parameter_name(std::string &result, const device_t &device, const rom_entry *romp);
 
 /* return the value for a per-game parameter */
-astring rom_parameter_value(const rom_entry *romp);
+std::string rom_parameter_value(const rom_entry *romp);
 
 
 /* ----- disk handling ----- */
