@@ -694,6 +694,9 @@ void ui_manager::draw_text_full(render_container *container, const char *origs, 
 						break;
 
 					curwidth -= get_font()->char_width(lineheight, aspect, schar);
+					// if back to 0, there is no space to draw even a single char
+					if (curwidth <= 0)
+						break;
 				}
 			}
 
