@@ -15,6 +15,7 @@
 #include "machine/pic8259.h"
 #include "machine/i8271.h"
 #include "imagedev/flopdrv.h"
+#include "bus/centronics/ctronics.h"
 
 class imds2_state : public driver_device
 {
@@ -53,6 +54,13 @@ class imds2_state : public driver_device
 
 	DECLARE_READ8_MEMBER(imds2_ioc_mem_r);
 	DECLARE_WRITE8_MEMBER(imds2_ioc_mem_w);
+	DECLARE_READ8_MEMBER(imds2_pio_port_p1_r);
+	DECLARE_WRITE8_MEMBER(imds2_pio_port_p1_w);
+	DECLARE_READ8_MEMBER(imds2_pio_port_p2_r);
+	DECLARE_WRITE8_MEMBER(imds2_pio_port_p2_w);
+	DECLARE_WRITE_LINE_MEMBER(imds2_pio_lpt_ack_w);
+	DECLARE_WRITE_LINE_MEMBER(imds2_pio_lpt_busy_w);
+	DECLARE_WRITE_LINE_MEMBER(imds2_pio_lpt_select_w);
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
@@ -71,10 +79,12 @@ class imds2_state : public driver_device
 	required_device<beep_device> m_iocbeep;
 	required_device<pit8253_device> m_ioctimer;
 	required_device<i8271_device> m_iocfdc;
+	required_device<i8041_device> m_iocpio;
 	required_device<i8741_device> m_kbcpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<centronics_device> m_centronics;
 	required_ioport m_io_key0;
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
@@ -90,6 +100,7 @@ class imds2_state : public driver_device
 	bool imds2_in_ipc_rom(offs_t offset) const;
 
 	void imds2_update_beeper(void);
+	void imds2_update_printer(void);
 
 	// IPC control port
 	UINT8 m_ipc_control;
@@ -117,6 +128,15 @@ class imds2_state : public driver_device
 
 	// IPC/IOC status
 	UINT8 m_ipc_ioc_status;
+
+	// PIO port 1
+	UINT8 m_pio_port1;
+
+	// PIO port 2
+	UINT8 m_pio_port2;
+
+	// PIO device status byte
+	UINT8 m_device_status_byte;
 };
 
 #endif /* _IMDS2_H_ */
