@@ -27,7 +27,7 @@ void vigilant_state::machine_start()
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-WRITE8_MEMBER(vigilant_state::vigilant_bank_select_w)
+WRITE8_MEMBER(vigilant_state::bank_select_w)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( vigilant_map, AS_PROGRAM, 8, vigilant_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vigilant_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( vigilant_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)          /* OUT2 */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(vigilant_bank_select_w)  /* PBANK */
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(bank_select_w)  /* PBANK */
 	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w)      /* HSPL, HSPH */
 	AM_RANGE(0x82, 0x83) AM_WRITE(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
 	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w)        /* RCOD */
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( kikcubic_map, AS_PROGRAM, 8, vigilant_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")        /* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(vigilant_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( kikcubic_io_map, AS_IO, 8, vigilant_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(vigilant_bank_select_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_audio_device, sound_command_byte_w)
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
@@ -964,15 +964,15 @@ ROM_START( buccanrsa )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant,  0,        vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev E)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilant1, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev C)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantu, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantu2,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US, Rev G)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantj, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL )
-GAME( 1988, vigilantb, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "bootleg",                      "Vigilante (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1988, vigilant,  0,        vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev E)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilant1, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (World, Rev C)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantu, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantu2,vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East USA license)", "Vigilante (US, Rev G)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantj, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "Irem",                         "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantb, vigilant, vigilant, vigilant, driver_device, 0, ROT0, "bootleg",                      "Vigilante (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1988, kikcubic,  0,        kikcubic, kikcubic, driver_device, 0, ROT0, "Irem",                         "Meikyu Jima (Japan)", GAME_NO_COCKTAIL )   /* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb, kikcubic, kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg",                      "Kickle Cubele", GAME_NO_COCKTAIL )
+GAME( 1988, kikcubic,  0,        kikcubic, kikcubic, driver_device, 0, ROT0, "Irem",                         "Meikyu Jima (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )   /* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb, kikcubic, kikcubic, kikcubic, driver_device, 0, ROT0, "bootleg",                      "Kickle Cubele", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1989, buccanrs,  0,        buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic",                   "Buccaneers (set 1)", GAME_NO_COCKTAIL )
-GAME( 1989, buccanrsa, buccanrs, buccanrs, buccanra, driver_device, 0, ROT0, "Duintronic",                   "Buccaneers (set 2)", GAME_NO_COCKTAIL )
+GAME( 1989, buccanrs,  0,        buccanrs, buccanrs, driver_device, 0, ROT0, "Duintronic",                   "Buccaneers (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, buccanrsa, buccanrs, buccanrs, buccanra, driver_device, 0, ROT0, "Duintronic",                   "Buccaneers (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
