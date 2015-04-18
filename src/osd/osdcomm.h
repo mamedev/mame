@@ -247,7 +247,7 @@ static __inline double log2(double x) { return log(x) * M_LOG2E; }
 
 #ifdef __GNUC__
 #ifndef alloca
-#define alloca  __builtin_alloca
+#define alloca(size)  __builtin_alloca(size)
 #endif
 #endif
 
