@@ -136,7 +136,7 @@ void ui_menu_slot_devices::set_slot_device(device_slot_interface *slot, const ch
 {
 	astring error;
 	machine().options().set_value(slot->device().tag()+1, val, OPTION_PRIORITY_CMDLINE, error);
-	assert(!error);
+	assert(error.empty());
 }
 
 /*-------------------------------------------------

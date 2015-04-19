@@ -320,7 +320,7 @@ public:
 			if (offset >= startoffs && offset < endoffs)
 			{
 				// if we don't already have this file open, open it now
-				if (m_file == NULL || m_lastfile != m_info.track[tracknum].fname)
+				if (m_file == NULL || m_lastfile.cmp(m_info.track[tracknum].fname)!=0)
 				{
 					if (m_file != NULL)
 						core_fclose(m_file);

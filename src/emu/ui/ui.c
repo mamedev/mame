@@ -2422,5 +2422,5 @@ void ui_manager::set_use_natural_keyboard(bool use_natural_keyboard)
 	m_use_natural_keyboard = use_natural_keyboard;
 	astring error;
 	machine().options().set_value(OPTION_NATURAL_KEYBOARD, use_natural_keyboard, OPTION_PRIORITY_CMDLINE, error);
-	assert(!error);
+	assert(error.empty());
 }

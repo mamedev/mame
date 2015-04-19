@@ -599,7 +599,7 @@ void parsed_expression::copy(const parsed_expression &src)
 {
 	m_symtable = src.m_symtable;
 	m_original_string.cpy(src.m_original_string);
-	if (m_original_string)
+	if (!m_original_string.empty())
 		parse_string_into_tokens();
 }
 

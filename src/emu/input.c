@@ -1502,7 +1502,7 @@ const char *input_manager::code_name(astring &str, input_code code) const
 
 	// concatenate the strings
 	str.cpy(devclass);
-	if (devindex)
+	if (!devindex.empty())
 		str.cat(" ").cat(devindex);
 	if (devcode[0] != 0)
 		str.cat(" ").cat(devcode);
@@ -1543,7 +1543,7 @@ const char *input_manager::code_to_token(astring &str, input_code code) const
 
 	// concatenate the strings
 	str.cpy(devclass);
-	if (devindex)
+	if (!devindex.empty())
 		str.cat("_").cat(devindex);
 	if (devcode[0] != 0)
 		str.cat("_").cat(devcode);

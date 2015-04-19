@@ -122,14 +122,14 @@ void ui_menu_bios_selection::handle()
 			if (strcmp(dev->tag(),":")==0) {
 				astring error;
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
-				assert(!error);
+				assert(error.empty());
 			} else {
 				astring error;
 				astring value;
 				astring temp;
 				value.printf("%s,bios=%d",machine().options().main_value(temp,dev->owner()->tag()+1),val-1);
 				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
-				assert(!error);
+				assert(error.empty());
 			}
 			reset(UI_MENU_RESET_REMEMBER_REF);
 		}

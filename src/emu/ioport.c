@@ -1519,7 +1519,7 @@ ioport_field::~ioport_field()
 const char *ioport_field::name() const
 {
 	// if we have a non-default name, use that
-	if (m_live != NULL && m_live->name)
+	if (m_live != NULL && !m_live->name.empty())
 		return m_live->name.c_str();
 	if (m_name != NULL)
 		return m_name;
@@ -2481,7 +2481,7 @@ time_t ioport_manager::initialize()
 	{
 		astring errors;
 		m_portlist.append(*device, errors);
-		if (errors)
+		if (!errors.empty())
 			osd_printf_error("Input port errors:\n%s", errors.c_str());
 	}
 

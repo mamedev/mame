@@ -186,7 +186,7 @@ int cli_frontend::execute(int argc, char **argv)
 			// otherwise, error on the options
 			throw emu_fatalerror(MAMERR_INVALID_CONFIG, "%s", option_errors.trimspace().c_str());
 		}
-		if (option_errors)
+		if (!option_errors.empty())
 			osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().c_str());
 
 		// determine the base name of the EXE
@@ -207,7 +207,7 @@ int cli_frontend::execute(int argc, char **argv)
 				m_options.revert(OPTION_PRIORITY_INI);
 				m_options.parse_standard_inis(option_errors);
 			}
-			if (option_errors)
+			if (!option_errors.empty())
 				osd_printf_error("Error in command line:\n%s\n", option_errors.trimspace().c_str());
 
 			// if we can't find it, give an appropriate error
@@ -1555,7 +1555,7 @@ void cli_frontend::execute_commands(const char *exename)
 	// other commands need the INIs parsed
 	astring option_errors;
 	m_options.parse_standard_inis(option_errors);
-	if (option_errors)
+	if (!option_errors.empty())
 		osd_printf_error("%s\n", option_errors.c_str());
 
 	// createconfig?

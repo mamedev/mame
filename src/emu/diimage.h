@@ -170,11 +170,11 @@ public:
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
-	bool exists() { return m_image_name; }
-	const char *filename() { if (!m_image_name) return NULL; else return m_image_name.c_str(); }
-	const char *basename() { if (!m_basename) return NULL; else return m_basename.c_str(); }
-	const char *basename_noext()  { if (!m_basename_noext) return NULL; else return m_basename_noext.c_str(); }
-	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype.c_str(); }
+	bool exists() { return !m_image_name.empty(); }
+	const char *filename() { if (m_image_name.empty()) return NULL; else return m_image_name.c_str(); }
+	const char *basename() { if (m_basename.empty()) return NULL; else return m_basename.c_str(); }
+	const char *basename_noext()  { if (m_basename_noext.empty()) return NULL; else return m_basename_noext.c_str(); }
+	const char *filetype()  { if (m_filetype.empty()) return NULL; else return m_filetype.c_str(); }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
 	bool is_readonly() { return m_readonly; }

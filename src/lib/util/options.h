@@ -75,7 +75,7 @@ public:
 	public:
 		// getters
 		entry *next() const { return m_next; }
-		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && m_name[index]) ? m_name[index].c_str() : NULL; }
+		const char *name(int index = 0) const { return (index < ARRAY_LENGTH(m_name) && !m_name[index].empty()) ? m_name[index].c_str() : NULL; }
 		const char *description() const { return m_description; }
 		const char *value() const { return m_data.c_str(); }
 		const char *default_value() const { return m_defdata.c_str(); }
@@ -87,7 +87,7 @@ public:
 		bool is_header() const { return type() == OPTION_HEADER; }
 		bool is_command() const { return type() == OPTION_COMMAND; }
 		bool is_internal() const { return m_flags & OPTION_FLAG_INTERNAL; }
-		bool has_range() const { return (m_minimum && m_maximum); }
+		bool has_range() const { return (!m_minimum.empty() && !m_maximum.empty()); }
 		int priority() const { return m_priority; }
 
 		// setters

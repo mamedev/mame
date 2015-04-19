@@ -498,7 +498,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 	}
 
 	// if there is a string to display, compute it
-	if (m_format)
+	if (!m_format.empty())
 	{
 		// iterate over arguments and evaluate them
 		UINT64 params[MAX_ARGUMENTS];
@@ -529,7 +529,7 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 	astring tempstring;
 
 	// output an action
-	if (!m_format)
+	if (m_format.empty())
 	{
 		cheatfile.printf("\t\t\t<action");
 		if (!m_condition.is_empty())
@@ -785,14 +785,14 @@ void cheat_entry::save(emu_file &cheatfile) const
 	cheatfile.printf("\t<cheat desc=\"%s\"", m_description.c_str());
 	if (m_numtemp != DEFAULT_TEMP_VARIABLES)
 		cheatfile.printf(" tempvariables=\"%d\"", m_numtemp);
-	if (!m_comment && m_parameter == NULL && !has_scripts)
+	if (m_comment.empty() && m_parameter == NULL && !has_scripts)
 		cheatfile.printf(" />\n");
 	else
 	{
 		cheatfile.printf(">\n");
 
 		// save the comment
-		if (m_comment)
+		if (!m_comment.empty())
 			cheatfile.printf("\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment.c_str());
 
 		// output the parameter, if present
@@ -961,10 +961,10 @@ void cheat_entry::menu_text(astring &description, astring &state, UINT32 &flags)
 	// some cheat entries are just text for display
 	if (is_text_only())
 	{
-		if (description)
+		if (!description.empty())
 		{
 			description.trimspace();
-			if (!description)
+			if (description.empty())
 				description.cpy(MENU_SEPARATOR_ITEM);
 		}
 		flags = MENU_FLAG_DISABLE;
@@ -1218,7 +1218,7 @@ void cheat_manager::render_text(render_container &container)
 {
 	// render any text and free it along the way
 	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
-		if (m_output[linenum])
+		if (!m_output[linenum].empty())
 		{
 			// output the text
 			machine().ui().draw_text_full(&container, m_output[linenum].c_str(),

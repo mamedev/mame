@@ -481,7 +481,7 @@ static void dview_draw_title(DView *dv)
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_TITLE, 0, 0, dv->bounds.width(), TITLE_HEIGHT, col);
 
-	if (!dv->title)
+	if (dv->title.empty())
 		return;
 
 	for (i = 0; i<strlen(dv->title.c_str()); i++)

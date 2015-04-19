@@ -173,12 +173,12 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		// stop when we find an entry whose name is after ours
-		if (entry->m_name > totalname)
+		if (entry->m_name.cmp(totalname)>0)
 			break;
 		insert_after = entry;
 
 		// error if we are equal
-		if (entry->m_name == totalname)
+		if (entry->m_name.cmp(totalname)==0)
 			fatalerror("Duplicate save state registration entry (%s)\n", totalname.c_str());
 	}
 

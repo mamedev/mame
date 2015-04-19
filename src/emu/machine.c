@@ -892,7 +892,7 @@ void running_machine::handle_saveload()
 
 	// if no name, bail
 	emu_file file(m_saveload_searchpath, openflags);
-	if (!m_saveload_pending_file)
+	if (m_saveload_pending_file.empty())
 		goto cancel;
 
 	// if there are anonymous timers, we can't save just yet, and we can't load yet either

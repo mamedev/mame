@@ -1313,7 +1313,7 @@ void layout_element::component::load_bitmap()
 	m_hasalpha[0] = render_load_png(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_imagefile[0].c_str());
 
 	// load the alpha bitmap if specified
-	if (m_bitmap[0].valid() && m_alphafile[0])
+	if (m_bitmap[0].valid() && !m_alphafile[0].empty())
 		render_load_png(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_alphafile[0].c_str(), true);
 
 	// if we can't load the bitmap, allocate a dummy one and report an error
@@ -1327,7 +1327,7 @@ void layout_element::component::load_bitmap()
 				m_bitmap[0].pix32((step + line) % 100, line % 100) = rgb_t(0xff,0xff,0xff,0xff);
 
 		// log an error
-		if (!m_alphafile[0])
+		if (m_alphafile[0].empty())
 			osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].c_str());
 		else
 			osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].c_str(), m_alphafile[0].c_str());

@@ -104,7 +104,7 @@ void ui_menu_file_manager::populate()
 	bool first_entry = true;
 	astring prev_owner;
 
-	if (m_warnings)
+	if (!m_warnings.empty())
 	{
 		item_append(m_warnings.c_str(), NULL, MENU_FLAG_DISABLE, NULL);
 		item_append("", NULL, MENU_FLAG_DISABLE, NULL);

@@ -207,7 +207,7 @@ public:
 		const render_color &color() const { return m_color; }
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const;
-		bool has_input() const { return bool(m_input_tag); }
+		bool has_input() const { return !m_input_tag.empty(); }
 		const char *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_tag.c_str(); }
 
 		// fetch state based on configured source

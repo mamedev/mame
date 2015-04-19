@@ -318,7 +318,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 		compute_hash_as_string(computedhash, splitbuffer, length);
 
 		// compare
-		if (computedhash != expectedhash)
+		if (computedhash.cmp(expectedhash)!=0)
 		{
 			printf("\n");
 			fprintf(stderr, "Fatal error: file '%s' has incorrect hash\n  Expected: %s\n  Computed: %s\n", infilename.c_str(), expectedhash.c_str(), computedhash.c_str());

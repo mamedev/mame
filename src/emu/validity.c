@@ -882,7 +882,7 @@ void validity_checker::validate_inputs()
 		portlist.append(*device, errorbuf);
 
 		// report any errors during construction
-		if (errorbuf)
+		if (!errorbuf.empty())
 			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
 
 		// do a first pass over ports to add their names and find duplicates

@@ -1035,14 +1035,14 @@ static void execute_ignore(running_machine &machine, int ref, int params, const 
 			/* build up a comma-separated list */
 			if (!exec->device().debug()->observing())
 			{
-				if (!buffer)
+				if (buffer.empty())
 					buffer.printf("Currently ignoring device '%s'", exec->device().tag());
 				else
 					buffer.catprintf(", '%s'", exec->device().tag());
 			}
 
 		/* special message for none */
-		if (!buffer)
+		if (buffer.empty())
 			buffer.printf("Not currently ignoring any devices");
 		debug_console_printf(machine, "%s\n", buffer.c_str());
 	}
@@ -1100,14 +1100,14 @@ static void execute_observe(running_machine &machine, int ref, int params, const
 			/* build up a comma-separated list */
 			if (exec->device().debug()->observing())
 			{
-				if (!buffer)
+				if (buffer.empty())
 					buffer.printf("Currently observing CPU '%s'", exec->device().tag());
 				else
 					buffer.catprintf(", '%s'", exec->device().tag());
 			}
 
 		/* special message for none */
-		if (!buffer)
+		if (buffer.empty())
 			buffer.printf("Not currently observing any devices");
 		debug_console_printf(machine, "%s\n", buffer.c_str());
 	}
@@ -1328,9 +1328,9 @@ static void execute_bplist(running_machine &machine, int ref, int params, const 
 			for (device_debug::breakpoint *bp = device->debug()->breakpoint_first(); bp != NULL; bp = bp->next())
 			{
 				buffer.printf("%c%4X @ %s", bp->enabled() ? ' ' : 'D', bp->index(), core_i64_hex_format(bp->address(), device->debug()->logaddrchars()));
-				if (astring(bp->condition()) != astring("1"))
+				if (astring(bp->condition()).cmp("1")!=0)
 					buffer.catprintf(" if %s", bp->condition());
-				if (astring(bp->action()) != astring(""))
+				if (astring(bp->action()).cmp("")!=0)
 					buffer.catprintf(" do %s", bp->action());
 				debug_console_printf(machine, "%s\n", buffer.c_str());
 				printed++;
@@ -1498,9 +1498,9 @@ static void execute_wplist(running_machine &machine, int ref, int params, const 
 							core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()),
 							core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()),
 							types[wp->type() & 3]);
-					if (astring(wp->condition()) != astring("1"))
+					if (astring(wp->condition()).cmp("1")!=0)
 						buffer.catprintf(" if %s", wp->condition());
-					if (astring(wp->action()) != astring(""))
+					if (astring(wp->action()).cmp("")!=0)
 						buffer.catprintf(" do %s", wp->action());
 					debug_console_printf(machine, "%s\n", buffer.c_str());
 					printed++;

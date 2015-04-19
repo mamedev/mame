@@ -362,7 +362,7 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, astri
 		if (curentry->type() == OPTION_COMMAND)
 		{
 			// can only have one command
-			if (m_command)
+			if (!m_command.empty())
 			{
 				error_string.catprintf("Error: multiple commands specified -%s and %s\n", m_command.c_str(), curarg);
 				return false;
@@ -701,7 +701,7 @@ void core_options::remove_entry(core_options::entry &delentry)
 {
 	// remove all names from the map
 	for (int name = 0; name < ARRAY_LENGTH(delentry.m_name); name++)
-		if (delentry.m_name[name])
+		if (!delentry.m_name[name].empty())
 			m_entrymap.remove(delentry.m_name[name].c_str());
 
 	// remove the entry from the list

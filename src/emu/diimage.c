@@ -210,7 +210,7 @@ const image_device_format *device_image_interface::device_get_named_creatable_fo
 void device_image_interface::clear_error()
 {
 	m_err = IMAGE_ERROR_SUCCESS;
-	if (m_err_message)
+	if (!m_err_message.empty())
 	{
 		m_err_message.reset();
 	}
@@ -236,7 +236,7 @@ static const char *const messages[] =
 
 const char *device_image_interface::error()
 {
-	return (m_err_message) ? m_err_message.c_str() : messages[m_err];
+	return (!m_err_message.empty()) ? m_err_message.c_str() : messages[m_err];
 }
 
 
@@ -351,7 +351,7 @@ void device_image_interface::setup_working_directory()
 const char * device_image_interface::working_directory()
 {
 	/* check to see if we've never initialized the working directory */
-	if (!m_working_directory)
+	if (m_working_directory.empty())
 		setup_working_directory();
 
 	return m_working_directory.c_str();
@@ -900,7 +900,7 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 
 				// if we had launched from softlist with a specified part, e.g. "shortname:part"
 				// we would have recorded the wrong name, so record it again based on software_info
-				if (m_software_info_ptr && m_full_software_name)
+				if (m_software_info_ptr && !m_full_software_name.empty())
 					m_err = set_image_filename(m_full_software_name.c_str());
 
 				// check if image should be read-only

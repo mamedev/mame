@@ -423,7 +423,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, astring &srcdir, astring 
 					dstfile.printf("%s%c%s.html", dstdir.c_str(), PATH_SEPARATOR[0], curlist->name.c_str());
 					if (indexfile != NULL)
 						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", curlist->name.c_str(), curlist->name.c_str());
-					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, srcdir == dstdir, tempheader, tempfooter);
+					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, srcdir.cmp(dstdir)==0, tempheader, tempfooter);
 				}
 			}
 
@@ -879,7 +879,7 @@ static bool find_include_file(astring &srcincpath, int srcrootlen, int dstrootle
 				astring tempinc(srcincpath, 0, sepindex);
 
 				// if we don't match, stop
-				if (tempfile != tempinc)
+				if (tempfile.cmp(tempinc)!=0)
 					break;
 				lastsepindex = sepindex + 1;
 			}

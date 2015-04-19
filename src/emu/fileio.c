@@ -229,7 +229,7 @@ hash_collection &emu_file::hashes(const char *types)
 			needed.cat(*scan);
 
 	// if we need nothing, skip it
-	if (!needed)
+	if (needed.empty())
 		return m_hashes;
 
 	// load the ZIP file if needed

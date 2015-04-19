@@ -492,7 +492,7 @@ void emu_options::set_system_name(const char *name)
 		// first set the new name
 		astring error;
 		set_value(OPTION_SYSTEMNAME, name, OPTION_PRIORITY_CMDLINE, error);
-		assert(!error);
+		assert(error.empty());
 
 		// remove any existing device options and then add them afresh
 		remove_device_options();
@@ -531,7 +531,7 @@ bool emu_options::parse_one_ini(const char *basename, int priority, astring *err
 	bool result = parse_ini_file(file, priority, OPTION_PRIORITY_DRIVER_INI, error);
 
 	// append errors if requested
-	if (error && error_string != NULL)
+	if (!error.empty() && error_string != NULL)
 		error_string->catprintf("While parsing %s:\n%s\n", file.fullpath(), error.c_str());
 
 	return result;

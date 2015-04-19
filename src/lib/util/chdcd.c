@@ -925,7 +925,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 			if (trknum == (outtoc.numtrks-1))
 			{
 				/* if we have the same filename as the last track, do it that way */
-				if (trknum != 0 && outinfo.track[trknum].fname == outinfo.track[trknum-1].fname)
+				if (trknum != 0 && (outinfo.track[trknum].fname.cmp(outinfo.track[trknum-1].fname)==0))
 				{
 					tlen = get_file_size(outinfo.track[trknum].fname.c_str());
 					if (tlen == 0)
@@ -952,7 +952,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 			else
 			{
 				/* if we have the same filename as the next track, do it that way */
-				if (outinfo.track[trknum].fname == outinfo.track[trknum+1].fname)
+				if (outinfo.track[trknum].fname.cmp(outinfo.track[trknum+1].fname)==0)
 				{
 					outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx0offs - outinfo.track[trknum].idx0offs;
 
