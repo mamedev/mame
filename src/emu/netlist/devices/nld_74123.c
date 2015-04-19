@@ -10,6 +10,8 @@
 
 NETLIB_START(74123)
 {
+	m_dev_type = 74123;
+
 	register_sub(m_RP, "RP");
 	register_sub(m_RN, "RN");
 
@@ -41,7 +43,13 @@ NETLIB_START(74123)
 
 NETLIB_UPDATE(74123)
 {
-	const netlist_sig_t m_trig = (INPLOGIC(m_A) ^ 1) & INPLOGIC(m_B) & INPLOGIC(m_CLRQ);
+	netlist_sig_t m_trig;
+
+	if (m_dev_type == 74123)
+		m_trig = (INPLOGIC(m_A) ^ 1) & INPLOGIC(m_B) & INPLOGIC(m_CLRQ);
+	else
+		// 9602
+		m_trig = (INPLOGIC(m_A) ^ 1) | INPLOGIC(m_B);
 
 	if (!INPLOGIC(m_CLRQ))
 	{
@@ -104,26 +112,28 @@ NETLIB_RESET(74123)
 
 NETLIB_START(74123_dip)
 {
-#if 0
 	register_sub(m_1, "1");
 	register_sub(m_2, "2");
-	register_sub(m_3, "3");
 
-	register_subalias("1", m_1.m_i[0]);
-	register_subalias("2", m_1.m_i[1]);
-	register_subalias("3", m_2.m_i[0]);
-	register_subalias("4", m_2.m_i[1]);
-	register_subalias("5", m_2.m_i[2]);
-	register_subalias("6", m_2.m_Q);
+	register_subalias("1", m_1.m_A);
+	register_subalias("2", m_1.m_B);
+	register_subalias("3", m_1.m_CLRQ);
+	register_subalias("4", m_1.m_QQ);
+	register_subalias("5", m_2.m_Q);
+	register_subalias("6", m_2.m_RN.m_N);
+	register_subalias("7", m_2.m_RN.m_P);
+	register_subalias("8", m_1.m_RN.m_N);
+	connect(m_1.m_RN.m_N, m_2.m_RN.m_N);
 
-	register_subalias("8", m_3.m_Q);
-	register_subalias("9", m_3.m_i[0]);
-	register_subalias("10", m_3.m_i[1]);
-	register_subalias("11", m_3.m_i[2]);
-
-	register_subalias("12", m_1.m_Q);
-	register_subalias("13", m_1.m_i[2]);
-#endif
+	register_subalias("9", m_2.m_A);
+	register_subalias("10", m_2.m_B);
+	register_subalias("11", m_2.m_CLRQ);
+	register_subalias("12", m_2.m_QQ);
+	register_subalias("13", m_1.m_Q);
+	register_subalias("14", m_1.m_RN.m_N);
+	register_subalias("15", m_1.m_RN.m_P);
+	register_subalias("16", m_1.m_RP.m_P);
+	connect(m_1.m_RP.m_P, m_2.m_RP.m_P);
 }
 
 NETLIB_UPDATE(74123_dip)
@@ -134,6 +144,48 @@ NETLIB_UPDATE(74123_dip)
 }
 
 NETLIB_RESET(74123_dip)
+{
+	m_1.do_reset();
+	m_2.do_reset();
+}
+
+NETLIB_START(9602_dip)
+{
+	register_sub(m_1, "1");
+	register_sub(m_2, "2");
+
+	m_1.m_dev_type = 9602;
+	m_2.m_dev_type = 9602;
+
+	register_subalias("1", m_1.m_RN.m_N); // C1
+	register_subalias("2", m_1.m_RN.m_P); // RC1
+	register_subalias("3", m_1.m_CLRQ);
+	register_subalias("4", m_1.m_B);
+	register_subalias("5", m_1.m_A);
+	register_subalias("6", m_1.m_Q);
+	register_subalias("7", m_1.m_QQ);
+	register_subalias("8", m_1.m_RN.m_N);
+	connect(m_1.m_RN.m_N, m_2.m_RN.m_N);
+
+	register_subalias("9", m_2.m_QQ);
+	register_subalias("10", m_2.m_Q);
+	register_subalias("11", m_2.m_A);
+	register_subalias("12", m_2.m_B);
+	register_subalias("13", m_2.m_CLRQ);
+	register_subalias("14", m_2.m_RN.m_P); // RC2
+	register_subalias("15", m_2.m_RN.m_N); // C2
+	register_subalias("16", m_1.m_RP.m_P);
+	connect(m_1.m_RP.m_P, m_2.m_RP.m_P);
+}
+
+NETLIB_UPDATE(9602_dip)
+{
+	/* only called during startup */
+	m_1.update_dev();
+	m_2.update_dev();
+}
+
+NETLIB_RESET(9602_dip)
 {
 	m_1.do_reset();
 	m_2.do_reset();
