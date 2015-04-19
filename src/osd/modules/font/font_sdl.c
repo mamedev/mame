@@ -55,7 +55,7 @@ bool osd_font_sdl::open(const char *font_path, const char *_name, int &height)
 	// accept qualifiers from the name
 	astring name(_name);
 
-	if (name == "default")
+	if (name.cmp("default")==0)
 	{
 		name = "Liberation Sans";
 	}
