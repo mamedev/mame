@@ -2646,9 +2646,9 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 	if (TRACE_LIVE)
 	{
 		if (limit == attotime::never)
-			logerror("%s: [%s] live_run_hd, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).cstr(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s] live_run_hd, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 		else
-			logerror("%s: [%s] live_run_hd until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).cstr(), tts(limit).cstr(), m_live_state.state, fm_mode()? "FM":"MFM");
+			logerror("%s: [%s] live_run_hd until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).c_str(), tts(limit).c_str(), m_live_state.state, fm_mode()? "FM":"MFM");
 	}
 	while (true)
 	{
@@ -3308,7 +3308,7 @@ void hdc9234_device::auxbus_out()
 	m_output2 = (m_output2 & 0xb0) | desired_head();
 	if (m_reduced_write_current) m_output2 |= OUT2_REDWRT;
 
-	if (TRACE_AUXBUS) logerror("%s: [%s] Setting OUTPUT1=%02x, OUTPUT2=%02x\n", tag(), ttsn().cstr(), m_output1, m_output2);
+	if (TRACE_AUXBUS) logerror("%s: [%s] Setting OUTPUT1=%02x, OUTPUT2=%02x\n", tag(), ttsn().c_str(), m_output1, m_output2);
 
 	if (m_output1 != m_output1_old || m_output2 != m_output2_old)
 	{

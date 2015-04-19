@@ -846,6 +846,7 @@ void myarc_hfdc_device::device_start()
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = NULL;
+	m_current_harddisk = NULL;
 }
 
 void myarc_hfdc_device::device_reset()
