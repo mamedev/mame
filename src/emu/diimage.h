@@ -280,7 +280,7 @@ protected:
 	astring m_filetype;
 
 	/* working directory; persists across mounts */
-	astring m_working_directory;
+	std::string m_working_directory;
 
 	/* Software information */
 	astring m_full_software_name;

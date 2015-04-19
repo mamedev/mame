@@ -219,7 +219,7 @@ static int is_valid_filename_char(unicode_char unichar)
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_create::ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool *ok)
+ui_menu_file_create::ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok)
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
 		m_current_file(current_file)
@@ -257,14 +257,14 @@ void ui_menu_file_create::custom_render(void *selectedref, float top, float bott
 
 void ui_menu_file_create::populate()
 {
-	astring buffer;
+	std::string buffer;
 	const image_device_format *format;
 	const char *new_image_name;
 
 	// append the "New Image Name" item
 	if (get_selection() == ITEMREF_NEW_IMAGE_NAME)
 	{
-		buffer.cat(m_filename_buffer).cat("_");
+		buffer.append(m_filename_buffer).append("_");
 		new_image_name = buffer.c_str();
 	}
 	else
@@ -307,10 +307,10 @@ void ui_menu_file_create::handle()
 			case IPT_UI_SELECT:
 				if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
 				{
-					astring tmp_file(m_filename_buffer);
-					if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.len() - 1)
+					std::string tmp_file(m_filename_buffer);
+					if (tmp_file.find(".") != -1 && tmp_file.find(".") < tmp_file.length() - 1)
 					{
-						m_current_file.cpy(m_filename_buffer);
+						m_current_file.append(m_filename_buffer);
 						ui_menu::stack_pop(machine());
 					}
 					else
@@ -344,7 +344,7 @@ void ui_menu_file_create::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
+ui_menu_file_selector::ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result)
 	: ui_menu(machine, container),
 		m_current_directory(current_directory),
 		m_current_file(current_file)
@@ -456,7 +456,7 @@ ui_menu_file_selector::file_selector_entry *ui_menu_file_selector::append_entry(
 
 ui_menu_file_selector::file_selector_entry *ui_menu_file_selector::append_dirent_entry(const osd_directory_entry *dirent)
 {
-	astring buffer;
+	std::string buffer;
 	file_selector_entry_type entry_type;
 	file_selector_entry *entry;
 
@@ -664,13 +664,13 @@ void ui_menu_file_selector::handle()
 						machine().ui().popup_time(1, "Error accessing %s", entry->fullpath);
 						break;
 					}
-					m_current_directory.cpy(entry->fullpath);
+					m_current_directory.assign(entry->fullpath);
 					reset((ui_menu_reset_options)0);
 					break;
 
 				case SELECTOR_ENTRY_TYPE_FILE:
 					// file
-					m_current_file.cpy(entry->fullpath);
+					m_current_file.assign(entry->fullpath);
 					*m_result = R_FILE;
 					ui_menu::stack_pop(machine());
 					break;

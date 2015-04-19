@@ -320,10 +320,10 @@ void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int
 	index_resync();
 }
 
-floppy_image_format_t *floppy_image_device::identify(astring filename)
+floppy_image_format_t *floppy_image_device::identify(std::string filename)
 {
 	core_file *fd;
-	astring revised_path;
+	std::string revised_path;
 
 	file_error err = zippath_fopen(filename.c_str(), OPEN_FLAG_READ, fd, revised_path);
 	if(err) {
@@ -862,7 +862,7 @@ ui_menu_control_floppy_image::~ui_menu_control_floppy_image()
 void ui_menu_control_floppy_image::do_load_create()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
-	if(input_filename.cmp("")==0) {
+	if(input_filename.compare("")==0) {
 		int err = fd->create(output_filename.c_str(), 0, NULL);
 		if (err != 0) {
 			popmessage("Error: %s", fd->error());
@@ -871,7 +871,7 @@ void ui_menu_control_floppy_image::do_load_create()
 		fd->setup_write(output_format);
 	} else {
 		int err = fd->load(input_filename.c_str());
-		if(!err && output_filename.cmp("")!=0)
+		if (!err && output_filename.compare("") != 0)
 			err = fd->reopen_for_write(output_filename.c_str());
 		if(err != 0) {
 			popmessage("Error: %s", fd->error());
@@ -882,7 +882,7 @@ void ui_menu_control_floppy_image::do_load_create()
 	}
 }
 
-void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
+void ui_menu_control_floppy_image::hook_load(std::string filename, bool softlist)
 {
 	if (softlist)
 	{
@@ -905,7 +905,7 @@ void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 	bool can_in_place = input_format->supports_save();
 	if(can_in_place) {
 		file_error filerr = FILERR_NOT_FOUND;
-		astring tmp_path;
+		std::string tmp_path;
 		core_file *tmp_file;
 		/* attempt to open the file for writing but *without* create */
 		filerr = zippath_fopen(filename.c_str(), OPEN_FLAG_READ | OPEN_FLAG_WRITE, tmp_file, tmp_path);

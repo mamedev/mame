@@ -120,7 +120,7 @@ void ui_menu_software_parts::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, astring &result)
+ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, std::string &result)
 	: ui_menu(machine, container), m_result(result)
 {
 	m_swlist = swlist;

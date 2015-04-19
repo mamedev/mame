@@ -573,7 +573,7 @@ image_error_t device_image_interface::load_image_by_path(UINT32 open_flags, cons
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
-	astring revised_path;
+	std::string revised_path;
 
 	/* attempt to read the file */
 	filerr = zippath_fopen(path, open_flags, m_file, revised_path);
@@ -627,7 +627,7 @@ int device_image_interface::reopen_for_write(const char *path)
 
 	file_error filerr = FILERR_NOT_FOUND;
 	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
-	astring revised_path;
+	std::string revised_path;
 
 	/* attempt to open the file for writing*/
 	filerr = zippath_fopen(path, OPEN_FLAG_READ|OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, m_file, revised_path);
