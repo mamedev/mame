@@ -48,18 +48,18 @@ public:
 	friend astring operator+(const char *lhs, const astring &rhs) { return astring(lhs) += rhs; }
 
 	// comparison operators
-	bool operator==(const char *string) const { return (cmp(string) == 0); }
-	bool operator==(const astring &string) const { return (cmp(string) == 0); }
-	bool operator!=(const char *string) const { return (cmp(string) != 0); }
-	bool operator!=(const astring &string) const { return (cmp(string) != 0); }
-	bool operator<(const char *string) const { return (cmp(string) < 0); }
-	bool operator<(const astring &string) const { return (cmp(string) < 0); }
-	bool operator<=(const char *string) const { return (cmp(string) <= 0); }
-	bool operator<=(const astring &string) const { return (cmp(string) <= 0); }
-	bool operator>(const char *string) const { return (cmp(string) > 0); }
-	bool operator>(const astring &string) const { return (cmp(string) > 0); }
-	bool operator>=(const char *string) const { return (cmp(string) >= 0); }
-	bool operator>=(const astring &string) const { return (cmp(string) >= 0); }
+//	bool operator==(const char *string) const { return (cmp(string) == 0); }
+//	bool operator==(const astring &string) const { return (cmp(string) == 0); }
+//	bool operator!=(const char *string) const { return (cmp(string) != 0); }
+//	bool operator!=(const astring &string) const { return (cmp(string) != 0); }
+//	bool operator<(const char *string) const { return (cmp(string) < 0); }
+//	bool operator<(const astring &string) const { return (cmp(string) < 0); }
+//	bool operator<=(const char *string) const { return (cmp(string) <= 0); }
+//	bool operator<=(const astring &string) const { return (cmp(string) <= 0); }
+//	bool operator>(const char *string) const { return (cmp(string) > 0); }
+//	bool operator>(const astring &string) const { return (cmp(string) > 0); }
+//	bool operator>=(const char *string) const { return (cmp(string) >= 0); }
+//	bool operator>=(const astring &string) const { return (cmp(string) >= 0); }
 
 	// character access operators
 	char operator[](int index) const { return (index < len()) ? m_text[index] : 0; }

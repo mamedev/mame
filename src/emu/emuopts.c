@@ -484,10 +484,10 @@ const game_driver *emu_options::system() const
 void emu_options::set_system_name(const char *name)
 {
 	// remember the original system name
-	astring old_system_name(system_name());
+	std::string old_system_name(system_name());
 
 	// if the system name changed, fix up the device options
-	if (old_system_name != name)
+	if (old_system_name.compare(name)!=0)
 	{
 		// first set the new name
 		astring error;

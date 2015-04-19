@@ -461,7 +461,7 @@ void a5200_cart_slot_device::get_default_card_software(std::string &result)
 			type = identify_cart_type(&head[0]);
 
 			astring info;
-			if (hashfile_extrainfo(*this, info) && info == "A13MIRRORING")
+			if (hashfile_extrainfo(*this, info) && info.cmp("A13MIRRORING")==0)
 				type = A5200_16K_2CHIPS;
 		}
 		if (type < A5200_4K)

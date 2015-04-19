@@ -1075,7 +1075,7 @@ static void parse_compression(const parameters_t &params, chd_codec_type compres
 		return;
 
 	// special case: 'none'
-	if (*compression_str == "none")
+	if (compression_str->cmp("none")==0)
 	{
 		compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
 		return;

@@ -862,7 +862,7 @@ ui_menu_control_floppy_image::~ui_menu_control_floppy_image()
 void ui_menu_control_floppy_image::do_load_create()
 {
 	floppy_image_device *fd = static_cast<floppy_image_device *>(image);
-	if(input_filename == "") {
+	if(input_filename.cmp("")==0) {
 		int err = fd->create(output_filename.c_str(), 0, NULL);
 		if (err != 0) {
 			popmessage("Error: %s", fd->error());
@@ -871,7 +871,7 @@ void ui_menu_control_floppy_image::do_load_create()
 		fd->setup_write(output_format);
 	} else {
 		int err = fd->load(input_filename.c_str());
-		if(!err && output_filename != "")
+		if(!err && output_filename.cmp("")!=0)
 			err = fd->reopen_for_write(output_filename.c_str());
 		if(err != 0) {
 			popmessage("Error: %s", fd->error());

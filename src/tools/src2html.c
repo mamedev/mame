@@ -833,7 +833,7 @@ static bool find_include_file(astring &srcincpath, int srcrootlen, int dstrootle
 	for (include_path *curpath = incpaths; curpath != NULL; curpath = curpath->next)
 	{
 		// a '.' include path is specially treated
-		if (curpath->path == ".")
+		if (curpath->path.cmp(".")==0)
 			srcincpath.cpysubstr(srcfile, 0, srcfile.rchr(0, PATH_SEPARATOR[0]));
 		else
 			srcincpath.cpysubstr(srcfile, 0, srcrootlen + 1).cat(curpath->path);
@@ -845,7 +845,7 @@ static bool find_include_file(astring &srcincpath, int srcrootlen, int dstrootle
 		{
 			// handle .. by removing a chunk from the incpath
 			astring pathpart(filename, lastsepindex, sepindex - lastsepindex);
-			if (pathpart == "..")
+			if (pathpart.cmp("..")==0)
 			{
 				sepindex = srcincpath.rchr(0, PATH_SEPARATOR[0]);
 				if (sepindex != -1)

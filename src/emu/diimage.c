@@ -1171,18 +1171,18 @@ void device_image_interface::update_names(const device_type device_type, const c
 //  case.
 //-------------------------------------------------
 
-void device_image_interface::software_name_split(const char *swlist_swname, astring &swlist_name, astring &swname, astring &swpart)
+void device_image_interface::software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart)
 {
 	// reset all output parameters
-	swlist_name.reset();
-	swname.reset();
-	swpart.reset();
+	swlist_name.clear();
+	swname.clear();
+	swpart.clear();
 
 	// if no colon, this is the swname by itself
 	const char *split1 = strchr(swlist_swname, ':');
 	if (split1 == NULL)
 	{
-		swname.cpy(swlist_swname);
+		swname.assign(swlist_swname);
 		return;
 	}
 
@@ -1190,22 +1190,22 @@ void device_image_interface::software_name_split(const char *swlist_swname, astr
 	const char *split2 = strchr(split1 + 1, ':');
 	if (split2 == NULL)
 	{
-		swname.cpy(swlist_swname, split1 - swlist_swname);
-		swpart.cpy(split1 + 1);
+		swname.assign(swlist_swname, split1 - swlist_swname);
+		swpart.assign(split1 + 1);
 		return;
 	}
 
 	// if two colons present, split into 3 parts
-	swlist_name.cpy(swlist_swname, split1 - swlist_swname);
-	swname.cpy(split1 + 1, split2 - (split1 + 1));
-	swpart.cpy(split2 + 1);
+	swlist_name.assign(swlist_swname, split1 - swlist_swname);
+	swname.assign(split1 + 1, split2 - (split1 + 1));
+	swpart.assign(split2 + 1);
 }
 
 
 software_part *device_image_interface::find_software_item(const char *path, bool restrict_to_interface)
 {
 	// split full software name into software list name and short software name
-	astring swlist_name, swinfo_name, swpart_name;
+	std::string swlist_name, swinfo_name, swpart_name;
 	software_name_split(path, swlist_name, swinfo_name, swpart_name);
 
 	// determine interface
@@ -1217,7 +1217,7 @@ software_part *device_image_interface::find_software_item(const char *path, bool
 	software_list_device_iterator deviter(device().mconfig().root_device());
 	for (software_list_device *swlistdev = deviter.first(); swlistdev != NULL; swlistdev = deviter.next())
 	{
-		if (swlist_name == swlistdev->list_name() || !(swlist_name.len() > 0))
+		if (swlist_name.compare(swlistdev->list_name())==0 || !(swlist_name.length() > 0))
 		{
 			software_info *info = swlistdev->find(swinfo_name.c_str());
 			if (info != NULL)

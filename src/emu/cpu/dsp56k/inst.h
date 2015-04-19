@@ -358,7 +358,7 @@ public:
 
 		assemble_D_from_P_table(BITSn(word0,0x0020), BITSn(word0,0x001f), dString);
 
-		if (dString == "!!")
+		if (dString.cmp("!!")==0)
 			return false;
 
 		switch(BITSn(word1,0x1f00))
@@ -1847,7 +1847,7 @@ public:
 	void disassemble(astring& retString) const
 	{
 		astring ts = m_sign;
-		if (ts != "-") ts = "";
+		if (ts.cmp("-") != 0) ts = "";
 		retString = "mac " +
 					ts +
 					regIdAsString(m_source) + "," +
@@ -1941,7 +1941,7 @@ public:
 	void disassemble(astring& retString) const
 	{
 		astring ts = m_sign;
-		if (ts != "-") ts = "";
+		if (ts.cmp("-")!=0) ts = "";
 		retString = "macr " +
 					ts +
 					regIdAsString(m_source) + "," +
@@ -2685,7 +2685,7 @@ public:
 	void disassemble(astring& retString) const
 	{
 		astring ts = m_sign;
-		if (ts != "-") ts = "";
+		if (ts.cmp("-")!=0) ts = "";
 		retString = "mpy " +
 					ts +
 					regIdAsString(m_source) + "," +
@@ -2781,7 +2781,7 @@ public:
 	void disassemble(astring& retString) const
 	{
 		astring ts = m_sign;
-		if (ts != "-") ts = "";
+		if (ts.cmp("-") != 0) ts = "";
 		retString = "mpyr " +
 					ts +
 					regIdAsString(m_source) + "," +

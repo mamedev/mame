@@ -47,7 +47,7 @@ bool osd_font_windows::open(const char *font_path, const char *_name, int &heigh
 {
 	// accept qualifiers from the name
 	astring name(_name);
-	if (name == "default") name = "Tahoma";
+	if (name.cmp("default")==0) name = "Tahoma";
 	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
 	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
 

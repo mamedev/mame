@@ -225,8 +225,8 @@ int machine_manager::execute()
 		// check the state of the machine
 		if (m_new_driver_pending)
 		{
-			astring old_system_name(m_options.system_name());
-			bool new_system = (old_system_name != m_new_driver_pending->name);
+			std::string old_system_name(m_options.system_name());
+			bool new_system = (old_system_name.compare(m_new_driver_pending->name)!=0);
 			// first: if we scheduled a new system, remove device options of the old system
 			// notice that, if we relaunch the same system, there is no effect on the emulation
 			if (new_system)

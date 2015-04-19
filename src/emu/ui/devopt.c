@@ -158,11 +158,11 @@ void ui_menu_device_config::populate()
 	int bios = 0;
 	if (dev->rom_region())
 	{
-		astring bios_str;
+		std::string bios_str;
 		// first loop through roms in search of default bios (shortname)
 		for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
 			if (ROMENTRY_ISDEFAULT_BIOS(rom))
-				bios_str.cpy(ROM_GETNAME(rom));
+				bios_str.assign(ROM_GETNAME(rom));
 
 		// then loop again to count bios options and to get the default bios complete name
 		for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
@@ -170,8 +170,8 @@ void ui_menu_device_config::populate()
 			if (ROMENTRY_ISSYSTEM_BIOS(rom))
 			{
 				bios++;
-				if (bios_str == ROM_GETNAME(rom))
-					bios_str.cpy(ROM_GETHASHDATA(rom));
+				if (bios_str.compare(ROM_GETNAME(rom))==0)
+					bios_str.assign(ROM_GETHASHDATA(rom));
 			}
 		}
 

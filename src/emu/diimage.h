@@ -234,7 +234,7 @@ public:
 	bool load_software(software_list_device &swlist, const char *swname, const rom_entry *entry);
 	int reopen_for_write(const char *path);
 
-	static void software_name_split(const char *swlist_swname, astring &swlist_name, astring &swname, astring &swpart);
+	static void software_name_split(const char *swlist_swname, std::string &swlist_name, std::string &swname, std::string &swpart);
 
 protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args, bool just_load);

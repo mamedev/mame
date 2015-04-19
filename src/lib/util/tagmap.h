@@ -15,7 +15,7 @@
 
 #include "osdcore.h"
 #include "coretmpl.h"
-#include "astring.h"
+#include <string>
 #ifdef MAME_DEBUG
 #include "eminline.h"
 #endif
@@ -67,7 +67,7 @@ public:
 				m_object(object) { }
 
 		// accessors
-		const astring &tag() const { return m_tag; }
+		const std::string &tag() const { return m_tag; }
 		_ElementType object() const { return m_object; }
 
 		// setters
@@ -81,7 +81,7 @@ public:
 		// internal state
 		entry_t *       m_next;
 		UINT32          m_fullhash;
-		astring         m_tag;
+		std::string     m_tag;
 		_ElementType    m_object;
 	};
 

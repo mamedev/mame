@@ -240,8 +240,8 @@ private:
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const astring &opt_name)
 	{
-		astring opt_val = opts.value(opt_name.c_str());
-		if (opt_val == "auto")
+		std::string opt_val = opts.value(opt_name.c_str());
+		if (opt_val.compare("auto")==0)
 			opt_val = "";
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
 		{
