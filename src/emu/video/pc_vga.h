@@ -237,7 +237,7 @@ public:
 	ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void set_vga(const char* tag) { m_vga_tag.cpy(tag); }
+	void set_vga(const char* tag) { m_vga_tag.assign(tag); }
 	void set_vga_owner() { m_vga = dynamic_cast<vga_device*>(owner()); }
 
 	void enabled();
@@ -343,7 +343,7 @@ protected:
 	virtual void device_start();
 	virtual void device_config_complete();
 	vga_device* m_vga;  // for pass-through
-	astring m_vga_tag;  // pass-through device tag
+	std::string m_vga_tag;  // pass-through device tag
 private:
 	void ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw);
 	void ibm8514_wait_draw_ssv();

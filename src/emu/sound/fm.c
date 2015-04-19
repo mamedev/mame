@@ -3673,14 +3673,13 @@ void ym2610_reset_chip(void *chip)
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 
-	astring name;
 	device_t* dev = F2610->OPN.ST.device;
+	std::string name(dev->tag());
 
 	/* setup PCM buffers again */
-	name.printf("%s",dev->tag());
 	F2610->pcmbuf = (const UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
 	F2610->pcm_size = dev->machine().root_device().memregion(name.c_str())->bytes();
-	name.printf("%s.deltat",dev->tag());
+	name.append(".deltat");
 	F2610->deltaT.memory = (UINT8 *)dev->machine().root_device().memregion(name.c_str())->base();
 	if(F2610->deltaT.memory == NULL)
 	{

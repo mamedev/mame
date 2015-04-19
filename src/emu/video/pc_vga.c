@@ -351,7 +351,7 @@ void ibm8514a_device::device_start()
 
 void ibm8514a_device::device_config_complete()
 {
-	if(m_vga_tag.len() != 0)
+	if(m_vga_tag.length() != 0)
 	{
 		m_vga = machine().device<vga_device>(m_vga_tag.c_str());
 	}
