@@ -48,6 +48,20 @@ harddisk_image_device::harddisk_image_device(const machine_config &mconfig, cons
 }
 
 //-------------------------------------------------
+//  harddisk_image_device - constructor for subclasses
+//------------------------------------------------- 
+harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_image_interface(mconfig, *this),
+		m_chd(NULL),
+		m_hard_disk_handle(NULL),
+		m_device_image_load(device_image_load_delegate()),
+		m_device_image_unload(device_image_func_delegate()),
+		m_interface(NULL)
+{
+}
+
+//-------------------------------------------------
 //  harddisk_image_device - destructor
 //-------------------------------------------------
 

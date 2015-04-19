@@ -24,37 +24,37 @@
 #include "hdc9234.h"
 
 // Per-command debugging
-#define TRACE_SELECT 0
-#define TRACE_STEP 0
-#define TRACE_RESTORE 0
-#define TRACE_SUBSTATES 0
-#define TRACE_READ 0
-#define TRACE_WRITE 0
-#define TRACE_READREG 0
-#define TRACE_SETREG 0
-#define TRACE_SETPTR 0
-#define TRACE_FORMAT 0
-#define TRACE_READTRACK 0
+#define TRACE_SELECT 1
+#define TRACE_STEP 1
+#define TRACE_RESTORE 1
+#define TRACE_SUBSTATES 1
+#define TRACE_READ 1
+#define TRACE_WRITE 1
+#define TRACE_READREG 1
+#define TRACE_SETREG 1
+#define TRACE_SETPTR 1
+#define TRACE_FORMAT 1
+#define TRACE_READTRACK 1
 
 // Common states
-#define TRACE_READID 0
-#define TRACE_VERIFY 0
-#define TRACE_TRANSFER 0
+#define TRACE_READID 1
+#define TRACE_VERIFY 1
+#define TRACE_TRANSFER 1
 
 // Live states debugging
-#define TRACE_LIVE 0
-#define TRACE_SHIFT 0
-#define TRACE_SYNC 0
+#define TRACE_LIVE 1
+#define TRACE_SHIFT 1
+#define TRACE_SYNC 1
 
 // Misc debugging
 #define TRACE_DELAY 0
-#define TRACE_INT 0
-#define TRACE_LINES 0
-#define TRACE_INDEX 0
-#define TRACE_DMA 0
-#define TRACE_DONE 0
-#define TRACE_FAIL 0
-#define TRACE_AUXBUS 0
+#define TRACE_INT 1
+#define TRACE_LINES 1
+#define TRACE_INDEX 1
+#define TRACE_DMA 1
+#define TRACE_DONE 1
+#define TRACE_FAIL 1
+#define TRACE_AUXBUS 1
 
 #define TRACE_DETAIL 0
 
@@ -239,8 +239,8 @@ enum
 enum
 {
 	GEN_TIMER = 1,
-	COM_TIMER,
-	LIVE_TIMER
+	COM_TIMER /*,
+	LIVE_TIMER */
 };
 
 /*
@@ -1027,6 +1027,7 @@ void hdc9234_device::drive_deselect()
 {
 	if (TRACE_SELECT) logerror("%s: DESELECT command\n", tag());
 	m_selected_drive_number = NODRIVE;
+	m_output1 = 0x00;
 	set_command_done(TC_SUCCESS);
 }
 
@@ -1066,7 +1067,7 @@ void hdc9234_device::restore_drive()
 			// Track 0 has not been reached yet
 			if ((m_register_r[DRIVE_STATUS] & HDC_DS_READY)==0)
 			{
-				if (TRACE_RESTORE) logerror("%s: restore command: drive not ready\n", tag());
+				if (TRACE_RESTORE) logerror("%s: restore command: Drive not ready\n", tag());
 				// Does not look like a success, but this takes into account
 				// that if a drive is not connected we do not want an error message
 				cont = SUCCESS;
@@ -1081,6 +1082,7 @@ void hdc9234_device::restore_drive()
 					// When we have buffered steps, the seek limit will be reached
 					// before TRK00 is asserted. In that case we have to wait for
 					// SEEK_COMPLETE. We also wait as soon as TRK00 is asserted.
+					if (TRACE_RESTORE) logerror("%s: restore using buffered steps\n", tag());
 					wait_line(SEEKCOMP_LINE, ASSERT_LINE, SEEK_COMPLETE, false);
 					cont = WAIT;
 				}
@@ -1809,7 +1811,8 @@ void hdc9234_device::live_start(int state)
 
 void hdc9234_device::live_run()
 {
-	live_run_until(attotime::never);
+	if (using_floppy()) live_run_until(attotime::never);
+	else live_run_hd_until(attotime::never);
 }
 
 /*
@@ -1817,6 +1820,8 @@ void hdc9234_device::live_run()
     the requested data are read.
     limit: if unlimited (attotime::never), run up to the end of the track and wait there
     otherwise, used to replay the read/write operation up to the point where the event happened
+    
+    THIS IS THE FLOPPY-ONLY LIVE_RUN
 */
 void hdc9234_device::live_run_until(attotime limit)
 {
@@ -2623,6 +2628,40 @@ void hdc9234_device::live_run_until(attotime limit)
 }
 
 /*
+    The main method of the live state machine. We stay in this method until
+    the requested data are read.
+    limit: if unlimited (attotime::never), run up to the end of the track and wait there
+    otherwise, used to replay the read/write operation up to the point where the event happened
+    
+    THIS IS THE HARDDISK-ONLY LIVE_RUN
+*/
+void hdc9234_device::live_run_hd_until(attotime limit)
+{
+	int slot = 0;
+	logerror("%s: live_run_hd\n", tag());
+	
+	if (m_live_state.state == IDLE || m_live_state.next_state != -1)
+		return;
+
+	if (TRACE_LIVE)
+	{
+		if (limit == attotime::never)
+			logerror("%s: [%s] live_run_hd, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).cstr(), m_live_state.state, fm_mode()? "FM":"MFM");
+		else
+			logerror("%s: [%s] live_run_hd until %s, live_state=%d, mode=%s\n", tag(), tts(m_live_state.time).cstr(), tts(limit).cstr(), m_live_state.state, fm_mode()? "FM":"MFM");
+	}
+	while (true)
+	{
+		switch (m_live_state.state)
+		{
+			case SEARCH_IDAM:
+				break;
+		}		
+		return;
+	}
+}
+
+/*
     Synchronize the live position on the track with the real time.
     Results in a new checkpoint and a live position at machine time or behind.
     As a side effect, portions of the track may be re-read
@@ -3269,7 +3308,7 @@ void hdc9234_device::auxbus_out()
 	m_output2 = (m_output2 & 0xb0) | desired_head();
 	if (m_reduced_write_current) m_output2 |= OUT2_REDWRT;
 
-	if (TRACE_AUXBUS) logerror("%s: Setting OUTPUT2 to %02x\n", tag(), m_output2);
+	if (TRACE_AUXBUS) logerror("%s: [%s] Setting OUTPUT1=%02x, OUTPUT2=%02x\n", tag(), ttsn().cstr(), m_output1, m_output2);
 
 	if (m_output1 != m_output1_old || m_output2 != m_output2_old)
 	{
@@ -3338,6 +3377,14 @@ void hdc9234_device::connect_floppy_drive(floppy_image_device* floppy)
 }
 
 /*
+    Connect the current hard drive.
+*/
+void hdc9234_device::connect_hard_drive(mfm_harddisk_device* harddisk)
+{
+	m_harddisk = harddisk;
+}
+
+/*
     Clock divider. This input line actually belongs to the data separator which
     is a separate circuit. Maybe we will take it out of this implementation
     at some time and make it a device of its own.
@@ -3363,9 +3410,9 @@ void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case COM_TIMER:
 		process_command();
 		break;
-	case LIVE_TIMER:
+	/* case LIVE_TIMER:
 		live_run();
-		break;
+		break; */
 	}
 }
 
@@ -3393,7 +3440,7 @@ void hdc9234_device::device_start()
 	// allocate timers
 	m_timer = timer_alloc(GEN_TIMER);
 	m_cmd_timer = timer_alloc(COM_TIMER);
-	m_live_timer = timer_alloc(LIVE_TIMER);
+	// m_live_timer = timer_alloc(LIVE_TIMER);
 
 	m_live_state.state = IDLE;
 }

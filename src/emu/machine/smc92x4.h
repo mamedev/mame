@@ -99,7 +99,7 @@ public:
 	// Used to reconfigure the drive connections. Drive selection is done
 	// using the select lines and maybe also the user-programmable outputs.
 	void connect_floppy_drive(legacy_floppy_image_device *drive);
-	void connect_hard_drive(mfm_harddisk_device *drive);
+	void connect_hard_drive(mfm_harddisk_legacy_device *drive);
 
 	void reset();
 
@@ -223,7 +223,7 @@ private:
 	// We expect the embedding board to replace the drive according to the
 	// select lines.
 	legacy_floppy_image_device    *m_drive;
-	mfm_harddisk_device           *m_harddisk;
+	mfm_harddisk_legacy_device    *m_harddisk;
 };
 
 #endif

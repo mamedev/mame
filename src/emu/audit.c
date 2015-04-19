@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "audit.h"
-#include "harddisk.h"
+#include "chd.h"
 #include "sound/samples.h"
 
 
