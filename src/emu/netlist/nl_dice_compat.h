@@ -46,6 +46,15 @@ public:
 		Mono555Desc(nl_double res, nl_double cap) : r(res), c(cap) { }
 };
 
+struct Mono9602Desc
+{
+public:
+		nl_double r1, c1, r2, c2;
+
+		Mono9602Desc(nl_double res1, nl_double cap1, nl_double res2, nl_double cap2)
+		: r1(res1), c1(cap1), r2(res2), c2(cap2) { }
+};
+
 struct SeriesRCDesc
 {
 public:
@@ -65,6 +74,23 @@ public:
 	NET_CSTR(# _name "_C.2", "GND") \
 	NET_C(_name.8, V5) \
 	NET_CSTR(# _name ".1", "GND")
+
+#define CHIP_9602_Mono(_name,  _pdesc)   \
+	CHIP(# _name, 9602) \
+	NET_C(VCC, _name.16)		\
+	NET_C(GND, _name.8)  		\
+	RES(_name ## _R1, (_pdesc)->r1) \
+	CAP(_name ## _C1, (_pdesc)->c1) \
+	RES(_name ## _R2, (_pdesc)->r2) \
+	CAP(_name ## _C2, (_pdesc)->c2) \
+	NET_C(_name.1, _name ## _C1.1) \
+	NET_C(_name.2, _name ## _C1.2) \
+	NET_C(_name.2, _name ## _R1.2) \
+	NET_C(VCC, 	   _name ## _R1.1) \
+	NET_C(_name.15, _name ## _C2.1) \
+	NET_C(_name.14, _name ## _C2.2) \
+	NET_C(_name.14, _name ## _R2.2) \
+	NET_C(VCC, 	   _name ## _R2.1) \
 
 #define CHIP_SERIES_RC(_name,  _pdesc)   \
 	RES(_name ## _R, (_pdesc)->r) \
