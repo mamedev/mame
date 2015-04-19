@@ -3032,8 +3032,8 @@ MACHINE_START_MEMBER(amstrad_state,plus)
 	m_system_type = SYSTEM_PLUS;
 	m_centronics->write_data7(0);
 
-	astring region_tag;
-	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (!m_region_cart) // this should never happen, since we make carts mandatory!
 		m_region_cart = memregion("maincpu");
 }
@@ -3076,8 +3076,8 @@ MACHINE_START_MEMBER(amstrad_state,gx4000)
 	m_asic.ram = m_region_user1->base();  // 16kB RAM for ASIC, memory-mapped registers.
 	m_system_type = SYSTEM_GX4000;
 
-	astring region_tag;
-	m_region_cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_region_cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (!m_region_cart) // this should never happen, since we make carts mandatory!
 		m_region_cart = memregion("maincpu");
 }

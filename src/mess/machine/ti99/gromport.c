@@ -2285,7 +2285,7 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 				global_free_array(contents);
 				throw rpk_exception(RPK_INVALID_RAM_SPEC, "<ram type='persistent'> must have a 'file' attribute");
 			}
-			astring ram_pathname = astring(system_name).cat(PATH_SEPARATOR).cat(ram_filename);
+			std::string ram_pathname = std::string(system_name).append(PATH_SEPARATOR).append(ram_filename);
 			ram_pname = core_strdup(ram_pathname.c_str());
 			// load, and fill rest with 00
 			if (VERBOSE>6) LOG("gromport/RPK: Loading NVRAM contents from '%s'\n", ram_pname);

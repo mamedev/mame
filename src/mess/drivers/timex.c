@@ -544,8 +544,8 @@ MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 	m_port_ff_data = 0;
 	m_port_f4_data = 0;
 
-	astring region_tag;
-	m_dock_crt = memregion(region_tag.cpy(m_dock->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_dock_crt = memregion(region_tag.assign(m_dock->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	m_dock_cart_type = m_dock_crt ? TIMEX_CART_DOCK : TIMEX_CART_NONE;
 
 	ts2068_update_memory();

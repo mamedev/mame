@@ -1228,9 +1228,9 @@ DRIVER_INIT_MEMBER( px4p_state, px4p )
 
 void px4_state::machine_start()
 {
-	astring region_tag;
-	m_caps1_rom = memregion(region_tag.cpy(m_caps1->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
-	m_caps2_rom = memregion(region_tag.cpy(m_caps2->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_caps1_rom = memregion(region_tag.assign(m_caps1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_caps2_rom = memregion(region_tag.assign(m_caps2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	m_nvram->set_base(m_ram->pointer(), 0x10000);
 

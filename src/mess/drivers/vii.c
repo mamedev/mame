@@ -1023,8 +1023,8 @@ void vii_state::machine_start()
 
 	if (m_cart && m_cart->exists())
 	{
-		astring region_tag;
-		m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+		std::string region_tag;
+		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 		memcpy(&m_p_cart[0], m_cart_rom->base(), 0x400000 * 2);
 	}
 	else if (m_spg243_mode == SPG243_VII)   // Vii bios is banked

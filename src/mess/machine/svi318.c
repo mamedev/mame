@@ -421,8 +421,8 @@ DRIVER_INIT_MEMBER(svi318_state, svi328_806)
 
 void svi318_state::machine_start()
 {
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	m_bios_rom = memregion("maincpu");
 
 	// 80 column card start

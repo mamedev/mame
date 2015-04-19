@@ -25,9 +25,9 @@ void gamecom_state::machine_reset()
 	m_lcv_reg = 0x27;
 	m_lcdc_reg = 0xb0;
 
-	astring region_tag;
-	m_cart1_rom = memregion(region_tag.cpy(m_cart1->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
-	m_cart2_rom = memregion(region_tag.cpy(m_cart2->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart1_rom = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_cart2_rom = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 }
 
 void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data)

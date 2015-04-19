@@ -1173,8 +1173,8 @@ void vboy_state::machine_start()
 	// trampoline (but forces us to alloc always a 0x200000-wide region)
 	if (m_cart->exists())
 	{
-		astring region_tag;
-		m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(VBOYSLOT_ROM_REGION_TAG).c_str());
+		std::string region_tag;
+		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(VBOYSLOT_ROM_REGION_TAG).c_str());
 
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x07000000, 0x071fffff, 0, 0x0e00000, "prog_cart_bank");
 		m_maincpu->space(AS_IO).install_read_bank(0x07000000, 0x071fffff, 0, 0x0e00000, "io_cart_bank");
