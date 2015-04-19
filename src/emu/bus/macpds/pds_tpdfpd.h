@@ -43,7 +43,7 @@ public:
 		UINT32 m_vbl_disable;
 		UINT32 m_palette[256], m_colors[3], m_count, m_clutoffs;
 		emu_timer *m_timer;
-		astring m_assembled_tag;
+		std::string m_assembled_tag;
 };
 
 

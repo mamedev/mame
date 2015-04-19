@@ -68,7 +68,7 @@ nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, const 
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(M2HIRES_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(M2HIRES_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
@@ -77,7 +77,7 @@ nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, device
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(M2HIRES_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(M2HIRES_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

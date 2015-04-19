@@ -166,7 +166,7 @@ bool msx_slot_cartridge_device::call_load()
 			}
 
 			// Check if there's some mapper related
-			astring extrainfo;
+			std::string extrainfo;
 			if (hashfile_extrainfo(*this, extrainfo))
 			{
 			}
@@ -286,7 +286,7 @@ void msx_slot_cartridge_device::get_default_card_software(std::string &result)
 		int type = NOMAPPER;
 
 		// Check if there's some mapper related information in the hashfiles
-		astring extrainfo;
+		std::string extrainfo;
 		if (hashfile_extrainfo(*this, extrainfo))
 		{
 			int extrainfo_type = -1;

@@ -90,8 +90,8 @@ void device_sns_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(SNSSLOT_ROM_REGION_TAG);
+		std::string tempstring(tag);
+		tempstring.append(SNSSLOT_ROM_REGION_TAG);
 		m_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
@@ -796,7 +796,7 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 	// otherwise, we need to use the legacy versions including DSP dump in device romset
 	if (!m_cart->get_addon_bios_size())
 	{
-		astring region = astring(m_cart->device().tag()).cat(":addon");
+		std::string region = std::string(m_cart->device().tag()).append(":addon");
 		UINT8 *ROM = NULL;
 
 		switch (m_addon)

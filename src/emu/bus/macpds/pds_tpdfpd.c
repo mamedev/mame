@@ -88,7 +88,7 @@ macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, 
 		device_video_interface(mconfig, *this),
 		device_macpds_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(SEDISPLAY_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(SEDISPLAY_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
@@ -97,7 +97,7 @@ macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, 
 		device_video_interface(mconfig, *this),
 		device_macpds_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(SEDISPLAY_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(SEDISPLAY_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

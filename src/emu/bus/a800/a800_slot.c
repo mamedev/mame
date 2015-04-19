@@ -63,8 +63,8 @@ void device_a800_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(A800SLOT_ROM_REGION_TAG);
+		std::string tempstring(tag);
+		tempstring.append(A800SLOT_ROM_REGION_TAG);
 		m_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 
@@ -460,8 +460,8 @@ void a5200_cart_slot_device::get_default_card_software(std::string &result)
 			core_fread(m_file, &head[0], 0x10);
 			type = identify_cart_type(&head[0]);
 
-			astring info;
-			if (hashfile_extrainfo(*this, info) && info.cmp("A13MIRRORING")==0)
+			std::string info;
+			if (hashfile_extrainfo(*this, info) && info.compare("A13MIRRORING")==0)
 				type = A5200_16K_2CHIPS;
 		}
 		if (type < A5200_4K)

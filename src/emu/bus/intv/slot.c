@@ -118,8 +118,8 @@ void device_intv_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(INTVSLOT_ROM_REGION_TAG);
+		std::string tempstring(tag);
+		tempstring.append(INTVSLOT_ROM_REGION_TAG);
 		m_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		memset(m_rom, 0xff, size);
 		m_rom_size = size;
@@ -310,7 +310,7 @@ int intv_cart_slot_device::load_fullpath()
 		// 7. extra = 1 ECS, 2 Intellivoice
 		int start, size;
 		int mapper, rom[5], ram, extra;
-		astring extrainfo;
+		std::string extrainfo;
 
 		m_cart->rom_alloc(0x20000, tag());
 		ROM = (UINT8 *)m_cart->get_rom_base();
@@ -479,7 +479,7 @@ void intv_cart_slot_device::get_default_card_software(std::string &result)
 			// assume it's .BIN and try to use .hsi file to determine type (just RAM)
 			int start;
 			int mapper, rom[5], ram, extra;
-			astring extrainfo;
+			std::string extrainfo;
 
 			if (hashfile_extrainfo(*this, extrainfo))
 			{

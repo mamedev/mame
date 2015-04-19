@@ -86,7 +86,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const 
 		device_nubus_card_interface(mconfig, *this),		
 		m_palette(*this, "palette")
 {
-	m_assembled_tag = astring(tag).cat(":").cat(SPECPDQ_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(SPECPDQ_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
@@ -96,7 +96,7 @@ nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device
 		device_nubus_card_interface(mconfig, *this),
 		m_palette(*this, "palette")
 {
-	m_assembled_tag = astring(tag).cat(":").cat(SPECPDQ_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(SPECPDQ_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

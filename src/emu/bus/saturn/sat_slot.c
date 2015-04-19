@@ -58,8 +58,8 @@ void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(SATSLOT_ROM_REGION_TAG);
+		std::string tempstring(tag);
+		tempstring.append(SATSLOT_ROM_REGION_TAG);
 		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring.c_str(), size, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}

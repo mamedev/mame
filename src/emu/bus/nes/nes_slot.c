@@ -148,8 +148,8 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 {
 	if (m_prg == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(NESSLOT_PRGROM_REGION_TAG);
+		std::string tempstring(tag);
+		tempstring.append(NESSLOT_PRGROM_REGION_TAG);
 		m_prg = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_prg_size = size;
 		m_prg_chunks = size / 0x4000;
@@ -217,8 +217,8 @@ void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
 {
 	if (m_vrom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(NESSLOT_CHRROM_REGION_TAG);
+		std::string tempstring(tag);
+		tempstring.append(NESSLOT_CHRROM_REGION_TAG);
 		m_vrom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_vrom_size = size;
 		m_vrom_chunks = size / 0x2000;
