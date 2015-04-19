@@ -64,13 +64,6 @@ typedef delegate<void ()> save_prepost_delegate;
 #define state_save_register_item_array(_mach, _mod, _tag, _index, _val) \
 	(_mach).save().save_item(NULL, _mod, _tag, _index, _val, #_val)
 
-#define state_save_register_item_2d_array(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, _val, #_val)
-
-#define state_save_register_item_bitmap(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, *(_val), #_val)
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

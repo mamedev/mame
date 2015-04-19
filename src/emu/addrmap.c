@@ -490,7 +490,7 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 	{
 		if (entry->m_read.m_type == AMH_DEVICE_SUBMAP)
 		{
-			astring tag;
+			std::string tag;
 			owner.subtag(tag, entry->m_read.m_tag);
 			device_t *mapdevice = machine.device(tag.c_str());
 			if (mapdevice == NULL) {

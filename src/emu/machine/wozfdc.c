@@ -63,7 +63,7 @@ appleiii_fdc::appleiii_fdc(const machine_config &mconfig, const char *tag, devic
 
 void wozfdc_device::device_start()
 {
-	astring tempstring;
+	std::string tempstring;
 	m_rom_p6 = machine().root_device().memregion(this->subtag(tempstring, DISKII_P6_REGION).c_str())->base();
 
 	timer = timer_alloc(0);

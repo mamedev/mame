@@ -408,7 +408,7 @@ int a800_cart_slot_device::identify_cart_type(UINT8 *header)
  get default card software
  -------------------------------------------------*/
 
-void a800_cart_slot_device::get_default_card_software(astring &result)
+void a800_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -438,14 +438,14 @@ void a800_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "a800_8k");
 }
 
 
-void a5200_cart_slot_device::get_default_card_software(astring &result)
+void a5200_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -471,14 +471,14 @@ void a5200_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "a5200");
 }
 
 
-void xegs_cart_slot_device::get_default_card_software(astring &result)
+void xegs_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -506,7 +506,7 @@ void xegs_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "xegs");

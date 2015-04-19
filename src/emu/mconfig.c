@@ -122,10 +122,10 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	{
 		const char *next = strchr(tag, ':');
 		assert(next != tag);
-		astring part(tag, next-tag);
+		std::string part(tag, next-tag);
 		device_t *curdevice;
 		for (curdevice = owner->m_subdevice_list.first(); curdevice != NULL; curdevice = curdevice->next())
-			if (part == curdevice->m_basetag)
+			if (part.compare(curdevice->m_basetag)==0)
 				break;
 		if (!curdevice)
 			throw emu_fatalerror("Could not find %s when looking up path for device %s\n",

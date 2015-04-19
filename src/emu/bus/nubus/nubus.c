@@ -325,7 +325,7 @@ void device_nubus_card_interface::install_declaration_rom(device_t *dev, const c
 {
 	bool inverted = false;
 
-	astring tempstring;
+	std::string tempstring;
 	UINT8 *rom = device().machine().root_device().memregion(dev->subtag(tempstring, romregion).c_str())->base();
 	UINT32 romlen = device().machine().root_device().memregion(dev->subtag(tempstring, romregion).c_str())->bytes();
 

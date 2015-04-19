@@ -129,8 +129,8 @@ public:
 	ioport_constructor input_ports() const { return device_input_ports(); }
 	UINT8 default_bios() const { return m_default_bios; }
 	UINT8 system_bios() const { return m_system_bios; }
-	astring default_bios_tag() const { return m_default_bios_tag; }
-	astring parameter(const char *tag) const;
+	std::string default_bios_tag() const { return m_default_bios_tag; }
+	std::string parameter(const char *tag) const;
 
 	// interface helpers
 	device_interface *first_interface() const { return m_interface_list; }
@@ -150,8 +150,8 @@ public:
 
 	// owned object helpers
 	device_t *first_subdevice() const { return m_subdevice_list.first(); }
-	astring &subtag(astring &dest, const char *tag) const;
-	astring &siblingtag(astring &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.cpy(tag); }
+	std::string &subtag(std::string &dest, const char *tag) const;
+	std::string &siblingtag(std::string &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.assign(tag); }
 	memory_region *memregion(const char *tag) const;
 	memory_share *memshare(const char *tag) const;
 	memory_bank *membank(const char *tag) const;
@@ -238,10 +238,10 @@ protected:
 
 	// core device properties
 	const device_type       m_type;                 // device type
-	astring                 m_name;                 // name of the device
-	astring                 m_shortname;            // short name of the device
-	astring                 m_searchpath;           // search path, used for media loading
-	astring                 m_source;               // device source file name
+	std::string             m_name;                 // name of the device
+	std::string             m_shortname;            // short name of the device
+	std::string             m_searchpath;           // search path, used for media loading
+	std::string             m_source;               // device source file name
 
 	// device relationships
 	device_t *              m_owner;                // device that owns us
@@ -270,7 +270,7 @@ protected:
 
 	UINT8                   m_system_bios;          // the system BIOS we wish to load
 	UINT8                   m_default_bios;         // the default system BIOS
-	astring                 m_default_bios_tag;     // tag of the default system BIOS
+	std::string             m_default_bios_tag;     // tag of the default system BIOS
 
 private:
 	// private helpers
@@ -282,8 +282,8 @@ private:
 	// private state; accessor use required
 	running_machine *       m_machine;
 	save_manager *          m_save;
-	astring                 m_tag;                  // full tag for this instance
-	astring                 m_basetag;              // base part of the tag
+	std::string             m_tag;                  // full tag for this instance
+	std::string             m_basetag;              // base part of the tag
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find

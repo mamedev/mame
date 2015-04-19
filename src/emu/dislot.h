@@ -116,7 +116,7 @@ public:
 	const char *default_option() const { return m_default_option; }
 	device_slot_option *first_option() const { return m_options.first(); }
 	device_slot_option *option(const char *name) const { if (name) return m_options.find(name); return NULL; }
-	virtual void get_default_card_software(astring &result) { result.reset(); }
+	virtual void get_default_card_software(std::string &result) { result.clear(); }
 	device_t *get_card_device();
 
 private:

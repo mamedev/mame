@@ -141,7 +141,7 @@ bool nes_aladdin_slot_device::call_softlist_load(software_list_device &swlist, c
 	return TRUE;
 }
 
-void nes_aladdin_slot_device::get_default_card_software(astring &result)
+void nes_aladdin_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -162,7 +162,7 @@ void nes_aladdin_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "algn");

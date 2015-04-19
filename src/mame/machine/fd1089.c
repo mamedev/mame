@@ -220,7 +220,7 @@ fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_typ
 	: m68000_device(mconfig, tag, owner, clock, shortname, source)
 {
 	// override the name after the m68000 initializes
-	m_name.cpy(name);
+	m_name.assign(name);
 }
 
 fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

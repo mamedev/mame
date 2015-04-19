@@ -779,7 +779,7 @@ int vcs_cart_slot_device::identify_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void vcs_cart_slot_device::get_default_card_software(astring &result)
+void vcs_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -795,7 +795,7 @@ void vcs_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "a26_4k");

@@ -1318,19 +1318,19 @@ bool device_image_interface::load_software_part(const char *path, software_part 
 //  software_get_default_slot
 //-------------------------------------------------
 
-void device_image_interface::software_get_default_slot(astring &result, const char *default_card_slot)
+void device_image_interface::software_get_default_slot(std::string &result, const char *default_card_slot)
 {
 	const char *path = device().mconfig().options().value(instance_name());
-	result.reset();
+	result.clear();
 	if (strlen(path) > 0)
 	{
-		result.cpy(default_card_slot);
+		result.assign(default_card_slot);
 		software_part *swpart = find_software_item(path, true);
 		if (swpart != NULL)
 		{
 			const char *slot = swpart->feature("slot");
 			if (slot != NULL)
-				result.cpy(slot);
+				result.assign(slot);
 		}
 	}
 }

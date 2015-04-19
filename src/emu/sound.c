@@ -598,6 +598,8 @@ void sound_stream::postload()
 
 void sound_stream::generate_samples(int samples)
 {
+	stream_sample_t **inputs = NULL;
+	stream_sample_t **outputs = NULL;
 	// if we're already there, skip it
 	if (samples <= 0)
 		return;
@@ -616,6 +618,11 @@ void sound_stream::generate_samples(int samples)
 		m_input_array[inputnum] = generate_resampled_data(input, samples);
 	}
 
+	if (!m_input.empty())
+	{
+		inputs = &m_input_array[0];
+	}
+
 	// loop over all outputs and compute the output pointer
 	for (unsigned int outputnum = 0; outputnum < m_output.size(); outputnum++)
 	{
@@ -623,9 +630,14 @@ void sound_stream::generate_samples(int samples)
 		m_output_array[outputnum] = &output.m_buffer[m_output_sampindex - m_output_base_sampindex];
 	}
 
+	if (!m_output.empty())
+	{
+		outputs = &m_output_array[0];
+	}
+
 	// run the callback
 	VPRINTF(("  callback(%p, %d)\n", this, samples));
-	m_callback(*this, &m_input_array[0], &m_output_array[0], samples);
+	m_callback(*this, inputs, outputs, samples);
 	VPRINTF(("  callback done\n"));
 }
 

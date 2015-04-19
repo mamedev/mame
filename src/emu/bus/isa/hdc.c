@@ -257,7 +257,7 @@ void isa8_hdc_device::device_reset()
 hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 {
 	harddisk_image_device *img = NULL;
-	astring tempstring;
+	std::string tempstring;
 	switch( id )
 	{
 	case 0:

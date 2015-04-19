@@ -35,6 +35,7 @@ static SLOT_INTERFACE_START( corv_floppies )
 	SLOT_INTERFACE( "525dsqd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
+
 MACHINE_CONFIG_FRAGMENT( fdc02 )
 	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, intrq_w))
@@ -108,7 +109,7 @@ void a2bus_corvfdc02_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
+	std::string tempstring;
 	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, FDC02_ROM_REGION).c_str())->base();
 
 	m_timer = timer_alloc(0);

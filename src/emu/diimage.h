@@ -259,7 +259,7 @@ protected:
 
 	software_part *find_software_item(const char *path, bool restrict_to_interface);
 	bool load_software_part(const char *path, software_part *&swpart);
-	void software_get_default_slot(astring &result, const char *default_card_slot);
+	void software_get_default_slot(std::string &result, const char *default_card_slot);
 
 	// derived class overrides
 

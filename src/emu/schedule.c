@@ -753,7 +753,7 @@ void device_scheduler::rebuild_execute_list()
 			min_quantum = attotime::from_hz(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
-		if (machine().config().m_perfect_cpu_quantum)
+		if (!machine().config().m_perfect_cpu_quantum.empty())
 		{
 			device_t *device = machine().device(machine().config().m_perfect_cpu_quantum.c_str());
 			if (device == NULL)

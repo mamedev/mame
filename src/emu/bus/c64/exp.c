@@ -220,7 +220,7 @@ bool c64_expansion_slot_device::call_softlist_load(software_list_device &swlist,
 //  get_default_card_software -
 //-------------------------------------------------
 
-void c64_expansion_slot_device::get_default_card_software(astring &result)
+void c64_expansion_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
