@@ -83,6 +83,8 @@ files {
 	MAME_DIR .. "src/emu/netlist/devices/nld_74153.h",
 	MAME_DIR .. "src/emu/netlist/devices/nld_74ls629.c",
 	MAME_DIR .. "src/emu/netlist/devices/nld_74ls629.h",
+	MAME_DIR .. "src/emu/netlist/devices/nld_9312.c",
+	MAME_DIR .. "src/emu/netlist/devices/nld_9312.h",
 	MAME_DIR .. "src/emu/netlist/devices/nld_9316.c",
 	MAME_DIR .. "src/emu/netlist/devices/nld_9316.h",
 	MAME_DIR .. "src/emu/netlist/devices/nld_ne555.c",
