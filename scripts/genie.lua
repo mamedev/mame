@@ -287,6 +287,15 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "NO_STRIPPING",
+	description = "Stripping.",
+	allowed = {
+		{ "0",   "Enabled" 	},
+		{ "1",   "Disabled"      },
+	}
+}
+
 
 PYTHON = "python"
 
@@ -1139,11 +1148,12 @@ else
 end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
+if (_OPTIONS["NO_STRIPPING"]~="1") then
+	strip()
+end
+
 if _OPTIONS["with-tools"] then
 	group "tools"
 	dofile(path.join("src", "tools.lua"))
 end
 
-if (_ACTION == "gmake" and _OPTIONS["gcc"]=='asmjs') then
-	strip()
-end

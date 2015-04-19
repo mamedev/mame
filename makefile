@@ -77,6 +77,7 @@
 # SEPARATE_BIN = 1
 # PYTHON_EXECUTABLE = python3
 # SHADOW_CHECK = 1
+# NO_STRIPPING = 1
 
 # QT_HOME = /usr/lib64/qt48/
 
@@ -536,6 +537,10 @@ endif
 
 ifdef SHADOW_CHECK
 PARAMS += --SHADOW_CHECK='$(SHADOW_CHECK)'
+endif
+
+ifdef NO_STRIPPING
+PARAMS += --NO_STRIPPING='$(NO_STRIPPING)'
 endif
 
 ifdef QT_HOME
