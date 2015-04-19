@@ -137,6 +137,9 @@ ATTR_COLD void netlist_owned_object_t::init_object(netlist_core_device_t &dev,
 
 netlist_base_t::netlist_base_t()
 	:   netlist_object_t(NETLIST, GENERIC),
+		m_stop(netlist_time::zero),
+		// FIXME:: Use a parameter to set this on a schematics per schematics basis
+	    m_use_deactivate(USE_DEACTIVE_DEVICE),
 		m_time(netlist_time::zero),
 		m_queue(*this),
 		m_mainclock(NULL),
@@ -494,26 +497,28 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 
 	m_list_active.insert(term);
 
-	if (USE_DEACTIVE_DEVICE)
+	if (m_active == 1)
 	{
-		if (m_active == 1 && m_in_queue > 0)
+		if (m_in_queue == 0)
 		{
-			railterminal().netdev().inc_active();
-			m_cur_Q = m_new_Q;
-		}
-	}
-
-	if (m_active == 1 && m_in_queue == 0)
-	{
-		if (m_time > netlist().time())
-		{
-			m_in_queue = 1;     /* pending */
-			netlist().push_to_queue(*this, m_time);
+			if (m_time > netlist().time())
+			{
+				m_in_queue = 1;     /* pending */
+				netlist().push_to_queue(*this, m_time);
+			}
+			else
+			{
+				m_cur_Q = m_new_Q;
+				m_in_queue = 2;
+			}
 		}
 		else
 		{
-			m_cur_Q = m_new_Q;
-			m_in_queue = 2;
+			if (netlist().use_deactivate())
+			{
+				railterminal().netdev().inc_active();
+				m_cur_Q = m_new_Q;
+			}
 		}
 	}
 }
@@ -523,11 +528,8 @@ ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 	m_active--;
 	m_list_active.remove(term);
 
-	if (USE_DEACTIVE_DEVICE)
-	{
-		if (m_active == 0)
+	if (m_active == 0 && netlist().use_deactivate())
 			railterminal().netdev().dec_active();
-	}
 }
 
 ATTR_COLD void netlist_net_t::register_railterminal(netlist_output_t &mr)

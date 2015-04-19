@@ -5,9 +5,10 @@
 
 #include "nld_7400.h"
 
-#if 0
+#if (USE_TRUTHTABLE)
 nld_7400::truthtable_t nld_7400::m_ttbl;
 
+#if 0
 const char *nld_7400::m_desc[] = {
 		"A,B,PQ,PA,PB|Q",
 		"0,X,X,X,X|1|22",
@@ -15,6 +16,15 @@ const char *nld_7400::m_desc[] = {
 		"1,1,X,X,X|0|15",
 		""
 };
+#else
+const char *nld_7400::m_desc[] = {
+		"A , B | Q ",
+		"0,X|1|22",
+		"X,0|1|22",
+		"1,1|0|15",
+		""
+};
+#endif
 
 #endif
 

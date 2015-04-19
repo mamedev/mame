@@ -50,19 +50,19 @@ public:
 		{
 			nl_util::pstring_list io = nl_util::split(ttline,"|");
 			// checks
-			nl_assert(io.count() == 2);
+			nl_assert_always(io.count() == 2, "too many '|'");
 			nl_util::pstring_list inout = nl_util::split(io[0], ",");
-			nl_assert(inout.count() == m_num_bits);
+			nl_assert_always(inout.count() == m_num_bits, "bitcount wrong");
 			nl_util::pstring_list out = nl_util::split(io[1], ",");
-			nl_assert(out.count() == m_NO);
+			nl_assert_always(out.count() == m_NO, "output count wrong");
 
 			for (int i=0; i < m_NI; i++)
 			{
-				register_input(inout[i], m_i[i]);
+				register_input(inout[i].trim(), m_i[i]);
 			}
 			for (int i=0; i < m_NO; i++)
 			{
-				register_output(out[i], m_Q[i]);
+				register_output(out[i].trim(), m_Q[i]);
 			}
 		}
 		setup_tt();
@@ -178,38 +178,35 @@ public:
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
-		//const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
-
 		// FIXME: this check is needed because update is called during startup as well
-		if (UNEXPECTED(USE_DEACTIVE_DEVICE && m_active == 0))
-			return;
+		//if (m_active == 0 && UNEXPECTED(netlist().use_deactivate()))
+		//	return;
 
 		UINT32 state = 0;
-		for (int i=0; i< m_NI; i++)
+		for (int i = 0; i < m_NI; i++)
 		{
 			m_i[i].activate();
-			state = state | (INPLOGIC(m_i[i]) << i);
+			state |= (INPLOGIC(m_i[i]) << i);
 		}
 
-		const UINT32 nstate = (has_state ? state | (m_last_state << m_NI) : state);
+		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
 		const UINT32 out = m_ttp->m_outs[nstate] & ((1 << m_NO) - 1);
 		const UINT32 ign = m_ttp->m_outs[nstate] >> m_NO;
-		if (has_state) m_last_state = (state << m_NO) | out;
+		if (has_state)
+			m_last_state = (state << m_NO) | out;
 
-		for (int i=0; i< m_NI; i++)
+		for (int i = 0; i < m_NI; i++)
 			if (ign & (1 << i))
 				m_i[i].inactivate();
 
-		for (int i=0; i<m_NO; i++)
-//            OUTLOGIC(m_Q[i], (out >> i) & 1, times[(out >> i) & 1]);// ? 22000 : 15000);
-			OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[nstate][i]]);// ? 22000 : 15000);
-
+		for (int i = 0; i < m_NO; i++)
+			OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[nstate][i]]);
 	}
 
 
-#if (USE_DEACTIVE_DEVICE)
 	ATTR_HOT void inc_active()
 	{
+		nl_assert(netlist().use_deactivate());
 		if (++m_active == 1)
 		{
 			update();
@@ -218,13 +215,13 @@ public:
 
 	ATTR_HOT void dec_active()
 	{
+		nl_assert(netlist().use_deactivate());
 		if (--m_active == 0)
 		{
 			for (int i = 0; i< m_NI; i++)
 				m_i[i].inactivate();
 		}
 	}
-#endif
 
 	netlist_ttl_input_t m_i[m_NI];
 	netlist_ttl_output_t m_Q[m_NO];

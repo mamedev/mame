@@ -1130,6 +1130,8 @@ public:
 	ATTR_HOT void process_queue(const netlist_time &delta);
 	ATTR_HOT inline void abort_current_queue_slice() { m_stop = netlist_time::zero; }
 
+	ATTR_HOT inline const bool &use_deactivate() const { return m_use_deactivate; }
+
 	ATTR_COLD void rebuild_lists(); /* must be called after post_load ! */
 
 	ATTR_COLD void set_setup(netlist_setup_t *asetup) { m_setup = asetup;  }
@@ -1214,6 +1216,7 @@ protected:
 
 private:
 	netlist_time                m_stop;     // target time for current queue processing
+	bool						m_use_deactivate;
 
 	netlist_time                m_time;
 	netlist_queue_t             m_queue;
