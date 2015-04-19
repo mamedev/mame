@@ -1433,7 +1433,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
 					break;
 
-				// used in test mode:
+				// used in test mode (code at 2cc4):
 //              case 0x5c:  membank("rombank")->set_base(rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
 
 				case 0x5e:  // 3800 IS RAM! (1404 bytes)
@@ -1461,6 +1461,13 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 				case 0x14:  // 3800 IS ROM
 					membank("rombank0")->set_base(rom + 0x8800);
 					membank("rombank1")->set_base(rom + 0x9800);
+					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
+					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
+					break;
+
+				case 0x16:  // 3800 IS ROM
+					membank("rombank0")->set_base(rom + 0xa800);
+					membank("rombank1")->set_base(rom + 0xb800);
 					membank("sprbank0")->set_base(m_spriteram + 0x1000*4);  // scratch
 					membank("sprbank1")->set_base(m_spriteram + 0x1000*4);  // scratch
 					break;
