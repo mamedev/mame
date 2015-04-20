@@ -168,7 +168,7 @@ private:
 	// Timers to delay execution/completion of commands */
 	emu_timer *m_timer;
 	emu_timer *m_cmd_timer;
-	emu_timer *m_live_timer;
+	// emu_timer *m_live_timer;
 
 	// Timer callback
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

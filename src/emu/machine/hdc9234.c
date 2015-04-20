@@ -2637,9 +2637,9 @@ void hdc9234_device::live_run_until(attotime limit)
 */
 void hdc9234_device::live_run_hd_until(attotime limit)
 {
-	int slot = 0;
+//	int slot = 0;
 	logerror("%s: live_run_hd\n", tag());
-	
+
 	if (m_live_state.state == IDLE || m_live_state.next_state != -1)
 		return;
 
