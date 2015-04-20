@@ -9,6 +9,7 @@
   serial  device  etc.
 -----------------------------------------------------------
  @036     1655A   1979, Ideal Maniac
+ *061     1655A   1980, Lakeside Le Boom (have dump)
  *110     1650A   1979, Tiger Rocket Pinball
  *192     1650    19??, (a phone dialer, have dump)
  *255     1655    19??, (a talking clock, have dump)
@@ -147,7 +148,7 @@ void hh_pic16_state::display_update()
 				int state = active_state[y] >> x & 1;
 				char buf1[0x10]; // lampyx
 				char buf2[0x10]; // y.x
-
+				
 				if (x == m_display_maxx)
 				{
 					// always-on if selected

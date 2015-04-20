@@ -3248,7 +3248,12 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 			if (mask & 0x0f)
 			{
 				stats_block *stats = &v->fbi.lfb_stats;
-				INT64 iterw = sw[pix] << (30-16);
+				INT64 iterw;
+				if (LFBMODE_WRITE_W_SELECT(v->reg[lfbMode].u)) {
+					iterw = (UINT32) (v->reg[zaColor].u & 0xffff) << 16;
+				} else {
+					iterw = (UINT32) sw[pix] << 16;
+				}
 				INT32 iterz = sw[pix] << 12;
 				rgb_union color;
 

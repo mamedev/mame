@@ -14,6 +14,7 @@
 	TODO:
 
     - write protect
+    - 75,format speed error,01,00,0
 
 */
 

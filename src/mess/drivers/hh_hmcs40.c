@@ -10,20 +10,23 @@
   serial  device    etc.
 ----------------------------------------------------------------
  @07      HD38750A  1979, Bambino Knock-Em Out Boxing (ET-06B)
- @08      HD38750A  1979, Bambino Basketball (ET-05)
+ @08      HD38750A  1979, Bambino Dribble Away Basketball (ET-05)
  @45      HD38750A  1981, VTech Invaders
  *58      HD38750A  1982, Ludotronic(Hanzawa) Grand Prix Turbo
  *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
 
- *04      HD38800A  1980, Gakken Heiankyo Alien
+ @04      HD38800A  1980, Gakken Heiankyo Alien
  @25      HD38800A  1981, Coleco Alien Attack
  @27      HD38800A  1981, Bandai Packri Monster
+ *31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2 (have dump)
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
  @70      HD38800A  1982, Coleco Galaxian
  @73      HD38800A  1982, Bandai(Mattel) Star Hawk
  @77      HD38800A  1982, Bandai Frisky Tom
+ @88      HD38800A  1984, Tomy Tron (THN-02)
  
+ @01      HD38800B  1982, Gakken Crazy Kong
  @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
@@ -41,10 +44,23 @@
  @45      HD38820A  1982, Coleco Donkey Kong
  @49      HD38820A  1983, Bandai Zackman
  @61      HD38820A  1983, Coleco Ms. Pac-Man
+ @69      HD38820A  1983, Gakken Dig Dug
  @70      HD38820A  1983, Parker Brothers Q*Bert
- @88      HD38820A  1984, Tomy Tron (THN-02)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
+
+
+  TODO:
+  - cdkong discrete sound (simple volume decay, simulated for now)
+  - cgalaxn discrete sound (alien attacking sound effect)
+  - vinvader locks up at boot
+  - gckong random lockups (tap the jump button repeatedly): mcu stack overflow,
+    works ok if stack levels is increased, 38800 B rev. has more stack levels?
+  - epacman booting the game in demo mode, pacman should go straight to the
+    upper-left power pill: mcu cycle/interrupt timing related
+  - Though very uncommon when compared to games with LED/lamp display,
+    some games may manipulate VFD plate brightness by strobing it longer,
+    eg. cgalaxn when the player ship explodes.
 
 ***************************************************************************/
 
@@ -291,7 +307,7 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
 
 /***************************************************************************
 
-  Bambino Basketball - Dribble Away (manufactured in Japan)
+  Bambino Dribble Away Basketball (manufactured in Japan)
   * PCBs are labeled Emix Corp. ET-05
   * Hitachi HD38750A08 MCU
   * green VFD display Emix-106, with bezel overlay
@@ -501,14 +517,14 @@ static INPUT_PORTS_START( bmboxing )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.4") // port D
-	PORT_CONFNAME( 0x01, 0x00, "Players" )
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x01, "2" )
-	PORT_CONFNAME( 0x02, 0x00, "Skill Level" )
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x02, "2" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x0001, 0x0000, "Players" )
+	PORT_CONFSETTING(      0x0000, "1" )
+	PORT_CONFSETTING(      0x0001, "2" )
+	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level" )
+	PORT_CONFSETTING(      0x0000, "1" )
+	PORT_CONFSETTING(      0x0002, "2" )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0xfff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( bmboxing, bmboxing_state )
@@ -722,7 +738,7 @@ WRITE16_MEMBER(packmon_state::grid_w)
 READ16_MEMBER(packmon_state::input_r)
 {
 	// D5: multiplexed inputs
-	return read_inputs(5);
+	return read_inputs(5) & 0x20;
 }
 
 
@@ -773,10 +789,10 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Bandai(Mattel) Star Hawk (manufactured in Japan)
+  Bandai/Mattel Star Hawk (manufactured in Japan)
   * PCBs are labeled Kaken, PT-317B
   * Hitachi HD38800A73 MCU
-  * cyan/red VFD display Futaba DM-41ZK, with partial color overlay
+  * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
   
   Kaken was a subsidiary of Bandai. The original Japanese release is unknown,
   was it canceled and only released in the USA?
@@ -908,7 +924,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Bandai Zackman "The Pit, FL Exploration of Space" (manufactured in Japan)
-  * Hitachi HD38820A49 MCU
+  * Hitachi QFP HD38820A49 MCU
   * cyan/red/yellow VFD display Futaba DM-53Z 3E, with color overlay
 
   NOTE!: MESS external artwork is recommended
@@ -1057,7 +1073,7 @@ WRITE8_MEMBER(alnattck_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// update display
-	UINT32 plate = BITSWAP16(m_plate,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15) | (m_plate & 0xf0000);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,16,11,9,8,10,7,2,0,1,3,4,5,6,12,13,14,15);
 	display_matrix(20, 10, plate, m_grid);
 }
 
@@ -1079,14 +1095,14 @@ WRITE16_MEMBER(alnattck_state::grid_w)
 READ16_MEMBER(alnattck_state::input_r)
 {
 	// D5: multiplexed inputs
-	return read_inputs(7);
+	return read_inputs(7) & 0x20;
 }
 
 
 // config
 
 static INPUT_PORTS_START( alnattck )
-	PORT_START("IN.0") // D5 D7
+	PORT_START("IN.0") // D7 line D5
 	PORT_CONFNAME( 0x20, 0x00, "Skill Level" )
 	PORT_CONFSETTING(    0x00, "1" )
 	PORT_CONFSETTING(    0x20, "2" )
@@ -1104,10 +1120,10 @@ static INPUT_PORTS_START( alnattck )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
 	PORT_START("IN.5") // D12 line D5
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Move")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Move")
 
 	PORT_START("IN.6") // D13 line D5
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fire")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fire")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( alnattck, alnattck_state )
@@ -1140,7 +1156,7 @@ MACHINE_CONFIG_END
 
   Coleco Donkey Kong (manufactured in Taiwan)
   * PCB label Coleco Rev C 75790 DK
-  * Hitachi HD38820A45 MCU
+  * Hitachi QFP HD38820A45 MCU
   * cyan/red VFD display Futaba DM-47ZK 2K, with color overlay
 
   NOTE!: MESS external artwork is recommended
@@ -1213,15 +1229,15 @@ WRITE16_MEMBER(cdkong_state::grid_w)
 // config
 
 static INPUT_PORTS_START( cdkong )
-	PORT_START("IN.0") // port D
+	PORT_START("IN.0") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+
+	PORT_START("IN.1") // port D
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-
-	PORT_START("IN.1") // INT0
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+	PORT_BIT( 0x7ff8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1246,7 +1262,7 @@ static MACHINE_CONFIG_START( cdkong, cdkong_state )
 	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(cdkong_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(cdkong_state, plate_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(cdkong_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(IOPORT("IN.0"))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(CDKONG_SPEAKER_DECAY))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
@@ -1289,9 +1305,11 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE16_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(grid_w);
+	DECLARE_WRITE16_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_r);
+
+	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
 };
 
 // handlers
@@ -1299,23 +1317,11 @@ public:
 void cgalaxn_state::prepare_display()
 {
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,1,2,0,11,10,9,8,7,6,5,4,3);
-	UINT16 plate = BITSWAP16(m_plate,15,14,5,4,3,2,1,0,7,11,12,9,8,10,6,13);
-	display_matrix(14, 12, plate, grid);
+	UINT16 plate = BITSWAP16(m_plate,15,14,6,5,4,3,2,1,7,8,9,10,11,0,12,13);
+	display_matrix(15, 12, plate, grid);
 }
 
 WRITE8_MEMBER(cgalaxn_state::grid_w)
-{
-	// D0: speaker out
-	m_speaker->level_w(data & 1);
-
-	// D1: speaker on?
-
-	// D2-D15: vfd matrix plate
-	m_plate = data >> 2 & 0x3fff;
-	prepare_display();
-}
-
-WRITE16_MEMBER(cgalaxn_state::plate_w)
 {
 	// R10,R11: input mux
 	if (offset == HMCS40_PORT_R1X)
@@ -1324,6 +1330,18 @@ WRITE16_MEMBER(cgalaxn_state::plate_w)
 	// R1x-R3x: vfd matrix grid
 	int shift = (offset - HMCS40_PORT_R1X) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(cgalaxn_state::plate_w)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D1: start alien attack whine sound effect (edge triggered)
+
+	// D2-D15: vfd matrix plate
+	m_plate = (m_plate & 0x4000) | (data >> 2 & 0x3fff);
 	prepare_display();
 }
 
@@ -1344,7 +1362,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("IN.1") // R11 port R0x
-	PORT_CONFNAME( 0x01, 0x01, "Players" )
+	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cgalaxn_state, player_switch, NULL)
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1355,6 +1373,13 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_START("IN.3") // INT1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
+{
+	// 2-player switch directly enables plate 14
+	m_plate = (m_plate & 0x3fff) | (newval ? 0 : 0x4000);
+}
+
 
 static MACHINE_CONFIG_START( cgalaxn, cgalaxn_state )
 
@@ -1385,7 +1410,7 @@ MACHINE_CONFIG_END
 
   Coleco Pac-Man (manufactured in Taiwan)
   * PCB label Coleco 75690
-  * Hitachi HD38820A28/29 MCU
+  * Hitachi QFP HD38820A28/29 MCU
   * cyan/red VFD display Futaba DM-34Z 2A, with color overlay
 
   known releases:
@@ -1506,7 +1531,7 @@ MACHINE_CONFIG_END
 
   Coleco Ms. Pac-Man (manufactured in Taiwan)
   * PCB label Coleco 911171
-  * Hitachi HD38820A61 MCU
+  * Hitachi QFP HD38820A61 MCU
   * cyan/red VFD display Futaba DM-60Z 3I, with color overlay
 
   Select game mode on start:
@@ -1557,7 +1582,7 @@ WRITE16_MEMBER(cmspacmn_state::grid_w)
 	// D5-D15: vfd matrix grid
 	m_grid = data >> 5 & 0x7ff;
 
-	// D0,D1: plate 11+17,6+22 (update display there)
+	// D0,D1: more plates (update display there)
 	plate_w(space, 6 + HMCS40_PORT_R1X, data & 3);
 }
 
@@ -1621,7 +1646,8 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Galaxian 2 (manufactured in Japan)
-  * Hitachi HD38820A13 MCU
+  * PCB labels ENTEX GALAXIAN PB-118/116/097 80-210137/135/114
+  * Hitachi QFP HD38820A13 MCU
   * cyan/red/green VFD display Futaba DM-20
 
   NOTE!: MESS external artwork is recommended
@@ -1688,7 +1714,7 @@ static INPUT_PORTS_START( egalaxn2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
 
 	PORT_START("IN.1") // D2 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // "
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY // "
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY // "
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY // "
@@ -1742,8 +1768,9 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Entex Pac Man 2 (manufactured in Japan)
-  * Hitachi HD38820A23 MCU
-  * cyan/red VFD display Futaba DM-28Z 1G
+  * PCB labels ENTEX PAC-MAN PB-093/094 80-210149/50/51
+  * Hitachi QFP HD38820A23 MCU
+  * cyan/red VFD display Futaba DM-28Z 1G(cyan Pac-Man) or DM-28 1K(orange Pac-Man)
   
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
@@ -1823,8 +1850,372 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Gakken Heiankyo Alien (manufactured in Japan)
+  * Hitachi HD38800A04 MCU
+  * cyan/red VFD display Futaba DM-11Z 1H
+
+  known releases:
+  - Japan: Heiankyo Alien
+  - USA: Earth Invaders, published by CGL
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class ghalien_state : public hh_hmcs40_state
+{
+public:
+	ghalien_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_READ16_MEMBER(input_r);
+};
+
+// handlers
+
+WRITE8_MEMBER(ghalien_state::plate_w)
+{
+	// R0x-R3x(,D10-D13): vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,14,12,10,8,9,13,15,2,0,1,3,11,7,5,4,6,19,17,16,18);
+	display_matrix(20, 10, plate, grid);
+}
+
+WRITE16_MEMBER(ghalien_state::grid_w)
+{
+	// D14: speaker out
+	m_speaker->level_w(data >> 14 & 1);
+
+	// D0-D6: input mux
+	m_inp_mux = data & 0x7f;
+
+	// D0-D9: vfd matrix grid
+	m_grid = data & 0x3ff;
+
+	// D10-D13: more plates (update display there)
+	plate_w(space, 4, data >> 10 & 0xf);
+}
+
+READ16_MEMBER(ghalien_state::input_r)
+{
+	// D15: multiplexed inputs
+	return read_inputs(7) & 0x8000;
+}
+
+
+// config
+
+static INPUT_PORTS_START( ghalien )
+	PORT_START("IN.0") // D0 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY // separate directional buttons, hence 16way
+
+	PORT_START("IN.1") // D1 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY // "
+
+	PORT_START("IN.2") // D2 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
+
+	PORT_START("IN.3") // D3 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
+
+	PORT_START("IN.4") // D4 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Dig")
+
+	PORT_START("IN.5") // D5 line D15
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bury")
+
+	PORT_START("IN.6") // D6 line D15
+	PORT_CONFNAME( 0x8000, 0x0000, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(      0x0000, "Amateur" )
+	PORT_CONFSETTING(      0x8000, "Professional" )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( ghalien, ghalien_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(ghalien_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(ghalien_state, input_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Crazy Kong (manufactured in Japan)
+  * PCB label ZENY 5603601
+  * Hitachi HD38800B01 MCU
+  * cyan/red/blue VFD display Futaba DM-54Z 2H, with bezel overlay
+
+  known releases:
+  - Japan: Crazy Kong
+  - USA: Super Kong, published by CGL
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class gckong_state : public hh_hmcs40_state
+{
+public:
+	gckong_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	void update_int1();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+};
+
+// handlers
+
+WRITE8_MEMBER(gckong_state::plate_w)
+{
+	// R0x-R3x(,D0,D1): vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,0,1,2,3,4,5,6,7,8,9,10);
+	UINT32 plate = BITSWAP32(m_plate,31,30,29,28,27,26,25,6,7,8,12,13,14,15,16,17,18,17,16,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	display_matrix(32, 11, plate, grid);
+}
+
+WRITE16_MEMBER(gckong_state::grid_w)
+{
+	// D2: speaker out
+	m_speaker->level_w(data >> 2 & 1);
+
+	// D5-D8: input mux
+	UINT8 inp_mux = data >> 5 & 0xf;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int1();
+	}
+
+	// D5-D15: vfd matrix grid
+	m_grid = data >> 5 & 0x7ff;
+
+	// D0,D1: more plates (update display there)
+	plate_w(space, 4, data & 3);
+}
+
+void gckong_state::update_int1()
+{
+	// INT1 on multiplexed inputs
+	set_interrupt(1, read_inputs(4));
+}
+
+
+// config
+
+static INPUT_PORTS_START( gckong )
+	PORT_START("IN.0") // D5 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gckong_state, input_changed, NULL)
+
+	PORT_START("IN.1") // D6 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, gckong_state, input_changed, NULL)
+
+	PORT_START("IN.2") // D7 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gckong_state, input_changed, NULL)
+
+	PORT_START("IN.3") // D8 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gckong_state, input_changed, NULL)
+
+	PORT_START("IN.4") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+
+	PORT_START("IN.5") // port D
+	PORT_CONFNAME( 0x0010, 0x0000, "Skill Level" )
+	PORT_CONFSETTING(      0x0000, "A" )
+	PORT_CONFSETTING(      0x0010, "B" )
+	PORT_BIT( 0xffef, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(gckong_state::input_changed)
+{
+	update_int1();
+}
+
+
+static MACHINE_CONFIG_START( gckong, gckong_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(gckong_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Dig Dug (manufactured in Japan)
+  * PCB label Gakken DIG-DAG KS-004283(A/B)
+  * Hitachi QFP HD38820A69 MCU
+  * cyan/red/green VFD display Futaba DM-69Z 3F, with color overlay
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class gdigdug_state : public hh_hmcs40_state
+{
+public:
+	gdigdug_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	void update_int1();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+};
+
+// handlers
+
+WRITE8_MEMBER(gdigdug_state::plate_w)
+{
+	// R0x-R6x(,D0-D3): vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT32 plate = BITSWAP32(m_plate,30,31,0,1,2,3,4,5,6,7,20,21,22,27,26,25,28,29,24,23,15,14,13,12,8,9,10,11,19,18,17,16);
+	display_matrix(32, 9, plate, m_grid);
+}
+
+WRITE16_MEMBER(gdigdug_state::grid_w)
+{
+	// D6: speaker out
+	m_speaker->level_w(data >> 6 & 1);
+
+	// D11-D15: input mux
+	UINT8 inp_mux = data >> 11 & 0x1f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int1();
+	}
+
+	// D7-D15: vfd matrix grid
+	m_grid = data >> 7 & 0x1ff;
+
+	// D0-D3: more plates (update display there)
+	plate_w(space, 7, data & 0xf);
+}
+
+void gdigdug_state::update_int1()
+{
+	// INT1 on multiplexed inputs
+	set_interrupt(1, read_inputs(5));
+}
+
+
+// config
+
+static INPUT_PORTS_START( gdigdug )
+	PORT_START("IN.0") // D11 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
+
+	PORT_START("IN.1") // D12 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
+
+	PORT_START("IN.2") // D13 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
+
+	PORT_START("IN.3") // D14 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
+
+	PORT_START("IN.4") // D15 INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gdigdug_state, input_changed, NULL)
+
+	PORT_START("IN.5") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
+{
+	update_int1();
+}
+
+
+static MACHINE_CONFIG_START( gdigdug, gdigdug_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(gdigdug_state, grid_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Q*Bert
-  * Hitachi HD38820A70 MCU
+  * PCB label 13662 REV-4
+  * Hitachi QFP HD38820A70 MCU
   * cyan/red/green/darkgreen VFD display Itron CP5137
 
   NOTE!: MESS external artwork is recommended
@@ -2211,11 +2602,11 @@ static INPUT_PORTS_START( vinvader )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // port D
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_CONFNAME( 0x08, 0x00, "Skill Level")
-	PORT_CONFSETTING(    0x00, "1" )
-	PORT_CONFSETTING(    0x08, "2" )
-	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x0002, 0x0000, "Skill Level")
+	PORT_CONFSETTING(      0x0000, "1" )
+	PORT_CONFSETTING(      0x0002, "2" )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0xfff5, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( vinvader, vinvader_state )
@@ -2274,6 +2665,13 @@ ROM_END
 ROM_START( packmon )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38800a27", 0x0000, 0x1000, CRC(86e09e84) SHA1(ac7d3c43667d5720ca513f8ff51d146d9f2af124) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( msthawk )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 ROM_END
 
@@ -2340,9 +2738,23 @@ ROM_START( epacman2 )
 ROM_END
 
 
-ROM_START( msthawk )
+ROM_START( ghalien )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "hd38800a73", 0x0000, 0x1000, CRC(a4f9a523) SHA1(465f06b02e2e7d2277218fd447830725790a816c) )
+	ROM_LOAD( "hd38800a04", 0x0000, 0x1000, CRC(019c3328) SHA1(9f1029c5c479f78350952c4f18747341ba5ea7a0) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( gckong )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b01", 0x0000, 0x1000, CRC(d5a2cca3) SHA1(37bb5784383daab672ed1e0e2362c7a40d8d9b3f) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( gdigdug )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a69", 0x0000, 0x1000, CRC(501165a9) SHA1(8a15d00c4aa66e870cadde33148426463560d2e6) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 ROM_END
 
@@ -2377,7 +2789,7 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Basketball - Dribble Away", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1979, bambball,  0,        0, bambball, bambball, driver_device, 0, "Bambino", "Dribble Away Basketball", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1979, bmboxing,  0,        0, bmboxing, bmboxing, driver_device, 0, "Bambino", "Knock-Em Out Boxing", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Bandai", "Frisky Tom (Bandai)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
@@ -2387,13 +2799,17 @@ CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Banda
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND )
-CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1982, cgalaxn,   0,        0, cgalaxn,  cgalaxn,  driver_device, 0, "Coleco", "Galaxian (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND )
 CONS( 1981, cpacman,   0,        0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 29)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Coleco", "Pac-Man (Coleco, Rev. 28)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+
+CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  driver_device, 0, "Gakken", "Heiankyo Alien (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1982, gckong,    0,        0, gckong,   gckong,   driver_device, 0, "Gakken", "Crazy Kong (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  driver_device, 0, "Gakken", "Dig Dug (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
