@@ -58,10 +58,10 @@ void psxrcnt_device::device_start()
 	for( n = 0; n < 3; n++ )
 	{
 		root_counter[ n ].timer = timer_alloc(n);
-		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_count );
-		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_mode );
-		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_target );
-		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_start );
+		save_item(NAME(root_counter[ n ].n_count), n);
+		save_item(NAME(root_counter[ n ].n_mode), n);
+		save_item(NAME(root_counter[ n ].n_target), n);
+		save_item(NAME(root_counter[ n ].n_start), n);
 		root_counter[ n ].n_count = 0;
 		root_counter[ n ].n_mode = 0;
 		root_counter[ n ].n_target = 0;

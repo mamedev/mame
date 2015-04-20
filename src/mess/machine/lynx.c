@@ -1381,11 +1381,11 @@ void lynx_state::lynx_timer_init(int which)
 	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
 	m_timer[which].timer = timer_alloc(TIMER_SHOT);
 
-	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].bakup);
-	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].cntrl1);
-	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].cntrl2);
-	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].counter);
-	state_save_register_item(machine(), "Lynx", NULL, which, m_timer[which].timer_active);
+	save_item(NAME(m_timer[which].bakup), which);
+	save_item(NAME(m_timer[which].cntrl1), which);
+	save_item(NAME(m_timer[which].cntrl2), which);
+	save_item(NAME(m_timer[which].counter), which);
+	save_item(NAME(m_timer[which].timer_active), which);
 }
 
 void lynx_state::lynx_timer_signal_irq(int which)
