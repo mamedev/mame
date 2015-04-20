@@ -285,8 +285,6 @@ void sdl_monitor_info::refresh()
 
 float osd_monitor_info::aspect()
 {
-	// refresh the monitor information and compute the aspect
-	refresh();
 	// FIXME: returning 0 looks odd, video_config is bad
 	if (video_config.keepaspect)
 	{
