@@ -134,6 +134,8 @@ void win_monitor_info::refresh()
 	char *temp = utf8_from_tstring(m_info.szDevice);
 
 	if (temp) strncpy(m_name, temp, sizeof(m_name));
+	
+	osd_free(temp);
 
 	m_pos_size = RECT_to_osd_rect(m_info.rcMonitor);
 	m_usuable_pos_size = RECT_to_osd_rect(m_info.rcWork);
