@@ -117,6 +117,7 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 				// Start the settle timer
 				m_step_phase = STEP_SETTLE;
 				m_seek_timer->adjust(attotime::from_usec(16800));
+				logerror("%s: Arrived at target track %d, settling ...\n", tag(), m_current_cylinder);	
 			}
 			break;
 		case STEP_SETTLE:
@@ -125,6 +126,7 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 			else
 			{
 				// Seek completed
+				logerror("%s: Settling done at cylinder %d, seek complete\n", tag(), m_current_cylinder);	
 				m_seek_complete = true;
 				m_seek_complete_cb(this, ASSERT_LINE);
 				m_step_phase = STEP_COLLECT;
@@ -136,8 +138,11 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 void mfm_harddisk_device::head_move() 
 {
-	int disttime = m_track_delta*200;
-	if (disttime < 0) disttime = -disttime;
+	int steps = m_track_delta;
+	if (steps < 0) steps = -steps; 
+	logerror("%s: Moving head by %d step(s) %s\n", tag(), steps, (m_track_delta<0)? "outward" : "inward");	
+
+	int disttime = steps*200;
 	m_step_phase = STEP_MOVING;
 	m_seek_timer->adjust(attotime::from_usec(disttime));
 	// We pretend that we already arrived
@@ -208,10 +213,10 @@ void mfm_harddisk_device::step_w(line_state line)
 			m_seek_complete_cb(this, CLEAR_LINE);
 		}
 
-		logerror("%s: Got seek pulse; distance %d, direction %s\n", tag(), m_track_delta, m_seek_inward? "inward" : "outward");
 		// Counter will be adjusted according to the direction (+-1)
 		m_track_delta += (m_seek_inward)? +1 : -1; 
-		if (m_track_delta < 0 || m_track_delta > 670) 
+		logerror("%s: Got seek pulse; track delta %d\n", tag(), m_track_delta);
+		if (m_track_delta < -670 || m_track_delta > 670) 
 		{
 			logerror("%s: Excessive step pulses - doing auto-truncation\n", tag());  
 			m_autotruncation = true;

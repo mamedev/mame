@@ -510,8 +510,8 @@ void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int s
 */
 void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, int state)
 {
-	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD seek complete\n", tag());
-	set_bits(m_status_latch, HDC_DS_SKCOM, (state==ASSERT_LINE));
+	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD index pulse\n", tag());
+	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
 	signal_drive_status();
 }
 
@@ -520,8 +520,8 @@ void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, i
 */
 void myarc_hfdc_device::harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state)
 {
-	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD index pulse\n", tag());
-	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
+	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD seek complete\n", tag());
+	set_bits(m_status_latch, HDC_DS_SKCOM, (state==ASSERT_LINE));
 	signal_drive_status();
 }
 
