@@ -731,4 +731,16 @@
 		</part>
 	</software>
 
+	<software name="8280blnk">
+		<description>Blank Formatted Commodore 8280 Diskette</description>
+		<year>1981</year>
+		<publisher>&lt;Commodore&gt;</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="1025024">
+				<rom name="blank.dsk" size="1025024" crc="9760c45c" sha1="797e77070efee22349a399d409999b0ad09604ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
