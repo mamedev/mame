@@ -53,7 +53,7 @@ private:
 	int			m_step_phase;
 	bool 		m_seek_complete;
 	bool		m_seek_inward;
-	bool		m_seeking;
+	//bool		m_seeking;
 	bool		m_autotruncation;
 	line_state	m_step_line;	// keep the last state
 	
