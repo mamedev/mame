@@ -2186,7 +2186,7 @@ bambball    // Bambino
 bmboxing    // Bambino
 bfriskyt    // Bandai
 packmon     // Bandai
-msthawk     // Bandai(Mattel)
+msthawk     // Bandai/Mattel
 zackman     // Bandai
 alnattck    // Coleco
 cdkong      // Coleco
@@ -2196,6 +2196,9 @@ cpacmanr1   // Coleco (rev 1)
 cmspacmn    // Coleco
 egalaxn2    // Entex
 epacman2    // Entex
+ghalien     // Gakken
+gckong      // Gakken
+gdigdug     // Gakken
 pbqbert     // Parker Brothers
 mvbfree     // Mego
 kingman     // Tomy
@@ -2231,10 +2234,16 @@ mbdtower    // Milton Bradley
 
 ufombs      // Bambino
 ssfball     // Bambino
+bmsoccer    // Bambino
+bmsafari    // Bambino
 splasfgt    // Bambino
 bcclimbr    // Bandai
+invspace    // Epoch
+efball      // Epoch
+galaxy2     // Epoch
 astrocmd    // Epoch
 edracula    // Epoch
+tccombat    // Tomy
 tmpacman    // Tomy
 tmtennis    // Tomy
 tmscramb    // Tomy
