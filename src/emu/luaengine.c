@@ -707,6 +707,7 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x (integer) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y (integer) expected");
 	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
+	luaL_argcheck(L, lua_isinteger(L, 5) || lua_isnone(L, 5), 5, "optional argument: text color, integer expected (default: 0xffffffff)");
 
 	// retrieve all parameters
 	int sc_width = sc->visible_area().width();
@@ -714,13 +715,16 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	float x = MIN(MAX(0, lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
 	float y = MIN(MAX(0, lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
 	const char *msg = luaL_checkstring(L,4);
-	// TODO: add optional parameters (colors, etc.)
+	rgb_t textcolor = UI_TEXT_COLOR;
+	if (!lua_isnone(L, 5)) {
+		textcolor = rgb_t(lua_tounsigned(L, 5));
+	}
 
 	// draw the text
 	render_container &rc = sc->container();
 	ui_manager &ui = sc->machine().ui();
 	ui.draw_text_full(&rc, msg, x, y , (1.0f - x),
-						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR,
+						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, textcolor,
 						UI_TEXT_BG_COLOR, NULL, NULL);
 
 	return 0;
