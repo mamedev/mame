@@ -3086,13 +3086,28 @@ do                                                                              
 		else                                                                    \
 		{                                                                       \
 			int exp = count_leading_zeros(temp);                                \
+			temp &=0x7fff0000;                                \
 			wfloat = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1;       \
 		}                                                                       \
+	}                                                                           \
+	/* add the bias for fog selection*/                                         \
+	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
+	{                                                                           \
+		wfloat += (INT16)(VV)->reg[zaColor].u;                                \
+		CLAMP(wfloat, 0, 0xffff);                                             \
 	}                                                                           \
 																				\
 	/* compute depth value (W or Z) for this pixel */                           \
 	if (FBZMODE_WBUFFER_SELECT(FBZMODE) == 0)                                   \
+	{                                                                           \
 		CLAMPED_Z(ITERZ, FBZCOLORPATH, depthval);                               \
+		/* add the bias */                                                          \
+		if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
+		{                                                                           \
+			depthval += (INT16)(VV)->reg[zaColor].u;                                \
+			CLAMP(depthval, 0, 0xffff);                                             \
+		}                                                                           \
+	}                                                                           \
 	else if (FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE) == 0)                          \
 		depthval = wfloat;                                                      \
 	else                                                                        \
@@ -3107,17 +3122,18 @@ do                                                                              
 			else                                                                \
 			{                                                                   \
 				int exp = count_leading_zeros(temp);                            \
+				temp &=0x7fff0000;                                \
 				depthval = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1; \
 			}                                                                   \
 		}                                                                       \
+		/* add the bias */                                                          \
+		if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
+		{                                                                           \
+			depthval += (INT16)(VV)->reg[zaColor].u;                                \
+			CLAMP(depthval, 0, 0xffff);                                             \
+		}                                                                           \
 	}                                                                           \
 																				\
-	/* add the bias */                                                          \
-	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
-	{                                                                           \
-		depthval += (INT16)(VV)->reg[zaColor].u;                                \
-		CLAMP(depthval, 0, 0xffff);                                             \
-	}                                                                           \
 																				\
 	/* handle depth buffer testing */                                           \
 	if (FBZMODE_ENABLE_DEPTHBUF(FBZMODE))                                       \
