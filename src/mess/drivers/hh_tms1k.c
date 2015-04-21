@@ -25,7 +25,8 @@
  *MP2105   TMS1370  1979, Gakken Poker, Entex Electronic Poker
  *MP2139   TMS1370? 1982, Gakken Galaxy Invader 1000
  *MP2788   ?        1980, Bandai Flight Time (? note: VFD-capable)
- @MP3226   TMS1000  1978, Milton Bradley Simon
+ *MP3208   TMS1000  1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
+ @MP3226   TMS1000  1978, Milton Bradley Simon (model 4850)
  *MP3301   TMS1000  1979, Milton Bradley Big Trak
  *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
   MP3403   TMS1100  1978, Marx Electronic Bowling -> elecbowl.c

@@ -522,6 +522,8 @@ protected:
 	void extract_sectors_from_bitstream_fm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
 	//! Commodore type sectors with GCR5 encoding
 	void extract_sectors_from_bitstream_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size, int head, int tracks);
+	//! Victor 9000 type sectors with GCR5 encoding
+	void extract_sectors_from_bitstream_victor_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
 
 
 	//! @brief Get a geometry (including sectors) from an image.

@@ -323,7 +323,7 @@ public:
 	void setLighting(const UINT16* packet);
 	void set3dFlags(const UINT16* packet);
 	void setCameraProjectionMatrix(const UINT16* packet);
-	void recoverPolygonBlock(const UINT16* packet, std::vector<struct polygon> &polys, int* numPolys);
+	void recoverPolygonBlock(const UINT16* packet, int* numPolys);
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
 
@@ -389,4 +389,6 @@ public:
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	UINT16 main_latch[2],sound_latch[2];
+	
+	std::vector<polygon> polys;//(1024*5);
 };
