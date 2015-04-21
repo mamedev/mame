@@ -2890,3 +2890,68 @@ void floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const UINT8 *bit
 		}
 	}
 }
+
+void floppy_image_format_t::extract_sectors_from_bitstream_victor_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size)
+{
+	memset(sectors, 0, 256*sizeof(desc_xs));
+
+	// Don't bother if it's just too small
+	if(track_size < 100)
+		return;
+
+	// Start by detecting all id and data blocks
+	int hblk[100], dblk[100];
+	int hblk_count = 0, dblk_count = 0;
+
+	// Precharge the shift register to detect over-the-index stuff
+	UINT16 shift_reg = 0;
+	for(int i=0; i<16; i++)
+		if(sbit_r(bitstream, track_size-16+i))
+			shift_reg |= 0x8000 >> i;
+
+	// Scan the bitstream for sync marks and follow them to check for blocks
+	bool sync = false;
+	for(int i=0; i<track_size; i++) {
+		int bit = sbit_r(bitstream, i);
+		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
+		
+		if (sync && !bit) {
+			UINT8 id = sbyte_gcr5_r(bitstream, i, track_size);
+
+			switch (id) {
+			case 0x07:
+				if(hblk_count < 100)
+					hblk[hblk_count++] = i-10;
+				break;
+			
+			case 0x08:
+				if(dblk_count < 100)
+					dblk[dblk_count++] = i-10;
+				break;
+			}
+		}
+
+		sync = (shift_reg == 0x3ff);
+	}
+
+	// Then extract the sectors
+	int sectdata_pos = 0;
+	for(int i=0; i<hblk_count; i++) {
+		int pos = hblk[i];
+		ATTR_UNUSED UINT8 block_id = sbyte_gcr5_r(bitstream, pos, track_size);
+		UINT8 track = sbyte_gcr5_r(bitstream, pos, track_size);
+		UINT8 sector = sbyte_gcr5_r(bitstream, pos, track_size);
+
+		pos = dblk[i];
+		block_id = sbyte_gcr5_r(bitstream, pos, track_size);
+
+		sectors[sector].track = track & 0x7f;
+		sectors[sector].head = BIT(track, 7);
+		sectors[sector].size = 512;
+		sectors[sector].data = sectdata + sectdata_pos;
+		for(int j=0; j<sectors[sector].size; j++) {
+			UINT8 data = sbyte_gcr5_r(bitstream, pos, track_size);
+			sectdata[sectdata_pos++] = data;
+		}
+	}
+}
