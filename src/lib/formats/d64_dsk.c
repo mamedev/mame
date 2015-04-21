@@ -272,7 +272,7 @@ bool d64_format::save(io_generic *io, floppy_image *image)
 		for(int track=0; track < f.track_count; track++) {
 			int sector_count = this->get_sectors_per_track(f, track);
 			int track_size = compute_track_size(f, track);
-			UINT8 sectdata[40*256];
+			UINT8 sectdata[40*256] = { 0 };
 			desc_s sectors[40];
 			int offset = get_image_offset(f, head, track);
 

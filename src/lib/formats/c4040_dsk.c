@@ -50,7 +50,7 @@ floppy_image_format_t::desc_e* c4040_format::get_sector_desc(const format &f, in
 {
 	static floppy_image_format_t::desc_e desc[] = {
 		/* 00 */ { SECTOR_LOOP_START, 0, -1 },
-		/* 01 */ {   RAWBYTE, 0xff, 5 },
+		/* 01 */ {   SYNC_GCR5, 4 },
 		/* 02 */ {   GCR5, 0x08, 1 },
 		/* 03 */ {   CRC, 1 },
 		/* 04 */ {   CRC_CBM_START, 1 },
@@ -60,7 +60,7 @@ floppy_image_format_t::desc_e* c4040_format::get_sector_desc(const format &f, in
 		/* 08 */ {     GCR5, id1, 1 },
 		/* 09 */ {   CRC_END, 1 },
 		/* 10 */ {   GCR5, 0x00, f.gap_1 },
-		/* 11 */ {   RAWBYTE, 0xff, 5 },
+		/* 11 */ {   SYNC_GCR5, 4 },
 		/* 12 */ {   GCR5, 0x07, 1 },
 		/* 13 */ {   CRC_CBM_START, 2 },
 		/* 14 */ {     SECTOR_DATA_GCR5, -1 },
