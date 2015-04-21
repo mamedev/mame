@@ -1268,6 +1268,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	SDL_WM_SetCaption(window->m_title, "SDLMAME");
 #endif
 
+	window->monitor()->refresh();
 	// initialize the drawing backend
 	if (window->renderer().create())
 		return (void *) &result[1];

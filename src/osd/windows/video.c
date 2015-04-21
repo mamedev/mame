@@ -139,7 +139,6 @@ void win_monitor_info::refresh()
 	osd_free(temp);
 
 	m_pos_size = RECT_to_osd_rect(m_info.rcMonitor);
-	printf("%d %d\n", m_pos_size.width(), m_pos_size.height());
 	m_usuable_pos_size = RECT_to_osd_rect(m_info.rcWork);
 	m_is_primary = ((m_info.dwFlags & MONITORINFOF_PRIMARY) != 0);
 	(void)result; // to silence gcc 4.6
