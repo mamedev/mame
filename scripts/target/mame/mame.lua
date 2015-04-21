@@ -2428,6 +2428,7 @@ files {
 	MAME_DIR .. "src/mame/machine/model3.c",
 	MAME_DIR .. "src/mame/drivers/monacogp.c",
 	MAME_DIR .. "src/mame/drivers/naomi.c",
+	MAME_DIR .. "src/mame/drivers/segasp.c",
 	MAME_DIR .. "src/mame/machine/dc.c",
 	MAME_DIR .. "src/mame/video/powervr2.c",
 	MAME_DIR .. "src/mame/machine/naomi.c",

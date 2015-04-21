@@ -239,8 +239,9 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			int physical_track = this->get_physical_track(f, head, track);
 			int sector_count = this->get_sectors_per_track(f, track);
 			int track_size = sector_count*f.sector_base_size;
+			int gap2 = this->get_gap2(f, head, track);
 
-			floppy_image_format_t::desc_e *desc = this->get_sector_desc(f, current_size, sector_count, id1, id2, f.gap_2);
+			floppy_image_format_t::desc_e *desc = this->get_sector_desc(f, current_size, sector_count, id1, id2, gap2);
 
 			int remaining_size = total_size - current_size;
 			if(remaining_size < 0)
@@ -271,7 +272,7 @@ bool d64_format::save(io_generic *io, floppy_image *image)
 		for(int track=0; track < f.track_count; track++) {
 			int sector_count = this->get_sectors_per_track(f, track);
 			int track_size = compute_track_size(f, track);
-			UINT8 sectdata[40*256];
+			UINT8 sectdata[40*256] = { 0 };
 			desc_s sectors[40];
 			int offset = get_image_offset(f, head, track);
 

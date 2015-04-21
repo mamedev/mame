@@ -1473,6 +1473,7 @@ ROM_START( gs4002a )
 	ROM_LOAD( "slot_9-24-84.5", 0x16000, 0x2000, CRC(25d8c504) SHA1(2d52b66e8a1f06f486015440668bd924a123dad0) )
 ROM_END
 
+
 /*
 Greyhound Poker board...
 
@@ -1566,6 +1567,36 @@ ROM_START( amuse1 ) /* V30.08  Rom board UMV8-B */
 	ROM_LOAD( "jokerpoker_amba_5-16-84",   0x10000, 0x4000, CRC(530b22d7) SHA1(418d41820429d0f8e054d383c502f4d75505ddca) )
 	ROM_LOAD( "rollingbones_am_5-16-84",   0x14000, 0x4000, CRC(60496f5a) SHA1(9f9fd4191eaaa12350dbcc9d414306454b2adfba) )
 	ROM_LOAD( "beatthespread_am2p_3-16-84",0x18000, 0x4000, CRC(40997230) SHA1(49e92a9f371a9839c94aa923aa5883284dae9dc2) )
+ROM_END
+
+/*
+
+Rom board is "GEI, inc UVM-8B" with a date code of "8339"
+
+Contains 1 AM2732A eprom, 5 HN4827128G eproms, 1 MMI PAL16R4CN, 1 7474N
+
+Battery (3V litium battery) backed up HM6117P-4
+
+Roms labeled as:
+
+HCON M108 9/30 at spot C (AM2732A-DC)
+CONT M108 9/26 at spot 1 (HN4827128G-25)
+POKR M108 9/26 at spot 2 (HN4827128G-30)
+BLJK M108 9/26 at spot 3 (HN4827128G-25)
+BONE M108 9/26 at spot 4 (HN4827128G-30)
+SLOT M108 9/26 at spot 5 (HN4827128G-30)
+
+*/
+
+ROM_START( amuse1a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cont m108 9_26.1", 0x00000, 0x4000, CRC(122d235b) SHA1(5647e7f50cc4c18d98e8f0517ca2f0dacf57cae7) )
+	ROM_LOAD( "hcon m108 9_30.c", 0x05800, 0x1000, CRC(5beb3d8b) SHA1(40a9458444f6a8e763a0374ab74e745500f4bf8a) )
+	/* Banked roms */
+	ROM_LOAD( "pokr m108 9_26.2", 0x10000, 0x4000, CRC(eafa1e22) SHA1(714b82ce2034c88b79d45a691dd71c975f91078c) )
+	ROM_LOAD( "bljk m108 9_26.3", 0x14000, 0x4000, CRC(c31a8b89) SHA1(487a3be9b5f3db3388de03ebc5f4a3f1572df19b) )
+	ROM_LOAD( "bone m108 9_26.4", 0x18000, 0x4000, CRC(40307a55) SHA1(3b276aa3ee6e8b25d1840d131db8d5dca34fe856) )
+	ROM_LOAD( "slot m108 9_26.5", 0x1c000, 0x4000, CRC(fbcc8942) SHA1(fc9ff6db84906edb1dfa2b0235d5cfe9d0a637ab) )
 ROM_END
 
 
@@ -1935,6 +1966,7 @@ GAME( 1982, gs4002a,  gs4002,   gselect,  gselect, driver_device,  0,       ROT0
 
 GAME( 1982, amuse,    0,        amuse,    gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1982, amuse1,   amuse,    amuse1,   gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08 IBA)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1983, amuse1a,  amuse,    amuse1,   gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 30.08A)",                  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1984, gepoker,  0,        gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gepoker1, gepoker,  gepoker,  gepoker, driver_device,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -1985,3 +2017,4 @@ GAME( 1992, sexappl,  0,        findout,  sexappl, driver_device,  0,       ROT0
 
 GAME( 1992, geimulti, 0,        geimulti, geimulti, gei_state, geimulti,    ROT0, "Grayhound Electronics", "GEI Multi Game",                          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1992, sprtauth, 0,        sprtauth, sprtauth, gei_state, geimulti,    ROT0, "Classic Games",         "Sports Authority",                        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
