@@ -1674,6 +1674,44 @@ ROM_START( ddragon2 )
 	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
 ROM_END
 
+// came from a dead board, 2 of the program roms were failing
+// if you attempt to use ROMs from another set it fails on Game Over due to code which should be different at 0x1800 in ic63
+ROM_START( ddragon2j )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "26a9-0_j.ic38", 0x08000, 0x8000, CRC(5e4fcdff) SHA1(78bf79a0b4f248c3355fef40448c76eb028f9163) )
+	ROM_LOAD( "26aa-0_j.ic52", 0x10000, 0x8000, CRC(bfb4ee04) SHA1(3692bbdef7d5b7cc3eb76362945b91b4a0f6ad4b) )
+	ROM_LOAD( "26ab-0.ic53",   0x18000, 0x8000, NO_DUMP) // proper dump might match other sets
+	ROM_LOAD( "26ac-0_j.ic63", 0x20000, 0x8000, NO_DUMP) // should be different
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* sprite CPU 64kb (Upper 16kb = 0) */
+	ROM_LOAD( "26ae-0.bin",   0x00000, 0x10000, CRC(ea437867) SHA1(cd910203af0565f981b9bdef51ea6e9c33ee82d3) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* music CPU, 64kb */
+	ROM_LOAD( "26ad-0.ic41",   0x00000, 0x8000, CRC(3788af3b) SHA1(7f8833b01522553c767c470a9c27d24e638f37b9) ) // why is this different, label was the same
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "26a8-0e.19",   0x00000, 0x10000, CRC(4e80cd36) SHA1(dcae0709f27f32effb359f6b943f61b102749f2a) )  /* chars */
+
+	ROM_REGION( 0xc0000, "gfx2", 0 )
+	ROM_LOAD( "26j0-0.bin",   0x00000, 0x20000, CRC(db309c84) SHA1(ee095e4a3bc86737539784945decb1f63da47b9b) )  /* sprites */
+	ROM_LOAD( "26j1-0.bin",   0x20000, 0x20000, CRC(c3081e0c) SHA1(c4a9ae151aae21073a2c79c5ac088c72d4f3d9db) )
+	ROM_LOAD( "26af-0.bin",   0x40000, 0x20000, CRC(3a615aad) SHA1(ec90a35224a177d00327de6fd1a299df38abd790) )
+	ROM_LOAD( "26j2-0.bin",   0x60000, 0x20000, CRC(589564ae) SHA1(1e6e0ef623545615e8409b6d3ba586a71e2612b6) )
+	ROM_LOAD( "26j3-0.bin",   0x80000, 0x20000, CRC(daf040d6) SHA1(ab0fd5482625dbe64f0f0b0baff5dcde05309b81) )
+	ROM_LOAD( "26a10-0.bin",  0xa0000, 0x20000, CRC(6d16d889) SHA1(3bc62b3e7f4ddc3200a9cf8469239662da80c854) )
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "26j4-0.bin",   0x00000, 0x20000, CRC(a8c93e76) SHA1(54d64f052971e7fa0d21c5ce12f87b0fa2b648d6) )  /* tiles */
+	ROM_LOAD( "26j5-0.bin",   0x20000, 0x20000, CRC(ee555237) SHA1(f9698f3e57f933a43e508f60667c860dee034d05) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* adpcm samples */
+	ROM_LOAD( "26j6-0.bin",   0x00000, 0x20000, CRC(a84b2a29) SHA1(9cb529e4939c16a0a42f45dd5547c76c2f86f07b) )
+	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "prom.16",      0x0000, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon) */
+ROM_END
+
 ROM_START( ddragon2u )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "26a9-04.bin",  0x08000, 0x8000, CRC(f2cfc649) SHA1(d3f1e0bae02472914a940222e4f600170a91736d) )
@@ -2101,8 +2139,10 @@ GAME( 1987, ddragonb,    ddragon,  ddragonb, ddragon, ddragon_state,  ddragon,  
 GAME( 1987, ddragonba,   ddragon,  ddragonba,   ddragon, ddragon_state,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragon6809, ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
 GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", GAME_NOT_WORKING )
+
 GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ddragon2j,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // bad dump
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike, ddragon_state,  darktowr, ROT0, "East Coast Coin Company", "Thunder Strike (set 1)", GAME_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
@@ -2113,5 +2153,6 @@ GAME( 1992, darktowr, 0,        darktowr, darktowr, ddragon_state, darktowr, ROT
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */
 GAME( 1993, toffy,    0,        toffy,    toffy, ddragon_state,    toffy,    ROT0, "Midas", "Toffy", GAME_SUPPORTS_SAVE )
+
 GAME( 1994, stoffy,   0,        toffy,    toffy, ddragon_state,    toffy,    ROT0, "Midas", "Super Toffy", GAME_SUPPORTS_SAVE )
 GAME( 1994, stoffyu,  stoffy,   toffy,    toffy, ddragon_state,    toffy,    ROT0, "Midas (Unico license)", "Super Toffy (Unico license)", GAME_SUPPORTS_SAVE )

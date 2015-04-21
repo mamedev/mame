@@ -323,6 +323,7 @@ scrambler       // bootleg
 explorer        // bootleg
 strfbomb        // bootleg
 scrambp         // bootleg (Billport S.A.)
+scramce			// bootleg (Centromatic S.A.)
 scrampt         // bootleg (Petaco S.A.)
 scramrf         // bootleg (Recreativos Franco)
 atlantis        // (c) 1981 Comsoft
@@ -7918,6 +7919,7 @@ vballb          // bootleg (of US set)
 vball2pjb       // bootleg (of Japan set)
 ddragon2        // TA-0026 (c) 1988 (World)
 ddragon2u       // TA-0026 (c) 1988 (US)
+ddragon2j       // TA-0026 (c) 1988 (Japan)
 toffy           // (c) 1993 Midas
 stoffy          // (c) 1994 Midas
 stoffyu         // (c) 1994 Midas + Unico
@@ -10354,6 +10356,7 @@ jokpokerc       // (c) 1983 Greyhound Electronics
 superbwl        // (c) 1982 Greyhound Electronics
 amuse           // (c) 1982 Greyhound Electronics
 amuse1          // (c) 1982 Greyhound Electronics
+amuse1a			// (c) 1983 Greyhound Electronics
 gs4002          // (c) 1982 G.E.I.
 gs4002a         // (c) 1982 G.E.I.
 gepoker         // (c) 1984 Greyhound Electronics
