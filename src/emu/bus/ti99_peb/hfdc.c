@@ -578,16 +578,20 @@ void myarc_hfdc_device::signal_drive_status()
 	{
 		if ((m_output1_latch & 0xe0)!=0)
 		{
-			if (m_current_harddisk->ready_r()==ASSERT_LINE) 
+			if (m_current_harddisk != NULL)
 			{
-				m_status_latch |= HDC_DS_READY;	
-				set_bits(m_status_latch, HDC_DS_SKCOM, m_current_harddisk->seek_complete_r()==ASSERT_LINE);
-				set_bits(m_status_latch, HDC_DS_TRK00, m_current_harddisk->trk00_r()==ASSERT_LINE);
+				if (m_current_harddisk->ready_r()==ASSERT_LINE) 
+				{
+					m_status_latch |= HDC_DS_READY;	
+					set_bits(m_status_latch, HDC_DS_SKCOM, m_current_harddisk->seek_complete_r()==ASSERT_LINE);
+					set_bits(m_status_latch, HDC_DS_TRK00, m_current_harddisk->trk00_r()==ASSERT_LINE);
+				}
 			}
+			// If WDS is selected but not connected, WDS.ready* and WDS.seekComplete* are 1, so Ready=SeekComplete=0
+			else set_bits(m_status_latch, HDC_DS_READY | HDC_DS_SKCOM, false);
 		}
 	}
 
-	// If WDS is selected but not connected, WDS.ready* and WDS.seekComplete* are 1, so Ready=SeekComplete=0
 	reply |= m_status_latch;
 
 	m_hdc9234->auxbus_in(reply);
