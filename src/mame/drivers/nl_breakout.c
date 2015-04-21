@@ -1,4 +1,73 @@
+// license:MAME,GPL-2.0+
+// copyright-holders:DICE Team,couriersud
+/*
+ * Changelog:
+ *      - Added discrete paddle potentiometers (couriersud)
+ *      - Changes made to run in MAME (couriersud)
+ *      - Original version imported from DICE
+ *
+ * TODO:
+ *      - implement trimmers
+ *
+ * The MAME team has asked for and received written confirmation from the
+ * author of DICE to use, modify and redistribute code under
+ * a dual licensing scheme:
+ *
+ *  *  The licensing terms of MAME apply to this piece of code for the MAME
+ *     project and derivative works, as defined by the MAME license. You
+ *     may opt to make modifications, improvements or derivative works under
+ *     that same conditions, and the MAME project may opt to keep
+ *     modifications, improvements or derivatives under their terms exclusively.
+ *
+ *   - Alternatively you can choose to apply the terms of the "GPL" (see
+ *     below) to this - and only this - piece of code or your derivative works.
+ *     Note that in no case your choice can have any impact on any other
+ *     source code of the MAME project, or binary, or executable, be it closely
+ *     or losely related to this piece of code.
+ *
+ *  -  GPL (GNU General Public License)
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License
+ *     as published by the Free Software Foundation; either version 2
+ *     of the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *   - DICE itself is licensed under version 3 of the GNU General Public License.
+ *     Under no circumstances the exemptions listed above shall apply to any
+ *     other code of DICE not contained in this file.
+ *
+ * The following is an extract from the DICE readme.
+ *
+ * ----------------------------------------------------------------------------
+ *
+ * DICE is a Discrete Integrated Circuit Emulator. It emulates computer systems
+ * that lack any type of CPU, consisting only of discrete logic components.
+ *
+ * Project Page: http://sourceforge.net/projects/dice/
+ * Email: dice.emulator@gmail.com
+ *
+ * License
+ *
+ * Copyright (C) 2008-2013 DICE Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ */
 
+// identify unknown devices in IDE
+
+#if 0
 #define NETLIST_DEVELOPMENT 1
 
 #include "netlist/nl_dice_compat.h"
@@ -16,7 +85,10 @@ static Mono555Desc c9_555_desc(OHM(47.0), U_FARAD(1.0));	// R33, C21
 static CapacitorDesc c32_desc(U_FARAD(0.1));
 static CapacitorDesc c36_desc(N_FARAD(1.0));	//0.001uF = 1nF
 static CapacitorDesc c37_desc(P_FARAD(330.0));
+
+#if 0
 static BufferDesc pad_en_buf_desc(DELAY_NS(15.0), DELAY_NS(15.0)); // Prevents 12ns glitch on PAD_EN_n signal from resetting C9. TODO: is this accurate?
+#endif
 
 #if 0
 static VIDEO_DESC( breakout )
@@ -56,17 +128,21 @@ static Mono9602Desc f3_desc(K_OHM(47.0), U_FARAD(1.0), K_OHM(47.0), U_FARAD(1.0)
 static Mono9602Desc a7_desc(K_OHM(68.0), U_FARAD(1.0), K_OHM(22.0), U_FARAD(10.0));
 static Mono9602Desc a8_desc(K_OHM(27.0), U_FARAD(1.0), K_OHM(27.0), U_FARAD(1.0));
 
+#if 0
 static Dipswitch53137Desc dipswitch1_desc("bonus_credit", "Bonus Credit", 3, "None", "100", "200", "300", "400", "500", "600", "700", "800");
+#endif
+
 //static DipswitchDesc dipswitch2_desc("cabinet_type", "Cabinet Type", 0, "Normal", "Cocktail");
 //static DipswitchDesc dipswitch3_desc("coinage", "Coinage", 0, "1 Coin / 1 Credit", "1 Coin / 2 Credits");
 //static DipswitchDesc dipswitch4_desc("ball_count", "Ball Count", 0, "3", "5");
 
 CIRCUIT_LAYOUT( breakout )
+#if 0
   	CHIP("S1", 53137, &dipswitch1_desc)
 	CHIP("S2", DIPSWITCH, &dipswitch2_desc)
 	CHIP("S3", DIPSWITCH, &dipswitch3_desc)
 	CHIP("S4", DIPSWITCH, &dipswitch4_desc)
-
+#endif
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-7) // works and is sufficient
     //CHIP("CLOCK", CLOCK_14_318_MHZ)
@@ -81,8 +157,9 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP_CAPACITOR(C32, &c32_desc)
 	CHIP_CAPACITOR(C36, &c36_desc)
  	CHIP_CAPACITOR(C37, &c37_desc)
+#if 0
  	CHIP("PAD_EN_BUF", BUFFER, &pad_en_buf_desc)
-
+#endif
 	CHIP("A3", 7474)
 	CHIP("A4", 7408)
 	CHIP("A5", 7400)
@@ -203,22 +280,29 @@ CIRCUIT_LAYOUT( breakout )
 //    CHIP("CREDIT_LIGHT2", LAMP)
 //    CHIP("SERVE_LIGHT", LAMP)
 
+#if 0
     CHIP("PAD1", PADDLE1_HORIZONTAL_INPUT, &pad1_desc)
     PADDLE_CONNECTION("PAD1", "C9")
+#endif
 
     CHIP_LATCH(LATCH)
-    CHIP("COIN1", COIN_INPUT)
+    //CHIP("COIN1", COIN_INPUT)
+	CHIP_INPUT_ACTIVE_LOW(COIN1)
 
     //CHIP("COIN2", COIN_INPUT)
 
-    CHIP("START", START_INPUT)
+	//CHIP("START", START_INPUT)
+	CHIP_INPUT_ACTIVE_HIGH(START)
 
-    CHIP("SERVE", BUTTONS1_INPUT)
+	//CHIP("SERVE", BUTTONS1_INPUT)
+	CHIP_INPUT_ACTIVE_LOW(SERVE)	// Active low?
+
 
     //TODO: coin2 and start 2
-
+#if 0
     VIDEO(breakout)
     AUDIO(breakout)
+#endif
 
 #ifdef DEBUG
 	CHIP("LOG1", VCD_LOG, &vcd_log_desc)
@@ -282,7 +366,7 @@ CIRCUIT_LAYOUT( breakout )
    #define SCORE 	"D3", 5
    #define VERT_TRIG_n 	"H1", 8
 
-   #define CLOCK 	"H1", 11
+   #define DICECLOCK	"H1", 11
    #define SCLOCK 	"K1", 15
    #define CKBH 	"F1", 13
 
@@ -594,7 +678,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(V16, "J2", 11)
    CONNECTION(H8, "J2", 1)
 
-   CONNECTION(CLOCK, "J1", 9)
+   CONNECTION(DICECLOCK, "J1", 9)
    CONNECTION(SCLOCK, "J1", 4)
    CONNECTION("N4", 6, "J1", 5)
    CONNECTION(PAD_n, "J1", 12)
@@ -608,7 +692,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "K1", 6)
    CONNECTION(P, "K1", 9)
    CONNECTION(P, "K1", 10)
-   CONNECTION(CLOCK, "K1", 2)
+   CONNECTION(DICECLOCK, "K1", 2)
    CONNECTION("L1", 15, "K1", 7)
 
    CONNECTION(P, "L1", 1)
@@ -618,7 +702,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(GND, "L1", 6)
    CONNECTION(VERT_TRIG_n, "L1", 9)
    CONNECTION(P, "L1", 10)
-   CONNECTION(CLOCK, "L1", 2)
+   CONNECTION(DICECLOCK, "L1", 2)
    CONNECTION(P, "L1", 7)
 
    CONNECTION(P, "N1", 1)
@@ -628,7 +712,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "N1", 5)
    CONNECTION(P, "N1", 6)
    CONNECTION(P, "N1", 9)
-   CONNECTION(CLOCK, "N1", 2)
+   CONNECTION(DICECLOCK, "N1", 2)
    CONNECTION("H2", 6, "N1", 7)
 
    CONNECTION("M1", 15, "H2", 5)
@@ -646,7 +730,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "M1", 5)
    CONNECTION(GND, "M1", 6)
    CONNECTION(VERT_TRIG_n, "M1", 9)
-   CONNECTION(CLOCK, "M1", 2)
+   CONNECTION(DICECLOCK, "M1", 2)
    CONNECTION("L1", 15, "M1", 7)
    CONNECTION("K1", 15, "M1", 10)
 
@@ -950,7 +1034,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("C7", 11, "C8", 10)
    CONNECTION("C7", 12, "D7", 10)
    CONNECTION("C7", 13, "D7", 11)
-   CONNECTION(CLOCK, "C7", 2)
+   CONNECTION(DICECLOCK, "C7", 2)
 
    CONNECTION(P, "C8", 1)
    CONNECTION(P, "C8", 3)
@@ -958,7 +1042,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "C8", 5)
    CONNECTION(P, "C8", 6)
    CONNECTION(P, "C8", 9)
-   CONNECTION(CLOCK, "C8", 2)
+   CONNECTION(DICECLOCK, "C8", 2)
    CONNECTION("C8", 15, "B7", 7)
    CONNECTION("C7", 15, "B7", 10)
 
@@ -968,7 +1052,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(Y2, "B7", 5)
    CONNECTION(GND, "B7", 6)
    CONNECTION("D8", 8, "B7", 9)
-   CONNECTION(CLOCK, "B7", 2)
+   CONNECTION(DICECLOCK, "B7", 2)
    CONNECTION("B7", 15, "B8", 7)
 
    CONNECTION(VB_HIT_SOUND, "D7", 9)
@@ -980,7 +1064,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "B8", 6)
    CONNECTION(P, "B8", 9)
    CONNECTION("C8", 15, "B8", 10)
-   CONNECTION(CLOCK, "B8", 2)
+   CONNECTION(DICECLOCK, "B8", 2)
 
    CONNECTION("B8", 15, "D8", 10)
    CONNECTION("B7", 15, "D8", 9)
@@ -1459,3 +1543,4 @@ CIRCUIT_LAYOUT( breakout )
 
 CIRCUIT_LAYOUT_END
 
+#endif

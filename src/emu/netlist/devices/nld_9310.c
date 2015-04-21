@@ -1,13 +1,13 @@
 /*
- * nld_9316.c
+ * nld_9310.c
  *
  */
 
-#include "nld_9316.h"
+#include "nld_9310.h"
 
-#define MAXCNT 15
+#define MAXCNT 9
 
-NETLIB_START(9316)
+NETLIB_START(9310)
 {
 	register_sub(subABCD, "subABCD");
 	sub.m_ABCD = &subABCD;
@@ -33,13 +33,13 @@ NETLIB_START(9316)
 
 }
 
-NETLIB_RESET(9316)
+NETLIB_RESET(9310)
 {
 	sub.do_reset();
 	subABCD.do_reset();
 }
 
-NETLIB_START(9316_subABCD)
+NETLIB_START(9310_subABCD)
 {
 	register_input("A", m_A);
 	register_input("B", m_B);
@@ -48,7 +48,7 @@ NETLIB_START(9316_subABCD)
 
 }
 
-NETLIB_RESET(9316_subABCD)
+NETLIB_RESET(9310_subABCD)
 {
 	m_A.inactivate();
 	m_B.inactivate();
@@ -56,16 +56,16 @@ NETLIB_RESET(9316_subABCD)
 	m_D.inactivate();
 }
 
-ATTR_HOT inline UINT8 NETLIB_NAME(9316_subABCD::read_ABCD)()
+ATTR_HOT inline UINT8 NETLIB_NAME(9310_subABCD::read_ABCD)()
 {
 	return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
 }
 
-NETLIB_UPDATE(9316_subABCD)
+NETLIB_UPDATE(9310_subABCD)
 {
 }
 
-NETLIB_START(9316_sub)
+NETLIB_START(9310_sub)
 {
 	register_input("CLK", m_CLK);
 
@@ -80,7 +80,7 @@ NETLIB_START(9316_sub)
 	save(NLNAME(m_ent.ref()));
 }
 
-NETLIB_RESET(9316_sub)
+NETLIB_RESET(9310_sub)
 {
 	m_CLK.set_state(netlist_input_t::STATE_INP_LH);
 	m_cnt = 0;
@@ -88,7 +88,7 @@ NETLIB_RESET(9316_sub)
 	m_ent = 1;
 }
 
-NETLIB_UPDATE(9316_sub)
+NETLIB_UPDATE(9310_sub)
 {
 	UINT8 cnt = m_cnt;
 	if (m_loadq)
@@ -114,7 +114,7 @@ NETLIB_UPDATE(9316_sub)
 	m_cnt = cnt;
 }
 
-NETLIB_UPDATE(9316)
+NETLIB_UPDATE(9310)
 {
 	sub.m_loadq = INPLOGIC(m_LOADQ);
 	sub.m_ent = INPLOGIC(m_ENT);
@@ -140,7 +140,7 @@ NETLIB_UPDATE(9316)
 	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(20));
 }
 
-inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
+inline NETLIB_FUNC_VOID(9310_sub, update_outputs_all, (const UINT8 cnt))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
 	OUTLOGIC(m_QA, (cnt >> 0) & 1, out_delay);
@@ -149,7 +149,7 @@ inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))
 	OUTLOGIC(m_QD, (cnt >> 3) & 1, out_delay);
 }
 
-inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
+inline NETLIB_FUNC_VOID(9310_sub, update_outputs, (const UINT8 cnt))
 {
 	const netlist_time out_delay = NLTIME_FROM_NS(20);
 #if 1
@@ -194,9 +194,9 @@ inline NETLIB_FUNC_VOID(9316_sub, update_outputs, (const UINT8 cnt))
 #endif
 }
 
-NETLIB_START(9316_dip)
+NETLIB_START(9310_dip)
 {
-	NETLIB_NAME(9316)::start();
+	NETLIB_NAME(9310)::start();
 
 	register_subalias("1", m_CLRQ);
 	register_subalias("2", sub.m_CLK);
@@ -217,12 +217,12 @@ NETLIB_START(9316_dip)
 	// register_subalias("16", ); --> VCC
 }
 
-NETLIB_UPDATE(9316_dip)
+NETLIB_UPDATE(9310_dip)
 {
-	NETLIB_NAME(9316)::update();
+	NETLIB_NAME(9310)::update();
 }
 
-NETLIB_RESET(9316_dip)
+NETLIB_RESET(9310_dip)
 {
-	NETLIB_NAME(9316)::reset();
+	NETLIB_NAME(9310)::reset();
 }

@@ -35,8 +35,12 @@
 #define CIRCUIT_LAYOUT_END NETLIST_END()
 
 
+#define OHM(x) (x)
 #define K_OHM(x) ((x) * 1000.0)
+#define M_OHM(x) ((x) * 1.0e6)
 #define U_FARAD(x) ((x) * 1.0e-6)
+#define N_FARAD(x) ((x) * 1.0e-9)
+#define P_FARAD(x) ((x) * 1.0e-12)
 
 struct Mono555Desc
 {
@@ -44,6 +48,14 @@ public:
 		nl_double r, c;
 
 		Mono555Desc(nl_double res, nl_double cap) : r(res), c(cap) { }
+};
+
+struct Astable555Desc
+{
+public:
+		nl_double r1, r2, c;
+
+		Astable555Desc(nl_double res1, nl_double res2, nl_double cap) : r1(res1), r2(res2), c(cap) { }
 };
 
 struct Mono9602Desc
@@ -63,6 +75,12 @@ public:
 		SeriesRCDesc(nl_double res, nl_double cap) : r(res), c(cap) { }
 };
 
+struct CapacitorDesc : public SeriesRCDesc
+{
+public:
+	CapacitorDesc(nl_double cap) : SeriesRCDesc(0.0, cap) { }
+};
+
 #define CHIP_555_Mono(_name,  _pdesc)   \
 	CHIP(# _name, NE555) \
 	NET_C(_name.6, _name.7) \
@@ -71,6 +89,21 @@ public:
 	NET_C(_name.6, _name ## _R.1) \
 	NET_C(_name.6, _name ## _C.1) \
 	NET_C(_name ## _R.2, V5) \
+	NET_CSTR(# _name "_C.2", "GND") \
+	NET_C(_name.8, V5) \
+	NET_CSTR(# _name ".1", "GND")
+
+#define CHIP_555_Astable(_name,  _pdesc)   \
+	CHIP(# _name, NE555) \
+	NET_C(_name.6, _name.2) \
+	RES(_name ## _R1, (_pdesc)->r1) \
+	RES(_name ## _R2, (_pdesc)->r2) \
+	CAP(_name ## _C, (_pdesc)->c) \
+	NET_C(_name.7, _name ## _R1.1) \
+	NET_C(_name.7, _name ## _R2.1) \
+	NET_C(_name.6, _name ## _R2.2) \
+	NET_C(_name.6, _name ## _C.1) \
+	NET_C(_name ## _R1.2, V5) \
 	NET_CSTR(# _name "_C.2", "GND") \
 	NET_C(_name.8, V5) \
 	NET_CSTR(# _name ".1", "GND")
@@ -118,6 +151,20 @@ public:
 	ALIAS(_name.2, _name.S) \
 	ALIAS(_name.3, _name.QQ)
 
+/* FIXME: Alternative implementation using capacitor.
+ * 		  This is a transitional implementation
+ */
+
+inline int CAPACITOR_tc(const double c, const double r)
+{
+	static const double TIME_CONSTANT = -log((3.4 - 2.0) / 3.4);
+	return (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
+}
+
+#define CHIP_CAPACITOR(_name, _pdesc) \
+	NETDEV_DELAY(_name) \
+	NETDEV_PARAMI(_name, L_TO_H, CAPACITOR_tc((_pdesc)->c, (_pdesc)->r)) \
+	NETDEV_PARAMI(_name, H_TO_HL, CAPACITOR_tc((_pdesc)->c, (_pdesc)->r)) \
 
 
 #endif /* NL_DICE_COMPAT_H_ */

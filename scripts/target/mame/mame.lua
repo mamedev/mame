@@ -980,6 +980,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pong.c",
 	MAME_DIR .. "src/mame/drivers/nl_pong.c",
 	MAME_DIR .. "src/mame/drivers/nl_pongd.c",
+	MAME_DIR .. "src/mame/drivers/nl_breakout.c",
 	MAME_DIR .. "src/mame/drivers/poolshrk.c",
 	MAME_DIR .. "src/mame/audio/poolshrk.c",
 	MAME_DIR .. "src/mame/video/poolshrk.c",
