@@ -15,6 +15,7 @@
 #define __C2040_FLOPPY__
 
 #include "emu.h"
+#include "formats/c4040_dsk.h"
 #include "formats/d64_dsk.h"
 #include "formats/d67_dsk.h"
 #include "formats/g64_dsk.h"

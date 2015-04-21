@@ -157,6 +157,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/bw2_dsk.h",
 		MAME_DIR .. "src/lib/formats/bw12_dsk.c",
 		MAME_DIR .. "src/lib/formats/bw12_dsk.h",
+		MAME_DIR .. "src/lib/formats/c4040_dsk.c",
+		MAME_DIR .. "src/lib/formats/c4040_dsk.h",
 		MAME_DIR .. "src/lib/formats/c8280_dsk.c",
 		MAME_DIR .. "src/lib/formats/c8280_dsk.h",
 		MAME_DIR .. "src/lib/formats/cbm_crt.c",
