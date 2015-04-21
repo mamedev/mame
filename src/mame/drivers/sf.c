@@ -140,7 +140,7 @@ WRITE8_MEMBER(sf_state::soundcmd_w)
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
-	membank("bank1")->set_base(memregion("audio2")->base() + 0x8000 * (data + 1));
+    membank("bank1")->set_entry(data);
 }
 
 WRITE8_MEMBER(sf_state::msm1_5205_w)
@@ -518,6 +518,8 @@ void sf_state::machine_start()
 	save_item(NAME(m_sf_active));
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_fgscroll));
+    
+    membank("bank1")->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
 }
 
 void sf_state::machine_reset()
