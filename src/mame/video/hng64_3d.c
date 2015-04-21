@@ -48,7 +48,7 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 	// this is written after the game uploads 16 packets, each 32 bytes long (2x 16 words?)
 	// we're assuming it to be a 'send to 3d hardware' trigger.
 	// this can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
-
+g_profiler.start(PROFILER_USER1);
 	for(int packetStart=0;packetStart<0x200;packetStart+=32)
 	{
 		// Send it off to the 3d subsystem.
@@ -56,6 +56,7 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 	}
 
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
+g_profiler.stop();	
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
@@ -284,7 +285,7 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 
 // Operation 0100
 // Polygon rasterization.
-void hng64_state::recoverPolygonBlock(const UINT16* packet, std::vector<struct polygon> &polys, int* numPolys)
+void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -863,9 +864,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, std::vector<struct p
 
 void hng64_state::hng64_command3d(const UINT16* packet)
 {
-	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	std::vector<polygon> polys(1024*5);
 
 	//printf("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
 
@@ -899,7 +898,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && m_mcu_type == SHOOT_MCU)
 			break;
 
-		recoverPolygonBlock( packet, polys, &numPolys);
+		recoverPolygonBlock( packet, &numPolys);
 		break;
 
 	case 0x0102:    // Geometry with only translation
@@ -919,7 +918,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock( miniPacket, polys, &numPolys);
+		recoverPolygonBlock( miniPacket, &numPolys);
 
 		memset(miniPacket, 0, sizeof(UINT16)*16);
 		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
@@ -927,7 +926,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock( miniPacket, polys, &numPolys);
+		recoverPolygonBlock( miniPacket, &numPolys);
 		break;
 
 	case 0x1000:    // Unknown: Some sort of global flags?
