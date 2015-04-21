@@ -6106,10 +6106,11 @@ pktgaldxb       // bootleg
 				// MBA ??
 				// MBB ??
 				// MBC ??
-boogwing        // MBD (c) 1992 (Euro)
-boogwinga       // MBD (c) 1992 (Asia)
-ragtime         // MBD (c) 1992 (Japan)
-ragtimea        // MBD (c) 1992 (Japan)
+boogwing        // MBD (c) 1992 (Euro, v1.5)
+boogwingu       // MBD (c) 1992 (USA, v1.7)
+boogwinga       // MBD (c) 1992 (Asia, v1.5)
+ragtime         // MBD (c) 1992 (Japan, v1.5)
+ragtimea        // MBD (c) 1992 (Japan, v1.3)
 dblewing        // MBE (c) 1993 Mitchell
 fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
 fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
