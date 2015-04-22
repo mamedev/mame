@@ -146,7 +146,7 @@ const device_type TMS1370 = &device_creator<tms1370_cpu_device>; // almost same 
 // TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
-const device_type TMS1400 = &device_creator<tms1400_cpu_device>; // 28-pin DIP, 11 R pins
+const device_type TMS1400 = &device_creator<tms1400_cpu_device>; // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
 const device_type TMS1470 = &device_creator<tms1470_cpu_device>; // almost same as tms1400, just supports higher voltage
 
 // TMS0980
