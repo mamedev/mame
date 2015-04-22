@@ -117,13 +117,11 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, U64(0x0000ffff0000ffff) )
 	
-//	AM_RANGE(0x01000000, 0x0100ffff) // - banked access to ROM board address space
-//  AM_RANGE(0x01010000, 0x010101ff) // banked access to ROM board address space, see later
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 	   
 	/* External Device */
-	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+//	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // - banked access to ROM board address space
+//	AM_RANGE(0x01010000, 0x010101ff) // I/O regs
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -169,14 +167,19 @@ MACHINE_CONFIG_END
 
 #define SEGASP_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "bios0" ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "BOOT VER 1.01" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-24236a.ic50", 0x000000, 0x200000, CRC(ca7df0de) SHA1(504c74d5fc96c53ef9f7753e9e37fb8b39cb628c) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "bios1" ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "BOOT VER 2.00" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-24328.ic50", 0x000000, 0x200000, CRC(25f2ef00) SHA1(e58dec9f171e52b3ded213b3fcd9a0de8a438076) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "bios2" ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "BOOT VER 2.01" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-24328a.ic50", 0x000000, 0x200000, CRC(03ec3805) SHA1(a8fbaea826ca257be0b2b86952f247254929e046) ) \
 
-// keep M$ board code happy for now
+// Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
+#define SEGASP_NETFIRM \
+	ROM_REGION( 0x200000, "netcpu", 0) \
+	ROM_LOAD( "ic72",  0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) )
+
+// keep M4 board code happy for now
 #define SEGASP_MISC \
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASEFF ) \
 	ROM_REGION(0x4, "boardid", ROMREGION_ERASEVAL(0x00)) \
@@ -185,6 +188,7 @@ MACHINE_CONFIG_END
 
 ROM_START( segasp )
 	SEGASP_BIOS
+	SEGASP_NETFIRM
 	SEGASP_MISC
 ROM_END
 
@@ -212,9 +216,6 @@ ROM_START( dinoking )
 	ROM_LOAD( "ic67s", 0x05000000, 0x01000000, CRC(42441393) SHA1(7ba94bc12ace699ea1159cece3d070fb35789d31) )
 	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(4a787a44) SHA1(4d8f348466187fb67ffff8605be151cea1f77ec6) )
 	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(c78e46c2) SHA1(b8224c68face23010414d13ebb4cc05a2a9dce8a) )
-
-	ROM_REGION( 0x200000, "ic72", ROMREGION_ERASE)
-	ROM_LOAD( "ic72",  0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) )
 ROM_END
 
 ROM_START( dinokior )
@@ -245,8 +246,9 @@ ROM_START( lovebero )
 	SEGASP_BIOS
 	SEGASP_MISC
 
-	ROM_REGION( 0x04000000, "rom_board", ROMREGION_ERASE)
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(0a23cea3) SHA1(1780d935b0d641769859b2022df8e4262e7bafd8) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 ROM_END
 
 ROM_START( tetgiant )
@@ -286,24 +288,24 @@ ROM_END
 
 #define GAME_FLAGS (GAME_NO_SOUND|GAME_NOT_WORKING)
 
-GAME( 200?, segasp,  0,          segasp,    segasp, driver_device,    0, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | GAME_IS_BIOS_ROOT )
+GAME( 2004, segasp,  0,          segasp,    segasp, driver_device,    0, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | GAME_IS_BIOS_ROOT )
 
 // These use ROMs
-GAME( 200?, brickppl,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Brick People / Block People", GAME_FLAGS )
+GAME( 2009, brickppl,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 
-GAME( 200?, dinoking,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King", GAME_FLAGS )
+GAME( 2005, dinoking,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
 
-GAME( 200?, dinokior,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue", GAME_FLAGS )
+GAME( 2006, dinokior,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export)", GAME_FLAGS )
 
-GAME( 200?, lovebery,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love & Berry (Ver 2.000)", GAME_FLAGS )
-GAME( 200?, lovebero,lovebery,   segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love & Berry (Ver 1.003)", GAME_FLAGS )
+GAME( 2006, lovebery,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
+GAME( 2006, lovebero,lovebery,   segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
 
-GAME( 200?, tetgiant,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver 2.000)", GAME_FLAGS )
+GAME( 2009, tetgiant,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 
 // These use a CF card
 
-GAME( 200?, dinoki25,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King 2 (Ver 2.5)", GAME_FLAGS )
+GAME( 2008, dinoki25,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
 
-GAME( 200?, loveber3,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love & Berry 3 (EXP Ver 1.002)", GAME_FLAGS )
+GAME( 2007, loveber3,segasp,     segasp,    segasp, driver_device,    0, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 
-GAME( 200?, tetgiano,tetgiant,   segasp,    segasp, driver_device,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris", GAME_FLAGS )
+GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, driver_device,    0, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )
