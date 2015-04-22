@@ -114,8 +114,7 @@ void a2bus_floppy_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	std::string tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, DISKII_ROM_REGION).c_str())->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION).c_str())->base();
 }
 
 void a2bus_floppy_device::device_reset()

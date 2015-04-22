@@ -387,8 +387,7 @@ void egret_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	std::string tempstring;
-	UINT8 *rom = device().machine().root_device().memregion(device().subtag(tempstring, EGRET_CPU_TAG).c_str())->base();
+	UINT8 *rom = device().machine().root_device().memregion(device().subtag(EGRET_CPU_TAG).c_str())->base();
 
 	if (rom)
 	{

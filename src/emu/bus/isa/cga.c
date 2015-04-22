@@ -362,8 +362,7 @@ void isa8_cga_device::device_start()
 		}
 	}
 
-	std::string tempstring;
-	m_chr_gen_base = memregion(subtag(tempstring, "gfx1").c_str())->base();
+	m_chr_gen_base = memregion(subtag("gfx1").c_str())->base();
 	m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
 
 	save_item(NAME(m_framecnt));

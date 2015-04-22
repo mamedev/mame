@@ -96,7 +96,6 @@ bool cdrom_image_device::call_load()
 {
 	chd_error   err = (chd_error)0;
 	chd_file    *chd = NULL;
-	std::string tempstring;
 
 	if (m_cdrom_handle)
 		cdrom_close(m_cdrom_handle);
@@ -110,7 +109,7 @@ bool cdrom_image_device::call_load()
 			chd = &m_self_chd;
 		}
 	} else {
-		chd = get_disk_handle(device().machine(), device().subtag(tempstring, "cdrom").c_str());
+		chd = get_disk_handle(device().machine(), device().subtag("cdrom").c_str());
 	}
 
 	/* open the CHD file */

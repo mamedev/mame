@@ -320,8 +320,7 @@ void isa8_cga_4enlinea_device::device_start()
 		}
 	}
 
-//  std::string tempstring;
-//  m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
+//  m_chr_gen_base = memregion(subtag("gfx1"))->base();
 //  m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
 }
 

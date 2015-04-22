@@ -1488,9 +1488,8 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		if (def != NULL)
 		{
 			const char *fulltag = port.tag();
-			std::string fullpath;
 			for ( ; def->tag != NULL; def++)
-				if (device().subtag(fullpath, def->tag) == fulltag && def->mask == m_mask)
+				if (device().subtag(def->tag) == fulltag && def->mask == m_mask)
 					m_defvalue = def->defvalue & m_mask;
 		}
 	}
@@ -3681,8 +3680,7 @@ const char *ioport_configurer::string_from_token(const char *string)
 void ioport_configurer::port_alloc(const char *tag)
 {
 	// create the full tag
-	std::string fulltag;
-	m_owner.subtag(fulltag, tag);
+	std::string fulltag = m_owner.subtag(tag);
 
 	// add it to the list, and reset current field/setting
 	m_curport = &m_portlist.append(fulltag.c_str(), *global_alloc(ioport_port(m_owner, fulltag.c_str())));
@@ -3699,8 +3697,7 @@ void ioport_configurer::port_alloc(const char *tag)
 void ioport_configurer::port_modify(const char *tag)
 {
 	// create the full tag
-	std::string fulltag;
-	m_owner.subtag(fulltag, tag);
+	std::string fulltag = m_owner.subtag(tag);
 
 	// find the existing port
 	m_curport = m_portlist.find(fulltag.c_str());

@@ -195,8 +195,7 @@ void isa8_mda_device::device_reset()
 	m_hsync = 0;
 	m_pixel = 0;
 
-	std::string tempstring;
-	m_chr_gen = memregion(subtag(tempstring, "gfx1").c_str())->base();
+	m_chr_gen = memregion(subtag("gfx1").c_str())->base();
 }
 
 /***************************************************************************
@@ -612,8 +611,7 @@ void isa8_hercules_device::device_reset()
 	isa8_mda_device::device_reset();
 	m_configuration_switch = 0;
 
-	std::string tempstring;
-	m_chr_gen = memregion(subtag(tempstring, "gfx1").c_str())->base();
+	m_chr_gen = memregion(subtag("gfx1").c_str())->base();
 }
 
 /***************************************************************************

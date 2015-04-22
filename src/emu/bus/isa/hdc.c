@@ -257,14 +257,13 @@ void isa8_hdc_device::device_reset()
 hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 {
 	harddisk_image_device *img = NULL;
-	std::string tempstring;
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring, "primary").c_str()));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("primary").c_str()));
 		break;
 	case 1:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring, "slave").c_str()));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("slave").c_str()));
 		break;
 	}
 	if ( img == NULL )

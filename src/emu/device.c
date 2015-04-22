@@ -129,8 +129,7 @@ memory_region *device_t::memregion(const char *_tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	std::string fullpath;
-	return machine().memory().region(subtag(fullpath, _tag).c_str());
+	return machine().memory().region(subtag(_tag).c_str());
 }
 
 
@@ -146,8 +145,7 @@ memory_share *device_t::memshare(const char *_tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	std::string fullpath;
-	return machine().memory().shared(subtag(fullpath, _tag).c_str());
+	return machine().memory().shared(subtag(_tag).c_str());
 }
 
 
@@ -163,8 +161,7 @@ memory_bank *device_t::membank(const char *_tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	std::string fullpath;
-	return machine().memory().bank(subtag(fullpath, _tag).c_str());
+	return machine().memory().bank(subtag(_tag).c_str());
 }
 
 
@@ -180,8 +177,7 @@ ioport_port *device_t::ioport(const char *tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	std::string fullpath;
-	return machine().ioport().port(subtag(fullpath, tag).c_str());
+	return machine().ioport().port(subtag(tag).c_str());
 }
 
 
@@ -197,8 +193,7 @@ std::string device_t::parameter(const char *tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	std::string fullpath;
-	return machine().parameters().lookup(subtag(fullpath, tag));
+	return machine().parameters().lookup(subtag(tag));
 }
 
 
@@ -695,8 +690,7 @@ void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 device_t *device_t::subdevice_slow(const char *tag) const
 {
 	// resolve the full path
-	std::string fulltag;
-	subtag(fulltag, tag);
+	std::string fulltag = subtag(tag);
 
 	// we presume the result is a rooted path; also doubled colons mess up our
 	// tree walk, so catch them early
@@ -726,8 +720,9 @@ device_t *device_t::subdevice_slow(const char *tag) const
 //  to our device based on the provided tag
 //-------------------------------------------------
 
-std::string &device_t::subtag(std::string &result, const char *tag) const
+std::string device_t::subtag(const char *tag) const
 {
+	std::string result;
 	// if the tag begins with a colon, ignore our path and start from the root
 	if (*tag == ':')
 	{

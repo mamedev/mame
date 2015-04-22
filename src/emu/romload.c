@@ -254,9 +254,9 @@ const rom_entry *rom_next_parameter(const rom_entry *romp)
     for a rom region
 -------------------------------------------------*/
 
-std::string &rom_region_name(std::string &result, const device_t &device, const rom_entry *romp)
+std::string rom_region_name(const device_t &device, const rom_entry *romp)
 {
-	return device.subtag(result, ROM_GETNAME(romp));
+	return device.subtag(ROM_GETNAME(romp));
 }
 
 
@@ -265,9 +265,9 @@ std::string &rom_region_name(std::string &result, const device_t &device, const 
     for a per-game parameter
 -------------------------------------------------*/
 
-std::string &rom_parameter_name(std::string &result, const device_t &device, const rom_entry *romp)
+std::string rom_parameter_name(const device_t &device, const rom_entry *romp)
 {
-	return device.subtag(result, romp->_name);
+	return device.subtag(romp->_name);
 }
 
 
@@ -1384,7 +1384,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 	{
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
-		device.subtag(regiontag, ROMREGION_GETTAG(region));
+		regiontag = device.subtag(ROMREGION_GETTAG(region));
 		LOG(("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength));
 
 		/* the first entry must be a region */
@@ -1438,7 +1438,7 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 	/* now go back and post-process all the regions */
 	for (region = start_region; region != NULL; region = rom_next_region(region))
 	{
-		device.subtag(regiontag, ROMREGION_GETTAG(region));
+		regiontag = device.subtag(ROMREGION_GETTAG(region));
 		region_post_process(romdata, regiontag.c_str(), ROMREGION_ISINVERTED(region));
 	}
 
@@ -1462,7 +1462,7 @@ static void process_region_list(romload_private *romdata)
 		{
 			UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
-			rom_region_name(regiontag, *device, region);
+			regiontag = rom_region_name(*device, region);
 			LOG(("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength));
 
 			/* the first entry must be a region */
@@ -1505,7 +1505,7 @@ static void process_region_list(romload_private *romdata)
 	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 		{
-			rom_region_name(regiontag, *device, region);
+			regiontag = rom_region_name(*device, region);
 			region_post_process(romdata, regiontag.c_str(), ROMREGION_ISINVERTED(region));
 		}
 
@@ -1513,7 +1513,7 @@ static void process_region_list(romload_private *romdata)
 	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 		for (const rom_entry *param = rom_first_parameter(*device); param != NULL; param = rom_next_parameter(param))
 		{
-			rom_parameter_name(regiontag, *device, param);
+			regiontag = rom_parameter_name(*device, param);
 			romdata->machine().parameters().add(regiontag, rom_parameter_value(param));
 		}
 }

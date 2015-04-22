@@ -150,8 +150,8 @@ public:
 
 	// owned object helpers
 	device_t *first_subdevice() const { return m_subdevice_list.first(); }
-	std::string &subtag(std::string &dest, const char *tag) const;
-	std::string &siblingtag(std::string &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.assign(tag); }
+	std::string subtag(const char *tag) const;
+	std::string siblingtag(const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(tag) : std::string(tag); }
 	memory_region *memregion(const char *tag) const;
 	memory_share *memshare(const char *tag) const;
 	memory_bank *membank(const char *tag) const;

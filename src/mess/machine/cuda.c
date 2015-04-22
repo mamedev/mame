@@ -438,8 +438,7 @@ void cuda_device::device_start()
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));
 
-	std::string tempstring;
-	UINT8 *rom = device().machine().root_device().memregion(device().subtag(tempstring, CUDA_CPU_TAG).c_str())->base();
+	UINT8 *rom = device().machine().root_device().memregion(device().subtag(CUDA_CPU_TAG).c_str())->base();
 
 	if (rom)
 	{

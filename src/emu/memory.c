@@ -1835,8 +1835,8 @@ void address_space::prepare_map()
 		if (entry->m_share != NULL)
 		{
 			// if we can't find it, add it to our map
-			std::string fulltag;
-			if (manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str()) == NULL)
+			std::string fulltag = entry->m_devbase.subtag(entry->m_share);
+			if (manager().m_sharelist.find(fulltag.c_str()) == NULL)
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry->m_byteend + 1 - entry->m_bytestart));
 				memory_share *share = global_alloc(memory_share(m_map->m_databits, entry->m_byteend + 1 - entry->m_bytestart, endianness()));
@@ -1859,8 +1859,7 @@ void address_space::prepare_map()
 		if (entry->m_region != NULL && entry->m_share == NULL)
 		{
 			// determine full tag
-			std::string fulltag;
-			entry->m_devbase.subtag(fulltag, entry->m_region);
+			std::string fulltag = entry->m_devbase.subtag(entry->m_region);
 
 			// find the region
 			memory_region *region = machine().root_device().memregion(fulltag.c_str());
@@ -1876,8 +1875,7 @@ void address_space::prepare_map()
 		if (entry->m_region != NULL)
 		{
 			// determine full tag
-			std::string fulltag;
-			entry->m_devbase.subtag(fulltag, entry->m_region);
+			std::string fulltag = entry->m_devbase.subtag(entry->m_region);
 
 			// set the memory address
 			entry->m_memory = machine().root_device().memregion(fulltag.c_str())->base() + entry->m_rgnoffs;
@@ -2153,8 +2151,8 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		// if we haven't assigned this block yet, see if we have a mapped shared pointer for it
 		if (entry->m_memory == NULL && entry->m_share != NULL)
 		{
-			std::string fulltag;
-			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str());
+			std::string fulltag = entry->m_devbase.subtag(entry->m_share);
+			memory_share *share = manager().m_sharelist.find(fulltag.c_str());
 			if (share != NULL && share->ptr() != NULL)
 			{
 				entry->m_memory = share->ptr();
@@ -2176,8 +2174,8 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		// if we're the first match on a shared pointer, assign it now
 		if (entry->m_memory != NULL && entry->m_share != NULL)
 		{
-			std::string fulltag;
-			memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str());
+			std::string fulltag = entry->m_devbase.subtag(entry->m_share);
+			memory_share *share = manager().m_sharelist.find(fulltag.c_str());
 			if (share != NULL && share->ptr() == NULL)
 			{
 				share->set_ptr(entry->m_memory);
@@ -2292,8 +2290,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	if (rtag != NULL)
 	{
 		// find the port
-		std::string fulltag;
-		ioport_port *port = machine().root_device().ioport(device().siblingtag(fulltag, rtag).c_str());
+		ioport_port *port = machine().root_device().ioport(device().siblingtag(rtag).c_str());
 		if (port == NULL)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
 
@@ -2304,8 +2301,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 	if (wtag != NULL)
 	{
 		// find the port
-		std::string fulltag;
-		ioport_port *port = machine().root_device().ioport(device().siblingtag(fulltag, wtag).c_str());
+		ioport_port *port = machine().root_device().ioport(device().siblingtag(wtag).c_str());
 		if (port == NULL)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
 
@@ -2333,8 +2329,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 	// map the read bank
 	if (rtag != NULL)
 	{
-		std::string fulltag;
-		device().siblingtag(fulltag, rtag);
+		std::string fulltag = device().siblingtag(rtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmask, addrmirror, ROW_READ);
 		read().map_range(addrstart, addrend, addrmask, addrmirror, bank.index());
 	}
@@ -2342,8 +2337,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 	// map the write bank
 	if (wtag != NULL)
 	{
-		std::string fulltag;
-		device().siblingtag(fulltag, wtag);
+		std::string fulltag = device().siblingtag(wtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
 		write().map_range(addrstart, addrend, addrmask, addrmirror, bank.index());
 	}
@@ -2612,8 +2606,8 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 	// if we are sharing, and we don't have a pointer yet, create one
 	if (entry->m_share != NULL)
 	{
-		std::string fulltag;
-		memory_share *share = manager().m_sharelist.find(entry->m_devbase.subtag(fulltag, entry->m_share).c_str());
+		std::string fulltag = entry->m_devbase.subtag(entry->m_share);
+		memory_share *share = manager().m_sharelist.find(fulltag.c_str());
 		if (share != NULL && share->ptr() == NULL)
 			return true;
 	}

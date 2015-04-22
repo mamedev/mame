@@ -229,7 +229,6 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 
 int harddisk_image_device::internal_load_hd()
 {
-	std::string tempstring;
 	chd_error err = CHDERR_NONE;
 
 	m_chd = NULL;
@@ -240,7 +239,7 @@ int harddisk_image_device::internal_load_hd()
 	/* open the CHD file */
 	if (software_entry() != NULL)
 	{
-		m_chd = get_disk_handle(device().machine(), device().subtag(tempstring, "harddriv").c_str());
+		m_chd = get_disk_handle(device().machine(), device().subtag("harddriv").c_str());
 	}
 	else
 	{

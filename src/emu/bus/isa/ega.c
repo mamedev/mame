@@ -593,8 +593,6 @@ void isa8_ega_device::device_start()
 	if (m_palette != NULL && !m_palette->started())
 		throw device_missing_dependencies();
 
-	std::string tempstring;
-
 	set_isa_device();
 
 	for (int i = 0; i < 64; i++ )
@@ -608,8 +606,8 @@ void isa8_ega_device::device_start()
 
 	if(m_default_bios_tag != "iskr3104")
 	{
-		UINT8   *dst = memregion(subtag(tempstring, "user2").c_str())->base() + 0x0000;
-		UINT8   *src = memregion(subtag(tempstring, "user1").c_str())->base() + 0x3fff;
+		UINT8   *dst = memregion(subtag("user2").c_str())->base() + 0x0000;
+		UINT8   *src = memregion(subtag("user1").c_str())->base() + 0x3fff;
 		int     i;
 
 		/* Perform the EGA bios address line swaps */
@@ -619,10 +617,10 @@ void isa8_ega_device::device_start()
 		}
 	}
 	else
-		memcpy(memregion(subtag(tempstring, "user2").c_str())->base(), memregion(subtag(tempstring, "user1").c_str())->base(), 0x4000);
+		memcpy(memregion(subtag("user2").c_str())->base(), memregion(subtag("user1").c_str())->base(), 0x4000);
 
 	/* Install 256KB Video ram on our EGA card */
-	m_vram = machine().memory().region_alloc(subtag(tempstring, "vram").c_str(), 256 * 1024, 1, ENDIANNESS_LITTLE);
+	m_vram = machine().memory().region_alloc(subtag("vram").c_str(), 256 * 1024, 1, ENDIANNESS_LITTLE);
 
 	m_videoram = m_vram->base();
 	m_plane[0] = m_videoram + 0x00000;

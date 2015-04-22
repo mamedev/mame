@@ -639,8 +639,7 @@ void validity_checker::validate_roms()
 				validate_tag(basetag);
 
 				// generate the full tag
-				std::string fulltag;
-				rom_region_name(fulltag, *device, romp);
+				std::string fulltag = rom_region_name(*device, romp);
 
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
@@ -848,11 +847,8 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 void validity_checker::validate_condition(ioport_condition &condition, device_t &device, int_map &port_map)
 {
 	// resolve the tag
-	std::string porttag;
-	device.subtag(porttag, condition.tag());
-
 	// then find a matching port
-	if (port_map.find(porttag.c_str()) == 0)
+	if (port_map.find(device.subtag(condition.tag()).c_str()) == 0)
 		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
 }
 

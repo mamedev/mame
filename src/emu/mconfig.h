@@ -132,7 +132,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 #define MCFG_QUANTUM_TIME(_time) \
 	config.m_minimum_quantum = _time;
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
-	owner->subtag(config.m_perfect_cpu_quantum, _cputag);
+	config.m_perfect_cpu_quantum = owner->subtag(_cputag);
 
 
 // watchdog configuration
