@@ -17,8 +17,6 @@ project "utils"
 	files {
 		MAME_DIR .. "src/lib/util/bitstream.h",
 		MAME_DIR .. "src/lib/util/coretmpl.h",
-		MAME_DIR .. "src/lib/util/astring.c",
-		MAME_DIR .. "src/lib/util/astring.h",
 		MAME_DIR .. "src/lib/util/avhuff.c",
 		MAME_DIR .. "src/lib/util/avhuff.h",
 		MAME_DIR .. "src/lib/util/aviio.c",
