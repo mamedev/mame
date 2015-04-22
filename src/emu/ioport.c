@@ -640,7 +640,7 @@ static const struct
 //  to the current list
 //-------------------------------------------------
 
-void ioport_list::append(device_t &device, astring &errorbuf)
+void ioport_list::append(device_t &device, std::string &errorbuf)
 {
 	// no constructor, no list
 	ioport_constructor constructor = device.input_ports();
@@ -648,7 +648,7 @@ void ioport_list::append(device_t &device, astring &errorbuf)
 		return;
 
 	// reset error buffer
-	errorbuf.reset();
+	errorbuf.clear();
 
 	// detokenize into the list
 	(*constructor)(device, *this, errorbuf);
@@ -897,7 +897,7 @@ void natural_keyboard::post(unicode_char ch)
 	if (LOG_NATURAL_KEYBOARD)
 	{
 		const keycode_map_entry *code = find_code(ch);
-		astring tempstr;
+		std::string tempstr;
 		logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(tempstr, ch), (code != NULL && code->field[0] != NULL) ? code->field[0]->name() : "<null>");
 	}
 
@@ -1101,7 +1101,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 
 							if (LOG_NATURAL_KEYBOARD)
 							{
-								astring tempstr;
+								std::string tempstr;
 								logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(tempstr, code), port, field->name());
 							}
 						}
@@ -1234,23 +1234,23 @@ void natural_keyboard::timer(void *ptr, int param)
 //  logging and debugging
 //-------------------------------------------------
 
-const char *natural_keyboard::unicode_to_string(astring &buffer, unicode_char ch)
+const char *natural_keyboard::unicode_to_string(std::string &buffer, unicode_char ch)
 {
-	buffer.reset();
+	buffer.clear();
 	switch (ch)
 	{
 		// check some magic values
-		case '\0':  buffer.cpy("\\0");      break;
-		case '\r':  buffer.cpy("\\r");      break;
-		case '\n':  buffer.cpy("\\n");      break;
-		case '\t':  buffer.cpy("\\t");      break;
+		case '\0':  buffer.assign("\\0");      break;
+		case '\r':  buffer.assign("\\r");      break;
+		case '\n':  buffer.assign("\\n");      break;
+		case '\t':  buffer.assign("\\t");      break;
 
 		default:
 			// seven bit ASCII is easy
 			if (ch >= 32 && ch < 128)
 			{
 				char temp[2] = { char(ch), 0 };
-				buffer.cpy(temp);
+				buffer.assign(temp);
 			}
 			else if (ch >= UCHAR_MAMEKEY_BEGIN)
 			{
@@ -1260,8 +1260,8 @@ const char *natural_keyboard::unicode_to_string(astring &buffer, unicode_char ch
 			}
 
 			// did we fail to resolve? if so, we have a last resort
-			if (buffer.len() == 0)
-				buffer.format("U+%04X", unsigned(ch));
+			if (buffer.length() == 0)
+				strprintf(buffer,"U+%04X", unsigned(ch));
 			break;
 	}
 	return buffer.c_str();
@@ -1307,13 +1307,13 @@ void natural_keyboard::frame_update(ioport_port &port, ioport_value &digital)
 //  key_name - returns the name of a specific key
 //-------------------------------------------------
 
-const char *natural_keyboard::key_name(astring &str, unicode_char ch)
+const char *natural_keyboard::key_name(std::string &str, unicode_char ch)
 {
 	// attempt to get the string from the character info table
 	const char_info *ci = char_info::find(ch);
 	const char *result = (ci != NULL) ? ci->name : NULL;
 	if (result != NULL)
-		str.cpy(result);
+		str.assign(result);
 
 	// if that doesn't work, convert to UTF-8
 	else if (ch > 0x7F || isprint(ch))
@@ -1321,12 +1321,12 @@ const char *natural_keyboard::key_name(astring &str, unicode_char ch)
 		char buf[10];
 		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
 		buf[count] = 0;
-		str.cpy(buf);
+		str.assign(buf);
 	}
 
 	// otherwise, opt for question marks
 	else
-		str.cpy("???");
+		str.assign("???");
 	return str.c_str();
 }
 
@@ -1335,9 +1335,9 @@ const char *natural_keyboard::key_name(astring &str, unicode_char ch)
 //  dump - dumps info to string
 //-------------------------------------------------
 
-astring natural_keyboard::dump()
+std::string natural_keyboard::dump()
 {
-	astring buffer, tempstr;
+	std::string buffer, tempstr;
 	const size_t left_column_width = 24;
 
 	// loop through all codes
@@ -1345,18 +1345,18 @@ astring natural_keyboard::dump()
 	{
 		// describe the character code
 		const natural_keyboard::keycode_map_entry &code = m_keycode_map[index];
-		buffer.catprintf("%08X (%s) ", code.ch, unicode_to_string(tempstr, code.ch));
+		strcatprintf(buffer,"%08X (%s) ", code.ch, unicode_to_string(tempstr, code.ch));
 
 		// pad with spaces
-		while (buffer.len() < left_column_width)
-			buffer.cat(' ');
+		while (buffer.length() < left_column_width)
+			buffer.push_back(' ');
 
 		// identify the keys used
 		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != 0; field++)
-			buffer.catprintf("%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
+			strcatprintf(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
 
 		// carriage return
-		buffer.cat('\n');
+		buffer.push_back('\n');
 	}
 
 	return buffer;
@@ -2041,7 +2041,7 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 //  descriptions
 //-------------------------------------------------
 
-void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
+void ioport_field::expand_diplocation(const char *location, std::string &errorbuf)
 {
 	// if nothing present, bail
 	if (location == NULL)
@@ -2050,7 +2050,7 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 	m_diploclist.reset();
 
 	// parse the string
-	astring name; // Don't move this variable inside the loop, lastname's lifetime depends on it being outside
+	std::string name; // Don't move this variable inside the loop, lastname's lifetime depends on it being outside
 	const char *lastname = NULL;
 	const char *curentry = location;
 	int entries = 0;
@@ -2062,8 +2062,8 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 			comma = curentry + strlen(curentry);
 
 		// extract it to tempbuf
-		astring tempstr;
-		tempstr.cpy(curentry, comma - curentry);
+		std::string tempstr;
+		tempstr.assign(curentry, comma - curentry);
 
 		// first extract the switch name if present
 		const char *number = tempstr.c_str();
@@ -2072,7 +2072,7 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 		// allocate and copy the name if it is present
 		if (colon != NULL)
 		{
-			lastname = name.cpy(number, colon - number).c_str();
+			lastname = name.assign(number, colon - number).c_str();
 			number = colon + 1;
 		}
 
@@ -2081,10 +2081,10 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 		{
 			if (lastname == NULL)
 			{
-				errorbuf.catprintf("Switch location '%s' missing switch name!\n", location);
+				strcatprintf(errorbuf, "Switch location '%s' missing switch name!\n", location);
 				lastname = (char *)"UNK";
 			}
-			name.cpy(lastname);
+			name.assign(lastname);
 		}
 
 		// if the number is preceded by a '!' it's active high
@@ -2098,7 +2098,7 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 		// now scan the switch number
 		int swnum = -1;
 		if (sscanf(number, "%d", &swnum) != 1)
-			errorbuf.catprintf("Switch location '%s' has invalid format!\n", location);
+			strcatprintf(errorbuf, "Switch location '%s' has invalid format!\n", location);
 
 		// allocate a new entry
 		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
@@ -2116,7 +2116,7 @@ void ioport_field::expand_diplocation(const char *location, astring &errorbuf)
 	for (bits = 0, temp = m_mask; temp != 0 && bits < 32; bits++)
 		temp &= temp - 1;
 	if (bits != entries)
-		errorbuf.catprintf("Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
+		strcatprintf(errorbuf, "Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
 }
 
 
@@ -2174,21 +2174,21 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	if (field.type_class() == INPUT_CLASS_KEYBOARD && field.specific_name() == NULL)
 	{
 		// loop through each character on the field
-		astring tempstr;
+		std::string tempstr;
 		for (int which = 0; ; which++)
 		{
 			unicode_char ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
-			name.catprintf("%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(tempstr, ch));
+			strcatprintf(name, "%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(tempstr, ch));
 		}
 
 		// trim extra spaces
-		name.trimspace();
+		strtrimspace(name);
 
 		// special case
-		if (name.len() == 0)
-			name.cpy("Unnamed Key");
+		if (name.length() == 0)
+			name.assign("Unnamed Key");
 	}
 }
 
@@ -2321,7 +2321,7 @@ void ioport_port::frame_update(ioport_field *mouse_field)
 //  wholly overlapped by other fields
 //-------------------------------------------------
 
-void ioport_port::collapse_fields(astring &errorbuf)
+void ioport_port::collapse_fields(std::string &errorbuf)
 {
 	ioport_value maskbits = 0;
 	int lastmodcount = -1;
@@ -2350,13 +2350,13 @@ void ioport_port::collapse_fields(astring &errorbuf)
 //  for errors
 //-------------------------------------------------
 
-void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedbits, astring &errorbuf)
+void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf)
 {
 	// verify against the disallowed bits, but only if we are condition-free
 	if (newfield.condition().none())
 	{
 		if ((newfield.mask() & disallowedbits) != 0)
-			errorbuf.catprintf("INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask());
+			strcatprintf(errorbuf, "INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask());
 		disallowedbits |= newfield.mask();
 	}
 
@@ -2479,7 +2479,7 @@ time_t ioport_manager::initialize()
 	device_iterator iter(machine().root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 	{
-		astring errors;
+		std::string errors;
 		m_portlist.append(*device, errors);
 		if (!errors.empty())
 			osd_printf_error("Input port errors:\n%s", errors.c_str());
@@ -3169,9 +3169,9 @@ void ioport_manager::save_config(int config_type, xml_data_node *parentnode)
 void ioport_manager::save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq)
 {
 	// get the string for the sequence
-	astring seqstring;
+	std::string seqstring;
 	if (seq.length() == 0)
-		seqstring.cpy("NONE");
+		seqstring.assign("NONE");
 	else
 		machine().input().seq_to_tokens(seqstring, seq);
 
@@ -3231,7 +3231,7 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 				if (portnode != NULL)
 				{
 					// add the port information and attributes
-					astring tempstr;
+					std::string tempstr;
 					xml_set_attribute(portnode, "type", input_type_to_token(tempstr, entry->type(), entry->player()));
 
 					// add only the sequences that have changed from the defaults
@@ -3286,7 +3286,7 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 					if (portnode != NULL)
 					{
 						// add the identifying information and attributes
-						astring tempstr;
+						std::string tempstr;
 						xml_set_attribute(portnode, "tag", port->tag());
 						xml_set_attribute(portnode, "type", input_type_to_token(tempstr, field->type(), field->player()));
 						xml_set_attribute_int(portnode, "mask", field->mask());
@@ -3629,7 +3629,7 @@ void ioport_manager::record_port(ioport_port &port)
 //  ioport_configurer - constructor
 //-------------------------------------------------
 
-ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, astring &errorbuf)
+ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std::string &errorbuf)
 	: m_owner(owner),
 		m_portlist(portlist),
 		m_errorbuf(errorbuf),
@@ -4397,15 +4397,15 @@ ioport_type ioport_manager::token_to_input_type(const char *string, int &player)
 //  type and player to a string token
 //-------------------------------------------------
 
-const char *ioport_manager::input_type_to_token(astring &str, ioport_type type, int player)
+const char *ioport_manager::input_type_to_token(std::string &str, ioport_type type, int player)
 {
 	// look up the port and return the token
 	input_type_entry *entry = m_type_to_entry[type][player];
 	if (entry != NULL)
-		return str.cpy(entry->token()).c_str();
+		return str.assign(entry->token()).c_str();
 
 	// if that fails, carry on
-	return str.format("TYPE_OTHER(%d,%d)", type, player).c_str();
+	return strformat(str, "TYPE_OTHER(%d,%d)", type, player).c_str();
 }
 
 

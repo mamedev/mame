@@ -1317,12 +1317,12 @@ void v810_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void v810_device::state_string_export(const device_state_entry &entry, astring &str)
+void v810_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				GET_AE ? 'A':'.',
 				GET_NP ? 'N':'.',
 				GET_EP ? 'E':'.',

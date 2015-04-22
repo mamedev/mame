@@ -96,7 +96,7 @@ const int MODE_GDI = 2;
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-typedef tagmap_t<astring *> parameters_t;
+typedef tagmap_t<std::string *> parameters_t;
 
 static void report_error(int error, const char *format, ...) ATTR_PRINTF(2,3);
 static void do_info(parameters_t &params);
@@ -320,7 +320,7 @@ public:
 			if (offset >= startoffs && offset < endoffs)
 			{
 				// if we don't already have this file open, open it now
-				if (m_file == NULL || m_lastfile.cmp(m_info.track[tracknum].fname)!=0)
+				if (m_file == NULL || m_lastfile.compare(m_info.track[tracknum].fname)!=0)
 				{
 					if (m_file != NULL)
 						core_fclose(m_file);
@@ -381,7 +381,7 @@ public:
 
 private:
 	// internal state
-	astring                     m_lastfile;
+	std::string                 m_lastfile;
 	core_file *                 m_file;
 	cdrom_toc &                 m_toc;
 	chdcd_track_input_info &    m_info;
@@ -826,27 +826,27 @@ static int print_help(const char *argv0, const command_description &desc, const 
 //  big_int_string - create a 64-bit string
 //-------------------------------------------------
 
-const char *big_int_string(astring &str, UINT64 intvalue)
+const char *big_int_string(std::string &str, UINT64 intvalue)
 {
 	// 0 is a special case
 	if (intvalue == 0)
-		return str.cpy("0").c_str();
+		return str.assign("0").c_str();
 
 	// loop until all chunks are done
-	str.reset();
+	str.clear();
 	bool first = true;
 	while (intvalue != 0)
 	{
 		int chunk = intvalue % 1000;
 		intvalue /= 1000;
 
-		astring insert;
-		insert.format((intvalue != 0) ? "%03d" : "%d", chunk);
+		std::string insert;
+		strprintf(insert, (intvalue != 0) ? "%03d" : "%d", chunk);
 
 		if (!first)
-			str.ins(0, ",").c_str();
+			str.insert(0, ",").c_str();
 		first = false;
-		str.ins(0, insert);
+		str.insert(0, insert);
 	}
 	return str.c_str();
 }
@@ -857,9 +857,10 @@ const char *big_int_string(astring &str, UINT64 intvalue)
 //  number of frames in M:S:F format
 //-------------------------------------------------
 
-const char *msf_string_from_frames(astring &str, UINT32 frames)
+const char *msf_string_from_frames(std::string &str, UINT32 frames)
 {
-	return str.format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75).c_str();
+	strprintf(str, "%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
+	return str.c_str();
 }
 
 
@@ -900,7 +901,7 @@ UINT64 parse_number(const char *string)
 //  compute a best guess CHS value set
 //-------------------------------------------------
 
-static void guess_chs(astring *filename, UINT64 filesize, int sectorsize, UINT32 &cylinders, UINT32 &heads, UINT32 &sectors, UINT32 &bps)
+static void guess_chs(std::string *filename, UINT64 filesize, int sectorsize, UINT32 &cylinders, UINT32 &heads, UINT32 &sectors, UINT32 &bps)
 {
 	// if this is a direct physical drive read, handle it specially
 	if (filename != NULL && osd_get_physical_drive_geometry(filename->c_str(), &cylinders, &heads, &sectors, &bps))
@@ -939,7 +940,7 @@ static void guess_chs(astring *filename, UINT64 filesize, int sectorsize, UINT32
 static void parse_input_chd_parameters(const parameters_t &params, chd_file &input_chd, chd_file &input_parent_chd, bool writeable = false)
 {
 	// process input parent file
-	astring *input_chd_parent_str = params.find(OPTION_INPUT_PARENT);
+	std::string *input_chd_parent_str = params.find(OPTION_INPUT_PARENT);
 	if (input_chd_parent_str != NULL)
 	{
 		chd_error err = input_parent_chd.open(input_chd_parent_str->c_str());
@@ -948,7 +949,7 @@ static void parse_input_chd_parameters(const parameters_t &params, chd_file &inp
 	}
 
 	// process input file
-	astring *input_chd_str = params.find(OPTION_INPUT);
+	std::string *input_chd_str = params.find(OPTION_INPUT);
 	if (input_chd_str != NULL)
 	{
 		chd_error err = input_chd.open(input_chd_str->c_str(), writeable, input_parent_chd.opened() ? &input_parent_chd : NULL);
@@ -970,9 +971,9 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 	input_end = logical_size;
 
 	// process input start
-	astring *input_start_byte_str = params.find(OPTION_INPUT_START_BYTE);
-	astring *input_start_hunk_str = params.find(OPTION_INPUT_START_HUNK);
-	astring *input_start_frame_str = params.find(OPTION_INPUT_START_FRAME);
+	std::string *input_start_byte_str = params.find(OPTION_INPUT_START_BYTE);
+	std::string *input_start_hunk_str = params.find(OPTION_INPUT_START_HUNK);
+	std::string *input_start_frame_str = params.find(OPTION_INPUT_START_FRAME);
 	if (input_start_byte_str != NULL)
 		input_start = parse_number(input_start_byte_str->c_str());
 	if (input_start_hunk_str != NULL)
@@ -983,9 +984,9 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 		report_error(1, "Input start offset greater than input file size");
 
 	// process input length
-	astring *input_length_bytes_str = params.find(OPTION_INPUT_LENGTH_BYTES);
-	astring *input_length_hunks_str = params.find(OPTION_INPUT_LENGTH_HUNKS);
-	astring *input_length_frames_str = params.find(OPTION_INPUT_LENGTH_FRAMES);
+	std::string *input_length_bytes_str = params.find(OPTION_INPUT_LENGTH_BYTES);
+	std::string *input_length_hunks_str = params.find(OPTION_INPUT_LENGTH_HUNKS);
+	std::string *input_length_frames_str = params.find(OPTION_INPUT_LENGTH_FRAMES);
 	UINT64 input_length = input_end;
 	if (input_length_bytes_str != NULL)
 		input_length = parse_number(input_length_bytes_str->c_str());
@@ -1024,10 +1025,10 @@ static void check_existing_output_file(const parameters_t &params, const char *f
 //  standard set of output CHD parameters
 //-------------------------------------------------
 
-static astring *parse_output_chd_parameters(const parameters_t &params, chd_file &output_parent_chd)
+static std::string *parse_output_chd_parameters(const parameters_t &params, chd_file &output_parent_chd)
 {
 	// process output parent file
-	astring *output_chd_parent_str = params.find(OPTION_OUTPUT_PARENT);
+	std::string *output_chd_parent_str = params.find(OPTION_OUTPUT_PARENT);
 	if (output_chd_parent_str != NULL)
 	{
 		chd_error err = output_parent_chd.open(output_chd_parent_str->c_str());
@@ -1036,7 +1037,7 @@ static astring *parse_output_chd_parameters(const parameters_t &params, chd_file
 	}
 
 	// process output file
-	astring *output_chd_str = params.find(OPTION_OUTPUT);
+	std::string *output_chd_str = params.find(OPTION_OUTPUT);
 	if (output_chd_str != NULL)
 		check_existing_output_file(params, output_chd_str->c_str());
 	return output_chd_str;
@@ -1050,7 +1051,7 @@ static astring *parse_output_chd_parameters(const parameters_t &params, chd_file
 
 static void parse_hunk_size(const parameters_t &params, UINT32 required_granularity, UINT32 &hunk_size)
 {
-	astring *hunk_size_str = params.find(OPTION_HUNK_SIZE);
+	std::string *hunk_size_str = params.find(OPTION_HUNK_SIZE);
 	if (hunk_size_str != NULL)
 	{
 		hunk_size = parse_number(hunk_size_str->c_str());
@@ -1070,12 +1071,12 @@ static void parse_hunk_size(const parameters_t &params, UINT32 required_granular
 static void parse_compression(const parameters_t &params, chd_codec_type compression[4])
 {
 	// see if anything was specified
-	astring *compression_str = params.find(OPTION_COMPRESSION);
+	std::string *compression_str = params.find(OPTION_COMPRESSION);
 	if (compression_str == NULL)
 		return;
 
 	// special case: 'none'
-	if (compression_str->cmp("none")==0)
+	if (compression_str->compare("none")==0)
 	{
 		compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
 		return;
@@ -1083,10 +1084,10 @@ static void parse_compression(const parameters_t &params, chd_codec_type compres
 
 	// iterate through compressors
 	int index = 0;
-	for (int start = 0, end = compression_str->chr(0, ','); index < 4; start = end + 1, end = compression_str->chr(end + 1, ','))
+	for (int start = 0, end = compression_str->find_first_of(','); index < 4; start = end + 1, end = compression_str->find_first_of(',', end + 1))
 	{
-		astring name(*compression_str, start, (end == -1) ? -1 : end - start);
-		if (name.len() != 4)
+		std::string name(*compression_str, start, (end == -1) ? -1 : end - start);
+		if (name.length() != 4)
 			report_error(1, "Invalid compressor '%s' specified", name.c_str());
 		chd_codec_type type = CHD_MAKE_TAG(name[0], name[1], name[2], name[3]);
 		if (!chd_codec_list::codec_exists(type))
@@ -1110,7 +1111,7 @@ static void parse_compression(const parameters_t &params, chd_codec_type compres
 
 static void parse_numprocessors(const parameters_t &params)
 {
-	astring *numprocessors_str = params.find(OPTION_NUMPROCESSORS);
+	std::string *numprocessors_str = params.find(OPTION_NUMPROCESSORS);
 	if (numprocessors_str == NULL)
 		return;
 
@@ -1128,12 +1129,12 @@ static void parse_numprocessors(const parameters_t &params)
 //  describing a set of compressors
 //-------------------------------------------------
 
-static const char *compression_string(astring &str, chd_codec_type compression[4])
+static const char *compression_string(std::string &str, chd_codec_type compression[4])
 {
 	// output compression types
-	str.reset();
+	str.clear();
 	if (compression[0] == CHD_CODEC_NONE)
-		return str.cpy("none").c_str();
+		return str.assign("none").c_str();
 
 	// iterate over types
 	for (int index = 0; index < 4; index++)
@@ -1142,9 +1143,12 @@ static const char *compression_string(astring &str, chd_codec_type compression[4
 		if (type == CHD_CODEC_NONE)
 			break;
 		if (index != 0)
-			str.cat(", ");
-		str.cat((type >> 24) & 0xff).cat((type >> 16) & 0xff).cat((type >> 8) & 0xff).cat(type & 0xff);
-		str.cat(" (").cat(chd_codec_list::codec_name(type)).cat(")");
+			str.append(", ");
+		str.push_back((type >> 24) & 0xff);
+		str.push_back((type >> 16) & 0xff);
+		str.push_back((type >> 8) & 0xff);
+		str.push_back(type & 0xff);
+		str.append(" (").append(chd_codec_list::codec_name(type)).append(")");
 	}
 	return str.c_str();
 }
@@ -1240,12 +1244,12 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 			core_fprintf(file, "FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
-		astring tempstr;
+		std::string tempstr;
 		switch (info.trktype)
 		{
 			case CD_TRACK_MODE1:
 			case CD_TRACK_MODE1_RAW:
-				tempstr.format("MODE1/%04d", info.datasize);
+				strprintf(tempstr,"MODE1/%04d", info.datasize);
 				break;
 
 			case CD_TRACK_MODE2:
@@ -1253,11 +1257,11 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 			case CD_TRACK_MODE2_FORM2:
 			case CD_TRACK_MODE2_FORM_MIX:
 			case CD_TRACK_MODE2_RAW:
-				tempstr.format("MODE2/%04d", info.datasize);
+				strprintf(tempstr,"MODE2/%04d", info.datasize);
 				break;
 
 			case CD_TRACK_AUDIO:
-				tempstr.cpy("AUDIO");
+				tempstr.assign("AUDIO");
 				break;
 		}
 
@@ -1295,11 +1299,11 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 		core_fprintf(file, "// Track %d\n", tracknum + 1);
 
 		// write out the track type
-		astring modesubmode;
+		std::string modesubmode;
 		if (info.subtype != CD_SUB_NONE)
-			modesubmode.format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
+			strprintf(modesubmode,"%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
 		else
-			modesubmode.format("%s", cdrom_get_type_string(info.trktype));
+			strprintf(modesubmode,"%s", cdrom_get_type_string(info.trktype));
 		core_fprintf(file, "TRACK %s\n", modesubmode.c_str());
 
 		// write out the attributes
@@ -1311,7 +1315,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 		}
 
 		// output pregap
-		astring tempstr;
+		std::string tempstr;
 		if (info.pregap > 0)
 			core_fprintf(file, "ZERO %s %s\n", modesubmode.c_str(), msf_string_from_frames(tempstr, info.pregap));
 
@@ -1343,7 +1347,7 @@ static void do_info(parameters_t &params)
 	parse_input_chd_parameters(params, input_chd, input_parent_chd);
 
 	// print filename and version
-	astring tempstr;
+	std::string tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->c_str());
 	printf("File Version: %d\n", input_chd.version());
 	if (input_chd.version() < 3)
@@ -1467,7 +1471,7 @@ static void do_info(parameters_t &params)
 				}
 
 				// output the stats
-				astring tempstr;
+				std::string tempstr;
 				printf("%10s   %5.1f%%  %-40s\n",
 						big_int_string(tempstr, compression_types[comptype]),
 						100.0 * double(compression_types[comptype]) / double(input_chd.hunk_count()),
@@ -1519,7 +1523,7 @@ static void do_verify(parameters_t &params)
 	// finish up
 	if (raw_sha1 != computed_sha1)
 	{
-		astring tempstr;
+		std::string tempstr;
 		fprintf(stderr, "Error: Raw SHA1 in header = %s\n", raw_sha1.as_string(tempstr));
 		fprintf(stderr, "              actual SHA1 = %s\n", computed_sha1.as_string(tempstr));
 
@@ -1542,7 +1546,7 @@ static void do_verify(parameters_t &params)
 				printf("Overall SHA1 verification successful!\n");
 			else
 			{
-				astring tempstr;
+				std::string tempstr;
 				fprintf(stderr, "Error: Overall SHA1 in header = %s\n", input_chd.sha1().as_string(tempstr));
 				fprintf(stderr, "                  actual SHA1 = %s\n", computed_overall_sha1.as_string(tempstr));
 
@@ -1567,7 +1571,7 @@ static void do_create_raw(parameters_t &params)
 {
 	// process input file
 	core_file *input_file = NULL;
-	astring *input_file_str = params.find(OPTION_INPUT);
+	std::string *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
 		file_error filerr = core_fopen(input_file_str->c_str(), OPEN_FLAG_READ, &input_file);
@@ -1577,7 +1581,7 @@ static void do_create_raw(parameters_t &params)
 
 	// process output CHD
 	chd_file output_parent;
-	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process hunk size
 	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : 0;
@@ -1585,7 +1589,7 @@ static void do_create_raw(parameters_t &params)
 
 	// process unit size
 	UINT32 unit_size = output_parent.opened() ? output_parent.unit_bytes() : 0;
-	astring *unit_size_str = params.find(OPTION_UNIT_SIZE);
+	std::string *unit_size_str = params.find(OPTION_UNIT_SIZE);
 	if (unit_size_str != NULL)
 	{
 		unit_size = parse_number(unit_size_str->c_str());
@@ -1607,7 +1611,7 @@ static void do_create_raw(parameters_t &params)
 	parse_numprocessors(params);
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->c_str());
@@ -1647,7 +1651,7 @@ static void do_create_raw(parameters_t &params)
 	{
 		delete chd;
 		// delete the output file
-		astring *output_chd_str = params.find(OPTION_OUTPUT);
+		std::string *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(output_chd_str->c_str());
 		throw;
@@ -1664,7 +1668,7 @@ static void do_create_hd(parameters_t &params)
 {
 	// process input file
 	core_file *input_file = NULL;
-	astring *input_file_str = params.find(OPTION_INPUT);
+	std::string *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
 		file_error filerr = core_fopen(input_file_str->c_str(), OPEN_FLAG_READ, &input_file);
@@ -1674,11 +1678,11 @@ static void do_create_hd(parameters_t &params)
 
 	// process output CHD
 	chd_file output_parent;
-	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process sectorsize
 	UINT32 sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
-	astring *sectorsize_str = params.find(OPTION_SECTOR_SIZE);
+	std::string *sectorsize_str = params.find(OPTION_SECTOR_SIZE);
 	if (sectorsize_str != NULL)
 	{
 		if (output_parent.opened())
@@ -1701,7 +1705,7 @@ static void do_create_hd(parameters_t &params)
 	}
 	else
 	{
-		astring *size_str = params.find(OPTION_SIZE);
+		std::string *size_str = params.find(OPTION_SIZE);
 		if (size_str != NULL)
 		{
 			if (sscanf(size_str->c_str(), "%" I64FMT"d", &filesize) != 1)
@@ -1725,7 +1729,7 @@ static void do_create_hd(parameters_t &params)
 	UINT32 cylinders = 0;
 	UINT32 heads = 0;
 	UINT32 sectors = 0;
-	astring *chs_str = params.find(OPTION_CHS);
+	std::string *chs_str = params.find(OPTION_CHS);
 	if (chs_str != NULL)
 	{
 		if (output_parent.opened())
@@ -1738,7 +1742,7 @@ static void do_create_hd(parameters_t &params)
 	dynamic_buffer identdata;
 	if (output_parent.opened())
 		output_parent.read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
-	astring *ident_str = params.find(OPTION_IDENT);
+	std::string *ident_str = params.find(OPTION_IDENT);
 	if (ident_str != NULL)
 	{
 		// load the file
@@ -1757,7 +1761,7 @@ static void do_create_hd(parameters_t &params)
 	// extract geometry from the parent if we have one
 	if (output_parent.opened() && cylinders == 0)
 	{
-		astring metadata;
+		std::string metadata;
 		if (output_parent.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) != CHDERR_NONE)
 			report_error(1, "Unable to find hard disk metadata in parent CHD");
 		if (sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &cylinders, &heads, &sectors, &sector_size) != 4)
@@ -1778,7 +1782,7 @@ static void do_create_hd(parameters_t &params)
 	UINT32 totalsectors = cylinders * heads * sectors;
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->c_str());
@@ -1814,8 +1818,8 @@ static void do_create_hd(parameters_t &params)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// add the standard hard disk metadata
-		astring metadata;
-		metadata.format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sector_size);
+		std::string metadata;
+		strprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sector_size);
 		err = chd->write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
@@ -1837,7 +1841,7 @@ static void do_create_hd(parameters_t &params)
 	{
 		delete chd;
 		// delete the output file
-		astring *output_chd_str = params.find(OPTION_OUTPUT);
+		std::string *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(output_chd_str->c_str());
 		throw;
@@ -1855,7 +1859,7 @@ static void do_create_cd(parameters_t &params)
 	// process input file
 	chdcd_track_input_info track_info;
 	cdrom_toc toc = { 0 };
-	astring *input_file_str = params.find(OPTION_INPUT);
+	std::string *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
 		chd_error err = chdcd_parse_toc(input_file_str->c_str(), toc, track_info);
@@ -1865,7 +1869,7 @@ static void do_create_cd(parameters_t &params)
 
 	// process output CHD
 	chd_file output_parent;
-	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process hunk size
 	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : CD_FRAMES_PER_HUNK * CD_FRAME_SIZE;
@@ -1892,7 +1896,7 @@ static void do_create_cd(parameters_t &params)
 	}
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->c_str());
@@ -1929,7 +1933,7 @@ static void do_create_cd(parameters_t &params)
 	{
 		delete chd;
 		// delete the output file
-		astring *output_chd_str = params.find(OPTION_OUTPUT);
+		std::string *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(output_chd_str->c_str());
 		throw;
@@ -1946,7 +1950,7 @@ static void do_create_ld(parameters_t &params)
 {
 	// process input file
 	avi_file *input_file = NULL;
-	astring *input_file_str = params.find(OPTION_INPUT);
+	std::string *input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != NULL)
 	{
 		avi_error avierr = avi_open(input_file_str->c_str(), &input_file);
@@ -1957,7 +1961,7 @@ static void do_create_ld(parameters_t &params)
 
 	// process output CHD
 	chd_file output_parent;
-	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process input start/end
 	UINT64 input_start;
@@ -2002,7 +2006,7 @@ static void do_create_ld(parameters_t &params)
 	parse_numprocessors(params);
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->c_str());
@@ -2035,8 +2039,8 @@ static void do_create_ld(parameters_t &params)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// write the core A/V metadata
-		astring metadata;
-		metadata.format(AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
+		std::string metadata;
+		strprintf(metadata, AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
 		err = chd->write_metadata(AV_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding AV metadata: %s\n", chd_file::error_string(err));
@@ -2057,7 +2061,7 @@ static void do_create_ld(parameters_t &params)
 	{
 		delete chd;
 		// delete the output file
-		astring *output_chd_str = params.find(OPTION_OUTPUT);
+		std::string *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(output_chd_str->c_str());
 		throw;
@@ -2084,7 +2088,7 @@ static void do_copy(parameters_t &params)
 
 	// process output CHD
 	chd_file output_parent;
-	astring *output_chd_str = parse_output_chd_parameters(params, output_parent);
+	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process hunk size
 	UINT32 hunk_size = input_chd.hunk_bytes();
@@ -2115,7 +2119,7 @@ static void do_copy(parameters_t &params)
 	parse_numprocessors(params);
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->c_str());
@@ -2193,7 +2197,7 @@ static void do_copy(parameters_t &params)
 	{
 		delete chd;
 		// delete the output file
-		astring *output_chd_str = params.find(OPTION_OUTPUT);
+		std::string *output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != NULL)
 			osd_rmfile(output_chd_str->c_str());
 		throw;
@@ -2219,12 +2223,12 @@ static void do_extract_raw(parameters_t &params)
 	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
 
 	// verify output file doesn't exist
-	astring *output_file_str = params.find(OPTION_OUTPUT);
+	std::string *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
 		check_existing_output_file(params, output_file_str->c_str());
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output File:  %s\n", output_file_str->c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->c_str());
 	if (input_start != 0 || input_end != input_chd.logical_bytes())
@@ -2299,25 +2303,25 @@ static void do_extract_cd(parameters_t &params)
 	const cdrom_toc *toc = cdrom_get_toc(cdrom);
 
 	// verify output file doesn't exist
-	astring *output_file_str = params.find(OPTION_OUTPUT);
+	std::string *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
 		check_existing_output_file(params, output_file_str->c_str());
 
 	// verify output BIN file doesn't exist
-	astring *output_bin_file_str = params.find(OPTION_OUTPUT_BIN);
-	astring default_name(*output_file_str);
-	int chop = default_name.rchr(0, '.');
+	std::string *output_bin_file_str = params.find(OPTION_OUTPUT_BIN);
+	std::string default_name(*output_file_str);
+	int chop = default_name.find_last_of('.');
 	if (chop != -1)
 		default_name.substr(0, chop);
 	char basename[128];
 	strncpy(basename, default_name.c_str(), 127);
-	default_name.cat(".bin");
+	default_name.append(".bin");
 	if (output_bin_file_str == NULL)
 		output_bin_file_str = &default_name;
 	check_existing_output_file(params, output_bin_file_str->c_str());
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output TOC:   %s\n", output_file_str->c_str());
 	printf("Output Data:  %s\n", output_bin_file_str->c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->c_str());
@@ -2368,17 +2372,17 @@ static void do_extract_cd(parameters_t &params)
 		dynamic_buffer buffer;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 		{
-			astring trackbin_name(basename);
+			std::string trackbin_name(basename);
 
 			if (mode == MODE_GDI)
 			{
 				char temp[8];
 				sprintf(temp, "%02d", tracknum+1);
-				trackbin_name.cat(temp);
+				trackbin_name.append(temp);
 				if (toc->tracks[tracknum].trktype == CD_TRACK_AUDIO)
-					trackbin_name.cat(".raw");
+					trackbin_name.append(".raw");
 				else
-					trackbin_name.cat(".bin");
+					trackbin_name.append(".bin");
 
 				if (output_bin_file)
 				{
@@ -2395,7 +2399,7 @@ static void do_extract_cd(parameters_t &params)
 
 			// output the metadata about the track to the TOC file
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
-			astring temp;
+			std::string temp;
 			if (mode == MODE_GDI)
 			{
 				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(temp, trackbin_name.c_str()).c_str(), discoffs, outputoffs);
@@ -2494,7 +2498,7 @@ static void do_extract_ld(parameters_t &params)
 	parse_input_chd_parameters(params, input_chd, input_parent_chd);
 
 	// read core metadata
-	astring metadata;
+	std::string metadata;
 	chd_error err = input_chd.read_metadata(AV_METADATA_TAG, 0, metadata);
 	if (err != CHDERR_NONE)
 		report_error(1, "Unable to find A/V metadata in the input CHD");
@@ -2546,12 +2550,12 @@ static void do_extract_ld(parameters_t &params)
 	info.audio_samplerate = rate;
 
 	// verify output file doesn't exist
-	astring *output_file_str = params.find(OPTION_OUTPUT);
+	std::string *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
 		check_existing_output_file(params, output_file_str->c_str());
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Output File:  %s\n", output_file_str->c_str());
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->c_str());
 	if (input_start != 0 || input_end != input_chd.hunk_count())
@@ -2645,31 +2649,31 @@ static void do_add_metadata(parameters_t &params)
 
 	// process tag
 	chd_metadata_tag tag = CHD_MAKE_TAG('?','?','?','?');
-	astring *tag_str = params.find(OPTION_TAG);
+	std::string *tag_str = params.find(OPTION_TAG);
 	if (tag_str != NULL)
 	{
-		tag_str->cat("    ");
+		tag_str->append("    ");
 		tag = CHD_MAKE_TAG((*tag_str)[0], (*tag_str)[1], (*tag_str)[2], (*tag_str)[3]);
 	}
 
 	// process index
 	UINT32 index = 0;
-	astring *index_str = params.find(OPTION_INDEX);
+	std::string *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
 		index = atoi(index_str->c_str());
 
 	// process text input
-	astring *text_str = params.find(OPTION_VALUE_TEXT);
-	astring text;
+	std::string *text_str = params.find(OPTION_VALUE_TEXT);
+	std::string text;
 	if (text_str != NULL)
 	{
 		text = *text_str;
-		if (text[0] == '"' && text[text.len() - 1] == '"')
-			text.substr(1, text.len() - 2);
+		if (text[0] == '"' && text[text.length() - 1] == '"')
+			text.substr(1, text.length() - 2);
 	}
 
 	// process file input
-	astring *file_str = params.find(OPTION_VALUE_FILE);
+	std::string *file_str = params.find(OPTION_VALUE_FILE);
 	dynamic_buffer file;
 	if (file_str != NULL)
 	{
@@ -2690,7 +2694,7 @@ static void do_add_metadata(parameters_t &params)
 		flags &= ~CHD_MDFLAGS_CHECKSUM;
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->c_str());
 	printf("Tag:          %c%c%c%c\n", (tag >> 24) & 0xff, (tag >> 16) & 0xff, (tag >> 8) & 0xff, tag & 0xff);
 	printf("Index:        %d\n", index);
@@ -2725,21 +2729,21 @@ static void do_del_metadata(parameters_t &params)
 
 	// process tag
 	chd_metadata_tag tag = CHD_MAKE_TAG('?','?','?','?');
-	astring *tag_str = params.find(OPTION_TAG);
+	std::string *tag_str = params.find(OPTION_TAG);
 	if (tag_str != NULL)
 	{
-		tag_str->cat("    ");
+		tag_str->append("    ");
 		tag = CHD_MAKE_TAG((*tag_str)[0], (*tag_str)[1], (*tag_str)[2], (*tag_str)[3]);
 	}
 
 	// process index
 	UINT32 index = 0;
-	astring *index_str = params.find(OPTION_INDEX);
+	std::string *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
 		index = atoi(index_str->c_str());
 
 	// print some info
-	astring tempstr;
+	std::string tempstr;
 	printf("Input file:   %s\n", params.find(OPTION_INPUT)->c_str());
 	printf("Tag:          %c%c%c%c\n", (tag >> 24) & 0xff, (tag >> 16) & 0xff, (tag >> 8) & 0xff, tag & 0xff);
 	printf("Index:        %d\n", index);
@@ -2765,22 +2769,22 @@ static void do_dump_metadata(parameters_t &params)
 	parse_input_chd_parameters(params, input_chd, input_parent_chd);
 
 	// verify output file doesn't exist
-	astring *output_file_str = params.find(OPTION_OUTPUT);
+	std::string *output_file_str = params.find(OPTION_OUTPUT);
 	if (output_file_str != NULL)
 		check_existing_output_file(params, output_file_str->c_str());
 
 	// process tag
 	chd_metadata_tag tag = CHD_MAKE_TAG('?','?','?','?');
-	astring *tag_str = params.find(OPTION_TAG);
+	std::string *tag_str = params.find(OPTION_TAG);
 	if (tag_str != NULL)
 	{
-		tag_str->cat("    ");
+		tag_str->append("    ");
 		tag = CHD_MAKE_TAG((*tag_str)[0], (*tag_str)[1], (*tag_str)[2], (*tag_str)[3]);
 	}
 
 	// process index
 	UINT32 index = 0;
-	astring *index_str = params.find(OPTION_INDEX);
+	std::string *index_str = params.find(OPTION_INDEX);
 	if (index_str != NULL)
 		index = atoi(index_str->c_str());
 
@@ -2808,7 +2812,7 @@ static void do_dump_metadata(parameters_t &params)
 			core_fclose(output_file);
 
 			// provide some feedback
-			astring tempstr;
+			std::string tempstr;
 			printf("File (%s) written, %s bytes\n", output_file_str->c_str(), big_int_string(tempstr, buffer.size()));
 		}
 
@@ -2864,7 +2868,7 @@ int CLIB_DECL main(int argc, char *argv[])
 				return print_help(argv[0], desc);
 
 			// otherwise, verify the parameters
-			tagmap_t<astring *> parameters;
+			tagmap_t<std::string *> parameters;
 			while (argnum < argc)
 			{
 				// should be an option name
@@ -2905,7 +2909,7 @@ int CLIB_DECL main(int argc, char *argv[])
 						}
 
 						// add to the map
-						if (parameters.add(odesc.name, new astring(param)) == TMERR_DUPLICATE)
+						if (parameters.add(odesc.name, new std::string(param)) == TMERR_DUPLICATE)
 							return print_help(argv[0], desc, "Multiple parameters of the same type specified");
 						break;
 					}

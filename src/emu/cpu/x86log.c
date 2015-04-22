@@ -48,7 +48,7 @@ struct data_range_t
 /* the code logging context */
 struct x86log_context
 {
-	astring         filename;                       /* name of the file */
+	std::string     filename;                       /* name of the file */
 	FILE *          file;                           /* file we are logging to */
 
 	data_range_t    data_range[MAX_DATA_RANGES];    /* list of data ranges */
@@ -88,7 +88,7 @@ x86log_context *x86log_create_context(const char *filename)
 	log = global_alloc_clear(x86log_context);
 
 	/* allocate the filename */
-	log->filename.cpy(filename);
+	log->filename.assign(filename);
 
 	/* reset things */
 	reset_log(log);

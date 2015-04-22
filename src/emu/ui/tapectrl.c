@@ -62,7 +62,7 @@ void ui_menu_tape_control::populate()
 
 		if (current_device()->exists())
 		{
-			astring timepos;
+			std::string timepos;
 			cassette_state state;
 			double t0 = current_device()->get_position();
 			double t1 = current_device()->get_length();
@@ -163,7 +163,7 @@ void ui_menu_tape_control::handle()
 //  representation of the time
 //-------------------------------------------------
 
-void ui_menu_tape_control::get_time_string(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos)
+void ui_menu_tape_control::get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos)
 {
 	double t0, t1;
 
@@ -171,9 +171,9 @@ void ui_menu_tape_control::get_time_string(astring &dest, cassette_image_device 
 	t1 = cassette->get_length();
 
 	if (t1)
-		dest.printf("%04d/%04d", (int) t0, (int) t1);
+		strprintf(dest, "%04d/%04d", (int)t0, (int)t1);
 	else
-		dest.printf("%04d/%04d", 0, (int) t1);
+		strprintf(dest, "%04d/%04d", 0, (int)t1);
 
 	if (curpos != NULL)
 		*curpos = t0;

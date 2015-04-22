@@ -112,7 +112,7 @@ void real_profiler_state::reset(bool enabled)
 
 
 //-------------------------------------------------
-//  text - return the current text in an astring
+//  text - return the current text in an std::string
 //-------------------------------------------------
 
 const char *real_profiler_state::text(running_machine &machine)
@@ -136,7 +136,7 @@ const char *real_profiler_state::text(running_machine &machine)
 
 
 //-------------------------------------------------
-//  update_text - update the current astring
+//  update_text - update the current std::string
 //-------------------------------------------------
 
 void real_profiler_state::update_text(running_machine &machine)
@@ -185,7 +185,7 @@ void real_profiler_state::update_text(running_machine &machine)
 
 	// this becomes the total; if we end up with 0 for anything, we were just started, so return empty
 	UINT64 total = computed;
-	m_text.reset();
+	m_text.clear();
 	if (total == 0 || normalize == 0)
 	{
 		return;
@@ -202,25 +202,25 @@ void real_profiler_state::update_text(running_machine &machine)
 		if (computed != 0)
 		{
 			// start with the un-normalized percentage
-			m_text.catprintf("%02d%% ", (int)((computed * 100 + total/2) / total));
+			strcatprintf(m_text, "%02d%% ", (int)((computed * 100 + total / 2) / total));
 
 			// followed by the normalized percentage for everything but profiler and idle
 			if (curtype < PROFILER_PROFILER)
-				m_text.catprintf("%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
+				strcatprintf(m_text, "%02d%% ", (int)((computed * 100 + normalize / 2) / normalize));
 
 			// and then the text
 			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
-				m_text.catprintf("'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
+				strcatprintf(m_text, "'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
 			else
 				for (int nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
 					if (names[nameindex].type == curtype)
 					{
-						m_text.cat(names[nameindex].string);
+						m_text.append(names[nameindex].string);
 						break;
 					}
 
 			// followed by a carriage return
-			m_text.cat("\n");
+			m_text.append("\n");
 		}
 	}
 

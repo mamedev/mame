@@ -326,13 +326,13 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				// FIXME: This doesn't work! AMH_DEVICE_DELEGATE entries don't even set m_tag, the device tag is inside the proto-delegate
 				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag != NULL)
 				{
-					astring temp(entry->m_read.m_tag);
+					std::string temp(entry->m_read.m_tag);
 					if (device().siblingdevice(temp.c_str()) == NULL)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
 				}
 				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag != NULL)
 				{
-					astring temp(entry->m_write.m_tag);
+					std::string temp(entry->m_write.m_tag);
 					if (device().siblingdevice(temp.c_str()) == NULL)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag);
 				}

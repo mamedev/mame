@@ -257,30 +257,30 @@ void video_manager::frame_update(bool debug)
 //  into a string buffer
 //-------------------------------------------------
 
-astring &video_manager::speed_text(astring &str)
+std::string &video_manager::speed_text(std::string &str)
 {
-	str.reset();
+	str.clear();
 
 	// if we're paused, just display Paused
 	bool paused = machine().paused();
 	if (paused)
-		str.cat("paused");
+		str.append("paused");
 
 	// if we're fast forwarding, just display Fast-forward
 	else if (m_fastforward)
-		str.cat("fast ");
+		str.append("fast ");
 
 	// if we're auto frameskipping, display that plus the level
 	else if (effective_autoframeskip())
-		str.catprintf("auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		strcatprintf(str, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// otherwise, just display the frameskip plus the level
 	else
-		str.catprintf("skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
+		strcatprintf(str, "skip %d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	// append the speed for all cases except paused
 	if (!paused)
-		str.catprintf("%4d%%", (int)(100 * m_speed_percent + 0.5));
+		strcatprintf(str, "%4d%%", (int)(100 * m_speed_percent + 0.5));
 
 	// display the number of partial updates as well
 	int partials = 0;
@@ -288,7 +288,7 @@ astring &video_manager::speed_text(astring &str)
 	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
 		partials += screen->partial_updates();
 	if (partials > 1)
-		str.catprintf("\n%d partial updates", partials);
+		strcatprintf(str, "\n%d partial updates", partials);
 
 	return str;
 }
@@ -308,8 +308,8 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	create_snapshot_bitmap(screen);
 
 	// add two text entries describing the image
-	astring text1 = astring(emulator_info::get_appname()).cat(" ").cat(build_version);
-	astring text2 = astring(machine().system().manufacturer).cat(" ").cat(machine().system().description);
+	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
+	std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
 	png_info pnginfo = { 0 };
 	png_add_text(&pnginfo, "Software", text1.c_str());
 	png_add_text(&pnginfo, "System", text2.c_str());
@@ -398,7 +398,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 
 		// create a new temporary movie file
 		file_error filerr;
-		astring fullpath;
+		std::string fullpath;
 		{
 			emu_file tempfile(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (name != NULL)
@@ -1117,30 +1117,30 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 
 	if (snapname == NULL || snapname[0] == 0)
 		snapname = "%g/%i";
-	astring snapstr(snapname);
+	std::string snapstr(snapname);
 
 	// strip any extension in the provided name
-	int index = snapstr.rchr(0, '.');
+	int index = snapstr.find_last_of('.');
 	if (index != -1)
-		snapstr.substr(0, index);
+		snapstr = snapstr.substr(0, index);
 
 	// handle %d in the template (for image devices)
-	astring snapdev("%d_");
-	int pos = snapstr.find(0, snapdev.c_str());
+	std::string snapdev("%d_");
+	int pos = snapstr.find(snapdev.c_str());
 
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (snapstr.find(pos + 3, snapdev.c_str()) != -1)
-			snapstr.cpy("%g/%i");
+		if (snapstr.find(snapdev.c_str(), pos + 3) != -1)
+			snapstr.assign("%g/%i");
 		// else if there is a single %d, try to create the correct snapname
 		else
 		{
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = snapstr.find(pos + 3, "/");
-			int end2 = snapstr.find(pos + 3, "%");
+			int end1 = snapstr.find("/", pos + 3);
+			int end2 = snapstr.find("%", pos + 3);
 			int end = -1;
 
 			if ((end1 != -1) && (end2 != -1))
@@ -1150,14 +1150,14 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 			else if (end2 != -1)
 				end = end2;
 			else
-				end = snapstr.len();
+				end = snapstr.length();
 
 			if (end - pos < 3)
 				fatalerror("Something very wrong is going on!!!\n");
 
-			// copy the device name to an astring
-			astring snapdevname;
-			snapdevname.cpysubstr(snapstr, pos + 3, end - pos - 3);
+			// copy the device name to an std::string
+			std::string snapdevname;
+			snapdevname.assign(snapstr.substr(pos + 3, end - pos - 3));
 			//printf("check template: %s\n", snapdevname.c_str());
 
 			// verify that there is such a device for this system
@@ -1165,22 +1165,22 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 			for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 			{
 				// get the device name
-				astring tempdevname(image->brief_instance_name());
+				std::string tempdevname(image->brief_instance_name());
 				//printf("check device: %s\n", tempdevname.c_str());
 
-				if (snapdevname.cmp(tempdevname) == 0)
+				if (snapdevname.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
 					if (image->basename() != NULL)
 					{
-						astring filename(image->basename());
+						std::string filename(image->basename());
 
 						// strip extension
-						filename.substr(0, filename.rchr(0, '.'));
+						filename = filename.substr(0, filename.find_last_of('.'));
 
 						// setup snapname and remove the %d_
-						snapstr.replace(0, snapdevname.c_str(), filename.c_str());
-						snapstr.del(pos, 3);
+						strreplace(snapstr, snapdevname.c_str(), filename.c_str());
+						snapstr.erase(pos, 3);
 						//printf("check image: %s\n", filename.c_str());
 
 						name_found = 1;
@@ -1190,32 +1190,34 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 
 			// or fallback to default
 			if (name_found == 0)
-				snapstr.cpy("%g/%i");
+				snapstr.assign("%g/%i");
 		}
 	}
 
 	// add our own extension
-	snapstr.cat(".").cat(extension);
+	snapstr.append(".").append(extension);
 
 	// substitute path and gamename up front
-	snapstr.replace(0, "/", PATH_SEPARATOR);
-	snapstr.replace(0, "%g", machine().basename());
+	strreplace(snapstr, "/", PATH_SEPARATOR);
+	strreplace(snapstr, "%g", machine().basename());
 
 	// determine if the template has an index; if not, we always use the same name
-	astring fname;
-	if (snapstr.find(0, "%i") == -1)
-		fname.cpy(snapstr);
+	std::string fname;
+	if (snapstr.find("%i") == -1)
+		fname.assign(snapstr);
 
 	// otherwise, we scan for the next available filename
 	else
 	{
 		// try until we succeed
-		astring seqtext;
+		std::string seqtext;
 		file.set_openflags(OPEN_FLAG_READ);
 		for (int seq = 0; ; seq++)
 		{
 			// build up the filename
-			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d", seq).c_str());
+			fname.assign(snapstr);			
+			strprintf(seqtext, "%04d", seq);
+			strreplace(fname, "%i", seqtext.c_str());
 
 			// try to open the file; stop when we fail
 			file_error filerr = file.open(fname.c_str());
@@ -1278,8 +1280,8 @@ void video_manager::record_frame()
 			png_info pnginfo = { 0 };
 			if (m_mng_frame == 0)
 			{
-				astring text1 = astring(emulator_info::get_appname()).cat(" ").cat(build_version);
-				astring text2 = astring(machine().system().manufacturer).cat(" ").cat(machine().system().description);
+				std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(build_version);
+				std::string text2 = std::string(machine().system().manufacturer).append(" ").append(machine().system().description);
 				png_add_text(&pnginfo, "Software", text1.c_str());
 				png_add_text(&pnginfo, "System", text2.c_str());
 			}

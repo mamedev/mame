@@ -126,7 +126,7 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 
 struct sc4inputinfo
 {
-	astring name;
+	std::string name;
 	bool used;
 };
 
@@ -193,7 +193,7 @@ int find_input_strings(running_machine &machine)
 					UINT32 stringaddr = (rom[j + 2] << 16) | rom[j + 3];
 
 					sc45helperlog("(port %02x position %02x) unk %04x addr %08x  ", port,pos, unk2, stringaddr);
-					astring tempstring;
+					std::string tempstring;
 
 					for (int k = stringaddr; k < stringaddr + 6; k++)
 					{
@@ -205,13 +205,13 @@ int find_input_strings(running_machine &machine)
 						}
 						else
 						{
-							tempstring.cat(chr);
+							tempstring.push_back(chr);
 						}
 
 					}
 
-					tempstring.trimspace();
-					tempstring.makelower();
+					strtrimspace(tempstring);
+					strmakelower(tempstring);
 
 
 					//if (pos <= 5)
@@ -226,8 +226,8 @@ int find_input_strings(running_machine &machine)
 						{
 							printf("position already used?\n");
 
-							sc4inputs[port][pos].name.cat(" OR ");
-							sc4inputs[port][pos].name.cat(tempstring);
+							sc4inputs[port][pos].name.append(" OR ");
+							sc4inputs[port][pos].name.append(tempstring);
 						}
 					}
 					//else
@@ -371,20 +371,20 @@ int find_input_strings(running_machine &machine)
 
 struct lampinfo
 {
-	astring lampname;
-	astring lampname_alt;
+	std::string lampname;
+	std::string lampname_alt;
 	bool used;
 	int x, y;
 	int width, height;
 	bool draw_label;
-	astring lamptypename;
+	std::string lamptypename;
 	int clickport;
 	int clickmask;
 };
 
 lampinfo lamps[16][16];
 
-void set_clickable_temp(running_machine &machine, const astring &teststring, int clickport, int clickmask)
+void set_clickable_temp(running_machine &machine, const std::string &teststring, int clickport, int clickmask)
 {
 	for (int y = 0; y < 16; y++)
 	{
@@ -438,7 +438,7 @@ int find_lamp_strings(running_machine &machine)
 
 			sprintf(tmp, "(%02d:%02d)", y, x);
 
-			lamps[y][x].lampname = astring(tmp);
+			lamps[y][x].lampname = std::string(tmp);
 			lamps[y][x].used = false;
 			lamps[y][x].y = (y * 28);
 			lamps[y][x].x = 380 + (x * 24);
@@ -476,7 +476,7 @@ int find_lamp_strings(running_machine &machine)
 
 			//sc45helperlog("(row %02d, col %02d, unused %02x) addr %08x  ", row,col, (portpos&0xff00)>>8, stringaddr);
 
-			astring tempstring;
+			std::string tempstring;
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
 			{
@@ -488,7 +488,7 @@ int find_lamp_strings(running_machine &machine)
 				}
 				else
 				{
-					tempstring.cat(chr);
+					tempstring.push_back(chr);
 				}
 
 			}
@@ -499,8 +499,8 @@ int find_lamp_strings(running_machine &machine)
 				lamps[row][col].lampname = tempstring;
 				lamps[row][col].lamptypename = "matrixlamp";
 
-				lamps[row][col].lampname.trimspace();
-				lamps[row][col].lampname.makelower();
+				strtrimspace(lamps[row][col].lampname);
+				strmakelower(lamps[row][col].lampname);
 			}
 			else
 			{
@@ -879,7 +879,7 @@ int find_reel_strings(running_machine &machine)
 
 			//sc45helperlog("addr %08x  ", stringaddr);
 
-			astring tempstring;
+			std::string tempstring;
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
 			{
@@ -891,18 +891,18 @@ int find_reel_strings(running_machine &machine)
 				}
 				else
 				{
-					tempstring.cat(chr);
+					tempstring.push_back(chr);
 				}
 
 			}
 
-			tempstring.trimspace();
-			tempstring.makelower();
+			strtrimspace(tempstring);
+			strmakelower(tempstring);
 
 			if (tempstring[0] == '!')
 			{
-				tempstring.delchr('!');
-				tempstring.cat("PND");
+				strdelchr(tempstring,'!');
+				tempstring.append("PND");
 			}
 
 			sc45helperlog("%s", tempstring.c_str());

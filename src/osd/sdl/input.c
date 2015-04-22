@@ -132,7 +132,7 @@ struct device_info
 	// device information
 	device_info **          head;
 	device_info *           next;
-	astring                 name;
+	std::string                 name;
 
 	// MAME information
 	input_device *          device;

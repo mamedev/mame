@@ -40,7 +40,7 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 {
 	int cylinders, heads, sectors, sectorbytes;
 	hard_disk_file *file;
-	astring metadata;
+	std::string metadata;
 	chd_error err;
 
 	/* punt if no CHD */

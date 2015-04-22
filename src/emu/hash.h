@@ -66,8 +66,8 @@ public:
 	bool operator!=(const hash_collection &rhs) const { return !(*this == rhs); }
 
 	// getters
-	bool flag(char flag) const { return (m_flags.chr(0, flag) != -1); }
-	const char *hash_types(astring &buffer) const;
+	bool flag(char flag) const { return (m_flags.find_first_of(flag) != -1); }
+	const char *hash_types(std::string &buffer) const;
 
 	// hash manipulators
 	void reset();
@@ -83,9 +83,9 @@ public:
 	void add_sha1(sha1_t sha1) { m_has_sha1 = true; m_sha1 = sha1; }
 
 	// string conversion
-	const char *internal_string(astring &buffer) const;
-	const char *macro_string(astring &buffer) const;
-	const char *attribute_string(astring &buffer) const;
+	const char *internal_string(std::string &buffer) const;
+	const char *macro_string(std::string &buffer) const;
+	const char *attribute_string(std::string &buffer) const;
 	bool from_internal_string(const char *string);
 
 	// creation
@@ -99,7 +99,7 @@ private:
 	void copyfrom(const hash_collection &src);
 
 	// internal state
-	astring                 m_flags;
+	std::string             m_flags;
 	bool                    m_has_crc32;
 	crc32_t                 m_crc32;
 	bool                    m_has_sha1;

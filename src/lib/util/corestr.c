@@ -191,3 +191,125 @@ char *core_i64_format(UINT64 value, UINT8 mindigits, bool is_octal)
 {
 	return is_octal ? core_i64_oct_format(value,mindigits) : core_i64_hex_format(value,mindigits);
 }
+
+/*-------------------------------------------------
+	std::string helpers
+-------------------------------------------------*/
+
+#include <algorithm>
+
+int strvprintf(std::string &str, const char *format, va_list args)
+{
+	char tempbuf[4096];
+	int result = vsprintf(tempbuf, format, args);
+
+	// set the result
+	str.assign(tempbuf);
+	return result;
+}
+
+int strprintf(std::string &str, const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	int retVal = strvprintf(str, format, ap);
+	va_end(ap);
+	return retVal;
+}
+
+std::string strformat(std::string &str, const char *format, ...)
+{
+	std::string retVal;
+	va_list ap;
+	va_start(ap, format);
+	strvprintf(str, format, ap);
+	va_end(ap);
+	retVal.assign(str);
+	return retVal;
+}
+
+int strcatvprintf(std::string &str, const char *format, va_list args)
+{
+	char tempbuf[4096];
+	int result = vsprintf(tempbuf, format, args);
+
+	// set the result
+	str.append(tempbuf);
+	return result;
+}
+
+int strcatprintf(std::string &str, const char *format, ...)
+{
+	va_list ap;
+	va_start(ap, format);
+	int retVal = strcatvprintf(str, format, ap);
+	va_end(ap);
+	return retVal;
+}
+
+void strdelchr(std::string& str, char chr)
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (str[i] == chr)
+		{
+			str.erase(i, 1);
+			i--;
+		}
+	}
+}
+
+void strreplacechr(std::string& str, char ch, char newch)
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (str[i] == ch) str[i] = newch;
+	}
+}
+
+std::string strtrimspace(std::string& str)
+{
+	int start = 0;
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (!isspace(UINT8(str[i])))  break;
+		start++;
+	}
+	int end = str.length();
+	if (end > 0)
+	{
+		for (size_t i = str.length() - 1; i > 0; i--)
+		{
+			if (!isspace(UINT8(str[i]))) break;
+			end--;
+		}
+	}
+	str = str.substr(start, end-start);
+	return str;
+}
+
+std::string strmakeupper(std::string& str)
+{
+	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+	return str;
+}
+
+std::string strmakelower(std::string& str)
+{
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+	return str;
+}
+
+int strreplace(std::string str, const std::string& search, const std::string& replace)
+{
+	int searchlen = search.length();
+	int replacelen = replace.length();
+	int matches = 0;
+
+	for (int curindex = str.find(search, 0); curindex != -1; curindex = str.find(search, curindex + replacelen))
+	{
+		matches++;
+		str.erase(curindex, searchlen).insert(curindex, replace);
+	}
+	return matches;
+}

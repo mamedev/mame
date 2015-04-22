@@ -162,23 +162,23 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	}
 
 	// create the full name
-	astring totalname;
+	std::string totalname;
 	if (tag != NULL)
-		totalname.printf("%s/%s/%X/%s", module, tag, index, name);
+		strprintf(totalname, "%s/%s/%X/%s", module, tag, index, name);
 	else
-		totalname.printf("%s/%X/%s", module, index, name);
+		strprintf(totalname, "%s/%X/%s", module, index, name);
 
 	// look for duplicates and an entry to insert in front of
 	state_entry *insert_after = NULL;
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		// stop when we find an entry whose name is after ours
-		if (entry->m_name.cmp(totalname)>0)
+		if (entry->m_name.compare(totalname)>0)
 			break;
 		insert_after = entry;
 
 		// error if we are equal
-		if (entry->m_name.cmp(totalname)==0)
+		if (entry->m_name.compare(totalname)==0)
 			fatalerror("Duplicate save state registration entry (%s)\n", totalname.c_str());
 	}
 
@@ -333,7 +333,7 @@ UINT32 save_manager::signature() const
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		// add the entry name to the CRC
-		crc = crc32(crc, (UINT8 *)entry->m_name.c_str(), entry->m_name.len());
+		crc = crc32(crc, (UINT8 *)entry->m_name.c_str(), entry->m_name.length());
 
 		// add the type and size to the CRC
 		UINT32 temp[2];

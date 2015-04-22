@@ -88,7 +88,7 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 int web_engine::json_slider_handler(struct mg_connection *conn)
 {
 	const slider_state *curslider;
-	astring tempstring;
+	std::string tempstring;
 	Json::Value array(Json::arrayValue);
 
 	// add all sliders
@@ -260,7 +260,7 @@ static int filename_endswith(const char *str, const char *suffix)
 // This function will be called by mongoose on every new request.
 int web_engine::begin_request_handler(struct mg_connection *conn)
 {
-	astring file_path = astring(mg_get_option(m_server, "document_root")).cat(PATH_SEPARATOR).cat(conn->uri);
+	std::string file_path = std::string(mg_get_option(m_server, "document_root")).append(PATH_SEPARATOR).append(conn->uri);
 	if (filename_endswith(file_path.c_str(), ".lp"))
 	{
 		FILE *fp = NULL;
@@ -440,7 +440,7 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 			return 0;
 		}
 
-		astring fname("screenshot.png");
+		std::string fname("screenshot.png");
 		emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		file_error filerr = file.open(fname.c_str());
 
@@ -450,7 +450,7 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		}
 
 		m_machine->video().save_snapshot(screen, file);
-		astring fullpath(file.fullpath());
+		std::string fullpath(file.fullpath());
 		file.close();
 		mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
 		mg_send_header(conn, "Pragma", "no-cache");

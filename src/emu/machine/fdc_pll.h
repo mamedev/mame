@@ -25,7 +25,7 @@ public:
 	void commit(floppy_image_device *floppy, const attotime &tm);
 	void stop_writing(floppy_image_device *floppy, const attotime &tm);
 
-	astring tts(attotime tm);
+	std::string tts(attotime tm);
 };
 
 #endif

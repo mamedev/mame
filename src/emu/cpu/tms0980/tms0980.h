@@ -96,7 +96,7 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 1; }
 
-	void state_string_export(const device_state_entry &entry, astring &str);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	void next_pc();
 

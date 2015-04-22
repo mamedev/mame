@@ -37,7 +37,7 @@ protected:
 	int current_index();
 	void previous();
 	void next();
-	astring current_display_name();
+	std::string current_display_name();
 	UINT32 current_display_flags();
 
 private:
@@ -122,15 +122,15 @@ void ui_menu_device_control<_DeviceType>::next()
 //-------------------------------------------------
 
 template<class _DeviceType>
-astring ui_menu_device_control<_DeviceType>::current_display_name()
+std::string ui_menu_device_control<_DeviceType>::current_display_name()
 {
-	astring display_name;
-	display_name.cpy(current_device()->name());
+	std::string display_name;
+	display_name.assign(current_device()->name());
 	if (count() > 1)
 	{
-		astring temp;
-		temp.printf(" %d", current_index() + 1);
-		display_name.cat(temp);
+		std::string temp;
+		strprintf(temp, " %d", current_index() + 1);
+		display_name.append(temp);
 	}
 	return display_name;
 }

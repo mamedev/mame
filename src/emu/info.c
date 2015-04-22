@@ -193,9 +193,9 @@ void info_xml_creator::output(FILE *out)
 
 	// output the DTD
 	fprintf(m_output, "<?xml version=\"1.0\"?>\n");
-	astring dtd(s_dtd_string);
-	dtd.replace(0,"__XML_ROOT__", emulator_info::get_xml_root());
-	dtd.replace(0,"__XML_TOP__", emulator_info::get_xml_top());
+	std::string dtd(s_dtd_string);
+	strreplace(dtd, "__XML_ROOT__", emulator_info::get_xml_root());
+	strreplace(dtd, "__XML_TOP__", emulator_info::get_xml_top());
 
 	fprintf(m_output, "%s\n\n", dtd.c_str());
 
@@ -239,7 +239,7 @@ void info_xml_creator::output_one()
 	// allocate input ports
 	machine_config &config = m_drivlist.config();
 	ioport_list portlist;
-	astring errors;
+	std::string errors;
 	device_iterator iter(config.root_device());
 	for (device_t *device = iter.first(); device != NULL; device = iter.next())
 		portlist.append(*device, errors);
@@ -325,7 +325,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 		has_speaker = TRUE;
 	// generate input list
 	ioport_list portlist;
-	astring errors;
+	std::string errors;
 	device_iterator iptiter(device);
 	for (device_t *dev = iptiter.first(); dev != NULL; dev = iptiter.next())
 		portlist.append(*dev, errors);
@@ -341,8 +341,8 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	// start to output info
 	fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
 	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
-	astring src(device.source());
-	src.replace("../","");
+	std::string src(device.source());
+	strreplace(src,"../", "");
 	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(src.c_str()));
 	fprintf(m_output, " isdevice=\"yes\"");
 	fprintf(m_output, " runnable=\"no\"");
@@ -402,8 +402,8 @@ void info_xml_creator::output_devices()
 		{
 			for (const device_slot_option *option = slot->first_option(); option != NULL; option = option->next())
 			{
-				astring temptag("_");
-				temptag.cat(option->name());
+				std::string temptag("_");
+				temptag.append(option->name());
 				device_t *dev = const_cast<machine_config &>(m_drivlist.config()).device_add(&m_drivlist.config().root_device(), temptag.c_str(), option->devtype(), 0);
 
 				// notify this device and all its subdevices that they are now configured
@@ -534,53 +534,53 @@ void info_xml_creator::output_rom(device_t &device)
 						}
 				}
 
-				astring output;
+				std::string output;
 
 				// opening tag
 				if (!is_disk)
-					output.cat("\t\t<rom");
+					output.append("\t\t<rom");
 				else
-					output.cat("\t\t<disk");
+					output.append("\t\t<disk");
 
 				// add name, merge, bios, and size tags */
 				if (name != NULL && name[0] != 0)
-					output.catprintf(" name=\"%s\"", xml_normalize_string(name));
+					strcatprintf(output," name=\"%s\"", xml_normalize_string(name));
 				if (merge_name != NULL)
-					output.catprintf(" merge=\"%s\"", xml_normalize_string(merge_name));
+					strcatprintf(output," merge=\"%s\"", xml_normalize_string(merge_name));
 				if (bios_name[0] != 0)
-					output.catprintf(" bios=\"%s\"", xml_normalize_string(bios_name));
+					strcatprintf(output," bios=\"%s\"", xml_normalize_string(bios_name));
 				if (!is_disk)
-					output.catprintf(" size=\"%d\"", rom_file_size(rom));
+					strcatprintf(output," size=\"%d\"", rom_file_size(rom));
 
 				// dump checksum information only if there is a known dump
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					// iterate over hash function types and print m_output their values
-					astring tempstr;
-					output.catprintf(" %s", hashes.attribute_string(tempstr));
+					std::string tempstr;
+					strcatprintf(output," %s", hashes.attribute_string(tempstr));
 				}
 				else
-					output.cat(" status=\"nodump\"");
+					output.append(" status=\"nodump\"");
 
 				// append a region name
-				output.catprintf(" region=\"%s\"", ROMREGION_GETTAG(region));
+				strcatprintf(output," region=\"%s\"", ROMREGION_GETTAG(region));
 
 				// for non-disk entries, print offset
 				if (!is_disk)
-					output.catprintf(" offset=\"%x\"", offset);
+					strcatprintf(output," offset=\"%x\"", offset);
 
 				// for disk entries, add the disk index
 				else
 				{
-					output.catprintf(" index=\"%x\"", DISK_GETINDEX(rom));
-					output.catprintf(" writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+					strcatprintf(output," index=\"%x\"", DISK_GETINDEX(rom));
+					strcatprintf(output," writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 				}
 
 				// add optional flag
 				if (ROM_ISOPTIONAL(rom))
-					output.cat(" optional=\"yes\"");
+					output.append(" optional=\"yes\"");
 
-				output.cat("/>\n");
+				output.append("/>\n");
 
 				fprintf(m_output, "%s", output.c_str());
 			}
@@ -627,8 +627,8 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 	{
 		if (strcmp(exec->device().tag(), device.tag()))
 		{
-			astring newtag(exec->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
+			std::string newtag(exec->device().tag()), oldtag(":");
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"cpu\"");
@@ -645,8 +645,8 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 	{
 		if (strcmp(sound->device().tag(), device.tag()))
 		{
-			astring newtag(sound->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
+			std::string newtag(sound->device().tag()), oldtag(":");
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
 
 			fprintf(m_output, "\t\t<chip");
 			fprintf(m_output, " type=\"audio\"");
@@ -673,8 +673,8 @@ void info_xml_creator::output_display(device_t &device, const char *root_tag)
 	{
 		if (strcmp(screendev->tag(), device.tag()))
 		{
-			astring newtag(screendev->tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
+			std::string newtag(screendev->tag()), oldtag(":");
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
 
 			fprintf(m_output, "\t\t<display");
 			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag.c_str()));
@@ -1077,24 +1077,24 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
 			if (field->type() == type)
 			{
-				astring output;
+				std::string output;
 
-				astring newtag(port->tag()), oldtag(":");
-				newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
+				std::string newtag(port->tag()), oldtag(":");
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length()); 
 
 				// output the switch name information
-				astring normalized_field_name(xml_normalize_string(field->name()));
-				astring normalized_newtag(xml_normalize_string(newtag.c_str()));
-				output.catprintf("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
+				std::string normalized_field_name(xml_normalize_string(field->name()));
+				std::string normalized_newtag(xml_normalize_string(newtag.c_str()));
+				strcatprintf(output,"\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field->mask());
 
 				// loop over settings
 				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
 				{
-					output.catprintf("\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
+					strcatprintf(output,"\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
 				}
 
 				// terminate the switch entry
-				output.catprintf("\t\t</%s>\n", outertag);
+				strcatprintf(output,"\t\t</%s>\n", outertag);
 
 				fprintf(m_output, "%s", output.c_str());
 			}
@@ -1210,8 +1210,8 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 	{
 		if (strcmp(imagedev->device().tag(), device.tag()))
 		{
-			astring newtag(imagedev->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
+			std::string newtag(imagedev->device().tag()), oldtag(":");
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
 
 			// print m_output device type
 			fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(imagedev->image_type_name()));
@@ -1238,7 +1238,7 @@ void info_xml_creator::output_images(device_t &device, const char *root_tag)
 			fprintf(m_output, " briefname=\"%s\"", xml_normalize_string(shortname));
 			fprintf(m_output, "/>\n");
 
-			astring extensions(imagedev->file_extensions());
+			std::string extensions(imagedev->file_extensions());
 
 			char *ext = strtok((char *)extensions.c_str(), ",");
 			while (ext != NULL)
@@ -1268,8 +1268,8 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 
 		if (strcmp(slot->device().tag(), device.tag()))
 		{
-			astring newtag(slot->device().tag()), oldtag(":");
-			newtag.substr(newtag.find(oldtag.cat(root_tag).c_str()) + oldtag.len());
+			std::string newtag(slot->device().tag()), oldtag(":");
+			newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
 
 			// print m_output device type
 			fprintf(m_output, "\t\t<slot name=\"%s\">\n", xml_normalize_string(newtag.c_str()));
@@ -1341,11 +1341,11 @@ void info_xml_creator::output_ramoptions()
 
 		if (ram->extra_options() != NULL)
 		{
-			astring options(ram->extra_options());
-			for (int start = 0, end = options.chr(0, ','); ; start = end + 1, end = options.chr(start, ','))
+			std::string options(ram->extra_options());
+			for (int start = 0, end = options.find_first_of(',');; start = end + 1, end = options.find_first_of(',', start))
 			{
-				astring option;
-				option.cpysubstr(options, start, (end == -1) ? -1 : end - start);
+				std::string option;
+				option.assign(options.substr(start, (end == -1) ? -1 : end - start));
 				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", ram_device::parse_string(option.c_str()));
 				if (end == -1)
 					break;

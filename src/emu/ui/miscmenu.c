@@ -120,14 +120,14 @@ void ui_menu_bios_selection::handle()
 			if (val>cnt) val=1;
 			dev->set_system_bios(val);
 			if (strcmp(dev->tag(),":")==0) {
-				astring error;
+				std::string error;
 				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			} else {
-				astring error;
-				astring value;
-				astring temp;
-				value.printf("%s,bios=%d",machine().options().main_value(temp,dev->owner()->tag()+1),val-1);
+				std::string error;
+				std::string value;
+				std::string temp;
+				strprintf(value,"%s,bios=%d",machine().options().main_value(temp,dev->owner()->tag()+1),val-1);
 				machine().options().set_value(dev->owner()->tag()+1, value.c_str(), OPTION_PRIORITY_CMDLINE, error);
 				assert(error.empty());
 			}
@@ -233,18 +233,18 @@ ui_menu_bookkeeping::~ui_menu_bookkeeping()
 void ui_menu_bookkeeping::populate()
 {
 	int tickets = get_dispensed_tickets(machine());
-	astring tempstring;
+	std::string tempstring;
 	int ctrnum;
 
 	/* show total time first */
 	if (prevtime.seconds >= 60 * 60)
-		tempstring.catprintf("Uptime: %d:%02d:%02d\n\n", prevtime.seconds / (60*60), (prevtime.seconds / 60) % 60, prevtime.seconds % 60);
+		strcatprintf(tempstring, "Uptime: %d:%02d:%02d\n\n", prevtime.seconds / (60 * 60), (prevtime.seconds / 60) % 60, prevtime.seconds % 60);
 	else
-		tempstring.catprintf("Uptime: %d:%02d\n\n", (prevtime.seconds / 60) % 60, prevtime.seconds % 60);
+		strcatprintf(tempstring,"Uptime: %d:%02d\n\n", (prevtime.seconds / 60) % 60, prevtime.seconds % 60);
 
 	/* show tickets at the top */
 	if (tickets > 0)
-		tempstring.catprintf("Tickets dispensed: %d\n\n", tickets);
+		strcatprintf(tempstring,"Tickets dispensed: %d\n\n", tickets);
 
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
@@ -252,18 +252,18 @@ void ui_menu_bookkeeping::populate()
 		int count = coin_counter_get_count(machine(), ctrnum);
 
 		/* display the coin counter number */
-		tempstring.catprintf("Coin %c: ", ctrnum + 'A');
+		strcatprintf(tempstring,"Coin %c: ", ctrnum + 'A');
 
 		/* display how many coins */
 		if (count == 0)
-			tempstring.cat("NA");
+			tempstring.append("NA");
 		else
-			tempstring.catprintf("%d", count);
+			strcatprintf(tempstring, "%d", count);
 
 		/* display whether or not we are locked out */
 		if (coin_lockout_get_state(machine(), ctrnum))
-			tempstring.cat(" (locked)");
-		tempstring.cat("\n");
+			tempstring.append(" (locked)");
+		tempstring.append("\n");
 	}
 
 	/* append the single item */

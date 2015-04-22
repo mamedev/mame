@@ -1109,8 +1109,8 @@ static void process_source_file(running_machine &machine)
 static device_t *expression_get_device(running_machine &machine, const char *tag)
 {
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
-	astring fullname(tag);
-	fullname.makelower();
+	std::string fullname(tag);
+	strmakelower(fullname);
 	return machine.device(fullname.c_str());
 }
 
@@ -1666,9 +1666,11 @@ device_debug::device_debug(device_t &device)
 		}
 
 		// add all registers into it
-		astring tempstr;
-		for (const device_state_entry *entry = m_state->state_first(); entry != NULL; entry = entry->next())
-			m_symtable.add(tempstr.cpy(entry->symbol()).makelower().c_str(), (void *)(FPTR)entry->index(), get_state, set_state);
+		std::string tempstr;
+		for (const device_state_entry *entry = m_state->state_first(); entry != NULL; entry = entry->next()) {
+			strmakelower(tempstr.assign(entry->symbol()));
+			m_symtable.add(tempstr.c_str(), (void *)(FPTR)entry->index(), get_state, set_state);
+		}
 	}
 
 	// set up execution-related stuff
@@ -2681,7 +2683,7 @@ const char *device_debug::comment_text(offs_t addr) const
 bool device_debug::comment_export(xml_data_node &curnode)
 {
 	// iterate through the comments
-	astring crc_buf;
+	std::string crc_buf;
 	for (std::set<dasm_comment>::iterator item = m_comment_set.begin(); item != m_comment_set.end(); ++item)
 	{
 		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(item->m_text.c_str()));
@@ -2689,7 +2691,7 @@ bool device_debug::comment_export(xml_data_node &curnode)
 			return false;
 		xml_set_attribute_int(datanode, "address", item->m_address);
 		xml_set_attribute_int(datanode, "color", item->m_color);
-		crc_buf.printf("%08X", item->m_crc);
+		strprintf(crc_buf,"%08X", item->m_crc);
 		xml_set_attribute(datanode, "crc", crc_buf.c_str());
 	}
 	return true;
@@ -2831,7 +2833,7 @@ void device_debug::compute_debug_flags()
 void device_debug::prepare_for_step_overout(offs_t pc)
 {
 	// disassemble the current instruction and get the flags
-	astring dasmbuffer;
+	std::string dasmbuffer;
 	offs_t dasmresult = dasm_wrapped(dasmbuffer, pc);
 
 	// if flags are supported and it's a call-style opcode, set a temp breakpoint after that instruction
@@ -3048,18 +3050,18 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};
 				offs_t pc = (space.device().debug()->m_state != NULL) ? space.device().debug()->m_state->pc() : 0;
-				astring buffer;
+				std::string buffer;
 
 				if (type & WATCHPOINT_WRITE)
 				{
-					buffer.printf("Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
+					strprintf(buffer, "Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
 					if (value_to_write >> 32)
-						buffer.catprintf(" (data=%X%08X)", (UINT32)(value_to_write >> 32), (UINT32)value_to_write);
+						strcatprintf(buffer, " (data=%X%08X)", (UINT32)(value_to_write >> 32), (UINT32)value_to_write);
 					else
-						buffer.catprintf(" (data=%X)", (UINT32)value_to_write);
+						strcatprintf(buffer, " (data=%X)", (UINT32)value_to_write);
 				}
 				else
-					buffer.printf("Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
+					strprintf(buffer,"Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->m_index, sizes[size], space.byte_to_address(address), pc);
 				debug_console_printf(space.machine(), "%s\n", buffer.c_str());
 				space.device().debug()->compute_debug_flags();
 			}
@@ -3121,7 +3123,7 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 //  buffer and then disassembling them
 //-------------------------------------------------
 
-UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
+UINT32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 {
 	assert(m_memory != NULL && m_disasm != NULL);
 
@@ -3142,7 +3144,7 @@ UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
 	char diasmbuf[200];
 	memset(diasmbuf, 0x00, 200);
 	UINT32 result = disassemble(diasmbuf, pc, opbuf, argbuf);
-	buffer.cpy(diasmbuf);
+	buffer.assign(diasmbuf);
 	return result;
 }
 
@@ -3484,14 +3486,14 @@ void device_debug::tracer::update(offs_t pc)
 		debug_console_execute_command(m_debug.m_device.machine(), m_action.c_str(), 0);
 
 	// print the address
-	astring buffer;
+	std::string buffer;
 	int logaddrchars = m_debug.logaddrchars();
-	buffer.printf("%0*X: ", logaddrchars, pc);
+	strprintf(buffer,"%0*X: ", logaddrchars, pc);
 
 	// print the disassembly
-	astring dasm;
+	std::string dasm;
 	offs_t dasmresult = m_debug.dasm_wrapped(dasm, pc);
-	buffer.cat(dasm);
+	buffer.append(dasm);
 
 	// output the result
 	fprintf(&m_file, "%s\n", buffer.c_str());

@@ -537,7 +537,7 @@ void rsp_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void rsp_device::state_string_export(const device_state_entry &entry, astring &str)
+void rsp_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	const int index = entry.index();
 	if (index >= RSP_V0 && index <= RSP_V31)
@@ -546,7 +546,7 @@ void rsp_device::state_string_export(const device_state_entry &entry, astring &s
 	}
 	else if (index == STATE_GENFLAGS)
 	{
-		str.printf("%s", "");
+		strprintf(str, "%s", "");
 	}
 }
 

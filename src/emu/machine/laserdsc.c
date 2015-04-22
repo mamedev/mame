@@ -755,7 +755,7 @@ void laserdisc_device::init_disc()
 			throw emu_fatalerror("Laserdisc video must be compressed with the A/V codec!");
 
 		// read the metadata
-		astring metadata;
+		std::string metadata;
 		chd_error err = m_disc->read_metadata(AV_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			throw emu_fatalerror("Non-A/V CHD file specified");

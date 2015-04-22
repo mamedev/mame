@@ -79,7 +79,7 @@ private:
 	void validate_devices();
 
 	// output helpers
-	void build_output_prefix(astring &str);
+	void build_output_prefix(std::string &str);
 	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
 
 	// internal driver list
@@ -88,8 +88,8 @@ private:
 	// error tracking
 	int                     m_errors;
 	int                     m_warnings;
-	astring                 m_error_text;
-	astring                 m_warning_text;
+	std::string             m_error_text;
+	std::string             m_warning_text;
 
 	// maps for finding duplicates
 	game_driver_map         m_names_map;

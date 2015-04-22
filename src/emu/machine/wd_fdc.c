@@ -188,7 +188,7 @@ void wd_fdc_t::dden_w(bool _dden)
 	}
 }
 
-astring wd_fdc_t::tts(const attotime &t)
+std::string wd_fdc_t::tts(const attotime &t)
 {
 	char buf[256];
 	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
@@ -196,7 +196,7 @@ astring wd_fdc_t::tts(const attotime &t)
 	return buf;
 }
 
-astring wd_fdc_t::ttsn()
+std::string wd_fdc_t::ttsn()
 {
 	return tts(machine().time());
 }

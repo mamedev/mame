@@ -41,8 +41,8 @@ public:
 	virtual void exit() { }
 
 private:
-	astring     m_name;
-	astring     m_type;
+	std::string     m_name;
+	std::string     m_type;
 };
 
 // a module_type is simply a pointer to its alloc function

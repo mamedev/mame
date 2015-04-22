@@ -134,8 +134,8 @@ private:
 	// internal helpers
 	bool query_system_for_address(FPTR address);
 	void scan_file_for_address(FPTR address, bool create_cache);
-	bool parse_sym_line(const char *line, FPTR &address, astring &symbol);
-	bool parse_map_line(const char *line, FPTR &address, astring &symbol);
+	bool parse_sym_line(const char *line, FPTR &address, std::string &symbol);
+	bool parse_map_line(const char *line, FPTR &address, std::string &symbol);
 	void scan_cache_for_address(FPTR address);
 	void format_symbol(const char *name, UINT32 displacement, const char *filename = NULL, int linenumber = 0);
 
@@ -149,13 +149,13 @@ private:
 
 		cache_entry *   m_next;
 		FPTR            m_address;
-		astring         m_name;
+		std::string     m_name;
 	};
 	simple_list<cache_entry> m_cache;
 
-	astring         m_mapfile;
-	astring         m_symfile;
-	astring         m_buffer;
+	std::string     m_mapfile;
+	std::string     m_symfile;
+	std::string     m_buffer;
 	HANDLE          m_process;
 	FPTR            m_last_base;
 	FPTR            m_text_base;
@@ -544,7 +544,7 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options.bench();
-	astring error_string;
+	std::string error_string;
 	if (bench > 0)
 	{
 		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
@@ -587,10 +587,10 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	astring tempstring;
+	std::string tempstring;
 	for (win_window_info *info = win_window_list; info != NULL; info = info->m_next)
 	{
-		tempstring.printf("Orientation(%s)", info->m_monitor->devicename());
+		strprintf(tempstring, "Orientation(%s)", info->m_monitor->devicename());
 		output_set_value(tempstring.c_str(), info->m_targetorient);
 	}
 
@@ -1010,23 +1010,23 @@ symbol_manager::symbol_manager(const char *argv0)
 {
 #ifdef __GNUC__
 	// compute the name of the mapfile
-	int extoffs = m_mapfile.rchr(0, '.');
+	int extoffs = m_mapfile.find_last_of('.');
 	if (extoffs != -1)
 		m_mapfile.substr(0, extoffs);
-	m_mapfile.cat(".map");
+	m_mapfile.append(".map");
 
 	// and the name of the symfile
-	extoffs = m_symfile.rchr(0, '.');
+	extoffs = m_symfile.find_last_of('.');
 	if (extoffs != -1)
-		m_symfile.substr(0, extoffs);
-	m_symfile.cat(".sym");
+		m_symfile = m_symfile.substr(0, extoffs);
+	m_symfile.append(".sym");
 
 	// figure out the base of the .text section
 	m_text_base = get_text_section_base();
 #endif
 
 	// expand the buffer to be decently large up front
-	m_buffer.printf("%500s", "");
+	strprintf(m_buffer,"%500s", "");
 }
 
 
@@ -1048,7 +1048,7 @@ symbol_manager::~symbol_manager()
 const char *symbol_manager::symbol_for_address(FPTR address)
 {
 	// default the buffer
-	m_buffer.cpy(" (not found)");
+	m_buffer.assign(" (not found)");
 	m_last_base = 0;
 
 	// first try to do it using system APIs
@@ -1129,11 +1129,11 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 		return;
 
 	// reset the best info
-	astring best_symbol;
+	std::string best_symbol;
 	FPTR best_addr = 0;
 
 	// parse the file, looking for valid entries
-	astring symbol;
+	std::string symbol;
 	char line[1024];
 	while (fgets(line, sizeof(line) - 1, srcfile))
 	{
@@ -1174,7 +1174,7 @@ void symbol_manager::scan_file_for_address(FPTR address, bool create_cache)
 void symbol_manager::scan_cache_for_address(FPTR address)
 {
 	// reset the best info
-	astring best_symbol;
+	std::string best_symbol;
 	FPTR best_addr = 0;
 
 	// walk the cache, looking for valid entries
@@ -1198,7 +1198,7 @@ void symbol_manager::scan_cache_for_address(FPTR address)
 //  which is just the output of objdump
 //-------------------------------------------------
 
-bool symbol_manager::parse_sym_line(const char *line, FPTR &address, astring &symbol)
+bool symbol_manager::parse_sym_line(const char *line, FPTR &address, std::string &symbol)
 {
 #ifdef __GNUC__
 /*
@@ -1238,8 +1238,8 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, astring &sy
 				chptr++;
 
 			// extract the symbol name
-			symbol.cpy(chptr).trimspace();
-			return (symbol.len() > 0);
+			strtrimspace(symbol.assign(chptr));
+			return (symbol.length() > 0);
 		}
 	}
 #endif
@@ -1252,7 +1252,7 @@ bool symbol_manager::parse_sym_line(const char *line, FPTR &address, astring &sy
 //  generated map file
 //-------------------------------------------------
 
-bool symbol_manager::parse_map_line(const char *line, FPTR &address, astring &symbol)
+bool symbol_manager::parse_map_line(const char *line, FPTR &address, std::string &symbol)
 {
 #ifdef __GNUC__
 /*
@@ -1278,8 +1278,8 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, astring &sy
 			chptr++;
 
 		// extract the symbol name
-		symbol.cpy(chptr).trimspace();
-		return (symbol.len() > 0);
+		strtrimspace(symbol.assign(chptr));
+		return (symbol.length() > 0);
 	}
 #endif
 	return false;
@@ -1293,16 +1293,16 @@ bool symbol_manager::parse_map_line(const char *line, FPTR &address, astring &sy
 void symbol_manager::format_symbol(const char *name, UINT32 displacement, const char *filename, int linenumber)
 {
 	// start with the address and offset
-	m_buffer.printf(" (%s", name);
+	strprintf(m_buffer, " (%s", name);
 	if (displacement != 0)
-		m_buffer.catprintf("+0x%04x", (UINT32)displacement);
+		strcatprintf(m_buffer, "+0x%04x", (UINT32)displacement);
 
 	// append file/line if present
 	if (filename != NULL)
-		m_buffer.catprintf(", %s:%d", filename, linenumber);
+		strcatprintf(m_buffer, ", %s:%d", filename, linenumber);
 
 	// close up the string
-	m_buffer.cat(")");
+	m_buffer.append(")");
 }
 
 

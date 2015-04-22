@@ -46,22 +46,22 @@
 
 static void log_quickload(running_machine &machine, const char *type, UINT32 start, UINT32 length, UINT32 exec, const char *exec_format)
 {
-	astring tempstring;
+	std::string tempstring;
 
 	logerror("Loading %04X bytes of RAM at %04X\n", length, start);
 
-	tempstring.catprintf("Quickload type: %s   Length: %d bytes\n", type, length);
-	tempstring.catprintf("Start: 0x%04X   End: 0x%04X   Exec: ", start, start + length - 1);
+	strcatprintf(tempstring,"Quickload type: %s   Length: %d bytes\n", type, length);
+	strcatprintf(tempstring,"Start: 0x%04X   End: 0x%04X   Exec: ", start, start + length - 1);
 
 	logerror("Quickload loaded.\n");
 	if (!core_stricmp(exec_format, EXEC_NA))
-		tempstring.cat("N/A");
+		tempstring.append("N/A");
 	else
 	{
 		logerror("Execution can resume with ");
 		logerror(exec_format, exec);
 		logerror("\n");
-		tempstring.catprintf(exec_format, exec);
+		strcatprintf(tempstring,exec_format, exec);
 	}
 
 	machine.ui().popup_time(10, "%s", tempstring.c_str());

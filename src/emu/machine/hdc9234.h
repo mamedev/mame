@@ -184,10 +184,10 @@ private:
 	void wait_line(int line, line_state level, int substate, bool stopwrite);
 
 	// Converts attotime to a string
-	astring tts(const attotime &t);
+	std::string tts(const attotime &t);
 
 	// Current time
-	astring ttsn();
+	std::string ttsn();
 
 	// Utility routine to set or reset bits
 	void set_bits(UINT8& byte, int mask, bool set);

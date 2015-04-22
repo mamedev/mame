@@ -253,14 +253,14 @@ private:
 	// internal helpers
 	void start();
 	void set_saveload_filename(const char *filename);
-	astring get_statename(const char *statename_opt);
+	std::string get_statename(const char *statename_opt);
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
 	void soft_reset(void *ptr = NULL, INT32 param = 0);
 	void watchdog_fired(void *ptr = NULL, INT32 param = 0);
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
 	const char *image_parent_basename(device_t *device);
-	astring &nvram_filename(astring &result, device_t &device);
+	std::string &nvram_filename(std::string &result, device_t &device);
 	void nvram_load();
 	void nvram_save();
 
@@ -306,8 +306,8 @@ private:
 	UINT32                  m_rand_seed;            // current random number seed
 	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
-	astring                 m_basename;             // basename used for game-related paths
-	astring                 m_context;              // context string buffer
+	std::string             m_basename;             // basename used for game-related paths
+	std::string             m_context;              // context string buffer
 	int                     m_sample_rate;          // the digital audio sample rate
 	auto_pointer<emu_file>  m_logfile;              // pointer to the active log file
 
@@ -320,7 +320,7 @@ private:
 	};
 	saveload_schedule       m_saveload_schedule;
 	attotime                m_saveload_schedule_time;
-	astring                 m_saveload_pending_file;
+	std::string             m_saveload_pending_file;
 	const char *            m_saveload_searchpath;
 
 	// notifier callbacks

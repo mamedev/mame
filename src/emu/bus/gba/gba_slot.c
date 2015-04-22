@@ -256,9 +256,9 @@ bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  fullpath
  -------------------------------------------------*/
 
-INLINE astring gba_chip_string( UINT32 chip )
+INLINE std::string gba_chip_string( UINT32 chip )
 {
-	astring str;
+	std::string str;
 	if (chip == 0) str += "NONE ";
 	if (chip & GBA_CHIP_EEPROM) str += "EEPROM ";
 	if (chip & GBA_CHIP_EEPROM_64K) str += "EEPROM_64K ";
@@ -268,7 +268,8 @@ INLINE astring gba_chip_string( UINT32 chip )
 	if (chip & GBA_CHIP_FLASH_512) str += "FLASH_512 ";
 	if (chip & GBA_CHIP_SRAM) str += "SRAM ";
 	if (chip & GBA_CHIP_RTC) str += "RTC ";
-	return str.trimspace();
+	strtrimspace(str);
+	return str;
 }
 
 

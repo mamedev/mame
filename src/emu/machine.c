@@ -190,10 +190,10 @@ const char *running_machine::describe_context()
 	{
 		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
 		if (cpu != NULL)
-			m_context.printf("'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
+			strprintf(m_context, "'%s' (%s)", cpu->tag(), core_i64_format(cpu->pc(), cpu->space(AS_PROGRAM).logaddrchars(), cpu->is_octal()));
 	}
 	else
-		m_context.cpy("(no context)");
+		m_context.assign("(no context)");
 
 	return m_context.c_str();
 }
@@ -204,9 +204,9 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 		manager().lua()->load_script(options().autoboot_script());
 	}
 	else if (strlen(options().autoboot_command())!=0) {
-		astring cmd = astring(options().autoboot_command());
-		cmd.replace("'","\\'");
-		astring val = astring("emu.keypost('").cat(cmd.c_str()).cat("')").c_str();
+		std::string cmd = std::string(options().autoboot_command());
+		strreplace(cmd, "'", "\\'");
+		std::string val = std::string("emu.keypost('").append(cmd.c_str()).append("')").c_str();
 		manager().lua()->load_string(val.c_str());
 	}
 }
@@ -545,36 +545,36 @@ void running_machine::schedule_soft_reset()
 //  software
 //-------------------------------------------------
 
-astring running_machine::get_statename(const char *option)
+std::string running_machine::get_statename(const char *option)
 {
-	astring statename_str("");
+	std::string statename_str("");
 	if (option == NULL || option[0] == 0)
-		statename_str.cpy("%g");
+		statename_str.assign("%g");
 	else
-		statename_str.cpy(option);
+		statename_str.assign(option);
 
 	// strip any extension in the provided statename
-	int index = statename_str.rchr(0, '.');
+	int index = statename_str.find_last_of('.');
 	if (index != -1)
-		statename_str.substr(0, index);
+		statename_str = statename_str.substr(0, index);
 
 	// handle %d in the template (for image devices)
-	astring statename_dev("%d_");
-	int pos = statename_str.find(0, statename_dev.c_str());
+	std::string statename_dev("%d_");
+	int pos = statename_str.find(statename_dev.c_str());
 
 	if (pos != -1)
 	{
 		// if more %d are found, revert to default and ignore them all
-		if (statename_str.find(pos + 3, statename_dev.c_str()) != -1)
-			statename_str.cpy("%g");
+		if (statename_str.find(statename_dev.c_str(), pos + 3) != -1)
+			statename_str.assign("%g");
 		// else if there is a single %d, try to create the correct snapname
 		else
 		{
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = statename_str.find(pos + 3, "/");
-			int end2 = statename_str.find(pos + 3, "%");
+			int end1 = statename_str.find("/", pos + 3);
+			int end2 = statename_str.find("%", pos + 3);
 			int end = -1;
 
 			if ((end1 != -1) && (end2 != -1))
@@ -584,14 +584,14 @@ astring running_machine::get_statename(const char *option)
 			else if (end2 != -1)
 				end = end2;
 			else
-				end = statename_str.len();
+				end = statename_str.length();
 
 			if (end - pos < 3)
 				fatalerror("Something very wrong is going on!!!\n");
 
-			// copy the device name to an astring
-			astring devname_str;
-			devname_str.cpysubstr(statename_str, pos + 3, end - pos - 3);
+			// copy the device name to an std::string
+			std::string devname_str;
+			devname_str.assign(statename_str.substr(pos + 3, end - pos - 3));
 			//printf("check template: %s\n", devname_str.c_str());
 
 			// verify that there is such a device for this system
@@ -599,19 +599,19 @@ astring running_machine::get_statename(const char *option)
 			for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 			{
 				// get the device name
-				astring tempdevname(image->brief_instance_name());
+				std::string tempdevname(image->brief_instance_name());
 				//printf("check device: %s\n", tempdevname.c_str());
 
-				if (devname_str.cmp(tempdevname) == 0)
+				if (devname_str.compare(tempdevname) == 0)
 				{
 					// verify that such a device has an image mounted
 					if (image->basename_noext() != NULL)
 					{
-						astring filename(image->basename_noext());
+						std::string filename(image->basename_noext());
 
 						// setup snapname and remove the %d_
-						statename_str.replace(0, devname_str.c_str(), filename.c_str());
-						statename_str.del(pos, 3);
+						strreplace(statename_str, devname_str.c_str(), filename.c_str());
+						statename_str.erase(pos, 3);
 						//printf("check image: %s\n", filename.c_str());
 
 						name_found = 1;
@@ -621,13 +621,13 @@ astring running_machine::get_statename(const char *option)
 
 			// or fallback to default
 			if (name_found == 0)
-				statename_str.cpy("%g");
+				statename_str.assign("%g");
 		}
 	}
 
 	// substitute path and gamename up front
-	statename_str.replace(0, "/", PATH_SEPARATOR);
-	statename_str.replace(0, "%g", basename());
+	strreplace(statename_str, "/", PATH_SEPARATOR);
+	strreplace(statename_str, "%g", basename());
 
 	return statename_str;
 }
@@ -643,15 +643,15 @@ void running_machine::set_saveload_filename(const char *filename)
 	if (osd_is_absolute_path(filename))
 	{
 		m_saveload_searchpath = NULL;
-		m_saveload_pending_file.cpy(filename);
+		m_saveload_pending_file.assign(filename);
 	}
 	else
 	{
 		m_saveload_searchpath = options().state_directory();
 		// take into account the statename option
 		const char *stateopt = options().state_name();
-		astring statename = get_statename(stateopt);
-		m_saveload_pending_file.cpy(statename.c_str()).cat(PATH_SEPARATOR).cat(filename).cat(".sta");
+		std::string statename = get_statename(stateopt);
+		m_saveload_pending_file.assign(statename.c_str()).append(PATH_SEPARATOR).append(filename).append(".sta");
 	}
 }
 
@@ -955,7 +955,7 @@ void running_machine::handle_saveload()
 
 	// unschedule the operation
 cancel:
-	m_saveload_pending_file.reset();
+	m_saveload_pending_file.clear();
 	m_saveload_searchpath = NULL;
 	m_saveload_schedule = SLS_NONE;
 }
@@ -1203,12 +1203,12 @@ const char *running_machine::image_parent_basename(device_t *device)
     NVRAM depending of selected BIOS
 -------------------------------------------------*/
 
-astring &running_machine::nvram_filename(astring &result, device_t &device)
+std::string &running_machine::nvram_filename(std::string &result, device_t &device)
 {
 	// start with either basename or basename_biosnum
-	result.cpy(basename());
+	result.assign(basename());
 	if (root_device().system_bios() != 0 && root_device().default_bios() != root_device().system_bios())
-		result.catprintf("_%d", root_device().system_bios() - 1);
+		strcatprintf(result, "_%d", root_device().system_bios() - 1);
 
 	// device-based NVRAM gets its own name in a subdirectory
 	if (&device != &root_device())
@@ -1217,11 +1217,12 @@ astring &running_machine::nvram_filename(astring &result, device_t &device)
 		const char *software = image_parent_basename(&device);
 		if (software!=NULL && strlen(software)>0)
 		{
-			result.cat(PATH_SEPARATOR).cat(software);
+			result.append(PATH_SEPARATOR).append(software);
 		}
-		astring tag(device.tag());
-		tag.del(0, 1).replacechr(':', '_');
-		result.cat(PATH_SEPARATOR).cat(tag);
+		std::string tag(device.tag());
+		tag.erase(0, 1);
+		strreplacechr(tag,':', '_');
+		result.append(PATH_SEPARATOR).append(tag);
 	}
 	return result;
 }
@@ -1235,7 +1236,7 @@ void running_machine::nvram_load()
 	nvram_interface_iterator iter(root_device());
 	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
 	{
-		astring filename;
+		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
 		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
 		{
@@ -1257,7 +1258,7 @@ void running_machine::nvram_save()
 	nvram_interface_iterator iter(root_device());
 	for (device_nvram_interface *nvram = iter.first(); nvram != NULL; nvram = iter.next())
 	{
-		astring filename;
+		std::string filename;
 		emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		if (file.open(nvram_filename(filename, nvram->device()).c_str()) == FILERR_NONE)
 		{

@@ -579,7 +579,7 @@ parsed_expression::parsed_expression(symbol_table *symtable, const char *express
 void parsed_expression::parse(const char *expression)
 {
 	// copy the string and reset our parsing state
-	m_original_string.cpy(expression);
+	m_original_string.assign(expression);
 	m_tokenlist.reset();
 	m_stringlist.reset();
 
@@ -598,7 +598,7 @@ void parsed_expression::parse(const char *expression)
 void parsed_expression::copy(const parsed_expression &src)
 {
 	m_symtable = src.m_symtable;
-	m_original_string.cpy(src.m_original_string);
+	m_original_string.assign(src.m_original_string);
 	if (!m_original_string.empty())
 		parse_string_into_tokens();
 }
@@ -1033,7 +1033,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 {
 	// accumulate a copy of the quoted string
 	string++;
-	astring buffer;
+	std::string buffer;
 	while (string[0] != 0)
 	{
 		// allow "" to mean a nested double-quote
@@ -1043,7 +1043,7 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 				break;
 			string++;
 		}
-		buffer.cat(string++, 1);
+		buffer.append(string++, 1);
 	}
 
 	// if we didn't find the ending quote, report an error

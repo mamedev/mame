@@ -28,7 +28,7 @@
     PROTOTYPES
 ***************************************************************************/
 
-static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, const astring& outfilename);
+static int generate_png_diff(const std::string& imgfile1, const std::string& imgfile2, const std::string& outfilename);
 
 /***************************************************************************
     MAIN
@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Usage:\npngcmp <image1> <image2> <outfile>\n");
 		return 10;
 	}
-	astring imgfilename1(argv[1]);
-	astring imgfilename2(argv[2]);
-	astring outfilename(argv[3]);
+	std::string imgfilename1(argv[1]);
+	std::string imgfilename2(argv[2]);
+	std::string outfilename(argv[3]);
 
 	try {
 		return generate_png_diff(imgfilename1, imgfilename2, outfilename);
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     side with a third set of differences
 -------------------------------------------------*/
 
-static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, const astring& outfilename)
+static int generate_png_diff(const std::string& imgfile1, const std::string& imgfile2, const std::string& outfilename)
 {
 	bitmap_argb32 bitmap1;
 	bitmap_argb32 bitmap2;

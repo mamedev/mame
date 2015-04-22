@@ -105,11 +105,11 @@ public:
 		bool                    m_error_reported;   // have we reported an error on this option yet?
 		int                     m_priority;         // priority of the data set
 		const char *            m_description;      // description for this item
-		astring                 m_name[4];          // up to 4 names for the item
-		astring                 m_data;             // data for this item
-		astring                 m_defdata;          // default data for this item
-		astring                 m_minimum;          // minimum value
-		astring                 m_maximum;          // maximum value
+		std::string             m_name[4];          // up to 4 names for the item
+		std::string             m_data;             // data for this item
+		std::string             m_defdata;          // default data for this item
+		std::string             m_minimum;          // minimum value
+		std::string             m_maximum;          // maximum value
 	};
 
 	// construction/destruction
@@ -138,15 +138,15 @@ public:
 	void remove_entry(entry &delentry);
 
 	// parsing/input
-	bool parse_command_line(int argc, char **argv, int priority, astring &error_string);
-	bool parse_ini_file(core_file &inifile, int priority, int ignore_priority, astring &error_string);
+	bool parse_command_line(int argc, char **argv, int priority, std::string &error_string);
+	bool parse_ini_file(core_file &inifile, int priority, int ignore_priority, std::string &error_string);
 
 	// reverting
 	void revert(int priority = OPTION_PRIORITY_MAXIMUM);
 
 	// output
-	const char *output_ini(astring &buffer, const core_options *diff = NULL);
-	const char *output_help(astring &buffer);
+	const char *output_ini(std::string &buffer, const core_options *diff = NULL);
+	const char *output_help(std::string &buffer);
 
 	// reading
 	const char *value(const char *option) const;
@@ -160,9 +160,9 @@ public:
 
 	// setting
 	void set_command(const char *command);
-	bool set_value(const char *name, const char *value, int priority, astring &error_string);
-	bool set_value(const char *name, int value, int priority, astring &error_string);
-	bool set_value(const char *name, float value, int priority, astring &error_string);
+	bool set_value(const char *name, const char *value, int priority, std::string &error_string);
+	bool set_value(const char *name, int value, int priority, std::string &error_string);
+	bool set_value(const char *name, float value, int priority, std::string &error_string);
 	void set_flag(const char *name, UINT32 mask, UINT32 flags);
 
 	// misc
@@ -174,12 +174,12 @@ private:
 	void reset();
 	void append_entry(entry &newentry);
 	void copyfrom(const core_options &src);
-	bool validate_and_set_data(entry &curentry, const char *newdata, int priority, astring &error_string);
+	bool validate_and_set_data(entry &curentry, const char *newdata, int priority, std::string &error_string);
 
 	// internal state
 	simple_list<entry>      m_entrylist;            // head of list of entries
 	tagmap_t<entry *>       m_entrymap;             // map for fast lookup
-	astring                 m_command;              // command found
+	std::string             m_command;              // command found
 	static const char *const s_option_unadorned[];  // array of unadorned option "names"
 };
 

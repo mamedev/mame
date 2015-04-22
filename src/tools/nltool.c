@@ -12,7 +12,6 @@
 #include <ctype.h>
 #include <sstream>
 #include <assert.h>
-#include "astring.h"
 #include "corefile.h"
 #include "corestr.h"
 #include "sha1.h"
@@ -205,7 +204,7 @@ private:
 
 void usage(core_options &opts)
 {
-	astring buffer;
+	std::string buffer;
 	fprintf(stderr,
 		"Usage:\n"
 		"  nltool -help\n"
@@ -298,7 +297,7 @@ int main(int argc, char *argv[])
 {
 	//int result;
 	core_options opts(oplist);
-	astring aerror("");
+	std::string aerror("");
 
 	fprintf(stderr, "%s", "WARNING: This is Work In Progress! - It may fail anytime\n");
 	if (!opts.parse_command_line(argc, argv, OPTION_PRIORITY_DEFAULT, aerror))

@@ -1007,136 +1007,136 @@ void ppc_device::state_import(const device_state_entry &entry)
 }
 
 
-void ppc_device::state_string_export(const device_state_entry &entry, astring &str)
+void ppc_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case PPC_F0:
-			str.printf("%12f", m_core->f[0]);
+			strprintf(str, "%12f", m_core->f[0]);
 			break;
 
 		case PPC_F1:
-			str.printf("%12f", m_core->f[1]);
+			strprintf(str, "%12f", m_core->f[1]);
 			break;
 
 		case PPC_F2:
-			str.printf("%12f", m_core->f[2]);
+			strprintf(str, "%12f", m_core->f[2]);
 			break;
 
 		case PPC_F3:
-			str.printf("%12f", m_core->f[3]);
+			strprintf(str, "%12f", m_core->f[3]);
 			break;
 
 		case PPC_F4:
-			str.printf("%12f", m_core->f[4]);
+			strprintf(str, "%12f", m_core->f[4]);
 			break;
 
 		case PPC_F5:
-			str.printf("%12f", m_core->f[5]);
+			strprintf(str, "%12f", m_core->f[5]);
 			break;
 
 		case PPC_F6:
-			str.printf("%12f", m_core->f[6]);
+			strprintf(str, "%12f", m_core->f[6]);
 			break;
 
 		case PPC_F7:
-			str.printf("%12f", m_core->f[7]);
+			strprintf(str, "%12f", m_core->f[7]);
 			break;
 
 		case PPC_F8:
-			str.printf("%12f", m_core->f[8]);
+			strprintf(str, "%12f", m_core->f[8]);
 			break;
 
 		case PPC_F9:
-			str.printf("%12f", m_core->f[9]);
+			strprintf(str, "%12f", m_core->f[9]);
 			break;
 
 		case PPC_F10:
-			str.printf("%12f", m_core->f[10]);
+			strprintf(str, "%12f", m_core->f[10]);
 			break;
 
 		case PPC_F11:
-			str.printf("%12f", m_core->f[11]);
+			strprintf(str, "%12f", m_core->f[11]);
 			break;
 
 		case PPC_F12:
-			str.printf("%12f", m_core->f[12]);
+			strprintf(str, "%12f", m_core->f[12]);
 			break;
 
 		case PPC_F13:
-			str.printf("%12f", m_core->f[13]);
+			strprintf(str, "%12f", m_core->f[13]);
 			break;
 
 		case PPC_F14:
-			str.printf("%12f", m_core->f[14]);
+			strprintf(str, "%12f", m_core->f[14]);
 			break;
 
 		case PPC_F15:
-			str.printf("%12f", m_core->f[15]);
+			strprintf(str, "%12f", m_core->f[15]);
 			break;
 
 		case PPC_F16:
-			str.printf("%12f", m_core->f[16]);
+			strprintf(str, "%12f", m_core->f[16]);
 			break;
 
 		case PPC_F17:
-			str.printf("%12f", m_core->f[17]);
+			strprintf(str, "%12f", m_core->f[17]);
 			break;
 
 		case PPC_F18:
-			str.printf("%12f", m_core->f[18]);
+			strprintf(str, "%12f", m_core->f[18]);
 			break;
 
 		case PPC_F19:
-			str.printf("%12f", m_core->f[19]);
+			strprintf(str, "%12f", m_core->f[19]);
 			break;
 
 		case PPC_F20:
-			str.printf("%12f", m_core->f[20]);
+			strprintf(str, "%12f", m_core->f[20]);
 			break;
 
 		case PPC_F21:
-			str.printf("%12f", m_core->f[21]);
+			strprintf(str, "%12f", m_core->f[21]);
 			break;
 
 		case PPC_F22:
-			str.printf("%12f", m_core->f[22]);
+			strprintf(str, "%12f", m_core->f[22]);
 			break;
 
 		case PPC_F23:
-			str.printf("%12f", m_core->f[23]);
+			strprintf(str, "%12f", m_core->f[23]);
 			break;
 
 		case PPC_F24:
-			str.printf("%12f", m_core->f[24]);
+			strprintf(str, "%12f", m_core->f[24]);
 			break;
 
 		case PPC_F25:
-			str.printf("%12f", m_core->f[25]);
+			strprintf(str, "%12f", m_core->f[25]);
 			break;
 
 		case PPC_F26:
-			str.printf("%12f", m_core->f[26]);
+			strprintf(str, "%12f", m_core->f[26]);
 			break;
 
 		case PPC_F27:
-			str.printf("%12f", m_core->f[27]);
+			strprintf(str, "%12f", m_core->f[27]);
 			break;
 
 		case PPC_F28:
-			str.printf("%12f", m_core->f[28]);
+			strprintf(str, "%12f", m_core->f[28]);
 			break;
 
 		case PPC_F29:
-			str.printf("%12f", m_core->f[29]);
+			strprintf(str, "%12f", m_core->f[29]);
 			break;
 
 		case PPC_F30:
-			str.printf("%12f", m_core->f[30]);
+			strprintf(str, "%12f", m_core->f[30]);
 			break;
 
 		case PPC_F31:
-			str.printf("%12f", m_core->f[31]);
+			strprintf(str, "%12f", m_core->f[31]);
 			break;
 	}
 }

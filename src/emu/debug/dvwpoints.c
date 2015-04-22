@@ -154,8 +154,8 @@ void debug_view_watchpoints::enumerate_sources()
 	disasm_interface_iterator iter(machine().root_device());
 	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
 	{
-		astring name;
-		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
+		std::string name;
+		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
@@ -211,16 +211,15 @@ void debug_view_watchpoints::view_click(const int button, const debug_view_xy& p
 }
 
 
-void debug_view_watchpoints::pad_astring_to_length(astring& str, int len)
+void debug_view_watchpoints::pad_astring_to_length(std::string& str, int len)
 {
-	int diff = len - str.len();
+	int diff = len - str.length();
 	if (diff > 0)
 	{
-		astring buffer;
-		buffer.expand(diff);
+		std::string buffer;
 		for (int i = 0; i < diff; i++)
-			buffer.catprintf(" ");
-		str.catprintf("%s", buffer.c_str());
+			buffer.append(" ");
+		strcatprintf(str, "%s", buffer.c_str());
 	}
 }
 
@@ -263,48 +262,48 @@ void debug_view_watchpoints::view_update()
 
 	// Draw
 	debug_view_char *dest = &m_viewdata[0];
-	astring         linebuf;
+	std::string         linebuf;
 
 	// Header
 	if (m_visible.y > 0)
 	{
-		linebuf.reset();
-		linebuf.cat("ID");
-		if (m_sortType == &cIndexAscending) linebuf.cat('\\');
-		else if (m_sortType == &cIndexDescending) linebuf.cat('/');
+		linebuf.clear();
+		linebuf.append("ID");
+		if (m_sortType == &cIndexAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cIndexDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[0]);
-		linebuf.cat("En");
-		if (m_sortType == &cEnabledAscending) linebuf.cat('\\');
-		else if (m_sortType == &cEnabledDescending) linebuf.cat('/');
+		linebuf.append("En");
+		if (m_sortType == &cEnabledAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cEnabledDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[1]);
-		linebuf.cat("CPU");
-		if (m_sortType == &cCpuAscending) linebuf.cat('\\');
-		else if (m_sortType == &cCpuDescending) linebuf.cat('/');
+		linebuf.append("CPU");
+		if (m_sortType == &cCpuAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cCpuDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[2]);
-		linebuf.cat("Space");
-		if (m_sortType == &cSpaceAscending) linebuf.cat('\\');
-		else if (m_sortType == &cSpaceDescending) linebuf.cat('/');
+		linebuf.append("Space");
+		if (m_sortType == &cSpaceAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cSpaceDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[3]);
-		linebuf.cat("Addresses");
-		if (m_sortType == &cAddressAscending) linebuf.cat('\\');
-		else if (m_sortType == &cAddressDescending) linebuf.cat('/');
+		linebuf.append("Addresses");
+		if (m_sortType == &cAddressAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cAddressDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[4]);
-		linebuf.cat("Type");
-		if (m_sortType == &cTypeAscending) linebuf.cat('\\');
-		else if (m_sortType == &cTypeDescending) linebuf.cat('/');
+		linebuf.append("Type");
+		if (m_sortType == &cTypeAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cTypeDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[5]);
-		linebuf.cat("Condition");
-		if (m_sortType == &cConditionAscending) linebuf.cat('\\');
-		else if (m_sortType == &cConditionDescending) linebuf.cat('/');
+		linebuf.append("Condition");
+		if (m_sortType == &cConditionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cConditionDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[6]);
-		linebuf.cat("Action");
-		if (m_sortType == &cActionAscending) linebuf.cat('\\');
-		else if (m_sortType == &cActionDescending) linebuf.cat('/');
+		linebuf.append("Action");
+		if (m_sortType == &cActionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cActionDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[7]);
 
 		for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 		{
-			dest->byte = (i < linebuf.len()) ? linebuf[i] : ' ';
+			dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
 			dest->attrib = DCA_ANCILLARY;
 		}
 	}
@@ -318,30 +317,30 @@ void debug_view_watchpoints::view_update()
 			static char const *const types[] = { "unkn ", "read ", "write", "r/w  " };
 			device_debug::watchpoint *const wp = m_buffer[wpi];
 
-			linebuf.reset();
-			linebuf.catprintf("%2X", wp->index());
+			linebuf.clear();
+			strcatprintf(linebuf, "%2X", wp->index());
 			pad_astring_to_length(linebuf, tableBreaks[0]);
-			linebuf.cat(wp->enabled() ? 'X' : 'O');
+			linebuf.push_back(wp->enabled() ? 'X' : 'O');
 			pad_astring_to_length(linebuf, tableBreaks[1]);
-			linebuf.cat(wp->debugInterface()->device().tag());
+			linebuf.append(wp->debugInterface()->device().tag());
 			pad_astring_to_length(linebuf, tableBreaks[2]);
-			linebuf.cat(wp->space().name());
+			linebuf.append(wp->space().name());
 			pad_astring_to_length(linebuf, tableBreaks[3]);
-			linebuf.cat(core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()));
-			linebuf.cat('-');
-			linebuf.cat(core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()));
+			linebuf.append(core_i64_hex_format(wp->space().byte_to_address(wp->address()), wp->space().addrchars()));
+			linebuf.push_back('-');
+			linebuf.append(core_i64_hex_format(wp->space().byte_to_address_end(wp->address() + wp->length()) - 1, wp->space().addrchars()));
 			pad_astring_to_length(linebuf, tableBreaks[4]);
-			linebuf.cat(types[wp->type() & 3]);
+			linebuf.append(types[wp->type() & 3]);
 			pad_astring_to_length(linebuf, tableBreaks[5]);
 			if (strcmp(wp->condition(), "1"))
-				linebuf.cat(wp->condition());
+				linebuf.append(wp->condition());
 			pad_astring_to_length(linebuf, tableBreaks[6]);
-			linebuf.cat(wp->action());
+			linebuf.append(wp->action());
 			pad_astring_to_length(linebuf, tableBreaks[7]);
 
 			for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 			{
-				dest->byte = (i < linebuf.len()) ? linebuf[i] : ' ';
+				dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
 				dest->attrib = DCA_NORMAL;
 
 				// Color disabled watchpoints red

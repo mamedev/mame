@@ -84,10 +84,10 @@ public:
 	// state
 	state_entry *       m_next;                 // pointer to next entry
 	void *              m_data;                 // pointer to the memory to save/restore
-	astring             m_name;                 // full name
+	std::string         m_name;                 // full name
 	device_t *          m_device;               // associated device, NULL if none
-	astring             m_module;               // module name
-	astring             m_tag;                  // tag name
+	std::string         m_module;               // module name
+	std::string         m_tag;                  // tag name
 	int                 m_index;                // index
 	UINT8               m_typesize;             // size of the raw data type
 	UINT32              m_typecount;            // number of items
@@ -260,9 +260,9 @@ inline void save_manager::save_item(device_t *device, const char *module, const 
 template<>
 inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, attotime &value, const char *name)
 {
-	astring tempstr = astring(name).cat(".attoseconds");
+	std::string tempstr = std::string(name).append(".attoseconds");
 	save_memory(device, module, tag, index, tempstr.c_str(), &value.attoseconds, sizeof(value.attoseconds));
-	tempstr.cpy(name).cat(".seconds");
+	tempstr.assign(name).append(".seconds");
 	save_memory(device, module, tag, index, tempstr.c_str(), &value.seconds, sizeof(value.seconds));
 }
 

@@ -129,7 +129,7 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 	// if we're to log, create the logfile
 	if (device.machine().options().drc_log_uml())
 	{
-		astring filename = astring("drcuml_").cat(m_device.shortname()).cat(".asm");
+		std::string filename = std::string("drcuml_").append(m_device.shortname()).append(".asm");
 		m_umllog = fopen(filename.c_str(), "w");
 	}
 }
@@ -386,14 +386,14 @@ uml::instruction &drcuml_block::append()
 void drcuml_block::append_comment(const char *format, ...)
 {
 	// do the printf
-	astring temp;
+	std::string temp;
 	va_list va;
 	va_start(va, format);
-	temp.vprintf(format, va);
+	strvprintf(temp,format, va);
 	va_end(va);
 
 	// allocate space in the cache to hold the comment
-	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.len() + 1);
+	char *comment = (char *)m_drcuml.cache().alloc_temporary(temp.length() + 1);
 	if (comment == NULL)
 		return;
 	strcpy(comment, temp.c_str());
@@ -457,8 +457,8 @@ void drcuml_block::optimize()
 
 void drcuml_block::disassemble()
 {
-	astring comment;
-	astring dasm;
+	std::string comment;
+	std::string dasm;
 
 	// iterate over instructions and output
 	int firstcomment = -1;
@@ -520,15 +520,17 @@ void drcuml_block::disassemble()
 //  associated with a comment or mapvar
 //-------------------------------------------------
 
-const char *drcuml_block::get_comment_text(const instruction &inst, astring &comment)
+const char *drcuml_block::get_comment_text(const instruction &inst, std::string &comment)
 {
 	// comments return their strings
 	if (inst.opcode() == OP_COMMENT)
-		return comment.cpy(inst.param(0).string()).c_str();
+		return comment.assign(inst.param(0).string()).c_str();
 
 	// mapvars comment about their values
-	else if (inst.opcode() == OP_MAPVAR)
-		return comment.format("m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (UINT32)inst.param(1).immediate()).c_str();
+	else if (inst.opcode() == OP_MAPVAR) {
+		strprintf(comment,"m%d = $%X", (int)inst.param(0).mapvar() - MAPVAR_M0, (UINT32)inst.param(1).immediate());
+		return comment.c_str();
+	}
 
 	// everything else is NULL
 	return NULL;

@@ -1767,7 +1767,7 @@ void hdc9234_device::write_sectors()
 ===========================================================================
 */
 
-astring hdc9234_device::tts(const attotime &t)
+std::string hdc9234_device::tts(const attotime &t)
 {
 	char buf[256];
 	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
@@ -1775,7 +1775,7 @@ astring hdc9234_device::tts(const attotime &t)
 	return buf;
 }
 
-astring hdc9234_device::ttsn()
+std::string hdc9234_device::ttsn()
 {
 	return tts(machine().time());
 }

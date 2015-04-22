@@ -87,10 +87,10 @@ public:
 
 private:
 	image_device_format *m_next;
-	astring m_name;
-	astring m_description;
-	astring m_extensions;
-	astring m_optspec;
+	std::string m_name;
+	std::string m_description;
+	std::string m_extensions;
+	std::string m_optspec;
 };
 
 
@@ -269,29 +269,29 @@ protected:
 
 	/* error related info */
 	image_error_t m_err;
-	astring m_err_message;
+	std::string m_err_message;
 
 	/* variables that are only non-zero when an image is mounted */
 	core_file *m_file;
 	emu_file *m_mame_file;
-	astring m_image_name;
-	astring m_basename;
-	astring m_basename_noext;
-	astring m_filetype;
+	std::string m_image_name;
+	std::string m_basename;
+	std::string m_basename_noext;
+	std::string m_filetype;
 
 	/* working directory; persists across mounts */
 	std::string m_working_directory;
 
 	/* Software information */
-	astring m_full_software_name;
+	std::string m_full_software_name;
 	software_info *m_software_info_ptr;
 	software_part *m_software_part_ptr;
-	astring m_software_list_name;
+	std::string m_software_list_name;
 
 	/* info read from the hash file/software list */
-	astring m_longname;
-	astring m_manufacturer;
-	astring m_year;
+	std::string m_longname;
+	std::string m_manufacturer;
+	std::string m_year;
 	UINT32  m_supported;
 
 	/* flags */
@@ -306,8 +306,8 @@ protected:
 
 	hash_collection m_hash;
 
-	astring m_brief_instance_name;
-	astring m_instance_name;
+	std::string m_brief_instance_name;
+	std::string m_instance_name;
 
 	/* creation info */
 	simple_list<image_device_format> m_formatlist;

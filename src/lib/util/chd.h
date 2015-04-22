@@ -15,7 +15,8 @@
 
 #include "osdcore.h"
 #include "coretmpl.h"
-#include "astring.h"
+#include "corestr.h"
+#include <string>
 #include "bitmap.h"
 #include "corefile.h"
 #include "hashing.h"
@@ -347,12 +348,12 @@ public:
 	chd_error write_bytes(UINT64 offset, const void *buffer, UINT32 bytes);
 
 	// metadata management
-	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, astring &output);
+	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::string &output);
 	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output);
 	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 &resultlen);
 	chd_error read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, dynamic_buffer &output, chd_metadata_tag &resulttag, UINT8 &resultflags);
 	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags = CHD_MDFLAGS_CHECKSUM);
-	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const astring &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.c_str(), input.len() + 1, flags); }
+	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const std::string &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.c_str(), input.length() + 1, flags); }
 	chd_error write_metadata(chd_metadata_tag metatag, UINT32 metaindex, const dynamic_buffer &input, UINT8 flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, &input[0], input.size(), flags); }
 	chd_error delete_metadata(chd_metadata_tag metatag, UINT32 metaindex);
 	chd_error clone_all_metadata(chd_file &source);

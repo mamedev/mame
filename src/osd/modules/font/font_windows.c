@@ -19,7 +19,7 @@
 #include "modules/osdmodule.h"
 
 #include "strconv.h"
-#include "astring.h"
+#include "corestr.h"
 #include "corealloc.h"
 #include "fileio.h"
 
@@ -46,10 +46,10 @@ private:
 bool osd_font_windows::open(const char *font_path, const char *_name, int &height)
 {
 	// accept qualifiers from the name
-	astring name(_name);
-	if (name.cmp("default")==0) name = "Tahoma";
-	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
-	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
+	std::string name(_name);
+	if (name.compare("default")==0) name = "Tahoma";
+	bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
+	bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
 	// build a basic LOGFONT description of what we want
 	LOGFONT logfont;

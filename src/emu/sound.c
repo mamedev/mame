@@ -75,8 +75,8 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		m_callback = stream_update_delegate(FUNC(device_sound_interface::sound_stream_update),(device_sound_interface *)sound);
 
 	// create a unique tag for saving
-	astring state_tag;
-	state_tag.printf("%d", m_device.machine().sound().m_stream_list.count());
+	std::string state_tag;
+	strprintf(state_tag, "%d", m_device.machine().sound().m_stream_list.count());
 	m_device.machine().save().save_item(&m_device, "stream", state_tag.c_str(), 0, NAME(m_sample_rate));
 	m_device.machine().save().register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
@@ -163,17 +163,17 @@ float sound_stream::output_gain(int outputnum) const
 //  on a given stream's input
 //-------------------------------------------------
 
-const char *sound_stream::input_name(int inputnum, astring &str) const
+const char *sound_stream::input_name(int inputnum, std::string &str) const
 {
 	// start with our device name and tag
 	assert(inputnum >= 0 && inputnum < m_input.size());
-	str.printf("%s '%s': ", m_device.name(), m_device.tag());
+	strprintf(str, "%s '%s': ", m_device.name(), m_device.tag());
 
 	// if we have a source, indicate where the sound comes from by device name and tag
 	if (m_input[inputnum].m_source != NULL && m_input[inputnum].m_source->m_stream != NULL)
 	{
 		device_t &source = m_input[inputnum].m_source->m_stream->device();
-		str.catprintf("%s '%s'", source.name(), source.tag());
+		strcatprintf(str, "%s '%s'", source.name(), source.tag());
 
 		// get the sound interface; if there is more than 1 output we need to figure out which one
 		device_sound_interface *sound;
@@ -186,7 +186,7 @@ const char *sound_stream::input_name(int inputnum, astring &str) const
 			for (int outputnum = 0; (outstream = sound->output_to_stream_output(outputnum, streamoutputnum)) != NULL; outputnum++)
 				if (outstream == m_input[inputnum].m_source->m_stream && m_input[inputnum].m_source == &outstream->m_output[streamoutputnum])
 				{
-					str.catprintf(" Ch.%d", outputnum);
+					strcatprintf(str, " Ch.%d", outputnum);
 					break;
 				}
 		}

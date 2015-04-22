@@ -209,7 +209,7 @@ void MorphToPM()
 sdl_options::sdl_options()
 : osd_options()
 {
-	astring ini_path(INI_PATH);
+	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
 	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());
 	set_default_value(SDLOPTION_INIPATH, ini_path.c_str());
@@ -493,7 +493,7 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options().bench();
-	astring error_string;
+	std::string error_string;
 	if (bench > 0)
 	{
 		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);

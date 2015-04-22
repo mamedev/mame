@@ -45,7 +45,7 @@ public:
 struct output_item
 {
 	output_item *       next;           /* next item in list */
-	astring             name;           /* string name of the item */
+	std::string         name;           /* string name of the item */
 	UINT32              hash;           /* hash for this item name */
 	UINT32              id;             /* unique ID for this item */
 	INT32               value;          /* current value */
@@ -117,7 +117,7 @@ INLINE output_item *create_new_item(const char *outname, INT32 value)
 
 	/* fill in the data */
 	item->next = itemtable[hash % HASH_SIZE];
-	item->name.cpy(outname);
+	item->name.assign(outname);
 	item->hash = hash;
 	item->id = uniqueid++;
 	item->value = value;

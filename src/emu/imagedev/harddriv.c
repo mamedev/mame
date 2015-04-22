@@ -135,7 +135,7 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 	int err;
 	UINT32 sectorsize, hunksize;
 	UINT32 cylinders, heads, sectors, totalsectors;
-	astring metadata;
+	std::string metadata;
 
 	cylinders   = option_resolution_lookup_int(create_args, 'C');
 	heads       = option_resolution_lookup_int(create_args, 'H');
@@ -152,7 +152,7 @@ bool harddisk_image_device::call_create(int create_format, option_resolution *cr
 		goto error;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
-	metadata.format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
+	strprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
 	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 	m_origchd.close();
 
@@ -190,7 +190,7 @@ void harddisk_image_device::call_unload()
 
 static chd_error open_disk_diff(emu_options &options, const char *name, chd_file &source, chd_file &diff_chd)
 {
-	astring fname = astring(name).cat(".dif");
+	std::string fname = std::string(name).append(".dif");
 
 	/* try to open the diff */
 	//printf("Opening differencing image file: %s\n", fname.c_str());
@@ -198,7 +198,7 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 	file_error filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
-		astring fullpath(diff_file.fullpath());
+		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		//printf("Opening differencing image file: %s\n", fullpath.c_str());
@@ -211,11 +211,11 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 	filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
-		astring fullpath(diff_file.fullpath());
+		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		/* create the CHD */
-		//printf("Creating differencing image file: %s\n", fullpath.c_str());
+		//printf("Creating differencing image file: %s\n", fupointllpath.c_str());
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
 		chd_error err = diff_chd.create(fullpath.c_str(), source.logical_bytes(), source.hunk_bytes(), compression, source);
 		if (err != CHDERR_NONE)

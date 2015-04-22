@@ -121,7 +121,7 @@ private:
 	// internal helpers
 	void optimize();
 	void disassemble();
-	const char *get_comment_text(const uml::instruction &inst, astring &comment);
+	const char *get_comment_text(const uml::instruction &inst, std::string &comment);
 
 	// internal state
 	drcuml_state &          m_drcuml;           // pointer back to the owning UML
@@ -220,7 +220,7 @@ private:
 		symbol *                m_next;             // link to the next symbol
 		drccodeptr              m_base;             // base of the symbol
 		UINT32                  m_length;           // length of the region covered
-		astring                 m_name;             // name of the symbol
+		std::string             m_name;             // name of the symbol
 	};
 
 	// internal state

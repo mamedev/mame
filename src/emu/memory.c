@@ -1932,7 +1932,7 @@ void address_space::populate_from_map(address_map *map)
 void address_space::populate_map_entry(const address_map_entry &entry, read_or_write readorwrite)
 {
 	const map_handler_data &data = (readorwrite == ROW_READ) ? entry.m_read : entry.m_write;
-	astring fulltag;
+	std::string fulltag;
 
 	// based on the handler type, alter the bits, name, funcptr, and object
 	switch (data.m_type)
@@ -2679,9 +2679,11 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 
 		// if no tag, create a unique one
 		membank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
-		astring temptag;
-		if (tag == NULL)
-			tag = temptag.format("anon_%p", membank).c_str();
+		std::string temptag;
+		if (tag == NULL) {
+			strprintf(temptag, "anon_%p", membank);
+			tag = temptag.c_str();
+		}
 		manager().m_banklist.append(tag, *membank);
 	}
 
@@ -3877,8 +3879,8 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	if (region == NULL)
 	{
 		int bytes_per_element = space.data_width() / 8;
-		astring name;
-		name.printf("%08x-%08x", bytestart, byteend);
+		std::string name;
+		strprintf(name,"%08x-%08x", bytestart, byteend);
 		space.machine().save().save_memory(NULL, "memory", space.device().tag(), space.spacenum(), name.c_str(), m_data, bytes_per_element, (UINT32)(byteend + 1 - bytestart) / bytes_per_element);
 	}
 }
@@ -3916,13 +3918,13 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 	// generate an internal tag if we don't have one
 	if (tag == NULL)
 	{
-		m_tag.printf("~%d~", index);
-		m_name.printf("Internal bank #%d", index);
+		strprintf(m_tag,"~%d~", index);
+		strprintf(m_name,"Internal bank #%d", index);
 	}
 	else
 	{
-		m_tag.cpy(tag);
-		m_name.printf("Bank '%s'", tag);
+		m_tag.assign(tag);
+		strprintf(m_name,"Bank '%s'", tag);
 	}
 
 	if (!m_anonymous && space.machine().save().registration_allowed())

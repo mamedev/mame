@@ -144,12 +144,12 @@ hd44828_device::hd44828_device(const machine_config &mconfig, const char *tag, d
 
 
 // disasm
-void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, astring &str)
+void hmcs40_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str.printf("%c%c",
+			strprintf(str, "%c%c",
 				m_c ? 'C':'c',
 				m_s ? 'S':'s'
 			);

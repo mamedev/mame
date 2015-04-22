@@ -62,4 +62,19 @@ char *core_i64_format(UINT64 value, UINT8 mindigits, bool is_octal);
 char *core_i64_hex_format(UINT64 value, UINT8 mindigits);
 char *core_i64_oct_format(UINT64 value, UINT8 mindigits);
 
+#include <string>
+
+int strvprintf(std::string &str, const char *format, va_list args);
+int strcatvprintf(std::string &str, const char *format, va_list args);
+int strprintf(std::string &str, const char *format, ...) ATTR_PRINTF(2, 3);
+int strcatprintf(std::string &str, const char *format, ...) ATTR_PRINTF(2, 3);
+std::string strformat(std::string &str, const char *format, ...) ATTR_PRINTF(2, 3);
+
+void strdelchr(std::string& str, char chr);
+void strreplacechr(std::string& str, char ch, char newch);
+std::string strtrimspace(std::string& str);
+std::string strmakeupper(std::string& str);
+std::string strmakelower(std::string& str);
+int strreplace(std::string str, const std::string& search, const std::string& replace);
+
 #endif /* __CORESTR_H__ */

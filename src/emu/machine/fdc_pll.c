@@ -1,6 +1,6 @@
 #include "fdc_pll.h"
 
-astring fdc_pll_t::tts(attotime t)
+std::string fdc_pll_t::tts(attotime t)
 {
 	char buf[256];
 	bool neg = t.seconds < 0;

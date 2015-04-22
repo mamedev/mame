@@ -268,14 +268,14 @@ protected:
 
 	//  device_state_interface overrides
 
-	virtual void state_string_export(const device_state_entry &entry, astring &str)
+	virtual void state_string_export(const device_state_entry &entry, std::string &str)
 	{
 		if (entry.index() >= 0)
 		{
 			if (entry.index() & 1)
-				str.format("%10.6f", *((double *)entry.dataptr()));
+				strprintf(str,"%10.6f", *((double *)entry.dataptr()));
 			else
-				str.format("%d", *((netlist_sig_t *)entry.dataptr()));
+				strprintf(str, "%d", *((netlist_sig_t *)entry.dataptr()));
 		}
 	}
 

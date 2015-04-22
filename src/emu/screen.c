@@ -1046,11 +1046,11 @@ void screen_device::finalize_burnin()
 void screen_device::load_effect_overlay(const char *filename)
 {
 	// ensure that there is a .png extension
-	astring fullname(filename);
-	int extension = fullname.rchr(0, '.');
+	std::string fullname(filename);
+	int extension = fullname.find_last_of('.');
 	if (extension != -1)
-		fullname.del(extension, -1);
-	fullname.cat(".png");
+		fullname.erase(extension, -1);
+	fullname.append(".png");
 
 	// load the file
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);

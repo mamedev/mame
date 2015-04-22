@@ -626,19 +626,19 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	{
 		m_type = CTYPE_REEL;
 
-		astring symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
+		std::string symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
 		int location = -1;
 		m_numstops = 0;
-		location=symbollist.find(0,",");
+		location=symbollist.find(",");
 		while (location!=-1)
 		{
 			m_stopnames[m_numstops] = symbollist;
-			m_stopnames[m_numstops].substr(0, location);
-			symbollist.substr(location+1, symbollist.len()-(location-1));
+			m_stopnames[m_numstops] = m_stopnames[m_numstops].substr(0, location);
+			symbollist = symbollist.substr(location+1, symbollist.length()-(location-1));
 			m_numstops++;
-			location=symbollist.find(0,",");
+			location=symbollist.find(",");
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
@@ -648,12 +648,12 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 		for (int i=0;i<m_numstops;i++)
 		{
-			location=m_stopnames[i].find(0,":");
+			location=m_stopnames[i].find(":");
 			if (location!=-1)
 			{
 				m_imagefile[i] = m_stopnames[i];
-				m_stopnames[i].substr(0, location);
-				m_imagefile[i].substr(location+1, m_imagefile[i].len()-(location-1));
+				m_stopnames[i] = m_stopnames[i].substr(0, location);
+				m_imagefile[i] = m_imagefile[i].substr(location+1, m_imagefile[i].length()-(location-1));
 
 				//m_alphafile[i] =
 				m_file[i].reset(global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ)));
@@ -987,7 +987,7 @@ void layout_element::component::draw_simplecounter(running_machine &machine, bit
 {
 	char temp[256];
 	sprintf(temp, "%0*d", m_digits, state);
-	m_string = astring(temp);
+	m_string = std::string(temp);
 	draw_text(machine, dest, bounds);
 }
 

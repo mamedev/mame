@@ -802,9 +802,9 @@ int lua_engine::luaopen_ioport(lua_State *L)
 }
 
 struct msg {
-	astring text;
+	std::string text;
 	int ready;
-	astring response;
+	std::string response;
 	int status;
 	int done;
 } msg;
@@ -817,7 +817,7 @@ void lua_engine::serve_lua()
 	printf("%s v%s - %s\n%s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info(),LUA_COPYRIGHT);
 	fflush(stdout);
 	char buff[LUA_MAXINPUT];
-	astring oldbuff;
+	std::string oldbuff;
 
 	const char *b = LUA_PROMPT;
 
@@ -830,8 +830,8 @@ void lua_engine::serve_lua()
 		osd_lock_acquire(lock);
 		if (msg.ready == 0) {
 			msg.text = oldbuff;
-			if (oldbuff.len()!=0) msg.text.cat("\n");
-			msg.text.cat(buff);
+			if (oldbuff.length()!=0) msg.text.append("\n");
+			msg.text.append(buff);
 			msg.ready = 1;
 			msg.done = 0;
 		}

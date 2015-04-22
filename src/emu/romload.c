@@ -51,7 +51,7 @@ public:
 
 private:
 	open_chd *          m_next;                 /* pointer to next in the list */
-	astring             m_region;               /* disk region we came from */
+	std::string         m_region;               /* disk region we came from */
 	chd_file            m_origchd;              /* handle to the original CHD */
 	chd_file            m_diffchd;              /* handle to the diff CHD */
 };
@@ -77,8 +77,8 @@ struct romload_private
 
 	memory_region * region;             /* info about current region */
 
-	astring         errorstring;        /* error string */
-	astring         softwarningstring;  /* software warning string */
+	std::string     errorstring;        /* error string */
+	std::string     softwarningstring;  /* software warning string */
 };
 
 
@@ -373,7 +373,7 @@ static void determine_bios_rom(romload_private *romdata, device_t *device, const
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0 && romdata != NULL)
 		{
-			romdata->errorstring.catprintf("%s: invalid bios\n", specbios);
+			strcatprintf(romdata->errorstring, "%s: invalid bios\n", specbios);
 			romdata->errors++;
 		}
 
@@ -428,12 +428,12 @@ static void fill_random(running_machine &machine, UINT8 *base, UINT32 length)
     for missing files
 -------------------------------------------------*/
 
-static void handle_missing_file(romload_private *romdata, const rom_entry *romp, astring tried_file_names, chd_error chderr)
+static void handle_missing_file(romload_private *romdata, const rom_entry *romp, std::string tried_file_names, chd_error chderr)
 {
-	if(tried_file_names.len() != 0)
+	if(tried_file_names.length() != 0)
 		tried_file_names = " (tried in " + tried_file_names + ")";
 
-	astring name(ROM_GETNAME(romp));
+	std::string name(ROM_GETNAME(romp));
 
 	bool is_chd = (chderr != CHDERR_NONE);
 	if (is_chd)
@@ -441,13 +441,13 @@ static void handle_missing_file(romload_private *romdata, const rom_entry *romp,
 
 	bool is_chd_error = (is_chd && chderr != CHDERR_FILE_NOT_FOUND);
 	if (is_chd_error)
-		romdata->errorstring.catprintf("%s CHD ERROR: %s\n", name.c_str(), chd_file::error_string(chderr));
+		strcatprintf(romdata->errorstring, "%s CHD ERROR: %s\n", name.c_str(), chd_file::error_string(chderr));
 
 	/* optional files are okay */
 	if (ROM_ISOPTIONAL(romp))
 	{
 		if (!is_chd_error)
-			romdata->errorstring.catprintf("OPTIONAL %s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
+			strcatprintf(romdata->errorstring, "OPTIONAL %s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
 		romdata->warnings++;
 	}
 
@@ -455,7 +455,7 @@ static void handle_missing_file(romload_private *romdata, const rom_entry *romp,
 	else if (hash_collection(ROM_GETHASHDATA(romp)).flag(hash_collection::FLAG_NO_DUMP))
 	{
 		if (!is_chd_error)
-			romdata->errorstring.catprintf("%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name.c_str(), tried_file_names.c_str());
+			strcatprintf(romdata->errorstring, "%s NOT FOUND (NO GOOD DUMP KNOWN)%s\n", name.c_str(), tried_file_names.c_str());
 		romdata->knownbad++;
 	}
 
@@ -463,7 +463,7 @@ static void handle_missing_file(romload_private *romdata, const rom_entry *romp,
 	else
 	{
 		if (!is_chd_error)
-			romdata->errorstring.catprintf("%s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
+			strcatprintf(romdata->errorstring, "%s NOT FOUND%s\n", name.c_str(), tried_file_names.c_str());
 		romdata->errors++;
 	}
 }
@@ -477,9 +477,9 @@ static void handle_missing_file(romload_private *romdata, const rom_entry *romp,
 
 static void dump_wrong_and_correct_checksums(romload_private *romdata, const hash_collection &hashes, const hash_collection &acthashes)
 {
-	astring tempstr;
-	romdata->errorstring.catprintf("    EXPECTED: %s\n", hashes.macro_string(tempstr));
-	romdata->errorstring.catprintf("       FOUND: %s\n", acthashes.macro_string(tempstr));
+	std::string tempstr;
+	strcatprintf(romdata->errorstring, "    EXPECTED: %s\n", hashes.macro_string(tempstr));
+	strcatprintf(romdata->errorstring, "       FOUND: %s\n", acthashes.macro_string(tempstr));
 }
 
 
@@ -498,30 +498,30 @@ static void verify_length_and_hash(romload_private *romdata, const char *name, U
 	UINT32 actlength = romdata->file->size();
 	if (explength != actlength)
 	{
-		romdata->errorstring.catprintf("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
+		strcatprintf(romdata->errorstring, "%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
 		romdata->warnings++;
 	}
 
 	/* If there is no good dump known, write it */
-	astring tempstr;
+	std::string tempstr;
 	hash_collection &acthashes = romdata->file->hashes(hashes.hash_types(tempstr));
 	if (hashes.flag(hash_collection::FLAG_NO_DUMP))
 	{
-		romdata->errorstring.catprintf("%s NO GOOD DUMP KNOWN\n", name);
+		strcatprintf(romdata->errorstring, "%s NO GOOD DUMP KNOWN\n", name);
 		romdata->knownbad++;
 	}
 	/* verify checksums */
 	else if (hashes != acthashes)
 	{
 		/* otherwise, it's just bad */
-		romdata->errorstring.catprintf("%s WRONG CHECKSUMS:\n", name);
+		strcatprintf(romdata->errorstring, "%s WRONG CHECKSUMS:\n", name);
 		dump_wrong_and_correct_checksums(romdata, hashes, acthashes);
 		romdata->warnings++;
 	}
 	/* If it matches, but it is actually a bad dump, write it */
 	else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 	{
-		romdata->errorstring.catprintf("%s ROM NEEDS REDUMP\n",name);
+		strcatprintf(romdata->errorstring, "%s ROM NEEDS REDUMP\n",name);
 		romdata->knownbad++;
 	}
 }
@@ -567,9 +567,9 @@ static void display_rom_load_results(romload_private *romdata, bool from_list)
 	/* if we had warnings, output them, but continue */
 	if ((romdata-> warnings) || (romdata->knownbad))
 	{
-		romdata->errorstring.cat("WARNING: the ");
-		romdata->errorstring.cat(emulator_info::get_gamenoun());
-		romdata->errorstring.cat(" might not run correctly.");
+		romdata->errorstring.append("WARNING: the ");
+		romdata->errorstring.append(emulator_info::get_gamenoun());
+		romdata->errorstring.append(" might not run correctly.");
 		osd_printf_warning("%s\n", romdata->errorstring.c_str());
 	}
 }
@@ -622,7 +622,7 @@ static void region_post_process(romload_private *romdata, const char *rgntag, bo
     up the parent and loading by checksum
 -------------------------------------------------*/
 
-static int open_rom_file(romload_private *romdata, const char *regiontag, const rom_entry *romp, astring &tried_file_names, bool from_list)
+static int open_rom_file(romload_private *romdata, const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list)
 {
 	file_error filerr = FILERR_NOT_FOUND;
 	UINT32 romsize = rom_file_size(romp);
@@ -639,7 +639,7 @@ static int open_rom_file(romload_private *romdata, const char *regiontag, const 
 	 attempts any kind of load by checksum supported by the archives. */
 	romdata->file = NULL;
 	for (int drv = driver_list::find(romdata->machine().system()); romdata->file == NULL && drv != -1; drv = driver_list::clone(drv)) {
-		if(tried_file_names.len() != 0)
+		if (tried_file_names.length() != 0)
 			tried_file_names += " ";
 		tried_file_names += driver_list::driver(drv).name;
 		filerr = common_process_file(romdata->machine().options(), driver_list::driver(drv).name, has_crc, crc, romp, &romdata->file);
@@ -651,42 +651,42 @@ static int open_rom_file(romload_private *romdata, const char *regiontag, const 
 		// check if we are dealing with softwarelists. if so, locationtag
 		// is actually a concatenation of: listname + setname + parentname
 		// separated by '%' (parentname being present only for clones)
-		astring tag1(regiontag), tag2, tag3, tag4, tag5;
+		std::string tag1(regiontag), tag2, tag3, tag4, tag5;
 		bool is_list = FALSE;
 		bool has_parent = FALSE;
 
-		int separator1 = tag1.chr(0, '%');
+		int separator1 = tag1.find_first_of('%');
 		if (separator1 != -1)
 		{
 			is_list = TRUE;
 
 			// we are loading through softlists, split the listname from the regiontag
-			tag4.cpysubstr(tag1, separator1 + 1, tag1.len() - separator1 + 1);
-			tag1.del(separator1, tag1.len() - separator1);
-			tag1.cat(PATH_SEPARATOR);
+			tag4.assign(tag1.substr(separator1 + 1, tag1.length() - separator1 + 1));
+			tag1.erase(separator1, tag1.length() - separator1);
+			tag1.append(PATH_SEPARATOR);
 
 			// check if we are loading a clone (if this is the case also tag1 have a separator '%')
-			int separator2 = tag4.chr(0, '%');
+			int separator2 = tag4.find_first_of('%');
 			if (separator2 != -1)
 			{
 				has_parent = TRUE;
 
 				// we are loading a clone through softlists, split the setname from the parentname
-				tag5.cpysubstr(tag4, separator2 + 1, tag4.len() - separator2 + 1);
-				tag4.del(separator2, tag4.len() - separator2);
+				tag5.assign(tag4.substr(separator2 + 1, tag4.length() - separator2 + 1));
+				tag4.erase(separator2, tag4.length() - separator2);
 			}
 
 			// prepare locations where we have to load from: list/parentname & list/clonename
-			astring swlist(tag1.c_str());
-			tag2.cpy(swlist.cat(tag4));
+			std::string swlist(tag1.c_str());
+			tag2.assign(swlist.append(tag4));
 			if (has_parent)
 			{
-				swlist.cpy(tag1);
-				tag3.cpy(swlist.cat(tag5));
+				swlist.assign(tag1);
+				tag3.assign(swlist.append(tag5));
 			}
 		}
 
-		if (tag5.chr(0, '%') != -1)
+		if (tag5.find_first_of('%') != -1)
 			fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
@@ -966,7 +966,7 @@ static void process_rom_entries(romload_private *romdata, const char *regiontag,
 
 			/* open the file if it is a non-BIOS or matches the current BIOS */
 			LOG(("Opening ROM file: %s\n", ROM_GETNAME(romp)));
-			astring tried_file_names;
+			std::string tried_file_names;
 			if (!irrelevantbios && !open_rom_file(romdata, regiontag, romp, tried_file_names, from_list))
 				handle_missing_file(romdata, romp, tried_file_names, CHDERR_NONE);
 
@@ -1052,42 +1052,42 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		// check if we are dealing with softwarelists. if so, locationtag
 		// is actually a concatenation of: listname + setname + parentname
 		// separated by '%' (parentname being present only for clones)
-		astring tag1(locationtag), tag2, tag3, tag4, tag5;
+		std::string tag1(locationtag), tag2, tag3, tag4, tag5;
 		bool is_list = FALSE;
 		bool has_parent = FALSE;
 
-		int separator1 = tag1.chr(0, '%');
+		int separator1 = tag1.find_first_of('%');
 		if (separator1 != -1)
 		{
 			is_list = TRUE;
 
 			// we are loading through softlists, split the listname from the regiontag
-			tag4.cpysubstr(tag1, separator1 + 1, tag1.len() - separator1 + 1);
-			tag1.del(separator1, tag1.len() - separator1);
-			tag1.cat(PATH_SEPARATOR);
+			tag4.assign(tag1.substr(separator1 + 1, tag1.length() - separator1 + 1));
+			tag1.erase(separator1, tag1.length() - separator1);
+			tag1.append(PATH_SEPARATOR);
 
 			// check if we are loading a clone (if this is the case also tag1 have a separator '%')
-			int separator2 = tag4.chr(0, '%');
+			int separator2 = tag4.find_first_of('%');
 			if (separator2 != -1)
 			{
 				has_parent = TRUE;
 
 				// we are loading a clone through softlists, split the setname from the parentname
-				tag5.cpysubstr(tag4, separator2 + 1, tag4.len() - separator2 + 1);
-				tag4.del(separator2, tag4.len() - separator2);
+				tag5.assign(tag4.substr(separator2 + 1, tag4.length() - separator2 + 1));
+				tag4.erase(separator2, tag4.length() - separator2);
 			}
 
 			// prepare locations where we have to load from: list/parentname (if any) & list/clonename
-			astring swlist(tag1.c_str());
-			tag2.cpy(swlist.cat(tag4));
+			std::string swlist(tag1.c_str());
+			tag2.assign(swlist.append(tag4));
 			if (has_parent)
 			{
-				swlist.cpy(tag1);
-				tag3.cpy(swlist.cat(tag5));
+				swlist.assign(tag1);
+				tag3.assign(swlist.append(tag5));
 			}
 		}
 
-		if (tag5.chr(0, '%') != -1)
+		if (tag5.find_first_of('%') != -1)
 			fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
@@ -1112,7 +1112,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 			// only for CHD we also try to load from list/
 			if ((filerr != FILERR_NONE) && (tag1.c_str() != NULL))
 			{
-				tag1.del(tag1.len() - 1, 1);    // remove the PATH_SEPARATOR
+				tag1.erase(tag1.length() - 1, 1);    // remove the PATH_SEPARATOR
 				filerr = common_process_file(options, tag1.c_str(), ".chd", romp, image_file);
 			}
 		}
@@ -1121,7 +1121,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 	/* did the file open succeed? */
 	if (filerr == FILERR_NONE)
 	{
-		astring fullpath(image_file.fullpath());
+		std::string fullpath(image_file.fullpath());
 		image_file.close();
 
 		/* try to open the CHD */
@@ -1159,7 +1159,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 							/* did the file open succeed? */
 							if (filerr == FILERR_NONE)
 							{
-								astring fullpath(image_file.fullpath());
+								std::string fullpath(image_file.fullpath());
 								image_file.close();
 
 								/* try to open the CHD */
@@ -1179,7 +1179,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 
 static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd)
 {
-	astring fname = astring(ROM_GETNAME(romp)).cat(".dif");
+	std::string fname = std::string(ROM_GETNAME(romp)).append(".dif");
 
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.c_str()));
@@ -1187,7 +1187,7 @@ static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd
 	file_error filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
-		astring fullpath(diff_file.fullpath());
+		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		LOG(("Opening differencing image file: %s\n", fullpath.c_str()));
@@ -1200,7 +1200,7 @@ static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd
 	filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
-		astring fullpath(diff_file.fullpath());
+		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		/* create the CHD */
@@ -1236,14 +1236,14 @@ static void process_disk_entries(romload_private *romdata, const char *regiontag
 			chd_error err;
 
 			/* make the filename of the source */
-			astring filename = astring(ROM_GETNAME(romp)).cat(".chd");
+			std::string filename = std::string(ROM_GETNAME(romp)).append(".chd");
 
 			/* first open the source drive */
 			LOG(("Opening disk image: %s\n", filename.c_str()));
 			err = chd_error(open_disk_image(romdata->machine().options(), &romdata->machine().system(), romp, chd->orig_chd(), locationtag));
 			if (err != CHDERR_NONE)
 			{
-				handle_missing_file(romdata, romp, astring(), err);
+				handle_missing_file(romdata, romp, std::string(), err);
 				global_free(chd);
 				continue;
 			}
@@ -1255,13 +1255,13 @@ static void process_disk_entries(romload_private *romdata, const char *regiontag
 			/* verify the hash */
 			if (hashes != acthashes)
 			{
-				romdata->errorstring.catprintf("%s WRONG CHECKSUMS:\n", filename.c_str());
+				strcatprintf(romdata->errorstring, "%s WRONG CHECKSUMS:\n", filename.c_str());
 				dump_wrong_and_correct_checksums(romdata, hashes, acthashes);
 				romdata->warnings++;
 			}
 			else if (hashes.flag(hash_collection::FLAG_BAD_DUMP))
 			{
-				romdata->errorstring.catprintf("%s CHD NEEDS REDUMP\n", filename.c_str());
+				strcatprintf(romdata->errorstring, "%s CHD NEEDS REDUMP\n", filename.c_str());
 				romdata->knownbad++;
 			}
 
@@ -1272,7 +1272,7 @@ static void process_disk_entries(romload_private *romdata, const char *regiontag
 				err = open_disk_diff(romdata->machine().options(), romp, chd->orig_chd(), chd->diff_chd());
 				if (err != CHDERR_NONE)
 				{
-					romdata->errorstring.catprintf("%s DIFF CHD ERROR: %s\n", filename.c_str(), chd_file::error_string(err));
+					strcatprintf(romdata->errorstring, "%s DIFF CHD ERROR: %s\n", filename.c_str(), chd_file::error_string(err));
 					romdata->errors++;
 					global_free(chd);
 					continue;
@@ -1335,13 +1335,13 @@ static void normalize_flags_for_device(running_machine &machine, const char *rgn
 
 void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region)
 {
-	astring locationtag(swlist.list_name()), breakstr("%");
+	std::string locationtag(swlist.list_name()), breakstr("%");
 	romload_private *romdata = device.machine().romload_data;
 	const rom_entry *region;
 	std::string regiontag;
 
-	romdata->errorstring.reset();
-	romdata->softwarningstring.reset();
+	romdata->errorstring.clear();
+	romdata->softwarningstring.clear();
 
 	romdata->romstotal = 0;
 	romdata->romstotalsize = 0;
@@ -1353,29 +1353,29 @@ void load_software_part_region(device_t &device, software_list_device &swlist, c
 		UINT32 supported = swinfo->supported();
 		if (supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
-			romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
-			romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+			strcatprintf(romdata->errorstring, "WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
+			strcatprintf(romdata->softwarningstring, "Support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
 		}
 		if (supported == SOFTWARE_SUPPORTED_NO)
 		{
-			romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
-			romdata->softwarningstring.catprintf("Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+			strcatprintf(romdata->errorstring, "WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
+			strcatprintf(romdata->softwarningstring, "Support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
 		}
 
-		// attempt reading up the chain through the parents and create a locationtag astring in the format
+		// attempt reading up the chain through the parents and create a locationtag std::string in the format
 		// " swlist % clonename % parentname "
 		// open_rom_file contains the code to split the elements and to create paths to load from
 
-		locationtag.cat(breakstr);
+		locationtag.append(breakstr);
 
 		while (swinfo != NULL)
 		{
-			locationtag.cat(swinfo->shortname()).cat(breakstr);
+			locationtag.append(swinfo->shortname()).append(breakstr);
 			const char *parentname = swinfo->parentname();
 			swinfo = (parentname != NULL) ? swlist.find(parentname) : NULL;
 		}
 		// strip the final '%'
-		locationtag.del(locationtag.len() - 1, 1);
+		locationtag.erase(locationtag.length() - 1, 1);
 	}
 
 
@@ -1542,7 +1542,7 @@ void rom_init(running_machine &machine)
 	for (device_t *device = deviter.first(); device != NULL; device = deviter.next()) {
 		if (device->rom_region()) {
 			const char *specbios;
-			astring temp;
+			std::string temp;
 			if (strcmp(device->tag(),":")==0) {
 				specbios = romdata->machine().options().bios();
 			} else {
@@ -1594,7 +1594,7 @@ int rom_load_warnings(running_machine &machine)
     software load warnings we generated
 -------------------------------------------------*/
 
-astring& software_load_warnings_message(running_machine &machine)
+std::string& software_load_warnings_message(running_machine &machine)
 {
 	return machine.romload_data->softwarningstring;
 }

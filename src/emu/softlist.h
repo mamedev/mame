@@ -227,7 +227,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
 
 	// configuration state
-	astring                     m_list_name;
+	std::string                 m_list_name;
 	softlist_type               m_list_type;
 	const char *                m_filter;
 
@@ -235,7 +235,7 @@ protected:
 	bool                        m_parsed;
 	emu_file                    m_file;
 	const char *                m_description;
-	astring                     m_errors;
+	std::string                 m_errors;
 	simple_list<software_info>  m_infolist;
 	const_string_pool           m_stringpool;
 };

@@ -328,17 +328,21 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 			if (subpath.length() > 0)
 			{
 				std::string temp2;
-				temp2.assign(mainpath.substr(temp.length()).append(PATH_SEPARATOR).append(subpath));
+				mainpath = mainpath.substr(temp.length());
+				temp2.assign(mainpath).append(PATH_SEPARATOR).append(subpath);
 				subpath.assign(temp2);
 			}
-			else
-				subpath.assign(mainpath.substr(temp.length()));
-
+			else 
+			{
+				mainpath = mainpath.substr(temp.length());
+				subpath.assign(mainpath);
+			}
 			/* get the new main path, truncating path separators */
 			len = temp.length();
 			while (len > 0 && is_zip_file_separator(temp[len - 1]))
 				len--;
-			mainpath.assign(temp.substr(0, len));
+			temp = temp.substr(0, len);
+			mainpath.assign(temp);
 		}
 	}
 
@@ -562,7 +566,8 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type &entry_ty
 		i = apath.length();
 		while (i > 1 && is_path_separator(apath[i - 1]))
 			i--;
-		apath_trimmed.assign(apath.substr(0, i));
+		apath = apath.substr(0, i);
+		apath_trimmed.assign(apath);
 
 		/* stat the path */
 		current_entry = osd_stat(apath_trimmed.c_str());

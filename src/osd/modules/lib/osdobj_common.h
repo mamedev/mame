@@ -113,10 +113,10 @@ public:
 	const char *aspect() const { return value(OSDOPTION_ASPECT); }
 	const char *resolution() const { return value(OSDOPTION_RESOLUTION); }
 	const char *view() const { return value(OSDOPTION_VIEW); }
-	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SCREEN, index).c_str()); }
-	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_ASPECT, index).c_str()); }
-	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_RESOLUTION, index).c_str()); }
-	const char *view(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_VIEW, index).c_str()); }
+	const char *screen(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SCREEN, index);  return value(temp.c_str()); }
+	const char *aspect(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_ASPECT, index); return value(temp.c_str()); }
+	const char *resolution(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_RESOLUTION, index); return value(temp.c_str()); }
+	const char *view(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_VIEW, index); return value(temp.c_str()); }
 
 	// full screen options
 	bool switch_res() const { return bool_value(OSDOPTION_SWITCHRES); }
@@ -136,12 +136,12 @@ public:
 	bool gl_pbo() const { return bool_value(OSDOPTION_GL_PBO); }
 	bool gl_glsl() const { return bool_value(OSDOPTION_GL_GLSL); }
 	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
-	const char *shader_mame(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_MAME, index).c_str()); }
-	const char *shader_screen(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_SHADER_SCREEN, index).c_str()); }
+	const char *shader_mame(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_MAME, index);  return value(temp.c_str()); }
+	const char *shader_screen(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_SHADER_SCREEN, index);  return value(temp.c_str()); }
 
 	// CoreAudio specific options
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
-	const char *audio_effect(int index) const { astring temp; return value(temp.format("%s%d", OSDOPTION_AUDIO_EFFECT, index).c_str()); }
+	const char *audio_effect(int index) const { std::string temp; strprintf(temp, "%s%d", OSDOPTION_AUDIO_EFFECT, index); return value(temp.c_str()); }
 
 private:
 	static const options_entry s_option_entries[];
@@ -238,7 +238,7 @@ private:
 
 	void update_option(const char * key, std::vector<const char *> &values);
 	// FIXME: should be elsewhere
-	osd_module *select_module_options(const core_options &opts, const astring &opt_name)
+	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
 	{
 		std::string opt_val = opts.value(opt_name.c_str());
 		if (opt_val.compare("auto")==0)
@@ -252,7 +252,7 @@ private:
 	}
 
 	template<class C>
-	C select_module_options(const core_options &opts, const astring &opt_name)
+	C select_module_options(const core_options &opts, const std::string &opt_name)
 	{
 		return dynamic_cast<C>(select_module_options(opts, opt_name));
 	}

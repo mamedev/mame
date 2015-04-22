@@ -408,7 +408,7 @@ void palette_device::device_start()
 	if (share != NULL)
 	{
 		// find the extended (split) memory, if present
-		astring tag_ext = astring(tag()).cat("_ext");
+		std::string tag_ext = std::string(tag()).append("_ext");
 		const memory_share *share_ext = memshare(tag_ext.c_str());
 
 		// make sure we have specified a format

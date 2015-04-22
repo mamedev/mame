@@ -135,7 +135,7 @@ protected:
 	symbol_entry *  m_next;                     // link to next entry
 	symbol_table &  m_table;                    // pointer back to the owning table
 	symbol_type     m_type;                     // type of symbol
-	astring         m_name;                     // name of the symbol
+	std::string     m_name;                     // name of the symbol
 	void *          m_ref;                      // internal reference
 };
 
@@ -341,7 +341,7 @@ private:
 	private:
 		// internal state
 		expression_string * m_next;                     // next string in list
-		astring             m_string;                   // copy of the string
+		std::string         m_string;                   // copy of the string
 	};
 
 	// internal helpers
@@ -373,7 +373,7 @@ private:
 
 	// internal state
 	symbol_table *      m_symtable;                     // symbol table
-	astring             m_original_string;              // original string (prior to parsing)
+	std::string         m_original_string;              // original string (prior to parsing)
 	simple_list<parse_token> m_tokenlist;               // token list
 	simple_list<expression_string> m_stringlist;        // string list
 	int                 m_token_stack_ptr;              // stack pointer (used during execution)

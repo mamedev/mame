@@ -180,8 +180,8 @@ void ui_menu::reset(ui_menu_reset_options options)
 	numitems = 0;
 	visitems = 0;
 	selected = 0;
-	astring backtext;
-	backtext.printf("Return to %s",emulator_info::get_capstartgamenoun());
+	std::string backtext;
+	strprintf(backtext, "Return to %s", emulator_info::get_capstartgamenoun());
 
 	// add an item to return
 	if (parent == NULL)

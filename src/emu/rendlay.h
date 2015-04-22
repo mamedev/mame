@@ -134,20 +134,20 @@ private:
 		int                 m_state;                    // state where this component is visible (-1 means all states)
 		render_bounds       m_bounds;                   // bounds of the element
 		render_color        m_color;                    // color of the element
-		astring             m_string;                   // string for text components
+		std::string         m_string;                   // string for text components
 		int                 m_digits;                   // number of digits for simple counters
 		int                 m_textalign;                // text alignment to box
 		bitmap_argb32       m_bitmap[MAX_BITMAPS];      // source bitmap for images
-		astring             m_dirname;                  // directory name of image file (for lazy loading)
+		std::string         m_dirname;                  // directory name of image file (for lazy loading)
 		auto_pointer<emu_file> m_file[MAX_BITMAPS];        // file object for reading image/alpha files
-		astring             m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
-		astring             m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
+		std::string         m_imagefile[MAX_BITMAPS];   // name of the image file (for lazy loading)
+		std::string         m_alphafile[MAX_BITMAPS];   // name of the alpha file (for lazy loading)
 		bool                m_hasalpha[MAX_BITMAPS];    // is there any alpha component present?
 
 		// stuff for fruit machine reels
 		// basically made up of multiple text strings / gfx
 		int                 m_numstops;
-		astring             m_stopnames[MAX_BITMAPS];
+		std::string         m_stopnames[MAX_BITMAPS];
 		int                 m_stateoffset;
 		int                 m_reelreversed;
 		int                 m_numsymbolsvisible;
@@ -172,7 +172,7 @@ private:
 	// internal state
 	layout_element *    m_next;             // link to next element
 	running_machine &   m_machine;          // reference to the owning machine
-	astring             m_name;             // name of this element
+	std::string         m_name;             // name of this element
 	simple_list<component> m_complist;      // list of components
 	int                 m_defstate;         // default state of this element
 	int                 m_maxstate;         // maximum state value for all components
@@ -217,8 +217,8 @@ public:
 		// internal state
 		item *              m_next;             // link to next item
 		layout_element *    m_element;          // pointer to the associated element (non-screens only)
-		astring             m_output_name;      // name of this item
-		astring             m_input_tag;        // input tag of this item
+		std::string         m_output_name;      // name of this item
+		std::string         m_input_tag;        // input tag of this item
 		ioport_value        m_input_mask;       // input mask of this item
 		screen_device *     m_screen;           // pointer to screen
 		int                 m_orientation;      // orientation of this item
@@ -248,7 +248,7 @@ public:
 private:
 	// internal state
 	layout_view *       m_next;             // pointer to next layout in the list
-	astring             m_name;             // name of the layout
+	std::string         m_name;             // name of the layout
 	float               m_aspect;           // X/Y of the layout
 	float               m_scraspect;        // X/Y of the screen areas
 	render_screen_list  m_screens;          // list of active screens

@@ -20,7 +20,7 @@
 
 void image_init(running_machine &machine);
 void image_postdevice_init(running_machine &machine);
-astring &image_mandatory_scan(running_machine &machine, astring &mandatory);
+std::string &image_mandatory_scan(running_machine &machine, std::string &mandatory);
 
 extern struct io_procs image_ioprocs;
 

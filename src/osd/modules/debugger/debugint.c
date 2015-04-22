@@ -157,7 +157,7 @@ public:
 	{ }
 	int                 active;
 	render_container *  container;
-	astring             str;
+	std::string         str;
 };
 
 /***************************************************************************
@@ -222,7 +222,7 @@ public:
 	rectangle           bounds;
 	int                 ofs_x;
 	int                 ofs_y;
-	astring             title;
+	std::string         title;
 	int                 last_x;
 	int                 last_y;
 	// Scrollbars
@@ -459,9 +459,9 @@ static void dview_draw_size(DView *dv)
 			r.width(),r.height(), rgb_t(0xff, 0xff, 0xff, 0x00));
 }
 
-static void dview_set_title(DView *dv, astring title)
+static void dview_set_title(DView *dv, std::string title)
 {
-	if (dv->title.cmp(title) != 0)
+	if (dv->title.compare(title) != 0)
 	{
 		dv->title = title;
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
@@ -1155,7 +1155,7 @@ static void CreateMainMenu(running_machine &machine)
 {
 	const char *subtext = "";
 	int rc;
-	astring title;
+	std::string title;
 
 	if (menu)
 		global_free( menu);
@@ -1180,7 +1180,7 @@ static void CreateMainMenu(running_machine &machine)
 		break;
 	}
 
-	menu->item_append(title.cat(focus_view->title).c_str(), NULL, MENU_FLAG_DISABLE, NULL);
+	menu->item_append(title.append(focus_view->title).c_str(), NULL, MENU_FLAG_DISABLE, NULL);
 	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	switch (focus_view->type)
@@ -1295,11 +1295,11 @@ static void handle_editor(running_machine &machine)
 			{
 			case UI_EVENT_CHAR:
 				/* if it's a backspace and we can handle it, do so */
-				if ((event.ch == 8 || event.ch == 0x7f) && focus_view->editor.str.len() > 0)
+				if ((event.ch == 8 || event.ch == 0x7f) && focus_view->editor.str.length() > 0)
 				{
 					/* autoschow */
 					cur_editor = &focus_view->editor;
-					cur_editor->str = cur_editor->str.substr(0, cur_editor->str.len()-1);
+					cur_editor->str = cur_editor->str.substr(0, cur_editor->str.length()-1);
 				}
 				/* if it's any other key and we're not maxed out, update */
 				else if (event.ch >= ' ' && event.ch < 0x7f)
@@ -1310,7 +1310,7 @@ static void handle_editor(running_machine &machine)
 					cur_editor = &focus_view->editor;
 					ret = utf8_from_uchar(buf, 10, event.ch);
 					buf[ret] = 0;
-					cur_editor->str = cur_editor->str.cat(buf);
+					cur_editor->str = cur_editor->str.append(buf);
 				}
 				break;
 			default:
@@ -1380,7 +1380,7 @@ static void handle_menus(running_machine &machine)
 
 static void followers_set_cpu(device_t *device)
 {
-	astring title;
+	std::string title;
 
 	for (DView *dv = list; dv != NULL; dv = dv->next)
 	{
@@ -1392,7 +1392,7 @@ static void followers_set_cpu(device_t *device)
 			case DVT_DISASSEMBLY:
 			case DVT_STATE:
 				dv->view->set_source(*source);
-				title.printf("%s", source->name());
+				strprintf(title, "%s", source->name());
 				dview_set_title(dv, title);
 				break;
 			}

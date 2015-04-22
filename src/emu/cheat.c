@@ -101,25 +101,25 @@
 //  the format
 //-------------------------------------------------
 
-inline const char *number_and_format::format(astring &str) const
+inline const char *number_and_format::format(std::string &str) const
 {
 	switch (m_format)
 	{
 		default:
 		case XML_INT_FORMAT_DECIMAL:
-			str.printf("%d", (UINT32)m_value);
+			strprintf(str, "%d", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_DECIMAL_POUND:
-			str.printf("#%d", (UINT32)m_value);
+			strprintf(str, "#%d", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_HEX_DOLLAR:
-			str.printf("$%X", (UINT32)m_value);
+			strprintf(str, "$%X", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_HEX_C:
-			str.printf("0x%X", (UINT32)m_value);
+			strprintf(str, "0x%X", (UINT32)m_value);
 			break;
 	}
 	return str.c_str();
@@ -178,16 +178,16 @@ const char *cheat_parameter::text()
 {
 	// are we a value cheat?
 	if (!has_itemlist())
-		m_curtext.format("%d (0x%X)", UINT32(m_value), UINT32(m_value));
+		strprintf(m_curtext,"%d (0x%X)", UINT32(m_value), UINT32(m_value));
 
 	// if not, we're an item cheat
 	else
 	{
-		m_curtext.format("??? (%d)", UINT32(m_value));
+		strprintf(m_curtext, "??? (%d)", UINT32(m_value));
 		for (item *curitem = m_itemlist.first(); curitem != NULL; curitem = curitem->next())
 			if (curitem->value() == m_value)
 			{
-				m_curtext.cpy(curitem->text());
+				m_curtext.assign(curitem->text());
 				break;
 			}
 	}
@@ -205,7 +205,7 @@ void cheat_parameter::save(emu_file &cheatfile) const
 	cheatfile.printf("\t\t<parameter");
 
 	// if no items, just output min/max/step
-	astring str;
+	std::string str;
 	if (!has_itemlist())
 	{
 		if (m_minval != 0)
@@ -426,7 +426,7 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 			const char *format = xml_get_attribute_string(&entrynode, "format", NULL);
 			if (format == NULL || format[0] == 0)
 				throw emu_fatalerror("%s.xml(%d): missing format in output tag\n", filename, entrynode.line);
-			m_format.cpy(format);
+			m_format.assign(format);
 
 			// extract other attributes
 			m_line = xml_get_attribute_int(&entrynode, "line", 0);
@@ -507,7 +507,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 			curarg += arg->values(argindex, &params[curarg]);
 
 		// generate the astring
-		manager.get_output_astring(m_line, m_justify).printf(m_format.c_str(),
+		strprintf(manager.get_output_astring(m_line, m_justify), m_format.c_str(),
 			(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
 			(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
 			(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
@@ -526,7 +526,7 @@ void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &arginde
 
 void cheat_script::script_entry::save(emu_file &cheatfile) const
 {
-	astring tempstring;
+	std::string tempstring;
 
 	// output an action
 	if (m_format.empty())
@@ -660,7 +660,7 @@ int cheat_script::script_entry::output_argument::values(UINT64 &argindex, UINT64
 
 void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) const
 {
-	astring tempstring;
+	std::string tempstring;
 
 	cheatfile.printf("\t\t\t\t<argument");
 	if (m_count != 1)
@@ -709,9 +709,11 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 
 		// create the symbol table
 		m_symbols.add("argindex", symbol_table::READ_ONLY, &m_argindex);
-		astring tempname;
-		for (int curtemp = 0; curtemp < tempcount; curtemp++)
-			m_symbols.add(tempname.format("temp%d", curtemp).c_str(), symbol_table::READ_WRITE);
+		std::string tempname;
+		for (int curtemp = 0; curtemp < tempcount; curtemp++) {
+			strprintf(tempname,"temp%d", curtemp);
+			m_symbols.add(tempname.c_str(), symbol_table::READ_WRITE);
+		}
 
 		// read the first comment node
 		xml_data_node *commentnode = xml_get_sibling(cheatnode.child, "comment");
@@ -719,7 +721,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		{
 			// set the value if not NULL
 			if (commentnode->value != NULL && commentnode->value[0] != 0)
-				m_comment.cpy(commentnode->value);
+				m_comment.assign(commentnode->value);
 
 			// only one comment is kept
 			commentnode = xml_get_sibling(commentnode->next, "comment");
@@ -951,11 +953,11 @@ bool cheat_entry::select_next_state()
 //  this cheat in a menu item
 //-------------------------------------------------
 
-void cheat_entry::menu_text(astring &description, astring &state, UINT32 &flags)
+void cheat_entry::menu_text(std::string &description, std::string &state, UINT32 &flags)
 {
 	// description is standard
-	description.cpy(m_description);
-	state.reset();
+	description.assign(m_description);
+	state.clear();
 	flags = 0;
 
 	// some cheat entries are just text for display
@@ -963,21 +965,21 @@ void cheat_entry::menu_text(astring &description, astring &state, UINT32 &flags)
 	{
 		if (!description.empty())
 		{
-			description.trimspace();
+			strtrimspace(description);
 			if (description.empty())
-				description.cpy(MENU_SEPARATOR_ITEM);
+				description.assign(MENU_SEPARATOR_ITEM);
 		}
 		flags = MENU_FLAG_DISABLE;
 	}
 
 	// if we have no parameter and no run or off script, it's a oneshot cheat
 	else if (is_oneshot())
-		state.cpy("Set");
+		state.assign("Set");
 
 	// if we have no parameter, it's just on/off
 	else if (is_onoff())
 	{
-		state.cpy((m_state == SCRIPT_STATE_RUN) ? "On" : "Off");
+		state.assign((m_state == SCRIPT_STATE_RUN) ? "On" : "Off");
 		flags = (m_state != 0) ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW;
 	}
 
@@ -986,12 +988,12 @@ void cheat_entry::menu_text(astring &description, astring &state, UINT32 &flags)
 	{
 		if (m_state == SCRIPT_STATE_OFF)
 		{
-			state.cpy(is_oneshot_parameter() ? "Set" : "Off");
+			state.assign(is_oneshot_parameter() ? "Set" : "Off");
 			flags = MENU_FLAG_RIGHT_ARROW;
 		}
 		else
 		{
-			state.cpy(m_parameter->text());
+			state.assign(m_parameter->text());
 			flags = MENU_FLAG_LEFT_ARROW;
 			if (!m_parameter->is_maximum())
 				flags |= MENU_FLAG_RIGHT_ARROW;
@@ -1149,8 +1151,8 @@ void cheat_manager::reload()
 				UINT32 crc = image->crc();
 				if (crc != 0)
 				{
-					astring filename;
-					filename.printf("%08X", crc);
+					std::string filename;
+					strprintf(filename,"%08X", crc);
 					load_cheats(filename.c_str());
 					break;
 				}
@@ -1235,7 +1237,7 @@ void cheat_manager::render_text(render_container &container)
 //  justification
 //-------------------------------------------------
 
-astring &cheat_manager::get_output_astring(int row, int justify)
+std::string &cheat_manager::get_output_astring(int row, int justify)
 {
 	// if the row is not specified, grab the next one
 	if (row == 0)
@@ -1263,34 +1265,34 @@ astring &cheat_manager::get_output_astring(int row, int justify)
 //  document
 //-------------------------------------------------
 
-const char *cheat_manager::quote_expression(astring &str, const parsed_expression &expression)
+const char *cheat_manager::quote_expression(std::string &str, const parsed_expression &expression)
 {
-	str.cpy(expression.original_string());
+	str.assign(expression.original_string());
 
-	str.replace(0, " && ", " and ");
-	str.replace(0, " &&", " and ");
-	str.replace(0, "&& ", " and ");
-	str.replace(0, "&&", " and ");
+	strreplace(str, " && ", " and ");
+	strreplace(str, " &&", " and ");
+	strreplace(str, "&& ", " and ");
+	strreplace(str, "&&", " and ");
 
-	str.replace(0, " & ", " band ");
-	str.replace(0, " &", " band ");
-	str.replace(0, "& ", " band ");
-	str.replace(0, "&", " band ");
+	strreplace(str, " & ", " band ");
+	strreplace(str, " &", " band ");
+	strreplace(str, "& ", " band ");
+	strreplace(str, "&", " band ");
 
-	str.replace(0, " <= ", " le ");
-	str.replace(0, " <=", " le ");
-	str.replace(0, "<= ", " le ");
-	str.replace(0, "<=", " le ");
+	strreplace(str, " <= ", " le ");
+	strreplace(str, " <=", " le ");
+	strreplace(str, "<= ", " le ");
+	strreplace(str, "<=", " le ");
 
-	str.replace(0, " < ", " lt ");
-	str.replace(0, " <", " lt ");
-	str.replace(0, "< ", " lt ");
-	str.replace(0, "<", " lt ");
+	strreplace(str, " < ", " lt ");
+	strreplace(str, " <", " lt ");
+	strreplace(str, "< ", " lt ");
+	strreplace(str, "<", " lt ");
 
-	str.replace(0, " << ", " lshift ");
-	str.replace(0, " <<", " lshift ");
-	str.replace(0, "<< ", " lshift ");
-	str.replace(0, "<<", " lshift ");
+	strreplace(str, " << ", " lshift ");
+	strreplace(str, " <<", " lshift ");
+	strreplace(str, "<< ", " lshift ");
+	strreplace(str, "<<", " lshift ");
 
 	return str.c_str();
 }
@@ -1347,7 +1349,7 @@ void cheat_manager::frame_update()
 	m_numlines = floor(1.0f / machine().ui().get_line_height());
 	m_numlines = MIN(m_numlines, ARRAY_LENGTH(m_output));
 	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
-		m_output[linenum].reset();
+		m_output[linenum].clear();
 
 	// iterate over running cheats and execute them
 	for (cheat_entry *cheat = m_cheatlist.first(); cheat != NULL; cheat = cheat->next())

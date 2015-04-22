@@ -475,11 +475,11 @@ const char *debug_cmderr_to_string(CMDERR error)
 
 void CLIB_DECL debug_console_printf(running_machine &machine, const char *format, ...)
 {
-	astring buffer;
+	std::string buffer;
 	va_list arg;
 
 	va_start(arg, format);
-	buffer.vprintf(format, arg);
+	strvprintf(buffer, format, arg);
 	va_end(arg);
 
 	text_buffer_print(console_textbuf, buffer.c_str());
@@ -497,9 +497,9 @@ void CLIB_DECL debug_console_printf(running_machine &machine, const char *format
 
 void CLIB_DECL debug_console_vprintf(running_machine &machine, const char *format, va_list args)
 {
-	astring buffer;
+	std::string buffer;
 
-	buffer.vprintf(format, args);
+	strvprintf(buffer, format, args);
 	text_buffer_print(console_textbuf, buffer.c_str());
 
 	/* force an update of any console views */
@@ -515,11 +515,11 @@ void CLIB_DECL debug_console_vprintf(running_machine &machine, const char *forma
 
 void CLIB_DECL debug_console_printf_wrap(running_machine &machine, int wrapcol, const char *format, ...)
 {
-	astring buffer;
+	std::string buffer;
 	va_list arg;
 
 	va_start(arg, format);
-	buffer.vprintf(format, arg);
+	strvprintf(buffer, format, arg);
 	va_end(arg);
 
 	text_buffer_print_wrap(console_textbuf, buffer.c_str(), wrapcol);

@@ -83,7 +83,7 @@ public:
 		UINT8                m_enabled;                  // enabled?
 		offs_t               m_address;                  // execution address
 		parsed_expression    m_condition;                // condition
-		astring              m_action;                   // action
+		std::string          m_action;                   // action
 	};
 
 	// watchpoint class
@@ -131,7 +131,7 @@ public:
 		offs_t               m_address;                  // start address
 		offs_t               m_length;                   // length of watch area
 		parsed_expression    m_condition;                // condition
-		astring              m_action;                   // action
+		std::string          m_action;                   // action
 	};
 
 	// registerpoint class
@@ -158,7 +158,7 @@ public:
 		int                 m_index;                    // user reported index
 		UINT8               m_enabled;                  // enabled?
 		parsed_expression   m_condition;                // condition
-		astring             m_action;                   // action
+		std::string         m_action;                   // action
 	};
 
 public:
@@ -278,7 +278,7 @@ private:
 	// internal helpers
 	void compute_debug_flags();
 	void prepare_for_step_overout(offs_t pc);
-	UINT32 dasm_wrapped(astring &buffer, offs_t pc);
+	UINT32 dasm_wrapped(std::string &buffer, offs_t pc);
 
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
@@ -351,7 +351,7 @@ private:
 
 		device_debug &      m_debug;                    // reference to our owner
 		FILE &              m_file;                     // tracing file for this CPU
-		astring             m_action;                   // action to perform during a trace
+		std::string         m_action;                   // action to perform during a trace
 		offs_t              m_history[TRACE_LOOPS];     // history of recent PCs
 		int                 m_loops;                    // number of instructions in a loop
 		int                 m_nextdex;                  // next index
@@ -399,7 +399,7 @@ private:
 	public:
 		dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color);
 
-		astring  m_text;        // Stores comment text & color for a given address & crc32
+		std::string  m_text;        // Stores comment text & color for a given address & crc32
 		rgb_t    m_color;
 	};
 	std::set<dasm_comment> m_comment_set;               // collection of comments

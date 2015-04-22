@@ -392,12 +392,12 @@ offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 	return CPU_DISASSEMBLE_NAME(tms0980)(this, buffer, pc, oprom, opram, options);
 }
 
-void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, astring &str)
+void tms1xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			str.printf("%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
+			strprintf(str, "%03X", m_rom_address << ((m_byte_bits > 8) ? 1 : 0));
 			break;
 	}
 }

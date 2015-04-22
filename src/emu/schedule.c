@@ -239,7 +239,7 @@ void emu_timer::register_save()
 {
 	// determine our instance number and name
 	int index = 0;
-	astring name;
+	std::string name;
 
 	// for non-device timers, it is an index based on the callback function name
 	if (m_device == NULL)
@@ -253,7 +253,7 @@ void emu_timer::register_save()
 	// for device timers, it is an index based on the device and timer ID
 	else
 	{
-		name.printf("%s/%d", m_device->tag(), m_id);
+		strprintf(name,"%s/%d", m_device->tag(), m_id);
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != NULL; curtimer = curtimer->next())
 			if (!curtimer->m_temporary && curtimer->m_device != NULL && curtimer->m_device == m_device && curtimer->m_id == m_id)
 				index++;

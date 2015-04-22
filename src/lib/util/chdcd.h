@@ -17,9 +17,9 @@
 struct chdcd_track_input_entry
 {
 	chdcd_track_input_entry() { reset(); }
-	void reset() { fname.reset(); offset = idx0offs = idx1offs = 0; swap = false; }
+	void reset() { fname.clear(); offset = idx0offs = idx1offs = 0; swap = false; }
 
-	astring fname;      // filename for each track
+	std::string fname;      // filename for each track
 	UINT32 offset;      // offset in the data file for each track
 	bool swap;          // data needs to be byte swapped
 	UINT32 idx0offs;

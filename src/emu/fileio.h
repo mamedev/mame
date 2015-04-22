@@ -42,7 +42,7 @@ public:
 	path_iterator(const char *searchpath);
 
 	// getters
-	bool next(astring &buffer, const char *name = NULL);
+	bool next(std::string &buffer, const char *name = NULL);
 
 	// reset
 	void reset() { m_current = m_base; m_index = 0; }
@@ -73,7 +73,7 @@ private:
 	// internal state
 	path_iterator   m_iterator;
 	osd_directory * m_curdir;
-	astring         m_pathbuffer;
+	std::string     m_pathbuffer;
 	//int             m_buflen;
 };
 
@@ -98,7 +98,7 @@ public:
 	UINT32 openflags() const { return m_openflags; }
 	hash_collection &hashes(const char *types);
 	bool restrict_to_mediapath() { return m_restrict_to_mediapath; }
-	bool part_of_mediapath(astring path);
+	bool part_of_mediapath(std::string path);
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
@@ -143,15 +143,15 @@ private:
 	// internal helpers
 	file_error attempt_zipped();
 	file_error load_zipped_file();
-	bool zip_filename_match(const zip_file_header &header, const astring &filename);
+	bool zip_filename_match(const zip_file_header &header, const std::string &filename);
 	bool zip_header_is_path(const zip_file_header &header);
 
 	file_error attempt__7zped();
 	file_error load__7zped_file();
 
 	// internal state
-	astring         m_filename;                     // original filename provided
-	astring         m_fullpath;                     // full filename
+	std::string     m_filename;                     // original filename provided
+	std::string     m_fullpath;                     // full filename
 	core_file *     m_file;                         // core file pointer
 	path_iterator   m_iterator;                     // iterator for paths
 	path_iterator   m_mediapaths;           // media-path iterator
@@ -168,7 +168,7 @@ private:
 	UINT64          m__7zlength;                    // 7Z file length
 
 	bool            m_remove_on_close;              // flag: remove the file when closing
-	bool        m_restrict_to_mediapath;    // flag: restrict to paths inside the media-path
+	bool            m_restrict_to_mediapath;    // flag: restrict to paths inside the media-path
 };
 
 
