@@ -18,7 +18,7 @@
 #endif
 
 
-#include "std::string.h"
+#include "corestr.h"
 #include "corealloc.h"
 #include "fileio.h"
 
@@ -55,15 +55,15 @@ bool osd_font_sdl::open(const char *font_path, const char *_name, int &height)
 	// accept qualifiers from the name
 	std::string name(_name);
 
-	if (name.cmp("default")==0)
+	if (name.compare("default")==0)
 	{
 		name = "Liberation Sans";
 	}
 
-	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
-	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
-	bool underline = (name.replace(0, "[U]", "") + name.replace(0, "[u]", "") > 0);
-	bool strike = (name.replace(0, "[S]", "") + name.replace(0, "[s]", "") > 0);
+	bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
+	bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
+	bool underline = (strreplace(name, "[U]", "") + strreplace(name, "[u]", "") > 0);
+	bool strike = (strreplace(name, "[S]", "") + strreplace(name, "[s]", "") > 0);
 
 	// first up, try it as a filename
 	font = TTF_OpenFont_Magic(name, POINT_SIZE);
