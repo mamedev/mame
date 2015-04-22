@@ -39179,7 +39179,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="chima">
-		<description>Yokai Tantei Chima Chima</description>
+		<description>Youkai Tantei Chima Chima</description>
 		<year>1984</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801 -->
