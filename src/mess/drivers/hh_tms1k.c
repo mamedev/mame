@@ -87,7 +87,6 @@
 #include "amaztron.lh"
 #include "astro.lh"
 #include "bankshot.lh"
-#include "bigtrak.lh"
 #include "cnsector.lh"
 #include "comp4.lh"
 #include "ebball.lh"
@@ -95,13 +94,8 @@
 #include "ebball3.lh"
 #include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
-#include "gpoker.lh"
-#include "h2hbaseb.lh"
-#include "h2hfootb.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
-#include "mmerlin.lh" // clickable
-#include "raisedvl.lh"
 #include "simon.lh" // clickable
 #include "ssimon.lh" // clickable
 #include "splitsec.lh"
@@ -109,6 +103,8 @@
 #include "stopthie.lh"
 #include "tandy12.lh" // clickable
 #include "tc4.lh"
+
+#include "hh_tms1k_test.lh" // test-layout - use external artwork
 
 
 // machine_start/reset
@@ -675,7 +671,7 @@ static MACHINE_CONFIG_START( h2hbaseb, h2hbaseb_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hbaseb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hbaseb)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
 
@@ -741,7 +737,7 @@ static MACHINE_CONFIG_START( h2hfootb, h2hfootb_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hfootb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_h2hfootb)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
 
@@ -1535,7 +1531,7 @@ static MACHINE_CONFIG_START( raisedvl, raisedvl_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(raisedvl_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_raisedvl)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
 
@@ -1601,7 +1597,7 @@ static MACHINE_CONFIG_START( gpoker, gpoker_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_gpoker)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
 
@@ -2401,7 +2397,7 @@ static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bigtrak_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_bigtrak)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
 
@@ -2610,7 +2606,7 @@ static INPUT_PORTS_START( merlin )
 	PORT_START("IN.2") // O2
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Button 8")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Button 9")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Same Game")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Same Game")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Button 10")
 
 	PORT_START("IN.3") // O3
@@ -2651,55 +2647,43 @@ MACHINE_CONFIG_END
 
   Parker Brothers Master Merlin
   * TMS1400 MP7351-N2LL (die labeled 1400CR MP7351)
-  * x
+  * 11 LEDs behind buttons, 2bit sound
 
-  x
+  The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
+  outside of the MCU is exactly the same as Merlin.
 
 ***************************************************************************/
 
-class mmerlin_state : public hh_tms1k_state
+class mmerlin_state : public merlin_state
 {
 public:
 	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: merlin_state(mconfig, type, tag)
 	{ }
-
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
 };
 
-// handlers
-
-WRITE16_MEMBER(mmerlin_state::write_r)
-{
-}
-
-WRITE16_MEMBER(mmerlin_state::write_o)
-{
-}
-
-READ8_MEMBER(mmerlin_state::read_k)
-{
-	return 0;
-}
+// handlers: uses the ones in merlin_state
 
 
 // config
 
 static INPUT_PORTS_START( mmerlin )
+	PORT_INCLUDE( merlin )
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Score") // instead of Hit Me
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( mmerlin, mmerlin_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, 250000) // x
+	MCFG_CPU_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=30K, C=100pf, but unknown RC curve
 	MCFG_TMS1XXX_READ_K_CB(READ8(mmerlin_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mmerlin_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mmerlin_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_mmerlin)
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* no video! */
 
@@ -3568,7 +3552,7 @@ CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Par
 CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE )
-CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", GAME_SUPPORTS_SAVE )
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE ) // some of the minigames: ***
 

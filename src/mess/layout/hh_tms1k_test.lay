@@ -6,8 +6,8 @@
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
 	<element name="led" defstate="2">
-		<disk state="0"><color red="0.06" green="0.2" blue="0.06" /></disk>
-		<disk state="1"><color red="0.3" green="1.0" blue="0.3" /></disk>
+		<disk state="0"><color red="0.2" green="0.04" blue="0.05" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
 
 		<disk state="2"><color red="0" green="0" blue="0" /></disk>
 	</element>
