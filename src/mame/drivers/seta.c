@@ -1957,6 +1957,11 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 	m_gun_old_clock = data & 1;
 }
 
+READ16_MEMBER(seta_state::extra_r)
+{
+	return ioport("EXTRA")->read_safe(0xff);
+}
+
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")     // RAM (pointer for zombraid crosshair hack)
@@ -1965,7 +1970,9 @@ static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
+
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_SHARE("vregs")   // (gundhara) Coin Lockout + Video Registers
+	AM_RANGE(0x500006, 0x500007) AM_READ(extra_r)                   // Buttons 4,5,6 (Daioh only)
 
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)                // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM                             // (rezon,jjsquawk)
