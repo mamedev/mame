@@ -1504,25 +1504,8 @@ Sushi Bar
 */
 
 #include "emu.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/z80/z80.h"
-#include "machine/x76f100.h"
-#include "machine/maple-dc.h"
-#include "machine/dc-ctrl.h"
-#include "machine/mie.h"
-#include "machine/naomirom.h"
-#include "machine/naomigd.h"
-#include "machine/naomim1.h"
-#include "machine/naomim2.h"
-#include "machine/naomim4.h"
-#include "machine/awboard.h"
-#include "cpu/sh4/sh4.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/aica.h"
-#include "machine/aicartc.h"
-#include "machine/jvsdev.h"
-#include "machine/jvs13551.h"
-#include "includes/dc.h"
+
+
 #include "includes/naomi.h"
 
 #define CPU_CLOCK (200000000)
@@ -1966,7 +1949,7 @@ static INPUT_PORTS_START( naomi_mie )
 INPUT_PORTS_END
 
 /* 2 players with 1 joystick and 6 buttons each */
-static INPUT_PORTS_START( naomi )
+INPUT_PORTS_START( naomi )
 	PORT_INCLUDE( naomi_mie )
 	PORT_INCLUDE( naomi_debug )
 
@@ -2632,7 +2615,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
+MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
 	MCFG_MIE_ADD("mie", XTAL_32MHz/2, "maple_dc", 0, 0, 0, 0, ":MIE.3", 0, ":MIE.5", 0, 0) // Actual frequency unknown, most likely 1/2 of 32MHz XTAL or even 2/3 (yes, 21MHz Z80 core)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")

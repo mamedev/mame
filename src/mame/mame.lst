@@ -5526,8 +5526,10 @@ starhrpr        // 2009.07.27 Star Horse Progress Returns (satellite)
 
 // NAOMI based (System SP)
 segasp
-				// 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
-				// 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
+lovebery		// 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
+lovebero
+dinoking		// 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
+dinokior
 				// 2007.06 Issyo ni Wanwan
 				// 2007.06 Konchuu Dash!!
 				// 2007.07 Marine Marine
@@ -5536,6 +5538,10 @@ segasp
 				// 2008.04 Issyo ni Wanwan Waiwai Puppy
 				// 2008.07 Issyo ni Turbo Drive
 brickppl
+tetgiant
+tetgiano
+dinoki25
+loveber3
 
 // NAOMI 2
 naomi2          // 2001.?? Naomi 2 BIOS
@@ -8265,6 +8271,7 @@ cartfury        // (c) 2000 Midway Games
 // Midway Quicksilver
 hydrthnd        // (c) 1999 Midway Games
 offrthnd        // (c) 2000 Midway Games
+arctthnd		// (c) 2001 Midway Games
 ultarctc        // (c) 2001 Midway Games
 ultarctcup      // (c) 2001 Midway Games
 
