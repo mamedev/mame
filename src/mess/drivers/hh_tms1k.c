@@ -9,57 +9,60 @@
   Let's use this driver for a list of known devices and their serials,
   excluding TI's own products (see ticalc1x.c, tispeak.c)
 
-  serial   device   etc.
+  serial   device    etc.
 --------------------------------------------------------------------
- @CP0904A  TMS0970  1977, Milton Bradley Comp IV
- @MP0905B  TMS0970  1977, Parker Brothers Codename Sector
- *MP0168   TMS1000? 1979, Conic Basketball
- @MP0914   TMS1000  1979, Entex Baseball 1
- @MP0923   TMS1000  1979, Entex Baseball 2
- @MP1030   TMS1100  1980, APF Mathemagician
- @MP1133   TMS1470  1979, Kosmos Astro
- @MP1204   TMS1100  1980, Entex Baseball 3
- @MP1211   TMS1100  1980, Entex Space Invader
- *MP1221   TMS1100  1980, Entex Raise The Devil
- *MP1312   TMS1100  198?, Tandy/RadioShack Science Fair Microcomputer Trainer
- *MP2105   TMS1370  1979, Gakken Poker, Entex Electronic Poker
- *MP2139   TMS1370? 1982, Gakken Galaxy Invader 1000
- *MP2788   ?        1980, Bandai Flight Time (? note: VFD-capable)
- *MP3208   TMS1000  1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
- @MP3226   TMS1000  1978, Milton Bradley Simon (model 4850)
- *MP3301   TMS1000  1979, Milton Bradley Big Trak
- *MP3320A  TMS1000  1979, Coleco Head to Head Basketball
-  MP3403   TMS1100  1978, Marx Electronic Bowling -> elecbowl.c
- @MP3404   TMS1100  1978, Parker Brothers Merlin
- @MP3405   TMS1100  1979, Coleco Amaze-A-Tron
- @MP3438A  TMS1100  1979, Kenner Star Wars Electronic Battle Command
-  MP3450A  TMS1100  1979, MicroVision cartridge: Blockbuster
-  MP3454   TMS1100  1979, MicroVision cartridge: Star Trek Phaser Strike
-  MP3455   TMS1100  1980, MicroVision cartridge: Pinball
-  MP3457   TMS1100  1979, MicroVision cartridge: Mindbuster
-  MP3474   TMS1100  1979, MicroVision cartridge: Vegas Slots
-  MP3475   TMS1100  1979, MicroVision cartridge: Bowling
- @MP3476   TMS1100  1979, Milton Bradley Super Simon
-  MP3479   TMS1100  1980, MicroVision cartridge: Baseball
-  MP3481   TMS1100  1979, MicroVision cartridge: Connect Four
-  MP3496   TMS1100  1980, MicroVision cartridge: Sea Duel
-  M34009   TMS1100  1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M34000, ..)
-  M34017   TMS1100  1981, MicroVision cartridge: Cosmic Hunter
-  M34047   TMS1100  1982, MicroVision cartridge: Super Blockbuster
- @MP6100A  TMS0980  1979, Ideal Electronic Detective
- @MP6101B  TMS0980  1979, Parker Brothers Stop Thief
- *MP6361   ?        1983, Defender Strikes (? note: VFD-capable)
- *MP7303   TMS1400? 19??, Tiger 7-in-1 Sports Stadium
- @MP7313   TMS1400  1980, Parker Brothers Bank Shot
- @MP7314   TMS1400  1980, Parker Brothers Split Second
- *MP7324   TMS1400? 1985, Coleco Talking Teacher
-  MP7332   TMS1400  1981, Milton Bradley Dark Tower -> mbdtower.c
- @MP7334   TMS1400  1981, Coleco Total Control 4
- *MP7573   ?        1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
+ @CP0904A  TMS0970   1977, Milton Bradley Comp IV
+ @MP0905B  TMS0970   1977, Parker Brothers Codename Sector
+ *MP0168   TMS1000?  1979, Conic Basketball
+ @MP0914   TMS1000   1979, Entex Baseball 1
+ @MP0923   TMS1000   1979, Entex Baseball 2
+ @MP1030   TMS1100   1980, APF Mathemagician
+ @MP1133   TMS1470   1979, Kosmos Astro
+ @MP1204   TMS1100   1980, Entex Baseball 3
+ @MP1211   TMS1100   1980, Entex Space Invader
+ @MP1221   TMS1100   1980, Entex Raise The Devil
+ *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
+ @MP1525   TMS1170   1980, Coleco Head to Head Baseball
+ @MP2105   TMS1370   1979, Gakken Poker
+ *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
+ *MP2788   ?         1980, Bandai Flight Time (? note: VFD-capable)
+ *MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A or B)
+ @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
+ @MP3301A  TMS1000   1979, Milton Bradley Big Trak
+ *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
+  MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.c
+ @MP3404   TMS1100   1978, Parker Brothers Merlin
+ @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
+ @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
+  MP3450A  TMS1100   1979, MicroVision cartridge: Blockbuster
+  MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
+  MP3455   TMS1100   1980, MicroVision cartridge: Pinball
+  MP3457   TMS1100   1979, MicroVision cartridge: Mindbuster
+ @MP3460   TMS1100   1980, Coleco Head to Head Football
+  MP3474   TMS1100   1979, MicroVision cartridge: Vegas Slots
+  MP3475   TMS1100   1979, MicroVision cartridge: Bowling
+ @MP3476   TMS1100   1979, Milton Bradley Super Simon
+  MP3479   TMS1100   1980, MicroVision cartridge: Baseball
+  MP3481   TMS1100   1979, MicroVision cartridge: Connect Four
+  MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
+  M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M34000, ..)
+  M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
+  M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
+ @MP6100A  TMS0980   1979, Ideal Electronic Detective
+ @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
+ *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
+ *MP7303   TMS1400?  19??, Tiger 7-in-1 Sports Stadium
+ @MP7313   TMS1400   1980, Parker Brothers Bank Shot
+ @MP7314   TMS1400   1980, Parker Brothers Split Second
+ *MP7324   TMS1400?  1985, Coleco Talking Teacher
+  MP7332   TMS1400   1981, Milton Bradley Dark Tower -> mbdtower.c
+ @MP7334   TMS1400   1981, Coleco Total Control 4
+ @MP7351   TMS1400CR 1982, Parker Brothers Master Merlin
+ *MP7573   ?         1981, Entex Select-a-Game cartridge: Football 4 (? note: 40-pin, VFD-capable)
 
   inconsistent:
 
- *MPF553   TMS1670  1980, Entex Jackpot Gin Rummy Black Jack
+ *MPF553   TMS1670  1980, Gakken/Entex Jackpot Gin Rummy Black Jack (have dump)
  *M95041   ?        1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
  @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
@@ -84,15 +87,21 @@
 #include "amaztron.lh"
 #include "astro.lh"
 #include "bankshot.lh"
+#include "bigtrak.lh"
 #include "cnsector.lh"
+#include "comp4.lh"
 #include "ebball.lh"
 #include "ebball2.lh"
 #include "ebball3.lh"
 #include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
-#include "comp4.lh"
+#include "gpoker.lh"
+#include "h2hbaseb.lh"
+#include "h2hfootb.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
+#include "mmerlin.lh" // clickable
+#include "raisedvl.lh"
 #include "simon.lh" // clickable
 #include "ssimon.lh" // clickable
 #include "splitsec.lh"
@@ -601,6 +610,138 @@ static MACHINE_CONFIG_START( amaztron, amaztron_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_amaztron)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Coleco Head to Head Baseball
+  * TMS1170NLN MP1525-N2 (die labeled MP1525)
+  * x
+
+  x
+
+***************************************************************************/
+
+class h2hbaseb_state : public hh_tms1k_state
+{
+public:
+	h2hbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(h2hbaseb_state::write_r)
+{
+}
+
+WRITE16_MEMBER(h2hbaseb_state::write_o)
+{
+}
+
+READ8_MEMBER(h2hbaseb_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( h2hbaseb )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( h2hbaseb, h2hbaseb_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1170, 250000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(h2hbaseb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hbaseb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hbaseb_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hbaseb)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Coleco Head to Head Football
+  * TMS1100NLLE MP3460 (die labeled MP3460)
+  * x
+
+  x
+
+***************************************************************************/
+
+class h2hfootb_state : public hh_tms1k_state
+{
+public:
+	h2hfootb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(h2hfootb_state::write_r)
+{
+}
+
+WRITE16_MEMBER(h2hfootb_state::write_o)
+{
+}
+
+READ8_MEMBER(h2hfootb_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( h2hfootb )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( h2hfootb, h2hfootb_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 250000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(h2hfootb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hfootb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hfootb_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hfootb)
 
 	/* no video! */
 
@@ -1329,6 +1470,138 @@ static MACHINE_CONFIG_START( einvader, einvader_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_einvader)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex Raise The Devil
+  * TMS1100 MP1221 (die labeled MP1221)
+  * x
+
+  x
+
+***************************************************************************/
+
+class raisedvl_state : public hh_tms1k_state
+{
+public:
+	raisedvl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(raisedvl_state::write_r)
+{
+}
+
+WRITE16_MEMBER(raisedvl_state::write_o)
+{
+}
+
+READ8_MEMBER(raisedvl_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( raisedvl )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( raisedvl, raisedvl_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1100, 250000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(raisedvl_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(raisedvl_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(raisedvl_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_raisedvl)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Poker
+  * TMS1370 MP2105 (die labeled MP2105)
+  * x
+
+  x
+
+***************************************************************************/
+
+class gpoker_state : public hh_tms1k_state
+{
+public:
+	gpoker_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(gpoker_state::write_r)
+{
+}
+
+WRITE16_MEMBER(gpoker_state::write_o)
+{
+}
+
+READ8_MEMBER(gpoker_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( gpoker )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( gpoker, gpoker_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1370, 250000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gpoker_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_gpoker)
 
 	/* no video! */
 
@@ -2078,6 +2351,72 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Milton Bradley Big Trak
+  * TMS1000NLL MP3301A or MP3301ANLL E (die labeled 1000E MP3301)
+  * x
+
+  x
+
+***************************************************************************/
+
+class bigtrak_state : public hh_tms1k_state
+{
+public:
+	bigtrak_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(bigtrak_state::write_r)
+{
+}
+
+WRITE16_MEMBER(bigtrak_state::write_o)
+{
+}
+
+READ8_MEMBER(bigtrak_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( bigtrak )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(bigtrak_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bigtrak_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bigtrak_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bigtrak)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Code Name: Sector, by Bob Doyle
   * TMS0970 MCU, MP0905BNL ZA0379 (die labeled 0970F-05B)
   * 6-digit 7seg LED display + 4 LEDs for compass, no sound
@@ -2301,6 +2640,72 @@ static MACHINE_CONFIG_START( merlin, merlin_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SPEAKER_LEVELS(4, merlin_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Parker Brothers Master Merlin
+  * TMS1400 MP7351-N2LL (die labeled 1400CR MP7351)
+  * x
+
+  x
+
+***************************************************************************/
+
+class mmerlin_state : public hh_tms1k_state
+{
+public:
+	mmerlin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(mmerlin_state::write_r)
+{
+}
+
+WRITE16_MEMBER(mmerlin_state::write_o)
+{
+}
+
+READ8_MEMBER(mmerlin_state::read_k)
+{
+	return 0;
+}
+
+
+// config
+
+static INPUT_PORTS_START( mmerlin )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mmerlin, mmerlin_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1400, 250000) // x
+	MCFG_TMS1XXX_READ_K_CB(READ8(mmerlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mmerlin_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mmerlin_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mmerlin)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2835,6 +3240,28 @@ ROM_START( amaztron )
 ROM_END
 
 
+ROM_START( h2hbaseb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1525", 0x0000, 0x0800, CRC(b5d6bf9b) SHA1(2cc9f35f077c1209c46d16ec853af87e4725c2fd) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_h2hbaseb_opla.pla", 0, 365, CRC(cb3d7e38) SHA1(6ab4a7c52e6010b7c7158463cb499973e52ff556) )
+ROM_END
+
+
+ROM_START( h2hfootb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp3460", 0x0000, 0x0800, CRC(3a4e53a8) SHA1(5052e706f992c6c4bada1fa7769589eec3df6471) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_h2hfootb_opla.pla", 0, 365, CRC(c8d85873) SHA1(16bd6fc8e3cd16d5f8fd32d0c74e67de77f5487e) )
+ROM_END
+
+
 ROM_START( tc4 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp7334", 0x0000, 0x1000, CRC(923f3821) SHA1(a9ae342d7ff8dae1dedcd1e4984bcfae68586581) )
@@ -2887,6 +3314,28 @@ ROM_START( einvader )
 	ROM_LOAD( "tms1100_einvader_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_einvader_opla.pla", 0, 365, CRC(490158e1) SHA1(61cace1eb09244663de98d8fb04d9459b19668fd) )
+ROM_END
+
+
+ROM_START( raisedvl )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1221", 0x0000, 0x0800, CRC(782791cc) SHA1(214249406fcaf44efc6350022bd534e59ec69c88) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_raisedvl_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_raisedvl_opla.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
+ROM_END
+
+
+ROM_START( gpoker )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp2105", 0x0000, 0x0800, CRC(95a8f5b4) SHA1(d14f00ba9f57e437264d972baa14a14a28ff8719) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_gpoker_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_gpoker_opla.pla", 0, 365, CRC(f7e2d812) SHA1(cc3abd89afb1d2145dc47636553ccd0ba7de70d9) )
 ROM_END
 
 
@@ -2974,6 +3423,17 @@ ROM_START( ssimon )
 ROM_END
 
 
+ROM_START( bigtrak )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3301a", 0x0000, 0x0400, CRC(1351bcdd) SHA1(68865389c25b541c09a742be61f8fb6488134d4e) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_bigtrak_mpla.pla", 0, 867, CRC(80912d0a) SHA1(7ae5293ed4d93f5b7a64d43fe30c3639f39fbe5a) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bigtrak_opla.pla", 0, 365, CRC(63be45f6) SHA1(918e38a223152db883c1a6f7acf56e87d7074734) )
+ROM_END
+
+
 ROM_START( cnsector )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0905bnl_za0379", 0x0000, 0x0400, CRC(201036e9) SHA1(b37fef86bb2bceaf0ac8bb3745b4702d17366914) )
@@ -3051,6 +3511,17 @@ ROM_START( splitsec )
 ROM_END
 
 
+ROM_START( mmerlin )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7351", 0x0000, 0x1000, CRC(0f7a4c83) SHA1(242c1278ddfe92c28fd7cd87300e48e7a4827831) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_mmerlin_opla.pla", 0, 557, CRC(fd3dcd93) SHA1(f2afc52df700daa0eb7356c7876af9b2966f971b) )
+ROM_END
+
+
 ROM_START( tandy12 )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "cd7282sl", 0x0000, 0x800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
@@ -3067,12 +3538,17 @@ ROM_END
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
 CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
+CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+
+CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
 
@@ -3084,6 +3560,7 @@ COMP( 1979, astro,     0,        0, astro,     astro,     driver_device, 0, "Kos
 CONS( 1977, comp4,     0,        0, comp4,     comp4,     driver_device, 0, "Milton Bradley", "Comp IV", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 CONS( 1978, simon,     0,        0, simon,     simon,     driver_device, 0, "Milton Bradley", "Simon (Rev. A)", GAME_SUPPORTS_SAVE )
 CONS( 1979, ssimon,    0,        0, ssimon,    ssimon,    driver_device, 0, "Milton Bradley", "Super Simon", GAME_SUPPORTS_SAVE )
+CONS( 1979, bigtrak,   0,        0, bigtrak,   bigtrak,   driver_device, 0, "Milton Bradley", "Big Trak", GAME_SUPPORTS_SAVE | GAME_MECHANICAL | GAME_NOT_WORKING ) // ***
 
 CONS( 1977, cnsector,  0,        0, cnsector,  cnsector,  driver_device, 0, "Parker Brothers", "Code Name: Sector", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,    0,        0, merlin,    merlin,    driver_device, 0, "Parker Brothers", "Merlin - The Electronic Wizard", GAME_SUPPORTS_SAVE )
@@ -3091,6 +3568,7 @@ CONS( 1979, stopthie,  0,        0, stopthief, stopthief, driver_device, 0, "Par
 CONS( 1979, stopthiep, stopthie, 0, stopthief, stopthief, driver_device, 0, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1980, bankshot,  0,        0, bankshot,  bankshot,  driver_device, 0, "Parker Brothers", "Bank Shot - Electronic Pool", GAME_SUPPORTS_SAVE )
 CONS( 1980, splitsec,  0,        0, splitsec,  splitsec,  driver_device, 0, "Parker Brothers", "Split Second", GAME_SUPPORTS_SAVE )
+CONS( 1982, mmerlin,   0,        0, mmerlin,   mmerlin,   driver_device, 0, "Parker Brothers", "Master Merlin", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", GAME_SUPPORTS_SAVE ) // some of the minigames: ***
 

@@ -56,6 +56,8 @@
 #include "cpu/ucom4/ucom4.h"
 #include "sound/speaker.h"
 
+// internal artwork
+#include "mvbfree.lh"
 #include "hh_ucom4_test.lh" // test-layout - use external artwork
 
 
@@ -1526,8 +1528,6 @@ MACHINE_CONFIG_END
   * NEC uCOM-43 MCU, labeled D553C 049
   * cyan VFD display Futaba DM-4.5 91
 
-  NOTE!: MESS external artwork is recommended
-
 ***************************************************************************/
 
 class mvbfree_state : public hh_ucom4_state
@@ -1612,7 +1612,7 @@ static MACHINE_CONFIG_START( mvbfree, mvbfree_state )
 	MCFG_UCOM4_WRITE_I_CB(WRITE8(mvbfree_state, speaker_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_ucom4_test)
+	MCFG_DEFAULT_LAYOUT(layout_mvbfree)
 
 	/* no video! */
 
@@ -2451,7 +2451,7 @@ CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  driver_device, 0, "Epoch"
 CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, driver_device, 0, "Epoch", "Astro Command", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, edracula, 0,        0, edracula, edracula, driver_device, 0, "Epoch", "Dracula (Epoch)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", GAME_SUPPORTS_SAVE )
 
 CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
