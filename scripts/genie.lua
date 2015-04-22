@@ -288,11 +288,11 @@ newoption {
 }
 
 newoption {
-	trigger = "NO_STRIPPING",
-	description = "Stripping.",
+	trigger = "STRIP_SYMBOLS",
+	description = "Symbols stripping.",
 	allowed = {
-		{ "0",   "Enabled" 	},
-		{ "1",   "Disabled"      },
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
 	}
 }
 
@@ -1148,7 +1148,7 @@ else
 end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
-if (_OPTIONS["NO_STRIPPING"]~="1") then
+if (_OPTIONS["STRIP_SYMBOLS"]== nil or _OPTIONS["STRIP_SYMBOLS"]=="1") then
 	strip()
 end
 
