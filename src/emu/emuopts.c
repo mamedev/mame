@@ -504,11 +504,8 @@ void emu_options::set_system_name(const char *name)
 		int num = 0;
 		do {
 			num = options_count();
-			printf("num = %i", num);
 			update_slot_options();
-			printf("options_count() = %i \n", options_count());
 		} while(num != options_count());
-		printf("out\n");
 	}
 }
 
