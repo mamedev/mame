@@ -137,7 +137,7 @@ void MainWindow::setProcessor(device_t* processor)
 
 	// Window title
 	std::string title;
-	title.printf("Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
+	strprintf(title,"Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
 	setWindowTitle(title.c_str());
 }
 
@@ -228,11 +228,11 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		std::string command;
 		if (bpindex == -1)
 		{
-			command.printf("bpset 0x%X", address);
+			strprintf(command,"bpset 0x%X", address);
 		}
 		else
 		{
-			command.printf("bpclear 0x%X", bpindex);
+			strprintf(command,"bpclear 0x%X", bpindex);
 		}
 		debug_console_execute_command(*m_machine, command.c_str(), 1);
 	}
@@ -258,7 +258,7 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 		{
 			INT32 const bpindex = bp->index();
 			std::string command;
-			command.printf(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
+			strprintf(command,bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
 			debug_console_execute_command(*m_machine, command.c_str(), 1);
 		}
 	}
@@ -274,7 +274,7 @@ void MainWindow::runToCursor(bool changedTo)
 	{
 		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
 		std::string command;
-		command.printf("go 0x%X", address);
+		strprintf(command,"go 0x%X", address);
 		debug_console_execute_command(*m_machine, command.c_str(), 1);
 	}
 }
@@ -464,7 +464,7 @@ void MainWindow::createImagesMenu()
 	for (device_image_interface *img = iter.first(); img != NULL; img = iter.next())
 	{
 		std::string menuName;
-		menuName.format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
+		strprintf(menuName,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 
 		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.c_str());
 		interfaceMenu->setObjectName(img->device().name());

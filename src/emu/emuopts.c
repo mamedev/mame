@@ -313,7 +313,7 @@ void emu_options::add_device_options(bool isfirstpass)
 		std::string option_name;
 		strprintf(option_name, "%s;%s", image->instance_name(), image->brief_instance_name());
 		if (strcmp(image->device_typename(image->image_type()), image->instance_name()) == 0)
-			strprintf(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
+			strcatprintf(option_name, ";%s1;%s1", image->instance_name(), image->brief_instance_name());
 
 		// add the option
 		if (!exists(image->instance_name()))
@@ -504,8 +504,11 @@ void emu_options::set_system_name(const char *name)
 		int num = 0;
 		do {
 			num = options_count();
+			printf("num = %i", num);
 			update_slot_options();
+			printf("options_count() = %i \n", options_count());
 		} while(num != options_count());
+		printf("out\n");
 	}
 }
 
