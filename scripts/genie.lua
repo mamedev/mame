@@ -1148,7 +1148,7 @@ else
 end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
-if (_OPTIONS["STRIP_SYMBOLS"]== nil or _OPTIONS["STRIP_SYMBOLS"]=="1") then
+if (_OPTIONS["STRIP_SYMBOLS"]=="1") then
 	strip()
 end
 
