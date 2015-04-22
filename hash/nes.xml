@@ -37404,7 +37404,7 @@
 	</software>
 
 	<software name="targtren">
-		<description>Target - Renegade (USA)</description>
+		<description>Target: Renegade (USA)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-NE-USA"/>
@@ -40884,7 +40884,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmnu" cloneof="wrestlmn" supported="no">
+	<software name="wmaniau" cloneof="wmania" supported="no">
 		<description>WWF WrestleMania (USA)</description>
 		<year>1989</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -40910,7 +40910,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmn" supported="no">
+	<software name="wmania" supported="no">
 		<description>WWF WrestleMania (Euro)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -40929,7 +40929,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmcu" cloneof="wrestlmc">
+	<software name="wmaniachu" cloneof="wmaniach">
 		<description>WWF WrestleMania Challenge (USA)</description>
 		<year>1990</year>
 		<publisher>LJN</publisher>
@@ -40948,7 +40948,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmc">
+	<software name="wmaniach">
 		<description>WWF WrestleMania Challenge (Euro)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
@@ -40968,7 +40968,7 @@
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF Wrestlemania - Steel Cage Challenge (Euro)</description>
+		<description>WWF WrestleMania - Steel Cage Challenge (Euro)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-WS-(NOE/UKV)"/>
@@ -48501,7 +48501,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="roboterm">
-		<description>RoboCop Versus The Terminator (USA, Prototype)</description>
+		<description>RoboCop versus The Terminator (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50174,7 +50174,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="wrestlmcj" cloneof="wrestlmc">
+	<software name="wmaniachj" cloneof="wmaniach">
 		<description>WWF WrestleMania Challenge (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
@@ -52507,24 +52507,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	    </part>
 	</software-->
 
-		<!-- Alt. Title: El Destructor (on the cart label) -->
-	<!--software name="destruct">
-	    <description>Destroyer (Spa)</description>
-	    <year>1992</year>
-	    <publisher>Gluk Video</publisher>
-	    <info name="serial" value="CN-13"/>
-	    <info name="release" value="19920101"/>
-	    <part name="cart" interface="nes_cart">
-	        <feature name="pcb" value="NTDEC-N715062" />
-	        <feature name="mirroring" value="horizontal" />
-	        <dataarea name="prg" size="32768">
-	            <rom name="0.prg" size="32768" crc="d438ee51" sha1="a21694e640cf45c1732cce6c39f8705100fb109b" offset="00000" />
-	        </dataarea>
-	        <dataarea name="chr" size="32768">
-	            <rom name="0.chr" size="32768" crc="fb0d9fd0" sha1="5a721b8de4d4aed347e1a5344e3c943a698b494b" offset="00000" />
-	        </dataarea>
-	    </part>
-	</software-->
+	<software name="destroyr">
+		<description>Destroyer (Spa)</description>
+		<year>1992</year>
+		<publisher>Gluk Video</publisher>
+		<info name="serial" value="CN-13"/>
+		<info name="release" value="19920101"/>
+		<info name="alt_title" value="El Destructor (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NTDEC-N715062" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="d438ee51" sha1="a21694e640cf45c1732cce6c39f8705100fb109b" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="0.chr" size="32768" crc="fb0d9fd0" sha1="5a721b8de4d4aed347e1a5344e3c943a698b494b" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="gobenny">
 		<description>Go! Benny! (Spa)</description>
@@ -52542,6 +52542,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="0.chr" size="32768" crc="ceaadb67" sha1="0e5173485ccac504ee50320c156edd2b19638316" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank">
+		<description>Tank (Spa)</description>
+		<year>1992</year>
+		<publisher>Gluk Video</publisher>
+		<info name="alt_title" value="Tanque (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="NTDEC-N715062" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="e17266e4" sha1="619cc065ef22640260ae1f46235ede0155943e3f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="0.chr" size="8192" crc="476c8195" sha1="03b167f8c7d28dd664906010b3afbc1b99b9803d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -70720,7 +70738,7 @@ Other
 	</software>
 
 	<software name="ddragon4" cloneof="targtren">
-		<description>Double Dragon IV (Target - Renegade pirate)</description>
+		<description>Double Dragon IV (Target: Renegade pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -79675,6 +79693,22 @@ that the real dumps might surface -->
 				<rom name="s29gl032.u3" size="4194304" crc="9f4194e8" sha1="bd2a356aea56188ea78169095cbbe603d00e0063" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_110cb" supported="no">
+		<description>110-in-1 CoolBaby (CoolBoy RS-1S)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="flop" size="4194304">
+				<rom name="29w320dt.bin" size="4194304" crc="a4bed7eb" sha1="f1aa89916264ba781d3f1390a2336ef42129b607" offset="00000" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
