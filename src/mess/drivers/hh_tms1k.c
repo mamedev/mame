@@ -2651,6 +2651,17 @@ MACHINE_CONFIG_END
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
   outside of the MCU is exactly the same as Merlin.
+  
+  The included minigames are:
+  1: Three Shells
+  2: Hi/Lo
+  3: Match It
+  4: Hit or Miss
+  5: Pair Off
+  6: Tempo
+  7: Musical Ladder
+  8: Patterns
+  9: Hot Potato
 
 ***************************************************************************/
 
@@ -2690,6 +2701,7 @@ static MACHINE_CONFIG_START( mmerlin, mmerlin_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, merlin_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
