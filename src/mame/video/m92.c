@@ -278,8 +278,8 @@ VIDEO_START_MEMBER(m92_state,m92)
 		layer->tmap->set_transmask(2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 		layer->wide_tmap->set_transmask(2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 
-		state_save_register_item(machine(), "layer", NULL, laynum, layer->vram_base);
-		state_save_register_item_array(machine(), "layer", NULL, laynum, layer->control);
+		save_item(NAME(layer->vram_base), laynum);
+		save_item(NAME(layer->control), laynum);
 	}
 
 	m_paletteram.resize(m_palette->entries());

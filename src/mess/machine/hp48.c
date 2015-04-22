@@ -1130,9 +1130,9 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	save_item(NAME(m_bank_switch) );
 	for ( i = 0; i < 6; i++ )
 	{
-		state_save_register_item(machine(), "globals", NULL, i, m_modules[i].state );
-		state_save_register_item(machine(), "globals", NULL, i, m_modules[i].base );
-		state_save_register_item(machine(), "globals", NULL, i, m_modules[i].mask );
+		save_item(m_modules[i].state, "globals/m_modules[i].state", i);
+		save_item(m_modules[i].base, "globals/m_modules[i].base", i);
+		save_item(m_modules[i].mask, "globals/m_modules[i].mask", i);
 	}
 	save_item(NAME(m_io) );
 	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_update_annunciators), this ));

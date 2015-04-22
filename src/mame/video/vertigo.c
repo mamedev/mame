@@ -118,36 +118,36 @@ enum {
 
 void vertigo_state::vertigo_vproc_init()
 {
-	state_save_register_item_array(machine(), "vector_proc", NULL, 0, m_vs.sram);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vs.ramlatch);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vs.rom_adr);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vs.pc);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vs.ret);
+	save_item(m_vs.sram, "vector_proc/m_vs.sram");
+	save_item(m_vs.ramlatch, "vector_proc/m_vs.ramlatch");
+	save_item(m_vs.rom_adr, "vector_proc/m_vs.rom_adr");
+	save_item(m_vs.pc, "vector_proc/m_vs.pc");
+	save_item(m_vs.ret, "vector_proc/m_vs.ret");
 
-	state_save_register_item_array(machine(), "vector_proc", NULL, 0, m_bsp.ram);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_bsp.d);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_bsp.q);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_bsp.f);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_bsp.y);
+	save_item(m_bsp.ram, "vector_proc/m_bsp.ram");
+	save_item(m_bsp.d, "vector_proc/m_bsp.d");
+	save_item(m_bsp.q, "vector_proc/m_bsp.q");
+	save_item(m_bsp.f, "vector_proc/m_bsp.f");
+	save_item(m_bsp.y, "vector_proc/m_bsp.y");
 
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.sreg);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.l1);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.l2);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.c_v);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.c_h);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.c_l);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.adder_s);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.adder_a);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.color);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.intensity);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.brez);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.vfin);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.hud1);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.hud2);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.vud1);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.vud2);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.hc1);
-	state_save_register_item(machine(), "vector_proc", NULL, 0, m_vgen.ven);
+	save_item(m_vgen.sreg, "vector_proc/m_vgen.sreg");
+	save_item(m_vgen.l1, "vector_proc/m_vgen.l1");
+	save_item(m_vgen.l2, "vector_proc/m_vgen.l2");
+	save_item(m_vgen.c_v, "vector_proc/m_vgen.c_v");
+	save_item(m_vgen.c_h, "vector_proc/m_vgen.c_h");
+	save_item(m_vgen.c_l, "vector_proc/m_vgen.c_l");
+	save_item(m_vgen.adder_s, "vector_proc/m_vgen.adder_s");
+	save_item(m_vgen.adder_a, "vector_proc/m_vgen.adder_a");
+	save_item(m_vgen.color, "vector_proc/m_vgen.color");
+	save_item(m_vgen.intensity, "vector_proc/m_vgen.intensity");
+	save_item(m_vgen.brez, "vector_proc/m_vgen.brez");
+	save_item(m_vgen.vfin, "vector_proc/m_vgen.vfin");
+	save_item(m_vgen.hud1, "vector_proc/m_vgen.hud1");
+	save_item(m_vgen.hud2, "vector_proc/m_vgen.hud2");
+	save_item(m_vgen.vud1, "vector_proc/m_vgen.vud1");
+	save_item(m_vgen.vud2, "vector_proc/m_vgen.vud2");
+	save_item(m_vgen.hc1, "vector_proc/m_vgen.hc1");
+	save_item(m_vgen.ven, "vector_proc/m_vgen.ven");
 }
 
 
