@@ -794,12 +794,12 @@ static MACHINE_CONFIG_START( plus4, plus4_state )
 
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NULL)
 
-	MCFG_CBM_IEC_ADD(NULL)
+	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_9))
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, plus4_expansion_cards, "c1551")
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, plus4_expansion_cards, NULL)
 	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(plus4_state, exp_irq_w))
 	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(plus4_state, read))
 	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(plus4_state, write))
@@ -811,6 +811,7 @@ static MACHINE_CONFIG_START( plus4, plus4_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
+
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( plus4p )
@@ -831,6 +832,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( plus4p, plus4, c16_state )
 	MCFG_SOFTWARE_LIST_FILTER("cass_list", "PAL")
 	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
 MACHINE_CONFIG_END
+
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( plus4n )
