@@ -85,9 +85,7 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		std::string tempstring(tag);
-		tempstring.append(MDSLOT_ROM_REGION_TAG);
-		m_rom = (UINT16 *)device().machine().memory().region_alloc(tempstring.c_str(), size, 2, ENDIANNESS_LITTLE)->base();
+		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
