@@ -92,7 +92,6 @@
 #include "ebball.lh"
 #include "ebball2.lh"
 #include "ebball3.lh"
-#include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
@@ -104,7 +103,8 @@
 #include "tandy12.lh" // clickable
 #include "tc4.lh"
 
-#include "hh_tms1k_test.lh" // test-layout - use external artwork
+#include "einvader.lh" // test-layout(but still playable)
+#include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 
 // machine_start/reset
@@ -1548,8 +1548,13 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Gakken Poker
+  * PCB label POKER. gakken
   * TMS1370 MP2105 (die labeled MP2105)
-  * x
+  * 11-digit cyan VFD display Itron FG1114B, 1bit sound
+
+  known releases:
+  - Japan: Poker
+  - USA: Electronic Poker, published by Entex
 
   x
 
@@ -1562,6 +1567,7 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -1569,29 +1575,103 @@ public:
 
 // handlers
 
+void gpoker_state::prepare_display()
+{
+	// imply 7seg display
+	memset(m_display_segmask, ~0, sizeof(m_display_segmask));
+	
+	// card symbol plates are from R11-R14
+	UINT16 grid = m_r & 0x7ff;
+	UINT16 plate = m_o | (m_r >> 3 & 0xf00);
+	display_matrix_seg(12, 11, plate, grid, 0x7f);
+}
+
 WRITE16_MEMBER(gpoker_state::write_r)
 {
+	// R15: speaker out
+	m_speaker->level_w(data >> 15 & 1);
+	
+	// R0-R6: input mux
+	m_inp_mux = data & 0x7f;
+	
+	// R0-R14: select digit/segment
+	m_r = data;
+	prepare_display();
 }
 
 WRITE16_MEMBER(gpoker_state::write_o)
 {
+	// O0-O7: digit segments A-G,H
+	m_o = data;
+	prepare_display();
 }
 
 READ8_MEMBER(gpoker_state::read_k)
 {
-	return 0;
+	return read_inputs(7);
 }
 
 
 // config
 
+
+/* physical button layout and labels is like this:
+
+    [7]   [8]   [9]   [DL]   | (on/off switch)
+    [4]   [5]   [6]   [BT]
+    [1]   [2]   [3]   [CA]  [CE]
+    [0]         [GO]  [T]   [AC]
+*/
+
 static INPUT_PORTS_START( gpoker )
+
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("9 / Deal") // DL, shares pad with 9
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear Entry") // CE
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear All") // AC
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Call") // CA
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Total") // T
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet") // BT
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( gpoker, gpoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1370, 250000) // x
+	MCFG_CPU_ADD("maincpu", TMS1370, 325000) // RC osc. R=47K, C=47pf -> ~325kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gpoker_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
@@ -2529,8 +2609,8 @@ MACHINE_CONFIG_END
   * 11 LEDs behind buttons, 2bit sound
 
   Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
-  The one with dark-blue case is the rare sequel Master Merlin. More sequels
-  followed too, but on other hardware.
+  The one with dark-blue case is the rare sequel Master Merlin, see below.
+  More sequels followed too, but on other hardware.
 
   To start a game, press NEW GAME, followed by a number:
   1: Tic-Tac-Toe
