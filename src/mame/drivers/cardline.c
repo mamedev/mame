@@ -97,7 +97,15 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 
 	gfx_ofs = 0;
 
-	if(m_video&2)
+	// bits 0 and 1 seem to be chip select lines. None of those selected
+	// most likely would put the output lines into a floating (threestate)
+	// state. The next statement doesn't add functioality but documents
+	// how this works.
+
+	if(m_video & 1)
+	 	gfx_ofs = 0;
+
+	if(m_video & 2)
 		gfx_ofs = 0x1000;
 
 	gfx = memregion("gfx1")->base();
