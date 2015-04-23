@@ -171,6 +171,7 @@ private:
 	UINT8 m_GMODE;
 	UINT16 m_page;
 	UINT8 *m_work_ram;
+	UINT8  motor;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<z80_device> m_maincpu;
@@ -206,7 +207,11 @@ READ8_MEMBER(spc1000_state::iplk_r)
 
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
+	char m = BIT(data, 1);
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
+	if (m != motor && m == 1)
+		m_cass->change_state(m_cass->get_state() & CASSETTE_MASK_MOTOR ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	motor = m;	
 }
 
 WRITE8_MEMBER(spc1000_state::gmode_w)
@@ -387,6 +392,7 @@ void spc1000_state::machine_reset()
 {
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
 	m_IPLK = 1;
+	m_motor = 0;
 }
 
 READ8_MEMBER(spc1000_state::mc6847_videoram_r)
@@ -414,7 +420,7 @@ READ8_MEMBER( spc1000_state::porta_r )
 {
 	UINT8 data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;
-	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x40;
+	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) && ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED)  ? 0x00 : 0x40;
 	data &= ~(m_io_joy->read() & 0x3f);
 
 	return data;
