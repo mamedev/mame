@@ -95,8 +95,8 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 	int gfx_ofs;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-	if(m_video&1)
-		gfx_ofs = 0;
+	gfx_ofs = 0;
+
 	if(m_video&2)
 		gfx_ofs = 0x1000;
 
