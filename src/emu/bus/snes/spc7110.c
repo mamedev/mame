@@ -319,49 +319,49 @@ SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 #undef map
 	}
 
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_mode);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_offset);
-	state_save_register_item_pointer(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer, SPC7110_DECOMP_BUFFER_SIZE);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer_rdoffset);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer_wroffset);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_decomp_buffer_length);
+	m_machine.save().save_item(m_decomp_mode, "SNES_SPC7110/m_decomp_mode");
+	m_machine.save().save_item(m_decomp_offset, "SNES_SPC7110/m_decomp_offset");
+	m_machine.save().save_pointer(m_decomp_buffer, "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
+	m_machine.save().save_item(m_decomp_buffer_rdoffset, "SNES_SPC7110/m_decomp_buffer_rdoffset");
+	m_machine.save().save_item(m_decomp_buffer_wroffset, "SNES_SPC7110/m_decomp_buffer_wroffset");
+	m_machine.save().save_item(m_decomp_buffer_length, "SNES_SPC7110/m_decomp_buffer_length");
 
 	for (int i = 0; i < 32; i++)
 	{
-		state_save_register_item(machine, "SNES_SPC7110", NULL, i, m_context[i].index);
-		state_save_register_item(machine, "SNES_SPC7110", NULL, i, m_context[i].invert);
+		m_machine.save().save_item(m_context[i].index, "SNES_SPC7110/m_context[i].index", i);
+		m_machine.save().save_item(m_context[i].invert, "SNES_SPC7110/m_context[i].invert", i);
 	}
 
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_val);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_in);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_span);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_out);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_inverts);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_lps);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m0_in_count);
+	m_machine.save().save_item(m_m0_val, "SNES_SPC7110/m_m0_val");
+	m_machine.save().save_item(m_m0_in, "SNES_SPC7110/m_m0_in");
+	m_machine.save().save_item(m_m0_span, "SNES_SPC7110/m_m0_span");
+	m_machine.save().save_item(m_m0_out, "SNES_SPC7110/m_m0_out");
+	m_machine.save().save_item(m_m0_inverts, "SNES_SPC7110/m_m0_inverts");
+	m_machine.save().save_item(m_m0_lps, "SNES_SPC7110/m_m0_lps");
+	m_machine.save().save_item(m_m0_in_count, "SNES_SPC7110/m_m0_in_count");
 
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_pixelorder);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_realorder);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_val);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_in);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_span);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_out);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_inverts);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_lps);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m1_in_count);
+	m_machine.save().save_item(m_m1_pixelorder, "SNES_SPC7110/m_m1_pixelorder");
+	m_machine.save().save_item(m_m1_realorder, "SNES_SPC7110/m_m1_realorder");
+	m_machine.save().save_item(m_m1_val, "SNES_SPC7110/m_m1_val");
+	m_machine.save().save_item(m_m1_in, "SNES_SPC7110/m_m1_in");
+	m_machine.save().save_item(m_m1_span, "SNES_SPC7110/m_m1_span");
+	m_machine.save().save_item(m_m1_out, "SNES_SPC7110/m_m1_out");
+	m_machine.save().save_item(m_m1_inverts, "SNES_SPC7110/m_m1_inverts");
+	m_machine.save().save_item(m_m1_lps, "SNES_SPC7110/m_m1_lps");
+	m_machine.save().save_item(m_m1_in_count, "SNES_SPC7110/m_m1_in_count");
 
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_pixelorder);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_realorder);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_bitplanebuffer);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_buffer_index);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_val);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_in);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_span);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_out0);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_out1);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_inverts);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_lps);
-	state_save_register_item(machine, "SNES_SPC7110", NULL, 0, m_m2_in_count);
+	m_machine.save().save_item(m_m2_pixelorder, "SNES_SPC7110/m_m2_pixelorder");
+	m_machine.save().save_item(m_m2_realorder, "SNES_SPC7110/m_m2_realorder");
+	m_machine.save().save_item(m_m2_bitplanebuffer, "SNES_SPC7110/m_m2_bitplanebuffer");
+	m_machine.save().save_item(m_m2_buffer_index, "SNES_SPC7110/m_m2_buffer_index");
+	m_machine.save().save_item(m_m2_val, "SNES_SPC7110/m_m2_val");
+	m_machine.save().save_item(m_m2_in, "SNES_SPC7110/m_m2_in");
+	m_machine.save().save_item(m_m2_span, "SNES_SPC7110/m_m2_span");
+	m_machine.save().save_item(m_m2_out0, "SNES_SPC7110/m_m2_out0");
+	m_machine.save().save_item(m_m2_out1, "SNES_SPC7110/m_m2_out1");
+	m_machine.save().save_item(m_m2_inverts, "SNES_SPC7110/m_m2_inverts");
+	m_machine.save().save_item(m_m2_lps, "SNES_SPC7110/m_m2_lps");
+	m_machine.save().save_item(m_m2_in_count, "SNES_SPC7110/m_m2_in_count");
 }
 
 void SPC7110_Decomp::reset()

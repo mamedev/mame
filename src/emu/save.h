@@ -54,17 +54,6 @@ typedef delegate<void ()> save_prepost_delegate;
 	template<> inline void save_manager::save_item(device_t *device, const char *module, const char *tag, int index, std::vector<TYPE> &value, const char *name) { save_memory(device, module, tag, index, name, &value[0], sizeof(TYPE), value.size()); }
 
 
-// register items with explicit tags
-#define state_save_register_item(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, _val, #_val)
-
-#define state_save_register_item_pointer(_mach, _mod, _tag, _index, _val, _count) \
-	(_mach).save().save_pointer(NULL, _mod, _tag, _index, _val, #_val, _count)
-
-#define state_save_register_item_array(_mach, _mod, _tag, _index, _val) \
-	(_mach).save().save_item(NULL, _mod, _tag, _index, _val, #_val)
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

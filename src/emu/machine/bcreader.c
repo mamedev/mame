@@ -73,13 +73,13 @@ barcode_reader_device::barcode_reader_device(const machine_config &mconfig, cons
 
 void barcode_reader_device::device_start()
 {
-	state_save_register_item(machine(), "DATACH", this->tag(), 0, m_byte_data);
-	state_save_register_item(machine(), "DATACH", this->tag(), 0, m_pixel_data);
-	state_save_register_item(machine(), "DATACH", this->tag(), 0, m_byte_length);
-	state_save_register_item(machine(), "DATACH", this->tag(), 0, m_pixel_length);
-	state_save_register_item(machine(), "DATACH", this->tag(), 0, m_byte_count);
-	state_save_register_item(machine(), "DATACH", this->tag(), 0, m_pixel_count);
-	state_save_register_item(machine(), "DATACH", this->tag(), 0, m_new_code);
+	save_item(m_byte_data, "DATACH/m_byte_data");
+	save_item(m_pixel_data, "DATACH/m_pixel_data");
+	save_item(m_byte_length, "DATACH/m_byte_length");
+	save_item(m_pixel_length, "DATACH/m_pixel_length");
+	save_item(m_byte_count, "DATACH/m_byte_count");
+	save_item(m_pixel_count, "DATACH/m_pixel_count");
+	save_item(m_new_code, "DATACH/m_new_code");
 }
 
 

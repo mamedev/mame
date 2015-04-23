@@ -253,12 +253,12 @@ gba_eeprom_device::gba_eeprom_device(running_machine &machine, UINT8 *eeprom, UI
 	m_data_size = size;
 	m_addr_bits = addr_bits;
 
-	state_save_register_item(machine, "GBA_EEPROM", NULL, 0, m_state);
-	state_save_register_item(machine, "GBA_EEPROM", NULL, 0, m_command);
-	state_save_register_item(machine, "GBA_EEPROM", NULL, 0, m_count);
-	state_save_register_item(machine, "GBA_EEPROM", NULL, 0, m_addr);
-	state_save_register_item(machine, "GBA_EEPROM", NULL, 0, m_bits);
-	state_save_register_item(machine, "GBA_EEPROM", NULL, 0, m_eep_data);
+	m_machine.save().save_item(m_state, "GBA_EEPROM/m_state");
+	m_machine.save().save_item(m_command, "GBA_EEPROM/m_command");
+	m_machine.save().save_item(m_count, "GBA_EEPROM/m_count");
+	m_machine.save().save_item(m_addr, "GBA_EEPROM/m_addr");
+	m_machine.save().save_item(m_bits, "GBA_EEPROM/m_bits");
+	m_machine.save().save_item(m_eep_data, "GBA_EEPROM/m_eep_data");
 }
 
 UINT32 gba_eeprom_device::read()

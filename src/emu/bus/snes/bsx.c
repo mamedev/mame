@@ -116,10 +116,10 @@ void sns_rom_bsmempak_device::device_reset()
 BSX_base::BSX_base(running_machine &machine)
 			: m_machine(machine)
 {
-	state_save_register_item(machine, "SNES_BSX", NULL, 0, regs);
-	state_save_register_item(machine, "SNES_BSX", NULL, 0, r2192_counter);
-	state_save_register_item(machine, "SNES_BSX", NULL, 0, r2192_hour);
-	state_save_register_item(machine, "SNES_BSX", NULL, 0, r2192_second);
+	m_machine.save().save_item(regs, "SNES_BSX/regs");
+	m_machine.save().save_item(r2192_counter, "SNES_BSX/r2192_counter");
+	m_machine.save().save_item(r2192_hour, "SNES_BSX/r2192_hour");
+	m_machine.save().save_item(r2192_second, "SNES_BSX/r2192_second");
 }
 
 void BSX_base::init()
