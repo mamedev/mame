@@ -965,3 +965,12 @@ generate: \
 $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 	@echo Converting $<...
 	$(SILENT)$(PYTHON) $(SRC)/build/file2str.py $< $@ layout_$(basename $(notdir $<))
+
+	
+#-------------------------------------------------
+# Regression tests
+#-------------------------------------------------
+
+include $(SRC)/regtests/regtests.mak
+
+tests: $(REGTESTS)
