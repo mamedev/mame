@@ -268,7 +268,8 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
   wasn't initially a toy company, the first release was through Tomy. Emix
   created the Bambino brand afterwards. It is claimed to be the first
-  computerized VFD game (true, unless TI's Speak & Spell is considered a game?)
+  computerized VFD game (true, unless TI Speak & Spell(1978), or even Invicta
+  Electronic Mastermind(1977) are considered games)
 
   known releases:
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy

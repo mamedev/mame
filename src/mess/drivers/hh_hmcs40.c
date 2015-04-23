@@ -33,6 +33,7 @@
  *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
  *43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon
 
+ @09      HD38820A  1980, Mattel World Championship Baseball
  @13      HD38820A  1981, Entex Galaxian 2
  @23      HD38820A  1981, Entex Pac Man 2
  @28      HD38820A  1981, Coleco Pac-Man (ver 1)
@@ -2213,6 +2214,168 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Mattel World Championship Baseball
+  * PCB label MEL-001 Baseball Rev. B
+  * Hitachi QFP HD38820A09 MCU
+  * cyan/red/green VFD display Futaba DM-24ZK 1G, with etched overlay
+  
+  To start the game in 2-player mode, simply turn the game on. For 1-player,
+  turn the game on while holding the 1-key and use the visitor's side keypad
+  to play offsense.
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class mwcbaseb_state : public hh_hmcs40_state
+{
+public:
+	mwcbaseb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+// handlers
+
+void mwcbaseb_state::prepare_display()
+{
+	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	display_matrix(16, 8, m_plate, grid);
+}
+
+WRITE8_MEMBER(mwcbaseb_state::plate_w)
+{
+	// R1x-R3x,R6x: vfd matrix plate
+	int shift = (offset == HMCS40_PORT_R6X) ? 12 : (offset - HMCS40_PORT_R1X) * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(mwcbaseb_state::grid_w)
+{
+	// D9-D15: input mux
+	m_inp_mux = data >> 9 & 0x7f;
+
+	// D0-D7: vfd matrix grid
+	m_grid = data & 0xff;
+	prepare_display();
+}
+
+WRITE8_MEMBER(mwcbaseb_state::speaker_w)
+{
+	// R50,R51+R52(tied together): speaker out
+	m_speaker->level_w((data & 3) | (data >> 1 & 2));
+}
+
+READ8_MEMBER(mwcbaseb_state::input_r)
+{
+	// R4x: multiplexed inputs
+	return read_inputs(7);
+}
+
+
+// config
+
+/* physical button layout and labels is like this:
+
+        (visitor team side)                                       (home team side)
+    COMP PITCH                     [SCORE]       [INNING]
+    [1]      [2]      [3]                                     [1]      [2]      [3]
+    NEW PITCHER       PINCH HITTER                            NEW PITCHER       PINCH HITTER
+
+    [4]      [5]      [6]                                     [4]      [5]      [6]
+    BACKWARD (pitch)  FORWARD                                 BACKWARD (pitch)  FORWARD
+
+    [7]      [8]      [9]                                     [7]      [8]      [9]
+
+    BUNT     NORMAL   HR SWING                                BUNT     NORMAL   HR SWING
+    [CLEAR]  [0]      [ENTER]                                 [CLEAR]  [0]      [ENTER]
+    SLOW     CURVE    FAST                                    SLOW     CURVE    FAST
+*/
+
+static INPUT_PORTS_START( mwcbaseb )
+	PORT_START("IN.0") // D9 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("P2 4") // note: P1 = left/visitor, P2 = right/home
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("P2 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("P2 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("P2 1")
+
+	PORT_START("IN.1") // D10 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P2 8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("P2 7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("P2 6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("P2 5")
+
+	PORT_START("IN.2") // D11 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("P2 Enter")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("P2 Clear")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("P2 0")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("P2 9")
+
+	PORT_START("IN.3") // D12 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Inning")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Score")
+
+	PORT_START("IN.4") // D13 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("P1 Enter")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("P1 Clear")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("P1 0")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("P1 9")
+
+	PORT_START("IN.5") // D14 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("P1 8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("P1 7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("P1 6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("P1 5")
+
+	PORT_START("IN.6") // D15 port R4x
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("P1 4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("P1 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("P1 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("P1 1")
+INPUT_PORTS_END
+
+
+static const INT16 mwcbaseb_speaker_levels[] = { 0, 32767, -32768, 0 };
+
+static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(mwcbaseb_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(4, READ8(mwcbaseb_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(mwcbaseb_state, speaker_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(mwcbaseb_state, grid_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(4, mwcbaseb_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Parker Brothers Q*Bert
   * PCB label 13662 REV-4
   * Hitachi QFP HD38820A70 MCU
@@ -2759,6 +2922,13 @@ ROM_START( gdigdug )
 ROM_END
 
 
+ROM_START( mwcbaseb )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a09", 0x0000, 0x1000, CRC(25ba7dc0) SHA1(69e0a867fdcf07b454b1faf835e576ae782432c0) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( pbqbert )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38820a70", 0x0000, 0x1000, CRC(be7c80b4) SHA1(0617a80ef7fe188ea221de32e760d45fd4318c67) )
@@ -2810,6 +2980,8 @@ CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  driver_device, 0, "Gakken", "Heiankyo Alien (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, gckong,    0,        0, gckong,   gckong,   driver_device, 0, "Gakken", "Crazy Kong (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  driver_device, 0, "Gakken", "Dig Dug (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+
+CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, driver_device, 0, "Mattel", "World Championship Baseball", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1983, pbqbert,   0,        0, pbqbert,  pbqbert,  driver_device, 0, "Parker Brothers", "Q*Bert (Parker Brothers)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 

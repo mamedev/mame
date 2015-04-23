@@ -82,6 +82,7 @@
 ***************************************************************************/
 
 #include "includes/hh_tms1k.h"
+#include "sound/beep.h"
 
 // internal artwork
 #include "amaztron.lh"
@@ -1491,6 +1492,19 @@ MACHINE_CONFIG_END
   * TMS1100 MP1221 (die labeled MP1221)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1bit sound
 
+  lamp translation table: led zz from game PCB = MESS lampyx:
+
+    0 = -          10 = lamp44     20 = lamp53     30 = lamp95     40 = lamp92
+    1 = lamp30     11 = lamp45     21 = lamp54     31 = lamp85     41 = lamp93
+    2 = lamp31     12 = -          22 = -          32 = lamp65     42 = lamp90
+    3 = lamp32     13 = lamp50     23 = lamp60     33 = lamp74     43 = lamp91
+    4 = lamp33     14 = lamp51     24 = lamp61     34 = lamp70
+    5 = lamp34     15 = lamp52     25 = lamp62     35 = lamp71
+    6 = lamp40     16 = -          26 = lamp63     36 = lamp80
+    7 = lamp41     17 = lamp72     27 = lamp64     37 = lamp81
+    8 = lamp42     18 = lamp73     28 = lamp84     38 = lamp82
+    9 = lamp43     19 = -          29 = lamp94     39 = lamp83
+
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
@@ -1621,7 +1635,7 @@ MACHINE_CONFIG_END
   Gakken Poker
   * PCB label POKER. gakken
   * TMS1370 MP2105 (die labeled MP2105)
-  * 11-digit cyan VFD display Itron FG1114B, 1bit sound
+  * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
   - Japan: Poker
@@ -1633,13 +1647,19 @@ class gpoker_state : public hh_tms1k_state
 {
 public:
 	gpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag)
+		: hh_tms1k_state(mconfig, type, tag),
+		m_beeper(*this, "beeper")
 	{ }
+
+	required_device<beep_device> m_beeper;
 
 	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+
+protected:
+	virtual void machine_reset();
 };
 
 // handlers
@@ -1657,8 +1677,8 @@ void gpoker_state::prepare_display()
 
 WRITE16_MEMBER(gpoker_state::write_r)
 {
-	// R15: speaker out
-	m_speaker->level_w(data >> 15 & 1);
+	// R15: enable beeper
+	m_beeper->set_state(data >> 15 & 1);
 	
 	// R0-R6: input mux
 	m_inp_mux = data & 0x7f;
@@ -1736,6 +1756,13 @@ static INPUT_PORTS_START( gpoker )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Bet") // BT
 INPUT_PORTS_END
 
+
+void gpoker_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	m_beeper->set_state(0);
+}
+
 static MACHINE_CONFIG_START( gpoker, gpoker_state )
 
 	/* basic machine hardware */
@@ -1751,7 +1778,7 @@ static MACHINE_CONFIG_START( gpoker, gpoker_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 2405) // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
