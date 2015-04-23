@@ -143,6 +143,7 @@ class spc1000_state : public driver_device
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_motor(0)
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "mc6847")
 		, m_cass(*this, "cassette")
@@ -171,7 +172,7 @@ private:
 	UINT8 m_GMODE;
 	UINT16 m_page;
 	UINT8 *m_work_ram;
-	UINT8  motor;
+	UINT8  m_motor;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<z80_device> m_maincpu;
@@ -209,9 +210,9 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 {
 	char m = BIT(data, 1);
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (m != motor && m == 1)
+	if (m != m_motor && m == 1)
 		m_cass->change_state(m_cass->get_state() & CASSETTE_MASK_MOTOR ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-	motor = m;	
+	m_motor = m;	
 }
 
 WRITE8_MEMBER(spc1000_state::gmode_w)
