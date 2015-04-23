@@ -300,7 +300,7 @@ std::string strmakelower(std::string& str)
 	return str;
 }
 
-int strreplace(std::string str, const std::string& search, const std::string& replace)
+int strreplace(std::string &str, const std::string& search, const std::string& replace)
 {
 	int searchlen = search.length();
 	int replacelen = replace.length();

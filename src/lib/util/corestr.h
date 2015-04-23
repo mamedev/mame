@@ -75,6 +75,6 @@ void strreplacechr(std::string& str, char ch, char newch);
 std::string strtrimspace(std::string& str);
 std::string strmakeupper(std::string& str);
 std::string strmakelower(std::string& str);
-int strreplace(std::string str, const std::string& search, const std::string& replace);
+int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
 #endif /* __CORESTR_H__ */
