@@ -171,6 +171,7 @@ private:
 	UINT8 m_GMODE;
 	UINT16 m_page;
 	UINT8 *m_work_ram;
+	UINT8  motor;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<z80_device> m_maincpu;
@@ -206,7 +207,6 @@ READ8_MEMBER(spc1000_state::iplk_r)
 
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
-	static char motor = 0;
 	char m = BIT(data, 1);
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	if (m != motor && m == 1)
@@ -392,6 +392,7 @@ void spc1000_state::machine_reset()
 {
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
 	m_IPLK = 1;
+	m_motor = 0;
 }
 
 READ8_MEMBER(spc1000_state::mc6847_videoram_r)
