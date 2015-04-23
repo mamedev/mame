@@ -396,8 +396,8 @@ TODO:
 - timefgtr : missing player bullets, sprite ROM extend(see later levels), sound is too slow, some sprites missing
 - zigzag   : full Dip Switches and Inputs
 - zigzag2  : full Dip Switches and Inputs
-- jumpbug  : full Dip Switches and Inputs
-- jumpbugb : full Dip Switches and Inputs
+- jumpbug  : full Dip Switches and Inputs - missing possible discrete sounds
+- jumpbugb : full Dip Switches and Inputs - missing possible discrete sounds
 - levers   : full Dip Switches and Inputs
 - kingball : full Dip Switches and Inputs
 - kingbalj : full Dip Switches and Inputs
@@ -5246,7 +5246,7 @@ static MACHINE_CONFIG_DERIVED( jumpbug, galaxian_base )
 	MCFG_CPU_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("8910.0", AY8910, 1789750)
+	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)	/* matches PCB video - unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -10869,8 +10869,8 @@ GAME( 198?, fantastc,    0,        fantastc,   fantastc,   galaxian_state, fanta
 GAME( 198?, timefgtr,    0,        timefgtr,   timefgtr,   galaxian_state, timefgtr,   ROT90,  "Taito do Brasil", "Time Fighter (Time Pilot conversion on Galaxian hardware)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Time Pilot (!) not a clone
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
-GAME( 1981, jumpbug,     0,        jumpbug,    jumpbug,    galaxian_state, jumpbug,    ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
-GAME( 1981, jumpbugb,    jumpbug,  jumpbug,    jumpbug,    galaxian_state, jumpbug,    ROT90,  "bootleg", "Jump Bug (bootleg)", GAME_SUPPORTS_SAVE ) // bootleg of Sega license
+GAME( 1981, jumpbug,     0,        jumpbug,    jumpbug,    galaxian_state, jumpbug,    ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // or by Alpha Denshi Co. under contract from Hoei?
+GAME( 1981, jumpbugb,    jumpbug,  jumpbug,    jumpbug,    galaxian_state, jumpbug,    ROT90,  "bootleg", "Jump Bug (bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // bootleg of Sega license
 GAME( 1983, levers,      0,        jumpbug,    levers,     galaxian_state, jumpbug,    ROT90,  "Rock-Ola", "Levers", GAME_SUPPORTS_SAVE )
 
 /* 2nd CPU driving AY8910 for sound */
