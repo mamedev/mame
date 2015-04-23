@@ -93,6 +93,7 @@
 #include "ebball2.lh"
 #include "ebball3.lh"
 #include "elecdet.lh"
+#include "gpoker.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
 #include "simon.lh" // clickable
@@ -361,6 +362,7 @@ WRITE16_MEMBER(mathmagi_state::write_o)
 
 READ8_MEMBER(mathmagi_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(6);
 }
 
@@ -542,6 +544,7 @@ WRITE16_MEMBER(amaztron_state::write_o)
 
 READ8_MEMBER(amaztron_state::read_k)
 {
+	// K: multiplexed inputs
 	UINT8 k = read_inputs(6);
 
 	// the 5th column is tied to K4+K8
@@ -835,6 +838,7 @@ WRITE16_MEMBER(tc4_state::write_o)
 
 READ8_MEMBER(tc4_state::read_k)
 {
+	// K: multiplexed inputs
 	UINT8 k = read_inputs(6);
 
 	// read from cartridge
@@ -987,13 +991,13 @@ WRITE16_MEMBER(ebball_state::write_o)
 {
 	// O0-O6: led state
 	// O7: N/C
-	m_o = data;
+	m_o = data & 0x7f;
 	prepare_display();
 }
 
 READ8_MEMBER(ebball_state::read_k)
 {
-	// note: K8(Vss row) is always on
+	// K: multiplexed inputs (note that K8(Vss row) is always on)
 	return m_inp_matrix[5]->read() | read_inputs(5);
 }
 
@@ -1098,7 +1102,7 @@ public:
 
 void ebball2_state::prepare_display()
 {
-	// the first 3 are 7segs
+	// R0-R2 are 7segs
 	for (int y = 0; y < 3; y++)
 		m_display_segmask[y] = 0x7f;
 
@@ -1127,6 +1131,7 @@ WRITE16_MEMBER(ebball2_state::write_o)
 
 READ8_MEMBER(ebball2_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(4);
 }
 
@@ -1275,6 +1280,7 @@ WRITE16_MEMBER(ebball3_state::write_o)
 
 READ8_MEMBER(ebball3_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(3);
 }
 
@@ -1483,9 +1489,9 @@ MACHINE_CONFIG_END
 
   Entex Raise The Devil
   * TMS1100 MP1221 (die labeled MP1221)
-  * x
+  * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1bit sound
 
-  x
+  NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
 
@@ -1496,36 +1502,101 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
+	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+
+	void set_clock();
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+
+protected:
+	virtual void machine_reset();
 };
 
 // handlers
 
+void raisedvl_state::prepare_display()
+{
+	// R0-R2 are 7segs
+	for (int y = 0; y < 3; y++)
+		m_display_segmask[y] = 0x7f;
+	
+	display_matrix(7, 10, m_o, m_r);
+}
+
 WRITE16_MEMBER(raisedvl_state::write_r)
 {
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+	
+	// R0,R1: input mux
+	m_inp_mux = data & 3;
+	
+	// R0-R9: led select
+	m_r = data;
+	prepare_display();
 }
 
 WRITE16_MEMBER(raisedvl_state::write_o)
 {
+	// O0-O6: led state
+	// O7: N/C
+	m_o = data & 0x7f;
+	prepare_display();
 }
 
 READ8_MEMBER(raisedvl_state::read_k)
 {
-	return 0;
+	// K: multiplexed inputs
+	return read_inputs(2) & 0xf;
 }
 
 
 // config
 
 static INPUT_PORTS_START( raisedvl )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1 (only bit 0)
+	PORT_CONFNAME( 0x31, 0x00, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, raisedvl_state, skill_switch, NULL)
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x10, "2" )
+	PORT_CONFSETTING(    0x11, "3" )
+	PORT_CONFSETTING(    0x21, "4" )
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(raisedvl_state::skill_switch)
+{
+	set_clock();
+}
+
+
+void raisedvl_state::set_clock()
+{
+	// MCU clock is from an RC circuit with C=47pf, R=47K by default. Skills
+	// 2 and 3 add a 150K resistor in parallel, and skill 4 adds a 100K one.
+	// 0:   R=47K  -> ~350kHz
+	// 2,3: R=35K8 -> ~425kHz (combined)
+	// 4:   R=32K  -> ~465kHz (combined)
+	UINT8 inp = m_inp_matrix[1]->read();
+	m_maincpu->set_unscaled_clock((inp & 0x20) ? 465000 : ((inp & 0x10) ? 425000 : 350000));
+}
+
+void raisedvl_state::machine_reset()
+{
+	hh_tms1k_state::machine_reset();
+	set_clock();
+}
 
 static MACHINE_CONFIG_START( raisedvl, raisedvl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 250000) // x
+	MCFG_CPU_ADD("maincpu", TMS1100, 350000) // see set_clock
 	MCFG_TMS1XXX_READ_K_CB(READ8(raisedvl_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(raisedvl_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(raisedvl_state, write_o))
@@ -1555,8 +1626,6 @@ MACHINE_CONFIG_END
   known releases:
   - Japan: Poker
   - USA: Electronic Poker, published by Entex
-
-  x
 
 ***************************************************************************/
 
@@ -1608,12 +1677,12 @@ WRITE16_MEMBER(gpoker_state::write_o)
 
 READ8_MEMBER(gpoker_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(7);
 }
 
 
 // config
-
 
 /* physical button layout and labels is like this:
 
@@ -1624,7 +1693,6 @@ READ8_MEMBER(gpoker_state::read_k)
 */
 
 static INPUT_PORTS_START( gpoker )
-
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
@@ -1671,13 +1739,13 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( gpoker, gpoker_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1370, 325000) // RC osc. R=47K, C=47pf -> ~325kHz
+	MCFG_CPU_ADD("maincpu", TMS1370, 350000) // RC osc. R=47K, C=47pf -> ~350kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gpoker_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_gpoker)
 
 	/* no video! */
 
@@ -1726,10 +1794,8 @@ WRITE16_MEMBER(elecdet_state::write_r)
 	m_speaker->level_w((data & 0x180 && m_o & 0x80) ? 1 : 0);
 
 	// R0-R6: select digit
-	for (int y = 0; y < 7; y++)
-		m_display_segmask[y] = 0x7f;
-
-	display_matrix(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data);
+	memset(m_display_segmask, ~0, sizeof(m_display_segmask));
+	display_matrix_seg(7, 7, BITSWAP8(m_o,7,5,2,1,4,0,6,3), data, 0x7f);
 }
 
 WRITE16_MEMBER(elecdet_state::write_o)
@@ -1744,7 +1810,7 @@ WRITE16_MEMBER(elecdet_state::write_o)
 
 READ8_MEMBER(elecdet_state::read_k)
 {
-	// note: the Vss row is always on
+	// K: multiplexed inputs (note that the Vss row is always on)
 	return m_inp_matrix[4]->read() | read_inputs(4);
 }
 
@@ -1878,6 +1944,7 @@ WRITE16_MEMBER(starwbc_state::write_o)
 
 READ8_MEMBER(starwbc_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
@@ -1977,11 +2044,9 @@ public:
 
 void astro_state::prepare_display()
 {
-	// declare 7segs
-	for (int y = 0; y < 9; y++)
-		m_display_segmask[y] = 0xff;
-
-	display_matrix(8, 10, m_o, m_r);
+	// imply 7seg display
+	memset(m_display_segmask, ~0, sizeof(m_display_segmask));
+	display_matrix_seg(8, 10, m_o, m_r, 0xff);
 }
 
 WRITE16_MEMBER(astro_state::write_r)
@@ -2003,6 +2068,7 @@ WRITE16_MEMBER(astro_state::write_o)
 
 READ8_MEMBER(astro_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(8);
 }
 
@@ -2131,6 +2197,7 @@ WRITE16_MEMBER(comp4_state::write_o)
 
 READ8_MEMBER(comp4_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(3);
 }
 
@@ -2225,6 +2292,7 @@ WRITE16_MEMBER(simon_state::write_r)
 
 READ8_MEMBER(simon_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(4);
 }
 
@@ -2328,6 +2396,7 @@ WRITE16_MEMBER(ssimon_state::write_r)
 
 READ8_MEMBER(ssimon_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(6);
 }
 
@@ -2544,6 +2613,7 @@ WRITE16_MEMBER(cnsector_state::write_o)
 
 READ8_MEMBER(cnsector_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
@@ -2664,6 +2734,7 @@ WRITE16_MEMBER(merlin_state::write_o)
 
 READ8_MEMBER(merlin_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(4);
 }
 
@@ -2844,7 +2915,7 @@ WRITE16_MEMBER(stopthief_state::write_o)
 
 READ8_MEMBER(stopthief_state::read_k)
 {
-	// note: the Vss row is always on
+	// K: multiplexed inputs (note that the Vss row is always on)
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
 
@@ -2955,12 +3026,13 @@ WRITE16_MEMBER(bankshot_state::write_o)
 {
 	// O0-O6: led state
 	// O7: N/C
-	m_o = data;
+	m_o = data & 0x7f;
 	display_matrix(7, 11, m_o, m_r);
 }
 
 READ8_MEMBER(bankshot_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(2);
 }
 
@@ -3079,12 +3151,13 @@ WRITE16_MEMBER(splitsec_state::write_o)
 {
 	// O0-O6: led state
 	// O7: N/C
-	m_o = data;
+	m_o = data & 0x7f;
 	display_matrix(7, 8, m_o, m_r);
 }
 
 READ8_MEMBER(splitsec_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(2);
 }
 
@@ -3192,6 +3265,7 @@ WRITE16_MEMBER(tandy12_state::write_o)
 
 READ8_MEMBER(tandy12_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
@@ -3622,9 +3696,9 @@ CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Ent
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", GAME_SUPPORTS_SAVE )
 CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
-CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
 

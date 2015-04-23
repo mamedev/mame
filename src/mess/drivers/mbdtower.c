@@ -164,7 +164,7 @@ WRITE16_MEMBER(mbdtower_state::write_o)
 
 READ8_MEMBER(mbdtower_state::read_k)
 {
-	// rotation sensor is on K8
+	// K: multiplexed inputs (note: rotation sensor is on K8)
 	return read_inputs(3) | ((!m_sensor_blind && sensor_led_on()) ? 8 : 0);
 }
 

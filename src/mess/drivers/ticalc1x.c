@@ -107,6 +107,7 @@ WRITE16_MEMBER(tisr16_state::write_o)
 
 READ8_MEMBER(tisr16_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(11);
 }
 
@@ -309,6 +310,7 @@ WRITE16_MEMBER(ti1270_state::write_o)
 
 READ8_MEMBER(ti1270_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(6);
 }
 
@@ -412,6 +414,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 
 READ8_MEMBER(ti1000_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
@@ -519,6 +522,7 @@ WRITE16_MEMBER(wizatron_state::write_o)
 
 READ8_MEMBER(wizatron_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(4);
 }
 
@@ -605,6 +609,7 @@ WRITE16_MEMBER(lilprof_state::write_o)
 
 READ8_MEMBER(lilprof_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
@@ -701,6 +706,7 @@ WRITE16_MEMBER(lilprof78_state::write_o)
 
 READ8_MEMBER(lilprof78_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(5);
 }
 
@@ -804,7 +810,7 @@ WRITE16_MEMBER(majestic_state::write_o)
 
 READ8_MEMBER(majestic_state::read_k)
 {
-	// note: the Vss row is always on
+	// K: multiplexed inputs (note that the Vss row is always on)
 	return m_inp_matrix[7]->read() | read_inputs(7);
 }
 
