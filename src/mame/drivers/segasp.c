@@ -32,61 +32,35 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 
 
 todo: make this actually readable, we don't support unicode source files
-convert CF card based sets to CHD?
 
  Title                                       PCB ID	 REV	CF ID		Dumped	Region	PIC             MAIN BD Serial
 Battle Police                               ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-???????????
 Beetle DASH!!                               ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-??DASH!!                                    						
 Bingo Galaxy                                ???-?????				no		???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
-?????????                                   						
 Bingo Parade                                ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-???????                                     						
 Brick People / Block People                 834-14881				ROM	ALL	253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
-????????                                    						
 Dinosaur King                               834-14493-01 D			ROM	US	253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
-?????                                       						
 Dinosaur King - Operation: Dinosaur Rescue  837-14434-91	MDA-C0021?	ROM	US/EXP	253-5508-0408   AAFE-01A30164715, AAFE-01B92094811
 -                                           834-14662-01
 Dinosaur King 2                             ???-?????				no		253-5508-0408   AAFE-xxxxxxxxxxx
-?????2007                                   						
 Dinosaur King 2 Ver 2.5                     834-14792-02 F	MDA-C0047	CF	EXP	253-5508-0408   AAFE-01D73384904
-????? 2008                                  						
 Disney: Magical Dream Dance on Stage        ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Disney??????? ?? ????????                   						
 Future Police Patrol Chase                  ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-???????????                                 						
 Issyouni Turbo Drive                        ???-?????				no		???-????-????   AAFE-01E91305101
-????????????                                						  
 Issyouni Wan Wan                            ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-?????????                                   						
 King of Beetle: Battle Terminal             ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-????????? ????????????                      						
 Love & Berry Ver 1.003                      834-14661-02			ROM	EXP	253-5508-0446   AAFE-01D84934906
-?????????and???                             						
 Love & Berry Ver 2.000                      834-14661-02			ROM	EXP	253-5508-0446   AAFE-01D8493xxxx
-?????????and???                             						
 Love & Berry 3 EXP Ver 1.002                834-14661-01	MDA-C0042	CF	US/EXP	253-5508-0446   AAFE-01D64704904
-?????????and???                             						
 Marine & Marine                             ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
--                                           						
 Mirage World                                ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-?????????                                   						
 Monopoly: The Medal                         ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-?????·?·???                                 						
 Monopoly: The Medal 2nd Edition             ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-?????·?·???                                 						
 Mushiking 2K6 2ND                           ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-                                            
 Mushiking 2K7 1ST                           ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-                                            
 Tetris Giant / Tetris Dekaris               834-14970	 G	MDA-C0076	CF	ALL	253-5508-0604   AAFE-01G03025212
-????·????                                   						
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970	 G			ROM	ALL	253-5508-0604   AAFE-xxxxxxxxxxx
-????·????                                   						
 Thomas: The Tank Engine                     ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
--                                           						
 
 REV PCB       IC6s      Flash       AU1500
 D  171-8278D  315-6370  8x 128Mbit  AMD
@@ -120,7 +94,7 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 	   
 	/* External Device */
-//	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // - banked access to ROM board address space
+	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // - banked access to ROM board address space
 //	AM_RANGE(0x01010000, 0x010101ff) // I/O regs
 
 	/* Area 1 */
@@ -265,24 +239,30 @@ ROM_START( dinoki25 )
 	SEGASP_BIOS
 	SEGASP_MISC
 
-	ROM_REGION( 0xf480000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "mda-c0047.img",  0x00000000, 0xf480000, CRC(d789fefd) SHA1(83bed650c2c87a9cbc7e77693475392c87bafa2a) ) // CF card, convert to CHD?
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0047", 0, SHA1(0f97291d9c5dbe3e66a5220da05aebdfaa78b35d) )
 ROM_END
 
 ROM_START( loveber3 )
 	SEGASP_BIOS
 	SEGASP_MISC
 
-	ROM_REGION( 0xf480000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "mda-c0042.img",  0x00000000, 0xf480000, CRC(cf1edd7c) SHA1(539b9f237fe157032ff6dca3befac4ecc6eeb0bb) ) // CF card, convert to CHD?
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0042", 0, SHA1(9992d90dae8ce7636e4153e02b779c27931b3be6) )
 ROM_END
 
 ROM_START( tetgiano )
 	SEGASP_BIOS
 	SEGASP_MISC
 
-	ROM_REGION( 0xf480000, "rom_board", ROMREGION_ERASE)
-	ROM_LOAD( "mda-c0076.img",  0x00000000, 0xf480000, CRC(7f974adb) SHA1(b1278a93cf7e4aa7806a09226f1df505e0ba2364) ) // CF card, convert to CHD?
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+
+	DISK_REGION( "cflash" )
+	DISK_IMAGE( "mda-c0076", 0, SHA1(6987c888d2a3ada2d07f6396d47fdba507ca859d) )
 ROM_END
 
 
