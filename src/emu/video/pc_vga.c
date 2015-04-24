@@ -5848,7 +5848,7 @@ void cirrus_gd5428_device::copy_pixel()
 	if(m_blt_mode & 0x40)  // enable 8x8 pattern
 	{
 		if(m_blt_mode & 0x80)  // colour expand
-			src = (vga.memory[m_blt_source] >> (abs(m_blt_source_current - m_blt_source) % 8)) & 0x01 ? 0xff : 0x00;
+			src = (vga.memory[m_blt_source] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? 0xff : 0x00;
 	}
 	
 	switch(m_blt_rop)
