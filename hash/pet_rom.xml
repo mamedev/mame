@@ -368,4 +368,16 @@
 		</part>
 	</software>
 
+	<software name="kram2">
+		<description>KRAM 2.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="kram2_pet8032_ud11_hn462532.bin" size="0x1000" crc="db606731" sha1="70b3fca8792e1010c3ad31e07df837f4772f8e3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
