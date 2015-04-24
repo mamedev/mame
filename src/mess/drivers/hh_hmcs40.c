@@ -2270,7 +2270,7 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 WRITE8_MEMBER(mwcbaseb_state::speaker_w)
 {
 	// R50,R51+R52(tied together): speaker out
-	m_speaker->level_w((data & 3) | (data >> 1 & 2));
+	m_speaker->level_w(data & 7);
 }
 
 READ8_MEMBER(mwcbaseb_state::input_r)
@@ -2344,7 +2344,7 @@ static INPUT_PORTS_START( mwcbaseb )
 INPUT_PORTS_END
 
 
-static const INT16 mwcbaseb_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 mwcbaseb_speaker_levels[] = { 0, 16384, -16384, 0, -16384, 0, -32768, -16384 };
 
 static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
 
@@ -2366,7 +2366,7 @@ static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SPEAKER_LEVELS(4, mwcbaseb_speaker_levels)
+	MCFG_SPEAKER_LEVELS(8, mwcbaseb_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -2277,7 +2277,7 @@ MACHINE_CONFIG_END
 
   Revision A hardware:
   * TMS1000 (die labeled MP3226)
-  * DS75494 lamp driver, 4 big lamps, 1bit sound
+  * DS75494 Hex digit LED driver, 4 big lamps, 1bit sound
 
   Newer revisions (also Pocket Simon) have a smaller 16-pin MB4850 chip
   instead of the TMS1000. This one has been decapped too, but we couldn't
@@ -2525,9 +2525,16 @@ MACHINE_CONFIG_END
 
   Milton Bradley Big Trak
   * TMS1000NLL MP3301A or MP3301ANLL E (die labeled 1000E MP3301)
-  * x
+  * SN75494N Hex digit LED driver, 1 lamp, 3-level sound
+  * gearbox with magnetic clutch, 1 IR led+sensor, 2 motors(middle wheels)
+  * 24-button keypad, ext in/out ports
+  
+  Big Trak is a programmable toy car, up to 16 steps. Supported commands include
+  driving and turning, firing a photon cannon(hey, have some imagination!),
+  and I/O ports. The output port was used for powering the dump truck accessory.
 
-  x
+  The In command was canceled midst production, it is basically a nop. Newer
+  releases and the European version removed the button completely.
 
 ***************************************************************************/
 
@@ -2541,37 +2548,149 @@ public:
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
+
+	int m_gearbox_pos;
+	bool sensor_state() { return m_gearbox_pos < 0 && m_display_decay[0][0] != 0; }
+	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
+
+protected:
+	virtual void machine_start();
 };
 
 // handlers
 
+TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
+{
+	// the last gear in the gearbox has 12 evenly spaced holes, it is located
+	// between an IR emitter and receiver
+	static const int speed = 20;
+	if (m_gearbox_pos >= speed)
+		m_gearbox_pos = -speed;
+
+	if (m_o & 0x1e)
+		m_gearbox_pos++;
+}
+
 WRITE16_MEMBER(bigtrak_state::write_r)
 {
+	// R0-R5,R8: input mux (keypad, ext in enable)
+	m_inp_mux = (data & 0x3f) | (data >> 2 & 0x40);
+	
+	// R6: N/C
+	// R7: IR led on
+	// R9: lamp on
+	display_matrix(2, 1, (data >> 7 & 1) | (data >> 8 & 2), 1);
+
+	// (O0,O7,)R10(tied together): speaker out
+	m_speaker->level_w((m_o & 1) | (m_o >> 6 & 2) | (data >> 8 & 4));
+	m_r = data;
 }
 
 WRITE16_MEMBER(bigtrak_state::write_o)
 {
+	// O1: left motor forward
+	// O2: left motor reverse
+	// O3: right motor reverse
+	// O4: right motor reverse
+	// O5: ext out
+	// O6: N/C
+	output_set_value("left_motor_forward", data >> 1 & 1);
+	output_set_value("left_motor_reverse", data >> 2 & 1);
+	output_set_value("right_motor_forward", data >> 3 & 1);
+	output_set_value("right_motor_reverse", data >> 4 & 1);
+	output_set_value("ext_out", data >> 5 & 1);
+
+	// O0,O7(,R10)(tied together): speaker out
+	m_speaker->level_w((data & 1) | (data >> 6 & 2) | (m_r >> 8 & 4));
+	m_o = data;
 }
 
 READ8_MEMBER(bigtrak_state::read_k)
 {
-	return 0;
+	// K: multiplexed inputs
+	// K8: IR sensor
+	return read_inputs(7) | (sensor_state() ? 8 : 0);
 }
 
 
 // config
 
+/* physical button layout and labels is like this:
+
+        USA version:                          UK version:
+
+           [^]           [CLR]                   [^]           [CM]
+    [<]    [HOLD] [>]    [FIRE]           [<]    [P]    [>]    [\|/]
+           [v]           [CLS]                   [v]           [CE]
+    [7]    [8]    [9]    [RPT]            [7]    [8]    [9]    [x2]
+    [4]    [5]    [6]    [TEST]           [4]    [5]    [6]    [TEST]
+    [1]    [2]    [3]    [CK]             [1]    [2]    [3]    [checkmark]
+    [IN]   [0]    [OUT]  [GO]                    [0]    [OUT]  [GO]
+*/
+
 static INPUT_PORTS_START( bigtrak )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("Hold")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Forward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Fire")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear Memory")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Backward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear Last Step")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Test")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Check")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("In")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Out")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
+
+	PORT_START("IN.6") // R8
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_F1) PORT_NAME("Input Port")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+
+void bigtrak_state::machine_start()
+{
+	hh_tms1k_state::machine_start();
+
+	// zerofill/register for savestates
+	m_gearbox_pos = 0;
+	save_item(NAME(m_gearbox_pos));
+}
+
+static const INT16 bigtrak_speaker_levels[] = { 0, 32767/3, 32767/3, 32767/3*2, 32767/3, 32767/3*2, 32767/3*2, 32767 };
 
 static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // x
+	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // RC osc. R=47K?, C=100pf -> ~200kHz
 	MCFG_TMS1XXX_READ_K_CB(READ8(bigtrak_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bigtrak_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bigtrak_state, write_o))
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("gearbox", bigtrak_state, gearbox_sim_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
@@ -2580,6 +2699,7 @@ static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SPEAKER_LEVELS(8, bigtrak_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2647,6 +2767,19 @@ READ8_MEMBER(cnsector_state::read_k)
 
 // config
 
+/* physical button layout and labels is like this:
+
+             COMBAT INFORMATION CENTER
+    [NEXT SHIP]       [RECALL]    [MOVE SHIP]
+    
+    [LEFT]   [RIGHT]      o       [SLOWER] [FASTER]
+        STEERING     EVASIVE SUB        SPEED            o (on/off switch)
+              NAVIGATIONAL PROGRAMMING                   |
+    
+    [RANGE]  [AIM]    [FIRE]        o      [TEACH MODE]
+      SONAR CONTROL            SUB FINDER
+*/
+
 static INPUT_PORTS_START( cnsector )
 	PORT_START("IN.0") // O0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Next Ship")
@@ -2703,7 +2836,7 @@ MACHINE_CONFIG_END
 
   Parker Bros Merlin handheld game, by Bob Doyle
   * TMS1100NLL MP3404A-N2
-  * 11 LEDs behind buttons, 2bit sound
+  * 11 LEDs behind buttons, 3-level sound
 
   Also published in Japan by Tomy as "Dr. Smith", white case instead of red.
   The one with dark-blue case is the rare sequel Master Merlin, see below.
@@ -2750,9 +2883,8 @@ WRITE16_MEMBER(merlin_state::write_r)
 
 WRITE16_MEMBER(merlin_state::write_o)
 {
-	// O4-O6: speaker out (paralleled for increased current driving capability)
-	static const int count[8] = { 0, 1, 1, 2, 1, 2, 2, 3 };
-	m_speaker->level_w(count[data >> 4 & 7]);
+	// O4-O6(tied together): speaker out
+	m_speaker->level_w(data >> 4 & 7);
 
 	// O0-O3: input mux
 	// O7: N/C
@@ -2795,7 +2927,7 @@ static INPUT_PORTS_START( merlin )
 INPUT_PORTS_END
 
 
-static const INT16 merlin_speaker_levels[] = { 0, 10922, 21845, 32767 };
+static const INT16 merlin_speaker_levels[] = { 0, 32767/3, 32767/3, 32767/3*2, 32767/3, 32767/3*2, 32767/3*2, 32767 };
 
 static MACHINE_CONFIG_START( merlin, merlin_state )
 
@@ -2813,7 +2945,7 @@ static MACHINE_CONFIG_START( merlin, merlin_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SPEAKER_LEVELS(4, merlin_speaker_levels)
+	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2825,7 +2957,6 @@ MACHINE_CONFIG_END
 
   Parker Brothers Master Merlin
   * TMS1400 MP7351-N2LL (die labeled 1400CR MP7351)
-  * 11 LEDs behind buttons, 2bit sound
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
   outside of the MCU is exactly the same as Merlin.
@@ -2879,7 +3010,7 @@ static MACHINE_CONFIG_START( mmerlin, mmerlin_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SPEAKER_LEVELS(4, merlin_speaker_levels)
+	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
