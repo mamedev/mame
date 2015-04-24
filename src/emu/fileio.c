@@ -789,8 +789,7 @@ file_error emu_file::load_zipped_file()
 bool emu_file::zip_filename_match(const zip_file_header &header, const std::string &filename)
 {
 	const char *zipfile = header.filename + header.filename_length - filename.length();
-	//FIXME: check if it should be case insensitive
-	return (zipfile >= header.filename && filename.compare(zipfile) == 0 && (zipfile == header.filename || zipfile[-1] == '/'));
+	return (zipfile >= header.filename && core_stricmp(filename.c_str(),zipfile) == 0 && (zipfile == header.filename || zipfile[-1] == '/'));
 }
 
 
