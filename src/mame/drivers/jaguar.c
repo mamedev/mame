@@ -2142,7 +2142,7 @@ ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Oct 17, 1
 	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
 ROM_END
 
-ROM_START( area51a ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
+ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Nov 15, 1995 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003c.3h", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "136105-0002c.3p", 0x00001, 0x80000, CRC(e9c9f4bd) SHA1(7c6c50372d45dca8929767241b092339f3bab4d2) )
