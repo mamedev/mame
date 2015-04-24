@@ -37,18 +37,18 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	int m_sf_active;
+	int m_active;
 	UINT16 m_bgscroll;
 	UINT16 m_fgscroll;
 
-	DECLARE_WRITE8_MEMBER(sf_coin_w);
+	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(soundcmd_w);
 	DECLARE_WRITE16_MEMBER(protection_w);
 	DECLARE_WRITE8_MEMBER(sound2_bank_w);
-	DECLARE_WRITE16_MEMBER(sf_videoram_w);
-	DECLARE_WRITE16_MEMBER(sf_bg_scroll_w);
-	DECLARE_WRITE16_MEMBER(sf_fg_scroll_w);
-	DECLARE_WRITE16_MEMBER(sf_gfxctrl_w);
+	DECLARE_WRITE16_MEMBER(videoram_w);
+	DECLARE_WRITE16_MEMBER(bg_scroll_w);
+	DECLARE_WRITE16_MEMBER(fg_scroll_w);
+	DECLARE_WRITE16_MEMBER(gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(msm1_5205_w);
 	DECLARE_WRITE8_MEMBER(msm2_5205_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -57,8 +57,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_sf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline int sf_invert( int nb );
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline int invert( int nb );
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	void write_dword( address_space &space, offs_t offset, UINT32 data );
 };
