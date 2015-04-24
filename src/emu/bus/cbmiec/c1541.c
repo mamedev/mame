@@ -353,6 +353,8 @@ ROM_START( fsd2 )
 	ROMX_LOAD( "fsd2b.u3", 0x0000, 0x4000, CRC(b39e4600) SHA1(991132fcc6e70e9a428062ae76055a150f2f7ac6), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v5.0" )
 	ROMX_LOAD( "jiffydos v5.0.u3", 0x0000, 0x4000, CRC(46c3302c) SHA1(e3623658cb7af30c9d3bce2ba3b6ad5ee89ac1b8), ROM_BIOS(3) )
+    ROM_SYSTEM_BIOS( 3, "rexdos", "REX-DOS" )
+    ROMX_LOAD( "rdos.bin", 0x0000, 0x4000, CRC(8ad6dba1) SHA1(f279d327d5e16ea1b62fb18514fb679d0b442941), ROM_BIOS(4) )
 ROM_END
 
 
