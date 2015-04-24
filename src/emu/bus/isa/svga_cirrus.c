@@ -18,8 +18,8 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_SVGA_CIRRUS = &device_creator<isa8_svga_cirrus_device>;
-const device_type ISA8_SVGA_CIRRUS_GD542X = &device_creator<isa8_svga_cirrus_gd542x_device>;
+const device_type ISA16_SVGA_CIRRUS = &device_creator<isa16_svga_cirrus_device>;
+const device_type ISA16_SVGA_CIRRUS_GD542X = &device_creator<isa16_svga_cirrus_gd542x_device>;
 
 static MACHINE_CONFIG_FRAGMENT( vga_cirrus )
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -36,7 +36,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_svga_cirrus_device::device_mconfig_additions() const
+machine_config_constructor isa16_svga_cirrus_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( vga_cirrus );
 }
@@ -45,7 +45,7 @@ machine_config_constructor isa8_svga_cirrus_device::device_mconfig_additions() c
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_svga_cirrus_device::device_rom_region() const
+const rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 {
 	return ROM_NAME( dm_clgd5430 );
 }
@@ -55,21 +55,21 @@ const rom_entry *isa8_svga_cirrus_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  isa8_vga_device - constructor
+//  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa8_svga_cirrus_device::isa8_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA8_SVGA_CIRRUS, "Diamond Speedstar Pro SE ISA Graphics Card (BIOS v1.00)", tag, owner, clock, "dm_clgd5430", __FILE__),
-		device_isa8_card_interface(mconfig, *this)
+isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, ISA16_SVGA_CIRRUS, "Diamond Speedstar Pro SE ISA Graphics Card (BIOS v1.00)", tag, owner, clock, "dm_clgd5430", __FILE__),
+		device_isa16_card_interface(mconfig, *this)
 {
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa8_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_cirrus_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
-void isa8_svga_cirrus_device::device_start()
+void isa16_svga_cirrus_device::device_start()
 {
 	set_isa_device();
 
@@ -88,7 +88,7 @@ void isa8_svga_cirrus_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_svga_cirrus_device::device_reset()
+void isa16_svga_cirrus_device::device_reset()
 {
 }
 
@@ -122,7 +122,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor isa8_svga_cirrus_gd542x_device::device_mconfig_additions() const
+machine_config_constructor isa16_svga_cirrus_gd542x_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( vga_cirrus_gd542x );
 }
@@ -131,7 +131,7 @@ machine_config_constructor isa8_svga_cirrus_gd542x_device::device_mconfig_additi
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_svga_cirrus_gd542x_device::device_rom_region() const
+const rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 {
 	return ROM_NAME( clgd542x );
 }
@@ -141,21 +141,21 @@ const rom_entry *isa8_svga_cirrus_gd542x_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  isa8_vga_device - constructor
+//  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa8_svga_cirrus_gd542x_device::isa8_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA8_SVGA_CIRRUS_GD542X, "Generic Cirrus Logic GD542x Graphics Card (BIOS v1.20)", tag, owner, clock, "clgd542x", __FILE__),
-		device_isa8_card_interface(mconfig, *this)
+isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, ISA16_SVGA_CIRRUS_GD542X, "Generic Cirrus Logic GD542x Graphics Card (BIOS v1.20)", tag, owner, clock, "clgd542x", __FILE__),
+		device_isa16_card_interface(mconfig, *this)
 {
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa8_svga_cirrus_gd542x_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER(isa16_svga_cirrus_gd542x_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
-void isa8_svga_cirrus_gd542x_device::device_start()
+void isa16_svga_cirrus_gd542x_device::device_start()
 {
 	set_isa_device();
 
@@ -174,6 +174,6 @@ void isa8_svga_cirrus_gd542x_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void isa8_svga_cirrus_gd542x_device::device_reset()
+void isa16_svga_cirrus_gd542x_device::device_reset()
 {
 }
