@@ -88,6 +88,7 @@
 #include "amaztron.lh"
 #include "astro.lh"
 #include "bankshot.lh"
+#include "bigtrak.lh"
 #include "cnsector.lh"
 #include "comp4.lh"
 #include "ebball.lh"
@@ -730,7 +731,7 @@ INPUT_CHANGED_MEMBER(h2hbaseb_state::skill_switch)
 
 void h2hbaseb_state::set_clock()
 {
-	// MCU clock is from an RC circuit with C=47pf, and R is depending on
+	// MCU clock is from an RC circuit with C=47pf, and R value is depending on
 	// skill switch: R=51K(1) or 43K(2)
 	m_maincpu->set_unscaled_clock((m_inp_matrix[5]->read() & 1) ? 400000 : 350000);
 }
@@ -2805,7 +2806,7 @@ static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gearbox", bigtrak_state, gearbox_sim_tick, attotime::from_msec(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_bigtrak)
 
 	/* no video! */
 
