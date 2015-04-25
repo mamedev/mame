@@ -2680,7 +2680,7 @@ CONS( 1995,  jaguarcd, jaguar,   0,      jaguarcd, jaguar,   jaguar_state, jagua
 GAME( 1996, area51,    0,        cojagr3k,  area51, jaguar_state,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
 GAME( 1995, area51ta,  area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 15, 1995)", 0 )
-GAME( 1995, area51a,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (rev A, Atari Games license)", 0 )
+GAME( 1995, area51a,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
 GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, jaguar_state, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
 GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
 GAME( 1996, freezeatjp,freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
