@@ -677,7 +677,7 @@ static void m68k_presave(m68000_base_device *m68k)
 static void m68k_postload(m68000_base_device *m68k)
 {
 	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
-	fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
+	//fprintf(stderr, "Reloaded, pc=%x\n", REG_PC(m68k));
 	m68k->stopped = (m68k->save_stopped ? STOP_LEVEL_STOP : 0) | (m68k->save_halted  ? STOP_LEVEL_HALT : 0);
 	m68ki_jump(m68k, REG_PC(m68k));
 }
