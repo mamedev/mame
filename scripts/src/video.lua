@@ -493,6 +493,8 @@ if (VIDEOS["PC_VGA"]~=null) then
 		MAME_DIR .. "src/emu/video/pc_vga.h",
 		MAME_DIR .. "src/emu/bus/isa/trident.c",
 		MAME_DIR .. "src/emu/bus/isa/trident.h",
+		MAME_DIR .. "src/emu/video/clgd542x.c",
+		MAME_DIR .. "src/emu/video/blgd542x.h",
 	}
 end
 

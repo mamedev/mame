@@ -5,7 +5,7 @@
 
 #include "emu.h"
 #include "isa.h"
-#include "video/pc_vga.h"
+#include "video/clgd542x.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

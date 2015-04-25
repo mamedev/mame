@@ -88,7 +88,7 @@ Smitdogg
 #include "machine/pcshare.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
-#include "video/pc_vga.h"
+#include "video/clgd542x.h"
 #include "machine/nvram.h"
 
 class pcat_nit_state : public pcat_base_state

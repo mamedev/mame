@@ -11,7 +11,7 @@
 #include "includes/bebox.h"
 
 /* Components */
-#include "video/pc_vga.h"
+#include "video/clgd542x.h"
 #include "bus/lpci/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/3812intf.h"

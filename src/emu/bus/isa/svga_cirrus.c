@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "svga_cirrus.h"
-#include "video/pc_vga.h"
 
 ROM_START( dm_clgd5430 )
 	ROM_REGION(0x8000,"dm_clgd5430", 0)
