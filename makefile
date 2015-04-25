@@ -973,4 +973,32 @@ $(GENDIR)/%.lh: $(SRC)/%.lay $(SRC)/build/file2str.py
 
 include $(SRC)/regtests/regtests.mak
 
+.PHONY: tests
+
 tests: $(REGTESTS)
+
+#-------------------------------------------------
+# Source cleanup
+#-------------------------------------------------
+
+.PHONY: cleansrc
+
+cleansrc:
+	@echo Cleaning up tabs/spaces/end of lines....
+ifeq ($(OS),windows)
+	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.inc) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
+else
+	$(shell find src/ -name *.c -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.h -exec ./srcclean {}  >&2 ;)
+	$(shell find src/ -name *.mak -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.lst -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.lay -exec ./srcclean {} >&2 ;)
+	$(shell find src/ -name *.inc -exec ./srcclean {} >&2 ;)
+	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
+endif
