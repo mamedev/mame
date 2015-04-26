@@ -711,9 +711,6 @@ void netlist_setup_t::start_devices()
 		}
 	}
 
-
-	NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
-
 	netlist().start();
 }
 

@@ -370,7 +370,8 @@ void netlist_mame_device_t::device_clock_changed()
 	//printf("device_clock_changed\n");
 	m_div = netlist_time::from_hz(clock()).as_raw();
 	//m_rem = 0;
-	NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clockfreq, m_div));
+	//NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clock(), m_div));
+	NL_VERBOSE_OUT(("Setting clock %d and divisor %d\n", clock(), m_div));
 	//printf("Setting clock %d and divisor %d\n", clock(), m_div);
 }
 

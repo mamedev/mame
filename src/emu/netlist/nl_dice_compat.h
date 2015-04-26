@@ -95,7 +95,6 @@ public:
 
 #define CHIP_555_Astable(_name,  _pdesc)   \
 	CHIP(# _name, NE555) \
-	NET_C(_name.6, _name.2) \
 	RES(_name ## _R1, (_pdesc)->r1) \
 	RES(_name ## _R2, (_pdesc)->r2) \
 	CAP(_name ## _C, (_pdesc)->c) \
@@ -103,6 +102,7 @@ public:
 	NET_C(_name.7, _name ## _R2.1) \
 	NET_C(_name.6, _name ## _R2.2) \
 	NET_C(_name.6, _name ## _C.1) \
+	NET_C(_name.2, _name ## _C.1) \
 	NET_C(_name ## _R1.2, V5) \
 	NET_CSTR(# _name "_C.2", "GND") \
 	NET_C(_name.8, V5) \

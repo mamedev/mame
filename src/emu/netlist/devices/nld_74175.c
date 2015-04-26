@@ -5,7 +5,8 @@
 
 #include "nld_74175.h"
 
-static const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
+static const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(25) };
+static const netlist_time delay_clear[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 
 NETLIB_UPDATE(74175)
 {
@@ -13,8 +14,8 @@ NETLIB_UPDATE(74175)
 	{
 		for (int i=0; i<4; i++)
 		{
-			OUTLOGIC(m_Q[i], 0, delay[0]);
-			OUTLOGIC(m_QQ[i], 1, delay[1]);
+			OUTLOGIC(m_Q[i], 0, delay_clear[0]);
+			OUTLOGIC(m_QQ[i], 1, delay_clear[1]);
 		}
 	}
 	else if (!m_last && INPLOGIC(m_CLK))
@@ -23,7 +24,7 @@ NETLIB_UPDATE(74175)
 		{
 			UINT8 d = INPLOGIC(m_D[i]);
 			OUTLOGIC(m_Q[i], d, delay[d]);
-			OUTLOGIC(m_QQ[i], !d, delay[!d]);
+			OUTLOGIC(m_QQ[i], d ^ 1, delay[d ^ 1]);
 		}
 	}
 	m_last = INPLOGIC(m_CLK);

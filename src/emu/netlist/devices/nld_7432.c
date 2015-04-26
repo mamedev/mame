@@ -12,13 +12,13 @@ NETLIB_START(7432_dip)
 	register_sub(m_3, "3");
 	register_sub(m_4, "4");
 
-	register_subalias("1", m_1.m_Q[0]);
-	register_subalias("2", m_1.m_i[0]);
-	register_subalias("3", m_1.m_i[1]);
+	register_subalias("3", m_1.m_Q[0]);
+	register_subalias("1", m_1.m_i[0]);
+	register_subalias("2", m_1.m_i[1]);
 
-	register_subalias("4", m_2.m_Q[0]);
-	register_subalias("5", m_2.m_i[0]);
-	register_subalias("6", m_2.m_i[1]);
+	register_subalias("6", m_2.m_Q[0]);
+	register_subalias("4", m_2.m_i[0]);
+	register_subalias("5", m_2.m_i[1]);
 
 	register_subalias("9", m_3.m_i[0]);
 	register_subalias("10", m_3.m_i[1]);
