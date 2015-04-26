@@ -52918,6 +52918,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="thundwar" supported="partial">
+		<description>Thunder Warrior (Tw)</description>
+		<year>19??</year>
+		<publisher>Micro Genius</publisher>
+		<info name="serial" value="MGC-017"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_tw" />
+			<feature name="pcb" value="TXC-TW" />
+			<dataarea name="chr" size="131072">
+				<rom name="thunder warrior (asia) (unl).chr" size="131072" crc="27a9e10c" sha1="24019230ac8961cff1717e3a7fafca299d190a79" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="thunder warrior (asia) (unl).prg" size="131072" crc="3d7b823f" sha1="94003e3c42ae7f582f91c72a58689171872391c9" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3suprgun">
 		<description>3 in 1 Supergun (Tw)</description>
 		<year>1993</year>
