@@ -98,6 +98,7 @@
 #include "gpoker.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
+#include "mmerlin.lh" // clickable
 #include "simon.lh" // clickable
 #include "ssimon.lh" // clickable
 #include "splitsec.lh"
@@ -3117,7 +3118,7 @@ static MACHINE_CONFIG_START( mmerlin, mmerlin_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(mmerlin_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_mmerlin)
 
 	/* no video! */
 
