@@ -72,8 +72,8 @@
   TODO:
   - verify output PLA and microinstructions PLA for MCUs that have been dumped
     electronically (mpla is usually the default, opla is often custom)
-  - unknown MCU clocks for some: TMS1000 and TMS1100 RC curve is documented in
-    the data manual, but for TMS1400 it's unknown. TMS0970/0980 osc. is on-die.
+  - unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
+    but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
   - some of the games rely on the fact that faster/longer strobed leds appear
     brighter: tc4(offensive players), bankshot(cue ball), ...
   - add softwarelist for tc4 cartridges?
@@ -95,6 +95,7 @@
 #include "ebball2.lh"
 #include "ebball3.lh"
 #include "elecdet.lh"
+#include "gjackpot.lh"
 #include "gpoker.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
@@ -769,7 +770,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Coleco Head to Head Football
-  * TMS1100NLLE MP3460 (die labeled MP3460)
+  * TMS1100NLLE (rev. E!) MP3460 (die labeled MP3460)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1bit sound
 
   x
@@ -865,7 +866,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( h2hfootb, h2hfootb_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // RC osc. R=30K?, C=100pf -> ~325kHz
+	MCFG_CPU_ADD("maincpu", TMS1100, 325000) // approximation - RC osc. R=39K, C=100pf, but unknown RC curve
 	MCFG_TMS1XXX_READ_K_CB(READ8(h2hfootb_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(h2hfootb_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hfootb_state, write_o))
@@ -1311,7 +1312,7 @@ MACHINE_CONFIG_END
 
   Entex Electronic Baseball 3
   * PCBs are labeled: ZENY
-  * TMS1100NLL 6007 MP1204 (die labeled MP1204)
+  * TMS1100NLL 6007 MP1204 (rev. E!) (die labeled MP1204)
   * 2*SN75492N LED display driver
   * 4 7seg LEDs, and other LEDs behind bezel, 1bit sound
 
@@ -1838,14 +1839,12 @@ static INPUT_PORTS_START( gpoker )
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // R3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
@@ -1855,14 +1854,11 @@ static INPUT_PORTS_START( gpoker )
 
 	PORT_START("IN.4") // R4
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear All") // AC
 
 	PORT_START("IN.6") // R6
@@ -1942,13 +1938,13 @@ static INPUT_PORTS_START( gjackpot )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("10/0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Deal") // DL
 
 	PORT_START("IN.1") // R1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Total") // T
 
 	PORT_START("IN.2") // R2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
@@ -1971,32 +1967,32 @@ static INPUT_PORTS_START( gjackpot )
 	PORT_START("IN.5") // R5
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Clear Entry") // CE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // R10
-	PORT_CONFNAME( 0x06, 0x02, "Game Select" )
-	PORT_CONFSETTING(    0x02, "Black Jack" )
+	PORT_CONFNAME( 0x06, 0x04, "Game Select" )
 	PORT_CONFSETTING(    0x04, "Gin Rummy" )
+	PORT_CONFSETTING(    0x02, "Black Jack" )
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( gjackpot, gjackpot_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1670, 350000) // approximation - RC osc. R=47K, C=47pf, but unknown RC curve
+	MCFG_CPU_ADD("maincpu", TMS1670, 450000) // approximation - RC osc. R=47K, C=47pf, but unknown RC curve
 	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gjackpot_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_gjackpot)
 
 	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2405) // same as gpoker
+	MCFG_SOUND_ADD("beeper", BEEP, 2405) // see gpoker
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2741,7 +2737,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   Milton Bradley Big Trak
-  * TMS1000NLL MP3301A or MP3301ANLL E (die labeled 1000E MP3301)
+  * TMS1000NLL MP3301A or MP3301ANLL E (rev. E!) (die labeled 1000E MP3301)
   * SN75494N Hex digit LED driver, 1 lamp, 3-level sound
   * gearbox with magnetic clutch, 1 IR led+sensor, 2 motors(middle wheels)
   * 24-button keypad, ext in/out ports
@@ -2780,7 +2776,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
 {
 	// the last gear in the gearbox has 12 evenly spaced holes, it is located
 	// between an IR emitter and receiver
-	static const int speed = 20;
+	static const int speed = 17;
 	if (m_gearbox_pos >= speed)
 		m_gearbox_pos = -speed;
 
@@ -2902,7 +2898,7 @@ static const INT16 bigtrak_speaker_levels[] = { 0, 32767/3, 32767/3, 32767/3*2, 
 static MACHINE_CONFIG_START( bigtrak, bigtrak_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // RC osc. R=47K?, C=100pf -> ~200kHz
+	MCFG_CPU_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=83K, C=100pf, but unknown RC curve
 	MCFG_TMS1XXX_READ_K_CB(READ8(bigtrak_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bigtrak_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bigtrak_state, write_o))
