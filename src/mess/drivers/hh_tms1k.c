@@ -75,7 +75,7 @@
   - unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
   - some of the games rely on the fact that faster/longer strobed leds appear
-    brighter: tc4(offensive players), bankshot(cue ball), ...
+    brighter: tc4/h2hfootb(offense), bankshot(cue ball), ...
   - add softwarelist for tc4 cartridges?
   - stopthiep: unable to start a game (may be intentional?)
 
@@ -97,6 +97,7 @@
 #include "elecdet.lh"
 #include "gjackpot.lh"
 #include "gpoker.lh"
+#include "h2hfootb.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
@@ -773,7 +774,8 @@ MACHINE_CONFIG_END
   * TMS1100NLLE (rev. E!) MP3460 (die labeled MP3460)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1bit sound
 
-  x
+  To distinguish between offense and defense, offense blips (should)
+  appear brighter.
 
 ***************************************************************************/
 
@@ -842,9 +844,8 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_CONFSETTING(    0x02, "2" )
 
 	PORT_START("IN.1") // K2
-	PORT_CONFNAME( 0x03, 0x02, "Play Selector" )
-	PORT_CONFSETTING(    0x01, "Pass" )
-	PORT_CONFSETTING(    0x02, "Run-Kick" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_TOGGLE PORT_NAME("P1 Play Selector") // pass
+	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
 
 	PORT_START("IN.2") // K4
 	PORT_CONFNAME( 0x03, 0x01, "Skill Level" )
@@ -872,7 +873,7 @@ static MACHINE_CONFIG_START( h2hfootb, h2hfootb_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hfootb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_h2hfootb)
 
 	/* no video! */
 
@@ -2693,7 +2694,6 @@ static INPUT_PORTS_START( ssimon )
 
 	PORT_START("IN.5") // R10
 	PORT_BIT( 0x02, 0x02, IPT_SPECIAL ) PORT_CONDITION("IN.4", 0x0f, EQUALS, 0x00)
-	PORT_BIT( 0x02, 0x00, IPT_SPECIAL ) PORT_CONDITION("IN.4", 0x0f, NOTEQUALS, 0x00)
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.6") // fake
@@ -4085,7 +4085,7 @@ COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF
 
 CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
 CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", GAME_SUPPORTS_SAVE )

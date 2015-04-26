@@ -299,6 +299,8 @@ void ufombs_state::prepare_display()
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
 	UINT16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
 	display_matrix(10, 9, plate, grid);
+	
+	printf("%X ",m_inp_matrix[0]->read());
 }
 
 WRITE8_MEMBER(ufombs_state::grid_w)
@@ -331,7 +333,6 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x04, 0x04, IPT_SPECIAL ) PORT_CONDITION("IN.0", 0x0a, EQUALS, 0x00) // pad in the middle, pressed when joystick is centered
-	PORT_BIT( 0x04, 0x00, IPT_SPECIAL ) PORT_CONDITION("IN.0", 0x0a, NOTEQUALS, 0x00)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
 	PORT_START("IN.1") // port B
