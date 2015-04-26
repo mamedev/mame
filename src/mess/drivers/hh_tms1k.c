@@ -62,7 +62,7 @@
 
   inconsistent:
 
- *MPF553   TMS1670  1980, Gakken/Entex Jackpot Gin Rummy Black Jack (have dump)
+ @MPF553   TMS1670  1980, Gakken Jackpot: Gin Rummy & Black Jack
  *M95041   ?        1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
  @CD7282SL TMS1100  1981, Tandy/RadioShack Tandy-12 (serial is similar to TI Speak & Spell series?)
 
@@ -1774,9 +1774,9 @@ public:
 	required_device<beep_device> m_beeper;
 
 	void prepare_display();
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
 
 protected:
 	virtual void machine_reset();
@@ -1895,6 +1895,108 @@ static MACHINE_CONFIG_START( gpoker, gpoker_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 2405) // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Jackpot: Gin Rummy & Black Jack
+  * PCB label gakken
+  * TMS1670 MPF553 (die labeled MPF553)
+  * 11-digit cyan VFD display Itron FG1114B, oscillator sound
+
+  known releases:
+  - Japan: Jackpot(?)
+  - USA: Electronic Jackpot: Gin Rummy & Black Jack, published by Entex
+
+***************************************************************************/
+
+class gjackpot_state : public gpoker_state
+{
+public:
+	gjackpot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gpoker_state(mconfig, type, tag)
+	{ }
+
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+};
+
+// handlers
+
+WRITE16_MEMBER(gjackpot_state::write_r)
+{
+	// same as gpoker, only input mux msb is R10 instead of R6
+	gpoker_state::write_r(space, offset, data);
+	m_inp_mux = (data & 0x3f) | (data >> 4 & 0x40);
+}
+
+
+// config
+
+static INPUT_PORTS_START( gjackpot )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("10/0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // R10
+	PORT_CONFNAME( 0x06, 0x02, "Game Select" )
+	PORT_CONFSETTING(    0x02, "Black Jack" )
+	PORT_CONFSETTING(    0x04, "Gin Rummy" )
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( gjackpot, gjackpot_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1670, 350000) // approximation - RC osc. R=47K, C=47pf, but unknown RC curve
+	MCFG_TMS1XXX_READ_K_CB(READ8(gpoker_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(gjackpot_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(gpoker_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beeper", BEEP, 2405) // same as gpoker
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2976,9 +3078,9 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_READ8_MEMBER(read_k);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_READ8_MEMBER(read_k);
 };
 
 // handlers
@@ -3072,6 +3174,7 @@ MACHINE_CONFIG_END
 
   Parker Brothers Master Merlin
   * TMS1400 MP7351-N2LL (die labeled 1400CR MP7351)
+  * 11 LEDs behind buttons, 3-level sound
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
   outside of the MCU is exactly the same as Merlin.
@@ -3762,6 +3865,17 @@ ROM_START( gpoker )
 ROM_END
 
 
+ROM_START( gjackpot )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mpf553", 0x0000, 0x1000, CRC(f45fd008) SHA1(8d5d6407a8a031a833ceedfb931f5c9d2725ecd0) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1400_gjackpot_mpla.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_gjackpot_opla.pla", 0, 557, CRC(50e471a7) SHA1(9d862cb9f51a563882b62662c5bfe61b52e3df00) )
+ROM_END
+
+
 ROM_START( elecdet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp6100a", 0x0000, 0x1000, CRC(6f396bb8) SHA1(1f104d4ca9bee0d4572be4779b7551dfe20c4f04) )
@@ -3883,6 +3997,17 @@ ROM_START( merlin )
 ROM_END
 
 
+ROM_START( mmerlin )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mp7351", 0x0000, 0x1000, CRC(0f7a4c83) SHA1(242c1278ddfe92c28fd7cd87300e48e7a4827831) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
+	ROM_REGION( 557, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1400_mmerlin_opla.pla", 0, 557, CRC(fd3dcd93) SHA1(f2afc52df700daa0eb7356c7876af9b2966f971b) )
+ROM_END
+
+
 ROM_START( stopthie )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
@@ -3934,17 +4059,6 @@ ROM_START( splitsec )
 ROM_END
 
 
-ROM_START( mmerlin )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp7351", 0x0000, 0x1000, CRC(0f7a4c83) SHA1(242c1278ddfe92c28fd7cd87300e48e7a4827831) )
-
-	ROM_REGION( 867, "maincpu:mpla", 0 )
-	ROM_LOAD( "tms1100_default_mpla.pla", 0, 867, CRC(62445fc9) SHA1(d6297f2a4bc7a870b76cc498d19dbb0ce7d69fec) )
-	ROM_REGION( 557, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1400_mmerlin_opla.pla", 0, 557, CRC(fd3dcd93) SHA1(f2afc52df700daa0eb7356c7876af9b2966f971b) )
-ROM_END
-
-
 ROM_START( tandy12 )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "cd7282sl", 0x0000, 0x800, CRC(a10013dd) SHA1(42ebd3de3449f371b99937f9df39c240d15ac686) )
@@ -3972,6 +4086,7 @@ CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Ent
 CONS( 1980, raisedvl,  0,        0, raisedvl,  raisedvl,  driver_device, 0, "Entex", "Raise The Devil", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1979, gpoker,    0,        0, gpoker,    gpoker,    driver_device, 0, "Gakken", "Poker (Gakken, 1979 version)", GAME_SUPPORTS_SAVE )
+CONS( 1980, gjackpot,  0,        0, gjackpot,  gjackpot,  driver_device, 0, "Gakken", "Jackpot: Gin Rummy & Black Jack", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 CONS( 1979, elecdet,   0,        0, elecdet,   elecdet,   driver_device, 0, "Ideal", "Electronic Detective", GAME_SUPPORTS_SAVE ) // ***
 
