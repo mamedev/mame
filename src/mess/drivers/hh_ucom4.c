@@ -299,8 +299,6 @@ void ufombs_state::prepare_display()
 	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
 	UINT16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
 	display_matrix(10, 9, plate, grid);
-	
-	printf("%X ",m_inp_matrix[0]->read());
 }
 
 WRITE8_MEMBER(ufombs_state::grid_w)
