@@ -2142,7 +2142,7 @@ ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Oct 17, 1
 	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
 ROM_END
 
-ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Nov 15, 1995 */
+ROM_START( area51ta ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003c.3h", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) ) /* Usually found with "orange" labels */
 	ROM_LOAD32_BYTE( "136105-0002c.3p", 0x00001, 0x80000, CRC(e9c9f4bd) SHA1(7c6c50372d45dca8929767241b092339f3bab4d2) )
@@ -2153,10 +2153,10 @@ ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Nov 15, 1
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
 
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
+	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
 ROM_END
 
-ROM_START( area51aa ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1995 */
+ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1995 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
 	ROM_LOAD32_BYTE( "136105-0003a.3h", 0x00000, 0x80000, CRC(116d37e6) SHA1(5d36cae792dd349faa77cd2d8018722a28ee55c1) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "136105-0002a.3p", 0x00001, 0x80000, CRC(eb10f539) SHA1(dadc4be5a442dd4bd17385033056555e528ed994) )
@@ -2678,9 +2678,9 @@ CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar_state, jagua
 CONS( 1995,  jaguarcd, jaguar,   0,      jaguarcd, jaguar,   jaguar_state, jaguarcd, "Atari",   "Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 GAME( 1996, area51,    0,        cojagr3k,  area51, jaguar_state,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
-GAME( 1995, area51t,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license)", 0 )
-GAME( 1995, area51a,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (rev C, Atari Games license)", 0 )
-GAME( 1995, area51aa,  area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (rev A, Atari Games license)", 0 )
+GAME( 1995, area51t,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
+GAME( 1995, area51ta,  area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 15, 1995)", 0 )
+GAME( 1995, area51a,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
 GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, jaguar_state, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
 GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
 GAME( 1996, freezeatjp,freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )

@@ -3,6 +3,12 @@
 /*
 
   TMS0980/TMS1000-family MCU cores
+  
+  TODO:
+  - emulate TMS1600 L-pins
+  - fix debugger disasm view
+  - add pinout diagrams for reference
+
 
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a
 slightly bigger addressable area and uses 9bit instructions where the TMS1000
@@ -133,21 +139,27 @@ unknown cycle: CME, SSE, SSS
 // - 20-term output PLA(opla) at the top-left
 // - the ALU is between the opla and mpla
 const device_type TMS1000 = &device_creator<tms1000_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // almost same as tms1000, just supports higher voltage
+const device_type TMS1070 = &device_creator<tms1070_cpu_device>; // high voltage version
 const device_type TMS1200 = &device_creator<tms1200_cpu_device>; // 40-pin DIP, 13 R pins
 // TMS1270 has 10 O pins, how does that work?
 
 // TMS1100 is nearly the same as TMS1000, some different opcodes, and with double the RAM and ROM
 const device_type TMS1100 = &device_creator<tms1100_cpu_device>; // 28-pin DIP, 11 R pins
-const device_type TMS1170 = &device_creator<tms1170_cpu_device>; // almost same as tms1100, just supports higher voltage
+const device_type TMS1170 = &device_creator<tms1170_cpu_device>; // high voltage version
 const device_type TMS1300 = &device_creator<tms1300_cpu_device>; // 40-pin DIP, 16 R pins
-const device_type TMS1370 = &device_creator<tms1370_cpu_device>; // almost same as tms1300, just supports higher voltage
+const device_type TMS1370 = &device_creator<tms1370_cpu_device>; // high voltage version
 
 // TMS1400 follows the TMS1100, it doubles the ROM size again (4 chapters of 16 pages), and adds a 3-level callstack
 // - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
 // - the opla size is increased from 20 to 32 terms
 const device_type TMS1400 = &device_creator<tms1400_cpu_device>; // 28-pin DIP, 11 R pins (TMS1400CR is same, but with TMS1100 pinout)
-const device_type TMS1470 = &device_creator<tms1470_cpu_device>; // almost same as tms1400, just supports higher voltage
+const device_type TMS1470 = &device_creator<tms1470_cpu_device>; // high voltage version, 1 R pin removed for Vdd
+
+// TMS1600 adds more I/O to the TMS1400, input pins are doubled with added L1,2,4,8
+// - rotate the view and mirror the OR-mask to get the proper layout of the mpla, the default is identical to tms1100
+// - the opla size is increased from 20 to 32 terms
+const device_type TMS1600 = &device_creator<tms1600_cpu_device>; // 40-pin DIP, 16 R pins
+const device_type TMS1670 = &device_creator<tms1670_cpu_device>; // high voltage version
 
 // TMS0980
 // - 64x9bit RAM array at the bottom-left (set up as 144x4)
@@ -254,6 +266,19 @@ tms1400_cpu_device::tms1400_cpu_device(const machine_config &mconfig, device_typ
 
 tms1470_cpu_device::tms1470_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: tms1400_cpu_device(mconfig, TMS1470, "TMS1470", tag, owner, clock, 8, 10, 6, 8, 3, 12, ADDRESS_MAP_NAME(program_12bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1470", __FILE__)
+{ }
+
+
+tms1600_cpu_device::tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1400_cpu_device(mconfig, TMS1600, "TMS1600", tag, owner, clock, 8, 16, 6, 8, 3, 12, ADDRESS_MAP_NAME(program_12bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1600", __FILE__)
+{ }
+
+tms1600_cpu_device::tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+	: tms1400_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
+{ }
+
+tms1670_cpu_device::tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms1600_cpu_device(mconfig, TMS1670, "TMS1670", tag, owner, clock, 8, 16, 6, 8, 3, 12, ADDRESS_MAP_NAME(program_12bit_8), 7, ADDRESS_MAP_NAME(data_128x4), "tms1670", __FILE__)
 { }
 
 

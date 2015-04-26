@@ -124,6 +124,8 @@ void cirrus_gd5428_device::device_reset()
 	m_vclk_num[1] = 0x5b;
 	m_vclk_denom[1] = 0x2f;
 	memset(m_ext_palette, 0, sizeof(m_ext_palette));
+	m_ext_palette_enabled = false;
+//	m_ext_palette[15].red = m_ext_palette[15].green = m_ext_palette[15].blue = 0xff;  // default?  Win3.1 doesn't seem to touch the extended DAC, or at least, it enables it, then immediately disables it then sets a palette...
 }
 
 UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -146,7 +148,7 @@ UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &
 					for(bit=0;bit<8;bit++)
 					{
 						UINT8 pixel1 = vga.memory[ptr] >> (7-bit);
-						UINT8 pixel2 = vga.memory[ptr+256] >> (7-bit);
+						UINT8 pixel2 = vga.memory[ptr+512] >> (7-bit);
 						UINT8 output = ((pixel1 & 0x01) << 1) | (pixel2 & 0x01);
 						switch(output)
 						{
@@ -183,13 +185,13 @@ UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &
 						case 0:  // transparent - do nothing
 							break;
 						case 1:  // background
-							bitmap.pix32(y,x+bit) = (m_ext_palette[0].red << 16) | (m_ext_palette[0].green << 8) | (m_ext_palette[0].blue);
+							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[0].red << 18) | (m_ext_palette[0].green << 10) | (m_ext_palette[0].blue << 2);
 							break;
 						case 2:  // XOR
-							bitmap.pix32(y,x+bit) = ~bitmap.pix32(y,x+bit);
+							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = ~bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit);
 							break;
 						case 3:  // foreground
-							bitmap.pix32(y,x+bit) = (m_ext_palette[15].red << 16) | (m_ext_palette[15].green << 8) | (m_ext_palette[15].blue);
+							bitmap.pix32(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[15].red << 18) | (m_ext_palette[15].green << 10) | (m_ext_palette[15].blue << 2);
 							break;
 						}
 					}
@@ -349,6 +351,9 @@ UINT8 cirrus_gd5428_device::cirrus_seq_reg_read(UINT8 index)
 			res = vga.sequencer.data[index] & 0xe7;
 			res |= 0x18;  // 32-bit DRAM data bus width (1MB-2MB)
 			break;
+		case 0x12:
+			res = m_cursor_attr;
+			break;
 		case 0x14:
 			res = m_scratchpad2;
 			break;
@@ -437,6 +442,7 @@ void cirrus_gd5428_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 			// bit 2 - 64x64 cursor (32x32 if clear, GD5422+)
 			// bit 7 - overscan colour protect - if set, use colour 2 in the extra palette for the border (GD5424+)
 			m_cursor_attr = data;
+			m_ext_palette_enabled = data & 0x02;
 			break;
 		case 0x13:
 			m_cursor_addr = data;  // bits 0 and 1 are ignored if using 64x64 cursor
@@ -693,7 +699,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
 			res = cirrus_seq_reg_read(vga.sequencer.index);
 			break;
 		case 0x09:
-			if(!(m_cursor_attr & 0x02))
+			if(!m_ext_palette_enabled)
 				res = vga_device::port_03c0_r(space,offset,mem_mask);
 			else
 			{
@@ -739,7 +745,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 			cirrus_seq_reg_write(vga.sequencer.index,data);
 			break;
 		case 0x09:
-			if(!(m_cursor_attr & 0x02))
+			if(!m_ext_palette_enabled)
 				vga_device::port_03c0_w(space,offset,data,mem_mask);
 			else
 			{
@@ -757,8 +763,10 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 						break;
 					}
 					vga.dac.dirty=1;
-					if (vga.dac.state==3) {
-						vga.dac.state=0; vga.dac.write_index++;
+					if (vga.dac.state==3) 
+					{
+						vga.dac.state=0; 
+						vga.dac.write_index++;
 					}
 				}
 			}

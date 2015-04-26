@@ -638,22 +638,19 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_ram)
 READ8_MEMBER(gb_rom_m161_device::read_rom)
 {
 	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_base_bank | m_latch_bank] * 0x4000 + offset];
+		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + offset];
 	else
-		return m_rom[rom_bank_map[m_base_bank | m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + (offset & 0x3fff)];
 }
 
 WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 {
 	switch (offset & 0xe000)
 	{
-		case 0x2000:	// ROM Bank Register? Tetris writes 1 here when selected...
-			data &= 0x1f;
-			m_latch_bank2 = data ? data : 1;
-			break;
 		case 0x4000:	// Base Bank Register
 			m_base_bank = data << 1;
 			break;
+		case 0x2000:	// Tetris writes 1 here when selected...
 		default:
 			break;
 	}

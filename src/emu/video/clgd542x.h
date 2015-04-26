@@ -49,6 +49,7 @@ protected:
 	UINT16 m_cursor_y;
 	UINT16 m_cursor_addr;
 	UINT8 m_cursor_attr;
+	bool m_ext_palette_enabled;
 	struct { UINT8 red, green, blue; } m_ext_palette[16];  // extra palette, colour 0 is cursor background, colour 15 is cursor foreground, colour 2 is overscan border colour
 
 	// BitBLT engine
