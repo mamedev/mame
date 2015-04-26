@@ -47,6 +47,7 @@
  @61      HD38820A  1983, Coleco Ms. Pac-Man
  @69      HD38820A  1983, Gakken Dig Dug
  @70      HD38820A  1983, Parker Brothers Q*Bert
+ @85      HD38820A  1984, Bandai Machine Man
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
@@ -1024,6 +1025,95 @@ static MACHINE_CONFIG_START( zackman, zackman_state )
 	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(zackman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(zackman_state, plate_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(zackman_state, grid_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai Machine Man (FL Flat Type) (manufactured in Japan)
+  * PCB label Kaken PT-438
+  * Hitachi QFP HD38820A85 MCU
+  * cyan/red/green VFD display NEC FIP5CM33T no. 4 21
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class machiman_state : public hh_hmcs40_state
+{
+public:
+	machiman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+};
+
+// handlers
+
+void machiman_state::prepare_display()
+{
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
+	display_matrix(19, 5, plate, m_grid);
+}
+
+WRITE8_MEMBER(machiman_state::plate_w)
+{
+	// R0x-R3x,R6012: vfd matrix plate
+	int shift = (offset == HMCS40_PORT_R6X) ? 16 : offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(machiman_state::grid_w)
+{
+	// D13: speaker out
+	m_speaker->level_w(data >> 13 & 1);
+
+	// D0-D4: vfd matrix grid
+	m_grid = data & 0x1f;
+	prepare_display();
+}
+
+
+// config
+
+static INPUT_PORTS_START( machiman )
+	PORT_START("IN.0") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+
+	PORT_START("IN.1") // port D
+	PORT_BIT( 0x3fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( machiman, machiman_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(machiman_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
@@ -2846,6 +2936,13 @@ ROM_START( zackman )
 ROM_END
 
 
+ROM_START( machiman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a85", 0x0000, 0x1000, CRC(894b4954) SHA1(cab49638a326b031aa548301beb16f818759ef62) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( alnattck )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38800a25", 0x0000, 0x1000, CRC(18b50869) SHA1(11e9d5f7b4ae818b077b0ee14a3b43190e20bff3) )
@@ -2966,6 +3063,7 @@ CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Banda
 CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  driver_device, 0, "Bandai (Mattel license)", "Star Hawk (Mattel)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND )
