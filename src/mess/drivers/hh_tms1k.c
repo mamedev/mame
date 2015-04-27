@@ -21,6 +21,7 @@
  @MP1204   TMS1100   1980, Entex Baseball 3
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1221   TMS1100   1980, Entex Raise The Devil
+ *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
  @MP2105   TMS1370   1979, Gakken Poker
@@ -774,8 +775,8 @@ MACHINE_CONFIG_END
   * TMS1100NLLE (rev. E!) MP3460 (die labeled MP3460)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1bit sound
 
-  To distinguish between offense and defense, offense blips (should)
-  appear brighter.
+  LED electronic football game. To distinguish between offense and defense,
+  offense blips (should) appear brighter.
 
 ***************************************************************************/
 
