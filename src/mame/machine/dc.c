@@ -633,6 +633,15 @@ WRITE64_MEMBER(dc_state::dc_modem_w )
 	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
+#define SAVE_G2DMA(x) \
+	save_item(NAME(m_g2_dma[x].g2_addr)); \
+	save_item(NAME(m_g2_dma[x].root_addr)); \
+	save_item(NAME(m_g2_dma[x].size)); \
+	save_item(NAME(m_g2_dma[x].dir)); \
+	save_item(NAME(m_g2_dma[x].flag)); \
+	save_item(NAME(m_g2_dma[x].indirect)); \
+	save_item(NAME(m_g2_dma[x].start)); \
+	save_item(NAME(m_g2_dma[x].sel));
 
 void dc_state::machine_start()
 {
@@ -643,8 +652,11 @@ void dc_state::machine_start()
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
 	save_pointer(NAME(g2bus_regs), 0x100/4);
-	save_pointer(NAME(m_g2_dma), sizeof(m_g2_dma));
 	save_pointer(NAME(dc_sound_ram.target()),dc_sound_ram.bytes());
+	SAVE_G2DMA(0)
+	SAVE_G2DMA(1)
+	SAVE_G2DMA(2)
+	SAVE_G2DMA(3)
 }
 
 void dc_state::machine_reset()
