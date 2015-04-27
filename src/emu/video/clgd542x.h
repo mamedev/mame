@@ -62,8 +62,8 @@ protected:
 	UINT16 m_blt_dest_pitch;
 	UINT16 m_blt_height;
 	UINT16 m_blt_width;
-	UINT16 m_blt_source_current;
-	UINT16 m_blt_dest_current;
+	UINT32 m_blt_source_current;
+	UINT32 m_blt_dest_current;
 	
 	UINT8 m_scratchpad1;
 	UINT8 m_scratchpad2;

@@ -1162,7 +1162,6 @@ UINT8 vga_device::crtc_reg_read(UINT8 index)
 			res  = (vga.crtc.line_compare & 0x100) >> 4;
 			res |= (vga.crtc.vert_retrace_start & 0x200) >> 2;
 			res |= (vga.crtc.vert_disp_end & 0x200) >> 3;
-			res |= (vga.crtc.vert_retrace_start & 0x200) >> 6;
 			res |= (vga.crtc.vert_total & 0x200) >> 4;
 			res |= (vga.crtc.vert_blank_start & 0x100) >> 5;
 			res |= (vga.crtc.vert_retrace_start & 0x100) >> 6;
@@ -1174,7 +1173,7 @@ UINT8 vga_device::crtc_reg_read(UINT8 index)
 			res |= (vga.crtc.preset_row_scan & 0x1f);
 			break;
 		case 0x09: // Maximum Scan Line Register
-			res  = (vga.crtc.maximum_scan_line & 0x1f) - 1;
+			res  = (vga.crtc.maximum_scan_line - 1) & 0x1f;
 			res |= (vga.crtc.scan_doubling & 1) << 7;
 			res |= (vga.crtc.line_compare & 0x200) >> 3;
 			res |= (vga.crtc.vert_blank_start & 0x200) >> 4;
@@ -1202,6 +1201,8 @@ UINT8 vga_device::crtc_reg_read(UINT8 index)
 			res  = (vga.crtc.protect_enable & 1) << 7;
 			res |= (vga.crtc.bandwidth & 1) << 6;
 			res |= (vga.crtc.vert_retrace_end & 0xf);
+			res |= (vga.crtc.irq_clear & 1)  << 4;
+			res |= (vga.crtc.irq_disable & 1) << 5;
 			break;
 		case 0x12:
 			res  = vga.crtc.vert_disp_end & 0xff;
@@ -1380,6 +1381,8 @@ void vga_device::crtc_reg_write(UINT8 index, UINT8 data)
 			vga.crtc.protect_enable = (data & 0x80) >> 7;
 			vga.crtc.bandwidth = (data & 0x40) >> 6;
 			vga.crtc.vert_retrace_end = data & 0x0f;
+			vga.crtc.irq_clear = (data & 0x10) >> 4;
+			vga.crtc.irq_disable = (data & 0x20) >> 5;
 			break;
 		case 0x12:
 			vga.crtc.vert_disp_end &= ~0xff;
