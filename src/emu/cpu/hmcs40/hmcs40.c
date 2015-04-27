@@ -502,7 +502,7 @@ void hmcs40_cpu_device::execute_set_input(int line, int state)
 void hmcs40_cpu_device::reset_prescaler()
 {
 	// reset 6-bit timer prescaler
-	attotime base = attotime::from_hz(unscaled_clock() / 4 / 64);
+	attotime base = attotime::from_ticks(4 * 64, unscaled_clock());
 	m_timer->adjust(base);
 }
 
