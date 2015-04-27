@@ -84,18 +84,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
 	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(toobin_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff6000, 0xff6001) AM_READNOP     /* who knows? read at controls time */
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
-	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE(toobin_intensity_w)
+	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE(intensity_w)
 	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_SHARE("interrupt_scan")
-	AM_RANGE(0xff8380, 0xff8381) AM_MIRROR(0x45003e) AM_RAM_WRITE(toobin_slip_w) AM_SHARE("mob:slip")
+	AM_RANGE(0xff8380, 0xff8381) AM_MIRROR(0x45003e) AM_RAM_WRITE(slip_w) AM_SHARE("mob:slip")
 	AM_RANGE(0xff83c0, 0xff83c1) AM_MIRROR(0x45003e) AM_WRITE(scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x4500fe) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
 	AM_RANGE(0xff8500, 0xff8501) AM_MIRROR(0x4500fe) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
-	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x4500fe) AM_WRITE(toobin_xscroll_w) AM_SHARE("xscroll")
-	AM_RANGE(0xff8700, 0xff8701) AM_MIRROR(0x4500fe) AM_WRITE(toobin_yscroll_w) AM_SHARE("yscroll")
+	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x4500fe) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
+	AM_RANGE(0xff8700, 0xff8701) AM_MIRROR(0x4500fe) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
 	AM_RANGE(0xff8800, 0xff8801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
 	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ_PORT("FF9000")
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x4507fe) AM_DEVREAD8("jsa", atari_jsa_i_device, main_response_r, 0x00ff)
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)
-	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update_toobin)
+	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toobin)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -575,28 +575,15 @@ ROM_START( toobin1 )
 ROM_END
 
 
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-DRIVER_INIT_MEMBER(toobin_state,toobin)
-{
-}
-
-
-
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (rev 3)", 0 )
-GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", 0 )
-GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (German, rev 3)", 0 )
-GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (rev 2)", 0 )
-GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", 0 )
-GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, toobin, ROT270, "Atari Games", "Toobin' (rev 1)", 0 )
+GAME( 1988, toobin,   0,      toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1988, toobine,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1988, toobing,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (German, rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1988, toobin2,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, toobin2e, toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, toobin1,  toobin, toobin, toobin, driver_device, 0, ROT270, "Atari Games", "Toobin' (rev 1)", GAME_SUPPORTS_SAVE )

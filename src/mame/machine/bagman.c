@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  machine.c
+  bagman.c
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -199,7 +199,7 @@ UINT8 row, column, val;
 }
 
 
-WRITE8_MEMBER(bagman_state::bagman_pal16r6_w)
+WRITE8_MEMBER(bagman_state::pal16r6_w)
 {
 UINT8 line;
 
@@ -208,21 +208,21 @@ UINT8 line;
 	m_columnvalue[line + 1] = 1 - (data & 1);
 }
 
-MACHINE_RESET_MEMBER(bagman_state,bagman)
+void bagman_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	bagman_pal16r6_w(space, 0, 1);  /*pin 2*/
-	bagman_pal16r6_w(space, 1, 1);  /*pin 3*/
-	bagman_pal16r6_w(space, 2, 1);  /*pin 4*/
-	bagman_pal16r6_w(space, 3, 1);  /*pin 5*/
-	bagman_pal16r6_w(space, 4, 1);  /*pin 6*/
-	bagman_pal16r6_w(space, 5, 1);  /*pin 7*/
-	bagman_pal16r6_w(space, 6, 1);  /*pin 8*/
-	bagman_pal16r6_w(space, 7, 1);  /*pin 9*/
+	pal16r6_w(space, 0, 1);  /*pin 2*/
+	pal16r6_w(space, 1, 1);  /*pin 3*/
+	pal16r6_w(space, 2, 1);  /*pin 4*/
+	pal16r6_w(space, 3, 1);  /*pin 5*/
+	pal16r6_w(space, 4, 1);  /*pin 6*/
+	pal16r6_w(space, 5, 1);  /*pin 7*/
+	pal16r6_w(space, 6, 1);  /*pin 8*/
+	pal16r6_w(space, 7, 1);  /*pin 9*/
 	update_pal();
 }
 
-READ8_MEMBER(bagman_state::bagman_pal16r6_r)
+READ8_MEMBER(bagman_state::pal16r6_r)
 {
 	update_pal();
 	return  (m_outvalue[6]) + (m_outvalue[5] << 1) + (m_outvalue[4] << 2) +

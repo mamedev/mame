@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  bagman.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -11,13 +11,13 @@
 #include "includes/bagman.h"
 
 
-WRITE8_MEMBER(bagman_state::bagman_videoram_w)
+WRITE8_MEMBER(bagman_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bagman_state::bagman_colorram_w)
+WRITE8_MEMBER(bagman_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -80,7 +80,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 	}
 }
 
-WRITE8_MEMBER(bagman_state::bagman_flipscreen_w)
+WRITE8_MEMBER(bagman_state::flipscreen_w)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
 }
 
-VIDEO_START_MEMBER(bagman_state,bagman)
+void bagman_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bagman_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
@@ -103,17 +103,14 @@ VIDEO_START_MEMBER(bagman_state,bagman)
 
 void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
-		sx = spriteram[offs + 3];
-		sy = 256 - spriteram[offs + 2] - 16;
-		flipx = spriteram[offs] & 0x40;
-		flipy = spriteram[offs] & 0x80;
+		sx = m_spriteram[offs + 3];
+		sy = 256 - m_spriteram[offs + 2] - 16;
+		flipx = m_spriteram[offs] & 0x40;
+		flipy = m_spriteram[offs] & 0x80;
 		if (flip_screen())
 		{
 			sx = 256 - sx - 15;
@@ -122,17 +119,17 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-		if (spriteram[offs + 2] && spriteram[offs + 3])
+		if (m_spriteram[offs + 2] && m_spriteram[offs + 3])
 			m_gfxdecode->gfx(1)->transpen(bitmap,
 					cliprect,
-					(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
-					spriteram[offs + 1] & 0x1f,
+					(m_spriteram[offs] & 0x3f) + 2 * (m_spriteram[offs + 1] & 0x20),
+					m_spriteram[offs + 1] & 0x1f,
 					flipx,flipy,
 					sx,sy,0);
 	}
 }
 
-UINT32 bagman_state::screen_update_bagman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 bagman_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	if (*m_video_enable == 0)
