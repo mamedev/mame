@@ -80,7 +80,7 @@ READ64_MEMBER(segasp_state::sn_93c46a_r)
 
 	/* bit 3 is EEPROM data */
 	res = m_eeprom->do_read() << 4;
-	res |= (ioport("DSW")->read() << 4) & 0xC0;	// note: only old REV D PCB have DSW here, newer does not, always 0 readed
+	res |= (ioport("DSW")->read() << 4) & 0xC0;	// note: only old REV D PCB have DSW 3-4 here, newer does not, always 0 readed
 	return res;
 }
 
@@ -115,7 +115,39 @@ READ64_MEMBER(segasp_state::sp_rombdflg_r)
 
 READ64_MEMBER(segasp_state::sp_io_r)
 {
-	return -1;
+	UINT64 retval;
+
+	int reg = offset * 2;
+	int shift = 0;
+
+	if (mem_mask & U64(0x000000ff00000000))
+	{
+		reg++;
+		shift = 32;
+	}
+
+	switch (reg)
+	{
+	case 0x00/4:		// CN9 17-24 IN_PORT 0 (IN)
+		retval = ioport("IN_PORT0")->read();
+		break;
+	case 0x04/4:		// CN9 41-48 IN_PORT 1 (IN)
+		retval = ioport("IN_PORT1")->read();
+		break;
+	case 0x08/4:		// CN9 25-32 (I/O)
+		retval = ioport("IN_PORT3")->read();
+		break;
+	case 0x18/4:		// IN_PORT 2
+		// bit 0:3 - DIPSW 1-4
+		// bit 4:5 - TEST/SERVICE SW, CN9 5-6 (old rev PCB only)
+		retval = ioport("DSW")->read();
+		retval |= ioport("IN_PORT2")->read();
+		break;
+	default:
+		retval = -1;
+	}
+
+	return retval << shift;
 }
 
 // todo, base DC / Naomi stuff should be in it's own map, differences only here, same for Naomi 2 etc.
@@ -191,6 +223,38 @@ INPUT_PORTS_START( segasp )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")		// Must be ON, with off BIOS bootstrap will deadloop
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN_PORT0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START("IN_PORT1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xca, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN_PORT2")
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN_PORT3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 INPUT_PORTS_END
 
