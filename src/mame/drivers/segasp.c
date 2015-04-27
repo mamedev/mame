@@ -208,7 +208,7 @@ ADDRESS_MAP_END
 
 
 INPUT_PORTS_START( segasp )
-	PORT_INCLUDE( naomi )
+	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:1")
@@ -258,7 +258,7 @@ INPUT_PORTS_START( segasp )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( segasp, naomi_base, segasp_state )
+static MACHINE_CONFIG_DERIVED_CLASS( segasp, naomi_aw_base, segasp_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(segasp_map)
 	MCFG_CPU_IO_MAP(onchip_port)
@@ -266,6 +266,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( segasp, naomi_base, segasp_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("sp_eeprom")
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
+	MCFG_X76F100_ADD("naomibd_eeprom")	// actually not present
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":pic_readout", "naomibd_eeprom", ":boardid", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 

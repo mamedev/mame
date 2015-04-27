@@ -1913,7 +1913,7 @@ ADDRESS_MAP_END
 * Input ports
 */
 
-static INPUT_PORTS_START( naomi_debug )
+INPUT_PORTS_START( naomi_debug )
 	PORT_START("MAMEDEBUG")
 	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1949,7 +1949,7 @@ static INPUT_PORTS_START( naomi_mie )
 INPUT_PORTS_END
 
 /* 2 players with 1 joystick and 6 buttons each */
-INPUT_PORTS_START( naomi )
+static INPUT_PORTS_START( naomi )
 	PORT_INCLUDE( naomi_mie )
 	PORT_INCLUDE( naomi_debug )
 
@@ -2569,7 +2569,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  * Common for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
+MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_SH4_MD0(1)
@@ -2615,7 +2615,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
+static MACHINE_CONFIG_DERIVED( naomi_base, naomi_aw_base )
 	MCFG_MIE_ADD("mie", XTAL_32MHz/2, "maple_dc", 0, 0, 0, 0, ":MIE.3", 0, ":MIE.5", 0, 0) // Actual frequency unknown, most likely 1/2 of 32MHz XTAL or even 2/3 (yes, 21MHz Z80 core)
 	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("mie_eeprom")

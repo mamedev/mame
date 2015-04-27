@@ -104,5 +104,5 @@ class naomi_state : public dc_state
 	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
 };
 
-MACHINE_CONFIG_EXTERN(naomi_base);
-INPUT_PORTS_EXTERN( naomi );
+MACHINE_CONFIG_EXTERN(naomi_aw_base);
+INPUT_PORTS_EXTERN( naomi_debug );
