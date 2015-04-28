@@ -1,0 +1,3 @@
+defines {
+	"OSD_RETRO",
+}
