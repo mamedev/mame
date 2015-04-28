@@ -47,16 +47,18 @@ CCOMFLAGS += -include $(SRC)/osd/retro/retroprefix.h
 MINISRC = $(SRC)/osd/$(OSD)
 MINIOBJ = $(OBJ)/osd/$(OSD)
 
-LIBCOOBJ = $(OBJ)/osd/$(OSD)/libretro-common/libco
+LIBCOOBJ = $(MINIOBJ)/libretro-common/libco
 
 OSDSRC = $(SRC)/osd
 OSDOBJ = $(OBJ)/osd
 
-OBJDIRS += $(MINIOBJ) $(LIBCOOBJ) \
+OBJDIRS += $(MINIOBJ) \
 	$(OSDOBJ)/modules/sync \
-	$(OSDOBJ)/modules/font \
 	$(OSDOBJ)/modules/lib \
-	$(OSDOBJ)/modules/midi
+	$(OSDOBJ)/modules/midi \
+	$(OSDOBJ)/modules/font \
+	$(LIBCOOBJ)
+
 
 ifeq ($(VRENDER),opengl)
 GLOBJ = $(OBJ)/osd/$(OSD)/libretro-common/glsym
@@ -71,11 +73,12 @@ OSDCOREOBJS := \
 	$(MINIOBJ)/retrodir.o \
 	$(MINIOBJ)/retrofile.o \
 	$(MINIOBJ)/retroos.o \
-	$(MINIOBJ)/../modules/font/font_none.o \
-	$(MINIOBJ)/../modules/lib/osdlib_retro.o \
+	$(OSDOBJ)/modules/font/font_none.o \
+	$(OSDOBJ)/modules/lib/osdlib_retro.o \
 	$(OSDOBJ)/modules/sync/sync_retro.o \
-	$(MINIOBJ)/../modules/midi/none.o \
-	$(OSDOBJ)/modules/osdmodule.o
+	$(OSDOBJ)/modules/midi/none.o \
+	$(OSDOBJ)/modules/osdmodule.o \
+
 
 INCPATH += -I$(SRC)/osd/retro/libretro-common/include
 
@@ -90,14 +93,14 @@ endif
 #-------------------------------------------------
 
 OSDOBJS = \
-	$(MINIOBJ)/../modules/sound/retro_sound.o \
-	$(MINIOBJ)/../modules/sound/none.o \
 	$(MINIOBJ)/libretro.o \
 	$(MINIOBJ)/retromain.o \
-	$(MINIOBJ)/../modules/debugger/none.o \
-	$(MINIOBJ)/../modules/debugger/debugint.o \
-	$(MINIOBJ)/../modules/debugger/debugint.o \
-	$(OSDOBJ)/modules/lib/osdobj_common.o
+	$(OSDOBJ)/modules/lib/osdobj_common.o  \
+	$(OSDOBJ)/modules/sound/retro_sound.o \
+	$(OSDOBJ)/modules/sound/none.o \
+	$(OSDOBJ)/modules/debugger/debugint.o \
+	$(OSDOBJ)/modules/debugger/none.o \
+
 
 ifdef NO_USE_MIDI
 	DEFS += -DNO_USE_MIDI
