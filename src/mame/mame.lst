@@ -4434,6 +4434,7 @@ wmatch          // (c) 1984 (S1)
 bullfgt         // 834-5478 (c) 1984 Sega / Coreland (S1)
 thetogyu        // 834-5478 (c) 1984 Sega / Coreland (S1)
 spatter         // 834-5583 (c) 1984 (S1)
+spattera        // 834-5583 (c) 1984 (S1)
 ssanchan        // 834-5583 (c) 1984 (S1)
 pitfall2        // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
 pitfall2a       // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
@@ -17054,6 +17055,7 @@ sc4s6cb     //
 sc4s6cc     //
 sc4s6cd     //
 sc4s6ce     //
+sc4s6cf		//
 sc4sdr      // Super Diamonds & Rubies (Bellfruit)
 sc4sdra     //
 sc4sdrb     //
@@ -17152,6 +17154,7 @@ sc4ticlb    // Treasure Island Club (Bellfruit)
 sc4ticlba   //
 sc4ticlbb   //
 sc4ticlbc   //
+sc4ticlbd	//
 sc4ttomb    // Treasure Tomb (Bellfruit)
 sc4ttomba   //
 sc4ttombb   //
@@ -17270,6 +17273,7 @@ sc4legd     //
 sc4lege     //
 sc4legf     //
 sc4legg     //
+sc4legh		//
 sc4legcb    // Who Wants To Be A Legionnaire Club (Bellfruit)
 sc4legcba   //
 sc4legcbb   //
@@ -18609,6 +18613,8 @@ sc5dndboh   //
 sc5dndboi   //
 sc5dndboj   //
 sc5dndbok   //
+sc5dndbol   //
+sc5dndbom   //
 sc5dndbl    // Deal Or No Deal Beat The Banker Club (Bellfruit)
 sc5dndbla   //
 sc5dndblb   //

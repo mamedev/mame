@@ -13260,7 +13260,12 @@ ROM_START( sc4s6ce )
 	sc_s6c_others
 ROM_END
 
-
+ROM_START( sc4s6cf )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "club_super_six_95400336_vssix_1.9_lo.bin", 0x000000, 0x080000, CRC(828e1e1a) SHA1(00d7ab13e89a28f49dddf5755e09a8a1d23de440) )
+	ROM_LOAD16_BYTE( "club_super_six_95400337_vssix_1.9_hi.bin", 0x000001, 0x080000, CRC(2bed3af5) SHA1(56c232cd9d7d8fa0bc02e314edd315f50d07764f) )
+	sc_s6c_others
+ROM_END
 
 ROM_START( sc4sdr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -13985,6 +13990,15 @@ ROM_START( sc4ticlbc )
 	sc_ticlb_matrix
 ROM_END
 
+
+ROM_START( sc4ticlbd )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "club_treasure_island_95400361_lo.bin", 0x000001, 0x080000, CRC(15910e0f) SHA1(0ff9614de9a9333510ca269fca7f9b08db2695f9) )
+	ROM_LOAD16_BYTE( "club_treasure_island_95400362_hi.bin", 0x000000, 0x080000, CRC(c0e6b3f7) SHA1(1c74fe6a5d6cae9486cf311e9b1c4c69e4552b42) )
+	sc_ticlb_others
+
+	sc_ticlb_matrix
+ROM_END
 
 ROM_START( sc4ttomb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -14835,6 +14849,12 @@ ROM_START( sc4legg )
 	sc_leg_others
 ROM_END
 
+ROM_START( sc4legh )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "legionnaire_std_1.5_402862_lo.bin", 0x000001, 0x080000, CRC(598bf2ba) SHA1(f3b02be06458e01bbacfdf4e0fcc3800102a88cd) )
+	ROM_LOAD16_BYTE( "legionnaire_std_1.5_402863_hi.bin", 0x000000, 0x080000, CRC(f9c5c16e) SHA1(08c2a937980c4d1183044f5b29680cab918fbdaa) )
+	sc_leg_others
+ROM_END
 
 ROM_START( sc4legcb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -31306,6 +31326,9 @@ GAMEL( 200?, sc4legd     ,sc4leg,    sc4_200_5rb, sc4leg, sc4_state, sc4leg, ROT
 GAMEL( 200?, sc4lege     ,sc4leg,    sc4_200_5rb, sc4leg, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4legf     ,sc4leg,    sc4_200_5rb, sc4leg, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4legg     ,sc4leg,    sc4_200_5rb, sc4leg, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
+GAMEL( 200?, sc4legh     ,sc4leg,    sc4_200_5rb, sc4leg, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 ) // doesn't do anything?
+
 
 DRIVER_INIT_MEMBER(sc4_state,sc4cleg)
 {
@@ -48954,6 +48977,8 @@ GAMEL( 200?, sc4s6cc     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","S
 GAMEL( 200?, sc4s6cd     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 GAMEL( 200?, sc4s6ce     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
 
+GAMEL( 200?, sc4s6cf     ,sc4s6c,    sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_bfm_sc4 )
+
 
 
 
@@ -49001,6 +49026,7 @@ GAMEL( 200?, sc4ticlbb   ,sc4ticlb,  sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BF
 GAMEL( 200?, sc4ticlba   ,sc4ticlb,  sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_sc4_dmd )
 GAMEL( 200?, sc4ticlbc   ,sc4ticlb,  sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_sc4_dmd )
 
+GAMEL( 200?, sc4ticlbd   ,sc4ticlb,  sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_CLICKABLE_ARTWORK, layout_sc4_dmd )
 
 
 
