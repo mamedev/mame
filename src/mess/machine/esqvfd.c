@@ -1,5 +1,5 @@
 /*
-    Ensoniq Vacuum Flourescent Displays (VFDs)
+    Ensoniq Vacuum Fluorescent Displays (VFDs)
     Emulation by R. Belmont
 */
 

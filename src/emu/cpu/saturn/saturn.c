@@ -181,7 +181,7 @@ void saturn_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void saturn_device::state_string_export(const device_state_entry &entry, astring &string)
+void saturn_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 #define Reg64Data(s) s[15],s[14],s[13],s[12],s[11],s[10],s[9],s[8],s[7],s[6],s[5],s[4],s[3],s[2],s[1],s[0]
 #define Reg64Format "%x %x%x%x%x%x%x%x %x%x%x %x%x%x%x%x"
@@ -189,47 +189,47 @@ void saturn_device::state_string_export(const device_state_entry &entry, astring
 	switch (entry.index())
 	{
 		case SATURN_A:
-			string.printf( Reg64Format, Reg64Data(m_reg[A]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[A]) );
 			break;
 
 		case SATURN_B:
-			string.printf( Reg64Format, Reg64Data(m_reg[B]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[B]) );
 			break;
 
 		case SATURN_C:
-			string.printf( Reg64Format, Reg64Data(m_reg[C]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[C]) );
 			break;
 
 		case SATURN_D:
-			string.printf( Reg64Format, Reg64Data(m_reg[D]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[D]) );
 			break;
 
 		case SATURN_R0:
-			string.printf( Reg64Format, Reg64Data(m_reg[R0]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R0]) );
 			break;
 
 		case SATURN_R1:
-			string.printf( Reg64Format, Reg64Data(m_reg[R1]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R1]) );
 			break;
 
 		case SATURN_R2:
-			string.printf( Reg64Format, Reg64Data(m_reg[R2]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R2]) );
 			break;
 
 		case SATURN_R3:
-			string.printf( Reg64Format, Reg64Data(m_reg[R3]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R3]) );
 			break;
 
 		case SATURN_R4:
-			string.printf( Reg64Format, Reg64Data(m_reg[R4]) );
+			strprintf(str,  Reg64Format, Reg64Data(m_reg[R4]) );
 			break;
 
 		case SATURN_IRQ_STATE:
-			string.printf( "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
+			strprintf(str,  "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
 			break;
 
 		case STATE_GENFLAGS:
-			string.printf( "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
+			strprintf(str,  "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
 			break;
 	}
 }

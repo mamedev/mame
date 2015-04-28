@@ -255,10 +255,22 @@ int arm7_cpu_device::storeInc(UINT32 pat, UINT32 rbv, int mode)
 
 int arm7_cpu_device::storeDec(UINT32 pat, UINT32 rbv, int mode)
 {
-	int i, result;
+	int i, result = 0, cnt;
 
-	result = 0;
+	// pre-count the # of registers being stored
 	for (i = 15; i >= 0; i--)
+	{
+		if ((pat >> i) & 1)
+		{
+			result++;
+
+			// starting address
+			rbv -= 4;
+		}
+	}
+
+	cnt = 0;
+	for (i = 0; i <= 15; i++)
 	{
 		if ((pat >> i) & 1)
 		{
@@ -266,8 +278,8 @@ int arm7_cpu_device::storeDec(UINT32 pat, UINT32 rbv, int mode)
 			if (i == 15) /* R15 is plus 12 from address of STM */
 				LOG(("%08x: StoreDec on R15\n", R15));
 #endif
-			WRITE32(rbv -= 4, GET_MODE_REGISTER(mode, i));
-			result++;
+			WRITE32(rbv + (cnt * 4), GET_MODE_REGISTER(mode, i));
+			cnt++;
 		}
 	}
 	return result;
@@ -1421,7 +1433,7 @@ void arm7_cpu_device::HandleMemBlock(UINT32 insn)
 	} /* Loading */
 	else
 	{
-		/* Storing */
+		/* Storing - STM */
 		if (insn & (1 << eR15))
 		{
 #if ARM7_DEBUG_CORE
@@ -1461,7 +1473,7 @@ void arm7_cpu_device::HandleMemBlock(UINT32 insn)
 		}
 		else
 		{
-			/* Decrementing */
+			/* Decrementing - but real CPU writes in incrementing order */
 			if (!(insn & INSN_BDT_P))
 			{
 				rbp = rbp - (-4);

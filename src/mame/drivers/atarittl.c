@@ -61,7 +61,6 @@
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
-#include "astring.h"
 
 
 // copied by Pong, not accurate for this driver!
@@ -360,10 +359,6 @@ ROM_END
 
 /*  // 100% TTL - NO ROMS
 
-ROM_START( breakout )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( goal4 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
@@ -432,7 +427,6 @@ GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 //GAME(1974,  quack,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Qwak!/Quack [TTL]",      GAME_IS_SKELETON)
 
 // 100% TLL
-//GAME(1976,  breakout,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Breakout [TTL]",GAME_IS_SKELETON)
 //GAME(1974,  coupedem,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Coupe De Monde [TTL]",GAME_IS_SKELETON)
 //GAME(1975,  goal4,     0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Goal 4/World Cup/Coupe De Monde [TTL]",GAME_IS_SKELETON)
 //GAME(1973,  gotchaat,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",      "Gotcha [TTL]",GAME_IS_SKELETON) //?

@@ -1560,7 +1560,7 @@ void hyperstone_device::init(int scale_mask)
 	m_clock_scale_mask = scale_mask;
 
 	// register our state for the debugger
-	astring tempstr;
+	std::string tempstr;
 	state_add(STATE_GENPC,    "GENPC",     m_global_regs[0]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_global_regs[1]).callimport().callexport().formatstr("%40s").noshow();
 	state_add(E132XS_PC,      "PC", m_global_regs[0]).mask(0xffffffff);
@@ -1847,12 +1847,12 @@ const address_space_config *hyperstone_device::memory_space_config(address_space
 //  for the debugger
 //-------------------------------------------------
 
-void hyperstone_device::state_string_export(const device_state_entry &entry, astring &string)
+void hyperstone_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c FTE:%X FRM:%X ILC:%d FL:%d FP:%d",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c FTE:%X FRM:%X ILC:%d FL:%d FP:%d",
 				GET_S ? 'S':'.',
 				GET_P ? 'P':'.',
 				GET_T ? 'T':'.',

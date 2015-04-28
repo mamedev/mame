@@ -660,7 +660,7 @@ GFXDECODE_END
 void paradise_state::machine_start()
 {
 	int bank_n = memregion("maincpu")->bytes() / 0x4000;
-	
+
 	membank("prgbank")->configure_entries(0, bank_n, memregion("maincpu")->base(), 0x4000);
 
 	save_item(NAME(m_palbank));

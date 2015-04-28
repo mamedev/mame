@@ -20,10 +20,12 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;"/>
-		<part name="cart" interface="pegasus_cart">
+		<part name="cart1" interface="pegasus_cart">
 			<dataarea name="0000" size="4096">
 				<rom name="forth11a_2569.bin" size="4096" crc="f0c09ac3" sha1="1f13c86b1a1a53198b07729572e71f262b4d5e0e" offset="0" />
 			</dataarea>
+		</part>
+		<part name="cart2" interface="pegasus_cart">
 			<dataarea name="1000" size="4096">
 				<rom name="forth11b_2569.bin" size="4096" crc="4411b268" sha1="0e7a0799179bb2675da67c1725c1911fbd4a4433" offset="0" />
 			</dataarea>
@@ -35,10 +37,12 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;"/>
-		<part name="cart" interface="pegasus_cart">
+		<part name="cart1" interface="pegasus_cart">
 			<dataarea name="0000" size="4096">
 				<rom name="forth13a_2569.bin" size="4096" crc="1033d0c4" sha1="b8834b4d271b780e6afb2f0d671146a258b2f8b0" offset="0" />
 			</dataarea>
+		</part>
+		<part name="cart2" interface="pegasus_cart">
 			<dataarea name="1000" size="4096">
 				<rom name="forth13b_2569.bin" size="4096" crc="f65a5e36" sha1="2f667734f7b5ca8f65ad769cb325b70ff69d144c" offset="0" />
 			</dataarea>
@@ -110,10 +114,12 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;"/>
-		<part name="cart" interface="pegasus_cart">
+		<part name="cart1" interface="pegasus_cart">
 			<dataarea name="0000" size="4096">
 				<rom name="pascal10a_2569.bin" size="4096" crc="7c4261db" sha1="cc8f668546c4d0a927ea158bc91e8861b20936ca" offset="0" />
 			</dataarea>
+		</part>
+		<part name="cart2" interface="pegasus_cart">
 			<dataarea name="1000" size="4096">
 				<rom name="pascal10b_2569.bin" size="4096" crc="b4ba1df0" sha1="70bb0fb601a7f2a05d4c06e5f935d9af78f8c0d0" offset="0" />
 			</dataarea>
@@ -173,13 +179,17 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load both in &quot;cart1&quot;, &quot;cart2&quot; and &quot;cart3&quot;"/>
-		<part name="cart" interface="pegasus_cart">
+		<part name="cart1" interface="pegasus_cart">
 			<dataarea name="0000" size="4096">
 				<rom name="xbasic10a_2569.bin" size="4096" crc="54d01145" sha1="cb427ed7f14d0d0cf718b2c4af5c664eefdfecdf" offset="0" />
 			</dataarea>
+		</part>
+		<part name="cart2" interface="pegasus_cart">
 			<dataarea name="1000" size="4096">
 				<rom name="xbasic10b_2569.bin" size="4096" crc="42c0bb45" sha1="076fc7dc5b74cd75e65ef9d2b1d53a938865512b" offset="0" />
 			</dataarea>
+		</part>
+		<part name="cart3" interface="pegasus_cart">
 			<dataarea name="2000" size="4096">
 				<rom name="xbasic10c_2569.bin" size="4096" crc="6d4acfe1" sha1="ea3db97242a9988a7dcdc1dbc6686063a241a009" offset="0" />
 			</dataarea>

@@ -568,8 +568,8 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		astring filename("drcbex86_", device.shortname(), ".asm");
-		m_log = x86log_create_context(filename.cstr());
+		std::string filename = std::string("drcbex86_").append(device.shortname()).append(".asm");
+		m_log = x86log_create_context(filename.c_str());
 	}
 }
 
@@ -770,7 +770,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 	x86code *dst = base;
 
 	// generate code
-	astring tempstring;
+	std::string tempstring;
 	const char *blockname = NULL;
 	for (int inum = 0; inum < numinst; inum++)
 	{
@@ -780,9 +780,9 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 		// add a comment
 		if (m_log != NULL)
 		{
-			astring dasm;
+			std::string dasm;
 			inst.disasm(dasm, &m_drcuml);
-			x86log_add_comment(m_log, dst, "%s", dasm.cstr());
+			x86log_add_comment(m_log, dst, "%s", dasm.c_str());
 		}
 
 		// extract a blockname
@@ -791,7 +791,7 @@ void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, UINT3
 			if (inst.opcode() == OP_HANDLE)
 				blockname = inst.param(0).handle().string();
 			else if (inst.opcode() == OP_HASH)
-				blockname = tempstring.format("Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate());
+				blockname = strformat(tempstring, "Code: mode=%d PC=%08X", (UINT32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate()).c_str();
 		}
 
 		// generate code

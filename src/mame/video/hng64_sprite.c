@@ -222,4 +222,3 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		if (!chaini) source +=8;
 	}
 }
-

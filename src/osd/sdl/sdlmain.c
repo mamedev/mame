@@ -209,10 +209,10 @@ void MorphToPM()
 sdl_options::sdl_options()
 : osd_options()
 {
-	astring ini_path(INI_PATH);
+	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
-	ini_path.replace(0, "APP_NAME", emulator_info::get_appname_lower());
-	set_default_value(SDLOPTION_INIPATH, ini_path.cstr());
+	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
+	set_default_value(SDLOPTION_INIPATH, ini_path.c_str());
 }
 
 //============================================================
@@ -252,16 +252,16 @@ int main(int argc, char *argv[])
 
 	// FIXME: this should be done differently
 
-	#ifdef SDLMAME_UNIX
+#ifdef SDLMAME_UNIX
 	sdl_entered_debugger = 0;
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	FcInit();
-	#endif
-	#endif
+#endif
+#endif
 
-	#ifdef SDLMAME_OS2
+#ifdef SDLMAME_OS2
 	MorphToPM();
-	#endif
+#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
 	if (SDL_Linked_Version()->patch < 10)
@@ -290,21 +290,14 @@ int main(int argc, char *argv[])
 		res = frontend.execute(argc, argv);
 	}
 
-#ifdef MALLOC_DEBUG
-	{
-		void check_unfreed_mem(void);
-		check_unfreed_mem();
-	}
-#endif
-
-	#ifdef SDLMAME_UNIX
-	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
+#ifdef SDLMAME_UNIX
+#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU)) && (!defined(SDLMAME_EMSCRIPTEN))
 	if (!sdl_entered_debugger)
 	{
 		FcFini();
 	}
-	#endif
-	#endif
+#endif
+#endif
 
 	exit(res);
 }
@@ -389,18 +382,16 @@ static void defines_verbose(void)
 	MACRO_VERBOSE(SDLMAME_DARWIN);
 	MACRO_VERBOSE(SDLMAME_LINUX);
 	MACRO_VERBOSE(SDLMAME_SOLARIS);
-	MACRO_VERBOSE(SDLMAME_NOASM);
 	MACRO_VERBOSE(SDLMAME_IRIX);
 	MACRO_VERBOSE(SDLMAME_BSD);
 	osd_printf_verbose("\n");
 	osd_printf_verbose("Build defines 1:    ");
 	MACRO_VERBOSE(LSB_FIRST);
 	MACRO_VERBOSE(PTR64);
+	MACRO_VERBOSE(MAME_NOASM);
 	MACRO_VERBOSE(MAME_DEBUG);
-	MACRO_VERBOSE(NO_DEBUGBER);
 	MACRO_VERBOSE(BIGENDIAN);
 	MACRO_VERBOSE(CPP_COMPILE);
-	MACRO_VERBOSE(DISTRO);
 	MACRO_VERBOSE(SYNC_IMPLEMENTATION);
 	osd_printf_verbose("\n");
 	osd_printf_verbose("SDL/OpenGL defines: ");
@@ -502,14 +493,14 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options().bench();
-	astring error_string;
+	std::string error_string;
 	if (bench > 0)
 	{
 		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
 		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM, error_string);
 		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
 		options().set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
-		assert(!error_string);
+		assert(error_string.c_str()[0] == 0);
 	}
 
 	// Some driver options - must be before audio init!
@@ -600,14 +591,6 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	defines_verbose();
 
-	if (!SDLMAME_HAS_DEBUGGER)
-		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
-		{
-			osd_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
-			osd_exit();
-			exit(-1);
-		}
-
 	osd_common_t::init_subsystems();
 
 	if (options().oslog())
@@ -633,44 +616,3 @@ void sdl_osd_interface::init(running_machine &machine)
 	SDL_EnableUNICODE(SDL_TRUE);
 #endif
 }
-
-#ifdef SDLMAME_WIN32
-
-//============================================================
-//  wstring_from_utf8
-//============================================================
-
-WCHAR *wstring_from_utf8(const char *utf8string)
-{
-	int char_count;
-	WCHAR *result;
-
-	// convert MAME string (UTF-8) to UTF-16
-	char_count = MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, NULL, 0);
-	result = (WCHAR *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
-		MultiByteToWideChar(CP_UTF8, 0, utf8string, -1, result, char_count);
-
-	return result;
-}
-
-
-//============================================================
-//  utf8_from_wstring
-//============================================================
-
-char *utf8_from_wstring(const WCHAR *wstring)
-{
-	int char_count;
-	char *result;
-
-	// convert UTF-16 to MAME string (UTF-8)
-	char_count = WideCharToMultiByte(CP_UTF8, 0, wstring, -1, NULL, 0, NULL, NULL);
-	result = (char *)osd_malloc_array(char_count * sizeof(*result));
-	if (result != NULL)
-		WideCharToMultiByte(CP_UTF8, 0, wstring, -1, result, char_count, NULL, NULL);
-
-	return result;
-}
-
-#endif

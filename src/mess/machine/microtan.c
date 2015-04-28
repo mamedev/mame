@@ -836,18 +836,18 @@ QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 {
 	int snapshot_size = 8263;   /* magic size */
 	dynamic_buffer snapshot_buff(snapshot_size, 0);
-	dynamic_array<char> buff(quickload_size + 1);
+	std::vector<char> buff(quickload_size + 1);
 	int rc;
 
-	image.fread( buff, quickload_size);
+	image.fread(&buff[0], quickload_size);
 
 	buff[quickload_size] = '\0';
 
 	if (buff[0] == ':')
-		rc = parse_intel_hex(snapshot_buff, buff);
+		rc = parse_intel_hex(&snapshot_buff[0], &buff[0]);
 	else
-		rc = parse_zillion_hex(snapshot_buff, buff);
+		rc = parse_zillion_hex(&snapshot_buff[0], &buff[0]);
 	if (rc == IMAGE_INIT_PASS)
-		microtan_snapshot_copy(snapshot_buff, snapshot_size);
+		microtan_snapshot_copy(&snapshot_buff[0], snapshot_size);
 	return rc;
 }

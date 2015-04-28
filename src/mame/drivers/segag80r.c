@@ -1392,7 +1392,7 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
 	/* banking */
 	dest = memregion(region)->base();
 	dynamic_buffer temp(0x4000);
-	memcpy(temp, dest, 0x4000);
+	memcpy(&temp[0], dest, 0x4000);
 
 	/* 16 effective total banks */
 	for (i = 0; i < 16; i++)

@@ -174,7 +174,12 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	bgfx::setViewName(8, "Blur vertical");
 	bgfx::setViewName(9, "Blur horizontal + tonemap");
 
-	bgfx::TextureHandle uffizi = loadTexture("uffizi.dds", BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP|BGFX_TEXTURE_W_CLAMP);
+	bgfx::TextureHandle uffizi = loadTexture("uffizi.dds"
+			, 0
+			| BGFX_TEXTURE_U_CLAMP
+			| BGFX_TEXTURE_V_CLAMP
+			| BGFX_TEXTURE_W_CLAMP
+			);
 
 	bgfx::ProgramHandle skyProgram     = loadProgram("vs_hdr_skybox",  "fs_hdr_skybox");
 	bgfx::ProgramHandle lumProgram     = loadProgram("vs_hdr_lum",     "fs_hdr_lum");
@@ -211,10 +216,10 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 	lum[4] = bgfx::createFrameBuffer(  1,   1, bgfx::TextureFormat::BGRA8);
 
 	bgfx::FrameBufferHandle bright;
-	bright = bgfx::createFrameBuffer(width/2, height/2, bgfx::TextureFormat::BGRA8);
+	bright = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Half, bgfx::TextureFormat::BGRA8);
 
 	bgfx::FrameBufferHandle blur;
-	blur = bgfx::createFrameBuffer(width/8, height/8, bgfx::TextureFormat::BGRA8);
+	blur = bgfx::createFrameBuffer(bgfx::BackbufferRatio::Eighth, bgfx::TextureFormat::BGRA8);
 
 	// Imgui.
 	imguiCreate();
@@ -251,15 +256,10 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 			uint32_t msaa = (reset&BGFX_RESET_MSAA_MASK)>>BGFX_RESET_MSAA_SHIFT;
 
 			bgfx::destroyFrameBuffer(fbh);
-			bgfx::destroyFrameBuffer(bright);
-			bgfx::destroyFrameBuffer(blur);
 
 			fbtextures[0] = bgfx::createTexture2D(width, height, 1, bgfx::TextureFormat::BGRA8, ( (msaa+1)<<BGFX_TEXTURE_RT_MSAA_SHIFT)|BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP);
 			fbtextures[1] = bgfx::createTexture2D(width, height, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY|( (msaa+1)<<BGFX_TEXTURE_RT_MSAA_SHIFT) );
 			fbh = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
-
-			bright = bgfx::createFrameBuffer(width/2, height/2, bgfx::TextureFormat::BGRA8);
-			blur   = bgfx::createFrameBuffer(width/8, height/8, bgfx::TextureFormat::BGRA8);
 		}
 
 		imguiBeginFrame(mouseState.m_mx
@@ -371,6 +371,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 
 		// Render skybox into view 0.
 		bgfx::setTexture(0, u_texCube, uffizi);
+
 		bgfx::setProgram(skyProgram);
 		bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 		screenSpaceQuad( (float)width, (float)height, true);

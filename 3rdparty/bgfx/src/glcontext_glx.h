@@ -11,7 +11,7 @@
 #	include <X11/Xlib.h>
 #	include <GL/glx.h>
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 	struct SwapChainGL;
 
@@ -26,7 +26,7 @@ namespace bgfx
 
 		void create(uint32_t _width, uint32_t _height);
 		void destroy();
-		void resize(uint32_t _width, uint32_t _height, bool _vsync);
+		void resize(uint32_t _width, uint32_t _height, uint32_t _flags);
 
 		static bool isSwapChainSupported();
 		SwapChainGL* createSwapChain(void* _nwh);
@@ -45,7 +45,7 @@ namespace bgfx
 		GLXContext m_context;
 		XVisualInfo* m_visualInfo;
 	};
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // BGFX_USE_GLX
 

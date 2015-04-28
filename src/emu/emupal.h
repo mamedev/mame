@@ -361,6 +361,7 @@ public:
 	void set_pen_color(pen_t pen, rgb_t rgb) { m_palette->entry_set_color(pen, rgb); }
 	void set_pen_color(pen_t pen, UINT8 r, UINT8 g, UINT8 b) { m_palette->entry_set_color(pen, rgb_t(r, g, b)); }
 	void set_pen_colors(pen_t color_base, const rgb_t *colors, int color_count) { while (color_count--) set_pen_color(color_base++, *colors++); }
+	void set_pen_colors(pen_t color_base, const std::vector<rgb_t> &colors) { for(unsigned int i=0; i != colors.size(); i++) set_pen_color(color_base+i, colors[i]); }
 	void set_pen_contrast(pen_t pen, double bright) { m_palette->entry_set_contrast(pen, bright); }
 
 	// indirection (aka colortables)
@@ -447,8 +448,8 @@ private:
 	pen_t               m_black_pen;            // precomputed black pen value
 
 	// indirection state
-	dynamic_array<rgb_t> m_indirect_colors;     // actual colors set for indirection
-	dynamic_array<UINT16> m_indirect_pens;      // indirection values
+	std::vector<rgb_t> m_indirect_colors;     // actual colors set for indirection
+	std::vector<UINT16> m_indirect_pens;      // indirection values
 
 	struct shadow_table_data
 	{
@@ -460,12 +461,12 @@ private:
 	};
 	shadow_table_data   m_shadow_tables[MAX_SHADOW_PRESETS]; // array of shadow table data
 
-	dynamic_array<pen_t> m_save_pen;           // pens for save/restore
-	dynamic_array<float> m_save_contrast;      // brightness for save/restore
+	std::vector<pen_t> m_save_pen;           // pens for save/restore
+	std::vector<float> m_save_contrast;      // brightness for save/restore
 
-	dynamic_array<pen_t> m_pen_array;
-	dynamic_array<pen_t> m_shadow_array;
-	dynamic_array<pen_t> m_hilight_array;
+	std::vector<pen_t> m_pen_array;
+	std::vector<pen_t> m_shadow_array;
+	std::vector<pen_t> m_hilight_array;
 	palette_init_delegate m_init;
 };
 

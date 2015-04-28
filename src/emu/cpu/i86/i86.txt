@@ -1,7 +1,7 @@
 intel 8086 and compatibles
 --------------------------
 
-this info is here, 
+this info is here,
 to list and give some remarks on all 8086 compatible processors
 
 excellent info in Hamarsoft's 86BUGS list
@@ -12,13 +12,13 @@ excellent info in Hamarsoft's 86BUGS list
 20 bit address bus, 16 bit data bus and registers
 many 8080 assembler sources should be compilable/reusable
 
-8086 
+8086
 ----
 6 bytes prefetch queue
 
 8088
 ----
-8086 with 8 bit data bus, 
+8086 with 8 bit data bus,
 prefetch queue only 4 byte, and refilled when 1 byte empty
 
 early 8086/8088 revisions bug
@@ -93,7 +93,7 @@ v30? emulation mode (without 8080 emulation mode)
 80286
 -----
 80186 with additional instructions
-24 bit address bus, 
+24 bit address bus,
 protected mode
 
 80386 and later
@@ -106,6 +106,6 @@ mathematical coprocessors
 
 weitek, iit variants
 
-in 80486 coprocessor integrated 
+in 80486 coprocessor integrated
 (except 80486sx and several clones)
 80487: 80486 with other pinout

@@ -317,7 +317,7 @@ bool cqm_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	int cqm_size = io_generic_size(io);
 	dynamic_buffer cqmbuf(cqm_size);
-	io_generic_read(io, cqmbuf, 0, cqm_size);
+	io_generic_read(io, &cqmbuf[0], 0, cqm_size);
 
 	// decode the RLE data
 	for (int s = 0, pos = CQM_HEADER_SIZE + comment_size; pos < cqm_size; )

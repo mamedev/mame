@@ -67,7 +67,7 @@ void saturn_bram_device::nvram_default()
 {
 	static const UINT8 init[16] =
 	{ 'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't' };
-	memset(m_ext_bram, 0, m_ext_bram.bytes());
+	memset(&m_ext_bram[0], 0, m_ext_bram.size());
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -85,7 +85,7 @@ void saturn_bram_device::nvram_default()
 
 READ32_MEMBER(saturn_bram_device::read_ext_bram)
 {
-	if (offset < m_ext_bram.bytes()/2)
+	if (offset < m_ext_bram.size()/2)
 		return (m_ext_bram[offset * 2] << 16) | m_ext_bram[offset * 2 + 1];
 	else
 	{
@@ -96,7 +96,7 @@ READ32_MEMBER(saturn_bram_device::read_ext_bram)
 
 WRITE32_MEMBER(saturn_bram_device::write_ext_bram)
 {
-	if (offset < m_ext_bram.bytes()/2)
+	if (offset < m_ext_bram.size()/2)
 	{
 		if (ACCESSING_BITS_16_23)
 			m_ext_bram[offset * 2 + 0] = (data & 0x00ff0000) >> 16;

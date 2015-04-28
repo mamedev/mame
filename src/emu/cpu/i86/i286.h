@@ -75,7 +75,7 @@ protected:
 	virtual void execute_run();
 	virtual void device_reset();
 	virtual void device_start();
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 	virtual UINT32 execute_input_lines() const { return 1; }
 	virtual void execute_set_input(int inputnum, int state);
 	bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);

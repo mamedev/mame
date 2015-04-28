@@ -467,8 +467,6 @@ MACHINE_CONFIG_FRAGMENT( peribox_device )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-
-	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_device::device_mconfig_additions() const
@@ -536,7 +534,6 @@ MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_gen_device::device_mconfig_additions() const
@@ -589,7 +586,6 @@ MACHINE_CONFIG_FRAGMENT( peribox_998_device )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_998_device::device_mconfig_additions() const
@@ -643,14 +639,12 @@ MACHINE_CONFIG_FRAGMENT( peribox_sg_device )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_sg_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( peribox_sg_device );
 }
-
 
 /****************************************************************************
     Another variant of the box; used for the TI with EVPC. The EVPC is
@@ -684,7 +678,6 @@ MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
 	MCFG_DEVICE_ADD(FLOPPY_3, LEGACY_FLOPPY, 0)
 	MCFG_DEVICE_CONFIG(ti99_4_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(peribox_device, indexhole))
-	MCFG_MFMHD_3_DRIVES_ADD()
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_ev_device::device_mconfig_additions() const

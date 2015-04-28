@@ -44,7 +44,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const;
@@ -91,12 +91,12 @@ protected:
 	UINT16 m_sdx;
 	UINT16 m_pioc;
 	UINT16 m_pdx0;  // pdx0 & pdx1 refer to the same physical register (page 6-1)
-	UINT16 m_pdx1;  // but we keep them seperate for logic's sake.
+	UINT16 m_pdx1;  // but we keep them separate for logic's sake.
 
 	// internal stuff
 	UINT16 m_ppc;
 
-	// This CPU core handles the cache as more of a loop than 15 seperate memory elements.
+	// This CPU core handles the cache as more of a loop than 15 separate memory elements.
 	// It's a bit of a hack, but it's easier this way (for now).
 	UINT16 m_cacheStart;
 	UINT16 m_cacheEnd;

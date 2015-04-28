@@ -58,9 +58,7 @@ void device_sat_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(SATSLOT_ROM_REGION_TAG);
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring, size, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(SATSLOT_ROM_REGION_TAG).c_str(), size, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -219,7 +217,7 @@ bool sat_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  get default card software
  -------------------------------------------------*/
 
-void sat_cart_slot_device::get_default_card_software(astring &result)
+void sat_cart_slot_device::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "rom");
 }

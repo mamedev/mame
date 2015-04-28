@@ -53,8 +53,7 @@ jasmin_device::~jasmin_device()
 void jasmin_device::device_start()
 {
 	oricext_device::device_start();
-	astring tempstring;
-	jasmin_rom = device().machine().root_device().memregion(this->subtag(tempstring, "jasmin"))->base();
+	jasmin_rom = device().machine().root_device().memregion(this->subtag("jasmin").c_str())->base();
 	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &jasmin_device::map);
 
 	for(int i=0; i<4; i++) {

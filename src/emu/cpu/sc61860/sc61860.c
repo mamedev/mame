@@ -181,12 +181,12 @@ void sc61860_device::device_start()
 }
 
 
-void sc61860_device::state_string_export(const device_state_entry &entry, astring &string)
+void sc61860_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c", m_zero?'Z':'.', m_carry ? 'C':'.');
+			strprintf(str, "%c%c", m_zero ? 'Z' : '.', m_carry ? 'C' : '.');
 			break;
 	}
 }

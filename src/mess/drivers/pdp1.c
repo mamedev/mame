@@ -405,7 +405,7 @@ static void iot_cks(device_t *device, int op2, int nac, int mb, int *io, int ac)
 
 
 /*
-    devices which are known to generate a completion pulse (source: maintainance manual 9-??,
+    devices which are known to generate a completion pulse (source: maintenance manual 9-??,
     and 9-20, 9-21):
     emulated:
     * perforated tape reader
@@ -451,8 +451,8 @@ static pdp1_reset_param_t pdp1_reset_param =
 {
 	{   /* external iot handlers.  NULL means that the iot is unimplemented, unless there are
         parentheses around the iot name, in which case the iot is internal to the cpu core. */
-		/* I put a ? when the source is the handbook, since a) I have used the maintainance manual
-		as the primary source (as it goes more into details) b) the handbook and the maintainance
+		/* I put a ? when the source is the handbook, since a) I have used the maintenance manual
+		as the primary source (as it goes more into details) b) the handbook and the maintenance
 		manual occasionnally contradict each other. */
 		/* dia, dba, dcc, dra are documented in MIT PDP-1 COMPUTER MODIFICATION
 		BULLETIN no. 2 (drumInstrWriteup.bin/drumInstrWriteup.txt), and are
@@ -1303,7 +1303,7 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	state->typewriter_out(ch);
 	state->m_io_status &= ~io_st_tyo;
 
-	/* compute completion delay (source: maintainance manual 9-12, 9-13 and 9-14) */
+	/* compute completion delay (source: maintenance manual 9-12, 9-13 and 9-14) */
 	switch (ch)
 	{
 	case 072:   /* lower-case */

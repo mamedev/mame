@@ -11,7 +11,7 @@ hlslpath                [path]          Path to the .fx files that are in use.  
 hlsl_prescale_x         [horizontal]    HLSL pre-scale override factor for X.  (0 for auto)
 hlsl_prescale_y         [vertical]      HLSL pre-scale override factor for Y.  (0 for auto)
 hlsl_preset             -1 through 3    HLSL preset to use.  (default: -1)
-hlsl_write              0/1		Enable HLSL AVI writing.  (huge disk bandwidth suggested)
+hlsl_write              [filename]      Enable HLSL AVI writing.   (huge disk bandwidth suggested)
 hlsl_snap_width         [width]         HLSL upscaled-snapshot width.  (default: 2048)
 hlsl_snap_height    	[height]        HLSL upscaled-snapshot height.  (default: 1536)
 
@@ -42,7 +42,7 @@ converge_y              [r,g,b]         Convergence in screen-relative Y directi
 radial_converge_x   	[r,g,b]         Radial convergence in screen-relative X direction.
 radial_converge_y   	[r,g,b]         Radial convergence in screen-relative Y direction.
                                         Allowed values for convergence: -150 to 150 for each color.
-red_ratio               [r,g,b]         These parameters define a 3x3 matrix which is multiplied 
+red_ratio               [r,g,b]         These parameters define a 3x3 matrix which is multiplied
 grn_ratio               [r,g,b]         by the incoming RGB signal. This can be used for any
 blu_ratio               [r,g,b]         standard matrix convolution, including H/S/V or simply
                                         affecting the TV-style tint.

@@ -12,6 +12,11 @@
 #ifndef __SDLVIDEO__
 #define __SDLVIDEO__
 
+#if defined(SDLMAME_WIN32) && !(SDLMAME_SDL2)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 #include "osdsdl.h"
 
 //============================================================
@@ -110,17 +115,19 @@ public:
 
 	virtual ~osd_monitor_info() { }
 
+	virtual void refresh() = 0;
+
 	const void *oshandle() { return m_handle; }
 
-	const osd_rect &position_size() { refresh(); return m_pos_size; }
-	const osd_rect &usuable_position_size() { refresh(); return m_usuable_pos_size; }
+	const osd_rect &position_size() { return m_pos_size; }
+	const osd_rect &usuable_position_size() { return m_usuable_pos_size; }
 
-	const char *devicename() { refresh(); return m_name[0] ? m_name : "UNKNOWN"; }
+	const char *devicename() { return m_name[0] ? m_name : "UNKNOWN"; }
 
 	float aspect();
 
 	void set_aspect(const float a) { m_aspect = a; }
-	bool is_primary() { refresh(); return m_is_primary; }
+	bool is_primary() { return m_is_primary; }
 
 	osd_monitor_info    * next() { return m_next; }   // pointer to next monitor in list
 
@@ -130,10 +137,9 @@ public:
 	// FIXME: should be private!
 	osd_monitor_info    *m_next;                   // pointer to next monitor in list
 protected:
-	virtual void refresh() = 0;
-	osd_rect			m_pos_size;
-	osd_rect			m_usuable_pos_size;
-	bool				m_is_primary;
+	osd_rect            m_pos_size;
+	osd_rect            m_usuable_pos_size;
+	bool                m_is_primary;
 	char                m_name[64];
 private:
 
@@ -185,7 +191,7 @@ struct osd_video_config
 	int                 syncrefresh;    // sync only to refresh rate
 	int                 switchres;      // switch resolutions
 
-	int                 fullstretch;	// FXIME: implement in windows!
+	int                 fullstretch;    // FXIME: implement in windows!
 
 	// ddraw options
 	int                 hwstretch;                  // stretch using the hardware

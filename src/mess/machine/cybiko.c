@@ -47,7 +47,7 @@ QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 	UINT32 size = MIN(image.length(), RAMDISK_SIZE);
 
 	dynamic_buffer buffer(size);
-	image.fread(buffer, size);
+	image.fread(&buffer[0], size);
 	for (int byte = 0; byte < size; byte++)
 		dest.write_byte(0x400000 + byte, buffer[byte]);
 

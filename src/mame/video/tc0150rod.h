@@ -17,7 +17,7 @@ protected:
 
 private:
 	// internal state
-	dynamic_array<UINT16> m_ram;
+	std::vector<UINT16> m_ram;
 	UINT16 *m_roadgfx;
 };
 

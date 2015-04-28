@@ -14,7 +14,8 @@
 //============================================================
 
 /* Only problems ... */
-#ifdef SDLMAME_WIN32
+#if defined(_WIN32)
+#define SDLMAME_WIN32
 #define _SDL_main_h
 #endif
 
@@ -27,6 +28,7 @@
 
 #if defined(__sun__) && defined(__svr4__)
 #define SDLMAME_SOLARIS 1
+#define NO_AFFINITY_NP 1
 //#undef _XOPEN_SOURCE
 //#undef _XOPEN_VERSION
 //#undef _XOPEN_SOURCE_EXTENDED
@@ -45,6 +47,7 @@
 
 #elif defined(__FreeBSD__)
 #define SDLMAME_FREEBSD 1
+#define NO_AFFINITY_NP 1
 #elif defined(__DragonFly__)
 #define SDLMAME_DRAGONFLY 1
 #elif defined(__OpenBSD__)
@@ -57,6 +60,10 @@
 #define SDLMAME_BSD 1
 #endif
 
+#if defined(__OS2__)
+#define SDLMAME_OS2 1
+#endif
+
 #if defined(__HAIKU__)
 #define SDLMAME_HAIKU 1
 #define SDLMAME_NO64BITIO 1
@@ -65,8 +72,6 @@
 #if defined(EMSCRIPTEN)
 #define SDLMAME_EMSCRIPTEN 1
 #define SDLMAME_NO64BITIO 1
-#define NOASM 1
-#define SDLMAME_NOASM 1
 struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which makes clang cranky
 #endif
 
@@ -77,17 +82,3 @@ struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which m
 
 #endif /* SDLMAME_UNIX */
 
-#ifdef _MSC_VER
-void *__cdecl _alloca(size_t);
-#define alloca _alloca
-#endif
-
-#ifdef __GNUC__
-#define alloca  __builtin_alloca
-#endif
-
-//============================================================
-// misc.
-//============================================================
-
-#define PATH_SEPARATOR      "/"

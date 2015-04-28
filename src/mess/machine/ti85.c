@@ -154,7 +154,7 @@ void ti85_state::update_ti83p_memory ()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well allmost
+	m_membank1->set_bank(m_booting ? 0x1f : 0); //Always flash page 0, well almost
 
 	if (m_ti83p_port4 & 1)
 	{
@@ -1179,12 +1179,12 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 
 	ti8x_snapshot_data.resize(snapshot_size);
 
-	image.fread( ti8x_snapshot_data, snapshot_size);
+	image.fread( &ti8x_snapshot_data[0], snapshot_size);
 
 	if (!strncmp(machine().system().name, "ti85", 4))
-		ti85_setup_snapshot(ti8x_snapshot_data);
+		ti85_setup_snapshot(&ti8x_snapshot_data[0]);
 	else if (!strncmp(machine().system().name, "ti86", 4))
-		ti86_setup_snapshot(ti8x_snapshot_data);
+		ti86_setup_snapshot(&ti8x_snapshot_data[0]);
 
 	return IMAGE_INIT_PASS;
 }

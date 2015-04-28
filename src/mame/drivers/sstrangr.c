@@ -24,13 +24,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	required_shared_ptr<UINT8> m_ram;
-	
+
 	UINT8 m_flip_screen;
-	
+
 	DECLARE_WRITE8_MEMBER(port_w);
-	
+
 	virtual void video_start();
-	
+
 	UINT32 screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

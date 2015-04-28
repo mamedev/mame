@@ -366,7 +366,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 {
 	int i, j;
 	UINT16 *src = (UINT16 *)(memregion("tiles")->base() + 0x180000);
-	dynamic_array<UINT16> dst(0x800000);
+	std::vector<UINT16> dst(0x800000);
 
 	for (i = 0; i < 0x800000 / 2; i++)
 	{
@@ -375,7 +375,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_tiles()
 		dst[j] = BITSWAP16(src[i], 1, 14, 8, 7, 0, 15, 6, 9, 13, 2, 5, 10, 12, 3, 4, 11);
 	}
 
-	memcpy( src, dst, 0x800000 );
+	memcpy( src, &dst[0], 0x800000 );
 }
 
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( UINT8 *src )
@@ -390,7 +390,7 @@ void pgm_arm_type1_state::pgm_decode_kovlsqh2_sprites( UINT8 *src )
 		dst[j] = src[i];
 	}
 
-	memcpy( src, dst, 0x800000 );
+	memcpy( src, &dst[0], 0x800000 );
 }
 
 void pgm_arm_type1_state::pgm_decode_kovlsqh2_samples()
@@ -409,7 +409,7 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 {
 	int i;
 	UINT16 *src = (UINT16 *)(memregion("maincpu")->base() + 0x100000);
-	dynamic_array<UINT16> dst(0x400000);
+	std::vector<UINT16> dst(0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
 	{
@@ -418,14 +418,14 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs_program()
 		dst[j] = BITSWAP16(src[i], 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 	}
 
-	memcpy( src, dst, 0x400000 );
+	memcpy( src, &dst[0], 0x400000 );
 }
 
 void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
 {
 	int i;
 	UINT16 *src = (UINT16 *)(memregion("maincpu")->base() + 0x100000);
-	dynamic_array<UINT16> dst(0x400000);
+	std::vector<UINT16> dst(0x400000);
 
 	for (i = 0; i < 0x400000 / 2; i++)
 	{
@@ -434,7 +434,7 @@ void pgm_arm_type1_state::pgm_decode_kovqhsgs2_program()
 		dst[j] = src[i];
 	}
 
-	memcpy( src, dst, 0x400000 );
+	memcpy( src, &dst[0], 0x400000 );
 }
 
 

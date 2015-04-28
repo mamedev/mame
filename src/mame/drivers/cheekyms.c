@@ -2,8 +2,8 @@
     Universal Cheeky Mouse Driver
     (c)Lee Taylor May/June 1998, All rights reserved.
 
-    For use only in offical MAME releases.
-    Not to be distributed as part of any commerical work.
+    For use only in official MAME releases.
+    Not to be distributed as part of any commercial work.
 **************************************************************************/
 
 #include "emu.h"
@@ -31,8 +31,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cheekyms_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x20, 0x3f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x40, 0x40) AM_WRITE(cheekyms_port_40_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_SHARE("port_80")
+	AM_RANGE(0x40, 0x40) AM_WRITE(port_40_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(port_80_w) AM_SHARE("port_80")
 ADDRESS_MAP_END
 
 
@@ -109,6 +109,7 @@ GFXDECODE_END
 
 void cheekyms_state::machine_start()
 {
+	save_item(NAME(m_irq_mask));
 }
 
 INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
@@ -133,7 +134,7 @@ static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update_cheekyms)
+	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cheekyms)

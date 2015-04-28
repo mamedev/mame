@@ -498,7 +498,7 @@ void fd1094_decryption_cache::reset()
 {
 	// reset all allocated cache buffers
 	for (int cache = 0; cache < 256; cache++)
-		m_decrypted_opcodes[cache].reset();
+		m_decrypted_opcodes[cache].clear();
 }
 
 
@@ -528,13 +528,13 @@ void fd1094_decryption_cache::configure(offs_t baseaddress, UINT32 size, offs_t 
 UINT16 *fd1094_decryption_cache::decrypted_opcodes(UINT8 state)
 {
 	// if we have already decrypted this state, use it
-	if (m_decrypted_opcodes[state].count() > 0)
-		return m_decrypted_opcodes[state];
+	if (!m_decrypted_opcodes[state].empty())
+		return &m_decrypted_opcodes[state][0];
 
 	// otherwise, allocate and decrypt
 	m_decrypted_opcodes[state].resize(m_size);
-	m_fd1094.decrypt(m_baseaddress, m_size, m_rgnoffset, m_decrypted_opcodes[state], state);
-	return m_decrypted_opcodes[state];
+	m_fd1094.decrypt(m_baseaddress, m_size, m_rgnoffset, &m_decrypted_opcodes[state][0], state);
+	return &m_decrypted_opcodes[state][0];
 }
 
 
@@ -558,7 +558,7 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 		m_key(NULL)
 {
 	// override the name after the m68000 initializes
-	m_name.cpy("FD1094");
+	m_name.assign("FD1094");
 
 	// create the initial masked opcode table
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));

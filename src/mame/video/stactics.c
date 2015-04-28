@@ -90,7 +90,7 @@ PALETTE_INIT_MEMBER(stactics_state,stactics)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::stactics_scroll_ram_w)
+WRITE8_MEMBER(stactics_state::scroll_ram_w)
 {
 	if (data & 0x01)
 	{
@@ -111,7 +111,7 @@ WRITE8_MEMBER(stactics_state::stactics_scroll_ram_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_frame_count_d3)
+CUSTOM_INPUT_MEMBER(stactics_state::get_frame_count_d3)
 {
 	return (m_frame_count >> 3) & 0x01;
 }
@@ -124,7 +124,7 @@ CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_frame_count_d3)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::stactics_speed_latch_w)
+WRITE8_MEMBER(stactics_state::speed_latch_w)
 {
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -149,25 +149,25 @@ WRITE8_MEMBER(stactics_state::stactics_speed_latch_w)
 }
 
 
-WRITE8_MEMBER(stactics_state::stactics_shot_trigger_w)
+WRITE8_MEMBER(stactics_state::shot_trigger_w)
 {
 	m_shot_standby = 0;
 }
 
 
-WRITE8_MEMBER(stactics_state::stactics_shot_flag_clear_w)
+WRITE8_MEMBER(stactics_state::shot_flag_clear_w)
 {
 	m_shot_arrive = 0;
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_shot_standby)
+CUSTOM_INPUT_MEMBER(stactics_state::get_shot_standby)
 {
 	return m_shot_standby;
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_not_shot_arrive)
+CUSTOM_INPUT_MEMBER(stactics_state::get_not_shot_arrive)
 {
 	return !m_shot_arrive;
 }
@@ -352,7 +352,7 @@ void stactics_state::update_artwork()
  *
  *************************************/
 
-VIDEO_START_MEMBER(stactics_state,stactics)
+void stactics_state::video_start()
 {
 	m_y_scroll_d = 0;
 	m_y_scroll_e = 0;
@@ -363,6 +363,16 @@ VIDEO_START_MEMBER(stactics_state,stactics)
 	m_shot_arrive = 0;
 	m_beam_state = 0;
 	m_old_beam_state = 0;
+
+	save_item(NAME(m_y_scroll_d));
+	save_item(NAME(m_y_scroll_e));
+	save_item(NAME(m_y_scroll_f));
+	save_item(NAME(m_frame_count));
+	save_item(NAME(m_shot_standby));
+	save_item(NAME(m_shot_arrive));
+	save_item(NAME(m_beam_state));
+	save_item(NAME(m_old_beam_state));
+	save_item(NAME(m_beam_states_per_frame));
 }
 
 
@@ -373,7 +383,7 @@ VIDEO_START_MEMBER(stactics_state,stactics)
  *
  *************************************/
 
-UINT32 stactics_state::screen_update_stactics(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 stactics_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_beam();
 	draw_background(bitmap, cliprect);
@@ -399,11 +409,10 @@ MACHINE_CONFIG_FRAGMENT( stactics_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stactics_state, screen_update_stactics)
+	MCFG_SCREEN_UPDATE_DRIVER(stactics_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 
 	MCFG_PALETTE_INIT_OWNER(stactics_state,stactics)
-	MCFG_VIDEO_START_OVERRIDE(stactics_state,stactics)
 MACHINE_CONFIG_END

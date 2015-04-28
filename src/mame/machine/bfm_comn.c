@@ -27,7 +27,7 @@ void bfm_decode_mainrom(running_machine &machine, const char *rom_region, UINT8*
 		dynamic_buffer tmp(0x10000);
 		int i;
 
-		memcpy(tmp, rom, 0x10000);
+		memcpy(&tmp[0], rom, 0x10000);
 
 		for ( i = 0; i < 256; i++ )
 		{

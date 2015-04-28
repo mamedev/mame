@@ -37,7 +37,7 @@ const char *d80_format::extensions() const
 
 const d80_format::format d80_format::file_formats[] = {
 	{ // d80, dos 2.5, 77 tracks, head/stepper 100 tpi
-		floppy_image::FF_525, floppy_image::SSQD, 2083, 77, 1, 256, 9, 8
+		floppy_image::FF_525, floppy_image::SSQD, 2083, 77, 1, 256, 21, 19 // TODO verify gaps
 	},
 	{}
 };
@@ -104,26 +104,31 @@ floppy_image_format_t::desc_e* d80_format::get_sector_desc(const format &f, int 
 		/* 07 */ {     GCR5, id2, 1 },
 		/* 08 */ {     GCR5, id1, 1 },
 		/* 09 */ {   CRC_END, 1 },
-		/* 10 */ {   GCR5, 0x0f, 2 },
-		/* 11 */ {   RAWBYTE, 0x55, f.gap_1 },
-		/* 12 */ {   RAWBYTE, 0xff, 5 },
-		/* 13 */ {   GCR5, 0x07, 1 },
-		/* 14 */ {   CRC_CBM_START, 2 },
-		/* 15 */ {     SECTOR_DATA_GCR5, -1 },
-		/* 16 */ {   CRC_END, 2 },
-		/* 17 */ {   CRC, 2 },
-		/* 18 */ {   GCR5, 0x00, 2 },
-		/* 19 */ {   RAWBYTE, 0x55, gap_2 },
-		/* 20 */ { SECTOR_LOOP_END },
-		/* 21 */ { RAWBYTE, 0x55, 0 },
-		/* 22 */ { RAWBITS, 0x5555, 0 },
-		/* 23 */ { END }
+		/* 10 */ {   GCR5, 0x0f, f.gap_1 },
+		/* 11 */ {   RAWBYTE, 0xff, 5 },
+		/* 12 */ {   GCR5, 0x07, 1 },
+		/* 13 */ {   CRC_CBM_START, 2 },
+		/* 14 */ {     SECTOR_DATA_GCR5, -1 },
+		/* 15 */ {   CRC_END, 2 },
+		/* 16 */ {   CRC, 2 },
+		/* 17 */ {   GCR5, 0x0f, gap_2 },
+		/* 18 */ { SECTOR_LOOP_END },
+		/* 19 */ { RAWBYTE, 0x55, 0 },
+		/* 20 */ { RAWBITS, 0x5555, 0 },
+		/* 21 */ { END }
 	};
 
-	current_size = 40 + (1+1+4+2)*10 + (f.gap_1)*8 + 40 + (1+f.sector_base_size+1+2)*10 + gap_2*8;
+	current_size = 40 + (1+1+4)*10 + (f.gap_1)*10 + 40 + (1+f.sector_base_size+1)*10 + gap_2*10;
 
 	current_size *= sector_count;
 	return desc;
+}
+
+void d80_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size)
+{
+	desc[19].p2 = remaining_size / 8;
+	desc[20].p2 = remaining_size & 7;
+	desc[20].p1 >>= remaining_size & 0x01;
 }
 
 const floppy_format_type FLOPPY_D80_FORMAT = &floppy_image_format_creator<d80_format>;

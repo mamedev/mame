@@ -20,26 +20,18 @@
 
 
 //**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define MAX_SLOTS 8
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> abc890_device
+// ======================> abc890_t
 
-class abc890_device :  public device_t,
-						public device_abcbus_card_interface
+class abc890_t :  public device_t,
+				  public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
-	abc890_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc890_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	abc890_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -63,52 +55,65 @@ protected:
 };
 
 
-// ======================> abc894_device
+// ======================> abc_expansion_unit_t
 
-class abc894_device :  public abc890_device
+class abc_expansion_unit_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc_expansion_unit_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 
-// ======================> abc850_device
+// ======================> abc894_t
 
-class abc850_device :  public abc890_device
+class abc894_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc894_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 
-// ======================> abc852_device
+// ======================> abc850_t
 
-class abc852_device :  public abc890_device
+class abc850_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc850_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 
-// ======================> abc856_device
+// ======================> abc852_t
 
-class abc856_device :  public abc890_device
+class abc852_t :  public abc890_t
 {
 public:
 	// construction/destruction
-	abc856_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc852_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
+
+// ======================> abc856_t
+
+class abc856_t :  public abc890_t
+{
+public:
+	// construction/destruction
+	abc856_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -116,6 +121,7 @@ public:
 
 
 // device type definition
+extern const device_type ABC_EXPANSION_UNIT;
 extern const device_type ABC890;
 extern const device_type ABC894;
 extern const device_type ABC850;

@@ -38,7 +38,7 @@
 #include "audio/dcs.h"
 #include "machine/pci.h"
 #include "machine/vrc4373.h"
-
+#include "machine/pci9050.h"
 
 class atlantis_state : public driver_device
 {
@@ -53,7 +53,47 @@ public:
 	UINT32 screen_update_mwskins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<mips3_device> m_maincpu;
 	required_device<dcs2_audio_denver_device> m_dcs;
+
+	READ32_MEMBER (red_r);
+	WRITE32_MEMBER(red_w);
+	READ32_MEMBER (green_r);
+	WRITE32_MEMBER(green_w);
+	READ32_MEMBER (blue_r);
+	WRITE32_MEMBER(blue_w);
 };
+
+READ32_MEMBER (atlantis_state::red_r)
+{
+	logerror("red_r %x\n", offset);
+	return 0;
+}
+
+WRITE32_MEMBER(atlantis_state::red_w)
+{
+	logerror("red_w %x,%x\n", offset, data);
+}
+
+READ32_MEMBER (atlantis_state::green_r)
+{
+	logerror("green_r %x\n", offset);
+	return 0;
+}
+
+WRITE32_MEMBER(atlantis_state::green_w)
+{
+	logerror("green_w %x,%x\n", offset, data);
+}
+
+READ32_MEMBER (atlantis_state::blue_r)
+{
+	logerror("blue_r %x\n", offset);
+	return 0;
+}
+
+WRITE32_MEMBER(atlantis_state::blue_w)
+{
+	logerror("blue_w %x,%x\n", offset, data);
+}
 
 
 /*************************************
@@ -103,6 +143,17 @@ UINT32 atlantis_state::screen_update_mwskins(screen_device &screen, bitmap_ind16
  *
  *************************************/
 
+static ADDRESS_MAP_START( map0, AS_PROGRAM, 32, atlantis_state )
+	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(red_r, red_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( map1, AS_PROGRAM, 32, atlantis_state )
+	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(green_r, green_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( map3, AS_PROGRAM, 32, atlantis_state )
+	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(blue_r, blue_w)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -128,6 +179,10 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
+	MCFG_PCI9050_ADD(                 ":pci:0b.0")
+	MCFG_PCI9050_SET_MAP(0, map0)
+	MCFG_PCI9050_SET_MAP(1, map1) // 2 skipped for testing
+	MCFG_PCI9050_SET_MAP(3, map3)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", NULL, true)
 

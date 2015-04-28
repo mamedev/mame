@@ -13,12 +13,12 @@
 
 
 ******************************************************************************/
-READ16_MEMBER(niyanpai_state::niyanpai_palette_r)
+READ16_MEMBER(niyanpai_state::palette_r)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE16_MEMBER(niyanpai_state::niyanpai_palette_w)
+WRITE16_MEMBER(niyanpai_state::palette_w)
 {
 	int r, g, b;
 	int offs_h, offs_l;
@@ -57,7 +57,7 @@ WRITE16_MEMBER(niyanpai_state::niyanpai_palette_w)
 
 
 ******************************************************************************/
-int niyanpai_state::niyanpai_blitter_r(int vram, int offset)
+int niyanpai_state::blitter_r(int vram, int offset)
 {
 	int ret;
 	UINT8 *GFXROM = memregion("gfx1")->base();
@@ -72,7 +72,7 @@ int niyanpai_state::niyanpai_blitter_r(int vram, int offset)
 	return ret;
 }
 
-void niyanpai_state::niyanpai_blitter_w(int vram, int offset, UINT8 data)
+void niyanpai_state::blitter_w(int vram, int offset, UINT8 data)
 {
 	switch (offset)
 	{
@@ -84,7 +84,7 @@ void niyanpai_state::niyanpai_blitter_w(int vram, int offset, UINT8 data)
 				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
 					m_flipscreen[vram] = (data & 0x40) ? 0 : 1;
 					m_dispflag[vram] = (data & 0x80) ? 1 : 0;
-					niyanpai_vramflip(vram);
+					vramflip(vram);
 					break;
 		case 0x01:  m_scrollx[vram] = (m_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:  m_scrollx[vram] = (m_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100); break;
@@ -99,18 +99,18 @@ void niyanpai_state::niyanpai_blitter_w(int vram, int offset, UINT8 data)
 		case 0x0b:  m_blitter_destx[vram] = (m_blitter_destx[vram]  & 0x00ff) | (data << 8); break;
 		case 0x0c:  m_blitter_desty[vram] = (m_blitter_desty[vram]  & 0xff00) | data; break;
 		case 0x0d:  m_blitter_desty[vram] = (m_blitter_desty[vram]  & 0x00ff) | (data << 8);
-					niyanpai_gfxdraw(vram);
+					gfxdraw(vram);
 					break;
 		default:    break;
 	}
 }
 
-void niyanpai_state::niyanpai_clutsel_w(int vram, UINT8 data)
+void niyanpai_state::clutsel_w(int vram, UINT8 data)
 {
 	m_clutsel[vram] = data;
 }
 
-void niyanpai_state::niyanpai_clut_w(int vram, int offset, UINT8 data)
+void niyanpai_state::clut_w(int vram, int offset, UINT8 data)
 {
 	m_clut[vram][((m_clutsel[vram] & 0xff) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -119,7 +119,7 @@ void niyanpai_state::niyanpai_clut_w(int vram, int offset, UINT8 data)
 
 
 ******************************************************************************/
-void niyanpai_state::niyanpai_vramflip(int vram)
+void niyanpai_state::vramflip(int vram)
 {
 	int x, y;
 	UINT16 color1, color2;
@@ -172,7 +172,7 @@ void niyanpai_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-void niyanpai_state::niyanpai_gfxdraw(int vram)
+void niyanpai_state::gfxdraw(int vram)
 {
 	UINT8 *GFX = memregion("gfx1")->base();
 	int width = m_screen->width();
@@ -324,28 +324,28 @@ void niyanpai_state::niyanpai_gfxdraw(int vram)
 	}
 
 	m_nb19010_busyflag = 0;
-	timer_set(attotime::from_nsec(1000 * m_nb19010_busyctr), TIMER_BLITTER);
+	m_blitter_timer->adjust(attotime::from_nsec(1000 * m_nb19010_busyctr));
 }
 
 /******************************************************************************
 
 
 ******************************************************************************/
-WRITE8_MEMBER(niyanpai_state::niyanpai_blitter_0_w){ niyanpai_blitter_w(0, offset, data); }
-WRITE8_MEMBER(niyanpai_state::niyanpai_blitter_1_w){ niyanpai_blitter_w(1, offset, data); }
-WRITE8_MEMBER(niyanpai_state::niyanpai_blitter_2_w){ niyanpai_blitter_w(2, offset, data); }
+WRITE8_MEMBER(niyanpai_state::blitter_0_w){ blitter_w(0, offset, data); }
+WRITE8_MEMBER(niyanpai_state::blitter_1_w){ blitter_w(1, offset, data); }
+WRITE8_MEMBER(niyanpai_state::blitter_2_w){ blitter_w(2, offset, data); }
 
-READ8_MEMBER(niyanpai_state::niyanpai_blitter_0_r){ return niyanpai_blitter_r(0, offset); }
-READ8_MEMBER(niyanpai_state::niyanpai_blitter_1_r){ return niyanpai_blitter_r(1, offset); }
-READ8_MEMBER(niyanpai_state::niyanpai_blitter_2_r){ return niyanpai_blitter_r(2, offset); }
+READ8_MEMBER(niyanpai_state::blitter_0_r){ return blitter_r(0, offset); }
+READ8_MEMBER(niyanpai_state::blitter_1_r){ return blitter_r(1, offset); }
+READ8_MEMBER(niyanpai_state::blitter_2_r){ return blitter_r(2, offset); }
 
-WRITE8_MEMBER(niyanpai_state::niyanpai_clut_0_w){ niyanpai_clut_w(0, offset, data); }
-WRITE8_MEMBER(niyanpai_state::niyanpai_clut_1_w){ niyanpai_clut_w(1, offset, data); }
-WRITE8_MEMBER(niyanpai_state::niyanpai_clut_2_w){ niyanpai_clut_w(2, offset, data); }
+WRITE8_MEMBER(niyanpai_state::clut_0_w){ clut_w(0, offset, data); }
+WRITE8_MEMBER(niyanpai_state::clut_1_w){ clut_w(1, offset, data); }
+WRITE8_MEMBER(niyanpai_state::clut_2_w){ clut_w(2, offset, data); }
 
-WRITE8_MEMBER(niyanpai_state::niyanpai_clutsel_0_w){ niyanpai_clutsel_w(0, data); }
-WRITE8_MEMBER(niyanpai_state::niyanpai_clutsel_1_w){ niyanpai_clutsel_w(1, data); }
-WRITE8_MEMBER(niyanpai_state::niyanpai_clutsel_2_w){ niyanpai_clutsel_w(2, data); }
+WRITE8_MEMBER(niyanpai_state::clutsel_0_w){ clutsel_w(0, data); }
+WRITE8_MEMBER(niyanpai_state::clutsel_1_w){ clutsel_w(1, data); }
+WRITE8_MEMBER(niyanpai_state::clutsel_2_w){ clutsel_w(2, data); }
 
 /******************************************************************************
 
@@ -370,13 +370,46 @@ void niyanpai_state::video_start()
 	m_clut[1] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_clut[2] = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_nb19010_busyflag = 1;
+	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_blitter_destx));
+	save_item(NAME(m_blitter_desty));
+	save_item(NAME(m_blitter_sizex));
+	save_item(NAME(m_blitter_sizey));
+	save_item(NAME(m_blitter_src_addr));
+	save_item(NAME(m_blitter_direction_x));
+	save_item(NAME(m_blitter_direction_y));
+	save_item(NAME(m_dispflag));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_clutmode));
+	save_item(NAME(m_transparency));
+	save_item(NAME(m_clutsel));
+	save_item(NAME(m_screen_refresh));
+	save_item(NAME(m_nb19010_busyctr));
+	save_item(NAME(m_nb19010_busyflag));
+	save_item(NAME(m_flipscreen_old));
+	save_pointer(NAME(m_palette_ptr), 0x480);
+	save_pointer(NAME(m_videoram[0]), width * height);
+	save_pointer(NAME(m_videoram[1]), width * height);
+	save_pointer(NAME(m_videoram[2]), width * height);
+	save_pointer(NAME(m_videoworkram[0]), width * height);
+	save_pointer(NAME(m_videoworkram[1]), width * height);
+	save_pointer(NAME(m_videoworkram[2]), width * height);
+	save_pointer(NAME(m_clut[0]), 0x1000);
+	save_pointer(NAME(m_clut[1]), 0x1000);
+	save_pointer(NAME(m_clut[2]), 0x1000);
+	save_item(NAME(m_tmpbitmap[0]));
+	save_item(NAME(m_tmpbitmap[1]));
+	save_item(NAME(m_tmpbitmap[2]));
 }
 
 /******************************************************************************
 
 
 ******************************************************************************/
-UINT32 niyanpai_state::screen_update_niyanpai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 niyanpai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int x, y;

@@ -212,37 +212,37 @@ const address_space_config *dsp16_device::memory_space_config(address_spacenum s
 //  for the debugger
 //-------------------------------------------------
 
-void dsp16_device::state_string_export(const device_state_entry &entry, astring &string)
+void dsp16_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-		string.printf("(below)");
+			strprintf(str, "(below)");
 			break;
 
 		case DSP16_AUC:
 		{
-			astring alignString;
+			std::string alignString;
 			const UINT8 align = m_auc & 0x03;
 			switch (align)
 			{
-				case 0x00: alignString.printf("xy"); break;
-				case 0x01: alignString.printf("/4"); break;
-				case 0x02: alignString.printf("x4"); break;
-				case 0x03: alignString.printf(",,"); break;
+				case 0x00: strprintf(alignString,"xy"); break;
+				case 0x01: strprintf(alignString,"/4"); break;
+				case 0x02: strprintf(alignString,"x4"); break;
+				case 0x03: strprintf(alignString,",,"); break;
 			}
-			string.printf("%c%c%c%c%c%s",
+			strprintf(str, "%c%c%c%c%c%s",
 							m_auc & 0x40 ? 'Y':'.',
 							m_auc & 0x20 ? '1':'.',
 							m_auc & 0x10 ? '0':'.',
 							m_auc & 0x08 ? '1':'.',
 							m_auc & 0x04 ? '0':'.',
-							alignString.cstr());
+							alignString.c_str());
 			break;
 		}
 
 		case DSP16_PSW:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 							m_psw & 0x8000 ? 'M':'.',
 							m_psw & 0x4000 ? 'E':'.',
 							m_psw & 0x2000 ? 'L':'.',
@@ -263,18 +263,18 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 
 		case DSP16_PIOC:
 		{
-			astring strobeString;
+			std::string strobeString;
 			const UINT8 strobe = (m_pioc & 0x6000) >> 13;
 			switch (strobe)
 			{
-				case 0x00: strobeString.printf("1T"); break;
-				case 0x01: strobeString.printf("2T"); break;
-				case 0x02: strobeString.printf("3T"); break;
-				case 0x03: strobeString.printf("4T"); break;
+				case 0x00: strprintf(strobeString, "1T"); break;
+				case 0x01: strprintf(strobeString, "2T"); break;
+				case 0x02: strprintf(strobeString, "3T"); break;
+				case 0x03: strprintf(strobeString, "4T"); break;
 			}
-			string.printf("%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%s%c%c%c%c%c%c%c%c%c%c%c%c%c",
 							m_pioc & 0x8000 ? 'I':'.',
-							strobeString.cstr(),
+							strobeString.c_str(),
 							m_pioc & 0x1000 ? 'O':'I',
 							m_pioc & 0x0800 ? 'O':'I',
 							m_pioc & 0x0400 ? 'S':'.',
@@ -294,18 +294,18 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 		// Placeholder for a better view later (TODO)
 		case DSP16_SIOC:
 		{
-			astring clkString;
+			std::string clkString;
 			const UINT8 clk = (m_sioc & 0x0180) >> 7;
 			switch (clk)
 			{
-				case 0x00: clkString.printf("/4"); break;
-				case 0x01: clkString.printf("12"); break;
-				case 0x02: clkString.printf("16"); break;
-				case 0x03: clkString.printf("20"); break;
+				case 0x00: strprintf(clkString, "/4"); break;
+				case 0x01: strprintf(clkString, "12"); break;
+				case 0x02: strprintf(clkString, "16"); break;
+				case 0x03: strprintf(clkString, "20"); break;
 			}
-			string.printf("%c%s%c%c%c%c%c%c%c",
+			strprintf(str, "%c%s%c%c%c%c%c%c%c",
 							m_sioc & 0x0200 ? 'I':'O',
-							clkString.cstr(),
+							clkString.c_str(),
 							m_sioc & 0x0040 ? 'L':'M',
 							m_sioc & 0x0020 ? 'I':'O',
 							m_sioc & 0x0010 ? 'I':'O',

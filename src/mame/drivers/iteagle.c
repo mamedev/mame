@@ -105,9 +105,9 @@ class iteagle_state : public driver_device
 public:
 	iteagle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")		
+			m_maincpu(*this, "maincpu")
 	{}
-	
+
 	required_device<mips3_device> m_maincpu;
 
 	virtual void machine_start();
@@ -118,7 +118,12 @@ void iteagle_state::machine_start()
 {
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
+
+	/* configure fast RAM regions for DRC */
+	//m_maincpu->mips3drc_add_fastram(0x00000000, 16*1024*1024-1, FALSE, m_rambase);
+	//m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
 }
+
 void iteagle_state::machine_reset()
 {
 }
@@ -129,22 +134,25 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	
+
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
 	MCFG_ITEAGLE_FPGA_ADD(            ":pci:06.0")
 	MCFG_ITEAGLE_IDE_ADD(             ":pci:06.1")
+	MCFG_ITEAGLE_IDE_IRQ_ADD(         ":maincpu", MIPS3_IRQ2)
 	MCFG_ES1373_ADD(                  ":pci:07.0")
-	MCFG_VOODOO_ADD(                  ":pci:09.0")
+	MCFG_SOUND_ROUTE(0, ":pci:07.0:lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, ":pci:07.0:rspeaker", 1.0)
+	MCFG_ES1373_IRQ_ADD(              ":maincpu", MIPS3_IRQ3)
+	MCFG_VOODOO_ADD(                  ":pci:09.0", ":maincpu")
 	MCFG_ITEAGLE_EEPROM_ADD(          ":pci:0a.0")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(56.644)
-	MCFG_SCREEN_SIZE(640, 350)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 349)
+	MCFG_SCREEN_REFRESH_RATE(59)
+	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_UPDATE_DEVICE(":pci:09.0", voodoo_pci_device, screen_update)
-	
+
 
 MACHINE_CONFIG_END
 
@@ -157,56 +165,107 @@ MACHINE_CONFIG_END
 static INPUT_PORTS_START( iteagle )
 
 	PORT_START("SW5")
-	PORT_DIPNAME( 0x3, 0x1, "Resolution" )
+	PORT_DIPNAME( 0xf, 0x1, "Resolution" )
 	PORT_DIPSETTING(0x1, "Medium" )
 	PORT_DIPSETTING(0x0, "Low" )
 	PORT_DIPSETTING(0x2, "Low_Alt" )
-	PORT_DIPNAME( 0xC, 0x0, "Always" )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Right" )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Fly By" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Backspin" )
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0010, 0x00, "SW51-1" )
+	PORT_DIPSETTING(0x00, "Normal" )
+	PORT_DIPSETTING(0x10, "Operator Mode" )
+	PORT_DIPNAME( 0x0020, 0x00, "SW51-2" )
+	PORT_DIPSETTING(0x00, "On" )
+	PORT_DIPSETTING(0x20, "Off" )
+	PORT_DIPNAME( 0x00c0, 0x00, "SW51-34" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BILL1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0xC000, 0xC000, "Voltage" )
+	PORT_DIPSETTING(0xC000, "OK" )
+	PORT_DIPSETTING(0x8000, "Low" )
+	PORT_DIPSETTING(0x4000, "High" )
+	PORT_DIPSETTING(0x0000, "Not Detected" )
 
 	PORT_START("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0000, "GAME" )
 	PORT_DIPNAME( 0x00F0, 0x0000, "MAJOR" )
-	PORT_DIPNAME( 0x000F, 0x0000, "MINOR" )
-	
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore05 )
-	PORT_INCLUDE(iteagle)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0050, "MAJOR" )
-	PORT_DIPNAME( 0x000F, 0x0001, "MINOR" )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore04 )
-	PORT_INCLUDE(iteagle)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0040, "MAJOR" )
-	PORT_DIPNAME( 0x000F, 0x0000, "MINOR" )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore02o )
-	PORT_INCLUDE(iteagle)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
-	PORT_DIPNAME( 0x000F, 0x0000, "MINOR" )
+	PORT_DIPNAME( 0x000F, 0x0000, "SIMM" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtfore02 )
 	PORT_INCLUDE(iteagle)
 
+	PORT_START("TRACKX1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+
+	PORT_START("TRACKY1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_MODIFY("VERSION")
+	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
+	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gtfore04 )
+	PORT_INCLUDE(gtfore02)
+
+	PORT_MODIFY("VERSION")
+	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
+	PORT_DIPNAME( 0x00F0, 0x0040, "MAJOR" )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gtfore05 )
+	PORT_INCLUDE(gtfore02)
+
+	PORT_MODIFY("VERSION")
+	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
+	PORT_DIPNAME( 0x00F0, 0x0050, "MAJOR" )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gtfore06 )
+	PORT_INCLUDE(gtfore02)
+
 	PORT_MODIFY("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
 	PORT_DIPNAME( 0x00F0, 0x0060, "MAJOR" )
-	PORT_DIPNAME( 0x000F, 0x0000, "MINOR" )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( carnking )
+	PORT_INCLUDE(iteagle)
+
+	PORT_MODIFY("VERSION")
+	PORT_DIPNAME( 0x0F00, 0x0600, "GAME" )
+	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
+
+	PORT_START("TRACKX1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("TRACKY1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
@@ -243,36 +302,25 @@ INPUT_PORTS_END
 	ROM_LOAD( "17s20lpc_sb4.u26", 0x000000, 0x008000, CRC(62c4af8a) SHA1(6eca277b9c66a401990599e98fdca64a9e38cc9a) ) \
 	ROM_LOAD( "17s20lpc_sb5.u26", 0x008000, 0x008000, CRC(c88b9d42) SHA1(b912d0fc50ecdc6a198c626f6e1644e8405fac6e) ) \
 	ROM_LOAD( "17s50a_red1.u26", 0x010000, 0x020000, CRC(f5cf3187) SHA1(83b4a14de9959e5a776d97d424945d43501bda7f) ) \
-	ROM_REGION( 0x80, "eeprom", 0 ) \
-	ROM_COPY( "fpga", 0x0, 0x0, 0x80 ) \
 	ROM_REGION( 0x2000, "pals", 0 ) \
 	ROM_LOAD( "e2-card1.u22.jed", 0x000000, 0x000bd1, CRC(9d1e1ace) SHA1(287d6a30e9f32137ef4eba54f0effa092c97a6eb) ) \
 	ROM_LOAD( "e2-res3.u117.jed", 0x001000, 0x000bd1, CRC(4f1ff45a) SHA1(213cbdd6cd37ad9b5bfc9545084892a68d29f5ff) )
 
+
 ROM_START( iteagle )
 	EAGLE_BIOS
 
-	DISK_REGION( ":pci:06.1:ide:0:hdd:image" )
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	//DISK_REGION( ":pci:06.1:ide:1:cdrom" ) // program CD-ROM
 ROM_END
+
 ROM_START( gtfore02 )
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
 
-	DISK_REGION( ":pci:06.1:ide:0:hdd:image" )
-	DISK_IMAGE( "golf_fore_2002_v2.01.04_umv", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Labeled Golf Fore! V2.01.04 UMV */
-	//DISK_REGION( "ide:1:cdrom" ) // program CD-ROM
-	
-ROM_END
-
-ROM_START( gtfore02o )
-	EAGLE_BIOS
-
-	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
-	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
-
-	DISK_REGION( ":pci:06.1:ide:0:hdd:image" )
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
 	DISK_IMAGE( "golf_fore_2002_v2.00.00", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) ) /* Labeled Golf Fore! 2002 V2.00.00 */
 ROM_END
 
@@ -282,7 +330,7 @@ ROM_START( carnking )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "ck1-us.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide:0:hdd:image" )
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
 	DISK_IMAGE( "carnival_king_v_1.00.11", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) ) /* Labeled Carnival King V 1.00.11 */
 ROM_END
 
@@ -292,7 +340,7 @@ ROM_START( gtfore04 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide:0:hdd:image" )
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
 	DISK_IMAGE( "gt2004", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) )
 ROM_END
 
@@ -302,8 +350,18 @@ ROM_START( gtfore05 )
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
-	DISK_REGION( ":pci:06.1:ide:0:hdd:image" )
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
 	DISK_IMAGE( "gt2005", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) )
+ROM_END
+
+ROM_START( gtfore06 )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g4c-us-u.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2002_v2.01.04_umv", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Labeled Golf Fore! V6.00.01 */
 ROM_END
 
 /*************************************
@@ -313,8 +371,8 @@ ROM_END
  *************************************/
 
 GAME( 2000, iteagle,          0, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
-GAME( 2001, gtfore02,   iteagle, gtfore, gtfore02,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.04 UMV)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2001, gtfore02o, gtfore02, gtfore, gtfore02o, driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.00.00)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2002, carnking,   iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2001, gtfore02,   iteagle, gtfore, gtfore02,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.00.00)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, carnking,   iteagle, gtfore, carnking,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gtfore04,   iteagle, gtfore, gtfore04,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2004, gtfore05,   iteagle, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2005, gtfore06,   iteagle, gtfore, gtfore06,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete", GAME_NOT_WORKING | GAME_NO_SOUND )

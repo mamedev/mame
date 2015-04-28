@@ -166,7 +166,7 @@ bool msx_slot_cartridge_device::call_load()
 			}
 
 			// Check if there's some mapper related
-			astring extrainfo;
+			std::string extrainfo;
 			if (hashfile_extrainfo(*this, extrainfo))
 			{
 			}
@@ -276,7 +276,7 @@ int msx_slot_cartridge_device::get_cart_type(UINT8 *rom, UINT32 length)
 }
 
 
-void msx_slot_cartridge_device::get_default_card_software(astring &result)
+void msx_slot_cartridge_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -286,11 +286,11 @@ void msx_slot_cartridge_device::get_default_card_software(astring &result)
 		int type = NOMAPPER;
 
 		// Check if there's some mapper related information in the hashfiles
-		astring extrainfo;
+		std::string extrainfo;
 		if (hashfile_extrainfo(*this, extrainfo))
 		{
 			int extrainfo_type = -1;
-			if (1 == sscanf(extrainfo.cstr(), "%d", &extrainfo_type))
+			if (1 == sscanf(extrainfo.c_str(), "%d", &extrainfo_type))
 			{
 				static const struct { int extrainfo; int mapper; } extrainfo_map[] = {
 					//{ 0, NOMAPPER },
@@ -326,7 +326,7 @@ void msx_slot_cartridge_device::get_default_card_software(astring &result)
 		if (type == NOMAPPER)
 		{
 			// Not identified through hashfile, try automatic detection
-			type = get_cart_type(rom, length);
+			type = get_cart_type(&rom[0], length);
 		}
 
 		if (type > NOMAPPER)
@@ -334,7 +334,7 @@ void msx_slot_cartridge_device::get_default_card_software(astring &result)
 			slot_string = msx_cart_get_slot_option(type);
 		}
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 	software_get_default_slot(result, "nomapper");

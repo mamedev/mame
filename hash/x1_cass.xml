@@ -1277,8 +1277,8 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="stararth" supported="no">
-		<description>Star Arthur Densetsu - Wakusei Mephius</description>
+	<software name="mephius" supported="no">
+		<description>Star Arthur Densetsu I - Wakusei Mephius</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="惑星メフィウス"/>

@@ -267,12 +267,12 @@ void mb88_cpu_device::state_export(const device_state_entry &entry)
 }
 
 
-void mb88_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void mb88_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c",
 					TEST_ST() ? 'T' : 't',
 					TEST_ZF() ? 'Z' : 'z',
 					TEST_CF() ? 'C' : 'c',

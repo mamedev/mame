@@ -436,7 +436,7 @@ namespace bgfx
 		}
 	}
 
-	uint32_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
+	uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
 	{
 		using namespace bx;
 		uint32_t tmp0   = uint32_sll(1, _to);
@@ -449,7 +449,7 @@ namespace bgfx
 		uint32_t tmp7   = uint32_add(tmp5, tmp6);
 		uint32_t result = uint32_srl(tmp7, _from);
 
-		return result;
+		return uint8_t(result);
 	}
 
 	void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
@@ -986,7 +986,7 @@ namespace bgfx
 		{ 0, 8, 0, 8 },
 	};
 
-	uint32_t morton2d(uint16_t _x, uint16_t _y)
+	uint32_t morton2d(uint32_t _x, uint32_t _y)
 	{
 		using namespace bx;
 		const uint32_t tmpx   = uint32_part1by1(_x);
@@ -1099,9 +1099,9 @@ namespace bgfx
 				const uint8_t wa = weight[0];
 				const uint8_t wb = weight[1];
 
-				_dst[(yy*4 + xx)*4+0] = (ab * wa + bb * wb) >> 7;
-				_dst[(yy*4 + xx)*4+1] = (ag * wa + bg * wb) >> 7;
-				_dst[(yy*4 + xx)*4+2] = (ar * wa + br * wb) >> 7;
+				_dst[(yy*4 + xx)*4+0] = uint8_t( (ab * wa + bb * wb) >> 7);
+				_dst[(yy*4 + xx)*4+1] = uint8_t( (ag * wa + bg * wb) >> 7);
+				_dst[(yy*4 + xx)*4+2] = uint8_t( (ar * wa + br * wb) >> 7);
 				_dst[(yy*4 + xx)*4+3] = 255;
 
 				mod >>= 2;
@@ -1209,10 +1209,10 @@ namespace bgfx
 				const uint8_t wc = weight[2];
 				const uint8_t wd = weight[3];
 
-				_dst[(yy*4 + xx)*4+0] = (ab * wa + bb * wb) >> 7;
-				_dst[(yy*4 + xx)*4+1] = (ag * wa + bg * wb) >> 7;
-				_dst[(yy*4 + xx)*4+2] = (ar * wa + br * wb) >> 7;
-				_dst[(yy*4 + xx)*4+3] = (aa * wc + ba * wd) >> 7;
+				_dst[(yy*4 + xx)*4+0] = uint8_t( (ab * wa + bb * wb) >> 7);
+				_dst[(yy*4 + xx)*4+1] = uint8_t( (ag * wa + bg * wb) >> 7);
+				_dst[(yy*4 + xx)*4+2] = uint8_t( (ar * wa + br * wb) >> 7);
+				_dst[(yy*4 + xx)*4+3] = uint8_t( (aa * wc + ba * wd) >> 7);
 
 				mod >>= 2;
 				factorTable += 4;
@@ -1235,49 +1235,49 @@ namespace bgfx
 #define DDS_BC5U BX_MAKEFOURCC('B', 'C', '5', 'U')
 #define DDS_DX10 BX_MAKEFOURCC('D', 'X', '1', '0')
 
-#define D3DFMT_A8R8G8B8       21
-#define D3DFMT_R5G6B5         23
-#define D3DFMT_A1R5G5B5       25
-#define D3DFMT_A4R4G4B4       26
-#define D3DFMT_A2B10G10R10    31
-#define D3DFMT_G16R16         34
-#define D3DFMT_A2R10G10B10    35
-#define D3DFMT_A16B16G16R16   36
-#define D3DFMT_A8L8           51
-#define D3DFMT_R16F           111
-#define D3DFMT_G16R16F        112
-#define D3DFMT_A16B16G16R16F  113
-#define D3DFMT_R32F           114
-#define D3DFMT_G32R32F        115
-#define D3DFMT_A32B32G32R32F  116
+#define DDS_A8R8G8B8       21
+#define DDS_R5G6B5         23
+#define DDS_A1R5G5B5       25
+#define DDS_A4R4G4B4       26
+#define DDS_A2B10G10R10    31
+#define DDS_G16R16         34
+#define DDS_A2R10G10B10    35
+#define DDS_A16B16G16R16   36
+#define DDS_A8L8           51
+#define DDS_R16F           111
+#define DDS_G16R16F        112
+#define DDS_A16B16G16R16F  113
+#define DDS_R32F           114
+#define DDS_G32R32F        115
+#define DDS_A32B32G32R32F  116
 
-#define DXGI_FORMAT_R32G32B32A32_FLOAT 2
-#define DXGI_FORMAT_R32G32B32A32_UINT  3
-#define DXGI_FORMAT_R16G16B16A16_FLOAT 10
-#define DXGI_FORMAT_R16G16B16A16_UNORM 11
-#define DXGI_FORMAT_R16G16B16A16_UINT  12
-#define DXGI_FORMAT_R32G32_FLOAT       16
-#define DXGI_FORMAT_R32G32_UINT        17
-#define DXGI_FORMAT_R10G10B10A2_UNORM  24
-#define DXGI_FORMAT_R16G16_FLOAT       34
-#define DXGI_FORMAT_R16G16_UNORM       35
-#define DXGI_FORMAT_R32_FLOAT          41
-#define DXGI_FORMAT_R32_UINT           42
-#define DXGI_FORMAT_R8G8_UNORM         49
-#define DXGI_FORMAT_R16_FLOAT          54
-#define DXGI_FORMAT_R16_UNORM          56
-#define DXGI_FORMAT_R8_UNORM           61
-#define DXGI_FORMAT_BC1_UNORM          71
-#define DXGI_FORMAT_BC2_UNORM          74
-#define DXGI_FORMAT_BC3_UNORM          77
-#define DXGI_FORMAT_BC4_UNORM          80
-#define DXGI_FORMAT_BC5_UNORM          83
-#define DXGI_FORMAT_B5G6R5_UNORM       85
-#define DXGI_FORMAT_B5G5R5A1_UNORM     86
-#define DXGI_FORMAT_B8G8R8A8_UNORM     87
-#define DXGI_FORMAT_BC6H_SF16          96
-#define DXGI_FORMAT_BC7_UNORM          98
-#define DXGI_FORMAT_B4G4R4A4_UNORM     115
+#define DDS_FORMAT_R32G32B32A32_FLOAT 2
+#define DDS_FORMAT_R32G32B32A32_UINT  3
+#define DDS_FORMAT_R16G16B16A16_FLOAT 10
+#define DDS_FORMAT_R16G16B16A16_UNORM 11
+#define DDS_FORMAT_R16G16B16A16_UINT  12
+#define DDS_FORMAT_R32G32_FLOAT       16
+#define DDS_FORMAT_R32G32_UINT        17
+#define DDS_FORMAT_R10G10B10A2_UNORM  24
+#define DDS_FORMAT_R16G16_FLOAT       34
+#define DDS_FORMAT_R16G16_UNORM       35
+#define DDS_FORMAT_R32_FLOAT          41
+#define DDS_FORMAT_R32_UINT           42
+#define DDS_FORMAT_R8G8_UNORM         49
+#define DDS_FORMAT_R16_FLOAT          54
+#define DDS_FORMAT_R16_UNORM          56
+#define DDS_FORMAT_R8_UNORM           61
+#define DDS_FORMAT_BC1_UNORM          71
+#define DDS_FORMAT_BC2_UNORM          74
+#define DDS_FORMAT_BC3_UNORM          77
+#define DDS_FORMAT_BC4_UNORM          80
+#define DDS_FORMAT_BC5_UNORM          83
+#define DDS_FORMAT_B5G6R5_UNORM       85
+#define DDS_FORMAT_B5G5R5A1_UNORM     86
+#define DDS_FORMAT_B8G8R8A8_UNORM     87
+#define DDS_FORMAT_BC6H_SF16          96
+#define DDS_FORMAT_BC7_UNORM          98
+#define DDS_FORMAT_B4G4R4A4_UNORM     115
 
 #define DDSD_CAPS                   0x00000001
 #define DDSD_HEIGHT                 0x00000002
@@ -1331,57 +1331,57 @@ namespace bgfx
 		{ DDS_BC4U,                  TextureFormat::BC4     },
 		{ DDS_ATI2,                  TextureFormat::BC5     },
 		{ DDS_BC5U,                  TextureFormat::BC5     },
-		{ D3DFMT_A16B16G16R16,       TextureFormat::RGBA16  },
-		{ D3DFMT_A16B16G16R16F,      TextureFormat::RGBA16F },
+		{ DDS_A16B16G16R16,          TextureFormat::RGBA16  },
+		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F },
 		{ DDPF_RGB|DDPF_ALPHAPIXELS, TextureFormat::BGRA8   },
 		{ DDPF_INDEXED,              TextureFormat::R8      },
 		{ DDPF_LUMINANCE,            TextureFormat::R8      },
 		{ DDPF_ALPHA,                TextureFormat::R8      },
-		{ D3DFMT_R16F,               TextureFormat::R16F    },
-		{ D3DFMT_R32F,               TextureFormat::R32F    },
-		{ D3DFMT_A8L8,               TextureFormat::RG8     },
-		{ D3DFMT_G16R16,             TextureFormat::RG16    },
-		{ D3DFMT_G16R16F,            TextureFormat::RG16F   },
-		{ D3DFMT_G32R32F,            TextureFormat::RG32F   },
-		{ D3DFMT_A8R8G8B8,           TextureFormat::BGRA8   },
-		{ D3DFMT_A16B16G16R16,       TextureFormat::RGBA16  },
-		{ D3DFMT_A16B16G16R16F,      TextureFormat::RGBA16F },
-		{ D3DFMT_A32B32G32R32F,      TextureFormat::RGBA32F },
-		{ D3DFMT_R5G6B5,             TextureFormat::R5G6B5  },
-		{ D3DFMT_A4R4G4B4,           TextureFormat::RGBA4   },
-		{ D3DFMT_A1R5G5B5,           TextureFormat::RGB5A1  },
-		{ D3DFMT_A2B10G10R10,        TextureFormat::RGB10A2 },
+		{ DDS_R16F,                  TextureFormat::R16F    },
+		{ DDS_R32F,                  TextureFormat::R32F    },
+		{ DDS_A8L8,                  TextureFormat::RG8     },
+		{ DDS_G16R16,                TextureFormat::RG16    },
+		{ DDS_G16R16F,               TextureFormat::RG16F   },
+		{ DDS_G32R32F,               TextureFormat::RG32F   },
+		{ DDS_A8R8G8B8,              TextureFormat::BGRA8   },
+		{ DDS_A16B16G16R16,          TextureFormat::RGBA16  },
+		{ DDS_A16B16G16R16F,         TextureFormat::RGBA16F },
+		{ DDS_A32B32G32R32F,         TextureFormat::RGBA32F },
+		{ DDS_R5G6B5,                TextureFormat::R5G6B5  },
+		{ DDS_A4R4G4B4,              TextureFormat::RGBA4   },
+		{ DDS_A1R5G5B5,              TextureFormat::RGB5A1  },
+		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2 },
 	};
 
 	static TranslateDdsFormat s_translateDxgiFormat[] =
 	{
-		{ DXGI_FORMAT_BC1_UNORM,          TextureFormat::BC1     },
-		{ DXGI_FORMAT_BC2_UNORM,          TextureFormat::BC2     },
-		{ DXGI_FORMAT_BC3_UNORM,          TextureFormat::BC3     },
-		{ DXGI_FORMAT_BC4_UNORM,          TextureFormat::BC4     },
-		{ DXGI_FORMAT_BC5_UNORM,          TextureFormat::BC5     },
-		{ DXGI_FORMAT_BC6H_SF16,          TextureFormat::BC6H    },
-		{ DXGI_FORMAT_BC7_UNORM,          TextureFormat::BC7     },
+		{ DDS_FORMAT_BC1_UNORM,          TextureFormat::BC1     },
+		{ DDS_FORMAT_BC2_UNORM,          TextureFormat::BC2     },
+		{ DDS_FORMAT_BC3_UNORM,          TextureFormat::BC3     },
+		{ DDS_FORMAT_BC4_UNORM,          TextureFormat::BC4     },
+		{ DDS_FORMAT_BC5_UNORM,          TextureFormat::BC5     },
+		{ DDS_FORMAT_BC6H_SF16,          TextureFormat::BC6H    },
+		{ DDS_FORMAT_BC7_UNORM,          TextureFormat::BC7     },
 
-		{ DXGI_FORMAT_R8_UNORM,           TextureFormat::R8      },
-		{ DXGI_FORMAT_R16_UNORM,          TextureFormat::R16     },
-		{ DXGI_FORMAT_R16_FLOAT,          TextureFormat::R16F    },
-		{ DXGI_FORMAT_R32_UINT,           TextureFormat::R32     },
-		{ DXGI_FORMAT_R32_FLOAT,          TextureFormat::R32F    },
-		{ DXGI_FORMAT_R8G8_UNORM,         TextureFormat::RG8     },
-		{ DXGI_FORMAT_R16G16_UNORM,       TextureFormat::RG16    },
-		{ DXGI_FORMAT_R16G16_FLOAT,       TextureFormat::RG16F   },
-		{ DXGI_FORMAT_R32G32_UINT,        TextureFormat::RG32    },
-		{ DXGI_FORMAT_R32G32_FLOAT,       TextureFormat::RG32F   },
-		{ DXGI_FORMAT_B8G8R8A8_UNORM,     TextureFormat::BGRA8   },
-		{ DXGI_FORMAT_R16G16B16A16_UNORM, TextureFormat::RGBA16  },
-		{ DXGI_FORMAT_R16G16B16A16_FLOAT, TextureFormat::RGBA16F },
-		{ DXGI_FORMAT_R32G32B32A32_UINT,  TextureFormat::RGBA32  },
-		{ DXGI_FORMAT_R32G32B32A32_FLOAT, TextureFormat::RGBA32F },
-		{ DXGI_FORMAT_B5G6R5_UNORM,       TextureFormat::R5G6B5  },
-		{ DXGI_FORMAT_B4G4R4A4_UNORM,     TextureFormat::RGBA4   },
-		{ DXGI_FORMAT_B5G5R5A1_UNORM,     TextureFormat::RGB5A1  },
-		{ DXGI_FORMAT_R10G10B10A2_UNORM,  TextureFormat::RGB10A2 },
+		{ DDS_FORMAT_R8_UNORM,           TextureFormat::R8      },
+		{ DDS_FORMAT_R16_UNORM,          TextureFormat::R16     },
+		{ DDS_FORMAT_R16_FLOAT,          TextureFormat::R16F    },
+		{ DDS_FORMAT_R32_UINT,           TextureFormat::R32     },
+		{ DDS_FORMAT_R32_FLOAT,          TextureFormat::R32F    },
+		{ DDS_FORMAT_R8G8_UNORM,         TextureFormat::RG8     },
+		{ DDS_FORMAT_R16G16_UNORM,       TextureFormat::RG16    },
+		{ DDS_FORMAT_R16G16_FLOAT,       TextureFormat::RG16F   },
+		{ DDS_FORMAT_R32G32_UINT,        TextureFormat::RG32    },
+		{ DDS_FORMAT_R32G32_FLOAT,       TextureFormat::RG32F   },
+		{ DDS_FORMAT_B8G8R8A8_UNORM,     TextureFormat::BGRA8   },
+		{ DDS_FORMAT_R16G16B16A16_UNORM, TextureFormat::RGBA16  },
+		{ DDS_FORMAT_R16G16B16A16_FLOAT, TextureFormat::RGBA16F },
+		{ DDS_FORMAT_R32G32B32A32_UINT,  TextureFormat::RGBA32  },
+		{ DDS_FORMAT_R32G32B32A32_FLOAT, TextureFormat::RGBA32F },
+		{ DDS_FORMAT_B5G6R5_UNORM,       TextureFormat::R5G6B5  },
+		{ DDS_FORMAT_B4G4R4A4_UNORM,     TextureFormat::RGBA4   },
+		{ DDS_FORMAT_B5G5R5A1_UNORM,     TextureFormat::RGB5A1  },
+		{ DDS_FORMAT_R10G10B10A2_UNORM,  TextureFormat::RGB10A2 },
 	};
 
 	struct TranslateDdsPixelFormat
@@ -1542,13 +1542,13 @@ namespace bgfx
 		_imageContainer.m_data = NULL;
 		_imageContainer.m_size = 0;
 		_imageContainer.m_offset = (uint32_t)bx::seek(_reader);
-		_imageContainer.m_width = width;
+		_imageContainer.m_width  = width;
 		_imageContainer.m_height = height;
-		_imageContainer.m_depth = depth;
-		_imageContainer.m_format = format;
-		_imageContainer.m_numMips = (caps[0] & DDSCAPS_MIPMAP) ? mips : 1;
+		_imageContainer.m_depth  = depth;
+		_imageContainer.m_format   = uint8_t(format);
+		_imageContainer.m_numMips  = uint8_t( (caps[0] & DDSCAPS_MIPMAP) ? mips : 1);
 		_imageContainer.m_hasAlpha = hasAlpha;
-		_imageContainer.m_cubeMap = cubeMap;
+		_imageContainer.m_cubeMap  = cubeMap;
 		_imageContainer.m_ktx = false;
 
 		return TextureFormat::Unknown != format;
@@ -1719,13 +1719,13 @@ namespace bgfx
 		_imageContainer.m_data = NULL;
 		_imageContainer.m_size = 0;
 		_imageContainer.m_offset = (uint32_t)offset;
-		_imageContainer.m_width = width;
+		_imageContainer.m_width  = width;
 		_imageContainer.m_height = height;
-		_imageContainer.m_depth = depth;
-		_imageContainer.m_format = format;
-		_imageContainer.m_numMips = numMips;
+		_imageContainer.m_depth  = depth;
+		_imageContainer.m_format = uint8_t(format);
+		_imageContainer.m_numMips  = uint8_t(numMips);
 		_imageContainer.m_hasAlpha = hasAlpha;
-		_imageContainer.m_cubeMap = numFaces > 1;
+		_imageContainer.m_cubeMap  = numFaces > 1;
 		_imageContainer.m_ktx = true;
 
 		return TextureFormat::Unknown != format;
@@ -1865,13 +1865,13 @@ namespace bgfx
 		_imageContainer.m_data = NULL;
 		_imageContainer.m_size = 0;
 		_imageContainer.m_offset = (uint32_t)offset;
-		_imageContainer.m_width = width;
+		_imageContainer.m_width  = width;
 		_imageContainer.m_height = height;
-		_imageContainer.m_depth = depth;
-		_imageContainer.m_format = format;
-		_imageContainer.m_numMips = numMips;
+		_imageContainer.m_depth  = depth;
+		_imageContainer.m_format = uint8_t(format);
+		_imageContainer.m_numMips  = uint8_t(numMips);
 		_imageContainer.m_hasAlpha = hasAlpha;
-		_imageContainer.m_cubeMap = numFaces > 1;
+		_imageContainer.m_cubeMap  = numFaces > 1;
 		_imageContainer.m_ktx = false;
 
 		return TextureFormat::Unknown != format;
@@ -2122,9 +2122,36 @@ namespace bgfx
 			imageCheckerboard(_width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xffffffff), _dst);
 			break;
 
+		case TextureFormat::RGBA8:
+			imageSwizzleBgra8(_width, _height, _pitch, _src, _dst);
+			break;
+
+		case TextureFormat::BGRA8:
+			memcpy(_dst, _src, _pitch*_height);
+			break;
+
 		default:
 			// Decompression not implemented... Make ugly red-yellow checkerboard texture.
 			imageCheckerboard(_width, _height, 16, UINT32_C(0xffff0000), UINT32_C(0xffffff00), _dst);
+			break;
+		}
+	}
+
+	void imageDecodeToRgba8(uint8_t* _dst, const uint8_t* _src, uint32_t _width, uint32_t _height, uint32_t _pitch, uint8_t _type)
+	{
+		switch (_type)
+		{
+		case TextureFormat::RGBA8:
+			memcpy(_dst, _src, _pitch*_height);
+			break;
+
+		case TextureFormat::BGRA8:
+			imageSwizzleBgra8(_width, _height, _pitch, _src, _dst);
+			break;
+
+		default:
+			imageDecodeToBgra8(_dst, _src, _width, _height, _pitch, _type);
+			imageSwizzleBgra8(_width, _height, _pitch, _dst, _dst);
 			break;
 		}
 	}
@@ -2175,13 +2202,13 @@ namespace bgfx
 				if (side == _side
 				&&  lod == _lod)
 				{
-					_mip.m_width = width;
-					_mip.m_height = height;
+					_mip.m_width     = width;
+					_mip.m_height    = height;
 					_mip.m_blockSize = blockSize;
 					_mip.m_size = size;
 					_mip.m_data = (const uint8_t*)_data + offset;
-					_mip.m_bpp = bpp;
-					_mip.m_format = type;
+					_mip.m_bpp  = bpp;
+					_mip.m_format   = uint8_t(type);
 					_mip.m_hasAlpha = hasAlpha;
 					return true;
 				}

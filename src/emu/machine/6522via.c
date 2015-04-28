@@ -132,6 +132,10 @@ UINT16 via6522_device::get_counter1_value()
 // device type definition
 const device_type VIA6522 = &device_creator<via6522_device>;
 
+DEVICE_ADDRESS_MAP_START( map, 8, via6522_device )
+	AM_RANGE(0x00, 0x0f) AM_READWRITE(read, write)
+ADDRESS_MAP_END
+
 //-------------------------------------------------
 //  via6522_device - constructor
 //-------------------------------------------------
@@ -489,6 +493,8 @@ void via6522_device::output_pb()
 READ8_MEMBER( via6522_device::read )
 {
 	int val = 0;
+	if (space.debugger_access())
+		return 0;
 
 	offset &= 0xf;
 

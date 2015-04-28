@@ -980,13 +980,49 @@ DRIVER_INIT_MEMBER(skns_state,galpans3)   { machine().device<sknsspr_device>("sp
 
 /***** ROM LOADING *****/
 
+// maybe we should treat each motherboard region as a separate parent / root?
+
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+
+#define SKNS_BIOS \
+	ROM_REGION( 0x0100000, "maincpu", 0 ) \
+	ROM_SYSTEM_BIOS( 0, "japan", "Japan" ) \
+	ROM_LOAD_BIOS( 0, "sknsj1.u10", 0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) )  \
+	ROM_SYSTEM_BIOS( 1, "europe", "Europe" ) \
+	ROM_LOAD_BIOS( 1, "sknse1.u10", 0x000000, 0x080000, CRC(e2b9d7d1) SHA1(b530a3bb9dedc8cfafcba9f1f10277590be04a15) )  \
+	ROM_SYSTEM_BIOS( 2, "asia", "Asia" ) \
+	ROM_LOAD_BIOS( 2, "sknsa1.u10", 0x000000, 0x080000, CRC(745e5212) SHA1(caba649ab2d83b2d7e007eecee0fc582c019df38) )  \
+	ROM_SYSTEM_BIOS( 3, "usa", "USA" ) \
+	ROM_LOAD_BIOS( 3, "sknsu1.u10", 0x000000, 0x080000, CRC(384d21ec) SHA1(a27e8a18099d9cea64fa32db28d01101c2a78815) )  \
+	ROM_SYSTEM_BIOS( 4, "korea", "Korea" ) \
+	ROM_LOAD_BIOS( 4, "sknsk1.u10", 0x000000, 0x080000, CRC(ff1c9f79) SHA1(a51e598d43e76d37da69b1f094c111273bdfc94a) )  \
+	ROM_SYSTEM_BIOS( 5, "japanmod", "Japan (No Region Lock)" ) /* hack */ \
+	ROM_LOAD_BIOS( 5, "supernova_modbios.u10", 0x000000, 0x080000, CRC(b8d3190c) SHA1(62c9a4a075fd944e89fe95c6b46046101eb6de1c) ) 
+
+#define SKNS_JAPAN \
+	SKNS_BIOS \
+	ROM_DEFAULT_BIOS( "japan" )
+
+#define SKNS_EUROPE \
+	SKNS_BIOS \
+	ROM_DEFAULT_BIOS( "europe" )
+
+#define SKNS_ASIA \
+	SKNS_BIOS \
+	ROM_DEFAULT_BIOS( "asia" )
+
+#define SKNS_USA \
+	SKNS_BIOS \
+	ROM_DEFAULT_BIOS( "usa" )
+
+#define SKNS_KOREA \
+	SKNS_BIOS \
+	ROM_DEFAULT_BIOS( "korea" )
+
+
 ROM_START( skns )
-	ROM_REGION( 0x0100000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10", 0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
-	ROM_LOAD       ( "sknse1.u10", 0x000000, 0x080000, CRC(e2b9d7d1) SHA1(b530a3bb9dedc8cfafcba9f1f10277590be04a15) ) /* Europ BIOS */
-	ROM_LOAD       ( "sknsa1.u10", 0x000000, 0x080000, CRC(745e5212) SHA1(caba649ab2d83b2d7e007eecee0fc582c019df38) ) /* Asia  BIOS */
-	ROM_LOAD       ( "sknsu1.u10", 0x000000, 0x080000, CRC(384d21ec) SHA1(a27e8a18099d9cea64fa32db28d01101c2a78815) ) /* USA   BIOS */
-	ROM_LOAD       ( "sknsk1.u10", 0x000000, 0x080000, CRC(ff1c9f79) SHA1(a51e598d43e76d37da69b1f094c111273bdfc94a) ) /* Korea BIOS */
+	SKNS_BIOS
 
 	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASE00 ) /* SH-2 Code mapped at 0x04000000 */
 
@@ -1001,8 +1037,7 @@ ROM_END
 
 
 ROM_START( cyvern )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsu1.u10",   0x000000, 0x080000, CRC(384d21ec) SHA1(a27e8a18099d9cea64fa32db28d01101c2a78815) ) /* US BIOS */
+	SKNS_USA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "cv-usa.u10", 0x000000, 0x100000, CRC(1023ddca) SHA1(7967e3e876cdb797bdaa2eb5136a33cd43941501) )
@@ -1026,8 +1061,7 @@ ROM_START( cyvern )
 ROM_END
 
 ROM_START( cyvernj )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "cvj-even.u10", 0x000000, 0x100000, CRC(802fadb4) SHA1(cbfac3a87a4863466117c61f2ecaf63d506352f6) )
@@ -1051,8 +1085,7 @@ ROM_START( cyvernj )
 ROM_END
 
 ROM_START( galpani4 )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gp4j1.u10", 0x000000, 0x080000, CRC(919a3893) SHA1(83b89a9e628a1f46f8a56ea512fc8ad641d5e239) )
@@ -1075,8 +1108,7 @@ ROM_START( galpani4 )
 ROM_END
 
 ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sound sample rom at U7 */
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsk1.u10",   0x000000, 0x080000, CRC(ff1c9f79) SHA1(a51e598d43e76d37da69b1f094c111273bdfc94a) ) /* Korean BIOS */
+	SKNS_KOREA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gp4k1.u10", 0x000000, 0x080000, CRC(cbd5c3a0) SHA1(17fc0d6f6050ffd31707cee3fcc263cd5b9d0c4f) )
@@ -1100,8 +1132,7 @@ ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sou
 ROM_END
 
 ROM_START( galpanis )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknse1.u10", 0x000000, 0x080000, CRC(e2b9d7d1) SHA1(b530a3bb9dedc8cfafcba9f1f10277590be04a15) ) /* Europe BIOS */
+	SKNS_EUROPE
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gps-000-e1.u10", 0x000000, 0x100000, CRC(b9ea3c44) SHA1(c1913545cd71ee75e60ade744a2a1054f770b981) )
@@ -1125,8 +1156,7 @@ ROM_START( galpanis )
 ROM_END
 
 ROM_START( galpanisj )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gps-000-j1.u10", 0x000000, 0x100000, CRC(c6938c3f) SHA1(05853ee6a44a55702788a75580b04a4be45e9bcb) )
@@ -1150,8 +1180,7 @@ ROM_START( galpanisj )
 ROM_END
 
 ROM_START( galpanisk )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsk1.u10",   0x000000, 0x080000, CRC(ff1c9f79) SHA1(a51e598d43e76d37da69b1f094c111273bdfc94a) ) /* Korean BIOS */
+	SKNS_KOREA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gps-000-k1.u10", 0x000000, 0x100000, CRC(c9ff3d8a) SHA1(edfec265654aaa8cb307424e5b2899e708392cd0) )
@@ -1175,8 +1204,7 @@ ROM_START( galpanisk )
 ROM_END
 
 ROM_START( galpans2 )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gps2j.u6", 0x000000, 0x100000, CRC(6e74005b) SHA1(a57e8307062e262c2e7a84e2c58f7dfe03fc0f78) )
@@ -1202,8 +1230,7 @@ ROM_START( galpans2 )
 ROM_END
 
 ROM_START( galpans2a )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsa1.u10", 0x000000, 0x080000, CRC(745e5212) SHA1(caba649ab2d83b2d7e007eecee0fc582c019df38) ) /* Asia BIOS */
+	SKNS_ASIA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gps2av11.u6", 0x000000, 0x100000, CRC(61c05d5f) SHA1(e47c7951c1f688edb6c677532f750537a64bb7b3) )
@@ -1247,8 +1274,7 @@ Gals Panic 2 set.
 */
 
 ROM_START( galpansu )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "bios.u10",   0x000000, 0x080000, CRC(161fb79e) SHA1(dfb5517de3a14a94344e0f58bbe90b69c5cb5b57) ) /* Korea BIOS */
+	SKNS_KOREA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "su.u10", 0x000000, 0x100000, CRC(5ae66218) SHA1(c3f32603e1da945efb984ff99e1a30202e535773) )
@@ -1275,8 +1301,7 @@ ROM_START( galpansu )
 ROM_END
 
 ROM_START( galpans3 )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gpss3.u10", 0x000000, 0x100000, CRC(c1449a72) SHA1(02db81a0ea349742d6ddf71d59fcfce45f0c5212) )
@@ -1297,8 +1322,7 @@ ROM_START( galpans3 )
 ROM_END
 
 ROM_START( gutsn )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "gts000j0.u6", 0x000000, 0x080000, CRC(8ee91310) SHA1(8dd918189fe445d79c7f028168862b852f70a6f2) )
@@ -1319,8 +1343,7 @@ ROM_START( gutsn )
 ROM_END
 
 ROM_START( panicstr )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "ps1000j0.u10", 0x000000, 0x100000, CRC(59645f89) SHA1(8da205c6e38899d6c637941700dd7eea56011c10) )
@@ -1342,8 +1365,7 @@ ROM_START( panicstr )
 ROM_END
 
 ROM_START( puzzloop )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknse1.u10", 0x000000, 0x080000, CRC(e2b9d7d1) SHA1(b530a3bb9dedc8cfafcba9f1f10277590be04a15) ) /* Europe BIOS */
+	SKNS_EUROPE
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "pl00e4.u6", 0x000000, 0x080000, CRC(7d3131a5) SHA1(f9302aa27addb8a730102b1869a34063d8b44e62) ) /* V0.94 */
@@ -1365,8 +1387,7 @@ ROM_START( puzzloop )
 ROM_END
 
 ROM_START( puzzloope )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknse1.u10", 0x000000, 0x080000, CRC(e2b9d7d1) SHA1(b530a3bb9dedc8cfafcba9f1f10277590be04a15) ) /* Europe BIOS */
+	SKNS_EUROPE
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "pl00e1.u6", 0x000000, 0x080000, CRC(273adc38) SHA1(37ca873342ba9fb9951114048a9cd255f73fe19c) ) /* V0.93 */
@@ -1388,8 +1409,7 @@ ROM_START( puzzloope )
 ROM_END
 
 ROM_START( puzzloopj )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "pl0j2.u6", 0x000000, 0x080000, CRC(23c3bf97) SHA1(77ea1f32bed5709a6ad5b250370f08cfe8036867) ) /* V0.94 */
@@ -1411,8 +1431,7 @@ ROM_START( puzzloopj )
 ROM_END
 
 ROM_START( puzzloopa )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsa1.u10", 0x000000, 0x080000, CRC(745e5212) SHA1(caba649ab2d83b2d7e007eecee0fc582c019df38) ) /* Asia BIOS */
+	SKNS_ASIA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "pl0a3.u6", 0x000000, 0x080000, CRC(4e8673b8) SHA1(17acfb0550912e6f2519df2bc24fbf629a1f6147) ) /* V0.94 */
@@ -1434,8 +1453,7 @@ ROM_START( puzzloopa )
 ROM_END
 
 ROM_START( puzzloopk )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsk1.u10",   0x000000, 0x080000, CRC(ff1c9f79) SHA1(a51e598d43e76d37da69b1f094c111273bdfc94a) ) /* Korean BIOS */
+	SKNS_KOREA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "pl0k4.u6", 0x000000, 0x080000, CRC(8d81f20c) SHA1(c32a525e8f92a625e3fecb7c43dd04b13e0a75e4) ) /* V0.94 */
@@ -1457,8 +1475,7 @@ ROM_START( puzzloopk )
 ROM_END
 
 ROM_START( puzzloopu )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsu1.u10",   0x000000, 0x080000, CRC(384d21ec) SHA1(a27e8a18099d9cea64fa32db28d01101c2a78815) ) /* US BIOS */
+	SKNS_USA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "plue5.u6", 0x000000, 0x080000, CRC(e6f3f82f) SHA1(ac61dc22fa3c1b1c2f3a41d3a8fb43938b77ca68) ) /* V0.94 */
@@ -1480,8 +1497,7 @@ ROM_START( puzzloopu )
 ROM_END
 
 ROM_START( jjparads )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "jp1j1.u10", 0x000000, 0x080000, CRC(de2fb669) SHA1(229ff1ae0ec5bc77fc17642964e0bb0146594e86) )
@@ -1504,8 +1520,7 @@ ROM_START( jjparads )
 ROM_END
 
 ROM_START( jjparad2 )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "jp2000j1.u6", 0x000000, 0x080000, CRC(5d75e765) SHA1(33bcd8f929f6025b00df2ea783b13a391a28a5c3) )
@@ -1529,8 +1544,7 @@ ROM_START( jjparad2 )
 ROM_END
 
 ROM_START( sengekis )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsa1.u10", 0x000000, 0x080000, CRC(745e5212) SHA1(caba649ab2d83b2d7e007eecee0fc582c019df38) ) /* Asia BIOS */
+	SKNS_ASIA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "ss01a.u6", 0x000000, 0x080000, CRC(962fe857) SHA1(3df74c5efff11333dea9316a063129dcec0d7bdd) )
@@ -1556,8 +1570,7 @@ ROM_START( sengekis )
 ROM_END
 
 ROM_START( sengekisj )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "ss01j.u6", 0x000000, 0x080000, CRC(9efdcd5a) SHA1(66cca04d07999dc8ca0bcf19db925996b34d0390) )
@@ -1583,8 +1596,7 @@ ROM_START( sengekisj )
 ROM_END
 
 ROM_START( senknow )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "snw000j1.u6", 0x000000, 0x080000, CRC(0d6136f6) SHA1(eedd011cfe03577bfaf386723502d03f6e5dbd8c) )
@@ -1608,8 +1620,7 @@ ROM_START( senknow )
 ROM_END
 
 ROM_START( teljan )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "tel1j.u10", 0x000000, 0x080000, CRC(09b552fe) SHA1(2f315fd09eb22fa8c81faa1e926038f20daa845f) )
@@ -1633,8 +1644,7 @@ ROM_END
 
 
 ROM_START( ryouran )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "or-000-j2.u10",  0x000000, 0x080000, CRC(cba8ca4e) SHA1(7389502622a04101ca34f7b390ca0da820f62590) )
@@ -1658,8 +1668,7 @@ ROM_START( ryouran )
 ROM_END
 
 ROM_START( ryourano )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "or000j1.u10",  0x000000, 0x080000, CRC(d93aa491) SHA1(dc01707f1e80d81f28d6b685d08fc6c0d2bf7330) )
@@ -1683,8 +1692,7 @@ ROM_START( ryourano )
 ROM_END
 
 ROM_START( vblokbrk )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsa1.u10", 0x000000, 0x080000, CRC(745e5212) SHA1(caba649ab2d83b2d7e007eecee0fc582c019df38) ) /* Asia BIOS */
+	SKNS_ASIA
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "sk01a.u10", 0x000000, 0x080000, CRC(4d1be53e) SHA1(3d28b73a67530147962b8df6244af8bea2ab080f) )
@@ -1706,8 +1714,7 @@ ROM_START( vblokbrk )
 ROM_END
 
 ROM_START( sarukani )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
-	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+	SKNS_JAPAN
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
 	ROM_LOAD16_BYTE( "sk1j1.u10", 0x000000, 0x080000, CRC(fcc131b6) SHA1(5e3e71ee1f736b6098e671e6f57b1fb313c81adb) )

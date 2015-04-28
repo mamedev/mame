@@ -10,7 +10,7 @@
 
 #	if BGFX_USE_WGL
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 	PFNWGLGETPROCADDRESSPROC wglGetProcAddress;
 	PFNWGLMAKECURRENTPROC wglMakeCurrent;
@@ -287,11 +287,12 @@ namespace bgfx
 		m_opengl32dll = NULL;
 	}
 
-	void GlContext::resize(uint32_t /*_width*/, uint32_t /*_height*/, bool _vsync)
+	void GlContext::resize(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t _flags)
 	{
 		if (NULL != wglSwapIntervalEXT)
 		{
-			wglSwapIntervalEXT(_vsync ? 1 : 0);
+			bool vsync = !!(_flags&BGFX_RESET_VSYNC);
+			wglSwapIntervalEXT(vsync ? 1 : 0);
 		}
 	}
 
@@ -376,7 +377,7 @@ namespace bgfx
 #	include "glimports.h"
 	}
 
-} // namespace bgfx
+} } // namespace bgfx
 
 #	endif // BGFX_USE_WGL
 #endif // (BGFX_CONFIG_RENDERER_OPENGLES|BGFX_CONFIG_RENDERER_OPENGL)

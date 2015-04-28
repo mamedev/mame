@@ -82,12 +82,12 @@ void m740_device::device_reset()
 	SP = 0x00ff;
 }
 
-void m740_device::state_string_export(const device_state_entry &entry, astring &string)
+void m740_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 	case M6502_P:
-		string.printf("%c%c%c%c%c%c%c",
+		strprintf(str, "%c%c%c%c%c%c%c",
 						P & F_N ? 'N' : '.',
 						P & F_V ? 'V' : '.',
 						P & F_T ? 'T' : '.',

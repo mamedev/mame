@@ -15,12 +15,12 @@ parameters_manager::parameters_manager(running_machine &machine)
 {
 }
 
-astring parameters_manager::lookup(astring tag) const
+std::string parameters_manager::lookup(std::string tag) const
 {
-	return m_parameters.find(tag);
+	return m_parameters.find(tag.c_str());
 }
 
-void parameters_manager::add(astring tag, astring value)
+void parameters_manager::add(std::string tag, std::string value)
 {
-	m_parameters.add(tag, value);
+	m_parameters.add(tag.c_str(), value);
 }

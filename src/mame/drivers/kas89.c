@@ -282,7 +282,7 @@ WRITE8_MEMBER(kas89_state::mux_w)
     7654 3210
     xxxx xxxx   Input selector.
 
-    Writes: 1-2-4-8-10-20-40-3f. Only 80 (for DSW) at very begining...
+    Writes: 1-2-4-8-10-20-40-3f. Only 80 (for DSW) at very beginning...
 */
 
 	m_mux_data = data;
@@ -854,7 +854,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 
 	/* Unscrambling address lines */
 	dynamic_buffer buf(memsize);
-	memcpy(buf, mem, memsize);
+	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[BITSWAP16(i,15,14,5,6,3,0,12,1,9,13,4,7,10,8,2,11)] = buf[i];

@@ -7431,22 +7431,22 @@ DRIVER_INIT_MEMBER(isgsm_state,isgsm)
 	DRIVER_INIT_CALL(generic_5521);
 
 	// decrypt the bios...
-	dynamic_array<UINT16> temp(0x20000/2);
+	std::vector<UINT16> temp(0x20000/2);
 	UINT16 *rom = (UINT16 *)memregion("bios")->base();
 	for (int addr = 0; addr < 0x20000/2; addr++)
 		temp[addr ^ 0x4127] = BITSWAP16(rom[addr], 6, 14, 4, 2, 12, 10, 8, 0, 1, 9, 11, 13, 3, 5, 7, 15);
-	memcpy(rom, temp, 0x20000);
+	memcpy(rom, &temp[0], 0x20000);
 }
 
 DRIVER_INIT_MEMBER(isgsm_state,shinfz)
 {
 	init_isgsm();
 
-	dynamic_array<UINT16> temp(0x200000/2);
+	std::vector<UINT16> temp(0x200000/2);
 	UINT16 *rom = (UINT16 *)memregion("gamecart_rgn")->base();
 	for (int addr = 0; addr < 0x200000/2; addr++)
 		temp[addr ^ 0x68956] = BITSWAP16(rom[addr], 8, 4, 12, 3, 6, 7, 1, 0, 15, 11, 5, 14, 10, 2, 9, 13);
-	memcpy(rom, temp, 0x200000);
+	memcpy(rom, &temp[0], 0x200000);
 
 	m_read_xor = 0x66;
 	m_security_callback = security_callback_delegate(FUNC(isgsm_state::shinfz_security), this);
@@ -7456,11 +7456,11 @@ DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
 {
 	init_isgsm();
 
-	dynamic_array<UINT16> temp(0x80000/2);
+	std::vector<UINT16> temp(0x80000/2);
 	UINT16 *rom = (UINT16 *)memregion("gamecart_rgn")->base();
 	for (int addr = 0; addr < 0x80000/2; addr++)
 		temp[addr ^ 0x2A6E6] = BITSWAP16(rom[addr], 4, 0, 12, 5, 7, 3, 1, 14, 10, 11, 9, 6, 15, 2, 13, 8);
-	memcpy(rom, temp, 0x80000);
+	memcpy(rom, &temp[0], 0x80000);
 
 	m_read_xor = 0x73;
 	m_security_callback = security_callback_delegate(FUNC(isgsm_state::tetrbx_security), this);

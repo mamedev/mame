@@ -33,6 +33,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "sms_vdp"),
 		m_main_scr(*this, "screen"),
+		m_psg_sms(*this, "segapsg"),
+		m_psg_gg(*this, "gamegear"),
 		m_ym(*this, "ym2413"),
 		m_port_ctrl1(*this, CONTROL1_TAG),
 		m_port_ctrl2(*this, CONTROL2_TAG),
@@ -62,6 +64,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<sega315_5124_device> m_vdp;
 	required_device<screen_device> m_main_scr;
+	optional_device<segapsg_device> m_psg_sms;
+	optional_device<gamegear_device> m_psg_gg;
 	optional_device<ym2413_device> m_ym;
 	optional_device<sms_control_port_device> m_port_ctrl1;
 	optional_device<sms_control_port_device> m_port_ctrl2;
@@ -116,7 +120,7 @@ public:
 	UINT8 m_io_ctrl_reg;
 	UINT8 m_mem_ctrl_reg;
 	UINT8 m_mem_device_enabled;
-	UINT8 m_fm_detect;
+	UINT8 m_audio_control;
 	UINT8 m_port_dc_reg;
 	UINT8 m_port_dd_reg;
 	UINT8 m_gg_sio[5];
@@ -164,8 +168,11 @@ public:
 	DECLARE_READ8_MEMBER(gg_input_port_00_r);
 	DECLARE_READ8_MEMBER(gg_sio_r);
 	DECLARE_WRITE8_MEMBER(gg_sio_w);
-	DECLARE_READ8_MEMBER(sms_fm_detect_r);
-	DECLARE_WRITE8_MEMBER(sms_fm_detect_w);
+	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
+	DECLARE_WRITE8_MEMBER(gg_psg_w);
+	DECLARE_WRITE8_MEMBER(sms_psg_w);
+	DECLARE_READ8_MEMBER(sms_audio_control_r);
+	DECLARE_WRITE8_MEMBER(sms_audio_control_w);
 	DECLARE_WRITE8_MEMBER(sms_ym2413_register_port_w);
 	DECLARE_WRITE8_MEMBER(sms_ym2413_data_port_w);
 	DECLARE_READ8_MEMBER(sms_sscope_r);

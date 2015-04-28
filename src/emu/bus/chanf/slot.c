@@ -49,9 +49,7 @@ void device_channelf_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(CHANFSLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(CHANFSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -219,7 +217,7 @@ bool channelf_cart_slot_device::call_softlist_load(software_list_device &swlist,
  get default card software
  -------------------------------------------------*/
 
-void channelf_cart_slot_device::get_default_card_software(astring &result)
+void channelf_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -237,7 +235,7 @@ void channelf_cart_slot_device::get_default_card_software(astring &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 	software_get_default_slot(result, "chess");

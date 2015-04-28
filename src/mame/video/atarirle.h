@@ -162,7 +162,7 @@ private:
 	const UINT16 *      m_rombase;            // pointer to the base of the GFX ROM
 	int                 m_romlength;          // length of the GFX ROM
 	int                 m_objectcount;        // number of objects in the ROM
-	dynamic_array<object_info> m_info;        // list of info records
+	std::vector<object_info> m_info;               // list of info records
 
 	// rendering state
 	bitmap_ind16        m_vram[2][2];         // pointers to VRAM bitmaps and backbuffers

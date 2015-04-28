@@ -378,8 +378,10 @@ tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decod
 	// reset scroll information
 	m_scrollrows = 1;
 	m_scrollcols = 1;
-	m_rowscroll.resize_and_clear(m_height);
-	m_colscroll.resize_and_clear(m_width);
+	m_rowscroll.resize(m_height);
+	memset(&m_rowscroll[0], 0, m_height*sizeof(m_rowscroll[0]));
+	m_colscroll.resize(m_width);
+	memset(&m_colscroll[0], 0, m_width*sizeof(m_colscroll[0]));
 	m_dx = 0;
 	m_dx_flipped = 0;
 	m_dy = 0;
@@ -442,7 +444,7 @@ tilemap_t::~tilemap_t()
 void tilemap_t::mark_tile_dirty(tilemap_memory_index memindex)
 {
 	// only mark if within range
-	if (memindex < m_memory_to_logical.count())
+	if (memindex < m_memory_to_logical.size())
 	{
 		// there may be no logical index for a given memory index
 		logical_index logindex = m_memory_to_logical[memindex];
@@ -660,10 +662,10 @@ void tilemap_t::mappings_create()
 void tilemap_t::mappings_update()
 {
 	// initialize all the mappings to invalid values
-	memset(&m_memory_to_logical[0], 0xff, m_memory_to_logical.count() * sizeof(m_memory_to_logical[0]));
+	memset(&m_memory_to_logical[0], 0xff, m_memory_to_logical.size() * sizeof(m_memory_to_logical[0]));
 
 	// now iterate over all logical indexes and populate the memory index
-	for (logical_index logindex = 0; logindex < m_logical_to_memory.count(); logindex++)
+	for (logical_index logindex = 0; logindex < m_logical_to_memory.size(); logindex++)
 	{
 		UINT32 logical_col = logindex % m_cols;
 		UINT32 logical_row = logindex / m_cols;
@@ -697,7 +699,7 @@ inline void tilemap_t::realize_all_dirty_tiles()
 	// flush the dirty status to all tiles
 	if (m_all_tiles_dirty || gfx_elements_changed())
 	{
-		memset(&m_tileflags[0], TILE_FLAG_DIRTY, m_tileflags.count());
+		memset(&m_tileflags[0], TILE_FLAG_DIRTY, m_tileflags.size());
 		m_all_tiles_dirty = false;
 		m_gfx_used = 0;
 	}
@@ -1785,8 +1787,8 @@ void tilemap_device::device_start()
 		m_basemem.set(*share, m_bytes_per_entry);
 
 		// look for an extension entry
-		astring tag_ext(tag(), "_ext");
-		share = memshare(tag_ext.cstr());
+		std::string tag_ext = std::string(tag()).append("_ext");
+		share = memshare(tag_ext.c_str());
 		if (share != NULL)
 			m_extmem.set(*share, m_bytes_per_entry);
 	}

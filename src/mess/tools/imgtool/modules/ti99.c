@@ -496,7 +496,7 @@ struct dsk_subdir
 /*
     DSK VIB record
 
-    Most fields in this record are only revelant to level 2 routines, but level
+    Most fields in this record are only relevant to level 2 routines, but level
     1 routines need the disk geometry information extracted from the VIB.
 */
 struct dsk_vib

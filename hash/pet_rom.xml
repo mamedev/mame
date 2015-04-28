@@ -104,6 +104,18 @@
 		</part>
 	</software>
 
+	<software name="mcterm110" cloneof="mcterm">
+		<description>McTerm 1.10</description>
+		<year>1981</year>
+		<publisher>Madison Computer</publisher>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="mcterm110-9000.bin" size="0x800" crc="7ff92c17" sha1="4df7e96cf49a5bbbad60eef8dd0449b5233c2c20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcterm120" cloneof="mcterm">
 		<description>McTerm 1.20</description>
 		<year>1981</year>
@@ -352,6 +364,18 @@
 		<part name="rom" interface="pet_a000_rom">
 			<dataarea name="rom" size="0x1000">
 				<rom name="wordpro-a000.bin" size="0x1000" crc="8fb42b4d" sha1="906d8ec3a0918d123e7d87bd3ebf6b0bc1bd87e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kram2">
+		<description>KRAM 2.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="rom" interface="pet_a000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="kram2_pet8032_ud11_hn462532.bin" size="0x1000" crc="db606731" sha1="70b3fca8792e1010c3ad31e07df837f4772f8e3e" offset="0" />
 			</dataarea>
 		</part>
 	</software>

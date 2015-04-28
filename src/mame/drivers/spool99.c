@@ -101,36 +101,41 @@ class spool99_state : public driver_device
 public:
 	spool99_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_main(*this, "mainram"),
-		m_vram(*this, "vram"),
-		m_cram(*this, "cram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_main(*this, "mainram"),
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<UINT8> m_main;
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
+
 	tilemap_t *m_sc0_tilemap;
-	DECLARE_WRITE8_MEMBER(spool99_vram_w);
-	DECLARE_WRITE8_MEMBER(spool99_cram_w);
+
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(cram_w);
 	DECLARE_READ8_MEMBER(spool99_io_r);
 	DECLARE_READ8_MEMBER(vcarn_io_r);
 	DECLARE_WRITE8_MEMBER(eeprom_resetline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_clockline_w);
 	DECLARE_WRITE8_MEMBER(eeprom_dataline_w);
+
 	DECLARE_DRIVER_INIT(spool99);
-	TILE_GET_INFO_MEMBER(get_spool99_tile_info);
 	virtual void video_start();
-	UINT32 screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
-TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
+TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
 {
 	int code = ((m_vram[tile_index*2+1]<<8) | (m_vram[tile_index*2+0]));
 	int color = m_cram[tile_index*2+0];
@@ -143,22 +148,22 @@ TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
 
 void spool99_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spool99_state::get_spool99_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_sc0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(spool99_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-UINT32 spool99_state::screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
-WRITE8_MEMBER(spool99_state::spool99_vram_w)
+WRITE8_MEMBER(spool99_state::vram_w)
 {
 	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(spool99_state::spool99_cram_w)
+WRITE8_MEMBER(spool99_state::cram_w)
 {
 	m_cram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
@@ -229,8 +234,8 @@ static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_SHARE("cram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END
 
 READ8_MEMBER(spool99_state::vcarn_io_r)
@@ -276,8 +281,8 @@ static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
 //  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_SHARE("vram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_SHARE("cram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END
 
 
@@ -360,7 +365,7 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(7*8, 55*8-1, 1*8, 31*8-1) //384x240,raw guess
-	MCFG_SCREEN_UPDATE_DRIVER(spool99_state, screen_update_spool99)
+	MCFG_SCREEN_UPDATE_DRIVER(spool99_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
@@ -455,8 +460,8 @@ DRIVER_INIT_MEMBER(spool99_state,spool99)
 
 
 
-GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.36)", 0 )
-GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.33)", 0 )
-GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.31)", 0 )
-GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.26)", 0 )
-GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", 0 ) //MAME screen says '98, PCB screen says '99?
+GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.36)", GAME_SUPPORTS_SAVE )
+GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.33)", GAME_SUPPORTS_SAVE )
+GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.31)", GAME_SUPPORTS_SAVE )
+GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Super Pool 99 (Version 0.26)", GAME_SUPPORTS_SAVE )
+GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state,    spool99, ROT0,  "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", GAME_SUPPORTS_SAVE ) //MAME screen says '98, PCB screen says '99?

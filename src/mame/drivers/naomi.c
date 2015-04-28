@@ -27,6 +27,21 @@ Compatibility list (as per 26-jun-2013)
 - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
 - vtennisg: crashes after stage screen.
 
+(25-mar-2015)
+- sl2007:
+0C04697A: MOV.L   @($28,R14),R0 ;8c167734
+0C04697C: TST     R0,R0
+0C04697E: BT      $0C046998
+0C046980: BRA     $0C046990
+0C04698E: BT      $0C046998
+0C046990: MOV.L   @($28,R14),R3
+0C046992: MOV     #$FD,R5
+0C046994: JSR     R3
+0C046608: NOP
+0C04660A: BRA     $0C04660A ;tight loops there, NOP-ing this opcode makes to go further, perhaps not supposed to go here in the first place?
+0C046608: NOP
+
+
 TODO (general):
     - all games that uses YUV just updates one frame then dies, why?
     - Some SH to ARM sound streaming doesn't work (used by ADX compression system)
@@ -52,7 +67,7 @@ TODO (general):
     * Shootout Pool Medal
     * Shootout Pool Prize
 
-    - "com error occured between Naomi BD and I/O BD"
+    - "com error occurred between Naomi BD and I/O BD"
     * Samba de Amigo
     * Samba de Amigo (prototype)
     * Samba de Amigo Ver. 2000
@@ -580,7 +595,7 @@ Mushiking - The King Of Beetles II ENG (Ver. 1.001) 840-0164C  not present  2 (5
 Mushiking - The King Of Beetles II ENG (Ver. 2.001) 840-0164C  24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
 Poka Suka Ghost                                     840-0170C  not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
 Radirgy Noa                                         841-0062C  not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
-Rythm Tengoku                                       841-0177C  not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Rhythm Tengoku                                      841-0177C  not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
 Star Horse Progress Returns (satellite)             840-0186C  not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Shooting Love 2007                                  841-0057C  not present  4 (512Mb)   present  317-5129-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)                              840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18", requires 837-14672 sensor board (SH4 based)
@@ -1489,25 +1504,8 @@ Sushi Bar
 */
 
 #include "emu.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/z80/z80.h"
-#include "machine/x76f100.h"
-#include "machine/maple-dc.h"
-#include "machine/dc-ctrl.h"
-#include "machine/mie.h"
-#include "machine/naomirom.h"
-#include "machine/naomigd.h"
-#include "machine/naomim1.h"
-#include "machine/naomim2.h"
-#include "machine/naomim4.h"
-#include "machine/awboard.h"
-#include "cpu/sh4/sh4.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/aica.h"
-#include "machine/aicartc.h"
-#include "machine/jvsdev.h"
-#include "machine/jvs13551.h"
-#include "includes/dc.h"
+
+
 #include "includes/naomi.h"
 
 #define CPU_CLOCK (200000000)
@@ -1915,7 +1913,7 @@ ADDRESS_MAP_END
 * Input ports
 */
 
-static INPUT_PORTS_START( naomi_debug )
+INPUT_PORTS_START( naomi_debug )
 	PORT_START("MAMEDEBUG")
 	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -2571,7 +2569,7 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  * Common for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-static MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
+MACHINE_CONFIG_START( naomi_aw_base, naomi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
 	MCFG_SH4_MD0(1)

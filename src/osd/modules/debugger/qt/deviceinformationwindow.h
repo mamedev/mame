@@ -34,7 +34,7 @@ private:
 class DeviceInformationWindowQtConfig : public WindowQtConfig
 {
 public:
-	astring m_device_tag;
+	std::string m_device_tag;
 
 	DeviceInformationWindowQtConfig() :
 		WindowQtConfig(WIN_TYPE_DEVICE_INFORMATION)

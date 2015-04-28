@@ -957,7 +957,7 @@ void cop400_cpu_device::device_start()
 	/* allocate serial timer */
 
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16));
+	m_serial_timer->adjust(attotime::zero, 0, attotime::from_ticks(16, clock()));
 
 	/* allocate counter timer */
 
@@ -965,7 +965,7 @@ void cop400_cpu_device::device_start()
 	if (m_has_counter)
 	{
 		m_counter_timer = timer_alloc(TIMER_COUNTER);
-		m_counter_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16 / 4));
+		m_counter_timer->adjust(attotime::zero, 0, attotime::from_ticks(16 * 4, clock()));
 	}
 
 	/* allocate IN latch timer */
@@ -974,7 +974,7 @@ void cop400_cpu_device::device_start()
 	if (m_has_inil)
 	{
 		m_inil_timer = timer_alloc(TIMER_INIL);
-		m_inil_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16));
+		m_inil_timer->adjust(attotime::zero, 0, attotime::from_ticks(16, clock()));
 	}
 
 	/* allocate Microbus timer */
@@ -983,7 +983,7 @@ void cop400_cpu_device::device_start()
 	if (m_microbus == COP400_MICROBUS_ENABLED)
 	{
 		m_microbus_timer = timer_alloc(TIMER_MICROBUS);
-		m_microbus_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / 16));
+		m_microbus_timer->adjust(attotime::zero, 0, attotime::from_ticks(16, clock()));
 	}
 
 	/* register for state saving */
@@ -1239,12 +1239,12 @@ void cop400_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void cop400_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void cop400_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c",
+			strprintf(str, "%c%c%c",
 							m_c ? 'C' : '.',
 							m_skl ? 'S' : '.',
 							m_skt_latch ? 'T' : '.');

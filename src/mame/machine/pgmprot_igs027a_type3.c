@@ -737,11 +737,11 @@ void pgm_arm_type3_state::pgm_descramble_happy6(UINT8* src)
 	{
 		for (int i = j; i < 0x800000; i += 0x800)
 		{
-			memcpy(buffer + writeaddress, src + i, 0x200);
+			memcpy(&buffer[writeaddress], src + i, 0x200);
 			writeaddress += 0x200;
 		}
 	}
-	memcpy(src, buffer, 0x800000);
+	memcpy(src, &buffer[0], 0x800000);
 }
 
 
@@ -756,12 +756,12 @@ void pgm_arm_type3_state::pgm_descramble_happy6_2(UINT8* src)
 		{
 			for (int i = j; i < 0x100000; i += 0x40000)
 			{
-				memcpy(buffer + writeaddress, src + i + k, 0x10000);
+				memcpy(&buffer[writeaddress], src + i + k, 0x10000);
 				writeaddress += 0x10000;
 			}
 		}
 	}
-	memcpy(src, buffer, 0x800000);
+	memcpy(src, &buffer[0], 0x800000);
 }
 
 INPUT_PORTS_START( happy6 )

@@ -32,8 +32,8 @@
 #include "modules/lib/osdlib.h"
 #include "modules/lib/osdobj_common.h"
 
-#ifdef OSD_WINDOWS
-#define SDLMAME_SDL2 1
+#if defined(OSD_WINDOWS) && !defined(SDLMAME_SDL2)
+#define SDLMAME_SDL2 0
 #endif
 
 // OpenGL headers
@@ -189,9 +189,8 @@ enum
 //  TYPES
 //============================================================
 
-#if (SDLMAME_SDL2)
+#if defined(OSD_WINDOWS)
 
-#ifdef OSD_WINDOWS
 class win_gl_context : public osd_gl_context
 {
 public:
@@ -281,50 +280,50 @@ private:
 
 	int setupPixelFormat(HDC hDC)
 	{
-	    PIXELFORMATDESCRIPTOR pfd = {
-	        sizeof(PIXELFORMATDESCRIPTOR),  /* size */
-	        1,                              /* version */
-	        PFD_SUPPORT_OPENGL |
-	        PFD_DRAW_TO_WINDOW |
-	        PFD_DOUBLEBUFFER,               /* support double-buffering */
-	        PFD_TYPE_RGBA,                  /* color type */
-	        32,                             /* prefered color depth */
-	        0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
-	        0,                              /* no alpha buffer */
-	        0,                              /* alpha bits (ignored) */
-	        0,                              /* no accumulation buffer */
-	        0, 0, 0, 0,                     /* accum bits (ignored) */
-	        16,                             /* depth buffer */
-	        0,                              /* no stencil buffer */
-	        0,                              /* no auxiliary buffers */
-	        PFD_MAIN_PLANE,                 /* main layer */
-	        0,                              /* reserved */
-	        0, 0, 0,                        /* no layer, visible, damage masks */
-	    };
-	    int pixelFormat;
+		PIXELFORMATDESCRIPTOR pfd = {
+			sizeof(PIXELFORMATDESCRIPTOR),  /* size */
+			1,                              /* version */
+			PFD_SUPPORT_OPENGL |
+			PFD_DRAW_TO_WINDOW |
+			PFD_DOUBLEBUFFER,               /* support double-buffering */
+			PFD_TYPE_RGBA,                  /* color type */
+			32,                             /* prefered color depth */
+			0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+			0,                              /* no alpha buffer */
+			0,                              /* alpha bits (ignored) */
+			0,                              /* no accumulation buffer */
+			0, 0, 0, 0,                     /* accum bits (ignored) */
+			16,                             /* depth buffer */
+			0,                              /* no stencil buffer */
+			0,                              /* no auxiliary buffers */
+			PFD_MAIN_PLANE,                 /* main layer */
+			0,                              /* reserved */
+			0, 0, 0,                        /* no layer, visible, damage masks */
+		};
+		int pixelFormat;
 
-	    pixelFormat = ChoosePixelFormat(hDC, &pfd);
-	    if (pixelFormat == 0) {
-	        strcpy(m_error, "ChoosePixelFormat failed");
-	        return 1;
-	    }
+		pixelFormat = ChoosePixelFormat(hDC, &pfd);
+		if (pixelFormat == 0) {
+			strcpy(m_error, "ChoosePixelFormat failed");
+			return 1;
+		}
 
-	    if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
-	        strcpy(m_error, "SetPixelFormat failed.");
-	        return 1;
-	    }
-	    return 0;
+		if (SetPixelFormat(hDC, pixelFormat, &pfd) != TRUE) {
+			strcpy(m_error, "SetPixelFormat failed.");
+			return 1;
+		}
+		return 0;
 	}
 
 	bool WGLExtensionSupported(const char *extension_name)
 	{
-	    //if (pfn_wglGetExtensionsStringEXT != NULL)
-	    //	printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
+		//if (pfn_wglGetExtensionsStringEXT != NULL)
+		//  printf("%s\n", this->pfn_wglGetExtensionsStringEXT());
 
-	    if (pfn_wglGetExtensionsStringEXT != NULL && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != NULL)
-	        return true;
-	    else
-	    	return false;
+		if (pfn_wglGetExtensionsStringEXT != NULL && strstr(pfn_wglGetExtensionsStringEXT(), extension_name) != NULL)
+			return true;
+		else
+			return false;
 	}
 
 	HGLRC m_context;
@@ -347,7 +346,8 @@ private:
 HMODULE win_gl_context::m_module;
 
 
-#else
+#elif SDLMAME_SDL2
+
 class sdl_gl_context : public osd_gl_context
 {
 public:
@@ -396,7 +396,7 @@ private:
 	SDL_Window *m_window;
 	char m_error[256];
 };
-#endif
+
 #else
 // SDL 1.2
 class sdl12_gl_context : public osd_gl_context
@@ -441,7 +441,6 @@ private:
 	SDL_Surface *m_window;
 	char m_error[256];
 };
-
 
 #endif
 
@@ -589,7 +588,7 @@ private:
 	int             m_height;
 	osd_dim         m_blit_dim;
 
-	osd_gl_context	*m_gl_context;
+	osd_gl_context  *m_gl_context;
 
 	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
 	// 3D info (GL mode only)
@@ -763,12 +762,13 @@ int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks)
 	dll_loaded = 0;
 
 	load_gl_lib(machine);
-	if (SDLMAME_SDL2)
-	{
-		osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
-	}
-	else
-		osd_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
+#if defined(OSD_WINDOWS)
+	osd_printf_verbose("Using Windows OpenGL driver\n");
+#elif SDLMAME_SDL2
+	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
+#else
+	osd_printf_verbose("Using SDL single-window OpenGL driver (SDL 1.2)\n");
+#endif
 
 	return 0;
 }
@@ -1030,13 +1030,11 @@ void sdl_info_ogl::initialize_gl()
 
 int sdl_info_ogl::create()
 {
-#if (SDLMAME_SDL2)
 	// create renderer
-#ifdef OSD_WINDOWS
+#if defined(OSD_WINDOWS)
 	m_gl_context = global_alloc(win_gl_context(window().m_hwnd));
-#else
+#elif SDLMAME_SDL2
 	m_gl_context = global_alloc(sdl_gl_context(window().sdl_window()));
-#endif
 #else
 	m_gl_context = global_alloc(sdl12_gl_context(window().sdl_surface()));
 #endif
@@ -1530,7 +1528,7 @@ int sdl_info_ogl::draw(const int update)
 	if (m_init_context)
 	{
 		// do some one-time OpenGL setup
-#if (SDLMAME_SDL2)
+#if SDLMAME_SDL2
 		// FIXME: SRGB conversion is working on SDL2, may be of use
 		// when we eventually target gamma and monitor profiles.
 		//glEnable(GL_FRAMEBUFFER_SRGB);
@@ -1560,7 +1558,7 @@ int sdl_info_ogl::draw(const int update)
 			loadGLExtensions();
 		}
 
-#if (!SDLMAME_SDL2)
+#if !defined(OSD_WINDOWS) && !SDLMAME_SDL2
 		// force all textures to be regenerated
 		destroy_all_textures();
 #endif
@@ -2780,11 +2778,10 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-			for (int x2 = 0; x2 < xprescale/2; x2++)
-			{
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
-			}
 		}
 		if (xborderpix)
 		{
@@ -2815,11 +2812,10 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			UINT16 srcpix1 = *src++;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
-			for (int x2 = 0; x2 < xprescale/2; x2++)
-			{
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			for (int x2 = 0; x2 < xprescale; x2++)
 				*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
-			}
 		}
 		if (xborderpix)
 		{
@@ -2862,7 +2858,7 @@ static void texture_set_data(texture_info *texture, const render_texinfo *texsou
 				(texsource->width * texture->xprescale + 2) * sizeof(UINT32));
 	}
 
-	// when nescesarry copy (and convert) the data
+	// when necessary copy (and convert) the data
 	if (!texture->nocopy)
 	{
 		int y, y2;

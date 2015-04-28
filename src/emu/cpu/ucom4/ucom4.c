@@ -75,13 +75,13 @@ upd552_cpu_device::upd552_cpu_device(const machine_config &mconfig, const char *
 
 
 // disasm
-void ucom4_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void ucom4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		// obviously not from a single flags register
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c",
 				m_inte_f    ? 'E':'e',
 				m_int_f     ? 'I':'i',
 				m_timer_f   ? 'T':'t',

@@ -183,18 +183,18 @@ void v30mz_cpu_device::device_start()
 }
 
 
-void v30mz_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void v30mz_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			string.printf("%08X", pc() );
+			strprintf(str, "%08X", pc());
 			break;
 
 		case STATE_GENFLAGS:
 			{
 				UINT16 flags = CompressFlags();
-				string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 					flags & 0x8000 ? 'M':'.',
 					flags & 0x4000 ? '?':'.',
 					flags & 0x2000 ? '?':'.',

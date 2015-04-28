@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "video/315_5124.h"
+#include "sound/sn76496.h"
 #include "sound/2413intf.h"
 #include "includes/sms.h"
 
@@ -120,34 +121,6 @@ void sms_state::sms_get_inputs()
 	{
 		m_port_dd_reg &= ~0x40 | data1; // TH ctrl1
 		m_port_dd_reg &= ~0x80 | (data2 << 1); // TH ctrl2
-	}
-}
-
-
-WRITE8_MEMBER(sms_state::sms_fm_detect_w)
-{
-	if (m_has_fm)
-		m_fm_detect = (data & 0x01);
-}
-
-
-READ8_MEMBER(sms_state::sms_fm_detect_r)
-{
-	if (m_has_fm)
-	{
-		return m_fm_detect;
-	}
-	else
-	{
-		if (!m_is_mark_iii && (m_mem_ctrl_reg & IO_CHIP))
-		{
-			return 0xff;
-		}
-		else
-		{
-			sms_get_inputs();
-			return m_port_dc_reg;
-		}
 	}
 }
 
@@ -400,20 +373,66 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 }
 
 
-WRITE8_MEMBER(sms_state::sms_ym2413_register_port_w)
+WRITE8_MEMBER(sms_state::sms_audio_control_w)
 {
 	if (m_has_fm)
-		m_ym->write(space, 0, (data & 0x3f));
+	{
+		if (m_is_smsj)
+			m_audio_control = data & 0x03;
+		else
+			m_audio_control = data & 0x01;
+	}
+}
+
+
+READ8_MEMBER(sms_state::sms_audio_control_r)
+{
+	if (m_has_fm)
+		return m_audio_control & 0x01; // just one bit even for smsj.
+	else
+		return sms_input_port_dc_r(space, offset);
+}
+
+
+WRITE8_MEMBER(sms_state::sms_ym2413_register_port_w)
+{
+	if (m_has_fm && (m_audio_control & 0x01))
+		m_ym->write(space, 0, data & 0x3f);
 }
 
 
 WRITE8_MEMBER(sms_state::sms_ym2413_data_port_w)
 {
-	if (m_has_fm)
+	if (m_has_fm && (m_audio_control & 0x01))
 	{
 		//logerror("data_port_w %x %x\n", offset, data);
 		m_ym->write(space, 1, data);
 	}
+}
+
+
+WRITE8_MEMBER(sms_state::sms_psg_w)
+{
+	// On Japanese SMS, if FM is enabled, PSG must be explicitly enabled too.
+	if (m_is_smsj && (m_audio_control & 0x01) && !(m_audio_control & 0x02))
+		return;
+
+	m_psg_sms->write(space, offset, data, mem_mask);
+}
+
+
+WRITE8_MEMBER(sms_state::gg_psg_w)
+{
+	m_psg_gg->write(space, offset, data, mem_mask);
+}
+
+
+WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
+{
+	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
+		return;
+
+	m_psg_gg->stereo_w(space, offset, data, mem_mask);
 }
 
 
@@ -871,7 +890,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 		// a F0 pattern on power up; F0 = RET P.
 		// This initialization breaks some Game Gear games though (e.g.
 		// tempojr), suggesting that not all systems had the same initialization.
-		// This also breaks some homebrew software (e.g. Nine Pixels).
+		// This also breaks some homebrew softwares (e.g. Nine Pixels).
 		// For the moment we apply this to systems that have the Japanese SMS
 		// cartridge slot.
 		if (m_has_jpn_sms_cart_slot)
@@ -888,7 +907,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	if (m_has_fm)
 	{
-		save_item(NAME(m_fm_detect));
+		save_item(NAME(m_audio_control));
 	}
 
 	if (!m_is_mark_iii)
@@ -935,7 +954,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 MACHINE_RESET_MEMBER(sms_state,sms)
 {
 	if (m_has_fm)
-		m_fm_detect = 0x01;
+		m_audio_control = 0x00;
 
 	if (!m_is_mark_iii)
 	{

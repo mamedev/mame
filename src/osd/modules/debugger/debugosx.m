@@ -53,7 +53,7 @@ public:
 			[m_console release];
 	}
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	virtual void init_debugger(running_machine &machine);
@@ -71,7 +71,7 @@ MODULE_DEFINITION(DEBUG_OSX, debugger_osx)
 //  debugger_osx::init
 //============================================================
 
-int debugger_osx::init()
+int debugger_osx::init(const osd_options &options)
 {
 	return 0;
 }
@@ -82,6 +82,7 @@ int debugger_osx::init()
 
 void debugger_osx::exit()
 {
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	if (m_console)
 	{
 		NSDictionary *info = [NSDictionary dictionaryWithObject:[NSValue valueWithPointer:m_machine]
@@ -93,6 +94,7 @@ void debugger_osx::exit()
 		m_console = nil;
 		m_machine = NULL;
 	}
+	[pool release];
 }
 
 //============================================================
@@ -110,6 +112,8 @@ void debugger_osx::init_debugger(running_machine &machine)
 
 void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 {
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
+
 	// create a console window
 	if (m_console == nil)
 		m_console = [[MAMEDebugConsole alloc] initWithMachine:*m_machine];
@@ -134,6 +138,8 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 									   dequeue:YES];
 	if (ev != nil)
 		[NSApp sendEvent:ev];
+
+	[pool release];
 }
 
 

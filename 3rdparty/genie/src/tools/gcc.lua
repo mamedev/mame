@@ -57,12 +57,10 @@
 		x32 = {
 			cppflags = "-MMD",
 			flags    = "-m32",
-			ldflags  = "-L/usr/lib32",
 		},
 		x64 = {
 			cppflags = "-MMD",
 			flags    = "-m64",
-			ldflags  = "-L/usr/lib64",
 		},
 		Universal = {
 			cppflags = "",
@@ -165,7 +163,7 @@
 		local platform = platforms[cfg.platform]
 		table.insert(result, platform.flags)
 		table.insert(result, platform.ldflags)
-
+		
 		return result
 	end
 

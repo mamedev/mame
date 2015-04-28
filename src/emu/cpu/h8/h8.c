@@ -243,12 +243,12 @@ void h8_device::state_export(const device_state_entry &entry)
 {
 }
 
-void h8_device::state_string_export(const device_state_entry &entry, astring &string)
+void h8_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 		if(has_exr)
-			string.printf("%c%c %c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c %c%c%c%c%c%c%c%c",
 							(EXR & EXR_T) ? 'T' : '-',
 							'0' + (EXR & EXR_I),
 							(CCR & F_I)  ? 'I' : '-',
@@ -260,7 +260,7 @@ void h8_device::state_string_export(const device_state_entry &entry, astring &st
 							(CCR & F_V)  ? 'V' : '-',
 							(CCR & F_C)  ? 'C' : '-');
 		else
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 							(CCR & F_I)  ? 'I' : '-',
 							(CCR & F_UI) ? 'u' : '-',
 							(CCR & F_H)  ? 'H' : '-',
@@ -279,7 +279,7 @@ void h8_device::state_string_export(const device_state_entry &entry, astring &st
 	case H8_R6:
 	case H8_R7: {
 		int r = entry.index() - H8_R0;
-		string.printf("%04x %04x", R[r+8], R[r]);
+		strprintf(str, "%04x %04x", R[r + 8], R[r]);
 		break;
 	}
 	}

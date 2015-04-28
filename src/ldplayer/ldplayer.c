@@ -137,7 +137,7 @@ protected:
 	};
 
 	// internal state
-	astring m_filename;
+	std::string m_filename;
 	ioport_value m_last_controls;
 	bool m_playing;
 };
@@ -229,14 +229,14 @@ chd_file *ldplayer_state::get_disc()
 			file_error filerr = image_file.open(dir->name);
 			if (filerr == FILERR_NONE)
 			{
-				astring fullpath(image_file.fullpath());
+				std::string fullpath(image_file.fullpath());
 				image_file.close();
 
 				// try to open the CHD
 
-				if (set_disk_handle(machine(), "laserdisc", fullpath) == CHDERR_NONE)
+				if (set_disk_handle(machine(), "laserdisc", fullpath.c_str()) == CHDERR_NONE)
 				{
-					m_filename.cpy(dir->name);
+					m_filename.assign(dir->name);
 					found = TRUE;
 					break;
 				}
@@ -371,7 +371,7 @@ void ldplayer_state::machine_reset()
 	timer_set(attotime::zero, TIMER_ID_AUTOPLAY);
 
 	// indicate the name of the file we opened
-	popmessage("Opened %s\n", m_filename.cstr());
+	popmessage("Opened %s\n", m_filename.c_str());
 }
 
 

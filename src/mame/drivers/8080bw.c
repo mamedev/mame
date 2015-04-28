@@ -2740,7 +2740,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 		buf1[addr] = rom[x];
 	}
 
-	memcpy(rom, buf1, length);
+	memcpy(rom, &buf1[0], length);
 }
 
 
@@ -3120,7 +3120,7 @@ DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
 	for (int i = 0; i < len; i++)
 		buffer[BITSWAP16(i, 15,14,13,12,11,10,8,9, 7,6,5,4,3,2,1,0)] = rom[i];
 
-	memcpy(rom, buffer, len);
+	memcpy(rom, &buffer[0], len);
 }
 
 

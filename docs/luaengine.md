@@ -112,6 +112,9 @@ your hook to be called on every frame repaint:
 > emu.sethook(draw_hud, "frame")
 ```
 
+All colors are expected in ARGB format (32b unsigned), while screen origin (0,0)
+normally corresponds to the top-left corner.
+
 Similarly to screens, you can inspect all the devices attached to a
 machine:
 ```

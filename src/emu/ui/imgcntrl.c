@@ -46,7 +46,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 	if(swi)
 	{
 		state = START_OTHER_PART;
-		current_directory.cpy(image->working_directory());
+		current_directory.assign(image->working_directory());
 	}
 	else
 	{
@@ -55,14 +55,14 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 		/* if the image exists, set the working directory to the parent directory */
 		if (image->exists())
 		{
-			current_file.cpy(image->filename());
-			zippath_parent(current_directory, current_file);
+			current_file.assign(image->filename());
+			zippath_parent(current_directory, current_file.c_str());
 		} else
-			current_directory.cpy(image->working_directory());
+			current_directory.assign(image->working_directory());
 
 		/* check to see if the path exists; if not clear it */
-		if (zippath_opendir(current_directory, NULL) != FILERR_NONE)
-			current_directory.reset();
+		if (zippath_opendir(current_directory.c_str(), NULL) != FILERR_NONE)
+			current_directory.clear();
 	}
 }
 
@@ -82,15 +82,15 @@ ui_menu_control_device_image::~ui_menu_control_device_image()
 
 void ui_menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
-	astring path;
+	std::string path;
 	osd_directory_entry *entry;
 	osd_dir_entry_type file_type;
 
 	/* assemble the full path */
-	zippath_combine(path, current_directory, current_file);
+	zippath_combine(path, current_directory.c_str(), current_file.c_str());
 
 	/* does a file or a directory exist at the path */
-	entry = osd_stat(path);
+	entry = osd_stat(path.c_str());
 	file_type = (entry != NULL) ? entry->type : ENTTYPE_NONE;
 
 	switch(file_type)
@@ -132,7 +132,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 void ui_menu_control_device_image::load_software_part()
 {
-	astring temp_name(sld->list_name(), ":", swi->shortname(), ":", swp->name());
+	std::string temp_name = std::string(sld->list_name()).append(":").append(swi->shortname()).append(":").append(swp->name());
 
 	driver_enumerator drivlist(machine().options(), machine().options().system_name());
 	media_auditor auditor(drivlist);
@@ -152,10 +152,10 @@ void ui_menu_control_device_image::load_software_part()
 //  hook_load
 //-------------------------------------------------
 
-void ui_menu_control_device_image::hook_load(astring name, bool softlist)
+void ui_menu_control_device_image::hook_load(std::string name, bool softlist)
 {
 	if (image->is_reset_on_load()) image->set_init_phase();
-	image->load(name);
+	image->load(name.c_str());
 	ui_menu::stack_pop(machine());
 }
 
@@ -180,7 +180,7 @@ void ui_menu_control_device_image::handle()
 		bool can_create = false;
 		if(image->is_creatable()) {
 			zippath_directory *directory = NULL;
-			file_error err = zippath_opendir(current_directory, &directory);
+			file_error err = zippath_opendir(current_directory.c_str(), &directory);
 			can_create = err == FILERR_NONE && !zippath_is_zip(directory);
 			if(directory)
 				zippath_closedir(directory);
@@ -215,7 +215,7 @@ void ui_menu_control_device_image::handle()
 		break;
 
 	case SELECT_PARTLIST:
-		swi = sld->find(software_info_name);
+		swi = sld->find(software_info_name.c_str());
 		if (!swi)
 			state = START_SOFTLIST;
 		else if(swi->has_multiple_parts(image->image_interface()))
@@ -330,9 +330,9 @@ void ui_menu_control_device_image::handle()
 		break;
 
 	case DO_CREATE: {
-		astring path;
-		zippath_combine(path, current_directory, current_file);
-		int err = image->create(path, 0, NULL);
+		std::string path;
+		zippath_combine(path, current_directory.c_str(), current_file.c_str());
+		int err = image->create(path.c_str(), 0, NULL);
 		if (err != 0)
 			popmessage("Error: %s", image->error());
 		ui_menu::stack_pop(machine());

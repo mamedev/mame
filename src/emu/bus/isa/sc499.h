@@ -46,7 +46,7 @@ public:
 
 	UINT8 *read_block(int block_num);
 	void write_block(int block_num, UINT8 *ptr);
-	UINT64 tapelen() { return m_ctape_data.bytes(); }
+	UINT64 tapelen() { return m_ctape_data.size(); }
 
 protected:
 	// device-level overrides

@@ -118,6 +118,7 @@ public:
 	// port I/O
 	UINT8 port_read(int offset) { return m_port[offset & 1].read(); }
 	void port_write(int offset, UINT8 data) { m_port[offset & 1].write(data); }
+	void port_write(int offset, int bit, int state) { port_write(offset, (m_port[offset & 1].m_input & ~(1 << bit)) | (state << bit));  }
 	UINT8 port_a_read() { return port_read(PORT_A); }
 	UINT8 port_b_read() { return port_read(PORT_B); }
 	void port_a_write(UINT8 data) { port_write(PORT_A, data); }
@@ -126,6 +127,22 @@ public:
 	DECLARE_READ8_MEMBER( pa_r ) { return port_a_read(); }
 	DECLARE_WRITE8_MEMBER( pb_w ) { port_b_write(data); }
 	DECLARE_READ8_MEMBER( pb_r ) { return port_b_read(); }
+	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { port_write(PORT_A, 0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { port_write(PORT_A, 1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { port_write(PORT_A, 2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { port_write(PORT_A, 3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { port_write(PORT_A, 4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { port_write(PORT_A, 5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { port_write(PORT_A, 6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { port_write(PORT_A, 7, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { port_write(PORT_B, 0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { port_write(PORT_B, 1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { port_write(PORT_B, 2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { port_write(PORT_B, 3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { port_write(PORT_B, 4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { port_write(PORT_B, 5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { port_write(PORT_B, 6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { port_write(PORT_B, 7, state); }
 
 	// standard read/write, with C/D in bit 1, B/A in bit 0
 	DECLARE_READ8_MEMBER( read );
@@ -136,6 +153,33 @@ public:
 	DECLARE_WRITE8_MEMBER( write_alt );
 
 private:
+	enum
+	{
+		MODE_OUTPUT = 0,
+		MODE_INPUT,
+		MODE_BIDIRECTIONAL,
+		MODE_BIT_CONTROL
+	};
+
+	enum
+	{
+		ANY = 0,
+		IOR,
+		MASK
+	};
+
+	enum
+	{
+		ICW_ENABLE_INT    = 0x80,
+		ICW_AND_OR        = 0x40,
+		ICW_AND           = 0x40,
+		ICW_OR            = 0x00,
+		ICW_HIGH_LOW      = 0x20,
+		ICW_HIGH          = 0x20,
+		ICW_LOW           = 0x00,
+		ICW_MASK_FOLLOWS  = 0x10
+	};
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -159,7 +203,6 @@ private:
 		void start(z80pio_device *device, int index);
 		void reset();
 
-		bool interrupt_signalled();
 		void trigger_interrupt();
 
 		int rdy() const { return m_rdy; }

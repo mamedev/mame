@@ -208,7 +208,7 @@ void i2cmem_device::nvram_read( emu_file &file )
 	int i2cmem_bytes = m_data_size;
 	dynamic_buffer buffer ( i2cmem_bytes );
 
-	file.read( buffer, i2cmem_bytes );
+	file.read( &buffer[0], i2cmem_bytes );
 
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
@@ -231,7 +231,7 @@ void i2cmem_device::nvram_write( emu_file &file )
 		buffer[ offs ] = m_addrspace[ 0 ]->read_byte( offs );
 	}
 
-	file.write( buffer, i2cmem_bytes );
+	file.write( &buffer[0], i2cmem_bytes );
 }
 
 

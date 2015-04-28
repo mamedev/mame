@@ -1320,7 +1320,7 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 		for (i = 0; i < len; i++)
 			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
 
-		memcpy(eeprom, temp, len);
+		memcpy(eeprom, &temp[0], len);
 
 	}
 }

@@ -32,13 +32,14 @@
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;, then press 5 to start"/>
 
-		<part name="cart" interface="aim65_cart">
-			<dataarea name="z25" size="4096">
-				<rom name="basic.z25" size="4096" crc="d7b42d2a" sha1="4bbdb28d332429825adea0266ed9192786d9e392" offset="0x0000" />
-			</dataarea>
-
+		<part name="cart1" interface="aim65_cart">
 			<dataarea name="z26" size="4096">
 				<rom name="basic.z26" size="4096" crc="36a61f39" sha1="f5ce0126cb594a565e730973fd140d03c298cefa" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="aim65_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="basic.z25" size="4096" crc="d7b42d2a" sha1="4bbdb28d332429825adea0266ed9192786d9e392" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -49,13 +50,14 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;, then press 5 to start"/>
 
-		<part name="cart" interface="aim65_cart">
-			<dataarea name="z25" size="4096">
-				<rom name="forth v1.3.z25" size="4096" crc="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26" offset="0x0000" />
-			</dataarea>
-
+		<part name="cart1" interface="aim65_cart">
 			<dataarea name="z26" size="4096">
 				<rom name="forth v1.3.z26" size="4096" crc="a80ad472" sha1="42a2e8c86829a2fe48090e6665ff9fe25b12b070" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="aim65_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="forth v1.3.z25" size="4096" crc="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,13 +80,14 @@
 		<publisher>Rockwell</publisher>
 		<info name="usage" value="Load both in &quot;cart1&quot; and &quot;cart2&quot;, then press 5 to start"/>
 
-		<part name="cart" interface="aim65_cart">
-			<dataarea name="z25" size="4096">
-				<rom name="pl65 v1.0.z25" size="4096" crc="76dcf864" sha1="e937c54ed109401f796640cd45b27dfefb76667e" offset="0x0000" />
-			</dataarea>
-
+		<part name="cart1" interface="aim65_cart">
 			<dataarea name="z26" size="4096">
 				<rom name="pl65 v1.0.z26" size="4096" crc="2ac71abd" sha1="6df5e3125bebefac80d51d9337555f54bdf0d8ea" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="aim65_cart">
+			<dataarea name="z25" size="4096">
+				<rom name="pl65 v1.0.z25" size="4096" crc="76dcf864" sha1="e937c54ed109401f796640cd45b27dfefb76667e" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

@@ -860,7 +860,7 @@ void mcf5206e_peripheral_device::device_start()
 	init_regs(true);
 
 	m_timer1 = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( mcf5206e_peripheral_device::timer1_callback ), this) );
-	
+
 	save_item(NAME(m_ICR));
 	save_item(NAME(m_CSAR));
 	save_item(NAME(m_CSMR));

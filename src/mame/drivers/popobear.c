@@ -108,7 +108,7 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	dynamic_array<UINT16> m_vram_rearranged;
+	std::vector<UINT16> m_vram_rearranged;
 
 	int tilemap_base[4];
 

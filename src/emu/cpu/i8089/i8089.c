@@ -159,7 +159,7 @@ offs_t i8089_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 //  for the debugger
 //-------------------------------------------------
 
-void i8089_device::state_string_export(const device_state_entry &entry, astring &string)
+void i8089_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	i8089_channel *ch = m_ch1;
 
@@ -169,30 +169,30 @@ void i8089_device::state_string_export(const device_state_entry &entry, astring 
 	switch (entry.index())
 	{
 	case SYSBUS:
-		string.printf("%c", sysbus_width() ? 'W' : '.');
+		strprintf(str, "%c", sysbus_width() ? 'W' : '.');
 		break;
 	case SOC:
-		string.printf("%c%c", remotebus_width() ? 'I' : '.', request_grant() ? 'R' : '.');
+		strprintf(str, "%c%c", remotebus_width() ? 'I' : '.', request_grant() ? 'R' : '.');
 		break;
 	case CH1_GA:
 	case CH2_GA:
-		string.printf("%d %05X", ch->m_r[i8089_channel::GA].t & 1, ch->m_r[i8089_channel::GA].w);
+		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GA].t & 1, ch->m_r[i8089_channel::GA].w);
 		break;
 	case CH1_GB:
 	case CH2_GB:
-		string.printf("%d %05X", ch->m_r[i8089_channel::GB].t & 1, ch->m_r[i8089_channel::GB].w);
+		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GB].t & 1, ch->m_r[i8089_channel::GB].w);
 		break;
 	case CH1_GC:
 	case CH2_GC:
-		string.printf("%d %05X", ch->m_r[i8089_channel::GC].t & 1, ch->m_r[i8089_channel::GC].w);
+		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GC].t & 1, ch->m_r[i8089_channel::GC].w);
 		break;
 	case CH1_TP:
 	case CH2_TP:
-		string.printf("%d %05X", ch->m_r[i8089_channel::TP].t & 1, ch->m_r[i8089_channel::TP].w);
+		strprintf(str, "%d %05X", ch->m_r[i8089_channel::TP].t & 1, ch->m_r[i8089_channel::TP].w);
 		break;
 	case CH1_PSW:
 	case CH2_PSW:
-		string.printf("%c%s%c%s%s%s%c%c",
+		strprintf(str, "%c%s%c%s%s%s%c%c",
 			BIT(ch->m_r[i8089_channel::PSW].w, 7) ? 'P':'.',
 			BIT(ch->m_r[i8089_channel::PSW].w, 6) ? "XF":"..",
 			BIT(ch->m_r[i8089_channel::PSW].w, 5) ? 'B':'.',

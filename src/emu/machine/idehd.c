@@ -408,7 +408,7 @@ void ata_mass_storage_device::finished_read()
 	set_dasp(CLEAR_LINE);
 
 	/* now do the read */
-	count = read_sector(lba, m_buffer);
+	count = read_sector(lba, &m_buffer[0]);
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -477,12 +477,12 @@ void ata_mass_storage_device::process_buffer()
 {
 	if (m_command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
-		if (m_user_password_enable && memcmp(m_buffer, m_user_password, 2 + 32) == 0)
+		if (m_user_password_enable && memcmp(&m_buffer[0], m_user_password, 2 + 32) == 0)
 		{
 			LOGPRINT(("IDE Unlocked user password\n"));
 			m_user_password_enable = 0;
 		}
-		if (m_master_password_enable && memcmp(m_buffer, m_master_password, 2 + 32) == 0)
+		if (m_master_password_enable && memcmp(&m_buffer[0], m_master_password, 2 + 32) == 0)
 		{
 			LOGPRINT(("IDE Unlocked master password\n"));
 			m_master_password_enable = 0;
@@ -538,7 +538,7 @@ void ata_mass_storage_device::finished_write()
 	set_dasp(CLEAR_LINE);
 
 	/* now do the write */
-	count = write_sector(lba, m_buffer);
+	count = write_sector(lba, &m_buffer[0]);
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
 	if (count == 1)
@@ -790,7 +790,7 @@ void ide_hdd_device::device_reset()
 
 		// build the features page
 		UINT32 metalength;
-		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, m_buffer, 512, metalength) == CHDERR_NONE)
+		if (m_handle->read_metadata (HARD_DISK_IDENT_METADATA_TAG, 0, &m_buffer[0], 512, metalength) == CHDERR_NONE)
 		{
 			for( int w = 0; w < 256; w++ )
 			{

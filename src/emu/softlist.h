@@ -111,7 +111,7 @@ public:
 	const char *name() const { return m_name; }
 	const char *interface() const { return m_interface; }
 	feature_list_item *featurelist() const { return m_featurelist.first(); }
-	rom_entry *romdata(int index = 0) { return (index < m_romdata.count()) ? &m_romdata[index] : NULL; }
+	rom_entry *romdata(unsigned int index = 0) { return (index < m_romdata.size()) ? &m_romdata[index] : NULL; }
 
 	// helpers
 	bool is_compatible(const software_list_device &swlist) const;
@@ -125,7 +125,7 @@ private:
 	const char *        m_name;
 	const char *        m_interface;
 	simple_list<feature_list_item> m_featurelist;
-	dynamic_array<rom_entry> m_romdata;
+	std::vector<rom_entry>   m_romdata;
 };
 
 
@@ -193,7 +193,7 @@ public:
 	static void static_set_filter(device_t &device, const char *filter);
 
 	// getters
-	const char *list_name() const { return m_list_name; }
+	const char *list_name() const { return m_list_name.c_str(); }
 	softlist_type list_type() const { return m_list_type; }
 	const char *filter() const { return m_filter; }
 	const char *filename() { return m_file.filename(); }
@@ -201,7 +201,7 @@ public:
 	// getters that may trigger a parse
 	const char *description() { if (!m_parsed) parse(); return m_description; }
 	bool valid() { if (!m_parsed) parse(); return m_infolist.count() > 0; }
-	const char *errors_string() { if (!m_parsed) parse(); return m_errors; }
+	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
 
 	// operations
 	software_info *find(const char *look_for, software_info *prev = NULL);
@@ -227,7 +227,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
 
 	// configuration state
-	astring                     m_list_name;
+	std::string                 m_list_name;
 	softlist_type               m_list_type;
 	const char *                m_filter;
 
@@ -235,7 +235,7 @@ protected:
 	bool                        m_parsed;
 	emu_file                    m_file;
 	const char *                m_description;
-	astring                     m_errors;
+	std::string                 m_errors;
 	simple_list<software_info>  m_infolist;
 	const_string_pool           m_stringpool;
 };

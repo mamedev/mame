@@ -62,7 +62,7 @@ pc080sn_device::pc080sn_device(const machine_config &mconfig, const char *tag, d
 {
 	for (int i = 0; i < 8; i++)
 		m_ctrl[i] = 0;
-	
+
 	for (int i = 0; i < 2; i++)
 	{
 		m_bg_ram[i] = NULL;

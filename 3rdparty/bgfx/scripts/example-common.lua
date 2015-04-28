@@ -31,7 +31,13 @@ project ("example-common")
 		}
 	end
 
-	configuration { "mingw* or vs2008" }
+	if _OPTIONS["with-glfw"] then
+		defines {
+			"ENTRY_CONFIG_USE_GLFW=1",
+		}
+	end
+
+	configuration { "vs2008" }
 		includedirs {
 			"$(DXSDK_DIR)/include",
 		}

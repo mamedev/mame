@@ -191,7 +191,7 @@ void esrip_device::device_start()
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger
-	astring tempstr;
+	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_status).callimport().callexport().formatstr("%8s").noshow();
 	state_add(ESRIP_PC,        "PC:",       m_rip_pc).mask(0xffff);
@@ -349,12 +349,12 @@ const address_space_config *esrip_device::memory_space_config(address_spacenum s
 //  for the debugger
 //-------------------------------------------------
 
-void esrip_device::state_string_export(const device_state_entry &entry, astring &string)
+void esrip_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c",
 				(m_status & 0x80) ? '3' : '.',
 				(m_status & 0x40) ? '2' : '.',
 				(m_status & 0x20) ? '1' : '.',

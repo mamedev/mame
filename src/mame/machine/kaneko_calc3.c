@@ -1555,7 +1555,7 @@ void kaneko_calc3_device::initial_scan_tables()
 		int length;
 #endif
 
-		memset(tmpdstram, 0x00,0x2000);
+		memset(&tmpdstram[0], 0x00,0x2000);
 
 #if VERBOSE_OUTPUT
 		length = decompress_table(x, tmpdstram, 0);

@@ -342,7 +342,7 @@ void nes_cart_slot_device::call_load_ines()
 	UINT8 header[0x10];
 	UINT8 mapper, submapper = 0, local_options;
 	bool ines20 = FALSE, prg16k;
-	astring mapinfo;
+	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
 	bool bus_conflict = FALSE;
@@ -379,7 +379,7 @@ void nes_cart_slot_device::call_load_ines()
 	// use info from nes.hsi if available!
 	if (hashfile_extrainfo(*this, mapinfo))
 	{
-		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
+		if (4 == sscanf(mapinfo.c_str(),"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
 			/* image is present in nes.hsi: overwrite the header settings with these */
 			mapper = mapint1;
@@ -392,7 +392,7 @@ void nes_cart_slot_device::call_load_ines()
 		}
 		else
 		{
-			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo.cstr());
+			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo.c_str());
 		}
 	}
 	else
@@ -797,15 +797,15 @@ void nes_cart_slot_device::call_load_ines()
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
 		dynamic_buffer temp_nvram(tot_size);
-		battery_load(temp_nvram, tot_size, 0x00);
+		battery_load(&temp_nvram[0], tot_size, 0x00);
 		if (battery_size)
 		{
 			//printf("here %d\n", battery_size);
 			m_cart->battery_alloc(battery_size);
-			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
+			memcpy(m_cart->get_battery_base(), &temp_nvram[0], battery_size);
 		}
 		if (mapper_sram_size)
-			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, m_cart->get_mapper_sram_size());
+			memcpy(m_cart->get_mapper_sram_base(), &temp_nvram[battery_size], m_cart->get_mapper_sram_size());
 	}
 }
 
@@ -813,7 +813,7 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 {
 	UINT8 mapper, submapper = 0;
 	bool ines20 = FALSE;
-	astring mapinfo;
+	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
 
@@ -837,7 +837,7 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 	// use info from nes.hsi if available!
 	if (hashfile_extrainfo(*this, mapinfo))
 	{
-		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
+		if (4 == sscanf(mapinfo.c_str(),"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 		{
 			/* image is present in nes.hsi: overwrite the header settings with these */
 			mapper = mapint1;

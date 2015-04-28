@@ -183,8 +183,8 @@ void hd61700_cpu_device::device_start()
 
 	for (int ireg=0; ireg<32; ireg++)
 	{
-		astring tmpstr;
-		state_add(HD61700_MAINREG + ireg, tmpstr.format("R%d", ireg), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
+		std::string tmpstr;
+		state_add(HD61700_MAINREG + ireg, strformat(tmpstr, "R%d", ireg).c_str(), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
 	}
 
 	state_add(STATE_GENPC, "curpc", m_curpc).callimport().callexport().formatstr("%8s").noshow();
@@ -271,12 +271,12 @@ void hd61700_cpu_device::state_import(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void hd61700_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void hd61700_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c",
 				m_flags & FLAG_Z   ? '.' : 'Z',
 				m_flags & FLAG_C   ? 'C' : '.',
 				m_flags & FLAG_LZ  ? '.' : 'L',

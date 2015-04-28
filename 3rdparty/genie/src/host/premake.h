@@ -18,6 +18,9 @@
 #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 #define PLATFORM_BSD      (1)
 #define PLATFORM_STRING   "bsd"
+#elif defined(__sun__) || defined(__svr4__)
+#define PLATFORM_SOLARIS  (1)
+#define PLATFORM_STRING   "solaris"
 #elif defined(__APPLE__) && defined(__MACH__)
 #define PLATFORM_MACOSX   (1)
 #define PLATFORM_STRING   "macosx"
@@ -33,6 +36,7 @@
 #include <windows.h>
 #else
 #include <unistd.h>
+#include <sys/time.h>
 #endif
 
 
@@ -63,6 +67,7 @@ int os_mkdir(lua_State* L);
 int os_pathsearch(lua_State* L);
 int os_rmdir(lua_State* L);
 int os_stat(lua_State* L);
+int os_ticks(lua_State* L);
 int os_uuid(lua_State* L);
 int string_endswith(lua_State* L);
 

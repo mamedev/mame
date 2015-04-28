@@ -626,19 +626,19 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 	{
 		m_type = CTYPE_REEL;
 
-		astring symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
+		std::string symbollist = xml_get_attribute_string_with_subst(machine, compnode, "symbollist", "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
 
 		// split out position names from string and figure out our number of symbols
 		int location = -1;
 		m_numstops = 0;
-		location=symbollist.find(0,",");
+		location=symbollist.find(",");
 		while (location!=-1)
 		{
 			m_stopnames[m_numstops] = symbollist;
-			m_stopnames[m_numstops].substr(0, location);
-			symbollist.substr(location+1, symbollist.len()-(location-1));
+			m_stopnames[m_numstops] = m_stopnames[m_numstops].substr(0, location);
+			symbollist = symbollist.substr(location+1, symbollist.length()-(location-1));
 			m_numstops++;
-			location=symbollist.find(0,",");
+			location=symbollist.find(",");
 		}
 		m_stopnames[m_numstops++] = symbollist;
 
@@ -648,12 +648,12 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 
 		for (int i=0;i<m_numstops;i++)
 		{
-			location=m_stopnames[i].find(0,":");
+			location=m_stopnames[i].find(":");
 			if (location!=-1)
 			{
 				m_imagefile[i] = m_stopnames[i];
-				m_stopnames[i].substr(0, location);
-				m_imagefile[i].substr(location+1, m_imagefile[i].len()-(location-1));
+				m_stopnames[i] = m_stopnames[i].substr(0, location);
+				m_imagefile[i] = m_imagefile[i].substr(location+1, m_imagefile[i].length()-(location-1));
 
 				//m_alphafile[i] =
 				m_file[i].reset(global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ)));
@@ -910,7 +910,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 
 	while (1)
 	{
-		width = font->string_width(bounds.height(), aspect, m_string);
+		width = font->string_width(bounds.height(), aspect, m_string.c_str());
 		if (width < bounds.width())
 			break;
 		aspect *= 0.9f;
@@ -941,7 +941,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_argb3
 	bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 	// loop over characters
-	for (const char *s = m_string; *s != 0; s++)
+	for (const char *s = m_string.c_str(); *s != 0; s++)
 	{
 		// get the font bitmap
 		rectangle chbounds;
@@ -987,7 +987,7 @@ void layout_element::component::draw_simplecounter(running_machine &machine, bit
 {
 	char temp[256];
 	sprintf(temp, "%0*d", m_digits, state);
-	m_string = astring(temp);
+	m_string = std::string(temp);
 	draw_text(machine, dest, bounds);
 }
 
@@ -1048,7 +1048,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 			{
 				while (1)
 				{
-					width = font->string_width(ourheight/num_shown, aspect, m_stopnames[fruit]);
+					width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
 					if (width < bounds.width())
 						break;
 					aspect *= 0.9f;
@@ -1100,7 +1100,7 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 					// loop over characters
-					for (const char *s = m_stopnames[fruit]; *s != 0; s++)
+					for (const char *s = m_stopnames[fruit].c_str(); *s != 0; s++)
 					{
 						// get the font bitmap
 						rectangle chbounds;
@@ -1198,7 +1198,7 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 		{
 			while (1)
 			{
-				width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
+				width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
 				if (width < bounds.width())
 					break;
 				aspect *= 0.9f;
@@ -1250,7 +1250,7 @@ void layout_element::component::draw_beltreel(running_machine &machine, bitmap_a
 				bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 				// loop over characters
-				for (const char *s = m_stopnames[fruit]; *s != 0; s++)
+				for (const char *s = m_stopnames[fruit].c_str(); *s != 0; s++)
 				{
 					// get the font bitmap
 					rectangle chbounds;
@@ -1310,11 +1310,11 @@ void layout_element::component::load_bitmap()
 {
 	// load the basic bitmap
 	assert(m_file[0] != NULL);
-	m_hasalpha[0] = render_load_png(m_bitmap[0], *m_file[0], m_dirname, m_imagefile[0]);
+	m_hasalpha[0] = render_load_png(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_imagefile[0].c_str());
 
 	// load the alpha bitmap if specified
-	if (m_bitmap[0].valid() && m_alphafile[0])
-		render_load_png(m_bitmap[0], *m_file[0], m_dirname, m_alphafile[0], true);
+	if (m_bitmap[0].valid() && !m_alphafile[0].empty())
+		render_load_png(m_bitmap[0], *m_file[0], m_dirname.c_str(), m_alphafile[0].c_str(), true);
 
 	// if we can't load the bitmap, allocate a dummy one and report an error
 	if (!m_bitmap[0].valid())
@@ -1327,10 +1327,10 @@ void layout_element::component::load_bitmap()
 				m_bitmap[0].pix32((step + line) % 100, line % 100) = rgb_t(0xff,0xff,0xff,0xff);
 
 		// log an error
-		if (!m_alphafile[0])
-			osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].cstr());
+		if (m_alphafile[0].empty())
+			osd_printf_warning("Unable to load component bitmap '%s'\n", m_imagefile[0].c_str());
 		else
-			osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].cstr(), m_alphafile[0].cstr());
+			osd_printf_warning("Unable to load component bitmap '%s'/'%s'\n", m_imagefile[0].c_str(), m_alphafile[0].c_str());
 	}
 }
 
@@ -1339,7 +1339,7 @@ void layout_element::component::load_reel_bitmap(int number)
 {
 	// load the basic bitmap
 	assert(m_file != NULL);
-	/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_imagefile[number]);
+	/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname.c_str(), m_imagefile[number].c_str());
 
 	// load the alpha bitmap if specified
 	//if (m_bitmap[number].valid() && m_alphafile[number])
@@ -2346,7 +2346,7 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	}
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (m_output_name[0] != 0 && m_element != NULL)
-		output_set_value(m_output_name, m_element->default_state());
+		output_set_value(m_output_name.c_str(), m_element->default_state());
 	parse_bounds(machine, xml_get_sibling(itemnode.child, "bounds"), m_rawbounds);
 	parse_color(machine, xml_get_sibling(itemnode.child, "color"), m_color);
 	parse_orientation(machine, xml_get_sibling(itemnode.child, "orientation"), m_orientation);
@@ -2396,12 +2396,12 @@ int layout_view::item::state() const
 
 	// if configured to an output, fetch the output value
 	if (m_output_name[0] != 0)
-		state = output_get_value(m_output_name);
+		state = output_get_value(m_output_name.c_str());
 
 	// if configured to an input, fetch the input value
 	else if (m_input_tag[0] != 0)
 	{
-		ioport_port *port = m_element->machine().root_device().ioport(m_input_tag);
+		ioport_port *port = m_element->machine().root_device().ioport(m_input_tag.c_str());
 		if (port != NULL)
 		{
 			ioport_field *field = port->field(m_input_mask);

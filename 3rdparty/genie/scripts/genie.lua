@@ -26,7 +26,7 @@
 			"StaticRuntime"
 		}
 		includedirs {
-			"../src/host/lua-5.2.3/src"
+			"../src/host/lua-5.3.0/src"
 		}
 
 		files {
@@ -36,12 +36,12 @@
 			"../src/host/scripts.c",
 		}
 
-		removefiles {
+		excludes {
 			"../src/premake.lua",
-			"../src/host/lua-5.2.3/src/lua.c",
-			"../src/host/lua-5.2.3/src/luac.c",
-			"../src/host/lua-5.2.3/**.lua",
-			"../src/host/lua-5.2.3/etc/*.c",
+			"../src/host/lua-5.3.0/src/lua.c",
+			"../src/host/lua-5.3.0/src/luac.c",
+			"../src/host/lua-5.3.0/**.lua",
+			"../src/host/lua-5.3.0/etc/*.c",
 		}
 
 		configuration "Debug"
@@ -66,7 +66,13 @@
 		configuration "bsd"
 			targetdir   "../bin/bsd"
 
-		configuration "linux or bsd"
+		configuration "solaris"
+			targetdir   "../bin/solaris"
+			defines     { "_REENTRANT" }
+			buildoptions { "-std=gnu99" }
+			links       { "dl" }
+
+		configuration "linux or bsd or solaris"
 			defines     { "LUA_USE_POSIX", "LUA_USE_DLOPEN" }
 			links       { "m" }
 			linkoptions { "-rdynamic" }

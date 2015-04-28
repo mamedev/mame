@@ -23,7 +23,7 @@
 #include <stdarg.h>
 
 // some cleanups for Solaris for things defined in stdlib.h
-#ifdef SDLMAME_SOLARIS
+#if defined(__sun__) && defined(__svr4__)
 #undef si_status
 #undef WWORD
 #endif
@@ -34,7 +34,6 @@
 
 // core system includes
 #include "osdcomm.h"
-#include "astring.h"
 #include "emualloc.h"
 #include "corestr.h"
 #include "bitmap.h"
@@ -380,7 +379,7 @@ ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, c
 //**************************************************************************
 
 // population count
-#ifndef SDLMAME_NETBSD
+#if !defined(__NetBSD__)
 inline int popcount(UINT32 val)
 {
 	int count;

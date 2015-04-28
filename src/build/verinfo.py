@@ -8,7 +8,7 @@ import sys
 
 def parse_args():
     def usage():
-        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume] [-r|-p] [-o <outfile>] <srcfile>\n')
+        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume|ldplayer] [-r|-p] [-o <outfile>] <srcfile>\n')
         sys.exit(1)
 
     flags = True
@@ -24,7 +24,7 @@ def parse_args():
             format = 'plist'
         elif flags and (sys.argv[i] == '-b'):
             i += 1
-            if (i >= len(sys.argv)) or (sys.argv[i] not in ('mame', 'mess', 'ume')):
+            if (i >= len(sys.argv)) or (sys.argv[i] not in ('mame', 'mess', 'ume', 'ldplayer')):
                 usage()
             else:
                 target = sys.argv[i]
@@ -108,10 +108,10 @@ else:
     comments = "Multiple Arcade Machine Emulator"
     company_name = "MAME Team"
     file_description = "Multiple Arcade Machine Emulator"
-    internal_name = "MAME"
-    original_filename = "MAME"
-    product_name = "MAME"
-    bundle_identifier = "org.mamedev.mame"
+    internal_name = "MAME" if build == "mame" else build
+    original_filename = "MAME" if build == "mame" else build
+    product_name = "MAME" if build == "mame" else build
+    bundle_identifier = "org.mamedev." + build
 
 legal_copyright = "Copyright Nicola Salmoria and the MAME team"
 

@@ -639,8 +639,8 @@ void taitoair_state::machine_start()
 
 	for (int i = 0; i < TAITOAIR_POLY_MAX_PT; i++)
 	{
-		state_save_register_item(machine(), "globals", NULL, i, m_q.p[i].x);
-		state_save_register_item(machine(), "globals", NULL, i, m_q.p[i].y);
+		save_item(NAME(m_q.p[i].x), i);
+		save_item(NAME(m_q.p[i].y), i);
 	}
 }
 

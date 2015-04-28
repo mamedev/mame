@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  spcforce.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -10,13 +10,13 @@
 #include "includes/spcforce.h"
 
 
-WRITE8_MEMBER(spcforce_state::spcforce_flip_screen_w)
+WRITE8_MEMBER(spcforce_state::flip_screen_w)
 {
 	flip_screen_set(~data & 0x01);
 }
 
 
-UINT32 spcforce_state::screen_update_spcforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 	int flip = flip_screen();

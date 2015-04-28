@@ -136,9 +136,9 @@ void MainWindow::setProcessor(device_t* processor)
 	m_dasmFrame->view()->verticalScrollBar()->setValue(m_dasmFrame->view()->view()->visible_position().y);
 
 	// Window title
-	astring title;
-	title.printf("Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
-	setWindowTitle(title.cstr());
+	std::string title;
+	strprintf(title,"Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
+	setWindowTitle(title.c_str());
 }
 
 
@@ -225,16 +225,16 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		}
 
 		// If none exists, add a new one
-		astring command;
+		std::string command;
 		if (bpindex == -1)
 		{
-			command.printf("bpset 0x%X", address);
+			strprintf(command,"bpset 0x%X", address);
 		}
 		else
 		{
-			command.printf("bpclear 0x%X", bpindex);
+			strprintf(command,"bpclear 0x%X", bpindex);
 		}
-		debug_console_execute_command(*m_machine, command, 1);
+		debug_console_execute_command(*m_machine, command.c_str(), 1);
 	}
 
 	refreshAll();
@@ -257,9 +257,9 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 		if (bp != NULL)
 		{
 			INT32 const bpindex = bp->index();
-			astring command;
-			command.printf(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
-			debug_console_execute_command(*m_machine, command, 1);
+			std::string command;
+			strprintf(command,bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
+			debug_console_execute_command(*m_machine, command.c_str(), 1);
 		}
 	}
 
@@ -273,9 +273,9 @@ void MainWindow::runToCursor(bool changedTo)
 	if (dasmView->cursor_visible() && (debug_cpu_get_visible_cpu(*m_machine) == dasmView->source()->device()))
 	{
 		offs_t address = downcast<debug_view_disasm*>(dasmView)->selected_address();
-		astring command;
-		command.printf("go 0x%X", address);
-		debug_console_execute_command(*m_machine, command, 1);
+		std::string command;
+		strprintf(command,"go 0x%X", address);
+		debug_console_execute_command(*m_machine, command.c_str(), 1);
 	}
 }
 
@@ -463,10 +463,10 @@ void MainWindow::createImagesMenu()
 	image_interface_iterator iter(m_machine->root_device());
 	for (device_image_interface *img = iter.first(); img != NULL; img = iter.next())
 	{
-		astring menuName;
-		menuName.format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
+		std::string menuName;
+		strprintf(menuName,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 
-		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.cstr());
+		QMenu* interfaceMenu = imagesMenu->addMenu(menuName.c_str());
 		interfaceMenu->setObjectName(img->device().name());
 
 		QAction* mountAct = new QAction("Mount...", interfaceMenu);

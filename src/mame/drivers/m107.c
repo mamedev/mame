@@ -43,12 +43,12 @@ confirmed for m107 games as well.
 
 void m107_state::machine_start()
 {
-	// TODO: state save registrations
+	save_item(NAME(m_sound_status));
 }
 
 /*****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(m107_state::m107_scanline_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 {
 	int scanline = param;
 
@@ -69,7 +69,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::m107_scanline_interrupt)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::m107_coincounter_w)
+WRITE16_MEMBER(m107_state::coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -78,7 +78,7 @@ WRITE16_MEMBER(m107_state::m107_coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(m107_state::m107_bankswitch_w)
+WRITE16_MEMBER(m107_state::bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -88,36 +88,36 @@ WRITE16_MEMBER(m107_state::m107_bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(m107_state::m107_soundlatch_w)
+WRITE16_MEMBER(m107_state::soundlatch_w)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
 	soundlatch_byte_w(space, 0, data & 0xff);
 //      logerror("soundlatch_byte_w %02x\n",data);
 }
 
-READ16_MEMBER(m107_state::m107_sound_status_r)
+READ16_MEMBER(m107_state::sound_status_r)
 {
 	return m_sound_status;
 }
 
-READ16_MEMBER(m107_state::m107_soundlatch_r)
+READ16_MEMBER(m107_state::soundlatch_r)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 	return soundlatch_byte_r(space, offset) | 0xff00;
 }
 
-WRITE16_MEMBER(m107_state::m107_sound_irq_ack_w)
+WRITE16_MEMBER(m107_state::sound_irq_ack_w)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(m107_state::m107_sound_status_w)
+WRITE16_MEMBER(m107_state::sound_status_w)
 {
 	COMBINE_DATA(&m_sound_status);
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M107_IRQ_3);
 }
 
-WRITE16_MEMBER(m107_state::m107_sound_reset_w)
+WRITE16_MEMBER(m107_state::sound_reset_w)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -127,7 +127,7 @@ WRITE16_MEMBER(m107_state::m107_sound_reset_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_SHARE("vram_data")
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(vram_w) AM_SHARE("vram_data")
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -139,15 +139,15 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)   /* answer from sound CPU */
-	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
+	AM_RANGE(0x08, 0x09) AM_READ(sound_status_r)   /* answer from sound CPU */
+	AM_RANGE(0x00, 0x01) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(coincounter_w)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
-	AM_RANGE(0x80, 0x9f) AM_WRITE(m107_control_w)
+	AM_RANGE(0x80, 0x9f) AM_WRITE(control_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
-	AM_RANGE(0xb0, 0xb1) AM_WRITE(m107_spritebuffer_w)
+	AM_RANGE(0xb0, 0xb1) AM_WRITE(spritebuffer_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(m107_sound_reset_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(sound_reset_w)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
@@ -182,8 +182,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(m107_soundlatch_r, m107_sound_irq_ack_w)
-	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m107_sound_status_w)
+	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(soundlatch_r, sound_irq_ack_w)
+	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(sound_status_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
 ADDRESS_MAP_END
 
@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, m107_scanline_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, scanline_interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
-	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update_m107)
+	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebarr)
@@ -996,7 +996,7 @@ DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::m107_bankswitch_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::bankswitch_w),this));
 
 	m_irq_vectorbase = 0x80;
 	m_spritesystem = 0;
@@ -1010,10 +1010,10 @@ DRIVER_INIT_MEMBER(m107_state,wpksoc)
 
 /***************************************************************************/
 
-GAME( 1993, airass,        0,             airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", GAME_NO_COCKTAIL ) // possible location test, but sound code is newer than Japan version
-GAME( 1993, firebarr,      airass,        firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_COCKTAIL )
+GAME( 1993, airass,        0,             airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
+GAME( 1993, firebarr,      airass,        firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1994, dsoccr94,      0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", GAME_NO_COCKTAIL )
+GAME( 1994, dsoccr94,      0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
-GAME( 1995, wpksoc,        0,        wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )
-GAME( 1994, kftgoal,       wpksoc,   wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL )
+GAME( 1995, wpksoc,        0,        wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL | GAME_SUPPORTS_SAVE )
+GAME( 1994, kftgoal,       wpksoc,   wpksoc,   wpksoc, m107_state,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_MECHANICAL | GAME_SUPPORTS_SAVE )

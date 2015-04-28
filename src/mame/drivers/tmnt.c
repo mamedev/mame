@@ -4001,8 +4001,8 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 	// unscramble the sprite ROM address lines
 	UINT32 *gfxdata = reinterpret_cast<UINT32 *>(memregion("k051960")->base());
 	int len = memregion("k051960")->bytes() / 4;
-	dynamic_array<UINT32> temp(len);
-	memcpy(temp, gfxdata, len * 4);
+	std::vector<UINT32> temp(len);
+	memcpy(&temp[0], gfxdata, len * 4);
 	for (int A = 0; A < len; A++)
 	{
 		// the bits to scramble are the low 8 ones
@@ -4027,8 +4027,8 @@ DRIVER_INIT_MEMBER(tmnt_state, tmnt)
 	const UINT8 *code_conv_table = memregion("proms")->base();
 	UINT32 *gfxdata = reinterpret_cast<UINT32 *>(memregion("k051960")->base());
 	int len = memregion("k051960")->bytes() / 4;
-	dynamic_array<UINT32> temp(len);
-	memcpy(temp, gfxdata, len * 4);
+	std::vector<UINT32> temp(len);
+	memcpy(&temp[0], gfxdata, len * 4);
 
 	for (int A = 0; A < len; A++)
 	{

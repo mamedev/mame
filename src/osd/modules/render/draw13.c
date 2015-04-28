@@ -118,7 +118,7 @@ public:
 
 private:
 	Uint32              m_sdl_access;
-	sdl_info13 *      	m_renderer;
+	sdl_info13 *        m_renderer;
 	render_texinfo      m_texinfo;            // copy of the texture info
 	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
 	UINT32              m_flags;              // rendering flags

@@ -7,7 +7,7 @@
 
 #if BGFX_CONFIG_RENDERER_NULL
 
-namespace bgfx
+namespace bgfx { namespace noop
 {
 	struct RendererContextNULL : public RendererContextI
 	{
@@ -29,7 +29,7 @@ namespace bgfx
 			return BGFX_RENDERER_NULL_NAME;
 		}
 
-		void flip() BX_OVERRIDE
+		void flip(HMD& /*_hmd*/) BX_OVERRIDE
 		{
 		}
 
@@ -113,6 +113,10 @@ namespace bgfx
 		{
 		}
 
+		void resizeTexture(TextureHandle /*_handle*/, uint16_t /*_width*/, uint16_t /*_height*/) BX_OVERRIDE
+		{
+		}
+
 		void destroyTexture(TextureHandle /*_handle*/) BX_OVERRIDE
 		{
 		}
@@ -168,31 +172,31 @@ namespace bgfx
 
 	static RendererContextNULL* s_renderNULL;
 
-	RendererContextI* rendererCreateNULL()
+	RendererContextI* rendererCreate()
 	{
 		s_renderNULL = BX_NEW(g_allocator, RendererContextNULL);
 		return s_renderNULL;
 	}
 
-	void rendererDestroyNULL()
+	void rendererDestroy()
 	{
 		BX_DELETE(g_allocator, s_renderNULL);
 		s_renderNULL = NULL;
 	}
-} // namespace bgfx
+} /* namespace noop */ } // namespace bgfx
 
 #else
 
-namespace bgfx
+namespace bgfx { namespace noop
 {
-	RendererContextI* rendererCreateNULL()
+	RendererContextI* rendererCreate()
 	{
 		return NULL;
 	}
 
-	void rendererDestroyNULL()
+	void rendererDestroy()
 	{
 	}
-} // namespace bgfx
+} /* namespace noop */ } // namespace bgfx
 
 #endif // BGFX_CONFIG_RENDERER_NULL

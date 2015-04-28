@@ -66,7 +66,7 @@ bool x68k_hdc_image_device::call_create(int format_type, option_resolution *form
 WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 {
 	unsigned int lba = 0;
-	dynamic_array<char> blk;
+	std::vector<char> blk;
 	switch(offset)
 	{
 	case 0x00:  // data I/O
@@ -265,9 +265,10 @@ WRITE16_MEMBER( x68k_hdc_image_device::hdc_w )
 						lba |= m_command[2] << 8;
 						lba |= (m_command[1] & 0x1f) << 16;
 						fseek(lba * 256,SEEK_SET);
-						blk.resize_and_clear(256*33);
+						blk.resize(256*33);
+						memset(&blk[0], 0, 256*33);
 						// formats 33 256-byte blocks
-						fwrite(blk,256*33);
+						fwrite(&blk[0],256*33);
 						logerror("SASI: FORMAT UNIT (LBA 0x%06x)\n",lba);
 					break;
 				default:

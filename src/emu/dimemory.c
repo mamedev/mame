@@ -297,17 +297,14 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				{
 					// make sure we can resolve the full path to the region
 					bool found = false;
-					astring entry_region;
-					entry->m_devbase.subtag(entry_region, entry->m_region);
+					std::string entry_region = entry->m_devbase.subtag(entry->m_region);
 
 					// look for the region
 					device_iterator deviter(device().mconfig().root_device());
 					for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
 						for (const rom_entry *romp = rom_first_region(*device); romp != NULL && !found; romp = rom_next_region(romp))
 						{
-							astring fulltag;
-							rom_region_name(fulltag, *device, romp);
-							if (fulltag == entry_region)
+							if (rom_region_name(*device, romp) == entry_region)
 							{
 								// verify the address range is within the region's bounds
 								offs_t length = ROMREGION_GETLENGTH(romp);
@@ -326,14 +323,14 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 				// FIXME: This doesn't work! AMH_DEVICE_DELEGATE entries don't even set m_tag, the device tag is inside the proto-delegate
 				if (entry->m_read.m_type == AMH_DEVICE_DELEGATE && entry->m_read.m_tag != NULL)
 				{
-					astring temp(entry->m_read.m_tag);
-					if (device().siblingdevice(temp) == NULL)
+					std::string temp(entry->m_read.m_tag);
+					if (device().siblingdevice(temp.c_str()) == NULL)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_read.m_tag);
 				}
 				if (entry->m_write.m_type == AMH_DEVICE_DELEGATE && entry->m_write.m_tag != NULL)
 				{
-					astring temp(entry->m_write.m_tag);
-					if (device().siblingdevice(temp) == NULL)
+					std::string temp(entry->m_write.m_tag);
+					if (device().siblingdevice(temp.c_str()) == NULL)
 						osd_printf_error("%s space memory map entry references nonexistant device '%s'\n", spaceconfig->m_name, entry->m_write.m_tag);
 				}
 

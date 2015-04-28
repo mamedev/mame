@@ -644,8 +644,8 @@ void ngp_state::machine_start()
 {
 	if (m_cart->exists())
 	{
-		astring region_tag;
-		UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG))->base();
+		std::string region_tag;
+		UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
 
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x3fffff, "flash0");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x800000, 0x9fffff, "flash1");

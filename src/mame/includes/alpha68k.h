@@ -83,6 +83,7 @@ public:
 	DECLARE_DRIVER_INIT(tnextspc);
 	DECLARE_DRIVER_INIT(timesold1);
 	DECLARE_DRIVER_INIT(sbasebal);
+	DECLARE_DRIVER_INIT(sbasebalj);
 	DECLARE_DRIVER_INIT(skysoldr);
 	DECLARE_DRIVER_INIT(skyadvntu);
 	DECLARE_DRIVER_INIT(btlfieldb);

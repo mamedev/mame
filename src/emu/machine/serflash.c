@@ -37,8 +37,8 @@ void serflash_device::device_start()
 	m_length = machine().root_device().memregion( tag() )->bytes();
 	m_region = machine().root_device().memregion( tag() )->base();
 
-	m_flashwritemap.resize_and_clear(m_length / FLASH_PAGE_SIZE);
-
+	m_flashwritemap.resize(m_length / FLASH_PAGE_SIZE);
+	memset(&m_flashwritemap[0], 0, m_length / FLASH_PAGE_SIZE);
 }
 
 void serflash_device::device_reset()

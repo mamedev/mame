@@ -44,18 +44,18 @@ void konppc_device::device_start()
 		nwk_fifo[i] = auto_alloc_array(machine(), UINT32, 0x800);
 		nwk_ram[i] = auto_alloc_array(machine(), UINT32, 0x2000);
 
-		state_save_register_item_array(machine(), "konppc", NULL, i, dsp_comm_ppc[i]);
-		state_save_register_item_array(machine(), "konppc", NULL, i, dsp_comm_sharc[i]);
-		state_save_register_item(machine(), "konppc", NULL, i, dsp_shared_ram_bank[i]);
-		state_save_register_item_pointer(machine(), "konppc", NULL, i, dsp_shared_ram[i], DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]));
-		state_save_register_item(machine(), "konppc", NULL, i, dsp_state[i]);
-		state_save_register_item(machine(), "konppc", NULL, i, nwk_device_sel[i]);
-		state_save_register_item(machine(), "konppc", NULL, i, nwk_fifo_read_ptr[i]);
-		state_save_register_item(machine(), "konppc", NULL, i, nwk_fifo_write_ptr[i]);
-		state_save_register_item_pointer(machine(), "konppc", NULL, i, nwk_fifo[i], 0x800);
-		state_save_register_item_pointer(machine(), "konppc", NULL, i, nwk_ram[i], 0x2000);
+		save_item(NAME(dsp_comm_ppc[i]), i);
+		save_item(NAME(dsp_comm_sharc[i]), i);
+		save_item(NAME(dsp_shared_ram_bank[i]), i);
+		save_pointer(NAME(dsp_shared_ram[i]), DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]), i);
+		save_item(NAME(dsp_state[i]), i);
+		save_item(NAME(nwk_device_sel[i]), i);
+		save_item(NAME(nwk_fifo_read_ptr[i]), i);
+		save_item(NAME(nwk_fifo_write_ptr[i]), i);
+		save_pointer(NAME(nwk_fifo[i]), 0x800, i);
+		save_pointer(NAME(nwk_ram[i]), 0x2000, i);
 	}
-	state_save_register_item(machine(), "konppc", NULL, 0, cgboard_id);
+	save_item(NAME(cgboard_id));
 
 	if (cgboard_type == CGBOARD_TYPE_NWKTR)
 	{

@@ -84,14 +84,14 @@ void balsente_state::machine_start()
 	/* register for saving */
 	for (i = 0; i < 3; i++)
 	{
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].timer_active);
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].initial);
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].count);
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].gate);
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].out);
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].mode);
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].readbyte);
-		state_save_register_item(machine(), "8253counter", NULL, i, m_counter[i].writebyte);
+		save_item(m_counter[i].timer_active, "8253counter[i].timer_active", i);
+		save_item(m_counter[i].initial, "8253counter[i].initial", i);
+		save_item(m_counter[i].count, "8253counter[i].count", i);
+		save_item(m_counter[i].gate, "8253counter[i].gate", i);
+		save_item(m_counter[i].out, "8253counter[i].out", i);
+		save_item(m_counter[i].mode, "8253counter[i].mode", i);
+		save_item(m_counter[i].readbyte, "8253counter[i].readbyte", i);
+		save_item(m_counter[i].writebyte, "8253counter[i].writebyte", i);
 	}
 
 	save_item(NAME(m_counter_control));

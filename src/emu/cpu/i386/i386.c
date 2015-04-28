@@ -3468,60 +3468,60 @@ void i386_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i386_device::state_string_export(const device_state_entry &entry, astring &string)
+void i386_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%08X", get_flags());
+			strprintf(str, "%08X", get_flags());
 			break;
 		case X87_ST0:
-			string.printf("%f", fx80_to_double(ST(0)));
+			strprintf(str, "%f", fx80_to_double(ST(0)));
 			break;
 		case X87_ST1:
-			string.printf("%f", fx80_to_double(ST(1)));
+			strprintf(str, "%f", fx80_to_double(ST(1)));
 			break;
 		case X87_ST2:
-			string.printf("%f", fx80_to_double(ST(2)));
+			strprintf(str, "%f", fx80_to_double(ST(2)));
 			break;
 		case X87_ST3:
-			string.printf("%f", fx80_to_double(ST(3)));
+			strprintf(str, "%f", fx80_to_double(ST(3)));
 			break;
 		case X87_ST4:
-			string.printf("%f", fx80_to_double(ST(4)));
+			strprintf(str, "%f", fx80_to_double(ST(4)));
 			break;
 		case X87_ST5:
-			string.printf("%f", fx80_to_double(ST(5)));
+			strprintf(str, "%f", fx80_to_double(ST(5)));
 			break;
 		case X87_ST6:
-			string.printf("%f", fx80_to_double(ST(6)));
+			strprintf(str, "%f", fx80_to_double(ST(6)));
 			break;
 		case X87_ST7:
-			string.printf("%f", fx80_to_double(ST(7)));
+			strprintf(str, "%f", fx80_to_double(ST(7)));
 			break;
 		case SSE_XMM0:
-			string.printf("%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
 			break;
 		case SSE_XMM1:
-			string.printf("%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
 			break;
 		case SSE_XMM2:
-			string.printf("%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
 			break;
 		case SSE_XMM3:
-			string.printf("%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
 			break;
 		case SSE_XMM4:
-			string.printf("%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
 			break;
 		case SSE_XMM5:
-			string.printf("%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
 			break;
 		case SSE_XMM6:
-			string.printf("%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
 			break;
 		case SSE_XMM7:
-			string.printf("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
+			strprintf(str, "%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
 }

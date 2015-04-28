@@ -773,12 +773,12 @@ void smc92x4_device::data_transfer_read(chrn_id_hd id, int transfer_enable)
 
 	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
-		m_drive->floppy_drive_read_sector_data(id.H, sector_data_id, buf, sector_len);
+		m_drive->floppy_drive_read_sector_data(id.H, sector_data_id, &buf[0], sector_len);
 	}
 	else
 	{
 		// TODO: Should we get the sector length from the harddisk?
-		m_harddisk->read_sector(id.C, id.H, id.R, buf);
+		m_harddisk->read_sector(id.C, id.H, id.R, &buf[0]);
 	}
 	sync_status_in();
 
@@ -867,11 +867,11 @@ void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur,
 	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
 		if (VERBOSE>4) LOG("smc92x4 info: write sector CHS=(%d,%d,%d)\n", id.C, id.H, id.R);
-		m_drive->floppy_drive_write_sector_data(id.H, sector_data_id, buf, sector_len, false);
+		m_drive->floppy_drive_write_sector_data(id.H, sector_data_id, &buf[0], sector_len, false);
 	}
 	else
 	{
-		m_harddisk->write_sector(id.C, id.H, id.R, buf);
+		m_harddisk->write_sector(id.C, id.H, id.R, &buf[0]);
 	}
 	sync_status_in();
 
@@ -1476,7 +1476,7 @@ void smc92x4_device::format_floppy_track(int flags)
 	memset(&buffer[index], gap_byte, gap4);
 	index += gap4;
 
-	m_drive->floppy_drive_write_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, buffer, &data_count);
+	m_drive->floppy_drive_write_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, &buffer[0], &data_count);
 	sync_status_in();
 }
 
@@ -1573,7 +1573,7 @@ void smc92x4_device::format_harddisk_track(int flags)
 	for (i=0; i < gap4; i++) buffer[index++] = gap_byte;
 
 	// Now write the whole track
-	m_harddisk->write_track(m_register_w[DESIRED_HEAD]&0x0f, buffer, data_count);
+	m_harddisk->write_track(m_register_w[DESIRED_HEAD]&0x0f, &buffer[0], data_count);
 
 	sync_status_in();
 }
@@ -1622,7 +1622,7 @@ void smc92x4_device::read_floppy_track(bool transfer_only_ids)
 
 	buffer.resize(data_count);
 
-	m_drive->floppy_drive_read_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, (char *)(UINT8 *)buffer, &data_count);
+	m_drive->floppy_drive_read_track_data_info_buffer(m_register_w[DESIRED_HEAD]&0x0f, (char *)&buffer[0], &data_count);
 	sync_status_in();
 
 	// Transfer the buffer to the external memory. We assume the memory
@@ -1654,7 +1654,7 @@ void smc92x4_device::read_harddisk_track(bool transfer_only_ids)
 	buffer.resize(data_count);
 
 	/* buffer and data_count are allocated and set by the function. */
-	m_harddisk->read_track(m_register_w[DESIRED_HEAD]&0x0f, buffer);
+	m_harddisk->read_track(m_register_w[DESIRED_HEAD]&0x0f, &buffer[0]);
 	sync_status_in();
 
 	if (!(m_register_r[DRIVE_STATUS] & DS_READY))
@@ -1991,7 +1991,7 @@ void smc92x4_device::connect_floppy_drive(legacy_floppy_image_device *drive)
 		else LOG("smc92x4: Connect drive %s\n", drive->tag());
 	}
 }
-void smc92x4_device::connect_hard_drive(mfm_harddisk_device *drive)
+void smc92x4_device::connect_hard_drive(mfm_harddisk_legacy_device *drive)
 {
 	m_harddisk = drive;
 	if (VERBOSE>3)

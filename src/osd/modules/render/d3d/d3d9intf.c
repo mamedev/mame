@@ -101,9 +101,15 @@ base *drawd3d9_init(void)
 	HINSTANCE fxhandle = NULL;
 	for (int idx = 99; idx >= 0; idx--) // a shameful moogle
 	{
+		#ifdef UNICODE
 		wchar_t dllbuf[13];
 		wsprintf(dllbuf, TEXT("d3dx9_%d.dll"), idx);
 		fxhandle = LoadLibrary(dllbuf);
+		#else
+		char dllbuf[13];
+		sprintf(dllbuf, "d3dx9_%d.dll", idx);
+		fxhandle = LoadLibraryA(dllbuf);
+		#endif
 		if (fxhandle != NULL)
 		{
 			break;

@@ -8,7 +8,6 @@
 
   Undumped pirate carts:
   - 4B-003: Sachen 4-in-1 version 3 (Taiwan's Mahjong, Japan's Mahjong, Hong Kong's Mahjong, Store Tris)
-  - 4B-004: Sachen 4-in-1 version 4 (Pile Wonder, Snake Roy, Suleiman's Treasure, Puppet Knight)
   - GOWIN carts (see below the list of known games)
 
 -->
@@ -4984,7 +4983,7 @@
 		<info name="serial" value="DMG-AD4P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="dropzone (europe).bin" size="32768" crc="6cb45fc6" sha1="703be7960b363f187737f7ee5fd4af60b6c98428" offset="000000" />
+				<rom name="dropzone (europe).bin" size="32768" crc="351a7277" sha1="0bf73ffa90fdba5a4ee4e2338bb2f0d01af6fb88" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10997,7 +10996,20 @@
 		</part>
 	</software>
 
-	<software name="4in1ta" cloneof="varpack">
+	<software name="4in1_601" supported="no">
+		<description>Mani 4 in 1 (Chi, DMG-601 CHN)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-601-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_m161_m12" />
+			<dataarea name="rom" size="262144">
+				<rom name="dmg-601-chn.bin" size="262144" crc="0c38a775" sha1="dfe46e066c599c17e684ddda3fd74c5357910630" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_602" cloneof="varpack">
 		<description>Mani 4 in 1 (Chi, DMG-602 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
@@ -11005,12 +11017,12 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mmm01" />
 			<dataarea name="rom" size="524288">
-				<rom name="mani 4 in 1 (china).bin" size="524288" crc="5bfc3ef5" sha1="c0639d6c993690022200f2fa4b3094249b9335c0" offset="000000" />
+				<rom name="dmg-602-chn.bin" size="524288" crc="5bfc3ef5" sha1="c0639d6c993690022200f2fa4b3094249b9335c0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="4in1to">
+	<software name="4in1_603">
 		<description>Mani 4 in 1 (Chi, DMG-603 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
@@ -11018,7 +11030,33 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mmm01" />
 			<dataarea name="rom" size="524288">
-				<rom name="4 in 1 (dmg-603 chn) [raw dump].bin" size="524288" crc="c373ac09" sha1="0030295574e4c518ff5cdf20febf6b6737426468" offset="000000" />
+				<rom name="dmg-603-chn.bin" size="524288" crc="c373ac09" sha1="0030295574e4c518ff5cdf20febf6b6737426468" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_604">
+		<description>Mani 4 in 1 (Chi, DMG-604 CHN)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-604-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mmm01" />
+			<dataarea name="rom" size="524288">
+				<rom name="dmg-604-chn.bin" size="524288" crc="cb48b6d0" sha1="1c79eb31a6754b4e96d33a182d36833208dc7177" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_605">
+		<description>Mani 4 in 1 (Chi, DMG-605 CHN)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-605-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mmm01" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dmg-605-chn.bin" size="1048576" crc="950773ee" sha1="af4706da224d794668f3b2c68aea7b3c16452d83" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23428,161 +23466,112 @@
 
 <!-- Sachen carts -->
 
-	<!-- This should contain Virus Attack, Electron World, Dice, Trouble Zone, but it currently does not work -->
-	<software name="4in1" supported="no">
+	<software name="4in1_001">
+		<description>4 in 1 (Euro, 4B-001)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-001"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="262144">
+				<rom name="4b-001.bin" size="262144" crc="82f06e93" sha1="7506c75fdfa29935afb1e85f5b6013516b2e9f92" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_002">
 		<description>4 in 1 (Euro, 4B-002)</description>
 		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
+		<publisher>Sachen</publisher>
 		<info name="serial" value="4B-002"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_sachen1" />
 			<dataarea name="rom" size="65536">
 				<rom name="4 in 1 (europe) (4b-002) (unl).bin" size="65536" crc="5e438db8" sha1="d9cb1721854709be7667f5dbce0adf2488c0919b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="4in1_004">
+		<description>4 in 1 (Euro, 4B-004)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-004"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="262144">
+				<rom name="4b-004.bin" size="262144" crc="c69a19f6" sha1="ca7990dc03a3b3ada1dce37afc4490deaf872402" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_005">
+		<description>4 in 1 (Euro, 4B-005)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-005"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="262144">
+				<rom name="4b-005.bin" size="262144" crc="f4310eb3" sha1="2107979104cff88bcd635215a936bbc44354ea7c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_006">
+		<description>4 in 1 (Euro, 4B-006)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-006"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="262144">
+				<rom name="4b-006.bin" size="262144" crc="95398da5" sha1="2e856de768c7cb442a206de8c94a23548027bb60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_007" supported="no">
+		<description>4 in 1 (Euro, 4B-007)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-007"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="262144">
+				<rom name="4b-007.bin" size="262144" crc="62d9350e" sha1="0eef7f3934508ab79e1cad4ddf3bfdb3216b6b4f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_008" supported="no">
+		<description>4 in 1 (Euro, 4B-008)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-008"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="262144">
+				<rom name="4b-008.bin" size="262144" crc="740e9bc8" sha1="d7c11d56a42ed7c4ef2fe3c752931a63160d7429" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1_009" supported="no">
+		<description>4 in 1 (Euro, 4B-009)</description>
+		<year>19??</year>
+		<publisher>Sachen</publisher>
+		<info name="serial" value="4B-009"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sachen1" />
+			<dataarea name="rom" size="262144">
+				<rom name="4b-009.bin" size="262144" crc="114e1f1e" sha1="39743e21935a9115fcb4ee86d67d51bdb4b5f6d6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Below we list the ripped games from Sachen multicarts (I assumed they come from a 4-in-1 cart, but they could come as well from a 8-in-1 cart).
 	    They should be removed as soon as the carts are properly dumped and emulated -->
-	<software name="srider">
-		<description>Street Rider (ripped from 4-in-1 4B-001)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="street rider (unl).bin" size="32768" crc="7751e066" sha1="b545cc60952176841590db7350479af8ec9d650e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vexblock">
-		<description>Vex Block (ripped from 4-in-1 4B-001)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="vex block (unl).bin" size="32768" crc="642aee97" sha1="869a81dbb555b2f815da5abb75304c70ce27b41c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trapturn">
-		<description>Trap &amp; Turn (ripped from 4-in-1 4B-001)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="trap &amp; turn (unl).bin" size="32768" crc="1c2fc6bf" sha1="822ab29560118eaa65586bbbef4ab7d64cbc9fae" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="duckadv">
-		<description>Duck Adventures (ripped from 4-in-1 4B-001)</description>
-		<year>1993</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="131072">
-				<rom name="duck adventures (unl).bin" size="131072" crc="d25f3b3c" sha1="eae872c3f3e0d29dd18bc5c82f248e09af7a5888" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="azone">
-		<description>Arctic Zone (ripped from 4-in-1 4B-005)</description>
-		<year>1993</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="arctic zone (unl).bin" size="32768" crc="eefe1001" sha1="0c1bf2e1aa03d9b856abc2f6d0f5ac8ced4c44e1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mtower">
-		<description>Magical Tower (ripped from 4-in-1 4B-005)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="65536">
-				<rom name="magical tower (unl).bin" size="65536" crc="f157ae9e" sha1="c240182aef0ce365df3a61f0e0c417b7ea906200" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="railway">
-		<description>Railway (ripped from 4-in-1 4B-005)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="65536">
-				<rom name="railway (unl).bin" size="65536" crc="a19ca3c1" sha1="6706d1da551ace91cedeb8a14f932c8e49ec87e6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wormvis">
-		<description>Worm Visitor (ripped from 4-in-1 4B-005)</description>
-		<year>19??</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="65536">
-				<rom name="worm visitor (unl).bin" size="65536" crc="66130a7a" sha1="96819e9941ffa1bb8118df8ff4b57709a9c597e1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bombdisp">
-		<description>Bomb Disposer (ripped from 4-in-1 4B-006)</description>
-		<year>1993</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="bomb disposer (unl).bin" size="32768" crc="c2a85d91" sha1="f39beb0cddceab0067cb468edca60cacd5ee5a37" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aforce">
-		<description>A-Force (ripped from 4-in-1 4B-006)</description>
-		<year>1993</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="65536">
-				<rom name="a-force (unl).bin" size="65536" crc="776d03dc" sha1="b8fe29112be8108cf087a5a90f347c736ad38a39" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bftale">
-		<description>Black Forest Tale (ripped from 4-in-1 4B-006)</description>
-		<year>1993</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="65536">
-				<rom name="black forest tale (unl).bin" size="65536" crc="3d4e1779" sha1="f5b46d061498b37e0c6eb0513c63720db17b5e52" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2ndspace">
-		<description>2nd Space (ripped from 4-in-1 4B-006)</description>
-		<year>1993</year>
-		<publisher>Sachen</publisher>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="131072">
-				<rom name="2nd space (unl).bin" size="131072" crc="1d0f279c" sha1="9424aa6b2d12b3729d1bf0e8602632fd780f9090" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="antsoldr" supported="partial">
 		<description>Ant Soldier (ripped from 4-in-1 4B-007)</description>
 		<year>1993</year>

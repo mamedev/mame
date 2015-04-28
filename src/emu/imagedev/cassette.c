@@ -273,14 +273,14 @@ bool cassette_image_device::call_load()
 		{
 			is_writable = !is_readonly();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
-			astring fname;
+			std::string fname;
 			if (software_entry()==NULL) {
 				extension = filetype();
 			} else {
 				fname = m_mame_file->filename();
-				int loc = fname.rchr(0,'.');
+				int loc = fname.find_last_of('.');
 				if (loc!=-1) {
-					extension = fname.substr(loc + 1,fname.len()-loc).cstr();
+					extension = fname.substr(loc + 1,fname.length()-loc).c_str();
 				} else {
 					extension = "";
 				}

@@ -54,10 +54,10 @@ void intv_ecs_device::device_start()
 	// if the ECS is mounted directly in the system, use device rom and alloc RAM
 	if (m_rom == NULL)
 	{
-		astring region_tag;
-		m_rom = memregion(region_tag.cpy(tag()).cat(":ecs"))->base();
+		std::string region_tag;
+		m_rom = memregion(region_tag.assign(tag()).append(":ecs").c_str())->base();
 	}
-	if (!m_ram.count())
+	if (m_ram.empty())
 	{
 		m_ram.resize(0x800);
 	}

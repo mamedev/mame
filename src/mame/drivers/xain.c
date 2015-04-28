@@ -555,9 +555,9 @@ void xain_state::machine_start()
 	membank("bank2")->configure_entries(0, 2, memregion("sub")->base()  + 0x4000, 0xc000);
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
-	
+
 	save_item(NAME(m_vblank));
-	
+
 	if (m_mcu)
 	{
 		save_item(NAME(m_from_main));

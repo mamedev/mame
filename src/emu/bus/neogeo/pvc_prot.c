@@ -124,7 +124,7 @@ void pvc_prot_device::mslug5_decrypt_68k(UINT8* rom, UINT32 size)
 		rom[BYTE_XOR_LE(i+1)] = rom16&0xff;
 		rom[BYTE_XOR_LE(i+2)] = rom16>>8;
 	}
-	memcpy( buf, rom, rom_size );
+	memcpy( &buf[0], rom, rom_size );
 	for( i = 0; i < 0x0100000 / 0x10000; i++ )
 	{
 		ofst = (i & 0xf0) + BITSWAP8( (i & 0x0f), 7, 6, 5, 4, 1, 0, 3, 2 );
@@ -135,7 +135,7 @@ void pvc_prot_device::mslug5_decrypt_68k(UINT8* rom, UINT32 size)
 		ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00700) + (BITSWAP8( ((i & 0x0ff000) >> 12), 5, 4, 7, 6, 1, 0, 3, 2 ) << 12);
 		memcpy( &rom[ i ], &buf[ ofst ], 0x100 );
 	}
-	memcpy( buf, rom, rom_size );
+	memcpy( &buf[0], rom, rom_size );
 	memcpy( &rom[ 0x100000 ], &buf[ 0x700000 ], 0x100000 );
 	memcpy( &rom[ 0x200000 ], &buf[ 0x100000 ], 0x600000 );
 }
@@ -167,7 +167,7 @@ void pvc_prot_device::svc_px_decrypt(UINT8* rom, UINT32 size)
 		rom[BYTE_XOR_LE(i+1)] = rom16&0xff;
 		rom[BYTE_XOR_LE(i+2)] = rom16>>8;
 	}
-	memcpy( buf, rom, rom_size );
+	memcpy( &buf[0], rom, rom_size );
 	for( i = 0; i < 0x0100000 / 0x10000; i++ )
 	{
 		ofst = (i & 0xf0) + BITSWAP8( (i & 0x0f), 7, 6, 5, 4, 2, 3, 0, 1 );
@@ -178,7 +178,7 @@ void pvc_prot_device::svc_px_decrypt(UINT8* rom, UINT32 size)
 		ofst = (i & 0xf000ff) + ((i & 0x000f00) ^ 0x00a00) + (BITSWAP8( ((i & 0x0ff000) >> 12), 4, 5, 6, 7, 1, 0, 3, 2 ) << 12);
 		memcpy( &rom[ i ], &buf[ ofst ], 0x100 );
 	}
-	memcpy( buf, rom, rom_size );
+	memcpy( &buf[0], rom, rom_size );
 	memcpy( &rom[ 0x100000 ], &buf[ 0x700000 ], 0x100000 );
 	memcpy( &rom[ 0x200000 ], &buf[ 0x100000 ], 0x600000 );
 }

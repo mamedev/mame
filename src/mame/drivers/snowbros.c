@@ -53,13 +53,22 @@ Cookie & Bibi 3
 This game is quite buggy.  The test mode is incomplete and displays garbage
 on the 'Dipswitch settings' screens, and during some of the attract mode
 scenes the credit counter is not updated when you insert coins until the next
-scene.  Both these bugs are verified as occuring on the original hardware.
+scene.  Both these bugs are verified as occurring on the original hardware.
 
 Honey Doll / Twin Adventure
 
 These appear to have clipping problems on the left / right edges, but this
 may be correct, the sprites which should be drawn there are simply blanked
 out of the sprite list at that point.. (verify on real hw)
+
+Ma Cheon Ru
+
+The electrified maze + ball minigame appears unreponsive to controls, this
+is because it actually requires you to move the joysticks in a circular
+motion through all 8 directions at a very even speed, a task which is
+practically impossible to perform on keyboard, and not even that easy with
+a joystick.  This is not an emulation bug.
+
 
 ***************************************************************************/
 
@@ -1111,6 +1120,86 @@ static INPUT_PORTS_START( moremore )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+// don't trust the test mode! <-- Verified via actual game play: Demo Sounds, Coinage & Free Play
+static INPUT_PORTS_START( mcheonru )
+	PORT_START("DSW1")  /* 500000.w */
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:2,3,4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) ) /* Duplicate */
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) ) /* Duplicate */
+	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_DIPSETTING(      0x0020, "Level 1" )
+	PORT_DIPSETTING(      0x0010, "Level 2" )
+	PORT_DIPSETTING(      0x0000, "Level 3" )
+	PORT_DIPSETTING(      0x0070, "Level 4" )
+	PORT_DIPSETTING(      0x0060, "Level 5" )
+	PORT_DIPSETTING(      0x0050, "Level 6" )
+	PORT_DIPSETTING(      0x0040, "Level 7" )
+	PORT_DIPSETTING(      0x0030, "Level 8" )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW2")  /* 500002.w */
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Tile Type" )    PORT_DIPLOCATION("SW2:2") /* Does NOT show up in service mode! */
+	PORT_DIPSETTING(      0x0002, "Picture" )
+	PORT_DIPSETTING(      0x0000, "Traditional" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Mini Game Frequency" )    PORT_DIPLOCATION("SW2:3") /* Does NOT show up in service mode! */
+	PORT_DIPSETTING(      0x0004, "Every 3 Rounds" )
+	PORT_DIPSETTING(      0x0000, "Every Round" )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )    PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")    /* 500004.w */
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( twinkle )
 	PORT_START("DSW1")  /* 500000.w */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
@@ -1619,23 +1708,23 @@ static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
+	MCFG_CPU_CLOCK(XTAL_12MHz) /* 12MHz - Confirmed */
 	MCFG_CPU_PROGRAM_MAP(hyperpac_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
+	MCFG_CPU_CLOCK(XTAL_16MHz/4) /* 4MHz - Confirmed */
 	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
 	MCFG_CPU_IO_MAP(hyperpac_sound_io_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", hyperpac)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, XTAL_16MHz/4) /* 4MHz - Confirmed */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* 1MHz & pin 7 High - Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2241,7 +2330,7 @@ ROM_START( moremorp )
 	ROM_LOAD( "mmp_u78.bin", 0x180000, 0x80000, CRC(5508d80b) SHA1(1b9a70a502b237fa11d1d55dce761e2def18873a) )
 ROM_END
 
-ROM_START( 3in1semi )
+ROM_START( 3in1semi ) /* SemiCom Ser-4331-4 PCB */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52",  0x00001, 0x40000, CRC(b0e4a0f7) SHA1(e1f8b8ef020a85fcd7817814cf6c5d560e9e608d) )
 	ROM_LOAD16_BYTE( "u74",  0x00000, 0x40000, CRC(266862c4) SHA1(2c5c513fee99bdb6e0ae3e0e644e516bdaddd629) )
@@ -2265,6 +2354,51 @@ ROM_START( 3in1semi )
 	ROM_LOAD( "u76", 0x080000, 0x80000, CRC(5f4b48ea) SHA1(e9dd1100d55b021b060990988c1e5271ce1ae35b) )
 	ROM_LOAD( "u77", 0x100000, 0x80000, CRC(d44211e3) SHA1(53af19dec03e76912632450414cdbcbb31cc094c) )
 	ROM_LOAD( "u78", 0x180000, 0x80000, CRC(af596afc) SHA1(875d7a51ff5c741cae4483d8da33df9cae8de52a) )
+ROM_END
+
+/*
+
+Ma Cheon Ru
+SemiCom (c) 1999
+
+PCB:  Ser-4331-4
+
+  CPU: 68000, Z80
+Sound: OKIM6295, YM2151+YM3012 (rebadged as KA51+BS902)
+Video: QuickLogic QL2003-XPL84C
+  OSC: 16MHz, 12MHz
+
+Measurements:
+   68000 12MHz
+     Z80 4MHz (16MHz/4)
+  YM2151 4MHz (16MHz/4)
+OKI 6295 1MHz (16MHz/16, pin 7 High)
+*/
+
+ROM_START( mcheonru ) /* SemiCom Ser-4331-4 PCB */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "u52",  0x00001, 0x40000, CRC(63fd8a9b) SHA1(53054d8072322842c32625ab38e7d62dc0e75627) )
+	ROM_LOAD16_BYTE( "u74",  0x00000, 0x40000, CRC(3edb17ce) SHA1(0c6ea239f57eca114d75c173b77b2c8ef43d63a2) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(79e965b4) SHA1(268df67ec6ea828ae01a6e4d2da9ad2a08a837f1) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from
+	   shared ram, the MCU puts it there */
+	ROM_LOAD( "protdata.bin", 0x00000, 0x200 , CRC(d61f4f07) SHA1(29485bce6e3a7ed2ace540bb81fe028456ae1ae9) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "u14", 0x00000, 0x40000, CRC(28a62d23) SHA1(24dbe6229647032599e02225de57650205dce5c3) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "u75", 0x000000, 0x80000, CRC(0142c085) SHA1(9d948a63e4edcdb7f5cef0d2d7f118e6cbf4779e) )
+	ROM_LOAD( "u76", 0x080000, 0x80000, CRC(27fda507) SHA1(87820348470979da730956066d3c820faedbec13) )
+	ROM_LOAD( "u77", 0x100000, 0x80000, CRC(4dfe0550) SHA1(9a227114765ea5327b64061e4b4e4d4f19bd3293) )
+	ROM_LOAD( "u78", 0x180000, 0x80000, CRC(f1b74978) SHA1(d1ac1bc212050d4f1a861045ab612115c73d3fd0) )
 ROM_END
 
 ROM_START( cookbib2 )
@@ -2444,364 +2578,10 @@ ROM_START( suhosong )
 	ROM_LOAD( "su_ho_sung.ua6", 0x100000, 0x80000, CRC(92fea02c) SHA1(946c7bf55354875a1581ce484cb185b640f74166) )
 ROM_END
 
-READ16_MEMBER(snowbros_state::moremorp_0a_read)
-{
-	return 0x000a;
-}
-
-DRIVER_INIT_MEMBER(snowbros_state,moremorp)
-{
-//  UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
-//  int i;
-
-//  for (i = 0;i < 0x200/2;i++)
-//      m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
-
-	/* explicit check in the code */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::moremorp_0a_read),this));
-}
 
 
 DRIVER_INIT_MEMBER(snowbros_state,cookbib2)
 {
-//  UINT16 *HCROM = (UINT16*)memregion("maincpu")->base();
-//  UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
-//  int i;
-//  m_hyperpac_ram[0xf000/2] = 0x46fc;
-//  m_hyperpac_ram[0xf002/2] = 0x2700;
-
-// verified on real hardware, need to move this to a file really
-
-//  static UINT16 cookbib2_mcu68k[] =
-//  {
-//      // moved to protdata.bin
-//  };
-
-
-
-
-//for (i = 0;i < ARRAY_LENGTH(cookbib2_mcu68k);i++)
-//      m_hyperpac_ram[0xf000/2 + i] = cookbib2_mcu68k[i];
-
-//  for (i = 0;i < 0x200/2;i++)
-//      m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
-
-
-	// trojan is actually buggy and gfx flicker like crazy
-	// but we can pause the system after bootup with HALT line of 68k to get the table before
-	// it goes nuts
-
-	//  m_hyperpac_ram[0xf07a/2] = 0x4e73;
-	//  m_hyperpac_ram[0xf000/2] = 0x4e73;
-
-#if 0
-
-	/* interrupt wait loop? */
-	HCROM[0x014942/2] = 0x4eb9;
-	HCROM[0x014944/2] = 0x0004;
-	HCROM[0x014946/2] = 0x8000;
-	HCROM[0x014948/2] = 0x4e71;
-
-	/* interrupt wait loop? */
-	HCROM[0x014968/2] = 0x4eb9;
-	HCROM[0x01496a/2] = 0x0004;
-	HCROM[0x01496c/2] = 0x8100;
-	HCROM[0x01496e/2] = 0x4e71;
-
-	/* interrupt wait loop? */
-	HCROM[0x014560/2] = 0x4eb9;
-	HCROM[0x014562/2] = 0x0004;
-	HCROM[0x014564/2] = 0x8200;
-	HCROM[0x014566/2] = 0x4e71;
-
-	/* new code for interrupt wait */
-	HCROM[0x048000/2] = 0x4a79;
-	HCROM[0x048002/2] = 0x0010;
-	HCROM[0x048004/2] = 0x2462;
-	HCROM[0x048006/2] = 0x66f8;
-	HCROM[0x048008/2] = 0x4eb9;
-	HCROM[0x04800a/2] = 0x0004;
-	HCROM[0x04800c/2] = 0x8300;
-	HCROM[0x04800e/2] = 0x4e75;
-
-	/* new code for interrupt wait */
-	HCROM[0x048100/2] = 0x4a79;
-	HCROM[0x048102/2] = 0x0010;
-	HCROM[0x048104/2] = 0x2460;
-	HCROM[0x048106/2] = 0x66f8;
-	HCROM[0x048108/2] = 0x4eb9;
-	HCROM[0x04810a/2] = 0x0004;
-	HCROM[0x04810c/2] = 0x8300;
-	HCROM[0x04810e/2] = 0x4e75;
-
-	/* new code for interrupt wait */
-	HCROM[0x048200/2] = 0x4a79;
-	HCROM[0x048202/2] = 0x0010;
-	HCROM[0x048204/2] = 0x2490;
-	HCROM[0x048206/2] = 0x66f8;
-	HCROM[0x048208/2] = 0x4eb9;
-	HCROM[0x04820a/2] = 0x0004;
-	HCROM[0x04820c/2] = 0x8300;
-	HCROM[0x04820e/2] = 0x4e75;
-
-
-
-	/* put registers on stack */
-	HCROM[0x048300/2] = 0x48e7;
-	HCROM[0x048302/2] = 0xfffe;
-
-	/* wipe sprite ram (fill with 0x0002) */
-
-	/* put the address we want to write TO in A2 */
-	HCROM[0x048304/2] = 0x45f9;
-	HCROM[0x048306/2] = 0x0070;
-	HCROM[0x048308/2] = 0x0000;
-
-	/* put the number of words we want to clear into D0 */
-	HCROM[0x04830a/2] = 0x203c;
-	HCROM[0x04830c/2] = 0x0000;
-	HCROM[0x04830e/2] = 0x1000;
-
-	/* write 0x0002 to A2 */
-	HCROM[0x048310/2] = 0x34bc;
-	HCROM[0x048312/2] = 0x0002;
-
-
-	/* add 1 to write address a2 */
-	HCROM[0x048314/2] = 0xd5fc;
-	HCROM[0x048316/2] = 0x0000;
-	HCROM[0x048318/2] = 0x0002;
-
-	/* decrease counter d0 */
-	HCROM[0x04831a/2] = 0x5380;
-
-	/* compare d0 to 0 */
-	HCROM[0x04831c/2] = 0x0c80;
-	HCROM[0x04831e/2] = 0x0000;
-	HCROM[0x048320/2] = 0x0000;
-
-	/* if its not 0 then branch back */
-	HCROM[0x048322/2] = 0x66ec;
-
-	/* ram has been wiped */
-
-	/* put the address we want to read protection data  in A2 */
-	HCROM[0x048324/2] = 0x45f9;
-	HCROM[0x048326/2] = 0x0010;
-//  HCROM[0x048328/2] = 0xf000;
-//  HCROM[0x048328/2] = 0xf000+0xb4;
-	HCROM[0x048328/2] = 0xf000+0xb4+0xb4;
-
-	/* put the address of spriteram  in A0 */
-	HCROM[0x04832a/2] = 0x41f9;
-	HCROM[0x04832c/2] = 0x0070;
-	HCROM[0x04832e/2] = 0x0000;
-
-	/* put the number of rows into D3 */
-	HCROM[0x048330/2] = 0x263c;
-	HCROM[0x048332/2] = 0x0000;
-	HCROM[0x048334/2] = 0x0012;
-
-	/* put the y co-ordinate of rows into D6 */
-	HCROM[0x048336/2] = 0x2c3c;
-	HCROM[0x048338/2] = 0x0000;
-	HCROM[0x04833a/2] = 0x0014;
-
-	/* put the number of bytes per row into D2 */
-	HCROM[0x04833c/2] = 0x243c;
-	HCROM[0x04833e/2] = 0x0000;
-	HCROM[0x048340/2] = 0x000a;
-
-	/* put the x co-ordinate of rows into D5 */
-	HCROM[0x048342/2] = 0x2a3c;
-	HCROM[0x048344/2] = 0x0000;
-	HCROM[0x048346/2] = 0x0010;
-
-	// move content of a2 to d4 (byte)
-	HCROM[0x048348/2] = 0x1812;
-
-	HCROM[0x04834a/2] = 0xe84c; // shift d4 right by 4
-
-	HCROM[0x04834c/2] = 0x0244; // mask with 0x000f
-	HCROM[0x04834e/2] = 0x000f; //
-
-	/* jump to character draw to draw first bit */
-	HCROM[0x048350/2] = 0x4eb9;
-	HCROM[0x048352/2] = 0x0004;
-	HCROM[0x048354/2] = 0x8600;
-
-	// increase x-cord
-	HCROM[0x048356/2] = 0x0645;
-	HCROM[0x048358/2] = 0x000a;
-
-
-	/* add 0x10 to draw address a0 */
-	HCROM[0x04835a/2] = 0xd1fc;
-	HCROM[0x04835c/2] = 0x0000;
-	HCROM[0x04835e/2] = 0x0010;
-
-
-	// move content of a2 to d4 (byte)
-	HCROM[0x048360/2] = 0x1812;
-
-	HCROM[0x048362/2] = 0x0244; // mask with 0x000f
-	HCROM[0x048364/2] = 0x000f; //
-
-	/* jump to character draw to draw second bit */
-	HCROM[0x048366/2] = 0x4eb9;
-	HCROM[0x048368/2] = 0x0004;
-	HCROM[0x04836a/2] = 0x8600;
-
-	// increase x-cord
-	HCROM[0x04836c/2] = 0x0645;
-	HCROM[0x04836e/2] = 0x000c;
-
-	/* add 0x10 to draw address a0 */
-	HCROM[0x048370/2] = 0xd1fc;
-	HCROM[0x048372/2] = 0x0000;
-	HCROM[0x048374/2] = 0x0010;
-
-// newcode
-	/* add 1 to read address a2 */
-	HCROM[0x048376/2] = 0xd5fc;
-	HCROM[0x048378/2] = 0x0000;
-	HCROM[0x04837a/2] = 0x0001;
-
-	/* decrease counter d2 (row count)*/
-	HCROM[0x04837c/2] = 0x5382;
-
-	/* compare d2 to 0 */
-	HCROM[0x04837e/2] = 0x0c82;
-	HCROM[0x048380/2] = 0x0000;
-	HCROM[0x048382/2] = 0x0000;
-
-	/* if its not 0 then branch back */
-	HCROM[0x048384/2] = 0x66c2;
-
-	// increase y-cord d6
-	HCROM[0x048386/2] = 0x0646;
-	HCROM[0x048388/2] = 0x000c;
-
-	/* decrease counter d3 */
-	HCROM[0x04838a/2] = 0x5383;
-
-	/* compare d3 to 0 */
-	HCROM[0x04838c/2] = 0x0c83;
-	HCROM[0x04838e/2] = 0x0000;
-	HCROM[0x048390/2] = 0x0000;
-
-	/* if its not 0 then branch back */
-	HCROM[0x048392/2] = 0x66a8;
-
-	/* get back registers from stack*/
-	HCROM[0x048394/2] = 0x4cdf;
-	HCROM[0x048396/2] = 0x7fff;
-
-	/* rts */
-	HCROM[0x048398/2] = 0x4e75;
-
-	/* Draw a character! */
-	/* D6 = y-coordinate
-	   D5 = x-coordinate
-	   D4 = value to draw
-
-	   A0 = spriteram base */
-
-	// 0002 0002 0002 0010 00xx 00yy 00nn 000n
-
-	// 357c 0020 000c
-	// 337c = a1
-	// move.w #$20, (#$c, A2)
-
-	HCROM[0x048600/2] = 0x317c;
-	HCROM[0x048602/2] = 0x0010;
-	HCROM[0x048604/2] = 0x0006;
-
-	HCROM[0x048606/2] = 0x3145;
-	HCROM[0x048608/2] = 0x0008;
-
-	HCROM[0x04860a/2] = 0x3146;
-	HCROM[0x04860c/2] = 0x000a;
-
-/* get true value */
-
-	/* put lookuptable address in  A3 */
-	HCROM[0x04860e/2] = 0x47f9;
-	HCROM[0x048610/2] = 0x0004;
-	HCROM[0x048612/2] = 0x8800;
-
-	HCROM[0x048614/2] = 0x3004; // d4 -> d0
-	HCROM[0x048616/2] = 0xe348;
-
-	HCROM[0x048618/2] = 0x3173;
-	HCROM[0x04861a/2] = 0x0000;
-	HCROM[0x04861c/2] = 0x000c;
-
-/* not value */
-
-	HCROM[0x04861e/2] = 0x317c;
-	HCROM[0x048620/2] = 0x0000;
-	HCROM[0x048622/2] = 0x000e;
-
-	/* rts */
-	HCROM[0x048624/2] = 0x4e75;
-
-
-	/* table used for lookup by the draw routine to get real tile numbers */
-
-	HCROM[0x048800/2] = 0x0010;
-	HCROM[0x048802/2] = 0x0011;
-	HCROM[0x048804/2] = 0x0012;
-	HCROM[0x048806/2] = 0x0013;
-	HCROM[0x048808/2] = 0x0014;
-	HCROM[0x04880a/2] = 0x0015;
-	HCROM[0x04880c/2] = 0x0016;
-	HCROM[0x04880e/2] = 0x0017;
-	HCROM[0x048810/2] = 0x0018;
-	HCROM[0x048812/2] = 0x0019;
-	HCROM[0x048814/2] = 0x0021;
-	HCROM[0x048816/2] = 0x0022;
-	HCROM[0x048818/2] = 0x0023;
-	HCROM[0x04881a/2] = 0x0024;
-	HCROM[0x04881c/2] = 0x0025;
-	HCROM[0x04881e/2] = 0x0026;
-
-
-
-/*
-10 0
-11 1
-12 2
-13 3
-14 4
-15 5
-16 6
-17 7
-18 8
-19 9
-21 a
-22 b
-23 c
-24 d
-25 e
-26 f
-*/
-
-
-
-
-
-	{
-		FILE *fp;
-
-		fp=fopen("cookie", "w+b");
-		if (fp)
-		{
-			fwrite(HCROM, 0x80000, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
 }
 
 
@@ -2823,7 +2603,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 			if (i&1) buffer[i] = BITSWAP8(src[i],6,7,5,4,3,2,1,0);
 			else buffer[i] = src[i];
 
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 
 	src = memregion("soundcpu")->base();
@@ -2835,7 +2615,7 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[i^0x4000];
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_4in1_02_read),this));
 }
@@ -2851,7 +2631,7 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = src[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,3,4,1,2,0)];
-		memcpy(src,buffer,len);
+		memcpy(src,&buffer[0],len);
 	}
 
 	save_item(NAME(m_sb3_music_is_playing));
@@ -2860,13 +2640,14 @@ DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 
 READ16_MEMBER(snowbros_state::_3in1_read)
 {
-	return 0x0a0a;
+	return 0x000a;
 }
 
 DRIVER_INIT_MEMBER(snowbros_state,3in1semi)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(snowbros_state::_3in1_read),this));
 }
+
 
 READ16_MEMBER(snowbros_state::cookbib3_read)
 {
@@ -2942,12 +2723,13 @@ GAME( 1995, hyperpacb,hyperpac, semicom,      hyperpac, driver_device,  0,      
 GAME( 1996, cookbib2, 0,        semiprot,     cookbib2, snowbros_state, cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2", GAME_SUPPORTS_SAVE )
 GAME( 1996, toppyrap, 0,        semiprot,     toppyrap, driver_device,  0,        ROT0, "SemiCom",              "Toppy & Rappy", GAME_SUPPORTS_SAVE )
 GAME( 1997, cookbib3, 0,        semiprot,     cookbib3, snowbros_state, cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", GAME_SUPPORTS_SAVE )
-GAME( 1997, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", GAME_SUPPORTS_SAVE )
-GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", GAME_SUPPORTS_SAVE )
 GAME( 1997, pzlbreak, 0,        semiprot,     pzlbreak, snowbros_state, pzlbreak, ROT0, "SemiCom",              "Puzzle Break", GAME_SUPPORTS_SAVE )
-GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More", GAME_SUPPORTS_SAVE )
-GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit",       "More More Plus", GAME_SUPPORTS_SAVE )
 GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", GAME_SUPPORTS_SAVE )
+GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", GAME_SUPPORTS_SAVE )
+GAME( 1998, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", GAME_SUPPORTS_SAVE )
+GAME( 1999, mcheonru, 0,        semiprot,     mcheonru, snowbros_state, 3in1semi, ROT0, "SemiCom",              "Ma Cheon Ru", GAME_SUPPORTS_SAVE )
+GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More", GAME_SUPPORTS_SAVE )
+GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", GAME_SUPPORTS_SAVE )
 // This is very similar to the SemiCom titles, but unprotected.
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (PacMan 2, Tetris, HyperMan 2, Snow Bros.)" , GAME_SUPPORTS_SAVE )
 

@@ -80,7 +80,7 @@ READ8_MEMBER(pce_rom_device::read_cart)
 READ8_MEMBER(pce_cdsys3_device::read_cart)
 {
 	int bank = offset / 0x20000;
-	if (m_ram && offset >= 0xd0000)
+	if (!m_ram.empty() && offset >= 0xd0000)
 		return m_ram[offset - 0xd0000];
 
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
@@ -88,7 +88,7 @@ READ8_MEMBER(pce_cdsys3_device::read_cart)
 
 WRITE8_MEMBER(pce_cdsys3_device::write_cart)
 {
-	if (m_ram && offset >= 0xd0000)
+	if (!m_ram.empty() && offset >= 0xd0000)
 		m_ram[offset - 0xd0000] = data;
 }
 
@@ -96,7 +96,7 @@ WRITE8_MEMBER(pce_cdsys3_device::write_cart)
 READ8_MEMBER(pce_populous_device::read_cart)
 {
 	int bank = offset / 0x20000;
-	if (m_ram && offset >= 0x80000 && offset < 0x88000)
+	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
 		return m_ram[offset & 0x7fff];
 
 	return m_rom[rom_bank_map[bank] * 0x20000 + (offset & 0x1ffff)];
@@ -104,7 +104,7 @@ READ8_MEMBER(pce_populous_device::read_cart)
 
 WRITE8_MEMBER(pce_populous_device::write_cart)
 {
-	if (m_ram && offset >= 0x80000 && offset < 0x88000)
+	if (!m_ram.empty() && offset >= 0x80000 && offset < 0x88000)
 		m_ram[offset & 0x7fff] = data;
 }
 

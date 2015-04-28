@@ -86,11 +86,10 @@ DM81LS95 = TriState buffer
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/tms5220.h"
 #include "machine/nvram.h"
 #include "includes/portrait.h"
 
-WRITE8_MEMBER(portrait_state::portrait_ctrl_w)
+WRITE8_MEMBER(portrait_state::ctrl_w)
 {
 	/* bits 4 and 5 are unknown */
 
@@ -106,30 +105,30 @@ WRITE8_MEMBER(portrait_state::portrait_ctrl_w)
 	output_set_value("photo", (data >> 7) & 1);
 }
 
-WRITE8_MEMBER(portrait_state::portrait_positive_scroll_w)
+WRITE8_MEMBER(portrait_state::positive_scroll_w)
 {
 	m_scroll = data;
 }
 
-WRITE8_MEMBER(portrait_state::portrait_negative_scroll_w)
+WRITE8_MEMBER(portrait_state::negative_scroll_w)
 {
 	m_scroll = - (data ^ 0xff);
 }
 
 static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_SHARE("bgvideoram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_SHARE("fgvideoram")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(bgvideo_write) AM_SHARE("bgvideoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(fgvideo_write) AM_SHARE("fgvideoram")
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE(portrait_ctrl_w)
+	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE(ctrl_w)
 	AM_RANGE(0xa010, 0xa010) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE(portrait_positive_scroll_w)
-	AM_RANGE(0xa019, 0xa019) AM_WRITE(portrait_negative_scroll_w)
+	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE(positive_scroll_w)
+	AM_RANGE(0xa019, 0xa019) AM_WRITE(negative_scroll_w)
 	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
 ADDRESS_MAP_END
@@ -257,7 +256,7 @@ static MACHINE_CONFIG_START( portrait, portrait_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 0*8, 40*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(portrait_state, screen_update_portrait)
+	MCFG_SCREEN_UPDATE_DRIVER(portrait_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", portrait)
@@ -381,5 +380,5 @@ ROM_END
 
 
 
-GAME( 1983, portrait, 0,        portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 1)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
-GAME( 1983, portraita,portrait, portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 2)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1983, portrait, 0,        portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 1)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, portraita,portrait, portrait, portrait, driver_device,  0, ROT270, "Olympia", "Portraits (set 2)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

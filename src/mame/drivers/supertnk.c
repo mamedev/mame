@@ -124,7 +124,7 @@ public:
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
 	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
 	DECLARE_DRIVER_INIT(supertnk);
-    virtual void machine_start();
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -135,7 +135,7 @@ public:
 
 void supertnk_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
 
@@ -148,14 +148,14 @@ void supertnk_state::machine_start()
 WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_0_w)
 {
 	m_rom_bank = (m_rom_bank & 0x02) | ((data << 0) & 0x01);
-    membank("bank1")->set_entry(m_rom_bank);
+	membank("bank1")->set_entry(m_rom_bank);
 }
 
 
 WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
 {
 	m_rom_bank = (m_rom_bank & 0x01) | ((data << 1) & 0x02);
-    membank("bank1")->set_entry(m_rom_bank);
+	membank("bank1")->set_entry(m_rom_bank);
 }
 
 

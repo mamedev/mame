@@ -199,11 +199,11 @@ static const res_net_info radarscp_grid_net_info =
 PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 	int i;
 
 	compute_res_net_all(rgb, color_prom, dkong_decode_info, dkong_net_info);
-	palette.set_pen_colors(0, rgb, 256);
+	palette.set_pen_colors(0, rgb);
 
 	/* Now treat tri-state black background generation */
 
@@ -428,10 +428,10 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 PALETTE_INIT_MEMBER(dkong_state,dkong3)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, dkong3_decode_info, dkong3_net_info);
-	palette.set_pen_colors(0, rgb, 256);
+	palette.set_pen_colors(0, rgb);
 	palette.palette()->normalize_range(0, 255);
 
 	color_prom += 1024;

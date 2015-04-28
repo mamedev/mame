@@ -67,7 +67,7 @@ void necdsp_device::device_start()
 	m_direct = &m_program->direct();
 
 	// register our state for the debugger
-	astring tempstr;
+	std::string tempstr;
 	state_add(STATE_GENPC, "GENPC", regs.pc).noshow();
 	state_add(UPD7725_PC, "PC", regs.pc);
 	state_add(UPD7725_RP, "RP", regs.rp);
@@ -201,12 +201,12 @@ void necdsp_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void necdsp_device::state_string_export(const device_state_entry &entry, astring &string)
+void necdsp_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case UPD7725_FLAGA:
-			string.printf("%s %s %c%c %s %s %s %s",
+			strprintf(str, "%s %s %c%c %s %s %s %s",
 							regs.flaga.s1 ? "S1" : "s1",
 							regs.flaga.s0 ? "S0" : "s0",
 							regs.flaga.c ? 'C' : 'c',
@@ -218,7 +218,7 @@ void necdsp_device::state_string_export(const device_state_entry &entry, astring
 			break;
 
 		case UPD7725_FLAGB:
-			string.printf("%s %s %c%c %s %s %s %s",
+			strprintf(str, "%s %s %c%c %s %s %s %s",
 							regs.flagb.s1 ? "S1" : "s1",
 							regs.flagb.s0 ? "S0" : "s0",
 							regs.flagb.c ? 'C' : 'c',

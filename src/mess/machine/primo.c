@@ -242,9 +242,9 @@ void primo_state::primo_common_machine_init ()
 
 void primo_state::machine_start()
 {
-	astring region_tag;
-	m_cart1_rom = memregion(region_tag.cpy(m_cart1->tag()).cat(GENERIC_ROM_REGION_TAG));
-	m_cart2_rom = memregion(region_tag.cpy(m_cart2->tag()).cat(GENERIC_ROM_REGION_TAG));
+	std::string region_tag;
+	m_cart1_rom = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	m_cart2_rom = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 }
 
 void primo_state::machine_reset()
@@ -303,17 +303,17 @@ SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 {
 	dynamic_buffer snapshot_data(snapshot_size);
 
-	if (image.fread(snapshot_data, snapshot_size) != snapshot_size)
+	if (image.fread(&snapshot_data[0], snapshot_size) != snapshot_size)
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	if (strncmp((char *)(UINT8 *)snapshot_data, "PS01", 4))
+	if (strncmp((char *)&snapshot_data[0], "PS01", 4))
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	primo_setup_pss(snapshot_data, snapshot_size);
+	primo_setup_pss(&snapshot_data[0], snapshot_size);
 
 	return IMAGE_INIT_PASS;
 }
@@ -345,12 +345,12 @@ QUICKLOAD_LOAD_MEMBER( primo_state, primo )
 {
 	dynamic_buffer quickload_data(quickload_size);
 
-	if (image.fread(quickload_data, quickload_size) != quickload_size)
+	if (image.fread(&quickload_data[0], quickload_size) != quickload_size)
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	primo_setup_pp(quickload_data, quickload_size);
+	primo_setup_pp(&quickload_data[0], quickload_size);
 
 	return IMAGE_INIT_PASS;
 }

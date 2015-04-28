@@ -14,7 +14,7 @@
 
 
 pointswin_info::pointswin_info(debugger_windows_interface &debugger) :
-	debugwin_info(debugger, false, astring("All Breakpoints"), NULL)
+	debugwin_info(debugger, false, std::string("All Breakpoints").c_str(), NULL)
 {
 	if (!window())
 		return;

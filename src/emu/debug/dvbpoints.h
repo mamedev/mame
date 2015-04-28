@@ -46,13 +46,13 @@ protected:
 private:
 	// internal helpers
 	void enumerate_sources();
-	void pad_astring_to_length(astring& str, int len);
+	void pad_astring_to_length(std::string& str, int len);
 	void gather_breakpoints();
 
 
 	// internal state
 	int (*m_sortType)(void const *, void const *);
-	dynamic_array<device_debug::breakpoint *> m_buffer;
+	std::vector<device_debug::breakpoint *> m_buffer;
 };
 
 

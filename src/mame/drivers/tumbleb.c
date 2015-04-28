@@ -3534,11 +3534,11 @@ DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 void tumbleb_state::suprtrio_decrypt_code()
 {
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
-	dynamic_array<UINT16> buf(0x80000/2);
+	std::vector<UINT16> buf(0x80000/2);
 	int i;
 
 	/* decrypt main ROMs */
-	memcpy(buf, rom, 0x80000);
+	memcpy(&buf[0], rom, 0x80000);
 	for (i = 0; i < 0x40000; i++)
 	{
 		int j = i ^ 0x06;
@@ -3551,11 +3551,11 @@ void tumbleb_state::suprtrio_decrypt_code()
 void tumbleb_state::suprtrio_decrypt_gfx()
 {
 	UINT16 *rom = (UINT16 *)memregion("tilegfx")->base();
-	dynamic_array<UINT16> buf(0x100000/2);
+	std::vector<UINT16> buf(0x100000/2);
 	int i;
 
 	/* decrypt tiles */
-	memcpy(buf, rom, 0x100000);
+	memcpy(&buf[0], rom, 0x100000);
 	for (i = 0; i < 0x80000; i++)
 	{
 		int j = i ^ 0x02;

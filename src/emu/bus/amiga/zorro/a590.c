@@ -155,21 +155,21 @@ ROM_START( dmac_hdc )
 	ROMX_LOAD("390721-01.u13", 0x4000, 0x2000, CRC(00dbf615) SHA1(503940d04fb3b49eaa61100fd3a487018b35e25a), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("390722-01.u12", 0x4001, 0x2000, CRC(c460cfdb) SHA1(0de457daec3b84f75e8fb344defe24ce56cda3e0), ROM_SKIP(1) | ROM_BIOS(2))
 
-	// changelog v6.6: fixes dual scsi problems with the wd33c93a controller
+	// changelog v6.6: fixes dual SCSI problems with the wd33c93a controller
 	ROM_SYSTEM_BIOS(2, "v66", "Version 6.6")
 	ROMX_LOAD("390721-02.u13", 0x0000, 0x2000, CRC(c0871d25) SHA1(e155f18abb90cf820589c15e70559d3b6b391af8), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("390722-02.u12", 0x0001, 0x2000, CRC(e536bbb2) SHA1(fd7f8a6da18c1b02d07eb990c2467a24183ede12), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("390721-02.u13", 0x4000, 0x2000, CRC(c0871d25) SHA1(e155f18abb90cf820589c15e70559d3b6b391af8), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("390722-02.u12", 0x4001, 0x2000, CRC(e536bbb2) SHA1(fd7f8a6da18c1b02d07eb990c2467a24183ede12), ROM_SKIP(1) | ROM_BIOS(3))
 
-	// final commodore released version
+	// final Commodore released version
 	ROM_SYSTEM_BIOS(3, "v70", "Version 7.0")
 	ROMX_LOAD("390721-03.u13", 0x0000, 0x2000, CRC(2942747a) SHA1(dbd7648e79c753337ff3e4f491de224bf05e6bb6), ROM_SKIP(1) | ROM_BIOS(4))
 	ROMX_LOAD("390722-03.u12", 0x0001, 0x2000, CRC(a9ccffed) SHA1(149f5bd52e2d29904e3de483b9ad772448e9278e), ROM_SKIP(1) | ROM_BIOS(4))
 	ROMX_LOAD("390721-03.u13", 0x4000, 0x2000, CRC(2942747a) SHA1(dbd7648e79c753337ff3e4f491de224bf05e6bb6), ROM_SKIP(1) | ROM_BIOS(4))
 	ROMX_LOAD("390722-03.u12", 0x4001, 0x2000, CRC(a9ccffed) SHA1(149f5bd52e2d29904e3de483b9ad772448e9278e), ROM_SKIP(1) | ROM_BIOS(4))
 
-	// third-party upgrade rom, requires a small rom adapter pcb
+	// third-party upgrade ROM, requires a small ROM adapter pcb
 	ROM_SYSTEM_BIOS(4, "g614", "Guru-ROM 6.14")
 	ROMX_LOAD("gururom_v614.bin", 0x0000, 0x8000, CRC(04e52f93) SHA1(6da21b6f5e8f8837d64507cd8a4d5cdcac4f426b), ROM_GROUPWORD | ROM_BIOS(5))
 
@@ -234,7 +234,7 @@ void a590_device::device_start()
 {
 	set_zorro_device();
 
-	// setup dmac
+	// setup DMAC
 	m_dmac->set_address_space(m_slot->m_space);
 	m_dmac->set_rom(memregion("bootrom")->base());
 }
@@ -243,7 +243,7 @@ void a2091_device::device_start()
 {
 	set_zorro_device();
 
-	// setup dmac
+	// setup DMAC
 	m_dmac->set_address_space(m_slot->m_space);
 	m_dmac->set_rom(memregion("bootrom")->base());
 }
@@ -258,7 +258,7 @@ void dmac_hdc_device::device_reset()
 
 void dmac_hdc_device::resize_ram(int config)
 {
-	// allocate space for ram
+	// allocate space for RAM
 	switch (config & 0x0f)
 	{
 	case 0x01:
@@ -279,7 +279,7 @@ void dmac_hdc_device::resize_ram(int config)
 		break;
 	}
 
-	m_dmac->set_ram(m_ram);
+	m_dmac->set_ram(&m_ram[0]);
 }
 
 void a590_device::device_reset()
@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER( a590_device::cfgin_w )
 	m_int6 = m_jp4->read() & 0x01;
 	resize_ram(m_dips->read() & 0x0f);
 
-	// then tell the dmac to start configuring
+	// then tell the DMAC to start configuring
 	m_dmac->configin_w(state);
 }
 
@@ -311,7 +311,7 @@ WRITE_LINE_MEMBER( a2091_device::cfgin_w )
 	m_int6 = m_jp3->read() & 0x01;
 	resize_ram(m_jp1->read() & 0x0f);
 
-	// then tell the dmac to start configuring
+	// then tell the DMAC to start configuring
 	m_dmac->configin_w(state);
 }
 
@@ -345,6 +345,6 @@ WRITE_LINE_MEMBER( dmac_hdc_device::dmac_int_w )
 
 WRITE_LINE_MEMBER( dmac_hdc_device::scsi_irq_w )
 {
-	// should be or'ed with xt-ide irq
+	// should be or'ed with xt-ide IRQ
 	m_dmac->intx_w(state);
 }

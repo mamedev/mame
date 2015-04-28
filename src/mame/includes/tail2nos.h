@@ -11,7 +11,7 @@ class tail2nos_state : public driver_device
 public:
 	tail2nos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_bgvideoram(*this, "bgvideoram"),
+		m_txvideoram(*this, "txvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_zoomram(*this, "k051316"),
 		m_maincpu(*this, "maincpu"),
@@ -21,14 +21,14 @@ public:
 		m_palette(*this, "palette")  { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bgvideoram;
+	required_shared_ptr<UINT16> m_txvideoram;
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_zoomram;
 
 	/* video-related */
-	tilemap_t   *m_bg_tilemap;
-	int         m_charbank;
-	int         m_charpalette;
+	tilemap_t   *m_tx_tilemap;
+	int         m_txbank;
+	int         m_txpalette;
 	int         m_video_enable;
 
 	/* devices */
@@ -39,7 +39,7 @@ public:
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE16_MEMBER(tail2nos_bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
 	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

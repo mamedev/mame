@@ -30,12 +30,12 @@ Windows debugging options
 
 	Specifies the name of the font to use for debugger windows. By default,
 	the font is Lucida Console.
-	
+
 -debugger_font_size <points> / -dfontsize <points>
 
 	Specifies the size of the font to use for debugger windows, in points.
 	By default, this is set to 9pt.
-	
+
 
 
 Windows performance options
@@ -54,13 +54,13 @@ Windows performance options
 	window and all DirectDraw/Direct3D code to execute on a second thread,
 	which can improve performance on hyperthreaded and multicore systems.
 	The default is OFF (-nomultithreading).
-	
+
 -numprocessors <auto|value> / -np <auto|value>
 
 	Specify the number of processors to use for work queues. Specifying
-	"auto" will use the value reported by the system or environment 
+	"auto" will use the value reported by the system or environment
 	variable OSDPROCESSORS. To avoid abuse, this value is internally limited
-	to 4 times the number of processors reported by the system. 
+	to 4 times the number of processors reported by the system.
 	The default is "auto".
 
 -profile [n]

@@ -125,7 +125,7 @@ void ws_rom_eeprom_device::device_reset()
 	m_eeprom_command = 0;
 	m_eeprom_start = 0;
 	m_eeprom_write_enabled = 0;
-	switch (m_nvram.count())
+	switch (m_nvram.size())
 	{
 		case 0x80:
 			m_eeprom_mode = EEPROM_1K;
@@ -343,7 +343,7 @@ WRITE8_MEMBER(ws_rom_sram_device::write_io)
 	switch (offset)
 	{
 		case 0x01:  // SRAM bank to select
-			m_nvram_base = (data * 0x10000) & (m_nvram.count() -  1);
+			m_nvram_base = (data * 0x10000) & (m_nvram.size() -  1);
 		default:
 			ws_rom_device::write_io(space, offset, data);
 			break;

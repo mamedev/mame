@@ -1877,7 +1877,59 @@ ROM_START( robocop2 )
 	ROM_LOAD( "go-12.v7", 0x00000,  0x400,  CRC(278f674f) SHA1(d4f5b9770d6d2ddebf1b999e291c80a3e274d492) )  /* Priority  Unused */
 ROM_END
 
+
 ROM_START( robocop2u )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "gp03-3.k1",   0x00000, 0x20000, CRC(c016a84b) SHA1(3ac4c61fd87899831e093596ffd7e8a213b946a2) )
+	ROM_LOAD16_BYTE( "gp07-3.k3",   0x00001, 0x20000, CRC(54c541ae) SHA1(c9aa46bdc182aceff3cfb1ad958965deabb335e3) )
+	ROM_LOAD16_BYTE( "gp02-3.j1",   0x40000, 0x20000, CRC(6777b8a0) SHA1(9081bd187c3b5923efab3e4abde952e9ab29d946) ) // == gq-02.j1 in 'robocop2'
+	ROM_LOAD16_BYTE( "gp06-3.j3",   0x40001, 0x20000, CRC(73b8cf96) SHA1(6c651db1d4322946529569f3e516f382f1becde7) )
+	ROM_LOAD16_BYTE( "gp01-.h1",    0x80000, 0x20000, CRC(ab5356c0) SHA1(297a89b4d9212c916745997bbb959b0ed660f909) ) // no '-1' but matches other '-1' roms we have
+	ROM_LOAD16_BYTE( "gp05-.h3",    0x80001, 0x20000, CRC(ce21bda5) SHA1(615701d4abdb56d50da44589e6e03909f4b28d45) )
+	ROM_LOAD16_BYTE( "gp00-.f1",    0xc0000, 0x20000, CRC(a93369ea) SHA1(9e13c36112eb7ebc97dc919e24d0b2955c57e10e) )
+	ROM_LOAD16_BYTE( "gp04-.f3",    0xc0001, 0x20000, CRC(ee2f6ad9) SHA1(3abc07792f444a3415fd32e50d6855843e900b1d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "gp-09.k13",  0x00000,  0x10000,  CRC(4a4e0f8d) SHA1(5408465667d2854bbade23a26ba619d42a0c22f8) )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "gp10-1.y6",  0x00001,  0x10000,  CRC(d25d719c) SHA1(be874cf403ec0e607eb9b54b7cfff0a53f4d59a2) )   /* chars */
+	ROM_LOAD16_BYTE( "gp11-1.z6",  0x00000,  0x10000,  CRC(030ded47) SHA1(59ded540b2601ec37255e871e38ac71a47c8d007) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "mah-04.z4", 0x000000, 0x40000,  CRC(9b6ca18c) SHA1(29a20200ea50b9e8e79da072c1b6e580e6ca180f) )
+	ROM_CONTINUE(          0x080000, 0x40000 )
+	ROM_LOAD( "mah-03.y4", 0x040000, 0x40000,  CRC(37894ddc) SHA1(ee08440b3b2023ec6ee2af6d509b642bcead2e60) )
+	ROM_CONTINUE(          0x0c0000, 0x40000 )
+
+	ROM_REGION( 0x180000, "gfx3", 0 )
+	ROM_LOAD( "mah-01.z1", 0x000000, 0x40000,  CRC(26e0dfff) SHA1(8cca2dbcda64f4bc6ee0842486da7dc7df3046fd) )
+	ROM_CONTINUE(          0x0c0000, 0x40000 )
+	ROM_LOAD( "mah-00.y1", 0x040000, 0x40000,  CRC(7bd69e41) SHA1(296adbf7d40f1092bf38599b3bad51f39d8093b2) )
+	ROM_CONTINUE(          0x100000, 0x40000 )
+	ROM_LOAD( "mah-02.a1", 0x080000, 0x40000,  CRC(328a247d) SHA1(879f75452dc7c327fd5b35c960c58bc0c0efd33c) )
+	ROM_CONTINUE(          0x140000, 0x40000 )
+
+	ROM_REGION( 0x300000, "gfx4", 0 )
+	ROM_LOAD16_BYTE( "mah-05.y9",  0x000000, 0x80000,  CRC(6773e613) SHA1(ee6cb4272bb9f80e0d918dc059b40e0a47db0876) )
+	ROM_LOAD16_BYTE( "mah-08.y12", 0x000001, 0x80000,  CRC(88d310a5) SHA1(82d249f331f51b7c72f9114ecf4e835ccdae7e97) )
+	ROM_LOAD16_BYTE( "mah-06.z9",  0x100000, 0x80000,  CRC(27a8808a) SHA1(cb14992d1073de38406e36f5884d77933dd6b765) )
+	ROM_LOAD16_BYTE( "mah-09.z12", 0x100001, 0x80000,  CRC(a58c43a7) SHA1(0b7f743cf0443d998479b7d5d95b8f2aaf1ef136) )
+	ROM_LOAD16_BYTE( "mah-07.a9",  0x200000, 0x80000,  CRC(526f4190) SHA1(23cb79230ec267b8e4236381b5a596d7af8ec5b3) )
+	ROM_LOAD16_BYTE( "mah-10.a12", 0x200001, 0x80000,  CRC(14b770da) SHA1(6d57da630da1ec457ebaeed8c251e85bd737e97c) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "gp-08.j13",  0x00000,  0x20000,  CRC(365183b1) SHA1(7d3c201c49981c3ac84022283b048e380cbb7ec3) )
+
+	ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_LOAD( "mah-11.f13", 0x00000,  0x80000,  CRC(642bc692) SHA1(8d9e446b7633bb6acc46d9f92044a69b99a0ccc9) )  /* banked */
+
+	ROM_REGION( 1024, "proms", 0 )
+	ROM_LOAD( "go-12.v7", 0x00000,  0x400,  CRC(278f674f) SHA1(d4f5b9770d6d2ddebf1b999e291c80a3e274d492) )  /* Priority  Unused */
+ROM_END
+
+
+ROM_START( robocop2ua )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "robo03.k1",  0x00000, 0x20000, CRC(f4c96cc9) SHA1(2eb58aca1134c33f2084267e65a565f9adc6ba49) )
 	ROM_LOAD16_BYTE( "robo07.k3",  0x00001, 0x20000, CRC(11e53a7c) SHA1(cdeb7f1983a771238d9d2000f99aed35ae4a06ee) )
@@ -2109,6 +2161,51 @@ ROM_START( mutantf3 ) /* World ver 3 */
 	ROM_LOAD( "maf-09.18l",    0x00000, 0x80000, CRC(28e7ed81) SHA1(e168a2748b75c647f6f9c0d7d25d4f046aa98094) )
 ROM_END
 
+
+ROM_START( mutantf2 ) /* World ver 2 */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE("hd-03-1.2c", 0x00000, 0x20000, CRC(7110cefc) SHA1(26b470cf2fcd026542c7ff4fca11c2095a17501d) )
+	ROM_LOAD16_BYTE("hd-00-1.2a", 0x00001, 0x20000, CRC(b279875b) SHA1(fc148f3f70f289ae1d383f714c41d7b50381803e) )
+	ROM_LOAD16_BYTE("hd-04-1.4c", 0x40000, 0x20000, CRC(fd2ea8d7) SHA1(00e50d42fcc7f6d5076963b02f5abb36275dc993) )
+	ROM_LOAD16_BYTE("hd-01-1.4a", 0x40001, 0x20000, CRC(48a247ac) SHA1(c69d67e44ffae92b261de247f8d3eac2e02fcf11) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "hd-12.21j",  0x00000,  0x10000,  CRC(13d55f11) SHA1(6438dca57f43b3ca6d273bf82b62104a49260132) )
+
+	ROM_REGION( 0x0a0000, "gfx1", 0 ) /* chars */
+	ROM_LOAD16_BYTE( "hd-06-1.8d", 0x000000, 0x10000, CRC(8b7a558b) SHA1(06f1f6910b9a54e208ee9a0b734d5df946016236) )
+	ROM_LOAD16_BYTE( "hd-07-1.9d", 0x000001, 0x10000, CRC(d2a3d449) SHA1(10ad634eb0238f6e9ba04266e4dbaf9470f5d169) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "maf-00.8a", 0x000000, 0x80000,  CRC(e56f528d) SHA1(3908d9b189fa4895c532d1d1f133df0913810cf9) ) /* tiles 3 */
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "maf-01.9a",  0x000000, 0x40000,  CRC(c3d5173d) SHA1(2b6559bf65d7cc5b957ad347b64cf6a18f661686) ) /* tiles 1 */
+	ROM_CONTINUE(           0x080000, 0x40000 )
+	ROM_LOAD( "maf-02.11a", 0x040000, 0x40000,  CRC(0b37d849) SHA1(a0606fb8130a2e86a241ce5ce0b4f61373a88c17) ) /* tiles 2 */
+	ROM_CONTINUE(           0x0c0000, 0x40000 )
+
+	ROM_REGION( 0x500000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "maf-03.18a",   0x000000, 0x100000, CRC(f4366d2c) SHA1(20964d0e1b879b3e5cb5d18a46d2a17dca2b4171) )
+	ROM_LOAD16_BYTE( "maf-04.20a",   0x200000, 0x100000, CRC(0c8f654e) SHA1(e566d4b789b345e20caf7e061e43be7c2e1be9b2) )
+	ROM_LOAD16_BYTE( "maf-05.21a",   0x400000, 0x080000, CRC(b0cfeb80) SHA1(b8519c604b03eb8bcf26d00a43b39d48f1b45ab5) )
+	ROM_LOAD16_BYTE( "maf-06.18d",   0x000001, 0x100000, CRC(f5c7a9b5) SHA1(92efc9401347598c90acf62c9aef30109c990ad6) )
+	ROM_LOAD16_BYTE( "maf-07.20d",   0x200001, 0x100000, CRC(fd6008a3) SHA1(7b680424eca3804c70fa0c4dc415d665c8626498) )
+	ROM_LOAD16_BYTE( "maf-08.21d",   0x400001, 0x080000, CRC(e41cf1e7) SHA1(06524e1aed0adc4c32c92e16a00dc983014f4994) )
+
+	ROM_REGION( 0x40000, "gfx5", 0 ) /* sprites 2 */
+	ROM_LOAD32_BYTE("hf-08.15a", 0x00001, 0x10000, CRC(93b7279f) SHA1(14304a1ffe1bc791bfa83f8200793d897449133c) )
+	ROM_LOAD32_BYTE("hf-09.17a", 0x00003, 0x10000, CRC(05e2c074) SHA1(ec95303e8196424864964b5d2ae862bf75571e83) )
+	ROM_LOAD32_BYTE("hf-10.15c", 0x00000, 0x10000, CRC(9b06f418) SHA1(d1579ae36676e38c96ee55a1ffa20aa307a21654) )
+	ROM_LOAD32_BYTE("hf-11.17c", 0x00002, 0x10000, CRC(3859a531) SHA1(a2a0c1aa28181b5ef6c075ff0118178340389693) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_LOAD( "maf-10.20l",    0x00000, 0x40000, CRC(7c57f48b) SHA1(9a5624553b3b038d70f9b517f410a635c00a8771) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )    /* ADPCM samples */
+	ROM_LOAD( "maf-09.18l",    0x00000, 0x80000, CRC(28e7ed81) SHA1(e168a2748b75c647f6f9c0d7d25d4f046aa98094) )
+ROM_END
+
 ROM_START( deathbrd ) /* Japan ver 3 */
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE("hf-03-2.2c", 0x00000, 0x20000, CRC(fb86fff3) SHA1(af4cfc19ec85e0aa49b5e46d95bdd94a20922cce) )
@@ -2185,6 +2282,7 @@ GAME( 1990, edrandy,  0,       edrandy,  edrandy,  driver_device, 0,        ROT0
 GAME( 1990, edrandy2, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 2)", GAME_SUPPORTS_SAVE )
 GAME( 1990, edrandy1, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (World ver 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, edrandyj, edrandy, edrandy,  edrandc,  driver_device, 0,        ROT0, "Data East Corporation", "The Cliffhanger - Edward Randy (Japan ver 3)", GAME_SUPPORTS_SAVE )
+
 GAME( 1991, cninja,   0,       cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 4)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninja1,  cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninjau,  cninja,  cninja,   cninjau,  cninja_state,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)", GAME_SUPPORTS_SAVE )
@@ -2192,10 +2290,14 @@ GAME( 1991, joemac,   cninja,  cninja,   cninja,   cninja_state,  cninja,   ROT0
 GAME( 1991, stoneage, cninja,  stoneage, cninja,   cninja_state,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninjabl, cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninjabl2,cninja,  cninjabl, cninja,   driver_device, 0,        ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", GAME_NOT_WORKING )
+
 GAME( 1991, robocop2, 0,       robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", GAME_SUPPORTS_SAVE )
-GAME( 1991, robocop2u,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", GAME_SUPPORTS_SAVE )
+GAME( 1991, robocop2u,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.10)", GAME_SUPPORTS_SAVE )
+GAME( 1991, robocop2ua,robocop2,robocop2,robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", GAME_SUPPORTS_SAVE )
 GAME( 1991, robocop2j,robocop2,robocop2, robocop2, driver_device, 0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", GAME_SUPPORTS_SAVE )
+
 GAME( 1992, mutantf,  0,       mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-5)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mutantf4, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-4)", GAME_SUPPORTS_SAVE )
 GAME( 1992, mutantf3, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-3)", GAME_SUPPORTS_SAVE )
+GAME( 1992, mutantf2, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Mutant Fighter (World ver EM-2)", GAME_SUPPORTS_SAVE )
 GAME( 1992, deathbrd, mutantf, mutantf,  mutantf,  cninja_state,  mutantf,  ROT0, "Data East Corporation", "Death Brade (Japan ver JM-3)", GAME_SUPPORTS_SAVE )

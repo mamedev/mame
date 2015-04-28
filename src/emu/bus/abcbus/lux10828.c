@@ -304,6 +304,10 @@ static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
+FLOPPY_FORMATS_MEMBER( luxor_55_10828_device::floppy_formats )
+	FLOPPY_ABC800_FORMAT
+FLOPPY_FORMATS_END
+
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 {
 	m_fdc_irq = state;
@@ -334,15 +338,15 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(luxor_55_10828_device, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(luxor_55_10828_device, pio_pa_w))
-	MCFG_Z80PIO_IN_PA_CB(READ8(luxor_55_10828_device, pio_pb_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(luxor_55_10828_device, pio_pb_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(luxor_55_10828_device, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(luxor_55_10828_device, pio_pb_w))
 
 	MCFG_MB8876x_ADD(MB8876_TAG, XTAL_4MHz/2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_drq_w))
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", luxor_55_10828_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -651,7 +655,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 {
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
-		fatalerror("Z80 WAIT not supported by MAME core\n");
+		logerror("Z80 WAIT not supported by MAME core\n");
 
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
@@ -668,7 +672,7 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 {
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
-		fatalerror("Z80 WAIT not supported by MAME core\n");
+		logerror("Z80 WAIT not supported by MAME core\n");
 
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}

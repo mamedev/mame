@@ -35,7 +35,7 @@ public:
 	tilemap_t *m_bg_tilemap_noscroll;
 	UINT8 m_flipx;
 	UINT8 m_flipy;
-	
+
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
@@ -48,19 +48,19 @@ public:
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
 	DECLARE_READ8_MEMBER(sound_data_r);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
-	
+
 	INTERRUPT_GEN_MEMBER(main_nmi_gen);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(suprridr);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int is_screen_flipped();
 };

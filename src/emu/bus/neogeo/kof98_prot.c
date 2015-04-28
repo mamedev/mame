@@ -33,7 +33,7 @@ void kof98_prot_device::kof98_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
 	static const UINT32 sec[]={0x000000,0x100000,0x000004,0x100004,0x10000a,0x00000a,0x10000e,0x00000e};
 	static const UINT32 pos[]={0x000,0x004,0x00a,0x00e};
 
-	memcpy( dst, src, 0x200000);
+	memcpy( &dst[0], src, 0x200000);
 	for( i=0x800; i<0x100000; i+=0x200 )
 	{
 		for( j=0; j<0x100; j+=0x10 )

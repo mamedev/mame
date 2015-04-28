@@ -122,8 +122,8 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
 }
 
 /*
-mjelctrn:	7 d e -> 1 - 4 8
-mjembase:	b d e -> - 2 4 8
+mjelctrn:   7 d e -> 1 - 4 8
+mjembase:   b d e -> - 2 4 8
 */
 WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
 {
@@ -381,7 +381,7 @@ void dynax_state::blitter_plot_pixel( int layer, int mask, int x, int y, int pen
 }
 
 /*
-	Flags:
+    Flags:
 
     7654 ----   -
     ---- 3---   Rotation = SWAPXY + FLIPY
@@ -1223,9 +1223,9 @@ WRITE8_MEMBER(dynax_state::tenkai_priority_w)
 }
 
 /*
-mjembase:	priority: 00 08 10 18 20 28; enable: 1,2,4
+mjembase:   priority: 00 08 10 18 20 28; enable: 1,2,4
 Convert to:
-mjelctrn:	priority: 00 20 10 40 30 50; enable: 1,2,8
+mjelctrn:   priority: 00 20 10 40 30 50; enable: 1,2,8
 */
 WRITE8_MEMBER(dynax_state::mjembase_priority_w)
 {

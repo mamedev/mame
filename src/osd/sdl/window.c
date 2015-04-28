@@ -9,6 +9,11 @@
 //
 //============================================================
 
+#ifdef SDLMAME_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 // standard SDL headers
 #include "sdlinc.h"
 
@@ -20,7 +25,9 @@
 
 // standard C headers
 #include <math.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 
 // MAME headers
 
@@ -58,16 +65,16 @@
 // minimum window dimension
 #define MIN_WINDOW_DIM                  200
 
-//#ifndef SDLMAME_WIN32
-#define WMSZ_TOP        (0)
-#define WMSZ_BOTTOM     (1)
+#ifndef SDLMAME_WIN32
+#define WMSZ_TOP            (0)
+#define WMSZ_BOTTOM         (1)
 #define WMSZ_BOTTOMLEFT     (2)
 #define WMSZ_BOTTOMRIGHT    (3)
-#define WMSZ_LEFT       (4)
+#define WMSZ_LEFT           (4)
 #define WMSZ_TOPLEFT        (5)
 #define WMSZ_TOPRIGHT       (6)
-#define WMSZ_RIGHT      (7)
-//#endif
+#define WMSZ_RIGHT          (7)
+#endif
 
 //============================================================
 //  GLOBAL VARIABLES
@@ -922,6 +929,7 @@ osd_dim sdl_window_info::pick_best_mode()
 	int minimum_width, minimum_height, target_width, target_height;
 	int i;
 	float size_score, best_score = 0.0f;
+	int best_width = 0, best_height = 0;
 	SDL_Rect **modes;
 
 	// determine the minimum width/height for the selected target
@@ -982,12 +990,13 @@ osd_dim sdl_window_info::pick_best_mode()
 			if (size_score > best_score)
 			{
 				best_score = size_score;
-				return osd_dim(modes[i]->w, modes[i]->h);
+				best_width = modes[i]->w;
+				best_height = modes[i]->h;
 			}
 
 		}
 	}
-	return osd_dim(0,0);
+	return osd_dim(best_width, best_height);
 }
 #endif
 
@@ -1153,8 +1162,8 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 
 #ifdef SDLMAME_MACOSX
 	/* FIMXE: On OSX, SDL_WINDOW_FULLSCREEN_DESKTOP seems to be more reliable.
-	 * 		  It however creates issues with white borders, i.e. the screen clear
-	 * 		  does not work. This happens both with opengl and accel.
+	 *        It however creates issues with white borders, i.e. the screen clear
+	 *        does not work. This happens both with opengl and accel.
 	 */
 #endif
 
@@ -1261,6 +1270,7 @@ OSDWORK_CALLBACK( sdl_window_info::complete_create_wt )
 	SDL_WM_SetCaption(window->m_title, "SDLMAME");
 #endif
 
+	window->monitor()->refresh();
 	// initialize the drawing backend
 	if (window->renderer().create())
 		return (void *) &result[1];

@@ -108,7 +108,7 @@ TAKO-8
 
 --- Gunbarich ---
 
-0-2-9-2-0 Maintainance Mode
+0-2-9-2-0 Maintenance Mode
 0-2-9-1-0 All Data Initialised
 1-2-3-4-5 Best Score Erased
 

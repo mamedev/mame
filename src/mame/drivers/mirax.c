@@ -93,7 +93,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * different stages names :
           . stages  1 to 10 : "LUXORI" instead of "MIRAX"
           . stages 71 to 80 : "DESCOM" instead of "DESBOM"
-        futhermore, for all stages, it's written "UNIT" instead of "CITY"
+        furthermore, for all stages, it's written "UNIT" instead of "CITY"
   - Same ingame bug as in 'mirax' when you reach level 100 (of course, it will display
     "LUXORI UNIT" instead of "MIRAX CITY" on "presentation" screen).
 
@@ -110,40 +110,46 @@ class mirax_state : public driver_device
 public:
 	mirax_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram")  { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
-	UINT8 m_nAyCtrl;
-	UINT8 m_nmi_mask;
-	UINT8 m_flipscreen_x;
-	UINT8 m_flipscreen_y;
-	DECLARE_WRITE8_MEMBER(audio_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(mirax_sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(mirax_coin_counter0_w);
-	DECLARE_WRITE8_MEMBER(mirax_coin_counter1_w);
-	DECLARE_WRITE8_MEMBER(mirax_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(ay1_sel);
-	DECLARE_WRITE8_MEMBER(ay2_sel);
-	DECLARE_DRIVER_INIT(mirax);
-	DECLARE_PALETTE_INIT(mirax);
-	virtual void sound_start();
-	UINT32 screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mirax_vblank_irq);
-	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
+
+	UINT8 m_nAyCtrl;
+	UINT8 m_nmi_mask;
+	UINT8 m_flipscreen_x;
+	UINT8 m_flipscreen_y;
+
+	DECLARE_WRITE8_MEMBER(audio_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(coin_counter0_w);
+	DECLARE_WRITE8_MEMBER(coin_counter1_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(ay1_sel);
+	DECLARE_WRITE8_MEMBER(ay2_sel);
+
+	DECLARE_DRIVER_INIT(mirax);
+	DECLARE_PALETTE_INIT(mirax);
+	virtual void machine_start();
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
@@ -207,32 +213,29 @@ void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void mirax_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int count;
-
-	for(count=0;count<0x200;count+=4)
+	for(int count=0;count<0x200;count+=4)
 	{
 		int spr_offs,x,y,color,fx,fy;
 
-		if(spriteram[count] == 0x00 || spriteram[count+3] == 0x00)
+		if(m_spriteram[count] == 0x00 || m_spriteram[count+3] == 0x00)
 			continue;
 
-		spr_offs = (spriteram[count+1] & 0x3f);
-		color = spriteram[count+2] & 0x7;
-		fx = (m_flipscreen_x) ^ ((spriteram[count+1] & 0x40) >> 6); //<- guess
-		fy = (m_flipscreen_y) ^ ((spriteram[count+1] & 0x80) >> 7);
+		spr_offs = (m_spriteram[count+1] & 0x3f);
+		color = m_spriteram[count+2] & 0x7;
+		fx = (m_flipscreen_x) ^ ((m_spriteram[count+1] & 0x40) >> 6); //<- guess
+		fy = (m_flipscreen_y) ^ ((m_spriteram[count+1] & 0x80) >> 7);
 
-		spr_offs += (spriteram[count+2] & 0xe0)<<1;
-		spr_offs += (spriteram[count+2] & 0x10)<<5;
+		spr_offs += (m_spriteram[count+2] & 0xe0)<<1;
+		spr_offs += (m_spriteram[count+2] & 0x10)<<5;
 
-		y = (m_flipscreen_y) ? spriteram[count] : 0x100 - spriteram[count] - 16;
-		x = (m_flipscreen_x) ? 240 - spriteram[count+3] : spriteram[count+3];
+		y = (m_flipscreen_y) ? m_spriteram[count] : 0x100 - m_spriteram[count] - 16;
+		x = (m_flipscreen_x) ? 240 - m_spriteram[count+3] : m_spriteram[count+3];
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,spr_offs,color,fx,fy,x,y,0);
 	}
 }
 
-UINT32 mirax_state::screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mirax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_tilemap(bitmap,cliprect,1);
 	draw_sprites(bitmap,cliprect);
@@ -241,9 +244,14 @@ UINT32 mirax_state::screen_update_mirax(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-void mirax_state::sound_start()
+void mirax_state::machine_start()
 {
 	m_nAyCtrl = 0x00;
+
+	save_item(NAME(m_nAyCtrl));
+	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_flipscreen_x));
+	save_item(NAME(m_flipscreen_y));
 }
 
 WRITE8_MEMBER(mirax_state::audio_w)
@@ -272,25 +280,25 @@ WRITE8_MEMBER(mirax_state::nmi_mask_w)
 		printf("Warning: %02x written at $f501\n",data);
 }
 
-WRITE8_MEMBER(mirax_state::mirax_sound_cmd_w)
+WRITE8_MEMBER(mirax_state::sound_cmd_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-WRITE8_MEMBER(mirax_state::mirax_coin_counter0_w)
+WRITE8_MEMBER(mirax_state::coin_counter0_w)
 {
 	coin_counter_w(machine(), 0, data & 1);
 }
 
-WRITE8_MEMBER(mirax_state::mirax_coin_counter1_w)
+WRITE8_MEMBER(mirax_state::coin_counter1_w)
 {
 	coin_counter_w(machine(), 1, data & 1);
 }
 
 /* One address flips X, the other flips Y, but I can't tell which is which - Since the value is the same for the 2 addresses, it doesn't really matter */
-WRITE8_MEMBER(mirax_state::mirax_flip_screen_w)
+WRITE8_MEMBER(mirax_state::flip_screen_w)
 {
 	if (offset == 0)
 		m_flipscreen_x = data & 0x01;
@@ -310,11 +318,11 @@ static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf300, 0xf300) AM_READNOP //watchdog? value is always read then discarded
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(mirax_coin_counter0_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(coin_counter0_w)
 	AM_RANGE(0xf501, 0xf501) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf502, 0xf502) AM_WRITE(mirax_coin_counter1_w) // only used in 'miraxa' - see notes
-	AM_RANGE(0xf506, 0xf507) AM_WRITE(mirax_flip_screen_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(mirax_sound_cmd_w)
+	AM_RANGE(0xf502, 0xf502) AM_WRITE(coin_counter1_w) // only used in 'miraxa' - see notes
+	AM_RANGE(0xf506, 0xf507) AM_WRITE(flip_screen_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_cmd_w)
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
 
@@ -455,7 +463,7 @@ static GFXDECODE_START( mirax )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(mirax_state::mirax_vblank_irq)
+INTERRUPT_GEN_MEMBER(mirax_state::vblank_irq)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -464,7 +472,7 @@ INTERRUPT_GEN_MEMBER(mirax_state::mirax_vblank_irq)
 static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mirax_state, mirax_vblank_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mirax_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
@@ -476,7 +484,7 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update_mirax)
+	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x40)
@@ -572,5 +580,5 @@ DRIVER_INIT_MEMBER(mirax_state,mirax)
 	m_flipscreen_y = 0;
 }
 
-GAME( 1985, mirax,    0,        mirax,    mirax, mirax_state,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", 0 )
-GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", 0 )
+GAME( 1985, mirax,    0,        mirax,    mirax, mirax_state,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, miraxa,   mirax,    mirax,    miraxa, mirax_state,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", GAME_SUPPORTS_SAVE )

@@ -537,12 +537,12 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 		bitmap.reset();
 
 	// open the file
-	astring fname;
+	std::string fname;
 	if (dirname == NULL)
-		fname.cpy(filename);
+		fname.assign(filename);
 	else
-		fname.cpy(dirname).cat(PATH_SEPARATOR).cat(filename);
-	file_error filerr = file.open(fname);
+		fname.assign(dirname).append(PATH_SEPARATOR).append(filename);
+	file_error filerr = file.open(fname.c_str());
 	if (filerr != FILERR_NONE)
 		return false;
 

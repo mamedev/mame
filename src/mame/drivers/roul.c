@@ -22,7 +22,7 @@ Has 36 pin Cherry master looking edge connector
 Z80 x2
 Altera Ep1810LC-45
 20.000 MHz crystal
-video 464p10 x4 (board silcksreeend 4416)
+video 464p10 x4 (board silkscreened 4416)
 AY-3-8912A
 
 ROM text showed SUPER LUCKY ROULETTE LEISURE ENT
@@ -77,18 +77,22 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu") { }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	
 	UINT8 m_reg[0x10];
 	UINT8 *m_videobuf;
 	UINT8 m_lamp_old;
+	
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
+	
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(roul);
-	UINT32 screen_update_roul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
+	
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -219,9 +223,13 @@ ADDRESS_MAP_END
 void roul_state::video_start()
 {
 	m_videobuf = auto_alloc_array_clear(machine(), UINT8, VIDEOBUF_SIZE);
+	
+	save_item(NAME(m_reg));
+	save_pointer(NAME(m_videobuf), VIDEOBUF_SIZE);
+	save_item(NAME(m_lamp_old));
 }
 
-UINT32 roul_state::screen_update_roul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 roul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i,j;
 	for (i = 0; i < 256; i++)
@@ -300,7 +308,7 @@ static MACHINE_CONFIG_START( roul, roul_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update_roul)
+	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -324,4 +332,4 @@ ROM_START(roul)
 	ROM_LOAD( "roul.u38",   0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
 
-GAMEL( 1990, roul,  0,   roul, roul, driver_device, 0, ROT0, "bootleg", "Super Lucky Roulette", GAME_IMPERFECT_GRAPHICS, layout_roul )
+GAMEL( 1990, roul,  0,   roul, roul, driver_device, 0, ROT0, "bootleg", "Super Lucky Roulette", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_roul )

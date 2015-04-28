@@ -83,7 +83,7 @@ void srmp2_state::machine_start()
 MACHINE_START_MEMBER(srmp2_state,srmp2)
 {
 	machine_start();
-	
+
 	m_iox.reset = 0x1f;
 	m_iox.ff_event = -1;
 	m_iox.ff_1 = 0x00;
@@ -92,14 +92,14 @@ MACHINE_START_MEMBER(srmp2_state,srmp2)
 	m_iox.protcheck[1] = -1;   m_iox.protlatch[1] = -1;
 	m_iox.protcheck[2] = -1;   m_iox.protlatch[2] = -1;
 	m_iox.protcheck[3] = -1;   m_iox.protlatch[3] = -1;
-	
+
 	save_item(NAME(m_color_bank));
 }
 
 MACHINE_START_MEMBER(srmp2_state,srmp3)
 {
 	machine_start();
-	
+
 	m_iox.reset = 0xc8;
 	m_iox.ff_event = 0xef;
 	m_iox.ff_1 = -1;
@@ -107,16 +107,16 @@ MACHINE_START_MEMBER(srmp2_state,srmp3)
 	m_iox.protcheck[1] = 0x4c; m_iox.protlatch[1] = 0x00;
 	m_iox.protcheck[2] = 0x1c; m_iox.protlatch[2] = 0x04;
 	m_iox.protcheck[3] = 0x45; m_iox.protlatch[3] = 0x00;
-    
-    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
-	
+
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x2000);
+
 	save_item(NAME(m_gfx_bank));
 }
 
 MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 {
 	machine_start();
-	
+
 	m_iox.reset = 0xc8;
 	m_iox.ff_event = 0xff;
 	m_iox.ff_1 = -1;
@@ -125,15 +125,15 @@ MACHINE_START_MEMBER(srmp2_state,rmgoldyh)
 	m_iox.protcheck[2] = -1;   m_iox.protlatch[2] = -1;
 	m_iox.protcheck[3] = -1;   m_iox.protlatch[3] = -1;
 
-    membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
-	
+	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base(), 0x2000);
+
 	save_item(NAME(m_gfx_bank));
 }
 
 MACHINE_START_MEMBER(srmp2_state,mjyuugi)
 {
 	machine_start();
-	
+
 	m_iox.reset = 0x1f;
 	m_iox.ff_event = -1;
 	m_iox.ff_1 = 0x00;

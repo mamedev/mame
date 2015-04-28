@@ -19,7 +19,7 @@
 #include "modules/osdmodule.h"
 
 #include "strconv.h"
-#include "astring.h"
+#include "corestr.h"
 #include "corealloc.h"
 #include "fileio.h"
 
@@ -34,7 +34,7 @@
 class osd_font_windows : public osd_font
 {
 public:
-	virtual ~osd_font_windows() {};
+	virtual ~osd_font_windows() { }
 
 	virtual bool open(const char *font_path, const char *name, int &height);
 	virtual void close();
@@ -46,10 +46,10 @@ private:
 bool osd_font_windows::open(const char *font_path, const char *_name, int &height)
 {
 	// accept qualifiers from the name
-	astring name(_name);
-	if (name == "default") name = "Tahoma";
-	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
-	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
+	std::string name(_name);
+	if (name.compare("default")==0) name = "Tahoma";
+	bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
+	bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
 	// build a basic LOGFONT description of what we want
 	LOGFONT logfont;
@@ -68,7 +68,7 @@ bool osd_font_windows::open(const char *font_path, const char *_name, int &heigh
 	logfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 
 	// copy in the face name
-	TCHAR *face = tstring_from_utf8(name);
+	TCHAR *face = tstring_from_utf8(name.c_str());
 	_tcsncpy(logfont.lfFaceName, face, sizeof(logfont.lfFaceName) / sizeof(TCHAR));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR)-1] = 0;
 	osd_free(face);
@@ -89,7 +89,7 @@ bool osd_font_windows::open(const char *font_path, const char *_name, int &heigh
 
 	// if it doesn't match our request, fail
 	char *utf = utf8_from_tstring(realname);
-	int result = core_stricmp(utf, name);
+	int result = core_stricmp(utf, name.c_str());
 	osd_free(utf);
 
 	// if we didn't match, nuke our font and fall back
@@ -266,10 +266,11 @@ bool osd_font_windows::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT
 class font_win : public osd_module, public font_module
 {
 public:
-	font_win()
-	: osd_module(OSD_FONT_PROVIDER, "win"), font_module()
+	font_win() : osd_module(OSD_FONT_PROVIDER, "win"), font_module()
 	{
 	}
+
+	virtual int init(const osd_options &options) { return 0; }
 
 	osd_font *font_alloc()
 	{

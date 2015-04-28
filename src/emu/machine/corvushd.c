@@ -692,7 +692,7 @@ UINT8 corvus_hdc_t::corvus_get_drive_parameters(UINT8 drv) {
 
 	// This firmware string and revision were taken from the Corvus firmware
 	// file CORVB184.CLR found on the SSE SoftBox distribution disk.
-	strcpy((char *) m_buffer.drive_param_response.firmware_desc, "V18.4     -- CONST II - 11/82  ");
+	strncpy((char *) m_buffer.drive_param_response.firmware_desc, "V18.4     -- CONST II - 11/82  ", sizeof(m_buffer.drive_param_response.firmware_desc));
 	m_buffer.drive_param_response.firmware_rev = 37;
 
 	// Controller ROM version

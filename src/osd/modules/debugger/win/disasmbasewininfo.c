@@ -195,12 +195,12 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				}
 				else if (dasmview->source_is_visible_cpu())
 				{
-					astring command;
+					std::string command;
 					if (bpindex == -1)
-						command.printf("bpset 0x%X", address);
+						strprintf(command, "bpset 0x%X", address);
 					else
-						command.printf("bpclear 0x%X", bpindex);
-					debug_console_execute_command(machine(), command, 1);
+						strprintf(command, "bpclear 0x%X", bpindex);
+					debug_console_execute_command(machine(), command.c_str(), 1);
 				}
 			}
 			return true;
@@ -228,9 +228,9 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					}
 					else if (dasmview->source_is_visible_cpu())
 					{
-						astring command;
-						command.printf(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (UINT32)bp->index());
-						debug_console_execute_command(machine(), command, 1);
+						std::string command;
+						strprintf(command, bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", (UINT32)bp->index());
+						debug_console_execute_command(machine(), command.c_str(), 1);
 					}
 				}
 			}
@@ -242,9 +242,9 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				offs_t const address = dasmview->selected_address();
 				if (dasmview->source_is_visible_cpu())
 				{
-					astring command;
-					command.printf("go 0x%X", address);
-					debug_console_execute_command(machine(), command, 1);
+					std::string command;
+					strprintf(command, "go 0x%X", address);
+					debug_console_execute_command(machine(), command.c_str(), 1);
 				}
 				else
 				{

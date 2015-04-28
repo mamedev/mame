@@ -40,7 +40,7 @@ void segas32_state::decrypt_ga2_protrom()
 	dynamic_buffer temp(0x100000);
 
 	// make copy of ROM so original can be overwritten
-	memcpy(temp, rom, 0x10000);
+	memcpy(&temp[0], rom, 0x10000);
 
 	// unscramble the address lines
 	for(i = 0; i < 0x10000; i++)

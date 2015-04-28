@@ -30,24 +30,36 @@ class horse_state : public driver_device
 public:
 	horse_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_video_ram(*this, "video_ram"),
+		m_color_ram(*this, "color_ram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_color_ram;
+
 	UINT8 m_output;
-	DECLARE_READ8_MEMBER(horse_input_r);
-	DECLARE_WRITE8_MEMBER(horse_output_w);
-	DECLARE_WRITE_LINE_MEMBER(horse_timer_out);
+
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE_LINE_MEMBER(timer_out);
+
+	virtual void machine_start();
 	DECLARE_PALETTE_INIT(horse);
-	UINT32 screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(horse_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
 };
 
+
+void horse_state::machine_start()
+{
+	save_item(NAME(m_output));
+}
 
 /***************************************************************************
 
@@ -62,7 +74,7 @@ PALETTE_INIT_MEMBER(horse_state, horse)
 		palette.set_pen_color(i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
-UINT32 horse_state::screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -98,7 +110,7 @@ static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(horse_state::horse_input_r)
+READ8_MEMBER(horse_state::input_r)
 {
 	switch (m_output >> 6 & 3)
 	{
@@ -111,7 +123,7 @@ READ8_MEMBER(horse_state::horse_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(horse_state::horse_output_w)
+WRITE8_MEMBER(horse_state::output_w)
 {
 	m_output = data;
 
@@ -120,7 +132,7 @@ WRITE8_MEMBER(horse_state::horse_output_w)
 	// other bits: ?
 }
 
-WRITE_LINE_MEMBER(horse_state::horse_timer_out)
+WRITE_LINE_MEMBER(horse_state::timer_out)
 {
 	m_dac->write_signed8(state ? 0x7f : 0);
 }
@@ -182,7 +194,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(horse_state::horse_interrupt)
+INTERRUPT_GEN_MEMBER(horse_state::interrupt)
 {
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
@@ -194,13 +206,13 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(horse_map)
 	MCFG_CPU_IO_MAP(horse_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  horse_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  interrupt)
 
 	MCFG_DEVICE_ADD("i8155", I8155, XTAL_12MHz / 2)
-	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, horse_input_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, horse_output_w))
+	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, input_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, output_w))
 	//port C output (but unused)
-	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(horse_state, horse_timer_out))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(horse_state, timer_out))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -208,7 +220,7 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update_horse)
+	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 8)
@@ -240,4 +252,4 @@ ROM_START( unkhorse )
 ROM_END
 
 
-GAME( 1981?, unkhorse, 0, horse, horse, driver_device, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", 0 ) // copyright not shown, datecodes on pcb suggests early-1981
+GAME( 1981?, unkhorse, 0, horse, horse, driver_device, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", GAME_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981

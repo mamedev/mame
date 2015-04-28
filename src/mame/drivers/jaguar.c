@@ -484,7 +484,7 @@ emu_file jaguar_state::*jaguar_nvram_fopen( UINT32 openflags)
     emu_file *file;
     if (image->exists())
     {
-        astring fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
+        std::string fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
         filerr = mame_fopen( SEARCHPATH_NVRAM, fname, openflags, &file);
         return (filerr == FILERR_NONE) ? file : NULL;
     }
@@ -2128,11 +2128,23 @@ ROM_END
 
 ****************************************/
 
-/* There is known to exist an Area 51 set with "136105-000x Q" labels - currently not dumped */
-
-ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
+ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Oct 17, 1996 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
-	ROM_LOAD32_BYTE( "136105-0003c.3h", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) ) /* Usually found with "green" labels */
+	ROM_LOAD32_BYTE( "136105-0003-q_h.3h", 0x00000, 0x80000, CRC(0681f398) SHA1(9e96db5a4ff90800685a5b95f8d758d211d3b982) )
+	ROM_LOAD32_BYTE( "136105-0002-q_p.3p", 0x00001, 0x80000, CRC(f76cfc68) SHA1(01a781b42b61279e09e0cb1d924e2a3e0df44591) )
+	ROM_LOAD32_BYTE( "136105-0001-q_m.3m", 0x00002, 0x80000, CRC(f422b4a8) SHA1(f95ef428be18adafae65e35f412eb03dcdaf7ed4) )
+	ROM_LOAD32_BYTE( "136105-0000-q_k.3k", 0x00003, 0x80000, CRC(1fb2f2b5) SHA1(cbed65463dd93eaf945750a9dc3a123d1c6bda42) )
+
+	ROM_REGION16_BE( 0x1000, "waverom", 0 )
+	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
+ROM_END
+
+ROM_START( area51ta ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1995 */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
+	ROM_LOAD32_BYTE( "136105-0003c.3h", 0x00000, 0x80000, CRC(e70a97c4) SHA1(39dabf6bf3dc6f717a587f362d040bfb332be9e1) ) /* Usually found with "orange" labels */
 	ROM_LOAD32_BYTE( "136105-0002c.3p", 0x00001, 0x80000, CRC(e9c9f4bd) SHA1(7c6c50372d45dca8929767241b092339f3bab4d2) )
 	ROM_LOAD32_BYTE( "136105-0001c.3m", 0x00002, 0x80000, CRC(6f135a81) SHA1(2d9660f240b14481e8c46bc98713e9dc12035063) )
 	ROM_LOAD32_BYTE( "136105-0000c.3k", 0x00003, 0x80000, CRC(94f50c14) SHA1(a54552e3ac5c4f481ba4f2fc7d724534576fe76c) )
@@ -2146,7 +2158,7 @@ ROM_END
 
 ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1995 */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for 68020 code */
-	ROM_LOAD32_BYTE( "136105-0003a.3h", 0x00000, 0x80000, CRC(116d37e6) SHA1(5d36cae792dd349faa77cd2d8018722a28ee55c1) ) /* Usually found with "orange" labels */
+	ROM_LOAD32_BYTE( "136105-0003a.3h", 0x00000, 0x80000, CRC(116d37e6) SHA1(5d36cae792dd349faa77cd2d8018722a28ee55c1) ) /* Usually found with "green" labels */
 	ROM_LOAD32_BYTE( "136105-0002a.3p", 0x00001, 0x80000, CRC(eb10f539) SHA1(dadc4be5a442dd4bd17385033056555e528ed994) )
 	ROM_LOAD32_BYTE( "136105-0001a.3m", 0x00002, 0x80000, CRC(c6d8322b) SHA1(90cf848a4195c51b505653cc2c74a3b9e3c851b8) )
 	ROM_LOAD32_BYTE( "136105-0000a.3k", 0x00003, 0x80000, CRC(729eb1b7) SHA1(21864b4281b1ad17b2903e3aa294e4be74161e80) )
@@ -2175,7 +2187,7 @@ ROM_END
 ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 2MB for IDT 79R3041 code */
 	ROM_LOAD32_BYTE( "maxf_105.hh", 0x00000, 0x80000, CRC(ec7f8167) SHA1(0cf057bfb1f30c2c9621d3ed25021e7ba7bdd46e) ) /* Usually found with "light grey" labels */
-	ROM_LOAD32_BYTE( "maxf_105.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) )
+	ROM_LOAD32_BYTE( "maxf_105.hl", 0x00001, 0x80000, CRC(3172611c) SHA1(00f14f871b737c66c20f95743740d964d0be3f24) ) /* Also found labeled as "MAXIMUM FORCE EE FIX PROG" */
 	ROM_LOAD32_BYTE( "maxf_105.lh", 0x00002, 0x80000, CRC(84d49423) SHA1(88d9a6724f1118f2bbef5dfa27accc2b65c5ba1d) )
 	ROM_LOAD32_BYTE( "maxf_105.ll", 0x00003, 0x80000, CRC(16d0768d) SHA1(665a6d7602a7f2f5b1f332b0220b1533143d56b1) )
 
@@ -2666,8 +2678,9 @@ CONS( 1993,  jaguar,   0,        0,      jaguar,   jaguar,   jaguar_state, jagua
 CONS( 1995,  jaguarcd, jaguar,   0,      jaguarcd, jaguar,   jaguar_state, jaguarcd, "Atari",   "Jaguar CD", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 GAME( 1996, area51,    0,        cojagr3k,  area51, jaguar_state,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
-GAME( 1995, area51t,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license)", 0 )
-GAME( 1995, area51a,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games license)", 0 )
+GAME( 1995, area51t,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
+GAME( 1995, area51ta,  area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 15, 1995)", 0 )
+GAME( 1995, area51a,   area51,   cojag68k,  area51, jaguar_state,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
 GAME( 1995, fishfren,  0,        cojagr3k_rom,  fishfren, jaguar_state, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
 GAME( 1996, freezeat,  0,        cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
 GAME( 1996, freezeatjp,freezeat, cojagr3k_rom,  freezeat, jaguar_state, freezeat, ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )

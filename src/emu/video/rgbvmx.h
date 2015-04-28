@@ -435,7 +435,7 @@ INLINE void rgbaint_bilinear_filter(rgbaint *color, rgb_t const &rgb00, rgb_t co
 }
 
 // altivec.h somehow redefines "bool" in a bad way on PowerPC Mac OS X.  really.
-#ifdef SDLMAME_MACOSX
+#ifdef OSX_PPC
 #undef vector
 #undef pixel
 #undef bool

@@ -441,7 +441,7 @@ void pdp1_device::field_interrupt()
 	/* current_irq: 1 bit for each active pending interrupt request
 	Pending interrupts are in b3 (simulated by (m_irq_state & m_b1) | m_b2)), but they
 	are only honored if no higher priority interrupt routine is in execution (one bit set in b4
-	for each routine in execution).  The revelant mask is created with (m_b4 | (- m_b4)),
+	for each routine in execution).  The relevant mask is created with (m_b4 | (- m_b4)),
 	as the carry chain (remember that -b4 = (~ b4) + 1) does precisely what we want.
 	b4:    0001001001000
 	-b4:   1110110111000
@@ -735,12 +735,12 @@ void pdp1_device::state_export(const device_state_entry &entry)
 }
 
 
-void pdp1_device::state_string_export(const device_state_entry &entry, astring &string)
+void pdp1_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c-%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c-%c%c%c%c%c%c",
 					(FLAGS & 040) ? '1' : '.',
 					(FLAGS & 020) ? '2' : '.',
 					(FLAGS & 010) ? '3' : '.',
@@ -833,7 +833,7 @@ void pdp1_device::execute_run()
 					else if ((IR == DIO) || (IR == DAC))    /* dio or dac instruction ? */
 					{   /* there is a discrepancy: the pdp1 handbook tells that only dio should be used,
                         but the lisp tape uses the dac instruction instead */
-						/* Yet maintainance manual p. 6-25 states clearly that the data is located
+						/* Yet maintenance manual p. 6-25 states clearly that the data is located
 						in IO and transfered to MB, so DAC is likely to be a mistake. */
 						m_rim_step = 2;
 					}
@@ -881,7 +881,7 @@ void pdp1_device::execute_run()
 			/* yes, interrupt can occur in the midst of an instruction (impressing, huh?) */
 			/* Note that break cannot occur during a one-cycle jump that is deferred only once,
 			or another break cycle.  Also, it cannot interrupt the long cycle 1 of automatic
-			multiply/divide.  (maintainance manual 6-19) */
+			multiply/divide.  (maintenance manual 6-19) */
 			if (m_sbs_request && (! m_no_sequence_break) && (! m_brk_ctr))
 			{   /* begin sequence break */
 				m_brk_ctr = 1;
@@ -900,7 +900,7 @@ void pdp1_device::execute_run()
 					MA = m_sbs_level << 2;  /* always 0 with standard sequence break system */
 					MB = AC;            /* save AC to MB */
 					AC = (OV << 17) | (EXD << 16) | PC; /* save OV/EXD/PC to AC */
-					EXD = OV = 0;       /* according to maintainance manual p. 8-17 and ?-?? */
+					EXD = OV = 0;       /* according to maintenance manual p. 8-17 and ?-?? */
 					m_cycle = m_defer = m_exc = 0;  /* mere guess */
 					WRITE_PDP_18BIT(MA, MB);    /* save former AC to memory */
 					INCREMENT_MA;
@@ -954,7 +954,7 @@ void pdp1_device::execute_run()
 									m_b4 &= ~(1 << level);
 									field_interrupt();
 									if (m_extend_support)
-										EXD = 1;    /* according to maintainance manual p. 6-33 */
+										EXD = 1;    /* according to maintenance manual p. 6-33 */
 									m_sbs_restore = 1;
 								}
 							}
@@ -990,7 +990,7 @@ void pdp1_device::execute_run()
 						m_exc = 0;
 
 						if (m_sbs_restore)
-						{   /* interrupt return: according to maintainance manual p. 6-33 */
+						{   /* interrupt return: according to maintenance manual p. 6-33 */
 							if (m_extend_support)
 								EXD = (MB >> 16) & 1;
 							OV = (MB >> 17) & 1;
@@ -1119,7 +1119,7 @@ void pdp1_device::execute_instruction()
 			break;
 		}
 	case SUB:       /* Subtract */
-		{   /* maintainance manual 7-14 seems to imply that substract does not test for -0.
+		{   /* maintenance manual 7-14 seems to imply that substract does not test for -0.
               The sim 2.3 source says so explicitely, though they do not give a reference.
               It sounds a bit weird, but the reason is probably that doing so would
               require additionnal logic that does not exist. */
@@ -1230,7 +1230,7 @@ void pdp1_device::execute_instruction()
 		}
 		else
 		{   /* MUS */
-			/* should we check for -0??? (Maintainance manual 7-14 seems to imply we should not:
+			/* should we check for -0??? (Maintenance manual 7-14 seems to imply we should not:
 			as a matter of fact, since the MUS instruction is supposed to have positive operands,
 			there is no need to check for -0, therefore such a simplification does not sound
 			absurd.) */
@@ -1777,8 +1777,8 @@ void pdp1_device::pdp1_type_20_sbs_iot(int op2, int nac, int mb, int *io, int ac
 void pdp1_device::pulse_start_clear()
 {
 	/* processor registers */
-	PC = 0;         /* according to maintainance manual p. 6-17 */
-	IR = 0;         /* according to maintainance manual p. 6-13 */
+	PC = 0;         /* according to maintenance manual p. 6-17 */
+	IR = 0;         /* according to maintenance manual p. 6-13 */
 	/*MB = 0;*/     /* ??? */
 	/*MA = 0;*/     /* ??? */
 	/*AC = 0;*/     /* ??? */
@@ -1790,14 +1790,14 @@ void pdp1_device::pulse_start_clear()
 	m_cycle = 0;        /* mere guess */
 	m_defer = 0;        /* mere guess */
 	m_brk_ctr = 0;  /* mere guess */
-	m_ov = 0;       /* according to maintainance manual p. 7-18 */
+	m_ov = 0;       /* according to maintenance manual p. 7-18 */
 	m_rim = 0;      /* ??? */
 	m_sbm = 0;      /* ??? */
-	EXD = 0;            /* according to maintainance manual p. 8-16 */
-	m_exc = 0;      /* according to maintainance manual p. 8-16 */
-	m_ioc = 1;      /* according to maintainance manual p. 6-10 */
-	m_ioh = 0;      /* according to maintainance manual p. 6-10 */
-	m_ios = 0;      /* according to maintainance manual p. 6-10 */
+	EXD = 0;            /* according to maintenance manual p. 8-16 */
+	m_exc = 0;      /* according to maintenance manual p. 8-16 */
+	m_ioc = 1;      /* according to maintenance manual p. 6-10 */
+	m_ioh = 0;      /* according to maintenance manual p. 6-10 */
+	m_ios = 0;      /* according to maintenance manual p. 6-10 */
 
 	m_b1 = m_type_20_sbs ? 0 : 1;   /* mere guess */
 	m_b2 = 0;       /* mere guess */

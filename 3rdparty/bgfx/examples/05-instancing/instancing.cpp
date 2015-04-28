@@ -132,7 +132,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 		{
 			float at[3]  = { 0.0f, 0.0f,   0.0f };
 			float eye[3] = { 0.0f, 0.0f, -35.0f };
-			
+
 			// Set view and projection matrix for view 0.
 			const bgfx::HMD* hmd = bgfx::getHMD();
 			if (NULL != hmd)
@@ -171,9 +171,9 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 				uint8_t* data = idb->data;
 
 				// Write instance data for 11x11 cubes.
-				for (uint32_t yy = 0; yy < 11; ++yy)
+				for (uint32_t yy = 0, numInstances = 0; yy < 11 && numInstances < idb->num; ++yy)
 				{
-					for (uint32_t xx = 0; xx < 11; ++xx)
+					for (uint32_t xx = 0; xx < 11 && numInstances < idb->num; ++xx, ++numInstances)
 					{
 						float* mtx = (float*)data;
 						bx::mtxRotateXY(mtx, time + xx*0.21f, time + yy*0.37f);
@@ -182,9 +182,9 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 						mtx[14] = 0.0f;
 
 						float* color = (float*)&data[64];
-						color[0] = sin(time+float(xx)/11.0f)*0.5f+0.5f;
-						color[1] = cos(time+float(yy)/11.0f)*0.5f+0.5f;
-						color[2] = sin(time*3.0f)*0.5f+0.5f;
+						color[0] = sinf(time+float(xx)/11.0f)*0.5f+0.5f;
+						color[1] = cosf(time+float(yy)/11.0f)*0.5f+0.5f;
+						color[2] = sinf(time*3.0f)*0.5f+0.5f;
 						color[3] = 1.0f;
 
 						data += instanceStride;
@@ -209,7 +209,7 @@ int _main_(int /*_argc*/, char** /*_argv*/)
 			}
 		}
 
-		// Advance to next frame. Rendering thread will be kicked to 
+		// Advance to next frame. Rendering thread will be kicked to
 		// process submitted rendering primitives.
 		bgfx::frame();
 	}

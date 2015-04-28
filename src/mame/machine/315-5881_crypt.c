@@ -45,9 +45,9 @@ void sega_315_5881_crypt_device::device_start()
 	save_item(NAME(line_buffer_pos));
 	save_item(NAME(line_buffer_size));
 
-	astring skey = parameter("key");
-	if(skey)
-		key = strtoll(skey.cstr(), 0, 16);
+	std::string skey = parameter("key").c_str();
+	if(!skey.empty())
+		key = strtoll(skey.c_str(), 0, 16);
 	else
 	{
 		logerror("%s: Warning: key not provided\n", tag());

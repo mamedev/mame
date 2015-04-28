@@ -595,9 +595,9 @@ void vegas_state::machine_start()
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
-	/* configure fast RAM regions for DRC */
-	m_maincpu->mips3drc_add_fastram(0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
-	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	/* configure fast RAM regions */
+	m_maincpu->add_fastram(0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_nile_irq_state));

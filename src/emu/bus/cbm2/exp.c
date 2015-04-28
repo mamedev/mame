@@ -158,7 +158,7 @@ bool cbm2_expansion_slot_device::call_softlist_load(software_list_device &swlist
 //  get_default_card_software -
 //-------------------------------------------------
 
-void cbm2_expansion_slot_device::get_default_card_software(astring &result)
+void cbm2_expansion_slot_device::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "standard");
 }

@@ -374,12 +374,12 @@ void tlcs900h_device::device_start()
 }
 
 
-void tlcs900h_device::state_string_export(const device_state_entry &entry, astring &string)
+void tlcs900h_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%d%c%d%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%d%c%d%c%c%c%c%c%c%c%c",
 					m_sr.w.l & 0x8000 ? 'S' : 'U',
 					( m_sr.w.l & 0x7000 ) >> 12,
 					m_sr.w.l & 0x0800 ? 'M' : 'N',

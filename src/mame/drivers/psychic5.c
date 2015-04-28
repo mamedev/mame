@@ -318,14 +318,14 @@ The first sprite data is located at f20b,then f21b and so on.
 MACHINE_START_MEMBER(psychic5_state, psychic5)
 {
 	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
-	
+
 	save_item(NAME(m_bank_latch));
 }
 
 MACHINE_START_MEMBER(psychic5_state, bombsa)
 {
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
-	
+
 	save_item(NAME(m_bank_latch));
 }
 
@@ -707,7 +707,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_CPU_IO_MAP(psychic5_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
-	
+
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
 
 	/* video hardware */
@@ -763,7 +763,7 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_CPU_IO_MAP(bombsa_soundport_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-	
+
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
 
 	/* video hardware */

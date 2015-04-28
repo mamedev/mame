@@ -749,7 +749,7 @@ void avr8_device::device_start()
 	m_io = &space(AS_IO);
 
 	// register our state for the debugger
-	astring tempstr;
+	std::string tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_shifted_pc).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_r[AVR8_REGIDX_SREG]).callimport().callexport().formatstr("%8s").noshow();
 	state_add(AVR8_SREG,       "STATUS",    m_r[AVR8_REGIDX_SREG]).mask(0xff);
@@ -902,12 +902,12 @@ const address_space_config *avr8_device::memory_space_config(address_spacenum sp
 //  for the debugger
 //-------------------------------------------------
 
-void avr8_device::state_string_export(const device_state_entry &entry, astring &string)
+void avr8_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				(m_r[AVR8_REGIDX_SREG] & 0x80) ? 'I' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x40) ? 'T' : '-',
 				(m_r[AVR8_REGIDX_SREG] & 0x20) ? 'H' : '-',

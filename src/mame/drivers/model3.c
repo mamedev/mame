@@ -5629,7 +5629,7 @@ static void interleave_vroms(running_machine &machine)
 
 DRIVER_INIT_MEMBER(model3_state, genprot)
 {
-//  astring key = parameter(":315_5881:key");
+//  std::string key = parameter(":315_5881:key");
 
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0, 0x0e000000);
 

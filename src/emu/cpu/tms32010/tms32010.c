@@ -893,12 +893,12 @@ void tms32010_device::device_reset()
 }
 
 
-void tms32010_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms32010_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_STR & 0x8000 ? 'O':'.',
 				m_STR & 0x4000 ? 'M':'.',
 				m_STR & 0x2000 ? 'I':'.',

@@ -467,13 +467,13 @@ void nes_cart_slot_device::call_load_unif()
 	if (prg_size == 0x4000)
 	{
 		m_cart->prg_alloc(0x8000, tag());
-		memcpy(m_cart->get_prg_base(), temp_prg, 0x4000);
+		memcpy(m_cart->get_prg_base(), &temp_prg[0], 0x4000);
 		memcpy(m_cart->get_prg_base() + 0x4000, m_cart->get_prg_base(), 0x4000);
 	}
 	else
 	{
 		m_cart->prg_alloc(prg_size, tag());
-		memcpy(m_cart->get_prg_base(), temp_prg, prg_size);
+		memcpy(m_cart->get_prg_base(), &temp_prg[0], prg_size);
 	}
 
 	if (small_prg)  // This is not supported yet, so warn users about this
@@ -482,7 +482,7 @@ void nes_cart_slot_device::call_load_unif()
 	if (vrom_size)
 	{
 		m_cart->vrom_alloc(vrom_size, tag());
-		memcpy(m_cart->get_vrom_base(), temp_chr, vrom_size);
+		memcpy(m_cart->get_vrom_base(), &temp_chr[0], vrom_size);
 	}
 
 #if SPLIT_PRG
@@ -530,14 +530,14 @@ void nes_cart_slot_device::call_load_unif()
 	{
 		UINT32 tot_size = battery_size + mapper_sram_size;
 		dynamic_buffer temp_nvram(tot_size);
-		battery_load(temp_nvram, tot_size, 0x00);
+		battery_load(&temp_nvram[0], tot_size, 0x00);
 		if (battery_size)
 		{
 			m_cart->battery_alloc(battery_size);
-			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
+			memcpy(m_cart->get_battery_base(), &temp_nvram[0], battery_size);
 		}
 		if (mapper_sram_size)
-			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, mapper_sram_size);
+			memcpy(m_cart->get_mapper_sram_base(), &temp_nvram[battery_size], mapper_sram_size);
 	}
 
 	logerror("UNIF support is only very preliminary.\n");

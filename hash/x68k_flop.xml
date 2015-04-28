@@ -8317,6 +8317,37 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		</part>
 	</software>
 
+	<!-- The first 3 disks are in 2HDE format and are not handled properly -->
+	<software name="ldb_x68k" supported="no">
+		<description>LOGiN Disk &amp; Book Series - X68000 Kessaku Game-sen</description>
+		<year>19??</year>
+		<publisher>Login</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="ldbx68k_1.hdm" size="1474560" crc="35a29e6e" sha1="68be72d44ed55bdc2bb84ab2396475e22452a43b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="ldbx68k_2.hdm" size="1474560" crc="0e1d25f0" sha1="53f3a6b192b788469142092ae4515612ebb0892c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="ldbx68k_3.hdm" size="1474560" crc="77726148" sha1="850bc85f0f6ef28082d13a4e7eb3fb0cffca9035" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1261568">
+				<rom name="ldbx68k_4.hdm" size="1261568" crc="bfccf8e0" sha1="ee7f6f56086e997620fef4dc1e9e102f33732a68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="looperas">
 		<description>Loop Eraser</description>
 		<year>1991</year>
@@ -13118,6 +13149,56 @@ maybe the remaining disks are the supposedly undumped addons: Daikairei Powerup 
 		<info name="release" value="19940930" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="s_sf2_sys.hdm" size="1261568" crc="5eacf67f" sha1="c1088bf10968aee8d611235f6d035b0c45dfc634" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="s_sf2_1.hdm" size="1261568" crc="6bb3366b" sha1="a73a23a83182547945f3a6059b81660b1803b229" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="s_sf2_2.hdm" size="1261568" crc="2fca1bb9" sha1="ca6cb84c5ca25ede85845d3dea17a3b4a0230149" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1261568">
+				<rom name="s_sf2_3.hdm" size="1261568" crc="94e2b40a" sha1="2bf2717ccca22897fc713fadb94333f56907eedb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1261568">
+				<rom name="s_sf2_4.hdm" size="1261568" crc="ebf009ca" sha1="c80783e6f9c2a06b9c0f0d185724865b8841bf23" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1261568">
+				<rom name="s_sf2_5.hdm" size="1261568" crc="5880bfc2" sha1="990a1404eabf4cd8c750cffe449037c9d20846f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1261568">
+				<rom name="s_sf2_6.hdm" size="1261568" crc="28530991" sha1="8cc2bbeb5668090f3c82633befd9e0bf9ec217cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssf2a" cloneof="ssf2">
+		<description>Super Street Fighter II - The New Challengers (Alt)</description>
+		<year>1994</year>
+		<publisher>カプコン (Capcom)</publisher>
+		<info name="alt_title" value="スーパーストリートファイター2" />
+		<info name="release" value="19940930" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="super street fighter ii - the new challengers [system].dim" size="1261824" crc="cd4358eb" sha1="4e8bdef49f4e003dcb84e675ce97be9cd1aba7c7" offset="000000" />
 			</dataarea>
@@ -16667,6 +16748,17 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<software name="hotfile7">
+		<description>The Hot File Disk Vol. 7</description>
+		<year>19??</year>
+		<publisher>Kyouto Media</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="hotfiledisk_vol7.hdm" size="1261568" crc="feb381d8" sha1="c8fb4984a54b0574dc6bf28967411d4ddea7c1f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hyperudv">
 		<description>Hyper UD v2.00</description>
 		<year>1988</year>
@@ -17395,8 +17487,27 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="x68kcoll">
 		<description>X68K Collection</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="x68k_free_software_collection_1.xdf" size="1261568" crc="4b54fa3d" sha1="3963dfcac9a902db27fa3067ae71be2d72cd9c64" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="x68k_free_software_collection_2.xdf" size="1261568" crc="145f8d5b" sha1="6c7ca6896e980a07b8ecbf570a8beffc2d8b6ccf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="x68kcolla" cloneof="x68kcoll">
+		<description>X68K Collection (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -17413,8 +17524,25 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="x68kace">
 		<description>X68K Collection Ace</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="x68_ace1.hdm" size="1261568" crc="dad5e45d" sha1="c161849dde8561656521f58e80a05498202ea094" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="x68_ace2.hdm" size="1261568" crc="b2dff0c8" sha1="417aef9589dec6475618eba7b52af86ae4dc925d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="x68kacea" cloneof="x68kace">
+		<description>X68K Collection Ace (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -17449,6 +17577,17 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<software name="x68kfree">
+		<description>X68000 Free Software Book</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="x68k_free_software_book.xdf" size="1261568" crc="c977be03" sha1="fbd4bcc187acee367d6979de1426ff7ac8a28d8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="x68klibc">
 		<description>X68K LIBC</description>
 		<year>1993</year>
@@ -17463,6 +17602,28 @@ a bootable disk out of that? -->
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<rom name="x68k libc (1993)(project libc group)(disk 2 of 2)(disk b).dim" size="1261824" crc="4e3b82c3" sha1="1baab4b54801eea8931e74f0d0425c3b6e6c29d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="x68lscan">
+		<description>X68000 Live Scan CZ-6VS1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="x68000_live_scan_cz-6vs1.hdm" size="1261568" crc="6692c088" sha1="c3f7af4b63970ca40e411a663c601b47f50fddf1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="x68mlang">
+		<description>X68000 Machine Language Programming</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="x68000_machine_language_programming.hdm" size="1261568" crc="b7b62a50" sha1="1545a5addb4a0b5ba3b6e71ca605b0ccf2f3325e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -19518,8 +19679,33 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="ohxzmus1">
 		<description>Bessatsu Oh! X Music System 01 Z-Music v1.0</description>
+		<year>1991</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z_music_1.hdm" size="1261568" crc="fe6c56b7" sha1="f844203de555a535a2e3b867f9b0947beaf9935f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z_music_2.hdm" size="1261568" crc="6b7ac66e" sha1="199321228261261a28855137868bc903548430af" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z_music_3.hdm" size="1261568" crc="0b28f3a3" sha1="c93f19f5a6d39a55d1479270f220ebaf3d22e061" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohxzmus1a" cloneof="ohxzmus1">
+		<description>Bessatsu Oh! X Music System 01 Z-Music v1.0 (Alt)</description>
 		<year>1991</year>
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -19542,8 +19728,51 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="ohxzmus2">
 		<description>Bessatsu Oh! X Music System 02 Z-Music v2.0</description>
+		<year>1991</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z-music-2_disk1.hdm" size="1261568" crc="b4bfb4e5" sha1="ba1a89d04a68c85f51be1311ae1aab2cccde3c5e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z-music-2_disk2.hdm" size="1261568" crc="09adb97a" sha1="0ca161950206db17ab43d1ea486bec16b4ada80a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z-music-2_disk3.hdm" size="1261568" crc="5eff099c" sha1="bccca2790077a74cfe9ba6d48815d4f861ec332b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z-music-2_disk4.hdm" size="1261568" crc="c02acc54" sha1="f85a782bc8e38a42ccf0f0f709b8ee9ff679fe2d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z-music-2_disk5.hdm" size="1261568" crc="863384ee" sha1="44f9662adef510a1d704caf4d97ab73cae28333b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1261568">
+				<rom name="z-music-2_disk6.hdm" size="1261568" crc="6a088f30" sha1="6c0c653c923df2e58a5355dd0ac4900fea5798d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohxzmus2a" cloneof="ohxzmus2">
+		<description>Bessatsu Oh! X Music System 02 Z-Music v2.0 (Alt)</description>
 		<year>1991</year>
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -19595,8 +19824,20 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="ohx9006">
 		<description>Oh! X 1990.06 - Soukan 8 - Shuunen Kinen PRO-68K</description>
+		<year>1990</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pro68k_8_anniversary.hdm" size="1261568" crc="967393a6" sha1="40f7b544e65c2f88c57737d7624037882a717542" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohx9006a" cloneof="ohx9006">
+		<description>Oh! X 1990.06 - Soukan 8 - Shuunen Kinen PRO-68K (Alt)</description>
 		<year>1990</year>
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -19606,8 +19847,20 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="ohx9105">
-		<description>Oh! X 1991.05 - Ougou Shuukan PRO-68K</description>
+		<description>Oh! X 1991.05 - Ougoun Shuukan PRO-68K</description>
+		<year>1991</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pro68k_ogonshukan.hdm" size="1261568" crc="0dad2e7a" sha1="66a6617d9b63fb6d3f07b408307937fc53d905e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohx9105a" cloneof="ohx9105">
+		<description>Oh! X 1991.05 - Ougoun Shuukan PRO-68K (Alt)</description>
 		<year>1991</year>
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -19617,8 +19870,33 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
+	<!-- Not sure about the month of this coverdisk... -->
+	<software name="ohx91xx">
+		<description>Oh! X 1991.?? - Ginga Shinnen PRO-68k</description>
+		<year>1991</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pro68k_happy_new_year.hdm" size="1261568" crc="43793bd3" sha1="8d83508dd3a5aeb4dff08941223cc8dc1c8e674a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- confirmed as good by pete_j -->
 	<software name="ohx9206">
 		<description>Oh! X 1992.06 - Soukan X - Shuunen Kinen PRO-68K</description>
+		<year>1992</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pro68k_x_anniversary.hdm" size="1261568" crc="9605f006" sha1="5492d995cfe61919e5083423c0a1eff24ca1a396" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohx9206a" cloneof="ohx9206">
+		<description>Oh! X 1992.06 - Soukan X - Shuunen Kinen PRO-68K (Alt)</description>
 		<year>1992</year>
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -19683,8 +19961,20 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="ohx9410">
 		<description>Oh! X 1994.10 - Momiji Gari PRO-68K</description>
+		<year>1994</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="oh_x_momijigari.xdf" size="1261568" crc="9a8cc220" sha1="a4557c6a6d587da5aad8a0361da5fc2db02f36b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohx9410a" cloneof="ohx9410">
+		<description>Oh! X 1994.10 - Momiji Gari PRO-68K (Alt)</description>
 		<year>1994</year>
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -19694,8 +19984,20 @@ a bootable disk out of that? -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
 	<software name="ohx9412">
-		<description>Oh! X 1994.12 - XL Image + Alpha</description>
+		<description>Oh! X 1994.12 - XL/Image Otameshi-ban +α</description>
+		<year>1994</year>
+		<publisher>Soft Bank</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="oh_x_xl_image_trial.xdf" size="1261568" crc="5441cc42" sha1="719d606281f1c6885ed42eadd254156958a109d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ohx9412a" cloneof="ohx9412">
+		<description>Oh! X 1994.12 - XL/Image Otameshi-ban +α (Alt)</description>
 		<year>1994</year>
 		<publisher>Soft Bank</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -19993,6 +20295,18 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="ajine">
+		<description>A-Jine (Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Mr. Terra" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="a-jine.xdf" size="1261568" crc="05c86e29" sha1="b84a0ba53509f95153c64ad9b55fa004f27d82bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aahime">
 		<description>Aa! O-Hime-sama!</description>
 		<year>19??</year>
@@ -20113,6 +20427,18 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<!-- same content as the PC98 disk! -->
+	<software name="akazucc" supported="no">
+		<description>Akazukin Cha Cha - CG Works ver 1.00</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="akazukin_cha_cha_cg.xdf" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="akazukin">
 		<description>Akazukin Monogatari</description>
 		<year>199?</year>
@@ -20163,7 +20489,19 @@ a contest among doujin programmers...  -->
 	</software>
 
 	<software name="amheroes">
-		<description>American Heroes BF 92 Extra Version</description>
+		<description>American Heroes - BF92 Extra Version</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="LTT - Kuma" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="american_heroes.xdf" size="1261568" crc="afe98cb1" sha1="66863762a2dfa77279c95c13720fd0f73face3ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amheroesa" cloneof="amheroes">
+		<description>American Heroes - BF92 Extra Version (Alt?)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="LTT - Kuma" />
@@ -20535,7 +20873,19 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
-	<software name="barcelono" cloneof="barcelon">
+	<software name="bf92ce">
+		<description>Barcelona Fighter '92 Champion Edition</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="LTT - Kuma" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="barcelona_fighter_92_champion_edition.xdf" size="1261568" crc="fdfb721b" sha1="5c2b8b2b5229c83df7db5696232a8e555f13ec62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bf92bang" cloneof="bf92">
 		<description>Barcelona Fighter 92 - Bangaihen Sekaiichi wa Ore Da (v1.00)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -20547,7 +20897,7 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
-	<software name="barcelon">
+	<software name="bf92">
 		<description>Barcelona Fighter 92 (v2.00.05)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -22080,6 +22430,24 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="devilch2">
+		<description>Devil Chain 2</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="devil_chain_2a.xdf" size="1261568" crc="8424fc4d" sha1="372070e540e26ed7fe7c3e003e89f595c5e263e7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="devil_chain_2b.xdf" size="1261568" crc="97af2aa2" sha1="81a7bc376b5c2ea58ca0136013f0f5dd568067dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="diamexp">
 		<description>Diamond Explorer</description>
 		<year>19??</year>
@@ -22111,6 +22479,18 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="dig dug (19xx)(-)[p].dim" size="1261824" crc="ea7f7f53" sha1="e376cc2be07cca1fb9accd8168e434e7b42ad8e2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="limnoama">
+		<description>Digital Comic - Lim no Amai Yoru</description>
+		<year>199?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="LTT" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="digital_comic_-_lim_no_amai_yoru.xdf" size="1261568" crc="1d2c3456" sha1="894a61faeb8658861506ec86d2b42436d1278c11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -22147,6 +22527,39 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="disco scroll (1989)(mugen kaisha rana).dim" size="1261824" crc="267ad682" sha1="2fb1aa1248b9e0efec6a23d702a82841bbe1bc28" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disk7fmv">
+		<description>Disk7 FMV - Choujikuu Yousai Macross</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk7_fmv.xdf" size="1261568" crc="452ee5cb" sha1="991cef991283547269253a8a22b05f7642d6fab9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disk8fmv">
+		<description>Disk8 FMV - Fushigi no Umi no Nadia</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk8_fmv.xdf" size="1261568" crc="e6fd2663" sha1="07ef61a78cf4dcd40af4cfa3853f8a330225a8ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disk9fmv">
+		<description>Disk9 FMV - Honou no Tenkousei</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="disk9_fmv.xdf" size="1261568" crc="cc920255" sha1="107ca885217a94df6261d26b55de159334794582" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -22632,6 +23045,83 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="fifteen1">
+		<description>Fifteens' 1</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fifteens_1.xdf" size="1261568" crc="0b1de7f9" sha1="f92ca966b8b4405958f9606a2910c522ced0d721" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifteen2">
+		<description>Fifteens' 2</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fifteens_2.xdf" size="1261568" crc="5f8a0f6d" sha1="7b4d13aecdf4fcd3c585f066f4ebfb217add463a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifteen3">
+		<description>Fifteens' 3</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fifteens_3.xdf" size="1261568" crc="21660196" sha1="7afa65f21eb461f51636c9bd07c80505135cd73d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifteen4">
+		<description>Fifteens' 4</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fifteens_4.xdf" size="1261568" crc="c42c1e50" sha1="c7fbbbbf23bd9f1d62b12efa692f01869dfb04f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifteen5">
+		<description>Fifteens' 5</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fifteens_5.xdf" size="1261568" crc="4071cc74" sha1="3c88b998f3d88d506da21f5e1eb27e8a5e246889" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifteen6">
+		<description>Fifteens' 6 - Bishoujo-Senshi Gou</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fifteens_6_bishoujo-senshi_gou.xdf" size="1261568" crc="5b9a2b4e" sha1="de4b3cbd2d89e8d6e015b8fb0f80c74819eb9e7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifteen7">
+		<description>Fifteens' 7</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fifteens_7.xdf" size="1261568" crc="31d55982" sha1="b678feedc5b8dafef423d418a060603e292ce5bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fire">
 		<description>Fire</description>
 		<year>19??</year>
@@ -22743,6 +23233,18 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="flaming dart (1992)(kei-h).dim" size="1261824" crc="eba1e59f" sha1="765ee1d8f2be86f3cee6db0c0a6c00787bcbc5ef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fleur">
+		<description>Fleur</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Shio Ueno" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="fleur.xdf" size="1261568" crc="31ed329a" sha1="af104cb67e320b43a57f1306b434c67ec3300569" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -23108,7 +23610,7 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
-	<software name="gardisli">
+	<software name="gardislg">
 		<description>Gardis Light (v2.10)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23120,8 +23622,20 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
-	<software name="gardisli202" cloneof="gardisli">
+	<software name="gardisli202" cloneof="gardislg">
 		<description>Gardis Light (v2.02)</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Sprite" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="gardis_light.xdf" size="1261568" crc="e21d3da3" sha1="887991f66f5a6b311fd344e3bce7d38f68d287cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gardisli202a" cloneof="gardislg">
+		<description>Gardis Light (v2.02, Alt)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Sprite" />
@@ -23399,6 +23913,17 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="halfmnd2">
+		<description>Half Mind II</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="half_mind_2.xdf" size="1261568" crc="fa3ce0cd" sha1="322cd9e9fe3d2ae7068c710b7834a1eaa69449bf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hanakoi">
 		<description>Hanafuda Koi Koi</description>
 		<year>19??</year>
@@ -23437,6 +23962,19 @@ a contest among doujin programmers...  -->
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261824">
 				<rom name="hatenkou (1998)(haiteidoradorazu)(disk 2 of 2)(disk 1).dim" size="1261824" crc="ae420def" sha1="c5cf44f7be2738a2c466596452b6fabf351ea647" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- sold through Takeru vending machines -->
+	<software name="hazard">
+		<description>Hazard</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Team N G" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="hazard.hdm" size="1261568" crc="37bc66b8" sha1="8bebcd66fcc1b998abb30eafc93dde628ad06d84" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -23708,8 +24246,29 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
+	<!-- sold through Takeru vending machines -->
 	<software name="hitomiza">
 		<description>Hitomi Zaka</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Higashikaihotsujuku" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="hitomi_zaka_a.hdm" size="1261568" crc="f0be3a85" sha1="840415b8864c135d1497a602e36720a419e9b0e1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="hitomi_zaka_b.hdm" size="1261568" crc="7e3cd5c0" sha1="b9315b9618e0b7af37f2d274a285a576c04c8052" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitomizaa" cloneof="hitomiza">
+		<description>Hitomi Zaka (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Higashikaihotsujuku" />
@@ -23783,6 +24342,18 @@ a contest among doujin programmers...  -->
 	</software>
 
 	<software name="hotjump">
+		<description>Hot Jump</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Hayabusa Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="hot_jump.xdf" size="1261568" crc="29dc2c67" sha1="551f878481d91b092153125ebcc744bb65ee3148" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hotjumpo" cloneof="hotjump">
 		<description>Hot Jump (v0.00)</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -23862,6 +24433,17 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="ikkaku toushi cecil (1993)(t&amp;h project).dim" size="1261824" crc="5f12fc4c" sha1="9c86c267a55d2a0760f0e596edcab7be8e401e1a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ilmlaser">
+		<description>Illumination Laser Rebuild</description>
+		<year>2000</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474816">
+				<rom name="il_boot.dim" size="1474816" crc="f9d5700c" sha1="2cc2dcf64da1b2296e809fe4b90c23231277d5a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25258,6 +25840,18 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="meteowrs">
+		<description>Meteo Wars</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Ken X" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="meteo_wars.xdf" size="1261568" crc="56127f76" sha1="1cc57c8e9317aa0f2a1e0e93a045446845e185ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mikkunl">
 		<description>Mikkun Fly!</description>
 		<year>1991</year>
@@ -25406,6 +26000,17 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="mokona in space (1995)(68 bank).dim" size="1261824" crc="8fee74de" sha1="99663368f790267adfd35d6772f975a305b3b66d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mokonas">
+		<description>Mokonas</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="mokonas.xdf" size="1261568" crc="96f902fe" sha1="bb1c939128f0222e70627b03cc284acd68570fec" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25639,6 +26244,19 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<!-- sold through Takeru vending machines -->
+	<software name="nmfire">
+		<description>Nasake Muyou Fire!</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Yamaco" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="merciless_fire.hdm" size="1261568" crc="8b66f7d3" sha1="4745e0474b090cf4546c5041447a5f1f5f7d2ae1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nasakemf">
 		<description>Nasake Muyou Fire 2!</description>
 		<year>1994</year>
@@ -25723,11 +26341,24 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<!-- confirmed as good by pete_j -->
+	<!-- sold through Takeru vending machines -->
 	<software name="nininbtl">
 		<description>Ninin Battle</description>
 		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Takeru" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="ninin_battle.xdf" size="1261568" crc="abae8b75" sha1="f07aa6e223ad0b3603b129b76701a5a4fcd119ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- sold through Takeru vending machines -->
+	<software name="nininbtla" cloneof="nininbtl">
+		<description>Ninin Battle (Alt)</description>
+		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="ninin battle (1990)(takeru).dim" size="1261824" crc="9b5c5804" sha1="b2b1596018a496e15bde6659b1aed79d4693fcfb" offset="000000" />
@@ -26073,6 +26704,18 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="prtaxiom">
+		<description>Partial Axiom</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Sol SoftWare" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="partialaxiom.xdf" size="1261568" crc="8d1602ea" sha1="e177bc248923b01589f5b9964280d207abad88fd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paruru">
 		<description>Paruru</description>
 		<year>199?</year>
@@ -26093,6 +26736,17 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="patariro! game (19xx)(68 bank).dim" size="1261824" crc="b60c6c8f" sha1="a88ca5e9365dda1975e9eb46c8bcc9dfd19a9f01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penjang">
+		<description>Penjang</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="penjang.xdf" size="1261568" crc="c96e4f2d" sha1="f68f29e3419a0465775f5aee5f268ecfc42c5001" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -26583,6 +27237,17 @@ a contest among doujin programmers...  -->
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="pushbon.xdf" size="1261568" crc="d1fef28a" sha1="5a9634823f85bac60d5a4efd9adbd770e5592f07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pushbona" cloneof="pushbon">
+		<description>Push Bon! (Alt)</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="push bon! (1994)(-).dim" size="1261824" crc="eed59df0" sha1="4523eb111b155fb47af53c2c2bf69cab84c38b05" offset="000000" />
 			</dataarea>
@@ -27065,6 +27730,18 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="ripobitan disk ace (1994)(toukyou kogei daigaku programming kenkyuutai).dim" size="1261824" crc="61405402" sha1="940155b92235d4583dad3383ef37bb95a98758fa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- sold through Takeru vending machines -->
+	<software name="robotbt2">
+		<description>Robot Battle v2</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="robot_battle_v2.hdm" size="1261568" crc="c78d324a" sha1="53ade5317ace14dc0de2b46436b8b1190d92d37e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -27726,7 +28403,19 @@ a contest among doujin programmers...  -->
 	</software>
 
 	<software name="silsteel">
-		<description>Silsteel</description>
+		<description>SiLsteeL v2.3</description>
+		<year>1998</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="P-Pink-Pot" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="silsteel_v2.3.xdf" size="1261568" crc="b8b5d07b" sha1="7aefa6083e3eeb7a345126806718a5ab18bd53ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silsteelo" cloneof="silsteel">
+		<description>SiLsteeL</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="P.Pink.Pot" />
@@ -27869,6 +28558,25 @@ a contest among doujin programmers...  -->
 			<feature name="part_id" value="Scenario Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="sorcerian (1995)(yasty-serv)(disk 2 of 2)(scenario).dim" size="1261824" crc="1c69283a" sha1="3416c8a344e6113846ae104f346877fe8d1dd27a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sorceryso" cloneof="sorcerys">
+		<description>Sorcerian Rel. 3 (Yasty-Serv)</description>
+		<year>1995</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Yasty-Serv" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="sorcerian_a.xdf" size="1261568" crc="b527b0c5" sha1="383df67b182d563325c7461c1875d1548545021e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="sorcerian_b.xdf" size="1261568" crc="61f300e0" sha1="f1aca506f80a488d6bc85e958821e178a1f0e8fc" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -28407,8 +29115,32 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="supermf">
+		<description>Super Moon Fighter v1.02</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Sprite" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="super_moon_fighter.dim" size="1261824" crc="d094f7fa" sha1="3829b61555374fcbe420c144367066c9d929b3b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spakris">
 		<description>Super Pakris EX</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="G' Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="super_pakris_ex.xdf" size="1261568" crc="8d42f545" sha1="4ac37500ef785c0d4c257dc29546cac1aab492bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spakrisa" cloneof="spakris">
+		<description>Super Pakris EX (Alt)</description>
 		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="G' Software" />
@@ -28569,6 +29301,18 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="sx aoumi v1.43 (1995)(yuuki asuka)[req sx-windows].dim" size="1261824" crc="e3ec4eef" sha1="27251832f71c8c96ac2d68f669d582579e11aa4b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="t94x">
+		<description>T-94X - The Ground Warriors</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Team Acquire" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="t-94x.xdf" size="1261568" crc="ffe160bc" sha1="262e192aca9429c9c67c3484d4e531a806e6f496" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -28774,6 +29518,30 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="targetv2" supported="no">
+		<description>Target v2</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Manx Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="target_v2_protected.xdf" size="1261568" crc="537e0867" sha1="49071cc4f8cccc4467093355991901663800e020" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="targetv2h" cloneof="targetv2">
+		<description>Target v2 (Protection Removed)</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Manx Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="target_v2.xdf" size="1261568" crc="a4fc90c6" sha1="61b9e5a3e81e1a0fefd74c5fbe6ca80ed237f363" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tataka8k">
 		<description>Tatakae! Dai 8 Kikou Shidan</description>
 		<year>1991</year>
@@ -28873,6 +29641,18 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="tenchi muyou puzzle de pazurou (199x)(-).dim" size="1261824" crc="046f7ef2" sha1="09f3ba2183c969f0398ef33997edcf6e7b44fa40" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="terishu">
+		<description>Terishu</description>
+		<year>1990</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Manx Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="terishu.xdf" size="1261568" crc="ff764a12" sha1="5804eebd73f59e58d5f42ba4b8410d7f10f660d0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -29005,6 +29785,28 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="tf4g v0.6426 (1994)(tnb saisakusho).dim" size="1261824" crc="cf068210" sha1="febec47be13455a8a39e24e40f33a4e5076ee41a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theater1">
+		<description>Theater Vol.1 - Spy</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="theater_vol_1.xdf" size="1261568" crc="04e02b79" sha1="3870763e509d59c1dbd0cadfa6e459a42f751c85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theater2">
+		<description>Theater Vol.2 - Night Walker</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="theater_vol_2.xdf" size="1261568" crc="5df71875" sha1="702a71d264e58effad3867619ae36d3cc7c43a10" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -29296,6 +30098,17 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="twin soul (1989)(-).dim" size="1261824" crc="1a9ca021" sha1="f5778ccf1932f136dfb80a960cc5d82738570ba9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twtwins2">
+		<description>Twinkle Twins Vol. 2</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="twinkle_twins_vol2.xdf" size="1261568" crc="f301bd0c" sha1="08c74506dde165e0239d6d458ea6a2542a87dd29" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -29646,6 +30459,30 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="xadlak">
+		<description>Xadlak v3.00</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Sprite" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="xadlak (1993)(sprite).dim" size="1261824" crc="b8c62a10" sha1="f47d7cc2f549254d0057c1b27c160b7b9b409f68" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xadlak221" cloneof="xadlak">
+		<description>Xadlak v2.21</description>
+		<year>1991</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Sprite" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="xadlak.xdf" size="1261568" crc="530cfa98" sha1="209d7281044c0395b97d86dd150d8130be684855" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="xadlako" cloneof="xadlak">
 		<description>Xadlak (Older)</description>
 		<year>1991</year>
@@ -29654,18 +30491,6 @@ a contest among doujin programmers...  -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="xadlak (1991)(sprite).dim" size="1261824" crc="8b032e29" sha1="02f4e8d3a43488d6c1bcf6e3f915a3766fb6e71a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="xadlak">
-		<description>Xadlak</description>
-		<year>1993</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Sprite" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261824">
-				<rom name="xadlak (1993)(sprite).dim" size="1261824" crc="b8c62a10" sha1="f47d7cc2f549254d0057c1b27c160b7b9b409f68" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29867,6 +30692,18 @@ a contest among doujin programmers...  -->
 		</part>
 	</software>
 
+	<software name="yuzurugi">
+		<description>Yuzurugi -nics I</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Active-Heart" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="yuzurugi_nics_i.xdf" size="1261568" crc="1e1d0c81" sha1="198ff0be07ebf9194dd0b87e6794550e4f6462a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zeromasto" cloneof="zeromast">
 		<description>Zero Master-Striker</description>
 		<year>1992</year>
@@ -30037,10 +30874,11 @@ a DIM dump with DIFC, these are at least confirmed as coming from real disk (by 
 		</part>
 	</software>
 
-	<software name="t94x">
-		<description>T-94X</description>
-		<year>19??</year>
+	<software name="t94xa" cloneof="t94x">
+		<description>T-94X - The Ground Warriors (Alt)</description>
+		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Team Acquire" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1277952">
 				<rom name="tx.xdf" size="1277952" crc="955385f5" sha1="b71782694fd7184351c4551c7d58b9aefd705ba9" offset="000000" />

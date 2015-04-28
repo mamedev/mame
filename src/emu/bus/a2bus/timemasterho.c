@@ -148,8 +148,7 @@ void a2bus_timemasterho_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, TIMEMASTER_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(TIMEMASTER_ROM_REGION).c_str())->base();
 }
 
 void a2bus_timemasterho_device::device_reset()

@@ -103,10 +103,10 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // ROM access in range [00-7f]
 	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }   // ROM access in range [80-ff]
-	virtual DECLARE_READ8_MEMBER(read_ram) { if (m_nvram) { UINT32 mask = m_nvram.count() - 1; return m_nvram[offset & mask]; } else return 0xff; }   // NVRAM access
+	virtual DECLARE_READ8_MEMBER(read_ram) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
 	virtual DECLARE_WRITE8_MEMBER(write_l) {}   // used by carts with subslots
 	virtual DECLARE_WRITE8_MEMBER(write_h) {}   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (m_nvram) { UINT32 mask = m_nvram.count() - 1; m_nvram[offset & mask] = data; return; } } // NVRAM access
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
 	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
 	virtual void speedup_addon_bios_access() {};
@@ -116,13 +116,13 @@ public:
 	void rtc_ram_alloc(UINT32 size);
 	void addon_bios_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; };
-	UINT8* get_nvram_base() { return m_nvram; };
-	UINT8* get_addon_bios_base() { return m_bios; };
-	UINT8* get_rtc_ram_base() { return m_rtc_ram; };
+	UINT8* get_nvram_base() { return &m_nvram[0]; };
+	UINT8* get_addon_bios_base() { return &m_bios[0]; };
+	UINT8* get_rtc_ram_base() { return &m_rtc_ram[0]; };
 	UINT32 get_rom_size() { return m_rom_size; };
-	UINT32 get_nvram_size() { return m_nvram.count(); };
-	UINT32 get_addon_bios_size() { return m_bios.count(); };
-	UINT32 get_rtc_ram_size() { return m_rtc_ram.count(); };
+	UINT32 get_nvram_size() { return m_nvram.size(); };
+	UINT32 get_addon_bios_size() { return m_bios.size(); };
+	UINT32 get_rtc_ram_size() { return m_rtc_ram.size(); };
 
 	void rom_map_setup(UINT32 size);
 	void save_nvram()   { device().save_item(NAME(m_nvram)); }
@@ -178,7 +178,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);

@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( tsamurai, tsamurai_state )
 
 	MCFG_CPU_ADD("audio2", Z80, XTAL_24MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
 
 	/* video hardware */
@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_CPU_PROGRAM_MAP(sound_vsgongf_map)
 	MCFG_CPU_IO_MAP(vsgongf_audio_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,vsgongf)
 
 	/* video hardware */
@@ -797,7 +797,7 @@ static MACHINE_CONFIG_START( m660, tsamurai_state )
 	MCFG_CPU_PROGRAM_MAP(sound3_m660_map)
 	MCFG_CPU_IO_MAP(sound3_m660_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  nmi_line_pulse)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
 
 	/* video hardware */

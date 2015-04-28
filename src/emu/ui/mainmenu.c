@@ -50,13 +50,13 @@ ui_menu_main::ui_menu_main(running_machine &machine, render_container *container
 
 void ui_menu_main::populate()
 {
-	astring menu_text;
+	std::string menu_text;
 
 	/* add input menu items */
 	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);
 
-	menu_text.printf("Input (this %s)",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)INPUT_SPECIFIC);
+	strprintf(menu_text, "Input (this %s)", emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), NULL, 0, (void *)INPUT_SPECIFIC);
 	item_append("Autofire Settings", NULL, 0, (void *)AUTOFIRE_MENU);
 
 	/* add optional input-related menus */
@@ -66,16 +66,16 @@ void ui_menu_main::populate()
 		item_append("Dip Switches", NULL, 0, (void *)SETTINGS_DIP_SWITCHES);
 	if (machine().ioport().has_configs())
 	{
-		menu_text.printf("%s Configuration",emulator_info::get_capstartgamenoun());
-		item_append(menu_text.cstr(), NULL, 0, (void *)SETTINGS_DRIVER_CONFIG);
+		strprintf(menu_text, "%s Configuration", emulator_info::get_capstartgamenoun());
+		item_append(menu_text.c_str(), NULL, 0, (void *)SETTINGS_DRIVER_CONFIG);
 	}
 
 	/* add bookkeeping menu */
 	item_append("Bookkeeping Info", NULL, 0, (void *)BOOKKEEPING);
 
 	/* add game info menu */
-	menu_text.printf("%s Information",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)GAME_INFO);
+	strprintf(menu_text, "%s Information", emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), NULL, 0, (void *)GAME_INFO);
 
 	image_interface_iterator imgiter(machine().root_device());
 	if (imgiter.first() != NULL)
@@ -135,8 +135,8 @@ void ui_menu_main::populate()
 		item_append("Cheat", NULL, 0, (void *)CHEAT);
 
 	/* add reset and exit menus */
-	menu_text.printf("Select New %s",emulator_info::get_capstartgamenoun());
-	item_append(menu_text.cstr(), NULL, 0, (void *)SELECT_GAME);
+	strprintf(menu_text, "Select New %s", emulator_info::get_capstartgamenoun());
+	item_append(menu_text.c_str(), NULL, 0, (void *)SELECT_GAME);
 }
 
 ui_menu_main::~ui_menu_main()

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  sauro.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -11,31 +11,31 @@
 
 /* General */
 
-WRITE8_MEMBER(sauro_state::tecfri_videoram_w)
+WRITE8_MEMBER(sauro_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::tecfri_colorram_w)
+WRITE8_MEMBER(sauro_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::tecfri_videoram2_w)
+WRITE8_MEMBER(sauro_state::sauro_videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::tecfri_colorram2_w)
+WRITE8_MEMBER(sauro_state::sauro_colorram2_w)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::tecfri_scroll_bg_w)
+WRITE8_MEMBER(sauro_state::scroll_bg_w)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
@@ -87,6 +87,8 @@ VIDEO_START_MEMBER(sauro_state,sauro)
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_palette_bank = 0;
+	
+	save_item(NAME(m_palette_bank));
 }
 
 void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

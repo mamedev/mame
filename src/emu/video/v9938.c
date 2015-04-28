@@ -3240,7 +3240,7 @@ UINT8 v99x8_device::command_unit_w(UINT8 Op)
 	// Start execution if we still have time slices
 	if(m_vdp_engine&&(m_vdp_ops_count>0)) (this->*m_vdp_engine)();
 
-	// Operation successfull initiated
+	// Operation successfully initiated
 	return(1);
 }
 

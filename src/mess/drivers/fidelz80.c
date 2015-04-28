@@ -74,9 +74,9 @@ PB.6 - enable language switches (W, see below)
 PB.7 - TSI DONE line (R)
 
 (button rows pulled up to 5V through 2.2K resistors)
-PC.0 - button row 0, german language jumper (R)
-PC.1 - button row 1, french language jumper (R)
-PC.2 - button row 2, spanish language jumper (R)
+PC.0 - button row 0, German language jumper (R)
+PC.1 - button row 1, French language jumper (R)
+PC.2 - button row 2, Spanish language jumper (R)
 PC.3 - button row 3, special language jumper (R)
 PC.4 - button column A (W)
 PC.5 - button column B (W)
@@ -90,20 +90,20 @@ language switches:
 When PB.6 is pulled low, the language switches can be read.  There are four.
 They connect to the button rows.  When enabled, the row(s) will read low if
 the jumper is present.  English only VCC's do not have the 367 or any pads stuffed.
-The jumpers are labelled: french, german, spanish, and special.
+The jumpers are labelled: French, German, Spanish, and special.
 
 
 language latch:
 ---------------
 
 There's an unstuffed 7474 on the board that connects to PA.6 and PA.7.  It allows
-one to latch the state of A12 to the speech ROM.  The english version has the chip
+one to latch the state of A12 to the speech ROM.  The English version has the chip
 missing, and a jumper pulling "A12" to ground.  This line is really a negative
 enable.
 
 To make the VCC multi-language, one would install the 74367 (note: it must be a 74367
 or possibly a 74LS367.  A 74HC367 would not work since they rely on the input current
-to keep the inputs pulled up), solder a piggybacked ROM to the existing english
+to keep the inputs pulled up), solder a piggybacked ROM to the existing English
 speech ROM, and finally install a 7474 dual flipflop.
 
 This way, the game can then detect which secondary language is present, and then it can
@@ -569,7 +569,7 @@ selection jumpers:
 
 These act like another row of buttons.  It is composed of two diode locations,
 so there's up to 4 possible configurations.  My board does not have either diode
-stuffed, so this most likely is "english".  I suspect it selects which language to use
+stuffed, so this most likely is "English".  I suspect it selects which language to use
 for the speech synth.  Of course you need the other speech ROMs for this to function
 properly.
 

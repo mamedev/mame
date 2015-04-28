@@ -31,8 +31,8 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_rome0);
 	virtual DECLARE_READ16_MEMBER(read_romf0);
 	// RAM
-	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.count() - 1)]; }
-	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.count() - 1)] = data & 0xff; }
+	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.size() - 1)]; }
+	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
 	// AY8914
 	virtual DECLARE_READ16_MEMBER(read_ay);
 	virtual DECLARE_WRITE16_MEMBER(write_ay);

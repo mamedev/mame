@@ -107,12 +107,12 @@ xxx_cpu_device::xxx_cpu_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void xxx_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c",
+			strprintf(str, "%c%c%c%c",
 				m_flags & 0x80 ? 'S':'.',
 				m_flags & 0x40 ? 'Z':'.',
 				m_flags & 0x20 ? 'V':'.',

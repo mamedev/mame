@@ -296,10 +296,10 @@ DRIVER_INIT_MEMBER(speedbal_state,speedbal)
 	for (int i=0;i<0x200;i++)
 	{
 		int j = BITSWAP16(i, 15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7);
-		memcpy(temp+i*128, rom+j*128, 128);
+		memcpy(&temp[i*128], rom+j*128, 128);
 	}
 
-	memcpy(rom,temp,0x200*128);
+	memcpy(rom,&temp[0],0x200*128);
 }
 
 

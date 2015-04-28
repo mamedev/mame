@@ -148,9 +148,7 @@ void device_nes_cart_interface::prg_alloc(size_t size, const char *tag)
 {
 	if (m_prg == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(NESSLOT_PRGROM_REGION_TAG);
-		m_prg = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_prg = device().machine().memory().region_alloc(std::string(tag).append(NESSLOT_PRGROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_prg_size = size;
 		m_prg_chunks = size / 0x4000;
 		if (size % 0x2000)
@@ -217,9 +215,9 @@ void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
 {
 	if (m_vrom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(NESSLOT_CHRROM_REGION_TAG);
-		m_vrom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		std::string tempstring(tag);
+		tempstring.append(NESSLOT_CHRROM_REGION_TAG);
+		m_vrom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_vrom_size = size;
 		m_vrom_chunks = size / 0x2000;
 	}
@@ -368,7 +366,7 @@ void device_nes_cart_interface::prg8_x(int start, int bank)
 
 inline void device_nes_cart_interface::chr_sanity_check( int source )
 {
-	if (source == CHRRAM && m_vram == NULL)
+	if (source == CHRRAM && m_vram.empty())
 		fatalerror("CHRRAM bankswitch with no VRAM\n");
 
 	if (source == CHRROM && m_vrom == NULL)
@@ -484,7 +482,7 @@ void device_nes_cart_interface::set_nt_page(int page, int source, int bank, int 
 	switch (source)
 	{
 		case CART_NTRAM:
-			base_ptr = m_ext_ntram;
+			base_ptr = &m_ext_ntram[0];
 			break;
 		case VROM:
 			bank &= ((m_vrom_chunks << 3) - 1);
@@ -546,7 +544,7 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 			break;
 
 		case PPU_MIRROR_4SCREEN:
-			if (!m_ext_ntram) fatalerror("4-screen mirroring without on-cart NTRAM!\n");
+			if (m_ext_ntram.empty()) fatalerror("4-screen mirroring without on-cart NTRAM!\n");
 			set_nt_page(0, CART_NTRAM, 0, 1);
 			set_nt_page(1, CART_NTRAM, 1, 1);
 			set_nt_page(2, CART_NTRAM, 2, 1);
@@ -643,10 +641,10 @@ READ8_MEMBER(device_nes_cart_interface::read_l)
 
 READ8_MEMBER(device_nes_cart_interface::read_m)
 {
-	if (m_battery)
-		return m_battery[offset & (m_battery.count() - 1)];
-	if (m_prgram)
-		return m_prgram[offset & (m_prgram.count() - 1)];
+	if (!m_battery.empty())
+		return m_battery[offset & (m_battery.size() - 1)];
+	if (!m_prgram.empty())
+		return m_prgram[offset & (m_prgram.size() - 1)];
 
 	return m_open_bus;
 }
@@ -657,10 +655,10 @@ WRITE8_MEMBER(device_nes_cart_interface::write_l)
 
 WRITE8_MEMBER(device_nes_cart_interface::write_m)
 {
-	if (m_battery)
-		m_battery[offset & (m_battery.count() - 1)] = data;
-	if (m_prgram)
-		m_prgram[offset & (m_prgram.count() - 1)] = data;
+	if (!m_battery.empty())
+		m_battery[offset & (m_battery.size() - 1)] = data;
+	if (!m_prgram.empty())
+		m_prgram[offset & (m_prgram.size() - 1)] = data;
 }
 
 WRITE8_MEMBER(device_nes_cart_interface::write_h)
@@ -709,11 +707,11 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 	set_nt_mirroring(m_mirroring);
 
 	// save the on-cart RAM pointers
-	if (m_prgram.count())
+	if (!m_prgram.empty())
 		device().save_item(NAME(m_prgram));
-	if (m_vram.bytes())
+	if (!m_vram.empty())
 		device().save_item(NAME(m_vram));
-	if (m_battery.count())
+	if (!m_battery.empty())
 		device().save_item(NAME(m_battery));
 }
 
@@ -888,11 +886,11 @@ void nes_cart_slot_device::call_unload()
 			UINT32 tot_size = m_cart->get_battery_size() + m_cart->get_mapper_sram_size();
 			dynamic_buffer temp_nvram(tot_size);
 			if (m_cart->get_battery_size())
-				memcpy(temp_nvram, m_cart->get_battery_base(), m_cart->get_battery_size());
+				memcpy(&temp_nvram[0], m_cart->get_battery_base(), m_cart->get_battery_size());
 			if (m_cart->get_mapper_sram_size())
-				memcpy(temp_nvram + m_cart->get_battery_size(), m_cart->get_mapper_sram_base(), m_cart->get_mapper_sram_size());
+				memcpy(&temp_nvram[m_cart->get_battery_size()], m_cart->get_mapper_sram_base(), m_cart->get_mapper_sram_size());
 
-			battery_save(temp_nvram, tot_size);
+			battery_save(&temp_nvram[0], tot_size);
 		}
 	}
 }
@@ -912,7 +910,7 @@ bool nes_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  get default card software
  -------------------------------------------------*/
 
-void nes_cart_slot_device::get_default_card_software(astring &result)
+void nes_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -920,17 +918,17 @@ void nes_cart_slot_device::get_default_card_software(astring &result)
 		UINT32 len = core_fsize(m_file);
 		dynamic_buffer rom(len);
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
-			slot_string = get_default_card_ines(rom, len);
+			slot_string = get_default_card_ines(&rom[0], len);
 
 		if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
-			slot_string = get_default_card_unif(rom, len);
+			slot_string = get_default_card_unif(&rom[0], len);
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "nrom");

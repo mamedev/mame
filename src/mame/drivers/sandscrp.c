@@ -102,7 +102,7 @@ public:
 	UINT8 m_vblank_irq;
 	UINT8 m_latch1_full;
 	UINT8 m_latch2_full;
-	
+
 	DECLARE_READ16_MEMBER(irq_cause_r);
 	DECLARE_WRITE16_MEMBER(irq_cause_w);
 	DECLARE_WRITE16_MEMBER(coincounter_w);
@@ -114,12 +114,12 @@ public:
 	DECLARE_READ8_MEMBER(latchstatus_r);
 	DECLARE_READ8_MEMBER(soundlatch_r);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	
+
 	virtual void machine_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
 };
@@ -150,7 +150,7 @@ UINT32 sandscrp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void sandscrp_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
-	
+
 	save_item(NAME(m_sprite_irq));
 	save_item(NAME(m_unknown_irq));
 	save_item(NAME(m_vblank_irq));

@@ -1021,12 +1021,12 @@ scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *
 }
 
 
-void scudsp_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void scudsp_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%s%s%s%c%c%c%c%c%s%s%s",
+			strprintf(str, "%s%s%s%c%c%c%c%c%s%s%s",
 				m_flags & 0x4000000 ? "PR":"..",
 				m_flags & 0x2000000 ? "EP":"..",
 				m_flags & 0x800000 ? "T0":"..",

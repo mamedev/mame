@@ -571,7 +571,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	UINT32 img_start = 0;
 
 	dynamic_buffer data(image.length());
-	image.fread(data, image.length());
+	image.fread(&data[0], image.length());
 
 	if(strncmp((const char*)&data[0], magic, 21))
 		return IMAGE_INIT_FAIL;

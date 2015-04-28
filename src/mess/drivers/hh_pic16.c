@@ -9,6 +9,7 @@
   serial  device  etc.
 -----------------------------------------------------------
  @036     1655A   1979, Ideal Maniac
+ *061     1655A   1980, Lakeside Le Boom (have dump)
  *110     1650A   1979, Tiger Rocket Pinball
  *192     1650    19??, (a phone dialer, have dump)
  *255     1655    19??, (a talking clock, have dump)
@@ -51,26 +52,28 @@ public:
 	UINT8 m_b;                          // MCU port B data
 	UINT8 m_c;                          // MCU port C data
 
-	virtual void machine_start();
-
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
 	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns
-	
-	UINT32 m_display_state[0x20];	    // display matrix rows data
+	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
+
+	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
 	UINT32 m_display_cache[0x20];       // (internal use)
 	UINT8 m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
+	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
 
-	// game-specific handlers
-	DECLARE_WRITE8_MEMBER(maniac_output_w);
+protected:
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
+
+// machine start/reset
 
 void hh_pic16_state::machine_start()
 {
@@ -79,7 +82,7 @@ void hh_pic16_state::machine_start()
 	memset(m_display_cache, ~0, sizeof(m_display_cache));
 	memset(m_display_decay, 0, sizeof(m_display_decay));
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-	
+
 	m_b = 0;
 	m_c = 0;
 
@@ -95,6 +98,10 @@ void hh_pic16_state::machine_start()
 
 	save_item(NAME(m_b));
 	save_item(NAME(m_c));
+}
+
+void hh_pic16_state::machine_reset()
+{
 }
 
 
@@ -116,14 +123,14 @@ void hh_pic16_state::display_update()
 	{
 		active_state[y] = 0;
 
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 		{
 			// turn on powered segments
 			if (m_display_state[y] >> x & 1)
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			int ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -136,15 +143,25 @@ void hh_pic16_state::display_update()
 				output_set_digit_value(y, active_state[y] & m_display_segmask[y]);
 
 			const int mul = (m_display_maxx <= 10) ? 10 : 100;
-			for (int x = 0; x < m_display_maxx; x++)
+			for (int x = 0; x <= m_display_maxx; x++)
 			{
 				int state = active_state[y] >> x & 1;
-				output_set_lamp_value(y * mul + x, state);
-
-				// bit coords for svg2lay
-				char buf[10];
-				sprintf(buf, "%d.%d", y, x);
-				output_set_value(buf, state);
+				char buf1[0x10]; // lampyx
+				char buf2[0x10]; // y.x
+				
+				if (x == m_display_maxx)
+				{
+					// always-on if selected
+					sprintf(buf1, "lamp%da", y);
+					sprintf(buf2, "%d.a", y);
+				}
+				else
+				{
+					sprintf(buf1, "lamp%d", y * mul + x);
+					sprintf(buf2, "%d.%d", y, x);
+				}
+				output_set_value(buf1, state);
+				output_set_value(buf2, state);
 			}
 		}
 
@@ -155,23 +172,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(hh_pic16_state::display_decay_tick)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x < m_display_maxx; x++)
+		for (int x = 0; x <= m_display_maxx; x++)
 			if (m_display_decay[y][x] != 0)
 				m_display_decay[y][x]--;
-	
+
 	display_update();
+}
+
+void hh_pic16_state::set_display_size(int maxx, int maxy)
+{
+	m_display_maxx = maxx;
+	m_display_maxy = maxy;
 }
 
 void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
 {
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
+	set_display_size(maxx, maxy);
 
 	// update current state
 	UINT32 mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? (setx & mask) : 0;
-	
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
+
 	display_update();
 }
 
@@ -179,7 +201,7 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 /***************************************************************************
 
-  Minidrivers (I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config)
 
 ***************************************************************************/
 
@@ -191,7 +213,19 @@ void hh_pic16_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
+class maniac_state : public hh_pic16_state
+{
+public:
+	maniac_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_pic16_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(output_w);
+};
+
+// handlers
+
+WRITE8_MEMBER(maniac_state::output_w)
 {
 	// B,C: outputs
 	offset -= PIC16C5x_PORTB;
@@ -199,19 +233,20 @@ WRITE8_MEMBER(hh_pic16_state::maniac_output_w)
 		m_c = data;
 	else
 		m_b = data;
-	
+
 	// d7: speaker out
 	m_speaker->level_w((m_b >> 7 & 1) | (m_c >> 6 & 2));
 
 	// d0-d6: 7seg
-	m_display_maxx = 7;
-	m_display_maxy = 2;
-	
 	m_display_segmask[offset] = 0x7f;
 	m_display_state[offset] = ~data & 0x7f;
+
+	set_display_size(7, 2);
 	display_update();
 }
 
+
+// config
 
 static INPUT_PORTS_START( maniac )
 	PORT_START("IN.0") // port A
@@ -224,13 +259,13 @@ INPUT_PORTS_END
 
 static const INT16 maniac_speaker_levels[] = { 0, 32767, -32768, 0 };
 
-static MACHINE_CONFIG_START( maniac, hh_pic16_state )
+static MACHINE_CONFIG_START( maniac, maniac_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PIC16C55, 850000) // RC osc. R=13.4K, C=470pf, but unknown RC curve - measured 800-890kHz
 	MCFG_PIC16C5x_READ_A_CB(IOPORT("IN.0"))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(hh_pic16_state, maniac_output_w))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(hh_pic16_state, maniac_output_w))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(maniac_state, output_w))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(maniac_state, output_w))
 	MCFG_PIC16C5x_SET_CONFIG(0) // ?
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_pic16_state, display_decay_tick, attotime::from_msec(1))

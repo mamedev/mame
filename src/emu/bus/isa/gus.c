@@ -389,7 +389,8 @@ void gf1_device::device_start()
 	m_nmi_handler.resolve_safe();
 
 	// TODO: make DRAM size configurable.  Can be 256k, 512k, 768k, or 1024k
-	m_wave_ram.resize_and_clear(1024*1024);
+	m_wave_ram.resize(1024*1024);
+	memset(&m_wave_ram[0], 0, 1024*1024);
 
 	m_stream = stream_alloc(0,2,44100);
 
@@ -734,7 +735,7 @@ WRITE8_MEMBER(gf1_device::global_reg_data_w)
  * bit 2 - DMA channel width (0=8-bit, 1=16-bit)
  * bits 3,4 - DMA rate divider
  * bit 5 - DMA terminal count IRQ enable
- * bit 6 - DMA terminal count IRQ pending (read), Data size (write, 0=8bit, 1=16-bit, independant of channel size)
+ * bit 6 - DMA terminal count IRQ pending (read), Data size (write, 0=8bit, 1=16-bit, independent of channel size)
  * bit 7 - Invert MSB of data
  */
 		if(offset == 1)

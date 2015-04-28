@@ -132,7 +132,7 @@ struct device_info
 	// device information
 	device_info **          head;
 	device_info *           next;
-	astring                 name;
+	std::string                 name;
 
 	// MAME information
 	input_device *          device;
@@ -687,14 +687,14 @@ static device_info *devmap_class_register(running_machine &machine, device_map_t
 		{
 			sprintf(tempname, "NC%d", index);
 			devinfo = generic_device_alloc(devlist, tempname);
-			devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name, devinfo);
+			devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name.c_str(), devinfo);
 		}
 		return NULL;
 	}
 	else
 	{
 		devinfo = generic_device_alloc(devlist, devmap->map[index].name);
-		devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name, devinfo);
+		devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name.c_str(), devinfo);
 	}
 	return devinfo;
 }
@@ -742,7 +742,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 
 		devinfo->joystick.device = joy;
 
-		osd_printf_verbose("Joystick: %s\n", devinfo->name.cstr());
+		osd_printf_verbose("Joystick: %s\n", devinfo->name.c_str());
 		osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 		osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 
@@ -758,7 +758,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 			else
 				itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
 
-			sprintf(tempname, "A%d %s", axis, devinfo->name.cstr());
+			sprintf(tempname, "A%d %s", axis, devinfo->name.c_str());
 			devinfo->device->add_item(tempname, itemid, generic_axis_get_state, &devinfo->joystick.axes[axis]);
 		}
 
@@ -809,9 +809,9 @@ static void sdlinput_register_joysticks(running_machine &machine)
 			else
 				itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
 
-			sprintf(tempname, "R%d %s", ball * 2, devinfo->name.cstr());
+			sprintf(tempname, "R%d %s", ball * 2, devinfo->name.c_str());
 			devinfo->device->add_item(tempname, (input_item_id) itemid, generic_axis_get_state, &devinfo->joystick.balls[ball * 2]);
-			sprintf(tempname, "R%d %s", ball * 2 + 1, devinfo->name.cstr());
+			sprintf(tempname, "R%d %s", ball * 2 + 1, devinfo->name.c_str());
 			devinfo->device->add_item(tempname, (input_item_id) (itemid + 1), generic_axis_get_state, &devinfo->joystick.balls[ball * 2 + 1]);
 		}
 	}
@@ -869,9 +869,9 @@ static void sdlinput_register_mice(running_machine &machine)
 			continue;
 
 		// add the axes
-		sprintf(defname, "X %s", devinfo->name.cstr());
+		sprintf(defname, "X %s", devinfo->name.c_str());
 		devinfo->device->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->mouse.lX);
-		sprintf(defname, "Y %s", devinfo->name.cstr());
+		sprintf(defname, "Y %s", devinfo->name.c_str());
 		devinfo->device->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->mouse.lY);
 
 		for (button = 0; button < 4; button++)
@@ -886,7 +886,7 @@ static void sdlinput_register_mice(running_machine &machine)
 
 		if (0 && mouse_enabled)
 			SDL_SetRelativeMouseMode(index, SDL_TRUE);
-		osd_printf_verbose("Mouse: Registered %s\n", devinfo->name.cstr());
+		osd_printf_verbose("Mouse: Registered %s\n", devinfo->name.c_str());
 	}
 	osd_printf_verbose("Mouse: End initialization\n");
 }
@@ -903,7 +903,7 @@ static void sdlinput_register_mice(running_machine &machine)
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
-	devinfo->device = machine.input().device_class(DEVICE_CLASS_MOUSE).add_device(devinfo->name.cstr(), devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_MOUSE).add_device(devinfo->name.c_str(), devinfo);
 
 	mouse_enabled = machine.options().mouse();
 
@@ -919,7 +919,7 @@ static void sdlinput_register_mice(running_machine &machine)
 		devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->mouse.buttons[button]);
 	}
 
-	osd_printf_verbose("Mouse: Registered %s\n", devinfo->name.cstr());
+	osd_printf_verbose("Mouse: Registered %s\n", devinfo->name.c_str());
 	osd_printf_verbose("Mouse: End initialization\n");
 }
 #endif
@@ -1126,9 +1126,9 @@ static void sdlinput_register_lightguns(running_machine &machine)
 		}
 
 
-		sprintf(defname, "X %s", devinfo->name.cstr());
+		sprintf(defname, "X %s", devinfo->name.c_str());
 		devinfo->device->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->lightgun.lX);
-		sprintf(defname, "Y %s", devinfo->name.cstr());
+		sprintf(defname, "Y %s", devinfo->name.c_str());
 		devinfo->device->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->lightgun.lY);
 
 
@@ -1325,7 +1325,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 			devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)]);
 		}
 
-		osd_printf_verbose("Keyboard: Registered %s\n", devinfo->name.cstr());
+		osd_printf_verbose("Keyboard: Registered %s\n", devinfo->name.c_str());
 	}
 	osd_printf_verbose("Keyboard: End initialization\n");
 }
@@ -1346,7 +1346,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 	// SDL 1.2 only has 1 keyboard (1.3+ will have multiple, this must be revisited then)
 	// add it now
 	devinfo = generic_device_alloc(&keyboard_list, "System keyboard");
-	devinfo->device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device(devinfo->name.cstr(), devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device(devinfo->name.c_str(), devinfo);
 
 	// populate it
 	for (keynum = 0; sdl_key_trans_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
@@ -1363,7 +1363,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 		devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)]);
 	}
 
-	osd_printf_verbose("Keyboard: Registered %s\n", devinfo->name.cstr());
+	osd_printf_verbose("Keyboard: Registered %s\n", devinfo->name.c_str());
 	osd_printf_verbose("Keyboard: End initialization\n");
 }
 #endif
@@ -1742,7 +1742,7 @@ void sdlinput_poll(running_machine &machine)
 		case SDL_KEYDOWN:
 #ifdef SDL2_MULTIAPI
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
-			//printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name.cstr(), OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
+			//printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name.c_str(), OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
 #else
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[0]);
 #endif
@@ -1841,7 +1841,7 @@ void sdlinput_poll(running_machine &machine)
 			devinfo = generic_device_find_index(mouse_list, mouse_map.logical[0]);
 #endif
 			devinfo->mouse.buttons[event.button.button-1] = 0x80;
-			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name.cstr());
+			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name.c_str());
 			if (event.button.button == 1)
 			{
 				// FIXME Move static declaration
@@ -1899,7 +1899,7 @@ void sdlinput_poll(running_machine &machine)
 #endif
 #if (SDLMAME_SDL2)
 			// FIXME: may apply to 1.2 as well ...
-			//printf("Motion %d %d %d %s\n", event.motion.which, event.motion.x, event.motion.y, devinfo->name.cstr());
+			//printf("Motion %d %d %d %s\n", event.motion.which, event.motion.x, event.motion.y, devinfo->name.c_str());
 			devinfo->mouse.lX += event.motion.xrel * INPUT_RELATIVE_PER_PIXEL;
 			devinfo->mouse.lY += event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
 #else
@@ -2231,7 +2231,7 @@ static device_info *generic_device_alloc(device_info **devlist_head_ptr, const c
 	devinfo->head = devlist_head_ptr;
 
 	// allocate a UTF8 copy of the name
-	devinfo->name.cpy(name);
+	devinfo->name.assign(name);
 
 	// append us to the list
 	for (curdev_ptr = devinfo->head; *curdev_ptr != NULL; curdev_ptr = &(*curdev_ptr)->next) ;

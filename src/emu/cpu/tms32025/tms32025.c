@@ -1102,7 +1102,7 @@ void tms32025_device::macd()          /** RAM blocks B0,B1,B2 may be important !
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
-	if ( (m_opcode.b.l & 0x80) || m_init_load_addr ) {  /* No writing during repitition, or DMA mode */
+	if ( (m_opcode.b.l & 0x80) || m_init_load_addr ) {  /* No writing during repetition, or DMA mode */
 		M_WRTRAM((m_memaccess+1), m_ALU.w.l);
 	}
 	m_Treg = m_ALU.w.l;
@@ -1799,12 +1799,12 @@ void tms32025_device::state_export(const device_state_entry &entry)
 }
 
 
-void tms32025_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms32025_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
+			strprintf(str, "arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
 				(m_STR0 & 0xe000) >> 13,
 				m_STR0 & 0x1000 ? 'O':'.',
 				m_STR0 & 0x0800 ? 'M':'.',

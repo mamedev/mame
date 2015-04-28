@@ -72,12 +72,12 @@ amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const ch
 
 
 // disasm
-void amis2000_base_device::state_string_export(const device_state_entry &entry, astring &string)
+void amis2000_base_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c",
 				m_f & 0x20 ? '6':'.',
 				m_f & 0x10 ? '5':'.',
 				m_f & 0x08 ? '4':'.',

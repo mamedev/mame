@@ -220,7 +220,7 @@ fd1089_base_device::fd1089_base_device(const machine_config &mconfig, device_typ
 	: m68000_device(mconfig, tag, owner, clock, shortname, source)
 {
 	// override the name after the m68000 initializes
-	m_name.cpy(name);
+	m_name.assign(name);
 }
 
 fd1089a_device::fd1089a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -258,15 +258,15 @@ void fd1089_base_device::device_start()
 	m_decrypted_opcodes.resize(romsize/2);
 
 	// copy the plaintext
-	memcpy(m_plaintext, rombase, romsize);
+	memcpy(&m_plaintext[0], rombase, romsize);
 
 	// decrypt it, overwriting original data with the decrypted data
-	decrypt(0x000000, romsize, m_plaintext, m_decrypted_opcodes, rombase);
+	decrypt(0x000000, romsize, &m_plaintext[0], &m_decrypted_opcodes[0], rombase);
 
 	// mark the ROM region as decrypted, pointing to the opcodes (if it is mapped)
 	address_space &program = space(AS_PROGRAM);
 	if (program.get_read_ptr(0) != NULL)
-		program.set_decrypted_region(0x000000, romsize - 1, m_decrypted_opcodes);
+		program.set_decrypted_region(0x000000, romsize - 1, &m_decrypted_opcodes[0]);
 }
 
 

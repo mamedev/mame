@@ -200,13 +200,13 @@ void m62_state::m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 PALETTE_INIT_MEMBER(m62_state, m62)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, m62_tile_decode_info, m62_tile_net_info);
-	palette.set_pen_colors(0x000, rgb, 0x100);
+	palette.set_pen_colors(0x000, rgb);
 
 	compute_res_net_all(rgb, color_prom, m62_sprite_decode_info, m62_sprite_net_info);
-	palette.set_pen_colors(0x100, rgb, 0x100);
+	palette.set_pen_colors(0x100, rgb);
 
 	m62_amplify_contrast(palette.palette(),0);
 
@@ -218,13 +218,13 @@ PALETTE_INIT_MEMBER(m62_state, m62)
 PALETTE_INIT_MEMBER(m62_state,lotlot)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, lotlot_tile_decode_info, m62_tile_net_info);
-	palette.set_pen_colors(0x000, rgb, 0x180);
+	palette.set_pen_colors(0x000, rgb);
 
 	compute_res_net_all(rgb, color_prom, lotlot_sprite_decode_info, m62_sprite_net_info);
-	palette.set_pen_colors(0x180, rgb, 0x180);
+	palette.set_pen_colors(0x180, rgb);
 
 	m62_amplify_contrast(palette.palette(),0);
 
@@ -236,20 +236,20 @@ PALETTE_INIT_MEMBER(m62_state,lotlot)
 PALETTE_INIT_MEMBER(m62_state,battroad)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	// m62 palette
 	compute_res_net_all(rgb, color_prom, m62_tile_decode_info, m62_tile_net_info);
-	palette.set_pen_colors(0x000, rgb, 0x100);
+	palette.set_pen_colors(0x000, rgb);
 
 	compute_res_net_all(rgb, color_prom, m62_sprite_decode_info, m62_sprite_net_info);
-	palette.set_pen_colors(0x100, rgb, 0x100);
+	palette.set_pen_colors(0x100, rgb);
 
 	m62_amplify_contrast(palette.palette(),0x200);
 
 	// custom palette for foreground
 	compute_res_net_all(rgb, color_prom, battroad_char_decode_info, battroad_char_net_info);
-	palette.set_pen_colors(0x200, rgb, 0x020);
+	palette.set_pen_colors(0x200, rgb);
 
 	/* we'll need this at run time */
 	m_sprite_height_prom = color_prom + 0x620;
@@ -259,13 +259,13 @@ PALETTE_INIT_MEMBER(m62_state,battroad)
 PALETTE_INIT_MEMBER(m62_state,spelunk2)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, spelunk2_tile_decode_info, m62_tile_net_info);
-	palette.set_pen_colors(0x000, rgb, 0x200);
+	palette.set_pen_colors(0x000, rgb);
 
 	compute_res_net_all(rgb, color_prom, spelunk2_sprite_decode_info, m62_sprite_net_info);
-	palette.set_pen_colors(0x200, rgb, 0x100);
+	palette.set_pen_colors(0x200, rgb);
 
 	m62_amplify_contrast(palette.palette(),0);
 

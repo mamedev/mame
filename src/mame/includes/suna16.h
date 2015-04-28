@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE16_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(DAC1_w);
 	DECLARE_WRITE8_MEMBER(DAC2_w);
-	
+
 	// bestbest specific
 	DECLARE_WRITE16_MEMBER(bestbest_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(bestbest_coin_w);
@@ -54,22 +54,22 @@ public:
 	DECLARE_WRITE8_MEMBER(bssoccer_pcm_2_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC3_w);
 	DECLARE_WRITE8_MEMBER(bssoccer_DAC4_w);
-	
+
 	// uballoon specific
 	DECLARE_WRITE16_MEMBER(uballoon_leds_w);
 	DECLARE_WRITE8_MEMBER(uballoon_pcm_1_bankswitch_w);
 	DECLARE_READ8_MEMBER(uballoon_prot_r);
 	DECLARE_WRITE8_MEMBER(uballoon_prot_w);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
-	
+
 	DECLARE_DRIVER_INIT(uballoon);
 	virtual void video_start();
 	DECLARE_MACHINE_START(bestbest);
 	DECLARE_MACHINE_START(bssoccer);
-    DECLARE_MACHINE_START(uballoon);
+	DECLARE_MACHINE_START(uballoon);
 	DECLARE_MACHINE_RESET(uballoon);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx);

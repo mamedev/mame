@@ -32,6 +32,9 @@
 #define MCFG_C8050_READY_CALLBACK(_write) \
 	devcb = &c8050_fdc_t::set_ready_wr_callback(*device, DEVCB_##_write);
 
+#define MCFG_C8050_BRDY_CALLBACK(_write) \
+	devcb = &c8050_fdc_t::set_brdy_wr_callback(*device, DEVCB_##_write);
+
 #define MCFG_C8050_ERROR_CALLBACK(_write) \
 	devcb = &c8050_fdc_t::set_error_wr_callback(*device, DEVCB_##_write);
 
@@ -51,11 +54,14 @@ public:
 
 	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_sync.set_callback(object); }
 	template<class _Object> static devcb_base &set_ready_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_ready.set_callback(object); }
+	template<class _Object> static devcb_base &set_brdy_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_brdy.set_callback(object); }
 	template<class _Object> static devcb_base &set_error_wr_callback(device_t &device, _Object object) { return downcast<c8050_fdc_t &>(device).m_write_error.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_WRITE_LINE_MEMBER( ds0_w );
+	DECLARE_WRITE_LINE_MEMBER( ds1_w );
 	DECLARE_WRITE_LINE_MEMBER( drv_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( mode_sel_w );
 	DECLARE_WRITE_LINE_MEMBER( rw_sel_w );
@@ -70,7 +76,7 @@ public:
 	void stp1_w(int stp);
 	void ds_w(int ds);
 
-	void set_floppy(floppy_image_device *floppy0, floppy_image_device *floppy1);
+	void set_floppy(floppy_connector *floppy0, floppy_connector *floppy1);
 
 protected:
 	// device-level overrides
@@ -94,6 +100,7 @@ protected:
 		int state, next_state;
 		int sync;
 		int ready;
+		int brdy;
 		int error;
 		int ds;
 		int drv_sel;
@@ -103,8 +110,6 @@ protected:
 
 		attotime edge;
 		UINT16 shift_reg;
-		int cycle_counter;
-		int cell_counter;
 		int bit_counter;
 		UINT8 e;
 		offs_t i;
@@ -115,6 +120,7 @@ protected:
 
 	devcb_write_line m_write_sync;
 	devcb_write_line m_write_ready;
+	devcb_write_line m_write_brdy;
 	devcb_write_line m_write_error;
 
 	required_memory_region m_gcr_rom;
@@ -127,6 +133,8 @@ protected:
 	int m_stp0;
 	int m_stp1;
 	int m_ds;
+	int m_ds0;
+	int m_ds1;
 	int m_drv_sel;
 	int m_mode_sel;
 	int m_rw_sel;
@@ -142,7 +150,7 @@ protected:
 	void live_start();
 	void checkpoint();
 	void rollback();
-	void pll_reset(const attotime &when, const attotime clock);
+	void pll_reset(const attotime &when);
 	void pll_start_writing(const attotime &tm);
 	void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);

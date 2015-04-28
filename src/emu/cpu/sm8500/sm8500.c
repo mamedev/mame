@@ -139,48 +139,48 @@ void sm8500_cpu_device::device_start()
 }
 
 
-void sm8500_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void sm8500_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case SM8500_PS:
-			string.printf( "%04X", ( m_PS0 << 8 ) | m_PS1 );
+			strprintf(str,  "%04X", ( m_PS0 << 8 ) | m_PS1 );
 			break;
 
 		case SM8500_RR0:
-			string.printf( "%04X", mem_readword( 0x00 ) );
+			strprintf(str,  "%04X", mem_readword( 0x00 ) );
 			break;
 
 		case SM8500_RR2:
-			string.printf( "%04X", mem_readword( 0x02 ) );
+			strprintf(str,  "%04X", mem_readword( 0x02 ) );
 			break;
 
 		case SM8500_RR4:
-			string.printf( "%04X", mem_readword( 0x04 ) );
+			strprintf(str,  "%04X", mem_readword( 0x04 ) );
 			break;
 
 		case SM8500_RR6:
-			string.printf( "%04X", mem_readword( 0x06 ) );
+			strprintf(str,  "%04X", mem_readword( 0x06 ) );
 			break;
 
 		case SM8500_RR8:
-			string.printf( "%04X", mem_readword( 0x08 ) );
+			strprintf(str,  "%04X", mem_readword( 0x08 ) );
 			break;
 
 		case SM8500_RR10:
-			string.printf( "%04X", mem_readword( 0x0a ) );
+			strprintf(str,  "%04X", mem_readword( 0x0a ) );
 			break;
 
 		case SM8500_RR12:
-			string.printf( "%04X", mem_readword( 0x0c ) );
+			strprintf(str,  "%04X", mem_readword( 0x0c ) );
 			break;
 
 		case SM8500_RR14:
-			string.printf( "%04X", mem_readword( 0x0e ) );
+			strprintf(str,  "%04X", mem_readword( 0x0e ) );
 			break;
 
 		case STATE_GENFLAGS:
-			string.printf( "%c%c%c%c%c%c%c%c",
+			strprintf(str,  "%c%c%c%c%c%c%c%c",
 				m_PS1 & FLAG_C ? 'C' : '.',
 				m_PS1 & FLAG_Z ? 'Z' : '.',
 				m_PS1 & FLAG_S ? 'S' : '.',

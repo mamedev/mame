@@ -8,13 +8,13 @@
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
     (assume same ROM contents between revisions)
   * SN75494N MOS-to-LED digit driver
-  * rotating reel + lightsensor
+  * motorized rotating reel + lightsensor, 1bit-sound
 
   This is a board game, it obviously requires game pieces and the board.
   The emulated part is the centerpiece, a black tower with a rotating card
   panel and LED digits for displaying health, amount of gold, etc. As far
   as MESS is concerned, the game works fine.
-  
+
   To start up the game, first press [MOVE], the machine now does a self-test.
   Then select level and number of players and the game will start. Read the
   official manual on how to play the game.
@@ -32,7 +32,7 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void mbdtower_display();
+	void prepare_display();
 	bool sensor_led_on() { return m_display_decay[0][0] != 0; }
 
 	int m_motor_pos;
@@ -58,13 +58,12 @@ protected:
 
 ***************************************************************************/
 
-void mbdtower_state::mbdtower_display()
+void mbdtower_state::prepare_display()
 {
 	// declare display matrix size and the 2 7segs
-	m_display_maxx = 7;
-	m_display_maxy = 3;
+	set_display_size(7, 3);
 	m_display_segmask[1] = m_display_segmask[2] = 0x7f;
-	
+
 	// update current state
 	if (~m_r & 0x10)
 	{
@@ -89,7 +88,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 	if (m_motor_on)
 	{
 		m_motor_pos = (m_motor_pos - 1) & 0x7f;
-		
+
 		// give it some time to spin out when it's turned off
 		if (m_r & 0x200)
 			m_motor_decay += (m_motor_decay < 4);
@@ -105,23 +104,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
 		m_sensor_blind = false;
 	else
 		m_sensor_blind = true;
-	
+
 	// on change, output info
 	if (m_motor_pos != m_motor_pos_prev)
 		output_set_value("motor_pos", 100 * (m_motor_pos / (float)0x80));
-	
+
 	/* 3 display cards per hole, like this:
-	
+
 	    (0)                <---- display increments this way <----                   (7)
 
-	    CURSED   VICTORY    WIZARD         DRAGON    GOLD KEY     SCOUT    WARRIOR   (void)    
-	    LOST     WARRIORS   BAZAAR CLOSED  SWORD     SILVER KEY   HEALER   FOOD      (void)    
-	    PLAGUE   BRIGANDS   KEY MISSING    PEGASUS   BRASS KEY    GOLD     BEAST     (void)    
+	    CURSED   VICTORY    WIZARD         DRAGON    GOLD KEY     SCOUT    WARRIOR   (void)
+	    LOST     WARRIORS   BAZAAR CLOSED  SWORD     SILVER KEY   HEALER   FOOD      (void)
+	    PLAGUE   BRIGANDS   KEY MISSING    PEGASUS   BRASS KEY    GOLD     BEAST     (void)
 	*/
 	int card_pos = m_motor_pos >> 4 & 7;
 	if (card_pos != (m_motor_pos_prev >> 4 & 7))
 		output_set_value("card_pos", card_pos);
-	
+
 	m_motor_pos_prev = m_motor_pos;
 }
 
@@ -137,7 +136,7 @@ WRITE16_MEMBER(mbdtower_state::write_r)
 {
 	// R0-R2: input mux
 	m_inp_mux = data & 7;
-	
+
 	// R9: motor on
 	if ((m_r ^ data) & 0x200)
 		output_set_value("motor_on", data >> 9 & 1);
@@ -149,8 +148,8 @@ WRITE16_MEMBER(mbdtower_state::write_r)
 	// R5-R7: tower lamps
 	// R8: rotation sensor led
 	m_r = data;
-	mbdtower_display();
-	
+	prepare_display();
+
 	// R10: speaker out
 	m_speaker->level_w(~data >> 4 & data >> 10 & 1);
 }
@@ -160,12 +159,13 @@ WRITE16_MEMBER(mbdtower_state::write_o)
 	// O0-O6: led segments A-G
 	// O7: digit select
 	m_o = data;
-	mbdtower_display();
+	prepare_display();
 }
 
 READ8_MEMBER(mbdtower_state::read_k)
 {
-	// rotation sensor is on K8
+	// K: multiplexed inputs
+	// K8: rotation sensor
 	return read_inputs(3) | ((!m_sensor_blind && sensor_led_on()) ? 8 : 0);
 }
 
@@ -182,14 +182,14 @@ READ8_MEMBER(mbdtower_state::read_k)
     (green)     (l.blue)    (red)
     [YES/       [REPEAT]    [NO/
      BUY]                    END]
-    
+
     (yellow)    (blue)      (white)
     [HAGGLE]    [BAZAAR]    [CLEAR]
-    
+
     (blue)      (blue)      (blue)
     [TOMB/      [MOVE]      [SANCTUARY/
      RUIN]                   CITADEL]
-    
+
     (orange)    (blue)      (d.yellow)
     [DARK       [FRONTIER]  [INVENTORY]
      TOWER]
@@ -227,13 +227,14 @@ void mbdtower_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
 
-	// zerofill/register for savestates
+	// zerofill
 	m_motor_pos = 0;
 	m_motor_pos_prev = -1;
 	m_motor_decay = 0;
 	m_motor_on = false;
 	m_sensor_blind = false;
-	
+
+	// register for savestates
 	save_item(NAME(m_motor_pos));
 	/* save_item(NAME(m_motor_pos_prev)); */ // don't save!
 	save_item(NAME(m_motor_decay));

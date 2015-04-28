@@ -96,7 +96,7 @@ const char *save_manager::indexed_item(int index, void *&base, UINT32 &valsize, 
 	valsize = entry->m_typesize;
 	valcount = entry->m_typecount;
 
-	return entry->m_name;
+	return entry->m_name.c_str();
 }
 
 
@@ -162,28 +162,28 @@ void save_manager::save_memory(device_t *device, const char *module, const char 
 	}
 
 	// create the full name
-	astring totalname;
+	std::string totalname;
 	if (tag != NULL)
-		totalname.printf("%s/%s/%X/%s", module, tag, index, name);
+		strprintf(totalname, "%s/%s/%X/%s", module, tag, index, name);
 	else
-		totalname.printf("%s/%X/%s", module, index, name);
+		strprintf(totalname, "%s/%X/%s", module, index, name);
 
 	// look for duplicates and an entry to insert in front of
 	state_entry *insert_after = NULL;
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		// stop when we find an entry whose name is after ours
-		if (entry->m_name > totalname)
+		if (entry->m_name.compare(totalname)>0)
 			break;
 		insert_after = entry;
 
 		// error if we are equal
-		if (entry->m_name == totalname)
-			fatalerror("Duplicate save state registration entry (%s)\n", totalname.cstr());
+		if (entry->m_name.compare(totalname)==0)
+			fatalerror("Duplicate save state registration entry (%s)\n", totalname.c_str());
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname, device, module, tag ? tag : "", index, valsize, valcount)), insert_after);
+	m_entry_list.insert_after(*global_alloc(state_entry(val, totalname.c_str(), device, module, tag ? tag : "", index, valsize, valcount)), insert_after);
 }
 
 
@@ -333,7 +333,7 @@ UINT32 save_manager::signature() const
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 	{
 		// add the entry name to the CRC
-		crc = crc32(crc, (UINT8 *)entry->m_name.cstr(), entry->m_name.len());
+		crc = crc32(crc, (UINT8 *)entry->m_name.c_str(), entry->m_name.length());
 
 		// add the type and size to the CRC
 		UINT32 temp[2];
@@ -353,7 +353,7 @@ UINT32 save_manager::signature() const
 void save_manager::dump_registry() const
 {
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
-		LOG(("%s: %d x %d\n", entry->m_name.cstr(), entry->m_typesize, entry->m_typecount));
+		LOG(("%s: %d x %d\n", entry->m_name.c_str(), entry->m_typesize, entry->m_typecount));
 }
 
 

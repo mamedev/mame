@@ -112,7 +112,7 @@
   (keep pressing HOLD 4, and press HIGH and LOW to set the stake limit
   between 10-100).
 
-  Pressing DEAL/START, you can get the winning hands, occurence of
+  Pressing DEAL/START, you can get the winning hands, occurrence of
   spades, diamonds, clubs and hearts. also number of jokers dealt.
 
   With DIP switch #8 ON, you can enter a sort of test mode, where you
@@ -1746,7 +1746,7 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 	dynamic_buffer buf(length);
 	int i;
 
-	memcpy(buf,rom,length);
+	memcpy(&buf[0],rom,length);
 
 	for(i = 0; i < length; i++)
 	{

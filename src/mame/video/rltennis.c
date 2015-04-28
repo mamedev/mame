@@ -224,7 +224,7 @@ void rltennis_state::video_start()
 	m_tmp_bitmap[BITMAP_FG_1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 	m_tmp_bitmap[BITMAP_FG_2] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 	m_tmp_bitmap[BITMAP_FG_DISPLAY] = auto_bitmap_ind16_alloc(machine(), 512, 256);
-	
+
 	save_item(NAME(m_blitter));
 }
 

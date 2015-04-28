@@ -1237,7 +1237,7 @@ ROM_END
  ID-0023
  . NGM-023
  NEO-MVS PROG42G / NEO-MVS CHA42G
- NEO-MVS PROGTOP / NEO-MVS CHA-256 
+ NEO-MVS PROGTOP / NEO-MVS CHA-256
  Boards used for the Korean release
  . NGH-023
  NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
@@ -1915,7 +1915,7 @@ ROM_START( aof ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "044-p1.p1", 0x000000, 0x080000, CRC(ca9f7a6d) SHA1(4d28ef86696f7e832510a66d3e8eb6c93b5b91a1) ) /* TC534200 */
 	/* also found sets with ep1 or p1 on eprom. */
-	
+
 	NEO_SFIX_128K( "044-s1.s1", CRC(89903f39) SHA1(a04a0c244a5d5c7a595fcf649107969635a6a8b6) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "044-m1.m1", CRC(0987e4bb) SHA1(8fae4b7fac09d46d4727928e609ed9d3711dbded) ) /* TC531001 */
@@ -1950,7 +1950,7 @@ ROM_START( samsho ) /* MVS VERSION */
 	ROM_LOAD16_WORD_SWAP( "045-p1.p1",   0x000000, 0x100000, CRC(dfe51bf0) SHA1(2243af3770a516ae698b69bcd9daf53632d9128d) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "045-pg2.sp2", 0x100000, 0x100000, CRC(46745b94) SHA1(d9e959fd1f88c9402915c1d0dcdb4a9e3d49cdcb) ) /* TC538200 */
 	/* also found set with ep1 / ep2 on eprom and sp2 on maskrom; same rom data as samshoh is used. */
-	
+
 	NEO_SFIX_128K( "045-s1.s1", CRC(9142a4d3) SHA1(54088e99fcfd75fd0f94852890a56350066a05a3) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "045-m1.m1", CRC(95170640) SHA1(125c502db0693e8d11cef619b090081c14a9a300) ) /* TC531001 */
@@ -2271,7 +2271,7 @@ ROM_START( wh1h ) /* AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "053-p1.p1", 0x000000, 0x080000, CRC(95b574cb) SHA1(b7b7af6a04c3d902e7f8852897741ecaf0b1062c) ) /* TC534200 */
 	ROM_LOAD16_WORD_SWAP( "053-p2.p2", 0x080000, 0x080000, CRC(f198ed45) SHA1(24ccc091e97f63796562bb5b30df51f39bd504ef) ) /* TC534200 */
-		
+
 	NEO_SFIX_128K( "053-s1.s1", CRC(8c2c2d6b) SHA1(87fa79611c6f8886dcc8766814829c669c65b40f) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "053-m1.m1", CRC(1bd9d04b) SHA1(65cd7b002123ed1a3111e3d942608d0082799ff3) ) /* TC531001 */
@@ -2615,7 +2615,7 @@ ROM_START( ssideki2 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "061-p1.p1", 0x000000, 0x100000, CRC(5969e0dc) SHA1(78abea880c125ec5a85bef6404478512a34b5513) ) /* mask rom TC538200 */
 	/* also found MVS sets with ep1 / ep2 on eprom; correct chip label unknown. */
-	
+
 	NEO_SFIX_128K( "061-s1.s1", CRC(226d1b68) SHA1(de010f6fda3ddadb181fe37daa6105f22e78b970) ) /* mask rom TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "061-m1.m1", CRC(156f6951) SHA1(49686f615f109a02b4f23931f1c84fee13872ffd) ) /* mask rom TC531001 */
@@ -2679,7 +2679,7 @@ ROM_START( samsho2 ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "063-p1.p1", 0x100000, 0x100000, CRC(22368892) SHA1(0997f8284aa0f57a333be8a0fdea777d0d01afd6) ) /* TC5316200 */
 	ROM_CONTINUE( 0x000000, 0x100000 )
 	/* also found MVS sets with ep1 / ep2 on eprom and p1 / sp2 on maskrom; correct chip label unknown */
-	
+
 	NEO_SFIX_128K( "063-s1.s1", CRC(64a5cd66) SHA1(12cdfb27bf9ccd5a8df6ddd4628ef7cf2c6d4964) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "063-m1.m1", CRC(56675098) SHA1(90429fc40d056d480d0e2bbefbc691d9fa260fc4) ) /* TC531001 */
@@ -2965,7 +2965,7 @@ ROM_END
   BANK 3  NOT USED
  ****************************************/
 
- ROM_START( b2b )
+	ROM_START( b2b )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "071.p1", 0x000000, 0x080000, CRC(7687197d) SHA1(4bb9cb7819807f7a7e1f85f1c4faac4a2f8761e8) )
 
@@ -4252,7 +4252,7 @@ ROM_START( kof96 ) /* MVS VERSION */
 	ROM_LOAD16_WORD_SWAP( "214-p1.p1",  0x000000, 0x100000, CRC(52755d74) SHA1(4232d627f1d2e6ea9fc8cf01571d77d4d5b8a1bb) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "214-p2.sp2", 0x100000, 0x200000, CRC(002ccb73) SHA1(3ae8df682c75027ca82db25491021eeba00a267e) ) /* TC5316200 */
 	/* also found sets with ep1 / ep2 / ep3 / ep4 on eprom and 214-P5 on TC5316200; correct chip labels for eproms is unknown */
-	
+
 	NEO_SFIX_128K( "214-s1.s1", CRC(1254cbdb) SHA1(fce5cf42588298711a3633e9c9c1d4dcb723ac76) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "214-m1.m1", CRC(dabc427c) SHA1(b76722ed142ee7addceb4757424870dbd003e8b3) ) /* TC531001 */
@@ -5013,9 +5013,9 @@ ROM_START( lastblad ) /* MVS VERSION */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "234-p1.p1",  0x000000, 0x100000, CRC(e123a5a3) SHA1(a3ddabc00feeb54272b145246612ad4632b0e413) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "234-p2.sp2", 0x100000, 0x400000, CRC(0fdc289e) SHA1(1ff31c0b0f4f9ddbedaf4bcf927faaae81892ec7) ) /* TC5332205 */
-	/* also found sets with p1 / sp2 / ep1 / ep2 / m1 on eprom with sticker */ 
+	/* also found sets with p1 / sp2 / ep1 / ep2 / m1 on eprom with sticker */
 	/* chip label is 0234-P1, 0234-SP2, 0234-EP1, 0234-EP2 and 0234-M1 */
-	
+
 	NEO_SFIX_128K( "234-s1.s1", CRC(95561412) SHA1(995de272f572fd08d909d3d0af4251b9957b3640) ) /* TC531000 */
 
 	NEO_BIOS_AUDIO_128K( "234-m1.m1", CRC(087628ea) SHA1(48dcf739bb16699af4ab8ed632b7dcb25e470e06) ) /* TC531001 */
@@ -6193,7 +6193,7 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 	/* The SMA for this release has a green colour marking; the older revision has a white colour marking */
 	ROM_LOAD16_WORD_SWAP( "256-pg1.p1", 0x100000, 0x400000, CRC(b07edfd5) SHA1(dcbd9e500bfae98d754e55cdbbbbf9401013f8ee) ) /* TC5332202 */
 	ROM_LOAD16_WORD_SWAP( "256-pg2.p2", 0x500000, 0x400000, CRC(6097c26b) SHA1(248ec29d21216f29dc6f5f3f0e1ad1601b3501b6) ) /* TC5332202 */
-		
+
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
@@ -6230,7 +6230,7 @@ ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* revision 2000.3.1
 	ROM_LOAD16_WORD_SWAP( "256-ph2.sp2", 0x100000, 0x400000, CRC(1f3d8ce8) SHA1(08b05a8abfb86ec09a5e758d6273acf1489961f9) )
 	/* also found AES set with p1 / p2 on maskrom on NEO-AEG PROGLBA (NEO-SMA); chip labels is 256-PG1 and 256-PG2 */
 	/* The SMA for this release has a pink color marking */
-	
+
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
@@ -6748,7 +6748,7 @@ ROM_START( pnyaa ) /* Encrypted Set */ /* MVS ONLY RELEASE */
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "267-p1.p1", 0x000000, 0x100000, CRC(112fe2c0) SHA1(01420e051f0bdbd4f68ce306a3738161b96f8ba8) ) /* mask rom TC538200 */
 	/* also found set with p1 and m1 on eprom with sticker; chip labels is PN 2.02 and M1 */
-	
+
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
@@ -6820,7 +6820,7 @@ ROM_START( mslug5h ) /* Encrypted Set */ /* AES release of the game but is also 
 	ROM_LOAD32_WORD_SWAP( "268-p1c.p1", 0x000000, 0x400000, CRC(3636690a) SHA1(e0da714b4bdc6efffe1250ded02ebddb3ab6d7b3) )
 	ROM_LOAD32_WORD_SWAP( "268-p2c.p2", 0x000002, 0x400000, CRC(8dfc47a2) SHA1(27d618cfbd0107a4d2a836797e967b39d2eb4851) )
 	/* also found AES set with p1 / p2 on maskrom; chip labels is 268-P1CR2 and 268-P2CR2 */
-	
+
 	ROM_Y_ZOOM
 
 	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */

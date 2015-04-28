@@ -23,9 +23,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 
 TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 {
-	UINT8 *videoram = m_videoram;
-	int code;
-	code = videoram[tile_index];
+	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 		code,
 		0,
@@ -34,28 +32,26 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 
 TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
 {
-	int code;
-	code = m_videoram2[tile_index];
+	int code = m_videoram2[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 		code + (m_char_bank<<8),
 		m_color_select&1,
 		0);
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_videoram_w)
+WRITE8_MEMBER(pitnrun_state::videoram_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_fg ->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_videoram2_w)
+WRITE8_MEMBER(pitnrun_state::videoram2_w)
 {
 	m_videoram2[offset] = data;
 	m_bg ->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_char_bank_select)
+WRITE8_MEMBER(pitnrun_state::char_bank_select)
 {
 	if(m_char_bank!=data)
 	{
@@ -65,34 +61,34 @@ WRITE8_MEMBER(pitnrun_state::pitnrun_char_bank_select)
 }
 
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_scroll_w)
+WRITE8_MEMBER(pitnrun_state::scroll_w)
 {
 	m_scroll = (m_scroll & (0xff<<((offset)?0:8))) |( data<<((offset)?8:0));
 	m_bg->set_scrollx(0, m_scroll);
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_ha_w)
+WRITE8_MEMBER(pitnrun_state::ha_w)
 {
 	m_ha=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_h_heed_w)
+WRITE8_MEMBER(pitnrun_state::h_heed_w)
 {
 	m_h_heed=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_v_heed_w)
+WRITE8_MEMBER(pitnrun_state::v_heed_w)
 {
 	m_v_heed=data;
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_color_select_w)
+WRITE8_MEMBER(pitnrun_state::color_select_w)
 {
 	m_color_select=data;
 	machine().tilemap().mark_all_dirty();
 }
 
-void pitnrun_state::pitnrun_spotlights()
+void pitnrun_state::spotlights()
 {
 	int x,y,i,b,datapix;
 	UINT8 *ROM = memregion("user1")->base();
@@ -166,7 +162,14 @@ void pitnrun_state::video_start()
 	m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine(),128,128);
 	m_tmp_bitmap[2] = auto_bitmap_ind16_alloc(machine(),128,128);
 	m_tmp_bitmap[3] = auto_bitmap_ind16_alloc(machine(),128,128);
-	pitnrun_spotlights();
+	spotlights();
+	
+	save_item(NAME(m_h_heed));
+	save_item(NAME(m_v_heed));
+	save_item(NAME(m_ha));
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_color_select));
 }
 
 void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -202,7 +205,7 @@ void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 pitnrun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int dx=0,dy=0;
 	rectangle myclip=cliprect;

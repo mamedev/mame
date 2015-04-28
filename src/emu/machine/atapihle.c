@@ -32,7 +32,7 @@ void atapi_hle_device::process_buffer()
 
 		m_error = 0; // HACK: This might not be the right place, but firebeat needs this cleared at some point
 
-		SetCommand(m_buffer, m_buffer_size);
+		SetCommand(&m_buffer[0], m_buffer_size);
 		ExecCommand();
 		GetLength(&m_data_size);
 
@@ -79,7 +79,7 @@ void atapi_hle_device::process_buffer()
 		switch (m_command)
 		{
 		case IDE_COMMAND_PACKET:
-			WriteData( m_buffer, m_buffer_size );
+			WriteData( &m_buffer[0], m_buffer_size );
 			m_data_size -= m_buffer_size;
 
 			wait_buffer();
@@ -107,7 +107,7 @@ void atapi_hle_device::fill_buffer()
 
 		if (m_buffer_size > 0)
 		{
-			ReadData( m_buffer, m_buffer_size );
+			ReadData( &m_buffer[0], m_buffer_size );
 			m_data_size -= m_buffer_size;
 
 			m_status |= IDE_STATUS_DRQ;

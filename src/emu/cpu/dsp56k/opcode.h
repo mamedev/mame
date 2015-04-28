@@ -21,7 +21,7 @@ public:
 	Opcode(UINT16 w0, UINT16 w1);
 	virtual ~Opcode();
 
-	astring disassemble() const;
+	std::string disassemble() const;
 	void evaluate(dsp56k_core* cpustate) const;
 	size_t size() const;
 	size_t evalSize() const;
@@ -38,7 +38,7 @@ private:
 	UINT16 m_word0;
 	//UINT16 m_word1;
 
-	astring dcString() const;
+	std::string dcString() const;
 };
 
 }

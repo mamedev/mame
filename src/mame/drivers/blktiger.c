@@ -610,7 +610,7 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 
 	}
 
-	memcpy(src, buffer, len);
+	memcpy(src, &buffer[0], len);
 }
 GAME( 1987, blktiger,   0,        blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger",                 GAME_SUPPORTS_SAVE )
 GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger (older)",         GAME_SUPPORTS_SAVE )

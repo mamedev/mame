@@ -2057,12 +2057,12 @@ void f8_cpu_device::device_start()
 }
 
 
-void f8_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void f8_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c",
 							m_w & 0x10 ? 'I':'.',
 							m_w & 0x08 ? 'O':'.',
 							m_w & 0x04 ? 'Z':'.',

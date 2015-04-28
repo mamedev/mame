@@ -48,7 +48,7 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 	// this is written after the game uploads 16 packets, each 32 bytes long (2x 16 words?)
 	// we're assuming it to be a 'send to 3d hardware' trigger.
 	// this can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
-
+g_profiler.start(PROFILER_USER1);
 	for(int packetStart=0;packetStart<0x200;packetStart+=32)
 	{
 		// Send it off to the 3d subsystem.
@@ -56,6 +56,7 @@ WRITE32_MEMBER(hng64_state::dl_upload_w)
 	}
 
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
+g_profiler.stop();	
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
@@ -68,7 +69,7 @@ TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )
 /* Note: Samurai Shodown games never calls bit 1, so it can't be framebuffer clear. It also calls bit 3 at start-up, meaning unknown */
 WRITE32_MEMBER(hng64_state::dl_control_w) // This handles framebuffers
 {
-//	printf("dl_control_w %08x %08x\n", data, mem_mask);
+//  printf("dl_control_w %08x %08x\n", data, mem_mask);
 
 	//if(data & 2) // swap buffers
 	//{
@@ -284,7 +285,7 @@ void hng64_state::setCameraProjectionMatrix(const UINT16* packet)
 
 // Operation 0100
 // Polygon rasterization.
-void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* polys, int* numPolys)
+void hng64_state::recoverPolygonBlock(const UINT16* packet, int* numPolys)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -540,7 +541,7 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 #if 0
 			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
 			{
-			//	if (chunkOffset[2] == 0xd870)
+			//  if (chunkOffset[2] == 0xd870)
 				{
 					polys[*numPolys].debugColor = 0xffff0000;
 					printf("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
@@ -863,13 +864,10 @@ void hng64_state::recoverPolygonBlock(const UINT16* packet, struct polygon* poly
 
 void hng64_state::hng64_command3d(const UINT16* packet)
 {
-
-	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	dynamic_array<polygon> polys(1024*5);
 
 	//printf("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
-	
+
 	switch (packet[0])
 	{
 	case 0x0000:    // Appears to be a NOP.
@@ -900,7 +898,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && m_mcu_type == SHOOT_MCU)
 			break;
 
-		recoverPolygonBlock( packet, polys, &numPolys);
+		recoverPolygonBlock( packet, &numPolys);
 		break;
 
 	case 0x0102:    // Geometry with only translation
@@ -920,7 +918,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock( miniPacket, polys, &numPolys);
+		recoverPolygonBlock( miniPacket, &numPolys);
 
 		memset(miniPacket, 0, sizeof(UINT16)*16);
 		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i+8];
@@ -928,7 +926,7 @@ void hng64_state::hng64_command3d(const UINT16* packet)
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
-		recoverPolygonBlock( miniPacket, polys, &numPolys);
+		recoverPolygonBlock( miniPacket, &numPolys);
 		break;
 
 	case 0x1000:    // Unknown: Some sort of global flags?
@@ -1239,7 +1237,7 @@ inline void hng64_state::FillSmoothTexPCHorizontalLine(
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
-	const UINT8 *gfx = m_texturerom;   
+	const UINT8 *gfx = m_texturerom;
 	const UINT8 *textureOffset = &gfx[prOptions.texIndex * 1024 * 1024];
 
 	for (; x_start <= x_end; x_start++)
@@ -1702,4 +1700,3 @@ void hng64_state::drawShaded( struct polygon *p)
 										prOptions);
 	}
 }
-

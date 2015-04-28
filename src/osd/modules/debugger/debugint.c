@@ -35,7 +35,7 @@ public:
 
 	virtual ~debug_internal() { }
 
-	virtual int init() { return 0;}
+	virtual int init(const osd_options &options) { return 0; }
 	virtual void exit();
 
 	virtual void init_debugger(running_machine &machine);
@@ -157,7 +157,7 @@ public:
 	{ }
 	int                 active;
 	render_container *  container;
-	astring             str;
+	std::string         str;
 };
 
 /***************************************************************************
@@ -222,7 +222,7 @@ public:
 	rectangle           bounds;
 	int                 ofs_x;
 	int                 ofs_y;
-	astring             title;
+	std::string         title;
 	int                 last_x;
 	int                 last_y;
 	// Scrollbars
@@ -459,9 +459,9 @@ static void dview_draw_size(DView *dv)
 			r.width(),r.height(), rgb_t(0xff, 0xff, 0xff, 0x00));
 }
 
-static void dview_set_title(DView *dv, astring title)
+static void dview_set_title(DView *dv, std::string title)
 {
-	if (dv->title.cmp(title) != 0)
+	if (dv->title.compare(title) != 0)
 	{
 		dv->title = title;
 		dview_set_state(dv, VIEW_STATE_NEEDS_UPDATE, TRUE);
@@ -481,10 +481,10 @@ static void dview_draw_title(DView *dv)
 
 	dview_draw_outlined_box(dv, RECT_DVIEW_TITLE, 0, 0, dv->bounds.width(), TITLE_HEIGHT, col);
 
-	if (!dv->title)
+	if (dv->title.empty())
 		return;
 
-	for (i=0; i<strlen(dv->title); i++)
+	for (i = 0; i<strlen(dv->title.c_str()); i++)
 	{
 		dview_draw_char(dv, RECT_DVIEW_TITLE, i * debug_font_width + BORDER_XTHICKNESS,
 				BORDER_YTHICKNESS, debug_font_height, //r.max_y - 2 * BORDER_YTHICKNESS,
@@ -1113,7 +1113,7 @@ static void render_editor(DView_edit *editor)
 
 	editor->container->empty();
 	/* get the size of the text */
-	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, 0.5);
@@ -1134,7 +1134,7 @@ static void render_editor(DView_edit *editor)
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str, x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	editor->container->manager().machine().ui().draw_text_full(editor->container, editor->str.c_str(), x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 }
@@ -1155,7 +1155,7 @@ static void CreateMainMenu(running_machine &machine)
 {
 	const char *subtext = "";
 	int rc;
-	astring title;
+	std::string title;
 
 	if (menu)
 		global_free( menu);
@@ -1180,7 +1180,7 @@ static void CreateMainMenu(running_machine &machine)
 		break;
 	}
 
-	menu->item_append(title.cat(focus_view->title), NULL, MENU_FLAG_DISABLE, NULL);
+	menu->item_append(title.append(focus_view->title).c_str(), NULL, MENU_FLAG_DISABLE, NULL);
 	menu->item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	switch (focus_view->type)
@@ -1295,11 +1295,11 @@ static void handle_editor(running_machine &machine)
 			{
 			case UI_EVENT_CHAR:
 				/* if it's a backspace and we can handle it, do so */
-				if ((event.ch == 8 || event.ch == 0x7f) && focus_view->editor.str.len() > 0)
+				if ((event.ch == 8 || event.ch == 0x7f) && focus_view->editor.str.length() > 0)
 				{
 					/* autoschow */
 					cur_editor = &focus_view->editor;
-					cur_editor->str = cur_editor->str.substr(0, cur_editor->str.len()-1);
+					cur_editor->str = cur_editor->str.substr(0, cur_editor->str.length()-1);
 				}
 				/* if it's any other key and we're not maxed out, update */
 				else if (event.ch >= ' ' && event.ch < 0x7f)
@@ -1310,7 +1310,7 @@ static void handle_editor(running_machine &machine)
 					cur_editor = &focus_view->editor;
 					ret = utf8_from_uchar(buf, 10, event.ch);
 					buf[ret] = 0;
-					cur_editor->str = cur_editor->str.cat(buf);
+					cur_editor->str = cur_editor->str.append(buf);
 				}
 				break;
 			default:
@@ -1322,7 +1322,7 @@ static void handle_editor(running_machine &machine)
 			render_editor(cur_editor);
 			if (ui_input_pressed(machine, IPT_UI_SELECT))
 			{
-				process_string(focus_view, focus_view->editor.str);
+				process_string(focus_view, focus_view->editor.str.c_str());
 				focus_view->editor.str = "";
 				cur_editor = NULL;
 			}
@@ -1380,7 +1380,7 @@ static void handle_menus(running_machine &machine)
 
 static void followers_set_cpu(device_t *device)
 {
-	astring title;
+	std::string title;
 
 	for (DView *dv = list; dv != NULL; dv = dv->next)
 	{
@@ -1392,7 +1392,7 @@ static void followers_set_cpu(device_t *device)
 			case DVT_DISASSEMBLY:
 			case DVT_STATE:
 				dv->view->set_source(*source);
-				title.printf("%s", source->name());
+				strprintf(title, "%s", source->name());
 				dview_set_title(dv, title);
 				break;
 			}

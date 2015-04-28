@@ -668,6 +668,7 @@ static void m68k_op_cpdbcc_32(m68000_base_device* mc68kcpu);
 static void m68k_op_cpgen_32(m68000_base_device* mc68kcpu);
 static void m68k_op_cpscc_32(m68000_base_device* mc68kcpu);
 static void m68k_op_cptrapcc_32(m68000_base_device* mc68kcpu);
+static void m68k_op_ftrapcc_32(m68000_base_device* mc68kcpu);
 static void m68k_op_dbt_16(m68000_base_device* mc68kcpu);
 static void m68k_op_dbf_16(m68000_base_device* mc68kcpu);
 static void m68k_op_dbhi_16(m68000_base_device* mc68kcpu);

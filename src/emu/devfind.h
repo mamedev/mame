@@ -267,8 +267,9 @@ public:
 	// construction/destruction
 	ioport_array_finder(device_t &base, const char *basetag)
 	{
-		for (int index = 0; index < _Count; index++)
-			m_array[index].reset(global_alloc(ioport_finder_type(base, m_tag[index].format("%s.%d", basetag, index))));
+		for (int index = 0; index < _Count; index++) {
+			m_array[index].reset(global_alloc(ioport_finder_type(base, strformat(m_tag[index], "%s.%d", basetag, index).c_str())));
+		}
 	}
 
 	ioport_array_finder(device_t &base, const char * const *tags)
@@ -284,7 +285,7 @@ public:
 protected:
 	// internal state
 	auto_pointer<ioport_finder_type> m_array[_Count];
-	astring m_tag[_Count];
+	std::string m_tag[_Count];
 };
 
 // optional ioport array finder
@@ -384,9 +385,9 @@ public:
 	// dynamic allocation of a shared pointer
 	void allocate(UINT32 entries)
 	{
-		assert(m_allocated.count() == 0);
+		assert(m_allocated.empty());
 		m_allocated.resize(entries);
-		this->m_target = m_allocated;
+		this->m_target = &m_allocated[0];
 		m_bytes = entries * sizeof(_PointerType);
 		this->m_base.save_item(this->m_allocated, this->m_tag);
 	}
@@ -403,7 +404,7 @@ protected:
 	// internal state
 	size_t m_bytes;
 	UINT8 m_width;
-	dynamic_array<_PointerType> m_allocated;
+	std::vector<_PointerType> m_allocated;
 };
 
 // optional shared pointer finder
@@ -436,7 +437,7 @@ public:
 	shared_ptr_array_finder(device_t &base, const char *basetag, UINT8 width = sizeof(_PointerType) * 8)
 	{
 		for (int index = 0; index < _Count; index++)
-			m_array[index].reset(global_alloc(shared_ptr_type(base, m_tag[index].format("%s.%d", basetag, index), width)));
+			m_array[index].reset(global_alloc(shared_ptr_type(base, strformat(m_tag[index],"%s.%d", basetag, index).c_str(), width)));
 	}
 
 	// array accessors
@@ -446,7 +447,7 @@ public:
 protected:
 	// internal state
 	auto_pointer<shared_ptr_type> m_array[_Count];
-	astring m_tag[_Count];
+	std::string m_tag[_Count];
 };
 
 // optional shared pointer array finder

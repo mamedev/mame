@@ -167,6 +167,12 @@ BGFX_HANDLE_T(bgfx_vertex_decl_handle);
 #undef BGFX_HANDLE_T
 
 /**
+ *
+ */
+typedef void (*bgfx_release_fn_t)(void* _ptr, void* _userData);
+
+/**
+ *
  */
 typedef struct bgfx_memory
 {
@@ -176,6 +182,7 @@ typedef struct bgfx_memory
 } bgfx_memory_t;
 
 /**
+ *
  */
 typedef struct bgfx_transform
 {
@@ -273,6 +280,15 @@ typedef struct bgfx_texture_info
 } bgfx_texture_info_t;
 
 /**
+ */
+typedef struct bgfx_caps_gpu
+{
+    uint16_t vendorId;
+    uint16_t deviceId;
+
+} bgfx_caps_gpu_t;
+
+/**
  *  Renderer capabilities.
  */
 typedef struct bgfx_caps
@@ -289,10 +305,15 @@ typedef struct bgfx_caps
      */
     uint64_t supported;
 
+    uint32_t maxDrawCalls;      /* < Maximum draw calls.               */
     uint16_t maxTextureSize;    /* < Maximum texture size.             */
     uint16_t maxViews;          /* < Maximum views.                    */
-    uint16_t maxDrawCalls;      /* < Maximum draw calls.               */
     uint8_t  maxFBAttachments;  /* < Maximum frame buffer attachments. */
+    uint8_t  numGPUs;           /* <                                   */
+
+    uint16_t vendorId;          /* <                                   */
+    uint16_t deviceId;          /* <                                   */
+    bgfx_caps_gpu_t gpu[4];     /* <                                   */
 
     /**
      *  Supported texture formats.
@@ -559,7 +580,7 @@ BGFX_C_API const char* bgfx_get_renderer_name(bgfx_renderer_type_t _type);
  *    specified, library uses default CRT allocator. The library assumes
  *    custom allocator is thread safe.
  */
-BGFX_C_API void bgfx_init(bgfx_renderer_type_t _type, bgfx_callback_interface_t* _callback, bgfx_reallocator_interface_t* _allocator);
+BGFX_C_API void bgfx_init(bgfx_renderer_type_t _type, uint16_t _vendorId, uint16_t _deviceId, bgfx_callback_interface_t* _callback, bgfx_reallocator_interface_t* _allocator);
 
 /**
  *  Shutdown bgfx library.
@@ -619,6 +640,11 @@ BGFX_C_API const bgfx_memory_t* bgfx_copy(const void* _data, uint32_t _size);
  *  You must make sure data is available for at least 2 bgfx::frame calls.
  */
 BGFX_C_API const bgfx_memory_t* bgfx_make_ref(const void* _data, uint32_t _size);
+
+/**
+ *
+ */
+BGFX_C_API const bgfx_memory_t* bgfx_make_ref_release(const void* _data, uint32_t _size, bgfx_release_fn_t _releaseFn, void* _userData);
 
 /**
  *  Set debug flags.

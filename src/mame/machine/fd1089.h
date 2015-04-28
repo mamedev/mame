@@ -54,8 +54,8 @@ protected:
 
 	// internal state
 	const UINT8 *           m_key;
-	dynamic_array<UINT16>   m_plaintext;
-	dynamic_array<UINT16>   m_decrypted_opcodes;
+	std::vector<UINT16>          m_plaintext;
+	std::vector<UINT16>          m_decrypted_opcodes;
 
 	// internal types
 	struct decrypt_parameters

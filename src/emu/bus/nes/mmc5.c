@@ -622,17 +622,17 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 READ8_MEMBER(nes_exrom_device::read_m)
 {
 	LOG_MMC(("exrom read_m, offset: %04x\n", offset));
-	if (m_battery && m_prgram)  // 2 chips present: first is BWRAM, second is WRAM
+	if (!m_battery.empty() && !m_prgram.empty())  // 2 chips present: first is BWRAM, second is WRAM
 	{
 		if (m_wram_base & 0x04)
-			return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.count() - 1)];
+			return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.size() - 1)];
 		else
-			return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.count() - 1)];
+			return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.size() - 1)];
 	}
-	else if (m_prgram)  // 1 chip, WRAM
-		return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.count() - 1)];
-	else if (m_battery) // 1 chip, BWRAM
-		return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.count() - 1)];
+	else if (!m_prgram.empty())  // 1 chip, WRAM
+		return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.size() - 1)];
+	else if (!m_battery.empty()) // 1 chip, BWRAM
+		return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.size() - 1)];
 	else
 		return m_open_bus;
 }
@@ -643,10 +643,10 @@ WRITE8_MEMBER(nes_exrom_device::write_m)
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01)
 		return;
 
-	if (m_battery && m_wram_base < 4)
-		m_battery[(offset + m_wram_base * 0x2000) & (m_battery.count() - 1)] = data;
-	else if (m_prgram)
-		m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.count() - 1)] = data;
+	if (!m_battery.empty() && m_wram_base < 4)
+		m_battery[(offset + m_wram_base * 0x2000) & (m_battery.size() - 1)] = data;
+	else if (!m_prgram.empty())
+		m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.size() - 1)] = data;
 }
 
 // some games (e.g. Bandit Kings of Ancient China) write to PRG-RAM through 0x8000-0xdfff
@@ -657,10 +657,10 @@ READ8_MEMBER(nes_exrom_device::read_h)
 
 	if (bank < 3 && offset >= bank * 0x2000 && offset < (bank + 1) * 0x2000 && m_prg_ram_mapped[bank])
 	{
-		if (m_battery && m_ram_hi_banks[bank] < 4)
-			return m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.count() - 1)];
-		else if (m_prgram)
-			return m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.count() - 1)];
+		if (!m_battery.empty() && m_ram_hi_banks[bank] < 4)
+			return m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.size() - 1)];
+		else if (!m_prgram.empty())
+			return m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.size() - 1)];
 	}
 
 	return hi_access_rom(offset);
@@ -673,8 +673,8 @@ WRITE8_MEMBER(nes_exrom_device::write_h)
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01 || bank == 3 || !m_prg_ram_mapped[bank])
 		return;
 
-	if (m_battery && m_ram_hi_banks[bank] < 4)
-		m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.count() - 1)] = data;
-	else if (m_prgram)
-		m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.count() - 1)] = data;
+	if (!m_battery.empty() && m_ram_hi_banks[bank] < 4)
+		m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.size() - 1)] = data;
+	else if (!m_prgram.empty())
+		m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.size() - 1)] = data;
 }

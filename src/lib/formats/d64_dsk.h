@@ -36,7 +36,8 @@ public:
 
 	virtual int identify(io_generic *io, UINT32 form_factor);
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
-	virtual bool supports_save() const;
+	virtual bool save(io_generic *io, floppy_image *image);
+	virtual bool supports_save() const { return true; }
 
 protected:
 	enum
@@ -63,8 +64,13 @@ protected:
 	virtual int get_sectors_per_track(const format &f, int track);
 	virtual int get_disk_id_offset(const format &f);
 	void get_disk_id(const format &f, io_generic *io, UINT8 &id1, UINT8 &id2);
+	virtual int get_image_offset(const format &f, int head, int track);
+	int compute_track_size(const format &f, int track);
+	virtual int get_gap2(const format &f, int head, int track) { return f.gap_2; }
 	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2);
 	void build_sector_description(const format &f, UINT8 *sectdata, UINT32 sect_offs, UINT32 error_offs, desc_s *sectors, int sector_count) const;
+	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size);
+	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count);
 
 	static const format file_formats[];
 
@@ -76,12 +82,5 @@ protected:
 extern const floppy_format_type FLOPPY_D64_FORMAT;
 
 
-FLOPPY_IDENTIFY( d64_dsk_identify );
-FLOPPY_IDENTIFY( d67_dsk_identify );
-FLOPPY_IDENTIFY( d71_dsk_identify );
-FLOPPY_IDENTIFY( d80_dsk_identify );
-FLOPPY_IDENTIFY( d82_dsk_identify );
-
-FLOPPY_CONSTRUCT( d64_dsk_construct );
 
 #endif

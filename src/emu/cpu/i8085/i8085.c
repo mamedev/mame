@@ -1081,12 +1081,12 @@ void i8085a_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void i8085a_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void i8085a_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				m_AF.b.l & 0x80 ? 'S':'.',
 				m_AF.b.l & 0x40 ? 'Z':'.',
 				m_AF.b.l & 0x20 ? 'X':'.', // X5

@@ -143,7 +143,7 @@ void ym2610_device::device_start()
 	int rate = clock()/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
-	astring name;
+	std::string name(tag());
 
 	m_irq_handler.resolve();
 
@@ -156,9 +156,9 @@ void ym2610_device::device_start()
 	/* setup adpcm buffers */
 	pcmbufa  = region()->base();
 	pcmsizea = region()->bytes();
-	name.printf("%s.deltat", tag());
-	pcmbufb  = (void *)(machine().root_device().memregion(name)->base());
-	pcmsizeb = machine().root_device().memregion(name)->bytes();
+	name.append(".deltat");
+	pcmbufb = (void *)(machine().root_device().memregion(name.c_str())->base());
+	pcmsizeb = machine().root_device().memregion(name.c_str())->bytes();
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;

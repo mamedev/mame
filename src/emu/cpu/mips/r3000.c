@@ -257,7 +257,7 @@ void r3000_device::device_start()
 	m_icache.resize(m_icache_size/4);
 	m_dcache.resize(m_dcache_size/4);
 
-	m_cache = m_dcache;
+	m_cache = &m_dcache[0];
 	m_cache_size = m_dcache_size;
 
 	// set up memory handlers
@@ -443,7 +443,7 @@ void r3000_device::state_export(const device_state_entry &entry)
 //  for the debugger
 //-------------------------------------------------
 
-void r3000_device::state_string_export(const device_state_entry &entry, astring &string)
+void r3000_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
@@ -712,9 +712,9 @@ inline void r3000_device::set_cop0_reg(int idx, UINT32 val)
 		if (diff & SR_SwC)
 		{
 			if (val & SR_SwC)
-				m_cache = m_icache, m_cache_size = m_icache_size;
+				m_cache = &m_icache[0], m_cache_size = m_icache_size;
 			else
-				m_cache = m_dcache, m_cache_size = m_dcache_size;
+				m_cache = &m_dcache[0], m_cache_size = m_dcache_size;
 		}
 		m_cpr[0][idx] = val;
 

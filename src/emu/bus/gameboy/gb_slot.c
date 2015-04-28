@@ -61,9 +61,7 @@ void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(GBSLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(GBSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -209,8 +207,11 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_MBC7, "rom_mbc7" },
 	{ GB_MBC_TAMA5, "rom_tama5" },
 	{ GB_MBC_MMM01, "rom_mmm01" },
+	{ GB_MBC_M161, "rom_m161_m12" },
 	{ GB_MBC_MBC3, "rom_huc1" },    // for now treat this as alias for MBC3
 	{ GB_MBC_MBC3, "rom_huc3" },    // for now treat this as alias for MBC3
+	{ GB_MBC_SACHEN1, "rom_sachen1" },
+	{ GB_MBC_SACHEN2, "rom_sachen2" },
 	{ GB_MBC_WISDOM, "rom_wisdom" },
 	{ GB_MBC_YONGYONG, "rom_yong" },
 	{ GB_MBC_LASAMA, "rom_lasama" },
@@ -299,6 +300,14 @@ bool base_gb_cart_slot_device::call_load()
 			m_type = gb_get_pcb_id(get_feature("slot") ? get_feature("slot") : "rom");
 		else
 			m_type = get_cart_type(ROM + offset, len - offset);
+
+		// setup additional mask/shift for MBC1 variants:
+		// a few game collections use the same mapper with slightly
+		// different lines connection with the ROM / RAM
+		if (m_type == GB_MBC_MBC1 || m_type == GB_MBC_188IN1)
+			m_cart->set_additional_wirings(0x1f, 0);
+		if (m_type == GB_MBC_MBC1_COL)
+			m_cart->set_additional_wirings(0x0f, -1);
 
 		// setup RAM/NVRAM/RTC/RUMBLE
 		if (software_entry() != NULL)
@@ -589,7 +598,7 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void base_gb_cart_slot_device::get_default_card_software(astring &result)
+void base_gb_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -598,21 +607,21 @@ void base_gb_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
 
-		if (get_mmm01_candidate(rom + offset, len - offset))
+		if (get_mmm01_candidate(&rom[offset], len - offset))
 			offset += (len - 0x8000);
 
-		type = get_cart_type(rom + offset, len - offset);
+		type = get_cart_type(&rom[offset], len - offset);
 		slot_string = gb_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 
@@ -620,11 +629,11 @@ void base_gb_cart_slot_device::get_default_card_software(astring &result)
 }
 
 
-void megaduck_cart_slot_device::get_default_card_software(astring &result)
+void megaduck_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
-		result.cpy("rom");
+		result.assign("rom");
 		return;
 	}
 

@@ -670,7 +670,7 @@ DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,0,1,2,4,5,9,3,6) ^ 0xfc],3,4,2,5,1,6,0,7);
-		memcpy(rom,buffer,len);
+		memcpy(rom,&buffer[0],len);
 	}
 
 	save_item(NAME(m_prot0));
@@ -689,7 +689,7 @@ DRIVER_INIT_MEMBER(popeye_state,popeye)
 		int i;
 		for (i = 0;i < len; i++)
 			buffer[i] = BITSWAP8(rom[BITSWAP16(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
-		memcpy(rom,buffer,len);
+		memcpy(rom,&buffer[0],len);
 	}
 
 	save_item(NAME(m_prot0));

@@ -104,7 +104,7 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	d_stream.avail_in = caslen - ( in_ptr - casdata );
 	d_stream.total_in=0;
 
-	d_stream.next_out = gz_ptr;
+	d_stream.next_out = &gz_ptr[0];
 	d_stream.avail_out = 1;
 	d_stream.total_out=0;
 
@@ -124,7 +124,7 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	total_size=1;
 	do
 	{
-		d_stream.next_out = gz_ptr;
+		d_stream.next_out = &gz_ptr[0];
 		d_stream.avail_out=1;
 		err=inflate( &d_stream, Z_SYNC_FLUSH );
 		if (err==Z_OK)
@@ -133,9 +133,9 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 			if (bsize==0)
 			{
 				d_stream.avail_out=4;
-				d_stream.next_out = gz_ptr;
+				d_stream.next_out = &gz_ptr[0];
 				err=inflate( &d_stream, Z_SYNC_FLUSH );
-				bsize=get_leuint32(gz_ptr);
+				bsize=get_leuint32(&gz_ptr[0]);
 			}
 			total_size=total_size+bsize;
 		}
@@ -212,7 +212,7 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 	d_stream.avail_in = mycaslen - ( in_ptr - bytes );
 	d_stream.total_in=0;
 
-	d_stream.next_out = gz_ptr;
+	d_stream.next_out = &gz_ptr[0];
 	d_stream.avail_out = 1;
 	d_stream.total_out=0;
 
@@ -232,7 +232,7 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 
 	do
 	{
-		d_stream.next_out = gz_ptr;
+		d_stream.next_out = &gz_ptr[0];
 		d_stream.avail_out=1;
 		err=inflate( &d_stream, Z_SYNC_FLUSH );
 		if (err==Z_OK)
@@ -241,9 +241,9 @@ static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 			if (bsize==0)
 			{
 				d_stream.avail_out=4;
-				d_stream.next_out = gz_ptr;
+				d_stream.next_out = &gz_ptr[0];
 				err=inflate( &d_stream, Z_SYNC_FLUSH );
-				bsize=get_leuint32(gz_ptr);
+				bsize=get_leuint32(&gz_ptr[0]);
 			}
 			for (i=0;i<bsize;i++)
 			{

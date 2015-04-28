@@ -51,6 +51,30 @@ void victory_state::video_start()
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));
+	save_pointer(NAME(m_rram), 0x4000);
+	save_pointer(NAME(m_gram), 0x4000);
+	save_pointer(NAME(m_bram), 0x4000);
+	save_item(NAME(m_vblank_irq));
+	save_item(NAME(m_fgcoll));
+	save_item(NAME(m_fgcollx));
+	save_item(NAME(m_fgcolly));
+	save_item(NAME(m_bgcoll));
+	save_item(NAME(m_bgcollx));
+	save_item(NAME(m_bgcolly));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_micro.i));
+	save_item(NAME(m_micro.pc));
+	save_item(NAME(m_micro.r));
+	save_item(NAME(m_micro.g));
+	save_item(NAME(m_micro.b));
+	save_item(NAME(m_micro.xp));
+	save_item(NAME(m_micro.yp));
+	save_item(NAME(m_micro.cmd));
+	save_item(NAME(m_micro.cmdlo));
+	save_item(NAME(m_micro.timer_active));
+	save_item(NAME(m_micro.endtime));
 }
 
 
@@ -61,7 +85,7 @@ void victory_state::video_start()
  *
  *************************************/
 
-void victory_state::victory_update_irq()
+void victory_state::update_irq()
 {
 	if (m_vblank_irq || m_fgcoll || (m_bgcoll && (m_video_control & 0x20)))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -70,11 +94,11 @@ void victory_state::victory_update_irq()
 }
 
 
-INTERRUPT_GEN_MEMBER(victory_state::victory_vblank_interrupt)
+INTERRUPT_GEN_MEMBER(victory_state::vblank_interrupt)
 {
 	m_vblank_irq = 1;
 
-	victory_update_irq();
+	update_irq();
 }
 
 
@@ -85,7 +109,7 @@ INTERRUPT_GEN_MEMBER(victory_state::victory_vblank_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::victory_paletteram_w)
+WRITE8_MEMBER(victory_state::paletteram_w)
 {
 	m_paletteram[offset & 0x3f] = ((offset & 0x80) << 1) | data;
 }
@@ -111,7 +135,7 @@ void victory_state::set_palette()
  *
  *************************************/
 
-READ8_MEMBER(victory_state::victory_video_control_r)
+READ8_MEMBER(victory_state::video_control_r)
 {
 	int result = 0;
 
@@ -127,7 +151,7 @@ READ8_MEMBER(victory_state::victory_video_control_r)
 			if (m_fgcoll)
 			{
 				m_fgcoll = 0;
-				victory_update_irq();
+				update_irq();
 			}
 			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
@@ -142,7 +166,7 @@ READ8_MEMBER(victory_state::victory_video_control_r)
 			if (m_bgcoll)
 			{
 				m_bgcoll = 0;
-				victory_update_irq();
+				update_irq();
 			}
 			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
@@ -163,7 +187,7 @@ READ8_MEMBER(victory_state::victory_video_control_r)
 			return result;
 
 		default:
-			logerror("%04X:victory_video_control_r(%02X)\n", space.device().safe_pcbase(), offset);
+			logerror("%04X:video_control_r(%02X)\n", space.device().safe_pcbase(), offset);
 			break;
 	}
 	return 0;
@@ -177,7 +201,7 @@ READ8_MEMBER(victory_state::victory_video_control_r)
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::victory_video_control_w)
+WRITE8_MEMBER(victory_state::video_control_w)
 {
 	struct micro_t &micro = m_micro;
 	switch (offset)
@@ -282,11 +306,11 @@ WRITE8_MEMBER(victory_state::victory_video_control_w)
 		case 0x0b:  /* CLRVIRQ */
 			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", space.device().safe_pcbase(), data);
 			m_vblank_irq = 0;
-			victory_update_irq();
+			update_irq();
 			break;
 
 		default:
-			if (LOG_MICROCODE) logerror("%04X:victory_video_control_w(%02X) = %02X\n", space.device().safe_pcbase(), offset, data);
+			if (LOG_MICROCODE) logerror("%04X:video_control_w(%02X) = %02X\n", space.device().safe_pcbase(), offset, data);
 			break;
 	}
 }
@@ -637,7 +661,7 @@ int victory_state::command3()
 					m_rram[dstoffs + 0] ^= src >> shift;
 					m_rram[dstoffs + 1] ^= src << nshift;
 				}
-				if (m_fgcoll) victory_update_irq();
+				if (m_fgcoll) update_irq();
 			}
 		}
 	}
@@ -839,7 +863,7 @@ int victory_state::command5()
 			}
 			acc &= 0xff;
 		}
-		if (m_fgcoll) victory_update_irq();
+		if (m_fgcoll) update_irq();
 	}
 
 	micro.xp = x;
@@ -971,7 +995,7 @@ int victory_state::command7()
 			m_rram[addr + 0] ^= micro.r >> shift;
 			m_rram[addr + 1] ^= micro.r << nshift;
 		}
-		if (m_fgcoll) victory_update_irq();
+		if (m_fgcoll) update_irq();
 	}
 
 	count_states(micro, 4);
@@ -1054,7 +1078,7 @@ TIMER_CALLBACK_MEMBER(victory_state::bgcoll_irq_callback)
 	m_bgcollx = param & 0xff;
 	m_bgcolly = param >> 8;
 	m_bgcoll = 1;
-	victory_update_irq();
+	update_irq();
 }
 
 
@@ -1065,7 +1089,7 @@ TIMER_CALLBACK_MEMBER(victory_state::bgcoll_irq_callback)
  *
  *************************************/
 
-UINT32 victory_state::screen_update_victory(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 victory_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int bgcollmask = (m_video_control & 4) ? 4 : 7;
 	int count = 0;

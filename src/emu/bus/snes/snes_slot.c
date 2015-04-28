@@ -90,9 +90,7 @@ void device_sns_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(SNSSLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(SNSSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -613,8 +611,8 @@ bool base_sns_cart_slot_device::call_load()
 		{
 			UINT32 tmplen = length();
 			dynamic_buffer tmpROM(tmplen);
-			fread(tmpROM, tmplen);
-			offset = snes_skip_header(tmpROM, tmplen);
+			fread(&tmpROM[0], tmplen);
+			offset = snes_skip_header(&tmpROM[0], tmplen);
 			fseek(offset, SEEK_SET);
 		}
 
@@ -666,11 +664,11 @@ bool base_sns_cart_slot_device::call_load()
 		{
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
 			dynamic_buffer temp_nvram(tot_size);
-			battery_load(temp_nvram, tot_size, 0xff);
+			battery_load(&temp_nvram[0], tot_size, 0xff);
 			if (m_cart->get_nvram_size())
-				memcpy(m_cart->get_nvram_base(), temp_nvram, m_cart->get_nvram_size());
+				memcpy(m_cart->get_nvram_base(), &temp_nvram[0], m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
-				memcpy(m_cart->get_rtc_ram_base(), temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_size());
+				memcpy(m_cart->get_rtc_ram_base(), &temp_nvram[m_cart->get_nvram_size()], m_cart->get_rtc_ram_size());
 		}
 
 		//printf("Type %d\n", m_type);
@@ -697,11 +695,11 @@ void base_sns_cart_slot_device::call_unload()
 			UINT32 tot_size = m_cart->get_nvram_size() + m_cart->get_rtc_ram_size();
 			dynamic_buffer temp_nvram(tot_size);
 			if (m_cart->get_nvram_size())
-				memcpy(temp_nvram, m_cart->get_nvram_base(), m_cart->get_nvram_size());
+				memcpy(&temp_nvram[0], m_cart->get_nvram_base(), m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
-				memcpy(temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_base(), m_cart->get_rtc_ram_size());
+				memcpy(&temp_nvram[m_cart->get_nvram_size()], m_cart->get_rtc_ram_base(), m_cart->get_rtc_ram_size());
 
-			battery_save(temp_nvram, tot_size);
+			battery_save(&temp_nvram[0], tot_size);
 		}
 	}
 }
@@ -796,43 +794,43 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 	// otherwise, we need to use the legacy versions including DSP dump in device romset
 	if (!m_cart->get_addon_bios_size())
 	{
-		astring region(m_cart->device().tag(), ":addon");
+		std::string region = std::string(m_cart->device().tag()).append(":addon");
 		UINT8 *ROM = NULL;
 
 		switch (m_addon)
 		{
 			case ADDON_DSP1:
-				ROM = machine().root_device().memregion(region)->base();
+				ROM = machine().root_device().memregion(region.c_str())->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP1B:
-				ROM = machine().root_device().memregion(region)->base();
+				ROM = machine().root_device().memregion(region.c_str())->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP2:
-				ROM = machine().root_device().memregion(region)->base();
+				ROM = machine().root_device().memregion(region.c_str())->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP3:
-				ROM = machine().root_device().memregion(region)->base();
+				ROM = machine().root_device().memregion(region.c_str())->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_DSP4:
-				ROM = machine().root_device().memregion(region)->base();
+				ROM = machine().root_device().memregion(region.c_str())->base();
 				m_cart->addon_bios_alloc(0x2800);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
 				break;
 			case ADDON_ST010:
-				ROM = machine().root_device().memregion(region)->base();
+				ROM = machine().root_device().memregion(region.c_str())->base();
 				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
 			case ADDON_ST011:
-				ROM = machine().root_device().memregion(region)->base();
+				ROM = machine().root_device().memregion(region.c_str())->base();
 				m_cart->addon_bios_alloc(0x11000);
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
@@ -999,7 +997,7 @@ void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int 
  get default card software
  -------------------------------------------------*/
 
-void base_sns_cart_slot_device::get_default_card_software(astring &result)
+void base_sns_cart_slot_device::get_default_card_software(std::string &result)
 {
 	bool fullpath = open_image_file(mconfig().options());
 
@@ -1011,11 +1009,11 @@ void base_sns_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type = 0, addon = 0;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
-		offset = snes_skip_header(rom, len);
+		offset = snes_skip_header(&rom[0], len);
 
-		get_cart_type_addon(rom + offset, len - offset, type, addon);
+		get_cart_type_addon(&rom[offset], len - offset, type, addon);
 		// here we're from fullpath, so check if it's a DSP game which needs legacy device (i.e. it has no appended DSP dump)
 		switch (addon)
 		{
@@ -1058,7 +1056,7 @@ void base_sns_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 

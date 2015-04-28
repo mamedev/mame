@@ -482,8 +482,8 @@ MACHINE_CONFIG_END
         WP keyboard, has 23-094E2 alt charset rom, 23-093E2 AVO rom.
  *     VT100-WY/WZ - has AVO board preinstalled, WP romset?, English
         WP keyboard, has 23-094E2 alt charset rom, 23-093E2 AVO rom.
-       The WP romset supports english, french, dutch and german languages but
-        will only display text properly in the non-english languages if the
+       The WP romset supports English, French, Dutch and German languages but
+        will only display text properly in the non-English languages if the
         23-094E2 alt charset rom AND the foreign language 23-093E2
         AVO rom are populated.
  *    VT100-NA/NB - ? romset with DECFORM keycaps
@@ -557,7 +557,7 @@ MACHINE_CONFIG_END
        23-095e2,096e2,139e2,140e2 set and probably others as well)
  * The vt100/101/102/103/etc 23-018e2-00 character set rom at location e4 is a 24 pin 2316 mask rom with enables as such: pin 18: CS2; pin 20: /CS1; pin 21: /CS3
  * The optional 23-094e2-00 alternate character set rom at location e9 is a 24 pin 2316 mask rom with enables as such: pin 18: /CS2; pin 20: /CS1; pin 21: /CS3
-       Supposedly the 23-094e2 rom is meant for vt100-WC or -WF systems, (which are french canadian and french respectively), implying that it has european language specific accented characters on it. It is probably used in all the -W* systems.
+       Supposedly the 23-094e2 rom is meant for vt100-WC or -WF systems, (which are French Canadian and French respectively), implying that it has European language specific accented characters on it. It is probably used in all the -W* systems.
        Pin 21 can be jumpered to +5v for this socket at location e9 by removing jumper w4 and inserting jumper w5, allowing a normal 2716 eprom to be used.
  * The optional AVO character set roms (see below) have: pin 18: /CS2*; pin 20: /CS1; pin 21: CS3 hence they match a normal 2716
    *(this is marked on the image as if it was CS2 but the input is tied to gnd meaning it must be /CS2)

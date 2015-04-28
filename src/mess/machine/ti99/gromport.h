@@ -509,8 +509,8 @@ public:
 	const char* to_string()
 	{
 		if (m_detail==NULL) return error_text[(int)m_err];
-		astring errormsg(error_text[(int)m_err], ": ", m_detail);
-		return core_strdup(errormsg.cstr());
+		std::string errormsg = std::string(error_text[(int)m_err]).append(": ").append(m_detail);
+		return core_strdup(errormsg.c_str());
 	}
 
 private:

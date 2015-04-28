@@ -170,13 +170,17 @@ Player 2 and Player 1 share the same controls !
 #define VBEND               (16)
 #define VBSTART             (224+16)
 
+void thepit_state::machine_start()
+{
+	save_item(NAME(m_nmi_mask));
+}
 
-READ8_MEMBER(thepit_state::thepit_colorram_r)
+READ8_MEMBER(thepit_state::intrepid_colorram_mirror_r)
 {
 	return m_colorram[offset];
 }
 
-WRITE8_MEMBER(thepit_state::thepit_sound_enable_w)
+WRITE8_MEMBER(thepit_state::sound_enable_w)
 {
 	machine().sound().system_enable(data);
 }
@@ -190,62 +194,62 @@ WRITE8_MEMBER(thepit_state::nmi_mask_w)
 static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("attributesram")
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
+	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( desertdan_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("attributesram")
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
+	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8c00, 0x8fff) AM_READ(thepit_colorram_r) AM_WRITE(thepit_colorram_w) /* mirror for intrepi2 */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(thepit_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(thepit_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8c00, 0x8fff) AM_READ(intrepid_colorram_mirror_r) AM_WRITE(colorram_w) /* mirror for intrepi2 */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("attributesram")
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(intrepid_graphics_bank_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
@@ -266,32 +270,32 @@ static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, thepit_state )
 ADDRESS_MAP_END
 
 
-#define IN0_REAL\
+static INPUT_PORTS_START( in0_real)
 	PORT_START("IN0")\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY\
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
 
-
-#define IN2_FAKE\
+static INPUT_PORTS_START( in2_fake )
 	PORT_START("IN2")\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( thepit )
-	IN0_REAL
+	PORT_INCLUDE(in0_real)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -330,12 +334,12 @@ static INPUT_PORTS_START( thepit )
 
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
-	IN2_FAKE
+	PORT_INCLUDE(in2_fake)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( desertdn )
-	IN0_REAL
+	PORT_INCLUDE(in0_real)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -373,12 +377,12 @@ static INPUT_PORTS_START( desertdn )
 
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
-	IN2_FAKE
+	PORT_INCLUDE(in2_fake)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( roundup )
-	IN0_REAL
+	PORT_INCLUDE(in0_real)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -416,7 +420,7 @@ static INPUT_PORTS_START( roundup )
 
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
-	IN2_FAKE
+	PORT_INCLUDE(in2_fake)
 INPUT_PORTS_END
 
 
@@ -431,7 +435,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( intrepid )
-	IN0_REAL
+	PORT_INCLUDE(in0_real)
 	/* The bit at 0x80 in IN0 Starts a timer, which, after it runs down, doesn't seem to do anything. See $0105 */
 
 	PORT_START("IN1")
@@ -471,12 +475,12 @@ static INPUT_PORTS_START( intrepid )
 
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
-	IN2_FAKE
+	PORT_INCLUDE(in2_fake)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( dockman )
-	IN0_REAL
+	PORT_INCLUDE(in0_real)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -514,12 +518,12 @@ static INPUT_PORTS_START( dockman )
 
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
-	IN2_FAKE
+	PORT_INCLUDE(in2_fake)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( suprmous )
-	IN0_REAL
+	PORT_INCLUDE(in0_real)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -558,7 +562,7 @@ static INPUT_PORTS_START( suprmous )
 
 	/* Since the real inputs are multiplexed, we used this fake port
 	   to read the 2nd player controls when the screen is flipped */
-	IN2_FAKE
+	PORT_INCLUDE(in2_fake)
 INPUT_PORTS_END
 
 
@@ -626,7 +630,7 @@ static INPUT_PORTS_START( rtriv )
 INPUT_PORTS_END
 
 
-static const gfx_layout thepit_charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
 	256,
@@ -638,7 +642,7 @@ static const gfx_layout thepit_charlayout =
 };
 
 
-static const gfx_layout thepit_spritelayout =
+static const gfx_layout spritelayout =
 {
 	16,16,
 	64,
@@ -675,15 +679,15 @@ static const gfx_layout suprmous_spritelayout =
 
 
 static GFXDECODE_START( thepit )
-	GFXDECODE_ENTRY( "gfx1", 0, thepit_charlayout,   0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0, thepit_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
 static GFXDECODE_START( intrepid )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, thepit_charlayout,   0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, thepit_spritelayout, 0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800, thepit_charlayout,   0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800, thepit_spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x0800, spritelayout, 0, 8 )
 GFXDECODE_END
 
 static GFXDECODE_START( suprmous )
@@ -717,7 +721,7 @@ static MACHINE_CONFIG_START( thepit, thepit_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_thepit)
+	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
@@ -1246,35 +1250,39 @@ DRIVER_INIT_MEMBER(thepit_state,rtriv)
 {
 	// Set-up the weirdest questions read ever done
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));
+
+	save_item(NAME(m_question_address));
+	save_item(NAME(m_question_rom));
+	save_item(NAME(m_remap_address));
 }
 
 
-GAME( 1981, roundup,  0,        thepit,   roundup,  driver_device, 0,     ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", 0 )
-GAME( 1981, fitter,   roundup,  thepit,   fitter,   driver_device, 0,     ROT90, "Taito Corporation",                           "Fitter", 0 )
-GAME( 1981, fitterbl, roundup,  thepit,   fitter,   driver_device, 0,     ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", 0 )
-GAME( 1981, ttfitter, roundup,  thepit,   fitter,   driver_device, 0,     ROT90, "Taito Corporation",                           "T.T. Fitter (Japan)", 0 )
+GAME( 1981, roundup,  0,        thepit,   roundup,  driver_device, 0,     ROT90, "Taito Corporation (Amenip/Centuri license)",  "Round-Up", GAME_SUPPORTS_SAVE )
+GAME( 1981, fitter,   roundup,  thepit,   fitter,   driver_device, 0,     ROT90, "Taito Corporation",                           "Fitter", GAME_SUPPORTS_SAVE )
+GAME( 1981, fitterbl, roundup,  thepit,   fitter,   driver_device, 0,     ROT90, "bootleg",                                     "Fitter (bootleg of Round-Up)", GAME_SUPPORTS_SAVE )
+GAME( 1981, ttfitter, roundup,  thepit,   fitter,   driver_device, 0,     ROT90, "Taito Corporation",                           "T.T. Fitter (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, thepit,   0,        thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics",                           "The Pit", 0 ) // AW == Andy Walker
-GAME( 1982, thepitu1, thepit,   thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", 0 )
-GAME( 1982, thepitu2, thepit,   thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", 0 ) // Bally PCB
-GAME( 1982, thepitj,  thepit,   thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", 0 )
+GAME( 1982, thepit,   0,        thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics",                           "The Pit", GAME_SUPPORTS_SAVE ) // AW == Andy Walker
+GAME( 1982, thepitu1, thepit,   thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, thepitu2, thepit,   thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", GAME_SUPPORTS_SAVE ) // Bally PCB
+GAME( 1982, thepitj,  thepit,   thepit,   thepit,   driver_device, 0,     ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, dockman,  0,        intrepid, dockman,  driver_device, 0,     ROT90, "Taito Corporation",                           "Dock Man", 0 )
-GAME( 1982, portman,  dockman,  intrepid, dockman,  driver_device, 0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", 0 )
+GAME( 1982, dockman,  0,        intrepid, dockman,  driver_device, 0,     ROT90, "Taito Corporation",                           "Dock Man", GAME_SUPPORTS_SAVE )
+GAME( 1982, portman,  dockman,  intrepid, dockman,  driver_device, 0,     ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, suprmous, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation",                           "Super Mouse", 0 )
-GAME( 1982, funnymou, suprmous, suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", 0 ) // Taito PCB
+GAME( 1982, suprmous, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation",                           "Super Mouse", GAME_SUPPORTS_SAVE )
+GAME( 1982, funnymou, suprmous, suprmous, suprmous, driver_device, 0,     ROT90, "Taito Corporation (Chuo Co. Ltd license)",    "Funny Mouse (Japan)", GAME_SUPPORTS_SAVE ) // Taito PCB
 
-GAME( 1982, machomou, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Techstar",                                    "Macho Mouse", 0 )
+GAME( 1982, machomou, 0,        suprmous, suprmous, driver_device, 0,     ROT90, "Techstar",                                    "Macho Mouse", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, desertdn, 0,        desertdn, desertdn, driver_device, 0,     ROT0,  "Video Optics",                                "Desert Dan", 0 )
+GAME( 1982, desertdn, 0,        desertdn, desertdn, driver_device, 0,     ROT0,  "Video Optics",                                "Desert Dan", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, intrepid, 0,        intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", 0 )
-GAME( 1983, intrepid2,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", 0 )
-GAME( 1984, intrepidb,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", 0 )
-GAME( 1984, intrepidb3,intrepid,intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", 0 )
-GAME( 1984, intrepidb2,intrepid,intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", 0 )
+GAME( 1983, intrepid, 0,        intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, intrepid2,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, intrepidb,intrepid, intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, intrepidb3,intrepid,intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, intrepidb2,intrepid,intrepid, intrepid, driver_device, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1984, zaryavos, 0,        intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games of Canada",                        "Zarya Vostoka", GAME_NOT_WORKING )
+GAME( 1984, zaryavos, 0,        intrepid, intrepid, driver_device, 0,     ROT90, "Nova Games of Canada",                        "Zarya Vostoka", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-GAME( 198?, rtriv,    0,        intrepid, rtriv,    thepit_state,  rtriv, ROT90, "Romar",                                       "Romar Triv", GAME_WRONG_COLORS )
+GAME( 198?, rtriv,    0,        intrepid, rtriv,    thepit_state,  rtriv, ROT90, "Romar",                                       "Romar Triv", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

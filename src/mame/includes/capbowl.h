@@ -37,7 +37,7 @@ public:
 
 	/* input-related */
 	UINT8 m_last_trackball_val[2];
-	
+
 	emu_timer *m_update_timer;
 
 	// common
@@ -47,21 +47,21 @@ public:
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	DECLARE_WRITE8_MEMBER(tms34061_w);
 	DECLARE_READ8_MEMBER(tms34061_r);
-	
+
 	// capbowl specific
 	DECLARE_WRITE8_MEMBER(capbowl_rom_select_w);
-	
+
 	// bowlrama specific
 	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
 	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
-	
+
 	DECLARE_DRIVER_INIT(capbowl);
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(update);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline rgb_t pen_for_pixel( UINT8 *src, UINT8 pix );
 

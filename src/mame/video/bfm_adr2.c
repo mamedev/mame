@@ -465,7 +465,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 		{
 			int x, y;
 
-			memcpy(s, p, 0x40000);
+			memcpy(&s[0], p, 0x40000);
 
 			y = 0;
 
@@ -474,7 +474,7 @@ void bfm_adder2_device::adder2_decode_char_roms()
 				x = 0;
 				while ( x < 64 )
 				{
-					UINT8 *src = s + (y*256*8)+(x*4);
+					UINT8 *src = &s[(y*256*8)+(x*4)];
 
 					*p++ = src[0*256+0];*p++ = src[0*256+1];*p++ = src[0*256+2];*p++ = src[0*256+3];
 					*p++ = src[1*256+0];*p++ = src[1*256+1];*p++ = src[1*256+2];*p++ = src[1*256+3];

@@ -127,7 +127,7 @@ void debug_view_memory::enumerate_sources()
 {
 	// start with an empty list
 	m_source_list.reset();
-	astring name;
+	std::string name;
 
 	// first add all the devices' address spaces
 	memory_interface_iterator iter(machine().root_device());
@@ -137,15 +137,15 @@ void debug_view_memory::enumerate_sources()
 				if (memintf->has_space(spacenum))
 				{
 					address_space &space = memintf->space(spacenum);
-					name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space.name());
-					m_source_list.append(*global_alloc(debug_view_memory_source(name, space)));
+					strprintf(name,"%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space.name());
+					m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), space)));
 				}
 
 	// then add all the memory regions
 	for (memory_region *region = machine().memory().first_region(); region != NULL; region = region->next())
 	{
-		name.printf("Region '%s'", region->name());
-		m_source_list.append(*global_alloc(debug_view_memory_source(name, *region)));
+		strprintf(name, "Region '%s'", region->name());
+		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region)));
 	}
 
 	// finally add all global array symbols
@@ -162,8 +162,8 @@ void debug_view_memory::enumerate_sources()
 		// also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
 		if (strncmp(itemname, "timer/", 6))
 		{
-			name.cpy(itemname);
-			m_source_list.append(*global_alloc(debug_view_memory_source(name, base, valsize, valcount)));
+			name.assign(itemname);
+			m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), base, valsize, valcount)));
 		}
 	}
 
@@ -217,7 +217,7 @@ void debug_view_memory::view_update()
 	// loop over visible rows
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
-		debug_view_char *destmin = m_viewdata + row * m_visible.x;
+		debug_view_char *destmin = &m_viewdata[row * m_visible.x];
 		debug_view_char *destmax = destmin + m_visible.x;
 		debug_view_char *destrow = destmin - m_topleft.x;
 		UINT32 effrow = m_topleft.y + row;
@@ -245,7 +245,7 @@ void debug_view_memory::view_update()
 			char addrtext[20];
 
 			// generate the address
-			sprintf(addrtext, m_addrformat, address);
+			sprintf(addrtext, m_addrformat.c_str(), address);
 			dest = destrow + m_section[0].m_pos + 1;
 			for (int ch = 0; addrtext[ch] != 0 && ch < m_section[0].m_width - 1; ch++, dest++)
 				if (dest >= destmin && dest < destmax)
@@ -451,14 +451,14 @@ void debug_view_memory::recompute()
 	else
 	{
 		m_maxaddr = source.m_length - 1;
-		addrchars = m_addrformat.printf("%X", m_maxaddr);
+		addrchars = strprintf(m_addrformat, "%X", m_maxaddr);
 	}
 
 	// generate an 8-byte aligned format for the address
 	if (!m_reverse_view)
-		m_addrformat.printf("%*s%%0%dX", 8 - addrchars, "", addrchars);
+		strprintf(m_addrformat, "%*s%%0%dX", 8 - addrchars, "", addrchars);
 	else
-		m_addrformat.printf("%%0%dX%*s", addrchars, 8 - addrchars, "");
+		strprintf(m_addrformat, "%%0%dX%*s", addrchars, 8 - addrchars, "");
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
 	if (source.m_space != NULL && source.m_space->byte_to_address(1) > 1)

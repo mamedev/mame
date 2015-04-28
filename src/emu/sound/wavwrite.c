@@ -122,15 +122,13 @@ void wav_add_data_16(wav_file *wav, INT16 *data, int samples)
 
 void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 {
-	dynamic_array<INT16> temp;
+	std::vector<INT16> temp;
 	int i;
 
-	if (!wav) return;
+	if (!wav || !samples) return;
 
 	/* resize dynamic array */
 	temp.resize(samples);
-	if (!temp)
-		return;
 
 	/* clamp */
 	for (i = 0; i < samples; i++)
@@ -140,44 +138,40 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 	}
 
 	/* write and flush */
-	fwrite(temp, 2, samples, wav->file);
+	fwrite(&temp[0], 2, samples, wav->file);
 	fflush(wav->file);
 }
 
 
 void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 {
-	dynamic_array<INT16> temp;
+	std::vector<INT16> temp;
 	int i;
 
-	if (!wav) return;
+	if (!wav || !samples) return;
 
 	/* resize dynamic array */
 	temp.resize(samples * 2);
-	if (!temp)
-		return;
 
 	/* interleave */
 	for (i = 0; i < samples * 2; i++)
 		temp[i] = (i & 1) ? right[i / 2] : left[i / 2];
 
 	/* write and flush */
-	fwrite(temp, 4, samples, wav->file);
+	fwrite(&temp[0], 4, samples, wav->file);
 	fflush(wav->file);
 }
 
 
 void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, int shift)
 {
-	dynamic_array<INT16> temp;
+	std::vector<INT16> temp;
 	int i;
 
-	if (!wav) return;
+	if (!wav || !samples) return;
 
 	/* resize dynamic array */
 	temp.resize(samples);
-	if (!temp)
-		return;
 
 	/* interleave */
 	for (i = 0; i < samples * 2; i++)
@@ -188,6 +182,6 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 	}
 
 	/* write and flush */
-	fwrite(temp, 4, samples, wav->file);
+	fwrite(&temp[0], 4, samples, wav->file);
 	fflush(wav->file);
 }

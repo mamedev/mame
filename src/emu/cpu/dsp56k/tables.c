@@ -283,7 +283,7 @@ void decode_JF_table(const UINT16 J, const UINT16 F, reg_id& S, reg_id& D)
 // NEW //   }
 // NEW // }
 
-void decode_kSign_table(const UINT16 k, astring& plusMinus)
+void decode_kSign_table(const UINT16 k, std::string& plusMinus)
 {
 	switch(k)
 	{
@@ -431,7 +431,7 @@ void decode_ss_table(const UINT16 ss, op_mnem& arithmetic)
 	}
 }
 
-void decode_uuuuF_table(const UINT16 uuuu, const UINT16 F, astring& arg, reg_id& S, reg_id& D)
+void decode_uuuuF_table(const UINT16 uuuu, const UINT16 F, std::string& arg, reg_id& S, reg_id& D)
 {
 	const UINT16 switchVal = (uuuu << 1) | F;
 
@@ -473,7 +473,7 @@ void decode_uuuuF_table(const UINT16 uuuu, const UINT16 F, astring& arg, reg_id&
 	}
 }
 
-void decode_Z_table(const UINT16 Z, astring& ea)
+void decode_Z_table(const UINT16 Z, std::string& ea)
 {
 	/* This is fixed as per the Family Manual errata addendum */
 	switch(Z)
@@ -483,7 +483,7 @@ void decode_Z_table(const UINT16 Z, astring& ea)
 	}
 }
 
-void assemble_ea_from_m_table(const UINT16 m, const int n, astring& ea)
+void assemble_ea_from_m_table(const UINT16 m, const int n, std::string& ea)
 {
 	char temp[32];
 	switch(m)
@@ -494,7 +494,7 @@ void assemble_ea_from_m_table(const UINT16 m, const int n, astring& ea)
 	ea = temp;
 }
 
-void assemble_eas_from_mm_table(UINT16 mm, int n1, int n2, astring& ea1, astring& ea2)
+void assemble_eas_from_mm_table(UINT16 mm, int n1, int n2, std::string& ea1, std::string& ea2)
 {
 	char temp1[32];
 	char temp2[32];
@@ -513,7 +513,7 @@ void assemble_eas_from_mm_table(UINT16 mm, int n1, int n2, astring& ea1, astring
 	ea2 = temp2;
 }
 
-void assemble_ea_from_MM_table(UINT16 MM, int n, astring& ea)
+void assemble_ea_from_MM_table(UINT16 MM, int n, std::string& ea)
 {
 	char temp[32];
 	switch(MM)
@@ -526,7 +526,7 @@ void assemble_ea_from_MM_table(UINT16 MM, int n, astring& ea)
 	ea = temp;
 }
 
-void assemble_ea_from_q_table(UINT16 q, int n, astring& ea)
+void assemble_ea_from_q_table(UINT16 q, int n, std::string& ea)
 {
 	char temp[32];
 	switch(q)
@@ -537,7 +537,7 @@ void assemble_ea_from_q_table(UINT16 q, int n, astring& ea)
 	ea = temp;
 }
 
-void assemble_ea_from_t_table(UINT16 t, UINT16 val, astring& ea)
+void assemble_ea_from_t_table(UINT16 t, UINT16 val, std::string& ea)
 {
 	char temp[32];
 	switch(t)
@@ -550,7 +550,7 @@ void assemble_ea_from_t_table(UINT16 t, UINT16 val, astring& ea)
 	ea = temp;
 }
 
-void assemble_ea_from_z_table(UINT16 z, int n, astring& ea)
+void assemble_ea_from_z_table(UINT16 z, int n, std::string& ea)
 {
 	char temp[32];
 	switch(z)
@@ -561,10 +561,10 @@ void assemble_ea_from_z_table(UINT16 z, int n, astring& ea)
 	ea = temp;
 }
 
-void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, astring& D)
+void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, std::string& D)
 {
 	char temp[32];
-	astring fullAddy;    /* Convert Short Absolute Address to full 16-bit */
+	std::string fullAddy;    /* Convert Short Absolute Address to full 16-bit */
 
 	switch(P)
 	{
@@ -574,18 +574,18 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, astring& D)
 			break;
 		case 0x1:
 			assemble_address_from_IO_short_address(ppppp, fullAddy);
-			sprintf(temp, "X:<<$%s", fullAddy.cstr());
-			// NEW // sprintf(temp, "X:$%s", fullAddy.cstr());
+			sprintf(temp, "X:<<$%s", fullAddy.c_str());
+			// NEW // sprintf(temp, "X:$%s", fullAddy.c_str());
 			break;
 	}
 	D = temp;
 }
 
-void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const astring& ea,
-										astring& source, astring& destination)
+void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const std::string& ea,
+	std::string& source, std::string& destination)
 {
 	char temp[32];
-	sprintf(temp, "%c:%s", ma, ea.cstr());
+	sprintf(temp, "%c:%s", ma, ea.c_str());
 	switch(W)
 	{
 		case 0x0: source = regIdAsString(SD); destination = temp; break;
@@ -593,11 +593,11 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const 
 	}
 }
 
-void assemble_arguments_from_W_table(UINT16 W, char ma, const astring& SD, const astring& ea,
-										astring& source, astring& destination)
+void assemble_arguments_from_W_table(UINT16 W, char ma, const std::string& SD, const std::string& ea,
+	std::string& source, std::string& destination)
 {
 	char temp[32];
-	sprintf(temp, "%c:%s", ma, ea.cstr());
+	sprintf(temp, "%c:%s", ma, ea.c_str());
 	switch(W)
 	{
 		case 0x0: source = SD;   destination = temp; break;
@@ -605,7 +605,7 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const astring& SD, const
 	}
 }
 
-void assemble_reg_from_W_table(UINT16 W, char ma, const reg_id& SD, const INT8 xx, astring& S, astring& D)
+void assemble_reg_from_W_table(UINT16 W, char ma, const reg_id& SD, const INT8 xx, std::string& S, std::string& D)
 {
 	UINT8 abs_xx;
 	char temp[32];
@@ -627,7 +627,7 @@ void assemble_reg_from_W_table(UINT16 W, char ma, const reg_id& SD, const INT8 x
 	}
 }
 
-void assemble_address_from_IO_short_address(UINT16 pp, astring& ea)
+void assemble_address_from_IO_short_address(UINT16 pp, std::string& ea)
 {
 	char temp[32];
 
@@ -751,7 +751,7 @@ void setReg16(dsp56k_core* cpustate, const UINT16& value, const reg_id& reg)
 	if (reg == iM3) M3 = value;
 }
 
-astring regIdAsString(const reg_id& regId)
+std::string regIdAsString(const reg_id& regId)
 {
 	switch(regId)
 	{
@@ -799,7 +799,7 @@ astring regIdAsString(const reg_id& regId)
 	return "INVALID_REG_ID";
 }
 
-astring opMnemonicAsString(const op_mnem& mnem)
+std::string opMnemonicAsString(const op_mnem& mnem)
 {
 	switch(mnem)
 	{
@@ -829,47 +829,47 @@ astring opMnemonicAsString(const op_mnem& mnem)
 	return "INVALID_OPCODE_MNEMONIC";
 }
 
-reg_id stringAsRegID(const astring& str)
+reg_id stringAsRegID(const std::string& str)
 {
-	if (str == "X") return iX;
-	if (str == "X0") return iX0;
-	if (str == "X1") return iX1;
-	if (str == "Y") return iY;
-	if (str == "Y0") return iY0;
-	if (str == "Y1") return iY1;
-	if (str == "A") return iA;
-	if (str == "A0") return iA0;
-	if (str == "A1") return iA1;
-	if (str == "A2") return iA2;
-	if (str == "B") return iB;
-	if (str == "B0") return iB0;
-	if (str == "B1") return iB1;
-	if (str == "B2") return iB2;
-	if (str == "R0") return iR0;
-	if (str == "R1") return iR1;
-	if (str == "R2") return iR2;
-	if (str == "R3") return iR3;
-	if (str == "N0") return iN0;
-	if (str == "N1") return iN1;
-	if (str == "N2") return iN2;
-	if (str == "N3") return iN3;
-	if (str == "M0") return iM0;
-	if (str == "M1") return iM1;
-	if (str == "M2") return iM2;
-	if (str == "M3") return iM3;
-	if (str == "LC") return iLC;
-	if (str == "SR") return iSR;
-	if (str == "OMR") return iOMR;
-	if (str == "SP") return iSP;
-	if (str == "SSH") return iSSH;
-	if (str == "SSL") return iSSL;
-	if (str == "LA") return iLA;
-	if (str == "MR") return iMR;
-	if (str == "CCR") return iCCR;
-	if (str == "F") return iF;
-	if (str == "^F") return iFHAT;
-	if (str == "!!") return iINVALID;
-	if (str == "?") return iWEIRD;
+	if (str.compare("X")==0) return iX;
+	if (str.compare("X0") == 0) return iX0;
+	if (str.compare("X1") == 0) return iX1;
+	if (str.compare("Y") == 0) return iY;
+	if (str.compare("Y0") == 0) return iY0;
+	if (str.compare("Y1") == 0) return iY1;
+	if (str.compare("A") == 0) return iA;
+	if (str.compare("A0") == 0) return iA0;
+	if (str.compare("A1") == 0) return iA1;
+	if (str.compare("A2") == 0) return iA2;
+	if (str.compare("B") == 0) return iB;
+	if (str.compare("B0") == 0) return iB0;
+	if (str.compare("B1") == 0) return iB1;
+	if (str.compare("B2") == 0) return iB2;
+	if (str.compare("R0") == 0) return iR0;
+	if (str.compare("R1") == 0) return iR1;
+	if (str.compare("R2") == 0) return iR2;
+	if (str.compare("R3") == 0) return iR3;
+	if (str.compare("N0") == 0) return iN0;
+	if (str.compare("N1") == 0) return iN1;
+	if (str.compare("N2") == 0) return iN2;
+	if (str.compare("N3") == 0) return iN3;
+	if (str.compare("M0") == 0) return iM0;
+	if (str.compare("M1") == 0) return iM1;
+	if (str.compare("M2") == 0) return iM2;
+	if (str.compare("M3") == 0) return iM3;
+	if (str.compare("LC") == 0) return iLC;
+	if (str.compare("SR") == 0) return iSR;
+	if (str.compare("OMR") == 0) return iOMR;
+	if (str.compare("SP") == 0) return iSP;
+	if (str.compare("SSH") == 0) return iSSH;
+	if (str.compare("SSL") == 0) return iSSL;
+	if (str.compare("LA") == 0) return iLA;
+	if (str.compare("MR") == 0) return iMR;
+	if (str.compare("CCR") == 0) return iCCR;
+	if (str.compare("F") == 0) return iF;
+	if (str.compare("^F") == 0) return iFHAT;
+	if (str.compare("!!") == 0) return iINVALID;
+	if (str.compare("?") == 0)return iWEIRD;
 
 	return iINVALID;
 }

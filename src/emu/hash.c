@@ -115,14 +115,14 @@ bool hash_collection::operator==(const hash_collection &rhs) const
 //  a string
 //-------------------------------------------------
 
-const char *hash_collection::hash_types(astring &buffer) const
+const char *hash_collection::hash_types(std::string &buffer) const
 {
-	buffer.reset();
+	buffer.clear();
 	if (m_has_crc32)
-		buffer.cat(HASH_CRC);
+		buffer.push_back(HASH_CRC);
 	if (m_has_sha1)
-		buffer.cat(HASH_SHA1);
-	return buffer;
+		buffer.push_back(HASH_SHA1);
+	return buffer.c_str();
 }
 
 
@@ -133,7 +133,7 @@ const char *hash_collection::hash_types(astring &buffer) const
 
 void hash_collection::reset()
 {
-	m_flags.reset();
+	m_flags.clear();
 	m_has_crc32 = m_has_sha1 = false;
 	delete m_creator;
 	m_creator = NULL;
@@ -190,21 +190,24 @@ bool hash_collection::remove(char type)
 //  format
 //-------------------------------------------------
 
-const char *hash_collection::internal_string(astring &buffer) const
+const char *hash_collection::internal_string(std::string &buffer) const
 {
-	buffer.reset();
+	buffer.clear();
 
 	// handle CRCs
-	astring temp;
-	if (m_has_crc32)
-		buffer.cat(HASH_CRC).cat(m_crc32.as_string(temp));
-
+	std::string temp;
+	if (m_has_crc32) {
+		buffer.push_back(HASH_CRC);
+		buffer.append(m_crc32.as_string(temp));
+	}
 	// handle SHA1s
-	if (m_has_sha1)
-		buffer.cat(HASH_SHA1).cat(m_sha1.as_string(temp));
+	if (m_has_sha1) {
+		buffer.push_back(HASH_SHA1);
+		buffer.append(m_sha1.as_string(temp));
+	}
 
 	// append flags
-	return buffer.cat(m_flags);
+	return buffer.append(m_flags).c_str();
 }
 
 
@@ -213,25 +216,26 @@ const char *hash_collection::internal_string(astring &buffer) const
 //  flags to a string in the macroized format
 //-------------------------------------------------
 
-const char *hash_collection::macro_string(astring &buffer) const
+const char *hash_collection::macro_string(std::string &buffer) const
 {
-	buffer.reset();
+	buffer.clear();
 
 	// handle CRCs
-	astring temp;
+	std::string temp;
 	if (m_has_crc32)
-		buffer.cat("CRC(").cat(m_crc32.as_string(temp)).cat(") ");
+		buffer.append("CRC(").append(m_crc32.as_string(temp)).append(") ");
 
 	// handle SHA1s
 	if (m_has_sha1)
-		buffer.cat("SHA1(").cat(m_sha1.as_string(temp)).cat(") ");
+		buffer.append("SHA1(").append(m_sha1.as_string(temp)).append(") ");
 
 	// append flags
 	if (flag(FLAG_NO_DUMP))
-		buffer.cat("NO_DUMP ");
+		buffer.append("NO_DUMP ");
 	if (flag(FLAG_BAD_DUMP))
-		buffer.cat("BAD_DUMP ");
-	return buffer.trimspace();
+		buffer.append("BAD_DUMP ");
+	strtrimspace(buffer);
+	return buffer.c_str();
 }
 
 
@@ -240,25 +244,26 @@ const char *hash_collection::macro_string(astring &buffer) const
 //  flags to a string in XML attribute format
 //-------------------------------------------------
 
-const char *hash_collection::attribute_string(astring &buffer) const
+const char *hash_collection::attribute_string(std::string &buffer) const
 {
-	buffer.reset();
+	buffer.clear();
 
 	// handle CRCs
-	astring temp;
+	std::string temp;
 	if (m_has_crc32)
-		buffer.cat("crc=\"").cat(m_crc32.as_string(temp)).cat("\" ");
+		buffer.append("crc=\"").append(m_crc32.as_string(temp)).append("\" ");
 
 	// handle SHA1s
 	if (m_has_sha1)
-		buffer.cat("sha1=\"").cat(m_sha1.as_string(temp)).cat("\" ");
+		buffer.append("sha1=\"").append(m_sha1.as_string(temp)).append("\" ");
 
 	// append flags
 	if (flag(FLAG_NO_DUMP))
-		buffer.cat("status=\"nodump\"" );
+		buffer.append("status=\"nodump\"");
 	if (flag(FLAG_BAD_DUMP))
-		buffer.cat("status=\"baddump\"" );
-	return buffer.trimspace();
+		buffer.append("status=\"baddump\"");
+	strtrimspace(buffer);
+	return buffer.c_str();
 }
 
 
@@ -319,7 +324,7 @@ bool hash_collection::from_internal_string(const char *string)
 		else if (skip_digits != 0)
 			errors = true;
 		else
-			m_flags.cat(c);
+			m_flags.push_back(c);
 	}
 	return !errors;
 }

@@ -97,8 +97,7 @@ void a2bus_applicard_device::device_start()
 	set_a2bus_device();
 
 	// locate Z80 ROM
-	astring tempstring;
-	m_z80rom = device().machine().root_device().memregion(this->subtag(tempstring, Z80_ROM_REGION))->base();
+	m_z80rom = device().machine().root_device().memregion(this->subtag(Z80_ROM_REGION).c_str())->base();
 
 	save_item(NAME(m_bROMAtZ80Zero));
 	save_item(NAME(m_z80stat));

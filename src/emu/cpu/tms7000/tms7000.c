@@ -271,12 +271,12 @@ void tms7000_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 }
 
-void tms7000_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms7000_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				m_sr & 0x80 ? 'C':'c',
 				m_sr & 0x40 ? 'N':'n',
 				m_sr & 0x20 ? 'Z':'z',

@@ -51,7 +51,6 @@ struct hash_file
 {
 	emu_file *file;
 	object_pool *pool;
-	astring functions[IO_COUNT];
 
 	hash_info **preloaded_hashes;
 	int preloaded_hash_count;
@@ -176,7 +175,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 	hash_info *hi;
 	char **text_dest;
 	hash_collection hashes;
-	astring all_functions;
+	std::string all_functions;
 	char functions;
 //  iodevice_t device;
 	int i;
@@ -238,7 +237,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if (functions)
 					{
 						hashes.add_from_string(functions, attributes[1], strlen(attributes[1]));
-						all_functions.cat(functions);
+						all_functions.append(1, functions);
 					}
 
 					attributes += 2;
@@ -493,7 +492,6 @@ struct hashlookup_params
 
 static int singular_selector_proc(hash_file *hashfile, void *param, const char *name, const hash_collection *hashes)
 {
-	astring tempstr;
 	struct hashlookup_params *hlparams = (struct hashlookup_params *) param;
 	return (*hashes == *hlparams->hashes);
 }
@@ -537,7 +535,7 @@ const hash_info *hashfile_lookup(hash_file *hashfile, const hash_collection *has
 
 const char *extra_info = NULL;
 
-bool read_hash_config(device_image_interface &image, const char *sysname, astring &result)
+bool read_hash_config(device_image_interface &image, const char *sysname, std::string &result)
 {
 	hash_file *hashfile = NULL;
 	const hash_info *info = NULL;
@@ -556,14 +554,14 @@ bool read_hash_config(device_image_interface &image, const char *sysname, astrin
 		return false;
 	}
 
-	result.cpy(info->extrainfo);
+	result.assign(info->extrainfo);
 
 	/* copy the relevant entries */
 	hashfile_close(hashfile);
 	return true;
 }
 
-bool hashfile_extrainfo(device_image_interface &image, astring &result)
+bool hashfile_extrainfo(device_image_interface &image, std::string &result)
 {
 	/* now read the hash file */
 	image.crc();

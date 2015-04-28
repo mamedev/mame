@@ -124,7 +124,7 @@
  * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
  * - Handle internal ram better (debugger visible)
  *  - Fixed port reading
- *  - Rewrote Macros for better readibility
+ *  - Rewrote Macros for better readability
  *  - Fixed and rewrote Interrupt handling
  *  - Now returns INTERNAL_DIVIDER, adjusted cycle counts
  *  - Remove unnecessary and duplicated code
@@ -286,6 +286,11 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	m_ds5002fp.mcon = 0;
 	m_ds5002fp.rpctl = 0;
 	m_ds5002fp.crc = 0;
+
+	/* default to standard cmos interfacing */
+
+	for (int i=0; i < ARRAY_LENGTH(m_forced_inputs); i++)
+		m_forced_inputs[i] = 0;
 }
 
 
@@ -2079,10 +2084,10 @@ UINT8 mcs51_cpu_device::sfr_read(size_t offset)
 	{
 		/* Read/Write/Modify operations read the port latch ! */
 		/* Move to memory map */
-		case ADDR_P0:   return RWM ? P0 : P0 & IN(MCS51_PORT_P0);
-		case ADDR_P1:   return RWM ? P1 : P1 & IN(MCS51_PORT_P1);
-		case ADDR_P2:   return RWM ? P2 : P2 & IN(MCS51_PORT_P2);
-		case ADDR_P3:   return RWM ? P3 : P3 & IN(MCS51_PORT_P3);
+		case ADDR_P0:   return RWM ? P0 : (P0 | m_forced_inputs[0]) & IN(MCS51_PORT_P0);
+		case ADDR_P1:   return RWM ? P1 : (P1 | m_forced_inputs[1]) & IN(MCS51_PORT_P1);
+		case ADDR_P2:   return RWM ? P2 : (P2 | m_forced_inputs[2]) & IN(MCS51_PORT_P2);
+		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & IN(MCS51_PORT_P3);
 
 		case ADDR_PSW:
 		case ADDR_ACC:
@@ -2218,12 +2223,12 @@ void mcs51_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void mcs51_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str,"%c%c%c%c%c%c%c%c",
 				PSW & 0x80 ? 'C':'.',
 				PSW & 0x40 ? 'A':'.',
 				PSW & 0x20 ? 'F':'.',

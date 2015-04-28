@@ -52,14 +52,14 @@ device_videobrain_expansion_card_interface::device_videobrain_expansion_card_int
 
 UINT8* device_videobrain_expansion_card_interface::videobrain_rom_pointer(running_machine &machine, size_t size)
 {
-	if (m_rom.count() == 0)
+	if (m_rom.empty())
 	{
 		m_rom.resize(size);
 
 		m_rom_mask = size - 1;
 	}
 
-	return m_rom;
+	return &m_rom[0];
 }
 
 
@@ -69,14 +69,14 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_rom_pointer(runnin
 
 UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(running_machine &machine, size_t size)
 {
-	if (m_ram.count() == 0)
+	if (m_ram.empty())
 	{
 		m_ram.resize(size);
 
 		m_ram_mask = size - 1;
 	}
 
-	return m_ram;
+	return &m_ram[0];
 }
 
 
@@ -157,7 +157,7 @@ bool videobrain_expansion_slot_device::call_softlist_load(software_list_device &
 //  get_default_card_software -
 //-------------------------------------------------
 
-void videobrain_expansion_slot_device::get_default_card_software(astring &result)
+void videobrain_expansion_slot_device::get_default_card_software(std::string &result)
 {
 	software_get_default_slot(result, "standard");
 }

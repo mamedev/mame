@@ -35,7 +35,7 @@ jaleco_blend_device::jaleco_blend_device(const machine_config &mconfig, const ch
 void jaleco_blend_device::device_start()
 {
 	m_table = auto_alloc_array_clear(machine(), UINT8, 0xc00);
-	
+
 	save_pointer(NAME(m_table), 0xc00);
 }
 

@@ -48,7 +48,7 @@
 
 /****************************************************************************************/
 
-WRITE8_MEMBER(tunhunt_state::tunhunt_videoram_w)
+WRITE8_MEMBER(tunhunt_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -78,19 +78,19 @@ void tunhunt_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrollx(0, 64);
+
+	save_item(NAME(m_control));
 }
 
 PALETTE_INIT_MEMBER(tunhunt_state, tunhunt)
 {
-	int i;
-
 	/* Tunnel Hunt uses a combination of color proms and palette RAM to specify a 16 color
 	 * palette.  Here, we manage only the mappings for alphanumeric characters and SHELL
 	 * graphics, which are unpacked ahead of time and drawn using MAME's drawgfx primitives.
 	 */
 
 	/* motion objects/box */
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 		palette.set_pen_indirect(i, i);
 
 	/* AlphaNumerics (1bpp)
@@ -152,10 +152,9 @@ void tunhunt_state::set_pens()
 	//const UINT8 *color_prom = memregion( "proms" )->base();
 	int color;
 	int shade;
-	int i;
 	int red,green,blue;
 
-	for( i=0; i<16; i++ )
+	for( int i=0; i<16; i++ )
 	{
 		color = m_generic_paletteram_8[i];
 		shade = 0xf^(color>>4);
@@ -207,11 +206,9 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
  */
 
 	bitmap_ind16 &tmpbitmap = m_tmpbitmap;
-	UINT8 *spriteram = m_spriteram;
-	UINT8 *tunhunt_ram = m_workram;
-	//int skip = tunhunt_ram[MOBST];
-	int x0 = 255-tunhunt_ram[MOBJV];
-	int y0 = 255-tunhunt_ram[MOBJH];
+	//int skip = m_workram[MOBST];
+	int x0 = 255-m_workram[MOBJV];
+	int y0 = 255-m_workram[MOBJH];
 	int scalex,scaley;
 	int line,span;
 	int x,span_data;
@@ -222,7 +219,7 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 	for( line=0; line<64; line++ )
 	{
 		x = 0;
-		source = &spriteram[line*0x10];
+		source = &m_spriteram[line*0x10];
 		for( span=0; span<0x10; span++ )
 		{
 			span_data = source[span];
@@ -236,7 +233,7 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 			tmpbitmap.pix16(line, x++) = 0;
 	} /* next line */
 
-	switch( tunhunt_ram[VSTRLO] )
+	switch( m_workram[VSTRLO] )
 	{
 	case 0x01:
 		scaley = (1<<16)*0.33; /* seems correct */
@@ -247,7 +244,7 @@ void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cl
 		break;
 
 	default:
-		scaley = (1<<16)*tunhunt_ram[VSTRLO]/4; /* ??? */
+		scaley = (1<<16)*m_workram[VSTRLO]/4; /* ??? */
 		break;
 	}
 	scalex = (1<<16);
@@ -284,7 +281,6 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
         1280: 07 03 00      01  07 06 04 05 02 07 03 00     09 0a   0b 0c       palette select
         ->hue 06 02 ff      60  06 05 03 04 01 06 02 ff     d2 00   c2 ff
 */
-	UINT8 *tunhunt_ram = m_workram;
 	int span,x,y;
 	int color;
 //  rectangle bbox;
@@ -300,13 +296,13 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				z = 0;
 				for( span=3; span<16; span++ )
 				{
-					x0 = tunhunt_ram[span+0x1080];
-					y0 = tunhunt_ram[span+0x1480];
-					y1 = tunhunt_ram[span+0x1400];
+					x0 = m_workram[span+0x1080];
+					y0 = m_workram[span+0x1480];
+					y1 = m_workram[span+0x1400];
 
 					if( y>=y0 && y<=y1 && x>=x0 && x0>=z )
 					{
-						color = tunhunt_ram[span+0x1280]&0xf;
+						color = m_workram[span+0x1280]&0xf;
 						z = x0; /* give priority to rightmost spans */
 					}
 				}
@@ -365,7 +361,7 @@ void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 			255-hposition-16,vstart-32,0 );
 }
 
-UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	set_pens();
 

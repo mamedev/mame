@@ -70,7 +70,7 @@ K1000233A
 #include "includes/pitnrun.h"
 
 
-INTERRUPT_GEN_MEMBER(pitnrun_state::pitnrun_nmi_source)
+INTERRUPT_GEN_MEMBER(pitnrun_state::nmi_source)
 {
 	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -80,12 +80,12 @@ WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
 		m_nmi = data & 1;
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_hflip_w)
+WRITE8_MEMBER(pitnrun_state::hflip_w)
 {
 	flip_screen_x_set(data);
 }
 
-WRITE8_MEMBER(pitnrun_state::pitnrun_vflip_w)
+WRITE8_MEMBER(pitnrun_state::vflip_w)
 {
 	flip_screen_y_set(data);
 }
@@ -93,26 +93,26 @@ WRITE8_MEMBER(pitnrun_state::pitnrun_vflip_w)
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(pitnrun_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(pitnrun_color_select_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(color_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP/* COLOR SEL 2 - not used ?*/
-	AM_RANGE(0xb005, 0xb005) AM_WRITE(pitnrun_char_bank_select)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(pitnrun_hflip_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(pitnrun_vflip_w)
+	AM_RANGE(0xb005, 0xb005) AM_WRITE(char_bank_select)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(hflip_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(vflip_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc800, 0xc801) AM_WRITE(pitnrun_scroll_w)
+	AM_RANGE(0xc800, 0xc801) AM_WRITE(scroll_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(pitnrun_mcu_data_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(pitnrun_h_heed_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(pitnrun_v_heed_w)
-	AM_RANGE(0xc807, 0xc807) AM_WRITE(pitnrun_ha_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(pitnrun_mcu_status_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(pitnrun_mcu_data_r)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
+	AM_RANGE(0xc805, 0xc805) AM_WRITE(h_heed_w)
+	AM_RANGE(0xc806, 0xc806) AM_WRITE(v_heed_w)
+	AM_RANGE(0xc807, 0xc807) AM_WRITE(ha_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
 	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
@@ -134,9 +134,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_mcu_map, AS_PROGRAM, 8, pitnrun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(pitnrun_68705_portA_r,pitnrun_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(pitnrun_68705_portB_r,pitnrun_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(pitnrun_68705_portC_r)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m68705_portA_r,m68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(m68705_portB_r,m68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READ(m68705_portC_r)
 	AM_RANGE(0x0003, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -220,7 +220,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)       /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  pitnrun_nmi_source)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pitnrun_state, screen_update_pitnrun)
+	MCFG_SCREEN_UPDATE_DRIVER(pitnrun_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pitnrun)
@@ -331,5 +331,5 @@ ROM_START( pitnruna )
 	ROM_LOAD( "clr.3",  0x0040, 0x0020, CRC(25e70e5e) SHA1(fdb9c69e9568a725dd0e3ac25835270fb4f49280) )
 ROM_END
 
-GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, driver_device, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

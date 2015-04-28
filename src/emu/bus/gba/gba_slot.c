@@ -48,10 +48,8 @@ void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(GBASLOT_ROM_REGION_TAG);
 		// we always alloc 32MB of rom region!
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(tempstring, 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -256,9 +254,9 @@ bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, cons
  fullpath
  -------------------------------------------------*/
 
-INLINE astring gba_chip_string( UINT32 chip )
+INLINE std::string gba_chip_string( UINT32 chip )
 {
-	astring str;
+	std::string str;
 	if (chip == 0) str += "NONE ";
 	if (chip & GBA_CHIP_EEPROM) str += "EEPROM ";
 	if (chip & GBA_CHIP_EEPROM_64K) str += "EEPROM_64K ";
@@ -268,7 +266,8 @@ INLINE astring gba_chip_string( UINT32 chip )
 	if (chip & GBA_CHIP_FLASH_512) str += "FLASH_512 ";
 	if (chip & GBA_CHIP_SRAM) str += "SRAM ";
 	if (chip & GBA_CHIP_RTC) str += "RTC ";
-	return str.trimspace();
+	strtrimspace(str);
+	return str;
 }
 
 
@@ -307,7 +306,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
 			chip |= GBA_CHIP_RTC;
 	}
-	osd_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).cstr());
+	osd_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).c_str());
 
 	// fix for games which return more than one kind of chip: either it is one of the known titles, or we default to no battery
 	if (gba_chip_has_conflict(chip))
@@ -364,7 +363,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		chip &= ~GBA_CHIP_RTC;
 	}
 
-	osd_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).cstr());
+	osd_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).c_str());
 
 	switch (chip)
 	{
@@ -399,7 +398,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void gba_cart_slot_device::get_default_card_software(astring &result)
+void gba_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -408,15 +407,15 @@ void gba_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
-		type = get_cart_type(rom, len);
+		type = get_cart_type(&rom[0], len);
 		slot_string = gba_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 

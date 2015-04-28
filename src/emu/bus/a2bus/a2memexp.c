@@ -102,8 +102,7 @@ void a2bus_memexp_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, MEMEXP_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(MEMEXP_ROM_REGION).c_str())->base();
 
 	memset(m_ram, 0xff, 1024*1024*sizeof(UINT8));
 

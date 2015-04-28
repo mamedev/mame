@@ -418,7 +418,7 @@ void tbowl_state::machine_start()
 {
 	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x800);
 	membank("subbank")->configure_entries(0, 32, memregion("sub")->base() + 0x10000, 0x800);
-	
+
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_end));
 	save_item(NAME(m_adpcm_data));

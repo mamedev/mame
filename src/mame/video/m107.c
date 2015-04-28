@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(m107_state::get_pf_tile_info)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::m107_vram_w)
+WRITE16_MEMBER(m107_state::vram_w)
 {
 	int laynum;
 
@@ -74,7 +74,7 @@ WRITE16_MEMBER(m107_state::m107_vram_w)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::m107_control_w)
+WRITE16_MEMBER(m107_state::control_w)
 {
 	UINT16 old = m_control[offset];
 	pf_layer_info *layer;
@@ -141,6 +141,16 @@ void m107_state::video_start()
 	}
 
 	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+
+	save_item(NAME(m_sprite_display));
+	save_item(NAME(m_raster_irq_position));
+	save_item(NAME(m_control));
+	save_pointer(NAME(m_buffered_spriteram), 0x1000/2);
+
+	for (int i = 0; i < 4; i++)
+	{
+		save_item(NAME(m_pf_layer[i].vram_base), i);
+	}
 }
 
 /*****************************************************************************/
@@ -267,7 +277,7 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 
 /*****************************************************************************/
 
-void m107_state::m107_update_scroll_positions()
+void m107_state::update_scroll_positions()
 {
 	int laynum;
 	int i;
@@ -306,7 +316,7 @@ void m107_state::m107_update_scroll_positions()
 
 /*****************************************************************************/
 
-void m107_state::m107_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque)
+void m107_state::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque)
 {
 	int line;
 	rectangle clip;
@@ -331,25 +341,25 @@ void m107_state::m107_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-void m107_state::m107_screenrefresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m107_state::screenrefresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
 	if ((~m_control[0x0b] >> 7) & 1)
 	{
-		m107_tilemap_draw(screen, bitmap, cliprect, 3, 0,0);
-		m107_tilemap_draw(screen, bitmap, cliprect, 3, 1,0);
+		tilemap_draw(screen, bitmap, cliprect, 3, 0,0);
+		tilemap_draw(screen, bitmap, cliprect, 3, 1,0);
 	}
 	else
 		bitmap.fill(0, cliprect);
 
 	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens */
-	m107_tilemap_draw(screen, bitmap, cliprect, 2, 0,(((m_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
-	m107_tilemap_draw(screen, bitmap, cliprect, 1, 0,0);
-	m107_tilemap_draw(screen, bitmap, cliprect, 0, 0,0);
-	m107_tilemap_draw(screen, bitmap, cliprect, 2, 1,0);
-	m107_tilemap_draw(screen, bitmap, cliprect, 1, 1,0);
-	m107_tilemap_draw(screen, bitmap, cliprect, 0, 1,0);
+	tilemap_draw(screen, bitmap, cliprect, 2, 0,(((m_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
+	tilemap_draw(screen, bitmap, cliprect, 1, 0,0);
+	tilemap_draw(screen, bitmap, cliprect, 0, 0,0);
+	tilemap_draw(screen, bitmap, cliprect, 2, 1,0);
+	tilemap_draw(screen, bitmap, cliprect, 1, 1,0);
+	tilemap_draw(screen, bitmap, cliprect, 0, 1,0);
 
 	if(m_sprite_display)
 		draw_sprites(screen, bitmap, cliprect);
@@ -360,7 +370,7 @@ void m107_state::m107_screenrefresh(screen_device &screen, bitmap_ind16 &bitmap,
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::m107_spritebuffer_w)
+WRITE16_MEMBER(m107_state::spritebuffer_w)
 {
 	if (ACCESSING_BITS_0_7) {
 		/*
@@ -375,9 +385,9 @@ WRITE16_MEMBER(m107_state::m107_spritebuffer_w)
 
 /*****************************************************************************/
 
-UINT32 m107_state::screen_update_m107(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 m107_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m107_update_scroll_positions();
-	m107_screenrefresh(screen, bitmap, cliprect);
+	update_scroll_positions();
+	screenrefresh(screen, bitmap, cliprect);
 	return 0;
 }

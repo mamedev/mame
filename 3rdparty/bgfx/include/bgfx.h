@@ -189,6 +189,20 @@ namespace bgfx
 		};
 	};
 
+	struct BackbufferRatio
+	{
+		enum Enum
+		{
+			None,
+			Equal,
+			Half,
+			Quarter,
+			Eighth,
+			Sixteenth,
+			Double,
+		};
+	};
+
 	static const uint16_t invalidHandle = UINT16_MAX;
 
 	BGFX_HANDLE(DynamicIndexBufferHandle);
@@ -279,6 +293,9 @@ namespace bgfx
 	}
 
 	///
+	typedef void (*ReleaseFn)(void* _ptr, void* _userData);
+
+	///
 	struct Memory
 	{
 		uint8_t* data;
@@ -311,10 +328,21 @@ namespace bgfx
 		///
 		uint64_t supported;
 
+		uint32_t maxDrawCalls;     ///< Maximum draw calls.
 		uint16_t maxTextureSize;   ///< Maximum texture size.
 		uint16_t maxViews;         ///< Maximum views.
-		uint16_t maxDrawCalls;     ///< Maximum draw calls.
 		uint8_t  maxFBAttachments; ///< Maximum frame buffer attachments.
+		uint8_t  numGPUs;          ///< Number of enumerated GPUs.
+		uint16_t vendorId;         ///< Selected GPU vendor id.
+		uint16_t deviceId;         ///< Selected GPU device id.
+
+		struct GPU
+		{
+			uint16_t vendorId;
+			uint16_t deviceId;
+		};
+
+		GPU gpu[4]; ///< Enumerated GPUs.
 
 		/// Supported texture formats.
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_NONE` - not supported
@@ -508,6 +536,15 @@ namespace bgfx
 	///   default rendering backend will be selected.
 	///   See: `bgfx::RendererType`
 	///
+	/// @param _vendorId Vendor PCI id. If set to BGFX_PCI_ID_NONE it will select the first device.
+	///   - `BGFX_PCI_ID_NONE` - autoselect.
+	///   - `BGFX_PCI_ID_AMD` - AMD.
+	///   - `BGFX_PCI_ID_INTEL` - Intel.
+	///   - `BGFX_PCI_ID_NVIDIA` - nVidia.
+	///
+	/// @param _deviceId Device id. If set to 0 it will select first device, or device with
+	///   matching id.
+	///
 	/// @param _callback Provide application specific callback interface.
 	///   See: `bgfx::CallbackI`
 	///
@@ -517,7 +554,7 @@ namespace bgfx
 	///
 	/// @attention C99 equivalent is `bgfx_init`.
 	///
-	void init(RendererType::Enum _type = RendererType::Count, CallbackI* _callback = NULL, bx::ReallocatorI* _reallocator = NULL);
+	void init(RendererType::Enum _type = RendererType::Count, uint16_t _vendorId = BGFX_PCI_ID_NONE, uint16_t _deviceId = 0, CallbackI* _callback = NULL, bx::ReallocatorI* _reallocator = NULL);
 
 	/// Shutdown bgfx library.
 	///
@@ -525,16 +562,26 @@ namespace bgfx
 	///
 	void shutdown();
 
-	/// Reset graphic settings.
+	/// Reset graphic settings and back-buffer size.
 	///
-	/// @param _width Main window width.
-	/// @param _height Main window height.
+	/// @param _width Back-buffer width.
+	/// @param _height Back-buffer height.
 	/// @param _flags
 	///   - `BGFX_RESET_NONE` - No reset flags.
 	///   - `BGFX_RESET_FULLSCREEN` - Not supported yet.
 	///   - `BGFX_RESET_MSAA_X[2/4/8/16]` - Enable 2, 4, 8 or 16 x MSAA.
 	///   - `BGFX_RESET_VSYNC` - Enable V-Sync.
+	///   - `BGFX_RESET_MAXANISOTROPY` - Turn on/off max anisotropy.
 	///   - `BGFX_RESET_CAPTURE` - Begin screen capture.
+	///   - `BGFX_RESET_HMD` - HMD stereo rendering.
+	///   - `BGFX_RESET_HMD_DEBUG` - HMD stereo rendering debug mode.
+	///   - `BGFX_RESET_HMD_RECENTER` - HMD calibration.
+	///   - `BGFX_RESET_FLIP_AFTER_RENDER` - This flag  specifies where flip
+	///     occurs. Default behavior is that flip occurs before rendering new
+	///     frame. This flag only has effect when `BGFX_CONFIG_MULTITHREADED=0`.
+	///
+	/// @attention This call doesn't actually change window size, it just
+	///   resizes back-buffer. Windowing code has to change window size.
 	///
 	/// @attention C99 equivalent is `bgfx_reset`.
 	///
@@ -583,8 +630,11 @@ namespace bgfx
 
 	/// Make reference to data to pass to bgfx. Unlike `bgfx::alloc` this call
 	/// doesn't allocate memory for data. It just copies pointer to data. You
-	/// must make sure data is available for at least 2 `bgfx::frame` calls.
-	const Memory* makeRef(const void* _data, uint32_t _size);
+	/// can pass `ReleaseFn` function pointer to release this memory after it's
+	/// consumed, or you must make sure data is available for at least 2
+	/// `bgfx::frame` calls. `ReleaseFn` function must be able to be called
+	/// called from any thread.
+	const Memory* makeRef(const void* _data, uint32_t _size, ReleaseFn _releaseFn = NULL, void* _userData = NULL);
 
 	/// Set debug flags.
 	///
@@ -618,8 +668,19 @@ namespace bgfx
 
 	/// Create static index buffer.
 	///
-	/// @remarks
-	///   Only 16-bit index buffer is supported.
+	/// @param _mem Index buffer data.
+	/// @param _flags Buffer creation flags.
+	///   - `BGFX_BUFFER_NONE` - No flags.
+	///   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	///   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	///       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	///   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	///   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if different amount of
+	///       data is passed. If this flag is not specified if more data is passed on update buffer
+	///       will be trimmed to fit existing buffer size. This flag has effect only on dynamic
+	///       buffers.
+	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	///       index buffers.
 	///
 	IndexBufferHandle createIndexBuffer(const Memory* _mem, uint8_t _flags = BGFX_BUFFER_NONE);
 
@@ -644,24 +705,35 @@ namespace bgfx
 	///
 	/// @param _num Number of indices.
 	/// @param _flags Buffer creation flags.
-	///   `BGFX_BUFFER_COMPUTE_READ` - compute shader will read buffer.
-	///   `BGFX_BUFFER_COMPUTE_WRITE` - compute shader will write into buffer.
-	///   `BGFX_BUFFER_ALLOW_RESIZE` buffer can be resized if updated with different size buffer.
-	///
-	/// @remarks
-	///   1. Only 16-bit index buffer is supported.
-	///
-	///   2. When buffer is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated
-	///      from CPU.
+	///   - `BGFX_BUFFER_NONE` - No flags.
+	///   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	///   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	///       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	///   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	///   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if different amount of
+	///       data is passed. If this flag is not specified if more data is passed on update buffer
+	///       will be trimmed to fit existing buffer size. This flag has effect only on dynamic
+	///       buffers.
+	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	///       index buffers.
 	///
 	DynamicIndexBufferHandle createDynamicIndexBuffer(uint32_t _num, uint8_t _flags = BGFX_BUFFER_NONE);
 
 	/// Create dynamic index buffer and initialized it.
 	///
 	/// @param _mem Index buffer data.
-	///
-	/// @remarks
-	///   Only 16-bit index buffer is supported.
+	/// @param _flags Buffer creation flags.
+	///   - `BGFX_BUFFER_NONE` - No flags.
+	///   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	///   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	///       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	///   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	///   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if different amount of
+	///       data is passed. If this flag is not specified if more data is passed on update buffer
+	///       will be trimmed to fit existing buffer size. This flag has effect only on dynamic
+	///       buffers.
+	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	///       index buffers.
 	///
 	DynamicIndexBufferHandle createDynamicIndexBuffer(const Memory* _mem, uint8_t _flags = BGFX_BUFFER_NONE);
 
@@ -683,13 +755,17 @@ namespace bgfx
 	/// @param _num Number of vertices.
 	/// @param _decl Vertex declaration.
 	/// @param _flags Buffer creation flags.
-	///   `BGFX_BUFFER_COMPUTE_READ` - compute shader will read buffer.
-	///   `BGFX_BUFFER_COMPUTE_WRITE` - compute shader will write into buffer.
-	///   `BGFX_BUFFER_ALLOW_RESIZE` buffer can be resized if updated with different size buffer.
-	///
-	/// @remarks
-	///   When buffer is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated
-	///   from CPU.
+	///   - `BGFX_BUFFER_NONE` - No flags.
+	///   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	///   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	///       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	///   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	///   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if different amount of
+	///       data is passed. If this flag is not specified if more data is passed on update buffer
+	///       will be trimmed to fit existing buffer size. This flag has effect only on dynamic
+	///       buffers.
+	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	///       index buffers.
 	///
 	DynamicVertexBufferHandle createDynamicVertexBuffer(uint32_t _num, const VertexDecl& _decl, uint8_t _flags = BGFX_BUFFER_NONE);
 
@@ -697,6 +773,18 @@ namespace bgfx
 	///
 	/// @param _mem Vertex buffer data.
 	/// @param _decl Vertex declaration.
+	/// @param _flags Buffer creation flags.
+	///   - `BGFX_BUFFER_NONE` - No flags.
+	///   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.
+	///   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer
+	///       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.
+	///   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.
+	///   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if different amount of
+	///       data is passed. If this flag is not specified if more data is passed on update buffer
+	///       will be trimmed to fit existing buffer size. This flag has effect only on dynamic
+	///       buffers.
+	///   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on
+	///       index buffers.
 	///
 	DynamicVertexBufferHandle createDynamicVertexBuffer(const Memory* _mem, const VertexDecl& _decl, uint8_t _flags = BGFX_BUFFER_NONE);
 
@@ -852,6 +940,9 @@ namespace bgfx
 	///
 	TextureHandle createTexture2D(uint16_t _width, uint16_t _height, uint8_t _numMips, TextureFormat::Enum _format, uint32_t _flags = BGFX_TEXTURE_NONE, const Memory* _mem = NULL);
 
+	///
+	TextureHandle createTexture2D(BackbufferRatio::Enum _ratio, uint8_t _numMips, TextureFormat::Enum _format, uint32_t _flags = BGFX_TEXTURE_NONE);
+
 	/// Create 3D texture.
 	///
 	/// @param _width
@@ -948,6 +1039,9 @@ namespace bgfx
 	///
 	FrameBufferHandle createFrameBuffer(uint16_t _width, uint16_t _height, TextureFormat::Enum _format, uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP);
 
+	///
+	FrameBufferHandle createFrameBuffer(BackbufferRatio::Enum _ratio, TextureFormat::Enum _format, uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP);
+
 	/// Create frame buffer.
 	///
 	/// @param _num Number of texture attachments.
@@ -1036,6 +1130,14 @@ namespace bgfx
 	///
 	/// @remarks
 	///   This is debug only feature.
+	///
+	///   In graphics debugger view name will appear as:
+	///
+	///     "nnnce <view name>"
+	///      ^  ^^ ^
+	///      |  |+-- eye (L/R)
+	///      |  +-- compute (C)
+	///      +-- view id
 	///
 	void setViewName(uint8_t _id, const char* _name);
 

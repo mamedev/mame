@@ -157,7 +157,7 @@ private:
 	// opcode descriptor arrays
 	simple_list<opcode_desc> m_desc_live_list;      // list of live descriptions
 	fixed_allocator<opcode_desc> m_desc_allocator;  // fixed allocator for descriptions
-	dynamic_array<opcode_desc *> m_desc_array;      // array of descriptions in PC order
+	std::vector<opcode_desc *> m_desc_array;      // array of descriptions in PC order
 };
 
 

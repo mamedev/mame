@@ -123,10 +123,10 @@ static const int tune2[96*6] = {
 /*
  * The theme from Phoenix, a sad little tune.
  * Gerald Coy:
- *   The starting song from Phoenix is coming from a old french movie and
+ *   The starting song from Phoenix comes from an old French movie and
  *   it's called : "Jeux interdits" which means "unallowed games"  ;-)
  * Mirko Buffoni:
- *   It's called "Sogni proibiti" in italian, by Anonymous.
+ *   It's called "Sogni proibiti" in Italian, by Anonymous.
  * Magic*:
  *   This song is a classical piece called "ESTUDIO" from M.A.Robira.
  */

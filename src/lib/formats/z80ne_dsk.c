@@ -177,7 +177,7 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	UINT8 *track_data;
 	void *track_data_v;
 	UINT32 max_track_size;
-	dynamic_array<int> sector_map;
+	std::vector<int> sector_map;
 	dynamic_buffer local_sector;
 	int local_sector_size;
 	int sector_position;
@@ -208,7 +208,8 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 	track_data = (UINT8 *) track_data_v;
 
 	/* set up sector map */
-	sector_map.resize_and_clear(sectors, 0xFF);
+	sector_map.resize(sectors);
+	memset(&sector_map, 0xff, sectors);
 
 	physical_sector = 0;
 	for (logical_sector = 0; logical_sector < sectors; logical_sector++)
@@ -231,7 +232,8 @@ static floperr_t z80ne_dmk_format_track(floppy_image_legacy *floppy, int head, i
 							sector_length +
 							DMK_DATA_CRC_LEN +
 							DMK_DATA_GAP_LEN);
-	local_sector.resize_and_clear(local_sector_size);
+	local_sector.resize(local_sector_size);
+	memset(&local_sector, 0, local_sector_size);
 
 	/* set up track table of contents */
 	physical_sector = 0;
@@ -391,7 +393,8 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image_legacy *floppy, int
 							DMK_ID_GAP_LEN +
 							DMK_DAM_LEN +
 							DMK_DATA_GAP_LEN);
-	local_idam.resize_and_clear(local_idam_size);
+	local_idam.resize(local_idam_size);
+	memset(&local_idam[0], 0, local_idam_size);
 
 	/* search for matching IDAM */
 	for (i = 0; i < DMK_TOC_LEN / 2; i++)
@@ -570,7 +573,8 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int
 
 	/* set up a local physical sector space (DAM + data + crc + GAP) */
 	local_sector_size = (DMK_DAM_LEN + sector_length + DMK_DATA_CRC_LEN + DMK_DATA_GAP_LEN);
-	local_sector.resize_and_clear(local_sector_size);
+	local_sector.resize(local_sector_size);
+	memset(&local_sector, 0, local_sector_size);
 
 	/* get sector data */
 	/* create a local copy of sector data including DAM (for crc calculation) */
@@ -582,7 +586,7 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int
 	crc_on_disk += local_sector[sector_length + 1 + 1];
 
 	/* crc calculated including DAM */
-	calculated_crc = ccitt_crc16(0xffff, local_sector, sector_length+1);
+	calculated_crc = ccitt_crc16(0xffff, &local_sector[0], sector_length+1);
 	if (calculated_crc != crc_on_disk)
 	{
 		err = FLOPPY_ERROR_INVALIDIMAGE;
@@ -590,7 +594,7 @@ static floperr_t internal_z80ne_dmk_read_sector(floppy_image_legacy *floppy, int
 	}
 
 	/* copy local sector data excluding DAM */
-	memcpy(buffer, local_sector+1, MIN(sector_length, buflen));
+	memcpy(buffer, &local_sector[1], MIN(sector_length, buflen));
 
 	done:
 	return err;
@@ -615,7 +619,8 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image_legacy *floppy, in
 
 	/* set up a local physical sector space */
 	local_sector_size = (DMK_DAM_LEN + sector_length + DMK_DATA_CRC_LEN + DMK_DATA_GAP_LEN);
-	local_sector.resize_and_clear(local_sector_size);
+	local_sector.resize(local_sector_size);
+	memset(&local_sector[0], 0, local_sector_size);
 	if(!ddam)
 		local_sector[0] = 0xFB;
 	else
@@ -629,7 +634,7 @@ static floperr_t internal_z80ne_dmk_write_sector(floppy_image_legacy *floppy, in
 
 	memcpy(&local_sector[1], buffer, buflen);
 
-	crc = ccitt_crc16(0xffff, local_sector, DMK_DAM_LEN + sector_length);
+	crc = ccitt_crc16(0xffff, &local_sector[0], DMK_DAM_LEN + sector_length);
 	local_sector[DMK_DAM_LEN + sector_length + 0] = crc >> 8;
 	local_sector[DMK_DAM_LEN + sector_length + 1] = crc >> 0;
 

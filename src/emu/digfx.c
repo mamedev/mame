@@ -121,8 +121,8 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 
 	// local variables to hold mutable copies of gfx layout data
 	gfx_layout glcopy;
-	dynamic_array<UINT32> extxoffs(0);
-	dynamic_array<UINT32> extyoffs(0);
+	std::vector<UINT32> extxoffs(0);
+	std::vector<UINT32> extyoffs(0);
 
 	// loop over all elements
 	for (int curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
@@ -206,8 +206,8 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 			memcpy(&extyoffs[0], (glcopy.extyoffs != NULL) ? glcopy.extyoffs : glcopy.yoffset, glcopy.height * sizeof(UINT32));
 
 			// always use the extended offsets here
-			glcopy.extxoffs = extxoffs;
-			glcopy.extyoffs = extyoffs;
+			glcopy.extxoffs = &extxoffs[0];
+			glcopy.extyoffs = &extyoffs[0];
 
 			// expand X and Y by the scale factors
 			if (xscale > 1)
@@ -319,15 +319,15 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 		if (region != NULL && GFXENTRY_ISROM(gfx.flags))
 		{
 			// resolve the region
-			astring gfxregion;
+			std::string gfxregion;
 			if (GFXENTRY_ISDEVICE(gfx.flags))
-				device().subtag(gfxregion, region);
+				gfxregion = device().subtag(region);
 			else
-				device().owner()->subtag(gfxregion, region);
+				gfxregion = device().owner()->subtag(region);
 
-			UINT32 region_length = valid.region_length(gfxregion);
+			UINT32 region_length = valid.region_length(gfxregion.c_str());
 			if (region_length == 0)
-				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.cstr());
+				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.c_str());
 
 			// if we have a valid region, and we're not using auto-sizing, check the decode against the region length
 			else if (!IS_FRAC(layout.total))

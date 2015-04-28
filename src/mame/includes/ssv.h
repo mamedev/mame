@@ -106,9 +106,9 @@ public:
 	DECLARE_WRITE16_MEMBER(scroll_w);
 	DECLARE_READ16_MEMBER(gdfs_eeprom_r);
 	DECLARE_WRITE16_MEMBER(gdfs_eeprom_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	
+
 	DECLARE_DRIVER_INIT(gdfs);
 	DECLARE_DRIVER_INIT(sxyreac2);
 	DECLARE_DRIVER_INIT(hypreac2);
@@ -135,16 +135,16 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(gdfs);
 	DECLARE_VIDEO_START(eaglshot);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gdfs_interrupt);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	
+
 	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,int shadow);
 	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);

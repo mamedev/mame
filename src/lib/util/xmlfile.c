@@ -698,7 +698,7 @@ static void expat_data(void *data, const XML_Char *s, int len)
 	if ((*curnode)->value != NULL)
 	{
 		memcpy(newdata, (*curnode)->value, oldlen);
-		free((*curnode)->value);
+		free((void *)(*curnode)->value);
 	}
 	(*curnode)->value = newdata;
 

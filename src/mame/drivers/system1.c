@@ -3660,9 +3660,8 @@ ROM_START( raflesia )
 	ROM_LOAD( "epr-7410.05",    0xc000, 0x4000, CRC(ced74789) SHA1(d0ad845bfe83412ac8d43125e1c50d0581a5b47e) ) /* epr-7410.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
-ROM_END
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
+	ROM_END
 
 
 ROM_START( wboy )
@@ -3692,11 +3691,17 @@ ROM_START( wboy )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+
+/* Wonder Boy (Escape, Sega license)
+PCB: 834-3984-09 WONDER BOY
+CPU: 317-0003 (encrypted Z80 @ IC137)
+PAL: 315-5063 (PAL @ IC67)
+*/
 ROM_START( wboyo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-.116",       0x0000, 0x4000, CRC(51d27534) SHA1(1cbc7201aacde89857f83b2600f309b514c5e758) ) /* encrypted */
-	ROM_LOAD( "epr-.109",       0x4000, 0x4000, CRC(e29d1cd1) SHA1(f6ff4a6fffea77cc5706549bb2d8bf9e96ed0be0) ) /* encrypted */
-	ROM_LOAD( "epr-7491.96",    0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) )
+	ROM_LOAD( "epr-7532.116",   0x0000, 0x4000, CRC(51d27534) SHA1(1cbc7201aacde89857f83b2600f309b514c5e758) ) /* encrypted */
+	ROM_LOAD( "epr-7533.109",   0x4000, 0x4000, CRC(e29d1cd1) SHA1(f6ff4a6fffea77cc5706549bb2d8bf9e96ed0be0) ) /* encrypted */
+	ROM_LOAD( "epr-7534.96",    0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) ) /* same contents as epr-7491.96 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7498.120",   0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) )

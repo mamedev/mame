@@ -109,7 +109,7 @@ READ32_MEMBER(generic_rom_linear_device::read32_rom)
 
 READ8_MEMBER(generic_romram_plain_device::read_ram)
 {
-	if (offset < m_ram.bytes())
+	if (offset < m_ram.size())
 		return m_ram[offset];
 	else
 		return 0xff;
@@ -117,6 +117,6 @@ READ8_MEMBER(generic_romram_plain_device::read_ram)
 
 WRITE8_MEMBER(generic_romram_plain_device::write_ram)
 {
-	if (offset < m_ram.bytes())
+	if (offset < m_ram.size())
 		m_ram[offset] = data;
 }

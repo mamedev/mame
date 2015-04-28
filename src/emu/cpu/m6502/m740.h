@@ -73,7 +73,7 @@ public:
 
 		static const disasm_entry disasm_entries[0x200];
 
-		virtual void state_string_export(const device_state_entry &entry, astring &string);
+		virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 		virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 		virtual void do_exec_full();

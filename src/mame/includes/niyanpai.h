@@ -19,9 +19,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	int m_musobana_inputport;
-	int m_musobana_outcoin_flag;
+	required_device<cpu_device> m_maincpu;
+	required_device<tmp68301_device> m_tmp68301;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
 
+	// common
 	int m_scrollx[VRAM_MAX];
 	int m_scrolly[VRAM_MAX];
 	int m_blitter_destx[VRAM_MAX];
@@ -45,55 +50,53 @@ public:
 	UINT16 *m_palette_ptr;
 	UINT8 *m_clut[VRAM_MAX];
 	int m_flipscreen_old[VRAM_MAX];
-	DECLARE_READ8_MEMBER(niyanpai_sound_r);
-	DECLARE_WRITE16_MEMBER(niyanpai_sound_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_soundclr_w);
+	emu_timer *m_blitter_timer;
 
-	DECLARE_READ8_MEMBER(cpu_portd_r);
-	DECLARE_WRITE8_MEMBER(cpu_porta_w);
-	DECLARE_WRITE8_MEMBER(cpu_portb_w);
-	DECLARE_WRITE8_MEMBER(cpu_portc_w);
-	DECLARE_WRITE8_MEMBER(cpu_porte_w);
+	// musobana and derived machine configs
+	int m_musobana_inputport;
+	int m_musobana_outcoin_flag;
+	UINT8 m_motor_on;
 
-	DECLARE_READ16_MEMBER(niyanpai_dipsw_r);
+	// common
+	DECLARE_WRITE8_MEMBER(soundbank_w);
+	DECLARE_WRITE8_MEMBER(soundlatch_clear_w);
+	DECLARE_READ16_MEMBER(dipsw_r);
+	DECLARE_READ16_MEMBER(palette_r);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(blitter_0_w);
+	DECLARE_WRITE8_MEMBER(blitter_1_w);
+	DECLARE_WRITE8_MEMBER(blitter_2_w);
+	DECLARE_READ8_MEMBER(blitter_0_r);
+	DECLARE_READ8_MEMBER(blitter_1_r);
+	DECLARE_READ8_MEMBER(blitter_2_r);
+	DECLARE_WRITE8_MEMBER(clut_0_w);
+	DECLARE_WRITE8_MEMBER(clut_1_w);
+	DECLARE_WRITE8_MEMBER(clut_2_w);
+	DECLARE_WRITE8_MEMBER(clutsel_0_w);
+	DECLARE_WRITE8_MEMBER(clutsel_1_w);
+	DECLARE_WRITE8_MEMBER(clutsel_2_w);
+	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
+
+	// musobana and derived machine configs
 	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
 	DECLARE_WRITE16_MEMBER(musobana_inputport_w);
-	DECLARE_READ16_MEMBER(niyanpai_palette_r);
-	DECLARE_WRITE16_MEMBER(niyanpai_palette_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_blitter_0_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_blitter_1_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_blitter_2_w);
-	DECLARE_READ8_MEMBER(niyanpai_blitter_0_r);
-	DECLARE_READ8_MEMBER(niyanpai_blitter_1_r);
-	DECLARE_READ8_MEMBER(niyanpai_blitter_2_r);
-	DECLARE_WRITE8_MEMBER(niyanpai_clut_0_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_clut_1_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_clut_2_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_clutsel_0_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_clutsel_1_w);
-	DECLARE_WRITE8_MEMBER(niyanpai_clutsel_2_w);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
+
 	DECLARE_DRIVER_INIT(niyanpai);
-	DECLARE_WRITE16_MEMBER(tmp68301_parallel_port_w);
-	UINT8 m_motor_on;
-	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_niyanpai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(niyanpai_interrupt);
-	int niyanpai_blitter_r(int vram, int offset);
-	void niyanpai_blitter_w(int vram, int offset, UINT8 data);
-	void niyanpai_clutsel_w(int vram, UINT8 data);
-	void niyanpai_clut_w(int vram, int offset, UINT8 data);
-	void niyanpai_vramflip(int vram);
+	DECLARE_MACHINE_START(musobana);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	int blitter_r(int vram, int offset);
+	void blitter_w(int vram, int offset, UINT8 data);
+	void clutsel_w(int vram, UINT8 data);
+	void clut_w(int vram, int offset, UINT8 data);
+	void vramflip(int vram);
 	void update_pixel(int vram, int x, int y);
-	void niyanpai_gfxdraw(int vram);
-	void niyanpai_soundbank_w(int data);
-	required_device<cpu_device> m_maincpu;
-	required_device<tmp68301_device> m_tmp68301;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	void gfxdraw(int vram);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

@@ -39,17 +39,23 @@ class rmhaihai_state : public driver_device
 public:
 	rmhaihai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram") { }
 
-	int m_gfxbank;
+	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_videoram;
+
 	tilemap_t *m_bg_tilemap;
 	int m_keyboard_cmd;
+	int m_gfxbank;
+
 	DECLARE_WRITE8_MEMBER(rmhaihai_videoram_w);
 	DECLARE_WRITE8_MEMBER(rmhaihai_colorram_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -58,14 +64,15 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(themj_rombank_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
+
 	DECLARE_DRIVER_INIT(rmhaihai);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start();
+	DECLARE_MACHINE_START(themj);
 	DECLARE_MACHINE_RESET(themj);
-	UINT32 screen_update_rmhaihai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 
@@ -95,9 +102,12 @@ void rmhaihai_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(rmhaihai_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 		8, 8, 64, 32);
+
+	save_item(NAME(m_keyboard_cmd));
+	save_item(NAME(m_gfxbank));
 }
 
-UINT32 rmhaihai_state::screen_update_rmhaihai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -190,16 +200,21 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 
 WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
-	int bank = data & 0x03;
-logerror("banksw %d\n",bank);
-	membank("bank1")->set_base(rom + bank*0x4000);
-	membank("bank2")->set_base(rom + bank*0x4000 + 0x2000);
+	logerror("banksw %d\n", data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
+	membank("bank2")->set_entry(data & 0x03);
+}
+
+MACHINE_START_MEMBER(rmhaihai_state,themj)
+{
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x12000, 0x4000);
 }
 
 MACHINE_RESET_MEMBER(rmhaihai_state,themj)
 {
-	themj_rombank_w(m_maincpu->space(AS_IO), 0, 0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 
@@ -465,7 +480,7 @@ static MACHINE_CONFIG_START( rmhaihai, rmhaihai_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update_rmhaihai)
+	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rmhaihai)
@@ -503,6 +518,7 @@ static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
 	MCFG_CPU_PROGRAM_MAP(themj_map)
 	MCFG_CPU_IO_MAP(themj_io_map)
 
+	MCFG_MACHINE_START_OVERRIDE(rmhaihai_state,themj)
 	MCFG_MACHINE_RESET_OVERRIDE(rmhaihai_state,themj)
 
 	/* video hardware */
@@ -678,8 +694,8 @@ DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 }
 
 
-GAME( 1985, rmhaihai, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan)", 0 )
-GAME( 1985, rmhaihib, rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", 0 )
-GAME( 1986, rmhaijin, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", 0 )
-GAME( 1986, rmhaisei, 0,        rmhaisei, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", 0 )
-GAME( 1987, themj,    0,        themj,    rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", 0 )
+GAME( 1985, rmhaihai, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, rmhaihib, rmhaihai, rmhaihai, rmhaihib, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rmhaijin, 0,        rmhaihai, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Alba",  "Real Mahjong Haihai Jinji Idou Hen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rmhaisei, 0,        rmhaisei, rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "Real Mahjong Haihai Seichouhen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, themj,    0,        themj,    rmhaihai, rmhaihai_state, rmhaihai, ROT0, "Visco", "The Mah-jong (Japan)", GAME_SUPPORTS_SAVE )

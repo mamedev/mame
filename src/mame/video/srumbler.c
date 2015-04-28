@@ -52,7 +52,7 @@ void srumbler_state::video_start()
 
 	m_bg_tilemap->set_transmask(0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1,0x07ff,0xf800); /* split type 1 has pens 0-10 transparent in front half */
-	
+
 	save_item(NAME(m_scroll));
 }
 

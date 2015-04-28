@@ -291,7 +291,8 @@ void tc0480scp_device::device_start()
 		m_tilemap[3][i]->set_scroll_rows(512);
 	}
 
-	m_ram.resize_and_clear(TC0480SCP_RAM_SIZE / 2);
+	m_ram.resize(TC0480SCP_RAM_SIZE / 2);
+	memset(&m_ram[0], 0, TC0480SCP_RAM_SIZE);
 	set_layer_ptrs();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
@@ -383,37 +384,37 @@ void tc0480scp_device::set_layer_ptrs()
 {
 	if (!m_dblwidth)
 	{
-		m_bg_ram[0]       = m_ram + 0x0000; //0000
-		m_bg_ram[1]       = m_ram + 0x0800; //1000
-		m_bg_ram[2]       = m_ram + 0x1000; //2000
-		m_bg_ram[3]       = m_ram + 0x1800; //3000
-		m_bgscroll_ram[0] = m_ram + 0x2000; //4000
-		m_bgscroll_ram[1] = m_ram + 0x2200; //4400
-		m_bgscroll_ram[2] = m_ram + 0x2400; //4800
-		m_bgscroll_ram[3] = m_ram + 0x2600; //4c00
-		m_rowzoom_ram[2]  = m_ram + 0x3000; //6000
-		m_rowzoom_ram[3]  = m_ram + 0x3200; //6400
-		m_bgcolumn_ram[2] = m_ram + 0x3400; //6800
-		m_bgcolumn_ram[3] = m_ram + 0x3600; //6c00
-		m_tx_ram          = m_ram + 0x6000; //c000
-		m_char_ram    = m_ram + 0x7000; //e000
+		m_bg_ram[0]       = &m_ram[0x0000]; //0000
+		m_bg_ram[1]       = &m_ram[0x0800]; //1000
+		m_bg_ram[2]       = &m_ram[0x1000]; //2000
+		m_bg_ram[3]       = &m_ram[0x1800]; //3000
+		m_bgscroll_ram[0] = &m_ram[0x2000]; //4000
+		m_bgscroll_ram[1] = &m_ram[0x2200]; //4400
+		m_bgscroll_ram[2] = &m_ram[0x2400]; //4800
+		m_bgscroll_ram[3] = &m_ram[0x2600]; //4c00
+		m_rowzoom_ram[2]  = &m_ram[0x3000]; //6000
+		m_rowzoom_ram[3]  = &m_ram[0x3200]; //6400
+		m_bgcolumn_ram[2] = &m_ram[0x3400]; //6800
+		m_bgcolumn_ram[3] = &m_ram[0x3600]; //6c00
+		m_tx_ram          = &m_ram[0x6000]; //c000
+		m_char_ram        = &m_ram[0x7000]; //e000
 	}
 	else
 	{
-		m_bg_ram[0]       = m_ram + 0x0000; //0000
-		m_bg_ram[1]       = m_ram + 0x1000; //2000
-		m_bg_ram[2]       = m_ram + 0x2000; //4000
-		m_bg_ram[3]       = m_ram + 0x3000; //6000
-		m_bgscroll_ram[0] = m_ram + 0x4000; //8000
-		m_bgscroll_ram[1] = m_ram + 0x4200; //8400
-		m_bgscroll_ram[2] = m_ram + 0x4400; //8800
-		m_bgscroll_ram[3] = m_ram + 0x4600; //8c00
-		m_rowzoom_ram[2]  = m_ram + 0x5000; //a000
-		m_rowzoom_ram[3]  = m_ram + 0x5200; //a400
-		m_bgcolumn_ram[2] = m_ram + 0x5400; //a800
-		m_bgcolumn_ram[3] = m_ram + 0x5600; //ac00
-		m_tx_ram          = m_ram + 0x6000; //c000
-		m_char_ram    = m_ram + 0x7000; //e000
+		m_bg_ram[0]       = &m_ram[0x0000]; //0000
+		m_bg_ram[1]       = &m_ram[0x1000]; //2000
+		m_bg_ram[2]       = &m_ram[0x2000]; //4000
+		m_bg_ram[3]       = &m_ram[0x3000]; //6000
+		m_bgscroll_ram[0] = &m_ram[0x4000]; //8000
+		m_bgscroll_ram[1] = &m_ram[0x4200]; //8400
+		m_bgscroll_ram[2] = &m_ram[0x4400]; //8800
+		m_bgscroll_ram[3] = &m_ram[0x4600]; //8c00
+		m_rowzoom_ram[2]  = &m_ram[0x5000]; //a000
+		m_rowzoom_ram[3]  = &m_ram[0x5200]; //a400
+		m_bgcolumn_ram[2] = &m_ram[0x5400]; //a800
+		m_bgcolumn_ram[3] = &m_ram[0x5600]; //ac00
+		m_tx_ram          = &m_ram[0x6000]; //c000
+		m_char_ram        = &m_ram[0x7000]; //e000
 	}
 }
 
@@ -690,7 +691,7 @@ Historical Issues
    TC0480SCP_ctrl_word_write.
 
 4) Zoom movement was jagged: improved by bringing in scroll delta
-   values... but the results are noticably imperfect.
+   values... but the results are noticeably imperfect.
 
 **********************************************************************/
 

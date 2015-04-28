@@ -119,12 +119,12 @@ void minx_cpu_device::device_start()
 }
 
 
-void minx_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void minx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf( "%c%c%c%c%c%c%c%c-%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c-%c%c%c%c%c",
 				m_F & FLAG_I ? 'I' : '.',
 				m_F & FLAG_D ? 'D' : '.',
 				m_F & FLAG_L ? 'L' : '.',

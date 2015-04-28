@@ -1665,7 +1665,7 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 
 	dynamic_buffer tmp(0x8000);
 	rom = memregion("audiocpu")->base() + 0x8000;
-	memcpy(tmp, rom, 0x8000);
+	memcpy(&tmp[0], rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
 	{

@@ -339,7 +339,7 @@ GFXDECODE_END
 void fgoal_state::machine_start()
 {
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
-	
+
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
 	save_item(NAME(m_current_color));

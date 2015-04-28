@@ -188,15 +188,20 @@ public:
 		m_serflash(*this, "game"),
 		m_eeprom(*this, "eeprom"),
 		m_ram(*this, "mainram"),
+		m_rombase(*this, "rombase"),
 		m_blitrate(*this, "BLITRATE"),
-		m_eepromout(*this, "EEPROMOUT") { }
+		m_eepromout(*this, "EEPROMOUT"),
+		m_idleramoffs(0),
+		m_idlepc(0)
+	 { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
 	required_device<serflash_device> m_serflash;
 	required_device<rtc9701_device> m_eeprom;
 
 	required_shared_ptr<UINT64> m_ram;
+	required_shared_ptr<UINT64> m_rombase;
 
 	DECLARE_READ8_MEMBER(cv1k_flash_io_r);
 	DECLARE_WRITE8_MEMBER(cv1k_flash_io_w);
@@ -209,13 +214,7 @@ public:
 	virtual void machine_reset();
 
 	/* game specific */
-	DECLARE_READ64_MEMBER(mushisam_speedup_r);
-	DECLARE_READ64_MEMBER(ibara_speedup_r);
-	DECLARE_READ64_MEMBER(espgal2_speedup_r);
-	DECLARE_READ64_MEMBER(mushitam_speedup_r);
-	DECLARE_READ64_MEMBER(pinkswts_speedup_r);
-	DECLARE_READ64_MEMBER(deathsml_speedup_r);
-	DECLARE_READ64_MEMBER(dpddfk_speedup_r);
+	DECLARE_READ64_MEMBER(cv1k_speedup_r);
 	DECLARE_DRIVER_INIT(mushisam);
 	DECLARE_DRIVER_INIT(ibara);
 	DECLARE_DRIVER_INIT(espgal2);
@@ -226,6 +225,10 @@ public:
 
 	required_ioport m_blitrate;
 	required_ioport m_eepromout;
+
+	UINT32 m_idleramoffs;
+	UINT32 m_idlepc;
+	void install_cv1k_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed);
 };
 
 
@@ -327,7 +330,7 @@ WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
 
 
 static ADDRESS_MAP_START( cv1k_map, AS_PROGRAM, 64, cv1k_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP // mmmbanc writes here on startup for some reason..
+	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0c7fffff) AM_RAM AM_SHARE("mainram") AM_MIRROR(0x800000) // work RAM
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(cv1k_flash_io_r, cv1k_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
@@ -337,7 +340,7 @@ static ADDRESS_MAP_START( cv1k_map, AS_PROGRAM, 64, cv1k_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cv1k_d_map, AS_PROGRAM, 64, cv1k_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP // mmmbanc writes here on startup for some reason..
+	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP AM_SHARE("rombase") // mmmbanc writes here on startup for some reason..
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("mainram") // work RAM
 	AM_RANGE(0x10000000, 0x10000007) AM_READWRITE8(cv1k_flash_io_r, cv1k_flash_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x10400000, 0x10400007) AM_DEVWRITE8("ymz770", ymz770_device, write, U64(0xffffffffffffffff))
@@ -809,85 +812,72 @@ ROM_START( dsmbl )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(3b673326) SHA1(1ae847eb4e752fef1d72081d82344f0ad0537c31) )
 ROM_END
 
+ROM_START( dfkbl )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(8092ca9d) SHA1(75e16cd7c8d0f9c715115ce12da5c245fbcd2416) ) /* (2010/1/18 BLACK LABEL) */
 
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(29f9d73a) SHA1(ed978ab5e3ad8c05e7778a91bfb5aaa17b0f72d9) )
 
-READ64_MEMBER( cv1k_state::mushisam_speedup_r )
+	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(36d4093b) SHA1(4aed7e2f7c0d2c9bceeb110a9907d8d99d55f4c3) )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(31f9eb0a) SHA1(322158779e969bb321241065dd49c1167b91ff6c) )
+ROM_END
+
+READ64_MEMBER( cv1k_state::cv1k_speedup_r )
 {
-	if (m_maincpu->pc()== 0xc04a2aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // mushisam / mushisamb
-//  else printf("read %08x\n", m_maincpu->pc());
-	return m_ram[0x00024d8/8];
+	if (m_maincpu->pc()== m_idlepc ) m_maincpu->spin_until_time( attotime::from_usec(10));
+	return m_ram[m_idleramoffs/8];
 }
+
+void cv1k_state::install_cv1k_speedups(UINT32 idleramoff, UINT32 idlepc, bool is_typed)
+{
+	m_idleramoffs = idleramoff;
+	m_idlepc = idlepc;
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::cv1k_speedup_r),this));
+
+	m_maincpu->add_fastram(0x00000000, 0x003fffff, TRUE,  m_rombase);
+
+	m_maincpu->add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, FALSE,  m_ram);
+	m_maincpu->add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, FALSE,  m_ram + ((m_idleramoffs+8)/8));
+}
+
 
 DRIVER_INIT_MEMBER(cv1k_state,mushisam)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0024d8, 0xc0024df, read64_delegate(FUNC(cv1k_state::mushisam_speedup_r),this));
-}
-
-READ64_MEMBER( cv1k_state::ibara_speedup_r )
-{
-	if (m_maincpu->pc()==  0xc04a0aa ) m_maincpu->spin_until_time( attotime::from_usec(10)); // ibara / mushisama
-	return m_ram[0x0022f0/8];
+	install_cv1k_speedups(0x024d8, 0xc04a2aa, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,ibara)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0022f0, 0xc0022f7, read64_delegate(FUNC(cv1k_state::ibara_speedup_r),this));
-}
-
-READ64_MEMBER( cv1k_state::espgal2_speedup_r )
-{
-	if (m_maincpu->pc()== 0xc05177a ) m_maincpu->spin_until_time( attotime::from_usec(10)); // espgal2
-	return m_ram[0x002310/8];
+	install_cv1k_speedups(0x022f0, 0xc04a0aa, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,espgal2)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc002310, 0xc002317, read64_delegate(FUNC(cv1k_state::espgal2_speedup_r),this));
-}
-
-READ64_MEMBER( cv1k_state::mushitam_speedup_r )
-{
-	if (m_maincpu->pc()==  0xc04a0da)  m_maincpu->spin_until_time( attotime::from_usec(10)); // mushitam / mushitama
-	return m_ram[0x0022f0/8];
+	install_cv1k_speedups(0x02310, 0xc05177a, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,mushitam)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0022f0, 0xc0022f7, read64_delegate(FUNC(cv1k_state::mushitam_speedup_r),this));
-}
-
-READ64_MEMBER( cv1k_state::pinkswts_speedup_r )
-{
-	// pinkswts / pinkswtsa / pinkswtsb / pinkswtsx / futari15 / futari15a / futari10 / futaribl / futariblj / ibarablk / ibarablka / mmpork / mmmbanc
-	if (m_maincpu->pc()== 0xc05176a ) m_maincpu->spin_until_time( attotime::from_usec(10));
-	return m_ram[0x002310/8];
+	install_cv1k_speedups(0x0022f0, 0xc04a0da, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,pinkswts)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc002310, 0xc002317, read64_delegate(FUNC(cv1k_state::pinkswts_speedup_r),this));
-}
-
-READ64_MEMBER( cv1k_state::deathsml_speedup_r )
-{
-	if (m_maincpu->pc()== 0xc0519a2 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // deathsml
-	return m_ram[0x002310/8];
+	install_cv1k_speedups(0x02310, 0xc05176a, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,deathsml)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc002310, 0xc002317, read64_delegate(FUNC(cv1k_state::deathsml_speedup_r),this));
-}
-
-READ64_MEMBER( cv1k_state::dpddfk_speedup_r )
-{
-	if (m_maincpu->pc()== 0xc1d1346 ) m_maincpu->spin_until_time( attotime::from_usec(10)); // dpddfk / dpddfk10 / dsmbl
-	return m_ram[0x002310/8];
+	install_cv1k_speedups(0x02310, 0xc0519a2, false);
 }
 
 DRIVER_INIT_MEMBER(cv1k_state,dpddfk)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc002310, 0xc002317, read64_delegate(FUNC(cv1k_state::dpddfk_speedup_r),this));
+	install_cv1k_speedups(0x02310, 0xc1d1346, true);
+
 }
 
 
@@ -923,12 +913,12 @@ GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "
 GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",       0 )
 GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",          0 )
 
+// CA015B Mushihime-Sama Futari Black Label
+GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label - Another Ver (2009/11/27 INTERNATIONAL BL)", 0 )
+GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",  0 )
+
 // CA016  Muchi Muchi Pork!
 GAME( 2007, mmpork,     0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                      0 )
-
-// CA015B Mushihime-Sama Futari Black Label
-GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label (2009/11/27 INTERNATIONAL BL)", 0 )
-GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, pinkswts,  ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",  0 )
 
 // CA017  Deathsmiles
 GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, deathsml,  ROT0,   "Cave (AMI license)", "Deathsmiles (2007/10/09 MASTER VER)",                             0 )
@@ -939,6 +929,9 @@ GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, dpddfk,    ROT0,   "
 // CA019  Do-Don-Pachi Dai-Fukkatsu
 GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, dpddfk,    ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23  MASTER VER 1.5)",    0 )
 GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, dpddfk,    ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16  MASTER VER)",        0 )
+
+// CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
+GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, dpddfk,    ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",     0 )
 
 // CMDL01 Medal Mahjong Moukari Bancho
 GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, pinkswts,  ROT0,   "Cave (AMI license)", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",            GAME_NOT_WORKING )

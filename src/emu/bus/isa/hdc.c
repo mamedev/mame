@@ -257,14 +257,13 @@ void isa8_hdc_device::device_reset()
 hard_disk_file *isa8_hdc_device::pc_hdc_file(int id)
 {
 	harddisk_image_device *img = NULL;
-	astring tempstring;
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring,"primary")));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("primary").c_str()));
 		break;
 	case 1:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag(tempstring,"slave")));
+		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("slave").c_str()));
 		break;
 	}
 	if ( img == NULL )
@@ -582,7 +581,7 @@ void isa8_hdc_device::hdc_command()
 	csb = 0x00;
 	error = 0;
 
-	buffer_ptr = buffer;
+	buffer_ptr = &buffer[0];
 	cmd = buffer[0];
 
 	get_drive();
@@ -716,7 +715,7 @@ void isa8_hdc_device::pc_hdc_data_w(int data)
 		if (LOG_HDC_DATA)
 			logerror("hdc_data_w $%02x: ", data);
 
-		buffer_ptr = buffer;
+		buffer_ptr = &buffer[0];
 		data_cnt = 6;   /* expect 6 bytes including this one */
 		status &= ~STA_READY;
 		status &= ~STA_INPUT;
@@ -792,8 +791,8 @@ void isa8_hdc_device::pc_hdc_reset_w(int data)
 	sector[0] = sector[1] = 0;
 	csb = 0;
 	status = STA_COMMAND | STA_READY;
-	memset(buffer, 0, buffer.count());
-	buffer_ptr = buffer;
+	memset(&buffer[0], 0, buffer.size());
+	buffer_ptr = &buffer[0];
 	data_cnt = 0;
 }
 

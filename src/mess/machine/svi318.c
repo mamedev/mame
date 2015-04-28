@@ -421,8 +421,8 @@ DRIVER_INIT_MEMBER(svi318_state, svi328_806)
 
 void svi318_state::machine_start()
 {
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG));
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	m_bios_rom = memregion("maincpu");
 
 	// 80 column card start
@@ -432,8 +432,8 @@ void svi318_state::machine_start()
 		// The upper 2KB will be set to FFs and will never be written to
 		m_svi806_ram.resize(0x1000);
 		save_item(NAME(m_svi806_ram));
-		memset(m_svi806_ram, 0x00, 0x800);
-		memset(m_svi806_ram + 0x800, 0xff, 0x800);
+		memset(&m_svi806_ram[0], 0x00, 0x800);
+		memset(&m_svi806_ram[0x800], 0xff, 0x800);
 
 		m_svi806_gfx = memregion("gfx1")->base();
 
@@ -649,7 +649,7 @@ void svi318_state::set_banks()
 	if (m_svi806_present)
 	{
 		if (m_svi806_ram_enabled)
-			m_bank4->set_base(m_svi806_ram);
+			m_bank4->set_base(&m_svi806_ram[0]);
 		else
 			m_bank4->set_base(m_bank_high2_ptr + 0x3000);
 	}

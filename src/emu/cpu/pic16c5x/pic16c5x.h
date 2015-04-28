@@ -81,7 +81,7 @@ public:
 	 *  the value if known (available in HEX dumps of the ROM).
 	 */
 	void pic16c5x_set_config(UINT16 data);
-	
+
 	// or with a macro
 	static void set_config_static(device_t &device, UINT16 data) { downcast<pic16c5x_device &>(device).m_temp_config = data; }
 
@@ -115,7 +115,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, astring &string);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 2; }
@@ -155,7 +155,7 @@ private:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
-	
+
 	// i/o handlers
 	devcb_read8 m_read_a;
 	devcb_read8 m_read_b;

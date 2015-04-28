@@ -2370,6 +2370,14 @@ ROM_START( puzznicb ) /* bootleg (original main board, bootleg sub-board without
 	ROM_LOAD16_BYTE( "ic9.bin",   0x00001, 0x10000, CRC(0f183340) SHA1(9eef7de801eb9763313f55a38e567b92fca3bfa6) )
 ROM_END
 
+ROM_START( puzznicba ) /* bootleg (original main board, bootleg sub-board without MCU) - marked PUZZNIC-2 008900 42 */
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "18.ic10",  0x00000, 0x20000, CRC(8349eb3b) SHA1(589dc99a22b3d7623b1ea6c1053f3b3dfe520547) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "19.ic9",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
+	ROM_LOAD16_BYTE( "20.ic8",  0x00001, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
+ROM_END
 /*
 
 Taito's Horse Shoe
@@ -2597,7 +2605,8 @@ GAME( 1989, flipull,   plotting, plotting,  plotting,  driver_device, 0,        
 GAME( 1989, puzznic,   0,        puzznic,   puzznic,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicj,  puzznic,  puzznic,   puzznic,   driver_device, 0,         ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
 GAME( 1989, puzznici,  puzznic,  puzznici,  puzznic,   driver_device, 0,         ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
-GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   driver_device, 0,         ROT0,   "bootleg", "Puzznic (bootleg)", 0 )
+GAME( 1989, puzznicb,  puzznic,  puzznici,  puzznic,   driver_device, 0,         ROT0,   "bootleg", "Puzznic (bootleg, set 1)", 0 )
+GAME( 1989, puzznicba, puzznic,  puzznici,  puzznic,   driver_device, 0,         ROT0,   "bootleg", "Puzznic (bootleg, set 2)", 0 )
 
 GAME( 1990, horshoes,  0,        horshoes,  horshoes,  driver_device, 0,         ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 

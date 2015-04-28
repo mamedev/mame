@@ -132,9 +132,9 @@ void debug_view_breakpoints::enumerate_sources()
 	disasm_interface_iterator iter(machine().root_device());
 	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
 	{
-		astring name;
-		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*global_alloc(debug_view_source(name.cstr(), &dasm->device())));
+		std::string name;
+		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
+		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
 	// reset the source to a known good entry
@@ -171,8 +171,8 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 		// Gather a sorted list of all the breakpoints for all the CPUs
 		gather_breakpoints();
 
-		int const bpIndex = pos.y - 1;
-		if ((bpIndex >= m_buffer.count()) || (bpIndex < 0))
+		int bpIndex = pos.y - 1;
+		if ((bpIndex >= m_buffer.size()) || (bpIndex < 0))
 			return;
 
 		// Enable / disable
@@ -187,16 +187,15 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 }
 
 
-void debug_view_breakpoints::pad_astring_to_length(astring& str, int len)
+void debug_view_breakpoints::pad_astring_to_length(std::string& str, int len)
 {
-	int diff = len - str.len();
+	int diff = len - str.length();
 	if (diff > 0)
 	{
-		astring buffer;
-		buffer.expand(diff);
+		std::string buffer;
 		for (int i = 0; i < diff; i++)
-			buffer.catprintf(" ");
-		str.catprintf("%s", buffer.cstr());
+			strcatprintf(buffer, " ");
+		strcatprintf(str, "%s", buffer.c_str());
 	}
 }
 
@@ -209,12 +208,12 @@ void debug_view_breakpoints::gather_breakpoints()
 		// Collect
 		device_debug &debugInterface = *source->device()->debug();
 		for (device_debug::breakpoint *bp = debugInterface.breakpoint_first(); bp != NULL; bp = bp->next())
-			m_buffer.append() = bp;
+			m_buffer.push_back(bp);
 	}
 
 	// And now for the sort
-	if (m_buffer.count() > 0)
-		qsort(&m_buffer[0], m_buffer.count(), sizeof(device_debug::breakpoint *), m_sortType);
+	if (!m_buffer.empty())
+		qsort(&m_buffer[0], m_buffer.size(), sizeof(device_debug::breakpoint *), m_sortType);
 }
 
 
@@ -230,46 +229,46 @@ void debug_view_breakpoints::view_update()
 
 	// Set the view region so the scroll bars update
 	m_total.x = tableBreaks[ARRAY_LENGTH(tableBreaks) - 1];
-	m_total.y = m_buffer.count() + 1;
+	m_total.y = m_buffer.size() + 1;
 	if (m_total.y < 10)
 		m_total.y = 10;
 
 	// Draw
-	debug_view_char *dest = m_viewdata;
-	astring         linebuf;
+	debug_view_char *dest = &m_viewdata[0];
+	std::string         linebuf;
 
 	// Header
 	if (m_visible.y > 0)
 	{
-		linebuf.reset();
-		linebuf.cat("ID");
-		if (m_sortType == &cIndexAscending) linebuf.cat('\\');
-		else if (m_sortType == &cIndexDescending) linebuf.cat('/');
+		linebuf.clear();
+		linebuf.append("ID");
+		if (m_sortType == &cIndexAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cIndexDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[0]);
-		linebuf.cat("En");
-		if (m_sortType == &cEnabledAscending) linebuf.cat('\\');
-		else if (m_sortType == &cEnabledDescending) linebuf.cat('/');
+		linebuf.append("En");
+		if (m_sortType == &cEnabledAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cEnabledDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[1]);
-		linebuf.cat("CPU");
-		if (m_sortType == &cCpuAscending) linebuf.cat('\\');
-		else if (m_sortType == &cCpuDescending) linebuf.cat('/');
+		linebuf.append("CPU");
+		if (m_sortType == &cCpuAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cCpuDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[2]);
-		linebuf.cat("Address");
-		if (m_sortType == &cAddressAscending) linebuf.cat('\\');
-		else if (m_sortType == &cAddressDescending) linebuf.cat('/');
+		linebuf.append("Address");
+		if (m_sortType == &cAddressAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cAddressDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[3]);
-		linebuf.cat("Condition");
-		if (m_sortType == &cConditionAscending) linebuf.cat('\\');
-		else if (m_sortType == &cConditionDescending) linebuf.cat('/');
+		linebuf.append("Condition");
+		if (m_sortType == &cConditionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cConditionDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[4]);
-		linebuf.cat("Action");
-		if (m_sortType == &cActionAscending) linebuf.cat('\\');
-		else if (m_sortType == &cActionDescending) linebuf.cat('/');
+		linebuf.append("Action");
+		if (m_sortType == &cActionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cActionDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[5]);
 
 		for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 		{
-			dest->byte = (i < linebuf.len()) ? linebuf[i] : ' ';
+			dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
 			dest->attrib = DCA_ANCILLARY;
 		}
 	}
@@ -278,28 +277,28 @@ void debug_view_breakpoints::view_update()
 	{
 		// Breakpoints
 		int bpi = row + m_topleft.y - 1;
-		if ((bpi < m_buffer.count()) && (bpi >= 0))
+		if ((bpi < m_buffer.size()) && (bpi >= 0))
 		{
 			device_debug::breakpoint *const bp = m_buffer[bpi];
 
-			linebuf.reset();
-			linebuf.catprintf("%2X", bp->index());
+			linebuf.clear();
+			strcatprintf(linebuf, "%2X", bp->index());
 			pad_astring_to_length(linebuf, tableBreaks[0]);
-			linebuf.cat(bp->enabled() ? 'X' : 'O');
+			linebuf.push_back(bp->enabled() ? 'X' : 'O');
 			pad_astring_to_length(linebuf, tableBreaks[1]);
-			linebuf.cat(bp->debugInterface()->device().tag());
+			linebuf.append(bp->debugInterface()->device().tag());
 			pad_astring_to_length(linebuf, tableBreaks[2]);
-			linebuf.cat(core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
+			linebuf.append(core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
 			pad_astring_to_length(linebuf, tableBreaks[3]);
 			if (strcmp(bp->condition(), "1"))
-				linebuf.cat(bp->condition());
+				linebuf.append(bp->condition());
 			pad_astring_to_length(linebuf, tableBreaks[4]);
-			linebuf.cat(bp->action());
+			linebuf.append(bp->action());
 			pad_astring_to_length(linebuf, tableBreaks[5]);
 
 			for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 			{
-				dest->byte = (i < linebuf.len()) ? linebuf[i] : ' ';
+				dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
 				dest->attrib = DCA_NORMAL;
 
 				// Color disabled breakpoints red

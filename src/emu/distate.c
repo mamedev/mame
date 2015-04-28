@@ -78,13 +78,13 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 
 	// override well-known symbols
 	if (index == STATE_GENPC)
-		m_symbol.cpy("CURPC");
+		m_symbol.assign("CURPC");
 	else if (index == STATE_GENPCBASE)
-		m_symbol.cpy("CURPCBASE");
+		m_symbol.assign("CURPCBASE");
 	else if (index == STATE_GENSP)
-		m_symbol.cpy("CURSP");
+		m_symbol.assign("CURSP");
 	else if (index == STATE_GENFLAGS)
-		m_symbol.cpy("CURFLAGS");
+		m_symbol.assign("CURFLAGS");
 }
 
 device_state_entry::device_state_entry(int index, device_state_interface *dev)
@@ -108,12 +108,12 @@ device_state_entry::device_state_entry(int index, device_state_interface *dev)
 
 device_state_entry &device_state_entry::formatstr(const char *_format)
 {
-	m_format.cpy(_format);
+	m_format.assign(_format);
 	m_default_format = false;
 
 	// set the DSF_CUSTOM_STRING flag by formatting with a NULL string
 	m_flags &= ~DSF_CUSTOM_STRING;
-	astring dummy;
+	std::string dummy;
 	format(dummy, NULL);
 
 	return *this;
@@ -135,7 +135,7 @@ void device_state_entry::format_from_mask()
 	int width = 0;
 	for (UINT64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
 		width++;
-	m_format.printf("%%0%dX", width);
+	strprintf(m_format,"%%0%dX", width);
 }
 
 
@@ -164,7 +164,7 @@ UINT64 device_state_entry::value() const
 //  pieces of indexed state as a string
 //-------------------------------------------------
 
-astring &device_state_entry::format(astring &dest, const char *string, bool maxout) const
+std::string &device_state_entry::format(std::string &dest, const char *string, bool maxout) const
 {
 	UINT64 result = value();
 
@@ -175,7 +175,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 	bool hitnonzero = false;
 	bool reset = true;
 	int width = 0;
-	for (const char *fptr = m_format; *fptr != 0; fptr++)
+	for (const char *fptr = m_format.c_str(); *fptr != 0; fptr++)
 	{
 		// reset any accumulated state
 		if (reset)
@@ -188,7 +188,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 		// if we're not within a format, then anything other than a % outputs directly
 		if (!percent && *fptr != '%')
 		{
-			dest.cat(fptr, 1);
+			dest.append(fptr, 1);
 			continue;
 		}
 
@@ -201,7 +201,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 					percent = true;
 				else
 				{
-					dest.cat(fptr, 1);
+					dest.append(fptr, 1);
 					percent = false;
 				}
 				break;
@@ -232,7 +232,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 				hitnonzero = false;
 				while (leadzero && width > 16)
 				{
-					dest.cat(" ");
+					dest.append(" ");
 					width--;
 				}
 				for (int digitnum = 15; digitnum >= 0; digitnum--)
@@ -241,11 +241,11 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 					if (digit != 0)
 					{
 						static const char hexchars[] = "0123456789ABCDEF";
-						dest.cat(&hexchars[digit], 1);
+						dest.append(&hexchars[digit], 1);
 						hitnonzero = true;
 					}
 					else if (hitnonzero || (leadzero && digitnum < width) || digitnum == 0)
-						dest.cat("0");
+						dest.append("0");
 				}
 				reset = true;
 				break;
@@ -257,7 +257,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 				hitnonzero = false;
 				while (leadzero && width > 22)
 				{
-					dest.cat(" ");
+					dest.append(" ");
 					width--;
 				}
 				for (int digitnum = 21; digitnum >= 0; digitnum--)
@@ -266,11 +266,11 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 					if (digit != 0)
 					{
 						static const char octchars[] = "01234567";
-						dest.cat(&octchars[digit], 1);
+						dest.append(&octchars[digit], 1);
 						hitnonzero = true;
 					}
 					else if (hitnonzero || (leadzero && digitnum < width) || digitnum == 0)
-						dest.cat("0");
+						dest.append("0");
 				}
 				reset = true;
 				break;
@@ -282,12 +282,12 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 				if ((result & m_datamask) > (m_datamask >> 1))
 				{
 					result = -result & m_datamask;
-					dest.cat("-");
+					dest.append("-");
 					width--;
 				}
 				else if (explicitsign)
 				{
-					dest.cat("+");
+					dest.append("+");
 					width--;
 				}
 				// fall through to unsigned case
@@ -299,7 +299,7 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 				hitnonzero = false;
 				while (leadzero && width > ARRAY_LENGTH(k_decimal_divisor))
 				{
-					dest.cat(" ");
+					dest.append(" ");
 					width--;
 				}
 				for (int digitnum = ARRAY_LENGTH(k_decimal_divisor) - 1; digitnum >= 0; digitnum--)
@@ -308,11 +308,11 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 					if (digit != 0)
 					{
 						static const char decchars[] = "0123456789";
-						dest.cat(&decchars[digit], 1);
+						dest.append(&decchars[digit], 1);
 						hitnonzero = true;
 					}
 					else if (hitnonzero || (leadzero && digitnum < width) || digitnum == 0)
-						dest.cat("0");
+						dest.append("0");
 				}
 				reset = true;
 				break;
@@ -328,13 +328,13 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 				}
 				if (strlen(string) <= width)
 				{
-					dest.cat(string);
+					dest.append(string);
 					width -= strlen(string);
 					while (width-- != 0)
-						dest.cat(" ");
+						dest.append(" ");
 				}
 				else
-					dest.cat(string, width);
+					dest.append(string, width);
 				reset = true;
 				break;
 
@@ -436,20 +436,20 @@ UINT64 device_state_interface::state_int(int index)
 //  pieces of indexed state as a string
 //-------------------------------------------------
 
-astring &device_state_interface::state_string(int index, astring &dest)
+std::string &device_state_interface::state_string(int index, std::string &dest)
 {
 	// NULL or out-of-range entry returns bogus string
 	const device_state_entry *entry = state_find_entry(index);
 	if (entry == NULL)
-		return dest.cpy("???");
+		return dest.assign("???");
 
 	// get the custom string if needed
-	astring custom;
+	std::string custom;
 	if (entry->needs_custom_string())
 		state_string_export(*entry, custom);
 
 	// ask the entry to format itself
-	return entry->format(dest, custom);
+	return entry->format(dest, custom.c_str());
 }
 
 
@@ -466,8 +466,8 @@ int device_state_interface::state_string_max_length(int index)
 		return 3;
 
 	// ask the entry to format itself maximally
-	astring tempstring;
-	return entry->format(tempstring, "", true).len();
+	std::string tempstring;
+	return entry->format(tempstring, "", true).length();
 }
 
 
@@ -580,7 +580,7 @@ void device_state_interface::state_export(const device_state_entry &entry)
 //  written to perform any post-processing
 //-------------------------------------------------
 
-void device_state_interface::state_string_import(const device_state_entry &entry, astring &string)
+void device_state_interface::state_string_import(const device_state_entry &entry, std::string &str)
 {
 	// do nothing by default
 }
@@ -591,7 +591,7 @@ void device_state_interface::state_string_import(const device_state_entry &entry
 //  written to perform any post-processing
 //-------------------------------------------------
 
-void device_state_interface::state_string_export(const device_state_entry &entry, astring &string)
+void device_state_interface::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	// do nothing by default
 }

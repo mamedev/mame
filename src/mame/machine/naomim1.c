@@ -30,9 +30,9 @@ void naomi_m1_board::device_start()
 {
 	naomi_board::device_start();
 
-	astring skey = parameter("key");
-	if(skey)
-		key = strtoll(skey.cstr(), 0, 16);
+	std::string skey = parameter("key").c_str();
+	if(!skey.empty())
+		key = strtoll(skey.c_str(), 0, 16);
 	else
 	{
 		logerror("%s: Warning: key not provided\n", tag());

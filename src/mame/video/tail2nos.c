@@ -12,10 +12,10 @@
 
 TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
 {
-	UINT16 code = m_bgvideoram[tile_index];
+	UINT16 code = m_txvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
-			(code & 0x1fff) + (m_charbank << 13),
-			((code & 0xe000) >> 13) + m_charpalette * 16,
+			(code & 0x1fff) + (m_txbank << 13),
+			((code & 0xe000) >> 13) + m_txpalette * 16,
 			0);
 }
 
@@ -40,16 +40,16 @@ K051316_CB_MEMBER(tail2nos_state::zoom_callback)
 
 void tail2nos_state::tail2nos_postload()
 {
-	m_bg_tilemap->mark_all_dirty();
+	m_tx_tilemap->mark_all_dirty();
 
 	m_k051316->gfx(0)->mark_all_dirty();
 }
 
 void tail2nos_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_bg_tilemap->set_transparent_pen(15);
+	m_tx_tilemap->set_transparent_pen(15);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_state::tail2nos_postload), this));
 }
@@ -62,10 +62,10 @@ void tail2nos_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tail2nos_state::tail2nos_bgvideoram_w)
+WRITE16_MEMBER(tail2nos_state::tail2nos_txvideoram_w)
 {
-	COMBINE_DATA(&m_bgvideoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
@@ -79,22 +79,24 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
 
 WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)
 {
+	// -------- --pe-b-b
+	// p = palette bank
+	// b = tile bank
+	// e = video enable
+
 	if (ACCESSING_BITS_0_7)
 	{
 		int bank;
-
+		bank = 0;
 		/* bits 0 and 2 select char bank */
-		if (data & 0x04)
-			bank = 2;
-		else if (data & 0x01)
-			bank = 1;
-		else
-			bank = 0;
+		if (data & 0x04) bank |= 2;
+		if (data & 0x01) bank |= 1;
 
-		if (m_charbank != bank)
+
+		if (m_txbank != bank)
 		{
-			m_charbank = bank;
-			m_bg_tilemap->mark_all_dirty();
+			m_txbank = bank;
+			m_tx_tilemap->mark_all_dirty();
 		}
 
 		/* bit 5 seems to select palette bank (used on startup) */
@@ -103,10 +105,10 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)
 		else
 			bank = 3;
 
-		if (m_charpalette != bank)
+		if (m_txpalette != bank)
 		{
-			m_charpalette = bank;
-			m_bg_tilemap->mark_all_dirty();
+			m_txpalette = bank;
+			m_tx_tilemap->mark_all_dirty();
 		}
 
 		/* bit 4 seems to be video enable */
@@ -157,7 +159,7 @@ UINT32 tail2nos_state::screen_update_tail2nos(screen_device &screen, bitmap_ind1
 	{
 		m_k051316->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(bitmap, cliprect);
-		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 		bitmap.fill(0, cliprect);

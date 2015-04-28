@@ -321,7 +321,7 @@ machine_config_constructor single_conn_device::device_mconfig_additions() const
     The multi-cartridge extender
 
     This is a somewhat mythical device which was never available for the normal
-    customer, but there are reports of the existance of such a device
+    customer, but there are reports of the existence of such a device
     in development labs or demonstrations.
 
     The interesting thing about this is that the OS of the console
@@ -1227,7 +1227,7 @@ bool ti99_cartridge_device::call_load()
 {
 	// File name is in m_basename
 	// return true = error
-	if (VERBOSE>8) LOG("cartridge_device: loading %s in slot %s\n", m_basename.cstr(), tag());
+	if (VERBOSE>8) LOG("cartridge_device: loading %s in slot %s\n", m_basename.c_str(), tag());
 
 	if (m_softlist)
 	{
@@ -2285,8 +2285,8 @@ rpk_socket* rpk_reader::load_ram_resource(emu_options &options, xml_data_node* r
 				global_free_array(contents);
 				throw rpk_exception(RPK_INVALID_RAM_SPEC, "<ram type='persistent'> must have a 'file' attribute");
 			}
-			astring ram_pathname(system_name, PATH_SEPARATOR, ram_filename);
-			ram_pname = core_strdup(ram_pathname.cstr());
+			std::string ram_pathname = std::string(system_name).append(PATH_SEPARATOR).append(ram_filename);
+			ram_pname = core_strdup(ram_pathname.c_str());
 			// load, and fill rest with 00
 			if (VERBOSE>6) LOG("gromport/RPK: Loading NVRAM contents from '%s'\n", ram_pname);
 			image_battery_load_by_name(options, ram_pname, contents, length, 0x00);
@@ -2315,7 +2315,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 
 	zip_file* zipfile;
 
-	dynamic_array<char> layout_text;
+	std::vector<char> layout_text;
 	xml_data_node *layout_xml = NULL;
 	xml_data_node *romset_node;
 	xml_data_node *configuration_node;
@@ -2344,7 +2344,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		layout_text.resize(header->uncompressed_length + 1);
 
 		/* uncompress the layout text */
-		ziperr = zip_file_decompress(zipfile, layout_text, header->uncompressed_length);
+		ziperr = zip_file_decompress(zipfile, &layout_text[0], header->uncompressed_length);
 		if (ziperr != ZIPERR_NONE)
 		{
 			if (ziperr == ZIPERR_UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
@@ -2354,7 +2354,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		layout_text[header->uncompressed_length] = '\0';  // Null-terminate
 
 		/* parse the layout text */
-		layout_xml = xml_string_read(layout_text, NULL);
+		layout_xml = xml_string_read(&layout_text[0], NULL);
 		if (layout_xml == NULL) throw rpk_exception(RPK_XML_ERROR);
 
 		// Now we work within the XML tree

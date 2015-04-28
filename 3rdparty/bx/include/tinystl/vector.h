@@ -38,8 +38,8 @@ namespace tinystl {
 	public:
 		vector();
 		vector(const vector& other);
-		vector(size_t size);
-		vector(size_t size, const T& value);
+		vector(size_t _size);
+		vector(size_t _size, const T& value);
 		vector(const T* first, const T* last);
 		~vector();
 
@@ -62,7 +62,7 @@ namespace tinystl {
 		void resize(size_t size);
 		void resize(size_t size, const T& value);
 		void clear();
-		void reserve(size_t capacity);
+		void reserve(size_t _capacity);
 
 		void push_back(const T& t);
 		void pop_back();
@@ -107,15 +107,15 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	inline vector<T, Alloc>::vector(size_t size) {
+	inline vector<T, Alloc>::vector(size_t _size) {
 		buffer_init(&m_buffer);
-		buffer_resize(&m_buffer, size, T());
+		buffer_resize(&m_buffer, _size, T());
 	}
 
 	template<typename T, typename Alloc>
-	inline vector<T, Alloc>::vector(size_t size, const T& value) {
+	inline vector<T, Alloc>::vector(size_t _size, const T& value) {
 		buffer_init(&m_buffer);
-		buffer_resize(&m_buffer, size, value);
+		buffer_resize(&m_buffer, _size, value);
 	}
 
 	template<typename T, typename Alloc>
@@ -187,13 +187,13 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	inline void vector<T, Alloc>::resize(size_t size) {
-		buffer_resize(&m_buffer, size, T());
+	inline void vector<T, Alloc>::resize(size_t _size) {
+		buffer_resize(&m_buffer, _size, T());
 	}
 
 	template<typename T, typename Alloc>
-	inline void vector<T, Alloc>::resize(size_t size, const T& value) {
-		buffer_resize(&m_buffer, size, value);
+	inline void vector<T, Alloc>::resize(size_t _size, const T& value) {
+		buffer_resize(&m_buffer, _size, value);
 	}
 
 	template<typename T, typename Alloc>
@@ -202,8 +202,8 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	inline void vector<T, Alloc>::reserve(size_t capacity) {
-		buffer_reserve(&m_buffer, capacity);
+	inline void vector<T, Alloc>::reserve(size_t _capacity) {
+		buffer_reserve(&m_buffer, _capacity);
 	}
 
 	template<typename T, typename Alloc>
@@ -277,4 +277,4 @@ namespace tinystl {
 	}
 }
 
-#endif 
+#endif

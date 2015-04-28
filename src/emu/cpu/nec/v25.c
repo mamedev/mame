@@ -523,14 +523,14 @@ void v25_common_device::device_start()
 }
 
 
-void v25_common_device::state_string_export(const device_state_entry &entry, astring &string)
+void v25_common_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	UINT16 flags = CompressFlags();
 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c %d %c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c %d %c%c%c%c%c%c%c%c%c%c%c%c",
 				flags & 0x8000 ? 'N':'S',
 				(flags & 0x7000) >> 12,
 				flags & 0x0800 ? 'O':'.',

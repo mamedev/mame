@@ -30,7 +30,7 @@ class softlist_parser
 {
 public:
 	// construction (== execution)
-	softlist_parser(software_list_device &list, astring &errors);
+	softlist_parser(software_list_device &list, std::string &errors);
 
 private:
 	enum parse_position
@@ -76,11 +76,11 @@ private:
 
 	// internal parsing state
 	software_list_device &  m_list;
-	astring &               m_errors;
+	std::string &           m_errors;
 	XML_Parser              m_parser;
 	bool                    m_done;
 	bool                    m_data_accum_expected;
-	astring                 m_data_accum;
+	std::string             m_data_accum;
 	software_info *         m_current_info;
 	software_part *         m_current_part;
 	parse_position          m_pos;
@@ -149,14 +149,14 @@ bool software_part::is_compatible(const software_list_device &swlistdev) const
 		return true;
 
 	// copy the comma-delimited strings and ensure they end with a final comma
-	astring comp(compatibility, ",");
-	astring filt(filter, ",");
+	std::string comp = std::string(compatibility).append(",");
+	std::string filt = std::string(filter).append(",");
 
 	// iterate over filter items and see if they exist in the compatibility list; if so, return true
-	for (int start = 0, end = filt.chr(start, ','); end != -1; start = end + 1, end = filt.chr(start, ','))
+	for (int start = 0, end = filt.find_first_of(',',start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
 	{
-		astring token(filt, start, end - start + 1);
-		if (comp.find(0, token) != -1)
+		std::string token(filt, start, end - start + 1);
+		if (comp.find(token.c_str()) != -1)
 			return true;
 	}
 	return false;
@@ -175,11 +175,11 @@ bool software_part::matches_interface(const char *interface_list) const
 		return true;
 
 	// copy the comma-delimited interface list and ensure it ends with a final comma
-	astring interfaces(interface_list, ",");
+	std::string interfaces = std::string(interface_list).append(",");
 
 	// then add a comma to the end of our interface and return true if we find it in the list string
-	astring our_interface(m_interface, ",");
-	return (interfaces.find(0, our_interface) != -1);
+	std::string our_interface = std::string(m_interface).append(",");
+	return (interfaces.find(our_interface.c_str()) != -1);
 }
 
 
@@ -290,7 +290,7 @@ software_list_device::software_list_device(const machine_config &mconfig, const 
 void software_list_device::static_set_type(device_t &device, const char *list, softlist_type list_type)
 {
 	software_list_device &swlistdev = downcast<software_list_device &>(device);
-	swlistdev.m_list_name.cpy(list);
+	swlistdev.m_list_name.assign(list);
 	swlistdev.m_list_type = list_type;
 }
 
@@ -328,7 +328,7 @@ void software_list_device::find_approx_matches(const char *name, int matches, so
 		return;
 
 	// initialize everyone's states
-	dynamic_array<int> penalty(matches);
+	std::vector<int> penalty(matches);
 	for (int matchnum = 0; matchnum < matches; matchnum++)
 	{
 		penalty[matchnum] = 9999;
@@ -376,7 +376,7 @@ void software_list_device::release()
 	osd_printf_verbose("Resetting %s\n", m_file.filename());
 	m_parsed = false;
 	m_description = NULL;
-	m_errors.reset();
+	m_errors.clear();
 	m_infolist.reset();
 	m_stringpool.reset();
 }
@@ -473,10 +473,10 @@ void software_list_device::parse()
 		return;
 
 	// reset the errors
-	m_errors.reset();
+	m_errors.clear();
 
 	// attempt to open the file
-	file_error filerr = m_file.open(m_list_name, ".xml");
+	file_error filerr = m_file.open(m_list_name.c_str(), ".xml");
 	if (filerr == FILERR_NONE)
 	{
 		// parse if no error
@@ -484,7 +484,7 @@ void software_list_device::parse()
 		m_file.close();
 	}
 	else
-		m_errors.printf("Error opening file: %s\n", filename());
+		strprintf(m_errors, "Error opening file: %s\n", filename());
 
 	// indicate that we've been parsed
 	m_parsed = true;
@@ -500,7 +500,7 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 {
 	// add to the global map whenever we check a list so we don't re-check
 	// it in the future
-	if (valid.already_checked(astring("softlist/", m_list_name.cstr())))
+	if (valid.already_checked(std::string("softlist/").append(m_list_name.c_str()).c_str()))
 		return;
 
 	// do device validation only in case of validate command
@@ -526,7 +526,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 	for (software_info *swinfo = first_software_info(); swinfo != NULL; swinfo = swinfo->next())
 	{
 		// first parse and output core errors if any
-		if (m_errors.len() > 0)
+		if (m_errors.length() > 0)
 		{
 			osd_printf_error("%s: Errors parsing software list:\n%s", filename(), errors_string());
 			break;
@@ -565,7 +565,8 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 		}
 
 		// check for duplicate descriptions
-		if (descriptions.add(astring(swinfo->longname()).makelower().cstr(), swinfo, false) == TMERR_DUPLICATE)
+		std::string longname = std::string(swinfo->longname());
+		if (descriptions.add(strmakelower(longname).c_str(), swinfo, false) == TMERR_DUPLICATE)
 			osd_printf_error("%s: %s is a duplicate description (%s)\n", filename(), swinfo->longname(), swinfo->shortname());
 
 		bool is_clone = false;
@@ -645,7 +646,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 //  softlist_parser - constructor
 //-------------------------------------------------
 
-softlist_parser::softlist_parser(software_list_device &list, astring &errors)
+softlist_parser::softlist_parser(software_list_device &list, std::string &errors)
 	: m_list(list),
 		m_errors(errors),
 		m_done(false),
@@ -724,16 +725,16 @@ void softlist_parser::expat_free(void *ptr)
 void ATTR_PRINTF(2,3) softlist_parser::parse_error(const char *fmt, ...)
 {
 	// always start with filename(line.column):
-	m_errors.catprintf("%s(%d.%d): ", filename(), line(), column());
+	strcatprintf(m_errors, "%s(%d.%d): ", filename(), line(), column());
 
 	// append the remainder of the string
 	va_list va;
 	va_start(va, fmt);
-	m_errors.catvprintf(fmt, va);
+	strcatvprintf(m_errors, fmt, va);
 	va_end(va);
 
 	// append a newline at the end
-	m_errors.cat("\n");
+	m_errors.append("\n");
 }
 
 
@@ -781,17 +782,19 @@ void softlist_parser::add_rom_entry(const char *name, const char *hashdata, UINT
 
 	// make sure we don't add duplicate regions
 	if (name != NULL && (flags & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_REGION)
-		for (int romentry = 0; romentry < m_current_part->m_romdata.count(); romentry++)
+		for (unsigned int romentry = 0; romentry < m_current_part->m_romdata.size(); romentry++)
 			if (m_current_part->m_romdata[romentry]._name != NULL && strcmp(m_current_part->m_romdata[romentry]._name, name) == 0)
 				parse_error("Duplicated dataarea %s in software %s", name, infoname());
 
 	// create the new entry and append it
-	rom_entry &entry = m_current_part->m_romdata.append();
+	rom_entry entry;
 	entry._name = m_list.add_string(name);
 	entry._hashdata = m_list.add_string(hashdata);
 	entry._offset = offset;
 	entry._length = length;
 	entry._flags = flags;
+
+	m_current_part->m_romdata.push_back(entry);
 }
 
 
@@ -865,7 +868,7 @@ void softlist_parser::end_handler(void *data, const char *name)
 
 	// stop accumulating
 	state->m_data_accum_expected = false;
-	state->m_data_accum.reset();
+	state->m_data_accum.clear();
 }
 
 
@@ -877,9 +880,9 @@ void softlist_parser::data_handler(void *data, const XML_Char *s, int len)
 {
 	softlist_parser *state = reinterpret_cast<softlist_parser *>(data);
 
-	// if we have an astring to accumulate data in, do it
+	// if we have an std::string to accumulate data in, do it
 	if (state->m_data_accum_expected)
-		state->m_data_accum.cat(s, len);
+		state->m_data_accum.append(s, len);
 
 	// otherwise, report an error if the data is non-blank
 	else
@@ -1144,17 +1147,17 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				bool baddump = (status != NULL && strcmp(status, "baddump") == 0);
 				bool nodump = (status != NULL && strcmp(status, "nodump") == 0);
 
-				astring hashdata;
+				std::string hashdata;
 				if (nodump)
 				{
-					hashdata.printf("%s", NO_DUMP);
+					strprintf(hashdata, "%s", NO_DUMP);
 					if (crc != NULL && sha1 != NULL)
 						parse_error("No need for hash definition");
 				}
 				else
 				{
 					if (crc != NULL && sha1 != NULL)
-						hashdata.printf("%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
+						strprintf(hashdata, "%c%s%c%s%s", hash_collection::HASH_CRC, crc, hash_collection::HASH_SHA1, sha1, (baddump ? BAD_DUMP : ""));
 					else
 						parse_error("Incomplete rom hash definition");
 				}
@@ -1172,7 +1175,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				else if (loadflag != NULL && strcmp(loadflag, "load32_byte") == 0)
 					romflags = ROM_SKIP(3);
 
-				add_rom_entry(name, hashdata, offset, length, ROMENTRYTYPE_ROM | romflags);
+				add_rom_entry(name, hashdata.c_str(), offset, length, ROMENTRYTYPE_ROM | romflags);
 			}
 			else
 				parse_error("Rom name missing");
@@ -1197,10 +1200,10 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			bool baddump = (status != NULL && strcmp(status, "baddump") == 0);
 			bool nodump = (status != NULL && strcmp(status, "nodump" ) == 0);
 			bool writeable = (writeablestr != NULL && strcmp(writeablestr, "yes") == 0);
-			astring hashdata;
-			hashdata.printf( "%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
+			std::string hashdata;
+			strprintf(hashdata, "%c%s%s", hash_collection::HASH_SHA1, sha1, (nodump ? NO_DUMP : (baddump ? BAD_DUMP : "")));
 
-			add_rom_entry(name, hashdata, 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
+			add_rom_entry(name, hashdata.c_str(), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}
 		else if (status == NULL || !strcmp(status, "nodump")) // a no_dump chd is not an incomplete entry
 			parse_error("Incomplete disk definition");
@@ -1225,15 +1228,15 @@ void softlist_parser::parse_soft_end(const char *tagname)
 
 	// <description>
 	if (strcmp(tagname, "description") == 0)
-		m_current_info->m_longname = m_list.add_string(m_data_accum);
+		m_current_info->m_longname = m_list.add_string(m_data_accum.c_str());
 
 	// <year>
 	else if (strcmp(tagname, "year") == 0)
-		m_current_info->m_year = m_list.add_string(m_data_accum);
+		m_current_info->m_year = m_list.add_string(m_data_accum.c_str());
 
 	// <publisher>
 	else if (strcmp(tagname, "publisher") == 0)
-		m_current_info->m_publisher = m_list.add_string(m_data_accum);
+		m_current_info->m_publisher = m_list.add_string(m_data_accum.c_str());
 
 	// </part>
 	else if (strcmp(tagname, "part") == 0)

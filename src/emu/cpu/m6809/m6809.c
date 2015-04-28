@@ -127,7 +127,6 @@ void m6809_base_device::device_start()
 	m_lic_func.resolve_safe();
 
 	// register our state for the debugger
-	astring tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc.w).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
@@ -292,12 +291,12 @@ const address_space_config *m6809_base_device::memory_space_config(address_space
 //  for the debugger
 //-------------------------------------------------
 
-void m6809_base_device::state_string_export(const device_state_entry &entry, astring &string)
+void m6809_base_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				(m_cc & 0x80) ? 'E' : '.',
 				(m_cc & 0x40) ? 'F' : '.',
 				(m_cc & 0x20) ? 'H' : '.',

@@ -37,11 +37,11 @@ protected:
 	int state;
 	device_image_interface *image;
 	int submenu_result;
-	astring current_directory;
-	astring current_file;
+	std::string current_directory;
+	std::string current_file;
 
 	// methods
-	virtual void hook_load(astring filename, bool softlist);
+	virtual void hook_load(std::string filename, bool softlist);
 
 	bool create_ok;
 
@@ -52,7 +52,7 @@ private:
 	const software_info *swi;
 	const software_part *swp;
 	class software_list_device *sld;
-	astring software_info_name;
+	std::string software_info_name;
 
 	// methods
 	void test_create(bool &can_create, bool &need_confirm);

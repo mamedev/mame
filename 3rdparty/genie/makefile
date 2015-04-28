@@ -4,11 +4,19 @@
 #
 
 UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin))
+ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin SunOS FreeBSD GNU/kFreeBSD NetBSD OpenBSD))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
 else
+ifeq ($(UNAME),$(filter $(UNAME),SunOS))
+OS=solaris
+else
+ifeq ($(UNAME),$(filter $(UNAME),FreeBSD GNU/kFreeBSD NetBSD OpenBSD))
+OS=bsd
+else
 OS=linux
+endif
+endif
 endif
 else
 OS=windows
@@ -21,27 +29,27 @@ GENIE=bin/$(OS)/genie
 SILENT?=@
 
 $(GENIE):
-	$(SILENT) make -C build/gmake.$(OS)
+	$(SILENT) $(MAKE) -C build/gmake.$(OS)
 
 all: $(GENIE)
 
 clean:
-	$(SILENT) make -C build/gmake.$(OS) clean
+	$(SILENT) $(MAKE) -C build/gmake.$(OS) clean
 	$(SILENT) -rm -rf bin
 
 rebuild:
-	$(SILENT) make -C build/gmake.$(OS) clean all
+	$(SILENT) $(MAKE) -C build/gmake.$(OS) clean all
 
 release-windows release-darwin: $(GENIE)
 	$(GENIE) release
-	$(SILENT) make -C build/gmake.$(OS) clean all
+	$(SILENT) $(MAKE) -C build/gmake.$(OS) clean all
 	$(SILENT) git checkout src/host/version.h
 
 release-linux: $(GENIE)
 	$(SILENT) $(GENIE) release
-	$(SILENT) make -C build/gmake.darwin  clean all CC=x86_64-apple-darwin13-clang++
-	$(SILENT) make -C build/gmake.linux   clean all
-	$(SILENT) make -C build/gmake.windows clean all CC=i686-w64-mingw32-gcc
+	$(SILENT) $(MAKE) -C build/gmake.darwin  clean all CC=x86_64-apple-darwin13-clang++
+	$(SILENT) $(MAKE) -C build/gmake.linux   clean all
+	$(SILENT) $(MAKE) -C build/gmake.windows clean all CC=i686-w64-mingw32-gcc
 	$(SILENT) git checkout src/host/version.h
 
 release: release-$(OS)

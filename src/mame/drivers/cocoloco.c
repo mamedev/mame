@@ -192,21 +192,21 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	
+
 	UINT8 *m_videoram;
 	UINT8 m_videobank;
-	
+
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(vbank_w);
 	DECLARE_WRITE8_MEMBER(vram_clear_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(cocoloco);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( cocoloco_map, AS_PROGRAM, 8, cocoloco_state )
 ADDRESS_MAP_END
 
 /*
-  1800-3fff: RW  --> code inits reading and writting the whole range.
+  1800-3fff: RW  --> code inits reading and writing the whole range.
 
   All 3 instances of A005 reads (d07e, d355 and dca8),
   discard the read in a non-sense way....

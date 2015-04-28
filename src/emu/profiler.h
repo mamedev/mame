@@ -93,11 +93,7 @@ public:
 	// getters
 	bool enabled() const
 	{
-#ifndef MAME_DEBUG_FAST
 		return m_filoptr != NULL;
-#else
-		return false;
-#endif
 	}
 	const char *text(running_machine &machine);
 
@@ -173,7 +169,7 @@ private:
 
 	// internal state
 	filo_entry *        m_filoptr;                  // current FILO index
-	astring             m_text;                     // profiler text
+	std::string         m_text;                     // profiler text
 	attotime            m_text_time;                // profiler text last update
 	filo_entry          m_filo[32];                 // array of FILO entries
 	osd_ticks_t         m_data[PROFILER_TOTAL + 1]; // array of data

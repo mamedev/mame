@@ -180,12 +180,12 @@ void ui_menu::reset(ui_menu_reset_options options)
 	numitems = 0;
 	visitems = 0;
 	selected = 0;
-	astring backtext;
-	backtext.printf("Return to %s",emulator_info::get_capstartgamenoun());
+	std::string backtext;
+	strprintf(backtext, "Return to %s", emulator_info::get_capstartgamenoun());
 
 	// add an item to return
 	if (parent == NULL)
-		item_append(backtext.cstr(), NULL, 0, NULL);
+		item_append(backtext.c_str(), NULL, 0, NULL);
 	else if (parent->is_special_main_menu())
 		item_append("Exit", NULL, 0, NULL);
 	else

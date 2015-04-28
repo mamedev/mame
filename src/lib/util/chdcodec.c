@@ -670,7 +670,7 @@ INT8 chd_compressor_group::find_best_compressor(const UINT8 *src, UINT8 *compres
 			try
 			{
 				// if this is the best one, copy the data into the permanent buffer
-				UINT32 compbytes = m_compressor[codecnum]->compress(src, m_hunkbytes, m_compress_test);
+				UINT32 compbytes = m_compressor[codecnum]->compress(src, m_hunkbytes, &m_compress_test[0]);
 #if CHDCODEC_VERIFY_COMPRESSION
 				try
 				{
@@ -699,7 +699,7 @@ printf("   codec%d=%d bytes            \n", codecnum, compbytes);
 				{
 					compression = codecnum;
 					complen = compbytes;
-					memcpy(compressed, m_compress_test, compbytes);
+					memcpy(compressed, &m_compress_test[0], compbytes);
 				}
 			}
 			catch (...) { }
@@ -1425,7 +1425,7 @@ UINT32 chd_cd_flac_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *
 
 	// reset and encode the audio portion
 	m_encoder.reset(dest, hunkbytes());
-	UINT8 *buffer = m_buffer;
+	UINT8 *buffer = &m_buffer[0];
 	if (!m_encoder.encode_interleaved(reinterpret_cast<INT16 *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
 		throw CHDERR_COMPRESSION_ERROR;
 
@@ -1525,7 +1525,7 @@ void chd_cd_flac_decompressor::decompress(const UINT8 *src, UINT32 complen, UINT
 	UINT32 frames = destlen / CD_FRAME_SIZE;
 	if (!m_decoder.reset(44100, 2, chd_cd_flac_compressor::blocksize(frames * CD_MAX_SECTOR_DATA), src, complen))
 		throw CHDERR_DECOMPRESSION_ERROR;
-	UINT8 *buffer = m_buffer;
+	UINT8 *buffer = &m_buffer[0];
 	if (!m_decoder.decode_interleaved(reinterpret_cast<INT16 *>(buffer), frames * CD_MAX_SECTOR_DATA/4, m_swap_endian))
 		throw CHDERR_DECOMPRESSION_ERROR;
 
@@ -1619,14 +1619,14 @@ UINT32 chd_avhuff_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *d
 void chd_avhuff_compressor::postinit()
 {
 	// get the metadata
-	astring metadata;
+	std::string metadata;
 	chd_error err = chd().read_metadata(AV_METADATA_TAG, 0, metadata);
 	if (err != CHDERR_NONE)
 		throw err;
 
 	// extract the info
 	int fps, fpsfrac, width, height, interlaced, channels, rate;
-	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
+	if (sscanf(metadata.c_str(), AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
 		throw CHDERR_INVALID_METADATA;
 
 	// compute the bytes per frame

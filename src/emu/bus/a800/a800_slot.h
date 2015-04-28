@@ -60,11 +60,11 @@ public:
 	void ram_alloc(UINT32 size);
 	void nvram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return m_ram; }
-	UINT8* get_nvram_base() { return m_nvram; }
+	UINT8* get_ram_base() { return &m_ram[0]; }
+	UINT8* get_nvram_base() { return &m_nvram[0]; }
 	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.bytes(); }
-	UINT32 get_nvram_size() { return m_nvram.bytes(); }
+	UINT32 get_ram_size() { return m_ram.size(); }
+	UINT32 get_nvram_size() { return m_nvram.size(); }
 
 protected:
 	// internal state
@@ -113,7 +113,7 @@ public:
 	virtual const char *file_extensions() const { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_80xx);
@@ -142,7 +142,7 @@ public:
 	virtual const char *file_extensions() const { return "bin,rom,car,a52"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 };
 
 // ======================> xegs_cart_slot_device
@@ -157,7 +157,7 @@ public:
 	virtual const char *file_extensions() const { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 };
 
 // device type definition

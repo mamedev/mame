@@ -95,11 +95,11 @@ void debug_view_disasm::enumerate_sources()
 
 	// iterate over devices with disassembly interfaces
 	disasm_interface_iterator iter(machine().root_device());
-	astring name;
+	std::string name;
 	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
 	{
-		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*global_alloc(debug_view_disasm_source(name, dasm->device())));
+		strprintf(name,"%s '%s'", dasm->device().name(), dasm->device().tag());
+		m_source_list.append(*global_alloc(debug_view_disasm_source(name.c_str(), dasm->device())));
 	}
 
 	// reset the source to a known good entry
@@ -167,7 +167,7 @@ void debug_view_disasm::view_char(int chval)
 			offs_t pc = source.m_space.address_to_byte(source.m_device.safe_pc()) & source.m_space.logbytemask();
 
 			// figure out which row the pc is on
-			for (int curline = 0; curline < m_byteaddress.count(); curline++)
+			for (unsigned int curline = 0; curline < m_byteaddress.size(); curline++)
 				if (m_byteaddress[curline] == pc)
 					m_cursor.y = curline;
 			break;
@@ -464,12 +464,12 @@ void debug_view_disasm::view_update()
 
 		// see if the new result is an address we already have
 		UINT32 row;
-		for (row = 0; row < m_byteaddress.count(); row++)
+		for (row = 0; row < m_byteaddress.size(); row++)
 			if (m_byteaddress[row] == resultbyte)
 				break;
 
 		// if we didn't find it, or if it's really close to the bottom, recompute
-		if (row == m_byteaddress.count() || row >= m_total.y - m_visible.y)
+		if (row == m_byteaddress.size() || row >= m_total.y - m_visible.y)
 			m_recompute = true;
 
 		// otherwise, if it's not visible, adjust the view so it is
@@ -491,7 +491,7 @@ recompute:
 	if (m_recompute)
 	{
 		// recompute the view
-		if (m_byteaddress.count() > 0 && m_last_change_count != source.m_device.debug()->comment_change_count())
+		if (!m_byteaddress.empty() && m_last_change_count != source.m_device.debug()->comment_change_count())
 		{
 			// smoosh us against the left column, but not the top row
 			m_topleft.x = 0;
@@ -520,7 +520,7 @@ recompute:
 		for (UINT32 row = 0; row < m_visible.y; row++)
 		{
 			UINT32 effrow = m_topleft.y + row;
-			if (effrow >= m_byteaddress.count())
+			if (effrow >= m_byteaddress.size())
 				break;
 			if (pcbyte == m_byteaddress[effrow])
 			{
@@ -541,8 +541,8 @@ recompute:
 	}
 
 	// loop over visible rows
-	debug_view_char *dest = m_viewdata;
-	int row_width = m_dasm.count() / m_byteaddress.count();
+	debug_view_char *dest = &m_viewdata[0];
+	int row_width = m_dasm.size() / m_byteaddress.size();
 	for (UINT32 row = 0; row < m_visible.y; row++)
 	{
 		UINT32 effrow = m_topleft.y + row;
@@ -550,7 +550,7 @@ recompute:
 
 		// if this visible row is valid, add it to the buffer
 		UINT8 attrib = DCA_NORMAL;
-		if (effrow < m_byteaddress.count())
+		if (effrow < m_byteaddress.size())
 		{
 			// if we're on the line with the PC, recompute and hilight it
 			if (pcbyte == m_byteaddress[effrow])

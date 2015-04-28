@@ -35,9 +35,9 @@ struct vtlb_state
 	int                 dynindex;           /* index of next dynamic entry */
 	int                 pageshift;          /* bits to shift to get page index */
 	int                 addrwidth;          /* logical address bus width */
-	dynamic_array<offs_t> live;             /* array of live entries by table index */
-	dynamic_array<int> fixedpages;          /* number of pages each fixed entry covers */
-	dynamic_array<vtlb_entry> table;        /* table of entries by address */
+	std::vector<offs_t> live;             /* array of live entries by table index */
+	std::vector<int> fixedpages;          /* number of pages each fixed entry covers */
+	std::vector<vtlb_entry> table;        /* table of entries by address */
 };
 
 
@@ -73,17 +73,20 @@ vtlb_state *vtlb_alloc(device_t *cpu, address_spacenum space, int fixed_entries,
 	assert(vtlb->addrwidth > vtlb->pageshift);
 
 	/* allocate the entry array */
-	vtlb->live.resize_and_clear(fixed_entries + dynamic_entries);
+	vtlb->live.resize(fixed_entries + dynamic_entries);
+	memset(&vtlb->live[0], 0, vtlb->live.size()*sizeof(vtlb->live[0]));
 	cpu->save_item(NAME(vtlb->live));
 
 	/* allocate the lookup table */
-	vtlb->table.resize_and_clear((size_t) 1 << (vtlb->addrwidth - vtlb->pageshift));
+	vtlb->table.resize((size_t) 1 << (vtlb->addrwidth - vtlb->pageshift));
+	memset(&vtlb->table[0], 0, vtlb->table.size()*sizeof(vtlb->table[0]));
 	cpu->save_item(NAME(vtlb->table));
 
 	/* allocate the fixed page count array */
 	if (fixed_entries > 0)
 	{
-		vtlb->fixedpages.resize_and_clear(fixed_entries);
+		vtlb->fixedpages.resize(fixed_entries);
+		memset(&vtlb->fixedpages[0], 0, fixed_entries*sizeof(vtlb->fixedpages[0]));
 		cpu->save_item(NAME(vtlb->fixedpages));
 	}
 	return vtlb;
@@ -96,17 +99,6 @@ vtlb_state *vtlb_alloc(device_t *cpu, address_spacenum space, int fixed_entries,
 
 void vtlb_free(vtlb_state *vtlb)
 {
-	/* free the fixed pages if allocated */
-	if (vtlb->fixedpages != NULL)
-		auto_free(vtlb->cpudevice->machine(), vtlb->fixedpages);
-
-	/* free the table and array if they exist */
-	if (vtlb->live != NULL)
-		auto_free(vtlb->cpudevice->machine(), vtlb->live);
-	if (vtlb->table != NULL)
-		auto_free(vtlb->cpudevice->machine(), vtlb->table);
-
-	/* and then the VTLB object itself */
 	auto_free(vtlb->cpudevice->machine(), vtlb);
 }
 
@@ -314,5 +306,5 @@ void vtlb_flush_address(vtlb_state *vtlb, offs_t address)
 
 const vtlb_entry *vtlb_table(vtlb_state *vtlb)
 {
-	return vtlb->table;
+	return &vtlb->table[0];
 }

@@ -27,8 +27,8 @@
  *
  */
 
- #include <assert.h>
- 
+	#include <assert.h>
+
 #include "flopimg.h"
 #include "imageutl.h"
 

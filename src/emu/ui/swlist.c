@@ -82,12 +82,12 @@ void ui_menu_software_parts::populate()
 			software_part_menu_entry *entry = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry));
 			// check if the available parts have specific part_id to be displayed (e.g. "Map Disc", "Bonus Disc", etc.)
 			// if not, we simply display "part_name"; if yes we display "part_name (part_id)"
-			astring menu_part_name(swpart->name());
+			std::string menu_part_name(swpart->name());
 			if (swpart->feature("part_id") != NULL)
-				menu_part_name.cat(" (").cat(swpart->feature("part_id")).cat(")");
+				menu_part_name.append(" (").append(swpart->feature("part_id")).append(")");
 			entry->type = T_ENTRY;
 			entry->part = swpart;
-			item_append(m_info->shortname(), menu_part_name.cstr(), 0, entry);
+			item_append(m_info->shortname(), menu_part_name.c_str(), 0, entry);
 		}
 	}
 }
@@ -120,7 +120,7 @@ void ui_menu_software_parts::handle()
 //  ctor
 //-------------------------------------------------
 
-ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, astring &result)
+ui_menu_software_list::ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, std::string &result)
 	: ui_menu(machine, container), m_result(result)
 {
 	m_swlist = swlist;

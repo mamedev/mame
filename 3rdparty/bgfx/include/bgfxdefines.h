@@ -81,16 +81,16 @@
 					| BGFX_STATE_MSAA \
 					)
 
-#define BGFX_STATE_ALPHA_REF(_ref) ( (uint64_t(_ref)<<BGFX_STATE_ALPHA_REF_SHIFT)&BGFX_STATE_ALPHA_REF_MASK)
-#define BGFX_STATE_POINT_SIZE(_size) ( (uint64_t(_size)<<BGFX_STATE_POINT_SIZE_SHIFT)&BGFX_STATE_POINT_SIZE_MASK)
+#define BGFX_STATE_ALPHA_REF(_ref)   ( ( (uint64_t)(_ref )<<BGFX_STATE_ALPHA_REF_SHIFT )&BGFX_STATE_ALPHA_REF_MASK)
+#define BGFX_STATE_POINT_SIZE(_size) ( ( (uint64_t)(_size)<<BGFX_STATE_POINT_SIZE_SHIFT)&BGFX_STATE_POINT_SIZE_MASK)
 
 ///
-#define BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (0 \
-					| ( (uint64_t(_srcRGB)|(uint64_t(_dstRGB)<<4) )   ) \
-					| ( (uint64_t(_srcA  )|(uint64_t(_dstA  )<<4) )<<8) \
+#define BGFX_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (UINT64_C(0) \
+					| ( ( (uint64_t)(_srcRGB)|( (uint64_t)(_dstRGB)<<4) )   ) \
+					| ( ( (uint64_t)(_srcA  )|( (uint64_t)(_dstA  )<<4) )<<8) \
 					)
 
-#define BGFX_STATE_BLEND_EQUATION_SEPARATE(_rgb, _a) (uint64_t(_rgb)|(uint64_t(_a)<<3) )
+#define BGFX_STATE_BLEND_EQUATION_SEPARATE(_rgb, _a) ( (uint64_t)(_rgb)|( (uint64_t)(_a)<<3) )
 
 ///
 #define BGFX_STATE_BLEND_FUNC(_src, _dst)    BGFX_STATE_BLEND_FUNC_SEPARATE(_src, _dst, _src, _dst)
@@ -225,6 +225,7 @@
 #define BGFX_BUFFER_COMPUTE_READ         UINT8_C(0x01)
 #define BGFX_BUFFER_COMPUTE_WRITE        UINT8_C(0x02)
 #define BGFX_BUFFER_ALLOW_RESIZE         UINT8_C(0x04)
+#define BGFX_BUFFER_INDEX32              UINT8_C(0x08)
 #define BGFX_BUFFER_COMPUTE_READ_WRITE   (BGFX_BUFFER_COMPUTE_READ | BGFX_BUFFER_COMPUTE_WRITE)
 
 ///
@@ -302,6 +303,7 @@
 #define BGFX_RESET_HMD                   UINT32_C(0x00000400)
 #define BGFX_RESET_HMD_DEBUG             UINT32_C(0x00000800)
 #define BGFX_RESET_HMD_RECENTER          UINT32_C(0x00001000)
+#define BGFX_RESET_FLIP_AFTER_RENDER     UINT32_C(0x00002000)
 
 ///
 #define BGFX_CAPS_TEXTURE_COMPARE_LEQUAL UINT64_C(0x0000000000000001)
@@ -316,6 +318,7 @@
 #define BGFX_CAPS_FRAGMENT_ORDERING      UINT64_C(0x0000000000000200)
 #define BGFX_CAPS_SWAP_CHAIN             UINT64_C(0x0000000000000400)
 #define BGFX_CAPS_HMD                    UINT64_C(0x0000000000000800)
+#define BGFX_CAPS_INDEX32                UINT64_C(0x0000000000001000)
 
 ///
 #define BGFX_CAPS_FORMAT_TEXTURE_NONE     UINT8_C(0x00)
@@ -332,5 +335,11 @@
 #define BGFX_SUBMIT_EYE_RIGHT UINT8_C(0x02)
 #define BGFX_SUBMIT_EYE_MASK  UINT8_C(0x03)
 #define BGFX_SUBMIT_EYE_FIRST BGFX_SUBMIT_EYE_LEFT
+
+///
+#define BGFX_PCI_ID_NONE   UINT16_C(0x0000)
+#define BGFX_PCI_ID_AMD    UINT16_C(0x1002)
+#define BGFX_PCI_ID_INTEL  UINT16_C(0x8086)
+#define BGFX_PCI_ID_NVIDIA UINT16_C(0x10de)
 
 #endif // BGFX_DEFINES_H_HEADER_GUARD

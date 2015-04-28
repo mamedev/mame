@@ -85,11 +85,14 @@ protected:
 		M_IO  = 1,
 		M_64D = 2,
 		M_64A = 4,
-		M_PREF = 8
+		M_PREF = 8,
+		M_DISABLED = 16
 	};
 
 	struct bank_info {
+		// One of the two
 		address_map_delegate map;
+
 		UINT64 adr;
 		UINT32 size;
 		int flags;
@@ -124,6 +127,14 @@ protected:
 
 	void add_rom(const UINT8 *data, UINT32 size);
 	void add_rom_from_region();
+
+	void set_map_address(int id, UINT64 adr);
+	void set_map_size(int id, UINT64 size);
+	void set_map_flags(int id, int flags);
+
+private:
+	void add_map_finish(int bid, UINT64 size, int flags);
+
 };
 
 class agp_device : public pci_device {
@@ -190,8 +201,8 @@ public:
 
 protected:
 	pci_device *sub_devices[32*8];
-	dynamic_array<pci_device *> all_devices;
-	dynamic_array<pci_bridge_device *> all_bridges;
+	std::vector<pci_device *> all_devices;
+	std::vector<pci_bridge_device *> all_bridges;
 
 	UINT32 prefetch_baseu, prefetch_limitu;
 	UINT16 bridge_control, memory_base, memory_limit, prefetch_base, prefetch_limit, iobaseu, iolimitu;

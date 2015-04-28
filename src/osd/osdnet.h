@@ -36,6 +36,8 @@ private:
 	void recv(void *ptr, int param);
 
 	class device_network_interface *m_dev;
+	emu_timer *m_timer;
+	bool m_stop;
 };
 
 class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int rate);

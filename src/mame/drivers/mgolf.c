@@ -47,18 +47,18 @@ public:
 	DECLARE_READ8_MEMBER(dial_r);
 	DECLARE_READ8_MEMBER(misc_r);
 	DECLARE_WRITE8_MEMBER(wram_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(mgolf);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	
+
 	void update_plunger(  );
 	double calc_plunger_pos();
 
@@ -343,7 +343,7 @@ GFXDECODE_END
 void mgolf_state::machine_start()
 {
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
-	
+
 	save_item(NAME(m_prev));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_time_pushed));

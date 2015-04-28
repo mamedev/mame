@@ -51,7 +51,7 @@ bool editwin_info::restore_field(HWND wnd)
 {
 	if (wnd == m_editwnd)
 	{
-		set_editwnd_text(m_edit_defstr);
+		set_editwnd_text(m_edit_defstr.c_str());
 		editwnd_select_all();
 		return true;
 	}
@@ -206,7 +206,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 						if (_tcslen(buffer) > 0)
 						{
 							set_ignore_char_lparam(lparam);
-							set_editwnd_text(m_edit_defstr);
+							set_editwnd_text(m_edit_defstr.c_str());
 							editwnd_select_all();
 						}
 						break;

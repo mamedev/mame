@@ -49,15 +49,15 @@ void kog_prot_device::kog_px_decrypt(UINT8* cpurom, UINT32 cpurom_size)
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xC, 0x1, 0xA, 0x6, 0xD };
 
 	for (i = 0; i < 8; i++){
-		memcpy (dst + i * 0x20000, src + sec[i] * 0x20000, 0x20000);
+		memcpy (&dst[i * 0x20000], src + sec[i] * 0x20000, 0x20000);
 	}
 
-	memcpy (dst + 0x0007A6, src + 0x0407A6, 0x000006);
-	memcpy (dst + 0x0007C6, src + 0x0407C6, 0x000006);
-	memcpy (dst + 0x0007E6, src + 0x0407E6, 0x000006);
-	memcpy (dst + 0x090000, src + 0x040000, 0x004000);
-	memcpy (dst + 0x100000, src + 0x200000, 0x400000);
-	memcpy (src, dst, 0x600000);
+	memcpy (&dst[0x0007A6], src + 0x0407A6, 0x000006);
+	memcpy (&dst[0x0007C6], src + 0x0407C6, 0x000006);
+	memcpy (&dst[0x0007E6], src + 0x0407E6, 0x000006);
+	memcpy (&dst[0x090000], src + 0x040000, 0x004000);
+	memcpy (&dst[0x100000], src + 0x200000, 0x400000);
+	memcpy (src, &dst[0], 0x600000);
 
 	for (i = 0x90000/2; i < 0x94000/2; i++){
 		if (((rom[i]&0xFFBF) == 0x4EB9 || rom[i] == 0x43F9) && !rom[i + 1])

@@ -1,6 +1,6 @@
 #include "fdc_pll.h"
 
-astring fdc_pll_t::tts(attotime t)
+std::string fdc_pll_t::tts(attotime t)
 {
 	char buf[256];
 	bool neg = t.seconds < 0;
@@ -22,7 +22,6 @@ void fdc_pll_t::set_clock(const attotime &_period)
 void fdc_pll_t::reset(const attotime &when)
 {
 	ctime = when;
-	write_ctime = when;
 	phase_adjust = attotime::zero;
 	freq_hist = 0;
 	write_position = 0;
@@ -60,13 +59,12 @@ int fdc_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, const att
 
 #if 0
 	if(!edge.is_never())
-		fprintf(stderr, "ctime=%s, transition_time=%s, next=%s, pha=%s\n", tts(ctime).cstr(), tts(edge).cstr(), tts(next).cstr(), tts(phase_adjust).cstr());
+		fprintf(stderr, "ctime=%s, transition_time=%s, next=%s, pha=%s\n", tts(ctime).c_str(), tts(edge).c_str(), tts(next).c_str(), tts(phase_adjust).c_str());
 #endif
 
 	if(next > limit)
 		return -1;
 
-	write_ctime = ctime;
 	ctime = next;
 	tm = next;
 
@@ -130,22 +128,5 @@ bool fdc_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *flop
 
 	tm = etime;
 	ctime = etime;
-	return false;
-}
-
-bool fdc_pll_t::write_next_bit_prev_cell(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
-{
-	if(write_start_time.is_never()) {
-		write_start_time = write_ctime;
-		write_position = 0;
-	}
-
-	attotime etime = write_ctime + period;
-	if(etime > limit)
-		return true;
-
-	if(bit && write_position < ARRAY_LENGTH(write_buffer))
-		write_buffer[write_position++] = write_ctime + period/2;
-
 	return false;
 }

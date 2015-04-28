@@ -51,20 +51,23 @@ Dumped by tirino73
 
 
 
-- works in a very similar way to 'Spider' (twins.c) 
+- works in a very similar way to 'Spider' (twins.c)
   including the blitter (seems to be doubled up hardware tho, twice as many layers?)
-- need to work out how it selects between upper/lower
-  program roms as blitter source
-- PIC is not for sound, what is is for?
-- eeprom? (I don't see one, maybe PIC is used for settings?)
-- more than one layer
-- layer clearing
+- Convert this to a blitter device, and share it with twins.c
+- A bunch of spurious RAM writes to ROM area (genuine bug? left-overs?)
+
+Notes
+I think the PIC is used to interface with battry backed RAM instead of an EEPROM,
+we currently simulate this as the PIC is read protected.
+
+
 
 */
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 class ttchamp_state : public driver_device
 {
@@ -85,9 +88,11 @@ public:
 
 	DECLARE_WRITE16_MEMBER(port20_w);
 	DECLARE_WRITE16_MEMBER(port62_w);
-	
+
 	DECLARE_READ16_MEMBER(port1e_r);
 
+	DECLARE_READ16_MEMBER(ttchamp_pic_r);
+	DECLARE_WRITE16_MEMBER(ttchamp_pic_w);
 
 	UINT16 m_port10;
 	UINT8 m_rombank;
@@ -100,10 +105,26 @@ public:
 	DECLARE_WRITE16_MEMBER(ttchamp_mem_w);
 
 	UINT16 m_videoram0[0x10000 / 2];
-//	UINT16 m_videoram1[0x10000 / 2];
 	UINT16 m_videoram2[0x10000 / 2];
 
 
+	enum picmode
+	{
+		PIC_IDLE = 0,
+		PIC_SET_READADDRESS = 1,
+		PIC_SET_WRITEADDRESS = 2,
+		PIC_SET_WRITELATCH = 3,
+		PIC_SET_READLATCH = 4,
+
+	} picmodex;
+
+
+	int m_pic_readaddr;
+	int m_pic_writeaddr;
+	int m_pic_latched;
+	int m_pic_writelatched;
+
+	UINT8* m_bakram;
 
 	UINT16 m_mainram[0x10000 / 2];
 
@@ -126,11 +147,16 @@ void ttchamp_state::machine_start()
 {
 	m_rom16 = (UINT16*)memregion("maincpu")->base();
 	m_rom8 = memregion("maincpu")->base();
+
+	picmodex = PIC_IDLE;
+
+	m_bakram = auto_alloc_array(machine(), UINT8, 0x100);
+	machine().device<nvram_device>("backram")->set_base(m_bakram, 0x100);
+
 }
 
 void ttchamp_state::video_start()
 {
-
 }
 
 UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -143,7 +169,7 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 	bitmap.fill(m_palette->black_pen());
 	UINT8 *videoramfg;
 	UINT8* videorambg;
-	
+
 	count=0;
 	videorambg = (UINT8*)m_videoram0;
 	videoramfg = (UINT8*)m_videoram2;
@@ -156,21 +182,21 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 			count++;
 		}
 	}
-	
+
 	/*
 	count=0;
 	videoram = (UINT8*)m_videoram1;
 	for (y=0;y<yyy;y++)
 	{
-		for(x=0;x<xxx;x++)
-		{
-			UINT8 pix = videoram[BYTE_XOR_LE(count)];
-			if (pix) bitmap.pix16(y, x) = pix+0x200;
-			count++;
-		}
+	    for(x=0;x<xxx;x++)
+	    {
+	        UINT8 pix = videoram[BYTE_XOR_LE(count)];
+	        if (pix) bitmap.pix16(y, x) = pix+0x200;
+	        count++;
+	    }
 	}
 	*/
-	
+
 	count=0;
 	for (y=0;y<yyy;y++)
 	{
@@ -204,7 +230,7 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 			count++;
 		}
 	}
-	
+
 #if 0
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -212,11 +238,11 @@ UINT32 ttchamp_state::screen_update_ttchamp(screen_device &screen, bitmap_ind16 
 		// I think it actually does more blit operations with
 		// different bits of m_port10 set to redraw the backgrounds using the video ram data as a source rather than ROM - notice the garbage you see behind 'sprites' right now
 		// this method also removes the text layer, which we don't want
-	//	m_videoram1[i] = 0x0000;
-	//	m_videoram2[i] = 0x0000;
+	//  m_videoram1[i] = 0x0000;
+	//  m_videoram2[i] = 0x0000;
 	}
 #endif
-	
+
 	return 0;
 }
 
@@ -231,6 +257,79 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 {
 	// 0x8000 of offset is sometimes set
 	m_palette->set_pen_color(m_paloff & 0x3ff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+}
+
+READ16_MEMBER(ttchamp_state::ttchamp_pic_r)
+{
+//	printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
+	if (picmodex == PIC_SET_READLATCH)
+	{
+//		printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
+		picmodex = PIC_IDLE;
+
+		return m_pic_latched << 8;
+
+	}
+	return 0x00;
+
+}
+
+WRITE16_MEMBER(ttchamp_state::ttchamp_pic_w)
+{
+//	printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, picmodex);
+	if (picmodex == PIC_IDLE)
+	{
+		if (data == 0x11)
+		{
+			picmodex = PIC_SET_READADDRESS;
+//			printf("state = SET_READADDRESS\n");
+		}
+		else if (data == 0x12)
+		{
+			picmodex = PIC_SET_WRITELATCH;
+//			printf("latch write data.. \n" );
+		}
+		else if (data == 0x20)
+		{
+			picmodex = PIC_SET_WRITEADDRESS;
+//			printf("state = PIC_SET_WRITEADDRESS\n");
+		}
+		else if (data == 0x21) // write latched data
+		{
+			picmodex = PIC_IDLE;
+			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
+	//		printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
+		}
+		else if (data == 0x22) // next data to latch
+		{
+			// why does it read twice as many addresses, forcing us to shift the
+			// address by 1 to give correct results? maybe it can read 'previous' data' too?
+			m_pic_latched = m_bakram[m_pic_readaddr>>1];
+
+//			printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
+			picmodex = PIC_SET_READLATCH; // waiting to read...
+		}
+		else
+		{
+//			printf("unknown\n");
+		}
+	}
+	else if (picmodex == PIC_SET_READADDRESS)
+	{
+		m_pic_readaddr = data;
+		picmodex = PIC_IDLE;
+	}
+	else if (picmodex == PIC_SET_WRITEADDRESS)
+	{
+		m_pic_writeaddr = data;
+		picmodex = PIC_IDLE;
+	}
+	else if (picmodex == PIC_SET_WRITELATCH)
+	{
+		m_pic_writelatched = data;
+		picmodex = PIC_IDLE;
+	}
+
 }
 
 
@@ -289,18 +388,18 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 	if (m_spritesinit == 1)
 	{
-	//	printf("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	//  printf("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
-		
+
 	}
 	else if (m_spritesinit == 2)
 	{
-	//	printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	//  printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", space.device().safe_pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
 		//printf("%08x\n",(offset*2) & 0xfff00);
-		
+
 		m_spritesinit = 3;
 	}
 	else
@@ -320,7 +419,7 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 				printf("blitter bus write but blitter unselected? %08x %04x\n",offset*2,data);
 				return;
 			}
-			
+
 			m_spritesinit = 0;
 
 			// 0x30000-0x3ffff used, on Spider it's 0x20000-0x2ffff
@@ -331,14 +430,21 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 			if (m_rombank)
 				src += 0x100000;
 
-		//	printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", space.device().safe_pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		//  printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", space.device().safe_pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
 			{
-				if ((m_port10 & 0xf) == 0x01) // this is set when moving objects are cleared, although not screen clears?
+				if (m_port10 & 0x30) // this is set when moving objects are cleared, although not screen clears?
 				{
-					vram[offset] = 0x0000;
+					/* guess: assume that bit 4 is for layer 0 and bit 5 for layer 1
+					   (according to 0x21 setted at the "Clubs League" color fade-out)
+					*/
+					if(m_port10 & 0x10)
+						m_videoram0[offset] = 0x0000;
+					if(m_port10 & 0x20)
+						m_videoram2[offset] = 0x0000;
+
 					offset++;
 				}
 				else
@@ -347,13 +453,12 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_mem_w)
 
 					data = (src[(m_spritesaddr * 2) + 1]);
 					//data |= vram[offset] >> 8;
-				
+
 					/* bit 1 actually enables transparent pen */
 					if (data || (m_port10 & 2) == 0)
 						vram[offset] = (vram[offset] & 0x00ff) | data << 8;
 
 					data = src[(m_spritesaddr * 2)];
-					//data |= vram[offset] & 0xff;
 
 					if (data || (m_port10 & 2) == 0)
 						vram[offset] = (vram[offset] & 0xff00) | data;
@@ -393,9 +498,14 @@ READ16_MEMBER(ttchamp_state::ttchamp_blit_start_r)
 	return 0xff;
 }
 
+/* blitter mode select */
 WRITE16_MEMBER(ttchamp_state::port10_w)
 {
-	UINT8 res;
+	/*
+	 --xx ---- fill enable
+	 ---- --x- opacity enable (Gamart logo)
+	 ---- ---x layer select
+	*/
 	COMBINE_DATA(&m_port10);
 	
 	res = m_port10 & 0xf0;
@@ -415,14 +525,14 @@ WRITE16_MEMBER(ttchamp_state::port10_w)
 /* selects upper bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port20_w)
 {
-	printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	//printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	m_rombank = 1;
 }
 
 /* selects lower bank for the blitter */
 WRITE16_MEMBER(ttchamp_state::port62_w)
 {
-	printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+	//printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	m_rombank = 0;
 }
 
@@ -444,7 +554,7 @@ static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
 
 	AM_RANGE(0x0020, 0x0021) AM_WRITE(port20_w)
 
-//	AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP // eeprom (PIC?) / settings?
+	AM_RANGE(0x0034, 0x0035) AM_READWRITE(ttchamp_pic_r, ttchamp_pic_w)
 
 	AM_RANGE(0x0062, 0x0063) AM_WRITE(port62_w)
 
@@ -540,6 +650,8 @@ static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 
+	MCFG_NVRAM_ADD_0FILL("backram")
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH)
@@ -577,10 +689,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 {
-//	UINT8 *ROM1 = memregion("user1")->base();
-//	membank("bank1")->set_base(&ROM1[0x100000]);
-//	membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
-GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", GAME_NOT_WORKING ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
-GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", GAME_NOT_WORKING ) // this only has Palencia Elektronik advertising boards
+// only the graphics differ between the two sets, code section is the same
+GAME( 1995, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart",                               "Table Tennis Champions", 0 ) // this has various advertising boards, including 'Electronic Devices' and 'Deniam'
+GAME( 1995, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart (Palencia Elektronik license)", "Table Tennis Champions (Palencia Elektronik license)", 0 ) // this only has Palencia Elektronik advertising boards

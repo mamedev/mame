@@ -66,25 +66,25 @@ void sf_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(sf_state::sf_videoram_w)
+WRITE16_MEMBER(sf_state::videoram_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(sf_state::sf_bg_scroll_w)
+WRITE16_MEMBER(sf_state::bg_scroll_w)
 {
 	COMBINE_DATA(&m_bgscroll);
 	m_bg_tilemap->set_scrollx(0, m_bgscroll);
 }
 
-WRITE16_MEMBER(sf_state::sf_fg_scroll_w)
+WRITE16_MEMBER(sf_state::fg_scroll_w)
 {
 	COMBINE_DATA(&m_fgscroll);
 	m_fg_tilemap->set_scrollx(0, m_fgscroll);
 }
 
-WRITE16_MEMBER(sf_state::sf_gfxctrl_w)
+WRITE16_MEMBER(sf_state::gfxctrl_w)
 {
 	/* b0 = reset, or maybe "set anyway" */
 	/* b1 = pulsed when control6.b6==0 until it's 1 */
@@ -97,7 +97,7 @@ WRITE16_MEMBER(sf_state::sf_gfxctrl_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_sf_active = data & 0xff;
+		m_active = data & 0xff;
 		flip_screen_set(data & 0x04);
 		m_tx_tilemap->enable(data & 0x08);
 		m_bg_tilemap->enable(data & 0x20);
@@ -113,7 +113,7 @@ WRITE16_MEMBER(sf_state::sf_gfxctrl_w)
 
 ***************************************************************************/
 
-inline int sf_state::sf_invert( int nb )
+inline int sf_state::invert( int nb )
 {
 	static const int delta[4] = {0x00, 0x18, 0x18, 0x00};
 	return nb ^ delta[(nb >> 3) & 3];
@@ -163,25 +163,25 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 
 			m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
-					sf_invert(c1),
+					invert(c1),
 					color,
 					flipx,flipy,
 					sx,sy, 15);
 			m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
-					sf_invert(c2),
+					invert(c2),
 					color,
 					flipx,flipy,
 					sx+16,sy, 15);
 			m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
-					sf_invert(c3),
+					invert(c3),
 					color,
 					flipx,flipy,
 					sx,sy+16, 15);
 			m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
-					sf_invert(c4),
+					invert(c4),
 					color,
 					flipx,flipy,
 					sx+16,sy+16, 15);
@@ -198,7 +198,7 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 
 			m_gfxdecode->gfx(2)->transpen(bitmap,
 					cliprect,
-					sf_invert(c),
+					invert(c),
 					color,
 					flipx,flipy,
 					sx,sy, 15);
@@ -207,16 +207,16 @@ void sf_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 }
 
 
-UINT32 sf_state::screen_update_sf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_sf_active & 0x20)
+	if (m_active & 0x20)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	if (m_sf_active & 0x80)
+	if (m_active & 0x80)
 		draw_sprites(bitmap, cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);

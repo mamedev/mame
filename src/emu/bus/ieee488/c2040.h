@@ -107,6 +107,12 @@ class c3040_device :  public c2040_device
 public:
 	// construction/destruction
 	c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 

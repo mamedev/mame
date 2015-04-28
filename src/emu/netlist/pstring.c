@@ -88,6 +88,53 @@ pstring pstring::ucase() const
 	return ret;
 }
 
+int pstring::find_first_not_of(const pstring no) const
+{
+	for (int i=0; i < len(); i++)
+	{
+		bool f = true;
+		for (int j=0; j < no.len(); j++)
+			if (m_ptr->m_str[i] == no.m_ptr->m_str[j])
+				f = false;
+		if (f)
+			return i;
+	}
+	return -1;
+}
+
+int pstring::find_last_not_of(const pstring no) const
+{
+	for (int i=len() - 1; i >= 0; i--)
+	{
+		bool f = true;
+		for (int j=0; j < no.len(); j++)
+			if (m_ptr->m_str[i] == no.m_ptr->m_str[j])
+				f = false;
+		if (f)
+			return i;
+	}
+	return -1;
+}
+
+
+pstring pstring::ltrim(const pstring ws) const
+{
+	int f = find_first_not_of(ws);
+	if (f>=0)
+		return substr(f);
+	else
+		return "";
+}
+
+pstring pstring::rtrim(const pstring ws) const
+{
+	int f = find_last_not_of(ws);
+	if (f>=0)
+		return left(f+1);
+	else
+		return "";
+}
+
 //-------------------------------------------------
 //  pcmpi - compare a character array to an nstring
 //-------------------------------------------------

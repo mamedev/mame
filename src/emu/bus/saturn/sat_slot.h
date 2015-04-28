@@ -34,13 +34,13 @@ public:
 	void dram0_alloc(UINT32 size);
 	void dram1_alloc(UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
-	UINT32* get_ext_dram0_base() { return m_ext_dram0; }
-	UINT32* get_ext_dram1_base() { return m_ext_dram1; }
-	UINT8*  get_ext_bram_base() { return m_ext_bram; }
+	UINT32* get_ext_dram0_base() { return &m_ext_dram0[0]; }
+	UINT32* get_ext_dram1_base() { return &m_ext_dram1[0]; }
+	UINT8*  get_ext_bram_base() { return &m_ext_bram[0]; }
 	UINT32  get_rom_size() { return m_rom_size; }
-	UINT32  get_ext_dram0_size() { return m_ext_dram0.bytes(); }
-	UINT32  get_ext_dram1_size() { return m_ext_dram1.bytes(); }
-	UINT32  get_ext_bram_size() { return m_ext_bram.bytes(); }
+	UINT32  get_ext_dram0_size() { return m_ext_dram0.size()*sizeof(UINT32); }
+	UINT32  get_ext_dram1_size() { return m_ext_dram1.size()*sizeof(UINT32); }
+	UINT32  get_ext_bram_size() { return m_ext_bram.size(); }
 
 protected:
 	int m_cart_type;
@@ -48,8 +48,8 @@ protected:
 	// internal state
 	UINT32 *m_rom;
 	UINT32 m_rom_size;
-	dynamic_array<UINT32> m_ext_dram0;
-	dynamic_array<UINT32> m_ext_dram1;
+	std::vector<UINT32> m_ext_dram0;
+	std::vector<UINT32> m_ext_dram1;
 	dynamic_buffer m_ext_bram;
 };
 
@@ -87,7 +87,7 @@ public:
 	virtual const char *file_extensions() const { return "bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom);

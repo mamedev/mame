@@ -10,7 +10,6 @@
 
 #include <Carbon/Carbon.h>
 
-#include "astring.h"
 #include "corealloc.h"
 #include "fileio.h"
 
@@ -26,7 +25,7 @@
 class osd_font_osx : public osd_font
 {
 public:
-	virtual ~osd_font_osx() {};
+	virtual ~osd_font_osx() { }
 
 	virtual bool open(const char *font_path, const char *name, int &height);
 	virtual void close();
@@ -35,53 +34,47 @@ private:
 	CTFontRef m_font;
 };
 
-bool osd_font_osx::open(const char *font_path, const char *_name, int &height)
+bool osd_font_osx::open(const char *font_path, const char *name, int &height)
 {
-	CFStringRef font_name = NULL;
-	CTFontRef ct_font = NULL;
-	CTFontDescriptorRef font_descriptor;
-	CGAffineTransform affine_transform = CGAffineTransformIdentity;
-
 	m_font = NULL;
-	astring name(_name);
-	printf("FONT NAME %s\n", _name);
+	osd_printf_verbose("FONT NAME %s\n", name);
 #if 0
-	if (name == "default")
+	if (!strcmp(name, "default"))
 	{
 		name = "LucidaGrande";
 	}
 #endif
-	/* handle bdf fonts in the core */
-	if (name.len() > 4)
-		if (name.makeupper().substr(name.len()-4,4) == ".BDF" )
-			return false;
 
-	font_name = CFStringCreateWithCString( NULL, name.cstr(), kCFStringEncodingUTF8 );
-	if( font_name != NULL )
+	CFStringRef const font_name = CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
+	if (kCFNotFound != CFStringFind(font_name, CFSTR(".BDF"), kCFCompareCaseInsensitive | kCFCompareBackwards | kCFCompareAnchored | kCFCompareNonliteral).location)
 	{
-		font_descriptor = CTFontDescriptorCreateWithNameAndSize( font_name, 0.0); //POINT_SIZE );
-
-		if( font_descriptor != NULL )
+		// handle bdf fonts in the core
+		CFRelease(font_name);
+		return false;
+	}
+	CTFontRef ct_font = NULL;
+	if (font_name != NULL)
+	{
+		CTFontDescriptorRef const font_descriptor = CTFontDescriptorCreateWithNameAndSize(font_name, 0.0);
+		if (font_descriptor != NULL)
 		{
-			ct_font = CTFontCreateWithFontDescriptor( font_descriptor, POINT_SIZE, &affine_transform );
-
-			CFRelease( font_descriptor );
+			ct_font = CTFontCreateWithFontDescriptor(font_descriptor, POINT_SIZE, &CGAffineTransformIdentity);
+			CFRelease(font_descriptor);
 		}
 	}
-
-	CFRelease( font_name );
+	CFRelease(font_name);
 
 	if (!ct_font)
 	{
-		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.cstr());
+		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name);
 		return false;
 	}
 
-	CFStringRef real_name = CTFontCopyPostScriptName( ct_font );
+	CFStringRef const real_name = CTFontCopyPostScriptName(ct_font);
 	char real_name_c_string[255];
-	CFStringGetCString ( real_name, real_name_c_string, 255, kCFStringEncodingUTF8 );
+	CFStringGetCString(real_name, real_name_c_string, 255, kCFStringEncodingUTF8);
 	osd_printf_verbose("Matching font: %s\n", real_name_c_string);
-	CFRelease( real_name );
+	CFRelease(real_name);
 
 	CGFloat line_height = 0.0;
 	line_height += CTFontGetAscent(ct_font);
@@ -100,9 +93,9 @@ bool osd_font_osx::open(const char *font_path, const char *_name, int &height)
 
 void osd_font_osx::close()
 {
-	if( m_font != NULL )
+	if (m_font != NULL)
 	{
-		CFRelease( m_font );
+		CFRelease(m_font);
 	}
 }
 
@@ -190,13 +183,15 @@ public:
 	{
 	}
 
+	virtual int init(const osd_options &options) { return 0; }
+
 	osd_font *font_alloc()
 	{
 		return global_alloc(osd_font_osx);
 	}
 
 };
-#else /* SDLMAME_UNIX */
+#else /* SDLMAME_MACOSX */
 	MODULE_NOT_SUPPORTED(font_osx, OSD_FONT_PROVIDER, "osx")
 #endif
 

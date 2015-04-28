@@ -257,28 +257,28 @@ void timekeeper_device::device_reset() { }
 
 void timekeeper_device::counters_to_ram()
 {
-	counter_to_ram( m_data, m_offset_control, m_control );
-	counter_to_ram( m_data, m_offset_seconds, m_seconds );
-	counter_to_ram( m_data, m_offset_minutes, m_minutes );
-	counter_to_ram( m_data, m_offset_hours, m_hours );
-	counter_to_ram( m_data, m_offset_day, m_day );
-	counter_to_ram( m_data, m_offset_date, m_date );
-	counter_to_ram( m_data, m_offset_month, m_month );
-	counter_to_ram( m_data, m_offset_year, m_year );
-	counter_to_ram( m_data, m_offset_century, m_century );
+	counter_to_ram( &m_data[0], m_offset_control, m_control );
+	counter_to_ram( &m_data[0], m_offset_seconds, m_seconds );
+	counter_to_ram( &m_data[0], m_offset_minutes, m_minutes );
+	counter_to_ram( &m_data[0], m_offset_hours, m_hours );
+	counter_to_ram( &m_data[0], m_offset_day, m_day );
+	counter_to_ram( &m_data[0], m_offset_date, m_date );
+	counter_to_ram( &m_data[0], m_offset_month, m_month );
+	counter_to_ram( &m_data[0], m_offset_year, m_year );
+	counter_to_ram( &m_data[0], m_offset_century, m_century );
 }
 
 void timekeeper_device::counters_from_ram()
 {
-	m_control = counter_from_ram( m_data, m_offset_control );
-	m_seconds = counter_from_ram( m_data, m_offset_seconds );
-	m_minutes = counter_from_ram( m_data, m_offset_minutes );
-	m_hours = counter_from_ram( m_data, m_offset_hours );
-	m_day = counter_from_ram( m_data, m_offset_day );
-	m_date = counter_from_ram( m_data, m_offset_date );
-	m_month = counter_from_ram( m_data, m_offset_month );
-	m_year = counter_from_ram( m_data, m_offset_year );
-	m_century = counter_from_ram( m_data, m_offset_century );
+	m_control = counter_from_ram( &m_data[0], m_offset_control );
+	m_seconds = counter_from_ram( &m_data[0], m_offset_seconds );
+	m_minutes = counter_from_ram( &m_data[0], m_offset_minutes );
+	m_hours = counter_from_ram( &m_data[0], m_offset_hours );
+	m_day = counter_from_ram( &m_data[0], m_offset_day );
+	m_date = counter_from_ram( &m_data[0], m_offset_date );
+	m_month = counter_from_ram( &m_data[0], m_offset_month );
+	m_year = counter_from_ram( &m_data[0], m_offset_year );
+	m_century = counter_from_ram( &m_data[0], m_offset_century );
 }
 
 void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -398,11 +398,11 @@ void timekeeper_device::nvram_default()
 {
 	if( m_default_data != NULL )
 	{
-		memcpy( m_data, m_default_data, m_size );
+		memcpy( &m_data[0], m_default_data, m_size );
 	}
 	else
 	{
-		m_data.clear( 0xff );
+		memset( &m_data[0], 0xff, m_data.size());
 	}
 
 	if ( m_offset_flags >= 0 )
@@ -418,7 +418,7 @@ void timekeeper_device::nvram_default()
 
 void timekeeper_device::nvram_read(emu_file &file)
 {
-	file.read( m_data, m_size );
+	file.read( &m_data[0], m_size );
 
 	counters_to_ram();
 }
@@ -431,5 +431,5 @@ void timekeeper_device::nvram_read(emu_file &file)
 
 void timekeeper_device::nvram_write(emu_file &file)
 {
-	file.write( m_data, m_size );
+	file.write( &m_data[0], m_size );
 }

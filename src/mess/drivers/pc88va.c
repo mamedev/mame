@@ -34,7 +34,9 @@
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
 #include "formats/xdf_dsk.h"
-#include "machine/upd71071.h"
+//#include "machine/upd71071.h"
+#include "machine/am9517a.h"
+
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */
 #define TEST_SUBFDC 0
@@ -79,7 +81,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
-	required_device<upd71071_device> m_dmac;
+	required_device<am9517a_device> m_dmac;
 	required_shared_ptr<UINT16> m_palram;
 	UINT16 m_bank_reg;
 	UINT16 m_screen_ctrl_reg;
@@ -158,8 +160,10 @@ public:
 //  void m_fdc_dma_w(UINT16 data);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
-	DECLARE_READ16_MEMBER(fdc_dma_r);
-	DECLARE_WRITE16_MEMBER(fdc_dma_w);
+	DECLARE_READ8_MEMBER(fdc_dma_r);
+	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+DECLARE_READ8_MEMBER(dma_memr_cb);
+DECLARE_WRITE8_MEMBER(dma_memw_cb);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
@@ -1146,7 +1150,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 				timer_set(attotime::from_msec(100), TIMER_PC88VA_FDC_TIMER);
 
 			if((m_fdc_ctrl_2 & 0x10) != (data & 0x10))
-				m_dmac->dmarq(1, 2);
+				m_dmac->dreq2_w(1);
 
 			if(data & 0x80) // correct?
 				machine().device<upd765a_device>("upd765")->reset();
@@ -1283,7 +1287,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x0156, 0x0157) AM_READ8(rom_bank_r,0x00ff) // ROM bank status
 //  AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
 //  AM_RANGE(0x015c, 0x015f) NMI mask port (strobe port)
-	AM_RANGE(0x0160, 0x016f) AM_DEVREADWRITE8("dmac", upd71071_device, read, write, 0xffff) // DMA Controller
+	AM_RANGE(0x0160, 0x016f) AM_DEVREADWRITE8("dmac", am9517a_device, read, write, 0xffff) // DMA Controller
 	AM_RANGE(0x0184, 0x0187) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x0188, 0x018b) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) // ICU, also controls 8214 emulation
 //  AM_RANGE(0x0190, 0x0191) System Port 5
@@ -1704,7 +1708,7 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 WRITE_LINE_MEMBER( pc88va_state::fdc_drq )
 {
 	printf("%02x DRQ\n",state);
-	m_dmac->dmarq(state, 2);
+	m_dmac->dreq2_w(state);
 }
 
 WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
@@ -1723,9 +1727,9 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+//	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-//  m_dmac->hack_w(state);
+    m_dmac->hack_w(state);
 
 //  printf("%02x HLDA\n",state);
 }
@@ -1739,13 +1743,13 @@ WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
 }
 
 
-READ16_MEMBER(pc88va_state::fdc_dma_r)
+READ8_MEMBER(pc88va_state::fdc_dma_r)
 {
 	printf("R DMA\n");
 	return m_fdc->dma_r();
 }
 
-WRITE16_MEMBER(pc88va_state::fdc_dma_w)
+WRITE8_MEMBER(pc88va_state::fdc_dma_w)
 {
 	printf("W DMA %08x\n",data);
 	m_fdc->dma_w(data);
@@ -1758,6 +1762,18 @@ FLOPPY_FORMATS_END
 static SLOT_INTERFACE_START( pc88va_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
+
+READ8_MEMBER(pc88va_state::dma_memr_cb)
+{
+printf("%08x\n",offset);
+	return 0;
+}
+
+WRITE8_MEMBER(pc88va_state::dma_memw_cb)
+{
+printf("%08x %02x\n",offset,data);
+}
+
 
 static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
@@ -1809,13 +1825,13 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL )
 
-	MCFG_DEVICE_ADD("dmac", UPD71071, 0) /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
-	MCFG_UPD71071_CPU("maincpu")
-	MCFG_UPD71071_CLOCK(8000000)
-	MCFG_UPD71071_OUT_HREQ_CB(WRITELINE(pc88va_state, pc88va_hlda_w))
-	MCFG_UPD71071_OUT_EOP_CB(WRITELINE(pc88va_state, pc88va_tc_w))
-	MCFG_UPD71071_DMA_READ_2_CB(READ16(pc88va_state, fdc_dma_r))
-	MCFG_UPD71071_DMA_WRITE_2_CB(WRITE16(pc88va_state, fdc_dma_w))
+	MCFG_DEVICE_ADD("dmac", AM9517A, 8000000) /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(pc88va_state, pc88va_hlda_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(pc88va_state, pc88va_tc_w))
+	MCFG_AM9517A_IN_IOR_2_CB(READ8(pc88va_state, fdc_dma_r))
+	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(pc88va_state, fdc_dma_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(pc88va_state, dma_memr_cb))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(pc88va_state, dma_memw_cb))
 
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_irq))

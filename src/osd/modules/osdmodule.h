@@ -18,6 +18,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+class osd_options;
 class osd_module;
 
 // ======================> osd_module
@@ -31,17 +32,17 @@ public:
 	{}
 	virtual ~osd_module() { }
 
-	const char * name() const { return m_name; }
-	const char * type() const { return m_type; }
+	const char * name() const { return m_name.c_str(); }
+	const char * type() const { return m_type.c_str(); }
 
 	virtual bool probe() { return true; }
 
-	virtual int init() { return 0; }
+	virtual int init(const osd_options &options) = 0;
 	virtual void exit() { }
 
 private:
-	astring     m_name;
-	astring     m_type;
+	std::string     m_name;
+	std::string     m_type;
 };
 
 // a module_type is simply a pointer to its alloc function
@@ -79,7 +80,7 @@ public:
 
 	void get_module_names(const char *type, const int max, int *num, const char *names[]);
 
-	void init();
+	void init(const osd_options &options);
 
 	void exit();
 
@@ -98,8 +99,8 @@ private:
 #define MODULE_NOT_SUPPORTED(_mod, _type, _name) \
 	class _mod : public osd_module { \
 	public: \
-		_mod () \
-		: osd_module(_type, _name) {} \
+		_mod () : osd_module(_type, _name) { } \
+		int init(const osd_options &options) { return -1; } \
 		bool probe() { return false; } \
 	};
 

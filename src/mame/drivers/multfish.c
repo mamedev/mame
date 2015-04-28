@@ -474,7 +474,7 @@ A12 <-> A13
 			memcpy(&temprom[j*0x40],&igrosoft_gamble_gfx[romoffset+(jscr*0x40)],0x40);
 
 		}
-		memcpy(&igrosoft_gamble_gfx[romoffset],temprom,igrosoft_gamble_ROM_SIZE);
+		memcpy(&igrosoft_gamble_gfx[romoffset],&temprom[0],igrosoft_gamble_ROM_SIZE);
 	}
 }
 
@@ -507,14 +507,14 @@ static void lottery_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, U
 	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
 
 	/* ROMs decode */
-	rom_decodel(&igrosoft_gamble_gfx[0x000000], temprom, xor12, xor_addr);
-	rom_decodel(&igrosoft_gamble_gfx[0x100000], temprom, xor12, xor_addr);
-	rom_decodel(&igrosoft_gamble_gfx[0x200000], temprom, xor34, xor_addr);
-	rom_decodel(&igrosoft_gamble_gfx[0x300000], temprom, xor34, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x080000], temprom, xor56, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x180000], temprom, xor56, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x280000], temprom, xor78, xor_addr);
-	rom_decodeh(&igrosoft_gamble_gfx[0x380000], temprom, xor78, xor_addr);
+	rom_decodel(&igrosoft_gamble_gfx[0x000000], &temprom[0], xor12, xor_addr);
+	rom_decodel(&igrosoft_gamble_gfx[0x100000], &temprom[0], xor12, xor_addr);
+	rom_decodel(&igrosoft_gamble_gfx[0x200000], &temprom[0], xor34, xor_addr);
+	rom_decodel(&igrosoft_gamble_gfx[0x300000], &temprom[0], xor34, xor_addr);
+	rom_decodeh(&igrosoft_gamble_gfx[0x080000], &temprom[0], xor56, xor_addr);
+	rom_decodeh(&igrosoft_gamble_gfx[0x180000], &temprom[0], xor56, xor_addr);
+	rom_decodeh(&igrosoft_gamble_gfx[0x280000], &temprom[0], xor78, xor_addr);
+	rom_decodeh(&igrosoft_gamble_gfx[0x380000], &temprom[0], xor78, xor_addr);
 }
 
 INLINE void roment_decodel(UINT8 *romptr, UINT8 *tmprom, UINT8 xor_data, UINT32 xor_add)
@@ -546,14 +546,14 @@ static void ent_decode(running_machine &machine, UINT8 xor12, UINT8 xor34, UINT8
 	dynamic_buffer temprom(igrosoft_gamble_ROM_SIZE);
 
 	/* ROMs decode */
-	roment_decodel(&igrosoft_gamble_gfx[0x000000], temprom, xor12, xor_addr);
-	roment_decodel(&igrosoft_gamble_gfx[0x100000], temprom, xor12, xor_addr);
-	roment_decodel(&igrosoft_gamble_gfx[0x200000], temprom, xor34, xor_addr);
-	roment_decodel(&igrosoft_gamble_gfx[0x300000], temprom, xor34, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x080000], temprom, xor56, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x180000], temprom, xor56, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x280000], temprom, xor78, xor_addr);
-	roment_decodeh(&igrosoft_gamble_gfx[0x380000], temprom, xor78, xor_addr);
+	roment_decodel(&igrosoft_gamble_gfx[0x000000], &temprom[0], xor12, xor_addr);
+	roment_decodel(&igrosoft_gamble_gfx[0x100000], &temprom[0], xor12, xor_addr);
+	roment_decodel(&igrosoft_gamble_gfx[0x200000], &temprom[0], xor34, xor_addr);
+	roment_decodel(&igrosoft_gamble_gfx[0x300000], &temprom[0], xor34, xor_addr);
+	roment_decodeh(&igrosoft_gamble_gfx[0x080000], &temprom[0], xor56, xor_addr);
+	roment_decodeh(&igrosoft_gamble_gfx[0x180000], &temprom[0], xor56, xor_addr);
+	roment_decodeh(&igrosoft_gamble_gfx[0x280000], &temprom[0], xor78, xor_addr);
+	roment_decodeh(&igrosoft_gamble_gfx[0x380000], &temprom[0], xor78, xor_addr);
 }
 
 DRIVER_INIT_MEMBER(igrosoft_gamble_state,island2l)

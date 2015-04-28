@@ -1,6 +1,7 @@
 #include <stdio.h>   /* snprintf */
 #include <stdlib.h>  /* malloc */
 
+#include "osdcomm.h"
 #include "osd_opengl.h"
 
 #include "gl_shader_mgr.h"

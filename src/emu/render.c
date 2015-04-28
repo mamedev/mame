@@ -729,7 +729,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
-			return m_bcglookup;
+			return &m_bcglookup[0];
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -1571,13 +1571,13 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	else
 	{
 		// build the path and optionally prepend the directory
-		astring fname(filename, ".lay");
+		std::string fname = std::string(filename).append(".lay");
 		if (dirname != NULL)
-			fname.ins(0, PATH_SEPARATOR).ins(0, dirname);
+			fname.insert(0, PATH_SEPARATOR).insert(0, dirname);
 
 		// attempt to open the file; bail if we can't
 		emu_file layoutfile(manager().machine().options().art_path(), OPEN_FLAG_READ);
-		file_error filerr = layoutfile.open(fname);
+		file_error filerr = layoutfile.open(fname.c_str());
 		if (filerr != FILERR_NONE)
 			return false;
 
@@ -2494,13 +2494,13 @@ float render_manager::ui_aspect(render_container *rc)
 		orient = orientation_add(m_ui_target->orientation(), m_ui_container->orientation());
 		// based on the orientation of the target, compute height/width or width/height
 		if (!(orient & ORIENTATION_SWAP_XY))
-			   aspect = (float)m_ui_target->height() / (float)m_ui_target->width();
+				aspect = (float)m_ui_target->height() / (float)m_ui_target->width();
 		else
-			   aspect = (float)m_ui_target->width() / (float)m_ui_target->height();
+				aspect = (float)m_ui_target->width() / (float)m_ui_target->height();
 
 		// if we have a valid pixel aspect, apply that and return
 		if (m_ui_target->pixel_aspect() != 0.0f)
-			   return (aspect / m_ui_target->pixel_aspect());
+				return (aspect / m_ui_target->pixel_aspect());
 	} else {
 		// single screen container
 

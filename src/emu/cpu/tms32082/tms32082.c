@@ -203,12 +203,12 @@ void tms32082_mp_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void tms32082_mp_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms32082_mp_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("?");
+			strprintf(str, "?");
 			break;
 	}
 }
@@ -502,12 +502,12 @@ void tms32082_pp_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void tms32082_pp_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms32082_pp_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("?");
+			strprintf(str, "?");
 			break;
 	}
 }

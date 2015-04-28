@@ -740,10 +740,10 @@ void uml::instruction::simplify()
 	/*
 	    if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
 	    {
-	        astring disasm1, disasm2;
+	        std::string disasm1, disasm2;
 	        orig.disasm(disasm1, block->drcuml);
 	        inst->disasm(disasm2, block->drcuml);
-	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.cstr(), disasm2.cstr());
+	        osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1.c_str(), disasm2.c_str());
 	    }
 	*/
 
@@ -855,7 +855,7 @@ UINT8 uml::instruction::modified_flags() const
 //  given buffer
 //-------------------------------------------------
 
-const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) const
+const char *uml::instruction::disasm(std::string &buffer, drcuml_state *drcuml) const
 {
 	static const char *const conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
 	static const char *const pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
@@ -869,19 +869,19 @@ const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) cons
 	assert(m_opcode != OP_INVALID && m_opcode < OP_MAX);
 
 	// start with the raw mnemonic and substitute sizes
-	buffer.reset();
+	buffer.clear();
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
-			buffer.catprintf("%s", bang_size[m_size]);
+			strcatprintf(buffer, "%s", bang_size[m_size]);
 		else if (*opsrc == '#')
-			buffer.catprintf("%s", pound_size[m_size]);
+			strcatprintf(buffer, "%s", pound_size[m_size]);
 		else
-			buffer.cat(*opsrc);
+			buffer.push_back(*opsrc);
 
 	// pad to 8 spaces
-	int pad = 8 - buffer.len();
+	int pad = 8 - buffer.length();
 	for (int ch = 0; ch < pad; ch++)
-		buffer.cat(' ');
+		buffer.push_back(' ');
 
 	// iterate through parameters
 	for (int pnum = 0; pnum < m_numparams; pnum++)
@@ -890,7 +890,7 @@ const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) cons
 
 		// start with a comma for all except the first parameter
 		if (pnum != 0)
-			buffer.cat(',');
+			buffer.push_back(',');
 
 		// ouput based on type
 		switch (param.type())
@@ -918,20 +918,20 @@ const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) cons
 					if (size == 2) value = (UINT16)value;
 					if (size == 4) value = (UINT32)value;
 					if ((UINT32)value == value)
-						buffer.catprintf("$%X", (UINT32)value);
+						strcatprintf(buffer, "$%X", (UINT32)value);
 					else
-						buffer.catprintf("$%X%08X", (UINT32)(value >> 32), (UINT32)value);
+						strcatprintf(buffer, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
 				}
 				break;
 
 			// immediates have several special cases
 			case parameter::PTYPE_SIZE:
-				buffer.catprintf("%s", sizes[param.size()]);
+				strcatprintf(buffer, "%s", sizes[param.size()]);
 				break;
 
 			// size + address space immediate
 			case parameter::PTYPE_SIZE_SPACE:
-				buffer.catprintf("%s_%s", spaces[param.space()], sizes[param.size()]);
+				strcatprintf(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
 				break;
 
 			// size + scale immediate
@@ -940,30 +940,30 @@ const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) cons
 					int scale = param.scale();
 					int size  = param.size();
 					if (scale == size)
-						buffer.catprintf("%s", sizes[size]);
+						strcatprintf(buffer, "%s", sizes[size]);
 					else
-						buffer.catprintf("%s_x%d", sizes[size], 1 << scale);
+						strcatprintf(buffer, "%s_x%d", sizes[size], 1 << scale);
 				}
 				break;
 
 			// fmod immediate
 			case parameter::PTYPE_ROUNDING:
-				buffer.catprintf("%s", fmods[param.rounding()]);
+				strcatprintf(buffer, "%s", fmods[param.rounding()]);
 				break;
 
 			// integer registers
 			case parameter::PTYPE_INT_REGISTER:
-				buffer.catprintf("i%d", param.ireg() - REG_I0);
+				strcatprintf(buffer, "i%d", param.ireg() - REG_I0);
 				break;
 
 			// floating point registers
 			case parameter::PTYPE_FLOAT_REGISTER:
-				buffer.catprintf("f%d", param.freg() - REG_F0);
+				strcatprintf(buffer, "f%d", param.freg() - REG_F0);
 				break;
 
 			// map variables
 			case parameter::PTYPE_MAPVAR:
-				buffer.catprintf("m%d", param.mapvar() - MAPVAR_M0);
+				strcatprintf(buffer, "m%d", param.mapvar() - MAPVAR_M0);
 				break;
 
 			// memory
@@ -976,55 +976,55 @@ const char *uml::instruction::disasm(astring &buffer, drcuml_state *drcuml) cons
 				if (drcuml != NULL && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != NULL)
 				{
 					if (symoffset == 0)
-						buffer.catprintf("[%s]", symbol);
+						strcatprintf(buffer, "[%s]", symbol);
 					else
-						buffer.catprintf("[%s+$%X]", symbol, symoffset);
+						strcatprintf(buffer, "[%s+$%X]", symbol, symoffset);
 				}
 
 				// cache memory
 				else if (drcuml != NULL && drcuml->cache().contains_pointer(param.memory()))
-					buffer.catprintf("[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
+					strcatprintf(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory
 				else
-					buffer.catprintf("[[$%p]]", param.memory());
+					strcatprintf(buffer, "[[$%p]]", param.memory());
 				break;
 			}
 
 			// string pointer
 			case parameter::PTYPE_STRING:
-				buffer.catprintf("%s", (const char *)(FPTR)param.string());
+				strcatprintf(buffer, "%s", (const char *)(FPTR)param.string());
 				break;
 
 			// handle pointer
 			case parameter::PTYPE_CODE_HANDLE:
-				buffer.catprintf("%s", param.handle().string());
+				strcatprintf(buffer, "%s", param.handle().string());
 				break;
 
 			default:
-				buffer.catprintf("???");
+				strcatprintf(buffer, "???");
 				break;
 		}
 	}
 
 	// if there's a condition, append it
 	if (m_condition != COND_ALWAYS)
-		buffer.catprintf(",%s", conditions[m_condition & 0x0f]);
+		strcatprintf(buffer, ",%s", conditions[m_condition & 0x0f]);
 
 	// if there are flags, append them
 	if (m_flags != 0)
 	{
-		buffer.cat(',');
+		buffer.push_back(',');
 		if (m_flags & FLAG_U)
-			buffer.cat('U');
+			buffer.push_back('U');
 		if (m_flags & FLAG_S)
-			buffer.cat('S');
+			buffer.push_back('S');
 		if (m_flags & FLAG_Z)
-			buffer.cat('Z');
+			buffer.push_back('Z');
 		if (m_flags & FLAG_V)
-			buffer.cat('V');
+			buffer.push_back('V');
 		if (m_flags & FLAG_C)
-			buffer.cat('C');
+			buffer.push_back('C');
 	}
-	return buffer;
+	return buffer.c_str();
 }

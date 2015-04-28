@@ -30,9 +30,9 @@ ui_menu_file_manager::ui_menu_file_manager(running_machine &machine, render_cont
 	// This warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
 	if (warnings)
-		m_warnings.cpy(warnings);
+		m_warnings.assign(warnings);
 	else
-		m_warnings.reset();
+		m_warnings.clear();
 
 	m_curr_selected = FALSE;
 }
@@ -62,15 +62,15 @@ void ui_menu_file_manager::custom_render(void *selectedref, float top, float bot
 }
 
 
-void ui_menu_file_manager::fill_image_line(device_image_interface *img, astring &instance, astring &filename)
+void ui_menu_file_manager::fill_image_line(device_image_interface *img, std::string &instance, std::string &filename)
 {
 	// get the image type/id
-	instance.printf("%s (%s)", img->instance_name(), img->brief_instance_name());
+	strprintf(instance,"%s (%s)", img->instance_name(), img->brief_instance_name());
 
 	// get the base name
 	if (img->basename() != NULL)
 	{
-		filename.cpy(img->basename());
+		filename.assign(img->basename());
 
 		// if the image has been loaded through softlist, also show the loaded part
 		if (img->part_entry() != NULL)
@@ -78,20 +78,20 @@ void ui_menu_file_manager::fill_image_line(device_image_interface *img, astring 
 			const software_part *tmp = img->part_entry();
 			if (tmp->name() != NULL)
 			{
-				filename.cat(" (");
-				filename.cat(tmp->name());
+				filename.append(" (");
+				filename.append(tmp->name());
 				// also check if this part has a specific part_id (e.g. "Map Disc", "Bonus Disc", etc.), and in case display it
 				if (img->get_feature("part_id") != NULL)
 				{
-					filename.cat(": ");
-					filename.cat(img->get_feature("part_id"));
+					filename.append(": ");
+					filename.append(img->get_feature("part_id"));
 				}
-				filename.cat(")");
+				filename.append(")");
 			}
 		}
 	}
 	else
-		filename.cpy("---");
+		filename.assign("---");
 }
 
 //-------------------------------------------------
@@ -100,13 +100,13 @@ void ui_menu_file_manager::fill_image_line(device_image_interface *img, astring 
 
 void ui_menu_file_manager::populate()
 {
-	astring buffer, tmp_inst, tmp_name;
+	std::string buffer, tmp_inst, tmp_name;
 	bool first_entry = true;
-	astring prev_owner;
+	std::string prev_owner;
 
-	if (m_warnings)
+	if (!m_warnings.empty())
 	{
-		item_append(m_warnings, NULL, MENU_FLAG_DISABLE, NULL);
+		item_append(m_warnings.c_str(), NULL, MENU_FLAG_DISABLE, NULL);
 		item_append("", NULL, MENU_FLAG_DISABLE, NULL);
 	}
 
@@ -138,13 +138,13 @@ void ui_menu_file_manager::populate()
 								first_entry = false;
 							else
 								item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
-							buffer.printf("[root%s]", dev->tag());
-							item_append(buffer, NULL, 0, NULL);
+							strprintf(buffer, "[root%s]", dev->tag());
+							item_append(buffer.c_str(), NULL, 0, NULL);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
 						fill_image_line(scan, tmp_inst, tmp_name);
-						item_append(tmp_inst, tmp_name, 0, (void *) scan);
+						item_append(tmp_inst.c_str(), tmp_name.c_str(), 0, (void *)scan);
 					}
 			}
 		}

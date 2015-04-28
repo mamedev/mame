@@ -76,10 +76,12 @@ void mainsnk_state::video_start()
 
 	m_bg_tilemap->set_scrolldx(16, 16);
 	m_bg_tilemap->set_scrolldy(8,  8);
+
+	save_item(NAME(m_bg_tile_offset));
 }
 
 
-WRITE8_MEMBER(mainsnk_state::mainsnk_c600_w)
+WRITE8_MEMBER(mainsnk_state::c600_w)
 {
 	int bank;
 	int total_elements = m_gfxdecode->gfx(0)->elements();
@@ -102,13 +104,13 @@ WRITE8_MEMBER(mainsnk_state::mainsnk_c600_w)
 	}
 }
 
-WRITE8_MEMBER(mainsnk_state::mainsnk_fgram_w)
+WRITE8_MEMBER(mainsnk_state::fgram_w)
 {
 	m_fgram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mainsnk_state::mainsnk_bgram_w)
+WRITE8_MEMBER(mainsnk_state::bgram_w)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -158,7 +160,7 @@ void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-UINT32 mainsnk_state::screen_update_mainsnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mainsnk_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 0, 0);

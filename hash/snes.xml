@@ -32826,7 +32826,7 @@ Alternate board (XL-1)
 		<!-- single cartridge source: d4s -->
 		<description>Parame ROM Cassette 4 Gō - Super X-T Sasuke Senyō (Jpn)</description>
 		<year>199?</year>
-		<publisher>GAMETECH Co. Ltd. (unlicensed)</publisher>
+		<publisher>Gametech</publisher>
 		<info name="alt_title" value="ぱらめROMカセット4号 SUPER X-Tサスケ専用" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="890409C" /> <!-- custom board, three epoxy chips -->
@@ -32841,7 +32841,7 @@ Alternate board (XL-1)
 		<!-- single cartridge source: d4s -->
 		<description>Parame ROM Cassette 5 Gō - Super X-T Sasuke Senyō (Jpn)</description>
 		<year>199?</year>
-		<publisher>GAMETECH Co. Ltd. (unlicensed)</publisher>
+		<publisher>Gametech</publisher>
 		<info name="alt_title" value="ぱらめROMカセット5号 SUPER X-Tサスケ専用" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -35418,6 +35418,20 @@ List of unclassified roms
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="bounty sword (japan).sfc" size="3145728" crc="f3ddf35f" sha1="560d3eb4ec3bc40a7d5a06af2f03b19f5104f633" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bountyswp" cloneof="bountysw">
+		<description>Bounty Sword (Jpn, Prototype 19950516)</description>
+		<year>1995</year>
+		<publisher>Pioneer</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="bounty sword (japan) (sample).sfc" size="3145728" crc="247680b9" sha1="180e754cf2e8341c964d667c9247dc4dbc98c090" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -42749,6 +42763,21 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="izzy's quest for the olympic rings (usa).sfc" size="2097152" crc="e9bb68c7" sha1="741f235d251ea91485024bfae45063895d2d5572" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jlexct95p" cloneof="jlexct95">
+		<description>J.League Excite Stage '95 (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Epoch</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1572864">
+				<rom name="j.league excite stage '95 (japan) (prototype).sfc" size="1572864" crc="c286ee0c" sha1="669c6e0f8b3967bfd7f44a0ea0e14f2bb4c169e8" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -50085,7 +50114,7 @@ List of unclassified roms
 	<software name="paramev1">
 		<description>Parame ROM Cassette Vol. 1 (Jpn)</description>
 		<year>199?</year>
-		<publisher>GAMETECH (unlicensed)</publisher>
+		<publisher>Gametech</publisher>
 		<info name="alt_title" value="ぱらめROMカセット VOL. 1" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -50098,7 +50127,7 @@ List of unclassified roms
 	<software name="paramev2">
 		<description>Parame ROM Cassette 2 Gō (Jpn)</description>
 		<year>199?</year>
-		<publisher>GAMETECH Co. Ltd. (unlicensed)</publisher>
+		<publisher>Gametech</publisher>
 		<info name="alt_title" value="ぱらめROMカセット2号" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -50111,7 +50140,7 @@ List of unclassified roms
 	<software name="paramev3">
 		<description>Parame ROM Cassette 3 Gō (Jpn)</description>
 		<year>199?</year>
-		<publisher>GAMETECH Co. Ltd. (unlicensed)</publisher>
+		<publisher>Gametech</publisher>
 		<info name="alt_title" value="ぱらめROMカセット3号" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -53712,6 +53741,20 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="shinodyss" cloneof="shinodys">
+		<description>Shinseiki Odysselya (Jpn, Sample)</description>
+		<year>1993</year>
+		<publisher>Vic Tokai</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="shinseiki odysselya (japan) (sample).sfc" size="1048576" crc="de7f3a8d" sha1="a2097dbace24813ba4dd16cfd28db80994acb459" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shinody2">
 		<description>Shinseiki Odysselya II (Jpn)</description>
 		<year>1995</year>
@@ -54576,6 +54619,20 @@ List of unclassified roms
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="soul blazer (france).sfc" size="1048576" crc="20157693" sha1="7498fb48bc977a85a73610c3185af3e5998c09b5" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soundfct">
+		<description>Sound Factory (Jpn)</description>
+		<year>1993</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sound.sfc" size="1048576" crc="fb0a855a" sha1="060bf62f0d2cd30d9cd4b843d8b316ebecbb96b6" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>

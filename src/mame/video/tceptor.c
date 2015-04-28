@@ -247,7 +247,7 @@ void tceptor_state::decode_bg(const char * region)
 		buffer[i*2] = (src[i] & 0xf0) >> 4;
 	}
 
-	memcpy(src, buffer, len);
+	memcpy(src, &buffer[0], len);
 
 	/* decode the graphics */
 	m_gfxdecode->set_gfx(gfx_index, global_alloc(gfx_element(m_palette, bg_layout, memregion(region)->base(), 0, 64, 0x0a00)));

@@ -43,12 +43,12 @@ Notes:
 
 void sidearms_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x8000, 0x4000);
 }
 
 WRITE8_MEMBER(sidearms_state::bankswitch_w)
 {
-    membank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 
@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 {
-    int bank = 0;
+	int bank = 0;
 	switch (data & 0xC0)
 	{
 		case 0x00 : bank = 0;   break;
@@ -127,7 +127,7 @@ WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 		case 0x80 : bank = 1;   break;
 		case 0xC0 : bank = 3;   break;
 	}
-    membank("bank1")->set_entry(bank);
+	membank("bank1")->set_entry(bank);
 }
 
 static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )

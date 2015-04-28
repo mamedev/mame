@@ -58,7 +58,7 @@ void saturn_dram_device::device_reset()
 READ32_MEMBER(saturn_dram_device::read_ext_dram0)
 {
 	if (offset < (0x400000/2)/4)
-		return m_ext_dram0[offset % m_ext_dram0.count()];
+		return m_ext_dram0[offset % m_ext_dram0.size()];
 	else
 	{
 		popmessage("DRAM0 read beyond its boundary! offs: %X\n", offset);
@@ -69,7 +69,7 @@ READ32_MEMBER(saturn_dram_device::read_ext_dram0)
 READ32_MEMBER(saturn_dram_device::read_ext_dram1)
 {
 	if (offset < (0x400000/2)/4)
-		return m_ext_dram1[offset % m_ext_dram1.count()];
+		return m_ext_dram1[offset % m_ext_dram1.size()];
 	else
 	{
 		popmessage("DRAM1 read beyond its boundary! offs: %X\n", offset);
@@ -80,7 +80,7 @@ READ32_MEMBER(saturn_dram_device::read_ext_dram1)
 WRITE32_MEMBER(saturn_dram_device::write_ext_dram0)
 {
 	if (offset < (0x400000/2)/4)
-		COMBINE_DATA(&m_ext_dram0[offset % m_ext_dram0.count()]);
+		COMBINE_DATA(&m_ext_dram0[offset % m_ext_dram0.size()]);
 	else
 		popmessage("DRAM0 write beyond its boundary! offs: %X data: %X\n", offset, data);
 }
@@ -88,7 +88,7 @@ WRITE32_MEMBER(saturn_dram_device::write_ext_dram0)
 WRITE32_MEMBER(saturn_dram_device::write_ext_dram1)
 {
 	if (offset < (0x400000/2)/4)
-		COMBINE_DATA(&m_ext_dram1[offset % m_ext_dram1.count()]);
+		COMBINE_DATA(&m_ext_dram1[offset % m_ext_dram1.size()]);
 	else
 		popmessage("DRAM1 write beyond its boundary! offs: %X data: %X\n", offset, data);
 }

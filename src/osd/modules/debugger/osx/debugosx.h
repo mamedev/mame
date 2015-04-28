@@ -24,14 +24,6 @@
 // workarounds for 10.6 warnings
 #ifdef MAC_OS_X_VERSION_MAX_ALLOWED
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 1050
-
-typedef int NSInteger;
-typedef unsigned NSUInteger;
-typedef float CGFloat;
-
-#endif // MAC_OS_X_VERSION_MAX_ALLOWED < 1050
-
 #if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
 
 @protocol NSWindowDelegate <NSObject>

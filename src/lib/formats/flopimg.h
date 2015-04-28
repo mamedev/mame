@@ -402,10 +402,10 @@ protected:
 	    know. trackbuf may be modified at that position or after.
 	    @param image
 	*/
-	void generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image);
+	void generate_track_from_levels(int track, int head, std::vector<UINT32> &trackbuf, int splice_pos, floppy_image *image);
 
 	//! Normalize the times in a cell buffer to sum up to 200000000
-	void normalize_times(UINT32 *buffer, int bitlen);
+	void normalize_times(std::vector<UINT32> &buffer);
 
 	// Some conversion tables for gcr
 	static const UINT8 gcr5fw_tb[0x10], gcr5bw_tb[0x20];
@@ -471,6 +471,7 @@ protected:
 	 C1541 tr 18-24   3.50    300    3500
 	 C1541 tr 25-30   3.75    300    3750
 	 C1541 tr 31+     4.00    300    4000
+	 8" DD            1       360    1200
 	 5.25" SD         4       300    4000
 	 5.25" DD         2       300    2000
 	 5.25" HD         1       360    1200
@@ -519,6 +520,10 @@ protected:
 	void extract_sectors_from_bitstream_mfm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
 	//! PC-type sectors with FM encoding
 	void extract_sectors_from_bitstream_fm_pc(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
+	//! Commodore type sectors with GCR5 encoding
+	void extract_sectors_from_bitstream_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size, int head, int tracks);
+	//! Victor 9000 type sectors with GCR5 encoding
+	void extract_sectors_from_bitstream_victor_gcr5(const UINT8 *bitstream, int track_size, desc_xs *sectors, UINT8 *sectdata, int sectdata_size);
 
 
 	//! @brief Get a geometry (including sectors) from an image.
@@ -538,25 +543,30 @@ protected:
 	void get_track_data_fm_pc(int track, int head, floppy_image *image, int cell_size, int sector_size, int sector_count, UINT8 *sectdata);
 
 	//! Look up a bit in a level-type stream.
-	bool bit_r(const UINT32 *buffer, int offset);
+	bool bit_r(const std::vector<UINT32> &buffer, int offset);
 	//! Look up multiple bits
-	UINT32 bitn_r(const UINT32 *buffer, int offset, int count);
+	UINT32 bitn_r(const std::vector<UINT32> &buffer, int offset, int count);
 	//! Write a bit with a given size.
-	void bit_w(UINT32 *buffer, int offset, bool val, UINT32 size = 1000);
+	void bit_w(std::vector<UINT32> &buffer, bool val, UINT32 size = 1000);
+	void bit_w(std::vector<UINT32> &buffer, bool val, UINT32 size, int offset);
 	//! Calculate a CCITT-type CRC.
-	UINT16 calc_crc_ccitt(const UINT32 *buffer, int start, int end);
-	//! Write a series of (raw) bits and increment the offset.
-	void raw_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	UINT16 calc_crc_ccitt(const std::vector<UINT32> &buffer, int start, int end);
+	//! Write a series of (raw) bits
+	void raw_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
+	void raw_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size, int offset);
 	//! FM-encode and write a series of bits
-	void fm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	void fm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
+	void fm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size, int offset);
 	//! MFM-encode and write a series of bits
-	void mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	void mfm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
+	void mfm_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size, int offset);
 	//! MFM-encode every two bits and write
-	void mfm_half_w(UINT32 *buffer, int &offset, int start_bit, UINT32 val, UINT32 size = 1000);
+	void mfm_half_w(std::vector<UINT32> &buffer, int start_bit, UINT32 val, UINT32 size = 1000);
 	//! GCR5-encode and write a series of bits
-	void gcr5_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	void gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size = 1000);
+	void gcr5_w(std::vector<UINT32> &buffer, UINT8 val, UINT32 size, int offset);
 	//! 8N1-encode and write a series of bits
-	void _8n1_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	void _8n1_w(std::vector<UINT32> &buffer, int n, UINT32 val, UINT32 size = 1000);
 	//! GCR4 encode (Apple II sector header)
 	UINT16 gcr4_encode(UINT8 va);
 	//! GCR4 decode
@@ -567,6 +577,7 @@ protected:
 	void gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc);
 
 	UINT8 sbyte_mfm_r(const UINT8 *bitstream, int &pos, int track_size);
+	UINT8 sbyte_gcr5_r(const UINT8 *bitstream, int &pos, int track_size);
 
 private:
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
@@ -585,15 +596,15 @@ private:
 	bool type_data_mfm(int type, int p1, const gen_crc_info *crcs) const;
 
 	int crc_cells_size(int type) const;
-	void fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crc_cbm(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crc_ccitt(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crc_ccitt_fm(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crc_machead(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crc_fcs(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crc_victor_header(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crc_victor_data(UINT32 *buffer, const gen_crc_info *crc);
-	void fixup_crcs(UINT32 *buffer, gen_crc_info *crcs);
+	void fixup_crc_amiga(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crc_cbm(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crc_ccitt(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crc_ccitt_fm(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crc_machead(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crc_fcs(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crc_victor_header(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crc_victor_data(std::vector<UINT32> &buffer, const gen_crc_info *crc);
+	void fixup_crcs(std::vector<UINT32> &buffer, gen_crc_info *crcs);
 	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
 
 	int sbit_r(const UINT8 *bitstream, int pos);
@@ -717,24 +728,10 @@ public:
 	/*!
 	  @param track
 	  @param subtrack
-	  @param head
-	  @param size size of this track
-	*/
-	void set_track_size(int track, int head, UINT32 size, int subtrack = 0) { track_array[track*4+subtrack][head].track_size = size; ensure_alloc(track*4+subtrack, head); }
-
-	/*!
-	  @param track
-	  @param subtrack
 	  @param head head number
 	  @return a pointer to the data buffer for this track and head
 	*/
-	UINT32 *get_buffer(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].cell_data; }
-
-	//! @return the track size
-	//! @param track
-	//! @param subtrack
-	//! @param head
-	UINT32 get_track_size(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].track_size; }
+	std::vector<UINT32> &get_buffer(int track, int head, int subtrack = 0) { return track_array[track*4+subtrack][head].cell_data; }
 
 	//! Sets the write splice position.
 	//! The "track splice" information indicates where to start writing
@@ -772,18 +769,15 @@ private:
 	UINT32 form_factor, variant;
 
 	struct track_info {
-		dynamic_array<UINT32> cell_data;
-		UINT32 track_size;
+		std::vector<UINT32> cell_data;
 		UINT32 write_splice;
 
-		track_info() { track_size = write_splice = 0; }
+		track_info() { write_splice = 0; }
 	};
 
 	// track number multiplied by 4 then head
 	// last array size may be bigger than actual track size
-	dynamic_array<dynamic_array<track_info> > track_array;
-
-	void ensure_alloc(int track, int head);
+	std::vector<std::vector<track_info> > track_array;
 };
 
 #endif /* FLOPIMG_H */

@@ -123,7 +123,7 @@ void tmp68301_device::device_start()
 
 	m_in_parallel_cb.resolve_safe(0);
 	m_out_parallel_cb.resolve_safe();
-	
+
 	save_item(NAME(m_regs));
 	save_item(NAME(m_IE));
 	save_item(NAME(m_irq_vector));

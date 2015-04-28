@@ -11,27 +11,33 @@ public:
 		m_videoram2(*this, "videoram2"){ }
 
 	optional_device<sn76477_device> m_sn;
+
 	required_shared_ptr<UINT8> m_sharedram;
-	UINT8 m_ttmahjng_port_select;
-	int m_speakres_vrx;
 	required_shared_ptr<UINT8> m_videoram1;
 	required_shared_ptr<UINT8> m_videoram2;
+
+	UINT8 m_ttmahjng_port_select;
+	int m_speakres_vrx;
 	UINT8 m_flipscreen;
 	UINT8 m_palette_1;
 	UINT8 m_palette_2;
-	DECLARE_READ8_MEMBER(sharedram_r);
-	DECLARE_WRITE8_MEMBER(sharedram_w);
+
+	DECLARE_WRITE8_MEMBER(out0_w);
+	DECLARE_WRITE8_MEMBER(out1_w);
 	DECLARE_WRITE8_MEMBER(route16_sharedram_w);
+	DECLARE_READ8_MEMBER(routex_prot_read);
 	DECLARE_WRITE8_MEMBER(ttmahjng_input_port_matrix_w);
 	DECLARE_READ8_MEMBER(ttmahjng_input_port_matrix_r);
 	DECLARE_READ8_MEMBER(speakres_in3_r);
 	DECLARE_WRITE8_MEMBER(speakres_out2_w);
-	DECLARE_READ8_MEMBER(routex_prot_read);
-	DECLARE_WRITE8_MEMBER(route16_out0_w);
-	DECLARE_WRITE8_MEMBER(route16_out1_w);
 	DECLARE_WRITE8_MEMBER(stratvox_sn76477_w);
+
 	DECLARE_DRIVER_INIT(route16);
 	DECLARE_DRIVER_INIT(route16a);
+	DECLARE_MACHINE_START(speakres);
+	DECLARE_MACHINE_START(ttmahjng);
+	virtual void video_start();
+
 	UINT32 screen_update_route16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

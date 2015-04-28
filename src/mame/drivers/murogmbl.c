@@ -45,18 +45,21 @@ class murogmbl_state : public driver_device
 public:
 	murogmbl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_video(*this, "video") { }
 
-	required_shared_ptr<UINT8> m_video;
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(murogmbl);
-	UINT32 screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	required_shared_ptr<UINT8> m_video;
+
+	virtual void video_start();
+	DECLARE_PALETTE_INIT(murogmbl);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -102,7 +105,7 @@ void murogmbl_state::video_start()
 {
 }
 
-UINT32 murogmbl_state::screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 murogmbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0;
@@ -201,7 +204,7 @@ static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update_murogmbl)
+	MCFG_SCREEN_UPDATE_DRIVER(murogmbl_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -227,4 +230,4 @@ ROM_START(murogmbl)
 	ROM_LOAD( "74s288.a8",  0x0000, 0x0020, CRC(fc35201c) SHA1(4549e228c48992e0d10957f029b89a547392e72b) )
 ROM_END
 
-GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, driver_device, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", GAME_NO_SOUND )
+GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, driver_device, 0, ROT0, "bootleg?", "Muroge Monaco (bootleg?)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

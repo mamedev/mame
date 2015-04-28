@@ -41,7 +41,7 @@ private:
 
 class ui_menu_software_list : public ui_menu {
 public:
-	ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, astring &result);
+	ui_menu_software_list(running_machine &machine, render_container *container, software_list_device *swlist, const char *interface, std::string &result);
 	virtual ~ui_menu_software_list();
 	virtual void populate();
 	virtual void handle();
@@ -57,7 +57,7 @@ private:
 	// variables
 	software_list_device *          m_swlist; // currently selected list
 	const char *                    m_interface;
-	astring &                       m_result;
+	std::string &                   m_result;
 	entry_info *                    m_entrylist;
 	char                            m_filename_buffer[1024];
 	bool                            m_ordered_by_shortname;

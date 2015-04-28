@@ -310,18 +310,18 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 }
 
-void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			string.printf("%08X", pc() );
+			strprintf(str, "%08X", pc());
 			break;
 
 		case STATE_GENFLAGS:
 			{
 				UINT16 flags = CompressFlags();
-				string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+				strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 					flags & 0x8000 ? '1':'.',
 					flags & 0x4000 ? '1':'.',
 					flags & 0x2000 ? '1':'.',

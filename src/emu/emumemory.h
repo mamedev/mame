@@ -590,8 +590,8 @@ public:
 	offs_t bytestart() const { return m_bytestart; }
 	void *base() const { return *m_baseptr; }
 	void *base_decrypted() const { return *m_basedptr; }
-	const char *tag() const { return m_tag; }
-	const char *name() const { return m_name; }
+	const char *tag() const { return m_tag.c_str(); }
+	const char *name() const { return m_name.c_str(); }
 
 	// compare a range against our range
 	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
@@ -629,9 +629,9 @@ private:
 	offs_t                  m_bytestart;            // byte-adjusted start offset
 	offs_t                  m_byteend;              // byte-adjusted end offset
 	int                     m_curentry;             // current entry
-	dynamic_array<bank_entry> m_entry;              // array of entries (dynamically allocated)
-	astring                 m_name;                 // friendly name for this bank
-	astring                 m_tag;                  // tag for this bank
+	std::vector<bank_entry> m_entry;                // array of entries (dynamically allocated)
+	std::string             m_name;                 // friendly name for this bank
+	std::string             m_tag;                  // tag for this bank
 	simple_list<bank_reference> m_reflist;          // linked list of address spaces referencing this bank
 };
 
@@ -696,9 +696,9 @@ public:
 	running_machine &machine() const { return m_machine; }
 	memory_region *next() const { return m_next; }
 	UINT8 *base() { return (this != NULL) ? &m_buffer[0] : NULL; }
-	UINT8 *end() { return (this != NULL) ? base() + m_buffer.count() : NULL; }
-	UINT32 bytes() const { return (this != NULL) ? m_buffer.count() : 0; }
-	const char *name() const { return m_name; }
+	UINT8 *end() { return (this != NULL) ? base() + m_buffer.size() : NULL; }
+	UINT32 bytes() const { return (this != NULL) ? m_buffer.size() : 0; }
+	const char *name() const { return m_name.c_str(); }
 
 	// flag expansion
 	endianness_t endianness() const { return m_endianness; }
@@ -715,7 +715,7 @@ private:
 	// internal data
 	running_machine &       m_machine;
 	memory_region *         m_next;
-	astring                 m_name;
+	std::string             m_name;
 	dynamic_buffer          m_buffer;
 	endianness_t            m_endianness;
 	UINT8                   m_bitwidth;

@@ -1065,10 +1065,10 @@ void i386_device::pentium_movnti_m32_r32() // Opcode 0f c3
 void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
 {
 /*
-0f 3a		BB0_RESET (set BB0 pointer = base)
-0f 3b		BB1_RESET (set BB1 pointer = base)
-0f 3c		CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
-0f 3d		CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
+0f 3a       BB0_RESET (set BB0 pointer = base)
+0f 3b       BB1_RESET (set BB1 pointer = base)
+0f 3c       CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
+0f 3d       CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
 */
 
 	CYCLES(1);
@@ -4417,36 +4417,36 @@ void i386_device::sse_predicate_compare_double(UINT8 imm8, XMM_REG d, XMM_REG s)
 	switch (imm8 & 7)
 	{
 	case 0:
-		d.q[0]=d.f64[0] == s.f64[0] ? 0xffffffffffffffff : 0;
-		d.q[1]=d.f64[1] == s.f64[1] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] == s.f64[0] ? U64(0xffffffffffffffff) : 0;
+		d.q[1]=d.f64[1] == s.f64[1] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 1:
-		d.q[0]=d.f64[0] < s.f64[0] ? 0xffffffffffffffff : 0;
-		d.q[1]=d.f64[1] < s.f64[1] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] < s.f64[0] ? U64(0xffffffffffffffff) : 0;
+		d.q[1]=d.f64[1] < s.f64[1] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 2:
-		d.q[0]=d.f64[0] <= s.f64[0] ? 0xffffffffffffffff : 0;
-		d.q[1]=d.f64[1] <= s.f64[1] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] <= s.f64[0] ? U64(0xffffffffffffffff) : 0;
+		d.q[1]=d.f64[1] <= s.f64[1] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 3:
-		d.q[0]=sse_isdoubleunordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
-		d.q[1]=sse_isdoubleunordered(d.f64[1], s.f64[1]) ? 0xffffffffffffffff : 0;
+		d.q[0]=sse_isdoubleunordered(d.f64[0], s.f64[0]) ? U64(0xffffffffffffffff) : 0;
+		d.q[1]=sse_isdoubleunordered(d.f64[1], s.f64[1]) ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 4:
-		d.q[0]=d.f64[0] != s.f64[0] ? 0xffffffffffffffff : 0;
-		d.q[1]=d.f64[1] != s.f64[1] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] != s.f64[0] ? U64(0xffffffffffffffff) : 0;
+		d.q[1]=d.f64[1] != s.f64[1] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 5:
-		d.q[0]=d.f64[0] < s.f64[0] ? 0 : 0xffffffffffffffff;
-		d.q[1]=d.f64[1] < s.f64[1] ? 0 : 0xffffffffffffffff;
+		d.q[0]=d.f64[0] < s.f64[0] ? 0 : U64(0xffffffffffffffff);
+		d.q[1]=d.f64[1] < s.f64[1] ? 0 : U64(0xffffffffffffffff);
 		break;
 	case 6:
-		d.q[0]=d.f64[0] <= s.f64[0] ? 0 : 0xffffffffffffffff;
-		d.q[1]=d.f64[1] <= s.f64[1] ? 0 : 0xffffffffffffffff;
+		d.q[0]=d.f64[0] <= s.f64[0] ? 0 : U64(0xffffffffffffffff);
+		d.q[1]=d.f64[1] <= s.f64[1] ? 0 : U64(0xffffffffffffffff);
 		break;
 	case 7:
-		d.q[0]=sse_isdoubleordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
-		d.q[1]=sse_isdoubleordered(d.f64[1], s.f64[1]) ? 0xffffffffffffffff : 0;
+		d.q[0]=sse_isdoubleordered(d.f64[0], s.f64[0]) ? U64(0xffffffffffffffff) : 0;
+		d.q[1]=sse_isdoubleordered(d.f64[1], s.f64[1]) ? U64(0xffffffffffffffff) : 0;
 		break;
 	}
 }
@@ -4487,28 +4487,28 @@ void i386_device::sse_predicate_compare_double_scalar(UINT8 imm8, XMM_REG d, XMM
 	switch (imm8 & 7)
 	{
 	case 0:
-		d.q[0]=d.f64[0] == s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] == s.f64[0] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 1:
-		d.q[0]=d.f64[0] < s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] < s.f64[0] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 2:
-		d.q[0]=d.f64[0] <= s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] <= s.f64[0] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 3:
-		d.q[0]=sse_isdoubleunordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
+		d.q[0]=sse_isdoubleunordered(d.f64[0], s.f64[0]) ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 4:
-		d.q[0]=d.f64[0] != s.f64[0] ? 0xffffffffffffffff : 0;
+		d.q[0]=d.f64[0] != s.f64[0] ? U64(0xffffffffffffffff) : 0;
 		break;
 	case 5:
-		d.q[0]=d.f64[0] < s.f64[0] ? 0 : 0xffffffffffffffff;
+		d.q[0]=d.f64[0] < s.f64[0] ? 0 : U64(0xffffffffffffffff);
 		break;
 	case 6:
-		d.q[0]=d.f64[0] <= s.f64[0] ? 0 : 0xffffffffffffffff;
+		d.q[0]=d.f64[0] <= s.f64[0] ? 0 : U64(0xffffffffffffffff);
 		break;
 	case 7:
-		d.q[0]=sse_isdoubleordered(d.f64[0], s.f64[0]) ? 0xffffffffffffffff : 0;
+		d.q[0]=sse_isdoubleordered(d.f64[0], s.f64[0]) ? U64(0xffffffffffffffff) : 0;
 		break;
 	}
 }

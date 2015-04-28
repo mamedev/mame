@@ -805,7 +805,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 	{
 		int seg_offset = address & 0x01ffff;
 
-		/* add revelant origin -> address */
+		/* add relevant origin -> address */
 		offs_t mapped_address = (m_mmu_regs[the_seg][segment].sorg + seg_offset) & 0x1fffff;
 
 		switch ((mmu_entry_t)m_mmu_regs[the_seg][segment].type)
@@ -1331,7 +1331,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 		/* offset in segment */
 		int seg_offset = (offset & 0x00ffff) << 1;
 
-		/* add revelant origin -> address */
+		/* add relevant origin -> address */
 		offs_t address = (m_mmu_regs[the_seg][segment].sorg + seg_offset) & 0x1fffff;
 
 		/*logerror("read, logical address%lX\n", offset);
@@ -1537,7 +1537,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 		/* offset in segment */
 		int seg_offset = (offset & 0x00ffff) << 1;
 
-		/* add revelant origin -> address */
+		/* add relevant origin -> address */
 		offs_t address = (m_mmu_regs[the_seg][segment].sorg + seg_offset) & 0x1fffff;
 
 		switch (m_mmu_regs[the_seg][segment].type)

@@ -47,7 +47,7 @@ protected:
 	int find_size(io_generic *io, UINT32 form_factor);
 	int compute_track_size(const format &f) const;
 	virtual void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors, int track, int head) const;
-	void check_compatibility(floppy_image *image, int *candidates, int &candidates_count);
+	void check_compatibility(floppy_image *image, std::vector<int> &candidates);
 	void extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head);
 
 private:

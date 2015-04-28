@@ -302,7 +302,7 @@ public:
 		int                 defval;
 		int                 maxval;
 		int                 step;
-		INT32 (*adjustor)(running_machine &, void *, astring *, INT32);
+		INT32(*adjustor)(running_machine &, void *, std::string *, INT32);
 	};
 
 private:

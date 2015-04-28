@@ -67,7 +67,7 @@ public:
 	void set_formats(const floppy_format_type *formats);
 	floppy_image_format_t *get_formats() const;
 	floppy_image_format_t *get_load_format() const;
-	floppy_image_format_t *identify(astring filename);
+	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
 
 	// image-level overrides
@@ -93,8 +93,7 @@ public:
 	void setup_ready_cb(ready_cb cb);
 	void setup_wpt_cb(wpt_cb cb);
 
-	UINT32* get_buffer() { return image->get_buffer(cyl, ss); }
-	UINT32 get_len() { return image->get_track_size(cyl, ss); }
+	std::vector<UINT32> &get_buffer() { return image->get_buffer(cyl, ss, subcyl); }
 	int get_cyl() { return cyl; }
 
 	void mon_w(int state);
@@ -181,7 +180,7 @@ protected:
 	wpt_cb cur_wpt_cb;
 
 	UINT32 find_position(attotime &base, const attotime &when);
-	int find_index(UINT32 position, const UINT32 *buf, int buf_size);
+	int find_index(UINT32 position, const std::vector<UINT32> &buf);
 	void write_zone(UINT32 *buf, int &cells, int &index, UINT32 spos, UINT32 epos, UINT32 mg);
 	void commit_image();
 };
@@ -198,10 +197,10 @@ protected:
 
 	floppy_image_format_t **format_array;
 	floppy_image_format_t *input_format, *output_format;
-	astring input_filename, output_filename;
+	std::string input_filename, output_filename;
 
 	void do_load_create();
-	virtual void hook_load(astring filename, bool softlist);
+	virtual void hook_load(std::string filename, bool softlist);
 };
 
 

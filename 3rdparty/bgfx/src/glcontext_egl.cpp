@@ -22,7 +22,7 @@
 #	define EGL_CONTEXT_MINOR_VERSION_KHR 0x30FB
 #endif // EGL_CONTEXT_MINOR_VERSION_KHR
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 #if BGFX_USE_GL_DYNAMIC_LIB
 
@@ -280,7 +280,7 @@ EGL_IMPORT
 #	endif // BX_PLATFORM_RPI
 	}
 
-	void GlContext::resize(uint32_t _width, uint32_t _height, bool _vsync)
+	void GlContext::resize(uint32_t _width, uint32_t _height, uint32_t _flags)
 	{
 		BX_UNUSED(_width, _height);
 #	if BX_PLATFORM_ANDROID
@@ -289,7 +289,8 @@ EGL_IMPORT
 		ANativeWindow_setBuffersGeometry(g_bgfxAndroidWindow, _width, _height, format);
 #	endif // BX_PLATFORM_ANDROID
 
-		eglSwapInterval(m_display, _vsync ? 1 : 0);
+		bool vsync = !!(_flags&BGFX_RESET_VSYNC);
+		eglSwapInterval(m_display, vsync ? 1 : 0);
 	}
 
 	bool GlContext::isSwapChainSupported()
@@ -369,7 +370,7 @@ EGL_IMPORT
 #	include "glimports.h"
 	}
 
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #	endif // BGFX_USE_EGL
 #endif // (BGFX_CONFIG_RENDERER_OPENGLES || BGFX_CONFIG_RENDERER_OPENGL)

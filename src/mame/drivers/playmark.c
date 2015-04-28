@@ -54,7 +54,7 @@ TODO:
   ROM is currently missing.
 - Lucky Boom has some minor colour issue with the background - see the title screen. The
   game selects the wrong colour for some tiles. The tiles should be colour 0x01 not 0x02.
-  Affects the backgrounds in game however it's barely noticable.
+  Affects the backgrounds in game however it's barely noticeable.
 
 ***************************************************************************/
 
@@ -1375,7 +1375,7 @@ static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
-//	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
 	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
@@ -1416,7 +1416,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
-//	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
 	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
@@ -1462,7 +1462,7 @@ static MACHINE_CONFIG_START( luckboomh, playmark_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
-//	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
 	MCFG_PIC16C5x_READ_B_CB(READ8(playmark_state, playmark_snd_command_r))
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))

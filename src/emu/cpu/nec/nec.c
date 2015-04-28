@@ -435,14 +435,14 @@ void nec_common_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void nec_common_device::state_string_export(const device_state_entry &entry, astring &string)
+void nec_common_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	UINT16 flags = CompressFlags();
 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				flags & 0x8000 ? 'N':'E',
 				flags & 0x4000 ? '?':'.',
 				flags & 0x2000 ? '?':'.',

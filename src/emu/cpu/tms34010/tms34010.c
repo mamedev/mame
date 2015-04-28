@@ -590,14 +590,14 @@ void tms340x0_device::device_start()
 		state_add(TMS34010_ST,     "ST",        m_st);
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_st).noshow().formatstr("%18s");
 
-		astring tempstr;
+		std::string tempstr;
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_A0 + regnum, tempstr.format("A%d", regnum), m_regs[regnum].reg);
+			state_add(TMS34010_A0 + regnum, strformat(tempstr, "A%d", regnum).c_str(), m_regs[regnum].reg);
 		}
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_B0 + regnum, tempstr.format("B%d", regnum), m_regs[30 - regnum].reg);
+			state_add(TMS34010_B0 + regnum, strformat(tempstr, "B%d", regnum).c_str(), m_regs[30 - regnum].reg);
 		}
 	}
 
@@ -1596,12 +1596,12 @@ READ16_MEMBER( tms340x0_device::host_r )
 }
 
 
-void tms340x0_device::state_string_export(const device_state_entry &entry, astring &string)
+void tms340x0_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_st & 0x80000000 ? 'N':'.',
 				m_st & 0x40000000 ? 'C':'.',
 				m_st & 0x20000000 ? 'Z':'.',

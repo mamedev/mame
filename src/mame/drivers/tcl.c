@@ -177,7 +177,7 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 	dynamic_buffer src(len);
 
 	int i,idx=0;
-	memcpy(src, dest, len);
+	memcpy(&src[0], dest, len);
 	for(i=0;i<64*1024;i+=4)
 	{
 		if(i&0x8000)

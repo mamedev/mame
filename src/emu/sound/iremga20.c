@@ -80,6 +80,7 @@ void iremga20_device::device_start()
 		save_item(NAME(m_channel[i].size), i);
 		save_item(NAME(m_channel[i].start), i);
 		save_item(NAME(m_channel[i].pos), i);
+		save_item(NAME(m_channel[i].frac), i);
 		save_item(NAME(m_channel[i].end), i);
 		save_item(NAME(m_channel[i].volume), i);
 		save_item(NAME(m_channel[i].pan), i);

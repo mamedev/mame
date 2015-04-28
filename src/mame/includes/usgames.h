@@ -17,8 +17,8 @@ public:
 	DECLARE_WRITE8_MEMBER(usgames_videoram_w);
 	DECLARE_WRITE8_MEMBER(usgames_charram_w);
 	TILE_GET_INFO_MEMBER(get_usgames_tile_info);
-    virtual void machine_start();
-    virtual void video_start();
+	virtual void machine_start();
+	virtual void video_start();
 	DECLARE_PALETTE_INIT(usgames);
 	UINT32 screen_update_usgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

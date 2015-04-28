@@ -435,7 +435,7 @@ WRITE8_MEMBER( ti99_4x_state::external_operation )
 
     When an interrupt line is set (and the corresponding bit in the interrupt mask is set),
     a level 1 interrupt is requested from the TMS9900.  This interrupt request lasts as long as
-    the interrupt pin and the revelant bit in the interrupt mask are set.
+    the interrupt pin and the relevant bit in the interrupt mask are set.
 
 ***************************************************************************/
 

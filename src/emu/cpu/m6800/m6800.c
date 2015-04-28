@@ -1123,12 +1123,12 @@ void m6800_cpu_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void m6800_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void m6800_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf( "%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				m_cc & 0x80 ? '?':'.',
 				m_cc & 0x40 ? '?':'.',
 				m_cc & 0x20 ? 'H':'.',

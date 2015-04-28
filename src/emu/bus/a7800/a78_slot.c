@@ -66,9 +66,7 @@ void device_a78_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(A78SLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A78SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 
 		// setup other helpers
@@ -530,7 +528,7 @@ int a78_cart_slot_device::verify_header(char *header)
  get default card software
  -------------------------------------------------*/
 
-void a78_cart_slot_device::get_default_card_software(astring &result)
+void a78_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -539,7 +537,7 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 		int type = A78_TYPE0, mapper;
 
 		// Load and check the header
-		core_fread(m_file, head, 128);
+		core_fread(m_file, &head[0], 128);
 
 		// let's try to auto-fix some common errors in the header
 		mapper = validate_header((head[53] << 8) | head[54], FALSE);
@@ -588,7 +586,7 @@ void a78_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "a78_rom");
@@ -733,75 +731,75 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 	UINT8 head_ctrl1 = header[55];
 	UINT8 head_ctrl2 = header[56];
 	UINT8 head_ispal = header[57];
-	astring cart_mapper, ctrl1, ctrl2;
+	std::string cart_mapper, ctrl1, ctrl2;
 	memcpy(head_title, header + 0x11, 0x20);
 
 	switch (head_mapper)
 	{
 		case 0x0000:
-			cart_mapper.cpy("No Bankswitch");
+			cart_mapper.assign("No Bankswitch");
 			break;
 		case 0x0001:
-			cart_mapper.cpy("No Bankswitch + POKEY");
+			cart_mapper.assign("No Bankswitch + POKEY");
 			break;
 		case 0x0002:
-			cart_mapper.cpy("SuperCart Bankswitch");
+			cart_mapper.assign("SuperCart Bankswitch");
 			break;
 		case 0x0003:
-			cart_mapper.cpy("SuperCart Bankswitch + POKEY");
+			cart_mapper.assign("SuperCart Bankswitch + POKEY");
 			break;
 		case 0x0006:
-			cart_mapper.cpy("SuperCart Bankswitch + RAM");
+			cart_mapper.assign("SuperCart Bankswitch + RAM");
 			break;
 		case 0x000a:
-			cart_mapper.cpy("SuperCart 9Banks");
+			cart_mapper.assign("SuperCart 9Banks");
 			break;
 		case 0x000b:
-			cart_mapper.cpy("SuperCart XM Compatible");
+			cart_mapper.assign("SuperCart XM Compatible");
 			break;
 		case 0x0020:
-			cart_mapper.cpy("SuperCart Bankswitch + 32K RAM");
+			cart_mapper.assign("SuperCart Bankswitch + 32K RAM");
 			break;
 		case 0x0100:
-			cart_mapper.cpy("Activision Bankswitch");
+			cart_mapper.assign("Activision Bankswitch");
 			break;
 		case 0x0200:
-			cart_mapper.cpy("Absolute Bankswitch");
+			cart_mapper.assign("Absolute Bankswitch");
 			break;
 		default:
-			cart_mapper.cpy("Unknown mapper");
+			cart_mapper.assign("Unknown mapper");
 			break;
 	}
 
 	switch (head_ctrl1)
 	{
 		case 0x00:
-			ctrl1.cpy("None");
+			ctrl1.assign("None");
 			break;
 		case 0x01:
-			ctrl1.cpy("Joystick");
+			ctrl1.assign("Joystick");
 			break;
 		case 0x02:
-			ctrl1.cpy("Light Gun");
+			ctrl1.assign("Light Gun");
 			break;
 		default:
-			ctrl1.cpy("Unknown controller");
+			ctrl1.assign("Unknown controller");
 			break;
 	}
 
 	switch (head_ctrl2)
 	{
 		case 0x00:
-			ctrl2.cpy("None");
+			ctrl2.assign("None");
 			break;
 		case 0x01:
-			ctrl2.cpy("Joystick");
+			ctrl2.assign("Joystick");
 			break;
 		case 0x02:
-			ctrl2.cpy("Light Gun");
+			ctrl2.assign("Light Gun");
 			break;
 		default:
-			ctrl2.cpy("Unknown controller");
+			ctrl2.assign("Unknown controller");
 			break;
 	}
 
@@ -812,7 +810,7 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 	logerror( "==============\n\n" );
 	logerror( "\tTitle:           %.32s\n", head_title);
 	logerror( "\tLength:          0x%X [real 0x%X]\n", head_length, len);
-	logerror( "\tMapper:          %s [0x%X]\n", cart_mapper.cstr(), head_mapper);
+	logerror( "\tMapper:          %s [0x%X]\n", cart_mapper.c_str(), head_mapper);
 	logerror( "\t\tPOKEY:           %s\n", BIT(head_mapper, 0) ? "Yes" : "No");
 	logerror( "\t\tSC Bankswitch:   %s\n", BIT(head_mapper, 1) ? "Yes" : "No");
 	logerror( "\t\tRAM at $4000:    %s\n", BIT(head_mapper, 2) ? "Yes" : "No");
@@ -827,7 +825,7 @@ void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
 	}
 	else
 		logerror( "\n");
-	logerror( "\tController 1:    0x%.2X [%s]\n", head_ctrl1, ctrl1.cstr());
-	logerror( "\tController 2:    0x%.2X [%s]\n", head_ctrl2, ctrl2.cstr());
+	logerror( "\tController 1:    0x%.2X [%s]\n", head_ctrl1, ctrl1.c_str());
+	logerror( "\tController 2:    0x%.2X [%s]\n", head_ctrl2, ctrl2.c_str());
 	logerror( "\tVideo:           %s\n", (head_ispal) ? "PAL" : "NTSC");
 }

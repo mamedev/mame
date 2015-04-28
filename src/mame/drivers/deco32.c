@@ -2922,8 +2922,8 @@ ROM_END
 
 ROM_START( fghthistu ) /* DE-0395-1 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
-	ROM_LOAD32_WORD( "le-00.1f", 0x000000, 0x80000, CRC(a5c410eb) SHA1(e2b0cb2351782e1155ecc4029010beb7326fd874) ) /* Version 42-05, US */
-	ROM_LOAD32_WORD( "le-01.2f", 0x000002, 0x80000, CRC(7e148aa2) SHA1(b21e16604c4d29611f91d629deb9f041eaf41e9b) )
+	ROM_LOAD32_WORD( "le00-1.1f", 0x000000, 0x80000, CRC(fccacafb) SHA1(b7236a90a09dbd5870a16aa4e4eac5ab5c098418) ) /* Version 42-06, US */
+	ROM_LOAD32_WORD( "le01-1.2f", 0x000002, 0x80000, CRC(06a3c326) SHA1(3d8842fb69def93fc544e89fd0e56ada416157dc) )
 
 	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "le02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
@@ -2954,7 +2954,41 @@ ROM_START( fghthistu ) /* DE-0395-1 PCB */
 	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
 ROM_END
 
-ROM_START( fghthistua ) /* DE-0380-2 PCB */
+ROM_START( fghthistua ) /* DE-0395-1 PCB */
+	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_WORD( "le00.1f", 0x000000, 0x80000, CRC(a5c410eb) SHA1(e2b0cb2351782e1155ecc4029010beb7326fd874) ) /* Version 42-05, US */
+	ROM_LOAD32_WORD( "le01.2f", 0x000002, 0x80000, CRC(7e148aa2) SHA1(b21e16604c4d29611f91d629deb9f041eaf41e9b) )
+
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "le02.18k",  0x00000,  0x10000,  CRC(5fd2309c) SHA1(2fb7af54d5cd9bf7dd6fb4f6b82aa52b03294f1f) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mbf00-8.8a",  0x000000,  0x100000,  CRC(d3e9b580) SHA1(fc4676e0ecc6c32441ff66fa1f990cc3158237db) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "mbf01-8.9a",  0x000000,  0x100000,  CRC(0c6ed2eb) SHA1(8e37ef4b1f0b6d3370a08758bfd602cb5f221282) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x800000, "gfx3", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "mbf02-16.16d",  0x000001,  0x200000,  CRC(c19c5953) SHA1(e6ed26f932c6c86bbd1fc4c000aa2f510c268009) )
+	ROM_LOAD16_BYTE( "mbf04-16.18d",  0x000000,  0x200000,  CRC(f6a23fd7) SHA1(74e5559f17cd591aa25d2ed6c34ac9ed89e2e9ba) )
+	ROM_LOAD16_BYTE( "mbf03-16.17d",  0x400001,  0x200000,  CRC(37d25c75) SHA1(8219d31091b4317190618edd8acc49f97cba6a1e) )
+	ROM_LOAD16_BYTE( "mbf05-16.19d",  0x400000,  0x200000,  CRC(137be66d) SHA1(3fde345183ce04a7a65b4cedfd050d771df7d026) )
+
+	ROM_REGION(0x80000, "oki1", 0 )
+	ROM_LOAD( "mbf06.15k",  0x000000,  0x80000,  CRC(fb513903) SHA1(7727a49ff7977f159ed36d097020edef3b5b36ba) )
+
+	ROM_REGION(0x80000, "oki2", 0 )
+	ROM_LOAD( "mbf07.16k",  0x000000,  0x80000,  CRC(51d4adc7) SHA1(22106ed7a05db94adc5a783ce34529e29d24d41a) )
+
+	ROM_REGION(512, "proms", 0 )
+	ROM_LOAD( "kt-00.8j",  0,  512,  CRC(7294354b) SHA1(14fe42ad5d26d022c0fe9a46a4a9017af2296f40) ) /* MB7124H type prom */
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "ve-00.3d",  0x0000, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+	ROM_LOAD( "ve-01a.4d", 0x0200, 0x0104, NO_DUMP ) /* PAL16L8 is read protected */
+ROM_END
+
+ROM_START( fghthistub ) /* DE-0380-2 PCB */
 	ROM_REGION(0x100000, "maincpu", 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_WORD( "kz00-1.1f", 0x000000, 0x80000, CRC(3a3dd15c) SHA1(689b51adf73402b12191a75061b8e709468c91bc) ) /* Version 42-03, US */
 	ROM_LOAD32_WORD( "kz01-1.2f", 0x000002, 0x80000, CRC(86796cd6) SHA1(c397c07d7a1d03ba96ccb2fe7a0ad25b8331e945) )
@@ -3699,14 +3733,14 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	RAM = memregion("gfx2")->base();
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
@@ -3718,14 +3752,14 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 	dynamic_buffer tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	RAM = memregion("gfx2")->base();
-	memcpy(tmp,RAM+0x80000,0x80000);
+	memcpy(&tmp[0],RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
-	memcpy(RAM+0x100000,tmp,0x80000);
+	memcpy(RAM+0x100000,&tmp[0],0x80000);
 
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -3749,8 +3783,9 @@ GAME( 1991, captavenua, captaven, captaven, captaven, deco32_state,   captaven, 
 GAME( 1991, captavenj,  captaven, captaven, captaven, deco32_state,   captaven,  ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)", 0 )
 
 GAME( 1993, fghthist,   0,        fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (World ver 43-07, DE-0380-2 PCB)", 0 )
-GAME( 1993, fghthistu,  fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)", 0 )
-GAME( 1993, fghthistua, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)", 0 )
+GAME( 1993, fghthistu,  fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-06, DE-0395-1 PCB)", 0 )
+GAME( 1993, fghthistua, fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, DE-0395-1 PCB)", 0 )
+GAME( 1993, fghthistub, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (US ver 42-03, DE-0380-2 PCB)", 0 )
 GAME( 1993, fghthistj,  fghthist, fghthsta, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-07, DE-0395-1 PCB)", 0 )
 GAME( 1993, fghthistja, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-05, DE-0380-2 PCB)", 0 )
 GAME( 1993, fghthistjb, fghthist, fghthist, fghthist, deco32_state,   fghthist,  ROT0, "Data East Corporation", "Fighter's History (Japan ver 41-04, DE-0380-1 PCB)", 0 )

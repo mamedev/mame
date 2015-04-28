@@ -62,9 +62,9 @@ public:
 	void rom_alloc(UINT32 size, const char *tag);
 	void ram_alloc(UINT32 size);
 	UINT8* get_rom_base() { return m_rom; }
-	UINT8*  get_ram_base() { return m_ram; }
+	UINT8*  get_ram_base() { return &m_ram[0]; }
 	UINT32  get_rom_size() { return m_rom_size; }
-	UINT32  get_ram_size() { return m_ram.bytes(); }
+	UINT32  get_ram_size() { return m_ram.size(); }
 
 protected:
 	// internal state
@@ -108,7 +108,7 @@ public:
 	virtual const char *file_extensions() const { return "bin,a26"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);

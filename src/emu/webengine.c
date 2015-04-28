@@ -69,7 +69,7 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 	data["ispaused"] = m_machine->paused();
 
 	Json::FastWriter writer;
-	const char *json = writer.write(data).c_str();
+	std::string json = writer.write(data);
 	// Send HTTP reply to the client
 	mg_printf(conn,
 			"HTTP/1.1 200 OK\r\n"
@@ -77,7 +77,7 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 			"Content-Length: %d\r\n"        // Always set Content-Length
 			"\r\n"
 			"%s",
-			(int)strlen(json), json);
+			(int)json.length(), json.c_str());
 
 	// Returning non-zero tells mongoose that our function has replied to
 	// the client, and mongoose should not send client any more data.
@@ -88,7 +88,7 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 int web_engine::json_slider_handler(struct mg_connection *conn)
 {
 	const slider_state *curslider;
-	astring tempstring;
+	std::string tempstring;
 	Json::Value array(Json::arrayValue);
 
 	// add all sliders
@@ -119,7 +119,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 		array.append(data);
 	}
 	Json::FastWriter writer;
-	const char *json = writer.write(array).c_str();
+	std::string json = writer.write(array);
 	// Send HTTP reply to the client
 	mg_printf(conn,
 			"HTTP/1.1 200 OK\r\n"
@@ -127,7 +127,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 			"Content-Length: %d\r\n"        // Always set Content-Length
 			"\r\n"
 			"%s",
-			(int)strlen(json), json);
+			(int)json.length(), json.c_str());
 
 	return MG_TRUE;
 }
@@ -260,11 +260,11 @@ static int filename_endswith(const char *str, const char *suffix)
 // This function will be called by mongoose on every new request.
 int web_engine::begin_request_handler(struct mg_connection *conn)
 {
-	astring file_path(mg_get_option(m_server, "document_root"), PATH_SEPARATOR, conn->uri);
-	if (filename_endswith(file_path,".lp"))
+	std::string file_path = std::string(mg_get_option(m_server, "document_root")).append(PATH_SEPARATOR).append(conn->uri);
+	if (filename_endswith(file_path.c_str(), ".lp"))
 	{
 		FILE *fp = NULL;
-		if ((fp = fopen(file_path, "rb")) != NULL) {
+		if ((fp = fopen(file_path.c_str(), "rb")) != NULL) {
 		fseek (fp, 0, SEEK_END);
 		size_t size = ftell(fp);
 		fseek (fp, 0, SEEK_SET);
@@ -440,9 +440,9 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 			return 0;
 		}
 
-		astring fname("screenshot.png");
+		std::string fname("screenshot.png");
 		emu_file file(m_machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = file.open(fname);
+		file_error filerr = file.open(fname.c_str());
 
 		if (filerr != FILERR_NONE)
 		{
@@ -450,12 +450,12 @@ int web_engine::begin_request_handler(struct mg_connection *conn)
 		}
 
 		m_machine->video().save_snapshot(screen, file);
-		astring fullpath(file.fullpath());
+		std::string fullpath(file.fullpath());
 		file.close();
 		mg_send_header(conn, "Cache-Control", "no-cache, no-store, must-revalidate");
 		mg_send_header(conn, "Pragma", "no-cache");
 		mg_send_header(conn, "Expires", "0");
-		mg_send_file(conn, fullpath.cstr(), NULL);
+		mg_send_file(conn, fullpath.c_str(), NULL);
 		return MG_MORE; // It is important to return MG_MORE after mg_send_file!
 	}
 	return 0;

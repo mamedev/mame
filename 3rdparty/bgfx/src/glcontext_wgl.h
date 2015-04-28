@@ -10,7 +10,7 @@
 
 #include <wgl/wglext.h>
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 typedef PROC (APIENTRYP PFNWGLGETPROCADDRESSPROC) (LPCSTR lpszProc);
 typedef BOOL (APIENTRYP PFNWGLMAKECURRENTPROC) (HDC hdc, HGLRC hglrc);
@@ -70,7 +70,7 @@ typedef void (APIENTRYP PFNGLSTENCILOPPROC) (GLenum fail, GLenum zfail, GLenum z
 
 		void create(uint32_t _width, uint32_t _height);
 		void destroy();
-		void resize(uint32_t _width, uint32_t _height, bool _vsync);
+		void resize(uint32_t _width, uint32_t _height, uint32_t _flags);
 
 		static bool isSwapChainSupported();
 		SwapChainGL* createSwapChain(void* _nwh);
@@ -93,7 +93,7 @@ typedef void (APIENTRYP PFNGLSTENCILOPPROC) (GLenum fail, GLenum zfail, GLenum z
 		HGLRC m_context;
 		HDC m_hdc;
 	};
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // BGFX_USE_WGL
 

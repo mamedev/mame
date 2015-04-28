@@ -28,7 +28,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	
+
 	optional_shared_ptr<UINT16> m_nvram;
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_vregs;
@@ -39,7 +39,7 @@ public:
 	int m_yoffset;
 	int m_keyboard_row;
 	UINT16 *m_buffered_spriteram;
-	
+
 	UINT64 m_funcube_coin_start_cycles;
 	UINT8 m_funcube_hopper_motor;
 

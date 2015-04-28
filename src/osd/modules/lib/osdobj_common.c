@@ -6,7 +6,7 @@
 
     OS-dependent code interface.
 
-*******************************************************************c********/
+***************************************************************************/
 
 
 #include "emu.h"
@@ -17,104 +17,122 @@ extern bool g_print_verbose;
 
 const options_entry osd_options::s_option_entries[] =
 {
-	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD FONT OPTIONS" },
-	{ OSD_FONT_PROVIDER,                      "auto",     OPTION_STRING,     "provider for ui font: " },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD FONT OPTIONS" },
+	{ OSD_FONT_PROVIDER,                      OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for ui font: " },
 
-	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD CLI OPTIONS" },
-	{ OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",        OPTION_COMMAND,    "list available MIDI I/O devices" },
-	{ OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",     OPTION_COMMAND,    "list available network adapters" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD CLI OPTIONS" },
+	{ OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",              OPTION_COMMAND,   "list available MIDI I/O devices" },
+	{ OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",           OPTION_COMMAND,   "list available network adapters" },
 
 	// debugging options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD DEBUGGING OPTIONS" },
-	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,      OPTION_STRING,    "debugger used : " },
-	{ OSDOPTION_WATCHDOG ";wdog",             "0",        OPTION_INTEGER,    "force the program to terminate if no updates within specified number of seconds" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD DEBUGGING OPTIONS" },
+	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,   OPTION_STRING,    "debugger used: " },
+	{ OSDOPTION_DEBUGGER_FONT ";dfont",       OSDOPTVAL_AUTO,   OPTION_STRING,    "specifies the font to use for debugging" },
+	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",           OPTION_FLOAT,     "specifies the font size to use for debugging" },
+
+	{ OSDOPTION_WATCHDOG ";wdog",             "0",              OPTION_INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
 
 	// performance options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD PERFORMANCE OPTIONS" },
-	{ OSDOPTION_MULTITHREADING ";mt",         "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
-	{ OSDOPTION_NUMPROCESSORS ";np",          OSDOPTVAL_AUTO,      OPTION_STRING,     "number of processors; this overrides the number the system reports" },
-	{ OSDOPTION_BENCH,                        "0",        OPTION_INTEGER,    "benchmark for the given number of emulated seconds; implies -video none -sound none -nothrottle" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD PERFORMANCE OPTIONS" },
+	{ OSDOPTION_MULTITHREADING ";mt",         "0",              OPTION_BOOLEAN,   "enable multithreading; this enables rendering and blitting on a separate thread" },
+	{ OSDOPTION_NUMPROCESSORS ";np",          OSDOPTVAL_AUTO,   OPTION_STRING,    "number of processors; this overrides the number the system reports" },
+	{ OSDOPTION_BENCH,                        "0",              OPTION_INTEGER,   "benchmark for the given number of emulated seconds; implies -video none -sound none -nothrottle" },
 	// video options
-	{ NULL,                                   NULL,       OPTION_HEADER,     "OSD VIDEO OPTIONS" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
-	{ OSDOPTION_VIDEO,                        OSDOPTVAL_AUTO,     OPTION_STRING,     "video output method: " },
-	{ OSDOPTION_NUMSCREENS "(1-4)",           "1",        OPTION_INTEGER,    "number of screens to create; usually, you want just one" },
-	{ OSDOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
-	{ OSDOPTION_MAXIMIZE ";max",              "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
-	{ OSDOPTION_KEEPASPECT ";ka",             "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
-	{ OSDOPTION_UNEVENSTRETCH ";ues",         "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
-	{ OSDOPTION_WAITVSYNC ";vs",              "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
-	{ OSDOPTION_SYNCREFRESH ";srf",           "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
+	{ OSDOPTION_VIDEO,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "video output method: " },
+	{ OSDOPTION_NUMSCREENS "(1-4)",           "1",              OPTION_INTEGER,   "number of screens to create; usually, you want just one" },
+	{ OSDOPTION_WINDOW ";w",                  "0",              OPTION_BOOLEAN,   "enable window mode; otherwise, full screen mode is assumed" },
+	{ OSDOPTION_MAXIMIZE ";max",              "1",              OPTION_BOOLEAN,   "default to maximized windows; otherwise, windows will be minimized" },
+	{ OSDOPTION_KEEPASPECT ";ka",             "1",              OPTION_BOOLEAN,   "constrain to the proper aspect ratio" },
+	{ OSDOPTION_UNEVENSTRETCH ";ues",         "1",              OPTION_BOOLEAN,   "allow non-integer stretch factors" },
+	{ OSDOPTION_WAITVSYNC ";vs",              "0",              OPTION_BOOLEAN,   "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
+	{ OSDOPTION_SYNCREFRESH ";srf",           "0",              OPTION_BOOLEAN,   "enable using the start of VBLANK for throttling instead of the game time" },
 
 	// per-window options
 	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD PER-WINDOW VIDEO OPTIONS" },
-	{ OSDOPTION_SCREEN,                   OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT ";screen_aspect",  OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION ";r",          OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW,                     OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for all screens" },
+	{ OSDOPTION_SCREEN,                       OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT ";screen_aspect",      OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION ";r",              OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW,                         OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for all screens" },
 
-	{ OSDOPTION_SCREEN "0",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "0",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "0;r0",        OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "0",                    OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the first screen" },
+	{ OSDOPTION_SCREEN "0",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "0",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "0;r0",            OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "0",                     OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the first screen" },
 
-	{ OSDOPTION_SCREEN "1",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "1",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "1;r1",        OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "1",                    OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the second screen" },
+	{ OSDOPTION_SCREEN "1",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "1",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "1;r1",            OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "1",                     OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the second screen" },
 
-	{ OSDOPTION_SCREEN "2",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "2",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "2;r2",        OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "2",                    OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the third screen" },
+	{ OSDOPTION_SCREEN "2",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "2",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "2;r2",            OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "2",                     OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the third screen" },
 
-	{ OSDOPTION_SCREEN "3",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "3",                  OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "3;r3",        OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "3",                    OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the fourth screen" },
+	{ OSDOPTION_SCREEN "3",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "3",                   OSDOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "3;r3",            OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "3",                     OSDOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the fourth screen" },
 
 	// full screen options
-	{ NULL,                                   NULL,  OPTION_HEADER,     "OSD FULL SCREEN OPTIONS" },
-	{ OSDOPTION_SWITCHRES,                    "0",   OPTION_BOOLEAN,    "enable resolution switching" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD FULL SCREEN OPTIONS" },
+	{ OSDOPTION_SWITCHRES,                    "0",              OPTION_BOOLEAN,   "enable resolution switching" },
 
-	// sound options
-	{ NULL,                                   NULL,  OPTION_HEADER,     "OSD SOUND OPTIONS" },
-	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO, OPTION_STRING,     "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",   OPTION_INTEGER,    "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
-
-	{ NULL,                                   NULL,   OPTION_HEADER,  "OSD VIDEO OPTIONS" },
-	{ OSDOPTION_FILTER ";glfilter;flt",       "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
-	{ OSDOPTION_PRESCALE,                     "1",    OPTION_INTEGER,                 "scale screen rendering by this amount in software" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
+	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "enable bilinear filtering on screen output" },
+	{ OSDOPTION_PRESCALE,                     "1",              OPTION_INTEGER,   "scale screen rendering by this amount in software" },
 
 #ifdef USE_OPENGL
 	// OpenGL specific options
-	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
-	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",    OPTION_BOOLEAN, "force power of two textures  (default no)" },
-	{ OSDOPTION_GL_NOTEXTURERECT,             "0",    OPTION_BOOLEAN, "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
-	{ OSDOPTION_GL_VBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
-	{ OSDOPTION_GL_PBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
-	{ OSDOPTION_GL_GLSL,                      "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
-	{ OSDOPTION_GLSL_FILTER,                  "1",    OPTION_STRING,  "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
-	{ OSDOPTION_SHADER_MAME "0",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 0" },
-	{ OSDOPTION_SHADER_MAME "1",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 1" },
-	{ OSDOPTION_SHADER_MAME "2",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 2" },
-	{ OSDOPTION_SHADER_MAME "3",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 3" },
-	{ OSDOPTION_SHADER_MAME "4",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 4" },
-	{ OSDOPTION_SHADER_MAME "5",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 5" },
-	{ OSDOPTION_SHADER_MAME "6",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 6" },
-	{ OSDOPTION_SHADER_MAME "7",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 7" },
-	{ OSDOPTION_SHADER_MAME "8",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 8" },
-	{ OSDOPTION_SHADER_MAME "9",     OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 9" },
-	{ OSDOPTION_SHADER_SCREEN "0",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 0" },
-	{ OSDOPTION_SHADER_SCREEN "1",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 1" },
-	{ OSDOPTION_SHADER_SCREEN "2",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 2" },
-	{ OSDOPTION_SHADER_SCREEN "3",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 3" },
-	{ OSDOPTION_SHADER_SCREEN "4",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 4" },
-	{ OSDOPTION_SHADER_SCREEN "5",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 5" },
-	{ OSDOPTION_SHADER_SCREEN "6",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 6" },
-	{ OSDOPTION_SHADER_SCREEN "7",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 7" },
-	{ OSDOPTION_SHADER_SCREEN "8",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 8" },
-	{ OSDOPTION_SHADER_SCREEN "9",   OSDOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 9" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },
+	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",              OPTION_BOOLEAN,   "force power of two textures  (default no)" },
+	{ OSDOPTION_GL_NOTEXTURERECT,             "0",              OPTION_BOOLEAN,   "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
+	{ OSDOPTION_GL_VBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL VBO,  if available (default on)" },
+	{ OSDOPTION_GL_PBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL PBO,  if available (default on)" },
+	{ OSDOPTION_GL_GLSL,                      "0",              OPTION_BOOLEAN,   "enable OpenGL GLSL, if available (default off)" },
+	{ OSDOPTION_GLSL_FILTER,                  "1",              OPTION_STRING,    "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+	{ OSDOPTION_SHADER_MAME "0",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 0" },
+	{ OSDOPTION_SHADER_MAME "1",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 1" },
+	{ OSDOPTION_SHADER_MAME "2",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 2" },
+	{ OSDOPTION_SHADER_MAME "3",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 3" },
+	{ OSDOPTION_SHADER_MAME "4",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 4" },
+	{ OSDOPTION_SHADER_MAME "5",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 5" },
+	{ OSDOPTION_SHADER_MAME "6",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 6" },
+	{ OSDOPTION_SHADER_MAME "7",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 7" },
+	{ OSDOPTION_SHADER_MAME "8",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 8" },
+	{ OSDOPTION_SHADER_MAME "9",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 9" },
+	{ OSDOPTION_SHADER_SCREEN "0",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 0" },
+	{ OSDOPTION_SHADER_SCREEN "1",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 1" },
+	{ OSDOPTION_SHADER_SCREEN "2",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 2" },
+	{ OSDOPTION_SHADER_SCREEN "3",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 3" },
+	{ OSDOPTION_SHADER_SCREEN "4",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 4" },
+	{ OSDOPTION_SHADER_SCREEN "5",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 5" },
+	{ OSDOPTION_SHADER_SCREEN "6",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 6" },
+	{ OSDOPTION_SHADER_SCREEN "7",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 7" },
+	{ OSDOPTION_SHADER_SCREEN "8",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 8" },
+	{ OSDOPTION_SHADER_SCREEN "9",            OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader screen bitmap 9" },
+#endif
+
+	// sound options
+	{ NULL,                                   NULL,             OPTION_HEADER,    "OSD SOUND OPTIONS" },
+	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },
+	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+
+#ifdef SDLMAME_MACOSX
+	{ NULL,                                   NULL,             OPTION_HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
+	{ OSDOPTION_AUDIO_OUTPUT,                 OSDOPTVAL_AUTO,   OPTION_STRING,    "Audio output device" },
+	{ OSDOPTION_AUDIO_EFFECT "0",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 0" },
+	{ OSDOPTION_AUDIO_EFFECT "1",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 1" },
+	{ OSDOPTION_AUDIO_EFFECT "2",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 2" },
+	{ OSDOPTION_AUDIO_EFFECT "3",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 3" },
+	{ OSDOPTION_AUDIO_EFFECT "4",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 4" },
+	{ OSDOPTION_AUDIO_EFFECT "5",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 5" },
+	{ OSDOPTION_AUDIO_EFFECT "6",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 6" },
+	{ OSDOPTION_AUDIO_EFFECT "7",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 7" },
+	{ OSDOPTION_AUDIO_EFFECT "8",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 8" },
+	{ OSDOPTION_AUDIO_EFFECT "9",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 9" },
 #endif
 
 	// End of list
@@ -147,7 +165,7 @@ osd_common_t::osd_common_t(osd_options &options)
 
 osd_common_t::~osd_common_t()
 {
-	for(int i= 0; i < m_video_names.count(); ++i)
+	for(unsigned int i= 0; i < m_video_names.size(); ++i)
 		osd_free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
 	osd_output::pop(this);
@@ -168,6 +186,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_RETRO);
 #else
 	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
+	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
@@ -177,11 +196,13 @@ void osd_common_t::register_options()
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
 #endif
+#ifndef OSD_MINI
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
 	REGISTER_MODULE(m_mod_man, DEBUG_INTERNAL);
 #endif
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
+#endif
 
 #ifndef OSD_RETRO
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);
@@ -199,31 +220,31 @@ void osd_common_t::register_options()
 	const char *names[20];
 	int num;
 	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
-	dynamic_array<const char *> dnames;
+	std::vector<const char *> dnames;
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
+		dnames.push_back(names[i]);
 	update_option(OSD_FONT_PROVIDER, dnames);
 
 	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, &num, names);
-	dnames.reset();
+	dnames.clear();
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
+		dnames.push_back(names[i]);
 	update_option(OSD_SOUND_PROVIDER, dnames);
 
 #if 0
 	// Register midi options and update options
-	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
-	dnames.reset();
+	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, &num, names);
+	dnames.clear();
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
-	update_option(OSD_DEBUG_PROVIDER, dnames);
+		dnames.push_back(names[i]);
+	update_option(OSD_MIDI_PROVIDER, dnames);
 #endif
 
 	// Register debugger options and update options
 	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, &num, names);
-	dnames.reset();
+	dnames.clear();
 	for (int i = 0; i < num; i++)
-		dnames.append(names[i]);
+		dnames.push_back(names[i]);
 	update_option(OSD_DEBUG_PROVIDER, dnames);
 
 	// Register video options and update options
@@ -232,24 +253,24 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const char * key, dynamic_array<const char *> &values)
+void osd_common_t::update_option(const char * key, std::vector<const char *> &values)
 {
-	astring current_value(m_options.description(key));
-	astring new_option_value("");
-	for (int index = 0; index < values.count(); index++)
+	std::string current_value(m_options.description(key));
+	std::string new_option_value("");
+	for (unsigned int index = 0; index < values.size(); index++)
 	{
-		astring t(values[index]);
-		if (new_option_value.len() > 0)
+		std::string t(values[index]);
+		if (new_option_value.length() > 0)
 		{
-			if( index != (values.count()-1))
-				new_option_value.cat(", ");
+			if( index != (values.size()-1))
+				new_option_value.append(", ");
 			else
-				new_option_value.cat(" or ");
+				new_option_value.append(" or ");
 		}
-		new_option_value.cat(t);
+		new_option_value.append(t);
 	}
 	// TODO: core_strdup() is leaked
-	m_options.set_description(key, core_strdup(current_value.cat(new_option_value).cstr()));
+	m_options.set_description(key, core_strdup(current_value.append(new_option_value).c_str()));
 }
 
 
@@ -493,7 +514,7 @@ bool osd_common_t::execute_command(const char *command)
 
 		if (om->probe())
 		{
-			om->init();
+			om->init(options());
 			osd_list_network_adapters();
 			om->exit();
 		}
@@ -507,7 +528,7 @@ bool osd_common_t::execute_command(const char *command)
 
 		if (om->probe())
 		{
-			om->init();
+			om->init(options());
 			pm->list_midi_devices();
 			om->exit();
 		}
@@ -548,7 +569,7 @@ void osd_common_t::init_subsystems()
 
 	m_midi = select_module_options<midi_module *>(options(), OSD_MIDI_PROVIDER);
 
-	m_mod_man.init();
+	m_mod_man.init(options());
 
 }
 
@@ -622,5 +643,5 @@ void osd_common_t::osd_exit()
 void osd_common_t::video_options_add(const char *name, void *type)
 {
 	//m_video_options.add(name, type, false);
-	m_video_names.append(core_strdup(name));
+	m_video_names.push_back(core_strdup(name));
 }

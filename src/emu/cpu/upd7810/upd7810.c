@@ -1732,12 +1732,12 @@ void upd78c05_device::device_start()
 
 }
 
-void upd7810_device::state_string_export(const device_state_entry &entry, astring &string)
+void upd7810_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%s:%s:%s:%s:%s:%s",
+			strprintf(str, "%s:%s:%s:%s:%s:%s",
 				m_psw & 0x40 ? "ZF":"--",
 				m_psw & 0x20 ? "SK":"--",
 				m_psw & 0x10 ? "HC":"--",

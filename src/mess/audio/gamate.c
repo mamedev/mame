@@ -38,7 +38,7 @@ gamate_sound_device::gamate_sound_device(const machine_config &mconfig, const ch
 void gamate_sound_device::device_start()
 {
 	// bind callbacks
-//	m_irq_cb.bind_relative_to(*owner());
+//  m_irq_cb.bind_relative_to(*owner());
 
 	memset(m_channels, 0, sizeof(m_channels));
 	memset(reg, 0, sizeof(reg));
@@ -56,7 +56,7 @@ void gamate_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int i, j;
 	Tone *channel;
-	
+
 	for (i = 0; i < samples; i++, left++, right++)
 	{
 		noise.pos += noise.step;
@@ -77,7 +77,7 @@ void gamate_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 			{
 				case 0: case 1: case 2: case 3:
 				case 4: case 5: case 6: case 7:
-				case 8: case 9: case 0xb: 
+				case 8: case 9: case 0xb:
 				case 0xd: case 0xf:
 					if (envelope.index>=ARRAY_LENGTH(EnvelopeVolumes)/2)
 					{

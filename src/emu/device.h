@@ -111,13 +111,13 @@ public:
 
 	// getters
 	running_machine &machine() const { /*assert(m_machine != NULL);*/ return *m_machine; }
-	const char *tag() const { return m_tag; }
-	const char *basetag() const { return m_basetag; }
+	const char *tag() const { return m_tag.c_str(); }
+	const char *basetag() const { return m_basetag.c_str(); }
 	device_type type() const { return m_type; }
-	const char *name() const { return m_name; }
-	const char *shortname() const { return m_shortname; }
-	const char *searchpath() const { return m_searchpath; }
-	const char *source() const { return m_source; }
+	const char *name() const { return m_name.c_str(); }
+	const char *shortname() const { return m_shortname.c_str(); }
+	const char *searchpath() const { return m_searchpath.c_str(); }
+	const char *source() const { return m_source.c_str(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
 	UINT32 configured_clock() const { return m_configured_clock; }
@@ -129,8 +129,8 @@ public:
 	ioport_constructor input_ports() const { return device_input_ports(); }
 	UINT8 default_bios() const { return m_default_bios; }
 	UINT8 system_bios() const { return m_system_bios; }
-	astring default_bios_tag() const { return m_default_bios_tag; }
-	astring parameter(const char *tag) const;
+	std::string default_bios_tag() const { return m_default_bios_tag; }
+	std::string parameter(const char *tag) const;
 
 	// interface helpers
 	device_interface *first_interface() const { return m_interface_list; }
@@ -150,8 +150,8 @@ public:
 
 	// owned object helpers
 	device_t *first_subdevice() const { return m_subdevice_list.first(); }
-	astring &subtag(astring &dest, const char *tag) const;
-	astring &siblingtag(astring &dest, const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(dest, tag) : dest.cpy(tag); }
+	std::string subtag(const char *tag) const;
+	std::string siblingtag(const char *tag) const { return (this != NULL && m_owner != NULL) ? m_owner->subtag(tag) : std::string(tag); }
 	memory_region *memregion(const char *tag) const;
 	memory_share *memshare(const char *tag) const;
 	memory_bank *membank(const char *tag) const;
@@ -166,7 +166,7 @@ public:
 	static void static_set_clock(device_t &device, UINT32 clock);
 	static void static_set_static_config(device_t &device, const void *config) { device.m_static_config = config; }
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
-	static void static_set_default_bios_tag(device_t &device, const char *tag) { astring default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
+	static void static_set_default_bios_tag(device_t &device, const char *tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
 
 	// state helpers
 	void config_complete();
@@ -238,10 +238,10 @@ protected:
 
 	// core device properties
 	const device_type       m_type;                 // device type
-	astring                 m_name;                 // name of the device
-	astring                 m_shortname;            // short name of the device
-	astring                 m_searchpath;           // search path, used for media loading
-	astring                 m_source;               // device source file name
+	std::string             m_name;                 // name of the device
+	std::string             m_shortname;            // short name of the device
+	std::string             m_searchpath;           // search path, used for media loading
+	std::string             m_source;               // device source file name
 
 	// device relationships
 	device_t *              m_owner;                // device that owns us
@@ -270,7 +270,7 @@ protected:
 
 	UINT8                   m_system_bios;          // the system BIOS we wish to load
 	UINT8                   m_default_bios;         // the default system BIOS
-	astring                 m_default_bios_tag;     // tag of the default system BIOS
+	std::string             m_default_bios_tag;     // tag of the default system BIOS
 
 private:
 	// private helpers
@@ -282,8 +282,8 @@ private:
 	// private state; accessor use required
 	running_machine *       m_machine;
 	save_manager *          m_save;
-	astring                 m_tag;                  // full tag for this instance
-	astring                 m_basetag;              // base part of the tag
+	std::string             m_tag;                  // full tag for this instance
+	std::string             m_basetag;              // base part of the tag
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find

@@ -562,7 +562,7 @@ void sega315_5124_device::check_pending_flags()
 	/* A timer ensures that this function will run at least at end of each line.
 	   When this function runs through a CPU instruction executed when the timer
 	   was about to fire, the time added in the CPU timeslice may make hpos()
-	   return some position in the begining of next line. To ensure the instruction
+	   return some position in the beginning of next line. To ensure the instruction
 	   will get updated status, here a maximum hpos is set if the timer reports no
 	   remaining time, what could also occur due to the ahead time of the timeslice. */
 	if (m_pending_flags_timer->remaining() == attotime::zero)
@@ -712,7 +712,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 				//
 				// For VINT disabling through register 01:
 				// When running eagles5 on the smskr driver the irq_state is 1 because of some
-				// previos HINTs that occured. eagles5 sets register 01 to 0x02 and expects
+				// previos HINTs that occurred. eagles5 sets register 01 to 0x02 and expects
 				// the irq state to be cleared after that.
 				// The following bit of code takes care of that.
 				//
@@ -1573,8 +1573,6 @@ void sega315_5124_device::device_start()
 	m_pause_cb.resolve();
 
 	/* Allocate video RAM */
-	astring tempstring;
-
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 
 	/* Make temp bitmap for rendering */

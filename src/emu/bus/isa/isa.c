@@ -329,7 +329,6 @@ void isa8_device::unmap_bank(offs_t start, offs_t end, offs_t mask, offs_t mirro
 
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, const char *region)
 {
-	astring tempstring;
 	if (machine().root_device().memregion("isa")) {
 		UINT8 *src = dev->memregion(region)->base();
 		UINT8 *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
@@ -337,7 +336,7 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, offs_t ma
 	} else {
 		m_prgspace->install_read_bank(start, end, mask, mirror, tag);
 		m_prgspace->unmap_write(start, end, mask, mirror);
-		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(tempstring, region))->base());
+		machine().root_device().membank(tag)->set_base(machine().root_device().memregion(dev->subtag(region).c_str())->base());
 	}
 }
 

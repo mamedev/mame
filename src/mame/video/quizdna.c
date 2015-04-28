@@ -58,9 +58,15 @@ void quizdna_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizdna_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,8,32,32 );
 
 	m_fg_tilemap->set_transparent_pen(0 );
+	
+	save_pointer(NAME(m_bg_ram), 0x2000);
+	save_pointer(NAME(m_fg_ram), 0x1000);
+	save_item(NAME(m_bg_xscroll));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_video_enable));
 }
 
-WRITE8_MEMBER(quizdna_state::quizdna_bg_ram_w)
+WRITE8_MEMBER(quizdna_state::bg_ram_w)
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	m_bg_ram[offset] = data;
@@ -69,7 +75,7 @@ WRITE8_MEMBER(quizdna_state::quizdna_bg_ram_w)
 	m_bg_tilemap->mark_tile_dirty((offset & 0xfff) / 2 );
 }
 
-WRITE8_MEMBER(quizdna_state::quizdna_fg_ram_w)
+WRITE8_MEMBER(quizdna_state::fg_ram_w)
 {
 	int i;
 	int offs = offset & 0xfff;
@@ -83,12 +89,12 @@ WRITE8_MEMBER(quizdna_state::quizdna_fg_ram_w)
 		m_fg_tilemap->mark_tile_dirty(((offs/2) & 0x1f) + i*0x20 );
 }
 
-WRITE8_MEMBER(quizdna_state::quizdna_bg_yscroll_w)
+WRITE8_MEMBER(quizdna_state::bg_yscroll_w)
 {
 	m_bg_tilemap->set_scrolldy(255-data, 255-data+1 );
 }
 
-WRITE8_MEMBER(quizdna_state::quizdna_bg_xscroll_w)
+WRITE8_MEMBER(quizdna_state::bg_xscroll_w)
 {
 	int x;
 	m_bg_xscroll[offset] = data;
@@ -97,7 +103,7 @@ WRITE8_MEMBER(quizdna_state::quizdna_bg_xscroll_w)
 	m_bg_tilemap->set_scrolldx(x+64, x-64+10 );
 }
 
-WRITE8_MEMBER(quizdna_state::quizdna_screen_ctrl_w)
+WRITE8_MEMBER(quizdna_state::screen_ctrl_w)
 {
 	int tmp = (data & 0x10) >> 4;
 	m_video_enable = data & 0x20;
@@ -132,20 +138,15 @@ WRITE8_MEMBER(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)
 
 void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0; offs<m_spriteram.bytes(); offs+=8)
+	for (int offs = 0; offs<m_spriteram.bytes(); offs+=8)
 	{
-		int i;
-
-		int x = spriteram[offs + 3]*0x100 + spriteram[offs + 2] + 64 - 8;
-		int y = (spriteram[offs + 1] & 1)*0x100 + spriteram[offs + 0];
-		int code = (spriteram[offs + 5] * 0x100 + spriteram[offs + 4]) & 0x3fff;
-		int col =  spriteram[offs + 6];
+		int x = m_spriteram[offs + 3]*0x100 + m_spriteram[offs + 2] + 64 - 8;
+		int y = (m_spriteram[offs + 1] & 1)*0x100 + m_spriteram[offs + 0];
+		int code = (m_spriteram[offs + 5] * 0x100 + m_spriteram[offs + 4]) & 0x3fff;
+		int col =  m_spriteram[offs + 6];
 		int fx = col & 0x80;
 		int fy = col & 0x40;
-		int ysize = (spriteram[offs + 1] & 0xc0) >> 6;
+		int ysize = (m_spriteram[offs + 1] & 0xc0) >> 6;
 		int dy = 0x10;
 		col &= 0x1f;
 
@@ -168,7 +169,7 @@ void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (code >= 0x2100)
 			code &= 0x20ff;
 
-		for (i=0; i<ysize+1; i++)
+		for (int i=0; i<ysize+1; i++)
 		{
 			y &= 0x1ff;
 
@@ -183,7 +184,7 @@ void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 }
 
-UINT32 quizdna_state::screen_update_quizdna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 quizdna_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_video_enable)
 	{

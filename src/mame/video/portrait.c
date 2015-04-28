@@ -9,13 +9,13 @@
 #include "includes/portrait.h"
 
 
-WRITE8_MEMBER(portrait_state::portrait_bgvideo_write)
+WRITE8_MEMBER(portrait_state::bgvideo_write)
 {
 	m_background->mark_tile_dirty(offset/2);
 	m_bgvideoram[offset] = data;
 }
 
-WRITE8_MEMBER(portrait_state::portrait_fgvideo_write)
+WRITE8_MEMBER(portrait_state::fgvideo_write)
 {
 	m_foreground->mark_tile_dirty(offset/2);
 	m_fgvideoram[offset] = data;
@@ -67,7 +67,9 @@ void portrait_state::video_start()
 	m_background = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(portrait_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
 	m_foreground = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(portrait_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32 );
 
-	m_foreground->set_transparent_pen(7 );
+	m_foreground->set_transparent_pen(7);
+
+	save_item(NAME(m_scroll));
 }
 
 
@@ -180,7 +182,7 @@ void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 portrait_state::screen_update_portrait(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle cliprect_scroll, cliprect_no_scroll;
 

@@ -109,8 +109,7 @@ void a2bus_cffa2000_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, CFFA2_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(CFFA2_ROM_REGION).c_str())->base();
 
 	// patch default setting so slave device is enabled and up to 13 devices on both connectors
 	m_rom[0x800] = 13;

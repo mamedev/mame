@@ -4759,7 +4759,7 @@
 	</software>
 
 	<software name="deadtest">
-		<description>C-64 Dead Test</description>
+		<description>C64/C128/C128D Diagnostic Dead Test (Rev 781220)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="c64_cart">
@@ -6983,6 +6983,20 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">
 				<rom name="insta-calc version 2.0.g64" size="279582" crc="ba827aef" sha1="ddafbb0550575c1a43da66f9348135fb7f6ab899" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diag64" supported="no">
+		<description>Diagnose64</description>
+		<year>1985</year>
+		<publisher>MicroDoctor</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mw203" />
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="micro doctor 64 mw-203.u6" size="0x2000" crc="8dbf3c3b" sha1="8a14829eb9b92e8c6d0588357074363a75cda886" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

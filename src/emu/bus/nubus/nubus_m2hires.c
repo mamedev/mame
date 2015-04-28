@@ -66,19 +66,19 @@ const rom_entry *nubus_m2hires_device::device_rom_region() const
 nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_M2HIRES, "Macintosh II Hi-Resolution video card", tag, owner, clock, "nb_m2hr", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this),
-		m_assembled_tag(tag, ":", M2HIRES_SCREEN_NAME)
+		device_nubus_card_interface(mconfig, *this)
 {
-	m_screen_tag = m_assembled_tag;
+	m_assembled_tag = std::string(tag).append(":").append(M2HIRES_SCREEN_NAME);
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_m2hires_device::nubus_m2hires_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this),
-		m_assembled_tag(tag, ":", M2HIRES_SCREEN_NAME)
+		device_nubus_card_interface(mconfig, *this)
 {
-	m_screen_tag = m_assembled_tag;
+	m_assembled_tag = std::string(tag).append(":").append(M2HIRES_SCREEN_NAME);
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 //-------------------------------------------------
@@ -118,7 +118,7 @@ void nubus_m2hires_device::device_reset()
 	m_clutoffs = 0;
 	m_vbl_disable = 1;
 	m_mode = 0;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -148,7 +148,7 @@ UINT32 nubus_m2hires_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	int x, y;
 	UINT8 pixels, *vram;
 
-	vram = m_vram + 0x20;
+	vram = &m_vram[0x20];
 
 	switch (m_mode)
 	{

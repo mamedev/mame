@@ -114,7 +114,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const;
@@ -143,7 +143,7 @@ protected:
 	virtual UINT16 io_r16(UINT8 adr) = 0;
 
 	void recompute_bcount(UINT64 event_time);
-	static astring regname(UINT8 reg);
+	static std::string regname(UINT8 reg);
 
 	inline void next(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH; }
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }

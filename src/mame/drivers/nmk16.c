@@ -5235,7 +5235,7 @@ static void decryptcode( running_machine &machine, int a23, int a22, int a21, in
 	size_t  size = machine.root_device().memregion( "maincpu" )->bytes();
 	dynamic_buffer buffer( size );
 
-	memcpy( buffer, RAM, size );
+	memcpy( &buffer[0], RAM, size );
 	for( i = 0; i < size; i++ )
 	{
 		RAM[ i ] = buffer[ BITSWAP24( i, a23, a22, a21, a20, a19, a18, a17, a16, a15, a14, a13, a12,
@@ -6932,6 +6932,26 @@ ROM_START( redhawkb )
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+ROM_START( redhawkk )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
+	ROM_LOAD16_BYTE( "2", 0x000000, 0x020000, CRC(8c02e81d) SHA1(e79b0369adfe4111d7596df5270c1db8e3618ce5) )
+	ROM_LOAD16_BYTE( "3", 0x000001, 0x020000, CRC(ab3597ee) SHA1(e9a2e085fa24cb2f500600b84ce2fe3924cf0827) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "1", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )   /* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "6", 0x000001, 0x080000, CRC(6a0b8224) SHA1(07e68a6d13534ff51964d5abeb991508e8c8ea1a) )
+	ROM_LOAD16_BYTE( "7", 0x000000, 0x080000, CRC(f4fa8211) SHA1(c3fed284127c9f837ab6cbd41d89ad827b423c9e) )
+
+	ROM_REGION( 0x080000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
+	ROM_LOAD( "4", 0x000000, 0x080000, CRC(6255d6a1) SHA1(dcde3149c15717d624ca184454703a15db54bcde) )
+
+	ROM_REGION( 0x080000, "fgtile", ROMREGION_ERASEFF )   /* Layer 1, 8x8x4 */
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
 
 
 
@@ -7072,7 +7092,6 @@ ROM_START( grdnstrmj )
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-
 ROM_START( grdnstrmv ) /* Apples Industries license - Vertical version */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_BYTE( "afega2.u112", 0x000000, 0x040000, CRC(16d41050) SHA1(79b6621dccb286e5adf60c40690083a37746a4f9) )
@@ -7105,7 +7124,6 @@ DRIVER_INIT_MEMBER(nmk16_state,grdnstrmg)
 
 }
 
-
 ROM_START( grdnstrmg ) /* Germany */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_BYTE( "gs5_c1.uc1", 0x000001, 0x040000, CRC(c0263e4a) SHA1(8cae60bd59730aaba215f825016a780eced3a12d) )
@@ -7135,9 +7153,6 @@ ROM_START( grdnstrmg ) /* Germany */
 	ROM_LOAD( "gs2_s2.uc18", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) ) //
 ROM_END
 
-
-
-
 ROM_START( redfoxwp2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_BYTE( "u112", 0x000000, 0x040000, CRC(3f31600b) SHA1(6c56e36178effb60ec27dfcd205393e2cfac4ed6) ) /* No label */
@@ -7160,7 +7175,6 @@ ROM_START( redfoxwp2 )
 	ROM_LOAD( "afega1.u95", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
-
 DRIVER_INIT_MEMBER(nmk16_state,redfoxwp2a)
 {
 	// todo collapse to one bitswap
@@ -7168,7 +7182,6 @@ DRIVER_INIT_MEMBER(nmk16_state,redfoxwp2a)
 	decryptcode( machine(),23, 22, 21, 20,   19, 18, 17, 16, /* */14,15, /* */    13,12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
 	decryptcode( machine(),23, 22, 21, 20,   19, 18, /* */ 16, 17, /* */    15,14,13,12,    11, 10, 9, 8,       7, 6, 5, 4,     3, 2, 1, 0 );
 }
-
 
 ROM_START( redfoxwp2a )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
@@ -7411,7 +7424,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( hotbubl )
+ROM_START( hotbubl ) /* Korean release - Nude images of women for backgrounds */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_BYTE( "c1.uc1",  0x00001, 0x40000, CRC(7bb240e9) SHA1(99048fa275182c3da3bfb0dedd790f4b5858bd92) )
 	ROM_LOAD16_BYTE( "c2.uc9",  0x00000, 0x40000, CRC(7917b95d) SHA1(0344bae9c373c5943e7693720e5e531bc2e0d7ee) )
@@ -7439,8 +7452,35 @@ ROM_START( hotbubl )
 	ROM_LOAD( "s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
 ROM_END
 
+ROM_START( hotbubla ) /* Korean release - Nude images replaced with pictures of satellite dishes */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 68000 Code */
+	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) )
+	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) )
 
-ROM_START( dolmen )
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "1_s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) /* same as the other games on this driver */
+
+	ROM_REGION( 0x100000, "sprites", 0 )   /* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "8_br1.uc3",  0x000000, 0x040000, CRC(7e132eff) SHA1(f3ec5750c73017f0a2eb87f6f39ab49e59d39711) )
+	ROM_LOAD16_BYTE( "9_br3.uc10", 0x000001, 0x040000, CRC(22707728) SHA1(8a27aa2d1b6f902276c02bd7098526243661cff8) )
+
+	ROM_REGION( 0x300000, "bgtile", 0 )   /* Layer 0, 16x16x8 */
+	ROM_LOAD( "5_cr6.uc16",  0x100000, 0x080000, CRC(324429c5) SHA1(8cf90abf32697b269d4ec03b5b20bf4046fa53aa) )
+	ROM_LOAD( "5_cr7.uc19",  0x080000, 0x080000, CRC(d293f1d0) SHA1(33c40c67bda477a2112cca4bfe9661edbcdf7689) )
+	ROM_LOAD( "2_cr5.uc15",  0x000000, 0x080000, CRC(dd7e92de) SHA1(954f18887ac7737abce363985255a747c0de1fa2) )
+
+	ROM_LOAD( "9_cr2.uc7",   0x280000, 0x080000, CRC(c5516087) SHA1(ae3692ecd7cd96b5d3653afb4c3a3b8f5931cbad) )
+	ROM_LOAD( "10_cr3.uc12", 0x200000, 0x080000, CRC(312c38d8) SHA1(1e706b3e8b381083575ef4a01c615408940d5d0f) )
+	ROM_LOAD( "8_cr1.uc6",   0x180000, 0x080000, CRC(7e2840b4) SHA1(333bf5631ee033ce528348d26888854eb1b063a0) )
+
+	ROM_REGION( 0x10000, "fgtile", 0 )    /* Layer 1, 8x8x4 */
+	ROM_LOAD( "2_t1.uc2",  0x00000, 0x10000, CRC(ce683a93) SHA1(aeee2671051f1badf2255375cd7c5fa847d1746c) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )    /* Samples */
+	ROM_LOAD( "1_s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
+ROM_END
+
+ROM_START( dolmen ) /* Original source of the caveman concept for Bubble 2000 / Hot Bubble, much earlier and completely different hardware */
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 68000 Code */
 	ROM_LOAD16_BYTE( "afega8.uj3", 0x00000, 0x20000, CRC(f1b73e4c) SHA1(fe5bbd1e91d1a81744c373effbd96adbbc896133) )
 	ROM_LOAD16_BYTE( "afega7.uj2", 0x00001, 0x20000, CRC(c91bda0b) SHA1(8c09e3020e72e8ab2ca3a3dad708d64f9bf75a4f) )
@@ -7642,7 +7682,6 @@ ROM_START( spec2kh )
 	ROM_LOAD( "yonatech3.u106", 0x00000, 0x80000, CRC(6644c404) SHA1(b7ad3f9f08971432d024ef8be3fa3140f0bbae67) )
 ROM_END
 
-
 ROM_START( spec2k )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u124", 0x00000, 0x40000, CRC(dbd6f65d) SHA1(0fad9836689fcbee60904ccad59a2a5be09f3139) )
@@ -7807,6 +7846,7 @@ GAME( 1998, stagger1, 0,        stagger1, stagger1, driver_device, 0,        ROT
 GAME( 1997, redhawk,  stagger1, stagger1, stagger1, nmk16_state,   redhawk,  ROT270, "Afega (New Vision Ent. license)",   "Red Hawk (US)", 0 )
 GAME( 1997, redhawki, stagger1, redhawki, stagger1, driver_device, 0,        ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, driver_device, 0,        ROT270, "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 )
+GAME( 1997, redhawkk, stagger1, stagger1, stagger1, driver_device, 0,        ROT270, "Afega",                             "Red Hawk (Korea)", 0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, driver_device, 0,        ROT0,   "bootleg",                           "Red Hawk (bootleg)", 0 )
 
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, driver_device, 0,        ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm (horizontal, not encrypted)", 0 )
@@ -7819,7 +7859,8 @@ GAME( 1998, grdnstrmg,grdnstrm, grdnstrmk,grdnstrk, nmk16_state,   grdnstrmg,ROT
 
 // is there a 'bubble 2000' / 'hot bubble' version with Afega copyright, or is the only Afega release dolmen above, this seems like a sequel, not a clone?
 GAME( 1998, bubl2000, 0,        popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Afega (Tuning license)",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
-GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Afega (Pandora license)",                           "Hot Bubble" , 0 ) // on an afega board ..
+GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Afega (Pandora license)",                           "Hot Bubble (Korea, with adult pictures)" , 0 ) // on an afega board ..
+GAME( 1998, hotbubla, bubl2000, popspops, bubl2000, nmk16_state,   bubl2000, ROT0,               "Afega (Pandora license)",                           "Hot Bubble (Korea)" , 0 ) // on an afega board ..
 
 GAME( 1999, popspops, 0,        popspops, popspops, nmk16_state,   grdnstrm, ROT0,               "Afega",                             "Pop's Pop's", 0 )
 

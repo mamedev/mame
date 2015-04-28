@@ -141,9 +141,9 @@ static int write_config(emu_options &options, const char *filename, const game_d
 	file_error filerr = file.open(filename);
 	if (filerr == FILERR_NONE)
 	{
-		astring inistring;
+		std::string inistring;
 		options.output_ini(inistring);
-		file.puts(inistring);
+		file.puts(inistring.c_str());
 		retval = 0;
 	}
 	return retval;
@@ -167,7 +167,7 @@ static void image_options_extract(running_machine &machine)
 			const char *filename = image->filename();
 
 			/* and set the option */
-			astring error;
+			std::string error;
 			machine.options().set_value(image->instance_name(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
 
 			index++;
@@ -224,16 +224,16 @@ void image_device_init(running_machine &machine)
 			if (result)
 			{
 				/* retrieve image error message */
-				astring image_err = astring(image->error());
-				astring image_basename(image_name);
+				std::string image_err = std::string(image->error());
+				std::string image_basename(image_name);
 
 				/* unload all images */
 				image_unload_all(machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 					image->device().name(),
-					image_basename.cstr(),
-					image_err.cstr());
+					image_basename.c_str(),
+					image_err.c_str());
 			}
 		}
 	}
@@ -244,15 +244,15 @@ void image_device_init(running_machine &machine)
  need an image to be loaded
  -------------------------------------------------*/
 
-astring &image_mandatory_scan(running_machine &machine, astring &mandatory)
+std::string &image_mandatory_scan(running_machine &machine, std::string &mandatory)
 {
-	mandatory.reset();
+	mandatory.clear();
 	// make sure that any required image has a mounted file
 	image_interface_iterator iter(machine.root_device());
 	for (device_image_interface *image = iter.first(); image != NULL; image = iter.next())
 	{
 		if (image->filename() == NULL && image->must_be_loaded())
-			mandatory.cat("\"").cat(image->instance_name()).cat("\", ");
+			mandatory.append("\"").append(image->instance_name()).append("\", ");
 	}
 	return mandatory;
 }
@@ -273,14 +273,14 @@ void image_postdevice_init(running_machine &machine)
 			if (result)
 			{
 				/* retrieve image error message */
-				astring image_err = astring(image->error());
+				std::string image_err = std::string(image->error());
 
 				/* unload all images */
 				image_unload_all(machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load failed: %s",
 					image->device().name(),
-					image_err.cstr());
+					image_err.c_str());
 			}
 	}
 

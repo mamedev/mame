@@ -643,7 +643,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 
 	buffer.resize(size);
 
-	err = imgtool_image_read_sector(img, track, head, sector, buffer, size);
+	err = imgtool_image_read_sector(img, track, head, sector, &buffer[0], size);
 	if (err)
 		goto done;
 
@@ -655,7 +655,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 		goto done;
 	}
 
-	stream_write(stream, buffer, size);
+	stream_write(stream, &buffer[0], size);
 
 done:
 	if (stream)
@@ -695,9 +695,9 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 
 	buffer.resize(size);
 
-	stream_read(stream, buffer, size);
+	stream_read(stream, &buffer[0], size);
 
-	err = imgtool_image_write_sector(img, track, head, sector, buffer, size);
+	err = imgtool_image_write_sector(img, track, head, sector, &buffer[0], size);
 	if (err)
 		goto done;
 

@@ -38,7 +38,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
 	{
 		device_t &owner = slot->device();
-		astring temp;
+		std::string temp;
 		const char *selval = options.main_value(temp, owner.tag()+1);
 		bool isdefault = (options.priority(owner.tag()+1)==OPTION_PRIORITY_DEFAULT);
 		if (!is_selected_driver || !options.exists(owner.tag()+1))
@@ -122,14 +122,14 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	{
 		const char *next = strchr(tag, ':');
 		assert(next != tag);
-		astring part(tag, next-tag);
+		std::string part(tag, next-tag);
 		device_t *curdevice;
 		for (curdevice = owner->m_subdevice_list.first(); curdevice != NULL; curdevice = curdevice->next())
-			if (part == curdevice->m_basetag)
+			if (part.compare(curdevice->m_basetag)==0)
 				break;
 		if (!curdevice)
 			throw emu_fatalerror("Could not find %s when looking up path for device %s\n",
-									part.cstr(), orig_tag);
+									part.c_str(), orig_tag);
 		owner = curdevice;
 		tag = next+1;
 	}

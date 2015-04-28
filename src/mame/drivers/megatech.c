@@ -642,25 +642,25 @@ MACHINE_RESET_MEMBER(mtech_state, megatech)
 	m_mt_bank_addr = 0;
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 
-	astring region_tag;
+	std::string region_tag;
 	if (m_cart1)
-		m_cart_reg[0] = memregion(region_tag.cpy(m_cart1->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[0] = memregion(region_tag.assign(m_cart1->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	else
 		m_cart_reg[0] = memregion("cart");
 	if (m_cart2)
-		m_cart_reg[1] = memregion(region_tag.cpy(m_cart2->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[1] = memregion(region_tag.assign(m_cart2->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_cart3)
-		m_cart_reg[2] = memregion(region_tag.cpy(m_cart3->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[2] = memregion(region_tag.assign(m_cart3->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_cart4)
-		m_cart_reg[3] = memregion(region_tag.cpy(m_cart4->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[3] = memregion(region_tag.assign(m_cart4->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_cart5)
-		m_cart_reg[4] = memregion(region_tag.cpy(m_cart5->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[4] = memregion(region_tag.assign(m_cart5->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_cart6)
-		m_cart_reg[5] = memregion(region_tag.cpy(m_cart6->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[5] = memregion(region_tag.assign(m_cart6->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_cart7)
-		m_cart_reg[6] = memregion(region_tag.cpy(m_cart7->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[6] = memregion(region_tag.assign(m_cart7->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	if (m_cart8)
-		m_cart_reg[7] = memregion(region_tag.cpy(m_cart8->tag()).cat(GENERIC_ROM_REGION_TAG));
+		m_cart_reg[7] = memregion(region_tag.assign(m_cart8->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	switch_cart(0);
 }

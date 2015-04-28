@@ -71,6 +71,6 @@ public:
 	UINT32 screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
-	
+
 	INTERRUPT_GEN_MEMBER(interrupt);
 };

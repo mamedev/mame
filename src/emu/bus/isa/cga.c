@@ -339,7 +339,7 @@ void isa8_cga_device::device_start()
 	set_isa_device();
 	m_vram.resize(m_vram_size);
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);
+	m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", &m_vram[0]);
 
 	/* Initialise the cga palette */
 	int i;
@@ -362,8 +362,7 @@ void isa8_cga_device::device_start()
 		}
 	}
 
-	astring tempstring;
-	m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
+	m_chr_gen_base = memregion(subtag("gfx1").c_str())->base();
 	m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
 
 	save_item(NAME(m_framecnt));
@@ -1552,7 +1551,7 @@ void isa8_cga_pc1512_device::device_start()
 	isa8_cga_device::device_start();
 
 	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
-	m_isa->install_bank(0xb8000, 0xbbfff, 0, 0, "bank1", m_vram);
+	m_isa->install_bank(0xb8000, 0xbbfff, 0, 0, "bank1", &m_vram[0]);
 
 	address_space &space = machine().firstcpu->space( AS_PROGRAM );
 
@@ -1787,7 +1786,7 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
 				read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
 				write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
 		} else {
-			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", m_vram);
+			m_isa->install_bank(0xb8000, 0xb8000 + MIN(0x8000,m_vram_size) - 1, 0, m_vram_size & 0x4000, "bank_cga", &m_vram[0]);
 		}
 		break;
 	default:

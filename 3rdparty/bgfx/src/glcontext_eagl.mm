@@ -10,7 +10,7 @@
 #	include <QuartzCore/CAEAGLLayer.h>
 #	include "renderer_gl.h"
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 #	define GL_IMPORT(_optional, _proto, _func, _import) _proto _func = NULL
 #	include "glimports.h"
@@ -54,7 +54,7 @@ namespace bgfx
 		GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, width, height) ); // from OES_packed_depth_stencil
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
 		GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencilRbo) );
-        
+
 		BX_CHECK(GL_FRAMEBUFFER_COMPLETE ==  glCheckFramebufferStatus(GL_FRAMEBUFFER)
 			, "glCheckFramebufferStatus failed 0x%08x"
 			, glCheckFramebufferStatus(GL_FRAMEBUFFER)
@@ -85,9 +85,9 @@ namespace bgfx
 		[context release];
 	}
 
-	void GlContext::resize(uint32_t _width, uint32_t _height, bool _vsync)
+	void GlContext::resize(uint32_t _width, uint32_t _height, uint32_t _flags)
 	{
-		BX_UNUSED(_width, _height, _vsync);
+		BX_UNUSED(_width, _height, _flags);
 		BX_TRACE("resize context");
 	}
 
@@ -123,6 +123,6 @@ namespace bgfx
 	{
 	}
 
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // BX_PLATFORM_IOS && (BGFX_CONFIG_RENDERER_OPENGLES2|BGFX_CONFIG_RENDERER_OPENGLES3|BGFX_CONFIG_RENDERER_OPENGL)

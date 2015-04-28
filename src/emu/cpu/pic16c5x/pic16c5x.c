@@ -799,7 +799,7 @@ void pic16c5x_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
-	
+
 	m_read_a.resolve_safe(0);
 	m_read_b.resolve_safe(0);
 	m_read_c.resolve_safe(0);
@@ -921,16 +921,16 @@ void pic16c5x_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void pic16c5x_device::state_string_export(const device_state_entry &entry, astring &string)
+void pic16c5x_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case PIC16C5x_PSCL:
-			string.printf("%c%02X", ((m_OPTION & 0x08) ? 'W':'T'), m_prescaler);
+			strprintf(str, "%c%02X", ((m_OPTION & 0x08) ? 'W' : 'T'), m_prescaler);
 			break;
 
 		case STATE_GENFLAGS:
-			string.printf("%01x%c%c%c%c%c %c%c%c%03x",
+			strprintf(str, "%01x%c%c%c%c%c %c%c%c%03x",
 				(STATUS & 0xe0) >> 5,
 				STATUS & 0x10 ? '.':'O',      /* WDT Overflow */
 				STATUS & 0x08 ? 'P':'D',      /* Power/Down */

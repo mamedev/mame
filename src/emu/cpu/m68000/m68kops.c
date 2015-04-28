@@ -3,6 +3,7 @@
 extern void m68040_fpu_op0(m68000_base_device *m68k);
 extern void m68040_fpu_op1(m68000_base_device *m68k);
 extern void m68881_mmu_ops(m68000_base_device *m68k);
+extern void m68881_ftrap(m68000_base_device *m68k);
 
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */
@@ -12514,6 +12515,17 @@ void m68000_base_device_ops::m68k_op_cptrapcc_32(m68000_base_device* mc68kcpu)
 	{
 		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
+		return;
+	}
+	m68ki_exception_1111(mc68kcpu);
+}
+
+
+void m68000_base_device_ops::m68k_op_ftrapcc_32(m68000_base_device* mc68kcpu)
+{
+	if((mc68kcpu)->has_fpu)
+	{
+		m68881_ftrap(mc68kcpu);
 		return;
 	}
 	m68ki_exception_1111(mc68kcpu);
@@ -34282,6 +34294,7 @@ static const opcode_handler_struct m68k_opcode_handler_table[] =
 	{m68000_base_device_ops::m68k_op_bfins_32_ai, 0xfff8, 0xefd0, {255, 255,  21,  21,  21,  21,  17}},
 	{m68000_base_device_ops::m68k_op_bfins_32_di, 0xfff8, 0xefe8, {255, 255,  22,  22,  22,  22,  17}},
 	{m68000_base_device_ops::m68k_op_bfins_32_ix, 0xfff8, 0xeff0, {255, 255,  24,  24,  24,  24,  17}},
+	{m68000_base_device_ops::m68k_op_ftrapcc_32, 0xfff8, 0xf278, {255, 255,   4,   4, 255, 255, 255}},
 	{m68000_base_device_ops::m68k_op_pflushan_32, 0xfff8, 0xf510, {255, 255, 255, 255,   4,   4,   4}},
 	{m68000_base_device_ops::m68k_op_pflusha_32, 0xfff8, 0xf518, {255, 255, 255, 255,   4,   4,   4}},
 	{m68000_base_device_ops::m68k_op_move16_32, 0xfff8, 0xf620, {255, 255, 255, 255,   4,   4,   4}},

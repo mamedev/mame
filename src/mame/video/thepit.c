@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  thepit.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -136,6 +136,10 @@ void thepit_state::video_start()
 	m_dummy_tile = auto_alloc_array_clear(machine(), UINT8, 8*8);
 
 	m_graphics_bank = 0;    /* only used in intrepid */
+
+	save_item(NAME(m_graphics_bank));
+	save_item(NAME(m_flip_x));
+	save_item(NAME(m_flip_y));
 }
 
 
@@ -146,14 +150,14 @@ void thepit_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(thepit_state::thepit_videoram_w)
+WRITE8_MEMBER(thepit_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(thepit_state::thepit_colorram_w)
+WRITE8_MEMBER(thepit_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -161,14 +165,14 @@ WRITE8_MEMBER(thepit_state::thepit_colorram_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::thepit_flip_screen_x_w)
+WRITE8_MEMBER(thepit_state::flip_screen_x_w)
 {
 	int flip;
 
-	m_flip_screen_x = data & 0x01;
+	m_flip_x = data & 0x01;
 
-	flip = m_flip_screen_x ? TILEMAP_FLIPX : 0;
-	if (m_flip_screen_y)
+	flip = m_flip_x ? TILEMAP_FLIPX : 0;
+	if (m_flip_y)
 		flip |= TILEMAP_FLIPY ;
 
 	m_tilemap->set_flip(flip);
@@ -177,14 +181,14 @@ WRITE8_MEMBER(thepit_state::thepit_flip_screen_x_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::thepit_flip_screen_y_w)
+WRITE8_MEMBER(thepit_state::flip_screen_y_w)
 {
 	int flip;
 
-	m_flip_screen_y = data & 0x01;
+	m_flip_y = data & 0x01;
 
-	flip = m_flip_screen_x ? TILEMAP_FLIPX : 0;
-	if (m_flip_screen_y)
+	flip = m_flip_x ? TILEMAP_FLIPX : 0;
+	if (m_flip_y)
 		flip |= TILEMAP_FLIPY ;
 
 	m_tilemap->set_flip(flip);
@@ -204,11 +208,11 @@ WRITE8_MEMBER(thepit_state::intrepid_graphics_bank_w)
 }
 
 
-READ8_MEMBER(thepit_state::thepit_input_port_0_r)
+READ8_MEMBER(thepit_state::input_port_0_r)
 {
 	/* Read either the real or the fake input ports depending on the
 	   horizontal flip switch. (This is how the real PCB does it) */
-	if (m_flip_screen_x)
+	if (m_flip_x)
 	{
 		return ioport("IN2")->read();
 	}
@@ -245,13 +249,13 @@ void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			flipx = m_spriteram[offs + 1] & 0x40;
 			flipy = m_spriteram[offs + 1] & 0x80;
 
-			if (m_flip_screen_y)
+			if (m_flip_y)
 			{
 				y = 240 - y;
 				flipy = !flipy;
 			}
 
-			if (m_flip_screen_x)
+			if (m_flip_x)
 			{
 				x = 242 - x;
 				flipx = !flipx;
@@ -277,7 +281,7 @@ void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 }
 
 
-UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 thepit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
@@ -286,8 +290,8 @@ UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &b
 
 	for (offs = 0; offs < 32; offs++)
 	{
-		int xshift = m_flip_screen_x ? 128 : 0;
-		int yshift = m_flip_screen_y ? -8 : 0;
+		int xshift = m_flip_x ? 128 : 0;
+		int yshift = m_flip_y ? -8 : 0;
 
 		m_tilemap->set_scrollx(offs, xshift);
 		m_solid_tilemap->set_scrollx(offs, xshift);
@@ -301,13 +305,13 @@ UINT32 thepit_state::screen_update_thepit(screen_device &screen, bitmap_ind16 &b
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* low priority sprites */
-	draw_sprites(bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 0);
+	draw_sprites(bitmap, m_flip_x ? spritevisibleareaflipx : spritevisiblearea, 0);
 
 	/* high priority tiles */
 	m_solid_tilemap->draw(screen, bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
-	draw_sprites(bitmap, m_flip_screen_x ? spritevisibleareaflipx : spritevisiblearea, 1);
+	draw_sprites(bitmap, m_flip_x ? spritevisibleareaflipx : spritevisiblearea, 1);
 
 	return 0;
 }
@@ -320,8 +324,8 @@ UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16
 
 	for (offs = 0; offs < 32; offs++)
 	{
-		int xshift = m_flip_screen_x ? 128 : 0;
-		int yshift = m_flip_screen_y ? -8 : 0;
+		int xshift = m_flip_x ? 128 : 0;
+		int yshift = m_flip_y ? -8 : 0;
 
 		m_tilemap->set_scrollx(offs, xshift);
 		m_solid_tilemap->set_scrollx(offs, xshift);
@@ -337,7 +341,7 @@ UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16
 
 	/* low priority sprites */
 	m_graphics_bank = 1;
-	draw_sprites(bitmap, m_flip_screen_y ? spritevisibleareaflipx : spritevisiblearea, 0);
+	draw_sprites(bitmap, m_flip_y ? spritevisibleareaflipx : spritevisiblearea, 0);
 
 	/* high priority tiles */ // not sure about this, draws a white block over the title logo sprite, looks like it should be behind?
 	m_graphics_bank = 0;
@@ -345,7 +349,7 @@ UINT32 thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16
 
 	/* high priority sprites */
 	m_graphics_bank = 1;
-	draw_sprites(bitmap, m_flip_screen_y ? spritevisibleareaflipx : spritevisiblearea, 1);
+	draw_sprites(bitmap, m_flip_y ? spritevisibleareaflipx : spritevisiblearea, 1);
 
 	return 0;
 }

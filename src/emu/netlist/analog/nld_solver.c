@@ -400,25 +400,28 @@ NETLIB_UPDATE(solver)
 		{
 			#pragma omp for nowait
 			for (int i = 0; i <  t_cnt; i++)
-			{
-				this_resched[i] = m_mat_solvers[i]->solve();
-			}
+				if (m_mat_solvers[i]->is_timestep())
+				{
+					// Ignore return value
+					ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
+				}
 		}
 	}
 	else
 		for (int i = 0; i < t_cnt; i++)
-		{
-			if (do_full || (m_mat_solvers[i]->is_timestep()))
-				this_resched[i] = m_mat_solvers[i]->solve();
-		}
-#else
-	for (int i = 0; i < t_cnt; i++)
-	{
-		if (m_mat_solvers[i]->is_timestep())
+			if (m_mat_solvers[i]->is_timestep())
 			{
 				// Ignore return value
 				ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
 			}
+#else
+	for (int i = 0; i < t_cnt; i++)
+	{
+		if (m_mat_solvers[i]->is_timestep())
+		{
+			// Ignore return value
+			ATTR_UNUSED const nl_double ts = m_mat_solvers[i]->solve();
+		}
 	}
 #endif
 

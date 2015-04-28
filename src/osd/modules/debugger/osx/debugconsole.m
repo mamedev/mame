@@ -77,7 +77,7 @@
 	// create the command field
 	commandField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[commandField setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
-	[commandField setFont:[[MAMEDebugView class] defaultFont]];
+	[commandField setFont:[[MAMEDebugView class] defaultFontForMachine:m]];
 	[commandField setFocusRingType:NSFocusRingTypeNone];
 	[commandField setTarget:self];
 	[commandField setAction:@selector(doCommand:)];
@@ -132,24 +132,24 @@
 	[window makeFirstResponder:commandField];
 
 	// calculate the optimal size for everything
-	NSRect	available = [[NSScreen mainScreen] visibleFrame];
-	NSRect	windowFrame = [window frame];
-	NSSize	regCurrent = [regScroll frame].size;
-	NSSize	regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
-									  hasHorizontalScroller:YES
-										hasVerticalScroller:YES
-												 borderType:[regScroll borderType]];
-	NSSize	dasmCurrent = [dasmScroll frame].size;
-	NSSize	dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
-									  hasHorizontalScroller:YES
-										hasVerticalScroller:YES
-												 borderType:[dasmScroll borderType]];
-	NSSize	consoleCurrent = [consoleContainer frame].size;
-	NSSize	consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
-										  hasHorizontalScroller:YES
-											hasVerticalScroller:YES
-													 borderType:[consoleScroll borderType]];
-	NSSize	adjustment;
+	NSRect const	available = [[NSScreen mainScreen] visibleFrame];
+	NSSize const	regCurrent = [regScroll frame].size;
+	NSSize const	regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
+											  hasHorizontalScroller:YES
+												hasVerticalScroller:YES
+														 borderType:[regScroll borderType]];
+	NSSize const	dasmCurrent = [dasmScroll frame].size;
+	NSSize const	dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
+											  hasHorizontalScroller:YES
+												hasVerticalScroller:YES
+														 borderType:[dasmScroll borderType]];
+	NSSize const	consoleCurrent = [consoleContainer frame].size;
+	NSSize			consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
+												  hasHorizontalScroller:YES
+													hasVerticalScroller:YES
+															 borderType:[consoleScroll borderType]];
+	NSRect			windowFrame = [window frame];
+	NSSize			adjustment;
 
 	consoleSize.width += consoleCurrent.width - [consoleScroll frame].size.width;
 	consoleSize.height += consoleCurrent.height - [consoleScroll frame].size.height;

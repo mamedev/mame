@@ -462,7 +462,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sfbonus_reel4_tile_info);
 	virtual void machine_reset();
 	virtual void video_start();
-	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int catagory);
+	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
 	UINT32 screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -929,7 +929,7 @@ void sfbonus_state::video_start()
 
 }
 
-void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int catagory)
+void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category)
 {
 	int zz;
 	int i;
@@ -1021,38 +1021,38 @@ void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 
 		if (rowenable2==0)
 		{
-			m_reel_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),3);
+			m_reel_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),3);
 		}
 		if (rowenable==0)
 		{
-			m_reel_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),3);
+			m_reel_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),3);
 		}
 
 		if (rowenable2==0x1)
 		{
-			m_reel2_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),2);
+			m_reel2_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),2);
 		}
 		if (rowenable==0x1)
 		{
-			m_reel2_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),2);
+			m_reel2_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),2);
 		}
 
 		if (rowenable2==0x2)
 		{
-			m_reel3_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),1);
+			m_reel3_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),1);
 		}
 		if (rowenable==0x2)
 		{
-			m_reel3_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),1);
+			m_reel3_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),1);
 		}
 
 		if (rowenable2==0x3)
 		{
-			m_reel4_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),4);
+			m_reel4_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),4);
 		}
 		if (rowenable==0x3)
 		{
-			m_reel4_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(catagory),4);
+			m_reel4_tilemap->draw(screen, *m_temp_reel_bitmap, clip, TILEMAP_DRAW_CATEGORY(category),4);
 		}
 
 

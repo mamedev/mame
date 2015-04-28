@@ -979,8 +979,8 @@ DRIVER_INIT_MEMBER(dassault_state,dassault)
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx
 	bank then the colours would be wrong). */
-	memcpy(tmp + 0x000000, dst + 0x80000, 0x80000);
-	memcpy(dst + 0x090000, tmp + 0x00000, 0x80000);
+	memcpy(&tmp[0x000000], dst + 0x80000, 0x80000);
+	memcpy(dst + 0x090000, &tmp[0x00000], 0x80000);
 	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
 	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 }
@@ -994,8 +994,8 @@ DRIVER_INIT_MEMBER(dassault_state,thndzone)
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx
 	bank then the colours would be wrong). */
-	memcpy(tmp + 0x000000, dst + 0x80000, 0x80000);
-	memcpy(dst + 0x090000, tmp + 0x00000, 0x80000);
+	memcpy(&tmp[0x000000], dst + 0x80000, 0x80000);
+	memcpy(dst + 0x090000, &tmp[0x00000], 0x80000);
 	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
 	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 }

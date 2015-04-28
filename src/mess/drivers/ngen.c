@@ -129,7 +129,7 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_3_dack_w ){ popmessage("IOW3: data %02x",data); }
 
 	DECLARE_WRITE16_MEMBER(hfd_w);
-	DECLARE_READ16_MEMBER(fhd_r);
+	DECLARE_READ16_MEMBER(hfd_r);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE8_MEMBER(fdc_control_w);
@@ -429,7 +429,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 	switch(m_xbus_current)
 	{
 		case 0x00:  // Floppy/Hard disk module
-			io.install_readwrite_handler(addr,addr+0xff,0,0,read16_delegate(FUNC(ngen_state::fhd_r),this),write16_delegate(FUNC(ngen_state::hfd_w),this));
+			io.install_readwrite_handler(addr,addr+0xff,read16_delegate(FUNC(ngen_state::hfd_r),this),write16_delegate(FUNC(ngen_state::hfd_w),this),0xffffffff);
 			break;
 		default:
 			cpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // reached end of the modules
@@ -526,7 +526,7 @@ WRITE16_MEMBER(ngen_state::hfd_w)
 	}
 }
 
-READ16_MEMBER(ngen_state::fhd_r)
+READ16_MEMBER(ngen_state::hfd_r)
 {
 	UINT16 ret = 0xffff;
 

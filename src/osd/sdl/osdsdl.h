@@ -30,12 +30,6 @@
 	#define SDL13_COMBINE_RESIZE (0)
 #endif
 
-#if defined(NO_DEBUGGER)
-#define SDLMAME_HAS_DEBUGGER            (0)
-#else
-#define SDLMAME_HAS_DEBUGGER            (1)
-#endif
-
 //============================================================
 //  Defines
 //============================================================
@@ -125,12 +119,12 @@ public:
 	const char *ui_mode_key() const { return value(SDLOPTION_UIMODEKEY); }
 
 	// joystick mapping
-	const char *joy_index(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_JOYINDEX, index)); }
+	const char *joy_index(int index) const { std::string temp; return value(strformat(temp, "%s%d", SDLOPTION_JOYINDEX, index).c_str()); }
 	bool sixaxis() const { return bool_value(SDLOPTION_SIXAXIS); }
 
 #if (SDLMAME_SDL2)
-	const char *mouse_index(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_MOUSEINDEX, index)); }
-	const char *keyboard_index(int index) const { astring temp; return value(temp.format("%s%d", SDLOPTION_KEYBINDEX, index)); }
+	const char *mouse_index(int index) const { std::string temp; return value(strformat(temp, "%s%d", SDLOPTION_MOUSEINDEX, index).c_str()); }
+	const char *keyboard_index(int index) const { std::string temp; return value(strformat(temp, "%s%d", SDLOPTION_KEYBINDEX, index).c_str()); }
 #endif
 
 	const char *video_driver() const { return value(SDLOPTION_VIDEODRIVER); }

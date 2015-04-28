@@ -338,6 +338,7 @@
 #include <new>          // new (ptr)
 
 #ifdef _MSC_VER
+#pragma warning (disable: 4100) // unreferenced formal parameter
 #pragma warning (disable: 4505) // unreferenced local function has been removed (stb stuff)
 #pragma warning (disable: 4996) // 'This function or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
 #endif
@@ -350,8 +351,8 @@
 #pragma clang diagnostic ignored "-Wexit-time-destructors"  // warning : declaration requires an exit-time destructor       // exit-time destruction order is undefined. if MemFree() leads to users code that has been disabled before exit it might cause problems. ImGui coding style welcomes static/globals.
 #pragma clang diagnostic ignored "-Wglobal-constructors"    // warning : declaration requires a global destructor           // similar to above, not sure what the exact difference it.
 #pragma clang diagnostic ignored "-Wsign-conversion"        // warning : implicit conversion changes signedness             //
-#endif
-#ifdef __GNUC__
+#pragma clang diagnostic ignored "-Wunused-parameter"         // warning: unused parameter ‘xxxx’
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-function"          // warning: 'xxxx' defined but not used
 #pragma GCC diagnostic ignored "-Wunused-parameter"         // warning: unused parameter ‘xxxx’
 #pragma GCC diagnostic ignored "-Wtype-limits"              // warning: comparison is always true due to limited range of data type
@@ -392,6 +393,8 @@ namespace IMGUI_STB_NAMESPACE
 #ifndef IMGUI_DISABLE_STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
+#else
+#define STBTT_DEF extern
 #endif
 #include "stb_truetype.h"
 
@@ -5563,7 +5566,7 @@ static bool InputTextFilterCharacter(unsigned int* p_char, ImGuiInputTextFlags f
         ImGuiTextEditCallbackData callback_data;
         memset(&callback_data, 0, sizeof(ImGuiTextEditCallbackData));
         callback_data.EventFlag = ImGuiInputTextFlags_CallbackCharFilter;
-        callback_data.EventChar = c;
+        callback_data.EventChar = ImWchar(c);
         callback_data.Flags = flags;
         callback_data.UserData = user_data;
         if (callback(&callback_data) != 0)

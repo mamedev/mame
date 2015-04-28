@@ -648,12 +648,12 @@ void z8002_device::register_debug_state()
 	state_add( STATE_GENSP, "GENSP", m_nspoff ).noshow();
 }
 
-void z8002_device::state_string_export(const device_state_entry &entry, astring &string)
+void z8002_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_fcw & 0x8000 ? 'S':'s',
 				m_fcw & 0x4000 ? 'n':'N',
 				m_fcw & 0x2000 ? 'E':'e',

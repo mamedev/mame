@@ -2078,7 +2078,7 @@ void i960_cpu_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void i960_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void i960_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	static const char *const conditions[8] =
 	{
@@ -2088,7 +2088,7 @@ void i960_cpu_device::state_string_export(const device_state_entry &entry, astri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%s", conditions[m_AC & 7]);
+			strprintf(str, "%s", conditions[m_AC & 7]);
 			break;
 	}
 }

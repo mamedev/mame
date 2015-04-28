@@ -29,10 +29,10 @@ void kof2002_prot_device::kof2002_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
 	static const int sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
 	UINT8 *src = cpurom+0x100000;
 	dynamic_buffer dst(0x400000);
-	memcpy( dst, src, 0x400000 );
+	memcpy( &dst[0], src, 0x400000 );
 	for( i=0; i<8; ++i )
 	{
-		memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
+		memcpy( src+i*0x80000, &dst[sec[i]], 0x80000 );
 	}
 }
 
@@ -43,10 +43,10 @@ void kof2002_prot_device::matrim_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
 	static const int sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
 	UINT8 *src = cpurom+0x100000;
 	dynamic_buffer dst(0x400000);
-	memcpy( dst, src, 0x400000);
+	memcpy( &dst[0], src, 0x400000);
 	for( i=0; i<8; ++i )
 	{
-		memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
+		memcpy( src+i*0x80000, &dst[sec[i]], 0x80000 );
 	}
 }
 
@@ -58,10 +58,10 @@ void kof2002_prot_device::samsho5_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size)
 	UINT8 *src = cpurom;
 	dynamic_buffer dst(0x800000);
 
-	memcpy( dst, src, 0x800000 );
+	memcpy( &dst[0], src, 0x800000 );
 	for( i=0; i<16; ++i )
 	{
-		memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
+		memcpy( src+i*0x80000, &dst[sec[i]], 0x80000 );
 	}
 }
 
@@ -73,9 +73,9 @@ void kof2002_prot_device::samsh5sp_decrypt_68k(UINT8* cpurom, UINT32 cpurom_size
 	UINT8 *src = cpurom;
 	dynamic_buffer dst(0x800000);
 
-	memcpy( dst, src, 0x800000 );
+	memcpy( &dst[0], src, 0x800000 );
 	for( i=0; i<16; ++i )
 	{
-		memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
+		memcpy( src+i*0x80000, &dst[sec[i]], 0x80000 );
 	}
 }

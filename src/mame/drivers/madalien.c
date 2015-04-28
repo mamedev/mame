@@ -437,7 +437,7 @@ ROM_START( madalienb )
 	ROM_LOAD( "mc-1.3k", 0x0000, 0x0400, BAD_DUMP CRC(2710c47e) SHA1(337e4f160c7db143ec3bfae3e08e8789b9e41cc5) ) // taken from chwy, see below, tile 2 is mismatched with the 2 roms from the actual PCB.
 	ROM_LOAD( "me-1.3l", 0x0400, 0x0400, CRC(7328a425) SHA1(327adc8b0e25d93f1ae98a44c26d0aaaac1b1a9c) )
 	ROM_LOAD( "md-1.3m", 0x0800, 0x0400, CRC(b5329929) SHA1(86890e1b7cc8cb31fc0dcbc2d3cff02e4cf95619) )
-	
+
 	/*  for reference, this is the data used by Highway Chase on the cassette system when extracted
 	ROM_REGION( 0x0400, "user1", 0 )                    // background tile map
 	ROM_LOAD( "rom1", 0x0000, 0x0400, CRC(9b04c446) SHA1(918013f3c0244ab6a670b9d1b6b642298e2c5ab8) )

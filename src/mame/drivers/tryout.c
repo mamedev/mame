@@ -45,12 +45,12 @@ WRITE8_MEMBER(tryout_state::sound_irq_ack_w)
 
 void tryout_state::machine_start()
 {
-    membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 WRITE8_MEMBER(tryout_state::bankswitch_w)
 {
-    membank("bank1")->set_entry(data & 0x01);
+	membank("bank1")->set_entry(data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )

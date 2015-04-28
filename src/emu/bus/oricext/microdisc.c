@@ -48,8 +48,7 @@ microdisc_device::~microdisc_device()
 void microdisc_device::device_start()
 {
 	oricext_device::device_start();
-	astring tempstring;
-	microdisc_rom = device().machine().root_device().memregion(this->subtag(tempstring, "microdisc"))->base();
+	microdisc_rom = device().machine().root_device().memregion(this->subtag("microdisc").c_str())->base();
 	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &microdisc_device::map);
 
 	for(int i=0; i<4; i++) {

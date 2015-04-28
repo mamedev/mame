@@ -322,6 +322,7 @@ static INT16 clip_analog(INT16 cliptemp);
 #define TMS5220_IS_CD2501E  TMS5220_IS_5200
 
 #define TMS5220_HAS_RATE_CONTROL ((m_variant == TMS5220_IS_5220C) || (m_variant == TMS5220_IS_CD2501ECD))
+#define TMS5220_IS_52xx ((m_variant == TMS5220_IS_5220C) || (m_variant == TMS5220_IS_5200) || (m_variant == TMS5220_IS_5220) || (m_variant == TMS5220_IS_CD2501ECD))
 
 static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c and cd2501ecd only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
 
@@ -405,6 +406,12 @@ void tms5220_device::register_for_save_states()
 	save_item(NAME(m_digital_select));
 
 	save_item(NAME(m_io_ready));
+
+	save_item(NAME(m_true_timing));
+
+	save_item(NAME(m_rs_ws));
+	save_item(NAME(m_read_latch));
+	save_item(NAME(m_write_latch));
 }
 
 
@@ -468,7 +475,7 @@ void tms5220_device::data_write(int data)
 #ifdef DEBUG_FIFO
 			logerror("data_write: Added byte to FIFO (current count=%2d)\n", m_fifo_count);
 #endif
-			update_status_and_ints();
+			update_fifo_status_and_ints();
 			if ((m_talk_status == 0) && (m_buffer_low == 0)) // we just unset buffer low with that last write, and talk status *was* zero...
 			{
 			int i;
@@ -508,7 +515,7 @@ void tms5220_device::data_write(int data)
 
 /**********************************************************************************************
 
-     update_status_and_ints -- check to see if the various flags should be on or off
+     update_fifo_status_and_ints -- check to see if the various flags should be on or off
      Description of flags, and their position in the status register:
       From the data sheet:
         bit D0(bit 7) = TS - Talk Status is active (high) when the VSP is processing speech data.
@@ -529,10 +536,10 @@ void tms5220_device::data_write(int data)
 
 ***********************************************************************************************/
 
-void tms5220_device::update_status_and_ints()
+void tms5220_device::update_fifo_status_and_ints()
 {
-	/* update flags and set ints if needed */
-
+	/* update 52xx fifo flags and set ints if needed */
+	if (!TMS5220_IS_52xx) return; // bail out if not a 52xx chip
 	update_ready_state();
 
 	/* BL is set if neither byte 9 nor 8 of the fifo are in use; this
@@ -599,7 +606,7 @@ int tms5220_device::extract_bits(int count)
 				m_fifo[m_fifo_head] = 0; // zero the newly depleted fifo head byte
 				m_fifo_head = (m_fifo_head + 1) % FIFO_SIZE;
 				m_fifo_bits_taken = 0;
-				update_status_and_ints();
+				update_fifo_status_and_ints();
 			}
 		}
 	}
@@ -791,7 +798,7 @@ void tms5220_device::process(INT16 *buffer, unsigned int size)
 				{
 					m_talk_status = m_speak_external = 0;
 					set_interrupt_state(1);
-					update_status_and_ints();
+					update_fifo_status_and_ints();
 				}
 
 			/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
@@ -1244,7 +1251,7 @@ void tms5220_device::process_command(unsigned char cmd)
 	}
 
 	/* update the buffer low state */
-	update_status_and_ints();
+	update_fifo_status_and_ints();
 }
 
 /******************************************************************************************
@@ -1273,7 +1280,7 @@ void tms5220_device::parse_frame()
 	else // non-5220C and 5220C in fixed rate mode
 	m_IP = reload_table[m_c_variant_rate&0x3];
 
-	update_status_and_ints();
+	update_fifo_status_and_ints();
 	if (!m_talk_status) goto ranout;
 
 	// attempt to extract the energy index
@@ -1282,7 +1289,7 @@ void tms5220_device::parse_frame()
 	printbits(m_new_frame_energy_idx,m_coeff->energy_bits);
 	fprintf(stderr," ");
 #endif
-	update_status_and_ints();
+	update_fifo_status_and_ints();
 	if (!m_talk_status) goto ranout;
 	// if the energy index is 0 or 15, we're done
 	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
@@ -1302,7 +1309,7 @@ void tms5220_device::parse_frame()
 	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
 	fprintf(stderr," ");
 #endif
-	update_status_and_ints();
+	update_fifo_status_and_ints();
 	if (!m_talk_status) goto ranout;
 	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
 	if (rep_flag)
@@ -1316,7 +1323,7 @@ void tms5220_device::parse_frame()
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
 		fprintf(stderr," ");
 #endif
-		update_status_and_ints();
+		update_fifo_status_and_ints();
 		if (!m_talk_status) goto ranout;
 	}
 
@@ -1335,7 +1342,7 @@ void tms5220_device::parse_frame()
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
 		fprintf(stderr," ");
 #endif
-		update_status_and_ints();
+		update_fifo_status_and_ints();
 		if (!m_talk_status) goto ranout;
 	}
 #ifdef VERBOSE
@@ -1361,6 +1368,7 @@ void tms5220_device::parse_frame()
 
 void tms5220_device::set_interrupt_state(int state)
 {
+	if (!TMS5220_IS_52xx) return; // bail out if not a 52xx chip, since there's no int pin
 #ifdef DEBUG_PIN_READS
 	logerror("irq pin set to state %d\n", state);
 #endif

@@ -86,7 +86,6 @@ WRITE8_MEMBER(seicross_state::portB_w)
 	m_irq_mask = data & 1;
 
 	/* bit 1 flips screen */
-	flip_screen_set(data & 2);
 
 	/* bit 2 resets the microcontroller */
 	if (((m_portb & 4) == 0) && (data & 4))

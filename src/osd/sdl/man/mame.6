@@ -13,7 +13,7 @@
 .\" and updated by Andrew Burton <burtona@gol.com>, July 2003
 .\"
 .\"
-.TH MAME 6 2015-03-23 0.160 "MAME \- The Multiple Arcade Machine Emulator"
+.TH MAME 6 2015-04-25 0.161 "MAME \- The Multiple Arcade Machine Emulator"
 .\"
 .\"
 .\" NAME chapter
@@ -1057,6 +1057,15 @@ immediately upon startup. The default is NULL (no commands).
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-debugger \fIdebugger_name
+Name of the debugger to use. Default is AUTO.
+.TP
+.B \-debugger_font, \-dfont \fIfont_name
+Specifies the font to use for debugging. Default is AUTO.
+.TP
+.B \-debugger_font_size, \-dfontsize \fIsize
+Specifies the font size to use for debugging.
 .TP
 .B \-[no]oslog
 Outputs the error.log data to the system debugger. This can be used at

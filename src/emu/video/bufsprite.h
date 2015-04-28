@@ -60,7 +60,7 @@ public:
 	// getters
 	_Type *live() const { return m_spriteram; }
 	#ifndef OSD_RETRO
-	_Type *buffer() { return m_buffered; }
+	_Type *buffer() { return &m_buffered[0]; }
 	#else
 		_Type *buffer()
 		{
@@ -78,9 +78,9 @@ public:
 	{
 		assert(m_spriteram != NULL);
 		if (m_spriteram != NULL)
-			memcpy(m_buffered, m_spriteram + srcoffset, MIN(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
+			memcpy(&m_buffered[0], m_spriteram + srcoffset, MIN(srclength, m_spriteram.bytes() / sizeof(_Type) - srcoffset) * sizeof(_Type));
 	#ifndef OSD_RETRO
-		return m_buffered;
+		return &m_buffered[0];
 	#else
 		extern bool nobuffer_enable;
 		if(nobuffer_enable)
@@ -88,7 +88,6 @@ public:
 		else
 			return m_buffered;
 	#endif
-
 	}
 
 	// read/write handlers
@@ -112,7 +111,7 @@ protected:
 private:
 	// internal state
 	required_shared_ptr<_Type>  m_spriteram;
-	dynamic_array<_Type>        m_buffered;
+	std::vector<_Type>        m_buffered;
 };
 
 

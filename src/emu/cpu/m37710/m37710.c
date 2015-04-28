@@ -1134,12 +1134,12 @@ void m37710_cpu_device::state_export(const device_state_entry &entry)
 }
 
 
-void m37710_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void m37710_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				m_flag_n & NFLAG_SET ? 'N':'.',
 				m_flag_v & VFLAG_SET ? 'V':'.',
 				m_flag_m & MFLAG_SET ? 'M':'.',

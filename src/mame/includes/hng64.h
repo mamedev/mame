@@ -1,6 +1,7 @@
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"
+#include "sound/l7a1045_l6028_dsp_a.h"
 
 enum
 {
@@ -103,6 +104,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_dsp(*this, "l7a1045"),
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
@@ -125,11 +127,13 @@ public:
 		m_generic_paletteram_32(*this, "paletteram")
 
 	{ }
-	
+
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
+	required_device<l7a1045_sound_device> m_dsp;
 	required_device<cpu_device> m_comm;
 	required_device<msm6242_device> m_rtc;
+
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_cart;
 	required_shared_ptr<UINT32> m_sysregs;
@@ -319,7 +323,7 @@ public:
 	void setLighting(const UINT16* packet);
 	void set3dFlags(const UINT16* packet);
 	void setCameraProjectionMatrix(const UINT16* packet);
-	void recoverPolygonBlock(const UINT16* packet, struct polygon* polys, int* numPolys);
+	void recoverPolygonBlock(const UINT16* packet, int* numPolys);
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
 
@@ -362,21 +366,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
 
-	UINT16 m_audiochannel;
-	
-	struct hng64_48bit_data {
-		UINT16 dat[3];
-	};
 
-	hng64_48bit_data m_audiodat[0x10000];
-
-	DECLARE_WRITE16_MEMBER(hng64_sound_select_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_02_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_04_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_data_06_w);
-
-	DECLARE_READ16_MEMBER(hng64_sound_port_0004_r);
-	DECLARE_READ16_MEMBER(hng64_sound_port_0006_r);
 
 	DECLARE_READ16_MEMBER(hng64_sound_port_0008_r);
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
@@ -394,5 +384,11 @@ public:
 	DECLARE_WRITE16_MEMBER(hng64_sound_port_010a_w);
 
 	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
+	DECLARE_READ16_MEMBER(main_sound_comms_r);
+	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
+	DECLARE_READ16_MEMBER(sound_comms_r);
+	DECLARE_WRITE16_MEMBER(sound_comms_w);
+	UINT16 main_latch[2],sound_latch[2];
+	
+	std::vector<polygon> polys;//(1024*5);
 };
-

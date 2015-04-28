@@ -1,4 +1,4 @@
-#if defined(SDLMAME_NET_TAPTUN)
+#if defined(OSD_NET_USE_TAPTUN)
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -27,7 +27,7 @@ public:
 	}
 	virtual ~taptun_module() { }
 
-	virtual int init();
+	virtual int init(const osd_options &options);
 	virtual void exit();
 
 	virtual bool probe() { return true; }
@@ -118,7 +118,7 @@ static CREATE_NETDEV(create_tap)
 	return dynamic_cast<osd_netdev *>(dev);
 }
 
-int taptun_module::init()
+int taptun_module::init(const osd_options &options)
 {
 	add_netdev("tap", "TAP/TUN Device", create_tap);
 	return 0;

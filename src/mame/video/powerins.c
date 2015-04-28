@@ -12,7 +12,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
         W           shows layer 2
         A           shows the sprites
 
-        Keys can be used togheter!
+        Keys can be used together!
 
         [ 2 Scrolling Layers ]
 
@@ -48,24 +48,19 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 
-WRITE16_MEMBER(powerins_state::powerins_flipscreen_w)
+WRITE8_MEMBER(powerins_state::flipscreen_w)
 {
-	if (ACCESSING_BITS_0_7) flip_screen_set(data & 1 );
+	flip_screen_set(data & 1 );
 }
 
-WRITE16_MEMBER(powerins_state::powerins_tilebank_w)
+WRITE8_MEMBER(powerins_state::tilebank_w)
 {
-	if (ACCESSING_BITS_0_7)
+	if (data != m_tile_bank)
 	{
-		if (data != m_tile_bank)
-		{
-			m_tile_bank = data;     // Tiles Bank (VRAM 0)
-			m_tilemap_0->mark_all_dirty();
-		}
+		m_tile_bank = data;     // Tiles Bank (VRAM 0)
+		m_tilemap_0->mark_all_dirty();
 	}
 }
-
-
 
 
 /***************************************************************************
@@ -105,13 +100,13 @@ TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
 			0);
 }
 
-WRITE16_MEMBER(powerins_state::powerins_vram_0_w)
+WRITE16_MEMBER(powerins_state::vram_0_w)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset);
 }
 
-TILEMAP_MAPPER_MEMBER(powerins_state::powerins_get_memory_offset_0)
+TILEMAP_MAPPER_MEMBER(powerins_state::get_memory_offset_0)
 {
 	return  (col * TILES_PER_PAGE_Y) +
 
@@ -144,7 +139,7 @@ TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 			0);
 }
 
-WRITE16_MEMBER(powerins_state::powerins_vram_1_w)
+WRITE16_MEMBER(powerins_state::vram_1_w)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);
@@ -157,14 +152,14 @@ WRITE16_MEMBER(powerins_state::powerins_vram_1_w)
 /***************************************************************************
 
 
-                                Vh_Start
+                                video_start
 
 
 ***************************************************************************/
 
 void powerins_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(powerins_state::powerins_get_memory_offset_0),this),16,16,DIM_NX_0, DIM_NY_0 );
+	m_tilemap_0 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(powerins_state::get_memory_offset_0),this),16,16,DIM_NX_0, DIM_NY_0 );
 	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),this),TILEMAP_SCAN_COLS,8,8,DIM_NX_1, DIM_NY_1 );
 
 	m_tilemap_0->set_scroll_rows(1);
@@ -173,11 +168,9 @@ void powerins_state::video_start()
 	m_tilemap_1->set_scroll_rows(1);
 	m_tilemap_1->set_scroll_cols(1);
 	m_tilemap_1->set_transparent_pen(15);
+
+	save_item(NAME(m_tile_bank));
 }
-
-
-
-
 
 
 /***************************************************************************
@@ -300,7 +293,7 @@ void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 ***************************************************************************/
 
 
-UINT32 powerins_state::screen_update_powerins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 powerins_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 

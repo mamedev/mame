@@ -69,7 +69,7 @@ typedef enum
 }
 casserr_t;
 
-typedef dynamic_array<INT32> sample_block;
+typedef std::vector<INT32> sample_block;
 
 struct CassetteOptions
 {
@@ -95,7 +95,7 @@ struct cassette_image
 	int flags;
 	UINT32 sample_frequency;
 
-	dynamic_array<sample_block *> blocks;
+	std::vector<sample_block *> blocks;
 	size_t sample_count;
 };
 

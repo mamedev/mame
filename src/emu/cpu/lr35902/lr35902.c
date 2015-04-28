@@ -178,16 +178,16 @@ void lr35902_cpu_device::device_start()
 }
 
 
-void lr35902_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void lr35902_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case LR35902_SPEED:
-			string.printf("%02X", 0x7E | ( ( m_gb_speed - 1 ) << 7 ) | m_gb_speed_change_pending );
+			strprintf(str, "%02X", 0x7E | ((m_gb_speed - 1) << 7) | m_gb_speed_change_pending);
 			break;
 
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c",
+			strprintf(str, "%c%c%c%c",
 				m_F & FLAG_Z   ? 'Z' : '.',
 				m_F & FLAG_N   ? 'N' : '.',
 				m_F & FLAG_H   ? 'H' : '.',

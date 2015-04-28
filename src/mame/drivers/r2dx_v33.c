@@ -889,7 +889,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 	int i;
 	for (i = 0; i < len; i ++)
 		buffer[i] = src[BITSWAP32(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];
-	memcpy(src, buffer, len);
+	memcpy(src, &buffer[0], len);
 }
 
 /*

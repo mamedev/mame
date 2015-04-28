@@ -32,7 +32,7 @@ class m68000_base_device;
 
 #include <limits.h>
 
-#ifdef SDLMAME_SOLARIS
+#if defined(__sun__) && defined(__svr4__)
 #undef REG_SP
 #undef REG_PC
 #undef REG_FP
@@ -698,7 +698,7 @@ INLINE UINT32 m68ki_ic_readimm16(m68000_base_device *m68k, UINT32 address)
 
 //              printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
-				// if no buserror occured, validate the tag
+				// if no buserror occurred, validate the tag
 				if (!m68k->mmu_tmp_buserror_occurred)
 				{
 					m68k->ic_address[idx] = tag;

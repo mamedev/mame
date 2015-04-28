@@ -9,14 +9,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - portrait/landscape detection is broken
-
-*/
-
 #include "includes/abc1600.h"
 #include "abc1600.lh"
 
@@ -620,6 +612,8 @@ WRITE8_MEMBER( abc1600_mover_device::ldty_hb_w )
 
 	if (LOG) logerror("%s LDTY HB: %02x\n", machine().describe_context(), data);
 
+	if (L_P) return;
+
 	m_ty = ((data & 0x0f) << 8) | (m_yto & 0xff);
 	m_yto = ((data & 0x0f) << 8) | (m_yto & 0xff);
 	m_mta = ((data & 0x0f) << 14) | (m_mta & 0x3fff);
@@ -648,6 +642,8 @@ WRITE8_MEMBER( abc1600_mover_device::ldty_lb_w )
 	*/
 
 	if (LOG) logerror("%s LDTY LB: %02x\n", machine().describe_context(), data);
+
+	if (L_P) return;
 
 	m_ty = (m_ty & 0xf00) | data;
 	m_yto = (m_yto & 0xf00) | data;

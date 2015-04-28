@@ -2195,7 +2195,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			//
 			// all other cliprect blits seem to be written after mode 50, so this hack just prevents
 			// writes with a higher value than the last one from taking effect, fixing the ending...
-			// especially noticable with 'LoveMachine'
+			// especially noticeable with 'LoveMachine'
 			// (mode 4f) unknown sprite list type 1 - 0054 0105 0059 0198 (00540105 0060019f 00000007)
 			// (mode 50) unknown sprite list type 1 - 0000 017f 0000 01f0 (0000017f 000701f7 00000007)
 			// said ending also ends up drawing a red bar under the image, which isn't clipped out and

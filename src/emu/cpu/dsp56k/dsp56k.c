@@ -357,14 +357,14 @@ void dsp56k_device::device_start()
 }
 
 
-void dsp56k_device::state_string_export(const device_state_entry &entry, astring &string)
+void dsp56k_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	dsp56k_core *cpustate = &m_dsp56k_core;
 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%s%s %s%s%s%s%s%s%s%s %s%s",
+			strprintf(str, "%s%s %s%s%s%s%s%s%s%s %s%s",
 				/* Status Register */
 				LF_bit(cpustate) ? "L" : ".",
 				FV_bit(cpustate) ? "F" : ".",
@@ -384,19 +384,19 @@ void dsp56k_device::state_string_export(const device_state_entry &entry, astring
 			break;
 
 		case DSP56K_X:
-			string.printf("%04x %04x", X1, X0);
+			strprintf(str, "%04x %04x", X1, X0);
 			break;
 
 		case DSP56K_Y:
-			string.printf("%04x %04x", Y1, Y0);
+			strprintf(str, "%04x %04x", Y1, Y0);
 			break;
 
 		case DSP56K_A:
-			string.printf("%02x %04x %04x", A2,A1,A0);
+			strprintf(str, "%02x %04x %04x", A2, A1, A0);
 			break;
 
 		case DSP56K_B:
-			string.printf("%02x %04x %04x", B2,B1,B0);
+			strprintf(str, "%02x %04x %04x", B2, B1, B0);
 			break;
 	}
 }

@@ -103,9 +103,9 @@ public:
 	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
 	virtual UINT16* get_rom_base() { return m_rom; };
-	virtual UINT16* get_nvram_base() { return m_nvram; };
+	virtual UINT16* get_nvram_base() { return &m_nvram[0]; };
 	virtual UINT32 get_rom_size() { return m_rom_size; };
-	virtual UINT32 get_nvram_size() { return m_nvram.bytes(); };
+	virtual UINT32 get_nvram_size() { return m_nvram.size()*sizeof(UINT16); };
 	virtual void set_bank_to_rom(const char *banktag, UINT32 offset) {};
 
 	void save_nvram() { device().save_item(NAME(m_nvram)); }
@@ -124,7 +124,7 @@ public:
 	// internal state
 	UINT16  *m_rom;
 	UINT32  m_rom_size;
-	dynamic_array<UINT16> m_nvram;
+	std::vector<UINT16> m_nvram;
 
 	UINT8 rom_bank_map[128];    // 64K chunks of rom
 };
@@ -159,7 +159,7 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	int get_type() { return m_type; }
 

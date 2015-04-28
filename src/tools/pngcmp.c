@@ -28,7 +28,7 @@
     PROTOTYPES
 ***************************************************************************/
 
-static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, const astring& outfilename);
+static int generate_png_diff(const std::string& imgfile1, const std::string& imgfile2, const std::string& outfilename);
 
 /***************************************************************************
     MAIN
@@ -46,16 +46,16 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Usage:\npngcmp <image1> <image2> <outfile>\n");
 		return 10;
 	}
-	astring imgfilename1(argv[1]);
-	astring imgfilename2(argv[2]);
-	astring outfilename(argv[3]);
+	std::string imgfilename1(argv[1]);
+	std::string imgfilename2(argv[2]);
+	std::string outfilename(argv[3]);
 
 	try {
 		return generate_png_diff(imgfilename1, imgfilename2, outfilename);
 	}
 	catch(...)
 	{
-		printf("Exception occured");
+		printf("Exception occurred");
 		return 1000;
 	}
 }
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     side with a third set of differences
 -------------------------------------------------*/
 
-static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, const astring& outfilename)
+static int generate_png_diff(const std::string& imgfile1, const std::string& imgfile2, const std::string& outfilename)
 {
 	bitmap_argb32 bitmap1;
 	bitmap_argb32 bitmap2;
@@ -80,10 +80,10 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 	int x, y;
 
 	/* open the source image */
-	filerr = core_fopen(imgfile1, OPEN_FLAG_READ, &file);
+	filerr = core_fopen(imgfile1.c_str(), OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 	{
-		printf("Could not open %s (%d)\n", imgfile1.cstr(), filerr);
+		printf("Could not open %s (%d)\n", imgfile1.c_str(), filerr);
 		goto error;
 	}
 
@@ -92,15 +92,15 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 	core_fclose(file);
 	if (pngerr != PNGERR_NONE)
 	{
-		printf("Could not read %s (%d)\n", imgfile1.cstr(), pngerr);
+		printf("Could not read %s (%d)\n", imgfile1.c_str(), pngerr);
 		goto error;
 	}
 
 	/* open the source image */
-	filerr = core_fopen(imgfile2, OPEN_FLAG_READ, &file);
+	filerr = core_fopen(imgfile2.c_str(), OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 	{
-		printf("Could not open %s (%d)\n", imgfile2.cstr(), filerr);
+		printf("Could not open %s (%d)\n", imgfile2.c_str(), filerr);
 		goto error;
 	}
 
@@ -109,7 +109,7 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 	core_fclose(file);
 	if (pngerr != PNGERR_NONE)
 	{
-		printf("Could not read %s (%d)\n", imgfile2.cstr(), pngerr);
+		printf("Could not read %s (%d)\n", imgfile2.c_str(), pngerr);
 		goto error;
 	}
 
@@ -170,17 +170,17 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 		}
 
 		/* write the final PNG */
-		filerr = core_fopen(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 		if (filerr != FILERR_NONE)
 		{
-			printf("Could not open %s (%d)\n", outfilename.cstr(), filerr);
+			printf("Could not open %s (%d)\n", outfilename.c_str(), filerr);
 			goto error;
 		}
 		pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
 		core_fclose(file);
 		if (pngerr != PNGERR_NONE)
 		{
-			printf("Could not write %s (%d)\n", outfilename.cstr(), pngerr);
+			printf("Could not write %s (%d)\n", outfilename.c_str(), pngerr);
 			goto error;
 		}
 	}
@@ -193,6 +193,6 @@ static int generate_png_diff(const astring& imgfile1, const astring& imgfile2, c
 
 error:
 	if (error == -1)
-		osd_rmfile(outfilename);
+		osd_rmfile(outfilename.c_str());
 	return error;
 }

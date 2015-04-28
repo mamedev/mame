@@ -52,17 +52,17 @@ void ui_menu_barcode_reader::populate()
 {
 	if (current_device())
 	{
-		astring buffer;
+		std::string buffer;
 		const char *new_barcode;
 
 		// selected device
-		item_append(current_display_name(), "", current_display_flags(), ITEMREF_SELECT_READER);
+		item_append(current_display_name().c_str(), "", current_display_flags(), ITEMREF_SELECT_READER);
 
 		// append the "New Barcode" item
 		if (get_selection() == ITEMREF_NEW_BARCODE)
 		{
-			buffer.cat(m_barcode_buffer);
-			new_barcode = buffer;
+			buffer.append(m_barcode_buffer);
+			new_barcode = buffer.c_str();
 		}
 		else
 		{
@@ -112,13 +112,13 @@ void ui_menu_barcode_reader::handle()
 			case IPT_UI_SELECT:
 				if (event->itemref == ITEMREF_ENTER_BARCODE)
 				{
-					astring tmp_file(m_barcode_buffer);
+					std::string tmp_file(m_barcode_buffer);
 					//printf("code %s\n", m_barcode_buffer);
-					if (!current_device()->is_valid(tmp_file.len()))
+					if (!current_device()->is_valid(tmp_file.length()))
 						machine().ui().popup_time(5, "Barcode length invalid!");
 					else
 					{
-						current_device()->write_code(tmp_file.cstr(), tmp_file.len());
+						current_device()->write_code(tmp_file.c_str(), tmp_file.length());
 						// if sending was successful, reset char buffer
 						if (m_barcode_buffer[0] != '\0')
 							memset(m_barcode_buffer, '\0', ARRAY_LENGTH(m_barcode_buffer));

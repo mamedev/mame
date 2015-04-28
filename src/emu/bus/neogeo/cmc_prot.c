@@ -504,8 +504,8 @@ void cmc_prot_device::neogeo_gfx_decrypt(UINT8* rom, UINT32 rom_size, int extra_
 	// Data xor
 	for (rpos = 0;rpos < rom_size/4;rpos++)
 	{
-		decrypt(buf+4*rpos+0, buf+4*rpos+3, rom[4*rpos+0], rom[4*rpos+3], type0_t03, type0_t12, type1_t03, rpos, (rpos>>8) & 1);
-		decrypt(buf+4*rpos+1, buf+4*rpos+2, rom[4*rpos+1], rom[4*rpos+2], type0_t12, type0_t03, type1_t12, rpos, ((rpos>>16) ^ address_16_23_xor2[(rpos>>8) & 0xff]) & 1);
+		decrypt(&buf[4*rpos+0], &buf[4*rpos+3], rom[4*rpos+0], rom[4*rpos+3], type0_t03, type0_t12, type1_t03, rpos, (rpos>>8) & 1);
+		decrypt(&buf[4*rpos+1], &buf[4*rpos+2], rom[4*rpos+1], rom[4*rpos+2], type0_t12, type0_t03, type1_t12, rpos, ((rpos>>16) ^ address_16_23_xor2[(rpos>>8) & 0xff]) & 1);
 	}
 
 	// Address xor
@@ -747,7 +747,7 @@ void cmc_prot_device::neogeo_cmc50_m1_decrypt(UINT8* romcrypt, UINT32 romcrypt_s
 		buffer[i] = rom[m1_address_scramble(i,key)];
 	}
 
-	memcpy(rom,buffer,rom_size);
+	memcpy(rom,&buffer[0],rom_size);
 
 	memcpy(rom2,rom,0x10000);
 	memcpy(rom2+0x10000,rom,0x80000);

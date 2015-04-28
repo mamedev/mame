@@ -402,12 +402,12 @@ void am29000_cpu_device::device_start()
 }
 
 
-void am29000_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void am29000_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c%c|%3d", m_alu & ALU_V ? 'V' : '.',
+			strprintf(str, "%c%c%c%c%c%c%c%c%c|%3d", m_alu & ALU_V ? 'V' : '.',
 													m_alu & ALU_Z ? 'Z' : '.',
 													m_alu & ALU_N ? 'N' : '.',
 													m_alu & ALU_C ? 'C' : '.',

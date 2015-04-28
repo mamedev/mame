@@ -4,7 +4,7 @@
 
 #define BLEND_TEST 0
 
-
+#define HNG64_VIDEO_DEBUG 0
 
 
 
@@ -623,8 +623,10 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	if ( (m_additive_tilemap_debug&(1 << tm)))
 		debug_blend_enabled = 1;
 
+#if HNG64_VIDEO_DEBUG
 	if ((global_dimensions != 0) && (global_dimensions != 3))
 		popmessage("unsupported global_dimensions on tilemaps");
+#endif
 
 	if (tm==0)
 	{
@@ -660,7 +662,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// xrally's pink tilemaps make me think this is a tilemap enable bit.
 	// fatfurwa makes me think otherwise.
-//	if (!(tileregs & 0x0040)) return;
+//  if (!(tileregs & 0x0040)) return;
 
 	// set the transmask so our manual copy is correct
 	if (tileregs & 0x0400)
@@ -708,7 +710,9 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 			*/
 
+#if HNG64_VIDEO_DEBUG
 			popmessage("Unhandled rowscroll %02x", tileregs>>12);
+#endif
 		}
 		else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
 		{
@@ -751,8 +755,10 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 	else
 	{
+#if HNG64_VIDEO_DEBUG
 		if ((tileregs&0xf000))
 			popmessage("Tilemap Mosaic? %02x", tileregs>>12);
+#endif
 		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 
 		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
@@ -775,6 +781,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 			INT32 ytopleft,ymiddle, yalt;
 			int xinc, xinc2, yinc, yinc2;
 
+#if HNG64_VIDEO_DEBUG
 			if (0)
 				if (tm==2)
 					popmessage("X %08x X %08x X %08x Y %08x Y %08x Y %08x",
@@ -787,7 +794,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 						hng64_videoram[(0x40018+(scrollbase<<4))/4],
 						hng64_videoram[(0x4000c+(scrollbase<<4))/4]);
 						/*hng64_videoram[(0x4001c+(scrollbase<<4))/4]);*/ // unused? (dupe value on fatfurwa, 00 on rest)
-
+#endif
 
 
 			xtopleft  = (hng64_videoram[(0x40000+(scrollbase<<4))/4]);
@@ -868,6 +875,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 			INT32 ytopleft,ymiddle;
 			int xinc,yinc;
 
+#if HNG64_VIDEO_DEBUG
 			if (0)
 				if (tm==2)
 					popmessage("%08x %08x %08x %08x",
@@ -875,6 +883,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 						hng64_videoram[(0x40014+(scrollbase<<4))/4],
 						hng64_videoram[(0x40018+(scrollbase<<4))/4],
 						hng64_videoram[(0x4001c+(scrollbase<<4))/4]);
+#endif
 
 			if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
 			{
@@ -1020,16 +1029,33 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	UINT32 animbits;
 	UINT16 tileflags[4];
 
-#if 0
+#if 1
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
 	if ( machine().input().code_pressed_once(KEYCODE_L) )
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
-		space.write_byte(0x2f27c8, 0x2);
+
+		if (!strcmp(machine().system().name, "sams64_2"))
+		{
+			space.write_byte(0x2f27c8, 0x2);
+		}
+		else if (!strcmp(machine().system().name, "roadedge")) // hack to get test mode (useful for sound test)
+		{
+			space.write_byte(0xcfb53, 0x1);
+		}
+		else if (!strcmp(machine().system().name, "xrally")) // hack to get test mode (useful for sound test)
+		{
+			space.write_byte(0xa2363, 0x1);
+		}
+
 	}
 #endif
+
+
+
+
 
 	bitmap.fill(hng64_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
 	screen.priority().fill(0x00, cliprect);
@@ -1115,6 +1141,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	if(0)
 		transition_control(bitmap, cliprect);
 
+#if HNG64_VIDEO_DEBUG
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
@@ -1192,6 +1219,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 		m_additive_tilemap_debug ^= 8;
 		popmessage("blend changed %02x", m_additive_tilemap_debug);
 	}
+#endif
 
 	return 0;
 }
@@ -1246,9 +1274,9 @@ void hng64_state::video_start()
 
 
 	m_dl = auto_alloc_array(machine(), UINT16, 0x200/2);
+	polys.resize(1024*5);
 
 	m_texturerom = memregion("textures")->base();
 	m_vertsrom = (UINT16*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
 }
-

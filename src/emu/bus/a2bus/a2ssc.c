@@ -154,8 +154,7 @@ void a2bus_ssc_device::device_start()
 	// set_a2bus_device makes m_slot valid
 	set_a2bus_device();
 
-	astring tempstring;
-	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, SSC_ROM_REGION))->base();
+	m_rom = device().machine().root_device().memregion(this->subtag(SSC_ROM_REGION).c_str())->base();
 }
 
 void a2bus_ssc_device::device_reset()

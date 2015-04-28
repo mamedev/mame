@@ -570,7 +570,7 @@ ADDRESS_MAP_END
 
 /* I/O byte R/W
 
-   0x080  R    ; Input port? polled once at begining.
+   0x080  R    ; Input port? Polled once at beginning.
    0x0C8  R    ; Input port.
 
    Can't see more inputs. There is a multiplexion with the following offsets as selectors:

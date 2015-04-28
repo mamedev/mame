@@ -9,6 +9,15 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+    - write protect
+    - separate read/write methods
+
+*/
+
 #include "c2040fdc.h"
 
 
@@ -18,6 +27,12 @@
 //**************************************************************************
 
 #define LOG 0
+
+#define GCR_DECODE(_e, _i) \
+	((BIT(_e, 6) << 7) | (BIT(_i, 7) << 6) | (_e & 0x33) | (BIT(_e, 2) << 3) | (_i & 0x04))
+
+#define GCR_ENCODE(_e, _i) \
+	((_e & 0xc0) << 2 | (_i & 0x80) | (_e & 0x3c) << 1 | (_i & 0x04) | (_e & 0x03))
 
 
 
@@ -82,7 +97,6 @@ c2040_fdc_t::c2040_fdc_t(const machine_config &mconfig, const char *tag, device_
 	cur_live.write_start_time = attotime::never;
 	cur_live.drv_sel = m_drv_sel;
 }
-
 
 
 //-------------------------------------------------
@@ -310,7 +324,7 @@ void c2040_fdc_t::live_run(const attotime &limit)
 					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.rw_sel, cur_live.mode_sel);
 
 				// write bit
-				if (!cur_live.rw_sel) {
+				if (!cur_live.rw_sel) { // TODO WPS
 					write_next_bit(BIT(cur_live.shift_reg_write, 9), limit);
 				}
 
@@ -341,11 +355,7 @@ void c2040_fdc_t::live_run(const attotime &limit)
 
 			if (!ready) {
 				// load write shift register
-				// E7 E6 I7 E5 E4 E3 E2 I2 E1 E0
-				UINT8 e = cur_live.e;
-				offs_t i = cur_live.i;
-
-				cur_live.shift_reg_write = BIT(e,7)<<9 | BIT(e,6)<<8 | BIT(i,7)<<7 | BIT(e,5)<<6 | BIT(e,4)<<5 | BIT(e,3)<<4 | BIT(e,2)<<3 | BIT(i,2)<<2 | (e & 0x03);
+				cur_live.shift_reg_write = GCR_ENCODE(cur_live.e, cur_live.i);
 
 				if (LOG) logerror("%s load write shift register %03x\n",cur_live.tm.as_string(),cur_live.shift_reg_write);
 			} else if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1)) {
@@ -425,7 +435,7 @@ READ8_MEMBER( c2040_fdc_t::read )
 	UINT8 e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
 
-	UINT8 data = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
+	UINT8 data = GCR_DECODE(e, i);
 
 	if (LOG) logerror("%s %s VIA reads data %02x (%03x)\n", machine().time().as_string(), machine().describe_context(), data, checkpoint_live.shift_reg);
 

@@ -140,7 +140,7 @@ private:
 
 		// updating
 		void update();
-		void reset() { m_fd1089_decrypted.reset(); if (m_fd1094_cache != NULL) m_fd1094_cache->reset(); }
+		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != NULL) m_fd1094_cache->reset(); }
 
 	private:
 		// internal state
@@ -150,7 +150,7 @@ private:
 		offs_t                  m_rgnoffs;
 		UINT8 *                 m_srcptr;
 		fd1089_base_device *    m_fd1089;
-		dynamic_array<UINT16>   m_fd1089_decrypted;
+		std::vector<UINT16>   m_fd1089_decrypted;
 		auto_pointer<fd1094_decryption_cache> m_fd1094_cache;
 	};
 

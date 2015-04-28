@@ -2189,12 +2189,12 @@ OP(op,ff) { h6280_cycles(4); bbs(7, rd_zpg());         } // 6/8 BBS7 ZPG,REL
 //  for the debugger
 //-------------------------------------------------
 
-void h6280_device::state_string_export(const device_state_entry &entry, astring &string)
+void h6280_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str, "%c%c%c%c%c%c%c%c",
 				(m_p & 0x80) ? 'N':'.',
 				(m_p & 0x40) ? 'V':'.',
 				(m_p & 0x20) ? 'R':'.',

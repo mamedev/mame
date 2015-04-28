@@ -88,7 +88,7 @@ Smitdogg
 #include "machine/pcshare.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
-#include "video/pc_vga.h"
+#include "video/clgd542x.h"
 #include "machine/nvram.h"
 
 class pcat_nit_state : public pcat_base_state
@@ -158,7 +158,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bonanza_map, AS_PROGRAM, 32, pcat_nit_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_vga_device, mem_r, mem_w, 0xffffffff)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
 	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
 	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
@@ -196,9 +196,9 @@ static ADDRESS_MAP_START( bonanza_io_map, AS_IO, 32, pcat_nit_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
+	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffffffff)
+	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffffffff)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffffffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( bonanza, pcat_nit_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
 	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )

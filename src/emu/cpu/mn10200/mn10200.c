@@ -174,12 +174,12 @@ void mn10200_device::device_start()
 }
 
 
-void mn10200_device::state_string_export(const device_state_entry &entry, astring &string)
+void mn10200_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf( "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
+			strprintf(str, "S=%d irq=%s im=%d %c%c%c%c %c%c%c%c",
 				(m_psw >> 12) & 3,
 				m_psw & FLAG_IE ? "on " : "off",
 				(m_psw >> 8) & 7,
@@ -394,7 +394,7 @@ TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
 
 	// handle our expiring and also tick our cascaded children
 	if (timer_tick_simple(tmr) == 2)
-		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occured
+		m_simple_timer[tmr].cur = 0xff; // cascaded and no underflow occurred
 	else
 		m_simple_timer[tmr].cur = m_simple_timer[tmr].base;
 

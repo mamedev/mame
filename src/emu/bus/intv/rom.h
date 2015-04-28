@@ -45,8 +45,8 @@ public:
 	intv_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.count() - 1)]; }
-	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.count() - 1)] = data & 0xff; }
+	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.size() - 1)]; }
+	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
 };
 
 // ======================> intv_gfact_device
@@ -58,8 +58,8 @@ public:
 	intv_gfact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.count() - 1)]; }
-	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.count() - 1)] = data & 0xff; }
+	virtual DECLARE_READ16_MEMBER(read_ram) { return (int)m_ram[offset & (m_ram.size() - 1)]; }
+	virtual DECLARE_WRITE16_MEMBER(write_ram) { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
 };
 
 // ======================> intv_wsmlb_device

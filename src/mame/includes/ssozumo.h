@@ -29,7 +29,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_sound_nmi_mask;
-	
+
 	DECLARE_WRITE8_MEMBER(sh_command_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -39,18 +39,18 @@ public:
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	
+
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(ssozumo);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

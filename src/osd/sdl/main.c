@@ -31,19 +31,11 @@ extern int utf8_main(int argc, char *argv[]);
 #undef main
 #undef wmain
 #endif
-
+#ifdef UNICODE
 extern "C" int _tmain(int argc, TCHAR **argv)
 {
 	int i, rc;
 	char **utf8_argv;
-
-#ifdef OSD_SDL
-#ifdef MALLOC_DEBUG
-{
-	extern int winalloc_in_main_code;
-	winalloc_in_main_code = TRUE;
-#endif
-#endif
 
 	/* convert arguments to UTF-8 */
 	utf8_argv = (char **) malloc(argc * sizeof(*argv));
@@ -64,16 +56,6 @@ extern "C" int _tmain(int argc, TCHAR **argv)
 		osd_free(utf8_argv[i]);
 	free(utf8_argv);
 
-#ifdef OSD_SDL
-#ifdef MALLOC_DEBUG
-	{
-		void check_unfreed_mem(void);
-		check_unfreed_mem();
-	}
-	winalloc_in_main_code = FALSE;
-}
-#endif
-#endif
-
 	return rc;
 }
+#endif

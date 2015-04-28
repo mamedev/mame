@@ -46,7 +46,7 @@ private:
 	static int const    HISTORY_LENGTH = 20;
 
 	HWND                m_editwnd;
-	astring             m_edit_defstr;
+	std::string         m_edit_defstr;
 	WNDPROC             m_original_editproc;
 	TCHAR               m_history[HISTORY_LENGTH][MAX_EDIT_STRING];
 	int                 m_history_count;

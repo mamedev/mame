@@ -20,34 +20,43 @@ public:
 	required_shared_ptr<UINT8> m_attributesram;
 	required_shared_ptr<UINT8> m_spriteram;
 
-	int m_question_address;
-	int m_question_rom;
-	int m_remap_address[16];
 	UINT8 m_graphics_bank;
-	UINT8 m_flip_screen_x;
-	UINT8 m_flip_screen_y;
+	UINT8 m_flip_x;
+	UINT8 m_flip_y;
 	tilemap_t *m_solid_tilemap;
 	tilemap_t *m_tilemap;
 	UINT8 *m_dummy_tile;
 	UINT8 m_nmi_mask;
-	DECLARE_READ8_MEMBER(thepit_colorram_r);
-	DECLARE_WRITE8_MEMBER(thepit_sound_enable_w);
+
+	int m_question_address;
+	int m_question_rom;
+	int m_remap_address[16];
+
+	DECLARE_WRITE8_MEMBER(sound_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_READ8_MEMBER(rtriv_question_r);
-	DECLARE_WRITE8_MEMBER(thepit_videoram_w);
-	DECLARE_WRITE8_MEMBER(thepit_colorram_w);
-	DECLARE_WRITE8_MEMBER(thepit_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(thepit_flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
+	DECLARE_READ8_MEMBER(input_port_0_r);
+
+	DECLARE_READ8_MEMBER(intrepid_colorram_mirror_r);
 	DECLARE_WRITE8_MEMBER(intrepid_graphics_bank_w);
-	DECLARE_READ8_MEMBER(thepit_input_port_0_r);
-	DECLARE_DRIVER_INIT(rtriv);
+
+	DECLARE_READ8_MEMBER(rtriv_question_r);
+
 	TILE_GET_INFO_MEMBER(solid_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	DECLARE_DRIVER_INIT(rtriv);
+	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(thepit);
 	DECLARE_PALETTE_INIT(suprmous);
-	UINT32 screen_update_thepit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
+
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };

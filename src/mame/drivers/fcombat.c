@@ -328,7 +328,7 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	dynamic_buffer temp(0x10000);
 
 	/* make a temporary copy of the character data */
-	src = temp;
+	src = &temp[0];
 	dst = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
@@ -346,7 +346,7 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	}
 
 	/* make a temporary copy of the sprite data */
-	src = temp;
+	src = &temp[0];
 	dst = memregion("gfx2")->base();
 	length = memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
@@ -367,7 +367,7 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	}
 
 	/* make a temporary copy of the character data */
-	src = temp;
+	src = &temp[0];
 	dst = memregion("gfx3")->base();
 	length = memregion("gfx3")->bytes();
 	memcpy(src, dst, length);
@@ -386,7 +386,7 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 		dst[newaddr] = src[oldaddr];
 	}
 
-	src = temp;
+	src = &temp[0];
 	dst = memregion("user1")->base();
 	length = memregion("user1")->bytes();
 	memcpy(src, dst, length);
@@ -398,7 +398,7 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	}
 
 
-	src = temp;
+	src = &temp[0];
 	dst = memregion("user2")->base();
 	length = memregion("user2")->bytes();
 	memcpy(src, dst, length);

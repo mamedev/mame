@@ -62,19 +62,19 @@ const rom_entry *nubus_lview_device::device_rom_region() const
 nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PDS030_LVIEW, "Sigma Designs L-View", tag, owner, clock, "pd3_lviw", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this),
-		m_assembled_tag(tag, ":", LVIEW_SCREEN_NAME)
+		device_nubus_card_interface(mconfig, *this)
 {
-	m_screen_tag = m_assembled_tag;
+	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this),
-		m_assembled_tag(tag, ":", LVIEW_SCREEN_NAME)
+		device_nubus_card_interface(mconfig, *this)
 {
-	m_screen_tag = m_assembled_tag;
+	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
+	m_screen_tag = m_assembled_tag.c_str();
 }
 
 //-------------------------------------------------
@@ -112,7 +112,7 @@ void nubus_lview_device::device_reset()
 {
 	m_vbl_disable = 1;
 	m_protstate = 0;
-	memset(m_vram, 0, VRAM_SIZE);
+	memset(&m_vram[0], 0, VRAM_SIZE);
 	memset(m_palette, 0, sizeof(m_palette));
 
 	m_palette[0] = rgb_t(255, 255, 255);
@@ -142,7 +142,7 @@ UINT32 nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	int x, y;
 	UINT8 pixels, *vram;
 
-	vram = m_vram + 0x20;
+	vram = &m_vram[0x20];
 
 	for (y = 0; y < 600; y++)
 	{

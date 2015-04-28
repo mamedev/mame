@@ -194,7 +194,7 @@ void ssv_state::drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_ele
 void ssv_state::video_start()
 {
 	m_gfxdecode->gfx(0)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
-	
+
 	save_item(NAME(m_enable_video));
 	save_item(NAME(m_shadow_pen_mask));
 	save_item(NAME(m_shadow_pen_shift));
@@ -208,7 +208,7 @@ VIDEO_START_MEMBER(ssv_state,eaglshot)
 
 	m_gfxdecode->gfx(0)->set_source((UINT8 *)m_eaglshot_gfxram);
 	m_gfxdecode->gfx(1)->set_source((UINT8 *)m_eaglshot_gfxram);
-	
+
 	save_pointer(NAME(m_eaglshot_gfxram), 16 * 0x40000 / 2);
 }
 

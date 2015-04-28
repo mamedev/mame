@@ -309,13 +309,14 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_vsp = (m_stored_attr & FAC_B) ? 1 : 0;
 			m_gpa = (m_stored_attr & FAC_GG) >> 2;
 			m_rvv = (m_stored_attr & FAC_R) ? 1 : 0;
-			m_lten = (m_stored_attr & FAC_U) ? 1 : 0;
+			m_lten = ((m_stored_attr & FAC_U) != 0) && (lc == UNDERLINE) ? 1 : 0;
 
 			for (int sx = 0; sx < CHARACTERS_PER_ROW; sx++)
 			{
 				int m_lineattr = 0;
 				int lten = 0;
 				int vsp = 0;
+				int rvv = 0;
 
 				UINT8 data = m_buffer[!m_buffer_dma][sx];
 
@@ -328,7 +329,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 						m_vsp = (data & FAC_B) ? 1 : 0;
 						m_gpa = (data & FAC_GG) >> 2;
 						m_rvv = (data & FAC_R) ? 1 : 0;
-						m_lten = (data & FAC_U) ? 1 : 0;
+						m_lten = ((data & FAC_U) != 0) && (lc == UNDERLINE) ? 1 : 0;
 						if ((SCANLINES_PER_ROW - lc)==1)
 							m_stored_attr = data;
 
@@ -412,7 +413,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					}
 					else
 					{
-						lten = vis;
+						rvv = vis;
 					}
 				}
 
@@ -429,7 +430,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					(data & 0x7f),  // char code to be displayed
 					m_lineattr,  // line attribute code
 					lten | m_lten,  // light enable signal
-					m_rvv,  // reverse video signal
+					rvv ^ m_rvv,  // reverse video signal
 					vsp, // video suppression
 					m_gpa,  // general purpose attribute code
 					m_hlgt  // highlight

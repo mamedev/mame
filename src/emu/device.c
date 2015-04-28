@@ -101,9 +101,9 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_auto_finder_list(NULL)
 {
 	if (owner != NULL)
-		m_tag.cpy((owner->owner() == NULL) ? "" : owner->tag()).cat(":").cat(tag);
+		m_tag.assign((owner->owner() == NULL) ? "" : owner->tag()).append(":").append(tag);
 	else
-		m_tag.cpy(":");
+		m_tag.assign(":");
 	static_set_clock(*this, clock);
 }
 
@@ -129,8 +129,7 @@ memory_region *device_t::memregion(const char *_tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	astring fullpath;
-	return machine().memory().region(subtag(fullpath, _tag));
+	return machine().memory().region(subtag(_tag).c_str());
 }
 
 
@@ -146,8 +145,7 @@ memory_share *device_t::memshare(const char *_tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	astring fullpath;
-	return machine().memory().shared(subtag(fullpath, _tag));
+	return machine().memory().shared(subtag(_tag).c_str());
 }
 
 
@@ -163,8 +161,7 @@ memory_bank *device_t::membank(const char *_tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	astring fullpath;
-	return machine().memory().bank(subtag(fullpath, _tag));
+	return machine().memory().bank(subtag(_tag).c_str());
 }
 
 
@@ -180,8 +177,7 @@ ioport_port *device_t::ioport(const char *tag) const
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	astring fullpath;
-	return machine().ioport().port(subtag(fullpath, tag));
+	return machine().ioport().port(subtag(tag).c_str());
 }
 
 
@@ -190,15 +186,14 @@ ioport_port *device_t::ioport(const char *tag) const
 //  object for a given port name
 //-------------------------------------------------
 
-astring device_t::parameter(const char *tag) const
+std::string device_t::parameter(const char *tag) const
 {
 	// safety first
 	if (this == NULL)
 		return NULL;
 
 	// build a fully-qualified name and look it up
-	astring fullpath;
-	return machine().parameters().lookup(subtag(fullpath, tag));
+	return machine().parameters().lookup(subtag(tag));
 }
 
 
@@ -695,8 +690,7 @@ void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 device_t *device_t::subdevice_slow(const char *tag) const
 {
 	// resolve the full path
-	astring fulltag;
-	subtag(fulltag, tag);
+	std::string fulltag = subtag(tag);
 
 	// we presume the result is a rooted path; also doubled colons mess up our
 	// tree walk, so catch them early
@@ -705,12 +699,12 @@ device_t *device_t::subdevice_slow(const char *tag) const
 
 	// walk the device list to the final path
 	device_t *curdevice = &mconfig().root_device();
-	if (fulltag.len() > 1)
-		for (int start = 1, end = fulltag.chr(start, ':'); start != 0 && curdevice != NULL; start = end + 1, end = fulltag.chr(start, ':'))
+	if (fulltag.length() > 1)
+		for (int start = 1, end = fulltag.find_first_of(':', start); start != 0 && curdevice != NULL; start = end + 1, end = fulltag.find_first_of(':', start))
 		{
-			astring part(fulltag, start, (end == -1) ? -1 : end - start);
+			std::string part(fulltag, start, (end == -1) ? -1 : end - start);
 			for (curdevice = curdevice->m_subdevice_list.first(); curdevice != NULL; curdevice = curdevice->next())
-				if (part == curdevice->m_basetag)
+				if (part.compare(curdevice->m_basetag)==0)
 					break;
 		}
 
@@ -726,21 +720,22 @@ device_t *device_t::subdevice_slow(const char *tag) const
 //  to our device based on the provided tag
 //-------------------------------------------------
 
-astring &device_t::subtag(astring &result, const char *tag) const
+std::string device_t::subtag(const char *tag) const
 {
+	std::string result;
 	// if the tag begins with a colon, ignore our path and start from the root
 	if (*tag == ':')
 	{
 		tag++;
-		result.cpy(":");
+		result.assign(":");
 	}
 
 	// otherwise, start with our path
 	else
 	{
-		result.cpy(m_tag);
+		result.assign(m_tag);
 		if (result != ":")
-			result.cat(":");
+			result.append(":");
 	}
 
 	// iterate over the tag, look for special path characters to resolve
@@ -748,30 +743,30 @@ astring &device_t::subtag(astring &result, const char *tag) const
 	while ((caret = strchr(tag, '^')) != NULL)
 	{
 		// copy everything up to there
-		result.cat(tag, caret - tag);
+		result.append(tag, caret - tag);
 		tag = caret + 1;
 
 		// strip trailing colons
-		int len = result.len();
+		int len = result.length();
 		while (result[--len] == ':')
-			result.substr(0, len);
+			result = result.substr(0, len);
 
 		// remove the last path part, leaving the last colon
 		if (result != ":")
 		{
-			int lastcolon = result.rchr(0, ':');
+			int lastcolon = result.find_last_of(':');
 			if (lastcolon != -1)
-				result.substr(0, lastcolon + 1);
+				result = result.substr(0, lastcolon + 1);
 		}
 	}
 
 	// copy everything else
-	result.cat(tag);
+	result.append(tag);
 
 	// strip trailing colons up to the root
-	int len = result.len();
+	int len = result.length();
 	while (len > 1 && result[--len] == ':')
-		result.substr(0, len);
+		result = result.substr(0, len);
 	return result;
 }
 

@@ -1270,6 +1270,20 @@ ROM_START( totlvice )
 	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
 
+	// was converted from the following cue/bin pair, is this sufficient / good for this platform? - there are a lot of audio tracks that need verifying as non-corrupt
+	//ROM_LOAD( "TotalVice-GQ639-EBA01.cue",  0, 0x00000555, CRC(55ef2f62) SHA1(8e31b3e62244e6090a93228dae377552340dcdeb) )
+	//ROM_LOAD( "TotalVice-GQ639-EBA01.bin",  0, 0x1ec4db10, CRC(5882f8ba) SHA1(e589d500d99d2f4cff4506cd5ac9a5bfc8d30675) )
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE( "639eba01", 0, BAD_DUMP  SHA1(d95c13575e015169b126f7e8492d150bd7e5ebda) )
+ROM_END
+
+ROM_START( totlvicu )
+	ROM_REGION64_BE( 0x200000, "boot", 0 )
+	ROM_LOAD16_WORD( "623b01.8q", 0x000000, 0x200000, CRC(bd879f93) SHA1(e2d63bfbd2b15260a2664082652442eadea3eab6) )
+
+	ROM_REGION( 0x100000, "ymz", 0 ) /* YMZ280B sound rom on sub board */
+	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
+
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE( "639uac01", 0, BAD_DUMP SHA1(88431b8a0ce83c156c8b19efbba1af901b859404) )
 ROM_END
@@ -1296,6 +1310,8 @@ ROM_START( totlvicj )
 	DISK_IMAGE( "639jad01", 0, BAD_DUMP SHA1(39d41d5a9d1c40636d174c8bb8172b1121e313f8) )
 ROM_END
 
+
+
 ROM_START(3do_m2)
 	ROM_REGION64_BE( 0x100000, "boot", 0 )
 	ROM_SYSTEM_BIOS( 0, "panafz35", "Panasonic FZ-35S (3DO M2)" )
@@ -1310,7 +1326,8 @@ DRIVER_INIT_MEMBER(konamim2_state,m2)
 }
 
 GAME( 1997, polystar, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver UAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvice, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver EBA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvicu, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver UAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1997, totlvicj, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1997, totlvica, totlvice, m2, m2, konamim2_state, m2, ROT0, "Konami", "Total Vice (ver AAB)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, btltryst, 0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )

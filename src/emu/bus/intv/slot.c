@@ -118,9 +118,7 @@ void device_intv_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(INTVSLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring, size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(INTVSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		memset(m_rom, 0xff, size);
 		m_rom_size = size;
 	}
@@ -310,7 +308,7 @@ int intv_cart_slot_device::load_fullpath()
 		// 7. extra = 1 ECS, 2 Intellivoice
 		int start, size;
 		int mapper, rom[5], ram, extra;
-		astring extrainfo;
+		std::string extrainfo;
 
 		m_cart->rom_alloc(0x20000, tag());
 		ROM = (UINT8 *)m_cart->get_rom_base();
@@ -328,7 +326,7 @@ int intv_cart_slot_device::load_fullpath()
 		}
 		else
 		{
-			sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+			sscanf(extrainfo.c_str() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 					&rom[3], &ram, &extra);
 			//printf("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2], rom[3], ram, extra);
 
@@ -459,7 +457,7 @@ bool intv_cart_slot_device::call_softlist_load(software_list_device &swlist, con
  get default card software
  -------------------------------------------------*/
 
-void intv_cart_slot_device::get_default_card_software(astring &result)
+void intv_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -468,7 +466,7 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 		dynamic_buffer rom(len);
 		int type = INTV_STD;
 
-		core_fread(m_file, rom, len);
+		core_fread(m_file, &rom[0], len);
 
 		if (rom[0] == 0xa8 && (rom[1] == (rom[2] ^ 0xff)))
 		{
@@ -479,11 +477,11 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 			// assume it's .BIN and try to use .hsi file to determine type (just RAM)
 			int start;
 			int mapper, rom[5], ram, extra;
-			astring extrainfo;
+			std::string extrainfo;
 
 			if (hashfile_extrainfo(*this, extrainfo))
 			{
-				sscanf(extrainfo.cstr() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+				sscanf(extrainfo.c_str() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 						&rom[3], &ram, &extra);
 
 				if (ram)
@@ -503,7 +501,7 @@ void intv_cart_slot_device::get_default_card_software(astring &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 	software_get_default_slot(result, "intv_rom");

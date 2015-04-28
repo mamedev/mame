@@ -160,14 +160,14 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 
 #if USE_NEW_COLOR
 	/* sprites */
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 	UINT8 cpi[512];
 
 	for (i=0; i<512; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
 
 	compute_res_net_all(rgb, &cpi[0], popeye_7052_decode_info, popeye_7052_obj_net_info);
-	m_palette->set_pen_colors(48, rgb, 256);
+	m_palette->set_pen_colors(48, rgb);
 #else
 	for (i = 0;i < 256;i++)
 	{
@@ -220,12 +220,12 @@ void popeye_state::set_background_palette(int bank)
 
 #if USE_NEW_COLOR
 	UINT8 cpi[16];
-	dynamic_array<rgb_t> rgb;
+	std::vector<rgb_t> rgb;
 	for (i=0; i<16; i++)
 		cpi[i] = color_prom[i] ^ m_invertmask;
 
 	compute_res_net_all(rgb, &cpi[0], popeye_7051_decode_info, popeye_7051_bck_net_info);
-	m_palette->set_pen_colors(0, rgb, 16);
+	m_palette->set_pen_colors(0, rgb);
 
 #else
 	for (i = 0;i < 16;i++)

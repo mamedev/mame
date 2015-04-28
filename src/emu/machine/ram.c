@@ -61,7 +61,8 @@ void ram_device::device_start()
 		m_size = default_size();
 
 	/* allocate space for the ram */
-	m_pointer.resize_and_clear(m_size, m_default_value);
+	m_pointer.resize(m_size);
+	memset(&m_pointer[0], m_default_value, m_size);
 
 	/* register for state saving */
 	save_item(NAME(m_size));
@@ -153,21 +154,21 @@ void ram_device::device_validity_check(validity_checker &valid) const
 
 	if (!is_valid)
 	{
-		astring output;
-		output.catprintf("Cannot recognize the RAM option %s", ramsize_string);
-		output.catprintf(" (valid options are %s", m_default_size);
+		std::string output;
+		strcatprintf(output, "Cannot recognize the RAM option %s", ramsize_string);
+		strcatprintf(output, " (valid options are %s", m_default_size);
 
 		if (m_extra_options != NULL)
-			output.catprintf(",%s).\n", m_extra_options);
+			strcatprintf(output, ",%s).\n", m_extra_options);
 		else
-			output.catprintf(").\n");
+			strcatprintf(output, ").\n");
 
-		osd_printf_error("%s", output.cstr());
+		osd_printf_error("%s", output.c_str());
 
 		osd_printf_warning("Setting value to default %s\n",m_default_size);
-		astring error;
+		std::string error;
 		mconfig().options().set_value(OPTION_RAMSIZE, m_default_size, OPTION_PRIORITY_CMDLINE, error);
-		assert(!error);
+		assert(error.empty());
 	}
 }
 

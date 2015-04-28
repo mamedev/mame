@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM                             /* work RAM */
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
@@ -187,15 +187,15 @@ void tail2nos_state::machine_start()
 	membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 	membank("bank3")->set_entry(0);
 
-	save_item(NAME(m_charbank));
-	save_item(NAME(m_charpalette));
+	save_item(NAME(m_txbank));
+	save_item(NAME(m_txpalette));
 	save_item(NAME(m_video_enable));
 }
 
 void tail2nos_state::machine_reset()
 {
-	m_charbank = 0;
-	m_charpalette = 0;
+	m_txbank = 0;
+	m_txpalette = 0;
 	m_video_enable = 0;
 }
 
@@ -301,7 +301,7 @@ ROM_START( sformula )
 	ROM_LOAD( "a24",          0x00000, 0x80000, CRC(b1e9de43) SHA1(0144252dd9ed561fbebd4994cccf11f6c87e1825) )
 	ROM_LOAD( "o1s",          0x80000, 0x40000, CRC(e27a8eb4) SHA1(4fcadabf42a1c3deeb6d74d75cdbee802cf16db5) )
 
-	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
 	ROM_LOAD( "oj2",          0x040000, 0x40000, CRC(77ccaea2) SHA1(e38175859c75c6d0f2f01752fad6e167608c4662) )
 
@@ -310,5 +310,39 @@ ROM_START( sformula )
 ROM_END
 
 
+ROM_START( sformulaa )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "04.bin",      0x00000, 0x10000, CRC(f40e9c3c) SHA1(2ab45f46f92bce42748692cafe601c5893de127b) )
+	ROM_LOAD16_BYTE( "07.bin",      0x00001, 0x10000, CRC(d1cf6dca) SHA1(18228cc98722eb5907850e2d0317d1f4bf04fb8f) )
+	ROM_LOAD16_BYTE( "v3",           0x20000, 0x10000, CRC(e2e0abad) SHA1(1a1054bada9654484fe81fe4b4b32af5ab7b53f0) )
+	ROM_LOAD16_BYTE( "v6",           0x20001, 0x10000, CRC(069817a7) SHA1(cca382fe2a49c8c3c84b879a1c30dffff84ef406) )
+
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	/* extra ROM mapped at 200000 */
+	ROM_LOAD16_WORD_SWAP( "a23",     0x00000, 0x80000, CRC(d851cf04) SHA1(ac5b366b686c5a037b127d223dc6fe90985eb160) )
+
+	ROM_REGION16_BE( 0x20000, "user2", 0 )
+	/* extra ROM mapped at 2c0000 */
+	ROM_LOAD16_BYTE( "v5",           0x00000, 0x10000, CRC(a9fe15a1) SHA1(d90bf40c610ea7daaa338f83f82cdffbae7da08e) )
+	ROM_LOAD16_BYTE( "v8",           0x00001, 0x10000, CRC(4fb6a43e) SHA1(5cddda0029b3b141c88b0c128655d35bb12fa34d) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_LOAD( "v2",           0x00000, 0x08000, CRC(920d8920) SHA1(b8d30903248fee6f985af7fafbe534cfc8c6e829) )
+	ROM_LOAD( "v1",           0x10000, 0x10000, CRC(bf35c1a4) SHA1(a838740e023dc3344dc528324a8dbc48bb98b574) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "a24",          0x00000, 0x80000, CRC(b1e9de43) SHA1(0144252dd9ed561fbebd4994cccf11f6c87e1825) )
+	ROM_LOAD( "o1s",          0x80000, 0x40000, CRC(e27a8eb4) SHA1(4fcadabf42a1c3deeb6d74d75cdbee802cf16db5) )
+	ROM_LOAD( "9.bin",           0xc0000, 0x08000, CRC(c76edc0a) SHA1(2c6c21f8d1f3bcb0f65ba5a779fe479783271e0b) ) // present on this PCB, contains Japanese text + same font as in above roms, where does it map? is there another layer?
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "oj1",          0x000000, 0x40000, CRC(39c36b35) SHA1(a97480696bf6d81bf415737e03cc5324d439ab84) )
+	ROM_LOAD( "oj2",          0x040000, 0x40000, CRC(77ccaea2) SHA1(e38175859c75c6d0f2f01752fad6e167608c4662) )
+
+	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */
+	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
+ROM_END
+
 GAME( 1989, tail2nos, 0,        tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Super Formula (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, sformula, tail2nos, tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1989, sformulaa,tail2nos, tail2nos, tail2nos, driver_device, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // No Japan warning, but Japanese version

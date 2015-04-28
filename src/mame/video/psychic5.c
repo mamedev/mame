@@ -24,10 +24,10 @@ void psychic5_state::change_palette(int offset, UINT8* palram, int palbase)
 	UINT8 hi = palram[(offset) | 1];
 
 	int color = offset >> 1;
-	
+
 	if (m_blend)
 		m_blend->set(palbase + color, hi & 0x0f);
-	
+
 	m_palette->set_pen_color(palbase + color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
@@ -188,11 +188,11 @@ void psychic5_state::video_start()
 VIDEO_START_MEMBER(psychic5_state,psychic5)
 {
 	video_start();
-	
+
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_title_screen));
 
 }
@@ -200,11 +200,11 @@ VIDEO_START_MEMBER(psychic5_state,psychic5)
 VIDEO_START_MEMBER(psychic5_state,bombsa)
 {
 	video_start();
-	
+
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(psychic5_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS,  8,  8,  32, 32);
 	m_fg_tilemap->set_transparent_pen(15);
-	
+
 	save_item(NAME(m_bombsa_unknown));
 }
 

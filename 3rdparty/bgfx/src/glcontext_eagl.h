@@ -8,7 +8,7 @@
 
 #if BX_PLATFORM_IOS
 
-namespace bgfx
+namespace bgfx { namespace gl
 {
 	struct SwapChainGL;
 
@@ -21,7 +21,7 @@ namespace bgfx
 
 		void create(uint32_t _width, uint32_t _height);
 		void destroy();
-		void resize(uint32_t _width, uint32_t _height, bool _vsync);
+		void resize(uint32_t _width, uint32_t _height, uint32_t _flags);
 
 		static bool isSwapChainSupported();
 		SwapChainGL* createSwapChain(void* _nwh);
@@ -48,7 +48,7 @@ namespace bgfx
 		GLuint m_colorRbo;
 		GLuint m_depthStencilRbo;
 	};
-} // namespace bgfx
+} /* namespace gl */ } // namespace bgfx
 
 #endif // BX_PLATFORM_IOS
 

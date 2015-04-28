@@ -158,12 +158,12 @@ void mb86233_cpu_device::device_start()
 }
 
 
-void mb86233_cpu_device::state_string_export(const device_state_entry &entry, astring &string)
+void mb86233_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			string.printf("%c%c", (m_sr & SIGN_FLAG) ? 'N' : 'n', (m_sr & ZERO_FLAG) ? 'Z' : 'z' );
+			strprintf(str, "%c%c", (m_sr & SIGN_FLAG) ? 'N' : 'n', (m_sr & ZERO_FLAG) ? 'Z' : 'z');
 			break;
 	}
 }

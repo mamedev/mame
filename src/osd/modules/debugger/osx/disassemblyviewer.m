@@ -31,11 +31,12 @@
 	if (!(self = [super initWithMachine:m title:@"Disassembly" console:c]))
 		return nil;
 	NSRect const contentBounds = [[window contentView] bounds];
+	NSFont *const defaultFont = [[MAMEDebugView class] defaultFontForMachine:m];
 
 	// create the expression field
 	expressionField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[expressionField setAutoresizingMask:(NSViewWidthSizable | NSViewMaxXMargin | NSViewMinYMargin)];
-	[expressionField setFont:[[MAMEDebugView class] defaultFont]];
+	[expressionField setFont:defaultFont];
 	[expressionField setFocusRingType:NSFocusRingTypeNone];
 	[expressionField setTarget:self];
 	[expressionField setAction:@selector(doExpression:)];
@@ -51,7 +52,7 @@
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinXMargin | NSViewMinYMargin)];
 	[subviewButton setBezelStyle:NSShadowlessSquareBezelStyle];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
-	[subviewButton setFont:[[MAMEDebugView class] defaultFont]];
+	[subviewButton setFont:defaultFont];
 	[subviewButton setTarget:self];
 	[subviewButton setAction:@selector(changeSubview:)];
 	[[subviewButton cell] setArrowPosition:NSPopUpArrowAtBottom];

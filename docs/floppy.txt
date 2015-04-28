@@ -83,11 +83,11 @@ is usually behind the term "density".
 A sensor detects when the head is on track 0 and the controller is not
 supposed to try to go past it.  In addition physical blocks prevent
 the head from going out of the correct track range.  Some systems
-(apple 2, some c64) do not take the track 0 sensor into account and
+(Apple II, some C64) do not take the track 0 sensor into account and
 just wham the head against the track 0 physical block, giving a
 well-known crash noise and eventually damaging the head alignment.
 
-Also, some systems (apple 2 and c64 again) have direct access to the
+Also, some systems (Apple II and C64 again) have direct access to the
 phases of the head positioning motor, allowing to trick the head into
 going between tracks, in middle or even quarter positions.  That was
 not usable to write more tracks, since the head width did not change,
@@ -95,15 +95,15 @@ but since reliable reading was only possible with the correct position
 it was used for some copy protection systems.
 
 The disk rotates at a fixed speed for a given track.  The most usual
-speed is 300rpm for every track, with 360rpm found for HD 5.25"
-floppies and most 8" ones, and a number of different values like 90rpm
-for the earlier floppies or 150rpm for an HD floppy in an amiga.
+speed is 300 rpm for every track, with 360 rpm found for HD 5.25"
+floppies and most 8" ones, and a number of different values like 90 rpm
+for the earlier floppies or 150 rpm for an HD floppy in an Amiga.
 Having a fixed rotational speed for the whole disk is called Constant
 Angular Velocity (CAV, almost everybody) or Zoned Constant Angular
 Velocity (ZCAV, C64) depending on whether the read/write bitrate is
-constant or track-dependant.  Some systems (apple 2, mac) varies the
-rotational speed depending on the track (something like 394rpm up to
-590rpm) to end up with a Constant Linear Velocity (CLV).  The idea
+constant or track-dependant.  Some systems (Apple II, Mac) vary the
+rotational speed depending on the track (something like 394 rpm up to
+590 rpm) to end up with a Constant Linear Velocity (CLV).  The idea
 behind ZCAV/CLV is to get more bits out of the media by keeping the
 minimal spacing between magnetic orientation transitions close to the
 best the support can do.  It seems that the complexity was not deemed
@@ -158,10 +158,10 @@ is never known.
   2.3 Floppy controller
 
 The task of the floppy controller is to turn the signals to/from the
-floppy drive into something the main cpu can digest.  The level of
+floppy drive into something the main CPU can digest.  The level of
 support actually done by the controller is extremely variable from one
-device to the other, from pretty much nothing (apple2, c64) through
-minimal (amiga) to complete (western digital chips, upd765 family).
+device to the other, from pretty much nothing (Apple II, C64) through
+minimal (Amiga) to complete (Western Digital chips, uPD765 family).
 Usual functions include drive selection, motor control, track seeking
 and of course reading and writing data.  Of these only the last two
 need to be described, the rest is obvious.
@@ -170,21 +170,21 @@ The data is structured at two levels: how individual bits (or nibbles,
 or bytes) are encoded on the surface, and how these are grouped in
 individually-addressable sectors.  Two standards exist for these,
 called FM and MFM, and in addition a number of systems use their
-home-grown variants.  Moreover, some systems such as the amiga use a
-standard bit-level encoding (MFM) but an homegrown sector-level
+home-grown variants.  Moreover, some systems such as the Amiga use a
+standard bit-level encoding (MFM) but a homegrown sector-level
 organisation.
 
 
   2.3.1 Bit-level encodings
   2.3.1.1 Cell organization
 
-All floppy controllers, even the wonkiest like the apple 2 one, start
+All floppy controllers, even the wonkiest like the Apple II one, start
 by dividing the track in equally-sized cells.  They're angular
 sections in the middle of which a magnetic orientation inversion may
-be present.  From an hardware point of view the cells are seen as
+be present.  From a hardware point of view the cells are seen as
 durations, which combined with the floppy rotation give the section.
 For instance the standard MFM cell size for a 3" double-density floppy
-is 2us, which combined with the also standard 300rpm rotational speed
+is 2us, which combined with the also standard 300 rpm rotational speed
 gives an angular size of 1/100000th of a turn.  Another way of saying
 it is that there are 100K cells in a 3" DD track.
 
@@ -234,7 +234,7 @@ Modulation encoding, which can cram exactly twice as much data on the
 same surface, hence its other name of "double density".  The cell size
 is set at slightly over half the physical limit, e.g. 2us usually.
 The constraint means that two '1' cells must be separated by at least
-one '0' cell. Each bit is once again encoded on two cells:
+one '0' cell.  Each bit is once again encoded on two cells:
 
 - the first cell, called the clock bit, is '1' if both the previous
   and current data bits are 0, '0' otherwise
@@ -252,7 +252,7 @@ maximum of three zeroes.
 Group Coded Recording, or GCR, encodings are a class of encodings
 where strings of bits at least nibble-size are encoded into a given
 cell stream given by a table.  It has been used in particular by the
-apple 2, the mac and the c64, and each system has its own table, or
+Apple II, the Mac and the C64, and each system has its own table, or
 tables.
 
   2.3.1.5 Other encodings
@@ -342,7 +342,7 @@ usually start at 1 and size code is 0 for 128 bytes, 1 for 256, 2 for
 The crc is a cyclic redundancy check of the data bits starting with
 the mark just after the pulse train using polynom 0x11021.
 
-The western digital-based controllers usually get rid of everything
+The Western Digital-based controllers usually get rid of everything
 but some 0xff before the first sector and allow a better use of space
 as a result.
 
@@ -365,19 +365,19 @@ Then for each sector:
 - MFM-encoded 0xfb, sector data followed by two bytes of crc
 - A number of MFM-encoded 0x4e (usually 84, very variable)
 
-The the track is finished with a stream of MFM-encoded 0x4e.
+The track is finished with a stream of MFM-encoded 0x4e.
 
 The 250KHz pulse trains are used to lock the PLL to the signal
 correctly.  The cell pattern 4489 does not appear in normal
-MFM-encoded data and is used for clock/data separation.  
+MFM-encoded data and is used for clock/data separation.
 
-As for FM, the western digital-based controllers usually get rid of
+As for FM, the Western Digital-based controllers usually get rid of
 everything but some 0x4e before the first sector and allow a better
 use of space as a result.
 
   2.3.2.3 Formatting and write splices
 
-To be usable a floppy must have the sector headers and default sector
+To be usable, a floppy must have the sector headers and default sector
 data written on every track before using it.  The controller starts
 writing at a given place, often the index pulse but on some systems
 whenever the command is sent, and writes until a complete turn is
@@ -392,7 +392,7 @@ Similarly two write splices are created when a sector is written at
 the start and end of the data block part.  They're not supposed to
 happen on a mastered disk though, even if there are some rare
 exceptions.
-  
+
 
   3 The new implementation
   3.1 Floppy disk representation
@@ -417,7 +417,7 @@ position of the start of the cell (not the size), and bits
 - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
 
 The position is in angular units of 1/200,000,000th of a turn.  It
-corresponds to one nanosecond when the drive rotates at 300rpm.
+corresponds to one nanosecond when the drive rotates at 300 rpm.
 
 The last cell implicit end position is of course 200,000,000.
 
@@ -523,7 +523,7 @@ extract_sectors_from_bitstream_fm_pc(const UINT8 *cell stream,
                                      int sectdata_size)
 
   Extract standard mfm or fm sectors from a regenerated
-  cell stream. Sectors must point to an array of 256 desc_xs.
+  cell stream.  Sectors must point to an array of 256 desc_xs.
 
   An existing sector is recognizable by having ->data non-null.
   Sector data is written in sectdata up to sectdata_size bytes.
@@ -563,8 +563,8 @@ the current time is the same for all devices.
 
   3.3.1 Control signals
 
-Due to the way they're usually connected to cpus (e.g. directly on an
-i/o port) the controls signals work with physical instead of logical
+Due to the way they're usually connected to CPUs (e.g. directly on an
+I/O port), the control signals work with physical instead of logical
 values.  Which means than in general 0 means active, 1 means inactive.
 Some signals also have a callback associated called when they change.
 

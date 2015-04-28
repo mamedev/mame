@@ -41,7 +41,7 @@
 #include "renderer.h"
 #include "renderer_d3d.h"
 
-namespace bgfx
+namespace bgfx { namespace d3d9
 {
 #	if defined(D3D_DISABLE_9EX)
 #		define D3DFMT_S8_LOCKABLE D3DFORMAT( 85)
@@ -129,11 +129,13 @@ namespace bgfx
 	{
 		IndexBufferD3D9()
 			: m_ptr(NULL)
+			, m_size(0)
+			, m_flags(BGFX_BUFFER_NONE)
 			, m_dynamic(false)
 		{
 		}
 
-		void create(uint32_t _size, void* _data);
+		void create(uint32_t _size, void* _data, uint8_t _flags);
 		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false)
 		{
 			void* buffer;
@@ -162,6 +164,7 @@ namespace bgfx
 
 		IDirect3DIndexBuffer9* m_ptr;
 		uint32_t m_size;
+		uint8_t  m_flags;
 		bool m_dynamic;
 	};
 
@@ -386,6 +389,6 @@ namespace bgfx
 		bool m_needResolve;
 	};
 
-} // namespace bgfx
+} /* namespace d3d9 */ } // namespace bgfx
 
 #endif // BGFX_RENDERER_D3D9_H_HEADER_GUARD

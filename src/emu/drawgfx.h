@@ -164,7 +164,7 @@ public:
 	UINT16 granularity() const { return m_color_granularity; }
 	UINT32 colors() const { return m_total_colors; }
 	UINT32 rowbytes() const { return m_line_modulo; }
-	bool has_pen_usage() const { return (m_pen_usage.count() > 0); }
+	bool has_pen_usage() const { return !m_pen_usage.empty(); }
 
 	// used by tilemaps
 	UINT32 dirtyseq() const { return m_dirtyseq; }
@@ -188,13 +188,13 @@ public:
 	const UINT8 *get_data(UINT32 code)
 	{
 		assert(code < elements());
-		if (code < m_dirty.count() && m_dirty[code]) decode(code);
+		if (code < m_dirty.size() && m_dirty[code]) decode(code);
 		return m_gfxdata + code * m_char_modulo + m_starty * m_line_modulo + m_startx;
 	}
 
 	UINT32 pen_usage(UINT32 code)
 	{
-		assert(code < m_pen_usage.count());
+		assert(code < m_pen_usage.size());
 		if (m_dirty[code]) decode(code);
 		return m_pen_usage[code];
 	}
@@ -293,15 +293,15 @@ private:
 	UINT8 *         m_gfxdata;              // pointer to decoded pixel data, 8bpp
 	dynamic_buffer  m_gfxdata_allocated;    // allocated decoded pixel data, 8bpp
 	dynamic_buffer  m_dirty;                // dirty array for detecting chars that need decoding
-	dynamic_array<UINT32> m_pen_usage;      // bitmask of pens that are used (pens 0-31 only)
+	std::vector<UINT32>  m_pen_usage;      // bitmask of pens that are used (pens 0-31 only)
 
 	bool            m_layout_is_raw;        // raw layout?
 	UINT8           m_layout_planes;        // bit planes in the layout
 	UINT32          m_layout_xormask;       // xor mask applied to each bit offset
 	UINT32          m_layout_charincrement; // per-character increment in source data
-	dynamic_array<UINT32> m_layout_planeoffset;// plane offsets
-	dynamic_array<UINT32> m_layout_xoffset; // X offsets
-	dynamic_array<UINT32> m_layout_yoffset; // Y offsets
+	std::vector<UINT32>  m_layout_planeoffset;// plane offsets
+	std::vector<UINT32>  m_layout_xoffset; // X offsets
+	std::vector<UINT32>  m_layout_yoffset; // Y offsets
 };
 
 

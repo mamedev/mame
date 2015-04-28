@@ -1454,7 +1454,7 @@ void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 		temp[da] = src[sa];
 	}
 
-	memcpy(src, temp, length);
+	memcpy(src, &temp[0], length);
 }
 
 void ninjakd2_state::gfx_unscramble()

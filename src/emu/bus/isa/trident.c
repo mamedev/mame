@@ -10,21 +10,6 @@
 #include "trident.h"
 #include "debugger.h"
 
-enum
-{
-	SCREEN_OFF = 0,
-	TEXT_MODE,
-	VGA_MODE,
-	EGA_MODE,
-	CGA_MODE,
-	MONO_MODE,
-	RGB8_MODE,
-	RGB15_MODE,
-	RGB16_MODE,
-	RGB24_MODE,
-	RGB32_MODE
-};
-
 const device_type TRIDENT_VGA = &device_creator<trident_vga_device>;
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
@@ -169,7 +154,8 @@ void trident_vga_device::device_start()
 	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
 	vga.svga_intf.vram_size = 0x200000;
 
-	vga.memory.resize_and_clear(vga.svga_intf.vram_size);
+	vga.memory.resize(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_item(NAME(vga.memory));
 	save_pointer(vga.crtc.data,"CRTC Registers",0x100);
 	save_pointer(vga.sequencer.data,"Sequencer Registers",0x100);

@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h" // BIT
-#include "astring.h"
 #include "formats/ccvf_dsk.h"
 
 ccvf_format::ccvf_format()
@@ -92,20 +91,20 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 	UINT64 size = io_generic_size(io);
 	dynamic_buffer img(size);
-	io_generic_read(io, img, 0, size);
+	io_generic_read(io, &img[0], 0, size);
 
-	astring ccvf = astring((const char *)&img[0], size);
+	std::string ccvf = std::string((const char *)&img[0], size);
 	dynamic_buffer bytes(78720);
 
 	int start = 0, end = 0;
-	astring line;
+	std::string line;
 	UINT32 byteoffs = 0;
 	char hex[3] = {0};
 
 	do {
-		end = ccvf.chr(start, 10);
-		line.cpysubstr(ccvf, start, end);
-		if (line.find(0, "Compucolor Virtual Floppy Disk Image") && line.find(0, "Label") && line.find(0, "Track")) {
+		end = ccvf.find_first_of(10, start);
+		line.assign(ccvf.substr(start, end));
+		if (line.find("Compucolor Virtual Floppy Disk Image") != std::string::npos && line.find("Label") != std::string::npos && line.find("Track") != std::string::npos) {
 			for (int byte = 0; byte < 32; byte++) {
 				if (byteoffs==78720) break;
 				hex[0]=line[byte * 2];
@@ -120,24 +119,24 @@ bool ccvf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int total_size = 200000000/f.cell_size;
 
 	for(int track=0; track < f.track_count; track++) {
-		dynamic_array<UINT32> buffer(total_size);
+		std::vector<UINT32> buffer;
 		int offset = 0;
 
 		for (int i=0; i<1920 && pos<size; i++, pos++) {
 			for (int bit=0; bit<8; bit++) {
-				bit_w(buffer, offset++, BIT(bytes[pos], bit), f.cell_size);
+				bit_w(buffer, BIT(bytes[pos], bit), f.cell_size);
 			}
 		}
 
 		if (offset < total_size) {
 			// pad the remainder of the track with sync
-			int count = (total_size-offset);
+			int count = total_size-buffer.size();
 			for (int i=0; i<count;i++) {
-				bit_w(buffer, offset++, (track > 0) ? 1 : 0, f.cell_size);
+				bit_w(buffer, (track > 0) ? 1 : 0, f.cell_size);
 			}
 		}
 
-		generate_track_from_levels(track, 0, buffer, total_size, 0, image);
+		generate_track_from_levels(track, 0, buffer, 0, image);
 	}
 
 	image->set_variant(f.variant);

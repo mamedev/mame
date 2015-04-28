@@ -12,6 +12,6 @@
 #include "emu.h"
 
 
-bool hashfile_extrainfo(device_image_interface &image, astring &result);
+bool hashfile_extrainfo(device_image_interface &image, std::string &result);
 
 #endif /* __HASHFILE_H__ */

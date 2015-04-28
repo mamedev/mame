@@ -390,11 +390,11 @@ INPUT_CHANGED_MEMBER( sigmab52_state::coin_drop_start )
 static INPUT_PORTS_START( jwildb52 )
 	PORT_START("IN0")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 5
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 4
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 3
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )          // Hold 1
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Double")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW1", 0x50, EQUALS, 0x00)  PORT_NAME("Deal / Draw")
@@ -428,16 +428,16 @@ static INPUT_PORTS_START( jwildb52 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Machine Door")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Weight Switch")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )  // Hold 1
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Attendant Call")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )  // Hold 2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Drop Door")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  // Hold 3
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )  // Hold 4
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )  // Hold 5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Meter Wire")
 
 	PORT_START("IN3")
@@ -533,10 +533,22 @@ static INPUT_PORTS_START( jwildb52 )
 	PORT_DIPNAME( 0x40, 0x40, "DSW2-9" )        PORT_DIPLOCATION("SW2:9")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW2-10" )       PORT_DIPLOCATION("SW2:10")
+	PORT_DIPNAME( 0x80, 0x00, "DSW2-10" )       PORT_DIPLOCATION("SW2:10")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( s8waysfc )
+	PORT_INCLUDE( jwildb52 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x07ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_NAME("Start")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_NAME("Max Bet")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("One Bet")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_NAME("Collect / Payout")
 INPUT_PORTS_END
 
 
@@ -554,6 +566,7 @@ void sigmab52_state::machine_reset()
 	m_bank1->set_entry(1);
 	m_coin_start_cycles = 0;
 	m_hopper_start_cycles = 0;
+	m_audiocpu_cmd_irq = CLEAR_LINE;
 }
 
 /*************************
@@ -583,7 +596,7 @@ static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 384-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 544-1, 0, 436-1)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", h63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -625,13 +638,13 @@ ROM_START( jwildb52a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sigm_wrk.bin", 0x00000, 0x10000, CRC(15c83c6c) SHA1(7a05bd94ea8b1ad051fbe6580a6550d4bb47dd15) )
 
-	/* No gfx & sound dumps. Using the ones from parent set for now... */
-
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "cards_2001-1.ic45", 0x00003, 0x10000, BAD_DUMP CRC(7664455e) SHA1(c9f129060e63b9ac9058ab94208846e4dc578ead) )
-	ROM_LOAD32_BYTE( "cards_2001-2.ic46", 0x00001, 0x10000, BAD_DUMP CRC(c1455d64) SHA1(ddb576ba471b5d2faa415ec425615cf5f9d87911) )
-	ROM_LOAD32_BYTE( "cards_2001-3.ic47", 0x00000, 0x10000, BAD_DUMP CRC(cb2ece6e) SHA1(f2b6949085fe395d0fdd16322a880ec87e2efd50) )
-	ROM_LOAD32_BYTE( "cards_2001-4.ic48", 0x00002, 0x10000, BAD_DUMP CRC(8131d236) SHA1(8984aa1f2af70df41973b61df17f184796a2ffe9) )
+	ROM_LOAD32_BYTE( "c-1416-1.ic45", 0x00003, 0x10000, CRC(02a0b517) SHA1(5a0818a174683f791ca885bfdfd7555616c80758) )
+	ROM_LOAD32_BYTE( "c-1416-2.ic46", 0x00001, 0x10000, CRC(3196e486) SHA1(2d264e518083ff05d1a1eb7f8e1649feb70349e7) )
+	ROM_LOAD32_BYTE( "c-1416-3.ic47", 0x00000, 0x10000, CRC(1c9a2939) SHA1(e18fdf9a656687db47ac00700e7721c3d8e800c5) )
+	ROM_LOAD32_BYTE( "c-1416-4.ic48", 0x00002, 0x10000, CRC(7bd8bf78) SHA1(ddacbb75df14a343e69949dcaa14ce1a7ec8407a) )
+
+	/* No sound dumps. Using the ones from parent set for now... */
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "sound-01-00.43", 0x0000, 0x8000, BAD_DUMP CRC(2712d44c) SHA1(295526b27676cd97cbf111d47305d63c2b3ea50d) )
@@ -659,6 +672,26 @@ ROM_START( jwildb52h )
 ROM_END
 
 
+ROM_START( s8waysfc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dv98103.011", 0x00000, 0x10000, CRC(416190a1) SHA1(e2738644efc6c2adcea2470b482f3f818ed9af8d) )
+
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "symb112.1", 0x00003, 0x10000, CRC(b09bd4f5) SHA1(af04845e84cb381f9babe088884b5bbab927a326) )
+	ROM_LOAD32_BYTE( "symb112.2", 0x00001, 0x10000, CRC(462a2d55) SHA1(3157893d150b98c80c0045f78cb2520e8b3ce4eb) )
+	ROM_LOAD32_BYTE( "symb112.3", 0x00000, 0x10000, CRC(be0c2e64) SHA1(82de83fc4754ff73e80e22187b7fba041832613e) )
+	ROM_LOAD32_BYTE( "symb112.4", 0x00002, 0x10000, CRC(f9d8529c) SHA1(7cd54bda71fb38c7bcbea42be4e322aec0581964) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "v-slot02.00", 0x00000, 0x08000, CRC(bc1eec0a) SHA1(300ebfbd314c58b434bb20a5c3c8f7463b424207) )
+
+	/* No prom dumps. Using the ones from jwildb52 for now... */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb7118.41", 0x0000, 0x0100, CRC(b362f9e2) SHA1(3963b40389ed6584e4cd96ab48849552857d99af) )
+ROM_END
+
+
 /*************************
 *      Driver Init       *
 *************************/
@@ -673,6 +706,7 @@ DRIVER_INIT_MEMBER(sigmab52_state,jwildb52)
 *************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY  FULLNAME                                  FLAGS */
-GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING, layout_sigmab52 )
-GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, Harrah's GFX)", GAME_NO_SOUND | GAME_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52,  0,        jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 1)",        GAME_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52a, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, set 2)",        GAME_NOT_WORKING, layout_sigmab52 )
+GAMEL( 199?, jwildb52h, jwildb52, jwildb52, jwildb52, sigmab52_state, jwildb52, ROT0, "Sigma", "Joker's Wild (B52 system, Harrah's GFX)", GAME_NOT_WORKING, layout_sigmab52 )
+GAME ( 199?, s8waysfc,  0,        jwildb52, s8waysfc, sigmab52_state, jwildb52, ROT0, "Sigma", "Super 8 Ways FC (Fruit combination)",     GAME_NOT_WORKING )

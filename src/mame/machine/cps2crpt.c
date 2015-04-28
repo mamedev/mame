@@ -899,7 +899,8 @@ static const struct game_keys keys_table[] =
 	{ "sfz2alj",  { 0x99450c88,0xa00a2c4d }, 0x100000 },    // 0C80 8E73 9110  cmpi.l  #$8E739110,D0
 	{ "sfz2alh",  { 0x95f15b7c,0x200c08c6 }, 0x100000 },    // 0C80 8E73 9110  cmpi.l  #$8E739110,D0
 	{ "sfz2alb",  { 0x73cd4a28,0xff83af1c }, 0x100000 },    // 0C80 8E73 9110  cmpi.l  #$8E739110,D0
-	{ "spf2t",    { 0x706a8750,0x7d0fc185 }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
+	{ "spf2t",    { 0xdde26f09,0x55821ee7 }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
+	{ "spf2tu",   { 0x706a8750,0x7d0fc185 }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
 	{ "spf2xj",   { 0xb12c835a,0xe90976ff }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
 	{ "spf2ta",   { 0x9c48e1ab,0xd60f34fb }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
 	{ "spf2th",   { 0x51ed8cab,0x228f85b6 }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0

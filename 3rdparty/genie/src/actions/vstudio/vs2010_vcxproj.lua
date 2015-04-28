@@ -477,19 +477,7 @@
 				vc2010.link(cfg)
 				event_hooks(cfg)
 			_p(1,'</ItemDefinitionGroup>')
-
-
 		end
-	end
-
-
-
-	function exists(table, fine)
-		for _, value in ipairs(table) do
-			if value == find then return true end
-		end
-
-		return false
 	end
 
 
@@ -506,7 +494,7 @@
 				ClInclude = {},
 				None = {},
 				ResourceCompile = {},
-                AppxManifest = {}
+				AppxManifest = {}
 			}
 
 			local foundAppxManifest = false
@@ -514,19 +502,19 @@
 				if path.iscppfile(file.name) then
 					table.insert(sortedfiles.ClCompile, file)
 				elseif path.iscppheader(file.name) then
-					if not exists(prj.removefiles, file) then
+					if not table.icontains(prj.removefiles, file) then
 						table.insert(sortedfiles.ClInclude, file)
 					end
 				elseif path.isresourcefile(file.name) then
 					table.insert(sortedfiles.ResourceCompile, file)
 				else
-                    local ext = path.getextension(file.name):lower()
-                    if ext == ".appxmanifest" then
+					local ext = path.getextension(file.name):lower()
+					if ext == ".appxmanifest" then
 						foundAppxManifest = true
-                        table.insert(sortedfiles.AppxManifest, file)
-                    else
-					    table.insert(sortedfiles.None, file)
-                    end
+						table.insert(sortedfiles.AppxManifest, file)
+					else
+						table.insert(sortedfiles.None, file)
+					end
 				end
 			end
 
@@ -556,23 +544,74 @@
 		vc2010.simplefilesgroup(prj, "ClInclude")
 		vc2010.compilerfilesgroup(prj)
 		vc2010.simplefilesgroup(prj, "None")
+		vc2010.customtaskgroup(prj)
 		vc2010.simplefilesgroup(prj, "ResourceCompile")
-        vc2010.simplefilesgroup(prj, "AppxManifest")
+		vc2010.simplefilesgroup(prj, "AppxManifest")
 	end
 
-
+	function vc2010.customtaskgroup(prj)
+		local files = { }
+		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+			for _, buildtask in ipairs(custombuildtask or {}) do
+				local fcfg = { }
+				fcfg.name = path.getrelative(prj.location,buildtask[1])
+				fcfg.vpath = path.trimdots(fcfg.name)
+				table.insert(files, fcfg)
+			end
+		end		
+		if #files > 0  then
+			_p(1,'<ItemGroup>')
+			local groupedBuildTasks = {}
+			for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
+				for _, buildtask in ipairs(custombuildtask or {}) do
+					if (groupedBuildTasks[buildtask[1]] == nil) then
+						groupedBuildTasks[buildtask[1]] = {}
+					end
+					table.insert(groupedBuildTasks[buildtask[1]], buildtask)
+				end
+			end
+			
+			for name, custombuildtask in pairs(groupedBuildTasks or {}) do
+				_p(2,'<CustomBuild Include=\"%s\">', path.translate(path.getrelative(prj.location,name), "\\"))
+				_p(3,'<FileType>Text</FileType>')
+				local cmd = ""
+				local outputs = ""
+				for _, buildtask in ipairs(custombuildtask or {}) do
+					for _, cmdline in ipairs(buildtask[4] or {}) do
+						cmd = cmd .. cmdline
+						local num = 1
+						for _, depdata in ipairs(buildtask[3] or {}) do
+							cmd = string.gsub(cmd,"%$%(" .. num .."%)", string.format("%s ",path.getrelative(prj.location,depdata)))
+							num = num + 1
+						end
+						cmd = string.gsub(cmd, "%$%(<%)", string.format("%s ",path.getrelative(prj.location,buildtask[1])))
+						cmd = string.gsub(cmd, "%$%(@%)", string.format("%s ",path.getrelative(prj.location,buildtask[2])))
+						cmd = cmd .. "\r\n"
+					end	 
+					outputs = outputs .. path.getrelative(prj.location,buildtask[2]) .. ";"
+				end
+				_p(3,'<Command>%s</Command>',cmd)
+				_p(3,'<Outputs>%s%%(Outputs)</Outputs>',outputs)
+				_p(3,'<SubType>Designer</SubType>')
+				_p(3,'<Message></Message>')
+				_p(2,'</CustomBuild>')
+			end
+			_p(1,'</ItemGroup>')
+		end
+	end
+	
 	function vc2010.simplefilesgroup(prj, section, subtype)
 		local files = vc2010.getfilegroup(prj, section)
 		if #files > 0  then
 			_p(1,'<ItemGroup>')
 			for _, file in ipairs(files) do
-                if subtype then
-                    _p(2,'<%s Include=\"%s\">', section, path.translate(file.name, "\\"))
-                    _p(3,'<SubType>%s</SubType>', subtype)
-                    _p(2,'</%s>', section)
-                else
-				    _p(2,'<%s Include=\"%s\" />', section, path.translate(file.name, "\\"))
-                end
+				if subtype then
+					_p(2,'<%s Include=\"%s\">', section, path.translate(file.name, "\\"))
+					_p(3,'<SubType>%s</SubType>', subtype)
+					_p(2,'</%s>', section)
+				else
+					_p(2,'<%s Include=\"%s\" />', section, path.translate(file.name, "\\"))
+				end
 			end
 			_p(1,'</ItemGroup>')
 		end
@@ -605,37 +644,15 @@
 					end
 				end
 
-				-- Global exclude
-				local excluded = false
-				for _, exclude in ipairs(prj.excludes) do
-					if exclude == file.name then
-						for _, vsconfig in ipairs(configs) do
-							local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
-							_p(3, '<ExcludedFromBuild '
-								.. if_config_and_platform()
-								.. '>true</ExcludedFromBuild>'
-								, premake.esc(vsconfig.name)
-								)
-						end
-						excluded = true
-						break
-					end
-				end
-
-				if not excluded then
-					-- Per configuration excludes
-					for _, vsconfig in ipairs(configs) do
-						local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
-						for _, exclude in ipairs(cfg.excludes) do
-
-							if exclude == file.name then
-								_p(3, '<ExcludedFromBuild '
-									.. if_config_and_platform()
-									.. '>true</ExcludedFromBuild>'
-									, premake.esc(vsconfig.name)
-									)
-							end
-						end
+				local excluded = table.icontains(prj.excludes, file.name)
+				for _, vsconfig in ipairs(configs) do
+					local cfg = premake.getconfig(prj, vsconfig.src_buildcfg, vsconfig.src_platform)
+					if excluded or table.icontains(cfg.excludes, file.name) then
+						_p(3, '<ExcludedFromBuild '
+							.. if_config_and_platform()
+							.. '>true</ExcludedFromBuild>'
+							, premake.esc(vsconfig.name)
+							)
 					end
 				end
 

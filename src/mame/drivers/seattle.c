@@ -566,9 +566,9 @@ void seattle_state::machine_start()
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
-	/* configure fast RAM regions for DRC */
-	m_maincpu->mips3drc_add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
-	m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	/* configure fast RAM regions */
+	m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_galileo.reg));
@@ -579,8 +579,8 @@ void seattle_state::machine_start()
 	save_item(NAME(m_galileo.pci_ide_regs));
 	for (index = 0; index < ARRAY_LENGTH(m_galileo.timer); index++)
 	{
-		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].count);
-		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].active);
+		save_item(NAME(m_galileo.timer[index].count), index);
+		save_item(NAME(m_galileo.timer[index].active), index);
 	}
 	save_item(NAME(m_widget.ethernet_addr));
 	save_item(NAME(m_widget.irq_num));

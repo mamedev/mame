@@ -171,6 +171,19 @@ public:
 };
 
 
+// ======================> fsd1_device
+
+class fsd1_device :  public base_c1541_device
+{
+public:
+	// construction/destruction
+	fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
 // ======================> fsd2_device
 
 class fsd2_device :  public base_c1541_device
@@ -258,17 +271,32 @@ protected:
 };
 
 
+// ======================> indus_gt_t
+
+class indus_gt_t :  public base_c1541_device
+{
+public:
+	// construction/destruction
+	indus_gt_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+};
+
+
 // device type definition
 extern const device_type C1540;
 extern const device_type C1541;
 extern const device_type C1541C;
 extern const device_type C1541II;
 extern const device_type SX1541;
+extern const device_type FSD1;
 extern const device_type FSD2;
 extern const device_type CSD1;
 extern const device_type C1541_DOLPHIN_DOS;
 extern const device_type C1541_PROFESSIONAL_DOS_V1;
 extern const device_type C1541_PROLOGIC_DOS_CLASSIC;
+extern const device_type INDUS_GT;
 
 
 

@@ -4594,7 +4594,7 @@ If the program doesn't automatically start, start it with RUN
 		</part>
 	</software>
 
-	<software name="knightlo">
+	<software name="knightlr">
 		<description>Knight Lore</description>
 		<year>1985</year>
 		<publisher>'a' Studio</publisher>
@@ -4606,7 +4606,7 @@ If the program doesn't automatically start, start it with RUN
 		</part>
 	</software>
 
-	<software name="knightloa" cloneof="knightlo">
+	<software name="knightlra" cloneof="knightlr">
 		<description>Knight Lore (Alt)</description>
 		<year>1985</year>
 		<publisher>'a' Studio</publisher>

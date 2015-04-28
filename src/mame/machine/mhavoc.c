@@ -64,18 +64,18 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_irq_ack_w)
 
 void mhavoc_state::machine_start()
 {
-	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_data);
-	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_rcvd);
-	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_xmtd);
-	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_data);
-	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_rcvd);
-	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_xmtd);
-	state_save_register_item(machine(), "misc", NULL, 0, m_player_1);
-	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_irq_clock);
-	state_save_register_item(machine(), "misc", NULL, 0, m_alpha_irq_clock_enable);
-	state_save_register_item(machine(), "misc", NULL, 0, m_gamma_irq_clock);
+	save_item(NAME(m_alpha_data));
+	save_item(NAME(m_alpha_rcvd));
+	save_item(NAME(m_alpha_xmtd));
+	save_item(NAME(m_gamma_data));
+	save_item(NAME(m_gamma_rcvd));
+	save_item(NAME(m_gamma_xmtd));
+	save_item(NAME(m_player_1));
+	save_item(NAME(m_alpha_irq_clock));
+	save_item(NAME(m_alpha_irq_clock_enable));
+	save_item(NAME(m_gamma_irq_clock));
 
-	state_save_register_item(machine(), "misc", NULL, 0, m_speech_write_buffer);
+	save_item(NAME(m_speech_write_buffer));
 }
 
 

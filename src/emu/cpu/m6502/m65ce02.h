@@ -63,7 +63,7 @@ protected:
 	virtual void device_reset();
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	virtual void state_string_export(const device_state_entry &entry, astring &string);
+	virtual void state_string_export(const device_state_entry &entry, std::string &str);
 
 	inline void dec_SP_ce() { if(P & F_E) SP = set_l(SP, SP-1); else SP--; }
 	inline void inc_SP_ce() { if(P & F_E) SP = set_l(SP, SP+1); else SP++; }

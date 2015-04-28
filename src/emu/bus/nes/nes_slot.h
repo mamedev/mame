@@ -198,17 +198,17 @@ public:
 	void set_open_bus(UINT8 val) { m_open_bus = val; }
 
 	UINT8* get_prg_base() { return m_prg; }
-	UINT8* get_prgram_base() { return m_prgram; }
+	UINT8* get_prgram_base() { return &m_prgram[0]; }
 	UINT8* get_vrom_base() { return m_vrom; }
-	UINT8* get_vram_base() { return m_vram; }
-	UINT8* get_battery_base() { return m_battery; }
+	UINT8* get_vram_base() { return &m_vram[0]; }
+	UINT8* get_battery_base() { return &m_battery[0]; }
 	UINT8* get_mapper_sram_base() { return m_mapper_sram; }
 
 	UINT32 get_prg_size() { return m_prg_size; }
-	UINT32 get_prgram_size() { return m_prgram.bytes(); }
+	UINT32 get_prgram_size() { return m_prgram.size(); }
 	UINT32 get_vrom_size() { return m_vrom_size; }
-	UINT32 get_vram_size() { return m_vram.bytes(); }
-	UINT32 get_battery_size() { return m_battery.bytes(); }
+	UINT32 get_vram_size() { return m_vram.size(); }
+	UINT32 get_battery_size() { return m_battery.size(); }
 	UINT32 get_mapper_sram_size() { return m_mapper_sram_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
@@ -320,7 +320,7 @@ protected:
 	void set_nt_page(int page, int source, int bank, int writable);
 	void set_nt_mirroring(int mirroring);
 
-	dynamic_array<UINT16> m_prg_bank_map;
+	std::vector<UINT16> m_prg_bank_map;
 };
 
 void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
@@ -361,7 +361,7 @@ public:
 	virtual device_image_partialhash_func get_partial_hash() const { return &nes_partialhash; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 	const char * get_default_card_ines(UINT8 *ROM, UINT32 len);
 	const char * get_default_card_unif(UINT8 *ROM, UINT32 len);
 	const char * nes_get_slot(int pcb_id);

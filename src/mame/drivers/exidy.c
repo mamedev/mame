@@ -639,16 +639,16 @@ static INPUT_PORTS_START( pepper2 )
 	PORT_START("DSW")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:2,3")
-	PORT_DIPSETTING(    0x06, "40000" )
-	PORT_DIPSETTING(    0x04, "50000" )
-	PORT_DIPSETTING(    0x02, "60000" )
-	PORT_DIPSETTING(    0x00, "70000" )
-		PORT_DIPNAME( 0x60, 0x40, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x06, "40000 and 80000" )
+	PORT_DIPSETTING(    0x04, "50000 and 100000" )
+	PORT_DIPSETTING(    0x02, "70000 and 140000" ) // 1st Edition manual lists 60000
+	PORT_DIPSETTING(    0x00, "90000 and 180000" ) // 1st Edition manual lists 70000
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-		PORT_DIPNAME( 0x98, 0x98, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4,5,8")
+	PORT_DIPNAME( 0x98, 0x98, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4,5,8")
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, "Coin A 2C/1C Coin B 1C/3C" )
 	PORT_DIPSETTING(    0x98, DEF_STR( 1C_1C ) )
@@ -868,7 +868,7 @@ static MACHINE_CONFIG_DERIVED( venture, base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(venture_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(venture_audio)
@@ -890,7 +890,7 @@ static MACHINE_CONFIG_DERIVED( mtrap, venture )
 
 	/* basic machine hardware */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* audio hardware */
 	MCFG_FRAGMENT_ADD(mtrap_cvsd_audio)

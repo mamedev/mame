@@ -215,14 +215,14 @@ static int kc_handle_sss(INT16 *buffer, const UINT8 *casdata)
 	dynamic_buffer sss(kc_image_size + 11);
 
 	// tries to generate the missing head
-	memset(sss + 0, 0xd3, 3);
-	memset(sss + 3, 0x20, 8);
-	memcpy(sss + 11, casdata, kc_image_size);
+	memset(&sss[0], 0xd3, 3);
+	memset(&sss[3], 0x20, 8);
+	memcpy(&sss[11], casdata, kc_image_size);
 
 	// set an arbitrary filename
 	sss[3] = 'A';
 
-	int retval = kc_handle_cass(buffer, sss, KC_IMAGE_KCC);
+	int retval = kc_handle_cass(buffer, &sss[0], KC_IMAGE_KCC);
 
 	return retval;
 }

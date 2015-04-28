@@ -65,30 +65,24 @@ Notes:
 
     TODO:
 
-    - cassette interrupt routine samples the latch too soon
     - proper keyboard controller emulation
-    - MyAB 80-column card
+    - MyAB TKN80 80-column card
     - GeJo 80-column card
     - Mikrodatorn 64K expansion
     - floppy
-    - printer
-    - IEC
     - Metric ABC CAD 1000
 
 */
 
 #include "includes/abc80.h"
 
-#define KEYBOARD_TAG "keyboard"
+
 
 //**************************************************************************
-//  MACROS / CONSTANTS
+//  CONSTANTS
 //**************************************************************************
 
-#define MMU_XM      0x01
-#define MMU_ROM     0x02
-#define MMU_VRAMS   0x04
-#define MMU_RAM     0x08
+#define LOG 0
 
 
 
@@ -186,14 +180,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c3_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, inp_r, out_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_t, stat_r, cs_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c2_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c3_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_t, c4_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_PORT("SN76477")
-	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r)
+	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_t, rst_r)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
@@ -308,7 +302,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	// cassette data
 	data |= m_tape_in_latch << 7;
 
-	//logerror("read tape latch %u\n", m_tape_in_latch);
+	if (LOG) logerror("%s %s read tape latch %u\n", machine().time().as_string(), machine().describe_context(), m_tape_in_latch);
 
 	return data;
 };
@@ -339,11 +333,13 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 	// cassette motor
 	if (BIT(data, 5))
 	{
+		if (!m_cassette_timer->enabled()) if (LOG) logerror("%s %s started cassette motor\n", machine().time().as_string(), machine().describe_context());
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_cassette_timer->enable(true);
 	}
 	else
 	{
+		if (m_cassette_timer->enabled()) if (LOG) logerror("%s %s stopped cassette motor\n", machine().time().as_string(), machine().describe_context());
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_cassette_timer->enable(false);
 	}
@@ -354,13 +350,14 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 	// cassette input latch
 	if (BIT(data, 6))
 	{
-		//logerror("clear tape in latch\n");
+		if (LOG) logerror("%s %s clear tape in latch\n", machine().time().as_string(), machine().describe_context());
 
 		m_tape_in_latch = 1;
 
-		m_pio->port_b_write(m_tape_in_latch << 7);
+		m_pio->pb7_w(m_tape_in_latch);
 	}
 };
+
 
 //-------------------------------------------------
 //  Z80 Daisy Chain
@@ -395,6 +392,14 @@ WRITE8_MEMBER( abc80_state::kbd_w )
 	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
 }
 
+/*
+DEVICE_INPUT_DEFAULTS_START( abc830_slow )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+*/
+
+
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -416,11 +421,13 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_ID_CASSETTE:
 		{
 			int tape_in = m_cassette->input() > 0;
-			//logerror("tape bit %u\n", tape_in);
 
-			if (m_tape_in_latch && !m_tape_in && tape_in)
+			if (m_tape_in != tape_in)
+				if (LOG) logerror("%s tape flank %u\n", machine().time().as_string(), tape_in);
+
+			if (m_tape_in_latch && (m_tape_in != tape_in))
 			{
-				//logerror("-------- set tape in latch\n");
+				if (LOG) logerror("%s set tape in latch\n", machine().time().as_string());
 				m_tape_in_latch = 0;
 
 				m_pio->port_b_write(m_tape_in_latch << 7);
@@ -470,16 +477,37 @@ void abc80_state::machine_start()
 	save_item(NAME(m_tape_in_latch));
 }
 
+QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	offs_t address = space.read_byte(BOFA + 1) << 8 | space.read_byte(BOFA);
+	if (LOG) logerror("BOFA %04x\n",address);
+
+	dynamic_buffer data;
+	data.resize(quickload_size);
+	image.fread(&data[0], quickload_size);
+	for (int i = 1; i < quickload_size; i++)
+		space.write_byte(address++, data[i]);
+
+	offs_t eofa = address;
+	space.write_byte(EOFA, eofa & 0xff);
+	space.write_byte(EOFA + 1, eofa >> 8);
+	if (LOG) logerror("EOFA %04x\n",address);
+
+	offs_t head = address + 1;
+	space.write_byte(HEAD, head & 0xff);
+	space.write_byte(HEAD + 1, head >> 8);
+	if (LOG) logerror("HEAD %04x\n",address);
+
+	return IMAGE_INIT_PASS;
+}
+
 
 
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
-
-DEVICE_INPUT_DEFAULTS_START( abc830_slow )
-	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
-	DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
-DEVICE_INPUT_DEFAULTS_END
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( abc80 )
@@ -509,6 +537,9 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	// devices
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_11_9808MHz/2/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
@@ -516,23 +547,28 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_Z80PIO_IN_PB_CB(READ8(abc80_state, pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc80_state, pio_pb_w))
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("abc80_cass")
 
 	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0)
 	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(abc80_state, keydown_w))
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, "slow")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("slow", abc830_slow)
+
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
+	
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, NULL)
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(abc80_state, kbd_w))
+
+	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 1)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "abc80_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc80_flop")
 MACHINE_CONFIG_END
 
 

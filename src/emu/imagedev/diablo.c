@@ -115,7 +115,7 @@ bool diablo_image_device::call_create(int create_format, option_resolution *crea
 	int err;
 	UINT32 sectorsize, hunksize;
 	UINT32 cylinders, heads, sectors, totalsectors;
-	astring metadata;
+	std::string metadata;
 
 	cylinders   = option_resolution_lookup_int(create_args, 'C');
 	heads       = option_resolution_lookup_int(create_args, 'H');
@@ -132,7 +132,7 @@ bool diablo_image_device::call_create(int create_format, option_resolution *crea
 		goto error;
 
 	/* if we created the image and hence, have metadata to set, set the metadata */
-	metadata.format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
+	strprintf(metadata,HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
 	err = m_origchd.write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 	m_origchd.close();
 
@@ -170,34 +170,34 @@ void diablo_image_device::call_unload()
 
 static chd_error open_disk_diff(emu_options &options, const char *name, chd_file &source, chd_file &diff_chd)
 {
-	astring fname(name, ".dif");
+	std::string fname = std::string(name).append(".dif");
 
 	/* try to open the diff */
-	//printf("Opening differencing image file: %s\n", fname.cstr());
+	//printf("Opening differencing image file: %s\n", fname.c_str());
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
-	file_error filerr = diff_file.open(fname);
+	file_error filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
-		astring fullpath(diff_file.fullpath());
+		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
-		//printf("Opening differencing image file: %s\n", fullpath.cstr());
-		return diff_chd.open(fullpath, true, &source);
+		//printf("Opening differencing image file: %s\n", fullpath.c_str());
+		return diff_chd.open(fullpath.c_str(), true, &source);
 	}
 
 	/* didn't work; try creating it instead */
-	//printf("Creating differencing image: %s\n", fname.cstr());
+	//printf("Creating differencing image: %s\n", fname.c_str());
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	filerr = diff_file.open(fname);
+	filerr = diff_file.open(fname.c_str());
 	if (filerr == FILERR_NONE)
 	{
-		astring fullpath(diff_file.fullpath());
+		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
 		/* create the CHD */
-		//printf("Creating differencing image file: %s\n", fullpath.cstr());
+		//printf("Creating differencing image file: %s\n", fullpath.c_str());
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
-		chd_error err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
+		chd_error err = diff_chd.create(fullpath.c_str(), source.logical_bytes(), source.hunk_bytes(), compression, source);
 		if (err != CHDERR_NONE)
 			return err;
 
@@ -209,7 +209,6 @@ static chd_error open_disk_diff(emu_options &options, const char *name, chd_file
 
 int diablo_image_device::internal_load_dsk()
 {
-	astring tempstring;
 	chd_error err = CHDERR_NONE;
 
 	m_chd = NULL;
@@ -220,7 +219,7 @@ int diablo_image_device::internal_load_dsk()
 	/* open the CHD file */
 	if (software_entry() != NULL)
 	{
-		m_chd  = get_disk_handle(device().machine(), device().subtag(tempstring,"harddriv"));
+		m_chd = get_disk_handle(device().machine(), device().subtag("harddriv").c_str());
 	}
 	else
 	{

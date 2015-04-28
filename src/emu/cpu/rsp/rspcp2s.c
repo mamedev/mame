@@ -295,7 +295,7 @@ rsp_cop2_simd::rsp_cop2_simd(rsp_device &rsp, running_machine &machine) : rsp_co
 	vec_flag_reverse = _mm_set_epi16(0x0100, 0x0302, 0x0504, 0x0706, 0x0908, 0x0b0a, 0x0d0c, 0x0f0e);
 }
 
-void rsp_cop2_simd::state_string_export(const int index, astring &string)
+void rsp_cop2_simd::state_string_export(const int index, std::string &str)
 {
 	switch (index)
 	{

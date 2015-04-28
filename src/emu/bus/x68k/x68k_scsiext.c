@@ -65,12 +65,11 @@ void x68k_scsiext_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
 	UINT8* ROM;
-	astring temp;
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	space.install_read_bank(0xea0020,0xea1fff,0,0,"scsi_ext");
 	space.unmap_write(0xea0020,0xea1fff,0,0);
-	ROM = machine().root_device().memregion(subtag(temp,"scsiexrom"))->base();
+	ROM = machine().root_device().memregion(subtag("scsiexrom").c_str())->base();
 	machine().root_device().membank("scsi_ext")->set_base(ROM);
 	space.install_readwrite_handler(0xea0000,0xea001f,0,0,read8_delegate(FUNC(x68k_scsiext_device::register_r),this),write8_delegate(FUNC(x68k_scsiext_device::register_w),this),0x00ff00ff);
 }

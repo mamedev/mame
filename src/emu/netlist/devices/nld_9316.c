@@ -5,6 +5,8 @@
 
 #include "nld_9316.h"
 
+#define MAXCNT 15
+
 NETLIB_START(9316)
 {
 	register_sub(subABCD, "subABCD");
@@ -91,9 +93,11 @@ NETLIB_UPDATE(9316_sub)
 	UINT8 cnt = m_cnt;
 	if (m_loadq)
 	{
-		cnt = ( cnt + 1) & 0x0f;
+		cnt++;
+		if (cnt > MAXCNT)
+			cnt = 0;
 		update_outputs(cnt);
-		OUTLOGIC(m_RC, m_ent & (cnt == 0x0f), NLTIME_FROM_NS(20));
+		OUTLOGIC(m_RC, m_ent & (cnt == MAXCNT), NLTIME_FROM_NS(20));
 #if 0
 		if (cnt == 0x0f)
 			OUTLOGIC(m_RC, m_ent, NLTIME_FROM_NS(20));
@@ -105,7 +109,7 @@ NETLIB_UPDATE(9316_sub)
 	{
 		cnt = m_ABCD.get()->read_ABCD();
 		update_outputs_all(cnt);
-		OUTLOGIC(m_RC, m_ent & (cnt == 0x0f), NLTIME_FROM_NS(20));
+		OUTLOGIC(m_RC, m_ent & (cnt == MAXCNT), NLTIME_FROM_NS(20));
 	}
 	m_cnt = cnt;
 }
@@ -133,7 +137,7 @@ NETLIB_UPDATE(9316)
 			//return;
 		}
 	}
-	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == 0x0f), NLTIME_FROM_NS(20));
+	OUTLOGIC(sub.m_RC, sub.m_ent & (sub.m_cnt == MAXCNT), NLTIME_FROM_NS(20));
 }
 
 inline NETLIB_FUNC_VOID(9316_sub, update_outputs_all, (const UINT8 cnt))

@@ -653,7 +653,7 @@ void deco156_state::descramble_sound( const char *tag )
 		buf1[addr] = rom[x];
 	}
 
-	memcpy(rom,buf1,length);
+	memcpy(rom,&buf1[0],length);
 }
 
 DRIVER_INIT_MEMBER(deco156_state,hvysmsh)
