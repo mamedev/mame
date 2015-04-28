@@ -21,6 +21,7 @@
  @MP1204   TMS1100   1980, Entex Baseball 3
  @MP1211   TMS1100   1980, Entex Space Invader
  @MP1221   TMS1100   1980, Entex Raise The Devil
+ *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
  @MP2105   TMS1370   1979, Gakken Poker
@@ -97,6 +98,7 @@
 #include "elecdet.lh"
 #include "gjackpot.lh"
 #include "gpoker.lh"
+#include "h2hbaseb.lh"
 #include "h2hfootb.lh"
 #include "mathmagi.lh"
 #include "merlin.lh" // clickable
@@ -630,8 +632,6 @@ MACHINE_CONFIG_END
   * TMS1170NLN MP1525-N2 (die labeled MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1bit sound
 
-  x
-
 ***************************************************************************/
 
 class h2hbaseb_state : public hh_tms1k_state
@@ -657,12 +657,8 @@ protected:
 
 void h2hbaseb_state::prepare_display()
 {
-	// imply 7seg display
 	memset(m_display_segmask, ~0, sizeof(m_display_segmask));
-	
-	UINT16 plate = (m_r & 0x100) | ((m_r & 0x400) ? m_o : 0);
-	UINT16 grid = (m_r & 0xff) | (m_r >> 1 & 0x100);
-	display_matrix_seg(9, 9, plate, grid, 0x7f);
+	display_matrix_seg(9, 9, (m_r & 0x100) | m_o, (m_r & 0xff) | (m_r >> 1 & 0x100), 0x7f);
 }
 
 WRITE16_MEMBER(h2hbaseb_state::write_r)
@@ -673,7 +669,6 @@ WRITE16_MEMBER(h2hbaseb_state::write_r)
 	// R4-R7: input mux
 	m_inp_mux = data >> 4 & 0xf;
 
-	// R10: vfd filament on
 	// R0-R7,R9: select vfd digit/led
 	// R8: led state
 	m_r = data;
@@ -754,7 +749,7 @@ static MACHINE_CONFIG_START( h2hbaseb, h2hbaseb_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(h2hbaseb_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_h2hbaseb)
 
 	/* no video! */
 
@@ -774,8 +769,8 @@ MACHINE_CONFIG_END
   * TMS1100NLLE (rev. E!) MP3460 (die labeled MP3460)
   * 2*SN75492N LED display drivers, 9-digit LED grid, 1bit sound
 
-  To distinguish between offense and defense, offense blips (should)
-  appear brighter.
+  LED electronic football game. To distinguish between offense and defense,
+  offense blips (should) appear brighter.
 
 ***************************************************************************/
 
@@ -4084,7 +4079,7 @@ ROM_END
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 
 CONS( 1979, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", GAME_SUPPORTS_SAVE )
-CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Coleco", "Head to Head Baseball", GAME_SUPPORTS_SAVE )
 CONS( 1980, h2hfootb,  0,        0, h2hfootb,  h2hfootb,  driver_device, 0, "Coleco", "Head to Head Football", GAME_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", GAME_SUPPORTS_SAVE )
 

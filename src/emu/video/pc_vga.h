@@ -168,13 +168,15 @@ protected:
 	/**/    UINT8 dw;
 	/**/    UINT8 div4;
 	/**/    UINT8 underline_loc;
-	/**/    UINT8 vert_blank_end;
+	/**/    UINT16 vert_blank_end;
 			UINT8 sync_en;
 	/**/    UINT8 aw;
 	/**/    UINT8 div2;
 	/**/    UINT8 sldiv;
 	/**/    UINT8 map14;
 	/**/    UINT8 map13;
+	/**/	UINT8 irq_clear;
+	/**/	UINT8 irq_disable;
 		} crtc;
 
 		struct

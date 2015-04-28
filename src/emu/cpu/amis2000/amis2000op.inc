@@ -499,7 +499,7 @@ void amis2000_base_device::op_rf2()
 void amis2152_cpu_device::d2f_timer_clock()
 {
 	// schedule next timeout (frequency is guessed)
-	attotime base = attotime::from_hz(unscaled_clock() / 4 / 64);
+	attotime base = attotime::from_ticks(4 * 64, unscaled_clock());
 	m_d2f_timer->adjust(base * (0x10 - m_d2f_latch));
 }
 

@@ -127,6 +127,8 @@ void naomi_m4_board::board_setup_address(UINT32 address, bool is_dma)
 
 void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 {
+	static UINT8 retzero[2] = { 0, 0 };
+
 	if (cfi_mode) {
 		int fpr_num = 0;
 
@@ -148,8 +150,15 @@ void naomi_m4_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 		limit = BUFFER_SIZE;
 
 	} else {
-		base = m_region->base() + rom_cur_address;
-		limit = m_region->bytes() - rom_cur_address;
+		UINT32 size = m_region->bytes();
+		if (rom_cur_address < size)
+		{
+			base = m_region->base() + rom_cur_address;
+			limit = size - rom_cur_address;
+		} else {
+			base = retzero;
+			limit = 2;
+		}
 	}
 }
 

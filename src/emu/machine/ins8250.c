@@ -324,7 +324,15 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 
 			break;
 		case 6:
-			// modem status register is read only
+			/*
+			  This register can be written, but if you write a 1 bit into any of
+			  bits 3 - 0, you could cause an interrupt if the appropriate IER bit
+			  is set.
+			 */
+			m_regs.msr = data;
+
+			if ( m_regs.msr & 0x0f )
+				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			break;
 		case 7:
 			m_regs.scr = data;
@@ -485,20 +493,25 @@ void ins8250_uart_device::tra_callback()
 void ins8250_uart_device::update_msr()
 {
 	UINT8 data;
+	int change;
 
 	if (m_regs.mcr & 0x10)
-		data = ((m_regs.mcr & 0x0c) << 4) | ((m_regs.mcr & 0x01) << 5) | ((m_regs.mcr & 0x02) << 3);
-	else
-		data = (!m_dcd << 7) | (!m_ri << 6) | (!m_dsr << 5) | (!m_cts << 4);
-
-	int change = (m_regs.msr ^ data) >> 4;
-
-	if (change)
 	{
-		m_regs.msr = data | (m_regs.msr & 0xf) | change;
-
-		trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+		data = (((m_regs.mcr & 0x0c) << 4) | ((m_regs.mcr & 0x01) << 5) | ((m_regs.mcr & 0x02) << 3));
+		change = (m_regs.msr ^ data) >> 4;
+		if(!(m_regs.msr & 0x40) && (data & 0x40))
+			change &= ~4;
 	}
+	else
+	{
+		data = (!m_dcd << 7) | (!m_ri << 6) | (!m_dsr << 5) | (!m_cts << 4);
+		change = (m_regs.msr ^ data) >> 4;
+	}
+
+	m_regs.msr = data | change;
+
+	if(change)
+		trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
