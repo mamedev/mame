@@ -583,13 +583,13 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 	switch(index)
 	{
 	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
-		if(gc_mode_ext & 0x02)
+		if(gc_mode_ext & 0x04)
 			vga.gc.set_reset = data & 0xff;
 		else
 			vga.gc.set_reset = data & 0x0f;
 		break;
 	case 0x01:
-		if(gc_mode_ext & 0x02)
+		if(gc_mode_ext & 0x04)
 			vga.gc.enable_set_reset = data & 0xff;
 		else
 			vga.gc.enable_set_reset = data & 0x0f;
@@ -931,8 +931,9 @@ void cirrus_gd5428_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
 inline UINT8 cirrus_gd5428_device::cirrus_vga_latch_write(int offs, UINT8 data)
 {
 	UINT8 res = 0;
+	UINT8 mode_mask = (gc_mode_ext & 0x04) ? 0x07 : 0x03;
 
-	switch (vga.gc.write_mode & 3) {
+	switch (vga.gc.write_mode & mode_mask) {
 	case 0:
 		data = rotate_right(data);
 		if(vga.gc.enable_set_reset & 1<<offs)
@@ -951,9 +952,11 @@ inline UINT8 cirrus_gd5428_device::cirrus_vga_latch_write(int offs, UINT8 data)
 		res = vga_logical_op((vga.gc.set_reset & 1<<offs) ? 0xff : 0x00,offs,data&vga.gc.bit_mask);
 		break;
 	case 4:
+		res = vga.gc.latch[offs];
 		popmessage("CL: Unimplemented VGA write mode 4 enabled");
 		break;
 	case 5:
+		res = vga.gc.latch[offs];
 		popmessage("CL: Unimplemented VGA write mode 5 enabled");
 		break;
 	}
@@ -980,7 +983,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	else  // 4kB bank granularity
 		addr = bank * 0x1000;
 
-	// Is the display address adjusted automatically when using Chain-4 addressing?  The GD542x BIOS doesn't do it, but Virtual Pool expects it.
+	// Is the display address adjusted automatically when not using Chain-4 addressing?  The GD542x BIOS doesn't do it, but Virtual Pool expects it.
 	if(!(vga.sequencer.data[4] & 0x8))
 		addr <<= 2;	
 
@@ -1001,21 +1004,11 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 		}
 		else
 			offset &= 0xffff;
+
 		if(vga.sequencer.data[4] & 0x8)
 			data = vga.memory[(offset+addr) % vga.svga_intf.vram_size];
 		else
 		{
-			if(vga.gc.write_mode == 4 || vga.gc.write_mode == 5 || (vga.gc.write_mode == 1 && gc_mode_ext & 0x02))
-			{
-				int i;
-
-				for(i=0;i<8;i++)
-				{
-					if(vga.sequencer.map_mask & 1 << i)
-						data |= vga.memory[((offset*8+i)+addr) % vga.svga_intf.vram_size];
-				}
-			}
-			else
 			{
 				int i;
 
@@ -1144,41 +1137,42 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 		}
 		else
 			offset &= 0xffff;
-		if(gc_mode_ext & 0x08)
+
+		if(vga.gc.write_mode == 4)
 		{
 			int i;
+
 			for(i=0;i<8;i++)
 			{
-				if(vga.sequencer.map_mask & 1 << i)
-				{
-					if(gc_mode_ext & 0x02)
-						vga.memory[(((offset+addr)>>3)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
-					else
-						vga.memory[((offset+addr)+i*0x10000) % vga.svga_intf.vram_size] = (vga.sequencer.data[4] & 4) ? cirrus_vga_latch_write(i,data) : data;
-				}
+				if(data & (0x01 << (7-i)))
+					vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;  // GR1 (and GR11 in 16bpp modes) = foreground colour in write modes 4 or 5
 			}
 			return;
 		}
+
+		if(vga.gc.write_mode == 5)
+		{
+			int i;
+
+			for(i=0;i<8;i++)
+			{
+				if(data & (0x01 << (7-i)))
+					vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;  // GR1 (and GR11 in 16bpp modes) = foreground colour in write modes 4 or 5
+				else
+					vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.set_reset;  // GR0 (and GR10 in 16bpp modes) = background colour in write mode 5
+			}
+			return;
+		}
+		
 		if(vga.sequencer.data[4] & 0x8)
 			vga.memory[(offset+addr) % vga.svga_intf.vram_size] = data;
 		else
 		{
 			int i;
-			if(vga.gc.write_mode == 4 || vga.gc.write_mode == 5 || (vga.gc.write_mode == 1 && gc_mode_ext & 0x08))
+			for(i=0;i<4;i++)
 			{
-				for(i=0;i<8;i++)
-				{
-					if(vga.sequencer.map_mask & 1 << i)
-						vga.memory[((offset*8+i)+addr) % vga.svga_intf.vram_size] = data;
-				}
-			}
-			else
-			{
-				for(i=0;i<4;i++)
-				{
-					if(vga.sequencer.map_mask & 1 << i)
-						vga.memory[((offset*4+i)+addr) % vga.svga_intf.vram_size] = data;
-				}
+				if(vga.sequencer.map_mask & 1 << i)
+					vga.memory[((offset*4+i)+addr) % vga.svga_intf.vram_size] = data;
 			}
 		}
 	}

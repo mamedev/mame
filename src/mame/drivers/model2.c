@@ -2731,11 +2731,11 @@ ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */
 	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
 	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
-	//             1997     317-5038-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
-
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
+	
+	//             1997     317-5038-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
 ROM_END
 
 ROM_START( zerogunaj ) /* Zero Gunner (Japan), Model 2A - Sega game ID# 833-11341, Sega ROM board ID# 834-11342 */
@@ -2766,11 +2766,11 @@ ROM_START( zerogunaj ) /* Zero Gunner (Japan), Model 2A - Sega game ID# 833-1134
 	ROM_LOAD("mpr-20303.32", 0x000000, 0x200000, CRC(c040973f) SHA1(57a496c5dcc1a3931b6e41bf8d41e45d6dac0c31) )
 	ROM_LOAD("mpr-20304.33", 0x200000, 0x200000, CRC(6decfe83) SHA1(d73adafceff2f1776c93e53bd5677d67f1c2c08f) )
 
-	//             1997     317-5038-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
-
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
+	
+	//             1997     317-5038-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
 ROM_END
 
 ROM_START( zerogun ) /* Zero Gunner (Export), Model 2B */
@@ -3570,11 +3570,11 @@ ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-1134
 	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
-	//             1998     317-0236-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
-
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
+	
+	//             1998     317-0236-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
 
 ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A */
@@ -3621,11 +3621,11 @@ ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A */
 	ROM_LOAD("mpr-20814.36", 0x400000, 0x200000, CRC(e8ebc74c) SHA1(731ce721bb9e148f3a9f7fbe569522567a681c4e) )
 	ROM_LOAD("mpr-20815.37", 0x600000, 0x200000, CRC(1b5aaae4) SHA1(32b4bf6c096fdccdd5d8f1ddb6c27d3389a52234) )
 
-	//             1998     317-0236-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
-
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
+	
+	//             1998     317-0236-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
 
 ROM_START( dynamcopb ) /* Dynamite Cop (Export), Model 2B */
@@ -4312,11 +4312,11 @@ ROM_START( pltkidsa ) /* Pilot Kids, Model 2A */
 	ROM_LOAD("mpr-21279.sd3", 0x0400000, 0x200000, CRC(3a8dcf68) SHA1(312496b45b699051c8b4dd0e5d94e73fe5f3ad8d) )
 	ROM_LOAD("mpr-21280.sd4", 0x0600000, 0x200000, CRC(aa548124) SHA1(a94adfe16b5c3236746451c181ccd3e1c27432f4) )
 
-	//             1998     317-5044-COM   Model 2
-	ROM_PARAMETER( ":315_5881:key", "042e2dc1" )
-
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
+	
+	//             1998     317-5044-COM   Model 2
+	ROM_PARAMETER( ":315_5881:key", "042e2dc1" )
 ROM_END
 
 ROM_START( pltkids ) /* Pilot Kids Revision A, Model 2B */

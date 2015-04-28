@@ -41,8 +41,12 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
+    int m_comms_state;
+	int m_comms_ind;
+	UINT8 m_comms_data[1002];
 
-	DECLARE_READ16_MEMBER(unk_r);
+	DECLARE_READ16_MEMBER(comms_r);
+	DECLARE_WRITE16_MEMBER(comms_w);
 };
 
 
@@ -54,9 +58,54 @@ static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
-READ16_MEMBER(gambl186_state::unk_r)
+READ16_MEMBER(gambl186_state::comms_r)
 {
-	return machine().rand();
+    if ((offset == 0) && ACCESSING_BITS_0_7) //port 680 == data
+    {
+        if ((m_comms_state == 0x16) && (m_comms_ind < sizeof(m_comms_data)))
+        {
+            return m_comms_data[m_comms_ind++];
+        }
+    }
+    else if (offset == 1) //port 681 == status
+    {
+        if (m_comms_state == 0x16) //read mode?
+        {
+            return 2;
+        }
+        else if (m_comms_state == 0x31) //write mode?
+        {
+            return 4;
+        }
+    }
+
+    return 0;
+}
+
+WRITE16_MEMBER(gambl186_state::comms_w)
+{
+    if (offset == 0)
+    {
+        if ((m_comms_state == 0x31) && (m_comms_ind < (sizeof(m_comms_data) - 2)))
+        {
+            m_comms_data[++m_comms_ind] = (UINT8) ~data;
+        }
+    }
+    else if (offset == 1)
+    {
+        if (m_comms_state != data)
+        {
+            m_comms_ind = 0;
+        }
+
+        m_comms_state = data;
+
+        if (data == 0x4e) //reset?
+        {
+            m_comms_data[0] = 5;
+            m_comms_data[sizeof(m_comms_data) - 1] = 0xec;
+        }
+    }
 }
 
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
@@ -73,7 +122,7 @@ static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW2") AM_WRITENOP // ???
 	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
-	AM_RANGE(0x0680, 0x0683) AM_READ(unk_r) // ???
+	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
 ADDRESS_MAP_END
 
 
