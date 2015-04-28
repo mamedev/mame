@@ -929,6 +929,7 @@ osd_dim sdl_window_info::pick_best_mode()
 	int minimum_width, minimum_height, target_width, target_height;
 	int i;
 	float size_score, best_score = 0.0f;
+	int best_width = 0, best_height = 0;
 	SDL_Rect **modes;
 
 	// determine the minimum width/height for the selected target
@@ -989,12 +990,13 @@ osd_dim sdl_window_info::pick_best_mode()
 			if (size_score > best_score)
 			{
 				best_score = size_score;
-				return osd_dim(modes[i]->w, modes[i]->h);
+				best_width = modes[i]->w;
+				best_height = modes[i]->h;
 			}
 
 		}
 	}
-	return osd_dim(0,0);
+	return osd_dim(best_width, best_height);
 }
 #endif
 

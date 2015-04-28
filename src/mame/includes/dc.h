@@ -41,7 +41,7 @@ class dc_state : public driver_device
 	UINT8 m_armrst;
 
 	struct {
-		UINT32 aica_addr;
+		UINT32 g2_addr;
 		UINT32 root_addr;
 		UINT32 size;
 		UINT8 dir;
@@ -49,18 +49,18 @@ class dc_state : public driver_device
 		UINT8 indirect;
 		UINT8 start;
 		UINT8 sel;
-	}m_wave_dma;
+	}m_g2_dma[4];
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	TIMER_CALLBACK_MEMBER(aica_dma_irq);
+	TIMER_CALLBACK_MEMBER(g2_dma_irq);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
 	TIMER_CALLBACK_MEMBER(yuv_fifo_irq);
 	DECLARE_READ32_MEMBER(dc_aica_reg_r);
 	DECLARE_WRITE32_MEMBER(dc_aica_reg_w);
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);
 	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
-	void wave_dma_execute(address_space &space);
+	void g2_dma_execute(address_space &space, int channel);
 	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
 	inline int decode_reg3216_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
 	int dc_compute_interrupt_level();

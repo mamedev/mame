@@ -49,7 +49,7 @@ public:
 
 	ATTR_COLD void reset()
 	{
-		m_Q[0].initial(1);
+		m_Q[0].initial(0);
 		m_active = 1;
 	}
 
@@ -123,7 +123,7 @@ public:
 
 	ATTR_COLD void reset()
 	{
-		m_Q[0].initial(1);
+		m_Q[0].initial(0);
 		m_active = 1;
 	}
 

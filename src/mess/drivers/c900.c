@@ -13,6 +13,8 @@
     The FDC is an intelligent device that communicates with the main board via the MMU.
     It has a 6508 CPU.
 
+    Disk drive is a Matsushita JA-560-012
+
 *******************************************************************************************/
 
 

@@ -281,11 +281,9 @@ void netlist_setup_t::register_link_arr(const pstring &terms)
 	nl_util::pstring_list list = nl_util::split(terms,", ");
 	if (list.count() < 2)
 		netlist().error("You must pass at least 2 terminals to NET_C");
-	pstring last = list[0];
 	for (int i = 1; i < list.count(); i++)
 	{
-		register_link(last, list[i]);
-		last = list[i];
+		register_link(list[0], list[i]);
 	}
 }
 
@@ -712,9 +710,6 @@ void netlist_setup_t::start_devices()
 			register_link(name + ".I", ll[i]);
 		}
 	}
-
-
-	NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
 
 	netlist().start();
 }

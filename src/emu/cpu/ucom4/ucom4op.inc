@@ -720,7 +720,7 @@ void ucom4_cpu_device::op_stm()
 
 	// on the default clockrate of 400kHz, the minimum time interval is
 	// 630usec and the maximum interval is 40320usec(630*64)
-	attotime base = attotime::from_hz(unscaled_clock() / 4 / 63);
+	attotime base = attotime::from_ticks(4 * 63, unscaled_clock());
 	m_timer->adjust(base * ((m_arg & 0x3f) + 1));
 
 	if ((m_arg & 0xc0) != 0x80)

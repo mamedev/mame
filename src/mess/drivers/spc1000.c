@@ -24,6 +24,14 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 
 2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
 
+ 
+IMPORTANT NOTE for tape usage: you *FIRST* press PLAY on the tape drive 
+  (e.g. by pressing F2 in partial emulated keyboard mode) and *THEN* you 
+  type LOAD on the BASIC prompt!
+  Otherwise, the system turns the tape motor ON but it does not receive any
+  data from tape, and it turns it OFF before the user can press PLAY.
+ 
+ 
 ****************************************************************************/
 /*
  * SAMSUNG SPC-1000 Series (info from zannylim)
@@ -143,7 +151,7 @@ class spc1000_state : public driver_device
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_motor(0)
+		, m_motor(false)
 		, m_maincpu(*this, "maincpu")
 		, m_vdg(*this, "mc6847")
 		, m_cass(*this, "cassette")
@@ -172,7 +180,7 @@ private:
 	UINT8 m_GMODE;
 	UINT16 m_page;
 	UINT8 *m_work_ram;
-	UINT8  m_motor;
+	bool m_motor;
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<z80_device> m_maincpu;
@@ -208,11 +216,11 @@ READ8_MEMBER(spc1000_state::iplk_r)
 
 WRITE8_MEMBER( spc1000_state::cass_w )
 {
-	char m = BIT(data, 1);
+	bool m = BIT(data, 1) ? true : false;
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (m != m_motor && m == 1)
+	if (m && !m_motor)
 		m_cass->change_state(m_cass->get_state() & CASSETTE_MASK_MOTOR ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-	m_motor = m;	
+	m_motor = m;
 }
 
 WRITE8_MEMBER(spc1000_state::gmode_w)
@@ -393,7 +401,7 @@ void spc1000_state::machine_reset()
 {
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
 	m_IPLK = 1;
-	m_motor = 0;
+	m_motor = false;
 }
 
 READ8_MEMBER(spc1000_state::mc6847_videoram_r)
@@ -471,7 +479,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1000_cass")
 

@@ -30,7 +30,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "video/pc_vga.h"
+#include "video/clgd542x.h"
 
 
 class gambl186_state : public driver_device

@@ -91,10 +91,10 @@ void dc_state::generic_dma(UINT32 main_adr, void *dma_ptr, UINT32 length, UINT32
 	m_maincpu->sh4_dma_ddt(&ddt);
 }
 
-TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
+TIMER_CALLBACK_MEMBER(dc_state::g2_dma_irq)
 {
-	m_wave_dma.start = g2bus_regs[SB_ADST] = 0;
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+	m_g2_dma[param].start = g2bus_regs[SB_ADST + (param * 8)] = 0;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA << param;
 	dc_update_interrupt_status();
 }
 
@@ -190,19 +190,19 @@ TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 	dc_update_interrupt_status();
 }
 
-void dc_state::wave_dma_execute(address_space &space)
+void dc_state::g2_dma_execute(address_space &space, int channel)
 {
 	UINT32 src,dst,size;
-	dst = m_wave_dma.aica_addr;
-	src = m_wave_dma.root_addr;
+	dst = m_g2_dma[channel].g2_addr;
+	src = m_g2_dma[channel].root_addr;
 	size = 0;
 
 	/* 0 rounding size = 32 Mbytes */
-	if(m_wave_dma.size == 0) { m_wave_dma.size = 0x200000; }
+	if (m_g2_dma[channel].size == 0) { m_g2_dma[channel].size = 0x200000; }
 
-	if(m_wave_dma.dir == 0)
+	if (m_g2_dma[channel].dir == 0)
 	{
-		for(;size<m_wave_dma.size;size+=4)
+		for (; size<m_g2_dma[channel].size; size += 4)
 		{
 			space.write_dword(dst,space.read_dword(src));
 			src+=4;
@@ -211,7 +211,7 @@ void dc_state::wave_dma_execute(address_space &space)
 	}
 	else
 	{
-		for(;size<m_wave_dma.size;size+=4)
+		for (; size<m_g2_dma[channel].size; size += 4)
 		{
 			space.write_dword(src,space.read_dword(dst));
 			src+=4;
@@ -220,13 +220,13 @@ void dc_state::wave_dma_execute(address_space &space)
 	}
 
 	/* update the params*/
-	m_wave_dma.aica_addr = g2bus_regs[SB_ADSTAG] = dst;
-	m_wave_dma.root_addr = g2bus_regs[SB_ADSTAR] = src;
-	m_wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
-	m_wave_dma.flag = (m_wave_dma.indirect & 1) ? 1 : 0;
+	m_g2_dma[channel].g2_addr = g2bus_regs[SB_ADSTAG + (channel * 8)] = dst;
+	m_g2_dma[channel].root_addr = g2bus_regs[SB_ADSTAR + (channel * 8)] = src;
+	m_g2_dma[channel].size = g2bus_regs[SB_ADLEN + (channel * 8)] = 0;
+	m_g2_dma[channel].flag = (m_g2_dma[channel].indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_wave_dma.size/4), timer_expired_delegate(FUNC(dc_state::aica_dma_irq),this));
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_g2_dma[channel].size / 4), timer_expired_delegate(FUNC(dc_state::g2_dma_irq), this), channel);
 }
 
 // register decode helpers
@@ -335,14 +335,17 @@ void dc_state::dc_update_interrupt_status()
 	m_maincpu->sh4_set_irln_input(15-level);
 
 	/* Wave DMA HW trigger */
-	if(m_wave_dma.flag && ((m_wave_dma.sel & 2) == 2))
+	for (int i = 0; i < 4; i++)
 	{
-		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
+		if (m_g2_dma[i].flag && ((m_g2_dma[i].sel & 2) == 2))
 		{
-			address_space &space = m_maincpu->space(AS_PROGRAM);
+			if ((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
+			{
+				address_space &space = m_maincpu->space(AS_PROGRAM);
 
-			printf("Wave DMA HW trigger\n");
-			wave_dma_execute(space);
+				printf("Wave DMA HW trigger\n");
+				g2_dma_execute(space, i);
+			}
 		}
 	}
 
@@ -533,54 +536,43 @@ WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
 
 	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
 
-	switch (reg)
+	if (reg >= (0x80 / 4))
+		return;
+	int g2chan = reg >> 3;
+	switch (reg & 7)
 	{
-		/*AICA Address register*/
-		case SB_ADSTAG: m_wave_dma.aica_addr = dat; break;
+		/*G2 Address register*/
+		case SB_ADSTAG: m_g2_dma[g2chan].g2_addr = dat; break;
 		/*Root address (work ram)*/
-		case SB_ADSTAR: m_wave_dma.root_addr = dat; break;
+		case SB_ADSTAR: m_g2_dma[g2chan].root_addr = dat; break;
 		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
 		case SB_ADLEN:
-			m_wave_dma.size = dat & 0x7fffffff;
-			m_wave_dma.indirect = (dat & 0x80000000)>>31;
+			m_g2_dma[g2chan].size = dat & 0x7fffffff;
+			m_g2_dma[g2chan].indirect = (dat & 0x80000000) >> 31;
 			break;
 		/*0 = root memory to aica / 1 = aica to root memory*/
-		case SB_ADDIR: m_wave_dma.dir = (dat & 1); break;
+		case SB_ADDIR: m_g2_dma[g2chan].dir = (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
-		case SB_ADEN: m_wave_dma.flag = (dat & 1); break;
+		case SB_ADEN: m_g2_dma[g2chan].flag = (dat & 1); break;
 		/*
 		SB_ADTSEL
 		bit 1: (0) Wave DMA through SB_ADST flag (1) Wave DMA through irq trigger, defined by SB_G2DTNRM / SB_G2DTEXT
 		*/
-		case SB_ADTSEL: m_wave_dma.sel = dat & 7; break;
+		case SB_ADTSEL: m_g2_dma[g2chan].sel = dat & 7; break;
 		/*ready for dma'ing*/
 		case SB_ADST:
-			old = m_wave_dma.start & 1;
-			m_wave_dma.start = dat & 1;
+			old = m_g2_dma[g2chan].start & 1;
+			m_g2_dma[g2chan].start = dat & 1;
 
 			#if DEBUG_AICA_DMA
 			printf("AICA: G2-DMA start \n");
-			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",m_wave_dma.aica_addr,m_wave_dma.root_addr,m_wave_dma.size,m_wave_dma.indirect);
-			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_wave_dma.sel,m_wave_dma.start,m_wave_dma.flag,m_wave_dma.dir);
+			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",m_g2_dma[g2chan].g2_addr,m_g2_dma[g2chan].root_addr,m_g2_dma[g2chan].size,m_g2_dma[g2chan].indirect);
+			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_g2_dma[g2chan].sel,m_g2_dma[g2chan].start,m_g2_dma[g2chan].flag,m_g2_dma[g2chan].dir);
 			#endif
 
 			//osd_printf_verbose("SB_ADST data %08x\n",dat);
-			if(((old & 1) == 0) && m_wave_dma.flag && m_wave_dma.start && ((m_wave_dma.sel & 2) == 0)) // 0 -> 1
-				wave_dma_execute(space);
-			break;
-
-		case SB_E1ST:
-		case SB_E2ST:
-		case SB_DDST:
-			if(dat & 1)
-				printf("Warning: enabled G2 Debug / External DMA %08x\n",reg);
-			break;
-
-		case SB_ADSUSP:
-		case SB_E1SUSP:
-		case SB_E2SUSP:
-		case SB_DDSUSP:
-		case SB_G2APRO:
+			if (((old & 1) == 0) && m_g2_dma[g2chan].flag && m_g2_dma[g2chan].start && ((m_g2_dma[g2chan].sel & 2) == 0)) // 0 -> 1
+				g2_dma_execute(space, g2chan);
 			break;
 
 		default:
@@ -641,6 +633,15 @@ WRITE64_MEMBER(dc_state::dc_modem_w )
 	osd_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
+#define SAVE_G2DMA(x) \
+	save_item(NAME(m_g2_dma[x].g2_addr)); \
+	save_item(NAME(m_g2_dma[x].root_addr)); \
+	save_item(NAME(m_g2_dma[x].size)); \
+	save_item(NAME(m_g2_dma[x].dir)); \
+	save_item(NAME(m_g2_dma[x].flag)); \
+	save_item(NAME(m_g2_dma[x].indirect)); \
+	save_item(NAME(m_g2_dma[x].start)); \
+	save_item(NAME(m_g2_dma[x].sel));
 
 void dc_state::machine_start()
 {
@@ -651,15 +652,11 @@ void dc_state::machine_start()
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
 	save_pointer(NAME(g2bus_regs), 0x100/4);
-	save_item(NAME(m_wave_dma.aica_addr));
-	save_item(NAME(m_wave_dma.root_addr));
-	save_item(NAME(m_wave_dma.size));
-	save_item(NAME(m_wave_dma.dir));
-	save_item(NAME(m_wave_dma.flag));
-	save_item(NAME(m_wave_dma.indirect));
-	save_item(NAME(m_wave_dma.start));
-	save_item(NAME(m_wave_dma.sel));
 	save_pointer(NAME(dc_sound_ram.target()),dc_sound_ram.bytes());
+	SAVE_G2DMA(0)
+	SAVE_G2DMA(1)
+	SAVE_G2DMA(2)
+	SAVE_G2DMA(3)
 }
 
 void dc_state::machine_reset()

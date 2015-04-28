@@ -14,6 +14,9 @@
 #define MCFG_PCI9050_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, PCI9050, 0x10b59050, 0x01, 0x06800000, 0x10b59050)
 
+#define MCFG_PCI9050_SET_MAP(id, map) \
+	downcast<pci9050_device *>(device)->set_map(id, ADDRESS_MAP_NAME(map), #map, owner);
+
 class pci9050_device : 
 	public pci_device
 {
@@ -21,8 +24,26 @@ public:
 	pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// PCI9050 I/O register space handlers
-	DECLARE_READ32_MEMBER(reg_r);
-	DECLARE_WRITE32_MEMBER(reg_w);
+	DECLARE_READ32_MEMBER( lasrr_r  );
+	DECLARE_WRITE32_MEMBER(lasrr_w  );
+	DECLARE_READ32_MEMBER( eromrr_r );
+	DECLARE_WRITE32_MEMBER(eromrr_w );
+	DECLARE_READ32_MEMBER( lasba_r  );
+	DECLARE_WRITE32_MEMBER(lasba_w  );
+	DECLARE_READ32_MEMBER( eromba_r );
+	DECLARE_WRITE32_MEMBER(eromba_w );
+	DECLARE_READ32_MEMBER( lasbrd_r );
+	DECLARE_WRITE32_MEMBER(lasbrd_w );
+	DECLARE_READ32_MEMBER( erombrd_r);
+	DECLARE_WRITE32_MEMBER(erombrd_w);
+	DECLARE_READ32_MEMBER( csbase_r );
+	DECLARE_WRITE32_MEMBER(csbase_w );
+	DECLARE_READ32_MEMBER( intcsr_r );
+	DECLARE_WRITE32_MEMBER(intcsr_w );
+	DECLARE_READ32_MEMBER( cntrl_r  );
+	DECLARE_WRITE32_MEMBER(cntrl_w  );
+
+	void set_map(int id, address_map_constructor map, const char *name, device_t *device);
 
 protected:
 	virtual void device_start();
@@ -31,11 +52,21 @@ protected:
 
 private:
 	DECLARE_ADDRESS_MAP(map, 32);
+	DECLARE_ADDRESS_MAP(empty, 32);
 
-//	address_space_config m_as0_config, m_as1_config, m_as2_config, m_as3_config;
-//	address_space *m_as0, *m_as1, *m_as2, *m_as3;
+	const char *m_names[4];
+	device_t *m_devices[4];
+	address_map_constructor m_maps[4];
 
-	UINT32 m_regs[0x54/4];
+	UINT32 m_lasrr[4], m_lasba[4], m_lasbrd[4], m_csbase[4];
+	UINT32 m_eromrr, m_eromba, m_erombrd, m_intcsr, m_cntrl;
+
+	void remap_local(int id);
+	void remap_rom();
+
+	template<int id> void map_trampoline(address_map &map, device_t &device) {
+		m_maps[id](map, *m_devices[id]);
+	}
 };
 
 extern const device_type PCI9050;

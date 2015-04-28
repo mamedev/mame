@@ -69,7 +69,7 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 	data["ispaused"] = m_machine->paused();
 
 	Json::FastWriter writer;
-	const char *json = writer.write(data).c_str();
+	std::string json = writer.write(data);
 	// Send HTTP reply to the client
 	mg_printf(conn,
 			"HTTP/1.1 200 OK\r\n"
@@ -77,7 +77,7 @@ int web_engine::json_game_handler(struct mg_connection *conn)
 			"Content-Length: %d\r\n"        // Always set Content-Length
 			"\r\n"
 			"%s",
-			(int)strlen(json), json);
+			(int)json.length(), json.c_str());
 
 	// Returning non-zero tells mongoose that our function has replied to
 	// the client, and mongoose should not send client any more data.
@@ -119,7 +119,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 		array.append(data);
 	}
 	Json::FastWriter writer;
-	const char *json = writer.write(array).c_str();
+	std::string json = writer.write(array);
 	// Send HTTP reply to the client
 	mg_printf(conn,
 			"HTTP/1.1 200 OK\r\n"
@@ -127,7 +127,7 @@ int web_engine::json_slider_handler(struct mg_connection *conn)
 			"Content-Length: %d\r\n"        // Always set Content-Length
 			"\r\n"
 			"%s",
-			(int)strlen(json), json);
+			(int)json.length(), json.c_str());
 
 	return MG_TRUE;
 }

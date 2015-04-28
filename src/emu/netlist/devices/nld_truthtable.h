@@ -72,7 +72,7 @@ public:
 	ATTR_COLD void help(int cur, nl_util::pstring_list list,
 			UINT64 state, UINT64 ignore, UINT16 val, UINT8 timing_index[m_NO])
 	{
-		pstring elem = list[cur];
+		pstring elem = list[cur].trim();
 		int start = 0;
 		int end = 0;
 		int ign = 0;
@@ -93,6 +93,8 @@ public:
 			end = 1;
 			ign = 1;
 		}
+		else
+			nl_assert_always(false, "unknown input value (not 0, 1, or X)");
 		for (int i = start; i <= end; i++)
 		{
 			const UINT64 nstate = state | (i << cur);
@@ -133,21 +135,24 @@ public:
 		{
 			nl_util::pstring_list io = nl_util::split(ttline,"|");
 			// checks
-			nl_assert(io.count() == 3);
+			nl_assert_always(io.count() == 3, "io.count mismatch");
 			nl_util::pstring_list inout = nl_util::split(io[0], ",");
-			nl_assert(inout.count() == m_num_bits);
+			nl_assert_always(inout.count() == m_num_bits, "number of bits not matching");
 			nl_util::pstring_list out = nl_util::split(io[1], ",");
-			nl_assert(out.count() == m_NO);
+			nl_assert_always(out.count() == m_NO, "output count not matching");
 			nl_util::pstring_list times = nl_util::split(io[2], ",");
-			nl_assert(times.count() == m_NO);
+			nl_assert_always(times.count() == m_NO, "timing count not matching");
 
 			UINT16 val = 0;
 			UINT8 tindex[m_NO];
 			for (int j=0; j<m_NO; j++)
 			{
-				if (out[j].equals("1"))
+				pstring outs = out[j].trim();
+				if (outs.equals("1"))
 					val = val | (1 << j);
-				netlist_time t = netlist_time::from_nsec(times[j].as_long());
+				else
+					nl_assert_always(outs.equals("0"), "Unknown value (not 0 or 1");
+				netlist_time t = netlist_time::from_nsec(times[j].trim().as_long());
 				int k=0;
 				while (m_ttp->m_timing_nt[k] != netlist_time::zero && m_ttp->m_timing_nt[k] != t)
 					k++;

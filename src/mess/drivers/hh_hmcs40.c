@@ -22,8 +22,8 @@
  *41      HD38800A  1982, Gakken Puck Monster
  *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
  @70      HD38800A  1982, Coleco Galaxian
- @73      HD38800A  1982, Bandai(Mattel) Star Hawk
- @77      HD38800A  1982, Bandai Frisky Tom
+ @73      HD38800A  1982, Bandai(Mattel) Star Hawk (PT-317B)
+ @77      HD38800A  1982, Bandai Frisky Tom (PT-327A)
  @88      HD38800A  1984, Tomy Tron (THN-02)
  
  @01      HD38800B  1982, Gakken Crazy Kong
@@ -31,7 +31,7 @@
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
  *29      HD38800B  1984, Tomy Portable 6000 Bombman
  *35      HD38800B  1983, Bandai Gundam vs Gelgoog Zaku
- *43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon
+ @43      HD38800B  1983, Bandai Dokodemo Dorayaki Doraemon (PT-412)
 
  @09      HD38820A  1980, Mattel World Championship Baseball
  @13      HD38820A  1981, Entex Galaxian 2
@@ -47,6 +47,7 @@
  @61      HD38820A  1983, Coleco Ms. Pac-Man
  @69      HD38820A  1983, Gakken Dig Dug
  @70      HD38820A  1983, Parker Brothers Q*Bert
+ @85      HD38820A  1984, Bandai Machine Man (PT-438)
 
   (* denotes not yet emulated by MESS, @ denotes it's in this driver)
 
@@ -374,8 +375,8 @@ static INPUT_PORTS_START( bambball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Shoot")
 
 	PORT_START("IN.1") // D8 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // D9 port R0x
@@ -1024,6 +1025,186 @@ static MACHINE_CONFIG_START( zackman, zackman_state )
 	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(zackman_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(zackman_state, plate_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(zackman_state, grid_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai Dokodemo Dorayaki Doraemon (FL LSI Game Push Up) (manufactured in Japan)
+  * PCB label Kaken Corp PT-412 FL-Doreamon(in katakana)
+  * Hitachi HD38800B43 MCU
+  * cyan/red/blue VFD display Futaba DM-71
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class bdoramon_state : public hh_hmcs40_state
+{
+public:
+	bdoramon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+};
+
+// handlers
+
+WRITE8_MEMBER(bdoramon_state::plate_w)
+{
+	// R0x-R3x(,D0-D3): vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,7,6);
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,11,19,18,17,16,15,14,13,12,10,9,8,7,6,5,4,3,2,1,0);
+	display_matrix(19, 8, plate, grid);
+}
+
+WRITE16_MEMBER(bdoramon_state::grid_w)
+{
+	// D7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// D8-D15: vfd matrix grid
+	m_grid = data >> 8 & 0xff;
+	
+	// D0-D3: plate 15-18 (update display there)
+	plate_w(space, 4, data & 0xf);
+}
+
+
+// config
+
+static INPUT_PORTS_START( bdoramon )
+	PORT_START("IN.0") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+
+	PORT_START("IN.1") // INT1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
+
+	PORT_START("IN.2") // port D
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(bdoramon_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai Machine Man (FL Flat Type) (manufactured in Japan)
+  * PCB label Kaken PT-438
+  * Hitachi QFP HD38820A85 MCU
+  * cyan/red/green VFD display NEC FIP5CM33T no. 4 21
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class machiman_state : public hh_hmcs40_state
+{
+public:
+	machiman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+};
+
+// handlers
+
+void machiman_state::prepare_display()
+{
+	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18);
+	display_matrix(19, 5, plate, m_grid);
+}
+
+WRITE8_MEMBER(machiman_state::plate_w)
+{
+	// R0x-R3x,R6012: vfd matrix plate
+	int shift = (offset == HMCS40_PORT_R6X) ? 16 : offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(machiman_state::grid_w)
+{
+	// D13: speaker out
+	m_speaker->level_w(data >> 13 & 1);
+
+	// D0-D4: vfd matrix grid
+	m_grid = data & 0x1f;
+	prepare_display();
+}
+
+
+// config
+
+static INPUT_PORTS_START( machiman )
+	PORT_START("IN.0") // INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
+
+	PORT_START("IN.1") // port D
+	PORT_BIT( 0x3fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( machiman, machiman_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(machiman_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
@@ -1710,15 +1891,15 @@ READ8_MEMBER(egalaxn2_state::input_r)
 static INPUT_PORTS_START( egalaxn2 )
 	PORT_START("IN.0") // D1 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 
 	PORT_START("IN.1") // D2 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // "
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY // "
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
 
 	PORT_START("IN.2") // D3 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -1793,16 +1974,16 @@ public:
 
 static INPUT_PORTS_START( epacman2 )
 	PORT_START("IN.0") // D1 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY // separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY // "
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 
 	PORT_START("IN.1") // D2 port R0x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY // separate directional buttons, hence 16way
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY // "
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY // "
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_16WAY
 
 	PORT_START("IN.2") // D3 port R0x
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Skill Control")
@@ -1915,16 +2096,16 @@ READ16_MEMBER(ghalien_state::input_r)
 
 static INPUT_PORTS_START( ghalien )
 	PORT_START("IN.0") // D0 line D15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 
 	PORT_START("IN.1") // D1 line D15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY // "
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 
 	PORT_START("IN.2") // D2 line D15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY // "
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 
 	PORT_START("IN.3") // D3 line D15
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY // "
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 
 	PORT_START("IN.4") // D4 line D15
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Dig")
@@ -2270,7 +2451,7 @@ WRITE16_MEMBER(mwcbaseb_state::grid_w)
 WRITE8_MEMBER(mwcbaseb_state::speaker_w)
 {
 	// R50,R51+R52(tied together): speaker out
-	m_speaker->level_w((data & 3) | (data >> 1 & 2));
+	m_speaker->level_w(data & 7);
 }
 
 READ8_MEMBER(mwcbaseb_state::input_r)
@@ -2344,7 +2525,7 @@ static INPUT_PORTS_START( mwcbaseb )
 INPUT_PORTS_END
 
 
-static const INT16 mwcbaseb_speaker_levels[] = { 0, 32767, -32768, 0 };
+static const INT16 mwcbaseb_speaker_levels[] = { 0, 16384, -16384, 0, -16384, 0, -32768, -16384 };
 
 static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
 
@@ -2366,7 +2547,7 @@ static MACHINE_CONFIG_START( mwcbaseb, mwcbaseb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SPEAKER_LEVELS(4, mwcbaseb_speaker_levels)
+	MCFG_SPEAKER_LEVELS(8, mwcbaseb_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2658,16 +2839,16 @@ void tmtron_state::update_int1()
 
 static INPUT_PORTS_START( tmtron )
 	PORT_START("IN.0") // D12 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL) PORT_16WAY // separate directional buttons, hence 16way
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL)
 
 	PORT_START("IN.1") // D13 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL) PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL)
 
 	PORT_START("IN.2") // D14 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL) PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL)
 
 	PORT_START("IN.3") // D15 INT1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL) PORT_16WAY // "
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_CHANGED_MEMBER(DEVICE_SELF, tmtron_state, input_changed, NULL)
 
 	PORT_START("IN.4") // INT0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
@@ -2846,6 +3027,20 @@ ROM_START( zackman )
 ROM_END
 
 
+ROM_START( bdoramon )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38800b43", 0x0000, 0x1000, CRC(9387ca42) SHA1(8937e208934b34bd9f49700aa50287dfc8bda76c) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
+ROM_START( machiman )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a85", 0x0000, 0x1000, CRC(894b4954) SHA1(cab49638a326b031aa548301beb16f818759ef62) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+ROM_END
+
+
 ROM_START( alnattck )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38800a25", 0x0000, 0x1000, CRC(18b50869) SHA1(11e9d5f7b4ae818b077b0ee14a3b43190e20bff3) )
@@ -2966,6 +3161,8 @@ CONS( 1982, bfriskyt,  0,        0, bfriskyt, bfriskyt, driver_device, 0, "Banda
 CONS( 1981, packmon,   0,        0, packmon,  packmon,  driver_device, 0, "Bandai", "Packri Monster", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, msthawk,   0,        0, msthawk,  msthawk,  driver_device, 0, "Bandai (Mattel license)", "Star Hawk (Mattel)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1983, zackman,   0,        0, zackman,  zackman,  driver_device, 0, "Bandai", "Zackman", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1983, bdoramon,  0,        0, bdoramon, bdoramon, driver_device, 0, "Bandai", "Dokodemo Dorayaki Doraemon", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1984, machiman,  0,        0, machiman, machiman, driver_device, 0, "Bandai", "Machine Man", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1981, alnattck,  0,        0, alnattck, alnattck, driver_device, 0, "Coleco", "Alien Attack", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, cdkong,    0,        0, cdkong,   cdkong,   driver_device, 0, "Coleco", "Donkey Kong (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_SOUND )

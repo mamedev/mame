@@ -8,7 +8,7 @@
   * TMS1400NLL MP7332-N1.U1(Rev. B) or MP7332-N2LL(Rev. C), die labeled MP7332
     (assume same ROM contents between revisions)
   * SN75494N MOS-to-LED digit driver
-  * rotating reel + lightsensor, 1bit-sound
+  * motorized rotating reel + lightsensor, 1bit-sound
 
   This is a board game, it obviously requires game pieces and the board.
   The emulated part is the centerpiece, a black tower with a rotating card
@@ -164,7 +164,8 @@ WRITE16_MEMBER(mbdtower_state::write_o)
 
 READ8_MEMBER(mbdtower_state::read_k)
 {
-	// K: multiplexed inputs (note: rotation sensor is on K8)
+	// K: multiplexed inputs
+	// K8: rotation sensor
 	return read_inputs(3) | ((!m_sensor_blind && sensor_led_on()) ? 8 : 0);
 }
 

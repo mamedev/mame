@@ -295,6 +295,20 @@ public:
 };
 
 
+class tms1600_cpu_device : public tms1400_cpu_device
+{
+public:
+	tms1600_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms1600_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source);
+};
+
+class tms1670_cpu_device : public tms1600_cpu_device
+{
+public:
+	tms1670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 class tms0970_cpu_device : public tms1000_cpu_device
 {
 public:
@@ -399,6 +413,8 @@ extern const device_type TMS1300;
 extern const device_type TMS1370;
 extern const device_type TMS1400;
 extern const device_type TMS1470;
+extern const device_type TMS1600;
+extern const device_type TMS1670;
 extern const device_type TMS0970;
 extern const device_type TMS1990;
 extern const device_type TMS0980;

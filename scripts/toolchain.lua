@@ -362,25 +362,51 @@ function toolchain(_buildDir, _subDir)
 
 
 	configuration { "x32", "vs*" }
-		targetdir (_buildDir .. "win32_" .. _ACTION .. "/bin/x32")
-		objdir (_buildDir .. "win32_" .. _ACTION .. "/obj")
+		objdir (_buildDir .. _ACTION .. "/obj")
+
+	configuration { "x32", "vs*", "Release" }
+		targetdir (_buildDir .. _ACTION .. "/bin/x32/Release")
+
+	configuration { "x32", "vs*", "Debug" }
+		targetdir (_buildDir .. _ACTION .. "/bin/x32/Debug")
 
 	configuration { "x64", "vs*" }
 		defines { "_WIN64" }
-		targetdir (_buildDir .. "win64_" .. _ACTION .. "/bin/x64")
-		objdir (_buildDir .. "win64_" .. _ACTION .. "/obj")
+		objdir (_buildDir .. _ACTION .. "/obj")
+
+	configuration { "x64", "vs*", "Release" }
+		targetdir (_buildDir .. _ACTION .. "/bin/x64/Release")
+
+	configuration { "x64", "vs*", "Debug" }
+		targetdir (_buildDir .. _ACTION .. "/bin/x64/Debug")
 
 	configuration { "ARM", "vs*" }
-		targetdir (_buildDir .. "arm_" .. _ACTION .. "/bin/ARM")
-		objdir (_buildDir .. "arm_" .. _ACTION .. "/obj")
+		targetdir (_buildDir .. _ACTION .. "/bin/ARM")
+		objdir (_buildDir .. _ACTION .. "/obj")
+
+	configuration { "ARM", "vs*", "Release" }
+		targetdir (_buildDir .. _ACTION .. "/bin/ARM/Release")
+
+	configuration { "ARM", "vs*", "Debug" }
+		targetdir (_buildDir .. _ACTION .. "/bin/ARM/Debug")
 
 	configuration { "x32", "vs*-clang" }
-		targetdir (_buildDir .. "win32_" .. _ACTION .. "-clang/bin/x32")
-		objdir (_buildDir .. "win32_" .. _ACTION .. "-clang/obj")
+		objdir (_buildDir .. _ACTION .. "-clang/obj")
+
+	configuration { "x32", "vs*-clang", "Release" }
+		targetdir (_buildDir .. _ACTION .. "-clang/bin/x32/Release")
+
+	configuration { "x32", "vs*-clang", "Debug" }
+		targetdir (_buildDir .. _ACTION .. "-clang/bin/x32/Debug")
 
 	configuration { "x64", "vs*-clang" }
-		targetdir (_buildDir .. "win64_" .. _ACTION .. "-clang/bin/x64")
-		objdir (_buildDir .. "win64_" .. _ACTION .. "-clang/obj")
+		objdir (_buildDir .. _ACTION .. "-clang/obj")
+
+	configuration { "x64", "vs*-clang", "Release" }
+		targetdir (_buildDir .. _ACTION .. "-clang/bin/x64/Release")
+
+	configuration { "x64", "vs*-clang", "Debug" }
+		targetdir (_buildDir .. _ACTION .. "-clang/bin/x64/Debug")
 
 	configuration { "vs*-clang" }
 		buildoptions {
@@ -391,15 +417,25 @@ function toolchain(_buildDir, _subDir)
 		defines { "WIN32" }
 
 	configuration { "x32", "mingw32-gcc" }
-		targetdir (_buildDir .. "win32_mingw-gcc" .. "/bin/x32")
-		objdir (_buildDir .. "win32_mingw-gcc" .. "/obj")
+		objdir (_buildDir .. "mingw-gcc" .. "/obj")
 		buildoptions { "-m32" }
 
+	configuration { "x32", "mingw32-gcc", "Release" }
+		targetdir (_buildDir .. "mingw-gcc" .. "/bin/x32/Release")
+
+	configuration { "x32", "mingw32-gcc", "Debug" }
+		targetdir (_buildDir .. "mingw-gcc" .. "/bin/x32/Debug")
+
 	configuration { "x64", "mingw64-gcc" }
-		targetdir (_buildDir .. "win64_mingw-gcc" .. "/bin/x64")
-		objdir (_buildDir .. "win64_mingw-gcc" .. "/obj")
+		objdir (_buildDir .. "mingw-gcc" .. "/obj")
 		buildoptions { "-m64" }
 		
+	configuration { "x64", "mingw64-gcc", "Release" }
+		targetdir (_buildDir .. "mingw-gcc" .. "/bin/x64/Release")
+
+	configuration { "x64", "mingw64-gcc", "Debug" }
+		targetdir (_buildDir .. "mingw-gcc" .. "/bin/x64/Debug")
+
 	configuration { "mingw-clang" }
 		linkoptions {
 			"-Qunused-arguments",
@@ -408,18 +444,22 @@ function toolchain(_buildDir, _subDir)
 		}
 
 	configuration { "x32", "mingw-clang" }
-		targetdir (_buildDir .. "win32_mingw-clang/bin/x32")
-		objdir ( _buildDir .. "win32_mingw-clang/obj")
+		objdir ( _buildDir .. "mingw-clang/obj")
 		buildoptions { "-m32" }
 		buildoptions {
 			"-isystem$(MINGW32)/i686-w64-mingw32/include/c++",
 			"-isystem$(MINGW32)/i686-w64-mingw32/include/c++/i686-w64-mingw32",
 			"-isystem$(MINGW32)/i686-w64-mingw32/include",
 		}
+
+	configuration { "x32", "mingw-clang", "Release" }
+		targetdir (_buildDir .. "mingw-clang/bin/x32/Release")
+
+	configuration { "x32", "mingw-clang", "Debug" }
+		targetdir (_buildDir .. "win32_mingw-clang/bin/x32/Debug")
 		
 	configuration { "x64", "mingw-clang" }
-		targetdir (_buildDir .. "win64_mingw-clang/bin/x64")
-		objdir (_buildDir .. "win64_mingw-clang/obj")
+		objdir (_buildDir .. "mingw-clang/obj")
 		buildoptions { "-m64" }
 		buildoptions {
 			"-isystem$(MINGW64)/x86_64-w64-mingw32/include/c++",
@@ -427,61 +467,106 @@ function toolchain(_buildDir, _subDir)
 			"-isystem$(MINGW64)/x86_64-w64-mingw32/include",
 		}		
 
+	configuration { "x64", "mingw-clang", "Release" }
+		targetdir (_buildDir .. "mingw-clang/bin/x64/Release")
+
+	configuration { "x64", "mingw-clang", "Debug" }
+		targetdir (_buildDir .. "mingw-clang/bin/x64/Debug")
+		
 	configuration { "linux-gcc", "x32" }
-		targetdir (_buildDir .. "linux32_gcc" .. "/bin/x32")
-		objdir (_buildDir .. "linux32_gcc" .. "/obj")
+		objdir (_buildDir .. "linux_gcc" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
+
+	configuration { "linux-gcc", "x32", "Release" }
+		targetdir (_buildDir .. "linux_gcc" .. "/bin/x32/Release")
+
+	configuration { "linux-gcc", "x32", "Debug" }
+		targetdir (_buildDir .. "linux_gcc" .. "/bin/x32/Debug")
 
 	configuration { "linux-gcc", "x64" }
-		targetdir (_buildDir .. "linux64_gcc" .. "/bin/x64")
-		objdir (_buildDir .. "linux64_gcc" .. "/obj")
+		objdir (_buildDir .. "linux_gcc" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
+
+	configuration { "linux-gcc", "x64", "Release" }
+		targetdir (_buildDir .. "linux_gcc" .. "/bin/x64/Release")
+	
+	configuration { "linux-gcc", "x64", "Debug" }
+		targetdir (_buildDir .. "linux_gcc" .. "/bin/x64/Debug")
 
 	configuration { "linux-clang", "x32" }
-		targetdir (_buildDir .. "linux32_clang" .. "/bin/x32")
-		objdir (_buildDir .. "linux32_clang" .. "/obj")
+		objdir (_buildDir .. "linux_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
+
+	configuration { "linux-clang", "x32", "Release" }
+		targetdir (_buildDir .. "linux_clang" .. "/bin/x32/Release")
+
+	configuration { "linux-clang", "x32", "Debug" }
+		targetdir (_buildDir .. "linux_clang" .. "/bin/x32/Debug")
 
 	configuration { "linux-clang", "x64" }
-		targetdir (_buildDir .. "linux64_clang" .. "/bin/x64")
-		objdir (_buildDir .. "linux64_clang" .. "/obj")
+		objdir (_buildDir .. "linux_clang" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
+
+	configuration { "linux-clang", "x64", "Release" }
+		targetdir (_buildDir .. "linux_clang" .. "/bin/x64/Release")
+
+	configuration { "linux-clang", "x64", "Debug" }
+		targetdir (_buildDir .. "linux_clang" .. "/bin/x64/Debug")
 		
 	configuration { "solaris", "x32" }
-		targetdir (_buildDir .. "solaris" .. "/bin/x32")
 		objdir (_buildDir .. "solaris" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
+
+	configuration { "solaris", "x32", "Release" }
+		targetdir (_buildDir .. "solaris" .. "/bin/x32/Release")
+	
+	configuration { "solaris", "x32", "Debug" }
+		targetdir (_buildDir .. "solaris" .. "/bin/x32/Debug")
 
 	configuration { "solaris", "x64" }
-		targetdir (_buildDir .. "solaris" .. "/bin/x64")
 		objdir (_buildDir .. "solaris" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
 
+	configuration { "solaris", "x64", "Release" }
+		targetdir (_buildDir .. "solaris" .. "/bin/x64/Release")
+	
+	configuration { "solaris", "x64", "Debug" }
+		targetdir (_buildDir .. "solaris" .. "/bin/x64/Debug")
+
 	configuration { "freebsd", "x32" }
-		targetdir (_buildDir .. "freebsd" .. "/bin/x32")
 		objdir (_buildDir .. "freebsd" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
 
+	configuration { "freebsd", "x32", "Release" }
+		targetdir (_buildDir .. "freebsd" .. "/bin/x32/Release")
+	
+	configuration { "freebsd", "x32", "Debug" }
+		targetdir (_buildDir .. "freebsd" .. "/bin/x32/Debug")
+
 	configuration { "freebsd", "x64" }
-		targetdir (_buildDir .. "freebsd" .. "/bin/x64")
 		objdir (_buildDir .. "freebsd" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
+	configuration { "freebsd", "x64", "Release" }
+		targetdir (_buildDir .. "freebsd" .. "/bin/x64/Release")
+	
+	configuration { "freebsd", "x64", "Debug" }
+		targetdir (_buildDir .. "freebsd" .. "/bin/x64/Debug")
 		
 	configuration { "android-*" }
 		includedirs {
@@ -680,19 +765,28 @@ function toolchain(_buildDir, _subDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
 	configuration { "osx*", "x32" }
-		targetdir (_buildDir .. "osx32_clang" .. "/bin")
 		objdir (_buildDir .. "osx32_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
+	configuration { "osx*", "x32", "Release" }
+		targetdir (_buildDir .. "osx_clang" .. "/bin/x32/Release")
 
+	configuration { "osx*", "x32", "Debug" }
+		targetdir (_buildDir .. "osx_clang" .. "/bin/x32/Debug")
+		
 	configuration { "osx*", "x64" }
-		targetdir (_buildDir .. "osx64_clang" .. "/bin")
-		objdir (_buildDir .. "osx64_clang" .. "/obj")
+		objdir (_buildDir .. "osx_clang" .. "/obj")
 		buildoptions {
 			"-m64",
 		}
 
+	configuration { "osx*", "x32", "Release" }
+		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Release")
+
+	configuration { "osx*", "x32", "Debug" }
+		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Debug")
+		
 	configuration { "ios-arm" }
 		targetdir (_buildDir .. "ios-arm" .. "/bin")
 		objdir (_buildDir .. "ios-arm" .. "/obj")

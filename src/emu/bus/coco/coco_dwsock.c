@@ -89,17 +89,17 @@ void beckerport_device::device_start(void)
 	/* format address string for opening the port */
 	snprintf(chAddress, sizeof(chAddress), "socket.%s:%d", m_hostname, m_dwtcpport);
 
-	fprintf(stderr, "Connecting to Drivewire server on %s:%d... ", m_hostname, m_dwtcpport);
+	osd_printf_verbose("Connecting to Drivewire server on %s:%d... ", m_hostname, m_dwtcpport);
 
 	UINT64 filesize; // unused
 	file_error filerr = osd_open(chAddress, 0, &m_pSocket, &filesize);
 	if (filerr != FILERR_NONE)
 	{
-		fprintf(stderr, "Error: osd_open returned error %i!\n", (int) filerr);
+		osd_printf_verbose("Error: osd_open returned error %i!\n", (int) filerr);
 		return;
 	}
 
-	fprintf(stderr, "Connected!\n");
+	osd_printf_verbose("Connected!\n");
 }
 
 /*-------------------------------------------------

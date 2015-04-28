@@ -4,7 +4,6 @@
 
     TODO:
 
-    - cassette motor is turned on only for a moment while LOADing
     - c16 function ROM test fails
     - clean up TED
     - dump PLA

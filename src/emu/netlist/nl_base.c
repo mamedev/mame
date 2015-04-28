@@ -182,6 +182,8 @@ ATTR_COLD void netlist_base_t::start()
 {
 	/* find the main clock and solver ... */
 
+	NL_VERBOSE_OUT(("Searching for mainclock and solver ...\n"));
+
 	m_mainclock = get_single_device<NETLIB_NAME(mainclock)>("mainclock");
 	m_solver = get_single_device<NETLIB_NAME(solver)>("solver");
 	m_gnd = get_single_device<NETLIB_NAME(gnd)>("gnd");

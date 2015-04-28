@@ -4,7 +4,7 @@
  * nld_7474.h
  *
  *  DM7474: Dual Positive-Edge-Triggered D Flip-Flops
- *          with Preset Clear and Complementary Outputs
+ *          with Preset, Clear and Complementary Outputs
  *
  *          +--------------+
  *     CLR1 |1     ++    14| VCC

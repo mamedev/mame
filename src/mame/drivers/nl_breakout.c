@@ -67,8 +67,8 @@
 
 // identify unknown devices in IDE
 
-#if 0
-#define NETLIST_DEVELOPMENT 1
+#if 1
+#define NETLIST_DEVELOPMENT 0
 
 #include "netlist/nl_dice_compat.h"
 #include "netlist/devices/net_lib.h"
@@ -143,14 +143,26 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("S3", DIPSWITCH, &dipswitch3_desc)
 	CHIP("S4", DIPSWITCH, &dipswitch4_desc)
 #endif
+
+	// DIPSWITCH - Free game
+	SWITCH(S1_1)
+	SWITCH(S1_2)
+	SWITCH(S1_3)
+	SWITCH(S1_4)
+
+	SWITCH(S2)	// Cocktail
+	SWITCH(S3)	// 2 Plays / 25c
+	SWITCH2(S4)	// Three Balls / 5 Balls
+
     SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-7) // works and is sufficient
+    PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
     //CHIP("CLOCK", CLOCK_14_318_MHZ)
     MAINCLOCK(Y1, 14318000.0)
 
     ANALOG_INPUT(V5, 5)
-#define VCC "V5", Q
-#define GND "GND", Q
+    ALIAS(VCC, V5)
+//#define VCC "V5", Q
+#define GNDD "GND", Q
 
     //CHIP("Y1", CLOCK_14_318_MHZ)	//Y1
 
@@ -290,9 +302,11 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP_INPUT_ACTIVE_LOW(COIN1)
 
     //CHIP("COIN2", COIN_INPUT)
+	CHIP_INPUT_ACTIVE_LOW(COIN2)
 
 	//CHIP("START", START_INPUT)
-	CHIP_INPUT_ACTIVE_HIGH(START)
+	CHIP_INPUT_ACTIVE_LOW(START1)
+	CHIP_INPUT_ACTIVE_HIGH(START2)
 
 	//CHIP("SERVE", BUTTONS1_INPUT)
 	CHIP_INPUT_ACTIVE_LOW(SERVE)	// Active low?
@@ -516,22 +530,22 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "F6", 1)
    CONNECTION(P, "F6", 10)
    CONNECTION(P, "F6", 9)
-   CONNECTION(GND, "F6", 14)
+   CONNECTION(GNDD, "F6", 14)
    CONNECTION("F7", 13, "J9", 2)
    CONNECTION(VSYNC, "J9", 1)
    CONNECTION("A7", 9, "J9", 13)
    CONNECTION("J9", 12, "F6", 4)
    CONNECTION("J9", 12, "A7", 11)
-   CONNECTION(GND, "A7", 12)
+   CONNECTION(GNDD, "A7", 12)
    CONNECTION(ATTRACT_n, "A7", 13)
    CONNECTION("J9", 12, "A8", 11)
-   CONNECTION(GND, "A8", 12)
+   CONNECTION(GNDD, "A8", 12)
    CONNECTION(ATTRACT_n, "A8", 13)
    CONNECTION(VB_HIT_n, "A7", 5)
-   CONNECTION(GND, "A7", 4)
+   CONNECTION(GNDD, "A7", 4)
    CONNECTION(ATTRACT_n, "A7", 3)
    CONNECTION(BP_HIT_n, "A8", 5)
-   CONNECTION(GND, "A8", 4)
+   CONNECTION(GNDD, "A8", 4)
    CONNECTION(ATTRACT_n, "A8", 3)
    CONNECTION("A8", 6, "B9", 13)
    CONNECTION(P_HIT_SOUND, "B9", 12)
@@ -540,6 +554,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("A7", 6, "B9", 4)
    CONNECTION(VB_HIT_SOUND, "B9", 5)
 
+#if 0
    CONNECTION(GND, "S1", 1)
    CONNECTION(P, "S1", 2)
    CONNECTION(GND, "S1", 4)
@@ -548,25 +563,53 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "S1", 11)
    CONNECTION(GND, "S1", 9)
    CONNECTION(P, "S1", 10)
+#endif
+   NET_C(S1_1.1, GND)
+   NET_C(S1_2.1, GND)
+   NET_C(S1_3.1, GND)
+   NET_C(S1_4.1, GND)
+
+   RES(R7, RES_K(2.7))
+   RES(R8, RES_K(2.7))
+   RES(R9, RES_K(2.7))
+   RES(R10, RES_K(2.7))
+
+   NET_C(R7.1, V5)
+   NET_C(R8.1, V5)
+   NET_C(R9.1, V5)
+   NET_C(R10.1, V5)
+
+   NET_C(S1_1.2, R7.2)
+   NET_C(S1_2.2, R8.2)
+   NET_C(S1_3.2, R9.2)
+   NET_C(S1_4.2, R10.2)
 
    //Free Game Selector
    CONNECTION(I1, "K7", 2)
-   CONNECTION("S1", 15, "K7", 1)
+   //CONNECTION("S1", 15, "K7", 1)
+   CONNECTION("S1_1", 2, "K7", 1)
    CONNECTION(J1, "K7", 12)
-   CONNECTION("S1", 14, "K7", 13)
+   //CONNECTION("S1", 14, "K7", 13)
+   CONNECTION("S1_2", 2, "K7", 13)
    CONNECTION(K1, "K7", 5)
-   CONNECTION("S1", 6, "K7", 4)
+   //CONNECTION("S1", 6, "K7", 4)
+   CONNECTION("S1_3", 2, "K7", 4)
    CONNECTION(L1, "K7", 9)
-   CONNECTION("S1", 7, "K7", 10)
+   //CONNECTION("S1", 7, "K7", 10)
+   CONNECTION("S1_4", 2, "K7", 10)
 
    CONNECTION(I2, "L7", 2)
-   CONNECTION("S1", 15, "L7", 1)
+   //CONNECTION("S1", 15, "L7", 1)
+   CONNECTION("S1_1", 2, "L7", 1)
    CONNECTION(J2, "L7", 12)
-   CONNECTION("S1", 14, "L7", 13)
+   //CONNECTION("S1", 14, "L7", 13)
+   CONNECTION("S1_2", 2, "L7", 13)
    CONNECTION(K2, "L7", 5)
-   CONNECTION("S1", 6, "L7", 4)
+   //CONNECTION("S1", 6, "L7", 4)
+   CONNECTION("S1_3", 2, "L7", 4)
    CONNECTION(L2, "L7", 9)
-   CONNECTION("S1", 7, "L7", 10)
+   //CONNECTION("S1", 7, "L7", 10)
+   CONNECTION("S1_4", 2, "L7", 10)
 
 
    CONNECTION("K7", 3, "J7", 13)
@@ -599,12 +642,12 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION(P, "K9", 8)
    CONNECTION("J8", 9, "K9", 9)
-   CONNECTION(GND, "K9", 11)
+   CONNECTION(GNDD, "K9", 11)
    CONNECTION(HSYNC_n, "K9", 10)
 
    CONNECTION(P, "K9", 1)
    CONNECTION("J8", 4, "K9", 12)
-   CONNECTION(GND, "K9", 4)
+   CONNECTION(GNDD, "K9", 4)
    CONNECTION(HSYNC_n, "K9", 13)
 
    CONNECTION("K9", 6, "L9", 12)
@@ -617,25 +660,25 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(V4_d, "N7", 2)
    CONNECTION("N8", 6, "N7", 1)
    //
-   CONNECTION(GND, "M2", 13)
+   CONNECTION(GNDD, "M2", 13)
    CONNECTION(V1_d, "M2", 10)
    CONNECTION(V2_d, "M2", 8)
    CONNECTION(V4_d, "M2", 3)
    CONNECTION(V8_d, "M2", 1)
-   CONNECTION(GND, "M2", 11)
+   CONNECTION(GNDD, "M2", 11)
    CONNECTION(P2_CONDITIONAL, "M2", 7)
-   CONNECTION(GND, "M2", 4)
-   CONNECTION(GND, "M2", 16)
+   CONNECTION(GNDD, "M2", 4)
+   CONNECTION(GNDD, "M2", 16)
 
    CONNECTION("M2", 14, "N2", 13)
    CONNECTION(V16_d, "N2", 10)
    CONNECTION(V32_d, "N2", 8)
    CONNECTION(V64_d, "N2", 3)
    CONNECTION(V128_d, "N2", 1)
-   CONNECTION(GND, "N2", 11)
+   CONNECTION(GNDD, "N2", 11)
    CONNECTION(P2_CONDITIONAL, "N2", 7)
-   CONNECTION(GND, "N2", 4)
-   CONNECTION(GND, "N2", 16)
+   CONNECTION(GNDD, "N2", 4)
+   CONNECTION(GNDD, "N2", 16)
 
    CONNECTION("M2", 6, "M3", 2)
    CONNECTION(P2_CONDITIONAL, "M3", 1)
@@ -697,9 +740,9 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION(P, "L1", 1)
    CONNECTION(P, "L1", 3)
-   CONNECTION(GND, "L1", 4)
+   CONNECTION(GNDD, "L1", 4)
    CONNECTION(P, "L1", 5)
-   CONNECTION(GND, "L1", 6)
+   CONNECTION(GNDD, "L1", 6)
    CONNECTION(VERT_TRIG_n, "L1", 9)
    CONNECTION(P, "L1", 10)
    CONNECTION(DICECLOCK, "L1", 2)
@@ -725,10 +768,10 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(VSYNC_n, "H1", 9)
 
    CONNECTION(P, "M1", 1)
-   CONNECTION(GND, "M1", 3)
-   CONNECTION(GND, "M1", 4)
+   CONNECTION(GNDD, "M1", 3)
+   CONNECTION(GNDD, "M1", 4)
    CONNECTION(P, "M1", 5)
-   CONNECTION(GND, "M1", 6)
+   CONNECTION(GNDD, "M1", 6)
    CONNECTION(VERT_TRIG_n, "M1", 9)
    CONNECTION(DICECLOCK, "M1", 2)
    CONNECTION("L1", 15, "M1", 7)
@@ -778,7 +821,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(C1, "L5", 5)
    CONNECTION(G1, "L5", 6)
    CONNECTION(K1, "L5", 7)
-   CONNECTION(GND, "L5", 9)
+   CONNECTION(GNDD, "L5", 9)
    CONNECTION(H32_n, "L5", 10)
    CONNECTION(V16, "L5", 11)
    CONNECTION(V64, "L5", 12)
@@ -787,11 +830,11 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(D2, "K5", 1)
    CONNECTION(H02, "K5", 2)
    CONNECTION(L2, "K5", 3)
-   CONNECTION(GND, "K5", 4)
+   CONNECTION(GNDD, "K5", 4)
    CONNECTION(D1, "K5", 5)
    CONNECTION(H01, "K5", 6)
    CONNECTION(L1, "K5", 7)
-   CONNECTION(GND, "K5", 9)
+   CONNECTION(GNDD, "K5", 9)
    CONNECTION(H32_n, "K5", 10)
    CONNECTION(V16, "K5", 11)
    CONNECTION(V64, "K5", 12)
@@ -806,13 +849,13 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(H32, "J5", 5)
 
    CONNECTION("J5", 13, "H5", 1)
-   CONNECTION(GND, "H5", 2)
-   CONNECTION(GND, "H5", 3)
+   CONNECTION(GNDD, "H5", 2)
+   CONNECTION(GNDD, "H5", 3)
    CONNECTION("J5", 14, "H5", 4)
-   CONNECTION(GND, "H5", 5)
-   CONNECTION(GND, "H5", 6)
+   CONNECTION(GNDD, "H5", 5)
+   CONNECTION(GNDD, "H5", 6)
    CONNECTION("J5", 10, "H5", 7)
-   CONNECTION(GND, "H5", 9)
+   CONNECTION(GNDD, "H5", 9)
 
    CONNECTION(V4, "K4", 12)
    CONNECTION(V8, "K4", 13)
@@ -828,12 +871,12 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION("J5", 12 , "J4", 1)
    CONNECTION("J5", 11, "J4", 2)
-   CONNECTION(GND, "J4", 3)
-   CONNECTION(GND, "J4", 4)
+   CONNECTION(GNDD, "J4", 3)
+   CONNECTION(GNDD, "J4", 4)
    CONNECTION("J5", 15, "J4", 5)
    CONNECTION("J5", 9, "J4", 6)
-   CONNECTION(GND, "J4", 7)
-   CONNECTION(GND, "J4", 9)
+   CONNECTION(GNDD, "J4", 7)
+   CONNECTION(GNDD, "J4", 9)
    CONNECTION("L4", 6, "J4", 10)
    CONNECTION(H8, "J4", 11)
    CONNECTION(V4, "J4", 12)
@@ -872,10 +915,16 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("M8", 6, "H4", 5)
    CONNECTION("F2", 8, "H4", 4)
 
+#if 0
    CONNECTION(PAD_EN_n, "PAD_EN_BUF", 1)
 
    CONNECTION("PAD_EN_BUF", 2, "C9", 4)
    CONNECTION("PAD_EN_BUF", 2, "C9", 2)
+#else
+   CONNECTION(PAD_EN_n, "C9", 4)
+   CONNECTION(PAD_EN_n, "C9", 2)
+#endif
+
    CONNECTION(BTB_HIT_n, "C5", 3)
    CONNECTION(P, "F5", 10)
    CONNECTION(P, "F5", 12)
@@ -929,15 +978,23 @@ CIRCUIT_LAYOUT( breakout )
 
    //SCORE
    CONNECTION(SCI_n, "D3", 4)
-   CONNECTION(GND, "D3", 2)
-   CONNECTION(GND, "D3", 3)
-   CONNECTION(GND, "D3", 1)
+   CONNECTION(GNDD, "D3", 2)
+   CONNECTION(GNDD, "D3", 3)
+   CONNECTION(GNDD, "D3", 1)
 
    //PLAYER2_CONDITIONAL
    CONNECTION(PLAYER_2, "H7", 10)
-   CONNECTION(GND, "S2", 1)
+#if 0
+   CONNECTION(GNDD, "S2", 1)
    CONNECTION(P, "S2", 2)
    CONNECTION("S2", 3, "H7", 9)
+#else
+   NET_C(S2.2, GND)
+   NET_C(S2.1, H7.9)
+   RES(R18, RES_K(1))
+   NET_C(R18.2, V5)
+   NET_C(R18.1, S2.1)
+#endif
 
    //A-L 1 and 2
    CONNECTION(SET_BRICKS_n, "B3", 2)
@@ -1008,7 +1065,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(START_GAME, "N9", 14)
    CONNECTION(H8_n, "N9", 1)
    CONNECTION(H16_n, "N9", 10)
-   CONNECTION(GND, "N9", 9)
+   CONNECTION(GNDD, "N9", 9)
 
    CONNECTION("N9", 13, "N7", 13)
    CONNECTION(SCLOCK, "N7", 12)
@@ -1028,7 +1085,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(CX0, "C7", 3)
    CONNECTION(CX1, "C7", 4)
    CONNECTION(X2, "C7", 5)
-   CONNECTION(GND, "C7", 6)
+   CONNECTION(GNDD, "C7", 6)
    CONNECTION("D8", 8, "C7", 9)
    CONNECTION("C7", 15, "C8", 7)
    CONNECTION("C7", 11, "C8", 10)
@@ -1050,7 +1107,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(Y0, "B7", 3)
    CONNECTION(Y1, "B7", 4)
    CONNECTION(Y2, "B7", 5)
-   CONNECTION(GND, "B7", 6)
+   CONNECTION(GNDD, "B7", 6)
    CONNECTION("D8", 8, "B7", 9)
    CONNECTION(DICECLOCK, "B7", 2)
    CONNECTION("B7", 15, "B8", 7)
@@ -1081,12 +1138,14 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(P, "F1", 1)
    CONNECTION(P, "F1", 7)
    CONNECTION(P, "F1", 10)
-   CONNECTION(GND, "F1", 3)
+   CONNECTION(GNDD, "F1", 3)
    CONNECTION(P, "F1", 4)
-   CONNECTION(GND, "F1", 5)
-   CONNECTION(GND, "F1", 6)
+   CONNECTION(GNDD, "F1", 5)
+   CONNECTION(GNDD, "F1", 6)
    CONNECTION("E1", 6, "F1", 9)
-   CONNECTION("Y1", 1, "F1", 2)
+
+   //CONNECTION("Y1", 1, "F1", 2)
+   NET_C(Y1.Q, F1.2)
 
    // RH and LH Sides
    CONNECTION(V128, "N4", 1)
@@ -1139,16 +1198,25 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("H8", 9, "J9", 9)
    CONNECTION(V16_d, "J8", 14)
    CONNECTION("J8", 13, "J9", 10)
+
+#if 0
    CONNECTION(P, "S3", 1)
    CONNECTION(V4_d, "S3", 2)
    CONNECTION("S3", 3, "J9", 11)
+#else
+   CONNECTION(V4_d, "S3", 1)
+   CONNECTION("S3", 2, "J9", 11)
+   RES(R15, RES_K(1))
+   NET_C(R15.1, V5)
+   NET_C(R15.2, S3.2)
+#endif
 
    CONNECTION("J9", 8, "L9", 5)
    CONNECTION("J9", 6, "L9", 4)
 
    //COIN2 circuit
-   //CONNECTION("COIN2", 1, "F9", 1)
-   CONNECTION(GND, "F9", 1)		//TODO: coin2 not implemented
+   CONNECTION("COIN2", 1, "F9", 1)
+   //CONNECTION(GNDD, "F9", 1)		//TODO: coin2 not implemented
 
    CONNECTION(CSW2, "F9", 3)
    CONNECTION(CSW2, "H9", 10)
@@ -1175,7 +1243,8 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("E9", 8, "H1", 2)
 
    //Start2 Input
-   CONNECTION("START", 2, "E9", 11)
+   //CONNECTION("START", 2, "E9", 11)
+   CONNECTION("START2", 1, "E9", 11)
    CONNECTION("E9", 10, "E8", 12)
    CONNECTION(P, "E8", 10)
    CONNECTION(V64I, "E8", 11)
@@ -1188,7 +1257,8 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("E7", 13, "E8", 13)
 
    //Start1 Input
-   CONNECTION("START", 1, "E9", 3)
+   //CONNECTION("START", 1, "E9", 3)
+   CONNECTION("START1", 1, "E9", 3)
    CONNECTION("E9", 4, "E8", 2)
    CONNECTION(P, "E8", 4)
    CONNECTION(V64_d, "E8", 3)
@@ -1419,9 +1489,9 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(START_GAME1_n, "F4", 13)
 
    CONNECTION("F4", 6, "F3", 5)
-   CONNECTION(GND, "F3", 4)
+   CONNECTION(GNDD, "F3", 4)
    CONNECTION("F4", 8, "F3", 11)
-   CONNECTION(GND, "F3", 12)
+   CONNECTION(GNDD, "F3", 12)
 
    CONNECTION(P, "F3", 3)
    CONNECTION(P, "F3", 13)
@@ -1484,9 +1554,10 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION(START_GAME1_n, "B4", 1)
    CONNECTION(BALL_A, "A4", 2)
-   CONNECTION(BALL_B, "S4", 1)
-   CONNECTION(BALL_C, "S4", 2)
-   CONNECTION("S4", 3, "A4", 1)
+   CONNECTION(BALL_B, "S4", 1) // Three balls
+   CONNECTION(BALL_C, "S4", 2) // Five balls
+   //CONNECTION("S4", 3, "A4", 1)
+   NET_C(S4.Q, A4.1)
    CONNECTION("A4", 3, "C37", 1)
 
    CONNECTION(SERVE_WAIT_n, "A4", 5)
@@ -1505,6 +1576,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION(PSYNC, "B9", 1)
    CONNECTION(VSYNC_n, "B9", 2)
 
+#if 0
    //CONNECTION("VIDEO", 1, "E2", 11)
    CONNECTION("VIDEO", 2, PLAYFIELD)
    CONNECTION("VIDEO", 3, BSYNC)
@@ -1514,14 +1586,61 @@ CIRCUIT_LAYOUT( breakout )
 
    CONNECTION("VIDEO", Video::HBLANK_PIN, HSYNC)
    CONNECTION("VIDEO", Video::VBLANK_PIN, "E3", 10)
+#else
+	RES(R41, RES_K(3.9))
+	//RES(R42, RES_K(3.9))
+	RES(R42, RES_K(3.9))
+	RES(R43, RES_K(3.9))
+	RES(R51, RES_K(3.9))
+	RES(R52, RES_K(3.9))
+	DIODE(CR6, "1N914")
 
+	NET_C(CR6.A, R41.1, R42.1, R43.1, R51.1, R52.1)
+	CONNECTION("R51", 2, PLAYFIELD)
+	CONNECTION("R43", 2, BSYNC)
+	CONNECTION("R52", 2, SCORE)
+	NET_C(R41.2, B9.3)
+	NET_C(R42.2, V5)
 
+	NET_C(E2.11, CR6.K)
+
+	ALIAS(videomix, R41.1)
+
+#endif
+
+#if 0
    // Audio Summing
    CONNECTION("AUDIO", 1, "B9", 11)
    CONNECTION("AUDIO", 2, "B9", 8)
    CONNECTION("AUDIO", 3, FREE_GAME_TONE)
    CONNECTION("AUDIO", 4, "B9", 6)
+#else
+   RES(R36, RES_K(47))
+   RES(R37, RES_K(47))
+   RES(R38, RES_K(47))
+   RES(R39, RES_K(47))
+   CONNECTION("R36", 2, "B9", 11)
+   CONNECTION("R38", 2, "B9", 8)
+   CONNECTION("R39", 2, FREE_GAME_TONE)
+   CONNECTION("R37", 2, "B9", 6)
+   NET_C(R36.1, R37.1, R38.1, R39.1)
+   ALIAS(sound, R36.1)
 
+#endif
+
+   /* Not connected pins */
+
+   NET_C(ttlhigh, B4.3, B4.4, B4.5, B4.6)
+   NET_C(ttlhigh, N6.3, N6.4, N6.5, N6.6)
+   NET_C(ttlhigh, M6.3, M6.4, M6.5, M6.6)
+   NET_C(ttlhigh, L6.3, L6.4, L6.5, L6.6)
+
+   NET_C(ttlhigh, H6.3, H6.4, H6.5, H6.6)
+   NET_C(ttlhigh, K6.3, K6.4, K6.5, K6.6)
+   NET_C(ttlhigh, J6.3, J6.4, J6.5, J6.6)
+
+   NET_C(ttlhigh, E1.9, E1.11)
+   NET_C(ttlhigh, E2.1, E2.2)
 
 #ifdef DEBUG
     // RAM access
