@@ -24,6 +24,14 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 
 2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
 
+ 
+IMPORTANT NOTE for tape usage: you *FIRST* press PLAY on the tape drive 
+  (e.g. by pressing F2 in partial emulated keyboard mode) and *THEN* you 
+  type LOAD on the BASIC prompt!
+  Otherwise, the system turns the tape motor ON but it does not receive any
+  data from tape, and it turns it OFF before the user can press PLAY.
+ 
+ 
 ****************************************************************************/
 /*
  * SAMSUNG SPC-1000 Series (info from zannylim)
@@ -471,7 +479,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1000_cass")
 
