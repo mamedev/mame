@@ -72,6 +72,7 @@ void nl_initialize_factory(netlist_factory_t &factory)
 {
 	ENTRY(R,                    RES,                    "R")
 	ENTRY(POT,                  POT,                    "R")
+	ENTRY(POT2,                 POT2,                   "R")
 	ENTRY(C,                    CAP,                    "C")
 	ENTRY(D,                    DIODE,                  "model")
 	ENTRY(VCVS,                 VCVS,                   "-")        // FIXME: STD parameters ?

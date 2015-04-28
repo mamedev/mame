@@ -227,11 +227,16 @@ static INPUT_PORTS_START( breakout )
 	PORT_START( "PADDLE1" ) /* fake input port for player 2 paddle */
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot1")
 #endif
+
+	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot0")
+
 	PORT_START("IN0") /* fake as well */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw1")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "servesw")
 
 #if 0
 	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
@@ -297,10 +302,12 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0, 0x01)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0, 0x01)
 #endif
+	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "POTP1.DIAL")
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw1", "COIN1_SW.POS", 0, 0x01)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw2", "COIN2_SW.POS", 0, 0x01)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw1", "START1_SW.POS", 0, 0x01)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw2", "START2_SW.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "servesw", "SERVE_SW.POS", 0, 0x01)
 #if 0
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
 #endif

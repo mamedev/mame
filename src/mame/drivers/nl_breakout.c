@@ -77,7 +77,7 @@
 //2 555 timers
 static Astable555Desc b2_555_desc(OHM(560.0), M_OHM(1.8), U_FARAD(0.1));
 
-static Mono555Desc c9_555_desc(OHM(47.0), U_FARAD(1.0));	// R33, C21
+static Mono555Desc c9_555_desc(OHM(47000.0), U_FARAD(1.0));	// R33, C21
 
 //check these values
 //static Paddle1HorizontalDesc pad1_desc(15047.0, 47.0, &c9_555_desc);
@@ -122,7 +122,7 @@ static AUDIO_DESC( breakout )
 VIDEO_DESC_END
 #endif
 
-static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(0.01)); // No capacitor on 2nd 9602, assume very low internal capacitance
+static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(1)); // No capacitor on 2nd 9602, assume very low internal capacitance
 static Mono9602Desc f3_desc(K_OHM(47.0), U_FARAD(1.0), K_OHM(47.0), U_FARAD(1.0));
 
 static Mono9602Desc a7_desc(K_OHM(68.0), U_FARAD(1.0), K_OHM(22.0), U_FARAD(10.0));
@@ -195,8 +195,8 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("C6", 7486)
 	CHIP("C7", 9316)
 	CHIP("C8", 9316)
-    CHIP_555_Mono(C9, &c9_555_desc)
-
+    //CHIP_555_Mono(C9, &c9_555_desc)
+	NE555_DIP(C9)
 	CHIP("D2", 7432)
 	CHIP("D3", 7474)
 	CHIP("D4", 9316)
@@ -921,8 +921,16 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("PAD_EN_BUF", 2, "C9", 4)
    CONNECTION("PAD_EN_BUF", 2, "C9", 2)
 #else
+   // NOTE: Stabilizing CAP C20 not modelled.
    CONNECTION(PAD_EN_n, "C9", 4)
    CONNECTION(PAD_EN_n, "C9", 2)
+   NET_C(C9.8, V5)
+   NET_C(C9.1, GND)
+   RES(R53, RES_K(12))   // 12k
+   CAP(C21, CAP_U(1))
+   NET_C(GND, C21.2, R53.2)
+   NET_C(C21.1, R53.1, C9.6, C9.7)
+
 #endif
 
    CONNECTION(BTB_HIT_n, "C5", 3)
@@ -1659,6 +1667,16 @@ CIRCUIT_LAYOUT( breakout )
     CONNECTION("LOG1", 15, "F2", 12)	//M
     CONNECTION("LOG1", 16, "L3", 6)*/	//N
 #endif
+
+    // POTS
+	POT2(POTP1, RES_K(6))     // 5k
+	PARAM(POTP1, 0)  // Log Dial ...
+	RES(R33, 47)
+
+	NET_C(POTP1.1, V5)
+	//NET_C(POTP1.3, GND)
+	NET_C(POTP1.2, R33.1)
+	NET_C(R33.2, C9.6)
 
 CIRCUIT_LAYOUT_END
 

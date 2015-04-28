@@ -115,13 +115,14 @@ public:
 	RES(_name ## _R1, (_pdesc)->r1) \
 	CAP(_name ## _C1, (_pdesc)->c1) \
 	RES(_name ## _R2, (_pdesc)->r2) \
-	CAP(_name ## _C2, (_pdesc)->c2) \
 	NET_C(_name.1, _name ## _C1.1) \
 	NET_C(_name.2, _name ## _C1.2) \
 	NET_C(_name.2, _name ## _R1.2) \
 	NET_C(VCC, 	   _name ## _R1.1) \
+	if (((_pdesc)->c2)>1e-15) { \
+	CAP(_name ## _C2, (_pdesc)->c2) \
 	NET_C(_name.15, _name ## _C2.1) \
-	NET_C(_name.14, _name ## _C2.2) \
+	NET_C(_name.14, _name ## _C2.2) }\
 	NET_C(_name.14, _name ## _R2.2) \
 	NET_C(VCC, 	   _name ## _R2.1) \
 
@@ -158,7 +159,8 @@ public:
 inline int CAPACITOR_tc(const double c, const double r)
 {
 	static const double TIME_CONSTANT = -log((3.4 - 2.0) / 3.4);
-	return (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
+	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9 * 0.1); // 0.1 avoids bricks with shadow
+	return ret;
 }
 
 #define CHIP_CAPACITOR(_name, _pdesc) \

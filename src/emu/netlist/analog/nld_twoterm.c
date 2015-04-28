@@ -173,6 +173,47 @@ NETLIB_UPDATE_PARAM(POT)
 }
 
 // ----------------------------------------------------------------------------------------
+// nld_POT2
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(POT2)
+{
+	register_sub(m_R1, "R1");
+
+	register_subalias("1", m_R1.m_P);
+	register_subalias("2", m_R1.m_N);
+
+	register_param("R", m_R, 1.0 / netlist().gmin());
+	register_param("DIAL", m_Dial, 0.5);
+	register_param("DIALLOG", m_DialIsLog, 0);
+
+}
+
+NETLIB_RESET(POT2)
+{
+	m_R1.do_reset();
+}
+
+NETLIB_UPDATE(POT2)
+{
+	m_R1.update_dev();
+}
+
+NETLIB_UPDATE_PARAM(POT2)
+{
+	nl_double v = m_Dial.Value();
+	if (m_DialIsLog.Value())
+		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
+
+	// FIXME: Only attached nets should be brought up to current time
+	//netlist().solver()->update_to_current_time(); // bring up current time
+
+	m_R1.update_dev();
+
+	m_R1.set_R(MAX(m_R.Value() * v, netlist().gmin()));
+}
+
+// ----------------------------------------------------------------------------------------
 // nld_C
 // ----------------------------------------------------------------------------------------
 

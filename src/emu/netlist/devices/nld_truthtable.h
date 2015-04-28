@@ -164,12 +164,13 @@ public:
 			ttline = pstring(truthtable[0]);
 			truthtable++;
 		}
+#if 0
 		for (int j=0; j < m_size; j++)
 			printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
 					m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j][0]);
 		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero; k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
-
+#endif
 		m_ttp->m_initialized = true;
 
 	}

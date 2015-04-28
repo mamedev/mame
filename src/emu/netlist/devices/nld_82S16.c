@@ -11,7 +11,7 @@ static const netlist_time delay[2] = { NLTIME_FROM_NS(40), NLTIME_FROM_NS(25) };
 // FIXME: optimize device (separate address decoder!)
 NETLIB_UPDATE(82S16)
 {
-	if (INPLOGIC(m_CE1Q) || INPLOGIC(m_CE1Q) || INPLOGIC(m_CE1Q))
+	if (INPLOGIC(m_CE1Q) || INPLOGIC(m_CE2Q) || INPLOGIC(m_CE3Q))
 	{
 		// FIXME: Outputs are tristate. This needs to be properly implemented
 		OUTLOGIC(m_DOUTQ, 1, NLTIME_FROM_NS(40));
@@ -23,7 +23,9 @@ NETLIB_UPDATE(82S16)
 			adr |= (INPLOGIC(m_A[i]) << i);
 
 		if (!INPLOGIC(m_WEQ))
+		{
 			m_ram[adr] = INPLOGIC(m_DIN);
+		}
 		OUTLOGIC(m_DOUTQ, m_ram[adr] ^ 1, NLTIME_FROM_NS(40));
 	}
 }
