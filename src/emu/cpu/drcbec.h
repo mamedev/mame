@@ -34,6 +34,8 @@ public:
 	// required overrides
 	virtual void reset();
 #ifdef ANDROID
+	// libretro: Disabling optimization for Android here is a hack we
+	// should revisit at some point.
 	virtual int execute(uml::code_handle &entry) __attribute__((optimize("-O0")));
 #else
 	virtual int execute(uml::code_handle &entry);
