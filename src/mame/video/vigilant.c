@@ -27,10 +27,15 @@ void vigilant_state::video_start()
 	save_item(NAME(m_rear_horiz_scroll_high));
 	save_item(NAME(m_rear_color));
 	save_item(NAME(m_rear_disable));
-	save_item(NAME(m_rear_refresh));
-	save_item(NAME(*m_bg_bitmap));
+
+	m_rear_refresh = 1;
+	machine().save().register_postload(save_prepost_delegate(FUNC(vigilant_state::vigilant_postload), this));
 }
 
+void vigilant_state::vigilant_postload()
+{
+	m_rear_refresh = 1;
+}
 
 void vigilant_state::video_reset()
 {
@@ -40,7 +45,6 @@ void vigilant_state::video_reset()
 	m_rear_horiz_scroll_high = 0;
 	m_rear_color = 0;
 	m_rear_disable = 1;
-	m_rear_refresh = 1;
 }
 
 
@@ -48,7 +52,6 @@ void vigilant_state::video_reset()
  update_background
 
  There are three background ROMs, each one contains a 512x256 picture.
- Redraw them if the palette changes.
  **************************************************************************/
 void vigilant_state::update_background()
 {
