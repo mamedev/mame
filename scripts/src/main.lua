@@ -5,7 +5,7 @@ function mainProject(_target, _subtarget)
 		project (_target .. _subtarget)
 	end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
-	kind "ConsoleApp"
+	kind "SharedLib"
 
 	options {
 		"ForceCPP",
