@@ -724,10 +724,10 @@ void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
-		for (netlist_setup_t::devices_list_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+		for (netlist_device_t * const *entry = netlist().m_devices.first(); entry != NULL; entry = netlist().m_devices.next(entry))
 		{
 			//entry->object()->s
-			printf("Device %20s : %12d %15ld\n", entry->object()->name().cstr(), entry->object()->stat_count, (long int) entry->object()->total_time / (entry->object()->stat_count + 1));
+			printf("Device %20s : %12d %15ld\n", (*entry)->name().cstr(), (*entry)->stat_count, (long int) (*entry)->total_time / ((*entry)->stat_count + 1));
 		}
 		printf("Queue Start %15d\n", m_netlist.queue().m_prof_start);
 		printf("Queue End   %15d\n", m_netlist.queue().m_prof_end);

@@ -340,6 +340,10 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 : netlist_object_t(DEVICE, afamily)
+#if (NL_KEEP_STATISTICS)
+	, total_time(0)
+	, stat_count(0)
+#endif
 {
 }
 
@@ -569,7 +573,7 @@ ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t 
 		begin_timing(netdev.total_time);
 		inc_stat(netdev.stat_count);
 		netdev.update_dev();
-		end_timing(netdev().total_time);
+		end_timing(netdev.total_time);
 	}
 }
 

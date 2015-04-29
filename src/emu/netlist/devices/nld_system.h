@@ -44,6 +44,13 @@
 		NET_C(_IN, _name.I)                                                    \
 		NET_C(_OUT, _name.Q)
 
+#define RES_SWITCH(_name, _IN, _P1, _P2)                                       \
+		NET_REGISTER_DEV(res_sw, _name)                                        \
+		NET_C(_IN, _name.I)                                                    \
+		NET_C(_P1, _name.1)													   \
+		NET_C(_P2, _name.2)													   \
+
+
 // -----------------------------------------------------------------------------
 // mainclock
 // -----------------------------------------------------------------------------
@@ -185,6 +192,34 @@ private:
 	netlist_analog_input_t m_I;
 	netlist_analog_output_t m_Q;
 
+};
+
+// -----------------------------------------------------------------------------
+// nld_res_sw
+// -----------------------------------------------------------------------------
+
+class NETLIB_NAME(res_sw) : public netlist_device_t
+{
+public:
+	ATTR_COLD NETLIB_NAME(res_sw)()
+			: netlist_device_t() { }
+
+	ATTR_COLD virtual ~NETLIB_NAME(res_sw)() {}
+
+	netlist_param_double_t m_RON;
+	netlist_param_double_t m_ROFF;
+	netlist_ttl_input_t m_I;
+	NETLIB_NAME(R) m_R;
+
+protected:
+
+	ATTR_COLD void start();
+	ATTR_COLD void reset();
+	ATTR_HOT ATTR_ALIGN void update();
+	ATTR_HOT ATTR_ALIGN void update_param();
+
+private:
+	netlist_state_t<UINT8> m_last_state;
 };
 
 

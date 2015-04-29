@@ -36,6 +36,7 @@
 #define NLD_74123_H_
 
 #include "../nl_base.h"
+#include "nld_system.h"
 #include "../analog/nld_twoterm.h"
 
 #define TTL_74123(_name)                                                        \
@@ -44,8 +45,11 @@
 
 NETLIB_DEVICE(74123,
 public:
-	NETLIB_NAME(R) m_RP;
-	NETLIB_NAME(R) m_RN;
+	NETLIB_NAME(res_sw) m_RP;
+	NETLIB_NAME(res_sw) m_RN;
+
+	netlist_ttl_output_t m_RP_Q;
+	netlist_ttl_output_t m_RN_Q;
 
 	netlist_ttl_input_t m_A;
 	netlist_ttl_input_t m_B;

@@ -74,6 +74,8 @@
 #include "netlist/devices/net_lib.h"
 #include "netlist/analog/nld_twoterm.h"
 
+#define SLOW_BUT_ACCURATE 0
+
 //2 555 timers
 static Astable555Desc b2_555_desc(OHM(560.0), M_OHM(1.8), U_FARAD(0.1));
 
@@ -122,7 +124,7 @@ static AUDIO_DESC( breakout )
 VIDEO_DESC_END
 #endif
 
-static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(1)); // No capacitor on 2nd 9602, assume very low internal capacitance
+static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(0)); // No capacitor on 2nd 9602
 static Mono9602Desc f3_desc(K_OHM(47.0), U_FARAD(1.0), K_OHM(47.0), U_FARAD(1.0));
 
 static Mono9602Desc a7_desc(K_OHM(68.0), U_FARAD(1.0), K_OHM(22.0), U_FARAD(10.0));
@@ -144,6 +146,12 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("S4", DIPSWITCH, &dipswitch4_desc)
 #endif
 
+    SOLVER(Solver, 48000)
+    PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
+
+    //CHIP("CLOCK", CLOCK_14_318_MHZ)
+    MAINCLOCK(Y1, 14318000.0)
+
 	// DIPSWITCH - Free game
 	SWITCH(S1_1)
 	SWITCH(S1_2)
@@ -153,11 +161,6 @@ CIRCUIT_LAYOUT( breakout )
 	SWITCH(S2)	// Cocktail
 	SWITCH(S3)	// 2 Plays / 25c
 	SWITCH2(S4)	// Three Balls / 5 Balls
-
-    SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
-    //CHIP("CLOCK", CLOCK_14_318_MHZ)
-    MAINCLOCK(Y1, 14318000.0)
 
     ANALOG_INPUT(V5, 5)
     ALIAS(VCC, V5)
@@ -311,16 +314,7 @@ CIRCUIT_LAYOUT( breakout )
 	//CHIP("SERVE", BUTTONS1_INPUT)
 	CHIP_INPUT_ACTIVE_LOW(SERVE)	// Active low?
 
-
-    //TODO: coin2 and start 2
-#if 0
-    VIDEO(breakout)
-    AUDIO(breakout)
-#endif
-
-#ifdef DEBUG
-	CHIP("LOG1", VCD_LOG, &vcd_log_desc)
-#endif
+    //TODO: start 2
 
    //HSYNC and VSYNC
    #define H1_d 		"L1", 14
@@ -459,7 +453,7 @@ CIRCUIT_LAYOUT( breakout )
    #define B2 		"N6", 13
    #define C2 		"N6", 12
    #define D2 		"N6", 11
-   #define E2 		"M6", 14
+   #define E2s 		"M6", 14
    #define F2 		"M6", 13
    #define G2 		"M6", 12
    #define H02 		"M6", 11	//TODO: better name for these signals
@@ -789,7 +783,7 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("A4", 11, "C4", 9)
 
    CONNECTION(A2, "N5", 1)
-   CONNECTION(E2, "N5", 2)
+   CONNECTION(E2s, "N5", 2)
    CONNECTION(I2, "N5", 3)
    CONNECTION("C5", 6, "N5", 4)
    CONNECTION(A1, "N5", 5)
@@ -1595,22 +1589,31 @@ CIRCUIT_LAYOUT( breakout )
    CONNECTION("VIDEO", Video::HBLANK_PIN, HSYNC)
    CONNECTION("VIDEO", Video::VBLANK_PIN, "E3", 10)
 #else
+   	// VIDEO SUMMING
 	RES(R41, RES_K(3.9))
 	//RES(R42, RES_K(3.9))
 	RES(R42, RES_K(3.9))
 	RES(R43, RES_K(3.9))
 	RES(R51, RES_K(3.9))
 	RES(R52, RES_K(3.9))
+
+#if (SLOW_BUT_ACCURATE)
 	DIODE(CR6, "1N914")
+	NET_C(E2.11, CR6.K)
 
 	NET_C(CR6.A, R41.1, R42.1, R43.1, R51.1, R52.1)
+#else
+	RES_SWITCH(CR6, E2.11, R41.1, GND)
+	PARAM(CR6.RON, 1e20)
+	PARAM(CR6.ROFF, 1)
+	NET_C(R41.1, R42.1, R43.1, R51.1, R52.1)
+#endif
 	CONNECTION("R51", 2, PLAYFIELD)
 	CONNECTION("R43", 2, BSYNC)
 	CONNECTION("R52", 2, SCORE)
 	NET_C(R41.2, B9.3)
 	NET_C(R42.2, V5)
 
-	NET_C(E2.11, CR6.K)
 
 	ALIAS(videomix, R41.1)
 
