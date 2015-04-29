@@ -192,7 +192,7 @@ public:
 	DECLARE_WRITE32_MEMBER( f0_w );
 
 	DECLARE_READ32_MEMBER( unk_r );
-	DECLARE_READ32_MEMBER( rand_r );
+	DECLARE_READ32_MEMBER( unk2_r );
 
 	DECLARE_READ32_MEMBER( serial_r );
 	DECLARE_WRITE32_MEMBER( serial_w );
@@ -523,7 +523,7 @@ READ32_MEMBER( magictg_state::unk_r )
 	return 0x6000;
 }
 
-READ32_MEMBER( magictg_state::rand_r )
+READ32_MEMBER( magictg_state::unk2_r )
 {
 	return 0xffffffff;
 }
@@ -833,7 +833,7 @@ static ADDRESS_MAP_START( magictg_map, AS_PROGRAM, 32, magictg_state )
 	AM_RANGE(0x1b001024, 0x1b001027) AM_READ(adsp_status_r)
 	AM_RANGE(0x1b001108, 0x1b00110b) AM_READ(unk_r)
 	AM_RANGE(0x1e000000, 0x1e002fff) AM_RAM // NVRAM?
-	AM_RANGE(0x1e800000, 0x1e800007) AM_READWRITE(rand_r, serial_w)
+	AM_RANGE(0x1e800000, 0x1e800007) AM_READWRITE(unk2_r, serial_w)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_REGION("mips", 0)
 ADDRESS_MAP_END
 
