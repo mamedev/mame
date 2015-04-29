@@ -3325,12 +3325,12 @@ ROM_START( doa2 )
 	ROM_LOAD("mpr-22119.ic20s",0xa000000, 0x0800000, CRC(d608fa86) SHA1(54c8107cccec8cbb536f13cda5b220b7972190b7) )
 	ROM_LOAD("mpr-22120.ic21s",0xa800000, 0x0800000, CRC(a30facb4) SHA1(70415ca34095c795297486bce1f956f6a8d4817f) )
 
-	// 841-0003    1999     317-5048-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0008ad01" )
-
 	// on-cart X76F100 eeprom contents
 	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "841-0003.sf",  0x000000, 0x000084, CRC(3a119a17) SHA1(d37a092cca7c9cfc5f2637b355af90a65d04013e) )
+
+	// 841-0003    1999     317-5048-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0008ad01" )
 ROM_END
 
 /*
@@ -3397,12 +3397,12 @@ ROM_START( doa2m )
 	ROM_LOAD("mpr-22119.ic20s",0xa000000, 0x0800000, CRC(d608fa86) SHA1(54c8107cccec8cbb536f13cda5b220b7972190b7) )
 	ROM_LOAD("mpr-22120.ic21s",0xa800000, 0x0800000, CRC(a30facb4) SHA1(70415ca34095c795297486bce1f956f6a8d4817f) )
 
-	// 841-0003    1999     317-5048-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0008ad01" )
-
 	// on-cart X76F100 eeprom contents
 	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "841-0003.sf",  0x000000, 0x000084, CRC(3a119a17) SHA1(d37a092cca7c9cfc5f2637b355af90a65d04013e) )
+
+	// 841-0003    1999     317-5048-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "0008ad01" )
 ROM_END
 
 /*
@@ -3454,8 +3454,6 @@ ROM_START( derbyoc )
 	ROM_LOAD("mpr-22097.ic13s", 0x6800000, 0x0800000, CRC(f1dedac5) SHA1(9d4499cbafe80dd0b36be617de7994a96e1e9a01) )
 	ROM_LOAD("mpr-22098.ic14s", 0x7000000, 0x0800000, CRC(f9824d2e) SHA1(f20f8cc2b1bef9077ede1cb874da8f2a335d39de) )
 
-	// 840-0016    1999     317-0262-JPN   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fee35" )
 /*
     838-13661 RS422/RS232C BD DOC
     IC1 - Toshiba TMPZ84C015BF-10 Z80-based MCU
@@ -3467,6 +3465,9 @@ ROM_START( derbyoc )
 */
 	ROM_REGION( 0x10000, "rs422_io", 0 )
 	ROM_LOAD( "epr-22083.ic7",  0x0000, 0x10000, CRC(c70b0de9) SHA1(329c924b4d29017482b1ecca839fb610ca20b2af) )
+
+	// 840-0016    1999     317-0262-JPN   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fee35" )
 ROM_END
 
 ROM_START( derbyocw )
@@ -3746,11 +3747,11 @@ ROM_START( f355 )
 	ROM_LOAD("mpr-21900.ic20s", 0xa000000, 0x0800000, CRC(81901130) SHA1(1573b5c4360e29ba1a4b4901af49d5399fa1e635) )
 	ROM_LOAD("mpr-21901.ic21s", 0xa800000, 0x0800000, CRC(266a3eea) SHA1(795ecc5589a0152b9cf1e03e454ed1ea01501942) )
 
-	// 834-13842   1999     317-0254-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280e8f84" )
-
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
 	ROM_LOAD( "epr-21867.bin", 0x000000, 0x010000, CRC(4f93a2a0) SHA1(875907e7fcfc44850e2c60c12268ac61c742f217) )
+
+	// 834-13842   1999     317-0254-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280e8f84" )
 ROM_END
 
 ROM_START( f355twin )
@@ -3836,12 +3837,12 @@ ROM_START( alpiltdx )
 	ROM_LOAD( "mpr-21737.ic10", 0x5000000, 0x800000, CRC(260aaa98) SHA1(d1082587afe9d79f286df8b107a553ee51c27643) )
 	ROM_LOAD( "mpr-21738.ic11", 0x5800000, 0x800000, CRC(95a592e8) SHA1(862dce467e8805381bab001df68262f1baf3c498) )
 
-	// 834-?????   1999     317-0251-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28070e41" )
-
 	// on-cart X76F100 eeprom contents
 	ROM_REGION( 0x84, "naomibd_eeprom", 0 )
 	ROM_LOAD( "airlinepdx.sf",  0x000000, 0x000084, CRC(404b2add) SHA1(540c8474806775646ace111a2993397b1419fee3) )
+
+	// 834-?????   1999     317-0251-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "28070e41" )
 ROM_END
 
 ROM_START( alpilota )
@@ -4597,9 +4598,6 @@ ROM_START( 18wheelr )
 	ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
 	ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	// 840-0023    2000     317-0273-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
-
 	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
@@ -4609,6 +4607,9 @@ ROM_START( 18wheelr )
 	// 18 Wheeler motor controller 838-13992, code is for a TMPZ84C015 which is Z80 compatible
 	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-23000.ic8", 0x000000, 0x010000, CRC(e3b162f7) SHA1(52c7ad759c3c4a3148764e14d77ba5006bc8af48) )
+
+	// 840-0023    2000     317-0273-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
 ROM_END
 
 /* 18 Wheeler (standard) */
@@ -4639,9 +4640,6 @@ ROM_START( 18wheels )
 	ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
 	ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	// 840-0023    2000     317-0273-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
-
 	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
@@ -4651,6 +4649,9 @@ ROM_START( 18wheels )
 	// 18 Wheeler motor controller 838-13992, code is for a TMPZ84C015 which is Z80 compatible
 	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-23000.ic8", 0x000000, 0x010000, CRC(e3b162f7) SHA1(52c7ad759c3c4a3148764e14d77ba5006bc8af48) )
+
+	// 840-0023    2000     317-0273-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
 ROM_END
 
 /* 18 Wheeler (upright) */
@@ -4681,14 +4682,14 @@ ROM_START( 18wheelu )
 	ROM_LOAD( "mpr-22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
 	ROM_LOAD( "mpr-22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
 
-	// 840-0023    2000     317-0273-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
-
 	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
 	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
 	// later version of the same I/O board (temporary, we'll handle this properly later)
 	ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
+
+	// 840-0023    2000     317-0273-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2807cf54" )
 ROM_END
 
 ROM_START( marstv )
@@ -6106,11 +6107,11 @@ ROM_START( ninjaslt )
 	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
 	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
 
-	// 25469801    2000     317-5068-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
-
 	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
 	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
+
+	// 25469801    2000     317-5068-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
 ROM_END
 
 ROM_START( ninjaslt1 )
@@ -6131,11 +6132,11 @@ ROM_START( ninjaslt1 )
 	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
 	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
 
-	// 25469801    2000     317-5068-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
-
 	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
 	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
+
+	// 25469801    2000     317-5068-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
 ROM_END
 
 ROM_START( ninjaslt2 )
@@ -6156,11 +6157,11 @@ ROM_START( ninjaslt2 )
 	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
 	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
 
-	// 25469801    2000     317-5068-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
-
 	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
 	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
+
+	// 25469801    2000     317-5068-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
 ROM_END
 
 ROM_START( ninjaslt4 )
@@ -6181,11 +6182,11 @@ ROM_START( ninjaslt4 )
 	ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
 	ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
 
-	// 25469801    2000     317-5068-COM   Naomi
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
-
 	ROM_REGION( 0x20000, "jyu_io", 0 )  // H8/3334-based I/O board ROM, eventually should be separated out
 	ROM_LOAD( "jyu1_prg0a.ic3", 0x000000, 0x020000, CRC(aec4dbc1) SHA1(bddd4f345baf7f594998a39c09da18b3834f0ac2) )
+
+	// 25469801    2000     317-5068-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "000ca510" )
 ROM_END
 
 ROM_START( mazan )
@@ -6481,11 +6482,11 @@ ROM_START( starhrse )
 	ROM_LOAD( "mpr-23233.ic3",  0x2800000, 0x1000000, CRC(d6451cab) SHA1(6508e27d0370b19df01150da7baf4875479c166a) )
 	ROM_LOAD( "mpr-23234.ic4",  0x3800000, 0x1000000, CRC(44044c14) SHA1(4934cb8d5f9b4085ffb5ddc711343f488aae4c4d) )
 
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
-
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(951684e4) SHA1(0beaf5827064252293223b946c04b8698e7207bb) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
 ROM_START( starhrct )
@@ -6514,11 +6515,11 @@ ROM_START( starhrct )
 	ROM_LOAD( "ic17s.bin", 0x8800000, 0x800000, CRC(b4c40606) SHA1(4f187dfe44bd89c90b6fa4b90f16222bc0a74d22) )
 	// .18s chip is not present but is tested for an FF fill (pull-up resistors on the PCB's data bus presumably accomplish this)
 
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
-
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(1557297e) SHA1(41e8a7a8eaf5076b124d378afdf97e328d100e72) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
 ROM_START( starhrcl )
@@ -6535,11 +6536,11 @@ ROM_START( starhrcl )
 	ROM_LOAD( "mpr-23280.ic6",  0x5800000, 0x1000000, CRC(b1c8daa2) SHA1(a05fb374156ea013e35502abccc92f5117c39daa) )
 	ROM_LOAD( "mpr-23281.ic7",  0x6800000, 0x0800000, CRC(c0378369) SHA1(c728a181eddb01b9f8574669d4550baed559a5a4) )
 
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
-
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(4929e940) SHA1(f8c4277ca0ae5e36b2eed033cc731b8fc4fccafc) )
+
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
 // this is satellite unit of the main game, server/control and lagre screen units required and need to be dumped
@@ -6592,12 +6593,12 @@ ROM_START( puyofevp )
 
 	ROM_COPY( "rom_board", 0x01000000, 0x400000, 0xc00000 )
 
-	// Actel FPGA stamped 315-6257A, not 317-xxxx like security components, so most likely it doesn't implement M1 encryption
-	ROM_PARAMETER( ":rom_board:key", "0" )
-
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(17150bc9) SHA1(c3af7d91e12141938d2b9e67eb9f5ff961cd09ff) )
+
+	// Actel FPGA stamped 315-6257A, not 317-xxxx like security components, so most likely it doesn't implement M1 encryption
+	ROM_PARAMETER( ":rom_board:key", "0" )
 ROM_END
 
 /* GD-ROM titles - a PIC supplies a decryption key
@@ -7966,15 +7967,15 @@ ROM_START( hopper )
 	ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "epr-24083.ic11", 0x000000, 0x400000, CRC(2733e65a) SHA1(4a5d109d0531bebd8e8f585789adce98cac2ab93) )
 
-	// 840-0130    2002     317-0339-COM   Naomi
-	ROM_PARAMETER( ":rom_board:key", "1e5bb0cd" )
-
 	ROM_REGION( 0x40000, "flash", ROMREGION_ERASEFF)
 	ROM_LOAD( "315-6358a.ic2", 0x000000, 0x020008, CRC(ef442e67) SHA1(70ac91e2ca1ff2dfba48d566e4de68bd8b82f282) )
 
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(ddedf494) SHA1(f1529615711a9871051cd09c2a9b95c90d356874) )
+
+	// 840-0130    2002     317-0339-COM   Naomi
+	ROM_PARAMETER( ":rom_board:key", "1e5bb0cd" )
 ROM_END
 
 ROM_START( clubkrte )
@@ -8101,12 +8102,12 @@ ROM_START( clubkpzb )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
-	// 840-0137    2004     317-0368-COM   Naomi 2
-	ROM_PARAMETER( ":rom_board:key", "997681fe")
-
 	// this dump can't be used as main_eeprom, because that's exactly 0x80 bytes
 	ROM_REGION(0x84, "some_eeprom", 0)
 	ROM_LOAD( "sflash.bin",   0x000000, 0x000084, CRC(afff6471) SHA1(c1e1d349ff25191eba09cd7d7186fbe2c6565b81) )
+
+	// 840-0137    2004     317-0368-COM   Naomi 2
+	ROM_PARAMETER( ":rom_board:key", "997681fe")
 ROM_END
 
 ROM_START( clubk2k3 )
