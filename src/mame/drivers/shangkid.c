@@ -122,7 +122,7 @@ READ8_MEMBER(shangkid_state::soundlatch_r)
 DRIVER_INIT_MEMBER(shangkid_state,chinhero)
 {
 	m_gfx_type = 0;
-	
+
 	save_item(NAME(m_bbx_sound_enable));
 	save_item(NAME(m_sound_latch));
 }
@@ -134,7 +134,7 @@ DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 	/* set up banking */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x0000, 0x10000);
-	
+
 	save_item(NAME(m_bbx_sound_enable));
 	save_item(NAME(m_sound_latch));
 }

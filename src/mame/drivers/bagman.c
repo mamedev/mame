@@ -574,7 +574,7 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -589,7 +589,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( squaitsa, botanic )
 	MCFG_MACHINE_START_OVERRIDE(bagman_state, squaitsa)
-	
+
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_AY8910_PORT_A_READ_CB(READ8(bagman_state, dial_input_p1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(bagman_state, dial_input_p2_r))

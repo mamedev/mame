@@ -137,15 +137,15 @@ static floperr_t imd_read_indexed_sector(floppy_image_legacy *floppy, int head, 
 
 static floperr_t imd_expand_file(floppy_image_legacy *floppy , UINT64 offset , size_t amount)
 {
-        if (amount == 0) {
-                return FLOPPY_ERROR_SUCCESS;
-        }
+		if (amount == 0) {
+				return FLOPPY_ERROR_SUCCESS;
+		}
 
-        UINT64 file_size = floppy_image_size(floppy);
+		UINT64 file_size = floppy_image_size(floppy);
 
-        if (offset > file_size) {
-                return FLOPPY_ERROR_INTERNAL;
-        }
+		if (offset > file_size) {
+				return FLOPPY_ERROR_INTERNAL;
+		}
 
 	UINT64 size_after_off = file_size - offset;
 
@@ -466,10 +466,10 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		for(int i=0; i<sector_count; i++) {
 			UINT8 stype = img[pos++];
-			sects[i].track	     = tnum ? tnum[i] : track;
-			sects[i].head	     = hnum ? hnum[i] : head;
-			sects[i].sector	     = snum[i];
-			sects[i].size	     = ssize;
+			sects[i].track       = tnum ? tnum[i] : track;
+			sects[i].head        = hnum ? hnum[i] : head;
+			sects[i].sector      = snum[i];
+			sects[i].size        = ssize;
 			sects[i].actual_size = actual_size;
 
 			if(stype == 0 || stype > 8) {

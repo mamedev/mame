@@ -8,7 +8,7 @@ public:
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram")	{ }
+		m_videoram(*this, "videoram")   { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -27,14 +27,14 @@ public:
 	DECLARE_WRITE8_MEMBER(palettebank_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_WRITE8_MEMBER(nmi_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(shaolins);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 };

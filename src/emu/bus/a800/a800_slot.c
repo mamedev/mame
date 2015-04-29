@@ -62,7 +62,7 @@ device_a800_cart_interface::~device_a800_cart_interface ()
 void device_a800_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
-	{		
+	{
 		m_rom = device().machine().memory().region_alloc(std::string(tag).append(A800SLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 

@@ -477,12 +477,12 @@ READ8_MEMBER( c8280_device::fk5_r )
 
 	    bit     description
 
-	    0       
-	    1       
-	    2       
+	    0
+	    1
+	    2
 	    3       DCHG
 	    4       TSID
-	    5       
+	    5
 	    6       0
 	    7       0
 

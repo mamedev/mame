@@ -18,7 +18,7 @@
 #include "imagedev/harddriv.h"
 
 class mfm_harddisk_device : public harddisk_image_device,
-                            public device_slot_card_interface
+							public device_slot_card_interface
 {
 public:
 	mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
@@ -30,34 +30,34 @@ public:
 	void setup_seek_complete_cb(seek_complete_cb cb);
 
 	// Active low lines. We're using ASSERT=0 / CLEAR=1
-	line_state		ready_r() { return m_ready? ASSERT_LINE : CLEAR_LINE; }
-	line_state		seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; } ;
-	line_state		trk00_r() { return m_current_cylinder==0? ASSERT_LINE : CLEAR_LINE; } 
+	line_state      ready_r() { return m_ready? ASSERT_LINE : CLEAR_LINE; }
+	line_state      seek_complete_r() { return m_seek_complete? ASSERT_LINE : CLEAR_LINE; } ;
+	line_state      trk00_r() { return m_current_cylinder==0? ASSERT_LINE : CLEAR_LINE; }
 
 	// Step
-	void 			step_w(line_state line);
-	void 			direction_in_w(line_state line);
-	
+	void            step_w(line_state line);
+	void            direction_in_w(line_state line);
+
 protected:
-	void        		device_start();
-	void				device_reset();
-	emu_timer    	  	*m_index_timer, *m_spinup_timer, *m_seek_timer;
-	index_pulse_cb 		m_index_pulse_cb;
-	seek_complete_cb	m_seek_complete_cb;
-	void           		device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	void                device_start();
+	void                device_reset();
+	emu_timer           *m_index_timer, *m_spinup_timer, *m_seek_timer;
+	index_pulse_cb      m_index_pulse_cb;
+	seek_complete_cb    m_seek_complete_cb;
+	void                device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	bool		m_ready;
-	int			m_current_cylinder;
-	int 		m_track_delta;
-	int			m_step_phase;
-	bool 		m_seek_complete;
-	bool		m_seek_inward;
-	//bool		m_seeking;
-	bool		m_autotruncation;
-	line_state	m_step_line;	// keep the last state
-	
-	void 		head_move();
+	bool        m_ready;
+	int         m_current_cylinder;
+	int         m_track_delta;
+	int         m_step_phase;
+	bool        m_seek_complete;
+	bool        m_seek_inward;
+	//bool      m_seeking;
+	bool        m_autotruncation;
+	line_state  m_step_line;    // keep the last state
+
+	void        head_move();
 };
 
 class mfm_hd_generic_device : public mfm_harddisk_device

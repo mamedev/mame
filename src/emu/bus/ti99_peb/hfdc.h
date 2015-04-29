@@ -52,7 +52,7 @@ public:
 
 protected:
 	void device_config_complete();
-	
+
 private:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	void device_start();
@@ -70,7 +70,7 @@ private:
 	void floppy_index_callback(floppy_image_device *floppy, int state);
 	void harddisk_index_callback(mfm_harddisk_device *harddisk, int state);
 	void harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state);
-	
+
 	// Operate the floppy motors
 	void set_floppy_motors_running(bool run);
 
@@ -184,7 +184,7 @@ private:
 
 /* Connector for a MFM hard disk. See also floppy.c */
 class mfm_harddisk_connector : public device_t,
-                               public device_slot_interface
+								public device_slot_interface
 {
 public:
 	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

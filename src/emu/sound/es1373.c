@@ -2,7 +2,7 @@
 
 #define LOG_ES            (0)
 #define LOG_ES_REG        (0)
-#define LOG_ES_FILE      	(0)
+#define LOG_ES_FILE         (0)
 
 
 static MACHINE_CONFIG_FRAGMENT( es1373 )
@@ -122,7 +122,6 @@ void es1373_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 //-------------------------------------------------
 void es1373_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-
 	if (m_dac1.enable) {
 		logerror("%s: sound_stream_update DAC1 not implemented yet\n", tag());
 	}

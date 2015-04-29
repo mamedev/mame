@@ -78,7 +78,7 @@ public:
 
 		// FIXME: this check is needed because update is called during startup as well
 		//if (m_active == 0 && netlist().use_deactivate())
-		//	return;
+		//  return;
 
 		for (int i = 0; i< _numdev; i++)
 		{
@@ -152,7 +152,7 @@ public:
 
 		// FIXME: this check is needed because update is called during startup as well
 		//if (m_active == 0 && netlist().use_deactivate())
-		//	return;
+		//  return;
 
 		m_i[0].activate();
 		m_i[1].activate();

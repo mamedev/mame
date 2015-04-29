@@ -34,20 +34,20 @@ public:
 	// common
 	DECLARE_WRITE8_MEMBER(bank_select_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
-	
+
 	// vigilant and buccanrs
 	DECLARE_WRITE8_MEMBER(vigilant_out2_w);
 	DECLARE_WRITE8_MEMBER(vigilant_horiz_scroll_w);
 	DECLARE_WRITE8_MEMBER(vigilant_rear_horiz_scroll_w);
 	DECLARE_WRITE8_MEMBER(vigilant_rear_color_w);
-	
+
 	// kikcubic
 	DECLARE_WRITE8_MEMBER(kikcubic_coin_w);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
 	virtual void video_reset();
-	
+
 	UINT32 screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_background();

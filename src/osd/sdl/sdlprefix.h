@@ -81,4 +81,3 @@ struct _IO_FILE {};  //_IO_FILE is an opaque type in the emscripten libc which m
 #endif
 
 #endif /* SDLMAME_UNIX */
-

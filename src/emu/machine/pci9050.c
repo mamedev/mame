@@ -1,9 +1,9 @@
 /*********************************************************************
 
     pci9050.c - PLX PCI9050 PCI to 4x Local Bus Bridge
- 
-	by R. Belmont
- 
+
+    by R. Belmont
+
     PCI spaces:
     0 - (config memory) not used
     1 - (config I/O) config regs
@@ -11,12 +11,12 @@
     3 - local bus 2 window
     4 - local bus 3 window
     5 - local bus 4 window
- 
+
     PCI9050 is located, mapped, and initialized at BFC00700.
- 
-	The boot ROM then copies ROM to RAM, jumps to RAM, and starts trying to
+
+    The boot ROM then copies ROM to RAM, jumps to RAM, and starts trying to
     access Zeus 2 video through the mapped windows.
- 
+
 *********************************************************************/
 
 #include "pci9050.h"
@@ -66,12 +66,12 @@ void pci9050_device::device_start()
 
 	pci_device::device_start();
 
-	add_map(0x100, M_MEM, FUNC(pci9050_device::map));			// map 0 is our config registers, mem space
-	add_map(0x100, M_IO,  FUNC(pci9050_device::map));			// map 1 is our config registers, i/o space
+	add_map(0x100, M_MEM, FUNC(pci9050_device::map));           // map 0 is our config registers, mem space
+	add_map(0x100, M_IO,  FUNC(pci9050_device::map));           // map 1 is our config registers, i/o space
 
 	for(int i=0; i<4; i++)
 		if(m_names[i])
-			//			add_map(0, M_MEM | M_DISABLED, m_maps[i], m_names[i], m_devices[i]);
+			//          add_map(0, M_MEM | M_DISABLED, m_maps[i], m_names[i], m_devices[i]);
 			add_map(0, M_MEM | M_DISABLED, trampolines[i], m_names[i]);
 		else
 			add_map(0, M_MEM | M_DISABLED, FUNC(pci9050_device::empty));
@@ -119,8 +119,8 @@ void pci9050_device::remap_local(int id)
 	int size = 2 << lsize;
 	if(csbase & 0x0fffffff & ~(size-1)) {
 		logerror("PCI9050 local bus %d disabled due to unimplemented post-decode remapping\n", id);
-		//		set_map_flags(id+2, M_MEM | M_DISABLED);
-		//		return;
+		//      set_map_flags(id+2, M_MEM | M_DISABLED);
+		//      return;
 	}
 
 	UINT32 mask = ~(size - 1);
@@ -131,8 +131,8 @@ void pci9050_device::remap_local(int id)
 
 	if((lasrr & mask) != mask) {
 		logerror("PCI9050 local bus %d disabled due to unimplemented pci mirroring\n", id);
-		//		set_map_flags(id+2, M_MEM | M_DISABLED);
-		//		return;
+		//      set_map_flags(id+2, M_MEM | M_DISABLED);
+		//      return;
 	}
 
 	set_map_size(id+2, size);

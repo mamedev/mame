@@ -2733,7 +2733,7 @@ ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
-	
+
 	//             1997     317-5038-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
 ROM_END
@@ -2768,7 +2768,7 @@ ROM_START( zerogunaj ) /* Zero Gunner (Japan), Model 2A - Sega game ID# 833-1134
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
-	
+
 	//             1997     317-5038-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "042c0d13" )
 ROM_END
@@ -3572,7 +3572,7 @@ ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-1134
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
-	
+
 	//             1998     317-0236-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
@@ -3623,7 +3623,7 @@ ROM_START( dyndeka2 ) /* Dynamite Deka 2 (Japan), Model 2A */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
-	
+
 	//             1998     317-0236-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "2c2a4a93" )
 ROM_END
@@ -4314,7 +4314,7 @@ ROM_START( pltkidsa ) /* Pilot Kids, Model 2A */
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
-	
+
 	//             1998     317-5044-COM   Model 2
 	ROM_PARAMETER( ":315_5881:key", "042e2dc1" )
 ROM_END

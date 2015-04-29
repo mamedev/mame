@@ -79,19 +79,19 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	
+
 	UINT8 m_reg[0x10];
 	UINT8 *m_videobuf;
 	UINT8 m_lamp_old;
-	
+
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
-	
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(roul);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -223,7 +223,7 @@ ADDRESS_MAP_END
 void roul_state::video_start()
 {
 	m_videobuf = auto_alloc_array_clear(machine(), UINT8, VIDEOBUF_SIZE);
-	
+
 	save_item(NAME(m_reg));
 	save_pointer(NAME(m_videobuf), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));

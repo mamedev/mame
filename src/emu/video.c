@@ -1215,7 +1215,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 		for (int seq = 0; ; seq++)
 		{
 			// build up the filename
-			fname.assign(snapstr);			
+			fname.assign(snapstr);
 			strprintf(seqtext, "%04d", seq);
 			strreplace(fname, "%i", seqtext.c_str());
 

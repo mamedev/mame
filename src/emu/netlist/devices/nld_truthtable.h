@@ -186,7 +186,7 @@ public:
 	{
 		// FIXME: this check is needed because update is called during startup as well
 		//if (m_active == 0 && UNEXPECTED(netlist().use_deactivate()))
-		//	return;
+		//  return;
 
 		UINT32 state = 0;
 		for (int i = 0; i < m_NI; i++)

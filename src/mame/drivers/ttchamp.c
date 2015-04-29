@@ -261,10 +261,10 @@ WRITE16_MEMBER(ttchamp_state::paldat_w)
 
 READ16_MEMBER(ttchamp_state::ttchamp_pic_r)
 {
-//	printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
+//  printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
 	if (picmodex == PIC_SET_READLATCH)
 	{
-//		printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
+//      printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
 		picmodex = PIC_IDLE;
 
 		return m_pic_latched << 8;
@@ -276,29 +276,29 @@ READ16_MEMBER(ttchamp_state::ttchamp_pic_r)
 
 WRITE16_MEMBER(ttchamp_state::ttchamp_pic_w)
 {
-//	printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, picmodex);
+//  printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, picmodex);
 	if (picmodex == PIC_IDLE)
 	{
 		if (data == 0x11)
 		{
 			picmodex = PIC_SET_READADDRESS;
-//			printf("state = SET_READADDRESS\n");
+//          printf("state = SET_READADDRESS\n");
 		}
 		else if (data == 0x12)
 		{
 			picmodex = PIC_SET_WRITELATCH;
-//			printf("latch write data.. \n" );
+//          printf("latch write data.. \n" );
 		}
 		else if (data == 0x20)
 		{
 			picmodex = PIC_SET_WRITEADDRESS;
-//			printf("state = PIC_SET_WRITEADDRESS\n");
+//          printf("state = PIC_SET_WRITEADDRESS\n");
 		}
 		else if (data == 0x21) // write latched data
 		{
 			picmodex = PIC_IDLE;
 			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
-	//		printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
+	//      printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
 		}
 		else if (data == 0x22) // next data to latch
 		{
@@ -306,12 +306,12 @@ WRITE16_MEMBER(ttchamp_state::ttchamp_pic_w)
 			// address by 1 to give correct results? maybe it can read 'previous' data' too?
 			m_pic_latched = m_bakram[m_pic_readaddr>>1];
 
-//			printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
+//          printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
 			picmodex = PIC_SET_READLATCH; // waiting to read...
 		}
 		else
 		{
-//			printf("unknown\n");
+//          printf("unknown\n");
 		}
 	}
 	else if (picmodex == PIC_SET_READADDRESS)

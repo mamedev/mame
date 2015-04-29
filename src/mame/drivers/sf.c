@@ -140,7 +140,7 @@ WRITE8_MEMBER(sf_state::soundcmd_w)
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
-    membank("bank1")->set_entry(data);
+	membank("bank1")->set_entry(data);
 }
 
 WRITE8_MEMBER(sf_state::msm1_5205_w)
@@ -395,7 +395,7 @@ static INPUT_PORTS_START( sfan )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "DSW2.13E:1" ) // Flip Screen not available
-	
+
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x0400, 0x0400, "Number of Countries Selected" )  PORT_DIPLOCATION("DSW4.11E:3")
 	PORT_DIPSETTING(      0x0400, "4" )
@@ -523,8 +523,8 @@ void sf_state::machine_start()
 	save_item(NAME(m_active));
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_fgscroll));
-    
-    membank("bank1")->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
+
+	membank("bank1")->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
 }
 
 void sf_state::machine_reset()

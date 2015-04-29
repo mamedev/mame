@@ -5547,5 +5547,3 @@ READ16_MEMBER(mach8_device::mach8_config2_r)
 {
 	return 0x0002;
 }
-
-

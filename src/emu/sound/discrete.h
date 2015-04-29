@@ -4128,7 +4128,7 @@ enum {
 #define IS_VALUE_A_NODE(val)    (((val) > NODE_START) && ((val) <= NODE_END))
 
 // Optional node such as used in CR_FILTER
-#define OPT_NODE(val)	(int) val
+#define OPT_NODE(val)   (int) val
 /*************************************
  *
  *  Enumerated values for Node types

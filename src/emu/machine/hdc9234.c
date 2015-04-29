@@ -240,7 +240,7 @@ enum
 {
 	GEN_TIMER = 1,
 	COM_TIMER /*,
-	LIVE_TIMER */
+    LIVE_TIMER */
 };
 
 /*
@@ -1820,7 +1820,7 @@ void hdc9234_device::live_run()
     the requested data are read.
     limit: if unlimited (attotime::never), run up to the end of the track and wait there
     otherwise, used to replay the read/write operation up to the point where the event happened
-    
+
     THIS IS THE FLOPPY-ONLY LIVE_RUN
 */
 void hdc9234_device::live_run_until(attotime limit)
@@ -2632,12 +2632,12 @@ void hdc9234_device::live_run_until(attotime limit)
     the requested data are read.
     limit: if unlimited (attotime::never), run up to the end of the track and wait there
     otherwise, used to replay the read/write operation up to the point where the event happened
-    
+
     THIS IS THE HARDDISK-ONLY LIVE_RUN
 */
 void hdc9234_device::live_run_hd_until(attotime limit)
 {
-//	int slot = 0;
+//  int slot = 0;
 	logerror("%s: live_run_hd\n", tag());
 
 	if (m_live_state.state == IDLE || m_live_state.next_state != -1)
@@ -2656,7 +2656,7 @@ void hdc9234_device::live_run_hd_until(attotime limit)
 		{
 			case SEARCH_IDAM:
 				break;
-		}		
+		}
 		return;
 	}
 }
@@ -3411,8 +3411,8 @@ void hdc9234_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		process_command();
 		break;
 	/* case LIVE_TIMER:
-		live_run();
-		break; */
+	    live_run();
+	    break; */
 	}
 }
 

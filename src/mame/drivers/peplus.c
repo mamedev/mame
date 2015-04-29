@@ -7909,7 +7909,7 @@ SA$ - Sequential ACE$ pays the same as RF
 	ROM_LOAD( "mgo-cg2172.u78",  0x08000, 0x8000, CRC(fff049bc) SHA1(d4b340e0c932db767cade56a55b649c80750fee4) )
 	ROM_LOAD( "mbo-cg2172.u79",  0x10000, 0x8000, CRC(1665c6be) SHA1(4650b9d8336434ce531c31b63e7780b47ef4e985) )
 	ROM_LOAD( "mxo-cg2172.u80",  0x18000, 0x8000, CRC(cc9d64e4) SHA1(4bf78e49150ca6fb4a05f3320f712bbbabcacf56) )
-	
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Philips N82S147N */
 ROM_END

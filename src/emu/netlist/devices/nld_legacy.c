@@ -53,7 +53,6 @@ NETLIB_RESET(nicDelay)
 
 NETLIB_UPDATE_PARAM(nicDelay)
 {
-
 }
 
 NETLIB_UPDATE(nicDelay)

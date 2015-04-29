@@ -139,7 +139,7 @@ netlist_base_t::netlist_base_t()
 	:   netlist_object_t(NETLIST, GENERIC),
 		m_stop(netlist_time::zero),
 		// FIXME:: Use a parameter to set this on a schematics per schematics basis
-	    m_use_deactivate(USE_DEACTIVE_DEVICE),
+		m_use_deactivate(USE_DEACTIVE_DEVICE),
 		m_time(netlist_time::zero),
 		m_queue(*this),
 		m_mainclock(NULL),

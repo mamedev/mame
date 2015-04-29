@@ -269,7 +269,7 @@ READ16_MEMBER(aw_rom_board::pio_r)
 WRITE16_MEMBER(aw_rom_board::pio_w)
 {
 	// write to ROM board address space, including FlashROM programming using CFI (TODO)
-	if (epr_offset == 0x7fffff)	// special register which changes ROMBD addressing
+	if (epr_offset == 0x7fffff) // special register which changes ROMBD addressing
 		adjust_off = data;
 	epr_offset++;
 }

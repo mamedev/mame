@@ -45,16 +45,16 @@ void midi_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, in
 			0x52,   // A2#
 			0x53,   // B2
 		};
-	
+
 		int i;
-	
+
 		UINT32 kbstate = m_keyboard->read();
 		if(kbstate != m_keyboard_state)
 		{
 			for (i=0; i < 24; i++)
 			{
 				int kbnote = keyboard_notes[i];
-	
+
 				if ((m_keyboard_state & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
 				{
 					// key was on, now off -> send Note Off message
@@ -74,7 +74,7 @@ void midi_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, in
 		else
 			// no messages, send Active Sense message instead
 			push_tx(0xfe);
-	
+
 		m_keyboard_state = kbstate;
 		if(is_transmit_register_empty())
 			tra_complete();

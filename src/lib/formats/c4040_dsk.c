@@ -41,9 +41,9 @@ const c4040_format::format c4040_format::file_formats[] = {
 const int c4040_format::c4040_gap2[] =
 {
 	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, // 1-17
-	19, 19, 19, 19, 19, 19, 19, 									    // 18-24
-	15, 15, 15, 15, 15, 15, 											// 25-30
-	12, 12, 12, 12, 12													// 31-35
+	19, 19, 19, 19, 19, 19, 19,                                         // 18-24
+	15, 15, 15, 15, 15, 15,                                             // 25-30
+	12, 12, 12, 12, 12                                                  // 31-35
 };
 
 floppy_image_format_t::desc_e* c4040_format::get_sector_desc(const format &f, int &current_size, int sector_count, UINT8 id1, UINT8 id2, int gap_2)

@@ -15,14 +15,14 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 
 	tilemap_t *m_tilemap;
-	
+
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(videoram_attr_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	
+
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(sbugger);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

@@ -24,14 +24,14 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 
 2014-10-11: Replaced above code with MESS-compliant code [Meeso Kim]
 
- 
-IMPORTANT NOTE for tape usage: you *FIRST* press PLAY on the tape drive 
-  (e.g. by pressing F2 in partial emulated keyboard mode) and *THEN* you 
+
+IMPORTANT NOTE for tape usage: you *FIRST* press PLAY on the tape drive
+  (e.g. by pressing F2 in partial emulated keyboard mode) and *THEN* you
   type LOAD on the BASIC prompt!
   Otherwise, the system turns the tape motor ON but it does not receive any
   data from tape, and it turns it OFF before the user can press PLAY.
- 
- 
+
+
 ****************************************************************************/
 /*
  * SAMSUNG SPC-1000 Series (info from zannylim)

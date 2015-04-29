@@ -37,7 +37,7 @@
 
 #define USE_DEACTIVE_DEVICE     (0)
 
-#define USE_TRUTHTABLE			(0)
+#define USE_TRUTHTABLE          (0)
 
 // The following adds about 10% performance ...
 

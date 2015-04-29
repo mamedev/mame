@@ -5246,7 +5246,7 @@ static MACHINE_CONFIG_DERIVED( jumpbug, galaxian_base )
 	MCFG_CPU_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)	/* matches PCB video - unconfirmed */
+	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)    /* matches PCB video - unconfirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

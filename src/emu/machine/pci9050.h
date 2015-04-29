@@ -1,9 +1,9 @@
 /*********************************************************************
 
     pci9050.h - PLX PCI9050 PCI to 4x Local Bus Bridge
- 
-	by R. Belmont
- 
+
+    by R. Belmont
+
 *********************************************************************/
 
 #ifndef _PCI9050_H
@@ -17,7 +17,7 @@
 #define MCFG_PCI9050_SET_MAP(id, map) \
 	downcast<pci9050_device *>(device)->set_map(id, ADDRESS_MAP_NAME(map), #map, owner);
 
-class pci9050_device : 
+class pci9050_device :
 	public pci_device
 {
 public:

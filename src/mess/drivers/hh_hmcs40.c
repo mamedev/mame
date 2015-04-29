@@ -25,7 +25,7 @@
  @73      HD38800A  1982, Bandai(Mattel) Star Hawk (PT-317B)
  @77      HD38800A  1982, Bandai Frisky Tom (PT-327A)
  @88      HD38800A  1984, Tomy Tron (THN-02)
- 
+
  @01      HD38800B  1982, Gakken Crazy Kong
  @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
@@ -795,7 +795,7 @@ MACHINE_CONFIG_END
   * PCBs are labeled Kaken, PT-317B
   * Hitachi HD38800A73 MCU
   * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
-  
+
   Kaken was a subsidiary of Bandai. The original Japanese release is unknown,
   was it canceled and only released in the USA?
 
@@ -1084,7 +1084,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 
 	// D8-D15: vfd matrix grid
 	m_grid = data >> 8 & 0xff;
-	
+
 	// D0-D3: plate 15-18 (update display there)
 	plate_w(space, 4, data & 0xf);
 }
@@ -1233,7 +1233,7 @@ MACHINE_CONFIG_END
   Coleco Alien Attack (manufactured in Taiwan)
   * Hitachi HD38800A25 MCU
   * cyan/red VFD display Futaba DM-19Z 1J
-  
+
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
   action-oriented game.
 
@@ -1960,7 +1960,7 @@ MACHINE_CONFIG_END
   * PCB labels ENTEX PAC-MAN PB-093/094 80-210149/50/51
   * Hitachi QFP HD38820A23 MCU
   * cyan/red VFD display Futaba DM-28Z 1G(cyan Pac-Man) or DM-28 1K(orange Pac-Man)
-  
+
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
   NOTE!: MESS external artwork is recommended
@@ -2406,7 +2406,7 @@ MACHINE_CONFIG_END
   * PCB label MEL-001 Baseball Rev. B
   * Hitachi QFP HD38820A09 MCU
   * cyan/red/green VFD display Futaba DM-24ZK 1G, with etched overlay
-  
+
   To start the game in 2-player mode, simply turn the game on. For 1-player,
   turn the game on while holding the 1-key and use the visitor's side keypad
   to play offsense.

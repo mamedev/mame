@@ -715,7 +715,7 @@ ROM_END
 DRIVER_INIT_MEMBER(shangha3_state,shangha3)
 {
 	m_do_shadows = 1;
-	
+
 	save_item(NAME(m_prot_count));
 }
 

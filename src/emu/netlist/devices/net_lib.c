@@ -122,7 +122,7 @@ void nl_initialize_factory(netlist_factory_t &factory)
 	ENTRY(74175,                TTL_74175,              "-")
 	ENTRY(74192,                TTL_74192,              "-")
 	ENTRY(74193,                TTL_74193,              "-")
-	//ENTRY(74279, 	            TTL_74279,              "-") // only dip available
+	//ENTRY(74279,              TTL_74279,              "-") // only dip available
 	ENTRY(SN74LS629,            SN74LS629,              "CAP")
 	ENTRY(82S16,                TTL_82S16,              "-")
 	ENTRY(9310,                 TTL_9310,               "-")

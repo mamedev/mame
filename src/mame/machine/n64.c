@@ -2264,7 +2264,7 @@ void n64_periphs::dd_read_sector()
 	for(int i = 0; i < ddZoneSecSize[dd_zone]/4; i++)
 	{
 		dd_sector_data[i] = sector[(i*4 + 0)] << 24 | sector[(i*4 + 1)] << 16 |
-		                    sector[(i*4 + 2)] << 8  | sector[(i*4 + 3)];
+							sector[(i*4 + 2)] << 8  | sector[(i*4 + 3)];
 	}
 	return;
 }

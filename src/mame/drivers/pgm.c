@@ -4263,10 +4263,10 @@ GAME( 2001, ddp2101c,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,
 GAME( 2001, ddp2100c,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (China, ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 
-// japan region only? service mode calls it Dragon World 2001 so I'm leaving that title in the description 
+// japan region only? service mode calls it Dragon World 2001 so I'm leaving that title in the description
 GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001, pgm_arm_type2_state,   dw2001,    ROT0,   "IGS", "Chuugokuryuu 2001 [Dragon World 2001] (V100?, Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/21/01 16:05:16
 
-// japan region only? service mode calls it Dragon World Pretty Chance so I'm leaving that title in the description 
+// japan region only? service mode calls it Dragon World Pretty Chance so I'm leaving that title in the description
 GAME( 2001, dwpc,         pgm,       pgm_arm_type2,     dw2001, pgm_arm_type2_state,   dwpc,      ROT0,   "IGS", "Chuugokuryuu Pretty Chance [Dragon World Pretty Chance] (V101, Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 09/26/01 10:23:26
 
 // we bypass the internal ARM rom on these, ideally it should still be dumped tho! the region screens show a blank string where the internal ROM revision would otherwise be displayed

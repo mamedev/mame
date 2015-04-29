@@ -11,9 +11,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- if port A is bidirectional, port B does not issue interrupts in bit mode
+    - if port A is bidirectional, port B does not issue interrupts in bit mode
 
 */
 
@@ -255,7 +255,7 @@ void z80pio_device::check_interrupts()
 	for (int index = PORT_A; index < PORT_COUNT; index++)
 	{
 		if (LOG) logerror("Z80PIO '%s' Port %c IE %s IP %s IUS %s\n", tag(), 'A' + index, m_port[index].m_ie ? "1":"0", m_port[index].m_ip ? "1":"0", m_port[index].m_ius ? "1":"0");
-		
+
 		if (!ius && m_port[index].m_ie && m_port[index].m_ip)
 		{
 			state = ASSERT_LINE;

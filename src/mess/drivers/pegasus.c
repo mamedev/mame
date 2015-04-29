@@ -383,7 +383,7 @@ static GFXDECODE_START( pegasus )
 GFXDECODE_END
 
 
-// An encrypted single rom starts with 02, decrypted with 20. 
+// An encrypted single rom starts with 02, decrypted with 20.
 // The 2nd and 3rd part of a multi-rom set will have no obvious byte,
 // so we check the first 4 bytes for a signature, and decrypt if found.
 void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)

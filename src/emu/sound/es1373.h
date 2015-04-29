@@ -66,10 +66,10 @@
 #define SCTRL_P2_S_MASK       0x0000000C
 #define SCTRL_P1_S_MASK       0x00000003
 
-#define SCTRL_8BIT_MONO				0x0
-#define SCTRL_8BIT_STEREO			0x1
-#define SCTRL_16BIT_MONO			0x2
-#define SCTRL_16BIT_STEREO		0x3
+#define SCTRL_8BIT_MONO             0x0
+#define SCTRL_8BIT_STEREO           0x1
+#define SCTRL_16BIT_MONO            0x2
+#define SCTRL_16BIT_STEREO      0x3
 
 #define ES_PCI_READ 0
 #define ES_PCI_WRITE 1

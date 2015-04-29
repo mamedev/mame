@@ -24,7 +24,7 @@
 nld_9312::truthtable_t nld_9312::m_ttbl;
 
 /* FIXME: Data changes are propagating faster than changing selects A,B,C
- * 		  Please refer to data sheet.
+ *        Please refer to data sheet.
  *        This would require a state machine, thus we do not
  *        do this right now.
  */
