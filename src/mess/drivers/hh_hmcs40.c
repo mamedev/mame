@@ -1104,6 +1104,12 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // port R2x
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
@@ -1113,6 +1119,7 @@ static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bdoramon_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bdoramon_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bdoramon_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(2, IOPORT("IN.3"))
 	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bdoramon_state, plate_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(bdoramon_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))

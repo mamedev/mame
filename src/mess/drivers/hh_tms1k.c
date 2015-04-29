@@ -632,6 +632,10 @@ MACHINE_CONFIG_END
   * TMS1170NLN MP1525-N2 (die labeled MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1bit sound
 
+  known releases:
+  - USA: Head to Head Baseball
+  - Japan: Computer Baseball, published by Tsukuda
+
 ***************************************************************************/
 
 class h2hbaseb_state : public hh_tms1k_state
