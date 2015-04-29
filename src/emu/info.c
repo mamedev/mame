@@ -1080,7 +1080,7 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				std::string output;
 
 				std::string newtag(port->tag()), oldtag(":");
-				newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length()); 
+				newtag = newtag.substr(newtag.find(oldtag.append(root_tag).c_str()) + oldtag.length());
 
 				// output the switch name information
 				std::string normalized_field_name(xml_normalize_string(field->name()));

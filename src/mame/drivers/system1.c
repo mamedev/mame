@@ -2747,9 +2747,9 @@ ROM_END
 
 ROM_START( spattera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr6597.116",   0x0000, 0x4000, BAD_DUMP CRC(be80384d) SHA1(9e1f5807492b98c3f36a5b80466dcb2a1f1fead8) ) /* encrypted */ // consistent read, but fails ingame ROM check on PCB
-	ROM_LOAD( "epr6598.109",   0x4000, 0x4000, CRC(5dff037a) SHA1(8e6f6b75a89609ab0498d317c11e6d653343ffbe) ) /* encrypted */
-	ROM_LOAD( "epr6599.96",    0x8000, 0x4000, CRC(7ba9de5b) SHA1(f18542c95e8241433ed995c213924ad1ce03cd5b) )
+	ROM_LOAD( "epr-6597.116",   0x0000, 0x4000, BAD_DUMP CRC(be80384d) SHA1(9e1f5807492b98c3f36a5b80466dcb2a1f1fead8) ) /* encrypted */ // consistent read, but fails ingame ROM check on PCB
+	ROM_LOAD( "epr-6598.109",   0x4000, 0x4000, CRC(5dff037a) SHA1(8e6f6b75a89609ab0498d317c11e6d653343ffbe) ) /* encrypted */
+	ROM_LOAD( "epr-6599.96",    0x8000, 0x4000, CRC(7ba9de5b) SHA1(f18542c95e8241433ed995c213924ad1ce03cd5b) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6316.120",   0x0000, 0x2000, CRC(1df95511) SHA1(5780631c8c5a2c3fcd4085f217affa660d72a4e9) )

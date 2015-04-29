@@ -1,6 +1,6 @@
 /*
 
-	Cirrus Logic GD542x/3x video chipsets
+    Cirrus Logic GD542x/3x video chipsets
 
 */
 
@@ -126,7 +126,7 @@ void cirrus_gd5428_device::device_reset()
 	m_blt_source = m_blt_dest = m_blt_source_current = m_blt_dest_current = 0;
 	memset(m_ext_palette, 0, sizeof(m_ext_palette));
 	m_ext_palette_enabled = false;
-//	m_ext_palette[15].red = m_ext_palette[15].green = m_ext_palette[15].blue = 0xff;  // default?  Win3.1 doesn't seem to touch the extended DAC, or at least, it enables it, then immediately disables it then sets a palette...
+//  m_ext_palette[15].red = m_ext_palette[15].green = m_ext_palette[15].blue = 0xff;  // default?  Win3.1 doesn't seem to touch the extended DAC, or at least, it enables it, then immediately disables it then sets a palette...
 }
 
 UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -201,7 +201,7 @@ UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &
 			}
 		}
 	}
-	return 0;	
+	return 0;
 }
 
 void cirrus_gd5428_device::cirrus_define_video_mode()
@@ -209,7 +209,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 	UINT8 divisor = 1;
 	float clock;
 	UINT8 clocksel = (vga.miscellaneous_output & 0xc) >> 2;
-	
+
 	svga.rgb8_en = 0;
 	svga.rgb15_en = 0;
 	svga.rgb16_en = 0;
@@ -226,7 +226,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 		clock = 14.31818f * ((float)numerator / ((float)denominator * mul));
 		clock *= 1000000;
 	}
-	
+
 	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))
 	{
 		switch(vga.sequencer.data[0x07] & 0x0E)
@@ -247,7 +247,7 @@ UINT16 cirrus_gd5428_device::offset()
 
 	if (svga.rgb8_en == 1) // guess
 		off <<= 2;
-//	popmessage("Offset: %04x  %s %s ** -- actual: %04x",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",off);
+//  popmessage("Offset: %04x  %s %s ** -- actual: %04x",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",off);
 	return off;
 }
 
@@ -259,7 +259,7 @@ void cirrus_gd5428_device::start_bitblt()
 
 	m_blt_source_current = m_blt_source;
 	m_blt_dest_current = m_blt_dest;
-	
+
 	for(y=0;y<m_blt_height;y++)
 	{
 		for(x=0;x<m_blt_width;x++)
@@ -289,13 +289,13 @@ void cirrus_gd5428_device::copy_pixel()
 {
 	UINT8 src = vga.memory[m_blt_source_current % vga.svga_intf.vram_size];
 	UINT8 dst = vga.memory[m_blt_dest_current % vga.svga_intf.vram_size];
-	
+
 	if(m_blt_mode & 0x40)  // enable 8x8 pattern
 	{
 		if(m_blt_mode & 0x80)  // colour expand
 			src = (vga.memory[m_blt_source % vga.svga_intf.vram_size] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? 0xff : 0x00;
 	}
-	
+
 	switch(m_blt_rop)
 	{
 	case 0x00:  // BLACK
@@ -728,7 +728,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
 						vga.dac.read_index++;
 					}
 				}
-			}				
+			}
 			break;
 		case 0x0f:
 			res = cirrus_gc_reg_read(vga.gc.index);
@@ -767,9 +767,9 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 						break;
 					}
 					vga.dac.dirty=1;
-					if (vga.dac.state==3) 
+					if (vga.dac.state==3)
 					{
-						vga.dac.state=0; 
+						vga.dac.state=0;
 						vga.dac.write_index++;
 					}
 				}
@@ -985,14 +985,14 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 
 	// Is the display address adjusted automatically when not using Chain-4 addressing?  The GD542x BIOS doesn't do it, but Virtual Pool expects it.
 	if(!(vga.sequencer.data[4] & 0x8))
-		addr <<= 2;	
+		addr <<= 2;
 
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		UINT8 data = 0;
 		if(gc_mode_ext & 0x01)
 		{
-			if(offset & 0x10000) 
+			if(offset & 0x10000)
 				return 0;
 			if(offset < 0x8000)
 				offset &= 0x7fff;
@@ -1069,7 +1069,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	{
 		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
 		UINT8 i,data;
-//		UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+//      UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
 
 		data = 0;
 		//printf("%08x\n",offset);
@@ -1119,11 +1119,11 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 
 	// Is the display address adjusted automatically when using Chain-4 addressing?  The GD542x BIOS doesn't do it, but Virtual Pool expects it.
 	if(!(vga.sequencer.data[4] & 0x8))
-		addr <<= 2;	
+		addr <<= 2;
 
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
-		if(offset & 0x10000) 
+		if(offset & 0x10000)
 			return;
 		if(gc_mode_ext & 0x01)
 		{
@@ -1163,7 +1163,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 			}
 			return;
 		}
-		
+
 		if(vga.sequencer.data[4] & 0x8)
 			vga.memory[(offset+addr) % vga.svga_intf.vram_size] = data;
 		else
@@ -1208,7 +1208,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 		{
 		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
 			UINT8 i;
-//			UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+//          UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
 
 			for(i=0;i<4;i++)
 			{
@@ -1227,4 +1227,3 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 		}
 	}
 }
-

@@ -25,7 +25,7 @@
  @73      HD38800A  1982, Bandai(Mattel) Star Hawk (PT-317B)
  @77      HD38800A  1982, Bandai Frisky Tom (PT-327A)
  @88      HD38800A  1984, Tomy Tron (THN-02)
- 
+
  @01      HD38800B  1982, Gakken Crazy Kong
  @23      HD38800B  1982, Tomy Kingman (THF-01II)
  *24      HD38800B  1982, Actronics(Hanzawa) Wanted G-Man
@@ -795,7 +795,7 @@ MACHINE_CONFIG_END
   * PCBs are labeled Kaken, PT-317B
   * Hitachi HD38800A73 MCU
   * cyan/red VFD display Futaba DM-41ZK, with partial color overlay + bezel
-  
+
   Kaken was a subsidiary of Bandai. The original Japanese release is unknown,
   was it canceled and only released in the USA?
 
@@ -1084,7 +1084,7 @@ WRITE16_MEMBER(bdoramon_state::grid_w)
 
 	// D8-D15: vfd matrix grid
 	m_grid = data >> 8 & 0xff;
-	
+
 	// D0-D3: plate 15-18 (update display there)
 	plate_w(space, 4, data & 0xf);
 }
@@ -1104,6 +1104,12 @@ static INPUT_PORTS_START( bdoramon )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0xff8f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // port R2x
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Factory Test" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
@@ -1113,6 +1119,7 @@ static MACHINE_CONFIG_START( bdoramon, bdoramon_state )
 	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bdoramon_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bdoramon_state, plate_w))
 	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bdoramon_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(2, IOPORT("IN.3"))
 	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bdoramon_state, plate_w))
 	MCFG_HMCS40_WRITE_D_CB(WRITE16(bdoramon_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
@@ -1226,7 +1233,7 @@ MACHINE_CONFIG_END
   Coleco Alien Attack (manufactured in Taiwan)
   * Hitachi HD38800A25 MCU
   * cyan/red VFD display Futaba DM-19Z 1J
-  
+
   It looks like Coleco took Gakken's Heiankyo Alien and turned it into a more
   action-oriented game.
 
@@ -1953,7 +1960,7 @@ MACHINE_CONFIG_END
   * PCB labels ENTEX PAC-MAN PB-093/094 80-210149/50/51
   * Hitachi QFP HD38820A23 MCU
   * cyan/red VFD display Futaba DM-28Z 1G(cyan Pac-Man) or DM-28 1K(orange Pac-Man)
-  
+
   2 VFD revisions are known, the difference is Pac-Man's color: cyan or red.
 
   NOTE!: MESS external artwork is recommended
@@ -2399,7 +2406,7 @@ MACHINE_CONFIG_END
   * PCB label MEL-001 Baseball Rev. B
   * Hitachi QFP HD38820A09 MCU
   * cyan/red/green VFD display Futaba DM-24ZK 1G, with etched overlay
-  
+
   To start the game in 2-player mode, simply turn the game on. For 1-player,
   turn the game on while holding the 1-key and use the visitor's side keypad
   to play offsense.

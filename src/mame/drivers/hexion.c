@@ -332,4 +332,3 @@ ROM_END
 
 GAME( 1992, hexion, 0,      hexion, hexion, driver_device, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)", 0 )
 GAME( 1992, hexionb,hexion, hexionb,hexion, driver_device, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA
-

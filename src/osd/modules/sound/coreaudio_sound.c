@@ -847,9 +847,9 @@ bool sound_coreaudio::extract_effect_info(
 	CFTypeRef subtype_val = NULL;
 	CFTypeRef manufacturer_val = NULL;
 	if (CFDictionaryContainsKey(desc, CFSTR("ComponentType"))
-	 && CFDictionaryContainsKey(desc, CFSTR("ComponentSubType"))
-	 && CFDictionaryContainsKey(desc, CFSTR("ComponentManufacturer"))
-	 && CFDictionaryContainsKey(desc, CFSTR("ClassInfo")))
+		&& CFDictionaryContainsKey(desc, CFSTR("ComponentSubType"))
+		&& CFDictionaryContainsKey(desc, CFSTR("ComponentManufacturer"))
+		&& CFDictionaryContainsKey(desc, CFSTR("ClassInfo")))
 	{
 		type_val = CFDictionaryGetValue(desc, CFSTR("ComponentType"));
 		subtype_val = CFDictionaryGetValue(desc, CFSTR("ComponentSubType"));
@@ -857,8 +857,8 @@ bool sound_coreaudio::extract_effect_info(
 		class_info = CFDictionaryGetValue(desc, CFSTR("ClassInfo"));
 	}
 	else if (CFDictionaryContainsKey(desc, CFSTR(kAUPresetTypeKey))
-		  && CFDictionaryContainsKey(desc, CFSTR(kAUPresetSubtypeKey))
-		  && CFDictionaryContainsKey(desc, CFSTR(kAUPresetManufacturerKey)))
+			&& CFDictionaryContainsKey(desc, CFSTR(kAUPresetSubtypeKey))
+			&& CFDictionaryContainsKey(desc, CFSTR(kAUPresetManufacturerKey)))
 	{
 		type_val = CFDictionaryGetValue(desc, CFSTR(kAUPresetTypeKey));
 		subtype_val = CFDictionaryGetValue(desc, CFSTR(kAUPresetSubtypeKey));
@@ -875,16 +875,16 @@ bool sound_coreaudio::extract_effect_info(
 
 	SInt64 type_int, subtype_int, manufacturer_int;
 	if ((NULL == type_val)
-	 || (NULL == subtype_val)
-	 || (NULL == manufacturer_val)
-	 || (NULL == class_info)
-	 || (CFNumberGetTypeID() != CFGetTypeID(type_val))
-	 || (CFNumberGetTypeID() != CFGetTypeID(subtype_val))
-	 || (CFNumberGetTypeID() != CFGetTypeID(manufacturer_val))
-	 || (CFDictionaryGetTypeID() != CFGetTypeID(class_info))
-	 || !CFNumberGetValue((CFNumberRef)type_val, kCFNumberSInt64Type, &type_int)
-	 || !CFNumberGetValue((CFNumberRef)subtype_val, kCFNumberSInt64Type, &subtype_int)
-	 || !CFNumberGetValue((CFNumberRef)manufacturer_val, kCFNumberSInt64Type, &manufacturer_int))
+		|| (NULL == subtype_val)
+		|| (NULL == manufacturer_val)
+		|| (NULL == class_info)
+		|| (CFNumberGetTypeID() != CFGetTypeID(type_val))
+		|| (CFNumberGetTypeID() != CFGetTypeID(subtype_val))
+		|| (CFNumberGetTypeID() != CFGetTypeID(manufacturer_val))
+		|| (CFDictionaryGetTypeID() != CFGetTypeID(class_info))
+		|| !CFNumberGetValue((CFNumberRef)type_val, kCFNumberSInt64Type, &type_int)
+		|| !CFNumberGetValue((CFNumberRef)subtype_val, kCFNumberSInt64Type, &subtype_int)
+		|| !CFNumberGetValue((CFNumberRef)manufacturer_val, kCFNumberSInt64Type, &manufacturer_int))
 	{
 		osd_printf_error(
 				"%s is not a valid AudioUnit effect description: incorrect property type(s)\n",

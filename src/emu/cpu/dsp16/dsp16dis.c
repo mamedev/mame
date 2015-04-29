@@ -101,7 +101,7 @@ std::string disasmF2Field(const UINT8& F2, const UINT8& D, const UINT8& S)
 		case 0x05: strprintf(ret, "a%d = a%d << 8", D, S); break;
 		case 0x06: strprintf(ret, "a%d = a%d >> 16", D, S); break;
 		case 0x07: strprintf(ret, "a%d = a%d << 16", D, S); break;
-			   
+
 		case 0x08: strprintf(ret, "a%d = p", D); break;
 		case 0x09: strprintf(ret, "a%dh = a%dh + 1", D, S); break;
 		case 0x0a: strprintf(ret, "RESERVED"); break;

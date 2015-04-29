@@ -69,7 +69,7 @@ public:
 	void rom_map_setup(UINT32 size);
 	void ram_map_setup(UINT8 banks);
 
-	virtual void set_additional_wirings(UINT8 mask, int shift) { }	// MBC-1 will then overwrite this!
+	virtual void set_additional_wirings(UINT8 mask, int shift) { }  // MBC-1 will then overwrite this!
 	void set_has_timer(bool val) { has_timer = val; }
 	void set_has_rumble(bool val) { has_rumble = val; }
 	void set_has_battery(bool val) { has_battery = val; }

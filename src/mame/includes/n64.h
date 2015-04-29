@@ -339,16 +339,16 @@ extern const device_type N64PERIPH;
 #define DD_SEQ_MICRO_INT_MASK    0x80000000
 #define DD_SEQ_MICRO_PC_ENABLE   0x40000000
 
-#define SECTORS_PER_BLOCK	85
-#define BLOCKS_PER_TRACK	2
+#define SECTORS_PER_BLOCK   85
+#define BLOCKS_PER_TRACK    2
 
 const unsigned int ddZoneSecSize[16] = {232,216,208,192,176,160,144,128,
-                                        216,208,192,176,160,144,128,112};
+										216,208,192,176,160,144,128,112};
 const unsigned int ddZoneTrackSize[16] = {158,158,149,149,149,149,149,114,
-                                          158,158,149,149,149,149,149,114};
+											158,158,149,149,149,149,149,114};
 const unsigned int ddStartOffset[16] =
 	{0x0,0x5F15E0,0xB79D00,0x10801A0,0x1523720,0x1963D80,0x1D414C0,0x20BBCE0,
-	 0x23196E0,0x28A1E00,0x2DF5DC0,0x3299340,0x36D99A0,0x3AB70E0,0x3E31900,0x4149200};
+		0x23196E0,0x28A1E00,0x2DF5DC0,0x3299340,0x36D99A0,0x3AB70E0,0x3E31900,0x4149200};
 
 
 

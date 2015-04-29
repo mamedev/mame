@@ -11,7 +11,7 @@
 
     References:
     [1] ST225 OEM Manual, Seagate
-    
+
 **************************************************************************/
 
 #include "emu.h"
@@ -31,7 +31,7 @@
 #define GAP4 340
 #define SYNC 13
 
-enum 
+enum
 {
 	INDEX_TM = 0,
 	SPINUP_TM,
@@ -47,7 +47,7 @@ enum
 
 mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: harddisk_image_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	  device_slot_card_interface(mconfig, *this)
+		device_slot_card_interface(mconfig, *this)
 {
 }
 
@@ -56,7 +56,7 @@ void mfm_harddisk_device::device_start()
 	m_index_timer = timer_alloc(INDEX_TM);
 	m_spinup_timer = timer_alloc(SPINUP_TM);
 	m_seek_timer = timer_alloc(SEEK_TM);
-	
+
 	// MFM drives have a revolution rate of 3600 rpm (i.e. 60/sec)
 	m_index_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 
@@ -112,12 +112,12 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 		case STEP_MOVING:
 			// Head has reached final position
 			// Check whether we have a new delta
-			if (m_track_delta == 0) 	
+			if (m_track_delta == 0)
 			{
 				// Start the settle timer
 				m_step_phase = STEP_SETTLE;
 				m_seek_timer->adjust(attotime::from_usec(16800));
-				logerror("%s: Arrived at target track %d, settling ...\n", tag(), m_current_cylinder);	
+				logerror("%s: Arrived at target track %d, settling ...\n", tag(), m_current_cylinder);
 			}
 			break;
 		case STEP_SETTLE:
@@ -126,7 +126,7 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 			else
 			{
 				// Seek completed
-				logerror("%s: Settling done at cylinder %d, seek complete\n", tag(), m_current_cylinder);	
+				logerror("%s: Settling done at cylinder %d, seek complete\n", tag(), m_current_cylinder);
 				m_seek_complete = true;
 				m_seek_complete_cb(this, ASSERT_LINE);
 				m_step_phase = STEP_COLLECT;
@@ -136,11 +136,11 @@ void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int
 	}
 }
 
-void mfm_harddisk_device::head_move() 
+void mfm_harddisk_device::head_move()
 {
 	int steps = m_track_delta;
-	if (steps < 0) steps = -steps; 
-	logerror("%s: Moving head by %d step(s) %s\n", tag(), steps, (m_track_delta<0)? "outward" : "inward");	
+	if (steps < 0) steps = -steps;
+	logerror("%s: Moving head by %d step(s) %s\n", tag(), steps, (m_track_delta<0)? "outward" : "inward");
 
 	int disttime = steps*200;
 	m_step_phase = STEP_MOVING;
@@ -153,72 +153,72 @@ void mfm_harddisk_device::head_move()
 	m_track_delta = 0;
 }
 
-void mfm_harddisk_device::direction_in_w(line_state line) 
+void mfm_harddisk_device::direction_in_w(line_state line)
 {
 	m_seek_inward = (line == ASSERT_LINE);
 	logerror("%s: Setting seek direction %s\n", tag(), m_seek_inward? "inward" : "outward");
 }
 
 /*
-	According to the specs [1]:
-	
-	"4.3.1 BUFFERED SEEK: To minimize access time, pulses may be issued at an 
-	accelerated rate and buffered in a counter. Initiation of a seek starts 
-	immediately after the first pulse is received. Head motion occurs during 
-	pulse accumulation, and the seek is completed following receipt of all pulses."
+    According to the specs [1]:
 
-	"8.1.3 SEEKING: Upon receiving a Step pulse, the MPU (microprocessor unit)
+    "4.3.1 BUFFERED SEEK: To minimize access time, pulses may be issued at an
+    accelerated rate and buffered in a counter. Initiation of a seek starts
+    immediately after the first pulse is received. Head motion occurs during
+    pulse accumulation, and the seek is completed following receipt of all pulses."
+
+    "8.1.3 SEEKING: Upon receiving a Step pulse, the MPU (microprocessor unit)
     pauses for 250 usec to allow for additional pulses before executing the seek
-	operation. Every incoming pulse resets the 250 usec timer. The seek will
-	not begin until the last pulse is received."
-	
-	WTF? Oh come on, Seagate, be consistent at least in a single document.
-	
-	================================
-	
-	Step behaviour:
-	During all waiting times, further step_w invocations increase the counter
-	
-	- Leading edge increments the counter c and sets the timer to 250us (mode=collect)
-	- When the timer expires (mode=collect):
-   (1)- Calculate the stepping time: time = c*200us; save the counter
-	  - Start the timer (mode=move)
-	  - When the timer expires (mode=move)
-	    - Add the track delta to the current track position
-	    - Subtract the delta from the current counter
-	    - When the counter is not zero (pulses arrived in the meantime), go to (1)
-	    - When the counter is zero, set the timer to 16.8 ms (mode=settle)
-	    - When the timer expires (mode=settle)
-	      - When the counter is not zero, go to (1)
-	      - When the counter is zero, signal seek_complete; done
-	     
-      Step timing:
- 		per track = 20 ms max, full seek: 150 ms max (615 tracks); both including settling time
-		We assume t(1) = 17; t(615)=140
-		t(i) = s+d*i
-		s=(615*t(1)-t(615))/614
-		d=t(1)-s
-		s=16800 us, d=200 us
-*/	
+    operation. Every incoming pulse resets the 250 usec timer. The seek will
+    not begin until the last pulse is received."
 
-void mfm_harddisk_device::step_w(line_state line) 
+    WTF? Oh come on, Seagate, be consistent at least in a single document.
+
+    ================================
+
+    Step behaviour:
+    During all waiting times, further step_w invocations increase the counter
+
+    - Leading edge increments the counter c and sets the timer to 250us (mode=collect)
+    - When the timer expires (mode=collect):
+   (1)- Calculate the stepping time: time = c*200us; save the counter
+      - Start the timer (mode=move)
+      - When the timer expires (mode=move)
+        - Add the track delta to the current track position
+        - Subtract the delta from the current counter
+        - When the counter is not zero (pulses arrived in the meantime), go to (1)
+        - When the counter is zero, set the timer to 16.8 ms (mode=settle)
+        - When the timer expires (mode=settle)
+          - When the counter is not zero, go to (1)
+          - When the counter is zero, signal seek_complete; done
+
+      Step timing:
+        per track = 20 ms max, full seek: 150 ms max (615 tracks); both including settling time
+        We assume t(1) = 17; t(615)=140
+        t(i) = s+d*i
+        s=(615*t(1)-t(615))/614
+        d=t(1)-s
+        s=16800 us, d=200 us
+*/
+
+void mfm_harddisk_device::step_w(line_state line)
 {
 	// Leading edge
 	if (line == ASSERT_LINE && m_step_line == CLEAR_LINE)
 	{
-		if (m_seek_complete) 
+		if (m_seek_complete)
 		{
-			m_step_phase = STEP_COLLECT;		
+			m_step_phase = STEP_COLLECT;
 			m_seek_complete = false;
 			m_seek_complete_cb(this, CLEAR_LINE);
 		}
 
 		// Counter will be adjusted according to the direction (+-1)
-		m_track_delta += (m_seek_inward)? +1 : -1; 
+		m_track_delta += (m_seek_inward)? +1 : -1;
 		logerror("%s: Got seek pulse; track delta %d\n", tag(), m_track_delta);
-		if (m_track_delta < -670 || m_track_delta > 670) 
+		if (m_track_delta < -670 || m_track_delta > 670)
 		{
-			logerror("%s: Excessive step pulses - doing auto-truncation\n", tag());  
+			logerror("%s: Excessive step pulses - doing auto-truncation\n", tag());
 			m_autotruncation = true;
 		}
 		m_seek_timer->adjust(attotime::from_usec(250));

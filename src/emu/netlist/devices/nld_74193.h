@@ -28,7 +28,7 @@
 
 #include "../nl_base.h"
 
-#define TTL_74193(_name) 				                              \
+#define TTL_74193(_name)                                              \
 		NET_REGISTER_DEV(74193, _name)
 
 #define TTL_74193_DIP(_name)                                                         \

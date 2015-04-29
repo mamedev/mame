@@ -30,32 +30,32 @@ const char *c8280_format::extensions() const
 }
 
 const c8280_format::format c8280_format::formats[] = {
-	// 80x4e 12x00 3xf6 fc 
+	// 80x4e 12x00 3xf6 fc
 	// 50x4e 12x00 3xf5 fe 2x00 01 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
 	// 54x4e 12x00 3xf5 fe 2x00 02 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
 	// 54x4e 12x00 3xf5 fe 2x00 03 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
-	// 54x4e 12x00 3xf5 fe 2x00 04 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 05 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 06 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 07 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 08 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 09 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 0a 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 0b 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 0c 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 0d 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 0e 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 0f 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 10 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 11 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 12 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 13 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 14 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 15 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 16 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 17 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 18 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
-	// 54x4e 12x00 3xf5 fe 2x00 19 01 f7 22x4e 12x00 3xf5 fb 256xaa f7 
+	// 54x4e 12x00 3xf5 fe 2x00 04 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 05 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 06 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 07 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 08 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 09 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 0a 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 0b 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 0c 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 0d 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 0e 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 0f 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 10 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 11 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 12 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 13 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 14 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 15 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 16 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 17 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 18 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
+	// 54x4e 12x00 3xf5 fe 2x00 19 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
 	// 54x4e 12x00 3xf5 fe 2x00 1a 01 f7 22x4e 12x00 3xf5 fb 256xaa f7
 	// 653x4e
 	{

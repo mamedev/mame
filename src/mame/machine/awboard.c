@@ -108,7 +108,7 @@ DEVICE_ADDRESS_MAP_START(submap, 16, aw_rom_board)
 	AM_RANGE(0x08, 0x09) AM_WRITE(mpr_first_file_index_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(mpr_file_offsetl_w)
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(mpr_file_offseth_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(adj_offset_r, adj_offset_w)
+	AM_RANGE(0x40, 0x41) AM_READWRITE(pio_r, pio_w)
 ADDRESS_MAP_END
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -255,14 +255,23 @@ void aw_rom_board::device_reset()
 	dma_limit  = 0;
 }
 
-READ16_MEMBER(aw_rom_board::adj_offset_r)
+READ16_MEMBER(aw_rom_board::pio_r)
 {
-	return adjust_off;
+	UINT16 retval;
+	if (epr_offset == 0x7fffff)
+		retval = adjust_off;
+	else
+		retval = m_region->u16(epr_offset * 2);
+	epr_offset++;
+	return retval;
 }
 
-WRITE16_MEMBER(aw_rom_board::adj_offset_w)
+WRITE16_MEMBER(aw_rom_board::pio_w)
 {
-	adjust_off = data;
+	// write to ROM board address space, including FlashROM programming using CFI (TODO)
+	if (epr_offset == 0x7fffff) // special register which changes ROMBD addressing
+		adjust_off = data;
+	epr_offset++;
 }
 
 WRITE16_MEMBER(aw_rom_board::epr_offsetl_w)

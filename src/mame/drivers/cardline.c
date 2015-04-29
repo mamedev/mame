@@ -14,7 +14,7 @@
  XTAL  4 MHz
 
  TODO:
- 	 Really understand ASIC chip
+     Really understand ASIC chip
 
 ***********************************/
 
@@ -103,7 +103,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 	// how this works.
 
 	if(m_video & 1)
-	 	gfx_ofs = 0;
+		gfx_ofs = 0;
 
 	if(m_video & 2)
 		gfx_ofs = 0x1000;

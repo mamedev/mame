@@ -32,7 +32,7 @@ NETLIB_UPDATE(74175)
 
 NETLIB_START(74175)
 {
-	register_input("CLK",	m_CLK);
+	register_input("CLK",   m_CLK);
 	register_input("CLRQ",  m_CLRQ);
 
 	register_input("D1",    m_D[0]);
@@ -60,7 +60,7 @@ NETLIB_RESET(74175)
 
 NETLIB_START(74175_dip)
 {
-	register_input("9",	m_CLK);
+	register_input("9", m_CLK);
 	register_input("1",  m_CLRQ);
 
 	register_input("4",    m_D[0]);

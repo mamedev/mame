@@ -2835,7 +2835,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const UINT8 *bit
 	for(int i=0; i<track_size; i++) {
 		int bit = sbit_r(bitstream, i);
 		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
-		
+
 		if (sync && !bit) {
 			UINT8 id = sbyte_gcr5_r(bitstream, i, track_size);
 
@@ -2844,7 +2844,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const UINT8 *bit
 				if(hblk_count < 100)
 					hblk[hblk_count++] = i-10;
 				break;
-			
+
 			case 0x07:
 				if(dblk_count < 100)
 					dblk[dblk_count++] = i-10;
@@ -2914,7 +2914,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_victor_gcr5(const UIN
 	for(int i=0; i<track_size; i++) {
 		int bit = sbit_r(bitstream, i);
 		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
-		
+
 		if (sync && !bit) {
 			UINT8 id = sbyte_gcr5_r(bitstream, i, track_size);
 
@@ -2923,7 +2923,7 @@ void floppy_image_format_t::extract_sectors_from_bitstream_victor_gcr5(const UIN
 				if(hblk_count < 100)
 					hblk[hblk_count++] = i-10;
 				break;
-			
+
 			case 0x08:
 				if(dblk_count < 100)
 					dblk[dblk_count++] = i-10;

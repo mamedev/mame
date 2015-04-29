@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE16_MEMBER(xscroll_w);
 	DECLARE_WRITE16_MEMBER(yscroll_w);
 	DECLARE_WRITE16_MEMBER(slip_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 

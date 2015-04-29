@@ -332,7 +332,7 @@ file_error zippath_fopen(const char *filename, UINT32 openflags, core_file *&fil
 				temp2.assign(mainpath).append(PATH_SEPARATOR).append(subpath);
 				subpath.assign(temp2);
 			}
-			else 
+			else
 			{
 				mainpath = mainpath.substr(temp.length());
 				subpath.assign(mainpath);

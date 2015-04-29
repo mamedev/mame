@@ -4,7 +4,7 @@
  * nld_74192.h
  *
  *  DM74192: Synchronous 4-Bit Binary Counter with Dual Clock
- *  		 Decade counter
+ *           Decade counter
  *
  *  FIXME: This should be merged with the 74193 which counts to 16
  *
@@ -31,7 +31,7 @@
 
 #include "../nl_base.h"
 
-#define TTL_74192(_name) 				                              \
+#define TTL_74192(_name)                                              \
 		NET_REGISTER_DEV(74192, _name)
 
 #define TTL_74192_DIP(_name)                                                         \

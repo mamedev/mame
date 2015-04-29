@@ -4,9 +4,9 @@
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,
   most of them are VFD electronic games/toys.
-  
+
   Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
-  
+
   NEC FIP9AM20T (example, Epoch Astro Command)
          grcss
 
@@ -264,7 +264,7 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
   * PCB label Emix Corp. ET-02
   * NEC uCOM-44 MCU, labeled EMIX D552C 017
   * cyan VFD display Emix-101, with blue color overlay
-  
+
   This is Bambino's first game, it is not known if ET-01 exists. Emix Corp.
   wasn't initially a toy company, the first release was through Tomy. Emix
   created the Bambino brand afterwards. It is claimed to be the first
@@ -380,7 +380,7 @@ MACHINE_CONFIG_END
   * PCB label Emix Corp. ET-03
   * NEC uCOM-43 MCU, labeled D553C 031
   * cyan VFD display Emix-102, with bezel
-  
+
   The game was rereleased in 1982 as Classic Football, with an improved VFD.
 
   Press the Kick button to start the game, an automatic sequence follows.
@@ -452,7 +452,7 @@ READ8_MEMBER(ssfball_state::input_b_r)
 
     [A]    [B]    [C]    [PASS]  [KICK/
        ^FORMATION^                DISPLAY]
-     
+
                                  [^]
                          [<>]
     (game lvl sw)                [v]
@@ -522,7 +522,7 @@ MACHINE_CONFIG_END
   * PCB label Emix Corp. ET-10/08 (PCB is for 2 possible games)
   * NEC uCOM-44 MCU, labeled D552C 043
   * cyan VFD display Emix-105, with bezel overlay
-  
+
   Press the Display button twice to start the game. Action won't start until
   player 1 presses one of the directional keys. In 2-player mode, player 2
   controls the goalkeeper, defensive players are still controlled by the CPU.
@@ -573,7 +573,7 @@ WRITE8_MEMBER(bmsoccer_state::plate_w)
 	// E012,F012,G012,H,I: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// E3: grid 8
 	if (offset == NEC_UCOM4_PORTE)
 		grid_w(space, offset, data >> 3 & 1);
@@ -688,7 +688,7 @@ WRITE8_MEMBER(bmsafari_state::plate_w)
 	// E012,H,I: vfd matrix plate
 	int shift = (offset == NEC_UCOM4_PORTE) ? 8 : (offset - NEC_UCOM4_PORTH) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	
+
 	// E3: grid 0
 	if (offset == NEC_UCOM4_PORTE)
 		grid_w(space, offset, data >> 3 & 1);
@@ -754,7 +754,7 @@ MACHINE_CONFIG_END
   * PCB label Emix Corp. ET-12
   * NEC uCOM-43 MCU, labeled D553C 055
   * cyan VFD display Emix-104, with blue or green color overlay
-  
+
   This is basically a revamp of their earlier Boxing game (ET-06), case and
   buttons are exactly the same.
 
@@ -1143,7 +1143,7 @@ WRITE8_MEMBER(efball_state::grid_w)
 	// H2: speaker out
 	if (offset == NEC_UCOM4_PORTH)
 		m_speaker->level_w(data >> 2 & 1);
-	
+
 	// F,G,H01: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTF) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
@@ -1257,7 +1257,7 @@ WRITE8_MEMBER(galaxy2_state::grid_w)
 	// E3: speaker out
 	if (offset == NEC_UCOM4_PORTE)
 		m_speaker->level_w(data >> 3 & 1);
-	
+
 	// C,D,E01: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
@@ -1557,7 +1557,7 @@ WRITE8_MEMBER(mvbfree_state::grid_w)
 	// E23,F,G,H: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	
+
 	// E01: plate 0,1
 	if (offset == NEC_UCOM4_PORTE)
 		plate_w(space, 2 + NEC_UCOM4_PORTC, data & 3);
@@ -1735,7 +1735,7 @@ MACHINE_CONFIG_END
 
   Press the Serve button to start, then hit the ball by pressing one of the
   positional buttons when the ball flies over it.
-  
+
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/

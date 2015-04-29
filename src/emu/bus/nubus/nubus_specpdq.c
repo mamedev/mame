@@ -83,7 +83,7 @@ const rom_entry *nubus_specpdq_device::device_rom_region() const
 nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, NUBUS_SPECPDQ, "SuperMac Spectrum PDQ video card", tag, owner, clock, "nb_spdq", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this),		
+		device_nubus_card_interface(mconfig, *this),
 		m_palette(*this, "palette")
 {
 	m_assembled_tag = std::string(tag).append(":").append(SPECPDQ_SCREEN_NAME);

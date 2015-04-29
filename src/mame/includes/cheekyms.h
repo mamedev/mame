@@ -34,21 +34,21 @@ public:
 	/* video-related */
 	tilemap_t        *m_cm_tilemap;
 	bitmap_ind16       *m_bitmap_buffer;
-	
+
 	UINT8          m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(port_40_w);
 	DECLARE_WRITE8_MEMBER(port_80_w);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	
+
 	virtual void machine_start();
 	virtual void video_start();
 	DECLARE_PALETTE_INIT(cheekyms);
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip );
 };

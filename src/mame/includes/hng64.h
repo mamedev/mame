@@ -389,6 +389,6 @@ public:
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	UINT16 main_latch[2],sound_latch[2];
-	
+
 	std::vector<polygon> polys;//(1024*5);
 };

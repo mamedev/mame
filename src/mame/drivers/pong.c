@@ -391,7 +391,7 @@ ROM_START( pong ) /* dummy to satisfy game entry*/
 ROM_END
 
 ROM_START( breakout )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pongf ) /* dummy to satisfy game entry*/

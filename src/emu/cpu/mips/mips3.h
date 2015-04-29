@@ -396,8 +396,8 @@ private:
 
 	/* memory accesses */
 	bool            m_bigendian;
-	UINT32			m_byte_xor;
-	UINT32			m_word_xor;
+	UINT32          m_byte_xor;
+	UINT32          m_word_xor;
 	data_accessors  m_memory;
 
 	/* cache memory */

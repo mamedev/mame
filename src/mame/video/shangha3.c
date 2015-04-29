@@ -80,7 +80,7 @@ void shangha3_state::video_start()
 		for (i = 0;i < 128;i++)
 			m_palette->shadow_table()[i] = i+128;
 	}
-	
+
 	save_item(NAME(m_gfxlist_addr));
 	save_item(NAME(m_rawbitmap));
 }

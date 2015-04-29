@@ -40,8 +40,7 @@
 #include "nld_signal.h"
 
 #define TTL_9312(_name)                                                \
-		NET_REGISTER_DEV(9312, _name)                                  \
-
+		NET_REGISTER_DEV(9312, _name)
 //#if (USE_TRUTHTABLE)
 #include "nld_truthtable.h"
 NETLIB_TRUTHTABLE(9312, 12, 2, 0);

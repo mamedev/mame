@@ -227,7 +227,7 @@ private:
 
 	// Analyses the track until the given time
 	void live_run_until(attotime limit);
-	
+
 	// Same for hard disks
 	void live_run_hd_until(attotime limit);
 

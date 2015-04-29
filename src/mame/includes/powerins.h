@@ -12,7 +12,7 @@ public:
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
-		m_spriteram(*this, "spriteram")	{ }
+		m_spriteram(*this, "spriteram") { }
 
 
 	required_device<cpu_device> m_maincpu;

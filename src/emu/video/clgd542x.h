@@ -1,6 +1,6 @@
 /*
 
-	Cirrus Logic GD542x/3x video chipsets
+    Cirrus Logic GD542x/3x video chipsets
 
 */
 
@@ -39,11 +39,11 @@ protected:
 	UINT8 gc_bank_1;
 	bool gc_locked;
 	UINT8 m_lock_reg;
-	
+
 	UINT8 m_cr19;
 	UINT8 m_cr1a;
 	UINT8 m_cr1b;
-	
+
 	// hardware cursor
 	UINT16 m_cursor_x;
 	UINT16 m_cursor_y;
@@ -64,13 +64,13 @@ protected:
 	UINT16 m_blt_width;
 	UINT32 m_blt_source_current;
 	UINT32 m_blt_dest_current;
-	
+
 	UINT8 m_scratchpad1;
 	UINT8 m_scratchpad2;
 	UINT8 m_scratchpad3;
 	UINT8 m_vclk_num[4];
 	UINT8 m_vclk_denom[4];
-	
+
 	inline UINT8 cirrus_vga_latch_write(int offs, UINT8 data);
 private:
 	void cirrus_define_video_mode();
@@ -80,7 +80,7 @@ private:
 	void cirrus_gc_reg_write(UINT8 index, UINT8 data);
 	UINT8 cirrus_crtc_reg_read(UINT8 index);
 	void cirrus_crtc_reg_write(UINT8 index, UINT8 data);
-	
+
 	void start_bitblt();
 	void copy_pixel();
 };
@@ -96,4 +96,3 @@ protected:
 // device type definition
 extern const device_type CIRRUS_GD5428;
 extern const device_type CIRRUS_GD5430;
-

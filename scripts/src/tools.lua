@@ -455,7 +455,7 @@ files {
 dofile("netlist.lua")
 
 
-if (_OPTIONS["target"]=="mess") then
+if (_OPTIONS["target"]~="mame") then
 --------------------------------------------------
 -- castool
 --------------------------------------------------

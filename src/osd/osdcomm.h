@@ -226,7 +226,7 @@ typedef UINT32                              FPTR;
 #ifdef _MSC_VER
 #include <malloc.h>
 #if _MSC_VER == 1900 // < VS2015
-#define __LINE__Var 0 
+#define __LINE__Var 0
 #endif
 #if _MSC_VER < 1900 // < VS2015
 #define snprintf _snprintf

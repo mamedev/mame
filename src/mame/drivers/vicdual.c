@@ -1123,7 +1123,7 @@ WRITE8_MEMBER(vicdual_state::alphaho_io_w)
 
 
 static ADDRESS_MAP_START( vicdual_dualgame_map, AS_PROGRAM, 8, vicdual_state )
-    AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_SHARE("characterram")

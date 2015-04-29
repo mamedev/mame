@@ -195,7 +195,7 @@ void hh_tms1k_state::display_update()
 				int state = active_state[y] >> x & 1;
 				char buf1[0x10]; // lampyx
 				char buf2[0x10]; // y.x
-				
+
 				if (x == m_display_maxx)
 				{
 					// always-on if selected
@@ -632,6 +632,10 @@ MACHINE_CONFIG_END
   * TMS1170NLN MP1525-N2 (die labeled MP1525)
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1bit sound
 
+  known releases:
+  - USA: Head to Head Baseball
+  - Japan: Computer Baseball, published by Tsukuda
+
 ***************************************************************************/
 
 class h2hbaseb_state : public hh_tms1k_state
@@ -665,7 +669,7 @@ WRITE16_MEMBER(h2hbaseb_state::write_r)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
-	
+
 	// R4-R7: input mux
 	m_inp_mux = data >> 4 & 0xf;
 
@@ -799,10 +803,10 @@ WRITE16_MEMBER(h2hfootb_state::write_r)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
-	
+
 	// R0-R8: input mux
 	m_inp_mux = data & 0x1ff;
-	
+
 	// R0-R8: select led
 	// R9: led between digits
 	m_r = data;
@@ -825,7 +829,7 @@ READ8_MEMBER(h2hfootb_state::read_k)
 	for (int i = 0; i < 4; i++)
 		if (m_inp_matrix[i]->read() & m_inp_mux)
 			k |= 1 << i;
-	
+
 	return k;
 }
 
@@ -1526,7 +1530,7 @@ void einvader_state::prepare_display()
 	// R7-R9 are 7segs
 	for (int y = 7; y < 10; y++)
 		m_display_segmask[y] = 0x7f;
-	
+
 	display_matrix(8, 10, m_o, m_r);
 }
 
@@ -1652,7 +1656,7 @@ void raisedvl_state::prepare_display()
 	// R0-R2 are 7segs
 	for (int y = 0; y < 3; y++)
 		m_display_segmask[y] = 0x7f;
-	
+
 	display_matrix(7, 10, m_o, m_r);
 }
 
@@ -1660,10 +1664,10 @@ WRITE16_MEMBER(raisedvl_state::write_r)
 {
 	// R10: speaker out
 	m_speaker->level_w(data >> 10 & 1);
-	
+
 	// R0,R1: input mux
 	m_inp_mux = data & 3;
-	
+
 	// R0-R9: led select
 	m_r = data;
 	prepare_display();
@@ -1791,10 +1795,10 @@ WRITE16_MEMBER(gpoker_state::write_r)
 {
 	// R15: enable beeper
 	m_beeper->set_state(data >> 15 & 1);
-	
+
 	// R0-R6: input mux
 	m_inp_mux = data & 0x7f;
-	
+
 	// R0-R10: select digit
 	// R11-R14: card symbols
 	m_r = data;
@@ -2014,7 +2018,7 @@ MACHINE_CONFIG_END
   Ideal Electronic Detective
   * TMS0980NLL MP6100A (die labeled 0980B-00)
   * 10-digit 7seg LED display, 1bit sound
-  
+
   hardware (and concept) is very similar to Parker Bros Stop Thief
 
   This is an electronic board game. It requires game cards with suspect info,
@@ -2302,7 +2306,7 @@ WRITE16_MEMBER(astro_state::write_r)
 {
 	// R0-R7: input mux
 	m_inp_mux = data & 0xff;
-	
+
 	// R0-R9: led select
 	m_r = data;
 	prepare_display();
@@ -2632,13 +2636,13 @@ WRITE16_MEMBER(ssimon_state::write_r)
 {
 	// R0-R3,R9,R10: input mux
 	m_inp_mux = (data & 0xf) | (data >> 5 & 0x30);
-	
+
 	// R4: yellow lamps
 	// R5: green lamps
 	// R6: blue lamps
 	// R7: red lamps
 	display_matrix(4, 1, data >> 4, 1);
-	
+
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
 }
@@ -2749,7 +2753,7 @@ MACHINE_CONFIG_END
   * SN75494N Hex digit LED driver, 1 lamp, 3-level sound
   * gearbox with magnetic clutch, 1 IR led+sensor, 2 motors(middle wheels)
   * 24-button keypad, ext in/out ports
-  
+
   Big Trak is a programmable toy car, up to 16 steps. Supported commands include
   driving and turning, firing a photon cannon(hey, have some imagination!),
   and I/O ports. The output port was used for powering the dump truck accessory.
@@ -2796,7 +2800,7 @@ WRITE16_MEMBER(bigtrak_state::write_r)
 {
 	// R0-R5,R8: input mux (keypad, ext in enable)
 	m_inp_mux = (data & 0x3f) | (data >> 2 & 0x40);
-	
+
 	// R6: N/C
 	// R7: IR led on
 	// R9: lamp on
@@ -2992,11 +2996,11 @@ READ8_MEMBER(cnsector_state::read_k)
 
              COMBAT INFORMATION CENTER
     [NEXT SHIP]       [RECALL]    [MOVE SHIP]
-    
+
     [LEFT]   [RIGHT]      o       [SLOWER] [FASTER]
         STEERING     EVASIVE SUB        SPEED            o (on/off switch)
               NAVIGATIONAL PROGRAMMING                   |
-    
+
     [RANGE]  [AIM]    [FIRE]        o      [TEACH MODE]
       SONAR CONTROL            SUB FINDER
 */
@@ -3182,7 +3186,7 @@ MACHINE_CONFIG_END
 
   The TMS1400CR MCU has the same pinout as a standard TMS1100. The hardware
   outside of the MCU is exactly the same as Merlin.
-  
+
   The included minigames are:
   1: Three Shells
   2: Hi/Lo

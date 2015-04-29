@@ -77,7 +77,7 @@
 		<bezel element="static_black">
 			<bounds left="0" right="47" top="0" bottom="53" />
 		</bezel>
-		
+
 	<!-- lamps -->
 
 		<bezel name="lamp3" element="lamp_r" inputtag="IN.1" inputmask="0x08">

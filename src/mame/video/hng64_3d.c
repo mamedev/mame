@@ -56,7 +56,7 @@ g_profiler.start(PROFILER_USER1);
 	}
 
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(0x200*8), timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed),this));
-g_profiler.stop();	
+g_profiler.stop();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed )

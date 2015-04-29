@@ -33,34 +33,34 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 
 todo: make this actually readable, we don't support unicode source files
 
- Title                                       PCB ID	 REV	CF ID		Dumped	Region	PIC             MAIN BD Serial
-Battle Police                               ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Beetle DASH!!                               ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Bingo Galaxy                                ???-?????				no		???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
-Bingo Parade                                ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-Brick People / Block People                 834-14881				ROM	ALL	253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
-Dinosaur King                               834-14493-01 D			ROM	US	253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
-Dinosaur King - Operation: Dinosaur Rescue  837-14434-91	MDA-C0021?	ROM	US/EXP	253-5508-0408   AAFE-01A30164715, AAFE-01B92094811
+ Title                                       PCB ID  REV    CF ID       Dumped  Region  PIC             MAIN BD Serial
+Battle Police                               ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Beetle DASH!!                               ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Bingo Galaxy                                ???-?????               no      ???-????-????   AAFE-01E10924916, AAFE-01D67304905, Medal
+Bingo Parade                                ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Brick People / Block People                 834-14881               ROM ALL 253-5508-0558   AAFE-01F67905202, AAFE-01F68275202
+Dinosaur King                               834-14493-01 D          ROM US  253-5508-0408   AAFE-01D1132xxxx, AAFE-01D15924816
+Dinosaur King - Operation: Dinosaur Rescue  837-14434-91    MDA-C0021?  ROM US/EXP  253-5508-0408   AAFE-01A30164715, AAFE-01B92094811
 -                                           834-14662-01
-Dinosaur King 2                             ???-?????				no		253-5508-0408   AAFE-xxxxxxxxxxx
-Dinosaur King 2 Ver 2.5                     834-14792-02 F	MDA-C0047	CF	EXP	253-5508-0408   AAFE-01D73384904
-Disney: Magical Dream Dance on Stage        ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Future Police Patrol Chase                  ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Issyouni Turbo Drive                        ???-?????				no		???-????-????   AAFE-01E91305101
-Issyouni Wan Wan                            ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-King of Beetle: Battle Terminal             ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Love & Berry Ver 1.003                      834-14661-02			ROM	EXP	253-5508-0446   AAFE-01D84934906
-Love & Berry Ver 2.000                      834-14661-02			ROM	EXP	253-5508-0446   AAFE-01D8493xxxx
-Love & Berry 3 EXP Ver 1.002                834-14661-01	MDA-C0042	CF	US/EXP	253-5508-0446   AAFE-01D64704904
-Marine & Marine                             ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Mirage World                                ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-Monopoly: The Medal                         ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-Monopoly: The Medal 2nd Edition             ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx, Medal
-Mushiking 2K6 2ND                           ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Mushiking 2K7 1ST                           ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
-Tetris Giant / Tetris Dekaris               834-14970	 G	MDA-C0076	CF	ALL	253-5508-0604   AAFE-01G03025212
-Tetris Giant / Tetris Dekaris Ver.2.000     834-14970	 G			ROM	ALL	253-5508-0604   AAFE-xxxxxxxxxxx
-Thomas: The Tank Engine                     ???-?????				no		???-????-????   AAFE-xxxxxxxxxxx
+Dinosaur King 2                             ???-?????               no      253-5508-0408   AAFE-xxxxxxxxxxx
+Dinosaur King 2 Ver 2.5                     834-14792-02 F  MDA-C0047   CF  EXP 253-5508-0408   AAFE-01D73384904
+Disney: Magical Dream Dance on Stage        ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Future Police Patrol Chase                  ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Issyouni Turbo Drive                        ???-?????               no      ???-????-????   AAFE-01E91305101
+Issyouni Wan Wan                            ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+King of Beetle: Battle Terminal             ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Love & Berry Ver 1.003                      834-14661-02            ROM EXP 253-5508-0446   AAFE-01D84934906
+Love & Berry Ver 2.000                      834-14661-02            ROM EXP 253-5508-0446   AAFE-01D8493xxxx
+Love & Berry 3 EXP Ver 1.002                834-14661-01    MDA-C0042   CF  US/EXP  253-5508-0446   AAFE-01D64704904
+Marine & Marine                             ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Mirage World                                ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal                         ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Monopoly: The Medal 2nd Edition             ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx, Medal
+Mushiking 2K6 2ND                           ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Mushiking 2K7 1ST                           ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
+Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076   CF  ALL 253-5508-0604   AAFE-01G03025212
+Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G          ROM ALL 253-5508-0604   AAFE-xxxxxxxxxxx
+Thomas: The Tank Engine                     ???-?????               no      ???-????-????   AAFE-xxxxxxxxxxx
 
 REV PCB       IC6s      Flash       AU1500
 D  171-8278D  315-6370  8x 128Mbit  AMD
@@ -80,7 +80,7 @@ READ64_MEMBER(segasp_state::sn_93c46a_r)
 
 	/* bit 3 is EEPROM data */
 	res = m_eeprom->do_read() << 4;
-	res |= (ioport("DSW")->read() << 4) & 0xC0;	// note: only old REV D PCB have DSW 3-4 here, newer does not, always 0 readed
+	res |= (ioport("DSW")->read() << 4) & 0xC0; // note: only old REV D PCB have DSW 3-4 here, newer does not, always 0 readed
 	return res;
 }
 
@@ -128,16 +128,16 @@ READ64_MEMBER(segasp_state::sp_io_r)
 
 	switch (reg)
 	{
-	case 0x00/4:		// CN9 17-24 IN_PORT 0 (IN)
+	case 0x00/4:        // CN9 17-24 IN_PORT 0 (IN)
 		retval = ioport("IN_PORT0")->read();
 		break;
-	case 0x04/4:		// CN9 41-48 IN_PORT 1 (IN)
+	case 0x04/4:        // CN9 41-48 IN_PORT 1 (IN)
 		retval = ioport("IN_PORT1")->read();
 		break;
-	case 0x08/4:		// CN9 25-32 (I/O)
+	case 0x08/4:        // CN9 25-32 (I/O)
 		retval = ioport("IN_PORT3")->read();
 		break;
-	case 0x18/4:		// IN_PORT 2
+	case 0x18/4:        // IN_PORT 2
 		// bit 0:3 - DIPSW 1-4
 		// bit 4:5 - TEST/SERVICE SW, CN9 5-6 (old rev PCB only)
 		retval = ioport("DSW")->read();
@@ -165,15 +165,15 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, U64(0x0000ffff0000ffff) )
-	
+
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
-	   
+
 	/* External Device */
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // - banked access to ROM board address space
 	AM_RANGE(0x01010100, 0x01010127) AM_READ(sp_io_r)
 	AM_RANGE(0x01010128, 0x0101012f) AM_READWRITE(sp_eeprom_r, sp_eeprom_w )
 	AM_RANGE(0x01010150, 0x01010157) AM_READ(sp_rombdflg_r)
-//	AM_RANGE(0x01010000, 0x010101ff) // I/O regs
+//  AM_RANGE(0x01010000, 0x010101ff) // I/O regs
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -220,7 +220,7 @@ INPUT_PORTS_START( segasp )
 	PORT_DIPNAME( 0x04, 0x04, "Monitor" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, "31 kHz" )
 	PORT_DIPSETTING(    0x00, "15 kHz" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")		// Must be ON, with off BIOS bootstrap will deadloop
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")     // Must be ON, with off BIOS bootstrap will deadloop
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -266,7 +266,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( segasp, naomi_aw_base, segasp_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("sp_eeprom")
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
-	MCFG_X76F100_ADD("naomibd_eeprom")	// actually not present
+	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", ":pic_readout", "naomibd_eeprom", ":boardid", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
@@ -280,8 +280,7 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "bios1", "BOOT VER 2.00" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-24328.ic50", 0x000000, 0x200000, CRC(25f2ef00) SHA1(e58dec9f171e52b3ded213b3fcd9a0de8a438076) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "BOOT VER 2.01" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-24328a.ic50", 0x000000, 0x200000, CRC(03ec3805) SHA1(a8fbaea826ca257be0b2b86952f247254929e046) ) \
-
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-24328a.ic50", 0x000000, 0x200000, CRC(03ec3805) SHA1(a8fbaea826ca257be0b2b86952f247254929e046) )
 // Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
 #define SEGASP_NETFIRM \
 	ROM_REGION( 0x200000, "netcpu", 0) \
@@ -290,7 +289,7 @@ MACHINE_CONFIG_END
 // keep M4 board code happy for now
 #define SEGASP_MISC \
 	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x04)) \
-	ROM_REGION( 0x84, "naomibd_eeprom", ROMREGION_ERASEFF )	\
+	ROM_REGION( 0x84, "naomibd_eeprom", ROMREGION_ERASEFF ) \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
 	ROM_LOAD16_WORD( "mb_serial.ic57", 0x0000, 0x0080, CRC(e1e3c009) SHA1(66bc636c527389c3338f631d78c788b4bd4e93be) )
 

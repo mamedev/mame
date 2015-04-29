@@ -2017,4 +2017,3 @@ GAME( 1992, sexappl,  0,        findout,  sexappl, driver_device,  0,       ROT0
 
 GAME( 1992, geimulti, 0,        geimulti, geimulti, gei_state, geimulti,    ROT0, "Grayhound Electronics", "GEI Multi Game",                          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1992, sprtauth, 0,        sprtauth, sprtauth, gei_state, geimulti,    ROT0, "Classic Games",         "Sports Authority",                        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-

@@ -2692,7 +2692,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
-	
+
 	save_item(NAME(m_qs1000_data));
 }
 
@@ -2752,7 +2752,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
-	
+
 	save_item(NAME(m_qs1000_data));
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
@@ -2777,7 +2777,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "data");
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
-	
+
 	save_item(NAME(m_qs1000_data));
 }
 
@@ -2794,7 +2794,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 	m_semicom_prot_idx = 8;
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 3;
-	
+
 	save_item(NAME(m_finalgdr_backupram_bank));
 	save_pointer(NAME(m_finalgdr_backupram), 0x80*0x100);
 	save_item(NAME(m_semicom_prot_idx));
@@ -2815,7 +2815,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 	m_semicom_prot_idx = 8;
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 3;
-	
+
 	save_item(NAME(m_semicom_prot_idx));
 	save_item(NAME(m_semicom_prot_which));
 }

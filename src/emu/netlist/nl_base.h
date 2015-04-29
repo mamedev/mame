@@ -1216,7 +1216,7 @@ protected:
 
 private:
 	netlist_time                m_stop;     // target time for current queue processing
-	bool						m_use_deactivate;
+	bool                        m_use_deactivate;
 
 	netlist_time                m_time;
 	netlist_queue_t             m_queue;

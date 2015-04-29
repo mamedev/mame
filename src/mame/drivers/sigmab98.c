@@ -21,14 +21,14 @@ http://www.nicozon.net/watch/sm14334996
 
 Dumped games:
 
-1997 Minna Atsumare! Dodge Hero			b9802	https://youtu.be/2eXDQnKCT6A
-1997 Itazura Daisuki! Sushimaru Kun		b9803	https://youtu.be/nhvbZ71KWr8
-1997 GeGeGe no Kitarou Youkai Slot		b9804
-1997 Burning Sanrinsya          		b9805
-1997 PEPSI Man							b9806	https://youtu.be/p3cbZ67m4lo
-1998 Transformers Beast Wars II			b9808
-1997 Uchuu Tokkyuu Medalian				b9809	https://youtu.be/u813kBOZbwI
-2000 Minna Ganbare! Dash Hero			b9811
+1997 Minna Atsumare! Dodge Hero         b9802   https://youtu.be/2eXDQnKCT6A
+1997 Itazura Daisuki! Sushimaru Kun     b9803   https://youtu.be/nhvbZ71KWr8
+1997 GeGeGe no Kitarou Youkai Slot      b9804
+1997 Burning Sanrinsya                  b9805
+1997 PEPSI Man                          b9806   https://youtu.be/p3cbZ67m4lo
+1998 Transformers Beast Wars II         b9808
+1997 Uchuu Tokkyuu Medalian             b9809   https://youtu.be/u813kBOZbwI
+2000 Minna Ganbare! Dash Hero           b9811
 
 --------------------------------------------------------------------------------------
 
@@ -48,11 +48,11 @@ is "Treasure Fall" (despite the cart label is "Treasure Hall").
 
 Dumped games:
 
-2000 Animal Catch		https://youtu.be/U4L5EwWbxqw
-2000 Itazura Monkey		https://youtu.be/GHxiqUQRpV8
-2000 Pye-nage Taikai	https://youtu.be/oL2OIbrv-KI
-2000 Taihou de Doboon	https://youtu.be/loPP3jt0Ob0
-2001 Hae Hae Ka Ka Ka	https://youtu.be/37IxYCg0tic
+2000 Animal Catch       https://youtu.be/U4L5EwWbxqw
+2000 Itazura Monkey     https://youtu.be/GHxiqUQRpV8
+2000 Pye-nage Taikai    https://youtu.be/oL2OIbrv-KI
+2000 Taihou de Doboon   https://youtu.be/loPP3jt0Ob0
+2001 Hae Hae Ka Ka Ka   https://youtu.be/37IxYCg0tic
 
 Games with the same cabinet which might be on the same hardware:
 
@@ -127,10 +127,10 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<buffered_spriteram8_device> m_buffered_spriteram;	// not on sammymdl?
-	optional_shared_ptr<UINT8> m_spriteram;	// optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<UINT8> m_vregs;		// optional as some games allocate it themselves (due to banking)
-	optional_shared_ptr<UINT8> m_vtable;	// optional as some games allocate it themselves (due to banking)
+	optional_device<buffered_spriteram8_device> m_buffered_spriteram;   // not on sammymdl?
+	optional_shared_ptr<UINT8> m_spriteram; // optional as some games allocate it themselves (due to banking)
+	optional_shared_ptr<UINT8> m_vregs;     // optional as some games allocate it themselves (due to banking)
+	optional_shared_ptr<UINT8> m_vtable;    // optional as some games allocate it themselves (due to banking)
 	required_shared_ptr<UINT8> m_nvram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -316,9 +316,9 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		sy      =   (s[ 0x06 ] & 0x03) * 256 + s[ 0x07 ];
 
-		zoom    =   (s[ 0x08 ] & 0xff) * 256 + s[ 0x09 ];	// 0x100 means no zoom
+		zoom    =   (s[ 0x08 ] & 0xff) * 256 + s[ 0x09 ];   // 0x100 means no zoom
 
-//		rot     =   (s[ 0x0a ] & 0xff) * 256 + s[ 0x0b ];	// unimplemented!
+//      rot     =   (s[ 0x0a ] & 0xff) * 256 + s[ 0x0b ];   // unimplemented!
 
 		dx      =   (s[ 0x0c ] & 0xff) * 256 + s[ 0x0d ];
 		dy      =   (s[ 0x0e ] & 0xff) * 256 + s[ 0x0f ];
@@ -430,7 +430,7 @@ WRITE8_MEMBER(sigmab98_state::vregs_w)
 
 	switch (offset)
 	{
-		case 0x1b:	// background color
+		case 0x1b:  // background color
 		case 0x1d:
 		{
 			int x = (m_vregs[0x1d] << 8) + m_vregs[0x1b];
@@ -440,8 +440,8 @@ WRITE8_MEMBER(sigmab98_state::vregs_w)
 			m_palette->set_pen_color(0x100, pal5bit(r), pal5bit(g), pal5bit(b));
 			break;
 		}
-//		default:
-//			logerror("%s: unknown video reg written: %02x = %02x\n", machine().describe_context(), offset, data);
+//      default:
+//          logerror("%s: unknown video reg written: %02x = %02x\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -460,13 +460,13 @@ READ8_MEMBER(sigmab98_state::d013_r)
 	// bit 5 must go 0->1 (vblank?)
 	// bit 2 must set (sprite buffered? triggered by pulsing bit 3 of port C6?)
 	return (m_screen->vblank() ? 0x20 : 0) | 0x04;
-//	return machine().rand();
+//  return machine().rand();
 }
 READ8_MEMBER(sigmab98_state::d021_r)
 {
 	// bit 5 must be 0?
 	return 0;
-//	return machine().rand();
+//  return machine().rand();
 }
 
 
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START( dodghero_mem_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0xd813, 0xd813 ) AM_READ(d013_r)
 	AM_RANGE( 0xd821, 0xd821 ) AM_READ(d021_r)
 	AM_RANGE( 0xd800, 0xd821 ) AM_READWRITE(vregs_r, vregs_w) AM_SHARE("vregs")
-	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")	// not used, where is it mapped?
+	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")    // not used, where is it mapped?
 
 	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram") // battery
 
@@ -877,9 +877,9 @@ static ADDRESS_MAP_START( dashhero_io_map, AS_IO, 8, sigmab98_state )
 	//  AM_RANGE( 0xa2, 0xa3 )
 	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE(dashhero_regs2_r, dashhero_regs2_w )
 
-	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" )	AM_WRITE(eeprom_w)
+	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" ) AM_WRITE(eeprom_w)
 	AM_RANGE( 0xc2, 0xc2 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0xc4, 0xc4 ) AM_READ_PORT( "PAYOUT" )	AM_WRITE(c4_w )
+	AM_RANGE( 0xc4, 0xc4 ) AM_READ_PORT( "PAYOUT" ) AM_WRITE(c4_w )
 	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(c6_w )
 	AM_RANGE( 0xc8, 0xc8 ) AM_WRITE(c8_w )
 
@@ -1401,7 +1401,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rombank_w)
 			m_rombank = data;
 			switch (data)
 			{
-//				case 0x0f:  // demo mode, after title
+//              case 0x0f:  // demo mode, after title
 
 				case 0x14:  // 3800 IS ROM
 					membank("rombank0")->set_base(rom + 0x8000);
@@ -2081,7 +2081,7 @@ static MACHINE_CONFIG_DERIVED( dashhero, sigmab98 )
 	MCFG_CPU_PROGRAM_MAP( gegege_mem_map )
 	MCFG_CPU_IO_MAP( dashhero_io_map )
 
-	MCFG_DEVICE_REMOVE("nvram")	// FIXME: does not survive between sessions otherwise
+	MCFG_DEVICE_REMOVE("nvram") // FIXME: does not survive between sessions otherwise
 MACHINE_CONFIG_END
 
 
@@ -2135,7 +2135,7 @@ static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2291,12 +2291,12 @@ DRIVER_INIT_MEMBER(sigmab98_state,gegege)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	// Related to d013
-//	rom[0x0bdd] = 0xc9;
+//  rom[0x0bdd] = 0xc9;
 
-//	rom[0x0bf9] = 0xc9;
+//  rom[0x0bf9] = 0xc9;
 
-//	rom[0x0dec] = 0x00;
-//	rom[0x0ded] = 0x00;
+//  rom[0x0dec] = 0x00;
+//  rom[0x0ded] = 0x00;
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;
@@ -2378,12 +2378,12 @@ DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	// Related to d013
-//	rom[0x058a] = 0xc9;
+//  rom[0x058a] = 0xc9;
 
-//	rom[0x05a6] = 0xc9;
+//  rom[0x05a6] = 0xc9;
 
-//	rom[0xa00e] = 0x00;
-//	rom[0xa00f] = 0x00;
+//  rom[0xa00e] = 0x00;
+//  rom[0xa00f] = 0x00;
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;
@@ -2469,12 +2469,12 @@ DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	// Related to d013
-//	rom[0x0bfa] = 0xc9;
+//  rom[0x0bfa] = 0xc9;
 
-//	rom[0x0c16] = 0xc9;
+//  rom[0x0c16] = 0xc9;
 
-//	rom[0xa43a] = 0x00;
-//	rom[0xa43b] = 0x00;
+//  rom[0xa43a] = 0x00;
+//  rom[0xa43b] = 0x00;
 
 	// EEPROM timing checks
 	rom[0x8138] = 0x00;

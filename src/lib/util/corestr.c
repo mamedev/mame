@@ -193,7 +193,7 @@ char *core_i64_format(UINT64 value, UINT8 mindigits, bool is_octal)
 }
 
 /*-------------------------------------------------
-	std::string helpers
+    std::string helpers
 -------------------------------------------------*/
 
 #include <algorithm>

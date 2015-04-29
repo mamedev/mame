@@ -52494,7 +52494,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Caltron</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />	<!-- NTDEC-N71506x ? -->
+			<feature name="pcb" value="NES-CNROM" />    <!-- NTDEC-N71506x ? -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="16384">
 				<rom name="adam &amp; eve (megasoft).chr" size="16384" crc="61cfe60d" sha1="d234813a34bdd8ef94ec63851c199e0c669ea1e3" offset="00000" status="baddump" />

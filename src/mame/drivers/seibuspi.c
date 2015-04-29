@@ -2140,12 +2140,15 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 {
 	/* rdft */
+	if (space.device().safe_pc()==0x0203f06) space.device().execute().spin_until_interrupt(); // idle
+
+	/* rdftj? */
 	if (space.device().safe_pc()==0x0203f0a) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdftau */
 	if (space.device().safe_pc()==0x0203f16) space.device().execute().spin_until_interrupt(); // idle
 
-	/* rdftj */
+	/* rdftja? */
 	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
 
 	/* rdfta, rdftadi, rdftam, rdftit */

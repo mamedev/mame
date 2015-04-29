@@ -323,7 +323,7 @@ scrambler       // bootleg
 explorer        // bootleg
 strfbomb        // bootleg
 scrambp         // bootleg (Billport S.A.)
-scramce			// bootleg (Centromatic S.A.)
+scramce         // bootleg (Centromatic S.A.)
 scrampt         // bootleg (Petaco S.A.)
 scramrf         // bootleg (Recreativos Franco)
 atlantis        // (c) 1981 Comsoft
@@ -2291,7 +2291,7 @@ puzznic         // C20 (c) 1989 Taito Corporation (Japan)
 puzznicj        // C20 (c) 1989 Taito Corporation (Japan)
 puzznici        // bootleg
 puzznicb        // bootleg
-puzznicba		// bootleg
+puzznicba       // bootleg
 horshoes        // C47 (c) 1990 Taito America Corporation (US)
 palamed         // C63 (c) 1990 Taito Corporation (Japan)
 cachat          // ??? (c) 1993 Taito Corporation (Japan)
@@ -4337,7 +4337,7 @@ nsub            // 268-275 (c) 1980 Sega
 samurai         // 289-302 + upgrades (c) 1980 Sega
 invinco         // 310-318 (c) 1979 Sega
 invds           // 367-382 (c) 1979 Sega
-carhntds		//
+carhntds        //
 tranqgun        // 413-428 (c) 1980 Sega
 				// 450-465  Tranquilizer Gun (different version?)
 				// ???-??? Car Hunt / Deep Scan
@@ -5527,9 +5527,9 @@ starhrpr        // 2009.07.27 Star Horse Progress Returns (satellite)
 
 // NAOMI based (System SP)
 segasp
-lovebery		// 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
+lovebery        // 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
 lovebero
-dinoking		// 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
+dinoking        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
 dinokior
 				// 2007.06 Issyo ni Wanwan
 				// 2007.06 Konchuu Dash!!
@@ -6475,7 +6475,7 @@ chqflag         // GX717 (c) 1988
 chqflagj        // GX717 (c) 1988 (Japan)
 ultraman        // GX910 (c) 1991 Banpresto/Bandai
 hexion          // GX122 (c) 1992
-hexionb			// bootleg
+hexionb         // bootleg
 lethalen        // GX191 (c) 1992
 lethalenub      // GX191 (c) 1992
 lethalenua      // GX191 (c) 1992
@@ -6576,6 +6576,7 @@ xmene           // GX065 (c) 1992 (World)
 xmena           // GX065 (c) 1992 (Asia)
 xmenaa          // GX065 (c) 1992 (Asia)
 xmen2pe         // GX065 (c) 1992 (World)
+xmen2pu         // GX065 (c) 1992 (US)
 xmen2pa         // GX065 (c) 1992 (Asia)
 xmen2pj         // GX065 (c) 1992 (Japan)
 xmen6p          // GX065 (c) 1992 (World)
@@ -7865,7 +7866,7 @@ gangwarsj       // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 gangwarsu       // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 gangwarsb       // bootleg
 sbasebal        // Alpha-68K96V       (c) 1989 SNK of America licensed from Alpha
-sbasebalj		// Alpha-68K96V
+sbasebalj       // Alpha-68K96V
 tnextspc        // A8003 'NS' (c) 1989 - MASKROM
 tnextspc2       // A8003 'NS' (c) 1989 - EPROMs
 tnextspcj       // A8003 'NS' (c) 1989 - Japan
@@ -8273,7 +8274,7 @@ cartfury        // (c) 2000 Midway Games
 // Midway Quicksilver
 hydrthnd        // (c) 1999 Midway Games
 offrthnd        // (c) 2000 Midway Games
-arctthnd		// (c) 2001 Midway Games
+arctthnd        // (c) 2001 Midway Games
 ultarctc        // (c) 2001 Midway Games
 ultarctcup      // (c) 2001 Midway Games
 
@@ -9559,7 +9560,7 @@ redhawk         // (c) 1997 New Vision Ent. license
 redhawke        // (c) 1997 Excellent Co., Ltd license
 redhawki        // (c) 1997 Haedong Corp. license
 redhawkb        // (c) 1997
-redhawkk		// (c) 1997
+redhawkk        // (c) 1997
 grdnstrm        // (c) 1998 Apples Industries license
 grdnstrmv       // (c) 1998 Apples Industries license
 grdnstrmk       // (c) 1998 (Korea)
@@ -9880,7 +9881,7 @@ drgw2j          //
 drgw2hk         //
 drgw3           // (c) 1998 Dragon World 3
 drgw3105        //
-drgw3103		//
+drgw3103        //
 drgw3100        //
 dwex            // (c) 1998 Dragon World 3 EX
 killbld         // (c) 1998 The Killing Blade
@@ -10367,7 +10368,7 @@ jokpokerc       // (c) 1983 Greyhound Electronics
 superbwl        // (c) 1982 Greyhound Electronics
 amuse           // (c) 1982 Greyhound Electronics
 amuse1          // (c) 1982 Greyhound Electronics
-amuse1a			// (c) 1983 Greyhound Electronics
+amuse1a         // (c) 1983 Greyhound Electronics
 gs4002          // (c) 1982 G.E.I.
 gs4002a         // (c) 1982 G.E.I.
 gepoker         // (c) 1984 Greyhound Electronics
@@ -12928,7 +12929,7 @@ tank            // (c) 1974 Atari
 pong            // (c) 1972 Atari
 pongd           // (c) 1975 Atari
 pongf           // (c) 1972 Atari
-breakout		// (c) 1976 Atari
+breakout        // (c) 1976 Atari
 //coupedem
 //goal4
 //gotchaat
@@ -17055,7 +17056,7 @@ sc4s6cb     //
 sc4s6cc     //
 sc4s6cd     //
 sc4s6ce     //
-sc4s6cf		//
+sc4s6cf     //
 sc4sdr      // Super Diamonds & Rubies (Bellfruit)
 sc4sdra     //
 sc4sdrb     //
@@ -17154,7 +17155,7 @@ sc4ticlb    // Treasure Island Club (Bellfruit)
 sc4ticlba   //
 sc4ticlbb   //
 sc4ticlbc   //
-sc4ticlbd	//
+sc4ticlbd   //
 sc4ttomb    // Treasure Tomb (Bellfruit)
 sc4ttomba   //
 sc4ttombb   //
@@ -17273,7 +17274,7 @@ sc4legd     //
 sc4lege     //
 sc4legf     //
 sc4legg     //
-sc4legh		//
+sc4legh     //
 sc4legcb    // Who Wants To Be A Legionnaire Club (Bellfruit)
 sc4legcba   //
 sc4legcbb   //

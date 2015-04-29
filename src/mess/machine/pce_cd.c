@@ -232,7 +232,7 @@ void pce_cd_device::late_setup()
 void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
 	static const UINT8 init[8] = { 0x48, 0x55, 0x42, 0x4d, 0x00, 0xa0, 0x10, 0x80 };
-	
+
 	memset(data, 0x00, size);
 	memcpy(data, init, sizeof(init));
 }

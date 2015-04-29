@@ -513,10 +513,10 @@ WRITE16_MEMBER(twins_state::spider_port_1c_w)
 //  otherwise you get garbage sprites between rounds and the bg incorrectly wiped
 
 	UINT16* vram;
-//	if (m_videorambank & 1)
+//  if (m_videorambank & 1)
 		vram = m_videoram2;
-//	else
-//		vram = m_videoram;
+//  else
+//      vram = m_videoram;
 
 	for (int i = 0; i < 0x8000; i++)
 	{

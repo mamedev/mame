@@ -1258,14 +1258,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( msx2p_floplist )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "msx2p_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")	// maybe not?
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")    // maybe not?
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( msxr_floplist )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "msxr_flop")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2p_flp_l", "msx2p_flop")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")	// maybe not?
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")	// maybe not?
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx2_flp_l", "msx2_flop")    // maybe not?
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flp_l", "msx1_flop")    // maybe not?
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )

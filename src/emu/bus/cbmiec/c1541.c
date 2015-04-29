@@ -336,7 +336,7 @@ ROM_END
 
 const rom_entry *fsd1_device::device_rom_region() const
 {
-    return ROM_NAME( fsd1 );
+	return ROM_NAME( fsd1 );
 }
 
 
@@ -353,8 +353,8 @@ ROM_START( fsd2 )
 	ROMX_LOAD( "fsd2b.u3", 0x0000, 0x4000, CRC(b39e4600) SHA1(991132fcc6e70e9a428062ae76055a150f2f7ac6), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v5.0" )
 	ROMX_LOAD( "jiffydos v5.0.u3", 0x0000, 0x4000, CRC(46c3302c) SHA1(e3623658cb7af30c9d3bce2ba3b6ad5ee89ac1b8), ROM_BIOS(3) )
-    ROM_SYSTEM_BIOS( 3, "rexdos", "REX-DOS" )
-    ROMX_LOAD( "rdos.bin", 0x0000, 0x4000, CRC(8ad6dba1) SHA1(f279d327d5e16ea1b62fb18514fb679d0b442941), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 3, "rexdos", "REX-DOS" )
+	ROMX_LOAD( "rdos.bin", 0x0000, 0x4000, CRC(8ad6dba1) SHA1(f279d327d5e16ea1b62fb18514fb679d0b442941), ROM_BIOS(4) )
 ROM_END
 
 
@@ -475,7 +475,7 @@ ROM_END
 
 const rom_entry *indus_gt_t::device_rom_region() const
 {
-    return ROM_NAME( indusgt );
+	return ROM_NAME( indusgt );
 }
 
 
@@ -1064,7 +1064,7 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 fsd1_device::fsd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : base_c1541_device(mconfig, FSD1, "FSD-1", tag, owner, clock, "fsd1", __FILE__) { }
+	: base_c1541_device(mconfig, FSD1, "FSD-1", tag, owner, clock, "fsd1", __FILE__) { }
 
 
 //-------------------------------------------------

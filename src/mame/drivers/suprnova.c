@@ -998,7 +998,7 @@ DRIVER_INIT_MEMBER(skns_state,galpans3)   { machine().device<sknsspr_device>("sp
 	ROM_SYSTEM_BIOS( 4, "korea", "Korea" ) \
 	ROM_LOAD_BIOS( 4, "sknsk1.u10", 0x000000, 0x080000, CRC(ff1c9f79) SHA1(a51e598d43e76d37da69b1f094c111273bdfc94a) )  \
 	ROM_SYSTEM_BIOS( 5, "japanmod", "Japan (No Region Lock)" ) /* hack */ \
-	ROM_LOAD_BIOS( 5, "supernova_modbios.u10", 0x000000, 0x080000, CRC(b8d3190c) SHA1(62c9a4a075fd944e89fe95c6b46046101eb6de1c) ) 
+	ROM_LOAD_BIOS( 5, "supernova_modbios.u10", 0x000000, 0x080000, CRC(b8d3190c) SHA1(62c9a4a075fd944e89fe95c6b46046101eb6de1c) )
 
 #define SKNS_JAPAN \
 	SKNS_BIOS \

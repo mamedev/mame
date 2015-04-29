@@ -32,14 +32,14 @@ NETLIB_UPDATE(82S16)
 
 NETLIB_START(82S16)
 {
-	register_input("A0",	m_A[0]);
-	register_input("A1",	m_A[1]);
-	register_input("A2",	m_A[2]);
-	register_input("A3",	m_A[3]);
-	register_input("A4",	m_A[4]);
-	register_input("A5",	m_A[5]);
-	register_input("A6",	m_A[6]);
-	register_input("A7",	m_A[7]);
+	register_input("A0",    m_A[0]);
+	register_input("A1",    m_A[1]);
+	register_input("A2",    m_A[2]);
+	register_input("A3",    m_A[3]);
+	register_input("A4",    m_A[4]);
+	register_input("A5",    m_A[5]);
+	register_input("A6",    m_A[6]);
+	register_input("A7",    m_A[7]);
 
 	register_input("CE1Q",  m_CE1Q);
 	register_input("CE2Q",  m_CE2Q);
@@ -63,16 +63,16 @@ NETLIB_RESET(82S16)
 
 NETLIB_START(82S16_dip)
 {
-	register_input("2",		m_A[0]);
-	register_input("1",		m_A[1]);
-	register_input("15",	m_A[2]);
-	register_input("14",	m_A[3]);
-	register_input("7",		m_A[4]);
-	register_input("9",		m_A[5]);
-	register_input("10",	m_A[6]);
-	register_input("11",	m_A[7]);
+	register_input("2",     m_A[0]);
+	register_input("1",     m_A[1]);
+	register_input("15",    m_A[2]);
+	register_input("14",    m_A[3]);
+	register_input("7",     m_A[4]);
+	register_input("9",     m_A[5]);
+	register_input("10",    m_A[6]);
+	register_input("11",    m_A[7]);
 
-	register_input("3",		m_CE1Q);
+	register_input("3",     m_CE1Q);
 	register_input("4",     m_CE2Q);
 	register_input("5",     m_CE3Q);
 

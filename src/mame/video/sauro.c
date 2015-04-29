@@ -87,7 +87,7 @@ VIDEO_START_MEMBER(sauro_state,sauro)
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_palette_bank = 0;
-	
+
 	save_item(NAME(m_palette_bank));
 }
 
