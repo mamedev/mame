@@ -765,7 +765,7 @@ function toolchain(_buildDir, _subDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
 	configuration { "osx*", "x32" }
-		objdir (_buildDir .. "osx32_clang" .. "/obj")
+		objdir (_buildDir .. "osx_clang" .. "/obj")
 		buildoptions {
 			"-m32",
 		}
@@ -781,10 +781,10 @@ function toolchain(_buildDir, _subDir)
 			"-m64",
 		}
 
-	configuration { "osx*", "x32", "Release" }
+	configuration { "osx*", "x64", "Release" }
 		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Release")
 
-	configuration { "osx*", "x32", "Debug" }
+	configuration { "osx*", "x64", "Debug" }
 		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Debug")
 		
 	configuration { "ios-arm" }
