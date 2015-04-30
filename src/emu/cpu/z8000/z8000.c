@@ -72,6 +72,7 @@ z8002_device::z8002_device(const machine_config &mconfig, const char *tag, devic
 	: cpu_device(mconfig, Z8002, "Z8002", tag, owner, clock, "z8002", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 16, 0)
+	, m_mo_out(*this)
 	, m_vector_mult(1)
 {
 }
@@ -81,6 +82,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 16, 0)
+	, m_mo_out(*this)
 	, m_vector_mult(2)
 {
 }
@@ -316,8 +318,8 @@ UINT8 z8002_device::RDPORT_B(int mode, UINT16 addr)
 	}
 	else
 	{
-		/* how to handle MMU reads? */
-		return 0x00;
+		/* how to handle MMU reads? for now just do it */
+		return m_io->read_byte(addr);
 	}
 }
 
@@ -356,7 +358,8 @@ void z8002_device::WRPORT_B(int mode, UINT16 addr, UINT8 value)
 	}
 	else
 	{
-		/* how to handle MMU writes? */
+		/* how to handle MMU writes? for now just do it */
+		m_io->write_byte(addr,value);
 	}
 }
 
@@ -701,6 +704,8 @@ void z8001_device::device_start()
 	register_debug_state();
 
 	m_icountptr = &m_icount;
+	m_mo_out.resolve_safe();
+	m_mi = CLEAR_LINE;
 }
 
 void z8002_device::device_start()
@@ -726,6 +731,8 @@ void z8002_device::device_start()
 	register_debug_state();
 
 	m_icountptr = &m_icount;
+	m_mo_out.resolve_safe();
+	m_mi = CLEAR_LINE;
 }
 
 void z8001_device::device_reset()
