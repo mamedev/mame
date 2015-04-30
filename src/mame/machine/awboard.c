@@ -257,11 +257,8 @@ void aw_rom_board::device_reset()
 
 READ16_MEMBER(aw_rom_board::pio_r)
 {
-	UINT16 retval;
-	if (epr_offset == 0x7fffff)
-		retval = adjust_off;
-	else
-		retval = m_region->u16(epr_offset * 2);
+	// FIXME: this must return original encrypted data, used by Extreme Hunt 2 in ROM TEST
+	UINT16 retval = m_region->u16(epr_offset * 2);
 	epr_offset++;
 	return retval;
 }
