@@ -68,7 +68,7 @@ READ8_MEMBER(m24_state::keyboard_r)
 		case 2:
 			return 0;
 		case 4:
-			return m_kbcibf ? 2 : 0;
+			return (m_kbcibf ? 2 : 0) | ((m_pa & 0x40) ? 0 : 1);
 	}
 	return 0xff;
 }
