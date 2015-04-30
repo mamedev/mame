@@ -20,10 +20,15 @@ U3 Max691cpe
 
 U300 Nec D7759GC (10Mhz xtal near it)
 
-TODO:
-- No idea about how to surpass the "No Funzione" (sic) screen. According to the bad settings almost
-  surely it wants EEPROM hooked up (i/o at 0x680/0x682?)
-
+In order to get the game to run, follow these steps:
+- enable service mode
+- run all of the tests (press '1' repeatedly to progress)
+- at the "cancellare la memoria" prompt, press 'X' to allow it
+- when the line of '*' appears, press the buttons in the following sequence:
+    1 1 X X 1 1 1 X X X 1 1 X 1 1 1 1 X 1 1 1 1 1 X 1 1 1 1 1 1 X
+(This is the "password" for the EEPROM.  You have three attempts to get it correct, otherwise the service mode will restart)
+- if accepted, disable service mode DIP switch
+- reset machine (press 'F3')
 */
 
 
@@ -41,9 +46,13 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
-	int m_comms_state;
+    int m_comms_state;
 	int m_comms_ind;
 	UINT8 m_comms_data[1002];
+    int m_comms_cmd;
+    int m_comms_expect;
+    int m_comms_blocks;
+    bool m_comms_ack;
 
 	DECLARE_READ16_MEMBER(comms_r);
 	DECLARE_WRITE16_MEMBER(comms_w);
@@ -58,54 +67,162 @@ static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
+static const UINT8 password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
+
 READ16_MEMBER(gambl186_state::comms_r)
 {
-	if ((offset == 0) && ACCESSING_BITS_0_7) //port 680 == data
-	{
-		if ((m_comms_state == 0x16) && (m_comms_ind < sizeof(m_comms_data)))
-		{
-			return m_comms_data[m_comms_ind++];
-		}
-	}
-	else if (offset == 1) //port 681 == status
-	{
-		if (m_comms_state == 0x16) //read mode?
-		{
-			return 2;
-		}
-		else if (m_comms_state == 0x31) //write mode?
-		{
-			return 4;
-		}
-	}
+    UINT16 retval = 0;
 
-	return 0;
+    if ((offset == 0) && ACCESSING_BITS_0_7) //port 680 == data
+    {
+        if (m_comms_state == 0x16) //read mode, just in case
+        {
+            if (!m_comms_ind && (m_comms_cmd == 0xff))
+            {
+                m_comms_cmd = m_comms_data[1];
+
+                switch (m_comms_cmd)
+                {
+                    case 0:
+                    {
+                        m_comms_expect = 4;
+                        break;
+                    }
+
+                    case 1: //unverified
+                    case 3: //unverified
+                    {
+                        m_comms_expect = 8;
+                        break;
+                    }
+
+                    case 2:
+                    {
+                        m_comms_expect = 408;
+                        m_comms_data[401] = 0x34; //precalc
+                        m_comms_blocks = 4;
+                        break;
+                    }
+
+                    case 4:
+                    {
+                        m_comms_expect = 4;
+                        break;
+                    }
+
+                    case 5: //unverified
+                    {
+                        m_comms_expect = 7;
+                        break;
+                    }
+
+                    case 6:
+                    {
+                        m_comms_expect = 1003;
+                        m_comms_data[1001] = 0xec; //precalc
+                        break;
+                    }
+
+                    default: //unverified
+                    {
+                        m_comms_expect = 1;
+                    }
+                }
+            }
+
+            if (m_comms_ind < sizeof(m_comms_data))
+            {
+                if ((m_comms_cmd == 4) && (m_comms_ind == 1) && !memcmp(m_comms_data, password, sizeof(password)))
+                {
+                    m_comms_data[1] = 0x55;
+                    m_comms_data[2] = 0x55;
+                }
+
+                retval = m_comms_data[m_comms_ind++];
+
+                if (m_comms_expect && !--m_comms_expect)
+                {
+                    if (!m_comms_blocks || !--m_comms_blocks)
+                    {
+                        m_comms_cmd = 0xff;
+                    }
+                    else if (m_comms_cmd == 2)
+                    {
+                        if (m_comms_blocks == 3)
+                        {
+                            m_comms_expect = 5;
+                            m_comms_data[4] = 0x17; //precalc
+                        }
+                        else
+                        {
+                            m_comms_expect = 3;
+                            m_comms_data[2] = 5; //precalc
+                        }
+                    }
+
+                    m_comms_ack = true;
+                }
+            }
+        }
+    }
+    else if (offset == 1) //port 681 == status
+    {
+        if (m_comms_state == 0x16) //read mode
+        {
+            retval = 2; //read ready
+        }
+        else if (m_comms_state == 0x31) //write mode
+        {
+            retval = 4; //write ready
+        }
+    }
+
+    return retval;
 }
 
 WRITE16_MEMBER(gambl186_state::comms_w)
 {
-	if (offset == 0)
-	{
-		if ((m_comms_state == 0x31) && (m_comms_ind < (sizeof(m_comms_data) - 2)))
-		{
-			m_comms_data[++m_comms_ind] = (UINT8) ~data;
-		}
-	}
-	else if (offset == 1)
-	{
-		if (m_comms_state != data)
-		{
-			m_comms_ind = 0;
-		}
+    if (offset == 0)
+    {
+        if ((m_comms_state == 0x31) && (m_comms_ind < 1000))
+        {
+            if (!m_comms_ack || (data == 0x15)) //validation failure
+            {
+                if (m_comms_cmd == 6) //1000 bytes transfer
+                {
+                    data = ~data;
+                }
+                else if (m_comms_ack)
+                {
+                    m_comms_cmd = 0xfe;
+                    m_comms_expect = 2;
+                    data = 5;
+                }
 
-		m_comms_state = data;
+                m_comms_data[++m_comms_ind] = (UINT8) data;
+            }
 
-		if (data == 0x4e) //reset?
-		{
-			m_comms_data[0] = 5;
-			m_comms_data[sizeof(m_comms_data) - 1] = 0xec;
-		}
-	}
+            m_comms_ack = false;
+        }
+    }
+    else if (offset == 1)
+    {
+        if (m_comms_state != data) //detect transition
+        {
+            m_comms_ind = 0;
+
+            if (data == 0x4e) //reset
+            {
+                m_comms_data[0] = 5; //operation complete
+                m_comms_cmd = 0xff; //none
+                m_comms_expect = 0;
+                m_comms_blocks = 0;
+                m_comms_ack = false;
+            }
+        }
+
+        m_comms_state = data;
+    }
 }
 
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
