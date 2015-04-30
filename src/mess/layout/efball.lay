@@ -4,33 +4,39 @@
 <!-- define elements -->
 
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
-	<element name="static_white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
-	<element name="static_green"><rect><color red="0.39" green="0.64" blue="0.39" /></rect></element>
+	<element name="static_white"><rect><color red="0.81" green="0.82" blue="0.81" /></rect></element>
+	<element name="static_green"><rect><color red="0.03" green="0.7" blue="0.22" /></rect></element>
 
 	<element name="text_down">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="DOWN"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
+		<text string="DOWN"><color red="0.16" green="0.17" blue="0.16" /></text>
 	</element>
 	<element name="text_home">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="HOME"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
+		<text string="HOME"><color red="0.16" green="0.17" blue="0.16" /></text>
 	</element>
 	<element name="text_yards">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="YARDS TO GO"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
+		<text string="YARDS TO GO"><color red="0.16" green="0.17" blue="0.16" /></text>
 	</element>
 	<element name="text_time">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="TIME REMAINING"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
+		<text string="TIME REMAINING"><color red="0.16" green="0.17" blue="0.16" /></text>
 	</element>
 	<element name="text_field">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="FIELD POSITION"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
+		<text string="FIELD POSITION"><color red="0.16" green="0.17" blue="0.16" /></text>
 	</element>
 	<element name="text_visitor">
-		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
-		<text string="VISITOR"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
+		<text string="VISITOR"><color red="0.16" green="0.17" blue="0.16" /></text>
 	</element>
+
+	<element name="text_10"><text string="10"><color red="0.83" green="0.84" blue="0.83" /></text></element>
+	<element name="text_20"><text string="20"><color red="0.83" green="0.84" blue="0.83" /></text></element>
+	<element name="text_30"><text string="30"><color red="0.83" green="0.84" blue="0.83" /></text></element>
+	<element name="text_40"><text string="40"><color red="0.83" green="0.84" blue="0.83" /></text></element>
+	<element name="text_50"><text string="50"><color red="0.83" green="0.84" blue="0.83" /></text></element>
 
 	<!-- 7segs are not italic here, so let's make custom ones -->
 
@@ -51,12 +57,43 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="393" top="0" bottom="100" />
-		<bezel element="static_black">
-			<bounds left="0" right="393" top="0" bottom="100" />
+		<bounds left="-8" right="298" top="-46" bottom="121" />
+		<bezel element="static_green">
+			<bounds left="-8" right="298" top="-46" bottom="121" />
 		</bezel>
 
+	<!-- outer bezel -->
 
+		<bezel element="static_white"><bounds left="-8" right="298" top="-42" bottom="117" /></bezel>
+		<bezel element="static_green"><bounds left="-8" right="298" top="-22" bottom="-20" /></bezel>
+		<bezel element="static_green"><bounds left="-8" right="298" top="95" bottom="97" /></bezel>
+
+		<bezel element="static_black"><bounds left="-5" right="295" top="-3" bottom="78" /></bezel>
+		<bezel element="static_black"><bounds x="-5" y="-17" width="300" height="12" /></bezel>
+		<bezel element="static_black"><bounds x="-5" y="80" width="300" height="12" /></bezel>
+
+		<bezel element="text_10"><bounds x="10" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_20"><bounds x="40" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_30"><bounds x="70" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_40"><bounds x="100" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_50"><bounds x="130" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_40"><bounds x="160" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_30"><bounds x="190" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_20"><bounds x="220" y="-17" width="30" height="12" /></bezel>
+		<bezel element="text_10"><bounds x="250" y="-17" width="30" height="12" /></bezel>
+
+		<bezel element="text_down"><bounds x="-5" y="-39" width="74" height="14" /></bezel>
+		<bezel element="text_field"><bounds x="71" y="-39" width="148" height="14" /></bezel>
+		<bezel element="text_yards"><bounds x="221" y="-39" width="77" height="14" /></bezel>
+
+		<bezel element="text_home"><bounds x="-5" y="100" width="74" height="14" /></bezel>
+		<bezel element="text_time"><bounds x="71" y="100" width="148" height="14" /></bezel>
+		<bezel element="text_visitor"><bounds x="221" y="100" width="77" height="14" /></bezel>
+
+		<bezel element="static_green"><bounds x="69" y="-43" width="2" height="22" /></bezel>
+		<bezel element="static_green"><bounds x="69" y="96" width="2" height="22" /></bezel>
+		<bezel element="static_green"><bounds x="219" y="-43" width="2" height="22" /></bezel>
+		<bezel element="static_green"><bounds x="219" y="96" width="2" height="22" /></bezel>
 
 	<!-- vfd -->
 
@@ -225,6 +262,18 @@
 		<bezel name="9.8" element="seg"><bounds x="285" y="26" width="5" height="17" /></bezel>
 		<bezel name="9.6" element="seg"><bounds x="285" y="50" width="5" height="17" /></bezel>
 
+
+	<!-- inner bezel -->
+
+		<bezel element="static_white"><bounds x="24" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="54" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="84" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="114" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="144" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="174" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="204" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="234" y="-4" width="2" height="83" /></bezel>
+		<bezel element="static_white"><bounds x="264" y="-4" width="2" height="83" /></bezel>
 
 	</view>
 </mamelayout>
