@@ -492,20 +492,20 @@ READ8_MEMBER( newbrain_state::cop_in_r )
 	return (m_cop_wr << 3) | (m_cop_access << 2) | (m_cop_rd << 1) | BIT(m_keydata, 2);
 }
 
-WRITE8_MEMBER( newbrain_state::cop_so_w )
+WRITE_LINE_MEMBER( newbrain_state::cop_so_w )
 {
 	// connected to K1
-	m_cop_so = data;
+	m_cop_so = state;
 }
 
-WRITE8_MEMBER( newbrain_state::cop_sk_w )
+WRITE_LINE_MEMBER( newbrain_state::cop_sk_w )
 {
 	// connected to K2
 	m_segment_data[m_keylatch] >>= 1;
 	m_segment_data[m_keylatch] = (m_cop_so << 15) | (m_segment_data[m_keylatch] & 0x7fff);
 }
 
-READ8_MEMBER( newbrain_state::cop_si_r )
+READ_LINE_MEMBER( newbrain_state::cop_si_r )
 {
 	// connected to TDI
 	m_cop_tdi = (((m_cassette1)->input() > +1.0) || ((m_cassette2)->input() > +1.0)) ^ m_cop_tdo;
@@ -1019,16 +1019,6 @@ static ADDRESS_MAP_START( newbrain_a_io_map, AS_IO, 8, newbrain_state )
 	AM_RANGE(0x16, 0x16) AM_MIRROR(0xffc0) AM_READ(user_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newbrain_cop_io_map, AS_IO, 8, newbrain_state )
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(cop_l_r, cop_l_w)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(cop_g_r, cop_g_w)
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(cop_d_w)
-	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN) AM_READ(cop_in_r)
-	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITE(cop_sk_w)
-	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_READWRITE(cop_si_r, cop_so_w)
-	AM_RANGE(COP400_PORT_CKO, COP400_PORT_CKO) AM_READNOP
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( newbrain_fdc_map, AS_PROGRAM, 8, newbrain_eim_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -1321,8 +1311,16 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, newbrain_state,  newbrain_interrupt)
 
 	MCFG_CPU_ADD(COP420_TAG, COP420, XTAL_16MHz/8) // COP420-GUW/N
-	MCFG_CPU_IO_MAP(newbrain_cop_io_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED )
+	MCFG_COP400_READ_L_CB(READ8(newbrain_state, cop_l_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(newbrain_state, cop_l_w))
+	MCFG_COP400_READ_G_CB(READ8(newbrain_state, cop_g_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(newbrain_state, cop_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(newbrain_state, cop_d_w))
+	MCFG_COP400_READ_IN_CB(READ8(newbrain_state, cop_in_r))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(newbrain_state, cop_sk_w))
+	MCFG_COP400_READ_SI_CB(READLINE(newbrain_state, cop_si_r))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(newbrain_state, cop_so_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", newbrain)
 

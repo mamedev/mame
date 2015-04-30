@@ -16,6 +16,43 @@
 #ifndef __COP400__
 #define __COP400__
 
+// i/o pins
+
+// L pins: 8-bit bi-directional
+#define MCFG_COP400_READ_L_CB(_devcb) \
+	cop400_cpu_device::set_read_l_callback(*device, DEVCB_##_devcb);
+#define MCFG_COP400_WRITE_L_CB(_devcb) \
+	cop400_cpu_device::set_write_l_callback(*device, DEVCB_##_devcb);
+
+// G pins: 4-bit bi-directional
+#define MCFG_COP400_READ_G_CB(_devcb) \
+	cop400_cpu_device::set_read_g_callback(*device, DEVCB_##_devcb);
+#define MCFG_COP400_WRITE_G_CB(_devcb) \
+	cop400_cpu_device::set_write_g_callback(*device, DEVCB_##_devcb);
+
+// D outputs: 4-bit general purpose output
+#define MCFG_COP400_WRITE_D_CB(_devcb) \
+	cop400_cpu_device::set_write_d_callback(*device, DEVCB_##_devcb);
+
+// IN inputs: 4-bit general purpose input
+#define MCFG_COP400_READ_IN_CB(_devcb) \
+	cop400_cpu_device::set_read_in_callback(*device, DEVCB_##_devcb);
+
+// SI/SO lines: serial in/out or counter/gen.purpose
+#define MCFG_COP400_READ_SI_CB(_devcb) \
+	cop400_cpu_device::set_read_si_callback(*device, DEVCB_##_devcb);
+#define MCFG_COP400_WRITE_SO_CB(_devcb) \
+	cop400_cpu_device::set_write_so_callback(*device, DEVCB_##_devcb);
+
+// SK output line: logic-controlled clock or gen.purpose
+#define MCFG_COP400_WRITE_SK_CB(_devcb) \
+	cop400_cpu_device::set_write_sk_callback(*device, DEVCB_##_devcb);
+
+// CKI/CKO lines: only CKO input here
+#define MCFG_COP400_READ_CKO_CB(_devcb) \
+	cop400_cpu_device::set_read_cko_callback(*device, DEVCB_##_devcb);
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -42,20 +79,6 @@ enum
 	COP400_GENPC = STATE_GENPC,
 	COP400_GENPCBASE = STATE_GENPCBASE,
 	COP400_GENSP = STATE_GENSP
-};
-
-/* special I/O space ports */
-enum
-{
-	COP400_PORT_L = 0x100,
-	COP400_PORT_G,
-	COP400_PORT_D,
-	COP400_PORT_H,
-	COP400_PORT_R,
-	COP400_PORT_IN,
-	COP400_PORT_SK,
-	COP400_PORT_SIO,
-	COP400_PORT_CKO
 };
 
 /* input lines */
@@ -112,6 +135,18 @@ public:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_read_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_l.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_l.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_g_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_g.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_g.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_d_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_d.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_in_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_in.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_si_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_si.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_so_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_so.set_callback(object); }
+	template<class _Object> static devcb_base &set_write_sk_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_sk.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_cko_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_cko.set_callback(object); }
+
 	static void set_cki(device_t &device, cop400_cki_bond cki) { downcast<cop400_cpu_device &>(device).m_cki = cki; }
 	static void set_cko(device_t &device, cop400_cko_bond cko) { downcast<cop400_cpu_device &>(device).m_cko = cko; }
 	static void set_microbus(device_t &device, cop400_microbus microbus) { downcast<cop400_cpu_device &>(device).m_microbus = microbus; }
@@ -132,8 +167,7 @@ protected:
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config :
-				( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL ) );
+		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : NULL );
 	}
 
 	// device_state_interface overrides
@@ -148,7 +182,18 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-	address_space_config m_io_config;
+
+	// i/o handlers
+	devcb_read8 m_read_l;
+	devcb_write8 m_write_l;
+	devcb_read8 m_read_g;
+	devcb_write8 m_write_g;
+	devcb_write8 m_write_d;
+	devcb_read8 m_read_in;
+	devcb_read_line m_read_si;
+	devcb_write_line m_write_so;
+	devcb_write_line m_write_sk;
+	devcb_read_line m_read_cko;
 
 	cop400_cki_bond m_cki;
 	cop400_cko_bond m_cko;
@@ -160,7 +205,6 @@ protected:
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_data;
-	address_space *m_io;
 
 	UINT8 m_featuremask;
 
@@ -174,7 +218,7 @@ protected:
 	UINT8   m_en;             /* 4-bit enable register */
 	UINT8   m_g;              /* 4-bit general purpose I/O port */
 	UINT8   m_q;              /* 8-bit latch for L port */
-	UINT16  m_sa, m_sb, m_sc;     /* subroutine save registers (not present in COP440) */
+	UINT16  m_sa, m_sb, m_sc; /* subroutine save registers (not present in COP440) */
 	UINT8   m_sio;            /* 4-bit shift register and counter */
 	int     m_skl;            /* 1-bit latch for SK output */
 	UINT8   m_h;              /* 4-bit general purpose I/O port (COP440 only) */
