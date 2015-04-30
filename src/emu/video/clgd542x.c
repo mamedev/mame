@@ -345,9 +345,6 @@ void cirrus_gd5428_device::blit_dword()
 
 void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 {
-	UINT8 src = vga.memory[m_blt_source_current % vga.svga_intf.vram_size];
-	UINT8 dst = vga.memory[m_blt_dest_current % vga.svga_intf.vram_size];
-
 	if(m_blt_mode & 0x40)  // enable 8x8 pattern
 	{
 		if(m_blt_mode & 0x80)  // colour expand
