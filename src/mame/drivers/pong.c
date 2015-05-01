@@ -17,6 +17,8 @@ TODO: please see netlist include files
 #include "sound/dac.h"
 #include "video/fixfreq.h"
 
+#include "breakout.lh"
+
 /*
  * H count width to 512
  * Reset at 1C6 = 454
@@ -42,13 +44,35 @@ TODO: please see netlist include files
  */
 
 #define MASTER_CLOCK    7159000
-#define V_TOTAL         (0x105+1)       // 262
-#define H_TOTAL         (0x1C6+1)       // 454
+#define V_TOTAL_PONG         (0x105+1)       // 262
+#define H_TOTAL_PONG         (0x1C6+1)       // 454
 
-#define HBSTART                 (H_TOTAL)
+/*
+ * Breakout's H1 signal:
+ *
+ *  __    _    __    _    __    _
+ * |  |__| |__|  |__| |__|  |__| |_
+ *  2  2  1  2  2  2 1  2  2  2 1
+ *
+ *  ==> Pixel width is 2:2:1:2:2:1:2:2 .....
+ *
+ *  4 Pixels = 7 cycles ==> 256 / 4 * 7 = 448
+ *
+ *  7 cycles ==> 14 Y1 cycles
+ *
+ */
+
+#define MASTER_CLOCK_BREAKOUT    (14318000 / 2)
+
+#define V_TOTAL_BREAKOUT         (0xFC)       // 252
+#define H_TOTAL_BREAKOUT         (448)    // 448
+
+#if 0
+#define HBSTART                 (H_TOTAL_PONG)
 #define HBEND                   (80)
-#define VBSTART                 (V_TOTAL)
+#define VBSTART                 (V_TOTAL_PONG)
 #define VBEND                   (16)
+#endif
 
 enum input_changed_enum
 {
@@ -275,8 +299,8 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")
 	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
 	MCFG_FIXFREQ_FIELDCOUNT(1)
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.31)
 
@@ -316,11 +340,12 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,  H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12, V_TOTAL)
+	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK_BREAKOUT)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_BREAKOUT-67,H_TOTAL_BREAKOUT-40,H_TOTAL_BREAKOUT-8,  H_TOTAL_BREAKOUT)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT)
 	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(1.0)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(1.2)
+	MCFG_FIXFREQ_GAIN(0.5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -367,8 +392,8 @@ static MACHINE_CONFIG_START( pongd, pong_state )
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")
 	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-52,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
 	MCFG_FIXFREQ_FIELDCOUNT(1)
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.31)
 
@@ -405,4 +430,4 @@ ROM_END
 GAME( 1972, pong,      0, pong,     pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) external [TTL]", GAME_SUPPORTS_SAVE)
 GAME( 1972, pongf,     0, pongf,    pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) [TTL]", GAME_SUPPORTS_SAVE )
 GAME( 1974, pongd,     0, pongd,    pongd,     driver_device,  0, ROT0,  "Atari", "Pong Doubles [TTL]", GAME_SUPPORTS_SAVE )
-GAME( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout [TTL]", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING)
+GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout [TTL]", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_breakout)

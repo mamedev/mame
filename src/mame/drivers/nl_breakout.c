@@ -65,6 +65,13 @@
  *
  */
 
+/*
+ * Notes
+ * FIXME: breakout generates some spurious hsync in the middle of line 27
+ *
+ */
+
+
 // identify unknown devices in IDE
 
 #if 1
@@ -146,9 +153,13 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("S4", DIPSWITCH, &dipswitch4_desc)
 #endif
 
+#if (SLOW_BUT_ACCURATE)
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
-
+#else
+    SOLVER(Solver, 48000)
+    PARAM(Solver.ACCURACY, 1e-6) // less accuracy and diode will not work
+#endif
     //CHIP("CLOCK", CLOCK_14_318_MHZ)
     MAINCLOCK(Y1, 14318000.0)
 
@@ -1613,7 +1624,6 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION("R52", 2, SCORE)
 	NET_C(R41.2, B9.3)
 	NET_C(R42.2, V5)
-
 
 	ALIAS(videomix, R41.1)
 
