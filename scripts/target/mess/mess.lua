@@ -759,6 +759,7 @@ function linkProjects_mess_mess(_target, _subtarget)
 		"nokia",
 		"northstar",
 		"novag",
+		"ns",
 		"olivetti",
 		"omnibyte",
 		"orion",
@@ -1876,6 +1877,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/m24.c",
 	MAME_DIR .. "src/mess/machine/m24_kbd.c",
 	MAME_DIR .. "src/mess/machine/m24_z8000.c"
+}
+
+createMESSProjects(_target, _subtarget, "ns")
+files {         
+	MAME_DIR .. "src/mess/drivers/hh_cop400.c", 
 }
 
 createMESSProjects(_target, _subtarget, "omnibyte")

@@ -95,6 +95,7 @@
 #include "ebball.lh"
 #include "ebball2.lh"
 #include "ebball3.lh"
+#include "einvader.lh" // test-layout(but still playable)
 #include "elecdet.lh"
 #include "gjackpot.lh"
 #include "gpoker.lh"
@@ -111,7 +112,6 @@
 #include "tandy12.lh" // clickable
 #include "tc4.lh"
 
-#include "einvader.lh" // test-layout(but still playable)
 #include "hh_tms1k_test.lh" // common test-layout - use external artwork
 
 

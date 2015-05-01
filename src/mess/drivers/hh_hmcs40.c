@@ -71,7 +71,7 @@
 #include "cpu/hmcs40/hmcs40.h"
 #include "sound/speaker.h"
 
-#include "hh_hmcs40_test.lh" // test-layout - use external artwork
+#include "hh_hmcs40_test.lh" // common test-layout - use external artwork
 
 
 class hh_hmcs40_state : public driver_device

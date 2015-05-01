@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.2" green="0.04" blue="0.05" /></disk>
+		<disk state="1"><color red="1.0" green="0.20" blue="0.22" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="100" top="0" bottom="100" />
+		<bezel element="static_black">
+			<bounds left="0" right="100" top="0" bottom="100" />
+		</bezel>
+
+	<!-- led matrix -->
+
+		<bezel name="lamp44" element="led"><bounds x="0" y="10" width="1" height="1" /></bezel>
+		<bezel name="lamp43" element="led"><bounds x="2" y="10" width="1" height="1" /></bezel>
+		<bezel name="lamp42" element="led"><bounds x="4" y="10" width="1" height="1" /></bezel>
+		<bezel name="lamp41" element="led"><bounds x="6" y="10" width="1" height="1" /></bezel>
+		<bezel name="lamp40" element="led"><bounds x="8" y="10" width="1" height="1" /></bezel>
+
+		<bezel name="lamp34" element="led"><bounds x="0" y="12" width="1" height="1" /></bezel>
+		<bezel name="lamp33" element="led"><bounds x="2" y="12" width="1" height="1" /></bezel>
+		<bezel name="lamp32" element="led"><bounds x="4" y="12" width="1" height="1" /></bezel>
+		<bezel name="lamp31" element="led"><bounds x="6" y="12" width="1" height="1" /></bezel>
+		<bezel name="lamp30" element="led"><bounds x="8" y="12" width="1" height="1" /></bezel>
+
+		<bezel name="lamp24" element="led"><bounds x="0" y="14" width="1" height="1" /></bezel>
+		<bezel name="lamp23" element="led"><bounds x="2" y="14" width="1" height="1" /></bezel>
+		<bezel name="lamp22" element="led"><bounds x="4" y="14" width="1" height="1" /></bezel>
+		<bezel name="lamp21" element="led"><bounds x="6" y="14" width="1" height="1" /></bezel>
+		<bezel name="lamp20" element="led"><bounds x="8" y="14" width="1" height="1" /></bezel>
+
+		<bezel name="lamp14" element="led"><bounds x="0" y="16" width="1" height="1" /></bezel>
+		<bezel name="lamp13" element="led"><bounds x="2" y="16" width="1" height="1" /></bezel>
+		<bezel name="lamp12" element="led"><bounds x="4" y="16" width="1" height="1" /></bezel>
+		<bezel name="lamp11" element="led"><bounds x="6" y="16" width="1" height="1" /></bezel>
+		<bezel name="lamp10" element="led"><bounds x="8" y="16" width="1" height="1" /></bezel>
+
+		<bezel name="lamp4"  element="led"><bounds x="0" y="18" width="1" height="1" /></bezel>
+		<bezel name="lamp3"  element="led"><bounds x="2" y="18" width="1" height="1" /></bezel>
+		<bezel name="lamp2"  element="led"><bounds x="4" y="18" width="1" height="1" /></bezel>
+		<bezel name="lamp1"  element="led"><bounds x="6" y="18" width="1" height="1" /></bezel>
+		<bezel name="lamp0"  element="led"><bounds x="8" y="18" width="1" height="1" /></bezel>
+
+
+	</view>
+</mamelayout>

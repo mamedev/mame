@@ -44,7 +44,7 @@
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
  *085     uPD650C  1980, Roland TR-808
- *127     uPD650C  198?  Sony OA-S1100 Typecorder (subcpu, have dump)
+ *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
  *128     uPD650C  1982, Roland TR-606
   133     uPD650C  1982, Roland TB-303 -> tb303.c
 
@@ -60,7 +60,7 @@
 #include "efball.lh"
 #include "mvbfree.lh"
 
-#include "hh_ucom4_test.lh" // test-layout - use external artwork
+#include "hh_ucom4_test.lh" // common test-layout - use external artwork
 
 
 class hh_ucom4_state : public driver_device
