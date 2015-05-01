@@ -287,7 +287,7 @@ void cirrus_gd5428_device::start_bitblt()
 			m_blt_source_current = m_blt_source + (8*(y % 8)); // patterns are linear data
 		else
 			m_blt_source_current = m_blt_source + (m_blt_source_pitch*y);
-		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*y);
+		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*(y+1));
 	}
 	m_blt_status &= ~0x02;
 }
@@ -308,7 +308,7 @@ void cirrus_gd5428_device::blit_dword()
 {
 	// TODO: add support for reverse direction
 	UINT8 x,pixel;
-	if(m_blt_mode & 0x80)  // patterns, colour expand
+	if(m_blt_mode & 0x80)  // colour expand
 	{
 		for(x=0;x<32;x++)
 		{
@@ -348,7 +348,7 @@ void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 	if(m_blt_mode & 0x40)  // enable 8x8 pattern
 	{
 		if(m_blt_mode & 0x80)  // colour expand
-			src = (vga.memory[m_blt_source % vga.svga_intf.vram_size] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? 0xff : 0x00;
+			src = (vga.memory[m_blt_source % vga.svga_intf.vram_size] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? vga.gc.enable_set_reset : vga.gc.set_reset;
 	}
 
 	switch(m_blt_rop)
