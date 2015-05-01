@@ -562,9 +562,11 @@ MACHINE_CONFIG_END
  * The optional AVO character set roms (see below) have: pin 18: /CS2*; pin 20: /CS1; pin 21: CS3 hence they match a normal 2716
    *(this is marked on the image as if it was CS2 but the input is tied to gnd meaning it must be /CS2)
 
- * The AVO itself can hold up to four character set roms on it (see http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
+ * The AVO itself can hold up to four roms on it (see http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
    and http://vt100.net/dec/ek-vt1ac-ug-002.pdf )
-   at least sixteen of these AVO roms were made, and are used as such:
+   and these roms can depending on jumpers be mapped at 0x8000, OR overlay the main code roms at 0x0000-0x1fff!
+   They may even allow banking between the main code roms and the overlay roms, I haven't traced the schematic.
+   At least sixteen of these AVO roms were made, and are used as such:
    (based on EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf)
  * No roms - normal vt100 system with AVO installed
  * 23-069E2 (location e21) - meant for vt100-wa and -wb 'LA120' 'word processing' systems (the mapping of the rom for this system is different than for the ones below)
