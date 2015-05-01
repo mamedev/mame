@@ -731,7 +731,7 @@ INSTRUCTION( xds )
 	A = t;
 
 	Bd = ((B & 0x0f) - 1) & 0x0f;
-	B = (B & 0x30) | Bd;
+	B = (B & 0x70) | Bd;
 
 	B = B ^ r;
 
@@ -766,7 +766,7 @@ INSTRUCTION( xis )
 	A = t;
 
 	Bd = ((B & 0x0f) + 1) & 0x0f;
-	B = (B & 0x30) | Bd;
+	B = (B & 0x70) | Bd;
 
 	B = B ^ r;
 
