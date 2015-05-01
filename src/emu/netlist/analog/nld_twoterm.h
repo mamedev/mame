@@ -172,6 +172,7 @@ NETLIB_DEVICE_WITH_PARAMS(POT2,
 	netlist_param_double_t m_R;
 	netlist_param_double_t m_Dial;
 	netlist_param_logic_t m_DialIsLog;
+	netlist_param_logic_t m_Reverse;
 );
 
 
