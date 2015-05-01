@@ -915,11 +915,11 @@ INSTRUCTION( lbi )
 {
 	if (opcode & 0x80)
 	{
-		B = opcode & 0x3f;
+		B = opcode & 0x7f;
 	}
 	else
 	{
-		B = (opcode & 0x70) | (((opcode & 0x0f) + 1) & 0x0f);
+		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
 	}
 
 	m_skip_lbi = 1;
