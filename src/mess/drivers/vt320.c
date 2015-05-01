@@ -105,7 +105,11 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( vt320 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-054e7.bin", 0x0000, 0x10000, CRC(be98f9a4) SHA1(b8044d42ffaadb734fbd047fbca9c8aadeb0bf6c))
+	ROM_DEFAULT_BIOS( "vt320" )
+	ROM_SYSTEM_BIOS( 0, "vt320o", "VT320 older version" )
+	ROMX_LOAD( "23-054e7.e9", 0x0000, 0x10000, CRC(be98f9a4) SHA1(b8044d42ffaadb734fbd047fbca9c8aadeb0bf6c), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "vt320", "VT320 newer version" )
+	ROMX_LOAD( "23-104e7.e9", 0x0000, 0x10000, CRC(5f419b5a) SHA1(dbc429b32d6baefd8a56862717d6e7fea1fb0c1c), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
