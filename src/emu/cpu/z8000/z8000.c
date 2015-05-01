@@ -341,7 +341,7 @@ UINT16 z8001_device::RDPORT_W(int mode, UINT16 addr)
 {
 	if(mode == 0)
 	{
-		return m_io->read_word((UINT16)addr);
+		return m_io->read_word_unaligned((UINT16)addr);
 	}
 	else
 	{
@@ -380,7 +380,7 @@ void z8001_device::WRPORT_W(int mode, UINT16 addr, UINT16 value)
 {
 	if(mode == 0)
 	{
-		m_io->write_word((UINT16)addr, value);
+		m_io->write_word_unaligned((UINT16)addr, value);
 	}
 	else
 	{

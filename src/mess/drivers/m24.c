@@ -8,6 +8,9 @@
 #include "machine/m24_z8000.h"
 #include "machine/mm58274c.h"
 #include "includes/genpc.h"
+#include "formats/pc_dsk.h"
+#include "formats/naslite_dsk.h"
+#include "formats/m20_dsk.h"
 
 class m24_state : public driver_device
 {
@@ -36,6 +39,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void machine_reset();
 
@@ -224,6 +228,20 @@ static INPUT_PORTS_START( m24 )
 	PORT_DIPSETTING(    0xc000, "4" )
 INPUT_PORTS_END
 
+FLOPPY_FORMATS_MEMBER( m24_state::floppy_formats )
+	FLOPPY_PC_FORMAT,
+	FLOPPY_NASLITE_FORMAT,
+	FLOPPY_M20_FORMAT
+FLOPPY_FORMATS_END
+
+static MACHINE_CONFIG_FRAGMENT( cfg_m20_format )
+	MCFG_DEVICE_MODIFY("fdc:0")
+	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
+
+	MCFG_DEVICE_MODIFY("fdc:1")
+	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( olivetti, m24_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)
@@ -235,6 +253,7 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb1", pc_isa8_cards, "cga_m24", true)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb2", pc_isa8_cards, "fdc_xt", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_m20_format)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb3", pc_isa8_cards, "lpt", true)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "mb4", pc_isa8_cards, "com", true)
 
