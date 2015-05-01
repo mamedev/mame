@@ -561,10 +561,12 @@ public:
 	{
 		register_input("IN", m_in);
 		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
+		save(NLNAME(m_last));
 	}
 
 	ATTR_COLD void reset()
 	{
+		m_last = 0.0;
 	}
 
 	ATTR_COLD void register_callback(netlist_analog_output_delegate callback)
@@ -574,15 +576,24 @@ public:
 
 	ATTR_HOT void update()
 	{
-		m_cpu_device->update_time_x();
-		m_callback(INPANALOG(m_in), m_cpu_device->local_time());
-		m_cpu_device->check_mame_abort_slice();
+		nl_double cur = INPANALOG(m_in);
+
+		// FIXME: make this a parameter
+		// avoid calls due to noise
+		if (fabs(cur - m_last) > 1e-6)
+		{
+			m_cpu_device->update_time_x();
+			m_callback(cur, m_cpu_device->local_time());
+			m_cpu_device->check_mame_abort_slice();
+			m_last = cur;
+		}
 	}
 
 private:
 	netlist_analog_input_t m_in;
 	netlist_analog_output_delegate m_callback;
 	netlist_mame_cpu_device_t *m_cpu_device;
+	netlist_state_t<nl_double> m_last;
 };
 
 // ----------------------------------------------------------------------------------------
