@@ -14,19 +14,24 @@ NETLIB_UPDATE(82S16)
 	if (INPLOGIC(m_CE1Q) || INPLOGIC(m_CE2Q) || INPLOGIC(m_CE3Q))
 	{
 		// FIXME: Outputs are tristate. This needs to be properly implemented
-		OUTLOGIC(m_DOUTQ, 1, NLTIME_FROM_NS(40));
+		OUTLOGIC(m_DOUTQ, 1, NLTIME_FROM_NS(20));
+		for (int i=0; i<8; i++)
+			m_A[i].inactivate();
 	}
 	else
 	{
 		int adr = 0;
 		for (int i=0; i<8; i++)
+		{
+			m_A[i].activate();
 			adr |= (INPLOGIC(m_A[i]) << i);
+		}
 
 		if (!INPLOGIC(m_WEQ))
 		{
 			m_ram[adr] = INPLOGIC(m_DIN);
 		}
-		OUTLOGIC(m_DOUTQ, m_ram[adr] ^ 1, NLTIME_FROM_NS(40));
+		OUTLOGIC(m_DOUTQ, m_ram[adr] ^ 1, NLTIME_FROM_NS(20));
 	}
 }
 
