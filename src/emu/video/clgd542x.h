@@ -65,6 +65,12 @@ protected:
 	UINT32 m_blt_source_current;
 	UINT32 m_blt_dest_current;
 
+	bool m_blt_system_transfer;  // blit from system memory 
+	UINT8 m_blt_system_count;
+	UINT32 m_blt_system_buffer;
+	UINT16 m_blt_pixel_count;
+	UINT16 m_blt_scan_count;
+	
 	UINT8 m_scratchpad1;
 	UINT8 m_scratchpad2;
 	UINT8 m_scratchpad3;
@@ -82,7 +88,9 @@ private:
 	void cirrus_crtc_reg_write(UINT8 index, UINT8 data);
 
 	void start_bitblt();
-	void copy_pixel();
+	void start_system_bitblt();
+	void blit_dword();
+	void copy_pixel(UINT8 src, UINT8 dst);
 };
 
 class cirrus_gd5430_device :  public cirrus_gd5428_device

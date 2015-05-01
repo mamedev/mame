@@ -14,7 +14,7 @@ differences with Naomi in SH4 memory map only:
 as for ROM board - unlike regular Naomi M4 it have not only ROM itself,
 but the other hardware too*:
 0x00000000 - 0x1fffffff - FlashROM, like in regular Naomi M4 cart
-0x39xxxxxx - SRAM(32Kb)**
+0x39xxxxxx - SRAM(128KB)**
 0x3axxxxxx - CF IDE registers (0 - data, 4 - error, 8 - sector count, etc)
 0x3bxxxxxx - CF IDE AltStatus/Device Ctrl register
 0x3dxxxxxx - Network aka Media board shared buffer/RAM
@@ -74,6 +74,23 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 #include "debugger.h"
 #include "includes/segasp.h"
 
+READ64_MEMBER(segasp_state::sp_bank_r)
+{
+	if (mem_mask & U64(0xffffffff00000000))
+		return -1;
+	return m_sp_bank;
+}
+
+WRITE64_MEMBER(segasp_state::sp_bank_w)
+{
+	if (mem_mask & U64(0xffffffff00000000))
+		return;
+	UINT16 bank = data & 0xffff;
+	if (bank != m_sp_bank)
+		logerror("SystemSP: G2 Bank set to %08X%s\n", (bank & 0x3fff) << 16, (bank & 0x4000) ? " decrypt ON" :"" );
+	m_sp_bank = bank;
+}
+
 READ64_MEMBER(segasp_state::sn_93c46a_r)
 {
 	int res;
@@ -96,11 +113,15 @@ WRITE64_MEMBER(segasp_state::sn_93c46a_w)
 
 READ64_MEMBER(segasp_state::sp_eeprom_r)
 {
+	if (mem_mask & U64(0xffffffff00000000))
+		return -1;
 	return m_sp_eeprom->do_read() << 4;
 }
 
 WRITE64_MEMBER(segasp_state::sp_eeprom_w)
 {
+	if (mem_mask & U64(0xffffffff00000000))
+		return;
 	m_sp_eeprom->di_write(data & 1);
 	m_sp_eeprom->cs_write((data & 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_sp_eeprom->clk_write((data & 4) ? ASSERT_LINE : CLEAR_LINE);
@@ -109,8 +130,8 @@ WRITE64_MEMBER(segasp_state::sp_eeprom_w)
 READ64_MEMBER(segasp_state::sp_rombdflg_r)
 {
 	// bit 0 - romboard type, 1 = M4
-	// bit 1 - debug mode
-	return 0x01;
+	// bit 1 - debug mode (enable easter eggs in BIOS, can boot game without proper eeproms/settings)
+	return ioport("CFG")->read();
 }
 
 READ64_MEMBER(segasp_state::sp_io_r)
@@ -120,7 +141,7 @@ READ64_MEMBER(segasp_state::sp_io_r)
 	int reg = offset * 2;
 	int shift = 0;
 
-	if (mem_mask & U64(0x000000ff00000000))
+	if (mem_mask & U64(0xffffffff00000000))
 	{
 		reg++;
 		shift = 32;
@@ -169,11 +190,14 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 	/* External Device */
-	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // - banked access to ROM board address space
+	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM // banked access to ROM/NET board address space, mainly backup SRAM and ATA
+	AM_RANGE(0x01010000, 0x01010007) AM_READWRITE(sp_bank_r, sp_bank_w )
+//	AM_RANGE(0x01010080, 0x01010087) IRQ pending/reset, ATA control
 	AM_RANGE(0x01010100, 0x01010127) AM_READ(sp_io_r)
 	AM_RANGE(0x01010128, 0x0101012f) AM_READWRITE(sp_eeprom_r, sp_eeprom_w )
 	AM_RANGE(0x01010150, 0x01010157) AM_READ(sp_rombdflg_r)
-//  AM_RANGE(0x01010000, 0x010101ff) // I/O regs
+//	AM_RANGE(0x01010180, 0x010101af) custom UART 1
+//	AM_RANGE(0x010101c0, 0x010101ef) custom UART 2
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -210,6 +234,14 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( segasp )
 	PORT_INCLUDE( naomi_debug )
 
+	PORT_START("CFG")
+	PORT_DIPNAME( 0x01, 0x01, "ROM Board type" )
+	PORT_DIPSETTING(    0x00, "other" )
+	PORT_DIPSETTING(    0x01, "M4-type" )
+	PORT_DIPNAME( 0x02, 0x00, "BIOS Debug mode" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -220,7 +252,7 @@ INPUT_PORTS_START( segasp )
 	PORT_DIPNAME( 0x04, 0x04, "Monitor" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, "31 kHz" )
 	PORT_DIPSETTING(    0x00, "15 kHz" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")     // Must be ON, with off BIOS bootstrap will deadloop
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:4")     // Must be ON, with off BIOS bootstrap will deadloop with green screen
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -275,23 +307,24 @@ MACHINE_CONFIG_END
 
 #define SEGASP_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "BOOT VER 1.01" ) \
+	ROM_SYSTEM_BIOS( 0, "v101", "BOOT VER 1.01" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-24236a.ic50", 0x000000, 0x200000, CRC(ca7df0de) SHA1(504c74d5fc96c53ef9f7753e9e37fb8b39cb628c) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "BOOT VER 2.00" ) \
+	ROM_SYSTEM_BIOS( 1, "v200", "BOOT VER 2.00" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-24328.ic50", 0x000000, 0x200000, CRC(25f2ef00) SHA1(e58dec9f171e52b3ded213b3fcd9a0de8a438076) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "BOOT VER 2.01" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-24328a.ic50", 0x000000, 0x200000, CRC(03ec3805) SHA1(a8fbaea826ca257be0b2b86952f247254929e046) )
+	ROM_SYSTEM_BIOS( 2, "v201", "BOOT VER 2.01" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-24328a.ic50", 0x000000, 0x200000, CRC(03ec3805) SHA1(a8fbaea826ca257be0b2b86952f247254929e046) ) \
+	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
+	ROM_LOAD16_WORD( "mb_serial.ic57", 0x0000, 0x0080, CRC(e1e3c009) SHA1(66bc636c527389c3338f631d78c788b4bd4e93be) )
+
 // Network/Media Board firmware VER 1.19(VxWorks), 1st half contain original 1.10 version
 #define SEGASP_NETFIRM \
 	ROM_REGION( 0x200000, "netcpu", 0) \
+	ROM_LOAD( "net_eeprom.ic74s",  0x00000000, 0x200, CRC(77cc5a6c) SHA1(cbfba546256b70bce6c6fd0030d7e2e410a25526) ) \
 	ROM_LOAD( "net_firm_119.ic72",  0x00000000, 0x200000, CRC(a738ea1c) SHA1(d25187a973a7e166e70334f964363adf2be87257) )
 
 // keep M4 board code happy for now
 #define SEGASP_MISC \
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x04)) \
-	ROM_REGION( 0x84, "naomibd_eeprom", ROMREGION_ERASEFF ) \
-	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \
-	ROM_LOAD16_WORD( "mb_serial.ic57", 0x0000, 0x0080, CRC(e1e3c009) SHA1(66bc636c527389c3338f631d78c788b4bd4e93be) )
+	ROM_REGION( 0x84, "naomibd_eeprom", ROMREGION_ERASEFF )
 
 #define SEGASPEE_US \
 	ROM_LOAD16_WORD( "mb_eeprom_us.ic54s", 0x0000, 0x0080, CRC(4186d7ab) SHA1(fc23da69a511a7643b6a066161bcfc3cdeeacf04) )
@@ -307,18 +340,26 @@ MACHINE_CONFIG_END
 	ROM_REGION16_BE(0x80, "sp_eeprom", 0) \
 	SEGASPEE_EXP
 
+#define SEGASP_JP \
+	ROM_REGION16_BE(0x80, "sp_eeprom",  ROMREGION_ERASEFF)
+
 ROM_START( segasp )
 	SEGASP_BIOS
 	SEGASP_NETFIRM
 	SEGASP_MISC
-	ROM_REGION16_BE(0x80, "sp_eeprom", 0)
+	SEGASP_JP
 	SEGASPEE_US
 	SEGASPEE_EXP
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))
+	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( brickppl )
 	SEGASP_BIOS
-	SEGASP_EXP
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
 	SEGASP_MISC
 
 	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASE)
@@ -326,6 +367,8 @@ ROM_START( brickppl )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(4f3c0937) SHA1(72d68b66c57ff539b8058f80f1a15ffa44095460) )
 	ROM_LOAD( "ic64",  0x08000000, 0x4000000, CRC(383e90d9) SHA1(eeca4b1bd0cd1fed7b85f045d71e0c7258d4350b) )
 	ROM_LOAD( "ic65",  0x0c000000, 0x4000000, CRC(4c29b5ac) SHA1(9e6a79ad2d2498eed5b2590c8764222e7d6c0229) )
+
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0558-com.ic15", 0, 0x800, BAD_DUMP CRC(7592d004) SHA1(632373d807f54953d68c95a9f874ed3e8011f085) )
@@ -346,6 +389,9 @@ ROM_START( dinoking )
 	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(4a787a44) SHA1(4d8f348466187fb67ffff8605be151cea1f77ec6) )
 	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(c78e46c2) SHA1(b8224c68face23010414d13ebb4cc05a2a9dce8a) )
 
+
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// actually 8x 128Mbit FlashROMs
+
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
 ROM_END
@@ -365,12 +411,15 @@ ROM_START( dinokior )
 	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(ff5ed2b8) SHA1(d8d86b3ed976c8c8fc51d225ae661e5f237b6e1d) )
 	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(ab8ac4eb) SHA1(e6b3ce796ae4887011e2764261f3f437dc9939f9) )
 
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// actually 8x 128Mbit FlashROMs
+
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
 ROM_END
 
 ROM_START( lovebery )
 	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
 	SEGASP_EXP
 	SEGASP_MISC
 
@@ -378,12 +427,23 @@ ROM_START( lovebery )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(1bd80ed0) SHA1(d50307573389ebe71e381a75deb83811fa397b94) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
+
+	// LOVE AND BERRY
+	// Dress up and Dance!
+	// Type-3
+	// 800
+	// note: this dump from "empty/dead" Management Chip with no game run count left
+	ROM_REGION( 0x80, "rf_tag", 0 )
+	ROM_LOAD( "berry_type3.bin", 0, 0x80, CRC(0c58aabd) SHA1(8e5d8c9fd2c84e93b442192682930cf4da3fcf79) )
 ROM_END
 
 ROM_START( lovebero )
 	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
 	SEGASP_EXP
 	SEGASP_MISC
 
@@ -391,18 +451,23 @@ ROM_START( lovebero )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(0a23cea3) SHA1(1780d935b0d641769859b2022df8e4262e7bafd8) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
 ROM_END
 
 ROM_START( tetgiant )
 	SEGASP_BIOS
-	SEGASP_EXP
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
 	SEGASP_MISC
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(31ba1938) SHA1(9b5a05193b3df13cd7617a38913e0b0fbd61da44) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(cb946213) SHA1(6195e33c44a1e8eb464dfc3558dc1c9b4d910ef3) )
+
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )
@@ -411,6 +476,7 @@ ROM_END
 
 ROM_START( dinoki25 )
 	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v200" )
 	SEGASP_EXP
 	SEGASP_MISC
 
@@ -419,12 +485,22 @@ ROM_START( dinoki25 )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0047", 0, SHA1(0f97291d9c5dbe3e66a5220da05aebdfaa78b35d) )
 
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
+
+	// DINOSAUR KING
+	// TYPE-3
+	// 800
+	// note: this dump from "empty/dead" Management Chip with no game run count left
+	ROM_REGION( 0x80, "rf_tag", 0 )
+	ROM_LOAD( "dino_type3.bin", 0, 0x80, CRC(1b6c9ea7) SHA1(2e56a1969c49c347f7facda187e5bf787c74328c) )
 ROM_END
 
 ROM_START( loveber3 )
 	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v200" )
 	SEGASP_US
 	SEGASP_MISC
 
@@ -433,19 +509,24 @@ ROM_START( loveber3 )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0042", 0, SHA1(9992d90dae8ce7636e4153e02b779c27931b3be6) )
 
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))	// 8x 512Mbit FlashROMs
+
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
 ROM_END
 
 ROM_START( tetgiano )
 	SEGASP_BIOS
-	SEGASP_EXP
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
 	SEGASP_MISC
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
 
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0076", 0, SHA1(6987c888d2a3ada2d07f6396d47fdba507ca859d) )
+
+	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))	// 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )

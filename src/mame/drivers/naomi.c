@@ -4132,6 +4132,15 @@ ROM_START( mtkob2 )
 
 	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
 
+
+	// MUSHIKING
+	// The King of Beetle
+	// TYPE-1
+	// 800
+	// note: this dump from "empty/dead" Management Chip with no game run count left
+	ROM_REGION( 0x80, "rf_tag", 0 )
+	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
+
 	// 840-0150    2003     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
 ROM_END

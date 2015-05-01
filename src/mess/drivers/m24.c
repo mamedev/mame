@@ -5,6 +5,7 @@
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "machine/m24_kbd.h"
+#include "machine/m24_z8000.h"
 #include "machine/mm58274c.h"
 #include "includes/genpc.h"
 
@@ -16,12 +17,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_kbc(*this, "kbc"),
-		m_keyboard(*this, "keyboard")
+		m_keyboard(*this, "keyboard"),
+		m_z8000_apb(*this, "z8000_apb")
 	{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<cpu_device> m_kbc;
 	required_device<m24_keyboard_device> m_keyboard;
+	optional_device<m24_z8000_device> m_z8000_apb;
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -30,11 +33,14 @@ public:
 	DECLARE_READ8_MEMBER(kbcdata_r);
 	DECLARE_WRITE8_MEMBER(kbcdata_w);
 	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
+	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
+	DECLARE_WRITE_LINE_MEMBER(int_w);
+	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
 
 	void machine_reset();
 
 	UINT8 m_sysctl, m_pa, m_kbcin, m_kbcout;
-	bool m_kbcibf, m_kbdata;
+	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
 };
 
 void m24_state::machine_reset()
@@ -43,6 +49,10 @@ void m24_state::machine_reset()
 	m_pa = 0x40;
 	m_kbcibf = false;
 	m_kbdata = true;
+	m_i86_halt = false;
+	m_i86_halt_perm = false;
+	if(m_z8000_apb)
+		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 READ8_MEMBER(m24_state::keyboard_r)
@@ -58,7 +68,7 @@ READ8_MEMBER(m24_state::keyboard_r)
 		case 2:
 			return 0;
 		case 4:
-			return m_kbcibf ? 2 : 0;
+			return (m_kbcibf ? 2 : 0) | ((m_pa & 0x40) ? 0 : 1);
 	}
 	return 0xff;
 }
@@ -81,6 +91,10 @@ WRITE8_MEMBER(m24_state::keyboard_w)
 			else
 				m_pa &= ~4;
 			break;
+		case 5:
+			m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			m_i86_halt = true;
+			m_i86_halt_perm = true;
 	}
 }
 
@@ -115,6 +129,33 @@ WRITE_LINE_MEMBER(m24_state::kbcin_w)
 	m_kbdata = state;
 }
 
+WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
+{
+	if(!m_i86_halt)
+		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	if(m_z8000_apb && !m_z8000_apb->halted())
+		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	/* Assert HLDA */
+	m_mb->m_dma8237->hack_w(state);
+}
+
+WRITE_LINE_MEMBER(m24_state::int_w)
+{
+	if(!m_i86_halt)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+	if(m_z8000_apb && !m_z8000_apb->halted())
+		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(m24_state::halt_i86_w)
+{
+	if(m_i86_halt_perm)
+		return;
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_i86_halt = state ? true : false;
+}
+
 static ADDRESS_MAP_START( m24_map, AS_PROGRAM, 16, m24_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
@@ -127,6 +168,7 @@ static ADDRESS_MAP_START(m24_io, AS_IO, 16, m24_state )
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(keyboard_r, keyboard_w, 0xffff)
 	AM_RANGE(0x0066, 0x0067) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("mm58174an", mm58274c_device, read, write, 0xffff)
+	AM_RANGE(0x80c0, 0x80c1) AM_DEVREADWRITE8("z8000_apb", m24_z8000_device, handshake_r, handshake_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kbc_map, AS_PROGRAM, 8, m24_state)
@@ -191,10 +233,14 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "mb1", pc_isa8_cards, "cga_m24", true)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "mb2", pc_isa8_cards, "fdc_xt", true)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "mb3", pc_isa8_cards, "lpt", true)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "mb4", pc_isa8_cards, "com", true)
+
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, NULL, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, NULL, false)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -210,6 +256,13 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // ?
 	MCFG_MM58274C_DAY1(1)   // ?
+
+	MCFG_DEVICE_ADD("z8000_apb", M24_Z8000, 0)
+	MCFG_M24_Z8000_HALT(WRITELINE(m24_state, halt_i86_w))
+	MCFG_DEVICE_MODIFY("mb:dma8237")
+	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE(":", m24_state, dma_hrq_w))
+	MCFG_DEVICE_MODIFY("mb:pic8259")
+	devcb = &pic8259_device::static_set_out_int_callback(*device, DEVCB_DEVWRITELINE(":", m24_state, int_w));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")

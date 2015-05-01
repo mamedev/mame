@@ -6,6 +6,8 @@
 
 #include "clgd542x.h"
 
+#define LOG_REG 0
+#define LOG_BLIT 1
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
@@ -126,7 +128,7 @@ void cirrus_gd5428_device::device_reset()
 	m_blt_source = m_blt_dest = m_blt_source_current = m_blt_dest_current = 0;
 	memset(m_ext_palette, 0, sizeof(m_ext_palette));
 	m_ext_palette_enabled = false;
-//  m_ext_palette[15].red = m_ext_palette[15].green = m_ext_palette[15].blue = 0xff;  // default?  Win3.1 doesn't seem to touch the extended DAC, or at least, it enables it, then immediately disables it then sets a palette...
+	m_blt_system_transfer = false;
 }
 
 UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -255,45 +257,98 @@ void cirrus_gd5428_device::start_bitblt()
 {
 	UINT32 x,y;
 
-	logerror("CL: BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+	if(LOG_BLIT) logerror("CL: BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
 
 	m_blt_source_current = m_blt_source;
 	m_blt_dest_current = m_blt_dest;
 
-	for(y=0;y<m_blt_height;y++)
+	for(y=0;y<=m_blt_height;y++)
 	{
-		for(x=0;x<m_blt_width;x++)
+		for(x=0;x<=m_blt_width;x++)
 		{
-			copy_pixel();
 			if(m_blt_mode & 0x80)  // colour expand
 			{
+				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+				
+				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 				if(x % 8)
 					m_blt_source_current++;
 			}
 			else
+			{
+				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 				m_blt_source_current++;
+			}
 			m_blt_dest_current++;
 			if(m_blt_mode & 0x40 && (x % 8) == 7)  // 8x8 pattern - reset pattern source location
-				m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y % 8));
+				m_blt_source_current = m_blt_source + (8*(y % 8)); // patterns are linear data
 		}
 		if(m_blt_mode & 0x40)  // 8x8 pattern
-			m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y % 8));
+			m_blt_source_current = m_blt_source + (8*(y % 8)); // patterns are linear data
 		else
 			m_blt_source_current = m_blt_source + (m_blt_source_pitch*y);
-		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*y);
+		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*(y+1));
 	}
 	m_blt_status &= ~0x02;
 }
 
-void cirrus_gd5428_device::copy_pixel()
+void cirrus_gd5428_device::start_system_bitblt()
 {
-	UINT8 src = vga.memory[m_blt_source_current % vga.svga_intf.vram_size];
-	UINT8 dst = vga.memory[m_blt_dest_current % vga.svga_intf.vram_size];
+	if(LOG_BLIT) logerror("CL: BitBLT from system memory started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+	m_blt_system_transfer = true;
+	m_blt_system_count = 0;
+	m_blt_system_buffer = 0;
+	m_blt_pixel_count = m_blt_scan_count = 0;
+	m_blt_source_current = m_blt_source;
+	m_blt_dest_current = m_blt_dest;
+	m_blt_status |= 0x01;
+}
 
+void cirrus_gd5428_device::blit_dword()
+{
+	// TODO: add support for reverse direction
+	UINT8 x,pixel;
+	if(m_blt_mode & 0x80)  // colour expand
+	{
+		for(x=0;x<32;x++)
+		{
+			pixel = ((m_blt_system_buffer & (0x00000001 << x)) >> x) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+			if(m_blt_pixel_count <= m_blt_width)
+				copy_pixel(pixel,vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+			m_blt_dest_current++;
+			m_blt_pixel_count++;
+		}
+	}
+	else
+	{
+		for(x=0;x<32;x+=8)
+		{
+			pixel = ((m_blt_system_buffer & (0x000000ff << x)) >> x);
+			if(m_blt_pixel_count <= m_blt_width)
+				copy_pixel(pixel,vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+			m_blt_dest_current++;
+			m_blt_pixel_count++;
+		}
+	}
+	if(m_blt_pixel_count > m_blt_width)
+	{
+		m_blt_pixel_count = 0;
+		m_blt_scan_count++;
+		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*m_blt_scan_count);
+	}
+	if(m_blt_scan_count > m_blt_height)
+	{
+		m_blt_system_transfer = false;  //  BitBLT complete
+		m_blt_status &= ~0x03;
+	}
+}
+
+void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
+{
 	if(m_blt_mode & 0x40)  // enable 8x8 pattern
 	{
 		if(m_blt_mode & 0x80)  // colour expand
-			src = (vga.memory[m_blt_source % vga.svga_intf.vram_size] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? 0xff : 0x00;
+			src = (vga.memory[m_blt_source % vga.svga_intf.vram_size] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? vga.gc.enable_set_reset : vga.gc.set_reset;
 	}
 
 	switch(m_blt_rop)
@@ -301,7 +356,7 @@ void cirrus_gd5428_device::copy_pixel()
 	case 0x00:  // BLACK
 		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = 0x00;
 		break;
-	case 0x0b:  // NOT DST
+	case 0x0b:  // DSTINVERT
 		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = ~dst;
 		break;
 	case 0x0d:  // SRC
@@ -379,7 +434,7 @@ UINT8 cirrus_gd5428_device::cirrus_seq_reg_read(UINT8 index)
 
 void cirrus_gd5428_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 {
-	logerror("CL: SEQ write %02x to SR%02x\n",data,index);
+	if(LOG_REG) logerror("CL: SEQ write %02x to SR%02x\n",data,index);
 	switch(index)
 	{
 		case 0x02:
@@ -579,7 +634,7 @@ UINT8 cirrus_gd5428_device::cirrus_gc_reg_read(UINT8 index)
 
 void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 {
-	logerror("CL: GC write %02x to GR%02x\n",data,index);
+	if(LOG_REG) logerror("CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
 	{
 	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
@@ -681,9 +736,14 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 		m_blt_mode = data;
 		break;
 	case 0x31:  // BitBLT Start / Status
-		m_blt_status = data & 0xf2;
+		m_blt_status = data & ~0xf2;
 		if(data & 0x02)
-			start_bitblt();
+		{
+			if(m_blt_mode & 0x04)  // blit source is system memory
+				start_system_bitblt();
+			else
+				start_bitblt();
+		}
 		break;
 	case 0x32:  // BitBLT ROP mode
 		m_blt_rop = data;
@@ -892,7 +952,7 @@ UINT8 cirrus_gd5428_device::cirrus_crtc_reg_read(UINT8 index)
 
 void cirrus_gd5428_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
 {
-	logerror("CL: CRTC write %02x to CR%02x\n",data,index);
+	if(LOG_REG) logerror("CL: CRTC write %02x to CR%02x\n",data,index);
 	switch(index)
 	{
 	case 0x16:  // VGA Vertical Blank end - some SVGA chipsets use all 8 bits, and this is one of them (according to MFGTST CRTC tests)
@@ -1100,6 +1160,19 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 	UINT32 addr;
 	UINT8 bank;
 	UINT8 cur_mode = pc_vga_choosevideomode();
+
+	if(m_blt_system_transfer)
+	{
+		m_blt_system_buffer &= ~(0x000000ff << (m_blt_system_count * 8));
+		m_blt_system_buffer |= (data << (m_blt_system_count * 8));
+		m_blt_system_count++;
+		if(m_blt_system_count >= 4)
+		{
+			blit_dword();
+			m_blt_system_count = 0;
+		}
+		return;
+	}
 
 	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 	{

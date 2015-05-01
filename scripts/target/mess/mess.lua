@@ -1875,6 +1875,7 @@ files {
 	MAME_DIR .. "src/mess/drivers/m20.c",       
 	MAME_DIR .. "src/mess/drivers/m24.c",
 	MAME_DIR .. "src/mess/machine/m24_kbd.c",
+	MAME_DIR .. "src/mess/machine/m24_z8000.c"
 }
 
 createMESSProjects(_target, _subtarget, "omnibyte")
