@@ -29,6 +29,11 @@ In order to get the game to run, follow these steps:
 (This is the "password" for the EEPROM.  You have three attempts to get it correct, otherwise the service mode will restart)
 - if accepted, disable service mode DIP switch
 - reset machine (press 'F3')
+
+TODO:
+- inputs needs overhaul, namely fix coins and games enable (right now only Bingo 10 is enabled);
+- watchdog (service mode claims that there's one at the end of the aforementioned procedure);
+- sound;
 */
 
 
@@ -575,5 +580,6 @@ ROM_START( gambl186a )
 ROM_END
 
 
+/* TODO: proper title, at least sub-label all games inside it. */
 GAME( 1997, gambl186,  0,        gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V398)",         GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V399)",         GAME_NOT_WORKING | GAME_NO_SOUND )
