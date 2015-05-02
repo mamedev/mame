@@ -13,7 +13,7 @@
 
 // internal artwork
 #include "einvaderc.lh" // test-layout(but still playable)
-#include "lightfgt.lh"
+#include "lightfgt.lh" // clickable
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
@@ -342,9 +342,21 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Milton Bradley Lightfight
+  Milton Bradley (Electronic) Lightfight
   * COP421L MCU labeled /B119 COP421L-HLA/N
   * LED matrix, 1bit sound
+  
+  Xbox-shaped electronic game for 2 or more players, with long diagonal buttons
+  next to each outer LED. The main object of the game is to pinpoint a light
+  by pressing 2 buttons. To start, press a skill-level button(P2 button 7/8/9)
+  after selecting a game mode(P1 button 6-10).
+  
+  The game variations are:
+  1: LightFight
+  2: NightFight
+  3: RiteSite
+  4: QuiteBrite
+  5: RightLight
 
 ***************************************************************************/
 
@@ -401,11 +413,9 @@ WRITE_LINE_MEMBER(lightfgt_state::write_sk)
 
 READ8_MEMBER(lightfgt_state::read_g)
 {
-	return 0xf;
-	
 	// G: multiplexed inputs
 	m_inp_mux = (m_so | m_d << 1) ^ 0x1f;
-	return read_inputs(5);
+	return read_inputs(5) ^ 0xf;
 }
 
 
@@ -413,16 +423,40 @@ READ8_MEMBER(lightfgt_state::read_g)
 
 static INPUT_PORTS_START( lightfgt )
 	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // note: button 1 is on the left side from player perspective
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_COCKTAIL
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_COCKTAIL
+
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_COCKTAIL
+
+	PORT_START("IN.3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_COCKTAIL
+
+	PORT_START("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( lightfgt, lightfgt_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP421, 1000000) // approximation - RC osc. R=82K to +6V, C=56pf to GND(-6V)
+	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K to +6V, C=56pf to GND(-6V)
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(lightfgt_state, write_so))
 	MCFG_COP400_WRITE_SK_CB(WRITELINE(lightfgt_state, write_sk))
@@ -464,6 +498,7 @@ ROM_END
 
 
 
-/*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1981, einvaderc,   einvader,        0, einvaderc,   einvaderc,   driver_device, 0, "Entex", "Space Invader (Entex, COP444)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
-CONS( 1981, lightfgt,   0,        0, lightfgt,   lightfgt,   driver_device, 0, "Milton Bradley", "Lightfight", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
+CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )
+
+CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", GAME_SUPPORTS_SAVE )

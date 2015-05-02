@@ -185,6 +185,7 @@ NETLIB_START(POT2)
 
 	register_param("R", m_R, 1.0 / netlist().gmin());
 	register_param("DIAL", m_Dial, 0.5);
+	register_param("REVERSE", m_Reverse, 0);
 	register_param("DIALLOG", m_DialIsLog, 0);
 
 }
@@ -202,8 +203,11 @@ NETLIB_UPDATE(POT2)
 NETLIB_UPDATE_PARAM(POT2)
 {
 	nl_double v = m_Dial.Value();
+
 	if (m_DialIsLog.Value())
 		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
+	if (m_Reverse.Value())
+		v = 1.0 - v;
 
 	// FIXME: Only attached nets should be brought up to current time
 	//netlist().solver()->update_to_current_time(); // bring up current time

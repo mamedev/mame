@@ -169,6 +169,14 @@ CIRCUIT_LAYOUT( breakout )
 	SWITCH(S1_3)
 	SWITCH(S1_4)
 
+	SWITCH2(COIN1)  // Coin 1
+	SWITCH2(COIN2)  // Coin 2
+
+	SWITCH(START1)  // Start 1
+	SWITCH(START2)  // Start 2
+
+	SWITCH(SERVE)  // Start 2
+
 	SWITCH(S2)  // Cocktail
 	SWITCH(S3)  // 2 Plays / 25c
 	SWITCH2(S4) // Three Balls / 5 Balls
@@ -313,17 +321,17 @@ CIRCUIT_LAYOUT( breakout )
 
 	CHIP_LATCH(LATCH)
 	//CHIP("COIN1", COIN_INPUT)
-	CHIP_INPUT_ACTIVE_LOW(COIN1)
+	//CHIP_INPUT_ACTIVE_LOW(COIN1)
 
 	//CHIP("COIN2", COIN_INPUT)
-	CHIP_INPUT_ACTIVE_LOW(COIN2)
+	//CHIP_INPUT_ACTIVE_LOW(COIN2)
 
 	//CHIP("START", START_INPUT)
-	CHIP_INPUT_ACTIVE_LOW(START1)
-	CHIP_INPUT_ACTIVE_HIGH(START2)
+	//CHIP_INPUT_ACTIVE_LOW(START1)
+	//CHIP_INPUT_ACTIVE_HIGH(START2)
 
 	//CHIP("SERVE", BUTTONS1_INPUT)
-	CHIP_INPUT_ACTIVE_LOW(SERVE)    // Active low?
+	//CHIP_INPUT_ACTIVE_LOW(SERVE)    // Active low?
 
     //TODO: start 2
 
@@ -1186,10 +1194,15 @@ CIRCUIT_LAYOUT( breakout )
 	//Cabinet type
 
 	// Coin Circuit
-	CONNECTION("COIN1", 1, "F9", 13)
+	CONNECTION("COIN1", 2, "F9", 13)
+	CONNECTION("COIN1", 1, "F9", 11)
+	NET_C(COIN1.Q, GND)
 
-	CONNECTION(CSW1, "F9", 11)
+	//CONNECTION(CSW1, "F9", 11)
+	CONNECTION(CSW1, "COIN1", 1)
+
 	//CONNECTION("F9", 10, "F9", 13) //TODO: causes lots of bouncing, commented out since this trace is not implemented in gotcha
+	CONNECTION("F9", 10, "COIN1", 2) //TODO: causes lots of bouncing, commented out since this trace is not implemented in gotcha
 
 	CONNECTION(V64, "H7", 12)
 	CONNECTION(V64, "H7", 13)
@@ -1228,12 +1241,17 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION("J9", 6, "L9", 4)
 
 	//COIN2 circuit
-	CONNECTION("COIN2", 1, "F9", 1)
+	//CONNECTION("COIN2", 1, "F9", 1)
 	//CONNECTION(GNDD, "F9", 1)     //TODO: coin2 not implemented
 
-	CONNECTION(CSW2, "F9", 3)
+	CONNECTION("COIN2", 2, "F9", 1)
+	CONNECTION("COIN2", 1, "F9", 3)
+	NET_C(COIN2.Q, GND)
+
+	CONNECTION(CSW2, "COIN2", 1)
 	CONNECTION(CSW2, "H9", 10)
 	CONNECTION("F9", 4, "H9", 12)
+	CONNECTION("F9", 4, "COIN2", 2)
 	CONNECTION(V64_n, "H9", 11)
 	CONNECTION(V64_n, "H9", 3)
 	CONNECTION(P, "H9", 13)
@@ -1256,8 +1274,13 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION("E9", 8, "H1", 2)
 
 	//Start2 Input
+	//Start1 Input
+	RES(R58, RES_K(1))
 	//CONNECTION("START", 2, "E9", 11)
-	CONNECTION("START2", 1, "E9", 11)
+	NET_C(START2.2, GND)
+	NET_C(R58.1, V5)
+	NET_C(START2.1, R58.2, E9.11)
+
 	CONNECTION("E9", 10, "E8", 12)
 	CONNECTION(P, "E8", 10)
 	CONNECTION(V64I, "E8", 11)
@@ -1270,8 +1293,11 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION("E7", 13, "E8", 13)
 
 	//Start1 Input
+	RES(R57, RES_K(1))
 	//CONNECTION("START", 1, "E9", 3)
-	CONNECTION("START1", 1, "E9", 3)
+	NET_C(START1.2, GND)
+	NET_C(R57.1, V5)
+	NET_C(START1.1, R57.2, E9.3)
 	CONNECTION("E9", 4, "E8", 2)
 	CONNECTION(P, "E8", 4)
 	CONNECTION(V64_d, "E8", 3)
@@ -1308,6 +1334,12 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION(EGL_n, "D6", 2)
 
 	//Serve
+
+	RES(R30, RES_K(1))
+	NET_C(SERVE.2, GND)
+	NET_C(SERVE.1, R30.2)
+	NET_C(R30.1, V5)
+
 	CONNECTION(H64, "J3", 6)
 	CONNECTION(H32, "J3", 5)
 	CONNECTION("J3", 4, "L4", 13)
@@ -1682,15 +1714,31 @@ CIRCUIT_LAYOUT( breakout )
 #endif
 
 	// POTS
-	POT2(POTP1, RES_K(6))     // 5k
-	PARAM(POTP1, 0)  // Log Dial ...
+	POT2(POTP1, RES_K(5))     // 5k
+	PARAM(POTP1.DIALLOG, 1)  // Log Dial ...
+	PARAM(POTP1.REVERSE, 1)  // Log Dial ...
+	NET_C(POTP1.1, V5)
+
+	POT2(POTP2, RES_K(5))     // 5k
+	PARAM(POTP2.DIALLOG, 1)  // Log Dial ...
+	PARAM(POTP2.REVERSE, 1)  // Log Dial ...
+	NET_C(POTP2.1, V5)
+
 	RES(R33, 47)
 
-	NET_C(POTP1.1, V5)
-	//NET_C(POTP1.3, GND)
-	NET_C(POTP1.2, R33.1)
+	CD_4016_DIP(D9)
+	NET_C(D9.7, GND)
+	NET_C(D9.14, V5)
+
+	CONNECTION(P2_CONDITIONAL_dash, "D9", 6)
+	NET_C(D9.12, E9.8)
+	NET_C(D9.8, POTP2.2) // Connect P2 dial here
+	NET_C(D9.11, POTP1.2)
+
+	NET_C(D9.9, D9.10, R33.1)
 	NET_C(R33.2, C9.6)
 
+	NET_C(GND, D9.1, D9.2, D9.13, D9.3, D9.4, D9.5)
 CIRCUIT_LAYOUT_END
 
 #endif

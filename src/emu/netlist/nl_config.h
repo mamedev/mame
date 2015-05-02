@@ -36,6 +36,7 @@
  *
  */
 
+// FIXME: breakout doesn't like this
 #define USE_DEACTIVE_DEVICE     (0)
 
 #define USE_TRUTHTABLE          (0)
