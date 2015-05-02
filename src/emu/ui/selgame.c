@@ -232,8 +232,8 @@ void ui_menu_select_game::populate()
 	// if nothing there, add a single multiline item and return
 	if (matchcount == 0)
 	{
-		astring txt;
-		txt.printf("No %s found. Please check the rompath specified in the %s.ini file.\n\n"
+		std::string txt;
+		strprintf(txt, "No %s found. Please check the rompath specified in the %s.ini file.\n\n"
 					"If this is your first time using %s, please see the config.txt file in "
 					"the docs directory for information on configuring %s.",
 					emulator_info::get_gamesnoun(),
@@ -282,15 +282,15 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	const game_driver *driver;
 	float width, maxwidth;
 	float x1, y1, x2, y2;
-	astring tempbuf[5];
+	std::string tempbuf[5];
 	rgb_t color;
 	int line;
 
 	// display the current typeahead
 	if (m_search[0] != 0)
-		tempbuf[0].printf("Type name or select: %s_", m_search);
+		strprintf(tempbuf[0], "Type name or select: %s_", m_search);
 	else
-		tempbuf[0].printf("Type name or select: (random)");
+		strprintf(tempbuf[0],"Type name or select: (random)");
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
@@ -324,21 +324,21 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		const char *gfxstat, *soundstat;
 
 		// first line is game name
-		tempbuf[0].printf("%-.100s", driver->description);
+		strprintf(tempbuf[0],"%-.100s", driver->description);
 
 		// next line is year, manufacturer
-		tempbuf[1].printf("%s, %-.100s", driver->year, driver->manufacturer);
+		strprintf(tempbuf[1], "%s, %-.100s", driver->year, driver->manufacturer);
 
 		// next line source path
-		tempbuf[2].printf("Driver: %-.100s", core_filename_extract_base(tempbuf[3], driver->source_file).c_str());
+		strprintf(tempbuf[2],"Driver: %-.100s", core_filename_extract_base(tempbuf[3], driver->source_file).c_str());
 
 		// next line is overall driver status
 		if (driver->flags & GAME_NOT_WORKING)
-			tempbuf[3].cpy("Overall: NOT WORKING");
+			tempbuf[3].assign("Overall: NOT WORKING");
 		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
-			tempbuf[3].cpy("Overall: Unemulated Protection");
+			tempbuf[3].assign("Overall: Unemulated Protection");
 		else
-			tempbuf[3].cpy("Overall: Working");
+			tempbuf[3].assign("Overall: Working");
 
 		// next line is graphics, sound status
 		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
@@ -353,7 +353,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		else
 			soundstat = "OK";
 
-		tempbuf[4].printf("Gfx: %s, Sound: %s", gfxstat, soundstat);
+		strprintf(tempbuf[4], "Gfx: %s, Sound: %s", gfxstat, soundstat);
 	}
 	else
 	{
@@ -361,13 +361,13 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		line = 0;
 
 		// first line is version string
-		tempbuf[line++].printf("%s %s", emulator_info::get_applongname(), build_version);
+		strprintf(tempbuf[line++], "%s %s", emulator_info::get_applongname(), build_version);
 
 		// output message
 		while (line < ARRAY_LENGTH(tempbuf))
 		{
 			if (!(*s == 0 || *s == '\n'))
-				tempbuf[line].cat(*s);
+				tempbuf[line].push_back(*s);
 
 			if (*s == '\n')
 			{

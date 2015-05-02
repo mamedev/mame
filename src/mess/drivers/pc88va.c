@@ -1727,9 +1727,9 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
 {
-//	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+//  m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-    m_dmac->hack_w(state);
+	m_dmac->hack_w(state);
 
 //  printf("%02x HLDA\n",state);
 }

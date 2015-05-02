@@ -383,7 +383,7 @@ static GFXDECODE_START( pegasus )
 GFXDECODE_END
 
 
-// An encrypted single rom starts with 02, decrypted with 20. 
+// An encrypted single rom starts with 02, decrypted with 20.
 // The 2nd and 3rd part of a multi-rom set will have no obvious byte,
 // so we check the first 4 bytes for a signature, and decrypt if found.
 void pegasus_state::pegasus_decrypt_rom(UINT8 *ROM)
@@ -433,8 +433,8 @@ int pegasus_state::load_cart(device_image_interface &image, generic_slot_device 
 
 		if (size == 0)
 		{
-			astring errmsg;
-			errmsg.printf("Attempted to load a file that does not work in this socket.\nPlease check \"Usage\" field in the software list for the correct socket(s) to use.");
+			std::string errmsg;
+			strprintf(errmsg,"Attempted to load a file that does not work in this socket.\nPlease check \"Usage\" field in the software list for the correct socket(s) to use.");
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
 			return IMAGE_INIT_FAIL;
 		}

@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "audit.h"
-#include "harddisk.h"
+#include "chd.h"
 #include "sound/samples.h"
 
 
@@ -64,9 +64,9 @@ const char *driverpath = m_enumerator.config().root_device().searchpath();
 		for (const rom_entry *region = rom_first_region(*device); region != NULL; region = rom_next_region(region))
 		{
 // temporary hack: add the driver path & region name
-astring combinedpath = astring(device->searchpath()).cat(";").cat(driverpath);
+std::string combinedpath = std::string(device->searchpath()).append(";").append(driverpath);
 if (device->shortname())
-	combinedpath.cat(";").cat(device->shortname());
+	combinedpath.append(";").append(device->shortname());
 m_searchpath = combinedpath.c_str();
 
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
@@ -188,19 +188,19 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 	// store validation for later
 	m_validation = validation;
 
-	astring combinedpath(swinfo->shortname());
-	combinedpath.cat(";");
-	combinedpath.cat(list_name);
-	combinedpath.cat(PATH_SEPARATOR);
-	combinedpath.cat(swinfo->shortname());
-	astring locationtag(list_name);
-	locationtag.cat("%");
-	locationtag.cat(swinfo->shortname());
-	locationtag.cat("%");
+	std::string combinedpath(swinfo->shortname());
+	combinedpath.append(";");
+	combinedpath.append(list_name);
+	combinedpath.append(PATH_SEPARATOR);
+	combinedpath.append(swinfo->shortname());
+	std::string locationtag(list_name);
+	locationtag.append("%");
+	locationtag.append(swinfo->shortname());
+	locationtag.append("%");
 	if (swinfo->parentname() != NULL)
 	{
-		locationtag.cat(swinfo->parentname());
-		combinedpath.cat(";").cat(swinfo->parentname()).cat(";").cat(list_name).cat(PATH_SEPARATOR).cat(swinfo->parentname());
+		locationtag.append(swinfo->parentname());
+		combinedpath.append(";").append(swinfo->parentname()).append(";").append(list_name).append(PATH_SEPARATOR).append(swinfo->parentname());
 	}
 	m_searchpath = combinedpath.c_str();
 
@@ -274,12 +274,12 @@ media_auditor::summary media_auditor::audit_samples()
 	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
 	{
 		// by default we just search using the driver name
-		astring searchpath(m_enumerator.driver().name);
+		std::string searchpath(m_enumerator.driver().name);
 
 		// add the alternate path if present
 		samples_iterator iter(*device);
 		if (iter.altbasename() != NULL)
-			searchpath.cat(";").cat(iter.altbasename());
+			searchpath.append(";").append(iter.altbasename());
 
 		// iterate over samples in this entry
 		for (const char *samplename = iter.first(); samplename != NULL; samplename = iter.next())
@@ -292,7 +292,7 @@ media_auditor::summary media_auditor::audit_samples()
 			// look for the files
 			emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
 			path_iterator path(searchpath.c_str());
-			astring curpath;
+			std::string curpath;
 			while (path.next(curpath, samplename))
 			{
 				// attempt to access the file (.flac) or (.wav)
@@ -327,7 +327,7 @@ media_auditor::summary media_auditor::audit_samples()
 //  string format
 //-------------------------------------------------
 
-media_auditor::summary media_auditor::summarize(const char *name, astring *output)
+media_auditor::summary media_auditor::summarize(const char *name, std::string *output)
 {
 	if (m_record_list.count() == 0)
 	{
@@ -347,37 +347,37 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *outpu
 		// output the game name, file name, and length (if applicable)
 		if (output != NULL)
 		{
-			output->catprintf("%-12s: %s", name, record->name());
+			strcatprintf(*output,"%-12s: %s", name, record->name());
 			if (record->expected_length() > 0)
-				output->catprintf(" (%" I64FMT "d bytes)", record->expected_length());
-			output->catprintf(" - ");
+				strcatprintf(*output," (%" I64FMT "d bytes)", record->expected_length());
+			strcatprintf(*output," - ");
 		}
 
 		// use the substatus for finer details
 		switch (record->substatus())
 		{
 			case audit_record::SUBSTATUS_GOOD_NEEDS_REDUMP:
-				if (output != NULL) output->catprintf("NEEDS REDUMP\n");
+				if (output != NULL) strcatprintf(*output,"NEEDS REDUMP\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_NODUMP:
-				if (output != NULL) output->catprintf("NO GOOD DUMP KNOWN\n");
+				if (output != NULL) strcatprintf(*output,"NO GOOD DUMP KNOWN\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_BAD_CHECKSUM:
 				if (output != NULL)
 				{
-					astring tempstr;
-					output->catprintf("INCORRECT CHECKSUM:\n");
-					output->catprintf("EXPECTED: %s\n", record->expected_hashes().macro_string(tempstr));
-					output->catprintf("   FOUND: %s\n", record->actual_hashes().macro_string(tempstr));
+					std::string tempstr;
+					strcatprintf(*output,"INCORRECT CHECKSUM:\n");
+					strcatprintf(*output,"EXPECTED: %s\n", record->expected_hashes().macro_string(tempstr));
+					strcatprintf(*output,"   FOUND: %s\n", record->actual_hashes().macro_string(tempstr));
 				}
 				break;
 
 			case audit_record::SUBSTATUS_FOUND_WRONG_LENGTH:
-				if (output != NULL) output->catprintf("INCORRECT LENGTH: %" I64FMT "d bytes\n", record->actual_length());
+				if (output != NULL) strcatprintf(*output,"INCORRECT LENGTH: %" I64FMT "d bytes\n", record->actual_length());
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND:
@@ -385,20 +385,20 @@ media_auditor::summary media_auditor::summarize(const char *name, astring *outpu
 				{
 					device_t *shared_device = record->shared_device();
 					if (shared_device == NULL)
-						output->catprintf("NOT FOUND\n");
+						strcatprintf(*output,"NOT FOUND\n");
 					else
-						output->catprintf("NOT FOUND (%s)\n", shared_device->shortname());
+						strcatprintf(*output,"NOT FOUND (%s)\n", shared_device->shortname());
 				}
 				best_new_status = NOTFOUND;
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND_NODUMP:
-				if (output != NULL) output->catprintf("NOT FOUND - NO GOOD DUMP KNOWN\n");
+				if (output != NULL) strcatprintf(*output,"NOT FOUND - NO GOOD DUMP KNOWN\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
 			case audit_record::SUBSTATUS_NOT_FOUND_OPTIONAL:
-				if (output != NULL) output->catprintf("NOT FOUND BUT OPTIONAL\n");
+				if (output != NULL) strcatprintf(*output,"NOT FOUND BUT OPTIONAL\n");
 				best_new_status = BEST_AVAILABLE;
 				break;
 
@@ -430,7 +430,7 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 	emu_file file(m_enumerator.options().media_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
 	file.set_restrict_to_mediapath(true);
 	path_iterator path(m_searchpath);
-	astring curpath;
+	std::string curpath;
 	while (path.next(curpath, record.name()))
 	{
 		// open the file if we can

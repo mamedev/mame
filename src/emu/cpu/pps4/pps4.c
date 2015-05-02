@@ -1552,12 +1552,12 @@ void pps4_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-void pps4_device::state_string_export(const device_state_entry &entry, astring &str)
+void pps4_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str.printf("%c%c%c",
+			strprintf(str, "%c%c%c",
 				m_C ? 'C':'.',
 				m_FF1 ? '1':'.',
 				m_FF2 ? '2':'.');

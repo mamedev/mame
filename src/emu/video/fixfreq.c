@@ -45,7 +45,8 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type ty
 		m_vsync(492),
 		m_vbackporch(525),
 		m_fieldcount(2),
-		m_sync_threshold(0.3)
+		m_sync_threshold(0.3),
+		m_gain(1.0 / 3.7)
 {
 }
 
@@ -63,7 +64,8 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *ta
 		m_vsync(492),
 		m_vbackporch(525),
 		m_fieldcount(2),
-		m_sync_threshold(0.3)
+		m_sync_threshold(0.3),
+		m_gain(1.0 / 3.7)
 {
 }
 
@@ -247,10 +249,11 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 		rgb_t col;
 
 		if (m_vid < m_sync_threshold)
+			// Mark sync areas
 			col = rgb_t(255, 0, 0);
 		else
 		{
-			int colv = (int) ((m_vid - m_sync_threshold) / 3.7 * 255.0);
+			int colv = (int) ((m_vid - m_sync_threshold) * m_gain * 255.0);
 			if (colv > 255)
 				colv = 255;
 			col = rgb_t(colv, colv, colv);
@@ -272,6 +275,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 	if (sync & 2)
 	{
 		VERBOSE_OUT(("HSYNC up %d\n", pixels));
+		//if (m_last_y == 27) printf("HSYNC up %d %d\n", m_last_y, pixels);
 	}
 	if (sync & 4)
 	{
@@ -287,7 +291,8 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 		m_last_vsync_time = time;
 	}
 
-	if ((sync & 2) && !m_sig_vsync)
+	// FIXME: pixels > 50 filters some spurious hysnc on line 27 in breakout
+	if ((sync & 2) && !m_sig_vsync && (pixels > 50))
 	{
 		m_last_y += m_fieldcount;
 		m_last_x = 0;

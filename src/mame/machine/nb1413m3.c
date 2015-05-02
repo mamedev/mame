@@ -50,7 +50,7 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 void nb1413m3_device::device_start()
 {
 	m_timer_cb = timer_alloc(TIMER_CB);
-	synchronize(TIMER_CB);
+	m_timer_cb->adjust(attotime::zero);
 
 	save_item(NAME(m_nb1413m3_type));
 	save_item(NAME(m_sndrombank1));

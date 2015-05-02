@@ -756,6 +756,37 @@ ROM_START( pbillrds ) /* Encrytped with a Sega MC-8123 (317-0030) CPU module */
 	ROM_LOAD( "82s129.3c", 0x0500, 0x0100, CRC(cc1657e5) SHA1(358f20dce376c2389009f9673ce38b297af863f6) )
 ROM_END
 
+// all ROMs were HN4827128G-25, except 17, HN27256G-25
+// CPU module marked 3?7-500B, but seems to act the same as above
+ROM_START( pbillrdsa )
+	ROM_REGION( 0x18000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "29",  0x00000, 0x4000, CRC(da020258) SHA1(172276061c2e06bcf3477488734a72598412181b) ) /* encrypted */ // label scraped off, might be 20
+	ROM_LOAD( "17",  0x04000, 0x4000, CRC(9bb3d467) SHA1(5d61c80c920363cbcb548f4a08434e2a05b3d5f3) ) /* encrypted */
+	ROM_CONTINUE(          0x10000, 0x4000 )
+	ROM_LOAD( "19", 0x14000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) ) /* encrypted */
+
+	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0030.key", 0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 ) /* GFX */
+	ROM_LOAD( "pb.4", 0x000000, 0x04000, CRC(2f4d4dd3) SHA1(ee4facabf591c235c270db4f4d3f612b8c474e57) )
+	ROM_LOAD( "pb.5", 0x004000, 0x04000, CRC(9dfccbd3) SHA1(66ad8882f36630312b488d5d67ae554477574c31) )
+	ROM_LOAD( "pb.6", 0x008000, 0x04000, CRC(b5c3f6f6) SHA1(586b47587619a766cf977b74978550aff41a58cc) )
+
+	ROM_REGION( 0xc000, "gfx2", 0 ) /* GFX */
+	ROM_LOAD( "1", 0x000000, 0x04000, CRC(c8ed651e) SHA1(9ddeb7906e0772f344af1d4f74755694cade1f97) )
+	ROM_LOAD( "3", 0x004000, 0x04000, CRC(5282fc86) SHA1(dd8938489071ce61dc9bd4fed5a28403131e5706) )
+	ROM_LOAD( "2", 0x008000, 0x04000, CRC(e9f73f5b) SHA1(470ad3b0d13269b098eec9d81956d70ac3aebc39) )
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "82s129.3a", 0x0000, 0x0100, CRC(44802169) SHA1(f181d80185e0f87ee906d2b40e3a5deb6f563aa2) )
+	ROM_LOAD( "82s129.4d", 0x0100, 0x0100, CRC(69ca07cc) SHA1(38ab08174633b53d70a38aacb40059a25cf12069) )
+	ROM_LOAD( "82s129.4a", 0x0200, 0x0100, CRC(145f950a) SHA1(b007d0c1cc9545e0e241b39b79a48593d457f826) )
+	ROM_LOAD( "82s129.3d", 0x0300, 0x0100, CRC(43d24e17) SHA1(de5c9391574781dcd8f244794010e8eddffa1c1e) )
+	ROM_LOAD( "82s129.3b", 0x0400, 0x0100, CRC(7fdc872c) SHA1(98572560aa524490489d4202dba292a5af9f15e7) )
+	ROM_LOAD( "82s129.3c", 0x0500, 0x0100, CRC(cc1657e5) SHA1(358f20dce376c2389009f9673ce38b297af863f6) )
+ROM_END
+
 /*
 
 The original Freekick boards have the main CPU code inside a custom CPU "block". This code is stored in battery
@@ -1171,6 +1202,7 @@ GAME( 1986, oigas,     gigas ,   oigas,     gigas,    freekick_state, gigasb,  R
 GAME( 1986, gigasm2b,  0,        gigas,     gigasm2,  freekick_state, gigasb,  ROT270, "bootleg",                      "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, pbillrd,   0,        pbillrd,   pbillrd,  driver_device,  0,       ROT0,   "Nihon System",                 "Perfect Billiard", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, pbillrds,  pbillrd,  pbillrd,   pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-0030)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrdsa, pbillrd,  pbillrd,   pbillrd,  freekick_state, pbillrds,ROT0,   "Nihon System",                 "Perfect Billiard (MC-8123, 317-5008)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // sticker on CPU module different (wrong?) functionality the same
 GAME( 1987, freekick,  0,        freekickb, freekck,  driver_device, 0,        ROT270, "Nihon System (Merit license)", "Free Kick (NS6201-A 1987.10)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, freekicka, freekick, freekickb, freekck,  driver_device, 0,        ROT270, "Nihon System",                 "Free Kick (NS6201-A 1987.9)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, freekickb1,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

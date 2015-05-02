@@ -1,84 +1,84 @@
 /***************************************************************************
 
     L7A1045 L6028 DSP-A
-	(QFP120 package)
+    (QFP120 package)
 
-	this is the audio chip used on the following
-	SNK Hyper NeoGeo 64 (arcade platform)
-	AKAI MPC3000 (synth)
+    this is the audio chip used on the following
+    SNK Hyper NeoGeo 64 (arcade platform)
+    AKAI MPC3000 (synth)
 
-	both are driven by a V53, the MPC3000 isn't dumped.
+    both are driven by a V53, the MPC3000 isn't dumped.
 
-	appears to write a register number and channel/voice using
-	l7a1045_sound_select_w (offset 0)
-	format:
+    appears to write a register number and channel/voice using
+    l7a1045_sound_select_w (offset 0)
+    format:
 
-	---- rrrr ---c cccc
-	r = register, c = channel
+    ---- rrrr ---c cccc
+    r = register, c = channel
 
-	the channel select appears to address 32 different voices (5-bits)
-	the register select appears to use 4-bits with 0x0 to 0xa being valid
+    the channel select appears to address 32 different voices (5-bits)
+    the register select appears to use 4-bits with 0x0 to 0xa being valid
 
-	the registers data is written / read using offsets 1,2,3 after
-	setting the register + channel, this gives 3 16-bit values for
-	each register.
+    the registers data is written / read using offsets 1,2,3 after
+    setting the register + channel, this gives 3 16-bit values for
+    each register.
 
-	register format:
+    register format:
 
-	   offset 3           offset 2           offset 1
-	   fedcba9876543210 | fedcba9876543210 | fedcba9876543210
+       offset 3           offset 2           offset 1
+       fedcba9876543210 | fedcba9876543210 | fedcba9876543210
 
-	0  ----------------   ----------------   ----------------
+    0  ----------------   ----------------   ----------------
 
-	1  ----------------   ----------------   ----------------
+    1  ----------------   ----------------   ----------------
 
-	2  ----------------   ----------------   ----------------
+    2  ----------------   ----------------   ----------------
 
-	3  ----------------   ----------------   ----------------
+    3  ----------------   ----------------   ----------------
 
-	4  ----------------   ----------------   ----------------
+    4  ----------------   ----------------   ----------------
 
-	5  ----------------   ----------------   ----------------
+    5  ----------------   ----------------   ----------------
 
-	6  ----------------   ----------------   ----------------
+    6  ----------------   ----------------   ----------------
 
-	7  ----------------   ----------------   llllllllrrrrrrrr left/right volume
+    7  ----------------   ----------------   llllllllrrrrrrrr left/right volume
 
-	8  ----------------   ----------------   ---------------- (read only?)
+    8  ----------------   ----------------   ---------------- (read only?)
 
-	9  ----------------   ----------------   ---------------- (read only?)
+    9  ----------------   ----------------   ---------------- (read only?)
 
-	a  ----------------   ----------------   ----------------
+    a  ----------------   ----------------   ----------------
 
-	Registers are not yet understood.
+    Registers are not yet understood.
 
-	probably sample start, end, loop positions, panning etc.
-	like CPS3, Qsound etc.
+    probably sample start, end, loop positions, panning etc.
+    like CPS3, Qsound etc.
 
-	case 0x00:
-	case 0x01:
-	case 0x02:
-	case 0x03: // 00003fffffff (startup only?)
-	case 0x04: // doesn't use 6
-	case 0x05: // 00003fffffff (mostly, often)
-	case 0x06: // 00007ff0ffff mostly
-	case 0x07: // 0000000f0708 etc. (low values)
-	case 0x08: // doesn't write to 2/4/6 with this set??
-	case 0x09: // doesn't write to 2/4/6 with this set??
-	case 0x0a: // random looking values
+    case 0x00:
+    case 0x01:
+    case 0x02:
+    case 0x03: // 00003fffffff (startup only?)
+    case 0x04: // doesn't use 6
+    case 0x05: // 00003fffffff (mostly, often)
+    case 0x06: // 00007ff0ffff mostly
+    case 0x07: // 0000000f0708 etc. (low values)
+    case 0x08: // doesn't write to 2/4/6 with this set??
+    case 0x09: // doesn't write to 2/4/6 with this set??
+    case 0x0a: // random looking values
 
-	Some of the other ports on the HNG64 sound CPU may also be tied
-	to this chip, this isn't yet clear.
-	Port $8 bit 8 is keyon, low byte is sound status related (masked with 0x7f)
+    Some of the other ports on the HNG64 sound CPU may also be tied
+    to this chip, this isn't yet clear.
+    Port $8 bit 8 is keyon, low byte is sound status related (masked with 0x7f)
 
-	Sample data format TBA
+    Sample data format TBA
 
-	TODO:
-	- Sample format needs to be double checked;
-	- Octave Control/BPM/Pitch, right now XRally Network BGM wants 66150 Hz which is definitely too fast for Terry Bogard speech;
-	- Key Off;
-	- ADSR (registers 2 & 4?);
-	
+    TODO:
+    - Sample format needs to be double checked;
+    - Octave Control/BPM/Pitch, right now XRally Network BGM wants 66150 Hz which is definitely too fast for Terry Bogard speech;
+    - Key Off;
+    - ADSR (registers 2 & 4?);
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -132,7 +132,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
-	
+
 	for (int i = 0; i < 32; i++)
 	{
 		if (m_key & (1 << i))
@@ -142,7 +142,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			UINT32 start = vptr->start;
 			UINT32 end = vptr->end;
 			UINT32 step  = 0x400;
-			
+
 			UINT32 pos = vptr->pos;
 			UINT32 frac = vptr->frac;
 
@@ -150,7 +150,7 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			{
 				INT32 sample;
 				UINT8 data;
-				
+
 				pos += (frac >> 12);
 				frac &= 0xfff;
 
@@ -205,7 +205,7 @@ READ16_MEMBER( l7a1045_sound_device::l7a1045_sound_r )
 		printf("sound_select_r?\n");
 	else
 		return sound_data_r(space,offset -1,mem_mask);
-		
+
 	return 0xffff;
 }
 
@@ -238,7 +238,7 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
 	//if(m_audioregister != 0 && m_audioregister != 1 && m_audioregister != 7)
-	//	printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
+	//  printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
@@ -277,9 +277,9 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_data_w)
 
 				vptr->end &= m_rom_size - 1;
 			}
-			
+
 			break;
-		
+
 		case 0x07:
 
 			vptr->r_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xff);
@@ -302,11 +302,11 @@ READ16_MEMBER(l7a1045_sound_device::sound_data_r)
 
 	switch(m_audioregister)
 	{
-		case 0x00: 
+		case 0x00:
 		{
 			UINT32 current_addr;
 			UINT16 res;
-			
+
 			current_addr = vptr->start + vptr->pos;
 			if(offset == 0)
 				res = (current_addr & 0xf) << 12; // TODO: frac
@@ -314,11 +314,11 @@ READ16_MEMBER(l7a1045_sound_device::sound_data_r)
 				res = (current_addr & 0xffff0) >> 4;
 			else
 				res = (current_addr & 0xf00000) >> 20;
-		
+
 			return res;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -333,16 +333,14 @@ WRITE16_MEMBER(l7a1045_sound_device::sound_status_w)
 		{
 		printf("%08x START\n",vptr->start);
 		printf("%08x END\n",vptr->end);
-		
+
 		for(int i=0;i<0x10;i++)
 			printf("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
 		}
 		#endif
-		
+
 		vptr->frac = 0;
 		vptr->pos = 0;
 		m_key |= 1 << m_audiochannel;
 	}
 }
-
-

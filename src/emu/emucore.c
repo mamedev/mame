@@ -25,7 +25,7 @@ emu_fatalerror::emu_fatalerror(const char *format, ...)
 	{
 		va_list ap;
 		va_start(ap, format);
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 		va_end(ap);
 	}
 	osd_break_into_debugger(text);
@@ -40,7 +40,7 @@ emu_fatalerror::emu_fatalerror(const char *format, va_list ap)
 	}
 	else
 	{
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 	}
 	osd_break_into_debugger(text);
 }
@@ -56,7 +56,7 @@ emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, ...)
 	{
 		va_list ap;
 		va_start(ap, format);
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 		va_end(ap);
 	}
 }
@@ -70,7 +70,7 @@ emu_fatalerror::emu_fatalerror(int _exitcode, const char *format, va_list ap)
 	}
 	else
 	{
-		vsprintf(text, format, ap);
+		vsnprintf(text, sizeof(text), format, ap);
 	}
 }
 

@@ -34,7 +34,7 @@ private:
 class ui_menu_file_create : public ui_menu
 {
 public:
-	ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool *ok);
+	ui_menu_file_create(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool *ok);
 	virtual ~ui_menu_file_create();
 	virtual void populate();
 	virtual void handle();
@@ -42,8 +42,8 @@ public:
 
 private:
 	device_image_interface *        m_image;
-	astring &                       m_current_directory;
-	astring &                       m_current_file;
+	std::string &                   m_current_directory;
+	std::string &                   m_current_file;
 	const image_device_format *     m_current_format;
 	char                            m_filename_buffer[1024];
 
@@ -58,7 +58,7 @@ class ui_menu_file_selector : public ui_menu
 {
 public:
 	enum { R_EMPTY, R_SOFTLIST, R_CREATE, R_FILE };
-	ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, astring &current_directory, astring &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
+	ui_menu_file_selector(running_machine &machine, render_container *container, device_image_interface *image, std::string &current_directory, std::string &current_file, bool has_empty, bool has_softlist, bool has_create, int *result);
 	virtual ~ui_menu_file_selector();
 	virtual void populate();
 	virtual void handle();
@@ -86,8 +86,8 @@ private:
 
 	// internal state
 	device_image_interface *    m_image;
-	astring &                   m_current_directory;
-	astring &                   m_current_file;
+	std::string &               m_current_directory;
+	std::string &               m_current_file;
 	bool                        m_has_empty;
 	bool                        m_has_softlist;
 	bool                        m_has_create;

@@ -25,7 +25,7 @@ const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
 const device_type GB_ROM_M161_M12 = &device_creator<gb_rom_m161_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
 const device_type GB_ROM_SACHEN1 = &device_creator<gb_rom_sachen1_device>;
-const device_type GB_ROM_SACHEN2 = &device_creator<gb_rom_sachen1_device>;	// Just a placeholder for the moment...
+const device_type GB_ROM_SACHEN2 = &device_creator<gb_rom_sachen1_device>;  // Just a placeholder for the moment...
 const device_type GB_ROM_188IN1 = &device_creator<gb_rom_188in1_device>;
 const device_type GB_ROM_SINTAX = &device_creator<gb_rom_sintax_device>;
 const device_type GB_ROM_CHONGWU = &device_creator<gb_rom_chongwu_device>;
@@ -322,18 +322,18 @@ WRITE8_MEMBER(gb_rom_mbc1_device::write_bank)
 	// the mapper only uses inputs A13-A15
 	switch (offset & 0xe000)
 	{
-		case 0x0000:	// RAM Enable Register
+		case 0x0000:    // RAM Enable Register
 			m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
 			break;
-		case 0x2000:	// ROM Bank Register
+		case 0x2000:    // ROM Bank Register
 			data &= 0x1f;
 			m_latch_bank2 = data ? data : 1;
 			m_latch_bank2 &= m_mask;
 			break;
-		case 0x4000:	// RAM Bank Register
+		case 0x4000:    // RAM Bank Register
 			m_ram_bank = data & 0x3;
 			break;
-		case 0x6000:	// MBC1 Mode Register
+		case 0x6000:    // MBC1 Mode Register
 		default:
 			m_mode = (data & 0x1) ? MODE_4M_256k : MODE_16M_8k;
 			break;
@@ -638,22 +638,19 @@ WRITE8_MEMBER(gb_rom_mbc7_device::write_ram)
 READ8_MEMBER(gb_rom_m161_device::read_rom)
 {
 	if (offset < 0x4000)
-		return m_rom[rom_bank_map[m_base_bank | m_latch_bank] * 0x4000 + offset];
+		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + offset];
 	else
-		return m_rom[rom_bank_map[m_base_bank | m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+		return m_rom[rom_bank_map[m_base_bank] * 0x4000 + (offset & 0x3fff)];
 }
 
 WRITE8_MEMBER(gb_rom_m161_device::write_bank)
 {
 	switch (offset & 0xe000)
 	{
-		case 0x2000:	// ROM Bank Register? Tetris writes 1 here when selected...
-			data &= 0x1f;
-			m_latch_bank2 = data ? data : 1;
-			break;
-		case 0x4000:	// Base Bank Register
+		case 0x4000:    // Base Bank Register
 			m_base_bank = data << 1;
 			break;
+		case 0x2000:    // Tetris writes 1 here when selected...
 		default:
 			break;
 	}
@@ -718,18 +715,18 @@ READ8_MEMBER(gb_rom_sachen1_device::read_rom)
 
 WRITE8_MEMBER(gb_rom_sachen1_device::write_bank)
 {
-	if (offset < 0x2000)	// Base ROM Bank register
+	if (offset < 0x2000)    // Base ROM Bank register
 	{
 		if ((m_latch_bank2 & 0x30) == 0x30 && data)
 			m_base_bank = data & 0x0f;
 		//logerror("write to base bank %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
 	}
-	else if (offset < 0x4000)	// ROM Bank Register
+	else if (offset < 0x4000)   // ROM Bank Register
 	{
 		m_latch_bank2 = data ? data : 1;
 		//logerror("write to latch %X - %X\n", data, (m_base_bank & m_mask) | (m_latch_bank2 & ~m_mask));
 	}
-	else if (offset < 0x6000)	// ROM bank mask register
+	else if (offset < 0x6000)   // ROM bank mask register
 	{
 		if ((m_latch_bank2 & 0x30) == 0x30)
 			m_mask = data;

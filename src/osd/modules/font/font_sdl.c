@@ -18,7 +18,7 @@
 #endif
 
 
-#include "astring.h"
+#include "corestr.h"
 #include "corealloc.h"
 #include "fileio.h"
 
@@ -39,10 +39,10 @@ public:
 	virtual bool get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 private:
 #ifndef SDLMAME_HAIKU
-	TTF_Font *search_font_config(astring name, bool bold, bool italic, bool underline, bool &bakedstyles);
+	TTF_Font *search_font_config(std::string name, bool bold, bool italic, bool underline, bool &bakedstyles);
 #endif
-	bool BDF_Check_Magic(astring name);
-	TTF_Font * TTF_OpenFont_Magic(astring name, int fsize);
+	bool BDF_Check_Magic(std::string name);
+	TTF_Font * TTF_OpenFont_Magic(std::string name, int fsize);
 	TTF_Font *m_font;
 };
 
@@ -53,17 +53,17 @@ bool osd_font_sdl::open(const char *font_path, const char *_name, int &height)
 	int style = 0;
 
 	// accept qualifiers from the name
-	astring name(_name);
+	std::string name(_name);
 
-	if (name == "default")
+	if (name.compare("default")==0)
 	{
 		name = "Liberation Sans";
 	}
 
-	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
-	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
-	bool underline = (name.replace(0, "[U]", "") + name.replace(0, "[u]", "") > 0);
-	bool strike = (name.replace(0, "[S]", "") + name.replace(0, "[s]", "") > 0);
+	bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
+	bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
+	bool underline = (strreplace(name, "[U]", "") + strreplace(name, "[u]", "") > 0);
+	bool strike = (strreplace(name, "[S]", "") + strreplace(name, "[s]", "") > 0);
 
 	// first up, try it as a filename
 	font = TTF_OpenFont_Magic(name, POINT_SIZE);
@@ -77,7 +77,7 @@ bool osd_font_sdl::open(const char *font_path, const char *_name, int &height)
 		emu_file file(font_path, OPEN_FLAG_READ);
 		if (file.open(name.c_str()) == FILERR_NONE)
 		{
-			astring full_name = file.fullpath();
+			std::string full_name = file.fullpath();
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE);
 			if (font)
 				osd_printf_verbose("Found font %s\n", full_name.c_str());
@@ -184,7 +184,7 @@ bool osd_font_sdl::get_bitmap(unicode_char chnum, bitmap_argb32 &bitmap, INT32 &
 	return bitmap.valid();
 }
 
-TTF_Font * osd_font_sdl::TTF_OpenFont_Magic(astring name, int fsize)
+TTF_Font * osd_font_sdl::TTF_OpenFont_Magic(std::string name, int fsize)
 {
 	emu_file file(OPEN_FLAG_READ);
 	if (file.open(name.c_str()) == FILERR_NONE)
@@ -198,7 +198,7 @@ TTF_Font * osd_font_sdl::TTF_OpenFont_Magic(astring name, int fsize)
 	return TTF_OpenFont(name.c_str(), POINT_SIZE);
 }
 
-bool osd_font_sdl::BDF_Check_Magic(astring name)
+bool osd_font_sdl::BDF_Check_Magic(std::string name)
 {
 	emu_file file(OPEN_FLAG_READ);
 	if (file.open(name.c_str()) == FILERR_NONE)
@@ -215,7 +215,7 @@ bool osd_font_sdl::BDF_Check_Magic(astring name)
 }
 
 #ifndef SDLMAME_HAIKU
-TTF_Font *osd_font_sdl::search_font_config(astring name, bool bold, bool italic, bool underline, bool &bakedstyles)
+TTF_Font *osd_font_sdl::search_font_config(std::string name, bool bold, bool italic, bool underline, bool &bakedstyles)
 {
 	TTF_Font *font = (TTF_Font *)NULL;
 	FcConfig *config;
@@ -269,7 +269,7 @@ TTF_Font *osd_font_sdl::search_font_config(astring name, bool bold, bool italic,
 
 		osd_printf_verbose("Matching font: %s\n", val.u.s);
 		{
-			astring match_name((const char*)val.u.s);
+			std::string match_name((const char*)val.u.s);
 			font = TTF_OpenFont_Magic(match_name, POINT_SIZE);
 		}
 
@@ -306,7 +306,7 @@ TTF_Font *osd_font_sdl::search_font_config(astring name, bool bold, bool italic,
 
 			osd_printf_verbose("Matching unstyled font: %s\n", val.u.s);
 			{
-				astring match_name((const char*)val.u.s);
+				std::string match_name((const char*)val.u.s);
 				font = TTF_OpenFont_Magic(match_name, POINT_SIZE);
 			}
 

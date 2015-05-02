@@ -10,6 +10,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -40,6 +44,10 @@ kind "ConsoleApp"
 
 options {
 	"ForceCPP",
+}
+
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
@@ -78,6 +86,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -108,6 +120,10 @@ kind "ConsoleApp"
 
 options {
 	"ForceCPP",
+}
+
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
@@ -149,6 +165,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -182,6 +202,10 @@ kind "ConsoleApp"
 
 options {
 	"ForceCPP",
+}
+
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
@@ -219,6 +243,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -249,6 +277,10 @@ kind "ConsoleApp"
 
 options {
 	"ForceCPP",
+}
+
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
@@ -283,6 +315,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -313,6 +349,10 @@ kind "ConsoleApp"
 
 options {
 	"ForceCPP",
+}
+
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
@@ -349,6 +389,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -381,6 +425,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -407,7 +455,7 @@ files {
 dofile("netlist.lua")
 
 
-if (_OPTIONS["target"]=="mess") then
+if (_OPTIONS["target"]~="mame") then
 --------------------------------------------------
 -- castool
 --------------------------------------------------
@@ -418,6 +466,10 @@ kind "ConsoleApp"
 
 options {
 	"ForceCPP",
+}
+
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
@@ -456,6 +508,10 @@ options {
 	"ForceCPP",
 }
 
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
+}
+
 if _OPTIONS["SEPARATE_BIN"]~="1" then 
 	targetdir(MAME_DIR)
 end
@@ -491,6 +547,10 @@ kind "ConsoleApp"
 
 options {
 	"ForceCPP",
+}
+
+flags {
+	"Symbols", -- always include minimum symbols for executables 	
 }
 
 if _OPTIONS["SEPARATE_BIN"]~="1" then 

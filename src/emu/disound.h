@@ -80,7 +80,7 @@ public:
 		UINT32              m_input;            // target input index
 		UINT32              m_mixoutput;        // target mixer output
 		float               m_gain;             // gain
-		astring             m_target;           // target tag
+		std::string         m_target;           // target tag
 	};
 
 	// construction/destruction

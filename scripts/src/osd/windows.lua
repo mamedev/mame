@@ -217,6 +217,10 @@ if _OPTIONS["with-tools"] then
 			"ForceCPP",
 		}
 
+		flags {
+			"Symbols", -- always include minimum symbols for executables 	
+		}
+
 		if _OPTIONS["SEPARATE_BIN"]~="1" then 
 			targetdir(MAME_DIR)
 		end

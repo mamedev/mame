@@ -132,7 +132,7 @@ struct device_info
 	// device information
 	device_info **          head;
 	device_info *           next;
-	astring                 name;
+	std::string                 name;
 
 	// MAME information
 	input_device *          device;
@@ -2231,7 +2231,7 @@ static device_info *generic_device_alloc(device_info **devlist_head_ptr, const c
 	devinfo->head = devlist_head_ptr;
 
 	// allocate a UTF8 copy of the name
-	devinfo->name.cpy(name);
+	devinfo->name.assign(name);
 
 	// append us to the list
 	for (curdev_ptr = devinfo->head; *curdev_ptr != NULL; curdev_ptr = &(*curdev_ptr)->next) ;

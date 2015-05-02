@@ -626,9 +626,9 @@ private:
 	offs_t                  m_bytestart;            // byte-adjusted start offset
 	offs_t                  m_byteend;              // byte-adjusted end offset
 	int                     m_curentry;             // current entry
-	std::vector<bank_entry>      m_entry;                // array of entries (dynamically allocated)
-	astring                 m_name;                 // friendly name for this bank
-	astring                 m_tag;                  // tag for this bank
+	std::vector<bank_entry> m_entry;                // array of entries (dynamically allocated)
+	std::string             m_name;                 // friendly name for this bank
+	std::string             m_tag;                  // tag for this bank
 	simple_list<bank_reference> m_reflist;          // linked list of address spaces referencing this bank
 };
 
@@ -712,7 +712,7 @@ private:
 	// internal data
 	running_machine &       m_machine;
 	memory_region *         m_next;
-	astring                 m_name;
+	std::string             m_name;
 	dynamic_buffer          m_buffer;
 	endianness_t            m_endianness;
 	UINT8                   m_bitwidth;

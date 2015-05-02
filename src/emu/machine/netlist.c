@@ -370,7 +370,8 @@ void netlist_mame_device_t::device_clock_changed()
 	//printf("device_clock_changed\n");
 	m_div = netlist_time::from_hz(clock()).as_raw();
 	//m_rem = 0;
-	NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clockfreq, m_div));
+	//NL_VERBOSE_OUT(("Setting clock %" I64FMT "d and divisor %d\n", clock(), m_div));
+	NL_VERBOSE_OUT(("Setting clock %d and divisor %d\n", clock(), m_div));
 	//printf("Setting clock %d and divisor %d\n", clock(), m_div);
 }
 
@@ -535,18 +536,16 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(char *buffer, off
 	//char tmp[16];
 	unsigned startpc = pc;
 	int relpc = pc - m_genPC;
-	//UINT16 opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
-	//UINT8 inst = opcode >> 13;
-
 	if (relpc >= 0 && relpc < netlist().queue().count())
 	{
-		//            sprintf(buffer, "%04x %02d %s", pc, relpc, netlist().queue()[netlist().queue().count() - relpc - 1].object().name().cstr());
 		int dpc = netlist().queue().count() - relpc - 1;
-		sprintf(buffer, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
+		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
+		snprintf(buffer, 50, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].object()->name().cstr(),
 				netlist().queue()[dpc].exec_time().as_double());
 	}
 	else
 		sprintf(buffer, "%s", "");
+
 	pc+=1;
 	return (pc - startpc);
 }

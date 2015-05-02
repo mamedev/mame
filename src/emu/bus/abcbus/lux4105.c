@@ -177,14 +177,21 @@ inline void luxor_4105_device::update_trrq_int()
 //  luxor_4105_device - constructor
 //-------------------------------------------------
 
-luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock, "lux4105", __FILE__),
-		device_abcbus_card_interface(mconfig, *this),
-		m_sasibus(*this, SASIBUS_TAG),
-		m_sasi_data_out(*this, "sasi_data_out"),
-		m_sasi_data_in(*this, "sasi_data_in"),
-		m_1e(*this, "1E"),
-		m_5e(*this, "5E")
+luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock, "lux4105", __FILE__),
+	device_abcbus_card_interface(mconfig, *this),
+	m_sasibus(*this, SASIBUS_TAG),
+	m_sasi_data_out(*this, "sasi_data_out"),
+	m_sasi_data_in(*this, "sasi_data_in"),
+	m_1e(*this, "1E"),
+	m_5e(*this, "5E"),
+	m_cs(false),
+	m_data(0),
+	m_dma(0),
+	m_sasi_bsy(0),
+	m_sasi_req(0),
+	m_sasi_cd(0),
+	m_sasi_io(0)
 {
 }
 
@@ -208,7 +215,7 @@ void luxor_4105_device::device_start()
 
 void luxor_4105_device::device_reset()
 {
-	m_cs = 0;
+	m_cs = false;
 	m_data = 0;
 	m_dma = 0;
 
@@ -264,10 +271,10 @@ UINT8 luxor_4105_device::abcbus_stat()
 
 		*/
 
-		data = m_sasi_bsy;
-		data |= m_sasi_req << 2;
-		data |= m_sasi_cd << 3;
-		data |= m_sasi_io << 6;
+		data = !m_sasi_bsy;
+		data |= !m_sasi_req << 2;
+		data |= !m_sasi_cd << 3;
+		data |= !m_sasi_io << 6;
 	}
 
 	return data;

@@ -113,6 +113,7 @@ void windows_osd_interface::video_exit()
 win_monitor_info::win_monitor_info(const HMONITOR handle, const char *monitor_device, float aspect)
 	: osd_monitor_info(&m_handle, monitor_device, aspect), m_handle(handle)
 {
+	refresh();
 }
 
 win_monitor_info::~win_monitor_info()
@@ -135,6 +136,8 @@ void win_monitor_info::refresh()
 
 	if (temp) strncpy(m_name, temp, sizeof(m_name));
 
+	osd_free(temp);
+
 	m_pos_size = RECT_to_osd_rect(m_info.rcMonitor);
 	m_usuable_pos_size = RECT_to_osd_rect(m_info.rcWork);
 	m_is_primary = ((m_info.dwFlags & MONITORINFOF_PRIMARY) != 0);
@@ -149,8 +152,6 @@ void win_monitor_info::refresh()
 
 float osd_monitor_info::aspect()
 {
-	// refresh the monitor information and compute the aspect
-	refresh();
 	// FIXME: returning 0 looks odd, video_config is bad
 	if (video_config.keepaspect)
 	{

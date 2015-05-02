@@ -36,7 +36,7 @@
 // ======================> luxor_4105_device
 
 class luxor_4105_device :  public device_t,
-	public device_abcbus_card_interface
+							public device_abcbus_card_interface
 {
 public:
 	// construction/destruction
@@ -76,7 +76,7 @@ private:
 	required_ioport m_1e;
 	required_ioport m_5e;
 
-	int m_cs;
+	bool m_cs;
 	UINT8 m_data;
 	UINT8 m_dma;
 

@@ -40,11 +40,11 @@ public:
 
 	bool m_flipscreen;
 	UINT8 m_last;
-	
+
 	virtual void machine_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 };
 

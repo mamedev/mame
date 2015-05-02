@@ -4983,7 +4983,7 @@
 		<info name="serial" value="DMG-AD4P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="dropzone (europe).bin" size="32768" crc="6cb45fc6" sha1="703be7960b363f187737f7ee5fd4af60b6c98428" offset="000000" />
+				<rom name="dropzone (europe).bin" size="32768" crc="351a7277" sha1="0bf73ffa90fdba5a4ee4e2338bb2f0d01af6fb88" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

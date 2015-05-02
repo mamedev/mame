@@ -119,7 +119,7 @@ protected:
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, astring &str);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
@@ -150,7 +150,7 @@ protected:
 	UINT8   m_irq_active;         /* mask which irq levels are serviced */
 	UINT8   m_irq_prio[8];        /* interrupt priority */
 
-	UINT8	m_forced_inputs[4];	  /* allow read even if configured as output */
+	UINT8   m_forced_inputs[4];   /* allow read even if configured as output */
 
 	int     m_icount;
 

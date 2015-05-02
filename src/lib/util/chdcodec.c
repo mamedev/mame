@@ -1619,7 +1619,7 @@ UINT32 chd_avhuff_compressor::compress(const UINT8 *src, UINT32 srclen, UINT8 *d
 void chd_avhuff_compressor::postinit()
 {
 	// get the metadata
-	astring metadata;
+	std::string metadata;
 	chd_error err = chd().read_metadata(AV_METADATA_TAG, 0, metadata);
 	if (err != CHDERR_NONE)
 		throw err;

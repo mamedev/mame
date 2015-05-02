@@ -731,7 +731,7 @@ INSTRUCTION( xds )
 	A = t;
 
 	Bd = ((B & 0x0f) - 1) & 0x0f;
-	B = (B & 0x30) | Bd;
+	B = (B & 0x70) | Bd;
 
 	B = B ^ r;
 
@@ -766,7 +766,7 @@ INSTRUCTION( xis )
 	A = t;
 
 	Bd = ((B & 0x0f) + 1) & 0x0f;
-	B = (B & 0x30) | Bd;
+	B = (B & 0x70) | Bd;
 
 	B = B ^ r;
 
@@ -913,16 +913,19 @@ INSTRUCTION( cba )
 
 INSTRUCTION( lbi )
 {
+	if (m_last_opcode_function == INST(lbi))
+	{
+		return;
+	}
+
 	if (opcode & 0x80)
 	{
-		B = opcode & 0x3f;
+		B = opcode & 0x7f;
 	}
 	else
 	{
-		B = (opcode & 0x70) | (((opcode & 0x0f) + 1) & 0x0f);
+		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
 	}
-
-	m_skip_lbi = 1;
 }
 
 /*

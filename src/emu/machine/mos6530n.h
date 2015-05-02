@@ -46,7 +46,7 @@
 //**************************************************************************
 
 #define MCFG_MOS6530n_IRQ_CB(_write) \
-    devcb = &mos6530_t::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &mos6530_t::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6530n_IN_PA_CB(_read) \
 	devcb = &mos6530_t::set_pa_rd_callback(*device, DEVCB_##_read);

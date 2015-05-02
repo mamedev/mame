@@ -110,7 +110,7 @@ enum
 	XTAL_10_738635MHz   = 10738635,     /* TMS9918 family (3x NTSC subcarrier) */
 	XTAL_10_816MHz      = 10816000,     /* Universal 1979-1980 (Cosmic Alien, etc) */
 	XTAL_11MHz          = 11000000,     /* Mario I8039 sound */
-	XTAL_11_0592MHz     = 11059200,     /* Lethal Justice, Ruleta RE-900 */
+	XTAL_11_0592MHz     = 11059200,     /* Lethal Justice, Ruleta RE-900, DEC VT220 */
 	XTAL_11_2MHz        = 11200000,     /* New York, New York */
 	XTAL_11_289MHz      = 11289000,     /* Vanguard */
 	XTAL_11_4MHz        = 11400000,     /* HP 9845 */

@@ -8,10 +8,11 @@
 #ifndef NLCONFIG_H_
 #define NLCONFIG_H_
 
-/* FIXME: at some time, make it compile on it's own */
+/* FIXME: at some time, make it compile on its own */
 
 #include "osdcore.h"
 #include "corealloc.h"
+#include "eminline.h"
 #include <math.h>
 #include <exception>
 #include <typeinfo>
@@ -35,11 +36,16 @@
  *
  */
 
+// FIXME: breakout doesn't like this
 #define USE_DEACTIVE_DEVICE     (0)
+
+#define USE_TRUTHTABLE          (0)
 
 // The following adds about 10% performance ...
 
+#if !defined(USE_OPENMP)
 #define USE_OPENMP              (0)
+#endif // !defined(USE_OPENMP)
 
 // Use nano-second resolution - Sufficient for now
 #define NETLIST_INTERNAL_RES        (U64(1000000000))
@@ -101,8 +107,8 @@
 #if NL_KEEP_STATISTICS
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { (v) -= get_profile_ticks(); } while (0)
-#define end_timing(v)           do { (v) += get_profile_ticks(); } while (0)
+#define begin_timing(v)         do { v -= get_profile_ticks(); } while (0)
+#define end_timing(v)           do { v += get_profile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)        do { } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
@@ -242,7 +248,7 @@ __extension__ typedef signed long long      INT64;
 
 #if (USE_OPENMP)
 #if (!(HAS_OPENMP))
-#warning To use openmp compile and link with "-fopenmp"
+#error To use openmp compile and link with "-fopenmp"
 #endif
 #endif
 

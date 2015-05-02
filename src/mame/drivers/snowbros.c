@@ -61,6 +61,15 @@ These appear to have clipping problems on the left / right edges, but this
 may be correct, the sprites which should be drawn there are simply blanked
 out of the sprite list at that point.. (verify on real hw)
 
+Ma Cheon Ru
+
+The electrified maze + ball minigame appears unreponsive to controls, this
+is because it actually requires you to move the joysticks in a circular
+motion through all 8 directions at a very even speed, a task which is
+practically impossible to perform on keyboard, and not even that easy with
+a joystick.  This is not an emulation bug.
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -2718,7 +2727,7 @@ GAME( 1997, pzlbreak, 0,        semiprot,     pzlbreak, snowbros_state, pzlbreak
 GAME( 1997, suhosong, 0,        semiprot,     suhosong, driver_device,  0,        ROT0, "SemiCom",              "Su Ho Seong", GAME_SUPPORTS_SAVE )
 GAME( 1997, twinkle,  0,        semiprot,     twinkle,  driver_device,  0,        ROT0, "SemiCom",              "Twinkle", GAME_SUPPORTS_SAVE )
 GAME( 1998, 3in1semi, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom",              "XESS - The New Revolution (SemiCom 3-in-1)", GAME_SUPPORTS_SAVE )
-GAME( 1999, mcheonru, 0,        semiprot,     mcheonru, snowbros_state, 3in1semi, ROT0, "SemiCom",              "Ma Cheon Ru", GAME_SUPPORTS_SAVE ) // the 'electrified maze' minigame seems to be broken, controls don't work, is it an original game bug?
+GAME( 1999, mcheonru, 0,        semiprot,     mcheonru, snowbros_state, 3in1semi, ROT0, "SemiCom",              "Ma Cheon Ru", GAME_SUPPORTS_SAVE )
 GAME( 1999, moremore, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More", GAME_SUPPORTS_SAVE )
 GAME( 1999, moremorp, 0,        semiprot,     moremore, snowbros_state, 3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", GAME_SUPPORTS_SAVE )
 // This is very similar to the SemiCom titles, but unprotected.

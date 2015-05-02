@@ -39,13 +39,13 @@ public:
 	virtual const char *file_extensions() const { return "bin"; }
 
 	// slot interface overrides
-	virtual void get_default_card_software(astring &result);
+	virtual void get_default_card_software(std::string &result);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_rom);
 
 	UINT16* get_rom_base() { if (m_cart) { return m_cart->get_rom_base(); } else { return 0; } }
-	UINT32  get_rom_size() { if (m_cart) { return m_cart->get_rom_size()*sizeof(UINT16); } else { return 0; } }
+	UINT32  get_rom_size() { if (m_cart) { return m_cart->get_rom_size(); } else { return 0; } }
 	UINT8* get_fixed_base() { if (m_cart) { return m_cart->get_fixed_base(); } else { return 0; } }
 	UINT32  get_fixed_size() { if (m_cart) { return m_cart->get_fixed_size(); } else { return 0; } }
 	UINT8* get_sprites_base() { if (m_cart) { return m_cart->get_sprites_base(); } else { return 0; } }

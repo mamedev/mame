@@ -79,7 +79,7 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(GC48_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(GC48_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

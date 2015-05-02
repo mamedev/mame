@@ -1,3 +1,6 @@
+
+#define NETLIST_DEVELOPMENT 1
+
 #include "netlist/nl_dice_compat.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/analog/nld_twoterm.h"
@@ -47,8 +50,7 @@ static AUDIO_DESC( breakout )
 VIDEO_DESC_END
 #endif
 
-
-static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(0.0)); // No capacitor on 2nd 9602.
+static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(0.01)); // No capacitor on 2nd 9602, assume very low internal capacitance
 static Mono9602Desc f3_desc(K_OHM(47.0), U_FARAD(1.0), K_OHM(47.0), U_FARAD(1.0));
 
 static Mono9602Desc a7_desc(K_OHM(68.0), U_FARAD(1.0), K_OHM(22.0), U_FARAD(10.0));
@@ -76,19 +78,19 @@ CIRCUIT_LAYOUT( breakout )
 
     //CHIP("Y1", CLOCK_14_318_MHZ)	//Y1
 
-	CHIP("C32", CAPACITOR, &c32_desc)
-	CHIP("C36", CAPACITOR, &c36_desc)
- 	CHIP("C37", CAPACITOR, &c37_desc)
+	CHIP_CAPACITOR(C32, &c32_desc)
+	CHIP_CAPACITOR(C36, &c36_desc)
+ 	CHIP_CAPACITOR(C37, &c37_desc)
  	CHIP("PAD_EN_BUF", BUFFER, &pad_en_buf_desc)
 
 	CHIP("A3", 7474)
 	CHIP("A4", 7408)
 	CHIP("A5", 7400)
 	CHIP("A6", 7474)
-	CHIP("A7", 9602, &a7_desc)
-	CHIP("A8", 9602, &a8_desc)
+	CHIP_9602_Mono(A7, &a7_desc)
+	CHIP_9602_Mono(A8, &a8_desc)
 
-    CHIP("B2", 555_Astable, &b2_555_desc)
+    CHIP_555_Astable(B2, &b2_555_desc)
 	CHIP("B3", 7402)
 	CHIP("B4", 9316)
 	CHIP("B5", 74193)
@@ -104,7 +106,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("C6", 7486)
 	CHIP("C7", 9316)
 	CHIP("C8", 9316)
-    CHIP("C9", 555_Mono, &c9_555_desc)
+    CHIP_555_Mono(C9, &c9_555_desc)
 
 	CHIP("D2", 7432)
 	CHIP("D3", 7474)
@@ -127,7 +129,7 @@ CIRCUIT_LAYOUT( breakout )
 
 	CHIP("F1", 9316)
 	CHIP("F2", 7411)
-	CHIP("F3", 9602, &f3_desc)
+	CHIP_9602_Mono(F3, &f3_desc)
 	CHIP("F4", 7474)
 	CHIP("F5", 7474)
 	CHIP("F6", 74193)
@@ -191,7 +193,7 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("N5", 9312)
 	CHIP("N6", 9310)
 	CHIP("N7", 7408)	//sometimes looks like H7 on schematic
-	CHIP("N8", 9602, &n8_desc)
+	CHIP_9602_Mono(N8, &n8_desc)
 	CHIP("N9", 74192)
 
 	//LM380			//speaker amplifier
@@ -204,7 +206,7 @@ CIRCUIT_LAYOUT( breakout )
     CHIP("PAD1", PADDLE1_HORIZONTAL_INPUT, &pad1_desc)
     PADDLE_CONNECTION("PAD1", "C9")
 
-    CHIP("LATCH", LATCH)
+    CHIP_LATCH(LATCH)
     CHIP("COIN1", COIN_INPUT)
 
     //CHIP("COIN2", COIN_INPUT)
@@ -1455,6 +1457,5 @@ CIRCUIT_LAYOUT( breakout )
     CONNECTION("LOG1", 16, "L3", 6)*/	//N
 #endif
 
-	CIRCUIT_LAYOUT_END
-};
+CIRCUIT_LAYOUT_END
 

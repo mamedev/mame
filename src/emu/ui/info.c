@@ -29,7 +29,7 @@ ui_menu_game_info::~ui_menu_game_info()
 
 void ui_menu_game_info::populate()
 {
-	astring tempstring;
+	std::string tempstring;
 	item_append(machine().ui().game_info_astring(tempstring).c_str(), NULL, MENU_FLAG_MULTILINE, NULL);
 }
 
@@ -85,13 +85,13 @@ void ui_menu_image_info::image_info(device_image_interface *image)
 		// if image has been loaded through softlist, let's add some more info
 		if (image->software_entry())
 		{
-			astring str;
+			std::string str;
 
 			// display long filename
 			item_append(image->longname(), "", MENU_FLAG_DISABLE, NULL);
 
 			// display manufacturer and year
-			str.catprintf("%s, %s", image->manufacturer(), image->year());
+			strcatprintf(str, "%s, %s", image->manufacturer(), image->year());
 			item_append(str.c_str(), "", MENU_FLAG_DISABLE, NULL);
 
 			// display supported information, if available

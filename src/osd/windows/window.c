@@ -1447,6 +1447,17 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			window->maximize_window();
 			break;
 
+		// maximum size set
+		case WM_DISPLAYCHANGE:
+			/* FIXME: The current codebase has an issue with setting aspect
+			 * ratios correctly after display change. set_aspect should
+			 * be set_forced_aspect and on a refresh this forced aspect should
+			 * be preserved if set. If not, the standard aspect calculation
+			 * should be used.
+			 */
+			window->m_monitor->refresh();
+			break;
+
 		// set focus: if we're not the primary window, switch back
 		// commented out ATM because this prevents us from resizing secondary windows
 //      case WM_SETFOCUS:

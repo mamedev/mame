@@ -365,7 +365,7 @@ public:
 	bool parse(const char *mapstring);
 
 	// create a friendly string
-	const char *to_string(astring &str) const;
+	const char *to_string(std::string &str) const;
 
 	// update the state of a live map
 	UINT8 update(INT32 xaxisval, INT32 yaxisval);
@@ -390,7 +390,7 @@ private:
 	// internal state
 	UINT8                   m_map[9][9];            // 9x9 grid
 	UINT8                   m_lastmap;              // last value returned (for sticky tracking)
-	astring                 m_origstring;           // originally parsed string
+	std::string             m_origstring;           // originally parsed string
 };
 
 
@@ -520,12 +520,12 @@ public:
 protected:
 	// internal state
 	input_device &          m_device;               // reference to our owning device
-	astring                 m_name;                 // string name of item
+	std::string             m_name;                 // string name of item
 	void *                  m_internal;             // internal callback pointer
 	input_item_id           m_itemid;               // originally specified item id
 	input_item_class        m_itemclass;            // class of the item
 	item_get_state_func     m_getstate;             // get state callback
-	astring                 m_token;                // tokenized name for non-standard items
+	std::string             m_token;                // tokenized name for non-standard items
 
 	// live state
 	INT32                   m_current;              // current raw value
@@ -569,7 +569,7 @@ public:
 private:
 	// internal state
 	input_class &           m_class;                // reference to our class
-	astring                 m_name;                 // string name of device
+	std::string             m_name;                 // string name of device
 	int                     m_devindex;             // device index of this device
 	auto_pointer<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
 	input_item_id           m_maxitem;              // maximum item index
@@ -655,8 +655,8 @@ public:
 	input_device *device_from_code(input_code code) const;
 	input_device_item *item_from_code(input_code code) const;
 	input_code code_from_itemid(input_item_id itemid) const;
-	const char *code_name(astring &str, input_code code) const;
-	const char *code_to_token(astring &str, input_code code) const;
+	const char *code_name(std::string &str, input_code code) const;
+	const char *code_to_token(std::string &str, input_code code) const;
 	input_code code_from_token(const char *_token);
 
 	// input sequence readers
@@ -669,8 +669,8 @@ public:
 	const input_seq &seq_poll_final() const { return m_poll_seq; }
 
 	// input sequence helpers
-	const char *seq_name(astring &str, const input_seq &seq) const;
-	const char *seq_to_tokens(astring &str, const input_seq &seq) const;
+	const char *seq_name(std::string &str, const input_seq &seq) const;
+	const char *seq_to_tokens(std::string &str, const input_seq &seq) const;
 	void seq_from_tokens(input_seq &seq, const char *_token);
 
 	// misc

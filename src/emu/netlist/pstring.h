@@ -155,6 +155,15 @@ public:
 	inline pstring left(unsigned int count) const { return substr(0, count); }
 	inline pstring right(unsigned int count) const  { return substr(len() - count, count); }
 
+	int find_first_not_of(const pstring no) const;
+	int find_last_not_of(const pstring no) const;
+
+	pstring ltrim(const pstring ws = " \t\n\r") const;
+	pstring rtrim(const pstring ws = " \t\n\r") const;
+
+
+	inline pstring trim(const pstring ws = " \t\n\r") const { return this->ltrim(ws).rtrim(ws); }
+
 	pstring ucase() const;
 
 	// conversions

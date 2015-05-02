@@ -161,7 +161,7 @@ void gba_state::dma_exec(FPTR ch)
 	else
 	{
 //      if (dst >= 0x6000000 && dst <= 0x6017fff)
-//		printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (%s)\n", (int)ch, src, dst, ctrl, cnt, ((ctrl>>10) & 1) ? "32" : "16");
+//      printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (%s)\n", (int)ch, src, dst, ctrl, cnt, ((ctrl>>10) & 1) ? "32" : "16");
 	}
 
 	for (int i = 0; i < cnt; i++)
@@ -1559,7 +1559,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 				ch = offset / 3;
 
-//				printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", space.device().safe_pc(), ch, data, offset%3, ~mem_mask);
+//              printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", space.device().safe_pc(), ch, data, offset%3, ~mem_mask);
 
 				if (((offset % 3) == 2) && ((~mem_mask & 0xffff0000) == 0))
 				{
@@ -2117,8 +2117,8 @@ void gba_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0a000000, 0x0bffffff, 0, 0, "rom2");
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, 0, 0, "rom3");
 
-		astring region_tag;
-		memory_region *cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GBASLOT_ROM_REGION_TAG).c_str());
+		std::string region_tag;
+		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GBASLOT_ROM_REGION_TAG).c_str());
 
 		// install ROM accesses
 		membank("rom1")->set_base(cart_rom->base());

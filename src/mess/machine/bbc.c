@@ -2033,22 +2033,22 @@ DRIVER_INIT_MEMBER(bbc_state,bbcm)
 // setup pointers for optional EPROMs
 void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
 {
-	astring region_tag;
+	std::string region_tag;
 	memory_region *tmp_reg;
 	UINT8 *eprom[4];
-	if (m_exp1 && (tmp_reg = memregion(region_tag.cpy(m_exp1->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())))
+	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;
 	else
 		eprom[0] = m_region_opt->base() + 0x0000 + shift;
-	if (m_exp2 && (tmp_reg = memregion(region_tag.cpy(m_exp2->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())))
+	if (m_exp2 && (tmp_reg = memregion(region_tag.assign(m_exp2->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[1] = tmp_reg->base() + shift;
 	else
 		eprom[1] = m_region_opt->base() + 0x4000 + shift;
-	if (m_exp3 && (tmp_reg = memregion(region_tag.cpy(m_exp3->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())))
+	if (m_exp3 && (tmp_reg = memregion(region_tag.assign(m_exp3->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[2] = tmp_reg->base() + shift;
 	else
 		eprom[2] = m_region_opt->base() + 0x8000 + shift;
-	if (m_exp4 && (tmp_reg = memregion(region_tag.cpy(m_exp4->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())))
+	if (m_exp4 && (tmp_reg = memregion(region_tag.assign(m_exp4->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[3] = tmp_reg->base() + shift;
 	else
 		eprom[3] = m_region_opt->base() + 0xc000 + shift;
@@ -2067,14 +2067,14 @@ void bbc_state::bbc_setup_banks(memory_bank *membank, int banks, UINT32 shift, U
 
 void bbc_state::bbcm_setup_banks(memory_bank *membank, int banks, UINT32 shift, UINT32 size)
 {
-	astring region_tag;
+	std::string region_tag;
 	memory_region *tmp_reg;
 	UINT8 *eprom[2];
-	if (m_exp1 && (tmp_reg = memregion(region_tag.cpy(m_exp1->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())))
+	if (m_exp1 && (tmp_reg = memregion(region_tag.assign(m_exp1->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[0] = tmp_reg->base() + shift;
 	else
 		eprom[0] = m_region_opt->base() + 0x0000 + shift;
-	if (m_exp2 && (tmp_reg = memregion(region_tag.cpy(m_exp2->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())))
+	if (m_exp2 && (tmp_reg = memregion(region_tag.assign(m_exp2->tag()).append(GENERIC_ROM_REGION_TAG).c_str())))
 		eprom[1] = tmp_reg->base() + shift;
 	else
 		eprom[1] = m_region_opt->base() + 0x8000 + shift;

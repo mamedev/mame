@@ -100,7 +100,7 @@ WRITE8_MEMBER( abc_fd2_t::status_w )
 	    3
 	    4
 	    5
-	    6       
+	    6
 	    7
 
 	*/
@@ -154,11 +154,11 @@ READ8_MEMBER( abc_fd2_t::pio_pb_r )
 
 	    bit     description
 
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
+	    0
+	    1
+	    2
+	    3
+	    4
 	    5       DRQ
 	    6       HLD
 	    7       INTRQ
@@ -185,9 +185,9 @@ WRITE8_MEMBER( abc_fd2_t::pio_pb_w )
 	    2       TG43
 	    3       MON
 	    4       HLT
-	    5       
-	    6       
-	    7       
+	    5
+	    6
+	    7
 
 	*/
 

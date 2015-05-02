@@ -2078,8 +2078,8 @@ void pc6001_state::machine_reset()
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	m_port_c_8255=0;
 
@@ -2096,8 +2096,8 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 {
 	m_video_ram = m_region_maincpu->base() + 0xc000 + 0x28000;
 
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	// hackish way to simplify bankswitch handling
 	if (m_cart_rom)
 		memcpy(m_region_maincpu->base() + 0x48000, m_cart_rom->base(), 0x4000);
@@ -2135,8 +2135,8 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
 {
 	m_video_ram = m_region_maincpu->base() + 0x70000;
 
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	// should this be mirrored into the EXROM regions? hard to tell without an actual cart dump...
 
 	m_port_c_8255=0;

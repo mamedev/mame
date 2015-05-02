@@ -545,8 +545,8 @@ void cc40_state::postload()
 void cc40_state::machine_start()
 {
 	// init
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 	if (m_cart_rom)

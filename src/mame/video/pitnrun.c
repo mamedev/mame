@@ -163,7 +163,7 @@ void pitnrun_state::video_start()
 	m_tmp_bitmap[2] = auto_bitmap_ind16_alloc(machine(),128,128);
 	m_tmp_bitmap[3] = auto_bitmap_ind16_alloc(machine(),128,128);
 	spotlights();
-	
+
 	save_item(NAME(m_h_heed));
 	save_item(NAME(m_v_heed));
 	save_item(NAME(m_ha));

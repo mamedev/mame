@@ -667,7 +667,7 @@ struct xml_data_node;
 class analog_field;
 
 // constructor function pointer
-typedef void (*ioport_constructor)(device_t &owner, ioport_list &portlist, astring &errorbuf);
+typedef void(*ioport_constructor)(device_t &owner, ioport_list &portlist, std::string &errorbuf);
 
 // I/O port callback function delegates
 typedef device_delegate<ioport_value (ioport_field &, void *)> ioport_field_read_delegate;
@@ -830,10 +830,10 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	void frame_update(ioport_port &port, ioport_value &digital);
-	const char *key_name(astring &str, unicode_char ch);
+	const char *key_name(std::string &str, unicode_char ch);
 
 	// debugging
-	astring dump();
+	std::string dump();
 
 private:
 	// internal keyboard code information
@@ -850,7 +850,7 @@ private:
 	attotime choose_delay(unicode_char ch);
 	void internal_post(unicode_char ch);
 	void timer(void *ptr, int param);
-	const char *unicode_to_string(astring &buffer, unicode_char ch);
+	const char *unicode_to_string(std::string &buffer, unicode_char ch);
 	const keycode_map_entry *find_code(unicode_char ch) const;
 
 	// internal state
@@ -975,7 +975,7 @@ public:
 
 private:
 	ioport_diplocation *    m_next;         // pointer to the next bit
-	astring                 m_name;         // name of the physical DIP switch
+	std::string             m_name;         // name of the physical DIP switch
 	UINT8                   m_number;       // physical switch number
 	bool                    m_invert;       // is this an active-high DIP?
 };
@@ -1093,7 +1093,7 @@ public:
 	void set_user_settings(const user_settings &settings);
 
 private:
-	void expand_diplocation(const char *location, astring &errorbuf);
+	void expand_diplocation(const char *location, std::string &errorbuf);
 
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
@@ -1158,7 +1158,7 @@ struct ioport_field_live
 	bool                    last;               // were we pressed last time?
 	bool                    toggle;             // current toggle setting
 	digital_joystick::direction_t joydir;       // digital joystick direction index
-	astring                 name;               // overridden name
+	std::string             name;               // overridden name
 };
 
 
@@ -1173,7 +1173,7 @@ public:
 	ioport_list() { }
 
 	using tagged_list<ioport_port>::append;
-	void append(device_t &device, astring &errorbuf);
+	void append(device_t &device, std::string &errorbuf);
 };
 
 
@@ -1211,18 +1211,18 @@ public:
 
 	// other operations
 	ioport_field *field(ioport_value mask);
-	void collapse_fields(astring &errorbuf);
+	void collapse_fields(std::string &errorbuf);
 	void frame_update(ioport_field *mouse_field);
 	void init_live_state();
 
 private:
-	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, astring &errorbuf);
+	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf);
 
 	// internal state
 	ioport_port *               m_next;         // pointer to next port
 	device_t &                  m_device;       // associated device
 	simple_list<ioport_field>   m_fieldlist;    // list of ioport_fields
-	astring                     m_tag;          // copy of this port's tag
+	std::string                 m_tag;          // copy of this port's tag
 	int                         m_modcount;     // modification count
 	ioport_value                m_active;       // mask of active bits in the port
 	auto_pointer<ioport_port_live> m_live;      // live state of port (NULL if not live)
@@ -1397,7 +1397,7 @@ public:
 	void setup_natural_keyboard(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
 	INT32 frame_interpolate(INT32 oldval, INT32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
-	const char *input_type_to_token(astring &str, ioport_type type, int player);
+	const char *input_type_to_token(std::string &str, ioport_type type, int player);
 
 private:
 	// internal helpers
@@ -1473,7 +1473,7 @@ class ioport_configurer
 {
 public:
 	// construction/destruction
-	ioport_configurer(device_t &owner, ioport_list &portlist, astring &errorbuf);
+	ioport_configurer(device_t &owner, ioport_list &portlist, std::string &errorbuf);
 
 	// static helpers
 	static const char *string_from_token(const char *string);
@@ -1521,7 +1521,7 @@ private:
 	// internal state
 	device_t &          m_owner;
 	ioport_list &       m_portlist;
-	astring &           m_errorbuf;
+	std::string &       m_errorbuf;
 
 	ioport_port *       m_curport;
 	ioport_field *      m_curfield;
@@ -1566,7 +1566,7 @@ private:
 
 // start of table
 #define INPUT_PORTS_START(_name) \
-ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf) \
+ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::string &errorbuf) \
 { \
 	ioport_configurer configurer(owner, portlist, errorbuf);
 // end of table
@@ -1575,7 +1575,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 
 // aliasing
 #define INPUT_PORTS_EXTERN(_name) \
-	extern void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf)
+	extern void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, std::string &errorbuf)
 
 // including
 #define PORT_INCLUDE(_name) \

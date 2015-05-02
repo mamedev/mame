@@ -185,7 +185,7 @@ bool vic10_expansion_slot_device::call_softlist_load(software_list_device &swlis
 //  get_default_card_software -
 //-------------------------------------------------
 
-void vic10_expansion_slot_device::get_default_card_software(astring &result)
+void vic10_expansion_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{

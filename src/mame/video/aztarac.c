@@ -21,9 +21,8 @@ inline void aztarac_state::read_vectorram(UINT16 *vectorram, int addr, int *x, i
 	if (*y & 0x200) *y |= 0xfffffc00;
 }
 
-WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
+WRITE16_MEMBER(aztarac_state::ubr_w)
 {
-	UINT16 *vectorram = m_vectorram;
 	int x, y, c, intensity, xoffset, yoffset, color;
 	int defaddr, objaddr=0, ndefs;
 
@@ -33,7 +32,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 
 		while (1)
 		{
-			read_vectorram(vectorram, objaddr, &xoffset, &yoffset, &c);
+			read_vectorram(m_vectorram, objaddr, &xoffset, &yoffset, &c);
 			objaddr++;
 
 			if (c & 0x4000)
@@ -44,7 +43,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 				defaddr = (c >> 1) & 0x7ff;
 				AVECTOR (xoffset, yoffset, 0, 0);
 
-				read_vectorram(vectorram, defaddr, &x, &ndefs, &c);
+				read_vectorram(m_vectorram, defaddr, &x, &ndefs, &c);
 				ndefs++;
 
 				if (c & 0xff00)
@@ -55,7 +54,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 					while (ndefs--)
 					{
 						defaddr++;
-						read_vectorram(vectorram, defaddr, &x, &y, &c);
+						read_vectorram(m_vectorram, defaddr, &x, &y, &c);
 						if ((c & 0xff00) == 0)
 							AVECTOR (x + xoffset, y + yoffset, 0, 0);
 						else
@@ -68,7 +67,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_ubr_w)
 					while (ndefs--)
 					{
 						defaddr++;
-						read_vectorram(vectorram, defaddr, &x, &y, &c);
+						read_vectorram(m_vectorram, defaddr, &x, &y, &c);
 						color = VECTOR_COLOR222(c & 0x3f);
 						AVECTOR (x + xoffset, y + yoffset, color, c >> 8);
 					}

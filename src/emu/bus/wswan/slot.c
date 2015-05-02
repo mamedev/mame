@@ -50,9 +50,7 @@ void device_ws_cart_interface::rom_alloc(UINT32 size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(WSSLOT_ROM_REGION_TAG);
-		m_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(std::string(tag).append(WSSLOT_ROM_REGION_TAG).c_str(), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 		m_bank_mask = ((m_rom_size >> 16) - 1);
 	}
@@ -306,7 +304,7 @@ int ws_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len, UINT32 &nvram_len
  get default card software
  -------------------------------------------------*/
 
-void ws_cart_slot_device::get_default_card_software(astring &result)
+void ws_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -325,7 +323,7 @@ void ws_cart_slot_device::get_default_card_software(astring &result)
 		//printf("type: %s\n", slot_string);
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 		return;
 	}
 

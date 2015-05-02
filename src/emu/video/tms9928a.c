@@ -635,8 +635,6 @@ void tms9928a_device::set_palette()
 
 void tms9928a_device::device_start()
 {
-	astring tempstring;
-
 	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
 	m_vertical_size = m_50hz ? TMS9928A_TOTAL_VERT_PAL : TMS9928A_TOTAL_VERT_NTSC;
 

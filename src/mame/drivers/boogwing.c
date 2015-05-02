@@ -448,6 +448,50 @@ ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
 	ROM_LOAD( "kj-00.15n",    0x000000, 0x00400, CRC(add4d50b) SHA1(080e5a8192a146d5141aef5c8d9996ddf8cd3ab4) )
 ROM_END
 
+ROM_START( boogwingu ) /* VER 1.7 USA 92.12.14 */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE102 code (encrypted) */
+	ROM_LOAD16_BYTE( "kl_00.2b",    0x000000, 0x040000, CRC(4dc14798) SHA1(f991edf8e308087ed7222b3b4e3bc959980f8f66) )
+	ROM_LOAD16_BYTE( "kl_02.2e",    0x000001, 0x040000, CRC(3bb3b0a0) SHA1(ba892ea52b6bb8d110050efdaa5effd8447c1b2a) )
+	ROM_LOAD16_BYTE( "kl_01.4b",    0x080000, 0x040000, CRC(d109ba13) SHA1(93fcda71e260ba94141e2d4d6b248f2cb8530b61) )
+	ROM_LOAD16_BYTE( "kl_03.4e",    0x080001, 0x040000, CRC(fef2a176) SHA1(b0505466237fe17b6aaa7eea47e309cd679208d1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "kl06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) ) /* same as other sets but labeled KL */
+
+	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
+	ROM_LOAD16_BYTE( "kl05.9e",   0x00000, 0x010000, CRC(d10aef95) SHA1(a611a35ab312caee19c31da079c647679d31673d) ) /* same as other sets but labeled KL */
+	ROM_LOAD16_BYTE( "kl04.8e",   0x00001, 0x010000, CRC(329323a8) SHA1(e2ec7b059301c0a2e052dfc683e044c808ad9b33) ) /* same as other sets but labeled KL */
+
+	ROM_REGION( 0x300000, "tiles2", 0 ) /* Tiles 2 */
+	ROM_LOAD( "mbd-01.9b", 0x000000, 0x100000, CRC(d7de4f4b) SHA1(4747f8795e277ed8106667b6f68e1176d95db684) )
+	ROM_LOAD( "mbd-00.8b", 0x100000, 0x100000, CRC(adb20ba9) SHA1(2ffa1dd19a438a4d2f5743b1050a8037183a3e7d) )
+	/* 0x100000 bytes expanded from mbd-02.10e copied here later */
+
+	ROM_REGION( 0x200000, "tiles3", 0 ) /* Tiles 3 */
+	ROM_LOAD( "mbd-03.13b",   0x000000, 0x100000, CRC(cf798f2c) SHA1(f484a22679d6a4d4b0dcac820de3f1a37cbc478f) )
+	ROM_LOAD( "mbd-04.14b",   0x100000, 0x100000, CRC(d9764d0b) SHA1(74d6f09d65d073606a6e10556cedf740aa50ff08) )
+
+	ROM_REGION( 0x400000, "sprites1", 0 ) /* Sprites 1 */
+	ROM_LOAD16_BYTE( "mbd-05.16b",    0x000001, 0x200000, CRC(1768c66a) SHA1(06bf3bb187c65db9dcce959a43a7231e2ac45c17) )
+	ROM_LOAD16_BYTE( "mbd-06.17b",    0x000000, 0x200000, CRC(7750847a) SHA1(358266ed68a9816094e7aab0905d958284c8ce98) )
+
+	ROM_REGION( 0x400000, "sprites2", 0 ) /* Sprites 2 */
+	ROM_LOAD16_BYTE( "mbd-07.18b",    0x000001, 0x200000, CRC(241faac1) SHA1(588be0cf2647c1d185a99c987a5a20ab7ad8dea8) )
+	ROM_LOAD16_BYTE( "mbd-08.19b",    0x000000, 0x200000, CRC(f13b1e56) SHA1(f8f5e8c4e6c159f076d4e6505bd901ade5c6a0ca) )
+
+	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
+	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
+	ROM_LOAD( "mbd-10.17p",    0x000000, 0x080000, CRC(f159f76a) SHA1(0b1ea69fecdd151e2b1fa96a21eade492499691d) )
+
+	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
+	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
+
+	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
+	ROM_LOAD( "kj-00.15n",    0x000000, 0x00400, CRC(add4d50b) SHA1(080e5a8192a146d5141aef5c8d9996ddf8cd3ab4) )
+ROM_END
+
 ROM_START( boogwinga ) /* VER 1.5 ASA 92.12.07 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "km_00-2.2b",    0x000000, 0x040000, CRC(71ab71c6) SHA1(00bfd71dd9ae5f12c574ab0ecc07d85898930c4b) )
@@ -594,6 +638,7 @@ DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 }
 
 GAME( 1992, boogwing, 0,        boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Euro v1.5, 92.12.07)", GAME_SUPPORTS_SAVE )
+GAME( 1992, boogwingu,boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (USA v1.7, 92.12.14)", GAME_SUPPORTS_SAVE )
 GAME( 1992, boogwinga,boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Asia v1.5, 92.12.07)", GAME_SUPPORTS_SAVE )
 GAME( 1992, ragtime,  boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "The Great Ragtime Show (Japan v1.5, 92.12.07)", GAME_SUPPORTS_SAVE )
 GAME( 1992, ragtimea, boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "The Great Ragtime Show (Japan v1.3, 92.11.26)", GAME_SUPPORTS_SAVE )

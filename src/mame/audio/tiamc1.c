@@ -85,15 +85,15 @@ void tiamc1_sound_device::device_start()
 
 		for (j = 0; j < 3; j++)
 		{
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].count);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].cnval);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].bcdMode);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].cntMode);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].valMode);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].gate);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].output);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].loadCnt);
-			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].enable);
+			save_item(NAME(t->channel[j].count), i * 3 + j);
+			save_item(NAME(t->channel[j].cnval), i * 3 + j);
+			save_item(NAME(t->channel[j].bcdMode), i * 3 + j);
+			save_item(NAME(t->channel[j].cntMode), i * 3 + j);
+			save_item(NAME(t->channel[j].valMode), i * 3 + j);
+			save_item(NAME(t->channel[j].gate), i * 3 + j);
+			save_item(NAME(t->channel[j].output), i * 3 + j);
+			save_item(NAME(t->channel[j].loadCnt), i * 3 + j);
+			save_item(NAME(t->channel[j].enable), i * 3 + j);
 		}
 	}
 

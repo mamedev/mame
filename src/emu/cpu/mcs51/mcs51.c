@@ -2223,12 +2223,12 @@ void mcs51_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
-void mcs51_cpu_device::state_string_export(const device_state_entry &entry, astring &str)
+void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			str.printf("%c%c%c%c%c%c%c%c",
+			strprintf(str,"%c%c%c%c%c%c%c%c",
 				PSW & 0x80 ? 'C':'.',
 				PSW & 0x40 ? 'A':'.',
 				PSW & 0x20 ? 'F':'.',

@@ -47,6 +47,11 @@
 		NET_REGISTER_DEV(POT, _name)                                                \
 		NETDEV_PARAMI(_name, R, _R)
 
+/* Does not have pin 3 connected */
+#define POT2(_name, _R)                                                       \
+		NET_REGISTER_DEV(POT2, _name)                                                \
+		NETDEV_PARAMI(_name, R, _R)
+
 
 #define CAP(_name, _C)                                                         \
 		NET_REGISTER_DEV(C, _name)                                                  \
@@ -159,6 +164,15 @@ NETLIB_DEVICE_WITH_PARAMS(POT,
 	netlist_param_double_t m_R;
 	netlist_param_double_t m_Dial;
 	netlist_param_logic_t m_DialIsLog;
+);
+
+NETLIB_DEVICE_WITH_PARAMS(POT2,
+	NETLIB_NAME(R_base) m_R1;
+
+	netlist_param_double_t m_R;
+	netlist_param_double_t m_Dial;
+	netlist_param_logic_t m_DialIsLog;
+	netlist_param_logic_t m_Reverse;
 );
 
 

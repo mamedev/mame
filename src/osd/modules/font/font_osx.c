@@ -10,7 +10,6 @@
 
 #include <Carbon/Carbon.h>
 
-#include "astring.h"
 #include "corealloc.h"
 #include "fileio.h"
 
@@ -35,26 +34,25 @@ private:
 	CTFontRef m_font;
 };
 
-bool osd_font_osx::open(const char *font_path, const char *_name, int &height)
+bool osd_font_osx::open(const char *font_path, const char *name, int &height)
 {
 	m_font = NULL;
-	astring name(_name);
-	osd_printf_verbose("FONT NAME %s\n", _name);
+	osd_printf_verbose("FONT NAME %s\n", name);
 #if 0
-	if (name == "default")
+	if (!strcmp(name, "default"))
 	{
 		name = "LucidaGrande";
 	}
 #endif
-	/* handle bdf fonts in the core */
-	if (name.len() > 4)
-	{
-		if (name.makeupper().substr(name.len() - 4, 4) == ".BDF")
-			return false;
-	}
 
+	CFStringRef const font_name = CFStringCreateWithCString(NULL, name, kCFStringEncodingUTF8);
+	if (kCFNotFound != CFStringFind(font_name, CFSTR(".BDF"), kCFCompareCaseInsensitive | kCFCompareBackwards | kCFCompareAnchored | kCFCompareNonliteral).location)
+	{
+		// handle bdf fonts in the core
+		CFRelease(font_name);
+		return false;
+	}
 	CTFontRef ct_font = NULL;
-	CFStringRef const font_name = CFStringCreateWithCString(NULL, name.c_str(), kCFStringEncodingUTF8);
 	if (font_name != NULL)
 	{
 		CTFontDescriptorRef const font_descriptor = CTFontDescriptorCreateWithNameAndSize(font_name, 0.0);
@@ -68,7 +66,7 @@ bool osd_font_osx::open(const char *font_path, const char *_name, int &height)
 
 	if (!ct_font)
 	{
-		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name.c_str());
+		osd_printf_verbose("Couldn't find/open font %s, using MAME default\n", name);
 		return false;
 	}
 

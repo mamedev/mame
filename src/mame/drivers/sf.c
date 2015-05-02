@@ -84,8 +84,8 @@ WRITE16_MEMBER(sf_state::protection_w)
 			space.write_word(0xffc00c, 0xc0);
 			space.write_word(0xffc00e, 0);
 
-			sf_fg_scroll_w(space, 0, d1, 0xffff);
-			sf_bg_scroll_w(space, 0, d2, 0xffff);
+			fg_scroll_w(space, 0, d1, 0xffff);
+			bg_scroll_w(space, 0, d2, 0xffff);
 			break;
 		}
 	case 4:
@@ -109,7 +109,7 @@ WRITE16_MEMBER(sf_state::protection_w)
 				}
 				space.write_word(0xffc682, d1);
 				space.write_word(0xffc00e, off);
-				sf_bg_scroll_w(space, 0, d1, 0xffff);
+				bg_scroll_w(space, 0, d1, 0xffff);
 			}
 			break;
 		}
@@ -123,7 +123,7 @@ WRITE16_MEMBER(sf_state::protection_w)
 }
 
 
-WRITE8_MEMBER(sf_state::sf_coin_w)
+WRITE8_MEMBER(sf_state::coin_w)
 {
 	coin_counter_w(machine(), 0,  data & 0x01);
 	coin_counter_w(machine(), 1,  data & 0x02);
@@ -140,7 +140,7 @@ WRITE8_MEMBER(sf_state::soundcmd_w)
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
-	membank("bank1")->set_base(memregion("audio2")->base() + 0x8000 * (data + 1));
+	membank("bank1")->set_entry(data);
 }
 
 WRITE8_MEMBER(sf_state::msm1_5205_w)
@@ -164,7 +164,7 @@ WRITE8_MEMBER(sf_state::msm2_5205_w)
 static ADDRESS_MAP_START( sfan_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
@@ -174,10 +174,10 @@ static ADDRESS_MAP_START( sfan_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READNOP
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(sf_coin_w, 0x00ff)
-	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
-	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
-	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(coin_w, 0x00ff)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE8(soundcmd_w, 0x00ff)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
@@ -197,10 +197,10 @@ static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READNOP
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(sf_coin_w, 0x00ff)
-	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
-	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
-	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(coin_w, 0x00ff)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE8(soundcmd_w, 0x00ff)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
@@ -210,7 +210,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
@@ -220,10 +220,10 @@ static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READNOP
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(sf_coin_w, 0x00ff)
-	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
-	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
-	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE8(coin_w, 0x00ff)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE8(soundcmd_w, 0x00ff)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
@@ -327,8 +327,8 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(      0x0180, "1st Stage Maximum" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( None ) )
 	PORT_DIPNAME( 0x0400, 0x0400, "Number of Countries Selected" )  PORT_DIPLOCATION("DSW4.11E:3")
-	PORT_DIPSETTING(      0x0400, "4" )
-	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPSETTING(      0x0400, "2" )
+	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "DSW4.11E:4" )
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "DSW4.11E:5" )
 	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "DSW4.11E:6" )
@@ -395,6 +395,11 @@ static INPUT_PORTS_START( sfan )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "DSW2.13E:1" ) // Flip Screen not available
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0400, 0x0400, "Number of Countries Selected" )  PORT_DIPLOCATION("DSW4.11E:3")
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0000, "2" )
 
 	// 4 pneumatic buttons. When their pressure starts decreasing, the game will latch
 	// the highest measured value and respond with a low/mid/strong attack: approx.
@@ -515,14 +520,16 @@ GFXDECODE_END
 
 void sf_state::machine_start()
 {
-	save_item(NAME(m_sf_active));
+	save_item(NAME(m_active));
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_fgscroll));
+
+	membank("bank1")->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
 }
 
 void sf_state::machine_reset()
 {
-	m_sf_active = 0;
+	m_active = 0;
 	m_bgscroll = 0;
 	m_fgscroll = 0;
 }
@@ -548,7 +555,7 @@ static MACHINE_CONFIG_START( sfan, sf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update_sf)
+	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sf)

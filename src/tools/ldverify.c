@@ -183,7 +183,7 @@ static void *open_chd(const char *filename, movie_info &info)
 	}
 
 	// get the metadata
-	astring metadata;
+	std::string metadata;
 	chderr = chd->read_metadata(AV_METADATA_TAG, 0, metadata);
 	if (chderr != CHDERR_NONE)
 	{

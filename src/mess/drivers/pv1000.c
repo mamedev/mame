@@ -405,8 +405,8 @@ void pv1000_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 
 		// FIXME: this is needed for gfx decoding, but there is probably a cleaner solution!
-		astring region_tag;
-		memcpy(memregion("gfxrom")->base(), memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base(), m_cart->get_rom_size());
+		std::string region_tag;
+		memcpy(memregion("gfxrom")->base(), memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base(), m_cart->get_rom_size());
 	}
 
 	save_item(NAME(m_io_regs));

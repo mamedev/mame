@@ -16,7 +16,7 @@ Opcode::~Opcode()
 }
 
 
-astring Opcode::disassemble() const
+std::string Opcode::disassemble() const
 {
 	// Duck out early if there isn't a valid op
 	if (!m_instruction)
@@ -29,8 +29,8 @@ astring Opcode::disassemble() const
 		return dcString();
 
 	// Disassemble what you can.
-	astring opString = "";
-	astring pmString = "";
+	std::string opString = "";
+	std::string pmString = "";
 	if (m_instruction) m_instruction->disassemble(opString);
 	if (m_parallelMove) m_parallelMove->disassemble(pmString);
 
@@ -68,11 +68,11 @@ const reg_id& Opcode::instSource() const { return m_instruction->source(); }
 const reg_id& Opcode::instDestination() const { return m_instruction->destination(); }
 const size_t Opcode::instAccumulatorBitsModified() const { return m_instruction->accumulatorBitsModified(); }
 
-astring Opcode::dcString() const
+std::string Opcode::dcString() const
 {
 	char tempStr[1024];
 	sprintf(tempStr, "dc $%x", m_word0);
-	return astring(tempStr);
+	return std::string(tempStr);
 }
 
 }

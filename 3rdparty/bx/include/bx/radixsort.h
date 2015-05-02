@@ -22,12 +22,12 @@ namespace bx
 		Ty* __restrict values = _values;
 		Ty* __restrict tempValues = _tempValues;
 
-		uint16_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
+		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 3; ++pass)
 		{
-			memset(histogram, 0, sizeof(uint16_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memset(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -47,10 +47,10 @@ namespace bx
 				goto done;
 			}
 
-			uint16_t offset = 0;
+			uint32_t offset = 0;
 			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
 			{
-				uint16_t count = histogram[ii];
+				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
 				offset += count;
 			}
@@ -59,7 +59,7 @@ namespace bx
 			{
 				uint32_t key = keys[ii];
 				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
-				uint16_t dest = histogram[index]++;
+				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 				tempValues[dest] = values[ii];
 			}
@@ -95,12 +95,12 @@ done:
 		Ty* __restrict values = _values;
 		Ty* __restrict tempValues = _tempValues;
 
-		uint16_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
+		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
 		uint32_t pass = 0;
 		for (; pass < 6; ++pass)
 		{
-			memset(histogram, 0, sizeof(uint16_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memset(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -120,10 +120,10 @@ done:
 				goto done;
 			}
 
-			uint16_t offset = 0;
+			uint32_t offset = 0;
 			for (uint32_t ii = 0; ii < BX_RADIXSORT_HISTOGRAM_SIZE; ++ii)
 			{
-				uint16_t count = histogram[ii];
+				uint32_t count = histogram[ii];
 				histogram[ii] = offset;
 				offset += count;
 			}
@@ -132,7 +132,7 @@ done:
 			{
 				uint64_t key = keys[ii];
 				uint16_t index = (key>>shift)&BX_RADIXSORT_BIT_MASK;
-				uint16_t dest = histogram[index]++;
+				uint32_t dest = histogram[index]++;
 				tempKeys[dest] = key;
 				tempValues[dest] = values[ii];
 			}

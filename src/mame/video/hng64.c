@@ -1274,6 +1274,7 @@ void hng64_state::video_start()
 
 
 	m_dl = auto_alloc_array(machine(), UINT16, 0x200/2);
+	polys.resize(1024*5);
 
 	m_texturerom = memregion("textures")->base();
 	m_vertsrom = (UINT16*)memregion("verts")->base();

@@ -9,16 +9,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - format
-
-        wd1772: track description 80x4e 12x00 3xf6 fc 50x4e 12x00 3xf5 fe 2x00 2x01 f7 22x4e 12x00 3xf5 fb 256xaa f7 54x4e
-
-*/
-
 #include "c8280.h"
 
 
@@ -159,6 +149,7 @@ WRITE8_MEMBER( c8280_device::dio_w )
 	m_bus->dio_w(this, data);
 }
 
+
 //-------------------------------------------------
 //  riot6532 1
 //-------------------------------------------------
@@ -291,6 +282,10 @@ static SLOT_INTERFACE_START( c8280_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
+FLOPPY_FORMATS_MEMBER( c8280_device::floppy_formats )
+	FLOPPY_C8280_FORMAT
+FLOPPY_FORMATS_END
+
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c8280 )
@@ -314,11 +309,11 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
 
-	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/6) // clock?
+	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/6)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_IRQ_LINE))
 	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_SET_OVERFLOW))
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":0", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":1", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -390,20 +385,20 @@ inline void c8280_device::update_ieee_signals()
 //  c8280_device - constructor
 //-------------------------------------------------
 
-c8280_device::c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C8280, "C8280", tag, owner, clock, "c8280", __FILE__),
-		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, M6502_DOS_TAG),
-		m_fdccpu(*this, M6502_FDC_TAG),
-		m_riot0(*this, M6532_0_TAG),
-		m_riot1(*this, M6532_1_TAG),
-		m_fdc(*this, WD1797_TAG),
-		m_floppy0(*this, WD1797_TAG":0"),
-		m_floppy1(*this, WD1797_TAG":1"),
-		m_address(*this, "ADDRESS"),
-		m_rfdo(1),
-		m_daco(1),
-		m_atna(1)
+c8280_device::c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, C8280, "C8280", tag, owner, clock, "c8280", __FILE__),
+	device_ieee488_interface(mconfig, *this),
+	m_maincpu(*this, M6502_DOS_TAG),
+	m_fdccpu(*this, M6502_FDC_TAG),
+	m_riot0(*this, M6532_0_TAG),
+	m_riot1(*this, M6532_1_TAG),
+	m_fdc(*this, WD1797_TAG),
+	m_floppy0(*this, WD1797_TAG ":0"),
+	m_floppy1(*this, WD1797_TAG ":1"),
+	m_address(*this, "ADDRESS"),
+	m_rfdo(1),
+	m_daco(1),
+	m_atna(1)
 {
 }
 
@@ -418,6 +413,7 @@ void c8280_device::device_start()
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));
 	save_item(NAME(m_atna));
+	save_item(NAME(m_ifc));
 	save_item(NAME(m_fk5));
 }
 
@@ -481,12 +477,12 @@ READ8_MEMBER( c8280_device::fk5_r )
 
 	    bit     description
 
-	    0       DS1
-	    1       DS2
-	    2       _DDEN
+	    0
+	    1
+	    2
 	    3       DCHG
 	    4       TSID
-	    5       MOTOR ENABLE
+	    5
 	    6       0
 	    7       0
 

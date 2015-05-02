@@ -73,8 +73,8 @@ DRIVER_INIT_MEMBER(vtech2_state,laser)
 	m_mem = memregion("maincpu")->base();
 
 	// check ROM expansion
-	astring region_tag;
-	m_cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	for (i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
 		m_laser_bank[i] = -1;

@@ -5,6 +5,25 @@ naomi.h -> NAOMI includes
 */
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
+#include "cpu/arm7/arm7.h"
+#include "cpu/z80/z80.h"
+#include "machine/x76f100.h"
+#include "machine/maple-dc.h"
+#include "machine/dc-ctrl.h"
+#include "machine/mie.h"
+#include "machine/naomirom.h"
+#include "machine/naomigd.h"
+#include "machine/naomim1.h"
+#include "machine/naomim2.h"
+#include "machine/naomim4.h"
+#include "machine/awboard.h"
+#include "cpu/sh4/sh4.h"
+#include "cpu/arm7/arm7core.h"
+#include "sound/aica.h"
+#include "machine/aicartc.h"
+#include "machine/jvsdev.h"
+#include "machine/jvs13551.h"
+#include "dc.h"
 
 enum {
 	JVSBD_DEFAULT = 0,
@@ -84,3 +103,6 @@ class naomi_state : public dc_state
 	DECLARE_READ64_MEMBER( naomigd_sfz3ugd_idle_skip_r );
 	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
 };
+
+MACHINE_CONFIG_EXTERN(naomi_aw_base);
+INPUT_PORTS_EXTERN( naomi_debug );

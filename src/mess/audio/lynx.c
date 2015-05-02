@@ -139,19 +139,19 @@ void lynx_sound_device::register_save()
 	save_item(NAME(m_master_enable));
 	for (int chan = 0; chan < LYNX_AUDIO_CHANNELS; chan++)
 	{
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.volume);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.feedback);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.output);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.shifter);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.bakup);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.control1);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.counter);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].reg.control2);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].attenuation);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].mask);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].shifter);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].ticks);
-		state_save_register_item(machine(), "Lynx sound", NULL, chan, m_audio[chan].count);
+		save_item(NAME(m_audio[chan].reg.volume), chan);
+		save_item(NAME(m_audio[chan].reg.feedback), chan);
+		save_item(NAME(m_audio[chan].reg.output), chan);
+		save_item(NAME(m_audio[chan].reg.shifter), chan);
+		save_item(NAME(m_audio[chan].reg.bakup), chan);
+		save_item(NAME(m_audio[chan].reg.control1), chan);
+		save_item(NAME(m_audio[chan].reg.counter), chan);
+		save_item(NAME(m_audio[chan].reg.control2), chan);
+		save_item(NAME(m_audio[chan].attenuation), chan);
+		save_item(NAME(m_audio[chan].mask), chan);
+		save_item(NAME(m_audio[chan].shifter), chan);
+		save_item(NAME(m_audio[chan].ticks), chan);
+		save_item(NAME(m_audio[chan].count), chan);
 	}
 }
 

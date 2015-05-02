@@ -2745,6 +2745,34 @@ ROM_START( spatter )
 																/* pr-5317.106 */
 ROM_END
 
+ROM_START( spattera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-6597.116",   0x0000, 0x4000, BAD_DUMP CRC(be80384d) SHA1(9e1f5807492b98c3f36a5b80466dcb2a1f1fead8) ) /* encrypted */ // consistent read, but fails ingame ROM check on PCB
+	ROM_LOAD( "epr-6598.109",   0x4000, 0x4000, CRC(5dff037a) SHA1(8e6f6b75a89609ab0498d317c11e6d653343ffbe) ) /* encrypted */
+	ROM_LOAD( "epr-6599.96",    0x8000, 0x4000, CRC(7ba9de5b) SHA1(f18542c95e8241433ed995c213924ad1ce03cd5b) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-6316.120",   0x0000, 0x2000, CRC(1df95511) SHA1(5780631c8c5a2c3fcd4085f217affa660d72a4e9) )
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "epr-6328.62",    0x0000, 0x2000, CRC(a2bf2832) SHA1(5d7047a6a0c0588a4e98b6ce94d5fd0e6ab963f9) )
+	ROM_LOAD( "epr-6397.61",    0x2000, 0x2000, CRC(c60d4471) SHA1(9e8130d575fa342485dfe093e086a4b48e51b904) )
+	ROM_LOAD( "epr-6326.64",    0x4000, 0x2000, CRC(269fbb4c) SHA1(7b91f551360698195bf9ce8e32dd2e8fa17e9db8) )
+	ROM_LOAD( "epr-6396.63",    0x6000, 0x2000, CRC(c15ccf3b) SHA1(14809ab81816eedb85cacda042e437d48cf9b31a) )
+	ROM_LOAD( "epr-6324.66",    0x8000, 0x2000, CRC(8ab3b563) SHA1(6ede93b9f1593dbcbabd6c875bac8ec01a1b40a2) )
+	ROM_LOAD( "epr-6395.65",    0xa000, 0x2000, CRC(3f083065) SHA1(cb17c8c2fe04baa58863c10cd8f359a58def3417) )
+
+	ROM_REGION( 0x10000, "sprites", 0 )
+	ROM_LOAD( "epr-6306.04",    0x0000, 0x4000, CRC(e871e132) SHA1(55f7ab1a8c9a118911c64930452ea05f6ee37fc4) )
+	ROM_LOAD( "epr-6308.117",   0x4000, 0x4000, CRC(99c2d90e) SHA1(5be54d931622892b7acc320e714d5b1cdce02d19) )
+	ROM_LOAD( "epr-6307.05",    0x8000, 0x4000, CRC(0a5ad543) SHA1(5acada30c1affc4ffbebc8365a9ba4465f213d47) )
+	ROM_LOAD( "epr-6309.110",   0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+																/* pr-5317.106 */
+ROM_END
+
 ROM_START( ssanchan )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6310.116",   0x0000, 0x4000, CRC(26b43701) SHA1(e041bde10da12a3f698da09220f0a7cc2ee99abe) ) /* encrypted */
@@ -3660,9 +3688,8 @@ ROM_START( raflesia )
 	ROM_LOAD( "epr-7410.05",    0xc000, 0x4000, CRC(ced74789) SHA1(d0ad845bfe83412ac8d43125e1c50d0581a5b47e) ) /* epr-7410.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
-ROM_END
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
+	ROM_END
 
 
 ROM_START( wboy )
@@ -3692,11 +3719,17 @@ ROM_START( wboy )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+
+/* Wonder Boy (Escape, Sega license)
+PCB: 834-3984-09 WONDER BOY
+CPU: 317-0003 (encrypted Z80 @ IC137)
+PAL: 315-5063 (PAL @ IC67)
+*/
 ROM_START( wboyo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-.116",       0x0000, 0x4000, CRC(51d27534) SHA1(1cbc7201aacde89857f83b2600f309b514c5e758) ) /* encrypted */
-	ROM_LOAD( "epr-.109",       0x4000, 0x4000, CRC(e29d1cd1) SHA1(f6ff4a6fffea77cc5706549bb2d8bf9e96ed0be0) ) /* encrypted */
-	ROM_LOAD( "epr-7491.96",    0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) )
+	ROM_LOAD( "epr-7532.116",   0x0000, 0x4000, CRC(51d27534) SHA1(1cbc7201aacde89857f83b2600f309b514c5e758) ) /* encrypted */
+	ROM_LOAD( "epr-7533.109",   0x4000, 0x4000, CRC(e29d1cd1) SHA1(f6ff4a6fffea77cc5706549bb2d8bf9e96ed0be0) ) /* encrypted */
+	ROM_LOAD( "epr-7534.96",    0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) ) /* same contents as epr-7491.96 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7498.120",   0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) )
@@ -4873,7 +4906,8 @@ GAME( 1986, nobb,       nob,      nob,      nob,       system1_state, nobb,     
 GAME( 1984, flicky,     0,        sys1pio,  flicky,    system1_state, flicky,   ROT0,   "Sega", "Flicky (128k Version, System 2, 315-5051)", GAME_SUPPORTS_SAVE )
 GAME( 1984, flickys2,   flicky,   sys1pio,  flickys2,  system1_state, bank00,   ROT0,   "Sega", "Flicky (128k Version, System 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1984, thetogyu,   bullfgt,  sys1pio,  bullfgt,   system1_state, bullfgtj, ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, spatter,    0,        sys1pios, spatter,   system1_state, spatter,  ROT0,   "Sega", "Spatter", GAME_SUPPORTS_SAVE )
+GAME( 1984, spatter,    0,        sys1pios, spatter,   system1_state, spatter,  ROT0,   "Sega", "Spatter (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, spattera,   spatter,  sys1pios, spatter,   system1_state, spatter,  ROT0,   "Sega", "Spatter (315-5099)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1984, ssanchan,   spatter,  sys1pios, spatter,   system1_state, spatter,  ROT0,   "Sega", "Sanrin San Chan (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pitfall2,   0,        sys1pio,  pitfall2,  system1_state, pitfall2, ROT0,   "Sega", "Pitfall II (315-5093)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pitfall2a,  pitfall2, sys1pio,  pitfall2,  system1_state, pitfall2, ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", GAME_SUPPORTS_SAVE )

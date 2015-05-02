@@ -67,7 +67,7 @@ public:
 	void set_formats(const floppy_format_type *formats);
 	floppy_image_format_t *get_formats() const;
 	floppy_image_format_t *get_load_format() const;
-	floppy_image_format_t *identify(astring filename);
+	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
 
 	// image-level overrides
@@ -197,10 +197,10 @@ protected:
 
 	floppy_image_format_t **format_array;
 	floppy_image_format_t *input_format, *output_format;
-	astring input_filename, output_filename;
+	std::string input_filename, output_filename;
 
 	void do_load_create();
-	virtual void hook_load(astring filename, bool softlist);
+	virtual void hook_load(std::string filename, bool softlist);
 };
 
 

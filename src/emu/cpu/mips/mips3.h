@@ -320,7 +320,7 @@ protected:
 
 	// device_state_interface overrides
 	virtual void state_export(const device_state_entry &entry);
-	void state_string_export(const device_state_entry &entry, astring &str);
+	void state_string_export(const device_state_entry &entry, std::string &str);
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
@@ -396,8 +396,8 @@ private:
 
 	/* memory accesses */
 	bool            m_bigendian;
-	UINT32			m_byte_xor;
-	UINT32			m_word_xor;
+	UINT32          m_byte_xor;
+	UINT32          m_word_xor;
 	data_accessors  m_memory;
 
 	/* cache memory */

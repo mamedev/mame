@@ -115,6 +115,7 @@ WRITE16_MEMBER(elecbowl_state::write_o)
 
 READ8_MEMBER(elecbowl_state::read_k)
 {
+	// K: multiplexed inputs
 	return read_inputs(4);
 }
 

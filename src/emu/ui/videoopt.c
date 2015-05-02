@@ -174,7 +174,7 @@ ui_menu_video_options::ui_menu_video_options(running_machine &machine, render_co
 void ui_menu_video_options::populate()
 {
 	const char *subtext = "";
-	astring tempstring;
+	std::string tempstring;
 	int viewnum;
 	int enabled;
 
@@ -186,7 +186,8 @@ void ui_menu_video_options::populate()
 			break;
 
 		/* create a string for the item, replacing underscores with spaces */
-		tempstring.cpy(name).replace(0, "_", " ");
+		tempstring.assign(name);
+		strreplace(tempstring, "_", " ");
 		item_append(tempstring.c_str(), NULL, 0, (void *)(FPTR)(VIDEO_ITEM_VIEW + viewnum));
 	}
 

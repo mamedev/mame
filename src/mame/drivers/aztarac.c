@@ -28,14 +28,15 @@
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(aztarac_state::aztarac_irq_callback)
+IRQ_CALLBACK_MEMBER(aztarac_state::irq_callback)
 {
 	return 0xc;
 }
 
 
-void aztarac_state::machine_reset()
+void aztarac_state::machine_start()
 {
+	save_item(NAME(m_sound_status));
 }
 
 
@@ -78,11 +79,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aztarac_state )
 	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_SHARE("nvram")
 	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
 	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x027008, 0x027009) AM_READWRITE(aztarac_sound_r, aztarac_sound_w)
+	AM_RANGE(0x027008, 0x027009) AM_READWRITE(sound_r, sound_w)
 	AM_RANGE(0x02700c, 0x02700d) AM_READ_PORT("DIAL")
 	AM_RANGE(0x02700e, 0x02700f) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_SHARE("vectorram")
-	AM_RANGE(0xffb000, 0xffb001) AM_WRITE(aztarac_ubr_w)
+	AM_RANGE(0xffb000, 0xffb001) AM_WRITE(ubr_w)
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -97,12 +98,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, aztarac_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ(aztarac_snd_command_r)
+	AM_RANGE(0x8800, 0x8800) AM_READ(snd_command_r)
 	AM_RANGE(0x8c00, 0x8c01) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_address_w)
 	AM_RANGE(0x8c02, 0x8c03) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_address_w)
 	AM_RANGE(0x8c04, 0x8c05) AM_DEVREADWRITE("ay3", ay8910_device, data_r, data_address_w)
 	AM_RANGE(0x8c06, 0x8c07) AM_DEVREADWRITE("ay4", ay8910_device, data_r, data_address_w)
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(aztarac_snd_status_r, aztarac_snd_status_w)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(snd_status_r, snd_status_w)
 ADDRESS_MAP_END
 
 
@@ -148,11 +149,11 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aztarac_state,  irq4_line_hold)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(aztarac_state,aztarac_irq_callback)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(aztarac_state, irq_callback)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(aztarac_state, aztarac_snd_timed_irq,  100)
+	MCFG_CPU_PERIODIC_INT_DRIVER(aztarac_state, snd_timed_irq,  100)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -217,4 +218,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, aztarac, 0, aztarac, aztarac, driver_device, 0, ROT0, "Centuri", "Aztarac", 0 )
+GAME( 1983, aztarac, 0, aztarac, aztarac, driver_device, 0, ROT0, "Centuri", "Aztarac", GAME_SUPPORTS_SAVE )

@@ -199,7 +199,7 @@ int machine_manager::execute()
 		if (m_options.read_config())
 		{
 			m_options.revert(OPTION_PRIORITY_INI);
-			astring errors;
+			std::string errors;
 			m_options.parse_standard_inis(errors);
 		}
 
@@ -225,8 +225,8 @@ int machine_manager::execute()
 		// check the state of the machine
 		if (m_new_driver_pending)
 		{
-			astring old_system_name(m_options.system_name());
-			bool new_system = (old_system_name != m_new_driver_pending->name);
+			std::string old_system_name(m_options.system_name());
+			bool new_system = (old_system_name.compare(m_new_driver_pending->name)!=0);
 			// first: if we scheduled a new system, remove device options of the old system
 			// notice that, if we relaunch the same system, there is no effect on the emulation
 			if (new_system)
@@ -236,7 +236,7 @@ int machine_manager::execute()
 			// third: if we scheduled a new system, take also care of ramsize options
 			if (new_system)
 			{
-				astring error_string;
+				std::string error_string;
 				m_options.set_value(OPTION_RAMSIZE, "", OPTION_PRIORITY_CMDLINE, error_string);
 			}
 			firstrun = true;
@@ -276,16 +276,16 @@ void CLIB_DECL popmessage(const char *format, ...)
 	// otherwise, generate the buffer and call the UI to display the message
 	else
 	{
-		astring temp;
+		std::string temp;
 		va_list arg;
 
 		// dump to the buffer
 		va_start(arg, format);
-		temp.vprintf(format, arg);
+		strvprintf(temp,format, arg);
 		va_end(arg);
 
 		// pop it in the UI
-		machine_manager::instance()->machine()->ui().popup_time(temp.len() / 40 + 2, "%s", temp.c_str());
+		machine_manager::instance()->machine()->ui().popup_time(temp.length() / 40 + 2, "%s", temp.c_str());
 
 		/*
 		// also write to error.log

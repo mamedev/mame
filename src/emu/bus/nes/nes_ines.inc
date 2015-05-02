@@ -342,7 +342,7 @@ void nes_cart_slot_device::call_load_ines()
 	UINT8 header[0x10];
 	UINT8 mapper, submapper = 0, local_options;
 	bool ines20 = FALSE, prg16k;
-	astring mapinfo;
+	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
 	bool bus_conflict = FALSE;
@@ -813,7 +813,7 @@ const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
 {
 	UINT8 mapper, submapper = 0;
 	bool ines20 = FALSE;
-	astring mapinfo;
+	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
 

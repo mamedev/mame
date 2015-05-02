@@ -30,6 +30,9 @@
 #define CD_4066_DIP(_name)                                                         \
 		NET_REGISTER_DEV(4066_dip, _name)
 
+#define CD_4016_DIP(_name)                                                         \
+		NET_REGISTER_DEV(4016_dip, _name)
+
 NETLIB_SUBDEVICE(4066,
 	NETLIB_LOGIC_FAMILY(CD4000)
 public:
@@ -38,6 +41,7 @@ public:
 	NETLIB_NAME(R) m_R;
 
 	netlist_state_t<NETLIB_NAME(vdd_vss) *>m_supply;
+	netlist_state_t<nl_double> m_base_r;
 );
 
 NETLIB_DEVICE(4066_dip,
@@ -48,6 +52,9 @@ NETLIB_DEVICE(4066_dip,
 	NETLIB_NAME(4066) m_C;
 	NETLIB_NAME(4066) m_D;
 	NETLIB_NAME(vdd_vss) m_supply;
+);
+
+NETLIB_DEVICE_DERIVED(4016_dip, 4066_dip,
 );
 
 #endif /* NLD_4066_H_ */

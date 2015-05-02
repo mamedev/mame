@@ -135,3 +135,55 @@ ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
 		}
 	}
 }
+
+
+// -----------------------------------------------------------------------------
+// nld_res_sw
+// -----------------------------------------------------------------------------
+
+NETLIB_START(res_sw)
+{
+	register_sub(m_R, "R");
+	register_input("I", m_I);
+	register_param("RON", m_RON, 1.0);
+	register_param("ROFF", m_ROFF, 1.0E20);
+
+	register_subalias("1", m_R.m_P);
+	register_subalias("2", m_R.m_N);
+
+	save(NLNAME(m_last_state));
+}
+
+NETLIB_RESET(res_sw)
+{
+	m_last_state = 0;
+	m_R.set_R(m_ROFF.Value());
+}
+
+NETLIB_UPDATE(res_sw)
+{
+	const int state = INPLOGIC(m_I);
+	if (state != m_last_state)
+	{
+		m_last_state = state;
+		const nl_double R = state ? m_RON.Value() : m_ROFF.Value();
+
+		// We only need to update the net first if this is a time stepping net
+		if (1) // m_R.m_P.net().as_analog().solver()->is_timestep())
+		{
+			m_R.update_dev();
+			m_R.set_R(R);
+			m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+		}
+		else
+		{
+			m_R.set_R(R);
+			m_R.update_dev();
+		}
+	}
+}
+
+NETLIB_UPDATE_PARAM(res_sw)
+{
+	// nothing, not intended to be called
+}

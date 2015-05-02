@@ -235,7 +235,7 @@ public:
 	// driver init configuration
 	UINT32 m_flashType;
 	int m_iocr_hack;
-	
+
 	// common
 	UINT32 m_PS7500_IO[MAXIO];
 	UINT32 m_PS7500_FIFO[256];
@@ -888,7 +888,7 @@ DRIVER_INIT_MEMBER(ssfindo_state,common)
 	m_speedup = 0;
 	m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
 	m_PS7500timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer1_callback),this));
-	
+
 	save_item(NAME(m_PS7500_IO));
 	save_item(NAME(m_PS7500_FIFO));
 }

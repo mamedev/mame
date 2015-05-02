@@ -156,12 +156,12 @@ void mcs96_device::state_export(const device_state_entry &entry)
 {
 }
 
-void mcs96_device::state_string_export(const device_state_entry &entry, astring &str)
+void mcs96_device::state_string_export(const device_state_entry &entry, std::string &str)
 {
 	switch(entry.index()) {
 	case STATE_GENFLAGS:
 	case MCS96_PSW:
-		str.printf("%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c",
+		strprintf(str, "%c%c%c%c%c%c%c %c%c%c%c%c%c%c%c",
 						PSW & F_Z  ? 'Z' : '.',
 						PSW & F_N  ? 'N' : '.',
 						PSW & F_V  ? 'V' : '.',
@@ -181,7 +181,7 @@ void mcs96_device::state_string_export(const device_state_entry &entry, astring 
 	}
 }
 
-astring mcs96_device::regname(UINT8 reg)
+std::string mcs96_device::regname(UINT8 reg)
 {
 	char res[32];
 	switch(reg) {

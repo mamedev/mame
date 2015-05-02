@@ -107,23 +107,23 @@ public:
 	DECLARE_READ8_MEMBER(igs_irqack_r);
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
 	DECLARE_READ8_MEMBER(expram_r);
-	
+
 	void unk_reg_lo_w( int offset, UINT8 data, int reg );
 	void unk_reg_hi_w( int offset, UINT8 data, int reg );
 	void show_out();
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
-	
+
 	DECLARE_DRIVER_INIT(jackie);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	
+
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 };

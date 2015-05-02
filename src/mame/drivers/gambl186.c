@@ -20,17 +20,23 @@ U3 Max691cpe
 
 U300 Nec D7759GC (10Mhz xtal near it)
 
-TODO:
-- No idea about how to surpass the "No Funzione" (sic) screen. According to the bad settings almost
-  surely it wants EEPROM hooked up (i/o at 0x680/0x682?)
-
+In order to get the game to run, follow these steps:
+- enable service mode
+- run all of the tests (press '1' repeatedly to progress)
+- at the "cancellare la memoria" prompt, press 'X' to allow it
+- when the line of '*' appears, press the buttons in the following sequence:
+    1 1 X X 1 1 1 X X X 1 1 X 1 1 1 1 X 1 1 1 1 1 X 1 1 1 1 1 1 X
+(This is the "password" for the EEPROM.  You have three attempts to get it correct, otherwise the service mode will restart)
+- if accepted, disable service mode DIP switch
+- reset machine (press 'F3')
 */
 
 
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "video/pc_vga.h"
+#include "video/clgd542x.h"
+#include "machine/nvram.h"
 
 
 class gambl186_state : public driver_device
@@ -41,22 +47,195 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
+    int m_comms_state;
+	int m_comms_ind;
+	UINT8 m_comms_data[1002];
+    int m_comms_cmd;
+    int m_comms_expect;
+    int m_comms_blocks;
+    bool m_comms_ack;
 
-	DECLARE_READ16_MEMBER(unk_r);
+	virtual void machine_start();
+	DECLARE_READ16_MEMBER(comms_r);
+	DECLARE_WRITE16_MEMBER(comms_w);
+	DECLARE_WRITE16_MEMBER(data_bank_w);
 };
 
-
+void gambl186_state::machine_start()
+{
+	membank("data_bank")->configure_entries(0, 4, memregion("data")->base(), 0x40000);
+}
 
 static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("data",0) // TODO: way bigger than this, banked?
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x40000, 0x7ffff) AM_ROMBANK("data_bank") // TODO: way bigger than this, banked?
 	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
-READ16_MEMBER(gambl186_state::unk_r)
+static const UINT8 password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
+
+READ16_MEMBER(gambl186_state::comms_r)
 {
-	return machine().rand();
+    UINT16 retval = 0;
+
+    if ((offset == 0) && ACCESSING_BITS_0_7) //port 680 == data
+    {
+        if (m_comms_state == 0x16) //read mode, just in case
+        {
+            if (!m_comms_ind && (m_comms_cmd == 0xff))
+            {
+                m_comms_cmd = m_comms_data[1];
+
+                switch (m_comms_cmd)
+                {
+                    case 0:
+                    {
+                        m_comms_expect = 4;
+                        break;
+                    }
+
+                    case 1: //unverified
+                    case 3: //unverified
+                    {
+                        m_comms_expect = 8;
+                        break;
+                    }
+
+                    case 2:
+                    {
+                        m_comms_expect = 408;
+                        m_comms_data[401] = 0x34; //precalc
+                        m_comms_blocks = 4;
+                        break;
+                    }
+
+                    case 4:
+                    {
+                        m_comms_expect = 4;
+                        break;
+                    }
+
+                    case 5: //unverified
+                    {
+                        m_comms_expect = 7;
+                        break;
+                    }
+
+                    case 6:
+                    {
+                        m_comms_expect = 1003;
+                        m_comms_data[1001] = 0xec; //precalc
+                        break;
+                    }
+
+                    default: //unverified
+                    {
+                        m_comms_expect = 1;
+                    }
+                }
+            }
+
+            if (m_comms_ind < sizeof(m_comms_data))
+            {
+                if ((m_comms_cmd == 4) && (m_comms_ind == 1) && !memcmp(m_comms_data, password, sizeof(password)))
+                {
+                    m_comms_data[1] = 0x55;
+                    m_comms_data[2] = 0x55;
+                }
+
+                retval = m_comms_data[m_comms_ind++];
+
+                if (m_comms_expect && !--m_comms_expect)
+                {
+                    if (!m_comms_blocks || !--m_comms_blocks)
+                    {
+                        m_comms_cmd = 0xff;
+                    }
+                    else if (m_comms_cmd == 2)
+                    {
+                        if (m_comms_blocks == 3)
+                        {
+                            m_comms_expect = 5;
+                            m_comms_data[4] = 0x17; //precalc
+                        }
+                        else
+                        {
+                            m_comms_expect = 3;
+                            m_comms_data[2] = 5; //precalc
+                        }
+                    }
+
+                    m_comms_ack = true;
+                }
+            }
+        }
+    }
+    else if (offset == 1) //port 681 == status
+    {
+        if (m_comms_state == 0x16) //read mode
+        {
+            retval = 2; //read ready
+        }
+        else if (m_comms_state == 0x31) //write mode
+        {
+            retval = 4; //write ready
+        }
+    }
+
+    return retval;
+}
+
+WRITE16_MEMBER(gambl186_state::comms_w)
+{
+    if (offset == 0)
+    {
+        if ((m_comms_state == 0x31) && (m_comms_ind < 1000))
+        {
+            if (!m_comms_ack || (data == 0x15)) //validation failure
+            {
+                if (m_comms_cmd == 6) //1000 bytes transfer
+                {
+                    data = ~data;
+                }
+                else if (m_comms_ack)
+                {
+                    m_comms_cmd = 0xfe;
+                    m_comms_expect = 2;
+                    data = 5;
+                }
+
+                m_comms_data[++m_comms_ind] = (UINT8) data;
+            }
+
+            m_comms_ack = false;
+        }
+    }
+    else if (offset == 1)
+    {
+        if (m_comms_state != data) //detect transition
+        {
+            m_comms_ind = 0;
+
+            if (data == 0x4e) //reset
+            {
+                m_comms_data[0] = 5; //operation complete
+                m_comms_cmd = 0xff; //none
+                m_comms_expect = 0;
+                m_comms_blocks = 0;
+                m_comms_ack = false;
+            }
+        }
+
+        m_comms_state = data;
+    }
+}
+
+WRITE16_MEMBER( gambl186_state::data_bank_w)
+{
+	membank("data_bank")->set_entry(data & 3);
+	if(data & 0xfffc)
+		popmessage("warning: set %04x to data bank",data);
 }
 
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
@@ -73,7 +252,8 @@ static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW2") AM_WRITENOP // ???
 	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
-	AM_RANGE(0x0680, 0x0683) AM_READ(unk_r) // ???
+	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
+	AM_RANGE(0x0700, 0x0701) AM_WRITE(data_bank_w)
 ADDRESS_MAP_END
 
 
@@ -360,6 +540,8 @@ static MACHINE_CONFIG_START( gambl186, gambl186_state )
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
 MACHINE_CONFIG_END
 
@@ -393,5 +575,5 @@ ROM_START( gambl186a )
 ROM_END
 
 
-GAME( 1999, gambl186,  0,        gambl186,   gambl186, driver_device,   0,       ROT0,  "<unknown>", "unknown 186 based gambling game (V398)",         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,       ROT0,  "<unknown>", "unknown 186 based gambling game (V399)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, gambl186,  0,        gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V398)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V399)",         GAME_NOT_WORKING | GAME_NO_SOUND )

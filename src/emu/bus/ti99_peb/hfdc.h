@@ -18,11 +18,12 @@
 #define __HFDC__
 
 #define HFDC_MAX_FLOPPY 4
-#define HFDC_MAX_HARD 4
+#define HFDC_MAX_HARD 3
 
 #include "imagedev/floppy.h"
 #include "machine/mm58274c.h"
 #include "machine/hdc9234.h"
+#include "machine/ti99_hd.h"
 
 extern const device_type TI99_HFDC;
 
@@ -49,11 +50,13 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+protected:
+	void device_config_complete();
+
 private:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	void device_start();
 	void device_reset();
-	void device_config_complete();
 
 	const rom_entry *device_rom_region() const;
 	machine_config_constructor device_mconfig_additions() const;
@@ -63,17 +66,23 @@ private:
 	void debug_read(offs_t offset, UINT8* value);
 	void debug_write(offs_t offset, UINT8 data);
 
-	// Callback for the index hole
+	// Callbacks for the index hole and seek complete
 	void floppy_index_callback(floppy_image_device *floppy, int state);
+	void harddisk_index_callback(mfm_harddisk_device *harddisk, int state);
+	void harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state);
 
 	// Operate the floppy motors
 	void set_floppy_motors_running(bool run);
 
-	// Connect or disconnect floppy drives
+	// Connect floppy drives
 	void connect_floppy_unit(int index);
 
-	// Connect or disconnect harddisk drives
+	// Connect harddisk drives
 	void connect_harddisk_unit(int index);
+
+	// Disconnect drives
+	void disconnect_floppy_drives();
+	void disconnect_hard_drives();
 
 	// Pushes the drive status to the HDC
 	void signal_drive_status();
@@ -90,11 +99,14 @@ private:
 	// Link to the attached floppy drives
 	floppy_image_device*    m_floppy_unit[4];
 
+	// Link to the attached hard disks
+	mfm_harddisk_device*    m_harddisk_unit[3];
+
 	// Currently selected floppy drive
 	floppy_image_device*    m_current_floppy;
 
 	// Currently selected hard drive
-	void*    m_current_harddisk;
+	mfm_harddisk_device*    m_current_harddisk;
 
 	// True: Access to DIP switch settings, false: access to line states
 	bool    m_see_switches;
@@ -159,8 +171,8 @@ private:
 	// Signal motor_on. When TRUE, makes all drives turning.
 	line_state m_MOTOR_ON;
 
-	// Calculates a simple version of a binary logarithm
-	int     slog2(int value);
+	// Calculates the index from the bit
+	int bit_to_index(int value);
 
 	// Utility function to set or unset bits in a byte
 	void set_bits(UINT8& byte, int mask, bool set);
@@ -169,6 +181,26 @@ private:
 	void set_ready(int dev, bool ready);
 	int  m_readyflags;
 };
+
+/* Connector for a MFM hard disk. See also floppy.c */
+class mfm_harddisk_connector : public device_t,
+								public device_slot_interface
+{
+public:
+	mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~mfm_harddisk_connector();
+
+	mfm_harddisk_device *get_device();
+
+protected:
+	void device_start();
+};
+
+extern const device_type MFM_HD_CONNECTOR;
+
+#define MCFG_MFM_HARDDISK_ADD(_tag, _slot_intf, _def_slot)  \
+	MCFG_DEVICE_ADD(_tag, MFM_HD_CONNECTOR, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);
 
 // =========================================================================
 
@@ -250,7 +282,7 @@ private:
 	legacy_floppy_image_device*       m_floppy_unit[HFDC_MAX_FLOPPY];
 
 	/* Connected harddisk drives. */
-	mfm_harddisk_device*       m_harddisk_unit[HFDC_MAX_HARD];
+	mfm_harddisk_legacy_device*       m_harddisk_unit[HFDC_MAX_HARD];
 
 	/* DMA address latch */
 	UINT32          m_dma_address;

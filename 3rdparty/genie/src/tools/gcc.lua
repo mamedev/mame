@@ -135,6 +135,15 @@
 	function premake.gcc.getldflags(cfg)
 		local result = { }
 
+		-- OS X has a bug, see http://lists.apple.com/archives/Darwin-dev/2006/Sep/msg00084.html
+		if not cfg.flags.Symbols then
+			if cfg.system == "macosx" then
+				table.insert(result, "-Wl,-x")
+			else
+				table.insert(result, "-s")
+			end
+		end
+
 		if cfg.kind == "SharedLib" then
 			if cfg.system == "macosx" then
 				table.insert(result, "-dynamiclib")

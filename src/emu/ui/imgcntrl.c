@@ -46,7 +46,7 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 	if(swi)
 	{
 		state = START_OTHER_PART;
-		current_directory.cpy(image->working_directory());
+		current_directory.assign(image->working_directory());
 	}
 	else
 	{
@@ -55,14 +55,14 @@ ui_menu_control_device_image::ui_menu_control_device_image(running_machine &mach
 		/* if the image exists, set the working directory to the parent directory */
 		if (image->exists())
 		{
-			current_file.cpy(image->filename());
+			current_file.assign(image->filename());
 			zippath_parent(current_directory, current_file.c_str());
 		} else
-			current_directory.cpy(image->working_directory());
+			current_directory.assign(image->working_directory());
 
 		/* check to see if the path exists; if not clear it */
 		if (zippath_opendir(current_directory.c_str(), NULL) != FILERR_NONE)
-			current_directory.reset();
+			current_directory.clear();
 	}
 }
 
@@ -82,7 +82,7 @@ ui_menu_control_device_image::~ui_menu_control_device_image()
 
 void ui_menu_control_device_image::test_create(bool &can_create, bool &need_confirm)
 {
-	astring path;
+	std::string path;
 	osd_directory_entry *entry;
 	osd_dir_entry_type file_type;
 
@@ -132,7 +132,7 @@ void ui_menu_control_device_image::test_create(bool &can_create, bool &need_conf
 
 void ui_menu_control_device_image::load_software_part()
 {
-	astring temp_name = astring(sld->list_name()).cat(":").cat(swi->shortname()).cat(":").cat(swp->name());
+	std::string temp_name = std::string(sld->list_name()).append(":").append(swi->shortname()).append(":").append(swp->name());
 
 	driver_enumerator drivlist(machine().options(), machine().options().system_name());
 	media_auditor auditor(drivlist);
@@ -152,7 +152,7 @@ void ui_menu_control_device_image::load_software_part()
 //  hook_load
 //-------------------------------------------------
 
-void ui_menu_control_device_image::hook_load(astring name, bool softlist)
+void ui_menu_control_device_image::hook_load(std::string name, bool softlist)
 {
 	if (image->is_reset_on_load()) image->set_init_phase();
 	image->load(name.c_str());
@@ -330,7 +330,7 @@ void ui_menu_control_device_image::handle()
 		break;
 
 	case DO_CREATE: {
-		astring path;
+		std::string path;
 		zippath_combine(path, current_directory.c_str(), current_file.c_str());
 		int err = image->create(path.c_str(), 0, NULL);
 		if (err != 0)

@@ -85,9 +85,7 @@ void device_md_cart_interface::rom_alloc(size_t size, const char *tag)
 {
 	if (m_rom == NULL)
 	{
-		astring tempstring(tag);
-		tempstring.cat(MDSLOT_ROM_REGION_TAG);
-		m_rom = (UINT16 *)device().machine().memory().region_alloc(tempstring.c_str(), size, 2, ENDIANNESS_LITTLE)->base();
+		m_rom = (UINT16 *)device().machine().memory().region_alloc(std::string(tag).append(MDSLOT_ROM_REGION_TAG).c_str(), size, 2, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -900,7 +898,7 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
  get default card software
  -------------------------------------------------*/
 
-void base_md_cart_slot_device::get_default_card_software(astring &result)
+void base_md_cart_slot_device::get_default_card_software(std::string &result)
 {
 	if (open_image_file(mconfig().options()))
 	{
@@ -919,7 +917,7 @@ void base_md_cart_slot_device::get_default_card_software(astring &result)
 
 		clear();
 
-		result.cpy(slot_string);
+		result.assign(slot_string);
 	}
 	else
 		software_get_default_slot(result, "rom");
@@ -989,7 +987,7 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	UINT32 rom_start, rom_end, ram_start, ram_end, sram_start = 0, sram_end = 0;
 	UINT16 checksum, csum = 0;
 	bool valid_sram = FALSE, is_pico = FALSE;
-	astring ctrl(""), reg("");
+	std::string ctrl(""), reg("");
 
 	// LOG FILE DETAILS
 	logerror("FILE DETAILS\n");
@@ -1027,9 +1025,9 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	{
 		io[i] = ROM8[0x190 + (i ^ 1)];
 		if (io[i] == 'J')
-			ctrl.cat(" - Joypad 3 buttons [J]\n");
+			ctrl.append(" - Joypad 3 buttons [J]\n");
 		if (io[i] == '6')
-			ctrl.cat(" - Joypad 6 buttons [6]\n");
+			ctrl.append(" - Joypad 6 buttons [6]\n");
 	}
 
 	rom_start = (ROM8[0x1a1] << 24 | ROM8[0x1a0] << 16 | ROM8[0x1a3] << 8 | ROM8[0x1a2]);
@@ -1051,11 +1049,11 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	{
 		country[i] = ROM8[0x1f0 + (i ^ 1)];
 		if (country[i] == 'J')
-			reg.cat(" - Japan [J]\n");
+			reg.append(" - Japan [J]\n");
 		if (country[i] == 'U')
-			reg.cat(" - USA [U]\n");
+			reg.append(" - USA [U]\n");
 		if (country[i] == 'E')
-			reg.cat(" - Europe [E]\n");
+			reg.append(" - Europe [E]\n");
 	}
 
 	// compute cart checksum to compare with expected one

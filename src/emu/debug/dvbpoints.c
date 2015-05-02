@@ -132,8 +132,8 @@ void debug_view_breakpoints::enumerate_sources()
 	disasm_interface_iterator iter(machine().root_device());
 	for (device_disasm_interface *dasm = iter.first(); dasm != NULL; dasm = iter.next())
 	{
-		astring name;
-		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
+		std::string name;
+		strprintf(name, "%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*global_alloc(debug_view_source(name.c_str(), &dasm->device())));
 	}
 
@@ -187,16 +187,15 @@ void debug_view_breakpoints::view_click(const int button, const debug_view_xy& p
 }
 
 
-void debug_view_breakpoints::pad_astring_to_length(astring& str, int len)
+void debug_view_breakpoints::pad_astring_to_length(std::string& str, int len)
 {
-	int diff = len - str.len();
+	int diff = len - str.length();
 	if (diff > 0)
 	{
-		astring buffer;
-		buffer.expand(diff);
+		std::string buffer;
 		for (int i = 0; i < diff; i++)
-			buffer.catprintf(" ");
-		str.catprintf("%s", buffer.c_str());
+			strcatprintf(buffer, " ");
+		strcatprintf(str, "%s", buffer.c_str());
 	}
 }
 
@@ -236,40 +235,40 @@ void debug_view_breakpoints::view_update()
 
 	// Draw
 	debug_view_char *dest = &m_viewdata[0];
-	astring         linebuf;
+	std::string         linebuf;
 
 	// Header
 	if (m_visible.y > 0)
 	{
-		linebuf.reset();
-		linebuf.cat("ID");
-		if (m_sortType == &cIndexAscending) linebuf.cat('\\');
-		else if (m_sortType == &cIndexDescending) linebuf.cat('/');
+		linebuf.clear();
+		linebuf.append("ID");
+		if (m_sortType == &cIndexAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cIndexDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[0]);
-		linebuf.cat("En");
-		if (m_sortType == &cEnabledAscending) linebuf.cat('\\');
-		else if (m_sortType == &cEnabledDescending) linebuf.cat('/');
+		linebuf.append("En");
+		if (m_sortType == &cEnabledAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cEnabledDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[1]);
-		linebuf.cat("CPU");
-		if (m_sortType == &cCpuAscending) linebuf.cat('\\');
-		else if (m_sortType == &cCpuDescending) linebuf.cat('/');
+		linebuf.append("CPU");
+		if (m_sortType == &cCpuAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cCpuDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[2]);
-		linebuf.cat("Address");
-		if (m_sortType == &cAddressAscending) linebuf.cat('\\');
-		else if (m_sortType == &cAddressDescending) linebuf.cat('/');
+		linebuf.append("Address");
+		if (m_sortType == &cAddressAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cAddressDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[3]);
-		linebuf.cat("Condition");
-		if (m_sortType == &cConditionAscending) linebuf.cat('\\');
-		else if (m_sortType == &cConditionDescending) linebuf.cat('/');
+		linebuf.append("Condition");
+		if (m_sortType == &cConditionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cConditionDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[4]);
-		linebuf.cat("Action");
-		if (m_sortType == &cActionAscending) linebuf.cat('\\');
-		else if (m_sortType == &cActionDescending) linebuf.cat('/');
+		linebuf.append("Action");
+		if (m_sortType == &cActionAscending) linebuf.push_back('\\');
+		else if (m_sortType == &cActionDescending) linebuf.push_back('/');
 		pad_astring_to_length(linebuf, tableBreaks[5]);
 
 		for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 		{
-			dest->byte = (i < linebuf.len()) ? linebuf[i] : ' ';
+			dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
 			dest->attrib = DCA_ANCILLARY;
 		}
 	}
@@ -282,24 +281,24 @@ void debug_view_breakpoints::view_update()
 		{
 			device_debug::breakpoint *const bp = m_buffer[bpi];
 
-			linebuf.reset();
-			linebuf.catprintf("%2X", bp->index());
+			linebuf.clear();
+			strcatprintf(linebuf, "%2X", bp->index());
 			pad_astring_to_length(linebuf, tableBreaks[0]);
-			linebuf.cat(bp->enabled() ? 'X' : 'O');
+			linebuf.push_back(bp->enabled() ? 'X' : 'O');
 			pad_astring_to_length(linebuf, tableBreaks[1]);
-			linebuf.cat(bp->debugInterface()->device().tag());
+			linebuf.append(bp->debugInterface()->device().tag());
 			pad_astring_to_length(linebuf, tableBreaks[2]);
-			linebuf.cat(core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
+			linebuf.append(core_i64_hex_format(bp->address(), bp->debugInterface()->logaddrchars()));
 			pad_astring_to_length(linebuf, tableBreaks[3]);
 			if (strcmp(bp->condition(), "1"))
-				linebuf.cat(bp->condition());
+				linebuf.append(bp->condition());
 			pad_astring_to_length(linebuf, tableBreaks[4]);
-			linebuf.cat(bp->action());
+			linebuf.append(bp->action());
 			pad_astring_to_length(linebuf, tableBreaks[5]);
 
 			for (UINT32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 			{
-				dest->byte = (i < linebuf.len()) ? linebuf[i] : ' ';
+				dest->byte = (i < linebuf.length()) ? linebuf[i] : ' ';
 				dest->attrib = DCA_NORMAL;
 
 				// Color disabled breakpoints red

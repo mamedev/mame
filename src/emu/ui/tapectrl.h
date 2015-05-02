@@ -25,7 +25,7 @@ public:
 	virtual void handle();
 
 private:
-	static void get_time_string(astring &dest, cassette_image_device *cassette, int *curpos, int *endpos);
+	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);
 };
 
 #endif /* __UI_TAPECTRL_H__ */

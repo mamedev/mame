@@ -54,6 +54,7 @@
 #define LOG 0
 #define LOG_VIA 0
 #define LOG_SCP 0
+#define LOG_BITS 0
 
 #define I8048_TAG       "5d"
 #define M6522_4_TAG     "1f"
@@ -1069,22 +1070,23 @@ void victor_9000_fdc_t::live_start()
 	cur_live.wrsync = m_wrsync;
 	cur_live.erase = m_erase;
 
-	pll_reset(cur_live.tm, attotime::from_nsec(2130));
+	pll_reset(cur_live.tm);
 	checkpoint_live = cur_live;
 	pll_save_checkpoint();
 
 	live_run();
 }
 
-void victor_9000_fdc_t::pll_reset(const attotime &when, const attotime &clock)
+void victor_9000_fdc_t::pll_reset(const attotime &when)
 {
 	cur_pll.reset(when);
-	cur_pll.set_clock(clock);
+	cur_pll.set_clock(attotime::from_nsec(2130));
 }
 
 void victor_9000_fdc_t::pll_start_writing(const attotime &tm)
 {
 	cur_pll.start_writing(tm);
+	pll_reset(cur_live.tm);
 }
 
 void victor_9000_fdc_t::pll_commit(floppy_image_device *floppy, const attotime &tm)
@@ -1095,6 +1097,7 @@ void victor_9000_fdc_t::pll_commit(floppy_image_device *floppy, const attotime &
 void victor_9000_fdc_t::pll_stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
 	cur_pll.stop_writing(floppy, tm);
+	pll_reset(cur_live.tm);
 }
 
 void victor_9000_fdc_t::pll_save_checkpoint()
@@ -1114,7 +1117,7 @@ int victor_9000_fdc_t::pll_get_next_bit(attotime &tm, floppy_image_device *flopp
 
 bool victor_9000_fdc_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
-	return cur_pll.write_next_bit_prev_cell(bit, tm, floppy, limit);
+	return cur_pll.write_next_bit(bit, tm, floppy, limit);
 }
 
 void victor_9000_fdc_t::checkpoint()
@@ -1197,10 +1200,22 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 				return;
 
 			// read bit
-			int bit = pll_get_next_bit(cur_live.tm, get_floppy(), limit);
-			if(bit < 0)
-				return;
+			int bit = 0;
+			if (cur_live.drw) {
+				bit = pll_get_next_bit(cur_live.tm, get_floppy(), limit);
+				if(bit < 0)
+					return;
+			}
 
+			// write bit
+			int write_bit = 0;
+			if (!cur_live.drw) { // TODO WPS
+				write_bit = BIT(cur_live.shift_reg_write, 9);
+				if (pll_write_next_bit(write_bit, cur_live.tm, get_floppy(), limit))
+					return;
+			}
+
+			// clock read shift register
 			cur_live.shift_reg <<= 1;
 			cur_live.shift_reg |= bit;
 			cur_live.shift_reg &= 0x3ff;
@@ -1261,11 +1276,12 @@ void victor_9000_fdc_t::live_run(const attotime &limit)
 			// GCR error
 			int gcr_err = !(brdy || BIT(cur_live.e, 3));
 
-			// write bit
-			if (!cur_live.drw) { // TODO WPS
-				int write_bit = BIT(cur_live.shift_reg_write, 9);
-				if (LOG) logerror("%s writing bit %u sr %03x\n",cur_live.tm.as_string(),write_bit,cur_live.shift_reg_write);
-				pll_write_next_bit(write_bit, cur_live.tm, get_floppy(), limit);
+			if (LOG_BITS) {
+				if (cur_live.drw) {
+					logerror("%s cyl %u bit %u sync %u bc %u sr %03x i %03x e %02x\n",cur_live.tm.as_string(),get_floppy()->get_cyl(),bit,sync,cur_live.bit_counter,cur_live.shift_reg,cur_live.i,cur_live.e);
+				} else {
+					logerror("%s cyl %u writing bit %u bc %u sr %03x i %03x e %02x\n",cur_live.tm.as_string(),get_floppy()->get_cyl(),write_bit,cur_live.bit_counter,cur_live.shift_reg_write,cur_live.i,cur_live.e);
+				}
 			}
 
 			if (!brdy) {

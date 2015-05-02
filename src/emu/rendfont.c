@@ -392,8 +392,8 @@ bool render_font::load_cached_bdf(const char *filename)
 	UINT32 hash = crc32(0, (const UINT8 *)&m_rawdata[0], bytes) ^ (UINT32)m_rawsize;
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
-	astring cachedname(filename);
-	cachedname.del(cachedname.len() - 3, 3).cat("bdc");
+	std::string cachedname(filename);
+	cachedname.erase(cachedname.length() - 3, 3).append("bdc");
 
 	// attempt to open the cached version of the font
 	{

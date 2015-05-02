@@ -33,3 +33,38 @@ NETLIB_UPDATE(nicRSFF)
 		OUTLOGIC(m_QQ, 1, NLTIME_FROM_NS(20));
 	}
 }
+
+NETLIB_START(nicDelay)
+{
+	register_input("1", m_I);
+	register_output("2", m_Q);
+
+	register_param("L_TO_H", m_L_to_H, 10);
+	register_param("H_TO_L", m_H_to_L, 10);
+
+	save(NLNAME(m_last));
+
+}
+
+NETLIB_RESET(nicDelay)
+{
+	m_Q.initial(0);
+}
+
+NETLIB_UPDATE_PARAM(nicDelay)
+{
+}
+
+NETLIB_UPDATE(nicDelay)
+{
+	if (INPLOGIC(m_I) && !m_last)
+	{
+		// L_to_H
+		OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(m_L_to_H.Value()));
+	}
+	else if (!INPLOGIC(m_I) && m_last)
+	{
+		OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(m_H_to_L.Value()));
+	}
+	m_last = INPLOGIC(m_I);
+}

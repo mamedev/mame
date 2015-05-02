@@ -74,12 +74,12 @@
 #define CLK_ADDR    0x0fe0
 #define RAM_ADDR    0x1000
 
-#define TRACE_EMU 0
+#define TRACE_EMU 1
 #define TRACE_CRU 0
 #define TRACE_COMP 0
 #define TRACE_RAM 0
 #define TRACE_ROM 0
-#define TRACE_LINES 0
+#define TRACE_LINES 1
 #define TRACE_MOTOR 0
 #define TRACE_DMA 0
 #define TRACE_INT 0
@@ -499,9 +499,29 @@ void myarc_hfdc_device::device_timer(emu_timer &timer, device_timer_id id, int p
 */
 void myarc_hfdc_device::floppy_index_callback(floppy_image_device *floppy, int state)
 {
-	if (TRACE_LINES) if (state==1) logerror("%s: Index pulse\n", tag());
+	if (TRACE_LINES) if (state==1) logerror("%s: Floppy index pulse\n", tag());
 	// m_status_latch = (state==ASSERT_LINE)? (m_status_latch | HDC_DS_INDEX) :  (m_status_latch & ~HDC_DS_INDEX);
 	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
+	signal_drive_status();
+}
+
+/*
+    This is called back from the hard disk when an index hole is passing by.
+*/
+void myarc_hfdc_device::harddisk_index_callback(mfm_harddisk_device *harddisk, int state)
+{
+	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD index pulse\n", tag());
+	set_bits(m_status_latch, HDC_DS_INDEX, (state==ASSERT_LINE));
+	signal_drive_status();
+}
+
+/*
+    This is called back from the hard disk when seek_complete becomes asserted.
+*/
+void myarc_hfdc_device::harddisk_skcom_callback(mfm_harddisk_device *harddisk, int state)
+{
+	/* if (TRACE_LINES) */ if (state==1) logerror("%s: HD seek complete\n", tag());
+	set_bits(m_status_latch, HDC_DS_SKCOM, (state==ASSERT_LINE));
 	signal_drive_status();
 }
 
@@ -512,18 +532,16 @@ void myarc_hfdc_device::set_bits(UINT8& byte, int mask, bool set)
 }
 
 /*
-    Calculate the logarithm. This is needed to determine the index of a drive.
-    Returns -1 for value=0
+   Maps the set bit to an index. The rightmost 1 bit is significant. When no
+   bit is set, returns -1.
 */
-int myarc_hfdc_device::slog2(int value)
+int myarc_hfdc_device::bit_to_index(int value)
 {
-	int i=-1;
-	while (value!=0)
-	{
-		value >>= 1;
-		i++;
-	}
-	return i;
+	if (value & 0x01) return 0;
+	if (value & 0x02) return 1;
+	if (value & 0x04) return 2;
+	if (value & 0x08) return 3;
+	return -1;
 }
 
 /*
@@ -554,10 +572,26 @@ void myarc_hfdc_device::signal_drive_status()
 
 		// Check for TRK00*
 		if ((m_current_floppy != NULL) && (!m_current_floppy->trk00_r()))
-			reply |= 0x10;
+			reply |= HDC_DS_TRK00;
+	}
+	else
+	{
+		if ((m_output1_latch & 0xe0)!=0)
+		{
+			if (m_current_harddisk != NULL)
+			{
+				if (m_current_harddisk->ready_r()==ASSERT_LINE)
+				{
+					m_status_latch |= HDC_DS_READY;
+					set_bits(m_status_latch, HDC_DS_SKCOM, m_current_harddisk->seek_complete_r()==ASSERT_LINE);
+					set_bits(m_status_latch, HDC_DS_TRK00, m_current_harddisk->trk00_r()==ASSERT_LINE);
+				}
+			}
+			// If WDS is selected but not connected, WDS.ready* and WDS.seekComplete* are 1, so Ready=SeekComplete=0
+			else set_bits(m_status_latch, HDC_DS_READY | HDC_DS_SKCOM, false);
+		}
 	}
 
-	// If WDS is selected but not connected, WDS.ready* and WDS.seekComplete* are 1, so Ready=SeekComplete=0
 	reply |= m_status_latch;
 
 	m_hdc9234->auxbus_in(reply);
@@ -598,27 +632,18 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 
 		m_output1_latch = data;
 
-		if ((data & 0x10) != 0)
-		{
-			// Floppy selected
-			connect_floppy_unit(slog2(data & 0x0f));
-		}
+		if ((data & 0x10) != 0) connect_floppy_unit(bit_to_index(data & 0x0f));             // Floppy selected
 		else
 		{
-			index = slog2((data>>4) & 0x0f);
-			if (index == -1)
-			{
-				if (TRACE_LINES) logerror("%s: Unselect all HD drives\n", tag());
-				connect_floppy_unit(index);
-			}
+			index = bit_to_index((data>>4) & 0x0f);
+
+			if (index > 0) connect_harddisk_unit(index-1);  // HD selected; index >= 1
 			else
 			{
-				// HD selected
-				if (TRACE_LINES) logerror("%s: Select hard disk WDS%d\n", tag(), index);
-				//          if (index>=0) m_hdc9234->connect_hard_drive(m_harddisk_unit[index-1]);
-			}
-			if (m_current_harddisk==NULL)
-			{
+				disconnect_floppy_drives();
+				disconnect_hard_drives();
+
+				// Turn off READY and SEEK COMPLETE
 				set_bits(m_status_latch, HDC_DS_READY | HDC_DS_SKCOM, false);
 			}
 		}
@@ -644,6 +669,13 @@ WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
 			m_current_floppy->stp_w((data & 0x10)==0);
 		}
 
+		if (m_current_harddisk != NULL)
+		{
+			// Dir = 0 -> outward
+			m_current_harddisk->direction_in_w((data & 0x20)? ASSERT_LINE : CLEAR_LINE);
+			m_current_harddisk->step_w((data & 0x10)? ASSERT_LINE : CLEAR_LINE);
+		}
+
 		// We are pushing the drive status after OUTPUT2
 		signal_drive_status();
 		break;
@@ -659,52 +691,74 @@ enum
 void myarc_hfdc_device::connect_floppy_unit(int index)
 {
 	// Check if we have a new floppy
-	if (index>=0)
+	if (m_floppy_unit[index] != m_current_floppy)
 	{
-		if (m_floppy_unit[index] != m_current_floppy)
-		{
-			if (TRACE_LINES) logerror("%s: Select floppy drive DSK%d\n", tag(), index+1);
-			if (m_current_floppy != NULL)
-			{
-				// Disconnect old drive from index line
-				if (TRACE_LINES) logerror("%s: Disconnect previous index callback DSK%d\n", tag(), index+1);
-				m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
-			}
-			// Connect new drive
-			m_current_floppy = m_floppy_unit[index];
+		disconnect_floppy_drives();
+		if (TRACE_LINES) logerror("%s: Select floppy drive DSK%d\n", tag(), index+1);
 
-			// We don't use the READY line of floppy drives.
-			// READY is asserted when DSKx = 1
-			// The controller fetches the state with the auxbus access
-			if (TRACE_LINES) logerror("%s: Connect index callback DSK%d\n", tag(), index+1);
-			if (m_current_floppy != NULL)
-				m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(myarc_hfdc_device::floppy_index_callback), this));
-			else
-				logerror("%s: Connection to DSK%d failed because no drive is connected\n", tag(), index+1);
-			m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
-		}
-	}
-	else
-	{
-		if (TRACE_LINES) logerror("%s: Unselect all floppy drives\n", tag());
-		// Disconnect current floppy
+		// Connect new drive
+		m_current_floppy = m_floppy_unit[index];
+
+		// We don't use the READY line of floppy drives.
+		// READY is asserted when DSKx = 1
+		// The controller fetches the state with the auxbus access
+		if (TRACE_LINES) logerror("%s: Connect index callback DSK%d\n", tag(), index+1);
 		if (m_current_floppy != NULL)
-		{
-			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
-			m_current_floppy = NULL;
-		}
+			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(myarc_hfdc_device::floppy_index_callback), this));
+		else
+			logerror("%s: Connection to DSK%d failed because no drive is connected\n", tag(), index+1);
+		m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
 	}
-	// The drive status is supposed to be sampled after OUTPUT2
-	// signal_drive_status();
+
+	// We can only run a floppy or a harddisk at a time, not both
+	disconnect_hard_drives();
 }
 
 void myarc_hfdc_device::connect_harddisk_unit(int index)
 {
-//  if (index < 0)
-//  {
+	if (m_harddisk_unit[index] != m_current_harddisk)
+	{
+		disconnect_hard_drives();
+		if (TRACE_LINES) logerror("%s: Select hard disk WDS%d\n", tag(), index+1);
+
+		// Connect new drive
+		m_current_harddisk = m_harddisk_unit[index];
+
+		if (TRACE_LINES) logerror("%s: Connect index callback WDS%d\n", tag(), index+1);
+		if (m_current_harddisk != NULL)
+		{
+			m_current_harddisk->setup_index_pulse_cb(mfm_harddisk_device::index_pulse_cb(FUNC(myarc_hfdc_device::harddisk_index_callback), this));
+			m_current_harddisk->setup_seek_complete_cb(mfm_harddisk_device::seek_complete_cb(FUNC(myarc_hfdc_device::harddisk_skcom_callback), this));
+		}
+		else
+			logerror("%s: Connection to WDS%d failed because no drive is connected\n", tag(), index+1);
+		m_hdc9234->connect_hard_drive(m_current_harddisk);
+	}
+
+	// We can only run a floppy or a harddisk at a time, not both
+	disconnect_floppy_drives();
+}
+
+void myarc_hfdc_device::disconnect_floppy_drives()
+{
+	if (TRACE_LINES) logerror("%s: Unselect floppy drives\n", tag());
+	// Disconnect current floppy
+	if (m_current_floppy != NULL)
+	{
+		m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		m_current_floppy = NULL;
+	}
+}
+
+void myarc_hfdc_device::disconnect_hard_drives()
+{
+	if (TRACE_LINES) logerror("%s: Unselect hard drives\n", tag());
+	if (m_current_harddisk != NULL)
+	{
+		m_current_harddisk->setup_index_pulse_cb(mfm_harddisk_device::index_pulse_cb());
+		m_current_harddisk->setup_seek_complete_cb(mfm_harddisk_device::seek_complete_cb());
 		m_current_harddisk = NULL;
-//  }
-	// signal_drive_status();
+	}
 }
 
 /*
@@ -796,6 +850,7 @@ void myarc_hfdc_device::device_start()
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	// The HFDC does not use READY; it has on-board RAM for DMA
 	m_current_floppy = NULL;
+	m_current_harddisk = NULL;
 }
 
 void myarc_hfdc_device::device_reset()
@@ -836,26 +891,45 @@ void myarc_hfdc_device::device_reset()
 	for (int i=0; i < 4; i++)
 	{
 		if (m_floppy_unit[i] != NULL)
-			logerror("%s: Connector %d with %s\n", tag(), i, m_floppy_unit[i]->name());
+			logerror("%s: FD connector %d with %s\n", tag(), i+1, m_floppy_unit[i]->name());
 		else
-			logerror("%s: Connector %d has no floppy attached\n", tag(), i);
+			logerror("%s: FD connector %d has no floppy attached\n", tag(), i+1);
+	}
+
+	for (int i=0; i < 3; i++)
+	{
+		if (m_harddisk_unit[i] != NULL)
+			logerror("%s: HD connector %d with %s\n", tag(), i+1, m_harddisk_unit[i]->name());
+		else
+			logerror("%s: HD connector %d has no drive attached\n", tag(), i+1);
 	}
 
 	// Disconnect all units
-	connect_floppy_unit(-1);
-	connect_harddisk_unit(-1);
+	disconnect_floppy_drives();
+	disconnect_hard_drives();
 }
 
 void myarc_hfdc_device::device_config_complete()
 {
-	for (int i=0; i < 4; i++)
+	for (int i=0; i < 3; i++)
+	{
 		m_floppy_unit[i] = NULL;
+		m_harddisk_unit[i] = NULL;
+	}
+	m_floppy_unit[3] = NULL;
 
 	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=NULL) m_floppy_unit[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
-	if (subdevice("1")!=NULL) m_floppy_unit[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
-	if (subdevice("2")!=NULL) m_floppy_unit[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
-	if (subdevice("3")!=NULL) m_floppy_unit[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
+	if (subdevice("f1")!=NULL)
+	{
+		m_floppy_unit[0] = static_cast<floppy_connector*>(subdevice("f1"))->get_device();
+		m_floppy_unit[1] = static_cast<floppy_connector*>(subdevice("f2"))->get_device();
+		m_floppy_unit[2] = static_cast<floppy_connector*>(subdevice("f3"))->get_device();
+		m_floppy_unit[3] = static_cast<floppy_connector*>(subdevice("f4"))->get_device();
+
+		m_harddisk_unit[0] = static_cast<mfm_harddisk_connector*>(subdevice("h1"))->get_device();
+		m_harddisk_unit[1] = static_cast<mfm_harddisk_connector*>(subdevice("h2"))->get_device();
+		m_harddisk_unit[2] = static_cast<mfm_harddisk_connector*>(subdevice("h3"))->get_device();
+	}
 }
 
 /*
@@ -918,6 +992,11 @@ static SLOT_INTERFACE_START( hfdc_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )          // 80 tracks 1.4 MiB
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START( hfdc_harddisks )
+	SLOT_INTERFACE( "generic", MFM_HD_GENERIC )     // Generic high-level emulation
+//  SLOT_INTERFACE( "seagatemfm", MFM_HD_SEAGATE )        // Seagate ST-225 and others
+SLOT_INTERFACE_END
+
 MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
 	MCFG_HDC9234_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
@@ -927,10 +1006,15 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc )
 	MCFG_HDC9234_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
 	MCFG_HDC9234_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
 
-	MCFG_FLOPPY_DRIVE_ADD("0", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("2", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("3", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f3", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, NULL, myarc_hfdc_device::floppy_formats)
+
+	// NB: Hard disks don't go without image (other than floppy drives)
+	MCFG_MFM_HARDDISK_ADD("h1", hfdc_harddisks, NULL)
+	MCFG_MFM_HARDDISK_ADD("h2", hfdc_harddisks, NULL)
+	MCFG_MFM_HARDDISK_ADD("h3", hfdc_harddisks, NULL)
 
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour
@@ -961,6 +1045,27 @@ ioport_constructor myarc_hfdc_device::device_input_ports() const
 }
 
 const device_type TI99_HFDC = &device_creator<myarc_hfdc_device>;
+
+mfm_harddisk_connector::mfm_harddisk_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock):
+	device_t(mconfig, MFM_HD_CONNECTOR, "MFM hard disk connector", tag, owner, clock, "mfm_hd_connector", __FILE__),
+	device_slot_interface(mconfig, *this)
+{
+}
+
+mfm_harddisk_connector::~mfm_harddisk_connector()
+{
+}
+
+mfm_harddisk_device *mfm_harddisk_connector::get_device()
+{
+	return dynamic_cast<mfm_harddisk_device *>(get_card_device());
+}
+
+void mfm_harddisk_connector::device_start()
+{
+}
+
+const device_type MFM_HD_CONNECTOR = &device_creator<mfm_harddisk_connector>;
 
 // =========================================================================
 
@@ -1252,7 +1357,7 @@ READ8_MEMBER( myarc_hfdc_legacy_device::auxbus_in )
 	{
 		UINT8 state;
 		index = slog2((m_output1_latch>>4) & 0x0f)-1;
-		mfm_harddisk_device *hd = m_harddisk_unit[index];
+		mfm_harddisk_legacy_device *hd = m_harddisk_unit[index];
 		state = hd->get_status();
 
 		if (state & MFMHD_TRACK00)      reply |= DS_TRK00;
@@ -1373,6 +1478,8 @@ MACHINE_CONFIG_FRAGMENT( ti99_hfdc_legacy )
 	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
 	MCFG_MM58274C_MODE24(1) // 24 hour
 	MCFG_MM58274C_DAY1(0)   // sunday
+
+	MCFG_MFMHD_3_DRIVES_ADD()   // add hard disks
 MACHINE_CONFIG_END
 
 ROM_START( ti99_hfdc_legacy )
@@ -1461,9 +1568,9 @@ void myarc_hfdc_legacy_device::device_reset()
 	m_floppy_unit[2] = static_cast<legacy_floppy_image_device *>(m_slot->get_drive(FLOPPY_2));
 	m_floppy_unit[3] = static_cast<legacy_floppy_image_device *>(m_slot->get_drive(FLOPPY_3));
 
-	m_harddisk_unit[0] = static_cast<mfm_harddisk_device *>(m_slot->get_drive(MFMHD_0));
-	m_harddisk_unit[1] = static_cast<mfm_harddisk_device *>(m_slot->get_drive(MFMHD_1));
-	m_harddisk_unit[2] = static_cast<mfm_harddisk_device *>(m_slot->get_drive(MFMHD_2));
+	m_harddisk_unit[0] = static_cast<mfm_harddisk_legacy_device *>(subdevice(MFMHD_0));
+	m_harddisk_unit[1] = static_cast<mfm_harddisk_legacy_device *>(subdevice(MFMHD_1));
+	m_harddisk_unit[2] = static_cast<mfm_harddisk_legacy_device *>(subdevice(MFMHD_2));
 
 	if (ioport("HFDCDIP")->read()&0x55)
 		ti99_set_80_track_drives(TRUE);

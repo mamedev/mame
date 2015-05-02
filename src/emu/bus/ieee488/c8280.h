@@ -14,10 +14,10 @@
 #ifndef __C8280__
 #define __C8280__
 
-
 #include "emu.h"
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
+#include "formats/c8280_dsk.h"
 #include "machine/6532riot.h"
 #include "machine/wd_fdc.h"
 
@@ -50,6 +50,8 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_READ8_MEMBER( fk5_r );
 	DECLARE_WRITE8_MEMBER( fk5_w );
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides

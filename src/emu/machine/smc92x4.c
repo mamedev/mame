@@ -1991,7 +1991,7 @@ void smc92x4_device::connect_floppy_drive(legacy_floppy_image_device *drive)
 		else LOG("smc92x4: Connect drive %s\n", drive->tag());
 	}
 }
-void smc92x4_device::connect_hard_drive(mfm_harddisk_device *drive)
+void smc92x4_device::connect_hard_drive(mfm_harddisk_legacy_device *drive)
 {
 	m_harddisk = drive;
 	if (VERBOSE>3)

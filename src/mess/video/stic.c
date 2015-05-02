@@ -58,23 +58,23 @@ void stic_device::device_start()
 	save_item(NAME(m_backtab_buffer));
 	for (int sp = 0; sp < STIC_MOBS; sp++)
 	{
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].visible);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].xpos);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].ypos);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].coll);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].collision);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].doublex);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].doubley);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].quady);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].xflip);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].yflip);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].behind_foreground);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].grom);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].card);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].color);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].doubleyres);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite[sp].dirty);
-		state_save_register_item(machine(), "STIC sprite", NULL, sp, m_sprite_buffers[sp]);
+		save_item(m_sprite[sp].visible, "STIC sprite/m_sprite[sp].visible", sp);
+		save_item(m_sprite[sp].xpos, "STIC sprite/m_sprite[sp].xpos", sp);
+		save_item(m_sprite[sp].ypos, "STIC sprite/m_sprite[sp].ypos", sp);
+		save_item(m_sprite[sp].coll, "STIC sprite/m_sprite[sp].coll", sp);
+		save_item(m_sprite[sp].collision, "STIC sprite/m_sprite[sp].collision", sp);
+		save_item(m_sprite[sp].doublex, "STIC sprite/m_sprite[sp].doublex", sp);
+		save_item(m_sprite[sp].doubley, "STIC sprite/m_sprite[sp].doubley", sp);
+		save_item(m_sprite[sp].quady, "STIC sprite/m_sprite[sp].quady", sp);
+		save_item(m_sprite[sp].xflip, "STIC sprite/m_sprite[sp].xflip", sp);
+		save_item(m_sprite[sp].yflip, "STIC sprite/m_sprite[sp].yflip", sp);
+		save_item(m_sprite[sp].behind_foreground, "STIC sprite/m_sprite[sp].behind_foreground", sp);
+		save_item(m_sprite[sp].grom, "STIC sprite/m_sprite[sp].grom", sp);
+		save_item(m_sprite[sp].card, "STIC sprite/m_sprite[sp].card", sp);
+		save_item(m_sprite[sp].color, "STIC sprite/m_sprite[sp].color", sp);
+		save_item(m_sprite[sp].doubleyres, "STIC sprite/m_sprite[sp].doubleyres", sp);
+		save_item(m_sprite[sp].dirty, "STIC sprite/m_sprite[sp].dirty", sp);
+		save_item(m_sprite_buffers[sp], "STIC sprite/m_sprite[sp].sprite_buffers", sp);
 	}
 }
 

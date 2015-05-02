@@ -20,6 +20,9 @@
 
 typedef ComponentDescription AudioComponentDescription;
 
+@protocol NSApplicationDelegate <NSObject>
+@end
+
 @protocol NSWindowDelegate <NSObject>
 @end
 
@@ -723,7 +726,7 @@ static void UpdateChangeCountCallback(void                      *userData,
 @end
 
 
-@interface AUEffectUtilAppDelegate : NSObject
+@interface AUEffectUtilAppDelegate : NSObject <NSApplicationDelegate>
 {
 	EffectInfo      *effects;
 
@@ -1036,7 +1039,7 @@ int main(int argc, char *argv[])
 	pool = [[NSAutoreleasePool alloc] init];
 	[NSApplication sharedApplication];
 	AUEffectUtilAppDelegate *const delegate = [[AUEffectUtilAppDelegate alloc] init];
-	[NSApp setDelegate:delegate];
+	[[NSApplication sharedApplication] setDelegate:delegate];
 	[pool release];
 
 	// Let's go!

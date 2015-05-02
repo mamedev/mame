@@ -44,8 +44,8 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for ( ; img != NULL; img = iter.next())
 			{
-				astring temp;
-				temp.format("%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]");
+				std::string temp;
+				strprintf(temp,"%s : %s", img->device().name(), img->exists() ? img->filename() : "[no image]");
 				TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
 				if (tc_buf != NULL)
 				{
@@ -107,11 +107,11 @@ void consolewin_info::set_cpu(device_t &device)
 
 	// then update the caption
 	char curtitle[256];
-	astring title;
+	std::string title;
 
-	title.printf("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
+	strprintf(title, "Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
 	win_get_window_text_utf8(window(), curtitle, ARRAY_LENGTH(curtitle));
-	if (title.cmp(curtitle) != 0)
+	if (title.compare(curtitle) != 0)
 		win_set_window_text_utf8(window(), title.c_str());
 
 	// and recompute the children
@@ -201,8 +201,8 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			astring temp;
-			temp.format("%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
+			std::string temp;
+			strprintf(temp,"%s :%s", img->device().name(), img->exists() ? img->filename() : "[empty slot]");
 			TCHAR *tc_buf = tstring_from_utf8(temp.c_str());
 			if (tc_buf != NULL)
 			{
@@ -227,7 +227,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			{
 			case DEVOPTION_OPEN :
 				{
-					astring filter;
+					std::string filter;
 					build_generic_filter(img, false, filter);
 					LPTSTR t_filter = tstring_from_utf8(filter.c_str());
 					if (t_filter)
@@ -314,41 +314,41 @@ void consolewin_info::process_string(char const *string)
 }
 
 
-void consolewin_info::build_generic_filter(device_image_interface *img, bool is_save, astring &filter)
+void consolewin_info::build_generic_filter(device_image_interface *img, bool is_save, std::string &filter)
 {
 	// common image types
 	add_filter_entry(filter, "Common image types", img->file_extensions());
 
 	// compressed
 	if (!is_save)
-		filter.cat("Compressed Images (*.zip)|*.zip|");
+		filter.append("Compressed Images (*.zip)|*.zip|");
 
 	// all files
-	filter.cat("All files (*.*)|*.*|");
+	filter.append("All files (*.*)|*.*|");
 }
 
 
-void consolewin_info::add_filter_entry(astring &dest, const char *description, const char *extensions)
+void consolewin_info::add_filter_entry(std::string &dest, const char *description, const char *extensions)
 {
 	// add the description
-	dest.cat(description);
-	dest.catformat(" (");
+	dest.append(description);
+	dest.append(" (");
 
 	// add the extensions to the description
 	copy_extension_list(dest, extensions);
 
 	// add the trailing rparen and '|' character
-	dest.cat(")|");
+	dest.append(")|");
 
 	// now add the extension list itself
 	copy_extension_list(dest, extensions);
 
 	// append a '|'
-	dest.cat('|');
+	dest.append("|");
 }
 
 
-void consolewin_info::copy_extension_list(astring &dest, const char *extensions)
+void consolewin_info::copy_extension_list(std::string &dest, const char *extensions)
 {
 	// our extension lists are comma delimited; Win32 expects to see lists
 	// delimited by semicolons
@@ -357,14 +357,14 @@ void consolewin_info::copy_extension_list(astring &dest, const char *extensions)
 	{
 		// append a semicolon if not at the beginning
 		if (s != extensions)
-			dest.cat(';');
+			dest.push_back(';');
 
 		// append ".*"
-		dest.cat("*.");
+		dest.append("*.");
 
 		// append the file extension
 		while (*s && (*s != ','))
-			dest.cat(*s++);
+			dest.push_back(*s++);
 
 		// if we found a comma, advance
 		while(*s == ',')

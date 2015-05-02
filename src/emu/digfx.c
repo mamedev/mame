@@ -319,11 +319,11 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 		if (region != NULL && GFXENTRY_ISROM(gfx.flags))
 		{
 			// resolve the region
-			astring gfxregion;
+			std::string gfxregion;
 			if (GFXENTRY_ISDEVICE(gfx.flags))
-				device().subtag(gfxregion, region);
+				gfxregion = device().subtag(region);
 			else
-				device().owner()->subtag(gfxregion, region);
+				gfxregion = device().owner()->subtag(region);
 
 			UINT32 region_length = valid.region_length(gfxregion.c_str());
 			if (region_length == 0)

@@ -64,7 +64,7 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, const char
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(LVIEW_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
@@ -73,7 +73,7 @@ nubus_lview_device::nubus_lview_device(const machine_config &mconfig, device_typ
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(LVIEW_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(LVIEW_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

@@ -11,6 +11,34 @@
 
 /*
 
+    2040/3040 disk initialization
+    -----------------------------
+    You need to initialize each diskette before trying to access it
+    or you will get a DISK ID MISMATCH error upon disk commands.
+    On the 4040 this is done automatically by the DOS.
+
+    open 15,8,15:print 15,"i":close 15
+
+    List directory
+    --------------
+    directory / diR
+
+    Format disk
+    -----------
+    header "label,id",d0,i01
+
+    Load file
+    ---------
+    dload "name" / dL"name
+
+    Save file
+    ---------
+    dsave "name" / dS"name
+
+*/
+
+/*
+
     TODO:
 
     - 2040/3040/4040 have a Shugart SA390 drive (FLOPPY_525_SSSD_35T)
@@ -53,19 +81,14 @@ const device_type C4040 = &device_creator<c4040_device>;
 //  ROM( c2040 )
 //-------------------------------------------------
 
-ROM_START( c2040 ) // schematic 320806
+ROM_START( c2040 ) // schematic 320806, DOS 1.0
 	ROM_REGION( 0x3000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("dos12")
-	ROM_SYSTEM_BIOS( 0, "dos10", "DOS 1.0" )
-	ROMX_LOAD( "901468-xx.ul1", 0x1000, 0x1000, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "901468-xx.uh1", 0x2000, 0x1000, NO_DUMP, ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "dos12", "DOS 1.2" )
-	ROMX_LOAD( "901468-06.ul1", 0x1000, 0x1000, CRC(25b5eed5) SHA1(4d9658f2e6ff3276e5c6e224611a66ce44b16fc7), ROM_BIOS(2) )
-	ROMX_LOAD( "901468-07.uh1", 0x2000, 0x1000, CRC(9b09ae83) SHA1(6a51c7954938439ca8342fc295bda050c06e1791), ROM_BIOS(2) )
+	ROM_LOAD( "901468-xx.ul1", 0x1000, 0x1000, NO_DUMP )
+	ROM_LOAD( "901468-xx.uh1", 0x2000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
-	ROMX_LOAD( "901466-01.uk3", 0x000, 0x400, CRC(9d1e25ce) SHA1(d539858f839f96393f218307df7394362a84a26a), ROM_BIOS(1) )
-	ROMX_LOAD( "901466-02.uk3", 0x000, 0x400, CRC(9d1e25ce) SHA1(d539858f839f96393f218307df7394362a84a26a), ROM_BIOS(2) )
+	ROM_LOAD( "901466-01.uk3", 0x000, 0x400, CRC(9d1e25ce) SHA1(d539858f839f96393f218307df7394362a84a26a) )
 
 	ROM_REGION( 0x800, "gcr", 0)
 	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
@@ -79,6 +102,33 @@ ROM_END
 const rom_entry *c2040_device::device_rom_region() const
 {
 	return ROM_NAME( c2040 );
+}
+
+
+//-------------------------------------------------
+//  ROM( c3040 )
+//-------------------------------------------------
+
+ROM_START( c3040 ) // schematic 320806, DOS 1.2
+	ROM_REGION( 0x3000, M6502_TAG, 0 )
+	ROM_LOAD( "901468-06.ul1", 0x1000, 0x1000, CRC(25b5eed5) SHA1(4d9658f2e6ff3276e5c6e224611a66ce44b16fc7) )
+	ROM_LOAD( "901468-07.uh1", 0x2000, 0x1000, CRC(9b09ae83) SHA1(6a51c7954938439ca8342fc295bda050c06e1791) )
+
+	ROM_REGION( 0x400, M6504_TAG, 0 )
+	ROM_LOAD( "901466-02.uk3", 0x000, 0x400, CRC(9d1e25ce) SHA1(d539858f839f96393f218307df7394362a84a26a) )
+
+	ROM_REGION( 0x800, "gcr", 0)
+	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *c3040_device::device_rom_region() const
+{
+	return ROM_NAME( c3040 );
 }
 
 
@@ -434,9 +484,28 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( c2040_device::floppy_formats )
-	FLOPPY_D64_FORMAT,
-	FLOPPY_G64_FORMAT,
-	FLOPPY_D67_FORMAT
+	FLOPPY_C3040_FORMAT,
+	FLOPPY_G64_FORMAT
+FLOPPY_FORMATS_END
+
+
+//-------------------------------------------------
+//  FLOPPY_FORMATS( floppy_formats )
+//-------------------------------------------------
+
+FLOPPY_FORMATS_MEMBER( c3040_device::floppy_formats )
+	FLOPPY_C3040_FORMAT,
+	FLOPPY_G64_FORMAT
+FLOPPY_FORMATS_END
+
+
+//-------------------------------------------------
+//  FLOPPY_FORMATS( floppy_formats )
+//-------------------------------------------------
+
+FLOPPY_FORMATS_MEMBER( c4040_device::floppy_formats )
+	FLOPPY_C4040_FORMAT,
+	FLOPPY_G64_FORMAT
 FLOPPY_FORMATS_END
 
 
@@ -495,6 +564,60 @@ machine_config_constructor c2040_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
+//  MACHINE_CONFIG_FRAGMENT( c3040 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( c3040 )
+	// DOS
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c2040_main_mem)
+
+	MCFG_DEVICE_ADD(M6532_0_TAG, RIOT6532, XTAL_16MHz/16)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c2040_device, dio_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c2040_device, dio_w))
+
+	MCFG_DEVICE_ADD(M6532_1_TAG, RIOT6532, XTAL_16MHz/16)
+	MCFG_RIOT6532_IN_PA_CB(READ8(c2040_device, riot1_pa_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(c2040_device, riot1_pa_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(c2040_device, riot1_pb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(c2040_device, riot1_pb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
+
+	// controller
+	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_16MHz/16)
+	MCFG_CPU_PROGRAM_MAP(c2040_fdc_mem)
+
+	MCFG_DEVICE_ADD(M6522_TAG, VIA6522, XTAL_16MHz/16)
+	MCFG_VIA6522_READPA_HANDLER(DEVREAD8(FDC_TAG, c2040_fdc_t, read))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(c2040_device, via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, mode_sel_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(FDC_TAG, c2040_fdc_t, rw_sel_w))
+
+	MCFG_DEVICE_ADD(M6530_TAG, MOS6530, XTAL_16MHz/16)
+	MCFG_MOS6530_OUT_PA_CB(DEVWRITE8(FDC_TAG, c2040_fdc_t, write))
+	MCFG_MOS6530_IN_PB_CB(READ8(c2040_device, miot_pb_r))
+	MCFG_MOS6530_OUT_PB_CB(WRITE8(c2040_device, miot_pb_w))
+
+	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
+	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
+	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor c3040_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( c3040 );
+}
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c4040 )
 //-------------------------------------------------
 
@@ -532,8 +655,8 @@ static MACHINE_CONFIG_FRAGMENT( c4040 )
 	MCFG_DEVICE_ADD(FDC_TAG, C2040_FDC, XTAL_16MHz)
 	MCFG_C2040_READY_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_ca1))
 	MCFG_C2040_ERROR_CALLBACK(DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -605,24 +728,24 @@ inline void c2040_device::update_ieee_signals()
 //  c2040_device - constructor
 //-------------------------------------------------
 
-c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_ieee488_interface(mconfig, *this),
-		m_maincpu(*this, M6502_TAG),
-		m_fdccpu(*this, M6504_TAG),
-		m_riot0(*this, M6532_0_TAG),
-		m_riot1(*this, M6532_1_TAG),
-		m_miot(*this, M6530_TAG),
-		m_via(*this, M6522_TAG),
-		m_floppy0(*this, FDC_TAG":0:525ssqd"),
-		m_floppy1(*this, FDC_TAG":1:525ssqd"),
-		m_fdc(*this, FDC_TAG),
-		m_gcr(*this, "gcr"),
-		m_address(*this, "ADDRESS"),
-		m_rfdo(1),
-		m_daco(1),
-		m_atna(1),
-		m_miot_irq(CLEAR_LINE)
+c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	device_ieee488_interface(mconfig, *this),
+	m_maincpu(*this, M6502_TAG),
+	m_fdccpu(*this, M6504_TAG),
+	m_riot0(*this, M6532_0_TAG),
+	m_riot1(*this, M6532_1_TAG),
+	m_miot(*this, M6530_TAG),
+	m_via(*this, M6522_TAG),
+	m_floppy0(*this, FDC_TAG":0:525ssqd"),
+	m_floppy1(*this, FDC_TAG":1:525ssqd"),
+	m_fdc(*this, FDC_TAG),
+	m_gcr(*this, "gcr"),
+	m_address(*this, "ADDRESS"),
+	m_rfdo(1),
+	m_daco(1),
+	m_atna(1),
+	m_miot_irq(CLEAR_LINE)
 {
 }
 
@@ -652,16 +775,16 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 //  c3040_device - constructor
 //-------------------------------------------------
 
-c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c2040_device(mconfig, C3040, "C3040", tag, owner, clock, "c3040", __FILE__) { }
+c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	c2040_device(mconfig, C3040, "C3040", tag, owner, clock, "c3040", __FILE__) { }
 
 
 //-------------------------------------------------
 //  c4040_device - constructor
 //-------------------------------------------------
 
-c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c2040_device(mconfig, C4040, "C4040", tag, owner, clock, "c4040", __FILE__) { }
+c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	c2040_device(mconfig, C4040, "C4040", tag, owner, clock, "c4040", __FILE__) { }
 
 
 //-------------------------------------------------

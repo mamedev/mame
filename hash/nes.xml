@@ -37404,7 +37404,7 @@
 	</software>
 
 	<software name="targtren">
-		<description>Target - Renegade (USA)</description>
+		<description>Target: Renegade (USA)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-NE-USA"/>
@@ -40884,7 +40884,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmnu" cloneof="wrestlmn" supported="no">
+	<software name="wmaniau" cloneof="wmania" supported="no">
 		<description>WWF WrestleMania (USA)</description>
 		<year>1989</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -40910,7 +40910,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmn" supported="no">
+	<software name="wmania" supported="no">
 		<description>WWF WrestleMania (Euro)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -40929,7 +40929,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmcu" cloneof="wrestlmc">
+	<software name="wmaniachu" cloneof="wmaniach">
 		<description>WWF WrestleMania Challenge (USA)</description>
 		<year>1990</year>
 		<publisher>LJN</publisher>
@@ -40948,7 +40948,7 @@
 		</part>
 	</software>
 
-	<software name="wrestlmc">
+	<software name="wmaniach">
 		<description>WWF WrestleMania Challenge (Euro)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
@@ -40968,7 +40968,7 @@
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF Wrestlemania - Steel Cage Challenge (Euro)</description>
+		<description>WWF WrestleMania - Steel Cage Challenge (Euro)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-WS-(NOE/UKV)"/>
@@ -48501,7 +48501,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="roboterm">
-		<description>RoboCop Versus The Terminator (USA, Prototype)</description>
+		<description>RoboCop versus The Terminator (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50174,7 +50174,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="wrestlmcj" cloneof="wrestlmc">
+	<software name="wmaniachj" cloneof="wmaniach">
 		<description>WWF WrestleMania Challenge (Jpn)</description>
 		<year>1992</year>
 		<publisher>Hot-B</publisher>
@@ -52488,6 +52488,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="adamneve">
+		<description>Adam &amp; Eve (Asia)</description>
+		<year>19??</year>
+		<publisher>Caltron</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="NES-CNROM" />    <!-- NTDEC-N71506x ? -->
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="16384">
+				<rom name="adam &amp; eve (megasoft).chr" size="16384" crc="61cfe60d" sha1="d234813a34bdd8ef94ec63851c199e0c669ea1e3" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="adam &amp; eve (megasoft).prg" size="32768" crc="69487f6c" sha1="bab27e1d428a6aa3f6dc5a2ad6d09ee8c111408a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Alt. Title: Adan y Eva (on the cart label) -->
 	<!--software name="adanyeva">
 	    <description>Adam &amp; Eve (Spa)</description>
@@ -52507,24 +52524,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	    </part>
 	</software-->
 
-		<!-- Alt. Title: El Destructor (on the cart label) -->
-	<!--software name="destruct">
-	    <description>Destroyer (Spa)</description>
-	    <year>1992</year>
-	    <publisher>Gluk Video</publisher>
-	    <info name="serial" value="CN-13"/>
-	    <info name="release" value="19920101"/>
-	    <part name="cart" interface="nes_cart">
-	        <feature name="pcb" value="NTDEC-N715062" />
-	        <feature name="mirroring" value="horizontal" />
-	        <dataarea name="prg" size="32768">
-	            <rom name="0.prg" size="32768" crc="d438ee51" sha1="a21694e640cf45c1732cce6c39f8705100fb109b" offset="00000" />
-	        </dataarea>
-	        <dataarea name="chr" size="32768">
-	            <rom name="0.chr" size="32768" crc="fb0d9fd0" sha1="5a721b8de4d4aed347e1a5344e3c943a698b494b" offset="00000" />
-	        </dataarea>
-	    </part>
-	</software-->
+	<software name="destroyr">
+		<description>Destroyer (Spa)</description>
+		<year>1992</year>
+		<publisher>Gluk Video</publisher>
+		<info name="serial" value="CN-13"/>
+		<info name="release" value="19920101"/>
+		<info name="alt_title" value="El Destructor (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="NTDEC-N715062" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="d438ee51" sha1="a21694e640cf45c1732cce6c39f8705100fb109b" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="0.chr" size="32768" crc="fb0d9fd0" sha1="5a721b8de4d4aed347e1a5344e3c943a698b494b" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="gobenny">
 		<description>Go! Benny! (Spa)</description>
@@ -52542,6 +52560,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="0.chr" size="32768" crc="ceaadb67" sha1="0e5173485ccac504ee50320c156edd2b19638316" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank">
+		<description>Tank (Spa)</description>
+		<year>1992</year>
+		<publisher>Gluk Video</publisher>
+		<info name="alt_title" value="Tanque (on the cart label)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="NTDEC-N715062" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="e17266e4" sha1="619cc065ef22640260ae1f46235ede0155943e3f" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="0.chr" size="8192" crc="476c8195" sha1="03b167f8c7d28dd664906010b3afbc1b99b9803d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -52809,8 +52845,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="pokeblck">
+	<software name="pokeblck" supported="partial">
 		<description>Poke Block (Tw)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="serial" value="MGC-012"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="16384">
+				<rom name="poke block (mgc-012) (unl).chr" size="16384" crc="9d70ade4" sha1="4e0cec09d5512b7ce2409fb55441de827bc71be9" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="poke block (mgc-012) (unl).prg" size="32768" crc="dc6b0991" sha1="d5f29a9b491f27064db8bda5413477b13a6a407d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokeblcka" cloneof="pokeblck">
+		<description>Poke Block (Tw, Alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="MGC-012"/>
@@ -52846,12 +52900,29 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="thundwar">
+	<software name="policemn" supported="partial">
+		<description>Policeman (Tw)</description>
+		<year>19??</year>
+		<publisher>TXC Corp</publisher>
+		<info name="serial" value="MGC-015"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_strikew" />
+			<feature name="pcb" value="TXC-STRIKEWOLF" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="65536">
+				<rom name="policeman (mgc-015).chr" size="65536" crc="f73ee39e" sha1="0142d357b7a8e38c720bef9a13250da76dbc0738" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="policeman (mgc-015).prg" size="65536" crc="65fe1590" sha1="be06c1c9c76bf270e83e98f6c5a79ff4d5589c59" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thundwar" supported="partial">
 		<description>Thunder Warrior (Tw)</description>
-		<year>199?</year>
+		<year>19??</year>
 		<publisher>Micro Genius</publisher>
 		<info name="serial" value="MGC-017"/>
-		<info name="alt_title" value="轰天至尊? ~ Hong Tian Zhi Zu?"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_tw" />
 			<feature name="pcb" value="TXC-TW" />
@@ -63333,6 +63404,22 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+	<software name="biohazb" cloneof="biohaz" supported="partial">
+		<description>Jing Wei Tian Hai (Chi)</description>
+		<year>2003?</year>
+		<publisher>HengGedianzi</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txc_commandos" />
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[hengge] jing wei tian hai (c).prg" size="1048576" crc="92b3e5a0" sha1="34f58f7def3a92140001682e6a8ee96573b38b53" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chaojidz" supported="partial">
 		<description>Chaoji Da Zhan Lue (Chi, Decrypted WXN)</description>
 		<year>19??</year>
@@ -70720,7 +70807,7 @@ Other
 	</software>
 
 	<software name="ddragon4" cloneof="targtren">
-		<description>Double Dragon IV (Target - Renegade pirate)</description>
+		<description>Double Dragon IV (Target: Renegade pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -79675,6 +79762,22 @@ that the real dumps might surface -->
 				<rom name="s29gl032.u3" size="4194304" crc="9f4194e8" sha1="bd2a356aea56188ea78169095cbbe603d00e0063" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_110cb" supported="no">
+		<description>110-in-1 CoolBaby (CoolBoy RS-1S)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="onebus" />
+			<feature name="pcb" value="UNL-OneBus" />
+			<dataarea name="flop" size="4194304">
+				<rom name="29w320dt.bin" size="4194304" crc="a4bed7eb" sha1="f1aa89916264ba781d3f1390a2336ef42129b607" offset="00000" />
+			</dataarea>
+			<!-- 8k? VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>

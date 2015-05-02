@@ -65,9 +65,9 @@ const rom_entry *nubus_xceedmc30_device::device_rom_region() const
 nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PDS030_XCEEDMC30, "Micron/XCEED Technology MacroColor 30", tag, owner, clock, "pd3_mclr", __FILE__),
 		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this)		
+		device_nubus_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(XCEEDMC30_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(XCEEDMC30_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 
@@ -76,7 +76,7 @@ nubus_xceedmc30_device::nubus_xceedmc30_device(const machine_config &mconfig, de
 		device_video_interface(mconfig, *this),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_assembled_tag = astring(tag).cat(":").cat(XCEEDMC30_SCREEN_NAME);
+	m_assembled_tag = std::string(tag).append(":").append(XCEEDMC30_SCREEN_NAME);
 	m_screen_tag = m_assembled_tag.c_str();
 }
 

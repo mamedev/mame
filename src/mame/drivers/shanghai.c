@@ -14,7 +14,7 @@ settings, but music runs too fast.
 * kothello
 
 Notes: If you use the key labeled as 'Service Coin' you can start the game
-with a single 'coin' no matter the Coingae Setting, but the credit is not
+with a single 'coin' no matter the Coinage Setting, but the credit is not
 displayed.
 
 ***************************************************************************/
@@ -33,14 +33,18 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hd63484(*this, "hd63484") { }
 
-	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
-	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(shanghai);
-	UINT32 screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(shanghai_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<hd63484_device> m_hd63484;
+
+	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
+	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
+
+	virtual void video_start();
+	DECLARE_PALETTE_INIT(shanghai);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
 };
 
 
@@ -78,7 +82,7 @@ void shanghai_state::video_start()
 {
 }
 
-UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 shanghai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, b, src;
 
@@ -125,7 +129,7 @@ UINT32 shanghai_state::screen_update_shanghai(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(shanghai_state::shanghai_interrupt)
+INTERRUPT_GEN_MEMBER(shanghai_state::interrupt)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
 }
@@ -419,14 +423,14 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* NEC D70116C-8 */
 	MCFG_CPU_PROGRAM_MAP(shanghai_map)
 	MCFG_CPU_IO_MAP(shanghai_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
+	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -455,14 +459,14 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* ? */
 	MCFG_CPU_PROGRAM_MAP(shangha2_map)
 	MCFG_CPU_IO_MAP(shangha2_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
+	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -489,7 +493,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kothello_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  shanghai_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  interrupt)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_16MHz/4)
 
@@ -500,7 +504,7 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_SCREEN_REFRESH_RATE(30) /* Should be 57Hz, but plays too fast */
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update_shanghai)
+	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
@@ -684,8 +688,8 @@ ROM_END
 
 
 
-GAME( 1988, shanghai,  0,        shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, shanghaij, shanghai, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, shangha2,  0,        shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", 0 )
-GAME( 1989, shangha2a, shangha2, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", 0 )
-GAME( 1990, kothello,  0,        kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, shanghai,  0,        shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (World)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, shanghaij, shanghai, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1989, shangha2,  0,        shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, shangha2a, shangha2, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, kothello,  0,        kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

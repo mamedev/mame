@@ -740,9 +740,9 @@ INPUT_PORTS_END
 
 void pc2000_state::machine_start()
 {
-	astring region_tag;
+	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base();
+	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
 	if (!cart)
 		cart = memregion("bios")->base();
 
@@ -754,9 +754,9 @@ void pc2000_state::machine_start()
 
 void gl4004_state::machine_start()
 {
-	astring region_tag;
+	std::string region_tag;
 	UINT8 *bios = memregion("bios")->base();
-	UINT8 *cart = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str())->base();
+	UINT8 *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
 	if (!cart)
 		cart = memregion("bios")->base();
 

@@ -33,12 +33,12 @@ public:
 class gb_rom_mbc1_device : public gb_rom_mbc_device
 {
 public:
-	
+
 	enum {
 		MODE_16M_8k  = 0, /// 16Mbit ROM, 8kBit RAM
 		MODE_4M_256k = 1, /// 4Mbit ROM, 256kBit RAM
 	};
-	
+
 	// construction/destruction
 	gb_rom_mbc1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -46,7 +46,7 @@ public:
 	// device-level overrides
 	virtual void device_start() { shared_start(); save_item(NAME(m_mode)); };
 	virtual void device_reset() { shared_reset(); m_mode = MODE_16M_8k; };
-	virtual void set_additional_wirings(UINT8 mask, int shift) { m_mask = mask; m_shift = shift; }	// these get set at cart loading
+	virtual void set_additional_wirings(UINT8 mask, int shift) { m_mask = mask; m_shift = shift; }  // these get set at cart loading
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -156,19 +156,19 @@ public:
 class gb_rom_m161_device : public gb_rom_mbc_device
 {
 public:
-	
+
 	// construction/destruction
 	gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
-	
+
 	UINT8 m_base_bank;
 };
 
@@ -194,19 +194,19 @@ public:
 class gb_rom_sachen1_device : public gb_rom_mbc1_device
 {
 public:
-	
+
 	// construction/destruction
 	gb_rom_sachen1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
-	
+
 	UINT8 m_base_bank, m_mask;
 };
 

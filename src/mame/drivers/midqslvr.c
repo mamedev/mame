@@ -462,7 +462,7 @@ ROM_START( arctthnd )
 ROM_END
 
 // this also required a dongle to work
-ROM_START( arctthndult )
+ROM_START( ultarctc )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
@@ -474,10 +474,33 @@ ROM_START( arctthndult )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
 ROM_END
 
+// this is an update CD, We don't know if it updates the HDD image we have, if the image we have is already an updated version, if it
+// requires a specific version we don't have, or even if it updates a regular Arctic Thunder to Ultimate.
+ROM_START( ultarctcup )
+	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
+	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
+	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
+//  ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+//  ROM_CONTINUE(                                 0x0001, 0x4000 )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
+
+	DISK_REGION( "cd" )
+	DISK_IMAGE( "040503_1309", 0, SHA1(453adb81e204b0580ad02c2d98f68525757ec2a1) )
+// sourced from these
+//    ROM_LOAD( "040503_1309.CUE", 0x0000, 0x000004d, CRC(4a9e2de5) SHA1(04d3d90ad4b235c0ac4606557e16a1410d018fa9) )
+//    ROM_LOAD( "040503_1309.BIN", 0x0000, 0x6bd9960, CRC(48a63422) SHA1(9d1cacf07526c5bddf4205c667a9010802f74859) )
+
+ROM_END
 
 // there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
 GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_IS_SKELETON)
+
 GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_IS_SKELETON)
+
 GAME(2001, arctthnd,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Arctic Thunder (v1.002)", GAME_IS_SKELETON)
-GAME(2001, arctthndult, arctthnd, midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder", GAME_IS_SKELETON)
+
+GAME(2001, ultarctc,    0,        midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder", GAME_IS_SKELETON)
+GAME(2004, ultarctcup,  ultarctc, midqslvr, at_keyboard, driver_device, 0, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", GAME_IS_SKELETON)

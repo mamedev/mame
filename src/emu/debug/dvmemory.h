@@ -108,7 +108,7 @@ private:
 	offs_t              m_maxaddr;              // (derived) maximum address to display
 	UINT32              m_bytes_per_row;        // (derived) number of bytes displayed per line
 	UINT32              m_byte_offset;          // (derived) offset of starting visible byte
-	astring             m_addrformat;           // (derived) format string to use to print addresses
+	std::string         m_addrformat;           // (derived) format string to use to print addresses
 
 	struct section
 	{

@@ -22,6 +22,9 @@
 #define NETDEV_RSFF(_name)                                                          \
 		NET_REGISTER_DEV(nicRSFF, _name)
 
+#define NETDEV_DELAY(_name)                                                         \
+		NET_REGISTER_DEV(nicDelay, _name)
+
 // ----------------------------------------------------------------------------------------
 // Devices ...
 // ----------------------------------------------------------------------------------------
@@ -32,6 +35,18 @@ NETLIB_DEVICE(nicRSFF,
 
 	netlist_ttl_output_t m_Q;
 	netlist_ttl_output_t m_QQ;
+);
+
+
+NETLIB_DEVICE_WITH_PARAMS(nicDelay,
+	netlist_ttl_input_t m_I;
+
+	netlist_ttl_output_t m_Q;
+
+	netlist_param_int_t m_L_to_H;
+	netlist_param_int_t m_H_to_L;
+
+	netlist_state_t<UINT8> m_last;
 );
 
 

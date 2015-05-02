@@ -109,8 +109,8 @@ ui_menu_cheat::ui_menu_cheat(running_machine &machine, render_container *contain
 void ui_menu_cheat::populate()
 {
 	/* iterate over cheats */
-	astring text;
-	astring subtext;
+	std::string text;
+	std::string subtext;
 	for (cheat_entry *curcheat = machine().cheat().first(); curcheat != NULL; curcheat = curcheat->next())
 	{
 		UINT32 flags;

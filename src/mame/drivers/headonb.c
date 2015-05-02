@@ -37,21 +37,24 @@ class headonb_state : public driver_device
 public:
 	headonb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_video_ram(*this, "video_ram") { }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<UINT8> m_video_ram;
 
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(headonb_video_ram_w);
+	DECLARE_WRITE8_MEMBER(video_ram_w);
 
 	virtual void video_start();
-	UINT32 screen_update_headonb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(get_headonb_tile_info);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
 
@@ -61,7 +64,7 @@ public:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(headonb_state::get_headonb_tile_info)
+TILE_GET_INFO_MEMBER(headonb_state::get_tile_info)
 {
 	UINT8 code = m_video_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
@@ -69,10 +72,10 @@ TILE_GET_INFO_MEMBER(headonb_state::get_headonb_tile_info)
 
 void headonb_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(headonb_state::get_headonb_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(headonb_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 headonb_state::screen_update_headonb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 headonb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -85,7 +88,7 @@ UINT32 headonb_state::screen_update_headonb(screen_device &screen, bitmap_ind16 
 
 ***************************************************************************/
 
-WRITE8_MEMBER(headonb_state::headonb_video_ram_w)
+WRITE8_MEMBER(headonb_state::video_ram_w)
 {
 	m_video_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -93,7 +96,7 @@ WRITE8_MEMBER(headonb_state::headonb_video_ram_w)
 
 static ADDRESS_MAP_START( headonb_map, AS_PROGRAM, 8, headonb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_MIRROR(0x4000)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(headonb_video_ram_w) AM_SHARE("video_ram")
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -138,7 +141,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout headonb_charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -150,7 +153,7 @@ static const gfx_layout headonb_charlayout =
 };
 
 static GFXDECODE_START( headonb )
-	GFXDECODE_ENTRY( "gfx1", 0, headonb_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( headonb, headonb_state )
@@ -167,7 +170,7 @@ static MACHINE_CONFIG_START( headonb, headonb_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update_headonb)
+	MCFG_SCREEN_UPDATE_DRIVER(headonb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", headonb)
@@ -201,4 +204,4 @@ ROM_START( headonb )
 ROM_END
 
 
-GAME( 1979, headonb, headon, headonb, headonb, driver_device, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", GAME_NO_SOUND )
+GAME( 1979, headonb, headon, headonb, headonb, driver_device, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

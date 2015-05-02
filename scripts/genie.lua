@@ -1,7 +1,7 @@
 premake.check_paths = true
 premake.make.override = { "TARGET" }
-premake.make.linkoptions_after = true
 MAME_DIR = (path.getabsolute("..") .. "/")
+MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. "build/")
 local naclToolchain = ""
 
@@ -288,6 +288,15 @@ newoption {
 	}
 }
 
+newoption {
+	trigger = "STRIP_SYMBOLS",
+	description = "Symbols stripping.",
+	allowed = {
+		{ "0",   "Disabled" 	},
+		{ "1",   "Enabled"      },
+	}
+}
+
 
 PYTHON = "python"
 
@@ -419,44 +428,6 @@ configuration { "gmake" }
 	flags {
 		"SingleOutputDir",
 	}
-
-configuration { "x64", "Release" }
-	targetsuffix "64"
-	if _OPTIONS["PROFILE"] then
-		targetsuffix "64p"
-	end
-
-configuration { "x64", "Debug" }
-	targetsuffix "64d"
-	if _OPTIONS["PROFILE"] then
-		targetsuffix "64dp"
-	end
-
-configuration { "x32", "Release" }
-	targetsuffix ""
-	if _OPTIONS["PROFILE"] then
-		targetsuffix "p"
-	end
-
-configuration { "x32", "Debug" }
-	targetsuffix "d"
-	if _OPTIONS["PROFILE"] then
-		targetsuffix "dp"
-	end
-
-configuration { "Native", "Release" }
-	targetsuffix ""
-	if _OPTIONS["PROFILE"] then
-		targetsuffix "p"
-	end
-
-configuration { "Native", "Debug" }
-	targetsuffix "d"
-	if _OPTIONS["PROFILE"] then
-		targetsuffix "dp"
-	end
-
-configuration { }
 
 dofile ("toolchain.lua")
 
@@ -747,6 +718,13 @@ if _OPTIONS["OPENMP"]=="1" then
 	buildoptions {
 		"-fopenmp",
 	}
+	linkoptions {
+		"-fopenmp"
+	}
+	defines {
+		"USE_OPENMP=1",
+	}
+	
 else
 	buildoptions {
 		"-Wno-unknown-pragmas",
@@ -754,9 +732,9 @@ else
 end
 
 if _OPTIONS["LDOPTS"] then
-		linkoptions {
-			_OPTIONS["LDOPTS"]
-		}
+	linkoptions {
+		_OPTIONS["LDOPTS"]
+	}
 end
 
 if _OPTIONS["MAP"] then
@@ -900,6 +878,9 @@ configuration { "asmjs" }
 	archivesplit_size "20"
 
 configuration { "android*" }
+	buildoptions {
+		"-Wno-undef",
+	}
 	buildoptions_cpp {
 		"-x c++",
 		"-std=gnu++98",
@@ -1130,11 +1111,12 @@ else
 end
 mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
+if (_OPTIONS["STRIP_SYMBOLS"]=="1") then
+	strip()
+end
+
 if _OPTIONS["with-tools"] then
 	group "tools"
 	dofile(path.join("src", "tools.lua"))
 end
 
-if (_ACTION == "gmake" and _OPTIONS["gcc"]=='asmjs') then
-	strip()
-end

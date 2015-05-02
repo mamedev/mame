@@ -247,7 +247,7 @@ void mos6530_t::update_pb()
 	}
 	else
 	{
-		m_out_pb_cb(data);	
+		m_out_pb_cb(data);
 	}
 }
 

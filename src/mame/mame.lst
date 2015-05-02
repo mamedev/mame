@@ -323,6 +323,7 @@ scrambler       // bootleg
 explorer        // bootleg
 strfbomb        // bootleg
 scrambp         // bootleg (Billport S.A.)
+scramce         // bootleg (Centromatic S.A.)
 scrampt         // bootleg (Petaco S.A.)
 scramrf         // bootleg (Recreativos Franco)
 atlantis        // (c) 1981 Comsoft
@@ -2290,7 +2291,7 @@ puzznic         // C20 (c) 1989 Taito Corporation (Japan)
 puzznicj        // C20 (c) 1989 Taito Corporation (Japan)
 puzznici        // bootleg
 puzznicb        // bootleg
-puzznicba		// bootleg
+puzznicba       // bootleg
 horshoes        // C47 (c) 1990 Taito America Corporation (US)
 palamed         // C63 (c) 1990 Taito Corporation (Japan)
 cachat          // ??? (c) 1993 Taito Corporation (Japan)
@@ -4336,7 +4337,7 @@ nsub            // 268-275 (c) 1980 Sega
 samurai         // 289-302 + upgrades (c) 1980 Sega
 invinco         // 310-318 (c) 1979 Sega
 invds           // 367-382 (c) 1979 Sega
-carhntds		//
+carhntds        //
 tranqgun        // 413-428 (c) 1980 Sega
 				// 450-465  Tranquilizer Gun (different version?)
 				// ???-??? Car Hunt / Deep Scan
@@ -4433,6 +4434,7 @@ wmatch          // (c) 1984 (S1)
 bullfgt         // 834-5478 (c) 1984 Sega / Coreland (S1)
 thetogyu        // 834-5478 (c) 1984 Sega / Coreland (S1)
 spatter         // 834-5583 (c) 1984 (S1)
+spattera        // 834-5583 (c) 1984 (S1)
 ssanchan        // 834-5583 (c) 1984 (S1)
 pitfall2        // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
 pitfall2a       // 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1)
@@ -5524,8 +5526,11 @@ starhrpr        // 2009.07.27 Star Horse Progress Returns (satellite)
 				// 2009.?? Project Cerberus (planned to be released in 2009)
 
 // NAOMI based (System SP)
-				// 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
-				// 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
+segasp
+lovebery        // 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
+lovebero
+dinoking        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
+dinokior
 				// 2007.06 Issyo ni Wanwan
 				// 2007.06 Konchuu Dash!!
 				// 2007.07 Marine Marine
@@ -5533,6 +5538,11 @@ starhrpr        // 2009.07.27 Star Horse Progress Returns (satellite)
 				// 2008.02 Marine Marine Ver.2
 				// 2008.04 Issyo ni Wanwan Waiwai Puppy
 				// 2008.07 Issyo ni Turbo Drive
+brickppl
+tetgiant
+tetgiano
+dinoki25
+loveber3
 
 // NAOMI 2
 naomi2          // 2001.?? Naomi 2 BIOS
@@ -6045,6 +6055,7 @@ cninjabl2       // bootleg
 stoneage        // bootleg
 robocop2        // MAH (c) 1991 Data East Corporation (World)
 robocop2u       // MAH (c) 1991 Data East Corporation (US)
+robocop2ua      // MAH (c) 1991 Data East Corporation (US)
 robocop2j       // MAH (c) 1991 Data East Corporation (Japan)
 thndzone        // MAJ (c) 1991 Data East Corporation (World) - Rev 1
 thndzonea       // MAJ (c) 1991 Data East Corporation (World)
@@ -6105,15 +6116,17 @@ pktgaldxb       // bootleg
 				// MBA ??
 				// MBB ??
 				// MBC ??
-boogwing        // MBD (c) 1992 (Euro)
-boogwinga       // MBD (c) 1992 (Asia)
-ragtime         // MBD (c) 1992 (Japan)
-ragtimea        // MBD (c) 1992 (Japan)
+boogwing        // MBD (c) 1992 (Euro, v1.5)
+boogwingu       // MBD (c) 1992 (USA, v1.7)
+boogwinga       // MBD (c) 1992 (Asia, v1.5)
+ragtime         // MBD (c) 1992 (Japan, v1.5)
+ragtimea        // MBD (c) 1992 (Japan, v1.3)
 dblewing        // MBE (c) 1993 Mitchell
 fghthist        // MBF (c) 1993 Data East Corporation (World) DE-0380-2 PCB
 fghthistu       // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
+fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0395-1 PCB
 fghthistj       // MBF (c) 1993 Data East Corporation (Japan) DE-0395-1 PCB
-fghthistua      // MBF (c) 1993 Data East Corporation (US)    DE-0380-2 PCB
+fghthistub      // MBF (c) 1993 Data East Corporation (US)    DE-0380-2 PCB
 fghthistja      // MBF (c) 1993 Data East Corporation (Japan) DE-0380-2 PCB
 fghthistjb      // MBF (c) 1993 Data East Corporation (Japan) DE-0380-1 PCB
 hvysmsh         // MBG (c) 1993 Data East Corporation (World)
@@ -6462,7 +6475,7 @@ chqflag         // GX717 (c) 1988
 chqflagj        // GX717 (c) 1988 (Japan)
 ultraman        // GX910 (c) 1991 Banpresto/Bandai
 hexion          // GX122 (c) 1992
-hexionb			// bootleg
+hexionb         // bootleg
 lethalen        // GX191 (c) 1992
 lethalenub      // GX191 (c) 1992
 lethalenua      // GX191 (c) 1992
@@ -6563,6 +6576,7 @@ xmene           // GX065 (c) 1992 (World)
 xmena           // GX065 (c) 1992 (Asia)
 xmenaa          // GX065 (c) 1992 (Asia)
 xmen2pe         // GX065 (c) 1992 (World)
+xmen2pu         // GX065 (c) 1992 (US)
 xmen2pa         // GX065 (c) 1992 (Asia)
 xmen2pj         // GX065 (c) 1992 (Japan)
 xmen6p          // GX065 (c) 1992 (World)
@@ -7370,6 +7384,7 @@ primrage20      // 136102           (c) 1994
 metalmx         // 136103?          (c) 1994
 area51          // 136105           (c) 1995
 area51t         // 136105           (c) 1995
+area51ta        // 136105           (c) 1995
 area51a         // 136105           (c) 1995
 fishfren        // (proto)          (c) 1995
 freezeat        // (proto)          (c) 1996
@@ -7851,7 +7866,7 @@ gangwarsj       // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 gangwarsu       // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 gangwarsb       // bootleg
 sbasebal        // Alpha-68K96V       (c) 1989 SNK of America licensed from Alpha
-sbasebalj		// Alpha-68K96V
+sbasebalj       // Alpha-68K96V
 tnextspc        // A8003 'NS' (c) 1989 - MASKROM
 tnextspc2       // A8003 'NS' (c) 1989 - EPROMs
 tnextspcj       // A8003 'NS' (c) 1989 - Japan
@@ -7915,6 +7930,7 @@ vballb          // bootleg (of US set)
 vball2pjb       // bootleg (of Japan set)
 ddragon2        // TA-0026 (c) 1988 (World)
 ddragon2u       // TA-0026 (c) 1988 (US)
+ddragon2j       // TA-0026 (c) 1988 (Japan)
 toffy           // (c) 1993 Midas
 stoffy          // (c) 1994 Midas
 stoffyu         // (c) 1994 Midas + Unico
@@ -8259,7 +8275,8 @@ cartfury        // (c) 2000 Midway Games
 hydrthnd        // (c) 1999 Midway Games
 offrthnd        // (c) 2000 Midway Games
 arctthnd        // (c) 2001 Midway Games
-arctthndult     // (c) 2001 Midway Games
+ultarctc        // (c) 2001 Midway Games
+ultarctcup      // (c) 2001 Midway Games
 
 // Midway Touchmaster / Galaxy Games
 tm              // (c) 1996 Midway Games
@@ -8520,12 +8537,13 @@ viprp1hk        // (c) 1995 Seibu Kaihatsu (Metrotainment License)
 
 ejanhs          // (c) 1996 Seibu Kaihatsu
 
-rdft            // (c) 1996 Seibu Kaihatsu
+rdft            // (c) 1996 Seibu Kaihatsu (Tuning License)
 rdftu           // (c) 1996 Seibu Kaihatsu (Fabtek license)
 rdftau          // (c) 1996 Seibu Kaihatsu
 rdftauge        // (c) 1996 Seibu Kaihatsu (Tuning license and text display, but Australia region code)
 rdftj           // (c) 1996 Seibu Kaihatsu
 rdftja          // (c) 1996 Seibu Kaihatsu
+rdftjb          // (c) 1996 Seibu Kaihatsu
 rdftadi         // (c) 1996 Seibu Kaihatsu (Dream Island license)
 rdftam          // (c) 1996 Seibu Kaihatsu (Metrotainment license)
 rdftit          // (c) 1996 Seibu Kaihatsu
@@ -8534,9 +8552,9 @@ rdfts           // (c) 1996 Seibu Kaihatsu (Explorer System Corp.)
 
 rdft2           // (c) 1997 Seibu Kaihatsu (Tuning License)
 rdft2a          // (c) 1997 Seibu Kaihatsu (Metrotainment license)
-rdft2a2         // (c) 1997 Seibu Kaihatsu (Dream Island license)
+rdft2aa         // (c) 1997 Seibu Kaihatsu (Dream Island license)
 rdft2j          // (c) 1997 Seibu Kaihatsu
-rdft2j2         // (c) 1997 Seibu Kaihatsu
+rdft2ja         // (c) 1997 Seibu Kaihatsu
 rdft2t          // (c) 1997 Seibu Kaihatsu
 rdft2u          // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdft2us         // (c) 1997 Seibu Kaihatsu (Fabtek license)
@@ -9542,7 +9560,7 @@ redhawk         // (c) 1997 New Vision Ent. license
 redhawke        // (c) 1997 Excellent Co., Ltd license
 redhawki        // (c) 1997 Haedong Corp. license
 redhawkb        // (c) 1997
-redhawkk		// (c) 1997
+redhawkk        // (c) 1997
 grdnstrm        // (c) 1998 Apples Industries license
 grdnstrmv       // (c) 1998 Apples Industries license
 grdnstrmk       // (c) 1998 (Korea)
@@ -9729,6 +9747,7 @@ sub             // (c) 1985 Sigma Ent. Inc.
 jwildb52        // (c) 199? Sigma
 jwildb52a       // (c) 199? Sigma
 jwildb52h       // (c) 199? Sigma
+s8waysfc        // (c) 199? Sigma
 
 // Sigma B98 / Sammy Medal Games
 dodghero        // b9802 (c) 1997 Sigma
@@ -9862,7 +9881,7 @@ drgw2j          //
 drgw2hk         //
 drgw3           // (c) 1998 Dragon World 3
 drgw3105        //
-drgw3103		//
+drgw3103        //
 drgw3100        //
 dwex            // (c) 1998 Dragon World 3 EX
 killbld         // (c) 1998 The Killing Blade
@@ -10042,7 +10061,8 @@ gigasb          // (c) 1986 bootleg
 gigasm2b        // (c) 1986 bootleg
 oigas           // (c) 1986 bootleg
 pbillrd         // (c) 1987 Nihon System
-pbillrds        // (c) 1988 Nihon System (+ optional Sega)
+pbillrds        // (c) 1987 Nihon System (Sega license?)
+pbillrdsa       // (c) 1987 Nihon System (Sega license?)
 freekick        // (c) 1988 Nihon System licensed to Merit (+ optional Sega) NS6201-A 1987.10
 freekicka       // (c) 1988 Nihon System (+ optional Sega) NS6201-A 1987.9
 freekickb1      // (c) 1987 bootleg
@@ -10348,6 +10368,7 @@ jokpokerc       // (c) 1983 Greyhound Electronics
 superbwl        // (c) 1982 Greyhound Electronics
 amuse           // (c) 1982 Greyhound Electronics
 amuse1          // (c) 1982 Greyhound Electronics
+amuse1a         // (c) 1983 Greyhound Electronics
 gs4002          // (c) 1982 G.E.I.
 gs4002a         // (c) 1982 G.E.I.
 gepoker         // (c) 1984 Greyhound Electronics
@@ -12683,33 +12704,35 @@ tajmah      // Tajmahal
 3wishrd     // Three Wishes Red
 
 
-// WMS (Russian)
+// WMS 360 / 550
 
 wms         // Set Chips
 wmsa        //
 wmsb        //
 
-btippers    // Big Tippers (Russia)
-wmsboom     // Boom (Russia)
-cashcrop    // Cash Crop (Russia)
-filthyr     // Filthy Rich (Russia)
-hottop      // Hot Toppings (Russia)
-inwinner    // In Winner (Russia)
-jptparty    // Jackpot Party (Russia)
-leprgld     // Leprecorns Gold (Russia)
-lol         // Life of Luxury (Russia)
-lovewin     // Love To Win (Russia)
-mtburn      // Money To Burn (Russia)
-otchart     // Off The Charts (Russia)
-perfect     // Perfect Game (Russia)
-reelemin    // Reel 'Em In (Russia)
-sonoth      // Sum Of Nothing (Russia)
-swingin     // Swingin' Green (Russia)
-wmstopb     // Top Banana (Russia)
-wdun        // Who Dunnit (Russia)
-winbid      // Winning Bid (Russia)
-wldstrek    // Wild Streak (Russia)
-yukongld    // Yukon Gold (Russia)
+btippers    // Big Tippers (Russian)
+wmsboom     // Boom (Russian)
+cashcrop    // Cash Crop (Russian)
+filthyr     // Filthy Rich (Russian)
+hottop      // Hot Toppings (English)
+hottopa     // Hot Toppings (Russian?)
+inwinner    // In Winner (Russian)
+jptparty    // Jackpot Party (Russian)
+leprgld     // Leprecorns Gold (Russian)
+leprglds    // Leprecorns Gold (Spanish)
+lol         // Life of Luxury (Russian)
+lovewin     // Love To Win (Russian)
+mtburn      // Money To Burn (Russian)
+otchart     // Off The Charts (Russian)
+perfect     // Perfect Game (Russian)
+reelemin    // Reel 'Em In (Russian)
+sonoth      // Sum Of Nothing (Russian)
+swingin     // Swingin' Green (Russian)
+wmstopb     // Top Banana (Russian)
+wdun        // Who Dunnit (Russian)
+winbid      // Winning Bid (Russian)
+wldstrek    // Wild Streak (Russian)
+yukongld    // Yukon Gold (Russian)
 
 // Extrema (Russian)
 
@@ -12907,8 +12930,8 @@ tank            // (c) 1974 Atari
 // Atari 100% TTL
 pong            // (c) 1972 Atari
 pongd           // (c) 1975 Atari
-pongf           // (c) 1972 Atari - no subcycles
-//breakout
+pongf           // (c) 1972 Atari
+breakout        // (c) 1976 Atari
 //coupedem
 //goal4
 //gotchaat
@@ -17035,6 +17058,7 @@ sc4s6cb     //
 sc4s6cc     //
 sc4s6cd     //
 sc4s6ce     //
+sc4s6cf     //
 sc4sdr      // Super Diamonds & Rubies (Bellfruit)
 sc4sdra     //
 sc4sdrb     //
@@ -17133,6 +17157,7 @@ sc4ticlb    // Treasure Island Club (Bellfruit)
 sc4ticlba   //
 sc4ticlbb   //
 sc4ticlbc   //
+sc4ticlbd   //
 sc4ttomb    // Treasure Tomb (Bellfruit)
 sc4ttomba   //
 sc4ttombb   //
@@ -17251,6 +17276,7 @@ sc4legd     //
 sc4lege     //
 sc4legf     //
 sc4legg     //
+sc4legh     //
 sc4legcb    // Who Wants To Be A Legionnaire Club (Bellfruit)
 sc4legcba   //
 sc4legcbb   //
@@ -18590,6 +18616,8 @@ sc5dndboh   //
 sc5dndboi   //
 sc5dndboj   //
 sc5dndbok   //
+sc5dndbol   //
+sc5dndbom   //
 sc5dndbl    // Deal Or No Deal Beat The Banker Club (Bellfruit)
 sc5dndbla   //
 sc5dndblb   //
@@ -20064,6 +20092,37 @@ sc5nunsmc   //
 sc5nunsmd   //
 sc5nunsme   //
 sc5dndbe    // Deal Or No Deal Beat The Banker (Bellfruit)
+sc5_3512
+sc5_3437
+sc5_3438
+sc5_3508
+sc5_3514
+sc5_3517
+sc5_3524
+sc5_3515
+sc5_3511
+sc5_3513
+sc5_3516
+sc5_3530
+sc5_3552
+sc5_3551
+sc5_3525
+sc5_3553
+sc5_3555
+sc5_3519
+sc5_3510
+sc5_3557
+sc5_3451
+sc5_3450
+sc5_3435
+sc5_3520
+sc5_3434
+sc5_z059
+sc5_z058
+sc5_z060
+sc5_z057
+sc5_3414
+sc5_3518
 
 // Adder 5
 

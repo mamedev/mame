@@ -1573,8 +1573,6 @@ void sega315_5124_device::device_start()
 	m_pause_cb.resolve();
 
 	/* Allocate video RAM */
-	astring tempstring;
-
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;
 
 	/* Make temp bitmap for rendering */

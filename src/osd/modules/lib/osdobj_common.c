@@ -245,22 +245,22 @@ void osd_common_t::register_options()
 
 void osd_common_t::update_option(const char * key, std::vector<const char *> &values)
 {
-	astring current_value(m_options.description(key));
-	astring new_option_value("");
+	std::string current_value(m_options.description(key));
+	std::string new_option_value("");
 	for (unsigned int index = 0; index < values.size(); index++)
 	{
-		astring t(values[index]);
-		if (new_option_value.len() > 0)
+		std::string t(values[index]);
+		if (new_option_value.length() > 0)
 		{
 			if( index != (values.size()-1))
-				new_option_value.cat(", ");
+				new_option_value.append(", ");
 			else
-				new_option_value.cat(" or ");
+				new_option_value.append(" or ");
 		}
-		new_option_value.cat(t);
+		new_option_value.append(t);
 	}
 	// TODO: core_strdup() is leaked
-	m_options.set_description(key, core_strdup(current_value.cat(new_option_value).c_str()));
+	m_options.set_description(key, core_strdup(current_value.append(new_option_value).c_str()));
 }
 
 

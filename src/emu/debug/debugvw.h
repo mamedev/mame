@@ -129,7 +129,7 @@ public:
 private:
 	// internal state
 	debug_view_source *     m_next;                 // link to next item
-	astring                 m_name;                 // name of the source item
+	std::string             m_name;                 // name of the source item
 	device_t *              m_device;               // associated device (if applicable)
 	bool                    m_is_octal;             // is view in octal or hex
 };
@@ -271,7 +271,7 @@ public:
 
 	// setters
 	void mark_dirty() { m_dirty = true; }
-	void set_string(const char *string) { m_string.cpy(string); m_dirty = true; }
+	void set_string(const char *string) { m_string.assign(string); m_dirty = true; }
 	void set_context(symbol_table *context);
 
 private:
@@ -283,7 +283,7 @@ private:
 	bool                m_dirty;                // true if the expression needs to be re-evaluated
 	UINT64              m_result;               // last result from the expression
 	parsed_expression   m_parsed;               // parsed expression data
-	astring             m_string;               // copy of the expression string
+	std::string         m_string;               // copy of the expression string
 };
 
 

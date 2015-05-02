@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  video.c
+  vigilant.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -20,8 +20,22 @@ static const rectangle bottomvisiblearea(16*8, 48*8-1, 6*8, 32*8-1);
 void vigilant_state::video_start()
 {
 	m_bg_bitmap = auto_bitmap_ind16_alloc(machine(),512*4,256);
+
+	save_item(NAME(m_horiz_scroll_low));
+	save_item(NAME(m_horiz_scroll_high));
+	save_item(NAME(m_rear_horiz_scroll_low));
+	save_item(NAME(m_rear_horiz_scroll_high));
+	save_item(NAME(m_rear_color));
+	save_item(NAME(m_rear_disable));
+
+	m_rear_refresh = 1;
+	machine().save().register_postload(save_prepost_delegate(FUNC(vigilant_state::vigilant_postload), this));
 }
 
+void vigilant_state::vigilant_postload()
+{
+	m_rear_refresh = 1;
+}
 
 void vigilant_state::video_reset()
 {
@@ -31,7 +45,6 @@ void vigilant_state::video_reset()
 	m_rear_horiz_scroll_high = 0;
 	m_rear_color = 0;
 	m_rear_disable = 1;
-	m_rear_refresh = 1;
 }
 
 
@@ -39,7 +52,6 @@ void vigilant_state::video_reset()
  update_background
 
  There are three background ROMs, each one contains a 512x256 picture.
- Redraw them if the palette changes.
  **************************************************************************/
 void vigilant_state::update_background()
 {
@@ -69,7 +81,7 @@ void vigilant_state::update_background()
 }
 
 /***************************************************************************
- vigilant_paletteram_w
+ paletteram_w
 
  There are two palette chips, each one is labelled "KNA91H014".  One is
  used for the sprites, one is used for the two background layers.
@@ -84,7 +96,7 @@ void vigilant_state::update_background()
  These are used to index a color triplet of RGB.  The triplet is read
  from RAM, and output to R0-R4, G0-G4, and B0-B4.
  **************************************************************************/
-WRITE8_MEMBER(vigilant_state::vigilant_paletteram_w)
+WRITE8_MEMBER(vigilant_state::paletteram_w)
 {
 	int bank,r,g,b;
 
@@ -160,18 +172,16 @@ WRITE8_MEMBER(vigilant_state::vigilant_rear_color_w)
 
 void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque )
 {
-	UINT8 *videoram = m_videoram;
-	int offs;
 	int scroll = -(m_horiz_scroll_low + m_horiz_scroll_high);
 
 
-	for (offs = 0; offs < 0x1000; offs += 2)
+	for (int offs = 0; offs < 0x1000; offs += 2)
 	{
 		int sy = 8 * ((offs/2) / 64);
 		int sx = 8 * ((offs/2) % 64);
-		int attributes = videoram[offs+1];
+		int attributes = m_videoram[offs+1];
 		int color = attributes & 0x0F;
-		int tile_number = videoram[offs] | ((attributes & 0xF0) << 4);
+		int tile_number = m_videoram[offs] | ((attributes & 0xF0) << 4);
 
 		if (priority)    /* foreground */
 		{
@@ -223,20 +233,17 @@ void vigilant_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 
 void vigilant_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0;offs < m_spriteram.bytes();offs += 8)
+	for (int offs = 0;offs < m_spriteram.bytes();offs += 8)
 	{
 		int code,color,sx,sy,flipx,flipy,h,y;
 
-		code = spriteram[offs+4] | ((spriteram[offs+5] & 0x0f) << 8);
-		color = spriteram[offs+0] & 0x0f;
-		sx = (spriteram[offs+6] | ((spriteram[offs+7] & 0x01) << 8));
-		sy = 256+128 - (spriteram[offs+2] | ((spriteram[offs+3] & 0x01) << 8));
-		flipx = spriteram[offs+5] & 0x40;
-		flipy = spriteram[offs+5] & 0x80;
-		h = 1 << ((spriteram[offs+5] & 0x30) >> 4);
+		code = m_spriteram[offs+4] | ((m_spriteram[offs+5] & 0x0f) << 8);
+		color = m_spriteram[offs+0] & 0x0f;
+		sx = (m_spriteram[offs+6] | ((m_spriteram[offs+7] & 0x01) << 8));
+		sy = 256+128 - (m_spriteram[offs+2] | ((m_spriteram[offs+3] & 0x01) << 8));
+		flipx = m_spriteram[offs+5] & 0x40;
+		flipy = m_spriteram[offs+5] & 0x80;
+		h = 1 << ((m_spriteram[offs+5] & 0x30) >> 4);
 		sy -= 16 * h;
 
 		code &= ~(h - 1);
@@ -259,16 +266,13 @@ void vigilant_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
-	int offs;
-
-	for (offs = 0; offs < 0x1000; offs += 2)
+	for (int offs = 0; offs < 0x1000; offs += 2)
 	{
 		int sy = 8 * ((offs/2) / 64);
 		int sx = 8 * ((offs/2) % 64);
-		int attributes = videoram[offs+1];
+		int attributes = m_videoram[offs+1];
 		int color = (attributes & 0xF0) >> 4;
-		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
+		int tile_number = m_videoram[offs] | ((attributes & 0x0F) << 8);
 
 		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect,
 				tile_number,
@@ -283,10 +287,8 @@ UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind1
 
 UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	/* copy the background palette */
-	for (i = 0;i < 16;i++)
+	for (int i = 0;i < 16;i++)
 	{
 		int r,g,b;
 

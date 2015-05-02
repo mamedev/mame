@@ -1571,9 +1571,9 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	else
 	{
 		// build the path and optionally prepend the directory
-		astring fname = astring(filename).cat(".lay");
+		std::string fname = std::string(filename).append(".lay");
 		if (dirname != NULL)
-			fname.ins(0, PATH_SEPARATOR).ins(0, dirname);
+			fname.insert(0, PATH_SEPARATOR).insert(0, dirname);
 
 		// attempt to open the file; bail if we can't
 		emu_file layoutfile(manager().machine().options().art_path(), OPEN_FLAG_READ);

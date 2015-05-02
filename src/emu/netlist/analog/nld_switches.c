@@ -9,6 +9,51 @@
 #define R_OFF   (1.0 / netlist().gmin())
 #define R_ON    0.01
 
+// ----------------------------------------------------------------------------------------
+// SWITCH
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(switch1)
+{
+	register_sub(m_R, "R");
+
+	register_param("POS", m_POS, 0);
+
+	register_subalias("1", m_R.m_P);
+	register_subalias("2", m_R.m_N);
+}
+
+NETLIB_RESET(switch1)
+{
+	m_R.do_reset();
+
+	m_R.set_R(R_OFF);
+}
+
+NETLIB_UPDATE(switch1)
+{
+	if (m_POS.Value() == 0)
+	{
+		m_R.set_R(R_OFF);
+	}
+	else
+	{
+		m_R.set_R(R_ON);
+	}
+
+	m_R.update_dev();
+}
+
+NETLIB_UPDATE_PARAM(switch1)
+{
+	update();
+}
+
+// ----------------------------------------------------------------------------------------
+// SWITCH2
+// ----------------------------------------------------------------------------------------
+
+
 NETLIB_START(switch2)
 {
 	register_sub(m_R[0], "R1");

@@ -167,7 +167,7 @@ static chd_error open_chd(chd_file &file, const char *filename, movie_info &info
 	}
 
 	// get the metadata
-	astring metadata;
+	std::string metadata;
 	chderr = file.read_metadata(AV_METADATA_TAG, 0, metadata);
 	if (chderr != CHDERR_NONE)
 	{

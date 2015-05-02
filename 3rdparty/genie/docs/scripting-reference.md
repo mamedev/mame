@@ -15,9 +15,11 @@
     * [buildoptions](#buildoptionsoptions)
     * [configuration](#configurationkeywords)
     * [configurations](#configurationsnames)
+    * [custombuildtask](#custombuildtasktask)
     * [debugargs](#debugargsargs)
     * [debugdir](#debugdirpath)
     * [defines](#definessymbols)
+    * [dependency](#dependencyfiles)
     * [deploymentoptions](#deploymentoptionsoptions)
     * [excludes](#excludesfiles)
     * [files](#filesfiles)
@@ -78,6 +80,7 @@
     * [pchsource](#pchsourcefile)
     * [platforms](#platformsidentifiers)
     * [postbuildcommands](#postbuildcommandscommands)
+    * [postcompiletasks](#postcompiletaskstasks)
     * [prebuildcommands](#prebuildcommandscommands)
     * [prelinkcommands](#prelinkcommandscommands)
     * [printf](#printfformat-args)
@@ -334,6 +337,33 @@ local cfgs = configurations()
 [Back to top](#table-of-contents)
 
 ---
+### custombuildtask({_input_file_, _output_file_, {_dependency_,...},{_command_,...}},...)
+Defines custom build task for specific input file, that generates output file, there can be additional dependencies, and 
+for rule listed commands are executed.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_input_file_ - source file that should be "compiled" with custom task
+_output_file_ - generated file name
+_dependency_ - additional dependencies, that can be used as parameters to commands
+_command_ - command list, special functions in commands are :
+		$(<) - input file
+		$(@) - output file
+		$(1) - $(9) - additional dependencies
+
+#### Examples
+
+```lua
+custombuildtask {
+		{ ROOT_DIR .. "version.txt" , GEN_DIR .. "src/version.inc",   { ROOT_DIR .. "version.py" }, {"@echo Generating version.inc file...", "python $(1) $(<) > $(@)" }},
+	}
+	
+```
+
+[Back to top](#table-of-contents)
+
+---
 ### debugargs({_args_...})
 Specifies a list of arguments to pas to the application when run under the debugger.
 
@@ -392,6 +422,23 @@ Assign a symbol value
 ```lua
 defines { "CALLSPEC=__dllexport" }
 ```
+[Back to top](#table-of-contents)
+
+---
+### dependency({_main_file, _depending_of_}...)
+GMAKE specific adds dependency between source file and any other file.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_main_file - name of source file that depends of other file
+_depending_of_ - name of dependency file
+
+#### Examples
+```lua
+dependency { { ROOT_DIR .. "src/test.c", ROOT_DIR .. "verion.txt" } }
+```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1498,6 +1545,22 @@ configuration "windows"
 
 configuration "not windows"
     postbuildcommands { "cp default.config bin/project.config" }
+```
+[Back to top](#table-of-contents)
+
+---
+### postcompiletasks({_commands_...})
+Specifies shell commands to run after compile of file is finished
+(GMAKE specific)
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_commands_ - one or more shell commands
+
+#### Examples
+```lua
+    postcompiletasks { "rm $(@:%.o=%.d)" }
 ```
 [Back to top](#table-of-contents)
 

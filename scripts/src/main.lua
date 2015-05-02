@@ -12,6 +12,7 @@ function mainProject(_target, _subtarget)
 	}
 	flags {
 		"NoManifest",
+		"Symbols", -- always include minimum symbols for executables 
 	}
 
 	if _OPTIONS["SYMBOLS"] then
@@ -26,6 +27,42 @@ function mainProject(_target, _subtarget)
 	flags {
 		"Unicode",
 	}
+
+	configuration { "x64", "Release" }
+		targetsuffix "64"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "64p"
+		end
+
+	configuration { "x64", "Debug" }
+		targetsuffix "64d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "64dp"
+		end
+
+	configuration { "x32", "Release" }
+		targetsuffix ""
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "p"
+		end
+
+	configuration { "x32", "Debug" }
+		targetsuffix "d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "dp"
+		end
+
+	configuration { "Native", "Release" }
+		targetsuffix ""
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "p"
+		end
+
+	configuration { "Native", "Debug" }
+		targetsuffix "d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "dp"
+		end
 
 	configuration { "mingw*" or "vs*" }
 		targetextension ".exe"

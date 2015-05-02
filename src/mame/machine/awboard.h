@@ -22,8 +22,8 @@ public:
 	DECLARE_WRITE16_MEMBER(mpr_first_file_index_w); // 5f7010
 	DECLARE_WRITE16_MEMBER(mpr_file_offsetl_w);     // 5f7014
 	DECLARE_WRITE16_MEMBER(mpr_file_offseth_w);     // 5f7018
-	DECLARE_READ16_MEMBER(adj_offset_r);            // 5f7080
-	DECLARE_WRITE16_MEMBER(adj_offset_w);           // 5f7080
+	DECLARE_READ16_MEMBER(pio_r);                   // 5f7080
+	DECLARE_WRITE16_MEMBER(pio_w);                  // 5f7080
 
 protected:
 	virtual void device_start();

@@ -1039,7 +1039,7 @@ chd_error chd_file::write_bytes(UINT64 offset, const void *buffer, UINT32 bytes)
 //  of the given type
 //-------------------------------------------------
 
-chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, astring &output)
+chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex, std::string &output)
 {
 	// wrap this for clean reporting
 	try
@@ -1054,7 +1054,7 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, UINT32 searchindex
 		char* metabuf = new char[metaentry.length+1];
 		memset(metabuf, 0x00, metaentry.length+1);
 		file_read(metaentry.offset + METADATA_HEADER_SIZE, metabuf, metaentry.length);
-		output.cpy(metabuf);
+		output.assign(metabuf);
 		delete[] metabuf;
 		return CHDERR_NONE;
 	}
@@ -1409,7 +1409,7 @@ const char *chd_file::error_string(chd_error err)
 UINT32 chd_file::guess_unitbytes()
 {
 	// look for hard disk metadata; if found, then the unit size == sector size
-	astring metadata;
+	std::string metadata;
 	int i0, i1, i2, i3;
 	if (read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE && sscanf(metadata.c_str(), HARD_DISK_METADATA_FORMAT, &i0, &i1, &i2, &i3) == 4)
 		return i3;

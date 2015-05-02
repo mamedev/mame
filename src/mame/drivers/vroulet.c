@@ -46,38 +46,44 @@ class vroulet_state : public driver_device
 public:
 	vroulet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_ball(*this, "ball"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_8(*this, "paletteram") { }
+		m_generic_paletteram_8(*this, "paletteram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_ball(*this, "ball") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_ball;
-	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(vroulet_paletteram_w);
-	DECLARE_WRITE8_MEMBER(vroulet_videoram_w);
-	DECLARE_WRITE8_MEMBER(vroulet_colorram_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_a_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_b_w);
-	DECLARE_WRITE8_MEMBER(ppi8255_c_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
-	UINT32 screen_update_vroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
+
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_ball;
+
+	tilemap_t *m_bg_tilemap;
+
+	DECLARE_WRITE8_MEMBER(paletteram_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_WRITE8_MEMBER(ppi8255_a_w);
+	DECLARE_WRITE8_MEMBER(ppi8255_b_w);
+	DECLARE_WRITE8_MEMBER(ppi8255_c_w);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	virtual void video_start();
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
 /* video */
 
 
-WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
+WRITE8_MEMBER(vroulet_state::paletteram_w)
 {
 	/*
 	 paletteram_xxxxBBBBGGGGRRRR_byte_be_w
@@ -97,13 +103,13 @@ WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 	}
 }
 
-WRITE8_MEMBER(vroulet_state::vroulet_videoram_w)
+WRITE8_MEMBER(vroulet_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(vroulet_state::vroulet_colorram_w)
+WRITE8_MEMBER(vroulet_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -124,7 +130,7 @@ void vroulet_state::video_start()
 		8, 8, 32, 32);
 }
 
-UINT32 vroulet_state::screen_update_vroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vroulet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, 0x320, 1, 0, 0,
@@ -138,10 +144,10 @@ static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa001) AM_RAM AM_SHARE("ball")
-	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END
 
@@ -283,7 +289,7 @@ static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update_vroulet)
+	MCFG_SCREEN_UPDATE_DRIVER(vroulet_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vroulet)
@@ -313,4 +319,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1989, vroulet, 0, vroulet, vroulet, driver_device, 0, ROT90, "World Game", "Vegas Roulette", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
+GAME( 1989, vroulet, 0, vroulet, vroulet, driver_device, 0, ROT90, "World Game", "Vegas Roulette", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

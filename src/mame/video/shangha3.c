@@ -21,12 +21,12 @@ The chip addresses 0x100000 bytes of memory, containing both the command list,
 tilemap, and spare RAM to be used by the CPU.
 
 The command list starts at a variable point in memory, set by
-shangha3_gfxlist_addr_w(), and always ends at 0x0fffff.
+gfxlist_addr_w(), and always ends at 0x0fffff.
 
 Large sprites refer to a single tilemap starting at 0x000000, the command list
 contains the coordinates of the place in the tilemap to pick data from.
 
-The commands list is processed when shangha3_blitter_go_w() is written to, so
+The commands list is processed when blitter_go_w() is written to, so
 it is not processed automatically every frame.
 
 The commands have a fixed length of 16 words. The format is as follows:
@@ -80,11 +80,14 @@ void shangha3_state::video_start()
 		for (i = 0;i < 128;i++)
 			m_palette->shadow_table()[i] = i+128;
 	}
+
+	save_item(NAME(m_gfxlist_addr));
+	save_item(NAME(m_rawbitmap));
 }
 
 
 
-WRITE16_MEMBER(shangha3_state::shangha3_flipscreen_w)
+WRITE16_MEMBER(shangha3_state::flipscreen_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -95,13 +98,13 @@ WRITE16_MEMBER(shangha3_state::shangha3_flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(shangha3_state::shangha3_gfxlist_addr_w)
+WRITE16_MEMBER(shangha3_state::gfxlist_addr_w)
 {
 	COMBINE_DATA(&m_gfxlist_addr);
 }
 
 
-WRITE16_MEMBER(shangha3_state::shangha3_blitter_go_w)
+WRITE16_MEMBER(shangha3_state::blitter_go_w)
 {
 	UINT16 *shangha3_ram = m_ram;
 	bitmap_ind16 &rawbitmap = m_rawbitmap;
@@ -254,7 +257,7 @@ else
 }
 
 
-UINT32 shangha3_state::screen_update_shangha3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 shangha3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;

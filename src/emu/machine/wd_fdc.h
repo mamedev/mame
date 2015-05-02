@@ -368,10 +368,10 @@ private:
 
 	UINT8 format_last_byte;
 	int format_last_byte_count;
-	astring format_description_string;
+	std::string format_description_string;
 
-	static astring tts(const attotime &t);
-	astring ttsn();
+	static std::string tts(const attotime &t);
+	std::string ttsn();
 
 	void delay_cycles(emu_timer *tm, int cycles);
 

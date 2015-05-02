@@ -4674,6 +4674,24 @@ void z8002_device::Z7B_dddd_1101()
 {
 	CHECK_PRIVILEGED_INSTR();
 	/* test mu-I line, invert cascade to mu-0  */
+	if (m_mi)
+	{
+		CLR_Z;
+		CLR_S;
+		m_mo_out(CLEAR_LINE);
+		return;
+	}
+	SET_Z;
+	m_mo_out(ASSERT_LINE);
+	if (m_mi)
+	{
+		SET_S;
+	}
+	else
+	{
+		CLR_S;
+		m_mo_out(CLEAR_LINE);
+	}
 }
 
 /******************************************

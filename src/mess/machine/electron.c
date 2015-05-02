@@ -346,8 +346,8 @@ void electron_state::machine_reset()
 void electron_state::machine_start()
 {
 	UINT8 *lo_rom, *up_rom;
-	astring region_tag;
-	memory_region *cart_rom = memregion(region_tag.cpy(m_cart->tag()).cat(GENERIC_ROM_REGION_TAG).c_str());
+	std::string region_tag;
+	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
 	if (cart_rom)
 		up_rom = cart_rom->base();

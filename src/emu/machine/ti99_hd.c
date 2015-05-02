@@ -2,23 +2,21 @@
 // copyright-holders:Michael Zapf
 /*************************************************************************
 
-    Hard disk support
-
-    This device wraps the plain image device as that device does not allow
-    for internal states (like head position)
-    The plain device is a subdevice ("drive") of this device, so we
-    get names like "mfmhd0:drive"
+    Hard disk emulation
 
     Michael Zapf
     April 2010
     February 2012: Rewritten as class
+    April 2015: Rewritten with deeper emulation detail
+
+    References:
+    [1] ST225 OEM Manual, Seagate
 
 **************************************************************************/
 
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "harddisk.h"
-#include "smc92x4.h"
 
 #include "ti99_hd.h"
 
@@ -33,8 +31,216 @@
 #define GAP4 340
 #define SYNC 13
 
-mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: device_t(mconfig, TI99_MFMHD, "MFM Harddisk", tag, owner, clock, "mfm_harddisk", __FILE__)
+enum
+{
+	INDEX_TM = 0,
+	SPINUP_TM,
+	SEEK_TM
+};
+
+enum
+{
+	STEP_COLLECT = 0,
+	STEP_MOVING,
+	STEP_SETTLE
+};
+
+mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: harddisk_image_device(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_slot_card_interface(mconfig, *this)
+{
+}
+
+void mfm_harddisk_device::device_start()
+{
+	m_index_timer = timer_alloc(INDEX_TM);
+	m_spinup_timer = timer_alloc(SPINUP_TM);
+	m_seek_timer = timer_alloc(SEEK_TM);
+
+	// MFM drives have a revolution rate of 3600 rpm (i.e. 60/sec)
+	m_index_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+
+	// Spinup may take up to 24 seconds
+	m_spinup_timer->adjust(attotime::from_msec(8000));
+
+	m_current_cylinder = 10; // for test purpose
+}
+
+void mfm_harddisk_device::device_reset()
+{
+	m_autotruncation = false;
+	m_ready = false;
+	m_seek_complete = true;
+	m_seek_inward = false;
+	m_track_delta = 0;
+	m_step_line = CLEAR_LINE;
+}
+
+void mfm_harddisk_device::setup_index_pulse_cb(index_pulse_cb cb)
+{
+	m_index_pulse_cb = cb;
+}
+
+void mfm_harddisk_device::setup_seek_complete_cb(seek_complete_cb cb)
+{
+	m_seek_complete_cb = cb;
+}
+
+void mfm_harddisk_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case INDEX_TM:
+		/* Simple index hole handling. We assume that there is only a short pulse. */
+		if (!m_index_pulse_cb.isnull())
+		{
+			m_index_pulse_cb(this, ASSERT_LINE);
+			m_index_pulse_cb(this, CLEAR_LINE);
+		}
+		break;
+	case SPINUP_TM:
+		m_ready = true;
+		logerror("%s: Spinup complete, drive is ready\n", tag());
+		break;
+	case SEEK_TM:
+		switch (m_step_phase)
+		{
+		case STEP_COLLECT:
+			// Collect timer has expired; start moving head
+			head_move();
+			break;
+		case STEP_MOVING:
+			// Head has reached final position
+			// Check whether we have a new delta
+			if (m_track_delta == 0)
+			{
+				// Start the settle timer
+				m_step_phase = STEP_SETTLE;
+				m_seek_timer->adjust(attotime::from_usec(16800));
+				logerror("%s: Arrived at target track %d, settling ...\n", tag(), m_current_cylinder);
+			}
+			break;
+		case STEP_SETTLE:
+			// Do we have new step pulses?
+			if (m_track_delta != 0) head_move();
+			else
+			{
+				// Seek completed
+				logerror("%s: Settling done at cylinder %d, seek complete\n", tag(), m_current_cylinder);
+				m_seek_complete = true;
+				m_seek_complete_cb(this, ASSERT_LINE);
+				m_step_phase = STEP_COLLECT;
+			}
+			break;
+		}
+	}
+}
+
+void mfm_harddisk_device::head_move()
+{
+	int steps = m_track_delta;
+	if (steps < 0) steps = -steps;
+	logerror("%s: Moving head by %d step(s) %s\n", tag(), steps, (m_track_delta<0)? "outward" : "inward");
+
+	int disttime = steps*200;
+	m_step_phase = STEP_MOVING;
+	m_seek_timer->adjust(attotime::from_usec(disttime));
+	// We pretend that we already arrived
+	// TODO: Check auto truncation?
+	m_current_cylinder += m_track_delta;
+	if (m_current_cylinder < 0) m_current_cylinder = 0;
+	if (m_current_cylinder > 670) m_current_cylinder = 670;
+	m_track_delta = 0;
+}
+
+void mfm_harddisk_device::direction_in_w(line_state line)
+{
+	m_seek_inward = (line == ASSERT_LINE);
+	logerror("%s: Setting seek direction %s\n", tag(), m_seek_inward? "inward" : "outward");
+}
+
+/*
+    According to the specs [1]:
+
+    "4.3.1 BUFFERED SEEK: To minimize access time, pulses may be issued at an
+    accelerated rate and buffered in a counter. Initiation of a seek starts
+    immediately after the first pulse is received. Head motion occurs during
+    pulse accumulation, and the seek is completed following receipt of all pulses."
+
+    "8.1.3 SEEKING: Upon receiving a Step pulse, the MPU (microprocessor unit)
+    pauses for 250 usec to allow for additional pulses before executing the seek
+    operation. Every incoming pulse resets the 250 usec timer. The seek will
+    not begin until the last pulse is received."
+
+    WTF? Oh come on, Seagate, be consistent at least in a single document.
+
+    ================================
+
+    Step behaviour:
+    During all waiting times, further step_w invocations increase the counter
+
+    - Leading edge increments the counter c and sets the timer to 250us (mode=collect)
+    - When the timer expires (mode=collect):
+   (1)- Calculate the stepping time: time = c*200us; save the counter
+      - Start the timer (mode=move)
+      - When the timer expires (mode=move)
+        - Add the track delta to the current track position
+        - Subtract the delta from the current counter
+        - When the counter is not zero (pulses arrived in the meantime), go to (1)
+        - When the counter is zero, set the timer to 16.8 ms (mode=settle)
+        - When the timer expires (mode=settle)
+          - When the counter is not zero, go to (1)
+          - When the counter is zero, signal seek_complete; done
+
+      Step timing:
+        per track = 20 ms max, full seek: 150 ms max (615 tracks); both including settling time
+        We assume t(1) = 17; t(615)=140
+        t(i) = s+d*i
+        s=(615*t(1)-t(615))/614
+        d=t(1)-s
+        s=16800 us, d=200 us
+*/
+
+void mfm_harddisk_device::step_w(line_state line)
+{
+	// Leading edge
+	if (line == ASSERT_LINE && m_step_line == CLEAR_LINE)
+	{
+		if (m_seek_complete)
+		{
+			m_step_phase = STEP_COLLECT;
+			m_seek_complete = false;
+			m_seek_complete_cb(this, CLEAR_LINE);
+		}
+
+		// Counter will be adjusted according to the direction (+-1)
+		m_track_delta += (m_seek_inward)? +1 : -1;
+		logerror("%s: Got seek pulse; track delta %d\n", tag(), m_track_delta);
+		if (m_track_delta < -670 || m_track_delta > 670)
+		{
+			logerror("%s: Excessive step pulses - doing auto-truncation\n", tag());
+			m_autotruncation = true;
+		}
+		m_seek_timer->adjust(attotime::from_usec(250));
+	}
+	m_step_line = line;
+}
+
+mfm_hd_generic_device::mfm_hd_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: mfm_harddisk_device(mconfig, MFM_HD_GENERIC, "Generic MFM hard disk (byte level)", tag, owner, clock, "mfm_harddisk", __FILE__)
+{
+}
+
+const device_type MFM_HD_GENERIC = &device_creator<mfm_hd_generic_device>;
+
+// ===========================================================================
+// Legacy implementation
+// ===========================================================================
+
+#include "smc92x4.h"
+
+mfm_harddisk_legacy_device::mfm_harddisk_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+: device_t(mconfig, TI99_MFMHD_LEG, "MFM Harddisk LEGACY", tag, owner, clock, "mfm_harddisk_leg", __FILE__)
 {
 }
 
@@ -43,7 +249,7 @@ mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, const ch
     define idents beyond cylinder 1023, but formatting programs seem to
     continue with 0xfd for cylinders between 1024 and 2047.
 */
-UINT8 mfm_harddisk_device::cylinder_to_ident(int cylinder)
+UINT8 mfm_harddisk_legacy_device::cylinder_to_ident(int cylinder)
 {
 	if (cylinder < 256) return 0xfe;
 	if (cylinder < 512) return 0xff;
@@ -55,7 +261,7 @@ UINT8 mfm_harddisk_device::cylinder_to_ident(int cylinder)
 /*
     Returns the linear sector number, given the CHS data.
 */
-bool mfm_harddisk_device::harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, int sector, UINT32 *lba)
+bool mfm_harddisk_legacy_device::harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, int sector, UINT32 *lba)
 {
 	const hard_disk_info *info;
 
@@ -77,7 +283,7 @@ bool mfm_harddisk_device::harddisk_chs_to_lba(hard_disk_file *hdfile, int cylind
 }
 
 /* Accessor functions */
-void mfm_harddisk_device::read_sector(int cylinder, int head, int sector, UINT8 *buf)
+void mfm_harddisk_legacy_device::read_sector(int cylinder, int head, int sector, UINT8 *buf)
 {
 	UINT32 lba;
 	if (VERBOSE>5) LOG("ti99_hd: read_sector(%d, %d, %d)\n", cylinder, head, sector);
@@ -109,7 +315,7 @@ void mfm_harddisk_device::read_sector(int cylinder, int head, int sector, UINT8 
 	m_status |= MFMHD_READY;
 }
 
-void mfm_harddisk_device::write_sector(int cylinder, int head, int sector, UINT8 *buf)
+void mfm_harddisk_legacy_device::write_sector(int cylinder, int head, int sector, UINT8 *buf)
 {
 	UINT32 lba;
 	if (VERBOSE>5) LOG("ti99_hd: write_sector(%d, %d, %d)\n", cylinder, head, sector);
@@ -142,7 +348,7 @@ void mfm_harddisk_device::write_sector(int cylinder, int head, int sector, UINT8
     Searches a block containing number * byte, starting at the given
     position. Returns the position of the first byte of the block.
 */
-int mfm_harddisk_device::find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size_t number)
+int mfm_harddisk_legacy_device::find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size_t number)
 {
 	int i = start;
 	size_t current = number;
@@ -165,7 +371,7 @@ int mfm_harddisk_device::find_block(const UINT8 *buffer, int start, int stop, UI
 		return TI99HD_BLOCKNOTFOUND;
 }
 
-int mfm_harddisk_device::get_track_length()
+int mfm_harddisk_legacy_device::get_track_length()
 {
 	int count;
 	int size;
@@ -187,7 +393,7 @@ int mfm_harddisk_device::get_track_length()
     WARNING: This function is untested! We need to create a suitable
     application program for the TI which makes use of it.
 */
-void mfm_harddisk_device::read_track(int head, UINT8 *trackdata)
+void mfm_harddisk_legacy_device::read_track(int head, UINT8 *trackdata)
 {
 	/* We assume an interleave of 3 for 32 sectors. */
 	int step = 3;
@@ -291,7 +497,7 @@ void mfm_harddisk_device::read_track(int head, UINT8 *trackdata)
     Writes a track to the image. We need to isolate the sector contents.
     This is basically done in the same way as in the SDF format in ti99_dsk.
 */
-void mfm_harddisk_device::write_track(int head, UINT8 *track_image, int data_count)
+void mfm_harddisk_legacy_device::write_track(int head, UINT8 *track_image, int data_count)
 {
 	int current_pos = 0;
 	bool found;
@@ -401,7 +607,7 @@ void mfm_harddisk_device::write_track(int head, UINT8 *track_image, int data_cou
 	}
 }
 
-UINT8 mfm_harddisk_device::get_status()
+UINT8 mfm_harddisk_legacy_device::get_status()
 {
 	UINT8 status = 0;
 	hard_disk_file *file = m_drive->get_hard_disk_file();
@@ -422,7 +628,7 @@ UINT8 mfm_harddisk_device::get_status()
 	return status;
 }
 
-void mfm_harddisk_device::seek(int direction)
+void mfm_harddisk_legacy_device::seek(int direction)
 {
 	const hard_disk_info *info;
 	hard_disk_file *file = m_drive->get_hard_disk_file();
@@ -449,7 +655,7 @@ void mfm_harddisk_device::seek(int direction)
 	m_seeking = false;
 }
 
-void mfm_harddisk_device::get_next_id(int head, chrn_id_hd *id)
+void mfm_harddisk_legacy_device::get_next_id(int head, chrn_id_hd *id)
 {
 	const hard_disk_info *info;
 	hard_disk_file *file;
@@ -479,13 +685,13 @@ void mfm_harddisk_device::get_next_id(int head, chrn_id_hd *id)
 	id->flags = 0;
 }
 
-void mfm_harddisk_device::device_start()
+void mfm_harddisk_legacy_device::device_start()
 {
 	m_current_cylinder = 0;
 	m_current_head = 0;
 }
 
-void mfm_harddisk_device::device_reset()
+void mfm_harddisk_legacy_device::device_reset()
 {
 	m_drive = static_cast<harddisk_image_device *>(subdevice("drive"));
 	m_seeking = false;
@@ -497,9 +703,9 @@ MACHINE_CONFIG_FRAGMENT( mfmhd )
 	MCFG_HARDDISK_ADD("drive")
 MACHINE_CONFIG_END
 
-machine_config_constructor mfm_harddisk_device::device_mconfig_additions() const
+machine_config_constructor mfm_harddisk_legacy_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( mfmhd );
 }
 
-const device_type TI99_MFMHD = &device_creator<mfm_harddisk_device>;
+const device_type TI99_MFMHD_LEG = &device_creator<mfm_harddisk_legacy_device>;

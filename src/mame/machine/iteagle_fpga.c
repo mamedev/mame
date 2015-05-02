@@ -109,7 +109,7 @@ void iteagle_fpga_device::update_sequence(UINT32 data)
 			m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2)&0xFF);
 		} else {
 			val1 = ((m_seq & 0x2)<<6) | ((m_seq & 0x4)<<4) | ((m_seq & 0x8)<<2) | ((m_seq & 0x10)<<0)
-				 | ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4) | ((m_seq & 0x80)>>6) | ((m_seq & 0x100)>>8);
+					| ((m_seq & 0x20)>>2) | ((m_seq & 0x40)>>4) | ((m_seq & 0x80)>>6) | ((m_seq & 0x100)>>8);
 			m_seq = (m_seq>>8) | ((feed&0xff)<<16);
 			m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((val1 + m_seq_rem1 + m_seq_rem2) & 0xff);
 		}
@@ -155,7 +155,6 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 
 WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 {
-
 	COMBINE_DATA(&m_fpga_regs[offset]);
 	switch (offset) {
 		case 0x04/4:

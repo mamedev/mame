@@ -94,7 +94,7 @@ VIDEO_START_MEMBER(toobin_state,toobin)
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::toobin_paletteram_w )
+WRITE16_MEMBER( toobin_state::paletteram_w )
 {
 	int newword;
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER( toobin_state::toobin_paletteram_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::toobin_intensity_w )
+WRITE16_MEMBER( toobin_state::intensity_w )
 {
 	int i;
 
@@ -141,7 +141,7 @@ WRITE16_MEMBER( toobin_state::toobin_intensity_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::toobin_xscroll_w )
+WRITE16_MEMBER( toobin_state::xscroll_w )
 {
 	UINT16 oldscroll = *m_xscroll;
 	UINT16 newscroll = oldscroll;
@@ -160,7 +160,7 @@ WRITE16_MEMBER( toobin_state::toobin_xscroll_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::toobin_yscroll_w )
+WRITE16_MEMBER( toobin_state::yscroll_w )
 {
 	UINT16 oldscroll = *m_yscroll;
 	UINT16 newscroll = oldscroll;
@@ -186,7 +186,7 @@ WRITE16_MEMBER( toobin_state::toobin_yscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::toobin_slip_w )
+WRITE16_MEMBER( toobin_state::slip_w )
 {
 	UINT16 oldslip = m_mob->slipram(offset);
 	UINT16 newslip = oldslip;
@@ -208,7 +208,7 @@ WRITE16_MEMBER( toobin_state::toobin_slip_w )
  *
  *************************************/
 
-UINT32 toobin_state::screen_update_toobin(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 toobin_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);

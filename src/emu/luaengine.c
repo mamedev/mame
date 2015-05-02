@@ -130,7 +130,7 @@ lua_engine::hook::hook()
 	cb = -1;
 }
 
-#if (defined(__sun__) && defined(__svr4__)) || defined(__ANDROID__)
+#if (defined(__sun__) && defined(__svr4__)) || defined(__ANDROID__) || defined(__OpenBSD__)
 #undef _L
 #endif
 
@@ -642,10 +642,10 @@ int lua_engine::lua_screen::l_draw_box(lua_State *L)
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(MAX(0, lua_tointeger(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	y1 = MIN(MAX(0, lua_tointeger(L, 3)), sc_height-1) / static_cast<float>(sc_height);
-	x2 = MIN(MAX(0, lua_tointeger(L, 4)), sc_width-1) / static_cast<float>(sc_width);
-	y2 = MIN(MAX(0, lua_tointeger(L, 5)), sc_height-1) / static_cast<float>(sc_height);
+	x1 = MIN(MAX(0, lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	y1 = MIN(MAX(0, lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	x2 = MIN(MAX(0, lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
+	y2 = MIN(MAX(0, lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
 	UINT32 bgcolor = lua_tounsigned(L, 6);
 	UINT32 fgcolor = lua_tounsigned(L, 7);
 
@@ -680,10 +680,10 @@ int lua_engine::lua_screen::l_draw_line(lua_State *L)
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
 	float x1, y1, x2, y2;
-	x1 = MIN(MAX(0, lua_tointeger(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	y1 = MIN(MAX(0, lua_tointeger(L, 3)), sc_height-1) / static_cast<float>(sc_height);
-	x2 = MIN(MAX(0, lua_tointeger(L, 4)), sc_width-1) / static_cast<float>(sc_width);
-	y2 = MIN(MAX(0, lua_tointeger(L, 5)), sc_height-1) / static_cast<float>(sc_height);
+	x1 = MIN(MAX(0, lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	y1 = MIN(MAX(0, lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	x2 = MIN(MAX(0, lua_tonumber(L, 4)), sc_width-1) / static_cast<float>(sc_width);
+	y2 = MIN(MAX(0, lua_tonumber(L, 5)), sc_height-1) / static_cast<float>(sc_height);
 	UINT32 color = lua_tounsigned(L, 6);
 
 	// draw the line
@@ -707,20 +707,24 @@ int lua_engine::lua_screen::l_draw_text(lua_State *L)
 	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x (integer) expected");
 	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y (integer) expected");
 	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
+	luaL_argcheck(L, lua_isinteger(L, 5) || lua_isnone(L, 5), 5, "optional argument: text color, integer expected (default: 0xffffffff)");
 
 	// retrieve all parameters
 	int sc_width = sc->visible_area().width();
 	int sc_height = sc->visible_area().height();
-	float x = MIN(MAX(0, lua_tointeger(L, 2)), sc_width-1) / static_cast<float>(sc_width);
-	float y = MIN(MAX(0, lua_tointeger(L, 3)), sc_height-1) / static_cast<float>(sc_height);
+	float x = MIN(MAX(0, lua_tonumber(L, 2)), sc_width-1) / static_cast<float>(sc_width);
+	float y = MIN(MAX(0, lua_tonumber(L, 3)), sc_height-1) / static_cast<float>(sc_height);
 	const char *msg = luaL_checkstring(L,4);
-	// TODO: add optional parameters (colors, etc.)
+	rgb_t textcolor = UI_TEXT_COLOR;
+	if (!lua_isnone(L, 5)) {
+		textcolor = rgb_t(lua_tounsigned(L, 5));
+	}
 
 	// draw the text
 	render_container &rc = sc->container();
 	ui_manager &ui = sc->machine().ui();
 	ui.draw_text_full(&rc, msg, x, y , (1.0f - x),
-						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR,
+						JUSTIFY_LEFT, WRAP_WORD, DRAW_NORMAL, textcolor,
 						UI_TEXT_BG_COLOR, NULL, NULL);
 
 	return 0;
@@ -798,9 +802,9 @@ int lua_engine::luaopen_ioport(lua_State *L)
 }
 
 struct msg {
-	astring text;
+	std::string text;
 	int ready;
-	astring response;
+	std::string response;
 	int status;
 	int done;
 } msg;
@@ -813,7 +817,7 @@ void lua_engine::serve_lua()
 	printf("%s v%s - %s\n%s\n%s\n\n", emulator_info::get_applongname(),build_version,emulator_info::get_fulllongname(),emulator_info::get_copyright_info(),LUA_COPYRIGHT);
 	fflush(stdout);
 	char buff[LUA_MAXINPUT];
-	astring oldbuff;
+	std::string oldbuff;
 
 	const char *b = LUA_PROMPT;
 
@@ -826,8 +830,8 @@ void lua_engine::serve_lua()
 		osd_lock_acquire(lock);
 		if (msg.ready == 0) {
 			msg.text = oldbuff;
-			if (oldbuff.len()!=0) msg.text.cat("\n");
-			msg.text.cat(buff);
+			if (oldbuff.length()!=0) msg.text.append("\n");
+			msg.text.append(buff);
 			msg.ready = 1;
 			msg.done = 0;
 		}

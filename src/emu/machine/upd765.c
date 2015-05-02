@@ -379,7 +379,7 @@ void upd765_family_device::set_rate(int rate)
 
 READ8_MEMBER(upd765_family_device::fifo_r)
 {
-	UINT8 r = 0;
+	UINT8 r = 0xff;
 	switch(main_phase) {
 	case PHASE_EXEC:
 		if(internal_drq)
@@ -2181,7 +2181,7 @@ bool upd765_family_device::get_irq() const
 	return cur_irq;
 }
 
-astring upd765_family_device::tts(attotime t)
+std::string upd765_family_device::tts(attotime t)
 {
 	char buf[256];
 	const char *sign = "";
@@ -2194,7 +2194,7 @@ astring upd765_family_device::tts(attotime t)
 	return buf;
 }
 
-astring upd765_family_device::ttsn()
+std::string upd765_family_device::ttsn()
 {
 	return tts(machine().time());
 }

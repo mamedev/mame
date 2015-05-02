@@ -63,14 +63,34 @@ DIP locations verified for:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/tms5110.h"
 #include "includes/bagman.h"
 
 
-WRITE8_MEMBER(bagman_state::bagman_ls259_w)
+void bagman_state::machine_start()
 {
-	tmsprom_device *tmsprom = machine().device<tmsprom_device>("tmsprom");
-	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_columnvalue));
+}
+
+MACHINE_START_MEMBER(bagman_state, bagman)
+{
+	bagman_state::machine_start();
+	save_item(NAME(m_ls259_buf));
+}
+
+MACHINE_START_MEMBER(bagman_state, squaitsa)
+{
+	bagman_state::machine_start();
+	save_item(NAME(m_p1_res));
+	save_item(NAME(m_p1_old_val));
+	save_item(NAME(m_p2_res));
+	save_item(NAME(m_p2_old_val));
+}
+
+
+WRITE8_MEMBER(bagman_state::ls259_w)
+{
+	pal16r6_w(space, offset,data); /*this is just a simulation*/
 
 	if (m_ls259_buf[offset] != (data&1) )
 	{
@@ -81,22 +101,22 @@ WRITE8_MEMBER(bagman_state::bagman_ls259_w)
 		case 0:
 		case 1:
 		case 2:
-			tmsprom->bit_w(space, 0, 7 - ((m_ls259_buf[0]<<2) | (m_ls259_buf[1]<<1) | (m_ls259_buf[2]<<0)));
+			m_tmsprom->bit_w(space, 0, 7 - ((m_ls259_buf[0]<<2) | (m_ls259_buf[1]<<1) | (m_ls259_buf[2]<<0)));
 			break;
 		case 3:
-			tmsprom->enable_w(m_ls259_buf[offset]);
+			m_tmsprom->enable_w(m_ls259_buf[offset]);
 			break;
 		case 4:
-			tmsprom->rom_csq_w(space, 0, m_ls259_buf[offset]);
+			m_tmsprom->rom_csq_w(space, 0, m_ls259_buf[offset]);
 			break;
 		case 5:
-			tmsprom->rom_csq_w(space, 1, m_ls259_buf[offset]);
+			m_tmsprom->rom_csq_w(space, 1, m_ls259_buf[offset]);
 			break;
 		}
 	}
 }
 
-WRITE8_MEMBER(bagman_state::bagman_coin_counter_w)
+WRITE8_MEMBER(bagman_state::coincounter_w)
 {
 	coin_counter_w(machine(), offset,data);
 }
@@ -109,20 +129,20 @@ WRITE8_MEMBER(bagman_state::irq_mask_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP    /* written to, but unused */
-	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ(bagman_ls259_r) /*just for debugging purposes*/
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_SHARE("video_enable")
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
 	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram") /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
-									/* writes are handled by bagman_colorram_w */
-	AM_RANGE(0xa800, 0xa805) AM_WRITE(bagman_ls259_w) /* TMS5110 driving state machine */
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
+									/* writes are handled by colorram_w */
+	AM_RANGE(0xa800, 0xa805) AM_WRITE(ls259_w) /* TMS5110 driving state machine */
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(coincounter_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READNOP                             /* looks like watchdog from schematics */
 
@@ -138,16 +158,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram") /* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
-									/* writes are handled by bagman_colorram_w */
+									/* writes are handled by colorram_w */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP    /* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_SHARE("video_enable")
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(coincounter_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
 
@@ -389,7 +409,7 @@ GFXDECODE_END
 
 
 /* squaitsa doesn't map the dial directly, instead it polls the results of the dial through an external circuitry.
-   I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
+   I don't know if the following is correct, there can possibly be multiple solutions for the same problem. */
 READ8_MEMBER(bagman_state::dial_input_p1_r)
 {
 	UINT8 dial_val;
@@ -445,19 +465,18 @@ static MACHINE_CONFIG_START( bagman, bagman_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
-	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
+	MCFG_MACHINE_START_OVERRIDE(bagman_state, bagman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update_bagman)
+	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
-	MCFG_VIDEO_START_OVERRIDE(bagman_state,bagman)
 
 	MCFG_DEVICE_ADD("tmsprom", TMSPROM, 640000 / 2)  /* rom clock */
 	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
@@ -495,19 +514,16 @@ static MACHINE_CONFIG_START( pickin, bagman_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
-	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update_bagman)
+	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pickin)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
-	MCFG_VIDEO_START_OVERRIDE(bagman_state,bagman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -548,19 +564,16 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
-	MCFG_MACHINE_RESET_OVERRIDE(bagman_state,bagman)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update_bagman)
+	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)
 
 	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
-	MCFG_VIDEO_START_OVERRIDE(bagman_state,bagman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -575,6 +588,8 @@ static MACHINE_CONFIG_START( botanic, bagman_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( squaitsa, botanic )
+	MCFG_MACHINE_START_OVERRIDE(bagman_state, squaitsa)
+
 	MCFG_SOUND_MODIFY("aysnd")
 	MCFG_AY8910_PORT_A_READ_CB(READ8(bagman_state, dial_input_p1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(bagman_state, dial_input_p2_r))
@@ -976,19 +991,19 @@ DRIVER_INIT_MEMBER(bagman_state,bagman)
 }
 
 
-GAME( 1982, bagman,   0,       bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Bagman", 0 )
-GAME( 1982, bagnard,  bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 1)", 0 )
-GAME( 1982, bagnarda, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 )
-GAME( 1982, bagnardi, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", 0 )
-GAME( 1982, bagmans,  bagman,  bagman,  bagmans, bagman_state, bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", 0 )
-GAME( 1982, bagmans2, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", 0 )
+GAME( 1982, bagman,   0,       bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Bagman", GAME_SUPPORTS_SAVE )
+GAME( 1982, bagnard,  bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, bagnarda, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, bagnardi, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT90,  "Valadon Automation (Itisa license)", "Le Bagnard (Itisa, Spain)", GAME_SUPPORTS_SAVE )
+GAME( 1982, bagmans,  bagman,  bagman,  bagmans, bagman_state, bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, bagmans2, bagman,  bagman,  bagman, bagman_state,  bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1984, sbagman,  0,       bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation", "Super Bagman", 0 )
-GAME( 1984, sbagmans, sbagman, bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", 0 )
+GAME( 1984, sbagman,  0,       bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation", "Super Bagman", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbagmans, sbagman, bagman,  sbagman, driver_device, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, pickin,   0,       pickin,  pickin, driver_device,  0,       ROT270, "Valadon Automation", "Pickin'", 0 )
+GAME( 1983, pickin,   0,       pickin,  pickin, driver_device,  0,       ROT270, "Valadon Automation", "Pickin'", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,  0,       botanic, botanici,driver_device, 0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", 0 )
-GAME( 1984, botanicf, botanic, botanic, botanicf,driver_device, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", 0 )
+GAME( 1983, botanic,  0,       botanic, botanici,driver_device, 0,       ROT90,  "Itisa",                              "Botanic (English / Spanish)", GAME_SUPPORTS_SAVE )
+GAME( 1984, botanicf, botanic, botanic, botanicf,driver_device, 0,       ROT270, "Itisa (Valadon Automation license)", "Botanic (French)", GAME_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa, 0,       squaitsa,squaitsa, driver_device,0,       ROT0,   "Itisa", "Squash (Itisa)", 0 )
+GAME( 1984, squaitsa, 0,       squaitsa,squaitsa, driver_device,0,       ROT0,   "Itisa", "Squash (Itisa)", GAME_SUPPORTS_SAVE )
