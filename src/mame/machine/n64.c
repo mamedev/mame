@@ -15,9 +15,6 @@ UINT32 *rsp_dmem;
 // device type definition
 const device_type N64PERIPH = &device_creator<n64_periphs>;
 
-int mouse_dx = 0, mouse_dy = 0, mouse_x2 = 0, mouse_y2 = 0, mouse_cntx = 0, mouse_cnty = 0;
-
-
 
 
 
@@ -272,6 +269,13 @@ void n64_periphs::device_reset()
 		pif_ram[0x26] = 0x85;
 		pif_ram[0x27] = 0x3f;
 		cic_type=6;
+	}
+
+	// Mouse X2/Y2 for delta
+	for (int i = 0; i < 4; i++)
+	{
+		mouse_x2[i] = 0;
+		mouse_y2[i] = 0;
 	}
 }
 
@@ -1799,52 +1803,53 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 							//x /= 4;
 							//y /= 4;
 
-							if (x != mouse_x2)
+							int mouse_dx = 0;
+							int mouse_dy = 0;
+
+							if (x != mouse_x2[channel])
 							{
-								mouse_dx = x - mouse_x2;
+								mouse_dx = x - mouse_x2[channel];
 
 								if (mouse_dx > 0x40)
 									mouse_dx = (0x80) - mouse_dx;
 								else if (mouse_dx < -0x40)
 									mouse_dx = -(0x80) - mouse_dx;
 
-								mouse_cntx = mouse_dx;
-								mouse_x2 = x;
+								mouse_x2[channel] = x;
 							}
 
-							if (y != mouse_y2)
+							if (y != mouse_y2[channel])
 							{
-								mouse_dy = y - mouse_y2;
+								mouse_dy = y - mouse_y2[channel];
 
 								if (mouse_dy > 0x40)
 									mouse_dy = (0x80) - mouse_dy;
 								else if (mouse_dy < -0x40)
 									mouse_dy = -(0x80) - mouse_dy;
 
-								mouse_cnty = mouse_dy;
-								mouse_y2 = y;
+								mouse_y2[channel] = y;
 							}
 
-							if (mouse_cntx)
+							if (mouse_dx)
 							{
-								if(mouse_cntx < 0)
-									mouse_cntx++;
+								if(mouse_dx < 0)
+									mouse_dx++;
 								else
-									mouse_cntx--;
+									mouse_dx--;
 							}
 
-							if (mouse_cnty)
+							if (mouse_dy)
 							{
-								if(mouse_cnty < 0)
-									mouse_cnty++;
+								if(mouse_dy < 0)
+									mouse_dy++;
 								else
-									mouse_cnty--;
+									mouse_dy--;
 							}
 
 							rdata[0] = (buttons >> 8) & 0xff;
 							rdata[1] = (buttons >> 0) & 0xff;
-							rdata[2] = (UINT8)(mouse_cntx);
-							rdata[3] = (UINT8)(mouse_cnty);
+							rdata[2] = (UINT8)(mouse_dx);
+							rdata[3] = (UINT8)(mouse_dy);
 							return 0;
 
 					}
