@@ -126,7 +126,7 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( wms, wms_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK / 2 )   // AMD N80C188-20
+	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )   // AMD N80C188-20, ( 40 MHz. internally divided by 2)
 	MCFG_CPU_PROGRAM_MAP(wms_map)
 	MCFG_CPU_IO_MAP(wms_io)
 MACHINE_CONFIG_END
