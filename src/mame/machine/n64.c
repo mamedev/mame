@@ -15,6 +15,8 @@ UINT32 *rsp_dmem;
 // device type definition
 const device_type N64PERIPH = &device_creator<n64_periphs>;
 
+int mouse_dx = 0, mouse_dy = 0, mouse_x2 = 0, mouse_y2 = 0, mouse_cntx = 0, mouse_cnty = 0;
+
 
 
 
@@ -1709,18 +1711,28 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			{
 				case 0:
 				case 1:
-				{
-					// Read status
-					rdata[0] = 0x05;
-					rdata[1] = 0x00;
-					rdata[2] = 0x01;
-					return 0;
-				}
 				case 2:
 				case 3:
 				{
-					// Read status (unconnected)
-					return 1;
+					// Read status
+					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
+					{
+						case 0:				//NONE (unconnected)
+						case 3:				//Invalid
+							return 1;
+
+						case 1:				//JOYPAD
+							rdata[0] = 0x05;
+							rdata[1] = 0x00;
+							rdata[2] = 0x01;
+							return 0;
+
+						case 2:				//MOUSE
+							rdata[0] = 0x02;
+							rdata[1] = 0x00;
+							rdata[2] = 0x01;
+							return 0;
+					}
 				}
 				case 4:
 				{
@@ -1744,9 +1756,11 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 		case 0x01:      // Read button values
 		{
 			UINT16 buttons = 0;
-			INT8 x = 0, y = 0;
-			/* add here tags for P3 and P4 when implemented */
-			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P2", "P2_ANALOG_X", "P2_ANALOG_Y" };
+			int x = 0, y = 0;
+			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P1_MOUSE_X", "P1_MOUSE_Y",
+													"P2", "P2_ANALOG_X", "P2_ANALOG_Y", "P2_MOUSE_X", "P2_MOUSE_Y",
+													"P3", "P3_ANALOG_X", "P3_ANALOG_Y", "P3_MOUSE_X", "P3_MOUSE_Y",
+													"P4", "P4_ANALOG_X", "P4_ANALOG_Y", "P4_MOUSE_X", "P4_MOUSE_Y" };
 
 			if (slength != 1 || rlength != 4)
 			{
@@ -1757,22 +1771,83 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			{
 				case 0: // P1 Inputs
 				case 1: // P2 Inputs
+				case 2: // P3 Inputs
+				case 3:	// P4 Inputs
 				{
-					buttons = machine().root_device().ioport(portnames[(channel*3) + 0])->read();
-					x = machine().root_device().ioport(portnames[(channel*3) + 1])->read() - 128;
-					y = machine().root_device().ioport(portnames[(channel*3) + 2])->read() - 128;
+					switch ((machine().root_device().ioport("input")->read() >> (2 * channel)) & 3)
+					{
+						case 0:			//NONE
+						case 3:			//Invalid
+							return 1;
 
-					rdata[0] = (buttons >> 8) & 0xff;
-					rdata[1] = (buttons >> 0) & 0xff;
-					rdata[2] = (UINT8)(x);
-					rdata[3] = (UINT8)(y);
-					return 0;
-				}
-				case 2:
-				case 3:
-				{
-					// P3/P4 Inputs (not connected)
-					return 1;
+						case 1:			//JOYPAD
+							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
+							x = machine().root_device().ioport(portnames[(channel*5) + 1])->read() - 128;
+							y = machine().root_device().ioport(portnames[(channel*5) + 2])->read() - 128;
+
+							rdata[0] = (buttons >> 8) & 0xff;
+							rdata[1] = (buttons >> 0) & 0xff;
+							rdata[2] = (UINT8)(x);
+							rdata[3] = (UINT8)(y);
+							return 0;
+
+						case 2:			//MOUSE
+							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
+							x = machine().root_device().ioport(portnames[(channel*5) + 1 + 2])->read() - 128;
+							y = machine().root_device().ioport(portnames[(channel*5) + 2 + 2])->read() - 128;
+
+							//x /= 4;
+							//y /= 4;
+
+							if (x != mouse_x2)
+							{
+								mouse_dx = x - mouse_x2;
+
+								if (mouse_dx > 0x40)
+									mouse_dx = (0x80) - mouse_dx;
+								else if (mouse_dx < -0x40)
+									mouse_dx = -(0x80) - mouse_dx;
+
+								mouse_cntx = mouse_dx;
+								mouse_x2 = x;
+							}
+
+							if (y != mouse_y2)
+							{
+								mouse_dy = y - mouse_y2;
+
+								if (mouse_dy > 0x40)
+									mouse_dy = (0x80) - mouse_dy;
+								else if (mouse_dy < -0x40)
+									mouse_dy = -(0x80) - mouse_dy;
+
+								mouse_cnty = mouse_dy;
+								mouse_y2 = y;
+							}
+
+							if (mouse_cntx)
+							{
+								if(mouse_cntx < 0)
+									mouse_cntx++;
+								else
+									mouse_cntx--;
+							}
+
+							if (mouse_cnty)
+							{
+								if(mouse_cnty < 0)
+									mouse_cnty++;
+								else
+									mouse_cnty--;
+							}
+
+							rdata[0] = (buttons >> 8) & 0xff;
+							rdata[1] = (buttons >> 0) & 0xff;
+							rdata[2] = (UINT8)(mouse_cntx);
+							rdata[3] = (UINT8)(mouse_cnty);
+							return 0;
+
+					}
 				}
 			}
 
