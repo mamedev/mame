@@ -21,7 +21,7 @@
 
   4x (1-2-4/8 Mb selectable through jumper) program ROM sockets. [XU02, XU03, XU04, XU05] 
   4x (1-2-4/8 Mb selectable through jumper) sound ROM sockets. [XU17, XU18, XU30, XU31]
-  1x unknown serial EEPROM (DIP8) (missing) [XU27]
+  1x unknown serial EEPROM (DIP8) (currently missing) [XU27]
 
   4x ISSI IS41C16257-60K (256K x 16, 4-MBit Dynamic RAM with fast page mode) [U14, U15, U22, U23]
   2x Cypress Semiconductor CY62256LL-70SNC (32K x 8 Static RAM) (near program ROMs) [U6, U9]
