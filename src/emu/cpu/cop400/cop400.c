@@ -51,7 +51,6 @@
 
     TODO:
 
-    - remove LBIOps
     - remove InstLen
     - run interrupt test suite
     - run production test suite
@@ -198,9 +197,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 
 	/* initialize instruction length array */
 	for (i=0; i<256; i++) m_InstLen[i]=1;
-	/* initialize LBI opcode array */
-	for (i=0x00; i<0x100; i++) m_LBIops[i] = 0;
-	for (i=0; i<256; i++) m_LBIops33[i] = 0;
 
 	switch (featuremask)
 	{
@@ -210,11 +206,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 			/* initialize instruction length array */
 			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x68] =
 			m_InstLen[0x69] = m_InstLen[0x33] = m_InstLen[0x23] = 2;
-			/* initialize LBI opcode array */
-			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
-			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
-			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
-			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
 			break;
 
 		case COP420_FEATURE:
@@ -224,12 +215,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
 			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
 			m_InstLen[0x33] = m_InstLen[0x23] = 2;
-			/* initialize LBI opcode array */
-			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
-			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
-			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
-			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
-			for (i=0x80; i<0xc0; i++) m_LBIops33[i] = 1;
 			break;
 
 		case COP444_FEATURE:
@@ -239,13 +224,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
 			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
 			m_InstLen[0x33] = m_InstLen[0x23] = 2;
-			/* initialize LBI opcode array */
-			for (i=0x00; i<0x100; i++) m_LBIops[i] = 0;
-			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
-			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
-			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
-			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
-			for (i=0x80; i<0xc0; i++) m_LBIops33[i] = 1;
 			break;
 
 		default:
@@ -1025,7 +1003,6 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_skl));
 	save_item(NAME(m_t));
 	save_item(NAME(m_skip));
-	save_item(NAME(m_skip_lbi));
 	save_item(NAME(m_skt_latch));
 	save_item(NAME(m_si));
 	save_item(NAME(m_last_skip));
@@ -1093,7 +1070,6 @@ void cop400_cpu_device::device_start()
 	m_il = 0;
 	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
 	m_si = 0;
-	m_skip_lbi = 0;
 	m_last_skip = 0;
 	m_microbus_int = 0;
 	m_skip = 0;
@@ -1118,6 +1094,7 @@ void cop400_cpu_device::device_reset()
 	T = 0;
 	m_skt_latch = 1;
 
+	m_last_opcode_function = INST(nop);
 	m_halt = 0;
 	m_idle = 0;
 }
@@ -1128,8 +1105,6 @@ void cop400_cpu_device::device_reset()
 
 void cop400_cpu_device::execute_run()
 {
-	UINT8 opcode;
-
 	do
 	{
 		m_prevpc = PC;
@@ -1147,87 +1122,61 @@ void cop400_cpu_device::execute_run()
 			continue;
 		}
 
-		opcode = ROM(PC);
-		if (m_skip_lbi)
+		UINT8 opcode = ROM(PC);
+		int inst_cycles = m_opcode_map[opcode].cycles;
+
+		PC++;
+
+		(this->*(m_opcode_map[opcode].function))(opcode);
+		m_last_opcode_function = m_opcode_map[opcode].function;
+		m_icount -= inst_cycles;
+
+		// check for interrupt
+
+		if (BIT(EN, 1) && BIT(IL, 1))
 		{
-			int is_lbi = 0;
+			cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
 
-			if (opcode == 0x33)
+			// all successive transfer of control instructions and successive LBIs have been completed
+			if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)) && !(m_last_opcode_function == INST(lbi) && function == INST(lbi)))
 			{
-				is_lbi = m_LBIops33[ROM(PC+1)];
-			}
-			else
-			{
-				is_lbi = m_LBIops[opcode];
+				// store skip logic
+				m_last_skip = m_skip;
+				m_skip = 0;
+
+				// push next PC
+				PUSH(PC);
+
+				// jump to interrupt service routine
+				PC = 0x0ff;
+
+				// disable interrupt
+				EN &= ~0x02;
 			}
 
-			if (is_lbi)
-			{
-				m_icount -= m_opcode_map[opcode].cycles;
-
-				PC += m_InstLen[opcode];
-			}
-			else
-			{
-				m_skip_lbi = 0;
-			}
+			IL &= ~2;
 		}
 
-		if (!m_skip_lbi)
+		// skip next instruction?
+
+		if (m_skip)
 		{
-			int inst_cycles = m_opcode_map[opcode].cycles;
+			cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
 
-			PC++;
+			opcode = ROM(PC);
 
-			(this->*(m_opcode_map[opcode].function))(opcode);
-			m_icount -= inst_cycles;
-
-			// check for interrupt
-
-			if (BIT(EN, 1) && BIT(IL, 1))
+			if ((function == INST(lqid)) || (function == INST(jid)))
 			{
-				cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
-
-				if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)))
-				{
-					// store skip logic
-					m_last_skip = m_skip;
-					m_skip = 0;
-
-					// push next PC
-					PUSH(PC);
-
-					// jump to interrupt service routine
-					PC = 0x0ff;
-
-					// disable interrupt
-					EN &= ~0x02;
-				}
-
-				IL &= ~2;
+				m_icount -= 1;
+			}
+			else
+			{
+				m_icount -= m_opcode_map[opcode].cycles;
 			}
 
-			// skip next instruction?
+			PC += m_InstLen[opcode];
 
-			if (m_skip)
-			{
-				cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
-
-				opcode = ROM(PC);
-
-				if ((function == INST(lqid)) || (function == INST(jid)))
-				{
-					m_icount -= 1;
-				}
-				else
-				{
-					m_icount -= m_opcode_map[opcode].cycles;
-				}
-
-				PC += m_InstLen[opcode];
-
-				m_skip = 0;
-			}
+			m_skip = 0;
 		}
 	} while (m_icount > 0);
 }

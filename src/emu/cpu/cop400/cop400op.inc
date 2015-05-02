@@ -913,6 +913,11 @@ INSTRUCTION( cba )
 
 INSTRUCTION( lbi )
 {
+	if (m_last_opcode_function == INST(lbi))
+	{
+		return;
+	}
+
 	if (opcode & 0x80)
 	{
 		B = opcode & 0x7f;
@@ -921,8 +926,6 @@ INSTRUCTION( lbi )
 	{
 		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
 	}
-
-	m_skip_lbi = 1;
 }
 
 /*
