@@ -11,7 +11,7 @@
 
   * Five Clown (English, set 1), 1993, IGS.
   * Five Clown (English, set 2), 1993, IGS.
-  * Five Clown (Spanish hack),   1993, IGS.
+  * Five Clown (Spanish, hack),  1993, IGS.
 
 
   This hardware seems to be based on Bonanza's Golden Poker, but on steroids...
