@@ -15,7 +15,7 @@
   WMS CPU 1.5 (Plus) MPU/CPU board:
 
   1x AMD N80C188-20 (CMOS High-Integration 16-bit Microprocessor), @20Mhz (40/2) [XU12]
-  1X Analog Devices ADSP-2105 (Single-Chip 16-bit Microcomputers: 20 MIPS, 5v, 1 Serial Port) [U28]
+  1X Analog Devices ADSP-2105 KP-55 (Single-Chip 16-bit Microcomputers: 20 MIPS, 5v, 1 Serial Port) [U28]
   1x Cirrus Logic CL-GD5429-86QC-C (VGA Graphics Controller) [U32]
   1x QuickLogic QL2003-XPF144C FPGA [U21]
 
@@ -80,6 +80,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "cpu/adsp2100/adsp2100.h"
 
 
 class wms_state : public driver_device
@@ -107,8 +108,14 @@ static ADDRESS_MAP_START( wms_map, AS_PROGRAM, 8, wms_state )
 	AM_RANGE(0x00000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( wms_io, AS_IO, 8, wms_state )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, wms_state )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, wms_state )
 ADDRESS_MAP_END
 
 
@@ -126,9 +133,14 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( wms, wms_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )   // AMD N80C188-20, ( 40 MHz. internally divided by 2)
+	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
 	MCFG_CPU_PROGRAM_MAP(wms_map)
 	MCFG_CPU_IO_MAP(wms_io)
+
+	MCFG_CPU_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
+	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
+	MCFG_CPU_DATA_MAP(adsp_data_map)
+
 MACHINE_CONFIG_END
 
 
