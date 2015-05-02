@@ -36,6 +36,7 @@ In order to get the game to run, follow these steps:
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "video/clgd542x.h"
+#include "machine/nvram.h"
 
 
 class gambl186_state : public driver_device
@@ -61,7 +62,7 @@ public:
 
 
 static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("data",0) // TODO: way bigger than this, banked?
 	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
@@ -525,6 +526,8 @@ static MACHINE_CONFIG_START( gambl186, gambl186_state )
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_40MHz/2)
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
 MACHINE_CONFIG_END
