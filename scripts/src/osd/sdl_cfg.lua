@@ -79,7 +79,6 @@ if BASE_TARGETOS=="unix" then
 			}
 		else
 			defines {
-				"NO_SDL_GLEXT",
 				"MACOSX_USE_LIBSDL",
 			}
 			buildoptions {
