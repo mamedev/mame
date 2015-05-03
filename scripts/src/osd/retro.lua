@@ -147,6 +147,10 @@ project ("libco")
 	uuid (os.uuid("libco"))
 	kind "StaticLib"
 
+	includedirs {
+		MAME_DIR .. "src/osd/retro/libretro-common/include",
+	}
+
 	files {
 		MAME_DIR .. "src/osd/retro/libretro-common/libco/libco.c",
 	}
