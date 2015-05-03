@@ -29,6 +29,11 @@ In order to get the game to run, follow these steps:
 (This is the "password" for the EEPROM.  You have three attempts to get it correct, otherwise the service mode will restart)
 - if accepted, disable service mode DIP switch
 - reset machine (press 'F3')
+
+TODO:
+- inputs needs overhaul, namely fix coins and games enable (right now only Bingo 10 is enabled);
+- watchdog (service mode claims that there's one at the end of the aforementioned procedure);
+- sound;
 */
 
 
@@ -36,6 +41,7 @@ In order to get the game to run, follow these steps:
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "video/clgd542x.h"
+#include "machine/nvram.h"
 
 
 class gambl186_state : public driver_device
@@ -54,15 +60,20 @@ public:
     int m_comms_blocks;
     bool m_comms_ack;
 
+	virtual void machine_start();
 	DECLARE_READ16_MEMBER(comms_r);
 	DECLARE_WRITE16_MEMBER(comms_w);
+	DECLARE_WRITE16_MEMBER(data_bank_w);
 };
 
-
+void gambl186_state::machine_start()
+{
+	membank("data_bank")->configure_entries(0, 4, memregion("data")->base(), 0x40000);
+}
 
 static ADDRESS_MAP_START( gambl186_map, AS_PROGRAM, 16, gambl186_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("data",0) // TODO: way bigger than this, banked?
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x40000, 0x7ffff) AM_ROMBANK("data_bank") // TODO: way bigger than this, banked?
 	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
@@ -225,6 +236,13 @@ WRITE16_MEMBER(gambl186_state::comms_w)
     }
 }
 
+WRITE16_MEMBER( gambl186_state::data_bank_w)
+{
+	membank("data_bank")->set_entry(data & 3);
+	if(data & 0xfffc)
+		popmessage("warning: set %04x to data bank",data);
+}
+
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffff)
@@ -240,6 +258,7 @@ static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW2") AM_WRITENOP // ???
 	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
 	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
+	AM_RANGE(0x0700, 0x0701) AM_WRITE(data_bank_w)
 ADDRESS_MAP_END
 
 
@@ -526,6 +545,8 @@ static MACHINE_CONFIG_START( gambl186, gambl186_state )
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
 MACHINE_CONFIG_END
 
@@ -559,5 +580,6 @@ ROM_START( gambl186a )
 ROM_END
 
 
-GAME( 1999, gambl186,  0,        gambl186,   gambl186, driver_device,   0,       ROT0,  "<unknown>", "unknown 186 based gambling game (V398)",         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,       ROT0,  "<unknown>", "unknown 186 based gambling game (V399)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+/* TODO: proper title, at least sub-label all games inside it. */
+GAME( 1997, gambl186,  0,        gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V398)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V399)",         GAME_NOT_WORKING | GAME_NO_SOUND )

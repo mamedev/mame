@@ -2035,7 +2035,7 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 		break;
 	case NV2A_VTXBUF_TYPE_UBYTE:
 		u = space.read_dword(address + 0);
-		for (c = l-1; c >= l; c--) {
+		for (c = l-1; c >= 0; c--) {
 			vertex.attribute[attrib].fv[c] = (u & 0xff) / 255.0;
 			u = u >> 8;
 		}
@@ -3023,9 +3023,9 @@ UINT32 nv2a_renderer::combiner_float_argb8(float reg[4])
 	UINT32 r, g, b, a;
 
 	a = reg[3] * 255.0;
-	b = reg[2] * 255.0;
+	r = reg[2] * 255.0;
 	g = reg[1] * 255.0;
-	r = reg[0] * 255.0;
+	b = reg[0] * 255.0;
 	return (a << 24) | (r << 16) | (g << 8) | b;
 }
 

@@ -367,6 +367,9 @@ static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, aleck64_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aleck64 )
+	PORT_START("input")
+	PORT_BIT( 0xff, 0x05, IPT_SPECIAL )                                     // Tell base driver to expect two gamepads
+
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)          // Button A
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)          // Button B
@@ -497,14 +500,10 @@ static INPUT_PORTS_START( 11beat )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mtetrisc )
+
 	// The basic N64 controls are unused in this game
-	PORT_START("P1")
-	PORT_START("P1_ANALOG_X")
-	PORT_START("P1_ANALOG_Y")
-	PORT_START("P2")
-	PORT_START("P2_ANALOG_X")
-	PORT_START("P2_ANALOG_Y")
-	PORT_START("INMJ")
+	PORT_START("input")
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL )
 
 	PORT_START("IN0")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -534,6 +533,9 @@ static INPUT_PORTS_START( mtetrisc )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( starsldr )
+	PORT_START("input")
+	PORT_BIT( 0xff, 0x05, IPT_SPECIAL )                                     // Tell base driver to expect two gamepads
+
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)          // Button A
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)          // Button B
@@ -636,13 +638,9 @@ static INPUT_PORTS_START( starsldr )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
-	static INPUT_PORTS_START( doncdoon )
-	PORT_START("P1")
-	PORT_START("P1_ANALOG_X")
-	PORT_START("P1_ANALOG_Y")
-	PORT_START("P2")
-	PORT_START("P2_ANALOG_X")
-	PORT_START("P2_ANALOG_Y")
+static INPUT_PORTS_START( doncdoon )
+	PORT_START("input")
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL ) // Disable standard N64 controls
 
 	PORT_START("IN0")
 	PORT_BIT(0xfcff8080, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -685,13 +683,8 @@ static INPUT_PORTS_START( kurufev )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( twrshaft )
-	PORT_START("P1")
-	PORT_START("P1_ANALOG_X")
-	PORT_START("P1_ANALOG_Y")
-	PORT_START("P2")
-	PORT_START("P2_ANALOG_X")
-	PORT_START("P2_ANALOG_Y")
-	PORT_START("INMJ")
+	PORT_START("input")
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL ) // Disable standard N64 controls
 
 	PORT_START("IN0")
 	PORT_BIT(0xff7fffe0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -713,14 +706,10 @@ static INPUT_PORTS_START( twrshaft )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hipai )
-	PORT_START("P1")
-	PORT_START("P1_ANALOG_X")
-	PORT_START("P1_ANALOG_Y")
-	PORT_START("P2")
-	PORT_START("P2_ANALOG_X")
-	PORT_START("P2_ANALOG_Y")
+	PORT_START("input")
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL ) // Disable standard N64 controls
 
-PORT_START("INMJ")
+	PORT_START("INMJ")
 	PORT_BIT( 0xe1c1c0c1, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_MAHJONG_A )

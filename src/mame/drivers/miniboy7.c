@@ -77,8 +77,10 @@
   $0100 - $01FF   RAM     ; 6502 Stack Pointer.
   $0200 - $07FF   RAM     ; R/W. (settings)
 
-  $0800 - $0FFF   Video RAM
-  $1000 - $17FF   Color RAM
+  $0800 - $0FFF   Video RAM A
+  $1000 - $17FF   Color RAM A
+  $1800 - $1FFF   Video RAM B
+  $2000 - $27FF   Color RAM B
 
   $2800 - $2801   MC6845  ; MC6845 use $2800 for register addressing and $2801 for register values.
 
@@ -130,13 +132,8 @@
 
   TODO:
 
-  - Inputs.
-  - DIP Switches.
-  - NVRAM support.
-  - Support for bottom scroll (big user message).
-  - Figure out the colors.
-  - Figure out the sound.
-  - Final cleanup and split the driver.
+  - Lamps layout.
+  - Improve colors.
 
 
 *******************************************************************************/
@@ -157,22 +154,46 @@ class miniboy7_state : public driver_device
 public:
 	miniboy7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
+		m_videoram_a(*this, "videoram_a"),
+		m_colorram_a(*this, "colorram_a"),
+		m_videoram_b(*this, "videoram_b"),
+		m_colorram_b(*this, "colorram_b"),
+		m_gfx1(*this, "gfx1"),
+		m_gfx2(*this, "gfx2"),
+		m_proms(*this, "proms"),
+		m_input2(*this, "INPUT2"),
+		m_dsw2(*this, "DSW2"),
 		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(miniboy7_videoram_w);
-	DECLARE_WRITE8_MEMBER(miniboy7_colorram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start();
-	DECLARE_PALETTE_INIT(miniboy7);
-	UINT32 screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<UINT8> m_videoram_a;
+	required_shared_ptr<UINT8> m_colorram_a;
+	required_shared_ptr<UINT8> m_videoram_b;
+	required_shared_ptr<UINT8> m_colorram_b;
+	required_region_ptr<UINT8> m_gfx1;
+	required_region_ptr<UINT8> m_gfx2;
+	required_region_ptr<UINT8> m_proms;
+	required_ioport m_input2;
+	required_ioport m_dsw2;
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+
+	DECLARE_WRITE8_MEMBER(ay_pa_w);
+	DECLARE_WRITE8_MEMBER(ay_pb_w);
+	DECLARE_READ8_MEMBER(pia_pb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+
+	void machine_reset();
+
+	int get_color_offset(UINT8 tile, UINT8 attr, int ra, int px);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	DECLARE_PALETTE_INIT(miniboy7);
+
+private:
+	UINT8 m_ay_pb;
+	int m_gpri;
 };
 
 
@@ -180,54 +201,57 @@ public:
 *          Video Hardware          *
 ***********************************/
 
-WRITE8_MEMBER(miniboy7_state::miniboy7_videoram_w)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(miniboy7_state::miniboy7_colorram_w)
-{
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(miniboy7_state::get_bg_tile_info)
+int miniboy7_state::get_color_offset(UINT8 tile, UINT8 attr, int ra, int px)
 {
 /*  - bits -
     7654 3210
-    --xx xx--   tiles color?.
-    ---- --x-   tiles bank.
-    xx-- ---x   seems unused. */
+    xxxx ----   tiles color.
+    ---- -xxx   tiles bank.
+    ---- x---   seems unused. */
 
-	int attr = m_colorram[tile_index];
-	int code = m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
-	int color = (attr & 0x3c) >> 2;  /* bits 2-3-4-5 for color? */
+	int color = (attr >> 4) & 0x0f;
 
-	if (bank == 1)  /* temporary hack to point to the 3rd gfx bank */
-		bank = 2;
+	if (attr & 0x04)
+	{
+		int bank = (attr & 0x03) << 8;
+		UINT8 bitplane0 = m_gfx2[0x0000 + ((tile + bank) << 3) + ra];
+		UINT8 bitplane1 = m_gfx2[0x2000 + ((tile + bank) << 3) + ra];
+		UINT8 bitplane2 = m_gfx2[0x4000 + ((tile + bank) << 3) + ra];
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+		return (color << 3) + ((BIT(bitplane0 << px, 7) << 0) | (BIT(bitplane1 << px, 7) << 1) | (BIT(bitplane2 << px, 7) << 2));
+	}
+	else
+	{
+		int bank = (attr & 0x01) << 8;
+		UINT8 bitplane0 = m_gfx1[((tile + bank) << 3) + ra];
+		return (color << 3) + BIT(bitplane0 << px, 7);
+	}
 }
 
-void miniboy7_state::video_start()
+MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(miniboy7_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 37, 37);
-}
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
-UINT32 miniboy7_state::screen_update_miniboy7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
+	for (UINT8 cx = 0; cx < x_count; cx+=1)
+	{
+		for (int px = 0; px < 8; px++)
+		{
+			int offset_a = (m_gpri ? 0x80 : 0) + get_color_offset(m_videoram_a[ma + cx], m_colorram_a[ma + cx], ra, px);
+			int offset_b = (m_gpri ? 0 : 0x80) + get_color_offset(m_videoram_b[ma + cx], m_colorram_b[ma + cx], ra, px);
+			UINT8 color_a = m_proms[offset_a] & 0x0f;
+			UINT8 color_b = m_proms[offset_b] & 0x0f;
+
+			if (color_a && (m_gpri || !color_b))          // videoram A has priority
+				bitmap.pix32(y, (cx << 3) + px) = palette[offset_a];
+			else if (color_b && (!m_gpri || !color_a))    // videoram B has priority
+				bitmap.pix32(y, (cx << 3) + px) = palette[offset_b];
+		}
+	}
 }
 
 PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-/*  FIXME... Can't get the correct palette.
-    sometimes RGB bits are inverted, disregarding the 4th bit.
-
+/*
     prom bits
     7654 3210
     ---- ---x   red component?.
@@ -239,7 +263,7 @@ PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 	int i;
 
 	/* 0000IBGR */
-	if (color_prom == 0) return;
+	if (m_proms == 0) return;
 
 	for (i = 0;i < palette.entries();i++)
 	{
@@ -250,23 +274,56 @@ PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 		intenmax = 0xff;
 
 		/* intensity component */
-		inten = (color_prom[i] >> 3) & 0x01;
+		inten = (m_proms[i] >> 3) & 0x01;
 
 		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit0 = (m_proms[i] >> 0) & 0x01;
 		r = (bit0 * intenmin) + (inten * (bit0 * (intenmax - intenmin)));
 
 		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit1 = (m_proms[i] >> 1) & 0x01;
 		g = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
 
 		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
+		bit2 = (m_proms[i] >> 2) & 0x01;
 		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
 
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+}
+
+void miniboy7_state::machine_reset()
+{
+	m_ay_pb = 0;
+	m_gpri = 0;
+}
+
+WRITE8_MEMBER(miniboy7_state::ay_pa_w)
+{
+	// ---x xxxx    lamps
+	// --x- ----    coins lockout
+	// -x-- ----    coins meter
+	// x--- ----    unused
+}
+
+WRITE8_MEMBER(miniboy7_state::ay_pb_w)
+{
+	// ---- xxxx    unused
+	// -xxx ----    HCD
+	// x--- ----    DSW2 select
+
+	m_ay_pb = data;
+}
+
+READ8_MEMBER(miniboy7_state::pia_pb_r)
+{
+	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
+}
+
+WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
+{
+	m_gpri = state;
 }
 
 
@@ -276,10 +333,10 @@ PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 
 static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM? */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x25ff) AM_RAM /* looks like videoram */
-	AM_RANGE(0x2600, 0x27ff) AM_RAM
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("videoram_a")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("colorram_a")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("videoram_b")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("colorram_b")
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)  // FIXME
@@ -344,6 +401,45 @@ ADDRESS_MAP_END
 ***********************************/
 
 static INPUT_PORTS_START( miniboy7 )
+	PORT_START("INPUT1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+
+	PORT_START("INPUT2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("RAM Reset")
+	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x06, 0x06, "Turns per Coin" )    PORT_DIPLOCATION("DSW2:2,DSW2:3")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+
+	PORT_DIPNAME( 0x18, 0x18, "Bonus Turns" )       PORT_DIPLOCATION("DSW2:4,DSW2:5")
+	PORT_DIPSETTING(    0x18, "50000 100000" )
+	PORT_DIPSETTING(    0x10, "100000 200000" )
+	PORT_DIPSETTING(    0x08, "100000 300000" )
+	PORT_DIPSETTING(    0x00, "200000 300000" )
+
+	PORT_DIPNAME( 0x01, 0x01, "DSW2-1" )            PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DSW2-6" )            PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DSW2-7" )            PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW2-8" )            PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -354,7 +450,7 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8, 8,
-	256,
+	RGN_FRAC(1,1),
 	1,
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -379,8 +475,7 @@ static const gfx_layout tilelayout =
 ****************************************/
 
 static GFXDECODE_START( miniboy7 )
-	GFXDECODE_ENTRY( "gfx1", 0x0800,    charlayout, 0, 128 ) /* text layer 1 */
-	GFXDECODE_ENTRY( "gfx1", 0x0000,    charlayout, 0, 128 ) /* text layer 2 */
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 128 ) /* text layer */
 
 	/* 0x000 cards
 	   0x100 joker
@@ -399,10 +494,15 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
 	MCFG_CPU_PROGRAM_MAP(miniboy7_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", miniboy7_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("INPUT1"))
+	MCFG_PIA_READPB_HANDLER(READ8(miniboy7_state, pia_pb_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(miniboy7_state, pia_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -410,8 +510,7 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_DRIVER(miniboy7_state, screen_update_miniboy7)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", miniboy7)
 
@@ -421,11 +520,15 @@ static MACHINE_CONFIG_START( miniboy7, miniboy7_state )
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/12) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(miniboy7_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("pia0", pia6821_device, ca1_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(miniboy7_state, ay_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(miniboy7_state, ay_pb_w))
 
 MACHINE_CONFIG_END
 
@@ -536,6 +639,6 @@ ROM_END
 ***********************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS  */
-GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1983, miniboy7b, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 3)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1983, miniboy7b, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 3)", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )

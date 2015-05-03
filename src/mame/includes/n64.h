@@ -123,6 +123,10 @@ public:
 	bool disk_present;
 	bool cart_present;
 
+	// Mouse X2/Y2 for delta position
+	int mouse_x2[4];
+	int mouse_y2[4];
+
 	void poll_reset_button(bool button);
 
 	UINT32 dp_clock;

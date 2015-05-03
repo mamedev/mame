@@ -257,6 +257,12 @@ void cirrus_gd5428_device::start_bitblt()
 {
 	UINT32 x,y;
 
+	if(m_blt_mode & 0x01)
+	{
+		start_reverse_bitblt();
+		return;
+	}
+
 	if(LOG_BLIT) logerror("CL: BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
 
 	m_blt_source_current = m_blt_source;
@@ -271,7 +277,7 @@ void cirrus_gd5428_device::start_bitblt()
 				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
 				
 				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
-				if(x % 8)
+				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 					m_blt_source_current++;
 			}
 			else
@@ -281,13 +287,73 @@ void cirrus_gd5428_device::start_bitblt()
 			}
 			m_blt_dest_current++;
 			if(m_blt_mode & 0x40 && (x % 8) == 7)  // 8x8 pattern - reset pattern source location
-				m_blt_source_current = m_blt_source + (8*(y % 8)); // patterns are linear data
+			{
+				if(m_blt_mode & 0x80) // colour expand
+					m_blt_source_current = m_blt_source + (1*(y % 8)); // patterns are linear data
+				else
+					m_blt_source_current = m_blt_source + (8*(y % 8));
+			}
 		}
 		if(m_blt_mode & 0x40)  // 8x8 pattern
-			m_blt_source_current = m_blt_source + (8*(y % 8)); // patterns are linear data
+		{
+			if(m_blt_mode & 0x80) // colour expand
+				m_blt_source_current = m_blt_source + (1*(y % 8)); // patterns are linear data
+			else
+				m_blt_source_current = m_blt_source + (8*(y % 8));
+		}
 		else
-			m_blt_source_current = m_blt_source + (m_blt_source_pitch*y);
+			m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y+1));
 		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*(y+1));
+	}
+	m_blt_status &= ~0x02;
+}
+
+void cirrus_gd5428_device::start_reverse_bitblt()
+{
+	UINT32 x,y;
+
+	if(LOG_BLIT) logerror("CL: Reverse BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+
+	// Start at end of blit
+	m_blt_source_current = m_blt_source;
+	m_blt_dest_current = m_blt_dest;
+
+	for(y=0;y<=m_blt_height;y++)
+	{
+		for(x=0;x<=m_blt_width;x++)
+		{
+			if(m_blt_mode & 0x80)  // colour expand
+			{
+				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+				
+				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't decrement if a pattern (it's only 8 bits)
+					m_blt_source_current--;
+			}
+			else
+			{
+				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+				m_blt_source_current--;
+			}
+			m_blt_dest_current--;
+			if(m_blt_mode & 0x40 && (x % 8) == 7)  // 8x8 pattern - reset pattern source location
+			{
+				if(m_blt_mode & 0x80) // colour expand
+					m_blt_source_current = m_blt_source - (1*(y % 8)); // patterns are linear data
+				else
+					m_blt_source_current = m_blt_source - (8*(y % 8));
+			}
+		}
+		if(m_blt_mode & 0x40)  // 8x8 pattern
+		{
+			if(m_blt_mode & 0x80) // colour expand
+				m_blt_source_current = m_blt_source - (1*(y % 8)); // patterns are linear data
+			else
+				m_blt_source_current = m_blt_source - (8*(y % 8));
+		}
+		else
+			m_blt_source_current = m_blt_source - (m_blt_source_pitch*(y+1));
+		m_blt_dest_current = m_blt_dest - (m_blt_dest_pitch*(y+1));
 	}
 	m_blt_status &= ~0x02;
 }
@@ -301,7 +367,7 @@ void cirrus_gd5428_device::start_system_bitblt()
 	m_blt_pixel_count = m_blt_scan_count = 0;
 	m_blt_source_current = m_blt_source;
 	m_blt_dest_current = m_blt_dest;
-	m_blt_status |= 0x01;
+	m_blt_status |= 0x09;
 }
 
 void cirrus_gd5428_device::blit_dword()
@@ -339,18 +405,12 @@ void cirrus_gd5428_device::blit_dword()
 	if(m_blt_scan_count > m_blt_height)
 	{
 		m_blt_system_transfer = false;  //  BitBLT complete
-		m_blt_status &= ~0x03;
+		m_blt_status &= ~0x0b;
 	}
 }
 
 void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 {
-	if(m_blt_mode & 0x40)  // enable 8x8 pattern
-	{
-		if(m_blt_mode & 0x80)  // colour expand
-			src = (vga.memory[m_blt_source % vga.svga_intf.vram_size] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? vga.gc.enable_set_reset : vga.gc.set_reset;
-	}
-
 	switch(m_blt_rop)
 	{
 	case 0x00:  // BLACK
@@ -366,7 +426,7 @@ void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
 		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = 0xff;
 		break;
 	case 0x59:  // SRCINVERT
-		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = dst ^ src;
+		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = src ^ dst;
 		break;
 	default:
 		popmessage("CL: Unsupported BitBLT ROP mode %02x",m_blt_rop);
