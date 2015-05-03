@@ -34,14 +34,6 @@
 #include "osxutils.h"
 #endif
 
-#if defined(OSD_SDL)
-typedef void *PVOID;
-#endif
-
-#if defined(OSD_RETRO)
-typedef void *PVOID;
-#endif
-
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -455,7 +447,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		do
 		{
 			item = (osd_work_item *)queue->free;
-		} while (item != NULL && compare_exchange_ptr((PVOID volatile *)&queue->free, item, item->next) != item);
+		} while (item != NULL && compare_exchange_ptr((void * volatile *)&queue->free, item, item->next) != item);
 		osd_scalable_lock_release(queue->lock, lockslot);
 
 		// if nothing, allocate something new
@@ -596,7 +588,7 @@ void osd_work_item_release(osd_work_item *item)
 	{
 		next = (osd_work_item *)item->queue->free;
 		item->next = next;
-	} while (compare_exchange_ptr((PVOID volatile *)&item->queue->free, next, item) != next);
+	} while (compare_exchange_ptr((void * volatile *)&item->queue->free, next, item) != next);
 	osd_scalable_lock_release(item->queue->lock, lockslot);
 }
 
