@@ -51,7 +51,7 @@ NETLIB_SUBDEVICE(74175_sub,
 	netlist_ttl_output_t m_QQ[4];
 
 	netlist_state_t<netlist_sig_t> m_clrq;
-	netlist_state_t<netlist_sig_t> m_data;
+	netlist_state_t<UINT8> m_data;
 );
 
 NETLIB_DEVICE(74175,

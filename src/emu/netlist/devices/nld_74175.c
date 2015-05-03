@@ -29,7 +29,7 @@ NETLIB_RESET(74175_sub)
 {
 	m_CLK.set_state(netlist_input_t::STATE_INP_LH);
 	m_clrq = 0;
-	m_data = 0;
+	m_data = 0xFF;
 }
 
 NETLIB_UPDATE(74175_sub)
@@ -42,26 +42,31 @@ NETLIB_UPDATE(74175_sub)
 			OUTLOGIC(m_Q[i], d, delay[d]);
 			OUTLOGIC(m_QQ[i], d ^ 1, delay[d ^ 1]);
 		}
+		m_CLK.inactivate();
 	}
 }
 
 NETLIB_UPDATE(74175)
 {
-	if (!INPLOGIC(m_CLRQ))
+	UINT8 d = 0;
+	for (int i=0; i<4; i++)
+	{
+		d |= (INPLOGIC(m_D[i]) << i);
+	}
+	m_sub.m_clrq = INPLOGIC(m_CLRQ);
+	if (!m_sub.m_clrq)
 	{
 		for (int i=0; i<4; i++)
 		{
 			OUTLOGIC(m_sub.m_Q[i], 0, delay_clear[0]);
 			OUTLOGIC(m_sub.m_QQ[i], 1, delay_clear[1]);
 		}
-	}
-	m_sub.m_clrq = INPLOGIC(m_CLRQ);
-	UINT8 d = 0;
-	for (int i=0; i<4; i++)
+		m_sub.m_data = 0;
+	} else if (d != m_sub.m_data)
 	{
-		d |= (INPLOGIC(m_D[i]) << i);
+		m_sub.m_data = d;
+		m_sub.m_CLK.activate_lh();
 	}
-	m_sub.m_data = d;
 }
 
 NETLIB_START(74175)

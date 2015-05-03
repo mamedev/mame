@@ -161,7 +161,9 @@ CIRCUIT_LAYOUT( breakout )
     PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
 #else
     SOLVER(Solver, 48000)
-    PARAM(Solver.ACCURACY, 1e-6) // less accuracy and diode will not work
+    PARAM(Solver.ACCURACY, 1e-6)
+    PARAM(Solver.GS_THRESHOLD, 2)
+    //PARAM(Solver.SOR_FACTOR, 1)
 #endif
     //CHIP("CLOCK", CLOCK_14_318_MHZ)
     MAINCLOCK(Y1, 14318000.0)
@@ -386,7 +388,7 @@ CIRCUIT_LAYOUT( breakout )
 	#define PAD_EN_n    "C2", 8
 
 	//#define P VCC
-	#define P "V5", Q
+	#define P "ttlhigh", Q
 
 	#define COIN        "L9", 6
 	#define COIN1_n         "F8", 5
@@ -1631,14 +1633,21 @@ CIRCUIT_LAYOUT( breakout )
 
 	NET_C(CR6.A, R41.1, R42.1, R43.1, R51.1, R52.1)
 #else
+	//RES_SWITCH(CR6, E2.11, R41.1, GND)
 	RES_SWITCH(CR6, E2.11, R41.1, GND)
 	PARAM(CR6.RON, 1e20)
 	PARAM(CR6.ROFF, 1)
 	NET_C(R41.1, R42.1, R43.1, R51.1, R52.1)
 #endif
+#if 1
 	CONNECTION("R51", 2, PLAYFIELD)
 	CONNECTION("R43", 2, BSYNC)
 	CONNECTION("R52", 2, SCORE)
+#else
+	CONNECTION("R51", 2, "V5", Q)
+	CONNECTION("R43", 2, "V5", Q)
+	CONNECTION("R52", 2, "V5", Q)
+#endif
 	NET_C(R41.2, B9.3)
 	NET_C(R42.2, V5)
 

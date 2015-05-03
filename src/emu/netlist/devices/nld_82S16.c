@@ -15,15 +15,15 @@ NETLIB_UPDATE(82S16)
 	{
 		// FIXME: Outputs are tristate. This needs to be properly implemented
 		OUTLOGIC(m_DOUTQ, 1, NLTIME_FROM_NS(20));
-		for (int i=0; i<8; i++)
-			m_A[i].inactivate();
+		//for (int i=0; i<8; i++)
+			//m_A[i].inactivate();
 	}
 	else
 	{
 		int adr = 0;
 		for (int i=0; i<8; i++)
 		{
-			m_A[i].activate();
+			//m_A[i].activate();
 			adr |= (INPLOGIC(m_A[i]) << i);
 		}
 

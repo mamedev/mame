@@ -30,6 +30,7 @@
 #define NLD_74192_H_
 
 #include "../nl_base.h"
+#include "nld_9316.h"
 
 #define TTL_74192(_name)                                              \
 		NET_REGISTER_DEV(74192, _name)
@@ -40,10 +41,7 @@
 NETLIB_DEVICE(74192,
 	ATTR_HOT void update_outputs();
 
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
+	NETLIB_NAME(9316_subABCD) m_ABCD;
 	netlist_ttl_input_t m_CLEAR;
 	netlist_ttl_input_t m_LOADQ;
 	netlist_ttl_input_t m_CU;
