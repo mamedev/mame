@@ -3,31 +3,27 @@
 	<element name="overlay">
 		<rect>
 			<bounds left="0" top="0" right="192" bottom="41" />
-			<color red="0.125" green="0.125" blue="1" />
+			<color red="0.3" green="0.33" blue="1.0" />
 		</rect>
 		<rect>
 			<bounds left="0" top="41" right="192" bottom="72.5" />
-			<color red="1" green="0.5" blue="0.0625" />
+			<color red="0.95" green="0.55" blue="0.15" />
 		</rect>
 		<rect>
 			<bounds left="0" top="72.5" right="192" bottom="105" />
-			<color red="0.25" green="1" blue="0.25" />
+			<color red="0.25" green="0.9" blue="0.3" />
 		</rect>
 		<rect>
-			<bounds left="0" top="105" right="192" bottom="137" />
-			<color red="1" green="1" blue="0.25" />
+			<bounds left="0" top="105" right="192" bottom="231.5" />
+			<color red="0.98" green="1.0" blue="0.33" />
 		</rect>
 		<rect>
-			<bounds left="0" top="137" right="192" bottom="232" />
-			<color red="1" green="1" blue="1" />
-		</rect>
-		<rect>
-			<bounds left="0" top="232" right="192" bottom="240" />
-			<color red="0.125" green="0.125" blue="1" />
+			<bounds left="0" top="231.5" right="192" bottom="240" />
+			<color red="0.3" green="0.33" blue="1.0" />
 		</rect>
 		<rect>
 			<bounds left="0" top="240" right="192" bottom="256" />
-			<color red="1" green="1" blue="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
 	</element>
 

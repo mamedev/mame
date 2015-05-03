@@ -1916,8 +1916,8 @@ Missing files come here
 	</software>
 
 	<software name="dos622" cloneof="msdos622">
-		<!-- Make Original Disks images from an Acer recovery CD, dated 07-13-1994 -->
-		<description>MS-DOS 6.22 (Acer Recovery CD)</description>
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>MS-DOS 6.22 (Alt)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<part name="disk1" interface="floppy_3_5">
@@ -3147,6 +3147,57 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="gd542x">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>CL GD542X Video</description>
+		<year>1994</year>
+		<publisher>Cirrus Logic</publisher>
+		<info name="version" value="1.43" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk1.img" size="1474560" crc="570265b9" sha1="2160115afec7d2e9d6304488cdac9de1548d34a1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk2.img" size="1474560" crc="627d6898" sha1="0f26472e2027e5afc5d1e33ad1a660fb6eb34b8a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk3.img" size="1474560" crc="3839eb78" sha1="9274cf9c2dae63a4cbbcfadc21d323411899ef8b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk4.img" size="1474560" crc="d081835e" sha1="f91b0e1b54309d17ee594c6b1e76889353b1412d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gd543x">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>CL GD543X Video</description>
+		<year>1995</year>
+		<publisher>Cirrus Logic</publisher>
+		<info name="version" value="1.22b" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd543x disk1.img" size="1474560" crc="8fb952d8" sha1="bbd3f3a11e3b36f629e2d59f67ee685e9eeefc75" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd543x disk2.img" size="1474560" crc="395fa9f9" sha1="a48a7a5d5a275b362c78c8e6c1ca2d47732108a4" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd543x disk3.img" size="1474560" crc="73730b04" sha1="758fea54ef90e8f31d0c94eee6e04b5807cfec74" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pds2keth">
 		<description>Compex RL2000 PnP Series Ethernet Adapter</description>
 		<year>1997</year>
@@ -3236,6 +3287,24 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="knowledge dynamics corp, cirrus logic supervga driver pt-521 (version 1.30) (disk 2).img" size="1474560" crc="f7350f94" sha1="0ebe33544679b90aa0497bc03abc576cf24d08a6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magics20">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Magic S20 Sound Card</description>
+		<year>1994</year>
+		<publisher>Acer Inc.</publisher>
+		<info name="version" value="2.11A" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="magics20 disk1.img" size="1474560" crc="2355fc07" sha1="f2c810b45359ad8a8ff2f1c0181a57eebe151aa2" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="magics20 disk2.img" size="1474560" crc="a2e4f6bf" sha1="8d9d430d55dc38db242a41b9cff2e0823969c48d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3405,6 +3474,32 @@ Missing files come here
 
 	<!-- Application Disks -->
 
+	<software name="acerwin">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Acer/Win Supplement</description>
+		<year>1995</year>
+		<publisher>Acer</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="acer_win disk1.img" size="1474560" crc="1365df28" sha1="534190e095cbb74d6ffed459db101897a86e2b03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aol20" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>America Online</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="aol20 disk1.img" size="1474560" crc="bd162144" sha1="7a15f872c34c5e316575ba0c74fa8706acadb027" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aftdark">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>After Dark for Windows</description>
@@ -3417,6 +3512,32 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="buttons" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Buttons for DOS (Shareware)</description>
+		<year>1995</year>
+		<publisher>Triad Pictures Corp.</publisher>
+		<info name="version" value="5.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="buttons disk1.img" size="1474560" crc="a58d2c51" sha1="edc4e6885f455f9427b6f4a7531532dc89cad954" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comit" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>COMit-LITE</description>
+		<year>1995</year>
+		<publisher>Tradewind Software</publisher>
+		<info name="version" value="1.37" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="comit disk1.img" size="1474560" crc="7e8110cc" sha1="178ddf2304af8c0454ad7826079e769d9bc6bc76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dos7demo">
 		<description>IBM PC-Dos 7 (Demonstration)</description>
 		<year>1994</year>
@@ -3424,6 +3545,19 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcdos7demo.img" size="737280" crc="c3af95bd" sha1="85a593503af1542b7332044d908c121d0b2475e9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mkorig" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Make Original Diskettes</description>
+		<year>1995</year>
+		<publisher>Acer</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mkorig disk1.img" size="1474560" crc="c1a77a4e" sha1="80eac5d9774514eb6798ddc25f22328b55c76ed5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3776,15 +3910,61 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="descsw">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Descent (Shareware, 1.0)</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="descent disk1.img" size="1474560" crc="5d3a21e6" sha1="bac18f7fc016c438e0ab14893fd417958e99f500" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="descent disk2.img" size="1474560" crc="07674313" sha1="59bdf205c6b3e3b2de5a08daaa3b67004618baa7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogz">
+		<description>Dogz, Your Computer Pet</description>
+		<year>1995</year>
+		<publisher>PF.Magic, Inc.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="dogz-disk1.img" size="1474560" crc="feb994f0" sha1="75099d994746e151bf9c5d7c94da23b43879b19d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="dogz-disk2.img" size="1474560" crc="05d3a216" sha1="203a0486d596ca98174606520779999ce0ef6397" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="duke">
 		<!-- Dumped via Kryoflux, all tracks show as modified - most likely not professionally duplicated -->
 		<!-- from a registered version ordered circa 2004 -->
 		<description>Duke Nukum (V 2.0)</description>
 		<year>1991</year>
 		<publisher>Apogee</publisher>
+		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="duke nukum.img" size="1474560" crc="3332d232" sha1="306b2802adbdbfe6655679c01a187582a05255ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epicpina">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Epic Pinball: Special ACER Edition</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames/Acer</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="epicpin disk1.img" size="1474560" crc="d56f9411" sha1="d5d5a12d56e9bda23f8f3aad2ed6bc5fb328d923" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3888,6 +4068,18 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="3e6fc1d5" sha1="45ee9c088ebee47ebc6be7e7d4337962c42a5887" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kilo1">
+		<description>Kiloblaster: Death of a Starship (Shareware, B&amp;N)</description>
+		<year>1994</year>
+		<publisher>Epic MegaGames/The B&amp;N Companies</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="kiloblaster-episode1.img" size="737280" crc="7efd9d81" sha1="a7dfe4f823426e66706c2e69aaed9abf9a3dfaf3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
