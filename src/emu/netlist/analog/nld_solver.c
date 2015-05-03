@@ -341,7 +341,7 @@ NETLIB_START(solver)
 
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
-	register_param("GS_THRESHOLD", m_gs_threshold, 5);      // below this value, gaussian elimination is used
+	register_param("GS_THRESHOLD", m_gs_threshold, 2);      // below this value, gaussian elimination is used
 	register_param("NR_LOOPS", m_nr_loops, 25);             // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
 	register_param("SOR_FACTOR", m_sor, 1.059);
@@ -441,11 +441,16 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 		return nl_alloc(netlist_matrix_solver_direct2_t, m_params);
 	else
 	{
-		typedef netlist_matrix_solver_gauss_seidel_t<m_N,_storage_N> solver_N;
 		if (size >= gs_threshold)
-			return nl_alloc(solver_N, m_params, size);
+		{
+			typedef netlist_matrix_solver_gauss_seidel_t<m_N,_storage_N> solver_GS;
+			return nl_alloc(solver_GS, m_params, size);
+		}
 		else
-			return nl_alloc(solver_N, m_params, size);
+		{
+			typedef netlist_matrix_solver_direct_t<m_N,_storage_N> solver_D;
+			return nl_alloc(solver_D, m_params, size);
+		}
 	}
 }
 
