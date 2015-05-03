@@ -39,6 +39,9 @@ public:
 	}
 	virtual ~sound_retro() { }
 
+	virtual int init(const osd_options &options);
+	virtual void exit();
+
 	// sound_module
 
 	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
