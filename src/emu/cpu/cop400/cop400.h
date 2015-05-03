@@ -239,6 +239,7 @@ protected:
 
 	/* skipping logic */
 	int m_skip;               /* skip next instruction */
+	int m_skip_lbi;           /* skip until next non-LBI instruction */
 	int m_last_skip;          /* last value of skip */
 	int m_halt;               /* halt mode */
 	int m_idle;               /* idle mode */
@@ -265,14 +266,13 @@ protected:
 	};
 
 	const cop400_opcode_map *m_opcode_map;
-	cop400_opcode_func m_last_opcode_function;
 
-	static const cop400_opcode_map COP410_OPCODE_23_MAP[];
-	static const cop400_opcode_map COP410_OPCODE_33_MAP[];
-	static const cop400_opcode_map COP410_OPCODE_MAP[];
-	static const cop400_opcode_map COP420_OPCODE_23_MAP[];
-	static const cop400_opcode_map COP420_OPCODE_33_MAP[];
-	static const cop400_opcode_map COP420_OPCODE_MAP[];
+	static const cop400_opcode_map COP410_OPCODE_23_MAP[256];
+	static const cop400_opcode_map COP410_OPCODE_33_MAP[256];
+	static const cop400_opcode_map COP410_OPCODE_MAP[256];
+	static const cop400_opcode_map COP420_OPCODE_23_MAP[256];
+	static const cop400_opcode_map COP420_OPCODE_33_MAP[256];
+	static const cop400_opcode_map COP420_OPCODE_MAP[256];
 	static const cop400_opcode_map COP444_OPCODE_23_MAP[256];
 	static const cop400_opcode_map COP444_OPCODE_33_MAP[256];
 	static const cop400_opcode_map COP444_OPCODE_MAP[256];

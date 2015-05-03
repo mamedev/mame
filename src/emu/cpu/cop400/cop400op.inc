@@ -913,10 +913,9 @@ INSTRUCTION( cba )
 
 INSTRUCTION( lbi )
 {
-	if (m_last_opcode_function == INST(lbi))
-	{
-		return;
-	}
+	m_skip_lbi++;
+	if (m_skip_lbi > 1) return;
+	m_skip_lbi++;
 
 	if (opcode & 0x80)
 	{

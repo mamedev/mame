@@ -1,12 +1,12 @@
 /**********************************************************************
 
-    DEC VT Terminal video emulation
-    [ DC012 and DC011 emulation ]
+DEC VT Terminal video emulation
+[ DC012 and DC011 emulation ]
 
-    01/05/2009 Initial implementation [Miodrag Milanovic]
+01/05/2009 Initial implementation [Miodrag Milanovic]
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+Copyright MESS Team.
+Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
@@ -16,7 +16,7 @@
 #include "emu.h"
 
 class vt100_video_device : public device_t,
-							public device_video_interface
+	public device_video_interface
 {
 public:
 	vt100_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);

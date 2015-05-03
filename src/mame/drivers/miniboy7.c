@@ -4,23 +4,14 @@
 
   Driver by Roberto Fresca.
 
-
   Games running on this hardware:
 
-  * Mini Boy 7 (set 1).    1983, Bonanza Enterprises, Ltd.
-  * Mini Boy 7 (set 2).    1983, Bonanza Enterprises, Ltd.
+  * Mini Boy 7 - 1983, Bonanza Enterprises, Ltd.
 
+Note: During attract mode display, pressing the service menu will allow you to
+      add a custom ad to scroll during attract mode display. Up to 120 characters
 
 *******************************************************************************
-
-
-  Preliminary Notes:
-
-  This driver was made reverse-engineering the program ROMs.
-  The Mini Boy 7 dump found lacks of PCB pics, technical notes or hardware list.
-  Only one text file inside telling that ROMs mb7511, mb7311 and mb7111 are rotten,
-  typical for M5L2764K parts. The color PROM was not dumped.
-
 
   Game Notes:
 
@@ -34,7 +25,6 @@
   - Hi-Lo.
   - Double-Up.
   - Craps.
-
 
 *******************************************************************************
 
@@ -402,11 +392,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( miniboy7 )
 	PORT_START("INPUT1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -416,21 +406,21 @@ static INPUT_PORTS_START( miniboy7 )
 	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x06, 0x06, "Turns per Coin" )    PORT_DIPLOCATION("DSW2:2,DSW2:3")
+	PORT_DIPNAME( 0x06, 0x06, "Turns per Coin" )    PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 
-	PORT_DIPNAME( 0x18, 0x18, "Bonus Turns" )       PORT_DIPLOCATION("DSW2:4,DSW2:5")
+	PORT_DIPNAME( 0x18, 0x18, "Bonus Turns" )       PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(    0x18, "50000 100000" )
 	PORT_DIPSETTING(    0x10, "100000 200000" )
 	PORT_DIPSETTING(    0x08, "100000 300000" )
 	PORT_DIPSETTING(    0x00, "200000 300000" )
 
-	PORT_DIPNAME( 0x01, 0x01, "DSW2-1" )            PORT_DIPLOCATION("DSW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )            PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, "Bartop" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x20, 0x20, "DSW2-6" )            PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -585,33 +575,7 @@ ROM_START( miniboy7 )
 	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
 
-/*
-   Incomplete set with some bad dumps.
-   Seems to be a different version/revision.
-*/
-ROM_START( miniboy7a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mb7111.8a",  0x4000, 0x2000,  BAD_DUMP CRC(1b7ac5f0) SHA1(a52052771fcce688afccf9f0c3e3c2b5e7cec4e4) )    /* marked as BAD for the dumper but seems OK */
-	ROM_LOAD( "mb7211.7a",  0x6000, 0x2000, CRC(ac9b66a6) SHA1(66a33e475de4fb3ffdd9a68a24932574e7d78116) )
-	ROM_LOAD( "mb7311.6a",  0x8000, 0x2000,  BAD_DUMP CRC(99f2a063) SHA1(94108cdc574c7e9400fe8a249b78ba190d10502b) )    /* marked as BAD for the dumper */
-	ROM_LOAD( "mb7411.5a",  0xa000, 0x2000, CRC(99f8268f) SHA1(a4ca98dfb5df86fe45f33e291bf0c40d1f43ae7c) )
-	ROM_LOAD( "mb7511.4a",  0xc000, 0x2000,  BAD_DUMP CRC(2820ae91) SHA1(70f9b3823733ae39d153948a4006a5972204f482) )    /* marked as BAD for the dumper */
-	ROM_LOAD( "mb7611.3a",  0xe000, 0x2000, CRC(ca9b9b20) SHA1(c6cd793a15948601faa051a4643b14fd3d8bda0b) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "mb70.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
-
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "mb71.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )
-	ROM_LOAD( "mb72.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
-	ROM_LOAD( "mb73.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
-
-	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* both bipolar PROMs are identical */
-	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
-	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
-ROM_END
-
-ROM_START( miniboy7b ) /* "Might" be the same set as miniboy7a, all roms read consistently for multiply reads */
+ROM_START( miniboy7a ) /* The term CREDIT has been changed to POINT is this version, other changes?? */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mb7_1-11.a8",  0x4000, 0x2000, CRC(e1c0f8f2) SHA1(0790dc37374cf12313ae13adaea2c6e7338e0dbc) )
 	ROM_LOAD( "mb7_2-11.a7",  0x6000, 0x2000, CRC(596040a3) SHA1(bb68b9fd12fba09c3d7c9dec70cf4770d31f911b) )
@@ -639,6 +603,5 @@ ROM_END
 ***********************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS  */
-GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
-GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
-GAME( 1983, miniboy7b, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 3)", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_NO_COCKTAIL )
+GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_NO_COCKTAIL )
