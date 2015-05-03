@@ -1003,6 +1003,7 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_skl));
 	save_item(NAME(m_t));
 	save_item(NAME(m_skip));
+	save_item(NAME(m_skip_lbi));
 	save_item(NAME(m_skt_latch));
 	save_item(NAME(m_si));
 	save_item(NAME(m_last_skip));
@@ -1070,6 +1071,7 @@ void cop400_cpu_device::device_start()
 	m_il = 0;
 	m_in[0] = m_in[1] = m_in[2] = m_in[3] = 0;
 	m_si = 0;
+	m_skip_lbi = 0;
 	m_last_skip = 0;
 	m_microbus_int = 0;
 	m_skip = 0;
@@ -1094,7 +1096,6 @@ void cop400_cpu_device::device_reset()
 	T = 0;
 	m_skt_latch = 1;
 
-	m_last_opcode_function = INST(nop);
 	m_halt = 0;
 	m_idle = 0;
 }
@@ -1128,8 +1129,8 @@ void cop400_cpu_device::execute_run()
 		PC++;
 
 		(this->*(m_opcode_map[opcode].function))(opcode);
-		m_last_opcode_function = m_opcode_map[opcode].function;
 		m_icount -= inst_cycles;
+		if (m_skip_lbi > 0) m_skip_lbi--;
 
 		// check for interrupt
 
@@ -1138,7 +1139,7 @@ void cop400_cpu_device::execute_run()
 			cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
 
 			// all successive transfer of control instructions and successive LBIs have been completed
-			if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)) && !(m_last_opcode_function == INST(lbi) && function == INST(lbi)))
+			if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)) && !m_skip_lbi)
 			{
 				// store skip logic
 				m_last_skip = m_skip;
