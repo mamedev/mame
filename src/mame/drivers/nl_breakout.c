@@ -91,48 +91,9 @@ static Astable555Desc b2_555_desc(OHM(560.0), M_OHM(1.8), U_FARAD(0.1));
 
 static Mono555Desc c9_555_desc(OHM(47000.0), U_FARAD(1.0)); // R33, C21
 
-//check these values
-//static Paddle1HorizontalDesc pad1_desc(15047.0, 47.0, &c9_555_desc);
-
 static CapacitorDesc c32_desc(U_FARAD(0.1));
 static CapacitorDesc c36_desc(N_FARAD(1.0));    //0.001uF = 1nF
 static CapacitorDesc c37_desc(P_FARAD(330.0));
-
-#if 0
-static BufferDesc pad_en_buf_desc(DELAY_NS(15.0), DELAY_NS(15.0)); // Prevents 12ns glitch on PAD_EN_n signal from resetting C9. TODO: is this accurate?
-#endif
-
-#if 0
-static VIDEO_DESC( breakout )
-	VIDEO_RESISTANCE(1, K_OHM(0.0))
-	VIDEO_RESISTANCE(2, K_OHM(3.9))
-	VIDEO_RESISTANCE(3, K_OHM(3.9))
-	VIDEO_RESISTANCE(4, K_OHM(3.9))
-	VIDEO_RESISTANCE(5, K_OHM(3.9))
-	VIDEO_RESISTANCE(6, K_OHM(3.9))
-	//VIDEO_RESISTANCE(Video::HBLANK_PIN, K_OHM(0.0))
-	VIDEO_ORIENTATION(ROTATE_90)
-	VIDEO_CONTRAST(4.0)
-
-	// Values guessed based on screenshots. TODO: Make more accurate
-	//             X,         Y,   W,        H,    R,    G,    B
-	VIDEO_OVERLAY( 15.570e-6, 0.0, 1.911e-6, -1.0, 0.80, 0.15, 0.05 ) // Red Bricks
-	VIDEO_OVERLAY( 17.481e-6, 0.0, 1.956e-6, -1.0, 0.95, 0.65, 0.05 ) // Amber Bricks
-	VIDEO_OVERLAY( 19.437e-6, 0.0, 1.956e-6, -1.0, 0.05, 0.65, 0.25 ) // Green Bricks
-	VIDEO_OVERLAY( 21.393e-6, 0.0, 1.955e-6, -1.0, 0.95, 0.95, 0.20 ) // Yellow Bricks
-	VIDEO_OVERLAY( 51.345e-6, 0.0, 1.956e-6, -1.0, 0.05, 0.65, 0.95 ) // Blue Paddle
-
-	// TODO: Different overlays for cocktail cabinet
-VIDEO_DESC_END
-
-static AUDIO_DESC( breakout )
-	AUDIO_RESISTANCE(1, K_OHM(47.0))
-	AUDIO_RESISTANCE(2, K_OHM(47.0))
-	AUDIO_RESISTANCE(3, K_OHM(47.0))
-	AUDIO_RESISTANCE(4, K_OHM(47.0))
-	AUDIO_GAIN(3.0)
-VIDEO_DESC_END
-#endif
 
 static Mono9602Desc n8_desc(K_OHM(33.0), U_FARAD(100.0), K_OHM(5.6), P_FARAD(0)); // No capacitor on 2nd 9602
 static Mono9602Desc f3_desc(K_OHM(47.0), U_FARAD(1.0), K_OHM(47.0), U_FARAD(1.0));
@@ -140,21 +101,7 @@ static Mono9602Desc f3_desc(K_OHM(47.0), U_FARAD(1.0), K_OHM(47.0), U_FARAD(1.0)
 static Mono9602Desc a7_desc(K_OHM(68.0), U_FARAD(1.0), K_OHM(22.0), U_FARAD(10.0));
 static Mono9602Desc a8_desc(K_OHM(27.0), U_FARAD(1.0), K_OHM(27.0), U_FARAD(1.0));
 
-#if 0
-static Dipswitch53137Desc dipswitch1_desc("bonus_credit", "Bonus Credit", 3, "None", "100", "200", "300", "400", "500", "600", "700", "800");
-#endif
-
-//static DipswitchDesc dipswitch2_desc("cabinet_type", "Cabinet Type", 0, "Normal", "Cocktail");
-//static DipswitchDesc dipswitch3_desc("coinage", "Coinage", 0, "1 Coin / 1 Credit", "1 Coin / 2 Credits");
-//static DipswitchDesc dipswitch4_desc("ball_count", "Ball Count", 0, "3", "5");
-
 CIRCUIT_LAYOUT( breakout )
-#if 0
-	CHIP("S1", 53137, &dipswitch1_desc)
-	CHIP("S2", DIPSWITCH, &dipswitch2_desc)
-	CHIP("S3", DIPSWITCH, &dipswitch3_desc)
-	CHIP("S4", DIPSWITCH, &dipswitch4_desc)
-#endif
 
 #if (SLOW_BUT_ACCURATE)
     SOLVER(Solver, 48000)
@@ -165,8 +112,6 @@ CIRCUIT_LAYOUT( breakout )
     PARAM(Solver.GS_THRESHOLD, 2)
     //PARAM(Solver.SOR_FACTOR, 1)
 #endif
-    //CHIP("CLOCK", CLOCK_14_318_MHZ)
-    MAINCLOCK(Y1, 14318000.0)
 
 	// DIPSWITCH - Free game
 	SWITCH(S1_1)
@@ -188,17 +133,92 @@ CIRCUIT_LAYOUT( breakout )
 
 	ANALOG_INPUT(V5, 5)
 	ALIAS(VCC, V5)
-//#define VCC "V5", Q
-#define GNDD "GND", Q
 
-	//CHIP("Y1", CLOCK_14_318_MHZ)  //Y1
+#define GNDD "ttllow", Q
+#define P "ttlhigh", Q
+
+	//----------------------------------------------------------------
+	// Clock circuit
+	//----------------------------------------------------------------
+#if 1  || (SLOW_BUT_ACCURATE)
+    MAINCLOCK(Y1, 14318000.0)
+	CHIP("F1", 9316)
+	NET_C(Y1.Q, F1.2)
+
+	CONNECTION("F1", 14, "H1", 13)
+	CONNECTION("F1", 13, "H1", 12)
+	CONNECTION("F1", 15, "E1", 5)
+	CONNECTION(P, "F1", 1)
+	CONNECTION(P, "F1", 7)
+	CONNECTION(P, "F1", 10)
+	CONNECTION(GNDD, "F1", 3)
+	CONNECTION(P, "F1", 4)
+	CONNECTION(GNDD, "F1", 5)
+	CONNECTION(GNDD, "F1", 6)
+	CONNECTION("E1", 6, "F1", 9)
+
+#define CKBH    "F1", 13
+#define DICECLOCK   "H1", 11
+#else
+	/* This works with bugs. The DICECLOCK (Y2) duty cycles are out of sync.
+	 * Speed gain is from 50% to 60% and not what would have been expected.
+	 */
+    MAINCLOCK(Y1, 14318000.0 / 2.0)
+#define CKBH    "Y1", Q
+    CLOCK(Y2, 14318000.0 / 3.5)
+#define DICECLOCK   "Y2", Q
+
+    NET_C(ttlhigh, H1.13)
+    NET_C(ttlhigh, H1.12)
+    NET_C(ttlhigh, E1.5)
+#endif
+
+	//----------------------------------------------------------------
+	// Startup / Antenna latch
+	//----------------------------------------------------------------
+
+	TTL_INPUT(antenna, 0)
+
+    DIODE(CR3, "1N914")
+    DIODE(CR4, "1N914")
+    DIODE(CR5, "1N914")
+    DIODE(CR7, "1N914")
+
+    QBJT_EB(Q1, "2N3644")
+    QBJT_EB(Q2, "2N3643")
+    QBJT_EB(Q3, "2N3643")
+    CAP(C19, CAP_U(0.1))
+    CAP(C16, CAP_U(0.1))
+
+    RES(R25, 100)
+    RES(R26, 330)
+    RES(R27, 100)
+    RES(R31, 220)
+    RES(R32, 100)
+
+    NET_C(GND, CR5.A, Q2.E, C16.2, R25.2, Q3.E)
+    NET_C(CR5.K, Q2.B, antenna)
+    NET_C(Q2.C, C16.1, R25.1, Q3.B, R27.2)
+    NET_C(R27.1, CR7.A, R31.2)  //CR7.K == IN
+    NET_C(R31.1, Q1.C)
+    NET_C(Q3.C, R26.2, CR3.A, CR4.A, E9.5) // E9.6 = Q Q3.C=QQ CR3.K = COIN*1 CR4.K = COIN*2
+    NET_C(R26.1, Q1.B, C19.2, R32.2)
+    NET_C(Q1.E, C19.1, R32.1, V5)
+
+	#define LAT_Q   "E9", 6
+	#define Q_n         "Q3", C
+	#define COIN1_n         "F8", 5
+	#define COIN2_n         "H9", 5
+
+    CONNECTION("CR7", K, "D8", 11)  //set
+	CONNECTION("CR3", K, COIN1_n)     //reset
+	CONNECTION("CR4", K, COIN2_n)     //reset
+
 
 	CHIP_CAPACITOR(C32, &c32_desc)
 	CHIP_CAPACITOR(C36, &c36_desc)
 	CHIP_CAPACITOR(C37, &c37_desc)
-#if 0
-	CHIP("PAD_EN_BUF", BUFFER, &pad_en_buf_desc)
-#endif
+
 	CHIP("A3", 7474)
 	CHIP("A4", 7408)
 	CHIP("A5", 7400)
@@ -243,7 +263,6 @@ CIRCUIT_LAYOUT( breakout )
 	CHIP("E8", 7474)
 	CHIP("E9", 7404)
 
-	CHIP("F1", 9316)
 	CHIP("F2", 7411)
 	CHIP_9602_Mono(F3, &f3_desc)
 	CHIP("F4", 7474)
@@ -315,13 +334,6 @@ CIRCUIT_LAYOUT( breakout )
 	//LM380         //speaker amplifier
 	//LM323         //regulator
 
-#if 0
-	CHIP("PAD1", PADDLE1_HORIZONTAL_INPUT, &pad1_desc)
-	PADDLE_CONNECTION("PAD1", "C9")
-#endif
-
-	CHIP_LATCH(LATCH)
-
 	//HSYNC and VSYNC
 	#define H1_d        "L1", 14
 	#define H2_d        "L1", 13
@@ -380,19 +392,12 @@ CIRCUIT_LAYOUT( breakout )
 	#define SCORE   "D3", 5
 	#define VERT_TRIG_n     "H1", 8
 
-	#define DICECLOCK   "H1", 11
 	#define SCLOCK  "K1", 15
-	#define CKBH    "F1", 13
 
 	#define PAD_n   "K3", 8
 	#define PAD_EN_n    "C2", 8
 
-	//#define P VCC
-	#define P "ttlhigh", Q
-
 	#define COIN        "L9", 6
-	#define COIN1_n         "F8", 5
-	#define COIN2_n         "H9", 5
 	#define CREDIT_1_OR_2   "L9", 3
 	#define CREDIT_1_OR_2_n     "F9", 8
 	#define CREDIT2         "F9", 6
@@ -421,9 +426,6 @@ CIRCUIT_LAYOUT( breakout )
 	#define FREE_GAME_TONE  "N7", 3
 	#define BONUS_COIN      "L9", 11
 
-	//#define Q        "E9", 6
-	#define LAT_Q   "E9", 6
-	#define Q_n         "LATCH", 3
 	#define SBD_n   "D2", 11
 
 	#define PLAY_CP     "D2", 8
@@ -517,10 +519,6 @@ CIRCUIT_LAYOUT( breakout )
 	#define RH_SIDE     "H2", 3
 	#define TOP_BOUND   "K4", 6
 
-//   CONNECTION(CREDIT_1_OR_2, "CREDIT_LIGHT1", 1)
-//   CONNECTION(CREDIT2, "CREDIT_LIGHT2", 1)
-//   CONNECTION(SERVE_WAIT_n, "SERVE_LIGHT", 1)
-
 	//Audio
 	CONNECTION("M9", 2, "F6", 5)
 	CONNECTION("M9", 2, "F7", 15)
@@ -554,16 +552,6 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION("A7", 6, "B9", 4)
 	CONNECTION(VB_HIT_SOUND, "B9", 5)
 
-#if 0
-	CONNECTION(GND, "S1", 1)
-	CONNECTION(P, "S1", 2)
-	CONNECTION(GND, "S1", 4)
-	CONNECTION(P, "S1", 3)
-	CONNECTION(GND, "S1", 12)
-	CONNECTION(P, "S1", 11)
-	CONNECTION(GND, "S1", 9)
-	CONNECTION(P, "S1", 10)
-#endif
 	NET_C(S1_1.1, GND)
 	NET_C(S1_2.1, GND)
 	NET_C(S1_3.1, GND)
@@ -1138,23 +1126,6 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION(P_HIT_SOUND, "D7", 4)
 	CONNECTION("B8", 15, "D7", 3)
 
-	//Clock Generator
-	CONNECTION(CKBH, "H1", 12)
-	CONNECTION("F1", 14, "H1", 13)
-	CONNECTION("F1", 15, "E1", 5)
-
-	CONNECTION(P, "F1", 1)
-	CONNECTION(P, "F1", 7)
-	CONNECTION(P, "F1", 10)
-	CONNECTION(GNDD, "F1", 3)
-	CONNECTION(P, "F1", 4)
-	CONNECTION(GNDD, "F1", 5)
-	CONNECTION(GNDD, "F1", 6)
-	CONNECTION("E1", 6, "F1", 9)
-
-	//CONNECTION("Y1", 1, "F1", 2)
-	NET_C(Y1.Q, F1.2)
-
 	// RH and LH Sides
 	CONNECTION(V128, "N4", 1)
 	CONNECTION(V64, "N4", 2)
@@ -1212,24 +1183,14 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION(V16_d, "J8", 14)
 	CONNECTION("J8", 13, "J9", 10)
 
-#if 0
-	CONNECTION(P, "S3", 1)
-	CONNECTION(V4_d, "S3", 2)
-	CONNECTION("S3", 3, "J9", 11)
-#else
 	CONNECTION(V4_d, "S3", 1)
 	CONNECTION("S3", 2, "J9", 11)
 	RES(R15, RES_K(1))
 	NET_C(R15.1, V5)
 	NET_C(R15.2, S3.2)
-#endif
 
 	CONNECTION("J9", 8, "L9", 5)
 	CONNECTION("J9", 6, "L9", 4)
-
-	//COIN2 circuit
-	//CONNECTION("COIN2", 1, "F9", 1)
-	//CONNECTION(GNDD, "F9", 1)     //TODO: coin2 not implemented
 
 	CONNECTION("COIN2", 2, "F9", 1)
 	CONNECTION("COIN2", 1, "F9", 3)
@@ -1311,10 +1272,6 @@ CIRCUIT_LAYOUT( breakout )
 	//TODO: hows this whole latch stuff work? what about Q_n going to COIN1_n and COIN2_n
 	CONNECTION(CREDIT_1_OR_2_n, "D8", 13)
 	CONNECTION(EGL, "D8", 12)
-	CONNECTION("LATCH", 1, "D8", 11)        //set
-	CONNECTION("LATCH", 2, COIN1_n)     //reset
-	//CONNECTION("LATCH", 3, COIN2_n)       //set   //TODO: coin2 here
-	CONNECTION( "LATCH", 3, "E9", 5)        //output
 
 
 	CONNECTION(LAT_Q, "D6", 1)
@@ -1608,20 +1565,8 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION(PSYNC, "B9", 1)
 	CONNECTION(VSYNC_n, "B9", 2)
 
-#if 0
-	//CONNECTION("VIDEO", 1, "E2", 11)
-	CONNECTION("VIDEO", 2, PLAYFIELD)
-	CONNECTION("VIDEO", 3, BSYNC)
-	CONNECTION("VIDEO", 4, SCORE)
-	CONNECTION("VIDEO", 5, "B9", 3)
-	//CONNECTION("VIDEO", 6, P)
-
-	CONNECTION("VIDEO", Video::HBLANK_PIN, HSYNC)
-	CONNECTION("VIDEO", Video::VBLANK_PIN, "E3", 10)
-#else
    	// VIDEO SUMMING
 	RES(R41, RES_K(3.9))
-	//RES(R42, RES_K(3.9))
 	RES(R42, RES_K(3.9))
 	RES(R43, RES_K(3.9))
 	RES(R51, RES_K(3.9))
@@ -1653,15 +1598,7 @@ CIRCUIT_LAYOUT( breakout )
 
 	ALIAS(videomix, R41.1)
 
-#endif
-
-#if 0
 	// Audio Summing
-	CONNECTION("AUDIO", 1, "B9", 11)
-	CONNECTION("AUDIO", 2, "B9", 8)
-	CONNECTION("AUDIO", 3, FREE_GAME_TONE)
-	CONNECTION("AUDIO", 4, "B9", 6)
-#else
 	RES(R36, RES_K(47))
 	RES(R37, RES_K(47))
 	RES(R38, RES_K(47))
@@ -1672,26 +1609,6 @@ CIRCUIT_LAYOUT( breakout )
 	CONNECTION("R37", 2, "B9", 6)
 	NET_C(R36.1, R37.1, R38.1, R39.1)
 	ALIAS(sound, R36.1)
-
-#endif
-
-#ifdef DEBUG
-	// RAM access
-	/*CONNECTION("LOG1", 3, H4)     //A
-	CONNECTION("LOG1", 4, H8)       //B
-	CONNECTION("LOG1", 5, H16)  //C
-	CONNECTION("LOG1", 6, V32)      //D
-	CONNECTION("LOG1", 7, V64)      //E
-	CONNECTION("LOG1", 8, V128) //F
-	CONNECTION("LOG1", 9, V16)  //G
-	CONNECTION("LOG1", 10, RAM_PLAYER1)     //H
-	CONNECTION("LOG1", 11, H32)     //I
-	CONNECTION("LOG1", 12, H128)        //J
-	CONNECTION("LOG1", 13, "H4", 8) //K
-	CONNECTION("LOG1", 14, "E1", 4) //L
-	CONNECTION("LOG1", 15, "F2", 12)    //M
-	CONNECTION("LOG1", 16, "L3", 6)*/   //N
-#endif
 
 	// POTS
 	POT2(POTP1, RES_K(5))     // 5k
@@ -1746,6 +1663,28 @@ CIRCUIT_LAYOUT( breakout )
 	ALIAS(CON_CREDIT2, F9.6) // CREDIT2
 
 	//----------------------------------------------------------------
+	// Coin Counter
+	//----------------------------------------------------------------
+
+	CONNECTION(CSW1, "E2", 1)
+	CONNECTION(CSW2, "E2", 2)
+	RES(R14, 150)
+	QBJT_SW(Q6, "2N5190")
+	DIODE(CR8, "1N4001")
+	NET_C(E2.3, R14.1)
+	NET_C(R14.2, Q6.B)
+	NET_C(GND, Q6.E)
+	NET_C(Q6.C, CR8.A)
+	NET_C(CR8.K, V5)
+	ALIAS(CON_T, Q6.C)
+
+	// Not on PCB: Coincounter
+
+	RES(CC_R, 20) // this is connected
+	NET_C(CC_R.1, CON_T)
+	NET_C(CC_R.2, V5)
+
+	//----------------------------------------------------------------
 	// Not connected pins
 	//----------------------------------------------------------------
 
@@ -1759,7 +1698,6 @@ CIRCUIT_LAYOUT( breakout )
 	NET_C(ttlhigh, J6.3, J6.4, J6.5, J6.6)
 
 	NET_C(ttlhigh, E1.9, E1.11)
-	NET_C(ttlhigh, E2.1, E2.2)
 
 	NET_C(GND, D9.1, D9.2, D9.13, D9.3, D9.4, D9.5)
 

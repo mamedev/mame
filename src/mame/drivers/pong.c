@@ -95,7 +95,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_video(*this, "fixfreq"),
-
 			m_dac(*this, "dac")                /* just to have a sound device */
 	{
 	}
@@ -158,12 +157,23 @@ public:
 		: ttl_mono_state(mconfig, type, tag),
 		m_led_serve(*this, "maincpu:led_serve"),
 		m_lamp_credit1(*this, "maincpu:lamp_credit1"),
-		m_lamp_credit2(*this, "maincpu:lamp_credit2")
+		m_lamp_credit2(*this, "maincpu:lamp_credit2"),
+		m_coin_counter(*this, "maincpu:coin_counter"),
+		m_sw1_1(*this, "maincpu:sw1_1"),
+		m_sw1_2(*this, "maincpu:sw1_2"),
+		m_sw1_3(*this, "maincpu:sw1_3"),
+		m_sw1_4(*this, "maincpu:sw1_4")
 	{
 	}
 	required_device<netlist_mame_analog_output_t> m_led_serve;
 	required_device<netlist_mame_analog_output_t> m_lamp_credit1;
 	required_device<netlist_mame_analog_output_t> m_lamp_credit2;
+	required_device<netlist_mame_analog_output_t> m_coin_counter;
+
+	required_device<netlist_mame_logic_input_t> m_sw1_1;
+	required_device<netlist_mame_logic_input_t> m_sw1_2;
+	required_device<netlist_mame_logic_input_t> m_sw1_3;
+	required_device<netlist_mame_logic_input_t> m_sw1_4;
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(serve_cb)
 	{
@@ -178,6 +188,19 @@ public:
 	NETDEV_ANALOG_CALLBACK_MEMBER(credit2_cb)
 	{
 		output_set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
+	{
+		coin_counter_w(machine(), 0, (data > 2.0) ? 0 : 1);
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(cb_free_play)
+	{
+		m_sw1_1->write((newval>>0) & 1);
+		m_sw1_2->write((newval>>1) & 1);
+		m_sw1_3->write((newval>>2) & 1);
+		m_sw1_4->write((newval>>3) & 1);
 	}
 
 protected:
@@ -278,6 +301,8 @@ static INPUT_PORTS_START( breakout )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw1")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw2")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "servesw")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Antenna") NETLIST_LOGIC_PORT_CHANGED("maincpu", "antenna")
+
 
 	PORT_START("DIPS")
 	PORT_DIPNAME( 0x01, 0x00, "Balls" )          PORT_DIPLOCATION("SW4:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw4")
@@ -286,18 +311,20 @@ static INPUT_PORTS_START( breakout )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW3:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw2")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CHANGED_MEMBER(DEVICE_SELF, breakout_state, cb_free_play, 0)
+	PORT_DIPSETTING(    0x00, "No Free Play" )
+	PORT_DIPSETTING(    0x10, "100" )
+	PORT_DIPSETTING(    0x20, "200" )
+	PORT_DIPSETTING(    0x30, "300" )
+	PORT_DIPSETTING(    0x40, "400" )
+	PORT_DIPSETTING(    0x50, "500" )
+	PORT_DIPSETTING(    0x60, "600" )
+	PORT_DIPSETTING(    0x70, "700" )
+	PORT_DIPSETTING(    0x80, "800" )
 
-#if 0
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Antenna") NETLIST_LOGIC_PORT_CHANGED("maincpu", "antenna")
-
-	PORT_START("VR1")
-	PORT_ADJUSTER( 50, "VR1 - 50k, Paddle 1 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr0")
-	PORT_START("VR2")
-	PORT_ADJUSTER( 50, "VR2 - 50k, Paddle 2 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr1")
-#endif
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pong, pong_state )
@@ -340,16 +367,7 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(breakout)
-#if 0
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "ic_b9_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "ic_a9_POT.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0, 0x01)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0, 0x01)
-#endif
+
 	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "POTP1.DIAL")
 	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "POTP2.DIAL")
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw1", "COIN1.POS", 0, 0x01)
@@ -360,9 +378,14 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw4", "S4.POS", 0, 0x01)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw3", "S3.POS", 0, 0x01)
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw2", "S2.POS", 0, 0x01)
-#if 0
+
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_1", "S1_1.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_2", "S1_2.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_3", "S1_3.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_4", "S1_4.POS", 0, 0x01)
+
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
-#endif
+
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", breakout_state, sound_cb, "")
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
 
@@ -371,6 +394,7 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "led_serve", "CON_P", breakout_state, serve_cb, "")
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit1", "CON_CREDIT1", breakout_state, credit1_cb, "")
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit2", "CON_CREDIT2", breakout_state, credit2_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "coin_counter", "CON_T", breakout_state, coin_counter_cb, "")
 
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")
