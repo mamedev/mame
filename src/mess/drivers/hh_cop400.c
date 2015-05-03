@@ -4,6 +4,11 @@
 
   National Semiconductor COP400 MCU handhelds or other simple devices,
   mostly LED electronic games/toys.
+  
+  TODO:
+  - non-working games are due to MCU emulation bugs?
+  - better not start on visually dumped games before other games are working
+    (due to possible dump errors, hard to distinguish between that or MCU bug)
 
 ***************************************************************************/
 
@@ -260,7 +265,7 @@ void einvaderc_state::prepare_display()
 	
 	// update display
 	UINT8 l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
-	UINT16 grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0f0;
+	UINT16 grid = (m_d | m_g << 4 | m_sk << 8 | m_so << 9) ^ 0x0ff;
 	display_matrix(8, 10, l, grid);
 }
 
@@ -451,6 +456,53 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Milton Bradley Plus One
+  * COP410L MCU in 8-pin DIP, labeled ~/029 MM 57405 (die labeled COP410L/B NNE)
+  * 4 sensors(1 on each die side), 1bit sound
+
+***************************************************************************/
+
+class plus1_state : public hh_cop400_state
+{
+public:
+	plus1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag)
+	{ }
+};
+
+// handlers
+
+//..
+
+
+// config
+
+static INPUT_PORTS_START( plus1 )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( plus1, plus1_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K to +5V, C=100pf to GND
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED) // guessed
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+//	MCFG_DEFAULT_LAYOUT(layout_plus1)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Milton Bradley (Electronic) Lightfight
   * COP421L MCU labeled /B119 COP421L-HLA/N
   * LED matrix, 1bit sound
@@ -596,19 +648,25 @@ MACHINE_CONFIG_END
 
 ROM_START( einvaderc )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "entexsi.bin", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
+	ROM_LOAD( "copl444-hrz_n_inv_ii", 0x0000, 0x0800, CRC(76400f38) SHA1(0e92ab0517f7b7687293b189d30d57110df20fe0) )
 ROM_END
 
 
 ROM_START( funjacks )
 	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "jacks.bin", 0x0000, 0x0200, CRC(863368ea) SHA1(f116cc27ae721b3a3e178fa13765808bdc275663) )
+	ROM_LOAD( "cop410l_b_ngs", 0x0000, 0x0200, CRC(863368ea) SHA1(f116cc27ae721b3a3e178fa13765808bdc275663) )
+ROM_END
+
+
+ROM_START( plus1 )
+	ROM_REGION( 0x0200, "maincpu", 0 )
+	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, BAD_DUMP CRC(8626fdb8) SHA1(fd241b6dde0e4e86b439cb2c5bb3a82fb257d7e1) ) // still need to verify
 ROM_END
 
 
 ROM_START( lightfgt )
 	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "lightfight.bin", 0x0000, 0x0400, CRC(aceb2d65) SHA1(2328cbb195faf93c575f3afa3a1fe0079180edd7) )
+	ROM_LOAD( "cop421l-hla_n", 0x0000, 0x0400, CRC(aceb2d65) SHA1(2328cbb195faf93c575f3afa3a1fe0079180edd7) )
 ROM_END
 
 
@@ -618,4 +676,5 @@ CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Ent
 
 CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
+CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", GAME_SUPPORTS_SAVE )
