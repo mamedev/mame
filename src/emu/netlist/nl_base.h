@@ -1323,7 +1323,7 @@ ATTR_HOT inline void netlist_logic_input_t::activate_lh()
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time &delay)
 {
 	//if (UNEXPECTED(m_num_cons == 0 || is_queued()))
-	if (!is_queued())
+	if (!is_queued() && (num_cons() > 0))
 	{
 		m_time = netlist().time() + delay;
 		m_in_queue = (m_active > 0);     /* queued ? */

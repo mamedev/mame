@@ -2,12 +2,16 @@
 // copyright-holders:DICE Team,couriersud
 /*
  * Changelog:
+ *
+ *      - Added led and lamp components (couriersud)
+ *      - Start2 works (couriersud)
  *      - Added discrete paddle potentiometers (couriersud)
  *      - Changes made to run in MAME (couriersud)
  *      - Original version imported from DICE
  *
  * TODO:
- *      - implement trimmers
+ *      - implement discrete startup latch
+ *      - implement bonus game dip switch
  *
  * The MAME team has asked for and received written confirmation from the
  * author of DICE to use, modify and redistribute code under
@@ -74,7 +78,6 @@
 
 // identify unknown devices in IDE
 
-#if 1
 #define NETLIST_DEVELOPMENT 0
 
 #include "netlist/nl_dice_compat.h"
@@ -310,30 +313,12 @@ CIRCUIT_LAYOUT( breakout )
 	//LM380         //speaker amplifier
 	//LM323         //regulator
 
-//    CHIP("CREDIT_LIGHT1", LAMP)
-//    CHIP("CREDIT_LIGHT2", LAMP)
-//    CHIP("SERVE_LIGHT", LAMP)
-
 #if 0
 	CHIP("PAD1", PADDLE1_HORIZONTAL_INPUT, &pad1_desc)
 	PADDLE_CONNECTION("PAD1", "C9")
 #endif
 
 	CHIP_LATCH(LATCH)
-	//CHIP("COIN1", COIN_INPUT)
-	//CHIP_INPUT_ACTIVE_LOW(COIN1)
-
-	//CHIP("COIN2", COIN_INPUT)
-	//CHIP_INPUT_ACTIVE_LOW(COIN2)
-
-	//CHIP("START", START_INPUT)
-	//CHIP_INPUT_ACTIVE_LOW(START1)
-	//CHIP_INPUT_ACTIVE_HIGH(START2)
-
-	//CHIP("SERVE", BUTTONS1_INPUT)
-	//CHIP_INPUT_ACTIVE_LOW(SERVE)    // Active low?
-
-    //TODO: start 2
 
 	//HSYNC and VSYNC
 	#define H1_d        "L1", 14
@@ -1681,20 +1666,6 @@ CIRCUIT_LAYOUT( breakout )
 
 #endif
 
-	/* Not connected pins */
-
-	NET_C(ttlhigh, B4.3, B4.4, B4.5, B4.6)
-	NET_C(ttlhigh, N6.3, N6.4, N6.5, N6.6)
-	NET_C(ttlhigh, M6.3, M6.4, M6.5, M6.6)
-	NET_C(ttlhigh, L6.3, L6.4, L6.5, L6.6)
-
-	NET_C(ttlhigh, H6.3, H6.4, H6.5, H6.6)
-	NET_C(ttlhigh, K6.3, K6.4, K6.5, K6.6)
-	NET_C(ttlhigh, J6.3, J6.4, J6.5, J6.6)
-
-	NET_C(ttlhigh, E1.9, E1.11)
-	NET_C(ttlhigh, E2.1, E2.2)
-
 #ifdef DEBUG
 	// RAM access
 	/*CONNECTION("LOG1", 3, H4)     //A
@@ -1734,11 +1705,81 @@ CIRCUIT_LAYOUT( breakout )
 	NET_C(D9.12, E9.8)
 	NET_C(D9.8, POTP2.2) // Connect P2 dial here
 	NET_C(D9.11, POTP1.2)
-
 	NET_C(D9.9, D9.10, R33.1)
 	NET_C(R33.2, C9.6)
 
+	//----------------------------------------------------------------
+	// Serve Leds
+	//----------------------------------------------------------------
+
+	RES(R40, 150)
+	RES(R21, 150)
+	DIODE(LED1, "LedRed")
+
+	/* Below is the upright cabinet configuration
+	 * cocktail has two leds connected to R40.1 */
+	CONNECTION(SERVE_WAIT_n, "R21", 2)
+	NET_C(R21.1, R40.2)
+	NET_C(LED1.K, R40.1)
+	NET_C(LED1.A, V5)
+	ALIAS(CON_P, R40.1)
+
+	//----------------------------------------------------------------
+	// Credit lamps
+	//----------------------------------------------------------------
+
+	/* The credit lamp circuit uses thyristors and 6VAC. This is
+	 * currently not modeled and instead the CREDIT_1_OR_2 and CREDIT2
+	 * signals are used.
+	 */
+
+	ALIAS(CON_CREDIT1, L9.3) // CREDIT_1_OR_2
+	ALIAS(CON_CREDIT2, F9.6) // CREDIT2
+
+	//----------------------------------------------------------------
+	// Not connected pins
+	//----------------------------------------------------------------
+
+	NET_C(ttlhigh, B4.3, B4.4, B4.5, B4.6)
+	NET_C(ttlhigh, N6.3, N6.4, N6.5, N6.6)
+	NET_C(ttlhigh, M6.3, M6.4, M6.5, M6.6)
+	NET_C(ttlhigh, L6.3, L6.4, L6.5, L6.6)
+
+	NET_C(ttlhigh, H6.3, H6.4, H6.5, H6.6)
+	NET_C(ttlhigh, K6.3, K6.4, K6.5, K6.6)
+	NET_C(ttlhigh, J6.3, J6.4, J6.5, J6.6)
+
+	NET_C(ttlhigh, E1.9, E1.11)
+	NET_C(ttlhigh, E2.1, E2.2)
+
 	NET_C(GND, D9.1, D9.2, D9.13, D9.3, D9.4, D9.5)
+
 CIRCUIT_LAYOUT_END
 
-#endif
+/*
+ * MCR106-2 model from http://www.duncanamps.com/
+ * MCR106-1 are used to drive lamps for player 1 and player 2
+ * These have a BV of 30 ("-2" has 60, see comments below
+ * Not yet modeled.
+ *
+* MCR106-2  SCR  A G K  MCE  7-17-95
+*MCE MCR106-2  60V  4A  pkg:TO-225AA
+.SUBCKT XMCR1062 1 2 3
+QP  6 4 1  POUT OFF
+QN  4 6 5  NOUT OFF
+RF  6 4    15MEG
+RR  1 4    10MEG
+RGK 6 5    6.25K
+RG  2 6    46.2
+RK  3 5    16.2M
+DF  6 4    ZF
+DR  1 4    ZR
+DGK 6 5    ZGK
+.MODEL ZF   D (IS=1.6F IBV=800N BV=60 RS=2.25MEG) // BV=30
+.MODEL ZR   D (IS=1.6F IBV=800N BV=80) // BV=80/60*30
+.MODEL ZGK  D (IS=1.6F IBV=800N BV=6)
+.MODEL POUT PNP (IS=1.6P BF=1 CJE=60.3P)
+.MODEL NOUT NPN (IS=1.6P BF=100 RC=65M
++ CJE=60.3P CJC=12P TF=126N TR=18U)
+.ENDS XMCR1062
+ */

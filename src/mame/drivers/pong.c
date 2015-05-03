@@ -155,8 +155,29 @@ class breakout_state : public ttl_mono_state
 {
 public:
 	breakout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ttl_mono_state(mconfig, type, tag)
+		: ttl_mono_state(mconfig, type, tag),
+		m_led_serve(*this, "maincpu:led_serve"),
+		m_lamp_credit1(*this, "maincpu:lamp_credit1"),
+		m_lamp_credit2(*this, "maincpu:lamp_credit2")
 	{
+	}
+	required_device<netlist_mame_analog_output_t> m_led_serve;
+	required_device<netlist_mame_analog_output_t> m_lamp_credit1;
+	required_device<netlist_mame_analog_output_t> m_lamp_credit2;
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(serve_cb)
+	{
+		output_set_value("serve_led", (data < 3.5) ? 1 : 0);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(credit1_cb)
+	{
+		output_set_value("lamp_credit1", (data < 2.0) ? 0 : 1);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(credit2_cb)
+	{
+		output_set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
 	}
 
 protected:
@@ -344,6 +365,12 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 #endif
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", breakout_state, sound_cb, "")
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
+
+	// Leds and lamps
+
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "led_serve", "CON_P", breakout_state, serve_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit1", "CON_CREDIT1", breakout_state, credit1_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit2", "CON_CREDIT2", breakout_state, credit2_cb, "")
 
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")

@@ -35,6 +35,36 @@
 		</rect>
 	</element>
 
+	<element name="serve_led" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.3" blue="0.3" />
+		</rect>
+		<text string="SERVE" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="lamp_credit1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="CREDIT1" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
+	<element name="lamp_credit2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<text string="CREDIT2" state="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
+	</element>
+
 	<view name="Color Overlay">
 		<screen index="0">
 			<bounds left="0" top="0" right="3" bottom="4" />
@@ -42,5 +72,14 @@
 		<overlay name="overlay" element="overlay">
 			<bounds left="0" top="0" right="3" bottom="4" />
 		</overlay>
+		<bezel name="serve_led" element="serve_led">
+			<bounds x="0.125" y="4.01" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp_credit1" element="lamp_credit1">
+			<bounds x="0.8" y="4.01" width="0.55" height="0.24" />
+		</bezel>
+		<bezel name="lamp_credit2" element="lamp_credit2">
+			<bounds x="1.5" y="4.01" width="0.55" height="0.24" />
+		</bezel>
 	</view>
 </mamelayout>

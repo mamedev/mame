@@ -53,7 +53,7 @@ public:
 		m_active = 1;
 	}
 
-	ATTR_HOT void inc_active()
+	ATTR_HOT virtual void inc_active()
 	{
 		nl_assert(netlist().use_deactivate());
 		if (++m_active == 1)
@@ -62,7 +62,7 @@ public:
 		}
 	}
 
-	ATTR_HOT void dec_active()
+	ATTR_HOT virtual void dec_active()
 	{
 		nl_assert(netlist().use_deactivate());
 		if (--m_active == 0)
