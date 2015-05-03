@@ -8,6 +8,9 @@
 
   * Mini Boy 7 - 1983, Bonanza Enterprises, Ltd.
 
+Note: During attract mode display, pressing the service menu will allow you to
+      add a custom ad to scroll during attract mode display. Up to 120 characters
+
 *******************************************************************************
 
   Game Notes:
@@ -415,9 +418,9 @@ static INPUT_PORTS_START( miniboy7 )
 	PORT_DIPSETTING(    0x08, "100000 300000" )
 	PORT_DIPSETTING(    0x00, "200000 300000" )
 
-	PORT_DIPNAME( 0x01, 0x01, "DSW2-1" )            PORT_DIPLOCATION("DSW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )            PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, "Bartop" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x20, 0x20, "DSW2-6" )            PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -572,7 +575,7 @@ ROM_START( miniboy7 )
 	ROM_LOAD( "j.f10",  0x0100, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
 ROM_END
 
-ROM_START( miniboy7a )
+ROM_START( miniboy7a ) /* The term CREDIT has been changed to POINT is this version, other changes?? */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mb7_1-11.a8",  0x4000, 0x2000, CRC(e1c0f8f2) SHA1(0790dc37374cf12313ae13adaea2c6e7338e0dbc) )
 	ROM_LOAD( "mb7_2-11.a7",  0x6000, 0x2000, CRC(596040a3) SHA1(bb68b9fd12fba09c3d7c9dec70cf4770d31f911b) )
@@ -600,5 +603,5 @@ ROM_END
 ***********************************/
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS  */
-GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", 0 )
-GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", 0 )
+GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_NO_COCKTAIL )
+GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_NO_COCKTAIL )
