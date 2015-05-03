@@ -1797,11 +1797,8 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 
 						case 2:			//MOUSE
 							buttons = machine().root_device().ioport(portnames[(channel*5) + 0])->read();
-							x = machine().root_device().ioport(portnames[(channel*5) + 1 + 2])->read() - 128;
-							y = machine().root_device().ioport(portnames[(channel*5) + 2 + 2])->read() - 128;
-
-							//x /= 4;
-							//y /= 4;
+							x = (INT16)machine().root_device().ioport(portnames[(channel*5) + 1 + 2])->read();// - 128;
+							y = (INT16)machine().root_device().ioport(portnames[(channel*5) + 2 + 2])->read();// - 128;
 
 							int mouse_dx = 0;
 							int mouse_dy = 0;
@@ -1811,9 +1808,9 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 								mouse_dx = x - mouse_x2[channel];
 
 								if (mouse_dx > 0x40)
-									mouse_dx = (0x80) - mouse_dx;
+									mouse_dx = (0x80) - (mouse_dx - ((mouse_dx / 0x80) * 0x80));
 								else if (mouse_dx < -0x40)
-									mouse_dx = -(0x80) - mouse_dx;
+									mouse_dx = -(0x80) - (mouse_dx - ((mouse_dx / 0x80) * 0x80));
 
 								mouse_x2[channel] = x;
 							}
@@ -1823,9 +1820,9 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 								mouse_dy = y - mouse_y2[channel];
 
 								if (mouse_dy > 0x40)
-									mouse_dy = (0x80) - mouse_dy;
+									mouse_dy = (0x80) - (mouse_dy - ((mouse_dy / 0x80) * 0x80));
 								else if (mouse_dy < -0x40)
-									mouse_dy = -(0x80) - mouse_dy;
+									mouse_dy = -(0x80) - (mouse_dy - ((mouse_dy / 0x80) * 0x80));
 
 								mouse_y2[channel] = y;
 							}
