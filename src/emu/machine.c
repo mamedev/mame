@@ -75,8 +75,6 @@
 #include "debugger.h"
 #include "render.h"
 #include "cheat.h"
-//MKCHAMP - ADDING HEADER FILE HISCORE FOR INCLUSION
-#include "hiscore.h"
 #include "ui/selgame.h"
 #include "uiinput.h"
 #include "crsshair.h"
@@ -165,11 +163,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		}
 	screen_device_iterator screeniter(root_device());
 	primary_screen = screeniter.first();
-
-	//MKCHAMP--initialize the cpu for hiscore
-	cpu[0] = firstcpu;
-	for (cpunum = 1; cpunum < ARRAY_LENGTH(cpu) && cpu[cpunum - 1] != NULL; cpunum++)
-		cpu[cpunum] = cpu[cpunum - 1]->next();
 
 	// fetch core options
 	if (options().debug())
@@ -361,10 +354,6 @@ int running_machine::run(bool firstrun)
 
 		// load the configuration settings and NVRAM
 		bool settingsloaded = config_load_settings(*this);
-
-		//MKCHAMP - INITIALIZING THE HISCORE ENGINE
-		if (! options().disable_hiscore_patch())
-			hiscore_init(*this);
 
 		// disallow save state registrations starting here.
 		// Don't do it earlier, config load can create network
