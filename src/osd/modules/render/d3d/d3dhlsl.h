@@ -74,11 +74,14 @@ public:
 		CU_PHOSPHOR_LIFE,
 		CU_PHOSPHOR_IGNORE,
 
-		CU_POST_PINCUSHION,
+		CU_POST_VIGNETTING,
 		CU_POST_CURVATURE,
+		CU_POST_ROUND_CORNER,
+		CU_POST_REFLECTION,
 		CU_POST_SHADOW_ALPHA,
 		CU_POST_SHADOW_COUNT,
 		CU_POST_SHADOW_UV,
+		CU_POST_SHADOW_UV_OFFSET,
 		CU_POST_SHADOW_DIMS,
 		CU_POST_SCANLINE_ALPHA,
 		CU_POST_SCANLINE_SCALE,
@@ -146,6 +149,7 @@ public:
 	void        set_vector(D3DXHANDLE param, int count, float *vector);
 	void        set_float(D3DXHANDLE param, float value);
 	void        set_int(D3DXHANDLE param, int value);
+	void        set_bool(D3DXHANDLE param, bool value);
 	void        set_matrix(D3DXHANDLE param, matrix *matrix);
 	void        set_texture(D3DXHANDLE param, texture *tex);
 
@@ -184,8 +188,12 @@ struct hlsl_options
 	int                     shadow_mask_count_y;
 	float                   shadow_mask_u_size;
 	float                   shadow_mask_v_size;
+	float                   shadow_mask_u_offset;
+	float                   shadow_mask_v_offset;
 	float                   curvature;
-	float                   pincushion;
+	float                   round_corner;
+	float                   reflection;
+	float                   vignetting;
 	float                   scanline_alpha;
 	float                   scanline_scale;
 	float                   scanline_height;
@@ -307,9 +315,6 @@ public:
 
 private:
 	void                    blit(surface *dst, texture *src, surface *new_dst,
-									D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count,
-									int dstw, int dsth);
-	void                    blit(surface *dst, texture *src, surface *new_dst,
 									D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
 	void                    enumerate_screens();
 
@@ -329,9 +334,9 @@ private:
 	void                    deconverge_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims);
 	void                    defocus_pass(render_target *rt, vec2f &texsize);
 	void                    phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize, bool focus_enable);
-	void                    screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
-	void                    avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum);
-	void                    raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
+	void                    post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum, bool prepare_bloom);
+	void                    bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
+	void                    screen_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum);
 
 	base *                  d3dintf;                    // D3D interface
 
@@ -351,6 +356,8 @@ private:
 	int                     prescale_force_y;           // prescale force y
 	int                     prescale_size_x;            // prescale size x
 	int                     prescale_size_y;            // prescale size y
+	int                     hlsl_prescale_x;            // hlsl prescale x
+	int                     hlsl_prescale_y;            // hlsl prescale y
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
@@ -388,6 +395,7 @@ private:
 	surface *               backbuffer;                 // pointer to our device's backbuffer
 	effect *                curr_effect;                // pointer to the currently active effect object
 	effect *                default_effect;             // pointer to the primary-effect object
+	effect *                simple_effect;              // pointer to the simple-effect object
 	effect *                prescale_effect;            // pointer to the prescale-effect object
 	effect *                post_effect;                // pointer to the post-effect object
 	effect *                focus_effect;               // pointer to the focus-effect object
