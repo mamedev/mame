@@ -30,16 +30,16 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
--- 		MAME_DIR .. "src/osd/osdnet.c",
+ 		MAME_DIR .. "src/osd/osdnet.c",
 -- 		MAME_DIR .. "src/osd/osdmini/minimain.c",
 -- 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
 -- 		MAME_DIR .. "src/osd/modules/font/font_sdl.c",
 -- 		MAME_DIR .. "src/osd/modules/font/font_windows.c",
 -- 		MAME_DIR .. "src/osd/modules/font/font_osx.c",
 -- 		MAME_DIR .. "src/osd/modules/font/font_none.c",
--- 		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
--- 		MAME_DIR .. "src/osd/modules/netdev/pcap.c",
--- 		MAME_DIR .. "src/osd/modules/netdev/none.c",
+ 		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
+		MAME_DIR .. "src/osd/modules/netdev/pcap.c",
+ 		MAME_DIR .. "src/osd/modules/netdev/none.c",
 -- 		MAME_DIR .. "src/osd/modules/midi/portmidi.c",
 -- 		MAME_DIR .. "src/osd/modules/midi/none.c",
 -- 		MAME_DIR .. "src/osd/modules/sound/js_sound.c",
