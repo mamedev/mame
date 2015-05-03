@@ -115,7 +115,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 	end
 
 	files {
--- 		MAME_DIR .. "src/osd/osdcore.c",
+ 		MAME_DIR .. "src/osd/osdcore.c",
 -- 		MAME_DIR .. "src/osd/modules/osdmodule.c",
 -- 		MAME_DIR .. "src/osd/osdmini/minidir.c",
 -- 		MAME_DIR .. "src/osd/osdmini/minifile.c",
