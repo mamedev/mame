@@ -14,7 +14,7 @@ project ("osd_" .. _OPTIONS["osd"])
 		"ForceCPP",
 	}
 
-	dofile("osdmini_cfg.lua")
+	dofile("retro_cfg.lua")
 	
 	includedirs {
 		MAME_DIR .. "3rdparty",
@@ -85,7 +85,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		"SingleOutputDir",	
 	}
 
-	dofile("osdmini_cfg.lua")
+   dofile("retro_cfg.lua")
 	
 	includedirs {
 		MAME_DIR .. "src/emu",
