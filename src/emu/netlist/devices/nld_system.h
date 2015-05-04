@@ -234,7 +234,7 @@ public:
 			: netlist_device_t()
 	{
 		nl_assert(in_proxied.family() == LOGIC);
-		m_I.m_logic_family = in_proxied.m_logic_family;
+		m_I.set_logic_family(in_proxied.logic_family());
 	}
 
 	ATTR_COLD virtual ~nld_a_to_d_proxy() {}
@@ -255,9 +255,9 @@ protected:
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
-		if (m_I.Q_Analog() > m_I.m_logic_family->m_high_thresh_V)
+		if (m_I.Q_Analog() > m_I.logic_family()->m_high_thresh_V)
 			OUTLOGIC(m_Q, 1, NLTIME_FROM_NS(1));
-		else if (m_I.Q_Analog() < m_I.m_logic_family->m_low_thresh_V)
+		else if (m_I.Q_Analog() < m_I.logic_family()->m_low_thresh_V)
 			OUTLOGIC(m_Q, 0, NLTIME_FROM_NS(1));
 		//else
 		//  OUTLOGIC(m_Q, m_Q.net().last_Q(), NLTIME_FROM_NS(1));
@@ -276,7 +276,7 @@ public:
 			: netlist_device_t()
 	{
 		nl_assert(out_proxied.family() == LOGIC);
-		m_logic_family = out_proxied.m_logic_family;
+		m_logic_family = out_proxied.logic_family();
 	}
 
 	ATTR_COLD virtual ~nld_base_d_to_a_proxy() {}

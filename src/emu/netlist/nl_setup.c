@@ -399,7 +399,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		proxy = nl_alloc(nld_d_to_a_proxy ,out);
+		proxy = out.logic_family()->create_d_a_proxy(out_cast);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 

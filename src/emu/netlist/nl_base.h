@@ -259,6 +259,7 @@ class netlist_net_t;
 class netlist_analog_net_t;
 class netlist_logic_net_t;
 class netlist_output_t;
+class netlist_logic_output_t;
 class netlist_param_t;
 class netlist_setup_t;
 class netlist_base_t;
@@ -272,8 +273,14 @@ class NETLIB_NAME(base_d_to_a_proxy);
 // netlist_output_family_t
 // -----------------------------------------------------------------------------
 
-struct netlist_logic_family_desc_t
+class nld_base_d_to_a_proxy;
+
+class netlist_logic_family_desc_t
 {
+public:
+	virtual ~netlist_logic_family_desc_t() {}
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const = 0;
+
 	nl_double m_low_thresh_V;
 	nl_double m_high_thresh_V;
 	nl_double m_low_V;
@@ -289,8 +296,8 @@ struct netlist_logic_family_desc_t
  * Only devices of type GENERIC should have a family description entry
  */
 
-extern netlist_logic_family_desc_t netlist_family_TTL;
-extern netlist_logic_family_desc_t netlist_family_CD4000;
+extern const netlist_logic_family_desc_t &netlist_family_TTL;
+extern const netlist_logic_family_desc_t &netlist_family_CD4000;
 
 
 // -----------------------------------------------------------------------------
@@ -450,7 +457,8 @@ public:
 		m_state = astate;
 	}
 
-	const netlist_logic_family_desc_t *m_logic_family;
+	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
+	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
 
 protected:
 	ATTR_COLD virtual void save_register()
@@ -462,6 +470,7 @@ protected:
 private:
 	netlist_net_t * RESTRICT m_net;
 	state_e m_state;
+	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 NETLIST_SAVE_TYPE(netlist_core_terminal_t::state_e, DT_INT);
