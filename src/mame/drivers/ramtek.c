@@ -9,7 +9,7 @@
  Deluxe Baseball (1975/06)  YES       550188
  Hockey (1973/11)           YES       500699         500629
  Horoscope (1976)           UNKNOWN
- Knock Out (1974/09)?       UNKNOWN
+ Knock Out (1974/09)        YES       550300
  Lie Detector (1976)        UNKNOWN   Unreleased     Unreleased
  Sea Battle (1976/04)       UNKNOWN
  Soccer (1973/11)           YES       500880         500889
@@ -162,6 +162,13 @@ ROM_START( cleanswp )
 	ROM_LOAD( "501074.k3",     0x0000, 0x0020, CRC(515a34ba) SHA1(471ca9d99851591ff11a87d18b88871edd7fd268) )   // number character generation
 ROM_END
 
+// Knockout - believed to be Knockout - XTAL is 10.733 MHz
+/* contains 4 proms (soldered in) labelled :
+5H - 55030604
+9C - 500399
+4B - 550306-02
+3B - 550306-03
+2B - 550306-01 */
 
 ROM_START( ramtek3 )    // maybe Hockey?
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
