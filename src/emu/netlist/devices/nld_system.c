@@ -105,6 +105,7 @@ ATTR_COLD void nld_d_to_a_proxy::start()
 ATTR_COLD void nld_d_to_a_proxy::reset()
 {
 	m_RV.do_reset();
+	m_is_timestep = m_RV.m_P.net().as_analog().solver()->is_timestep();
 }
 
 ATTR_COLD netlist_core_terminal_t &nld_d_to_a_proxy::out()
@@ -122,17 +123,12 @@ ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
 		const nl_double V = state ? m_logic_family->m_high_V : m_logic_family->m_low_V;
 
 		// We only need to update the net first if this is a time stepping net
-		if (m_RV.m_P.net().as_analog().solver()->is_timestep())
+		if (m_is_timestep)
 		{
 			m_RV.update_dev();
-			m_RV.set(1.0 / R, V, 0.0);
-			m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
 		}
-		else
-		{
-			m_RV.set(1.0 / R, V, 0.0);
-			m_RV.update_dev();
-		}
+		m_RV.set(1.0 / R, V, 0.0);
+		m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
 	}
 }
 
@@ -169,7 +165,7 @@ NETLIB_UPDATE(res_sw)
 		const nl_double R = state ? m_RON.Value() : m_ROFF.Value();
 
 		// We only need to update the net first if this is a time stepping net
-		if (1) // m_R.m_P.net().as_analog().solver()->is_timestep())
+		if (0) // m_R.m_P.net().as_analog().solver()->is_timestep())
 		{
 			m_R.update_dev();
 			m_R.set_R(R);
@@ -178,7 +174,8 @@ NETLIB_UPDATE(res_sw)
 		else
 		{
 			m_R.set_R(R);
-			m_R.update_dev();
+			m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+			//m_R.update_dev();
 		}
 	}
 }

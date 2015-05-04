@@ -286,7 +286,7 @@ public:
 	netlist_ttl_input_t m_I;
 
 protected:
-	ATTR_COLD void start()
+	ATTR_COLD virtual void start()
 	{
 		register_input("I", m_I);
 	}
@@ -344,6 +344,7 @@ public:
 	: nld_base_d_to_a_proxy(out_proxied)
 	, m_RV(TWOTERM)
 	, m_last_state(-1)
+	, m_is_timestep(false)
 	{
 	}
 
@@ -362,6 +363,7 @@ private:
 	netlist_analog_output_t m_Q;
 	nld_twoterm m_RV;
 	int m_last_state;
+	bool m_is_timestep;
 };
 #endif
 

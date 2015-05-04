@@ -98,11 +98,11 @@ NETLIB_UPDATE(9316_sub)
 		{
 			case MAXCNT - 1:
 				m_cnt = MAXCNT;
-				OUTLOGIC(m_RC, m_ent, NLTIME_FROM_NS(20));
+				OUTLOGIC(m_RC, m_ent, NLTIME_FROM_NS(27));
 				OUTLOGIC(m_QA, 1, NLTIME_FROM_NS(20));
 				break;
 			case MAXCNT:
-				OUTLOGIC(m_RC, 0, NLTIME_FROM_NS(20));
+				OUTLOGIC(m_RC, 0, NLTIME_FROM_NS(27));
 				m_cnt = 0;
 				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
 				break;
@@ -115,8 +115,8 @@ NETLIB_UPDATE(9316_sub)
 	else
 	{
 		m_cnt = m_ABCD.get()->read_ABCD();
-		update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 		OUTLOGIC(m_RC, m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+		update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 	}
 }
 
