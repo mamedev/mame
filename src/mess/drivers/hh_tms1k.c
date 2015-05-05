@@ -24,6 +24,7 @@
  *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
+ *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000
  @MP2105   TMS1370   1979, Gakken Poker
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  *MP2788   ?         1980, Bandai Flight Time (? note: VFD-capable)
@@ -897,7 +898,7 @@ MACHINE_CONFIG_END
 
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
-  sold separately. Gameplay has emphasis on strategy, read the official manual
+  sold in a pack. Gameplay has emphasis on strategy, read the official manual
   on how to play. Remember that you can rotate the view in MESS: rotate left
   for Home(P1) orientation, rotate right for Visitor(P2) orientation.
 
