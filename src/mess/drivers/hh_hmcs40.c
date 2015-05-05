@@ -1968,7 +1968,7 @@ MACHINE_CONFIG_END
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
-
+#if 0
 class epacman2_state : public egalaxn2_state
 {
 public:
@@ -1976,7 +1976,7 @@ public:
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
-
+#endif
 // handlers are identical to Galaxian 2, so we can use those
 
 // config
