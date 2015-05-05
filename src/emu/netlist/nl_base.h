@@ -457,9 +457,6 @@ public:
 		m_state = astate;
 	}
 
-	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
-	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
-
 protected:
 	ATTR_COLD virtual void save_register()
 	{
@@ -470,7 +467,6 @@ protected:
 private:
 	netlist_net_t * RESTRICT m_net;
 	state_e m_state;
-	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 NETLIST_SAVE_TYPE(netlist_core_terminal_t::state_e, DT_INT);
@@ -564,7 +560,7 @@ class netlist_logic_input_t : public netlist_input_t
 {
 public:
 	ATTR_COLD netlist_logic_input_t()
-		: netlist_input_t(INPUT, LOGIC)
+		: netlist_input_t(INPUT, LOGIC), m_logic_family(NULL)
 	{
 	}
 
@@ -574,6 +570,11 @@ public:
 	ATTR_HOT inline void activate_hl();
 	ATTR_HOT inline void activate_lh();
 
+	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
+	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
+
+private:
+	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 // -----------------------------------------------------------------------------
@@ -813,18 +814,22 @@ public:
 
 	ATTR_COLD void initial(const netlist_sig_t val);
 
-	ATTR_COLD bool has_proxy() const { return (m_proxy != NULL); }
-	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() const  { return m_proxy; }
-	ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
-
 	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time &delay)
 	{
 		net().as_logic().set_Q(newQ, delay);
 	}
 
+	ATTR_COLD bool has_proxy() const { return (m_proxy != NULL); }
+	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() const  { return m_proxy; }
+	ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
+
+	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
+	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
+
 private:
 	netlist_logic_net_t m_my_net;
 	nld_base_d_to_a_proxy *m_proxy;
+	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 class netlist_ttl_output_t : public netlist_logic_output_t
@@ -1067,7 +1072,9 @@ public:
 	ATTR_COLD void register_subalias(const pstring &name, netlist_core_terminal_t &term);
 	ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
 	ATTR_COLD void register_output(const pstring &name, netlist_output_t &out);
+	ATTR_COLD void register_output(const pstring &name, netlist_logic_output_t &out);
 	ATTR_COLD void register_input(const pstring &name, netlist_input_t &in);
+	ATTR_COLD void register_input(const pstring &name, netlist_logic_input_t &in);
 
 	ATTR_COLD void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 

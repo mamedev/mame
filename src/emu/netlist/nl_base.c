@@ -453,15 +453,28 @@ ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_
 		m_terminals.add(port.name());
 }
 
-ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
+ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_logic_output_t &port)
 {
 	port.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, port);
 }
 
-ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp)
+ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
+{
+	//port.set_logic_family(this->logic_family());
+	setup().register_object(*this, name, port);
+}
+
+ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_logic_input_t &inp)
 {
 	inp.set_logic_family(this->logic_family());
+	setup().register_object(*this, name, inp);
+	m_terminals.add(inp.name());
+}
+
+ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp)
+{
+	//inp.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, inp);
 	m_terminals.add(inp.name());
 }
@@ -788,7 +801,6 @@ ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, c
 , plinkedlist_element_t<netlist_core_terminal_t>()
 , m_net(NULL)
 , m_state(STATE_NONEX)
-, m_logic_family(NULL)
 {
 }
 
@@ -873,7 +885,7 @@ ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const p
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
-	: netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL)
+	: netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL), m_logic_family(NULL)
 {
 	this->set_net(m_my_net);
 }

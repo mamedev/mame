@@ -399,7 +399,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		proxy = out.logic_family()->create_d_a_proxy(out_cast);
+		proxy = out_cast.logic_family()->create_d_a_proxy(out_cast);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -417,7 +417,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 		}
 		out.net().m_core_terms.clear(); // clear the list
 #endif
-		out.net().register_con(proxy->m_I);
+		out.net().register_con(proxy->in());
 		out_cast.set_proxy(proxy);
 
 	}
@@ -428,7 +428,8 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 {
 	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
 	{
-		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, in);
+		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(in);
+		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, incast);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -463,8 +464,9 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 	}
 	else if (inp.isFamily(netlist_terminal_t::LOGIC))
 	{
+		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, inp);
+		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, incast);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
