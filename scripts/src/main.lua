@@ -194,6 +194,7 @@ function mainProject(_target, _subtarget)
 	if _OPTIONS["osd"]=="retro" then
 		kind "SharedLib"
 		targetsuffix "_libretro"
+		targetprefix ""
 		links {
 			"libco",
 		}
