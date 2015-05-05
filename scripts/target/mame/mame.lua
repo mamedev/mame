@@ -125,7 +125,7 @@ CPUS["ARC"] = true
 CPUS["ARCOMPACT"] = true
 --CPUS["AMIS2000"] = true
 --CPUS["UCOM4"] = true
---CPUS["HMCS40"] = true
+CPUS["HMCS40"] = true
 --CPUS["E0C6200"] = true
 
 --------------------------------------------------
