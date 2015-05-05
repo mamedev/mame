@@ -39,39 +39,6 @@
 #include "omp.h"
 #endif
 
-vector_ops_t *vector_ops_t::create_ops(const int size)
-{
-	switch (size)
-	{
-		case 1:
-			return nl_alloc(vector_ops_impl_t<1>);
-		case 2:
-			return nl_alloc(vector_ops_impl_t<2>);
-		case 3:
-			return nl_alloc(vector_ops_impl_t<3>);
-		case 4:
-			return nl_alloc(vector_ops_impl_t<4>);
-		case 5:
-			return nl_alloc(vector_ops_impl_t<5>);
-		case 6:
-			return nl_alloc(vector_ops_impl_t<6>);
-		case 7:
-			return nl_alloc(vector_ops_impl_t<7>);
-		case 8:
-			return nl_alloc(vector_ops_impl_t<8>);
-		case 9:
-			return nl_alloc(vector_ops_impl_t<9>);
-		case 10:
-			return nl_alloc(vector_ops_impl_t<10>);
-		case 11:
-			return nl_alloc(vector_ops_impl_t<11>);
-		case 12:
-			return nl_alloc(vector_ops_impl_t<12>);
-		default:
-			return nl_alloc(vector_ops_impl_t<0>, size);
-	}
-}
-
 ATTR_COLD void terms_t::add(netlist_terminal_t *term, int net_other)
 {
 	m_term.add(term);
@@ -556,7 +523,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				break;
 		}
 
-		register_sub(*ms, pstring::sprintf("Solver %d",m_mat_solvers.count()));
+		register_sub(*ms, pstring::sprintf("Solver_%d",m_mat_solvers.count()));
 
 		ms->vsetup(groups[i]);
 

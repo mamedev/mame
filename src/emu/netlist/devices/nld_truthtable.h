@@ -65,6 +65,7 @@ public:
 				register_output(out[i].trim(), m_Q[i]);
 			}
 		}
+		m_ign = 0;
 		setup_tt();
 		// FIXME: save state
 	}
@@ -191,18 +192,19 @@ public:
 		UINT32 state = 0;
 		for (int i = 0; i < m_NI; i++)
 		{
-			m_i[i].activate();
+			if ((m_ign & (1<<i)) != 0)
+				m_i[i].activate();
 			state |= (INPLOGIC(m_i[i]) << i);
 		}
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
 		const UINT32 out = m_ttp->m_outs[nstate] & ((1 << m_NO) - 1);
-		const UINT32 ign = m_ttp->m_outs[nstate] >> m_NO;
+		m_ign = m_ttp->m_outs[nstate] >> m_NO;
 		if (has_state)
 			m_last_state = (state << m_NO) | out;
 
 		for (int i = 0; i < m_NI; i++)
-			if (ign & (1 << i))
+			if (m_ign & (1 << i))
 				m_i[i].inactivate();
 
 		for (int i = 0; i < m_NO; i++)
@@ -235,6 +237,7 @@ public:
 private:
 
 	UINT32 m_last_state;
+	UINT32 m_ign;
 	INT32 m_active;
 
 	truthtable_t *m_ttp;

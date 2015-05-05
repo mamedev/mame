@@ -148,7 +148,7 @@ public:
 
 	ATTR_HOT ATTR_ALIGN void update()
 	{
-		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
+		static const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 
 		// FIXME: this check is needed because update is called during startup as well
 		//if (m_active == 0 && netlist().use_deactivate())

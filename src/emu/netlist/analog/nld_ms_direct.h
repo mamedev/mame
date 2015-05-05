@@ -21,7 +21,7 @@ public:
 	ATTR_COLD virtual void vsetup(netlist_analog_net_t::list_t &nets);
 	ATTR_COLD virtual void reset() { netlist_matrix_solver_t::reset(); }
 
-	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
+	ATTR_HOT inline const int N() const { return (m_N == 0 ? m_dim : m_N); }
 
 	ATTR_HOT inline int vsolve_non_dynamic();
 
@@ -52,7 +52,6 @@ protected:
 	terms_t *m_rails_temp;
 
 private:
-	vector_ops_t *m_row_ops[_storage_N + 1];
 
 	int m_dim;
 	nl_double m_lp_fact;
@@ -72,9 +71,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::~netlist_matrix_solver_direct_t
 	for (int k = 0; k < N(); k++)
 	{
 		nl_free(m_terms[k]);
-		nl_free(m_row_ops[k]);
 	}
-	nl_free(m_row_ops[N()]);
 	//delete[] m_last_RHS;
 	//delete[] m_RHS;
 	nl_free_array(m_terms);
@@ -243,16 +240,12 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::build_LE()
 			const nl_double * RESTRICT gt = m_terms[k]->gt();
 			const nl_double * RESTRICT go = m_terms[k]->go();
 			const nl_double * RESTRICT Idr = m_terms[k]->Idr();
-#if VECTALT
-
 			for (int i = 0; i < terms_count; i++)
 			{
 				rhsk = rhsk + Idr[i];
 				akk = akk + gt[i];
 			}
-#else
-			m_terms[k]->ops()->sum2(Idr, gt, rhsk, akk);
-#endif
+
 			nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
 			for (int i = m_terms[k]->m_railstart; i < terms_count; i++)
 			{
@@ -345,13 +338,8 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::gauss_LE(
 			const nl_double f1 = - m_A[j][i] * f;
 			if (f1 != 0.0)
 			{
-#if 0 && VECTALT
 				for (int k = i + 1; k < kN; k++)
 					m_A[j][k] += m_A[i][k] * f1;
-#else
-				// addmult gives some performance increase here...
-				m_row_ops[kN - (i + 1)]->addmult(&m_A[j][i+1], &m_A[i][i+1], f1) ;
-#endif
 				m_RHS[j] += m_RHS[i] * f1;
 			}
 		}
@@ -464,9 +452,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	for (int k = 0; k < N(); k++)
 	{
 		m_terms[k] = nl_alloc(terms_t);
-		m_row_ops[k] = vector_ops_t::create_ops(k);
 	}
-	m_row_ops[N()] = vector_ops_t::create_ops(N());
 }
 
 template <int m_N, int _storage_N>
@@ -481,9 +467,7 @@ netlist_matrix_solver_direct_t<m_N, _storage_N>::netlist_matrix_solver_direct_t(
 	for (int k = 0; k < N(); k++)
 	{
 		m_terms[k] = nl_alloc(terms_t);
-		m_row_ops[k] = vector_ops_t::create_ops(k);
 	}
-	m_row_ops[N()] = vector_ops_t::create_ops(N());
 }
 
 

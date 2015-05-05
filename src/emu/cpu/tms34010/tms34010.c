@@ -35,7 +35,7 @@ tms340x0_device::tms340x0_device(const machine_config &mconfig, device_type type
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
 	, device_video_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 32, 3)
-	, m_reset_deferred(FALSE)
+	, m_halt_on_reset(FALSE)
 	, m_pixclock(0)
 	, m_pixperclock(0)
 	, m_output_int_cb(*this)
@@ -648,6 +648,8 @@ void tms340x0_device::device_reset()
 
 	/* HALT the CPU if requested, and remember to re-read the starting PC */
 	/* the first time we are run */
+	m_reset_deferred = m_halt_on_reset;
+	
 	if (m_reset_deferred)
 	{
 		io_register_w(*m_program, REG_HSTCTLH, 0x8000, 0xffff);
@@ -714,11 +716,10 @@ void tms340x0_device::execute_run()
 		m_icount = 0;
 		return;
 	}
-
 	/* if the CPU's reset was deferred, do it now */
 	if (m_reset_deferred)
 	{
-		m_reset_deferred = 0;
+		m_reset_deferred = FALSE;
 		m_pc = RLONG(0xffffffe0);
 	}
 

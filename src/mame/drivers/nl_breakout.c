@@ -109,7 +109,7 @@ CIRCUIT_LAYOUT( breakout )
 #else
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-6)
-    PARAM(Solver.GS_THRESHOLD, 2)
+    PARAM(Solver.GS_THRESHOLD, 6)
     //PARAM(Solver.SOR_FACTOR, 1)
 #endif
 

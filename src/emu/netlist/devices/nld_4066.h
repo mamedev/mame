@@ -40,8 +40,8 @@ public:
 	netlist_analog_input_t m_control;
 	NETLIB_NAME(R) m_R;
 
-	netlist_state_t<NETLIB_NAME(vdd_vss) *>m_supply;
-	netlist_state_t<nl_double> m_base_r;
+	NETLIB_NAME(vdd_vss) *m_supply;
+	nl_double m_base_r;
 );
 
 NETLIB_DEVICE(4066_dip,

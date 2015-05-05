@@ -16,9 +16,10 @@ NETLIB_RESET(7486)
 {
 }
 
+static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
+
 NETLIB_UPDATE(7486)
 {
-	static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 	UINT8 t = INPLOGIC(m_A) ^ INPLOGIC(m_B);
 	OUTLOGIC(m_Q, t, delay[t]);
 }

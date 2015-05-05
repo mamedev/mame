@@ -593,7 +593,7 @@ private:
 	netlist_analog_input_t m_in;
 	netlist_analog_output_delegate m_callback;
 	netlist_mame_cpu_device_t *m_cpu_device;
-	netlist_state_t<nl_double> m_last;
+	nl_double m_last;
 };
 
 // ----------------------------------------------------------------------------------------

@@ -362,8 +362,9 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 : netlist_object_t(DEVICE, afamily)
 #if (NL_KEEP_STATISTICS)
-	, total_time(0)
-	, stat_count(0)
+	, stat_total_time(0)
+	, stat_update_count(0)
+	, stat_call_count(0)
 #endif
 {
 }
@@ -381,6 +382,14 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 
 ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
 {
+}
+
+ATTR_COLD void netlist_core_device_t::start_dev()
+{
+#if (NL_KEEP_STATISTICS)
+	netlist().m_started_devices.add(this, false);
+#endif
+	start();
 }
 
 ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
@@ -596,19 +605,20 @@ ATTR_COLD void netlist_net_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
+ATTR_HOT /*ATTR_ALIGN*/ static inline void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
 {
+	netlist_core_device_t &netdev = inp->netdev();
+	inc_stat(netdev.stat_call_count);
 	if ((inp->state() & mask) != 0)
 	{
-		netlist_core_device_t &netdev = inp->netdev();
-		begin_timing(netdev.total_time);
-		inc_stat(netdev.stat_count);
+		begin_timing(netdev.stat_total_time);
+		inc_stat(netdev.stat_update_count);
 		netdev.update_dev();
-		end_timing(netdev.total_time);
+		end_timing(netdev.stat_total_time);
 	}
 }
 
-ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
+ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());

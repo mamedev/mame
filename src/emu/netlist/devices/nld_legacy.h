@@ -46,7 +46,7 @@ NETLIB_DEVICE_WITH_PARAMS(nicDelay,
 	netlist_param_int_t m_L_to_H;
 	netlist_param_int_t m_H_to_L;
 
-	netlist_state_t<UINT8> m_last;
+	UINT8 m_last;
 );
 
 

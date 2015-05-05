@@ -301,23 +301,6 @@ extern const netlist_logic_family_desc_t &netlist_family_CD4000;
 
 
 // -----------------------------------------------------------------------------
-// netlist_state_t
-// -----------------------------------------------------------------------------
-
-template< typename X>
-class netlist_state_t {
-public:
-	inline netlist_state_t() : m_x(static_cast<X>(0)) {}
-	inline netlist_state_t(const X& x_) : m_x(x_) {}
-	inline const X& get() const { return m_x; }
-	inline X& ref() { return m_x; }
-	inline operator const X&() const { return m_x; }
-	inline operator X&() { return m_x; }
-private:
-	X m_x;
-};
-
-// -----------------------------------------------------------------------------
 // netlist_object_t
 // -----------------------------------------------------------------------------
 
@@ -365,11 +348,6 @@ public:
 	ATTR_COLD const pstring &name() const;
 
 	PSTATE_INTERFACE_DECL()
-	template<typename C> ATTR_COLD void save(netlist_state_t<C> &state,
-			const pstring &stname)
-	{
-		save(state.ref(), stname);
-	}
 
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
 	ATTR_HOT inline const family_t family() const { return m_family; }
@@ -995,10 +973,7 @@ public:
 		update();
 #endif
 	}
-	ATTR_HOT inline void start_dev()
-	{
-		start();
-	}
+	ATTR_COLD void start_dev();
 
 	ATTR_HOT const netlist_sig_t INPLOGIC_PASSIVE(netlist_logic_input_t &inp);
 
@@ -1033,8 +1008,9 @@ public:
 
 #if (NL_KEEP_STATISTICS)
 	/* stats */
-	osd_ticks_t total_time;
-	INT32 stat_count;
+	osd_ticks_t stat_total_time;
+	INT32 stat_update_count;
+	INT32 stat_call_count;
 #endif
 
 #if USE_PMFDELEGATES
@@ -1205,6 +1181,9 @@ public:
 
 	pnamedlist_t<netlist_device_t *> m_devices;
 	netlist_net_t::list_t m_nets;
+#if (NL_KEEP_STATISTICS)
+	pnamedlist_t<netlist_core_device_t *> m_started_devices;
+#endif
 
 protected:
 

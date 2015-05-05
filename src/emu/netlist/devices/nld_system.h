@@ -219,7 +219,7 @@ protected:
 	ATTR_HOT ATTR_ALIGN void update_param();
 
 private:
-	netlist_state_t<UINT8> m_last_state;
+	UINT8 m_last_state;
 };
 
 

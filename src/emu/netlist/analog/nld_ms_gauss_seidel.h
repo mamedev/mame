@@ -260,6 +260,7 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolv
 	ATTR_ALIGN nl_double one_m_w[_storage_N];
 	ATTR_ALIGN nl_double RHS[_storage_N];
 	ATTR_ALIGN nl_double new_V[_storage_N];
+	ATTR_ALIGN nl_double old_V[_storage_N];
 
 	for (int k = 0; k < iN; k++)
 	{
@@ -275,21 +276,15 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolv
 			const nl_double * const RESTRICT go = this->m_terms[k]->go();
 			const nl_double * const RESTRICT Idr = this->m_terms[k]->Idr();
 			const nl_double * const *other_cur_analog = this->m_terms[k]->other_curanalog();
-#if VECTALT
+
 			for (int i = 0; i < term_count; i++)
 			{
 				gtot_t = gtot_t + gt[i];
 				RHS_t = RHS_t + Idr[i];
-			}
-			if (USE_GABS)
-				for (int i = 0; i < term_count; i++)
+				if (USE_GABS)
 					gabs_t = gabs_t + fabs(go[i]);
-#else
-			if (USE_GABS)
-				this->m_terms[k]->ops()->sum2a(gt, Idr, go, gtot_t, RHS_t, gabs_t);
-			else
-				this->m_terms[k]->ops()->sum2(gt, Idr, gtot_t, RHS_t);
-#endif
+			}
+
 			for (int i = this->m_terms[k]->m_railstart; i < term_count; i++)
 				RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
 		}

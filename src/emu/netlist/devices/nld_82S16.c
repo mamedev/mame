@@ -84,7 +84,10 @@ NETLIB_START(82S16_dip)
 	register_input("12",    m_WEQ);
 	register_input("13",    m_DIN);
 
-	register_output("6",   m_DOUTQ);}
+	register_output("6",    m_DOUTQ);
+
+	save(NLNAME(m_ram));
+}
 
 NETLIB_RESET(82S16_dip)
 {

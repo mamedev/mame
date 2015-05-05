@@ -16,13 +16,17 @@
 // ----------------------------------------------------------------------------------------
 
 #define PSTATE_INTERFACE_DECL()               \
-	template<typename C> ATTR_COLD void save(C &state, const pstring &stname);
+	template<typename C> ATTR_COLD void save(C &state, const pstring &stname); \
+	template<typename C, std::size_t N> ATTR_COLD void save(C (&state)[N], const pstring &stname); \
+	template<typename C> ATTR_COLD void save(C *state, const pstring &stname, const int count);
 
 #define PSTATE_INTERFACE(obj, manager, module)               \
 	template<typename C> ATTR_COLD void obj::save(C &state, const pstring &stname) \
-	{                                                                       \
-		manager->save_item(state, this, module + "." + stname);  \
-	}
+	{ manager->save_item(state, this, module + "." + stname); } \
+	template<typename C, std::size_t N> ATTR_COLD void obj::save(C (&state)[N], const pstring &stname) \
+	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(state[0]), N, &(state[0]), false); } \
+	template<typename C> ATTR_COLD void obj::save(C *state, const pstring &stname, const int count) \
+	{ manager->save_state_ptr(module + "." + stname, nl_datatype<C>::type, this, sizeof(C), count, state, false); 	}
 
 enum pstate_data_type_e {
 	NOT_SUPPORTED,
@@ -140,8 +144,10 @@ public:
 
 	inline const pstate_entry_t::list_t &save_list() const { return m_save; }
 
-protected:
+	// FIXME: should be protected
 	ATTR_COLD void save_state_ptr(const pstring &stname, const pstate_data_type_e, const void *owner, const int size, const int count, void *ptr, bool is_ptr);
+
+protected:
 
 private:
 	pstate_entry_t::list_t m_save;

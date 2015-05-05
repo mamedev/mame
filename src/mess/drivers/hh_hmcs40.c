@@ -40,8 +40,8 @@
  @29      HD38820A  1981, Coleco Pac-Man (ver 2)
  *32      HD38820A  198?, Gakken Super Cobra
  *38      HD38820A  1982, Entex Crazy Climber
- *42      HD38820A  1982, Entex Stargate (have dump, +COP411 for audio)
- *43      HD38820A  1982, Entex Turtles (have dump, +COP411 for audio)
+ @42      HD38820A  1982, Entex Stargate
+ @43      HD38820A  1982, Entex Turtles
  @45      HD38820A  1982, Coleco Donkey Kong
  @49      HD38820A  1983, Bandai Zackman
  @61      HD38820A  1983, Coleco Ms. Pac-Man
@@ -69,6 +69,7 @@
 
 #include "emu.h"
 #include "cpu/hmcs40/hmcs40.h"
+#include "cpu/cop400/cop400.h"
 #include "sound/speaker.h"
 
 #include "hh_hmcs40_test.lh" // common test-layout - use external artwork
@@ -1875,7 +1876,7 @@ WRITE16_MEMBER(egalaxn2_state::grid_w)
 	m_inp_mux = data >> 1 & 0xf;
 
 	// D1-D15: vfd matrix grid
-	m_grid = data >> 1;
+	m_grid = data >> 1 & 0x7fff;
 	prepare_display();
 }
 
@@ -1967,7 +1968,7 @@ MACHINE_CONFIG_END
   NOTE!: MESS external artwork is recommended
 
 ***************************************************************************/
-
+#if 0
 class epacman2_state : public egalaxn2_state
 {
 public:
@@ -1975,7 +1976,7 @@ public:
 		: egalaxn2_state(mconfig, type, tag)
 	{ }
 };
-
+#endif
 // handlers are identical to Galaxian 2, so we can use those
 
 // config
@@ -2010,18 +2011,295 @@ static INPUT_PORTS_START( epacman2 )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( epacman2, epacman2_state )
+
+
+
+
+/***************************************************************************
+
+  Entex Turtles (manufactured in Japan)
+  * PCB label 560359
+  * Hitachi QFP HD38820A43 MCU
+  * COP411L sub MCU, labeled COP411L-KED/N
+  * cyan/red/green VFD display NEC FIP15BM32T
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class eturtles_state : public hh_hmcs40_state
+{
+public:
+	eturtles_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_hmcs40_state(mconfig, type, tag),
+		m_cop_irq(0)
+	{ }
+
+	virtual void prepare_display();
+	DECLARE_WRITE8_MEMBER(plate_w);
+	DECLARE_WRITE16_MEMBER(grid_w);
+
+	UINT8 m_cop_irq;
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(cop_irq_w);
+	DECLARE_READ8_MEMBER(cop_latch_r);
+	DECLARE_READ8_MEMBER(cop_ack_r);
+
+	void update_int();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+protected:
+	virtual void machine_start();
+};
+
+// handlers (maincpu side first)
+
+void eturtles_state::prepare_display()
+{
+	UINT16 grid = BITSWAP16(m_grid,15,1,14,13,12,11,10,9,8,7,6,5,4,3,2,0);
+	UINT32 plate = BITSWAP32(m_plate,31,30,11,12,18,19,16,17,22,15,20,21,27,26,23,25,24,2,3,1,0,6,4,5,10,9,2,8,7,14,1,13);
+	display_matrix(30, 15, plate | (grid >> 5 & 8), grid); // grid 8 also forces plate 3 high
+}
+
+WRITE8_MEMBER(eturtles_state::plate_w)
+{
+	m_r[offset] = data;
+	
+	// R0x-R6x: vfd matrix plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+	prepare_display();
+}
+
+WRITE16_MEMBER(eturtles_state::grid_w)
+{
+	m_d = data;
+	
+	// D1-D6: input mux
+	UINT8 inp_mux = data >> 1 & 0x3f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int();
+	}
+
+	// D1-D15: vfd matrix grid
+	m_grid = data >> 1 & 0x7fff;
+	prepare_display();
+}
+
+void eturtles_state::update_int()
+{
+	// INT0/1 on multiplexed inputs, and from COP D0
+	UINT8 inp = read_inputs(6);
+	set_interrupt(0, (inp & 1) | m_cop_irq);
+	set_interrupt(1, inp & 2);
+}
+
+
+// COP side
+
+WRITE_LINE_MEMBER(eturtles_state::speaker_w)
+{
+	// SK: speaker out
+	m_speaker->level_w(!state);
+}
+
+WRITE8_MEMBER(eturtles_state::cop_irq_w)
+{
+	// D0: maincpu INT0 (active low)
+	m_cop_irq = ~data & 1;
+	update_int();
+}
+
+READ8_MEMBER(eturtles_state::cop_latch_r)
+{
+	// L0-L3: soundlatch from maincpu R0x
+	return m_r[0];
+}
+
+READ8_MEMBER(eturtles_state::cop_ack_r)
+{
+	// G0: ack from maincpu D0
+	return m_d & 1;
+}
+
+
+// config
+
+static INPUT_PORTS_START( eturtles )
+	PORT_START("IN.0") // D1 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+
+	PORT_START("IN.1") // D2 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+
+	PORT_START("IN.2") // D3 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+
+	PORT_START("IN.3") // D4 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+
+	PORT_START("IN.4") // D5 INT0/1
+	PORT_CONFNAME( 0x01, 0x01, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+
+	PORT_START("IN.5") // D6 INT0/1
+	PORT_CONFNAME( 0x03, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_CONFSETTING(    0x02, "0 (Demo)" )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(eturtles_state::input_changed)
+{
+	update_int();
+}
+
+
+void eturtles_state::machine_start()
+{
+	hh_hmcs40_state::machine_start();
+	
+	// register for savestates
+	save_item(NAME(m_cop_irq));
+}
+
+static MACHINE_CONFIG_START( eturtles, eturtles_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(egalaxn2_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(egalaxn2_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
+
+	MCFG_CPU_ADD("audiocpu", COP411, 215000) // approximation
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
+	MCFG_COP400_READ_L_CB(READ8(eturtles_state, cop_latch_r))
+	MCFG_COP400_READ_G_CB(READ8(eturtles_state, cop_ack_r))
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
+
+	/* no video! */
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex Stargate (manufactured in Japan)
+  * PCB label 5603521/31
+  * Hitachi QFP HD38820A42 MCU
+  * COP411L sub MCU, labeled ~/B8236 COP411L-KEC/N
+  * cyan/red/green VFD display NEC FIP15AM32T (EL628-003) no. 2-421, with partial color overlay
+
+  NOTE!: MESS external artwork is recommended
+
+***************************************************************************/
+
+class estargte_state : public eturtles_state
+{
+public:
+	estargte_state(const machine_config &mconfig, device_type type, const char *tag)
+		: eturtles_state(mconfig, type, tag)
+	{ }
+
+	virtual void prepare_display();
+	DECLARE_READ8_MEMBER(cop_data_r);
+};
+
+// handlers (most of it is handled in eturtles_state above)
+
+void estargte_state::prepare_display()
+{
+	UINT16 grid = BITSWAP16(m_grid,15,0,14,13,12,11,10,9,8,7,6,5,4,3,2,1);
+	UINT32 plate = BITSWAP32(m_plate,31,30,29,15,17,19,21,23,25,27,26,24,3,22,20,18,16,14,12,10,8,6,4,2,0,1,3,5,7,9,11,13);
+	display_matrix(29, 14, plate, grid);
+}
+
+READ8_MEMBER(estargte_state::cop_data_r)
+{
+	// L0-L3: soundlatch from maincpu R0x
+	// L7: ack from maincpu D0
+	return m_r[0] | (m_d << 7 & 0x80);
+}
+
+
+// config
+
+static INPUT_PORTS_START( estargte )
+	PORT_START("IN.0") // D1 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL) PORT_NAME("Inviso")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL) PORT_NAME("Smart Bomb")
+
+	PORT_START("IN.1") // D2 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL) PORT_NAME("Fire")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL) PORT_NAME("Change Direction")
+
+	PORT_START("IN.2") // D3 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+
+	PORT_START("IN.3") // D4 INT0/1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL) PORT_NAME("Thrust")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // D5 INT0/1
+	PORT_CONFNAME( 0x01, 0x00, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_CONFSETTING(    0x00, "0 (Demo)" ) // yes, same value as 1-player, hold the Inviso button at boot to enter demo mode
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+	PORT_CONFNAME( 0x02, 0x02, "Skill Level" ) PORT_CHANGED_MEMBER(DEVICE_SELF, eturtles_state, input_changed, NULL)
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+
+	PORT_START("IN.5") // D6 INT0/1
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( estargte, estargte_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
+
+	MCFG_CPU_ADD("audiocpu", COP411, 190000) // approximation
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED) // guessed
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
+	MCFG_COP400_READ_L_CB(READ8(estargte_state, cop_data_r))
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_hh_hmcs40_test)
@@ -3104,6 +3382,26 @@ ROM_START( epacman2 )
 ROM_END
 
 
+ROM_START( estargte )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a42", 0x0000, 0x1000, CRC(5f6d55a6) SHA1(0da32149790fa5f16097338fc80536b462169e0c) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 0x0200, "audiocpu", 0 )
+	ROM_LOAD( "cop411l-kec_n", 0x0000, 0x0200, CRC(fbd3c2d3) SHA1(65b8b24d38678c3fa970bfd639e9449a75a28927) )
+ROM_END
+
+
+ROM_START( eturtles )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a43", 0x0000, 0x1000, CRC(446aa4e2) SHA1(d1c0fb14ea7081def53b1174964b39eed1e5d5e6) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 0x0200, "audiocpu", 0 )
+	ROM_LOAD( "cop411l-ked_n", 0x0000, 0x0200, CRC(503d26e9) SHA1(a53d24d62195bfbceff2e4a43199846e0950aef6) )
+ROM_END
+
+
 ROM_START( ghalien )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "hd38800a04", 0x0000, 0x1000, CRC(019c3328) SHA1(9f1029c5c479f78350952c4f18747341ba5ea7a0) )
@@ -3180,7 +3478,9 @@ CONS( 1981, cpacmanr1, cpacman,  0, cpacman,  cpacman,  driver_device, 0, "Colec
 CONS( 1983, cmspacmn,  0,        0, cmspacmn, cmspacmn, driver_device, 0, "Coleco", "Ms. Pac-Man (Coleco)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1981, egalaxn2,  0,        0, egalaxn2, egalaxn2, driver_device, 0, "Entex", "Galaxian 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
-CONS( 1981, epacman2,  0,        0, epacman2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1981, epacman2,  0,        0, egalaxn2, epacman2, driver_device, 0, "Entex", "Pac Man 2 (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1982, estargte,  0,        0, estargte, estargte, driver_device, 0, "Entex", "Stargate (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
+CONS( 1982, eturtles,  0,        0, eturtles, eturtles, driver_device, 0, "Entex", "Turtles (Entex)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  driver_device, 0, "Gakken", "Heiankyo Alien (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK )
 CONS( 1982, gckong,    0,        0, gckong,   gckong,   driver_device, 0, "Gakken", "Crazy Kong (Gakken)", GAME_SUPPORTS_SAVE | GAME_REQUIRES_ARTWORK | GAME_NOT_WORKING )

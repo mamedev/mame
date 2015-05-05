@@ -5289,7 +5289,7 @@ GAME( 1990, racedrivcg4, racedriv, racedrivc_machine, racedrivc, driver_device, 
 GAME( 1990, racedrivc2,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 2)", 0 )
 GAME( 1990, racedrivc1,  racedriv, racedrivc1_machine, racedrivc, driver_device, 0,ROT0, "Atari Games", "Race Drivin' (compact, rev 1)", 0 )
 
-GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, driver_device, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", GAME_NOT_WORKING, layout_racedrivpan ) // picking roadster crashes the side monitors?
+GAMEL( 1990, racedrivpan, racedriv, racedriv_panorama_machine, racedriv_pan, driver_device, 0, ROT0, "Atari Games", "Race Drivin' Panorama (prototype, rev 2.1)", 0, layout_racedrivpan )
 
 GAME( 1991, steeltal,  0,        steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (rev 2)", 0 )
 GAME( 1991, steeltalg, steeltal, steeltal_machine, steeltal, driver_device, 0, ROT0, "Atari Games", "Steel Talons (German, rev 2)", 0 )
