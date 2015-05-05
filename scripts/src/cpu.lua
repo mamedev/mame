@@ -360,6 +360,22 @@ if (CPUS["ESRIP"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Seiko Epson E0C6200 series
+---@src/emu/cpu/e0c6200/e0c6200.h,CPUS += E0C6200
+--------------------------------------------------
+
+if (CPUS["E0C6200"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200.c",
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200.h",
+	}
+end
+
+if (CPUS["E0C6200"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200d.c")
+end
+
+--------------------------------------------------
 -- RCA COSMAC
 ---@src/emu/cpu/cosmac/cosmac.h,CPUS += COSMAC
 --------------------------------------------------

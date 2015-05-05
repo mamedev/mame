@@ -494,8 +494,8 @@ int vertex_program_simulator::step()
 {
 	int p1, p2;
 	float tmp[3 * 4];
-	float tmpv[4];
-	float tmps[4];
+	float tmpv[4] = { 0, 0, 0, 0};
+	float tmps[4] = { 0, 0, 0, 0};
 	instruction::decoded *d;
 
 #if 0 // useful while debugging to see what instrucion is being executed

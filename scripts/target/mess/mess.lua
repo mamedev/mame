@@ -103,7 +103,7 @@ CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
 CPUS["I8008"] = true
 CPUS["SCMP"] = true
-CPUS["MN10200"] = true
+--CPUS["MN10200"] = true
 CPUS["COSMAC"] = true
 CPUS["UNSP"] = true
 CPUS["HCD62121"] = true
@@ -123,6 +123,7 @@ CPUS["ARCOMPACT"] = true
 CPUS["AMIS2000"] = true
 CPUS["UCOM4"] = true
 CPUS["HMCS40"] = true
+CPUS["E0C6200"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are

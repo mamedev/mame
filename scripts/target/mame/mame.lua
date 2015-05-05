@@ -100,7 +100,7 @@ CPUS["SM8500"] = true
 CPUS["MINX"] = true
 CPUS["SSEM"] = true
 CPUS["AVR8"] = true
-CPUS["TMS0980"] = true
+--CPUS["TMS0980"] = true
 CPUS["I4004"] = true
 CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
@@ -123,9 +123,10 @@ CPUS["ALTO2"] = true
 --CPUS["W65816"] = true
 CPUS["ARC"] = true
 CPUS["ARCOMPACT"] = true
-CPUS["AMIS2000"] = true
-CPUS["UCOM4"] = true
+--CPUS["AMIS2000"] = true
+--CPUS["UCOM4"] = true
 CPUS["HMCS40"] = true
+--CPUS["E0C6200"] = true
 
 --------------------------------------------------
 -- specify available sound cores

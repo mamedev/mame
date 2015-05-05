@@ -24,6 +24,7 @@
  *MP1296   TMS1100?  1982, Entex Black Knight
  *MP1312   TMS1100   198?, Tandy/RadioShack Science Fair Microcomputer Trainer
  @MP1525   TMS1170   1980, Coleco Head to Head Baseball
+ *MP1604   ?         1981, Hanzawa Twinvader III/Tandy Cosmic Fire Away 3000
  @MP2105   TMS1370   1979, Gakken Poker
  *MP2139   TMS1370?  1982, Gakken Galaxy Invader 1000
  *MP2788   ?         1980, Bandai Flight Time (? note: VFD-capable)
@@ -31,6 +32,7 @@
  @MP3226   TMS1000   1978, Milton Bradley Simon (model 4850)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head Basketball
+ *M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
   MP3403   TMS1100   1978, Marx Electronic Bowling -> elecbowl.c
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
@@ -45,10 +47,12 @@
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
   MP3479   TMS1100   1980, MicroVision cartridge: Baseball
   MP3481   TMS1100   1979, MicroVision cartridge: Connect Four
+ *MP3491   TMS1100   1980, Mattel Horserace Analyzer
   MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
-  M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M34000, ..)
+  M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
   M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
+ *M34078A  TMS1100   1983, Milton Bradley Arcade Mania
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
@@ -894,7 +898,7 @@ MACHINE_CONFIG_END
 
   This is a head to head electronic tabletop LED-display sports console.
   One cartridge(Football) was included with the console, the other three were
-  sold separately. Gameplay has emphasis on strategy, read the official manual
+  sold in a pack. Gameplay has emphasis on strategy, read the official manual
   on how to play. Remember that you can rotate the view in MESS: rotate left
   for Home(P1) orientation, rotate right for Visitor(P2) orientation.
 
