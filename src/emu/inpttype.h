@@ -20,10 +20,10 @@
 	typelist.append(*global_alloc(input_type_entry(IPT_##_type, IPG_##_group, (_player == 0) ? _player : (_player) - 1, (_player == 0) ? #_type : ("P" #_player "_" #_type), _name, _seq, _decseq, _incseq)));
 
 /* These input port macros expand to a great deal of code and break compilers */
-#if defined(__GNUC__) && __GNUC__ == 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5) || (__GNUC__ == 4 && __GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ >= 4)
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4 || (__GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ >= 4))))
+#pragma GCC push_options
 #pragma GCC optimize ("O1")
-#endif
-#ifdef _MSC_VER
+#elif defined(_MSC_VER)
 #pragma optimize("", off)
 #endif
 
@@ -829,6 +829,8 @@ void construct_core_types(simple_list<input_type_entry> &typelist)
 	construct_core_types_OSD(typelist);
 	construct_core_types_invalid(typelist);
 }
-#ifdef _MSC_VER
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 4 || (__GNUC_MINOR__ == 4 && __GNUC_PATCHLEVEL__ >= 4))))
+#pragma GCC pop_options
+#elif defined(_MSC_VER)
 #pragma optimize("", on)
 #endif
