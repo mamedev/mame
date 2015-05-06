@@ -12,6 +12,19 @@
 
 *********************************************************************/
 
+/*
+royalpk2 : to get 'secret. OK.'
+
+0002D92C: MOV L18, L29
+0002D92E: CMPI L18, $1
+0002D930: BNE $2d94c
+
+go 2d92c
+do l29 = 1
+f5
+
+*/
+
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
