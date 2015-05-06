@@ -36,6 +36,65 @@ NETLIB_UPDATE(clock)
 }
 
 // ----------------------------------------------------------------------------------------
+// extclock
+// ----------------------------------------------------------------------------------------
+
+NETLIB_START(extclock)
+{
+	register_output("Q", m_Q);
+	register_input("FB", m_feedback);
+
+	register_param("FREQ", m_freq, 7159000.0 * 5.0);
+	register_param("PATTERN", m_pattern, "1,1");
+	register_param("OFFSET", m_offset, 0.0);
+	m_inc[0] = netlist_time::from_hz(m_freq.Value()*2);
+
+	connect(m_feedback, m_Q);
+	{
+		netlist_time base = netlist_time::from_hz(m_freq.Value()*2);
+		nl_util::pstring_list pat = nl_util::split(m_pattern.Value(),",");
+		m_off = netlist_time::from_double(m_offset.Value());
+
+		int pati[256];
+		m_size = pat.count();
+		int total = 0;
+		for (int i=0; i<m_size; i++)
+		{
+			pati[i] = pat[i].as_long();
+			total += pati[i];
+		}
+		netlist_time ttotal = netlist_time::zero;
+		for (int i=0; i<m_size - 1; i++)
+		{
+			m_inc[i] = base * pati[i];
+			ttotal += m_inc[i];
+		}
+		m_inc[m_size - 1] = base * total - ttotal;
+	}
+	save(NLNAME(m_cnt));
+	save(NLNAME(m_off));
+}
+
+NETLIB_RESET(extclock)
+{
+	m_cnt = 0;
+	m_off = netlist_time::from_double(m_offset.Value());
+	m_Q.initial(0);
+}
+
+NETLIB_UPDATE_PARAM(extclock)
+{
+}
+
+NETLIB_UPDATE(extclock)
+{
+	//static UINT8 pattern[6] = { 4, 4, 4, 4, 4, 8 };
+	OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
+	m_cnt = (m_cnt + 1) % m_size;
+	m_off = netlist_time::zero;
+}
+
+// ----------------------------------------------------------------------------------------
 // logic_input
 // ----------------------------------------------------------------------------------------
 

@@ -109,6 +109,9 @@ NETLIB_START(9312)
 
 	m_last_chan = 0;
 	m_last_G = 0;
+
+	save(NLNAME(m_last_chan));
+	save(NLNAME(m_last_G));
 }
 
 NETLIB_RESET(9312)
