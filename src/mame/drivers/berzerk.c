@@ -22,17 +22,14 @@ class berzerk_state : public driver_device
 public:
 	berzerk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_s14001a(*this, "speech"),
 		m_ls181_10c(*this, "ls181_10c"),
 		m_ls181_12c(*this, "ls181_12c"),
 		m_custom(*this, "exidy"),
-		m_screen(*this, "screen") { }
-
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+		m_screen(*this, "screen"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
@@ -40,6 +37,9 @@ public:
 	required_device<ttl74181_device> m_ls181_12c;
 	required_device<exidy_sound_device> m_custom;
 	required_device<screen_device> m_screen;
+
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 
 	UINT8 m_magicram_control;
 	UINT8 m_last_shift_data;
@@ -52,6 +52,7 @@ public:
 	int m_p1_direction;
 	int m_p2_counter_74ls161;
 	int m_p2_direction;
+
 	DECLARE_READ8_MEMBER(led_on_r);
 	DECLARE_WRITE8_MEMBER(led_on_w);
 	DECLARE_READ8_MEMBER(led_off_r);
@@ -64,16 +65,19 @@ public:
 	DECLARE_WRITE8_MEMBER(magicram_w);
 	DECLARE_WRITE8_MEMBER(magicram_control_w);
 	DECLARE_READ8_MEMBER(intercept_v256_r);
-	DECLARE_WRITE8_MEMBER(berzerk_audio_w);
-	DECLARE_READ8_MEMBER(berzerk_audio_r);
+	DECLARE_WRITE8_MEMBER(audio_w);
+	DECLARE_READ8_MEMBER(audio_r);
 	DECLARE_READ8_MEMBER(moonwarp_p1_r);
 	DECLARE_READ8_MEMBER(moonwarp_p2_r);
+
 	DECLARE_DRIVER_INIT(moonwarp);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void sound_reset();
 	virtual void video_start();
-	UINT32 screen_update_berzerk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	TIMER_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256);
@@ -467,7 +471,7 @@ void berzerk_state::get_pens(rgb_t *pens)
 }
 
 
-UINT32 berzerk_state::screen_update_berzerk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[NUM_PENS];
 	offs_t offs;
@@ -514,7 +518,7 @@ UINT32 berzerk_state::screen_update_berzerk(screen_device &screen, bitmap_rgb32 
  *
  *************************************/
 
-WRITE8_MEMBER(berzerk_state::berzerk_audio_w)
+WRITE8_MEMBER(berzerk_state::audio_w)
 {
 	int clock_divisor;
 
@@ -568,7 +572,7 @@ WRITE8_MEMBER(berzerk_state::berzerk_audio_w)
 }
 
 
-READ8_MEMBER(berzerk_state::berzerk_audio_r)
+READ8_MEMBER(berzerk_state::audio_r)
 {
 	switch (offset)
 	{
@@ -591,7 +595,7 @@ void berzerk_state::sound_reset()
 {
 	address_space &space = m_maincpu->space(AS_IO);
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
-	berzerk_audio_w(space, 4, 0x40);
+	audio_w(space, 4, 0x40);
 }
 
 
@@ -633,7 +637,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( berzerk_io_map, AS_IO, 8, berzerk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP
-	AM_RANGE(0x40, 0x47) AM_READWRITE(berzerk_audio_r, berzerk_audio_w)
+	AM_RANGE(0x40, 0x47) AM_READWRITE(audio_r, audio_w)
 	AM_RANGE(0x48, 0x48) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x49, 0x49) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(0x4a, 0x4a) AM_READ_PORT("P2") AM_WRITENOP
@@ -1124,7 +1128,7 @@ static MACHINE_CONFIG_START( berzerk, berzerk_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(berzerk_state, screen_update_berzerk)
+	MCFG_SCREEN_UPDATE_DRIVER(berzerk_state, screen_update)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1319,6 +1323,11 @@ DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
 	io.install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), this));
+	
+	save_item(NAME(m_p1_counter_74ls161));
+	save_item(NAME(m_p1_direction));
+	save_item(NAME(m_p2_counter_74ls161));
+	save_item(NAME(m_p2_direction));
 }
 
 /*************************************
@@ -1327,10 +1336,10 @@ DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
  *
  *************************************/
 
-GAME( 1980, berzerk,  0,       berzerk, berzerk,  driver_device,        0, ROT0, "Stern Electronics", "Berzerk (set 1)", 0 )
-GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  driver_device,        0, ROT0, "Stern Electronics", "Berzerk (set 2)", 0 )
-GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, driver_device,        0, ROT0, "Stern Electronics", "Berzerk (French Speech)", 0 )
-GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, driver_device,        0, ROT0, "Stern Electronics", "Berzerk (German Speech)", 0 )
-GAME( 1980, berzerks, berzerk, berzerk, berzerks, driver_device,        0, ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech)", 0 )
-GAME( 1981, frenzy,   0,       frenzy,  frenzy,   driver_device,        0, ROT0, "Stern Electronics", "Frenzy", 0 )
-GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", 0)
+GAME( 1980, berzerk,  0,       berzerk, berzerk,  driver_device,        0, ROT0, "Stern Electronics", "Berzerk (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, berzerk1, berzerk, berzerk, berzerk,  driver_device,        0, ROT0, "Stern Electronics", "Berzerk (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, berzerkf, berzerk, berzerk, berzerkf, driver_device,        0, ROT0, "Stern Electronics", "Berzerk (French Speech)", GAME_SUPPORTS_SAVE )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg, driver_device,        0, ROT0, "Stern Electronics", "Berzerk (German Speech)", GAME_SUPPORTS_SAVE )
+GAME( 1980, berzerks, berzerk, berzerk, berzerks, driver_device,        0, ROT0, "Stern Electronics (Sonic License)", "Berzerk (Spanish Speech)", GAME_SUPPORTS_SAVE )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy,   driver_device,        0, ROT0, "Stern Electronics", "Frenzy", GAME_SUPPORTS_SAVE )
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp, berzerk_state, moonwarp, ROT0, "Stern Electronics", "Moon War (prototype on Frenzy hardware)", GAME_SUPPORTS_SAVE )

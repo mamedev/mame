@@ -16,8 +16,6 @@
 #include "e0c6200.h"
 #include "debugger.h"
 
-#include "e0c6200op.inc"
-
 
 const device_type EPSON_E0C6S46 = &device_creator<e0c6s46_device>;
 
