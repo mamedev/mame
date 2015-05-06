@@ -147,6 +147,8 @@ static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -218,9 +220,11 @@ static MACHINE_CONFIG_START( royalpk2, mosaicf2_state )
 	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(royalpk2_map)
 	MCFG_CPU_IO_MAP(royalpk2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -343,4 +347,4 @@ ROM_END
 
 
 GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, driver_device, 0,        ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE )
-GAME( 1999, royalpk2, 0, royalpk2, royalpk2, driver_device, 0,        ROT0, "F2 System", "Royal Poker 2", GAME_NOT_WORKING )
+GAME( 1999, royalpk2, 0, royalpk2, royalpk2, driver_device, 0,        ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", GAME_NOT_WORKING )
