@@ -638,7 +638,7 @@ void s14001a_device::device_start()
 	save_item(NAME(m_OldDelta));
 	save_item(NAME(m_DACOutput));
 	save_item(NAME(m_audioout));
-	save_item(NAME(m_filtervals[8]));
+	save_item(NAME(m_filtervals));
 	save_item(NAME(m_VSU1000_amp)); 
 }
 
