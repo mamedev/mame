@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   IMOLA GP by RB Bologna (Alberici?)

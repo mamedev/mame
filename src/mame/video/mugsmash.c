@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* video/mugsmash.c - see drivers/mugsmash.c for more info */
 
 #include "emu.h"

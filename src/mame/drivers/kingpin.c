@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 ACL Manufacturing 1983 hardware (a division of American Communication Laboratories)
 Driver by Andrew Gardner

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Karnov (USA version)                   (c) 1987 Data East USA

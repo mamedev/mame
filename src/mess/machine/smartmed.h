@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     smartmed.h: header file for smartmed.c
 */

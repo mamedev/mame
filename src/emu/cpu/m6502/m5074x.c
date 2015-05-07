@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Mitsubishi M5074x 8-bit microcontroller family
 */

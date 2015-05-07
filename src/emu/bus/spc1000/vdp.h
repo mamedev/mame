@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SPC1000_VDP_H__
 #define __SPC1000_VDP_H__
 

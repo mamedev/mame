@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
   Greyhound Electronics Inc. hardware

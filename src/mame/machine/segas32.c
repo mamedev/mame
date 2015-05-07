@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Sega System 32 Protection related functions */
 
 #include "emu.h"

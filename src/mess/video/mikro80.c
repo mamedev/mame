@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         Mikro-80 video driver by Miodrag Milanovic

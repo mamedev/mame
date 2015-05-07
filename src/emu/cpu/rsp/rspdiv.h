@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 static const UINT16 rsp_divtable[1024] =
 {
 	0xffff,

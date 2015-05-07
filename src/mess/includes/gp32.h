@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _GP32_H_
 #define _GP32_H_
 

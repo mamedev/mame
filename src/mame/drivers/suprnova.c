@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
    Super Kaneko Nova System
     Original Driver by Sylvain Glaize

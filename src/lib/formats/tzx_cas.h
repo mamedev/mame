@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
        tzx_cas.h

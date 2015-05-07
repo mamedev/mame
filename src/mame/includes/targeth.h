@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class targeth_state : public driver_device
 {
 public:

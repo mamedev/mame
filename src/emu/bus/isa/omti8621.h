@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * omti8621.h - SMS OMTI 8621 disk controller
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef WD_FDC_H
 #define WD_FDC_H
 

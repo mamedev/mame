@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
 #include "cpu/v60/v60.h"

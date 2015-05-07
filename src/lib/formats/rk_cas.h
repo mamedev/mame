@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
        rk_cas.h

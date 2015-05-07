@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PC_JOY_SW_H_
 #define PC_JOY_SW_H_
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*  CAT702 security chip */
 
 #pragma once

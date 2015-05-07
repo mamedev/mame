@@ -4,9 +4,6 @@
 
     Centronics printer interface
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "ctronics.h"

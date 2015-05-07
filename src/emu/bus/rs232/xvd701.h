@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef JVC_XV701_H_
 #define JVC_XV701_H_
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  The schematics don't seem to make a lot of sense when it
  *  comes to the video timing chain::

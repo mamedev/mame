@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/tecmo_spr.h"
 
 class wc90_state : public driver_device

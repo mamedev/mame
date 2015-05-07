@@ -5,9 +5,6 @@
     IEEE-488.1 General Purpose Interface Bus emulation
     (aka HP-IB, GPIB, CBM IEEE)
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "ieee488.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "crsshair.h"
 #include "video/315_5124.h"

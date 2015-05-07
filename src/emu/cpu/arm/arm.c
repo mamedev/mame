@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* arm.c
 
     ARM 2/3/6 Emulation (26 bit address bus)

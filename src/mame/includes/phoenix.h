@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/pleiads.h"
 #include "sound/discrete.h"
 #include "sound/tms36xx.h"

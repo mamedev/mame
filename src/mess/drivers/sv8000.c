@@ -1,4 +1,4 @@
-// license:BSD
+// license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Robbbert
 /***************************************************************************
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Chack'n Pop (C) 1983 TAITO Corp.
  *  simulate 68705 MCU

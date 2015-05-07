@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/tms5220.h"
 
 class portrait_state : public driver_device

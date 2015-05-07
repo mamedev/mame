@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
     Bandai Wonderswan / Wonderswan Color cart emulation

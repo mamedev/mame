@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include <string.h>
 #include <assert.h>
 #include "trs_dsk.h"

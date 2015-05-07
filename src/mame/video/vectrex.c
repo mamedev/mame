@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include <math.h>
 #include "emu.h"
 #include "includes/vectrex.h"

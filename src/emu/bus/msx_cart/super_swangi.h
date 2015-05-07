@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_CART_SUPER_SWANGI_H
 #define __MSX_CART_SUPER_SWANGI_H
 

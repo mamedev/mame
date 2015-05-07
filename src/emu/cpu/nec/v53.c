@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* V53 */
 
 // V33 / V33A cores with onboard peripherals

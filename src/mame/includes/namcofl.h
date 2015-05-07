@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "namcos2.h"
 #include "video/c116.h"
 

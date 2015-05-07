@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     VTech Laser/VZ Laser Memory Expansions

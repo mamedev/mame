@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Creative labs SB0400 Audigy2 Value
 
 #ifndef SB0400_H

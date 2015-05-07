@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Sprite/tile priority is quite complex in this game: it is handled both

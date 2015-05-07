@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __JASMIN_H__
 #define __JASMIN_H__
 

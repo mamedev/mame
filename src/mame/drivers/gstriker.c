@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** DRIVER INFO **************************************************************
 
 Grand Striker, V Goal Soccer, World Cup '94

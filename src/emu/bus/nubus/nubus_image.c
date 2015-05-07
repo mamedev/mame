@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   nubus_image.c - synthetic NuBus card to allow reading/writing "raw"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MD_STM95_H
 #define __MD_STM95_H
 

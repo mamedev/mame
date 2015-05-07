@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
    Texas Instruments TMS320C51 DSP Emulator
 

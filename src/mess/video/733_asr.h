@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #define asr733_chr_region ":gfx1"
 

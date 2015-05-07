@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Various Tecmo Sprite implementations
 
  - the various sprite implementations here are slightly different but can clearly be refactored to use

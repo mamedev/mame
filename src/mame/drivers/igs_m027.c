@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* IGS ARM7 (IGS027A) based Mahjong / Gambling platform(s)
  Driver by Xing Xing
 

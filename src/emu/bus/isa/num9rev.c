@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // license:BSD-3-Clause
 // Number Nine Revolution 512x32/1024x8
 // TODO: for 1024x768 mode the 7220 is programmed for 512x768, how does that work?

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SNS_UPD_H
 #define __SNS_UPD_H
 

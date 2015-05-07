@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
  SSP1601 disassembler

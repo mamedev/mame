@@ -4,9 +4,6 @@
 
     Commodore C2N/1530/1531 Datassette emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

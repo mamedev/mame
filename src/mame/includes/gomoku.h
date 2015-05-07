@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class gomoku_state : public driver_device
 {

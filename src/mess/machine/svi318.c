@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 ** Spectravideo SVI-318 and SVI-328
 **

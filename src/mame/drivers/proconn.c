@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  Project PROCONN (and PC92/PC98) Fruit Machine hardware
   skeleton driver!

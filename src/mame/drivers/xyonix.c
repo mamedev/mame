@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Xyonix *********************************************************************
 
 driver by David Haywood and Stephh

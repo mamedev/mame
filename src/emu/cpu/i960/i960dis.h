@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __I960DIS_H__
 #define __I960DIS_H__
 

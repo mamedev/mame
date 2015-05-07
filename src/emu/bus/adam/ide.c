@@ -4,9 +4,6 @@
 
     Micro Innovations Powermate IDE Hard Disk emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

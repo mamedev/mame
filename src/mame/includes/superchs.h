@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/eepromser.h"
 #include "video/tc0480scp.h"
 

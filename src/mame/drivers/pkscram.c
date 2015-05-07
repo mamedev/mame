@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 PCB# -   ANIMAL-01  Cosmo Electronics Corporation

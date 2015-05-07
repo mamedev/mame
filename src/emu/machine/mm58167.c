@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     mm58167.c - National Semiconductor MM58167 real-time clock emulation

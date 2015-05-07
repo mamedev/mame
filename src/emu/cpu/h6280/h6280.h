@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
     h6280.h Portable Hu6280 emulator interface

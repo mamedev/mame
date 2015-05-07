@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* parameter x = result, y = source 1, z = source 2 */
 
 #define SetTF(x)        (m_TF = (x))

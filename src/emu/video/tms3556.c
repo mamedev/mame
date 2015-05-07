@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     tms3556 emulation
 

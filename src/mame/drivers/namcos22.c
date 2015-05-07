@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**
  * This driver describes Namco's System22 and Super System 22 hardware.
  *

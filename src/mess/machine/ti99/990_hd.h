@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     990_hd.h: include file for 990_hd.c
 */

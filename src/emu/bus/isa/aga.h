@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   pc cga/mda combi adapters
 

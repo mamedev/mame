@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         Kramer MC machine driver by Miodrag Milanovic

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************\
 * Multitech Micro Professor 1                    *
 *                                                *

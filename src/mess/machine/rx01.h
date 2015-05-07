@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /**********************************************************************
 
     DEC RX01 floppy drive controller

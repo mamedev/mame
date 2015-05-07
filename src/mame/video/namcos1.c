@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************
 
 Namco System 1 Video Hardware

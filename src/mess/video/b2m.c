@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         Bashkiria-2M video driver by Miodrag Milanovic

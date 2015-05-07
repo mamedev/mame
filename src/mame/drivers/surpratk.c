@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Surprise Attack (Konami GX911) (c) 1990 Konami

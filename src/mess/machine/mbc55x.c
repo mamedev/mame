@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     machine/mbc55x.c
 

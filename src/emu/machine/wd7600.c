@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Western Digital WD7600 PC system chipset
  *

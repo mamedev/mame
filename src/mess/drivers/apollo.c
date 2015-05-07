@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * apollo.c - APOLLO DN3500/DN3000 driver
  *

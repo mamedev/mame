@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Konami Ultra Sports hardware
 

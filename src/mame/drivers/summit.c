@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Summit Coin - Push Over (c)1981

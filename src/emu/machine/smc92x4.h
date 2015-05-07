@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Interface */
 
 #ifndef __SMC92X4_H__

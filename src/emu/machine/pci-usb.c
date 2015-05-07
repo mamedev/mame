@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "pci-usb.h"
 
 const device_type USB_UHCI = &device_creator<usb_uhci_device>;

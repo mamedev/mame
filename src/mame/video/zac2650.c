@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************/
 /*                                                           */
 /* Zaccaria/Zelco S2650 based games video                    */

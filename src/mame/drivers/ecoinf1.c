@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Electrocoin Older (original?) HW type
 
   this appears to be the earliest of the Electrocoin hardware

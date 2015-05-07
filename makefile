@@ -341,7 +341,6 @@ endif
 ifdef PROFILE
 PROFILER =
 SYMBOLS = 1
-OPTIMIZE = 3
 ifndef SYMLEVEL
 SYMLEVEL = 1
 endif

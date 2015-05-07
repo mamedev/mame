@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************************
 
                       -= Electronic Devices / International Games =-

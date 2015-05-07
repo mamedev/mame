@@ -4,9 +4,6 @@
 
     Commodore 1700/1750/1764 RAM Expansion Unit emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

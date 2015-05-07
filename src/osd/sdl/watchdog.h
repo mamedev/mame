@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _watchdog_h_
 #define _watchdog_h_
 //============================================================

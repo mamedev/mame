@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Sega GP World hardware
 Driver by Andrew Gardner with help from Daphne Source.

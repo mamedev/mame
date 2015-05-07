@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Sega Model 1 Hardware Overview

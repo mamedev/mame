@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Power Balls  (c) 1994 Playmark

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Kaneko 'Calc' hitbox collision / protection
 
    It is thought that this is done by the 'CALC1' 'TOYBOX' and 'CALC3' protection chips found on the various boards

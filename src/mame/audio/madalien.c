@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************
  * madalien Sound System Analog emulation
  * Aug 2008, Derrick Renaud

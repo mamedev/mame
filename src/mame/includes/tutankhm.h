@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class tutankhm_state : public driver_device
 {
 public:

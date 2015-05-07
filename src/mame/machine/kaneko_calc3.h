@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* CALC 3 */
 
 #define VERBOSE_OUTPUT 0

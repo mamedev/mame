@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Konami Twin16 Hardware - Video

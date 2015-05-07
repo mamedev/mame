@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Dick Smith VZ-300 WordPro Cartridge

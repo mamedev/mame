@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"

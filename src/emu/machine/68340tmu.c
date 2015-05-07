@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 68340 TIMER module */
 
 #include "emu.h"

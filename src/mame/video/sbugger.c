@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Space Bugger - Video Hardware */
 
 #include "emu.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Yie Ar Kung-Fu memory map (preliminary)

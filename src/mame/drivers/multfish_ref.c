@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* The following sets are known to exist based on official documentation, but have not been dumped. */
 /* no other official sets are known to exist apart from these and the ones in multfish.c */

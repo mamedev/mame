@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:PeT
 /***************************************************************************
  gamate sound hardware
 

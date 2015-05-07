@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* PGM System (c)1997 IGS
 

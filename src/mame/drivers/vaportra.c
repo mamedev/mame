@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Vapor Trail (World version)  (c) 1989 Data East Corporation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Video Hardware for Shoot Out
     prom GB09.K6 may be related to background tile-sprite priority

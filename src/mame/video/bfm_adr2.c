@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Bellfruit Adder2 video board driver, (under heavy construction !!!)

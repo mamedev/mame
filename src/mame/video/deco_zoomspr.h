@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 
 class deco_zoomspr_device : public device_t

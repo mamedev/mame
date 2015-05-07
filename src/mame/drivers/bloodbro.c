@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************
 
 Blood Bros, West Story & Sky Smasher

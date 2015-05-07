@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * 3c505.c - 3COM 3C505 ethernet controller (for Apollo DN3x00)
  *

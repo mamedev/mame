@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         Radio-86RK machine driver by Miodrag Milanovic

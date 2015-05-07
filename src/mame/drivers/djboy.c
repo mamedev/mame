@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 DJ Boy (c)1989 Kaneko
 

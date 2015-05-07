@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 const char glsl_plain_rgb32_dir_fsh_src[] =
 "\n"
 "#pragma optimize (on)\n"

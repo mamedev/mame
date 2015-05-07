@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Sharp X68000 video functions

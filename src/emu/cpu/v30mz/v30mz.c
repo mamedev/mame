@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
 
     NEC V20/V30/V33 emulator modified to a v30mz emulator

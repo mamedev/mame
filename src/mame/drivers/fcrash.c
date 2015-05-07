@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Final Crash & other CPS1 bootlegs */
 
 /*

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   macpds.c - Mac 68000 PDS implementation (SE, Portable)

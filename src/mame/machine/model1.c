@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 ** Model 1 coprocessor TGP simulation
 */

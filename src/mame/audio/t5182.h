@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/2151intf.h"
 #include "cpu/z80/z80.h"
 

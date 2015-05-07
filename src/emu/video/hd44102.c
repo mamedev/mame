@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     HD44102 Dot Matrix Liquid Crystal Graphic Display Column Driver emulation

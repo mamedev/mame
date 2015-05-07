@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/bufsprite.h"
 
 class sidearms_state : public driver_device

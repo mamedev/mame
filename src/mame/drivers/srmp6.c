@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Super Real Mahjong P6 (JPN Ver.)
     (c)1996 Seta

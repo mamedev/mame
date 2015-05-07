@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __DSP56K_INSTRUCTION_H__
 #define __DSP56K_INSTRUCTION_H__
 

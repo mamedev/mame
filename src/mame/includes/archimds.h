@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
  *
  *  Acorn Archimedes custom chips (IOC, MEMC, VIDC)

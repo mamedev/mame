@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Sang Ho Soft 'Puzzle Star' PCB

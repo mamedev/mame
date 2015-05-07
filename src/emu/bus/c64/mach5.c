@@ -4,9 +4,6 @@
 
     Access Software MACH 5 cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mach5.h"

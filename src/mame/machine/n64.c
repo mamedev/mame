@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* machine/n64.c - contains N64 hardware emulation shared between MAME and MESS */
 
 #include "emu.h"

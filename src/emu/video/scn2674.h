@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef SCN2674_H
 #define SCN2674_H
 

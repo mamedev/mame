@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     HDC9224 and HDC9234 Hard and Floppy Disk Controller
 

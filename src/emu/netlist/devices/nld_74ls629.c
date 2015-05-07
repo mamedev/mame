@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_SN74LS629.c
  *

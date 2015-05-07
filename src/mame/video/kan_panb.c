@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* bootlegs of Kaneko Pandora chip, with modifications */
 
 #include "emu.h"

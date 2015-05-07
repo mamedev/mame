@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     CES Classic wall games

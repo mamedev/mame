@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* video/pass.c - see drivers/pass.c for more info */
 
 #include "emu.h"

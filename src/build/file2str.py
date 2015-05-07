@@ -1,4 +1,7 @@
 #!/usr/bin/python
+##
+## license:BSD-3-Clause
+## copyright-holders:Aaron Giles, Andrew Gardner
 
 from __future__ import with_statement
 

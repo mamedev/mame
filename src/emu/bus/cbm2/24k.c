@@ -4,9 +4,6 @@
 
     GLA 24K RAM cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "24k.h"

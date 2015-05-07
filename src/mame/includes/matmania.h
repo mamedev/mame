@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class matmania_state : public driver_device
 {

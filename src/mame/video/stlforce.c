@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* video/stlforce.c - see main driver for other notes */
 
 #include "emu.h"

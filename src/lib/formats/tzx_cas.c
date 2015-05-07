@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 TZX (currently spectrum only) and spectrum TAP cassette format support by Wilbert Pol

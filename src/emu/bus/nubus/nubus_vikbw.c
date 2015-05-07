@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Viking 1024x768 fixed-resolution monochrome board

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************************
 
     Alien: The Arcade Medal Edition (c) 2005 Capcom

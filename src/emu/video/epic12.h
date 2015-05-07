@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
 
 #define MCFG_EPIC12_ADD(_tag) \

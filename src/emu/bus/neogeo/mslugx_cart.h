@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NEOGEO_MSLUGX_CART_H
 #define __NEOGEO_MSLUGX_CART_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************
 
     Konami 056800 MIRAC sound interface

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Sega CD / Mega CD */
 
 #include "cpu/m68000/m68000.h"

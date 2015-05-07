@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
  PeT mess@utanet.at 2007, 2014
  Peter Wilhelmsen peter.wilhelmsen@gmail.com

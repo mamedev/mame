@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"

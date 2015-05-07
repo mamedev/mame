@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/okim6295.h"
 
 class sslam_state : public driver_device

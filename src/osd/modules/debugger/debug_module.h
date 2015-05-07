@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * debug_module.h
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* ASG 971222 -- rewrote this interface */
 #ifndef __NEC_V25_H_
 #define __NEC_V25_H_

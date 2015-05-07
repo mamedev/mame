@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Poke Champ */
 
 #include "emu.h"

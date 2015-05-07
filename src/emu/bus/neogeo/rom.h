@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NEOGEO_ROM_H
 #define __NEOGEO_ROM_H
 

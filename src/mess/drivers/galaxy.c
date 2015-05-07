@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Krzysztof Strzecha, Miodrag Milanovic
 /***************************************************************************
 Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 

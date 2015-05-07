@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 
 #define CGA_PALETTE_SETS 83

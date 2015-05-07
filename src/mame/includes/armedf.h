@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "includes/nb1414m4.h"
 #include "video/bufsprite.h"
 

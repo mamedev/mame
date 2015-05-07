@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Big Striker (bootleg) Video Hardware */
 
 #include "emu.h"

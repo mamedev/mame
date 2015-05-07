@@ -4,9 +4,6 @@
 
     OKI MSM6255 Dot Matrix LCD Controller implementation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "msm6255.h"

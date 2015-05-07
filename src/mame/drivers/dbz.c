@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Dragonball Z                  (c) 1993 Banpresto
   Dragonball Z 2 - Super Battle (c) 1994 Banpresto

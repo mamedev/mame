@@ -6,9 +6,6 @@
 
     http://hitmen.c02.at/html/hardware.html
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "4tba.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Super Slam (c)1993 Playmark */
 
 /*

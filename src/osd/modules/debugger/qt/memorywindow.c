@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #define NO_MEM_TRACKING
 
 #include "memorywindow.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Anthony Kruize
 #ifndef __GBSOUND_H__
 #define __GBSOUND_H__
 

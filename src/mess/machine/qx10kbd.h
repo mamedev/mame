@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef QX10KBD_H_
 #define QX10KBD_H_
 

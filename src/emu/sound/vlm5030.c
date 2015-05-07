@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     vlm5030.c
 

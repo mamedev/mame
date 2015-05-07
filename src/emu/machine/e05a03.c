@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     E05A03 Gate Array (used in the Epson LX-800)

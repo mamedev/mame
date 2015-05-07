@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 68340 DMA module */
 
 #include "emu.h"

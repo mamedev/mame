@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************
 
     !!! DEPRECATED, USE src/emu/wd_fdc.h FOR NEW DRIVERS !!!

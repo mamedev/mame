@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         Bashkiria-2M machine driver by Miodrag Milanovic

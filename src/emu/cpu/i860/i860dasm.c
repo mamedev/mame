@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "i860.h"
 
 /* Sub-group decoders */

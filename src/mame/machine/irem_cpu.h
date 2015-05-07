@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 extern const UINT8 gunforce_decryption_table[];
 extern const UINT8 bomberman_decryption_table[];

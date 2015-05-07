@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Kusayakyuu (Sandlot Baseball)
 (c)1985 Taito

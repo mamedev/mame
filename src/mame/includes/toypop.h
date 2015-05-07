@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/namcoio.h"
 #include "sound/namco.h"
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Notes: DJH 04 Jan 2008
 
   fixed gridiron079gre (shared access to spriteram was broken)

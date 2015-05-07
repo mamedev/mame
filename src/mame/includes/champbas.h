@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Talbot - Champion Base Ball - Exciting Soccer

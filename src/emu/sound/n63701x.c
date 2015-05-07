@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 An Hitachi HD637A01X0 MCU programmed to act as a sample player.

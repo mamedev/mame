@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_MULTIGAME_H
 #define __NES_MULTIGAME_H
 

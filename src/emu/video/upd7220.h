@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     NEC uPD7220 Graphics Display Controller emulation

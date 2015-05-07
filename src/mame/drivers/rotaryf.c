@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Rotary Fighter, 01/1979, Kasco (Kansai Seiki Seisakusho Co.)
  board KIV-101 CPU: xtal(??mhz), i8085A, 40 pin IC(i8255?), 6*ROM, 1*RAM, DIP(8 switches), ..
  board KIV-101 CRT: 2*RAM, lots of 74xx TTL

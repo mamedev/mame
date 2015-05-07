@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "cdu76s.h"
 
 void sony_cdu76s_device::ExecCommand()

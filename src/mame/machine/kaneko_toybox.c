@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Kaneko 'Toybox' protection
 
  the following chips have been seen

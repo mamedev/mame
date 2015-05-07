@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Konami Endeavour hardware (gambling games)
 

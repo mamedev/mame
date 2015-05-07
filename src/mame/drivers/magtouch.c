@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Magical Touch by Micro MFG
 

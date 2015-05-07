@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     Battle Rangers                  (c) 1988 Data East Corporation

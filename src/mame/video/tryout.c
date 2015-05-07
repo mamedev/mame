@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************
 
  Pro Yakyuu Nyuudan Test Tryout (JPN Ver.)

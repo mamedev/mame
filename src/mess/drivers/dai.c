@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
 DAI driver by Krzysztof Strzecha and Nathan Woods

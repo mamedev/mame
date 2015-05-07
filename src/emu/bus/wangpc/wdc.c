@@ -4,9 +4,6 @@
 
     Wang PC-PM001 Winchester Disk Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "wdc.h"

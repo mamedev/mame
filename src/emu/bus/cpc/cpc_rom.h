@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * cpc_rom.h
  * Amstrad CPC mountable ROM image device

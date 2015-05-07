@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Atari Tomcat prototype hardware

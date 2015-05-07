@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef FMTOWNS_H_
 #define FMTOWNS_H_
 

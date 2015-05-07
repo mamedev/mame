@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __VCS_SLOT_H
 #define __VCS_SLOT_H
 

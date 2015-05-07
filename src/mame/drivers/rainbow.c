@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Rainbow Islands  (c) Taito 1987   + Jumping

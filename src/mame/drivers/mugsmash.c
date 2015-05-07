@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Mug Smashers (c)199? Electronic Devices (Italy) / 3D Games (England)
     driver by David Haywood - Dip Switches and Inputs by stephh
 

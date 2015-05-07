@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class snookr10_state : public driver_device
 {
 public:

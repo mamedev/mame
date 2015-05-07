@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "pcd_kbd.h"
 
 const device_type PCD_KEYBOARD = &device_creator<pcd_keyboard_device>;

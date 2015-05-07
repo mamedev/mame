@@ -1,8 +1,7 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, Dirk Best
 /******************************************************************************
  *  Sharp MZ700
- *
- *  license: MAME
- *  copyright-holders: Juergen Buchmueller, Dirk Best
  *
  *  Reference: http://sharpmz.computingmuseum.com
  *

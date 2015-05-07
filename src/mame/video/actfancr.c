@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     actfancr - Bryan McPhail, mish@tendril.co.uk

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
   TI-85 driver by Krzysztof Strzecha
 

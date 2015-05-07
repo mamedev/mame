@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
  Lucky Girl (newer 1991 version on different hardware?)

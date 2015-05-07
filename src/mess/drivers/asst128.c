@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "includes/genpc.h"
 #include "machine/pc_fdc.h"

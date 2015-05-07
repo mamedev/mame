@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Toshiba TMPZ84C011, MPUZ80/TLCS-Z80 ASSP Family

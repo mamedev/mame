@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "oricext.h"
 #include "jasmin.h"
 #include "microdisc.h"

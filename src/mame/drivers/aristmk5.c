@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Aristocrat MK5 / MKV hardware

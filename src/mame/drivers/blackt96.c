@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Black Touch '96

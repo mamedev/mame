@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 68307 MBUS module */
 /* all ports on this are 8-bit? */
 

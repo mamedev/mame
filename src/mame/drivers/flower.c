@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Flower (c)1986 Komax (USA license)

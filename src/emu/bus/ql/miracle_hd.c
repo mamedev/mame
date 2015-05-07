@@ -4,9 +4,6 @@
 
     Miracle Hard Disk emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "miracle_hd.h"

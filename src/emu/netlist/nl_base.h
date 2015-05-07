@@ -259,6 +259,7 @@ class netlist_net_t;
 class netlist_analog_net_t;
 class netlist_logic_net_t;
 class netlist_output_t;
+class netlist_logic_output_t;
 class netlist_param_t;
 class netlist_setup_t;
 class netlist_base_t;
@@ -272,8 +273,14 @@ class NETLIB_NAME(base_d_to_a_proxy);
 // netlist_output_family_t
 // -----------------------------------------------------------------------------
 
-struct netlist_logic_family_desc_t
+class nld_base_d_to_a_proxy;
+
+class netlist_logic_family_desc_t
 {
+public:
+	virtual ~netlist_logic_family_desc_t() {}
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const = 0;
+
 	nl_double m_low_thresh_V;
 	nl_double m_high_thresh_V;
 	nl_double m_low_V;
@@ -289,26 +296,9 @@ struct netlist_logic_family_desc_t
  * Only devices of type GENERIC should have a family description entry
  */
 
-extern netlist_logic_family_desc_t netlist_family_TTL;
-extern netlist_logic_family_desc_t netlist_family_CD4000;
+extern const netlist_logic_family_desc_t &netlist_family_TTL;
+extern const netlist_logic_family_desc_t &netlist_family_CD4000;
 
-
-// -----------------------------------------------------------------------------
-// netlist_state_t
-// -----------------------------------------------------------------------------
-
-template< typename X>
-class netlist_state_t {
-public:
-	inline netlist_state_t() : m_x(static_cast<X>(0)) {}
-	inline netlist_state_t(const X& x_) : m_x(x_) {}
-	inline const X& get() const { return m_x; }
-	inline X& ref() { return m_x; }
-	inline operator const X&() const { return m_x; }
-	inline operator X&() { return m_x; }
-private:
-	X m_x;
-};
 
 // -----------------------------------------------------------------------------
 // netlist_object_t
@@ -358,11 +348,6 @@ public:
 	ATTR_COLD const pstring &name() const;
 
 	PSTATE_INTERFACE_DECL()
-	template<typename C> ATTR_COLD void save(netlist_state_t<C> &state,
-			const pstring &stname)
-	{
-		save(state.ref(), stname);
-	}
 
 	ATTR_HOT inline const type_t type() const { return m_objtype; }
 	ATTR_HOT inline const family_t family() const { return m_family; }
@@ -449,8 +434,6 @@ public:
 		nl_assert(astate != STATE_NONEX);
 		m_state = astate;
 	}
-
-	const netlist_logic_family_desc_t *m_logic_family;
 
 protected:
 	ATTR_COLD virtual void save_register()
@@ -555,7 +538,7 @@ class netlist_logic_input_t : public netlist_input_t
 {
 public:
 	ATTR_COLD netlist_logic_input_t()
-		: netlist_input_t(INPUT, LOGIC)
+		: netlist_input_t(INPUT, LOGIC), m_logic_family(NULL)
 	{
 	}
 
@@ -565,6 +548,11 @@ public:
 	ATTR_HOT inline void activate_hl();
 	ATTR_HOT inline void activate_lh();
 
+	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
+	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
+
+private:
+	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 // -----------------------------------------------------------------------------
@@ -804,18 +792,22 @@ public:
 
 	ATTR_COLD void initial(const netlist_sig_t val);
 
-	ATTR_COLD bool has_proxy() const { return (m_proxy != NULL); }
-	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() const  { return m_proxy; }
-	ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
-
 	ATTR_HOT inline void set_Q(const netlist_sig_t newQ, const netlist_time &delay)
 	{
 		net().as_logic().set_Q(newQ, delay);
 	}
 
+	ATTR_COLD bool has_proxy() const { return (m_proxy != NULL); }
+	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() const  { return m_proxy; }
+	ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
+
+	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
+	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
+
 private:
 	netlist_logic_net_t m_my_net;
 	nld_base_d_to_a_proxy *m_proxy;
+	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 class netlist_ttl_output_t : public netlist_logic_output_t
@@ -981,10 +973,7 @@ public:
 		update();
 #endif
 	}
-	ATTR_HOT inline void start_dev()
-	{
-		start();
-	}
+	ATTR_COLD void start_dev();
 
 	ATTR_HOT const netlist_sig_t INPLOGIC_PASSIVE(netlist_logic_input_t &inp);
 
@@ -1019,8 +1008,9 @@ public:
 
 #if (NL_KEEP_STATISTICS)
 	/* stats */
-	osd_ticks_t total_time;
-	INT32 stat_count;
+	osd_ticks_t stat_total_time;
+	INT32 stat_update_count;
+	INT32 stat_call_count;
 #endif
 
 #if USE_PMFDELEGATES
@@ -1058,7 +1048,9 @@ public:
 	ATTR_COLD void register_subalias(const pstring &name, netlist_core_terminal_t &term);
 	ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
 	ATTR_COLD void register_output(const pstring &name, netlist_output_t &out);
+	ATTR_COLD void register_output(const pstring &name, netlist_logic_output_t &out);
 	ATTR_COLD void register_input(const pstring &name, netlist_input_t &in);
+	ATTR_COLD void register_input(const pstring &name, netlist_logic_input_t &in);
 
 	ATTR_COLD void connect(netlist_core_terminal_t &t1, netlist_core_terminal_t &t2);
 
@@ -1189,6 +1181,9 @@ public:
 
 	pnamedlist_t<netlist_device_t *> m_devices;
 	netlist_net_t::list_t m_nets;
+#if (NL_KEEP_STATISTICS)
+	pnamedlist_t<netlist_core_device_t *> m_started_devices;
+#endif
 
 protected:
 

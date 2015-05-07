@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_9310.c
  *
@@ -94,7 +96,7 @@ NETLIB_UPDATE(9310_sub)
 		update_outputs(m_cnt);
 		OUTLOGIC(m_RC, m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(20));
 #else
-		switch (m_cnt.get())
+		switch (m_cnt)
 		{
 			case MAXCNT - 1:
 				m_cnt = MAXCNT;
@@ -114,7 +116,7 @@ NETLIB_UPDATE(9310_sub)
 	}
 	else
 	{
-		m_cnt = m_ABCD.get()->read_ABCD();
+		m_cnt = m_ABCD->read_ABCD();
 		update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 		OUTLOGIC(m_RC, m_ent & (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 	}

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Tatsumi TX-1/Buggy Boy video hardware

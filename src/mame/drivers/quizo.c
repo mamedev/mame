@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************
  Quiz Olympic (c)1985 Seoul Coin Corp.
 

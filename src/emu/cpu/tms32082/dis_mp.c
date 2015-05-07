@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // TMS32082 MP Disassembler
 
 #include "emu.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/t5182.h"
 
 class darkmist_state : public driver_device

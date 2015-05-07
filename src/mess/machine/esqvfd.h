@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef ESQVFD_H
 #define ESQVFD_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Handlers for ti990 disk images
 

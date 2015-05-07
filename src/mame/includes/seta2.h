@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
 #include "sound/x1_010.h"

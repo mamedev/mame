@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __YGV608_H__
 #define __YGV608_H__
 

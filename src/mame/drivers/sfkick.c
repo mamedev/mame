@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Super Free Kick / Spinkick by HEC (Haesung Enterprise Co.)
 

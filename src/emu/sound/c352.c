@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     c352.c - Namco C352 custom PCM chip emulation
     v1.2

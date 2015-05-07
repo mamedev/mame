@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* Deal 'Em */
 /* Deal 'Em was designed as an enhanced gamecard, to fit into various existing MPU4 cabinets

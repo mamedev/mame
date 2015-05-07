@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     Hewlett Packard 49G+ Graphing Calculator

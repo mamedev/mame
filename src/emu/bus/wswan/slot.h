@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __WS_SLOT_H
 #define __WS_SLOT_H
 

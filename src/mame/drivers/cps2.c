@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Driver by Paul Leaman (paul@vortexcomputing.demon.co.uk)

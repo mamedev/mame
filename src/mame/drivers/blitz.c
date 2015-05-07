@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
   MEGA DOUBLE POKER (BLITZ SYSTEM INC.)

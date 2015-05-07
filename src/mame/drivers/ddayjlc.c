@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     D-DAY   (c)Jaleco 1984

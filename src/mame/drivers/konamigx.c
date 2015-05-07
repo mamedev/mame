@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************
  *
  * konamigx.c - Konami System GX

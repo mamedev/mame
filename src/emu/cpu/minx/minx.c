@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Implementation for the Nintendo Minx CPU.
 

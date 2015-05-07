@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Mirage Youjuu Mahjongden
 
 TODO:

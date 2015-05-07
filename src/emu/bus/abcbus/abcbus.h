@@ -4,9 +4,6 @@
 
     Luxor ABC (Databoard 4680) Bus emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                               ABC 80

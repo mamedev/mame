@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __K053250_H__
 #define __K053250_H__
 

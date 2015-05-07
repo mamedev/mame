@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     Pro Soccer                      (c) 1983 Data East Corporation

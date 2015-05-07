@@ -4,9 +4,6 @@
 
     Commodore VIC-1110 8K RAM Expansion Cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "vic1110.h"

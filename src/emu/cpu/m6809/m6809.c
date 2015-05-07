@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** m6809: Portable 6809 emulator ******************************************
 
     Copyright John Butler

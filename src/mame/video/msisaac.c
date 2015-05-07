@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 *   Video Driver for Metal Soldier Isaac II (1985)
 */

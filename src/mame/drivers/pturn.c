@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Parallel Turn
 (c) Jaleco, 1984

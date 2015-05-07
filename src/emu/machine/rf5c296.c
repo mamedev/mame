@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "rf5c296.h"
 
 // rf5c296 is very inaccurate at that point, it hardcodes the gnet config

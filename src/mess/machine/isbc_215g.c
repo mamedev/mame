@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // license:BSD-3-Clause
 
 // Currently only emulates Shugart SA1000 interface disks (aka ST506)

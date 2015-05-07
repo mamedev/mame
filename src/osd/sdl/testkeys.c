@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  testkey.c - A small utility to analyze SDL keycodes

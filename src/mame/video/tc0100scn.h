@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TC0100SCN_H__
 #define __TC0100SCN_H__
 

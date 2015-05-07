@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/k007232.h"
 #include "video/k051316.h"
 

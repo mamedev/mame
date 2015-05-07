@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************************************
 
      TMS5110 simulator (modified from TMS5220 by Jarek Burczynski)

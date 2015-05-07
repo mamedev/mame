@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "omti5100.h"
 
 #define OMTI_STATUS_NOT_READY 0x04

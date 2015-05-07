@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     TX-0 emulator
 

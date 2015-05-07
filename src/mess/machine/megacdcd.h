@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"

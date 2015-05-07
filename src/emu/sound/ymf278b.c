@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
    YMF278B  FM + Wave table Synthesizer (OPL4)

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   RasterOps ColorBoard 264 NuBus video card emulation

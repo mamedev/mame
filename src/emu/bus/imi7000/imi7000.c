@@ -4,9 +4,6 @@
 
     International Memories Incorporated IMI 7000 Series bus emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "imi7000.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     SMC KR2376 Keyboard Encoder emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SNS_SGB_H
 #define __SNS_SGB_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "dsp56pcu.h"
 #include "dsp56mem.h"
 

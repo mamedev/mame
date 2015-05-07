@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __VECTOR__
 #define __VECTOR__
 

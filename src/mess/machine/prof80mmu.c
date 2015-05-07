@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Conitec PROF-80 Memory Management Unit emulation

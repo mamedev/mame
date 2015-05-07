@@ -4,9 +4,6 @@
 
     Commodore VIC-1011A/B RS-232C Adapter emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "vic1011.h"

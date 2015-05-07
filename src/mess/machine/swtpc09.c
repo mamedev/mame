@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
     swtpc09 machine file
     Robert Justice ,2009-2014

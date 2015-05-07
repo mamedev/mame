@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     cpu/apexc/apexc.c: APE(X)C CPU emulation
 

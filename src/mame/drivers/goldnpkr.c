@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************
 
   GOLDEN POKER DOUBLE UP (BONANZA ENTERPRISES, LTD)

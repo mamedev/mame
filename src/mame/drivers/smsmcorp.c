@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     SMS Manufacturing Corp hardware
 

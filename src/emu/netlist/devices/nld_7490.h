@@ -80,9 +80,9 @@ NETLIB_DEVICE(7490,
 	netlist_ttl_input_t m_A;
 	netlist_ttl_input_t m_B;
 
-	netlist_state_t<UINT8> m_cnt;
-	netlist_state_t<UINT8> m_last_A;
-	netlist_state_t<UINT8> m_last_B;
+	UINT8 m_cnt;
+	UINT8 m_last_A;
+	UINT8 m_last_B;
 
 	netlist_ttl_output_t m_Q[4];
 );

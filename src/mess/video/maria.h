@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __ATARI_MARIA__
 #define __ATARI_MARIA__
 

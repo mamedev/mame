@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Laser Battle / Lazarian - Cat and Mouse

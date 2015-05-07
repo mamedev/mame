@@ -4,9 +4,6 @@
 
     Intel 8355 - 16,384-Bit ROM with I/O emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   _CE1   1 |*    \_/     | 40  Vcc

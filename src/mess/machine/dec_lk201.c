@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     DEC LK-201 keyboard
     Emulation by R. Belmont & M. Burke

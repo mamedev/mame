@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************************
 
 When backing up the SRAM from an FM-PAC the file seems to be prefixed

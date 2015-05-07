@@ -4,9 +4,6 @@
 
     Commodore 1551 Single Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "c1551.h"

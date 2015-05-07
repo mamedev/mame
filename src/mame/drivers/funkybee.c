@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Funky Bee/Sky Lancer memory map (preliminary)

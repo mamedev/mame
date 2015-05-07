@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Some Dynax/Nakanihon games using the third version of their blitter

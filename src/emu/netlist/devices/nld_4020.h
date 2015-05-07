@@ -47,7 +47,7 @@ NETLIB_SUBDEVICE(4020_sub,
 
 	netlist_ttl_input_t m_IP;
 
-	netlist_state_t<UINT16> m_cnt;
+	UINT16 m_cnt;
 
 	netlist_ttl_output_t m_Q[14];
 );

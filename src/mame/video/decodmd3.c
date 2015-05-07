@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Data East Pinball / Sega Pinball Dot Matrix Display
  *

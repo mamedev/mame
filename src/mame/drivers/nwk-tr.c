@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 	/*  Konami NWK-TR System
 
 	Driver by Ville Linde

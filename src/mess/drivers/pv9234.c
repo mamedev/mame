@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 PowerVu D9234 STB (c) 1997 Scientific Atlanta

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Intel I82541 ethernet controller
 
 #ifndef I82541_H

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** T-11: Portable DEC T-11 emulator ******************************************/
 
 #pragma once

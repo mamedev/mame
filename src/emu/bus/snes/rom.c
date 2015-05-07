@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
  Super NES/Famicom (LoROM) cartridge emulation (for SNES/SFC)

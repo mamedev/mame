@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* This program is based on DIS68k by Aaron Giles */
 
 #include "emu.h"

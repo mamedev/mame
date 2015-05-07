@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
     Game Driver for Nichibutsu Mahjong series.

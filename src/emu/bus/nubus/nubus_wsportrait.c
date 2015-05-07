@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Apple model 820-5037-C "Macintosh II Portrait Video Card"

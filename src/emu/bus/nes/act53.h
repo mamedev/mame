@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_ACTION53_H
 #define __NES_ACTION53_H
 

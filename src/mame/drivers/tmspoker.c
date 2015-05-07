@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
     Unknown TMS9980 Poker Game  <--- We need the real name & manufacturer! :)

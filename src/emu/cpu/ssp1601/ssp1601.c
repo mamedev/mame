@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Samsung SSP1601 DSP emulator
  *

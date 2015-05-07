@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _included_psxcdrom_
 #define _included_psxcdrom_
 

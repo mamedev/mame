@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef M24_Z8000_H_
 #define M24_Z8000_H_
 

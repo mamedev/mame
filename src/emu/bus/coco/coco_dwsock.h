@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _DWSOCK_H_
 #define _DWSOCK_H_
 

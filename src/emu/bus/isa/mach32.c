@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * mach32.c
  *

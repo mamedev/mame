@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __PCE_CD_H
 #define __PCE_CD_H
 

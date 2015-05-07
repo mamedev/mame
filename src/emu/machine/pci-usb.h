@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PCI_USB_H
 #define PCI_USB_H
 

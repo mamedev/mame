@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _DIGITALKER_H_
 #define _DIGITALKER_H_
 

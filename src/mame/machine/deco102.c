@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
  Data East Custom Chip 102 decryption

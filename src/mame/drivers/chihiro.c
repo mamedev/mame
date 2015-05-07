@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Chihiro is an Xbox-based arcade system from SEGA.
 

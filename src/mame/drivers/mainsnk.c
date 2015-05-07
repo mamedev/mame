@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Main Event - SNK 1984
 Canvas Croquis - SNK 1985

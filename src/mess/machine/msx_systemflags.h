@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_SYSTEMFLAGS_H
 #define __MSX_SYSTEMFLAGS_H
 

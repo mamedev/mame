@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Caveman Ninja (and other DECO 16bit titles)

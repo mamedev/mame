@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 "CGA" Amcoe HW (c) 1999-2004 Amcoe
 

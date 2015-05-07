@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************************
 
     "Mitchell hardware". Actually used mostly by Capcom.

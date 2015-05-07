@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  Super Othello (c)1986 Fujiwara/Success
 

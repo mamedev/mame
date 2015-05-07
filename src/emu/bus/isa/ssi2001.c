@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Innovation SSI-2001
 
 #include "ssi2001.h"

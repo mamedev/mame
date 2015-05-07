@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * mface2.h  --  Romantic Robot Multiface II expansion device for the Amstrad CPC/CPC+
  *

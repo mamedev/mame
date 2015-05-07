@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef DM7000_H_
 #define DM7000_H_
 

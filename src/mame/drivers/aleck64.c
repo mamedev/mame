@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 'Aleck64' and similar boards */
 /* N64 based hardware */
 /*
@@ -195,7 +197,7 @@ private:
 };
 
 
-WRITE32_MEMBER(aleck64_state::aleck_dips_w )
+WRITE32_MEMBER(aleck64_state::aleck_dips_w)
 {
 	/*
 	    mtetrisc uses offset 0x1c and 0x03 a good bit in conjunction with reading INMJ.
@@ -215,44 +217,42 @@ WRITE32_MEMBER(aleck64_state::aleck_dips_w )
 	}
 }
 
-READ32_MEMBER(aleck64_state::aleck_dips_r )
+READ32_MEMBER(aleck64_state::aleck_dips_r)
 {
 	// srmvs uses 0x40, communications?
 
 	switch( offset )
 	{
-		case 0:
-			return (ioport("IN0")->read());   /* mtetrisc has regular inputs here */
-		case 1:
-			return (ioport("IN1")->read());
-		case 2:
+	case 0:
+		return (ioport("IN0")->read());   /* mtetrisc has regular inputs here */
+	case 1:
+		return (ioport("IN1")->read());
+	case 2:
 		{
-			UINT32 val = ioport("INMJ")->read();
+			UINT32 const val = ioport("INMJ")->read();
 
 			switch( m_dip_read_offset >> 8 & 0xff )
 			{
-				case 1:
-					return  val;
+			case 1:
+				return  val;
 
-				case 2:
-					return val << 8;
+			case 2:
+				return val << 8;
 
-				case 4:
-					return val << 16;
+			case 4:
+				return val << 16;
 
-				case 8:
-					return val >> 8;
+			case 8:
+				return val >> 8;
 
-				default:
-					logerror("Unexpected read from INMJ with no dip_read_offset set.\n");
-					return 0;
+			default:
+				logerror("Unexpected read from INMJ with no dip_read_offset set.\n");
+				return 0;
 			}
 		}
-		default:
-		{
-			logerror("Unknown aleck_dips_r(0x%08x, 0x%08x) @ 0x%08x PC=%08x\n", offset, 0xc0800000 + offset*4, mem_mask, space.device().safe_pc());
-			return 0;
-		}
+	default:
+		logerror("Unknown aleck_dips_r(0x%08x, 0x%08x) @ 0x%08x PC=%08x\n", offset, 0xc0800000 + offset*4, mem_mask, space.device().safe_pc());
+		return 0;
 	}
 }
 
@@ -505,6 +505,8 @@ static INPUT_PORTS_START( mtetrisc )
 	PORT_START("input")
 	PORT_BIT( 0xff, 0x00, IPT_SPECIAL )
 
+	PORT_START("INMJ")
+
 	PORT_START("IN0")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START2 )
@@ -685,6 +687,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( twrshaft )
 	PORT_START("input")
 	PORT_BIT( 0xff, 0x00, IPT_SPECIAL ) // Disable standard N64 controls
+
+	PORT_START("INMJ")
 
 	PORT_START("IN0")
 	PORT_BIT(0xff7fffe0, IP_ACTIVE_LOW, IPT_UNUSED )

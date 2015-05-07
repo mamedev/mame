@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Puckman Pockimon
   -- original driver by Luca Elia
 

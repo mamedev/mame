@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SB16__
 #define __SB16__
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
  tiny bartop b&w Space Invaders type game with colour overlay

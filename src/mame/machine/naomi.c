@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.

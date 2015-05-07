@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class pk8000_base_state : public driver_device
 {
 public:

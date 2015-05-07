@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************
 
 Emulation for the MSX BM-012 Midi cartridge that was sold together with Midisaurus.

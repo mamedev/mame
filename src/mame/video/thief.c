@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*  video hardware for Pacific Novelty games:
 **  Thief/Nato Defense
 */

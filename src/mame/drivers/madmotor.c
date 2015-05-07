@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Mad Motor                             (c) 1989 Mitchell Corporation

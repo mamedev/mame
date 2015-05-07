@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
   Emulation of the firmware mapper as found in Panasonic FS-A1WX andFS-A1WSX machines.

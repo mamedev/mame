@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************
 Terra Cresta (preliminary)
 Nichibutsu 1985

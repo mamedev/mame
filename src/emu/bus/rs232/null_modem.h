@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef NULL_MODEM_H_
 #define NULL_MODEM_H_
 

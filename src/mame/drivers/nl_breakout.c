@@ -106,11 +106,13 @@ CIRCUIT_LAYOUT( breakout )
 #if (SLOW_BUT_ACCURATE)
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
+    PARAM(Solver.GS_THRESHOLD, 6)
 #else
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-6)
-    PARAM(Solver.GS_THRESHOLD, 2)
-    //PARAM(Solver.SOR_FACTOR, 1)
+    PARAM(Solver.GS_THRESHOLD, 6)
+    // FIXME: PARALLEL Doesn't work in breakout!
+    PARAM(Solver.PARALLEL, 0)
 #endif
 
 	// DIPSWITCH - Free game
@@ -140,7 +142,7 @@ CIRCUIT_LAYOUT( breakout )
 	//----------------------------------------------------------------
 	// Clock circuit
 	//----------------------------------------------------------------
-#if 1  || (SLOW_BUT_ACCURATE)
+#if 0  || (SLOW_BUT_ACCURATE)
     MAINCLOCK(Y1, 14318000.0)
 	CHIP("F1", 9316)
 	NET_C(Y1.Q, F1.2)
@@ -160,12 +162,20 @@ CIRCUIT_LAYOUT( breakout )
 #define CKBH    "F1", 13
 #define DICECLOCK   "H1", 11
 #else
-	/* This works with bugs. The DICECLOCK (Y2) duty cycles are out of sync.
-	 * Speed gain is from 50% to 60% and not what would have been expected.
+	/*
+	 * 	9316	2	3	4	5	6	7	8	9	10	11	12	13	14	15	2	3	4	5	6
+	 *  A		0	1	0	1	0	1	0	1	0	1	0	1	0	1
+	 *  B		1	1	0	0	1	1	0	0	1	1	0	0	1	1
+	 * CKBH		1	1	0	0	1	1	0	0	1	1	0	0	1	1	1	1
+	 *                  ^--- Pattern Start
+	 * CLOCK	1	0	1	1	1	0	1	1	1	0	1	1	1	0	1	0	1	1	1
+	 *                              ^--- Pattern Start
+	 *                  <--------> 3 Clocks Offset
 	 */
-    MAINCLOCK(Y1, 14318000.0 / 2.0)
+    EXTCLOCK(Y1, 14318000.0, "4,4,4,4,4,8")
+    EXTCLOCK(Y2, 14318000.0, "2,6,2,6,2,2,2,6")
+    PARAM(Y2.OFFSET, 3.0 / 14318000.0 + 20.0e-9	)
 #define CKBH    "Y1", Q
-    CLOCK(Y2, 14318000.0 / 3.5)
 #define DICECLOCK   "Y2", Q
 
     NET_C(ttlhigh, H1.13)

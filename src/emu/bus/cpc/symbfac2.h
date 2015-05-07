@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * symbfac2.h
  *

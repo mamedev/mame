@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Mitsubishi M37702/37710 CPU Emulator
 

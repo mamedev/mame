@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Sony ZN1/ZN2 - Arcade PSX Hardware

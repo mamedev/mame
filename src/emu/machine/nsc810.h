@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nsc810.h
  *

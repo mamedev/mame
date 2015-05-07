@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *
  *  Implementation of Fujitsu FMR-50, FMR-60 and FM-Towns SCSI hardware

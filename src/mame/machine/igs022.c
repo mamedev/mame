@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
  IGS022 is an encrypted DMA device, most likely an MCU of some sort

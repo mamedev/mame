@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Snow Brothers (Toaplan) / SemiCom Hardware

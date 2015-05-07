@@ -4,9 +4,6 @@
 
     North Star MICRO-DISK System MDS-A (Single Density) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

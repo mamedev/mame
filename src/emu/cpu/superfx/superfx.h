@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SUPERFX_H__
 #define __SUPERFX_H__
 

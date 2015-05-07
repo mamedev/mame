@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Galaxian 3
 
   -- bootable driver --

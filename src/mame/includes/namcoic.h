@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* namcoic.h
 
 Custom Chips:                       Final Lap   Assault     LuckyWld    System21    NA1/2       NB1/2

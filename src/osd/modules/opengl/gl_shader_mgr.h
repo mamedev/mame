@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #ifndef GL_SHADER_MGR_H
 #define GL_SHADER_MGR_H

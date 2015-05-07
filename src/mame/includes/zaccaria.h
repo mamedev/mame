@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "sound/tms5220.h"

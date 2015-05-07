@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NE2000_H__
 #define __NE2000_H__
 

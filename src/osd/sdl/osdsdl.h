@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 

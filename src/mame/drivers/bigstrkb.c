@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Jaleco's Big Striker (bootleg version)
 
  Driver by David Haywood

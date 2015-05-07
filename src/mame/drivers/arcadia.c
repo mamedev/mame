@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Arcadia System - (c) 1988 Arcadia Systems

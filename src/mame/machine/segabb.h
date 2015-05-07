@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Lindbergh Sega baseboard
 
 #ifndef SEGABB_H

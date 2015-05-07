@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     MOS 6566/6567/6569 Video Interface Chip (VIC-II) emulation

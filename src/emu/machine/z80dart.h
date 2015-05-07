@@ -7,9 +7,6 @@
     Z80-DART Dual Asynchronous Receiver/Transmitter emulation
     Z80-SIO/0/1/2/3/4 Serial Input/Output Controller emulation
 
-    Copyright (c) 2008, The MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
                             _____   _____
                    CLK   1 |*    \_/     | 40  Vcc

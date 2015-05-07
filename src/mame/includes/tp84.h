@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class tp84_state : public driver_device
 {
 public:

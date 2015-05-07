@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Sega Megadrive / Genesis VDP */
 
 #pragma once

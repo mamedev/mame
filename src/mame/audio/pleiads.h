@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/tms36xx.h"
 
 struct pl_t_state

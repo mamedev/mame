@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Dragon Master (c)1994 Unico

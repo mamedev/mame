@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
 
     Samurai, Nunchackun, Yuke Yuke Yamaguchi-kun (c) Taito 1985

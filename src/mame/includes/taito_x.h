@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "includes/seta.h"
 
 class taitox_state : public seta_state

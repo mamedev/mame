@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Buggy Challenge - (c) 1984 Taito Corporation

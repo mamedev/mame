@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __RS232_PRINTER_H__
 #define __RS232_PRINTER_H__
 

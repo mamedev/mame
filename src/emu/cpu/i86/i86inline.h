@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "i86.h"
 
 #define CF      (m_CarryVal!=0)

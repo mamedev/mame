@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 static const char *lookup_trap(UINT16 opcode)
 {
 	static const struct

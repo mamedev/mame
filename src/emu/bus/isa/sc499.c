@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * sc499.c - ARCHIVE SC-499 cartridge tape controller (for Apollo DN3x00)
  *  Created on: April 17, 2011

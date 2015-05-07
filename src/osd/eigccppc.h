@@ -7,9 +7,6 @@
     PowerPC (32 and 64-bit) inline implementations for GCC compilers. This
     code is automatically included if appropriate by eminline.h.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #ifndef __EIGCCPPC__

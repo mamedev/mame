@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* MPU4 games by 'Concept' */
 
 #include "emu.h"

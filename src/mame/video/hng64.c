@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "drawgfxm.h"
 #include "includes/hng64.h"

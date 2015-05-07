@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/pleiads.h"
 
 class naughtyb_state : public driver_device

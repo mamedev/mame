@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Mogura Desse */
 
 #include "emu.h"

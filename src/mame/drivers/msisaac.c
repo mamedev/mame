@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
 
     Metal Soldier Isaac II  (c) Taito 1985

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* video/namconb1.c */
 
 #include "emu.h"

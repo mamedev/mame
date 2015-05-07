@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nlbase.c
  *
@@ -13,26 +15,47 @@
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
-netlist_logic_family_desc_t netlist_family_TTL =
+class netlist_logic_family_ttl_t : public netlist_logic_family_desc_t
 {
-		0.8, // m_low_thresh_V
-		2.0, // m_high_thresh_V
-		0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		3.7, // m_high_V
-		1.0, // m_R_low;
-		130.0, //  m_R_high;
+public:
+	netlist_logic_family_ttl_t()
+	{
+		m_low_thresh_V = 0.8;
+		m_high_thresh_V = 2.0;
+		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
+		m_low_V = 0.3;
+		m_high_V = 3.7;
+		m_R_low = 1.0;
+		m_R_high = 130.0;
+	}
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	{
+		return nl_alloc(nld_d_to_a_proxy , proxied);
+	}
 };
 
 //FIXME: set to proper values
-netlist_logic_family_desc_t netlist_family_CD4000 =
+class netlist_logic_family_cd4000_t : public netlist_logic_family_desc_t
 {
-		0.8, // m_low_thresh_V
-		2.0, // m_high_thresh_V
-		0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		3.7, // m_high_V
-		1.0, // m_R_low;
-		130.0, //  m_R_high;
+public:
+	netlist_logic_family_cd4000_t()
+	{
+		m_low_thresh_V = 0.8;
+		m_high_thresh_V = 2.0;
+		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
+		m_low_V = 0.3;
+		m_high_V = 3.7;
+		m_R_low = 1.0;
+		m_R_high = 130.0;
+	}
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	{
+		return nl_alloc(nld_d_to_a_proxy , proxied);
+	}
 };
+
+const netlist_logic_family_desc_t &netlist_family_TTL = netlist_logic_family_ttl_t();
+const netlist_logic_family_desc_t &netlist_family_CD4000 = netlist_logic_family_cd4000_t();
 
 // ----------------------------------------------------------------------------------------
 // netlist_queue_t
@@ -341,8 +364,9 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 : netlist_object_t(DEVICE, afamily)
 #if (NL_KEEP_STATISTICS)
-	, total_time(0)
-	, stat_count(0)
+	, stat_total_time(0)
+	, stat_update_count(0)
+	, stat_call_count(0)
 #endif
 {
 }
@@ -360,6 +384,14 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 
 ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
 {
+}
+
+ATTR_COLD void netlist_core_device_t::start_dev()
+{
+#if (NL_KEEP_STATISTICS)
+	netlist().m_started_devices.add(this, false);
+#endif
+	start();
 }
 
 ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
@@ -432,15 +464,28 @@ ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_
 		m_terminals.add(port.name());
 }
 
+ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_logic_output_t &port)
+{
+	port.set_logic_family(this->logic_family());
+	setup().register_object(*this, name, port);
+}
+
 ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
 {
-	port.m_logic_family = this->logic_family();
+	//port.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, port);
+}
+
+ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_logic_input_t &inp)
+{
+	inp.set_logic_family(this->logic_family());
+	setup().register_object(*this, name, inp);
+	m_terminals.add(inp.name());
 }
 
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp)
 {
-	inp.m_logic_family = this->logic_family();
+	//inp.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, inp);
 	m_terminals.add(inp.name());
 }
@@ -562,19 +607,20 @@ ATTR_COLD void netlist_net_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
+ATTR_HOT /*ATTR_ALIGN*/ static inline void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
 {
+	netlist_core_device_t &netdev = inp->netdev();
+	inc_stat(netdev.stat_call_count);
 	if ((inp->state() & mask) != 0)
 	{
-		netlist_core_device_t &netdev = inp->netdev();
-		begin_timing(netdev.total_time);
-		inc_stat(netdev.stat_count);
+		begin_timing(netdev.stat_total_time);
+		inc_stat(netdev.stat_update_count);
 		netdev.update_dev();
-		end_timing(netdev.total_time);
+		end_timing(netdev.stat_total_time);
 	}
 }
 
-ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
+ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
@@ -765,7 +811,6 @@ ATTR_COLD void netlist_analog_net_t::process_net(list_t *groups, int &cur_group)
 ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, const family_t afamily)
 : netlist_owned_object_t(atype, afamily)
 , plinkedlist_element_t<netlist_core_terminal_t>()
-, m_logic_family(NULL)
 , m_net(NULL)
 , m_state(STATE_NONEX)
 {
@@ -852,7 +897,7 @@ ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const p
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
-	: netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL)
+	: netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL), m_logic_family(NULL)
 {
 	this->set_net(m_my_net);
 }

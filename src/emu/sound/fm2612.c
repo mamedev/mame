@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 **
 ** File: fm2612.c -- software implementation of Yamaha YM2612 FM sound generator

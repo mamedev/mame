@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
 	ARKUNK = 0,  /* unknown bootlegs for inclusion of possible new sets */

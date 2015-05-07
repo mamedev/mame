@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _INCLUDES_CDI_H_
 #define _INCLUDES_CDI_H_
 

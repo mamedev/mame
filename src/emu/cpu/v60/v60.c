@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // V60.C
 // Undiscover the beast!
 // Main hacking and coding by Farfetch'd

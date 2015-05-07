@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Konami PowerPC-based 3D games common functions */
 
 #include "emu.h"

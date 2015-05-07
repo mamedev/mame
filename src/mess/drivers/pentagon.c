@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "includes/spectrum.h"
 #include "imagedev/snapquik.h"

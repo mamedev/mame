@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*  Konami Hornet System
     Driver by Ville Linde
 

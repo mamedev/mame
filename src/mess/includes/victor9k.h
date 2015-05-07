@@ -4,9 +4,6 @@
 
     Victor 9000 / ACT Sirius 1 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * s11.h
  *

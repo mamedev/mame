@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
     Ashita no Joe (Success Joe) [Wave]

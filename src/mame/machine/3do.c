@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Reset boot sequence:

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Taiwan Chess Legend
 Uniwang, 1995

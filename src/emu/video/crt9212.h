@@ -4,9 +4,6 @@
 
     SMC CRT9212 Double Row Buffer (DRB) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   DIN2   1 |*    \_/     | 28  DIN3

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _SNES_H_
 #define _SNES_H_
 

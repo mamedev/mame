@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/seibu.h"
 #include "machine/raiden2cop.h"
 #include "video/seibu_crtc.h"

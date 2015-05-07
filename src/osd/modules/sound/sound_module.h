@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * sound_module.h
  *

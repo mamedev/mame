@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************************
 
     Yamaha MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone module

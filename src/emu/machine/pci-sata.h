@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PCI_SATA_H
 #define PCI_SATA_H
 

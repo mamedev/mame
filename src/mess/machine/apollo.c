@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * apollo.c - Apollo DS3500 CPU Board
  *

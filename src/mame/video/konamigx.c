@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * video/konamigx.c - Konami GX video hardware (here there be dragons, and achocode)
  *

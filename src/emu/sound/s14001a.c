@@ -602,16 +602,6 @@ s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void s14001a_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -629,6 +619,27 @@ void s14001a_device::device_start()
 	}
 
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() ? clock() : machine().sample_rate());
+	
+	save_item(NAME(m_WordInput));
+	save_item(NAME(m_LatchedWord));
+	save_item(NAME(m_SyllableAddress));
+	save_item(NAME(m_PhoneAddress));
+	save_item(NAME(m_PlayParams));
+	save_item(NAME(m_PhoneOffset));
+	save_item(NAME(m_LengthCounter));
+	save_item(NAME(m_RepeatCounter));
+	save_item(NAME(m_OutputCounter));
+	save_item(NAME(m_machineState));
+	save_item(NAME(m_nextstate));
+	save_item(NAME(m_laststate));
+	save_item(NAME(m_resetState));
+	save_item(NAME(m_oddeven));
+	save_item(NAME(m_GlobalSilenceState));
+	save_item(NAME(m_OldDelta));
+	save_item(NAME(m_DACOutput));
+	save_item(NAME(m_audioout));
+	save_item(NAME(m_filtervals));
+	save_item(NAME(m_VSU1000_amp)); 
 }
 
 //-------------------------------------------------

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* Ramtek - Star Cruiser */
 

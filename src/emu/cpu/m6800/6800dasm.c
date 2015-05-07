@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *   A quick-hack 6803/6808 disassembler
  *

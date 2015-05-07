@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Sony PlayStation SPU (CXD2922BQ/CXD2925Q) emulator

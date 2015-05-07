@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 * FILE
 *   Yamaha 3812 emulator interface - MAME VERSION

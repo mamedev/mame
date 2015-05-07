@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************************************************************
 
 Some Dynax games using the second version of their blitter

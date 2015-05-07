@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 68340 SIM module */
 
 #include "emu.h"

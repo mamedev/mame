@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  drawsdl.c - SDL software and OpenGL implementation

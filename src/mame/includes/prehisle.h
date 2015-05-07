@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/upd7759.h"
 
 class prehisle_state : public driver_device

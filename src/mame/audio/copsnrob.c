@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************
  * copsnrob Sound System Analog emulation
  * Nov 2010, Derrick Renaud

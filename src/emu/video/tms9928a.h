@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 ** File: tms9928a.h -- software implementation of the TMS9928A VDP.
 **

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Gals Panic 3
     (c) Kaneko 1995

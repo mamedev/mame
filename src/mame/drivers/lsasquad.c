@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Land Sea Air Squad / Storming Party  (c) 1986 Taito

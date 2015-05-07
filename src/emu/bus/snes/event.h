@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SNS_EVENT_H
 #define __SNS_EVENT_H
 

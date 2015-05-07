@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  Ace System 1 Hardware
  Fruit Machines

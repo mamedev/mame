@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Track & Field / Hyper Olympic

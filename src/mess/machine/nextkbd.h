@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NEXTKBD_H__
 #define __NEXTKBD_H__
 

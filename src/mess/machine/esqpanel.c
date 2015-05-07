@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Ensoniq panel/display device
 */

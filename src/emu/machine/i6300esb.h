@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Intel i6300ESB southbridge
 
 #ifndef I6300ESB_H

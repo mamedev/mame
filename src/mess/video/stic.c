@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
  General Instruments AY-3-8900-1 a.k.a. Standard Television Interface Chip

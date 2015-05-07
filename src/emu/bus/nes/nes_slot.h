@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_SLOT_H__
 #define __NES_SLOT_H__
 

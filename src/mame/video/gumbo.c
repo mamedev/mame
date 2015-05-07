@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Gumbo video */
 
 #include "emu.h"

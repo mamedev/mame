@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Dynamite Duke                       (c) 1989 Seibu Kaihatsu/Fabtek

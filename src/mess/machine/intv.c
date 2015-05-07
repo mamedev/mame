@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "video/stic.h"
 #include "includes/intv.h"

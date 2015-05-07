@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * isa_vga_ati.c
  *

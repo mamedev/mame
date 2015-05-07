@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* SHA3/4 DMA Controller */
 
 /* bit definitions */

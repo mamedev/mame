@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *   D77 and D88 disk images
  *

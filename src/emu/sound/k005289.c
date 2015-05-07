@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Konami 005289 - SCC sound as used in Bubblesystem

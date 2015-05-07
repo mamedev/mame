@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Game Driver for Video System Mahjong series and Pipe Dream.

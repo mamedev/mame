@@ -4,9 +4,6 @@
 
     Wang PC-PM031-B Extended Memory Board emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

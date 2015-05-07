@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Penguin Adventure bootleg (tagged 'Screen', 1988)

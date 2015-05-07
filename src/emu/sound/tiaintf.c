@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "tiaintf.h"
 #include "tiasound.h"

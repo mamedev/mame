@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Ground Effects / Super Ground FX                    (c) 1993 Taito

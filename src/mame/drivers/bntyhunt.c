@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Bounty Hunter
 
  PC hardware.. no dumps of the bios roms are currently available

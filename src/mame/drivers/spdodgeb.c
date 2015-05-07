@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Super Dodge Ball / Nekketsu Koukou Dodgeball Bu

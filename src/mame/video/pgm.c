@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** Video *******************************************************************/
 /* see drivers/pgm.c for notes on where improvements can be made */
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************
 
   Nazionale Elettronica + others (mostly Italian) Gambling games

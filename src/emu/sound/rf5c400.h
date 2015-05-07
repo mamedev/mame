@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Ricoh RF5C400 emulator */
 
 #pragma once

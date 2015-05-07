@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 * Model Racing's Super Shot

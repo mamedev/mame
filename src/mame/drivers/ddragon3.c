@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************
 
     Double Dragon 3                     Technos Japan Corp 1990

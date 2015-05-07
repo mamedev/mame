@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* PGM 2 hardware.
 
     Motherboard is bare bones stuff, and does not contain any ROMs.

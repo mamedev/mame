@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Mahjong Kyou Jidai     (c)1986 Sanritsu

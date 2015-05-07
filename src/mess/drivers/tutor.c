@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Experimental Tomy Tutor driver
 

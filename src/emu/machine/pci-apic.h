@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PCI_APIC_H
 #define PCI_APIC_H
 

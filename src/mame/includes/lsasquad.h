@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class lsasquad_state : public driver_device
 {

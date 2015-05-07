@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Note: Original Java source written by:
  *

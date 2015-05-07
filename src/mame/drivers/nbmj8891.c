@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
     nbmj8891 - Nichibutsu Mahjong games for years 1988-1991

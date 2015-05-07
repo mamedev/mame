@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Konami 051649 - SCC1 sound as used in Haunted Castle, City Bomber

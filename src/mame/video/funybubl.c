@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Funny Bubble Video hardware
 
 todo - convert to tilemap

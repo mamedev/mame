@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** DRIVER INFORMATION & NOTES ***********************************************
 
 Super Slams - Driver by David Haywood

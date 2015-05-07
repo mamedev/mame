@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     SGI "Newport" graphics board used in the Indy and some Indigo2s
 

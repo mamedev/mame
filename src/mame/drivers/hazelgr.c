@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Hazel Grove Fruit Machine HW
  unknown platform! z80 based..
 

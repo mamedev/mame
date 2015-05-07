@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "machine/deco146.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_MMC1_H
 #define __NES_MMC1_H
 

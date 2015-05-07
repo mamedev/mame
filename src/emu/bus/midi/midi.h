@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __BUS_MIDI_H__
 #define __BUS_MIDI_H__
 

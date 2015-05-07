@@ -4,9 +4,6 @@
 
     Intel 82720 Graphics Display Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*
