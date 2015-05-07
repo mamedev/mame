@@ -9,7 +9,8 @@
   - 1998 MF1049-01a E0C6S46 Technical Manual
 
   TODO:
-  - niks
+  - RLC is part of the r,q opcodes and requires that r == q, what happens otherwise?
+  - documentation is conflicting on whether or not the zero flag is set on RLC/RRC
 
 */
 
@@ -116,6 +117,9 @@ void e0c6200_cpu_device::device_start()
 
 void e0c6200_cpu_device::device_reset()
 {
+	m_op = 0xff; // nop
+	m_pc = 0x100;
+	m_f &= 3; // decimal flag is 0 on 6200A, undefined on 6200
 }
 
 
@@ -143,27 +147,27 @@ void e0c6200_cpu_device::execute_one()
 	{
 		// JP s: jump unconditional
 		case 0x000:
-			m_pc = m_jpc | (m_op & 0xff);
+			do_branch();
 			break;
 
 		// JP C,s: jump if carry
 		case 0x200:
-			if (m_f & 1) m_pc = m_jpc | (m_op & 0xff);
+			do_branch(m_f & C_FLAG);
 			break;
 
 		// JP NC,s: jump if no carry
 		case 0x300:
-			if (~m_f & 1) m_pc = m_jpc | (m_op & 0xff);
+			do_branch(~m_f & C_FLAG);
 			break;
 
 		// JP Z,s: jump if zero
 		case 0x600:
-			if (m_f & 2) m_pc = m_jpc | (m_op & 0xff);
+			do_branch(m_f & Z_FLAG);
 			break;
 
 		// JP NZ,s: jump if not zero
 		case 0x700:
-			if (~m_f & 2) m_pc = m_jpc | (m_op & 0xff);
+			do_branch(~m_f & Z_FLAG);
 			break;
 
 		// CALL s: call unconditional (on current bank)
@@ -335,121 +339,121 @@ void e0c6200_cpu_device::execute_one()
 		case 0xff6: write_mx(m_sp & 0xf); break;
 		case 0xff7: write_my(m_sp & 0xf); break;
 
-		// ADD r,q
-		case 0xa80:
-		case 0xa81:
-		case 0xa82:
-		case 0xa83:
-		case 0xa84:
-		case 0xa85:
-		case 0xa86:
-		case 0xa87:
-		case 0xa88:
-		case 0xa89:
-		case 0xa8a:
-		case 0xa8b:
-		case 0xa8c:
-		case 0xa8d:
-		case 0xa8e:
-		case 0xa8f:
+		// ADD r,q: add register to register (flags: C, Z)
+		case 0xa80: m_a = op_add(m_a, m_a, D_FLAG); break;
+		case 0xa81: m_a = op_add(m_a, m_b, D_FLAG); break;
+		case 0xa82: m_a = op_add(m_a, read_mx(), D_FLAG); break;
+		case 0xa83: m_a = op_add(m_a, read_my(), D_FLAG); break;
+		case 0xa84: m_b = op_add(m_b, m_a, D_FLAG); break;
+		case 0xa85: m_b = op_add(m_b, m_b, D_FLAG); break;
+		case 0xa86: m_b = op_add(m_b, read_mx(), D_FLAG); break;
+		case 0xa87: m_b = op_add(m_b, read_my(), D_FLAG); break;
+		case 0xa88: write_mx(op_add(read_mx(), m_a, D_FLAG)); break;
+		case 0xa89: write_mx(op_add(read_mx(), m_b, D_FLAG)); break;
+		case 0xa8a: write_mx(op_add(read_mx(), read_mx(), D_FLAG)); break;
+		case 0xa8b: write_mx(op_add(read_mx(), read_my(), D_FLAG)); break;
+		case 0xa8c: write_my(op_add(read_my(), m_a, D_FLAG)); break;
+		case 0xa8d: write_my(op_add(read_my(), m_b, D_FLAG)); break;
+		case 0xa8e: write_my(op_add(read_my(), read_mx(), D_FLAG)); break;
+		case 0xa8f: write_my(op_add(read_my(), read_my(), D_FLAG)); break;
 
-		// ADC r,q
-		case 0xa90:
-		case 0xa91:
-		case 0xa92:
-		case 0xa93:
-		case 0xa94:
-		case 0xa95:
-		case 0xa96:
-		case 0xa97:
-		case 0xa98:
-		case 0xa99:
-		case 0xa9a:
-		case 0xa9b:
-		case 0xa9c:
-		case 0xa9d:
-		case 0xa9e:
-		case 0xa9f:
+		// ADC r,q: add with carry register to register (flags: C, Z)
+		case 0xa90: m_a = op_adc(m_a, m_a, D_FLAG); break;
+		case 0xa91: m_a = op_adc(m_a, m_b, D_FLAG); break;
+		case 0xa92: m_a = op_adc(m_a, read_mx(), D_FLAG); break;
+		case 0xa93: m_a = op_adc(m_a, read_my(), D_FLAG); break;
+		case 0xa94: m_b = op_adc(m_b, m_a, D_FLAG); break;
+		case 0xa95: m_b = op_adc(m_b, m_b, D_FLAG); break;
+		case 0xa96: m_b = op_adc(m_b, read_mx(), D_FLAG); break;
+		case 0xa97: m_b = op_adc(m_b, read_my(), D_FLAG); break;
+		case 0xa98: write_mx(op_adc(read_mx(), m_a, D_FLAG)); break;
+		case 0xa99: write_mx(op_adc(read_mx(), m_b, D_FLAG)); break;
+		case 0xa9a: write_mx(op_adc(read_mx(), read_mx(), D_FLAG)); break;
+		case 0xa9b: write_mx(op_adc(read_mx(), read_my(), D_FLAG)); break;
+		case 0xa9c: write_my(op_adc(read_my(), m_a, D_FLAG)); break;
+		case 0xa9d: write_my(op_adc(read_my(), m_b, D_FLAG)); break;
+		case 0xa9e: write_my(op_adc(read_my(), read_mx(), D_FLAG)); break;
+		case 0xa9f: write_my(op_adc(read_my(), read_my(), D_FLAG)); break;
 
-		// ACPX MX,r
-		case 0xf28:
-		case 0xf29:
-		case 0xf2a:
-		case 0xf2b:
+		// ACPX MX,r: ADC MX,r, then increment X (flags: C, Z)
+		case 0xf28: write_mx(op_adc(read_mx(), m_a, D_FLAG)); inc_x(); break;
+		case 0xf29: write_mx(op_adc(read_mx(), m_b, D_FLAG)); inc_x(); break;
+		case 0xf2a: write_mx(op_adc(read_mx(), read_mx(), D_FLAG)); inc_x(); break;
+		case 0xf2b: write_mx(op_adc(read_mx(), read_my(), D_FLAG)); inc_x(); break;
 
-		// ACPY MY,
-		case 0xf2c:
-		case 0xf2d:
-		case 0xf2e:
-		case 0xf2f:
+		// ACPY MY,r: ADC MY,r, then increment Y (flags: C, Z)
+		case 0xf2c: write_my(op_adc(read_my(), m_a, D_FLAG)); inc_y(); break;
+		case 0xf2d: write_my(op_adc(read_my(), m_b, D_FLAG)); inc_y(); break;
+		case 0xf2e: write_my(op_adc(read_my(), read_mx(), D_FLAG)); inc_y(); break;
+		case 0xf2f: write_my(op_adc(read_my(), read_my(), D_FLAG)); inc_y(); break;
 
-		// SUB r,q
-		case 0xaa0:
-		case 0xaa1:
-		case 0xaa2:
-		case 0xaa3:
-		case 0xaa4:
-		case 0xaa5:
-		case 0xaa6:
-		case 0xaa7:
-		case 0xaa8:
-		case 0xaa9:
-		case 0xaaa:
-		case 0xaab:
-		case 0xaac:
-		case 0xaad:
-		case 0xaae:
-		case 0xaaf:
+		// SUB r,q: subtract register from register (flags: C, Z)
+		case 0xaa0: m_a = op_sub(m_a, m_a, D_FLAG); break;
+		case 0xaa1: m_a = op_sub(m_a, m_b, D_FLAG); break;
+		case 0xaa2: m_a = op_sub(m_a, read_mx(), D_FLAG); break;
+		case 0xaa3: m_a = op_sub(m_a, read_my(), D_FLAG); break;
+		case 0xaa4: m_b = op_sub(m_b, m_a, D_FLAG); break;
+		case 0xaa5: m_b = op_sub(m_b, m_b, D_FLAG); break;
+		case 0xaa6: m_b = op_sub(m_b, read_mx(), D_FLAG); break;
+		case 0xaa7: m_b = op_sub(m_b, read_my(), D_FLAG); break;
+		case 0xaa8: write_mx(op_sub(read_mx(), m_a, D_FLAG)); break;
+		case 0xaa9: write_mx(op_sub(read_mx(), m_b, D_FLAG)); break;
+		case 0xaaa: write_mx(op_sub(read_mx(), read_mx(), D_FLAG)); break;
+		case 0xaab: write_mx(op_sub(read_mx(), read_my(), D_FLAG)); break;
+		case 0xaac: write_my(op_sub(read_my(), m_a, D_FLAG)); break;
+		case 0xaad: write_my(op_sub(read_my(), m_b, D_FLAG)); break;
+		case 0xaae: write_my(op_sub(read_my(), read_mx(), D_FLAG)); break;
+		case 0xaaf: write_my(op_sub(read_my(), read_my(), D_FLAG)); break;
 
-		// SBC r,q
-		case 0xab0:
-		case 0xab1:
-		case 0xab2:
-		case 0xab3:
-		case 0xab4:
-		case 0xab5:
-		case 0xab6:
-		case 0xab7:
-		case 0xab8:
-		case 0xab9:
-		case 0xaba:
-		case 0xabb:
-		case 0xabc:
-		case 0xabd:
-		case 0xabe:
-		case 0xabf:
+		// SBC r,q: subtract with carry register from register (flags: C, Z)
+		case 0xab0: m_a = op_sbc(m_a, m_a, D_FLAG); break;
+		case 0xab1: m_a = op_sbc(m_a, m_b, D_FLAG); break;
+		case 0xab2: m_a = op_sbc(m_a, read_mx(), D_FLAG); break;
+		case 0xab3: m_a = op_sbc(m_a, read_my(), D_FLAG); break;
+		case 0xab4: m_b = op_sbc(m_b, m_a, D_FLAG); break;
+		case 0xab5: m_b = op_sbc(m_b, m_b, D_FLAG); break;
+		case 0xab6: m_b = op_sbc(m_b, read_mx(), D_FLAG); break;
+		case 0xab7: m_b = op_sbc(m_b, read_my(), D_FLAG); break;
+		case 0xab8: write_mx(op_sbc(read_mx(), m_a, D_FLAG)); break;
+		case 0xab9: write_mx(op_sbc(read_mx(), m_b, D_FLAG)); break;
+		case 0xaba: write_mx(op_sbc(read_mx(), read_mx(), D_FLAG)); break;
+		case 0xabb: write_mx(op_sbc(read_mx(), read_my(), D_FLAG)); break;
+		case 0xabc: write_my(op_sbc(read_my(), m_a, D_FLAG)); break;
+		case 0xabd: write_my(op_sbc(read_my(), m_b, D_FLAG)); break;
+		case 0xabe: write_my(op_sbc(read_my(), read_mx(), D_FLAG)); break;
+		case 0xabf: write_my(op_sbc(read_my(), read_my(), D_FLAG)); break;
 
-		// SCPX MX,
-		case 0xf38:
-		case 0xf39:
-		case 0xf3a:
-		case 0xf3b:
+		// SCPX MX,r: SBC MX,r, then increment X (flags: C, Z)
+		case 0xf38: write_mx(op_sbc(read_mx(), m_a, D_FLAG)); inc_x(); break;
+		case 0xf39: write_mx(op_sbc(read_mx(), m_b, D_FLAG)); inc_x(); break;
+		case 0xf3a: write_mx(op_sbc(read_mx(), read_mx(), D_FLAG)); inc_x(); break;
+		case 0xf3b: write_mx(op_sbc(read_mx(), read_my(), D_FLAG)); inc_x(); break;
 
-		// SCPY MY,
-		case 0xf3c:
-		case 0xf3d:
-		case 0xf3e:
-		case 0xf3f:
+		// SCPY MY,r: SBC MY,r, then increment Y (flags: C, Z)
+		case 0xf3c: write_my(op_sbc(read_my(), m_a, D_FLAG)); inc_y(); break;
+		case 0xf3d: write_my(op_sbc(read_my(), m_b, D_FLAG)); inc_y(); break;
+		case 0xf3e: write_my(op_sbc(read_my(), read_mx(), D_FLAG)); inc_y(); break;
+		case 0xf3f: write_my(op_sbc(read_my(), read_my(), D_FLAG)); inc_y(); break;
 
-		// CP r,q: SUB r,q, but discard result (D flag has no effect)
-		case 0xf00:
-		case 0xf01:
-		case 0xf02:
-		case 0xf03:
-		case 0xf04:
-		case 0xf05:
-		case 0xf06:
-		case 0xf07:
-		case 0xf08:
-		case 0xf09:
-		case 0xf0a:
-		case 0xf0b:
-		case 0xf0c:
-		case 0xf0d:
-		case 0xf0e:
-		case 0xf0f:
+		// CP r,q: compare: SUB r,q, but discard result (flags: C, Z, no D flag)
+		case 0xf00: op_sub(m_a, m_a); break;
+		case 0xf01: op_sub(m_a, m_b); break;
+		case 0xf02: op_sub(m_a, read_mx()); break;
+		case 0xf03: op_sub(m_a, read_my()); break;
+		case 0xf04: op_sub(m_b, m_a); break;
+		case 0xf05: op_sub(m_b, m_b); break;
+		case 0xf06: op_sub(m_b, read_mx()); break;
+		case 0xf07: op_sub(m_b, read_my()); break;
+		case 0xf08: op_sub(read_mx(), m_a); break;
+		case 0xf09: op_sub(read_mx(), m_b); break;
+		case 0xf0a: op_sub(read_mx(), read_mx()); break;
+		case 0xf0b: op_sub(read_mx(), read_my()); break;
+		case 0xf0c: op_sub(read_my(), m_a); break;
+		case 0xf0d: op_sub(read_my(), m_b); break;
+		case 0xf0e: op_sub(read_my(), read_mx()); break;
+		case 0xf0f: op_sub(read_my(), read_my()); break;
 
-		// AND r,q: logical AND register with register (affect flags: Z)
+		// AND r,q: logical AND register with register (flags: Z)
 		case 0xac0: m_a = op_and(m_a, m_a); break;
 		case 0xac1: m_a = op_and(m_a, m_b); break;
 		case 0xac2: m_a = op_and(m_a, read_mx()); break;
@@ -467,7 +471,7 @@ void e0c6200_cpu_device::execute_one()
 		case 0xace: write_my(op_and(read_my(), read_mx())); break;
 		case 0xacf: write_my(op_and(read_my(), read_my())); break;
 
-		// FAN r,q: AND r,q, but discard result
+		// FAN r,q: flag-check: AND r,q, but discard result (flags: Z)
 		case 0xf10: op_and(m_a, m_a); break;
 		case 0xf11: op_and(m_a, m_b); break;
 		case 0xf12: op_and(m_a, read_mx()); break;
@@ -485,7 +489,7 @@ void e0c6200_cpu_device::execute_one()
 		case 0xf1e: op_and(read_my(), read_mx()); break;
 		case 0xf1f: op_and(read_my(), read_my()); break;
 
-		// OR r,q: logical OR register with register (affect flags: Z)
+		// OR r,q: logical OR register with register (flags: Z)
 		case 0xad0: m_a = op_or(m_a, m_a); break;
 		case 0xad1: m_a = op_or(m_a, m_b); break;
 		case 0xad2: m_a = op_or(m_a, read_mx()); break;
@@ -503,7 +507,7 @@ void e0c6200_cpu_device::execute_one()
 		case 0xade: write_my(op_or(read_my(), read_mx())); break;
 		case 0xadf: write_my(op_or(read_my(), read_my())); break;
 
-		// XOR r,q: exclusive-OR register with register (affect flags: Z)
+		// XOR r,q: exclusive-OR register with register (flags: Z)
 		case 0xae0: m_a = op_xor(m_a, m_a); break;
 		case 0xae1: m_a = op_xor(m_a, m_b); break;
 		case 0xae2: m_a = op_xor(m_a, read_mx()); break;
@@ -521,17 +525,17 @@ void e0c6200_cpu_device::execute_one()
 		case 0xaee: write_my(op_xor(read_my(), read_mx())); break;
 		case 0xaef: write_my(op_xor(read_my(), read_my())); break;
 
-		// RLC r: rotate register left through carry (affect flags: C, Z)
-		case 0xaf0: 
-		case 0xaf5: 
-		case 0xafa: read_mx();
-		case 0xaff: read_my();
+		// RLC r(,r): rotate register left through carry (flags: C, Z)
+		case 0xaf0: m_a = op_rlc(m_a); break;
+		case 0xaf5: m_b = op_rlc(m_b); break;
+		case 0xafa: read_mx(); write_mx(op_rlc(read_mx())); break;
+		case 0xaff: read_my(); write_my(op_rlc(read_my())); break;
 
-		// RRC r: rotate register right through carry (affect flags: C, Z)
-		case 0xe8c:
-		case 0xe8d:
-		case 0xe8e:
-		case 0xe8f:
+		// RRC r: rotate register right through carry (flags: C, Z)
+		case 0xe8c: m_a = op_rrc(m_a); break;
+		case 0xe8d: m_b = op_rrc(m_b); break;
+		case 0xe8e: write_mx(op_rrc(read_mx())); break;
+		case 0xe8f: write_my(op_rrc(read_my())); break;
 
 		// INC SP: increment stackpointer
 		case 0xfdb:
@@ -645,100 +649,71 @@ void e0c6200_cpu_device::execute_one()
 			write_mn(m_b);
 			break;
 
-		// INC Mn: increment memory (affect flags: C, Z)
+		// INC Mn: increment memory (flags: C, Z)
 		case 0xf60:
 			write_mn(op_inc(read_mn()));
 			break;
 
-		// DEC Mn: decrement memory (affect flags: C, Z)
+		// DEC Mn: decrement memory (flags: C, Z)
 		case 0xf70:
 			write_mn(op_dec(read_mn()));
 			break;
 
-		// ADD r,i
-		case 0xc00:
-		case 0xc10:
-		case 0xc20:
-		case 0xc30:
+		// ADD r,i: add 4-bit immediate data to register (flags: C, Z)
+		case 0xc00: m_a = op_add(m_a, m_op & 0xf, D_FLAG); break;
+		case 0xc10: m_b = op_add(m_b, m_op & 0xf, D_FLAG); break;
+		case 0xc20: write_mx(op_add(read_mx(), m_op & 0xf, D_FLAG)); break;
+		case 0xc30: write_my(op_add(read_my(), m_op & 0xf, D_FLAG)); break;
 
-		// ADC r,i
-		case 0xc40:
-		case 0xc50:
-		case 0xc60:
-		case 0xc70:
+		// ADC r,i: add with carry 4-bit immediate data to register (flags: C, Z)
+		case 0xc40: m_a = op_adc(m_a, m_op & 0xf, D_FLAG); break;
+		case 0xc50: m_b = op_adc(m_b, m_op & 0xf, D_FLAG); break;
+		case 0xc60: write_mx(op_adc(read_mx(), m_op & 0xf, D_FLAG)); break;
+		case 0xc70: write_my(op_adc(read_my(), m_op & 0xf, D_FLAG)); break;
 
+		// ADC Xhl/Yhl,i: add with carry 4-bit immediate data to X/Y (flags: C, Z, no D flag)
+		case 0xa00: m_xh = op_adc(m_xh, m_op & 0xf); break;
+		case 0xa10: m_xl = op_adc(m_xl, m_op & 0xf); break;
+		case 0xa20: m_yh = op_adc(m_yh, m_op & 0xf); break;
+		case 0xa30: m_yl = op_adc(m_yl, m_op & 0xf); break;
 
-		// ADC XH,i
-		case 0xa00:
-			break;
+		// SBC r,i: subtract with carry 4-bit immediate data from register (flags: C, Z)
+		case 0xd40: m_a = op_sbc(m_a, m_op & 0xf, D_FLAG); break;
+		case 0xd50: m_b = op_sbc(m_b, m_op & 0xf, D_FLAG); break;
+		case 0xd60: write_mx(op_sbc(read_mx(), m_op & 0xf, D_FLAG)); break;
+		case 0xd70: write_my(op_sbc(read_my(), m_op & 0xf, D_FLAG)); break;
 
-		// ADC XL,i
-		case 0xa10:
-			break;
+		// CP r,i: compare: SUB r,i, but discard result (flags: C, Z, no D flag)
+		case 0xdc0: op_sub(m_a, m_op & 0xf); break;
+		case 0xdd0: op_sub(m_b, m_op & 0xf); break;
+		case 0xde0: op_sub(read_mx(), m_op & 0xf); break;
+		case 0xdf0: op_sub(read_my(), m_op & 0xf); break;
 
-		// ADC YH,i
-		case 0xa20:
-			break;
+		// CP XH,i: compare: SUB Xhl/Yhl,i, but discard result (flags: C, Z, no D flag)
+		case 0xa40: op_sub(m_xh, m_op & 0xf); break;
+		case 0xa50: op_sub(m_xl, m_op & 0xf); break;
+		case 0xa60: op_sub(m_yh, m_op & 0xf); break;
+		case 0xa70: op_sub(m_yl, m_op & 0xf); break;
 
-		// ADC YL,i
-		case 0xa30:
-			break;
-
-
-
-		// SBC r,i
-		case 0xd40:
-		case 0xd50:
-		case 0xd60:
-		case 0xd70:
-
-
-		// CP r,i: SUB r,i, but discard result (D flag has no effect)
-		case 0xdc0:
-		case 0xdd0:
-		case 0xde0:
-		case 0xdf0:
-
-
-		// CP XH,i
-		case 0xa40:
-			break;
-
-		// CP XL,i
-		case 0xa50:
-			break;
-
-		// CP YH,i
-		case 0xa60:
-			break;
-
-		// CP YL,i
-		case 0xa70:
-			break;
-
-
-
-
-
-		// AND r,i: logical AND register with 4-bit immediate data (affect flags: Z)
+		// AND r,i: logical AND register with 4-bit immediate data (flags: Z)
 		case 0xc80: m_a = op_and(m_a, m_op & 0xf); break;
 		case 0xc90: m_b = op_and(m_b, m_op & 0xf); break;
 		case 0xca0: write_mx(op_and(read_mx(), m_op & 0xf)); break;
 		case 0xcb0: write_my(op_and(read_my(), m_op & 0xf)); break;
 
-		// FAN r,i: AND r,i, but discard result
+		// FAN r,i: flag-check: AND r,i, but discard result (flags: Z)
 		case 0xd80: op_and(m_a, m_op & 0xf); break;
 		case 0xd90: op_and(m_b, m_op & 0xf); break;
 		case 0xda0: op_and(read_mx(), m_op & 0xf); break;
 		case 0xdb0: op_and(read_my(), m_op & 0xf); break;
 
-		// OR r,i: logical OR register with 4-bit immediate data (affect flags: Z)
+		// OR r,i: logical OR register with 4-bit immediate data (flags: Z)
 		case 0xcc0: m_a = op_or(m_a, m_op & 0xf); break;
 		case 0xcd0: m_b = op_or(m_b, m_op & 0xf); break;
 		case 0xce0: write_mx(op_or(read_mx(), m_op & 0xf)); break;
 		case 0xcf0: write_my(op_or(read_my(), m_op & 0xf)); break;
 
-		// XOR r,i: exclusive-OR register with 4-bit immediate data (affect flags: Z)
+		// XOR r,i: exclusive-OR register with 4-bit immediate data (flags: Z)
 		case 0xd00: m_a = op_xor(m_a, m_op & 0xf); break;
 		case 0xd10: m_b = op_xor(m_b, m_op & 0xf); break;
 		case 0xd20: write_mx(op_xor(read_mx(), m_op & 0xf)); break;

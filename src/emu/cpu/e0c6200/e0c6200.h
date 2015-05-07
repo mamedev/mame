@@ -92,17 +92,21 @@ protected:
 	inline void set_zf(UINT8 data);
 	inline void inc_x();
 	inline void inc_y();
+	void do_branch(int condition = 0);
 	
 	// opcode handlers
 	UINT8 op_inc(UINT8 x);
 	UINT8 op_dec(UINT8 x);
+	UINT8 op_add(UINT8 x, UINT8 y, int decimal = 0);
+	UINT8 op_adc(UINT8 x, UINT8 y, int decimal = 0);
+	UINT8 op_sub(UINT8 x, UINT8 y, int decimal = 0);
+	UINT8 op_sbc(UINT8 x, UINT8 y, int decimal = 0);
 
 	UINT8 op_and(UINT8 x, UINT8 y);
 	UINT8 op_or(UINT8 x, UINT8 y);
 	UINT8 op_xor(UINT8 x, UINT8 y);
-	
-	//UINT8 op_rlc(UINT8 x);
-	//UINT8 op_rrc(UINT8 x);
+	UINT8 op_rlc(UINT8 x);
+	UINT8 op_rrc(UINT8 x);
 };
 
 
