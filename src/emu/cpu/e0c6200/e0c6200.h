@@ -34,6 +34,7 @@ protected:
 	virtual UINT32 execute_max_cycles() const { return 12; }
 	virtual UINT32 execute_input_lines() const { return 1; }
 	virtual void execute_run();
+	virtual void execute_one();
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
@@ -55,7 +56,39 @@ protected:
 	int m_prgmask;
 	int m_datamask;
 	
+	UINT16 m_op;
+	UINT16 m_prev_op;
 	int m_icount;
+
+	UINT16 m_pc;            // 13-bit programcounter: 1-bit bank, 4-bit page, 8-bit 'step'
+	UINT16 m_prev_pc;
+	UINT16 m_npc;           // new bankpointer and pagepointer prepared by pset
+	UINT16 m_jpc;           // actual bank/page destination for jumps
+	
+	// all work registers are 4-bit
+	UINT8 m_a;              // accumulator
+	UINT8 m_b;              // generic
+	UINT8 m_xp, m_xh, m_xl; // 12-bit index register when combined
+	UINT8 m_yp, m_yh, m_yl; // "
+	UINT8 m_sp;             // stackpointer (SPH, SPL)
+	UINT8 m_f;              // flags
+
+	// internal read/write (MX, MY, Mn/RP)
+	inline UINT8 read_mx() { return m_data->read_byte(m_xp << 8 | m_xh << 4 | m_xl); }
+	inline void write_mx(UINT8 data) { m_data->write_byte(m_xp << 8 | m_xh << 4 | m_xl, data); }
+	inline UINT8 read_my() { return m_data->read_byte(m_yp << 8 | m_yh << 4 | m_yl); }
+	inline void write_my(UINT8 data) { m_data->write_byte(m_yp << 8 | m_yh << 4 | m_yl, data); }
+	inline UINT8 read_mn() { return m_data->read_byte(m_op & 0xf); }
+	inline void write_mn(UINT8 data) { m_data->write_byte(m_op & 0xf, data); }
+
+	inline void inc_x() { m_xl++; m_xh = (m_xh + (m_xl >> 4 & 1)) & 0xf; m_xl &= 0xf; }
+	inline void inc_y() { m_yl++; m_yh = (m_yh + (m_yl >> 4 & 1)) & 0xf; m_yl &= 0xf; }
+
+	// stack ops
+	inline void push(UINT8 data) { m_data->write_byte(--m_sp, data); }
+	inline UINT8 pop() { return m_data->read_byte(m_sp++); }
+	inline void push_pc() { push(m_pc >> 8 & 0xf); push(m_pc >> 4 & 0xf); push(m_pc & 0xf); }
+	inline void pop_pc() { UINT16 bank = m_pc & 0x1000; m_pc = pop(); m_pc |= pop() << 4; m_pc |= pop() << 8; m_pc |= bank; }
 };
 
 
