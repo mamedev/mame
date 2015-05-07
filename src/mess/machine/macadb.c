@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   macadb.c - handles various aspects of ADB on the Mac.

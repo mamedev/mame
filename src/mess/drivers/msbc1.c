@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Omnibyte MSBC-1

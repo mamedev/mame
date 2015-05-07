@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     M-Systems DiskOnChip G3 - Flash Disk with MLC NAND and M-Systems? x2 Technology

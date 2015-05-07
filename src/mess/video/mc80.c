@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         MC-80.xx video by Miodrag Milanovic

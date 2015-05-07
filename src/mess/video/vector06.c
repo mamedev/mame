@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         Vector06c driver by Miodrag Milanovic

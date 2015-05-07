@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     This 1980s computer was manufactured by Vtech of Hong Kong.
     known as: CreatiVision, Dick Smith Wizzard, Funvision, Rameses, VZ 2000 and possibly others.

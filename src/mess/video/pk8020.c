@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         PK-8020 driver by Miodrag Milanovic

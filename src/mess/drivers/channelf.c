@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************
  *
  *  Fairchild Channel F driver

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     mbc55x.h
     Includes for the Sanyo MBC-550, MBC-555.

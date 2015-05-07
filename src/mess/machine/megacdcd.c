@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* CD controller code from megacd.c, used by Sega CD / Mega CD */
 
 /* todo: cleanup(!!), make more generic, unifiy implementation with NeoCD, turn into a device and move to the proper lc89510.c file

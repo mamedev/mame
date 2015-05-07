@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "sound/sn76496.h"

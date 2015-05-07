@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     machine/rmnimbus.c
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     X68000 Custom SASI HD controller

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _GBA_H_
 #define _GBA_H_
 

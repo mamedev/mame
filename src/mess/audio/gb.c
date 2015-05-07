@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************************
 * Game Boy sound emulation (c) Anthony Kruize (trandor@labyrinth.net.au)
 *

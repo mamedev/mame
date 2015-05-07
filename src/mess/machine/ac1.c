@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         AC1 video driver by Miodrag Milanovic

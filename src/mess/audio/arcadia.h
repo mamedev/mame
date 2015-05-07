@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef ARCADIA_SOUND_H_
 #define ARCADIA_SOUND_H_
 

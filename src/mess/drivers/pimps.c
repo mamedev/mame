@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         P.I.M.P.S. (Personal Interactive MicroProcessor System)

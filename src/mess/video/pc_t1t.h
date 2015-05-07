@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PC_T1T_H
 #define PC_T1T_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     NEC uPD1771-017 as used in the Epoch Super Cassette Vision (SCV)

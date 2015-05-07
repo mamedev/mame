@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
  supervision sound hardware
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * fm_scsi.h
  *

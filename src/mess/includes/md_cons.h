@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "includes/megadriv.h"
 #include "bus/megadrive/md_slot.h"

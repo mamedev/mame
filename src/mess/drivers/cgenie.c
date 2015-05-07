@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 HAD to change the PORT_ANALOG defs in this file...  please check ;-)
 

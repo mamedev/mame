@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Slicer Computers Slicer 80186 SBC
 // The bios makefile refers to a "exe3bin" utility, this can be substituted with FreeDOS exe2bin and the /l=0xf800 option
 // which will fixup the relocations

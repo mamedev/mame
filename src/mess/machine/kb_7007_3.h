@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * MC 7007 keyboard, variant 3, used by mc1502.
  *

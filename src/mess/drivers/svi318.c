@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 ** svi318.c : driver for Spectravideo SVI-318 and SVI-328
 **

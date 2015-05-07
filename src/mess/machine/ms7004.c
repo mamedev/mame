@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Electronika MS 7004 keyboard (DEC LK-201 workalike with extra keys
     for Cyrillic characters).

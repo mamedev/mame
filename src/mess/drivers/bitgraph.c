@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     BBN BitGraph -- monochrome, raster graphics (768x1024), serial terminal.

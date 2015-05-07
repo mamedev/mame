@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     video/dgn_beta.c
 

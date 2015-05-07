@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Hewlett-Packard HP16500a/b/c Logic Analyzer

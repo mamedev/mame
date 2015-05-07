@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Preliminary X68000 driver for MESS
 // Started 18/11/2006
 // Written by Barry Rodewald

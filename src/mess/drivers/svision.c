@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
  watara supervision handheld
 

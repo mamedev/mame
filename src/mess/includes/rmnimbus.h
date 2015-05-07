@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     rmnimbus.c
     Machine driver for the Research Machines Nimbus.

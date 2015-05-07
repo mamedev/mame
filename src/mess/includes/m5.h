@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __M5__
 #define __M5__
 

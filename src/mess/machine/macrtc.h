@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     macrtc.h - Apple 343-0042 real time clock and battery RAM

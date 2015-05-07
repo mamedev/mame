@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"

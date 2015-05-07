@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
         SM1800 (original name is CM1800 in cyrilic letters)

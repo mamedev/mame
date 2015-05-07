@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     drivers/mbc55x.c
 

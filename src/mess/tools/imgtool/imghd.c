@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Code to interface the MESS image code with MAME's harddisk core.
 

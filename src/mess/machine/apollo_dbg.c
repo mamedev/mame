@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * debug/apollo.c - APOLLO DN3500/DN3000 debug functions
  *

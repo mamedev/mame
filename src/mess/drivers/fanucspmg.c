@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // licenses: MAME, BSD
 // copyright-holders:R. Belmont
 /***************************************************************************

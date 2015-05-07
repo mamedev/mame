@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     PC/AT 486 with Chips & Technologies CS4031 chipset

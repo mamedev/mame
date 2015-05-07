@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************
 
     video/apple2.h  - Video handling for 8-bit Apple IIs

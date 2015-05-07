@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Research Machines 380Z (aka "RML 380Z" or "RM 380Z")

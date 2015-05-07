@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   macrtc.c - the real-time clock & NVRAM chip used in early 680x0 Macs,

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************\
 *
 *   SGI IP22 Indigo2/Indy workstation

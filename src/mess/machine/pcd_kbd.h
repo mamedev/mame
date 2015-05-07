@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PCD_KBD_H_
 #define PCD_KBD_H_
 

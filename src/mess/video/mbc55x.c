@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     video/mbc55x.c
 

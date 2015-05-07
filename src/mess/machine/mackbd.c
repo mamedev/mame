@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Apple Macintosh original/512/Plus keyboard
     Emulation by R. Belmont

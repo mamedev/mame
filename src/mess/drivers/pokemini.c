@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
 Driver file to handle emulation of the Nintendo Pokemon Mini handheld

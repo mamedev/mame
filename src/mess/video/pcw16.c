@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "includes/pcw16.h"
 #include "machine/ram.h"

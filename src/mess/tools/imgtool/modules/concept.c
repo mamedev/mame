@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Handlers for concept floppy images
 

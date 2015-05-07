@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     smartmed.c: SmartMedia Flash ROM emulation
 

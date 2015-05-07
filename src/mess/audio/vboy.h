@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     vboy.h - Virtual Boy audio emulation
 
