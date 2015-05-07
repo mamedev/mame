@@ -2,8 +2,11 @@
 // copyright-holders:???
 /***********************************************************************************
 
-  Multi Game - EGD
+  Multi Game - EGD, 1997
   Poker - Roulette - Black Jack - Bingo
+
+  Game base is Bingo. Casino 10 (poker), Roulette, and Black Jack,
+  could be enabled/disabled through DIP switches.
 
 ************************************************************************************
 
@@ -39,6 +42,7 @@ TODO:
 - watchdog (service mode claims that there's one at the end of the aforementioned procedure);
 - fix the poker game (casino 10). seems lack of watchdog.
 - sound;
+- proper 3x D71055C emulation. 
 
 ***********************************************************************************/
 
@@ -47,6 +51,7 @@ TODO:
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "video/clgd542x.h"
+#include "sound/upd7759.h"
 #include "machine/nvram.h"
 
 
@@ -55,9 +60,11 @@ class gambl186_state : public driver_device
 public:
 	gambl186_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_upd7759(*this, "7759") { }
 
 	required_device<cpu_device> m_maincpu;
+ 	optional_device<upd7759_device> m_upd7759;
     int m_comms_state;
 	int m_comms_ind;
 	UINT8 m_comms_data[1002];
@@ -70,6 +77,8 @@ public:
 	DECLARE_READ16_MEMBER(comms_r);
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);
+	DECLARE_READ16_MEMBER(upd_r);
+	DECLARE_WRITE16_MEMBER(upd_w);
 };
 
 void gambl186_state::machine_start()
@@ -249,20 +258,52 @@ WRITE16_MEMBER( gambl186_state::data_bank_w)
 		popmessage("warning: set %04x to data bank",data);
 }
 
+
+/* Preliminary sound through UPD7759
+
+   port 400h writes the sample index/input
+   port 504h writes the commands...
+   
+   504h xxxx ---- ---- ----
+ 
+   Sound event:
+   504h: 2000
+   504h: e000
+   400h: xxyy <--- xx and yy are the sample number/index
+   504h: c000
+   504h: e000
+   504h: 2000
+*/
+WRITE16_MEMBER(gambl186_state::upd_w)
+{
+//// FIXME
+//	m_upd7759->reset_w(0);
+//	m_upd7759->reset_w(1);
+
+//	if (mem_mask&0x00ff) m_upd7759->port_w(space, 0, data & 0xff);
+//	if (mem_mask&0xff00) m_upd7759->port_w(space, 0, (data >> 8) & 0xff);
+	data = (data >> 8);
+    popmessage("sample index: %02x", data);
+
+//	m_upd7759->start_w(0);
+//	m_upd7759->start_w(1);
+}
+
+
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffff)
-	AM_RANGE(0x0400, 0x0401) AM_WRITENOP // sound
+	AM_RANGE(0x0400, 0x0401) AM_WRITE(upd_w)      // upd7759 sample index/input
 	AM_RANGE(0x0500, 0x0501) AM_READ_PORT("IN0")
 	AM_RANGE(0x0502, 0x0503) AM_READ_PORT("IN1")
-	AM_RANGE(0x0504, 0x0505) AM_READ_PORT("IN2")
+	AM_RANGE(0x0504, 0x0505) AM_READ_PORT("IN2")  // Seems to writes more upd7759 params in MSB...
 
 	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
 	AM_RANGE(0x0580, 0x0581) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("JOY")
 	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW0") AM_WRITENOP // Watchdog: bit 8
-	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
+//	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
 	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
 	AM_RANGE(0x0700, 0x0701) AM_WRITE(data_bank_w)
 ADDRESS_MAP_END
@@ -358,6 +399,12 @@ static MACHINE_CONFIG_START( gambl186, gambl186_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
 MACHINE_CONFIG_END
 
 
@@ -371,7 +418,7 @@ ROM_START( gambl186 )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
-	ROM_REGION( 0x20000, "snd", 0 )
+	ROM_REGION( 0x20000, "upd", 0 )	// upd7759 sound samples
 	ROM_LOAD( "347.u302", 0x00000, 0x20000, CRC(7ce8f490) SHA1(2f856e31d189e9d46ba6b322133d99133e0b52ac) )
 ROM_END
 
@@ -384,7 +431,7 @@ ROM_START( gambl186a )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
-	ROM_REGION( 0x20000, "snd", 0 )
+	ROM_REGION( 0x20000, "upd", 0 )	// upd7759 sound samples
 	ROM_LOAD( "347.u302", 0x00000, 0x20000, CRC(7ce8f490) SHA1(2f856e31d189e9d46ba6b322133d99133e0b52ac) )
 ROM_END
 
