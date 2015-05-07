@@ -33,7 +33,7 @@ harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &m
 	m_dac(*this, "dac"),
 	m_sounddsp(*this, "sounddsp"),
 	m_sounddsp_ram(*this, "sounddsp_ram"),
-	m_rombase(*this, "serialroms"),
+	m_sound_rom(*this, "serialroms"),
 	m_soundflag(0),
 	m_mainflag(0),
 	m_sounddata(0),
@@ -62,6 +62,7 @@ void harddriv_sound_board_device::device_start()
 
 void harddriv_sound_board_device::device_reset()
 {
+	m_last_bio_cycles = 0;
 	m_sounddsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
@@ -370,8 +371,8 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnddsp_soundaddr_w)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_rom_r)
 {
-	if (m_sound_rom_offs < m_rombase.bytes())
-		return m_rombase[m_sound_rom_offs++] << 7;
+	if (m_sound_rom_offs < m_sound_rom.length())
+		return m_sound_rom[m_sound_rom_offs++] << 7;
 	m_sound_rom_offs++;
 	return 0;
 }

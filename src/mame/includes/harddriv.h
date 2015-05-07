@@ -473,7 +473,7 @@ private:
 	required_device<dac_device> m_dac;
 	required_device<cpu_device> m_sounddsp;
 	required_shared_ptr<UINT16> m_sounddsp_ram;
-	required_region_ptr<UINT8> m_rombase;	
+	required_region_ptr<UINT8>  m_sound_rom;
 	
 	UINT8                   m_soundflag;
 	UINT8                   m_mainflag;
