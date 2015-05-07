@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* TAS 5 REEL system? by Olympic Video Gaming */
 
 #include "emu.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Taito F3 Package System (aka F3 Cybercore System)

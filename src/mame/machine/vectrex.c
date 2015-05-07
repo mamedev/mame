@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * D9060 - SASI + TANDON TM602S
  *

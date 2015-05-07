@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Hanaroku - Alba ZC HW */
 
 /*

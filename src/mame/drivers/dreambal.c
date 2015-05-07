@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Dream Ball
 
 PCB DE-0386-2

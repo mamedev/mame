@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Atmel at29c040a flash EEPROM
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Double Dragon & Double Dragon II (but also China Gate)

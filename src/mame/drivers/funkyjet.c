@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Funky Jet                               (c) 1992 Data East / Mitchell Corporation

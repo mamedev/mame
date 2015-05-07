@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Astra Fruit Machines
  -- Unknown 68340 based HW platform (seems related to pluto5.c?)
  -- dumps are of an unknown quality

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Sand Scorpion    (C) 1992 FACE

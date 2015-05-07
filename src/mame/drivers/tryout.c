@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************
 
  Pro Baseball Skill Tryout (JPN Ver.)

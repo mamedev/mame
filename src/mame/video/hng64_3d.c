@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Hyper NeoGeo 64 - 3D bits */
 
 // todo, use poly.c

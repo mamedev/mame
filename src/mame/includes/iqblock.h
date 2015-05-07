@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class iqblock_state : public driver_device
 {
 public:

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Unknown game, dump was marked 'slot 72 - poker'
 

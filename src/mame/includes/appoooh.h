@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/msm5205.h"
 
 class appoooh_state : public driver_device

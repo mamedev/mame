@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
  Bandai Sufami Turbo cartridge emulation (for SNES/SFC)

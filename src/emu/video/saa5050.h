@@ -4,9 +4,6 @@
 
     Mullard SAA5050 Teletext Character Generator emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    Vss   1 |*    \_/     | 28  DE

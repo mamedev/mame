@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************
 
     Quiz Panicuru Fantasy video hardware

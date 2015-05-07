@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Cupidon - Russian Video Fruit Machines? */
 
 /*

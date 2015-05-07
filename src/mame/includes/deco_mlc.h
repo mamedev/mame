@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/eepromser.h"
 #include "machine/deco146.h"
 #include "sound/ymz280b.h"

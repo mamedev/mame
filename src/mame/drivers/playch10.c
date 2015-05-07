@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Playchoice 10 - (c) 1986 Nintendo of America

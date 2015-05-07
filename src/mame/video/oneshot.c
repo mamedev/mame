@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* One Shot One Kill Video Hardware */
 
 #include "emu.h"

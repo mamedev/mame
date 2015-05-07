@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Asante MC3NB NuBus Ethernet card (DP83902)

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Apple "Egret" ADB/system controller MCU
     Emulation by R. Belmont

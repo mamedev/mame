@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Halley's Comet, 1986 Taito
 

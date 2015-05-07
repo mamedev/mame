@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Scorpion 4 Hardware Platform (c)1996 Bell Fruit Manufacturing

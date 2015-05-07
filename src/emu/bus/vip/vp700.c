@@ -4,9 +4,6 @@
 
     RCA VIP Tiny BASIC VP-700 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "vp700.h"

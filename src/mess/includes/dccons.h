@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "imagedev/chd_cd.h"
 #include "machine/gdrom.h"
 #include "machine/ataintf.h"

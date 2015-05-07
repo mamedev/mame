@@ -4,9 +4,6 @@
 
     RCA CDP1871 Keyboard Encoder emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                     D1   1 |*    \_/     | 40  Vdd

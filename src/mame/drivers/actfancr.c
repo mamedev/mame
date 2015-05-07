@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     Act Fancer (Japan)              FD (c) 1989 Data East Corporation

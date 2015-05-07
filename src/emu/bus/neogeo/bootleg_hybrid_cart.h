@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NEOGEO_BOOTLEG_HYBRID_HYBRID_CART_H
 #define __NEOGEO_BOOTLEG_HYBRID_HYBRID_CART_H
 

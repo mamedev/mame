@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Poisk-1 does not have a real mc6845 and always runs in graphics mode.
  * Text mode is emulated by BIOS.

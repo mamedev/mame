@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     psxcard.c - Sony PlayStation memory card device
 

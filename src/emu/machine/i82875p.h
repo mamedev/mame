@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Intel i82875p northbridge
 
 #ifndef I82875P_H

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * 8x300dasm.c
  *  Implementation of the Scientific Micro Systems SMS300 / Signetics 8X300 Microcontroller

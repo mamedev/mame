@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 8 voices max */
 #define MAX_VOICES 8
 

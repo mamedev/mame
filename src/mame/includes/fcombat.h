@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 
 /* this is compied from Exerion, but it should be correct */

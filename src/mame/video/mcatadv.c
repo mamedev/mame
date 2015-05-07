@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Magical Cat Adventure / Nostradamus Video Hardware */
 
 /*

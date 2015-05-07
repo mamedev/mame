@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #ifndef BWIDOW_H_
 #define BWIDOW_H_

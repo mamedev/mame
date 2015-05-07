@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Convergent NGEN keyboard device
 
 #include "ngen_kb.h"

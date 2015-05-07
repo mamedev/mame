@@ -1619,6 +1619,7 @@ struct raster_info
 	UINT32              eff_fbz_mode;           /* effective fbzMode value */
 	UINT32              eff_tex_mode_0;         /* effective textureMode value for TMU #0 */
 	UINT32              eff_tex_mode_1;         /* effective textureMode value for TMU #1 */
+	UINT32              hash;
 };
 
 
@@ -2420,9 +2421,8 @@ do                                                                              
 	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))                                        \
 	{                                                                           \
 		int dpix = dest[XX];                                                    \
-		int dr = (dpix >> 8) & 0xf8;                                            \
-		int dg = (dpix >> 3) & 0xfc;                                            \
-		int db = (dpix << 3) & 0xf8;                                            \
+		int dr, dg, db;                                                         \
+		EXTRACT_565_TO_888(dpix, dr, dg, db);                                   \
 		int da = FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) ? depth[XX] : 0xff;       \
 		int sr = (RR);                                                          \
 		int sg = (GG);                                                          \
@@ -2623,12 +2623,12 @@ do                                                                              
 			{                                                                   \
 				case 0:     /* fog table */                                     \
 				{                                                               \
-					INT32 delta = (VV)->fbi.fogdelta[wfloat >> 10];             \
+					INT32 delta = (VV)->fbi.fogdelta[fogdepth >> 10];             \
 					INT32 deltaval;                                             \
 																				\
 					/* perform the multiply against lower 8 bits of wfloat */   \
 					deltaval = (delta & (VV)->fbi.fogdelta_mask) *              \
-								((wfloat >> 2) & 0xff);                         \
+								((fogdepth >> 2) & 0xff);                         \
 																				\
 					/* fog zones allow for negating this value */               \
 					if (FOGMODE_FOG_ZONES(FOGMODE) && (delta & 2))              \
@@ -2641,7 +2641,7 @@ do                                                                              
 					deltaval >>= 4;                                             \
 																				\
 					/* add to the blending factor */                            \
-					fogblend = (VV)->fbi.fogblend[wfloat >> 10] + deltaval;     \
+					fogblend = (VV)->fbi.fogblend[fogdepth >> 10] + deltaval;     \
 					break;                                                      \
 				}                                                               \
 																				\
@@ -3040,7 +3040,7 @@ while (0)
 #define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)    \
 do                                                                              \
 {                                                                               \
-	INT32 depthval, wfloat;                                                     \
+	INT32 depthval, wfloat, fogdepth, biasdepth;                                  \
 	INT32 prefogr, prefogg, prefogb;                                            \
 	INT32 r, g, b, a;                                                           \
 																				\
@@ -3080,33 +3080,27 @@ do                                                                              
 		wfloat = 0x0000;                                                        \
 	else                                                                        \
 	{                                                                           \
-		UINT32 temp = (UINT32)(ITERW);                                          \
-		if ((temp & 0xffff0000) == 0)                                           \
+		UINT32 temp = (UINT32)(ITERW);                                \
+		if (!(temp & 0xffff0000))                                           \
 			wfloat = 0xffff;                                                    \
 		else                                                                    \
 		{                                                                       \
 			int exp = count_leading_zeros(temp);                                \
-			temp &=0x7fff0000;                                \
 			wfloat = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1;       \
 		}                                                                       \
 	}                                                                           \
+	fogdepth = wfloat;                                                         \
 	/* add the bias for fog selection*/                                         \
 	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
 	{                                                                           \
-		wfloat += (INT16)(VV)->reg[zaColor].u;                                \
-		CLAMP(wfloat, 0, 0xffff);                                             \
+		fogdepth += (INT16)(VV)->reg[zaColor].u;                                \
+		CLAMP(fogdepth, 0, 0xffff);                                             \
 	}                                                                           \
 																				\
 	/* compute depth value (W or Z) for this pixel */                           \
 	if (FBZMODE_WBUFFER_SELECT(FBZMODE) == 0)                                   \
 	{                                                                           \
 		CLAMPED_Z(ITERZ, FBZCOLORPATH, depthval);                               \
-		/* add the bias */                                                          \
-		if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
-		{                                                                           \
-			depthval += (INT16)(VV)->reg[zaColor].u;                                \
-			CLAMP(depthval, 0, 0xffff);                                             \
-		}                                                                           \
 	}                                                                           \
 	else if (FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE) == 0)                          \
 		depthval = wfloat;                                                      \
@@ -3116,25 +3110,28 @@ do                                                                              
 			depthval = 0x0000;                                                  \
 		else                                                                    \
 		{                                                                       \
-			UINT32 temp = (ITERZ) << 4;                                         \
-			if ((temp & 0xffff0000) == 0)                                       \
+			UINT32 temp = (ITERZ << 4);                             \
+			if (!(temp & 0xffff0000))                                                           \
 				depthval = 0xffff;                                              \
 			else                                                                \
 			{                                                                   \
 				int exp = count_leading_zeros(temp);                            \
-				temp &=0x7fff0000;                                \
 				depthval = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1; \
 			}                                                                   \
 		}                                                                       \
-		/* add the bias */                                                          \
-		if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
-		{                                                                           \
-			depthval += (INT16)(VV)->reg[zaColor].u;                                \
-			CLAMP(depthval, 0, 0xffff);                                             \
-		}                                                                           \
-	}                                                                           \
-																				\
-																				\
+	}                                                                            \
+	/* add the bias */                                                          \
+	biasdepth = depthval;                                                     \
+	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
+	{                                                                           \
+		biasdepth += (INT16)(VV)->reg[zaColor].u;                                \
+		CLAMP(biasdepth, 0, 0xffff);                                             \
+	}
+
+
+#define DEPTH_TEST(VV, STATS, XX, FBZMODE)    \
+do                                                                              \
+{                                                                               \
 	/* handle depth buffer testing */                                           \
 	if (FBZMODE_ENABLE_DEPTHBUF(FBZMODE))                                       \
 	{                                                                           \
@@ -3143,7 +3140,7 @@ do                                                                              
 		/* the source depth is either the iterated W/Z+bias or a */             \
 		/* constant value */                                                    \
 		if (FBZMODE_DEPTH_SOURCE_COMPARE(FBZMODE) == 0)                         \
-			depthsource = depthval;                                             \
+			depthsource = biasdepth;                                             \
 		else                                                                    \
 			depthsource = (UINT16)(VV)->reg[zaColor].u;                         \
 																				\
@@ -3205,7 +3202,9 @@ do                                                                              
 			case 7:     /* depthOP = always */                                  \
 				break;                                                          \
 		}                                                                       \
-	}
+	}                                                                       \
+}                                                                               \
+while (0)
 
 
 #define PIXEL_PIPELINE_END(VV, STATS, DITHER, DITHER4, DITHER_LOOKUP, XX, dest, depth, FBZMODE, FBZCOLORPATH, ALPHAMODE, FOGMODE, ITERZ, ITERW, ITERAXXX) \
@@ -3235,7 +3234,7 @@ do                                                                              
 	if (depth && FBZMODE_AUX_BUFFER_MASK(FBZMODE))                              \
 	{                                                                           \
 		if (FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) == 0)                          \
-			depth[XX] = depthval;                                               \
+			depth[XX] = biasdepth;                                               \
 		else                                                                    \
 			depth[XX] = a;                                                      \
 	}                                                                           \
@@ -3315,7 +3314,7 @@ do                                                                              
 			c_other.u = (VV)->reg[color1].u;                                    \
 			break;                                                              \
 																				\
-		default:    /* reserved */                                              \
+		default:    /* reserved - voodoo3 framebufferRGB */                   \
 			c_other.u = 0;                                                      \
 			break;                                                              \
 	}                                                                           \
@@ -3647,9 +3646,11 @@ static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, co
 		rgb_union iterargb = { 0 };                                             \
 		rgb_union texel = { 0 };                                                \
 																				\
-		/* pixel pipeline part 1 handles depth testing and stippling */         \
+		/* pixel pipeline part 1 handles depth setup and stippling */         \
 		PIXEL_PIPELINE_BEGIN(v, stats, x, y, FBZCOLORPATH, FBZMODE,             \
 								iterz, iterw);                                  \
+		/* depth testing */         \
+		DEPTH_TEST(v, stats, x, FBZMODE);    \
 																				\
 		/* run the texture pipeline on TMU1 to produce a value in texel */      \
 		/* note that they set LOD min to 8 to "disable" a TMU */                \

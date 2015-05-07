@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Rohga Video emulation - Bryan McPhail, mish@tendril.co.uk

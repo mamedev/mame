@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"

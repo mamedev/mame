@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _DP8390_H_
 #define _DP8390_H_
 

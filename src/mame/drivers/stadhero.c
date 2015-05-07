@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Stadium Hero (Japan)            (c) 1988 Data East Corporation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
 Support for Jupiter Ace .tap cassette images

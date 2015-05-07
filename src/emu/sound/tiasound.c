@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************/
 /*                                                                           */
 /* Module:  TIA Chip Sound Simulator                                         */

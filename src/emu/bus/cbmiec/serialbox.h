@@ -4,9 +4,6 @@
 
     Serial Box 64K Serial Port Buffer emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

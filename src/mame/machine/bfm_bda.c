@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Bellfruit 7x5 Dot matrix VFD module interface and emulation by J.Wallace

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 Consolidation and enhancement of documentation by Manfred Schneider based on previous work from
  PeT mess@utanet.at and Paul Robson (autismuk@aol.com) minor updates by incog

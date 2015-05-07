@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Extrema Russian Video Fruit Machines */
 /*
   Appear to be Z80 based, some rom scramble?

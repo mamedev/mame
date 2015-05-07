@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 From: erbo@xs4all.nl (erik de boer)
 

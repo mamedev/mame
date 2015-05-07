@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/samples.h"
 
 class superqix_state : public driver_device

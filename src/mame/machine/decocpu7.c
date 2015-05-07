@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "decocpu7.h"
 

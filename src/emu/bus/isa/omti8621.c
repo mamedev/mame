@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * omti8621.c - SMS OMTI 8621 disk controller (for Apollo DN3x00)
  *

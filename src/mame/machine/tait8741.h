@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TAITO8741__
 #define __TAITO8741__
 

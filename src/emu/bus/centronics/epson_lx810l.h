@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Epson LX-810L dot matrix printer emulation
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************
  PGM 012 + 025 PGM protection emulation
 

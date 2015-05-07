@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class tsamurai_state : public driver_device
 {
 public:

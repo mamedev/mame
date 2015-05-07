@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/polylgcy.h"
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"

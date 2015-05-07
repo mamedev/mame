@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SCP1000_SLOT_H
 #define __SCP1000_SLOT_H
 

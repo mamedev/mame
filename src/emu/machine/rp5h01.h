@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     RP5H01 - Ricoh 64x1bit(+8bit) PROM with 6/7-bit counter

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************
 
     NEXUS 3D Version 1.0 Board from Interpark

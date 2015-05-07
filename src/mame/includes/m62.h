@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class m62_state : public driver_device
 {
 public:

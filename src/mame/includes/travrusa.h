@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class travrusa_state : public driver_device
 {
 public:

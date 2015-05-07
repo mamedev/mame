@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "sound/speaker.h"
 #include "cpu/upd7810/upd7810.h"

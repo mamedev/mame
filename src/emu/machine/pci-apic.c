@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "pci-apic.h"
 
 const device_type APIC = &device_creator<apic_device>;

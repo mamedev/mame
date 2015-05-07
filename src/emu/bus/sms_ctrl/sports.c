@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Sega Master System "Sports Pad" (US model) emulation

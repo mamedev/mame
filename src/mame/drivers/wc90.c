@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 World Cup 90 ( Tecmo ) driver
 -----------------------------

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _MAPLEDEV_H_
 #define _MAPLEDEV_H_
 

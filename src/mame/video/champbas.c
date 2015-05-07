@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "video/resnet.h"
 #include "includes/champbas.h"

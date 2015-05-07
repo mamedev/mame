@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Vs. Janshi Brandnew Stars
 (c)1997 Jaleco

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PSXANALOG_H_
 #define PSXANALOG_H_
 

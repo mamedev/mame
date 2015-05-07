@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TAITOSND_H__
 #define __TAITOSND_H__
 

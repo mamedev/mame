@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_SUNSOFT_H
 #define __NES_SUNSOFT_H
 

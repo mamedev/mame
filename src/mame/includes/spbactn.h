@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"

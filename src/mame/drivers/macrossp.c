@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** DRIVER INFO **************************************************************
 
 Macross Plus                        (c)1996 Banpresto

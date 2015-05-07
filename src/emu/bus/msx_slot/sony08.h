@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_SLOT_SONY08_H
 #define __MSX_SLOT_SONY08_H
 

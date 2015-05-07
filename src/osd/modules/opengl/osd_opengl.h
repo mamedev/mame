@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef GET_GLFUNC
 #ifndef MANGLE
 

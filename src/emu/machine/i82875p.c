@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "i82875p.h"
 
 const device_type I82875P_HOST     = &device_creator<i82875p_host_device>;

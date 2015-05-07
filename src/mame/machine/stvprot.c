@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* ST-V hookup for 315-5881 encryption/compression chip */
 
 /*

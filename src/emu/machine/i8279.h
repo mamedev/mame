@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Intel 8279 Programmable Keyboard/Display Interface emulation

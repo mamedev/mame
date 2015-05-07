@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #define PIXMAP_COLOR_BASE  (16 + 32)
 #define BITMAPRAM_SIZE      0x6000

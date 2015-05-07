@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Intel Flash ROM emulation
 */

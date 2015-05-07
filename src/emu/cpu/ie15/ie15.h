@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __IE15_H__
 #define __IE15_H__
 

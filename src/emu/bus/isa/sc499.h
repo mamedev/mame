@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * sc499.h - Archive Cartridge tape controller SC-499
  *

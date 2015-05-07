@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     SemiCom 68020 based hardware

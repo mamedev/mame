@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef LPC_ACPI_H
 #define LPC_ACPI_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * am53cf96.c
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 68307 SIM module */
 
 #include "cpu/m68000/m68000.h"

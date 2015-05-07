@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/s2636.h"
 
 class zac2650_state : public driver_device

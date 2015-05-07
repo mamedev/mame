@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * NEC PC-6001 cassette format handling
  */

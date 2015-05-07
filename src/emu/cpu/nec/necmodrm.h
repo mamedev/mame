@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 static struct {
 	struct {
 		WREGS w[256];

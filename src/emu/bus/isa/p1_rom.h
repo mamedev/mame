@@ -4,9 +4,6 @@
 
     Poisk-1 ROM cartridge device
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _GAMEPOCK_H_
 #define _GAMEPOCK_H_
 #include "sound/speaker.h"

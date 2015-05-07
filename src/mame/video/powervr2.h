@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __POWERVR2_H__
 #define __POWERVR2_H__
 

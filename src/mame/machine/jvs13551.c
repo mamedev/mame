@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "jvs13551.h"
 
 const device_type SEGA_837_13551 = &device_creator<sega_837_13551>;

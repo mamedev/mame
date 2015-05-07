@@ -4,9 +4,6 @@
 
     OKI MSM5832 Real Time Clock/Calendar emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    Vdd   1 |*    \_/     | 18  HOLD

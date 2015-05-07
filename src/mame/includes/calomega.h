@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 

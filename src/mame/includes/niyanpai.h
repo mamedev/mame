@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/dac.h"
 #include "machine/tmp68301.h"
 #define VRAM_MAX    3

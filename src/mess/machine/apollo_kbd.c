@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * apollo_kbd.c - Apollo keyboard and mouse emulation
  *

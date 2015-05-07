@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Sega Master System "Sports Pad" (Japanese model) emulation

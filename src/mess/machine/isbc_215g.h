@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // license:BSD-3-Clause
 
 #ifndef ISBC_215G_H_

@@ -4,9 +4,6 @@
 
     CST Q+4 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "cst_q_plus4.h"

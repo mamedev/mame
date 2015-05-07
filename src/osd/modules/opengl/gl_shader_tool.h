@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***
  *
  * GL Shader Tool - Convinient Basic Shader functionality

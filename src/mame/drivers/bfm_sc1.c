@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************************
 
     Bellfruit scorpion1 driver, (under heavy construction !!!)

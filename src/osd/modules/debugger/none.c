@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  none.c - stubs for linking when NO_DEBUGGER is defined

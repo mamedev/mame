@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /***************************************************************************************************
 DEC Rainbow 100
 

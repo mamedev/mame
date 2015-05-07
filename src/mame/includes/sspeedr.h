@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class sspeedr_state : public driver_device
 {
 public:

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SAT_ROM_H
 #define __SAT_ROM_H
 

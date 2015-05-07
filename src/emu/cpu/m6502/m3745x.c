@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Mitsubishi M3745x 8-bit microcontroller family
 */

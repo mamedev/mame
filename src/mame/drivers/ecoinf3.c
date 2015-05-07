@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Electrocoin Pyramid HW type */
 
 // this seems to not like our Z180 timers much? (or wants a 10ms interrupt externally?)

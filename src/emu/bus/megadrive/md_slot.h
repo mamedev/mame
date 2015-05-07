@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MD_SLOT_H
 #define __MD_SLOT_H
 

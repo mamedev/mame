@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Hyper NeoGeo 64 Audio */
 
 // uses a V53A ( == V33A with extra peripherals eg. DMA, Timers, MMU giving virtual 24-bit address space etc.)

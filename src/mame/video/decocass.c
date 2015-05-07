@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************
 
     DECO Cassette System video

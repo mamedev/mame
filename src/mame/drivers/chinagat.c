@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 China Gate.
 By Paul Hampson from First Principles

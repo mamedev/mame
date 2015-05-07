@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 typedef device_delegate<UINT16 (UINT16 pri)> decospr_pri_cb_delegate;
 typedef device_delegate<UINT16 (UINT16 col)> decospr_col_cb_delegate;

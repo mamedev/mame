@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
 #include "machine/53c810.h"

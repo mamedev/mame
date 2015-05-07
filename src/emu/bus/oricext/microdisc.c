@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "microdisc.h"
 #include "formats/oric_dsk.h"
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
 
     Irem M107 video hardware, Bryan McPhail, mish@tendril.co.uk

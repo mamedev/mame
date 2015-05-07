@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
       Seibu SPI Hardware
       Seibu SYS386I

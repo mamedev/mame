@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     TMP68301 basic emulation + Interrupt Handling

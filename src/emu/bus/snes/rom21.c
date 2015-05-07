@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
  Super NES/Famicom (HiROM) cartridge emulation (for SNES/SFC)

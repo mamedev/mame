@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 void minx_cpu_device::execute_one_ce()
 {

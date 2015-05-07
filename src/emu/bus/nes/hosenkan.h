@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_HOSENKAN_H
 #define __NES_HOSENKAN_H
 

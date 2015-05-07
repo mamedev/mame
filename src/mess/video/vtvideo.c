@@ -1,9 +1,8 @@
+// license:???
+// copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /**********************************************************************
 DEC VT Terminal video emulation
 [ DC012 and DC011 emulation ]
-
-Copyright MESS Team.
-Visit http://mamedev.org for licensing and usage restrictions.
 
 01/05/2009 Initial implementation [Miodrag Milanovic]
 Enhancements (2013 - 2015) by Karl-Ludwig Deisenhofer.

@@ -4,9 +4,6 @@
 
     RCA CDP1862 Video Display Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "cdp1862.h"

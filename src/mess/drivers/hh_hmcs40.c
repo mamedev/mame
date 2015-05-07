@@ -12,7 +12,8 @@
  @07      HD38750A  1979, Bambino Knock-Em Out Boxing (ET-06B)
  @08      HD38750A  1979, Bambino Dribble Away Basketball (ET-05)
  @45      HD38750A  1981, VTech Invaders
- *58      HD38750A  1982, Ludotronic(Hanzawa) Grand Prix Turbo
+ *56      HD38750A  1981, Actronics(Hanzawa) Twinvader (small brown version)
+ *58      HD38750A  1981, Actronics(Hanzawa) Challenge Racer/Ludotronic(Hanzawa) Grand Prix Turbo
  *62      HD38750A  1982, Actronics(Hanzawa) Pack'n Maze
 
  @04      HD38800A  1980, Gakken Heiankyo Alien
@@ -20,7 +21,7 @@
  @27      HD38800A  1981, Bandai Packri Monster
  *31      HD38800A  1981, Entex Select-a-Game cartridge: Space Invader 2 (have dump)
  *41      HD38800A  1982, Gakken Puck Monster
- *51      HD38800A  1981, Actronics(Hanzawa) Twinvader
+ *51      HD38800A  1981, Actronics(Hanzawa) Twinvader (larger white version)
  @70      HD38800A  1982, Coleco Galaxian
  @73      HD38800A  1982, Bandai(Mattel) Star Hawk (PT-317B)
  @77      HD38800A  1982, Bandai Frisky Tom (PT-327A)

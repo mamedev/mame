@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     This code handles the floppy drives.
     All FDD actions should be performed using these functions.

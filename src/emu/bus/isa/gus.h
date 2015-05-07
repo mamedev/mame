@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Gravis Ultrasound ISA card
  *

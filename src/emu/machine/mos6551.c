@@ -4,9 +4,6 @@
 
     MOS Technology 6551 Asynchronous Communication Interface Adapter
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mos6551.h"

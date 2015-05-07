@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Diver Boy
  (c)1992 Device Electronics
 

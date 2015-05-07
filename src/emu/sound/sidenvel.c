@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*========================================================================= */
 /* This source implements the ADSR volume envelope of the SID-chip. */
 /* Two different envelope shapes are implemented, an exponential */

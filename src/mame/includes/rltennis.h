@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/dac.h"
 
 

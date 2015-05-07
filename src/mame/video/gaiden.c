@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Ninja Gaiden / Tecmo Knights Video Hardware

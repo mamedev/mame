@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
  Arcade games (hacks of console games) running on SNES harware.

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MACHINE_SUBSINO__
 #define __MACHINE_SUBSINO__
 

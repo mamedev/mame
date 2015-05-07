@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
 #include "sound/okim6295.h"

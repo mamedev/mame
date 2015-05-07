@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_CART_HOLY_QURAN_H
 #define __MSX_CART_HOLY_QURAN_H
 

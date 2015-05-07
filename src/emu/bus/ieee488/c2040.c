@@ -4,9 +4,6 @@
 
     Commodore 2040/3040/4040 Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

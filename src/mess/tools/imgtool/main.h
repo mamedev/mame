@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "imgtool.h"
 
 struct command

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 const char glsl_general_vsh_src[] =
 "\n"
 "void main()\n"

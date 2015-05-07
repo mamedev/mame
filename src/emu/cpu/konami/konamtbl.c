@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 INLINE void abx(konami_state *cpustate);
 INLINE void adca_di(konami_state *cpustate);
 INLINE void adca_ex(konami_state *cpustate);

@@ -4,9 +4,6 @@
 
     Motorola MC68901 Multi Function Peripheral emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   R/_W   1 |*    \_/     | 48  _CS

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Super Kaneko Nova System video */
 
 #include "emu.h"

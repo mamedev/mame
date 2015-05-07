@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 8080bw.c *******************************************/
 
 #include "emu.h"

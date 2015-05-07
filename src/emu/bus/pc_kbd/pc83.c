@@ -4,9 +4,6 @@
 
     IBM 5150 83-key keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "pc83.h"

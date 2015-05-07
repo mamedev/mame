@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/2203intf.h"

@@ -4,9 +4,6 @@
 
     COMX-35 Serial/Parallel Printer Card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

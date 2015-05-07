@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Cirrus Logic GD542x/3x video chipsets

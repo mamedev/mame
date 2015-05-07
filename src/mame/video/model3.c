@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"

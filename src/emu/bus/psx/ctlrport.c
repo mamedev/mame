@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* PAD emulation */
 
 #include "ctlrport.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Ensoniq Vacuum Fluorescent Displays (VFDs)
     Emulation by R. Belmont

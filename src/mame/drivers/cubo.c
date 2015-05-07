@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)

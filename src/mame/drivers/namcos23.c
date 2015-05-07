@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Namco System 22.5 and (Super) System 23 (Evolution 2)
     Extremely preliminary driver by R. Belmont, thanks to Phil Stroffolino & Olivier Galibert

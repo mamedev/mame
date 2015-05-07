@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __STEREO_FX__
 #define __STEREO_FX__
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class bublbobl_state : public driver_device
 {

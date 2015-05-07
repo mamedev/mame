@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   re: Tecmo World Cup '98 (ST-V) (from ANY)
 

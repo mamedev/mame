@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_legacy.c
  *

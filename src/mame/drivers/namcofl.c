@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Namco System FL
     Driver by R. Belmont and ElSemi

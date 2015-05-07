@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef RMNKBD_H_
 #define RMNKBD_H_
 

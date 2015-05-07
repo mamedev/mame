@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
    MOLE ATTACK by Yachiyo Electronics Co.,LTD. 1982

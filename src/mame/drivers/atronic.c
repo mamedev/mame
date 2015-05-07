@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Atronic Russian Video Fruit Machines */
 /*
  From 1999? (documentation is dated August 99)

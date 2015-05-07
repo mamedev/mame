@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Capcom A0015405
 */

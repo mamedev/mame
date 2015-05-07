@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Ping Pong Masters '93

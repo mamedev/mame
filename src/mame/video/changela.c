@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************
 Change Lanes - Video Hardware
 (C) Taito 1983

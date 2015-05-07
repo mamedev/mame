@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************
       Seta custom ST-0016 chip
       sound emulation by R. Belmont, Tomasz Slanina, and David Haywood

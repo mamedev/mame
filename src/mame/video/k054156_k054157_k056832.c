@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* this should probably be k054156.c and k054156_device (the base management device) */
 
 /***************************************************************************/

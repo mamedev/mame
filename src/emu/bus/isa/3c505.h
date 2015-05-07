@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * threecom3c505.h - 3COM 3C505 ethernet controller
  *

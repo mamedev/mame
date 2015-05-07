@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************************************************
 
 Control Data Corporation CDC 721 Terminal (Viking)

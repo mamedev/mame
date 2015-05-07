@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __PCE_SLOT_H
 #define __PCE_SLOT_H
 

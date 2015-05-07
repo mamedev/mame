@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "t10mmc.h"
 
 static int to_msf(int frame)

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     rtc65271 emulation
 

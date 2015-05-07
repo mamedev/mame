@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Cristaltec "Game Cristal" (MAME bootleg)
 

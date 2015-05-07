@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 const nec_common_device::nec_ophandler nec_common_device::s_nec_instruction[256] =
 {

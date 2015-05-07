@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
  Mephisto Chess Computers using plugin modules
 

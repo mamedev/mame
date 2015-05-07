@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "cpu/sh2/sh2.h"
 

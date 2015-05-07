@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/msm5232.h"
 
 class flstory_state : public driver_device

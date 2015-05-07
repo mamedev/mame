@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class lkage_state : public driver_device
 {

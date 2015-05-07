@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _TC0110PCR_H_
 #define _TC0110PCR_H_
 

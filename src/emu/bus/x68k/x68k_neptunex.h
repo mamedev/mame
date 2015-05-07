@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * x68k_neptunex.h
  *

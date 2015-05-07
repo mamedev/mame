@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NSCSI_CD_H__
 #define __NSCSI_CD_H__
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* MPU4 hardware emulation
   for sets see mpu4.c
 */

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PSXMULTITAP_H_
 #define PSXMULTITAP_H_
 

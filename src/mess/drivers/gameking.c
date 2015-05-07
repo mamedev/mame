@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* TimeTop - GameKing */
 
 // these are meant to have a 3-in-1 internal ROM, not dumped

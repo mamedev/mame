@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*  Konami Cobra System
 
     Driver by Ville Linde

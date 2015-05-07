@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 naomi.h -> NAOMI includes

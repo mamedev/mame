@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************
 
     pci9050.c - PLX PCI9050 PCI to 4x Local Bus Bridge

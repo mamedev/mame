@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* GP9001 Video Controller */
 
 struct gp9001layeroffsets

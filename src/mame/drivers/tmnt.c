@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 This driver contains several Konami 68000 based games. For the most part they

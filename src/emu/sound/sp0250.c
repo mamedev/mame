@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
    GI SP0250 digital LPC sound synthesizer
 

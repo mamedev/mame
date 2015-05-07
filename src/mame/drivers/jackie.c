@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Happy Jackie (c) 1993 IGS.
 Video Slot machine game for amusement only.

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Flower Video Hardware */
 
 #include "emu.h"

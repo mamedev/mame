@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     very simple sprite scheme, used by some Capcom games and hardware cloned from them

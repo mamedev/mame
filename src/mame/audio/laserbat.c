@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "sound/tms3615.h"
 #include "includes/laserbat.h"

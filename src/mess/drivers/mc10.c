@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     TRS-80 Radio Shack MicroColor Computer

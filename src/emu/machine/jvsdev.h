@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __JVSDEV_H__
 #define __JVSDEV_H__
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_S1985_H
 #define __MSX_S1985_H
 

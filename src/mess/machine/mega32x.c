@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Megadrive / Genesis 32X emulation */
 
 /*

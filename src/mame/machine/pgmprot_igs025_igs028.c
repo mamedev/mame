@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************
  IGS28 + IGS025 PGM protection emulation
 

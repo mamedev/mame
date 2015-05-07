@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #if 0
 #include <sys/time.h>
 #include <sys/stat.h>

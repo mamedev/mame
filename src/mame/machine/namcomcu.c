@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Mitsubishi M37702 MCUs with Namco custom labels.
 

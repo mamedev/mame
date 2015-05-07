@@ -4,9 +4,6 @@
 
     CBM 8000 High Speed Graphics (324402-01) card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

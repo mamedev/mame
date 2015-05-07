@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 NEC uPD7752 Voice Synthesizing LSI

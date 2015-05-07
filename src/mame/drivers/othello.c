@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Othello (version 3.0) - Success 1984

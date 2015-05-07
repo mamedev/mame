@@ -4,9 +4,6 @@
 
     ISBX 218a with ISBC configuration
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "isbc_218a.h"

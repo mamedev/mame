@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 CASIO PV-2000

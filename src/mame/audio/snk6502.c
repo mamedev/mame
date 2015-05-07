@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* from Andrew Scott (ascott@utkux.utcc.utk.edu) */
 
 /*

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*  Video hardware for Taito Grand Champion */
 
 /* updated by Hans Andersson, dec 2005     */

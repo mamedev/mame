@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Iskra-1030 and -1031 XX-key keyboard emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/nscsi_cd.h"
 #include "imagedev/chd_cd.h"
 

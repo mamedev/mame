@@ -4,9 +4,6 @@
 
     Western Digital WD11C00-17 PC/XT Host Interface Logic Device
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

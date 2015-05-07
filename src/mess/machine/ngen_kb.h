@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Convergent NGEN keyboard
 
 #ifndef NGEN_KB_H_

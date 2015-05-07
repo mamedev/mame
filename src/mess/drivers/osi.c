@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Ohio Scientific Superboard II Model 600

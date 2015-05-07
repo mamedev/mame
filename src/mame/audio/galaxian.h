@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/discrete.h"
 
 #define GAL_AUDIO   "discrete"

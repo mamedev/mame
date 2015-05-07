@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/bufsprite.h"
 #include "sound/msm5205.h"
 

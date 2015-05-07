@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************************
 
     Counter Steer                   (c) 1985 Data East Corporation

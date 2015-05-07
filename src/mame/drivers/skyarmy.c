@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  2010.04.05. stephh
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Functions to emulate the video hardware of some Toaplan games,

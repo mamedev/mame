@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef LPC_PIT_H
 #define LPC_PIT_H
 

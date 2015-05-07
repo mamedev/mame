@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
     Bell-Fruit Cobra I/II and Viper Hardware

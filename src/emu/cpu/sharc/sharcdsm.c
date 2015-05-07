@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
    Analog Devices ADSP-2106x SHARC Disassembler
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef NEXTMO_H
 #define NEXTMO_H
 

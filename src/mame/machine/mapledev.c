@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "mapledev.h"
 #include "maple-dc.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Apple 4*8 Graphics Card (model 630-0400) emulation

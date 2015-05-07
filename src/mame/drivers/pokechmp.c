@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Poke Champ */
 
 /* This is a Korean hack of Data East's Pocket Gal

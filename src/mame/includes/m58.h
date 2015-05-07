@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class m58_state : public driver_device
 {
 public:

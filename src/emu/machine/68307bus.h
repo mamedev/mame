@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "cpu/m68000/m68000.h"
 
 #define m68307BUS_MADR (0x01)

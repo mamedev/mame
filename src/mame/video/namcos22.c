@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**
  * video hardware for Namco System22
  *

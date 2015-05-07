@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     IBM PC AT compatibles 8042 keyboard controller

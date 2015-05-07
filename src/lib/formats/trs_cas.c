@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
 Support for TRS80 .cas cassette images

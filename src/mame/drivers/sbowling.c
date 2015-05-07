@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************
 Strike Bowling  (c)1982 Taito
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
     G-Stream (c)2002 Oriental Soft Japan

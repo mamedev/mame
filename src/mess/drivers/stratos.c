@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Saitek/Scisys Kasparov Stratos Chess Computer

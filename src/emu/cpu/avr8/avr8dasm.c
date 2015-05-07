@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Atmel 8-bit AVR disassembler
 

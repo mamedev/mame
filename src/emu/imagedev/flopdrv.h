@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* flopdrv provides simple emulation of a disc drive */
 /* the 8271, upd765 and wd179x use this */
 

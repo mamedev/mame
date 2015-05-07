@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Super80.c written by Robbbert, 2005-2009. See driver source for documentation. */
 
 #include "includes/super80.h"

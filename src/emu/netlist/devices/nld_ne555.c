@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_NE555.c
  *
@@ -79,7 +81,7 @@ NETLIB_UPDATE(NE555)
 		m_ff = false;
 	}
 
-	bool out = (!INPLOGIC(m_RESET) ? false : m_ff.get());
+	bool out = (!INPLOGIC(m_RESET) ? false : m_ff);
 
 	if (m_last_out && !out)
 	{

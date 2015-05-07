@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************
 
     Konami 054539 (TOP) PCM Sound Chip

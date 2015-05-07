@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "includes/kaneko16.h"
 
 class galpanic_state : public driver_device

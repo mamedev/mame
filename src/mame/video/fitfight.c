@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Fit of Fighting Video Hardware */
 
 #include "emu.h"

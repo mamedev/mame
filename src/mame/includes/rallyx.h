@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"

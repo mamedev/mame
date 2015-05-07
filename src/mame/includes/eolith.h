@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "cpu/mcs51/mcs51.h"
 #include "sound/qs1000.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Data East 146 protection chip / memory-mapper & I/O interface */
 
 /*

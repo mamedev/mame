@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     MPEG audio support.  Only layer2 and variants for now.

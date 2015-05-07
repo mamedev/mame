@@ -33,6 +33,11 @@
 		NET_REGISTER_DEV(clock, _name)                                         \
 		PARAM(_name.FREQ, _freq)
 
+#define EXTCLOCK(_name, _freq, _pattern)                                       \
+		NET_REGISTER_DEV(extclock, _name)                                      \
+		PARAM(_name.FREQ, _freq)											   \
+		PARAM(_name.PATTERN, _pattern)
+
 #define GNDA()                                                                 \
 		NET_REGISTER_DEV(gnd, GND)
 
@@ -77,6 +82,23 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 	netlist_time m_inc;
 );
 
+// -----------------------------------------------------------------------------
+// extclock
+// -----------------------------------------------------------------------------
+
+NETLIB_DEVICE_WITH_PARAMS(extclock,
+	netlist_ttl_input_t m_feedback;
+	netlist_ttl_output_t m_Q;
+
+	netlist_param_double_t m_freq;
+	netlist_param_str_t m_pattern;
+	netlist_param_double_t m_offset;
+
+	UINT8 m_cnt;
+	UINT8 m_size;
+	netlist_time m_off;
+	netlist_time m_inc[32];
+);
 
 // -----------------------------------------------------------------------------
 // Special support devices ...
@@ -219,7 +241,7 @@ protected:
 	ATTR_HOT ATTR_ALIGN void update_param();
 
 private:
-	netlist_state_t<UINT8> m_last_state;
+	UINT8 m_last_state;
 };
 
 

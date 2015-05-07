@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Fairchild F3853 SRAM interface with integrated interrupt

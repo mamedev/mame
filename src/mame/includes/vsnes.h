@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/nes_apu.h"
 #include "video/ppu2c0x.h"
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"

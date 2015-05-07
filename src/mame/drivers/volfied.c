@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************
 
 Volfied (c) 1989 Taito Corporation

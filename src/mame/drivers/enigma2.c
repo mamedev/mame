@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
 Enigma 2 (c) Zilec Electronics

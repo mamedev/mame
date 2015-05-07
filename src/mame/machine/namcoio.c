@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 The following Namco custom chips are all instances of the same 4-bit MCU,

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "i286.h"
 #include "debugger.h"
 #include "i86inline.h"

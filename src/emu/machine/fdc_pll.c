@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "fdc_pll.h"
 
 std::string fdc_pll_t::tts(attotime t)

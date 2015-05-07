@@ -211,7 +211,7 @@ static TIMER_CALLBACK( stall_cpu_callback );
 static void stall_cpu(voodoo_state *v, int state, attotime current_time);
 static TIMER_CALLBACK( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
-static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
+static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, bool lfb_3d);
 static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data);
 
@@ -1725,7 +1725,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			/* loop over all registers and write them one at a time */
 			for (i = 3; i <= 31; i++)
 				if (command & (1 << i))
-					cycles += register_w(v, bltSrcBaseAddr + (i - 3), *src++);
+					cycles += register_w(v, banshee2D_clip0Min + (i - 3), *src++);
 			break;
 
 		/*
@@ -1874,11 +1874,12 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 				//  Banshee/Voodoo3 2D register writes
 
 				/* loop over all registers and write them one at a time */
+				target &= 0xff;
 				for (i = 15; i <= 28; i++)
 				{
 					if (command & (1 << i))
 					{
-						cycles += banshee_2d_w(v, target & 0xff, *src);
+						cycles += banshee_2d_w(v, target + (i - 15), *src);
 						//logerror("    2d reg: %03x = %08X\n", target & 0x7ff, *src);
 						src++;
 					}
@@ -1942,7 +1943,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 					/* loop over words */
 					for (i = 0; i < count; i++)
-						cycles += lfb_w(v, target++, *src++, 0xffffffff, FALSE);
+						cycles += lfb_w(v, target++, *src++, 0xffffffff, true);
 
 					break;
 				}
@@ -2931,7 +2932,7 @@ default_case:
  *
  *************************************/
 
-static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront)
+static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, bool lfb_3d)
 {
 	UINT16 *dest, *depth;
 	UINT32 destmax, depthmax;
@@ -2941,6 +2942,29 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 
 	/* statistics */
 	v->stats.lfb_writes++;
+
+	// TODO: This direct write is not verified.
+	// For direct lfb access just write the data
+	if (!lfb_3d) {
+		UINT32 bufoffs;
+		/* compute X,Y */
+		offset <<= 1;
+		x = offset & ((1 << v->fbi.lfb_stride) - 1);
+		y = (offset >> v->fbi.lfb_stride);
+		dest = (UINT16 *)(v->fbi.ram + v->fbi.lfb_base*4);
+		destmax = (v->fbi.mask + 1 - v->fbi.lfb_base*4) / 2;
+		bufoffs = y * v->fbi.rowpixels + x;
+		if (bufoffs >= destmax) {
+			logerror("LFB_W: Buffer offset out of bounds x=%i y=%i lfb_3d=%i offset=%08X bufoffs=%08X data=%08X\n", x, y, lfb_3d, offset, (UINT32) bufoffs, data);
+			return 0;
+		}
+		if (ACCESSING_BITS_0_15)
+			dest[bufoffs + 0] = data&0xffff;
+		if (ACCESSING_BITS_16_31)
+			dest[bufoffs + 1] = data>>16;
+		if (LOG_LFB) logerror("VOODOO.%d.LFB:write direct (%d,%d) = %08X & %08X\n", v->index, x, y, data, mem_mask);
+		return 0;
+	}
 
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(v->reg[lfbMode].u))
@@ -3128,12 +3152,13 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 			break;
 
 		default:            /* reserved */
+			logerror("lfb_w: Unknown format\n");
 			return 0;
 	}
 
 	/* compute X,Y */
-	x = (offset << 0) & ((1 << v->fbi.lfb_stride) - 1);
-	y = (offset >> v->fbi.lfb_stride) & ((1 << v->fbi.lfb_stride) - 1);
+	x = offset & ((1 << v->fbi.lfb_stride) - 1);
+	y = (offset >> v->fbi.lfb_stride) & 0x3ff;
 
 	/* adjust the mask based on which half of the data is written */
 	if (!ACCESSING_BITS_0_15)
@@ -3142,7 +3167,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 		mask &= ~(0xf0 + LFB_DEPTH_PRESENT_MSW);
 
 	/* select the target buffer */
-	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_WRITE_BUFFER_SELECT(v->reg[lfbMode].u);
+	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? 1 : LFBMODE_WRITE_BUFFER_SELECT(v->reg[lfbMode].u);
 	switch (destbuf)
 	{
 		case 0:         /* front buffer */
@@ -3250,12 +3275,14 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				stats_block *stats = &v->fbi.lfb_stats;
 				INT64 iterw;
 				if (LFBMODE_WRITE_W_SELECT(v->reg[lfbMode].u)) {
-					iterw = (UINT32) (v->reg[zaColor].u & 0xffff) << 16;
+					iterw = (UINT32) v->reg[zaColor].u << 16;
 				} else {
+					// The most significant fractional bits of 16.32 W are set to z
 					iterw = (UINT32) sw[pix] << 16;
 				}
 				INT32 iterz = sw[pix] << 12;
 				rgb_union color;
+				rgb_union iterargb = { 0 };
 
 				/* apply clipping */
 				if (FBZMODE_ENABLE_CLIPPING(v->reg[fbzMode].u))
@@ -3272,7 +3299,52 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				}
 
 				/* pixel pipeline part 1 handles depth testing and stippling */
-				PIXEL_PIPELINE_BEGIN(v, stats, x, y, v->reg[fbzColorPath].u, v->reg[fbzMode].u, iterz, iterw);
+				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, v->reg[fbzColorPath].u, v->reg[fbzMode].u, iterz, iterw);
+// Start PIXEL_PIPE_BEGIN copy
+				//#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)
+				do
+				{
+					INT32 fogdepth, biasdepth;
+					INT32 prefogr, prefogg, prefogb;
+					INT32 r, g, b, a;
+
+					(stats)->pixels_in++;
+
+					/* apply clipping */
+					/* note that for perf reasons, we assume the caller has done clipping */
+
+					/* handle stippling */
+					if (FBZMODE_ENABLE_STIPPLE(v->reg[fbzMode].u))
+					{
+						/* rotate mode */
+						if (FBZMODE_STIPPLE_PATTERN(v->reg[fbzMode].u) == 0)
+						{
+							v->reg[stipple].u = (v->reg[stipple].u << 1) | (v->reg[stipple].u >> 31);
+							if ((v->reg[stipple].u & 0x80000000) == 0)
+							{
+								v->stats.total_stippled++;
+								goto skipdrawdepth;
+							}
+						}
+
+						/* pattern mode */
+						else
+						{
+							int stipple_index = ((y & 3) << 3) | (~x & 7);
+							if (((v->reg[stipple].u >> stipple_index) & 1) == 0)
+							{
+								v->stats.total_stippled++;
+								goto skipdrawdepth;
+							}
+						}
+					}
+// End PIXEL_PIPELINE_BEGIN COPY
+
+				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
+				fogdepth = biasdepth = (UINT32) sw[pix];
+
+				/* Perform depth testing */
+				DEPTH_TEST(v, stats, x, v->reg[fbzMode].u);
 
 				/* use the RGBA we stashed above */
 				color.rgb.r = r = sr[pix];
@@ -3286,7 +3358,9 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				APPLY_ALPHATEST(v, stats, v->reg[alphaMode].u, color.rgb.a);
 
 				/* pixel pipeline part 2 handles color combine, fog, alpha, and final output */
-				PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth, v->reg[fbzMode].u, v->reg[fbzColorPath].u, v->reg[alphaMode].u, v->reg[fogMode].u, iterz, iterw, v->reg[zaColor]);
+				PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth,
+					v->reg[fbzMode].u, v->reg[fbzColorPath].u, v->reg[alphaMode].u, v->reg[fogMode].u,
+					iterz, iterw, iterargb);
 			}
 nextpixel:
 			/* advance our pointers */
@@ -3368,7 +3442,7 @@ static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data)
 		{
 			tbaseaddr = t->lodoffset[0] + offset*4;
 
-			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: offset=%X data=%08X\n", offset*4, data);
+			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: offset=%X data=%08X\n", offset*4, data);
 		}
 
 		/* write the four bytes in little-endian order */
@@ -3520,7 +3594,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 						mem_mask &= 0xffff0000;
 					address &= 0xffffff;
 
-					cycles = lfb_w(v, address, data, mem_mask, FALSE);
+					cycles = lfb_w(v, address, data, mem_mask, true);
 				}
 			}
 
@@ -3646,7 +3720,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 		else if (offset & (0x800000/4))
 			cycles = texture_w(v, offset, data);
 		else
-			cycles = lfb_w(v, offset, data, mem_mask, FALSE);
+			cycles = lfb_w(v, offset, data, mem_mask, true);
 
 		/* if we ended up with cycles, mark the operation pending */
 		if (cycles)
@@ -3916,7 +3990,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
  *
  *************************************/
 
-static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
+static UINT32 lfb_r(voodoo_state *v, offs_t offset, bool lfb_3d)
 {
 	UINT16 *buffer;
 	UINT32 bufmax;
@@ -3928,43 +4002,54 @@ static UINT32 lfb_r(voodoo_state *v, offs_t offset, int forcefront)
 	v->stats.lfb_reads++;
 
 	/* compute X,Y */
-	x = (offset << 1) & 0x3fe;
-	y = (offset >> 9) & 0x3ff;
+	offset <<= 1;
+	x = offset & ((1 << v->fbi.lfb_stride) - 1);
+	y = (offset >> v->fbi.lfb_stride);
 
 	/* select the target buffer */
-	destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? (!forcefront) : LFBMODE_READ_BUFFER_SELECT(v->reg[lfbMode].u);
-	switch (destbuf)
-	{
-		case 0:         /* front buffer */
-			buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
-			bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.frontbuf]) / 2;
-			break;
+	if (lfb_3d) {
+		y &= 0x3ff;
+		destbuf = (v->type >= TYPE_VOODOO_BANSHEE) ? 1 : LFBMODE_READ_BUFFER_SELECT(v->reg[lfbMode].u);
+		switch (destbuf)
+		{
+			case 0:         /* front buffer */
+				buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.frontbuf]);
+				bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.frontbuf]) / 2;
+				break;
 
-		case 1:         /* back buffer */
-			buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
-			bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.backbuf]) / 2;
-			break;
+			case 1:         /* back buffer */
+				buffer = (UINT16 *)(v->fbi.ram + v->fbi.rgboffs[v->fbi.backbuf]);
+				bufmax = (v->fbi.mask + 1 - v->fbi.rgboffs[v->fbi.backbuf]) / 2;
+				break;
 
-		case 2:         /* aux buffer */
-			if (v->fbi.auxoffs == ~0)
+			case 2:         /* aux buffer */
+				if (v->fbi.auxoffs == ~0)
+					return 0xffffffff;
+				buffer = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs);
+				bufmax = (v->fbi.mask + 1 - v->fbi.auxoffs) / 2;
+				break;
+
+			default:        /* reserved */
 				return 0xffffffff;
-			buffer = (UINT16 *)(v->fbi.ram + v->fbi.auxoffs);
-			bufmax = (v->fbi.mask + 1 - v->fbi.auxoffs) / 2;
-			break;
+		}
 
-		default:        /* reserved */
-			return 0xffffffff;
+		/* determine the screen Y */
+		scry = y;
+		if (LFBMODE_Y_ORIGIN(v->reg[lfbMode].u))
+			scry = (v->fbi.yorigin - y) & 0x3ff;
+	} else {
+		// Direct lfb access
+		buffer = (UINT16 *)(v->fbi.ram + v->fbi.lfb_base*4);
+		bufmax = (v->fbi.mask + 1 - v->fbi.lfb_base*4) / 2;
+		scry = y;
 	}
-
-	/* determine the screen Y */
-	scry = y;
-	if (LFBMODE_Y_ORIGIN(v->reg[lfbMode].u))
-		scry = (v->fbi.yorigin - y) & 0x3ff;
 
 	/* advance pointers to the proper row */
 	bufoffs = scry * v->fbi.rowpixels + x;
-	if (bufoffs >= bufmax)
+	if (bufoffs >= bufmax) {
+		logerror("LFB_R: Buffer offset out of bounds x=%i y=%i lfb_3d=%i offset=%08X bufoffs=%08X\n", x, y, lfb_3d, offset, (UINT32) bufoffs);
 		return 0xffffffff;
+	}
 
 	/* wait for any outstanding work to finish */
 	poly_wait(v->poly, "LFB read");
@@ -4005,7 +4090,7 @@ READ32_MEMBER( voodoo_device::voodoo_r )
 	if (!(offset & (0xc00000/4)))
 		return register_r(v, offset);
 	else if (!(offset & (0x800000/4)))
-		return lfb_r(v, offset, FALSE);
+		return lfb_r(v, offset, true);
 
 	return 0xffffffff;
 }
@@ -4098,17 +4183,18 @@ READ32_MEMBER( voodoo_banshee_device::banshee_r )
 	else if (offset < 0x600000/4)
 		result = register_r(v, offset & 0x1fffff/4);
 	else if (offset < 0x800000/4)
-		logerror("%s:banshee_r(TEX:%X)\n", machine().describe_context(), (offset*4) & 0x1fffff);
+		logerror("%s:banshee_r(TEX0:%X)\n", machine().describe_context(), (offset*4) & 0x1fffff);
+	else if (offset < 0xa00000/4)
+		logerror("%s:banshee_r(TEX1:%X)\n", machine().describe_context(), (offset*4) & 0x1fffff);
 	else if (offset < 0xc00000/4)
-		logerror("%s:banshee_r(RES:%X)\n", machine().describe_context(), (offset*4) & 0x3fffff);
+		logerror("%s:banshee_r(FLASH Bios ROM:%X)\n", machine().describe_context(), (offset*4) & 0x3fffff);
 	else if (offset < 0x1000000/4)
 		logerror("%s:banshee_r(YUV:%X)\n", machine().describe_context(), (offset*4) & 0x3fffff);
 	else if (offset < 0x2000000/4)
 	{
-		UINT8 temp = v->fbi.lfb_stride;
-		v->fbi.lfb_stride = 11;
-		result = lfb_r(v, offset & 0xffffff/4, FALSE);
-		v->fbi.lfb_stride = temp;
+		result = lfb_r(v, offset & 0xffffff/4, true);
+	} else {
+			logerror("%s:banshee_r(%X) Access out of bounds\n", machine().describe_context(), offset*4);
 	}
 	return result;
 }
@@ -4130,9 +4216,14 @@ READ32_MEMBER( voodoo_banshee_device::banshee_fb_r )
 #endif
 		if (offset*4 <= v->fbi.mask)
 			result = ((UINT32 *)v->fbi.ram)[offset];
+		else
+			logerror("%s:banshee_fb_r(%X) Access out of bounds\n", machine().describe_context(), offset*4);
 	}
-	else
-		result = lfb_r(v, offset - v->fbi.lfb_base, FALSE);
+	else {
+		if (LOG_LFB)
+			logerror("%s:banshee_fb_r(%X) to lfb_r: %08X lfb_base=%08X\n", machine().describe_context(), offset*4, offset - v->fbi.lfb_base, v->fbi.lfb_base);
+		result = lfb_r(v, offset - v->fbi.lfb_base, false);
+	}
 	return result;
 }
 
@@ -4657,17 +4748,18 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_w )
 	else if (offset < 0x600000/4)
 		register_w(v, offset & 0x1fffff/4, data);
 	else if (offset < 0x800000/4)
-		logerror("%s:banshee_w(TEX:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x1fffff, data, mem_mask);
+		logerror("%s:banshee_w(TEX0:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x1fffff, data, mem_mask);
+	else if (offset < 0xa00000/4)
+		logerror("%s:banshee_w(TEX1:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x1fffff, data, mem_mask);
 	else if (offset < 0xc00000/4)
-		logerror("%s:banshee_w(RES:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x3fffff, data, mem_mask);
+		logerror("%s:banshee_r(FLASH Bios ROM:%X)\n", machine().describe_context(), (offset*4) & 0x3fffff);
 	else if (offset < 0x1000000/4)
 		logerror("%s:banshee_w(YUV:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x3fffff, data, mem_mask);
 	else if (offset < 0x2000000/4)
 	{
-		UINT8 temp = v->fbi.lfb_stride;
-		v->fbi.lfb_stride = 11;
-		lfb_w(v, offset & 0xffffff/4, data, mem_mask, FALSE);
-		v->fbi.lfb_stride = temp;
+		lfb_w(v, offset & 0xffffff/4, data, mem_mask, true);
+	} else {
+		logerror("%s:banshee_w Address out of range %08X = %08X & %08X\n", machine().describe_context(), (offset*4), data, mem_mask);
 	}
 }
 
@@ -4691,13 +4783,15 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_fb_w )
 		{
 			if (offset*4 <= v->fbi.mask)
 				COMBINE_DATA(&((UINT32 *)v->fbi.ram)[offset]);
+			else
+				logerror("%s:banshee_fb_w Out of bounds (%X) = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 #if LOG_LFB
 			logerror("%s:banshee_fb_w(%X) = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 #endif
 		}
 	}
 	else
-		lfb_w(v, offset - v->fbi.lfb_base, data, mem_mask, FALSE);
+		lfb_w(v, offset - v->fbi.lfb_base, data, mem_mask, false);
 }
 
 
@@ -4828,7 +4922,7 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 		}
 
 		case io_lfbMemoryConfig:
-			v->fbi.lfb_base = (data & 0x1fff) << 10;
+			v->fbi.lfb_base = (data & 0x1fff) << (12-2);
 			v->fbi.lfb_stride = ((data >> 13) & 7) + 9;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
@@ -4870,7 +4964,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	voodoo_state *v = get_safe_token(this);
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
-	UINT32 tmumem0;
+	UINT32 tmumem0, tmumem1;
 	int val;
 
 	/* validate configuration */
@@ -4993,6 +5087,7 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 
 	/* allocate memory */
 	tmumem0 = m_tmumem0;
+	tmumem1 = m_tmumem1;
 	if (v->type <= TYPE_VOODOO_2)
 	{
 		/* separate FB/TMU memory */
@@ -5005,6 +5100,8 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 		/* shared memory */
 		tmumem[0] = tmumem[1] = fbmem = auto_alloc_array(machine(), UINT8, m_fbmem << 20);
 		tmumem0 = m_fbmem;
+		if (v->type == TYPE_VOODOO_3)
+			tmumem1 = m_fbmem;
 	}
 
 	/* set up frame buffer */
@@ -5016,9 +5113,9 @@ void voodoo_device::common_start_voodoo(UINT8 type)
 	/* set up the TMUs */
 	init_tmu(v, &v->tmu[0], &v->reg[0x100], tmumem[0], tmumem0 << 20);
 	v->chipmask |= 0x02;
-	if (m_tmumem1 != 0 || v->type == TYPE_VOODOO_3)
+	if (tmumem1 != 0)
 	{
-		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], m_tmumem1 << 20);
+		init_tmu(v, &v->tmu[1], &v->reg[0x200], tmumem[1], tmumem1 << 20);
 		v->chipmask |= 0x04;
 		v->tmu_config |= 0x40;
 	}
@@ -5567,7 +5664,7 @@ static raster_info *add_rasterizer(voodoo_state *v, const raster_info *cinfo)
 	v->raster_hash[hash] = info;
 
 	if (LOG_RASTERIZERS)
-		printf("Adding rasterizer @ %p : %08X %08X %08X %08X %08X %08X (hash=%d)\n",
+		printf("Adding rasterizer @ %p : cp=%08X am=%08X %08X fbzM=%08X tm0=%08X tm1=%08X (hash=%d)\n",
 				info->callback,
 				info->eff_color_path, info->eff_alpha_mode, info->eff_fog_mode, info->eff_fbz_mode,
 				info->eff_tex_mode_0, info->eff_tex_mode_1, hash);
@@ -5627,6 +5724,7 @@ static raster_info *find_rasterizer(voodoo_state *v, int texcount)
 	curinfo.polys = 0;
 	curinfo.hits = 0;
 	curinfo.next = 0;
+	curinfo.hash = hash;
 
 	return add_rasterizer(v, &curinfo);
 }

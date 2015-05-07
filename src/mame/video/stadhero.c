@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   stadhero video emulation - Bryan McPhail, mish@tendril.co.uk

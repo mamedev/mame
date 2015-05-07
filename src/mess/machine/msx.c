@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * msx.c: MSX emulation
  *

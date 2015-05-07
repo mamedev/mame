@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Sega Mega Drive/Genesis-based bootlegs

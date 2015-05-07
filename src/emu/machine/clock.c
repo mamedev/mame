@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "clock.h"
 
 const device_type CLOCK = &device_creator<clock_device>;

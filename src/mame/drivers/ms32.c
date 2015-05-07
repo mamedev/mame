@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Jaleco MegaSystem 32 (Preliminary Driver)
 
  - hardware tests are needed to establish how the mixing really works (and interrupt source etc.)

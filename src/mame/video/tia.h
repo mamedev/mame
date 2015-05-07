@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _VIDEO_TIA_H_
 #define _VIDEO_TIA_H_
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************
  * sprint8 Sound System Analog emulation
  * Sept 2009, Derrick Renaud

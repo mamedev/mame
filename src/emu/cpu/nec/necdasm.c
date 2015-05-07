@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
    NEC V-series Disassembler
 

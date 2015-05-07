@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __M37710_H__
 #define __M37710_H__
 

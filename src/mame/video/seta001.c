@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 	/*
 	emulation of Seta sprite chips
 	X1-001A  X1-002A (SDIP64)

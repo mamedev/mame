@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     rtc4543.c - Epson R4543 real-time clock chip emulation

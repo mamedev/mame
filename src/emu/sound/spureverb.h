@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _included_reverb_
 	#define _included_reverb_
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
     Irem M90 system.  There is 1 video chip - NANAO GA-25, it produces

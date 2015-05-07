@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 const char glsl_bilinear_idx16_lut_fsh_src[] =
 "\n"
 "#pragma optimize (on)\n"

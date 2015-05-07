@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Super Slam - Video Hardware */
 
 #include "emu.h"

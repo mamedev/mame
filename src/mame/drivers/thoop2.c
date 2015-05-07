@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Thunder Hoop II: Strikes Back (c) 1994 Gaelco

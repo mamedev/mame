@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // remaining gfx glitches
 
 // layer priority register not fully understood

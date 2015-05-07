@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Entertainment Sciences Real-Time Image Processor (RIP) hardware

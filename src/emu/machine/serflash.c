@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Serial Flash Device */
 
 /* todo: cleanup, refactor etc. */

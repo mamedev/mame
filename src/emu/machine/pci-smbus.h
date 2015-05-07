@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PCI_SMBUS_H
 #define PCI_SMBUS_H
 

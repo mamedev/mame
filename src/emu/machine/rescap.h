@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef RC_MACROS_H
 #define RC_MACROS_H
 

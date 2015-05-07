@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Jibun wo Migaku Culture School Mahjong Hen
     (c)1994 Face

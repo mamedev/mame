@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * wd33c93.h
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  todo: bank handlers etc. should be installed on a per-game basis
        to make it clearer why all the sets with hacked bank

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #define HCD62121_MSK                                                                        \
 		{                                                                                   \

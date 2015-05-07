@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     KSM (Kontroller Simvolnogo Monitora = Character Display Controller),

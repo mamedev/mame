@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 // later, this might be merged with segas1x_state in segas16.h
 

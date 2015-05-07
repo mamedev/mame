@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* Williams WPC Fliptronics I */
 

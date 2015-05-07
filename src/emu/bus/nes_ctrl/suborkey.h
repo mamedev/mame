@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Nintendo Family Computer Subor Keyboard (used by some Famiclones)

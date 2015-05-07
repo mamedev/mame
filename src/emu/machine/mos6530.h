@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     MOS Technology 6530 Memory, I/O, Timer Array emulation

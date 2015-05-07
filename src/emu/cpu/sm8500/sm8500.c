@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Implementation for Sharp sm8500 cpu. There is hardly any information available
   on this cpu. Currently we've only found documentation on the microcontroller

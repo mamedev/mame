@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* ST0016 - CPU (z80) + Sound + Video */
 
 #include "st0016.h"

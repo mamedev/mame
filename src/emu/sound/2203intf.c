@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "2203intf.h"
 #include "fm.h"
 

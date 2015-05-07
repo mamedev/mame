@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef DFI_DSK_H
 #define DFI_DSK_H
 

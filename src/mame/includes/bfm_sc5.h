@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "cpu/m68000/m68000.h"
 #include "includes/bfm_sc45.h"
 

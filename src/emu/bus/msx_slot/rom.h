@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_SLOT_ROM_H
 #define __MSX_SLOT_ROM_H
 

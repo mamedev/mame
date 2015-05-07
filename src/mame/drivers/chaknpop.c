@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Chack'n Pop driver by BUT

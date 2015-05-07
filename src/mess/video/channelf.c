@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "includes/channelf.h"
 
 static const rgb_t channelf_palette[] =

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef LSI53C810_H
 #define LSI53C810_H
 

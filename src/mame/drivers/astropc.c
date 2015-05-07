@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Astro Russian Fruit Machines

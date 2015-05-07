@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     csw_cas.h
 

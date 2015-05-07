@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Free Kick Video Hardware */
 
 #include "emu.h"

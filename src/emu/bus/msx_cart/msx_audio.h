@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_CART_MSX_AUDIO_H
 #define __MSX_CART_MSX_AUDIO_H
 

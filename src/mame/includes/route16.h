@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/sn76477.h"
 
 class route16_state : public driver_device

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Dynamic Ski
 (c)1984 Taiyo

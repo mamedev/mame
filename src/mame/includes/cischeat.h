@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* TODO: some variables are per-game specifics */
 #include "sound/okim6295.h"
 

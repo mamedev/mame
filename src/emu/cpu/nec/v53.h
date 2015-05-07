@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* V53 */
 
 #include "nec.h"

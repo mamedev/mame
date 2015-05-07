@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "nscsi_cb.h"
 
 const device_type NSCSI_CB = &device_creator<nscsi_callback_device>;

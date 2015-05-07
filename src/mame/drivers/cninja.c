@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Edward Randy      (c) 1990 Data East Corporation (World version)

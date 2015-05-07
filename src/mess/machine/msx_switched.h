@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_SWITCHED_H
 #define __MSX_SWITCHED_H
 

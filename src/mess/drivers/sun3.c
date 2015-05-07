@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   sun3.c: preliminary driver for Sun 3 and Sun 3x models.

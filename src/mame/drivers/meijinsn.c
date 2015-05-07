@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  Meijinsen (snk/alpha)
  ---------------------

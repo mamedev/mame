@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * ncr5394/5396.h SCSI controller
  *

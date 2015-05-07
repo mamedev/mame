@@ -33,7 +33,6 @@
 
 NETLIB_DEVICE(82S16,
 
-	UINT8 m_ram[256];
 	netlist_ttl_input_t m_A[8];
 	netlist_ttl_input_t m_CE1Q;
 	netlist_ttl_input_t m_CE2Q;
@@ -41,6 +40,9 @@ NETLIB_DEVICE(82S16,
 	netlist_ttl_input_t m_WEQ;
 	netlist_ttl_input_t m_DIN;
 	netlist_ttl_output_t m_DOUTQ;
+
+	//netlist_state_t<UINT8[256]> m_ram;
+	UINT8 m_ram[256];
 );
 
 NETLIB_DEVICE_DERIVED(82S16_dip, 82S16,

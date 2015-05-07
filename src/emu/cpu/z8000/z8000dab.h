@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************
  * Result table for Z8000 DAB instruction
  *

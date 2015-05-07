@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Handlers for SH3 internals */
 
 #include "emu.h"

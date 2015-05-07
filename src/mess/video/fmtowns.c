@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /*
  * FM Towns video hardware

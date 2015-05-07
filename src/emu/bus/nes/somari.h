@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_SOMARI_H
 #define __NES_SOMARI_H
 

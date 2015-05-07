@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __I8085_H__
 #define __I8085_H__
 

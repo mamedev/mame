@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "inst.h"
 #include "emu.h"
 

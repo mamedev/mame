@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     TMS34010: Portable Texas Instruments TMS34010 emulator

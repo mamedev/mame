@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* tecmosys protection related functions */
 
 /*

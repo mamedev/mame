@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 World Grand Prix    (c) Taito Corporation 1989

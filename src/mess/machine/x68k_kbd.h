@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef X68K_KBD_H_
 #define X68K_KBD_H_
 

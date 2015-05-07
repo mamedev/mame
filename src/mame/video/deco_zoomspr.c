@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* the sprites used by DragonGun + Lock 'n' Loaded */
 

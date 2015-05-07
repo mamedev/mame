@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Motorola 68328 ("DragonBall") System-on-a-Chip implementation

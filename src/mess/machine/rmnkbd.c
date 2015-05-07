@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/rmnkbd.h"
 
 rmnimbus_keyboard_device::rmnimbus_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :

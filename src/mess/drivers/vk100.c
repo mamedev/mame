@@ -1,5 +1,5 @@
-//license:MAME|LGPL-2.1+
-//copyright-holders:Jonathan Gevaryahu
+// license:BSD-3-Clause
+// copyright-holders:Jonathan Gevaryahu
 /***************************************************************************
 
         DEC VK100 'GIGI'

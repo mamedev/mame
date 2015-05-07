@@ -4,9 +4,6 @@
 
     Commodore 64H156 Gate Array emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

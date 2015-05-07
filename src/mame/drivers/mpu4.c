@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* these are the MPU4 set listings / set specific code, for hardware emulation see mpu4hw.c */
 
 /* todo: driver inits (basic hw reel, protection configs etc.) should probably be moved here

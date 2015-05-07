@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     VIDEO POKER - IGT/INTERFLIP

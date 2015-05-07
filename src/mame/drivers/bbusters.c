@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Beast Busters           A9003   (c) 1989 SNK Corporation

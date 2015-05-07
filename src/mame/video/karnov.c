@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     Karnov - Bryan McPhail, mish@tendril.co.uk

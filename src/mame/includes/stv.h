@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*----------- defined in drivers/stv.c -----------*/
 #include "cdrom.h"
 #include "machine/eepromser.h"

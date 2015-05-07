@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_R2R_dac.c
  *

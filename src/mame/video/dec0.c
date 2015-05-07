@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Dec0 Video emulation - Bryan McPhail, mish@tendril.co.uk

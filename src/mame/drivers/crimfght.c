@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Crime Fighters (Konami GX821) (c) 1989 Konami

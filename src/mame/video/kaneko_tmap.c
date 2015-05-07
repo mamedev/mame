@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Kaneko View2 Tilemaps */
 
 /*

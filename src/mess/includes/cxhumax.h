@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef CXHUMAX_H_
 #define CXHUMAX_H_
 

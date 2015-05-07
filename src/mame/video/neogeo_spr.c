@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* NeoGeo sprites (and fixed text layer) */
 
 #include "emu.h"

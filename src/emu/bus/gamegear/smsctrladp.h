@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Sega Game Gear "SMS Controller Adaptor" emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NSCSI_BUS_H__
 #define __NSCSI_BUS_H__
 

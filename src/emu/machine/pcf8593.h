@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************
 
     Philips PCF8593 CMOS clock/calendar circuit

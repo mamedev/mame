@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* It's a standard 486 PC motherboard, gfx card etc. with expansion ROM board
 
  probably impossible to emulate right now due to the bad / missing (blank when read) rom

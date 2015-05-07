@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class wrally_state : public driver_device
 {
 public:

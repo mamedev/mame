@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Mitsubishi 7700 Series CPU disassembler v1.1

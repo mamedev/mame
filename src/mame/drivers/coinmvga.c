@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
   COINMASTER-GAMING - VGA BOARD

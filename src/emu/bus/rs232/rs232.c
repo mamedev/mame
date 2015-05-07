@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "rs232.h"
 
 const device_type RS232_PORT = &device_creator<rs232_port_device>;

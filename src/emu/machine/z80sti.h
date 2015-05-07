@@ -4,9 +4,6 @@
 
     Mostek MK3801 Serial Timer Interrupt Controller (Z80-STI) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    TAO   1 |*    \_/     | 40  Vcc

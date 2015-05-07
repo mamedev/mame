@@ -4,9 +4,6 @@
 
     Commodore 8050 floppy disk controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

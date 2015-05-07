@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //
 // /home/ms/source/sidplay/libsidplay/emu/RCS/enve_dl.h,v
 //

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
     mos tri port interface 6525
     mos triple interface adapter 6523

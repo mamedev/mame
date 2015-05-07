@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef AMIGAFDC_H
 #define AMIGAFDC_H
 

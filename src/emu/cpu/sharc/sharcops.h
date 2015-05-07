@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 const adsp21062_device::SHARC_OP adsp21062_device::s_sharc_opcode_table[] =
 {

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/tc0100scn.h"
 #include "video/tc0480scp.h"
 

@@ -4,9 +4,6 @@
 
     RCA CDP1863 CMOS 8-Bit Programmable Frequency Generator emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

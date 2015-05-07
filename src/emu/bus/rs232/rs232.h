@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __BUS_RS232_H__
 #define __BUS_RS232_H__
 

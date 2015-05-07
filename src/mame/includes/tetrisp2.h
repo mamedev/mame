@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class tetrisp2_state : public driver_device
 {
 public:

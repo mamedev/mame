@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SAT_DRAM_H
 #define __SAT_DRAM_H
 

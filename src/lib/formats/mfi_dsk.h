@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef MFI_DSK_H
 #define MFI_DSK_H
 

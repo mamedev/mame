@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Motorola MC6845 and compatible CRT controller emulation

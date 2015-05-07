@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "bus/msx_slot/cartridge.h"
 #include "hashfile.h"

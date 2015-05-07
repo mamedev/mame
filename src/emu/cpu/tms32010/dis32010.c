@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 	/**************************************************************************\
 	*               Texas Instruments TMS32010 DSP Disassembler                *
 	*                                                                          *

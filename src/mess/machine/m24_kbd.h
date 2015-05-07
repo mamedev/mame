@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef M24KBD_H_
 #define M24KBD_H_
 

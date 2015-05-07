@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Video System Sprites (type 2)
 // todo:
 //  move various vsystem sprite functions here

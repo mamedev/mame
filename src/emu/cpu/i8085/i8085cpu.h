@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************
  *
  *      Portable (hopefully ;-) 8085A emulator

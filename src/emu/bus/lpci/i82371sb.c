@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Intel 82371SB PCI IDE ISA Xcelerator (PIIX3)

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Pandora's Palace(GX328) (c) 1984 Konami/Interlogic

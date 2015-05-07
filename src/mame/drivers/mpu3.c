@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Notes 17/07/11 DH
  added most other MPU3 sets
 

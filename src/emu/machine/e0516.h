@@ -4,9 +4,6 @@
 
     Microelectronic-Marin E050-16 Real Time Clock emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   Vdd1   1 |*    \_/     | 16  Vdd2

@@ -4,9 +4,6 @@
 
     Brown Boxes Double Quick Brown Box emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

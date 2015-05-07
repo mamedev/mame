@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 The XT-IDE project is a Vintage Computer forum driven project to develop and manufacturer an 8-bit ISA IDE controller.

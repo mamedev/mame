@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Tandy 1000
 ==========

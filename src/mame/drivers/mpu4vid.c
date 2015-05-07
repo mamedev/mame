@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 Barcrest MPU4 Extension driver by J.Wallace, Phil Bennett and Anonymous.
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef OMTI5100_H_
 #define OMTI5100_H_
 

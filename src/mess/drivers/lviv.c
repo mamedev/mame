@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
 PK-01 Lviv driver by Krzysztof Strzecha

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* notes...
 
  drawing sprites in a single pass with pdrawgfx breaks Thunder Dragon 2,

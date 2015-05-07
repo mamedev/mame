@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 King Of Football (c)1995 BMC
 

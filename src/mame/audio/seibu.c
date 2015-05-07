@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Seibu Sound System v1.02, designed 1986 by Seibu Kaihatsu

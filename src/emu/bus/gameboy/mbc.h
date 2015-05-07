@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __GB_MBC_H
 #define __GB_MBC_H
 

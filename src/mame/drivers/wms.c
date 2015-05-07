@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************************************
 
   WMS 360 / 550 (also 3601?) CPU 1.5 Plus board
@@ -91,24 +93,39 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
+	DECLARE_DRIVER_INIT(wms);
+	DECLARE_READ8_MEMBER(test_r);
+		UINT32 screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-public:
-	DECLARE_DRIVER_INIT(wms);
+
+private:
 };
 
+UINT32 wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 /*********************************************
 *           Memory Map Information           *
 *********************************************/
 
 static ADDRESS_MAP_START( wms_map, AS_PROGRAM, 8, wms_state )
-	AM_RANGE(0x00000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	AM_RANGE(0x60000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x60000) // TODO: fix me
 ADDRESS_MAP_END
 
+READ8_MEMBER(wms_state::test_r)
+{
+	return 1;
+}
+
 static ADDRESS_MAP_START( wms_io, AS_IO, 8, wms_state )
+	AM_RANGE(0x1207, 0x1207) AM_READ(test_r)
 ADDRESS_MAP_END
 
 
@@ -131,6 +148,22 @@ INPUT_PORTS_END
 *              Machine Drivers               *
 *********************************************/
 
+static const gfx_layout gfxlayout =
+{
+	8,8,
+	0x100000/(8),
+	1,
+	{ 0 },
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
+	8*8
+};
+
+static GFXDECODE_START( wms )
+	GFXDECODE_ENTRY( "maincpu", 0x00000, gfxlayout,   0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_CONFIG_START( wms, wms_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
@@ -138,9 +171,20 @@ static MACHINE_CONFIG_START( wms, wms_state )
 	MCFG_CPU_IO_MAP(wms_io)
 
 	MCFG_CPU_ADD("adsp", ADSP2105, MAIN_CLOCK / 2)  // ADSP-2105 could run either at 13.824 or 20 MHz...
+	MCFG_DEVICE_DISABLE()
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
+	
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(wms_state, screen_update_wms)
+	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wms)
+	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
 
 

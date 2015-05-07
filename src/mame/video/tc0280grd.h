@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TC0280GRD_H__
 #define __TC0280GRD_H__
 

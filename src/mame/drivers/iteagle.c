@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Incredible Technologies "Eagle" hardware
@@ -148,7 +150,6 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_ITEAGLE_EEPROM_ADD(          ":pci:0a.0")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(59)
 	MCFG_SCREEN_SIZE(512, 384)
 	MCFG_SCREEN_UPDATE_DEVICE(":pci:09.0", voodoo_pci_device, screen_update)

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __DINETWORK_H__
 #define __DINETWORK_H__
 

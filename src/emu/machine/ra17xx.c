@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Rockwell A17XX ROM, RAM and I/O chip

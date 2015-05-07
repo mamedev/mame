@@ -4,9 +4,6 @@
 
     Commodore VIC-20 Expansion Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                     GND       1      A       GND

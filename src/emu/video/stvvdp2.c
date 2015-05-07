@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Sega Saturn VDP2 */
 
 #define DEBUG_MODE 0

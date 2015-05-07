@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SEGA8_ROM_H
 #define __SEGA8_ROM_H
 

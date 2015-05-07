@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "cpu/m68000/m68000.h"
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"

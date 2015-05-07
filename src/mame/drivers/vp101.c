@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Play Mechanix / Right Hand Tech "VP100" and "VP101" platforms

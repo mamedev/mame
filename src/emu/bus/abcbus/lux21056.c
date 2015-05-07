@@ -4,9 +4,6 @@
 
     Luxor 55 21056-00 Xebec Interface Host Adapter emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 /*

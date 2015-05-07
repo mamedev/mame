@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 "Combat School" (also known as "Boot Camp") - (Konami GX611)

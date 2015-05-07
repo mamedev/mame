@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Emulation for the bunsetsu internal firmware mapper found in a number of MSX machines
 */

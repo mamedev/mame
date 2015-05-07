@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Speed Spin video, see driver file for notes */
 
 #include "emu.h"

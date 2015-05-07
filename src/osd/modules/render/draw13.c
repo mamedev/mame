@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  draw13.c - SDL 2.0 drawing implementation

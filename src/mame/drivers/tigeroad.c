@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Tiger Road     (C) 1987 Capcom (licensed to Romstar)

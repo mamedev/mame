@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TLCS900_H__
 #define __TLCS900_H__
 

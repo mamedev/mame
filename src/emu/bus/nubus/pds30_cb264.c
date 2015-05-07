@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   RasterOps ColorBoard 264/SE30 video card emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* Data East encrypted CPU 222, aka C10707?
  also sometimes implemented as basic logic outside the CPU on early revs and bootlegs */

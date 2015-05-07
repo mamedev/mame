@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Tekunon Kougyou(Teknon Kogyo) Beam Invader hardware

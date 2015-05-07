@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __INTV_SLOT_H
 #define __INTV_SLOT_H
 

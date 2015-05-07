@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
     commodore c65 home computer
     peter.trauner@jk.uni-linz.ac.at

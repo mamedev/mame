@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef GENPIN_H_
 #define GENPIN_H_
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __DSP56_MEM_H__
 #define __DSP56_MEM_H__
 

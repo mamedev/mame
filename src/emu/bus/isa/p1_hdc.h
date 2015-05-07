@@ -4,9 +4,6 @@
 
     Poisk-1 HDC device (model B942)
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

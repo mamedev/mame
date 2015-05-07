@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     key translation table for both US and UK terminals
 

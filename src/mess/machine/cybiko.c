@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Cybiko Wireless Inter-tainment System

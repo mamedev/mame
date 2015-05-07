@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NEOGEO_FATFURY2_CART_H
 #define __NEOGEO_FATFURY2_CART_H
 

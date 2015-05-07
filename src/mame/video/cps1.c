@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 The CPS1 system is made of 3 boards: A, B and C. The first two games also exist

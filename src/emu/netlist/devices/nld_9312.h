@@ -41,10 +41,27 @@
 
 #define TTL_9312(_name)                                                \
 		NET_REGISTER_DEV(9312, _name)
-//#if (USE_TRUTHTABLE)
+#if (USE_TRUTHTABLE)
 #include "nld_truthtable.h"
 NETLIB_TRUTHTABLE(9312, 12, 2, 0);
-//#endif
+#else
+
+NETLIB_DEVICE(9312,
+public:
+//		C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ
+	netlist_ttl_input_t m_A;
+	netlist_ttl_input_t m_B;
+	netlist_ttl_input_t m_C;
+	netlist_ttl_input_t m_G;
+	netlist_ttl_input_t m_D[8];
+	netlist_ttl_output_t m_Y;
+	netlist_ttl_output_t m_YQ;
+
+	UINT8 m_last_chan;
+	UINT8 m_last_G;
+);
+
+#endif
 
 
 #define TTL_9312_DIP(_name)                                            \

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/bankdev.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Fujitsu MB89363 Parallel Communication Interface

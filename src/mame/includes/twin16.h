@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/bufsprite.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"

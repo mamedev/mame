@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_ALADDIN_H
 #define __NES_ALADDIN_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   a1bus.h - Apple I expansion slot and card emulation

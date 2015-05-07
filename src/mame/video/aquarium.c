@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Aquarium */
 
 #include "emu.h"

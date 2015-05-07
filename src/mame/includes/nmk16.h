@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "machine/nmk004.h"
