@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
  * Sound hardware for Pleiades, Naughty Boy and Pop Flamer.

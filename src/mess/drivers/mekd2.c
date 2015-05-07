@@ -1,4 +1,4 @@
-// license:BSD-3-Clause
+// license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller, Robbbert
 /******************************************************************************
     Motorola Evaluation Kit 6800 D2

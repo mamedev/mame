@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
  * Phoenix sound hardware simulation - still very ALPHA!

@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 /***************************************************************************
  *   Xerox AltoII driver for MESS
  *
- *   Copyright Juergen Buchmueller <pullmoll@t-online.de>
- *
- *   Licenses: MAME, GPLv2
  ***************************************************************************/
 
 #include "emu.h"
