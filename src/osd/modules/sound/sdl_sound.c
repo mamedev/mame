@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  sound.c - SDL implementation of MAME sound routines

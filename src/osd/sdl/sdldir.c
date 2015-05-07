@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  sdldir.c - SDL core directory access functions

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  drawogl.c - SDL software and OpenGL implementation

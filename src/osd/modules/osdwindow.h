@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  osdwindow.h - SDL window handling

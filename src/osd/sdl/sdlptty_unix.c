@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //============================================================
 //
 //  sdlptty_unix.c - SDL psuedo tty access functions

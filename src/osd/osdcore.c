@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "osdcore.h"
 
 bool g_print_verbose = false;

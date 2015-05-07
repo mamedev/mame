@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #if defined(OSD_NET_USE_TAPTUN)
 
 #include <unistd.h>

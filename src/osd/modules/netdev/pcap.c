@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #if defined(OSD_NET_USE_PCAP)
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)

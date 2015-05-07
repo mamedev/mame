@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _sdlinc_h_
 #define _sdlinc_h_
 

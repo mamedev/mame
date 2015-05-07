@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __DEBUG_QT_MEMORY_WINDOW_H__
 #define __DEBUG_QT_MEMORY_WINDOW_H__
 

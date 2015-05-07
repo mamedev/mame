@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * netdev_module.h
  *

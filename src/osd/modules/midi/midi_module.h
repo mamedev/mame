@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * midi_module.h
  *
