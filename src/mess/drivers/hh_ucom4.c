@@ -43,6 +43,7 @@
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
 
+ *060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
  *128     uPD650C  1982, Roland TR-606
