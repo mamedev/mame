@@ -4,9 +4,6 @@
 
     CBM 500/600/700 High Resolution Graphics cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

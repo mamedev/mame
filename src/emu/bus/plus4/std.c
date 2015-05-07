@@ -4,9 +4,6 @@
 
     Commodore Plus/4 standard cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "std.h"

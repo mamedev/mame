@@ -4,9 +4,6 @@
 
     Epson LX-800 dot matrix printer emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

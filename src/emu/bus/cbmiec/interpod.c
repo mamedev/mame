@@ -4,9 +4,6 @@
 
     Oxford Computer Systems Interpod IEC to IEEE interface emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 /*

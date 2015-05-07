@@ -4,9 +4,6 @@
 
     Mator Systems SHARK Intelligent Winchester Disc Subsystem emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "shark.h"

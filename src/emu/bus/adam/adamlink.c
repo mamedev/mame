@@ -4,9 +4,6 @@
 
     Coleco AdamLink 300 Baud Modem emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "adamlink.h"

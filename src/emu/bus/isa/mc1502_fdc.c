@@ -4,9 +4,6 @@
 
     Electronika MC 1502 FDC device
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mc1502_fdc.h"

@@ -4,9 +4,6 @@
 
     Luxor 55 21046-11/-21/-41 5.25"/8" Controller Card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once

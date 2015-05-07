@@ -4,9 +4,6 @@
 
     Western Digital WD2010 Winchester Disk Controller
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

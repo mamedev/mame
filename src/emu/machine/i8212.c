@@ -4,9 +4,6 @@
 
     Intel 8212 8-Bit Input/Output Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "emu.h"

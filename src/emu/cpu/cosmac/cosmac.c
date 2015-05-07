@@ -4,9 +4,6 @@
 
     RCA COSMAC CPU emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "emu.h"

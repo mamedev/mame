@@ -4,9 +4,6 @@
 
     Motorola MC2661/MC68661 Enhanced Programmable Communications Interface
 
-    Copyright the MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "mc2661.h"

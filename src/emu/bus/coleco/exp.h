@@ -4,9 +4,6 @@
 
     ColecoVision cartridge port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                      D2       1      2       /C000

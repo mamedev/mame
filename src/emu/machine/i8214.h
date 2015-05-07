@@ -4,9 +4,6 @@
 
     Intel 8214 Priority Interrupt Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    _B0   1 |*    \_/     | 24  Vcc

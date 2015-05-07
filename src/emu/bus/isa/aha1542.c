@@ -4,9 +4,6 @@
  *
  *    Adaptec AHA-1542{,C,CF} SCSI Controller
  *
- *    Copyright MESS Team.
- *    Visit http://mamedev.org for licensing and usage restrictions.
- *
  **********************************************************************/
 
 /*

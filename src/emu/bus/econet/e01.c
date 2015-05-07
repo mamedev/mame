@@ -4,9 +4,6 @@
 
     Acorn FileStore E01/E01S network hard disk emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
     http://acorn.chriswhy.co.uk/Network/Econet.html
     http://acorn.chriswhy.co.uk/Network/Pics/Acorn_FileStoreE01.html
     http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_FileStoreE01S.html

@@ -4,9 +4,6 @@
 
     Intel 8275 Programmable CRT Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

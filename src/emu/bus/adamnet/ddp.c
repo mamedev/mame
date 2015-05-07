@@ -4,9 +4,6 @@
 
     Coleco Adam Digital Data Pack emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "ddp.h"

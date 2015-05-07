@@ -4,9 +4,6 @@
 
     RCA CDP1852 Byte-Wide Input/Output Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
               CSI/_CSI   1 |*    \_/     | 24  Vdd

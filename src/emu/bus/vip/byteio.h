@@ -4,9 +4,6 @@
 
     RCA Cosmac VIP Byte Input/Output port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                             A   IN 0

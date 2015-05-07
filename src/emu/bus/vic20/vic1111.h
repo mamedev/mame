@@ -4,9 +4,6 @@
 
     Commodore VIC-1111 16K RAM Expansion Cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

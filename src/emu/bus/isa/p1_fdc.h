@@ -4,9 +4,6 @@
 
     Poisk-1 FDC device (model B504)
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

@@ -4,9 +4,6 @@
 
     The Digital Excess & Hitmen 4-Player Joystick adapter emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

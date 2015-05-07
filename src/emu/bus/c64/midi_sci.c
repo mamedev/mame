@@ -4,9 +4,6 @@
 
     Sequential Circuits MIDI Interface cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "midi_sci.h"

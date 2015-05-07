@@ -4,9 +4,6 @@
 
     CMOS 40105 FIFO Register emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

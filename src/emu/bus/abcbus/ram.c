@@ -4,9 +4,6 @@
 
     ABC 80 16 KB RAM expansion card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "ram.h"

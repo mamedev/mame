@@ -4,9 +4,6 @@
 
     National Semiconductor NMC9306 256-Bit Serial EEPROM emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "emu.h"
