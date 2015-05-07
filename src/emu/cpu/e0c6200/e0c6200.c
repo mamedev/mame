@@ -16,6 +16,8 @@
 #include "e0c6200.h"
 #include "debugger.h"
 
+#include "e0c6200op.inc"
+
 
 const device_type EPSON_E0C6S46 = &device_creator<e0c6s46_device>;
 
@@ -448,82 +450,82 @@ void e0c6200_cpu_device::execute_one()
 		case 0xf0f:
 
 		// AND r,q: logical AND register with register (affect flags: Z)
-		case 0xac0: m_icount -= 2; /* m_a &= m_a; */ set_zf(m_a); break;
-		case 0xac1: m_icount -= 2; m_a &= m_b; set_zf(m_a); break;
-		case 0xac2: m_icount -= 2; m_a &= read_mx(); set_zf(m_a); break;
-		case 0xac3: m_icount -= 2; m_a &= read_my(); set_zf(m_a); break;
-		case 0xac4: m_icount -= 2; m_b &= m_a; set_zf(m_b); break;
-		case 0xac5: m_icount -= 2; /* m_b &= m_b; */ set_zf(m_b); break;
-		case 0xac6: m_icount -= 2; m_b &= read_mx(); set_zf(m_b); break;
-		case 0xac7: m_icount -= 2; m_b &= read_my(); set_zf(m_b); break;
-		case 0xac8: m_icount -= 2; { UINT8 t = read_mx() & m_a; write_mx(t); set_zf(t); break; }
-		case 0xac9: m_icount -= 2; { UINT8 t = read_mx() & m_b; write_mx(t); set_zf(t); break; }
-		case 0xaca: m_icount -= 2; { UINT8 t = read_mx() & read_mx(); write_mx(t); set_zf(t); break; }
-		case 0xacb: m_icount -= 2; { UINT8 t = read_mx() & read_my(); write_mx(t); set_zf(t); break; }
-		case 0xacc: m_icount -= 2; { UINT8 t = read_my() & m_a; write_my(t); set_zf(t); break; }
-		case 0xacd: m_icount -= 2; { UINT8 t = read_my() & m_b; write_my(t); set_zf(t); break; }
-		case 0xace: m_icount -= 2; { UINT8 t = read_my() & read_mx(); write_my(t); set_zf(t); break; }
-		case 0xacf: m_icount -= 2; { UINT8 t = read_my() & read_my(); write_my(t); set_zf(t); break; }
+		case 0xac0: m_a = op_and(m_a, m_a); break;
+		case 0xac1: m_a = op_and(m_a, m_b); break;
+		case 0xac2: m_a = op_and(m_a, read_mx()); break;
+		case 0xac3: m_a = op_and(m_a, read_my()); break;
+		case 0xac4: m_b = op_and(m_b, m_a); break;
+		case 0xac5: m_b = op_and(m_b, m_b); break;
+		case 0xac6: m_b = op_and(m_b, read_mx()); break;
+		case 0xac7: m_b = op_and(m_b, read_my()); break;
+		case 0xac8: write_mx(op_and(read_mx(), m_a)); break;
+		case 0xac9: write_mx(op_and(read_mx(), m_b)); break;
+		case 0xaca: write_mx(op_and(read_mx(), read_mx())); break;
+		case 0xacb: write_mx(op_and(read_mx(), read_my())); break;
+		case 0xacc: write_my(op_and(read_my(), m_a)); break;
+		case 0xacd: write_my(op_and(read_my(), m_b)); break;
+		case 0xace: write_my(op_and(read_my(), read_mx())); break;
+		case 0xacf: write_my(op_and(read_my(), read_my())); break;
 
 		// FAN r,q: AND r,q, but discard result
-		case 0xf10: m_icount -= 2; set_zf(m_a /* & m_a */); break;
-		case 0xf11: m_icount -= 2; set_zf(m_a & m_b); break;
-		case 0xf12: m_icount -= 2; set_zf(m_a & read_mx()); break;
-		case 0xf13: m_icount -= 2; set_zf(m_a & read_my()); break;
-		case 0xf14: m_icount -= 2; set_zf(m_b & m_a); break;
-		case 0xf15: m_icount -= 2; set_zf(m_b /* & m_b */); break;
-		case 0xf16: m_icount -= 2; set_zf(m_b & read_mx()); break;
-		case 0xf17: m_icount -= 2; set_zf(m_b & read_my()); break;
-		case 0xf18: m_icount -= 2; set_zf(read_mx() & m_a); break;
-		case 0xf19: m_icount -= 2; set_zf(read_mx() & m_b); break;
-		case 0xf1a: m_icount -= 2; set_zf(read_mx() & read_mx()); break;
-		case 0xf1b: m_icount -= 2; set_zf(read_mx() & read_my()); break;
-		case 0xf1c: m_icount -= 2; set_zf(read_my() & m_a); break;
-		case 0xf1d: m_icount -= 2; set_zf(read_my() & m_b); break;
-		case 0xf1e: m_icount -= 2; set_zf(read_my() & read_mx()); break;
-		case 0xf1f: m_icount -= 2; set_zf(read_my() & read_my()); break;
+		case 0xf10: op_and(m_a, m_a); break;
+		case 0xf11: op_and(m_a, m_b); break;
+		case 0xf12: op_and(m_a, read_mx()); break;
+		case 0xf13: op_and(m_a, read_my()); break;
+		case 0xf14: op_and(m_b, m_a); break;
+		case 0xf15: op_and(m_b, m_b); break;
+		case 0xf16: op_and(m_b, read_mx()); break;
+		case 0xf17: op_and(m_b, read_my()); break;
+		case 0xf18: op_and(read_mx(), m_a); break;
+		case 0xf19: op_and(read_mx(), m_b); break;
+		case 0xf1a: op_and(read_mx(), read_mx()); break;
+		case 0xf1b: op_and(read_mx(), read_my()); break;
+		case 0xf1c: op_and(read_my(), m_a); break;
+		case 0xf1d: op_and(read_my(), m_b); break;
+		case 0xf1e: op_and(read_my(), read_mx()); break;
+		case 0xf1f: op_and(read_my(), read_my()); break;
 
 		// OR r,q: logical OR register with register (affect flags: Z)
-		case 0xad0: m_icount -= 2; /* m_a |= m_a; */ set_zf(m_a); break;
-		case 0xad1: m_icount -= 2; m_a |= m_b; set_zf(m_a); break;
-		case 0xad2: m_icount -= 2; m_a |= read_mx(); set_zf(m_a); break;
-		case 0xad3: m_icount -= 2; m_a |= read_my(); set_zf(m_a); break;
-		case 0xad4: m_icount -= 2; m_b |= m_a; set_zf(m_b); break;
-		case 0xad5: m_icount -= 2; /* m_b |= m_b; */ set_zf(m_b); break;
-		case 0xad6: m_icount -= 2; m_b |= read_mx(); set_zf(m_b); break;
-		case 0xad7: m_icount -= 2; m_b |= read_my(); set_zf(m_b); break;
-		case 0xad8: m_icount -= 2; { UINT8 t = read_mx() | m_a; write_mx(t); set_zf(t); break; }
-		case 0xad9: m_icount -= 2; { UINT8 t = read_mx() | m_b; write_mx(t); set_zf(t); break; }
-		case 0xada: m_icount -= 2; { UINT8 t = read_mx() | read_mx(); write_mx(t); set_zf(t); break; }
-		case 0xadb: m_icount -= 2; { UINT8 t = read_mx() | read_my(); write_mx(t); set_zf(t); break; }
-		case 0xadc: m_icount -= 2; { UINT8 t = read_my() | m_a; write_my(t); set_zf(t); break; }
-		case 0xadd: m_icount -= 2; { UINT8 t = read_my() | m_b; write_my(t); set_zf(t); break; }
-		case 0xade: m_icount -= 2; { UINT8 t = read_my() | read_mx(); write_my(t); set_zf(t); break; }
-		case 0xadf: m_icount -= 2; { UINT8 t = read_my() | read_my(); write_my(t); set_zf(t); break; }
+		case 0xad0: m_a = op_or(m_a, m_a); break;
+		case 0xad1: m_a = op_or(m_a, m_b); break;
+		case 0xad2: m_a = op_or(m_a, read_mx()); break;
+		case 0xad3: m_a = op_or(m_a, read_my()); break;
+		case 0xad4: m_b = op_or(m_b, m_a); break;
+		case 0xad5: m_b = op_or(m_b, m_b); break;
+		case 0xad6: m_b = op_or(m_b, read_mx()); break;
+		case 0xad7: m_b = op_or(m_b, read_my()); break;
+		case 0xad8: write_mx(op_or(read_mx(), m_a)); break;
+		case 0xad9: write_mx(op_or(read_mx(), m_b)); break;
+		case 0xada: write_mx(op_or(read_mx(), read_mx())); break;
+		case 0xadb: write_mx(op_or(read_mx(), read_my())); break;
+		case 0xadc: write_my(op_or(read_my(), m_a)); break;
+		case 0xadd: write_my(op_or(read_my(), m_b)); break;
+		case 0xade: write_my(op_or(read_my(), read_mx())); break;
+		case 0xadf: write_my(op_or(read_my(), read_my())); break;
 
 		// XOR r,q: exclusive-OR register with register (affect flags: Z)
-		case 0xae0: m_icount -= 2; m_a ^= m_a; set_zf(m_a); break;
-		case 0xae1: m_icount -= 2; m_a ^= m_b; set_zf(m_a); break;
-		case 0xae2: m_icount -= 2; m_a ^= read_mx(); set_zf(m_a); break;
-		case 0xae3: m_icount -= 2; m_a ^= read_my(); set_zf(m_a); break;
-		case 0xae4: m_icount -= 2; m_b ^= m_a; set_zf(m_b); break;
-		case 0xae5: m_icount -= 2; m_b ^= m_b; set_zf(m_b); break;
-		case 0xae6: m_icount -= 2; m_b ^= read_mx(); set_zf(m_b); break;
-		case 0xae7: m_icount -= 2; m_b ^= read_my(); set_zf(m_b); break;
-		case 0xae8: m_icount -= 2; { UINT8 t = read_mx() ^ m_a; write_mx(t); set_zf(t); break; }
-		case 0xae9: m_icount -= 2; { UINT8 t = read_mx() ^ m_b; write_mx(t); set_zf(t); break; }
-		case 0xaea: m_icount -= 2; { UINT8 t = read_mx() ^ read_mx(); write_mx(t); set_zf(t); break; }
-		case 0xaeb: m_icount -= 2; { UINT8 t = read_mx() ^ read_my(); write_mx(t); set_zf(t); break; }
-		case 0xaec: m_icount -= 2; { UINT8 t = read_my() ^ m_a; write_my(t); set_zf(t); break; }
-		case 0xaed: m_icount -= 2; { UINT8 t = read_my() ^ m_b; write_my(t); set_zf(t); break; }
-		case 0xaee: m_icount -= 2; { UINT8 t = read_my() ^ read_mx(); write_my(t); set_zf(t); break; }
-		case 0xaef: m_icount -= 2; { UINT8 t = read_my() ^ read_my(); write_my(t); set_zf(t); break; }
+		case 0xae0: m_a = op_xor(m_a, m_a); break;
+		case 0xae1: m_a = op_xor(m_a, m_b); break;
+		case 0xae2: m_a = op_xor(m_a, read_mx()); break;
+		case 0xae3: m_a = op_xor(m_a, read_my()); break;
+		case 0xae4: m_b = op_xor(m_b, m_a); break;
+		case 0xae5: m_b = op_xor(m_b, m_b); break;
+		case 0xae6: m_b = op_xor(m_b, read_mx()); break;
+		case 0xae7: m_b = op_xor(m_b, read_my()); break;
+		case 0xae8: write_mx(op_xor(read_mx(), m_a)); break;
+		case 0xae9: write_mx(op_xor(read_mx(), m_b)); break;
+		case 0xaea: write_mx(op_xor(read_mx(), read_mx())); break;
+		case 0xaeb: write_mx(op_xor(read_mx(), read_my())); break;
+		case 0xaec: write_my(op_xor(read_my(), m_a)); break;
+		case 0xaed: write_my(op_xor(read_my(), m_b)); break;
+		case 0xaee: write_my(op_xor(read_my(), read_mx())); break;
+		case 0xaef: write_my(op_xor(read_my(), read_my())); break;
 
 		// RLC r: rotate register left through carry (affect flags: C, Z)
-		case 0xaf0: m_icount -= 2;
-		case 0xaf5: m_icount -= 2;
-		case 0xafa: m_icount -= 2; read_mx();
-		case 0xaff: m_icount -= 2; read_my();
+		case 0xaf0: 
+		case 0xaf5: 
+		case 0xafa: read_mx();
+		case 0xaff: read_my();
 
 		// RRC r: rotate register right through carry (affect flags: C, Z)
 		case 0xe8c:
@@ -645,27 +647,13 @@ void e0c6200_cpu_device::execute_one()
 
 		// INC Mn: increment memory (affect flags: C, Z)
 		case 0xf60:
-		{
-			m_icount -= 2;
-			UINT8 t = read_mn();
-			t = (t + 1) & 0xf;
-			write_mn(t);
-			m_f = (m_f & ~1) | ((t == 0) ? 1 : 0);
-			set_zf(t);
+			write_mn(op_inc(read_mn()));
 			break;
-		}
 
 		// DEC Mn: decrement memory (affect flags: C, Z)
 		case 0xf70:
-		{
-			m_icount -= 2;
-			UINT8 t = read_mn();
-			t = (t - 1) & 0xf;
-			write_mn(t);
-			m_f = (m_f & ~1) | ((t == 0xf) ? 1 : 0);
-			set_zf(t);
+			write_mn(op_dec(read_mn()));
 			break;
-		}
 
 		// ADD r,i
 		case 0xc00:
@@ -733,28 +721,28 @@ void e0c6200_cpu_device::execute_one()
 
 
 		// AND r,i: logical AND register with 4-bit immediate data (affect flags: Z)
-		case 0xc80: m_icount -= 2; m_a &= m_op & 0xf; set_zf(m_a); break;
-		case 0xc90: m_icount -= 2; m_b &= m_op & 0xf; set_zf(m_b); break;
-		case 0xca0: m_icount -= 2; { UINT8 t = read_mx() & (m_op & 0xf); write_mx(t); set_zf(t); break; }
-		case 0xcb0: m_icount -= 2; { UINT8 t = read_my() & (m_op & 0xf); write_my(t); set_zf(t); break; }
+		case 0xc80: m_a = op_and(m_a, m_op & 0xf); break;
+		case 0xc90: m_b = op_and(m_b, m_op & 0xf); break;
+		case 0xca0: write_mx(op_and(read_mx(), m_op & 0xf)); break;
+		case 0xcb0: write_my(op_and(read_my(), m_op & 0xf)); break;
 
 		// FAN r,i: AND r,i, but discard result
-		case 0xd80: m_icount -= 2; set_zf(m_a & (m_op & 0xf)); break;
-		case 0xd90: m_icount -= 2; set_zf(m_b & (m_op & 0xf)); break;
-		case 0xda0: m_icount -= 2; set_zf(read_mx() & (m_op & 0xf)); break;
-		case 0xdb0: m_icount -= 2; set_zf(read_my() & (m_op & 0xf)); break;
+		case 0xd80: op_and(m_a, m_op & 0xf); break;
+		case 0xd90: op_and(m_b, m_op & 0xf); break;
+		case 0xda0: op_and(read_mx(), m_op & 0xf); break;
+		case 0xdb0: op_and(read_my(), m_op & 0xf); break;
 
 		// OR r,i: logical OR register with 4-bit immediate data (affect flags: Z)
-		case 0xcc0: m_icount -= 2; m_a |= m_op & 0xf; set_zf(m_a); break;
-		case 0xcd0: m_icount -= 2; m_b |= m_op & 0xf; set_zf(m_b); break;
-		case 0xce0: m_icount -= 2; { UINT8 t = read_mx() | (m_op & 0xf); write_mx(t); set_zf(t); break; }
-		case 0xcf0: m_icount -= 2; { UINT8 t = read_my() | (m_op & 0xf); write_my(t); set_zf(t); break; }
+		case 0xcc0: m_a = op_or(m_a, m_op & 0xf); break;
+		case 0xcd0: m_b = op_or(m_b, m_op & 0xf); break;
+		case 0xce0: write_mx(op_or(read_mx(), m_op & 0xf)); break;
+		case 0xcf0: write_my(op_or(read_my(), m_op & 0xf)); break;
 
 		// XOR r,i: exclusive-OR register with 4-bit immediate data (affect flags: Z)
-		case 0xd00: m_icount -= 2; m_a ^= m_op & 0xf; set_zf(m_a); break;
-		case 0xd10: m_icount -= 2; m_b ^= m_op & 0xf; set_zf(m_b); break;
-		case 0xd20: m_icount -= 2; { UINT8 t = read_mx() ^ (m_op & 0xf); write_mx(t); set_zf(t); break; }
-		case 0xd30: m_icount -= 2; { UINT8 t = read_my() ^ (m_op & 0xf); write_my(t); set_zf(t); break; }
+		case 0xd00: m_a = op_xor(m_a, m_op & 0xf); break;
+		case 0xd10: m_b = op_xor(m_b, m_op & 0xf); break;
+		case 0xd20: write_mx(op_xor(read_mx(), m_op & 0xf)); break;
+		case 0xd30: write_my(op_xor(read_my(), m_op & 0xf)); break;
 
 		// SET F,i: set flag(s), this includes opcodes SCF, SZF, SDF, EI
 		case 0xf40:
