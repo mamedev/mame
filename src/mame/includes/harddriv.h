@@ -469,10 +469,11 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	
 private:
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<dac_device> m_dac;
-	optional_device<cpu_device> m_sounddsp;
-	optional_shared_ptr<UINT16> m_sounddsp_ram;
+	required_device<cpu_device> m_soundcpu;
+	required_device<dac_device> m_dac;
+	required_device<cpu_device> m_sounddsp;
+	required_shared_ptr<UINT16> m_sounddsp_ram;
+	required_region_ptr<UINT8> m_rombase;	
 	
 	UINT8                   m_soundflag;
 	UINT8                   m_mainflag;
@@ -485,8 +486,6 @@ private:
 
 	offs_t                  m_sound_rom_offs;
 
-	UINT8 *                 m_rombase;
-	UINT32                  m_romsize;
 	UINT16                  m_comram[0x400/2];
 	UINT64                  m_last_bio_cycles;
 	
