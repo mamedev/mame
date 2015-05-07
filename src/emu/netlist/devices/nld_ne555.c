@@ -26,10 +26,10 @@ inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a,
 
 NETLIB_START(NE555)
 {
-	register_sub(m_R1, "R1");
-	register_sub(m_R2, "R2");
-	register_sub(m_R3, "R3");
-	register_sub(m_RDIS, "RDIS");
+	register_sub("R1", m_R1);
+	register_sub("R2", m_R2);
+	register_sub("R3", m_R3);
+	register_sub("RDIS", m_RDIS);
 
 	register_subalias("GND",  m_R3.m_N);    // Pin 1
 	register_input("TRIG",    m_TRIG);      // Pin 2

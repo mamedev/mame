@@ -55,9 +55,19 @@
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
 
-//typedef double   nl_double;
-
 #define nl_double double
+
+//============================================================
+//  Solver defines
+//============================================================
+
+#define USE_MATRIX_GS (0)
+#define USE_PIVOT_SEARCH (0)
+#define USE_GABS (0)
+// savings are eaten up by effort
+// FIXME: Convert into solver parameter
+#define USE_LINEAR_PREDICTION (0)
+
 
 //============================================================
 //  DEBUGGING

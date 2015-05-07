@@ -123,7 +123,7 @@ NETLIB_RESET(9312)
 
 NETLIB_START(9312_dip)
 {
-	register_sub(m_sub, "1");
+	register_sub("1", m_sub);
 
 #if (USE_TRUTHTABLE)
 

@@ -440,7 +440,7 @@ ATTR_COLD void netlist_device_t::init(netlist_base_t &anetlist, const pstring &n
 }
 
 
-ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstring &name)
+ATTR_COLD void netlist_device_t::register_sub(const pstring &name, netlist_device_t &dev)
 {
 	dev.init(netlist(), this->name() + "." + name);
 	dev.start_dev();
@@ -850,6 +850,7 @@ ATTR_HOT void netlist_terminal_t::schedule_after(const netlist_time &after)
 
 ATTR_COLD void netlist_terminal_t::reset()
 {
+	//printf("reset %s\n", name().cstr());
 	//netlist_terminal_core_terminal_t::reset();
 	set_state(STATE_INP_ACTIVE);
 	set_ptr(m_Idr1, 0.0);

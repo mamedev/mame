@@ -98,7 +98,7 @@ public:
 	netlist_terminal_t m_P;
 	netlist_terminal_t m_N;
 
-	virtual NETLIB_UPDATE_TERMINALS()
+	virtual NETLIB_UPDATE_TERMINALSI()
 	{
 	}
 
@@ -311,11 +311,7 @@ class NETLIB_NAME(D) : public NETLIB_NAME(twoterm)
 public:
 	ATTR_COLD NETLIB_NAME(D)() : NETLIB_NAME(twoterm)(DIODE) { }
 
-	NETLIB_UPDATE_TERMINALS()
-	{
-		m_D.update_diode(deltaV());
-		set(m_D.G(), 0.0, m_D.Ieq());
-	}
+	NETLIB_UPDATE_TERMINALSI();
 
 protected:
 	ATTR_COLD virtual void start();

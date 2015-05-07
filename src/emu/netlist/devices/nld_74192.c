@@ -11,7 +11,7 @@
 
 NETLIB_START(74192)
 {
-	register_sub(m_ABCD, "subABCD");
+	register_sub("subABCD", m_ABCD);
 	register_subalias("A", m_ABCD.m_A);
 	register_subalias("B", m_ABCD.m_B);
 	register_subalias("C", m_ABCD.m_C);

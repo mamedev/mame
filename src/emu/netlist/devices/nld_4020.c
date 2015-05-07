@@ -9,8 +9,8 @@
 
 NETLIB_START(4020)
 {
-	register_sub(sub, "sub");
-	register_sub(m_supply, "supply");
+	register_sub("sub", sub);
+	register_sub("supply", m_supply);
 
 	register_input("RESET", m_RESET);
 	register_subalias("IP", sub.m_IP);

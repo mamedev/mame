@@ -35,10 +35,10 @@ const char *nld_74279B::m_desc[] = {
 
 NETLIB_START(74279_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
-	register_sub(m_3, "3");
-	register_sub(m_4, "4");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
+	register_sub("3", m_3);
+	register_sub("4", m_4);
 
 	register_subalias("1", m_1.m_i[2]);  //R
 	register_subalias("2", m_1.m_i[0]);

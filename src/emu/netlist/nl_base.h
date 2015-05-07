@@ -195,8 +195,9 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 #define NETLIB_UPDATE_PARAM(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(_chip, _name, _params) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: _name _params
 
-#define NETLIB_UPDATE_TERMINALS() ATTR_HOT ATTR_ALIGN inline void update_terminals(void)
-#define NETLIB_UPDATEI() ATTR_HOT ATTR_ALIGN inline void update(void)
+#define NETLIB_UPDATE_TERMINALS(_chip) ATTR_HOT ATTR_ALIGN void NETLIB_NAME(_chip) :: update_terminals(void)
+#define NETLIB_UPDATE_TERMINALSI() ATTR_HOT ATTR_ALIGN void update_terminals(void)
+#define NETLIB_UPDATEI() ATTR_HOT ATTR_ALIGN void update(void)
 
 #define NETLIB_DEVICE_BASE(_name, _pclass, _extra, _priv)                       \
 	class _name : public _pclass                                                \
@@ -494,10 +495,12 @@ protected:
 
 	ATTR_COLD virtual void reset();
 private:
-	inline void set_ptr(nl_double *ptr, const nl_double val)
+	ATTR_HOT inline void set_ptr(nl_double *ptr, const nl_double val)
 	{
-		if (ptr != NULL)
+		if (ptr != NULL && *ptr != val)
+		{
 			*ptr = val;
+		}
 	}
 };
 
@@ -1044,7 +1047,7 @@ public:
 
 	ATTR_COLD netlist_setup_t &setup();
 
-	ATTR_COLD void register_sub(netlist_device_t &dev, const pstring &name);
+	ATTR_COLD void register_sub(const pstring &name, netlist_device_t &dev);
 	ATTR_COLD void register_subalias(const pstring &name, netlist_core_terminal_t &term);
 	ATTR_COLD void register_terminal(const pstring &name, netlist_terminal_t &port);
 	ATTR_COLD void register_output(const pstring &name, netlist_output_t &out);

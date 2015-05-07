@@ -111,7 +111,7 @@ CIRCUIT_LAYOUT( breakout )
     SOLVER(Solver, 48000)
     PARAM(Solver.ACCURACY, 1e-6)
     PARAM(Solver.GS_THRESHOLD, 6)
-    // FIXME: PARALLEL Doesn't work in breakout!
+    // FIXME: PARALLEL Doesn't work in breakout.
     PARAM(Solver.PARALLEL, 0)
 #endif
 

@@ -80,6 +80,7 @@ NETLIB_UPDATE(twoterm)
 
 NETLIB_START(R_base)
 {
+	NETLIB_NAME(twoterm)::start();
 	register_terminal("1", m_P);
 	register_terminal("2", m_N);
 }
@@ -130,8 +131,8 @@ NETLIB_UPDATE_PARAM(R)
 
 NETLIB_START(POT)
 {
-	register_sub(m_R1, "R1");
-	register_sub(m_R2, "R2");
+	register_sub("R1", m_R1);
+	register_sub("R2", m_R2);
 
 	register_subalias("1", m_R1.m_P);
 	register_subalias("2", m_R1.m_N);
@@ -180,7 +181,7 @@ NETLIB_UPDATE_PARAM(POT)
 
 NETLIB_START(POT2)
 {
-	register_sub(m_R1, "R1");
+	register_sub("R1", m_R1);
 
 	register_subalias("1", m_R1.m_P);
 	register_subalias("2", m_R1.m_N);
@@ -277,4 +278,10 @@ NETLIB_UPDATE_PARAM(D)
 NETLIB_UPDATE(D)
 {
 	NETLIB_NAME(twoterm)::update();
+}
+
+NETLIB_UPDATE_TERMINALS(D)
+{
+	m_D.update_diode(deltaV());
+	set(m_D.G(), 0.0, m_D.Ieq());
 }

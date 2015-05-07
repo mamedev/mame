@@ -14,8 +14,8 @@ NETLIB_START(74123)
 {
 	m_dev_type = 74123;
 
-	register_sub(m_RP, "RP");
-	register_sub(m_RN, "RN");
+	register_sub("RP", m_RP);
+	register_sub("RN", m_RN);
 
 	register_input("A", m_A);
 	register_input("B", m_B);
@@ -122,8 +122,8 @@ NETLIB_RESET(74123)
 
 NETLIB_START(74123_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
 
 	register_subalias("1", m_1.m_A);
 	register_subalias("2", m_1.m_B);
@@ -161,8 +161,8 @@ NETLIB_RESET(74123_dip)
 
 NETLIB_START(9602_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
 
 	m_1.m_dev_type = 9602;
 	m_2.m_dev_type = 9602;
