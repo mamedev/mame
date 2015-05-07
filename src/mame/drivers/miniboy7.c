@@ -312,7 +312,7 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
     coin_counter_w(machine(), 0, data & 0x40);    // counter
 
 //  popmessage("Out Lamps: %02x", data);
- 	logerror("Out Lamps: %02x\n", data);
+// 	logerror("Out Lamps: %02x\n", data);
 
 }
 
