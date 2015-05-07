@@ -682,7 +682,6 @@ CPU_DISASSEMBLE(e0c6200)
 			m = em_ILL;
 			break;
 
-
 			} // 0xff0
 			break;
 

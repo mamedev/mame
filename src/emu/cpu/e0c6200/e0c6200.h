@@ -62,7 +62,7 @@ protected:
 
 	UINT16 m_pc;            // 13-bit programcounter: 1-bit bank, 4-bit page, 8-bit 'step'
 	UINT16 m_prev_pc;
-	UINT16 m_npc;           // new bankpointer and pagepointer prepared by pset
+	UINT16 m_npc;           // new bank/page prepared by pset
 	UINT16 m_jpc;           // actual bank/page destination for jumps
 	
 	// all work registers are 4-bit
@@ -73,22 +73,29 @@ protected:
 	UINT8 m_sp;             // stackpointer (SPH, SPL)
 	UINT8 m_f;              // flags
 
+	// misc internal helpers
+	inline void set_zf(UINT8 data) { m_f = (m_f & ~2) | ((data & 0xf) ? 0 : 2); }
+	
 	// internal read/write (MX, MY, Mn/RP)
-	inline UINT8 read_mx() { return m_data->read_byte(m_xp << 8 | m_xh << 4 | m_xl); }
+	inline UINT8 read_mx() { return m_data->read_byte(m_xp << 8 | m_xh << 4 | m_xl) & 0xf; }
 	inline void write_mx(UINT8 data) { m_data->write_byte(m_xp << 8 | m_xh << 4 | m_xl, data); }
-	inline UINT8 read_my() { return m_data->read_byte(m_yp << 8 | m_yh << 4 | m_yl); }
+	inline UINT8 read_my() { return m_data->read_byte(m_yp << 8 | m_yh << 4 | m_yl) & 0xf; }
 	inline void write_my(UINT8 data) { m_data->write_byte(m_yp << 8 | m_yh << 4 | m_yl, data); }
-	inline UINT8 read_mn() { return m_data->read_byte(m_op & 0xf); }
+	inline UINT8 read_mn() { return m_data->read_byte(m_op & 0xf) & 0xf; }
 	inline void write_mn(UINT8 data) { m_data->write_byte(m_op & 0xf, data); }
 
 	inline void inc_x() { m_xl++; m_xh = (m_xh + (m_xl >> 4 & 1)) & 0xf; m_xl &= 0xf; }
 	inline void inc_y() { m_yl++; m_yh = (m_yh + (m_yl >> 4 & 1)) & 0xf; m_yl &= 0xf; }
 
-	// stack ops
+	// common stack ops
 	inline void push(UINT8 data) { m_data->write_byte(--m_sp, data); }
-	inline UINT8 pop() { return m_data->read_byte(m_sp++); }
+	inline UINT8 pop() { return m_data->read_byte(m_sp++) & 0xf; }
 	inline void push_pc() { push(m_pc >> 8 & 0xf); push(m_pc >> 4 & 0xf); push(m_pc & 0xf); }
 	inline void pop_pc() { UINT16 bank = m_pc & 0x1000; m_pc = pop(); m_pc |= pop() << 4; m_pc |= pop() << 8; m_pc |= bank; }
+	
+	// opcode handlers
+	//UINT8 op_rlc(UINT8 data);
+	//UINT8 op_rrc(UINT8 data);
 };
 
 
