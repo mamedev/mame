@@ -88,75 +88,77 @@ public:
 	popobear_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
 		m_spr(*this, "spr"),
 		m_vram(*this, "vram"),
-		m_vregs(*this, "vregs"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-
+		m_vregs(*this, "vregs")
 	{
-		tilemap_base[0] = 0xf0000;
-		tilemap_base[1] = 0xf4000;
-		tilemap_base[2] = 0xf8000;
-		tilemap_base[3] = 0xfc000;
+		m_tilemap_base[0] = 0xf0000;
+		m_tilemap_base[1] = 0xf4000;
+		m_tilemap_base[2] = 0xf8000;
+		m_tilemap_base[3] = 0xfc000;
 	}
 
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	required_shared_ptr<UINT16> m_spr;
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_vregs;
-	optional_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	std::vector<UINT16> m_vram_rearranged;
-
-	int tilemap_base[4];
-
-	DECLARE_READ8_MEMBER(popo_620000_r);
-	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
-	virtual void video_start();
-	UINT32 screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(popobear_irq);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-
+	int m_tilemap_base[4];
 	tilemap_t    *m_bg_tilemap[4];
-	TILE_GET_INFO_MEMBER(get_popobear_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_popobear_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_popobear_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_popobear_bg3_tile_info);
 
-	DECLARE_WRITE16_MEMBER(popo_vram_w)
-	{
-		COMBINE_DATA(&m_vram[offset]);
+	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 
-		// the graphic data for the tiles is in a strange order, rearrange it so that we can use it as tiles..
-		int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
-
-		18,17,16,15,14,13,12,
-
-		8,7,6,5,4,3,2,
-
-		11,10,9, /* y tile address bits */
-
-		1,0 /* x tile address bits */);
-
-
-
-		COMBINE_DATA(&m_vram_rearranged[swapped_offset]);
-		m_gfxdecode->gfx(0)->mark_dirty((swapped_offset)/32);
-
-		// unfortunately tilemaps and tilegfx share the same ram so we're always dirty if we write to RAM
-		m_bg_tilemap[0]->mark_all_dirty();
-		m_bg_tilemap[1]->mark_all_dirty();
-		m_bg_tilemap[2]->mark_all_dirty();
-		m_bg_tilemap[3]->mark_all_dirty();
-
-	}
-
+	DECLARE_READ8_MEMBER(_620000_r);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	
+	virtual void video_start();
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	
+	void postload();
 };
 
 
-static const gfx_layout popobear_char_layout =
+WRITE16_MEMBER(popobear_state::vram_w)
+{
+	COMBINE_DATA(&m_vram[offset]);
+
+	// the graphic data for the tiles is in a strange order, rearrange it so that we can use it as tiles..
+	int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
+
+	18,17,16,15,14,13,12,
+
+	8,7,6,5,4,3,2,
+
+	11,10,9, /* y tile address bits */
+
+	1,0 /* x tile address bits */);
+
+
+
+	COMBINE_DATA(&m_vram_rearranged[swapped_offset]);
+	m_gfxdecode->gfx(0)->mark_dirty((swapped_offset)/32);
+
+	// unfortunately tilemaps and tilegfx share the same ram so we're always dirty if we write to RAM
+	m_bg_tilemap[0]->mark_all_dirty();
+	m_bg_tilemap[1]->mark_all_dirty();
+	m_bg_tilemap[2]->mark_all_dirty();
+	m_bg_tilemap[3]->mark_all_dirty();
+}
+
+static const gfx_layout char_layout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -168,43 +170,46 @@ static const gfx_layout popobear_char_layout =
 };
 
 GFXDECODE_START(popobear)
-	GFXDECODE_RAM( "vram", 0, popobear_char_layout, 0, 1 )
+	GFXDECODE_RAM( "vram", 0, char_layout, 0, 1 )
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg0_tile_info)
+TILE_GET_INFO_MEMBER(popobear_state::get_bg0_tile_info)
 {
-	int base = tilemap_base[0];
+	int base = m_tilemap_base[0];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
 	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
+TILE_GET_INFO_MEMBER(popobear_state::get_bg1_tile_info)
 {
-	int base = tilemap_base[1];
+	int base = m_tilemap_base[1];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
 	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
+TILE_GET_INFO_MEMBER(popobear_state::get_bg2_tile_info)
 {
-	int base = tilemap_base[2];
+	int base = m_tilemap_base[2];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
 	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
+TILE_GET_INFO_MEMBER(popobear_state::get_bg3_tile_info)
 {
-	int base = tilemap_base[3];
+	int base = m_tilemap_base[3];
 	int tileno = m_vram[base/2 + tile_index];
 	int flipyx = (tileno>>14);
 	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 
-
+void popobear_state::postload()
+{
+	m_gfxdecode->gfx(0)->mark_all_dirty();
+}
 
 void popobear_state::video_start()
 {
@@ -212,16 +217,18 @@ void popobear_state::video_start()
 
 	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<UINT8 *>(&m_vram_rearranged[0]));
 
-	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[0] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[1] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[2] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[3] = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(popobear_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
 	m_bg_tilemap[2]->set_transparent_pen(0);
 	m_bg_tilemap[3]->set_transparent_pen(0);
-
+	
+	save_item(NAME(m_vram_rearranged));
+	machine().save().register_postload(save_prepost_delegate(FUNC(popobear_state::postload), this));
 }
 
 
@@ -338,7 +345,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	int line;
@@ -445,12 +452,12 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 }
 
 /* ??? */
-READ8_MEMBER(popobear_state::popo_620000_r)
+READ8_MEMBER(popobear_state::_620000_r)
 {
 	return 9;
 }
 
-WRITE8_MEMBER(popobear_state::popobear_irq_ack_w)
+WRITE8_MEMBER(popobear_state::irq_ack_w)
 {
 	int i;
 
@@ -466,19 +473,19 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
 	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
-	AM_RANGE(0x300000, 0x3fffff) AM_RAM_WRITE( popo_vram_w ) AM_SHARE("vram") // tile definitions + tilemaps
+	AM_RANGE(0x300000, 0x3fffff) AM_RAM_WRITE( vram_w ) AM_SHARE("vram") // tile definitions + tilemaps
 
 
 	/* Most if not all of these are vregs */
 	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_SHARE("vregs")
 	AM_RANGE(0x480020, 0x480023) AM_RAM
 	AM_RANGE(0x480028, 0x48002d) AM_RAM
-//  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(popo_480020_r) AM_WRITE(popo_480020_w)
-//  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(popo_480028_w)
-//  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(popo_48002c_w)
-	AM_RANGE(0x480030, 0x480031) AM_WRITE8(popobear_irq_ack_w, 0x00ff)
+//  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(480020_r) AM_WRITE(480020_w)
+//  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(480028_w)
+//  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(48002c_w)
+	AM_RANGE(0x480030, 0x480031) AM_WRITE8(irq_ack_w, 0x00ff)
 	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
-	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
+	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(48003a_r) AM_WRITE(48003a_w)
 
 	AM_RANGE(0x480400, 0x4807ff) AM_RAM AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 
@@ -488,7 +495,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
-	AM_RANGE(0x620000, 0x620001) AM_READ8(popo_620000_r,0xff00) AM_WRITENOP
+	AM_RANGE(0x620000, 0x620001) AM_READ8(_620000_r,0xff00) AM_WRITENOP
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -608,7 +615,7 @@ static INPUT_PORTS_START( popobear )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::popobear_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
 {
 	int scanline = param;
 
@@ -631,12 +638,12 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	// levels 2,3,5 look interesting
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
 	//MCFG_CPU_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popobear_state, popobear_irq, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popobear_state, irq, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update_popobear)
+	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_SIZE(128*8, 32*8)
@@ -670,4 +677,4 @@ ROM_START( popobear )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
-GAME( 2000, popobear,    0, popobear,    popobear, driver_device,    0, ROT0,  "BMC", "PoPo Bear",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, popobear,    0, popobear,    popobear, driver_device,    0, ROT0,  "BMC", "PoPo Bear",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
