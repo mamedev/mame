@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Tape support for Orao  TAP format

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* .PTP Microkey Primo tape images */
 
 

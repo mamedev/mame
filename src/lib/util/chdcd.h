@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     CDRDAO TOC parser for CHD compression frontend

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef APFCAS_H
 #define APFCAS_H
 

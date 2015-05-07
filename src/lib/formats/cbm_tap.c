@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Tape support for C16 / C64 / VIC20 TAP format

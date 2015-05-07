@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef TD0_DSK_H_
 #define TD0_DSK_H_
 

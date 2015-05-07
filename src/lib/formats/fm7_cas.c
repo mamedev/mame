@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Fujitsu FM-7 series cassette handling
  */

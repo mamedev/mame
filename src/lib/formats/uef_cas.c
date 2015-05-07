@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 UEF format support (for electron driver)
