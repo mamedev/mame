@@ -1,21 +1,21 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
-  MINI BOY 7
+  MINI-BOY 7
 
   Driver by Roberto Fresca.
 
   Games running on this hardware:
 
-  * Mini Boy 7 - 1983, Bonanza Enterprises, Ltd.
+  * Mini-Boy 7 - 1983, Bonanza Enterprises, Ltd.
 
-Note: During attract mode display, pressing the service menu will allow you to
-      add a custom ad to scroll during attract mode display. Up to 120 characters
 
 *******************************************************************************
 
   Game Notes:
 
-  Mini Boy 7. Seven games in one, plus Ad message support.
+  Mini-Boy 7. Seven games in one, plus Ad message support.
   http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4275
 
   - Draw Poker.
@@ -26,8 +26,10 @@ Note: During attract mode display, pressing the service menu will allow you to
   - Double-Up.
   - Craps.
 
-*******************************************************************************
+  During attract mode display, pressing the service menu will allow you to
+  add a custom ad to scroll during attract mode display. Up to 120 characters
 
+*******************************************************************************
 
   Hardware Notes:
   --------------
@@ -55,9 +57,10 @@ Note: During attract mode display, pressing the service menu will allow you to
   - 1x 2x28 pins edge connector.
   - 1x 2x20 pins female connector.
 
+  - 2x pots to handle the B-G background color/intensity.
+
 
 *******************************************************************************
-
 
   --------------------
   ***  Memory Map  ***
@@ -75,7 +78,7 @@ Note: During attract mode display, pressing the service menu will allow you to
   $2800 - $2801   MC6845  ; MC6845 use $2800 for register addressing and $2801 for register values.
 
   $3000 - $3001   ?????   ; R/W. AY8910?
-  $3080 - $3083   ?????   ; R/W. PIA?
+  $3080 - $3083   MC6821  ; R/W. PIA
   $3800 - $3800   ?????   ; R.
 
   $4000 - $FFFF   ROM     ; ROM space.
@@ -122,9 +125,10 @@ Note: During attract mode display, pressing the service menu will allow you to
 
   TODO:
 
-  - Lamps layout.
-  - Improve colors.
+  - Find the way to clean the lamps writes.
+    (there are alternate writes that mess the lamps)
 
+  - Implement fake pots for B-G background color
 
 *******************************************************************************/
 
@@ -137,6 +141,7 @@ Note: During attract mode display, pressing the service menu will allow you to
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "miniboy7.lh"
 
 
 class miniboy7_state : public driver_device
@@ -295,6 +300,20 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 	// --x- ----    coins lockout
 	// -x-- ----    coins meter
 	// x--- ----    unused
+
+	data = data ^ 0xff;
+
+//    output_set_lamp_value(0, (data) & 1);         // [----x]
+//    output_set_lamp_value(1, (data >> 1) & 1);    // [---x-]
+//    output_set_lamp_value(2, (data >> 2) & 1);    // [--x--]
+//    output_set_lamp_value(3, (data >> 3) & 1);    // [-x---]
+//    output_set_lamp_value(4, (data >> 4) & 1);    // [x----]
+
+    coin_counter_w(machine(), 0, data & 0x40);    // counter
+
+//  popmessage("Out Lamps: %02x", data);
+ 	logerror("Out Lamps: %02x\n", data);
+
 }
 
 WRITE8_MEMBER(miniboy7_state::ay_pb_w)
@@ -418,7 +437,7 @@ static INPUT_PORTS_START( miniboy7 )
 	PORT_DIPSETTING(    0x08, "100000 300000" )
 	PORT_DIPSETTING(    0x00, "200000 300000" )
 
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )            PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x01, "Bartop" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x20, 0x20, "DSW2-6" )            PORT_DIPLOCATION("DSW2:6")
@@ -588,9 +607,9 @@ ROM_START( miniboy7a ) /* The term CREDIT has been changed to POINT is this vers
 	ROM_LOAD( "mb7_0.11d",   0x0000, 0x1000, CRC(84f78ee2) SHA1(c434e8a9b19ef1394b1dac67455f859eef299f95) )    /* text layer */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "mb7_1.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )
-	ROM_LOAD( "mb7_2.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )
-	ROM_LOAD( "mb7_3.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )
+	ROM_LOAD( "mb7_1.12d",   0x0000, 0x2000, CRC(5f3e3b93) SHA1(41ab6a42a41ddeb8b6b76f4d790bf9fb9e7c32a3) )  /* bitplane 1 */
+	ROM_LOAD( "mb7_2.13d",   0x2000, 0x2000, CRC(b3362650) SHA1(603907fd3a0049c0a3e1858c4329bf9fd58137f6) )  /* bitplane 2 */
+	ROM_LOAD( "mb7_3.14d",   0x4000, 0x2000, CRC(10c2bf71) SHA1(23a01625b0fc0b772054ee4bc026d2257df46a03) )  /* bitplane 3 */
 
 	ROM_REGION( 0x0200, "proms", ROMREGION_INVERT )    /* both bipolar PROMs are identical */
 	ROM_LOAD( "j.e7",   0x0000, 0x0100, CRC(4b66215e) SHA1(de4a8f1ee7b9bea02f3a5fc962358d19c7a871a0) ) /* N82S129N BPROM simply labeled J */
@@ -602,6 +621,6 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS  */
-GAME( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 1)", GAME_NO_COCKTAIL )
-GAME( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini Boy 7 (set 2)", GAME_NO_COCKTAIL )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT   ROT    COMPANY                     FULLNAME             FLAGS             LAYOUT
+GAMEL( 1983, miniboy7,  0,        miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 1)", GAME_NO_COCKTAIL, layout_miniboy7 )
+GAMEL( 1983, miniboy7a, miniboy7, miniboy7, miniboy7, driver_device, 0,     ROT0, "Bonanza Enterprises, Ltd", "Mini-Boy 7 (set 2)", GAME_NO_COCKTAIL, layout_miniboy7 )

@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+<!--
+		Mini-Boy 7 control panel
+		Written by Roberto Fresca.
+-->
+
+<!-- define button-lamps -->
+
+	<element name="button" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+		</rect>
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+
+<!-- define basic elements -->
+
+	<element name="cpanel">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="buttonedge" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.35" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</rect>
+	</element>
+
+
+<!-- define cpanel degradee elements -->
+
+	<element name="cpanel1">
+		<rect>
+			<color red="0.20" green="0.20" blue="0.20" />
+		</rect>
+	</element>
+
+	<element name="cpanel2">
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
+	</element>
+
+	<element name="cpanel3">
+		<rect>
+			<color red="0.10" green="0.10" blue="0.10" />
+		</rect>
+	</element>
+
+	<element name="cpanel4">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+
+<!-- define background -->
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel element="cpanel">
+			<bounds left="0" right="4" top="3" bottom="3.40" />
+		</bezel>
+
+		<bezel element="cpanel1">
+			<bounds left="0" right="4" top="3.01" bottom="3.39" />
+		</bezel>
+
+		<bezel element="cpanel2">
+			<bounds left="0" right="4" top="3.02" bottom="3.38" />
+		</bezel>
+
+		<bezel element="cpanel3">
+			<bounds left="0" right="4" top="3.03" bottom="3.37" />
+		</bezel>
+
+		<bezel element="cpanel4">
+			<bounds left="0" right="4" top="3.04" bottom="3.36" />
+		</bezel>
+
+		<bezel element="cpanel">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+		</bezel>
+
+
+<!-- define lamps -->
+
+		<bezel name="lamp0" element="buttonedge">
+			<bounds x="3.18" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp0" element="button">
+			<bounds x="3.20" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp1" element="buttonedge">
+			<bounds x="2.43" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp1" element="button">
+			<bounds x="2.45" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp2" element="buttonedge">
+			<bounds x="1.68" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp2" element="button">
+			<bounds x="1.70" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp3" element="buttonedge">
+			<bounds x="0.93" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp3" element="button">
+			<bounds x="0.95" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+		<bezel name="lamp4" element="buttonedge">
+			<bounds x="0.18" y="3.08" width="0.50" height="0.24" />
+		</bezel>
+		<bezel name="lamp4" element="button">
+			<bounds x="0.20" y="3.10" width="0.46" height="0.20" />
+		</bezel>
+
+
+	</view>
+</mamelayout>
