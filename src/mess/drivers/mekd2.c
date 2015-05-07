@@ -1,4 +1,4 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, Robbbert
 /******************************************************************************
     Motorola Evaluation Kit 6800 D2
