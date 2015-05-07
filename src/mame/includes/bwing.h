@@ -56,13 +56,9 @@ public:
 	int m_bwp3_nmimask;
 	int m_bwp3_u8F_d;
 
-	/* misc */
-	UINT8 *m_bwp123_membase[3];
-
 	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
 	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);
 	DECLARE_WRITE8_MEMBER(bwp3_nmiack_w);
-	DECLARE_READ8_MEMBER(bwp1_io_r);
 	DECLARE_WRITE8_MEMBER(bwp1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bwp2_ctrl_w);
 	DECLARE_WRITE8_MEMBER(spriteram_w);
@@ -85,11 +81,10 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	void bwing_postload();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri );
 	
 	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
-
-	void fix_bwp3(  );
 };

@@ -60,18 +60,6 @@ WRITE8_MEMBER(bwing_state::bwp3_nmiack_w)
 }
 
 
-READ8_MEMBER(bwing_state::bwp1_io_r)
-{
-	if (offset == 0) return(ioport("DSW0")->read());
-	if (offset == 1) return(ioport("DSW1")->read());
-	if (offset == 2) return(ioport("IN0")->read());
-	if (offset == 3) return(ioport("IN1")->read());
-	if (offset == 4) return(ioport("IN2")->read());
-
-	return((m_bwp123_membase[0])[0x1b00 + offset]);
-}
-
-
 WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 {
 	switch (offset)
@@ -130,14 +118,18 @@ WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
 
 // Main CPU
 static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8, bwing_state )
-	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(scrollreg_w)
+	AM_RANGE(0x1b00, 0x1b00) AM_READ_PORT("DSW0")
+	AM_RANGE(0x1b01, 0x1b01) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1b02, 0x1b02) AM_READ_PORT("IN0")
+	AM_RANGE(0x1b03, 0x1b03) AM_READ_PORT("IN1")
+	AM_RANGE(0x1b04, 0x1b04) AM_READ_PORT("IN2")
+	AM_RANGE(0x1b00, 0x1b07) AM_WRITE(scrollreg_w)
 	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0xffff) AM_ROM // "B-Wings US" writes to 9631-9632(debug?)
@@ -342,6 +334,8 @@ void bwing_state::machine_start()
 	save_item(NAME(m_bwp3_u8F_d));
 
 	save_item(NAME(m_sreg));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(bwing_state::bwing_postload), this));
 }
 
 void bwing_state::machine_reset()
@@ -352,6 +346,13 @@ void bwing_state::machine_reset()
 	m_bwp3_nmimask = 0;
 	m_bwp3_u8F_d = 0;
 }
+
+void bwing_state::bwing_postload()
+{
+	m_gfxdecode->gfx(2)->mark_all_dirty();
+	m_gfxdecode->gfx(3)->mark_all_dirty();
+}
+
 
 static MACHINE_CONFIG_START( bwing, bwing_state )
 
@@ -543,7 +544,7 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-void bwing_state::fix_bwp3(  )
+DRIVER_INIT_MEMBER(bwing_state,bwing)
 {
 	UINT8 *rom = memregion("audiocpu")->base();
 	int j = memregion("audiocpu")->bytes();
@@ -555,16 +556,6 @@ void bwing_state::fix_bwp3(  )
 	// relocate vectors
 	rom[j - (0x10 - 0x4)] = rom[j - (0x10 - 0xb)] = rom[j - (0x10 - 0x6)];
 	rom[j - (0x10 - 0x5)] = rom[j - (0x10 - 0xa)] = rom[j - (0x10 - 0x7)];
-}
-
-
-DRIVER_INIT_MEMBER(bwing_state,bwing)
-{
-	m_bwp123_membase[0] = memregion("maincpu")->base();
-	m_bwp123_membase[1] = memregion("sub")->base();
-	m_bwp123_membase[2] = memregion("audiocpu")->base();
-
-	fix_bwp3();
 }
 
 //****************************************************************************
