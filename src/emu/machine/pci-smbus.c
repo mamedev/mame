@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "pci-smbus.h"
 
 const device_type SMBUS = &device_creator<smbus_device>;

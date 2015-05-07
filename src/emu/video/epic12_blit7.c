@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #define REALLY_SIMPLE 0
 /* X-Flipped, Tinted, Non-Transparent */
 #define FLIPX 1

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 68307 TIMER module */
 // 2x timers
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
 // steppers.c steppermotor emulation                                     //

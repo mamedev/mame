@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "midi.h"
 
 const device_type MIDI_PORT = &device_creator<midi_port_device>;

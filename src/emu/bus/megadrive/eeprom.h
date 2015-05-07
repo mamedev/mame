@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MD_EEPROM_H
 #define __MD_EEPROM_H
 

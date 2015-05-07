@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_JY_H
 #define __NES_JY_H
 

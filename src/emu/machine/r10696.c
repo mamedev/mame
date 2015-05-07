@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Rockwell 10696 General Purpose Input/Output (I/O)

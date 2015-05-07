@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
  Sega 8-bit cart emulation (for Master System, GameGear and SG-1000)

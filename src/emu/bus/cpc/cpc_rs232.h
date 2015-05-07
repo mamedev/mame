@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * cpc_rs232.h
  *

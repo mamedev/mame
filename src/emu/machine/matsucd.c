@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Matsushita/Panasonic CDR521/522 type CDROM drive emulation

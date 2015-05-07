@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "jvsdev.h"
 #include "jvshost.h"
 

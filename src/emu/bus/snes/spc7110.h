@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SNS_SPC7110_H
 #define __SNS_SPC7110_H
 

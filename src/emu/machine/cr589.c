@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "cr589.h"
 
 

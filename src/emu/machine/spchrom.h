@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Voice Synthesis Memory
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
     Harris HC-55516 (and related) emulator

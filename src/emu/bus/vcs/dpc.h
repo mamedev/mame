@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __VCS_DCP_H
 #define __VCS_DCP_H
 

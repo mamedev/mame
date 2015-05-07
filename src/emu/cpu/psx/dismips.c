@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * standalone MIPS disassembler by smf
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 	/**************************************************************************\
 	*              Texas Instruments TMS320x25 DSP Disassembler                *
 	*                                                                          *

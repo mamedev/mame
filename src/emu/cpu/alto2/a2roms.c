@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
  *
  *   Xerox AltoII PROM loading and decoding

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "lpc-rtc.h"
 
 const device_type LPC_RTC = &device_creator<lpc_rtc_device>;

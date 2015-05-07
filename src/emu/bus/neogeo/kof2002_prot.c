@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "emu.h"
 #include "kof2002_prot.h"

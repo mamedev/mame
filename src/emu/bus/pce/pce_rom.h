@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __PCE_ROM_H
 #define __PCE_ROM_H
 

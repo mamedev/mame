@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Radius Full Page Display card for the Mac SE, assy # 632-0022-A1

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Hitachi HD63450 DMA Controller
 */

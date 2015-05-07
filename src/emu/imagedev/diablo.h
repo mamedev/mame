@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************
  *   DIABLO drive image to hard disk interface
  *

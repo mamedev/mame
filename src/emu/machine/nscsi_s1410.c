@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/nscsi_s1410.h"
 
 const device_type NSCSI_S1410 = &device_creator<nscsi_s1410_device>;

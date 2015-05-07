@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nl_util.h
  *

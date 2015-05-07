@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __FDC_PLL_H__
 #define __FDC_PLL_H__
 

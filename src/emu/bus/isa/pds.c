@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * isa_pds.c - Programmers Development System 8-bit ISA card
  *

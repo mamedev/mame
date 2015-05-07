@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NSCSI_S1410_H__
 #define __NSCSI_S1410_H__
 

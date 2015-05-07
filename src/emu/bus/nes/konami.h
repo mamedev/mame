@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NES_KONAMI_H
 #define __NES_KONAMI_H
 

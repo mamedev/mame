@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef NSCSI_CB_H
 #define NSCSI_CB_H
 

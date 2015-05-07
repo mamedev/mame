@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   a2eauxslot.h - Apple IIe auxiliary slot and card emulation

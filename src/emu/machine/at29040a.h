@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     ATMEL 29040a
 

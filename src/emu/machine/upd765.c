@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "debugger.h"
 
 #include "upd765.h"

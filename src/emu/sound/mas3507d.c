@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //
 // MAS 3507D MPEG audio decoder
 //

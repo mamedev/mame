@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************
  *
  *      Portable Signetics 2650 cpu emulation

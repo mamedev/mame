@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Nintendo Super Famicom - Yonezawa / PartyRoom 21 Twin Tap Controller

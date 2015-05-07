@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     MOS 6581/8580 Sound Interface Device emulation

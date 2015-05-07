@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   ISA 8/16 bit Creative Labs Sound Blaster Sound Card

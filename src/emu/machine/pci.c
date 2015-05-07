@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "pci.h"
 
 const device_type PCI_ROOT   = &device_creator<pci_root_device>;

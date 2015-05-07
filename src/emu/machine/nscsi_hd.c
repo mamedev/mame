@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/nscsi_hd.h"
 #include "imagedev/harddriv.h"
 

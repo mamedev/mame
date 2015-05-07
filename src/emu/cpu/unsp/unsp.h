@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************\
 *
 *   SunPlus u'nSP emulator

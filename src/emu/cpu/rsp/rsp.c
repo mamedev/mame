@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Nintendo/SGI Reality Signal Processor (RSP) emulator
 

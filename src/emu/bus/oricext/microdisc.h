@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MICRODISC_H__
 #define __MICRODISC_H__
 

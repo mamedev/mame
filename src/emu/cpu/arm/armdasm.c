@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     ARM 2/3 disassembler
 

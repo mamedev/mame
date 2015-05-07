@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * cpc_pds.h  --  CPC interface hardware for the Programmers Development System
  *

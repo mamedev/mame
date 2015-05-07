@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
   ES5503 - Ensoniq ES5503 "DOC" emulator v2.1.1

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Special case 'Really Simple' blitters, no blending, no tinting etc.*/
 
 #include "emu.h"

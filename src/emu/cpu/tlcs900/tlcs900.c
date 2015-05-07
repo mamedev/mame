@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************
 
 Toshiba TLCS-900/H emulation

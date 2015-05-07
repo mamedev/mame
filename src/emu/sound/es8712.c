@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************************************
  *
  *  Streaming single channel ADPCM core for the ES8712 chip

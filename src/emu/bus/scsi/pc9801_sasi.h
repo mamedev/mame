@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PC9801_SASI_H_
 #define PC9801_SASI_H_
 

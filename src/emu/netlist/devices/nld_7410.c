@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_7410.c
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
  *
  *   Xerox AltoII Dual J/K flip-flop 74109 emulation

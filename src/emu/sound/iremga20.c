@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************
 
 Irem GA20 PCM Sound Chip

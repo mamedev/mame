@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "null_modem.h"
 
 null_modem_device::null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

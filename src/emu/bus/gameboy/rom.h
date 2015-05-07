@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __GB_ROM_H
 #define __GB_ROM_H
 

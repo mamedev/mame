@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
   MB87078 6-bit,4-channel electronic volume controller emulator

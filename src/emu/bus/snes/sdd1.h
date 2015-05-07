@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SNS_SDD1_H
 #define __SNS_SDD1_H
 

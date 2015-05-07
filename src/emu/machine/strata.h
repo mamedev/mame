@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     strata.h: header file for strata.c
 */

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * svga_trident.h
  *

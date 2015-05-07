@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __JVSHOST_H__
 #define __JVSHOST_H__
 

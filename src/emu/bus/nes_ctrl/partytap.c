@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Nintendo Family Computer Yonezawa / PartyRoom 21 Party Tap Controller

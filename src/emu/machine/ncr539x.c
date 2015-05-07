@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * ncr539x.c
  *

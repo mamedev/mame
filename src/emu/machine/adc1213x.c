@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     National Semiconductor ADC12130 / ADC12132 / ADC12138

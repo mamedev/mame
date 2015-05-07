@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
  BS-X Satellaview cartridge emulation (for SNES/SFC)

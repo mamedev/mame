@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __VCS_COMPUMAT_H
 #define __VCS_COMPUMAT_H
 

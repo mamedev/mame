@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Couriersud, July 2014:
  *

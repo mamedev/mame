@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "nscsi_bus.h"
 
 const device_type NSCSI_BUS = &device_creator<nscsi_bus_device>;

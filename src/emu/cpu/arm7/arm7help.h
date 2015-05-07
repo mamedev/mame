@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* ARM7 core helper Macros / Functions */
 
 /* Macros that need to be defined according to the cpu implementation specific need */

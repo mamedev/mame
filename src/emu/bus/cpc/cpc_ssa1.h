@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * cpc_ssa1.h  --  Amstrad SSA-1 Speech Synthesiser, dk'Tronics Speech Synthesiser
  *

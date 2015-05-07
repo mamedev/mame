@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     TI TMS9927 and compatible CRT controller emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __RS232_KEYBOARD_H__
 #define __RS232_KEYBOARD_H__
 

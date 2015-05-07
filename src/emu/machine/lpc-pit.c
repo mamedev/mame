@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "lpc-pit.h"
 
 const device_type LPC_PIT = &device_creator<lpc_pit_device>;

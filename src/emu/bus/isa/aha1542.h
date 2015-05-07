@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
  *
  *    Adaptec AHA-1542{,C,CF} SCSI Controller

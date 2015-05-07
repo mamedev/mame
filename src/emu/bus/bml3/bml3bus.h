@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   bml3bus.h - Hitachi MB-6890 slot bus and card emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     uPD7227 Intelligent Dot-Matrix LCD Controller/Driver emulation

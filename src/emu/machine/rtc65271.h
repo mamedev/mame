@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     rtc65271.h: include file for rtc65271.c
 */

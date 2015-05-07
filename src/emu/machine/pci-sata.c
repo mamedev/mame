@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "pci-sata.h"
 
 const device_type SATA = &device_creator<sata_device>;

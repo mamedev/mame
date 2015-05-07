@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef ISA_DECTALK_H_
 #define ISA_DECTALK_H_
 

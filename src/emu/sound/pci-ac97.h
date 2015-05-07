@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PCI_AC97_H
 #define PCI_AC97_H
 

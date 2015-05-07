@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include <stdio.h>
 
 #define CF  0x100

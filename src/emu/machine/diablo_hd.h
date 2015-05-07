@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************
  *   DIABLO31 and DIABLO44 hard drive support
  *

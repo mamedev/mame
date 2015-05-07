@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
  Game Boy carts with MBC (Memory Bank Controller)

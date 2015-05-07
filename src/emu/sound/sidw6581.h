@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef WAVE6581_h
 #define WAVE6581_h
 

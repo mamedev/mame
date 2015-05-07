@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     m68kmmu.h - PMMU implementation for 68851/68030/68040
             HMMU implementation for 68020 (II and LC variants)

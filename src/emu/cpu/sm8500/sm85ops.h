@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #define ARG_R   r1 = mem_readbyte( m_PC++ );
 

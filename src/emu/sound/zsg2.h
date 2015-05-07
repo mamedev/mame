@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     ZOOM ZSG-2 custom wavetable synthesizer
 */

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __SSI2001__
 #define __SSI2001__
 

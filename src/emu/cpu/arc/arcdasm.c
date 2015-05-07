@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************\
 
  ARCtangent A4 disassembler

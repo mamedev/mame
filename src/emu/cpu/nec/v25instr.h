@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 const v25_common_device::nec_ophandler v25_common_device::s_nec_instruction[256] =
 {
 	&v25_common_device::i_add_br8,      /* 0x00 */

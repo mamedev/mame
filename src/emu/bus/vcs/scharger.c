@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
  Atari 2600 cart Starpath Supercharger (Cart + Tape drive!)

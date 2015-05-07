@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_9312.c
  *

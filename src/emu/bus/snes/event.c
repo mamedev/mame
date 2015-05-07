@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************************************************
 
  Super NES/Famicom Event cartridges emulation (for SNES/SFC)

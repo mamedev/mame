@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "vrc4373.h"
 
 #define LOG_NILE            (0)

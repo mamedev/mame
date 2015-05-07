@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Microtouch touch screen controller
 

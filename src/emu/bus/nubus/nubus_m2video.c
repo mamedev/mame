@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Apple Macintosh II Video Card (630-0153) emulation

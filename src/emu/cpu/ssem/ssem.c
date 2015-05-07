@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Manchester Small-Scale Experimental Machine (SSEM) emulator
 

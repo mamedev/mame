@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   a1bus.c - Apple I slot bus and card emulation

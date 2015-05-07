@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * nld_ms_direct.h
  *

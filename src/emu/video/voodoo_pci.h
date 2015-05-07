@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // 3dfx Voodoo Graphics SST-1/2 emulator.
 
 #ifndef VOODOO_PCI_H

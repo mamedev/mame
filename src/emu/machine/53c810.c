@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* LSI Logic LSI53C810A PCI to SCSI I/O Processor */
 
 #include "emu.h"

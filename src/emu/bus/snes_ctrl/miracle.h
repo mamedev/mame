@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Super Nintendo Entertainment System - Miracle Piano Keyboard

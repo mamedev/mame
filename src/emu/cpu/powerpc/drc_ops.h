@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 static const PPC_OPCODE ppcdrc_opcode_common[] =
 {
 	/*code  subcode         handler                 */

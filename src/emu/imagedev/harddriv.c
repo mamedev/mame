@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************
 
     Code to interface the image code with harddisk core.

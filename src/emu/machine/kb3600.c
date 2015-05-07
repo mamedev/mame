@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     General Instruments AY-5-3600 Keyboard Encoder emulation

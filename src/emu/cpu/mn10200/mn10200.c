@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Panasonic MN10200 emulator
 

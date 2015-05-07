@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // TMS320C82 Master Processor core execution
 
 #include "emu.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // psx multitap emulation
 
 #include "multitap.h"

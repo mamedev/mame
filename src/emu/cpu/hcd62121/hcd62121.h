@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __HCD62121_H__
 #define __HCD62121_H__
 

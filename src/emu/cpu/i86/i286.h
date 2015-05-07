@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef I286_H_
 #define I286_H_
 

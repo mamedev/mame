@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
 
     ay31015.c by Robbbert, May 2008. Bugs fixed by Judge.

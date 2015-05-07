@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Modern device for the MCF5206e Peripherals
  this can be hooked properly to the CPU once the CPU is a modern device too
 */

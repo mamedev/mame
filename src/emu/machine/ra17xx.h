@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Rockwell RA17xx (e.g. A1752, A1753) ROM, RAM and I/O chip

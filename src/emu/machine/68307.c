@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 68307 */
 
 #include "68307.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * ncr5380.h SCSI controller
  *

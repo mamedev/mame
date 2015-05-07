@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * E05A30 Gate Array (used in the Epson ActionPrinter 2000)
  *

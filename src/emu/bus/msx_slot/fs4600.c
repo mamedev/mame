@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Emulation for the internal firmware mapper in the National FS-4600.
 */

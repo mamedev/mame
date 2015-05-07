@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************
 
     NEC uPD7759/55/56/P56/57/58 ADPCM Speech Processor

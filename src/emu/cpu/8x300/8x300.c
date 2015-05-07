@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * 8x300.c
  *

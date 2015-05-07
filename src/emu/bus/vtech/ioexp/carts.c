@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     VTech Laser/VZ I/O Expansion Slot Devices

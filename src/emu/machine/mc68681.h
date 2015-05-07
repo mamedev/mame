@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _MC68681_H
 #define _MC68681_H
 

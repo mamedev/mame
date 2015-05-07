@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
   7474 positive-edge-triggered D-type flip-flop with preset, clear and

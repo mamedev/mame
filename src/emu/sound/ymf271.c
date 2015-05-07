@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Yamaha YMF271-F "OPX" emulator v0.1
     By R. Belmont.

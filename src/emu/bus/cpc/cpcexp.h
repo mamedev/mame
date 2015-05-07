@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * cpcexp.h  --  Amstrad CPC Expansion port
  *

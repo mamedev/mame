@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef MB8795_H
 #define MB8795_H
 

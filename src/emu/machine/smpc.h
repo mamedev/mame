@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // TODO: make separate device when code is decoupled better
 //DECLARE_WRITE8_MEMBER( stv_SMPC_w );
 //DECLARE_READ8_MEMBER( stv_SMPC_r );

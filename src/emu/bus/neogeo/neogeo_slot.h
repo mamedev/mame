@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NEOGEO_SLOT_H
 #define __NEOGEO_SLOT_H
 

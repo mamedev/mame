@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** m6805: Portable 6805 emulator ******************************************/
 
 #pragma once

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __INTV_ECS_H
 #define __INTV_ECS_H
 

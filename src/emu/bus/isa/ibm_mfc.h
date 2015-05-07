@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   ISA 8 bit IBM PC Music Feature Card

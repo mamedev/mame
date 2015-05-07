@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MSX_AUDIO_KB_H__
 #define __MSX_AUDIO_KB_H__
 

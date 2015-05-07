@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "t10sbc.h"
 
 void t10sbc::t10_start(device_t &device)

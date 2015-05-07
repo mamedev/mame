@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __GBA_SLOT_H
 #define __GBA_SLOT_H
 
