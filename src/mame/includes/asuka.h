@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)

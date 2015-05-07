@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
  *
  * Asteroids Analog Sound system interface

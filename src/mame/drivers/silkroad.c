@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* The Legend of Silk Road - Unico 1999 */
 
 /* Preliminary Driver by David Haywood */

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 
 class kaneko_view2_tilemap_device : public device_t

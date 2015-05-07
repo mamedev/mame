@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Pinball 2000
 

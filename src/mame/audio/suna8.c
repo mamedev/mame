@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     SunA 8 Bit Games samples
 

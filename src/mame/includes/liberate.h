@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class liberate_state : public driver_device
 {
 public:

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
 UPL "sprite framebuffer" hardware

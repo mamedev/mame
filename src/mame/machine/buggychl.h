@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class buggychl_mcu_device : public device_t
 {
 public:

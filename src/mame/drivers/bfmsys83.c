@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* BFM System 83 */
 
 #include "emu.h"

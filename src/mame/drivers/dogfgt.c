@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Acrobatic Dog-Fight / Batten O'hara no Sucha-Raka Kuuchuu Sen

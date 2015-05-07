@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Unknown Fruit Machine ROMs
 

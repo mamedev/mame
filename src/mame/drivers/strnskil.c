@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
 Strength & Skill (c) 1984 Sun Electronics

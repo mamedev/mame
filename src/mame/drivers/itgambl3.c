@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************
 
   Italian Gambling games based on Mitsubishi (Renesas) M16C MCU family.

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Super Eagle Shot
 (c)1994 Seta (distributed by Visco)

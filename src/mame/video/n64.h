@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _VIDEO_N64_H_
 #define _VIDEO_N64_H_
 

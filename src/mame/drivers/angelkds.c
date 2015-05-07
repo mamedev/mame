@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Angel Kids / Space Position hardware driver
 
  driver by David Haywood

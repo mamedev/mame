@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 void astyanax_rom_decode(running_machine &machine, const char *region);
 void phantasm_rom_decode(running_machine &machine, const char *region);
 void rodland_rom_decode (running_machine &machine, const char *region);

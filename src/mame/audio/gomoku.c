@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Gomoku sound driver (quick hack of the Wiping sound driver)

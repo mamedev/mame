@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class ms32_state : public driver_device
 {
 public:

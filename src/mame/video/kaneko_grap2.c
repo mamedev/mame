@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Kaneko GRAP2, RLE blitter / Framebuffer etc.? */
 
 

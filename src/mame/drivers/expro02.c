@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
    Kaneko EXPRO-02 board

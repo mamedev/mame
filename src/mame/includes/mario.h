@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef MARIO_H_
 #define MARIO_H_
 

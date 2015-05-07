@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  'Swinging Singles' by Ent. Ent. Ltd
  driver by Tomasz Slanina

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Target Hits (c) 1994 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)

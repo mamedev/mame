@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/namco.h"
 
 class namcos86_state : public driver_device

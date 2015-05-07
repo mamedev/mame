@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************
  *
  * machine/konamigx.c - contains various System GX hardware abstractions

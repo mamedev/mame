@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
    Tumblepop Video emulation - Bryan McPhail, mish@tendril.co.uk

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Galaxia
 
 Galaxia by Zaccaria (1979)

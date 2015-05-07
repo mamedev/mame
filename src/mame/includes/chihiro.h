@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * geforce 3d (NV2A) vertex program disassembler
  */

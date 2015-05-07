@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Fast Freddie/Jump Coaster hardware

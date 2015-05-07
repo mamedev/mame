@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
  Enerdyne Technologies Inc. (El Cajon, CA 92020) hardware

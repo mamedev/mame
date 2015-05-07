@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/bankdev.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k052109.h"

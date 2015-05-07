@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     P's Attack
     using VRender0 System on a Chip

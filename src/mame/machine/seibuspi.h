@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 UINT32 partial_carry_sum32(UINT32 add1,UINT32 add2,UINT32 carry_mask);
 
 void seibuspi_text_decrypt(UINT8 *rom);

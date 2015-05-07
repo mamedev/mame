@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************
 
     Kaneko Pandora Sprite Chip

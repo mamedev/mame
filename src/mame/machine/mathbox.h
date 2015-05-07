@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * mathbox.h: math box simulation (Battlezone/Red Baron/Tempest)
  *

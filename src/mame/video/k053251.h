@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #pragma once
 #ifndef __K053251_H__
 #define __K053251_H__

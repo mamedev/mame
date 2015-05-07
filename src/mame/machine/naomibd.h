@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _NAOMIBD_H_
 #define _NAOMIBD_H_
 

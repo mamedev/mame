@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  sp.ACE system by ACE
  based roughly on the Mach2000 hardware used by Castle

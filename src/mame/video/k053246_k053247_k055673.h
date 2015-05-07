@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* */
 
 /* todo: remove code from header, linker starts throwing silly messages when I try due to the templates.. make sense of them */

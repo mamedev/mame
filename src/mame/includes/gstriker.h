@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __GSTRIKER_H
 #define __GSTRIKER_H
 

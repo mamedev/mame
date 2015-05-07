@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/nvram.h"
 #include "sound/msm5205.h"
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************
 
   MEYCO 8080 BASED GAMBLING HARDWARE

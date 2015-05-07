@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Raiden 2 Sprite Decryption */
 
 #include "emu.h"

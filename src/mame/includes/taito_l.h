@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/msm5205.h"
 #include "sound/2203intf.h"
 

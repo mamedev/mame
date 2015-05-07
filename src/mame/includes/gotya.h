@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/samples.h"
 
 class gotya_state : public driver_device

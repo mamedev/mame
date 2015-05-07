@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Video Hardware for Championship V'ball by Paul Hampson

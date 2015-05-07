@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
   Functions to emulate video hardware on these Taito games:
 

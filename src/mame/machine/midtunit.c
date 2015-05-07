@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Driver for Midway T-unit games.

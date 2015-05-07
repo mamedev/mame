@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* MPU4 sets from various other manufactuers which appear to be based off unique code / behaviors (no barcrest headers etc.) */
 
 #include "emu.h"

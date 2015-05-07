@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     The Main Event / Devastators

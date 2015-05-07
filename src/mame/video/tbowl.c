@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* video/tbowl.c */
 
 /* see drivers/tbowl.c for more info */

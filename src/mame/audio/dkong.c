@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/nes_apu.h"

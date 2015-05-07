@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Konami Gambling Games ("Tasman" hardware)
   System GX derivative

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/samples.h"
 #include "video/tms9927.h"
 

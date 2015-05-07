@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
    Taito F3 Video emulation - Bryan McPhail, mish@tendril.co.uk

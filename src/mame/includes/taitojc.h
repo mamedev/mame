@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/poly.h"
 #include "machine/taitoio.h"
 

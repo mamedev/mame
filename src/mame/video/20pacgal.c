@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Ms.Pac-Man/Galaga - 20 Year Reunion hardware

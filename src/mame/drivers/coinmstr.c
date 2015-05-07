@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*==================================================================================
 
   Coinmaster trivia and poker games.

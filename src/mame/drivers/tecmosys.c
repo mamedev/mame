@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Tecmo System
  Driver by Farfetch, David Haywood & Tomasz Slanina
  Protection simulation by nuapete

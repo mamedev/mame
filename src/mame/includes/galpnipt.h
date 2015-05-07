@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     Input port macros used by games in the galpanic.c driver

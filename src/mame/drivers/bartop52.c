@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Atari Bartop 5200 prototype system
 

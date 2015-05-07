@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/nvram.h"
 
 class seicross_state : public driver_device

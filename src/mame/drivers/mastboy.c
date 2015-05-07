@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Master Boy - Gaelco (c)1991
 

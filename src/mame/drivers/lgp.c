@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Taito Laser Grand Prix laserdisc hardware
 Driver by Andrew Gardner with help from Daphne Source

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Acorn Archimedes VIDC (VIDeo Controller) emulation

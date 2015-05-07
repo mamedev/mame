@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     (Some) Data East 32 bit 156 CPU ARM based games:
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************************
 
     Maygay M1 A/B driver, (under heavy construction !!!)

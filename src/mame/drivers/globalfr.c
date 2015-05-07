@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
   Global Games 'Stealth' Hardware

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/decobsmt.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"

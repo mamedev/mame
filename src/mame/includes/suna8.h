@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/samples.h"
 
 #define TILEMAPS 0

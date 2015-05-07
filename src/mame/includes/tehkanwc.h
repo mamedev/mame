@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/msm5205.h"
 
 class tehkanwc_state : public driver_device

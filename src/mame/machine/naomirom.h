@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _NAOMIROM_H_
 #define _NAOMIROM_H_
 

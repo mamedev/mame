@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * wpcsnd.h - Williams WPC pinball sound
  *

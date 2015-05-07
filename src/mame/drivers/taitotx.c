@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Taito Type X Skeleton
  - PC based platforms
 

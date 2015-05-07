@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class tiamc1_state : public driver_device
 {

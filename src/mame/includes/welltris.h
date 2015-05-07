@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/vsystem_spr2.h"
 
 class welltris_state : public driver_device

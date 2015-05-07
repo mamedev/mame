@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/upd7759.h"
 
 class snk68_state : public driver_device

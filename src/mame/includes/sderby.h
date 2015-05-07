@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class sderby_state : public driver_device
 {
 public:

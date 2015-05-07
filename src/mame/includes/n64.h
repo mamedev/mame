@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _INCLUDES_N64_H_
 #define _INCLUDES_N64_H_
 

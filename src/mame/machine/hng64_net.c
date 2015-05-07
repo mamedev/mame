@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* HNG64 Communication / Network CPU */
 
 // this is driven by a KL5C80A12CFP which is basically a super-charged Z80

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
 

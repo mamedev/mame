@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Konami GV System (aka "Baby Phoenix") - Arcade PSX Hardware

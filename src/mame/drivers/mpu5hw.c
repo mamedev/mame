@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* MPU5 hardware emulation */
 
 /* This file contains the hardware emulation, the mpu5.c contains the set listings */

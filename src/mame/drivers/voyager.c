@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************************
 
 Star Trek Voyager (c) 2002 Team Play, Inc. / Game Refuge / Monaco Entertainment

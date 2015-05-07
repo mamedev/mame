@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************
  * Mystic Warrior (c) 1993 Konami
  * Metamorphic Force (c) 1993 Konami

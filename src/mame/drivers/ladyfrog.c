@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Lady Frog (c) 1990 Mondial Games
 (there's  "(c) Alfa Tecnology" in the ROM)

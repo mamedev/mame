@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
  *  Twin Cobra                                                              *
  *  Communications and memory functions between shared CPU memory spaces    *

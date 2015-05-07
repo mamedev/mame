@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/buggychl.h"
 
 class bking_state : public driver_device

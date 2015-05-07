@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Deco 156 analysis
 
  Data East chip 156 is an encrypted ARM processor.

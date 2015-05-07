@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************
  *
  *  Williams Multigame (6-game version) driver, by Robbbert,

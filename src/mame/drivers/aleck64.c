@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 'Aleck64' and similar boards */
 /* N64 based hardware */
 /*

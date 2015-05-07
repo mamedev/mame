@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
 

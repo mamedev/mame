@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MAPLE_DC_H__
 #define __MAPLE_DC_H__
 

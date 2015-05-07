@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 

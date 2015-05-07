@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/m72.h"
 
 class m90_state : public driver_device

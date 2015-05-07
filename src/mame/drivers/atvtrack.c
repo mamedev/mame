@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   ATV Track
   (c)2002 Gaelco

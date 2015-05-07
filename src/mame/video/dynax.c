@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     The CPU controls a video blitter that can read data from the ROMs

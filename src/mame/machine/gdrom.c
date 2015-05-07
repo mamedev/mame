@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
  gdrom.c - Implementation of the Sega GD-ROM device

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Kick Goal - video */
 
 #include "emu.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/msm5205.h"
 
 class splash_state : public driver_device

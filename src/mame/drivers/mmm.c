@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Early Maygay HW
  I believe this is 'Triple M' or 'MMM' hardware
 

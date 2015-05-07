@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* paint & puzzle */
 /* video is standard VGA */
 /*

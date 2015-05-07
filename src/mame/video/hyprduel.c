@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* based on driver from video/metro.c by Luca Elia */
 /* modified by Hau */

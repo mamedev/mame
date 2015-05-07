@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
    Desert Assault Video emulation - Bryan McPhail, mish@tendril.co.uk

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Pocket Gal                      (c) 1987 Data East Corporation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
   Sega encryption emulation                                 by Nicola Salmoria

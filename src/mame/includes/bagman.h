@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/tms5110.h"
 
 class bagman_state : public driver_device

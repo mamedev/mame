@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
  Shadow Force (c)1993 Technos
  Preliminary Driver by David Haywood

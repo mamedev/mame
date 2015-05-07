@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
    Crude Buster Video emulation - Bryan McPhail, mish@tendril.co.uk

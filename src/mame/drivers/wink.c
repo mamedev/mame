@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Wink    -   (c) 1985 Midcoin
 

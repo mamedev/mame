@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Thunder Ceptor board
  *  (C) 1986 Namco

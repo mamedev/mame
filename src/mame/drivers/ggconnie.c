@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
 
     Go! Go! Connie chan Jaka Jaka Janken

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Gumbo - Miss Bingo - Miss Puzzle

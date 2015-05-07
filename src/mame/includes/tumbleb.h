@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "video/decospr.h"
 #include "sound/okim6295.h"

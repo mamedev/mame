@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class nova2001_state : public driver_device
 {
 public:

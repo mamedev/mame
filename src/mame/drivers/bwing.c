@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
 B-Wings  (c) 1984 Data East Corporation

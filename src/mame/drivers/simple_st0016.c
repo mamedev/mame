@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************
 
   Seta custom ST-0016 chip based games.

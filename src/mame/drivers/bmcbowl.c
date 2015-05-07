@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 BMC Bowling (c) 1994.05 BMC, Ltd
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**
  * @file namcos21.h
  */

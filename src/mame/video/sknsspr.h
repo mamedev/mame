@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class sknsspr_device : public device_t,
 							public device_video_interface

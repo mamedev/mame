@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
    Dinamic / Inder arcade hardware
 

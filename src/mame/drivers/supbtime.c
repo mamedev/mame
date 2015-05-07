@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Super Burger Time     (c) 1990 Data East Corporation (DE-0343)

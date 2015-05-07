@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 ---------------------------
 Marine Date by TAITO (1981)

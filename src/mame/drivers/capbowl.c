@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Coors Light Bowling/Bowl-O-Rama hardware

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Taito TC0280GRD
 Taito TC0430GRW

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * Signetics 2650 CPU Games
  *

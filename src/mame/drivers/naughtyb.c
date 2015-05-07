@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Naughty Boy driver by Sal and John Bugliarisi.

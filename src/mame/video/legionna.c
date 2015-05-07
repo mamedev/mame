@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Legionnaire / Heated Barrel video hardware (derived from D-Con)

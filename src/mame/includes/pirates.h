@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 

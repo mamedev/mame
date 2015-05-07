@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
   Limenko Power System 2

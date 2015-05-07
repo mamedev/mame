@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************************
 
     AWP Hardware video simulation system

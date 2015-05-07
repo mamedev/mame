@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
  Seibu Cop (Co-Processor) emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TC0180VCU_H__
 #define __TC0180VCU_H__
 

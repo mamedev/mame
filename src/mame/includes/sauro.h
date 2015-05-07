@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "sound/sp0256.h"
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class taotaido_state : public driver_device
 {
 public:

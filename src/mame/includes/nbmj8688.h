@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/hd61830.h"
 #include "includes/nb1413m3.h"
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/m72.h"
 
 class shisen_state : public driver_device

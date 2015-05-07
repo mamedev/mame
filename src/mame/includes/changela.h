@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 
 class changela_state : public driver_device

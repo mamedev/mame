@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __NAMCOIO_H__
 #define __NAMCOIO_H__
 

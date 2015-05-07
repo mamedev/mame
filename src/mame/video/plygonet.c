@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Polygonet Commanders (Konami, 1993)
 

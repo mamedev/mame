@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "iteagle_fpga.h"
 #include "coreutil.h"
 

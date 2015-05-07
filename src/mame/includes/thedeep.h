@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/decmxc06.h"
 
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Sega Compression (and possibly encryption) device
 
     315-5838 - Decathlete (ST-V)

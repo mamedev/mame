@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
 

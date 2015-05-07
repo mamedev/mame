@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 To Do:
 - redump COP420 internal ROM

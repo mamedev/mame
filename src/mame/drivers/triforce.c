@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Triforce Skeleton
  -- split from Naomi.c
 

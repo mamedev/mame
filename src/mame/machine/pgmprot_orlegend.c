@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************
  PGM ASIC3 PGM protection emulation
 

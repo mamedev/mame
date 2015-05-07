@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
 Data East machine functions - Bryan McPhail, mish@tendril.co.uk

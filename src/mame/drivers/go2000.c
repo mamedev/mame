@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Go 2000 - Korean Card game

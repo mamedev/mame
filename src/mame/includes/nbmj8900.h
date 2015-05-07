@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "includes/nb1413m3.h"
 
 class nbmj8900_state : public driver_device

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _AWBOARD_H_
 #define _AWBOARD_H_
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     United Amusements PC-Engine based hardware

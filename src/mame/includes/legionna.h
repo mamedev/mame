@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/okim6295.h"
 #include "audio/seibu.h"
 #include "machine/raiden2cop.h"

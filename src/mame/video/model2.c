@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************************************************************************
 
     Sega Model 2 Geometry Engine and 3D Rasterizer Emulation

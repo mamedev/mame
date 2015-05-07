@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
    Vapour Trail Video emulation - Bryan McPhail, mish@tendril.co.uk

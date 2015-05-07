@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class jaleco_blend_device : public device_t
 {
 public:

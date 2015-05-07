@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
   CAT702 ZN security chip

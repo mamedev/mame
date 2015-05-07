@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _IGS036CRYPT_H_
 #define _IGS036CRYPT_H_
 

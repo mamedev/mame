@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class news_state : public driver_device
 {

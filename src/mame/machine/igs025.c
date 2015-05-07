@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
  IGS025 is some kind of state machine / logic device which the game

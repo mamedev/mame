@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/samples.h"
 class tankbatt_state : public driver_device
 {

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Konami 'ZR107' Hardware
     Konami, 1995-1996

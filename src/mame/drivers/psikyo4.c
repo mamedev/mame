@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*----------------------------------------------------------------
    Psikyo PS4 SH-2 Based Systems
    driver by David Haywood (+ Paul Priest)

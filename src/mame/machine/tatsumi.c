@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "includes/tatsumi.h"
 #include "sound/2151intf.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Driver by Jarek Burczynski, started by Tomasz Slanina  dox@space.pl

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************
 
     Data East Side Pocket hardware

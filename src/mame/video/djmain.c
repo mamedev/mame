@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Beatmania DJ Main Board (GX753)
  *  emulate video hardware

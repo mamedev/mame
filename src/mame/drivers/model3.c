@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Sega Model 3
     PowerPC 603e + tilemaps + Real3D 1000 + 68000 + 2x SCSP

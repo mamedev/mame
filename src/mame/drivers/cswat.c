@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Namco Cosmoswat, a lightgun game that uses a projector and a bunch of

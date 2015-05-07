@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifdef MAME_DEBUG
 #define LOGLEVEL  5
 #else

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************/
 /*                                                           */
 /* Lazer Command video handler                               */

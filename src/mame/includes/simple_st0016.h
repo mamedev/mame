@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "machine/st0016.h"
 

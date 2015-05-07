@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 macs.c - Multi Amenity Cassette System

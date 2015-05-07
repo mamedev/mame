@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/eepromser.h"
 #include "video/k053936.h"
 #include "cpu/dsp56k/dsp56k.h"

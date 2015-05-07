@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 ADP (Merkur?) games from '90 running on similar hardware.

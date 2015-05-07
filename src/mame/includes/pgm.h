@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "machine/v3021.h"
 #include "cpu/z80/z80.h"

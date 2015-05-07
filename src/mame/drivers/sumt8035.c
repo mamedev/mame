@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Summit Coin - 8035 hardware

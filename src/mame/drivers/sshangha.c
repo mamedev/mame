@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   Super Shanghai Dragon's Eye             (c) 1992 Hot-B

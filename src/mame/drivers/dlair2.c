@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Skeleton driver for Dragon's Lair II: Time Warp

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Konami Viper Hardware Overview (last updated 5th June 2011 10:56pm)

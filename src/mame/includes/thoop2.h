@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class thoop2_state : public driver_device
 {
 public:

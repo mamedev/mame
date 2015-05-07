@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/warpwarp.h"
 
 class warpwarp_state : public driver_device

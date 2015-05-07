@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "video/fuukifg.h"
 
 /* Define clocks based on actual OSC on the PCB */

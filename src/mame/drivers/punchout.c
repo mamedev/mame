@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Punch Out / Super Punch Out / Arm Wrestling

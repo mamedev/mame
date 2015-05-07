@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /******************************************************************************************
 
 Seibu Mahjong games (distributed by Tecmo)

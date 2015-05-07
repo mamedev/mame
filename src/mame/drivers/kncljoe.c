@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Knuckle Joe - (c) 1985 Seibu Kaihatsu ( Taito License )

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Data East Sprite Chip
    DECO 52
 

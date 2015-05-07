@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 // currently used by gstriker.c, apparently inufuku uses the same chip
 

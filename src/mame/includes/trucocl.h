@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/dac.h"
 
 class trucocl_state : public driver_device

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 Super Poker (IGS)
 Driver by Mirko Buffoni

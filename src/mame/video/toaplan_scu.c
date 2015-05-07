@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Toaplan Sprite Controller 'SCU'
  used by video/twincobr.c (including wardner)
  and rallybik in toaplan1.c

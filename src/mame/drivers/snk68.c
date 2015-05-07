@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     POW - Prisoners Of War (US version 1)    A7008   SNK 1988

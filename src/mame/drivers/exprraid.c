@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Express Raider - (c) 1986 Data East Corporation / Data East USA

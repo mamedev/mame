@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   - BG layer 32x128 , 8x8 tiles 4bpp , 2 palettes  (2nd is black )

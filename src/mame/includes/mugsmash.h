@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class mugsmash_state : public driver_device
 {

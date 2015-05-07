@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Bellfruit BD1 VFD module interface and emulation by J.Wallace

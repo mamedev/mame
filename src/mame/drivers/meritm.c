@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Merit CRT-250 and CRT-260 hardware
 

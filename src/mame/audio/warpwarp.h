@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class geebee_sound_device : public device_t,
 									public device_sound_interface
 {

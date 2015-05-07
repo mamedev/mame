@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Free Kick  - (c) 1987 Sega / Nihon System (made by Nihon, licensed to Sega)

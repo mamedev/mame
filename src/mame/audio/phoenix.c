@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
  *
  * Phoenix sound hardware simulation - still very ALPHA!

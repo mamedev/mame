@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 class mcatadv_state : public driver_device
 {

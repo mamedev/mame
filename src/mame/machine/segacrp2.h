@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 void sega_315_5162_decode(running_machine &machine, const char *cputag);
 void sega_315_5177_decode(running_machine &machine, const char *cputag);
 void sega_315_5178_decode(running_machine &machine, const char *cputag);

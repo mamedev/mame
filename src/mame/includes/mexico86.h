@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/2203intf.h"
 
 class mexico86_state : public driver_device

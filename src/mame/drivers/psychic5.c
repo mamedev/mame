@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************
  *** PSYCHIC 5 hardware ***     (by Roberto Ventura)
  **************************

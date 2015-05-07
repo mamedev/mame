@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************
 
 Libble Rabble (c) 1983 Namco

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
  *
  * Sound hardware for Pleiades, Naughty Boy and Pop Flamer.
