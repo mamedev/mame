@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #ifndef __TERMINAL_H__
 #define __TERMINAL_H__
 
