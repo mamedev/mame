@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************************
 
     Rockwell 10696 General Purpose Input/Output (I/O)

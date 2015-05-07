@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, Frank Palazzolo, Sean Riddle
 /******************************************************************
  *
  *  Fairchild Channel F driver

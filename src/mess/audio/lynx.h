@@ -1,5 +1,6 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:PeT
+
 #ifndef __LYNXSOUND_H__
 #define __LYNXSOUND_H__
 

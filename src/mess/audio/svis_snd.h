@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:PeT
 /*****************************************************************************
  *
  *  svis_snd.h

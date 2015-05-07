@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************************
 
     Rockwell 10788 General Purpose Keyboard and Display circuit

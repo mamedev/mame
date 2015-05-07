@@ -1,10 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /*************************************************************************
  *
  *      Portable Signetics 2650 cpu emulation
- *
- *      Written by Juergen Buchmueller for use with MAME
  *
  *  Version 1.2
  *  - changed to clock cycle counts from machine cycles

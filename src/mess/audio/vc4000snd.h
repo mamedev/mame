@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:PeT
 /*****************************************************************************
  *
  * includes/vc4000snd.h

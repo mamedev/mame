@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
 /***************************************************************************
 
     mac.c

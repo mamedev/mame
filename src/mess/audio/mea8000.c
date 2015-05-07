@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Antoine Mine
 /**********************************************************************
 
   Copyright (C) Antoine Mine' 2006

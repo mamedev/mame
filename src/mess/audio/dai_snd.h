@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Krzysztof Strzecha
 /*****************************************************************************
  *
  * dai_snd.h

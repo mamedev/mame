@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************************
 
     Rockwell RA17xx (e.g. A1752, A1753) ROM, RAM and I/O chip
