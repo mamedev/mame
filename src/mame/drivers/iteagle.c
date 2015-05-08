@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders: R. Belmont
 /***************************************************************************
 
     Incredible Technologies "Eagle" hardware
@@ -7,7 +7,6 @@
     by Ted Green & R. Belmont
 
     Known games on this hardware and their security chip IDs:
-        * ITVP-1     (c) 1998     Virtual Pool (not on IT's website master list)
         * E2-LED0    (c) 2000     Golden Tee Fore!
         * E2-BBH0    (c) 2000     Big Buck Hunter
         * G42-US-U   (c) 2001     Golden Tee Fore! 2002
@@ -19,12 +18,12 @@
         * G45-US-U   (c) 2004     Golden Tee Fore! 2005
         * CW-US-U    (c) 2005     Big Buck Hunter: Call of the Wild
         * G4C-US-U   (c) 2006     Golden Tee Complete
+        * ????????   (c) ????     Virtual Pool (not on IT's website master list but known to exist)
 
     Valid regions: US = USA, CAN = Canada, ENG = England, EUR = Euro, SWD = Sweden, AUS = Australia, NZ  = New Zealand, SA  = South Africa
 
     Note:
         Golden Tee Fore! 2004 & Golden Tee Fore! 2005 had updates called "Extra" that installed 2 additional courses.
-         It's unknown if the Extra version required a different security chip or simply validation with IT's servers.
         There are "8-meg" versions of Big Buck Hunter: Call of the Wild to upgrade Eagle PCBs with only 8 megs of main
          memory. This was common for the earlier Big Buck Hunter series. The security chip is labeled CW-US-8
 
@@ -42,12 +41,7 @@
 		* Add support for later RED boards
 
 	Notes:
-		Sound volume may be muted, it can be adjusted through the service menu
-		
-	    Missing the original Golden Tee Fore! & Golden Tee Fore! 2002
-		Current images come from versions that have been updated from
-		previous versions. Each upgrade procedure adds a new file system
-		partition to the hard drive.
+		Sound volume may be muted, it can be adjusted through the service menu or with volume up/down buttons (+/-)
 
 		The PCB for Virtual Pool is considered "Eagle 1" while the boards
 		that were production runs for later games are considered Eagle 2.
@@ -128,33 +122,7 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
-
-	// gtfore / gtfore02 don't boot without this, wrong key? other security?
-	// causes checksum error but boots for now
-	TIMER_CALLBACK_MEMBER( hack_timer );
-	emu_timer   *m_hack_timer;
-	int m_hackaddr;
-	DECLARE_DRIVER_INIT(gtfore02);
-	DECLARE_DRIVER_INIT(gtfore);
-
 };
-
-
-TIMER_CALLBACK_MEMBER(iteagle_state::hack_timer)
-{
-	m_hack_timer->adjust(attotime::from_hz(60));
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT32 result = space.read_dword(m_hackaddr-4);
-
-	if (result == 0x90840000)
-	{
-		space.write_dword(m_hackaddr-4, 0x90850000);
-		space.write_dword(m_hackaddr, 0x90840000);
-	}
-}
-
-
 
 void iteagle_state::machine_start()
 {
@@ -170,7 +138,7 @@ void iteagle_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( gtfore, iteagle_state )
+static MACHINE_CONFIG_START( iteagle, iteagle_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
@@ -195,6 +163,76 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_SCREEN_UPDATE_DEVICE(":pci:09.0", voodoo_pci_device, screen_update)
 
 
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gtfore01, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000401, 0x0b0b0b)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0401, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gtfore02, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000402, 0x020201)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0402, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gtfore03, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000403, 0x0a0b0a)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0403, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gtfore04, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000404, 0x0a020b)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0404, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gtfore05, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000405, 0x0b0a0c)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0405, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( gtfore06, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000406, 0x0c0b0d)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0406, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( carnking, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000603, 0x0c0b0d)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bbhsc, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x02000201, 0x0c0a0a)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0201, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bbhcotw, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x02000603, 0x080704)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0603, 0x7);
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( virtpool, iteagle )
+	MCFG_DEVICE_MODIFY(":pci:06.0")
+	MCFG_ITEAGLE_FPGA_INIT(0x01000202, 0x0c0b0d)
+	MCFG_DEVICE_MODIFY(":pci:0a.0")
+	MCFG_ITEAGLE_EEPROM_INIT(0x0202, 0x7);
 MACHINE_CONFIG_END
 
 
@@ -244,86 +282,29 @@ static INPUT_PORTS_START( iteagle )
 	PORT_DIPSETTING(0x4000, "High" )
 	PORT_DIPSETTING(0x0000, "Not Detected" )
 
-	PORT_START("TRACKX1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("TRACKY1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0000, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0000, "MAJOR" )
-	PORT_DIPNAME( 0x000F, 0x0000, "SIMM" )
-
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( gtfore )
 	PORT_INCLUDE(iteagle)
 
-	PORT_MODIFY("TRACKX1")
+	PORT_START("TRACKX1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 
-	PORT_MODIFY("TRACKY1")
+	PORT_START("TRACKY1")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0010, "MAJOR" ) /* Assumes original GT Fore! is 0x0010 */
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore02 )
-	PORT_INCLUDE(gtfore)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0020, "MAJOR" )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore03 )
-	PORT_INCLUDE(gtfore)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore04 )
-	PORT_INCLUDE(gtfore)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0040, "MAJOR" )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore05 )
-	PORT_INCLUDE(gtfore)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0050, "MAJOR" )
-
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( gtfore06 )
-	PORT_INCLUDE(gtfore)
-
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0060, "MAJOR" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( carnking )
 	PORT_INCLUDE(iteagle)
 
-	PORT_MODIFY("VERSION")
-	PORT_DIPNAME( 0x0F00, 0x0600, "GAME" )
-	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
+	PORT_START("TRACKX1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("TRACKY1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
@@ -394,7 +375,7 @@ ROM_START( carnking ) /* REQUIRES a "RED" board, will NOT work with earlier gree
 	DISK_IMAGE( "carnival_king_v_1.00.11", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) ) /* Labeled Carnival King V 1.00.11 */
 ROM_END
 
-ROM_START( gtfore )
+ROM_START( gtfore01 )
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -518,7 +499,6 @@ ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
-//	ROM_LOAD( "cw-us-8.u53.hex", 0x0000, 0x1490, CRC(bd435ca0) SHA1(6e956f71b7c95ab172686228983f4e5ce6218271) )
 	ROM_LOAD( "cw-us-8.u53", 0x0000, 0x0880, CRC(c5234b58) SHA1(fb47b2233147a3f633f01edebef9994c358bd162) )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
@@ -531,35 +511,19 @@ ROM_END
  *
  *************************************/
 
- 
-DRIVER_INIT_MEMBER(iteagle_state,gtfore02)
-{
-	m_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iteagle_state::hack_timer),this));
-	m_hack_timer->adjust(attotime::from_hz(60));
-	m_hackaddr = 0x02077720;
-}
-
-DRIVER_INIT_MEMBER(iteagle_state,gtfore)
-{
-	m_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iteagle_state::hack_timer),this));
-	m_hack_timer->adjust(attotime::from_hz(60));
-	m_hackaddr = 0x206d9a0;
-}
-	
-
-GAME( 2000, iteagle,            0, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1998, virtpool,     iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", GAME_NOT_WORKING )
-GAME( 2002, carnking,     iteagle, gtfore, carnking,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING )
-GAME( 2002, gtfore,       iteagle, gtfore,   gtfore,  iteagle_state, gtfore, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2002, gtfore02,     iteagle, gtfore, gtfore02,  iteagle_state, gtfore02, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2002, gtfore03,     iteagle, gtfore, gtfore03,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2002, gtfore03a,   gtfore03, gtfore, gtfore03,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2003, gtfore04,     iteagle, gtfore, gtfore04,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2003, gtfore04a,   gtfore04, gtfore, gtfore04,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2004, gtfore05,     iteagle, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2004, gtfore05a,   gtfore05, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2004, gtfore05b,   gtfore05, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2004, gtfore05c,   gtfore05, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2005, gtfore06,     iteagle, gtfore, gtfore06,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2002, bbhsc,        iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 2006, bbhcotw,      iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Call of the Wild (v3.02.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, iteagle,          0,  iteagle,  iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1998, virtpool,   iteagle,  virtpool, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", GAME_NOT_WORKING )
+GAME( 2002, carnking,   iteagle,  carnking, carnking, driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING )
+GAME( 2000, gtfore01,   iteagle,  gtfore01, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", 0 )
+GAME( 2001, gtfore02,   iteagle,  gtfore02, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", 0 )
+GAME( 2002, gtfore03,   iteagle,  gtfore03, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", 0 )
+GAME( 2002, gtfore03a,  gtfore03, gtfore03, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", 0 )
+GAME( 2003, gtfore04,   iteagle,  gtfore04, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", 0 )
+GAME( 2003, gtfore04a,  gtfore04, gtfore04, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", 0 )
+GAME( 2004, gtfore05,   iteagle,  gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", 0 )
+GAME( 2004, gtfore05a,  gtfore05, gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", 0 )
+GAME( 2004, gtfore05b,  gtfore05, gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", 0 )
+GAME( 2004, gtfore05c,  gtfore05, gtfore05, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", 0 )
+GAME( 2005, gtfore06,   iteagle,  gtfore06, gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", 0 )
+GAME( 2002, bbhsc,      iteagle,  bbhsc,    gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", GAME_NOT_WORKING )
+GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  gtfore,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", GAME_NOT_WORKING )
