@@ -262,7 +262,7 @@ ATTR_HOT inline int netlist_matrix_solver_gauss_seidel_t<m_N, _storage_N>::vsolv
 	ATTR_ALIGN nl_double one_m_w[_storage_N];
 	ATTR_ALIGN nl_double RHS[_storage_N];
 	ATTR_ALIGN nl_double new_V[_storage_N];
-	ATTR_ALIGN nl_double old_V[_storage_N];
+	//ATTR_ALIGN nl_double old_V[_storage_N];
 
 	for (int k = 0; k < iN; k++)
 	{
