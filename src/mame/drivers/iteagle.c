@@ -4,9 +4,10 @@
 
     Incredible Technologies "Eagle" hardware
 
-    skeleton by R. Belmont
+    by Ted Green & R. Belmont
 
     Known games on this hardware and their security chip IDs:
+        * ITVP-1     (c) 1998     Virtual Pool (not on IT's website master list)
         * E2-LED0    (c) 2000     Golden Tee Fore!
         * E2-BBH0    (c) 2000     Big Buck Hunter
         * G42-US-U   (c) 2001     Golden Tee Fore! 2002
@@ -18,7 +19,6 @@
         * G45-US-U   (c) 2004     Golden Tee Fore! 2005
         * CW-US-U    (c) 2005     Big Buck Hunter: Call of the Wild
         * G4C-US-U   (c) 2006     Golden Tee Complete
-        * ????????   (c) ????     Virtual Pool (not on IT's website master list but known to exist)
 
     Valid regions: US = USA, CAN = Canada, ENG = England, EUR = Euro, SWD = Sweden, AUS = Australia, NZ  = New Zealand, SA  = South Africa
 
@@ -26,7 +26,7 @@
         Golden Tee Fore! 2004 & Golden Tee Fore! 2005 had updates called "Extra" that installed 2 additional courses.
          It's unknown if the Extra version required a different security chip or simply validation with IT's servers.
         There are "8-meg" versions of Big Buck Hunter: Call of the Wild to upgrade Eagle PCBs with only 8 megs of main
-         memory. This was common for the ealier Big Buck Hunter series. The security chip is labeled CW-US-8
+         memory. This was common for the earlier Big Buck Hunter series. The security chip is labeled CW-US-8
 
     Hardware overview:
         * NEC VR4310 CPU (similar to the N64's VR4300)
@@ -38,7 +38,21 @@
         * Conexant CX88168 modem
 
     TODO:
-        * Everything (need new PCI subsystem to do this right)
+        * Add support for Eagle 1 (Virtual Pool) PCBs
+		* Add support for later RED boards
+
+	Notes:
+		Sound volume may be muted, it can be adjusted through the service menu
+		
+	    Missing the original Golden Tee Fore! & Golden Tee Fore! 2002
+		Current images come from versions that have been updated from
+		previous versions. Each upgrade procedure adds a new file system
+		partition to the hard drive.
+
+		The PCB for Virtual Pool is considered "Eagle 1" while the boards
+		that were production runs for later games are considered Eagle 2.
+		IE: GT Fore! & BBH, both security chips are "E2-" as are various
+		preprogrammed PALs: E2-CARD1 & E2-RES3
 
 ***************************************************************************/
 
@@ -114,7 +128,33 @@ public:
 
 	virtual void machine_start();
 	virtual void machine_reset();
+
+	// gtfore / gtfore02 don't boot without this, wrong key? other security?
+	// causes checksum error but boots for now
+	TIMER_CALLBACK_MEMBER( hack_timer );
+	emu_timer   *m_hack_timer;
+	int m_hackaddr;
+	DECLARE_DRIVER_INIT(gtfore02);
+	DECLARE_DRIVER_INIT(gtfore);
+
 };
+
+
+TIMER_CALLBACK_MEMBER(iteagle_state::hack_timer)
+{
+	m_hack_timer->adjust(attotime::from_hz(60));
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT32 result = space.read_dword(m_hackaddr-4);
+
+	if (result == 0x90840000)
+	{
+		space.write_dword(m_hackaddr-4, 0x90850000);
+		space.write_dword(m_hackaddr, 0x90840000);
+	}
+}
+
+
 
 void iteagle_state::machine_start()
 {
@@ -217,7 +257,8 @@ static INPUT_PORTS_START( iteagle )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gtfore02 )
+
+static INPUT_PORTS_START( gtfore )
 	PORT_INCLUDE(iteagle)
 
 	PORT_MODIFY("TRACKX1")
@@ -228,12 +269,30 @@ static INPUT_PORTS_START( gtfore02 )
 
 	PORT_MODIFY("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
+	PORT_DIPNAME( 0x00F0, 0x0010, "MAJOR" ) /* Assumes original GT Fore! is 0x0010 */
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gtfore02 )
+	PORT_INCLUDE(gtfore)
+
+	PORT_MODIFY("VERSION")
+	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
+	PORT_DIPNAME( 0x00F0, 0x0020, "MAJOR" )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gtfore03 )
+	PORT_INCLUDE(gtfore)
+
+	PORT_MODIFY("VERSION")
+	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
 	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtfore04 )
-	PORT_INCLUDE(gtfore02)
+	PORT_INCLUDE(gtfore)
 
 	PORT_MODIFY("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
@@ -242,7 +301,7 @@ static INPUT_PORTS_START( gtfore04 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtfore05 )
-	PORT_INCLUDE(gtfore02)
+	PORT_INCLUDE(gtfore)
 
 	PORT_MODIFY("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
@@ -251,7 +310,7 @@ static INPUT_PORTS_START( gtfore05 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtfore06 )
-	PORT_INCLUDE(gtfore02)
+	PORT_INCLUDE(gtfore)
 
 	PORT_MODIFY("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0400, "GAME" )
@@ -265,14 +324,6 @@ static INPUT_PORTS_START( carnking )
 	PORT_MODIFY("VERSION")
 	PORT_DIPNAME( 0x0F00, 0x0600, "GAME" )
 	PORT_DIPNAME( 0x00F0, 0x0030, "MAJOR" )
-
-	PORT_MODIFY("TRACKX1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
-
-	PORT_MODIFY("TRACKY1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
@@ -305,6 +356,8 @@ INPUT_PORTS_END
 	ROMX_LOAD( "eagle102.u15", 0x000000, 0x100000, CRC(1fd39e73) SHA1(d1ac758f94defc5c55c62594b3999a406dd9ef1f), ROM_BIOS(10) ) \
 	ROM_SYSTEM_BIOS( 10, "101", "bootrom 1.01" ) \
 	ROMX_LOAD( "eagle101.u15", 0x000000, 0x100000, CRC(2600bc2b) SHA1(c4b89e69c51e4a3bb1874407c4d30b6caed4f396), ROM_BIOS(11) ) \
+	ROM_SYSTEM_BIOS( 11, "pool", "Virtual Pool bootrom" ) \
+	ROMX_LOAD( "eagle1_bootrom_v1p01", 0x000000, 0x080000, CRC(6c8c1593) SHA1(707d5633388f8dd4e9252f4d8d6f27c98c2cb35a), ROM_BIOS(12) ) \
 	ROM_REGION( 0x30000, "fpga", 0 ) \
 	ROM_LOAD( "17s20lpc_sb4.u26", 0x000000, 0x008000, CRC(62c4af8a) SHA1(6eca277b9c66a401990599e98fdca64a9e38cc9a) ) \
 	ROM_LOAD( "17s20lpc_sb5.u26", 0x008000, 0x008000, CRC(c88b9d42) SHA1(b912d0fc50ecdc6a198c626f6e1644e8405fac6e) ) \
@@ -321,17 +374,17 @@ ROM_START( iteagle )
 	//DISK_REGION( ":pci:06.1:ide:1:cdrom" ) // program CD-ROM
 ROM_END
 
-ROM_START( gtfore02 )
+ROM_START( virtpool ) /* On earlier Eagle 1 PCB, possibly a prototype version - later boards are known as Eagle 2 */
 	EAGLE_BIOS
-
+	
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
-	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
+	ROM_LOAD( "itvp-1.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "golf_fore_2002_v2.00.00", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) ) /* Labeled Golf Fore! 2002 V2.00.00 */
+	DISK_IMAGE( "virtualpool", 0, SHA1(be8f890c33701ca17fab8112ee6cd7b5e435d8cf) ) /* HD hand labeled 3-1-99 V.P. */
 ROM_END
 
-ROM_START( carnking )
+ROM_START( carnking ) /* REQUIRES a "RED" board, will NOT work with earlier green boards */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -341,6 +394,46 @@ ROM_START( carnking )
 	DISK_IMAGE( "carnival_king_v_1.00.11", 0, SHA1(c819af66d36df173ab17bf42f4045c7cca3203d8) ) /* Labeled Carnival King V 1.00.11 */
 ROM_END
 
+ROM_START( gtfore )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "e2-led0.u53", 0x0000, 0x0880, CRC(6ec86dc6) SHA1(01665ad6d92d2b8e917e33ca705fab9258766513) )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_v1.00.25", 0, SHA1(6dc445b982aee3bab93ade5c4f5d148471939ecc) ) /* Build 19:19:59, Sep 11 2000 */
+ROM_END
+
+ROM_START( gtfore02 )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g42-us-u.u53", 0x0000, 0x0880, CRC(06e0b452) SHA1(f6b865799cb94941e0e77453b9d556d5988b0194) )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2002_v2.01.06", 0, SHA1(d1363bc17337c91684148b76fa1e73ac9dd80d8f) ) /* Build 11:27:20, Nov  5 2001 */
+ROM_END
+
+ROM_START( gtfore03 )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g43-us-u.u53", 0x0000, 0x0880, CRC(51c6f726) SHA1(9930337315128f89f7202893fb123ee3f0d33649) )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2003_v3.00.10", 0, SHA1(d789ef86837a5012beb224c487537dd563d93886) ) /* Build 09:36:45, Nov  7 2002 */
+ROM_END
+
+ROM_START( gtfore03a )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g43-us-u.u53", 0x0000, 0x0880, CRC(51c6f726) SHA1(9930337315128f89f7202893fb123ee3f0d33649) )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2003_v3.00.09", 0, SHA1(b804656a032302e541a8221d4e0e4e4fe37ed637) ) /* Build 09:36:45, Oct 17 2002 */
+ROM_END
+
 ROM_START( gtfore04 )
 	EAGLE_BIOS
 
@@ -348,7 +441,17 @@ ROM_START( gtfore04 )
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "gt2004", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) )
+	DISK_IMAGE( "golf_fore_2004_v4.00.08", 0, SHA1(fe7525de89d67e0e3d10c48572fd04382543c19f) ) /* Build 14:15:44, Aug 27 2003 - Has been upgraded to Extra */
+ROM_END
+
+ROM_START( gtfore04a )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2004_v4.00.00", 0, SHA1(97d7a081cedc5d2fc5b90bbde95dd126445f9204) ) /* Build 16:40:59, Feb 28 2003 */
 ROM_END
 
 ROM_START( gtfore05 )
@@ -358,7 +461,37 @@ ROM_START( gtfore05 )
 	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "gt2005", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) )
+	DISK_IMAGE( "golf_fore_2005_v5.01.06", 0, SHA1(fa465263218d8e39102ec81d116c11447ef07e19) ) /* Build 10:55:49, Oct 27 2005 - Has been upgraded to Extra */
+ROM_END
+
+ROM_START( gtfore05a )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2005_v5.01.02", 0, SHA1(6e20d60fb7e9ab6bf0086267fa5b4329d8a9f468) ) /* Build 15:02:32, Feb 27 2004 - Has been upgraded to Extra */
+ROM_END
+
+ROM_START( gtfore05b )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2005_v5.01.00", 0, SHA1(d8de569d8cf97b5aaada10ce896eb3c75f1b37f1) ) /* Build 12:30:35, Feb 16 2004 - Has been upgraded to Extra */
+ROM_END
+
+ROM_START( gtfore05c )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "g45-us-u.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "golf_fore_2005_v5.00.00", 0, SHA1(4236f57e639cae2e5a3eaa97fb24f5ff80557e84) ) /* Build 23:15:38, Jan 31 2004 - Has been upgraded to Extra */
 ROM_END
 
 ROM_START( gtfore06 )
@@ -368,7 +501,28 @@ ROM_START( gtfore06 )
 	ROM_LOAD( "g4c-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "golf_fore_2002_v2.01.04_umv", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Labeled Golf Fore! V6.00.01 */
+	DISK_IMAGE( "golf_fore_complete_v6.00.01", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Build 09:51:13, Jan 20 2006 */
+ROM_END
+
+ROM_START( bbhsc )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "bb15-us.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "bbhsc_v1.50.07_cf", 0, SHA1(21dcf1f7e5ab901ac64e6afb099c35e273b3bf1f) ) /* Build 16:35:34, Feb 26 2002 - 4gb Compact Flash conversion */
+ROM_END
+
+ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+//	ROM_LOAD( "cw-us-8.u53.hex", 0x0000, 0x1490, CRC(bd435ca0) SHA1(6e956f71b7c95ab172686228983f4e5ce6218271) )
+	ROM_LOAD( "cw-us-8.u53", 0x0000, 0x0880, CRC(c5234b58) SHA1(fb47b2233147a3f633f01edebef9994c358bd162) )
+
+	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
+	DISK_IMAGE( "bbhcotw_v3.02.05_cf", 0, SHA1(b1fcaab3a5aa51821673a914333c8868d36f77ae) ) /* Build 21:00:39, Sep 10 2006 - 4gb Compact Flash conversion  */
 ROM_END
 
 /*************************************
@@ -377,9 +531,35 @@ ROM_END
  *
  *************************************/
 
-GAME( 2000, iteagle,          0, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
-GAME( 2001, gtfore02,   iteagle, gtfore, gtfore02,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.00.00)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2002, carnking,   iteagle, gtfore, carnking,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2003, gtfore04,   iteagle, gtfore, gtfore04,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2004, gtfore05,   iteagle, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2005, gtfore06,   iteagle, gtfore, gtfore06,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete", GAME_NOT_WORKING | GAME_NO_SOUND )
+ 
+DRIVER_INIT_MEMBER(iteagle_state,gtfore02)
+{
+	m_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iteagle_state::hack_timer),this));
+	m_hack_timer->adjust(attotime::from_hz(60));
+	m_hackaddr = 0x02077720;
+}
+
+DRIVER_INIT_MEMBER(iteagle_state,gtfore)
+{
+	m_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(iteagle_state::hack_timer),this));
+	m_hack_timer->adjust(attotime::from_hz(60));
+	m_hackaddr = 0x206d9a0;
+}
+	
+
+GAME( 2000, iteagle,            0, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Eagle BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1998, virtpool,     iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Virtual Pool", GAME_NOT_WORKING )
+GAME( 2002, carnking,     iteagle, gtfore, carnking,  driver_device, 0, ROT0, "Incredible Technologies", "Carnival King (v1.00.11)", GAME_NOT_WORKING )
+GAME( 2002, gtfore,       iteagle, gtfore,   gtfore,  iteagle_state, gtfore, ROT0, "Incredible Technologies", "Golden Tee Fore! (v1.00.25)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, gtfore02,     iteagle, gtfore, gtfore02,  iteagle_state, gtfore02, ROT0, "Incredible Technologies", "Golden Tee Fore! 2002 (v2.01.06)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, gtfore03,     iteagle, gtfore, gtfore03,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.10)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, gtfore03a,   gtfore03, gtfore, gtfore03,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2003 (v3.00.09)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2003, gtfore04,     iteagle, gtfore, gtfore04,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 Extra (v4.00.08)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2003, gtfore04a,   gtfore04, gtfore, gtfore04,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2004 (v4.00.00)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2004, gtfore05,     iteagle, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.06)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2004, gtfore05a,   gtfore05, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.02)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2004, gtfore05b,   gtfore05, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2004, gtfore05c,   gtfore05, gtfore, gtfore05,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2005, gtfore06,     iteagle, gtfore, gtfore06,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, bbhsc,        iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 2006, bbhcotw,      iteagle, gtfore, iteagle,   driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Call of the Wild (v3.02.5)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )

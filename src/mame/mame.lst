@@ -4207,15 +4207,24 @@ gt2kp100        // (c) 2000 Incredible Technologies
 gt2ks100        // (c) 2000 Incredible Technologies
 gt2kt500        // (c) 2000 Incredible Technologies
 gtsupreme       // (c) 2000 Incredible Technologies
-iteagle         // (c) 2000 Incredible Technologies
 gtclassc        // (c) 2001 Incredible Technologies
 gtclasscp       // (c) 2001 Incredible Technologies
 gtclasscs       // (c) 2001 Incredible Technologies
-gtfore02        // (c) 2001 Incredible Technologies
-carnking        // (c) 2002 Incredible Technologies
-gtfore04        // (c) 2003 Incredible Technologies
-gtfore05        // (c) 2004 Incredible Technologies
-gtfore06        // (c) 2005 Incredible Technologies
+
+iteagle         // (c) 2000 Incredible Technologies
+virtpool
+carnking
+gtfore
+gtfore02
+gtfore03
+gtfore03a
+gtfore04
+gtfore04a
+gtfore05
+gtfore05a
+gtfore06
+bbhsc
+bbhcotw
 
 // Leland games
 cerberus        // (c) 1985 Cinematronics
