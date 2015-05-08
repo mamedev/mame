@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Wilbert Pol
 /********************************************************************
 
 Driver file to handle emulation of the Nintendo Pokemon Mini handheld
