@@ -131,7 +131,6 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 	 * Need something like that for gaussian elimination as well.
 	 */
 
-	static int ws_cnt = 0;
 
 	ATTR_ALIGN nl_double new_v[_storage_N] = { 0.0 };
 	const int iN = this->N();
@@ -145,6 +144,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 
 #if 1
 #if 0
+	static int ws_cnt = 0;
 	ws_cnt++;
 	if (0 && ws_cnt % 100 == 0)
 	{
