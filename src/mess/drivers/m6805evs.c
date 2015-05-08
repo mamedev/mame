@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /******************************************************************************************************
 
 Motorola M68HC05EVS evaluation system

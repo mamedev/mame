@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:PeT
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 
 #ifndef __LYNXSOUND_H__
 #define __LYNXSOUND_H__

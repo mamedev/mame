@@ -1,4 +1,4 @@
-// license:MAME|GPL-2.0+
+// license:GPL-2.0+
 // copyright-holders: Felipe Sanches
 /***************************************************************************
 

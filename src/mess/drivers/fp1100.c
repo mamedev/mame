@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Casio FP-1100

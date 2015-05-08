@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tim Schuerewegen
 /*******************************************************************************
 
     Mattel Juice Box

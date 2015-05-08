@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     esqkt.c - Ensoniq KT-76, KT-88, and E-Prime

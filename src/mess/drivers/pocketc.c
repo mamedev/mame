@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 /******************************************************************************
  sharp pocket computers
  pc1401/pc1403

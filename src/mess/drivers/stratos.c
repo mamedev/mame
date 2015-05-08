@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /***************************************************************************
 
     Saitek/Scisys Kasparov Stratos Chess Computer
-
-    license: MAME, BSD-3-Clause
-    copyright-holders: Olivier Galibert
 
 ***************************************************************************/
 

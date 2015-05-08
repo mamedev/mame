@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:PeT
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 #ifndef ARCADIA_SOUND_H_
 #define ARCADIA_SOUND_H_
 

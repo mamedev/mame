@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Peter Trauner
 /******************************************************************************
  Peter.Trauner@jk.uni-linz.ac.at September 2000
 

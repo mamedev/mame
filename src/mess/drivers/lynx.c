@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 /******************************************************************************
  PeT peter.trauner@utanet.at 2000,2001
 

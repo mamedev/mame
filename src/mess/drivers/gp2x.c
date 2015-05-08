@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R.Belmont
 /**************************************************************************
  *
  * gp2x.c - Game Park Holdings GP2X

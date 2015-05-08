@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Korg M1 (c) 1988

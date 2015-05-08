@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Christian Grossler
 /*
 
  Olivetti M20 skeleton driver, by incog (19/05/2009)

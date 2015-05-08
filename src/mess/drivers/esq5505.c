@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     esq5505.c - Ensoniq ES5505 + ES5510 based synthesizers and samplers

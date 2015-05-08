@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R.Belmont
 /**************************************************************************
  *
  * gp32.c - Game Park GP32

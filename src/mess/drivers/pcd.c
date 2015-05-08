@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Siemens PC-D
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Skeleton driver
 

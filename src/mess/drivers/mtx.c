@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:MAME
+// copyright-holders:(Original Author?), Dirk Best, Curt Coder
 /*************************************************************************
 
     Memotech MTX 500, MTX 512 and RS 128
-
-    license: MAME
-    copyright-holders: (Original Author?), Dirk Best, Curt Coder
 
 **************************************************************************/
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Lukasz Markowski
 /***************************************************************************
     HUMAX HDCI-2000 ( Conexant CX2417x )
 

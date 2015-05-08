@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Olivier Galibert
 /***************************************************************************
 
     drivers/esq1.c

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:PeT
 /******************************************************************************
 Consolidation and enhancment of documentation by Manfred Schneider based on previous work from
  PeT mess@utanet.at and Paul Robson (autismuk@aol.com)

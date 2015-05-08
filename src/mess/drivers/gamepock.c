@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Wilbert Pol
 
 
 #include "emu.h"

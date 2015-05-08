@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     esqasr.c - Ensoniq ASR-10 and ASR-X

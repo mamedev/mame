@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Lukasz Markowski
 /***************************************************************************
 
         Dream Multimedia Dreambox 7000/5620/500

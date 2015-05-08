@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:MAME
+// copyright-holders:Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles, Dirk Best
 /****************************************************************************
 
     Bally Astrocade consumer hardware
-
-    license: MAME
-    copyright-holders: Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles, Dirk Best
 
 ****************************************************************************/
 

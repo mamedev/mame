@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phill Harvey-Smith
 /*
     drivers/mbc55x.c
 

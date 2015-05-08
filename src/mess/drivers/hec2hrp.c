@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:JJ Stacino
 /***************************************************************************
 
         Hector 2HR+

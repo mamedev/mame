@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Robbbert,Barry Rodewald
 /***************************************************************************
 
     Skeleton driver for Husky Hunter 2

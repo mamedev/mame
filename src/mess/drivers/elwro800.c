@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mariusz Wojcieszek
 /***************************************************************************
 
         Elwro 800 Junior
