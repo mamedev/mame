@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Angelo Salese
 /****************************************************************************************************************************************
 
     Sharp Zaurus PDA skeleton driver (SL, ARM/Linux based, 4th generation)

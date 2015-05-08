@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Wilbert Pol
 /***************************************************************************
 
     Driver for Casio PV-1000

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Wilbert Pol
 /***************************************************************************
 
     Driver for Epoch Super Cassette Vision

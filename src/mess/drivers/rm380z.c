@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Wilbert Pol,friol
 /*
 
 Research Machines 380Z (aka "RML 380Z" or "RM 380Z")

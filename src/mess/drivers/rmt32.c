@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Olivier Galibert,Jonathan Gevaryahu
 /*************************************************************************************************
 
     Roland MT-32/CM32L driver
