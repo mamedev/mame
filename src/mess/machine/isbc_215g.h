@@ -1,6 +1,5 @@
-// license:???
-// copyright-holders:???
 // license:BSD-3-Clause
+// copyright-holders:Carl
 
 #ifndef ISBC_215G_H_
 #define ISBC_215G_H_

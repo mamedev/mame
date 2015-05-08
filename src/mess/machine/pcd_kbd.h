@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef PCD_KBD_H_
 #define PCD_KBD_H_
 

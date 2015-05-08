@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef QX10KBD_H_
 #define QX10KBD_H_
 

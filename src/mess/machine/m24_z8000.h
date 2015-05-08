@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef M24_Z8000_H_
 #define M24_Z8000_H_
 

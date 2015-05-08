@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef _DP8390_H_
 #define _DP8390_H_
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
