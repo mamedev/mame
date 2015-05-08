@@ -692,9 +692,14 @@ static void execute_show(running_machine &machine, int ref, int params, const ch
 	{
 	        if (!strcmp(param[0], "clock"))
 	        {
-	                debug_console_printf(machine, "The clock is: %lld(%08llx) and that is %lld(%08llx) CPU clock cycles since last 'show clock' command\n", 
+	                debug_console_printf(machine, "The clock is: %lld(0x%llx) and that is %lld(0x%llx) CPU clock cycles since last 'show clock' command\n", 
 					     cpu->total_cycles(), cpu->total_cycles(), cpu->total_cycles() - last, cpu->total_cycles() - last);
 			last = cpu->total_cycles();
+		}
+		else
+		{
+		  debug_console_printf(machine, "Unknown property %s. ", param[0]);
+		  debug_console_printf(machine, "Valid properties are: 'clock'\n");
 		}
 	}
 }
