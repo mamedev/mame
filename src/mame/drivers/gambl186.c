@@ -36,11 +36,11 @@ In order to get the game to run, follow these steps:
     1 1 X X 1 1 1 X X X 1 1 X 1 1 1 1 X 1 1 1 1 1 X 1 1 1 1 1 1 X
 (This is the "password" for the EEPROM.  You have three attempts to get it correct, otherwise the service mode will restart)
 - if accepted, disable service mode DIP switch
-- reset machine (press 'F3')
+- reset machine (press 'F3') (watchdog is not implemented)
+- if another password prompt appears, just press 'X' 9 times
 
 TODO:
-- watchdog (service mode claims that there's one at the end of the aforementioned procedure);
-- fix the poker game (casino 10). seems lack of watchdog.
+- fix the poker game (casino 10). EEPROM behaviour still buggy.
 - sound;
 - proper 3x D71055C emulation. 
 
@@ -115,41 +115,48 @@ READ16_MEMBER(gambl186_state::comms_r)
                         break;
                     }
 
-                    case 1: //unverified
-                    case 3: //unverified
+                    case 1:
                     {
-                        m_comms_expect = 8;
+                        m_comms_expect = 12;
+                        m_comms_blocks = 2;
                         break;
                     }
 
                     case 2:
                     {
                         m_comms_expect = 408;
-                        m_comms_data[401] = 0x34; //precalc
                         m_comms_blocks = 4;
+                        break;
+                    }
+
+                    case 3:
+                    {
+                        m_comms_expect = 7;
+                        m_comms_blocks = 3;
                         break;
                     }
 
                     case 4:
                     {
-                        m_comms_expect = 4;
+                        m_comms_expect = 2;
+                        m_comms_blocks = 2;
                         break;
                     }
 
-                    case 5: //unverified
+                    case 5:
                     {
-                        m_comms_expect = 7;
+                        m_comms_expect = 13;
+                        m_comms_blocks = 5;
                         break;
                     }
 
                     case 6:
                     {
                         m_comms_expect = 1003;
-                        m_comms_data[1001] = 0xec; //precalc
                         break;
                     }
 
-                    default: //unverified
+                    default: //unknown
                     {
                         m_comms_expect = 1;
                     }
@@ -158,36 +165,99 @@ READ16_MEMBER(gambl186_state::comms_r)
 
             if (m_comms_ind < sizeof(m_comms_data))
             {
-                if ((m_comms_cmd == 4) && (m_comms_ind == 1) && !memcmp(m_comms_data, password, sizeof(password)))
-                {
-                    m_comms_data[1] = 0x55;
-                    m_comms_data[2] = 0x55;
-                }
-
-                retval = m_comms_data[m_comms_ind++];
-
                 if (m_comms_expect && !--m_comms_expect)
                 {
+                    m_comms_ack = true;
+
+                    if (m_comms_ind)
+                    {
+                        int i, sum;
+
+                        for (i = 1, sum = 0; i < m_comms_ind; sum += m_comms_data[i++]);
+                        m_comms_data[m_comms_ind] = (unsigned char) sum;
+
+                        switch (m_comms_cmd)
+                        {
+                            case 1:
+                            {
+                                if (m_comms_blocks == 2)
+                                {
+                                    m_comms_expect = 5;
+                                }
+                                else
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                }
+
+                                break;
+                            }
+
+                            case 2:
+                            {
+                                if (m_comms_blocks == 4)
+                                {
+                                    m_comms_expect = 5;
+                                }
+                                else
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                    m_comms_expect = 3;
+                                }
+
+                                break;
+                            }
+
+                            case 3:
+                            {
+                                if (m_comms_blocks == 3)
+                                {
+                                    m_comms_expect = 3;
+                                }
+                                else
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                    m_comms_expect = 5;
+                                }
+
+                                break;
+                            }
+
+                            case 5:
+                            {
+                                m_comms_expect = 3;
+
+                                if (m_comms_blocks < 5)
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                }
+
+                                break;
+                            }
+
+                            default:
+                            {
+                            }
+                        }
+                    }
+                    else if (m_comms_cmd == 4)
+                    {
+                        if (!memcmp(m_comms_data, password, sizeof(password)))
+                        {
+                            m_comms_data[1] = 0x55;
+                            m_comms_data[2] = 0x55;
+                        }
+
+                        m_comms_expect = 2;
+                        m_comms_ack = false;
+                    }
+
                     if (!m_comms_blocks || !--m_comms_blocks)
                     {
                         m_comms_cmd = 0xff;
                     }
-                    else if (m_comms_cmd == 2)
-                    {
-                        if (m_comms_blocks == 3)
-                        {
-                            m_comms_expect = 5;
-                            m_comms_data[4] = 0x17; //precalc
-                        }
-                        else
-                        {
-                            m_comms_expect = 3;
-                            m_comms_data[2] = 5; //precalc
-                        }
-                    }
-
-                    m_comms_ack = true;
                 }
+
+                retval = m_comms_data[m_comms_ind++];
             }
         }
     }
@@ -330,7 +400,7 @@ static INPUT_PORTS_START( gambl186 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN6 )  PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Key")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("IN2")
