@@ -2589,6 +2589,7 @@ ROM_START( sammymdl )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
+	ROM_COPY( "mainbios", 0x0000, 0x0000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -2815,7 +2816,7 @@ GAME( 1998, tbeastw2, 0,        gegege,   sigma_3b, sigmab98_state, tbeastw2, RO
 GAME( 1997, ucytokyu, 0,        gegege,   sigma_js, sigmab98_state, ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",               GAME_IMPERFECT_GRAPHICS ) // Banpresto + others in the ROM
 GAME( 2000, dashhero, 0,        dashhero, sigma_1b, sigmab98_state, dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ) // 1999 in the rom
 // Sammy Medal Games:
-GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, driver_device,  0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",         GAME_IS_BIOS_ROOT )
+GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Sammy Medal Game System Bios",         GAME_IS_BIOS_ROOT )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Animal Catch",                         GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, ROT0, "Sammy",             "Itazura Monkey",                       GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      GAME_IMPERFECT_GRAPHICS )
