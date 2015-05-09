@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Paul Priest
 /*----------------------------------------------------------------
    Psikyo PS3/PS5/PS5v2 SH-2 Based Systems
    driver by David Haywood (+ Paul Priest)

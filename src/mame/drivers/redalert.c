@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Balfour
 /***************************************************************************
 
     redalert.c, Irem M27 hardware

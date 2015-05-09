@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Eugene Sandulenko
 /*****************************************************************************
 
   TIA-MC1 driver

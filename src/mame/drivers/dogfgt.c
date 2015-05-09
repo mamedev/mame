@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Acrobatic Dog-Fight / Batten O'hara no Sucha-Raka Kuuchuu Sen

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Darren Olafson, Quench
 /***************************************************************************
 
         ToaPlan game hardware from 1988-1991

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Graves
 /***************************************************************************
 
 Slapshot (c) Taito 1994

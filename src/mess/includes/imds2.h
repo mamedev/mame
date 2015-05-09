@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:fulivi
 // Driver for Intel Intellec MDS series-II
 

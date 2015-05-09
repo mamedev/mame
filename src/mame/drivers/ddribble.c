@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia 
 /***************************************************************************
 
     Double Dribble (GX690) (c) Konami 1986

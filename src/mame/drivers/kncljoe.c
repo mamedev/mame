@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 Knuckle Joe - (c) 1985 Seibu Kaihatsu ( Taito License )

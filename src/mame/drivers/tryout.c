@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
 /***************************************************************
 
  Pro Baseball Skill Tryout (JPN Ver.)

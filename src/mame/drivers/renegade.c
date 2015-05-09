@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 /***************************************************************************
 
 Renegade

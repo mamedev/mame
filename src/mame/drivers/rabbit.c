@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /***************************************************************************
 
                      -= 68020 + Imagetek I5000 Games =-

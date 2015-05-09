@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
  Hyperstone cpu emulator
  written by Pierpaolo Prazzoli

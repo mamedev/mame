@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bernd Wiebelt
 /***************************************************************************
 
     Midway Omega Race hardware

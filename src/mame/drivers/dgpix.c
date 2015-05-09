@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli, Tomasz Slanina
 /********************************************************************
 
  dgPIX VRender0 hardware

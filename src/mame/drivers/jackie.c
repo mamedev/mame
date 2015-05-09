@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Mirko Buffoni
 /*
 Happy Jackie (c) 1993 IGS.
 Video Slot machine game for amusement only.

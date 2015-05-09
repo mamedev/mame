@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Carlos A. Lozano
 /***************************************************************************
 
 Cops 01      (c) 1985 Nichibutsu

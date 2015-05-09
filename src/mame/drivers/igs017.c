@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli, Luca Elia
 /************************************************************************************************************
 
                                         -= IGS017 / IGS031 Based Hardware =-

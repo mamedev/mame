@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /*
     (Some) Data East 32 bit 156 CPU ARM based games:
 

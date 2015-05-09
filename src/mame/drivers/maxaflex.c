@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mariusz Wojcieszek
 /******************************************************************************
     Exidy Max-A-Flex driver
 

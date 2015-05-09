@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Phil Stroffolino, Acho Tang, Nicola Salmoria
 /**************************************************************************
  * Mystic Warrior (c) 1993 Konami
  * Metamorphic Force (c) 1993 Konami

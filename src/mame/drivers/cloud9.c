@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Balfour
 /***************************************************************************
 
     Atari Cloud 9 (prototype) hardware

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino
 /***************************************************************************
 
 Solar Warrior / Xain'd Sleena

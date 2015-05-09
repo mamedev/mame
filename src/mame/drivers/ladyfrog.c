@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /*
 Lady Frog (c) 1990 Mondial Games
 (there's  "(c) Alfa Tecnology" in the ROM)

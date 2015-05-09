@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Yochizo
 /***************************************************************************
 
 Argus (Early NMK driver 1986-1987)

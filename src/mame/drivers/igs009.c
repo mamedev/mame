@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
                           -= IGS009 Based Games =-

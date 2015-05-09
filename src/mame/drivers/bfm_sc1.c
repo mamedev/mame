@@ -1,11 +1,8 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /*****************************************************************************************
 
     Bellfruit scorpion1 driver, (under heavy construction !!!)
-
-    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
-    used under license from http://mamedev.org
 
 ******************************************************************************************
 

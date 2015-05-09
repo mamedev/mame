@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Fresca
 /******************************************************************************
 
     Unknown TMS9980 Poker Game  <--- We need the real name & manufacturer! :)

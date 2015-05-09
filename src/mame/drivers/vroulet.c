@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Curt Coder,Tomasz Slanina
 /*
 
     Vegas Roulette

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Fabrice Frances, Nicola Salmoria
 /***************************************************************************
 
     Gottlieb hardware

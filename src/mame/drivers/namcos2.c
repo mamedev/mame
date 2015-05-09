@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:K.Wilkins
 /***************************************************************************
 
 Namco System II driver by K.Wilkins  (Jun1998, Oct1999)

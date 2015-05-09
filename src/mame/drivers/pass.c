@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Pass (c)1992, Oksan
 
  Driver by David Haywood

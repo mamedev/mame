@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mirko Buffoni
 /***************************************************************************
 
 Son Son memory map (preliminary)

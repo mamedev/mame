@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi, Mariusz Wojcieszek
 /***************************************************************************
 
     Arcadia System - (c) 1988 Arcadia Systems

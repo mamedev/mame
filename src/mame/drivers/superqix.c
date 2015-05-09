@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
 /***************************************************************************
 
 Prebillian        (c) 1986 Taito

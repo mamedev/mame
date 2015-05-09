@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Priest, David Haywood
 /******************************************************************************
 
   'Face' LINDA board

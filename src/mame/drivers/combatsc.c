@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino, Manuel Abadia
 /***************************************************************************
 
 "Combat School" (also known as "Boot Camp") - (Konami GX611)

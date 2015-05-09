@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
 /****************************************************
    Pit&Run - Taito 1984
 

@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:smf
 /*
  * Konami 573 Network PCB Unit

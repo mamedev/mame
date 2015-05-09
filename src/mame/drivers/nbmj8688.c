@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     nbmj8688 - Nichibutsu Mahjong games for years 1986-1988

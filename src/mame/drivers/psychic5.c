@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jarek Parchanski
 /**************************
  *** PSYCHIC 5 hardware ***     (by Roberto Ventura)
  **************************

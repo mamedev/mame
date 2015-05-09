@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:(Original Author?), Dirk Best
 /************************************************************************
 

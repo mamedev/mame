@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jason Eckhardt, Andrew Gardner, Phil Bennett
 /*
 Virtual Combat hardware games.
 

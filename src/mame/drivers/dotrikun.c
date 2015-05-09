@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi
 /***************************************************************************
 
 Dottori Kun (Head On's mini game)

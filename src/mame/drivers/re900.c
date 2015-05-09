@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Grull Osgo, Roberto Fresca
 /***********************************************************************************
 
     re900.c

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli
 /*
 
  Enerdyne Technologies Inc. (El Cajon, CA 92020) hardware

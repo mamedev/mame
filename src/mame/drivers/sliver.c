@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /*
 Sliver - Hollow Corp.1996
 driver by Tomasz Slanina

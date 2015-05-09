@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /*
     Gals Panic 3
     (c) Kaneko 1995

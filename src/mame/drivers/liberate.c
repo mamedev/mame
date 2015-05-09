@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /*******************************************************************************
 
     Pro Soccer                      (c) 1983 Data East Corporation

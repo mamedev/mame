@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:smf, R Belmont
 /***************************************************************************
 
   Sony ZN1/ZN2 - Arcade PSX Hardware

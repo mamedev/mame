@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:smf
 #ifndef __DS128X_H__
 #define __DS128X_H__
