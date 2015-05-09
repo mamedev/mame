@@ -45,18 +45,18 @@ NETLIB_SUBDEVICE(4020_sub,
 	NETLIB_LOGIC_FAMILY(CD4000)
 	ATTR_HOT void update_outputs(const UINT16 cnt);
 
-	netlist_ttl_input_t m_IP;
+	netlist_logic_input_t m_IP;
 
 	UINT16 m_cnt;
 
-	netlist_ttl_output_t m_Q[14];
+	netlist_logic_output_t m_Q[14];
 );
 
 NETLIB_DEVICE(4020,
 	NETLIB_LOGIC_FAMILY(CD4000)
 	NETLIB_NAME(4020_sub) sub;
 	NETLIB_NAME(vdd_vss) m_supply;
-	netlist_ttl_input_t m_RESET;
+	netlist_logic_input_t m_RESET;
 );
 
 NETLIB_DEVICE_DERIVED(4020_dip, 4020,

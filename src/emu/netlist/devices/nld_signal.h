@@ -98,8 +98,8 @@ public:
 	}
 
 public:
-	netlist_ttl_input_t m_i[_numdev];
-	netlist_ttl_output_t m_Q[1];
+	netlist_logic_input_t m_i[_numdev];
+	netlist_logic_output_t m_Q[1];
 	INT32 m_active;
 };
 
@@ -175,8 +175,8 @@ public:
 	}
 
 public:
-	netlist_ttl_input_t m_i[2];
-	netlist_ttl_output_t m_Q[1];
+	netlist_logic_input_t m_i[2];
+	netlist_logic_output_t m_Q[1];
 	INT32 m_active;
 
 };

@@ -567,17 +567,6 @@ public:
 };
 
 // -----------------------------------------------------------------------------
-// netlist_ttl_input_t
-// -----------------------------------------------------------------------------
-
-class netlist_ttl_input_t : public netlist_logic_input_t
-{
-public:
-	ATTR_COLD netlist_ttl_input_t()
-		: netlist_logic_input_t() { }
-};
-
-// -----------------------------------------------------------------------------
 // netlist_analog_input_t
 // -----------------------------------------------------------------------------
 
@@ -815,14 +804,6 @@ public:
 private:
 	netlist_logic_net_t m_my_net;
 	nld_base_d_to_a_proxy *m_proxy;
-};
-
-class netlist_ttl_output_t : public netlist_logic_output_t
-{
-public:
-
-	ATTR_COLD netlist_ttl_output_t();
-
 };
 
 class netlist_analog_output_t : public netlist_output_t

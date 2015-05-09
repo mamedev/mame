@@ -233,8 +233,8 @@ public:
 		}
 	}
 
-	netlist_ttl_input_t m_i[m_NI];
-	netlist_ttl_output_t m_Q[m_NO];
+	netlist_logic_input_t m_i[m_NI];
+	netlist_logic_output_t m_Q[m_NO];
 
 private:
 

@@ -67,10 +67,10 @@
 		NET_REGISTER_DEV(9316_dip, _name)
 
 NETLIB_SUBDEVICE(9316_subABCD,
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
+	netlist_logic_input_t m_C;
+	netlist_logic_input_t m_D;
 
 	ATTR_HOT inline UINT8 read_ABCD() const
 	{
@@ -83,13 +83,13 @@ NETLIB_SUBDEVICE(9316_sub,
 	ATTR_HOT inline void update_outputs_all(const UINT8 cnt, const netlist_time out_delay);
 	ATTR_HOT inline void update_outputs(const UINT8 cnt);
 
-	netlist_ttl_input_t m_CLK;
+	netlist_logic_input_t m_CLK;
 
-	netlist_ttl_output_t m_QA;
-	netlist_ttl_output_t m_QB;
-	netlist_ttl_output_t m_QC;
-	netlist_ttl_output_t m_QD;
-	netlist_ttl_output_t m_RC;
+	netlist_logic_output_t m_QA;
+	netlist_logic_output_t m_QB;
+	netlist_logic_output_t m_QC;
+	netlist_logic_output_t m_QD;
+	netlist_logic_output_t m_RC;
 
 	UINT8 m_cnt;
 	NETLIB_NAME(9316_subABCD) *m_ABCD;
@@ -101,10 +101,10 @@ NETLIB_SUBDEVICE(9316_sub,
 NETLIB_DEVICE(9316,
 	NETLIB_NAME(9316_sub) sub;
 	NETLIB_NAME(9316_subABCD) subABCD;
-	netlist_ttl_input_t m_ENP;
-	netlist_ttl_input_t m_ENT;
-	netlist_ttl_input_t m_CLRQ;
-	netlist_ttl_input_t m_LOADQ;
+	netlist_logic_input_t m_ENP;
+	netlist_logic_input_t m_ENT;
+	netlist_logic_input_t m_CLRQ;
+	netlist_logic_input_t m_LOADQ;
 );
 
 NETLIB_DEVICE_DERIVED(9316_dip, 9316,

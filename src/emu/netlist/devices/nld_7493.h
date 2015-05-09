@@ -70,15 +70,15 @@
 		NET_REGISTER_DEV(7493_dip, _name)
 
 NETLIB_SUBDEVICE(7493ff,
-	netlist_ttl_input_t m_I;
-	netlist_ttl_output_t m_Q;
+	netlist_logic_input_t m_I;
+	netlist_logic_output_t m_Q;
 
 	UINT8 m_reset;
 );
 
 NETLIB_DEVICE(7493,
-	netlist_ttl_input_t m_R1;
-	netlist_ttl_input_t m_R2;
+	netlist_logic_input_t m_R1;
+	netlist_logic_input_t m_R2;
 
 	NETLIB_NAME(7493ff) A;
 	NETLIB_NAME(7493ff) B;

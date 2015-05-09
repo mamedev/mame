@@ -46,9 +46,9 @@
 
 NETLIB_SUBDEVICE(74175_sub,
 
-	netlist_ttl_input_t m_CLK;
-	netlist_ttl_output_t m_Q[4];
-	netlist_ttl_output_t m_QQ[4];
+	netlist_logic_input_t m_CLK;
+	netlist_logic_output_t m_Q[4];
+	netlist_logic_output_t m_QQ[4];
 
 	netlist_sig_t m_clrq;
 	UINT8 m_data;
@@ -57,8 +57,8 @@ NETLIB_SUBDEVICE(74175_sub,
 NETLIB_DEVICE(74175,
 
 	NETLIB_NAME(74175_sub) m_sub;
-	netlist_ttl_input_t m_D[4];
-	netlist_ttl_input_t m_CLRQ;
+	netlist_logic_input_t m_D[4];
+	netlist_logic_input_t m_CLRQ;
 );
 
 NETLIB_DEVICE_DERIVED(74175_dip, 74175,

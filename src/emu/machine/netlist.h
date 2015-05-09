@@ -744,8 +744,8 @@ public:
 	netlist_time m_inc;
 
 private:
-	netlist_ttl_input_t m_feedback;
-	netlist_ttl_output_t m_Q;
+	netlist_logic_input_t m_feedback;
+	netlist_logic_output_t m_Q;
 
 	int m_pos;
 	int m_num_channel;

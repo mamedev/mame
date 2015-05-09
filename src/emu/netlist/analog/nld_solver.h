@@ -151,8 +151,8 @@ private:
 	dev_list_t m_step_devices;
 	dev_list_t m_dynamic_devices;
 
-	netlist_ttl_input_t m_fb_sync;
-	netlist_ttl_output_t m_Q_sync;
+	netlist_logic_input_t m_fb_sync;
+	netlist_logic_output_t m_Q_sync;
 
 	ATTR_HOT void step(const netlist_time delta);
 
@@ -181,8 +181,8 @@ protected:
 	ATTR_HOT void reset();
 	ATTR_HOT void update_param();
 
-	netlist_ttl_input_t m_fb_step;
-	netlist_ttl_output_t m_Q_step;
+	netlist_logic_input_t m_fb_step;
+	netlist_logic_output_t m_Q_step;
 
 	netlist_param_double_t m_freq;
 	netlist_param_double_t m_sync_delay;

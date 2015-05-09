@@ -62,7 +62,7 @@
 
 NETLIB_DEVICE_WITH_PARAMS(mainclock,
 public:
-	netlist_ttl_output_t m_Q;
+	netlist_logic_output_t m_Q;
 
 	netlist_param_double_t m_freq;
 	netlist_time m_inc;
@@ -75,8 +75,8 @@ public:
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(clock,
-	netlist_ttl_input_t m_feedback;
-	netlist_ttl_output_t m_Q;
+	netlist_logic_input_t m_feedback;
+	netlist_logic_output_t m_Q;
 
 	netlist_param_double_t m_freq;
 	netlist_time m_inc;
@@ -87,8 +87,8 @@ NETLIB_DEVICE_WITH_PARAMS(clock,
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(extclock,
-	netlist_ttl_input_t m_feedback;
-	netlist_ttl_output_t m_Q;
+	netlist_logic_input_t m_feedback;
+	netlist_logic_output_t m_Q;
 
 	netlist_param_double_t m_freq;
 	netlist_param_str_t m_pattern;
@@ -105,7 +105,7 @@ NETLIB_DEVICE_WITH_PARAMS(extclock,
 // -----------------------------------------------------------------------------
 
 NETLIB_DEVICE_WITH_PARAMS(ttl_input,
-	netlist_ttl_output_t m_Q;
+	netlist_logic_output_t m_Q;
 
 	netlist_param_logic_t m_IN;
 );
@@ -230,7 +230,7 @@ public:
 
 	netlist_param_double_t m_RON;
 	netlist_param_double_t m_ROFF;
-	netlist_ttl_input_t m_I;
+	netlist_logic_input_t m_I;
 	NETLIB_NAME(R) m_R;
 
 protected:
@@ -320,7 +320,7 @@ protected:
 
 	const netlist_logic_family_desc_t *m_logic_family;
 
-	netlist_ttl_input_t m_I;
+	netlist_logic_input_t m_I;
 
 private:
 };
