@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Poke Champ */
 
 /* This is a Korean hack of Data East's Pocket Gal

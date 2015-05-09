@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* tmmjprd.c
 
  - split from rabbit.c  (it uses the same GFX chip, but is otherwise a different PCB, and until the methods

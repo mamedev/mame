@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, ElSemi, ???
 
 /* PGM System (c)1997 IGS
 

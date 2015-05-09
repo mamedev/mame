@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /***************************************************************************
 
 Janshi / Pinkiri 8 / Ron Jan

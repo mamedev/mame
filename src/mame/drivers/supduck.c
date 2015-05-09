@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /*********************************************************************************
 
    Super Duck (c) 1992 Comad

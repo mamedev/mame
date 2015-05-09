@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /*** DRIVER INFO **************************************************************
 
 Macross Plus                        (c)1996 Banpresto

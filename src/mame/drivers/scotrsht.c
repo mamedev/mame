@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, ???
 /***************************************************************************
 
  GX545 Scooter Shooter - (c) 1985 Konami

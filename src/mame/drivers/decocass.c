@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Juergen Buchmueller
+// copyright-holders:Juergen Buchmueller, David Haywood
 /***********************************************************************
 
     DECO Cassette System driver

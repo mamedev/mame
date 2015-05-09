@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Pierpaolo Prazzoli
+// copyright-holders:Pierpaolo Prazzoli, David Haywood
 /*
 
       F2 System

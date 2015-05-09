@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Ken Sei Mogura: Street Fighter II
   aka Street Fighter II Whack-a-mole game */
 

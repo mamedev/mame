@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, ???
 /*
 Vs. Janshi Brandnew Stars
 (c)1997 Jaleco
