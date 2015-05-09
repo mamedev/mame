@@ -6,8 +6,8 @@
 
 */
 
-#ifndef _E06200_H_
-#define _E06200_H_
+#ifndef _E0C6200_H_
+#define _E0C6200_H_
 
 #include "emu.h"
 
@@ -110,15 +110,5 @@ protected:
 };
 
 
-class e0c6s46_device : public e0c6200_cpu_device
-{
-public:
-	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
 
-
-
-extern const device_type EPSON_E0C6S46;
-
-
-#endif /* _E06200_H_ */
+#endif /* _E0C6200_H_ */

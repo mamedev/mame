@@ -368,6 +368,8 @@ if (CPUS["E0C6200"]~=null) then
 	files {
 		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200.c",
 		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200.h",
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6s46.c",
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6s46.h",
 	}
 end
 
