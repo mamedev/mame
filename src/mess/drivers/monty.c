@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(monty_io, AS_IO, 8, monty_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_WRITE(ioCommandWrite0)
-    // TODO: "unmapped io memory read from 0001 & FF" - almost certainly a watchdog or inputs - resets around pc=135f if some condition isn't met
+    // TODO: "unmapped io memory read from 0001 & FF" - almost certainly a watchdog or inputs - resets around pc=1350 if some condition isn't met
     AM_RANGE(0x02, 0x02) AM_WRITE(ioCommandWrite1)
     AM_RANGE(0x80, 0xff) AM_WRITE(ioDisplayWrite)
 ADDRESS_MAP_END
