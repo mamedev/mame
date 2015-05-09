@@ -58,7 +58,7 @@ const device_type SATURN = &device_creator<saturn_device>;
 
 
 saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, SATURN, "Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
+	: cpu_device(mconfig, SATURN, "HP Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
 	, m_in_func(*this)
