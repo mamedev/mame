@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:LGPL2.1
+// copyright-holders:Peter Gutmann, Andrew Kuchling, Niels Moeller
 /* sha1.h
  *
  * The sha1 hash function.

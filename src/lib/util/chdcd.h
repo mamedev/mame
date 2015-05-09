@@ -1,11 +1,8 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R.Belmont
 /***************************************************************************
 
     CDRDAO TOC parser for CHD compression frontend
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
