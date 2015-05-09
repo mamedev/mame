@@ -75,6 +75,7 @@ uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
 uniform float2 Prescale = float2(8.0f, 8.0f);
 
 uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
+uniform bool RotationSwapXY = false; // swapped default screen orientation due to screen rotation
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures 
 
 VS_OUTPUT vs_main(VS_INPUT Input)
