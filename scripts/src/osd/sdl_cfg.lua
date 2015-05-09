@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
