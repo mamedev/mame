@@ -347,7 +347,7 @@ INPUT_PORTS_END
 	ROM_LOAD( "e2-card1.u22.jed", 0x000000, 0x000bd1, CRC(9d1e1ace) SHA1(287d6a30e9f32137ef4eba54f0effa092c97a6eb) ) \
 	ROM_LOAD( "e2-res3.u117.jed", 0x001000, 0x000bd1, CRC(4f1ff45a) SHA1(213cbdd6cd37ad9b5bfc9545084892a68d29f5ff) )
 
-
+ 
 ROM_START( iteagle )
 	EAGLE_BIOS
 
@@ -412,7 +412,7 @@ ROM_START( gtfore03a )
 	ROM_LOAD( "g43-us-u.u53", 0x0000, 0x0880, CRC(51c6f726) SHA1(9930337315128f89f7202893fb123ee3f0d33649) )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "golf_fore_2003_v3.00.09", 0, SHA1(b804656a032302e541a8221d4e0e4e4fe37ed637) ) /* Build 09:36:45, Oct 17 2002 */
+	DISK_IMAGE( "golf_fore_2003_v3.00.09", 0, SHA1(3c9cf82c3ad87b0d6b5a21089795abd8a08f8dd2) ) /* Build 09:36:45, Oct 17 2002 */
 ROM_END
 
 ROM_START( gtfore04 )
@@ -422,7 +422,7 @@ ROM_START( gtfore04 )
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "golf_fore_2004_v4.00.08", 0, SHA1(fe7525de89d67e0e3d10c48572fd04382543c19f) ) /* Build 14:15:44, Aug 27 2003 - Has been upgraded to Extra */
+	DISK_IMAGE( "golf_fore_2004_v4.00.08", 0, SHA1(739a52d6ce13bb6ac7a543ee0e8086fb66be19b9) ) /* Build 14:15:44, Aug 27 2003 - Has been upgraded to Extra */
 ROM_END
 
 ROM_START( gtfore04a )
@@ -432,7 +432,7 @@ ROM_START( gtfore04a )
 	ROM_LOAD( "g44-us-u.u53", 0x0000, 0x0880, NO_DUMP )
 
 	DISK_REGION( ":pci:06.1:ide2:0:hdd:image" )
-	DISK_IMAGE( "golf_fore_2004_v4.00.00", 0, SHA1(97d7a081cedc5d2fc5b90bbde95dd126445f9204) ) /* Build 16:40:59, Feb 28 2003 */
+	DISK_IMAGE( "golf_fore_2004_v4.00.00", 0, SHA1(fe7525de89d67e0e3d10c48572fd04382543c19f) ) /* Build 16:40:59, Feb 28 2003 */
 ROM_END
 
 ROM_START( gtfore05 )
