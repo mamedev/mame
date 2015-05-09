@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino, hap, R.Belmont
 /**
  * video hardware for Namco System22
  *

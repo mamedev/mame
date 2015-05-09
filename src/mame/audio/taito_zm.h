@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, hap
 /***************************************************************************
 
     Taito Zoom ZSG-2 sound board

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:MAME, LGPL 2.1
+// copyright-holders:R. Belmont, Olivier Galibert, hap
 #pragma once
 
 #ifndef __YMF278B_H__

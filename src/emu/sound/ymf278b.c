@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:MAME, LGPL 2.1
+// copyright-holders:R. Belmont, Olivier Galibert, hap
 /*
 
    YMF278B  FM + Wave table Synthesizer (OPL4)

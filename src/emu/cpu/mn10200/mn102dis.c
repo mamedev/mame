@@ -1,5 +1,9 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont, hap
+/*
+    Panasonic MN10200 disassembler
+*/
+
 #include "emu.h"
 
 #include <stdio.h>

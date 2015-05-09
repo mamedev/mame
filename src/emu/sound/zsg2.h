@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont, hap
 /*
     ZOOM ZSG-2 custom wavetable synthesizer
 */
