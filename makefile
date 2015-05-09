@@ -949,8 +949,8 @@ ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak
 endif
 
-ifneq (,$(wildcard src/$(TARGET)/$(SUBTARGET).mak))
-include src/$(TARGET)/$(SUBTARGET).mak
+ifneq (,$(wildcard src/$(TARGET)/$(TARGET).mak))
+include src/$(TARGET)/$(TARGET).mak
 endif
 
 $(GEN_FOLDERS):
