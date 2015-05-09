@@ -2,43 +2,43 @@
 <mamelayout version="2">
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="192" bottom="64" />
+			<bounds left="0" top="0" right="192" bottom="47" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="63" right="192" bottom="73" />
+			<bounds left="0" top="47" right="192" bottom="57" />
 			<color red="1" green="0.125" blue="0.125" />
 		</rect>
 		<rect>
-			<bounds left="0" top="73" right="192" bottom="82" />
+			<bounds left="0" top="57" right="192" bottom="67" />
 			<color red="1" green="0.5" blue="0.0625" />
 		</rect>
 		<rect>
-			<bounds left="0" top="82" right="192" bottom="90" />
+			<bounds left="0" top="67" right="192" bottom="77" />
 			<color red="0.25" green="1" blue="0.25" />
 		</rect>
 		<rect>
-			<bounds left="0" top="90" right="192" bottom="100" />
+			<bounds left="0" top="77" right="192" bottom="88" />
 			<color red="1" green="1" blue="0.25" />
 		</rect>
 		<rect>
-			<bounds left="0" top="100" right="192" bottom="232" />
+			<bounds left="0" top="88" right="192" bottom="236" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="232" right="192" bottom="240" />
+			<bounds left="0" top="236" right="192" bottom="244" />
 			<color red="0.125" green="0.125" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="240" right="192" bottom="256" />
+			<bounds left="0" top="244" right="192" bottom="258" />
 			<color red="1" green="1" blue="1" />
 		</rect>
 	</element>
 
 	<element name="serve_led" defstate="0">
-		<rect state="1">
+		<disk state="1">
 			<color red="1.0" green="0.3" blue="0.3" />
-		</rect>
+		</disk>
 		<text string="SERVE" state="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
@@ -46,9 +46,9 @@
 	</element>
 
 	<element name="lamp_credit1" defstate="0">
-		<rect state="1">
+		<disk state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
+		</disk>
 		<text string="CREDIT1" state="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
@@ -56,9 +56,9 @@
 	</element>
 
 	<element name="lamp_credit2" defstate="0">
-		<rect state="1">
+		<disk state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</rect>
+		</disk>
 		<text string="CREDIT2" state="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
@@ -72,14 +72,14 @@
 		<overlay name="overlay" element="overlay">
 			<bounds left="0" top="0" right="3" bottom="4" />
 		</overlay>
-		<bezel name="serve_led" element="serve_led">
-			<bounds x="0.125" y="4.01" width="0.55" height="0.24" />
-		</bezel>
 		<bezel name="lamp_credit1" element="lamp_credit1">
-			<bounds x="0.8" y="4.01" width="0.55" height="0.24" />
+			<bounds x="0.2" y="4.01" width="0.55" height="0.55" />
+		</bezel>
+		<bezel name="serve_led" element="serve_led">
+			<bounds x="1.4" y="4.01" width="0.24" height="0.24" />
 		</bezel>
 		<bezel name="lamp_credit2" element="lamp_credit2">
-			<bounds x="1.5" y="4.01" width="0.55" height="0.24" />
+			<bounds x="2.25" y="4.01" width="0.55" height="0.55" />
 		</bezel>
 	</view>
 </mamelayout>
