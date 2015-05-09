@@ -1516,13 +1516,17 @@ void shaders::post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &
 
 	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
 	bool orientation_swap_xy = (d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+	bool rotation_swap_xy = 
+		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
+		(d3d->window().target()->orientation() & ROT270) == ROT270;
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
 	curr_effect->set_texture("DiffuseTexture", rt->render_texture[0]);
 	curr_effect->set_vector("Prescale", 2, prescale);
-	curr_effect->set_bool("ShadowSwapXY", orientation_swap_xy);	
+	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);	
+	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);	
 	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 
 	d3d->set_wrap(D3DTADDRESS_MIRROR);

@@ -54,6 +54,11 @@ struct PS_INPUT
 	float2 ScreenCoord : TEXCOORD1;
 };
 
+bool xor(bool a, bool b)
+{
+	return (a || b) && !(a && b);
+}
+
 //-----------------------------------------------------------------------------
 // Scanline & Shadowmask Vertex Shader
 //-----------------------------------------------------------------------------
@@ -69,7 +74,7 @@ uniform float2 ShadowUVOffset = float2(0.0f, 0.0f);
 
 uniform float2 Prescale = float2(8.0f, 8.0f);
 
-uniform bool OrientationSwapXY = false; // false landscape, true portrait
+uniform bool OrientationSwapXY = false; // false landscape, true portrait for default screen orientation
 uniform bool PrepareBloom = false; // disables some effects for rendering bloom textures 
 
 VS_OUTPUT vs_main(VS_INPUT Input)
@@ -78,10 +83,15 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
 	float2 SourceTexelDims = 1.0f / SourceDims;
+	
+	float2 shadowUVOffset = ShadowUVOffset;
+	shadowUVOffset = xor(OrientationSwapXY, RotationSwapXY)
+		? shadowUVOffset.yx
+		: shadowUVOffset.xy;
 
 	// todo: calculate offset
 	float2 ScreenCoordPrescaleOffset = 0.0f;
-	ScreenCoordPrescaleOffset += ShadowUVOffset;
+	ScreenCoordPrescaleOffset += shadowUVOffset;
 
 	Output.ScreenCoord = Input.Position;
 	Output.ScreenCoord += ScreenCoordPrescaleOffset;
@@ -235,17 +245,18 @@ float GetRoundCornerFactor(float2 coord, float amount)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
-	
+
 	float2 UsedArea = 1.0f / SourceRect;
 	float2 HalfRect = SourceRect * 0.5f;
 
 	// Screen Curvature
 	float2 CurvatureUnitCoord = Input.TexCoord * (UsedArea * 2.0f) - 1.0f;
 	float2 CurvatureCurve =
-		  CurvatureAmount * 0.25f
-		* CurvatureUnitCoord
+		  CurvatureUnitCoord
+		* CurvatureAmount * 0.25f
 		* pow(length(CurvatureUnitCoord), 2.0f) 
 		/ pow(length(UsedArea), 2.0f);
+	// todo: zoom is only full screen fitting for 10:7 source ratio
 	float2 CurvatureZoom = 1.0f - (CurvatureAmount * 0.25f) * (UsedArea * 0.5f);
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
@@ -293,33 +304,38 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom)
 	{
-		float2 ShadowTexelDims = 1.0f / ShadowDims;	
-		ShadowTexelDims = OrientationSwapXY
+		float2 ShadowTexelDims = 1.0f / ShadowDims;
+		ShadowTexelDims = xor(OrientationSwapXY, RotationSwapXY)
 			? ShadowTexelDims.yx
 			: ShadowTexelDims.xy;
-	
+
 		float2 shadowUV = ShadowUV;
-		shadowUV = OrientationSwapXY
-			? shadowUV.yx
-			: shadowUV.xy;
-	
+		// shadowUV = xor(OrientationSwapXY, RotationSwapXY)
+			// ? shadowUV.yx
+			// : shadowUV.xy;
+
 		float2 screenCoord = ScreenCoord;
-		screenCoord = OrientationSwapXY
+		screenCoord = xor(OrientationSwapXY, RotationSwapXY)
 			? screenCoord.yx
 			: screenCoord.xy;
-	
-		float2 shadowTile = (ScreenTexelDims * ShadowCount);
-		shadowTile = OrientationSwapXY
+
+		float2 shadowCount = ShadowCount;
+		shadowCount = xor(OrientationSwapXY, RotationSwapXY)
+			? shadowCount.yx
+			: shadowCount.xy;
+
+		float2 shadowTile = (ScreenTexelDims * shadowCount);
+		shadowTile = xor(OrientationSwapXY, RotationSwapXY)
 			? shadowTile.yx
 			: shadowTile.xy;
 
 		float2 ShadowFrac = frac(screenCoord / shadowTile);
 		float2 ShadowCoord = (ShadowFrac * shadowUV);
 		ShadowCoord += ShadowTexelDims * 0.5f; // half texel offset
-		ShadowCoord =	OrientationSwapXY
-			? ShadowCoord.yx
-			: ShadowCoord.xy;
-		
+		// ShadowCoord = xor(OrientationSwapXY, RotationSwapXY)
+			// ? ShadowCoord.yx
+			// : ShadowCoord.xy;
+
 		float3 ShadowColor = tex2D(ShadowSampler, ShadowCoord).rgb;
 		ShadowColor = lerp(1.0f, ShadowColor, ShadowAlpha);
 
@@ -343,8 +359,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	{
 		// todo: there is an offset which can be noticed at lower prescale in high-resolution
 		float2 ScanlinePrescaleOffset = 0.0f;
-		
-		float InnerSine =	BaseCoordCentered.y * ScanlineScale * SourceDims.y;
+
+		float InnerSine = BaseCoordCentered.y * ScanlineScale * SourceDims.y;
 		float ScanJitter = ScanlineOffset * SourceDims.y;
 		float ScanBrightMod = sin(InnerSine * PI + ScanJitter + ScanlinePrescaleOffset);
 		float3 ScanColor = lerp(1.0f, (pow(ScanBrightMod * ScanBrightMod, ScanlineHeight) * ScanlineBrightScale + 1.0f + ScanlineBrightOffset) * 0.5f, ScanlineAlpha);
