@@ -66,6 +66,7 @@ NETLIB_UPDATE(nicDelay)
 	}
 	else if (!INPLOGIC(m_I) && m_last)
 	{
+		// H_to_L
 		OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(m_H_to_L.Value()));
 	}
 	m_last = INPLOGIC(m_I);
