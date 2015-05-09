@@ -780,6 +780,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"psion",
 		"radio",
 		"rca",
+		"ritam",
 		"rm",
 		"robotron",
 		"rockwell",
@@ -1995,6 +1996,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/microkit.c",  
 	MAME_DIR .. "src/mess/drivers/studio2.c",   
 	MAME_DIR .. "src/mess/drivers/vip.c",       
+}
+
+createMESSProjects(_target, _subtarget, "ritam")
+files {                
+	MAME_DIR .. "src/mess/drivers/monty.c",
 }
 
 createMESSProjects(_target, _subtarget, "rm")
