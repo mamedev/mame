@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:smf, R. Belmont
 /*
 
 Twinkle System

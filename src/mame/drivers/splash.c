@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
 
 Splash! (c) 1992 Gaelco

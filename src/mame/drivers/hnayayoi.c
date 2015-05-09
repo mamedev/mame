@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /****************************************************************************
 
 Some Dynax games using the first version of their blitter

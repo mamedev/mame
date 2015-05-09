@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /*****************************************************************************
 
     Irem M90/M97 system games:

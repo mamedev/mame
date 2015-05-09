@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /****************************************************************************************
 
 Super Wing - (c) 1985 Wing (UPL?)

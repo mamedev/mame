@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Angelo Salese, Tomasz Slanina, Luca Elia
 /*************************************************************************************************************
 
 Blitter based gambling games

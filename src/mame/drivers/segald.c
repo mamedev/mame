@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Andrew Gardner
 /*
 Sega LaserDisc Hardware
 Driver by Andrew Gardner from schematics with help from Daphne Source

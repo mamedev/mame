@@ -1,6 +1,6 @@
 // license:???
-// copyright-holders:???
-	/*  Konami NWK-TR System
+// copyright-holders:Ville Linde
+/*  Konami NWK-TR System
 
 	Driver by Ville Linde
 

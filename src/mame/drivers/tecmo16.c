@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Eisuke Watanabe, Nicola Salmoria
 /******************************************************************************
 
   Ganbare Ginkun  (Japan)  (c)1995 TECMO

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Norbert Kehrer
 /***************************************************************************
 
     Mad Alien (c) 1980 Data East Corporation

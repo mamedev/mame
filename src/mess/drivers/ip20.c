@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /*********************************************************************\
 *
 *   SGI IP20 IRIS Indigo workstation

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /***************************************************************************
     N.Y. Captor - Taito '85
 

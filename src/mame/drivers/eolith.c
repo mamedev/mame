@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli
 /********************************************************************
  Eolith 32 bits hardware: Gradation 2D system
 

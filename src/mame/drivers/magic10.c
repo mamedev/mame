@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli, Roberto Fresca
 /****************************************************************************
 
     MAGIC'S 10

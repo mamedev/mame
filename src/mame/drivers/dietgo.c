@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail, David Haywood
 /*
     Diet Go Go
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Marc Lafontaine
 /***************************************************************************
 
 Popeye  (c) 1982 Nintendo

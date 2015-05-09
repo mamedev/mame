@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Fresca
 /******************************************************************************
 
   SIGMA B52 SYSTEM.

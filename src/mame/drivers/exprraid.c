@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 Express Raider - (c) 1986 Data East Corporation / Data East USA

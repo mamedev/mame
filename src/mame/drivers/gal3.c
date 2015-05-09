@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Naibo Zhang
 /* Galaxian 3
 
   -- bootable driver --

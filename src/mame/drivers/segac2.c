@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Aaron Giles
 /***********************************************************************************************
 
     Sega System C (System 14)/C2 Driver

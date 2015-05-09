@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /*************************************************************************************************************
 
                                      -= Sigma B-98 Hardware / Sammy Medal Games =-

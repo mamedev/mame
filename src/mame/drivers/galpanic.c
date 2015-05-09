@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Gals Panic       1990 Kaneko

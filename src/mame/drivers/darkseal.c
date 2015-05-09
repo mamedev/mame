@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Dark Seal (Rev 3)    (c) 1990 Data East Corporation (World version)

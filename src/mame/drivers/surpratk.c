@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
     Surprise Attack (Konami GX911) (c) 1990 Konami

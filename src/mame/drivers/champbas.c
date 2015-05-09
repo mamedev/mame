@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
 /***************************************************************************
 
 Talbot                     - (c) 1982 Alpha Denshi Co.

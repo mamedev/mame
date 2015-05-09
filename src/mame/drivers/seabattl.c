@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mariusz Wojcieszek, hap, Phil Bennett, David Haywood
 /*
 
 Sea Battle by Zaccaria

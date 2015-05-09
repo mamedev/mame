@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Dan Boris
 /***************************************************************************
 
     Sun Electronics Arabian hardware

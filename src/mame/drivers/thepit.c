@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
 The Pit/Round Up/Intrepid/Super Mouse memory map (preliminary)

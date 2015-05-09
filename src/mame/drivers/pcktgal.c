@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Pocket Gal                      (c) 1987 Data East Corporation

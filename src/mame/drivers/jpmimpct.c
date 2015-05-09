@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     JPM IMPACT (aka System 6)

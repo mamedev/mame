@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Crash Race       (c) 1993 Video System Co.

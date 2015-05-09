@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /***************************************************************************
 
   Tao Taido             (c) 1993 Video System

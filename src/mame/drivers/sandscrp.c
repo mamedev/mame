@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /*
 
     Sand Scorpion    (C) 1992 FACE

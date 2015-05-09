@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /****************************************************************************************
 Reality Tennis - (c) 1993 TCH
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Baraduke    (c) 1985 Namco

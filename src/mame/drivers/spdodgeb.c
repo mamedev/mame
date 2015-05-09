@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Hampson, Nicola Salmoria
 /***************************************************************************
 
 Super Dodge Ball / Nekketsu Koukou Dodgeball Bu

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Taito F3 Package System (aka F3 Cybercore System)

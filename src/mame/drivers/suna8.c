@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                             -=  SunA 8 Bit Games =-

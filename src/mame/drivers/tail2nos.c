@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
     Tail to Nose / Super Formula - (c) 1989 Video System Co.

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Angelo Salese, David Haywood
 /*******************************************************************************************
 
 Champion Super (c) 1999 <unknown>

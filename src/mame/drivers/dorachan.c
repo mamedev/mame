@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /*
 Dorachan (Dora-Chan ?) (c) 1980 Craul Denshi
 Driver by Tomasz Slanina

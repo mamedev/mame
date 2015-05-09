@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Grull Osgo
 /************************************************************************************
 
 Game Magic (c) 1997 Bally Gaming Co.

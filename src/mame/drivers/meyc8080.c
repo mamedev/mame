@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli,hap,Roberto Fresca
 /**********************************************************
 
   MEYCO 8080 BASED GAMBLING HARDWARE

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Apache 3                                            ATF-011

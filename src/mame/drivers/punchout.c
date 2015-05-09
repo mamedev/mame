@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Punch Out / Super Punch Out / Arm Wrestling

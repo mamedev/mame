@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
   Thunder Zone / Desert Assault (c) 1991 Data East Corporation

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Uki
 /*****************************************************************************
 
     Mahjong Sisters (c) 1986 Toa Plan

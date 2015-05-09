@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mathis Rosenhauer
 /*
 
   Beezer - (c) 1982 Tong Electronic

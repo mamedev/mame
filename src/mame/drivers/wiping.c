@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Allard van der Bas
 /***************************************************************************
                 Wiping
                 (C) 1982 Nichibutsu

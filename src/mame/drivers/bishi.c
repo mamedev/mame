@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont
 /***************************************************************************
 
  Bishi Bashi Champ Mini Game Senshuken (c) 1996 Konami

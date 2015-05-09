@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
  Route 16/Stratovox memory map (preliminary)

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, smf
 /***************************************************************************
 
   Konami GQ System - Arcade PSX Hardware

@@ -4,9 +4,6 @@
 
     Maygay M1 A/B driver, (under heavy construction !!!)
 
-    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
-    used under license from http://mamedev.org
-
     This only loads the basic stuff - there needs to be more done to make this run.
 
     The sound ROM + OKIM6376 is on the game plug-in board, so not all games have it

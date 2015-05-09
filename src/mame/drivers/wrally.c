@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Andel Horna
 /***************************************************************************
 
 World Rally (c) 1993 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Alex Pasadyn, Howie Cohen, Frank Palazzolo, Ernesto Corvi, Aaron Giles
 /*************************************************************************
 
     Sega Z80-3D system

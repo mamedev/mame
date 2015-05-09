@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Angelo Salese
 /***************************************************************************************************************************
 
 Cherry Chance (c) 1987 Taito Corporation?

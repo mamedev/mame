@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /*
    Super Kaneko Nova System
     Original Driver by Sylvain Glaize

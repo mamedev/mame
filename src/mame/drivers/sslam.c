@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli
 /* Super Slam (c)1993 Playmark */
 
 /*

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     Microprose Games 3D hardware

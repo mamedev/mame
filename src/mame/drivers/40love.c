@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jaroslaw Burczynski
 /****************************************************************************
 
     Forty-Love (c) Taito 1984

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /*
 
 Othello (version 3.0) - Success 1984

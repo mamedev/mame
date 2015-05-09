@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail, David Graves
 /***************************************************************************
 
     Underfire                           (c) 1993 Taito

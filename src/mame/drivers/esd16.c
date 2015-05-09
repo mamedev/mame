@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
                           -= ESD 16 Bit Games =-

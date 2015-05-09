@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 King of Boxer - (c) 1985 Wood Place Inc.

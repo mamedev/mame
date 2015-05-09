@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Shanghai 3           (c)1993 Sunsoft     (68000     AY8910 OKI6295)

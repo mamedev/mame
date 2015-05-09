@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 /*************************************************************************
     Quiz Panicuru Fantasy
     (c) 1993 NMK

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
 
  Eolith 16 bits hardware

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /********************************************
     NEC V810 (upd70732) disassembler
   Tomasz Slanina - analog[at]op.pl

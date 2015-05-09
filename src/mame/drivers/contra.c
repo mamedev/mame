@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Carlos A. Lozano, Phil Stroffolino
 /***************************************************************************
 
 Contra/Gryzor (c) 1987 Konami

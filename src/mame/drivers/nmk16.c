@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:Mirko Buffoni,Richard Bush,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,trap15,Angelo Salese
 /********************************************************************
 

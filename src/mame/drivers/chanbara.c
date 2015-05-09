@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina, David Haywood
 /****************************************************************************************
 Chanbara
 Data East, 1985

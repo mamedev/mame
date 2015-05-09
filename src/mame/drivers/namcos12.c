@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:smf
 /***************************************************************************
 
   Namco System 12 - Arcade Playstation-based Hardware

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Dan Boris
 /***************************************************************************
 
     Atari Return of the Jedi hardware

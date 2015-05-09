@@ -1,4 +1,4 @@
-// license:MAME|LGPL-2.1+
+// license:LGPL-2.1+
 // copyright-holders:Jonathan Gevaryahu,R. Belmont,Zsolt Vasvari
 #pragma once
 /*
