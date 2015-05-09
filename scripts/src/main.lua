@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 function mainProject(_target, _subtarget)
 	if (_target == _subtarget) then
 		project (_target)

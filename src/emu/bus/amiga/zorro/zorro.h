@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Amiga Zorro Slots
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     86-pin Expansion Slot (Zorro-I), Zorro-II, Zorro-III
 

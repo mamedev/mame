@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Commodore A2052
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Zorro-II RAM Expansion (0.5, 1 or 2 MB)
 

@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /**********************************************************************
 
     EPSON PF-10
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Battery operated portable 3.5" floppy drive
 

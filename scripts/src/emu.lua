@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 project ("emu")
 uuid ("e6fa15e4-a354-4526-acef-13c8e80fcacf")
 kind "StaticLib"

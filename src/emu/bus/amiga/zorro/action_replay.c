@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Datel Action Replay
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Freezer cartridge for Amiga 500 and Amiga 2000
 

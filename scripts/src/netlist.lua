@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 files {
 	MAME_DIR .. "src/emu/netlist/nl_config.h",
 	MAME_DIR .. "src/emu/netlist/nl_dice_compat.h",

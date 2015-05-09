@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /**********************************************************************
 
     EPSON TF-20
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Dual 5.25" floppy drive with HX-20 factory option
 
