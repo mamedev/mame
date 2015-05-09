@@ -1,7 +1,7 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*
- * font_sdl.c
+ * font_windows.c
  *
  */
 

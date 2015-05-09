@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 #ifndef _osdsdl_h_
 #define _osdsdl_h_
 

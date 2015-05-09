@@ -1,4 +1,4 @@
-// license:? (pending decision)
+// license:???
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 /********************************************************************************************************
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL2.0+
+// copyright-holders:Sven Gothel
 const char glsl_general_vsh_src[] =
 "\n"
 "void main()\n"

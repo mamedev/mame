@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL2.0+
+// copyright-holders:Sven Gothel
 
 #ifndef GL_SHADER_MGR_H
 #define GL_SHADER_MGR_H

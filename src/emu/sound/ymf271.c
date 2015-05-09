@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 /*
     Yamaha YMF271-F "OPX" emulator v0.1
     By R. Belmont.

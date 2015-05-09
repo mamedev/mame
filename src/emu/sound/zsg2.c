@@ -1,15 +1,11 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 /*
     ZOOM ZSG-2 custom wavetable synthesizer
 
     Written by Olivier Galibert
     MAME conversion by R. Belmont
     Working emulation by The Talentuous Hands Of The Popularious hap
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
     ---------------------------------------------------------
 
     Additional notes on the sample format, reverse-engineered

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 /*
 Funai / Gakken Interstellar Laser Fantasy laserdisc hardware

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovis
 //============================================================
 //
 //  none.c - stubs for linking when NO_DEBUGGER is defined

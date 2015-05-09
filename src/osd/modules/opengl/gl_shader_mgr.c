@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL2.0+
+// copyright-holders:Sven Gothel
 #include <stdio.h>   /* snprintf */
 #include <stdlib.h>  /* malloc */
 
