@@ -89,6 +89,8 @@ void e0c6200_cpu_device::device_start()
 	save_item(NAME(m_f));
 
 	// register state for debugger
+	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%4s").noshow();
 
 	m_icountptr = &m_icount;
 }

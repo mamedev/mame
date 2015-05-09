@@ -1171,6 +1171,7 @@ createMESSProjects(_target, _subtarget, "bandai")
 files {            
 	MAME_DIR .. "src/mess/drivers/sv8000.c",    
 	MAME_DIR .. "src/mess/drivers/rx78.c",      
+	MAME_DIR .. "src/mess/drivers/tamag1.c",
 	MAME_DIR .. "src/mess/drivers/wswan.c",
 	MAME_DIR .. "src/mess/audio/wswan_snd.c",
 	MAME_DIR .. "src/mess/machine/wswan.c",

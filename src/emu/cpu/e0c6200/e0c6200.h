@@ -92,7 +92,7 @@ protected:
 	inline void set_zf(UINT8 data);
 	inline void inc_x();
 	inline void inc_y();
-	void do_branch(int condition = 0);
+	void do_branch(int condition = 1);
 	
 	// opcode handlers
 	UINT8 op_inc(UINT8 x);

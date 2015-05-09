@@ -24,6 +24,6 @@ protected:
 
 
 
-extern const device_type EPSON_E0C6S46;
+extern const device_type E0C6S46;
 
 #endif /* _E0C6S46_H_ */
