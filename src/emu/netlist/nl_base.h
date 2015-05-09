@@ -245,7 +245,7 @@ typedef void (*net_update_delegate)(netlist_core_device_t *);
 		, _priv)
 
 #define NETLIB_LOGIC_FAMILY(_fam)                                               \
-ATTR_COLD virtual const netlist_logic_family_desc_t *logic_family()             \
+ATTR_COLD virtual const netlist_logic_family_desc_t *default_logic_family()     \
 {                                                                               \
 	return &netlist_family_ ## _fam;                                            \
 }
@@ -288,6 +288,19 @@ public:
 	nl_double m_high_V;
 	nl_double m_R_low;
 	nl_double m_R_high;
+};
+
+class netlist_logic_family_t
+{
+public:
+
+	netlist_logic_family_t() : m_logic_family(NULL) {}
+
+	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() const { return m_logic_family; }
+	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
+
+private:
+	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 /* Terminals inherit the family description from the netlist_device
@@ -537,11 +550,11 @@ private:
 // netlist_logic_input_t
 // -----------------------------------------------------------------------------
 
-class netlist_logic_input_t : public netlist_input_t
+class netlist_logic_input_t : public netlist_input_t, public netlist_logic_family_t
 {
 public:
 	ATTR_COLD netlist_logic_input_t()
-		: netlist_input_t(INPUT, LOGIC), m_logic_family(NULL)
+		: netlist_input_t(INPUT, LOGIC), netlist_logic_family_t()
 	{
 	}
 
@@ -551,11 +564,6 @@ public:
 	ATTR_HOT inline void activate_hl();
 	ATTR_HOT inline void activate_lh();
 
-	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
-	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
-
-private:
-	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 // -----------------------------------------------------------------------------
@@ -786,7 +794,7 @@ private:
 };
 
 
-class netlist_logic_output_t : public netlist_output_t
+class netlist_logic_output_t : public netlist_output_t, public netlist_logic_family_t
 {
 	NETLIST_PREVENT_COPYING(netlist_logic_output_t)
 public:
@@ -804,13 +812,9 @@ public:
 	ATTR_COLD nld_base_d_to_a_proxy *get_proxy() const  { return m_proxy; }
 	ATTR_COLD void set_proxy(nld_base_d_to_a_proxy *proxy) { m_proxy = proxy; }
 
-	ATTR_HOT inline const netlist_logic_family_desc_t *logic_family() { return m_logic_family; }
-	ATTR_COLD void set_logic_family(const netlist_logic_family_desc_t *fam) { m_logic_family = fam; }
-
 private:
 	netlist_logic_net_t m_my_net;
 	nld_base_d_to_a_proxy *m_proxy;
-	const netlist_logic_family_desc_t *m_logic_family;
 };
 
 class netlist_ttl_output_t : public netlist_logic_output_t
@@ -954,7 +958,7 @@ private:
 // net_device_t
 // -----------------------------------------------------------------------------
 
-class netlist_core_device_t : public netlist_object_t
+class netlist_core_device_t : public netlist_object_t, public netlist_logic_family_t
 {
 	NETLIST_PREVENT_COPYING(netlist_core_device_t)
 public:
@@ -1024,7 +1028,7 @@ protected:
 
 	ATTR_HOT virtual void update() { }
 	ATTR_COLD virtual void start() { }
-	ATTR_COLD virtual const netlist_logic_family_desc_t *logic_family()
+	ATTR_COLD virtual const netlist_logic_family_desc_t *default_logic_family()
 	{
 		return &netlist_family_TTL;
 	}
