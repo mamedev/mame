@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Coates, Couriersud
 /***************************************************************************
 
 Century CVS System

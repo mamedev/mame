@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:smf
 /*
  * x76f041.h

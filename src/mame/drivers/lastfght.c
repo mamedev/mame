@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /*********************************************************************************************************************
 
 Last Fighting  (C)2000 Subsino

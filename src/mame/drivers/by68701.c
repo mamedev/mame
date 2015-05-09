@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /**************************************************************************
 
   Last Duel                       - Capcom, 1988

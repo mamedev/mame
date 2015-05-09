@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 /******************************************************************************
 
 Sega System 1 / System 2

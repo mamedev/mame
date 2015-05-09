@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 Pac-Land  (c) 1984 Namco

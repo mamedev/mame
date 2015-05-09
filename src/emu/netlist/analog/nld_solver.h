@@ -14,13 +14,6 @@
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
 
-#define USE_PIVOT_SEARCH (0)
-#define VECTALT 1
-#define USE_GABS 1
-#define USE_MATRIX_GS 0
-// savings are eaten up by effort
-#define USE_LINEAR_PREDICTION (0)
-
 // ----------------------------------------------------------------------------------------
 // Macros
 // ----------------------------------------------------------------------------------------

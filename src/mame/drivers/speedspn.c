@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Farfetch'd
 /*** DRIVER INFO & NOTES ******************************************************
  Speed Spin (c)1994 TCH
   driver by David Haywood & Farfetch'd

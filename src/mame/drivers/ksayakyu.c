@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /*
 Kusayakyuu (Sandlot Baseball)
 (c)1985 Taito

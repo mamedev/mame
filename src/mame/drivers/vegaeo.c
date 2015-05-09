@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli
 /********************************************************************
  Eolith 32 bits hardware: Vega system
 

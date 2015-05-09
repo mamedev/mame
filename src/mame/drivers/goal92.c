@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli, David Haywood
 /***************************************************************************
 
     Goal! '92

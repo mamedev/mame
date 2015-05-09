@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mariusz Wojcieszek
 /****************************************************************************
 
     Go! Go! Connie chan Jaka Jaka Janken

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 Karate Champ - (c) 1984 Data East

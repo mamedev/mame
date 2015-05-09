@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mariusz Wojcieszek, Angelo Salese
 /***************************************************************************
 
     QX-10

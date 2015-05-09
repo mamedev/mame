@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Krzysztof Strzecha,Jon Sturm
 /***************************************************************************
 TI-85 and TI-86 drivers by Krzysztof Strzecha
 TI-83 Plus, TI-84 Plus, and Siliver Edition support by Jon Sturm

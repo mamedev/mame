@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:smf, pSXAuthor, R. Belmont
 /***************************************************************************
 
   Sony Playstaion

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:smf
 /***************************************************************************
 
 Ace Video Fruit Machine hardware

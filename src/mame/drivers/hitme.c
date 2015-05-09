@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Dan Boris
 /* Hit Me driver by the EMUL8, led by Dan Boris */
 
 /*

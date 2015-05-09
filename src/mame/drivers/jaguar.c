@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:Aaron Giles,Nathan Woods,Angelo Salese, Robbbert
 /***************************************************************************
 

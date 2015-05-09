@@ -54,7 +54,7 @@ NETLIB_UPDATE(7474)
 
 NETLIB_START(7474)
 {
-	register_sub(sub, "sub");
+	register_sub("sub", sub);
 
 	register_subalias("CLK",    sub.m_CLK);
 	register_input("D",         m_D);
@@ -93,8 +93,8 @@ NETLIB_RESET(7474sub)
 
 NETLIB_START(7474_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
 
 	register_subalias("1", m_1.m_CLRQ);
 	register_subalias("2", m_1.m_D);

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail, David Haywood
 /*
     Boogie Wings (aka The Great Ragtime Show)
     Data East, 1992

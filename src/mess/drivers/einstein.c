@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:Kevin Thacker, Dirk Best, Phill Harvey-Smith
 /******************************************************************************
 

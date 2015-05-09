@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /*********************************************************************************************************************
 
 Mahjong Dunhuang (C)1995 Spirit

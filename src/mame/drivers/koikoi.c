@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina, David Haywood
 /***************************************************************************
 
 Koi Koi Part 2

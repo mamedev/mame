@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
   Data East 16 bit games - Bryan McPhail, mish@tendril.co.uk

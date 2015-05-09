@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Eisuke Watanabe
 /***************************************************************************
 
 Quiz Do Re Mi Fa Grand Prix (Japan)     (GQ460) (c)1994 Konami

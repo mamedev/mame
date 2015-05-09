@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:smf,Ryan Holtz,R. Belmont
 /***************************************************************************
 
   Namco System 11 - Arcade PSX Hardware

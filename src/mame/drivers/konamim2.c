@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 /*
 Konami M2 Hardware
 Preliminary driver by Ville Linde

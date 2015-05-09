@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Dynamite Duke                       (c) 1989 Seibu Kaihatsu/Fabtek

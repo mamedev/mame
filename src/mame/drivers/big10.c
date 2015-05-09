@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Angelo Salese, Roberto Fresca, Tomasz Slanina
 /***************************************************************************
 
   BIG 10

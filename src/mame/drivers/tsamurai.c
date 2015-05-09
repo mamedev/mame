@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 /****************************************************************************
 
     Samurai, Nunchackun, Yuke Yuke Yamaguchi-kun (c) Taito 1985

@@ -11,6 +11,7 @@
 
 #if 0
 #pragma GCC optimize "-ffast-math"
+#pragma GCC optimize "-ftree-parallelize-loops=4"
 //#pragma GCC optimize "-funroll-loops"
 #pragma GCC optimize "-funswitch-loops"
 #pragma GCC optimize "-fvariable-expansion-in-unroller"
@@ -22,7 +23,6 @@
 #pragma GCC optimize "-ftree-loop-im"
 #pragma GCC optimize "-ftree-loop-ivcanon"
 #pragma GCC optimize "-fivopts"
-#pragma GCC optimize "-ftree-parallelize-loops=4"
 #endif
 
 #define SOLVER_VERBOSE_OUT(x) do {} while (0)
@@ -33,7 +33,8 @@
 #include "nld_ms_direct.h"
 #include "nld_ms_direct1.h"
 #include "nld_ms_direct2.h"
-#include "nld_ms_gauss_seidel.h"
+#include "nld_ms_sor.h"
+#include "nld_ms_sor_mat.h"
 #include "nld_twoterm.h"
 #include "../nl_lists.h"
 
@@ -367,7 +368,7 @@ NETLIB_UPDATE(solver)
 		omp_set_dynamic(0);
 		#pragma omp parallel
 		{
-			#pragma omp for nowait
+			#pragma omp for
 			for (int i = 0; i <  t_cnt; i++)
 				if (m_mat_solvers[i]->is_timestep())
 				{
@@ -412,8 +413,16 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 	{
 		if (size >= gs_threshold)
 		{
-			typedef netlist_matrix_solver_gauss_seidel_t<m_N,_storage_N> solver_GS;
-			return nl_alloc(solver_GS, m_params, size);
+			if (USE_MATRIX_GS)
+			{
+				typedef netlist_matrix_solver_SOR_mat_t<m_N,_storage_N> solver_mat;
+				return nl_alloc(solver_mat, m_params, size);
+			}
+			else
+			{
+				typedef netlist_matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
+				return nl_alloc(solver_GS, m_params, size);
+			}
 		}
 		else
 		{
@@ -525,7 +534,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				break;
 		}
 
-		register_sub(*ms, pstring::sprintf("Solver_%d",m_mat_solvers.count()));
+		register_sub(pstring::sprintf("Solver_%d",m_mat_solvers.count()), *ms);
 
 		ms->vsetup(groups[i]);
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina,David Haywood
 /***************************************************************************
 
 Free Kick  - (c) 1987 Sega / Nihon System (made by Nihon, licensed to Sega)

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli, Tomasz Slanina
 /*
 
     D-DAY   (c)Jaleco 1984

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
     Tekunon Kougyou(Teknon Kogyo) Beam Invader hardware

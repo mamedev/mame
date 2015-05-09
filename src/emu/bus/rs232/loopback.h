@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:smf
 
 #ifndef RS232_LOOPBACK_H_

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, smf
 /***************************************************************************
 
   Konami GV System (aka "Baby Phoenix") - Arcade PSX Hardware

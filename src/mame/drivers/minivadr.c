@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi
 /***************************************************************************
 
 Mini Vaders (Space Invaders's mini game)

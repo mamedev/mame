@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Couriersud
 /***************************************************************************
 
 Pong (c) 1972 Atari

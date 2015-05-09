@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles
 /****************************************************************************
 
     Bally Astrocade style games

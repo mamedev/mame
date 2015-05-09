@@ -79,11 +79,6 @@ NETLIB_START(QBJT_switch)
 
 	save(NLNAME(m_state_on));
 
-	m_RB.set(netlist().gmin(), 0.0, 0.0);
-	m_RC.set(netlist().gmin(), 0.0, 0.0);
-
-	m_BC_dummy.set(netlist().gmin(), 0.0, 0.0);
-
 	m_state_on = 0;
 
 	{
@@ -115,6 +110,17 @@ NETLIB_START(QBJT_switch)
 
 }
 
+NETLIB_RESET(QBJT_switch)
+{
+	NETLIB_NAME(Q)::reset();
+
+	m_RB.set(netlist().gmin(), 0.0, 0.0);
+	m_RC.set(netlist().gmin(), 0.0, 0.0);
+
+	m_BC_dummy.set(netlist().gmin(), 0.0, 0.0);
+
+}
+
 NETLIB_UPDATE(QBJT_switch)
 {
 	if (!m_RB.m_P.net().isRailNet())
@@ -130,6 +136,36 @@ NETLIB_UPDATE_PARAM(QBJT_switch)
 {
 }
 
+NETLIB_UPDATE_TERMINALS(QBJT_switch)
+{
+	const nl_double m = (is_qtype( BJT_NPN) ? 1 : -1);
+
+	const int new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
+	if (m_state_on ^ new_state)
+	{
+#if 0
+		nl_double gb = m_gB;
+		nl_double gc = m_gC;
+		nl_double v  = m_V * m;
+		if (!new_state )
+		{
+			// not conducting
+			gb = netlist().gmin();
+			v = 0;
+			gc = netlist().gmin();
+		}
+#else
+		const nl_double gb = new_state ? m_gB : netlist().gmin();
+		const nl_double gc = new_state ? m_gC : netlist().gmin();
+		const nl_double v  = new_state ? m_V * m : 0;
+#endif
+		m_RB.set(gb, v,   0.0);
+		m_RC.set(gc, 0.0, 0.0);
+		//m_RB.update_dev();
+		//m_RC.update_dev();
+		m_state_on = new_state;
+	}
+}
 
 
 // ----------------------------------------------------------------------------------------
@@ -190,6 +226,26 @@ NETLIB_RESET(QBJT_EB)
 	NETLIB_NAME(Q)::reset();
 }
 
+NETLIB_UPDATE_TERMINALS(QBJT_EB)
+{
+	const nl_double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
+
+	m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
+	m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
+
+	const nl_double gee = m_gD_BE.G();
+	const nl_double gcc = m_gD_BC.G();
+	const nl_double gec =  m_alpha_r * gcc;
+	const nl_double gce =  m_alpha_f * gee;
+	const nl_double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
+	const nl_double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
+	const nl_double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
+	const nl_double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
+
+	m_D_EB.set_mat(gee, gec - gee, gce - gee, gee - gec, Ie, -Ie);
+	m_D_CB.set_mat(gcc, gce - gcc, gec - gcc, gcc - gce, Ic, -Ic);
+	m_D_EC.set_mat( 0,    -gec,      -gce,        0,       0,   0);
+}
 
 
 NETLIB_UPDATE_PARAM(QBJT_EB)

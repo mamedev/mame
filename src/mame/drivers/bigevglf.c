@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jaroslaw Burczynski, Tomasz Slanina
 /***************************************************************************
 Big Event Golf (c) Taito 1986
 

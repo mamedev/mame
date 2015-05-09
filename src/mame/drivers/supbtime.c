@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
   Super Burger Time     (c) 1990 Data East Corporation (DE-0343)

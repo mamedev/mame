@@ -362,7 +362,7 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
-: netlist_object_t(DEVICE, afamily)
+: netlist_object_t(DEVICE, afamily), netlist_logic_family_t()
 #if (NL_KEEP_STATISTICS)
 	, stat_total_time(0)
 	, stat_update_count(0)
@@ -373,6 +373,7 @@ ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
 
 ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstring &name)
 {
+	set_logic_family(this->default_logic_family());
 	init_object(anetlist, name);
 
 #if USE_PMFDELEGATES
@@ -440,9 +441,11 @@ ATTR_COLD void netlist_device_t::init(netlist_base_t &anetlist, const pstring &n
 }
 
 
-ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstring &name)
+ATTR_COLD void netlist_device_t::register_sub(const pstring &name, netlist_device_t &dev)
 {
 	dev.init(netlist(), this->name() + "." + name);
+	// FIXME: subdevices always first inherit the logic family of the parent
+	dev.set_logic_family(this->logic_family());
 	dev.start_dev();
 }
 
@@ -850,6 +853,7 @@ ATTR_HOT void netlist_terminal_t::schedule_after(const netlist_time &after)
 
 ATTR_COLD void netlist_terminal_t::reset()
 {
+	//printf("reset %s\n", name().cstr());
 	//netlist_terminal_core_terminal_t::reset();
 	set_state(STATE_INP_ACTIVE);
 	set_ptr(m_Idr1, 0.0);
@@ -897,7 +901,7 @@ ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const p
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
-	: netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL), m_logic_family(NULL)
+	: netlist_output_t(OUTPUT, LOGIC), netlist_logic_family_t(), m_proxy(NULL)
 {
 	this->set_net(m_my_net);
 }

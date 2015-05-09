@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pat Lawrence
 /***************************************************************************
 
     Atari Crystal Castles hardware

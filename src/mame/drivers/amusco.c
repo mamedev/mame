@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Fresca
 /******************************************************************************
 
   AMERICAN MUSIC POKER V1.4

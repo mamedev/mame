@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mariusz Wojcieszek
 /*
   Merit CRT-250 and CRT-260 hardware
 

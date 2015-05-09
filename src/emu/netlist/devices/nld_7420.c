@@ -9,8 +9,8 @@
 
 NETLIB_START(7420_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
 
 	register_subalias("1", m_1.m_i[0]);
 	register_subalias("2", m_1.m_i[1]);

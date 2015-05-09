@@ -2,7 +2,11 @@ function mainProject(_target, _subtarget)
 	if (_target == _subtarget) then
 		project (_target)
 	else
-		project (_target .. _subtarget)
+		if (_subtarget=="mess") then
+			project (_subtarget)
+		else
+			project (_target .. _subtarget)
+		end
 	end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
@@ -141,21 +145,20 @@ function mainProject(_target, _subtarget)
 	end
 
 	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/" .. _target ..".rc"
+		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/"  .. _subtarget .. "/" .. _subtarget ..".rc"
 		if not os.isfile(rcfile) then
-			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
+			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _subtarget .. "/" .. _subtarget ..".rc"
 		end
-		
 		if os.isfile(rcfile) then
 			files {
 				rcfile,
 			}
 			dependency {
-				{ "$(OBJDIR)/".._target ..".res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
+				{ "$(OBJDIR)/".._subtarget ..".res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
 			}
 		else
 			files {
-				MAME_DIR .. "src/osd/windows/mame.rc",
+				MAME_DIR .. "src/mame/osd/windows/mame/mame.rc",
 			}
 			dependency {
 				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },

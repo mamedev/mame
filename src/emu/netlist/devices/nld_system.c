@@ -152,7 +152,7 @@ ATTR_COLD void nld_d_to_a_proxy::start()
 {
 	nld_base_d_to_a_proxy::start();
 
-	register_sub(m_RV, "RV");
+	register_sub("RV", m_RV);
 	register_terminal("1", m_RV.m_P);
 	register_terminal("2", m_RV.m_N);
 
@@ -200,7 +200,7 @@ ATTR_HOT ATTR_ALIGN void nld_d_to_a_proxy::update()
 
 NETLIB_START(res_sw)
 {
-	register_sub(m_R, "R");
+	register_sub("R", m_R);
 	register_input("I", m_I);
 	register_param("RON", m_RON, 1.0);
 	register_param("ROFF", m_ROFF, 1.0E20);

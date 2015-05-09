@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     Play Mechanix / Right Hand Tech "VP100" and "VP101" platforms

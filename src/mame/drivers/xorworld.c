@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 XOR WORLD (c) 1990 Gaelco

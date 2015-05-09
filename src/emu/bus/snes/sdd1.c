@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz, Andreas Naive, Fabio Priuli
 /***********************************************************************************************************
 
  S-DD1 add-on chip emulation (for SNES/SFC)

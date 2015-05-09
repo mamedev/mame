@@ -454,8 +454,6 @@ files {
 
 dofile("netlist.lua")
 
-
-if (_OPTIONS["target"]~="mame") then
 --------------------------------------------------
 -- castool
 --------------------------------------------------
@@ -610,5 +608,3 @@ files {
 	MAME_DIR .. "src/mess/tools/imgtool/modules/bml3.c",
 	MAME_DIR .. "src/mess/tools/imgtool/modules/hp48.c",
 }
-
-end

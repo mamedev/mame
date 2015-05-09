@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Pierpaolo Prazzoli
 /******************************************************************************
 
     Dacholer    (c) 1983 Nichibutsu

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jaroslaw Burczynski
 /****************************************************************************
 
     Metal Soldier Isaac II  (c) Taito 1985

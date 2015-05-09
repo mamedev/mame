@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Brad Oliver
 /***************************************************************************
 
 Jack the Giant Killer memory map (preliminary)

@@ -2113,6 +2113,8 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cpc/playcity.h",
 		MAME_DIR .. "src/emu/bus/cpc/smartwatch.c",
 		MAME_DIR .. "src/emu/bus/cpc/smartwatch.h",
+		MAME_DIR .. "src/emu/bus/cpc/brunword4.c",
+		MAME_DIR .. "src/emu/bus/cpc/brunword4.h",
 	}
 end
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina,Ryan Holtz
 /*
  2010.04.05. stephh
 

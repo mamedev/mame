@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Frank Palazzolo
 /***************************************************************************
 
 Ramtek Star Cruiser Driver

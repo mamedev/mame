@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Rock'n Rage (GX620) (c) 1986 Konami

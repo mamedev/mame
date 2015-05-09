@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Steve Ellenoff, Peo
 /**************************************************************************
  Portraits
  (c) 1983 Olympia

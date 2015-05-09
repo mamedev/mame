@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Victor Trucco, Mike Balfour, Phil Stroffolino
 /******************************************************************
 
 Shark Attack

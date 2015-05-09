@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Bryan McPhail
 /*******************************************************************************
 
     Battle Rangers                  (c) 1988 Data East Corporation

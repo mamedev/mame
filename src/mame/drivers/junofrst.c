@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Chris Hardy
 /***************************************************************************
 
 Juno First :  memory map same as tutankham with some address changes

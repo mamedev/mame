@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Tomasz Slanina
 /*
 Main Event - SNK 1984
 Canvas Croquis - SNK 1985

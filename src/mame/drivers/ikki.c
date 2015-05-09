@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Uki
 /*****************************************************************************
 
 Ikki (c) 1985 Sun Electronics

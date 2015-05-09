@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Bennett, Anonymous
 /******************************************************************************
 
     Bell-Fruit Cobra I/II and Viper Hardware

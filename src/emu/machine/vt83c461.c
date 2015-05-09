@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:smf
 #include "vt83c461.h"
 

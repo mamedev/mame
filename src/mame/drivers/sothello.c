@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tomasz Slanina
 /*
  Super Othello (c)1986 Fujiwara/Success
 

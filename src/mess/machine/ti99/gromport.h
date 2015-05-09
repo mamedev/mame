@@ -1,4 +1,4 @@
-// license:MAME|LGPL-2.1+
+// license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /***************************************************************************
     Gromport of the TI-99 consoles
