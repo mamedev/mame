@@ -1,8 +1,4 @@
-/*****************************************************************************
- *
- * tms70op.inc (Op code functions)
- *
- *****************************************************************************/
+// TMS7000 opcode handlers
 
 // addressing modes (not all opcodes have a write cycle)
 #define WB_NO -1
