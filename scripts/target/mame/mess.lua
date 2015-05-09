@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------
 --
---   mess.mak
+--   mess.lua
 --
 --   MESS target makefile
 --
@@ -651,7 +651,7 @@ BUSES["ZORRO"] = true
 -- comprise MESS plus messdriv.*", which contains
 -- the list of drivers
 --------------------------------------------------
-function linkProjects_mess_mess(_target, _subtarget)
+function linkProjects_mame_mess(_target, _subtarget)
 	links {
 		"acorn",
 		"act",
@@ -840,7 +840,7 @@ function linkProjects_mess_mess(_target, _subtarget)
 		"zvt",
 		"messshared",
 	}
-	if (_target=="mess") then
+	if (_subtarget=="mess") then
 	links {
 		"mameshared",
 	}
@@ -872,7 +872,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	}
 end
 	
-function createProjects_mess_mess(_target, _subtarget)
+function createProjects_mame_mess(_target, _subtarget)
 --------------------------------------------------
 -- the following files are MAME components and
 -- shared across a number of drivers
@@ -896,7 +896,7 @@ function createProjects_mess_mess(_target, _subtarget)
 -- vectrex.c (MESS + MAME)
 -- cps1.c (MESS + MAME)
 --------------------------------------------------
-if (_target=="mess") then
+if (_subtarget=="mess") then
 createMESSProjects(_target, _subtarget, "mameshared")
 files { 
 	MAME_DIR .. "src/mame/machine/archimds.c",  

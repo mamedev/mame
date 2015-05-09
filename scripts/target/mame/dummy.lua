@@ -1,16 +1,19 @@
-CPUS["Z80"] = true
+---------------------------------------------------------------------------
+--
+--   dummy.lua
+--
+--   Dummy target makefile
+--
+---------------------------------------------------------------------------
 
-SOUNDS["SN76496"] = true
+dofile("arcade.lua")
+dofile("mess.lua")
 
-VIDEOS["TMS9928A"] = true
-
-BUSES["COLECO"] = true
-
-function createProjects_mess_tiny(_target, _subtarget)
-	project ("mess_tiny")
+function createProjects_mame_dummy(_target, _subtarget)
+	project ("mame_dummy")
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
-	uuid (os.uuid("drv-mess-tiny"))
+	uuid (os.uuid("drv-mame_dummy"))
 	
 	options {
 		"ForceCPP",
@@ -33,8 +36,8 @@ function createProjects_mess_tiny(_target, _subtarget)
 	}
 end
 
-function linkProjects_mess_tiny(_target, _subtarget)
+function linkProjects_mame_dummy(_target, _subtarget)
 	links {
-		"mess_tiny",
+		"mame_dummy",
 	}
 end
