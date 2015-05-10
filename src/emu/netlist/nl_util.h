@@ -57,8 +57,8 @@ public:
 	ATTR_HOT inline static double log1p(const double x) { return nl_math::log(1.0 + x); }
 	ATTR_HOT inline static float log1p(const float x) { return nl_math::log(1.0 + x); }
 #else
-	ATTR_HOT inline static double log1p(const double x) { return log1p(x); }
-	ATTR_HOT inline static float log1p(const float x) { return log1pf(x); }
+	ATTR_HOT inline static double e_log1p(const double x) { return log1p(x); }
+	ATTR_HOT inline static float e_log1p(const float x) { return log1pf(x); }
 #endif
 	ATTR_HOT inline static double sqrt(const double x) { return std::sqrt(x); }
 	ATTR_HOT inline static float sqrt(const float x) { return std::sqrt(x); }

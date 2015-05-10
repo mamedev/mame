@@ -449,6 +449,9 @@ public:
 		m_state = astate;
 	}
 
+	/* inline, only intended to be called from nl_base.c */
+	ATTR_HOT inline void update_dev(const UINT32 mask);
+
 protected:
 	ATTR_COLD virtual void save_register()
 	{
@@ -955,11 +958,14 @@ public:
 
 	ATTR_HOT inline void update_dev()
 	{
+		begin_timing(stat_total_time);
+		inc_stat(stat_update_count);
 #if USE_PMFDELEGATES
 		static_update(this);
 #else
 		update();
 #endif
+		end_timing(stat_total_time);
 	}
 	ATTR_COLD void start_dev();
 

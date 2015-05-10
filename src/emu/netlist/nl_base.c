@@ -610,16 +610,12 @@ ATTR_COLD void netlist_net_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT /*ATTR_ALIGN*/ static inline void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
+ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
 {
-	netlist_core_device_t &netdev = inp->netdev();
-	inc_stat(netdev.stat_call_count);
-	if ((inp->state() & mask) != 0)
+	inc_stat(netdev().stat_call_count);
+	if ((state() & mask) != 0)
 	{
-		begin_timing(netdev.stat_total_time);
-		inc_stat(netdev.stat_update_count);
-		netdev.update_dev();
-		end_timing(netdev.stat_total_time);
+		netdev().update_dev();
 	}
 }
 
@@ -635,9 +631,9 @@ ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
 
+#if 0
 	switch (m_active)
 	{
-#if 0
 	case 2:
 		update_dev(p, mask);
 		p = m_list_active.next(p);
@@ -645,7 +641,6 @@ ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 	case 1:
 		update_dev(p, mask);
 		break;
-#endif
 	default:
 		while (p != NULL)
 		{
@@ -654,6 +649,14 @@ ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 		}
 		break;
 	}
+#else
+	while (p != NULL)
+	{
+		//update_dev(p, mask);
+		p->update_dev(mask);
+		p = m_list_active.next(p);
+	}
+#endif
 
 }
 
