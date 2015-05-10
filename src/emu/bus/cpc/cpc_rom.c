@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * cpc_rom.c
  * Amstrad CPC mountable ROM image device

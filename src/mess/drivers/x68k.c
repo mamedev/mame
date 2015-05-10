@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 
 // Preliminary X68000 driver for MESS

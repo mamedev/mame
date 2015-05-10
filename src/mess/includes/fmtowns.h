@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 #ifndef FMTOWNS_H_
 #define FMTOWNS_H_
 
