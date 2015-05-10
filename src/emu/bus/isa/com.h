@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Carl
+/// license:BSD-3-Clause
+// copyright-holders:Carl,Miodrag Milanovic
 #pragma once
 
 #ifndef __ISA_COM_H__

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 // Innovation SSI-2001
 
 #include "ssi2001.h"

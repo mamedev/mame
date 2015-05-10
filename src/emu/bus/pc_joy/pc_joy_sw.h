@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef PC_JOY_SW_H_
 #define PC_JOY_SW_H_
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Carl
+// copyright-holders:Carl,Miodrag Milanovic
 /***************************************************************************
 
   ISA 8 bit Generic Communication Card

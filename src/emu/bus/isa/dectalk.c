@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "dectalk.h"
 
 const device_type ISA8_DECTALK = &device_creator<dectalk_isa_device>;

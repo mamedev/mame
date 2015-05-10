@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:Carl
 /* PAD emulation */
 
 #include "ctlrport.h"
