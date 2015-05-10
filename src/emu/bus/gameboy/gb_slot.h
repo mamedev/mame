@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:etabeta
+// copyright-holders:etabeta, Wilbert Pol
 #ifndef __GB_SLOT_H
 #define __GB_SLOT_H
 
