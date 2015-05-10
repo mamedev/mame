@@ -1305,7 +1305,6 @@ ATTR_HOT inline void netlist_logic_input_t::activate_lh()
 
 ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time &delay)
 {
-	//if (UNEXPECTED(m_num_cons == 0 || is_queued()))
 	if (!is_queued() && (num_cons() > 0))
 	{
 		m_time = netlist().time() + delay;
@@ -1319,7 +1318,6 @@ ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time &delay)
 
 ATTR_HOT inline void netlist_net_t::reschedule_in_queue(const netlist_time &delay)
 {
-	//if (UNEXPECTED(m_num_cons == 0 || is_queued()))
 	if (is_queued())
 		netlist().remove_from_queue(*this);
 
@@ -1334,6 +1332,7 @@ ATTR_HOT inline void netlist_net_t::reschedule_in_queue(const netlist_time &dela
 
 ATTR_HOT inline const netlist_sig_t netlist_logic_input_t::Q() const
 {
+	nl_assert(family() == LOGIC);
 	return net().as_logic().Q();
 }
 

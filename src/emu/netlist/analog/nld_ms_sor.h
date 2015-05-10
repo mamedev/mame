@@ -94,7 +94,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 	 *
 	 * and estimate using
 	 *
-	 * omega = 2.0 / (1.0 + sqrt(1-rho))
+	 * omega = 2.0 / (1.0 + nl_math::sqrt(1-rho))
 	 */
 
 	const nl_double ws = this->m_params.m_sor; //1.045; //2.0 / (1.0 + /*sin*/(3.14159 * 5.5 / (double) (m_nets.count()+1)));
@@ -128,7 +128,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 			if (USE_GABS)
 				for (int i = 0; i < term_count; i++)
-					gabs_t = gabs_t + fabs(go[i]);
+					gabs_t = gabs_t + nl_math::abs(go[i]);
 
 			for (int i = this->m_terms[k]->m_railstart; i < term_count; i++)
 				RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
@@ -174,7 +174,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 			const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
 
-			resched = resched || (std::abs(new_val - new_V[k]) > accuracy);
+			resched = resched || (nl_math::abs(new_val - new_V[k]) > accuracy);
 			new_V[k] = new_val;
 		}
 

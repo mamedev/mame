@@ -114,7 +114,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 			this->m_Vdelta[k] = nv;
 		}
 		if (sqo > 1e-90)
-			m_lp_fact = std::min(sqrt(sq/sqo), 2.0);
+			m_lp_fact = std::min(nl_math::sqrt(sq/sqo), (nl_double) 2.0);
 		else
 			m_lp_fact = 0.0;
 	}
@@ -154,16 +154,16 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 		for (int k = 0; k < iN; k++)
 		{
 	#if 0
-			nl_double akk = fabs(this->m_A[k][k]);
+			nl_double akk = nl_math::abs(this->m_A[k][k]);
 			if ( akk > lambdaN)
 				lambdaN = akk;
 			if (akk < lambda1)
 				lambda1 = akk;
 	#else
-			nl_double akk = fabs(this->m_A[k][k]);
+			nl_double akk = nl_math::abs(this->m_A[k][k]);
 			nl_double s = 0.0;
 			for (int i=0; i<iN; i++)
-				s = s + fabs(this->m_A[k][i]);
+				s = s + nl_math::abs(this->m_A[k][i]);
 			akk = s / akk - 1.0;
 			//if ( akk > lambdaN)
 			//	lambdaN = akk;
@@ -194,7 +194,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 			for (int i = 0; i < iN; i++)
 			{
 				frob += this->m_A[k][i] * this->m_A[k][i];
-				s = s + fabs(this->m_A[k][i]);
+				s = s + nl_math::abs(this->m_A[k][i]);
 			}
 
 			if (s<rmin)
@@ -203,9 +203,9 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 				rmax = s;
 		}
 #if 0
-		nl_double frobA = sqrt(frob /(iN));
+		nl_double frobA = nl_math::sqrt(frob /(iN));
 		if (1 &&frobA < 1.0)
-			//ws = 2.0 / (1.0 + sqrt(1.0-frobA));
+			//ws = 2.0 / (1.0 + nl_math::sqrt(1.0-frobA));
 			ws = 2.0 / (2.0 - frobA);
 		else
 			ws = 1.0;
@@ -220,7 +220,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 		// suitable parameter.
 		nl_double rm = (rmax + rmin) * 0.5;
 		if (rm < 1.0)
-			ws = 2.0 / (1.0 + sqrt(1.0-rm));
+			ws = 2.0 / (1.0 + nl_math::sqrt(1.0-rm));
 		else
 			ws = 1.0;
 		if (ws > 1.02 && rmax > 1.001)
@@ -252,19 +252,19 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 			{
 				if (i < k) frobL += this->m_A[k][i] * this->m_A[k][i] / this->m_A[k][k] /this-> m_A[k][k];
 				if (i > k) frobU += this->m_A[k][i] * this->m_A[k][i] / this->m_A[k][k] / this->m_A[k][k];
-				norm_t += fabs(this->m_A[k][i]);
+				norm_t += nl_math::abs(this->m_A[k][i]);
 			}
 #endif
 			//if (norm_t > norm) norm = norm_t;
 #if 0
 			const nl_double new_val = (1.0-ws) * new_v[k] + ws * (this->m_RHS[k] - Idrive + this->m_A[k][k] * new_v[k]) / this->m_A[k][k];
 
-			const nl_double e = fabs(new_val - new_v[k]);
+			const nl_double e = nl_math::abs(new_val - new_v[k]);
 			cerr = (e > cerr ? e : cerr);
 			new_v[k] = new_val;
 #else
 			const nl_double delta = m_omega * (this->m_RHS[k] - Idrive) / this->m_A[k][k];
-			const nl_double adelta = std::abs(delta);
+			const nl_double adelta = nl_math::abs(delta);
 			cerr = (adelta > cerr ? adelta : cerr);
 			new_v[k] += delta;
 #endif
@@ -275,10 +275,10 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve_non
 			resched = true;
 		}
 		resched_cnt++;
-		//ATTR_UNUSED nl_double frobUL = sqrt((frobU + frobL) / (double) (iN) / (double) (iN));
+		//ATTR_UNUSED nl_double frobUL = nl_math::sqrt((frobU + frobL) / (double) (iN) / (double) (iN));
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
-	//printf("Frobenius %f %f %f %f %f\n", sqrt(frobU), sqrt(frobL), frobUL, frobA, norm);
-	//printf("Omega Estimate1 %f %f\n", 2.0 / (1.0 + sqrt(1-frobUL)), 2.0 / (1.0 + sqrt(1-frobA)) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
+	//printf("Frobenius %f %f %f %f %f\n", nl_math::sqrt(frobU), nl_math::sqrt(frobL), frobUL, frobA, norm);
+	//printf("Omega Estimate1 %f %f\n", 2.0 / (1.0 + nl_math::sqrt(1-frobUL)), 2.0 / (1.0 + nl_math::sqrt(1-frobA)) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
 	//printf("Omega Estimate2 %f %f\n", 2.0 / (2.0 - frobUL), 2.0 / (2.0 - frobA) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
 
 

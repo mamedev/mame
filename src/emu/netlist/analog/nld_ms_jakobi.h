@@ -104,7 +104,7 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve()
 			this->m_Vdelta[k] = nv;
 		}
 		if (sqo > 1e-90)
-			m_lp_fact = std::min(sqrt(sq/sqo), 2.0);
+			m_lp_fact = std::min(nl_math::sqrt(sq/sqo), 2.0);
 		else
 			m_lp_fact = 0.0;
 	}
@@ -143,7 +143,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 			for (int i = 0; i < iN; i++)
 			{
 				frob += this->m_A[k][i] * this->m_A[k][i];
-				s = s + fabs(this->m_A[k][i]);
+				s = s + nl_math::abs(this->m_A[k][i]);
 			}
 
 			if (s<rmin)
@@ -152,9 +152,9 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 				rmax = s;
 		}
 #if 0
-		nl_double frobA = sqrt(frob /(iN));
+		nl_double frobA = nl_math::sqrt(frob /(iN));
 		if (1 &&frobA < 1.0)
-			//ws = 2.0 / (1.0 + sqrt(1.0-frobA));
+			//ws = 2.0 / (1.0 + nl_math::sqrt(1.0-frobA));
 			ws = 2.0 / (2.0 - frobA);
 		else
 			ws = 1.0;
@@ -169,7 +169,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 		// suitable parameter.
 		nl_double rm = (rmax + rmin) * 0.5;
 		if (rm < 1.0)
-			ws = 2.0 / (1.0 + sqrt(1.0-rm));
+			ws = 2.0 / (1.0 + nl_math::sqrt(1.0-rm));
 		else
 			ws = 1.0;
 		if (ws > 1.02 && rmax > 1.001)
@@ -200,13 +200,13 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 			{
 				//if (i < k) frobL += this->m_A[k][i] * this->m_A[k][i] / this->m_A[k][k] /this-> m_A[k][k];
 				//if (i > k) frobU += this->m_A[k][i] * this->m_A[k][i] / this->m_A[k][k] / this->m_A[k][k];
-				//norm_t += fabs(this->m_A[k][i]);
+				//norm_t += nl_math::abs(this->m_A[k][i]);
 			}
 
 			//if (norm_t > norm) norm = norm_t;
 			const nl_double new_val = (1.0-ws) * new_v[k] + ws * (this->m_RHS[k] - Idrive + this->m_A[k][k] * new_v[k]) / this->m_A[k][k];
 
-			const nl_double e = fabs(new_val - new_v[k]);
+			const nl_double e = nl_math::abs(new_val - new_v[k]);
 			cerr = (e > cerr ? e : cerr);
 			new_v[k] = new_val;
 		}
@@ -216,10 +216,10 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 			resched = true;
 		}
 		resched_cnt++;
-		//ATTR_UNUSED nl_double frobUL = sqrt((frobU + frobL) / (double) (iN) / (double) (iN));
+		//ATTR_UNUSED nl_double frobUL = nl_math::sqrt((frobU + frobL) / (double) (iN) / (double) (iN));
 	} while (resched && (resched_cnt < this->m_params.m_gs_loops));
-	//printf("Frobenius %f %f %f %f %f\n", sqrt(frobU), sqrt(frobL), frobUL, frobA, norm);
-	//printf("Omega Estimate1 %f %f\n", 2.0 / (1.0 + sqrt(1-frobUL)), 2.0 / (1.0 + sqrt(1-frobA)) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
+	//printf("Frobenius %f %f %f %f %f\n", nl_math::sqrt(frobU), nl_math::sqrt(frobL), frobUL, frobA, norm);
+	//printf("Omega Estimate1 %f %f\n", 2.0 / (1.0 + nl_math::sqrt(1-frobUL)), 2.0 / (1.0 + nl_math::sqrt(1-frobA)) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
 	//printf("Omega Estimate2 %f %f\n", 2.0 / (2.0 - frobUL), 2.0 / (2.0 - frobA) ); //        printf("Frobenius %f\n", sqrt(frob / (double) (iN * iN) ));
 
 
@@ -250,7 +250,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 	 *
 	 * and estimate using
 	 *
-	 * omega = 2.0 / (1.0 + sqrt(1-rho))
+	 * omega = 2.0 / (1.0 + nl_math::sqrt(1-rho))
 	 */
 
 	const nl_double ws = this->m_params.m_sor; //1.045; //2.0 / (1.0 + /*sin*/(3.14159 * 5.5 / (double) (m_nets.count()+1)));
@@ -284,7 +284,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 			}
 			if (USE_GABS)
 				for (int i = 0; i < term_count; i++)
-					gabs_t = gabs_t + fabs(go[i]);
+					gabs_t = gabs_t + nl_math::abs(go[i]);
 
 			for (int i = this->m_terms[k]->m_railstart; i < term_count; i++)
 				RHS_t = RHS_t  + go[i] * *other_cur_analog[i];
@@ -292,7 +292,7 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 		RHS[k] = RHS_t;
 
-		//if (fabs(gabs_t - fabs(gtot_t)) > 1e-20)
+		//if (nl_math::abs(gabs_t - nl_math::abs(gtot_t)) > 1e-20)
 		//    printf("%d %e abs: %f tot: %f\n",k, gabs_t / gtot_t -1.0, gabs_t, gtot_t);
 
 		gabs_t *= 0.95; // avoid rounding issues
@@ -329,9 +329,9 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 				Idrive = Idrive + go[i] * old_V[net_other[i]];
 
 			//const nl_double new_val = new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
-			//resched = resched || (std::abs(new_val - new_V[k]) > accuracy);
+			//resched = resched || (nl_math::abs(new_val - new_V[k]) > accuracy);
 			const nl_double new_val = old_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
-			resched = resched || (std::abs(new_val - old_V[k]) > accuracy);
+			resched = resched || (nl_math::abs(new_val - old_V[k]) > accuracy);
 			new_V[k] = new_val;
 		}
 		for (int k = 0; k < iN; k++)

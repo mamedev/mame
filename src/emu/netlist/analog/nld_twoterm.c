@@ -20,13 +20,14 @@ ATTR_COLD netlist_generic_diode::netlist_generic_diode()
 
 ATTR_COLD void netlist_generic_diode::set_param(const nl_double Is, const nl_double n, nl_double gmin)
 {
+	static const int csqrt2 = nl_math::sqrt(2.0);
 	m_Is = Is;
 	m_n = n;
 	m_gmin = gmin;
 
 	m_Vt = 0.0258 * m_n;
 
-	m_Vcrit = m_Vt * log(m_Vt / m_Is / sqrt(2.0));
+	m_Vcrit = m_Vt * nl_math::log(m_Vt / m_Is / csqrt2);
 	m_VtInv = 1.0 / m_Vt;
 }
 
@@ -162,7 +163,7 @@ NETLIB_UPDATE_PARAM(POT)
 {
 	nl_double v = m_Dial.Value();
 	if (m_DialIsLog.Value())
-		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
+		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
 
 	// FIXME: Only attached nets should be brought up to current time
 	//netlist().solver()->update_to_current_time(); // bring up current time
@@ -208,7 +209,7 @@ NETLIB_UPDATE_PARAM(POT2)
 	nl_double v = m_Dial.Value();
 
 	if (m_DialIsLog.Value())
-		v = (exp(v) - 1.0) / (exp(1.0) - 1.0);
+		v = (nl_math::exp(v) - 1.0) / (nl_math::exp(1.0) - 1.0);
 	if (m_Reverse.Value())
 		v = 1.0 - v;
 

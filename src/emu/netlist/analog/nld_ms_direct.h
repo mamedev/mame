@@ -106,8 +106,8 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::compute_next
 
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
-			if (fabs(DD2) > 1e-50) // avoid div-by-zero
-				new_net_timestep = sqrt(m_params.m_lte / fabs(0.5*DD2));
+			if (nl_math::abs(DD2) > 1e-50) // avoid div-by-zero
+				new_net_timestep = nl_math::sqrt(m_params.m_lte / nl_math::abs(0.5*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 
@@ -290,7 +290,7 @@ ATTR_HOT void netlist_matrix_solver_direct_t<m_N, _storage_N>::LE_solve()
 			int maxrow = i;
 			for (int j = i + 1; j < kN; j++)
 			{
-				if (fabs(m_A[j][i]) > fabs(m_A[maxrow][i]))
+				if (nl_math::abs(m_A[j][i]) > nl_math::abs(m_A[maxrow][i]))
 					maxrow = j;
 			}
 
@@ -359,8 +359,8 @@ ATTR_HOT nl_double netlist_matrix_solver_direct_t<m_N, _storage_N>::delta(
 	nl_double cerr2 = 0;
 	for (int i = 0; i < this->N(); i++)
 	{
-		const nl_double e = fabs(V[i] - this->m_nets[i]->m_cur_Analog);
-		const nl_double e2 = fabs(m_RHS[i] - this->m_last_RHS[i]);
+		const nl_double e = nl_math::abs(V[i] - this->m_nets[i]->m_cur_Analog);
+		const nl_double e2 = nl_math::abs(m_RHS[i] - this->m_last_RHS[i]);
 		cerr = (e > cerr ? e : cerr);
 		cerr2 = (e2 > cerr2 ? e2 : cerr2);
 	}

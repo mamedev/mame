@@ -44,7 +44,7 @@ ATTR_HOT inline int netlist_matrix_solver_direct1_t::vsolve_non_dynamic()
 	nl_double new_val =  m_RHS[0] / m_A[0][0];
 
 	nl_double e = (new_val - net->m_cur_Analog);
-	nl_double cerr = fabs(e);
+	nl_double cerr = nl_math::abs(e);
 
 	net->m_cur_Analog = new_val;
 
