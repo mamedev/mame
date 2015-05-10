@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nathan Woods
 #ifndef _DWSOCK_H_
 #define _DWSOCK_H_
 

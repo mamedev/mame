@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __MD_GGENIE_H
 #define __MD_GGENIE_H
 

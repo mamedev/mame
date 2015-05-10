@@ -1,12 +1,9 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  UPD7725 / UPD96050 add-on chip emulation (for SNES/SFC)
  used in carts with DSP-1, DSP-1A, DSP-1B, DSP-2, DSP-3, DSP-4, ST-010 & ST-011 add-on chips
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 

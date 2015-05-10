@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Nintendo Family Computer & Entertainment System Joypads
@@ -24,9 +24,6 @@
     daisy chain a second controller to the first one, to play 4players
     game (an image of such connection is shown e.g. in Nekketsu Koukou
     Dodgeball Bu manual)
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

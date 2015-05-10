@@ -9,9 +9,6 @@
     by default; 'Lat' key (mapped to F11) switches it to Latin mode.
     'Rus' (F12) switches back.
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "ec1841.h"

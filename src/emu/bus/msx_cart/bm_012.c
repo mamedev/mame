@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***********************************************************************************
 
 Emulation for the MSX BM-012 Midi cartridge that was sold together with Midisaurus.

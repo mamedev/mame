@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  Super Game Boy emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  TODO: almost everything, e.g.
  * implement gb_timer_callback

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nathan Woods
 #pragma once
 
 #ifndef __COCO_FDC_H__

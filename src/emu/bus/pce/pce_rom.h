@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __PCE_ROM_H
 #define __PCE_ROM_H
 

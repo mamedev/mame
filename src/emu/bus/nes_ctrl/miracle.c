@@ -1,13 +1,10 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Nintendo Entertainment System - Miracle Piano Keyboard
 
     TODO: MIDI input, output is now working.
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

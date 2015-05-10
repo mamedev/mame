@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Nintendo Family Computer Subor Keyboard (used by some Famiclones)
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * mface2.c  --  Romantic Robot Multiface II expansion device for the Amstrad CPC/CPC+
  *

@@ -4,9 +4,6 @@
 
     Iskra-1030 XX-key keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef PSXMULTITAP_H_
 #define PSXMULTITAP_H_
 

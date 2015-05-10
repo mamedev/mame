@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #pragma once
 
 #ifndef __SOUTHBRIDGE_H__

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __NES_MMC5_H
 #define __NES_MMC5_H
 

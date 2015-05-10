@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Nintendo Super Famicom - Yonezawa / PartyRoom 21 Twin Tap Controller
@@ -10,9 +10,6 @@
     plugged in, to start the game and browse the menus). By plugging
     a multitap adapter to Port2, up to 4 Twin Tap controllers can be
     attached at the same time, allowing for 8 players quiz sessions.
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

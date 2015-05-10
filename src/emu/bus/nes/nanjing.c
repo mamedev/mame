@@ -1,12 +1,9 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Nanjing PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  TODO:
  - Emulate the variants often assigned to mapper 162/164 (and investigate connection with Waixing FS-304)!

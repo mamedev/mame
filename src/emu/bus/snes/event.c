@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  Super NES/Famicom Event cartridges emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  TODO: figure out how the Test Mode switch works...
 

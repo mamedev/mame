@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __INTV_VOICE_H
 #define __INTV_VOICE_H
 

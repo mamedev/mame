@@ -1,12 +1,9 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Namcot PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate the following PCBs

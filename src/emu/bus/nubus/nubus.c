@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   nubus.c - NuBus bus and card emulation

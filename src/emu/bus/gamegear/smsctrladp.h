@@ -1,12 +1,9 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Sega Game Gear "SMS Controller Adaptor" emulation
     Also known as "Master Link" cable.
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   RasterOps ColorBoard 264/SE30 video card emulation

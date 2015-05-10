@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nathan Woods
 /*********************************************************************
 
     coco_fdc.c

@@ -1,12 +1,9 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for JY Company
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate multiple PCBs by JY Company with weird IRQ mechanisms [mappers 90, 209, 211]

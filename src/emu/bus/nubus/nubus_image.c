@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   nubus_image.c - synthetic NuBus card to allow reading/writing "raw"

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
   Emulation for the internal firmware mapper in the National FS-4600.
 */

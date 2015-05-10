@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   a2eauxslot.c - Apple IIe auxiliary slot and card emulation

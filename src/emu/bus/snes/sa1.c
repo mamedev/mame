@@ -1,11 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  SA-1 add-on chip emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  Note:
  - SA-1 register description below is based on no$cash docs.

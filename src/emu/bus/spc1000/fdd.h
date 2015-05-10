@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __SPC1000_FDD_H__
 #define __SPC1000_FDD_H__
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 #ifndef __STEREO_FX__
 #define __STEREO_FX__
 

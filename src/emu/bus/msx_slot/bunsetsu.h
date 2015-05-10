@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __MSX_SLOT_BUNSETSU_H
 #define __MSX_SLOT_BUNSETSU_H
 

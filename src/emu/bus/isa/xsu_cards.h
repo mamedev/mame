@@ -4,9 +4,6 @@
 
     ISA bus cards for ex-USSR PC clones
 
-    license: MAME, GPL-2.0+
-    copyright-holders: XXX
-
 **********************************************************************/
 
 #pragma once

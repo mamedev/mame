@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /*****************************************************************************************
 
     NES MMC Emulation - UNIF boards

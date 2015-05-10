@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Nintendo Super Famicom - Epoch Barcode Battler
@@ -7,9 +7,6 @@
     TODO: this should be actually emulated as a standalone system with
     a few 7segments LEDs, once we get a dump of its BIOS
     At the moment we only emulated the connection with a Super Famicom
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

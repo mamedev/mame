@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nathan Woods
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef __GNUC__
