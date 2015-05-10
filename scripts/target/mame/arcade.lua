@@ -3509,6 +3509,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roul.c",
 	MAME_DIR .. "src/mame/drivers/savquest.c",
 	MAME_DIR .. "src/mame/drivers/sanremo.c",
+	MAME_DIR .. "src/mame/drivers/sealy.c",
 	MAME_DIR .. "src/mame/drivers/sfbonus.c",
 	MAME_DIR .. "src/mame/drivers/shangkid.c",
 	MAME_DIR .. "src/mame/video/shangkid.c",
