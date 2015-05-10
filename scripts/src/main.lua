@@ -169,8 +169,12 @@ function mainProject(_target, _subtarget)
 		end	
 	end
 
+	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".c"
+	if not os.isfile(mainfile) then
+		mainfile = MAME_DIR .. "src/".._target .."/" .. _target ..".c"
+	end
 	files {
-		MAME_DIR .. "src/".._target .."/" .. _target ..".c",
+		mainfile,
 		MAME_DIR .. "src/version.c",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
 	}

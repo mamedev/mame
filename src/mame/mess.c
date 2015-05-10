@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mame.c
+    mess.c
 
     Specific (per target) constants
 
@@ -10,29 +10,30 @@
 
 #include "emu.h"
 
-#define APPNAME                 "MAME"
-#define APPNAME_LOWER           "mame"
-#define CONFIGNAME              "mame"
-#define APPLONGNAME             "M.A.M.E."
-#define FULLLONGNAME            "Multiple Arcade Machine Emulator"
-#define CAPGAMENOUN             "GAME"
-#define CAPSTARTGAMENOUN        "Game"
-#define GAMENOUN                "game"
-#define GAMESNOUN               "games"
+#define APPNAME                 "MESS"
+#define APPNAME_LOWER           "mess"
+#define CONFIGNAME              "mess"
+#define APPLONGNAME             "M.E.S.S."
+#define FULLLONGNAME            "Multi Emulator Super System"
+#define CAPGAMENOUN             "SYSTEM"
+#define CAPSTARTGAMENOUN        "System"
+#define GAMENOUN                "system"
+#define GAMESNOUN               "systems"
 #define COPYRIGHT               "Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
 #define COPYRIGHT_INFO          "Copyright Nicola Salmoria and the MAME team"
-#define DISCLAIMER              "MAME is an emulator: it reproduces, more or less faithfully, the behaviour of\n" \
-								"several arcade machines. But hardware is useless without software, so an image\n" \
-								"of the ROMs which run on that hardware is required. Such ROMs, like any other\n" \
-								"commercial software, are copyrighted material and it is therefore illegal to\n" \
-								"use them if you don't own the original arcade machine. Needless to say, ROMs\n" \
-								"are not distributed together with MAME. Distribution of MAME together with ROM\n" \
-								"images is a violation of copyright law and should be promptly reported to the\n" \
-								"authors so that appropriate legal action can be taken.\n"
+#define DISCLAIMER              "MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"\
+								"several computer and console systems. But hardware is useless without software\n" \
+								"so a file dump of the ROM, cartridges, discs, and cassettes which run on that\n" \
+								"hardware is required. Such files, like any other commercial software, are\n" \
+								"copyrighted material and it is therefore illegal to use them if you don't own\n" \
+								"the original media from which the files are derived. Needless to say, these\n" \
+								"files are not distributed together with MESS. Distribution of MESS together\n" \
+								"with these files is a violation of copyright law and should be promptly\n" \
+								"reported to the authors so that appropriate legal action can be taken.\n"
 #define USAGE                   "Usage:  %s [%s] [media] [software] [options]"
-#define XML_ROOT                "mame"
-#define XML_TOP                 "game"
-#define STATE_MAGIC_NUM         "MAMESAVE"
+#define XML_ROOT                "mess"
+#define XML_TOP                 "machine"
+#define STATE_MAGIC_NUM         "MESSSAVE"
 
 const char * emulator_info::get_appname() { return APPNAME;}
 const char * emulator_info::get_appname_lower() { return APPNAME_LOWER;}
