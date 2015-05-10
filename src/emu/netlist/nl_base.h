@@ -680,7 +680,7 @@ public:
 
 	ATTR_HOT inline void set_Q(const netlist_sig_t &newQ, const netlist_time &delay)
 	{
-		if (EXPECTED(newQ !=  m_new_Q))
+		if (newQ !=  m_new_Q)
 		{
 			m_new_Q = newQ;
 			push_to_queue(delay);

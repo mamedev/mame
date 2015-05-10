@@ -100,12 +100,13 @@ NETLIB_START(QBJT_switch)
 		/* Base current is 0.005 / beta
 		 * as a rough estimate, we just scale the conductance down */
 
-		m_gB = d.gI(0.005 / alpha);
+		m_gB = 1.0 / (m_V/(0.005 / BF));
+
+		//m_gB = d.gI(0.005 / alpha);
 
 		if (m_gB < netlist().gmin())
 			m_gB = netlist().gmin();
 		m_gC =  d.gI(0.005); // very rough estimate
-		//printf("%f %f \n", m_V, m_gB);
 	}
 
 }
@@ -117,7 +118,7 @@ NETLIB_RESET(QBJT_switch)
 	m_RB.set(netlist().gmin(), 0.0, 0.0);
 	m_RC.set(netlist().gmin(), 0.0, 0.0);
 
-	m_BC_dummy.set(netlist().gmin(), 0.0, 0.0);
+	m_BC_dummy.set(netlist().gmin() / 10.0, 0.0, 0.0);
 
 }
 
@@ -201,7 +202,6 @@ NETLIB_START(QBJT_EB)
 		//nl_double VJE = m_model.dValue("VJE", 0.75);
 
 		set_qtype((m_model.model_type() == "NPN") ? BJT_NPN : BJT_PNP);
-		//printf("type %s\n", m_model.model_type().cstr());
 
 		m_alpha_f = BF / (1.0 + BF);
 		m_alpha_r = BR / (1.0 + BR);

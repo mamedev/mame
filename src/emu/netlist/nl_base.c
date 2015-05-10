@@ -285,9 +285,9 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time &delta
 	{
 		while ( (m_time < m_stop) && (m_queue.is_not_empty()))
 		{
-			const netlist_queue_t::entry_t *e = m_queue.pop();
-			m_time = e->exec_time();
-			e->object()->update_devs();
+			const netlist_queue_t::entry_t e = *m_queue.pop();
+			m_time = e.exec_time();
+			e.object()->update_devs();
 
 			add_to_stat(m_perf_out_processed, 1);
 		}
@@ -310,9 +310,9 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time &delta
 					NETLIB_NAME(mainclock)::mc_update(mc_net);
 				}
 
-				const netlist_queue_t::entry_t *e = m_queue.pop();
-				m_time = e->exec_time();
-				e->object()->update_devs();
+				const netlist_queue_t::entry_t e = *m_queue.pop();
+				m_time = e.exec_time();
+				e.object()->update_devs();
 
 			} else {
 				m_time = mc_time;
@@ -624,27 +624,27 @@ ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	static const UINT32 masks[4] = { 1, 5, 3, 1 };
+	const int masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
-	netlist_core_terminal_t *p = m_list_active.first();
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
+
+	netlist_core_terminal_t *p = m_list_active.first();
 
 #if 0
 	switch (m_active)
 	{
 	case 2:
-		update_dev(p, mask);
+		p->update_dev(mask);
 		p = m_list_active.next(p);
-		if (p == NULL) break;
 	case 1:
-		update_dev(p, mask);
+		p->update_dev(mask);
 		break;
 	default:
 		while (p != NULL)
 		{
-			update_dev(p, mask);
+			p->update_dev(mask);
 			p = m_list_active.next(p);
 		}
 		break;
@@ -652,7 +652,6 @@ ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 #else
 	while (p != NULL)
 	{
-		//update_dev(p, mask);
 		p->update_dev(mask);
 		p = m_list_active.next(p);
 	}

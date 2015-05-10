@@ -90,10 +90,17 @@ NETLIB_UPDATE_PARAM(extclock)
 
 NETLIB_UPDATE(extclock)
 {
-	//static UINT8 pattern[6] = { 4, 4, 4, 4, 4, 8 };
-	OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
-	m_cnt = (m_cnt + 1) % m_size;
-	m_off = netlist_time::zero;
+	if (m_cnt != 0)
+	{
+		OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[m_cnt]);
+		m_cnt = (m_cnt + 1) % m_size;
+	}
+	else
+	{
+		OUTLOGIC(m_Q, (m_cnt & 1) ^ 1, m_inc[0] + m_off);
+		m_cnt = 1;
+		m_off = netlist_time::zero;
+	}
 }
 
 // ----------------------------------------------------------------------------------------
