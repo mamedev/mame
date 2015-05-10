@@ -145,7 +145,7 @@ float nextPowerOfTwo(float n)
 	return pow(2, floor(log2(n) / log2(2)) + 1);
 }
 
-// stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
+// www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
 float random(float2 seed)
 {
 	// irrationals for pseudo randomness
@@ -154,7 +154,7 @@ float random(float2 seed)
 	return frac(cos(dot(seed, i)) * 123456.0f);
 }
 
-// dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
+// www.dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
 float normalizedSigmoid(float n, float k)
 {
 	// valid for n and k in range of -1.0 and 1.0
@@ -251,14 +251,20 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 HalfRect = SourceRect * 0.5f;
 
 	// Screen Curvature
-	float2 CurvatureUnitCoord = Input.TexCoord * (UsedArea * 2.0f) - 1.0f;
+	float2 CurvatureUnitCoord = 
+		  Input.TexCoord 
+		* UsedArea * 2.0f -
+		  1.0f;
 	float2 CurvatureCurve =
 		  CurvatureUnitCoord
-		* CurvatureAmount * 0.25f
-		* pow(length(CurvatureUnitCoord), 2.0f) 
-		/ pow(length(UsedArea), 2.0f);
-	// todo: zoom is only full screen fitting for 10:7 source ratio
-	float2 CurvatureZoom = 1.0f - (CurvatureAmount * 0.25f) * (UsedArea * 0.5f);
+		* pow(length(CurvatureUnitCoord), 2.0f)
+		/ pow(length(UsedArea), 2.0f)
+		* CurvatureAmount * 0.25f; // reduced curvature
+	float2 CurvatureZoom = 
+		  1.0f - 
+		  UsedArea * 2.0f
+		/ pow(length(UsedArea), 2.0f)
+		* CurvatureAmount * 0.25f; // reduced curvature
 
 	float2 ScreenCoord = Input.ScreenCoord / ScreenDims;
 	ScreenCoord -= HalfRect;
