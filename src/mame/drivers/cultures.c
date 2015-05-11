@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
 /*
     Jibun wo Migaku Culture School Mahjong Hen
