@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ernesto Corvi,Brad Oliver
 /******************************************************************************
 
     Nintendo 2C0x PPU emulation.

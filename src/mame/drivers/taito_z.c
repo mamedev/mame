@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Graves
 /***************************************************************************
 
 Taito Z System [twin 68K with optional Z80]

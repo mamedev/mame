@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Ernesto Corvi
+// copyright-holders:Ernesto Corvi,Brad Oliver
 /***************************************************************************
 
 Playchoice 10 - (c) 1986 Nintendo of America
