@@ -59,8 +59,8 @@ hlsl_options shaders::s_hlsl_presets[4] =
 {
 	{   // 25% Shadow mask, 50% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
-		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
-		0.03f, 0.03f,
+		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
+		0.03f, 0.03f, 0.03f, 0.03f,
 		0.5f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -82,8 +82,8 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	},
 	{   // 25% Shadow mask, 0% Scanlines, 3% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
-		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
-		0.03f, 0.03f,
+		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
+		0.03f, 0.03f, 0.03f, 0.03f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -105,8 +105,8 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	},
 	{   // 25% Shadow mask, 0% Scanlines, 0% Pincushion, 0 defocus, No Tint, 0.9 Exponent, 5% Floor, 25% Phosphor Return, 120% Saturation
 		true,
-		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
-		0.0f, 0.0f,
+		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.0f,
 		{ 0.0f, 0.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -128,8 +128,8 @@ hlsl_options shaders::s_hlsl_presets[4] =
 	},
 	{   // 25% Shadow mask, 100% Scanlines, 15% Pincushion, 3 defocus, 24-degree Tint Out, 1.5 Exponent, 5% Floor, 70% Phosphor Return, 80% Saturation, Bad Convergence
 		true,
-		0.25f, { "aperture.png" }, 320, 240, 0.09375f, 0.109375f,
-		0.15f, 0.15f,
+		0.25f, { "adapture-grill.png" }, 6, 6, 0.1875f, 0.1875f, 0.0f, 0.0f,
+		0.15f, 0.15f, 0.15f, 0.15f,
 		1.0f, 1.0f, 0.5f, 1.0f, 0.0f, 0.5f,
 		{ 3.0f, 3.0f },
 		{ 0.5f,-0.33f,0.7f },
@@ -736,8 +736,12 @@ void shaders::init(base *d3dintf, running_machine *machine, d3d::renderer *rende
 		options->shadow_mask_count_y = winoptions.screen_shadow_mask_count_y();
 		options->shadow_mask_u_size = winoptions.screen_shadow_mask_u_size();
 		options->shadow_mask_v_size = winoptions.screen_shadow_mask_v_size();
+		options->shadow_mask_u_offset = winoptions.screen_shadow_mask_u_offset();
+		options->shadow_mask_v_offset = winoptions.screen_shadow_mask_v_offset();
 		options->curvature = winoptions.screen_curvature();
-		options->pincushion = winoptions.screen_pincushion();
+		options->round_corner = winoptions.screen_round_corner();
+		options->reflection = winoptions.screen_reflection();
+		options->vignetting = winoptions.screen_vignetting();
 		options->scanline_alpha = winoptions.screen_scanline_amount();
 		options->scanline_scale = winoptions.screen_scanline_scale();
 		options->scanline_height = winoptions.screen_scanline_height();
@@ -930,14 +934,14 @@ int shaders::create_resources(bool reset)
 		texture.palette = NULL;
 		texture.seqid = 0;
 
-		// FIXME: should shadow bitmap really use prescale?
-		// now create it
-		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, video_config.prescale, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		// now create it (no prescale, but wrap)
+		shadow_texture = new texture_info(d3d->get_texture_manager(), &texture, 1, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_TEXWRAP_MASK);
 	}
 
 	const char *fx_dir = downcast<windows_options &>(machine->options()).screen_post_fx_dir();
 
 	default_effect = new effect(this, d3d->get_device(), "primary.fx", fx_dir);
+	simple_effect = new effect(this, d3d->get_device(), "simple.fx", fx_dir);
 	post_effect = new effect(this, d3d->get_device(), "post.fx", fx_dir);
 	prescale_effect = new effect(this, d3d->get_device(), "prescale.fx", fx_dir);
 	phosphor_effect = new effect(this, d3d->get_device(), "phosphor.fx", fx_dir);
@@ -951,6 +955,7 @@ int shaders::create_resources(bool reset)
 	vector_effect = new effect(this, d3d->get_device(), "vector.fx", fx_dir);
 
 	if (!default_effect->is_valid()) return 1;
+	if (!simple_effect->is_valid()) return 1;
 	if (!post_effect->is_valid()) return 1;
 	if (!prescale_effect->is_valid()) return 1;
 	if (!phosphor_effect->is_valid()) return 1;
@@ -1017,18 +1022,27 @@ int shaders::create_resources(bool reset)
 
 	phosphor_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
-	phosphor_effect->add_uniform("Passthrough", uniform::UT_FLOAT, uniform::CU_PHOSPHOR_IGNORE);
+	phosphor_effect->add_uniform("Passthrough", uniform::UT_FLOAT, uniform::CU_PHOSPHOR_IGNORE);	
+	
+	downsample_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	
+	bloom_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	
+	simple_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
 	post_effect->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 	post_effect->add_uniform("SourceRect", uniform::UT_VEC2, uniform::CU_SOURCE_RECT);
 	post_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
-	post_effect->add_uniform("PincushionAmount", uniform::UT_FLOAT, uniform::CU_POST_PINCUSHION);
+	post_effect->add_uniform("VignettingAmount", uniform::UT_FLOAT, uniform::CU_POST_VIGNETTING);
 	post_effect->add_uniform("CurvatureAmount", uniform::UT_FLOAT, uniform::CU_POST_CURVATURE);
+	post_effect->add_uniform("RoundCornerAmount", uniform::UT_FLOAT, uniform::CU_POST_ROUND_CORNER);
+	post_effect->add_uniform("ReflectionAmount", uniform::UT_FLOAT, uniform::CU_POST_REFLECTION);
 
 	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
 	post_effect->add_uniform("ShadowUV", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV);
+	post_effect->add_uniform("ShadowUVOffset", uniform::UT_VEC2, uniform::CU_POST_SHADOW_UV_OFFSET);
 	post_effect->add_uniform("ShadowDims", uniform::UT_VEC2, uniform::CU_POST_SHADOW_DIMS);
 
 	post_effect->add_uniform("ScanlineAlpha", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_ALPHA);
@@ -1038,6 +1052,10 @@ int shaders::create_resources(bool reset)
 	post_effect->add_uniform("ScanlineBrightOffset", uniform::UT_FLOAT, uniform::CU_POST_SCANLINE_BRIGHT_OFFSET);
 	post_effect->add_uniform("Power", uniform::UT_VEC3, uniform::CU_POST_POWER);
 	post_effect->add_uniform("Floor", uniform::UT_VEC3, uniform::CU_POST_FLOOR);
+	
+	vector_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
+	
+	default_effect->add_uniform("ScreenDims", uniform::UT_VEC2, uniform::CU_SCREEN_DIMS);
 
 	initialized = true;
 
@@ -1057,6 +1075,7 @@ void shaders::begin_draw()
 	curr_effect = default_effect;
 
 	default_effect->set_technique("TestTechnique");
+	simple_effect->set_technique("TestTechnique");
 	post_effect->set_technique("ScanMaskTechnique");
 	phosphor_effect->set_technique("TestTechnique");
 	focus_effect->set_technique("TestTechnique");
@@ -1085,49 +1104,6 @@ void shaders::begin_frame()
 //============================================================
 
 void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYPE prim_type,
-						UINT32 prim_index, UINT32 prim_count, int dstw, int dsth)
-{
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
-	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-	curr_effect = default_effect;
-
-	curr_effect->set_texture("Diffuse", src);
-
-	float dst_dims[2] = { (float)dstw, (float)dsth };
-	curr_effect->set_vector("ScreenDims", 2, dst_dims);
-	curr_effect->set_float("PostPass", 1.0f);
-	curr_effect->set_float("PincushionAmount", options->pincushion);
-	curr_effect->set_float("Brighten", 0.0f);
-
-	unsigned int num_passes = 0;
-	curr_effect->begin(&num_passes, 0);
-
-	for (UINT pass = 0; pass < num_passes; pass++)
-	{
-		curr_effect->begin_pass(pass);
-		// add the primitives
-		HRESULT result = (*d3dintf->device.draw_primitive)(d3d->get_device(), prim_type, prim_index, prim_count);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-		curr_effect->end_pass();
-	}
-
-	curr_effect->end();
-
-	if (new_dst)
-	{
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, new_dst);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-	}
-}
-
-
-
-//============================================================
-//  shaders::blit
-//============================================================
-
-void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYPE prim_type,
 						UINT32 prim_index, UINT32 prim_count)
 {
 	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, dst);
@@ -1136,13 +1112,10 @@ void shaders::blit(surface *dst, texture *src, surface *new_dst, D3DPRIMITIVETYP
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 	curr_effect = default_effect;
+	curr_effect->update_uniforms();
 
 	curr_effect->set_texture("Diffuse", src);
-
-	vec2f screendims = d3d->get_dims();
-	curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
 	curr_effect->set_float("PostPass", 1.0f);
-	curr_effect->set_float("PincushionAmount", options->pincushion);
 	curr_effect->set_float("Brighten", 1.0f);
 
 	unsigned int num_passes = 0;
@@ -1433,10 +1406,13 @@ void shaders::defocus_pass(render_target *rt, vec2f &texsize)
 {
 	UINT num_passes = 0;
 
+	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
+
 	// Defocus pass 1
 	curr_effect = focus_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->render_texture[2]);
+	curr_effect->set_vector("Prescale", 2, prescale);
 
 	curr_effect->begin(&num_passes, 0);
 
@@ -1481,13 +1457,13 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 {
 	UINT num_passes = 0;
 
-	curr_effect = phosphor_effect;
 	phosphor_passthrough = false;
+	
+	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 
 	float rtsize[2] = { rt->target_width, rt->target_height };
 	curr_effect->set_vector("TargetDims", 2, rtsize);
-
 	curr_effect->set_texture("Diffuse", focus_enable ? rt->render_texture[1] : rt->render_texture[2]);
 	curr_effect->set_texture("LastPass", ct->last_texture);
 
@@ -1534,73 +1510,30 @@ void shaders::phosphor_pass(render_target *rt, cache_target *ct, vec2f &texsize,
 	curr_effect->end();
 }
 
-void shaders::avi_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum)
+void shaders::post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum, bool prepare_bloom)
 {
 	UINT num_passes = 0;
+
+	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
+	bool orientation_swap_xy = (d3d->window().machine().system().flags & ORIENTATION_SWAP_XY) == ORIENTATION_SWAP_XY;
+	bool rotation_swap_xy = 
+		(d3d->window().target()->orientation() & ROT90) == ROT90 ||
+		(d3d->window().target()->orientation() & ROT270) == ROT270;
 
 	curr_effect = post_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
-
-	// Scanlines and shadow mask, at high res for AVI logging
-	if(avi_output_file != NULL)
-	{
-		curr_effect->set_texture("DiffuseTexture", rt->render_texture[0]);
-
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, avi_final_target);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-		curr_effect->begin(&num_passes, 0);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
-	}
-
-	if(render_snap)
-	{
-		curr_effect->set_texture("DiffuseTexture", rt->render_texture[0]);
-
-		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, snap_target);
-		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-
-		curr_effect->begin(&num_passes, 0);
-
-		for (UINT pass = 0; pass < num_passes; pass++)
-		{
-			curr_effect->begin_pass(pass);
-			// add the primitives
-			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
-			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-			curr_effect->end_pass();
-		}
-
-		curr_effect->end();
-
-		snap_rendered = true;
-	}
-}
-
-void shaders::screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, vec2f &sourcedims, poly_info *poly, int vertnum)
-{
-	UINT num_passes = 0;
-
-	curr_effect = post_effect;
-	curr_effect->update_uniforms();
-	curr_effect->set_texture("ShadowTexture", shadow_texture == NULL ? NULL : shadow_texture->get_finaltex());
-
 	curr_effect->set_texture("DiffuseTexture", rt->render_texture[0]);
+	curr_effect->set_vector("Prescale", 2, prescale);
+	curr_effect->set_bool("OrientationSwapXY", orientation_swap_xy);	
+	curr_effect->set_bool("RotationSwapXY", rotation_swap_xy);	
+	curr_effect->set_bool("PrepareBloom", prepare_bloom);
 
 	d3d->set_wrap(D3DTADDRESS_MIRROR);
 
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[2]);
+	HRESULT result = prepare_bloom
+		? (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[3])  // target which is used by bloom effect
+		: (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[2]);
 
 	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(1,0,0,0), 0, 0);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -1621,21 +1554,21 @@ void shaders::screen_post_pass(render_target *rt, vec2f &texsize, vec2f &delta, 
 	d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(poly->get_texture()->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 }
 
-void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
+void shaders::bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
 {
 	UINT num_passes = 0;
 
-	curr_effect = downsample_effect;
+	float prescale[2] = { (float)hlsl_prescale_x, (float)hlsl_prescale_y };
 
-	curr_effect->set_texture("Diffuse", rt->render_texture[2]);
+	curr_effect = downsample_effect;
+	curr_effect->update_uniforms();
 	curr_effect->set_float("BloomRescale", options->raster_bloom_scale);
+	curr_effect->set_vector("Prescale", 2, prescale);
 
 	float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 	int bloom_index = 0;
 	float bloom_width = rt->target_width;
 	float bloom_height = rt->target_height;
-	vec2f screendims = d3d->get_dims();
-	curr_effect->set_vector("ScreenSize", 2, &screendims.c.x);
 	float bloom_dims[11][2];
 	for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 	{
@@ -1645,7 +1578,7 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 
 		curr_effect->begin(&num_passes, 0);
 
-		curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->render_texture[2] : rt->bloom_texture[bloom_index - 1]);
+		curr_effect->set_texture("DiffuseTexture", (bloom_index == 0) ? rt->render_texture[3] : rt->bloom_texture[bloom_index - 1]);
 
 		HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->bloom_target[bloom_index]);
 		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
@@ -1670,9 +1603,8 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 	}
 
 	curr_effect = bloom_effect;
+	curr_effect->update_uniforms();
 
-	float target_size[2] = { d3d->get_width(), d3d->get_height() };
-	curr_effect->set_vector("TargetSize", 2, target_size);
 	float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
 	float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
 	float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
@@ -1688,6 +1620,8 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 
 	curr_effect->set_texture("DiffuseA", rt->render_texture[2]);
 
+	curr_effect->set_vector("Prescale", 2, prescale);
+
 	char name[9] = "Diffuse*";
 	for(int index = 1; index < bloom_index; index++)
 	{
@@ -1702,8 +1636,10 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 
 	curr_effect->begin(&num_passes, 0);
 
-	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
+	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, rt->target[1]);
 	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
+	result = (*d3dintf->device.clear)(d3d->get_device(), 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 	for (UINT pass = 0; pass < num_passes; pass++)
 	{
@@ -1715,6 +1651,72 @@ void shaders::raster_bloom_pass(render_target *rt, vec2f &texsize, vec2f &delta,
 	}
 
 	curr_effect->end();
+}
+
+void shaders::screen_pass(render_target *rt, vec2f &texsize, vec2f &delta, poly_info *poly, int vertnum)
+{
+  UINT num_passes = 0;
+	
+	curr_effect = simple_effect;
+	curr_effect->update_uniforms();
+	curr_effect->set_texture("DiffuseTexture", rt->render_texture[1]);
+
+	HRESULT result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
+	if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+
+	curr_effect->begin(&num_passes, 0);
+
+	for (UINT pass = 0; pass < num_passes; pass++)
+	{
+		curr_effect->begin_pass(pass);
+		// add the primitives
+		result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
+		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+		curr_effect->end_pass();
+	}
+
+	curr_effect->end();
+
+	// Scanlines and shadow mask, at high res for AVI logging
+	if(avi_output_file != NULL)
+	{
+		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, avi_final_target);
+		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+
+		curr_effect->begin(&num_passes, 0);
+
+		for (UINT pass = 0; pass < num_passes; pass++)
+		{
+			curr_effect->begin_pass(pass);
+			// add the primitives
+			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
+			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+			curr_effect->end_pass();
+		}
+
+		curr_effect->end();
+	}
+
+	if(render_snap)
+	{
+		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, snap_target);
+		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+
+		curr_effect->begin(&num_passes, 0);
+
+		for (UINT pass = 0; pass < num_passes; pass++)
+		{
+			curr_effect->begin_pass(pass);
+			// add the primitives
+			result = (*d3dintf->device.draw_primitive)(d3d->get_device(), poly->get_type(), vertnum, poly->get_count());
+			if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+			curr_effect->end_pass();
+		}
+
+		curr_effect->end();
+
+		snap_rendered = true;
+	}
 }
 
 //============================================================
@@ -1754,9 +1756,10 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			defocus_pass(rt, texsize);
 		}
 		phosphor_pass(rt, ct, texsize, focus_enable);
-		avi_post_pass(rt, texsize, delta, sourcedims, poly, vertnum);
-		screen_post_pass(rt, texsize, delta, sourcedims, poly, vertnum);
-		raster_bloom_pass(rt, texsize, delta, poly, vertnum);
+		post_pass(rt, texsize, delta, sourcedims, poly, vertnum, true);
+		post_pass(rt, texsize, delta, sourcedims, poly, vertnum, false);
+		bloom_pass(rt, texsize, delta, poly, vertnum);
+		screen_pass(rt, texsize, delta, poly, vertnum);
 
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
@@ -1775,12 +1778,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		lines_pending = true;
 
 		curr_effect = vector_effect;
-
-		if(options->params_dirty)
-		{
-			vec2f screendims = d3d->get_dims();
-			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-		}
+		curr_effect->update_uniforms();
 
 		float time_params[2] = { 0.0f, 0.0f };
 		float length_params[3] = { poly->get_line_length(), options->vector_length_scale, options->vector_length_ratio };
@@ -1802,29 +1800,33 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		}
 
 		curr_effect->end();
+		
 		result = (*d3dintf->device.set_render_target)(d3d->get_device(), 0, backbuffer);
 		if (result != D3D_OK) osd_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 
 		curr_effect = default_effect;
-
+		curr_effect->update_uniforms();
+		
 		curr_effect->set_float("FixedAlpha", 1.0f);
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->get_flags()) && vector_enable)
 	{
 		render_target *rt = find_render_target(d3d->get_width(), d3d->get_height(), 0, 0);
+		if (rt == NULL)
+		{
+			return;
+		}
 
-		/* Bloom */
+		/* Bloom, todo: merge with bloom_pass() */
 		curr_effect = downsample_effect;
-
-		curr_effect->set_texture("Diffuse", rt->render_texture[0]);
+		curr_effect->update_uniforms();
 		curr_effect->set_float("BloomRescale", options->vector_bloom_scale);
+		curr_effect->set_bool("PrepareVector", true);
 
 		float bloom_size = (d3d->get_width() < d3d->get_height()) ? d3d->get_width() : d3d->get_height();
 		int bloom_index = 0;
 		float bloom_width = rt->target_width;
 		float bloom_height = rt->target_height;
-		float screen_size[2] = { d3d->get_width(), d3d->get_height() };
-		curr_effect->set_vector("ScreenSize", 2, screen_size);
 		float bloom_dims[11][2];
 		for(; bloom_size >= 2.0f && bloom_index < 11; bloom_size *= 0.5f)
 		{
@@ -1859,15 +1861,11 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		// Bloom composite pass
 		curr_effect = bloom_effect;
+		curr_effect->update_uniforms();
 
-		float target_size[2] = { d3d->get_width(), d3d->get_height() };
-		curr_effect->set_vector("TargetSize", 2, target_size);
-		float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight,
-								options->bloom_level2_weight, options->bloom_level3_weight };
-		float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight,
-								options->bloom_level6_weight, options->bloom_level7_weight };
-		float weight89A[3] = { options->bloom_level8_weight, options->bloom_level9_weight,
-								options->bloom_level10_weight };
+		float weight0123[4] = { options->bloom_level0_weight, options->bloom_level1_weight, options->bloom_level2_weight, options->bloom_level3_weight };
+		float weight4567[4] = { options->bloom_level4_weight, options->bloom_level5_weight, options->bloom_level6_weight, options->bloom_level7_weight };
+		float weight89A[3]  = { options->bloom_level8_weight, options->bloom_level9_weight, options->bloom_level10_weight };
 		curr_effect->set_vector("Level0123Weight", 4, weight0123);
 		curr_effect->set_vector("Level4567Weight", 4, weight4567);
 		curr_effect->set_vector("Level89AWeight", 3, weight89A);
@@ -1879,6 +1877,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_effect->set_vector("LevelASize", 2, bloom_dims[10]);
 
 		curr_effect->set_texture("DiffuseA", rt->render_texture[0]);
+
+		curr_effect->set_bool("PrepareVector", true);
 
 		char name[9] = "Diffuse*";
 		for(int index = 1; index < bloom_index; index++)
@@ -1910,19 +1910,14 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 
 		curr_effect->end();
 
-		/* Phosphor */
+		/* Phosphor, todo: merge with phosphor_pass() */
+		phosphor_passthrough = false;
+	
 		curr_effect = phosphor_effect;
-
-		if(options->params_dirty)
-		{
-			vec2f screendims = d3d->get_dims();
-			curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
-			curr_effect->set_vector("Phosphor", 3, options->phosphor);
-		}
+		curr_effect->update_uniforms();
+		
 		float target_dims[2] = { d3d->get_width(), d3d->get_height() };
 		curr_effect->set_vector("TargetDims", 2, target_dims);
-		curr_effect->set_float("Passthrough", 0.0f);
-
 		curr_effect->set_texture("Diffuse", rt->render_texture[1]);
 		curr_effect->set_texture("LastPass", rt->render_texture[2]);
 
@@ -1959,9 +1954,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 	else
 	{
 		curr_effect = default_effect;
-
-		vec2f screendims = d3d->get_dims();
-		curr_effect->set_vector("ScreenDims", 2, &screendims.c.x);
+		curr_effect->update_uniforms();
+		
 		curr_effect->set_float("PostPass", 0.0f);
 
 		curr_effect->begin(&num_passes, 0);
@@ -2170,8 +2164,8 @@ bool shaders::register_texture(texture_info *texture)
 
 	enumerate_screens();
 
-	int hlsl_prescale_x = prescale_force_x;
-	int hlsl_prescale_y = prescale_force_y;
+	hlsl_prescale_x = prescale_force_x;
+	hlsl_prescale_y = prescale_force_y;
 
 	// Find the nearest prescale factor that is over our screen size
 	if (hlsl_prescale_x == 0)
@@ -2251,6 +2245,11 @@ void shaders::delete_resources(bool reset)
 	{
 		delete default_effect;
 		default_effect = NULL;
+	}
+	if (simple_effect != NULL)
+	{
+		delete simple_effect;
+		simple_effect = NULL;
 	}
 	if (post_effect != NULL)
 	{
@@ -2436,16 +2435,40 @@ static INT32 slider_shadow_mask_vsize(running_machine &machine, void *arg, std::
 	return slider_set(&(((hlsl_options*)arg)->shadow_mask_v_size), 1.0f / 32.0f, "%2.5f", str, newval);
 }
 
+static INT32 slider_shadow_mask_uoffset(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->shadow_mask_u_offset), 0.01f, "%2.2f", str, newval);
+}
+
+static INT32 slider_shadow_mask_voffset(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->shadow_mask_v_offset), 0.01f, "%2.2f", str, newval);
+}
+
 static INT32 slider_curvature(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
 	return slider_set(&(((hlsl_options*)arg)->curvature), 0.01f, "%2.2f", str, newval);
 }
 
-static INT32 slider_pincushion(running_machine &machine, void *arg, std::string *str, INT32 newval)
+static INT32 slider_round_corner(running_machine &machine, void *arg, std::string *str, INT32 newval)
 {
 	((hlsl_options*)arg)->params_dirty = true;
-	return slider_set(&(((hlsl_options*)arg)->pincushion), 0.01f, "%2.2f", str, newval);
+	return slider_set(&(((hlsl_options*)arg)->round_corner), 0.01f, "%2.2f", str, newval);
+}
+
+static INT32 slider_reflection(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->reflection), 0.01f, "%2.2f", str, newval);
+}
+
+static INT32 slider_vignetting(running_machine &machine, void *arg, std::string *str, INT32 newval)
+{
+	((hlsl_options*)arg)->params_dirty = true;
+	return slider_set(&(((hlsl_options*)arg)->vignetting), 0.01f, "%2.2f", str, newval);
 }
 
 static INT32 slider_scanline_alpha(running_machine &machine, void *arg, std::string *str, INT32 newval)
@@ -2815,15 +2838,16 @@ static INT32 slider_bloom_lvl10_scale(running_machine &machine, void *arg, std::
 shaders::slider_desc shaders::s_sliders[] =
 {
 	{ "Shadow Mask Darkness",                0,     0,   100, 1, slider_shadow_mask_alpha },
-	{ "Shadow Mask X Count",                 1,   320,  1024, 1, slider_shadow_mask_x_count },
-	{ "Shadow Mask Y Count",                 1,   240,  1024, 1, slider_shadow_mask_y_count },
+	{ "Shadow Mask X Count",                 1,     6,  1024, 1, slider_shadow_mask_x_count },
+	{ "Shadow Mask Y Count",                 1,     6,  1024, 1, slider_shadow_mask_y_count },
 	{ "Shadow Mask Pixel Count X",           1,     6,    64, 1, slider_shadow_mask_usize },
-	{ "Shadow Mask Pixel Count Y",           1,     7,    64, 1, slider_shadow_mask_vsize },
-	{ "Shadow Mask Pixel Count Y",           1,     7,    64, 1, slider_shadow_mask_vsize },
-	{ "Shadow Mask Pixel Count Y",           1,     7,    64, 1, slider_shadow_mask_vsize },
-	{ "Shadow Mask Pixel Count Y",           1,     7,    64, 1, slider_shadow_mask_vsize },
+	{ "Shadow Mask Pixel Count Y",           1,     6,    64, 1, slider_shadow_mask_vsize },
+	{ "Shadow Mask Offset X",             -100,     0,   100, 1, slider_shadow_mask_uoffset },
+	{ "Shadow Mask Offset Y",             -100,     0,   100, 1, slider_shadow_mask_voffset },
 	{ "Screen Curvature",                    0,     3,   100, 1, slider_curvature },
-	{ "Image Pincushion",                    0,     3,   100, 1, slider_pincushion },
+	{ "Screen Round Corner",                 0,     3,   100, 1, slider_round_corner },
+	{ "Screen Reflection",                   0,     3,   100, 1, slider_reflection },
+	{ "Image Vignetting",                    0,     3,   100, 1, slider_vignetting },
 	{ "Scanline Darkness",                   0,   100,   100, 1, slider_scanline_alpha },
 	{ "Scanline Screen Height",              1,    20,    80, 1, slider_scanline_scale },
 	{ "Scanline Indiv. Height",              1,    20,    80, 1, slider_scanline_height },
@@ -3062,11 +3086,17 @@ void uniform::update()
 			m_shader->set_float("Passthrough", shadersys->phosphor_passthrough ? 1.0f : 0.0f);
 			break;
 
-		case CU_POST_PINCUSHION:
-			m_shader->set_float("PincushionAmount", options->pincushion);
+		case CU_POST_REFLECTION:
+			m_shader->set_float("ReflectionAmount", options->reflection);
+			break;
+		case CU_POST_VIGNETTING:
+			m_shader->set_float("VignettingAmount", options->vignetting);
 			break;
 		case CU_POST_CURVATURE:
 			m_shader->set_float("CurvatureAmount", options->curvature);
+			break;
+		case CU_POST_ROUND_CORNER:
+			m_shader->set_float("RoundCornerAmount", options->round_corner);
 			break;
 		case CU_POST_SHADOW_ALPHA:
 			m_shader->set_float("ShadowAlpha", shadersys->shadow_texture == NULL ? 0.0f : options->shadow_mask_alpha);
@@ -3081,6 +3111,12 @@ void uniform::update()
 		{
 			float shadowuv[2] = { options->shadow_mask_u_size, options->shadow_mask_v_size };
 			m_shader->set_vector("ShadowUV", 2, shadowuv);
+			break;
+		}
+		case CU_POST_SHADOW_UV_OFFSET:
+		{
+			float shadowuv[2] = { options->shadow_mask_u_offset, options->shadow_mask_v_offset };
+			m_shader->set_vector("ShadowUVOffset", 2, shadowuv);
 			break;
 		}
 		case CU_POST_SHADOW_DIMS:
@@ -3344,6 +3380,11 @@ void effect::set_int(D3DXHANDLE param, int value)
 	m_effect->SetInt(param, value);
 }
 
+void effect::set_bool(D3DXHANDLE param, bool value)
+{
+	m_effect->SetBool(param, value);
+}
+
 void effect::set_matrix(D3DXHANDLE param, matrix *matrix)
 {
 	m_effect->SetMatrix(param, (D3DXMATRIX*)matrix);
@@ -3431,7 +3472,7 @@ static file_error open_next(d3d::renderer *d3d, emu_file &file, const char *temp
 			if (end - pos < 3)
 				fatalerror("Something very wrong is going on!!!\n");
 
-			// copy the device name to an astring
+			// copy the device name to a string
 			std::string snapdevname;
 			snapdevname.assign(snapstr.substr(pos + 3, end - pos - 3));
 
