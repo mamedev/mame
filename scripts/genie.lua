@@ -89,6 +89,11 @@ newoption {
 }
 
 newoption {
+    trigger = 'with-bundled-expat',
+    description = 'Build bundled Expat library',
+}
+
+newoption {
 	trigger = "distro",
 	description = "Choose distribution",
 	allowed = {

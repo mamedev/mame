@@ -14,12 +14,16 @@ includedirs {
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
-	MAME_DIR .. "3rdparty/expat/lib",
 	MAME_DIR .. "3rdparty/lua/src",
 	MAME_DIR .. "3rdparty/zlib",
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }
+if _OPTIONS["with-bundled-expat"] then
+	includedirs {
+		MAME_DIR .. "3rdparty/expat/lib",
+	}
+end
 
 files {
 	MAME_DIR .. "src/emu/emu.h",
@@ -368,13 +372,17 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/expat/lib",
 		MAME_DIR .. "3rdparty/lua/src",
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 		MAME_DIR .. "src/emu/cpu/m68000",
 	}
+	if _OPTIONS["with-bundled-expat"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
 	
 	dofile(path.join("src", "cpu.lua"))
 
@@ -402,7 +410,6 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/expat/lib",
 		MAME_DIR .. "3rdparty/lua/src",
 		MAME_DIR .. "3rdparty/zlib",
 		MAME_DIR .. "src/mess", -- some mess bus devices need this
@@ -410,6 +417,11 @@ function emuProject(_target, _subtarget)
 		GEN_DIR  .. "emu",
 		GEN_DIR  .. "emu/layout",
 	}
+	if _OPTIONS["with-bundled-expat"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
 
 	dofile(path.join("src", "bus.lua"))
 	
@@ -428,11 +440,15 @@ function emuProject(_target, _subtarget)
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/expat/lib",
 		MAME_DIR .. "3rdparty/lua/src",
 		MAME_DIR .. "3rdparty/zlib",
 		GEN_DIR  .. "emu",
 	}
+	if _OPTIONS["with-bundled-expat"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
 	
 	files {
 		disasm_files

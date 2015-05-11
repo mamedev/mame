@@ -13,9 +13,13 @@ project "utils"
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/expat/lib",
 		MAME_DIR .. "3rdparty/zlib",
 	}
+	if _OPTIONS["with-bundled-expat"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
 
 	files {
 		MAME_DIR .. "src/lib/util/bitstream.h",
