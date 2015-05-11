@@ -53,6 +53,8 @@
 # ARCHOPTS =
 # LDOPTS =
 
+# USE_SYSTEM_LIB_EXPAT = 1
+
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
 # SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
@@ -285,6 +287,13 @@ OSD := sdl
 endif
 endif
 
+#-------------------------------------------------
+# which 3rdparty library to build;
+#  link against system (common) library otherwise
+#-------------------------------------------------
+ifndef USE_SYSTEM_LIB_EXPAT
+PARAMS += --with-bundled-expat
+endif
 
 #-------------------------------------------------
 # distribution may change things

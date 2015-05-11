@@ -5,6 +5,7 @@
 -- expat library objects
 --------------------------------------------------
 
+if _OPTIONS["with-bundled-expat"] then
 project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
@@ -23,6 +24,11 @@ project "expat"
 			"-Wshadow"
 		}
 	end
+else
+links {
+	"expat",
+}
+end
 
 --------------------------------------------------
 -- zlib library objects
@@ -84,8 +90,12 @@ project "softfloat"
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/expat/lib/",
 	}
+	if _OPTIONS["with-bundled-expat"] then
+	    includedirs {
+			MAME_DIR .. "3rdparty/expat/lib/",
+		}
+	end
 	
 	files {
 		MAME_DIR .. "3rdparty/softfloat/softfloat.c",
