@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Mariusz Wojcieszek
 /*
     Atari Bartop 5200 prototype system
