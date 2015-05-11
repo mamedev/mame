@@ -144,6 +144,7 @@ void ucom4_cpu_device::device_start()
 	m_prev_op = 0;
 	m_skip = false;
 	m_pc = 0;
+	m_prev_pc = 0;
 	m_acc = 0;
 	m_dpl = 0;
 	m_dph = 0;
@@ -161,6 +162,7 @@ void ucom4_cpu_device::device_start()
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_acc));
 	save_item(NAME(m_dpl));
 	save_item(NAME(m_dph));
@@ -209,7 +211,7 @@ void ucom4_cpu_device::device_reset()
 
 
 //-------------------------------------------------
-//  execute
+//  interrupt
 //-------------------------------------------------
 
 void ucom4_cpu_device::execute_set_input(int line, int state)
@@ -228,6 +230,23 @@ void ucom4_cpu_device::execute_set_input(int line, int state)
 			break;
 	}
 }
+
+void ucom4_cpu_device::do_interrupt()
+{
+	m_icount--;
+	push_stack();
+	m_pc = 0xf << 2;
+	m_int_f = 0;
+	m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
+
+	standard_irq_callback(0);
+}
+
+
+
+//-------------------------------------------------
+//  execute
+//-------------------------------------------------
 
 inline void ucom4_cpu_device::increment_pc()
 {
@@ -250,25 +269,21 @@ void ucom4_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		m_icount--;
-
-		// remember previous opcode
-		m_prev_op = m_op;
-
-		// handle interrupt - it not accepted during LI($9x) or EI($31), or while skipping
-		if (m_int_f && m_inte_f && (m_prev_op & 0xf0) != 0x90 && m_prev_op != 0x31 && !m_skip)
+		// handle interrupt, but not during LI($9x) or EI($31) or while skipping
+		if (m_int_f && m_inte_f && (m_op & 0xf0) != 0x90 && m_op != 0x31 && !m_skip)
 		{
-			m_icount--;
-			push_stack();
-			m_pc = 0xf << 2;
-			m_int_f = 0;
-			m_inte_f = (m_family == NEC_UCOM43) ? 0 : 1;
-
-			standard_irq_callback(0);
+			do_interrupt();
+			if (m_icount <= 0)
+				break;
 		}
+
+		// remember previous state
+		m_prev_op = m_op;
+		m_prev_pc = m_pc;
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
+		m_icount--;
 		m_op = m_program->read_byte(m_pc);
 		m_bitmask = 1 << (m_op & 0x03);
 		increment_pc();

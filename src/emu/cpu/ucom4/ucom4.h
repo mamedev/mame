@@ -175,6 +175,7 @@ protected:
 	emu_timer *m_timer;
 
 	UINT16 m_pc;            // program counter
+	UINT16 m_prev_pc;
 	UINT8 m_acc;            // 4-bit accumulator
 	UINT8 m_dpl;            // 4-bit data pointer low (RAM x)
 	UINT8 m_dph;            // 4-bit(?) data pointer high (RAM y)
@@ -203,6 +204,7 @@ protected:
 	// misc internal helpers
 	void increment_pc();
 	void fetch_arg();
+	void do_interrupt();
 
 	UINT8 ram_r();
 	void ram_w(UINT8 data);
