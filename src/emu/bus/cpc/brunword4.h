@@ -32,8 +32,6 @@ private:
 	
 	bool m_rombank_active;
 	UINT8 m_bank_sel;
-	UINT8* m_4xxx_ptr;
-	UINT8* m_6xxx_ptr;
 };
 
 // device type definition
