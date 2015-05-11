@@ -311,7 +311,7 @@ NETLIB_START(solver)
 
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
-	register_param("GS_THRESHOLD", m_gs_threshold, 2);      // below this value, gaussian elimination is used
+	register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
 	register_param("NR_LOOPS", m_nr_loops, 25);             // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
 	register_param("SOR_FACTOR", m_sor, 1.059);
