@@ -1,4 +1,4 @@
-// license:???
+// license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina
 /*********************************************************
 Sega hardware based on their SG-1000 console

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /********************************************
     NEC V810 (upd70732) disassembler

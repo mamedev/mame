@@ -1,4 +1,4 @@
-// license:???
+// license:LGPL-2.1+
 // copyright-holders:Sebastien Volpe, Tomasz Slanina, David Haywood
 /*
     Super Real Mahjong P6 (JPN Ver.)

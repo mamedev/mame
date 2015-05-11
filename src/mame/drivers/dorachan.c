@@ -1,4 +1,4 @@
-// license:???
+// license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina
 /*
 Dorachan (Dora-Chan ?) (c) 1980 Craul Denshi

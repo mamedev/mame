@@ -1,4 +1,4 @@
-// license:???
+// license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina
 /*
 Sliver - Hollow Corp.1996

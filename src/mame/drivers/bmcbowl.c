@@ -1,4 +1,4 @@
-// license:???
+// license:LGPL-2.1+
 // copyright-holders:Tomasz Slanina
 /*
 BMC Bowling (c) 1994.05 BMC, Ltd

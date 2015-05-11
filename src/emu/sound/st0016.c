@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:R. Belmont, Tomasz Slanina, David Haywood
 /************************************
       Seta custom ST-0016 chip
