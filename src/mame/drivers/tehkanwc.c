@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Roberto Fresca
 /* Notes: DJH 04 Jan 2008
 

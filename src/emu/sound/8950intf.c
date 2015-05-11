@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 /******************************************************************************
 * FILE
 *   Yamaha 3812 emulator interface - MAME VERSION
