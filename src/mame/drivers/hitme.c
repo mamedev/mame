@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Dan Boris
 /* Hit Me driver by the EMUL8, led by Dan Boris */
 
