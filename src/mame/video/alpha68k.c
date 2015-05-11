@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
    Alpha 68k video emulation - Bryan McPhail, mish@tendril.co.uk

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /****************************************************************************
 
     Data East 104 based protection/IO chips

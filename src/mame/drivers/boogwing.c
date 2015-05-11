@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
 /*
     Boogie Wings (aka The Great Ragtime Show)

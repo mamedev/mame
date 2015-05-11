@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 /*
     (Some) Data East 32 bit 156 CPU ARM based games:

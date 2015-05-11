@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
    Caveman Ninja Video emulation - Bryan McPhail, mish@tendril.co.uk
