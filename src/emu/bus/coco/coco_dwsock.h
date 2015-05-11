@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Nathan Woods
 #ifndef _DWSOCK_H_
 #define _DWSOCK_H_

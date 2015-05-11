@@ -1,14 +1,10 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
     mame.h
 
     Controls execution of the core MAME system.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #pragma once

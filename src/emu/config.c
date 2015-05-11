@@ -1,14 +1,10 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /***************************************************************************
 
     config.c
 
     Configuration file I/O.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "emu.h"

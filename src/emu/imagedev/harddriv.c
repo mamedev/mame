@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Raphael Nabet, Miodrag Milanovic
 /*********************************************************************
 
     Code to interface the image code with harddisk core.

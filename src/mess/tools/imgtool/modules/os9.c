@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Nathan Woods
 /****************************************************************************
 
     os9.c

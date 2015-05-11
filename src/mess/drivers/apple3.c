@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods,R. Belmont
 /***************************************************************************
 
     drivers/apple3.c

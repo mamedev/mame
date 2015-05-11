@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl, Miodrag Milanovic
 #pragma once
 
 #ifndef __EMU_H__

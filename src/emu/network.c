@@ -1,14 +1,10 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 /***************************************************************************
 
     network.c
 
     Core network functions and definitions.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 #include <ctype.h>
 
