@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Antoine Mine
 /**********************************************************************
 
   Copyright (C) Antoine Mine' 2008

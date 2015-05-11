@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /*****************************************************************************
  *
  *   sc61860.c
