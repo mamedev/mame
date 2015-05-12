@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
 /**************************
  *** PSYCHIC 5 hardware ***     (by Roberto Ventura)
