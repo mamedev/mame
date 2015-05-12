@@ -30,6 +30,12 @@ void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
+			strprintf(str, "%c%c%c%c",
+				(m_f & I_FLAG) ? 'I':'i',
+				(m_f & D_FLAG) ? 'D':'d',
+				(m_f & Z_FLAG) ? 'Z':'z',
+				(m_f & C_FLAG) ? 'C':'c'
+			);
 			break;
 
 		default: break;
@@ -48,16 +54,26 @@ offs_t e0c6200_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UIN
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+enum
+{
+	E0C6200_PC=1, E0C6200_A, E0C6200_B,
+	E0C6200_XP, E0C6200_XH, E0C6200_XL,
+	E0C6200_YP, E0C6200_YH, E0C6200_YL,
+	E0C6200_SP
+};
+
 void e0c6200_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_prgmask = (1 << m_prgwidth) - 1;
-	m_datamask = (1 << m_datawidth) - 1;
 
 	// zerofill
 	m_op = 0;
 	m_prev_op = 0;
+	m_irq_vector = 0;
+	m_irq_id = 0;
+	m_possible_irq = false;
+	m_halt = m_sleep = false;
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_npc = 0;
@@ -73,6 +89,11 @@ void e0c6200_cpu_device::device_start()
 	// register for savestates
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
+	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_irq_id));
+	save_item(NAME(m_possible_irq));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_sleep));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_npc));
@@ -89,6 +110,17 @@ void e0c6200_cpu_device::device_start()
 	save_item(NAME(m_f));
 
 	// register state for debugger
+	state_add(E0C6200_PC, "PC", m_pc).formatstr("%04X");
+	state_add(E0C6200_A,  "A",  m_a).formatstr("%01X");
+	state_add(E0C6200_B,  "B",  m_b).formatstr("%01X");
+	state_add(E0C6200_XP, "XP", m_xp).formatstr("%01X");
+	state_add(E0C6200_XH, "XH", m_xh).formatstr("%01X");
+	state_add(E0C6200_XL, "XL", m_xl).formatstr("%01X");
+	state_add(E0C6200_YP, "YP", m_yp).formatstr("%01X");
+	state_add(E0C6200_YH, "YH", m_yh).formatstr("%01X");
+	state_add(E0C6200_YL, "YL", m_yl).formatstr("%01X");
+	state_add(E0C6200_SP, "SP", m_sp).formatstr("%02X");
+
 	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%4s").noshow();
 
@@ -103,6 +135,7 @@ void e0c6200_cpu_device::device_start()
 
 void e0c6200_cpu_device::device_reset()
 {
+	m_halt = m_sleep = false;
 	m_op = 0xfff; // nop
 	m_pc = 0x100;
 	m_f &= 3; // decimal flag is 0 on 6200A, undefined on 6200
@@ -111,7 +144,72 @@ void e0c6200_cpu_device::device_reset()
 
 
 //-------------------------------------------------
-//  execute
+//  execute loop
+//-------------------------------------------------
+
+void e0c6200_cpu_device::do_interrupt()
+{
+	// interrupt handling takes 13* cycles, plus 1 extra if cpu was halted
+	// *: 12.5 on E0C6200A, does the cpu osc source change polarity or something?
+	m_icount -= 13;
+	if (m_halt || m_sleep)
+		m_icount--;
+
+	m_halt = m_sleep = false;
+	push_pc();
+	m_f &= ~I_FLAG;
+	
+	// page 1 of the current bank
+	m_pc = (m_pc & 0x1000) | 0x100 | m_irq_vector;
+
+	standard_irq_callback(m_irq_id);
+}
+
+void e0c6200_cpu_device::execute_run()
+{
+	while (m_icount > 0)
+	{
+		// check/handle interrupt, but not right after EI or in the middle of a longjump
+		if (m_possible_irq && (m_op & 0xfe0) != 0xe40 && (m_op & 0xff8) != 0xf48)
+		{
+			m_possible_irq = false;
+			if (m_f & I_FLAG && check_interrupt())
+			{
+				do_interrupt();
+				if (m_icount <= 0)
+					break;
+			}
+		}
+		
+		// cpu halted (peripherals still run)
+		if (m_halt || m_sleep)
+		{
+			m_icount = 0;
+			break;
+		}
+		
+		// remember previous state, prepare pset-longjump
+		m_prev_op = m_op;
+		m_prev_pc = m_pc;
+		m_jpc = ((m_prev_op & 0xfe0) == 0xe40) ? m_npc : (m_prev_pc & 0x1f00);
+		
+		// fetch next opcode
+		debugger_instruction_hook(this, m_pc);
+		m_op = m_program->read_word(m_pc << 1) & 0xfff;
+		m_pc = (m_pc & 0x1000) | ((m_pc + 1) & 0x0fff);
+		
+		// minimal opcode time is 5 clock cycles, opcodes take 5, 7, or 12 clock cycles
+		m_icount -= 5;
+		
+		// handle opcode
+		execute_one();
+	}
+}
+
+
+
+//-------------------------------------------------
+//  execute one
 //-------------------------------------------------
 
 void e0c6200_cpu_device::execute_one()
@@ -557,7 +655,7 @@ void e0c6200_cpu_device::execute_one()
 		case 0xfd7: m_yp = pop(); break;
 		case 0xfd8: m_yh = pop(); break;
 		case 0xfd9: m_yl = pop(); break;
-		case 0xfda: m_f = pop(); break;
+		case 0xfda: m_f = pop(); m_possible_irq = true; break;
 
 		// RETS: return from subroutine, then skip next instruction
 		case 0xfde:
@@ -577,12 +675,14 @@ void e0c6200_cpu_device::execute_one()
 			m_pc = m_jpc | m_b << 4 | m_a;
 			break;
 
-		// HALT: halt (stop clock)
+		// HALT: halt (stop cpu core clock)
 		case 0xff8:
+			m_halt = true;
 			break;
 
-		// SLP: sleep (stop oscillation)
+		// SLP: sleep (stop source oscillation)
 		case 0xff9:
+			m_sleep = true;
 			break;
 
 		// NOP5: no operation (5 clock cycles)
@@ -709,6 +809,7 @@ void e0c6200_cpu_device::execute_one()
 		case 0xf40:
 			m_icount -= 2;
 			m_f |= (m_op & 0xf);
+			m_possible_irq = true;
 			break;
 
 		// RST F,i: reset flag(s), this includes opcodes RCF, RZF, RDF, DI
@@ -735,26 +836,4 @@ void e0c6200_cpu_device::execute_one()
 			break;
 
 	} // 0xf00 (big switch)
-}
-
-void e0c6200_cpu_device::execute_run()
-{
-	while (m_icount > 0)
-	{
-		// remember previous state, prepare pset-longjump
-		m_prev_op = m_op;
-		m_prev_pc = m_pc;
-		m_jpc = ((m_prev_op & 0xfe0) == 0xe40) ? m_npc : (m_prev_pc & 0x1f00);
-		
-		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
-		m_op = m_program->read_word(m_pc << 1) & 0xfff;
-		m_pc = (m_pc & 0x1000) | ((m_pc + 1) & 0x0fff);
-		
-		// minimal opcode time is 5 clock cycles, opcodes take 5, 7, or 12 clock cycles
-		m_icount -= 5;
-		
-		// handle opcode
-		execute_one();
-	}
 }

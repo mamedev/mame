@@ -22,9 +22,19 @@ public:
 		m_speaker(*this, "speaker")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+
+	DECLARE_PALETTE_INIT(tama);
 };
+
+
+
+PALETTE_INIT_MEMBER(tamag1_state, tama)
+{
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
+}
 
 
 
@@ -37,9 +47,21 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( tama, tamag1_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E0C6S46, 32768)
+	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)
+//	MCFG_E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 
-	/* no video! */
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(XTAL_32_768kHz/1024)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40, 16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40-1, 0, 16-1)
+//	MCFG_DEFAULT_LAYOUT(layout_tama)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", e0c6s46_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(tamag1_state, tama)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -57,6 +79,7 @@ MACHINE_CONFIG_END
 
 ROM_START( tama )
 	ROM_REGION( 0x3000, "maincpu", 0 )
+//	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) )
 	ROM_LOAD( "tama.b", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
 ROM_END
 

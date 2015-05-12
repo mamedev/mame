@@ -120,9 +120,9 @@ void e0c6200_cpu_device::do_branch(int condition)
 
 
 // common opcodes (simpler ones are handled directly)
-// note: it is implied that most opcodes below take 7 clock cycles (5 already deducted)
+// note: it is implied that all opcodes below except RRC take 7 clock cycles (5 already deducted)
 
-// artithmetic instructions
+// arithmetic instructions
 
 UINT8 e0c6200_cpu_device::op_inc(UINT8 x)
 {
