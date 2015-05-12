@@ -1020,3 +1020,48 @@ endif
 doxygen:
 	@echo Generate Doxygen documentation
 	doxygen mame.doxygen
+
+#-------------------------------------------------
+# CppCheck analysis
+#-------------------------------------------------
+
+.PHONY: cppcheck
+
+CPPCHECK_PARAMS  = -Isrc/osd
+CPPCHECK_PARAMS += -Isrc/emu
+CPPCHECK_PARAMS += -Isrc/lib
+CPPCHECK_PARAMS += -Isrc/lib/util
+CPPCHECK_PARAMS += -Isrc/mame
+CPPCHECK_PARAMS += -Isrc/mess 
+CPPCHECK_PARAMS += -Isrc/osd/modules/render
+CPPCHECK_PARAMS += -Isrc/osd/windows
+CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
+CPPCHECK_PARAMS += -I3rdparty
+CPPCHECK_PARAMS += -I3rdparty/lua/src
+CPPCHECK_PARAMS += -I3rdparty/zlib 
+CPPCHECK_PARAMS += -I3rdparty/bgfx/include
+CPPCHECK_PARAMS += -I3rdparty/bx/include
+CPPCHECK_PARAMS += -Ibuild/generated/emu 
+CPPCHECK_PARAMS += -Ibuild/generated/emu/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mess/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mame/layout 
+CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
+CPPCHECK_PARAMS += -DPTR64=1
+CPPCHECK_PARAMS += -DMAME_DEBUG
+CPPCHECK_PARAMS += -DMAME_PROFILER
+CPPCHECK_PARAMS += -DCRLF=3
+CPPCHECK_PARAMS += -DLSB_FIRST
+CPPCHECK_PARAMS += -DFLAC__NO_DLL
+CPPCHECK_PARAMS += -DNATIVE_DRC=drcbe_x64
+CPPCHECK_PARAMS += -DLUA_COMPAT_APIINTCASTS
+CPPCHECK_PARAMS += -DWIN32
+CPPCHECK_PARAMS += -D__GNUC__
+CPPCHECK_PARAMS += -D__x86_64__
+ifndef VERBOSE
+CPPCHECK_PARAMS += --quiet
+endif
+
+cppcheck:
+	@echo Generate CppCheck analysis report
+	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
+	
