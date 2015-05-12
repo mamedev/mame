@@ -131,7 +131,7 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 	palette.set_pen_color(64+12,   0,  85,   0); // palette.set_pen_color(64+12,  33, 176,  59);
 	palette.set_pen_color(64+13, 255,   0, 255); // palette.set_pen_color(64+13, 201,  91, 186);
 	palette.set_pen_color(64+14,  85,  85,  85); // palette.set_pen_color(64+14, 204, 204, 204);
-	palette.set_pen_color(64+15,   0,   0,   0); // palette.set_pen_color(64+15, 255, 255, 255);
+	palette.set_pen_color(64+15, 255, 255, 255); // palette.set_pen_color(64+15, 255, 255, 255);
 }
 
 
