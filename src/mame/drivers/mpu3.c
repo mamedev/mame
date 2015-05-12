@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /* Notes 17/07/11 DH
  added most other MPU3 sets
 

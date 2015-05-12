@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /***************************************************************************
 
   Bellfruit Adder2 video board driver, (under heavy construction !!!)

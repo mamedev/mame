@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:J Wallace
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /***************************************************************************
 
     Bellfruit system85 driver, (under heavy construction !!!)
