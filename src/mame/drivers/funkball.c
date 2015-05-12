@@ -1,4 +1,4 @@
-// license:?
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Phil Bennett
 
 // dgPIX 'VRender 2 Beta Rev4' hardware
