@@ -921,11 +921,6 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
 	pcw16_refresh_ints();
 }
 
-INPUT_CHANGED_MEMBER(pcw16_state::power)
-{
-	m_uart2->ri_w((newval & 0x040) ? 0 : 1);
-}
-
 FLOPPY_FORMATS_MEMBER( pcw16_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
@@ -998,9 +993,7 @@ static INPUT_PORTS_START(pcw16)
 	/* vblank */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 	/* power switch - default is on */
-	PORT_DIPNAME(0x40, 0x40, "Power Switch/Suspend") PORT_CHANGED_MEMBER(DEVICE_SELF, pcw16_state, power, 0)
-	PORT_DIPSETTING(0x0, DEF_STR( Off) )
-	PORT_DIPSETTING(0x40, DEF_STR( On) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Power Switch/Suspend") PORT_WRITE_LINE_DEVICE_MEMBER("ns16550_2", ins8250_uart_device, ri_w) PORT_TOGGLE
 
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
