@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni, J. Wallace
 /**********************************************************************************************
  *
  *   OKI MSM6376 ADPCM
