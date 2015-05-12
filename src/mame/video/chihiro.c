@@ -1236,7 +1236,10 @@ void nv2a_renderer::write_pixel(int x, int y, UINT32 color, UINT32 depth)
 	bool stencil_passed;
 	bool depth_passed;
 
-	addr=rendertarget + (pitch_rendertarget / 4)*y + x;
+	if (type_rendertarget == SWIZZLED)
+		addr = rendertarget + (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]);
+	else // type_rendertarget == LINEAR*/
+		addr = rendertarget + (pitch_rendertarget / 4)*y + x;
 	fbcolor = *addr;
 	daddr=depthbuffer + (pitch_depthbuffer / 4)*y + x;
 	deptsten = *daddr;
@@ -2593,7 +2596,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		int m;
 
 		m = channel[chanel][subchannel].object.method[0x1d7c / 4];
-		if (channel[chanel][subchannel].object.method[0x0208 / 4] & 0x2000)
+		if (antialiasing_rendertarget != 0)
 			m = 2;
 		else
 			m = 1;
@@ -2631,12 +2634,13 @@ int nv2a_renderer::geforce_exec_method(address_space & space, UINT32 chanel, UIN
 		limits_rendertarget.sety(y,y+h-1);
 	}
 	if (maddress == 0x0208) {
-		height_rendertarget=(data >> 24) & 255;
-		width_rendertarget=(data >> 16) & 255;
-		antialiasing_rendertarget=(data >> 12) & 15;
-		type_rendertarget=(data >> 8) & 15;
-		depth_rendertarget=(data >> 4) & 15;
-		color_rendertarget=(data >> 0) & 15;
+		log2height_rendertarget = (data >> 24) & 255;
+		log2width_rendertarget = (data >> 16) & 255;
+		antialiasing_rendertarget = (data >> 12) & 15;
+		type_rendertarget = (data >> 8) & 15;
+		depth_rendertarget = (data >> 4) & 15;
+		color_rendertarget = (data >> 0) & 15;;
+		dilate_rendertarget = dilatechose[(log2width_rendertarget << 4) + log2height_rendertarget];
 	}
 	if (maddress == 0x020c) {
 		// line size ?
