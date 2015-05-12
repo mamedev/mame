@@ -1153,8 +1153,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 	</software>
 
 <!-- Save Disk Error? -->
-	<software name="kindgals" supported="no">
-		<description>Kind Gal's</description>
+	<software name="kudokik2" supported="no">
+		<description>Kudokikata Oshiemasu II - Kind Gal's</description>
 		<year>1989</year>
 		<publisher>Wild</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1434,7 +1434,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="kinetic">
+	<software name="kineticc">
 		<description>The Monitor Puzzle Kineko - Kinetic Connection</description>
 		<year>1986</year>
 		<publisher>Irem</publisher>

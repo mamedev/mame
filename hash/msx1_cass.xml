@@ -2232,7 +2232,7 @@
 		</part>
 	</software>
 
-	<software name="bblock">
+	<software name="bustblck">
 		<description>Buster Block (Euro)</description>
 		<year>1985</year>
 		<publisher>Kuma Computers</publisher>
@@ -5161,7 +5161,7 @@
 		</part>
 	</software>
 
-	<software name="flintst">
+	<software name="flint">
 		<description>The Flintstones (Euro)</description>
 		<year>1988</year>
 		<publisher>Grandslam Entertainments</publisher>
@@ -14151,7 +14151,7 @@
 		</part>
 	</software>
 
-	<software name="tresluce">
+	<software name="lucesglr">
 		<description>Las Tres Luces de Glaurung (Spa)</description>
 		<year>1986</year>
 		<publisher>Erbe Software</publisher>
@@ -14177,7 +14177,7 @@
 		</part>
 	</software>
 
-	<software name="tripcomm">
+	<software name="tripcom">
 		<description>Triple Comando (Spa)</description>
 		<year>1988</year>
 		<publisher>Dro Soft</publisher>
@@ -15532,6 +15532,49 @@
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- Doujin -->
+
+	<software name="mtype">
+		<description>M-TYPE (Jpn)</description>
+		<year>1989</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Shigenori Kumagai" />
+		<info name="usage" value="Load with CLOAD + RUN"/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="17346">
+				<rom name="mtype.cas" size="17346" crc="2d537c7d" sha1="698509696c533bf2f52a557384ab6e687a738415" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="resurect">
+		<description>Resurection (Spa?)</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="Dakar Soft" />
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="78080">
+				<rom name="resurection (dakar soft, 2013).cas" size="78080" crc="11e1389f" sha1="e41e25346add0eece843b8878fbf97e67df400f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chiteidb">
+		<description>Chitei Daibouken (Jpn)</description>
+		<year>1987</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Yasunori Takahara" />
+		<info name="usage" value="Load with CLOAD + RUN"/>
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="30048">
+				<rom name="ugadventure.cas" size="30048" crc="294e3342" sha1="3f33068710feb943738190a8a2ad1e8ad11f420b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 
 

@@ -615,7 +615,7 @@ Xyzolog - Electric Software
 	</software>
 
 	<software name="hydlide2" supported="partial">
-		<description>Hydlide II (Jpn)</description>
+		<description>Hydlide II - Shine of Darkness (Jpn)</description>
 		<year>1986</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="TEX-70" />
@@ -2154,7 +2154,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="battlecr">
+	<software name="battlex">
 		<description>Battle Cross (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sony</publisher>
@@ -5117,7 +5117,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 <!-- only tape released? tap2crt hack?? -->
-	<software name="flics">
+	<software name="lesflics">
 		<description>Les Flics (Euro)</description>
 		<year>1985</year>
 		<publisher>PSS?</publisher>
@@ -12862,7 +12862,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="xyxolog">
+	<software name="xyzolog">
 		<description>Xyzolog (Jpn)</description>
 		<year>1984</year>
 		<publisher>Nidecom</publisher>
@@ -12874,8 +12874,8 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="xyxologa" cloneof="xyxolog">
-		<description>Xyxolog (Jpn, Alt)</description>
+	<software name="xyzologa" cloneof="xyzolog">
+		<description>Xyzolog (Jpn, Alt)</description>
 		<year>1984</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="ザイゾログ" />
@@ -12924,7 +12924,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="hadesa" cloneof="hades">
-		<description>Yami no Ryuuou - Hades no Monsho (Jpn, Alt)</description>
+		<description>Yami no Ryuuou - Hades no Monshou (Jpn, Alt)</description>
 		<year>1986</year>
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-131" />
@@ -13189,7 +13189,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="zexas">
+	<software name="zexasltd">
 		<description>Zexas Limited (Jpn)</description>
 		<year>1985</year>
 		<publisher>dB-Soft</publisher>
@@ -13202,7 +13202,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="zexasa" cloneof="zexas">
+	<software name="zexasltda" cloneof="zexasltd">
 		<description>Zexas Limited (Jpn, Alt)</description>
 		<year>1985</year>
 		<publisher>dB-Soft</publisher>
@@ -13215,7 +13215,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="zexasb" cloneof="zexas">
+	<software name="zexasltdb" cloneof="zexasltd">
 		<description>Zexas Limited (Jpn, Alt 2)</description>
 		<year>1985</year>
 		<publisher>dB-Soft</publisher>

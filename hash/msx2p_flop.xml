@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="msx2p_flop" description="MSX2+ floppies">
+<softwarelist name="msx2p_flop" description="MSX2+ disk images">
 
 <!--
 
@@ -21,19 +21,6 @@ Known undumped:
     Mouse Master ( http://www.generation-msx.nl/software/msx-club-gouda/mouse-master/release/2542/ )
 
 -->
-
-
-	<software name="evaplay">
-		<description> (v0.06)</description>
-		<year>2000</year>
-		<publisher>Sergio Guerrero</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="eva player for sunrise ata-ide v0.06 (2000)(sergio guerrero)[needs msx-dos].dsk" size="737280" crc="3d125143" sha1="b87dafb0bddd3134d3c08cbcd697b954c1870587" offset="0" />
-			</dataarea>
-		</part>
-	</software>
 
 
 	<software name="beppin">

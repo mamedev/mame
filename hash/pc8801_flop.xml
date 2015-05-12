@@ -4050,7 +4050,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<software name="balancep">
+	<software name="balpower">
 		<description>Balance of Power</description>
 		<year>1989</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -4187,7 +4187,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		</part>
 	</software>
 
-	<software name="bastards">
+	<software name="bastard">
 		<description>Bastard Special</description>
 		<year>1988</year>
 		<publisher>ザインソフト (Xain Soft)</publisher>
@@ -4410,7 +4410,7 @@ ExtractDisk  [04]"Disk 2          " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="best9py">
-		<description>Best Nine Pro Yakyu</description>
+		<description>Best Nine Pro Yakyuu</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -8456,7 +8456,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 	</software>
 
 	<software name="dennoga3">
-		<description>Dennou Gakuen 3 - Top wo Nerae</description>
+		<description>Dennou Gakuen 3 - Cybernetic Hi-School Part III - Top wo Nerae!</description>
 		<year>1990</year>
 		<publisher>ゼネラルプロダクツ (General Products)</publisher>
 		<!-- PC8801mk2SR -->
@@ -12679,7 +12679,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gaiamons">
-		<description>Gaia no Monsho</description>
+		<description>Gaia no Monshou</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<!-- PC8801mk2SR -->
@@ -12704,7 +12704,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gaiamonsa" cloneof="gaiamons">
-		<description>Gaia no Monsho (Alt)</description>
+		<description>Gaia no Monshou (Alt)</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<!-- PC8801mk2SR -->
@@ -19963,7 +19963,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="littleva">
+	<software name="lilvamp">
 		<description>Little Vampire</description>
 		<year>1988</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
@@ -19995,7 +19995,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="littlevaa" cloneof="littleva">
+	<software name="lilvampa" cloneof="lilvamp">
 		<description>Little Vampire (Alt)</description>
 		<year>1988</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
@@ -23183,7 +23183,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="mrproyak">
-		<description>Mr. Pro Yakyu</description>
+		<description>Mr. Pro Yakyuu</description>
 		<year>1987</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -23215,7 +23215,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="mrproyaka" cloneof="mrproyak">
-		<description>Mr. Pro Yakyu (Alt)</description>
+		<description>Mr. Pro Yakyuu (Alt)</description>
 		<year>1987</year>
 		<publisher>クリスタルソフト (Xtal Soft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -24324,7 +24324,7 @@ ExtractDisk  [05]"ｺｹﾞﾝﾀ          " -> "Nukenin Densetsu 05.d88"
 	</software>
 
 	<software name="ojibinbm">
-		<description>Oji Binbin Monogatari</description>
+		<description>Ouji Binbin Monogatari</description>
 		<year>1987</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<!-- PC8801mk2SR -->
@@ -24353,7 +24353,7 @@ ExtractDisk  [01]"DISK_1          " -> "oji binbin monogatari(a)_01.d88"
 ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 -->
 	<software name="ojibinbma" cloneof="ojibinbm">
-		<description>Oji Binbin Monogatari (Alt)</description>
+		<description>Ouji Binbin Monogatari (Alt)</description>
 		<year>1987</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<!-- PC8801mk2SR -->
@@ -24378,7 +24378,7 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="ojibinbmb" cloneof="ojibinbm">
-		<description>Oji Binbin Monogatari (Alt 2)</description>
+		<description>Ouji Binbin Monogatari (Alt 2)</description>
 		<year>1987</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<!-- PC8801mk2SR -->
@@ -24403,7 +24403,7 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 	</software>
 
 	<software name="ojibinbmbc" cloneof="ojibinbm">
-		<description>Oji Binbin Monogatari (Alt 3)</description>
+		<description>Ouji Binbin Monogatari (Alt 3)</description>
 		<year>1987</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<!-- PC8801mk2SR -->
@@ -26208,7 +26208,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 	</software>
 
 	<software name="proyakfn">
-		<description>Pro Yakyu Fan</description>
+		<description>Pro Yakyuu Fan</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<!-- PC8801mk2SR -->
@@ -26237,7 +26237,7 @@ ExtractDisk  [01]"ｷﾞﾌﾞｽDISK      " -> "pro yakyu fan & yosei gips_01.d
 ExtractDisk  [02]"DRIVE_2        " -> "pro yakyu fan & yosei gips_02.d88"       fde0b7fe
 -->
 	<software name="proyakfna" cloneof="proyakfn">
-		<description>Pro Yakyu Fan (Alt)</description>
+		<description>Pro Yakyuu Fan (Alt)</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<!-- PC8801mk2SR -->
@@ -26262,7 +26262,7 @@ ExtractDisk  [02]"DRIVE_2        " -> "pro yakyu fan & yosei gips_02.d88"       
 	</software>
 
 	<software name="proyakfy" cloneof="proyakfn">
-		<description>Pro Yakyu Fan Yosei Gips</description>
+		<description>Pro Yakyuu Fan Yosei Gips</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -26279,7 +26279,7 @@ ExtractDisk  [03]"ﾖｳｾｲｷﾞﾌﾞｽ      " -> "pro yakyu fan & yosei g
 ExtractDisk  [04]"USER          " -> "pro yakyu fan & yosei gips (a)_04.d88"
 -->
 	<software name="proyakfnp" cloneof="proyakfn">
-		<description>Pro Yakyu Fan &amp; Yosei Gips</description>
+		<description>Pro Yakyuu Fan &amp; Yosei Gips</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<!-- PC8801mk2SR -->
@@ -28916,7 +28916,7 @@ ExtractDisk  [02]"MUSIC2          " -> "scheme music disk_02.d88"
 	</software>
 
 	<software name="schwarzsa" cloneof="schwarzs">
-		<description>Schwarzschild (Alt)</description>
+		<description>Schwarzschild - Kyouran no Ginga (Alt)</description>
 		<year>1989</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<!-- PC8801mk2SR -->
@@ -29876,8 +29876,8 @@ ExtractDisk  [02]"MUSIC2          " -> "scheme music disk_02.d88"
 		</part>
 	</software>
 
-	<software name="shinbest">
-		<description>Shin Best Nine Pro Yakyu</description>
+	<software name="sbest9py">
+		<description>Shin Best Nine Pro Yakyuu</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -32333,7 +32333,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 	</software>
 
 	<software name="sugoroku">
-		<description>Sugoroku Yakyu-do</description>
+		<description>Sugoroku Yakyuu-do</description>
 		<year>1989</year>
 		<publisher>日本クリエイト (Nihon Create) / タケル (Takeru)</publisher>
 		<!-- PC8801 -->
@@ -36540,8 +36540,8 @@ ExtractDisk  [03]"Ulysses_Disk1   " -> "ulysses_v80_03.d88" (same as ulyssesa)
 		</part>
 	</software>
 
-	<software name="watanabe">
-		<description>Watanabe Wataru no Zatsugaku Olympic</description>
+	<software name="zatsolym">
+		<description>Zatsugaku Olympics - Watanabe Wataru Hen</description>
 		<year>1988</year>
 		<publisher>ハード (Hard)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38806,7 +38806,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo">
-		<description>Yakyu-do</description>
+		<description>Yakyuu-do</description>
 		<year>1988</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38845,7 +38845,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudoa" cloneof="yakyudo">
-		<description>Yakyu-do (Alt)</description>
+		<description>Yakyuu-do (Alt)</description>
 		<year>1988</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38884,7 +38884,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudod89" cloneof="yakyudo">
-		<description>Yakyu-do Data Book '89</description>
+		<description>Yakyuu-do Data Book '89</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38899,7 +38899,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudou" cloneof="yakyudo">
-		<description>Yakyu-do Taisen Disk Vol.1</description>
+		<description>Yakyuu-do Taisen Disk Vol.1</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38914,7 +38914,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo2">
-		<description>Yakyu-do II</description>
+		<description>Yakyuu-do II</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -38960,7 +38960,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo2a" cloneof="yakyudo2">
-		<description>Yakyu-do II (Alt User Disk)</description>
+		<description>Yakyuu-do II (Alt User Disk)</description>
 		<year>1989</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -39006,7 +39006,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyudo2d90" cloneof="yakyudo2">
-		<description>Yakyu-do II Data Book '90</description>
+		<description>Yakyuu-do II Data Book '90</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -39021,7 +39021,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 	</software>
 
 	<software name="yakyukyo">
-		<description>Yakyu Kyo</description>
+		<description>Yakyuu Kyo</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
@@ -47940,7 +47940,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<software name="issekini">
-		<description>Issekini Kakeru Seishun</description>
+		<description>Isseki ni Kakeru Seishun</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
@@ -54411,7 +54411,7 @@ ExtractDisk  [02]"DATA_DISK    " -> "ncs music art v.2_02.d88"
 	</software>
 
 	<software name="packtrum">
-		<description>Pack(Trump Kyo, Yakyu Kyo,etc)</description>
+		<description>Pack(Trump Kyo, Yakyuu Kyo,etc)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

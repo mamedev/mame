@@ -30061,6 +30061,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="tomclown">
+		<description>Tom Clown (USA)</description>
+		<year>1993</year>
+		<publisher>Realtec</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_realtec"/>
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="tom clown (unl).bin" size="524288" crc="0c543cad" sha1="a17b48e45235a7441a6e2236bfe9721fddad1abc" offset="00000"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Are these unprotected versions legit? or were they hacked to work with emus? -->
 
 	<software name="chinf3a" cloneof="chinf3">
