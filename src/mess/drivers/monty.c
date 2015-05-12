@@ -20,7 +20,7 @@
     
     TODO:
     - Everything - this is just a little better than a skeleton
-
+    - Get clock speeds from the dumper
 
 ****************************************************************************/
 
@@ -36,12 +36,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
         , m_sed0(*this, "sed1520_0")
+        , m_writeUpper(false)
 	{
         for (int i = 0; i < 42*32; i++)
             m_pixels[i] = 0xff000000;
 	}
 
-	DECLARE_READ8_MEMBER(init_r);
+    DECLARE_READ8_MEMBER(ioInputRead);
 
     DECLARE_WRITE8_MEMBER(ioDisplayWrite);
     DECLARE_WRITE8_MEMBER(ioCommandWrite0);
@@ -53,9 +54,10 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
     required_device<sed1520_device> m_sed0;     // TODO: This isn't actually a SED1520, it's a SED1503F
-    //required_device<sed1520_device> m_sed0;   // TODO: Also, there are 2 SED1503Fs on the board - one is flipped upside down
+    //required_device<sed1520_device> m_sed1;   // TODO: Also, there are 2 SED1503Fs on the board - one is flipped upside down
 
     // Test
+    UINT8 m_writeUpper;
     UINT32 m_pixels[42*32];
 };
 
@@ -70,9 +72,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(monty_io, AS_IO, 8, monty_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_WRITE(ioCommandWrite0)
-    // TODO: "unmapped io memory read from 0001 & FF" - almost certainly a watchdog or inputs - resets around pc=1350 if some condition isn't met
     AM_RANGE(0x02, 0x02) AM_WRITE(ioCommandWrite1)
     AM_RANGE(0x80, 0xff) AM_WRITE(ioDisplayWrite)
+
+    // 7 reads from a bit shifted IO port
+    AM_RANGE(0x01, 0x01) AM_READ(ioInputRead)
+    AM_RANGE(0x02, 0x02) AM_READ(ioInputRead)
+    AM_RANGE(0x04, 0x04) AM_READ(ioInputRead)
+    AM_RANGE(0x08, 0x08) AM_READ(ioInputRead)
+    AM_RANGE(0x10, 0x10) AM_READ(ioInputRead)
+    AM_RANGE(0x20, 0x20) AM_READ(ioInputRead)
+    AM_RANGE(0x40, 0x40) AM_READ(ioInputRead)
 ADDRESS_MAP_END
 
 
@@ -81,47 +91,65 @@ static INPUT_PORTS_START( monty )
 INPUT_PORTS_END
 
 
+READ8_MEMBER( monty_state::ioInputRead )
+{
+    //UINT8 foo; // = machine().rand() & 0xff;
+    //if (m_maincpu->pc() == 0x135f)
+    //    foo = 0x14;
+    //if (m_maincpu->pc() == 0x1371)
+    //    foo = 0x1f;
+    
+    UINT8 foo = (machine().rand() & 0xff) | 0x14;
+    
+    //printf("(%04x) %02x %02x\n", m_maincpu->pc(), foo, (foo & 0x14));
+    return foo;
+}
+
+
 WRITE8_MEMBER( monty_state::ioCommandWrite0 )
 {
-    // DEBUG // printf("Command Port 0 write : %02x\n", data);
+    //printf("(%04x) Command Port 0 write : %02x\n", m_maincpu->pc(), data);
+    m_writeUpper = false;
 }
 
 
 WRITE8_MEMBER( monty_state::ioCommandWrite1 )
 {
-    // DEBUG // printf("Command Port 1 write : %02x\n", data);
+    //if (data == 0xfe)
+    //    printf("---\n");
+    
+    //printf("(%04x) Command Port 1 write : %02x\n", m_maincpu->pc(), data);
+    m_writeUpper = true;
 }
 
 
 WRITE8_MEMBER( monty_state::ioDisplayWrite )
 {
-    // Offset directly corresponds to sed1503, DD RAM address
-    // Offset 0x7f may be special?
-    // DEBUG // printf("%02x %02x\n", offset, data);
+    // Offset directly corresponds to sed1503, DD RAM address (offset 0x7f may be special?)
+    //printf("(%04x) %02x %02x\n", m_maincpu->pc(), offset, data);
     
-    const UINT8 lower = (offset & 0x40) >> 6;
+    const UINT8 localUpper = (offset & 0x40) >> 6;
     const UINT8 seg = offset & 0x3f;
     const UINT8 com = data;
 
     // Skip the controller and write straight to the LCD    (pc=134f)
     for (int i = 0; i < 8; i++)
     {
+        // Pixel location
+        const int upperSedOffset = m_writeUpper ? 8*2 : 0;
+        
         const size_t x = seg;
-        const size_t y = i + (lower*8);
+        const size_t y = i + (localUpper*8) + upperSedOffset;
         
+        // Pixel color
         const bool on = (com >> i) & 0x01;
-        
-        if (on)
-            m_pixels[(y*42) + x] = 0xffffffff;
-        else
-            m_pixels[(y*42) + x] = 0x00000000;
+        m_pixels[(y*42) + x] = on ? 0xffffffff : 0xff000000;
     }
-    
 }
+
 
 UINT32 monty_state::lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-    // Just toss random garbage into the LCD display for now
     for (int y = 0; y < 32; y++)
     {
         for (int x = 0; x < 42; x++)
@@ -144,7 +172,7 @@ SED1520_UPDATE_CB(monty_screen_update)
 // TODO: Additional machine definition - Master Monty has a different memory layout
 static MACHINE_CONFIG_START( monty, monty_state )
 	// Basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 1000000)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(monty_mem)
 	MCFG_CPU_IO_MAP(monty_io)
 
