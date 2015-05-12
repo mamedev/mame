@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 #pragma once
 
 #ifndef __SPC700_H__

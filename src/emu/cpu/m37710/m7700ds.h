@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Karl Stenerud
 #pragma once
 
 #ifndef __M7700DS_H__

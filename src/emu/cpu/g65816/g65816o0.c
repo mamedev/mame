@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 #include "emu.h"
 #include "debugger.h"
 #include "g65816.h"
