@@ -1,5 +1,5 @@
-// license: MAME
-// copyright-holders: Angelo Salese
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 Device for Mazer Blazer/Great Guns custom Video Controller Unit

@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, ???
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese, Olivier Galibert
 /***************************************************************************
 
 Taito Air System

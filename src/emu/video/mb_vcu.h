@@ -1,5 +1,5 @@
-// license: ?
-// copyright-holders: Angelo Salese
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese
 #pragma once
 
 #ifndef __MB_VCUDEV_H__

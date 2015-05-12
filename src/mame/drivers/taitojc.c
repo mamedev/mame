@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:Ville Linde, Angelo Salese, hap, ???
+// license:GPL-2.0+
+// copyright-holders:Ville Linde, Angelo Salese, hap
 /*************************************************************************
 
   Taito JC System

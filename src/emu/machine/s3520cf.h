@@ -1,8 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton device
+Seiko/Epson S-3520CF
 
 ***************************************************************************/
 

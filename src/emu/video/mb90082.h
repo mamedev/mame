@@ -1,8 +1,8 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
-Template for skeleton device
+ Fujitsu MB90082 OSD
 
 ***************************************************************************/
 
