@@ -1010,3 +1010,13 @@ else
 	$(shell find src/ -name *.inc -exec ./srcclean {} >&2 ;)
 	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
 endif
+
+#-------------------------------------------------
+# Doxygen documentation
+#-------------------------------------------------
+
+.PHONY: doxygen
+
+doxygen:
+	@echo Generate Doxygen documentation
+	doxygen mame.doxygen

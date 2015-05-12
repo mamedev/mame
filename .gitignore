@@ -4,6 +4,7 @@
 !/.gitattributes
 !/.gitignore
 !/makefile
+!/mame.doxygen 
 !/*.md
 /cfg
 /diff
@@ -18,3 +19,4 @@ src/regtests/jedutil/output
 /sta
 *.pyc
 /build
+/documentation
