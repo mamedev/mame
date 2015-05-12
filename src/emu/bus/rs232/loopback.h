@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:smf
 
 #ifndef RS232_LOOPBACK_H_

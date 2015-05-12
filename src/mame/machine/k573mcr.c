@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:smf
 /*
  * Konami 573 Memory Card Reader

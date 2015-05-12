@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:smf
 /*
  * Namco System 11 Protection
