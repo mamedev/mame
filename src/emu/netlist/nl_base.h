@@ -618,7 +618,7 @@ public:
 	ATTR_HOT inline bool isRailNet() const { return !(m_railterminal == NULL); }
 	ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
 
-	ATTR_HOT inline void push_to_queue(const netlist_time &delay);
+	ATTR_HOT inline void push_to_queue(const netlist_sig_t newval, const netlist_time &delay);
 	ATTR_HOT inline void reschedule_in_queue(const netlist_time &delay);
 	ATTR_HOT bool inline is_queued() const { return m_in_queue == 1; }
 
@@ -632,6 +632,16 @@ public:
 	ATTR_COLD void move_connections(netlist_net_t *new_net);
 
 	plinearlist_t<netlist_core_terminal_t *> m_core_terms; // save post-start m_list ...
+
+	ATTR_HOT inline void set_Q_time(const netlist_sig_t &newQ, const netlist_time &at)
+	{
+		if (newQ != m_new_Q)
+		{
+			m_in_queue = 0;
+			m_time = at;
+		}
+		m_cur_Q = m_new_Q = newQ;
+	}
 
 protected:  //FIXME: needed by current solver code
 
@@ -682,8 +692,7 @@ public:
 	{
 		if (newQ !=  m_new_Q)
 		{
-			m_new_Q = newQ;
-			push_to_queue(delay);
+			push_to_queue(newQ, delay);
 		}
 	}
 
@@ -1309,17 +1318,24 @@ ATTR_HOT inline void netlist_logic_input_t::activate_lh()
 }
 
 
-ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time &delay)
+ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_sig_t newval,  const netlist_time &delay)
 {
 	if (!is_queued() && (num_cons() > 0))
 	{
+		m_new_Q = newval;
 		m_time = netlist().time() + delay;
 		m_in_queue = (m_active > 0);     /* queued ? */
-		if (EXPECTED(m_in_queue))
+		if (m_in_queue)
 		{
 			netlist().push_to_queue(*this, m_time);
 		}
 	}
+	else
+	{
+		m_cur_Q = m_new_Q;
+		m_new_Q = newval;
+	}
+
 }
 
 ATTR_HOT inline void netlist_net_t::reschedule_in_queue(const netlist_time &delay)
@@ -1352,7 +1368,7 @@ ATTR_HOT inline void netlist_analog_output_t::set_Q(const nl_double newQ)
 	if (newQ != net().as_analog().m_cur_Analog)
 	{
 		net().as_analog().m_cur_Analog = newQ;
-		net().push_to_queue(NLTIME_FROM_NS(1));
+		net().push_to_queue(0, NLTIME_FROM_NS(1));
 	}
 }
 

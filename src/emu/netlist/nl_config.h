@@ -28,15 +28,18 @@
  */
 #define USE_PMFDELEGATES        (0)
 
+#if (USE_PMFDELEGATES)
+#pragma GCC diagnostic ignored "-Wpmf-conversions"
+#endif
+
 /*
  *  This increases performance in circuits with a lot of gates
  *  but is not guaranteed to be absolutely timing correct.
  *
- *  Performance increase about 10%
+ *  Performance increase about 10% (breakout) to 20% (pong)
  *
  */
 
-// FIXME: breakout doesn't like this
 #define USE_DEACTIVE_DEVICE     (0)
 
 #define USE_TRUTHTABLE          (0)

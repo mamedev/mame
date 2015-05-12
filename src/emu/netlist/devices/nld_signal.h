@@ -53,27 +53,38 @@ public:
 		m_active = 1;
 	}
 
+	ATTR_HOT inline netlist_sig_t process()
+	{
+		for (int i = 0; i< _numdev; i++)
+		{
+			this->m_i[i].activate();
+			if (INPLOGIC(this->m_i[i]) == _check)
+			{
+				for (int j = 0; j < i; j++)
+					this->m_i[j].inactivate();
+				for (int j = i + 1; j < _numdev; j++)
+					this->m_i[j].inactivate();
+				return _check ^ (1 ^ _invert);
+			}
+		}
+		return _check ^ _invert;
+	}
+
 	ATTR_HOT virtual void inc_active()
 	{
+		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 		nl_assert(netlist().use_deactivate());
 		if (++m_active == 1)
 		{
-			//update();
+			// FIXME: need to activate before time is accessed !
+			netlist_time mt = netlist_time::zero;
 			for (int i = 0; i< _numdev; i++)
 			{
-				this->m_i[i].activate();
-				if (INPLOGIC(this->m_i[i]) == _check)
-				{
-					for (int j = 0; j < i; j++)
-						this->m_i[j].inactivate();
-					for (int j = i + 1; j < _numdev; j++)
-						this->m_i[j].inactivate();
-
-					this->m_Q[0].initial(_check ^ (1 ^ _invert));
-					return;
-				}
+				if (this->m_i[i].net().time() > mt)
+					mt = this->m_i[i].net().time();
 			}
-			this->m_Q[0].initial(_check ^ (_invert));
+			netlist_sig_t r = process();
+			m_Q[0].net().set_Q_time(r, mt + times[r]);
 		}
 	}
 
@@ -91,25 +102,8 @@ public:
 	{
 		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 
-		// FIXME: this check is needed because update is called during startup as well
-		//if (m_active == 0 && netlist().use_deactivate())
-		//  return;
-
-		for (int i = 0; i< _numdev; i++)
-		{
-			this->m_i[i].activate();
-			if (INPLOGIC(this->m_i[i]) == _check)
-			{
-				for (int j = 0; j < i; j++)
-					this->m_i[j].inactivate();
-				for (int j = i + 1; j < _numdev; j++)
-					this->m_i[j].inactivate();
-
-				OUTLOGIC(this->m_Q[0], _check ^ (1 ^ _invert), times[_check ^ (1 ^ _invert)]);// ? 15000 : 22000);
-				return;
-			}
-		}
-		OUTLOGIC(this->m_Q[0],_check ^ (_invert), times[_check ^ (_invert)]);// ? 22000 : 15000);
+		netlist_sig_t r = process();
+		OUTLOGIC(this->m_Q[0], r, times[r]);
 	}
 
 public:

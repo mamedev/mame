@@ -551,6 +551,11 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 	m_list_active.insert(term);
 	if (m_active == 1)
 	{
+		if (netlist().use_deactivate())
+		{
+			railterminal().netdev().inc_active();
+			//m_cur_Q = m_new_Q;
+		}
 		if (m_in_queue == 0)
 		{
 			if (m_time > netlist().time())
@@ -564,14 +569,8 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 				m_in_queue = 2;
 			}
 		}
-		else
-		{
-			if (netlist().use_deactivate())
-			{
-				railterminal().netdev().inc_active();
-				m_cur_Q = m_new_Q;
-			}
-		}
+		//else if (netlist().use_deactivate())
+		//	m_cur_Q = m_new_Q;
 	}
 }
 

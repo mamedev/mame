@@ -52,7 +52,7 @@ const char *nld_9312::m_desc[] = {
 		" 1, 1, 1, 0, X, X, X, X, X, X, X, 1| 1, 0|33,28",
 		""
 };
-#endif
+#else
 
 NETLIB_UPDATE(9312)
 {
@@ -119,7 +119,7 @@ NETLIB_START(9312)
 NETLIB_RESET(9312)
 {
 }
-
+#endif
 
 NETLIB_START(9312_dip)
 {
