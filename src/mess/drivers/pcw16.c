@@ -976,6 +976,7 @@ void pcw16_state::machine_reset()
 	m_rtc_256ths_seconds = 0;
 
 	pcw16_keyboard_init();
+	m_uart2->ri_w(0);
 }
 
 
