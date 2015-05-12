@@ -492,7 +492,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="hmrobot">
+	<software name="manyrobo">
 		<description>How Many Robot</description>
 		<year>1988</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -712,7 +712,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="merchen" supported="no">
+	<software name="marchen" supported="no">
 		<description>Märchen Veil</description>
 		<year>1987</year>
 		<publisher>システムサコム (System Sacom)</publisher>
@@ -847,7 +847,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<!-- No sound on the FM-7, FM sound only?  -->
-	<software name="psychic">
+	<software name="psychwar">
 		<description>Psychic War - Cosmic Soldier 2</description>
 		<year>1988</year>
 		<publisher>KGD Software</publisher>
