@@ -154,14 +154,8 @@ void retro_set_environment(retro_environment_t cb)
      * common for MAME/MESS/UME. */
 
     { option_read_config, "Read configuration; disabled|enabled" },
-
-    /* ONLY FOR MESS/UME */
-#if !defined(WANT_MAME)
     { option_write_config, "Write configuration; disabled|enabled" },
     { option_saves, "Save state naming; game|system" },
-#endif
-
-    /* common for MAME/MESS/UME */
     { option_auto_save, "Auto save/load states; disabled|enabled" },
     { option_mouse, "Enable in-game mouse; disabled|enabled" },
     { option_throttle, "Enable throttle; disabled|enabled" },
@@ -172,19 +166,11 @@ void retro_set_environment(retro_environment_t cb)
 //  { option_warnings, "Hide warnings screen; disabled|enabled" },
     { option_renderer, "Alternate render method; disabled|enabled" },
 
-    /* ONLY FOR MESS/UME */
-#if !defined(WANT_MAME)
     { option_softlist, "Enable softlists; enabled|disabled" },
     { option_softlist_media, "Softlist automatic media type; enabled|disabled" },
-#if defined(WANT_MESS)
-    { option_media, "Media type; cart|flop|cdrm|cass|hard|serl|prin" },
-#elif defined(WANT_UME)
     { option_media, "Media type; rom|cart|flop|cdrm|cass|hard|serl|prin" },
-#endif
     { option_bios, "Boot to BIOS; disabled|enabled" },
-#endif
 
-    /* common for MAME/MESS/UME */
     { option_osd, "Boot to OSD; disabled|enabled" },
     { option_cli, "Boot from CLI; disabled|enabled" },
     { NULL, NULL },
@@ -347,8 +333,6 @@ static void check_variables(void)
          game_specific_saves_enable = false;
    }
 
-#if !defined(WANT_MAME)
-
    var.key   = option_media;
    var.value = NULL;
 
@@ -400,8 +384,6 @@ static void check_variables(void)
       if (strcmp(var.value, "enabled") == 0)
          write_config_enable = true;
    }
-
-#endif
 }
 
 unsigned retro_api_version(void)
@@ -413,16 +395,7 @@ void retro_get_system_info(struct retro_system_info *info)
 {
    memset(info, 0, sizeof(*info));
 
-#if defined(WANT_MAME)
    info->library_name     = "MAME 2015";
-#elif defined(WANT_MESS)
-   info->library_name     = "MESS 2015";
-#elif defined(WANT_UME)
-   info->library_name     = "UME 2015";
-#else
-   info->library_name     = "MAME 2015";
-#endif
-
    info->library_version  = "Git";
    info->valid_extensions = "zip|chd|7z";
    info->need_fullpath    = true;

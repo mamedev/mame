@@ -64,16 +64,7 @@ extern int fb_pitch;
 extern float retro_aspect;
 extern float retro_fps;
 
-#if defined(WANT_MAME)
 static const char core[] = "mame";
-#elif defined(WANT_MESS)
-static const char core[] = "mess";
-#elif defined(WANT_UME)
-static const char core[] = "ume";
-#else
-/* fallback */
-static const char core[] = "mame";
-#endif
 
 /* libretro callbacks */
 extern retro_log_printf_t log_cb;

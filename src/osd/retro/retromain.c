@@ -1125,15 +1125,6 @@ static int execute_game(char* path)
 
    Extract_AllPath(path);
 
-#ifdef WANT_MAME
-   //find if the driver exists for MgameName, if not, exit
-   if (getGameInfo(MgameName, &gameRot, &driverIndex,&arcade) == 0)
-   {
-      if (log_cb)
-         log_cb(RETRO_LOG_ERROR, "Driver not found: %s\n",MgameName);
-      return -2;
-   }
-#else
    /* Find if the driver exists for MgameName.
     * If not, check if a driver exists for MsystemName.
     * Otherwise, exit. */
@@ -1159,8 +1150,6 @@ static int execute_game(char* path)
       if (getGameInfo(MsystemName, &gameRot, &driverIndex,&arcade) != 0)
          arcade=false;
    }
-
-#endif
 
    /* useless ? */
    if (tate)
@@ -1205,14 +1194,6 @@ static int execute_game(char* path)
 
    Add_Option((char*)("-rompath"));
 
-#ifdef WANT_MAME
-   sprintf(tmp_dir, "%s", MgamePath);
-   Add_Option((char*)(tmp_dir));
-   if(!boot_to_osd_enable)
-      Add_Option(MgameName);
-
-#else
-
    if(!boot_to_osd_enable)
    {
       sprintf(tmp_dir, "%s", MgamePath);
@@ -1250,7 +1231,6 @@ static int execute_game(char* path)
       sprintf(tmp_dir, "%s;%s", MgamePath,MparentPath);
       Add_Option((char*)(tmp_dir));
    }
-#endif
 
    return 0;
 }
