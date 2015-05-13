@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "machine/bankdev.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"

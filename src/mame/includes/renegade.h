@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 #include "sound/msm5205.h"
 
 #define MCU_BUFFER_MAX 6

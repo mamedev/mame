@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Quench
 /***************************************************************************
         Twincobr/Flying Shark/Wardner  game hardware from 1986-1987
         -----------------------------------------------------------

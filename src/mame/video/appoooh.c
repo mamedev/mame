@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tatsuyuki Satoh
 /***************************************************************************
 
   video.c

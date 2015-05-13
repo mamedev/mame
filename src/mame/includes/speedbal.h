@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Joseba Epalza
 class speedbal_state : public driver_device
 {
 public:

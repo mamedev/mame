@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski
 /***************************************************************************
   Goindol
 

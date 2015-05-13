@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Graves, Brian Troha
 #include "emu.h"
 #include "includes/asuka.h"
 

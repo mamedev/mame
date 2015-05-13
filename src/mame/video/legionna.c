@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:David Graves, Angelo Salese, David Haywood, Tomasz Slanina
 /***************************************************************************
 
     Legionnaire / Heated Barrel video hardware (derived from D-Con)

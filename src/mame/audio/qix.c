@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:John Butler, Ed Mueller, Aaron Giles
 /*************************************************************************
 
     audio\qix.c

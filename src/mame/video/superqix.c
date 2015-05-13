@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
 /***************************************************************************
 
   video.c

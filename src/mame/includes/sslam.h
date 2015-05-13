@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 #include "sound/okim6295.h"
 
 class sslam_state : public driver_device

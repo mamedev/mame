@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Steph, Phil Stroffolino, Uki
 #include "emu.h"
 #include "includes/nova2001.h"
 

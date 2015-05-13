@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Tomasz Slanina
 #include "emu.h"
 #include "includes/mainsnk.h"
 

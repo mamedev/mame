@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
   Functions to emulate the video hardware of the machine.

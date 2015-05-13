@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"

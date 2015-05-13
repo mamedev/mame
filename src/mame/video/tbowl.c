@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* video/tbowl.c */
 
 /* see drivers/tbowl.c for more info */

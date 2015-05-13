@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 #include "video/vsystem_spr2.h"
 
 class welltris_state : public driver_device

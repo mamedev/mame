@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Eugene Sandulenko
 
 class tiamc1_state : public driver_device
 {

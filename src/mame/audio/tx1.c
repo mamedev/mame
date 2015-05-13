@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     Tatsumi TX-1/Buggy Boy sound hardware

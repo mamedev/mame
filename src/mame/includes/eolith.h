@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina,Pierpaolo Prazzoli
 
 #include "cpu/mcs51/mcs51.h"
 #include "sound/qs1000.h"

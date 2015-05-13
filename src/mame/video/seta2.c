@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                           -= Newer Seta Hardware =-

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #include "sound/msm5205.h"
 
 class fantland_state : public driver_device

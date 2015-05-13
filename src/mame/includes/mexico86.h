@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 #include "sound/2203intf.h"
 
 class mexico86_state : public driver_device

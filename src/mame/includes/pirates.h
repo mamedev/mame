@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood,Nicola Salmoria
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 

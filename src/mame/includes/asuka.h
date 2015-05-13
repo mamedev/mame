@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Graves, Brian Troha
 /*************************************************************************
 
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)

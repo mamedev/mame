@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 #include "machine/nmk112.h"
 
 class quizpani_state : public driver_device

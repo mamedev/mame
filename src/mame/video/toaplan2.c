@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Quench, Yochizo
 /***************************************************************************
 
  Functions to emulate additional video hardware on several Toaplan2 games.

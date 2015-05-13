@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Coates
 /*************************************************************/
 /*                                                           */
 /* Zaccaria/Zelco S2650 based games video                    */

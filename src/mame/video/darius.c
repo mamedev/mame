@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Graves, Jarek Burczynski
 #include "emu.h"
 #include "includes/darius.h"
 

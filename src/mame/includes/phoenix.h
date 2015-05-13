@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Richard Davies
 #include "audio/pleiads.h"
 #include "sound/discrete.h"
 #include "sound/tms36xx.h"

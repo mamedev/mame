@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
 #include "sound/tms5220.h"
 
 class portrait_state : public driver_device

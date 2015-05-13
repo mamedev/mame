@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "sound/tms5220.h"

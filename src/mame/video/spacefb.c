@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Chris Hardy
 /***************************************************************************
 
     Space Firebird hardware

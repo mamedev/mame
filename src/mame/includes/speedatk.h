@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, Pierpaolo Prazzoli
 #include "video/mc6845.h"
 
 class speedatk_state : public driver_device

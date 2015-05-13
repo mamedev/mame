@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Gaelco CG-1V/GAE1 based games

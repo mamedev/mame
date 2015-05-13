@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jaroslaw Burczynski
 /*
 *   Video Driver for Metal Soldier Isaac II (1985)
 */

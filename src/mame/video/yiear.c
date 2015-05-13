@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Enrique Sanchez
 /***************************************************************************
 
   video.c

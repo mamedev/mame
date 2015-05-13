@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Graves
 #include "emu.h"
 #include "includes/groundfx.h"
 

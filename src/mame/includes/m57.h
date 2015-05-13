@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Stroffolino
 class m57_state : public driver_device
 {
 public:

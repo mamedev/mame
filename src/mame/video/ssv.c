@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                     -= Seta, Sammy, Visco (SSV) System =-

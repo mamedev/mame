@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Edgardo E. Contini Salvan
 /***************************************************************************
 
   video.c

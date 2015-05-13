@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"

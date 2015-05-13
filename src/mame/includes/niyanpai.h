@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi
 #include "sound/dac.h"
 #include "machine/tmp68301.h"
 #define VRAM_MAX    3

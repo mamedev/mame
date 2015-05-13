@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Haywood
 /*************************************************************************
 
     Double Dragon 3 & The Combatribes

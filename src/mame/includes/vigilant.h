@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Balfour
 #include "audio/m72.h"
 
 class vigilant_state : public driver_device

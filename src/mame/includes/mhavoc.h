@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Appolo
 /*************************************************************************
 
     Atari Major Havoc hardware

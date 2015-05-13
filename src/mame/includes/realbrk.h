@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #include "machine/tmp68301.h"
 
 class realbrk_state : public driver_device

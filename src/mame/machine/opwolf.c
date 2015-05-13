@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Graves, Jarek Burczynski
 /*************************************************************************
 
   Operation Wolf C-Chip Protection

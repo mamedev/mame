@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Nicola Salmoria, Tomasz Slanina
 #include "emu.h"
 #include "includes/darkmist.h"
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 class targeth_state : public driver_device
 {
 public:

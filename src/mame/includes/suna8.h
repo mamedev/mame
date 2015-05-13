@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #include "sound/samples.h"
 
 #define TILEMAPS 0

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:K.Wilkins
 /***************************************************************************
 
 Namco System II

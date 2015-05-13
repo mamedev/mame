@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Sylvain Glaize
 /* Super Kaneko Nova System video */
 
 #include "emu.h"

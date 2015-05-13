@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:BUT
 /*
  *  Chack'n Pop (C) 1983 TAITO Corp.
  *  emulate video hardware

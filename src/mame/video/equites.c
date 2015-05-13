@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Acho A. Tang, Nicola Salmoria
 #include "emu.h"
 #include "includes/equites.h"
 

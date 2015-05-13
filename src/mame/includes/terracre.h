@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Carlos A. Lozano
 #include "video/bufsprite.h"
 
 class terracre_state : public driver_device

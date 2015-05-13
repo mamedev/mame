@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Victor Trucco,Steve Ellenoff,Phil Stroffolino,Tatsuyuki Satoh,Tomasz Slanina,Nicola Salmoria
 #include "sound/msm5205.h"
 
 class gladiatr_state : public driver_device

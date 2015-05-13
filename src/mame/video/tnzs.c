@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia, Mirko Buffoni, Takahiro Nogi
 /***************************************************************************
 
   video.c

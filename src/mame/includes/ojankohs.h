@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi, Uki
 /*************************************************************************
 
     Ojanko High School & other Video System mahjong series

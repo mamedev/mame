@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, R. Belmont
 #include "emu.h"
 #include "includes/silkroad.h"
 

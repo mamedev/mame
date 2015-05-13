@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Uki
 /******************************************************************************
 
 Himeshikibu (C) 1989 Hi-Soft

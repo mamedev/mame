@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi
 class magmax_state : public driver_device
 {
 public:

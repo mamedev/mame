@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Phil Stroffolino, Acho Tang, Nicola Salmoria
 #define MW_VERBOSE 0
 
 /*

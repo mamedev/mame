@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Haywood
 /***************************************************************************
 
   Video Hardware for Double Dragon 3

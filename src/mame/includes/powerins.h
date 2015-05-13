@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #include "machine/nmk112.h"
 
 class powerins_state : public driver_device

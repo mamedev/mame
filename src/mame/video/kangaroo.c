@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Laitinen
 /***************************************************************************
 
     Sun Electronics Kangaroo hardware

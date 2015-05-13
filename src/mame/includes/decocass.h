@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, David Haywood
 #ifdef MAME_DEBUG
 #define LOGLEVEL  5
 #else

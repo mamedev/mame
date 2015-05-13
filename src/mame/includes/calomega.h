@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Fresca
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 

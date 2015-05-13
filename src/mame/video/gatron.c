@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Fresca
 /******************************************************************************
 
     GAME-A-TRON gambling hardware

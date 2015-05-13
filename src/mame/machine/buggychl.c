@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Nicola Salmoria
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/buggychl.h"

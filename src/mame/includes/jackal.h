@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Kenneth Lin
 
 #define MASTER_CLOCK         XTAL_18_432MHz
 #define SOUND_CLOCK          XTAL_3_579545MHz

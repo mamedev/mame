@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Priest, David Haywood
 #include "video/fuukifg.h"
 
 /* Define clocks based on actual OSC on the PCB */

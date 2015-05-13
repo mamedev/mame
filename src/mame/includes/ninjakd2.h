@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Ventura, Leandro Dardini, Yochizo, Nicola Salmoria
 /******************************************************************************
 
     UPL "sprite framebuffer" hardware

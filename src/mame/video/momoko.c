@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Uki
 /*******************************************************************************
 
     Momoko 120% (c) 1986 Jaleco

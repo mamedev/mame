@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Andrew Gardner
 /*
     Polygonet Commanders (Konami, 1993)
 

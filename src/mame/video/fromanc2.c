@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     Video Hardware for Video System Mahjong series.

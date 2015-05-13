@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Lee Taylor
 /***************************************************************************
 
   video.c

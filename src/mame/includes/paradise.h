@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #include "sound/okim6295.h"
 
 class paradise_state : public driver_device

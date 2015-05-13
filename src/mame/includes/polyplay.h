@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Martin Buchholz
 #include "sound/samples.h"
 
 #define SAMPLE_LENGTH 32

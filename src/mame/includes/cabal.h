@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Carlos A. Lozano Baides
 #include "audio/seibu.h"
 #include "sound/msm5205.h"
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Chris Moore, Nicola Salmoria
 /***************************************************************************
 
   video.c

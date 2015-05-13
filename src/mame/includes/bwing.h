@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Acho A. Tang, Alex W. Jackson
 /***************************************************************************
 
     B-Wings

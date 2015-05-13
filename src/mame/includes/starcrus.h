@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Frank Palazzolo
 #include "sound/samples.h"
 class starcrus_state : public driver_device
 {

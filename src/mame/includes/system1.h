@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 

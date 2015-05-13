@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Paul Priest
 #include "sound/okim6295.h"
 
 class oneshot_state : public driver_device

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 /**************************************************************************
 Change Lanes - Video Hardware
 (C) Taito 1983

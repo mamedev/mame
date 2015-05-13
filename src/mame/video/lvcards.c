@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari, Curt Coder
 /***************************************************************************
 
   video.c

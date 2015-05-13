@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Eisuke Watanabe, Nicola Salmoria
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 

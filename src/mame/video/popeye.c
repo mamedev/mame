@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Marc Lafontaine
 /***************************************************************************
 
   video.c

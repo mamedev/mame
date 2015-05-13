@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Andrew Gardiner, R. Belmont, Ville Linde
 /*
 
   machine/model3.c: functions emulating various aspects of the Model 3 hardware

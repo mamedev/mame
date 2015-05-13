@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Paul Priest
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
 #include "cpu/sh2/sh2.h"

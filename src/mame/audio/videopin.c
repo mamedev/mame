@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Sebastien Monassa
 /*************************************************************************
 
     audio\videopin.c

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* video/mugsmash.c - see drivers/mugsmash.c for more info */
 
 #include "emu.h"

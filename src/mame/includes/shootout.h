@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Phil Stroffolino, Bryan McPhail
 class shootout_state : public driver_device
 {
 public:

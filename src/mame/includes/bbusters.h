@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "video/bufsprite.h"
 
 class bbusters_state : public driver_device

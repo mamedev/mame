@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Farfetch,David Haywood,Tomasz Slanina
 /***************************************************************************
 
  tecmosys video driver

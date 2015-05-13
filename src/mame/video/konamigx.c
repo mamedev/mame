@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
 /*
  * video/konamigx.c - Konami GX video hardware (here there be dragons, and achocode)
  *

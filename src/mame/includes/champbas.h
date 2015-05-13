@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Jarek Parchanski, Nicola Salmoria
 /*************************************************************************
 
     Talbot - Champion Base Ball - Exciting Soccer

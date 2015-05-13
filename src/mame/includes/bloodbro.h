@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Carlos A. Lozano Baides
 class bloodbro_state : public driver_device
 {
 public:

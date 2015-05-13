@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Acho A. Tang, Nicola Salmoria
 #include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"

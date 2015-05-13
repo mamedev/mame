@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Phil Stroffolino, Acho Tang, Nicola Salmoria
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "video/k055555.h"

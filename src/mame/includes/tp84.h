@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Marc Lafontaine
 class tp84_state : public driver_device
 {
 public:

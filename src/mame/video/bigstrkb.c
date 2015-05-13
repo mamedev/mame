@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Big Striker (bootleg) Video Hardware */
 
 #include "emu.h"

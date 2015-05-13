@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Bennett
 /*************************************************************************
 
     TX-1/Buggy Boy hardware

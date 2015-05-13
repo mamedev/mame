@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Hau
 #include "emu.h"
 #include "video/polylgcy.h"
 #include "includes/galastrm.h"

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
 /***************************************************************************
 
 Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.

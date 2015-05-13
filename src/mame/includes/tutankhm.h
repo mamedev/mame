@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni
 class tutankhm_state : public driver_device
 {
 public:

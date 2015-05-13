@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Coates, Pierpaolo Prazzoli
 /***************************************************************************
 
   video\quasar.c

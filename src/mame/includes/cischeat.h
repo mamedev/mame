@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /* TODO: some variables are per-game specifics */
 #include "sound/okim6295.h"
 

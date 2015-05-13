@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul "TBBle" Hampson
 class vball_state : public driver_device
 {
 public:

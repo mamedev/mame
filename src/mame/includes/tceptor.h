@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:BUT
 #include "sound/dac.h"
 #include "sound/namco.h"
 #include "video/c45.h"

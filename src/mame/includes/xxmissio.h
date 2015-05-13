@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Uki
 class xxmissio_state : public driver_device
 {
 public:

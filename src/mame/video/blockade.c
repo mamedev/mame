@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Frank Palazzolo
 #include "emu.h"
 #include "includes/blockade.h"
 

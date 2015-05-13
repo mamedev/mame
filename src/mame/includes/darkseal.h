@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"

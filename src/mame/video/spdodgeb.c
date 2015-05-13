@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Hampson, Nicola Salmoria
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/spdodgeb.h"

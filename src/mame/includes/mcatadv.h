@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Priest, David Haywood
 
 class mcatadv_state : public driver_device
 {

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi
 /*********************************************************************************************************************************
 
     Sega Model 2 Geometry Engine and 3D Rasterizer Emulation

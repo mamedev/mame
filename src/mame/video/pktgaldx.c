@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Bryan McPhail
 #include "emu.h"
 #include "includes/pktgaldx.h"
 

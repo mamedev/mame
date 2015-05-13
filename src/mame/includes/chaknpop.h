@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:BUT
 
 
 #define MCU_INITIAL_SEED    0x81

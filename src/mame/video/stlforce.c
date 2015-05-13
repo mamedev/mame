@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* video/stlforce.c - see main driver for other notes */
 
 #include "emu.h"

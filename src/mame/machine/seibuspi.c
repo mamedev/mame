@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde, hap, ???
 #include "emu.h"
 #include "machine/seibuspi.h"
 

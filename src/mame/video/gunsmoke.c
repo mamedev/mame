@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Leaman
 #include "emu.h"
 #include "includes/gunsmoke.h"
 

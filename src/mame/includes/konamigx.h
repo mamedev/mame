@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"

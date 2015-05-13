@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Super Slams - video, see notes in driver file */
 
 #include "emu.h"

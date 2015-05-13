@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Allard Van Der Bas
 class shaolins_state : public driver_device
 {
 public:

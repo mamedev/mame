@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:BUT
 /*
  *  Thunder Ceptor board
  *  emulate video hardware

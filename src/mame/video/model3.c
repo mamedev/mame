@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Andrew Gardiner, R. Belmont, Ville Linde
 #include "emu.h"
 #include "video/poly.h"
 #include "video/rgbutil.h"

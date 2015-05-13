@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Uki
 /******************************************************************************
 
     Markham (c) 1983 Sun Electronics

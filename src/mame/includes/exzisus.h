@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Yochizo
 class exzisus_state : public driver_device
 {
 public:

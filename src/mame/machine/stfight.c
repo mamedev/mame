@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mark McDougall
 /***************************************************************************
 
   stfight.c

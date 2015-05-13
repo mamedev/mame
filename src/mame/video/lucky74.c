@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Fresca
 /****************************************************************************************
 
     LUCKY 74 - WING CO.,LTD.

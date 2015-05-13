@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Stephh
 
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"

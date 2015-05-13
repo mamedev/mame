@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Allard van der Bas
 class wiping_state : public driver_device
 {
 public:

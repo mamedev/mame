@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                           -= Fuuki 16 Bit Games (FG-2) =-

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Charles MacDonald, David Haywood
 /***************************************************************************
 
     Uses Data East custom chip 55 for backgrounds, with a special 8bpp mode

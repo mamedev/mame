@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:R.Belmont
 /*************************************************************************
 
    Run and Gun

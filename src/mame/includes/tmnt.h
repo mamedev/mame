@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "sound/samples.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"

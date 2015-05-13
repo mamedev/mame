@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 #include "sound/okim6295.h"
 
 class shadfrce_state : public driver_device

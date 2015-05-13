@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mike Coates
 #include "machine/s2636.h"
 
 class zac2650_state : public driver_device

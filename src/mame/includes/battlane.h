@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Leaman
 /***************************************************************************
 
     Battle Lane Vol. 5

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #include "sound/dac.h"
 
 class suna16_state : public driver_device

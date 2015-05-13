@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"

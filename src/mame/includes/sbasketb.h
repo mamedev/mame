@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"

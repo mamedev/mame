@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, David Haywood, Angelo Salese, Roberto Fresca.
 /***************************************************************************
 
 Subsino XOR + Bitswap Encryption

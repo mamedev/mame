@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
 /***************************************************************************
 
   Portraits

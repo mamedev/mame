@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 // remaining gfx glitches
 
 // layer priority register not fully understood

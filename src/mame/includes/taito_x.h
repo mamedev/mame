@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Richard Bush, Howie Cohen, Yochizo
 #include "includes/seta.h"
 
 class taitox_state : public seta_state

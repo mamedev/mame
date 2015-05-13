@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*************************************************************************
 
     Universal 8106-A2 + 8106-B PCB set

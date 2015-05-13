@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 #include "emu.h"
 #include "includes/rockrage.h"
 

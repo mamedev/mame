@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Uki
 /*******************************************************************************
 
 Dr. Micro (c) 1983 Sanritsu

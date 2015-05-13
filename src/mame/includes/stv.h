@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R.Belmont
 /*----------- defined in drivers/stv.c -----------*/
 #include "cdrom.h"
 #include "machine/eepromser.h"

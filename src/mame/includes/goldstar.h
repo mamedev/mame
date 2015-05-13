@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Roberto Fresca
 #include "emu.h"
 
 #include "machine/ticket.h"

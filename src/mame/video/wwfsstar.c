@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /*******************************************************************************
  WWF Superstars (C) 1989 Technos Japan  (video/wwfsstar.c)
 ********************************************************************************

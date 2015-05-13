@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Manuel Abadia
 #include "sound/namco.h"
 
 class skykid_state : public driver_device
