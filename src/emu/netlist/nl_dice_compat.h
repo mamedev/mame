@@ -1,5 +1,5 @@
-// license:???,GPL-2.0+
-// copyright-holders:couriersud
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nl_dice_compat.h
  *
