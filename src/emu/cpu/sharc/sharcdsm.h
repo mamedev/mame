@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ville Linde
 static const char ureg_names[256][16] =
 {

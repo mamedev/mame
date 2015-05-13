@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ville Linde
 // TMS32082 MP Disassembler
 

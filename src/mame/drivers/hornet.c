@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ville Linde
 /*  Konami Hornet System
     Driver by Ville Linde

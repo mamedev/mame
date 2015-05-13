@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /*
 
 Konami Viper Hardware Overview (last updated 5th June 2011 10:56pm)

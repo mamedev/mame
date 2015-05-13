@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ville Linde
 #define SIGN_EXTEND6(x)     (((x) & 0x20) ? (0xffffffc0 | (x)) : (x))
 #define SIGN_EXTEND24(x)    (((x) & 0x800000) ? (0xff000000 | (x)) : (x))

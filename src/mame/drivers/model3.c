@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Andrew Gardiner, R. Belmont, Ville Linde
 /*
     Sega Model 3
