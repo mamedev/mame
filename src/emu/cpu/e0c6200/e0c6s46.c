@@ -3,6 +3,11 @@
 /*
 
   Seiko Epson E0C6S46 MCU
+  
+  TODO:
+  - K input interrupts
+  - serial interface
+  - output ports
 
 */
 
@@ -42,8 +47,6 @@ e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, d
 	, m_vram2(*this, "vram2")
 	, m_pixel_update_handler(NULL)
 { }
-
-
 
 
 
@@ -154,6 +157,7 @@ void e0c6s46_device::device_reset()
 }
 
 
+
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
@@ -168,6 +172,10 @@ void e0c6s46_device::execute_one()
 }
 
 
+
+//-------------------------------------------------
+//  interrupts
+//-------------------------------------------------
 
 bool e0c6s46_device::check_interrupt()
 {
@@ -218,6 +226,13 @@ void e0c6s46_device::execute_set_input(int line, int state)
 }
 
 
+
+//-------------------------------------------------
+//  timers
+//-------------------------------------------------
+
+// clock timer
+
 void e0c6s46_device::clock_watchdog()
 {
 	// initial reset after 3 to 4 seconds
@@ -255,6 +270,9 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::clktimer_cb)
 	if (m_clktimer_count == 0)
 		clock_watchdog();
 }
+
+
+// stopwatch timer
 
 void e0c6s46_device::clock_stopwatch()
 {
@@ -300,6 +318,9 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::stopwatch_cb)
 	m_stopwatch_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
 }
 
+
+// programmable timer
+
 void e0c6s46_device::clock_prgtimer()
 {
 	// irq and reload when it reaches zero
@@ -340,8 +361,14 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
 }
 
 
+
+//-------------------------------------------------
+//  LCD Driver
+//-------------------------------------------------
+
 UINT32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// call this 32 times per second (osc1/1024: 32hz at default clock of 32768hz)
 	for (int bank = 0; bank < 2; bank++)
 	{
 		const UINT8* vram = bank ? m_vram2 : m_vram1;
@@ -378,6 +405,12 @@ UINT32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	return 0;
 }
+
+
+
+//-------------------------------------------------
+//  internal I/O
+//-------------------------------------------------
 
 READ8_MEMBER(e0c6s46_device::io_r)
 {

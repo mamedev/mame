@@ -30,16 +30,16 @@ public:
 };
 
 
+/***************************************************************************
 
-PALETTE_INIT_MEMBER(tamag1_state, tama)
-{
-	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff));
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
-}
+  Video
 
+***************************************************************************/
 
 static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 {
+	// 16 COM(common) pins, 40 SEG(segment) pins from MCU,
+	// 32x16 LCD screen and 2 rows of indicators
 	static const int seg2x[0x28] =
 	{
 		0, 1, 2, 3, 4, 5, 6, 7,
@@ -48,11 +48,34 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 		27,26,25,24,36,23,22,21,
 		20,19,18,17,16,37,38,39
 	};
-	
-	bitmap.pix16(com, seg2x[seg]) = state;
+
+	int y = com, x = seg2x[seg];
+	if (cliprect.contains(x, y))
+		bitmap.pix16(y, x) = state;
+}
+
+PALETTE_INIT_MEMBER(tamag1_state, tama)
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148));
+	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
 
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
+
+INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
+{
+	// inputs are hooked up backwards here, because MCU input
+	// ports are all tied to its interrupt controller
+	int line = (int)(FPTR)param;
+	int state = newval ? ASSERT_LINE : CLEAR_LINE;
+	m_maincpu->set_input_line(line, state);
+}
 
 static INPUT_PORTS_START( tama )
 	PORT_START("K0")
@@ -62,16 +85,13 @@ static INPUT_PORTS_START( tama )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
-{
-	// Inputs are hooked up backwards here, because MCU input
-	// ports are all tied to its interrupt controller.
-	int line = (int)(FPTR)param;
-	int state = newval ? ASSERT_LINE : CLEAR_LINE;
-	m_maincpu->set_input_line(line, state);
-}
 
 
+/***************************************************************************
+
+  Machine Config
+
+***************************************************************************/
 
 static MACHINE_CONFIG_START( tama, tamag1_state )
 
@@ -84,7 +104,7 @@ static MACHINE_CONFIG_START( tama, tamag1_state )
 	MCFG_SCREEN_REFRESH_RATE(XTAL_32_768kHz/1024)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40, 16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40-1, 0, 16-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 16-1)
 //	MCFG_DEFAULT_LAYOUT(layout_tama)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", e0c6s46_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
@@ -108,7 +128,7 @@ MACHINE_CONFIG_END
 
 ROM_START( tama )
 	ROM_REGION( 0x3000, "maincpu", 0 )
-	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) )
+	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
 	ROM_LOAD( "tama.b", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
 ROM_END
 

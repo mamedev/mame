@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Karl Stenerud
+// copyright-holders:R. Belmont, Karl Stenerud, hap
 /*
     Mitsubishi M37702/37710 CPU Emulator
 
