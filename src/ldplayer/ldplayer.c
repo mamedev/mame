@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*************************************************************************
 
     ldplayer.c
 
     Laserdisc player driver.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **************************************************************************/
 

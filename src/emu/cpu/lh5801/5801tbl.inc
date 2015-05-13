@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /* assumed
    res=left+right+c
    sbc is like adc with inverted carry and right side

@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v53.h"
@@ -389,6 +391,6 @@ public:
 	DECLARE_READ16_MEMBER(sound_comms_r);
 	DECLARE_WRITE16_MEMBER(sound_comms_w);
 	UINT16 main_latch[2],sound_latch[2];
-	
+
 	std::vector<polygon> polys;//(1024*5);
 };

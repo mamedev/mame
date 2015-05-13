@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Phil Stroffolino, Bryan McPhail
 /*
     Video Hardware for Shoot Out
     prom GB09.K6 may be related to background tile-sprite priority

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, Richter Belmont
 UINT32 v60_device::opINCB() /* TRUSTED */
 {
 	UINT8 appb;

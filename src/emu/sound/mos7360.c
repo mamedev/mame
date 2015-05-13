@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     MOS 7360/8360 Text Edit Device (TED) emulation

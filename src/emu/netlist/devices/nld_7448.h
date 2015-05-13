@@ -43,29 +43,29 @@ NETLIB_SUBDEVICE(7448_sub,
 	ATTR_HOT void update_outputs(UINT8 v);
 	static const UINT8 tab7448[16][7];
 
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
-	netlist_ttl_input_t m_RBIQ;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
+	netlist_logic_input_t m_C;
+	netlist_logic_input_t m_D;
+	netlist_logic_input_t m_RBIQ;
 
-	netlist_state_t<UINT8> m_state;
+	UINT8 m_state;
 
-	netlist_ttl_output_t m_a;
-	netlist_ttl_output_t m_b;
-	netlist_ttl_output_t m_c;
-	netlist_ttl_output_t m_d;
-	netlist_ttl_output_t m_e;
-	netlist_ttl_output_t m_f;
-	netlist_ttl_output_t m_g;
+	netlist_logic_output_t m_a;
+	netlist_logic_output_t m_b;
+	netlist_logic_output_t m_c;
+	netlist_logic_output_t m_d;
+	netlist_logic_output_t m_e;
+	netlist_logic_output_t m_f;
+	netlist_logic_output_t m_g;
 );
 
 NETLIB_DEVICE(7448,
 public:
 	NETLIB_NAME(7448_sub) sub;
 
-	netlist_ttl_input_t m_LTQ;
-	netlist_ttl_input_t m_BIQ;
+	netlist_logic_input_t m_LTQ;
+	netlist_logic_input_t m_BIQ;
 );
 
 NETLIB_DEVICE_DERIVED(7448_dip, 7448,

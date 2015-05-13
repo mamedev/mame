@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     CD-DA "Red Book" audio sound hardware handler
     Relies on the actual CD logic and reading in cdrom.c.

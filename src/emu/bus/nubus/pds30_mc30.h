@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 #pragma once
 
 #ifndef __NUBUS_XCEEDMC30_H__

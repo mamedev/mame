@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:R. Belmont, ElSemi
 /* video/namcofl.c */
 
 #include "emu.h"

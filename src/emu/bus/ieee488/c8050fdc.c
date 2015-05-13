@@ -4,14 +4,11 @@
 
     Commodore 8050 floppy disk controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
     - write protect
     - 75,format speed error,01,00,0
@@ -221,7 +218,7 @@ void c8050_fdc_t::ds_w(int ds)
 void c8050_fdc_t::set_floppy(floppy_connector *floppy0, floppy_connector *floppy1)
 {
 	m_floppy0 = floppy0->get_device();
-	
+
 	if (floppy1) {
 		m_floppy1 = floppy1->get_device();
 	}

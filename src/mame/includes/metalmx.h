@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"

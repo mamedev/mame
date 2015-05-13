@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
     Texas Instruments SN76477 emulator

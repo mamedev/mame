@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 #pragma once
 
 #ifndef __UPD7810_H__

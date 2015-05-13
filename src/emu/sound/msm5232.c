@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 
 #include "msm5232.h"

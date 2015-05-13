@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /***************************************************************************
 
         Digital Microsystems DMS-86

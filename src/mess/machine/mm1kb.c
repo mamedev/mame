@@ -4,9 +4,6 @@
 
     Nokia MikroMikko 1 keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "mm1kb.h"

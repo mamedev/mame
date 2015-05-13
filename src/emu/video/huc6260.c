@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Hudson/NEC HuC6260 Video Colour Encoder

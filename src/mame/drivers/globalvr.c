@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Global VR - PC-Based Hardware
 
 Skeleton only at this time holding info regarding Install Disks

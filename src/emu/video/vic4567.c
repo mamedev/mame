@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /***************************************************************************
 
     Video Interface Chip (4567)

@@ -1,7 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, O. Galibert
 /*************************************************************************************
 
     Yamaha MU-100 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone module
-    Preliminary driver by R. Belmont
+    Preliminary driver by R. Belmont and O. Galibert
 
     CPU: Hitachi H8S/2655 (HD6432655F), strapped for mode 4 (24-bit address, 16-bit data, no internal ROM)
     Sound ASIC: Yamaha XS725A0

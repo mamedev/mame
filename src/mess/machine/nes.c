@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Brad Oliver,Fabio Priuli
 /*****************************************************************************
 
     nes.c

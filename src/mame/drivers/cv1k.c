@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 U2 flash rom note
@@ -193,7 +195,7 @@ public:
 		m_eepromout(*this, "EEPROMOUT"),
 		m_idleramoffs(0),
 		m_idlepc(0)
-	 { }
+		{ }
 
 	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;

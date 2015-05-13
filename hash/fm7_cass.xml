@@ -783,7 +783,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ぐっちゃんバンク"/>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="2407350">
-				<rom name="gbank.t77" size="2407350" crc="b5b66db4" sha1="7498c5b8f25eb5aa3a8dfd2972d75f7af22dce1a" offset="0" />
+				<rom name="gbankalt.t77" size="2407350" crc="b5b66db4" sha1="7498c5b8f25eb5aa3a8dfd2972d75f7af22dce1a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

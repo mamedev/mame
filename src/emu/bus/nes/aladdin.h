@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __NES_ALADDIN_H
 #define __NES_ALADDIN_H
 

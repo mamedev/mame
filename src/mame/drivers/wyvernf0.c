@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
 Wyvern F-0 (1985, Taito)

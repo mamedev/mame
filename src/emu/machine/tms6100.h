@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Couriersud
 #pragma once
 
 #ifndef __TMS6100_H__

@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_solver.h
  *
@@ -11,13 +13,6 @@
 
 //#define ATTR_ALIGNED(N) __attribute__((aligned(N)))
 #define ATTR_ALIGNED(N) ATTR_ALIGN
-
-#define USE_PIVOT_SEARCH (0)
-#define VECTALT 1
-#define USE_GABS 1
-#define USE_MATRIX_GS 0
-// savings are eaten up by effort
-#define USE_LINEAR_PREDICTION (0)
 
 // ----------------------------------------------------------------------------------------
 // Macros
@@ -48,107 +43,6 @@ struct netlist_solver_parameters_t
 	netlist_time m_nt_sync_delay;
 };
 
-class vector_ops_t
-{
-public:
-
-	vector_ops_t(int size)
-	: m_dim(size)
-	{
-	}
-
-	virtual ~vector_ops_t() {}
-
-	virtual const nl_double sum(const nl_double * v) = 0;
-	virtual void sum2(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, nl_double & RESTRICT  s1, nl_double & RESTRICT s2) = 0;
-	virtual void addmult(nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double &mult) = 0;
-	virtual void sum2a(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double * RESTRICT v3abs, nl_double & RESTRICT s1, nl_double & RESTRICT s2, nl_double & RESTRICT s3abs) = 0;
-
-	virtual const nl_double sumabs(const nl_double * v) = 0;
-
-	static vector_ops_t *create_ops(const int size);
-
-protected:
-	int m_dim;
-
-private:
-
-};
-
-template <int m_N>
-class vector_ops_impl_t : public vector_ops_t
-{
-public:
-
-	vector_ops_impl_t()
-	: vector_ops_t(m_N)
-	{
-	}
-
-	vector_ops_impl_t(int size)
-	: vector_ops_t(size)
-	{
-		nl_assert(m_N == 0);
-	}
-
-	virtual ~vector_ops_impl_t() {}
-
-	ATTR_HOT inline const int N() const { if (m_N == 0) return m_dim; else return m_N; }
-
-	const nl_double sum(const nl_double * v)
-	{
-		const nl_double *  RESTRICT vl = v;
-		nl_double tmp = 0.0;
-		for (int i=0; i < N(); i++)
-			tmp += vl[i];
-		return tmp;
-	}
-
-	void sum2(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, nl_double & RESTRICT s1, nl_double & RESTRICT s2)
-	{
-		const nl_double * RESTRICT v1l = v1;
-		const nl_double * RESTRICT v2l = v2;
-		for (int i=0; i < N(); i++)
-		{
-			s1 += v1l[i];
-			s2 += v2l[i];
-		}
-	}
-
-	void addmult(nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double &mult)
-	{
-		nl_double * RESTRICT v1l = v1;
-		const nl_double * RESTRICT v2l = v2;
-		for (int i=0; i < N(); i++)
-		{
-			v1l[i] += v2l[i] * mult;
-		}
-	}
-
-	void sum2a(const nl_double * RESTRICT v1, const nl_double * RESTRICT v2, const nl_double * RESTRICT v3abs, nl_double & RESTRICT s1, nl_double & RESTRICT s2, nl_double & RESTRICT s3abs)
-	{
-		const nl_double * RESTRICT v1l = v1;
-		const nl_double * RESTRICT v2l = v2;
-		const nl_double * RESTRICT v3l = v3abs;
-		for (int i=0; i < N(); i++)
-		{
-			s1 += v1l[i];
-			s2 += v2l[i];
-			s3abs += fabs(v3l[i]);
-		}
-	}
-
-	const nl_double sumabs(const nl_double * v)
-	{
-		const nl_double * RESTRICT vl = v;
-		nl_double tmp = 0.0;
-		for (int i=0; i < N(); i++)
-			tmp += fabs(vl[i]);
-		return tmp;
-	}
-
-private:
-};
 
 class ATTR_ALIGNED(64) terms_t
 {
@@ -257,8 +151,8 @@ private:
 	dev_list_t m_step_devices;
 	dev_list_t m_dynamic_devices;
 
-	netlist_ttl_input_t m_fb_sync;
-	netlist_ttl_output_t m_Q_sync;
+	netlist_logic_input_t m_fb_sync;
+	netlist_logic_output_t m_Q_sync;
 
 	ATTR_HOT void step(const netlist_time delta);
 
@@ -287,8 +181,8 @@ protected:
 	ATTR_HOT void reset();
 	ATTR_HOT void update_param();
 
-	netlist_ttl_input_t m_fb_step;
-	netlist_ttl_output_t m_Q_step;
+	netlist_logic_input_t m_fb_step;
+	netlist_logic_output_t m_Q_step;
 
 	netlist_param_double_t m_freq;
 	netlist_param_double_t m_sync_delay;

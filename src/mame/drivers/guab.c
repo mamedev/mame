@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     JPM Give us a Break hardware

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Balfour, Ben Bruscella, Sean Young
 #pragma once
 
 #ifndef __COLECO_CONTROLLERS__

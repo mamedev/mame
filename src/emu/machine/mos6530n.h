@@ -4,9 +4,6 @@
 
     MOS Technology 6530 Memory, I/O, Timer Array emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    Vss   1 |*    \_/     | 40  PA1
@@ -46,7 +43,7 @@
 //**************************************************************************
 
 #define MCFG_MOS6530n_IRQ_CB(_write) \
-    devcb = &mos6530_t::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &mos6530_t::set_irq_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_MOS6530n_IN_PA_CB(_read) \
 	devcb = &mos6530_t::set_pa_rd_callback(*device, DEVCB_##_read);

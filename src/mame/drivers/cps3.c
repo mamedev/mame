@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
 /*
 
 CPS3 Driver (preliminary)

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jaroslaw Burczynski
 /***************************************************************************
 
 Tank Busters memory map

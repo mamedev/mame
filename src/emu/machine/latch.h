@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __LATCH_H__
 #define __LATCH_H__
 

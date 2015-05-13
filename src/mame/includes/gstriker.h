@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Farfetch, David Haywood
 #ifndef __GSTRIKER_H
 #define __GSTRIKER_H
 

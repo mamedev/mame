@@ -4,9 +4,6 @@
 
     CMD HD hard drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "cmdhd.h"

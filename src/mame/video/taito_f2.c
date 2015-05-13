@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
 #include "emu.h"
 #include "includes/taito_f2.h"
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Depth Charge audio routines
  */

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -30,7 +32,7 @@ public:
 	l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~l7a1045_sound_device() { }
 
-//	void set_base(INT8* base) { m_base = base; }
+//  void set_base(INT8* base) { m_base = base; }
 
 	DECLARE_WRITE16_MEMBER( l7a1045_sound_w );
 	DECLARE_READ16_MEMBER( l7a1045_sound_r );

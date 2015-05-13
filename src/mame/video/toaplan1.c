@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Darren Olafson, Quench
 /***************************************************************************
 
   Functions to emulate the video hardware of some Toaplan games,

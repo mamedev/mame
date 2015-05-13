@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_legacy.c
  *
@@ -53,7 +55,6 @@ NETLIB_RESET(nicDelay)
 
 NETLIB_UPDATE_PARAM(nicDelay)
 {
-
 }
 
 NETLIB_UPDATE(nicDelay)
@@ -65,7 +66,8 @@ NETLIB_UPDATE(nicDelay)
 	}
 	else if (!INPLOGIC(m_I) && m_last)
 	{
-		OUTLOGIC(m_Q,  1, NLTIME_FROM_NS(m_H_to_L.Value()));
+		// H_to_L
+		OUTLOGIC(m_Q,  0, NLTIME_FROM_NS(m_H_to_L.Value()));
 	}
 	m_last = INPLOGIC(m_I);
 }

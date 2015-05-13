@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "emu.h"
 #include "dp8390.h"
 

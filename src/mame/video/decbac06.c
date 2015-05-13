@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  Deco BAC06 tilemap generator:
 

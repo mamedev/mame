@@ -1,92 +1,75 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /******************************************************************************
 
-    JOKER'S WILD - SIGMA
-    --------------------
-
-    Preliminary driver by Roberto Fresca.
-
-
-    Games running on this hardware:
-
-    * Joker's Wild (encrypted).   1988, Sigma.
+  JOKER'S WILD - SIGMA (1988)
+  Preliminary driver by Roberto Fresca.
 
 
 *******************************************************************************
 
+  Hardware Notes (guessed):
+  ------------------------
 
-    Hardware Notes (guessed):
-    ------------------------
-
-    CPU:    1x M6809
-    Video:  1x M6845 CRTC or similar.
-    I/O:    2x PIAs ?? (there is code to initialize PIAs at $8033)
-
+  CPU:    1x M6809
+  Video:  1x M6845 CRTC or similar.
+  I/O:    2x PIAs ?? (there is code to initialize PIAs at $8033)
 
 *******************************************************************************
 
+  *** Game Notes ***
 
-    *** Game Notes ***
+  RND old notes:
+  Game is trying to boot, and after approx. 90 seconds an error message appear
+  on screen: "Random number generator is defective", then stuck here.
+  See code at $9859
 
-    Game is trying to boot, and after approx. 90 seconds an error message appear
-    on screen: "Random number generator is defective", then stuck here.
-
-    See code at $9859
-
-    PIAs are commented out just to see the R/W on error log.
-
-
-*******************************************************************************
-
-    --------------------
-    ***  Memory Map  ***
-    --------------------
-
-    0x0000 - 0x07FF    ; Video RAM.
-    0x2000 - 0x27FF    ; Color RAM.
-    0x4004 - 0x4007    ; PIA?.
-    0x4008 - 0x400B    ; PIA?.
-    0x6000 - 0x6001    ; M6845 CRTC.
-    0x8000 - 0xFFFF    ; ROM space.
-
-
-    *** MC6545 Initialization ***
-    ----------------------------------------------------------------------------------------------------------------------
-    register:  R00   R01   R02   R03   R04   R05   R06   R07   R08   R09   R10   R11   R12   R13   R14   R15   R16   R17
-    ----------------------------------------------------------------------------------------------------------------------
-    value:     0x20  0x18  0x1B  0x64  0x20  0x07  0x1A  0x1D  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
-
+  Currently the game spit an error about bad RAM, and after approx 90 seconds
+  the playfield is drawn and then hang.
 
 *******************************************************************************
 
+  --------------------
+  ***  Memory Map  ***
+  --------------------
 
-    DRIVER UPDATES:
-
-
-    [2008-10-30]
-
-    - Fixed graphics to 2 bits per pixel.
-
-
-    [2008-10-25]
-
-    - Initial release.
-    - ROMs load OK.
-    - Proper ROMs decryption.
-    - Added MC6845 CRTC.
-    - Video RAM OK.
-    - Added technical notes.
+  0x0000 - 0x07FF    ; Video RAM.
+  0x2000 - 0x27FF    ; Color RAM.
+  0x4004 - 0x4007    ; PIA?.
+  0x4008 - 0x400B    ; PIA?.
+  0x6000 - 0x6001    ; M6845 CRTC.
+  0x8000 - 0xFFFF    ; ROM space.
 
 
-    TODO:
+  *** MC6545 Initialization ***
+  ----------------------------------------------------------------------------------------------------------------------
+  register:  R00   R01   R02   R03   R04   R05   R06   R07   R08   R09   R10   R11   R12   R13   R14   R15   R16   R17
+  ----------------------------------------------------------------------------------------------------------------------
+  value:     0x20  0x18  0x1B  0x64  0x20  0x07  0x1A  0x1D  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
 
-    - RND number generator.
-    - Inputs
-    - Sound.
-    - A lot of work.
+*******************************************************************************
 
+  DRIVER UPDATES:
+
+  [2008-10-30]
+   - Fixed graphics to 2 bits per pixel.
+
+  [2008-10-25]
+   - Initial release.
+   - ROMs load OK.
+   - Proper ROMs decryption.
+   - Added MC6845 CRTC.
+   - Video RAM OK.
+   - Added technical notes.
+
+  TODO:
+
+  - RND number generator.
+  - Inputs
+  - Sound.
+  - A lot of work.
 
 *******************************************************************************/
-
 
 #define MASTER_CLOCK    XTAL_8MHz   /* guess */
 
@@ -129,20 +112,17 @@ public:
 *     Video Hardware     *
 *************************/
 
-
 WRITE8_MEMBER(jokrwild_state::jokrwild_videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-
 WRITE8_MEMBER(jokrwild_state::jokrwild_colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
-
 
 TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 {
@@ -158,12 +138,10 @@ TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code , color , 0);
 }
 
-
 void jokrwild_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
-
 
 UINT32 jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -171,16 +149,10 @@ UINT32 jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-
 PALETTE_INIT_MEMBER(jokrwild_state, jokrwild)
 {
 	//missing proms
 }
-
-
-/*************************
-*      Machine Init      *
-*************************/
 
 
 /*****************************
@@ -197,6 +169,7 @@ READ8_MEMBER(jokrwild_state::rng_r)
 
 	return machine().rand() & 0xff;
 }
+
 
 /*************************
 * Memory Map Information *
@@ -218,7 +191,6 @@ static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
 /* I/O byte R/W
 
 
@@ -235,6 +207,7 @@ ADDRESS_MAP_END
 
 
 */
+
 
 /*************************
 *      Input Ports       *
@@ -423,6 +396,7 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 //  printf("%02x B\n",data);
 }
 
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -450,8 +424,8 @@ static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  /* From MC6845, registers 00 & 04. (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    /* From MC6845, registers 01 & 06 */
+	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  // From MC6845, registers 00 & 04. (value-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    // From MC6845, registers 01 & 06.
 	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -502,17 +476,16 @@ ROM_END
 DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 /*****************************************************************************
 
-    Encryption was made by pages of 256 bytes.
+  Encryption was made by pages of 256 bytes.
 
-    For each page, the value is XORed with a fixed value (0xCC),
-    then XORed again with the offset of the original value inside its own page.
+  For each page, the value is XORed with a fixed value (0xCC),
+  then XORed again with the offset of the original value inside its own page.
 
-    Example:
+  Example:
 
-    For encrypted value at offset 0x123A (0x89)...
+  For encrypted value at offset 0x123A (0x89)...
 
-    0x89 XOR 0xCC XOR 0x3A = 0x7F
-
+  0x89 XOR 0xCC XOR 0x3A = 0x7F
 
 *****************************************************************************/
 {
@@ -531,5 +504,5 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY  FULLNAME                   FLAGS */
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY  FULLNAME                   FLAGS */
 GAME( 1988, jokrwild, 0,      jokrwild, jokrwild, jokrwild_state, jokrwild, ROT0, "Sigma", "Joker's Wild (encrypted)", GAME_NO_SOUND | GAME_NOT_WORKING )

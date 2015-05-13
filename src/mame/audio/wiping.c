@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
     Wiping sound driver (quick hack of the Namco sound driver)
@@ -69,9 +71,9 @@ void wiping_sound_device::device_start()
 		voice->wave = &m_sound_prom[0];
 		voice->counter = 0;
 	}
-	
+
 	save_item(NAME(m_soundregs));
-	
+
 	for (int i = 0; i < MAX_VOICES; i++)
 	{
 		save_item(NAME(m_channel_list[i].frequency), i);

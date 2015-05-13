@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  BS-X Satellaview cartridge emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 

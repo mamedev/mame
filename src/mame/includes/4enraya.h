@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina, Roberto Fresca
 /*************************************************************************
 
     IDSA 4 En Raya

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* MPU4 'Avantine' games
   These seem to be 3rd party games for various regions
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
 #include "video/decbac06.h"

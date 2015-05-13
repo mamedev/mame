@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 #include "emu.h"
 
 #define OP(A)   oprom[(A) - PC]

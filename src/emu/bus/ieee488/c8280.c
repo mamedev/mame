@@ -4,9 +4,6 @@
 
     Commodore 8280 Dual 8" Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "c8280.h"
@@ -477,12 +474,12 @@ READ8_MEMBER( c8280_device::fk5_r )
 
 	    bit     description
 
-	    0       
-	    1       
-	    2       
+	    0
+	    1
+	    2
 	    3       DCHG
 	    4       TSID
-	    5       
+	    5
 	    6       0
 	    7       0
 

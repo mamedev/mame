@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* IGS 027 Encryptions
 
   the IGS027 chips are typically used with encrypted ROMs.

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __MIE_H__
 #define __MIE_H__
 

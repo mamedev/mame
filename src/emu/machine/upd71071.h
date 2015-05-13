@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __UPD71071_H__
 #define __UPD71071_H__
 

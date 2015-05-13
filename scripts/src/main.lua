@@ -1,8 +1,15 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 function mainProject(_target, _subtarget)
 	if (_target == _subtarget) then
 		project (_target)
 	else
-		project (_target .. _subtarget)
+		if (_subtarget=="mess") then
+			project (_subtarget)
+		else
+			project (_target .. _subtarget)
+		end
 	end	
 	uuid (os.uuid(_target .."_" .. _subtarget))
 	kind "ConsoleApp"
@@ -129,42 +136,45 @@ function mainProject(_target, _subtarget)
 
 	if _OPTIONS["targetos"]=="macosx" and (not override_resources) then
 		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _target .. "-Info.plist"
+			"-sectcreate __TEXT __info_plist " .. GEN_DIR .. "/resource/" .. _subtarget .. "-Info.plist"
 		}
 		custombuildtask {
-			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _target .. "-Info.plist",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _target .. "-Info.plist" .. "...",    PYTHON .. " $(1)  -p -b " .. _target .. " $(<) > $(@)" }},
+			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "-Info.plist",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "-Info.plist" .. "...",    PYTHON .. " $(1)  -p -b " .. _subtarget .. " $(<) > $(@)" }},
 		}
 		dependency {
-			{ "$(TARGET)" ,  GEN_DIR  .. "/resource/" .. _target .. "-Info.plist", true  },
+			{ "$(TARGET)" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "-Info.plist", true  },
 		}
 
 	end
 
 	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/" .. _target ..".rc"
+		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/"  .. _subtarget .. "/" .. _subtarget ..".rc"
 		if not os.isfile(rcfile) then
-			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _target ..".rc"
+			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _subtarget .. "/" .. _subtarget ..".rc"
 		end
-		
 		if os.isfile(rcfile) then
 			files {
 				rcfile,
 			}
 			dependency {
-				{ "$(OBJDIR)/".._target ..".res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
+				{ "$(OBJDIR)/".._subtarget ..".res" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc", true  },
 			}
 		else
 			files {
-				MAME_DIR .. "src/osd/windows/mame.rc",
+				MAME_DIR .. "src/mame/osd/windows/mame/mame.rc",
 			}
 			dependency {
-				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc", true  },
+				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc", true  },
 			}
 		end	
 	end
 
+	local mainfile = MAME_DIR .. "src/".._target .."/" .. _subtarget ..".c"
+	if not os.isfile(mainfile) then
+		mainfile = MAME_DIR .. "src/".._target .."/" .. _target ..".c"
+	end
 	files {
-		MAME_DIR .. "src/".._target .."/" .. _target ..".c",
+		mainfile,
 		MAME_DIR .. "src/version.c",
 		GEN_DIR  .. _target .. "/" .. _subtarget .."/drivlist.c",
 	}
@@ -175,14 +185,14 @@ function mainProject(_target, _subtarget)
 	
 	configuration { "mingw*" }
 		custombuildtask {	
-			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _target .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _target .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. _target .. " $(<) > $(@)" }},
+			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. _subtarget .. " $(<) > $(@)" }},
 		}	
 	
 	configuration { "vs*" }
 		prebuildcommands {	
 			"mkdir " .. path.translate(GEN_DIR  .. "/resource/","\\") .. " 2>NUL",
-			"@echo Emitting ".. _target .. "vers.rc...",
-			PYTHON .. " " .. path.translate(MAME_DIR .. "src/build/verinfo.py","\\") .. " -r -b " .. _target .. " " .. path.translate(MAME_DIR .. "src/version.c","\\") .. " > " .. path.translate(GEN_DIR  .. "/resource/" .. _target .. "vers.rc", "\\") ,
+			"@echo Emitting ".. _subtarget .. "vers.rc...",
+			PYTHON .. " " .. path.translate(MAME_DIR .. "src/build/verinfo.py","\\") .. " -r -b " .. _subtarget .. " " .. path.translate(MAME_DIR .. "src/version.c","\\") .. " > " .. path.translate(GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc", "\\") ,
 		}	
 	
 	 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Sega/Yamaha AICA emulation
     By ElSemi, kingshriek, Deunan Knute, and R. Belmont

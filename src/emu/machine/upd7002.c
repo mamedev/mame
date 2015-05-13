@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Gordon Jefferyes
 /******************************************************************************
     uPD7002 Analogue to Digital Converter
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #pragma once
 
 #ifndef __T6W28_H__

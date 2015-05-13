@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jim Stolis, Brian Troha
 /**********************************************************************************
 
 
@@ -7909,7 +7911,7 @@ SA$ - Sequential ACE$ pays the same as RF
 	ROM_LOAD( "mgo-cg2172.u78",  0x08000, 0x8000, CRC(fff049bc) SHA1(d4b340e0c932db767cade56a55b649c80750fee4) )
 	ROM_LOAD( "mbo-cg2172.u79",  0x10000, 0x8000, CRC(1665c6be) SHA1(4650b9d8336434ce531c31b63e7780b47ef4e985) )
 	ROM_LOAD( "mxo-cg2172.u80",  0x18000, 0x8000, CRC(cc9d64e4) SHA1(4bf78e49150ca6fb4a05f3320f712bbbabcacf56) )
-	
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2172.u43", 0x0000, 0x0200, CRC(c9b4f1da) SHA1(c911da564cfb33218441de0f91e67a02191d76c2) ) /* Philips N82S147N */
 ROM_END
@@ -9574,6 +9576,41 @@ ROM_START( pexmp026 ) /* Superboard : 5-in-1 Wingboard (XMP00026) Program in Spa
 ROM_END
 
 ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) */
+/*
+
+The CG2451 set supersedes CG2298, CG2352 & CG2426 and adds graphics support for the following XnnnnnnP Data game types:
+  Double Double Bonus Plus
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x002037p.u66",   0x00000, 0x10000, CRC(12aea90e) SHA1(26ff0e7b81271252573739f26db9d20f35af274b) ) /* Nevada Bonus Poker */
+
+	ROM_REGION( 0x10000, "user2", 0 )
+	ROM_LOAD( "x002111p.u66",   0x00000, 0x10000, CRC(f19dd63e) SHA1(0fe16cd0c75a9759e34bf95ce428e5b2da236215) ) /* 4 of a Kind Bonus Poker with Sequential Royal Flush */
+
+	ROM_REGION( 0x10000, "user3", 0 )
+	ROM_LOAD( "x000455p.u66",   0x00000, 0x10000, CRC(4992c51f) SHA1(8c70c59bdb16feba438230b30765076cebd44b53) ) /* Joker Poker */
+
+	ROM_REGION( 0x10000, "user4", 0 )
+	ROM_LOAD( "x000006p.u66",   0x00000, 0x10000, CRC(0ee609a1) SHA1(57043ac2c6ff4377479dd7b66d7e379053f3f602) ) /* Standard Draw Poker */
+
+	ROM_REGION( 0x10000, "user5", 0 )
+	ROM_LOAD( "x002474p.u66",   0x00000, 0x10000, CRC(74cc1423) SHA1(0522cee3a7e123ce51739c69f38915ca92bd03e5) ) /* Double Double Bonus Plus */
+
+	ROM_REGION( 0x040000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2451.u77",  0x00000, 0x10000, CRC(ffc7dd2e) SHA1(277e0620cbe4358137179b3c98170e295470c651) )
+	ROM_LOAD( "mgo-cg2451.u78",  0x10000, 0x10000, CRC(b1a746b5) SHA1(64bb1a4e57d693010004a585503e46892afecb8f) )
+	ROM_LOAD( "mbo-cg2451.u79",  0x20000, 0x10000, CRC(ecfd6737) SHA1(4b563dbf76e81b49d2736c6eaeab243173e8e51b) )
+	ROM_LOAD( "mxo-cg2451.u80",  0x30000, 0x10000, CRC(ac1395c9) SHA1(ce1fb78b0440c80da0d6b99b6f6369861da212df) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
+ROM_END
+
+ROM_START( pexmp030a ) /* Superboard : 5-in-1 Wingboard (XMP00030) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */
 
@@ -9581,7 +9618,7 @@ ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) */
 	ROM_LOAD( "x002066p.u66",   0x00000, 0x10000, CRC(01236011) SHA1(3edfee014705b3540386c5e42026ab93628b2597) ) /* Double Double Bonus Poker */
 
 	ROM_REGION( 0x10000, "user2", 0 )
-	ROM_LOAD( "x002111p.u66",   0x00000, 0x10000, CRC(f19dd63e) SHA1(0fe16cd0c75a9759e34bf95ce428e5b2da236215) ) /* 4 of a Kind Bonus Poker with Sequential Royal Flush */
+	ROM_LOAD( "x000158p.u66",   0x00000, 0x10000, CRC(51a8a294) SHA1(f76992729ceaca18af82ab2fb3403dc5a48b7e8a) ) /* 4 of a Kind Bonus Poker */
 
 	ROM_REGION( 0x10000, "user3", 0 )
 	ROM_LOAD( "x000536p.u66",   0x00000, 0x10000, CRC(0b18dc1b) SHA1(07350fe258441f8565bfd875342823149b7757f1) ) /* Joker Poker */
@@ -9979,7 +10016,8 @@ GAMEL(1995, pexmp017,  0,        peplus,  peplus_poker, peplus_state, peplussbw,
 GAMEL(1995, pexmp017a, pexmp017, peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2352)",   0, layout_pe_poker )
 GAMEL(1995, pexmp017b, pexmp017, peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2426)",   0, layout_pe_poker )
 GAMEL(1995, pexmp026,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00026) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
-GAMEL(1995, pexmp030,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2426)",   0, layout_pe_poker )
+GAMEL(1995, pexmp030,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2451)",   0, layout_pe_poker )
+GAMEL(1995, pexmp030a, pexmp030, peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2426)",   0, layout_pe_poker )
 
 /* Superboard : Slots machine */
 GAMEL(1997, pex0838s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000838S+XS000002) Five Times Pay Slots",        0, layout_pe_slots )

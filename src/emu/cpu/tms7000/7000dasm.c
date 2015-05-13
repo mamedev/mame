@@ -1,3 +1,11 @@
+// license:???
+// copyright-holders:Tim Lindner
+/*
+
+  TMS7000 disassembler
+
+*/
+
 #include "emu.h"
 #include "debugger.h"
 #include "tms7000.h"
@@ -5,15 +13,15 @@
 enum operandtype { DONE, NONE, UI8, I8, UI16, I16, PCREL, PCABS, TRAP };
 
 struct oprandinfo {
-	char        opstr[4][12];
+	char opstr[4][12];
 	operandtype decode[4];
 };
 
 struct opcodeinfo {
-	int     opcode;
-	char        name[8];
-	int     operand;
-	UINT32      s_flag;
+	int opcode;
+	char name[8];
+	int operand;
+	UINT32 s_flag;
 };
 
 static const oprandinfo of[] = {
@@ -373,7 +381,7 @@ CPU_DISASSEMBLE( tms7000 )
 		{
 			/* We found a match */
 
-			int             j,k,vector;
+			int j,k,vector;
 			UINT8   a;
 			INT8    b;
 			UINT16  c;

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     IBM EGA CRT Controller emulation

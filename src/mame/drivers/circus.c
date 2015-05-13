@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Coates
 /***************************************************************************
 
 Exidy 'Universal' Game Board V1

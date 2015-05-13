@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 /****************************************************************************
 
     Gotya / The Hand driver by Zsolt Vasvari

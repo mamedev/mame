@@ -1,4 +1,4 @@
-// license:MAME|LGPL-2.1+
+// license:LGPL-2.1+
 // copyright-holders:Jonathan Gevaryahu,R. Belmont,Zsolt Vasvari
 #pragma once
 /*
@@ -27,7 +27,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides

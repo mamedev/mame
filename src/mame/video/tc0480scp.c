@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Taito TC0480SCP
 ---------

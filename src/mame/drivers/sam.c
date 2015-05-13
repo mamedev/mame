@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"

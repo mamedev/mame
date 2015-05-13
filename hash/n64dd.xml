@@ -22,7 +22,7 @@
 		<info name="usage" value="Requires F-Zero X cart" />
 		<info name="serial" value="NUD-EFZJ-JPN" />
 		<info name="release" value="20000421" />
-        <info name="alt_title" value="エフ　ゼロ　エックス　エクスパンションキット" />
+		<info name="alt_title" value="エフ　ゼロ　エックス　エクスパンションキット" />
 		<part name="disk" interface="n64dd_disk">
 			<dataarea name="rom" size="70627520">
 				<rom name="f-zero x expansion kit [nud-efzj-jpn].bin" size="70627520" crc="9ab91e71" sha1="7b39677dad61b2fb91eb2ede756fbd3b49f15afe" offset="0" />

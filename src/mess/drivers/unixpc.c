@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     AT&T Unix PC series

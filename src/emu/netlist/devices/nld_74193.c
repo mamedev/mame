@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_74193.c
  *
@@ -41,10 +43,11 @@ NETLIB_RESET(74193)
 // FIXME: Timing
 static const netlist_time delay[4] =
 {
-		NLTIME_FROM_NS(18),
-		NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),
-		NLTIME_FROM_NS(54) - NLTIME_FROM_NS(18),
-		NLTIME_FROM_NS(72) - NLTIME_FROM_NS(18)};
+		NLTIME_FROM_NS(40),
+		NLTIME_FROM_NS(40),
+		NLTIME_FROM_NS(40),
+		NLTIME_FROM_NS(40)
+};
 
 NETLIB_UPDATE(74193)
 {
@@ -57,7 +60,7 @@ NETLIB_UPDATE(74193)
 	else if (!INPLOGIC(m_LOADQ))
 	{
 		m_cnt = (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2)
-				| (INPLOGIC(m_B) << 1) | (INPLOGIC(m_D) << 0);
+				| (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
 	}
 	else
 	{
@@ -67,11 +70,6 @@ NETLIB_UPDATE(74193)
 			if (m_cnt > MAXCNT)
 				m_cnt = 0;
 		}
-		else if (INPLOGIC(m_CD) && m_last_CU && !INPLOGIC(m_CU))
-		{
-			if (m_cnt == MAXCNT)
-				tCarry = 0;
-		}
 		if (INPLOGIC(m_CU) && !m_last_CD && INPLOGIC(m_CD))
 		{
 			if (m_cnt > 0)
@@ -79,12 +77,13 @@ NETLIB_UPDATE(74193)
 			else
 				m_cnt = MAXCNT;
 		}
-		else if (INPLOGIC(m_CU) && m_last_CD && !INPLOGIC(m_CD))
-		{
-			if (m_cnt == 0)
-				tBorrow = 0;
-		}
 	}
+
+	if (!INPLOGIC(m_CU) && (m_cnt == MAXCNT))
+		tCarry = 0;
+
+	if (!INPLOGIC(m_CD) && (m_cnt == 0))
+				tBorrow = 0;
 
 	m_last_CD = INPLOGIC(m_CD);
 	m_last_CU = INPLOGIC(m_CU);

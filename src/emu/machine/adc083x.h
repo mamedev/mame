@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     National Semiconductor ADC0831 / ADC0832 / ADC0834 / ADC0838

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  *
  *  Implementation of Fujitsu FMR-50, FMR-60 and FM-Towns SCSI hardware

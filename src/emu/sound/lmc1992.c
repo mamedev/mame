@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with

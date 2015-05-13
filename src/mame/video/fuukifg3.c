@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Priest, David Haywood
 /***************************************************************************
 
                           -= Fuuki 32 Bit Games (FG-3) =-

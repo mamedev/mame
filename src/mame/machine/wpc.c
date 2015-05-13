@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * wpc.c  --  Williams WPC ASIC, used on Williams WPC pinball machines
  *

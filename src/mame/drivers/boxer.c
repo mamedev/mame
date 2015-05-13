@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Atari Boxer (prototype) driver

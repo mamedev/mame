@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "pci.h"
 
 const device_type PCI_ROOT   = &device_creator<pci_root_device>;

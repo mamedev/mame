@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jaroslaw Burczynski
 /*
 *   Video Driver for Tank Busters
 */

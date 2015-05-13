@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina,Ryan Holtz
 /*
  2010.04.05. stephh
 

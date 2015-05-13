@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     Ultraman (c) 1991  Banpresto / Bandai

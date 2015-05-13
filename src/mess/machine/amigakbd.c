@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Amiga Keyboard
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     We currently emulate the Amiga 500 keyboard controller, which was
     also used in later Amiga 2000 keyboards.

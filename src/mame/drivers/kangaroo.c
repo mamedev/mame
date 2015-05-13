@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ville Laitinen
 /***************************************************************************
 
     Sun Electronics hardware:

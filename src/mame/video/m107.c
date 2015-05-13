@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /****************************************************************************
 
     Irem M107 video hardware, Bryan McPhail, mish@tendril.co.uk

@@ -4,14 +4,11 @@
 
     Commodore 2040 floppy disk controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
     - write protect
     - separate read/write methods

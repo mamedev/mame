@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***********************************************************************************************************
 
     Bandai Wonderswan / Wonderswan Color cart emulation

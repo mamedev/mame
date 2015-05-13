@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Yochizo
 #include "video/jalblend.h"
 
 class argus_state : public driver_device

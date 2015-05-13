@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Megadrive / Genesis 32X emulation */
 
 /*

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "machine/nvram.h"
 
 class seicross_state : public driver_device

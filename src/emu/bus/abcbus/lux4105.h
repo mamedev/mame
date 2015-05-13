@@ -4,9 +4,6 @@
 
     Luxor 4105 SASI hard disk controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once
@@ -36,7 +33,7 @@
 // ======================> luxor_4105_device
 
 class luxor_4105_device :  public device_t,
-						   public device_abcbus_card_interface
+							public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, R. Belmont
 /***************************************************************************
 
     Seibu Sound System v1.02, designed 1986 by Seibu Kaihatsu

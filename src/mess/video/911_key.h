@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*
     key translation table for both US and UK terminals
 

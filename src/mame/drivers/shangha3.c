@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Shanghai 3           (c)1993 Sunsoft     (68000     AY8910 OKI6295)
@@ -715,7 +717,7 @@ ROM_END
 DRIVER_INIT_MEMBER(shangha3_state,shangha3)
 {
 	m_do_shadows = 1;
-	
+
 	save_item(NAME(m_prot_count));
 }
 

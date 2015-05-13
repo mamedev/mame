@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 /*
 must fix:
     callm
@@ -13,15 +15,6 @@ must fix:
  * A portable Motorola M68xxx processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
  *
- * This code may be freely used for non-commercial purposes as long as this
- * copyright notice remains unaltered in the source code and any binary files
- * containing this code in compiled form.
- *
- * All other licensing terms must be negotiated with the author
- * (Karl Stenerud).
- *
- * The latest version of this code can be obtained at:
- * http://kstenerud.cjb.net
  */
 
 /* Special thanks to Bart Trzynadlowski for his insight into the

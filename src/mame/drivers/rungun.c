@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:R.Belmont
 /*************************************************************************
 
    Run and Gun / Slam Dunk

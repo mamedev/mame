@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /*********************************************************************
 
     drawgfxm.h
@@ -5,10 +7,6 @@
     Macros implementing drawgfx core operations. Drivers can use
     these if they need custom behavior not provided by the existing
     drawgfx functions.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
     How to use these macros:

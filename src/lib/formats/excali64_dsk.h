@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*********************************************************************
 
     formats/excali64_dsk.h

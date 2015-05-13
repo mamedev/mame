@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
 #include "video/vsystem_spr.h"

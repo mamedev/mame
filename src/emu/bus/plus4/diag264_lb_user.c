@@ -4,9 +4,6 @@
 
     Diag264 User Port Loop Back Connector emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "diag264_lb_user.h"

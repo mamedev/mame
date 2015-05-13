@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     Conitec PROF-80 Memory Management Unit emulation

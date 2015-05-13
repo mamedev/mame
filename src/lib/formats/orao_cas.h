@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
        orao_cas.h

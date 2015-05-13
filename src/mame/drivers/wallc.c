@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 /****************************************************************************
 
 Wall Crash by Midcoin (c) 1984

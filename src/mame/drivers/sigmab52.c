@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca, Sandro Ronco
 /******************************************************************************
 
   SIGMA B52 SYSTEM.

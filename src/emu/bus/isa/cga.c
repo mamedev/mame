@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***************************************************************************
 
   Color Graphics Adapter (CGA) section
@@ -844,7 +846,7 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_2bpp_update_row )
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_2bpp_update_row",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
-		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( y & 1 ) << 13 );
+		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 1 ) << 13 );
 		UINT8 data = videoram[ offset ];
 
 		*p = palette[m_palette_lut_2bpp[ ( data >> 6 ) & 0x03 ]]; p++;
@@ -1887,4 +1889,123 @@ ROM_END
 const rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 {
 	return ROM_NAME( mc1502 );
+}
+
+const device_type ISA8_CGA_M24 = &device_creator<isa8_cga_m24_device>;
+
+isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		isa8_cga_device( mconfig, ISA8_CGA_M24, "Olivetti M24 CGA", tag, owner, clock, "cga_m24", __FILE__)
+{
+	m_vram_size = 0x8000;
+}
+
+void isa8_cga_m24_device::device_reset()
+{
+	isa8_cga_device::device_reset();
+	m_mode2 = 0;
+	m_start_offset = 0;
+}
+
+WRITE8_MEMBER( isa8_cga_m24_device::io_write )
+{
+	mc6845_device *mc6845 = subdevice<mc6845_device>(CGA_MC6845_NAME);
+	switch(offset)
+	{
+		case 0: case 2: case 4: case 6:
+			m_index = data;
+			mc6845->address_w( space, offset, data );
+			break;
+		case 1: case 3: case 5: case 7:
+			switch(m_index & 0x1f) // TODO: this is handled by a pal and prom
+			{
+				case 0:
+					data &= 0x7f;
+					break;
+				case 9:
+					if((data < 0x80) && (data != 3))
+						data = (data << 1) + 1;
+					break;
+				case 10:
+					data = ((data << 1) & 0x1f) | (data & 0x60);
+					break;
+				case 11:
+					data <<= 1;
+					break;
+			}
+			mc6845->register_w( space, offset, data );
+			break;
+		case 0x0e:
+			m_mode2 = data;
+			if((data & 8) && !(data & 1))
+				m_start_offset = 0x4000;
+			else
+				m_start_offset = 0;
+			break;
+		default:
+			isa8_cga_device::io_write(space, offset, data);
+			break;
+	}
+}
+
+READ8_MEMBER( isa8_cga_m24_device::io_read )
+{
+	UINT8 data = 0xff;
+
+	switch(offset)
+	{
+		case 0x0a:
+			data = 0xc0 | m_vsync | ( ( data & 0x40 ) >> 4 ) | m_hsync; // 0xc0 == no expansion
+			break;
+		case 0x0e:
+			data = m_mode2;
+			break;
+		default:
+			data = isa8_cga_device::io_read(space, offset);
+			break;
+	}
+	return data;
+}
+
+MC6845_UPDATE_ROW( isa8_cga_m24_device::crtc_update_row )
+{
+	if(m_mode2 & 1)
+		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+	else
+		isa8_cga_device::crtc_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+}
+
+MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
+{
+	UINT8 *videoram = &m_vram[m_start_offset];
+	UINT32  *p = &bitmap.pix32(y);
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	UINT8   fg = m_color_select & 0x0F;
+	int i;
+
+	if ( y == 0 ) CGA_LOG(1,"m24_gfx_1bpp_m24_update_row",("\n"));
+	for ( i = 0; i < x_count; i++ )
+	{
+		UINT16 offset = ( ( ( ma + i ) << 1 ) & 0x1fff ) | ( ( ra & 3 ) << 13 );
+		UINT8 data = videoram[ offset ];
+
+		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
+
+		data = videoram[ offset + 1 ];
+
+		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
+		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
+	}
 }

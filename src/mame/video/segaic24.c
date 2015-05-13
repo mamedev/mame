@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   Sega system24 hardware
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #include "terminal.h"
 
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

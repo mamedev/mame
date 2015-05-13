@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R.Belmont
 /*****************************************************************************
  *
  *   sh4.c
@@ -100,8 +102,8 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 #if SH4_USE_FASTRAM_OPTIMIZATION
 	, m_bigendian(endianness == ENDIANNESS_BIG)
 	, m_byte_xor(m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0))
-    , m_word_xor(m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0))
-    , m_dword_xor(m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0))
+	, m_word_xor(m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0))
+	, m_dword_xor(m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0))
 	, m_fastram_select(0)
 #endif
 {

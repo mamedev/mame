@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
 
     Break Thru Doc. Data East (1986)

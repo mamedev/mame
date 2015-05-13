@@ -4,9 +4,6 @@
 
     Scandia Metric ABC FD2 floppy controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once
@@ -31,7 +28,7 @@
 // ======================> abc_fd2_t
 
 class abc_fd2_t :  public device_t,
-				   public device_abcbus_card_interface
+					public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

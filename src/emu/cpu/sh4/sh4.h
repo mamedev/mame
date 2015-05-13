@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R.Belmont
 /*****************************************************************************
  *
  *   sh4->h
@@ -693,9 +695,9 @@ protected:
 #if SH4_USE_FASTRAM_OPTIMIZATION
 	/* fast RAM */
 	bool            m_bigendian;
-	UINT32			m_byte_xor;
-	UINT32			m_word_xor;
-	UINT32			m_dword_xor;
+	UINT32          m_byte_xor;
+	UINT32          m_word_xor;
+	UINT32          m_dword_xor;
 	UINT32              m_fastram_select;
 	struct
 	{

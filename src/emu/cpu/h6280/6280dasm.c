@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*****************************************************************************
 
     6280dasm.c Hudsonsoft Hu6280 (HuC6280/Hu6280a) disassembler

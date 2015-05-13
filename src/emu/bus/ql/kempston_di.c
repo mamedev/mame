@@ -4,9 +4,6 @@
 
     Kempston Disk Interface emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "kempston_di.h"

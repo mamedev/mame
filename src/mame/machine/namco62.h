@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef NAMCO62_H
 #define NAMCO62_H
 

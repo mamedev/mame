@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 Pac-Land  (c) 1984 Namco

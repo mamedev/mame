@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Allard Van Der Bas
 class vastar_state : public driver_device
 {
 public:

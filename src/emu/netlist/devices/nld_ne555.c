@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_NE555.c
  *
@@ -24,10 +26,10 @@ inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a,
 
 NETLIB_START(NE555)
 {
-	register_sub(m_R1, "R1");
-	register_sub(m_R2, "R2");
-	register_sub(m_R3, "R3");
-	register_sub(m_RDIS, "RDIS");
+	register_sub("R1", m_R1);
+	register_sub("R2", m_R2);
+	register_sub("R3", m_R3);
+	register_sub("RDIS", m_RDIS);
 
 	register_subalias("GND",  m_R3.m_N);    // Pin 1
 	register_input("TRIG",    m_TRIG);      // Pin 2
@@ -43,6 +45,7 @@ NETLIB_START(NE555)
 	connect(m_RDIS.m_N, m_R3.m_N);
 
 	save(NLNAME(m_last_out));
+	save(NLNAME(m_ff));
 }
 
 NETLIB_RESET(NE555)
@@ -63,33 +66,35 @@ NETLIB_RESET(NE555)
 NETLIB_UPDATE(NE555)
 {
 	// FIXME: assumes GND is connected to 0V.
+	// FIXME: Hookup RESET!
 
 	nl_double vt = clamp(TERMANALOG(m_R2.m_P), 0.7, 1.4);
 	bool bthresh = (INPANALOG(m_THRES) > vt);
 	bool btrig = (INPANALOG(m_TRIG) > clamp(TERMANALOG(m_R2.m_N), 0.7, 1.4));
-	bool out = m_last_out;
 
 	if (!btrig)
 	{
-		out = true;
+		m_ff = true;
 	}
 	else if (bthresh)
 	{
-		out = false;
+		m_ff = false;
 	}
 
-	if (!m_last_out && out)
+	bool out = (!INPLOGIC(m_RESET) ? false : m_ff);
+
+	if (m_last_out && !out)
+	{
+		m_RDIS.update_dev();
+		OUTANALOG(m_OUT, TERMANALOG(m_R3.m_N));
+		m_RDIS.set_R(R_ON);
+	}
+	else if (!m_last_out && out)
 	{
 		m_RDIS.update_dev();
 		// FIXME: Should be delayed by 100ns
 		OUTANALOG(m_OUT, TERMANALOG(m_R1.m_P));
 		m_RDIS.set_R(R_OFF);
-	}
-	else if (m_last_out && !out)
-	{
-		m_RDIS.update_dev();
-		OUTANALOG(m_OUT, TERMANALOG(m_R3.m_N));
-		m_RDIS.set_R(R_ON);
 	}
 	m_last_out = out;
 }

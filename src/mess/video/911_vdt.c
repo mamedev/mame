@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*
     TI 911 VDT core.  To be operated with the TI 990 line of computers (can be connected to
     any model, as communication uses the CRU bus).

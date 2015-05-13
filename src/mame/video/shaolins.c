@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Allard Van Der Bas
 /***************************************************************************
 
   shaolins.c
@@ -140,7 +142,7 @@ void shaolins_state::video_start()
 			8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_cols(32);
-	
+
 	save_item(NAME(m_palettebank));
 	save_item(NAME(m_nmi_enable));
 }

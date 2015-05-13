@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 
 void mgakuen2_decode(running_machine &machine);

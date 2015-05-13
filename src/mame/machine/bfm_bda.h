@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #pragma once
 #ifndef BFM_BDA_H
 #define BFM_BDA_H

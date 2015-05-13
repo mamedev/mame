@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Reip, Barry Rodewald
 /*************************************************************************
 
     Malzak

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*** m6800: Portable 6800 class emulator *************************************/
 
 #pragma once

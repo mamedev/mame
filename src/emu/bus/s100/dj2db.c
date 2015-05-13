@@ -4,9 +4,6 @@
 
     Morrow Designs Disk Jockey 2D/B floppy controller board emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

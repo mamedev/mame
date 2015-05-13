@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mark McDougall, R. Belmont
 /*************************************************************
 
     Namco ND-1 Driver - Mark McDougall

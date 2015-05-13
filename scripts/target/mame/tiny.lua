@@ -1,12 +1,12 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 ---------------------------------------------------------------------------
 --
 --   tiny.lua
 --
 --   Small driver-specific example makefile
 --   Use make SUBTARGET=tiny to build
---
---   Copyright Nicola Salmoria and the MAME Team.
---   Visit  http://mamedev.org for licensing and usage restrictions.
 --
 ---------------------------------------------------------------------------
 

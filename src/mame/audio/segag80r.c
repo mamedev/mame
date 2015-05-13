@@ -705,8 +705,8 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, monsterb_sound_a_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, monsterb_sound_b_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, monsterb_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(segag80r_state, monsterb_sound_b_w))
 	MCFG_I8255_IN_PORTC_CB(READ8(segag80r_state, n7751_status_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, n7751_command_w))
 

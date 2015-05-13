@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #pragma once
 
 #ifndef __SEGAM1AUDIO_H__

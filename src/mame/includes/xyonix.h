@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Stephh
 class xyonix_state : public driver_device
 {
 public:

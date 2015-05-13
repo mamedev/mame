@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Sal,John Bugliarisi
 /***************************************************************************
 
   video.c

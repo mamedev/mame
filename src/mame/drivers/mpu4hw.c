@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /* MPU4 hardware emulation
   for sets see mpu4.c
 */

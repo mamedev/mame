@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Dirk V.
 /***************************************************************************
 Mephisto Glasgow 3 S chess computer
 Dirk V.

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     spchroms.c - This is an emulator for "typical" speech ROMs from TI, as used by TI99/4(a).
 

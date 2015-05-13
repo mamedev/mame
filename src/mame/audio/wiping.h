@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* 8 voices max */
 #define MAX_VOICES 8
 
@@ -27,7 +29,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	
+
 private:
 	// internal state
 

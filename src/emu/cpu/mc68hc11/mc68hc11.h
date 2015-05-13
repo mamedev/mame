@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Angelo Salese, hap
 #pragma once
 
 #ifndef __MC68HC11_H__

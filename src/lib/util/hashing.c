@@ -167,7 +167,7 @@ bool crc32_t::from_string(const char *string, int length)
 //-------------------------------------------------
 
 const char *crc32_t::as_string(std::string &buffer) const
-{	
+{
 	strprintf(buffer, "%08x", m_raw);
 	return buffer.c_str();
 }

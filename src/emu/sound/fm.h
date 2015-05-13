@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
   File: fm.h -- header file for software emulation for FM sound generator
 

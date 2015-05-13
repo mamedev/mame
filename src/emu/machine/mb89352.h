@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * mb89352.h
  *

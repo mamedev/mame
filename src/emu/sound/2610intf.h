@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #pragma once
 
 #ifndef __2610INTF_H__

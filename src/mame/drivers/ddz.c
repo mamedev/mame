@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Dou Di Zhu (by IGS?)
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**************************************************************************
  *
  * Intel PXA255 on-chip peripheral emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     Konami Target Panic (cabinet test PCB)

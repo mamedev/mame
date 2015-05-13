@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef __STEREO_FX__
 #define __STEREO_FX__
 

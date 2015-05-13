@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #define YM2610B_WARNING
 
 /*

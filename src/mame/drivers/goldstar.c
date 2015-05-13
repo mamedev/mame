@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Roberto Fresca
 /***************************************************************************
 
   Golden Star
@@ -162,6 +164,24 @@
   Hold Settings button (9) during boot to access switch test.
   Hold Stats button (0) during boot to access palette test.
 
+
+  * Super Nove (Playmark) (super9)
+
+  This game has similar memory map than Golden Star. The program writes to init
+  the reels RAM/palette (bp C11A), then transfer the control to PC 253h where
+  starts to write to some NVRAM chunks. Unfortunatelly at PC 2DBh there is a call
+  to 0C33h, where there are only ASCII strings instead of subroutines.
+  Also there are some other calls to the same range, that also lack of code.
+
+
+  * Tetris + Cherry Master (+K, Canada Version, encrypted) (cmtetrsb)
+
+  Start the game and you can find some garbage due to wrong graphics banks.
+  Press the key "insert" to throttle the game. Keep the key pressed till
+  you can see what seems the attract working (still with wrong graphics).
+
+  Seems to be sooo slow.... (interrupts?)
+  
 
 ***************************************************************************/
 
@@ -13027,7 +13047,6 @@ GAME(  199?, goldfrui,  goldstar, goldfrui, goldstar, driver_device,  0,        
 GAME(  2001, super9,    goldstar, super9,   goldstar, goldstar_state, super9,    ROT0, "Playmark",          "Super Nove (Playmark)",                       GAME_NOT_WORKING )   // need to decode gfx and see the program loops/reset...
 GAME(  2001, wcherry,   0,        wcherry,  chrygld,  goldstar_state, wcherry,   ROT0, "bootleg",           "Win Cherry (ver 0.16 - 19990219)",            GAME_NOT_WORKING )
 GAME(  199?, star100,   0,        star100,  star100,  driver_device,  0,         ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    GAME_IMPERFECT_COLORS )
-GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, driver_device,  0,         ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                          GAME_IMPERFECT_COLORS, layout_crazybon )
 
 
 // are these really dyna, or bootlegs?
@@ -13141,14 +13160,14 @@ GAMEL( 1996, roypok96b, roypok96, amcoe2,   roypok96a, cmaster_state,  rp36c3,  
 /* these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
    some sets are messy and appear to have mismatched graphic roms, they need to be sorted out properly
 */
-/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT       ROT    COMPANY    FULLNAME                                                FLAGS  */
+/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT       ROT    COMPANY    FULLNAME                                                                   FLAGS  */
 GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl,   driver_device,  0,         ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
 GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  nfb96sea,  ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 2, v97-3.3c English)",    GAME_WRONG_COLORS ) // encrypted program
 GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,         ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 3, v97-3.3c Portuguese)", GAME_WRONG_COLORS )
-GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,         ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS )
-GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,         ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS )
+GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,         ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            GAME_WRONG_COLORS )
+GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   driver_device,  0,         ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            GAME_WRONG_COLORS )
 
-GAME( 2003, nfm,       0,        nfm,      nfm,       driver_device,  0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)", GAME_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
+GAME( 2003, nfm,       0,        nfm,      nfm,       driver_device,  0,         ROT0, "Ming-Yang Electronic", "New Fruit Machine (Ming-Yang Electronic)",                    GAME_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06"
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99" probably hacks of a 1994 version of Cherry Bonus / Cherry Master (Super Cherry Master?)
 GAMEL(1999, unkch1,   0,         unkch,    unkch,     unkch_state,    unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
@@ -13160,12 +13179,14 @@ GAMEL(1999, unkch4,   unkch1,    unkch,    unkch4,    unkch_state,    unkch4,   
 /* Stealth sets.
    These have hidden games inside that can be switched to avoid inspections, police or whatever purposes)... */
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT       ROT    COMPANY      FULLNAME                                                 FLAGS  */
-GAMEL( 198?, cmpacman,  0,        cm,       cmpacman,  cmaster_state,  cm,        ROT0, "<unknown>", "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31)",   0,                 layout_cmpacman ) // need to press K to switch between games...
-GAMEL( 198?, cmtetris,  0,        cm,       cmtetris,  cmaster_state,  cm,        ROT0, "<unknown>", "Tetris + Cherry Master (Corsica, v8.01, set 1)",         0,                 layout_cmpacman ) // need to press K/L to switch between games...
-GAMEL( 198?, cmtetrsa,  0,        cm,       cmtetris,  cmaster_state,  cm,        ROT0, "<unknown>", "Tetris + Cherry Master (Corsica, v8.01, set 2)",         GAME_NOT_WORKING,  layout_cmpacman ) // seems banked...
-GAMEL( 198?, cmtetrsb,  0,        cm,       cmtetris,  cmaster_state,  cm,        ROT0, "<unknown>", "Tetris + Cherry Master (+K, Canada Version, encrypted)", GAME_NOT_WORKING,  layout_cmpacman ) // different Tetris game
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT     ROT    COMPANY                FULLNAME                                                 FLAGS                  LAYOUT    */
+GAMEL( 198?, cmpacman, 0,        cm,       cmpacman, cmaster_state,  cm,      ROT0, "<unknown>",           "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31)",   0,                     layout_cmpacman ) // need to press K to switch between games...
+GAMEL( 198?, cmtetris, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",         0,                     layout_cmpacman ) // need to press K/L to switch between games...
+GAMEL( 198?, cmtetrsa, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",         GAME_NOT_WORKING,      layout_cmpacman ) // seems banked...
+GAMEL( 198?, cmtetrsb, 0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)", GAME_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
+GAMEL( 1997, crazybon, 0,        pkrmast,  crazybon, driver_device,  0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                                       GAME_IMPERFECT_COLORS, layout_crazybon )
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.
+                 the game has tetris graphics inside.
 */

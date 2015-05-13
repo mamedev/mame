@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __MSX_AUDIO_KB_H__
 #define __MSX_AUDIO_KB_H__
 

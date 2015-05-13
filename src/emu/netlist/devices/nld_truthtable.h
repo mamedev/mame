@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_truthtable.h
  *
@@ -40,7 +42,7 @@ public:
 	};
 
 	nld_truthtable_t(truthtable_t *ttbl, const char *desc[])
-	: netlist_device_t(), m_last_state(0), m_active(1), m_ttp(ttbl), m_desc(desc)
+	: netlist_device_t(), m_last_state(0), m_ign(0), m_active(1), m_ttp(ttbl), m_desc(desc)
 	{
 	}
 
@@ -65,6 +67,7 @@ public:
 				register_output(out[i].trim(), m_Q[i]);
 			}
 		}
+		m_ign = 0;
 		setup_tt();
 		// FIXME: save state
 	}
@@ -164,76 +167,96 @@ public:
 			ttline = pstring(truthtable[0]);
 			truthtable++;
 		}
+#if 0
 		for (int j=0; j < m_size; j++)
 			printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
 					m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j][0]);
 		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero; k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
-
+#endif
 		m_ttp->m_initialized = true;
 
 	}
 
 	ATTR_COLD void reset()
 	{
-		//m_Q.initial(1);
 		m_active = 1;
 		m_last_state = 0;
 	}
 
-	ATTR_HOT ATTR_ALIGN void update()
+	template<bool doOUT>
+	ATTR_HOT inline void process()
 	{
-		// FIXME: this check is needed because update is called during startup as well
-		//if (m_active == 0 && UNEXPECTED(netlist().use_deactivate()))
-		//	return;
+
+		netlist_time mt = netlist_time::zero;
 
 		UINT32 state = 0;
 		for (int i = 0; i < m_NI; i++)
 		{
-			m_i[i].activate();
+			if (!doOUT || (m_ign & (1<<i)) != 0)
+				m_i[i].activate();
 			state |= (INPLOGIC(m_i[i]) << i);
+		}
+
+		if (!doOUT)
+		{
+			for (int i = 0; i< m_NI; i++)
+			{
+				if (this->m_i[i].net().time() > mt)
+					mt = this->m_i[i].net().time();
+			}
 		}
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);
 		const UINT32 out = m_ttp->m_outs[nstate] & ((1 << m_NO) - 1);
-		const UINT32 ign = m_ttp->m_outs[nstate] >> m_NO;
+		m_ign = m_ttp->m_outs[nstate] >> m_NO;
 		if (has_state)
 			m_last_state = (state << m_NO) | out;
 
 		for (int i = 0; i < m_NI; i++)
-			if (ign & (1 << i))
+			if (m_ign & (1 << i))
 				m_i[i].inactivate();
 
-		for (int i = 0; i < m_NO; i++)
-			OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[nstate][i]]);
+		if (doOUT)
+		{
+			for (int i = 0; i < m_NO; i++)
+				OUTLOGIC(m_Q[i], (out >> i) & 1, m_ttp->m_timing_nt[m_ttp->m_timing[nstate][i]]);
+		}
+		else
+			for (int i = 0; i < m_NO; i++)
+				m_Q[i].net().set_Q_time((out >> i) & 1, mt + m_ttp->m_timing_nt[m_ttp->m_timing[nstate][i]]);
+
 	}
 
+	ATTR_HOT ATTR_ALIGN void update()
+	{
+		process<true>();
+	}
 
 	ATTR_HOT void inc_active()
 	{
 		nl_assert(netlist().use_deactivate());
-		if (++m_active == 1)
-		{
-			update();
-		}
+		if (has_state == 0)
+			if (++m_active == 1)
+				process<false>();
 	}
 
 	ATTR_HOT void dec_active()
 	{
 		nl_assert(netlist().use_deactivate());
-		if (--m_active == 0)
-		{
-			for (int i = 0; i< m_NI; i++)
-				m_i[i].inactivate();
-		}
+		if (has_state == 0)
+			if (--m_active == 0)
+				for (int i = 0; i< m_NI; i++)
+					m_i[i].inactivate();
 	}
 
-	netlist_ttl_input_t m_i[m_NI];
-	netlist_ttl_output_t m_Q[m_NO];
+	netlist_logic_input_t m_i[m_NI];
+	netlist_logic_output_t m_Q[m_NO];
 
 private:
 
 	UINT32 m_last_state;
+	UINT32 m_ign;
 	INT32 m_active;
 
 	truthtable_t *m_ttp;

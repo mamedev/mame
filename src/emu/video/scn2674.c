@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     SCN2674 - Advanced Video Display Controller (AVDC)  (Video Chip)
 */

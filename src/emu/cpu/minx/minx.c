@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
   Implementation for the Nintendo Minx CPU.
 

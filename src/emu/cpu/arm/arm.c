@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /* arm.c
 
     ARM 2/3/6 Emulation (26 bit address bus)

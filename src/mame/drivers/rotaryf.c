@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Barry Rodewald
 /* Rotary Fighter, 01/1979, Kasco (Kansai Seiki Seisakusho Co.)
  board KIV-101 CPU: xtal(??mhz), i8085A, 40 pin IC(i8255?), 6*ROM, 1*RAM, DIP(8 switches), ..
  board KIV-101 CRT: 2*RAM, lots of 74xx TTL
@@ -40,11 +42,11 @@ public:
 
 	bool m_flipscreen;
 	UINT8 m_last;
-	
+
 	virtual void machine_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 };
 

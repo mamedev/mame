@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     pc_vga.h
@@ -175,8 +177,8 @@ protected:
 	/**/    UINT8 sldiv;
 	/**/    UINT8 map14;
 	/**/    UINT8 map13;
-	/**/	UINT8 irq_clear;
-	/**/	UINT8 irq_disable;
+	/**/    UINT8 irq_clear;
+	/**/    UINT8 irq_disable;
 		} crtc;
 
 		struct

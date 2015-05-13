@@ -4,36 +4,33 @@
 
     Commodore 2040/3040/4040 Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*
 
-	2040/3040 disk initialization
-	-----------------------------
-	You need to initialize each diskette before trying to access it
-	or you will get a DISK ID MISMATCH error upon disk commands.
-	On the 4040 this is done automatically by the DOS.
+    2040/3040 disk initialization
+    -----------------------------
+    You need to initialize each diskette before trying to access it
+    or you will get a DISK ID MISMATCH error upon disk commands.
+    On the 4040 this is done automatically by the DOS.
 
-	open 15,8,15:print 15,"i":close 15
+    open 15,8,15:print 15,"i":close 15
 
-	List directory
-	--------------
-	directory / diR
+    List directory
+    --------------
+    directory / diR
 
-	Format disk
-	-----------
-	header "label,id",d0,i01
+    Format disk
+    -----------
+    header "label,id",d0,i01
 
-	Load file
-	---------
-	dload "name" / dL"name
+    Load file
+    ---------
+    dload "name" / dL"name
 
-	Save file
-	---------
-	dsave "name" / dS"name
+    Save file
+    ---------
+    dsave "name" / dS"name
 
 */
 

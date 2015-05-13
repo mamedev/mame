@@ -39,19 +39,26 @@
 #include "nld_signal.h"
 
 #define TTL_74175(_name)                                     \
-		NET_REGISTER_DEV(74175, _name)                       \
-
+		NET_REGISTER_DEV(74175, _name)
 #define TTL_74175_DIP(_name)                                 \
 		NET_REGISTER_DEV(74175_dip, _name)
 
+
+NETLIB_SUBDEVICE(74175_sub,
+
+	netlist_logic_input_t m_CLK;
+	netlist_logic_output_t m_Q[4];
+	netlist_logic_output_t m_QQ[4];
+
+	netlist_sig_t m_clrq;
+	UINT8 m_data;
+);
+
 NETLIB_DEVICE(74175,
 
-	netlist_state_t<UINT8> m_last;
-	netlist_ttl_input_t m_D[4];
-	netlist_ttl_input_t m_CLRQ;
-	netlist_ttl_input_t m_CLK;
-	netlist_ttl_output_t m_Q[4];
-	netlist_ttl_output_t m_QQ[4];
+	NETLIB_NAME(74175_sub) m_sub;
+	netlist_logic_input_t m_D[4];
+	netlist_logic_input_t m_CLRQ;
 );
 
 NETLIB_DEVICE_DERIVED(74175_dip, 74175,

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet, Brett Wyer
 /*****************************************************************************
  *
  * includes/concept.h

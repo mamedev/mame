@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 INLINE void video_filter16(int *out_r, int *out_g, int *out_b, UINT16* vbuff, UINT8* hbuff, const UINT32 hres);
 INLINE void divot_filter16(UINT8* r, UINT8* g, UINT8* b, UINT16* fbuff, UINT32 fbuff_index);
 INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 fbuff_index, UINT32 hres);

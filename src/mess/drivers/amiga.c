@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Commodore Amiga
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
 ***************************************************************************/
 

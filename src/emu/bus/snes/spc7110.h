@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __SNS_SPC7110_H
 #define __SNS_SPC7110_H
 

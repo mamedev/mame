@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 
     ui/devctrl.h
@@ -13,9 +15,6 @@
     users to pass from a device to another one by simply pressing left/right
     and the menu is rebuilt accordingly, without the need of a preliminary
     submenu listing available devices of the same kind.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski, Andrea Mazzoleni
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/retofinv.h"

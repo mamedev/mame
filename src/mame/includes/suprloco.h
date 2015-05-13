@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 class suprloco_state : public driver_device
 {
 public:

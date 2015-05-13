@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 /* 3com Etherlink II 3c503 */
 
 #ifndef __3C503_H__

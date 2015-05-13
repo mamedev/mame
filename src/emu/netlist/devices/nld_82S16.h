@@ -27,21 +27,22 @@
 #include "../nl_base.h"
 
 #define TTL_82S16(_name)                                     \
-		NET_REGISTER_DEV(82S16, _name)                       \
-
+		NET_REGISTER_DEV(82S16, _name)
 #define TTL_82S16_DIP(_name)                                 \
 		NET_REGISTER_DEV(82S16_dip, _name)
 
 NETLIB_DEVICE(82S16,
 
+	netlist_logic_input_t m_A[8];
+	netlist_logic_input_t m_CE1Q;
+	netlist_logic_input_t m_CE2Q;
+	netlist_logic_input_t m_CE3Q;
+	netlist_logic_input_t m_WEQ;
+	netlist_logic_input_t m_DIN;
+	netlist_logic_output_t m_DOUTQ;
+
+	//netlist_state_t<UINT8[256]> m_ram;
 	UINT8 m_ram[256];
-	netlist_ttl_input_t m_A[8];
-	netlist_ttl_input_t m_CE1Q;
-	netlist_ttl_input_t m_CE2Q;
-	netlist_ttl_input_t m_CE3Q;
-	netlist_ttl_input_t m_WEQ;
-	netlist_ttl_input_t m_DIN;
-	netlist_ttl_output_t m_DOUTQ;
 );
 
 NETLIB_DEVICE_DERIVED(82S16_dip, 82S16,

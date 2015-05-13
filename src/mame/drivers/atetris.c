@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
     Atari Tetris hardware

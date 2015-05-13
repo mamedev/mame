@@ -4,9 +4,6 @@
 
     Commodore 8280 Dual 8" Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -30,7 +27,7 @@
 // ======================> c8280_device
 
 class c8280_device :  public device_t,
-					  public device_ieee488_interface
+						public device_ieee488_interface
 {
 public:
 	// construction/destruction

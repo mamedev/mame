@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
     Excellent Systems Sprite chip
 

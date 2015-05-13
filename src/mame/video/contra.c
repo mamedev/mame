@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Carlos A. Lozano, Phil Stroffolino
 /***************************************************************************
 
     video/contra.c

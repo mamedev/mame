@@ -1,11 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Stephh, Dirk Best
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)
 
    The CuboCD32 is a stock retail CD32 unit with additional hardware to adapt it
    for JAMMA use.
-
-   copyright-holders: Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Stephh, Dirk Best
 
    Known Games:
    Title                | rev. | year

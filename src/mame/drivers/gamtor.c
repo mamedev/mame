@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Novomatic CoolFire I */
 /* Austrian gaming system - used late 2002 - early 2008? */
 

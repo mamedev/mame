@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __NES_CONY_H
 #define __NES_CONY_H
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 class clshroad_state : public driver_device
 {
 public:
@@ -28,7 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(vram_0_w);
 	DECLARE_WRITE8_MEMBER(vram_1_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info_0a);
 	TILE_GET_INFO_MEMBER(get_tile_info_0b);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_extra);

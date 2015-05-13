@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* 68340 DMA module */
 
 #include "emu.h"

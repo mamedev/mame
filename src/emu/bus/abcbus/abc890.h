@@ -4,9 +4,6 @@
 
     Luxor ABC 890 bus expander emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once
@@ -26,7 +23,7 @@
 // ======================> abc890_t
 
 class abc890_t :  public device_t,
-				  public device_abcbus_card_interface
+					public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

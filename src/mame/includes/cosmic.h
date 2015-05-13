@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Cosmic Guerilla & other Universal boards (in cosmic.c)

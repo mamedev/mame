@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	std::string tempfooter(tempheader);
-	tempfooter = tempfooter.substr(result + 14); 
+	tempfooter = tempfooter.substr(result + 14);
 	tempfooter = tempheader.substr(0, result);
 
 	/* loop over arguments and read the files */

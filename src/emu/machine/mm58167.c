@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /**********************************************************************
 
     mm58167.c - National Semiconductor MM58167 real-time clock emulation

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /**********************************************************************
 
     Rockwell 6522 VIA interface and emulation

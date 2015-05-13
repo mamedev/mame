@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
   Fast Freddie/Jump Coaster hardware

@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_7430.c
  *
@@ -7,7 +9,7 @@
 
 NETLIB_START(7430_dip)
 {
-	register_sub(m_1, "1");
+	register_sub("1", m_1);
 
 	register_subalias("1", m_1.m_i[0]);
 	register_subalias("2", m_1.m_i[1]);

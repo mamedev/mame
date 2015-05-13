@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* .LVT tape images */
 #include <assert.h>
 

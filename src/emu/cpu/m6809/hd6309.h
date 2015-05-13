@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*********************************************************************
 
     hd6309.h

@@ -1,12 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer,R. Belmont
 /*
  * 3c505.c - 3COM 3C505 ethernet controller (for Apollo DN3x00)
  *
  *  Created on: August 27, 2010
  *      Author: Hans Ostermeyer
  *      ISA conversion by R. Belmont
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  *  see also:
  *  - http://lxr.free-electrons.com/source/drivers/net/3c505.h

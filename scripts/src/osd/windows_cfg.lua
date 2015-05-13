@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 defines {
 	"OSD_WINDOWS",
 	"_WIN32_WINNT=0x0501",

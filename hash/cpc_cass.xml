@@ -3,7 +3,7 @@
 
 <!-- Amstrad CPC 464 / 464+ etc. Tapes -->
 
-<!-- 
+<!--
 
 List Revision History:
 
@@ -18,7 +18,7 @@ STILL TO DO:
 
 -->
 
-<!-- 
+<!--
 
 The following tapes have only been made available as separate data blocks and they need to be properly dumped.
 Please stick to using the floppy versions for the time being...
@@ -101,7 +101,7 @@ Please stick to using the floppy versions for the time being...
 
 -->
 
-<!-- 
+<!--
 
     Loading Instructions are documented in the <info> field below. Typically these consist, when the system has a disk drive
     (as the MESS drivers do have by default), in typing
@@ -109,16 +109,16 @@ Please stick to using the floppy versions for the time being...
     and then in typing
       run""
     and press return. The latter part can be replaced by using the CPC keyboard shortcut 'Ctrl' + the numeric keypad 'Enter'
-    (in both the real system and MESS, such shortcut is equivalent to the RUN"" command). 
+    (in both the real system and MESS, such shortcut is equivalent to the RUN"" command).
     Notice that the '|' key necessary for the former part is mapper to the key on the left of 'P' of your keyboard (corresponding
     to '{' in most English keyboards).
 
-    To start/stop the tape you can either use the emulation shortcuts for Tape Play and Tape Stop by default mapped to 
-    'F2' and 'Shift'+'F2', or use the Tape Control options in the MESS internal menu, accessible by entering partial keyboard 
+    To start/stop the tape you can either use the emulation shortcuts for Tape Play and Tape Stop by default mapped to
+    'F2' and 'Shift'+'F2', or use the Tape Control options in the MESS internal menu, accessible by entering partial keyboard
     mode (press 'Scroll Lock' on your keyboard) and then pressing 'TAB'.
 
     Notice that you can speed up the loading process by pressing the FFWD key (by default mapped to 'Insert' on  your keyboard)
-    or by unthrottling emulation until the tape is fully loaded. 
+    or by unthrottling emulation until the tape is fully loaded.
 
 -->
 
@@ -127,9 +127,9 @@ Please stick to using the floppy versions for the time being...
 <softwarelist name="cpc_cass" description="Amstrad CPC cassettes">
 
 
-<!-- 
+<!--
 
-  Games 
+  Games
 
 -->
 
@@ -450,7 +450,7 @@ Please stick to using the floppy versions for the time being...
 		<year>1985</year>
 		<publisher>Amsoft</publisher>
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
-		<info name="alt_title" value="3D Boxkampf" />		<part name="cass1" interface="cpc_cass">
+		<info name="alt_title" value="3D Boxkampf" />       <part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="58470">
 				<rom name="3d boxing (uk) (1985) [original] [tape].cdt" size="58470" crc="19182316" sha1="adc783a37568ae81fcaa3c7a0af80b08258c038c" offset="0" />
 			</dataarea>
@@ -30818,7 +30818,7 @@ Please stick to using the floppy versions for the time being...
 	<software name="saicombt" supported="no">
 		<description>Sai Combat (UK)</description>
 		<year>1986</year>
-		<publisher>Mirrorsoft / Silverbird</publisher>	<!-- Both releases contain the same tape! -->
+		<publisher>Mirrorsoft / Silverbird</publisher>  <!-- Both releases contain the same tape! -->
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="71691">
@@ -38331,7 +38331,7 @@ Please stick to using the floppy versions for the time being...
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="troglo" supported="no">
 		<description>Troglo (Spa)</description>
 		<year>1986</year>
@@ -43825,7 +43825,7 @@ Covertapes
 		<description>Advanced Lawnmowing Simulator (UK)</description>
 		<year>2010</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-        <info name="developer" value="Devilmarkus" />
+		<info name="developer" value="Devilmarkus" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="27727">
@@ -43903,7 +43903,7 @@ Covertapes
 		<description>Blue Angel 69 (UK)</description>
 		<year>2010</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-        <info name="developer" value="Kevin Thacker" />
+		<info name="developer" value="Kevin Thacker" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="81485">
@@ -43921,7 +43921,7 @@ Covertapes
 		<description>Breaking Baud Demo (UK)</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-        <info name="developer" value="Doz" />
+		<info name="developer" value="Doz" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="110186">
@@ -44147,7 +44147,7 @@ Covertapes
 		<description>Jetpac (UK, v1.1, Converted from ZX)</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-        <info name="developer" value="40CRISIS" />
+		<info name="developer" value="40CRISIS" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="18811">
@@ -44160,7 +44160,7 @@ Covertapes
 		<description>Jetpac (UK, Converted from ZX)</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-        <info name="developer" value="40CRISIS" />
+		<info name="developer" value="40CRISIS" />
 		<info name="usage" value="Load with |TAPE and then RUN&quot;&quot;" />
 		<part name="cass1" interface="cpc_cass">
 			<dataarea name="cass" size="18247">
@@ -44575,10 +44575,10 @@ Covertapes
 
 
 
-<!-- 
+<!--
 
-	Misc tapes not confirmed at CPC-Power
-	
+    Misc tapes not confirmed at CPC-Power
+
 -->
 
 

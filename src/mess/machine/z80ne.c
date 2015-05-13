@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Lavarone
 /***********************************************************************
 
     machine/z80ne.c

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef I286_H_
 #define I286_H_
 

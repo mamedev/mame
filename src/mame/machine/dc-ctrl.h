@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _DC_CTRL_H_
 #define _DC_CTRL_H_
 

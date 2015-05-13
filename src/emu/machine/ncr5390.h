@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef NCR5390_H
 #define NCR5390_H
 

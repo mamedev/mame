@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, Richter Belmont
 
 #include "emu.h"
 #include "debugger.h"

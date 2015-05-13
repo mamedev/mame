@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
 /*****************************************************************************
  *
  * includes/mac.h

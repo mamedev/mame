@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tim Schuerewegen
 /*******************************************************************************
 
     Samsung S3C44B0

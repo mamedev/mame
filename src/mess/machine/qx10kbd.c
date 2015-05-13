@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 // TODO: dump 8049 mcu; key repeat
 
 #include "machine/qx10kbd.h"

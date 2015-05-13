@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Witch / Pinball Champ '95

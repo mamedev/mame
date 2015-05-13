@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
  Taito Discrete Hardware Games

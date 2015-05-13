@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class sprcros2_state : public driver_device
 {
 public:

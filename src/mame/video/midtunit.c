@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi, Aaron Giles
 /*************************************************************************
 
     Driver for Midway T-unit games.

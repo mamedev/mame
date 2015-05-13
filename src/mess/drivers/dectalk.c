@@ -1,4 +1,4 @@
-// license:MAME|LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
 /******************************************************************************
 *
@@ -11,27 +11,6 @@
 *  http://bitsavers.org/pdf/dec/dectalk/MP-01820_DTC01_EngrDrws_Nov83.pdf
 *  which has been invaluable for work on this driver.
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
-*
-*
-*  This source file is dual-licensed under the following licenses:
-*  1. The MAME license as of September 2013
-*  2. The GNU LGPLv2.1:
-*
-*  This library is free software; you can redistribute it and/or
-*  modify it under the terms of the GNU Lesser General Public
-*  License as published by the Free Software Foundation; either
-*  version 2.1 of the License, or (at your option) any later version.
-*
-*  This library is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-*  Lesser General Public License for more details.
-*
-*  You should have received a copy of the GNU Lesser General Public
-*  License along with this library; if not, write to the Free Software
-*  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*
-*  Please contact the author if you require other licensing.
 *
 *
 *  This driver dedicated in memory of Dennis Klatt and Jonathan Allen, without whose

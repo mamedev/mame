@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* video/macrossp.c */
 
 #include "emu.h"

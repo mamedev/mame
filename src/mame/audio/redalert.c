@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Balfour
 /***************************************************************************
 
     Irem Red Alert hardware

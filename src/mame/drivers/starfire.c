@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Daniel Boris, Olivier Galibert, Aaron Giles
 /***************************************************************************
 
     Star Fire/Fire One system

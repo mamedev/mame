@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __MICRODISC_H__
 #define __MICRODISC_H__
 

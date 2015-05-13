@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 #include "sound/msm5205.h"
 #include "video/tecmo_spr.h"
 

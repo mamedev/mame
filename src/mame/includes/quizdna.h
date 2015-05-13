@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Uki
 class quizdna_state : public driver_device
 {
 public:
@@ -15,7 +17,7 @@ public:
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_generic_paletteram_8;
-	
+
 	UINT8 *m_bg_ram;
 	UINT8 *m_fg_ram;
 	tilemap_t *m_bg_tilemap;
@@ -32,7 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(screen_ctrl_w);
 	DECLARE_WRITE8_MEMBER(paletteram_xBGR_RRRR_GGGG_BBBB_w);
 	DECLARE_WRITE8_MEMBER(rombank_w);
-	
+
 	// game specific
 	DECLARE_WRITE8_MEMBER(gekiretu_rombank_w);
 

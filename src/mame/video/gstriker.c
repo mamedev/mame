@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Farfetch, David Haywood
 #include "emu.h"
 #include "includes/gstriker.h"
 

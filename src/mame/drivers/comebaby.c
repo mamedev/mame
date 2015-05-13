@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Come On Baby
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 

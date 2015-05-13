@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Karl Stenerud, hap
 #include "emu.h"
 #include "debugger.h"
 #include "m37710cm.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Couriersud
 /***************************************************************************
 
 Pong (c) 1972 Atari
@@ -16,6 +18,8 @@ TODO: please see netlist include files
 #include "netlist/devices/net_lib.h"
 #include "sound/dac.h"
 #include "video/fixfreq.h"
+
+#include "breakout.lh"
 
 /*
  * H count width to 512
@@ -42,13 +46,35 @@ TODO: please see netlist include files
  */
 
 #define MASTER_CLOCK    7159000
-#define V_TOTAL         (0x105+1)       // 262
-#define H_TOTAL         (0x1C6+1)       // 454
+#define V_TOTAL_PONG         (0x105+1)       // 262
+#define H_TOTAL_PONG         (0x1C6+1)       // 454
 
-#define HBSTART                 (H_TOTAL)
+/*
+ * Breakout's H1 signal:
+ *
+ *  __    _    __    _    __    _
+ * |  |__| |__|  |__| |__|  |__| |_
+ *  2  2  1  2  2  2 1  2  2  2 1
+ *
+ *  ==> Pixel width is 2:2:1:2:2:1:2:2 .....
+ *
+ *  4 Pixels = 7 cycles ==> 256 / 4 * 7 = 448
+ *
+ *  7 cycles ==> 14 Y1 cycles
+ *
+ */
+
+#define MASTER_CLOCK_BREAKOUT    (14318000 / 2)
+
+#define V_TOTAL_BREAKOUT         (0xFC)       // 252
+#define H_TOTAL_BREAKOUT         (448)    // 448
+
+#if 0
+#define HBSTART                 (H_TOTAL_PONG)
 #define HBEND                   (80)
-#define VBSTART                 (V_TOTAL)
+#define VBSTART                 (V_TOTAL_PONG)
 #define VBEND                   (16)
+#endif
 
 enum input_changed_enum
 {
@@ -71,7 +97,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_video(*this, "fixfreq"),
-
 			m_dac(*this, "dac")                /* just to have a sound device */
 	{
 	}
@@ -131,8 +156,53 @@ class breakout_state : public ttl_mono_state
 {
 public:
 	breakout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ttl_mono_state(mconfig, type, tag)
+		: ttl_mono_state(mconfig, type, tag),
+		m_led_serve(*this, "maincpu:led_serve"),
+		m_lamp_credit1(*this, "maincpu:lamp_credit1"),
+		m_lamp_credit2(*this, "maincpu:lamp_credit2"),
+		m_coin_counter(*this, "maincpu:coin_counter"),
+		m_sw1_1(*this, "maincpu:sw1_1"),
+		m_sw1_2(*this, "maincpu:sw1_2"),
+		m_sw1_3(*this, "maincpu:sw1_3"),
+		m_sw1_4(*this, "maincpu:sw1_4")
 	{
+	}
+	required_device<netlist_mame_analog_output_t> m_led_serve;
+	required_device<netlist_mame_analog_output_t> m_lamp_credit1;
+	required_device<netlist_mame_analog_output_t> m_lamp_credit2;
+	required_device<netlist_mame_analog_output_t> m_coin_counter;
+
+	required_device<netlist_mame_logic_input_t> m_sw1_1;
+	required_device<netlist_mame_logic_input_t> m_sw1_2;
+	required_device<netlist_mame_logic_input_t> m_sw1_3;
+	required_device<netlist_mame_logic_input_t> m_sw1_4;
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(serve_cb)
+	{
+		output_set_value("serve_led", (data < 3.5) ? 1 : 0);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(credit1_cb)
+	{
+		output_set_value("lamp_credit1", (data < 2.0) ? 0 : 1);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(credit2_cb)
+	{
+		output_set_value("lamp_credit2", (data < 2.0) ? 0 : 1);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
+	{
+		coin_counter_w(machine(), 0, (data > 2.0) ? 0 : 1);
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(cb_free_play)
+	{
+		m_sw1_1->write((newval>>0) & 1);
+		m_sw1_2->write((newval>>1) & 1);
+		m_sw1_3->write((newval>>2) & 1);
+		m_sw1_4->write((newval>>3) & 1);
 	}
 
 protected:
@@ -220,31 +290,43 @@ static INPUT_PORTS_START( pongd )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( breakout )
-#if 0
+
 	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot0")
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(1) PORT_KEYDELTA(200) PORT_CENTERDELTA(0)   NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot1")
 
 	PORT_START( "PADDLE1" ) /* fake input port for player 2 paddle */
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(2) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot1")
-#endif
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(1) PORT_KEYDELTA(200) PORT_CENTERDELTA(0) PORT_PLAYER(2) NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot2")
+
 	PORT_START("IN0") /* fake as well */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw1")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw2")
-
-#if 0
-	PORT_DIPNAME( 0x06, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1B:1") PORT_CHANGED_MEMBER(DEVICE_SELF, pong_state, input_changed, IC_SWITCH)
-	PORT_DIPSETTING(    0x00, "11" )
-	PORT_DIPSETTING(    0x06, "15" )
-
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "servesw")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Antenna") NETLIST_LOGIC_PORT_CHANGED("maincpu", "antenna")
 
-	PORT_START("VR1")
-	PORT_ADJUSTER( 50, "VR1 - 50k, Paddle 1 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr0")
-	PORT_START("VR2")
-	PORT_ADJUSTER( 50, "VR2 - 50k, Paddle 2 adjustment" )   NETLIST_ANALOG_PORT_CHANGED("maincpu", "vr1")
-#endif
+
+	PORT_START("DIPS")
+	PORT_DIPNAME( 0x01, 0x00, "Balls" )          PORT_DIPLOCATION("SW4:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw4")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW3:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:1") NETLIST_LOGIC_PORT_CHANGED("maincpu", "sw2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CHANGED_MEMBER(DEVICE_SELF, breakout_state, cb_free_play, 0)
+	PORT_DIPSETTING(    0x00, "No Free Play" )
+	PORT_DIPSETTING(    0x10, "100" )
+	PORT_DIPSETTING(    0x20, "200" )
+	PORT_DIPSETTING(    0x30, "300" )
+	PORT_DIPSETTING(    0x40, "400" )
+	PORT_DIPSETTING(    0x50, "500" )
+	PORT_DIPSETTING(    0x60, "600" )
+	PORT_DIPSETTING(    0x70, "700" )
+	PORT_DIPSETTING(    0x80, "800" )
+
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( pong, pong_state )
@@ -270,8 +352,8 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")
 	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
 	MCFG_FIXFREQ_FIELDCOUNT(1)
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.31)
 
@@ -287,33 +369,46 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(breakout)
-#if 0
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "ic_b9_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "ic_a9_POT.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0, 0x01)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0, 0x01)
-#endif
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw1", "COIN1_SW.POS", 0, 0x01)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw2", "COIN2_SW.POS", 0, 0x01)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw1", "START1_SW.POS", 0, 0x01)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw2", "START2_SW.POS", 0, 0x01)
-#if 0
+
+	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "POTP1.DIAL")
+	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "POTP2.DIAL")
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw1", "COIN1.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw2", "COIN2.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw1", "START1.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw2", "START2.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "servesw", "SERVE.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw4", "S4.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw3", "S3.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw2", "S2.POS", 0, 0x01)
+
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_1", "S1_1.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_2", "S1_2.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_3", "S1_3.POS", 0, 0x01)
+	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_4", "S1_4.POS", 0, 0x01)
+
 	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
-#endif
+
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", breakout_state, sound_cb, "")
 	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
 
+	// Leds and lamps
+
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "led_serve", "CON_P", breakout_state, serve_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit1", "CON_CREDIT1", breakout_state, credit1_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit2", "CON_CREDIT2", breakout_state, credit2_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "coin_counter", "CON_T", breakout_state, coin_counter_cb, "")
+
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
+	 * Thus we must use double resolution horizontally
+	 */
+	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK_BREAKOUT*2)
+	MCFG_FIXFREQ_HORZ_PARAMS((H_TOTAL_BREAKOUT-104)*2,(H_TOTAL_BREAKOUT-72)*2,(H_TOTAL_BREAKOUT-8)*2,  (H_TOTAL_BREAKOUT)*2)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-23,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT)
 	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(1.0)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(1.2)
+	MCFG_FIXFREQ_GAIN(1.5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -360,8 +455,8 @@ static MACHINE_CONFIG_START( pongd, pong_state )
 	/* video hardware */
 	MCFG_FIXFREQ_ADD("fixfreq", "screen")
 	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-52,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
 	MCFG_FIXFREQ_FIELDCOUNT(1)
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.31)
 
@@ -384,7 +479,7 @@ ROM_START( pong ) /* dummy to satisfy game entry*/
 ROM_END
 
 ROM_START( breakout )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( pongf ) /* dummy to satisfy game entry*/
@@ -398,4 +493,4 @@ ROM_END
 GAME( 1972, pong,      0, pong,     pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) external [TTL]", GAME_SUPPORTS_SAVE)
 GAME( 1972, pongf,     0, pongf,    pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) [TTL]", GAME_SUPPORTS_SAVE )
 GAME( 1974, pongd,     0, pongd,    pongd,     driver_device,  0, ROT0,  "Atari", "Pong Doubles [TTL]", GAME_SUPPORTS_SAVE )
-GAME( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout [TTL]", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING)
+GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout [TTL]", GAME_SUPPORTS_SAVE, layout_breakout)

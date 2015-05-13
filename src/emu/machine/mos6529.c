@@ -4,9 +4,6 @@
 
     MOS Technology 6529 Single Port Interface Adapter emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mos6529.h"

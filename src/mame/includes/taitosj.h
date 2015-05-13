@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/dac.h"
 
 class taitosj_state : public driver_device

@@ -4,9 +4,6 @@
 
     Commodore 64 User Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "user.h"

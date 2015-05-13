@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         MZ80 driver by Miodrag Milanovic

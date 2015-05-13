@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /*****************************************************************************************
 
     NES Cart PCBs Emulation
@@ -313,7 +315,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "coolboy",          UNSUPPORTED_BOARD },
-	{ "btl_900218",       UNSUPPORTED_BOARD },	// pirate The Lord of King, to be emulated soon
+	{ "btl_900218",       UNSUPPORTED_BOARD },  // pirate The Lord of King, to be emulated soon
 	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "dance2k",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },

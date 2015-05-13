@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Paul Priest
 /*
 
 Psikyo PS6807 (PS4):

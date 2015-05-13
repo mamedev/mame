@@ -4,9 +4,6 @@
 
     Luxor ABC 1600 Mover emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "includes/abc1600.h"

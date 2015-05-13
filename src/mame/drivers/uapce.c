@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mariusz Wojcieszek
 /*
 
     United Amusements PC-Engine based hardware

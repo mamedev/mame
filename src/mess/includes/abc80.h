@@ -58,8 +58,8 @@
 #define Z80PIO_TAG          "cd67"
 #define SN76477_TAG         "g8"
 #define RS232_TAG           "ser"
-#define CASSETTE_TAG 		"cassette"
-#define KEYBOARD_TAG 		"keyboard"
+#define CASSETTE_TAG        "cassette"
+#define KEYBOARD_TAG        "keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
 
 class abc80_state : public driver_device

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /* register names for apexc_get_reg & apexc_set_reg */
 #pragma once
 

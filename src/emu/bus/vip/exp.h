@@ -4,9 +4,6 @@
 
     RCA Cosmac VIP Expansion Interface emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                   CLOCK       1      A       _MWR

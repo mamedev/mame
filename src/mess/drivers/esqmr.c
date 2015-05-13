@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     esqmr.c - Ensoniq MR-61, MR-76, and MR-Rack

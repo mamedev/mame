@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 /*
 
 Calorie-Kun

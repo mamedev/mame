@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Video System Sprites
 
 typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;

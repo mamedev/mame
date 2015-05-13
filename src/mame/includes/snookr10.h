@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 class snookr10_state : public driver_device
 {
 public:

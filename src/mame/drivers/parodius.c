@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
     Parodius (Konami GX955) (c) 1990 Konami

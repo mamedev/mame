@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
 /***************************************************************************
 
         DEC VT520
@@ -31,7 +33,7 @@ static ADDRESS_MAP_START(vt520_mem, AS_PROGRAM, 8, vt520_state)
 ADDRESS_MAP_END
 
 /*
-    On the boardthere is TC160G41AF (1222) custom chip
+    On the board there is TC160G41AF (1222) custom chip
     doing probably all video/uart logic
     there is 43.430MHz xtal near by
 */

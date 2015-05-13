@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 /**********************************************************************************************************
 
 PACHI FEVER / (c) 1983 SANKI DENSHI KOGYO

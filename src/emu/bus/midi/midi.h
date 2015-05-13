@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 #ifndef __BUS_MIDI_H__
 #define __BUS_MIDI_H__
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Coates
 /***************************************************************************
 
 Rainbow Islands  (c) Taito 1987   + Jumping

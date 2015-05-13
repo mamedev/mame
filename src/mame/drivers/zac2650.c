@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Coates
 /*
  * Signetics 2650 CPU Games
  *

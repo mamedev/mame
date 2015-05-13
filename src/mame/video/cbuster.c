@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
    Crude Buster Video emulation - Bryan McPhail, mish@tendril.co.uk

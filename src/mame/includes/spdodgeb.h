@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Hampson, Nicola Salmoria
 /*************************************************************************
 
     Super Dodge Ball hardware

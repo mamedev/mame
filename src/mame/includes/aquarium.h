@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
 

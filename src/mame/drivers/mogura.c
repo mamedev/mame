@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Mogura Desse */
 
 #include "emu.h"

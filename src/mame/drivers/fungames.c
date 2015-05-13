@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
  Fun Games discrete hardware games

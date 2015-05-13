@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 
 UINT32 nec_common_device::EA_000() { m_EO=Wreg(BW)+Wreg(IX); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }
 UINT32 nec_common_device::EA_001() { m_EO=Wreg(BW)+Wreg(IY); m_EA=DefaultBase(DS0)+m_EO; return m_EA; }

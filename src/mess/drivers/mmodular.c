@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ralf Schaefer
 /******************************************************************************
  Mephisto Chess Computers using plugin modules
 

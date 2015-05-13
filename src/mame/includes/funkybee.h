@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 
 
 class funkybee_state : public driver_device

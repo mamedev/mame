@@ -4,9 +4,6 @@
 
     Zilog Z80 Parallel Input/Output Controller implementation
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************
                             _____   _____
                     D2   1 |*    \_/     | 40  D3

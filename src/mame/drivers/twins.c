@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /*
 
 Twins
@@ -104,12 +106,11 @@ public:
 	UINT16 m_videoram2[0x10000 / 2];
 	UINT16 m_videorambank;
 
-	DECLARE_VIDEO_START(twins);
-	DECLARE_VIDEO_START(twinsa);
 	UINT32 screen_update_twins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start();
+	virtual void video_start();
 	UINT16* m_rom16;
 	UINT8* m_rom8;
 
@@ -282,10 +283,11 @@ static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
 ADDRESS_MAP_END
 
-VIDEO_START_MEMBER(twins_state,twins)
+void twins_state::video_start()
 {
+	m_paloff = 0;
+	
 	save_item(NAME(m_paloff));
-
 	save_item(NAME(m_spritesinit));
 	save_item(NAME(m_spriteswidth));
 	save_item(NAME(m_spritesaddr));
@@ -394,8 +396,6 @@ static MACHINE_CONFIG_START( twins, twins_state )
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_VIDEO_START_OVERRIDE(twins_state,twins)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -406,13 +406,6 @@ static MACHINE_CONFIG_START( twins, twins_state )
 MACHINE_CONFIG_END
 
 /* The second set has different palette hardware and a different port map */
-
-
-VIDEO_START_MEMBER(twins_state,twinsa)
-{
-	save_item(NAME(m_paloff));
-	m_paloff = 0;
-}
 
 
 
@@ -452,8 +445,6 @@ static MACHINE_CONFIG_START( twinsa, twins_state )
 	MCFG_RAMDAC_SPLIT_READ(0)
 
 	MCFG_24C02_ADD("i2cmem")
-
-	MCFG_VIDEO_START_OVERRIDE(twins_state,twinsa)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -513,10 +504,10 @@ WRITE16_MEMBER(twins_state::spider_port_1c_w)
 //  otherwise you get garbage sprites between rounds and the bg incorrectly wiped
 
 	UINT16* vram;
-//	if (m_videorambank & 1)
+//  if (m_videorambank & 1)
 		vram = m_videoram2;
-//	else
-//		vram = m_videoram;
+//  else
+//      vram = m_videoram;
 
 	for (int i = 0; i < 0x8000; i++)
 	{
@@ -580,8 +571,6 @@ static MACHINE_CONFIG_START( spider, twins_state )
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_VIDEO_START_OVERRIDE(twins_state,twins)
-
 	MCFG_24C02_ADD("i2cmem")
 
 	/* sound hardware */
@@ -634,4 +623,4 @@ ROM_END
 GAME( 1994, twins,  0,     twins,  twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1994, twinsa, twins, twinsa, twins, driver_device, 0, ROT0, "Electronic Devices", "Twins (set 2)", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, spider,  0,     spider,  twins, driver_device, 0, ROT0, "Buena Vision", "Spider", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, spider,  0,     spider,  twins, driver_device, 0, ROT0, "Buena Vision", "Spider", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

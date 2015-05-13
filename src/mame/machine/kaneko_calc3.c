@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
  KANEKO CALC3 MCU simulation ( KANEKO CALC3 508 (74 PIN PQFP) )
 

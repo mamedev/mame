@@ -1,3 +1,6 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
+
 /* Field Combat (c)1985 Jaleco
 
     TS 2004.10.22. analog[at]op.pl

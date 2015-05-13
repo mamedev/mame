@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer, R. Belmont
 /*
  * omti8621.c - SMS OMTI 8621 disk controller (for Apollo DN3x00)
  *
@@ -5,9 +7,6 @@
  *      Author: Hans Ostermeyer
  *
  *  Converted to ISA device by R. Belmont
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  *  see also:
  *  * http://www.bitsavers.org/pdf/sms/pc/OMTI_AT_Controller_Series_Jan87.pdf

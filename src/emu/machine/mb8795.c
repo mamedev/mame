@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "emu.h"
 #include "mb8795.h"

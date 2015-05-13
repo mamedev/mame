@@ -399,7 +399,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 	if (proxy == NULL)
 	{
 		// create a new one ...
-		proxy = nl_alloc(nld_d_to_a_proxy ,out);
+		proxy = out_cast.logic_family()->create_d_a_proxy(out_cast);
 		pstring x = pstring::sprintf("proxy_da_%s_%d", out.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -417,7 +417,7 @@ nld_base_d_to_a_proxy *netlist_setup_t::get_d_a_proxy(netlist_output_t &out)
 		}
 		out.net().m_core_terms.clear(); // clear the list
 #endif
-		out.net().register_con(proxy->m_I);
+		out.net().register_con(proxy->in());
 		out_cast.set_proxy(proxy);
 
 	}
@@ -428,7 +428,8 @@ void netlist_setup_t::connect_input_output(netlist_input_t &in, netlist_output_t
 {
 	if (out.isFamily(netlist_terminal_t::ANALOG) && in.isFamily(netlist_terminal_t::LOGIC))
 	{
-		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, in);
+		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(in);
+		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, incast);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", in.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -463,8 +464,9 @@ void netlist_setup_t::connect_terminal_input(netlist_terminal_t &term, netlist_i
 	}
 	else if (inp.isFamily(netlist_terminal_t::LOGIC))
 	{
+		netlist_logic_input_t &incast = dynamic_cast<netlist_logic_input_t &>(inp);
 		NL_VERBOSE_OUT(("connect_terminal_input: connecting proxy\n"));
-		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, inp);
+		nld_a_to_d_proxy *proxy = nl_alloc(nld_a_to_d_proxy, incast);
 		pstring x = pstring::sprintf("proxy_ad_%s_%d", inp.name().cstr(), m_proxy_cnt);
 		m_proxy_cnt++;
 
@@ -724,10 +726,10 @@ void netlist_setup_t::print_stats() const
 {
 #if (NL_KEEP_STATISTICS)
 	{
-		for (netlist_setup_t::devices_list_t::entry_t *entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
+		for (netlist_core_device_t * const *entry = netlist().m_started_devices.first(); entry != NULL; entry = netlist().m_started_devices.next(entry))
 		{
 			//entry->object()->s
-			printf("Device %20s : %12d %15ld\n", entry->object()->name().cstr(), entry->object()->stat_count, (long int) entry->object()->total_time / (entry->object()->stat_count + 1));
+			printf("Device %20s : %12d %12d %15ld\n", (*entry)->name().cstr(), (*entry)->stat_call_count, (*entry)->stat_update_count, (long int) (*entry)->stat_total_time / ((*entry)->stat_update_count + 1));
 		}
 		printf("Queue Start %15d\n", m_netlist.queue().m_prof_start);
 		printf("Queue End   %15d\n", m_netlist.queue().m_prof_end);

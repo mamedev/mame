@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Castle Mach2000 Hardware
 
   Mechanical Fruit Machines with DMD display

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /*
   OLD Seibu Cop simulation code.

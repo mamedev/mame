@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* MayGay M1A/B Software */
 
 /*

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __MSX_S1985_H
 #define __MSX_S1985_H
 

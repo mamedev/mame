@@ -1,11 +1,11 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 ---------------------------------------------------------------------------
 --
 --   machine.lua
 --
 --   Rules for building machine cores
---
---   Copyright Nicola Salmoria and the MAME Team.
---   Visit http://mamedev.org for licensing and usage restrictions.
 --
 ----------------------------------------------------------------------------
 

@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Dirk Best
 /***************************************************************************
 
     TRS-80 Radio Shack MicroColor Computer
-
-    license: MAME
-    copyright-holders: Nathan Woods, Dirk Best
 
 ***************************************************************************/
 

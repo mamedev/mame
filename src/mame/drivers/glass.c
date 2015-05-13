@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Glass (c) 1993 Gaelco (Developed by OMK. Produced by Gaelco)

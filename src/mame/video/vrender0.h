@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __VR0VIDEO_H__
 #define __VR0VIDEO_H__
 

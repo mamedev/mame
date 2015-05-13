@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, hap
 /***************************************************************************
 
     Taito Zoom ZSG-2 sound board
     Includes: MN10200 CPU, ZOOM ZSG-2 audio chip, TMS57002 DASP
     By Olivier Galibert.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 
 ----------------------------------------------------------------------------
 

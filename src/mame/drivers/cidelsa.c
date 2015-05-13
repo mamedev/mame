@@ -196,15 +196,6 @@ static ADDRESS_MAP_START( draco_sound_map, AS_PROGRAM, 8, draco_state )
 	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( draco_sound_io_map, AS_IO, 8, draco_state )
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(sound_g_w)
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(psg_r, psg_w)
-	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN) AM_READ(sound_in_r)
-	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_NOP
-	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITENOP
-ADDRESS_MAP_END
-
 /* Input Ports */
 
 READ_LINE_MEMBER( cidelsa_state::cdp1869_pcb_r )
@@ -469,8 +460,12 @@ static MACHINE_CONFIG_START( draco, draco_state )
 
 	MCFG_CPU_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
 	MCFG_CPU_PROGRAM_MAP(draco_sound_map)
-	MCFG_CPU_IO_MAP(draco_sound_io_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
+	MCFG_COP400_WRITE_D_CB(WRITE8(draco_state, sound_bankswitch_w))
+	MCFG_COP400_WRITE_G_CB(WRITE8(draco_state, sound_g_w))
+	MCFG_COP400_READ_L_CB(READ8(draco_state, psg_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(draco_state, psg_w))
+	MCFG_COP400_READ_IN_CB(READ8(draco_state, sound_in_r))
 
 	/* input/output hardware */
 	MCFG_DEVICE_ADD("ic29", CDP1852, 0) // clock is really tied to CDP1869 CMSEL (pin 37)

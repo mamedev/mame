@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 #include "emu.h"
 #include "m68kcpu.h"
 extern void m68040_fpu_op0(m68000_base_device *m68k);
@@ -34882,5 +34884,3 @@ void m68ki_build_opcode_table(void)
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
-
-

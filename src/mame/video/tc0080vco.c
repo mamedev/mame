@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Taito tc0080vco
 ---------

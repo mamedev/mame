@@ -553,15 +553,17 @@ void hmcs40_cpu_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		m_icount--;
-
 		// LPU is handled 1 cycle later
 		if ((m_prev_op & 0x3e0) == 0x340)
 			m_pc = ((m_page << 6) | (m_pc & 0x3f)) & m_pcmask;
 
 		// check/handle interrupt, but not in the middle of a long jump
 		if (m_ie && (m_iri || m_irt) && (m_op & 0x3e0) != 0x340)
+		{
 			do_interrupt();
+			if (m_icount <= 0)
+				break;
+		}
 
 		// remember previous state
 		m_prev_op = m_op;
@@ -569,6 +571,7 @@ void hmcs40_cpu_device::execute_run()
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
+		m_icount--;
 		m_op = m_program->read_word(m_pc << 1) & 0x3ff;
 		m_i = BITSWAP8(m_op,7,6,5,4,0,1,2,3) & 0xf; // reversed bit-order for 4-bit immediate param (except for XAMR, REDD, SEDD)
 		increment_pc();

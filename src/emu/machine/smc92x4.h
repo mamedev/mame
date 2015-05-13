@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet, Michael Zapf
 /* Interface */
 
 #ifndef __SMC92X4_H__

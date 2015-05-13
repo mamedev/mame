@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
 Aliens (c) 1990 Konami Co. Ltd

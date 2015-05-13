@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 class funworld_state : public driver_device
 {
 public:

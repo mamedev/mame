@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nlbase.c
  *
@@ -13,26 +15,47 @@
 
 const netlist_time netlist_time::zero = netlist_time::from_raw(0);
 
-netlist_logic_family_desc_t netlist_family_TTL =
+class netlist_logic_family_ttl_t : public netlist_logic_family_desc_t
 {
-		0.8, // m_low_thresh_V
-		2.0, // m_high_thresh_V
-		0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		3.7, // m_high_V
-		1.0, // m_R_low;
-		130.0, //  m_R_high;
+public:
+	netlist_logic_family_ttl_t()
+	{
+		m_low_thresh_V = 0.8;
+		m_high_thresh_V = 2.0;
+		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
+		m_low_V = 0.3;
+		m_high_V = 3.7;
+		m_R_low = 1.0;
+		m_R_high = 130.0;
+	}
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	{
+		return nl_alloc(nld_d_to_a_proxy , proxied);
+	}
 };
 
 //FIXME: set to proper values
-netlist_logic_family_desc_t netlist_family_CD4000 =
+class netlist_logic_family_cd4000_t : public netlist_logic_family_desc_t
 {
-		0.8, // m_low_thresh_V
-		2.0, // m_high_thresh_V
-		0.3, // m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		3.7, // m_high_V
-		1.0, // m_R_low;
-		130.0, //  m_R_high;
+public:
+	netlist_logic_family_cd4000_t()
+	{
+		m_low_thresh_V = 0.8;
+		m_high_thresh_V = 2.0;
+		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
+		m_low_V = 0.3;
+		m_high_V = 3.7;
+		m_R_low = 1.0;
+		m_R_high = 130.0;
+	}
+	virtual nld_base_d_to_a_proxy *create_d_a_proxy(netlist_logic_output_t &proxied) const
+	{
+		return nl_alloc(nld_d_to_a_proxy , proxied);
+	}
 };
+
+const netlist_logic_family_desc_t &netlist_family_TTL = netlist_logic_family_ttl_t();
+const netlist_logic_family_desc_t &netlist_family_CD4000 = netlist_logic_family_cd4000_t();
 
 // ----------------------------------------------------------------------------------------
 // netlist_queue_t
@@ -139,7 +162,7 @@ netlist_base_t::netlist_base_t()
 	:   netlist_object_t(NETLIST, GENERIC),
 		m_stop(netlist_time::zero),
 		// FIXME:: Use a parameter to set this on a schematics per schematics basis
-	    m_use_deactivate(USE_DEACTIVE_DEVICE),
+		m_use_deactivate(USE_DEACTIVE_DEVICE),
 		m_time(netlist_time::zero),
 		m_queue(*this),
 		m_mainclock(NULL),
@@ -262,9 +285,9 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time &delta
 	{
 		while ( (m_time < m_stop) && (m_queue.is_not_empty()))
 		{
-			const netlist_queue_t::entry_t *e = m_queue.pop();
-			m_time = e->exec_time();
-			e->object()->update_devs();
+			const netlist_queue_t::entry_t e = *m_queue.pop();
+			m_time = e.exec_time();
+			e.object()->update_devs();
 
 			add_to_stat(m_perf_out_processed, 1);
 		}
@@ -287,9 +310,9 @@ ATTR_HOT ATTR_ALIGN void netlist_base_t::process_queue(const netlist_time &delta
 					NETLIB_NAME(mainclock)::mc_update(mc_net);
 				}
 
-				const netlist_queue_t::entry_t *e = m_queue.pop();
-				m_time = e->exec_time();
-				e->object()->update_devs();
+				const netlist_queue_t::entry_t e = *m_queue.pop();
+				m_time = e.exec_time();
+				e.object()->update_devs();
 
 			} else {
 				m_time = mc_time;
@@ -339,12 +362,18 @@ ATTR_COLD void netlist_base_t::log(const char *format, ...) const
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_core_device_t::netlist_core_device_t(const family_t afamily)
-: netlist_object_t(DEVICE, afamily)
+: netlist_object_t(DEVICE, afamily), netlist_logic_family_t()
+#if (NL_KEEP_STATISTICS)
+	, stat_total_time(0)
+	, stat_update_count(0)
+	, stat_call_count(0)
+#endif
 {
 }
 
 ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstring &name)
 {
+	set_logic_family(this->default_logic_family());
 	init_object(anetlist, name);
 
 #if USE_PMFDELEGATES
@@ -356,6 +385,14 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 
 ATTR_COLD netlist_core_device_t::~netlist_core_device_t()
 {
+}
+
+ATTR_COLD void netlist_core_device_t::start_dev()
+{
+#if (NL_KEEP_STATISTICS)
+	netlist().m_started_devices.add(this, false);
+#endif
+	start();
 }
 
 ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
@@ -404,9 +441,11 @@ ATTR_COLD void netlist_device_t::init(netlist_base_t &anetlist, const pstring &n
 }
 
 
-ATTR_COLD void netlist_device_t::register_sub(netlist_device_t &dev, const pstring &name)
+ATTR_COLD void netlist_device_t::register_sub(const pstring &name, netlist_device_t &dev)
 {
 	dev.init(netlist(), this->name() + "." + name);
+	// FIXME: subdevices always first inherit the logic family of the parent
+	dev.set_logic_family(this->logic_family());
 	dev.start_dev();
 }
 
@@ -428,15 +467,28 @@ ATTR_COLD void netlist_device_t::register_terminal(const pstring &name, netlist_
 		m_terminals.add(port.name());
 }
 
+ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_logic_output_t &port)
+{
+	port.set_logic_family(this->logic_family());
+	setup().register_object(*this, name, port);
+}
+
 ATTR_COLD void netlist_device_t::register_output(const pstring &name, netlist_output_t &port)
 {
-	port.m_logic_family = this->logic_family();
+	//port.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, port);
+}
+
+ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_logic_input_t &inp)
+{
+	inp.set_logic_family(this->logic_family());
+	setup().register_object(*this, name, inp);
+	m_terminals.add(inp.name());
 }
 
 ATTR_COLD void netlist_device_t::register_input(const pstring &name, netlist_input_t &inp)
 {
-	inp.m_logic_family = this->logic_family();
+	//inp.set_logic_family(this->logic_family());
 	setup().register_object(*this, name, inp);
 	m_terminals.add(inp.name());
 }
@@ -496,11 +548,14 @@ ATTR_COLD void netlist_net_t::init_object(netlist_base_t &nl, const pstring &ana
 ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 {
 	m_active++;
-
 	m_list_active.insert(term);
-
 	if (m_active == 1)
 	{
+		if (netlist().use_deactivate())
+		{
+			railterminal().netdev().inc_active();
+			//m_cur_Q = m_new_Q;
+		}
 		if (m_in_queue == 0)
 		{
 			if (m_time > netlist().time())
@@ -514,14 +569,8 @@ ATTR_HOT void netlist_net_t::inc_active(netlist_core_terminal_t &term)
 				m_in_queue = 2;
 			}
 		}
-		else
-		{
-			if (netlist().use_deactivate())
-			{
-				railterminal().netdev().inc_active();
-				m_cur_Q = m_new_Q;
-			}
-		}
+		//else if (netlist().use_deactivate())
+		//	m_cur_Q = m_new_Q;
 	}
 }
 
@@ -529,7 +578,6 @@ ATTR_HOT void netlist_net_t::dec_active(netlist_core_terminal_t &term)
 {
 	m_active--;
 	m_list_active.remove(term);
-
 	if (m_active == 0 && netlist().use_deactivate())
 			railterminal().netdev().dec_active();
 }
@@ -561,47 +609,52 @@ ATTR_COLD void netlist_net_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT ATTR_ALIGN static inline void update_dev(const netlist_core_terminal_t *inp, const UINT32 mask)
+ATTR_HOT inline void netlist_core_terminal_t::update_dev(const UINT32 mask)
 {
-	if ((inp->state() & mask) != 0)
+	inc_stat(netdev().stat_call_count);
+	if ((state() & mask) != 0)
 	{
-		netlist_core_device_t &netdev = inp->netdev();
-		begin_timing(netdev.total_time);
-		inc_stat(netdev.stat_count);
-		netdev.update_dev();
-		end_timing(netdev().total_time);
+		netdev().update_dev();
 	}
 }
 
-ATTR_HOT ATTR_ALIGN inline void netlist_net_t::update_devs()
+ATTR_HOT /*ATTR_ALIGN*/ inline void netlist_net_t::update_devs()
 {
 	//assert(m_num_cons != 0);
 	nl_assert(this->isRailNet());
 
-	const UINT32 masks[4] = { 1, 5, 3, 1 };
+	const int masks[4] = { 1, 5, 3, 1 };
 	const UINT32 mask = masks[ (m_cur_Q  << 1) | m_new_Q ];
-	netlist_core_terminal_t *p = m_list_active.first();
 
 	m_in_queue = 2; /* mark as taken ... */
 	m_cur_Q = m_new_Q;
 
+	netlist_core_terminal_t *p = m_list_active.first();
+
+#if 0
 	switch (m_active)
 	{
 	case 2:
-		update_dev(p, mask);
+		p->update_dev(mask);
 		p = m_list_active.next(p);
-		if (p == NULL) break;
 	case 1:
-		update_dev(p, mask);
+		p->update_dev(mask);
 		break;
 	default:
 		while (p != NULL)
 		{
-			update_dev(p, mask);
+			p->update_dev(mask);
 			p = m_list_active.next(p);
 		}
 		break;
 	}
+#else
+	while (p != NULL)
+	{
+		p->update_dev(mask);
+		p = m_list_active.next(p);
+	}
+#endif
 
 }
 
@@ -762,7 +815,6 @@ ATTR_COLD void netlist_analog_net_t::process_net(list_t *groups, int &cur_group)
 ATTR_COLD netlist_core_terminal_t::netlist_core_terminal_t(const type_t atype, const family_t afamily)
 : netlist_owned_object_t(atype, afamily)
 , plinkedlist_element_t<netlist_core_terminal_t>()
-, m_logic_family(NULL)
 , m_net(NULL)
 , m_state(STATE_NONEX)
 {
@@ -802,6 +854,7 @@ ATTR_HOT void netlist_terminal_t::schedule_after(const netlist_time &after)
 
 ATTR_COLD void netlist_terminal_t::reset()
 {
+	//printf("reset %s\n", name().cstr());
 	//netlist_terminal_core_terminal_t::reset();
 	set_state(STATE_INP_ACTIVE);
 	set_ptr(m_Idr1, 0.0);
@@ -849,7 +902,7 @@ ATTR_COLD void netlist_output_t::init_object(netlist_core_device_t &dev, const p
 // ----------------------------------------------------------------------------------------
 
 ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
-	: netlist_output_t(OUTPUT, LOGIC), m_proxy(NULL)
+	: netlist_output_t(OUTPUT, LOGIC), netlist_logic_family_t(), m_proxy(NULL)
 {
 	this->set_net(m_my_net);
 }
@@ -857,15 +910,6 @@ ATTR_COLD netlist_logic_output_t::netlist_logic_output_t()
 ATTR_COLD void netlist_logic_output_t::initial(const netlist_sig_t val)
 {
 	net().as_logic().initial(val);
-}
-
-// ----------------------------------------------------------------------------------------
-// netlist_ttl_output_t
-// ----------------------------------------------------------------------------------------
-
-ATTR_COLD netlist_ttl_output_t::netlist_ttl_output_t()
-	: netlist_logic_output_t()
-{
 }
 
 // ----------------------------------------------------------------------------------------

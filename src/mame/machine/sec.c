@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Serial Electronic Counter (SEC) */
 
 #include "emu.h"

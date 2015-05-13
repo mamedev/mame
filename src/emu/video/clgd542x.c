@@ -1,11 +1,15 @@
+// license:???
+// copyright-holders:???
 /*
 
-	Cirrus Logic GD542x/3x video chipsets
+    Cirrus Logic GD542x/3x video chipsets
 
 */
 
 #include "clgd542x.h"
 
+#define LOG_REG 0
+#define LOG_BLIT 1
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
@@ -126,7 +130,7 @@ void cirrus_gd5428_device::device_reset()
 	m_blt_source = m_blt_dest = m_blt_source_current = m_blt_dest_current = 0;
 	memset(m_ext_palette, 0, sizeof(m_ext_palette));
 	m_ext_palette_enabled = false;
-//	m_ext_palette[15].red = m_ext_palette[15].green = m_ext_palette[15].blue = 0xff;  // default?  Win3.1 doesn't seem to touch the extended DAC, or at least, it enables it, then immediately disables it then sets a palette...
+	m_blt_system_transfer = false;
 }
 
 UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -201,7 +205,7 @@ UINT32 cirrus_gd5428_device::screen_update(screen_device &screen, bitmap_rgb32 &
 			}
 		}
 	}
-	return 0;	
+	return 0;
 }
 
 void cirrus_gd5428_device::cirrus_define_video_mode()
@@ -209,7 +213,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 	UINT8 divisor = 1;
 	float clock;
 	UINT8 clocksel = (vga.miscellaneous_output & 0xc) >> 2;
-	
+
 	svga.rgb8_en = 0;
 	svga.rgb15_en = 0;
 	svga.rgb16_en = 0;
@@ -226,7 +230,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 		clock = 14.31818f * ((float)numerator / ((float)denominator * mul));
 		clock *= 1000000;
 	}
-	
+
 	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))
 	{
 		switch(vga.sequencer.data[0x07] & 0x0E)
@@ -247,7 +251,7 @@ UINT16 cirrus_gd5428_device::offset()
 
 	if (svga.rgb8_en == 1) // guess
 		off <<= 2;
-//	popmessage("Offset: %04x  %s %s ** -- actual: %04x",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",off);
+//  popmessage("Offset: %04x  %s %s ** -- actual: %04x",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",off);
 	return off;
 }
 
@@ -255,53 +259,166 @@ void cirrus_gd5428_device::start_bitblt()
 {
 	UINT32 x,y;
 
-	logerror("CL: BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+	if(m_blt_mode & 0x01)
+	{
+		start_reverse_bitblt();
+		return;
+	}
+
+	if(LOG_BLIT) logerror("CL: BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
 
 	m_blt_source_current = m_blt_source;
 	m_blt_dest_current = m_blt_dest;
-	
-	for(y=0;y<m_blt_height;y++)
+
+	for(y=0;y<=m_blt_height;y++)
 	{
-		for(x=0;x<m_blt_width;x++)
+		for(x=0;x<=m_blt_width;x++)
 		{
-			copy_pixel();
 			if(m_blt_mode & 0x80)  // colour expand
 			{
-				if(x % 8)
+				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+				
+				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 					m_blt_source_current++;
 			}
 			else
+			{
+				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 				m_blt_source_current++;
+			}
 			m_blt_dest_current++;
 			if(m_blt_mode & 0x40 && (x % 8) == 7)  // 8x8 pattern - reset pattern source location
-				m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y % 8));
+			{
+				if(m_blt_mode & 0x80) // colour expand
+					m_blt_source_current = m_blt_source + (1*(y % 8)); // patterns are linear data
+				else
+					m_blt_source_current = m_blt_source + (8*(y % 8));
+			}
 		}
 		if(m_blt_mode & 0x40)  // 8x8 pattern
-			m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y % 8));
+		{
+			if(m_blt_mode & 0x80) // colour expand
+				m_blt_source_current = m_blt_source + (1*(y % 8)); // patterns are linear data
+			else
+				m_blt_source_current = m_blt_source + (8*(y % 8));
+		}
 		else
-			m_blt_source_current = m_blt_source + (m_blt_source_pitch*y);
-		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*y);
+			m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y+1));
+		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*(y+1));
 	}
 	m_blt_status &= ~0x02;
 }
 
-void cirrus_gd5428_device::copy_pixel()
+void cirrus_gd5428_device::start_reverse_bitblt()
 {
-	UINT8 src = vga.memory[m_blt_source_current % vga.svga_intf.vram_size];
-	UINT8 dst = vga.memory[m_blt_dest_current % vga.svga_intf.vram_size];
-	
-	if(m_blt_mode & 0x40)  // enable 8x8 pattern
+	UINT32 x,y;
+
+	if(LOG_BLIT) logerror("CL: Reverse BitBLT started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+
+	// Start at end of blit
+	m_blt_source_current = m_blt_source;
+	m_blt_dest_current = m_blt_dest;
+
+	for(y=0;y<=m_blt_height;y++)
 	{
-		if(m_blt_mode & 0x80)  // colour expand
-			src = (vga.memory[m_blt_source % vga.svga_intf.vram_size] >> (abs((int)(m_blt_source_current - m_blt_source)) % 8)) & 0x01 ? 0xff : 0x00;
+		for(x=0;x<=m_blt_width;x++)
+		{
+			if(m_blt_mode & 0x80)  // colour expand
+			{
+				UINT8 pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+				
+				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't decrement if a pattern (it's only 8 bits)
+					m_blt_source_current--;
+			}
+			else
+			{
+				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+				m_blt_source_current--;
+			}
+			m_blt_dest_current--;
+			if(m_blt_mode & 0x40 && (x % 8) == 7)  // 8x8 pattern - reset pattern source location
+			{
+				if(m_blt_mode & 0x80) // colour expand
+					m_blt_source_current = m_blt_source - (1*(y % 8)); // patterns are linear data
+				else
+					m_blt_source_current = m_blt_source - (8*(y % 8));
+			}
+		}
+		if(m_blt_mode & 0x40)  // 8x8 pattern
+		{
+			if(m_blt_mode & 0x80) // colour expand
+				m_blt_source_current = m_blt_source - (1*(y % 8)); // patterns are linear data
+			else
+				m_blt_source_current = m_blt_source - (8*(y % 8));
+		}
+		else
+			m_blt_source_current = m_blt_source - (m_blt_source_pitch*(y+1));
+		m_blt_dest_current = m_blt_dest - (m_blt_dest_pitch*(y+1));
 	}
-	
+	m_blt_status &= ~0x02;
+}
+
+void cirrus_gd5428_device::start_system_bitblt()
+{
+	if(LOG_BLIT) logerror("CL: BitBLT from system memory started: Src: %06x Dst: %06x Width: %i Height %i ROP: %02x Mode: %02x\n",m_blt_source,m_blt_dest,m_blt_width,m_blt_height,m_blt_rop,m_blt_mode);
+	m_blt_system_transfer = true;
+	m_blt_system_count = 0;
+	m_blt_system_buffer = 0;
+	m_blt_pixel_count = m_blt_scan_count = 0;
+	m_blt_source_current = m_blt_source;
+	m_blt_dest_current = m_blt_dest;
+	m_blt_status |= 0x09;
+}
+
+void cirrus_gd5428_device::blit_dword()
+{
+	// TODO: add support for reverse direction
+	UINT8 x,pixel;
+	if(m_blt_mode & 0x80)  // colour expand
+	{
+		for(x=0;x<32;x++)
+		{
+			pixel = ((m_blt_system_buffer & (0x00000001 << x)) >> x) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+			if(m_blt_pixel_count <= m_blt_width)
+				copy_pixel(pixel,vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+			m_blt_dest_current++;
+			m_blt_pixel_count++;
+		}
+	}
+	else
+	{
+		for(x=0;x<32;x+=8)
+		{
+			pixel = ((m_blt_system_buffer & (0x000000ff << x)) >> x);
+			if(m_blt_pixel_count <= m_blt_width)
+				copy_pixel(pixel,vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+			m_blt_dest_current++;
+			m_blt_pixel_count++;
+		}
+	}
+	if(m_blt_pixel_count > m_blt_width)
+	{
+		m_blt_pixel_count = 0;
+		m_blt_scan_count++;
+		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*m_blt_scan_count);
+	}
+	if(m_blt_scan_count > m_blt_height)
+	{
+		m_blt_system_transfer = false;  //  BitBLT complete
+		m_blt_status &= ~0x0b;
+	}
+}
+
+void cirrus_gd5428_device::copy_pixel(UINT8 src, UINT8 dst)
+{
 	switch(m_blt_rop)
 	{
 	case 0x00:  // BLACK
 		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = 0x00;
 		break;
-	case 0x0b:  // NOT DST
+	case 0x0b:  // DSTINVERT
 		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = ~dst;
 		break;
 	case 0x0d:  // SRC
@@ -311,7 +428,7 @@ void cirrus_gd5428_device::copy_pixel()
 		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = 0xff;
 		break;
 	case 0x59:  // SRCINVERT
-		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = dst ^ src;
+		vga.memory[m_blt_dest_current % vga.svga_intf.vram_size] = src ^ dst;
 		break;
 	default:
 		popmessage("CL: Unsupported BitBLT ROP mode %02x",m_blt_rop);
@@ -379,7 +496,7 @@ UINT8 cirrus_gd5428_device::cirrus_seq_reg_read(UINT8 index)
 
 void cirrus_gd5428_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 {
-	logerror("CL: SEQ write %02x to SR%02x\n",data,index);
+	if(LOG_REG) logerror("CL: SEQ write %02x to SR%02x\n",data,index);
 	switch(index)
 	{
 		case 0x02:
@@ -579,7 +696,7 @@ UINT8 cirrus_gd5428_device::cirrus_gc_reg_read(UINT8 index)
 
 void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 {
-	logerror("CL: GC write %02x to GR%02x\n",data,index);
+	if(LOG_REG) logerror("CL: GC write %02x to GR%02x\n",data,index);
 	switch(index)
 	{
 	case 0x00:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
@@ -681,9 +798,14 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
 		m_blt_mode = data;
 		break;
 	case 0x31:  // BitBLT Start / Status
-		m_blt_status = data & 0xf2;
+		m_blt_status = data & ~0xf2;
 		if(data & 0x02)
-			start_bitblt();
+		{
+			if(m_blt_mode & 0x04)  // blit source is system memory
+				start_system_bitblt();
+			else
+				start_bitblt();
+		}
 		break;
 	case 0x32:  // BitBLT ROP mode
 		m_blt_rop = data;
@@ -728,7 +850,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
 						vga.dac.read_index++;
 					}
 				}
-			}				
+			}
 			break;
 		case 0x0f:
 			res = cirrus_gc_reg_read(vga.gc.index);
@@ -767,9 +889,9 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 						break;
 					}
 					vga.dac.dirty=1;
-					if (vga.dac.state==3) 
+					if (vga.dac.state==3)
 					{
-						vga.dac.state=0; 
+						vga.dac.state=0;
 						vga.dac.write_index++;
 					}
 				}
@@ -892,7 +1014,7 @@ UINT8 cirrus_gd5428_device::cirrus_crtc_reg_read(UINT8 index)
 
 void cirrus_gd5428_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
 {
-	logerror("CL: CRTC write %02x to CR%02x\n",data,index);
+	if(LOG_REG) logerror("CL: CRTC write %02x to CR%02x\n",data,index);
 	switch(index)
 	{
 	case 0x16:  // VGA Vertical Blank end - some SVGA chipsets use all 8 bits, and this is one of them (according to MFGTST CRTC tests)
@@ -985,14 +1107,14 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 
 	// Is the display address adjusted automatically when not using Chain-4 addressing?  The GD542x BIOS doesn't do it, but Virtual Pool expects it.
 	if(!(vga.sequencer.data[4] & 0x8))
-		addr <<= 2;	
+		addr <<= 2;
 
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		UINT8 data = 0;
 		if(gc_mode_ext & 0x01)
 		{
-			if(offset & 0x10000) 
+			if(offset & 0x10000)
 				return 0;
 			if(offset < 0x8000)
 				offset &= 0x7fff;
@@ -1069,7 +1191,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	{
 		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
 		UINT8 i,data;
-//		UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+//      UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
 
 		data = 0;
 		//printf("%08x\n",offset);
@@ -1101,6 +1223,19 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 	UINT8 bank;
 	UINT8 cur_mode = pc_vga_choosevideomode();
 
+	if(m_blt_system_transfer)
+	{
+		m_blt_system_buffer &= ~(0x000000ff << (m_blt_system_count * 8));
+		m_blt_system_buffer |= (data << (m_blt_system_count * 8));
+		m_blt_system_count++;
+		if(m_blt_system_count >= 4)
+		{
+			blit_dword();
+			m_blt_system_count = 0;
+		}
+		return;
+	}
+
 	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 	{
 		vga_device::mem_w(space,offset,data,mem_mask);
@@ -1119,11 +1254,11 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 
 	// Is the display address adjusted automatically when using Chain-4 addressing?  The GD542x BIOS doesn't do it, but Virtual Pool expects it.
 	if(!(vga.sequencer.data[4] & 0x8))
-		addr <<= 2;	
+		addr <<= 2;
 
 	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
-		if(offset & 0x10000) 
+		if(offset & 0x10000)
 			return;
 		if(gc_mode_ext & 0x01)
 		{
@@ -1163,7 +1298,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 			}
 			return;
 		}
-		
+
 		if(vga.sequencer.data[4] & 0x8)
 			vga.memory[(offset+addr) % vga.svga_intf.vram_size] = data;
 		else
@@ -1208,7 +1343,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 		{
 		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
 			UINT8 i;
-//			UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+//          UINT8 bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
 
 			for(i=0;i<4;i++)
 			{
@@ -1227,4 +1362,3 @@ WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
 		}
 	}
 }
-

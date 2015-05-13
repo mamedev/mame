@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***************************************************************************
 
     PHUNSY (Philipse Universal System)

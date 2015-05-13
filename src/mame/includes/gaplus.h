@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Manuel Abadia, Ernesto Corvi, Nicola Salmoria
 #include "sound/namco.h"
 #include "sound/samples.h"
 #include "machine/namcoio.h"

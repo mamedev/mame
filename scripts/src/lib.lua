@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 project "utils"
 	uuid "22489ad0-4cb2-4d91-ad81-24b0d80ca30a"
 	kind "StaticLib"
@@ -10,9 +13,13 @@ project "utils"
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/expat/lib",
 		MAME_DIR .. "3rdparty/zlib",
 	}
+	if _OPTIONS["with-bundled-expat"] then
+		includedirs {
+			MAME_DIR .. "3rdparty/expat/lib",
+		}
+	end
 
 	files {
 		MAME_DIR .. "src/lib/util/bitstream.h",

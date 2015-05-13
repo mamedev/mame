@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phill Harvey-Smith
 /*
     machine/mbc55x.c
 

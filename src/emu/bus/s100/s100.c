@@ -4,9 +4,6 @@
 
     S-100 (IEEE-696/1983) bus emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "s100.h"

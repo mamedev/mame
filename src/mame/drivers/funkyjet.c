@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
   Funky Jet                               (c) 1992 Data East / Mitchell Corporation

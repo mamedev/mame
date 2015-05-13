@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 /***************************************************************************
 
     Commodore C65 home computer

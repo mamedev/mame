@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:R. Belmont, Acho A. Tang
 /*************************************************************************
 
     Wild West C.O.W.boys of Moo Mesa / Bucky O'Hare

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**********************************************************************
 
     Rockwell 10788 General Purpose Keyboard and Display circuit

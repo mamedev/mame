@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /***************************************************************************
 
     Success Joe / Ashita no Joe [Wave]

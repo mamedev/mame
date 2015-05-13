@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Emmanuel Vadot
 
 /****************************************** PICO emulation ****************************************/
 

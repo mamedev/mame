@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #define OP(num,func_name) void nec_common_device::func_name()
 
 OP( 0x00, i_add_br8  ) { DEF_br8;   ADDB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Bryan McPhail
 /*
 
 Pocket Gal Deluxe

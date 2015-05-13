@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 /***********************************
  Super Speed Race Jr (c) 1985 Taito
  driver by  Tomasz Slanina

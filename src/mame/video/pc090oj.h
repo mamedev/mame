@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __PC090OJ_H__
 #define __PC090OJ_H__
 

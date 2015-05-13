@@ -4,9 +4,6 @@
 
     Commodore VIC-1010 Expansion Module emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

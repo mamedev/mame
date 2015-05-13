@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #pragma once
 
 #ifndef __ISA_IDE_H__

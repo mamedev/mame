@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Serial Flash */
 
 #pragma once

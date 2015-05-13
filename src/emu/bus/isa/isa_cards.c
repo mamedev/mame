@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /**********************************************************************
 
     ISA cards
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
 **********************************************************************/
 
@@ -15,6 +14,7 @@ SLOT_INTERFACE_START( pc_isa8_cards )
 	SLOT_INTERFACE("cga_ec1841", ISA8_EC1841_0002)
 	SLOT_INTERFACE("cga_poisk2", ISA8_CGA_POISK2)
 	SLOT_INTERFACE("cga_mc1502", ISA8_CGA_MC1502)
+	SLOT_INTERFACE("cga_m24", ISA8_CGA_M24)
 	SLOT_INTERFACE("aga", ISA8_AGA)
 	SLOT_INTERFACE("aga_pc200", ISA8_AGA_PC200)
 	SLOT_INTERFACE("ega", ISA8_EGA)

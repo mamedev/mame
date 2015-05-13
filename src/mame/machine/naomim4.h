@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _NAOMIM4_H_
 #define _NAOMIM4_H_
 

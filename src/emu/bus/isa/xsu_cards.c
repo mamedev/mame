@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     ISA bus cards for ex-USSR PC clones
-
-    license: MAME, GPL-2.0+
-    copyright-holders: XXX
 
 **********************************************************************/
 

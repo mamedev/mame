@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /*********************************************************************
 
     ui.c
 
     Functions used to handle MAME's user interface.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 

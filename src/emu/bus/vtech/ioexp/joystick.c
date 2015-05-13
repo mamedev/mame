@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     VTech Laser/VZ Joystick Interface
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     VTech Laser JS 20
     Dick Smith Electronics X-7315

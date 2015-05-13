@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef GF7600GS_H
 #define GF7600GS_H
 

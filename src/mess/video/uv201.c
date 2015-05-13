@@ -4,9 +4,6 @@
 
     VideoBrain UV201/UV202 video chip emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "uv201.h"

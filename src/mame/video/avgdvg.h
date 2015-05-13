@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __AVGDVG__
 #define __AVGDVG__
 

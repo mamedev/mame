@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* JPM MPS1/2 Hardware
 
   TMS9995 CPU

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 // stack is LIFO and is 8 levels deep, there is no stackpointer on the real chip
 void tms32051_device::PUSH_STACK(UINT16 pc)
 {

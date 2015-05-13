@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /**********************************************************************************
 
   Super Card - Fun World.

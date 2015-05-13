@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for MMC-3 clone PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate several pirate PCBs based on MMC-3 boards

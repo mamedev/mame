@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
 Atari Fire Truck + Super Bug + Monte Carlo video emulation

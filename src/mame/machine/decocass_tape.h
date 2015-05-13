@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __DECOCASS_TAPE_H__
 #define __DECOCASS_TAPE_H__
 

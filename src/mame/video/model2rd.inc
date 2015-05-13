@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
     Sega Model 2 3D rasterization functions

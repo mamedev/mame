@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman, Curt Coder
 /***************************************************************************
 
   sidearms.c

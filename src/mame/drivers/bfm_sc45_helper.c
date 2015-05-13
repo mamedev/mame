@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* helper functions for BFM SC4/5 set identification and layout file creation
  - these are not strictly required by the emulation
 

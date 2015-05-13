@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Fit of Fighting / The History of Martial Arts / 'BB' */
 
 /* NIX or Novatecnia (both spanish) may have produced these

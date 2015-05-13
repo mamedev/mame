@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Gumbo video */
 
 #include "emu.h"

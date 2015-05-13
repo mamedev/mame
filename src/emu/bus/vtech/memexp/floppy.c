@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     VTech Laser/VZ Floppy Controller Cartridge
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Laser DD 20
     Dick Smith Electronics X-7304

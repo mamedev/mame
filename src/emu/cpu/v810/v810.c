@@ -1,4 +1,4 @@
-// license:?
+// license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Tomasz Slanina
 /******************************************************************
  NEC V810 (upd70732) core

@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Hans Ostermeyer,R. Belmont
 /*
  * threecom3c505.h - 3COM 3C505 ethernet controller
  *
  *  Created on: August 27, 2010
  *      Author: Hans Ostermeyer
- *
- *  Released for general non-commercial use under the MAME license
- *  Visit http://mamedev.org for licensing and usage restrictions.
  *
  */
 

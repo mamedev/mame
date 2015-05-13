@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Epson PX-4
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Note: We are missing a dump of the slave 7508 CPU that controls
     the keyboard and some other things.

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
 
   Emulation of the firmware mapper as found in Panasonic FS-A1WX andFS-A1WSX machines.

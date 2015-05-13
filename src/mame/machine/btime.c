@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 #include "emu.h"
 #include "includes/btime.h"
 

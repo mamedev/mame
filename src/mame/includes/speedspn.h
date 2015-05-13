@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Farfetch'd
 #include "sound/okim6295.h"
 
 class speedspn_state : public driver_device

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino
 /*
 **  Video Driver for Taito Samurai (1985)
 */

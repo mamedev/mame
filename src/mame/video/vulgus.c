@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni
 /***************************************************************************
 
   Capcom Vulgus hardware

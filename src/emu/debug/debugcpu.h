@@ -236,7 +236,7 @@ public:
 	void registerpoint_enable_all(bool enable = true );
 
 	// hotspots
-  bool hotspot_tracking_enabled() const { return !m_hotspots.empty(); }
+	bool hotspot_tracking_enabled() const { return !m_hotspots.empty(); }
 	void hotspot_track(int numspots, int threshhold);
 
 	// comments

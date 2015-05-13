@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tim Schuerewegen
 /*******************************************************************************
 
     Hewlett Packard 49G+ Graphing Calculator

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef WD_FDC_H
 #define WD_FDC_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "pci-ac97.h"
 
 const device_type AC97 = &device_creator<ac97_device>;

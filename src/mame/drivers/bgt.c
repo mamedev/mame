@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* BGT Fruit Machines
   BGT (British Gaming Technology) were a small Spanish company
 

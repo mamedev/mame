@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /**********************************************************************************
 
     SNOOKER 10 / SANDII'

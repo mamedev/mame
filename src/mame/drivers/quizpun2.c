@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
 Quiz Punch 2 (C)1989 Space Computer

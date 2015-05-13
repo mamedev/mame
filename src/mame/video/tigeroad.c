@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino
 #include "emu.h"
 #include "includes/tigeroad.h"
 

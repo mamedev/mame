@@ -6,9 +6,6 @@
 
     National Semiconductor COP400 Emulator.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
 
     Type        ROM     RAM     G       D       IN
@@ -51,7 +48,6 @@
 
     TODO:
 
-    - remove LBIOps
     - remove InstLen
     - run interrupt test suite
     - run production test suite
@@ -104,20 +100,18 @@ const device_type COP445 = &device_creator<cop445_cpu_device>;
 #define ROM(a)          m_direct->read_decrypted_byte(a)
 #define RAM_R(a)        m_data->read_byte(a)
 #define RAM_W(a, v)     m_data->write_byte(a, v)
-#define IN(a)           m_io->read_byte(a)
-#define OUT(a, v)       m_io->write_byte(a, v)
 
-#define IN_G()          (IN(COP400_PORT_G) & m_g_mask)
-#define IN_L()          IN(COP400_PORT_L)
-#define IN_SI()         BIT(IN(COP400_PORT_SIO), 0)
-#define IN_CKO()        BIT(IN(COP400_PORT_CKO), 0)
-#define IN_IN()         (m_in_mask ? IN(COP400_PORT_IN) : 0)
+#define IN_G()          (m_read_g(0, 0xff) & m_g_mask)
+#define IN_L()          m_read_l(0, 0xff)
+#define IN_SI()         BIT(m_read_si(), 0)
+#define IN_CKO()        BIT(m_read_cko(), 0)
+#define IN_IN()         (m_in_mask ? m_read_in(0, 0xff) : 0)
 
-#define OUT_G(v)        OUT(COP400_PORT_G, (v) & m_g_mask)
-#define OUT_L(v)        OUT(COP400_PORT_L, (v))
-#define OUT_D(v)        OUT(COP400_PORT_D, (v) & m_d_mask)
-#define OUT_SK(v)       OUT(COP400_PORT_SK, (v))
-#define OUT_SO(v)       OUT(COP400_PORT_SIO, (v))
+#define OUT_G(v)        m_write_g(0, (v) & m_g_mask, 0xff)
+#define OUT_L(v)        m_write_l(0, v, 0xff)
+#define OUT_D(v)        m_write_d(0, (v) & m_d_mask, 0xff)
+#define OUT_SK(v)       m_write_sk(v)
+#define OUT_SO(v)       m_write_so(v)
 
 #define PC              m_pc
 #define A               m_a
@@ -176,7 +170,16 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 9, 0)
+	, m_read_l(*this)
+	, m_write_l(*this)
+	, m_read_g(*this)
+	, m_write_g(*this)
+	, m_write_d(*this)
+	, m_read_in(*this)
+	, m_read_si(*this)
+	, m_write_so(*this)
+	, m_write_sk(*this)
+	, m_read_cko(*this)
 	, m_cki(COP400_CKI_DIVISOR_16)
 	, m_cko(COP400_CKO_OSCILLATOR_OUTPUT)
 	, m_microbus(COP400_MICROBUS_DISABLED)
@@ -191,9 +194,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 
 	/* initialize instruction length array */
 	for (i=0; i<256; i++) m_InstLen[i]=1;
-	/* initialize LBI opcode array */
-	for (i=0x00; i<0x100; i++) m_LBIops[i] = 0;
-	for (i=0; i<256; i++) m_LBIops33[i] = 0;
 
 	switch (featuremask)
 	{
@@ -203,11 +203,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 			/* initialize instruction length array */
 			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x68] =
 			m_InstLen[0x69] = m_InstLen[0x33] = m_InstLen[0x23] = 2;
-			/* initialize LBI opcode array */
-			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
-			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
-			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
-			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
 			break;
 
 		case COP420_FEATURE:
@@ -217,12 +212,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
 			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
 			m_InstLen[0x33] = m_InstLen[0x23] = 2;
-			/* initialize LBI opcode array */
-			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
-			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
-			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
-			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
-			for (i=0x80; i<0xc0; i++) m_LBIops33[i] = 1;
 			break;
 
 		case COP444_FEATURE:
@@ -232,13 +221,6 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 			m_InstLen[0x60] = m_InstLen[0x61] = m_InstLen[0x62] = m_InstLen[0x63] =
 			m_InstLen[0x68] = m_InstLen[0x69] = m_InstLen[0x6a] = m_InstLen[0x6b] =
 			m_InstLen[0x33] = m_InstLen[0x23] = 2;
-			/* initialize LBI opcode array */
-			for (i=0x00; i<0x100; i++) m_LBIops[i] = 0;
-			for (i=0x08; i<0x10; i++) m_LBIops[i] = 1;
-			for (i=0x18; i<0x20; i++) m_LBIops[i] = 1;
-			for (i=0x28; i<0x30; i++) m_LBIops[i] = 1;
-			for (i=0x38; i<0x40; i++) m_LBIops[i] = 1;
-			for (i=0x80; i<0xc0; i++) m_LBIops33[i] = 1;
 			break;
 
 		default:
@@ -378,7 +360,7 @@ INSTRUCTION(illegal)
     OPCODE TABLES
 ***************************************************************************/
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_23_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_23_MAP[256] =
 {
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
@@ -424,7 +406,7 @@ void cop400_cpu_device::cop410_op23(UINT8 opcode)
 	(this->*COP410_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_33_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_33_MAP[256] =
 {
 	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
@@ -470,7 +452,7 @@ void cop400_cpu_device::cop410_op33(UINT8 opcode)
 	(this->*COP410_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_MAP[256] =
 {
 	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
 	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
@@ -509,7 +491,7 @@ const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_MAP[
 	{1, INST(jp)          },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)            },{1, INST(jp)        },{1, INST(jp)        },{1, INST(jp)        },{2, INST(jid)       }
 };
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_23_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_23_MAP[256] =
 {
 	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
 	{1, INST(ldd)         },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },{1, INST(ldd)       },
@@ -555,7 +537,7 @@ void cop400_cpu_device::cop420_op23(UINT8 opcode)
 	(this->*COP420_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_33_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_33_MAP[256] =
 {
 	{1, INST(illegal)     },{1, INST(skgbz0)    },{1, INST(illegal)   },{1, INST(skgbz2)    },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },
@@ -601,7 +583,7 @@ void cop400_cpu_device::cop420_op33(UINT8 opcode)
 	(this->*COP420_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
 
-const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_MAP[] =
+const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_MAP[256] =
 {
 	{1, INST(clra)        },{1, INST(skmbz0)    },{1, INST(xor_)      },{1, INST(skmbz2)        },{1, INST(xis)       },{1, INST(ld)        },{1, INST(x)         },{1, INST(xds)       },
 	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)           },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
@@ -952,7 +934,19 @@ void cop400_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+
+	/* find i/o handlers */
+
+	m_read_l.resolve_safe(0);
+	m_write_l.resolve_safe();
+	m_read_g.resolve_safe(0);
+	m_write_g.resolve_safe();
+	m_write_d.resolve_safe();
+	m_read_in.resolve_safe(0);
+	m_read_si.resolve_safe(0);
+	m_write_so.resolve_safe();
+	m_write_sk.resolve_safe();
+	m_read_cko.resolve_safe(0);
 
 	/* allocate serial timer */
 
@@ -1109,8 +1103,6 @@ void cop400_cpu_device::device_reset()
 
 void cop400_cpu_device::execute_run()
 {
-	UINT8 opcode;
-
 	do
 	{
 		m_prevpc = PC;
@@ -1128,87 +1120,61 @@ void cop400_cpu_device::execute_run()
 			continue;
 		}
 
-		opcode = ROM(PC);
-		if (m_skip_lbi)
+		UINT8 opcode = ROM(PC);
+		int inst_cycles = m_opcode_map[opcode].cycles;
+
+		PC++;
+
+		(this->*(m_opcode_map[opcode].function))(opcode);
+		m_icount -= inst_cycles;
+		if (m_skip_lbi > 0) m_skip_lbi--;
+
+		// check for interrupt
+
+		if (BIT(EN, 1) && BIT(IL, 1))
 		{
-			int is_lbi = 0;
+			cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
 
-			if (opcode == 0x33)
+			// all successive transfer of control instructions and successive LBIs have been completed
+			if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)) && !m_skip_lbi)
 			{
-				is_lbi = m_LBIops33[ROM(PC+1)];
-			}
-			else
-			{
-				is_lbi = m_LBIops[opcode];
+				// store skip logic
+				m_last_skip = m_skip;
+				m_skip = 0;
+
+				// push next PC
+				PUSH(PC);
+
+				// jump to interrupt service routine
+				PC = 0x0ff;
+
+				// disable interrupt
+				EN &= ~0x02;
 			}
 
-			if (is_lbi)
-			{
-				m_icount -= m_opcode_map[opcode].cycles;
-
-				PC += m_InstLen[opcode];
-			}
-			else
-			{
-				m_skip_lbi = 0;
-			}
+			IL &= ~2;
 		}
 
-		if (!m_skip_lbi)
+		// skip next instruction?
+
+		if (m_skip)
 		{
-			int inst_cycles = m_opcode_map[opcode].cycles;
+			cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
 
-			PC++;
+			opcode = ROM(PC);
 
-			(this->*(m_opcode_map[opcode].function))(opcode);
-			m_icount -= inst_cycles;
-
-			// check for interrupt
-
-			if (BIT(EN, 1) && BIT(IL, 1))
+			if ((function == INST(lqid)) || (function == INST(jid)))
 			{
-				cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
-
-				if ((function != INST(jp)) && (function != INST(jmp)) && (function != INST(jsr)))
-				{
-					// store skip logic
-					m_last_skip = m_skip;
-					m_skip = 0;
-
-					// push next PC
-					PUSH(PC);
-
-					// jump to interrupt service routine
-					PC = 0x0ff;
-
-					// disable interrupt
-					EN &= ~0x02;
-				}
-
-				IL &= ~2;
+				m_icount -= 1;
+			}
+			else
+			{
+				m_icount -= m_opcode_map[opcode].cycles;
 			}
 
-			// skip next instruction?
+			PC += m_InstLen[opcode];
 
-			if (m_skip)
-			{
-				cop400_opcode_func function = m_opcode_map[ROM(PC)].function;
-
-				opcode = ROM(PC);
-
-				if ((function == INST(lqid)) || (function == INST(jid)))
-				{
-					m_icount -= 1;
-				}
-				else
-				{
-					m_icount -= m_opcode_map[opcode].cycles;
-				}
-
-				PC += m_InstLen[opcode];
-
-				m_skip = 0;
-			}
+			m_skip = 0;
 		}
 	} while (m_icount > 0);
 }

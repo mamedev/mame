@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Harriet (c) 1990 Quantel

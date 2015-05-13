@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /***************************************************************************
 
   ISA SVGA Cirrus Logic wrapper
@@ -93,7 +95,7 @@ void isa16_svga_cirrus_device::device_reset()
 
 
 /*
-	Generic CL-GD542x video card
+    Generic CL-GD542x video card
 */
 
 ROM_START( clgd542x )

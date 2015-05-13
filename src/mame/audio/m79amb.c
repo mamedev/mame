@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /************************************************************************
  * m79amb Sound System Analog emulation
  * Nov 2008, Derrick Renaud

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Quench
 /****************************************************************************
  *  Twin Cobra                                                              *
  *  Communications and memory functions between shared CPU memory spaces    *

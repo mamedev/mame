@@ -5,6 +5,17 @@
 
 <softwarelist name="gameking" description="TimeTop GameKing cartridges">
 
+	<software name="4in1" supported="no">
+		<description>4 in 1 No. 10</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1no10.bin" size="524288" crc="b25b1080" sha1="24bc65a9e49ba6f0ffc19b3b858d6c576a3196f7" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2004" supported="no">
 		<description>2004</description>
 		<year>200?</year>

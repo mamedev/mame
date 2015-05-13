@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /***************************************************************************
 
 Custom blitter GA9201 KA01-0249 (120pin IC)
@@ -80,7 +82,7 @@ void shangha3_state::video_start()
 		for (i = 0;i < 128;i++)
 			m_palette->shadow_table()[i] = i+128;
 	}
-	
+
 	save_item(NAME(m_gfxlist_addr));
 	save_item(NAME(m_rawbitmap));
 }

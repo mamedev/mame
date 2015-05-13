@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*
     Handlers for ti990 disk images
 

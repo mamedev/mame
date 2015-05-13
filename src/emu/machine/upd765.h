@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __UPD765_F_H__
 #define __UPD765_F_H__
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Konami video helper functions */
 
 #pragma once

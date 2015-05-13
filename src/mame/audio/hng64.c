@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
 /* Hyper NeoGeo 64 Audio */
 
 // uses a V53A ( == V33A with extra peripherals eg. DMA, Timers, MMU giving virtual 24-bit address space etc.)
@@ -353,7 +355,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 	//m_audiocpu->set_input_line(1, state? ASSERT_LINE :CLEAR_LINE);
 	//m_audiocpu->set_input_line(2, state? ASSERT_LINE :CLEAR_LINE);
 
-	
+
 	// NOT ACCURATE, just so that all the interrupts get triggered for now.
 	#if 0
 	static int i;

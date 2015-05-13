@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
 
     Atari Ultra Tank hardware

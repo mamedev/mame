@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /***************************************************************************
 
   the following run on hardware which is physically not the same as

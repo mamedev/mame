@@ -1,11 +1,11 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 ---------------------------------------------------------------------------
 --
 --   cpu.lua
 --
 --   Rules for building CPU cores
---
---   Copyright Nicola Salmoria and the MAME Team.
---   Visit http://mamedev.org for licensing and usage restrictions.
 --
 ---------------------------------------------------------------------------
 
@@ -357,6 +357,24 @@ end
 
 if (CPUS["ESRIP"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/esrip/esripdsm.c")
+end
+
+--------------------------------------------------
+-- Seiko Epson E0C6200 series
+---@src/emu/cpu/e0c6200/e0c6200.h,CPUS += E0C6200
+--------------------------------------------------
+
+if (CPUS["E0C6200"]~=null) then
+	files {
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200.c",
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200.h",
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6s46.c",
+		MAME_DIR .. "src/emu/cpu/e0c6200/e0c6s46.h",
+	}
+end
+
+if (CPUS["E0C6200"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/emu/cpu/e0c6200/e0c6200d.c")
 end
 
 --------------------------------------------------

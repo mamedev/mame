@@ -4,9 +4,6 @@
 
     RCA CDP1861 Video Display Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                   _CLK   1 |*    \_/     | 24  Vdd

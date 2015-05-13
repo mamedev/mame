@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 #include "emu.h"
 #include "sound/tms3615.h"
 #include "includes/laserbat.h"

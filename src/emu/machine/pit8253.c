@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, Nathan Woods
 /*****************************************************************************
  *
  *  Programmable Interval Timer 8253/8254

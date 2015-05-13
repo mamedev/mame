@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood,Tomasz Slanina
 /****************************************************************
 
 Wheels & Fire

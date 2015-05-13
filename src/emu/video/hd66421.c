@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     Hitachi HD66421 LCD Controller/Driver

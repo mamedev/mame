@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders: Original author, Robbbert
 #ifndef APFCAS_H
 #define APFCAS_H
 

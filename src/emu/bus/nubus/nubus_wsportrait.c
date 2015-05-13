@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   Apple model 820-5037-C "Macintosh II Portrait Video Card"

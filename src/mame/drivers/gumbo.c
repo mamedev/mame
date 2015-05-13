@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /*
 
 Gumbo (c)1994 Min Corp (Main Corp written on PCB)

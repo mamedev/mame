@@ -4,9 +4,6 @@
 
     Wang PC-PM070 Local Interconnect option card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

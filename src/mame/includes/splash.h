@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia, David Haywood
 #include "sound/msm5205.h"
 
 class splash_state : public driver_device
@@ -42,12 +44,12 @@ public:
 	// driver init configuration
 	int m_bitmap_type;
 	int m_sprite_attr2_shift;
-	
+
 	tilemap_t *m_bg_tilemap[2];
 
 	// splash specific
 	int m_adpcm_data;
-	
+
 	//roldfrog specific
 	int m_ret;
 	int m_vblank_irq;
@@ -118,7 +120,7 @@ public:
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq(  );
 };

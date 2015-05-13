@@ -75,14 +75,14 @@
 		NET_REGISTER_DEV(74107_dip, _name)
 
 NETLIB_SUBDEVICE(74107Asub,
-	netlist_ttl_input_t m_clk;
+	netlist_logic_input_t m_clk;
 
-	netlist_ttl_output_t m_Q;
-	netlist_ttl_output_t m_QQ;
+	netlist_logic_output_t m_Q;
+	netlist_logic_output_t m_QQ;
 
-	netlist_state_t<netlist_sig_t> m_Q1;
-	netlist_state_t<netlist_sig_t> m_Q2;
-	netlist_state_t<netlist_sig_t> m_F;
+	netlist_sig_t m_Q1;
+	netlist_sig_t m_Q2;
+	netlist_sig_t m_F;
 
 	ATTR_HOT void newstate(const netlist_sig_t state);
 
@@ -92,9 +92,9 @@ NETLIB_DEVICE(74107A,
 public:
 	NETLIB_NAME(74107Asub) sub;
 
-	netlist_ttl_input_t m_J;
-	netlist_ttl_input_t m_K;
-	netlist_ttl_input_t m_clrQ;
+	netlist_logic_input_t m_J;
+	netlist_logic_input_t m_K;
+	netlist_logic_input_t m_clrQ;
 
 );
 

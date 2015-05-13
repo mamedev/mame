@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /* Super80.c written by Robbbert, 2005-2009. See driver source for documentation. */
 
 #include "includes/super80.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Battlezone sound info, courtesy of Al Kossow:

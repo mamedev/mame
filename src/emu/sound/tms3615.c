@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 #include "tms3615.h"
 

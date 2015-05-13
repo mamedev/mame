@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
 Galaxi (C)2000 B.R.L.

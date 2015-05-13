@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
 class pitnrun_state : public driver_device
 {
 public:
@@ -60,7 +62,7 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
-	
+
 	INTERRUPT_GEN_MEMBER(nmi_source);
 	TIMER_CALLBACK_MEMBER(mcu_real_data_r);
 	TIMER_CALLBACK_MEMBER(mcu_real_data_w);

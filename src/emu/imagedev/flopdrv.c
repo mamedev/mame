@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Miodrag Milanovic
 /*
     This code handles the floppy drives.
     All FDD actions should be performed using these functions.

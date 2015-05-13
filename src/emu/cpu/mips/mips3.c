@@ -998,7 +998,7 @@ offs_t mips3_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
     TLB HANDLING
 ***************************************************************************/
 
-bool mips3_device::RBYTE(offs_t address, UINT32 *result)
+inline bool mips3_device::RBYTE(offs_t address, UINT32 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1032,7 +1032,7 @@ bool mips3_device::RBYTE(offs_t address, UINT32 *result)
 	return true;
 }
 
-bool mips3_device::RHALF(offs_t address, UINT32 *result)
+inline bool mips3_device::RHALF(offs_t address, UINT32 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1066,7 +1066,7 @@ bool mips3_device::RHALF(offs_t address, UINT32 *result)
 	return true;
 }
 
-bool mips3_device::RWORD(offs_t address, UINT32 *result)
+inline bool mips3_device::RWORD(offs_t address, UINT32 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1100,7 +1100,7 @@ bool mips3_device::RWORD(offs_t address, UINT32 *result)
 	return true;
 }
 
-bool mips3_device::RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
+inline bool mips3_device::RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1123,7 +1123,7 @@ bool mips3_device::RWORD_MASKED(offs_t address, UINT32 *result, UINT32 mem_mask)
 	return true;
 }
 
-bool mips3_device::RDOUBLE(offs_t address, UINT64 *result)
+inline bool mips3_device::RDOUBLE(offs_t address, UINT64 *result)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1146,7 +1146,7 @@ bool mips3_device::RDOUBLE(offs_t address, UINT64 *result)
 	return true;
 }
 
-bool mips3_device::RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
+inline bool mips3_device::RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_READ_ALLOWED)
@@ -1169,7 +1169,7 @@ bool mips3_device::RDOUBLE_MASKED(offs_t address, UINT64 *result, UINT64 mem_mas
 	return true;
 }
 
-void mips3_device::WBYTE(offs_t address, UINT8 data)
+inline void mips3_device::WBYTE(offs_t address, UINT8 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1204,7 +1204,7 @@ void mips3_device::WBYTE(offs_t address, UINT8 data)
 	}
 }
 
-void mips3_device::WHALF(offs_t address, UINT16 data)
+inline void mips3_device::WHALF(offs_t address, UINT16 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1239,7 +1239,7 @@ void mips3_device::WHALF(offs_t address, UINT16 data)
 	}
 }
 
-void mips3_device::WWORD(offs_t address, UINT32 data)
+inline void mips3_device::WWORD(offs_t address, UINT32 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1274,7 +1274,7 @@ void mips3_device::WWORD(offs_t address, UINT32 data)
 	}
 }
 
-void mips3_device::WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
+inline void mips3_device::WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1298,7 +1298,7 @@ void mips3_device::WWORD_MASKED(offs_t address, UINT32 data, UINT32 mem_mask)
 	}
 }
 
-void mips3_device::WDOUBLE(offs_t address, UINT64 data)
+inline void mips3_device::WDOUBLE(offs_t address, UINT64 data)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -1322,7 +1322,7 @@ void mips3_device::WDOUBLE(offs_t address, UINT64 data)
 	}
 }
 
-void mips3_device::WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
+inline void mips3_device::WDOUBLE_MASKED(offs_t address, UINT64 data, UINT64 mem_mask)
 {
 	const UINT32 tlbval = m_tlb_table[address >> 12];
 	if (tlbval & VTLB_WRITE_ALLOWED)
@@ -2780,7 +2780,9 @@ void mips3_device::execute_run()
 			m_core->pc += 4;
 
 		/* parse the instruction */
-		switch (op >> 26)
+		const int switch_val = (op >> 26) & 0x3f;
+
+		switch (switch_val)
 		{
 			case 0x00:  /* SPECIAL */
 				handle_special(op);

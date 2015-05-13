@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Krzysztof Strzecha,Jon Sturm
 /*****************************************************************************
  *
  * includes/ti85.h

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /**********************************************************************
 
  Motorola 68328 ("DragonBall") System-on-a-Chip implementation

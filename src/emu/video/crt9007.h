@@ -4,9 +4,6 @@
 
     SMC CRT9007 CRT Video Processor and Controller (VPAC) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    VA2   1 |*    \_/     | 40  GND

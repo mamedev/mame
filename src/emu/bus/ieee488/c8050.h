@@ -4,9 +4,6 @@
 
     Commodore 8050/8250/SFD-1001 Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once
@@ -32,7 +29,7 @@
 // ======================> c8050_device
 
 class c8050_device :  public device_t,
-					  public device_ieee488_interface
+						public device_ieee488_interface
 {
 public:
 	// construction/destruction
@@ -53,7 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_READ8_MEMBER( pi_r );
 	DECLARE_WRITE8_MEMBER( pi_w );
-	
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:

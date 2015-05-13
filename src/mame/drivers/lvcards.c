@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari, Curt Coder
 /***************************************************************************
 Lovely Cards/Poker/Pontoon driver, updated by El Condor from work by Uki and
 Zsolt Vasvari respectively.

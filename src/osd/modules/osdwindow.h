@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont, Couriersud
 //============================================================
 //
 //  osdwindow.h - SDL window handling
-//
-//  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================
 

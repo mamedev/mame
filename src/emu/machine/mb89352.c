@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Fujitsu MB89352A SCSI Protocol Controller
  *

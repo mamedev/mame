@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __VCS_SCHARGER_H
 #define __VCS_SCHARGER_H
 

@@ -4,9 +4,6 @@
 
     Enterprise Sixty Four / One Two Eight Expansion Bus emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "exp.h"

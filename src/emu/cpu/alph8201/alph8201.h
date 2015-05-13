@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tatsuyuki Satoh
 	/**************************************************************************\
 	*                      Alpha8201 Emulator                                  *
 	*                                                                          *

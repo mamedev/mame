@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _MICROTOUCH_H
 #define _MICROTOUCH_H
 

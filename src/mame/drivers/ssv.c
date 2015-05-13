@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /***************************************************************************
 
                     -= Seta, Sammy, Visco (SSV) System =-
@@ -411,11 +413,12 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(irq_enable_w)                                         /*  IRQ En  */  \
 	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0x00ff)    /*  Sound   */  \
 	AM_RANGE(_ROM, 0xffffff) AM_ROM AM_REGION("maincpu", 0)                                         /*  ROM     */
+
 /***************************************************************************
                                 Drift Out '94
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::drifto94_rand_r)
+READ16_MEMBER(ssv_state::drifto94_unknown_r)
 {
 	return machine().rand() & 0xffff;
 }
@@ -427,8 +430,8 @@ static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(dsp_r, dsp_w)
 	AM_RANGE(0x483000, 0x485fff) AM_WRITENOP                                        // ?
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP                                        // ??
-	AM_RANGE(0x510000, 0x510001) AM_READ(drifto94_rand_r        )                       // ??
-	AM_RANGE(0x520000, 0x520001) AM_READ(drifto94_rand_r        )                       // ??
+	AM_RANGE(0x510000, 0x510001) AM_READ(drifto94_unknown_r)                       // ??
+	AM_RANGE(0x520000, 0x520001) AM_READ(drifto94_unknown_r)                       // ??
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_SHARE("nvram")   // NVRAM
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END

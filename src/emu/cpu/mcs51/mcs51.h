@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff
 /*****************************************************************************
  *
  *   mcs51.h
@@ -150,7 +152,7 @@ protected:
 	UINT8   m_irq_active;         /* mask which irq levels are serviced */
 	UINT8   m_irq_prio[8];        /* interrupt priority */
 
-	UINT8	m_forced_inputs[4];	  /* allow read even if configured as output */
+	UINT8   m_forced_inputs[4];   /* allow read even if configured as output */
 
 	int     m_icount;
 

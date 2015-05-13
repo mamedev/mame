@@ -1,45 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller,Ernesto Corvi
 /*****************************************************************************
  *
  *   z8000.c
  *   Portable Z8000(2) emulator
  *   Z8000 MAME interface
- *
- *   Copyright Juergen Buchmueller, all rights reserved.
- *   You can contact me at juergen@mame.net or pullmoll@stop1984.com
- *
- *   - This source code is released as freeware for non-commercial purposes
- *     as part of the M.A.M.E. (Multiple Arcade Machine Emulator) project.
- *     The licensing terms of MAME apply to this piece of code for the MAME
- *     project and derviative works, as defined by the MAME license. You
- *     may opt to make modifications, improvements or derivative works under
- *     that same conditions, and the MAME project may opt to keep
- *     modifications, improvements or derivatives under their terms exclusively.
- *
- *   - Alternatively you can choose to apply the terms of the "GPL" (see
- *     below) to this - and only this - piece of code or your derivative works.
- *     Note that in no case your choice can have any impact on any other
- *     source code of the MAME project, or binary, or executable, be it closely
- *     or losely related to this piece of code.
- *
- *  -  At your choice you are also free to remove either licensing terms from
- *     this file and continue to use it under only one of the two licenses. Do this
- *     if you think that licenses are not compatible (enough) for you, or if you
- *     consider either license 'too restrictive' or 'too free'.
- *
- *  -  GPL (GNU General Public License)
- *     This program is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License
- *     as published by the Free Software Foundation; either version 2
- *     of the License, or (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program; if not, write to the Free Software
- *     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  *     TODO:
  *     - make the z8001 opcodes to be dynamic (i.e. to take segmented mode flag into account and use the non-segmented mode)
@@ -72,6 +37,7 @@ z8002_device::z8002_device(const machine_config &mconfig, const char *tag, devic
 	: cpu_device(mconfig, Z8002, "Z8002", tag, owner, clock, "z8002", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 16, 0)
+	, m_mo_out(*this)
 	, m_vector_mult(1)
 {
 }
@@ -81,6 +47,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 16, 0)
+	, m_mo_out(*this)
 	, m_vector_mult(2)
 {
 }
@@ -316,8 +283,8 @@ UINT8 z8002_device::RDPORT_B(int mode, UINT16 addr)
 	}
 	else
 	{
-		/* how to handle MMU reads? */
-		return 0x00;
+		/* how to handle MMU reads? for now just do it */
+		return m_io->read_byte(addr);
 	}
 }
 
@@ -339,7 +306,7 @@ UINT16 z8001_device::RDPORT_W(int mode, UINT16 addr)
 {
 	if(mode == 0)
 	{
-		return m_io->read_word((UINT16)addr);
+		return m_io->read_word_unaligned((UINT16)addr);
 	}
 	else
 	{
@@ -356,7 +323,8 @@ void z8002_device::WRPORT_B(int mode, UINT16 addr, UINT8 value)
 	}
 	else
 	{
-		/* how to handle MMU writes? */
+		/* how to handle MMU writes? for now just do it */
+		m_io->write_byte(addr,value);
 	}
 }
 
@@ -377,7 +345,7 @@ void z8001_device::WRPORT_W(int mode, UINT16 addr, UINT16 value)
 {
 	if(mode == 0)
 	{
-		m_io->write_word((UINT16)addr, value);
+		m_io->write_word_unaligned((UINT16)addr, value);
 	}
 	else
 	{
@@ -701,6 +669,8 @@ void z8001_device::device_start()
 	register_debug_state();
 
 	m_icountptr = &m_icount;
+	m_mo_out.resolve_safe();
+	m_mi = CLEAR_LINE;
 }
 
 void z8002_device::device_start()
@@ -726,6 +696,8 @@ void z8002_device::device_start()
 	register_debug_state();
 
 	m_icountptr = &m_icount;
+	m_mo_out.resolve_safe();
+	m_mi = CLEAR_LINE;
 }
 
 void z8001_device::device_reset()

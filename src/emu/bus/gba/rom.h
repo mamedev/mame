@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont,Ryan Holtz,etabeta
 #ifndef __GBA_ROM_H
 #define __GBA_ROM_H
 

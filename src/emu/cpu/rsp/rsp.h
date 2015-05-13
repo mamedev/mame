@@ -1,13 +1,11 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Ryan Holtz
 /***************************************************************************
 
     rsp.h
 
     Interface file for the universal machine language-based
     Reality Signal Processor (RSP) emulator.
-
-    Copyright the MESS team
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

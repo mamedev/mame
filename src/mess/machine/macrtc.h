@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /**********************************************************************
 
     macrtc.h - Apple 343-0042 real time clock and battery RAM

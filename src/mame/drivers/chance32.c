@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Angelo Salese, Roberto Fresca
 /*********************************************************
 
   Chance 32

@@ -4,9 +4,6 @@
 
     Commodore 1570/1571/1571CR Single Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

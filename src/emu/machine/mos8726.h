@@ -4,9 +4,6 @@
 
     MOS 8726R1 DMA Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                 /RESET   1 |*    \_/     | 64  Vcc

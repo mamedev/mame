@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mark McDougall, R. Belmont
 /***************************************************************************
 
   namcond1.h

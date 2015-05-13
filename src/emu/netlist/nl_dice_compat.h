@@ -1,5 +1,5 @@
-// license:MAME,GPL-2.0+
-// copyright-holders:couriersud
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nl_dice_compat.h
  *
@@ -110,21 +110,21 @@ public:
 
 #define CHIP_9602_Mono(_name,  _pdesc)   \
 	CHIP(# _name, 9602) \
-	NET_C(VCC, _name.16)		\
-	NET_C(GND, _name.8)  		\
+	NET_C(VCC, _name.16)        \
+	NET_C(GND, _name.8)         \
 	RES(_name ## _R1, (_pdesc)->r1) \
 	CAP(_name ## _C1, (_pdesc)->c1) \
 	RES(_name ## _R2, (_pdesc)->r2) \
-	CAP(_name ## _C2, (_pdesc)->c2) \
 	NET_C(_name.1, _name ## _C1.1) \
 	NET_C(_name.2, _name ## _C1.2) \
 	NET_C(_name.2, _name ## _R1.2) \
-	NET_C(VCC, 	   _name ## _R1.1) \
+	NET_C(VCC,     _name ## _R1.1) \
+	if (((_pdesc)->c2)>1e-15) { \
+	CAP(_name ## _C2, (_pdesc)->c2) \
 	NET_C(_name.15, _name ## _C2.1) \
-	NET_C(_name.14, _name ## _C2.2) \
+	NET_C(_name.14, _name ## _C2.2) }\
 	NET_C(_name.14, _name ## _R2.2) \
-	NET_C(VCC, 	   _name ## _R2.1) \
-
+	NET_C(VCC,     _name ## _R2.1)
 #define CHIP_SERIES_RC(_name,  _pdesc)   \
 	RES(_name ## _R, (_pdesc)->r) \
 	CAP(_name ## _C, (_pdesc)->c) \
@@ -152,19 +152,34 @@ public:
 	ALIAS(_name.3, _name.QQ)
 
 /* FIXME: Alternative implementation using capacitor.
- * 		  This is a transitional implementation
+ *        This is a transitional implementation
  */
 
-inline int CAPACITOR_tc(const double c, const double r)
+inline int CAPACITOR_tc_hl(const double c, const double r)
 {
-	static const double TIME_CONSTANT = -log((3.4 - 2.0) / 3.4);
-	return (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
+	/*
+	 * Vt = (VH-VL)*exp(-t/RC)
+	 * ln(Vt/(VH-VL))*RC = -t
+	 */
+	static const double TIME_CONSTANT = -nl_math::log(2.0 / (3.7-0.3));
+	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
+	return ret;
+}
+
+inline int CAPACITOR_tc_lh(const double c, const double r)
+{
+	/*
+	 * Vt = (VH-VL)*(1-exp(-t/RC))
+	 * -t=ln(1-Vt/(VH-VL))*RC
+	 */
+	static const double TIME_CONSTANT = -nl_math::log(1.0 - 0.8 / (3.7-0.3));
+	int ret = (int) (TIME_CONSTANT * (1.0 + r) * c * 1e9);
+	return ret;
 }
 
 #define CHIP_CAPACITOR(_name, _pdesc) \
 	NETDEV_DELAY(_name) \
-	NETDEV_PARAMI(_name, L_TO_H, CAPACITOR_tc((_pdesc)->c, (_pdesc)->r)) \
-	NETDEV_PARAMI(_name, H_TO_HL, CAPACITOR_tc((_pdesc)->c, (_pdesc)->r)) \
-
+	NETDEV_PARAMI(_name, L_TO_H, CAPACITOR_tc_lh((_pdesc)->c, (_pdesc)->r)) \
+	NETDEV_PARAMI(_name, H_TO_L, CAPACITOR_tc_hl((_pdesc)->c, (_pdesc)->r))
 
 #endif /* NL_DICE_COMPAT_H_ */

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Coates, Pierpaolo Prazzoli
 /***************************************************************************
 
     Zaccaria Quasar

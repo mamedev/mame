@@ -4,9 +4,6 @@
 
     Dinamic Software cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "dinamic.h"

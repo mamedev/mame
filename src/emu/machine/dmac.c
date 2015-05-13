@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     DMAC
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     DMA controller used in Amiga systems
 

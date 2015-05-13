@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
 /***************************************************************************
 
     Capcom CPS-3 Sound Hardware

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 class bigstrkb_state : public driver_device
 {
 public:

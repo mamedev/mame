@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 --------------------------------------------------
 -- romcmp
 --------------------------------------------------
@@ -454,8 +457,6 @@ files {
 
 dofile("netlist.lua")
 
-
-if (_OPTIONS["target"]=="mess") then
 --------------------------------------------------
 -- castool
 --------------------------------------------------
@@ -610,5 +611,3 @@ files {
 	MAME_DIR .. "src/mess/tools/imgtool/modules/bml3.c",
 	MAME_DIR .. "src/mess/tools/imgtool/modules/hp48.c",
 }
-
-end

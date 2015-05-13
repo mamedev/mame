@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __TLCS900_H__
 #define __TLCS900_H__
 

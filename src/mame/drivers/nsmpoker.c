@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /******************************************************************************
 
   NSM TMS9995 BASED HARDWARE

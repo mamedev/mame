@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
         Poly-88 machine by Miodrag Milanovic

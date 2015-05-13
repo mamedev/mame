@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Jaroslaw Burczynski, Tomasz Slanina
 /***************************************************************************
 
   machine.c

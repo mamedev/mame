@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Konami Video Helper functions */
 
 #include "emu.h"

@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Commodore A590 / A2091
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     DMAC based HD controller for the Amiga 500 and Zorro-II
 

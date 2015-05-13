@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /**  Konami 053252  **/
 /* CRT and interrupt control unit */
 #pragma once

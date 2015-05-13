@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood,Nicola Salmoria
 /*---
 
 Pirates      (c)1994 NIX  (DEC 14 1994 17:32:29) displayed in cabinet test mode

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Chris Moore, Nicola Salmoria
 
 class bublbobl_state : public driver_device
 {

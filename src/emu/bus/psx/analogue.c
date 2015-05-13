@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "analogue.h"
 
 const device_type PSX_ANALOG_JOYSTICK = &device_creator<psx_analog_joystick_device>;

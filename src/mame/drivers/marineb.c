@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
 Marine Boy hardware memory map (preliminary)

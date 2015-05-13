@@ -1,11 +1,8 @@
-// license:MAME, GPL-2.0+
+// license:GPL-2.0+
 // copyright-holders:Dirk Best
 /**********************************************************************
 
     Epson EX-800 dot matrix printer emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

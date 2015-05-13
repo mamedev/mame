@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
 #include "audio/seibu.h"
 #include "machine/raiden2cop.h"
 #include "video/seibu_crtc.h"

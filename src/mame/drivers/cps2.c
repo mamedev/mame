@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman, Andreas Naive, Nicola Salmoria
 /***************************************************************************
 
 Driver by Paul Leaman (paul@vortexcomputing.demon.co.uk)

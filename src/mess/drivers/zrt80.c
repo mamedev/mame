@@ -1,4 +1,4 @@
-// license:MAME
+// license:BSD-3-Clause
 // copyright-holders:Robbbert
 /***************************************************************************
 
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_MC6845_UPDATE_ROW_CB(zrt80_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD( "ins8250", INS8250, 2457600 )
-	MCFG_INS8250_OUT_RTS_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(zrt80_state, kbd_put))
 MACHINE_CONFIG_END
@@ -319,5 +319,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY                   FULLNAME       FLAGS */
 COMP( 1982, zrt80,  0,       0,      zrt80,     zrt80, driver_device,    0, "Digital Research Computers", "ZRT-80", 0)

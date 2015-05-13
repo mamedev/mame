@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * wpc_pin.h
  *

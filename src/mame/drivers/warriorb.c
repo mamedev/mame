@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 /***************************************************************************
 
 Taito Dual Screen Games

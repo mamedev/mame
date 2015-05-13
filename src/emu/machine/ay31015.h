@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /* ay31015.h
 
     Written for MESS by Robbbert on May 29th, 2008.

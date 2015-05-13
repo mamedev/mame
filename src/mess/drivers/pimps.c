@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /***************************************************************************
 
         P.I.M.P.S. (Personal Interactive MicroProcessor System)

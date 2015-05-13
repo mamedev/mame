@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 /*************************************************************************
 
     Blades of Steel

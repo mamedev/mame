@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*************************************************************************
 
     drivers/advision.c
@@ -42,14 +44,6 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, advision_state )
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vsync_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, advision_state )
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READ(sound_cmd_r)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(sound_g_w)
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(sound_d_w)
-	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_NOP
-	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_NOP
-ADDRESS_MAP_END
-
 /* Input Ports */
 
 static INPUT_PORTS_START( advision )
@@ -74,7 +68,9 @@ static MACHINE_CONFIG_START( advision, advision_state )
 
 	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*16) // COP411L-KCN/N
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, COP400_MICROBUS_DISABLED)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_COP400_READ_L_CB(READ8(advision_state, sound_cmd_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(advision_state, sound_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(advision_state, sound_d_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

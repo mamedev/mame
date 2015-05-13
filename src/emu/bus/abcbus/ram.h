@@ -4,9 +4,6 @@
 
     ABC 80 16 KB RAM expansion card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once
@@ -26,7 +23,7 @@
 // ======================> abc80_16kb_ram_card_t
 
 class abc80_16kb_ram_card_t :  public device_t,
-						   	   public device_abcbus_card_interface
+								public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

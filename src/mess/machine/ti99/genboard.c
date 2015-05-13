@@ -1,4 +1,4 @@
-// license:MAME|LGPL-2.1+
+// license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /***************************************************************************
     Geneve 9640 mapper and more components

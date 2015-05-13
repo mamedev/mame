@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 Jailbreak - (c) 1986 Konami

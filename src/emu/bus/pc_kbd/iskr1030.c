@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     Iskra-1030 and -1031 XX-key keyboard emulation
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 

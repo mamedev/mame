@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /*************************************************************************
 
     Gumbo - Miss Bingo - Miss Puzzle

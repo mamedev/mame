@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     Commodore A2232
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     Zorro-II Serial Card
 

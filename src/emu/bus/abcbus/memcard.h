@@ -4,9 +4,6 @@
 
     Luxor ABC Memory Card 55 10762-01 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once
@@ -26,7 +23,7 @@
 // ======================> abc_memory_card_t
 
 class abc_memory_card_t :  public device_t,
-						   public device_abcbus_card_interface
+							public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

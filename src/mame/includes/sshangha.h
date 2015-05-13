@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Charles MacDonald, David Haywood
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 #include "machine/deco146.h"

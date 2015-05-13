@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"

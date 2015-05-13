@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
   ISA 8 bit Creative Labs Game Blaster Sound Card

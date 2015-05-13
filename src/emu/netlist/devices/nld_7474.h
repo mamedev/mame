@@ -55,11 +55,11 @@
 		NET_REGISTER_DEV(7474_dip, _name)
 
 NETLIB_SUBDEVICE(7474sub,
-	netlist_ttl_input_t m_CLK;
+	netlist_logic_input_t m_CLK;
 
-	netlist_state_t<UINT8> m_nextD;
-	netlist_ttl_output_t m_Q;
-	netlist_ttl_output_t m_QQ;
+	INT8 m_nextD;
+	netlist_logic_output_t m_Q;
+	netlist_logic_output_t m_QQ;
 
 	ATTR_HOT inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
 );
@@ -68,9 +68,9 @@ NETLIB_DEVICE(7474,
 public:
 	NETLIB_NAME(7474sub) sub;
 
-	netlist_ttl_input_t m_D;
-	netlist_ttl_input_t m_CLRQ;
-	netlist_ttl_input_t m_PREQ;
+	netlist_logic_input_t m_D;
+	netlist_logic_input_t m_CLRQ;
+	netlist_logic_input_t m_PREQ;
 );
 
 NETLIB_DEVICE(7474_dip,

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
   The Konami_1 CPU is a 6809 with opcodes scrambled. Here is how to

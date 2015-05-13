@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 /***************************************************************************
 
 Truco Clemente (c) 1991 Miky SRL

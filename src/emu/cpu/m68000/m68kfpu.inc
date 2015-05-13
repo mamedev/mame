@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Karl Stenerud
 #include <math.h>
 
 #define FPCC_N          0x08000000

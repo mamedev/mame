@@ -1,4 +1,4 @@
-// license:MAME|GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:James Wallace,'Re-Animator'
 /****************************************************************************************
 

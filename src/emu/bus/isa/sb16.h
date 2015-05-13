@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
+
 #ifndef __SB16__
 #define __SB16__
 

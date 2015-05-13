@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************************
  PGM IGS027A ARM protection emulation
 

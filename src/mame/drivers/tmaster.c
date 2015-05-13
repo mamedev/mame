@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, Mariusz Wojcieszek
 /***************************************************************************
 
                       -= Touch Master / Galaxy Games =-

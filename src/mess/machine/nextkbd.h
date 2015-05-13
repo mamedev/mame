@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __NEXTKBD_H__
 #define __NEXTKBD_H__
 

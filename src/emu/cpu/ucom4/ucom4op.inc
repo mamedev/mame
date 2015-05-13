@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
+
 // uCOM-4 opcode handlers
 
 // internal helpers
@@ -41,7 +44,7 @@ UINT8 ucom4_cpu_device::input_r(int index)
 		case NEC_UCOM4_PORTD: inp = m_read_d(index, 0xff); break;
 
 		default:
-			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_pc);
+			logerror("%s read from unknown port %c at $%03X\n", tag(), 'A' + index, m_prev_pc);
 			break;
 	}
 
@@ -64,7 +67,7 @@ void ucom4_cpu_device::output_w(int index, UINT8 data)
 		case NEC_UCOM4_PORTI: m_write_i(index, data & 7, 0xff); break;
 
 		default:
-			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data & 0xf, m_pc);
+			logerror("%s write to unknown port %c = $%X at $%03X\n", tag(), 'A' + index, data & 0xf, m_prev_pc);
 			break;
 	}
 
@@ -73,7 +76,7 @@ void ucom4_cpu_device::output_w(int index, UINT8 data)
 
 void ucom4_cpu_device::op_illegal()
 {
-	logerror("%s unknown opcode $%02X at $%03X\n", tag(), m_op, m_pc);
+	logerror("%s unknown opcode $%02X at $%03X\n", tag(), m_op, m_prev_pc);
 }
 
 
@@ -372,7 +375,7 @@ void ucom4_cpu_device::op_ci()
 	m_skip = (m_acc == (m_arg & 0x0f));
 
 	if ((m_arg & 0xf0) != 0xc0)
-		logerror("%s CI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_pc);
+		logerror("%s CI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_prev_pc);
 }
 
 void ucom4_cpu_device::op_cm()
@@ -399,7 +402,7 @@ void ucom4_cpu_device::op_cli()
 	m_skip = (m_dpl == (m_arg & 0x0f));
 
 	if ((m_arg & 0xf0) != 0xe0)
-		logerror("%s CLI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_pc);
+		logerror("%s CLI opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xf0, m_prev_pc);
 }
 
 void ucom4_cpu_device::op_tmb()
@@ -482,7 +485,7 @@ inline bool ucom4_cpu_device::check_op_43()
 {
 	// these opcodes are officially only supported on uCOM-43
 	if (m_family != NEC_UCOM43)
-		logerror("%s using uCOM-43 opcode $%02X at $%03X\n", tag(), m_op, m_pc);
+		logerror("%s using uCOM-43 opcode $%02X at $%03X\n", tag(), m_op, m_prev_pc);
 
 	return (m_family == NEC_UCOM43);
 }
@@ -724,7 +727,7 @@ void ucom4_cpu_device::op_stm()
 	m_timer->adjust(base * ((m_arg & 0x3f) + 1));
 
 	if ((m_arg & 0xc0) != 0x80)
-		logerror("%s STM opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xc0, m_pc);
+		logerror("%s STM opcode unexpected upper arg $%02X at $%03X\n", tag(), m_arg & 0xc0, m_prev_pc);
 }
 
 void ucom4_cpu_device::op_ttm()

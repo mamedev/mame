@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  * wpcsnd.c - Williams WPC pinball sound
  *   M6809E + YM2151 + HC55516 + DAC

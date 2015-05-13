@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 * fdc37c665gt.h
 *

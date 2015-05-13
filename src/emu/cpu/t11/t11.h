@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*** T-11: Portable DEC T-11 emulator ******************************************/
 
 #pragma once

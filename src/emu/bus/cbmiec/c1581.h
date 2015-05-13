@@ -4,9 +4,6 @@
 
     Commodore 1581/1563 Single Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

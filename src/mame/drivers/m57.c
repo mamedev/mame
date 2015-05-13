@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino
 /****************************************************************************
 
     Irem M57 hardware

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/mb14241.h"
 
 class fgoal_state : public driver_device

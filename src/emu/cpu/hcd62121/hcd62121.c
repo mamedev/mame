@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /**********************************************************************
 
     Hitachi hcd62121 cpu core emulation.

@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 /*****************************************************************************
  *
  * includes/pc1403.h

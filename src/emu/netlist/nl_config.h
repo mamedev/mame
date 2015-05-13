@@ -12,6 +12,7 @@
 
 #include "osdcore.h"
 #include "corealloc.h"
+#include "eminline.h"
 #include <math.h>
 #include <exception>
 #include <typeinfo>
@@ -27,17 +28,21 @@
  */
 #define USE_PMFDELEGATES        (0)
 
+#if (USE_PMFDELEGATES)
+#pragma GCC diagnostic ignored "-Wpmf-conversions"
+#endif
+
 /*
  *  This increases performance in circuits with a lot of gates
  *  but is not guaranteed to be absolutely timing correct.
  *
- *  Performance increase about 10%
+ *  Performance increase about 10% (breakout) to 20% (pong)
  *
  */
 
 #define USE_DEACTIVE_DEVICE     (0)
 
-#define USE_TRUTHTABLE			(0)
+#define USE_TRUTHTABLE          (0)
 
 // The following adds about 10% performance ...
 
@@ -53,9 +58,19 @@
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
 
-//typedef double   nl_double;
-
 #define nl_double double
+
+//============================================================
+//  Solver defines
+//============================================================
+
+#define USE_MATRIX_GS (0)
+#define USE_PIVOT_SEARCH (0)
+#define USE_GABS (0)
+// savings are eaten up by effort
+// FIXME: Convert into solver parameter
+#define USE_LINEAR_PREDICTION (0)
+
 
 //============================================================
 //  DEBUGGING
@@ -105,8 +120,8 @@
 #if NL_KEEP_STATISTICS
 #define add_to_stat(v,x)        do { v += (x); } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
-#define begin_timing(v)         do { (v) -= get_profile_ticks(); } while (0)
-#define end_timing(v)           do { (v) += get_profile_ticks(); } while (0)
+#define begin_timing(v)         do { v -= get_profile_ticks(); } while (0)
+#define end_timing(v)           do { v += get_profile_ticks(); } while (0)
 #else
 #define add_to_stat(v,x)        do { } while (0)
 #define inc_stat(v)             add_to_stat(v, 1)
@@ -159,12 +174,11 @@ public:
 
 #ifdef MAME_DEBUG
 #define nl_assert(x)               do { if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
-#define nl_assert_always(x, msg)   do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
-#define nl_assert(x)               do { } while (0)
+#define nl_assert(x)               do { if (0) if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 //#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #endif
+#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 
 //============================================================
 //  Compiling standalone

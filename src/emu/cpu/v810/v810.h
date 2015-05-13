@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese, Tomasz Slanina
 #pragma once
 
 #ifndef __V810_H__

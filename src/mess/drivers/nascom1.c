@@ -1,10 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:(Original Author?), Dirk Best
 /************************************************************************
 
     Nascom 1 and Nascom 2
-
-    license: MAME
-    copyright-holders: (Original Author?), Dirk Best
-
 
     Memory map
 

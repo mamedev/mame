@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Victor Trucco,Steve Ellenoff,Phil Stroffolino,Tatsuyuki Satoh,Tomasz Slanina,Nicola Salmoria
 /***************************************************************************
 
 Ping Pong King  (c) Taito 1985

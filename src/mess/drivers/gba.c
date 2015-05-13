@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R.Belmont,Ryan Holtz
 /***************************************************************************
 
   gba.c
@@ -5,12 +7,6 @@
   Driver file to handle emulation of the Nintendo Game Boy Advance.
 
   By R. Belmont & Harmony
-
-  TODO:
-  - Raster timing issues.  Castlevania (HOD and AOS)'s raster effects
-    work if the VBlank is fired on scanline 0, else they're offset by
-    the height of the vblank region.  Is scanline 0 the start of the
-    visible area?
 
 ***************************************************************************/
 
@@ -161,7 +157,7 @@ void gba_state::dma_exec(FPTR ch)
 	else
 	{
 //      if (dst >= 0x6000000 && dst <= 0x6017fff)
-//		printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (%s)\n", (int)ch, src, dst, ctrl, cnt, ((ctrl>>10) & 1) ? "32" : "16");
+//      printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (%s)\n", (int)ch, src, dst, ctrl, cnt, ((ctrl>>10) & 1) ? "32" : "16");
 	}
 
 	for (int i = 0; i < cnt; i++)
@@ -1559,7 +1555,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 				ch = offset / 3;
 
-//				printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", space.device().safe_pc(), ch, data, offset%3, ~mem_mask);
+//              printf("%08x: DMA(%d): %x to reg %d (mask %08x)\n", space.device().safe_pc(), ch, data, offset%3, ~mem_mask);
 
 				if (((offset % 3) == 2) && ((~mem_mask & 0xffff0000) == 0))
 				{

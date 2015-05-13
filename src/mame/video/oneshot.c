@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Paul Priest
 /* One Shot One Kill Video Hardware */
 
 #include "emu.h"

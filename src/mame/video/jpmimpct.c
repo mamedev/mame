@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     JPM IMPACT with Video hardware

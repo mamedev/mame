@@ -805,7 +805,7 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 				int separator = tag4.find_first_of('%');
 				if (separator != -1)
 				{
-					// we are loading a clone through softlists, split the setname from the parentname					
+					// we are loading a clone through softlists, split the setname from the parentname
 					tag5.assign(tag4.substr(separator + 1, tag4.length() - separator + 1));
 					tag4.erase(separator, tag4.length() - separator);
 				}

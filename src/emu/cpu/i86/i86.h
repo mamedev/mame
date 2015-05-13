@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef __I8086_H__
 #define __I8086_H__
 

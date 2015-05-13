@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller,Ernesto Corvi
 #pragma once
 
 #ifndef __Z8000_H__
@@ -26,6 +28,8 @@ enum
 #define Z8000_SYSCALL   0x0200  /* system call (lsb is vector) */
 #define Z8000_HALT      0x0100  /* halted flag  */
 
+#define MCFG_Z8000_MO(_devcb) \
+	devcb = &z8002_device::set_mo_callback(*device, DEVCB_##_devcb);
 
 class z8002_device : public cpu_device
 {
@@ -34,6 +38,9 @@ public:
 	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~z8002_device();
+
+	template<class _Object> static devcb_base &set_mo_callback(device_t &device, _Object object) { return downcast<z8002_device &>(device).m_mo_out.set_callback(object); }
+	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:
 	// device-level overrides
@@ -69,6 +76,7 @@ protected:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+	devcb_write_line m_mo_out;
 
 	UINT32  m_op[4];      /* opcodes/data of current instruction */
 	UINT32  m_ppc;        /* previous program counter */
@@ -91,6 +99,7 @@ protected:
 	} m_regs;             /* registers */
 	int m_nmi_state;      /* NMI line state */
 	int m_irq_state[2];   /* IRQ line states (NVI, VI) */
+	int m_mi;
 	address_space *m_program;
 	address_space *m_data;
 	direct_read_data *m_direct;

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Norbert Kehrer
 /***************************************************************************
 
 Super Tank

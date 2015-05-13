@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Coates, Couriersud
 /***************************************************************************
 
   video\cvs.c

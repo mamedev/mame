@@ -898,7 +898,7 @@ READ8_MEMBER(fidelz80_state::unknown_r)
 	return 0;
 }
 
-READ8_MEMBER(fidelz80_state::rand_r)
+READ8_MEMBER(fidelz80_state::unknown2_r)
 {
 	return machine().rand();
 }
@@ -1040,7 +1040,7 @@ static ADDRESS_MAP_START(bridgec_mcu_io, AS_IO, 8, fidelz80_state)
 
 	// related to the card scanner, probably clock and data optical
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(unknown_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(rand_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(unknown2_r)
 ADDRESS_MAP_END
 
 /******************************************************************************

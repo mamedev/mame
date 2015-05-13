@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Dr. Tomy    -   (c) 1993 Playmark

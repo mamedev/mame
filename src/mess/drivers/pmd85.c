@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Krzysztof Strzecha
 /*******************************************************************************
 
 PMD-85 driver by Krzysztof Strzecha

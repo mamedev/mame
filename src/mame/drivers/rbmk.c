@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Real Battle Mahjong King by 'Game Men System Co. Ltd.'
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Bennett
 /*************************************************************************
 
     Turrett Tower video hardware

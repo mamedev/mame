@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /**********************************************************************************
 
   Major Poker / Major Joker

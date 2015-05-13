@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_7404.c
  *
@@ -24,12 +26,12 @@ NETLIB_UPDATE(7404)
 
 NETLIB_START(7404_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
-	register_sub(m_3, "3");
-	register_sub(m_4, "4");
-	register_sub(m_5, "5");
-	register_sub(m_6, "6");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
+	register_sub("3", m_3);
+	register_sub("4", m_4);
+	register_sub("5", m_5);
+	register_sub("6", m_6);
 
 	register_subalias("1", m_1.m_I);
 	register_subalias("2", m_1.m_Q);

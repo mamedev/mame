@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***********************************************************
 
     Astrocade custom 'IO' chip sound chip driver

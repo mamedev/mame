@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo
 /****************************************************************************
 
     Sega "Space Tactics" Driver

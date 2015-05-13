@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Karl Stenerud
 /*
 
 Mitsubishi 7700 Series CPU disassembler v1.1

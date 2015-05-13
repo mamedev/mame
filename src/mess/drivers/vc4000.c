@@ -1,4 +1,4 @@
-// license:MAME
+// license:GPL-2.0+
 // copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
 /******************************************************************************
  Peter Trauner May 2001

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Miodrag Milanovic
 /* flopdrv provides simple emulation of a disc drive */
 /* the 8271, upd765 and wd179x use this */
 

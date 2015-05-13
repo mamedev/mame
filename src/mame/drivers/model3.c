@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardiner, R. Belmont, Ville Linde
 /*
     Sega Model 3
     PowerPC 603e + tilemaps + Real3D 1000 + 68000 + 2x SCSP

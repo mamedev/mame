@@ -38,11 +38,11 @@
 
 NETLIB_DEVICE(7450,
 public:
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
-	netlist_ttl_output_t m_Q;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
+	netlist_logic_input_t m_C;
+	netlist_logic_input_t m_D;
+	netlist_logic_output_t m_Q;
 );
 
 NETLIB_DEVICE(7450_dip,

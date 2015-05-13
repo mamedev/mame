@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski, Andrea Mazzoleni
 class retofinv_state : public driver_device
 {
 public:

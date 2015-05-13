@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, ElSemi, ???
 /*** Video *******************************************************************/
 /* see drivers/pgm.c for notes on where improvements can be made */
 
