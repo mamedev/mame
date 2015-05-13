@@ -1863,18 +1863,7 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 
 	// if we didn't find it, try to guess what it might be
 	if (found == 0)
-	{
-		// if not a power of 2, assume it is a non-ROM file
-		if ((length & (length - 1)) != 0)
-		{
-			osd_printf_info("NOT A ROM\n");
-			m_nonroms++;
-		}
-
-		// otherwise, it's just not a match
-		else
-			osd_printf_info("NO MATCH\n");
-	}
+		osd_printf_info("NO MATCH\n");
 
 	// if we did find it, count it as a match
 	else
@@ -1887,9 +1876,12 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 //  of drivers by hash
 //-------------------------------------------------
 
+typedef tagmap_t<FPTR> slname_map;
+
 int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 {
 	int found = 0;
+	slname_map listnames;
 
 	// iterate over drivers
 	m_drivlist.reset();
@@ -1918,23 +1910,26 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 		software_list_device_iterator iter(m_drivlist.config().root_device());
 		for (software_list_device *swlistdev = iter.first(); swlistdev != NULL; swlistdev = iter.next())
 		{
-			for (software_info *swinfo = swlistdev->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
-				for (software_part *part = swinfo->first_part(); part != NULL; part = part->next())
-					for (const rom_entry *region = part->romdata(); region != NULL; region = rom_next_region(region))
-						for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
-						{
-							hash_collection romhashes(ROM_GETHASHDATA(rom));
-							if (hashes == romhashes)
+			if (listnames.add(swlistdev->list_name(), 0, FALSE) != TMERR_DUPLICATE)
+			{
+				for (software_info *swinfo = swlistdev->first_software_info(); swinfo != NULL; swinfo = swinfo->next())
+					for (software_part *part = swinfo->first_part(); part != NULL; part = part->next())
+						for (const rom_entry *region = part->romdata(); region != NULL; region = rom_next_region(region))
+							for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 							{
-								bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
-
-								// output information about the match
-								if (found)
-									osd_printf_info("                    ");
-								osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev->list_name(), swinfo->shortname(), swinfo->longname());
-								found++;
+								hash_collection romhashes(ROM_GETHASHDATA(rom));
+								if (hashes == romhashes)
+								{
+									bool baddump = romhashes.flag(hash_collection::FLAG_BAD_DUMP);
+									
+									// output information about the match
+									if (found)
+										osd_printf_info("                    ");
+									osd_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlistdev->list_name(), swinfo->shortname(), swinfo->longname());
+									found++;
+								}
 							}
-						}
+			}
 		}
 	}
 
