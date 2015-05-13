@@ -23,8 +23,8 @@ public:
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
 		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		m_low_V = 0.3;
-		m_high_V = 3.7;
+		m_low_V = 0.1;
+		m_high_V = 4.0;
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
@@ -43,8 +43,8 @@ public:
 		m_low_thresh_V = 0.8;
 		m_high_thresh_V = 2.0;
 		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		m_low_V = 0.3;
-		m_high_V = 3.7;
+		m_low_V = 0.1;
+		m_high_V = 4.0;
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
