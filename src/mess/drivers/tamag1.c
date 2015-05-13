@@ -26,6 +26,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 
 	DECLARE_PALETTE_INIT(tama);
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 };
 
 
@@ -37,10 +38,38 @@ PALETTE_INIT_MEMBER(tamag1_state, tama)
 }
 
 
+static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+{
+	static const int seg2x[0x28] =
+	{
+		0, 1, 2, 3, 4, 5, 6, 7,
+		35, 8, 9,10,11,12,13,14,
+		15,34,33,32,31,30,29,28,
+		27,26,25,24,36,23,22,21,
+		20,19,18,17,16,37,38,39
+	};
+	
+	bitmap.pix16(com, seg2x[seg]) = state;
+}
+
 
 
 static INPUT_PORTS_START( tama )
+	PORT_START("K0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
+{
+	// Inputs are hooked up backwards here, because MCU input
+	// ports are all tied to its interrupt controller.
+	int line = (int)(FPTR)param;
+	int state = newval ? ASSERT_LINE : CLEAR_LINE;
+	m_maincpu->set_input_line(line, state);
+}
 
 
 
@@ -48,7 +77,7 @@ static MACHINE_CONFIG_START( tama, tamag1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)
-//	MCFG_E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+	MCFG_E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -79,7 +108,7 @@ MACHINE_CONFIG_END
 
 ROM_START( tama )
 	ROM_REGION( 0x3000, "maincpu", 0 )
-//	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) )
+	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) )
 	ROM_LOAD( "tama.b", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
 ROM_END
 

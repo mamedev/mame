@@ -64,6 +64,9 @@ void e0c6s46_device::device_start()
 	m_prgtimer_handle->adjust(attotime::never);
 	
 	// zerofill
+	memset(m_port_k, 0xf, sizeof(m_port_k));
+	m_dfk0 = 0xf;
+	
 	memset(m_irqflag, 0, sizeof(m_irqflag));
 	memset(m_irqmask, 0, sizeof(m_irqmask));
 	m_osc = 0;
@@ -89,6 +92,9 @@ void e0c6s46_device::device_start()
 	m_prgtimer_reload = 0;
 	
 	// register for savestates
+	save_item(NAME(m_port_k));
+	save_item(NAME(m_dfk0));
+	
 	save_item(NAME(m_irqflag));
 	save_item(NAME(m_irqmask));
 	save_item(NAME(m_osc));
@@ -125,11 +131,8 @@ void e0c6s46_device::device_reset()
 	e0c6200_cpu_device::device_reset();
 
 	// reset interrupts
-	for (int i = 0; i < 6; i++)
-	{
-		m_data->read_byte(0xf00+i);
-		m_data->write_byte(0xf10+i, 0);
-	}
+	memset(m_irqflag, 0, sizeof(m_irqflag));
+	memset(m_irqmask, 0, sizeof(m_irqmask));
 	
 	// reset other i/o
 	m_data->write_byte(0xf41, 0xf);
@@ -186,6 +189,7 @@ bool e0c6s46_device::check_interrupt()
 		// middle of handling this interrupt, irq vector may be an OR of 2 vectors
 		m_irq_vector = 2*pri + 2;
 		int reg = priorder[pri];
+		m_irq_id = reg;
 		
 		switch (reg)
 		{
@@ -200,6 +204,18 @@ bool e0c6s46_device::check_interrupt()
 	return false;
 }
 
+void e0c6s46_device::execute_set_input(int line, int state)
+{
+	// only support 8 K input lines at the moment
+	if (line < 0 || line > 7)
+		return;
+
+	state = (state) ? 1 : 0;
+	int port = line >> 3 & 1;
+	UINT8 bit = 1 << (line & 3);
+	
+	m_port_k[port] = (m_port_k[port] & ~bit) | (state ? bit : 0);
+}
 
 
 void e0c6s46_device::clock_watchdog()
@@ -235,7 +251,7 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::clktimer_cb)
 	// schedule next timeout (256hz at default clock of 32768hz)
 	m_clktimer_handle->adjust(attotime::from_ticks(128, unscaled_clock()));
 
-	// 1hz timeout also clocks the watchdog timer
+	// 1hz falling edge also clocks the watchdog timer
 	if (m_clktimer_count == 0)
 		clock_watchdog();
 }
@@ -349,13 +365,13 @@ UINT32 e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					pixel = vram[offset] >> c & 1;
 				
 				// 16 COM(common) pins, 40 SEG(segment) pins
-				int segment = offset / 2;
-				int common = bank * 8 + (offset & 1) * 4 + c;
+				int seg = offset / 2;
+				int com = bank * 8 + (offset & 1) * 4 + c;
 				
 				if (m_pixel_update_handler != NULL)
-					m_pixel_update_handler(*this, bitmap, cliprect, m_lcd_contrast, segment, common, pixel);
-				else if (cliprect.contains(segment, common))
-					bitmap.pix16(common, segment) = pixel;
+					m_pixel_update_handler(*this, bitmap, cliprect, m_lcd_contrast, seg, com, pixel);
+				else if (cliprect.contains(seg, com))
+					bitmap.pix16(com, seg) = pixel;
 			}
 		}
 	}
@@ -372,11 +388,18 @@ READ8_MEMBER(e0c6s46_device::io_r)
 		{
 			// irq flags are reset(acked) when read
 			UINT8 flag = m_irqflag[offset];
-			m_irqflag[offset] = 0;
+			if (!space.debugger_access())
+				m_irqflag[offset] = 0;
 			return flag;
 		}
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
 			return m_irqmask[offset-0x10];
+		
+		// k input ports
+		case 0x40: case 0x42:
+			return m_port_k[offset >> 1 & 1];
+		case 0x41:
+			return m_dfk0;
 		
 		// clock timer (lo, hi)
 		case 0x20: case 0x21:
@@ -441,6 +464,12 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			m_possible_irq = true;
 			break;
 		}
+		
+		// k input ports
+		case 0x41:
+			// d0-d3: K0x input port irq on 0: rising edge, 1: falling edge, 
+			m_dfk0 = data;
+			break;
 		
 		// OSC circuit
 		case 0x70:

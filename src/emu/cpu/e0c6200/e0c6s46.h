@@ -15,8 +15,8 @@
 	e0c6s46_device::static_set_pixel_update_cb(*device, _cb);
 
 
-typedef void (*e0c6s46_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int segment, int common, int state);
-#define E0C6S46_PIXEL_UPDATE_CB(name) void name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int segment, int common, int state)
+typedef void (*e0c6s46_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state);
+#define E0C6S46_PIXEL_UPDATE_CB(name) void name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
 
 
 class e0c6s46_device : public e0c6200_cpu_device
@@ -38,6 +38,8 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_input_lines() const { return 8; }
+	virtual void execute_set_input(int line, int state);
 	virtual void execute_one();
 	virtual bool check_interrupt();
 
@@ -49,9 +51,12 @@ private:
 	UINT8 m_irqmask[6];
 	UINT8 m_osc;
 	UINT8 m_svd;
+	
+	UINT8 m_port_k[2];
+	UINT8 m_dfk0;
+	
 	UINT8 m_lcd_control;
 	UINT8 m_lcd_contrast;
-
 	e0c6s46_pixel_update_func m_pixel_update_handler;
 
 	int m_watchdog_count;

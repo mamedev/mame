@@ -152,7 +152,7 @@ void e0c6200_cpu_device::do_interrupt()
 	// interrupt handling takes 13* cycles, plus 1 extra if cpu was halted
 	// *: 12.5 on E0C6200A, does the cpu osc source change polarity or something?
 	m_icount -= 13;
-	if (m_halt || m_sleep)
+	if (m_halt)
 		m_icount--;
 
 	m_halt = m_sleep = false;
@@ -181,7 +181,7 @@ void e0c6200_cpu_device::execute_run()
 			}
 		}
 		
-		// cpu halted (peripherals still run)
+		// core cpu not running (peripherals still work)
 		if (m_halt || m_sleep)
 		{
 			m_icount = 0;
