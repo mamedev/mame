@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "sound/speaker.h"
 #include "cpu/upd7810/upd7810.h"

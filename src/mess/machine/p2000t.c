@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Daniels
 /**********************************************************************
 
   machine.c

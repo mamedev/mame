@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tim Schuerewegen
 #ifndef _GP32_H_
 #define _GP32_H_
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
         LLC driver by Miodrag Milanovic

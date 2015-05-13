@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder,Lord Nightmare
 #pragma once
 
 #ifndef __TDV2324__

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Paul Daniels
 /*****************************************************************************
  *
  * includes/p2000t.h

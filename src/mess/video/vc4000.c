@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
 
 #include "includes/vc4000.h"
 

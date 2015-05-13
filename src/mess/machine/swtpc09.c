@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Robert Justice
 /***************************************************************************
     swtpc09 machine file
     Robert Justice ,2009-2014

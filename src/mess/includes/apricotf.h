@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, Robbbert
 #pragma once
 
 #ifndef __APRICOTF__

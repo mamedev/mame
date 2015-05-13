@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese, R. Belmont
 #include "imagedev/chd_cd.h"
 #include "machine/gdrom.h"
 #include "machine/ataintf.h"

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese, R. Belmont
 /*
 
     dc.c - Sega Dreamcast hardware

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Brad Oliver,Fabio Priuli
 /***************************************************************************
 
   video/nes.c

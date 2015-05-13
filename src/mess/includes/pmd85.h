@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Krzysztof Strzecha
 /*****************************************************************************
  *
  * includes/pmd85.h

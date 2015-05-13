@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:?
+// copyright-holders:R.Belmont
 /*****************************************************************************
  *
  * includes/macpci.h

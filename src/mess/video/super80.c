@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /* Super80.c written by Robbbert, 2005-2010. See the driver source for documentation. */
 
 /* Notes on using MAME MC6845 Device (MMD).

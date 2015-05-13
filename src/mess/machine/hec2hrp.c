@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:JJ Stacino
 /////////////////////////////////////////////////////////////////////////
 // HEC2HRP.C  in machine
 /*      Hector 2HR+

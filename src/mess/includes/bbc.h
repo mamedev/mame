@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Gordon Jefferyes, Nigel Barnes
 /*****************************************************************************
  *
  * includes/bbc.h

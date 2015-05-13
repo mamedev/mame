@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Sean Young,Tomas Karlsson
 /*
 ** Spectravideo SVI-318 and SVI-328
 **

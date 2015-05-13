@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Krzysztof Strzecha,Jon Sturm
 /***************************************************************************
   TI-85 driver by Krzysztof Strzecha
 

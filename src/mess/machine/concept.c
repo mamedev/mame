@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Raphael Nabet, Brett Wyer
 /*
     Corvus Concept driver
 

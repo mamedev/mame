@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Angelo Salese, Dirk Best
 #pragma once
 
 #ifndef __APRICOTP__

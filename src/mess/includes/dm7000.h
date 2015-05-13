@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Lukasz Markowski
 #ifndef DM7000_H_
 #define DM7000_H_
 

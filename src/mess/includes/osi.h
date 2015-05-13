@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder, Robbbert, Wilbert Pol
 #pragma once
 
 #ifndef __OSI__

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Hans Ostermeyer, R. Belmont
 /*
  * apollo.h - APOLLO DN3500/DN3000 driver includes
  *

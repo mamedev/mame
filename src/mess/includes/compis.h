@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Per Ola Ingvarsson, Tomas Karlsson
 /*****************************************************************************
  *
  * includes/compis.h
