@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "sound/okim6295.h"
 #include "video/fuukifg.h"

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, Hau
 
 /* based on driver from video/metro.c by Luca Elia */
 /* modified by Hau */

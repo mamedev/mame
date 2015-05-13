@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Luca Elia
 class tetrisp2_state : public driver_device
 {

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
