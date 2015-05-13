@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods,Frank Palazzolo
 /**********************************************************************
 
  General Instruments AY-3-8900-1 a.k.a. Standard Television Interface Chip

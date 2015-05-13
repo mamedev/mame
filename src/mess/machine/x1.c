@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Barry Rodewald
 
 #include "includes/x1.h"

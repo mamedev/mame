@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:LGPL-2.1+
 // copyright-holders:Angelo Salese, R. Belmont, Juergen Bunchmueller
 /******************************************************************************
  *

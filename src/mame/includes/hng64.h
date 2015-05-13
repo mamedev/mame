@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
 #include "machine/msm6242.h"
 #include "cpu/mips/mips3.h"

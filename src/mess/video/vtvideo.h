@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Miodrag Milanovic,Karl-Ludwig Deisenhofer
 /**********************************************************************
 
 DEC VT Terminal video emulation

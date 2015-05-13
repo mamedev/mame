@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
 /***************************************************************************
 
