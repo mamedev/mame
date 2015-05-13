@@ -55,23 +55,29 @@ NETLIB_UPDATE(74193)
 	int tBorrow = 1;
 	if (INPLOGIC(m_CLEAR))
 	{
+		printf("%s CLEAR\n", name().cstr());
 		m_cnt = 0;
 	}
 	else if (!INPLOGIC(m_LOADQ))
 	{
+		printf("%s LoadQ\n", name().cstr());
 		m_cnt = (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2)
 				| (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
 	}
 	else
 	{
+		printf("%s Other\n", name().cstr());
+
 		if (INPLOGIC(m_CD) && !m_last_CU && INPLOGIC(m_CU))
 		{
+			printf("%s count up\n", name().cstr());
 			m_cnt++;
 			if (m_cnt > MAXCNT)
 				m_cnt = 0;
 		}
 		if (INPLOGIC(m_CU) && !m_last_CD && INPLOGIC(m_CD))
 		{
+			printf("%s count down\n", name().cstr());
 			if (m_cnt > 0)
 				m_cnt--;
 			else
@@ -88,6 +94,7 @@ NETLIB_UPDATE(74193)
 	m_last_CD = INPLOGIC(m_CD);
 	m_last_CU = INPLOGIC(m_CU);
 
+	printf("%s cnt %d B %d C %d\n", name().cstr(), m_cnt, tBorrow, tCarry);
 	for (int i=0; i<4; i++)
 		OUTLOGIC(m_Q[i], (m_cnt >> i) & 1, delay[i]);
 

@@ -22,6 +22,7 @@ static NETLIST_START(base)
 	TTL_INPUT(ttlhigh, 1)
 	TTL_INPUT(ttllow, 0)
 	NET_REGISTER_DEV(gnd, GND)
+	NET_REGISTER_DEV(netlistparams, NETLIST)
 
 	INCLUDE(diode_models);
 	INCLUDE(bjt_models);

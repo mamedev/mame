@@ -268,6 +268,7 @@ class netlist_matrix_solver_t;
 class NETLIB_NAME(gnd);
 class NETLIB_NAME(solver);
 class NETLIB_NAME(mainclock);
+class NETLIB_NAME(netlistparams);
 class NETLIB_NAME(base_d_to_a_proxy);
 
 // -----------------------------------------------------------------------------
@@ -618,7 +619,7 @@ public:
 	ATTR_HOT inline bool isRailNet() const { return !(m_railterminal == NULL); }
 	ATTR_HOT inline const netlist_core_terminal_t & RESTRICT  railterminal() const { return *m_railterminal; }
 
-	ATTR_HOT inline void push_to_queue(const netlist_sig_t newval, const netlist_time &delay);
+	ATTR_HOT inline void push_to_queue(const netlist_time &delay);
 	ATTR_HOT inline void reschedule_in_queue(const netlist_time &delay);
 	ATTR_HOT bool inline is_queued() const { return m_in_queue == 1; }
 
@@ -692,7 +693,8 @@ public:
 	{
 		if (newQ !=  m_new_Q)
 		{
-			push_to_queue(newQ, delay);
+			m_new_Q = newQ;
+			push_to_queue(delay);
 		}
 	}
 
@@ -1214,15 +1216,17 @@ protected:
 
 private:
 	netlist_time                m_stop;     // target time for current queue processing
-	bool                        m_use_deactivate;
 
 	netlist_time                m_time;
 	netlist_queue_t             m_queue;
+
+	bool                        m_use_deactivate;
 
 	NETLIB_NAME(mainclock) *    m_mainclock;
 	NETLIB_NAME(solver) *       m_solver;
 	NETLIB_NAME(gnd) *          m_gnd;
 
+	NETLIB_NAME(netlistparams) *m_params;
 	netlist_setup_t *m_setup;
 };
 
@@ -1318,11 +1322,10 @@ ATTR_HOT inline void netlist_logic_input_t::activate_lh()
 }
 
 
-ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_sig_t newval,  const netlist_time &delay)
+ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_time &delay)
 {
 	if (!is_queued() && (num_cons() > 0))
 	{
-		m_new_Q = newval;
 		m_time = netlist().time() + delay;
 		m_in_queue = (m_active > 0);     /* queued ? */
 		if (m_in_queue)
@@ -1330,12 +1333,6 @@ ATTR_HOT inline void netlist_net_t::push_to_queue(const netlist_sig_t newval,  c
 			netlist().push_to_queue(*this, m_time);
 		}
 	}
-	else
-	{
-		m_cur_Q = m_new_Q;
-		m_new_Q = newval;
-	}
-
 }
 
 ATTR_HOT inline void netlist_net_t::reschedule_in_queue(const netlist_time &delay)
@@ -1368,7 +1365,7 @@ ATTR_HOT inline void netlist_analog_output_t::set_Q(const nl_double newQ)
 	if (newQ != net().as_analog().m_cur_Analog)
 	{
 		net().as_analog().m_cur_Analog = newQ;
-		net().push_to_queue(0, NLTIME_FROM_NS(1));
+		net().push_to_queue(NLTIME_FROM_NS(1));
 	}
 }
 

@@ -40,7 +40,9 @@
  *
  */
 
-#define USE_DEACTIVE_DEVICE     (0)
+
+// moved to parameter NETLIST.USE_DEACTIVATE
+// #define USE_DEACTIVE_DEVICE     (0)
 
 #define USE_TRUTHTABLE          (0)
 
@@ -64,9 +66,9 @@
 //  Solver defines
 //============================================================
 
-#define USE_MATRIX_GS (0)
+#define USE_MATRIX_GS (1)
 #define USE_PIVOT_SEARCH (0)
-#define USE_GABS (0)
+#define USE_GABS (1)
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
 #define USE_LINEAR_PREDICTION (0)

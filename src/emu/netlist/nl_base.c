@@ -162,9 +162,9 @@ netlist_base_t::netlist_base_t()
 	:   netlist_object_t(NETLIST, GENERIC),
 		m_stop(netlist_time::zero),
 		// FIXME:: Use a parameter to set this on a schematics per schematics basis
-		m_use_deactivate(USE_DEACTIVE_DEVICE),
 		m_time(netlist_time::zero),
 		m_queue(*this),
+		m_use_deactivate(0),
 		m_mainclock(NULL),
 		m_solver(NULL),
 		m_gnd(NULL),
@@ -210,17 +210,25 @@ ATTR_COLD void netlist_base_t::start()
 	m_mainclock = get_single_device<NETLIB_NAME(mainclock)>("mainclock");
 	m_solver = get_single_device<NETLIB_NAME(solver)>("solver");
 	m_gnd = get_single_device<NETLIB_NAME(gnd)>("gnd");
+	m_params = get_single_device<NETLIB_NAME(netlistparams)>("parameter");
 
-	/* make sure the solver is started first! */
+	/* make sure the solver and parameters are started first! */
 
 	if (m_solver != NULL)
 		m_solver->start_dev();
+
+	if (m_params != NULL)
+	{
+		m_params->start_dev();
+	}
+
+	m_use_deactivate = (m_params->m_use_deactivate.Value() ? true : false);
 
 	NL_VERBOSE_OUT(("Initializing devices ...\n"));
 	for (netlist_device_t * const * entry = m_devices.first(); entry != NULL; entry = m_devices.next(entry))
 	{
 		netlist_device_t *dev = *entry;
-		if (dev != m_solver)
+		if (dev != m_solver && dev != m_params)
 			dev->start_dev();
 	}
 

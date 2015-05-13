@@ -55,6 +55,18 @@
 		NET_C(_P1, _name.1)													   \
 		NET_C(_P2, _name.2)													   \
 
+/* Default device to hold netlist parameters */
+#define PARAMETERS(_name)													   \
+		NET_REGISTER_DEV(netlistparams, _name)                                 \
+
+// -----------------------------------------------------------------------------
+// mainclock
+// -----------------------------------------------------------------------------
+
+NETLIB_DEVICE_WITH_PARAMS(netlistparams,
+public:
+		netlist_param_logic_t m_use_deactivate;
+);
 
 // -----------------------------------------------------------------------------
 // mainclock
