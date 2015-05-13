@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #ifndef __DSP56K_PARALLEL_MOVE_H__
 #define __DSP56K_PARALLEL_MOVE_H__
 

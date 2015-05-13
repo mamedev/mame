@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:?
+// copyright-holders:Ville Linde, Angelo Salese
 #pragma once
 
 #ifndef __MC68HC11_H__

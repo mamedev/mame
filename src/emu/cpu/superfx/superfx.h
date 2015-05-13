@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 #ifndef __SUPERFX_H__
 #define __SUPERFX_H__
 

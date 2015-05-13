@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #include "dsp56pcu.h"
 #include "dsp56mem.h"
 

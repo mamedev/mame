@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*
  *   A quick-hack 6803/6808 disassembler
  *

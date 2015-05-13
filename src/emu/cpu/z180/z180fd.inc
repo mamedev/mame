@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************
  * IY register related opcodes (FD prefix)
  **********************************************************/

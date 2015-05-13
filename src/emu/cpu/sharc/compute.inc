@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ville Linde
 /* compute operations */
 
 #include <math.h>

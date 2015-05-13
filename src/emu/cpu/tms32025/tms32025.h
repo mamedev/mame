@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tony La Porta
 	/**************************************************************************\
 	*                Texas Instruments TMS320x25 DSP Emulator                  *
 	*                                                                          *

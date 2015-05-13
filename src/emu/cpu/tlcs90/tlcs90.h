@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 #pragma once
 
 #ifndef __TLCS90_H__

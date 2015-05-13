@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #define GetRB   \
 	ModRM = FETCH();    \
 	if (ModRM >= 0xc0)  \

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Frank Palazzolo
 /*****************************************************************************
  *
  *   cp1610.h

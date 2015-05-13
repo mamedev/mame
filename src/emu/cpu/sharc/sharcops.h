@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 
 const adsp21062_device::SHARC_OP adsp21062_device::s_sharc_opcode_table[] =
 {

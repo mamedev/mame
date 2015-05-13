@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 // uCOM-4 opcode handlers
 
 // internal helpers

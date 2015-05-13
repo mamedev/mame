@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 #pragma once
 
 #ifndef __SHARC_H__

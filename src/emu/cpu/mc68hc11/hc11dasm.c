@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 /*
    Motorola M68HC11 disassembler
 

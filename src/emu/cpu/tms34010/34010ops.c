@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 /***************************************************************************
 
     TMS34010: Portable Texas Instruments TMS34010 emulator

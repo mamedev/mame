@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Raphael Nabet
 /*
     cpu/apexc/apexc.c: APE(X)C CPU emulation
 

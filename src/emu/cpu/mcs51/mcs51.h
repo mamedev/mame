@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Steve Ellenoff
 /*****************************************************************************
  *
  *   mcs51.h

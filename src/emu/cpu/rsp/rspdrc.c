@@ -9,10 +9,6 @@
     SIMD versions of vector multiplication opcodes provided by Marathon Man
       of the CEN64 team.
 
-    Copyright the MESS team.
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************
 
     Future improvements/changes:

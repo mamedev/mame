@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #pragma once
 
 #ifndef __SM8500_H__

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods,Tim Lindner
 /*****************************************************************************
 
     6309dasm.c - a 6309 opcode disassembler

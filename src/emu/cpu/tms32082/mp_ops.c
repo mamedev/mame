@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 // TMS320C82 Master Processor core execution
 
 #include "emu.h"

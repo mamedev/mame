@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
     Mitsubishi M3745x 8-bit microcontroller family
 */

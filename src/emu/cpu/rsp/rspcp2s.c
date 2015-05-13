@@ -8,10 +8,6 @@
     SSSE3 SIMD optimizations.
     Written by Harmony of the MESS team.
 
-    Copyright the MESS team.
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #include "emu.h"

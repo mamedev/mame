@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 const v25_common_device::nec_ophandler v25_common_device::s_nec_instruction[256] =
 {
 	&v25_common_device::i_add_br8,      /* 0x00 */

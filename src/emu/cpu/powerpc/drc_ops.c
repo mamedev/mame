@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /* PowerPC common opcodes */
 
 // it really seems like this should be elsewhere - like maybe the floating point checks can hang out someplace else

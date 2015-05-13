@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Steve Ellenoff
 /*****************************************************************************
  *
  *   i8051dasm.c

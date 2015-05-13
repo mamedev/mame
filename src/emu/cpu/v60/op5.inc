@@ -1,4 +1,5 @@
-
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, Richter Belmont
 /*
  *  HALT: must add log
  */

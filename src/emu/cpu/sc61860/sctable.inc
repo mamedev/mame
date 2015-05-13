@@ -1,4 +1,5 @@
-
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 void sc61860_device::sc61860_instruction()
 {
 	int oper=READ_OP();

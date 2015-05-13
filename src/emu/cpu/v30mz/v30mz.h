@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #ifndef __V30MZ_H__
 #define __V30MZ_H__
 

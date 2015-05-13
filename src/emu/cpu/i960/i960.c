@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, R. Belmont
 #include "emu.h"
 #include "debugger.h"
 #include "i960.h"

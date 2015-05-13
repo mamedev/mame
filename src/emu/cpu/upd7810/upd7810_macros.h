@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /***************************************************************************
 
     uPD7810/11, 7810H/11H, 78C10/C11/C14 private use macros

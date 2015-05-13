@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 #include "emu.h"
 #include "debugger.h"
 #include "z8.h"

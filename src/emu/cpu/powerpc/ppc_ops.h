@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 #pragma once
 
 #ifndef __PPC_OPS_H__

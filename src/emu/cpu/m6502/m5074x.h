@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #pragma once
 
 #ifndef __M5074X_H__

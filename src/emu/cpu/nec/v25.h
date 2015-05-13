@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /* ASG 971222 -- rewrote this interface */
 #ifndef __NEC_V25_H_
 #define __NEC_V25_H_

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Farfetch'd, Richter Belmont
 // V60.C
 // Undiscover the beast!
 // Main hacking and coding by Farfetch'd

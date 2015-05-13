@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:hap
 // E0C6200 opcode handlers
 
 enum

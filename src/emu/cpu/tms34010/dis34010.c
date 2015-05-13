@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 /* This program is based on DIS68k by Aaron Giles */
 
 #include "emu.h"

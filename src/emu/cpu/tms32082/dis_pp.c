@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 // TMS32082 PP Disassembler
 
 #include "emu.h"

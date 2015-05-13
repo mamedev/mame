@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 #pragma once
 
 #ifndef __E132XS_H__

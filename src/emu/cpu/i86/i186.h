@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef I186_H__
 #define I186_H__
 

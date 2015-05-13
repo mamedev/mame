@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #pragma once
 
 #ifndef __LR35902_H__

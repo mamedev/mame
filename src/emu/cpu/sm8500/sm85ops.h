@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 
 #define ARG_R   r1 = mem_readbyte( m_PC++ );
 

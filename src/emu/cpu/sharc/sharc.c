@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 /* Analog Devices ADSP-2106x SHARC emulator v2.0
 
    Written by Ville Linde

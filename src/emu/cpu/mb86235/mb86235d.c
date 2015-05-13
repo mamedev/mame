@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, ElSemi
 #include "emu.h"
 #include "debugger.h"
 #include "mb86235.h"

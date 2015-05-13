@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /* IBM/Motorola PowerPC 4xx/6xx Emulator */
 
 #include <setjmp.h>

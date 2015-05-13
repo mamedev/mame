@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Frank Palazzolo
 #include "emu.h"
 #include "debugger.h"
 #include "cp1610.h"

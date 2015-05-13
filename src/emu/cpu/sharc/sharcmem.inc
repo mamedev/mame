@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ville Linde
 /* SHARC memory operations */
 
 UINT32 adsp21062_device::pm_read32(UINT32 address)

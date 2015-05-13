@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /***************************************************************************
  *
  *  Portable Signetics 2650 disassembler

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller,Ernesto Corvi
 #pragma once
 
 #ifndef __Z8000_H__

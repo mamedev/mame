@@ -1,5 +1,5 @@
-// license: ?
-// copyright-holders: Angelo Salese, ElSemi
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, ElSemi
 /*****************************************************************************
  *
  * MB86235 "TGPx4" (c) Fujitsu

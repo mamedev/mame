@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*******************************************************************
 
 TLCS-900/H instruction set

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /*** m6809: Portable 6809 emulator ******************************************
 
     Copyright John Butler

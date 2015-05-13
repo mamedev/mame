@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ville Linde
 static const char ureg_names[256][16] =
 {
 	"R0",       "R1",       "R2",       "R3",       "R4",       "R5",       "R6",       "R7",

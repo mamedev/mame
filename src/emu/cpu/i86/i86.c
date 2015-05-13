@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Carl
 /****************************************************************************
 
     NEC V20/V30/V33 emulator modified back to a 8086/80186 emulator

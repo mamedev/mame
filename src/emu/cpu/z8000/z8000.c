@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller
+// copyright-holders:Juergen Buchmueller,Ernesto Corvi
 /*****************************************************************************
  *
  *   z8000.c

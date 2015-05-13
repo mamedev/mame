@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Zsolt Vasvari
 /*
  *   A TMS34010 disassembler
  *

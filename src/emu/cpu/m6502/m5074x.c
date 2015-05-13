@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
     Mitsubishi M5074x 8-bit microcontroller family
 */

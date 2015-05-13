@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R.Belmont
 /* Handlers for SH3 internals */
 
 #include "emu.h"

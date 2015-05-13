@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Luca Elia
 /*************************************************************************************************************
 
     Toshiba TLCS-90 Series MCU's
