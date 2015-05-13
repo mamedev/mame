@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Raphael Nabet
 
 #include "sound/beep.h"
 

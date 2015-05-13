@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 
 #include "includes/megadriv.h"
 #include "bus/megadrive/md_slot.h"

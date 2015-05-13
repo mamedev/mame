@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Raphael Nabet
 
 #define asr733_chr_region ":gfx1"
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 #include "emu.h"
 
 #define CGA_PALETTE_SETS 83

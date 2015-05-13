@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /*
     SGI "Newport" graphics board used in the Indy and some Indigo2s
 
