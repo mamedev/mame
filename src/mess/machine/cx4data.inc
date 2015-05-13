@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:byuu
 /***************************************************************************
 
     cx4data.c

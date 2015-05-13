@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 // Convergent NGEN keyboard device
 
 #include "ngen_kb.h"

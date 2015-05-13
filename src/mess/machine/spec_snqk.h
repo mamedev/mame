@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Kevin Thacker
 /*****************************************************************************
  *
  * machine/spec_snqk.h

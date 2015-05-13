@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Raphael Nabet
 /*
     smartmed.c: SmartMedia Flash ROM emulation
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Fabio Priuli,byuu
 /***************************************************************************
 
     snescx4.h

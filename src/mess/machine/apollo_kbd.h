@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Hans Ostermeyer
 /*
  * apollo_kbd.h
  *

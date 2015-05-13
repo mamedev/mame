@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, M. Burke
 /*
     DEC LK-201 keyboard
     Emulation by R. Belmont & M. Burke

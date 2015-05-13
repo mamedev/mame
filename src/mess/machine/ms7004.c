@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /*
     Electronika MS 7004 keyboard (DEC LK-201 workalike with extra keys
     for Cyrillic characters).

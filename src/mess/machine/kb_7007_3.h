@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /*
  * MC 7007 keyboard, variant 3, used by mc1502.
  *

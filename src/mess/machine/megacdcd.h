@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
