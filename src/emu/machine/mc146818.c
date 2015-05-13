@@ -196,7 +196,7 @@ void mc146818_device::nvram_default()
 	}
 	else
 	{
-		m_data.clear();
+		memset(&m_data[0], 0, data_size());
 	}
 
 	set_base_datetime();
