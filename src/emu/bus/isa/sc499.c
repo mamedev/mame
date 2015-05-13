@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hans Ostermeyer, R. Belmont
 /*
  * sc499.c - ARCHIVE SC-499 cartridge tape controller (for Apollo DN3x00)

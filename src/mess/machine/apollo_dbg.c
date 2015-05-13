@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hans Ostermeyer
 /*
  * debug/apollo.c - APOLLO DN3500/DN3000 debug functions

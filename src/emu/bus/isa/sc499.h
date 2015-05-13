@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hans Ostermeyer, R. Belmont
 /*
  * sc499.h - Archive Cartridge tape controller SC-499

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hans Ostermeyer
 /*
  * apollo_kbd.c - Apollo keyboard and mouse emulation

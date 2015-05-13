@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Hans Ostermeyer,R. Belmont
 /*
  * omti8621.h - SMS OMTI 8621 disk controller
