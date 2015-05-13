@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*********************************************************************
 
     pci9050.h - PLX PCI9050 PCI to 4x Local Bus Bridge

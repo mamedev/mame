@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "pci-usb.h"
 
 const device_type USB_UHCI = &device_creator<usb_uhci_device>;

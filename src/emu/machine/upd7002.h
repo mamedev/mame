@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Gordon Jefferyes
 /*****************************************************************************
  *
  * machine/upd7002.h

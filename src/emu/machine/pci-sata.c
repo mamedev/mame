@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "pci-sata.h"
 
 const device_type SATA = &device_creator<sata_device>;

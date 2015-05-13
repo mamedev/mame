@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __NSCSI_BUS_H__
 #define __NSCSI_BUS_H__
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "machine/nscsi_cd.h"
 #include "imagedev/chd_cd.h"
 
