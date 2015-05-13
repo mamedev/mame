@@ -16,10 +16,10 @@
     - HDX hard disk
     - HRX high resolution graphics
     - CBM (all RAM) mode
-
-*/
     - "Silicon" disks
     - Multi Effect Video Wall
+ 
+ */
 
 #include "emu.h"
 #include "includes/mtx.h"
