@@ -234,7 +234,7 @@ public:
 		{
 			nl_double a = (nVd - m_Vd) * m_VtInv;
 			if (a<1e-12 - 1.0) a = 1e-12 - 1.0;
-			m_Vd = m_Vd + log1p(a) * m_Vt;
+			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
 
 			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
 			m_Id = m_Is * (eVDVt - 1.0);

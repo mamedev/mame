@@ -54,8 +54,8 @@ public:
 	ATTR_HOT inline static double log(const double x) { return std::log(x); }
 	ATTR_HOT inline static float log(const float x) { return std::log(x); }
 #if defined(_MSC_VER) && _MSC_VER < 1800
-	ATTR_HOT inline static double log1p(const double x) { return nl_math::log(1.0 + x); }
-	ATTR_HOT inline static float log1p(const float x) { return nl_math::log(1.0 + x); }
+	ATTR_HOT inline static double e_log1p(const double x) { return nl_math::log(1.0 + x); }
+	ATTR_HOT inline static float e_log1p(const float x) { return nl_math::log(1.0 + x); }
 #else
 	ATTR_HOT inline static double e_log1p(const double x) { return log1p(x); }
 	ATTR_HOT inline static float e_log1p(const float x) { return log1pf(x); }
