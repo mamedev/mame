@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Robbbert
 /***************************************************************************
 
     Intel 8279 Programmable Keyboard/Display Interface emulation

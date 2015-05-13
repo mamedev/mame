@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Raphael Nabet, Michael Zapf
 /*
     Atmel at29c040a flash EEPROM
 

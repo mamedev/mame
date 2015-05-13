@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef _LEGSCSI_H_
 #define _LEGSCSI_H_
 

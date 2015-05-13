@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __JVSDEV_H__
 #define __JVSDEV_H__
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "lpc-acpi.h"
 
 const device_type LPC_ACPI = &device_creator<lpc_acpi_device>;

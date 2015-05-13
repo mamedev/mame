@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Raphael Nabet, Michael Zapf
 /*
     ATMEL 29040a
 

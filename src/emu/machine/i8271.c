@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Kevin Thacker
 /* Intel 8271 Floppy Disc Controller */
 /* used in BBC Micro B,Acorn Atom */
 /* Jun 2000. Kev Thacker */
