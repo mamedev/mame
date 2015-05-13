@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef __BUS_RS232_H__
 #define __BUS_RS232_H__
 

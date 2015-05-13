@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:S. Smith,David Haywood
 #ifndef __NEOGEO_KOF98_CART_H
 #define __NEOGEO_KOF98_CART_H
 

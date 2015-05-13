@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R.Belmont,Kevin Horton
 #pragma once
 
 #ifndef __ISA_MPU401_H__

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef OMTI5100_H_
 #define OMTI5100_H_
 

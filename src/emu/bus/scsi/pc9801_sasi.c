@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #include "pc9801_sasi.h"
 
 #define SASI_CMD_SPECIFY 0xc2 // according to x68k_hdc.c

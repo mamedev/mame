@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Paul Daniels, Colin Howel, R.Belmont
+// copyright-holders:Paul Daniels, Colin Howell, R.Belmont
 /**********************************************************************
 
 Apple I

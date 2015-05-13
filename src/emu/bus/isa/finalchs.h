@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Jonathan Gevaryahu
 #pragma once
 
 #ifndef __ISA_FINALCHS_H__

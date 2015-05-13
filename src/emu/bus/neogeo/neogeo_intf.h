@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:S. Smith,David Haywood
 
 #ifndef __NEOGEO_INTF_H
 #define __NEOGEO_INTF_H

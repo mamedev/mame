@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// license:???
+// copyright-holders:Phill Harvey-Smith
 /***************************************************************************
 
 The XT-IDE project is a Vintage Computer forum driven project to develop and manufacturer an 8-bit ISA IDE controller.

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #include "omti5100.h"
 
 #define OMTI_STATUS_NOT_READY 0x04

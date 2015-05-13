@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     Iskra-1030 XX-key keyboard emulation

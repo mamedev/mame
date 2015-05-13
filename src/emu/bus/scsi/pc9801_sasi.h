@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef PC9801_SASI_H_
 #define PC9801_SASI_H_
 

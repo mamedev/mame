@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __WS_ROM_H
 #define __WS_ROM_H
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * x68k_scsiext.h
  *

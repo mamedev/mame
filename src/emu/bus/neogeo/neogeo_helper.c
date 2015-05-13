@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:S. Smith,David Haywood
 
 #include "emu.h"
 #include "neogeo_helper.h"

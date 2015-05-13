@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef __RS232_TERMINAL_H__
 #define __RS232_TERMINAL_H__
 
