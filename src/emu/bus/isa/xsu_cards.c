@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dirk Best
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     ISA bus cards for ex-USSR PC clones

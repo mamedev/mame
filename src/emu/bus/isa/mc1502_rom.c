@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:XXX
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     MC-1502 ROM cartridge device
