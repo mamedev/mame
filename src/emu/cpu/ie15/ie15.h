@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 #ifndef __IE15_H__
 #define __IE15_H__
 

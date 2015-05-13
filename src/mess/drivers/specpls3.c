@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Kevin Thacker
 /***************************************************************************
 
     NOTE: ****** Specbusy: press N, R, or E to boot *************

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods
 /***************************************************************************
 HAD to change the PORT_ANALOG defs in this file...  please check ;-)
 

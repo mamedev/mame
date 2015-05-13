@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:(Original Author?), Dirk Best, Curt Coder
 /*************************************************************************
 
@@ -16,10 +16,10 @@
     - HDX hard disk
     - HRX high resolution graphics
     - CBM (all RAM) mode
-    - "Silicon" disks
-    - Multi Effect Video Wall
 
 */
+    - "Silicon" disks
+    - Multi Effect Video Wall
 
 #include "emu.h"
 #include "includes/mtx.h"

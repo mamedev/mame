@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Dirk V.
 /******************************************************************************
  Mephisto 4 + 5 Chess Computer
  2007 Dirk V.

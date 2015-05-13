@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 #include "emu.h"
 #include "includes/genpc.h"
 #include "machine/pc_fdc.h"

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Peter Trauner, Manfred Schneider, Robbbert
 /******************************************************************************
  Peter Trauner May 2001

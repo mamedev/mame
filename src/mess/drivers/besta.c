@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /***************************************************************************
 
     Besta-88 and Besta-90 engineering workstations.
