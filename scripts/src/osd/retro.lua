@@ -1,6 +1,14 @@
 function maintargetosdoptions(_target)
 end
 
+newoption {
+	trigger = "NO_USE_MIDI",
+	description = "Disable MIDI I/O",
+	allowed = {
+		{ "0",  "Enable MIDI"  },
+		{ "1",  "Disable MIDI" },
+	},
+}
 
 project ("osd_" .. _OPTIONS["osd"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
@@ -44,6 +52,10 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	if _OPTIONS["NO_USE_MIDI"]=="1" then
+		defines {
+			"NO_USE_MIDI",
+		}
+
 		files {
 			MAME_DIR .. "src/osd/modules/midi/none.c",
 		}
