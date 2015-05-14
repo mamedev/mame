@@ -407,8 +407,7 @@ WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 
 WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 {
-	UINT8 *videoram = m_videoram;
-	videoram[m_vid_address] = data;
+	m_videoram[m_vid_address] = data;
 	m_palette_ram[m_vid_address] = m_io_port[1];
 	m_palette_ram2[m_vid_address] = m_io_port[3];
 
@@ -951,7 +950,7 @@ PALETTE_INIT_MEMBER(peplus_state, peplus)
 ******************************/
 
 static GFXDECODE_START( peplus )
-			GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x4_planar, 0, 16 )
+			GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x4_planar, 0, 32 )
 GFXDECODE_END
 
 
