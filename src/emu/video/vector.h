@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Brad Oliver,Aaron Giles,Bernd Wiebelt,Allard van der Bas
 #ifndef __VECTOR__
 #define __VECTOR__
 
