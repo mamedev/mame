@@ -205,8 +205,11 @@ function mainProject(_target, _subtarget)
 		kind "SharedLib"
 		targetsuffix "_libretro"
 		targetprefix ""
+		buildoptions {
+			"-fPIC",
+		}
 		linkoptions {
-			"-fPIC -mmacosx-version-min=10.7",
+			"-fPIC",
 		}
 		links {
 			"libco",
