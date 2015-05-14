@@ -4,9 +4,6 @@
 
     Miles Gordon Technology SAM Coupe
 
-    license: MAME
-    copyright-holders: Lee Hammerton, Dirk Best
-
 ***************************************************************************/
 
 #include "emu.h"

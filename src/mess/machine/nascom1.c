@@ -4,9 +4,6 @@
 
     Nascom 1 and Nascom 2
 
-    license: MAME
-    copyright-holders: (Original Author?), Dirk Best
-
 **********************************************************************/
 
 #include "emu.h"

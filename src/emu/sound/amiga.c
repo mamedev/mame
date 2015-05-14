@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     Amiga audio hardware
