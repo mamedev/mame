@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Mark McDougall
 #ifndef __YGV608_H__
 #define __YGV608_H__
 
