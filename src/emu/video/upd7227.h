@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     uPD7227 Intelligent Dot-Matrix LCD Controller/Driver emulation

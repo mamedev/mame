@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Sean Young, Nathan Woods, Aaron Giles
 /*
 ** File: tms9928a.h -- software implementation of the TMS9928A VDP.
 **

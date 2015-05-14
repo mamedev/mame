@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles, Nathan Woods
 /***************************************************************************
 
     v9938 / v9958 emulation
