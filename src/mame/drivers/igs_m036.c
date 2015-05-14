@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* IGS Gambling games using IGS036 CPU
    pgm2.c also uses this CPU
 

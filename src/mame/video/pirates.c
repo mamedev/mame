@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood,Nicola Salmoria
 #include "emu.h"
 #include "includes/pirates.h"
 

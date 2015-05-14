@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_legacy.c
  *
@@ -15,7 +17,7 @@
 
 NETLIB_START(switch1)
 {
-	register_sub(m_R, "R");
+	register_sub("R", m_R);
 
 	register_param("POS", m_POS, 0);
 
@@ -56,8 +58,8 @@ NETLIB_UPDATE_PARAM(switch1)
 
 NETLIB_START(switch2)
 {
-	register_sub(m_R[0], "R1");
-	register_sub(m_R[1], "R2");
+	register_sub("R1", m_R[0]);
+	register_sub("R2", m_R[1]);
 
 	register_param("POS", m_POS, 0);
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 /************************************************************************
  * copsnrob Sound System Analog emulation
  * Nov 2010, Derrick Renaud

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*
     911_chr.h: character definitions for 911_vdt.c
 

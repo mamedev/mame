@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_4066.c
  *
@@ -9,7 +11,7 @@
 NETLIB_START(4066)
 {
 	register_input("CTL", m_control);
-	register_sub(m_R, "R");
+	register_sub("R", m_R);
 	m_base_r = 270.0;
 }
 
@@ -20,10 +22,10 @@ NETLIB_RESET(4066)
 
 NETLIB_UPDATE(4066)
 {
-	nl_double sup = (m_supply.get()->vdd() - m_supply.get()->vss());
+	nl_double sup = (m_supply->vdd() - m_supply->vss());
 	nl_double low = 0.45 * sup;
 	nl_double high = 0.55 * sup;
-	nl_double in = INPANALOG(m_control) - m_supply.get()->vss();
+	nl_double in = INPANALOG(m_control) - m_supply->vss();
 	nl_double rON = m_base_r * 5.0 / sup;
 	nl_double R = -1.0;
 
@@ -55,12 +57,12 @@ NETLIB_UPDATE(4066)
 
 NETLIB_START(4066_dip)
 {
-	register_sub(m_supply, "supply");
+	register_sub("supply", m_supply);
 	m_A.m_supply = m_B.m_supply = m_C.m_supply = m_D.m_supply = &m_supply;
-	register_sub(m_A, "A");
-	register_sub(m_B, "B");
-	register_sub(m_C, "C");
-	register_sub(m_D, "D");
+	register_sub("A", m_A);
+	register_sub("B", m_B);
+	register_sub("C", m_C);
+	register_sub("D", m_D);
 
 	m_A.m_base_r = m_B.m_base_r = m_C.m_base_r = m_D.m_base_r = 270;
 

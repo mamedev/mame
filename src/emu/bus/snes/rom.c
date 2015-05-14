@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Fabio Priuli, byuu
 /***********************************************************************************************************
 
  Super NES/Famicom (LoROM) cartridge emulation (for SNES/SFC)
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 
@@ -202,9 +201,6 @@ READ8_MEMBER(sns_rom_device::read_h)
 
  The implementation below is released under the MAME license
  for use in MAME, MESS and derivatives by permission of Byuu
-
- Copyright (for the implementation below) MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 

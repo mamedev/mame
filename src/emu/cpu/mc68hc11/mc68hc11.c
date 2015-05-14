@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Ville Linde, Angelo Salese
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Angelo Salese, hap
 /*
    Motorola MC68HC11 emulator
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  Deco MXC06 sprite generator:
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari, Curt Coder
 class lvcards_state : public driver_device
 {
 public:

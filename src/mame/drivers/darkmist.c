@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Nicola Salmoria, Tomasz Slanina
 /*
 ***********************************************************************************
 Dark Mist (c)1986  Taito / Seibu

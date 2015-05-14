@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 #include "emu.h"
 #include "machine/megacd.h"
 #include "machine/nvram.h"

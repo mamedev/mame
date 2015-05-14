@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miguel Angel Horna
 /*
  * Sega System 32 Multi/Model 1/Model 2 custom PCM chip (315-5560) emulation.
  *

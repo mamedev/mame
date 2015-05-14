@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Nathan Woods
 /***************************************************************************
 
     video/apple3.c

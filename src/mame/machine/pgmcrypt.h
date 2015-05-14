@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* IGS 027 Encryptions */
 
 void pgm_kov_decrypt(running_machine &machine);

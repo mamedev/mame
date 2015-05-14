@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, R. Belmont, Miodrag Milanovic
 /*********************************************************************
 
     Code to interface the image code with CHD-CD core.

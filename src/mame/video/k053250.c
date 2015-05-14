@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "k053250.h"
 
 const device_type K053250 = &device_creator<k053250_device>;

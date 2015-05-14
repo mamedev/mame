@@ -4,9 +4,6 @@
 
     National Semiconductor ADC0808/ADC0809 8-Bit A/D Converter emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    IN3   1 |*    \_/     | 28  IN2

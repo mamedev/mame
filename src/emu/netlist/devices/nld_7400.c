@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_7400.c
  *
@@ -7,16 +9,6 @@
 
 #if (USE_TRUTHTABLE)
 nld_7400::truthtable_t nld_7400::m_ttbl;
-
-#if 0
-const char *nld_7400::m_desc[] = {
-		"A,B,PQ,PA,PB|Q",
-		"0,X,X,X,X|1|22",
-		"X,0,X,X,X|1|22",
-		"1,1,X,X,X|0|15",
-		""
-};
-#else
 const char *nld_7400::m_desc[] = {
 		"A , B | Q ",
 		"0,X|1|22",
@@ -24,16 +16,15 @@ const char *nld_7400::m_desc[] = {
 		"1,1|0|15",
 		""
 };
-#endif
 
 #endif
 
 NETLIB_START(7400_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
-	register_sub(m_3, "3");
-	register_sub(m_4, "4");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
+	register_sub("3", m_3);
+	register_sub("4", m_4);
 
 	register_subalias("1", m_1.m_i[0]);
 	register_subalias("2", m_1.m_i[1]);

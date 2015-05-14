@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phill Harvey-Smith
 /*
     drivers/rmnimbus.c
 

@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli,Grazvydas Ignotas
 /*
  * Samsung SSP1601 DSP emulator
  *
  * Copyright 2008, Grazvydas Ignotas
- *
- * This code is released under the MAME license.
- *
  *
  * notes:
  * not everything is implemented, but it is accurate enough to

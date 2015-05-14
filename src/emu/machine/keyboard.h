@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef __KEYBOARD_H__
 #define __KEYBOARD_H__
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 #include "emu.h"
 #include "includes/shadfrce.h"
 

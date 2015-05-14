@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet, Couriersud, Michael Zapf
 /*
     spchroms.c - This is an emulator for "typical" speech ROMs from TI, as used by TI99/4(a).
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino
 /***************************************************************************
 
     video/lkage.c

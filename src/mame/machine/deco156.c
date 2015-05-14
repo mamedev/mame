@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /* Deco 156 analysis
 
  Data East chip 156 is an encrypted ARM processor.

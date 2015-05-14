@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 /***************************************************************************
 
     network.h
 
     Core network interface functions and definitions.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ***************************************************************************/
 
 #pragma once

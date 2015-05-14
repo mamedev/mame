@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Quench
 /****************************************************************************
 
         ToaPlan game hardware from 1987

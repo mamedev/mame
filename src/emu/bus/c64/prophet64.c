@@ -4,9 +4,6 @@
 
     PROPHET64 cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "prophet64.h"

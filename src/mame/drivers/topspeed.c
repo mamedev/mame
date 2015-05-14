@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************+************************************************************
 
 Top Speed / Full Throttle    (c) Taito 1987

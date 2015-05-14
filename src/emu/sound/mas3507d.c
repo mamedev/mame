@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 //
 // MAS 3507D MPEG audio decoder
 //

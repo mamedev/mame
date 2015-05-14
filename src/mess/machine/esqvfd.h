@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 #ifndef ESQVFD_H
 #define ESQVFD_H
 

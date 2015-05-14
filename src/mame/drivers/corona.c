@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /**************************************************************************
 
   Winners Circle.
@@ -31,12 +33,9 @@
 
   Very rare game, due to massive conversions to any kind of roulette games.
 
-  ------
-
   This game is a milestone. If you ask any old operator about the gambling
   games history, he will say that every started with the Winners Circle.
 
-  ------
 
 **************************************************************************
 
@@ -294,10 +293,21 @@
 
   - See why the "rainbow timer" for gamble the earnings is nearly twice
     the slow against the real thing.
+
   - Check the sound CPU and AY clocks in Winners Circle sets.
 
 
 **************************************************************************/
+
+
+#define WC81_MAIN_XTAL      XTAL_24MHz        /* Main crystal for Winners Circle 28*28 pins PCB's */
+#define WC82_MAIN_XTAL      XTAL_18_432MHz    /* Main crystal for Winners Circle 18*22 pins PCB's */
+#define RE_MAIN_XTAL        XTAL_16MHz        /* Main for roulette boards */
+#define VIDEO_XTAL          XTAL_20MHz        /* Video circuitry crystal (all) */
+#define AY_CLK1             1000000           /* AY-3-8912 clock for WC81 (28*28 PCB), measured */
+#define AY_CLK2             2000000           /* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
+#define VIDEOBUF_SIZE       512*512
+
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -305,16 +315,6 @@
 #include "machine/nvram.h"
 #include "re800.lh"
 #include "luckyrlt.lh"
-
-#define WC81_MAIN_XTAL      (XTAL_24MHz)        /* Main crystal for Winners Circle 28*28 pins PCB's */
-#define WC82_MAIN_XTAL      (XTAL_18_432MHz)    /* Main crystal for Winners Circle 18*22 pins PCB's */
-#define RE_MAIN_XTAL        (XTAL_16MHz)        /* Main for roulette boards */
-#define VIDEO_XTAL          (XTAL_20MHz)        /* Video circuitry crystal (all) */
-#define AY_CLK1             (1000000)           /* AY-3-8912 clock for WC81 (28*28 PCB), measured */
-#define AY_CLK2             (2000000)           /* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
-
-
-#define VIDEOBUF_SIZE 512*512
 
 
 class corona_state : public driver_device
@@ -517,7 +517,6 @@ WRITE8_MEMBER(corona_state::ball_w)
 
 /********  Multiplexed Inputs  ********/
 
-
 READ8_MEMBER(corona_state::mux_port_r)
 {
 	switch( m_input_selector )
@@ -600,6 +599,7 @@ WRITE8_MEMBER(corona_state::wc_meters_w)
   RAM data is relocated to B800-B8FF
 
 */
+
 static ADDRESS_MAP_START( winner81_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
@@ -922,6 +922,7 @@ static INPUT_PORTS_START( winner81 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( winner82 )
 	PORT_START("IN0")   /* players A & B controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Player A - Bet/Triple")   /* A: bet/triple */
@@ -1025,6 +1026,7 @@ static INPUT_PORTS_START( winner82 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( re800 )
 	/* Multiplexed from just one single port */
 	PORT_START("IN0-1")
@@ -1124,6 +1126,7 @@ static INPUT_PORTS_START( re800 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( re800v3 )
 	/* Multiplexed from just one single port */
 	PORT_START("IN0-1")
@@ -1222,6 +1225,7 @@ static INPUT_PORTS_START( re800v3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( luckyrlt )
 	PORT_START("IN0-1")
@@ -1347,7 +1351,6 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1365,6 +1368,7 @@ static MACHINE_CONFIG_START( winner81, corona_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_START( winner82, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
@@ -1377,7 +1381,6 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1396,6 +1399,7 @@ static MACHINE_CONFIG_START( winner82, corona_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_START( re800, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
@@ -1410,7 +1414,6 @@ static MACHINE_CONFIG_START( re800, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1427,6 +1430,7 @@ static MACHINE_CONFIG_START( re800, corona_state )
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( rcirulet, corona_state )
 	/* basic machine hardware */
@@ -1441,7 +1445,6 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1459,6 +1462,7 @@ static MACHINE_CONFIG_START( rcirulet, corona_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_START( luckyrlt, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
@@ -1472,7 +1476,6 @@ static MACHINE_CONFIG_START( luckyrlt, corona_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1533,6 +1536,7 @@ ROM_START(winner81)
 	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+
 ROM_START(winner81b)
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* from the 18*22 pins PCB, more close to winner82 */
 	ROM_LOAD("winner_27128_a145.bin",   0x0000, 0x4000, CRC(a9737c8f) SHA1(d1e3b3979d3ef1aa2d8c32d5d56c30165c949e50) )
@@ -1543,6 +1547,7 @@ ROM_START(winner81b)
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
+
 
 ROM_START(winner82)
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 18*22 pins PCB?? */
@@ -1586,6 +1591,7 @@ ROM_START(re800ea)
 	ROM_LOAD( "promcoro.123",   0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+
 ROM_START(re800v1)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("re800v1.128", 0x0000, 0x4000, CRC(503647fb) SHA1(ccecb18058a672d955c5f94b0c049e6dd64d12e3) )
@@ -1597,6 +1603,7 @@ ROM_START(re800v1)
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "promcoro.123",   0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
+
 
 ROM_START(re800v3)
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1610,7 +1617,9 @@ ROM_START(re800v3)
 	ROM_LOAD( "promcoro.123",   0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+
 /******************************
+
   Ruleta RCI.
   6-players spanish roulette.
 
@@ -1640,7 +1649,9 @@ ROM_START(rcirulet)
 	ROM_LOAD( "rci_82s123_ic04_1f95.bin",   0x0000, 0x0020, CRC(3a6684b3) SHA1(c9461565a78f1024c6bd4088e4555f1a8020013b) )
 ROM_END
 
+
 /******************************
+
   Lucky Roulette
   6-players spanish roulette.
 
@@ -1665,12 +1676,12 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                   LAYOUT      */
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                   LAYOUT      */
 GAME(  1981, winner81,  winner82, winner81, winner81, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           GAME_IMPERFECT_SOUND )
 GAME(  1981, winner81b, winner82, winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
 GAME(  1982, winner82,  0,        winner82, winner82, driver_device, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800, driver_device,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                      layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800, driver_device,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                      layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3, driver_device,  0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     GAME_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 199?, rcirulet,  0,        rcirulet, re800, driver_device,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                      layout_re800 )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                      layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                      layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    driver_device, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                      layout_re800 )
 GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, driver_device, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                      layout_luckyrlt )

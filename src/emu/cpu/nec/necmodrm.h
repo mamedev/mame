@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 static struct {
 	struct {
 		WREGS w[256];

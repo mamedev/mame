@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*******************************************************************************
 
     Act Fancer (Japan)              FD (c) 1989 Data East Corporation

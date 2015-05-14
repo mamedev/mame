@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "lpc-pit.h"
 
 const device_type LPC_PIT = &device_creator<lpc_pit_device>;

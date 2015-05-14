@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /*
     Master Boy - Gaelco (c)1991
 

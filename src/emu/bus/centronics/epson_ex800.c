@@ -1,11 +1,8 @@
-// license:MAME, GPL-2.0+
+// license:GPL-2.0+
 // copyright-holders:Dirk Best
 /******************************************************************************
 
     Epson EX-800 Dot Matrix printer
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
 
  --

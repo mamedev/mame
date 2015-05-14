@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Uki
 class quizdna_state : public driver_device
 {
 public:

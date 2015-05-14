@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mark McDougall
 
 /*
  *    Yamaha YGV608 - PVDC2 Pattern mode Video Display Controller 2

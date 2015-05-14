@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef __CLOCK_H__
 #define __CLOCK_H__
 

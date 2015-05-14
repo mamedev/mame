@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*****************************************************************************
 
   74148 8-line-to-3-line priority encoder

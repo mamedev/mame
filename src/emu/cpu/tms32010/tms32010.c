@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tony La Porta
 	/**************************************************************************\
 	*                 Texas Instruments TMS32010 DSP Emulator                  *
 	*                                                                          *

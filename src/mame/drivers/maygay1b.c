@@ -1,9 +1,8 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************************
 
     Maygay M1 A/B driver, (under heavy construction !!!)
-
-    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
-    used under license from http://mamedev.org
 
     This only loads the basic stuff - there needs to be more done to make this run.
 

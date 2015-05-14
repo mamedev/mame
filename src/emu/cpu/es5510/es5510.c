@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Christian Brunschen
 /***************************************************************************
  *
  *   es5510.c - Ensoniq ES5510 (ESP) emulation

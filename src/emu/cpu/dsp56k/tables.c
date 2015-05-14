@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

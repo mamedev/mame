@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TC0480SCP_H__
 #define __TC0480SCP_H__
 

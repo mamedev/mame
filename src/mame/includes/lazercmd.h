@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 

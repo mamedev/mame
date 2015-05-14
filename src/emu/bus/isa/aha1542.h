@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Darkstar
 /**********************************************************************
  *
  *    Adaptec AHA-1542{,C,CF} SCSI Controller
- *
- *    Copyright MESS Team.
- *    Visit http://mamedev.org for licensing and usage restrictions.
  *
  **********************************************************************
 

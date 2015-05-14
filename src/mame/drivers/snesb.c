@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 /***************************************************************************
 
  Arcade games (hacks of console games) running on SNES harware.

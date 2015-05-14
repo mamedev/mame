@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_ms_direct1.h
  *
@@ -36,7 +38,8 @@ ATTR_HOT nl_double netlist_matrix_solver_direct2_t::vsolve()
 
 ATTR_HOT inline int netlist_matrix_solver_direct2_t::vsolve_non_dynamic()
 {
-	build_LE();
+	build_LE_A();
+	build_LE_RHS();
 
 	const nl_double a = m_A[0][0];
 	const nl_double b = m_A[0][1];

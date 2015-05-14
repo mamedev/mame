@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include <assert.h>
 #include "ipf_dsk.h"
 

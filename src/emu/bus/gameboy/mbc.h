@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta, Wilbert Pol
 #ifndef __GB_MBC_H
 #define __GB_MBC_H
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Hau
 #include "machine/eepromser.h"
 #include "video/polylgcy.h"
 #include "video/tc0100scn.h"

@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Fabio Priuli, byuu
 /***********************************************************************************************************
 
  SPC-7110 add-on chip emulation (for SNES/SFC)
@@ -6,12 +8,6 @@
 
  Byuu's code is released under GNU General Public License
  version 2 as published by the Free Software Foundation.
-
- The implementation below is released under the MAME license
- for use in MAME, MESS and derivatives by permission of Byuu
-
- Copyright (for the implementation below) MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
  ***********************************************************************************************************/
 

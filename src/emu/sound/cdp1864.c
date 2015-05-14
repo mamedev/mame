@@ -4,9 +4,6 @@
 
     RCA CDP1864C COS/MOS PAL Compatible Color TV Interface
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese, Harmony
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese,Ryan Holtz
 /***************************************************************************
 
 

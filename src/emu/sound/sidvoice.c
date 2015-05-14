@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 #include "emu.h"
 #include "sidvoice.h"
 #include "sid.h"

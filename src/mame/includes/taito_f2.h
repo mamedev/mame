@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
 #include "machine/taitoio.h"
 #include "sound/okim6295.h"
 #include "video/tc0100scn.h"

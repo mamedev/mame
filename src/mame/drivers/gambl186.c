@@ -1,6 +1,14 @@
-/* Unknown Gambling game with 186 CPU */
+// license:???
+// copyright-holders:???
+/***********************************************************************************
 
-/*
+  Multi Game - EGD, 1997
+  Poker - Roulette - Black Jack - Bingo
+
+  Game base is Bingo. Casino 10 (poker), Roulette, and Black Jack,
+  could be enabled/disabled through DIP switches.
+
+************************************************************************************
 
 80186xl20   Xtal 40Mhz
 At89c52 (not dumped) with external 32K ram?? Xtal 11.xxx18Mhz
@@ -28,14 +36,22 @@ In order to get the game to run, follow these steps:
     1 1 X X 1 1 1 X X X 1 1 X 1 1 1 1 X 1 1 1 1 1 X 1 1 1 1 1 1 X
 (This is the "password" for the EEPROM.  You have three attempts to get it correct, otherwise the service mode will restart)
 - if accepted, disable service mode DIP switch
-- reset machine (press 'F3')
-*/
+- reset machine (press 'F3') (watchdog is not implemented)
+- if another password prompt appears, just press 'X' 9 times
+
+TODO:
+- fix the poker game (casino 10). EEPROM behaviour still buggy.
+- sound;
+- proper 3x D71055C emulation. 
+
+***********************************************************************************/
 
 
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "video/clgd542x.h"
+#include "sound/upd7759.h"
 #include "machine/nvram.h"
 
 
@@ -44,9 +60,11 @@ class gambl186_state : public driver_device
 public:
 	gambl186_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_upd7759(*this, "7759") { }
 
 	required_device<cpu_device> m_maincpu;
+ 	optional_device<upd7759_device> m_upd7759;
     int m_comms_state;
 	int m_comms_ind;
 	UINT8 m_comms_data[1002];
@@ -59,6 +77,8 @@ public:
 	DECLARE_READ16_MEMBER(comms_r);
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);
+	DECLARE_READ16_MEMBER(upd_r);
+	DECLARE_WRITE16_MEMBER(upd_w);
 };
 
 void gambl186_state::machine_start()
@@ -95,41 +115,48 @@ READ16_MEMBER(gambl186_state::comms_r)
                         break;
                     }
 
-                    case 1: //unverified
-                    case 3: //unverified
+                    case 1:
                     {
-                        m_comms_expect = 8;
+                        m_comms_expect = 12;
+                        m_comms_blocks = 2;
                         break;
                     }
 
                     case 2:
                     {
                         m_comms_expect = 408;
-                        m_comms_data[401] = 0x34; //precalc
                         m_comms_blocks = 4;
+                        break;
+                    }
+
+                    case 3:
+                    {
+                        m_comms_expect = 7;
+                        m_comms_blocks = 3;
                         break;
                     }
 
                     case 4:
                     {
-                        m_comms_expect = 4;
+                        m_comms_expect = 2;
+                        m_comms_blocks = 2;
                         break;
                     }
 
-                    case 5: //unverified
+                    case 5:
                     {
-                        m_comms_expect = 7;
+                        m_comms_expect = 13;
+                        m_comms_blocks = 5;
                         break;
                     }
 
                     case 6:
                     {
                         m_comms_expect = 1003;
-                        m_comms_data[1001] = 0xec; //precalc
                         break;
                     }
 
-                    default: //unverified
+                    default: //unknown
                     {
                         m_comms_expect = 1;
                     }
@@ -138,36 +165,99 @@ READ16_MEMBER(gambl186_state::comms_r)
 
             if (m_comms_ind < sizeof(m_comms_data))
             {
-                if ((m_comms_cmd == 4) && (m_comms_ind == 1) && !memcmp(m_comms_data, password, sizeof(password)))
-                {
-                    m_comms_data[1] = 0x55;
-                    m_comms_data[2] = 0x55;
-                }
-
-                retval = m_comms_data[m_comms_ind++];
-
                 if (m_comms_expect && !--m_comms_expect)
                 {
+                    m_comms_ack = true;
+
+                    if (m_comms_ind)
+                    {
+                        int i, sum;
+
+                        for (i = 1, sum = 0; i < m_comms_ind; sum += m_comms_data[i++]);
+                        m_comms_data[m_comms_ind] = (unsigned char) sum;
+
+                        switch (m_comms_cmd)
+                        {
+                            case 1:
+                            {
+                                if (m_comms_blocks == 2)
+                                {
+                                    m_comms_expect = 5;
+                                }
+                                else
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                }
+
+                                break;
+                            }
+
+                            case 2:
+                            {
+                                if (m_comms_blocks == 4)
+                                {
+                                    m_comms_expect = 5;
+                                }
+                                else
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                    m_comms_expect = 3;
+                                }
+
+                                break;
+                            }
+
+                            case 3:
+                            {
+                                if (m_comms_blocks == 3)
+                                {
+                                    m_comms_expect = 3;
+                                }
+                                else
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                    m_comms_expect = 5;
+                                }
+
+                                break;
+                            }
+
+                            case 5:
+                            {
+                                m_comms_expect = 3;
+
+                                if (m_comms_blocks < 5)
+                                {
+                                    m_comms_data[m_comms_ind] += 5; //compensate for ack
+                                }
+
+                                break;
+                            }
+
+                            default:
+                            {
+                            }
+                        }
+                    }
+                    else if (m_comms_cmd == 4)
+                    {
+                        if (!memcmp(m_comms_data, password, sizeof(password)))
+                        {
+                            m_comms_data[1] = 0x55;
+                            m_comms_data[2] = 0x55;
+                        }
+
+                        m_comms_expect = 2;
+                        m_comms_ack = false;
+                    }
+
                     if (!m_comms_blocks || !--m_comms_blocks)
                     {
                         m_comms_cmd = 0xff;
                     }
-                    else if (m_comms_cmd == 2)
-                    {
-                        if (m_comms_blocks == 3)
-                        {
-                            m_comms_expect = 5;
-                            m_comms_data[4] = 0x17; //precalc
-                        }
-                        else
-                        {
-                            m_comms_expect = 3;
-                            m_comms_data[2] = 5; //precalc
-                        }
-                    }
-
-                    m_comms_ack = true;
                 }
+
+                retval = m_comms_data[m_comms_ind++];
             }
         }
     }
@@ -238,20 +328,52 @@ WRITE16_MEMBER( gambl186_state::data_bank_w)
 		popmessage("warning: set %04x to data bank",data);
 }
 
+
+/* Preliminary sound through UPD7759
+
+   port 400h writes the sample index/input
+   port 504h writes the commands...
+   
+   504h xxxx ---- ---- ----
+ 
+   Sound event:
+   504h: 2000
+   504h: e000
+   400h: xxyy <--- xx and yy are the sample number/index
+   504h: c000
+   504h: e000
+   504h: 2000
+*/
+WRITE16_MEMBER(gambl186_state::upd_w)
+{
+//// FIXME
+//	m_upd7759->reset_w(0);
+//	m_upd7759->reset_w(1);
+
+//	if (mem_mask&0x00ff) m_upd7759->port_w(space, 0, data & 0xff);
+//	if (mem_mask&0xff00) m_upd7759->port_w(space, 0, (data >> 8) & 0xff);
+	data = (data >> 8);
+    popmessage("sample index: %02x", data);
+
+//	m_upd7759->start_w(0);
+//	m_upd7759->start_w(1);
+}
+
+
 static ADDRESS_MAP_START( gambl186_io, AS_IO, 16, gambl186_state )
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffff)
-	AM_RANGE(0x0400, 0x0401) AM_WRITENOP // sound
+	AM_RANGE(0x0400, 0x0401) AM_WRITE(upd_w)      // upd7759 sample index/input
 	AM_RANGE(0x0500, 0x0501) AM_READ_PORT("IN0")
 	AM_RANGE(0x0502, 0x0503) AM_READ_PORT("IN1")
-	AM_RANGE(0x0504, 0x0505) AM_READ_PORT("IN2")
+	AM_RANGE(0x0504, 0x0505) AM_READ_PORT("IN2")  // Seems to writes more upd7759 params in MSB...
 
 	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
-	AM_RANGE(0x0580, 0x0581) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW2") AM_WRITENOP // ???
-	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
+	AM_RANGE(0x0580, 0x0581) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("JOY")
+	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW0") AM_WRITENOP // Watchdog: bit 8
+//	AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
 	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
 	AM_RANGE(0x0700, 0x0701) AM_WRITE(data_bank_w)
 ADDRESS_MAP_END
@@ -260,274 +382,78 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gambl186 )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "0-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("-") // Unknown meaning
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )  PORT_NAME("-")  PORT_CODE(KEYCODE_2)  // Unknown meaning
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "1-2" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN5 )  PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN6 )  PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Key")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "2-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	/* TODO: order isn't honored */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN5 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN6 )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER )  PORT_NAME("- Aux")  PORT_CODE(KEYCODE_3)  // Unknown meaning
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("JOY")
+	PORT_BIT( 0x01ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "0-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "0-2" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE(0x1000, IP_ACTIVE_LOW )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x2000, 0x0000, "Casino 10 Game" )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Bookkeeping" )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "SW1-1" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "1-2" )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0100, 0x0100, "SW2-4" )            PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "SW2-3" )            PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "SW2-2" )            PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "VGA Mode" )         PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x0800, "640x480" )
+	PORT_DIPSETTING(    0x0000, "640x240" )
+	PORT_DIPNAME( 0x1000, 0x0000, "Roulette Game" )    PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "SW2-6" )            PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x0000, "Black Jack Game" )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "2-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "2-2" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_SERVICE(0x1000, IP_ACTIVE_LOW )
-
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Bookkeeping" )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "SW2-8" )            PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
@@ -536,15 +462,20 @@ INPUT_PORTS_END
 
 
 static MACHINE_CONFIG_START( gambl186, gambl186_state )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_40MHz/2)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(gambl186_map)
 	MCFG_CPU_IO_MAP(gambl186_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
-MACHINE_CONFIG_END
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+MACHINE_CONFIG_END
 
 
 
@@ -557,7 +488,7 @@ ROM_START( gambl186 )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
-	ROM_REGION( 0x20000, "snd", 0 )
+	ROM_REGION( 0x20000, "upd", 0 )	// upd7759 sound samples
 	ROM_LOAD( "347.u302", 0x00000, 0x20000, CRC(7ce8f490) SHA1(2f856e31d189e9d46ba6b322133d99133e0b52ac) )
 ROM_END
 
@@ -570,10 +501,10 @@ ROM_START( gambl186a )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
-	ROM_REGION( 0x20000, "snd", 0 )
+	ROM_REGION( 0x20000, "upd", 0 )	// upd7759 sound samples
 	ROM_LOAD( "347.u302", 0x00000, 0x20000, CRC(7ce8f490) SHA1(2f856e31d189e9d46ba6b322133d99133e0b52ac) )
 ROM_END
 
 
-GAME( 1997, gambl186,  0,        gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V398)",         GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,       ROT0,  "EGD", "Multi Game - Bingo 10 (V399)",         GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, gambl186,  0,        gambl186,   gambl186, driver_device,   0,   ROT0,  "EGD", "Multi Game (V398)",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, gambl186a, gambl186, gambl186,   gambl186, driver_device,   0,   ROT0,  "EGD", "Multi Game (V399)",  GAME_NOT_WORKING | GAME_NO_SOUND )

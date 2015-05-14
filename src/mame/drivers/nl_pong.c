@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:DICE Team,couriersud
 
 /***************************************************************************
 
@@ -12,6 +14,7 @@ NETLIST_START(pong_fast)
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
 	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
 	PARAM(Solver.LTE,     1e-4) // Default is not enough for paddle control if using LTE
+    PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
 

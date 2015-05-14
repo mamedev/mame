@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Couriersud
 /***************************************************************************
 
     Zilog Z80 DMA Direct Memory Access Controller emulation

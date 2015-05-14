@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 #include "sound/flt_rc.h"
 #include "sound/k007232.h"
 #include "sound/k005289.h"

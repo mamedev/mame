@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_7493.c
  *
@@ -8,10 +10,10 @@
 
 NETLIB_START(7493)
 {
-	register_sub(A, "A");
-	register_sub(B, "B");
-	register_sub(C, "C");
-	register_sub(D, "D");
+	register_sub("A", A);
+	register_sub("B", B);
+	register_sub("C", C);
+	register_sub("D", D);
 
 	register_subalias("CLKA", A.m_I);
 	register_subalias("CLKB", B.m_I);

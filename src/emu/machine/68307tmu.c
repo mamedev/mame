@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* 68307 TIMER module */
 // 2x timers
 

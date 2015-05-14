@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jonathan Edwards
 /*********************************************************************
 
     bml3kanji.h

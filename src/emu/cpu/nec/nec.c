@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /****************************************************************************
 
     NEC V20/V30/V33 emulator

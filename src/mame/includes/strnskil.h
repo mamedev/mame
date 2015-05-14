@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Uki
 class strnskil_state : public driver_device
 {
 public:

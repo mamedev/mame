@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 #include "sound/msm5232.h"
 
 class nycaptor_state : public driver_device

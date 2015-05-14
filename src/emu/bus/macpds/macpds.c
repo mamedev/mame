@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   macpds.c - Mac 68000 PDS implementation (SE, Portable)

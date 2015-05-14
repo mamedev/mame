@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include <assert.h>
 

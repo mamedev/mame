@@ -1,5 +1,5 @@
-// license:MAME
-// copyright-holders:
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald, Robbbert
 /*
     Gimix 6809-Based Computers
 

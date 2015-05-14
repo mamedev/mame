@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Joseph Zbiciak,Tim Lindner
 /**********************************************************************
 
     SP0256 Narrator Speech Processor emulation

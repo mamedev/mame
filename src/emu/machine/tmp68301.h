@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef TMP68301_H
 #define TMP68301_H
 

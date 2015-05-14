@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, Miodrag Milanovic
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Coates
 /***************************************************************************
   Functions to emulate video hardware on these Taito games:
 

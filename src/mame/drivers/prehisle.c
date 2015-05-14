@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Prehistoric Isle in 1930 (World)        (c) 1989 SNK

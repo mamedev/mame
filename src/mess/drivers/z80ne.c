@@ -1,4 +1,4 @@
-// license:MAME
+// license:???
 // copyright-holders:Roberto Lavarone
 /******************************************************************************
     Nuova Elettronica Z80NE system driver

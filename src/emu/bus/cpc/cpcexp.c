@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * cpcexp.c  --  Amstrad CPC Expansion port
  *
@@ -45,7 +47,8 @@ cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconf
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
 		m_out_reset_cb(*this),
-		m_out_romdis_cb(*this)
+		m_out_romdis_cb(*this),
+		m_out_rom_select(*this)
 {
 }
 
@@ -66,6 +69,7 @@ void cpc_expansion_slot_device::device_start()
 	m_out_nmi_cb.resolve_safe();
 	m_out_reset_cb.resolve_safe();
 	m_out_romdis_cb.resolve_safe();
+	m_out_rom_select.resolve_safe();
 }
 
 
@@ -82,3 +86,4 @@ WRITE_LINE_MEMBER( cpc_expansion_slot_device::irq_w ) { m_out_irq_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::nmi_w ) { m_out_nmi_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::reset_w ) { m_out_reset_cb(state); }
 WRITE_LINE_MEMBER( cpc_expansion_slot_device::romdis_w ) { m_out_romdis_cb(state); }
+WRITE8_MEMBER( cpc_expansion_slot_device::rom_select ) { m_out_rom_select(data); }

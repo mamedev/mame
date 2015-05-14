@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /***************************************************************************
 
     15WWW-97-006 keyboard, normally used with 15IE-00-013.

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Roberto Fresca
 #include "sound/msm5205.h"
 
 class tehkanwc_state : public driver_device

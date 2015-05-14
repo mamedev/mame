@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /*******************************************************************************
 
 Data East machine functions - Bryan McPhail, mish@tendril.co.uk

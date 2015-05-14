@@ -1,10 +1,9 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Nintendo MMC-1 PCBs
-
- Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions.
 
 
  Here we emulate the Nintendo SxROM / MMC-1 PCBs + older variants without WRAM protect bit

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 #ifndef JVC_XV701_H_
 #define JVC_XV701_H_
 

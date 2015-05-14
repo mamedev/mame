@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol,???
 /*
 
 TZX (currently spectrum only) and spectrum TAP cassette format support by Wilbert Pol

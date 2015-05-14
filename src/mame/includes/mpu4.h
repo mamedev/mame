@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"

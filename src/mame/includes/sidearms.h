@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman, Curt Coder
 #include "video/bufsprite.h"
 
 class sidearms_state : public driver_device

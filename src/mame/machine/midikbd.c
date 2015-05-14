@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "machine/midikbd.h"
 
 const device_type MIDI_KBD = &device_creator<midi_keyboard_device>;

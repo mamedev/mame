@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, kingshriek, Deunan Knute, R. Belmont
 /*
 
     Sega/Yamaha AICA emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, ???
 /* PGM 2 hardware.
 
     Motherboard is bare bones stuff, and does not contain any ROMs.

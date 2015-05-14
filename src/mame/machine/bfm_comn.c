@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Bellfruit Common Hardware / Functions */
 #include "emu.h"
 

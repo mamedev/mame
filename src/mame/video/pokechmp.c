@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Poke Champ */
 
 #include "emu.h"

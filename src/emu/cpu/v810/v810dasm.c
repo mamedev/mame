@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 /********************************************
     NEC V810 (upd70732) disassembler
   Tomasz Slanina - analog[at]op.pl

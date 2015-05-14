@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*********************************************************************
 
     drivers/lisa.c

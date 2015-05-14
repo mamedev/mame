@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf,Barry Rodewald
 /***************************************************************************
 
     x2212.h

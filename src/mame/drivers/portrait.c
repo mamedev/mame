@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff, Pierpaolo Prazzoli
 /**************************************************************************
  Portraits
  (c) 1983 Olympia

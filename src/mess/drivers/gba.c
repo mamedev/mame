@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R.Belmont,Ryan Holtz
 /***************************************************************************
 
   gba.c
@@ -5,12 +7,6 @@
   Driver file to handle emulation of the Nintendo Game Boy Advance.
 
   By R. Belmont & Harmony
-
-  TODO:
-  - Raster timing issues.  Castlevania (HOD and AOS)'s raster effects
-    work if the VBlank is fired on scanline 0, else they're offset by
-    the height of the vblank region.  Is scanline 0 the start of the
-    visible area?
 
 ***************************************************************************/
 

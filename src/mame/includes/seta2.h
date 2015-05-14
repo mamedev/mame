@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
 #include "sound/x1_010.h"

@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina,Tatsuyuki Satoh
 /*
 Parallel Turn
 (c) Jaleco, 1984

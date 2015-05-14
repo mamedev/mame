@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
 /***************************************************************************
 
     POW - Prisoners Of War (US version 1)    A7008   SNK 1988

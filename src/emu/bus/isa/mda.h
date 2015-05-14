@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, Miodrag Milanovic
 #pragma once
 
 #ifndef __ISA_MDA_H__

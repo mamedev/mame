@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari
 /***************************************************************************
 
     Midway 8080-based black and white hardware

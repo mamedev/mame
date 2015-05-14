@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 #include "emu.h"
 #include "includes/aliens.h"
 

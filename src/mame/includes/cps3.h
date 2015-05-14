@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, Andreas Naive, Tomasz Slanina, ElSemi
 /***************************************************************************
 
     Capcom CPS-3 Hardware

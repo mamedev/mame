@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /**********************************************************************************
 
   Fun World / Amatic / TAB / Impera.

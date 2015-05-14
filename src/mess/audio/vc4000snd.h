@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 /*****************************************************************************
  *
  * includes/vc4000snd.h

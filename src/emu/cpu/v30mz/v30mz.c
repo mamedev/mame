@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol,Bryan McPhail
 /****************************************************************************
 
     NEC V20/V30/V33 emulator modified to a v30mz emulator

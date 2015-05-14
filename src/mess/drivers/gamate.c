@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Peter Trauner
 /******************************************************************************
  PeT mess@utanet.at 2007, 2014
  Peter Wilhelmsen peter.wilhelmsen@gmail.com

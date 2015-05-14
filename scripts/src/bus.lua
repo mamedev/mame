@@ -1,11 +1,11 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 ---------------------------------------------------------------------------
 --
 --   bus.lua
 --
 --   Rules for building bus cores
---
---   Copyright Nicola Salmoria and the MAME Team.
---   Visit http://mamedev.org for licensing and usage restrictions.
 --
 ---------------------------------------------------------------------------
 
@@ -2113,6 +2113,8 @@ if (BUSES["CPC"]~=null) then
 		MAME_DIR .. "src/emu/bus/cpc/playcity.h",
 		MAME_DIR .. "src/emu/bus/cpc/smartwatch.c",
 		MAME_DIR .. "src/emu/bus/cpc/smartwatch.h",
+		MAME_DIR .. "src/emu/bus/cpc/brunword4.c",
+		MAME_DIR .. "src/emu/bus/cpc/brunword4.h",
 	}
 end
 

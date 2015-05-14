@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Diver Boy
  (c)1992 Device Electronics
 

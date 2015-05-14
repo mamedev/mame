@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:K.Wilkins
 /* video hardware for Namco System II */
 
 #include "emu.h"

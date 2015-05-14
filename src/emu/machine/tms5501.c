@@ -4,9 +4,6 @@
 
     TMS5501 Multifunction Input/Output Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "tms5501.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Aquarium */
 
 #include "emu.h"

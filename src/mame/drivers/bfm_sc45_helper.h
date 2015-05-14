@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* */
 
 void bfm_sc45_layout_helper(running_machine &machine);

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Aquarium (c)1996 Excellent Systems */
 
 /* the hardware is similar to gcpinbal.c, probably should merge it at some point */

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 static const UINT8 ef9341_char_set[2][128][10] = {
 	// Alphanumeric character set (128 characters)
 	{

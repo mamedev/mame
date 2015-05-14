@@ -23,23 +23,43 @@
 
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
- * This is intended for non-mame usage.
+ * There is quite some significant speed-up of up to 20% involved.
+ * NO_USE_PMFCONVERSION is for illustrative purposes only. Using PMFs
+ * has some overhead in comparison to calling a virtual function.
+ *
+ * To get a performance increase we need the GCC extension.
  *
  */
-#define USE_PMFDELEGATES        (0)
+
+#ifndef USE_PMFDELEGATES
+#if defined(__clang__)
+	#define USE_PMFDELEGATES        	(0)
+	#define NO_USE_PMFCONVERSION		(1)
+#else
+	#if defined(__GNUC__)
+		#define USE_PMFDELEGATES        (1)
+		#define NO_USE_PMFCONVERSION	(0)
+		#pragma GCC diagnostic ignored "-Wpmf-conversions"
+	#else
+		#define USE_PMFDELEGATES        (0)
+		#define NO_USE_PMFCONVERSION	(1)
+	#endif
+#endif
+#endif
 
 /*
  *  This increases performance in circuits with a lot of gates
  *  but is not guaranteed to be absolutely timing correct.
  *
- *  Performance increase about 10%
+ *  Performance increase about 10% (breakout) to 20% (pong)
  *
  */
 
-// FIXME: breakout doesn't like this
-#define USE_DEACTIVE_DEVICE     (0)
 
-#define USE_TRUTHTABLE          (0)
+// moved to parameter NETLIST.USE_DEACTIVATE
+// #define USE_DEACTIVE_DEVICE     (0)
+
+#define USE_TRUTHTABLE          (1)
 
 // The following adds about 10% performance ...
 
@@ -55,9 +75,19 @@
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
 
-//typedef double   nl_double;
-
 #define nl_double double
+
+//============================================================
+//  Solver defines
+//============================================================
+
+#define USE_MATRIX_GS (1)
+#define USE_PIVOT_SEARCH (0)
+#define USE_GABS (1)
+// savings are eaten up by effort
+// FIXME: Convert into solver parameter
+#define USE_LINEAR_PREDICTION (0)
+
 
 //============================================================
 //  DEBUGGING
@@ -161,12 +191,11 @@ public:
 
 #ifdef MAME_DEBUG
 #define nl_assert(x)               do { if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
-#define nl_assert_always(x, msg)   do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
-#define nl_assert(x)               do { } while (0)
+#define nl_assert(x)               do { if (0) if (!(x)) throw nl_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 //#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #endif
+#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 
 //============================================================
 //  Compiling standalone

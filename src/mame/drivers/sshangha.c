@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Charles MacDonald, David Haywood
 /***************************************************************************
 
   Super Shanghai Dragon's Eye             (c) 1992 Hot-B

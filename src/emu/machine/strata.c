@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet, Michael Zapf
 /*
     Intel 28F640J5 Flash ROM emulation (could also handle 28F320J5 with minor
     changes, and possibly 28F256J3, 28F128J3, 28F640J3 and 28F320J3)

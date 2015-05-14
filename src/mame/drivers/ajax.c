@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
     "AJAX/Typhoon"  (Konami GX770)

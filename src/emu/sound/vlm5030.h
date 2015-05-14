@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tatsuyuki Satoh
 #pragma once
 
 #ifndef __VLM5030_H__

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
 Data East gfx encryption emulation                            by Nicola Salmoria

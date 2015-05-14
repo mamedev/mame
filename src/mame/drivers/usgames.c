@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 US Games - Trivia / Quiz / 'Amusement Only' Gambling Games

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Kevin Thacker, Barry Rodewald 
 /***************************************************************************
 
   machine.c
@@ -1656,6 +1658,10 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		}
 
 		/* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */
+		if((dataToGateArray & 0x0c) != 0)
+			m_exp->romen_w(0);  // active low
+		else
+			m_exp->romen_w(1);
 		amstrad_setLowerRom();
 		amstrad_setUpperRom();
 
@@ -1939,6 +1945,29 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 	m_prev_data = data;
 }
 
+WRITE8_MEMBER(amstrad_state::rom_select)
+{
+	m_gate_array.upper_bank = data;
+	// expansion devices know the selected ROM by monitoring I/O writes to DFxx
+	// there are no signals related to which ROM is selected
+	cpc_expansion_slot_device* exp_port = m_exp;
+	while(exp_port != NULL)
+	{
+		device_cpc_expansion_card_interface* temp;
+		device_t* temp_dev;
+
+		temp = dynamic_cast<device_cpc_expansion_card_interface*>(exp_port->get_card_device());
+		temp_dev = dynamic_cast<device_t*>(exp_port->get_card_device());
+		if(temp != NULL)
+		{
+			temp->set_rom_bank(data);
+		}
+		exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
+	}
+
+	amstrad_setUpperRom();
+}
+
 /* Offset handler for write */
 WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 {
@@ -2005,25 +2034,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	/* b13 = 0 : ROM select Write Selected*/
 	if ((offset & (1<<13)) == 0)
 	{
-		m_gate_array.upper_bank = data;
-		// expansion devices know the selected ROM by monitoring I/O writes to DFxx
-		// there are no signals related to which ROM is selected
-		cpc_expansion_slot_device* exp_port = m_exp;
-		while(exp_port != NULL)
-		{
-			device_cpc_expansion_card_interface* temp;
-			device_t* temp_dev;
-
-			temp = dynamic_cast<device_cpc_expansion_card_interface*>(exp_port->get_card_device());
-			temp_dev = dynamic_cast<device_t*>(exp_port->get_card_device());
-			if(temp != NULL)
-			{
-				temp->set_rom_bank(data);
-			}
-			exp_port = temp_dev->subdevice<cpc_expansion_slot_device>("exp");
-		}
-
-		amstrad_setUpperRom();
+		rom_select(space,0,data);
 	}
 
 	/* b12 = 0 : Printer port Write Selected*/
@@ -2372,6 +2383,9 @@ void amstrad_state::amstrad_rethinkMemory()
 			}
 		}
 	}
+	
+	/* mappings for other expansion devices */
+	m_exp->set_mapping();
 }
 
 

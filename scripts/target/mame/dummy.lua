@@ -1,19 +1,22 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 ---------------------------------------------------------------------------
 --
---   ume.lua
+--   dummy.lua
 --
---   Universal target makefile
+--   Dummy target makefile
 --
 ---------------------------------------------------------------------------
 
-dofile("../mess/mess.lua")
-dofile("../mame/mame.lua")
+dofile("arcade.lua")
+dofile("mess.lua")
 
-function createProjects_ume_dummy(_target, _subtarget)
-	project ("ume_dummy")
+function createProjects_mame_dummy(_target, _subtarget)
+	project ("mame_dummy")
 	targetsubdir(_target .."_" .. _subtarget)
 	kind "StaticLib"
-	uuid (os.uuid("drv-ume_dummy"))
+	uuid (os.uuid("drv-mame_dummy"))
 	
 	options {
 		"ForceCPP",
@@ -36,8 +39,8 @@ function createProjects_ume_dummy(_target, _subtarget)
 	}
 end
 
-function linkProjects_ume_dummy(_target, _subtarget)
+function linkProjects_mame_dummy(_target, _subtarget)
 	links {
-		"ume_dummy",
+		"mame_dummy",
 	}
 end

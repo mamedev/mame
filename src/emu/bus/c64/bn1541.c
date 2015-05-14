@@ -6,9 +6,6 @@
 
     http://sta.c64.org/cbmparc2.html
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "bn1541.h"

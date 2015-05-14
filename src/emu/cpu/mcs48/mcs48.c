@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni
 /*
 EA pin - defined by architecture, must implement:
    1 means external access, bypassing internal ROM

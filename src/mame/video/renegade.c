@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Stroffolino, Carlos A. Lozano, Rob Rosenbrock
 /***************************************************************************
 
     Renegade Video Hardware
@@ -22,7 +24,7 @@ WRITE8_MEMBER(renegade_state::fg_videoram_w)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(renegade_state::renegade_flipscreen_w)
+WRITE8_MEMBER(renegade_state::flipscreen_w)
 {
 	flip_screen_set(~data & 0x01);
 }
@@ -119,7 +121,7 @@ void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 renegade_state::screen_update_renegade(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 renegade_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0 , 0);

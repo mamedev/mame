@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*
     990_tap.h: include file for 990_tap.c
 */

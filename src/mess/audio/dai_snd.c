@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Krzysztof Strzecha
 /***************************************************************************
 
   audio/dai_snd.c

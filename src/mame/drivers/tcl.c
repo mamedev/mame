@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 /*
 Taiwan Chess Legend
 Uniwang, 1995

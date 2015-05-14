@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /* TimeTop - GameKing */
 
 // these are meant to have a 3-in-1 internal ROM, not dumped

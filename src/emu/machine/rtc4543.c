@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /**********************************************************************
 
     rtc4543.c - Epson R4543 real-time clock chip emulation

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /*
 
     SemiCom 68020 based hardware

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ted Green
 #include "voodoo_pci.h"
 
 static MACHINE_CONFIG_FRAGMENT( voodoo_pci )

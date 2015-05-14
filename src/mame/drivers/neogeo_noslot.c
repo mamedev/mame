@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 // MAME NeoGeo code for single fixed slot 'shortname' configs
 // none of this is required by MESS or the slot-based implementation

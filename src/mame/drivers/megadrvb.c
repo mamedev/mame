@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /***************************************************************************
 
     Sega Mega Drive/Genesis-based bootlegs

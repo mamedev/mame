@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Lukasz Markowski
 #ifndef CXHUMAX_H_
 #define CXHUMAX_H_
 

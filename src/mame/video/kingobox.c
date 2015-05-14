@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 #include "emu.h"
 #include "video/resnet.h"
 #include "includes/kingobox.h"

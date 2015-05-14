@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
     dc.h - Sega Dreamcast includes

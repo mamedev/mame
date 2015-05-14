@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_7427.c
  *
@@ -5,11 +7,25 @@
 
 #include "nld_7427.h"
 
+#include "nld_7402.h"
+
+#if (USE_TRUTHTABLE)
+nld_7427::truthtable_t nld_7427::m_ttbl;
+const char *nld_7427::m_desc[] = {
+		"A,B,C|Q ",
+		"0,0,0|1|22",
+		"1,X,X|0|15",
+		"X,1,X|0|15",
+		"X,X,1|0|15",
+		""
+};
+#endif
+
 NETLIB_START(7427_dip)
 {
-	register_sub(m_1, "1");
-	register_sub(m_2, "2");
-	register_sub(m_3, "3");
+	register_sub("1", m_1);
+	register_sub("2", m_2);
+	register_sub("3", m_3);
 
 	register_subalias("1", m_1.m_i[0]);
 	register_subalias("2", m_1.m_i[1]);

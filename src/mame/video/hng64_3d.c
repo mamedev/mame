@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner, Andrew Zaferakis
 /* Hyper NeoGeo 64 - 3D bits */
 
 // todo, use poly.c

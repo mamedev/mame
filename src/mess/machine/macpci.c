@@ -1,3 +1,5 @@
+// license:?
+// copyright-holders:R.Belmont
 /****************************************************************************
 
     machine/pcimac.c

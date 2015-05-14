@@ -4,9 +4,6 @@
 
     Morrow Designs MM65K16S memory board emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mm65k16s.h"

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Lee Taylor
 /***************************************************************************
 
     IREM M-10,M-11 and M-15 based hardware

@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     TEA1002
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     PAL colour encoder and video summer
 

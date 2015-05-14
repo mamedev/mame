@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "sound/discrete.h"
 
 class sprint8_state : public driver_device

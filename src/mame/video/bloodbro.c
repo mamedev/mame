@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Carlos A. Lozano Baides
 /***************************************************************************
 
     Video Hardware for Blood Brothers

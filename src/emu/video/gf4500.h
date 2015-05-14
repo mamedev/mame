@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tim Schuerewegen
 /*
 
     NVIDIA GoForce 4500

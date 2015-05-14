@@ -48,20 +48,20 @@ public:
 	NETLIB_NAME(res_sw) m_RP;
 	NETLIB_NAME(res_sw) m_RN;
 
-	netlist_ttl_output_t m_RP_Q;
-	netlist_ttl_output_t m_RN_Q;
+	netlist_logic_output_t m_RP_Q;
+	netlist_logic_output_t m_RN_Q;
 
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_CLRQ;
-	netlist_ttl_output_t m_Q;
-	netlist_ttl_output_t m_QQ;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
+	netlist_logic_input_t m_CLRQ;
+	netlist_logic_output_t m_Q;
+	netlist_logic_output_t m_QQ;
 
 	netlist_analog_input_t m_CV;
 
-	netlist_state_t<netlist_sig_t> m_last_trig;
-	netlist_state_t<UINT8>         m_state;
-	netlist_state_t<double>        m_KP;
+	netlist_sig_t m_last_trig;
+	UINT8         m_state;
+	double        m_KP;
 
 	netlist_param_double_t m_K;
 	netlist_param_double_t m_RI;

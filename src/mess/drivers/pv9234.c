@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 PowerVu D9234 STB (c) 1997 Scientific Atlanta

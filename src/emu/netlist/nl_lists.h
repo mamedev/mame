@@ -49,9 +49,9 @@ public:
 		clear();
 	}
 
-	ATTR_HOT inline int capacity() const { return _Size; }
-	ATTR_HOT inline bool is_empty() const { return (m_end == &m_list[0]); }
-	ATTR_HOT inline bool is_not_empty() const { return (m_end > &m_list[0]); }
+	ATTR_HOT inline const int capacity() const { return _Size; }
+	ATTR_HOT inline const bool is_empty() const { return (m_end == &m_list[0]); }
+	ATTR_HOT inline const bool is_not_empty() const { return (m_end > &m_list[0]); }
 
 	ATTR_HOT /*ATTR_ALIGN*/ void push(const entry_t &e)
 	{

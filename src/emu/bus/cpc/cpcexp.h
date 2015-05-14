@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
  * cpcexp.h  --  Amstrad CPC Expansion port
  *
@@ -62,6 +64,9 @@
 #define MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(_devcb) \
 	devcb = &cpc_expansion_slot_device::set_out_romdis_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(_devcb) \
+	devcb = &cpc_expansion_slot_device::set_out_rom_select_callback(*device, DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -79,9 +84,11 @@ public:
 	// reset
 	virtual void cpc_reset_w() { };
 	virtual WRITE_LINE_MEMBER( cursor_w ) { };
+	virtual WRITE_LINE_MEMBER( romen_w ) { };
 
 	void set_rom_bank(UINT8 sel) { m_rom_sel = sel; }  // tell device the currently selected ROM
 	UINT8 get_rom_bank() { return m_rom_sel; }
+	virtual void set_mapping() { };
 
 private:
 	UINT8 m_rom_sel;  // currently selected ROM
@@ -102,14 +109,18 @@ public:
 	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_reset_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_reset_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_romdis_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_romdis_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_rom_select_callback(device_t &device, _Object object) { return downcast<cpc_expansion_slot_device &>(device).m_out_rom_select.set_callback(object); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_WRITE_LINE_MEMBER( romdis_w );
+	DECLARE_WRITE8_MEMBER( rom_select );
 
 	void set_rom_bank(UINT8 sel) { if(m_card) m_card->set_rom_bank(sel); }  // tell device the currently selected ROM
+	void set_mapping() { if(m_card) m_card->set_mapping(); }  // tell device to enable any ROM or RAM mapping
 	DECLARE_WRITE_LINE_MEMBER( cursor_w ) { if(m_card) m_card->cursor_w(state); }  // pass on CRTC Cursor signal
+	DECLARE_WRITE_LINE_MEMBER( romen_w ) { if(m_card) m_card->romen_w(state); }  // pass on /ROMEN signal
 
 protected:
 	// device-level overrides
@@ -120,6 +131,7 @@ protected:
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_reset_cb;
 	devcb_write_line    m_out_romdis_cb;
+	devcb_write8        m_out_rom_select;
 
 	device_cpc_expansion_card_interface *m_card;
 

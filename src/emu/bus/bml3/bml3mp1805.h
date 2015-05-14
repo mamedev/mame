@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jonathan Edwards
 /*********************************************************************
 
     bml3mp1805.h

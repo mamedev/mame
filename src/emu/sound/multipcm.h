@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miguel Angel Horna
 #pragma once
 
 #ifndef __MULTIPCM_H__

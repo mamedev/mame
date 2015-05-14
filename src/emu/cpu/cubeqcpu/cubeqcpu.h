@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Philip Bennett
 /***************************************************************************
 
     cubeqcpu.h

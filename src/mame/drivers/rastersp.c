@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     Bell-Fruit/ATD RasterSpeed hardware

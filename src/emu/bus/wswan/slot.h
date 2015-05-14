@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 #ifndef __WS_SLOT_H
 #define __WS_SLOT_H
 

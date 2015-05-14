@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:pSXAuthor, R.Belmont
 #include "emu.h"
 #include "spu.h"
 

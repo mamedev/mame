@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Yochizo
 /***************************************************************************
 
 Functions to emulate the video hardware of the machine.

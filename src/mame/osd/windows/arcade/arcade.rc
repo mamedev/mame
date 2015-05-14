@@ -2,13 +2,13 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//	ume.rc - Minimal resource file for Win32 MAME
+//	arcade.rc - Minimal resource file for Win32 MAME
 //
 //============================================================
 
 #include <windows.h>
-#include "umevers.rc"
+#include "arcadevers.rc"
 
-1                       24      MOVEABLE PURE   "ume.man"
+1                       24      MOVEABLE PURE   "arcade.man"
 
-2                       ICON    DISCARDABLE     "ume.ico"
+2                       ICON    DISCARDABLE     "arcade.ico"

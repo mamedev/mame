@@ -144,7 +144,7 @@ protected:
 	virtual void execute_run();
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config :((spacenum == AS_DATA) ? &m_data_config : NULL); }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return(spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_DATA) ? &m_data_config : NULL); }
 
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return 1; }
@@ -175,6 +175,7 @@ protected:
 	emu_timer *m_timer;
 
 	UINT16 m_pc;            // program counter
+	UINT16 m_prev_pc;
 	UINT8 m_acc;            // 4-bit accumulator
 	UINT8 m_dpl;            // 4-bit data pointer low (RAM x)
 	UINT8 m_dph;            // 4-bit(?) data pointer high (RAM y)
@@ -203,6 +204,7 @@ protected:
 	// misc internal helpers
 	void increment_pc();
 	void fetch_arg();
+	void do_interrupt();
 
 	UINT8 ram_r();
 	void ram_w(UINT8 data);

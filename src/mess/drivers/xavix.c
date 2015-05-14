@@ -1,5 +1,5 @@
-// license: MAME
-// copyright-holders: ?
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
     Skeleton driver for XaviX TV PNP console and childs (Let's! Play TV Classic)

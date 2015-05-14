@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*****************************************************************************
 
 Taken from nocash ZX81 docs by Martin Korth.

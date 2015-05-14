@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Roberto Fresca
 /*************************************************************************
 
   Cuatro en Linea.

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Paul Leaman, Miguel Angel Horna
 /*********************************************************
 
     Capcom Q-Sound system

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef IPF_DSK_H_
 #define IPF_DSK_H_
 

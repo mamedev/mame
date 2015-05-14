@@ -1,11 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     mame.c
 
     Specific (per target) constants
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************/
 
@@ -30,7 +29,7 @@
 								"are not distributed together with MAME. Distribution of MAME together with ROM\n" \
 								"images is a violation of copyright law and should be promptly reported to the\n" \
 								"authors so that appropriate legal action can be taken.\n"
-#define USAGE                   "Usage:  %s [%s] [options]"
+#define USAGE                   "Usage:  %s [%s] [media] [software] [options]"
 #define XML_ROOT                "mame"
 #define XML_TOP                 "game"
 #define STATE_MAGIC_NUM         "MAMESAVE"

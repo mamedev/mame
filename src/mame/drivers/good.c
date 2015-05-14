@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /*
   'Good' Driver by David Haywood
   todo: finish inputs etc.

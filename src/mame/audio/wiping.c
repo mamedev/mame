@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Allard van der Bas
 /***************************************************************************
 
     Wiping sound driver (quick hack of the Namco sound driver)

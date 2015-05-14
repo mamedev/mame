@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Sega SP (Spider)
 
  Naomi derived platform

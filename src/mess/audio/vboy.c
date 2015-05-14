@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:R. Belmont
 /*
     vboy.c - Virtual Boy audio emulation
 

@@ -4,9 +4,6 @@
 
     MM74C922/MM74C923 16/20-Key Encoder emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mm74c922.h"

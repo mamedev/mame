@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 #pragma once
 
 #ifndef __TX0_H__

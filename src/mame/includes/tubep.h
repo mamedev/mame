@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 #include "sound/msm5205.h"
 
 class tubep_state : public driver_device

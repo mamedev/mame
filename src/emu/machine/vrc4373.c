@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ted Green
 #include "vrc4373.h"
 
 #define LOG_NILE            (0)

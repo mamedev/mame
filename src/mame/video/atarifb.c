@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mike Balfour, Patrick Lawrence, Brad Oliver
 /*************************************************************************
 
     Atari Football hardware

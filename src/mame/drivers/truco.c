@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi, Roberto Fresca
 /******************************************************************************************************
 
   Truco-Tron - (c) 198? Playtronic SRL, Argentina.

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles
 /***************************************************************************
 
     Bally Astrocade-based hardware

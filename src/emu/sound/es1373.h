@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ted Green
 // Creative Labs Ensonic AudioPCI97 ES1373
 
 #pragma once

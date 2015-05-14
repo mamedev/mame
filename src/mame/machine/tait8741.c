@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Taito 8741 emulation

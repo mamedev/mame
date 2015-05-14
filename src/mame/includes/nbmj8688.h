@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Takahiro Nogi
 #include "video/hd61830.h"
 #include "includes/nb1413m3.h"
 

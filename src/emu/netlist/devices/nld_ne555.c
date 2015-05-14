@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_NE555.c
  *
@@ -24,10 +26,10 @@ inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a,
 
 NETLIB_START(NE555)
 {
-	register_sub(m_R1, "R1");
-	register_sub(m_R2, "R2");
-	register_sub(m_R3, "R3");
-	register_sub(m_RDIS, "RDIS");
+	register_sub("R1", m_R1);
+	register_sub("R2", m_R2);
+	register_sub("R3", m_R3);
+	register_sub("RDIS", m_RDIS);
 
 	register_subalias("GND",  m_R3.m_N);    // Pin 1
 	register_input("TRIG",    m_TRIG);      // Pin 2
@@ -58,7 +60,7 @@ NETLIB_RESET(NE555)
 	m_R3.set_R(5000);
 	m_RDIS.set_R(R_OFF);
 
-	m_last_out = false;
+	m_last_out = true;
 }
 
 NETLIB_UPDATE(NE555)
@@ -79,7 +81,7 @@ NETLIB_UPDATE(NE555)
 		m_ff = false;
 	}
 
-	bool out = (!INPLOGIC(m_RESET) ? false : m_ff.get());
+	bool out = (!INPLOGIC(m_RESET) ? false : m_ff);
 
 	if (m_last_out && !out)
 	{

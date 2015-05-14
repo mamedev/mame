@@ -4,9 +4,6 @@
 
     MOS Technology 8722 Memory Management Unit emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mos8722.h"

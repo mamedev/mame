@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ernesto Corvi
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"

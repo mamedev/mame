@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Eugene Sandulenko
 /***************************************************************************
 
   TIA-MC1 sound hardware

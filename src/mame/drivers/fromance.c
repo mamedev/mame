@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Takahiro Nogi, Nicola Salmoria, Aaron Giles
 /******************************************************************************
 
     Game Driver for Video System Mahjong series.

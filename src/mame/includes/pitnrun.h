@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
 class pitnrun_state : public driver_device
 {
 public:

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class sprint4_state : public driver_device
 {
 public:

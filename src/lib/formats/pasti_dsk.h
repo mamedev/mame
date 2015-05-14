@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef PASTI_DSK_H_
 #define PASTI_DSK_H_
 

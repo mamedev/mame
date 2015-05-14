@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /**********************************************************************************************
  *
  *   OKI MSM6258 ADPCM

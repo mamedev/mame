@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* video/shangkid */
 
 #include "emu.h"

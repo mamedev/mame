@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Stephh
 
 #include "emu.h"
 #include "includes/spbactn.h"

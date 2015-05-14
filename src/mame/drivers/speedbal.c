@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Joseba Epalza
 /***************************************************************************
 
  Speed Ball / Music Ball

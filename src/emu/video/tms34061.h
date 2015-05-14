@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
  *                                                                          *
  *  Function prototypes and constants used by the TMS34061 emulator         *

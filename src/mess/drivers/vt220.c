@@ -1,5 +1,5 @@
-// license:MAME
-// copyright-holders: Micko, Jonathan Gevaryahu
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Jonathan Gevaryahu
 /***************************************************************************
 
         DEC VT220

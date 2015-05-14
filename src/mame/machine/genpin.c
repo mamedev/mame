@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*********************************************************************************
 
 This is for common pinball machine coding.

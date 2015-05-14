@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
     Intel 82371AB PCI IDE ISA Xcelerator (PIIX4)

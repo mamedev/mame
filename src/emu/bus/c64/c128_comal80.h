@@ -4,9 +4,6 @@
 
     Commodore 128 COMAL 80 cartridge emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

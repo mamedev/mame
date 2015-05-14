@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Steph, Phil Stroffolino, Uki
 /******************************************************************************
 
 UPL "orthogonal palette" hardware

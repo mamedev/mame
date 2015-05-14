@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 // Convergent NGEN keyboard
 
 #ifndef NGEN_KB_H_

@@ -4,9 +4,6 @@
 
     Wang PC PM-001B Medium-Resolution Video Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

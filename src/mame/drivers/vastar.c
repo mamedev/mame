@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Allard Van Der Bas
 /***************************************************************************
 
 Vastar memory map (preliminary)

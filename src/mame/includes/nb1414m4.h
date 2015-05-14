@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 class nb1414m4_device : public device_t,
 									public device_video_interface
 {

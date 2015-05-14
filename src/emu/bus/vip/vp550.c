@@ -4,9 +4,6 @@
 
     RCA VIP Super Sound System VP550 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

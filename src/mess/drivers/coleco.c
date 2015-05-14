@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Balfour, Ben Bruscella, Sean Young
 /*******************************************************************************************************
 
   coleco.c

@@ -53,16 +53,42 @@ public:
 		m_active = 1;
 	}
 
-	ATTR_HOT void inc_active()
+	ATTR_HOT inline netlist_sig_t process()
 	{
+		for (int i = 0; i< _numdev; i++)
+		{
+			this->m_i[i].activate();
+			if (INPLOGIC(this->m_i[i]) == _check)
+			{
+				for (int j = 0; j < i; j++)
+					this->m_i[j].inactivate();
+				for (int j = i + 1; j < _numdev; j++)
+					this->m_i[j].inactivate();
+				return _check ^ (1 ^ _invert);
+			}
+		}
+		return _check ^ _invert;
+	}
+
+	ATTR_HOT virtual void inc_active()
+	{
+		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 		nl_assert(netlist().use_deactivate());
 		if (++m_active == 1)
 		{
-			update();
+			// FIXME: need to activate before time is accessed !
+			netlist_time mt = netlist_time::zero;
+			for (int i = 0; i< _numdev; i++)
+			{
+				if (this->m_i[i].net().time() > mt)
+					mt = this->m_i[i].net().time();
+			}
+			netlist_sig_t r = process();
+			m_Q[0].net().set_Q_time(r, mt + times[r]);
 		}
 	}
 
-	ATTR_HOT void dec_active()
+	ATTR_HOT virtual void dec_active()
 	{
 		nl_assert(netlist().use_deactivate());
 		if (--m_active == 0)
@@ -76,118 +102,14 @@ public:
 	{
 		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
 
-		// FIXME: this check is needed because update is called during startup as well
-		//if (m_active == 0 && netlist().use_deactivate())
-		//  return;
-
-		for (int i = 0; i< _numdev; i++)
-		{
-			this->m_i[i].activate();
-			if (INPLOGIC(this->m_i[i]) == _check)
-			{
-				for (int j = 0; j < i; j++)
-					this->m_i[j].inactivate();
-				for (int j = i + 1; j < _numdev; j++)
-					this->m_i[j].inactivate();
-
-				OUTLOGIC(this->m_Q[0], _check ^ (1 ^ _invert), times[_check ^ (1 ^ _invert)]);// ? 15000 : 22000);
-				return;
-			}
-		}
-		OUTLOGIC(this->m_Q[0],_check ^ (_invert), times[_check ^ (_invert)]);// ? 22000 : 15000);
+		netlist_sig_t r = process();
+		OUTLOGIC(this->m_Q[0], r, times[r]);
 	}
 
 public:
-	netlist_ttl_input_t m_i[_numdev];
-	netlist_ttl_output_t m_Q[1];
+	netlist_logic_input_t m_i[_numdev];
+	netlist_logic_output_t m_Q[1];
 	INT32 m_active;
 };
-
-template <int _check, int _invert>
-class net_signal_2inp_t: public netlist_device_t
-{
-public:
-	net_signal_2inp_t()
-	: netlist_device_t(), m_active(1)
-	{
-	}
-
-	ATTR_COLD void start()
-	{
-		register_output("Q", m_Q[0]);
-		register_input("A", m_i[0]);
-		register_input("B", m_i[1]);
-
-		save(NLNAME(m_active));
-	}
-
-	ATTR_COLD void reset()
-	{
-		m_Q[0].initial(0);
-		m_active = 1;
-	}
-
-	ATTR_HOT virtual void inc_active()
-	{
-		nl_assert(netlist().use_deactivate());
-		if (++m_active == 1)
-		{
-			update();
-		}
-	}
-
-	ATTR_HOT virtual void dec_active()
-	{
-		nl_assert(netlist().use_deactivate());
-		if (--m_active == 0)
-		{
-			m_i[0].inactivate();
-			m_i[1].inactivate();
-		}
-	}
-
-	ATTR_HOT ATTR_ALIGN void update()
-	{
-		const netlist_time times[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22)};
-
-		// FIXME: this check is needed because update is called during startup as well
-		//if (m_active == 0 && netlist().use_deactivate())
-		//  return;
-
-		m_i[0].activate();
-		m_i[1].activate();
-
-		const UINT8 val = (INPLOGIC(m_i[0]) ^ _check) | ((INPLOGIC(m_i[1]) ^ _check) << 1);
-		UINT8 res = _invert ^ 1 ^_check;
-		switch (val)
-		{
-			case 1:
-				m_i[0].inactivate();
-				break;
-			case 2:
-				m_i[1].inactivate();
-				break;
-			case 3:
-				res = _invert ^ _check;
-				break;
-		}
-		OUTLOGIC(m_Q[0], res, times[res]);// ? 22000 : 15000);
-	}
-
-public:
-	netlist_ttl_input_t m_i[2];
-	netlist_ttl_output_t m_Q[1];
-	INT32 m_active;
-
-};
-
-template <int _check, int _invert>
-class net_signal_t<2, _check, _invert> : public net_signal_2inp_t<_check, _invert>
-{
-public:
-	net_signal_t()
-	: net_signal_2inp_t<_check, _invert>() { }
-};
-
 
 #endif /* NLD_SIGNAL_H_ */

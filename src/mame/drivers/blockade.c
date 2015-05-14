@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo
 /****************************************************************************
 
     Blockade/Comotion/Blasto/Hustle Memory MAP

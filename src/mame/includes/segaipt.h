@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************************************
 
     Input port macros used by many games in multiple Sega drivers

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 UINT8 minx_cpu_device::ADD8( UINT8 arg1, UINT8 arg2 )
 {
 	UINT32 res = arg1 + arg2;

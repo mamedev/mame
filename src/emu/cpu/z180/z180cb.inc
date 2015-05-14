@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************
  * opcodes with CB prefix
  * rotate, shift and bit operations

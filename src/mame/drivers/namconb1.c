@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Namco System NB-1
 

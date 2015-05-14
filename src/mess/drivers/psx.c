@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf, pSXAuthor, R. Belmont
 /***************************************************************************
 
   Sony Playstaion

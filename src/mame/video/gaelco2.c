@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 /***************************************************************************
 
   Gaelco Type CG-1V/GAE1 Video Hardware

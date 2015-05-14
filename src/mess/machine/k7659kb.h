@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Sergey Svishchev
 /**********************************************************************
 
     K7659 keyboard emulation

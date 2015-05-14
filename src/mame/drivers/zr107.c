@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /*
     Konami 'ZR107' Hardware
     Konami, 1995-1996

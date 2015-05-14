@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /****************************************************************************
  *                                                                          *
  *  Functions to emulate the TMS34061 video controller                      *

@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 Mitsubishi M50458 OSD chip

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Alex W. Jackson
 /*************************************************************************
 
     nmk112.h

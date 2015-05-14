@@ -4,9 +4,6 @@
 
     Commodore D9060/D9090 Hard Disk Drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

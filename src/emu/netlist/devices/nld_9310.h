@@ -63,39 +63,43 @@
 		NET_REGISTER_DEV(9310_dip, _name)
 
 NETLIB_SUBDEVICE(9310_subABCD,
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
-	netlist_ttl_input_t m_C;
-	netlist_ttl_input_t m_D;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
+	netlist_logic_input_t m_C;
+	netlist_logic_input_t m_D;
 
-	ATTR_HOT inline UINT8 read_ABCD();
+	ATTR_HOT inline UINT8 read_ABCD() const
+	{
+		//return (INPLOGIC_PASSIVE(m_D) << 3) | (INPLOGIC_PASSIVE(m_C) << 2) | (INPLOGIC_PASSIVE(m_B) << 1) | (INPLOGIC_PASSIVE(m_A) << 0);
+		return (INPLOGIC(m_D) << 3) | (INPLOGIC(m_C) << 2) | (INPLOGIC(m_B) << 1) | (INPLOGIC(m_A) << 0);
+	}
 );
 
 NETLIB_SUBDEVICE(9310_sub,
-	ATTR_HOT void update_outputs_all(const UINT8 cnt);
-	ATTR_HOT void update_outputs(const UINT8 cnt);
+	ATTR_HOT inline void update_outputs_all(const UINT8 cnt, const netlist_time out_delay);
+	ATTR_HOT inline void update_outputs(const UINT8 cnt);
 
-	netlist_ttl_input_t m_CLK;
+	netlist_logic_input_t m_CLK;
 
-	netlist_state_t<UINT8> m_cnt;
-	netlist_state_t<NETLIB_NAME(9310_subABCD) *> m_ABCD;
-	netlist_state_t<netlist_sig_t> m_loadq;
-	netlist_state_t<netlist_sig_t> m_ent;
+	UINT8 m_cnt;
+	NETLIB_NAME(9310_subABCD) *m_ABCD;
+	netlist_sig_t m_loadq;
+	netlist_sig_t m_ent;
 
-	netlist_ttl_output_t m_QA;
-	netlist_ttl_output_t m_QB;
-	netlist_ttl_output_t m_QC;
-	netlist_ttl_output_t m_QD;
-	netlist_ttl_output_t m_RC;
+	netlist_logic_output_t m_QA;
+	netlist_logic_output_t m_QB;
+	netlist_logic_output_t m_QC;
+	netlist_logic_output_t m_QD;
+	netlist_logic_output_t m_RC;
 );
 
 NETLIB_DEVICE(9310,
 	NETLIB_NAME(9310_sub) sub;
 	NETLIB_NAME(9310_subABCD) subABCD;
-	netlist_ttl_input_t m_ENP;
-	netlist_ttl_input_t m_ENT;
-	netlist_ttl_input_t m_CLRQ;
-	netlist_ttl_input_t m_LOADQ;
+	netlist_logic_input_t m_ENP;
+	netlist_logic_input_t m_ENT;
+	netlist_logic_input_t m_CLRQ;
+	netlist_logic_input_t m_LOADQ;
 );
 
 NETLIB_DEVICE_DERIVED(9310_dip, 9310,

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Sebastien Monassa
 /*************************************************************************
 
     Atari Video Pinball hardware

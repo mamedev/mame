@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski
 #include "machine/bankdev.h"
 #include "video/jalblend.h"
 

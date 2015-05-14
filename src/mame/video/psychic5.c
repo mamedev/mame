@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Jarek Parchanski
 /***************************************************************************
   Psychic 5
   Bombs Away

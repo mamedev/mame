@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Graves
 #include "emu.h"
 #include "includes/taito_z.h"
 

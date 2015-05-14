@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Couriersud
 /***************************************************************************
 
   Nintendo Donkey Kong hardware

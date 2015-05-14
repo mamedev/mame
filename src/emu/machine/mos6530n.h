@@ -4,9 +4,6 @@
 
     MOS Technology 6530 Memory, I/O, Timer Array emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    Vss   1 |*    \_/     | 40  PA1

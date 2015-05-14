@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Tomasz Slanina
 /*
   Dwarfs Den by Electro-Sport
   http://www.arcadeflyers.net/?page=flyerdb&subpage=thumbs&id=3993

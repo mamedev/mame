@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Tomasz Slanina
 class mainsnk_state : public driver_device
 {
 public:

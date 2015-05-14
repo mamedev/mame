@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 #if 0
 #include <sys/time.h>
 #include <sys/stat.h>

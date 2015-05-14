@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
+
 /*
 ACL Manufacturing 1983 hardware (a division of American Communication Laboratories)
 Driver by Andrew Gardner

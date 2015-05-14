@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _KONPPC_H
 #define _KONPPC_H
 

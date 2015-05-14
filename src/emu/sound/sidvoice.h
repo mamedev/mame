@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 #pragma once
 
 #ifndef __SIDVOICE_H__

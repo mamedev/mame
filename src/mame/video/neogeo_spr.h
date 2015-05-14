@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 #define VERBOSE     (0)
 

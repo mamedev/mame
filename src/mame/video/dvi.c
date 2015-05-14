@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "emu.h"
 
 // This just attempts to parse some of the header structures in the DVI data Dragon Gun uses...

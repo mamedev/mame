@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Bennett,Carlos A. Lozano, Rob Rosenbrock, Phil Stroffolino, Ernesto Corvi, David Haywood, R. Belmont
 /***************************************************************************
 
 Double Dragon     (c) 1987 Technos Japan

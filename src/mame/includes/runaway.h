@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Balfour
 class runaway_state : public driver_device
 {
 public:

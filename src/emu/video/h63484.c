@@ -1,5 +1,5 @@
-// license:?
-// copyright-holders:Angelo Salese
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, Sandro Ronco
 /***************************************************************************
 
     HD63484 ACRTC (rewrite in progress)

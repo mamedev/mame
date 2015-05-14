@@ -53,6 +53,8 @@
 # ARCHOPTS =
 # LDOPTS =
 
+# USE_SYSTEM_LIB_EXPAT = 1
+
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
 # SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
@@ -285,6 +287,13 @@ OSD := sdl
 endif
 endif
 
+#-------------------------------------------------
+# which 3rdparty library to build;
+#  link against system (common) library otherwise
+#-------------------------------------------------
+ifndef USE_SYSTEM_LIB_EXPAT
+PARAMS += --with-bundled-expat
+endif
 
 #-------------------------------------------------
 # distribution may change things
@@ -341,7 +350,6 @@ endif
 ifdef PROFILE
 PROFILER =
 SYMBOLS = 1
-OPTIMIZE = 3
 ifndef SYMLEVEL
 SYMLEVEL = 1
 endif
@@ -950,8 +958,8 @@ ifneq (,$(wildcard src/osd/$(OSD)/$(OSD).mak))
 include src/osd/$(OSD)/$(OSD).mak
 endif
 
-ifneq (,$(wildcard src/$(TARGET)/$(SUBTARGET).mak))
-include src/$(TARGET)/$(SUBTARGET).mak
+ifneq (,$(wildcard src/$(TARGET)/$(TARGET).mak))
+include src/$(TARGET)/$(TARGET).mak
 endif
 
 $(GEN_FOLDERS):
@@ -1002,3 +1010,58 @@ else
 	$(shell find src/ -name *.inc -exec ./srcclean {} >&2 ;)
 	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
 endif
+
+#-------------------------------------------------
+# Doxygen documentation
+#-------------------------------------------------
+
+.PHONY: doxygen
+
+doxygen:
+	@echo Generate Doxygen documentation
+	doxygen mame.doxygen
+
+#-------------------------------------------------
+# CppCheck analysis
+#-------------------------------------------------
+
+.PHONY: cppcheck
+
+CPPCHECK_PARAMS  = -Isrc/osd
+CPPCHECK_PARAMS += -Isrc/emu
+CPPCHECK_PARAMS += -Isrc/lib
+CPPCHECK_PARAMS += -Isrc/lib/util
+CPPCHECK_PARAMS += -Isrc/mame
+CPPCHECK_PARAMS += -Isrc/mess 
+CPPCHECK_PARAMS += -Isrc/osd/modules/render
+CPPCHECK_PARAMS += -Isrc/osd/windows
+CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
+CPPCHECK_PARAMS += -I3rdparty
+CPPCHECK_PARAMS += -I3rdparty/lua/src
+CPPCHECK_PARAMS += -I3rdparty/zlib 
+CPPCHECK_PARAMS += -I3rdparty/bgfx/include
+CPPCHECK_PARAMS += -I3rdparty/bx/include
+CPPCHECK_PARAMS += -Ibuild/generated/emu 
+CPPCHECK_PARAMS += -Ibuild/generated/emu/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mess/layout
+CPPCHECK_PARAMS += -Ibuild/generated/mame/layout 
+CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
+CPPCHECK_PARAMS += -DPTR64=1
+CPPCHECK_PARAMS += -DMAME_DEBUG
+CPPCHECK_PARAMS += -DMAME_PROFILER
+CPPCHECK_PARAMS += -DCRLF=3
+CPPCHECK_PARAMS += -DLSB_FIRST
+CPPCHECK_PARAMS += -DFLAC__NO_DLL
+CPPCHECK_PARAMS += -DNATIVE_DRC=drcbe_x64
+CPPCHECK_PARAMS += -DLUA_COMPAT_APIINTCASTS
+CPPCHECK_PARAMS += -DWIN32
+CPPCHECK_PARAMS += -D__GNUC__
+CPPCHECK_PARAMS += -D__x86_64__
+ifndef VERBOSE
+CPPCHECK_PARAMS += --quiet
+endif
+
+cppcheck:
+	@echo Generate CppCheck analysis report
+	cppcheck --enable=all src/ $(CPPCHECK_PARAMS) -j9
+	

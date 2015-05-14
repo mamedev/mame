@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /***************************************************************************
     mos tri port interface 6525
     mos triple interface adapter 6523

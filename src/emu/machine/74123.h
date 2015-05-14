@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Couriersud
 /*****************************************************************************
 
     74123 monoflop emulator

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia
 #pragma once
 
 #ifndef __GAELCO_SND_H__

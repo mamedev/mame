@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
        gtp_cas.h

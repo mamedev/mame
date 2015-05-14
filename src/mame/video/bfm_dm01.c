@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:James Wallace
 /***************************************************************************
 
     Bellfruit dotmatrix driver, (under heavy construction !!!)
@@ -8,8 +10,6 @@
     A.G.E Code Copyright J. Wallace and the AGEMAME Development Team.
     Visit http://www.mameworld.net/agemame/ for more information.
 
-    M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
-    used under license from http://mamedev.org
 
 Standard dm01 memorymap
 

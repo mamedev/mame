@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *
  *   Sharp X1 TAP image format

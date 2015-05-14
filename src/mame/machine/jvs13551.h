@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __JVS13551_H__
 #define __JVS13551_H__
 

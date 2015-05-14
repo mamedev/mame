@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /*
     Apple "Egret" ADB/system controller MCU
     Emulation by R. Belmont

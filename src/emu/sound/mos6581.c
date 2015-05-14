@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Curt Coder
 /**********************************************************************
 
     MOS 6581/8580 Sound Interface Device emulation

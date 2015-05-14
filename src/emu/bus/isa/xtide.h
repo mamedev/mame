@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phill Harvey-Smith
 #pragma once
 
 #ifndef __XTIDE_H__

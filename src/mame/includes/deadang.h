@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #include "audio/seibu.h"
 
 class deadang_state : public driver_device

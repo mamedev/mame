@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 /*
  * D9060 - SASI + TANDON TM602S
  *

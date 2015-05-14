@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 OP(illegal,2)
 {
 	logerror("Z180 '%s' ill. opcode $ed $%02x\n",

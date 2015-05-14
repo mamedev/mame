@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #pragma once
 
 #ifndef __PSXCPORT_H__

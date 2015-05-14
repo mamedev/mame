@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 Gaelco video RAM encryption

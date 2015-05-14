@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     Video Hardware for Nichibutsu Mahjong series.

@@ -4,9 +4,6 @@
 
     Commodore PET userport "CB2 sound" audio device emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

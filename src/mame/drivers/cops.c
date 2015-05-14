@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mariusz Wojcieszek, James Wallace
 /***************************************************************************
 
     Nova 'LaserMax'/Atari Games Cops

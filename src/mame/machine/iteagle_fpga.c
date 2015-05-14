@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ted Green
 #include "iteagle_fpga.h"
 #include "coreutil.h"
 
@@ -20,7 +22,7 @@ ADDRESS_MAP_END
 
 iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ITEAGLE_FPGA, "ITEagle FPGA", tag, owner, clock, "iteagle_fpga", __FILE__),
-		device_nvram_interface(mconfig, *this)
+		device_nvram_interface(mconfig, *this), m_version(0), m_seq_init(0)
 {
 }
 
@@ -45,21 +47,7 @@ void iteagle_fpga_device::device_reset()
 	memset(m_fpga_regs, 0, sizeof(m_fpga_regs));
 	//memset(m_rtc_regs, 0, sizeof(m_rtc_regs));
 	//m_rtc_regs[0] = 0x11223344;
-	switch ((machine().root_device().ioport("VERSION")->read()>>4)&0xF) {
-		case 3:
-			m_seq = 0x0a0b0a; // gt02
-			break;
-		case 4:
-			m_seq = 0x0a020b; // gt04
-			break;
-		case 5:
-			m_seq = 0x0b0a0c; // gt05
-			break;
-		default:
-			m_seq = 0x0c0b0d; // gt06
-			break;
-	}
-
+	m_seq = m_seq_init;
 	m_seq_rem1 = 0;
 	m_seq_rem2 = 0;
 
@@ -79,20 +67,7 @@ void iteagle_fpga_device::update_sequence(UINT32 data)
 {
 	UINT32 offset = 0x04/4;
 	if (data & 0x80) {
-		switch (data&0x3) {
-			case 0:
-				m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((machine().root_device().ioport("VERSION")->read()>>4)&0xF);
-				break;
-			case 1:
-				m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((machine().root_device().ioport("VERSION")->read()>>8)&0xF);
-				break;
-			case 2:
-				m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((machine().root_device().ioport("VERSION")->read()>>12)&0xF);
-				break;
-			case 3:
-				m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | ((machine().root_device().ioport("VERSION")->read()>>0)&0xF);
-				break;
-		}
+		m_fpga_regs[offset] = (m_fpga_regs[offset]&0xFFFFFF00) | (m_version>>(8*(data&3)));
 	} else {
 		UINT32 val1, feed;
 		feed = ((m_seq<<4) ^ m_seq)>>7;
@@ -129,7 +104,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 			break;
 		case 0x04/4:
 			result =  (result & 0xFF0FFFFF) | ((machine().root_device().ioport("SW5")->read()&0xf)<<20);
-			//if (0 && LOG_FPGA  && ACCESSING_BITS_0_7)
+			//if (1  && ACCESSING_BITS_0_7)
 			if (1 && LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
@@ -161,7 +136,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			if (ACCESSING_BITS_0_7) {
 				// ATMEL Chip access.  Returns version id's when bit 7 is set.
 				update_sequence(data & 0xff);
-				if (0 && LOG_FPGA)
+				if (1 && LOG_FPGA)
 						logerror("%s:fpga_w offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			} else {
 				if (LOG_FPGA)
@@ -266,15 +241,16 @@ DEVICE_ADDRESS_MAP_START(eeprom_map, 32, iteagle_eeprom_device)
 ADDRESS_MAP_END
 
 // When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
-// 0x4 = HW Version
+// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB
 // 0x5 = Serial Num + top byte of 0x4
 // 0x6 = OperID
 // 0xe = SW Version
+// 0xf = 0x01 for extra courses
 // 0x7f = checksum
 static const UINT16 iteagle_default_eeprom[0x40] =
 {
-	0x0011,0x0022,0x0033,0x0002,0x1206,0x1111,0x2222,0x1234,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+	0x0000,0x0000,0x0000,0x0003,0x1209,0x1111,0x2222,0x1234,
+	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0001,
 	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
 	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
 	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
@@ -282,6 +258,7 @@ static const UINT16 iteagle_default_eeprom[0x40] =
 	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
 	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0002,0x0000
 };
+
 
 static MACHINE_CONFIG_FRAGMENT( iteagle_eeprom )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -295,7 +272,7 @@ machine_config_constructor iteagle_eeprom_device::device_mconfig_additions() con
 
 iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: pci_device(mconfig, ITEAGLE_EEPROM, "ITEagle EEPROM AT93C46", tag, owner, clock, "eeprom", __FILE__),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"), m_sw_version(0)
 {
 }
 
@@ -309,8 +286,8 @@ void iteagle_eeprom_device::device_start()
 void iteagle_eeprom_device::device_reset()
 {
 	// Set software version and calc crc
-	m_eeprom->write(0xe, (machine().root_device().ioport("VERSION")->read()&0xFF00) |
-			(((machine().root_device().ioport("VERSION")->read()>>4)&0x0F)));
+	m_eeprom->write(0xe, m_sw_version);
+	m_eeprom->write(0x4, (m_eeprom->read(0x4)&0xff00) | m_hw_version);
 	UINT16 checkSum = 0;
 	for (int i=0; i<0x3f; i++) {
 		checkSum += m_eeprom->read(i);

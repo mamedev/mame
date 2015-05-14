@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 void ppc603_exception(int exception)
 {
 	switch( exception )

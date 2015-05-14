@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Kevin Thacker, Robbbert
 /******************************************************************************
 
   Exidy Sorcerer machine functions

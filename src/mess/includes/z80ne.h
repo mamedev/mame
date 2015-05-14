@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Lavarone
 /*****************************************************************************
  *
  * includes/z80ne.h

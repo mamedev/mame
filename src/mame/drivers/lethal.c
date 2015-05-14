@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:R. Belmont, Nicola Salmoria
 /***************************************************************************
 
  Lethal Enforcers

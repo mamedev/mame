@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Takahiro Nogi
 /******************************************************************************
 
     Game Driver for Nichibutsu Mahjong series.

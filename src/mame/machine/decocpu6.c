@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* apparently Deco CPU-6 used by ProGolf
  just seems to be a bitswap on the opcodes like 222, but not the same one
  not a complex scheme like CPU-7?

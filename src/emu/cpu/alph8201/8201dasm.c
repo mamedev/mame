@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tatsuyuki Satoh
 /****************************************************************************
                          Alpha 8201/8301 Disassembler
 

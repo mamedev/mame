@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner,Antoine Mine
 static const int adr_a_begin[]={
 -1, -1, BEGIN_XS, BEGIN_X, BEGIN_S, BEGIN_M, BEGIN_B, BEGIN_W,
 -1, -1, -1, -1,  -1, -1, -1, -1,

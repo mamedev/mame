@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #define RASTER_LINES 262
 #define FIRST_VISIBLE_LINE 0
 #define LAST_VISIBLE_LINE 223

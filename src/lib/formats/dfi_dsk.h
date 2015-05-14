@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef DFI_DSK_H
 #define DFI_DSK_H
 

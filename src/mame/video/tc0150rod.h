@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __TC0150ROD_H__
 #define __TC0150ROD_H__
 

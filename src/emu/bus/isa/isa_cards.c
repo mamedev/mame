@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /**********************************************************************
 
     ISA cards
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
 **********************************************************************/
 

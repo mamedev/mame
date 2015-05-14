@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 
 class vs920a_text_tilemap_device : public device_t

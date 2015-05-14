@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 Chihiro is an Xbox-based arcade system from SEGA.
 
@@ -1801,7 +1803,7 @@ void chihiro_state::machine_start()
 	save_item(NAME(smbusst.words));
 	save_item(NAME(pic16lc_buffer));
 	save_item(NAME(usbhack_counter));
-	nvidia_nv2a->start();
+	nvidia_nv2a->start(&m_maincpu->space());
 	nvidia_nv2a->savestate_items();
 }
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Graves
 /***************************************************************************
 
     Ground Effects / Super Ground FX                    (c) 1993 Taito

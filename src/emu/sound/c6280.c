@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Charles MacDonald
 /*
     HuC6280 sound chip emulator
     by Charles MacDonald

@@ -4,9 +4,6 @@
 
     Amstrad PC1640 Integrated Graphics Adapter emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
     This display controller is integrated on the PC1640 motherboard

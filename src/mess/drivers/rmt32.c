@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert,Jonathan Gevaryahu
 /*************************************************************************************************
 
     Roland MT-32/CM32L driver

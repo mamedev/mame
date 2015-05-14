@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_ms_direct1.h
  *
@@ -35,13 +37,14 @@ ATTR_HOT nl_double netlist_matrix_solver_direct1_t::vsolve()
 ATTR_HOT inline int netlist_matrix_solver_direct1_t::vsolve_non_dynamic()
 {
 	netlist_analog_net_t *net = m_nets[0];
-	this->build_LE();
+	this->build_LE_A();
+	this->build_LE_RHS();
 	//NL_VERBOSE_OUT(("%f %f\n", new_val, m_RHS[0] / m_A[0][0]);
 
 	nl_double new_val =  m_RHS[0] / m_A[0][0];
 
 	nl_double e = (new_val - net->m_cur_Analog);
-	nl_double cerr = fabs(e);
+	nl_double cerr = nl_math::abs(e);
 
 	net->m_cur_Analog = new_val;
 

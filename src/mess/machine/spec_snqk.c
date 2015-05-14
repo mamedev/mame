@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Kevin Thacker
 /***************************************************************************
 
   mess/machine/spec_snqk.c

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 #include "emu.h"
 #include "arm7core.h"
 #include "arm7help.h"

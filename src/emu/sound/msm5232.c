@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski, Hiromitsu Shioya
 #include "emu.h"
 
 #include "msm5232.h"

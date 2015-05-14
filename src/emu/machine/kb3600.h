@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /**********************************************************************
 
     General Instruments AY-5-3600 Keyboard Encoder emulation

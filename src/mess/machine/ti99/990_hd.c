@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Raphael Nabet
 /*
     990_hd.c: emulation of a generic ti990 hard disk controller, for use with
     TILINE-based TI990 systems (TI990/10, /12, /12LR, /10A, Business system 300

@@ -1,9 +1,8 @@
+// license:GPL-2.0+
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     VTech Laser/VZ Printer Interface
-
-    license: MAME, GPL-2.0+
-    copyright-holders: Dirk Best
 
     VTech PI 20
     Dick Smith Electronics X-7320

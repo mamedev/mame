@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles,Frank Palazzolo
 /***********************************************************
 
     Astrocade custom 'IO' chip sound chip driver

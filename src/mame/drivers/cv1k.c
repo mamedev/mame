@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 U2 flash rom note

@@ -4,9 +4,6 @@
 
     CMD FD-2000/FD-4000 disk drive emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

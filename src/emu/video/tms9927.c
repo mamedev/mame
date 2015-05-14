@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /**********************************************************************
 
     TI TMS9927 and compatible CRT controller emulation

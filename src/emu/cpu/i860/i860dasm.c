@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jason Eckhardt
 #include "i860.h"
 
 /* Sub-group decoders */

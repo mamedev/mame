@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef _VIDEO_N64_H_
 #define _VIDEO_N64_H_
 
@@ -56,7 +58,7 @@
 #define MEM16_LIMIT 0x3fffff
 #define MEM32_LIMIT 0x1fffff
 
-#define RDP_RANGE_CHECK (1)
+#define RDP_RANGE_CHECK (0)
 
 #if RDP_RANGE_CHECK
 #define CHECK8(in) if(rdp_range_check((in))) { printf("Check8: Address %08x out of range!\n", (in)); fflush(stdout); fatalerror("Address %08x out of range!\n", (in)); }
@@ -663,29 +665,13 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 
 		static UINT32 s_special_9bit_clamptable[512];
 
-		Writer              _Write[16];
-		Reader              _Read[4];
 		Copier              _Copy[2];
 		Filler              _Fill[2];
 
-		void                _Write16Bit_Cvg0_Blend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write16Bit_Cvg0_NoBlend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write16Bit_Cvg1(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write16Bit_Cvg2(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write16Bit_Cvg3(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write32Bit_Cvg0_Blend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write32Bit_Cvg0_NoBlend(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write32Bit_Cvg1(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write32Bit_Cvg2(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Write32Bit_Cvg3(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Read16Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Read16Bit_ImgRead1(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Read32Bit_ImgRead0(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Read32Bit_ImgRead1(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void                _Copy16Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object);
-		void                _Copy32Bit(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object);
-		void                _Fill16Bit(UINT32 curpixel, const rdp_poly_state &object);
-		void                _Fill32Bit(UINT32 curpixel, const rdp_poly_state &object);
+		void				write_pixel(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				read_pixel(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				copy_pixel(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object);
+		void				fill_pixel(UINT32 curpixel, const rdp_poly_state &object);
 
 		class ZDecompressEntry
 		{

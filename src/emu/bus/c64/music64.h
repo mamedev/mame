@@ -4,9 +4,6 @@
 
     Wersi Wersiboard Music 64 / Siel CMK 49 Keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

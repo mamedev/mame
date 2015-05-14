@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Juergen Buchmueller, Frank Palazzolo, Sean Riddle
 #include "emu.h"
 #include "audio/channelf.h"
 

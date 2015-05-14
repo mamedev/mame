@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Chris Moore, Nicola Salmoria
 /***************************************************************************
 
 Tokio          (c) 1986 Taito

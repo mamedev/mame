@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, Roberto Fresca
 /*******************************************************************************************
 
   Playmark 'Super Derby' Hardware

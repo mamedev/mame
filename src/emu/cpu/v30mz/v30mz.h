@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol,Bryan McPhail
 #ifndef __V30MZ_H__
 #define __V30MZ_H__
 

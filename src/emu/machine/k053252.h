@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese
 /**  Konami 053252  **/
 /* CRT and interrupt control unit */
 #pragma once

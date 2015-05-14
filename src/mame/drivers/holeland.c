@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mathis Rosenhauer
 /***************************************************************************
 
     Hole Land

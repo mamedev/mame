@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /*************************************************************************************************************
 
     Toshiba TLCS-90 Series MCU's

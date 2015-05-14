@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef INC_BFMADDER2
 #define INC_BFMADDER2
 

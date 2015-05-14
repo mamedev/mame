@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Pierpaolo Prazzoli
 /***************************************************************************
 
     SNK/Alpha 68000 based games:

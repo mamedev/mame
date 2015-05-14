@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Christian Brunschen
 /**********************************************************************************************
  *
  *   es5510.h - Ensoniq ES5510 (ESP) driver

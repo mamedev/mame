@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 /* Ganbare Chinsan Ooshoubu
  driver by David Haywood
 

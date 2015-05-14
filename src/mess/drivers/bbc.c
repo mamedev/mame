@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Gordon Jefferyes, Nigel Barnes
 /******************************************************************************
     BBC Model A,B
 

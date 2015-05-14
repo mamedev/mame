@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* emulation of Altera Cyclone EPIC12 FPGA programmed as a blitter */
 
 #include "emu.h"

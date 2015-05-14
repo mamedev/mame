@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Angelo Salese, Barry Rodewald
 /*****************************************************************************
  *
  * includes/x1.h

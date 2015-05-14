@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 #include "sound/sn76477.h"
 
 class route16_state : public driver_device

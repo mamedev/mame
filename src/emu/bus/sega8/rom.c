@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /***********************************************************************************************************
 
  Sega 8-bit cart emulation (for Master System, GameGear and SG-1000)

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Dirk Best
 /***************************************************************************
 
     IBM-PC printer interface

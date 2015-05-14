@@ -61,27 +61,27 @@
 		NET_REGISTER_DEV(74153_dip, _name)
 
 NETLIB_SUBDEVICE(74153sub,
-	netlist_ttl_input_t m_C[4];
-	netlist_ttl_input_t m_G;
+	netlist_logic_input_t m_C[4];
+	netlist_logic_input_t m_G;
 
-	netlist_ttl_output_t m_Y;
+	netlist_logic_output_t m_Y;
 
-	netlist_state_t<int> m_chan;
+	int m_chan;
 );
 
 NETLIB_DEVICE(74153,
 public:
 	NETLIB_NAME(74153sub) m_sub;
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
 );
 
 NETLIB_DEVICE(74153_dip,
 
 	NETLIB_NAME(74153sub) m_1;
 	NETLIB_NAME(74153sub) m_2;
-	netlist_ttl_input_t m_A;
-	netlist_ttl_input_t m_B;
+	netlist_logic_input_t m_A;
+	netlist_logic_input_t m_B;
 );
 
 #endif /* NLD_74153_H_ */

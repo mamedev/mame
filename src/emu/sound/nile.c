@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Tomasz Slanina
 /************************************
       Seta custom Nile ST-0026 chip
       sound emulation by Tomasz Slanina

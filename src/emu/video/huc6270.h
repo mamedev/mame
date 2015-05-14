@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /**********************************************************************
 
     Hudson/NEC HuC6270 interface

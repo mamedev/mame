@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* MayGay M2 hardware
   SWP (Skill With Prizes) Video based games */
 

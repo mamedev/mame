@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /******************************************************************************
 
     Video Hardware for Video System Mahjong series and Pipe Dream.

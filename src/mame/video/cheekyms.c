@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*************************************************************************
     Universal Cheeky Mouse Driver
     (c)Lee Taylor May 1998, All rights reserved.

@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
+
 /***************************************************************************
 
   Radius Full Page Display card for the Mac SE, assy # 632-0022-A1

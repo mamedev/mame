@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol, Charles MacDonald,Mathis Rosenhauer,Brad Oliver,Michael Luong,Fabio Priuli,Enik Land
 /******************************************************************************
  Contributors:
 
@@ -7,7 +9,7 @@
     Brad Oliver
     Michael Luong
     Wilbert Pol
-    Fabio Priulli
+    Fabio Priuli
     Enik Land
 
  To do:

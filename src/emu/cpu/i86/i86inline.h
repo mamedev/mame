@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "i86.h"
 
 #define CF      (m_CarryVal!=0)

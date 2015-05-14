@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 // This file contains functions which handle the On-Chip peripheral Memory Map
 // as well as the Host Interface and the SSI0/SSI1 Serial Interfaces.
 

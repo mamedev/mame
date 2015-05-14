@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail
 /* V53 */
 
 // V33 / V33A cores with onboard peripherals

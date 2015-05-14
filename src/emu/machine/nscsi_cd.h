@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef __NSCSI_CD_H__
 #define __NSCSI_CD_H__
 

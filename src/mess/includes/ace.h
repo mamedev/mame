@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder, Robbbert, and unknown others
 /*****************************************************************************
  *
  * includes/ace.h

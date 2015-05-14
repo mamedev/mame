@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #include "i286.h"
 #include "debugger.h"
 #include "i86inline.h"

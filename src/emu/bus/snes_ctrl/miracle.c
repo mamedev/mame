@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 /**********************************************************************
 
     Super Nintendo Entertainment System - Miracle Piano Keyboard
-
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
 
     recv at PC = 008a4a
     xmit at PC = 008adb

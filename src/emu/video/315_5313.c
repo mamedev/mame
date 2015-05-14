@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Sega 315-5313 - Megadrive VDP */
 
 #include "emu.h"

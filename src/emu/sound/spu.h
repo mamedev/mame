@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:pSXAuthor, R.Belmont
 #pragma once
 
 #ifndef __SPU_H__

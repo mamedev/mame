@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
 /***************************************************************************
 
     rspcp2.h
 
     Interface file for Reality Signal Processor (RSP) vector extensions.
-
-    Copyright the MESS team
-    Released for general non-commercial use under the MAME license
-    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 

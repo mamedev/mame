@@ -1,3 +1,5 @@
+// license:GPL2.0+
+// copyright-holders:Sven Gothel
 const char glsl_plain_rgb32_lut_fsh_src[] =
 "\n"
 "#pragma optimize (on)\n"

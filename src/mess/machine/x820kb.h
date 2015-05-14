@@ -4,9 +4,6 @@
 
     Xerox 820/820-II ASCII keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #pragma once

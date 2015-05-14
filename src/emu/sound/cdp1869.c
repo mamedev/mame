@@ -4,9 +4,6 @@
 
     RCA CDP1869/1870/1876 Video Interface System (VIS) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

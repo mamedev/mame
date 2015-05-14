@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina,David Haywood
 /* Free Kick Video Hardware */
 
 #include "emu.h"

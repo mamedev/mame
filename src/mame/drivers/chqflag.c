@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988

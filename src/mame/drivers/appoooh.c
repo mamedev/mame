@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tatsuyuki Satoh
 /***************************************************************************
 
     Appoooh memory map (preliminary)

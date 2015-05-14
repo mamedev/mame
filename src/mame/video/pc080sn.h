@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 #ifndef __PC080SN_H__
 #define __PC080SN_H__
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*************************************************************************
 
     Hana Yayoi & other Dynax games (using 1st version of their blitter)

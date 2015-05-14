@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 #include "emu.h"
 #include "sound/samples.h"
 #include "includes/gotya.h"

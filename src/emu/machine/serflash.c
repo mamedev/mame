@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Serial Flash Device */
 
 /* todo: cleanup, refactor etc. */

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 
 void minx_cpu_device::execute_one_cf()
 {

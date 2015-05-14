@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end

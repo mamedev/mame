@@ -1,6 +1,9 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 ---------------------------------------------------------------------------
 --
---   mess.mak
+--   mess.lua
 --
 --   MESS target makefile
 --
@@ -103,7 +106,7 @@ CPUS["SUPERFX"] = true
 CPUS["Z8"] = true
 CPUS["I8008"] = true
 CPUS["SCMP"] = true
-CPUS["MN10200"] = true
+--CPUS["MN10200"] = true
 CPUS["COSMAC"] = true
 CPUS["UNSP"] = true
 CPUS["HCD62121"] = true
@@ -123,6 +126,7 @@ CPUS["ARCOMPACT"] = true
 CPUS["AMIS2000"] = true
 CPUS["UCOM4"] = true
 CPUS["HMCS40"] = true
+CPUS["E0C6200"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -650,7 +654,7 @@ BUSES["ZORRO"] = true
 -- comprise MESS plus messdriv.*", which contains
 -- the list of drivers
 --------------------------------------------------
-function linkProjects_mess_mess(_target, _subtarget)
+function linkProjects_mame_mess(_target, _subtarget)
 	links {
 		"acorn",
 		"act",
@@ -776,6 +780,7 @@ function linkProjects_mess_mess(_target, _subtarget)
 		"psion",
 		"radio",
 		"rca",
+		"ritam",
 		"rm",
 		"robotron",
 		"rockwell",
@@ -839,7 +844,7 @@ function linkProjects_mess_mess(_target, _subtarget)
 		"zvt",
 		"messshared",
 	}
-	if (_target=="mess") then
+	if (_subtarget=="mess") then
 	links {
 		"mameshared",
 	}
@@ -871,7 +876,7 @@ function createMESSProjects(_target, _subtarget, _name)
 	}
 end
 	
-function createProjects_mess_mess(_target, _subtarget)
+function createProjects_mame_mess(_target, _subtarget)
 --------------------------------------------------
 -- the following files are MAME components and
 -- shared across a number of drivers
@@ -895,7 +900,7 @@ function createProjects_mess_mess(_target, _subtarget)
 -- vectrex.c (MESS + MAME)
 -- cps1.c (MESS + MAME)
 --------------------------------------------------
-if (_target=="mess") then
+if (_subtarget=="mess") then
 createMESSProjects(_target, _subtarget, "mameshared")
 files { 
 	MAME_DIR .. "src/mame/machine/archimds.c",  
@@ -1166,6 +1171,7 @@ createMESSProjects(_target, _subtarget, "bandai")
 files {            
 	MAME_DIR .. "src/mess/drivers/sv8000.c",    
 	MAME_DIR .. "src/mess/drivers/rx78.c",      
+	MAME_DIR .. "src/mess/drivers/tamag1.c",
 	MAME_DIR .. "src/mess/drivers/wswan.c",
 	MAME_DIR .. "src/mess/audio/wswan_snd.c",
 	MAME_DIR .. "src/mess/machine/wswan.c",
@@ -1991,6 +1997,11 @@ files {
 	MAME_DIR .. "src/mess/drivers/microkit.c",  
 	MAME_DIR .. "src/mess/drivers/studio2.c",   
 	MAME_DIR .. "src/mess/drivers/vip.c",       
+}
+
+createMESSProjects(_target, _subtarget, "ritam")
+files {                
+	MAME_DIR .. "src/mess/drivers/monty.c",
 }
 
 createMESSProjects(_target, _subtarget, "rm")

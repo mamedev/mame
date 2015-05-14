@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Sean Riddle
 /*****************************************************************************
 
     6809dasm.c - a 6809 opcode disassembler

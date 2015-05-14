@@ -4,9 +4,6 @@
 
     S-100 (IEEE Std 696-1983) bus emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
                 +8 V (B)     1      51      +8 V (B)

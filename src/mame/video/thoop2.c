@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia, Peter Ferrie
 /***************************************************************************
 
   Gaelco Type 1 Video Hardware Rev B

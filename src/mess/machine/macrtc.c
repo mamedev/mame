@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   macrtc.c - the real-time clock & NVRAM chip used in early 680x0 Macs,

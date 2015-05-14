@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Couriersud
 /**********************************************************************
 
     8 bit latch interface and emulation

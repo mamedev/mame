@@ -4,9 +4,6 @@
 
     Ricoh RP5C01(A) Real Time Clock With Internal RAM emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                    _CS   1 |*    \_/     | 18  Vcc

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /***********************************************************************************
 
   GOLDEN POKER DOUBLE UP (BONANZA ENTERPRISES, LTD)

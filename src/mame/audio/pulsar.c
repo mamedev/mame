@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Pulsar sound routines
  *

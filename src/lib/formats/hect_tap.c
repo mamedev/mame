@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /********************************************************************
 
 Support for Micronique machine .K7 and *.FOR cassette images

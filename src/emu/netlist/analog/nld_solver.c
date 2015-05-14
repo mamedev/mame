@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nld_solver.c
  *
@@ -9,6 +11,7 @@
 
 #if 0
 #pragma GCC optimize "-ffast-math"
+#pragma GCC optimize "-ftree-parallelize-loops=4"
 //#pragma GCC optimize "-funroll-loops"
 #pragma GCC optimize "-funswitch-loops"
 #pragma GCC optimize "-fvariable-expansion-in-unroller"
@@ -20,7 +23,6 @@
 #pragma GCC optimize "-ftree-loop-im"
 #pragma GCC optimize "-ftree-loop-ivcanon"
 #pragma GCC optimize "-fivopts"
-#pragma GCC optimize "-ftree-parallelize-loops=4"
 #endif
 
 #define SOLVER_VERBOSE_OUT(x) do {} while (0)
@@ -31,46 +33,14 @@
 #include "nld_ms_direct.h"
 #include "nld_ms_direct1.h"
 #include "nld_ms_direct2.h"
-#include "nld_ms_gauss_seidel.h"
+#include "nld_ms_sor.h"
+#include "nld_ms_sor_mat.h"
 #include "nld_twoterm.h"
 #include "../nl_lists.h"
 
 #if HAS_OPENMP
 #include "omp.h"
 #endif
-
-vector_ops_t *vector_ops_t::create_ops(const int size)
-{
-	switch (size)
-	{
-		case 1:
-			return nl_alloc(vector_ops_impl_t<1>);
-		case 2:
-			return nl_alloc(vector_ops_impl_t<2>);
-		case 3:
-			return nl_alloc(vector_ops_impl_t<3>);
-		case 4:
-			return nl_alloc(vector_ops_impl_t<4>);
-		case 5:
-			return nl_alloc(vector_ops_impl_t<5>);
-		case 6:
-			return nl_alloc(vector_ops_impl_t<6>);
-		case 7:
-			return nl_alloc(vector_ops_impl_t<7>);
-		case 8:
-			return nl_alloc(vector_ops_impl_t<8>);
-		case 9:
-			return nl_alloc(vector_ops_impl_t<9>);
-		case 10:
-			return nl_alloc(vector_ops_impl_t<10>);
-		case 11:
-			return nl_alloc(vector_ops_impl_t<11>);
-		case 12:
-			return nl_alloc(vector_ops_impl_t<12>);
-		default:
-			return nl_alloc(vector_ops_impl_t<0>, size);
-	}
-}
 
 ATTR_COLD void terms_t::add(netlist_terminal_t *term, int net_other)
 {
@@ -341,7 +311,7 @@ NETLIB_START(solver)
 
 	register_param("ACCURACY", m_accuracy, 1e-7);
 	register_param("GS_LOOPS", m_gs_loops, 9);              // Gauss-Seidel loops
-	register_param("GS_THRESHOLD", m_gs_threshold, 5);      // below this value, gaussian elimination is used
+	register_param("GS_THRESHOLD", m_gs_threshold, 6);      // below this value, gaussian elimination is used
 	register_param("NR_LOOPS", m_nr_loops, 25);             // Newton-Raphson loops
 	register_param("PARALLEL", m_parallel, 0);
 	register_param("SOR_FACTOR", m_sor, 1.059);
@@ -398,7 +368,7 @@ NETLIB_UPDATE(solver)
 		omp_set_dynamic(0);
 		#pragma omp parallel
 		{
-			#pragma omp for nowait
+			#pragma omp for
 			for (int i = 0; i <  t_cnt; i++)
 				if (m_mat_solvers[i]->is_timestep())
 				{
@@ -441,11 +411,24 @@ netlist_matrix_solver_t * NETLIB_NAME(solver)::create_solver(int size, const int
 		return nl_alloc(netlist_matrix_solver_direct2_t, m_params);
 	else
 	{
-		typedef netlist_matrix_solver_gauss_seidel_t<m_N,_storage_N> solver_N;
 		if (size >= gs_threshold)
-			return nl_alloc(solver_N, m_params, size);
+		{
+			if (USE_MATRIX_GS)
+			{
+				typedef netlist_matrix_solver_SOR_mat_t<m_N,_storage_N> solver_mat;
+				return nl_alloc(solver_mat, m_params, size);
+			}
+			else
+			{
+				typedef netlist_matrix_solver_SOR_t<m_N,_storage_N> solver_GS;
+				return nl_alloc(solver_GS, m_params, size);
+			}
+		}
 		else
-			return nl_alloc(solver_N, m_params, size);
+		{
+			typedef netlist_matrix_solver_direct_t<m_N,_storage_N> solver_D;
+			return nl_alloc(solver_D, m_params, size);
+		}
 	}
 }
 
@@ -551,7 +534,7 @@ ATTR_COLD void NETLIB_NAME(solver)::post_start()
 				break;
 		}
 
-		register_sub(*ms, pstring::sprintf("Solver %d",m_mat_solvers.count()));
+		register_sub(pstring::sprintf("Solver_%d",m_mat_solvers.count()), *ms);
 
 		ms->vsetup(groups[i]);
 

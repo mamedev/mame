@@ -4,9 +4,6 @@
 
     MyAB Turbo-Kontroller disk controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 *********************************************************************/
 
 #include "turbo.h"

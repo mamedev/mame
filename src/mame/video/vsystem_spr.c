@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 // Video System Sprites
 // todo:
 //  update drivers which call multiple priority passes to use the pdrawgfx version (aerofgt, gstriker)

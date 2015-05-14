@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 /*
 **
 ** File: ym2413.c - software implementation of YM2413

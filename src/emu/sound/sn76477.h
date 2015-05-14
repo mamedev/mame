@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 /*****************************************************************************
 
     Texas Instruments SN76477 emulator

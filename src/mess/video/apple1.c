@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Daniels, Colin Howell, R.Belmont
 /***************************************************************************
 
   apple1.c

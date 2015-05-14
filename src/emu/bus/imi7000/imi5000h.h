@@ -6,9 +6,6 @@
 
     Used in Corvus Systems H-Series drives (Model 6/11/20)
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #pragma once

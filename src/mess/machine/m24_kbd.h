@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef M24KBD_H_
 #define M24KBD_H_
 

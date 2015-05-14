@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Carlos A. Lozano Baides
 /******************************************************************
 
 Cabal  (c)1998 Tad

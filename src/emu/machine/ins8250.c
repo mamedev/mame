@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf, Carl
 /**********************************************************************
 
     National Semiconductor 8250 UART interface and emulation

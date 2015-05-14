@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Couriersud
 /***************************************************************************
 
     fixfreq.h
@@ -292,7 +294,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
 	}
 
 	// FIXME: pixels > 50 filters some spurious hysnc on line 27 in breakout
-	if ((sync & 2) && !m_sig_vsync && (pixels > 50))
+	if ((sync & 2) && !m_sig_vsync && (pixels > 100))
 	{
 		m_last_y += m_fieldcount;
 		m_last_x = 0;

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /* PowerPC 403 specific functions */
 
 static void ppc403_dma_exec(int ch);

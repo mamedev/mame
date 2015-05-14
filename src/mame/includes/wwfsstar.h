@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood
 class wwfsstar_state : public driver_device
 {
 public:

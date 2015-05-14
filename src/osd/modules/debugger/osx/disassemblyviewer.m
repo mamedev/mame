@@ -4,9 +4,6 @@
 //
 //  disassemblyviewer.m - MacOS X Cocoa debug window handling
 //
-//  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //============================================================
 
 #import "disassemblyviewer.h"
@@ -41,9 +38,7 @@
 	[expressionField setTarget:self];
 	[expressionField setAction:@selector(doExpression:)];
 	[expressionField setDelegate:self];
-	expressionFrame = [expressionField frame];
-	expressionFrame.size.width = (contentBounds.size.width - expressionFrame.size.height) / 2;
-	[expressionField setFrameSize:expressionFrame.size];
+	[expressionField sizeToFit];
 
 	// create the subview popup
 	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSOffsetRect(expressionFrame,
@@ -56,6 +51,16 @@
 	[subviewButton setTarget:self];
 	[subviewButton setAction:@selector(changeSubview:)];
 	[[subviewButton cell] setArrowPosition:NSPopUpArrowAtBottom];
+	[subviewButton sizeToFit];
+
+	// adjust sizes to make it fit nicely
+	expressionFrame = [expressionField frame];
+	expressionFrame.size.height = MAX(expressionFrame.size.height, [subviewButton frame].size.height);
+	expressionFrame.size.width = (contentBounds.size.width - expressionFrame.size.height) / 2;
+	[expressionField setFrame:expressionFrame];
+	expressionFrame.origin.x = expressionFrame.size.width;
+	expressionFrame.size.width = contentBounds.size.width - expressionFrame.size.height - expressionFrame.origin.x;
+	[subviewButton setFrame:expressionFrame];
 
 	// create a container for the expression field and subview popup
 	expressionFrame = NSMakeRect(expressionFrame.size.height,
@@ -94,6 +99,7 @@
 																	 expressionFrame.size.height,
 																	 expressionFrame.size.height)];
 	[actionButton setAutoresizingMask:(NSViewMaxXMargin | NSViewMinYMargin)];
+	[actionButton setFont:[NSFont systemFontOfSize:[defaultFont pointSize]]];
 	[dasmView insertActionItemsInMenu:[actionButton menu] atIndex:1];
 	[[window contentView] addSubview:actionButton];
 	[actionButton release];

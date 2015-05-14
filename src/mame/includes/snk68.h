@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
 #include "sound/upd7759.h"
 
 class snk68_state : public driver_device

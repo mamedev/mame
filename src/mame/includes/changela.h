@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 
 
 class changela_state : public driver_device

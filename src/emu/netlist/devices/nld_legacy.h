@@ -30,23 +30,23 @@
 // ----------------------------------------------------------------------------------------
 
 NETLIB_DEVICE(nicRSFF,
-	netlist_ttl_input_t m_S;
-	netlist_ttl_input_t m_R;
+	netlist_logic_input_t m_S;
+	netlist_logic_input_t m_R;
 
-	netlist_ttl_output_t m_Q;
-	netlist_ttl_output_t m_QQ;
+	netlist_logic_output_t m_Q;
+	netlist_logic_output_t m_QQ;
 );
 
 
 NETLIB_DEVICE_WITH_PARAMS(nicDelay,
-	netlist_ttl_input_t m_I;
+	netlist_logic_input_t m_I;
 
-	netlist_ttl_output_t m_Q;
+	netlist_logic_output_t m_Q;
 
 	netlist_param_int_t m_L_to_H;
 	netlist_param_int_t m_H_to_L;
 
-	netlist_state_t<UINT8> m_last;
+	UINT8 m_last;
 );
 
 

@@ -284,8 +284,20 @@
 		</part>
 	</software>
 
+	<software name="toolkit2">
+		<description>The BASIC Programmer's Toolkit (for BASIC 2.0)</description>
+		<year>1979</year>
+		<publisher>Palo Alto ICs Inc.</publisher>
+
+		<part name="rom" interface="pet_b000_rom">
+			<dataarea name="rom" size="0x800">
+				<rom name="toolkit2-b000.bin" size="0x800" crc="bf8d29f3" sha1="324508c0cec374c80387b4286ed1b0fee9159486" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="toolkit">
-		<description>The BASIC Programmer's Toolkit</description>
+		<description>The BASIC Programmer's Toolkit (for BASIC 3.0)</description>
 		<year>1979</year>
 		<publisher>Palo Alto ICs Inc.</publisher>
 

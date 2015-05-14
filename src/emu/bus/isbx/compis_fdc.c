@@ -4,9 +4,6 @@
 
     TeleNova Compis Floppy Disk Controller (119 106/1) emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "compis_fdc.h"

@@ -1,13 +1,13 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /***************************************************************************
 
     mess.c
 
     Specific (per target) constants
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 ****************************************************************************/
+
 #include "emu.h"
 
 #define APPNAME                 "MESS"
@@ -19,10 +19,8 @@
 #define CAPSTARTGAMENOUN        "System"
 #define GAMENOUN                "system"
 #define GAMESNOUN               "systems"
-#define COPYRIGHT               "Copyright the MESS team\nhttp://mess.org"
-#define COPYRIGHT_INFO          "Copyright the MESS team\n\n" \
-								"MESS is based on MAME Source code\n" \
-								"Copyright Nicola Salmoria and the MAME team"
+#define COPYRIGHT               "Copyright Nicola Salmoria\nand the MAME team\nhttp://mamedev.org"
+#define COPYRIGHT_INFO          "Copyright Nicola Salmoria and the MAME team"
 #define DISCLAIMER              "MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"\
 								"several computer and console systems. But hardware is useless without software\n" \
 								"so a file dump of the ROM, cartridges, discs, and cassettes which run on that\n" \

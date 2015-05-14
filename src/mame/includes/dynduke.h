@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Bryan McPhail, David Haywood
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, Angelo Salese, hap
 
 const mc68hc11_cpu_device::hc11_opcode_list_struct mc68hc11_cpu_device::hc11_opcode_list[] =
 {

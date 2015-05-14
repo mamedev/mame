@@ -1,3 +1,5 @@
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina
 /*
  'Swinging Singles' by Ent. Ent. Ltd
  driver by Tomasz Slanina

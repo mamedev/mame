@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 This is a simple 'Pairs' game called

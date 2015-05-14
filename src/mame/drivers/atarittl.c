@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
  Atari / Kee Games Driver - Discrete Games made in the 1970's

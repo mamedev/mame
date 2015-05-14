@@ -1,4 +1,7 @@
 #!/usr/bin/python
+##
+## license:BSD-3-Clause
+## copyright-holders:Aaron Giles, Andrew Gardner
 
 from __future__ import with_statement
 
@@ -24,7 +27,7 @@ def parse_args():
             format = 'plist'
         elif flags and (sys.argv[i] == '-b'):
             i += 1
-            if (i >= len(sys.argv)) or (sys.argv[i] not in ('mame', 'mess', 'ume', 'ldplayer')):
+            if (i >= len(sys.argv)):
                 usage()
             else:
                 target = sys.argv[i]
@@ -92,16 +95,6 @@ if build == "mess":
     original_filename = "MESS"
     product_name = "MESS"
     bundle_identifier = "org.mamedev.mess"
-elif build == "ume":
-    # UME
-    author = "MAME and MESS Team"
-    comments = "Universal Machine Emulator"
-    company_name = "MAME and MESS Team"
-    file_description = "Universal Machine Emulator"
-    internal_name = "UME"
-    original_filename = "UME"
-    product_name = "UME"
-    bundle_identifier = "org.mamedev.ume"
 else:
     # MAME
     author = "Nicola Salmoria and the MAME Team"

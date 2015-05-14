@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Charles Mac Donald, Wilbert Pol, Angelo Salese
 /*****************************************************************************
  *
  * includes/pce.h

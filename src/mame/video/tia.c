@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Wilbert Pol,???
 /***************************************************************************
 
   Atari TIA video emulation

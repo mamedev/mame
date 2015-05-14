@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller <pullmoll@t-online.de>
+// copyright-holders:Juergen Buchmueller
 
 /*****************************************************************************
  *

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tim Schuerewegen
 /***************************************************************************
 
   Hitachi HD66421 LCD Controller

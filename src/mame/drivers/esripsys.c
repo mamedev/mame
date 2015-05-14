@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Phil Bennett
 /***************************************************************************
 
     Entertainment Sciences Real-Time Image Processor (RIP) hardware

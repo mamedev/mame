@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, MetalliC
 #include "emu.h"
 #include "includes/spectrum.h"
 #include "imagedev/snapquik.h"

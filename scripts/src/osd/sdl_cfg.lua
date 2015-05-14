@@ -1,3 +1,6 @@
+-- license:BSD-3-Clause
+-- copyright-holders:MAMEdev Team
+
 forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
@@ -79,7 +82,6 @@ if BASE_TARGETOS=="unix" then
 			}
 		else
 			defines {
-				"NO_SDL_GLEXT",
 				"MACOSX_USE_LIBSDL",
 			}
 			buildoptions {

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Oliver Bergmann, Bryan McPhail, Randy Mongenel
 /***************************************************************************
 
     Seibu Raiden hardware

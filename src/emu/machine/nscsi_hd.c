@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #include "machine/nscsi_hd.h"
 #include "imagedev/harddriv.h"
 

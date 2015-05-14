@@ -1,3 +1,5 @@
+// license:GPL-2.0+
+// copyright-holders:(Original Author?), Dirk Best
 /***************************************************************************
 
   nascom1.c

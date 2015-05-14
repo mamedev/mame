@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo
 
 /* Ramtek - Star Cruiser */
 

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Quench
 /**********************************************************************************************
  *
  *  Streaming single channel ADPCM core for the ES8712 chip

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* Belatra Russian Fruit Machines (Video?) */
 
 /*

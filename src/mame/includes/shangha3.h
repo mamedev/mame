@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 #include "sound/okim6295.h"
 
 class shangha3_state : public driver_device

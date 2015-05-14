@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /* Sega System 32 Protection related functions */
 
 #include "emu.h"

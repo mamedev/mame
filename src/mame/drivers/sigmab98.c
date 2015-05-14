@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia
 /*************************************************************************************************************
 
                                      -= Sigma B-98 Hardware / Sammy Medal Games =-
@@ -85,13 +87,13 @@ http://www.tsc-acnet.com/index.php?sort=8&action=cataloglist&s=1&mode=3&genre_id
 To Do:
 
 - KL5C80 emulation is needed to consolidate the sammymdl games in one memory map and to run the BIOS
-- Sprites rotation, e.g. logo in dashhero, pepsiman https://youtu.be/p3cbZ67m4lo?t=1m24s, tdoboon https://youtu.be/loPP3jt0Ob0
 - Remove ROM patches: gegege checks the EEPROM output after reset, and wants a timed 0->1 transition or locks up while
   saving setting in service mode. Using a reset_delay of 7 works, unless when "play style" is set
   to "coin" (it probably changes the number of reads from port $C0).
   I guess the reset_delay mechanism should be implemented with a timer in eeprom.c.
 - pyenaget intro: when the theater scrolls out to the left, the train should scroll in from the right,
   with no visible gaps. It currently leaves the screen empty instead, for several seconds.
+- tdoboon: no smoke from hit planes as shown in the video? Tiles are present (f60-125f) and used in demo mode.
 - dashhero does not acknowledge the button bashing correctly, it's very hard to win (a slower pace works better!)
 
 Notes:
@@ -137,6 +139,8 @@ public:
 	std::vector<UINT8> m_paletteram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	bitmap_ind16 *m_sprite_bitmap;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -235,6 +239,7 @@ public:
 	DECLARE_MACHINE_RESET(sigmab98);
 	DECLARE_MACHINE_RESET(sammymdl);
 
+	virtual void video_start();
 	UINT32 screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
@@ -248,6 +253,11 @@ public:
     Video
 
 ***************************************************************************/
+
+void sigmab98_state::video_start()
+{
+	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 512);
+}
 
 /***************************************************************************
 
@@ -272,18 +282,27 @@ public:
     6           7654 3---     Number of Y Tiles - 1
                 ---- -210     Y (High)
     7                         Y (Low)
-    8                         Shrink Factor (<< 8, High)
-    9                         Shrink Factor (<< 8, Low)
-    a                         ? rotation, see dashhero (Sigma logo)
-    b                         ? and pepsiman (when falling)
+    8                         Destination Delta X, Scaled by Shrink Factor << 8 (High)
+    9                         Destination Delta X, Scaled by Shrink Factor << 8 (Low)
+    a                         Destination Delta Y, Scaled by Shrink Factor << 8 (High)
+    b                         Destination Delta Y, Scaled by Shrink Factor << 8 (Low)
     c           7654 3---
-                ---- -210     Delta X (High)
-    d                         Delta X (Low)
+                ---- -210     Source X (High)
+    d                         Source X (Low)
     e           7654 3---
-                ---- -210     Delta Y (High)
-    f                         Delta Y (Low)
+                ---- -210     Source Y (High)
+    f                         Source Y (Low)
+
+    Sprites rotation examples:
+    logo in dashhero, pepsiman https://youtu.be/p3cbZ67m4lo?t=1m24s, tdoboon https://youtu.be/loPP3jt0Ob0
 
 ***************************************************************************/
+
+inline int integer_part(int x)
+{
+//	return x >> 16;
+	return (x + 0x8000) >> 16;
+}
 
 void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask)
 {
@@ -292,60 +311,36 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	for ( ; s != end; s -= 0x10 )
 	{
-		int gfx, code, color, zoom, /*rot,*/ dim, scale;
-		int sx, nx, x, x0, x1, dx, flipx;
-		int sy, ny, y, y0, y1, dy, flipy;
-
 		if ( (s[ 0x01 ] & 0x04) == 0)
 			continue;
 
 		if ( ((1 << (s[ 0x01 ] & 0x03)) & pri_mask) == 0 )
 			continue;
 
-		color   =   s[ 0x00 ] & 0xf;
+		int color   =   s[ 0x00 ] & 0xf;
 
-		gfx     =   (s[ 0x01 ] & 0x40 ) ? 1 : 0;
+		int gfx     =   (s[ 0x01 ] & 0x40 ) ? 1 : 0;
+		int code    =   s[ 0x02 ] * 256 + s[ 0x03 ];
 
-		code    =   s[ 0x02 ] * 256 + s[ 0x03 ];
+		int nx      =   ((s[ 0x04 ] & 0xf8) >> 3) + 1;
+		int dstx    =   (s[ 0x04 ] & 0x03) * 256 + s[ 0x05 ];
 
-		nx      =   ((s[ 0x04 ] & 0xf8) >> 3) + 1;
+		int ny      =   ((s[ 0x06 ] & 0xf8) >> 3) + 1;
+		int dsty    =   (s[ 0x06 ] & 0x03) * 256 + s[ 0x07 ];
 
-		sx      =   (s[ 0x04 ] & 0x03) * 256 + s[ 0x05 ];
+		int dstdx   =   (s[ 0x08 ] & 0xff) * 256 + s[ 0x09 ];	// 0x100 = no zoom, 0x200 = 50% zoom
+		int dstdy   =   (s[ 0x0a ] & 0xff) * 256 + s[ 0x0b ];	// ""
 
-		ny      =   ((s[ 0x06 ] & 0xf8) >> 3) + 1;
-
-		sy      =   (s[ 0x06 ] & 0x03) * 256 + s[ 0x07 ];
-
-		zoom    =   (s[ 0x08 ] & 0xff) * 256 + s[ 0x09 ];   // 0x100 means no zoom
-
-//      rot     =   (s[ 0x0a ] & 0xff) * 256 + s[ 0x0b ];   // unimplemented!
-
-		dx      =   (s[ 0x0c ] & 0xff) * 256 + s[ 0x0d ];
-		dy      =   (s[ 0x0e ] & 0xff) * 256 + s[ 0x0f ];
+		int srcx    =   (s[ 0x0c ] & 0xff) * 256 + s[ 0x0d ];
+		int srcy    =   (s[ 0x0e ] & 0xff) * 256 + s[ 0x0f ];
 
 		// Sign extend the position
-		sx      =   (sx & 0x1ff) - (sx & 0x200);
-		sy      =   (sy & 0x1ff) - (sy & 0x200);
-		dx      =   (dx & 0x7fff) - (dx & 0x8000);
-		dy      =   (dy & 0x7fff) - (dy & 0x8000);
+		dstx = (dstx  & 0x01ff) - (dstx  & 0x0200);	// or 0x3ff/0x400?
+		dsty = (dsty  & 0x01ff) - (dsty  & 0x0200);
 
-		// Use fixed point values (16.16), for accuracy
-		sx      <<= 16;
-		sy      <<= 16;
-
-		zoom    =   (1 << 16) / (zoom ? zoom : 1);
-		dim     =   (0x10 << 8) * zoom;
-		// Add shift (negated)
-		sx      -=  (dx << 8) * zoom;
-		sy      -=  (dy << 8) * zoom;
-		scale   =   dim / 0x10;
-
-		// Let's approximate to the nearest greater integer value
-		// to avoid holes in between tiles
-		if (scale & 0xffff) scale += (1<<16) / 0x10;
-
-		flipx   =   s[ 0x01 ] & 0x10;
-		flipy   =   s[ 0x01 ] & 0x08;
+		// Flipping
+		int x0, x1, dx, flipx = s[ 0x01 ] & 0x10;
+		int y0, y1, dy, flipy = s[ 0x01 ] & 0x08;
 
 		if ( flipx )    {   x0 = nx - 1;    x1 = -1;    dx = -1;    }
 		else            {   x0 = 0;         x1 = nx;    dx = +1;    }
@@ -353,16 +348,133 @@ void sigmab98_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if ( flipy )    {   y0 = ny - 1;    y1 = -1;    dy = -1;    }
 		else            {   y0 = 0;         y1 = ny;    dy = +1;    }
 
-		for (y = y0; y != y1; y += dy)
+		// Draw the sprite directly to screen if no zoom/rotation/offset is required
+		if (dstdx == 0x100 && !dstdy && !srcx && !srcy)
 		{
-			for (x = x0; x != x1; x += dx)
+			for (int y = y0; y != y1; y += dy)
 			{
-				m_gfxdecode->gfx(gfx)->zoom_transpen(bitmap,cliprect,
+				for (int x = x0; x != x1; x += dx)
+				{
+					m_gfxdecode->gfx(gfx)->transpen(bitmap, cliprect,
+											code++, color,
+											flipx, flipy,
+											dstx + x * 16, dsty + y * 16, 0);
+				}
+			}
+
+			continue;
+		}
+
+		// First draw the sprite in a buffer without zoom/rotation/offset, nor transparency
+		rectangle sprite_cliprect(0, nx * 16 - 1, 0, ny * 16 - 1);
+		for (int y = y0; y != y1; y += dy)
+		{
+			for (int x = x0; x != x1; x += dx)
+			{
+				m_gfxdecode->gfx(gfx)->opaque(*m_sprite_bitmap, sprite_cliprect,
 										code++, color,
 										flipx, flipy,
-										(sx + x * dim) / 0x10000, (sy + y * dim) / 0x10000,
-										scale, scale, 0 );
+										x * 16, y * 16);
 			}
+		}
+
+		// Sign extend the transformation values
+		dstdx   =   (dstdx & 0x7fff) - (dstdx & 0x8000);
+		dstdy   =   (dstdy & 0x7fff) - (dstdy & 0x8000);
+		srcx    =   (srcx  & 0x7fff) - (srcx  & 0x8000);
+		srcy    =   (srcy  & 0x7fff) - (srcy  & 0x8000);
+		dstdy   =   -dstdy;
+
+		// Use fixed point values (16.16), for accuracy
+		dstx  <<=   16;
+		dsty  <<=   16;
+
+		// Source delta (equal for x and y)
+		int z = int( sqrt(dstdx * dstdx + dstdy * dstdy) + 0.5 );	// dest delta vector is scaled by the source delta!?
+		if (!z)
+			z = 0x100;
+		int srcdzz = z << 8;
+
+		// Destination x and y deltas
+		int dstdxx = (dstdx << 16) / z;	// dest x delta for source x increments
+		int dstdyx = (dstdy << 16) / z;	// dest y delta for source x increments
+
+		int dstdxy = -dstdyx;			// dest x delta for source y increments (orthogonal to the above vector)
+		int dstdyy = dstdxx;			// dest y delta for source y increments
+
+		// Transform the source offset in a destination offset (negate, scale and rotate it)
+		srcx = (-srcx << 8) / z;
+		srcy = (-srcy << 8) / z;
+
+		dstx += srcx * dstdxx;
+		dsty += srcx * dstdyx;
+
+		dstx += srcy * dstdxy;
+		dsty += srcy * dstdyy;
+
+		// Supersampling (2x2) to avoid gaps in the destination
+		srcdzz /= 2;
+		dstdxx /= 2;
+		dstdyx /= 2;
+		dstdxy /= 2;
+		dstdyy /= 2;
+
+		// Transform the source image while drawing to the screen
+		UINT16 *src = &m_sprite_bitmap->pix16(0);
+		UINT16 *dst = &bitmap.pix16(0);
+
+		int src_rowpixels = m_sprite_bitmap->rowpixels();
+		int dst_rowpixels = bitmap.rowpixels();
+
+		UINT16 penmask = gfx ? 0xff : 0x0f;
+
+		// Scan source image top to bottom
+		srcy = 0;
+		for (;;)
+		{
+			int dstx_prev = dstx;
+			int dsty_prev = dsty;
+
+			int fy = integer_part(srcy);
+			if (fy > sprite_cliprect.max_y)
+				break;
+			if (fy >= sprite_cliprect.min_y)
+			{
+				// left to right
+				srcx = 0;
+				for (;;)
+				{
+					int fx = integer_part(srcx);
+					if (fx > sprite_cliprect.max_x)
+						break;
+					if (fx >= sprite_cliprect.min_x)
+					{
+						int px = integer_part(dstx);
+						int py = integer_part(dsty);
+
+						if (px >= cliprect.min_x && px <= cliprect.max_x && py >= cliprect.min_y && py <= cliprect.max_y)
+						{
+							UINT16 pen = src[fy * src_rowpixels + fx];
+							if (pen & penmask)
+								dst[py * dst_rowpixels + px] = pen;
+						}
+					}
+
+					// increment source x and dest x,y
+					srcx += srcdzz;
+
+					dstx += dstdxx;
+					dsty += dstdyx;
+				}
+			}
+
+			// increment source y and dest x,y
+			srcy += srcdzz;
+
+			dstx = dstx_prev;
+			dsty = dsty_prev;
+			dstx += dstdxy;
+			dsty += dstdyy;
 		}
 	}
 }
@@ -2587,6 +2699,7 @@ ROM_START( sammymdl )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
+	ROM_COPY( "mainbios", 0x0000, 0x0000, 0x40000 )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_ERASEFF )
 ROM_END
@@ -2804,18 +2917,18 @@ DRIVER_INIT_MEMBER(sigmab98_state,haekaka)
 
 ***************************************************************************/
 
-GAME( 1997, dodghero, 0,        dodghero, sigma_1b, sigmab98_state, dodghero, ROT0, "Sigma",             "Minna Atsumare! Dodge Hero",           GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sushimar, 0,        dodghero, sigma_3b, sigmab98_state, dodghero, ROT0, "Sigma",             "Itazura Daisuki! Sushimaru Kun",       GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, gegege,   0,        gegege,   sigma_1b, sigmab98_state, gegege,   ROT0, "Sigma / Banpresto", "GeGeGe no Kitarou Youkai Slot",        GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, b3rinsya, 0,        gegege,   sigma_5b, sigmab98_state, b3rinsya, ROT0, "Sigma",             "Burning Sanrinsya - Burning Tricycle", GAME_IMPERFECT_GRAPHICS ) // 1997 in the rom
-GAME( 1997, pepsiman, 0,        gegege,   sigma_3b, sigmab98_state, pepsiman, ROT0, "Sigma",             "PEPSI Man",                            GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, tbeastw2, 0,        gegege,   sigma_3b, sigmab98_state, tbeastw2, ROT0, "Sigma / Transformer Production Company / Takara", "Transformers Beast Wars II", GAME_IMPERFECT_GRAPHICS ) // 1997 in the rom
-GAME( 1997, ucytokyu, 0,        gegege,   sigma_js, sigmab98_state, ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",               GAME_IMPERFECT_GRAPHICS ) // Banpresto + others in the ROM
-GAME( 2000, dashhero, 0,        dashhero, sigma_1b, sigmab98_state, dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ) // 1999 in the rom
+GAME( 1997, dodghero, 0,        dodghero, sigma_1b, sigmab98_state, dodghero, ROT0, "Sigma",             "Minna Atsumare! Dodge Hero",           0 )
+GAME( 1997, sushimar, 0,        dodghero, sigma_3b, sigmab98_state, dodghero, ROT0, "Sigma",             "Itazura Daisuki! Sushimaru Kun",       0 )
+GAME( 1997, gegege,   0,        gegege,   sigma_1b, sigmab98_state, gegege,   ROT0, "Sigma / Banpresto", "GeGeGe no Kitarou Youkai Slot",        0 )
+GAME( 1997, b3rinsya, 0,        gegege,   sigma_5b, sigmab98_state, b3rinsya, ROT0, "Sigma",             "Burning Sanrinsya - Burning Tricycle", 0 ) // 1997 in the rom
+GAME( 1997, pepsiman, 0,        gegege,   sigma_3b, sigmab98_state, pepsiman, ROT0, "Sigma",             "PEPSI Man",                            0 )
+GAME( 1998, tbeastw2, 0,        gegege,   sigma_3b, sigmab98_state, tbeastw2, ROT0, "Sigma / Transformer Production Company / Takara", "Transformers Beast Wars II", 0 ) // 1997 in the rom
+GAME( 1997, ucytokyu, 0,        gegege,   sigma_js, sigmab98_state, ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",               0 ) // Banpresto + others in the ROM
+GAME( 2000, dashhero, 0,        dashhero, sigma_1b, sigmab98_state, dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             GAME_NOT_WORKING ) // 1999 in the rom
 // Sammy Medal Games:
-GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, driver_device,  0,        ROT0, "Sammy",             "Sammy Medal Game System Bios",         GAME_IS_BIOS_ROOT )
-GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Animal Catch",                         GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, ROT0, "Sammy",             "Itazura Monkey",                       GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Sammy Medal Game System Bios",         GAME_IS_BIOS_ROOT )
+GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sigmab98_state, animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
+GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sigmab98_state, itazuram, ROT0, "Sammy",             "Itazura Monkey",                       0 )
+GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sigmab98_state, haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
+GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
+GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sigmab98_state, haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )

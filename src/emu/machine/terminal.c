@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic
 #include "machine/terminal.h"
 
 #define KEYBOARD_TAG "keyboard"

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Tomasz Slanina, David Haywood
 #pragma once
 
 #ifndef __ST0016_H__

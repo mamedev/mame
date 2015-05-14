@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /*========================================================================= */
 /* This source implements the ADSR volume envelope of the SID-chip. */
 /* Two different envelope shapes are implemented, an exponential */

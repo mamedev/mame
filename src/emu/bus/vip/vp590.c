@@ -4,9 +4,6 @@
 
     RCA VIP Color Board VP590 emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "vp590.h"

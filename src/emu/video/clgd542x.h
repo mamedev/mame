@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 /*
 
     Cirrus Logic GD542x/3x video chipsets
@@ -88,6 +90,7 @@ private:
 	void cirrus_crtc_reg_write(UINT8 index, UINT8 data);
 
 	void start_bitblt();
+	void start_reverse_bitblt();
 	void start_system_bitblt();
 	void blit_dword();
 	void copy_pixel(UINT8 src, UINT8 dst);

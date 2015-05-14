@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /* This is MPU4 MOD4 with a Y2413 instead of an OKI */
 
 #include "emu.h"

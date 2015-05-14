@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 #define DUMP_PAGEFAULTS 0
 
 INLINE UINT8 READ8(UINT32 a)

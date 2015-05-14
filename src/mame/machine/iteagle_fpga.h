@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Ted Green
 //*************************************
 // iteagle fpga device
 //*************************************
@@ -11,8 +13,14 @@
 #define MCFG_ITEAGLE_FPGA_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_FPGA, 0x55CC33AA, 0xAA, 0xAAAAAA, 0x00)
 
+#define MCFG_ITEAGLE_FPGA_INIT(_version, _seq_init) \
+	downcast<iteagle_fpga_device *>(device)->set_init_info(_version, _seq_init);
+
 #define MCFG_ITEAGLE_EEPROM_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_EEPROM, 0xAABBCCDD, 0x00, 0x088000, 0x00)
+
+#define MCFG_ITEAGLE_EEPROM_INIT(_sw_version, _hw_version) \
+	downcast<iteagle_eeprom_device *>(device)->set_info(_sw_version, _hw_version);
 
 #define MCFG_ITEAGLE_IDE_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_IDE, 0x11223344, 0x00, 0x010100, 0x00)
@@ -25,6 +33,7 @@ class iteagle_fpga_device : public pci_device,
 {
 public:
 	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 
 protected:
 	virtual void device_start();
@@ -36,11 +45,13 @@ protected:
 	virtual void nvram_write(emu_file &file);
 
 private:
-
+	
 	UINT32 m_fpga_regs[0x20];
 	UINT32 m_rtc_regs[0x200];
 	UINT32 m_prev_reg;
 
+	UINT32 m_version;
+	UINT32 m_seq_init;
 	UINT32 m_seq;
 	UINT32 m_seq_rem1, m_seq_rem2;
 	void update_sequence(UINT32 data);
@@ -62,11 +73,15 @@ public:
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
+	void set_info(int sw_version, int hw_version) {m_sw_version=sw_version; m_hw_version=hw_version;}
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 
 private:
+	UINT16 m_sw_version;
+	UINT8 m_hw_version;
+	
 	DECLARE_ADDRESS_MAP(eeprom_map, 32);
 	DECLARE_READ32_MEMBER( eeprom_r );
 	DECLARE_WRITE32_MEMBER( eeprom_w );

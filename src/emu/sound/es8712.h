@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Quench
 /* An interface for the ES8712 ADPCM chip */
 
 #pragma once

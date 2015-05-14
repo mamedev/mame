@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Carl
 #ifndef RMNKBD_H_
 #define RMNKBD_H_
 

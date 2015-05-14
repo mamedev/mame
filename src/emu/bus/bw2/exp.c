@@ -4,9 +4,6 @@
 
     Bondwell 2 Expansion Port emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "exp.h"

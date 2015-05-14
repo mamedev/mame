@@ -1,5 +1,5 @@
-// license: ?
-// copyright-holders: Angelo Salese
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, ElSemi
 /*****************************************************************************
  *
  * template for CPU cores

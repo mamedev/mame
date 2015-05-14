@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Barry Rodewald
 #pragma once
 
 #ifndef __OKIM6258_H__

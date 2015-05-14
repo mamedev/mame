@@ -4,9 +4,6 @@
 
     Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 #define YM2610B_WARNING
 
 /*

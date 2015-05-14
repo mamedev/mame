@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Frank Palazzolo
 #include "sound/discrete.h"
 #include "sound/samples.h"
 

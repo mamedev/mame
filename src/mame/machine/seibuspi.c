@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde, hap, ???
 #include "emu.h"
 #include "machine/seibuspi.h"
 

@@ -4,9 +4,6 @@
 //
 //  pointsviewer.m - MacOS X Cocoa debug window handling
 //
-//  Copyright (c) 1996-2015, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
-//
 //============================================================
 
 #import "pointsviewer.h"
@@ -22,21 +19,19 @@
 	NSScrollView	*breakScroll, *watchScroll;
 	NSTabViewItem	*breakTab, *watchTab;
 	NSPopUpButton	*actionButton, *subviewButton;
-	NSRect			contentBounds;
+	NSRect			subviewFrame;
 
 	if (!(self = [super initWithMachine:m title:@"(Break|Watch)points" console:c]))
 		return nil;
-	contentBounds = [[window contentView] bounds];
+	NSRect const contentBounds = [[window contentView] bounds];
+	NSFont *const defaultFont = [[MAMEDebugView class] defaultFontForMachine:m];
 
 	// create the subview popup
-	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(19,
-																	contentBounds.size.height - 19,
-																	contentBounds.size.width - 19,
-																	19)];
+	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
 	[subviewButton setBezelStyle:NSShadowlessSquareBezelStyle];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
-	[subviewButton setFont:[[MAMEDebugView class] defaultFontForMachine:m]];
+	[subviewButton setFont:defaultFont];
 	[subviewButton setTarget:self];
 	[subviewButton setAction:@selector(changeSubview:)];
 	[[subviewButton cell] setArrowPosition:NSPopUpArrowAtBottom];
@@ -46,15 +41,22 @@
 	[[[subviewButton menu] addItemWithTitle:@"All Watchpoints"
 									 action:NULL
 							  keyEquivalent:@""] setTag:1];
+	[subviewButton sizeToFit];
+	subviewFrame = [subviewButton frame];
+	subviewFrame.origin.x = subviewFrame.size.height;
+	subviewFrame.origin.y = contentBounds.size.height - subviewFrame.size.height;
+	subviewFrame.size.width = contentBounds.size.width - subviewFrame.size.height;
+	[subviewButton setFrame:subviewFrame];
 	[[window contentView] addSubview:subviewButton];
 	[subviewButton release];
 
 	// create the action popup
 	actionButton = [[self class] newActionButtonWithFrame:NSMakeRect(0,
-																	 contentBounds.size.height - 19,
-																	 19,
-																	 19)];
+																	 subviewFrame.origin.y,
+																	 subviewFrame.size.height,
+																	 subviewFrame.size.height)];
 	[actionButton setAutoresizingMask:(NSViewMaxXMargin | NSViewMinYMargin)];
+	[actionButton setFont:[NSFont systemFontOfSize:[defaultFont pointSize]]];
 	[[window contentView] addSubview:actionButton];
 	[actionButton release];
 
@@ -64,7 +66,7 @@
 	breakScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0,
 																 0,
 																 contentBounds.size.width,
-																 contentBounds.size.height - 19)];
+																 contentBounds.size.height - subviewFrame.size.height)];
 	[breakScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[breakScroll setHasHorizontalScroller:YES];
 	[breakScroll setHasVerticalScroller:YES];
@@ -79,10 +81,7 @@
 	// create the breakpoints view
 	watchView = [[MAMEWatchpointsView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)
 												   machine:*machine];
-	watchScroll = [[NSScrollView alloc] initWithFrame:NSMakeRect(0,
-																 0,
-																 contentBounds.size.width,
-																 contentBounds.size.height - 19)];
+	watchScroll = [[NSScrollView alloc] initWithFrame:[breakScroll frame]];
 	[watchScroll setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[watchScroll setHasHorizontalScroller:YES];
 	[watchScroll setHasVerticalScroller:YES];
@@ -95,10 +94,7 @@
 	[watchScroll release];
 
 	// create a tabless tabview for the two subviews
-	tabs = [[NSTabView alloc] initWithFrame:NSMakeRect(0,
-													   0,
-													   contentBounds.size.width,
-													   contentBounds.size.height - 19)];
+	tabs = [[NSTabView alloc] initWithFrame:[breakScroll frame]];
 	[tabs setTabViewType:NSNoTabsNoBorder];
 	[tabs setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
 	[tabs addTabViewItem:breakTab];

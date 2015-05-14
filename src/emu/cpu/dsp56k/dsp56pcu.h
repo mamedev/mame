@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 #ifndef __DSP56_PCU_H__
 #define __DSP56_PCU_H__
 

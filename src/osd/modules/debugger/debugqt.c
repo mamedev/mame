@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Andrew Gardner
 //============================================================
 //
 //  debugqt.c - SDL/QT debug window handling
-//
-//  Copyright (c) 1996-2014, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
 
 "Sega Shooting Zone" aka "Sega Sharp Shooter"

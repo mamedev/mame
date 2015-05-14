@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Zsolt Vasvari
 class marineb_state : public driver_device
 {
 public:

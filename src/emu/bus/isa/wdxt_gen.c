@@ -4,9 +4,6 @@
 
     Western Digital WDXT-GEN ISA XT MFM Hard Disk Controller
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 /*

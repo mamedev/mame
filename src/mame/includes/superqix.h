@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
 #include "sound/samples.h"
 
 class superqix_state : public driver_device

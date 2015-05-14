@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Keith Wilkins
 #pragma once
 
 #ifndef __DISC_MTH_H__

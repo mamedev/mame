@@ -4,9 +4,6 @@
 
     MOS Technology 6702 Mystery Device emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "mos6702.h"

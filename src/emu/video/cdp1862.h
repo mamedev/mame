@@ -4,9 +4,6 @@
 
     RCA CDP1862 COS/MOS Color Generator Controller emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
                             _____   _____
                     RD   1 |*    \_/     | 24  Vdd

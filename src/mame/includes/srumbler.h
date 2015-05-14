@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Paul Leaman
 #include "video/bufsprite.h"
 
 class srumbler_state : public driver_device

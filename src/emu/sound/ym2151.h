@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Jarek Burczynski
 /*
 ** File: ym2151.h - header file for software implementation of YM2151
 **                                            FM Operator Type-M(OPM)

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller, Manuel Abadia
 /**********************************************
     Philips SAA1099 Sound driver
 **********************************************/

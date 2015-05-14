@@ -4,9 +4,6 @@
 
     Miracle Systems Gold Card emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "miracle_gold_card.h"

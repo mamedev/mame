@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Andel Horna
 class wrally_state : public driver_device
 {
 public:

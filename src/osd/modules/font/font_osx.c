@@ -1,5 +1,7 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert, R. Belmont
 /*
- * font_sdl.c
+ * font_osx.c
  *
  */
 

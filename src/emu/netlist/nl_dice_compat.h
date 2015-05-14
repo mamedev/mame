@@ -1,5 +1,5 @@
-// license:MAME,GPL-2.0+
-// copyright-holders:couriersud
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /*
  * nl_dice_compat.h
  *
@@ -155,16 +155,31 @@ public:
  *        This is a transitional implementation
  */
 
-inline int CAPACITOR_tc(const double c, const double r)
+inline int CAPACITOR_tc_hl(const double c, const double r)
 {
-	static const double TIME_CONSTANT = -log((3.4 - 2.0) / 3.4);
-	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9 * 0.1); // 0.1 avoids bricks with shadow
+	/*
+	 * Vt = (VH-VL)*exp(-t/RC)
+	 * ln(Vt/(VH-VL))*RC = -t
+	 */
+	static const double TIME_CONSTANT = -nl_math::log(2.0 / (3.7-0.3));
+	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
+	return ret;
+}
+
+inline int CAPACITOR_tc_lh(const double c, const double r)
+{
+	/*
+	 * Vt = (VH-VL)*(1-exp(-t/RC))
+	 * -t=ln(1-Vt/(VH-VL))*RC
+	 */
+	static const double TIME_CONSTANT = -nl_math::log(1.0 - 0.8 / (3.7-0.3));
+	int ret = (int) (TIME_CONSTANT * (1.0 + r) * c * 1e9);
 	return ret;
 }
 
 #define CHIP_CAPACITOR(_name, _pdesc) \
 	NETDEV_DELAY(_name) \
-	NETDEV_PARAMI(_name, L_TO_H, CAPACITOR_tc((_pdesc)->c, (_pdesc)->r)) \
-	NETDEV_PARAMI(_name, H_TO_HL, CAPACITOR_tc((_pdesc)->c, (_pdesc)->r))
+	NETDEV_PARAMI(_name, L_TO_H, CAPACITOR_tc_lh((_pdesc)->c, (_pdesc)->r)) \
+	NETDEV_PARAMI(_name, H_TO_L, CAPACITOR_tc_hl((_pdesc)->c, (_pdesc)->r))
 
 #endif /* NL_DICE_COMPAT_H_ */

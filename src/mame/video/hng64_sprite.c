@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 
 /* Hyper NeoGeo 64 Sprite bits */
 

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese, Mariusz Wojcieszek
 #include "emu.h"
 #include "debugger.h"
 #include "scudsp.h"

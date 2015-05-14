@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Tim Schuerewegen
 /*******************************************************************************
 
     FriendlyARM Mini2440

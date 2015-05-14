@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
   Implementation for Sharp sm8500 cpu. There is hardly any information available
   on this cpu. Currently we've only found documentation on the microcontroller

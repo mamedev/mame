@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Krzysztof Strzecha, Miodrag Milanovic
 /*****************************************************************************
  *
  * includes/galaxy.h

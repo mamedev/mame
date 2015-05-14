@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Data East Pinball DMD Type 2 Display
  */

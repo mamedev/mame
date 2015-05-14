@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 const tms32051_device::opcode_func tms32051_device::s_opcode_table[256] =
 {
 	/* 0x00 - 0x0f */

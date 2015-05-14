@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Roberto Fresca
 /*************************************************************************************
 
   /\/\<< Kasino '89 >>/\/\
@@ -49,13 +51,12 @@
     that they tied a 20MHz crystal due to lack of 21.477MHz ones stock.
 
   - You can see the scrambling stuff inside the CPU box through a X-RAY picture,
-    and other reverse-engineering steps here: http://www.robertofresca.com.ar/
+    and other reverse-engineering steps here: http://www.robertofresca.com/
 
 
 **************************************************************************************
 
   Tech Notes...
-
 
   - NMI of main Z80 is connected to a 138Hz. oscillator AND bit6 of port $82.
     That means NMI should be triggered each 138Hz. *only* if bit6 of port $82
@@ -78,7 +79,6 @@
   Ports $83/$84 handle the roulette's LEDs in a multiplexed way...
   Port $84 is the selector, while port $83 carry the LEDs set.
 
-
   Checks:
 
   00: OK 40-02       10: OK 08-10       20: OK 10-08       30: OK 40-10
@@ -91,7 +91,6 @@
   07: OK 10-04       17: OK 40-01       27: OK 08-01
   08: OK 20-10       18: OK 40-04       28: OK 08-04
   09: OK 02-08       19: OK 08-02       29: OK 20-04
-
 
   .------------------++----+----+----+----+----+----+----+----.
   |  Set \ Writes... || 80 | 40 | 20 | 10 | 08 | 04 | 02 | 01 |
@@ -190,6 +189,8 @@
 
 
 #define MASTER_CLOCK        XTAL_21_4772MHz
+#define VDP_MEM             0x40000
+
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -235,8 +236,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
 	DECLARE_WRITE_LINE_MEMBER(kas89_vdp_interrupt);
 };
-
-#define VDP_MEM             0x40000
 
 
 /***************************************
@@ -653,14 +652,8 @@ static INPUT_PORTS_START( kas89 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* Blank the screen. Disclaimer isn't shown.*/
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Otherwise hang the game when insert credits.*/
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8)  PORT_TOGGLE PORT_NAME("Operator/Habilitation Key")
-//  PORT_DIPNAME( 0x20, 0x00, "Habilitation Key")
-//  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9)  PORT_TOGGLE PORT_NAME("Audit/Test Mode Switch")
-//  PORT_DIPNAME( 0x80, 0x80, "Audit/Test Mode Switch" )    PORT_DIPLOCATION("SVC:1")
-//  PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 
 	PORT_START("DSW")
@@ -769,7 +762,6 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 	MCFG_CPU_IO_MAP(audio_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_snmi", kas89_state, kas89_sound_nmi_cb, attotime::from_hz(138))
 
-
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -849,7 +841,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	/* Unscrambling data lines */
 	for ( i = 0; i < memsize; i++ )
 	{
-		mem[i] = BITSWAP8(mem[i],3,1,0,5,6,4,7,2);
+		mem[i] = BITSWAP8(mem[i], 3, 1, 0, 5, 6, 4, 7, 2);
 	}
 
 	/* Unscrambling address lines */
@@ -857,7 +849,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
-		mem[BITSWAP16(i,15,14,5,6,3,0,12,1,9,13,4,7,10,8,2,11)] = buf[i];
+		mem[BITSWAP16(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
 	}
 }
 
@@ -866,5 +858,5 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 *           Game Driver(s)            *
 **************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT    ROT     COMPANY       FULLNAME     FLAGS                 LAYOUT */
-GAMEL( 1989, kas89,    0,      kas89,    kas89, kas89_state,    kas89,  ROT90, "SFC S.R.L.", "Kasino '89", GAME_IMPERFECT_SOUND, layout_kas89 )
+/*     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT     COMPANY       FULLNAME     FLAGS                 LAYOUT */
+GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", GAME_IMPERFECT_SOUND, layout_kas89 )

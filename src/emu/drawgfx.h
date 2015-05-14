@@ -1,12 +1,10 @@
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria, Aaron Giles
 /*********************************************************************
 
     drawgfx.h
 
     Generic graphic functions.
-
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************
 
     How to use priority-masked drawing (formerly pdrawgfx):

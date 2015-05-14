@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mike Balfour
 /***************************************************************************
 
     Atari Night Driver hardware

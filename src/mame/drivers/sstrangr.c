@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*******************************************************/
 /*                                                     */
 /* Yachiyo "Space Stranger/Space Stranger 2"           */

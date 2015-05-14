@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Mathis Rosenhauer
 /*************************************************************************
 
     Beezer 6522+6840 audio hardware

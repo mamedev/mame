@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*  Namco System NA1/2 Video Hardware */
 
 /*

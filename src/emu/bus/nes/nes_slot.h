@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:etabeta
 #ifndef __NES_SLOT_H__
 #define __NES_SLOT_H__
 

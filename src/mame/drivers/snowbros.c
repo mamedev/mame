@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:David Haywood, ???
 /***************************************************************************
 
   Snow Brothers (Toaplan) / SemiCom Hardware

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* LC89510 CD Controller
  based off old NeoCD emulator code, adapted to SegaCD, needs reworking to work with NeoCD again
 

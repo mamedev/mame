@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:smf
 /***************************************************************************
 
     National Semiconductor ADC12130 / ADC12132 / ADC12138

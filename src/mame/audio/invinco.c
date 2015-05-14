@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /*
  *  Invinco sound routines
  */

@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /*******************************************************
  *
  *      Portable (hopefully ;-) 8085A emulator

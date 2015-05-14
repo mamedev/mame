@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 /**********************************************************************
 
     8042 Keyboard Controller Emulation

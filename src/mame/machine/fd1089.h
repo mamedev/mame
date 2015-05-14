@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:???
 /***************************************************************************
 
     Hitachi FD1089A/FD1089B encryption emulation

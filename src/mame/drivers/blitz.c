@@ -1,4 +1,6 @@
-/******************************************************************************
+// license:???
+// copyright-holders:Roberto Fresca
+/**************************************************************************************************
 
   MEGA DOUBLE POKER (BLITZ SYSTEM INC.)
   -------------------------------------
@@ -13,7 +15,7 @@
   * Mega Double Poker (conversion kit, set 2). 1990, Blitz System Inc.
 
 
-*******************************************************************************
+***************************************************************************************************
 
   Mega Double Poker is distributed as standalone PCB, or as upgrade kit for
   modified Golden Poker boards. The game has an undumped MC68705P5 MCU, so
@@ -21,8 +23,7 @@
   properly dumped.
 
 
-*******************************************************************************
-
+***************************************************************************************************
 
   Hardware Notes (Mega Double Poker, kit):
 
@@ -95,7 +96,6 @@
   |__________________________________________________________________________|
 
 
-
   PCB Layout: Daughterboard.
    ________________________________________________________
   |                                ::::::::::::::::::::    |
@@ -139,7 +139,6 @@
   |________________________________________________|
 
 
-
   Connections... (pins in parenthesis)
   ------------------------------------
 
@@ -152,91 +151,70 @@
   system accuratelly.
 
 
-
-                                                      CPU  R6502AP (U6)
-                                                    .--------\ /--------.
-  MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20) ---|01 VSS   '  /RES 40|---
-                                        MCU (02) ---|02 RDY    PH2(O) 39|---
-                                        MCU (04) ---|03 PH1(O)    /SO 38|---
-                                                 ---|04 /IRQ   PH0(I) 37|---
-                                                 ---|05 (NC)     (NC) 36|---
-  MCU (03-06), MEGA-2 (01-27-28), MEGA-3 (01-28) ---|06 /NMI     (NC) 35|---
-                                                 ---|07 SYNC      R/W 34|---
-  MCU (03-06), MEGA-2 (01-27-28), MEGA-3 (01-28) ---|08 VCC        D0 33|--- MEGA-2 (11)
-                        MEGA-2 (10), MEGA-3 (10) ---|09 A0         D1 32|--- MEGA-2 (12)
-                        MEGA-2 (09), MEGA-3 (09) ---|10 A1         D2 31|---
-                        MEGA-2 (08), MEGA-3 (08) ---|11 A2         D3 30|--- MEGA-2 (15)
-                        MEGA-2 (07), MEGA-3 (07) ---|12 A3         D4 29|--- MEGA-2 (16)
-                        MEGA-2 (06), MEGA-3 (06) ---|13 A4         D5 28|--- MEGA-2 (17)
-                        MEGA-2 (05), MEGA-3 (05) ---|14 A5         D6 27|--- MEGA-2 (18)
-                        MEGA-2 (04), MEGA-3 (04) ---|15 A6         D7 26|--- MEGA-2 (19)
-                        MEGA-2 (03), MEGA-3 (03) ---|16 A7        A15 25|---
-                        MEGA-2 (25), MEGA-3 (25) ---|17 A8        A14 24|---
-                        MEGA-2 (24), MEGA-3 (24) ---|18 A9        A13 23|--- MEGA-2 (26), MEGA-3 (26)
-                        MEGA-2 (21), MEGA-3 (21) ---|19 A10       A12 22|--- MEGA-2 (02), MEGA-3 (02)
-                        MEGA-2 (23), MEGA-3 (23) ---|20 A11       VSS 21|--- MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20)
-                                                    '-------------------'
-
-
-                                       MCU MC68705P5S (U1)
-                                      .--------\ /--------.
-  MEGA-2 (12, 20), MEGA-3 (12, 20) ---|01 VSS   '  /RES 28|---
-                          CPU (02) ---|02 /INT      PA7 27|---
-  MEGA-2 (01, 28), MEGA-3 (01, 28) ---|03 VCC       PA6 26|---
-                          CPU (03) ---|04 EXTAL     PA5 25|---
-  MEGA-2 (14, 20), MEGA-3 (14, 20) ---|05 XTAL      PA4 24|---
-  MEGA-2 (27, 28), MEGA-3 (27, 28) ---|06 VPP       PA3 23|---
-  MEGA-2 (14, 20), MEGA-3 (14, 20) ---|07 TIMER     PA2 22|---
-                                   ---|08 PC0       PA1 21|---
-                                   ---|09 PC1       PA0 20|---
-                                   ---|10 PC2       PB7 19|---
-                                   ---|11 PC3       PB6 18|---
-                                   ---|12 PB0       PB5 17|---
-                                   ---|13 PB1       PB4 16|---
-                                   ---|14 PB2       PB3 15|---
-                                      '-------------------'
+                                                     CPU  R6502AP (U6)
+                                                   .--------\ /--------.
+  MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20) --|01 VSS   '  /RES 40|--
+                                        MCU (02) --|02 RDY    PH2(O) 39|--
+                                        MCU (04) --|03 PH1(O)    /SO 38|--
+                                                 --|04 /IRQ   PH0(I) 37|--
+                                                 --|05 (NC)     (NC) 36|--
+  MCU (03-06), MEGA-2 (01-27-28), MEGA-3 (01-28) --|06 /NMI     (NC) 35|--
+                                                 --|07 SYNC      R/W 34|--
+  MCU (03-06), MEGA-2 (01-27-28), MEGA-3 (01-28) --|08 VCC        D0 33|-- MEGA-2 (11)
+                        MEGA-2 (10), MEGA-3 (10) --|09 A0         D1 32|-- MEGA-2 (12)
+                        MEGA-2 (09), MEGA-3 (09) --|10 A1         D2 31|--
+                        MEGA-2 (08), MEGA-3 (08) --|11 A2         D3 30|-- MEGA-2 (15)
+                        MEGA-2 (07), MEGA-3 (07) --|12 A3         D4 29|-- MEGA-2 (16)
+                        MEGA-2 (06), MEGA-3 (06) --|13 A4         D5 28|-- MEGA-2 (17)
+                        MEGA-2 (05), MEGA-3 (05) --|14 A5         D6 27|-- MEGA-2 (18)
+                        MEGA-2 (04), MEGA-3 (04) --|15 A6         D7 26|-- MEGA-2 (19)
+                        MEGA-2 (03), MEGA-3 (03) --|16 A7        A15 25|--
+                        MEGA-2 (25), MEGA-3 (25) --|17 A8        A14 24|--
+                        MEGA-2 (24), MEGA-3 (24) --|18 A9        A13 23|-- MEGA-2 (26), MEGA-3 (26)
+                        MEGA-2 (21), MEGA-3 (21) --|19 A10       A12 22|-- MEGA-2 (02), MEGA-3 (02)
+                        MEGA-2 (23), MEGA-3 (23) --|20 A11       VSS 21|-- MCU (01-05-07), MEGA-2 (14-20), MEGA-3 (14-20)
+                                                   '-------------------'
 
 
-                                                  MEGA-2 27C256 (U2)
-                                                 .-------\ /-------.
-                                              ---|01 VPP  '  VCC 28|---
-                                              ---|02 A12     A14 27|---
-                                              ---|03 A7      A13 26|---
-                                              ---|04 A6       A8 25|---
-                                              ---|05 A5       A9 24|---
-                                              ---|06 A4      A11 23|---
-                                              ---|07 A3      /OE 22|---
-                                              ---|08 A2      A10 21|---
-                                              ---|09 A1      /CE 20|--- CPU (01-21), MCU (01-05-07), MEGA-3 (14-20)
-                                              ---|10 A0       D7 19|---
-                                              ---|11 D0       D6 18|---
-                                              ---|12 D1       D5 17|---
-                                              ---|13 D2       D4 16|---
-  CPU (01-21), MCU (01-05-07), MEGA-3 (14-20) ---|14 GND      D3 15|---
-                                                 '-----------------'
+                                      MCU MC68705P5S (U1)
+                                     .--------\ /--------.
+  MEGA-2 (12, 20), MEGA-3 (12, 20) --|01 VSS   '  /RES 28|--
+                          CPU (02) --|02 /INT      PA7 27|--
+  MEGA-2 (01, 28), MEGA-3 (01, 28) --|03 VCC       PA6 26|--
+                          CPU (03) --|04 EXTAL     PA5 25|--
+  MEGA-2 (14, 20), MEGA-3 (14, 20) --|05 XTAL      PA4 24|--
+  MEGA-2 (27, 28), MEGA-3 (27, 28) --|06 VPP       PA3 23|--
+  MEGA-2 (14, 20), MEGA-3 (14, 20) --|07 TIMER     PA2 22|--
+                                   --|08 PC0       PA1 21|--
+                                   --|09 PC1       PA0 20|--
+                                   --|10 PC2       PB7 19|--
+                                   --|11 PC3       PB6 18|--
+                                   --|12 PB0       PB5 17|--
+                                   --|13 PB1       PB4 16|--
+                                   --|14 PB2       PB3 15|--
+                                     '-------------------'
 
 
-                                                  MEGA-3 27C256 (U3)
-                                                 .-------\ /-------.
-                                              ---|01 VPP  '  VCC 28|---
-                                              ---|02 A12     A14 27|---
-                                              ---|03 A7      A13 26|---
-                                              ---|04 A6       A8 25|---
-                                              ---|05 A5       A9 24|---
-                                              ---|06 A4      A11 23|---
-                                              ---|07 A3      /OE 22|---
-                                              ---|08 A2      A10 21|---
-                                              ---|09 A1      /CE 20|--- CPU (01-21), MCU (01-05-07), MEGA-3 (14-20)
-                                              ---|10 A0       D7 19|---
-                                              ---|11 D0       D6 18|---
-                                              ---|12 D1       D5 17|---
-                                              ---|13 D2       D4 16|---
-  CPU (01-21), MCU (01-05-07), MEGA-3 (14-20) ---|14 GND      D3 15|---
-                                                 '-----------------'
+                         MEGA-2 27C256 (U2)                               MEGA-3 27C256 (U3)
+                        .-------\ /-------.                              .-------\ /-------.
+                      --|01 VPP  '  VCC 28|--                          --|01 VPP  '  VCC 28|--
+                      --|02 A12     A14 27|--                          --|02 A12     A14 27|--
+                      --|03 A7      A13 26|--                          --|03 A7      A13 26|--
+                      --|04 A6       A8 25|--                          --|04 A6       A8 25|--
+                      --|05 A5       A9 24|--                          --|05 A5       A9 24|--
+                      --|06 A4      A11 23|--                          --|06 A4      A11 23|--
+                      --|07 A3      /OE 22|--                          --|07 A3      /OE 22|--
+                      --|08 A2      A10 21|--  .-- MCU (01-05-07)      --|08 A2      A10 21|--  .-- MCU (01-05-07)
+                      --|09 A1      /CE 20|----+-- MEGA-3 (14-20)      --|09 A1      /CE 20|----+-- MEGA-2 (14-20)
+                      --|10 A0       D7 19|--  '-- CPU (01-21)         --|10 A0       D7 19|--  '-- CPU (01-21)
+                      --|11 D0       D6 18|--                          --|11 D0       D6 18|--
+                      --|12 D1       D5 17|--                          --|12 D1       D5 17|--
+  MCU (01-05-07) --.  --|13 D2       D4 16|--      MCU (01-05-07) --.  --|13 D2       D4 16|--
+  MEGA-3 (14-20) --+----|14 GND      D3 15|--      MEGA-2 (14-20) --+----|14 GND      D3 15|--
+     CPU (01-21) --'    '-----------------'           CPU (01-21) --'    '-----------------'
 
 
-*******************************************************************************
-
+***************************************************************************************************
 
   ------------------------------------------------
   ***  Memory Map (from Golden Poker hardware) ***
@@ -259,9 +237,7 @@
   $8000 - $FFFF           ; Mirrored from $0000 - $7FFF due to lack of A15 line connection.
 
 
-
-********************************************************************************
-
+****************************************************************************************************
 
   Driver Updates:
   --------------
@@ -276,10 +252,7 @@
   * Added partial docs and diagrams about the CPU/MCU/ROMs addressing.
   * Added debug and technical notes.
 
-
-
-*******************************************************************************/
-
+***************************************************************************************************/
 
 #define MASTER_CLOCK    XTAL_10MHz
 #define CPU_CLOCK       (MASTER_CLOCK/16)
@@ -321,11 +294,9 @@ public:
 };
 
 
-
 /*********************************************
 *               Video Hardware               *
 *********************************************/
-
 
 WRITE8_MEMBER(blitz_state::megadpkr_videoram_w)
 {
@@ -349,7 +320,6 @@ TILE_GET_INFO_MEMBER(blitz_state::get_bg_tile_info)
     ---- ---x   tiles extended address (MSB).
     xx-- ----   unused.
 */
-
 	int attr = m_colorram[tile_index];
 	int code = ((attr & 1) << 8) | m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;  /* bit 1 switch the gfx banks */
@@ -445,10 +415,7 @@ WRITE8_MEMBER(blitz_state::mux_w)
 }
 
 
-/***** Lamps wiring *****
-
-
-*/
+/***** Lamps & Counters wiring *****/
 
 WRITE8_MEMBER(blitz_state::lamps_a_w)
 {
@@ -462,11 +429,8 @@ WRITE8_MEMBER(blitz_state::lamps_a_w)
 //  coin_counter_w(machine(), 0, data & 0x40);    /* counter1 */
 //  coin_counter_w(machine(), 1, data & 0x80);    /* counter2 */
 //  coin_counter_w(machine(), 2, data & 0x20);    /* counter3 */
-
-/*  Counters:
-
-*/
 }
+
 
 WRITE8_MEMBER(blitz_state::sound_w)
 {
@@ -494,7 +458,6 @@ static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
     AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
     AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 */
-
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_SHARE("colorram")
 
@@ -674,7 +637,6 @@ static INPUT_PORTS_START( megadpkr )
 INPUT_PORTS_END
 
 
-
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -815,32 +777,28 @@ ROM_START( megadpkr )
 ROM_END
 
 /*
+  Manufacturer : Blitz system
+  Game name :    Mega Double Poker
+  Platform  :    Bonanza golden poker interface
 
-manufacturer : Blitz system
-Game name :    Mega Double Poker
-Platform  :    Bonanza golden poker interface
+  BoardID
+  BO-BL-01
 
+  Protection:    U11  MC68705P5S  microcontroller with window
 
-BoardID
-BO-BL-01
+  Main CPU:
+  U6  UM6502
+  U5  MK48T02B-15   time/clock backup RAM
 
-Protection:    U11  MC68705P5S  microcontroller with window
+  U2.bin  27C256 ROM
+  U3.bin  27C256 ROM
 
-maincpu:
-U6  UM6502
-U5  MK48T02B-15   time/clock backup ram
+  Graphics IC
+  car1_5a.bin  27C32 ROM
+  car2_4a.bin  27C32 ROM
+  car3_2a.bin  27C32 ROM
 
-U2.bin  27C256 ROM
-U3.bin  27C256 ROM
-
-Graphics ic
-car1_5a.bin  27C32 ROM
-car2_4a.bin  27C32 ROM
-car3_2a.bin  27C32 ROM
-
-
-note : MC68705P5S is protected
-
+  note : MC68705P5S is protected
 */
 
 ROM_START( megadpkrb )
@@ -872,6 +830,6 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY              FULLNAME                                    FLAGS */
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     STATE          INIT  ROT     COMPANY              FULLNAME                                    FLAGS */
 GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, driver_device, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )

@@ -1,3 +1,5 @@
+// license:???
+// copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 /*****************************************************************************
  *
  *   arm7core.h
