@@ -27,7 +27,7 @@ enum
 	E0C6S46_PORT_R4X
 };
 
-// 4 4-bit P ports
+// 4 4-bit P I/O ports
 #define MCFG_E0C6S46_READ_P_CB(R, _devcb) \
 	hmcs40_cpu_device::set_read_r##P##_callback(*device, DEVCB_##_devcb);
 #define MCFG_E0C6S46_WRITE_P_CB(R, _devcb) \
@@ -61,7 +61,6 @@ enum
 
 typedef void (*e0c6s46_pixel_update_func)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state);
 #define E0C6S46_PIXEL_UPDATE_CB(name) void name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
-
 
 
 class e0c6s46_device : public e0c6200_cpu_device
@@ -120,6 +119,10 @@ private:
 	devcb_write8 m_write_r0, m_write_r1, m_write_r2, m_write_r3, m_write_r4;
 	devcb_read8 m_read_p0, m_read_p1, m_read_p2, m_read_p3;
 	devcb_write8 m_write_p0, m_write_p1, m_write_p2, m_write_p3;
+	void write_r(UINT8 port, UINT8 data);
+	void write_r4();
+	void write_p(UINT8 port, UINT8 data);
+	UINT8 read_p(UINT8 port);
 	
 	UINT8 m_port_r[5];
 	UINT8 m_r_dir;

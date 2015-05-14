@@ -3,11 +3,13 @@
 /*
 
   Seiko Epson E0C6S46 MCU
+  QFP5-128pin, see manual for pinout
   
   TODO:
   - K input interrupts
   - finish i/o ports
   - serial interface
+  - add mask options to MCFG (eg. buzzer on output port R4x is optional)
 
 */
 
@@ -185,6 +187,12 @@ void e0c6s46_device::device_reset()
 	m_data->write_byte(0xf7b, 0x0);
 	m_data->write_byte(0xf7d, 0x0);
 	m_data->write_byte(0xf7e, 0x0);
+	
+	// reset ports
+	for (int i = 0; i < 5; i++)
+		write_r(i, m_port_r[i]);
+	for (int i = 0; i < 4; i++)
+		write_p(i, m_port_p[i]);
 }
 
 
@@ -254,6 +262,84 @@ void e0c6s46_device::execute_set_input(int line, int state)
 	UINT8 bit = 1 << (line & 3);
 	
 	m_port_k[port] = (m_port_k[port] & ~bit) | (state ? bit : 0);
+}
+
+
+
+//-------------------------------------------------
+//  ports
+//-------------------------------------------------
+
+// R output ports
+
+void e0c6s46_device::write_r(UINT8 port, UINT8 data)
+{
+	data &= 0xf;
+	m_port_r[port] = data;
+
+	if (port == 4)
+		write_r4();
+
+	// ports R0x-R3x can be high-impedance
+	UINT8 out = data;
+	if (port < 4 && !(m_r_dir >> port & 1))
+		out = 0xf;
+	
+	switch (port)
+	{
+		case 0: m_write_r0(port, out, 0xff); break;
+		case 1: m_write_r1(port, out, 0xff); break;
+		case 2: m_write_r2(port, out, 0xff); break;
+		case 3: m_write_r3(port, out, 0xff); break; // TODO: R33 PTCLK/_SRDY
+	}
+}
+
+void e0c6s46_device::write_r4()
+{
+	// R40: _FOUT(clock inverted output)
+	// R42: FOUT or _BZ
+	// R43: BZ(buzzer) on
+	UINT8 data = m_port_r[4] & 2;
+	
+	m_write_r4(4, data, 0xff);
+}
+
+
+// P I/O ports
+
+void e0c6s46_device::write_p(UINT8 port, UINT8 data)
+{
+	data &= 0xf;
+	m_port_p[port] = data;
+	
+	// don't output if port direction is set to input
+	if (!(m_p_dir >> port & 1))
+		return;
+
+	switch (port)
+	{
+		case 0: m_write_p0(port, data, 0xff); break;
+		case 1: m_write_p1(port, data, 0xff); break;
+		case 2: m_write_p2(port, data, 0xff); break;
+		case 3: m_write_p3(port, data, 0xff); break;
+	}
+}
+
+UINT8 e0c6s46_device::read_p(UINT8 port)
+{
+	// return written value if port direction is set to output
+	if (m_p_dir >> port & 1)
+		return m_port_p[port];
+	
+	switch (port)
+	{
+		case 0: return m_read_p0(port, 0xff);
+		case 1: return m_read_p1(port, 0xff);
+		case 2: return m_read_p2(port, 0xff);
+		case 3: return m_read_p3(port, 0xff);
+	}
+	
+	return 0;
 }
 
 
@@ -471,10 +557,14 @@ READ8_MEMBER(e0c6s46_device::io_r)
 			return m_dfk0;
 
 		// R output ports
+		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54:
+			return m_port_r[offset & 7];
 		case 0x7b:
 			return m_r_dir;
 		
-		// P i/o ports
+		// P I/O ports
+		case 0x60: case 0x61: case 0x62: case 0x63:
+			return read_p(offset & 3);
 		case 0x7d:
 			return m_p_dir;
 		case 0x7e:
@@ -551,15 +641,35 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			break;
 		
 		// R output ports
+		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54:
+			write_r(offset & 7, data);
+			break;
 		case 0x7b:
 			// d0-d3: Rx* direction 0: high impedance, 1: output
-			m_r_dir = data;
+			if (data != m_r_dir)
+			{
+				m_r_dir = data;
+
+				// refresh outputs
+				for (int i = 0; i < 5; i++)
+					write_r(i, m_port_r[i]);
+			}
 			break;
 		
-		// P i/o ports
+		// P I/O ports
+		case 0x60: case 0x61: case 0x62: case 0x63:
+			write_p(offset & 3, data);
+			break;
 		case 0x7d:
 			// d0-d3: Px* direction 0: input, 1: output
-			m_p_dir = data;
+			if (data != m_p_dir)
+			{
+				m_p_dir = data;
+
+				// refresh outputs
+				for (int i = 0; i < 4; i++)
+					write_p(i, m_port_p[i]);
+			}
 			break;
 		case 0x7e:
 			// d0-d3: Px* pull up resistor on/off
