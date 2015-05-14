@@ -386,7 +386,11 @@ ATTR_COLD void netlist_core_device_t::init(netlist_base_t &anetlist, const pstri
 
 #if USE_PMFDELEGATES
 	void (netlist_core_device_t::* pFunc)() = &netlist_core_device_t::update;
+#if NO_USE_PMFCONVERSION
+	static_update = pFunc;
+#else
 	static_update = reinterpret_cast<net_update_delegate>((this->*pFunc));
+#endif
 #endif
 
 }
@@ -1019,7 +1023,10 @@ ATTR_COLD nl_double netlist_param_model_t::model_value(const pstring &entity, co
 		return atof(tmp.cstr()) * factor;
 	}
 	else
+	{
+		netlist().log("Entity %s not found in model %s\n", entity.cstr(), tmp.cstr());
 		return defval;
+	}
 }
 
 

@@ -173,7 +173,11 @@
 class netlist_core_device_t;
 
 #if USE_PMFDELEGATES
+#if NO_USE_PMFCONVERSION
+typedef void (netlist_core_device_t::*net_update_delegate)();
+#else
 typedef void (*net_update_delegate)(netlist_core_device_t *);
+#endif
 #endif
 
 //============================================================
@@ -972,7 +976,11 @@ public:
 		begin_timing(stat_total_time);
 		inc_stat(stat_update_count);
 #if USE_PMFDELEGATES
+#if	NO_USE_PMFCONVERSION
+		(this->*static_update)();
+#else
 		static_update(this);
+#endif
 #else
 		update();
 #endif

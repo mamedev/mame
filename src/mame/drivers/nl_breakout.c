@@ -114,7 +114,7 @@ CIRCUIT_LAYOUT( breakout )
     // FIXME: PARALLEL Doesn't work in breakout.
     PARAM(Solver.PARALLEL, 0)
 #endif
-    //PARAM(NETLIST.USE_DEACTIVATE, 1)
+    PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	// DIPSWITCH - Free game
 	SWITCH(S1_1)

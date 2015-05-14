@@ -8,7 +8,9 @@
 #include "nld_74279.h"
 
 nld_74279A::truthtable_t nld_74279A::m_ttbl;
+nld_74279B::truthtable_t nld_74279B::m_ttbl;
 
+#if 0
 const char *nld_74279A::m_desc[] = {
 		"S,R,PQ,PS,PR|Q",
 		"0,0,X,X,X|1|22",
@@ -19,7 +21,6 @@ const char *nld_74279A::m_desc[] = {
 		""
 };
 
-nld_74279B::truthtable_t nld_74279B::m_ttbl;
 
 const char *nld_74279B::m_desc[] = {
 		"S1,S2,R,PQ,PS1,PS2,PR|Q",
@@ -32,6 +33,29 @@ const char *nld_74279B::m_desc[] = {
 		"1,1,1,1,X,X,X|1|22",
 		""
 };
+#else
+const char *nld_74279A::m_desc[] = {
+		"S,R,_Q|Q",
+		"0,X,X|1|22",
+		"1,0,X|0|27",
+		"1,1,0|0|27", //15
+		"1,1,1|1|22",
+		""
+};
+
+
+const char *nld_74279B::m_desc[] = {
+		"S1,S2,R,_Q|Q",
+		"0,X,X,X|1|22",
+		"X,0,X,X|1|22",
+		"1,1,0,X|0|27",
+		"1,1,1,0|0|27", // 15
+		"1,1,1,1|1|22",
+		""
+};
+
+#endif
+
 
 NETLIB_START(74279_dip)
 {
