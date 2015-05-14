@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:ElSemi, R.Belmont
 #include "emu.h"
 #include "scspdsp.h"
