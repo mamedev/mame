@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jarek Burczynski
 /*****************************************************************************
 *
 *   Yamaha YM2151 driver (version 2.150 final beta)

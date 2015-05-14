@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:ElSemi, R.Belmont
 #pragma once
 
 #ifndef __SCSPDSP_H__

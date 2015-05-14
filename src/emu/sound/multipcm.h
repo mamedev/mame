@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Miguel Angel Horna
 #pragma once
 
 #ifndef __MULTIPCM_H__

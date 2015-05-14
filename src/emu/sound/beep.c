@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:?
+// copyright-holders:Kevin Thacker
 /***************************************************************************
 
     beep.c

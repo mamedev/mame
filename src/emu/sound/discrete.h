@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Keith Wilkins, D.Renaud, F.Palazzolo, Couriersud
 #pragma once
 
 #ifndef __DISCRETE_H__

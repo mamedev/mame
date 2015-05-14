@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Keith Wilkins
 #pragma once
 
 #ifndef __DISC_DEV_H__

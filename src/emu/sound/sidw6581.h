@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Dag Lem
 #ifndef WAVE6581_h
 #define WAVE6581_h
 

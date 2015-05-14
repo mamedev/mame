@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Peter Trauner
 //
 // /home/ms/source/sidplay/libsidplay/emu/RCS/envelope.h,v
 //

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:ElSemi, R.Belmont
 #include "emu.h"
 #include "scspdsp.h"
 

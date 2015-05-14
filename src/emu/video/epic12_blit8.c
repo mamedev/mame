@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
 /* Special case 'Really Simple' blitters, no blending, no tinting etc.*/
 
 #include "emu.h"

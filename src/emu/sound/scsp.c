@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:ElSemi, R.Belmont
 /*
     Sega/Yamaha YMF292-F (SCSP = Saturn Custom Sound Processor) emulation
     By ElSemi

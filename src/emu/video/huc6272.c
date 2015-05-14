@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /***************************************************************************
 
     Hudson/NEC HuC6272 "King" device
