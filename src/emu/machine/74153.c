@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*****************************************************************************
 
   74153 Dual 4-line to 1-line data selectors/multiplexers

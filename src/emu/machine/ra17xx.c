@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Juergen Buchmueller
 /**********************************************************************
 
     Rockwell A17XX ROM, RAM and I/O chip

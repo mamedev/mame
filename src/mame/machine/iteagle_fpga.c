@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Ted Green
 #include "iteagle_fpga.h"
 #include "coreutil.h"
 

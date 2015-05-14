@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:smf
 #include "t10spc.h"
 
 void t10spc::t10_start(device_t &device)

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:smf
+// copyright-holders:smf, Mariusz Wojcieszek
 /***************************************************************************
 
     Matsushita/Panasonic CDR521/522 type CDROM drive emulation
