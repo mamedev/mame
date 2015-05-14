@@ -1354,6 +1354,7 @@ DRIVER_INIT_MEMBER(peplus_state,peplussb)
 	m_wingboard = FALSE;
 	m_jumper_e16_e17 = FALSE;
 	peplus_load_superdata("user1");
+}
 
 /* Superboard with 64K CG rom set */
 DRIVER_INIT_MEMBER(peplus_state,pepluss64)
@@ -1363,7 +1364,6 @@ DRIVER_INIT_MEMBER(peplus_state,pepluss64)
 	m_wingboard = FALSE;
 	m_jumper_e16_e17 = TRUE;
 	peplus_load_superdata("user1");
-}
 }
 
 /* Superboard with Attached Wingboard */
