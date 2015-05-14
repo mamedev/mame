@@ -6,8 +6,8 @@
   
   TODO:
   - K input interrupts
+  - finish i/o ports
   - serial interface
-  - output ports
 
 */
 
@@ -46,6 +46,9 @@ e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, d
 	, m_vram1(*this, "vram1")
 	, m_vram2(*this, "vram2")
 	, m_pixel_update_handler(NULL)
+	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this)
+	, m_read_p0(*this), m_read_p1(*this), m_read_p2(*this), m_read_p3(*this)
+	, m_write_p0(*this), m_write_p1(*this), m_write_p2(*this), m_write_p3(*this)
 { }
 
 
@@ -58,6 +61,22 @@ void e0c6s46_device::device_start()
 {
 	e0c6200_cpu_device::device_start();
 	
+	// find ports
+	m_write_r0.resolve_safe();
+	m_write_r1.resolve_safe();
+	m_write_r2.resolve_safe();
+	m_write_r3.resolve_safe();
+	m_write_r4.resolve_safe();
+
+	m_read_p0.resolve_safe(0);
+	m_read_p1.resolve_safe(0);
+	m_read_p2.resolve_safe(0);
+	m_read_p3.resolve_safe(0);
+	m_write_p0.resolve_safe();
+	m_write_p1.resolve_safe();
+	m_write_p2.resolve_safe();
+	m_write_p3.resolve_safe();
+
 	// create timers
 	m_clktimer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::clktimer_cb), this));
 	m_clktimer_handle->adjust(attotime::from_ticks(128, unscaled_clock()));
@@ -65,8 +84,15 @@ void e0c6s46_device::device_start()
 	m_stopwatch_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
 	m_prgtimer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::prgtimer_cb), this));
 	m_prgtimer_handle->adjust(attotime::never);
+	m_buzzer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::buzzer_cb), this));
+	m_buzzer_handle->adjust(attotime::never);
 	
 	// zerofill
+	memset(m_port_r, 0x0, sizeof(m_port_r));
+	m_r_dir = 0;
+	memset(m_port_p, 0x0, sizeof(m_port_p));
+	m_p_dir = 0;
+	m_p_pullup = 0;
 	memset(m_port_k, 0xf, sizeof(m_port_k));
 	m_dfk0 = 0xf;
 	
@@ -95,6 +121,11 @@ void e0c6s46_device::device_start()
 	m_prgtimer_reload = 0;
 	
 	// register for savestates
+	save_item(NAME(m_port_r));
+	save_item(NAME(m_r_dir));
+	save_item(NAME(m_port_p));
+	save_item(NAME(m_p_dir));
+	save_item(NAME(m_p_pullup));
 	save_item(NAME(m_port_k));
 	save_item(NAME(m_dfk0));
 	
@@ -359,6 +390,13 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
 }
 
 
+// buzzer
+
+TIMER_CALLBACK_MEMBER(e0c6s46_device::buzzer_cb)
+{
+}
+
+
 
 //-------------------------------------------------
 //  LCD Driver
@@ -426,11 +464,21 @@ READ8_MEMBER(e0c6s46_device::io_r)
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
 			return m_irqmask[offset-0x10];
 		
-		// k input ports
+		// K input ports
 		case 0x40: case 0x42:
 			return m_port_k[offset >> 1 & 1];
 		case 0x41:
 			return m_dfk0;
+
+		// R output ports
+		case 0x7b:
+			return m_r_dir;
+		
+		// P i/o ports
+		case 0x7d:
+			return m_p_dir;
+		case 0x7e:
+			return m_p_pullup;
 		
 		// clock timer (lo, hi)
 		case 0x20: case 0x21:
@@ -496,10 +544,26 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			break;
 		}
 		
-		// k input ports
+		// K input ports
 		case 0x41:
-			// d0-d3: K0x input port irq on 0: rising edge, 1: falling edge, 
+			// d0-d3: K0x irq on 0: rising edge, 1: falling edge
 			m_dfk0 = data;
+			break;
+		
+		// R output ports
+		case 0x7b:
+			// d0-d3: Rx* direction 0: high impedance, 1: output
+			m_r_dir = data;
+			break;
+		
+		// P i/o ports
+		case 0x7d:
+			// d0-d3: Px* direction 0: input, 1: output
+			m_p_dir = data;
+			break;
+		case 0x7e:
+			// d0-d3: Px* pull up resistor on/off
+			m_p_pullup = data;
 			break;
 		
 		// OSC circuit
