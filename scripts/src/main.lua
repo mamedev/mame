@@ -205,14 +205,17 @@ function mainProject(_target, _subtarget)
 		kind "SharedLib"
 		targetsuffix "_libretro"
 		targetprefix ""
+		links {
+			"libco",
+		}
+
+		-- These kind of presume OS X for now, more robust solution
+		-- once we get that working...
 		buildoptions {
 			"-fPIC",
 		}
 		linkoptions {
 			"-fPIC",
-		}
-		links {
-			"libco",
 		}
 	end
 end
