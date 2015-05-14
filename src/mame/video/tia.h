@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol,???
 #ifndef _VIDEO_TIA_H_
 #define _VIDEO_TIA_H_
 

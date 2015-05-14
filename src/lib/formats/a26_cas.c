@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /*
 
 Atari 2600 SuperCharger support
