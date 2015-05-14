@@ -219,7 +219,7 @@ void e0c6s46_device::execute_set_input(int line, int state)
 		return;
 
 	state = (state) ? 1 : 0;
-	int port = line >> 3 & 1;
+	int port = line >> 2 & 1;
 	UINT8 bit = 1 << (line & 3);
 	
 	m_port_k[port] = (m_port_k[port] & ~bit) | (state ? bit : 0);
@@ -304,7 +304,6 @@ void e0c6s46_device::clock_stopwatch()
 	}
 }
 
-
 TIMER_CALLBACK_MEMBER(e0c6s46_device::stopwatch_cb)
 {
 	m_swl_src_pulse ^= 1;
@@ -344,7 +343,6 @@ bool e0c6s46_device::prgtimer_reset_prescaler()
 	
 	return (sel >= 2);
 }
-
 
 TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
 {
