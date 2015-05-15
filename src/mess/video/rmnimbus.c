@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:Phill Harvey-Smith
+// copyright-holders:Phill Harvey-Smith, Carl
 /*
     video/rmnimbus.c
 
