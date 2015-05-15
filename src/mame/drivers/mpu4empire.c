@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* MPU4 games by 'Empire' */
 
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /*****************************************************************************************
 
     Maygay M1 A/B driver, (under heavy construction !!!)

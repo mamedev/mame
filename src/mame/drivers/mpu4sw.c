@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* mpu4 sets which have been split, and appear to do something useful
 
   I'm trying to keep this file to official Barcrest / BwB rebuilds on mod4 hw

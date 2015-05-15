@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Unkonwn JPM Platform */
 /* only Ker - Chinq has sound roms, they seem to map in cpu space, sound roms are probably missing from the rest? */
 

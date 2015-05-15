@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Dream Ball
 
 PCB DE-0386-2

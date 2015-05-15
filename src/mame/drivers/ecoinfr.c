@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Electrocoin Fruit Machines
 
  This seems to be the most common Electrocoin hardware type, used

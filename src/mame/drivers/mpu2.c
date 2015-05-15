@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* There were also MPU0 and MPU1 units
 
  Information from 'MAGIK'

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* MPU4 'Plasma' addition */
 
 /* the Plasma was an oversized DMD, but was rarely used, Big Chief might be the only game with it, at least it's the only dump we have? */

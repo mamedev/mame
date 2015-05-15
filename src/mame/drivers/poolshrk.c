@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Stefan Jokisch, Nicola Salmoria
+// license:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
 Atari Poolshark Driver

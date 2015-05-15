@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* MPU4 BwB games
  - these are Bwb originals, not rebuilds..
    typically they have large 0x3f fills in rom..

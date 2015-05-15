@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Atronic Russian Video Fruit Machines */
 /*
  From 1999? (documentation is dated August 99)

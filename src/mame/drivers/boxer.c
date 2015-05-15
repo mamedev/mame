@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Stefan Jokisch
+// license:???
+// copyright-holders:Stefan Jokisch
 /***************************************************************************
 
     Atari Boxer (prototype) driver

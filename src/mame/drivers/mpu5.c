@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* for MPU5 hardware emulation see mpu5hw.c, this just contains the set listing and per machine configs */
 
 #include "emu.h"

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 
 /**************************************************************************************************
   JPM System 5 non-video software
