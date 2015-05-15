@@ -446,7 +446,7 @@ project "sqllite3"
 --------------------------------------------------
 -- portmidi library objects
 --------------------------------------------------
-if _OPTIONS["NO_USE_MIDI"]=="0" then
+if _OPTIONS["NO_USE_MIDI"]~="1" then
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
 	kind "StaticLib"

@@ -104,7 +104,7 @@ function mainProject(_target, _subtarget)
 		"jsoncpp",
 		"mongoose",
 	}
-	if _OPTIONS["NO_USE_MIDI"]=="0" then
+	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
 			"portmidi",
 		}
