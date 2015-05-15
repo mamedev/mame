@@ -508,7 +508,7 @@ void e0c6s46_device::schedule_buzzer()
 	// pulse width differs per frequency selection
 	int mul = (m_bz_freq & 4) ? 1 : 2;
 	int high = ((m_bz_freq & 2) ? 12 : 8) - m_bz_duty_ratio;
-	int low = (16 + (m_bz_freq & 3)) - high;
+	int low = (16 + (m_bz_freq << 2 & 0xc)) - high;
 	
 	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * unscaled_clock()));
 }
