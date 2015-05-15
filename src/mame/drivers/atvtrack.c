@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, Samuele Zannoli
 /*
   ATV Track
   (c)2002 Gaelco
