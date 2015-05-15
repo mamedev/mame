@@ -9,6 +9,8 @@
   - K input interrupts
   - finish i/o ports
   - serial interface
+  - one-shot buzzer
+  - buzzer envelope
   - add mask options to MCFG (eg. buzzer on output port R4x is optional)
 
 */
@@ -80,10 +82,8 @@ void e0c6s46_device::device_start()
 	m_write_p3.resolve_safe();
 
 	// create timers
-	m_clktimer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::clktimer_cb), this));
-	m_clktimer_handle->adjust(attotime::from_ticks(128, unscaled_clock()));
-	m_stopwatch_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::stopwatch_cb), this));
-	m_stopwatch_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
+	m_core_256_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::core_256_cb), this));
+	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
 	m_prgtimer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::prgtimer_cb), this));
 	m_prgtimer_handle->adjust(attotime::never);
 	m_buzzer_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::buzzer_cb), this));
@@ -105,11 +105,11 @@ void e0c6s46_device::device_start()
 	m_lcd_control = 0;
 	m_lcd_contrast = 0;
 
+	m_256_src_pulse = 0;
 	m_watchdog_count = 0;
 	m_clktimer_count = 0;
 
 	m_stopwatch_on = 0;
-	m_swl_src_pulse = 0;
 	m_swl_cur_pulse = 0;
 	m_swl_slice = 0;
 	m_swl_count = 0;
@@ -121,6 +121,12 @@ void e0c6s46_device::device_start()
 	m_prgtimer_cur_pulse = 0;
 	m_prgtimer_count = 0;
 	m_prgtimer_reload = 0;
+
+	m_bz_43_on = 0;
+	m_bz_freq = 0;
+	m_bz_envelope = 0;
+	m_bz_duty_ratio = 0;
+	m_bz_pulse = 0;
 	
 	// register for savestates
 	save_item(NAME(m_port_r));
@@ -138,11 +144,11 @@ void e0c6s46_device::device_start()
 	save_item(NAME(m_lcd_control));
 	save_item(NAME(m_lcd_contrast));
 
+	save_item(NAME(m_256_src_pulse));
 	save_item(NAME(m_watchdog_count));
 	save_item(NAME(m_clktimer_count));
 
 	save_item(NAME(m_stopwatch_on));
-	save_item(NAME(m_swl_src_pulse));
 	save_item(NAME(m_swl_cur_pulse));
 	save_item(NAME(m_swl_slice));
 	save_item(NAME(m_swl_count));
@@ -154,6 +160,12 @@ void e0c6s46_device::device_start()
 	save_item(NAME(m_prgtimer_cur_pulse));
 	save_item(NAME(m_prgtimer_count));
 	save_item(NAME(m_prgtimer_reload));
+
+	save_item(NAME(m_bz_43_on));
+	save_item(NAME(m_bz_freq));
+	save_item(NAME(m_bz_envelope));
+	save_item(NAME(m_bz_duty_ratio));
+	save_item(NAME(m_bz_pulse));
 }
 
 
@@ -277,9 +289,6 @@ void e0c6s46_device::write_r(UINT8 port, UINT8 data)
 	data &= 0xf;
 	m_port_r[port] = data;
 
-	if (port == 4)
-		write_r4();
-
 	// ports R0x-R3x can be high-impedance
 	UINT8 out = data;
 	if (port < 4 && !(m_r_dir >> port & 1))
@@ -291,17 +300,27 @@ void e0c6s46_device::write_r(UINT8 port, UINT8 data)
 		case 1: m_write_r1(port, out, 0xff); break;
 		case 2: m_write_r2(port, out, 0xff); break;
 		case 3: m_write_r3(port, out, 0xff); break; // TODO: R33 PTCLK/_SRDY
+		
+		// R4x: special output
+		case 4:
+			// d3: buzzer on: direct output or 1-shot output
+			if ((data >> 3 & 1) != m_bz_43_on)
+			{
+				m_bz_43_on = data >> 3 & 1;
+				reset_buzzer();
+			}
+			write_r4_out();
+			break;
 	}
 }
 
-void e0c6s46_device::write_r4()
+void e0c6s46_device::write_r4_out()
 {
 	// R40: _FOUT(clock inverted output)
 	// R42: FOUT or _BZ
-	// R43: BZ(buzzer) on
-	UINT8 data = m_port_r[4] & 2;
-	
-	m_write_r4(4, data, 0xff);
+	// R43: BZ(buzzer)
+	UINT8 out = (m_port_r[4] & 2) | (m_bz_pulse << 3) | (m_bz_pulse << 2 ^ 4);
+	m_write_r4(4, out, 0xff);
 }
 
 
@@ -348,7 +367,25 @@ UINT8 e0c6s46_device::read_p(UINT8 port)
 //  timers
 //-------------------------------------------------
 
-// clock timer
+TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
+{
+	// clock-timer, stopwatch timer, and some features of the buzzer all run
+	// from the same internal 256hz timer (64 ticks high+low at default clock of 32768hz)
+	m_256_src_pulse ^= 1;
+	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
+
+	// clock-timer is always running, advance it on falling edge
+	if (m_256_src_pulse == 0)
+		clock_clktimer();
+
+	// clock stopwatch on falling edge of pulse+on
+	m_swl_cur_pulse = m_256_src_pulse | (m_stopwatch_on ^ 1);
+	if (m_swl_cur_pulse == 0)
+		clock_stopwatch();
+}
+
+
+// clock-timer
 
 void e0c6s46_device::clock_watchdog()
 {
@@ -361,7 +398,7 @@ void e0c6s46_device::clock_watchdog()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(e0c6s46_device::clktimer_cb)
+void e0c6s46_device::clock_clktimer()
 {
 	m_clktimer_count++;
 	
@@ -380,9 +417,6 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::clktimer_cb)
 	if (m_irqflag[IRQREG_CLKTIMER] & m_irqmask[IRQREG_CLKTIMER])
 		m_possible_irq = true;
 	
-	// schedule next timeout (256hz at default clock of 32768hz)
-	m_clktimer_handle->adjust(attotime::from_ticks(128, unscaled_clock()));
-
 	// 1hz falling edge also clocks the watchdog timer
 	if (m_clktimer_count == 0)
 		clock_watchdog();
@@ -419,19 +453,6 @@ void e0c6s46_device::clock_stopwatch()
 		if (m_irqflag[IRQREG_STOPWATCH] & m_irqmask[IRQREG_STOPWATCH])
 			m_possible_irq = true;
 	}
-}
-
-TIMER_CALLBACK_MEMBER(e0c6s46_device::stopwatch_cb)
-{
-	m_swl_src_pulse ^= 1;
-	m_swl_cur_pulse = m_swl_src_pulse | (m_stopwatch_on ^ 1);
-	
-	// clock stopwatch on falling edge of pulse+on
-	if (m_swl_cur_pulse == 0)
-		clock_stopwatch();
-	
-	// schedule next timeout (256hz high+low at default clock of 32768hz)
-	m_stopwatch_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
 }
 
 
@@ -478,8 +499,34 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
 
 // buzzer
 
+void e0c6s46_device::schedule_buzzer()
+{
+	// only schedule next buzzer timeout if it's on
+	if (m_bz_43_on != 0)
+		return;
+	
+	// pulse width differs per frequency selection
+	int mul = (m_bz_freq & 4) ? 1 : 2;
+	int high = ((m_bz_freq & 2) ? 12 : 8) - m_bz_duty_ratio;
+	int low = (16 + (m_bz_freq & 3)) - high;
+	
+	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * unscaled_clock()));
+}
+
 TIMER_CALLBACK_MEMBER(e0c6s46_device::buzzer_cb)
 {
+	// invert pulse wave and write to output
+	m_bz_pulse ^= 1;
+	write_r4_out();
+
+	schedule_buzzer();
+}
+
+void e0c6s46_device::reset_buzzer()
+{
+	// don't reset if the timer is running
+	if (m_buzzer_handle->remaining() == attotime::never)
+		schedule_buzzer();
 }
 
 
@@ -570,7 +617,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 		case 0x7e:
 			return m_p_pullup;
 		
-		// clock timer (lo, hi)
+		// clock-timer (lo, hi)
 		case 0x20: case 0x21:
 			return m_clktimer_count >> (4 * (offset & 1)) & 0xf;
 		
@@ -591,6 +638,13 @@ READ8_MEMBER(e0c6s46_device::io_r)
 			return m_prgtimer_on;
 		case 0x79:
 			return m_prgtimer_select;
+		
+		// buzzer
+		case 0x74:
+			return m_bz_freq;
+		case 0x75:
+			// d3: 1-shot buzzer is running
+			return 0 | m_bz_envelope;
 		
 		// OSC circuit
 		case 0x70:
@@ -645,7 +699,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			write_r(offset & 7, data);
 			break;
 		case 0x7b:
-			// d0-d3: Rx* direction 0: high impedance, 1: output
+			// d0-d3: Rx* direction 0: high-impedance, 1: output
 			if (data != m_r_dir)
 			{
 				m_r_dir = data;
@@ -705,10 +759,10 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			m_svd = data & 7;
 			break;
 		
-		// clock timer
+		// clock-timer
 		case 0x76:
 			// d0: reset watchdog
-			// d1: reset clock timer (hw glitch note, not emulated: this also "sometimes"(when??)
+			// d1: reset clktimer (hw glitch note, not emulated: this also "sometimes"(when??)
 			// sets the clktimer interrupt and clocks the watchdog)
 			if (data & 1)
 				m_watchdog_count = 0;
@@ -727,7 +781,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 				m_swl_count = 0;
 				m_swl_slice = 0;
 			}
-			if (m_stopwatch_on && m_swl_cur_pulse && !m_swl_src_pulse)
+			if (m_stopwatch_on && m_swl_cur_pulse && !m_256_src_pulse)
 			{
 				// clock stopwatch on falling edge of pulse+on
 				m_swl_cur_pulse = 0;
@@ -771,6 +825,20 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 				prgtimer_reset_prescaler();
 			}
 			m_prgtimer_select = data;
+			break;
+
+		// buzzer
+		case 0x74:
+			// d0-d2: frequency (8 steps, 4096hz to ~1170hz)
+			// d3: 1-shot buzzer duration 31.25ms or 62.5ms
+			m_bz_freq = data;
+			break;
+		case 0x75:
+			// d0: envelope on/off
+			// d1: envelope cycle selection
+			// d2: reset envelope
+			// d3: trigger one-shot buzzer
+			m_bz_envelope = data & 3;
 			break;
 		
 		// read-only registers

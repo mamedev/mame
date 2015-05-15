@@ -27,6 +27,8 @@ public:
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
+	DECLARE_WRITE8_MEMBER(speaker_w);
+
 	DECLARE_PALETTE_INIT(tama);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 };
@@ -59,7 +61,7 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 	// above screen: 0:meal, 1:lamp, 2:play, 3:medicine
 	// under screen: 4:bath, 5:scales, 6:shout, 7:attention
 
-	// they are on pin SEG08(x=35) + COM00-03, pin SEG28(x=36) + COM12-15
+	// they are on pin SEG8(x=35) + COM0-3, pin SEG28(x=36) + COM12-15
 	if (x == 35 && y < 4)
 		output_set_lamp_value(y, state);
 	else if (x == 36 && y >= 12)
@@ -75,6 +77,20 @@ PALETTE_INIT_MEMBER(tamag1_state, tama)
 {
 	palette.set_pen_color(0, rgb_t(0xf0, 0xf2, 0xff)); // background
 	palette.set_pen_color(1, rgb_t(0x3c, 0x38, 0x38)); // lcd pixel
+}
+
+
+
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
+WRITE8_MEMBER(tamag1_state::speaker_w)
+{
+	// R43: speaker out
+	m_speaker->level_w(data >> 3 & 1);
 }
 
 
@@ -115,6 +131,7 @@ static MACHINE_CONFIG_START( tama, tamag1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)
 	MCFG_E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(tamag1_state, speaker_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
