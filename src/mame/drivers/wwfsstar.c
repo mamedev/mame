@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*******************************************************************************
  WWF Superstars (C) 1989 Technos Japan  (drivers/wwfsstar.c)

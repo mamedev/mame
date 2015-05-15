@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* This is MPU4 MOD4 with a Y2413 instead of an OKI */
 

@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood, MetalliC
 /*
  todo: bank handlers etc. should be installed on a per-game basis

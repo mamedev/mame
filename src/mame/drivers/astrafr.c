@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Astra Fruit Machines
  -- Unknown 68340 based HW platform (seems related to pluto5.c?)

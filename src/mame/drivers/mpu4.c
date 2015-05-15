@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* these are the MPU4 set listings / set specific code, for hardware emulation see mpu4hw.c */
 
