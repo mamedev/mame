@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, Hau
 #define RASTER_LINES 262
 #define FIRST_VISIBLE_LINE 0
 #define LAST_VISIBLE_LINE 223

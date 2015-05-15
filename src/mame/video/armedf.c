@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
 /***************************************************************************
 
   Armed Formation video emulation

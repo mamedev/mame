@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Samuele Zannoli
 /*
  * geforce 3d (NV2A) vertex program disassembler
  */

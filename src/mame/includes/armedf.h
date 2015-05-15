@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
 #include "includes/nb1414m4.h"
 #include "video/bufsprite.h"
 
