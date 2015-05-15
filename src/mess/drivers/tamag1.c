@@ -75,7 +75,7 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 
 PALETTE_INIT_MEMBER(tamag1_state, tama)
 {
-	palette.set_pen_color(0, rgb_t(0xf0, 0xf2, 0xff)); // background
+	palette.set_pen_color(0, rgb_t(0xf1, 0xf0, 0xf9)); // background
 	palette.set_pen_color(1, rgb_t(0x3c, 0x38, 0x38)); // lcd pixel
 }
 
@@ -167,4 +167,4 @@ ROM_START( tama )
 ROM_END
 
 
-CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", GAME_SUPPORTS_SAVE )
