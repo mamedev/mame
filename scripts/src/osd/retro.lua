@@ -17,13 +17,13 @@ project ("osd_" .. _OPTIONS["osd"])
 	removeflags {
 		"SingleOutputDir",
 	}
-	
+
 	options {
 		"ForceCPP",
 	}
 
 	dofile("retro_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
@@ -38,10 +38,10 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
- 		MAME_DIR .. "src/osd/osdnet.c",
- 		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
+		MAME_DIR .. "src/osd/osdnet.c",
+		MAME_DIR .. "src/osd/modules/netdev/taptun.c",
 		MAME_DIR .. "src/osd/modules/netdev/pcap.c",
- 		MAME_DIR .. "src/osd/modules/netdev/none.c",
+		MAME_DIR .. "src/osd/modules/netdev/none.c",
 		MAME_DIR .. "src/osd/modules/debugger/debugint.c",
 		MAME_DIR .. "src/osd/modules/debugger/none.c",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.c",
@@ -71,7 +71,7 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/retro/libretro-common/glsym/glsym_gl.c",
 		}
 	end
-	
+
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind "StaticLib"
@@ -81,11 +81,11 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 
 	removeflags {
-		"SingleOutputDir",	
+		"SingleOutputDir",
 	}
 
-   dofile("retro_cfg.lua")
-	
+	dofile("retro_cfg.lua")
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/osd",
@@ -114,8 +114,8 @@ project ("ocore_" .. _OPTIONS["osd"])
 	end
 
 	files {
- 		MAME_DIR .. "src/osd/osdcore.c",
- 		MAME_DIR .. "src/osd/modules/osdmodule.c",
+		MAME_DIR .. "src/osd/osdcore.c",
+		MAME_DIR .. "src/osd/modules/osdmodule.c",
 		MAME_DIR .. "src/osd/modules/font/font_none.c",
 		MAME_DIR .. "src/osd/modules/lib/osdlib_retro.c",
 		MAME_DIR .. "src/osd/modules/midi/none.c",
@@ -154,38 +154,38 @@ project ("libco")
 -- #
 -- ###########################################################################
 --X DEFS += -DOSD_RETRO
--- 
+--
 -- CCOMFLAGS += -include $(SRC)/osd/retro/retroprefix.h
--- 
+--
 -- #-------------------------------------------------
 -- # object and source roots
 -- #-------------------------------------------------
--- 
+--
 -- MINISRC = $(SRC)/osd/$(OSD)
 -- MINIOBJ = $(OBJ)/osd/$(OSD)
--- 
+--
 -- LIBCOOBJ = $(MINIOBJ)/libretro-common/libco
--- 
+--
 -- OSDSRC = $(SRC)/osd
 -- OSDOBJ = $(OBJ)/osd
--- 
+--
 -- OBJDIRS += $(MINIOBJ) \
 -- 	$(OSDOBJ)/modules/sync \
 -- 	$(OSDOBJ)/modules/lib \
 -- 	$(OSDOBJ)/modules/midi \
 -- 	$(OSDOBJ)/modules/font \
 -- 	$(LIBCOOBJ)
--- 
--- 
+--
+--
 -- ifeq ($(VRENDER),opengl)
 -- GLOBJ = $(OBJ)/osd/$(OSD)/libretro-common/glsym
 -- OBJDIRS += $(GLOBJ)
 -- endif
--- 
+--
 -- #-------------------------------------------------
 -- # OSD core library
 -- #-------------------------------------------------
--- 
+--
 --X OSDCOREOBJS := \
 --X 	$(MINIOBJ)/retrodir.o \
 --X 	$(MINIOBJ)/retrofile.o \
@@ -195,20 +195,20 @@ project ("libco")
 --X 	$(OSDOBJ)/modules/sync/sync_retro.o \
 --X 	$(OSDOBJ)/modules/midi/none.o \
 --X 	$(OSDOBJ)/modules/osdmodule.o \
--- 
--- 
+--
+--
 -- INCPATH += -I$(SRC)/osd/retro/libretro-common/include
--- 
+--
 --X ifdef NOASM
 --X OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_mini.o
 --X else
 --X OSDCOREOBJS += $(OSDOBJ)/modules/sync/work_osd.o
 --X endif
--- 
+--
 -- #-------------------------------------------------
 -- # OSD mini library
 -- #-------------------------------------------------
--- 
+--
 --X OSDOBJS = \
 --X 	$(MINIOBJ)/libretro.o \
 --X 	$(MINIOBJ)/retromain.o \
@@ -217,17 +217,17 @@ project ("libco")
 --X 	$(OSDOBJ)/modules/sound/none.o \
 --X 	$(OSDOBJ)/modules/debugger/debugint.o \
 --X 	$(OSDOBJ)/modules/debugger/none.o \
--- 
--- 
+--
+--
 --X ifdef NO_USE_MIDI
 --X 	DEFS += -DNO_USE_MIDI
 --X 	OSDOBJS += $(OSDOBJ)/modules/midi/none.o
 --X else
 --X 	OSDOBJS += $(OSDOBJ)/modules/midi/portmidi.o
 --X endif
--- 
+--
 --X OSDOBJS += $(LIBCOOBJ)/libco.o
--- 
+--
 --X ifeq ($(VRENDER),opengl)
 --X OSDOBJS += $(GLOBJ)/rglgen.o
 -- ifeq ($(GLES), 1)
@@ -236,20 +236,20 @@ project ("libco")
 --X OSDOBJS += $(GLOBJ)/glsym_gl.o
 --X endif
 --X endif
--- 
+--
 -- ifneq ($(platform),android)
 -- LIBS += -lpthread
 -- BASELIBS += -lpthread
 -- endif
--- 
+--
 -- #-------------------------------------------------
 -- # rules for building the libaries
 -- #-------------------------------------------------
--- 
+--
 --X $(LIBOCORE): $(OSDCOREOBJS)
--- 
+--
 --X $(LIBOSD): $(OSDOBJS)
--- 
+--
 --X # Override to force libco to build as C
 --X $(LIBCOOBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
 --X 	@echo Compiling $< FOR C ONLY...
@@ -257,7 +257,7 @@ project ("libco")
 --X ifdef CPPCHECK
 --X 	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
 --X endif
--- 
+--
 --X ifeq ($(armplatform), 1)
 --X $(LIBCOOBJ)/armeabi_asm.o:
 --X 	$(REALCC) -I$(SRC)/osd/$(OSD)/libretro-common/include -c $(SRC)/osd/$(OSD)/libretro-common/libco/armeabi_asm.S -o $(LIBCOOBJ)/armeabi_asm.o
