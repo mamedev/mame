@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /**********************************************************************************
 
     Alien: The Arcade Medal Edition (c) 2005 Capcom

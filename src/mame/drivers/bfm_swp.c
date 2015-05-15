@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
 

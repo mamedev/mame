@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Castle Mach2000 Hardware
 
   Mechanical Fruit Machines with DMD display

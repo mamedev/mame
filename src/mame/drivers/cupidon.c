@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /* Cupidon - Russian Video Fruit Machines? */
 
 /*

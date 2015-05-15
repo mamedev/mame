@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood
 /*
 
     Scorpion 4 Hardware Platform (c)1996 Bell Fruit Manufacturing
