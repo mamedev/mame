@@ -59,8 +59,8 @@ private:
 
 	/* additional values */
 
-	const int m_num_bits;
-	const int m_size;
+	const UINT32 m_num_bits;
+	const UINT32 m_size;
 
 };
 
@@ -154,16 +154,13 @@ public:
 		{
 			if (!doOUT || (m_ign & (1<<i)) != 0)
 				m_i[i].activate();
-			state |= (INPLOGIC(m_i[i]) << i);
 		}
-
-		if (!doOUT)
+		for (int i = 0; i < m_NI; i++)
 		{
-			for (int i = 0; i< m_NI; i++)
-			{
+			state |= (INPLOGIC(m_i[i]) << i);
+			if (!doOUT)
 				if (this->m_i[i].net().time() > mt)
 					mt = this->m_i[i].net().time();
-			}
 		}
 
 		const UINT32 nstate = state | (has_state ? (m_last_state << m_NI) : 0);

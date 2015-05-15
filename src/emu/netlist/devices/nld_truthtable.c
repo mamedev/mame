@@ -86,7 +86,7 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable)
 	truthtable++;
 
 	for (int j=0; j < m_size; j++)
-		m_outs[j] = -1;
+		m_outs[j] = 0; //-1;
 
 	for (int j=0; j < 16; j++)
 		m_timing_nt[j] = netlist_time::zero;
@@ -128,11 +128,11 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable)
 	// determine ignore
 	UINT32 ign[m_size];
 
-	for (int i=0; i<m_size; i++)
+	for (UINT32 i=0; i<m_size; i++)
 	{
 #if 1
 		UINT32 m_enable = 0;
-		for (int j=0; j<m_size; j++)
+		for (UINT32 j=0; j<m_size; j++)
 		{
 			if (m_outs[j] != m_outs[i])
 			{
