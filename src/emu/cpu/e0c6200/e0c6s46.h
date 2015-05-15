@@ -143,7 +143,7 @@ private:
 	void clock_clktimer();
 
 	UINT8 m_stopwatch_on;
-	int m_swl_src_pulse;
+	//int m_swl_src_pulse;
 	int m_swl_cur_pulse;
 	int m_swl_slice;
 	int m_swl_count;
