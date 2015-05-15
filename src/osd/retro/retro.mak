@@ -1,3 +1,13 @@
+###
+### THIS FILE IS OBSOLETE
+###
+### This is part of the libretro port using the old MAME build system.  It
+### can be safely removed, but is maintained here because some bits of the
+### old port (like OpenGL) are not yet done for the current GENie-based
+### build system.
+###
+
+
 ###########################################################################
 #
 #   retro.mak : based on osdmini.mak

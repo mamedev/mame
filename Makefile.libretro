@@ -1,3 +1,16 @@
+###
+### THIS FILE IS OBSOLETE
+###
+### This is part of the libretro port using the old MAME build system.  It
+### can be safely removed, but is maintained here because some bits of the
+### old port (like OpenGL) are not yet done for the current GENie-based
+### build system.
+###
+### This file in particular MAY be re-written as a wrapper around the MAME
+### GENie makefile if we cannot effectively use GENie to do what we need,
+### but at this point that hasn't happened yet.
+###
+
 ###########################################################################
 #
 #   Makefile.libretro
