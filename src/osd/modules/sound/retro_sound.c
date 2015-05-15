@@ -39,33 +39,18 @@ public:
 	}
 	virtual ~sound_retro() { }
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(const osd_options &options) { return 0; }
+	virtual void exit() { }
 
 	// sound_module
 
-	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame);
-	virtual void set_mastervolume(int attenuation);
+	virtual void update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame) {
+	    if (retro_pause != -1)
+	        audio_batch_cb(buffer, samples_this_frame);
+	}
+
+	virtual void set_mastervolume(int attenuation) {}
 };
 
-//============================================================
-//  update_audio_stream
-//============================================================
-
-void sound_retro::update_audio_stream(bool is_throttled, const INT16 *buffer, int samples_this_frame)
-{
-   if (retro_pause != -1)
-      audio_batch_cb(buffer, samples_this_frame);
-}
-
-
-
-//============================================================
-//  set_mastervolume
-//============================================================
-
-void sound_retro::set_mastervolume(int _attenuation)
-{
-}
 
 MODULE_DEFINITION(SOUND_RETRO, sound_retro)
