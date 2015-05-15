@@ -1658,10 +1658,14 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		}
 
 		/* b3b2 != 0 then change the state of upper or lower rom area and rethink memory */
-		if((dataToGateArray & 0x0c) != 0)
-			m_exp->romen_w(0);  // active low
-		else
-			m_exp->romen_w(1);
+		if (m_exp)
+		{
+			if((dataToGateArray & 0x0c) != 0)
+				m_exp->romen_w(0);  // active low
+			else
+				m_exp->romen_w(1);
+		}
+		
 		amstrad_setLowerRom();
 		amstrad_setUpperRom();
 
@@ -2385,7 +2389,8 @@ void amstrad_state::amstrad_rethinkMemory()
 	}
 	
 	/* mappings for other expansion devices */
-	m_exp->set_mapping();
+	if (m_exp)
+		m_exp->set_mapping();
 }
 
 
