@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:inside out boy, Nicola Salmoria
+// copyright-holders:insideoutboy, Nicola Salmoria
 /***************************************************************************
 
     Car Jamboree
