@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald,Carl
 /*
 
     Sharp X68000 video functions

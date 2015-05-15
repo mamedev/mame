@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Dirk Best
+// copyright-holders:Dirk Best,Carl
 /***************************************************************************
 
     Intel 8089 I/O Processor
