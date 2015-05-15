@@ -68,10 +68,10 @@ NETLIB_SUBDEVICE(7448_sub,
 	netlist_logic_output_t m_Q[7];  /* a .. g */
 
 	// FIXME: doesn't work
-#if 0
+/*
 	ATTR_HOT void inc_active();
 	ATTR_HOT void dec_active();
-#endif
+*/
 );
 
 NETLIB_DEVICE(7448,
