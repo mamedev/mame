@@ -9,8 +9,7 @@
   - K input interrupts
   - finish i/o ports
   - serial interface
-  - one-shot buzzer
-  - buzzer envelope
+  - buzzer envelope addition
   - add mask options to MCFG (eg. buzzer on output port R4x is optional)
 
 */
@@ -126,6 +125,9 @@ void e0c6s46_device::device_start()
 	m_bz_freq = 0;
 	m_bz_envelope = 0;
 	m_bz_duty_ratio = 0;
+	m_bz_1shot_on = 0;
+	m_bz_1shot_running = false;
+	m_bz_1shot_count = 0;
 	m_bz_pulse = 0;
 	
 	// register for savestates
@@ -165,6 +167,9 @@ void e0c6s46_device::device_start()
 	save_item(NAME(m_bz_freq));
 	save_item(NAME(m_bz_envelope));
 	save_item(NAME(m_bz_duty_ratio));
+	save_item(NAME(m_bz_1shot_on));
+	save_item(NAME(m_bz_1shot_running));
+	save_item(NAME(m_bz_1shot_count));
 	save_item(NAME(m_bz_pulse));
 }
 
@@ -304,9 +309,9 @@ void e0c6s46_device::write_r(UINT8 port, UINT8 data)
 		// R4x: special output
 		case 4:
 			// d3: buzzer on: direct output or 1-shot output
-			if ((data >> 3 & 1) != m_bz_43_on)
+			if ((data & 8) != m_bz_43_on)
 			{
-				m_bz_43_on = data >> 3 & 1;
+				m_bz_43_on = data & 8;
 				reset_buzzer();
 			}
 			write_r4_out();
@@ -382,6 +387,10 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 	m_swl_cur_pulse = m_256_src_pulse | (m_stopwatch_on ^ 1);
 	if (m_swl_cur_pulse == 0)
 		clock_stopwatch();
+
+	// clock 1-shot buzzer on rising edge if it's on
+	if (m_bz_1shot_on && m_256_src_pulse == 1)
+		clock_bz_1shot();
 }
 
 
@@ -502,13 +511,18 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
 void e0c6s46_device::schedule_buzzer()
 {
 	// only schedule next buzzer timeout if it's on
-	if (m_bz_43_on != 0)
+	if (m_bz_43_on && !m_bz_1shot_running)
 		return;
 	
 	// pulse width differs per frequency selection
 	int mul = (m_bz_freq & 4) ? 1 : 2;
-	int high = ((m_bz_freq & 2) ? 12 : 8) - m_bz_duty_ratio;
-	int low = (16 + (m_bz_freq << 2 & 0xc)) - high;
+	int high = (m_bz_freq & 2) ? 12 : 8;
+	int low = 16 + (m_bz_freq << 2 & 0xc);
+	
+	// pulse width envelope if it's on
+	if (m_bz_envelope & 1)
+		high -= m_bz_duty_ratio;
+	low -= high;
 	
 	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * unscaled_clock()));
 }
@@ -527,6 +541,25 @@ void e0c6s46_device::reset_buzzer()
 	// don't reset if the timer is running
 	if (m_buzzer_handle->remaining() == attotime::never)
 		schedule_buzzer();
+}
+
+void e0c6s46_device::clock_bz_1shot()
+{
+	m_bz_1shot_running = true;
+	
+	// reload counter the 1st time
+	if (m_bz_1shot_count == 0)
+	{
+		reset_buzzer();
+		m_bz_1shot_count = (m_bz_freq & 8) ? 16 : 8;
+	}
+	
+	// stop ringing when counter reaches 0
+	if (--m_bz_1shot_count == 0)
+	{
+		m_bz_1shot_on = 0;
+		m_bz_1shot_running = false;
+	}
 }
 
 
@@ -643,8 +676,8 @@ READ8_MEMBER(e0c6s46_device::io_r)
 		case 0x74:
 			return m_bz_freq;
 		case 0x75:
-			// d3: 1-shot buzzer is running
-			return 0 | m_bz_envelope;
+			// d3: 1-shot buzzer is on
+			return m_bz_1shot_on | m_bz_envelope;
 		
 		// OSC circuit
 		case 0x70:
@@ -839,6 +872,7 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			// d2: reset envelope
 			// d3: trigger one-shot buzzer
 			m_bz_envelope = data & 3;
+			m_bz_1shot_on |= data & 8;
 			break;
 		
 		// read-only registers

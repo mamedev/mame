@@ -165,11 +165,15 @@ private:
 	UINT8 m_bz_freq;
 	UINT8 m_bz_envelope;
 	UINT8 m_bz_duty_ratio;
+	UINT8 m_bz_1shot_on;
+	bool m_bz_1shot_running;
+	UINT8 m_bz_1shot_count;
 	int m_bz_pulse;
 	emu_timer *m_buzzer_handle;
 	TIMER_CALLBACK_MEMBER(buzzer_cb);
 	void schedule_buzzer();
 	void reset_buzzer();
+	void clock_bz_1shot();
 };
 
 
