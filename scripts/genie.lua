@@ -369,6 +369,8 @@ flags {
 configuration { "vs*" }
 	flags {
 		"ExtraWarnings",
+		"NoEditAndContinue",
+		"EnableMinimalRebuild",
 	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
