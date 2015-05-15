@@ -216,8 +216,8 @@ function mainProject(_target, _subtarget)
 		}
 		linkoptions {
 			"-fPIC",
-			-- FIXME: Don't hard-code this OS X path
-			"-Wl,-force_load,../../../../osx_clang/bin/x64/Release/libosd_retro.a",
+			-- FIXME: We only need this on OS X
+			"-Wl,-u,_retro_run",
 		}
 	end
 end
