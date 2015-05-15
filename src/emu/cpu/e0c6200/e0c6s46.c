@@ -389,7 +389,7 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 		clock_stopwatch();
 
 	// clock 1-shot buzzer on rising edge if it's on
-	if (m_bz_1shot_on && m_256_src_pulse == 1)
+	if (m_bz_1shot_on != 0 && m_256_src_pulse == 1)
 		clock_bz_1shot();
 }
 
@@ -511,7 +511,7 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
 void e0c6s46_device::schedule_buzzer()
 {
 	// only schedule next buzzer timeout if it's on
-	if (m_bz_43_on && !m_bz_1shot_running)
+	if (m_bz_43_on != 0 && !m_bz_1shot_running)
 		return;
 	
 	// pulse width differs per frequency selection
@@ -555,7 +555,7 @@ void e0c6s46_device::clock_bz_1shot()
 	}
 	
 	// stop ringing when counter reaches 0
-	if (--m_bz_1shot_count == 0)
+	else if (--m_bz_1shot_count == 0)
 	{
 		m_bz_1shot_on = 0;
 		m_bz_1shot_running = false;
