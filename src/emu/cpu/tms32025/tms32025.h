@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Tony La Porta, hap
 	/**************************************************************************\
 	*                Texas Instruments TMS320x25 DSP Emulator                  *
