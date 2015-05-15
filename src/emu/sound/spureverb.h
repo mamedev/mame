@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:pSXAuthor, R.Belmont
 #ifndef _included_reverb_
 	#define _included_reverb_
