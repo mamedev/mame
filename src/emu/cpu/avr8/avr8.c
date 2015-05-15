@@ -1158,7 +1158,7 @@ void avr8_device::timer_tick(int cycles)
 //TODO  UINT8 int0[2] = { AVR8_INTIDX_OCF0A, AVR8_INTIDX_OCF0B };
 
 #define LOG_TIMER_0 0
-#define LOG_TIMER_5 1
+#define LOG_TIMER_5 0
 // Timer 0 Handling
 void avr8_device::timer0_tick()
 {
@@ -1890,62 +1890,64 @@ void avr8_device::timer5_tick()
 
 	switch(AVR8_WGM5)
 	{
-		case WGM5_NORMAL:
-	case WGM5_PWM_8_PC:
-	case WGM5_PWM_9_PC:
-	case WGM5_PWM_10_PC:
-//    case WGM5_CTC_OCR:
-	case WGM5_FAST_PWM_8:
-	case WGM5_FAST_PWM_9:
-	case WGM5_FAST_PWM_10:
-	case WGM5_PWM_PFC_ICR:
-	case WGM5_PWM_PFC_OCR:
-	case WGM5_PWM_PC_ICR:
-	case WGM5_PWM_PC_OCR:
-	case WGM5_CTC_ICR:
-	case WGM5_FAST_PWM_ICR:
-	case WGM5_FAST_PWM_OCR:
-		printf("Unimplemented timer#5 waveform generation mode: WGMM5=0x%02X\n", AVR8_WGM5);
-		break;
+	    case WGM5_NORMAL:
+	    case WGM5_PWM_8_PC:
+	    case WGM5_PWM_9_PC:
+	    case WGM5_PWM_10_PC:
+//      case WGM5_CTC_OCR:
+        case WGM5_FAST_PWM_8:
+	    case WGM5_FAST_PWM_9:
+	    case WGM5_FAST_PWM_10:
+	    case WGM5_PWM_PFC_ICR:
+	    case WGM5_PWM_PFC_OCR:
+	    case WGM5_PWM_PC_ICR:
+	    case WGM5_PWM_PC_OCR:
+	    case WGM5_CTC_ICR:
+	    case WGM5_FAST_PWM_ICR:
+	    case WGM5_FAST_PWM_OCR:
+#if LOG_TIMER_5
+	        printf("Unimplemented timer#5 waveform generation mode: AVR8_WGM5 = 0x%02X\n", AVR8_WGM5);
+#endif
+	        break;
 
 		case WGM5_CTC_OCR:
-		//TODO: verify this! Can be very wrong!!!
-		switch(AVR8_TCCR5A_COM5B){
-		case 0: /* Normal Operation */
-			if (count == m_timer_top[5]){
-			m_timer_top[5] = 0;
-			}
-			break;
-		case 1: /* Toggle OC5B on compare match */
-			if (count == m_timer_top[5]){
-			m_timer_top[5] = 0;
+		    //TODO: verify this! Can be very wrong!!!
+		    switch(AVR8_TCCR5A_COM5B){
+		        case 0: /* Normal Operation */
+			        if (count == m_timer_top[5]){
+			        m_timer_top[5] = 0;
+			        }
+			        break;
+		        case 1: /* Toggle OC5B on compare match */
+			        if (count == m_timer_top[5]){
+			        m_timer_top[5] = 0;
 #if LOG_TIMER_5
-			printf("[5] Toggle OC5B\n");
+			        printf("[5] Toggle OC5B\n");
 #endif
-			m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) ^ (1 << 4));
-			}
-			break;
-		case 2: /* Clear OC5B on compare match */
-			if (count == m_timer_top[5]){
-			m_timer_top[5] = 0;
-			//Clear OC5B
+			        m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) ^ (1 << 4));
+			        }
+			        break;
+		        case 2: /* Clear OC5B on compare match */
+			        if (count == m_timer_top[5]){
+			        m_timer_top[5] = 0;
+			        //Clear OC5B
 #if LOG_TIMER_5
-			printf("[5] Clear OC5B\n");
+			        printf("[5] Clear OC5B\n");
 #endif
-			m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) & ~(1 << 4));
-			}
-			break;
-		case 3: /* Set OC5B on compare match */
-			if (count == m_timer_top[5]){
-			m_timer_top[5] = 0;
+			        m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) & ~(1 << 4));
+			        }
+			        break;
+		        case 3: /* Set OC5B on compare match */
+			        if (count == m_timer_top[5]){
+			        m_timer_top[5] = 0;
 #if LOG_TIMER_5
-			printf("[5] Set OC5B\n");
+			        printf("[5] Set OC5B\n");
 #endif
-			m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) | (1 << 4));
-			}
-			break;
-		}
-		break;
+			        m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) | (1 << 4));
+			        }
+			        break;
+		    }
+		    break;
 
 		default:
 			printf("Timer #5: Unknown waveform generation mode: %02x\n", AVR8_WGM5);
