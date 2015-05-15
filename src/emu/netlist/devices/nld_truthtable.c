@@ -7,6 +7,7 @@
 
 #include "nld_truthtable.h"
 
+/*
 static inline int count_bits(UINT32 v)
 {
 	int ret = 0;
@@ -27,6 +28,7 @@ static inline UINT32 set_bits(UINT32 v, UINT32 b)
 		}
 	return ret;
 }
+*/
 
 
 // ----------------------------------------------------------------------------------------

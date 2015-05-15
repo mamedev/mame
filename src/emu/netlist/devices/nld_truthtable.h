@@ -36,7 +36,7 @@ struct truthtable_desc_t
 {
 	truthtable_desc_t(int NO, int NI, int has_state, bool *initialized,
 			UINT32 *outs, UINT8 *timing, netlist_time *timing_nt)
-	: m_NO(NO), m_NI(NI), m_has_state(has_state), m_initialized(initialized),
+	: m_NO(NO), m_NI(NI), /*m_has_state(has_state),*/ m_initialized(initialized),
 	  m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
 	  m_num_bits(m_NI + has_state * (m_NI + m_NO)),
 	  m_size(1 << (m_num_bits))
@@ -51,7 +51,7 @@ private:
 
 	int m_NO;
 	int m_NI;
-	int m_has_state;
+	//int m_has_state;
 	bool *m_initialized;
 	UINT32 *m_outs;
 	UINT8  *m_timing;
