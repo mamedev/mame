@@ -820,7 +820,6 @@ end
 				"-Wno-cast-align",
 				"-Wno-tautological-compare",
 				"-Wno-dynamic-class-memaccess",
-				"-Wno-self-assign-field",
 			}
 			if (version >= 30200) then
 				buildoptions {
