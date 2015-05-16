@@ -288,7 +288,8 @@ struct OtherModesT
 	int blend_m2b_0;
 	int blend_m2b_1;
 	int tex_edge;
-	bool force_blend;
+	int force_blend;
+	int blend_shift;
 	bool alpha_cvg_select;
 	bool cvg_times_alpha;
 	int z_mode;
@@ -299,8 +300,9 @@ struct OtherModesT
 	bool z_compare_en;
 	bool antialias_en;
 	bool z_source_sel;
-	bool dither_alpha_en;
-	bool alpha_compare_en;
+	int dither_alpha_en;
+	int alpha_compare_en;
+	int alpha_dither_mode;
 };
 
 struct ColorInputsT
@@ -591,6 +593,8 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 
 		UINT8 ReplicatedRGBA[32];
 
+		UINT16 m_dzpix_normalize[0x10000];
+
 		Rectangle       Scissor;
 		SpanBaseT       SpanBase;
 
@@ -668,9 +672,9 @@ class n64_rdp : public poly_manager<UINT32, rdp_poly_state, 8, 32000>
 		Copier              _Copy[2];
 		Filler              _Fill[2];
 
-		void				write_pixel(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
+		void				write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp_span_aux *userdata, const rdp_poly_state &object);
 		void				read_pixel(UINT32 curpixel, rdp_span_aux *userdata, const rdp_poly_state &object);
-		void				copy_pixel(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object);
+		void				copy_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, int CurrentPixCvg, const rdp_poly_state &object);
 		void				fill_pixel(UINT32 curpixel, const rdp_poly_state &object);
 
 		class ZDecompressEntry

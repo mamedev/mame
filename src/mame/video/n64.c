@@ -2005,7 +2005,7 @@ void n64_rdp::DrawTriangle(bool shade, bool texture, bool zbuffer, bool rect)
 	SpanBase.m_span_dw = dwdx;
 	SpanBase.m_span_dz = OtherModes.z_source_sel ? 0 : dzdx;
 	SpanBase.m_span_dymax = 0;
-	SpanBase.m_span_dzpix = NormalizeDZPix(temp_dzpix & 0xffff) & 0xffff;
+	SpanBase.m_span_dzpix = m_dzpix_normalize[temp_dzpix & 0xffff];
 
 	int xleft_inc = (dxmdy >> 2) & ~1;
 	int xright_inc = (dxhdy >> 2) & ~1;
@@ -2694,6 +2694,7 @@ void n64_rdp::CmdSetOtherModes(UINT32 w1, UINT32 w2)
 	OtherModes.blend_m2b_0      = (w2 >> 18) & 0x3; // 00
 	OtherModes.blend_m2b_1      = (w2 >> 16) & 0x3; // 01
 	OtherModes.force_blend      = (w2 >> 14) & 1; // 0
+	OtherModes.blend_shift		= OtherModes.force_blend ? 5 : 2;
 	OtherModes.alpha_cvg_select = (w2 >> 13) & 1; // 1
 	OtherModes.cvg_times_alpha  = (w2 >> 12) & 1; // 0
 	OtherModes.z_mode           = (w2 >> 10) & 0x3; // 00
@@ -2706,6 +2707,7 @@ void n64_rdp::CmdSetOtherModes(UINT32 w1, UINT32 w2)
 	OtherModes.z_source_sel     = (w2 >> 2) & 1; // 0
 	OtherModes.dither_alpha_en  = (w2 >> 1) & 1; // 0
 	OtherModes.alpha_compare_en = (w2) & 1; // 0
+	OtherModes.alpha_dither_mode = (OtherModes.alpha_compare_en << 1) | OtherModes.dither_alpha_en;
 }
 
 void n64_rdp::CmdLoadTLUT(UINT32 w1, UINT32 w2)
@@ -3485,6 +3487,11 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 	for(int i = 0; i < 32; i++)
 	{
 		ReplicatedRGBA[i] = (i << 3) | ((i >> 2) & 7);
+	}
+
+	for(int i = 0; i < 0x10000; i++)
+	{
+		m_dzpix_normalize[i] = (UINT16)NormalizeDZPix(i & 0xffff);
 	}
 }
 

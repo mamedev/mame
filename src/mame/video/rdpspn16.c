@@ -132,7 +132,7 @@ void n64_rdp::RGBAZCorrectTriangle(INT32 offx, INT32 offy, INT32* r, INT32* g, I
 	}
 }
 
-inline void n64_rdp::write_pixel(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, rdp_span_aux *userdata, const rdp_poly_state &object)
+inline void n64_rdp::write_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, rdp_span_aux *userdata, const rdp_poly_state &object)
 {
 	if (object.MiscState.FBSize == 2) // 16-bit framebuffer
 	{
@@ -277,7 +277,7 @@ inline void n64_rdp::read_pixel(UINT32 curpixel, rdp_span_aux *userdata, const r
 	}
 }
 
-inline void n64_rdp::copy_pixel(UINT32 curpixel, UINT32 r, UINT32 g, UINT32 b, int CurrentPixCvg, const rdp_poly_state &object)
+inline void n64_rdp::copy_pixel(UINT32 curpixel, INT32 r, INT32 g, INT32 b, int CurrentPixCvg, const rdp_poly_state &object)
 {
 	if (object.MiscState.FBSize == 2) // 16-bit framebuffer
 	{
@@ -348,7 +348,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	TexPipe.CalculateClampDiffs(tilenum, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
 	const bool partialreject = (userdata->ColorInputs.blender2b_a[0] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[0] == &userdata->PixelColor.i.a);
-	const int sel0 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0);
+	const int sel0 = (userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0;
 
 	int drinc, dginc, dbinc, dainc;
 	int dzinc, dzpix;
@@ -389,7 +389,7 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	int x = xend;
 
 	const int length = flip ? (xstart - xend) : (xend - xstart);
-	UINT32 fir, fig, fib;
+	INT32 fir, fig, fib;
 
 	if(object.OtherModes.z_source_sel)
 	{
@@ -407,7 +407,6 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 	const int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
 	const int cycle0 = ((object.OtherModes.sample_type & 1) << 1) | (object.OtherModes.bi_lerp0 & 1);
-	const int acmode = (object.OtherModes.alpha_compare_en ? 2 : 0) | (object.OtherModes.dither_alpha_en ? 1 : 0);
 
 	INT32 sss = 0;
 	INT32 sst = 0;
@@ -465,7 +464,11 @@ void n64_rdp::SpanDraw1Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 				int adith = 0;
 				GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = ((&Blender)->*(Blender.blend1[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, acmode, userdata, object);
+				if (((userdata->BlendEnable << 2) | blend_index) != 5 && machine().input().code_pressed(KEYCODE_B))
+				{
+					printf("1:%d\n", (userdata->BlendEnable << 2) | blend_index);
+				}
+				bool rendered = ((&Blender)->*(Blender.blend1[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, userdata, object);
 
 				if (rendered)
 				{
@@ -535,8 +538,8 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	TexPipe.CalculateClampDiffs(tile1, userdata, object, m_clamp_s_diff, m_clamp_t_diff);
 
 	bool partialreject = (userdata->ColorInputs.blender2b_a[1] == &userdata->InvPixelColor.i.a && userdata->ColorInputs.blender1b_a[1] == &userdata->PixelColor.i.a);
-	int sel0 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0);
-	int sel1 = (OtherModes.force_blend ? 2 : 0) | ((userdata->ColorInputs.blender2b_a[1] == &userdata->MemoryColor.i.a) ? 1 : 0);
+	int sel0 = (userdata->ColorInputs.blender2b_a[0] == &userdata->MemoryColor.i.a) ? 1 : 0;
+	int sel1 = (userdata->ColorInputs.blender2b_a[1] == &userdata->MemoryColor.i.a) ? 1 : 0;
 
 	int drinc, dginc, dbinc, dainc;
 	int dzinc, dzpix;
@@ -580,7 +583,7 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	int x = xend;
 
 	const int length = flip ? (xstart - xend) : (xend - xstart);
-	UINT32 fir, fig, fib;
+	INT32 fir, fig, fib;
 
 	if(object.OtherModes.z_source_sel)
 	{
@@ -599,7 +602,6 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 	const int blend_index = (object.OtherModes.alpha_cvg_select ? 2 : 0) | ((object.OtherModes.rgb_dither_sel < 3) ? 1 : 0);
 	const int cycle0 = ((object.OtherModes.sample_type & 1) << 1) | (object.OtherModes.bi_lerp0 & 1);
 	const int cycle1 = ((object.OtherModes.sample_type & 1) << 1) | (object.OtherModes.bi_lerp1 & 1);
-	const int acmode = (object.OtherModes.alpha_compare_en ? 2 : 0) | (object.OtherModes.dither_alpha_en ? 1 : 0);
 
 	INT32 sss = 0;
 	INT32 sst = 0;
@@ -699,7 +701,11 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 			{
 				GetDitherValues(scanline, j, &cdith, &adith, object);
 
-				bool rendered = ((&Blender)->*(Blender.blend2[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, sel1, acmode, userdata, object);
+				if (((userdata->BlendEnable << 2) | blend_index) != 5 && machine().input().code_pressed(KEYCODE_B))
+				{
+					printf("2:%d\n", (userdata->BlendEnable << 2) | blend_index);
+				}
+				bool rendered = ((&Blender)->*(Blender.blend2[(userdata->BlendEnable << 2) | blend_index]))(&fir, &fig, &fib, cdith, adith, partialreject, sel0, sel1, userdata, object);
 
 				if (rendered)
 				{
@@ -729,36 +735,33 @@ void n64_rdp::SpanDraw2Cycle(INT32 scanline, const extent_t &extent, const rdp_p
 
 void n64_rdp::SpanDrawCopy(INT32 scanline, const extent_t &extent, const rdp_poly_state &object, int threadid)
 {
-	assert(object.MiscState.FBSize >= 2 && object.MiscState.FBSize < 4);
+	const int clipx1 = object.Scissor.m_xh;
+	const int clipx2 = object.Scissor.m_xl;
+	const int tilenum = object.tilenum;
+	const bool flip = object.flip;
 
-	int clipx1 = object.Scissor.m_xh;
-	int clipx2 = object.Scissor.m_xl;
-	int tilenum = object.tilenum;
-	bool flip = object.flip;
+	rdp_span_aux *userdata = (rdp_span_aux*)extent.userdata;
+	const int xstart = extent.startx;
+	const int xend = userdata->m_unscissored_rx;
+	const int xend_scissored = extent.stopx;
+	const int xinc = flip ? 1 : -1;
+	const int length = flip ? (xstart - xend) : (xend - xstart);
 
 	SpanParam s; s.w = extent.param[SPAN_S].start;
 	SpanParam t; t.w = extent.param[SPAN_T].start;
 
-	int ds = object.SpanBase.m_span_ds / 4;
-	int dt = object.SpanBase.m_span_dt / 4;
-	int dsinc = flip ? (ds) : -ds;
-	int dtinc = flip ? (dt) : -dt;
-	int xinc = flip ? 1 : -1;
+	const int ds = object.SpanBase.m_span_ds / 4;
+	const int dt = object.SpanBase.m_span_dt / 4;
+	const int dsinc = flip ? (ds) : -ds;
+	const int dtinc = flip ? (dt) : -dt;
 
-	int fb_index = object.MiscState.FBWidth * scanline;
-
-	rdp_span_aux *userdata = (rdp_span_aux*)extent.userdata;
-	int xstart = extent.startx;
-	int xend = userdata->m_unscissored_rx;
-	int xend_scissored = extent.stopx;
+	const int fb_index = object.MiscState.FBWidth * scanline;
 
 	int x = xend;
 
-	int length = flip ? (xstart - xend) : (xend - xstart);
-
 	for (int j = 0; j <= length; j++)
 	{
-		bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
+		const bool valid_x = (flip) ? (x >= xend_scissored) : (x <= xend_scissored);
 
 		if (x >= clipx1 && x < clipx2 && valid_x)
 		{
