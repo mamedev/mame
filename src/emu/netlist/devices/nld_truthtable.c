@@ -62,7 +62,8 @@ UINT32 truthtable_desc_t::get_ignored_extended(UINT32 i)
 	 * may change the output
 	 */
 	int bits = (1<<count_bits(nign));
-	int t[bits];
+	plinearlist_t<int> t;
+	t.set_count(bits);
 
 	for (UINT32 j=1; j<bits; j++)
 	{
