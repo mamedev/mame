@@ -3,6 +3,22 @@
 /*
  * nl_dice_compat.h
  *
+ * The follwoing script will convert a circuit using dice syntax into netlist
+ * syntax. It's not fail proof, but eases the manual work involved significantly.
+
+sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/mame/drivers/nl_breakout.c   \
+| sed -e 's/^[ \t]*$/NL_EMPTY /' \
+| cpp -I src/emu -I src/osd/ -DNL_CONVERT_CPP -P -CC - \
+| sed -e 's/\(TTL_.*\)("\(.*\)")/\1(\2)/' \
+| sed -e 's/CONNECTION(\(.*\),[ \t]*"\(.*\)", \(.*\))/NET_C(\1, \2.\3)/' \
+| sed -e 's/CONNECTION("\(.*\)",[ \t]*\(.*\), \(.*\))/NET_C(\1.\2, \3)/' \
+| sed -e 's/NET_C("\(.*\)", \(.*\), \(.*\))/NET_C(\1.\2, \3)/' \
+| sed -e 's/) RES(/)\n    RES(/g' \
+| sed -e 's/) CAP(/)\n    CAP(/g' \
+| sed -e 's/) NET_C(/)\n    NET_C(/g' \
+| sed -e 's/NL_EMPTY//' \
+
+ *
  */
 
 #ifndef NL_DICE_COMPAT_H_
@@ -12,6 +28,7 @@
 #include "netlist/devices/net_lib.h"
 #include "netlist/analog/nld_twoterm.h"
 #endif
+
 /* --------------------------------------------------------------------
  * Compatibility macros for DICE netlists ...
  * -------------------------------------------------------------------- */
@@ -33,14 +50,6 @@
 #define CONNECTIONY(_a) _a
 #define CONNECTIONX(_a, _b, _c, _d) setup.register_link(_a "." # _b, _c "." # _d);
 #define NET_CSTR(_a, _b) setup.register_link( _a, _b);
-
-#else
-#define CHIP(_n, _t) TTL_ ## _t ## _DIP(_n)
-#endif
-
-#define CIRCUIT_LAYOUT(x) NETLIST_START(x)
-#define CIRCUIT_LAYOUT_END NETLIST_END()
-
 
 #define OHM(x) (x)
 #define K_OHM(x) ((x) * 1000.0)
@@ -87,6 +96,22 @@ struct CapacitorDesc : public SeriesRCDesc
 public:
 	CapacitorDesc(nl_double cap) : SeriesRCDesc(0.0, cap) { }
 };
+
+#else
+#define CHIP(_n, _t) TTL_ ## _t ## _DIP(_n)
+
+#define OHM(x) x
+#define K_OHM(x) RES_K(X)
+#define M_OHM(x) RES_M(X)
+#define U_FARAD(x) CAP_U(x)
+#define N_FARAD(x) CAP_N(x)
+#define P_FARAD(x) CAP_P(x)
+
+#endif
+
+
+#define CIRCUIT_LAYOUT(x) NETLIST_START(x)
+#define CIRCUIT_LAYOUT_END NETLIST_END()
 
 #define CHIP_555_Mono(_name,  _pdesc)   \
 	CHIP(# _name, NE555) \
