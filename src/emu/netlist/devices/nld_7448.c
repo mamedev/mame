@@ -141,7 +141,7 @@ NETLIB_START(7448_sub)
 NETLIB_RESET(7448_sub)
 {
 	m_state = 0;
-	m_active = 7;
+	m_active = 1;
 }
 
 NETLIB_UPDATE(7448_sub)

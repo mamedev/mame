@@ -76,12 +76,12 @@ ATTR_HOT void NETLIB_NAME(7486)::inc_active()
 	nl_assert(netlist().use_deactivate());
 	if (++m_active == 1)
 	{
+		m_A.activate();
+		m_B.activate();
+
 		netlist_time mt = this->m_A.net().time();
 		if (this->m_B.net().time() > mt)
 			mt = this->m_B.net().time();
-
-		m_A.activate();
-		m_B.activate();
 
 		UINT8 t = INPLOGIC(m_A) ^ INPLOGIC(m_B);
 		m_Q.net().set_Q_time(t, mt + delay[t]);
@@ -90,10 +90,12 @@ ATTR_HOT void NETLIB_NAME(7486)::inc_active()
 
 ATTR_HOT void NETLIB_NAME(7486)::dec_active()
 {
+#if 1
 	nl_assert(netlist().use_deactivate());
 	if (--m_active == 0)
 	{
 		m_A.inactivate();
 		m_B.inactivate();
 	}
+#endif
 }

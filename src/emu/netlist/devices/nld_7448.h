@@ -40,11 +40,7 @@
 		NET_REGISTER_DEV(7448_dip, _name)
 
 /*
- * FIXME: Big FIXME
- * The truthtable will ignore BIQ for certain states.
- * This causes a severe issue in pongf when USE_DEACTIVATE is used.
- * For now, just use the old implementation.
- *
+ * FIXME: Using truthtable is a lot slower than the explicit device
  */
 #if (0 && USE_TRUTHTABLE)
 #include "nld_truthtable.h"
