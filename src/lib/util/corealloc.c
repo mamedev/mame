@@ -95,6 +95,32 @@ bool memory_entry::s_tracking = false;
 memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
 memory_entry *memory_entry::s_freehead = NULL;
 
+//**************************************************************************
+//  OPERATOR OVERLOADS - DEFINITIONS
+//**************************************************************************
+
+#ifndef NO_MEM_TRACKING
+
+// standard new/delete operators (try to avoid using)
+void *operator new(std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, false, true, false); }
+void *operator new[](std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, true, true, false); }
+void operator delete(void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
+void operator delete[](void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
+
+#endif
+
+// file/line new/delete operators
+void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc) { return malloc_file_line(size, file, line, false, true, false); }
+void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc) { return malloc_file_line(size, file, line, true, true, false); }
+void operator delete(void *ptr, const char *file, int line) { if (ptr != NULL) free_file_line(ptr, file, line, false); }
+void operator delete[](void *ptr, const char *file, int line) { if (ptr != NULL) free_file_line(ptr, file, line, true); }
+
+// file/line new/delete operators with zeroing
+void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc) { return malloc_file_line(size, file, line, false, true, true); }
+void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc) { return malloc_file_line(size, file, line, true, true, true); }
+void operator delete(void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != NULL) free_file_line(ptr, file, line, false); }
+void operator delete[](void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != NULL) free_file_line(ptr, file, line, true); }
+
 
 
 //**************************************************************************
