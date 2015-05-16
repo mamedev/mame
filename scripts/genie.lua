@@ -671,6 +671,7 @@ if (_OPTIONS["SHADOW_CHECK"]=="1") then
 	buildoptions {
 		"-Wshadow"
 	}
+end
 
 -- only show deprecation warnings when enabled
 if _OPTIONS["DEPRECATED"]~="1" then
@@ -840,7 +841,6 @@ end
 				}
 			end
 		else
-			end
 			if (version == 40201) then
 				buildoptions {
 					"-Wno-cast-align"
