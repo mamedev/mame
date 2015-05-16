@@ -1,6 +1,5 @@
 abs  1  01 1 n
 	abs
-	aacc = %a;
 	if(((INT32)aacc) < 0) {
 	aacc = - aacc;
 	if(((INT32)aacc) < 0)
