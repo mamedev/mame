@@ -57,16 +57,6 @@ void dump_unfreed_mem(UINT64 start = 0);
 // zeromem_t is a dummy class used to tell new to zero memory after allocation
 class zeromem_t { };
 
-#ifndef NO_MEM_TRACKING
-
-// standard new/delete operators (try to avoid using)
-void *operator new(std::size_t size) throw (std::bad_alloc);
-void *operator new[](std::size_t size) throw (std::bad_alloc);
-void operator delete(void *ptr) throw();
-void operator delete[](void *ptr) throw();
-
-#endif
-
 // file/line new/delete operators
 void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc);
 void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc);

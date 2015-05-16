@@ -96,7 +96,7 @@ memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
 memory_entry *memory_entry::s_freehead = NULL;
 
 //**************************************************************************
-//  OPERATOR OVERLOADS - DEFINITIONS
+//  OPERATOR REPLACEMENTS
 //**************************************************************************
 
 #ifndef NO_MEM_TRACKING
@@ -107,7 +107,16 @@ void *operator new[](std::size_t size) throw (std::bad_alloc) { return malloc_fi
 void operator delete(void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
 void operator delete[](void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
 
+void* operator new(std::size_t size,const std::nothrow_t&) throw() { return malloc_file_line(size, NULL, 0, false, false, false); }
+void* operator new[](std::size_t size, const std::nothrow_t&) throw() { return malloc_file_line(size, NULL, 0, true, false, false); }
+void operator delete(void* ptr, const std::nothrow_t&) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
+void operator delete[](void* ptr, const std::nothrow_t&) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
+
 #endif
+
+//**************************************************************************
+//  OPERATOR OVERLOADS - DEFINITIONS
+//**************************************************************************
 
 // file/line new/delete operators
 void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc) { return malloc_file_line(size, file, line, false, true, false); }
