@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Quench
 /* An interface for the ES8712 ADPCM chip */
 
