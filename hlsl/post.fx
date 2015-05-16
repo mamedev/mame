@@ -84,9 +84,10 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 
-	float2 ScreenTexelDims = 1.0f / ScreenDims;
-	float2 SourceTexelDims = 1.0f / SourceDims;
-	
+	float4 Position = Input.Position;
+	Position.xy *= (ScreenDims + 1.0f) / ScreenDims;
+	Position.xy -= 0.5f / ScreenDims;
+
 	float2 shadowUVOffset = ShadowUVOffset;
 	shadowUVOffset = xor(OrientationSwapXY, RotationSwapXY)
 		? shadowUVOffset.yx
@@ -96,17 +97,16 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	float2 ScreenCoordPrescaleOffset = 0.0f;
 	ScreenCoordPrescaleOffset += shadowUVOffset;
 
-	Output.ScreenCoord = Input.Position;
+	Output.ScreenCoord = Position.xy;
 	Output.ScreenCoord += ScreenCoordPrescaleOffset;
 
-	Output.Position = float4(Input.Position.xyz, 1.0f);
+	Output.Position = float4(Position.xyz, 1.0f);
 	Output.Position.xy /= ScreenDims;
 	Output.Position.y = 1.0f - Output.Position.y; // flip y
 	Output.Position.xy -= 0.5f; // center
 	Output.Position.xy *= 2.0f; // zoom
 
 	Output.TexCoord = Input.TexCoord;
-	Output.TexCoord -= SourceTexelDims * 0.5f;
 
 	Output.Color = Input.Color;
 
@@ -140,7 +140,7 @@ static const float Epsilon = 1.0e-7f;
 static const float PI = 3.1415927f;
 static const float E = 2.7182817f;
 static const float Gelfond = 23.140692f; // e^pi (Gelfond constant)
-static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfond–Schneider constant)
+static const float GelfondSchneider = 2.6651442f; // 2^sqrt(2) (Gelfondâ€“Schneider constant)
 
 float nextPowerOfTwo(float n)
 {
@@ -217,13 +217,10 @@ float GetRoundCornerFactor(float2 coord, float amount)
 	float2 HalfSourceDims = SourceDims * 0.5f;
 	float2 SourceTexelDims = 1.0f / SourceDims;
 
-	float2 RoundCoord = coord;
-
-	// bug: offset and scale correction (due to miss-aligned fullscreen quad)
-	RoundCoord *= (1.0f + SourceTexelDims * ScreenRatio * 2.0f);
-	RoundCoord -= SourceTexelDims * ScreenRatio;
-
 	// hint: roundness correction (base on the default ratio of 4:3)
+	float2 RoundCoord = coord;
+	RoundCoord -= SourceTexelDims;
+	RoundCoord *= SourceTexelDims + 1.0f;
 	RoundCoord *= SourceDims / ScreenRatio;
 
 	float radius = amount * 50.0f;
@@ -248,6 +245,7 @@ float GetRoundCornerFactor(float2 coord, float amount)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 ScreenTexelDims = 1.0f / ScreenDims;
+	float2 SourceTexelDims = 1.0f / SourceDims;
 
 	float2 UsedArea = 1.0f / SourceRect;
 	float2 HalfRect = SourceRect * 0.5f;
@@ -297,9 +295,9 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 BaseAreaCoordCentered = BaseCoordCentered;
 	BaseAreaCoordCentered *= UsedArea;
 
-	// Alpha Clipping (1px border in drawd3d does not work for some reason)
-	clip(BaseCoord < ScreenTexelDims ? -1 : 1);
-	clip(BaseCoord > SourceRect + ScreenTexelDims ? -1 : 1);
+	// // Alpha Clipping (round corners applies smoother clipping when screen is curved)
+	// clip((BaseCoord < SourceTexelDims) ? -1 : 1);
+	// clip((BaseCoord > SourceRect + SourceTexelDims) ? -1 : 1);
 
 	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
 	BaseColor.a = 1.0f;
@@ -313,10 +311,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// Mask Simulation (may not affect bloom)
 	if (!PrepareBloom)
 	{
-		float2 ShadowTexelDims = 1.0f / ShadowDims;
-		ShadowTexelDims = xor(OrientationSwapXY, RotationSwapXY)
-			? ShadowTexelDims.yx
-			: ShadowTexelDims.xy;
+		float2 shadowDims = ShadowDims;
+		shadowDims = xor(OrientationSwapXY, RotationSwapXY)
+			? shadowDims.yx
+			: shadowDims.xy;
 
 		float2 shadowUV = ShadowUV;
 		// shadowUV = xor(OrientationSwapXY, RotationSwapXY)
@@ -340,7 +338,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 		float2 ShadowFrac = frac(screenCoord / shadowTile);
 		float2 ShadowCoord = (ShadowFrac * shadowUV);
-		ShadowCoord += ShadowTexelDims * 0.5f; // half texel offset
+		ShadowCoord += 0.5f / shadowDims; // half texel offset
 		// ShadowCoord = xor(OrientationSwapXY, RotationSwapXY)
 			// ? ShadowCoord.yx
 			// : ShadowCoord.xy;
