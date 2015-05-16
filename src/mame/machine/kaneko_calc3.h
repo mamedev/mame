@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Luca Elia
 /* CALC 3 */
 
 #define VERBOSE_OUTPUT 0

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:???, David Haywood
 /* NeoGeo sprites (and fixed text layer) */
 
 #include "emu.h"

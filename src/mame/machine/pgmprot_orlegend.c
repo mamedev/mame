@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Olivier Galibert, iq_132
 /***********************************************************************
  PGM ASIC3 PGM protection emulation
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Olivier Gaibert, Angelo Salese, David Haywood
 /***************************************************************************
 
  Seibu Cop (Co-Processor) emulation
