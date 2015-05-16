@@ -666,6 +666,12 @@ if _OPTIONS["VERBOSE"] then
 	}
 end
 
+-- only show shadow warnings when enabled
+if (_OPTIONS["SHADOW_CHECK"]=="1") then
+	buildoptions {
+		"-Wshadow"
+	}
+
 -- only show deprecation warnings when enabled
 if _OPTIONS["DEPRECATED"]~="1" then
 	buildoptions {
@@ -834,10 +840,6 @@ end
 				}
 			end
 		else
-			if (_OPTIONS["SHADOW_CHECK"]=="1") then
-				buildoptions {
-					"-Wshadow"
-				}			
 			end
 			if (version == 40201) then
 				buildoptions {
