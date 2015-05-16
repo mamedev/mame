@@ -81,8 +81,6 @@
 #define NETLIST_DEVELOPMENT 0
 
 #include "netlist/nl_dice_compat.h"
-#include "netlist/devices/net_lib.h"
-#include "netlist/analog/nld_twoterm.h"
 
 #define SLOW_BUT_ACCURATE 0
 

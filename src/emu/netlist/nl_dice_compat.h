@@ -8,8 +8,10 @@
 #ifndef NL_DICE_COMPAT_H_
 #define NL_DICE_COMPAT_H_
 
+#ifndef NL_CONVERT_CPP
 #include "netlist/devices/net_lib.h"
-
+#include "netlist/analog/nld_twoterm.h"
+#endif
 /* --------------------------------------------------------------------
  * Compatibility macros for DICE netlists ...
  * -------------------------------------------------------------------- */
@@ -20,6 +22,7 @@
  * a temporary support and not be used in commits.
  */
 
+#ifndef NL_CONVERT_CPP
 #ifdef NETLIST_DEVELOPMENT
 #define CHIP(_n, _t) setup.register_dev( nl_alloc(nld_ ## _t ## _dip), _n);
 #else
@@ -30,6 +33,10 @@
 #define CONNECTIONY(_a) _a
 #define CONNECTIONX(_a, _b, _c, _d) setup.register_link(_a "." # _b, _c "." # _d);
 #define NET_CSTR(_a, _b) setup.register_link( _a, _b);
+
+#else
+#define CHIP(_n, _t) TTL_ ## _t ## _DIP(_n)
+#endif
 
 #define CIRCUIT_LAYOUT(x) NETLIST_START(x)
 #define CIRCUIT_LAYOUT_END NETLIST_END()

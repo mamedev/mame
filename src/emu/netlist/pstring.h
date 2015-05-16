@@ -63,7 +63,7 @@ inline void *operator new(std::size_t size, pblockpool &pool, int extra = 0) thr
 	return result;
 }
 
-inline void operator delete(void *pMem, pblockpool &pool, int extra)
+inline void operator delete(void *pMem, pblockpool &pool, ATTR_UNUSED int extra)
 {
 	pool.dealloc(pMem);
 }

@@ -196,7 +196,7 @@ ATTR_COLD void netlist_base_t::save_register()
 	netlist_object_t::save_register();
 }
 
-ATTR_HOT const nl_double netlist_base_t::gmin() const
+ATTR_HOT nl_double netlist_base_t::gmin() const
 {
 	return solver()->gmin();
 }
@@ -407,7 +407,7 @@ ATTR_COLD void netlist_core_device_t::start_dev()
 	start();
 }
 
-ATTR_HOT ATTR_ALIGN const netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
+ATTR_HOT ATTR_ALIGN netlist_sig_t netlist_core_device_t::INPLOGIC_PASSIVE(netlist_logic_input_t &inp)
 {
 	if (inp.state() != netlist_input_t::STATE_INP_PASSIVE)
 		return inp.Q();

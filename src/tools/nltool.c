@@ -86,7 +86,7 @@ struct options_entry oplist[] =
 	{ "f",               "-",   OPTION_STRING,  "file to process (default is stdin)" },
 	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
-	{ NULL }
+	{ NULL, NULL, 0, NULL }
 };
 
 NETLIST_START(dummy)
