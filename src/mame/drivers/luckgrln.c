@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Roberto Fresca, Angelo Salese
 /*
 
  Lucky Girl (newer 1991 version on different hardware?)
