@@ -1057,11 +1057,11 @@ ROM_END
 
 GAME( 1988, vigilant,	0,		vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev E)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1988, vigilantg,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilano,	0,		vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilanta,	vigilano,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev A)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantb,	vigilano,	vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantc,	vigilano,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev C)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, vigilantd,	vigilano,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilano,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilanta,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev A)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantb,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantc,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (World, Rev C)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, vigilantd,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1988, vigilanbl,	vigilant,	vigilant, vigilant, driver_device, 0, ROT0, "bootleg", "Vigilante (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
 GAME( 1988, kikcubic,  0,        kikcubic, kikcubic, driver_device, 0, ROT0, "Irem",                         "Meikyu Jima (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )   /* English title is Kickle Cubicle */
