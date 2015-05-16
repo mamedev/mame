@@ -154,45 +154,6 @@ NETLIB_UPDATE(7448_sub)
 	update_outputs(v);
 }
 
-#if 0
-ATTR_HOT void NETLIB_NAME(7448_sub)::inc_active()
-{
-	const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
-	nl_assert(netlist().use_deactivate());
-	if (++m_active == 1)
-	{
-		m_A.activate();
-		m_B.activate();
-		m_C.activate();
-		m_D.activate();
-		m_RBIQ.activate();
-
-		netlist_time mt = this->m_Q[0].net().time();
-		for (int i=1; i<7; i++)
-		{
-			if (this->m_Q[i].net().time() > mt)
-				mt = this->m_Q[i].net().time();
-		}
-
-		for (int i=0; i<7; i++)
-			m_Q[i].net().set_Q_time( tab7448[m_state][i], mt + NLTIME_FROM_NS(100));
-	}
-}
-
-ATTR_HOT void NETLIB_NAME(7448_sub)::dec_active()
-{
-	nl_assert(netlist().use_deactivate());
-	if (--m_active == 0)
-	{
-		m_A.inactivate();
-		m_B.inactivate();
-		m_C.inactivate();
-		m_D.inactivate();
-		m_RBIQ.inactivate();
-	}
-}
-#endif
-
 NETLIB_FUNC_VOID(7448_sub, update_outputs, (UINT8 v))
 {
 	nl_assert(v<16);

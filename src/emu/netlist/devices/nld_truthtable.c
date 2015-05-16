@@ -6,6 +6,7 @@
  */
 
 #include "nld_truthtable.h"
+#include "../plists.h"
 
 int truthtable_desc_t::count_bits(UINT32 v)
 {
@@ -170,7 +171,9 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 		nl_assert_always(times.count() == m_NO, "timing count not matching");
 
 		UINT16 val = 0;
-		UINT8 tindex[m_NO];
+		plinearlist_t<UINT8> tindex;
+		tindex.set_count(m_NO);
+
 		for (int j=0; j<m_NO; j++)
 		{
 			pstring outs = out[j].trim();
@@ -192,7 +195,9 @@ ATTR_COLD void truthtable_desc_t::setup(const char **truthtable, UINT32 disabled
 	}
 
 	// determine ignore
-	UINT32 ign[m_size];
+	plinearlist_t<UINT32> ign;
+	ign.set_count(m_size);
+
 	for (int j=0; j < m_size; j++)
 		ign[j] = -1;
 
