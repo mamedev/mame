@@ -146,7 +146,7 @@ READ16_MEMBER(gambl186_state::comms_r)
                     case 5:
                     {
                         m_comms_expect = 13;
-                        m_comms_blocks = 5;
+                        m_comms_blocks = 4;
                         break;
                     }
 
@@ -226,9 +226,14 @@ READ16_MEMBER(gambl186_state::comms_r)
                             {
                                 m_comms_expect = 3;
 
-                                if (m_comms_blocks < 5)
+                                if (m_comms_blocks < 4)
                                 {
                                     m_comms_data[m_comms_ind] += 5; //compensate for ack
+
+                                    if (m_comms_blocks == 2)
+                                    {
+                                        m_comms_expect = 2;
+                                    }
                                 }
 
                                 break;
