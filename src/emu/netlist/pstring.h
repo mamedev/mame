@@ -102,6 +102,7 @@ public:
 	pstring& operator+=(const pstring &string) { pcat(string.cstr()); return *this; }
 	friend pstring operator+(const pstring &lhs, const pstring &rhs) { return pstring(lhs) += rhs; }
 	friend pstring operator+(const pstring &lhs, const char *rhs) { return pstring(lhs) += rhs; }
+	friend pstring operator+(const pstring &lhs, const char rhs) { return pstring(lhs) += rhs; }
 	friend pstring operator+(const char *lhs, const pstring &rhs) { return pstring(lhs) += rhs; }
 
 	// comparison operators
@@ -145,6 +146,8 @@ public:
 
 	inline bool startsWith(const pstring &arg) const { return (pcmp(cstr(), arg.cstr(), arg.len()) == 0); }
 	inline bool startsWith(const char *arg) const { return (pcmp(cstr(), arg, strlen(arg)) == 0); }
+
+	pstring replace(const pstring &search, const pstring &replace);
 
 	// these return nstring ...
 	inline pstring cat(const pstring &s) const { return *this + s; }

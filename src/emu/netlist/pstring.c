@@ -118,7 +118,28 @@ int pstring::find_last_not_of(const pstring no) const
 	return -1;
 }
 
+pstring pstring::replace(const pstring &search, const pstring &replace)
+{
+	pstring ret = "";
 
+	if (search.len() == 0)
+		return *this;
+	int i = 0;
+	while (i<len())
+	{
+		if (strncmp(cstr()+i,search.cstr(),search.len()) == 0)
+		{
+			ret += replace;
+			i += search.len();
+		}
+		else
+		{
+			ret += *(cstr() + i);
+			i++;
+		}
+	}
+	return ret;
+}
 pstring pstring::ltrim(const pstring ws) const
 {
 	int f = find_first_not_of(ws);
