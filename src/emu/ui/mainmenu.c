@@ -25,7 +25,7 @@
 #include "ui/inputmap.h"
 #include "ui/mainmenu.h"
 #include "ui/miscmenu.h"
-#include "ui/selgame.h"
+#include "mewui/selgame.h"
 #include "ui/sliders.h"
 #include "ui/slotopt.h"
 #include "ui/tapectrl.h"

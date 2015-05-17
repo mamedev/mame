@@ -8,6 +8,8 @@ options {
 	"ForceCPP",
 }
 
+-- MEWUI
+dofile("mewui.lua")
 includedirs {
 	MAME_DIR .. "src/osd",
 	MAME_DIR .. "src/emu",
@@ -135,7 +137,7 @@ files {
 	MAME_DIR .. "src/emu/output.c",
 	MAME_DIR .. "src/emu/output.h",
 	MAME_DIR .. "src/emu/render.c",
-	MAME_DIR .. "src/emu/render.h",	
+	MAME_DIR .. "src/emu/render.h",
 	MAME_DIR .. "src/emu/rendfont.c",
 	MAME_DIR .. "src/emu/rendfont.h",
 	MAME_DIR .. "src/emu/rendlay.c",
@@ -189,8 +191,8 @@ files {
 	MAME_DIR .. "src/emu/ui/info.h",
 	MAME_DIR .. "src/emu/ui/inputmap.c",
 	MAME_DIR .. "src/emu/ui/inputmap.h",
-	MAME_DIR .. "src/emu/ui/selgame.c",
-	MAME_DIR .. "src/emu/ui/selgame.h",
+--	MAME_DIR .. "src/emu/ui/selgame.c",
+--	MAME_DIR .. "src/emu/ui/selgame.h",
 	MAME_DIR .. "src/emu/ui/sliders.c",
 	MAME_DIR .. "src/emu/ui/sliders.h",
 	MAME_DIR .. "src/emu/ui/slotopt.c",
@@ -207,7 +209,7 @@ files {
 	MAME_DIR .. "src/emu/validity.h",
 	MAME_DIR .. "src/emu/video.c",
 	MAME_DIR .. "src/emu/video.h",
-	MAME_DIR .. "src/emu/rendersw.inc",	
+	MAME_DIR .. "src/emu/rendersw.inc",
 	MAME_DIR .. "src/emu/debug/debugcmd.c",
 	MAME_DIR .. "src/emu/debug/debugcmd.h",
 	MAME_DIR .. "src/emu/debug/debugcon.c",
@@ -331,12 +333,12 @@ dependency {
 	{ MAME_DIR .. "src/emu/rendlay.c", GEN_DIR .. "emu/layout/noscreens.lh" },
 
 	{ MAME_DIR .. "src/emu/video.c",   GEN_DIR .. "emu/layout/snap.lh" },
-	
+
 }
 
 custombuildtask {
 	{ MAME_DIR .. "src/emu/uismall.png"         , GEN_DIR .. "emu/uismall.fh",  {  MAME_DIR.. "src/build/png2bdc.py",  MAME_DIR .. "src/build/file2str.py" }, {"@echo Converting uismall.png...", PYTHON .. " $(1) $(<) temp.bdc", PYTHON .. " $(2) temp.bdc $(@) font_uismall UINT8" }},
-                                                
+
 	layoutbuildtask("emu/layout", "dualhovu"),
 	layoutbuildtask("emu/layout", "dualhsxs"),
 	layoutbuildtask("emu/layout", "dualhuov"),
@@ -383,18 +385,18 @@ function emuProject(_target, _subtarget)
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
-	
+
 	dofile(path.join("src", "cpu.lua"))
 
 	dofile(path.join("src", "sound.lua"))
-	
+
 	dofile(path.join("src", "netlist.lua"))
-	
+
 	dofile(path.join("src", "video.lua"))
 
 	dofile(path.join("src", "machine.lua"))
 
-	
+
 	project ("bus")
 	uuid ("5d782c89-cf7e-4cfe-8f9f-0d4bfc16c91d")
 	kind "StaticLib"
@@ -424,8 +426,8 @@ function emuProject(_target, _subtarget)
 	end
 
 	dofile(path.join("src", "bus.lua"))
-	
-	
+
+
 	project ("dasm")
 	uuid ("f2d28b0a-6da5-4f78-b629-d834aa00429d")
 	kind "StaticLib"
@@ -449,10 +451,10 @@ function emuProject(_target, _subtarget)
 			MAME_DIR .. "3rdparty/expat/lib",
 		}
 	end
-	
+
 	files {
 		disasm_files
-	}	
+	}
 
 	if #disasm_dependency > 0 then
 		dependency {
