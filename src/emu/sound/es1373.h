@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ted Green
 // Creative Labs Ensonic AudioPCI97 ES1373
 

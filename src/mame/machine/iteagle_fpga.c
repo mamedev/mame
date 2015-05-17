@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ted Green
 #include "iteagle_fpga.h"
 #include "coreutil.h"

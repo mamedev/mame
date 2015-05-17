@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:Ted Green
 #include "voodoo_pci.h"
 
