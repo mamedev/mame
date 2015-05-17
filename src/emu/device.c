@@ -122,8 +122,15 @@ device_t::~device_t()
 //  info for a given region
 //-------------------------------------------------
 
+// NOTE: this being NULL in a C++ member function can lead to undefined behavior.
+// However, it is relied on throughout MAME, so will remain for now.
+
 memory_region *device_t::memregion(const char *_tag) const
 {
+	// safety first
+	if (this == NULL)
+		return NULL;
+
 	// build a fully-qualified name and look it up
 	return machine().memory().region(subtag(_tag).c_str());
 }
@@ -136,6 +143,10 @@ memory_region *device_t::memregion(const char *_tag) const
 
 memory_share *device_t::memshare(const char *_tag) const
 {
+	// safety first
+	if (this == NULL)
+		return NULL;
+
 	// build a fully-qualified name and look it up
 	return machine().memory().shared(subtag(_tag).c_str());
 }
@@ -148,6 +159,10 @@ memory_share *device_t::memshare(const char *_tag) const
 
 memory_bank *device_t::membank(const char *_tag) const
 {
+	// safety first
+	if (this == NULL)
+		return NULL;
+
 	// build a fully-qualified name and look it up
 	return machine().memory().bank(subtag(_tag).c_str());
 }
@@ -160,6 +175,10 @@ memory_bank *device_t::membank(const char *_tag) const
 
 ioport_port *device_t::ioport(const char *tag) const
 {
+	// safety first
+	if (this == NULL)
+		return NULL;
+
 	// build a fully-qualified name and look it up
 	return machine().ioport().port(subtag(tag).c_str());
 }
@@ -172,6 +191,10 @@ ioport_port *device_t::ioport(const char *tag) const
 
 std::string device_t::parameter(const char *tag) const
 {
+	// safety first
+	if (this == NULL)
+		return NULL;
+
 	// build a fully-qualified name and look it up
 	return machine().parameters().lookup(subtag(tag));
 }
