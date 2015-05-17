@@ -83,7 +83,8 @@ struct options_entry oplist[] =
 {
 	{ "time_to_run;t",   "1.0", OPTION_FLOAT,   "time to run the emulation (seconds)" },
 	{ "logs;l",          "",    OPTION_STRING,  "colon separated list of terminals to log" },
-	{ "f",               "-",   OPTION_STRING,  "file to process (default is stdin)" },
+	{ "file;f",          "-",   OPTION_STRING,  "file to process (default is stdin)" },
+	{ "cmd;c",			 "run", OPTION_STRING,  "run|convert|listdevices" },
 	{ "listdevices;ld",  "",    OPTION_BOOLEAN, "list all devices available for use" },
 	{ "help;h",          "0",   OPTION_BOOLEAN, "display help" },
 	{ NULL, NULL, 0, NULL }
@@ -101,9 +102,9 @@ NETLIST_END()
     CORE IMPLEMENTATION
 ***************************************************************************/
 
-const char *filetobuf(pstring fname)
+pstring filetobuf(pstring fname)
 {
-	static pstring pbuf = "";
+	pstring pbuf = "";
 
 	if (fname == "-")
 	{
@@ -114,7 +115,7 @@ const char *filetobuf(pstring fname)
 			pbuf += lbuf;
 		}
 		printf("%d\n",*(pbuf.right(1).cstr()+1));
-		return pbuf.cstr();
+		return pbuf;
 	}
 	else
 	{
@@ -128,7 +129,9 @@ const char *filetobuf(pstring fname)
 		fread(buf, fsize, 1, f);
 		buf[fsize] = 0;
 		fclose(f);
-		return buf;
+		pbuf = buf;
+		free(buf);
+		return pbuf;
 	}
 }
 
@@ -292,6 +295,81 @@ static void listdevices()
 }
 
 /*-------------------------------------------------
+    convert - convert a spice netlist
+-------------------------------------------------*/
+
+struct sp_net_t
+{
+	const pstring &name() { return m_name;}
+
+	pstring m_name;
+	nl_util::pstring_list m_terminals;
+};
+
+static pnamedlist_t<sp_net_t *> nets;
+
+static void add_term(pstring netname, pstring termname)
+{
+	sp_net_t * net = nets.find(netname);
+	if (net == NULL)
+	{
+		net = new sp_net_t;
+		net->m_name = netname;
+		nets.add(net, false);
+	}
+	net->m_terminals.add(termname);
+}
+
+static void convert(core_options &opts)
+{
+	pstring spnlf = filetobuf(opts.value("f"));
+	nl_util::pstring_list spnl = nl_util::split(spnlf, "\n");
+
+	for (int i=0; i < spnl.count(); i++)
+	{
+		pstring line = spnl[i].trim();
+		if (line != "" && line.left(1) != "*")
+		{
+			nl_util::pstring_list tt = nl_util::split(line, " ", true);
+			switch (tt[0].cstr()[0])
+			{
+				case '.':
+					// e.g. SUBCKT - ignored for now
+					break;
+				case 'Q':
+					printf("QBJT(%s, \"%s\")\n", tt[0].cstr(), tt[4].cstr());
+					add_term(tt[1], tt[0] + ".C");
+					add_term(tt[2], tt[0] + ".B");
+					add_term(tt[3], tt[0] + ".E");
+					break;
+				case 'R':
+					// FIXME: Rewrite resistor value
+					printf("RES(%s, %s)\n", tt[0].cstr(), tt[3].cstr());
+					add_term(tt[1], tt[0] + ".1");
+					add_term(tt[2], tt[0] + ".2");
+					break;
+				default:
+					printf("%s: %s\n", tt[0].cstr(), line.cstr());
+			}
+		}
+	}
+	// print nets
+	for (int i=0; i<nets.count(); i++)
+	{
+		sp_net_t * net = nets[i];
+		//printf("Net %s\n", net->name().cstr());
+		printf("NET_C(%s", net->m_terminals[0].cstr() );
+		for (int j=1; j<net->m_terminals.count(); j++)
+		{
+			printf(", %s", net->m_terminals[j].cstr() );
+		}
+		printf(")\n");
+	}
+
+}
+
+
+/*-------------------------------------------------
     main - primary entry point
 -------------------------------------------------*/
 
@@ -315,13 +393,18 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if (opts.bool_value("ld"))
-	{
+	pstring cmd = opts.value("c");
+	if (cmd == "listdevices")
 		listdevices();
-	}
+	else if (cmd == "run")
+		run(opts);
+	else if (cmd == "convert")
+		convert(opts);
 	else
 	{
-		run(opts);
+		fprintf(stderr, "Unknown command %s\n", cmd.cstr());
+		usage(opts);
+		return 1;
 	}
 
 	return 0;
