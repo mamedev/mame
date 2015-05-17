@@ -6,6 +6,7 @@
   QFP5-128pin, see manual for pinout
   
   TODO:
+  - OSC3
   - K input interrupts
   - finish i/o ports
   - serial interface
@@ -379,10 +380,6 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 	m_256_src_pulse ^= 1;
 	m_core_256_handle->adjust(attotime::from_ticks(64, unscaled_clock()));
 
-	// clock-timer is always running, advance it on falling edge
-	if (m_256_src_pulse == 0)
-		clock_clktimer();
-
 	// clock stopwatch on falling edge of pulse+on
 	m_swl_cur_pulse = m_256_src_pulse | (m_stopwatch_on ^ 1);
 	if (m_swl_cur_pulse == 0)
@@ -391,6 +388,11 @@ TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
 	// clock 1-shot buzzer on rising edge if it's on
 	if (m_bz_1shot_on != 0 && m_256_src_pulse == 1)
 		clock_bz_1shot();
+
+	// clock-timer is always running, advance it on falling edge
+	// (handle clock_clktimer last in case of watchdog reset)
+	if (m_256_src_pulse == 0)
+		clock_clktimer();
 }
 
 
@@ -871,6 +873,8 @@ WRITE8_MEMBER(e0c6s46_device::io_w)
 			// d1: envelope cycle selection
 			// d2: reset envelope
 			// d3: trigger one-shot buzzer
+			if (data & 1)
+				logerror("%s io_w enabled envelope, PC=$%04X\n", tag(), m_prev_pc);
 			m_bz_envelope = data & 3;
 			m_bz_1shot_on |= data & 8;
 			break;
