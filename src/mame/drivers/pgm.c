@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:David Haywood, ElSemi, ???
+// license:BSD-3-Clause
+// copyright-holders:David Haywood, ElSemi
 
 /* PGM System (c)1997 IGS
 

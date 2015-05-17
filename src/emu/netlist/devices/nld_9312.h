@@ -43,6 +43,10 @@
 		NET_REGISTER_DEV(9312, _name)
 #if (USE_TRUTHTABLE)
 #include "nld_truthtable.h"
+
+/* The truthtable implementation is a lot faster than
+ * the carefully crafted code :-(
+ */
 NETLIB_TRUTHTABLE(9312, 12, 2, 0);
 #else
 

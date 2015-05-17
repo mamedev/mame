@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Luca Elia, David Haywood
 
 
 class kaneko_view2_tilemap_device : public device_t

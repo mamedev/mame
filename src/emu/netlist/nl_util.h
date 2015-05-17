@@ -21,7 +21,7 @@ private:
 public:
 	typedef plinearlist_t<pstring, 10> pstring_list;
 
-	static pstring_list split(const pstring &str, const pstring &onstr)
+	static pstring_list split(const pstring &str, const pstring &onstr, bool ignore_empty = false)
 	{
 		pstring_list temp;
 
@@ -31,12 +31,18 @@ public:
 		pn = str.find(onstr, p);
 		while (pn>=0)
 		{
-			temp.add(str.substr(p, pn - p));
+			pstring t = str.substr(p, pn - p);
+			if (!ignore_empty || t.len() != 0)
+				temp.add(t);
 			p = pn + onstr.len();
 			pn = str.find(onstr, p);
 		}
 		if (p<str.len())
-			temp.add(str.substr(p));
+		{
+			pstring t = str.substr(p);
+			if (!ignore_empty || t.len() != 0)
+				temp.add(t);
+		}
 		return temp;
 	}
 };

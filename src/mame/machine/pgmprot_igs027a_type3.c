@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:David Haywood, Xing Xing
 /***********************************************************************
  PGM IGS027A ARM protection emulation
 

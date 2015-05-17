@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nathan Woods, Kevin Thacker, Phill Harvey-Smith, Robbbert, Curt Coder
 /*********************************************************************
 
     !!! DEPRECATED, USE src/emu/wd_fdc.h FOR NEW DRIVERS !!!

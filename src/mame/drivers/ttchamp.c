@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Table Tennis Champions
    (c) 1995 Gamart

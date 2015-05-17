@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Nicola Salmoria
 /*******************************************************************************
 
 Data East gfx encryption emulation                            by Nicola Salmoria

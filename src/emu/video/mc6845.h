@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Wilbert Pol
 /**********************************************************************
 
     Motorola MC6845 and compatible CRT controller emulation

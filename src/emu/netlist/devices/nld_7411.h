@@ -40,7 +40,12 @@
 		NET_CONNECT(_name, B, _I2)                                                  \
 		NET_CONNECT(_name, C, _I3)
 
+#if (USE_TRUTHTABLE)
+#include "nld_truthtable.h"
+NETLIB_TRUTHTABLE(7411, 3, 1, 0);
+#else
 NETLIB_SIGNAL(7411, 3, 0, 1);
+#endif
 
 #define TTL_7411_DIP(_name)                                                         \
 		NET_REGISTER_DEV(7411_dip, _name)

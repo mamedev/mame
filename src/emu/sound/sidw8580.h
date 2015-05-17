@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Dag Lem
 #pragma once
 
 #ifndef __SIDW8580_H__

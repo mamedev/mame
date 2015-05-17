@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Samuele Zannoli
 /*
 Chihiro is an Xbox-based arcade system from SEGA.
 

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Tatsuyuki Satoh
 /*
     vlm5030.c
 

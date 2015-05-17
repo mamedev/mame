@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Derrick Renaud, Couriersud
 #pragma once
 
 #ifndef __FLT_VOL_H__

@@ -279,6 +279,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/mz_cas.h",
 		MAME_DIR .. "src/lib/formats/nanos_dsk.c",
 		MAME_DIR .. "src/lib/formats/nanos_dsk.h",
+		MAME_DIR .. "src/lib/formats/nascom_dsk.c",
+		MAME_DIR .. "src/lib/formats/nascom_dsk.h",
 		MAME_DIR .. "src/lib/formats/naslite_dsk.c",
 		MAME_DIR .. "src/lib/formats/naslite_dsk.h",
 		MAME_DIR .. "src/lib/formats/nes_dsk.c",

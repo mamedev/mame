@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
   Roland MPU-401 core

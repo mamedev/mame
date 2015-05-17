@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Peter Ferrie
 /***************************************************************************
 
     savquest.c
@@ -54,14 +54,16 @@
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
 #include "video/voodoo.h"
-
+#include "machine/ds128x.h"
+#include "bus/isa/sblaster.h"
 
 class savquest_state : public pcat_base_state
 {
 public:
 	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
-		m_vga(*this, "vga")
+		m_vga(*this, "vga"),
+		m_voodoo(*this, "voodoo")
 	{
 	}
 
@@ -74,6 +76,7 @@ public:
 	UINT8 *m_smram;
 
 	required_device<s3_vga_device> m_vga;
+	required_device<voodoo_2_device> m_voodoo;
 
 	int m_haspind;
 	int m_haspstate;
@@ -85,12 +88,14 @@ public:
 		HASPSTATE_READ
 	};
 	int m_hasp_passind;
-	UINT8 m_hasp_tmppass[15];
+	UINT8 m_hasp_tmppass[0x29];
 	UINT8 m_port379;
 	int m_hasp_passmode;
+	int m_hasp_prodind;
 
 	UINT8 m_mtxc_config_reg[256];
 	UINT8 m_piix4_config_reg[8][256];
+	UINT32 m_pci_3dfx_regs[0x40];
 
 	DECLARE_WRITE32_MEMBER( bios_f0000_ram_w );
 	DECLARE_WRITE32_MEMBER( bios_e0000_ram_w );
@@ -98,8 +103,8 @@ public:
 	DECLARE_WRITE32_MEMBER( bios_e8000_ram_w );
 	DECLARE_WRITE32_MEMBER( bios_ec000_ram_w );
 
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
+	DECLARE_READ8_MEMBER(parallel_port_r);
+	DECLARE_WRITE8_MEMBER(parallel_port_w);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
@@ -115,6 +120,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	void intel82439tx_init();
+	void vid_3dfx_init();
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -327,6 +333,44 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 	}
 }
 
+void savquest_state::vid_3dfx_init()
+{
+	m_pci_3dfx_regs[0x00 / 4] = 0x0002121a; // 3dfx Multimedia device
+	m_pci_3dfx_regs[0x08 / 4] = 2; // revision ID
+	m_pci_3dfx_regs[0x10 / 4] = 0xff000000;
+	m_pci_3dfx_regs[0x40 / 4] = 0x4000; //INITEN_SECONDARY_REV_ID
+	voodoo_set_init_enable(m_voodoo, 0x4000); //INITEN_SECONDARY_REV_ID
+}
+
+static UINT32 pci_3dfx_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+{
+//osd_printf_warning("PCI read: %x\n", reg);
+	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
+	return state->m_pci_3dfx_regs[reg / 4];
+}
+
+static void pci_3dfx_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+osd_printf_warning("PCI write: %x %x\n", reg, data);
+
+	savquest_state *state = busdevice->machine().driver_data<savquest_state>();
+
+	if (reg == 0x10)
+	{
+		data &= 0xff000000;
+	}
+	else if (reg == 0x40)
+	{
+		voodoo_set_init_enable(state->m_voodoo, data);
+	}
+	else if (reg == 0x54)
+	{
+		data &= 0xf000ffff; /* bits 16-27 are read-only */
+	}
+
+	state->m_pci_3dfx_regs[reg / 4] = data;
+}
+
 WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
 {
 	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
@@ -382,21 +426,71 @@ WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
 	#endif
 }
 
-static const UINT8 m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d, 0x9d};
+static const UINT8 m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d}; /* 0x9d or 0x9e */
+static const UINT8 m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x53, 0x4e, 0x53, 0x49, 0x53, 0x48, 0x53, 0x4b, 0x53, 0x4a,
+					0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
+					0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
+				       };
 
-READ32_MEMBER(savquest_state::parallel_port_r)
+READ8_MEMBER(savquest_state::parallel_port_r)
 {
-	if (ACCESSING_BITS_8_15)
+	if (offset == 1)
 	{
-		return ((UINT32) m_port379 << 8);
+		if ((m_haspstate == HASPSTATE_READ)
+		 && (m_hasp_passmode == 3)
+		   )
+		{
+			/* passmode 3 is used to retrieve the product(s) information
+			   it comes in two parts: header and product
+			   the header has this format:
+				offset	range		purpose
+				00	01		header type
+				01	01-05		count of used product slots, must be 2
+				02	01-05		count of unused product slots
+							this is assumed to be 6-(count of used slots)
+							but it is not enforced here
+							however a total of 6 structures will be checked
+				03	01-02		unknown
+				04	01-46		country code
+				05-0f	00		reserved
+			   the used product slots have this format:
+			   (the unused product slots must be entirely zeroes)
+				00-01	0001-000a	product ID, one must be 6, the other 0a
+				02	0001-0003	unknown but must be 0001
+				04	01-05		HASP plug country ID
+				05	01-02		unknown but must be 01
+				06	05		unknown
+				07-0a	any		unknown, not used
+				0b	ff		unknown
+				0c	ff		unknown
+				0d-0f	00		reserved
+
+			  the read is performed by accessing an array of 16-bit big-endian values
+			  and returning one bit at a time into bit 5 of the result
+			  the 16-bit value is then XORed with 0x534d and the register index
+			*/
+
+			if (m_hasp_prodind <= (sizeof(m_hasp_prodinfo) * 8))
+			{
+				m_port379 = ((m_hasp_prodinfo[(m_hasp_prodind - 1) >> 3] >> ((8 - m_hasp_prodind) & 7)) & 1) << 5; /* return defined info */
+			}
+			else
+			{
+				m_port379 = (((0x534d ^ ((m_hasp_prodind - 1) >> 4)) >> ((16 - m_hasp_prodind) & 15)) & 1) << 5; /* then just alternate between the two key values */
+			}
+
+			++m_hasp_prodind;
+		}
+
+		return m_port379;
 	}
 
 	return 0;
 }
 
-WRITE32_MEMBER(savquest_state::parallel_port_w)
+WRITE8_MEMBER(savquest_state::parallel_port_w)
 {
-	if (ACCESSING_BITS_0_7)
+	if (!offset)
 	{
 		UINT8 data8 = (UINT8) (data & 0xff);
 
@@ -443,13 +537,15 @@ WRITE32_MEMBER(savquest_state::parallel_port_w)
 
 			case 3:
 			{
+				m_haspind = 0;
+
 				if (data8 == 0x80)
 				{
 					m_haspstate = HASPSTATE_PASSBEG;
 					m_hasp_passind = 0;
+					return;
 				}
 
-				m_haspind = 0;
 				break;
 			}
 
@@ -462,35 +558,36 @@ WRITE32_MEMBER(savquest_state::parallel_port_w)
 
 		if (m_haspstate == HASPSTATE_READ)
 		{
-			/* different passwords causes different values to be returned
-			   but there is really only one password of interest
+			/* different passwords cause different values to be returned
+			   but there are really only two passwords of interest
+			   passmode 2 is used to verify that the dongle is responding correctly
 			*/
 
-			if (m_hasp_passmode == 1)
+			if (m_hasp_passmode == 2)
 			{
-				/* in passmode 1, some values remain unknown: 96, 9a, c4, d4, ec, f8
+				/* in passmode 2, some values remain unknown: 96, 9a, c4, d4, ec, f8
 				   they all return 00, but if that's wrong then there will be failures to start
 				*/
 
 				if ((data8 == 0x94)
-					|| (data8 == 0x9e)
-					|| (data8 == 0xa4)
-					|| (data8 == 0xb2)
-					|| (data8 == 0xbe)
-					|| (data8 == 0xd0)
-					)
+				 || (data8 == 0x9e)
+				 || (data8 == 0xa4)
+				 || (data8 == 0xb2)
+				 || (data8 == 0xbe)
+				 || (data8 == 0xd0)
+				   )
 				{
 					return;
 				}
 
 				if ((data8 == 0x8a)
-					|| (data8 == 0x8e)
-					|| (data8 == 0xca)
-					|| (data8 == 0xd2)
-					|| (data8 == 0xe2)
-					|| (data8 == 0xf0)
-					|| (data8 == 0xfc)
-					)
+				 || (data8 == 0x8e)
+				 || (data8 == 0xca)
+				 || (data8 == 0xd2)
+				 || (data8 == 0xe2)
+				 || (data8 == 0xf0)
+				 || (data8 == 0xfc)
+				   )
 				{
 					/* someone with access to the actual dongle could dump the true values
 					   I've never seen it so I just determined the relevant bits instead
@@ -548,31 +645,64 @@ WRITE32_MEMBER(savquest_state::parallel_port_w)
 				{
 				}
 			}
-
-			return;
 		}
-
-		if (m_haspstate == HASPSTATE_PASSEND)
+		else if (m_haspstate == HASPSTATE_PASSEND)
 		{
-			m_haspstate = HASPSTATE_READ;
-			return;
-		}
+			if (data8 & 1)
+			{
+				if ((m_hasp_passmode == 1)
+				 && (data8 == 0x9d)
+				   )
+				{
+					m_hasp_passmode = 2;
+				}
 
-		if ((m_haspstate == HASPSTATE_PASSBEG)
-			&& (data8 & 1)
+				m_haspstate = HASPSTATE_READ;
+			}
+			else if (m_hasp_passmode == 1)
+			{
+				m_hasp_tmppass[m_hasp_passind] = data8;
+
+				if (++m_hasp_passind == sizeof(m_hasp_tmppass))
+				{
+					if ((m_hasp_tmppass[0] == 0x9c)
+				 	 && (m_hasp_tmppass[1] == 0x9e)
+				   	   )
+					{
+						int i;
+
+						i = 2;
+						m_hasp_prodind = 0;
+
+						do
+						{
+							m_hasp_prodind = (m_hasp_prodind << 1) + ((m_hasp_tmppass[i] >> 6) & 1);
+						}
+						while ((i += 3) < sizeof(m_hasp_tmppass));
+
+						m_hasp_prodind = (m_hasp_prodind - 0xc08) << 4;
+
+						if (m_hasp_prodind < (0x38 << 4))
+						{
+							m_hasp_passmode = 3;
+						}
+					}
+
+					m_haspstate = HASPSTATE_READ;
+				}
+			}
+		}
+		else if ((m_haspstate == HASPSTATE_PASSBEG)
+		      && (data8 & 1)
 			)
 		{
 			m_hasp_tmppass[m_hasp_passind] = data8;
 
-			if (++m_hasp_passind == 15)
+			if (++m_hasp_passind == sizeof(m_hasp_cmppass))
 			{
 				m_haspstate = HASPSTATE_PASSEND;
-				m_hasp_passmode = 0;
-
-				if (!memcmp(m_hasp_tmppass, m_hasp_cmppass, sizeof(m_hasp_tmppass)))
-				{
-					m_hasp_passmode = 1;
-				}
+				m_hasp_passind = 0;
+				m_hasp_passmode = (int) !memcmp(m_hasp_tmppass, m_hasp_cmppass, sizeof(m_hasp_cmppass));
 			}
 		}
 	}
@@ -607,17 +737,19 @@ static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_e8000") AM_WRITE(bios_e8000_ram_w)
 	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ec000") AM_WRITE(bios_ec000_ram_w)
 	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 128MB RAM
+	AM_RANGE(0xe0000000, 0xe0fbffff) AM_DEVREADWRITE("voodoo", voodoo_device, voodoo_r, voodoo_w)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(savquest_io, AS_IO, 32, savquest_state)
 	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", ds12885_device, read, write, 0xffffffff)
 
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
 	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
+	AM_RANGE(0x0378, 0x037b) AM_READWRITE8(parallel_port_r, parallel_port_w, 0xffffffff)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
@@ -646,6 +778,7 @@ void savquest_state::machine_start()
 	m_bios_ec000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
 
 	intel82439tx_init();
+	vid_3dfx_init();
 }
 
 void savquest_state::machine_reset()
@@ -655,11 +788,16 @@ void savquest_state::machine_reset()
 	membank("bios_e4000")->set_base(memregion("bios")->base() + 0x24000);
 	membank("bios_e8000")->set_base(memregion("bios")->base() + 0x28000);
 	membank("bios_ec000")->set_base(memregion("bios")->base() + 0x2c000);
+	m_haspstate = HASPSTATE_NONE;
 }
 
 WRITE_LINE_MEMBER(savquest_state::vblank_assert)
 {
 }
+
+SLOT_INTERFACE_START( savquest_isa16_cards )
+	SLOT_INTERFACE("sb16", ISA16_SOUND_BLASTER_16)
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
@@ -668,10 +806,13 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
+	MCFG_DEVICE_REMOVE("rtc") 
+	MCFG_DS12885_ADD("rtc")
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
+	MCFG_PCI_BUS_LEGACY_DEVICE(13, NULL, pci_3dfx_r, pci_3dfx_w)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
@@ -679,12 +820,18 @@ static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, NULL, NULL, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
 
+	/* sound hardware */
+
+	MCFG_DEVICE_ADD("isa", ISA16, 0)
+	MCFG_ISA16_CPU(":maincpu")
+	MCFG_ISA16_SLOT_ADD("isa", "isa1", savquest_isa16_cards, "sb16", false)
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_s3_vga )
 
 	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(4,4)
+	MCFG_VOODOO_FBMEM(4)
+	MCFG_VOODOO_TMUMEM(4,4) /* this is the 12Mb card */
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("maincpu")
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(savquest_state,vblank_assert))

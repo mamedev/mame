@@ -17,6 +17,7 @@
 //**************************************************************************
 
 #define LOG_ALLOCS      (0)
+#define DEBUG_MISMATCHED_ALLOCS (0)
 
 // define this to initialize allocated memory to a fixed non-0 value
 #ifdef MAME_DEBUG
@@ -95,6 +96,41 @@ bool memory_entry::s_tracking = false;
 memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
 memory_entry *memory_entry::s_freehead = NULL;
 
+//**************************************************************************
+//  OPERATOR REPLACEMENTS
+//**************************************************************************
+
+#ifndef NO_MEM_TRACKING
+
+// standard new/delete operators (try to avoid using)
+void *operator new(std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, false, true, false); }
+void *operator new[](std::size_t size) throw (std::bad_alloc) { return malloc_file_line(size, NULL, 0, true, true, false); }
+void operator delete(void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
+void operator delete[](void *ptr) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
+
+void* operator new(std::size_t size,const std::nothrow_t&) throw() { return malloc_file_line(size, NULL, 0, false, false, false); }
+void* operator new[](std::size_t size, const std::nothrow_t&) throw() { return malloc_file_line(size, NULL, 0, true, false, false); }
+void operator delete(void* ptr, const std::nothrow_t&) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, false); }
+void operator delete[](void* ptr, const std::nothrow_t&) throw() { if (ptr != NULL) free_file_line(ptr, NULL, 0, true); }
+
+#endif
+
+//**************************************************************************
+//  OPERATOR OVERLOADS - DEFINITIONS
+//**************************************************************************
+
+// file/line new/delete operators
+void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc) { return malloc_file_line(size, file, line, false, true, false); }
+void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc) { return malloc_file_line(size, file, line, true, true, false); }
+void operator delete(void *ptr, const char *file, int line) { if (ptr != NULL) free_file_line(ptr, file, line, false); }
+void operator delete[](void *ptr, const char *file, int line) { if (ptr != NULL) free_file_line(ptr, file, line, true); }
+
+// file/line new/delete operators with zeroing
+void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc) { return malloc_file_line(size, file, line, false, true, true); }
+void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc) { return malloc_file_line(size, file, line, true, true, true); }
+void operator delete(void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != NULL) free_file_line(ptr, file, line, false); }
+void operator delete[](void *ptr, const char *file, int line, const zeromem_t &) { if (ptr != NULL) free_file_line(ptr, file, line, true); }
+
 
 
 //**************************************************************************
@@ -157,14 +193,18 @@ void free_file_line(void *memory, const char *file, int line, bool array)
 	// warn about mismatched arrays
 	if (!array && entry->m_array)
 	{
-		fprintf(stderr, "Error: attempt to free array %p with global_free in %s(%d)!\n", memory, file, line);
-		osd_break_into_debugger("Error: attempt to free array with global_free");
+		fprintf(stderr, "Warning: attempt to free array %p with global_free in %s(%d)!\n", memory, file, line);
+		if (DEBUG_MISMATCHED_ALLOCS) {
+			osd_break_into_debugger("Error: attempt to free array with global_free");
+		}
 	}
 	if (array && !entry->m_array)
 	{
 #ifndef __INTEL_COMPILER // todo: fix this properly, it appears some optimization the compiler applies breaks our logic here
-		fprintf(stderr, "Error: attempt to free single object %p with global_free_array in %s(%d)!\n", memory, file, line);
-		osd_break_into_debugger("Error: attempt to free single object with global_free_array");
+		fprintf(stderr, "Warning: attempt to free single object %p with global_free_array in %s(%d)!\n", memory, file, line);
+		if (DEBUG_MISMATCHED_ALLOCS) {
+			osd_break_into_debugger("Error: attempt to free single object with global_free_array");
+		}
 #endif
 	}
 

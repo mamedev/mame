@@ -1,4 +1,4 @@
-// license:???
+// license:BSD-3-Clause
 // copyright-holders:David Haywood, Stephh
 /*******************************************************************************
  Super Pinball Action (c) 1991 Tecmo

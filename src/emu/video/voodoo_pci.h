@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ted Green
 // 3dfx Voodoo Graphics SST-1/2 emulator.
 
 #ifndef VOODOO_PCI_H

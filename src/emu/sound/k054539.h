@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*********************************************************
 
     Konami 054539 PCM Sound Chip

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Fabio Priuli,Phil Bennett
 /*****************************************************************************
 
   MB87078 6-bit,4-channel electronic volume controller emulator

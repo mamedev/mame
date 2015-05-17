@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Grull Osgo
+// copyright-holders:Angelo Salese, Grull Osgo, Peter Ferrie
 /************************************************************************************
 
 California Chase (c) 1999 The Game Room

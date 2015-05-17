@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Tomasz Slanina
 #pragma once
 
 #ifndef __NILE_H__

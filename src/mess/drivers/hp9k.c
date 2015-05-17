@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:fulivi
+// license:BSD-3-Clause
+// copyright-holders:F. Ulivi
 
 /***************************************************************************
 

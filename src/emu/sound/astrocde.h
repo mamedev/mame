@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles,Frank Palazzolo
 #pragma once
 
 #ifndef __ASTROCDE_H__

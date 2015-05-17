@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Brad Oliver, Bernd Wiebelt, Allard Van Der Bas
 /*************************************************************************
 
     Atari Asteroids hardware

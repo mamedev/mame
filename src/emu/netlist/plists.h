@@ -162,6 +162,17 @@ public:
 		clear();
 	}
 
+	ATTR_COLD void set_count(const int new_count)
+	{
+		if (new_count < m_count)
+			m_count = new_count;
+		else
+		{
+			resize(new_count);
+			m_count = new_count;
+		}
+
+	}
 private:
 	ATTR_COLD void resize(const int new_size)
 	{

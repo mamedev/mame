@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ville Linde
 /***********************************************************************
 
     Konami K056800 (MIRAC)

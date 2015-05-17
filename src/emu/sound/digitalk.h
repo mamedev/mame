@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 #ifndef _DIGITALKER_H_
 #define _DIGITALKER_H_
 

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     HD44102 Dot Matrix Liquid Crystal Graphic Display Column Driver emulation

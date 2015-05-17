@@ -37,7 +37,6 @@
 #include "emu.h"
 #include "drcuml.h"
 #include "drcumlsh.h"
-#include <setjmp.h>
 
 using namespace uml;
 

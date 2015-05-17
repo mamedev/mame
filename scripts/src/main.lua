@@ -104,7 +104,7 @@ function mainProject(_target, _subtarget)
 		"jsoncpp",
 		"mongoose",
 	}
-	if _OPTIONS["NO_USE_MIDI"]=="0" then
+	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {
 			"portmidi",
 		}
@@ -146,25 +146,27 @@ function mainProject(_target, _subtarget)
 		}
 
 	end
+	local rctarget = _subtarget
 
 	if _OPTIONS["targetos"]=="windows" and (not override_resources) then
-		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/"  .. _subtarget .. "/" .. _subtarget ..".rc"
+		local rcfile = MAME_DIR .. "src/" .. _target .. "/osd/".._OPTIONS["osd"].."/"  .. _subtarget .. "/" .. rctarget ..".rc"
 		if not os.isfile(rcfile) then
-			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _subtarget .. "/" .. _subtarget ..".rc"
+			rcfile = MAME_DIR .. "src/" .. _target .. "/osd/windows/" .. _subtarget .. "/" .. rctarget ..".rc"
 		end
 		if os.isfile(rcfile) then
 			files {
 				rcfile,
 			}
 			dependency {
-				{ "$(OBJDIR)/".._subtarget ..".res" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc", true  },
+				{ "$(OBJDIR)/".._subtarget ..".res" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", true  },
 			}
 		else
+			rctarget = "mame"
 			files {
 				MAME_DIR .. "src/mame/osd/windows/mame/mame.rc",
 			}
 			dependency {
-				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc", true  },
+				{ "$(OBJDIR)/mame.res" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", true  },
 			}
 		end	
 	end
@@ -185,14 +187,14 @@ function mainProject(_target, _subtarget)
 	
 	configuration { "mingw*" }
 		custombuildtask {	
-			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. _subtarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. _subtarget .. " $(<) > $(@)" }},
+			{ MAME_DIR .. "src/version.c" ,  GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "src/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
 		}	
 	
 	configuration { "vs*" }
 		prebuildcommands {	
 			"mkdir " .. path.translate(GEN_DIR  .. "/resource/","\\") .. " 2>NUL",
-			"@echo Emitting ".. _subtarget .. "vers.rc...",
-			PYTHON .. " " .. path.translate(MAME_DIR .. "src/build/verinfo.py","\\") .. " -r -b " .. _subtarget .. " " .. path.translate(MAME_DIR .. "src/version.c","\\") .. " > " .. path.translate(GEN_DIR  .. "/resource/" .. _subtarget .. "vers.rc", "\\") ,
+			"@echo Emitting ".. rctarget .. "vers.rc...",
+			PYTHON .. " " .. path.translate(MAME_DIR .. "src/build/verinfo.py","\\") .. " -r -b " .. rctarget .. " " .. path.translate(MAME_DIR .. "src/version.c","\\") .. " > " .. path.translate(GEN_DIR  .. "/resource/" .. rctarget .. "vers.rc", "\\") ,
 		}	
 	
 	 

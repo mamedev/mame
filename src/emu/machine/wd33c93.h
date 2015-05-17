@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:ElSemi, R. Belmont, Ryan Holtz
 /*
  * wd33c93.h
  *

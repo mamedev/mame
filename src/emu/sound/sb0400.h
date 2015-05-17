@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galiber
 // Creative labs SB0400 Audigy2 Value
 
 #ifndef SB0400_H

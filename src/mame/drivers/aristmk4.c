@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Palindrome, FraSher
+// copyright-holders:Angelo Salese, Palindrome, FraSher, Roberto Fresca
 /*
     Driver: aristmk4
 

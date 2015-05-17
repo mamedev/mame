@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Ted Green
 // NEC VRC 4373 System Controller
 
 #ifndef VRC4373_H

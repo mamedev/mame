@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Brett Wyer, Raphael Nabet
 /*****************************************************************************
  *
  * includes/corvushd.h

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:GPL-2.0+
+// copyright-holders:Ron Fries,Dan Boris
 #include "emu.h"
 #include "tiaintf.h"
 #include "tiasound.h"

@@ -23,13 +23,28 @@
 
 /*
  * The next options needs -Wno-pmf-conversions to compile and gcc
- * This is intended for non-mame usage.
+ * There is quite some significant speed-up of up to 20% involved.
+ * NO_USE_PMFCONVERSION is for illustrative purposes only. Using PMFs
+ * has some overhead in comparison to calling a virtual function.
+ *
+ * To get a performance increase we need the GCC extension.
  *
  */
-#define USE_PMFDELEGATES        (0)
 
-#if (USE_PMFDELEGATES)
-#pragma GCC diagnostic ignored "-Wpmf-conversions"
+#ifndef USE_PMFDELEGATES
+#if defined(__clang__)
+	#define USE_PMFDELEGATES        	(0)
+	#define NO_USE_PMFCONVERSION		(1)
+#else
+	#if defined(__GNUC__)
+		#define USE_PMFDELEGATES        (1)
+		#define NO_USE_PMFCONVERSION	(0)
+		#pragma GCC diagnostic ignored "-Wpmf-conversions"
+	#else
+		#define USE_PMFDELEGATES        (0)
+		#define NO_USE_PMFCONVERSION	(1)
+	#endif
+#endif
 #endif
 
 /*
@@ -40,9 +55,11 @@
  *
  */
 
-#define USE_DEACTIVE_DEVICE     (0)
 
-#define USE_TRUTHTABLE          (0)
+// moved to parameter NETLIST.USE_DEACTIVATE
+// #define USE_DEACTIVE_DEVICE     (0)
+
+#define USE_TRUTHTABLE          (1)
 
 // The following adds about 10% performance ...
 
@@ -64,9 +81,9 @@
 //  Solver defines
 //============================================================
 
-#define USE_MATRIX_GS (0)
+#define USE_MATRIX_GS (1)
 #define USE_PIVOT_SEARCH (0)
-#define USE_GABS (0)
+#define USE_GABS (1)
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
 #define USE_LINEAR_PREDICTION (0)

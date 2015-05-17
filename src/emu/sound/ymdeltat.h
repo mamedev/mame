@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Jarek Burczynski
 #pragma once
 
 #ifndef __YMDELTAT_H__

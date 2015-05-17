@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Andreas Naive, Olivier Galibert, David Haywood
 /*
   re: Tecmo World Cup '98 (ST-V) (from ANY)
 

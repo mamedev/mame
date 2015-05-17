@@ -3,14 +3,16 @@
 /***************************************************************************
 
   Bandai Tamagotchi generation 1 hardware
-  
-  ** SKELETON Driver - feel free to add notes here, but driver itself is WIP
+  * PCB label TMG-M1
+  * Seiko Epson E0C6S46 MCU under epoxy
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/e0c6200/e0c6s46.h"
 #include "sound/speaker.h"
+
+#include "tama.lh"
 
 
 class tamag1_state : public driver_device
@@ -24,6 +26,8 @@ public:
 
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+
+	DECLARE_WRITE8_MEMBER(speaker_w);
 
 	DECLARE_PALETTE_INIT(tama);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
@@ -39,7 +43,7 @@ public:
 static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 {
 	// 16 COM(common) pins, 40 SEG(segment) pins from MCU,
-	// 32x16 LCD screen and 2 rows of indicators
+	// 32x16 LCD screen:
 	static const int seg2x[0x28] =
 	{
 		0, 1, 2, 3, 4, 5, 6, 7,
@@ -48,16 +52,45 @@ static E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
 		27,26,25,24,36,23,22,21,
 		20,19,18,17,16,37,38,39
 	};
-
+	
 	int y = com, x = seg2x[seg];
 	if (cliprect.contains(x, y))
 		bitmap.pix16(y, x) = state;
+
+	// 2 rows of indicators:
+	// above screen: 0:meal, 1:lamp, 2:play, 3:medicine
+	// under screen: 4:bath, 5:scales, 6:shout, 7:attention
+
+	// they are on pin SEG8(x=35) + COM0-3, pin SEG28(x=36) + COM12-15
+	if (x == 35 && y < 4)
+		output_set_lamp_value(y, state);
+	else if (x == 36 && y >= 12)
+		output_set_lamp_value(y-8, state);
+	
+	// output for svg2lay
+	char buf[0x10];
+	sprintf(buf, "%d.%d", y, x);
+	output_set_value(buf, state);
 }
 
 PALETTE_INIT_MEMBER(tamag1_state, tama)
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(0xf1, 0xf0, 0xf9)); // background
+	palette.set_pen_color(1, rgb_t(0x3c, 0x38, 0x38)); // lcd pixel
+}
+
+
+
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
+WRITE8_MEMBER(tamag1_state::speaker_w)
+{
+	// R43: speaker out
+	m_speaker->level_w(data >> 3 & 1);
 }
 
 
@@ -79,9 +112,9 @@ INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
 
 static INPUT_PORTS_START( tama )
 	PORT_START("K0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)E0C6S46_LINE_K00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)E0C6S46_LINE_K01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tamag1_state, input_changed, (void *)E0C6S46_LINE_K02)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -98,6 +131,7 @@ static MACHINE_CONFIG_START( tama, tamag1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E0C6S46, XTAL_32_768kHz)
 	MCFG_E0C6S46_PIXEL_UPDATE_CB(tama_pixel_update)
+	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(tamag1_state, speaker_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -105,7 +139,7 @@ static MACHINE_CONFIG_START( tama, tamag1_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(40, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 16-1)
-//	MCFG_DEFAULT_LAYOUT(layout_tama)
+	MCFG_DEFAULT_LAYOUT(layout_tama)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", e0c6s46_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -133,4 +167,4 @@ ROM_START( tama )
 ROM_END
 
 
-CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", GAME_NOT_WORKING )
+CONS( 1997, tama, 0, 0, tama, tama, driver_device, 0, "Bandai", "Tamagotchi (USA)", GAME_SUPPORTS_SAVE )

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
 /*****************************************************************************
 
   7474 positive-edge-triggered D-type flip-flop with preset, clear and

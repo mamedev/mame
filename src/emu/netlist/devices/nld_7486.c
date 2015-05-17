@@ -12,16 +12,19 @@ NETLIB_START(7486)
 	register_input("A", m_A);
 	register_input("B", m_B);
 	register_output("Q", m_Q);
+
+	save(NLNAME(m_active));
 }
 
 NETLIB_RESET(7486)
 {
+	m_active = 1;
 }
-
-static const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
 
 NETLIB_UPDATE(7486)
 {
+	const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
+
 	UINT8 t = INPLOGIC(m_A) ^ INPLOGIC(m_B);
 	OUTLOGIC(m_Q, t, delay[t]);
 }
@@ -65,4 +68,34 @@ NETLIB_RESET(7486_dip)
 	m_2.do_reset();
 	m_3.do_reset();
 	m_4.do_reset();
+}
+
+ATTR_HOT void NETLIB_NAME(7486)::inc_active()
+{
+	const netlist_time delay[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(22) };
+	nl_assert(netlist().use_deactivate());
+	if (++m_active == 1)
+	{
+		m_A.activate();
+		m_B.activate();
+
+		netlist_time mt = this->m_A.net().time();
+		if (this->m_B.net().time() > mt)
+			mt = this->m_B.net().time();
+
+		UINT8 t = INPLOGIC(m_A) ^ INPLOGIC(m_B);
+		m_Q.net().set_Q_time(t, mt + delay[t]);
+	}
+}
+
+ATTR_HOT void NETLIB_NAME(7486)::dec_active()
+{
+#if 1
+	nl_assert(netlist().use_deactivate());
+	if (--m_active == 0)
+	{
+		m_A.inactivate();
+		m_B.inactivate();
+	}
+#endif
 }

@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Roberto Lavarone
 /**********************************************************************
 
     SMC KR2376 Keyboard Encoder emulation

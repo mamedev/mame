@@ -122,7 +122,7 @@ public:
 	ATTR_COLD int get_net_idx(netlist_net_t *net);
 	ATTR_COLD virtual void log_stats() {};
 
-	inline const eSolverType type() const { return m_type; }
+	inline eSolverType type() const { return m_type; }
 
 protected:
 
@@ -143,7 +143,7 @@ protected:
 
 	const netlist_solver_parameters_t &m_params;
 
-	ATTR_HOT inline const nl_double current_timestep() { return m_cur_ts; }
+	ATTR_HOT inline nl_double current_timestep() { return m_cur_ts; }
 private:
 
 	netlist_time m_last_step;

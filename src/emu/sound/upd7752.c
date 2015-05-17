@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Angelo Salese
 /***************************************************************************
 
 NEC uPD7752 Voice Synthesizing LSI

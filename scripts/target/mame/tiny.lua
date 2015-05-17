@@ -13,7 +13,7 @@
 
 --------------------------------------------------
 -- Specify all the CPU cores necessary for the
--- drivers referenced in tiny.c.
+-- drivers referenced in tiny.lst.
 --------------------------------------------------
 
 CPUS["Z80"] = true
@@ -28,7 +28,7 @@ CPUS["COP400"] = true
 
 --------------------------------------------------
 -- Specify all the sound cores necessary for the
--- drivers referenced in tiny.c.
+-- drivers referenced in tiny.lst.
 --------------------------------------------------
 
 SOUNDS["SAMPLES"] = true
@@ -72,7 +72,7 @@ BUSES["CENTRONICS"] = true
 --------------------------------------------------
 -- This is the list of files that are necessary
 -- for building all of the drivers referenced
--- in tiny.c
+-- in tiny.lst
 --------------------------------------------------
 
 function createProjects_mame_tiny(_target, _subtarget)
@@ -136,28 +136,6 @@ function createProjects_mame_tiny(_target, _subtarget)
 		MAME_DIR .. "src/mame/drivers/looping.c",
 		MAME_DIR .. "src/mame/drivers/supertnk.c",
 	}
-	
-	--------------------------------------------------
-	-- layout dependencies
-	--------------------------------------------------
-
-	dependency {
-		{ MAME_DIR .. "src/mame/drivers/astrocde.c", GEN_DIR .. "mame/layout/gorf.lh" },
-		{ MAME_DIR .. "src/mame/drivers/astrocde.c", GEN_DIR .. "mame/layout/seawolf2.lh" },
-		{ MAME_DIR .. "src/mame/drivers/astrocde.c", GEN_DIR .. "mame/layout/spacezap.lh" },
-		{ MAME_DIR .. "src/mame/drivers/astrocde.c", GEN_DIR .. "mame/layout/tenpindx.lh" },
-		{ MAME_DIR .. "src/mame/drivers/circus.c", GEN_DIR .. "mame/layout/circus.lh" },
-		{ MAME_DIR .. "src/mame/drivers/circus.c", GEN_DIR .. "mame/layout/crash.lh" },	
-	}
-
-	custombuildtask {
-		layoutbuildtask("mame/layout", "crash"),
-		layoutbuildtask("mame/layout", "circus"),
-		layoutbuildtask("mame/layout", "tenpindx"),
-		layoutbuildtask("mame/layout", "spacezap"),
-		layoutbuildtask("mame/layout", "seawolf2"),
-		layoutbuildtask("mame/layout", "gorf"),
-	}	
 end
 
 function linkProjects_mame_tiny(_target, _subtarget)

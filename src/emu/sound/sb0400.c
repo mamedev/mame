@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galiber
 #include "sb0400.h"
 
 const device_type SB0400 = &device_creator<sb0400_device>;

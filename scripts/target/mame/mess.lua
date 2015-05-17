@@ -606,6 +606,7 @@ BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
 BUSES["MEGADRIVE"] = true
 BUSES["MSX_SLOT"] = true
+BUSES["NASBUS"] = true
 BUSES["NEOGEO"] = true
 BUSES["NES"] = true
 BUSES["NES_CTRL"] = true
@@ -1790,8 +1791,6 @@ files {
 createMESSProjects(_target, _subtarget, "nascom")
 files {            
 	MAME_DIR .. "src/mess/drivers/nascom1.c",
-	MAME_DIR .. "src/mess/machine/nascom1.c",
-	MAME_DIR .. "src/mess/video/nascom1.c", 
 }
 
 createMESSProjects(_target, _subtarget, "ne")

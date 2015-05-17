@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles,smf
 #pragma once
 
 #ifndef __CDDA_H__

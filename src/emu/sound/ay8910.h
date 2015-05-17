@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Couriersud
 #pragma once
 
 #ifndef __AY8910_H__

@@ -662,21 +662,21 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 		case 0x20/4:        // DP_CMD_START
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetStartReg();
+			ret = state->m_rdp->get_start();
 			break;
 		}
 
 		case 0x24/4:        // DP_CMD_END
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetEndReg();
+			ret = state->m_rdp->get_end();
 			break;
 		}
 
 		case 0x28/4:        // DP_CMD_CURRENT
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetCurrentReg();
+			ret = state->m_rdp->get_current();
 			break;
 		}
 
@@ -688,13 +688,13 @@ READ32_MEMBER(n64_periphs::sp_reg_r)
 		case 0x2c/4:        // DP_CMD_STATUS
 		{
 			n64_state *state = machine().driver_data<n64_state>();
-			ret = state->m_rdp->GetStatusReg();
+			ret = state->m_rdp->get_status();
 			break;
 		}
 
 		case 0x30/4:        // DP_CMD_CLOCK
 		{
-			if(!(machine().driver_data<n64_state>()->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+			if(!(machine().driver_data<n64_state>()->m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				ret = dp_clock;
@@ -908,24 +908,24 @@ READ32_MEMBER( n64_periphs::dp_reg_r )
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			ret = state->m_rdp->GetStartReg();
+			ret = state->m_rdp->get_start();
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			ret = state->m_rdp->GetEndReg();
+			ret = state->m_rdp->get_end();
 			break;
 
 		case 0x08/4:        // DP_CURRENT_REG
-			ret = state->m_rdp->GetCurrentReg();
+			ret = state->m_rdp->get_current();
 			break;
 
 		case 0x0c/4:        // DP_STATUS_REG
-			ret = state->m_rdp->GetStatusReg();
+			ret = state->m_rdp->get_status();
 			break;
 
 		case 0x10/4:        // DP_CLOCK_REG
 		{
-			if(!(state->m_rdp->GetStatusReg() & DP_STATUS_FREEZE))
+			if(!(state->m_rdp->get_status() & DP_STATUS_FREEZE))
 			{
 				dp_clock += 13;
 				ret = dp_clock;
@@ -948,20 +948,20 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 	switch (offset)
 	{
 		case 0x00/4:        // DP_START_REG
-			state->m_rdp->SetStartReg(data);
-			state->m_rdp->SetCurrentReg(state->m_rdp->GetStartReg());
+			state->m_rdp->set_start(data);
+			state->m_rdp->set_current(state->m_rdp->get_start());
 			break;
 
 		case 0x04/4:        // DP_END_REG
-			state->m_rdp->SetEndReg(data);
+			state->m_rdp->set_end(data);
 			g_profiler.start(PROFILER_USER1);
-			state->m_rdp->ProcessList();
+			state->m_rdp->process_command_list();
 			g_profiler.stop();
 			break;
 
 		case 0x0c/4:        // DP_STATUS_REG
 		{
-			UINT32 current_status = state->m_rdp->GetStatusReg();
+			UINT32 current_status = state->m_rdp->get_status();
 			if (data & 0x00000001)  current_status &= ~DP_STATUS_XBUS_DMA;
 			if (data & 0x00000002)  current_status |= DP_STATUS_XBUS_DMA;
 			if (data & 0x00000004)  current_status &= ~DP_STATUS_FREEZE;
@@ -969,7 +969,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 			if (data & 0x00000010)  current_status &= ~DP_STATUS_FLUSH;
 			if (data & 0x00000020)  current_status |= DP_STATUS_FLUSH;
 			if (data & 0x00000200)  dp_clock = 0;
-			state->m_rdp->SetStatusReg(current_status);
+			state->m_rdp->set_status(current_status);
 			break;
 		}
 
@@ -1025,7 +1025,7 @@ void n64_periphs::vi_recalculate_resolution()
 	if (height > 480)
 		height = 480;
 
-	state->m_rdp->MiscState.FBHeight = height;
+	state->m_rdp->m_misc_state.m_fb_height = height;
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
@@ -1122,7 +1122,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 				vi_recalculate_resolution();
 			}
 			vi_width = data;
-			state->m_rdp->MiscState.FBWidth = data;
+			state->m_rdp->m_misc_state.m_fb_width = data;
 			break;
 
 		case 0x0c/4:        // VI_INTR_REG

@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
 /*
     Sega Model 2: i960KB + (5x TGP) or (2x SHARC) or (2x TGPx4)
     System 24 tilemaps
@@ -7,7 +7,7 @@
     (68000 + YM3834 + 2x MultiPCM) or (68000 + SCSP)
 
     Hardware and protection reverse-engineering and general assistance by ElSemi.
-    MAME driver by R. Belmont, Olivier Galibert, and ElSemi.
+    MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
 
     TODO (updated as for April 2014):
     - all Model 2B games: FIFO comms looks way wrong, and 3d is mostly missing/incomplete. Games also tends to stalls at some point, culprit might be when i960 tries

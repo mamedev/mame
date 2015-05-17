@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:BSD-3-Clause
+// copyright-holders:Acho A. Tang,R. Belmont
 /*********************************************************
 
     Irem GA20 PCM Sound Chip
