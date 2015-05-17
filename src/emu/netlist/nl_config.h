@@ -75,7 +75,13 @@
 
 #define NETLIST_GMIN_DEFAULT    (1e-9)
 
+
+//#define nl_double float
+//#define NL_FCONST(x) (x ## f)
+
 #define nl_double double
+#define NL_FCONST(x) x
+
 
 //============================================================
 //  Solver defines

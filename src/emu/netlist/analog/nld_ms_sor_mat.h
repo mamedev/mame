@@ -113,10 +113,12 @@ ATTR_HOT nl_double netlist_matrix_solver_SOR_mat_t<m_N, _storage_N>::vsolve()
 			sqo += this->m_Vdelta[k] * this->m_Vdelta[k];
 			this->m_Vdelta[k] = nv;
 		}
-		if (sqo > 1e-90)
+
+		// FIXME: used to be 1e90, but this would not be compatible with float
+		if (sqo > NL_FCONST(1e-20))
 			m_lp_fact = std::min(nl_math::sqrt(sq/sqo), (nl_double) 2.0);
 		else
-			m_lp_fact = 0.0;
+			m_lp_fact = NL_FCONST(0.0);
 	}
 
 

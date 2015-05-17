@@ -138,22 +138,22 @@ ATTR_HOT inline int netlist_matrix_solver_SOR_t<m_N, _storage_N>::vsolve_non_dyn
 
 		if (USE_GABS)
 		{
-			gabs_t *= 0.95; // avoid rounding issues
+			gabs_t *= NL_FCONST(0.95); // avoid rounding issues
 			if (gabs_t <= gtot_t)
 			{
 				w[k] = ws / gtot_t;
-				one_m_w[k] = 1.0 - ws;
+				one_m_w[k] = NL_FCONST(1.0) - ws;
 			}
 			else
 			{
-				w[k] = 1.0 / (gtot_t + gabs_t);
-				one_m_w[k] = 1.0 - 1.0 * gtot_t / (gtot_t + gabs_t);
+				w[k] = NL_FCONST(1.0) / (gtot_t + gabs_t);
+				one_m_w[k] = NL_FCONST(1.0) - NL_FCONST(1.0) * gtot_t / (gtot_t + gabs_t);
 			}
 		}
 		else
 		{
 			w[k] = ws / gtot_t;
-			one_m_w[k] = 1.0 - ws;
+			one_m_w[k] = NL_FCONST(1.0) - ws;
 		}
 	}
 

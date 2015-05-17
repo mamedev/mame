@@ -601,7 +601,7 @@ public:
 
 	ATTR_HOT void update()
 	{
-		double val = INPANALOG(m_in);
+		nl_double val = INPANALOG(m_in);
 		sound_update(netlist().time());
 		m_cur = (stream_sample_t) (val * m_mult.Value() + m_offset.Value());
 	}
@@ -685,7 +685,7 @@ public:
 		{
 			if (m_buffer[i] == NULL)
 				break; // stop, called outside of stream_update
-			double v = m_buffer[i][m_pos];
+			nl_double v = m_buffer[i][m_pos];
 			m_param[i]->setTo(v * m_param_mult[i].Value() + m_param_offset[i].Value());
 		}
 		m_pos++;

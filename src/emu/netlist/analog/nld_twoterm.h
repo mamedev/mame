@@ -140,7 +140,7 @@ public:
 
 	inline void set_R(const nl_double R)
 	{
-		set(1.0 / R, 0.0, 0.0);
+		set(NL_FCONST(1.0) / R, 0.0, 0.0);
 	}
 
 protected:
@@ -216,7 +216,7 @@ public:
 	{
 		//FIXME: Optimize cutoff case
 
-		if (nVd < -5.0 * m_Vt)
+		if (nVd < NL_FCONST(-5.0) * m_Vt)
 		{
 			m_Vd = nVd;
 			m_G = m_gmin;
@@ -227,17 +227,17 @@ public:
 			m_Vd = nVd;
 
 			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - 1.0);
+			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
 		else
 		{
 			nl_double a = (nVd - m_Vd) * m_VtInv;
-			if (a<1e-12 - 1.0) a = 1e-12 - 1.0;
+			if (a < NL_FCONST(1e-12) - NL_FCONST(1.0)) a = NL_FCONST(1e-12) - NL_FCONST(1.0);
 			m_Vd = m_Vd + nl_math::e_log1p(a) * m_Vt;
 
 			const nl_double eVDVt = nl_math::exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - 1.0);
+			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
 
 			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
 		}
