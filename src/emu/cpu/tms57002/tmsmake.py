@@ -420,10 +420,7 @@ def CheckSelfAssign(line):
         return False
     lhs = ls[0].strip()
     rhs = ls[1].strip().rstrip(';')
-    if lhs == rhs:
-        return True
-    else:
-        return False
+    return lhs == rhs
 
 ins_list = LoadLst(sys.argv[1])
 try:
