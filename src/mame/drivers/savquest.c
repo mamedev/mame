@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Peter Ferrie
 /***************************************************************************
 
     savquest.c
