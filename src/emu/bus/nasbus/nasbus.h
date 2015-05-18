@@ -114,6 +114,9 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	nasbus_slot_device::set_nasbus_slot(*device, owner, NASBUS_TAG);
 
+#define MCFG_NASBUS_RAM_DISABLE_HANDLER(_devcb) \
+	devcb = &nasbus_device::set_ram_disable_handler(*device, DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -155,10 +158,16 @@ public:
     nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~nasbus_device();
 
+	template<class _Object> static devcb_base &set_ram_disable_handler(device_t &device, _Object object)
+		{ return downcast<nasbus_device &>(device).m_ram_disable_handler.set_callback(object); }
+
 	void add_card(device_nasbus_card_interface *card);
 
 	void set_program_space(address_space *program);
 	void set_io_space(address_space *io);
+
+	// from cards
+	DECLARE_WRITE_LINE_MEMBER( ram_disable_w );
 
 	address_space *m_program;
 	address_space *m_io;
@@ -170,6 +179,8 @@ protected:
 
 private:
 	simple_list<device_nasbus_card_interface> m_dev;
+
+	devcb_write_line m_ram_disable_handler;
 };
 
 // device type definition

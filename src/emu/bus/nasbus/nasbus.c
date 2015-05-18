@@ -72,7 +72,8 @@ const device_type NASBUS = &device_creator<nasbus_device>;
 nasbus_device::nasbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, NASBUS_SLOT, "NASBUS Backplane", tag, owner, clock, "nasbus", __FILE__),
 	m_program(NULL),
-	m_io(NULL)
+	m_io(NULL),
+	m_ram_disable_handler(*this)
 {
 }
 
@@ -91,6 +92,8 @@ nasbus_device::~nasbus_device()
 
 void nasbus_device::device_start()
 {
+	// resolve callbacks
+	m_ram_disable_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -128,6 +131,9 @@ void nasbus_device::set_io_space(address_space *io)
 {
 	m_io = io;
 }
+
+// callbacks from slot device to the host
+WRITE_LINE_MEMBER( nasbus_device::ram_disable_w ) { m_ram_disable_handler(state); }
 
 
 //**************************************************************************

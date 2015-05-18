@@ -109,6 +109,8 @@ public:
 	m_socket2(*this, "socket2")
 	{}
 
+	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
+
 	virtual DECLARE_DRIVER_INIT(nascom);
 	UINT32 screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -340,6 +342,17 @@ DRIVER_INIT_MEMBER( nascom2_state, nascom )
 	// setup nasbus
 	m_nasbus->set_program_space(&m_maincpu->space(AS_PROGRAM));
 	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
+}
+
+// since we don't know for which regions we should disable ram, we just let other devices
+// overwrite the region they need, and re-install our ram when they are disabled
+WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
+{
+	if (state)
+	{
+		// enable ram again
+		m_maincpu->space(AS_PROGRAM).install_ram(0x1000, 0x1000 + m_ram->size() - 1, m_ram->pointer());
+	}
 }
 
 
@@ -574,8 +587,8 @@ static MACHINE_CONFIG_START( nascom1, nascom1_state )
 
 	// internal extra ram
 	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
+	MCFG_RAM_DEFAULT_SIZE("48K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
 
 	// devices
 	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
@@ -606,6 +619,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( nascom2, nascom1, nascom2_state )
 
 	// nasbus expansion bus
 	MCFG_NASBUS_ADD(NASBUS_TAG)
+	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(nascom2_state, ram_disable_w))
 	MCFG_NASBUS_SLOT_ADD("nasbus1", nasbus_slot_cards, NULL)
 	MCFG_NASBUS_SLOT_ADD("nasbus2", nasbus_slot_cards, NULL)
 	MCFG_NASBUS_SLOT_ADD("nasbus3", nasbus_slot_cards, NULL)

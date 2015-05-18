@@ -2426,6 +2426,8 @@ if (BUSES["NASBUS"]~=null) then
 		MAME_DIR .. "src/emu/bus/nasbus/nasbus.h",
 		MAME_DIR .. "src/emu/bus/nasbus/cards.c",
 		MAME_DIR .. "src/emu/bus/nasbus/cards.h",
+		MAME_DIR .. "src/emu/bus/nasbus/avc.c",
+		MAME_DIR .. "src/emu/bus/nasbus/avc.h",
 		MAME_DIR .. "src/emu/bus/nasbus/floppy.c",
 		MAME_DIR .. "src/emu/bus/nasbus/floppy.h",
 	}
