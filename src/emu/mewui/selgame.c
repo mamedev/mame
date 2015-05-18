@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/selgame.c
+    mewui/selgame.c
 
     Game selector
 
@@ -27,7 +27,9 @@
 //  ctor
 //-------------------------------------------------
 
-ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container), m_driverlist(driver_list::total() + 1)
+ui_menu_select_game::ui_menu_select_game(running_machine &machine, render_container *container, const char *gamename) : ui_menu(machine, container),
+	m_availablelist(driver_list::total() + 1),
+	m_fulllist(driver_list::total() + 1)
 {
 	build_driver_list();
 	if(gamename)
@@ -53,8 +55,14 @@ ui_menu_select_game::~ui_menu_select_game()
 
 void ui_menu_select_game::build_driver_list()
 {
-	// start with an empty list
+	// first start with an full list
 	m_drivlist.reset(global_alloc(driver_enumerator(machine().options())));
+	int listnum = 0;
+	m_drivlist->include_all();
+	while (m_drivlist->next())
+		m_fulllist[listnum++] = &m_drivlist->driver();
+
+	// then restart with an empty list
 	m_drivlist->exclude_all();
 
 	// open a path to the ROMs and find them in the array
@@ -80,12 +88,12 @@ void ui_menu_select_game::build_driver_list()
 
 	// now build the final list
 	m_drivlist->reset();
-	int listnum = 0;
+	listnum = 0;
 	while (m_drivlist->next())
-		m_driverlist[listnum++] = &m_drivlist->driver();
+		m_availablelist[listnum++] = &m_drivlist->driver();
 
 	// NULL-terminate
-	m_driverlist[listnum] = NULL;
+	m_availablelist[listnum] = NULL;
 }
 
 
@@ -222,8 +230,8 @@ void ui_menu_select_game::populate()
 {
 	int curitem, matchcount;
 
-	for (curitem = matchcount = 0; m_driverlist[curitem] != NULL; curitem++)
-		if (!(m_driverlist[curitem]->flags & GAME_NO_STANDALONE))
+	for (curitem = matchcount = 0; m_availablelist[curitem] != NULL; curitem++)
+		if (!(m_availablelist[curitem]->flags & GAME_NO_STANDALONE))
 			matchcount++;
 
 	// if nothing there, add a single multiline item and return
@@ -262,10 +270,10 @@ void ui_menu_select_game::populate()
 	else
 	{
 		// iterate over entries
-		for (curitem = 0; m_driverlist[curitem] != NULL; curitem++)
+		for (curitem = 0; m_fulllist[curitem] != NULL; curitem++)
 		{
-			int cloneof = driver_list::non_bios_clone(*m_driverlist[curitem]);
-			item_append(m_driverlist[curitem]->name, m_driverlist[curitem]->description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)m_driverlist[curitem]);
+			int cloneof = driver_list::non_bios_clone(*m_fulllist[curitem]);
+			item_append(m_fulllist[curitem]->name, m_fulllist[curitem]->description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)m_fulllist[curitem]);
 		}
 	}
 
@@ -296,10 +304,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	int line;
 
 	// display the current typeahead
-	if (m_search[0] != 0)
-		strprintf(tempbuf[0], "MEWUI - Type name or select: %s_", m_search);
-	else
-		strprintf(tempbuf[0],"MEWUI - Type name or select: (random)");
+	strprintf(tempbuf[0], "MEWUI - Type name or select: %s_", m_search);
 
 	// get the size of the text
 	machine().ui().draw_text_full(container, tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,

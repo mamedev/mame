@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
+#include "mewui/menu.h"
 #include "ui/imgcntrl.h"
 #include "ui/filesel.h"
 #include "ui/swlist.h"

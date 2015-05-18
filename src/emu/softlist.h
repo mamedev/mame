@@ -11,7 +11,7 @@
 #ifndef __SOFTLIST_H_
 #define __SOFTLIST_H_
 
-#include "ui/menu.h"
+#include "mewui/menu.h"
 #include "cstrpool.h"
 
 

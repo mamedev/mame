@@ -13,4 +13,6 @@ end
 files {
 	MAME_DIR .. "src/emu/mewui/selgame.c",
 	MAME_DIR .. "src/emu/mewui/selgame.h",
+	MAME_DIR .. "src/emu/mewui/menu.c",
+	MAME_DIR .. "src/emu/mewui/menu.h",
 }

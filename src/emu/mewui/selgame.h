@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/selgame.h
+    mewui/selgame.h
 
     Game selector
 
@@ -35,7 +35,8 @@ private:
 	UINT8                   m_error;
 	char                    m_search[40];
 	int                     m_matchlist[VISIBLE_GAMES_IN_SEARCH];
-	std::vector<const game_driver *> m_driverlist;
+	std::vector<const game_driver *> m_availablelist;
+	std::vector<const game_driver *> m_fulllist;
 	auto_pointer<driver_enumerator> m_drivlist;
 
 	// internal methods
