@@ -203,7 +203,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 		case 0x1c/4:
 			if (ACCESSING_BITS_0_7) {
 				if (!m_serial_data) {
-					m_serial_idx = data&0xff;
+					m_serial_idx = data&0xf;
 				} else {
 					m_serial_reg1c[m_serial_idx] = data&0xff;
 					m_serial_idx = 0;
@@ -212,7 +212,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 			}
 			if (ACCESSING_BITS_8_15) {
 				if (!m_serial_data) {
-					m_serial_idx = (data&0xff00)>>8;
+					m_serial_idx = (data&0x0f00)>>8;
 				} else {
 					m_serial_reg1d[m_serial_idx] = (data&0xff00)>>8;
 				}
