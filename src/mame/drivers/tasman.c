@@ -1,5 +1,5 @@
 // license:???
-// copyright-holders:???
+// copyright-holders:Phil Bennett, R. Belmont 
 /*
   Konami Gambling Games ("Tasman" hardware)
   System GX derivative

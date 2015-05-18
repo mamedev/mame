@@ -1,5 +1,5 @@
-// license:???
-// copyright-holders:???
+// license:LGPL-2.1+
+// copyright-holders:Tomasz Slanina, David Haywood
 /*
 Real Battle Mahjong King by 'Game Men System Co. Ltd.'
 
