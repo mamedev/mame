@@ -6,7 +6,7 @@ namespace DSP56K
 {
 const reg_id& ParallelMove::opSource() const { return m_oco->instSource(); }
 const reg_id& ParallelMove::opDestination() const { return m_oco->instDestination(); }
-const size_t ParallelMove::opAccumulatorBitsModified() const { return m_oco->instAccumulatorBitsModified(); }
+size_t ParallelMove::opAccumulatorBitsModified() const { return m_oco->instAccumulatorBitsModified(); }
 
 
 ParallelMove* ParallelMove::decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1)

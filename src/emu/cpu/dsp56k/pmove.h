@@ -26,12 +26,12 @@ public:
 
 	static ParallelMove* decodeParallelMove(const Opcode* opc, const UINT16 word0, const UINT16 word1);
 
-	const bool valid() const { return m_valid; }
+	bool valid() const { return m_valid; }
 
 	// Peek through the opcode to see the instruction
 	const reg_id& opSource() const;
 	const reg_id& opDestination() const;
-	const size_t opAccumulatorBitsModified() const;
+	size_t opAccumulatorBitsModified() const;
 
 protected:
 	bool m_valid;

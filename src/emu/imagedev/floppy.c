@@ -250,7 +250,7 @@ void floppy_image_device::set_rpm(float _rpm)
 
 	rpm = _rpm;
 	rev_time = attotime::from_double(60/rpm);
-	floppy_ratio_1 = int(1000*rpm/300+0.5);
+	floppy_ratio_1 = int(1000.0f*rpm/300.0f+0.5f);
 }
 
 void floppy_image_device::setup_write(floppy_image_format_t *_output_format)

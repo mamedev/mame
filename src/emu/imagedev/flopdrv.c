@@ -145,7 +145,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 /* index pulses at rpm/60 Hz, and stays high 1/20th of time */
 void legacy_floppy_image_device::floppy_drive_index_func()
 {
-	double ms = 1000.0 / (m_rpm / 60.0);
+	double ms = 1000.0 / ((double) m_rpm / 60.0);
 
 	if (m_idx)
 	{

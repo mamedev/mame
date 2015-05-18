@@ -1181,9 +1181,9 @@ WRITE32_MEMBER(chihiro_state::audio_apu_w)
 	}
 	if (offset == 0x2037c / 4) { // value related to sample rate
 		INT16 v = (INT16)(data >> 16); // upper 16 bits as a signed 16 bit value
-		float vv = ((float)v) / 4096.0; // divide by 4096
+		float vv = ((float)v) / 4096.0f; // divide by 4096
 		float vvv = powf(2, vv); // two to the vv
-		int f = vvv*48000.0; // sample rate
+		int f = vvv*48000.0f; // sample rate
 		apust.voices_frequency[apust.voice_number] = f;
 		return;
 	}
